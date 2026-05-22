@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h, ref, nextTick } from 'vue'
 import { Carousel } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Carousel', () => {
   beforeEach(() => {
@@ -463,6 +464,18 @@ describe('Carousel', () => {
   })
 
   describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      vi.useRealTimers()
+
+      const { container } = render(Carousel, {
+        slots: {
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
+        }
+      })
+
+      await expectNoA11yViolationsIsolated(container)
+    })
+
     it('should have proper ARIA attributes on container', () => {
       const { container } = render(Carousel, {
         slots: {
@@ -623,6 +636,12 @@ describe('Carousel', () => {
       await nextTick()
 
       expect(onChange).toHaveBeenCalledWith(2, 0)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

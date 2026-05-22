@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { FormWizard } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const steps = [{ title: 'Step 1' }, { title: 'Step 2' }]
 
@@ -122,6 +123,18 @@ describe('FormWizard (React)', () => {
 
       await user.click(screen.getByRole('button', { name: 'Next' }))
       expect(autoSave).toHaveBeenCalledWith(1, steps[1])
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<FormWizard />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

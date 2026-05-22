@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
 import { Steps, StepsItem } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Steps', () => {
   describe('Rendering', () => {
@@ -270,6 +271,18 @@ describe('Steps', () => {
       expect(screen.getByText('Login')).toBeInTheDocument()
       expect(screen.getByText('Verify')).toBeInTheDocument()
       expect(screen.getByText('Complete')).toBeInTheDocument()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Steps />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

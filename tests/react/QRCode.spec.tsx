@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { QRCode } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('QRCode', () => {
   // --- Basic rendering ---
@@ -96,5 +97,17 @@ describe('QRCode', () => {
     const rects2 = c2.querySelectorAll('svg rect').length
     expect(rects1).toBeGreaterThan(1)
     expect(rects2).toBeGreaterThan(1)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<QRCode value="https://example.com" />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

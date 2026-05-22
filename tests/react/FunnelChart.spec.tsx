@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { FunnelChart } from '@expcat/tigercat-react'
-import { renderWithProps } from '../utils/render-helpers-react'
-import { fireEvent } from '@testing-library/react'
+import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
+import { fireEvent, render } from '@testing-library/react'
 
 const defaultSize = { width: 320, height: 300 }
 
@@ -139,5 +139,17 @@ describe('FunnelChart (React)', () => {
 
     expect(container.querySelector('title')?.textContent).toBe('Funnel Title')
     expect(container.querySelector('desc')?.textContent).toBe('Funnel Description')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<FunnelChart data={sampleData} width={320} height={300} />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

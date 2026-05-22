@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { ColorPicker } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ColorPicker', () => {
   // --- Basic rendering ---
@@ -80,5 +81,17 @@ describe('ColorPicker', () => {
     const { container } = render(<ColorPicker value="#2563eb" />)
     fireEvent.click(container.querySelector('[role="button"]')!)
     expect(container.querySelector('input[type="range"]')).toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<ColorPicker />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

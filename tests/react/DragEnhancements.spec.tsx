@@ -6,6 +6,7 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { List, Tree, Modal } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const sampleListData = [
   { key: 1, title: 'Item 1' },
@@ -154,5 +155,21 @@ describe('Modal - Drag Enhancements', () => {
 
     const dialog = document.querySelector('[data-tiger-modal]') as HTMLElement
     expect(dialog.style.transform).toBe('')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      render(
+        <Modal open={true} title="Test Modal">
+          <p>content</p>
+        </Modal>
+      )
+      await expectNoA11yViolationsIsolated(document.body)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

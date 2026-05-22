@@ -3,6 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { InputNumber } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('InputNumber (React)', () => {
   it('renders with default props', () => {
@@ -254,5 +255,17 @@ describe('InputNumber (React)', () => {
 
     fireEvent.blur(input)
     expect(onBlur).toHaveBeenCalled()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<InputNumber />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

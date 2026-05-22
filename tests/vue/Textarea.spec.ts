@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event'
 import { Textarea } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables,
@@ -530,7 +530,7 @@ describe('Textarea', () => {
         }
       })
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('should be keyboard accessible', async () => {

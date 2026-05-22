@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Radio, RadioGroup } from '@expcat/tigercat-react'
 import {
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables
@@ -674,7 +674,7 @@ describe('Radio', () => {
           </RadioGroup>
         )
 
-        await expectNoA11yViolations(container)
+        await expectNoA11yViolationsIsolated(container)
       })
     })
   })
@@ -707,7 +707,7 @@ describe('Radio', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<Radio value="option1">Accessible Radio</Radio>)
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('should be focusable', () => {

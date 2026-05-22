@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { Mentions } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const defaultOptions = [
   { value: 'alice', label: 'Alice' },
@@ -86,9 +87,7 @@ describe('Mentions', () => {
 
   // --- Keyboard navigation ---
   it('navigates options with ArrowDown and ArrowUp', async () => {
-    const { container } = render(
-      <Mentions options={defaultOptions} value="" onChange={vi.fn()} />
-    )
+    const { container } = render(<Mentions options={defaultOptions} value="" onChange={vi.fn()} />)
     const textarea = container.querySelector('textarea')!
 
     fireEvent.change(textarea, {
@@ -122,9 +121,7 @@ describe('Mentions', () => {
   })
 
   it('closes dropdown on Escape', async () => {
-    const { container } = render(
-      <Mentions options={defaultOptions} value="" onChange={vi.fn()} />
-    )
+    const { container } = render(<Mentions options={defaultOptions} value="" onChange={vi.fn()} />)
     const textarea = container.querySelector('textarea')!
 
     fireEvent.change(textarea, {
@@ -157,9 +154,7 @@ describe('Mentions', () => {
 
   // --- Filtering ---
   it('filters options based on query text', async () => {
-    const { container } = render(
-      <Mentions options={defaultOptions} value="" onChange={vi.fn()} />
-    )
+    const { container } = render(<Mentions options={defaultOptions} value="" onChange={vi.fn()} />)
     const textarea = container.querySelector('textarea')!
 
     fireEvent.change(textarea, {
@@ -191,10 +186,7 @@ describe('Mentions', () => {
 
   // --- Disabled options ---
   it('does not select disabled options', async () => {
-    const disabledOptions = [
-      ...defaultOptions,
-      { value: 'dave', label: 'Dave', disabled: true }
-    ]
+    const disabledOptions = [...defaultOptions, { value: 'dave', label: 'Dave', disabled: true }]
     const onSelect = vi.fn()
     const { container } = render(
       <Mentions options={disabledOptions} value="" onChange={vi.fn()} onSelect={onSelect} />
@@ -209,5 +201,17 @@ describe('Mentions', () => {
     // Since filter excludes disabled, dropdown might be empty or not shown
     // This covers the disabled option filtering branch
     expect(container.querySelector('textarea')).toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Mentions />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

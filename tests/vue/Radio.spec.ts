@@ -9,7 +9,7 @@ import { ref, nextTick, defineComponent, h } from 'vue'
 import { Radio, RadioGroup } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables
@@ -314,7 +314,7 @@ describe('Radio', () => {
         slots: { default: 'Accessible Radio' }
       })
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('should be focusable', () => {
@@ -819,7 +819,7 @@ describe('Radio', () => {
           `
         })
 
-        await expectNoA11yViolations(container)
+        await expectNoA11yViolationsIsolated(container)
       })
     })
   })

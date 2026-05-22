@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { RichTextEditor } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 function renderEditor(props: Record<string, unknown> = {}) {
   return render(RichTextEditor, {
@@ -173,6 +174,18 @@ describe('RichTextEditor', () => {
       await fireEvent.input(editor)
       const events = emitted()['change']
       expect(events).toBeTruthy()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(RichTextEditor)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

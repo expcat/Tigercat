@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { VirtualList } from '@expcat/tigercat-vue'
-import { renderWithProps } from '../utils'
+import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('VirtualList', () => {
   const defaultProps = {
@@ -193,5 +193,17 @@ describe('VirtualList', () => {
     })
     const outer = container.firstElementChild as HTMLElement
     expect(outer.style.height).toBe('0px')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(VirtualList)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

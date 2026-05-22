@@ -6,6 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import React from 'react'
 import { Statistic } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function createFrameScheduler() {
   let nextFrame = 1
@@ -111,5 +112,17 @@ describe('Statistic', () => {
 
     expect(requestAnimationFrame).not.toHaveBeenCalled()
     expect(screen.getByText('Active')).toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Statistic />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

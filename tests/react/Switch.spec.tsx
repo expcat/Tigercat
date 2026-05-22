@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Switch } from '@expcat/tigercat-react'
 import {
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables
@@ -174,7 +174,7 @@ describe('Switch', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<Switch aria-label="Toggle switch" />)
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('should have proper role and aria attributes', () => {

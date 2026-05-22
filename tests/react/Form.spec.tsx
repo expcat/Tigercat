@@ -13,7 +13,7 @@ import {
   type FormRule,
   type FormRules
 } from '@expcat/tigercat-react'
-import { expectNoA11yViolations } from '../utils/react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Form', () => {
   // ==================== Basic Functionality ====================
@@ -1183,7 +1183,7 @@ describe('Form', () => {
         </Form>
       )
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('associates label with input field', () => {

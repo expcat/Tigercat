@@ -9,7 +9,7 @@ import { Input } from '@expcat/tigercat-vue'
 import type { InputType, InputStatus } from '@expcat/tigercat-core'
 import {
   renderWithProps,
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables,
@@ -514,7 +514,7 @@ describe('Input', () => {
         }
       })
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('should be keyboard accessible', async () => {

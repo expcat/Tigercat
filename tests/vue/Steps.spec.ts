@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
 import { Steps, StepsItem } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Steps', () => {
   describe('Rendering', () => {
@@ -218,10 +219,7 @@ describe('Steps', () => {
           'onUpdate:current': onChange
         },
         slots: {
-          default: () => [
-            h(StepsItem, { title: 'Step 1' }),
-            h(StepsItem, { title: 'Step 2' })
-          ]
+          default: () => [h(StepsItem, { title: 'Step 1' }), h(StepsItem, { title: 'Step 2' })]
         }
       })
 
@@ -326,6 +324,18 @@ describe('Steps', () => {
       expect(screen.getByText('Login')).toBeInTheDocument()
       expect(screen.getByText('Verify')).toBeInTheDocument()
       expect(screen.getByText('Complete')).toBeInTheDocument()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Steps)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

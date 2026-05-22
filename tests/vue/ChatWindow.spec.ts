@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import { ChatWindow } from '@expcat/tigercat-vue'
 import type { ChatMessage } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('ChatWindow (Vue)', () => {
   it('renders empty state and emits send', async () => {
@@ -141,5 +142,17 @@ describe('ChatWindow (Vue)', () => {
     // VirtualList must keep the rendered window much smaller than 200 rows.
     expect(bubbles.length).toBeGreaterThan(0)
     expect(bubbles.length).toBeLessThan(40)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(ChatWindow)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

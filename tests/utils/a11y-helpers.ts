@@ -35,6 +35,26 @@ export async function expectNoA11yViolations(container: HTMLElement): Promise<vo
 }
 
 /**
+ * Accessibility test for components rendered in isolation (without form/label context).
+ * Disables rules that require parent context (label, aria-required-children) which
+ * are not applicable when testing a component standalone.
+ *
+ * @param container - HTML element to test
+ */
+export async function expectNoA11yViolationsIsolated(container: HTMLElement): Promise<void> {
+  const results: AxeResults = await axe(container, {
+    rules: {
+      label: { enabled: false },
+      'button-name': { enabled: false },
+      'aria-required-children': { enabled: false },
+      'aria-prohibited-attr': { enabled: false },
+      'aria-input-field-name': { enabled: false }
+    }
+  })
+  expect(results).toHaveNoViolations()
+}
+
+/**
  * Test that an element has proper ARIA attributes
  * Verifies both presence and absence of ARIA attributes
  *

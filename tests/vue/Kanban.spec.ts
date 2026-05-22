@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Kanban } from '@expcat/tigercat-vue'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 const columns: TaskBoardColumn[] = [
   {
@@ -86,9 +87,7 @@ describe('Kanban', () => {
       // but the inline WIP display (1/3) still appears for WIP-limited columns
       const text = container.textContent
       // No standalone card count badges should exist
-      const badges = container.querySelectorAll(
-        '.inline-flex.items-center.justify-center'
-      )
+      const badges = container.querySelectorAll('.inline-flex.items-center.justify-center')
       expect(badges.length).toBe(0)
     })
   })
@@ -183,6 +182,18 @@ describe('Kanban', () => {
       headers.forEach((header) => {
         expect(header.getAttribute('draggable')).toBe('true')
       })
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Kanban)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

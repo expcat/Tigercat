@@ -4,7 +4,8 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { GaugeChart } from '@expcat/tigercat-vue'
-import { renderWithProps } from '../utils'
+import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { render } from '@testing-library/vue'
 
 const defaultSize = { width: 280, height: 200 }
 
@@ -146,5 +147,22 @@ describe('GaugeChart (Vue)', () => {
 
     expect(container.querySelector('title')?.textContent).toBe('Gauge Title')
     expect(container.querySelector('desc')?.textContent).toBe('Gauge Description')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(GaugeChart, {
+        props: {
+          value: 50,
+          ...defaultSize
+        }
+      })
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

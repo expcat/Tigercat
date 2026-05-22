@@ -9,7 +9,7 @@ import { nextTick, defineComponent, h, ref } from 'vue'
 import { Checkbox, CheckboxGroup } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables
@@ -730,7 +730,7 @@ describe('Checkbox', () => {
         slots: { default: 'Accessible Checkbox' }
       })
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('is focusable', () => {
@@ -763,7 +763,7 @@ describe('Checkbox', () => {
         `
       })
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
   })
 

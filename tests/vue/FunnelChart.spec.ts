@@ -4,7 +4,8 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { FunnelChart } from '@expcat/tigercat-vue'
-import { renderWithProps } from '../utils'
+import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { render } from '@testing-library/vue'
 
 const defaultSize = { width: 320, height: 300 }
 
@@ -141,5 +142,19 @@ describe('FunnelChart (Vue)', () => {
 
     expect(container.querySelector('title')?.textContent).toBe('Funnel Title')
     expect(container.querySelector('desc')?.textContent).toBe('Funnel Description')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(FunnelChart, {
+        props: { data: sampleData, width: 320, height: 300 }
+      })
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

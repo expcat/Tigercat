@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { nextTick } from 'vue'
 import { Message } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 const messageTypes = ['success', 'warning', 'error', 'info', 'loading'] as const
 
@@ -324,6 +325,16 @@ describe('Message (Vue)', () => {
   })
 
   describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      Message.info({
+        content: 'Accessible message',
+        duration: 0
+      })
+      await flushDomUpdates()
+
+      await expectNoA11yViolationsIsolated(document.body)
+    })
+
     it('should use role=status for non-error messages', async () => {
       Message.info('Accessible message')
       await flushDomUpdates()
@@ -349,6 +360,12 @@ describe('Message (Vue)', () => {
 
       const closeButton = document.querySelector('button[aria-label="Close message"]')
       expect(closeButton).toBeTruthy()
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

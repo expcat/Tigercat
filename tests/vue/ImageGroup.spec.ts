@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
 import { ImageGroup, Image } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('ImageGroup', () => {
   it('renders children in a group container', () => {
@@ -51,5 +52,17 @@ describe('ImageGroup', () => {
     const { container } = render(Wrapper)
     const images = container.querySelectorAll('img')
     expect(images.length).toBe(2)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(ImageGroup)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { ChatWindow } from '@expcat/tigercat-react'
 import type { ChatMessage } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ChatWindow (React)', () => {
   it('renders empty state and sends message', async () => {
@@ -127,5 +128,17 @@ describe('ChatWindow (React)', () => {
     const bubbles = container.querySelectorAll('[data-tiger-chat-bubble]')
     expect(bubbles.length).toBeGreaterThan(0)
     expect(bubbles.length).toBeLessThan(40)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<ChatWindow />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

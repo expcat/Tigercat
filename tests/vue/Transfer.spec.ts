@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Transfer } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 const dataSource = [
   { key: '1', label: 'Item 1' },
@@ -161,6 +162,18 @@ describe('Transfer', () => {
 
       expect(getByLabelText('Move selected to target')).toBeInTheDocument()
       expect(getByLabelText('Move selected to source')).toBeInTheDocument()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Transfer)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

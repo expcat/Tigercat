@@ -7,7 +7,7 @@ import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { Select } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables
@@ -422,7 +422,7 @@ describe('Select', () => {
         }
       })
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('should have proper button element', () => {

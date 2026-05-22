@@ -5,6 +5,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const { getSpinnerSVGMock } = vi.hoisted(() => ({
   getSpinnerSVGMock: vi.fn(() => ({
@@ -72,5 +73,18 @@ describe('React Button default spinner lazy creation', () => {
 
     expect(screen.getByTestId('custom-loading-icon')).toBeInTheDocument()
     expect(getSpinnerSVGMock).not.toHaveBeenCalled()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { Button } = await import('../../packages/react/src/components/Button')
+      const { container } = render(<Button>Test</Button>)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

@@ -7,6 +7,7 @@ import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { Kanban } from '@expcat/tigercat-react'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const columns: TaskBoardColumn[] = [
   {
@@ -80,9 +81,7 @@ describe('Kanban', () => {
       const { container } = renderKanban({ showCardCount: false })
       // With showCardCount disabled, the badge-style count is hidden
       // but the inline WIP display (1/3) still appears for WIP-limited columns
-      const badges = container.querySelectorAll(
-        '.inline-flex.items-center.justify-center'
-      )
+      const badges = container.querySelectorAll('.inline-flex.items-center.justify-center')
       expect(badges.length).toBe(0)
     })
   })
@@ -190,6 +189,18 @@ describe('Kanban', () => {
         renderColumnHeader: (col: { title: string }) => <span>{col.title} ★</span>
       })
       expect(getByText('To Do ★')).toBeTruthy()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Kanban />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

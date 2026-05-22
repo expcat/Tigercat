@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { Result } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Result (React)', () => {
   describe('Rendering', () => {
@@ -80,7 +81,11 @@ describe('Result (React)', () => {
     })
 
     it('renders children body', () => {
-      render(<Result title="T"><div>Body content</div></Result>)
+      render(
+        <Result title="T">
+          <div>Body content</div>
+        </Result>
+      )
       expect(screen.getByText('Body content')).toBeInTheDocument()
     })
   })
@@ -89,6 +94,18 @@ describe('Result (React)', () => {
     it('merges className prop', () => {
       const { container } = render(<Result className="my-result" />)
       expect(container.firstElementChild).toHaveClass('my-result')
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Result />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

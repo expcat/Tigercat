@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { ImagePreview } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ImagePreview', () => {
   const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg']
@@ -181,5 +182,17 @@ describe('ImagePreview', () => {
 
     expect(document.querySelector('[aria-label="Previous image"]')).not.toBeInTheDocument()
     expect(document.querySelector('[aria-label="Next image"]')).not.toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<ImagePreview open={false} images={['/img1.jpg']} />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

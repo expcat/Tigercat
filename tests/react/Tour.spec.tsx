@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Tour } from '@expcat/tigercat-react'
 import type { TourStep } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const baseSteps: TourStep[] = [
   { title: 'Step 1', description: 'First step description' },
@@ -84,15 +85,7 @@ describe('Tour', () => {
     const user = userEvent.setup()
     const onFinish = vi.fn()
     const onClose = vi.fn()
-    render(
-      <Tour
-        steps={baseSteps}
-        open={true}
-        current={2}
-        onFinish={onFinish}
-        onClose={onClose}
-      />
-    )
+    render(<Tour steps={baseSteps} open={true} current={2} onFinish={onFinish} onClose={onClose} />)
 
     await waitFor(() => expect(screen.getByText('Finish')).toBeInTheDocument())
     await user.click(screen.getByText('Finish'))
@@ -148,11 +141,7 @@ describe('Tour', () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
     render(
-      <Tour
-        steps={[{ title: 'Solo', description: 'no target' }]}
-        open={true}
-        onClose={onClose}
-      />
+      <Tour steps={[{ title: 'Solo', description: 'no target' }]} open={true} onClose={onClose} />
     )
 
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
@@ -165,12 +154,7 @@ describe('Tour', () => {
   })
 
   it('should not render mask when step.mask is false', async () => {
-    render(
-      <Tour
-        steps={[{ title: 'No mask', description: '...', mask: false }]}
-        open={true}
-      />
-    )
+    render(<Tour steps={[{ title: 'No mask', description: '...', mask: false }]} open={true} />)
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
     expect(document.querySelector('div.fixed.inset-0.bg-black\\/45')).not.toBeInTheDocument()
   })
@@ -222,5 +206,17 @@ describe('Tour', () => {
   it('should render nothing if step does not exist (out-of-range current)', () => {
     render(<Tour steps={baseSteps} open={true} current={99} />)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Tour steps={baseSteps} open={false} />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

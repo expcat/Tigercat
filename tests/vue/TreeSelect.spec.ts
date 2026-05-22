@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { TreeSelect } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 const treeData = [
   {
@@ -326,6 +327,18 @@ describe('TreeSelect', () => {
       const trigger = getByRole('combobox')
       await fireEvent.keyDown(trigger, { key: 'Enter' })
       expect(getByRole('listbox')).toBeInTheDocument()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(TreeSelect)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

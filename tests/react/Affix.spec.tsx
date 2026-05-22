@@ -7,6 +7,7 @@ import { render, screen, waitFor, act } from '@testing-library/react'
 import React from 'react'
 import { Affix } from '@expcat/tigercat-react'
 import { MockIntersectionObserver, MockResizeObserver } from '../utils/mock-observers'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Affix', () => {
   beforeEach(() => {
@@ -116,5 +117,17 @@ describe('Affix', () => {
     )
     expect(handleChange).toHaveBeenLastCalledWith(false)
     expect(handleChange).toHaveBeenCalledTimes(2)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Affix />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

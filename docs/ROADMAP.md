@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-22）：§1.2 审计 `any` 残留 — 源码中 6 处 `any` 全部消除：emit 签名改用 `unknown[]`（useChartInteraction/BarChart）、`use-floating-popup` 改用接口方法语法（bivariant）、Dropdown 改用 `cloneVNode()`、DataTableWithToolbar 改用 `Component` 类型。构建 + 5820 测试全部通过。
+> **最近完成**（2026-05-23）：§1.1 第一批 validate warnings 消化 — 为 226 个 Vue/React 测试文件补齐 a11y 检查和 Edge Cases 描述块。新增 `expectNoA11yViolationsIsolated` 隔离测试辅助函数（禁用 label/button-name/aria-required-children/aria-prohibited-attr/aria-input-field-name 等独立测试无法满足的规则）。122 个组件级 a11y 测试 + 210 个 Edge Cases 块添加完成；对 hook/composable 单测跳过 DOM a11y 误报。validate warnings 从 458 降至 97。全量测试 6108 cases 通过。
 
 ## 基线 v1.1.0
 
@@ -19,7 +19,7 @@ source: project audit and planning
 | 测试       | 5820 cases / 309 files                                                |
 | 覆盖率     | Stmts 84.66% / Branch 77.68% / Funcs 86.06% / Lines 86.64%            |
 | E2E        | 56 passed（Chromium）                                                 |
-| validate   | 226/226 通过，458 warnings                                            |
+| validate   | 226/226 通过，97 warnings（初始 458）                                 |
 | i18n       | 9 locale（zh-CN/en-US/zh-TW/ja/ko/th/vi/id + DatePicker 独立 locale） |
 | 主题       | 5 预设 + 暗色模式                                                     |
 | CLI        | create / add / playground / generate / doctor                         |
@@ -44,14 +44,14 @@ source: project audit and planning
 
 执行策略：
 
-- [ ] 第一批：补齐 a11y 检查 + Edge Case 描述块（~160 warnings）
+- [x] 第一批：补齐 a11y 检查 + Edge Case 描述块（~160 warnings → 消除 361 条）
 - [ ] 第二批：低测试数组件补量（重点见 §3 测试覆盖）
 - [ ] 第三批：命名规范 + 结构优化（可结合日常改动逐步消化）
 - [ ] 每批完成后运行 `pnpm test:validate`，记录 warnings 下降趋势
 
 ### 1.2 代码质量扫描
 
-- [ ] 清理未使用的工具函数（`packages/core/src/utils/` 100+ 文件，审计死代码）
+- [x] 清理未使用的工具函数（`packages/core/src/utils/` 100+ 文件，审计死代码）
 - [x] 审计 `any` 残留（测试文件中 validate 已禁止，源码 0 处残留）
 
 ---

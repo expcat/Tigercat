@@ -7,7 +7,7 @@ import { render, fireEvent } from '@testing-library/vue'
 import { Slider } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables

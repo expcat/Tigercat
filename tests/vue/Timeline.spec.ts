@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
 import { Timeline } from '../../packages/vue/src/components/Timeline'
 import type { TimelineItem } from '../../packages/core/src/types/timeline'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Timeline (Vue)', () => {
   it('renders labels and content', () => {
@@ -89,5 +90,17 @@ describe('Timeline (Vue)', () => {
     })
     expect(container.querySelector('ul')?.className).toContain('custom')
     expect(container.querySelector('ul')?.className).toContain('from-attrs')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Timeline)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

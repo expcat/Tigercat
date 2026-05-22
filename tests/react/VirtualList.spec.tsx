@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { VirtualList } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('VirtualList', () => {
   const defaultProps = {
@@ -116,7 +117,12 @@ describe('VirtualList', () => {
   // --- Edge cases ---
   it('renders with zero items', () => {
     const { container } = render(
-      <VirtualList itemCount={0} itemHeight={40} height={400} renderItem={defaultProps.renderItem} />
+      <VirtualList
+        itemCount={0}
+        itemHeight={40}
+        height={400}
+        renderItem={defaultProps.renderItem}
+      />
     )
     const outer = container.firstElementChild as HTMLElement
     const inner = outer.firstElementChild as HTMLElement
@@ -125,7 +131,12 @@ describe('VirtualList', () => {
 
   it('renders with single item', () => {
     const { container } = render(
-      <VirtualList itemCount={1} itemHeight={40} height={400} renderItem={defaultProps.renderItem} />
+      <VirtualList
+        itemCount={1}
+        itemHeight={40}
+        height={400}
+        renderItem={defaultProps.renderItem}
+      />
     )
     const outer = container.firstElementChild as HTMLElement
     const inner = outer.firstElementChild as HTMLElement
@@ -136,7 +147,12 @@ describe('VirtualList', () => {
 
   it('renders with very large itemCount', () => {
     const { container } = render(
-      <VirtualList itemCount={100_000} itemHeight={40} height={400} renderItem={defaultProps.renderItem} />
+      <VirtualList
+        itemCount={100_000}
+        itemHeight={40}
+        height={400}
+        renderItem={defaultProps.renderItem}
+      />
     )
     const outer = container.firstElementChild as HTMLElement
     const inner = outer.firstElementChild as HTMLElement
@@ -147,7 +163,13 @@ describe('VirtualList', () => {
 
   it('renders with overscan=0', () => {
     const { container } = render(
-      <VirtualList itemCount={100} itemHeight={40} height={200} overscan={0} renderItem={defaultProps.renderItem} />
+      <VirtualList
+        itemCount={100}
+        itemHeight={40}
+        height={200}
+        overscan={0}
+        renderItem={defaultProps.renderItem}
+      />
     )
     const outer = container.firstElementChild as HTMLElement
     const inner = outer.firstElementChild as HTMLElement
@@ -159,7 +181,12 @@ describe('VirtualList', () => {
 
   it('renders with estimatedItemHeight (dynamic strategy)', () => {
     const { container } = render(
-      <VirtualList itemCount={50} estimatedItemHeight={60} height={300} renderItem={defaultProps.renderItem} />
+      <VirtualList
+        itemCount={50}
+        estimatedItemHeight={60}
+        height={300}
+        renderItem={defaultProps.renderItem}
+      />
     )
     const outer = container.firstElementChild as HTMLElement
     const inner = outer.firstElementChild as HTMLElement
@@ -172,5 +199,17 @@ describe('VirtualList', () => {
     )
     const outer = container.firstElementChild as HTMLElement
     expect(outer.style.height).toBe('0px')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<VirtualList />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

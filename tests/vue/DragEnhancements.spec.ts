@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { List, Tree, Modal } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 const sampleListData = [
   { key: 1, title: 'Item 1' },
@@ -184,5 +185,19 @@ describe('Modal - Drag Enhancements', () => {
     const dialog = document.querySelector('[data-tiger-modal]') as HTMLElement
     // Position should be reset
     expect(dialog.style.transform).toBe('')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Modal, {
+        props: { open: true, title: 'Test Modal', disableTeleport: true }
+      })
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

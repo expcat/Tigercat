@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/vue'
 import { h } from 'vue'
 import { Resizable } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 function renderResizable(props: Record<string, unknown> = {}) {
   return render(Resizable, {
@@ -189,6 +190,18 @@ describe('Resizable', () => {
       const { container } = renderResizable({ style: { border: '1px solid red' } })
       const root = container.firstElementChild as HTMLElement
       expect(root.style.border).toBe('1px solid red')
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Resizable)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

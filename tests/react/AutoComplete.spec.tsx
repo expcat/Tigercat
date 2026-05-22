@@ -7,6 +7,7 @@ import { act, render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { AutoComplete } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const options = [
   { label: 'Apple', value: 'apple' },
@@ -279,6 +280,18 @@ describe('AutoComplete', () => {
 
       const opts = container.querySelectorAll('[role="option"]')
       expect(opts.length).toBe(4)
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<AutoComplete />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

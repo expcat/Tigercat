@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Textarea } from '@expcat/tigercat-react'
 import {
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables,
@@ -429,7 +429,7 @@ describe('Textarea', () => {
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
       const { container } = render(<Textarea aria-label="Description" />)
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('is keyboard accessible', async () => {

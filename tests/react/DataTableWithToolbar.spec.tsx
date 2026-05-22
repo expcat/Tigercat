@@ -4,10 +4,11 @@
 
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { DataTableWithToolbar } from '@expcat/tigercat-react'
 import type { TableColumn } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 interface RowData extends Record<string, unknown> {
   id: number
@@ -149,5 +150,26 @@ describe('DataTableWithToolbar (React)', () => {
     await userEvent.click(checkboxes[1])
 
     expect(onSelectionChange).toHaveBeenCalledWith([1])
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(
+        <DataTableWithToolbar
+          columns={columns}
+          dataSource={[{ id: 1, name: 'A' }]}
+          pagination={false}
+        />
+      )
+      await act(async () => {
+        await new Promise((resolve) => requestAnimationFrame(resolve))
+      })
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

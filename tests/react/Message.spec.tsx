@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, waitFor } from '@testing-library/react'
 import { Message } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const messageTypes = ['success', 'warning', 'error', 'info', 'loading'] as const
 
@@ -361,6 +362,23 @@ describe('Message (React)', () => {
   })
 
   describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      vi.useFakeTimers()
+      await runMessageAction(() =>
+        Message.info({
+          content: 'Accessible message',
+          duration: 0
+        })
+      )
+      await act(async () => {
+        vi.advanceTimersByTime(10)
+      })
+      vi.useRealTimers()
+
+      await waitFor(() => expect(getMessageByType('info')).toBeTruthy())
+      await expectNoA11yViolationsIsolated(document.body)
+    })
+
     it('should use role=status for non-error messages', async () => {
       await runMessageAction(() => Message.info('Accessible message'))
       await waitFor(() => {
@@ -389,6 +407,12 @@ describe('Message (React)', () => {
         const closeButton = document.querySelector('button[aria-label="Close message"]')
         expect(closeButton).toBeTruthy()
       })
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

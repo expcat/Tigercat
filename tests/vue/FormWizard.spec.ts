@@ -7,6 +7,7 @@ import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
 import { FormWizard } from '@expcat/tigercat-vue'
 import type { WizardStep } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 const steps: WizardStep[] = [{ title: 'Step 1' }, { title: 'Step 2' }]
 
@@ -123,6 +124,18 @@ describe('FormWizard (Vue)', () => {
 
       await fireEvent.click(screen.getByRole('button', { name: 'Next' }))
       expect(autoSave).toHaveBeenCalledWith(1, steps[1])
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(FormWizard)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

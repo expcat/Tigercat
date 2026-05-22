@@ -6,6 +6,7 @@ import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Space } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Space (React)', () => {
   it('renders defaults and children', () => {
@@ -73,5 +74,17 @@ describe('Space (React)', () => {
     const el = screen.getByTestId('space')
     expect(el).toHaveAttribute('id', 'my-space')
     expect(el).toHaveAttribute('aria-label', 'space')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Space />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

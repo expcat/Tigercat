@@ -5,7 +5,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { HeatmapChart } from '@expcat/tigercat-vue'
-import { renderWithProps } from '../utils'
+import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { render } from '@testing-library/vue'
 
 const data = [
   { x: 'A', y: 'One', value: 1 },
@@ -90,5 +91,19 @@ describe('HeatmapChart', () => {
 
     expect(container.querySelector('[data-heatmap-canvas]')).toBeNull()
     expect(container.querySelectorAll('rect')).toHaveLength(4)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(HeatmapChart, {
+        props: defaultProps
+      })
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

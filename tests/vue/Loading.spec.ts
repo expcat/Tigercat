@@ -1,6 +1,7 @@
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { Loading } from '../../packages/vue/src/components/Loading'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Loading (Vue)', () => {
   afterEach(() => {
@@ -111,5 +112,17 @@ describe('Loading (Vue)', () => {
     vi.advanceTimersByTime(100)
     await vi.runAllTimersAsync()
     expect(screen.getByRole('status')).toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Loading)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { FloatButton, FloatButtonGroup } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('FloatButton (React)', () => {
   describe('Rendering', () => {
@@ -125,7 +126,10 @@ describe('FloatButtonGroup (React)', () => {
   it('toggles on trigger click', async () => {
     const onOpenChange = vi.fn()
     render(
-      <FloatButtonGroup trigger="click" triggerNode={<button>Toggle</button>} onOpenChange={onOpenChange}>
+      <FloatButtonGroup
+        trigger="click"
+        triggerNode={<button>Toggle</button>}
+        onOpenChange={onOpenChange}>
         <button>Child</button>
       </FloatButtonGroup>
     )
@@ -136,7 +140,10 @@ describe('FloatButtonGroup (React)', () => {
   it('opens on hover when trigger=hover', async () => {
     const onOpenChange = vi.fn()
     const { container } = render(
-      <FloatButtonGroup trigger="hover" triggerNode={<button>Hover</button>} onOpenChange={onOpenChange}>
+      <FloatButtonGroup
+        trigger="hover"
+        triggerNode={<button>Hover</button>}
+        onOpenChange={onOpenChange}>
         <button>Child</button>
       </FloatButtonGroup>
     )
@@ -155,5 +162,17 @@ describe('FloatButtonGroup (React)', () => {
     )
     const group = document.querySelector('.custom-group')
     expect(group).toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<FloatButton />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { CodeEditor } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function renderCodeEditor(props: Record<string, unknown> = {}) {
   return render(<CodeEditor value="const x = 1" language="javascript" {...props} />)
@@ -137,6 +138,18 @@ describe('CodeEditor', () => {
       })
       const textarea = container.querySelector('textarea') as HTMLTextAreaElement
       expect(textarea.placeholder).toBe('Type code...')
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<CodeEditor />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

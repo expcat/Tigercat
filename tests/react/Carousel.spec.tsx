@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import React, { createRef } from 'react'
 import { Carousel, type CarouselRef } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Carousel', () => {
   beforeEach(() => {
@@ -466,6 +467,19 @@ describe('Carousel', () => {
   })
 
   describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      vi.useRealTimers()
+
+      const { container } = render(
+        <Carousel>
+          <div>Slide 1</div>
+          <div>Slide 2</div>
+        </Carousel>
+      )
+
+      await expectNoA11yViolationsIsolated(container)
+    })
+
     it('should have proper ARIA attributes on container', () => {
       const { container } = render(
         <Carousel>
@@ -524,6 +538,12 @@ describe('Carousel', () => {
       const dots = container.querySelectorAll('[role="tablist"] button')
       expect(dots[0]).toHaveAttribute('aria-label', 'Go to slide 1')
       expect(dots[1]).toHaveAttribute('aria-label', 'Go to slide 2')
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

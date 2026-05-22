@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { Empty } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Empty (React)', () => {
   describe('Rendering', () => {
@@ -42,7 +43,11 @@ describe('Empty (React)', () => {
     })
 
     it('renders children body content', () => {
-      render(<Empty><p>Body text</p></Empty>)
+      render(
+        <Empty>
+          <p>Body text</p>
+        </Empty>
+      )
       expect(screen.getByText('Body text')).toBeInTheDocument()
     })
   })
@@ -58,6 +63,18 @@ describe('Empty (React)', () => {
     it('renders with default preset', () => {
       render(<Empty preset="default" />)
       expect(screen.getByText('No data')).toBeInTheDocument()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Empty />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

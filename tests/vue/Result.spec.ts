@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
 import { Result } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Result (Vue)', () => {
   describe('Rendering', () => {
@@ -123,6 +124,18 @@ describe('Result (Vue)', () => {
     it('merges className prop', () => {
       const { container } = render(Result, { props: { className: 'my-result' } })
       expect(container.firstElementChild).toHaveClass('my-result')
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Result)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

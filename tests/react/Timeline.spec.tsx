@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { Timeline } from '../../packages/react/src/components/Timeline'
 import type { TimelineItem } from '../../packages/core/src/types/timeline'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Timeline (React)', () => {
   it('renders labels and content', () => {
@@ -84,5 +85,17 @@ describe('Timeline (React)', () => {
     const ul = getByTestId('timeline')
     expect(ul.getAttribute('aria-label')).toBe('Timeline')
     expect(ul.className).toContain('custom')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Timeline />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { CropUpload } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('CropUpload', () => {
   it('renders trigger button', () => {
@@ -75,5 +76,17 @@ describe('CropUpload', () => {
     screen.getByRole('button').focus()
     await user.keyboard('{Enter}')
     expect(clickSpy).toHaveBeenCalled()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<CropUpload />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

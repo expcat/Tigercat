@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import React from 'react'
 import { Stepper } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Stepper', () => {
   // --- Basic rendering ---
@@ -122,5 +123,17 @@ describe('Stepper', () => {
   it('renders SVG icons in buttons', () => {
     const { container } = render(<Stepper />)
     expect(container.querySelectorAll('svg').length).toBe(2)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Stepper />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

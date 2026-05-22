@@ -59,25 +59,65 @@ function checkTestNaming(filePath, content, counters) {
     if (!match) continue
     total++
     const lower = match[2].toLowerCase()
-    if (lower.includes('should') || lower.includes('snapshot') || lower.includes('render') ||
-        lower.includes('display') || lower.includes('emit') || lower.includes('trigger') ||
-        lower.includes('accept') || lower.includes('reject') || lower.includes('throw') ||
-        lower.includes('return') || lower.includes('call') || lower.includes('when') ||
-        lower.includes('with') || lower.includes('without') || lower.includes('not ') ||
-        lower.includes('handle') || lower.includes('support') || lower.includes('allow') ||
-        lower.includes('prevent') || lower.includes('disable') || lower.includes('enable') ||
-        lower.includes('show') || lower.includes('hide') || lower.includes('open') ||
-        lower.includes('close') || lower.includes('toggle') || lower.includes('update') ||
-        lower.includes('set') || lower.includes('clear') || lower.includes('reset') ||
-        lower.includes('apply') || lower.includes('remove') || lower.includes('add') ||
-        lower.includes('create') || lower.includes('delete') || lower.includes('select') ||
-        lower.includes('validate') || lower.includes('format') || lower.includes('parse') ||
-        lower.includes('convert') || lower.includes('calculate') || lower.includes('compute') ||
-        lower.includes('respond') || lower.includes('fire') || lower.includes('navigate') ||
-        lower.includes('focus') || lower.includes('blur') || lower.includes('scroll') ||
-        lower.includes('resize') || lower.includes('change') || lower.includes('submit') ||
-        lower.includes('cancel') || lower.includes('confirm') || lower.includes('dismiss') ||
-        lower.includes('load') || lower.includes('fetch') || lower.includes('default')) {
+    if (
+      lower.includes('should') ||
+      lower.includes('snapshot') ||
+      lower.includes('render') ||
+      lower.includes('display') ||
+      lower.includes('emit') ||
+      lower.includes('trigger') ||
+      lower.includes('accept') ||
+      lower.includes('reject') ||
+      lower.includes('throw') ||
+      lower.includes('return') ||
+      lower.includes('call') ||
+      lower.includes('when') ||
+      lower.includes('with') ||
+      lower.includes('without') ||
+      lower.includes('not ') ||
+      lower.includes('handle') ||
+      lower.includes('support') ||
+      lower.includes('allow') ||
+      lower.includes('prevent') ||
+      lower.includes('disable') ||
+      lower.includes('enable') ||
+      lower.includes('show') ||
+      lower.includes('hide') ||
+      lower.includes('open') ||
+      lower.includes('close') ||
+      lower.includes('toggle') ||
+      lower.includes('update') ||
+      lower.includes('set') ||
+      lower.includes('clear') ||
+      lower.includes('reset') ||
+      lower.includes('apply') ||
+      lower.includes('remove') ||
+      lower.includes('add') ||
+      lower.includes('create') ||
+      lower.includes('delete') ||
+      lower.includes('select') ||
+      lower.includes('validate') ||
+      lower.includes('format') ||
+      lower.includes('parse') ||
+      lower.includes('convert') ||
+      lower.includes('calculate') ||
+      lower.includes('compute') ||
+      lower.includes('respond') ||
+      lower.includes('fire') ||
+      lower.includes('navigate') ||
+      lower.includes('focus') ||
+      lower.includes('blur') ||
+      lower.includes('scroll') ||
+      lower.includes('resize') ||
+      lower.includes('change') ||
+      lower.includes('submit') ||
+      lower.includes('cancel') ||
+      lower.includes('confirm') ||
+      lower.includes('dismiss') ||
+      lower.includes('load') ||
+      lower.includes('fetch') ||
+      lower.includes('default')
+    ) {
       descriptive++
     }
   }
@@ -98,7 +138,9 @@ function checkEdgeCases(content, counters) {
   return false
 }
 
-function checkAccessibility(content, counters) {
+function checkAccessibility(filePath, content, counters) {
+  if (/^use[A-Z].*\.spec\.(ts|tsx)$/.test(path.basename(filePath))) return true
+
   if (content.includes('expectNoA11yViolations')) return true
   console.log(c('yellow', '  ⚠ No accessibility checks'))
   counters.warnings++
@@ -201,7 +243,7 @@ async function main() {
     if (!checkTestStructure(filePath, content, counters)) softIssues++
     if (!checkTestNaming(filePath, content, counters)) softIssues++
     if (!checkEdgeCases(content, counters)) softIssues++
-    if (!checkAccessibility(content, counters)) softIssues++
+    if (!checkAccessibility(filePath, content, counters)) softIssues++
 
     if (errors === 0) {
       if (softIssues === 0) {

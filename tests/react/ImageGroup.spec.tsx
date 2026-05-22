@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
 import React from 'react'
 import { ImageGroup, Image } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ImageGroup', () => {
   it('renders children in a group container', () => {
@@ -52,5 +53,17 @@ describe('ImageGroup', () => {
 
     const group = container.querySelector('[role="group"]')
     expect(group?.className).toContain('custom-group')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<ImageGroup />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

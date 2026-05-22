@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { Resizable } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function renderResizable(props: Record<string, unknown> = {}) {
   return render(
@@ -209,6 +210,18 @@ describe('Resizable', () => {
 
       fireEvent.mouseMove(document, { clientX: 350, clientY: 100 })
       // onResize should have been called via createDocumentDragSession
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Resizable />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

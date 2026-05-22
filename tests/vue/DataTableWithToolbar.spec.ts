@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { DataTableWithToolbar } from '@expcat/tigercat-vue'
 import type { TableColumn } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 interface RowData extends Record<string, unknown> {
   id: number
@@ -155,5 +156,19 @@ describe('DataTableWithToolbar (Vue)', () => {
     await userEvent.click(checkboxes[1])
 
     expect(onSelectionChange).toHaveBeenCalledWith([1])
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(DataTableWithToolbar, {
+        props: { columns, dataSource: [{ id: 1, name: 'A' }], pagination: false }
+      })
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

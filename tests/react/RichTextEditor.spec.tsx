@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { RichTextEditor } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function renderEditor(props: Record<string, unknown> = {}) {
   return render(<RichTextEditor value="<p>Hello</p>" {...props} />)
@@ -157,6 +158,18 @@ describe('RichTextEditor', () => {
       editor.innerHTML = '<p>New content</p>'
       fireEvent.input(editor)
       expect(onChange).toHaveBeenCalled()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<RichTextEditor />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

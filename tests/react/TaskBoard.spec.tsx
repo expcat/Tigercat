@@ -7,6 +7,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { TaskBoard } from '@expcat/tigercat-react'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const columns: TaskBoardColumn[] = [
   {
@@ -405,6 +406,18 @@ describe('TaskBoard (React)', () => {
       ]
       render(<TaskBoard columns={colsWithDesc} />)
       expect(screen.getByText('Column description text')).toBeInTheDocument()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<TaskBoard />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

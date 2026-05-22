@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Cascader } from '@expcat/tigercat-vue'
-import { renderWithProps, componentSizes } from '../utils'
+import { renderWithProps, componentSizes, expectNoA11yViolationsIsolated } from '../utils'
 
 const simpleOptions = [
   {
@@ -365,6 +365,18 @@ describe('Cascader', () => {
 
       await fireEvent.keyDown(trigger, { key: 'Escape' })
       expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Cascader)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

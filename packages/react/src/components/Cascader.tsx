@@ -53,10 +53,12 @@ const CASCADER_KEYS = new Set([
   'className'
 ])
 
+const EMPTY_CASCADER_VALUE: CascaderValue = []
+
 export const Cascader: React.FC<CascaderProps> = (props) => {
   const {
     options = [],
-    value = [],
+    value = EMPTY_CASCADER_VALUE,
     onChange,
     placeholder = 'Please select',
     size = 'md',

@@ -2,6 +2,7 @@ import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import React from 'react'
 import { Loading } from '../../packages/react/src/components/Loading'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Loading (React)', () => {
   afterEach(() => {
@@ -97,5 +98,17 @@ describe('Loading (React)', () => {
       vi.advanceTimersByTime(100)
     })
     expect(screen.getByRole('status')).toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Loading />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

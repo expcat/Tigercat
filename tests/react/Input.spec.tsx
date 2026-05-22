@@ -10,7 +10,7 @@ import { Input } from '@expcat/tigercat-react'
 import type { InputType, InputStatus } from '@expcat/tigercat-core'
 import {
   renderWithProps,
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables,
@@ -442,7 +442,7 @@ describe('Input', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<Input placeholder="Accessible input" />)
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('should be keyboard accessible', async () => {

@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { NotificationCenter } from '@expcat/tigercat-react'
 import type { NotificationItem } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('NotificationCenter (React)', () => {
   it('renders groups and switches tabs', async () => {
@@ -70,5 +71,17 @@ describe('NotificationCenter (React)', () => {
 
     expect(onItemReadChange).toHaveBeenCalledTimes(1)
     expect(onItemReadChange).toHaveBeenCalledWith(items[0], true)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<NotificationCenter />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

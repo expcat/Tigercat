@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { CommentThread } from '@expcat/tigercat-react'
 import type { CommentNode } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('CommentThread (React)', () => {
   it('renders nested replies when expanded', () => {
@@ -118,5 +119,17 @@ describe('CommentThread (React)', () => {
 
     expect(onLoadMore).toHaveBeenCalledTimes(1)
     expect(onLoadMore).toHaveBeenCalledWith(expect.objectContaining({ id: 1, content: 'Root' }))
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<CommentThread />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

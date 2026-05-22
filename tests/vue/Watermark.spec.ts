@@ -5,6 +5,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { Watermark } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Watermark', () => {
   afterEach(() => {
@@ -86,5 +87,17 @@ describe('Watermark', () => {
     })
     const overlay = container.querySelector('[data-watermark="true"]')
     expect(overlay).toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Watermark)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

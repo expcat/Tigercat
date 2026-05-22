@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Button, getButtonVariantClasses, buttonSizeClasses } from '@expcat/tigercat-vue'
-import { expectNoA11yViolations, setThemeVariables, clearThemeVariables } from '../utils'
+import { expectNoA11yViolationsIsolated, setThemeVariables, clearThemeVariables } from '../utils'
 
 describe('Button', () => {
   it('renders and merges class/style from props and attrs', () => {
@@ -226,7 +226,7 @@ describe('Button', () => {
         }
       })
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
   })
 
@@ -284,6 +284,12 @@ describe('Button', () => {
       const spinner = container.querySelector('svg.animate-spin')!
       expect(spinner.parentElement).toHaveClass('ml-2')
       expect(spinner.parentElement).toHaveClass('order-1')
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, reactive, ref, h, nextTick } from 'vue'
 import { Form, FormItem, type FormRule, type FormRules } from '@expcat/tigercat-vue'
-import { expectNoA11yViolations } from '../utils'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Form', () => {
   // ==================== Basic Functionality ====================
@@ -1738,7 +1738,7 @@ describe('Form', () => {
         slots: { default: '<div>Accessible form</div>' }
       })
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('associates label with input field', () => {

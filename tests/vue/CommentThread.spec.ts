@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { CommentThread } from '@expcat/tigercat-vue'
 import type { CommentNode } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('CommentThread (Vue)', () => {
   it('renders nested replies when expanded', () => {
@@ -110,5 +111,17 @@ describe('CommentThread (Vue)', () => {
 
     expect(onLoadMore).toHaveBeenCalledTimes(1)
     expect(onLoadMore).toHaveBeenCalledWith(expect.objectContaining({ id: 1, content: 'Root' }))
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(CommentThread)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

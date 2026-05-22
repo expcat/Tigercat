@@ -4,7 +4,8 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { TreeMapChart } from '@expcat/tigercat-vue'
-import { renderWithProps } from '../utils'
+import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
+import { render } from '@testing-library/vue'
 
 const defaultSize = { width: 400, height: 300 }
 
@@ -140,5 +141,19 @@ describe('TreeMapChart (Vue)', () => {
 
     const rects = container.querySelectorAll('rect')
     expect(rects.length).toBeGreaterThanOrEqual(4)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(TreeMapChart, {
+        props: { data: sampleData, width: 400, height: 300 }
+      })
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

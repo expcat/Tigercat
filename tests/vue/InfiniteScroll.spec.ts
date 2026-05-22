@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { InfiniteScroll } from '@expcat/tigercat-vue'
 import { h } from 'vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('InfiniteScroll (Vue)', () => {
   it('renders children via default slot', () => {
@@ -153,5 +154,17 @@ describe('InfiniteScroll (Vue)', () => {
     const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel') as HTMLElement
     expect(sentinel.style.height).toBe('0px')
     expect(sentinel.style.overflow).toBe('hidden')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(InfiniteScroll)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

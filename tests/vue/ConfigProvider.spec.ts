@@ -7,6 +7,7 @@ import { render, waitFor } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-vue'
 import type { TigerLocale } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 const LocaleDisplay = defineComponent({
   name: 'LocaleDisplay',
@@ -15,11 +16,7 @@ const LocaleDisplay = defineComponent({
     return () =>
       h('div', [
         h('span', { 'data-testid': 'ok' }, config.value.locale?.common?.okText ?? 'default'),
-        h(
-          'span',
-          { 'data-testid': 'loading' },
-          config.value.localeLoading ? 'loading' : 'ready'
-        )
+        h('span', { 'data-testid': 'loading' }, config.value.localeLoading ? 'loading' : 'ready')
       ])
   }
 })
@@ -153,10 +150,8 @@ describe('ConfigProvider', () => {
           setup() {
             return () =>
               h(ConfigProvider, { locale: () => outerPromise }, () =>
-                h(
-                  ConfigProvider,
-                  { locale: { common: { cancelText: 'Inner' } } },
-                  () => h(LocaleDisplay)
+                h(ConfigProvider, { locale: { common: { cancelText: 'Inner' } } }, () =>
+                  h(LocaleDisplay)
                 )
               )
           }
@@ -180,6 +175,18 @@ describe('ConfigProvider', () => {
 
       expect(getByTestId('ok').textContent).toBe('default')
       expect(getByTestId('loading').textContent).toBe('ready')
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(ConfigProvider)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

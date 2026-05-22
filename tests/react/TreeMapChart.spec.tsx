@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { TreeMapChart } from '@expcat/tigercat-react'
-import { renderWithProps } from '../utils/render-helpers-react'
-import { fireEvent } from '@testing-library/react'
+import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
+import { fireEvent, render } from '@testing-library/react'
 
 const defaultSize = { width: 400, height: 300 }
 
@@ -138,5 +138,17 @@ describe('TreeMapChart (React)', () => {
 
     const rects = container.querySelectorAll('rect')
     expect(rects.length).toBeGreaterThanOrEqual(4)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<TreeMapChart data={sampleData} width={400} height={300} />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

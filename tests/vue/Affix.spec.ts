@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/vue'
 import { Affix } from '@expcat/tigercat-vue'
 import { MockIntersectionObserver, MockResizeObserver } from '../utils/mock-observers'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Affix', () => {
   beforeEach(() => {
@@ -128,5 +129,17 @@ describe('Affix', () => {
       expect(screen.getByTestId('affix-content')).not.toHaveStyle('position: fixed')
     )
     expect(emitted().change).toEqual([[true], [false]])
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Affix)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

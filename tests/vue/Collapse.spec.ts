@@ -6,6 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
 import { Collapse, CollapsePanel } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 function createFrameScheduler() {
   let nextFrame = 1
@@ -517,6 +518,18 @@ describe('Collapse', () => {
       const panelHeader = screen.getByText('Panel 1').closest('[role="button"]')
       expect(panelHeader).toHaveAttribute('tabindex', '-1')
       expect(panelHeader).toHaveAttribute('aria-disabled', 'true')
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Collapse)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

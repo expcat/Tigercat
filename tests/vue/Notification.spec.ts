@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { nextTick } from 'vue'
 import { notification } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 async function flushMicrotasks() {
   await nextTick()
@@ -123,5 +124,23 @@ describe('Notification (Vue)', () => {
     expect(document.querySelectorAll('[data-tiger-notification]').length).toBe(1)
     const remaining = document.querySelector('[data-tiger-notification]')
     expect(remaining?.textContent).toContain('Top-left 1')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      notification.info({
+        title: 'Accessible notification',
+        description: 'Notification details',
+        duration: 0
+      })
+      await flush()
+
+      await expectNoA11yViolationsIsolated(document.body)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

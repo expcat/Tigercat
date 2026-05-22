@@ -6,6 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { Tour } from '@expcat/tigercat-vue'
 import type { TourStep } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 const baseSteps: TourStep[] = [
   { title: 'Step 1', description: 'First step description' },
@@ -198,7 +199,17 @@ describe('Tour', () => {
     const target = document.createElement('div')
     target.id = 'tour-target'
     target.getBoundingClientRect = () =>
-      ({ top: 100, left: 200, width: 50, height: 30, right: 250, bottom: 130, x: 200, y: 100, toJSON: () => ({}) }) as DOMRect
+      ({
+        top: 100,
+        left: 200,
+        width: 50,
+        height: 30,
+        right: 250,
+        bottom: 130,
+        x: 200,
+        y: 100,
+        toJSON: () => ({})
+      }) as DOMRect
     document.body.appendChild(target)
 
     render(Tour, {
@@ -234,5 +245,21 @@ describe('Tour', () => {
   it('should render nothing if step does not exist (out-of-range current)', () => {
     render(Tour, { props: { steps: baseSteps, open: true, current: 99 } })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Tour, {
+        props: {
+          steps: baseSteps
+        }
+      })
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

@@ -7,7 +7,7 @@ import { render, screen, fireEvent } from '@testing-library/vue'
 import { Switch } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables
@@ -199,7 +199,7 @@ describe('Switch', () => {
         }
       })
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('should have proper role and aria attributes', () => {

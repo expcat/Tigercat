@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { InfiniteScroll } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('InfiniteScroll (React)', () => {
   it('renders children', () => {
@@ -133,5 +134,17 @@ describe('InfiniteScroll (React)', () => {
     const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel') as HTMLElement
     expect(sentinel.style.height).toBe('0px')
     expect(sentinel.style.overflow).toBe('hidden')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<InfiniteScroll />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

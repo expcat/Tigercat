@@ -7,6 +7,7 @@ import { render, waitFor, act } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react'
 import type { TigerLocale } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function LocaleDisplay() {
   const config = useTigerConfig()
@@ -158,6 +159,18 @@ describe('ConfigProvider', () => {
 
       expect(getByTestId('ok').textContent).toBe('default')
       expect(getByTestId('loading').textContent).toBe('ready')
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<ConfigProvider />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

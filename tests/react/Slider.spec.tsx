@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Slider } from '@expcat/tigercat-react'
 import {
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables

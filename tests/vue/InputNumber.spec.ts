@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { InputNumber } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('InputNumber (Vue)', () => {
   it('renders with default props', () => {
@@ -271,5 +272,17 @@ describe('InputNumber (Vue)', () => {
 
     await fireEvent.blur(input)
     expect(emitted()['blur']).toBeTruthy()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(InputNumber)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

@@ -7,6 +7,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Breadcrumb', () => {
   describe('Rendering', () => {
@@ -313,6 +314,18 @@ describe('Breadcrumb', () => {
 
       const item = container.querySelector('li')
       expect(item).toHaveStyle({ color: 'red' })
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Breadcrumb />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

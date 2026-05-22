@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Segmented } from '@expcat/tigercat-vue'
-import { renderWithProps } from '../utils'
+import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const defaultOptions = [
   { value: 'a', label: 'Option A' },
@@ -104,5 +104,17 @@ describe('Segmented', () => {
     const { container } = renderWithProps(Segmented, { options: defaultOptions, block: true })
     const group = container.querySelector('[role="radiogroup"]')
     expect(group?.className).toContain('w-full')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Segmented)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

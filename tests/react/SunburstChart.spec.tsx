@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { SunburstChart } from '@expcat/tigercat-react'
-import { renderWithProps } from '../utils/render-helpers-react'
-import { fireEvent } from '@testing-library/react'
+import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
+import { fireEvent, render } from '@testing-library/react'
 
 const defaultSize = { width: 320, height: 320 }
 
@@ -137,5 +137,17 @@ describe('SunburstChart (React)', () => {
 
     const paths = container.querySelectorAll('path')
     expect(paths.length).toBeGreaterThanOrEqual(3)
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<SunburstChart data={sampleData} width={320} height={320} />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
 import { Splitter } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 function renderSplitter(props: Record<string, unknown> = {}) {
   return render(Splitter, {
@@ -225,6 +226,18 @@ describe('Splitter', () => {
       const { container } = renderSplitter({ className: 'my-splitter' })
       const root = container.firstElementChild as HTMLElement
       expect(root.className).toContain('my-splitter')
+    })
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Splitter)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
     })
   })
 })

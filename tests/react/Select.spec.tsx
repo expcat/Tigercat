@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Select } from '@expcat/tigercat-react'
 import {
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables
@@ -329,7 +329,7 @@ describe('Select', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<Select options={testOptions} placeholder="Select option" />)
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('should have proper button element', () => {

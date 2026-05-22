@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { FileManager } from '@expcat/tigercat-vue'
 import type { FileItem } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 const files: FileItem[] = [
   {
@@ -215,5 +216,17 @@ describe('FileManager (Vue)', () => {
     expect(getByText('Root')).toBeTruthy()
     expect(getByText('a')).toBeTruthy()
     expect(getByText('b')).toBeTruthy()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(FileManager)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

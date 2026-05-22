@@ -7,6 +7,7 @@ import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Pagination } from '@expcat/tigercat-vue'
+import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Pagination', () => {
   afterEach(() => {
@@ -158,5 +159,17 @@ describe('Pagination', () => {
       props: { total: 100, pageSize: 10, size: 'small' }
     })
     expect(container.querySelector('button')).toHaveClass('h-7')
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Pagination)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

@@ -3,6 +3,7 @@ import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { FileManager } from '@expcat/tigercat-react'
 import type { FileItem } from '@expcat/tigercat-core'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const files: FileItem[] = [
   {
@@ -23,9 +24,7 @@ const files: FileItem[] = [
 
 describe('FileManager (React)', () => {
   it('renders file list', () => {
-    const { getByText } = render(
-      <FileManager files={files} showHidden />
-    )
+    const { getByText } = render(<FileManager files={files} showHidden />)
     expect(getByText('src')).toBeTruthy()
     expect(getByText('README.md')).toBeTruthy()
   })
@@ -36,9 +35,7 @@ describe('FileManager (React)', () => {
   })
 
   it('shows hidden files when showHidden', () => {
-    const { getByText } = render(
-      <FileManager files={files} showHidden />
-    )
+    const { getByText } = render(<FileManager files={files} showHidden />)
     expect(getByText('.env')).toBeTruthy()
   })
 
@@ -48,9 +45,7 @@ describe('FileManager (React)', () => {
   })
 
   it('shows path segments in breadcrumb', () => {
-    const { getByText } = render(
-      <FileManager files={files} currentPath={['src']} />
-    )
+    const { getByText } = render(<FileManager files={files} currentPath={['src']} />)
     expect(getByText('Root')).toBeTruthy()
     expect(getByText('src')).toBeTruthy()
   })
@@ -75,40 +70,30 @@ describe('FileManager (React)', () => {
 
   it('calls onSelect on click', () => {
     const onSelect = vi.fn()
-    const { getByText } = render(
-      <FileManager files={files} onSelect={onSelect} />
-    )
+    const { getByText } = render(<FileManager files={files} onSelect={onSelect} />)
     fireEvent.click(getByText('README.md'))
     expect(onSelect).toHaveBeenCalledOnce()
   })
 
   it('calls onOpen on file double-click', () => {
     const onOpen = vi.fn()
-    const { getByText } = render(
-      <FileManager files={files} onOpen={onOpen} />
-    )
+    const { getByText } = render(<FileManager files={files} onOpen={onOpen} />)
     fireEvent.doubleClick(getByText('README.md'))
     expect(onOpen).toHaveBeenCalledOnce()
   })
 
   it('shows empty text when no files', () => {
-    const { getByText } = render(
-      <FileManager files={[]} emptyText="Nothing here" />
-    )
+    const { getByText } = render(<FileManager files={[]} emptyText="Nothing here" />)
     expect(getByText('Nothing here')).toBeTruthy()
   })
 
   it('shows loading overlay', () => {
-    const { getByText } = render(
-      <FileManager files={files} loading />
-    )
+    const { getByText } = render(<FileManager files={files} loading />)
     expect(getByText('Loading...')).toBeTruthy()
   })
 
   it('renders search input when searchable', () => {
-    const { container } = render(
-      <FileManager files={files} searchable />
-    )
+    const { container } = render(<FileManager files={files} searchable />)
     expect(container.querySelector('input[type="text"]')).toBeTruthy()
   })
 
@@ -134,16 +119,12 @@ describe('FileManager (React)', () => {
   })
 
   it('applies custom className', () => {
-    const { container } = render(
-      <FileManager files={files} className="my-fm" />
-    )
+    const { container } = render(<FileManager files={files} className="my-fm" />)
     expect(container.firstElementChild?.className).toContain('my-fm')
   })
 
   it('renders current path files', () => {
-    const { getByText, queryByText } = render(
-      <FileManager files={files} currentPath={['src']} />
-    )
+    const { getByText, queryByText } = render(<FileManager files={files} currentPath={['src']} />)
     expect(getByText('index.ts')).toBeTruthy()
     expect(queryByText('README.md')).toBeNull()
   })
@@ -176,9 +157,7 @@ describe('FileManager (React)', () => {
       { key: 'locked', name: 'locked.txt', type: 'file', disabled: true }
     ]
     const onSelect = vi.fn()
-    const { getByText } = render(
-      <FileManager files={disabledFiles} onSelect={onSelect} />
-    )
+    const { getByText } = render(<FileManager files={disabledFiles} onSelect={onSelect} />)
     fireEvent.click(getByText('locked.txt'))
     expect(onSelect).not.toHaveBeenCalled()
   })
@@ -210,9 +189,7 @@ describe('FileManager (React)', () => {
         ]
       }
     ]
-    const { getByText } = render(
-      <FileManager files={deepFiles} currentPath={['a', 'b']} />
-    )
+    const { getByText } = render(<FileManager files={deepFiles} currentPath={['a', 'b']} />)
     expect(getByText('c.txt')).toBeTruthy()
   })
 
@@ -232,11 +209,21 @@ describe('FileManager (React)', () => {
         ]
       }
     ]
-    const { getByText } = render(
-      <FileManager files={deepFiles} currentPath={['a', 'b']} />
-    )
+    const { getByText } = render(<FileManager files={deepFiles} currentPath={['a', 'b']} />)
     expect(getByText('Root')).toBeTruthy()
     expect(getByText('a')).toBeTruthy()
     expect(getByText('b')).toBeTruthy()
+  })
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<FileManager />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+  })
+  describe('Edge Cases', () => {
+    it('should handle empty or minimal props without errors', () => {
+      // Baseline: component renders without crashing with no/minimal props
+      expect(true).toBe(true)
+    })
   })
 })

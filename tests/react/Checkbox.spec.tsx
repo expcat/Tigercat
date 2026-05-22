@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Checkbox, CheckboxGroup } from '@expcat/tigercat-react'
 import {
-  expectNoA11yViolations,
+  expectNoA11yViolationsIsolated,
   componentSizes,
   setThemeVariables,
   clearThemeVariables
@@ -533,7 +533,7 @@ describe('Checkbox', () => {
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
       const { container } = render(<Checkbox>Accessible Checkbox</Checkbox>)
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
 
     it('is focusable', () => {
@@ -557,7 +557,7 @@ describe('Checkbox', () => {
         </CheckboxGroup>
       )
 
-      await expectNoA11yViolations(container)
+      await expectNoA11yViolationsIsolated(container)
     })
   })
 
