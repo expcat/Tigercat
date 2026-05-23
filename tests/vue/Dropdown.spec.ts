@@ -7,7 +7,6 @@ import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
 import { Dropdown, DropdownMenu, DropdownItem } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
-import { axe } from 'jest-axe'
 
 describe('Dropdown', () => {
   it('renders trigger and menu content', () => {
@@ -218,11 +217,9 @@ describe('Dropdown', () => {
           ]
         }
       })
-      // Skip aria-allowed-attr: trigger div uses aria-expanded (known issue)
-      const results = await axe(container, {
+      await expectNoA11yViolationsIsolated(container, {
         rules: { 'aria-allowed-attr': { enabled: false } }
       })
-      expect(results).toHaveNoViolations()
     })
   })
 
@@ -278,9 +275,102 @@ describe('Dropdown', () => {
     })
   })
   describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+    it('does not close on item click when closeOnClick is false', async () => {
+      const { container } = render(Dropdown, {
+        props: { trigger: 'click', closeOnClick: false },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Item 1'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+    })
+
+    it('emits open-change event', async () => {
+      const { emitted } = render(Dropdown, {
+        props: { trigger: 'click' },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(emitted()['open-change']?.[0]).toEqual([true])
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(emitted()['open-change']?.[1]).toEqual([false])
+    })
+
+    it('emits update:open event', async () => {
+      const { emitted } = render(Dropdown, {
+        props: { trigger: 'click' },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(emitted()['update:open']?.[0]).toEqual([true])
+    })
+
+    it('renders disabled item with aria-disabled', () => {
+      render(Dropdown, {
+        props: { defaultOpen: true },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, { disabled: true }, () => 'Disabled')])
+          ]
+        }
+      })
+
+      const item = screen.getByText('Disabled').closest('[role="menuitem"]')
+      expect(item).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    it('updates aria-expanded when toggling', async () => {
+      render(Dropdown, {
+        props: { trigger: 'click' },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('renders with empty DropdownMenu', () => {
+      const { container } = render(Dropdown, {
+        slots: {
+          default: () => [h('button', null, 'Trigger'), h(DropdownMenu, null, () => [])]
+        }
+      })
+
+      expect(container.querySelector('.tiger-dropdown-container')).toBeInTheDocument()
     })
   })
 })

@@ -7,7 +7,6 @@ import { act, render, screen, fireEvent } from '@testing-library/react'
 import { Dropdown, DropdownMenu, DropdownItem } from '@expcat/tigercat-react'
 import React from 'react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
-import { axe } from 'jest-axe'
 
 describe('Dropdown', () => {
   it('renders trigger and menu content', () => {
@@ -277,11 +276,9 @@ describe('Dropdown', () => {
       await act(async () => {
         await Promise.resolve()
       })
-      // Skip aria-allowed-attr: trigger div uses aria-expanded (known issue)
-      const results = await axe(container, {
+      await expectNoA11yViolationsIsolated(container, {
         rules: { 'aria-allowed-attr': { enabled: false } }
       })
-      expect(results).toHaveNoViolations()
     })
   })
 
@@ -334,9 +331,67 @@ describe('Dropdown', () => {
     })
   })
   describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+    it('does not close on item click when closeOnClick is false', async () => {
+      const { container } = render(
+        <Dropdown trigger="click" closeOnClick={false}>
+          <button>Trigger</button>
+          <DropdownMenu>
+            <DropdownItem>Item 1</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Item 1'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+    })
+
+    it('renders disabled item with aria-disabled', () => {
+      render(
+        <Dropdown defaultOpen>
+          <button>Trigger</button>
+          <DropdownMenu>
+            <DropdownItem disabled>Disabled</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const item = screen.getByText('Disabled').closest('[role="menuitem"]')
+      expect(item).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    it('updates aria-expanded when toggling', async () => {
+      render(
+        <Dropdown trigger="click">
+          <button>Trigger</button>
+          <DropdownMenu>
+            <DropdownItem>Item 1</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('renders with empty DropdownMenu', () => {
+      const { container } = render(
+        <Dropdown>
+          <button>Trigger</button>
+          <DropdownMenu>{null}</DropdownMenu>
+        </Dropdown>
+      )
+
+      expect(container.querySelector('.tiger-dropdown-container')).toBeInTheDocument()
     })
   })
 })

@@ -9,17 +9,17 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-23）：§2.3 预防机制全部完成 — `scripts/validate-api.mjs` 新增 `overlay-api` 规则：自动扫描弹出层组件类型中的 `open` 属性，交叉校验 Vue 是否发射 `update:open`、React 是否有 `onOpenChange` 回调；`deprecated-in-example` 规则改为按 prop/event 使用形态扫描，避免把示例局部变量误判为废弃 API。Drawer/Tour/ImageViewer 的 React `onOpenChange` 和 Example 废弃引用已同步修复。
+> **最近完成**（2026-05-23）：§3.1 低覆盖组件补测全部完成（Menu / Code / Dropdown / CropUpload）— CropUpload 从 9/10 提升至 30/30（Vue/React），全量测试 6232 cases / 309 files 全部通过，validate warnings 95 → 93。§3.1 已关闭。
 
 ## 基线 v1.1.0
 
 | 指标       | 数据                                                                  |
 | ---------- | --------------------------------------------------------------------- |
 | 组件       | 133+（Vue 3 + React 双端，含 12 种 SVG 图表）                         |
-| 测试       | 5820 cases / 309 files                                                |
+| 测试       | 6232 cases / 309 files                                                |
 | 覆盖率     | Stmts 84.66% / Branch 77.68% / Funcs 86.06% / Lines 86.64%            |
 | E2E        | 56 passed（Chromium）                                                 |
-| validate   | 226/226 通过，97 warnings（初始 458）                                 |
+| validate   | 226/226 通过，93 warnings（初始 458）                                 |
 | i18n       | 9 locale（zh-CN/en-US/zh-TW/ja/ko/th/vi/id + DatePicker 独立 locale） |
 | 主题       | 5 预设 + 暗色模式                                                     |
 | CLI        | create / add / playground / generate / doctor                         |
@@ -84,12 +84,12 @@ source: project audit and planning
 
 ### 3.1 低覆盖组件补测
 
-| 组件       | Vue 测试数 | React 测试数 | 目标 | 需补充内容                                             |
-| ---------- | ---------- | ------------ | ---- | ------------------------------------------------------ |
-| Menu       | 7          | 7            | ≥25  | 选中态、click 事件、disabled、子菜单展开收起、键盘导航 |
-| Code       | 4          | 4            | ≥20  | 语法高亮、复制、行号、主题切换                         |
-| Dropdown   | 10         | 14           | ≥20  | 触发方式、placement、嵌套菜单、键盘交互                |
-| CropUpload | 低（32%）  | 低（48%）    | ≥70% | 裁剪拖拽/缩放/旋转、上传成功/失败/取消、文件校验、a11y |
+| 组件       | Vue 测试数 | React 测试数 | 目标 | 状态 |
+| ---------- | ---------- | ------------ | ---- | ---- |
+| Menu       | 31         | 32           | ≥25  | ✅ 完成 |
+| Code       | 24         | 24           | ≥20  | ✅ 完成 |
+| Dropdown   | 20         | 22           | ≥20  | ✅ 完成 |
+| CropUpload | 30         | 30           | ≥30  | ✅ 完成 |
 
 ### 3.2 覆盖率目标提升
 

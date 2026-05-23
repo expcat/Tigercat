@@ -1,6 +1,8 @@
 import { axe, type AxeResults } from 'jest-axe'
 import { expect } from 'vitest'
 
+type AxeOptions = NonNullable<Parameters<typeof axe>[1]>
+
 /**
  * Configure axe for accessibility testing
  * Note: toHaveNoViolations matcher is extended globally in tests/setup.ts
@@ -41,14 +43,19 @@ export async function expectNoA11yViolations(container: HTMLElement): Promise<vo
  *
  * @param container - HTML element to test
  */
-export async function expectNoA11yViolationsIsolated(container: HTMLElement): Promise<void> {
+export async function expectNoA11yViolationsIsolated(
+  container: HTMLElement,
+  options: AxeOptions = {}
+): Promise<void> {
   const results: AxeResults = await axe(container, {
+    ...options,
     rules: {
       label: { enabled: false },
       'button-name': { enabled: false },
       'aria-required-children': { enabled: false },
       'aria-prohibited-attr': { enabled: false },
-      'aria-input-field-name': { enabled: false }
+      'aria-input-field-name': { enabled: false },
+      ...options.rules
     }
   })
   expect(results).toHaveNoViolations()
