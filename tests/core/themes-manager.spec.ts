@@ -40,7 +40,7 @@ describe('themes/manager — ThemeManager', () => {
   // -------------------------------------------------------------------------
 
   describe('built-in presets', () => {
-    it('auto-registers all 6 built-in presets', () => {
+    it('auto-registers all built-in presets', () => {
       const names = ThemeManager.getAvailableThemes()
       expect(names).toEqual(
         expect.arrayContaining([
@@ -49,7 +49,8 @@ describe('themes/manager — ThemeManager', () => {
           'professional',
           'minimal',
           'natural',
-          'modern'
+          'modern',
+          'high-contrast'
         ])
       )
     })
@@ -110,9 +111,7 @@ describe('themes/manager — ThemeManager', () => {
     it('defineTheme() registers and immediately applies the preset', () => {
       ThemeManager.defineTheme(customPreset)
       expect(ThemeManager.getCurrentTheme()).toBe('unit-test-custom')
-      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe(
-        '#ff00ff'
-      )
+      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('#ff00ff')
     })
   })
 
@@ -146,9 +145,7 @@ describe('themes/manager — ThemeManager', () => {
         label: 'With extra',
         light: { colors: { primary: '#abcdef' } }
       })
-      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe(
-        '#abcdef'
-      )
+      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('#abcdef')
       ThemeManager.defineTheme({
         name: 'without-primary',
         label: 'Without',
@@ -156,9 +153,7 @@ describe('themes/manager — ThemeManager', () => {
       })
       // Previous primary value must have been cleared.
       expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('')
-      expect(document.documentElement.style.getPropertyValue('--tiger-surface')).toBe(
-        '#111111'
-      )
+      expect(document.documentElement.style.getPropertyValue('--tiger-surface')).toBe('#111111')
     })
   })
 
@@ -213,10 +208,7 @@ describe('themes/manager — ThemeManager', () => {
           addEventListener: (_: string, listener: (e: MediaQueryListEvent) => void) => {
             mediaListeners.push(listener)
           },
-          removeEventListener: (
-            _: string,
-            listener: (e: MediaQueryListEvent) => void
-          ) => {
+          removeEventListener: (_: string, listener: (e: MediaQueryListEvent) => void) => {
             mediaListeners = mediaListeners.filter((l) => l !== listener)
           },
           addListener: () => {},

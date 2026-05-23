@@ -30,6 +30,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "test:a11y": "vitest run tests/vue tests/react tests/core/a11y-aa-regression.spec.tsx tests/core/a11y-interactive-regression.spec.tsx tests/core/composite-a11y-roles.spec.tsx",
     "test:vue": "vitest tests/vue",
     "test:react": "vitest tests/react",
     "test:validate": "node ./scripts/validate-tests.mjs",

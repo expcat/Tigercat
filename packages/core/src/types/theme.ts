@@ -180,6 +180,7 @@ export type ThemePresetName =
   | 'minimal'
   | 'natural'
   | 'modern'
+  | 'high-contrast'
 
 /**
  * A fully defined preset theme.

@@ -68,13 +68,15 @@ GitHub Pages： https://expcat.github.io/Tigercat/
 
 ## 文档
 
-| 文档                                                   | 说明                                             |
-| ------------------------------------------------------ | ------------------------------------------------ |
-| [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md) | 📘 **AI Agent 入口** - 组件列表、API、主题、i18n |
-| [docs/ROADMAP.md](./docs/ROADMAP.md)                   | 开发路线图与进度                                 |
-| [docs/api-summary.md](./docs/api-summary.md)           | 生成的组件 API 摘要                              |
-| [tests/README.md](./tests/README.md)                   | 测试结构、运行方式与质量标准入口                 |
-| [examples/README.md](./examples/README.md)             | Vue / React 示例应用运行说明                     |
+| 文档                                                                                         | 说明                                             |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md)                                       | 📘 **AI Agent 入口** - 组件列表、API、主题、i18n |
+| [docs/ROADMAP.md](./docs/ROADMAP.md)                                                         | 开发路线图与进度                                 |
+| [docs/api-summary.md](./docs/api-summary.md)                                                 | 生成的组件 API 摘要                              |
+| [docs/accessibility/screen-reader-testing.md](./docs/accessibility/screen-reader-testing.md) | 屏幕阅读器手工测试清单                           |
+| [docs/accessibility/keyboard-navigation.md](./docs/accessibility/keyboard-navigation.md)     | 全组件键盘导航清单                               |
+| [tests/README.md](./tests/README.md)                                                         | 测试结构、运行方式与质量标准入口                 |
+| [examples/README.md](./examples/README.md)                                                   | Vue / React 示例应用运行说明                     |
 
 ## 性能与兼容性
 
@@ -112,17 +114,18 @@ pnpm example:react  # http://localhost:5174
 
 ## 常用命令
 
-| Command            | Description      |
-| ------------------ | ---------------- |
-| `pnpm build`       | 构建所有包       |
-| `pnpm dev`         | 监听模式         |
-| `pnpm test`        | 运行测试         |
-| `pnpm size`        | 检查 bundle 大小 |
-| `pnpm bench`       | 运行性能基准     |
-| `pnpm docs:api`    | 生成 API 文档    |
-| `pnpm example:all` | 同时运行两个示例 |
-| `pnpm lint`        | 代码检查         |
-| `pnpm clean`       | 清理构建产物     |
+| Command            | Description         |
+| ------------------ | ------------------- |
+| `pnpm build`       | 构建所有包          |
+| `pnpm dev`         | 监听模式            |
+| `pnpm test`        | 运行测试            |
+| `pnpm test:a11y`   | 运行 axe 无障碍回归 |
+| `pnpm size`        | 检查 bundle 大小    |
+| `pnpm bench`       | 运行性能基准        |
+| `pnpm docs:api`    | 生成 API 文档       |
+| `pnpm example:all` | 同时运行两个示例    |
+| `pnpm lint`        | 代码检查            |
+| `pnpm clean`       | 清理构建产物        |
 
 ## 参与贡献
 

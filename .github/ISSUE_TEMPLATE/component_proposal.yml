@@ -1,0 +1,82 @@
+name: Component Proposal
+description: Propose a new component for Tigercat
+title: '[Component]: '
+labels: [component, proposal]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New components should fit Tigercat's cross-framework model: shared core types/utilities, Vue and React implementations, tests, examples, and skills documentation.
+  - type: input
+    id: name
+    attributes:
+      label: Component name
+      placeholder: Spotlight, Signature, Countdown, etc.
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Basic
+        - Form
+        - Feedback
+        - Layout
+        - Navigation
+        - Data
+        - Charts
+        - Advanced
+        - Composite
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: use_cases
+    attributes:
+      label: Primary use cases
+      description: What workflows should this component support?
+    validations:
+      required: true
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed API
+      description: List important props, events/callbacks, slots/children, and controlled state.
+      placeholder: |
+        props:
+          - value
+          - disabled
+        events/callbacks:
+          - change
+        slots/children:
+          - default
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Interaction and accessibility notes
+      description: Keyboard behavior, ARIA roles, focus management, mobile behavior, and edge cases.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Comparable components, design references, standards, or screenshots.
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Expected implementation scope
+      options:
+        - label: Shared props/types in packages/core.
+          required: true
+        - label: Framework-neutral utilities where behavior is shared.
+          required: true
+        - label: Vue 3 and React implementations.
+          required: true
+        - label: Tests including accessibility and edge cases.
+          required: true
+        - label: Examples and skills documentation updates.
+          required: true

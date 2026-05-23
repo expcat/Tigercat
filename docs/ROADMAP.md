@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-23）：§5.4 Context 文件优化 — 在 `SKILL.md` 新增 2-step Component Lookup，支持按组件名快速定位分类文档。
+> **最近完成**（2026-05-24）：§9.5 无障碍增强 — 消化 validate a11y warnings，新增 CI axe 回归、高对比度主题预设、屏幕阅读器手工测试清单和全组件键盘导航文档。
 
 ## 基线 v1.1.0
 
@@ -21,7 +21,7 @@ source: project audit and planning
 | E2E        | 56 passed（Chromium）                                                 |
 | validate   | 226/226 通过，58 warnings（初始 458）                                 |
 | i18n       | 9 locale（zh-CN/en-US/zh-TW/ja/ko/th/vi/id + DatePicker 独立 locale） |
-| 主题       | 5 预设 + 暗色模式                                                     |
+| 主题       | 6 预设（含高对比度）+ 暗色模式                                        |
 | CLI        | create / add / playground / generate / doctor                         |
 | SSR 守卫   | 原始 `typeof window/document/navigator` 检查已集中到 `isBrowser()`    |
 | Size Limit | Core < 100KB / Vue < 250KB / React < 250KB（gzip）                    |
@@ -123,7 +123,7 @@ source: project audit and planning
 - [ ] 选型：VitePress（Vue 生态一致）或 Astro Starlight（框架无关）
 - [ ] 组件 API 页面：复用 `scripts/generate-api-docs.mjs` 自动生成
 - [ ] 在线 Playground：嵌入 StackBlitz WebContainer，支持 Vue/React 切换
-- [ ] 主题预览：5 预设 + 暗色模式实时切换
+- [ ] 主题预览：6 预设（含高对比度）+ 暗色模式实时切换
 - [ ] 全文搜索：MiniSearch / Algolia DocSearch
 - [ ] 代码示例：从 `skills/tigercat/references/vue/` 和 `react/` 同步，保持单一数据源
 - [ ] 部署：GitHub Pages / Vercel，CI 自动构建
@@ -337,7 +337,7 @@ source: project audit and planning
 - [ ] Nuxt 3 集成测试：创建 `examples/nuxt/` 验证 Vue 组件 SSR 渲染
 - [ ] Next.js 集成测试：创建 `examples/nextjs/` 验证 React 组件 SSR 渲染
 - [ ] hydration mismatch 修复：重点排查 DatePicker（日期格式化依赖 locale）、Chart（SVG id 唯一性）
-- [ ] SSR 文档：在 `skills/tigercat/references/` 新增 `ssr.md`
+- [x] SSR 文档：在 `skills/tigercat/references/` 新增 `ssr.md`
 
 ### 9.4 i18n 扩展
 
@@ -352,16 +352,16 @@ source: project audit and planning
 
 当前已达 WCAG 2.1 AA，可向 AAA 和更高自动化推进。
 
-- [ ] 消化 validate 中 ~80 条 a11y warnings
-- [ ] 新增 axe-core 自动扫描到 CI（全组件 a11y 回归）
-- [ ] 高对比度主题预设
-- [ ] 屏幕阅读器手工测试文档（NVDA / VoiceOver 验证清单）
-- [ ] 键盘导航文档：每个组件标注支持的快捷键
+- [x] 消化 validate 中 ~80 条 a11y warnings（当前 `pnpm test:validate` 无 a11y warnings，剩余 58 条为低测试数软警告）
+- [x] 新增 axe-core 自动扫描到 CI（全组件 a11y 回归）
+- [x] 高对比度主题预设
+- [x] 屏幕阅读器手工测试文档（NVDA / VoiceOver 验证清单）
+- [x] 键盘导航文档：每个组件标注支持的快捷键
 
 ### 9.6 社区与生态
 
-- [ ] Contributing Guide：贡献流程、开发环境搭建、PR 规范
-- [ ] Issue/PR 模板：Bug Report / Feature Request / Component Proposal
+- [x] Contributing Guide：贡献流程、开发环境搭建、PR 规范
+- [x] Issue/PR 模板：Bug Report / Feature Request / Component Proposal
 - [ ] Discord / GitHub Discussions 社区
 - [ ] Starter Templates：通过 CLI `create` 提供 Vite + Vue/React + Tigercat 模板
 - [ ] 与 Tailwind v4 兼容性验证

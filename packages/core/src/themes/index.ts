@@ -1,7 +1,7 @@
 /**
  * Tigercat Theme System
  *
- * Provides 5 built-in preset themes, a ThemeManager singleton for runtime
+ * Provides built-in preset themes, a ThemeManager singleton for runtime
  * switching, and type definitions for custom themes.
  *
  * @module themes
@@ -38,6 +38,7 @@ export { professionalTheme } from './professional/theme'
 export { minimalTheme } from './minimal/theme'
 export { naturalTheme } from './natural/theme'
 export { modernTheme } from './modern/theme'
+export { highContrastTheme } from './high-contrast/theme'
 
 // Re-export modern token layer (opt-in extended design tokens)
 export {
@@ -68,6 +69,7 @@ import { professionalTheme } from './professional/theme'
 import { minimalTheme } from './minimal/theme'
 import { naturalTheme } from './natural/theme'
 import { modernTheme } from './modern/theme'
+import { highContrastTheme } from './high-contrast/theme'
 
 const builtInPresets = [
   defaultTheme,
@@ -75,7 +77,8 @@ const builtInPresets = [
   professionalTheme,
   minimalTheme,
   naturalTheme,
-  modernTheme
+  modernTheme,
+  highContrastTheme
 ]
 
 for (const preset of builtInPresets) {

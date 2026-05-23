@@ -55,6 +55,39 @@ export default {
 
 ---
 
+## High Contrast 主题
+
+`highContrastTheme` 是内置高对比度预设，面向低视力、强对比和键盘高亮场景。它使用接近黑白的 surface/text token、强边框和高饱和状态色，并纳入主题对比度回归测试。
+
+```js
+// tailwind.config.js
+import { createTigercatPlugin, highContrastTheme } from '@expcat/tigercat-core'
+
+export default {
+  plugins: [createTigercatPlugin({ preset: highContrastTheme })]
+}
+```
+
+运行时切换：
+
+```ts
+import { ThemeManager } from '@expcat/tigercat-core'
+
+ThemeManager.setTheme('high-contrast')
+ThemeManager.setColorScheme('light') // 或 'dark' / 'auto'
+```
+
+| Token          | Light     | Dark      |
+| -------------- | --------- | --------- |
+| `surface`      | `#ffffff` | `#000000` |
+| `text`         | `#000000` | `#ffffff` |
+| `focusRing`    | `#000000` | `#ffff00` |
+| `borderStrong` | `#000000` | `#ffffff` |
+| `primary`      | `#0033cc` | `#66b2ff` |
+| `error`        | `#b00020` | `#ff8a80` |
+
+---
+
 ## CSS 变量
 
 ### 核心变量

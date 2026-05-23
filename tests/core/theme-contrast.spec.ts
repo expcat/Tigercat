@@ -5,7 +5,8 @@ import {
   vibrantTheme,
   professionalTheme,
   minimalTheme,
-  naturalTheme
+  naturalTheme,
+  highContrastTheme
 } from '@expcat/tigercat-core'
 import type { ThemePreset, ThemeSemanticColors } from '@expcat/tigercat-core'
 
@@ -93,7 +94,8 @@ const PRESETS: { name: string; preset: ThemePreset }[] = [
   { name: 'vibrant', preset: vibrantTheme },
   { name: 'professional', preset: professionalTheme },
   { name: 'minimal', preset: minimalTheme },
-  { name: 'natural', preset: naturalTheme }
+  { name: 'natural', preset: naturalTheme },
+  { name: 'high-contrast', preset: highContrastTheme }
 ]
 
 function runChecks(
