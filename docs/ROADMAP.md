@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-23）：§5.1 Skills 文档精简 — 统一术语入口，建立 `glossary.md` 与 common patterns 的简写引用约定。
+> **最近完成**（2026-05-23）：§5.4 Context 文件优化 — 在 `SKILL.md` 新增 2-step Component Lookup，支持按组件名快速定位分类文档。
 
 ## 基线 v1.1.0
 
@@ -172,7 +172,7 @@ source: project audit and planning
 ### 5.2 LLM-INDEX 标注增强
 
 - [x] 每个 Props 文档头部添加 `<!-- LLM-INDEX -->` 摘要（组件数量、关键 API 列表）
-- [ ] `copilot-instructions.md` 精简：移除历史决策说明，保留可执行规则
+- [x] `copilot-instructions.md` 精简：移除历史决策说明，保留可执行规则
 - [x] 新增 `skills/tigercat/references/shared/glossary.md`：组件术语速查，减少重复解释
 
 ### 5.3 文档自动化
@@ -183,9 +183,9 @@ source: project audit and planning
 
 ### 5.4 Context 文件优化
 
-- [ ] 优化 `context7.json` 结构：按组件分类索引，支持 Context7 MCP 精准检索
-- [ ] 审计 `copilot-instructions.md` token 开销：目标控制在 2000 token 以内
-- [ ] 确保 Agent 通过 `SKILL.md` → 分类文档 → 具体组件的三级导航能在 2 步内定位任意组件
+- [x] 优化 `context7.json` 结构：按组件分类索引，支持 Context7 MCP 精准检索
+- [x] 审计 `copilot-instructions.md` token 开销：目标控制在 2000 token 以内（当前 257 words / 2860 bytes）
+- [x] 确保 Agent 通过 `SKILL.md` → 分类文档 → 具体组件的三级导航能在 2 步内定位任意组件
 
 ---
 

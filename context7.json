@@ -1,4 +1,183 @@
 {
   "url": "https://context7.com/expcat/tigercat",
-  "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m"
+  "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
+  "reference_paths": {
+    "skill_index": "skills/tigercat/SKILL.md",
+    "glossary": "skills/tigercat/references/shared/glossary.md",
+    "patterns": "skills/tigercat/references/shared/patterns/common.md",
+    "shared_props": "skills/tigercat/references/shared/props",
+    "vue_examples": "skills/tigercat/references/vue",
+    "react_examples": "skills/tigercat/references/react"
+  },
+  "component_index": {
+    "basic": {
+      "props": "skills/tigercat/references/shared/props/basic.md",
+      "vue": "skills/tigercat/references/vue/basic.md",
+      "react": "skills/tigercat/references/react/basic.md",
+      "components": [
+        "Alert",
+        "Avatar",
+        "AvatarGroup",
+        "Badge",
+        "Button",
+        "ButtonGroup",
+        "Code",
+        "Divider",
+        "Empty",
+        "Icon",
+        "Image",
+        "ImageCropper",
+        "Link",
+        "QRCode",
+        "Tag",
+        "Text"
+      ]
+    },
+    "form": {
+      "props": "skills/tigercat/references/shared/props/form.md",
+      "vue": "skills/tigercat/references/vue/form.md",
+      "react": "skills/tigercat/references/react/form.md",
+      "components": [
+        "AutoComplete",
+        "Cascader",
+        "Checkbox",
+        "CheckboxGroup",
+        "ColorPicker",
+        "DatePicker",
+        "Form",
+        "Input",
+        "InputGroup",
+        "InputNumber",
+        "Mentions",
+        "Radio",
+        "RadioGroup",
+        "Rate",
+        "Select",
+        "Slider",
+        "Stepper",
+        "Switch",
+        "Textarea",
+        "TimePicker",
+        "Transfer",
+        "TreeSelect",
+        "Upload"
+      ]
+    },
+    "feedback": {
+      "props": "skills/tigercat/references/shared/props/feedback.md",
+      "vue": "skills/tigercat/references/vue/feedback.md",
+      "react": "skills/tigercat/references/react/feedback.md",
+      "components": [
+        "Drawer",
+        "Loading",
+        "Message",
+        "Modal",
+        "Notification",
+        "Popconfirm",
+        "Popover",
+        "Progress",
+        "Result",
+        "Tooltip",
+        "Tour",
+        "Watermark"
+      ]
+    },
+    "layout": {
+      "props": "skills/tigercat/references/shared/props/layout.md",
+      "vue": "skills/tigercat/references/vue/layout.md",
+      "react": "skills/tigercat/references/react/layout.md",
+      "components": [
+        "Card",
+        "Carousel",
+        "Container",
+        "Descriptions",
+        "Grid",
+        "Layout",
+        "List",
+        "Resizable",
+        "Skeleton",
+        "Space",
+        "Splitter",
+        "Statistic"
+      ]
+    },
+    "navigation": {
+      "props": "skills/tigercat/references/shared/props/navigation.md",
+      "vue": "skills/tigercat/references/vue/navigation.md",
+      "react": "skills/tigercat/references/react/navigation.md",
+      "components": [
+        "Affix",
+        "Anchor",
+        "BackTop",
+        "Breadcrumb",
+        "Dropdown",
+        "FloatButton",
+        "Menu",
+        "Pagination",
+        "Segmented",
+        "Steps",
+        "Tabs",
+        "Tree"
+      ]
+    },
+    "data": {
+      "props": "skills/tigercat/references/shared/props/data.md",
+      "vue": "skills/tigercat/references/vue/data.md",
+      "react": "skills/tigercat/references/react/data.md",
+      "components": ["Calendar", "Collapse", "Table", "Timeline"]
+    },
+    "charts": {
+      "props": "skills/tigercat/references/shared/props/charts.md",
+      "vue": "skills/tigercat/references/vue/charts.md",
+      "react": "skills/tigercat/references/react/charts.md",
+      "components": [
+        "AreaChart",
+        "BarChart",
+        "ChartCanvas",
+        "ChartLegend",
+        "ChartTooltip",
+        "DonutChart",
+        "FunnelChart",
+        "GaugeChart",
+        "HeatmapChart",
+        "LineChart",
+        "PieChart",
+        "RadarChart",
+        "ScatterChart",
+        "SunburstChart",
+        "TreeMapChart"
+      ]
+    },
+    "advanced": {
+      "props": "skills/tigercat/references/shared/props/advanced.md",
+      "vue": "skills/tigercat/references/vue/advanced.md",
+      "react": "skills/tigercat/references/react/advanced.md",
+      "components": [
+        "CodeEditor",
+        "FileManager",
+        "ImageViewer",
+        "InfiniteScroll",
+        "Kanban",
+        "PrintLayout",
+        "RichTextEditor",
+        "TaskBoard",
+        "VirtualList",
+        "VirtualTable"
+      ]
+    },
+    "composite": {
+      "props": "skills/tigercat/references/shared/props/composite.md",
+      "vue": "skills/tigercat/references/vue/composite.md",
+      "react": "skills/tigercat/references/react/composite.md",
+      "components": [
+        "ActivityFeed",
+        "ChatWindow",
+        "CommentThread",
+        "CropUpload",
+        "DataTableWithToolbar",
+        "FormWizard",
+        "NotificationCenter"
+      ]
+    }
+  }
 }

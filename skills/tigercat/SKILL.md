@@ -26,6 +26,23 @@ Tailwind CSS 驱动的跨框架组件库，支持 Vue 3 和 React。
 | Glossary   | [shared/glossary.md](references/shared/glossary.md)                 | -                                                 | -                                                     |
 | CLI        | [cli.md](references/cli.md)                                         | -                                                 | -                                                     |
 
+## 2-Step Component Lookup
+
+1. 在下表搜索组件名，确认所属分类。
+2. 打开同一行的 Props / Vue / React 分类文档，再搜索组件标题。
+
+| Category   | Components                                                                                                                                                                                                                             | Props                                          | Vue                                 | React                                   |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ----------------------------------- | --------------------------------------- |
+| Basic      | Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, Code, Divider, Empty, Icon, Image, ImageCropper, Link, QRCode, Tag, Text                                                                                                       | [Props](references/shared/props/basic.md)      | [Vue](references/vue/basic.md)      | [React](references/react/basic.md)      |
+| Form       | AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, DatePicker, Form, Input, InputGroup, InputNumber, Mentions, Radio, RadioGroup, Rate, Select, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload | [Props](references/shared/props/form.md)       | [Vue](references/vue/form.md)       | [React](references/react/form.md)       |
+| Feedback   | Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Result, Tooltip, Tour, Watermark                                                                                                                         | [Props](references/shared/props/feedback.md)   | [Vue](references/vue/feedback.md)   | [React](references/react/feedback.md)   |
+| Layout     | Card, Carousel, Container, Descriptions, Grid, Layout, List, Resizable, Skeleton, Space, Splitter, Statistic                                                                                                                           | [Props](references/shared/props/layout.md)     | [Vue](references/vue/layout.md)     | [React](references/react/layout.md)     |
+| Navigation | Affix, Anchor, BackTop, Breadcrumb, Dropdown, FloatButton, Menu, Pagination, Segmented, Steps, Tabs, Tree                                                                                                                              | [Props](references/shared/props/navigation.md) | [Vue](references/vue/navigation.md) | [React](references/react/navigation.md) |
+| Data       | Calendar, Collapse, Table, Timeline                                                                                                                                                                                                    | [Props](references/shared/props/data.md)       | [Vue](references/vue/data.md)       | [React](references/react/data.md)       |
+| Charts     | AreaChart, BarChart, ChartCanvas, ChartLegend, ChartTooltip, DonutChart, FunnelChart, GaugeChart, HeatmapChart, LineChart, PieChart, RadarChart, ScatterChart, SunburstChart, TreeMapChart                                             | [Props](references/shared/props/charts.md)     | [Vue](references/vue/charts.md)     | [React](references/react/charts.md)     |
+| Advanced   | CodeEditor, FileManager, ImageViewer, InfiniteScroll, Kanban, PrintLayout, RichTextEditor, TaskBoard, VirtualList, VirtualTable                                                                                                        | [Props](references/shared/props/advanced.md)   | [Vue](references/vue/advanced.md)   | [React](references/react/advanced.md)   |
+| Composite  | ActivityFeed, ChatWindow, CommentThread, CropUpload, DataTableWithToolbar, FormWizard, NotificationCenter                                                                                                                              | [Props](references/shared/props/composite.md)  | [Vue](references/vue/composite.md)  | [React](references/react/composite.md)  |
+
 ## Installation
 
 ```bash
