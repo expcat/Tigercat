@@ -1,0 +1,21 @@
+{
+  "name": "@expcat/tigercat-example-nuxt",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Nuxt 3 SSR example for Tigercat Vue components",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "@expcat/tigercat-core": "workspace:*",
+    "@expcat/tigercat-vue": "workspace:*",
+    "nuxt": "^3.17.5",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useId, useMemo } from 'react'
 import {
   chartAxisTickTextClasses,
   classNames,
@@ -8,7 +8,7 @@ import {
   getChartElementOpacity,
   getChartInnerRect,
   getPieArcs,
-  getPieGradientPrefix,
+  getStableChartGradientPrefix,
   PIE_BASE_SHADOW,
   PIE_EMPHASIS_SHADOW,
   polarToCartesian,
@@ -135,7 +135,11 @@ export const PieChart: React.FC<PieChartProps> = ({
 
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
 
-  const gradientPrefix = useMemo(() => getPieGradientPrefix(), [])
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('pie', gradientId),
+    [gradientId]
+  )
 
   const cx = innerRect.width / 2
   const cy = innerRect.height / 2

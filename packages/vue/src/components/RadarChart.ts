@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, PropType } from 'vue'
+import { defineComponent, computed, h, ref, PropType, useId } from 'vue'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -7,7 +7,7 @@ import {
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
-  getRadarGradientPrefix,
+  getStableChartGradientPrefix,
   getRadarLabelAlign,
   getRadarPoints,
   polarToCartesian,
@@ -246,7 +246,7 @@ export const RadarChart = defineComponent({
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'series-click', 'series-hover'],
   setup(props, { emit }) {
     // Unique gradient prefix for radar area fills (avoid id collision across instances)
-    const gradientPrefix = getRadarGradientPrefix()
+    const gradientPrefix = getStableChartGradientPrefix('radar', useId())
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 

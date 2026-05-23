@@ -1,11 +1,11 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, useId } from 'vue'
 import {
   classNames,
   clampBarWidth,
   createBandScale,
   createLinearScale,
   ensureBarMinHeight,
-  getBarGradientPrefix,
+  getStableChartGradientPrefix,
   getBarValueLabelY,
   getChartInnerRect,
   getNumberExtent,
@@ -228,7 +228,7 @@ export const BarChart = defineComponent({
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'bar-click', 'bar-hover'],
   setup(props, { emit }) {
     // Unique gradient prefix for this instance
-    const gradientPrefix = getBarGradientPrefix()
+    const gradientPrefix = getStableChartGradientPrefix('bar', useId())
 
     // Use shared interaction composable
     const {

@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, watch, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, computed, h, ref, watch, onBeforeUnmount, PropType, useId } from 'vue'
 import {
   classNames,
   createGaugeArcPath,
@@ -7,7 +7,7 @@ import {
   computeGaugeTicks,
   getChartInnerRect,
   chartAxisTickTextClasses,
-  getGaugeGradientPrefix,
+  getStableChartGradientPrefix,
   createGaugeAnimation,
   type GaugeAnimationController,
   type ChartPadding,
@@ -55,7 +55,7 @@ export const GaugeChart = defineComponent({
     const cy = computed(() => innerRect.value.height / 2)
 
     // Per-instance gradient ID prefix (only used when props.gradient is true)
-    const gradientPrefix = getGaugeGradientPrefix()
+    const gradientPrefix = getStableChartGradientPrefix('gauge', useId())
     const valueGradientId = `${gradientPrefix}-value`
 
     const targetAngle = computed(() =>

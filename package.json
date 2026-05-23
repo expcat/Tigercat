@@ -41,6 +41,9 @@
     "example:vue": "pnpm --filter @expcat/tigercat-example-vue3 dev",
     "example:react": "pnpm --filter @expcat/tigercat-example-react dev",
     "example:build": "pnpm --filter @expcat/tigercat-example-react build && pnpm --filter @expcat/tigercat-example-vue3 build",
+    "example:ssr:nuxt": "pnpm --filter @expcat/tigercat-example-nuxt build",
+    "example:ssr:next": "pnpm --filter @expcat/tigercat-example-nextjs build",
+    "example:ssr:build": "pnpm example:ssr:nuxt && pnpm example:ssr:next",
     "example:all": "node ./scripts/run-examples.mjs",
     "dev:check": "node ./scripts/check-env.mjs",
     "setup": "node ./scripts/setup.mjs"
@@ -60,6 +63,7 @@
     "@typescript-eslint/eslint-plugin": "^8.59.1",
     "@typescript-eslint/parser": "^8.59.1",
     "@vitejs/plugin-vue": "catalog:",
+    "@vue/server-renderer": "catalog:",
     "@vitest/coverage-v8": "^4.1.5",
     "@vitest/ui": "^4.1.5",
     "axe-core": "catalog:",

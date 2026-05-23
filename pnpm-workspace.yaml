@@ -1,10 +1,12 @@
 packages:
   - packages/*
+  - examples/*
   - examples/example/*
 
 catalog:
   # ── Frameworks ──────────────────────────────────
   vue: ^3.5.33
+  '@vue/server-renderer': ^3.5.33
   react: ^19.2.5
   react-dom: ^19.2.5
 

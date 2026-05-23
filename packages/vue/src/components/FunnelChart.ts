@@ -1,10 +1,10 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, useId } from 'vue'
 import {
   classNames,
   computeFunnelSegments,
   getChartElementOpacity,
   getChartInnerRect,
-  getFunnelGradientPrefix,
+  getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -104,7 +104,7 @@ export const FunnelChart = defineComponent({
     const total = computed(() => props.data.reduce((s, d) => s + d.value, 0))
 
     // Stable gradient ID prefix per FunnelChart instance
-    const gradientPrefix = getFunnelGradientPrefix()
+    const gradientPrefix = getStableChartGradientPrefix('funnel', useId())
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({

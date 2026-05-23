@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react'
+import React, { useId, useMemo } from 'react'
 import {
   classNames,
   computeSunburstArcs,
   getChartElementOpacity,
   getChartInnerRect,
-  getSunburstGradientPrefix,
+  getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -62,7 +62,11 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
     [width, height, padding]
   )
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
-  const gradientPrefix = useMemo(() => getSunburstGradientPrefix(), [])
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('sunburst', gradientId),
+    [gradientId]
+  )
 
   const outerRadius = useMemo(
     () => Math.min(innerRect.width, innerRect.height) / 2,

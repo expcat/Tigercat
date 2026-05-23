@@ -1,11 +1,13 @@
 # Tigercat Examples
 
-本目录保留两个 Vite 示例应用，用来验证 Tigercat Vue 与 React 组件的真实使用路径。
+本目录保留 Vite 示例应用与 SSR 示例应用，用来验证 Tigercat Vue 与 React 组件的真实使用路径。
 
 ## 结构
 
 ```text
 examples/
+├── nuxt/      # @expcat/tigercat-example-nuxt，Nuxt 3 SSR smoke
+├── nextjs/    # @expcat/tigercat-example-nextjs，Next.js SSR smoke
 ├── example/
 │   ├── vue3/   # @expcat/tigercat-example-vue3
 │   └── react/  # @expcat/tigercat-example-react
@@ -17,6 +19,8 @@ examples/
 ```bash
 pnpm example:vue    # http://localhost:5173
 pnpm example:react  # http://localhost:5174
+pnpm --filter @expcat/tigercat-example-nuxt dev
+pnpm --filter @expcat/tigercat-example-nextjs dev
 pnpm example:all    # 同时启动两个示例
 ```
 
@@ -31,6 +35,7 @@ pnpm build
 
 ```bash
 pnpm example:build
+pnpm example:ssr:build
 ```
 
 单独构建：
@@ -38,7 +43,11 @@ pnpm example:build
 ```bash
 pnpm --filter @expcat/tigercat-example-vue3 build
 pnpm --filter @expcat/tigercat-example-react build
+pnpm --filter @expcat/tigercat-example-nuxt build
+pnpm --filter @expcat/tigercat-example-nextjs build
 ```
+
+SSR 示例会渲染稳定 `DatePicker` 与带 SVG gradient 的 `BarChart`，覆盖 Roadmap §9.3 中的 hydration mismatch 风险点。
 
 ## 样式接入要点
 

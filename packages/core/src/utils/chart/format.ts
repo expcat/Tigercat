@@ -28,6 +28,27 @@ const treemapGradient = createGradientIdFactory('treemap')
 const sunburstGradient = createGradientIdFactory('sunburst')
 const pieGradient = createGradientIdFactory('pie')
 
+export type ChartGradientKind =
+  | 'line'
+  | 'area'
+  | 'bar'
+  | 'scatter'
+  | 'radar'
+  | 'gauge'
+  | 'funnel'
+  | 'treemap'
+  | 'sunburst'
+  | 'pie'
+
+function normalizeSvgIdSegment(value: string): string {
+  const normalized = value.replace(/[^A-Za-z0-9_-]/g, '-').replace(/^-+|-+$/g, '')
+  return normalized || '0'
+}
+
+export function getStableChartGradientPrefix(kind: ChartGradientKind, instanceId: string): string {
+  return `tiger-${kind}-grad-${normalizeSvgIdSegment(instanceId)}`
+}
+
 /** Generate a unique gradient ID prefix for a LineChart instance. */
 export function getLineGradientPrefix(): string {
   return lineGradient.getPrefix()

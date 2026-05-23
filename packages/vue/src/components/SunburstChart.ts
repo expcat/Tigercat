@@ -1,10 +1,10 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, useId } from 'vue'
 import {
   classNames,
   computeSunburstArcs,
   getChartElementOpacity,
   getChartInnerRect,
-  getSunburstGradientPrefix,
+  getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -92,7 +92,7 @@ export const SunburstChart = defineComponent({
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
     const palette = computed(() => resolveChartPalette(props.colors))
-    const gradientPrefix = getSunburstGradientPrefix()
+    const gradientPrefix = getStableChartGradientPrefix('sunburst', useId())
 
     const outerRadius = computed(() => Math.min(innerRect.value.width, innerRect.value.height) / 2)
     const innerRadius = computed(

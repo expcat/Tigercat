@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react'
+import React, { useId, useMemo } from 'react'
 import {
   classNames,
   computeFunnelSegments,
   getChartElementOpacity,
   getChartInnerRect,
-  getFunnelGradientPrefix,
+  getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -110,7 +110,11 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   const total = useMemo(() => data.reduce((s, d) => s + d.value, 0), [data])
 
   // Stable gradient ID prefix per FunnelChart instance
-  const gradientPrefix = useMemo(() => getFunnelGradientPrefix(), [])
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('funnel', gradientId),
+    [gradientId]
+  )
 
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>

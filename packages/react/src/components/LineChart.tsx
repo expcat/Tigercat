@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useId, useMemo, useState, useCallback } from 'react'
 import {
   classNames,
   createAreaPath,
@@ -7,7 +7,7 @@ import {
   createPointScale,
   getChartElementOpacity,
   getChartInnerRect,
-  getLineGradientPrefix,
+  getStableChartGradientPrefix,
   getNumberExtent,
   linePointTransitionClasses,
   resolveChartPalette,
@@ -117,7 +117,11 @@ export const LineChart: React.FC<LineChartProps> = ({
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
 
   // Unique gradient prefix for area fills
-  const gradientPrefix = useMemo(() => getLineGradientPrefix(), [])
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('line', gradientId),
+    [gradientId]
+  )
 
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),

@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, useId } from 'vue'
 import {
   chartAxisTickTextClasses,
   classNames,
@@ -8,7 +8,7 @@ import {
   getChartElementOpacity,
   getChartInnerRect,
   getPieArcs,
-  getPieGradientPrefix,
+  getStableChartGradientPrefix,
   PIE_BASE_SHADOW,
   PIE_EMPHASIS_SHADOW,
   polarToCartesian,
@@ -217,7 +217,7 @@ export const PieChart = defineComponent({
 
     const palette = computed(() => resolveChartPalette(props.colors))
 
-    const gradientPrefix = getPieGradientPrefix()
+    const gradientPrefix = getStableChartGradientPrefix('pie', useId())
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({

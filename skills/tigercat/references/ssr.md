@@ -37,13 +37,19 @@ if (isBrowser()) {
 
 ## Nuxt 3 示例
 
+仓库内提供 `examples/nuxt/`，可用以下命令验证 Vue 组件的 SSR 构建：
+
+```bash
+pnpm --filter @expcat/tigercat-example-nuxt build
+```
+
 ```vue
 <script setup lang="ts">
 import { Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
-  <Button variant="solid">保存</Button>
+  <Button variant="primary">保存</Button>
 </template>
 ```
 
@@ -62,11 +68,17 @@ onMounted(() => {
 
 ## Next.js 示例
 
+仓库内提供 `examples/nextjs/`，可用以下命令验证 React 组件的 App Router SSR 构建：
+
+```bash
+pnpm --filter @expcat/tigercat-example-nextjs build
+```
+
 ```tsx
 import { Button } from '@expcat/tigercat-react'
 
 export function SaveButton() {
-  return <Button variant="solid">保存</Button>
+  return <Button variant="primary">保存</Button>
 }
 ```
 
@@ -89,13 +101,13 @@ export function ThemeBootstrap() {
 
 ## Hydration 风险点
 
-| 组件/能力       | 风险                                        | 建议                                         |
-| --------------- | ------------------------------------------- | -------------------------------------------- |
-| DatePicker      | locale、时区或当前日期导致服务端/客户端不同 | 传入稳定 `value`、`locale` 和格式化配置      |
-| Charts          | 随机 id 或客户端尺寸影响 SVG 输出           | 使用稳定 id；尺寸依赖客户端时先给定容器尺寸  |
-| Modal/Drawer    | 初始 `open` 与客户端状态不同                | 服务端和客户端使用同一初始 open 值           |
-| Tooltip/Popover | 首屏定位依赖 DOM 尺寸                       | 关闭态首屏渲染，打开后再计算定位             |
-| Theme           | 客户端读取 localStorage 后切换 class        | 在 HTML 层提前注入默认 class 或使用 CSS 默认 |
+| 组件/能力       | 风险                                        | 建议                                                             |
+| --------------- | ------------------------------------------- | ---------------------------------------------------------------- |
+| DatePicker      | locale、时区或当前日期导致服务端/客户端不同 | 传入稳定 `value`、`locale` 和格式化配置                          |
+| Charts          | 随机 id 或客户端尺寸影响 SVG 输出           | 使用框架 `useId` 派生稳定 SVG id；尺寸依赖客户端时先给定容器尺寸 |
+| Modal/Drawer    | 初始 `open` 与客户端状态不同                | 服务端和客户端使用同一初始 open 值                               |
+| Tooltip/Popover | 首屏定位依赖 DOM 尺寸                       | 关闭态首屏渲染，打开后再计算定位                                 |
+| Theme           | 客户端读取 localStorage 后切换 class        | 在 HTML 层提前注入默认 class 或使用 CSS 默认                     |
 
 ## 组件开发检查清单
 
@@ -105,5 +117,5 @@ export function ThemeBootstrap() {
 - 初始 render 不依赖客户端尺寸、滚动位置或媒体查询结果。
 - 浏览器事件监听有对应清理逻辑。
 - Portal、overlay、拖拽、复制、上传等能力在非浏览器环境下可静默跳过或返回稳定占位。
-- 可见文案、日期和 id 在服务端与客户端保持稳定。
-- 相关 SSR 行为已通过单测覆盖；Nuxt / Next 集成验证仍按 Roadmap 单独推进。
+- 可见文案、日期和 id 在服务端与客户端保持稳定；图表 SVG gradient id 使用稳定实例 id。
+- 相关 SSR 行为已通过单测覆盖；Nuxt / Next 集成验证使用 `pnpm example:ssr:build`。

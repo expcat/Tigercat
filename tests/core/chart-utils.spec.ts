@@ -29,6 +29,7 @@ import {
   ensureBarMinHeight,
   getBarValueLabelY,
   getBarGradientPrefix,
+  getStableChartGradientPrefix,
   computePieHoverOffset,
   computePieLabelLine,
   PIE_EMPHASIS_SHADOW,
@@ -766,6 +767,28 @@ describe('chart-utils', () => {
       const b = getBarGradientPrefix()
       expect(a).not.toBe(b)
       expect(a).toMatch(/^tiger-bar-grad-\d+$/)
+    })
+  })
+
+  describe('getStableChartGradientPrefix', () => {
+    it('returns a deterministic prefix for the same framework instance id', () => {
+      const first = getStableChartGradientPrefix('bar', ':R1:')
+      const second = getStableChartGradientPrefix('bar', ':R1:')
+
+      expect(first).toBe(second)
+      expect(first).toBe('tiger-bar-grad-R1')
+    })
+
+    it('sanitizes framework ids for SVG fragment identifiers', () => {
+      const prefix = getStableChartGradientPrefix('line', 'v-0:section/chart')
+
+      expect(prefix).toBe('tiger-line-grad-v-0-section-chart')
+    })
+
+    it('uses a fallback segment when the framework id has no valid SVG characters', () => {
+      const prefix = getStableChartGradientPrefix('area', ':::')
+
+      expect(prefix).toBe('tiger-area-grad-0')
     })
   })
 })

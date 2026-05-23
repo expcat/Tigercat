@@ -1,11 +1,11 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react'
+import React, { useId, useMemo, useState, useEffect } from 'react'
 import {
   classNames,
   createLinearScale,
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
-  getScatterGradientPrefix,
+  getStableChartGradientPrefix,
   getScatterHoverShadow,
   getScatterHoverSize,
   getScatterPointPath,
@@ -117,8 +117,11 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   desc,
   className
 }) => {
-  const gradientPrefixRef = useRef(getScatterGradientPrefix())
-  const gradientPrefix = gradientPrefixRef.current
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('scatter', gradientId),
+    [gradientId]
+  )
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {

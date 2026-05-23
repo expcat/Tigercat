@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, ref } from 'vue'
+import { defineComponent, computed, h, PropType, ref, useId } from 'vue'
 import {
   classNames,
   createAreaPath,
@@ -7,7 +7,7 @@ import {
   createPointScale,
   getChartElementOpacity,
   getChartInnerRect,
-  getLineGradientPrefix,
+  getStableChartGradientPrefix,
   getNumberExtent,
   linePointTransitionClasses,
   resolveChartPalette,
@@ -264,7 +264,7 @@ export const LineChart = defineComponent({
     const tooltipPosition = ref({ x: 0, y: 0 })
 
     // Unique gradient prefix for area fills
-    const gradientPrefix = getLineGradientPrefix()
+    const gradientPrefix = getStableChartGradientPrefix('line', useId())
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 

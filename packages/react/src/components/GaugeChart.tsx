@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, useEffect } from 'react'
+import React, { useId, useMemo, useState, useRef, useEffect } from 'react'
 import {
   classNames,
   createGaugeArcPath,
@@ -7,7 +7,7 @@ import {
   computeGaugeTicks,
   getChartInnerRect,
   chartAxisTickTextClasses,
-  getGaugeGradientPrefix,
+  getStableChartGradientPrefix,
   createGaugeAnimation,
   type ChartPadding,
   type GaugeChartProps as CoreGaugeChartProps
@@ -91,7 +91,11 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   const formattedValue = valueFormatter ? valueFormatter(value) : `${value}`
 
   // Per-instance gradient ID (only used when gradient prop is on)
-  const gradientPrefix = useMemo(() => getGaugeGradientPrefix(), [])
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('gauge', gradientId),
+    [gradientId]
+  )
   const valueGradientId = `${gradientPrefix}-value`
 
   return (
@@ -161,10 +165,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       ))}
 
       {/* Needle */}
-      <path
-        d={needlePath}
-        fill="var(--tiger-text,#374151)"
-      />
+      <path d={needlePath} fill="var(--tiger-text,#374151)" />
 
       {/* Center dot */}
       <circle cx={cx} cy={cy} r={5} fill="var(--tiger-text,#374151)" />

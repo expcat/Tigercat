@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-23）：§9.4 i18n 扩展 — 新增 5 个语言包与 DatePicker locale，补齐 RTL direction/组件镜像、Intl 数字/日期格式 helper，并新增 i18n 覆盖审计文档。
+> **最近完成**（2026-05-23）：§9.3 SSR 支持 — 新增 Nuxt 3 / Next.js SSR 示例与 `example:ssr:build` 验证脚本，修复图表 SVG gradient id 的 hydration mismatch 风险，并补充 SSR 回归测试。
 
 ## 基线 v1.1.0
 
@@ -332,11 +332,11 @@ source: project audit and planning
 
 ### 9.3 SSR 支持
 
-当前 SSR 守卫已集中到 `isBrowser()`，但未经框架级验证。
+当前 SSR 守卫已集中到 `isBrowser()`，Nuxt 3 / Next.js 示例已通过框架级构建验证。
 
-- [ ] Nuxt 3 集成测试：创建 `examples/nuxt/` 验证 Vue 组件 SSR 渲染
-- [ ] Next.js 集成测试：创建 `examples/nextjs/` 验证 React 组件 SSR 渲染
-- [ ] hydration mismatch 修复：重点排查 DatePicker（日期格式化依赖 locale）、Chart（SVG id 唯一性）
+- [x] Nuxt 3 集成测试：创建 `examples/nuxt/` 验证 Vue 组件 SSR 渲染
+- [x] Next.js 集成测试：创建 `examples/nextjs/` 验证 React 组件 SSR 渲染
+- [x] hydration mismatch 修复：重点排查 DatePicker（日期格式化依赖 locale）、Chart（SVG id 唯一性）
 - [x] SSR 文档：在 `skills/tigercat/references/` 新增 `ssr.md`
 
 ### 9.4 i18n 扩展

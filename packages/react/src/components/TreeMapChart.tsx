@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react'
+import React, { useId, useMemo } from 'react'
 import {
   classNames,
   computeTreeMapNodes,
   getChartElementOpacity,
   getChartInnerRect,
-  getTreeMapGradientPrefix,
+  getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -63,7 +63,11 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     [width, height, padding]
   )
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
-  const gradientPrefix = useMemo(() => getTreeMapGradientPrefix(), [])
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('treemap', gradientId),
+    [gradientId]
+  )
 
   const nodes = useMemo(
     () =>

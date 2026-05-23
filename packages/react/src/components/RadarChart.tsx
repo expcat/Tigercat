@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useId, useMemo, useState, useCallback } from 'react'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -7,7 +7,7 @@ import {
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
-  getRadarGradientPrefix,
+  getStableChartGradientPrefix,
   getRadarLabelAlign,
   getRadarPoints,
   polarToCartesian,
@@ -337,7 +337,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
   const dasharray = getChartGridLineDasharray(gridLineStyle)
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
-  const gradientPrefix = useMemo(() => getRadarGradientPrefix(), [])
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('radar', gradientId),
+    [gradientId]
+  )
 
   const tooltipContent = useMemo(
     () =>

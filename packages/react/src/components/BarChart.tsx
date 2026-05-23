@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { useId, useMemo } from 'react'
 import {
   classNames,
   clampBarWidth,
   createBandScale,
   createLinearScale,
   ensureBarMinHeight,
-  getBarGradientPrefix,
+  getStableChartGradientPrefix,
   getBarValueLabelY,
   getChartElementOpacity,
   getChartInnerRect,
@@ -96,7 +96,11 @@ export const BarChart: React.FC<BarChartProps> = ({
   onBarHover
 }) => {
   // Unique gradient prefix for this instance
-  const gradientPrefix = useMemo(() => getBarGradientPrefix(), [])
+  const gradientId = useId()
+  const gradientPrefix = useMemo(
+    () => getStableChartGradientPrefix('bar', gradientId),
+    [gradientId]
+  )
 
   // Use shared interaction hook
   const {

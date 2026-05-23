@@ -1,10 +1,10 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, useId } from 'vue'
 import {
   classNames,
   computeTreeMapNodes,
   getChartElementOpacity,
   getChartInnerRect,
-  getTreeMapGradientPrefix,
+  getStableChartGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -93,7 +93,7 @@ export const TreeMapChart = defineComponent({
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
     const palette = computed(() => resolveChartPalette(props.colors))
-    const gradientPrefix = getTreeMapGradientPrefix()
+    const gradientPrefix = getStableChartGradientPrefix('treemap', useId())
 
     const nodes = computed(() =>
       computeTreeMapNodes(props.data, {

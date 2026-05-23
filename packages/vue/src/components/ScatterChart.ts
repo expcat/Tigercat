@@ -1,11 +1,11 @@
-import { defineComponent, computed, h, PropType, onMounted, ref } from 'vue'
+import { defineComponent, computed, h, PropType, onMounted, ref, useId } from 'vue'
 import {
   classNames,
   createLinearScale,
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
-  getScatterGradientPrefix,
+  getStableChartGradientPrefix,
   getScatterHoverShadow,
   getScatterHoverSize,
   getScatterPointPath,
@@ -127,7 +127,7 @@ export const ScatterChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'point-click', 'point-hover'],
   setup(props, { emit }) {
-    const gradientPrefix = getScatterGradientPrefix()
+    const gradientPrefix = getStableChartGradientPrefix('scatter', useId())
     const mounted = ref(false)
 
     onMounted(() => {
