@@ -105,6 +105,20 @@ describe('Loading (React)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+  it('renders spinner variant by default', () => {
+    const { container } = render(<Loading />)
+    expect(container.querySelector('svg')).toBeInTheDocument()
+  })
+
+  it('applies all size variants without errors', () => {
+    const sizes = ['sm', 'md', 'lg', 'xl'] as const
+    for (const size of sizes) {
+      const { container, unmount } = render(<Loading size={size} />)
+      expect(container.querySelector('[role="status"]')).toBeInTheDocument()
+      unmount()
+    }
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

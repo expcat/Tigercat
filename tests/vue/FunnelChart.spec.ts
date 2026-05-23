@@ -151,6 +151,26 @@ describe('FunnelChart (Vue)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+  it('renders single segment without errors', () => {
+    const { container } = renderWithProps(FunnelChart, {
+      data: [{ label: 'Only', value: 100 }],
+      ...defaultSize
+    })
+    const series = container.querySelector('g[data-series-type="funnel"]')
+    expect(series!.querySelectorAll('path')).toHaveLength(1)
+  })
+
+  it('renders with minimal dimensions', () => {
+    const { container } = renderWithProps(FunnelChart, {
+      data: sampleData,
+      width: 100,
+      height: 80
+    })
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveAttribute('width', '100')
+    expect(svg).toHaveAttribute('height', '80')
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

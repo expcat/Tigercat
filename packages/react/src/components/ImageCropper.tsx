@@ -398,6 +398,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           <>
             <div
               className={imageCropperGuideClasses}
+              data-guide="true"
               style={{
                 left: `${cr.x}px`,
                 top: `${cr.y + cr.height / 3}px`,
@@ -409,6 +410,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             />
             <div
               className={imageCropperGuideClasses}
+              data-guide="true"
               style={{
                 left: `${cr.x}px`,
                 top: `${cr.y + (cr.height * 2) / 3}px`,
@@ -420,6 +422,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             />
             <div
               className={imageCropperGuideClasses}
+              data-guide="true"
               style={{
                 left: `${cr.x + cr.width / 3}px`,
                 top: `${cr.y}px`,
@@ -431,6 +434,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             />
             <div
               className={imageCropperGuideClasses}
+              data-guide="true"
               style={{
                 left: `${cr.x + (cr.width * 2) / 3}px`,
                 top: `${cr.y}px`,

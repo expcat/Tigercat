@@ -150,6 +150,25 @@ describe('TreeMapChart (Vue)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+  it('renders single data item', () => {
+    const { container } = renderWithProps(TreeMapChart, {
+      data: [{ label: 'Single', value: 100 }],
+      ...defaultSize
+    })
+    const rects = container.querySelectorAll('rect')
+    expect(rects.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('renders with gap=0', () => {
+    const { container } = renderWithProps(TreeMapChart, {
+      data: sampleData,
+      gap: 0,
+      ...defaultSize
+    })
+    const rects = container.querySelectorAll('rect')
+    expect(rects.length).toBeGreaterThanOrEqual(4)
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

@@ -70,10 +70,10 @@ describe('ImageCropper', () => {
     expect(el).toHaveAttribute('aria-label', 'Loading image for cropping')
   })
 
-  it('renders with guides prop', () => {
-    const { container } = render(<ImageCropper src="/test.jpg" guides />)
+  it('renders with guides prop', async () => {
+    const { container } = await renderLoadedCropper(<ImageCropper src="/test.jpg" guides />)
 
-    expect(container.firstElementChild).toBeInTheDocument()
+    expect(container.querySelectorAll('[data-guide="true"]')).toHaveLength(4)
   })
 
   it('renders with aspect ratio', () => {
@@ -162,6 +162,18 @@ describe('ImageCropper', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+  it('hides guides when guides is false', async () => {
+    const { container } = await renderLoadedCropper(<ImageCropper src="/test.jpg" guides={false} />)
+    expect(container.querySelectorAll('[data-guide="true"]')).toHaveLength(0)
+  })
+
+  it('accepts outputType and quality props without error', () => {
+    const { container } = render(
+      <ImageCropper src="/test.jpg" outputType="image/jpeg" quality={0.75} />
+    )
+    expect(container.firstElementChild).toBeInTheDocument()
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

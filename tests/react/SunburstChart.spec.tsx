@@ -144,6 +144,27 @@ describe('SunburstChart (React)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+  it('renders as full pie when innerRadiusRatio is 0', () => {
+    const { container } = renderWithProps(SunburstChart, {
+      data: sampleData,
+      innerRadiusRatio: 0,
+      ...defaultSize
+    })
+    const paths = container.querySelectorAll('path')
+    expect(paths.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('renders with rectangular dimensions', () => {
+    const { container } = renderWithProps(SunburstChart, {
+      data: sampleData,
+      width: 500,
+      height: 300
+    })
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveAttribute('width', '500')
+    expect(svg).toHaveAttribute('height', '300')
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

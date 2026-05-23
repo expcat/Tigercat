@@ -9,17 +9,17 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-23）：§1.1 第二批首轮 — Alert / Avatar / Icon / GaugeChart / Rate / Statistic 补测至 ≥15（Vue+React 各 6 组件），并清理剩余命名 warning；全量测试 6248 cases / 309 files 全部通过，validate warnings 93 → 80。
+> **最近完成**（2026-05-23）：§1.1 第二批二轮 — FunnelChart / Loading / Progress / ImageCropper / TreeMapChart / SunburstChart 补测至 ≥15（Vue+React 各 6 组件，+24 tests）；validate warnings 80 → 68。
 
 ## 基线 v1.1.0
 
 | 指标       | 数据                                                                  |
 | ---------- | --------------------------------------------------------------------- |
 | 组件       | 133+（Vue 3 + React 双端，含 12 种 SVG 图表）                         |
-| 测试       | 6248 cases / 309 files                                                |
+| 测试       | 6272 cases / 309 files                                                |
 | 覆盖率     | Stmts 84.66% / Branch 77.68% / Funcs 86.06% / Lines 86.64%            |
 | E2E        | 56 passed（Chromium）                                                 |
-| validate   | 226/226 通过，80 warnings（初始 458）                                 |
+| validate   | 226/226 通过，68 warnings（初始 458）                                 |
 | i18n       | 9 locale（zh-CN/en-US/zh-TW/ja/ko/th/vi/id + DatePicker 独立 locale） |
 | 主题       | 5 预设 + 暗色模式                                                     |
 | CLI        | create / add / playground / generate / doctor                         |
@@ -45,9 +45,9 @@ source: project audit and planning
 执行策略：
 
 - [x] 第一批：补齐 a11y 检查 + Edge Case 描述块（~160 warnings → 消除 361 条）
-- [ ] 第二批：低测试数组件补量（重点见 §3 测试覆盖）— 首轮完成 Alert/Avatar/Icon/GaugeChart/Rate/Statistic（93→81），命名清理后剩余 80 below-threshold warnings
+- [ ] 第二批：低测试数组件补量（重点见 §3 测试覆盖）— 首轮 Alert/Avatar/Icon/GaugeChart/Rate/Statistic（93→80）；二轮 FunnelChart/Loading/Progress/ImageCropper/TreeMapChart/SunburstChart（80→68）
 - [x] 第三批：命名规范 + 结构优化（剩余 1 条 naming warning 已清理，可结合日常改动继续维护）
-- [ ] 每批完成后运行 `pnpm test:validate`，记录 warnings 下降趋势：458 → 93 → 80
+- [ ] 每批完成后运行 `pnpm test:validate`，记录 warnings 下降趋势：458 → 93 → 80 → 68
 
 ### 1.2 代码质量扫描
 

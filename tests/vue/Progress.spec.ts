@@ -147,6 +147,26 @@ describe('Progress', () => {
     })
     await expectNoA11yViolationsIsolated(circle)
   })
+  it('applies success status color', () => {
+    const { container } = renderWithProps(Progress, {
+      percentage: 100,
+      status: 'success'
+    })
+    const progressbar = container.querySelector('[role="progressbar"]')
+    expect(progressbar?.className).toContain('success')
+  })
+
+  it('renders striped without animation', () => {
+    const { container } = renderWithProps(Progress, {
+      percentage: 50,
+      striped: true,
+      stripedAnimation: false
+    })
+    const progressbar = container.querySelector('[role="progressbar"]') as HTMLElement
+    expect(progressbar.className).toContain('bg-gradient')
+    expect(progressbar.className).not.toContain('progress-stripes')
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props
