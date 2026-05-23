@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, waitFor, act } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react'
@@ -15,11 +15,17 @@ function LocaleDisplay() {
     <div>
       <span data-testid="ok">{config.locale?.common?.okText ?? 'default'}</span>
       <span data-testid="loading">{config.localeLoading ? 'loading' : 'ready'}</span>
+      <span data-testid="direction">{config.direction ?? 'none'}</span>
     </div>
   )
 }
 
 describe('ConfigProvider', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+    document.documentElement.removeAttribute('data-tiger-dir')
+  })
+
   describe('sync locale', () => {
     it('provides a static locale to children', () => {
       const locale: Partial<TigerLocale> = {
@@ -34,6 +40,18 @@ describe('ConfigProvider', () => {
 
       expect(getByTestId('ok').textContent).toBe('确定')
       expect(getByTestId('loading').textContent).toBe('ready')
+    })
+
+    it('derives RTL direction from locale metadata and applies document dir', () => {
+      const { getByTestId } = render(
+        <ConfigProvider locale={{ locale: 'ar-SA', direction: 'rtl' }}>
+          <LocaleDisplay />
+        </ConfigProvider>
+      )
+
+      expect(getByTestId('direction').textContent).toBe('rtl')
+      expect(document.documentElement.getAttribute('dir')).toBe('rtl')
+      expect(document.documentElement.getAttribute('data-tiger-dir')).toBe('rtl')
     })
 
     it('merges nested ConfigProvider locales', () => {

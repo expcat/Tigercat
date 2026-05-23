@@ -18,14 +18,40 @@ export function parseDate(value: Date | string | null | undefined): Date | null 
   return isNaN(parsed.getTime()) ? null : parsed
 }
 
+function getIntlOptionsFromDateFormat(format: DateFormat): Intl.DateTimeFormatOptions {
+  switch (format) {
+    case 'yyyy-MM-dd':
+    case 'yyyy/MM/dd':
+      return { year: 'numeric', month: '2-digit', day: '2-digit' }
+    case 'MM/dd/yyyy':
+      return { year: 'numeric', month: '2-digit', day: '2-digit' }
+    case 'dd/MM/yyyy':
+      return { year: 'numeric', month: '2-digit', day: '2-digit' }
+    default:
+      return { year: 'numeric', month: '2-digit', day: '2-digit' }
+  }
+}
+
 /**
- * Format a date according to the specified format
+ * Format a date according to the specified format.
+ * Passing a locale uses Intl.DateTimeFormat for localized digits/order.
+ * Omitting locale preserves the legacy fixed ASCII output.
  * @param date - Date to format
  * @param format - Date format string
+ * @param locale - Optional BCP 47 locale identifier
  * @returns Formatted date string, empty string if date is null
  */
-export function formatDate(date: Date | null, format: DateFormat = 'yyyy-MM-dd'): string {
+export function formatDate(
+  date: Date | null,
+  format: DateFormat = 'yyyy-MM-dd',
+  locale?: string
+): string {
   if (!date || isNaN(date.getTime())) return ''
+
+  if (locale) {
+    const localized = safeIntlFormat(locale, getIntlOptionsFromDateFormat(format), date)
+    if (localized) return localized
+  }
 
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -44,6 +70,18 @@ export function formatDate(date: Date | null, format: DateFormat = 'yyyy-MM-dd')
     default:
       return `${year}-${month}-${day}`
   }
+}
+
+export function formatDateWithLocale(
+  date: Date | null,
+  locale?: string,
+  options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' }
+): string {
+  if (!date || isNaN(date.getTime())) return ''
+  if (!locale) return formatDate(date)
+
+  const localized = safeIntlFormat(locale, options, date)
+  return localized || formatDate(date)
 }
 
 /**

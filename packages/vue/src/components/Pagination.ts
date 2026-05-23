@@ -17,6 +17,7 @@ import {
   validateCurrentPage,
   getPageNumbers,
   defaultTotalText,
+  formatPaginationTotal,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
   getPaginationButtonActiveClasses,
@@ -26,6 +27,7 @@ import {
   getTotalTextClasses,
   getSizeTextClasses,
   getPaginationLabels,
+  getLocaleDirection,
   formatPageAriaLabel,
   createPaginationIdleValidationScheduler,
   getImmediateTigerLocale,
@@ -265,6 +267,8 @@ export const Pagination = defineComponent({
 
     // Get resolved locale labels
     const labels = computed(() => getPaginationLabels(resolvedLocale.value))
+    const localeCode = computed(() => resolvedLocale.value?.locale)
+    const isRtl = computed(() => getLocaleDirection(resolvedLocale.value) === 'rtl')
 
     // Internal state for uncontrolled mode
     const internalCurrent = ref<number>(props.defaultCurrent)
@@ -428,7 +432,12 @@ export const Pagination = defineComponent({
 
       // Total text
       if (props.showTotal) {
-        const totalTextFn = props.totalText || defaultTotalText
+        const totalTextFn =
+          props.totalText ||
+          (resolvedLocale.value?.pagination?.totalText
+            ? (value: number, range: [number, number]) =>
+                formatPaginationTotal(labels.value.totalText, value, range, localeCode.value)
+            : defaultTotalText)
         elements.push(
           h('span', { class: getTotalTextClasses(size) }, totalTextFn(props.total, pageRange.value))
         )
@@ -445,7 +454,7 @@ export const Pagination = defineComponent({
             onClick: () => handlePageChange(page - 1),
             'aria-label': labels.value.prevPageAriaLabel
           },
-          '‹'
+          isRtl.value ? '›' : '‹'
         )
       )
 
@@ -474,7 +483,11 @@ export const Pagination = defineComponent({
                   ),
                   disabled: props.disabled,
                   onClick: () => handlePageChange(pageNum as number),
-                  'aria-label': formatPageAriaLabel(labels.value.pageAriaLabel, pageNum as number),
+                  'aria-label': formatPageAriaLabel(
+                    labels.value.pageAriaLabel,
+                    pageNum as number,
+                    localeCode.value
+                  ),
                   'aria-current': isActive ? 'page' : undefined
                 },
                 String(pageNum)
@@ -495,7 +508,7 @@ export const Pagination = defineComponent({
             onClick: () => handlePageChange(page + 1),
             'aria-label': labels.value.nextPageAriaLabel
           },
-          '›'
+          isRtl.value ? '‹' : '›'
         )
       )
 

@@ -2,6 +2,7 @@ import {
   defineComponent,
   computed,
   inject,
+  onBeforeUnmount,
   provide,
   ref,
   watch,
@@ -14,15 +15,18 @@ import {
   isLazyTigerLocale,
   getImmediateTigerLocale,
   resolveTigerLocale,
+  getLocaleDirection,
   ThemeManager,
   type TigerLocale,
   type TigerLocaleInput,
+  type TigerLocaleDirection,
   type ColorScheme
 } from '@expcat/tigercat-core'
 
 export interface TigerConfig {
   locale?: Partial<TigerLocale>
   localeLoading?: boolean
+  direction?: TigerLocaleDirection
   theme?: string
   colorScheme?: ColorScheme
 }
@@ -41,6 +45,10 @@ export const ConfigProvider = defineComponent({
   props: {
     locale: {
       type: [Object, Function, Promise] as PropType<TigerLocaleInput>,
+      default: undefined
+    },
+    direction: {
+      type: String as PropType<TigerLocaleDirection>,
       default: undefined
     },
     theme: {
@@ -94,6 +102,11 @@ export const ConfigProvider = defineComponent({
       return {
         locale: mergeTigerLocale(parent.value.locale, resolvedLocale.value),
         localeLoading: localeLoading.value || parent.value.localeLoading,
+        direction:
+          props.direction ??
+          resolvedLocale.value?.direction ??
+          parent.value.direction ??
+          (resolvedLocale.value?.locale ? getLocaleDirection(resolvedLocale.value) : undefined),
         theme: props.theme ?? parent.value.theme,
         colorScheme: props.colorScheme ?? parent.value.colorScheme
       }
@@ -115,6 +128,33 @@ export const ConfigProvider = defineComponent({
       },
       { immediate: true }
     )
+
+    let previousDir: string | null = null
+    let previousDataDir: string | null = null
+    watch(
+      () => merged.value.direction,
+      (direction) => {
+        if (!direction || typeof document === 'undefined') return
+
+        const root = document.documentElement
+        if (previousDir === null && previousDataDir === null) {
+          previousDir = root.getAttribute('dir')
+          previousDataDir = root.getAttribute('data-tiger-dir')
+        }
+        root.setAttribute('dir', direction)
+        root.setAttribute('data-tiger-dir', direction)
+      },
+      { immediate: true }
+    )
+
+    onBeforeUnmount(() => {
+      if (typeof document === 'undefined') return
+      const root = document.documentElement
+      if (previousDir === null) root.removeAttribute('dir')
+      else root.setAttribute('dir', previousDir)
+      if (previousDataDir === null) root.removeAttribute('data-tiger-dir')
+      else root.setAttribute('data-tiger-dir', previousDataDir)
+    })
 
     provide(TigerConfigKey, merged)
 

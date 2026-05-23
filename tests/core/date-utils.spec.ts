@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   clearCalendarMonthDaysCache,
+  formatDate,
+  formatDateWithLocale,
   getCalendarDays,
   getCalendarMonthDaysCacheSize,
   getMonthDays
@@ -49,5 +51,25 @@ describe('date-utils calendar month cache', () => {
     }
 
     expect(getCalendarMonthDaysCacheSize()).toBe(48)
+  })
+
+  it('keeps legacy fixed formatting when no locale is provided', () => {
+    expect(formatDate(new Date(2024, 0, 5), 'yyyy-MM-dd')).toBe('2024-01-05')
+    expect(formatDate(new Date(2024, 0, 5), 'dd/MM/yyyy')).toBe('05/01/2024')
+  })
+
+  it('formats dates through Intl when locale is provided', () => {
+    const date = new Date(2024, 0, 5)
+
+    expect(formatDate(date, 'yyyy-MM-dd', 'fr-FR')).toBe(
+      new Intl.DateTimeFormat('fr-FR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).format(date)
+    )
+    expect(formatDateWithLocale(date, 'de-DE', { dateStyle: 'medium' })).toBe(
+      new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium' }).format(date)
+    )
   })
 })

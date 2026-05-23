@@ -18,10 +18,13 @@ import type {
   TigerLocaleLazyModule,
   TigerLocalePagination,
   TigerLocaleFormWizard,
-  TigerLocaleTaskBoard
+  TigerLocaleTaskBoard,
+  TigerLocaleDirection
 } from '../types/locale'
 
 const TIGER_LOCALE_KEYS = [
+  'locale',
+  'direction',
   'common',
   'modal',
   'drawer',
@@ -89,6 +92,8 @@ export function mergeTigerLocale(
   if (!base && !override) return undefined
 
   return {
+    locale: override?.locale ?? base?.locale,
+    direction: override?.direction ?? base?.direction,
     common: { ...base?.common, ...override?.common },
     modal: { ...base?.modal, ...override?.modal },
     drawer: { ...base?.drawer, ...override?.drawer },
@@ -97,6 +102,40 @@ export function mergeTigerLocale(
     datePicker: { ...base?.datePicker, ...override?.datePicker },
     formWizard: { ...base?.formWizard, ...override?.formWizard },
     taskBoard: { ...base?.taskBoard, ...override?.taskBoard }
+  }
+}
+
+const RTL_LANGUAGE_CODES = new Set(['ar', 'fa', 'he', 'iw', 'ps', 'ur'])
+
+export function isRtlLocale(locale?: string | Partial<TigerLocale>): boolean {
+  if (!locale) return false
+  if (typeof locale !== 'string') {
+    if (locale.direction) return locale.direction === 'rtl'
+    return isRtlLocale(locale.locale)
+  }
+
+  const language = locale.split('-')[0]?.toLowerCase()
+  return RTL_LANGUAGE_CODES.has(language)
+}
+
+export function getLocaleDirection(locale?: string | Partial<TigerLocale>): TigerLocaleDirection {
+  return isRtlLocale(locale) ? 'rtl' : 'ltr'
+}
+
+export function formatIntlNumber(value: number, locale?: string): string {
+  if (!locale) return String(value)
+  try {
+    return new Intl.NumberFormat(locale).format(value)
+  } catch {
+    return String(value)
+  }
+}
+
+export function getIntlPluralCategory(value: number, locale?: string): Intl.LDMLPluralRule {
+  try {
+    return new Intl.PluralRules(locale).select(value)
+  } catch {
+    return value === 1 ? 'one' : 'other'
   }
 }
 
@@ -190,12 +229,16 @@ export function getPaginationLabels(
 export function formatPaginationTotal(
   template: string,
   total: number,
-  range: [number, number]
+  range: [number, number],
+  locale?: string
 ): string {
+  const category = getIntlPluralCategory(total, locale)
+
   return template
-    .replace('{total}', String(total))
-    .replace('{start}', String(range[0]))
-    .replace('{end}', String(range[1]))
+    .replace('{total}', formatIntlNumber(total, locale))
+    .replace('{start}', formatIntlNumber(range[0], locale))
+    .replace('{end}', formatIntlNumber(range[1], locale))
+    .replace('{plural}', category)
 }
 
 /**
@@ -205,8 +248,8 @@ export function formatPaginationTotal(
  * @param page - Page number
  * @returns Formatted string
  */
-export function formatPageAriaLabel(template: string, page: number): string {
-  return template.replace('{page}', String(page))
+export function formatPageAriaLabel(template: string, page: number, locale?: string): string {
+  return template.replace('{page}', formatIntlNumber(page, locale))
 }
 
 // ============================================================================

@@ -5,6 +5,8 @@
 import type { TigerLocale } from '../../../types/locale'
 
 export const jaJP: TigerLocale = {
+  locale: 'ja-JP',
+  direction: 'ltr',
   common: {
     okText: 'OK',
     cancelText: 'キャンセル',

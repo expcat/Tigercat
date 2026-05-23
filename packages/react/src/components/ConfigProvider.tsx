@@ -4,15 +4,18 @@ import {
   isLazyTigerLocale,
   getImmediateTigerLocale,
   resolveTigerLocale,
+  getLocaleDirection,
   ThemeManager,
   type TigerLocale,
   type TigerLocaleInput,
+  type TigerLocaleDirection,
   type ColorScheme
 } from '@expcat/tigercat-core'
 
 export interface TigerConfig {
   locale?: Partial<TigerLocale>
   localeLoading?: boolean
+  direction?: TigerLocaleDirection
   theme?: string
   colorScheme?: ColorScheme
 }
@@ -21,6 +24,7 @@ const TigerConfigContext = React.createContext<TigerConfig>({})
 
 export interface ConfigProviderProps {
   locale?: TigerLocaleInput
+  direction?: TigerLocaleDirection
   theme?: string
   colorScheme?: ColorScheme
   children?: React.ReactNode
@@ -28,6 +32,7 @@ export interface ConfigProviderProps {
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   locale,
+  direction,
   theme,
   colorScheme,
   children
@@ -75,10 +80,26 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
     return {
       locale: mergeTigerLocale(parent.locale, resolvedLocale),
       localeLoading: localeLoading || parent.localeLoading,
+      direction:
+        direction ??
+        resolvedLocale?.direction ??
+        parent.direction ??
+        (resolvedLocale?.locale ? getLocaleDirection(resolvedLocale) : undefined),
       theme: theme ?? parent.theme,
       colorScheme: colorScheme ?? parent.colorScheme
     }
-  }, [parent.locale, resolvedLocale, localeLoading, parent.localeLoading, theme, parent.theme, colorScheme, parent.colorScheme])
+  }, [
+    parent.locale,
+    resolvedLocale,
+    localeLoading,
+    parent.localeLoading,
+    direction,
+    parent.direction,
+    theme,
+    parent.theme,
+    colorScheme,
+    parent.colorScheme
+  ])
 
   useEffect(() => {
     if (value.theme) ThemeManager.setTheme(value.theme)
@@ -87,6 +108,23 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   useEffect(() => {
     if (value.colorScheme) ThemeManager.setColorScheme(value.colorScheme)
   }, [value.colorScheme])
+
+  useEffect(() => {
+    if (!value.direction || typeof document === 'undefined') return
+
+    const root = document.documentElement
+    const previousDir = root.getAttribute('dir')
+    const previousDataDir = root.getAttribute('data-tiger-dir')
+    root.setAttribute('dir', value.direction)
+    root.setAttribute('data-tiger-dir', value.direction)
+
+    return () => {
+      if (previousDir === null) root.removeAttribute('dir')
+      else root.setAttribute('dir', previousDir)
+      if (previousDataDir === null) root.removeAttribute('data-tiger-dir')
+      else root.setAttribute('data-tiger-dir', previousDataDir)
+    }
+  }, [value.direction])
 
   return <TigerConfigContext.Provider value={value}>{children}</TigerConfigContext.Provider>
 }

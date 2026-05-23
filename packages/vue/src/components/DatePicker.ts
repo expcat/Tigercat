@@ -32,6 +32,7 @@ import {
   ChevronRightIconPath,
   getDatePickerLocaleCode,
   getDatePickerLabels,
+  getLocaleDirection,
   type DatePickerSize,
   type DateFormat,
   type DatePickerModelValue,
@@ -265,6 +266,7 @@ export const DatePicker = defineComponent({
     })
     const minDateParsed = computed(() => parseDate(props.minDate))
     const maxDateParsed = computed(() => parseDate(props.maxDate))
+    const localeCode = computed(() => getDatePickerLocaleCode(props.locale))
 
     // Current viewing month/year in calendar
     const viewingMonth = ref(
@@ -276,12 +278,14 @@ export const DatePicker = defineComponent({
 
     const displayValue = computed(() => {
       if (!isRangeMode.value) {
-        return selectedDate.value ? formatDate(selectedDate.value, props.format) : ''
+        return selectedDate.value
+          ? formatDate(selectedDate.value, props.format, localeCode.value)
+          : ''
       }
 
       const [start, end] = selectedRange.value
-      const startText = start ? formatDate(start, props.format) : ''
-      const endText = end ? formatDate(end, props.format) : ''
+      const startText = start ? formatDate(start, props.format, localeCode.value) : ''
+      const endText = end ? formatDate(end, props.format, localeCode.value) : ''
 
       if (!startText && !endText) return ''
       if (startText && endText) return `${startText} - ${endText}`
@@ -303,9 +307,10 @@ export const DatePicker = defineComponent({
       return getCalendarDays(viewingYear.value, viewingMonth.value)
     })
 
-    const localeCode = computed(() => getDatePickerLocaleCode(props.locale))
-
     const dayNames = computed(() => getShortDayNames(localeCode.value))
+    const isRtl = computed(() => getLocaleDirection(localeCode.value) === 'rtl')
+    const previousMonthIcon = computed(() => (isRtl.value ? ChevronRightIcon : ChevronLeftIcon))
+    const nextMonthIcon = computed(() => (isRtl.value ? ChevronLeftIcon : ChevronRightIcon))
 
     const labels = computed(() => getDatePickerLabels(props.locale, props.labels))
 
@@ -672,7 +677,7 @@ export const DatePicker = defineComponent({
                       onClick: previousMonth,
                       'aria-label': labels.value.previousMonth
                     },
-                    ChevronLeftIcon
+                    previousMonthIcon.value
                   ),
                   h(
                     'div',
@@ -687,7 +692,7 @@ export const DatePicker = defineComponent({
                       onClick: nextMonth,
                       'aria-label': labels.value.nextMonth
                     },
-                    ChevronRightIcon
+                    nextMonthIcon.value
                   )
                 ]),
                 // Day names header

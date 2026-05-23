@@ -87,6 +87,31 @@
       "import": "./dist/locales/id-ID.js",
       "require": "./dist/locales/id-ID.cjs"
     },
+    "./locales/es-ES": {
+      "types": "./dist/locales/es-ES.d.ts",
+      "import": "./dist/locales/es-ES.js",
+      "require": "./dist/locales/es-ES.cjs"
+    },
+    "./locales/fr-FR": {
+      "types": "./dist/locales/fr-FR.d.ts",
+      "import": "./dist/locales/fr-FR.js",
+      "require": "./dist/locales/fr-FR.cjs"
+    },
+    "./locales/de-DE": {
+      "types": "./dist/locales/de-DE.d.ts",
+      "import": "./dist/locales/de-DE.js",
+      "require": "./dist/locales/de-DE.cjs"
+    },
+    "./locales/pt-BR": {
+      "types": "./dist/locales/pt-BR.d.ts",
+      "import": "./dist/locales/pt-BR.js",
+      "require": "./dist/locales/pt-BR.cjs"
+    },
+    "./locales/ar-SA": {
+      "types": "./dist/locales/ar-SA.d.ts",
+      "import": "./dist/locales/ar-SA.js",
+      "require": "./dist/locales/ar-SA.cjs"
+    },
     "./datepicker-locales/en-US": {
       "types": "./dist/datepicker-locales/en-US.d.ts",
       "import": "./dist/datepicker-locales/en-US.js",
@@ -126,6 +151,31 @@
       "types": "./dist/datepicker-locales/id-ID.d.ts",
       "import": "./dist/datepicker-locales/id-ID.js",
       "require": "./dist/datepicker-locales/id-ID.cjs"
+    },
+    "./datepicker-locales/es-ES": {
+      "types": "./dist/datepicker-locales/es-ES.d.ts",
+      "import": "./dist/datepicker-locales/es-ES.js",
+      "require": "./dist/datepicker-locales/es-ES.cjs"
+    },
+    "./datepicker-locales/fr-FR": {
+      "types": "./dist/datepicker-locales/fr-FR.d.ts",
+      "import": "./dist/datepicker-locales/fr-FR.js",
+      "require": "./dist/datepicker-locales/fr-FR.cjs"
+    },
+    "./datepicker-locales/de-DE": {
+      "types": "./dist/datepicker-locales/de-DE.d.ts",
+      "import": "./dist/datepicker-locales/de-DE.js",
+      "require": "./dist/datepicker-locales/de-DE.cjs"
+    },
+    "./datepicker-locales/pt-BR": {
+      "types": "./dist/datepicker-locales/pt-BR.d.ts",
+      "import": "./dist/datepicker-locales/pt-BR.js",
+      "require": "./dist/datepicker-locales/pt-BR.cjs"
+    },
+    "./datepicker-locales/ar-SA": {
+      "types": "./dist/datepicker-locales/ar-SA.d.ts",
+      "import": "./dist/datepicker-locales/ar-SA.js",
+      "require": "./dist/datepicker-locales/ar-SA.cjs"
     },
     "./icons/common": {
       "types": "./dist/icons/common.d.ts",

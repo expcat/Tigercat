@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import {
   createPaginationIdleValidationScheduler,
+  formatPageAriaLabel,
+  formatPaginationTotal,
+  getTimePickerLabels,
+  getTimePickerOptionAriaLabel,
   getPaginationJumperPage,
   getValidatedPaginationJumperValue,
   resolveTigerLocale
@@ -50,5 +54,23 @@ describe('pagination-utils', () => {
     )
 
     expect(locale?.pagination?.jumpToText).toBe('跳至')
+  })
+
+  it('formats pagination variables with Intl numbers and plural category', () => {
+    expect(formatPaginationTotal('Total {total} ({plural})', 1, [1, 1], 'en-US')).toBe(
+      'Total 1 (one)'
+    )
+    expect(formatPageAriaLabel('الصفحة {page}', 12, 'ar-SA')).toBe(
+      `الصفحة ${new Intl.NumberFormat('ar-SA').format(12)}`
+    )
+  })
+
+  it('resolves TimePicker labels for new locale codes', () => {
+    expect(getTimePickerLabels('es-ES').selectTime).toBe('Seleccionar hora')
+    expect(getTimePickerLabels('ar-SA').ok).toBe('موافق')
+    expect(getTimePickerOptionAriaLabel(2, 'hour', 'en-US')).toBe('2 hours')
+    expect(getTimePickerOptionAriaLabel(5, 'minute', 'ar-SA')).toBe(
+      `${new Intl.NumberFormat('ar-SA').format(5)} دقيقة`
+    )
   })
 })

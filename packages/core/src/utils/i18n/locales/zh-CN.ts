@@ -5,6 +5,8 @@
 import type { TigerLocale } from '../../../types/locale'
 
 export const zhCN: TigerLocale = {
+  locale: 'zh-CN',
+  direction: 'ltr',
   common: {
     okText: '确定',
     cancelText: '取消',

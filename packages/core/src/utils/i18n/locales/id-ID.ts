@@ -5,6 +5,8 @@
 import type { TigerLocale } from '../../../types/locale'
 
 export const idID: TigerLocale = {
+  locale: 'id-ID',
+  direction: 'ltr',
   common: {
     okText: 'OK',
     cancelText: 'Batal',

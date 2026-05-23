@@ -5,6 +5,8 @@
 import type { TigerLocale } from '../../../types/locale'
 
 export const viVN: TigerLocale = {
+  locale: 'vi-VN',
+  direction: 'ltr',
   common: {
     okText: 'Đồng ý',
     cancelText: 'Hủy',

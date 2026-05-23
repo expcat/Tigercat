@@ -6,6 +6,7 @@ import {
   validateCurrentPage,
   getPageNumbers,
   defaultTotalText,
+  formatPaginationTotal,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
   getPaginationButtonActiveClasses,
@@ -15,6 +16,7 @@ import {
   getTotalTextClasses,
   getSizeTextClasses,
   getPaginationLabels,
+  getLocaleDirection,
   formatPageAriaLabel,
   createPaginationIdleValidationScheduler,
   getImmediateTigerLocale,
@@ -97,6 +99,8 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   // Get resolved locale labels
   const labels = useMemo(() => getPaginationLabels(resolvedLocale), [resolvedLocale])
+  const localeCode = resolvedLocale?.locale
+  const isRtl = getLocaleDirection(resolvedLocale) === 'rtl'
 
   // Internal state for uncontrolled mode
   const [internalCurrent, setInternalCurrent] = useState<number>(defaultCurrent)
@@ -243,7 +247,12 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   // Total text
   if (showTotal) {
-    const totalTextFn = totalText || defaultTotalText
+    const totalTextFn =
+      totalText ||
+      (resolvedLocale?.pagination?.totalText
+        ? (value: number, range: [number, number]) =>
+            formatPaginationTotal(labels.totalText, value, range, localeCode)
+        : defaultTotalText)
     elements.push(
       <span key="total" className={getTotalTextClasses(size)}>
         {totalTextFn(total, pageRange)}
@@ -260,7 +269,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       disabled={prevDisabled}
       onClick={() => handlePageChange(validatedCurrentPage - 1)}
       aria-label={labels.prevPageAriaLabel}>
-      ‹
+      {isRtl ? '›' : '‹'}
     </button>
   )
 
@@ -295,7 +304,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             )}
             disabled={disabled}
             onClick={() => handlePageChange(pageNum as number)}
-            aria-label={formatPageAriaLabel(labels.pageAriaLabel, pageNum as number)}
+            aria-label={formatPageAriaLabel(labels.pageAriaLabel, pageNum as number, localeCode)}
             aria-current={isActive ? 'page' : undefined}>
             {String(pageNum)}
           </button>
@@ -313,7 +322,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       disabled={nextDisabled}
       onClick={() => handlePageChange(validatedCurrentPage + 1)}
       aria-label={labels.nextPageAriaLabel}>
-      ›
+      {isRtl ? '‹' : '›'}
     </button>
   )
 

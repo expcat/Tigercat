@@ -1,5 +1,7 @@
 import type { DatePickerLocalePreset } from './datepicker'
 
+export type TigerLocaleDirection = 'ltr' | 'rtl'
+
 export interface TigerLocaleCommon {
   okText?: string
   cancelText?: string
@@ -87,6 +89,10 @@ export interface TigerLocaleTaskBoard {
 }
 
 export interface TigerLocale {
+  /** BCP 47 locale identifier, for Intl formatting and direction inference. */
+  locale?: string
+  /** Text/layout direction. RTL locales should set this to `rtl`. */
+  direction?: TigerLocaleDirection
   common?: TigerLocaleCommon
   modal?: TigerLocaleModal
   drawer?: TigerLocaleDrawer

@@ -7,8 +7,14 @@ import { koKR } from '@expcat/tigercat-core/locales/ko-KR'
 import { thTH } from '@expcat/tigercat-core/locales/th-TH'
 import { viVN } from '@expcat/tigercat-core/locales/vi-VN'
 import { idID } from '@expcat/tigercat-core/locales/id-ID'
+import { esES } from '@expcat/tigercat-core/locales/es-ES'
+import { frFR } from '@expcat/tigercat-core/locales/fr-FR'
+import { deDE } from '@expcat/tigercat-core/locales/de-DE'
+import { ptBR } from '@expcat/tigercat-core/locales/pt-BR'
+import { arSA } from '@expcat/tigercat-core/locales/ar-SA'
+import { getLocaleDirection, isRtlLocale } from '@expcat/tigercat-core'
 
-const locales = { enUS, zhCN, zhTW, jaJP, koKR, thTH, viVN, idID }
+const locales = { enUS, zhCN, zhTW, jaJP, koKR, thTH, viVN, idID, esES, frFR, deDE, ptBR, arSA }
 
 describe('i18n locale presets', () => {
   const requiredKeys = ['common', 'modal', 'drawer', 'pagination', 'formWizard', 'taskBoard']
@@ -35,6 +41,21 @@ describe('i18n locale presets', () => {
 
   it('koKR common.cancelText is "취소"', () => {
     expect(koKR.common.cancelText).toBe('취소')
+  })
+
+  it('new western and Arabic locales expose translated labels', () => {
+    expect(esES.common.okText).toBe('Aceptar')
+    expect(frFR.pagination.nextPageAriaLabel).toBe('Page suivante')
+    expect(deDE.formWizard.finishText).toBe('Fertigstellen')
+    expect(ptBR.taskBoard.boardAriaLabel).toBe('Quadro de tarefas')
+    expect(arSA.common.cancelText).toBe('إلغاء')
+  })
+
+  it('marks Arabic as RTL and keeps other built-ins LTR', () => {
+    expect(arSA.direction).toBe('rtl')
+    expect(isRtlLocale(arSA)).toBe(true)
+    expect(isRtlLocale('he-IL')).toBe(true)
+    expect(getLocaleDirection(esES)).toBe('ltr')
   })
 
   it('all locales have pagination.totalText', () => {

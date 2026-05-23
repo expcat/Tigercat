@@ -5,6 +5,8 @@
 import type { TigerLocale } from '../../../types/locale'
 
 export const koKR: TigerLocale = {
+  locale: 'ko-KR',
+  direction: 'ltr',
   common: {
     okText: '확인',
     cancelText: '취소',

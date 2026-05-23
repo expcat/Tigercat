@@ -9,6 +9,7 @@
 
 import type { TimePickerLabels } from '../types/timepicker'
 import { clockSolidIcon20PathD, closeSolidIcon20PathD } from './common-icons'
+import { formatIntlNumber, getIntlPluralCategory } from './locale-utils'
 
 // ============================================================================
 // Icons (re-exports for backward compatibility)
@@ -58,6 +59,81 @@ const EN_LABELS: TimePickerLabels = {
   selectTimeRange: 'Select time range'
 }
 
+const TIME_PICKER_LABELS_BY_LANGUAGE: Record<string, TimePickerLabels> = {
+  en: EN_LABELS,
+  zh: ZH_LABELS,
+  es: {
+    hour: 'Hora',
+    minute: 'Min',
+    second: 'Seg',
+    now: 'Ahora',
+    ok: 'Aceptar',
+    start: 'Inicio',
+    end: 'Fin',
+    clear: 'Borrar hora',
+    toggle: 'Abrir selector de hora',
+    dialog: 'Selector de hora',
+    selectTime: 'Seleccionar hora',
+    selectTimeRange: 'Seleccionar rango de horas'
+  },
+  fr: {
+    hour: 'Heure',
+    minute: 'Min',
+    second: 'Sec',
+    now: 'Maintenant',
+    ok: 'OK',
+    start: 'Début',
+    end: 'Fin',
+    clear: 'Effacer l’heure',
+    toggle: 'Ouvrir le sélecteur d’heure',
+    dialog: 'Sélecteur d’heure',
+    selectTime: 'Sélectionner une heure',
+    selectTimeRange: 'Sélectionner une plage horaire'
+  },
+  de: {
+    hour: 'Stunde',
+    minute: 'Min',
+    second: 'Sek',
+    now: 'Jetzt',
+    ok: 'OK',
+    start: 'Start',
+    end: 'Ende',
+    clear: 'Zeit löschen',
+    toggle: 'Zeitauswahl öffnen',
+    dialog: 'Zeitauswahl',
+    selectTime: 'Zeit auswählen',
+    selectTimeRange: 'Zeitbereich auswählen'
+  },
+  pt: {
+    hour: 'Hora',
+    minute: 'Min',
+    second: 'Seg',
+    now: 'Agora',
+    ok: 'OK',
+    start: 'Início',
+    end: 'Fim',
+    clear: 'Limpar hora',
+    toggle: 'Abrir seletor de hora',
+    dialog: 'Seletor de hora',
+    selectTime: 'Selecionar hora',
+    selectTimeRange: 'Selecionar intervalo de horas'
+  },
+  ar: {
+    hour: 'ساعة',
+    minute: 'دقيقة',
+    second: 'ثانية',
+    now: 'الآن',
+    ok: 'موافق',
+    start: 'البداية',
+    end: 'النهاية',
+    clear: 'مسح الوقت',
+    toggle: 'فتح منتقي الوقت',
+    dialog: 'منتقي الوقت',
+    selectTime: 'اختر الوقت',
+    selectTimeRange: 'اختر نطاق الوقت'
+  }
+}
+
 function isZhLocale(locale?: string): boolean {
   return (locale ?? '').toLowerCase().startsWith('zh')
 }
@@ -66,14 +142,15 @@ export function getTimePickerLabels(
   locale?: string,
   overrides?: Partial<TimePickerLabels>
 ): TimePickerLabels {
-  const base = isZhLocale(locale) ? ZH_LABELS : EN_LABELS
+  const language = (locale ?? '').split('-')[0]?.toLowerCase()
+  const base = language ? (TIME_PICKER_LABELS_BY_LANGUAGE[language] ?? EN_LABELS) : EN_LABELS
   return { ...base, ...(overrides ?? {}) }
 }
 
 export type TimePickerOptionUnit = 'hour' | 'minute' | 'second'
 
 function pluralizeEn(value: number, singular: string): string {
-  return value === 1 ? singular : `${singular}s`
+  return getIntlPluralCategory(value, 'en') === 'one' ? singular : `${singular}s`
 }
 
 export function getTimePickerOptionAriaLabel(
@@ -87,15 +164,15 @@ export function getTimePickerOptionAriaLabel(
     unit === 'hour' ? labels.hour : unit === 'minute' ? labels.minute : labels.second
 
   // Chinese: no space between value and unit
-  if (isZhLocale(locale)) return `${value}${unitLabel}`
+  if (isZhLocale(locale)) return `${formatIntlNumber(value, locale)}${unitLabel}`
 
   // English pluralization when locale is explicitly English or using default EN labels
   const lc = (locale ?? '').toLowerCase()
   if (lc.startsWith('en') || (!lc && !labelOverrides)) {
-    return `${value} ${pluralizeEn(value, unit)}`
+    return `${formatIntlNumber(value, locale)} ${pluralizeEn(value, unit)}`
   }
 
-  return `${value} ${unitLabel}`
+  return `${formatIntlNumber(value, locale)} ${unitLabel}`
 }
 
 // ============================================================================

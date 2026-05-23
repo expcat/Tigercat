@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-24）：§9.5 无障碍增强 — 消化 validate a11y warnings，新增 CI axe 回归、高对比度主题预设、屏幕阅读器手工测试清单和全组件键盘导航文档。
+> **最近完成**（2026-05-23）：§9.4 i18n 扩展 — 新增 5 个语言包与 DatePicker locale，补齐 RTL direction/组件镜像、Intl 数字/日期格式 helper，并新增 i18n 覆盖审计文档。
 
 ## 基线 v1.1.0
 
@@ -20,7 +20,7 @@ source: project audit and planning
 | 覆盖率     | Stmts 84.66% / Branch 77.68% / Funcs 86.06% / Lines 86.64%            |
 | E2E        | 56 passed（Chromium）                                                 |
 | validate   | 226/226 通过，58 warnings（初始 458）                                 |
-| i18n       | 9 locale（zh-CN/en-US/zh-TW/ja/ko/th/vi/id + DatePicker 独立 locale） |
+| i18n       | 13 locale（含 es/fr/de/pt-BR/ar-SA；DatePicker 独立 locale 同步覆盖） |
 | 主题       | 6 预设（含高对比度）+ 暗色模式                                        |
 | CLI        | create / add / playground / generate / doctor                         |
 | SSR 守卫   | 原始 `typeof window/document/navigator` 检查已集中到 `isBrowser()`    |
@@ -341,12 +341,12 @@ source: project audit and planning
 
 ### 9.4 i18n 扩展
 
-当前 9 locale，覆盖东亚 + 东南亚。
+当前 13 locale，覆盖东亚、东南亚、西欧/拉美与阿拉伯语 RTL。
 
-- [ ] 新增 locale：es-ES（西班牙语）、fr-FR（法语）、de-DE（德语）、pt-BR（葡萄牙语）、ar-SA（阿拉伯语 RTL）
-- [ ] RTL 布局支持：阿拉伯语/希伯来语方向适配（CSS `direction: rtl` + 组件镜像）
-- [ ] i18n 覆盖审计：确认全部含文案组件都接入 locale 系统（估计覆盖 ~80%，目标 100%）
-- [ ] 复数/日期格式：接入 Intl API 替代硬编码格式
+- [x] 新增 locale：es-ES（西班牙语）、fr-FR（法语）、de-DE（德语）、pt-BR（葡萄牙语）、ar-SA（阿拉伯语 RTL）
+- [x] RTL 布局支持：阿拉伯语/希伯来语方向适配（CSS `direction: rtl` + 组件镜像）
+- [x] i18n 覆盖审计：确认全部含文案组件都接入 locale 系统（基础控件 locale-driven，组合组件 prop-driven）
+- [x] 复数/日期格式：接入 Intl API 替代硬编码格式
 
 ### 9.5 无障碍增强
 

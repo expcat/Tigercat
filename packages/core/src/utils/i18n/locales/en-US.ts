@@ -5,6 +5,8 @@
 import type { TigerLocale } from '../../../types/locale'
 
 export const enUS: TigerLocale = {
+  locale: 'en-US',
+  direction: 'ltr',
   common: {
     okText: 'OK',
     cancelText: 'Cancel',

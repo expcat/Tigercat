@@ -89,6 +89,21 @@ export const tigercatDarkTheme: Record<string, string> = {
   '--tiger-chart-6': '#f87171'
 }
 
+const tigercatDirectionBase = {
+  '[dir="rtl"] .tiger-rtl-mirror, [data-tiger-dir="rtl"] .tiger-rtl-mirror': {
+    transform: 'scaleX(-1)'
+  },
+  '[dir="rtl"] .tiger-text-start, [data-tiger-dir="rtl"] .tiger-text-start': {
+    textAlign: 'right'
+  },
+  '[dir="rtl"] .tiger-text-end, [data-tiger-dir="rtl"] .tiger-text-end': {
+    textAlign: 'left'
+  },
+  '[dir="rtl"] .tiger-flex-row, [data-tiger-dir="rtl"] .tiger-flex-row': {
+    flexDirection: 'row-reverse'
+  }
+}
+
 /**
  * Tailwind CSS plugin for Tigercat
  * Injects the default CSS variables into the root scope
@@ -100,7 +115,8 @@ export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
     // Remove browser default focus outline on interactive SVG elements
     'svg [tabindex], svg [role="button"]': {
       outline: 'none'
-    }
+    },
+    ...tigercatDirectionBase
   })
 })
 
@@ -167,7 +183,8 @@ export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
       '.dark': { ...darkVars, ...MODERN_BASE_TOKENS_DARK },
       'svg [tabindex], svg [role="button"]': {
         outline: 'none'
-      }
+      },
+      ...tigercatDirectionBase
     })
 
     if (options.modern) {

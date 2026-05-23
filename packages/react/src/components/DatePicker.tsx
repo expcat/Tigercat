@@ -31,6 +31,7 @@ import {
   ChevronRightIconPath,
   getDatePickerLocaleCode,
   getDatePickerLabels,
+  getLocaleDirection,
   type DatePickerProps as CoreDatePickerProps,
   type DatePickerSingleModelValue,
   type DatePickerRangeModelValue,
@@ -157,6 +158,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
 
   const minDateParsed = useMemo(() => parseDate(props.minDate ?? null), [props.minDate])
   const maxDateParsed = useMemo(() => parseDate(props.maxDate ?? null), [props.maxDate])
+  const localeCode = useMemo(() => getDatePickerLocaleCode(props.locale), [props.locale])
 
   // Current viewing month/year in calendar
   const [viewingMonth, setViewingMonth] = useState(
@@ -168,12 +170,12 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
 
   const displayValue = (() => {
     if (!isRangeMode) {
-      return selectedDate ? formatDate(selectedDate, format) : ''
+      return selectedDate ? formatDate(selectedDate, format, localeCode) : ''
     }
 
     const [start, end] = selectedRange
-    const startText = start ? formatDate(start, format) : ''
-    const endText = end ? formatDate(end, format) : ''
+    const startText = start ? formatDate(start, format, localeCode) : ''
+    const endText = end ? formatDate(end, format, localeCode) : ''
 
     if (!startText && !endText) return ''
     if (startText && endText) return `${startText} - ${endText}`
@@ -202,9 +204,8 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
   maxDateParsedRef.current = maxDateParsed
   calendarDaysRef.current = calendarDays
 
-  const localeCode = useMemo(() => getDatePickerLocaleCode(props.locale), [props.locale])
-
   const dayNames = useMemo(() => getShortDayNames(localeCode), [localeCode])
+  const isRtl = getLocaleDirection(localeCode) === 'rtl'
 
   const labels = useMemo(
     () => getDatePickerLabels(props.locale, props.labels),
@@ -587,7 +588,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
               className={datePickerNavButtonClasses}
               onClick={previousMonth}
               aria-label={labels.previousMonth}>
-              <Icon path={ChevronLeftIconPath} className="w-5 h-5" />
+              <Icon path={isRtl ? ChevronRightIconPath : ChevronLeftIconPath} className="w-5 h-5" />
             </button>
             <div className={datePickerMonthYearClasses}>
               {formatMonthYear(viewingYear, viewingMonth, localeCode)}
@@ -597,7 +598,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
               className={datePickerNavButtonClasses}
               onClick={nextMonth}
               aria-label={labels.nextMonth}>
-              <Icon path={ChevronRightIconPath} className="w-5 h-5" />
+              <Icon path={isRtl ? ChevronLeftIconPath : ChevronRightIconPath} className="w-5 h-5" />
             </button>
           </div>
 

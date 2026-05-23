@@ -19,10 +19,14 @@ export const activityItemTitleGroupClasses = 'flex items-center gap-2 min-w-0'
 export const activityItemDescriptionClasses = 'mb-2 break-words'
 export const activityItemActionsClasses = 'flex flex-wrap gap-2'
 
-export const formatActivityTime = (value?: string | number | Date): string => {
+export const formatActivityTime = (
+  value?: string | number | Date,
+  locale?: string,
+  options?: Intl.DateTimeFormatOptions
+): string => {
   if (value == null || value === '') return ''
-  if (value instanceof Date) return value.toLocaleString()
-  if (typeof value === 'number') return new Date(value).toLocaleString()
+  if (value instanceof Date) return value.toLocaleString(locale, options)
+  if (typeof value === 'number') return new Date(value).toLocaleString(locale, options)
   return value
 }
 
@@ -72,9 +76,7 @@ export const buildActivityGroups = (
   return [{ key: 'default', title: '', items }]
 }
 
-export const toActivityTimelineItems = (
-  items: ActivityItem[]
-): ActivityTimelineItem[] => {
+export const toActivityTimelineItems = (items: ActivityItem[]): ActivityTimelineItem[] => {
   return items.map((item, index) => ({
     key: item.id ?? index,
     activity: item

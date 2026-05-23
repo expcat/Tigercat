@@ -1,6 +1,20 @@
 import { defineConfig } from 'tsup'
 
-const localeIds = ['en-US', 'zh-CN', 'zh-TW', 'ja-JP', 'ko-KR', 'th-TH', 'vi-VN', 'id-ID']
+const localeIds = [
+  'en-US',
+  'zh-CN',
+  'zh-TW',
+  'ja-JP',
+  'ko-KR',
+  'th-TH',
+  'vi-VN',
+  'id-ID',
+  'es-ES',
+  'fr-FR',
+  'de-DE',
+  'pt-BR',
+  'ar-SA'
+]
 
 const localeEntries = Object.fromEntries(
   localeIds.map((id) => [`locales/${id}`, `src/utils/i18n/locales/${id}.ts`])

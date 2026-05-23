@@ -5,6 +5,8 @@
 import type { TigerLocale } from '../../../types/locale'
 
 export const thTH: TigerLocale = {
+  locale: 'th-TH',
+  direction: 'ltr',
   common: {
     okText: 'ตกลง',
     cancelText: 'ยกเลิก',
