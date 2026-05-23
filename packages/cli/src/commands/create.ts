@@ -12,13 +12,14 @@ export function createCreateCommand() {
   return new Command('create')
     .argument('<name>', 'Project name')
     .option('-t, --template <template>', 'Project template (vue3 | react)')
+    .option('--dry-run', 'Preview files without writing them')
     .description('Create a new project with Tigercat pre-configured')
-    .action(async (name: string, opts: { template?: string }) => {
-      await runCreate(name, opts.template)
+    .action(async (name: string, opts: { template?: string; dryRun?: boolean }) => {
+      await runCreate(name, opts.template, Boolean(opts.dryRun))
     })
 }
 
-async function runCreate(name: string, templateArg?: string) {
+export async function runCreate(name: string, templateArg?: string, dryRun = false) {
   let template: TemplateName
 
   if (templateArg && TEMPLATES.includes(templateArg as TemplateName)) {
@@ -42,7 +43,7 @@ async function runCreate(name: string, templateArg?: string) {
 
   const targetDir = resolve(process.cwd(), name)
 
-  if (existsSync(targetDir) && !isDirEmpty(targetDir)) {
+  if (!dryRun && existsSync(targetDir) && !isDirEmpty(targetDir)) {
     const { overwrite } = await prompts({
       type: 'confirm',
       name: 'overwrite',
@@ -58,6 +59,14 @@ async function runCreate(name: string, templateArg?: string) {
   logInfo(`Creating ${template} project in ${targetDir}...`)
 
   const files = template === 'vue3' ? getVue3Template(name) : getReactTemplate(name)
+
+  if (dryRun) {
+    logInfo('Dry run: no files will be written.')
+    for (const filePath of Object.keys(files)) {
+      console.log(`  ${filePath}`)
+    }
+    return
+  }
 
   const totalSteps = Object.keys(files).length
   let step = 0

@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-23）：§1.1 第二批三轮 — Affix / CommentThread / HeatmapChart / ImageGroup / NotificationCenter 补测至 ≥15（Vue+React 各 5 组件），并修复 Affix `offsetBottom` 吸底计算；validate warnings 68 → 58。
+> **最近完成**（2026-05-23）：§4.2 CLI 增强 — 添加 CLI `--dry-run` 模式，覆盖 create/add/playground/generate docs 的预览流程并补充测试。
 
 ## 基线 v1.1.0
 
@@ -137,8 +137,8 @@ source: project audit and planning
 | `generate`   | 支持生成测试模板、文档模板                           |
 | `doctor`     | 结构化 JSON 输出 + 修复建议 + 版本兼容矩阵检查       |
 
-- [ ] 补充 CLI README 使用示例
-- [ ] 添加 `--dry-run` 模式（预览变更不写入文件）
+- [x] 补充 CLI README 使用示例
+- [x] 添加 `--dry-run` 模式（预览变更不写入文件）
 - [ ] CLI E2E 测试（验证 create/add/generate 输出正确）
 
 ### 4.3 发布流程自动化

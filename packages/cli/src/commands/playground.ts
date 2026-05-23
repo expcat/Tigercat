@@ -13,13 +13,14 @@ export function createPlaygroundCommand() {
   return new Command('playground')
     .option('-t, --template <template>', 'Framework template (vue3 | react)')
     .option('-p, --port <port>', 'Dev server port', '3456')
+    .option('--dry-run', 'Preview playground setup without writing files or starting Vite')
     .description('Launch an interactive playground for testing components')
-    .action(async (opts: { template?: string; port: string }) => {
-      await runPlayground(opts.template, opts.port)
+    .action(async (opts: { template?: string; port: string; dryRun?: boolean }) => {
+      await runPlayground(opts.template, opts.port, Boolean(opts.dryRun))
     })
 }
 
-async function runPlayground(templateArg?: string, port = '3456') {
+export async function runPlayground(templateArg?: string, port = '3456', dryRun = false) {
   let template: TemplateName
 
   if (templateArg && TEMPLATES.includes(templateArg as TemplateName)) {
@@ -43,6 +44,21 @@ async function runPlayground(templateArg?: string, port = '3456') {
 
   const tmpDir = resolve(process.cwd(), '.tigercat-playground')
   const projectDir = join(tmpDir, `playground-${template}`)
+
+  if (dryRun) {
+    const safePort = /^\d+$/.test(port) ? port : '3456'
+    logInfo(`Dry run: would prepare ${template} playground in ${projectDir}.`)
+    if (!existsSync(projectDir)) {
+      const files =
+        template === 'vue3' ? getVue3Template('playground') : getReactTemplate('playground')
+      for (const filePath of Object.keys(files)) {
+        console.log(`  ${filePath}`)
+      }
+      logInfo('Would run pnpm install')
+    }
+    logInfo(`Would start Vite on port ${safePort}`)
+    return
+  }
 
   if (!existsSync(projectDir)) {
     logInfo(`Setting up ${template} playground...`)

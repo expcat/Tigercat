@@ -8,9 +8,10 @@ import { readFileSafe, writeFileSafe } from '../utils/fs'
 export function createAddCommand() {
   return new Command('add')
     .argument('<components...>', 'Component names to add (e.g. Button Input Select)')
+    .option('--dry-run', 'Preview generated demo files without writing them')
     .description('Add component import boilerplate to your project')
-    .action(async (components: string[]) => {
-      await runAdd(components)
+    .action(async (components: string[], opts: { dryRun?: boolean }) => {
+      await runAdd(components, Boolean(opts.dryRun))
     })
 }
 
@@ -43,7 +44,7 @@ function validateComponents(names: string[]): { valid: string[]; invalid: string
   return { valid, invalid }
 }
 
-async function runAdd(components: string[]) {
+export async function runAdd(components: string[], dryRun = false) {
   const cwd = process.cwd()
   const framework = detectFramework(cwd)
 
@@ -91,11 +92,20 @@ async function runAdd(components: string[]) {
     return
   }
 
+  if (dryRun) {
+    logInfo('Dry run: no demo files will be written.')
+  }
+
   for (const comp of valid) {
     const ext = framework === 'vue3' ? 'vue' : 'tsx'
     const sampleFile = join(sampleDir, `${comp}Demo.${ext}`)
     if (existsSync(sampleFile)) {
       logWarn(`${sampleFile} already exists, skipping`)
+      continue
+    }
+
+    if (dryRun) {
+      logInfo(`Would create ${sampleFile}`)
       continue
     }
 

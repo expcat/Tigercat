@@ -18,6 +18,10 @@ import {
 
 // Test utils
 import { ensureDir, writeFileSafe, isDirEmpty, readFileSafe } from '@expcat/tigercat-cli/utils/fs'
+import { runCreate } from '@expcat/tigercat-cli/commands/create'
+import { runAdd } from '@expcat/tigercat-cli/commands/add'
+import { runPlayground } from '@expcat/tigercat-cli/commands/playground'
+import { runGenerateDocs } from '@expcat/tigercat-cli/commands/generate'
 import { collectDoctorChecks } from '@expcat/tigercat-cli/commands/doctor'
 
 describe('CLI Constants', () => {
@@ -382,6 +386,68 @@ describe('CLI Doctor', () => {
 
     expect(checks.find((check) => check.name === 'Project package')?.status).toBe('fail')
     expect(checks.some((check) => check.name === 'Tailwind CSS')).toBe(false)
+  })
+})
+
+describe('CLI Dry Run', () => {
+  const originalCwd = process.cwd()
+  const testDir = join(tmpdir(), `tigercat-dry-run-test-${Date.now()}`)
+  let logSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    ensureDir(testDir)
+    process.chdir(testDir)
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    logSpy.mockRestore()
+    process.chdir(originalCwd)
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true })
+    }
+  })
+
+  it('previews create without writing project files', async () => {
+    await runCreate('dry-vue', 'vue3', true)
+
+    expect(existsSync(join(testDir, 'dry-vue'))).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Dry run'))
+  })
+
+  it('previews add without writing demo files', async () => {
+    writeFileSafe(
+      join(testDir, 'package.json'),
+      JSON.stringify({ dependencies: { '@expcat/tigercat-react': '^1.0.0' } })
+    )
+    ensureDir(join(testDir, 'src/components'))
+
+    await runAdd(['Button'], true)
+
+    expect(existsSync(join(testDir, 'src/components/ButtonDemo.tsx'))).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Dry run'))
+  })
+
+  it('previews playground without creating the temporary project', async () => {
+    await runPlayground('react', '3457', true)
+
+    expect(existsSync(join(testDir, '.tigercat-playground'))).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Would start Vite on port 3457'))
+  })
+
+  it('previews docs generation without writing markdown files', async () => {
+    writeFileSafe(
+      join(testDir, 'types/button.ts'),
+      `export interface ButtonProps {
+  label?: string
+}
+`
+    )
+
+    await runGenerateDocs('types', 'api', true)
+
+    expect(existsSync(join(testDir, 'api'))).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Dry run'))
   })
 })
 

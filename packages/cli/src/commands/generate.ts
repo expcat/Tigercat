@@ -11,9 +11,10 @@ export function createGenerateCommand() {
     .command('docs')
     .option('-i, --input <dir>', 'Types directory', 'packages/core/src/types')
     .option('-o, --output <dir>', 'Output directory', 'docs/api')
+    .option('--dry-run', 'Preview generated docs without writing files')
     .description('Generate API documentation from component type definitions')
-    .action(async (opts: { input: string; output: string }) => {
-      await runGenerateDocs(opts.input, opts.output)
+    .action(async (opts: { input: string; output: string; dryRun?: boolean }) => {
+      await runGenerateDocs(opts.input, opts.output, Boolean(opts.dryRun))
     })
 
   return cmd
@@ -103,7 +104,7 @@ function generateMarkdown(doc: ComponentDoc): string {
   return lines.join('\n')
 }
 
-async function runGenerateDocs(inputDir: string, outputDir: string) {
+export async function runGenerateDocs(inputDir: string, outputDir: string, dryRun = false) {
   const resolvedInput = resolve(process.cwd(), inputDir)
   const resolvedOutput = resolve(process.cwd(), outputDir)
 
@@ -118,7 +119,11 @@ async function runGenerateDocs(inputDir: string, outputDir: string) {
 
   logInfo(`Found ${files.length} type files in ${inputDir}`)
 
-  ensureDir(resolvedOutput)
+  if (dryRun) {
+    logInfo('Dry run: no documentation files will be written.')
+  } else {
+    ensureDir(resolvedOutput)
+  }
 
   const docs: ComponentDoc[] = []
   let step = 0
@@ -130,7 +135,12 @@ async function runGenerateDocs(inputDir: string, outputDir: string) {
     if (doc) {
       docs.push(doc)
       const md = generateMarkdown(doc)
-      writeFileSafe(join(resolvedOutput, `${doc.fileName}.md`), md)
+      const outputPath = join(resolvedOutput, `${doc.fileName}.md`)
+      if (dryRun) {
+        logInfo(`Would generate ${outputPath}`)
+      } else {
+        writeFileSafe(outputPath, md)
+      }
     }
   }
 
@@ -158,7 +168,14 @@ async function runGenerateDocs(inputDir: string, outputDir: string) {
     indexLines.push('')
   }
 
-  writeFileSafe(join(resolvedOutput, 'index.md'), indexLines.join('\n'))
+  const indexPath = join(resolvedOutput, 'index.md')
+  if (dryRun) {
+    logInfo(`Would generate ${indexPath}`)
+    logSuccess(`Dry run completed for ${docs.length} component docs in ${outputDir}`)
+    return
+  }
+
+  writeFileSafe(indexPath, indexLines.join('\n'))
 
   logSuccess(`Generated docs for ${docs.length} components in ${outputDir}`)
 }
