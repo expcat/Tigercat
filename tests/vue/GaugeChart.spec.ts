@@ -159,6 +159,20 @@ describe('GaugeChart (Vue)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+  it('clamps value that exceeds max', () => {
+    const { container } = renderWithProps(GaugeChart, {
+      value: 150,
+      min: 0,
+      max: 100,
+      ...defaultSize
+    })
+
+    const paths = container.querySelectorAll('path')
+    const trackPath = paths[0].getAttribute('d')
+    const valuePath = paths[1].getAttribute('d')
+    expect(valuePath).toBe(trackPath)
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

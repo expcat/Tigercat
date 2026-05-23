@@ -186,6 +186,17 @@ describe('Alert', () => {
       vi.useRealTimers()
     })
   })
+  it('renders in banner mode with full-width styling', () => {
+    const { container } = renderWithProps(Alert, {
+      title: 'Banner Alert',
+      banner: true
+    })
+
+    const alert = container.querySelector('[role="alert"]')
+    expect(alert).toHaveClass('w-full', 'rounded-none', 'border-x-0')
+    expect(screen.getByText('Banner Alert')).toBeInTheDocument()
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

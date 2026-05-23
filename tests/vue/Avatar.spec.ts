@@ -194,6 +194,19 @@ describe('AvatarGroup', () => {
     })
     expect(container.querySelector('[role="group"]')).toBeInTheDocument()
   })
+  it('prioritizes image over text when both provided', () => {
+    const { container } = render(Avatar, {
+      props: {
+        src: '/avatar.jpg',
+        text: 'John Doe',
+        alt: 'John Doe'
+      }
+    })
+
+    expect(container.querySelector('img')).toBeInTheDocument()
+    expect(screen.queryByText('JD')).not.toBeInTheDocument()
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

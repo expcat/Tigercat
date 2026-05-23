@@ -96,6 +96,21 @@ describe('Rate', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+  it('renders correctly with allowHalf and half value', () => {
+    const { container } = render(<Rate value={2.5} allowHalf />)
+    const stars = container.querySelectorAll('[role="radio"]')
+    expect(stars.length).toBe(5)
+    expect(stars[2].getAttribute('aria-checked')).toBe('true')
+    expect(stars[2].querySelector('.overflow-hidden')).toHaveStyle({ width: '50%' })
+    expect(stars[3].getAttribute('aria-checked')).toBe('false')
+  })
+
+  it('renders custom character', () => {
+    const { container } = render(<Rate character="♥" />)
+    expect(container.textContent).toContain('♥')
+    expect(container.querySelectorAll('svg').length).toBe(0)
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

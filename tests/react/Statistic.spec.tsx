@@ -119,6 +119,16 @@ describe('Statistic', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+  it('formats zero value with precision', () => {
+    render(<Statistic title="T" value={0} precision={2} />)
+    expect(screen.getByText('0.00')).toBeInTheDocument()
+  })
+
+  it('formats negative number', () => {
+    render(<Statistic title="T" value={-42} />)
+    expect(screen.getByText('-42')).toBeInTheDocument()
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

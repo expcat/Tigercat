@@ -104,6 +104,7 @@ describe('Icon (React)', () => {
     })
     const wrapper = container.querySelector('span')
     expect(wrapper).toHaveAttribute('role', 'img')
+    expect(wrapper).toHaveAttribute('aria-label', 'Search')
     expect(wrapper).not.toHaveAttribute('aria-hidden')
   })
 
@@ -114,6 +115,7 @@ describe('Icon (React)', () => {
     })
     const wrapper = container.querySelector('span')
     expect(wrapper).toHaveAttribute('role', 'img')
+    expect(wrapper).toHaveAttribute('aria-labelledby', 'label-id')
     expect(wrapper).not.toHaveAttribute('aria-hidden')
   })
 
@@ -145,6 +147,19 @@ describe('Icon (React)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
+  it('sets role="img" when both aria-label and aria-labelledby are provided', () => {
+    const { container } = renderWithProps(Icon, {
+      'aria-label': 'Search',
+      'aria-labelledby': 'label-id',
+      children: SimpleSVG
+    })
+    const wrapper = container.querySelector('span')
+    expect(wrapper).toHaveAttribute('role', 'img')
+    expect(wrapper).toHaveAttribute('aria-label', 'Search')
+    expect(wrapper).toHaveAttribute('aria-labelledby', 'label-id')
+    expect(wrapper).not.toHaveAttribute('aria-hidden')
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       // Baseline: component renders without crashing with no/minimal props

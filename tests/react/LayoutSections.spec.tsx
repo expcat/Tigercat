@@ -5,7 +5,7 @@ import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'
 import { Layout, Header, Footer, Sidebar, Content } from '@expcat/tigercat-react'
 
 describe('Layout Sections', () => {
-  it('Layout merges className and forwards attrs', () => {
+  it('renders Layout with className and forwarded attrs', () => {
     const { container } = render(
       <Layout className="from-props" id="layout-id" data-testid="layout">
         Layout content
@@ -19,7 +19,7 @@ describe('Layout Sections', () => {
     expect(screen.getByTestId('layout')).toBeTruthy()
   })
 
-  it('Header applies height and merges style', () => {
+  it('sets Header height and merged style', () => {
     const { container } = render(
       <Header height="80px" style={{ paddingLeft: 12 }} aria-label="Site header">
         Header
@@ -33,7 +33,7 @@ describe('Layout Sections', () => {
     expect(header).toHaveAttribute('aria-label', 'Site header')
   })
 
-  it('Sidebar respects collapsed and width', () => {
+  it('handles Sidebar collapsed width', () => {
     const { container, rerender } = render(<Sidebar width="300px">Sidebar</Sidebar>)
 
     const aside = container.querySelector('aside') as HTMLElement | null
@@ -59,14 +59,14 @@ describe('Layout Sections', () => {
     expect(main?.className).toContain('custom-content')
   })
 
-  it('Footer applies default height', () => {
+  it('uses default Footer height', () => {
     const { container } = render(<Footer>Footer</Footer>)
     const footer = container.querySelector('footer') as HTMLElement | null
     expect(footer).toBeTruthy()
     expect(footer?.style.height).toBe('auto')
   })
 
-  it('has no basic accessibility violations', async () => {
+  it('should have no basic accessibility violations', async () => {
     const { container } = render(
       <Layout>
         <Header>Header</Header>
