@@ -69,10 +69,13 @@ export const Affix = defineComponent({
       }
 
       // Force-affixed: build the fixed style using the captured rect.
+      const forcedTop =
+        props.offsetBottom !== undefined
+          ? containerRect.bottom - originalRect.value.height + props.offsetBottom + 1
+          : -1
       const next = calculateAffixState(
-        // Force the calc into the affix branch by lifting the element above the threshold
         {
-          top: -1,
+          top: forcedTop,
           left: originalRect.value.left,
           width: originalRect.value.width,
           height: originalRect.value.height

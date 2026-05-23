@@ -120,6 +120,105 @@ describe('CommentThread (React)', () => {
     expect(onLoadMore).toHaveBeenCalledTimes(1)
     expect(onLoadMore).toHaveBeenCalledWith(expect.objectContaining({ id: 1, content: 'Root' }))
   })
+  it('renders empty state when no nodes provided', () => {
+    render(<CommentThread nodes={[]} />)
+    expect(screen.getByRole('feed', { name: '评论线程' })).toBeInTheDocument()
+  })
+
+  it('renders emptyText when nodes is empty', () => {
+    render(<CommentThread nodes={[]} emptyText="暂无评论" />)
+    expect(screen.getByText('暂无评论')).toBeInTheDocument()
+  })
+
+  it('renders comment with user name', () => {
+    const nodes: CommentNode[] = [{ id: 1, content: 'Hello', user: { name: '张三' } }]
+
+    render(<CommentThread nodes={nodes} />)
+    expect(screen.getByText('Hello')).toBeInTheDocument()
+    expect(screen.getAllByText('张三')).toHaveLength(2)
+  })
+
+  it('renders comment with time', () => {
+    const nodes: CommentNode[] = [{ id: 1, content: 'Hello', user: { name: 'A' }, time: '10:30' }]
+
+    render(<CommentThread nodes={nodes} />)
+    expect(screen.getByText('10:30')).toBeInTheDocument()
+  })
+
+  it('hides avatar when showAvatar is false', () => {
+    const nodes: CommentNode[] = [
+      { id: 1, content: 'Hello', user: { name: 'A', avatar: '/avatar.png' } }
+    ]
+
+    const { container } = render(<CommentThread nodes={nodes} showAvatar={false} />)
+    expect(container.querySelector('img[src="/avatar.png"]')).not.toBeInTheDocument()
+  })
+
+  it('renders multiple root comments', () => {
+    const nodes: CommentNode[] = [
+      { id: 1, content: 'First', user: { name: 'A' } },
+      { id: 2, content: 'Second', user: { name: 'B' } },
+      { id: 3, content: 'Third', user: { name: 'C' } }
+    ]
+
+    render(<CommentThread nodes={nodes} />)
+    expect(screen.getByText('First')).toBeInTheDocument()
+    expect(screen.getByText('Second')).toBeInTheDocument()
+    expect(screen.getByText('Third')).toBeInTheDocument()
+  })
+
+  it('cancels reply input', async () => {
+    const nodes: CommentNode[] = [{ id: 1, content: 'Root', user: { name: 'A' } }]
+
+    render(<CommentThread nodes={nodes} cancelReplyText="取消回复" replyPlaceholder="写下回复" />)
+
+    await userEvent.click(screen.getByRole('button', { name: '回复' }))
+    expect(screen.getByPlaceholderText('写下回复')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: '取消回复' }))
+    expect(screen.queryByPlaceholderText('写下回复')).not.toBeInTheDocument()
+  })
+
+  it('renders deeply nested replies within maxDepth', () => {
+    const nodes: CommentNode[] = [
+      {
+        id: 1,
+        content: 'Level 0',
+        user: { name: 'A' },
+        children: [
+          {
+            id: 2,
+            parentId: 1,
+            content: 'Level 1',
+            user: { name: 'B' },
+            children: [
+              {
+                id: 3,
+                parentId: 2,
+                content: 'Level 2',
+                user: { name: 'C' }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+
+    render(<CommentThread nodes={nodes} defaultExpandedKeys={[1, 2]} maxDepth={3} />)
+    expect(screen.getByText('Level 0')).toBeInTheDocument()
+    expect(screen.getByText('Level 1')).toBeInTheDocument()
+    expect(screen.getByText('Level 2')).toBeInTheDocument()
+  })
+
+  it('shows like button with count', () => {
+    const nodes: CommentNode[] = [
+      { id: 1, content: 'Likeable', user: { name: 'A' }, likes: 5, liked: false }
+    ]
+
+    render(<CommentThread nodes={nodes} showLike />)
+    expect(screen.getByRole('button', { name: /点赞\s+5/ })).toBeInTheDocument()
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<CommentThread />)

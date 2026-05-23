@@ -146,16 +146,16 @@ export function createAffixObserver(sentinel: Element, options: AffixObserverOpt
 
   const { offsetTop = 0, offsetBottom, root = null, onToggle } = options
 
+  const topRootMargin = offsetTop === 0 ? 0 : -offsetTop
   const rootMargin =
-    offsetBottom !== undefined ? `0px 0px -${offsetBottom}px 0px` : `-${offsetTop}px 0px 0px 0px`
+    offsetBottom !== undefined ? `0px 0px -${offsetBottom}px 0px` : `${topRootMargin}px 0px 0px 0px`
 
   const observer = new IntersectionObserver(
     (entries) => {
       const entry = entries[entries.length - 1]
       if (!entry) return
       const rootBoundsTop = entry.rootBounds?.top ?? 0
-      const rootBoundsBottom =
-        entry.rootBounds?.bottom ?? (isBrowser() ? window.innerHeight : 0)
+      const rootBoundsBottom = entry.rootBounds?.bottom ?? (isBrowser() ? window.innerHeight : 0)
       let affixed: boolean
       if (offsetBottom !== undefined) {
         affixed = !entry.isIntersecting && entry.boundingClientRect.bottom > rootBoundsBottom

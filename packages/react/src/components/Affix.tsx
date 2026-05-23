@@ -67,9 +67,13 @@ export const Affix: React.FC<AffixProps> = ({
         return
       }
 
+      const forcedTop =
+        offsetBottom !== undefined
+          ? containerRect.bottom - originalRectRef.current.height + offsetBottom + 1
+          : -1
       const next = calculateAffixState(
         {
-          top: -1,
+          top: forcedTop,
           left: originalRectRef.current.left,
           width: originalRectRef.current.width,
           height: originalRectRef.current.height

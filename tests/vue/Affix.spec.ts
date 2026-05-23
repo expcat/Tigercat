@@ -22,7 +22,7 @@ describe('Affix', () => {
   })
 
   it('renders children and forwards wrapper attributes while not affixed', () => {
-    render(Affix, {
+    const { emitted } = render(Affix, {
       props: {
         className: 'custom-affix',
         style: { color: 'red' }
@@ -130,6 +130,176 @@ describe('Affix', () => {
     )
     expect(emitted().change).toEqual([[true], [false]])
   })
+  it('applies offsetBottom with bottom-affixed rootMargin', async () => {
+    render(Affix, {
+      props: { offsetBottom: 20 },
+      attrs: { 'data-testid': 'affix-bottom' },
+      slots: { default: 'Bottom pinned' }
+    })
+
+    const content = screen.getByTestId('affix-bottom')
+    vi.spyOn(content, 'getBoundingClientRect').mockReturnValue(new DOMRect(10, 500, 200, 40))
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+
+    const observer = MockIntersectionObserver.instances[0]
+    expect(observer.rootMargin).toBe('0px 0px -20px 0px')
+  })
+
+  it('uses default zIndex of 10 when not specified', async () => {
+    render(Affix, {
+      props: { offsetTop: 0 },
+      attrs: { 'data-testid': 'affix-z' },
+      slots: { default: 'Content' }
+    })
+
+    const content = screen.getByTestId('affix-z')
+    vi.spyOn(content, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 100, 30))
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+
+    MockIntersectionObserver.instances[0].trigger({
+      isIntersecting: false,
+      boundingClientRect: new DOMRect(0, -1, 0, 0),
+      rootBounds: new DOMRect(0, 0, 100, 600)
+    })
+
+    await waitFor(() => expect(screen.getByTestId('affix-z').style.position).toBe('fixed'))
+    expect(screen.getByTestId('affix-z')).toHaveStyle({ zIndex: '10' })
+  })
+
+  it('falls back to window when target selector matches nothing', async () => {
+    render(Affix, {
+      props: { target: '#does-not-exist', offsetTop: 0 },
+      attrs: { 'data-testid': 'affix-fallback' },
+      slots: { default: 'Content' }
+    })
+
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+    expect(MockIntersectionObserver.instances[0].root).toBeNull()
+  })
+
+  it('renders placeholder sentinel with aria-hidden', () => {
+    render(Affix, {
+      attrs: { 'data-testid': 'affix-sentinel' },
+      slots: { default: 'Content' }
+    })
+
+    const wrapper = screen.getByTestId('affix-sentinel')
+    const sentinel = wrapper.previousElementSibling
+    expect(sentinel).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('renders without any children', () => {
+    const { container } = render(Affix)
+    expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
+  })
+
+  it('does not re-emit change when affixed state is unchanged', async () => {
+    const { emitted } = render(Affix, {
+      props: { offsetTop: 10 },
+      attrs: { 'data-testid': 'affix-dedup' },
+      slots: { default: 'Content' }
+    })
+
+    const content = screen.getByTestId('affix-dedup')
+    vi.spyOn(content, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 100, 30))
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+
+    MockIntersectionObserver.instances[0].trigger({
+      isIntersecting: false,
+      boundingClientRect: new DOMRect(0, -1, 0, 0),
+      rootBounds: new DOMRect(0, 0, 100, 600)
+    })
+
+    await waitFor(() => expect(screen.getByTestId('affix-dedup').style.position).toBe('fixed'))
+
+    MockIntersectionObserver.instances[0].trigger({
+      isIntersecting: false,
+      boundingClientRect: new DOMRect(0, -5, 0, 0),
+      rootBounds: new DOMRect(0, 0, 100, 600)
+    })
+
+    await waitFor(() => {
+      const changes = emitted().change || []
+      expect(changes).toHaveLength(1)
+    })
+  })
+
+  it('applies bottom fixed position with offsetBottom', async () => {
+    render(Affix, {
+      props: { offsetBottom: 16, zIndex: 50 },
+      attrs: { 'data-testid': 'affix-bot-style' },
+      slots: { default: 'Bottom' }
+    })
+
+    const content = screen.getByTestId('affix-bot-style')
+    vi.spyOn(content, 'getBoundingClientRect').mockReturnValue(new DOMRect(10, 550, 200, 40))
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+
+    MockIntersectionObserver.instances[0].trigger({
+      isIntersecting: false,
+      boundingClientRect: new DOMRect(0, 610, 0, 0),
+      rootBounds: new DOMRect(0, 0, 100, 600)
+    })
+
+    await waitFor(() => expect(screen.getByTestId('affix-bot-style').style.position).toBe('fixed'))
+    expect(screen.getByTestId('affix-bot-style')).toHaveStyle({ bottom: '16px', zIndex: '50' })
+  })
+
+  it('uses default offsetTop of 0 when no offset is specified', async () => {
+    render(Affix, {
+      attrs: { 'data-testid': 'affix-default' },
+      slots: { default: 'Content' }
+    })
+
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+    expect(MockIntersectionObserver.instances[0].rootMargin).toBe('0px 0px 0px 0px')
+  })
+
+  it('resets placeholder dimensions when un-affixed', async () => {
+    render(Affix, {
+      props: { offsetTop: 5 },
+      attrs: { 'data-testid': 'affix-reset' },
+      slots: { default: 'Content' }
+    })
+
+    const content = screen.getByTestId('affix-reset')
+    vi.spyOn(content, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 10, 150, 25))
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+
+    MockIntersectionObserver.instances[0].trigger({
+      isIntersecting: false,
+      boundingClientRect: new DOMRect(0, -1, 0, 0),
+      rootBounds: new DOMRect(0, 0, 100, 600)
+    })
+
+    await waitFor(() => expect(screen.getByTestId('affix-reset').style.position).toBe('fixed'))
+    const placeholder = screen.getByTestId('affix-reset').previousElementSibling as HTMLElement
+    expect(placeholder).toHaveStyle({ width: '150px', height: '25px' })
+
+    MockIntersectionObserver.instances[0].trigger({
+      isIntersecting: true,
+      boundingClientRect: new DOMRect(0, 20, 0, 0),
+      rootBounds: new DOMRect(0, 0, 100, 600)
+    })
+
+    await waitFor(() => expect(screen.getByTestId('affix-reset').style.position).not.toBe('fixed'))
+  })
+
+  it('disconnects observers on unmount', async () => {
+    const { unmount } = render(Affix, {
+      props: { offsetTop: 0 },
+      slots: { default: 'Content' }
+    })
+
+    await waitFor(() => expect(MockIntersectionObserver.instances).toHaveLength(1))
+    await waitFor(() => expect(MockResizeObserver.instances).toHaveLength(1))
+
+    unmount()
+
+    expect(MockIntersectionObserver.instances[0].disconnect).toHaveBeenCalled()
+    expect(MockResizeObserver.instances[0].disconnect).toHaveBeenCalled()
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Affix)
