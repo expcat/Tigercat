@@ -3,6 +3,13 @@ name: tigercat-shared-props-basic
 description: Shared props definitions for basic components - Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, Code, ConfigProvider, Empty, Icon, Image, ImageCropper, ImageGroup, ImagePreview, ImageViewer, Link, QRCode, Rate, Result, Segmented, Statistic, Tag, Text, Watermark
 ---
 
+<!-- LLM-INDEX
+type: props-reference
+category: basic
+components: 24
+key-apis: variant, size, disabled, loading, closable, open, preview, copyable, className
+-->
+
 # Basic Components - Props Reference
 
 共享 Props 定义，框架差异在表格中标注。

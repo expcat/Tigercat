@@ -3,6 +3,13 @@ name: tigercat-shared-props-form
 description: Shared props definitions for form components - AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, DatePicker, Form, FormItem, Input, InputGroup, Mentions, Radio, RadioGroup, Rate, Select, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
 ---
 
+<!-- LLM-INDEX
+type: props-reference
+category: form
+components: 23
+key-apis: modelValue, value, checked, onChange, rules, validation, options, placeholder, disabled
+-->
+
 # Form Components - Props Reference
 
 共享 Props 定义，框架差异在表格中标注。
@@ -15,22 +22,22 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop                 | Type                         | Default   | Vue | React | Description              |
-| -------------------- | ---------------------------- | --------- | :-: | :---: | ------------------------ |
-| model                | `object`                     | `{}`      |  ✓  |   ✓   | 表单数据对象             |
-| rules                | `FormRules`                  | -         |  ✓  |   ✓   | 校验规则（字段名→规则）  |
-| labelWidth           | `string \| number`           | -         |  ✓  |   ✓   | 标签宽度                 |
-| labelPosition        | `'left' \| 'right' \| 'top'` | `'right'` |  ✓  |   ✓   | 标签位置                 |
-| labelAlign           | `'left' \| 'right' \| 'top'` | `'right'` |  ✓  |   ✓   | 标签文字对齐             |
-| size                 | `'sm' \| 'md' \| 'lg'`       | `'md'`    |  ✓  |   ✓   | 表单尺寸（影响子表单项） |
-| inlineMessage        | `boolean`                    | `true`    |  ✓  |   ✓   | 是否行内显示校验消息     |
-| showRequiredAsterisk | `boolean`                    | `true`    |  ✓  |   ✓   | 必填字段显示星号         |
-| disabled             | `boolean`                    | `false`   |  ✓  |   ✓   | 禁用所有表单项           |
-| loading              | `boolean`                    | `false`   |  ✓  |   ✓   | 加载状态（防止重复提交） |
-| fieldDependencies    | `Map<string, string[]>`      | -         |  ✓  |   ✓   | 字段依赖关系（联动校验） |
-| undoable             | `boolean`                    | `false`   |  ✓  |   ✓   | 启用撤销/重做功能       |
-| maxHistorySize       | `number`                     | `50`      |  ✓  |   ✓   | 最大历史记录数（需 undoable）|
-| className            | `string`                     | -         |  -  |   ✓   | 自定义 CSS 类            |
+| Prop                 | Type                         | Default   | Vue | React | Description                   |
+| -------------------- | ---------------------------- | --------- | :-: | :---: | ----------------------------- |
+| model                | `object`                     | `{}`      |  ✓  |   ✓   | 表单数据对象                  |
+| rules                | `FormRules`                  | -         |  ✓  |   ✓   | 校验规则（字段名→规则）       |
+| labelWidth           | `string \| number`           | -         |  ✓  |   ✓   | 标签宽度                      |
+| labelPosition        | `'left' \| 'right' \| 'top'` | `'right'` |  ✓  |   ✓   | 标签位置                      |
+| labelAlign           | `'left' \| 'right' \| 'top'` | `'right'` |  ✓  |   ✓   | 标签文字对齐                  |
+| size                 | `'sm' \| 'md' \| 'lg'`       | `'md'`    |  ✓  |   ✓   | 表单尺寸（影响子表单项）      |
+| inlineMessage        | `boolean`                    | `true`    |  ✓  |   ✓   | 是否行内显示校验消息          |
+| showRequiredAsterisk | `boolean`                    | `true`    |  ✓  |   ✓   | 必填字段显示星号              |
+| disabled             | `boolean`                    | `false`   |  ✓  |   ✓   | 禁用所有表单项                |
+| loading              | `boolean`                    | `false`   |  ✓  |   ✓   | 加载状态（防止重复提交）      |
+| fieldDependencies    | `Map<string, string[]>`      | -         |  ✓  |   ✓   | 字段依赖关系（联动校验）      |
+| undoable             | `boolean`                    | `false`   |  ✓  |   ✓   | 启用撤销/重做功能             |
+| maxHistorySize       | `number`                     | `50`      |  ✓  |   ✓   | 最大历史记录数（需 undoable） |
+| className            | `string`                     | -         |  -  |   ✓   | 自定义 CSS 类                 |
 
 ### Events
 
@@ -42,17 +49,17 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Methods (Vue expose / React FormHandle ref)
 
-| Method         | Type                                          | Description      |
-| -------------- | --------------------------------------------- | ---------------- |
-| validate       | `() => Promise<boolean>`                      | 验证整个表单     |
-| validateFields | `(fields: string[]) => Promise<boolean>`      | 验证指定字段列表 |
-| validateField  | `(name: string, rules?, trigger?) => Promise` | 验证单个字段     |
-| clearValidate  | `(fields?: string \| string[]) => void`       | 清除验证状态     |
-| resetFields    | `() => void`                                  | 重置表单         |
+| Method         | Type                                          | Description                 |
+| -------------- | --------------------------------------------- | --------------------------- |
+| validate       | `() => Promise<boolean>`                      | 验证整个表单                |
+| validateFields | `(fields: string[]) => Promise<boolean>`      | 验证指定字段列表            |
+| validateField  | `(name: string, rules?, trigger?) => Promise` | 验证单个字段                |
+| clearValidate  | `(fields?: string \| string[]) => void`       | 清除验证状态                |
+| resetFields    | `() => void`                                  | 重置表单                    |
 | undo           | `() => void`                                  | 撤销（需 `undoable: true`） |
 | redo           | `() => void`                                  | 重做（需 `undoable: true`） |
-| canUndo        | `boolean`                                     | 是否可撤销       |
-| canRedo        | `boolean`                                     | 是否可重做       |
+| canUndo        | `boolean`                                     | 是否可撤销                  |
+| canRedo        | `boolean`                                     | 是否可重做                  |
 
 ---
 
@@ -61,7 +68,7 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 ### Props
 
 | Prop        | Type                     | Default | Vue | React | Description                                                                           |
-| ----------- | ------------------------ | ------- | :-: | :---: | ------------------------------------------------------------------------------------- |
+| ----------- | ------------------------ | ------- | :-: | :---: | ------------------------------------------------------------------------------------- | --- | ---------------- | -------------------------------- | ---------- | --- | --- | ---------------------------------- |
 | name        | `string`                 | -       |  ✓  |   ✓   | 字段名（对应 model 中的 key，支持嵌套如 `user.name`）                                 |
 | label       | `string`                 | -       |  ✓  |   ✓   | 标签文本                                                                              |
 | labelWidth  | `string \| number`       | -       |  ✓  |   ✓   | 标签宽度（覆盖 Form 级别）                                                            |
@@ -70,7 +77,8 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 | error       | `string`                 | -       |  ✓  |   ✓   | 错误信息（受控模式）                                                                  |
 | showMessage | `boolean`                | `true`  |  ✓  |   ✓   | 是否在表单项下方显示错误信息。设为 `false` 可让 Input 内部显示错误（抖动 + 错误文字） |
 | size        | `'sm' \| 'md' \| 'lg'`   | -       |  ✓  |   ✓   | 尺寸（覆盖 Form 级别）                                                                |
-| className   | `string`                 | -       |  -  |   ✓   | 自定义 CSS 类                                                                         || errorDisplayMode | `'inline' \| 'popup' \| 'block'` | `'inline'` | ✓ | ✓ | 错误信息展示方式（行内/气泡/块级） |
+| className   | `string`                 | -       |  -  |   ✓   | 自定义 CSS 类                                                                         |     | errorDisplayMode | `'inline' \| 'popup' \| 'block'` | `'inline'` | ✓   | ✓   | 错误信息展示方式（行内/气泡/块级） |
+
 ---
 
 ## Input 输入框
@@ -142,11 +150,11 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### InputGroupAddon Props
 
-| Prop      | Type                   | Default  | Vue | React | Description  |
-| --------- | ---------------------- | -------- | :-: | :---: | ------------ |
-| type      | `'text' \| 'icon'`    | `'text'` |  ✓  |   -   | 附加元素类型 |
-| addonType | `'text' \| 'icon'`    | `'text'` |  -  |   ✓  | 附加元素类型（React 专用） |
-| className | `string`               | -        |  ✓  |   ✓   | 自定义类名   |
+| Prop      | Type               | Default  | Vue | React | Description                |
+| --------- | ------------------ | -------- | :-: | :---: | -------------------------- |
+| type      | `'text' \| 'icon'` | `'text'` |  ✓  |   -   | 附加元素类型               |
+| addonType | `'text' \| 'icon'` | `'text'` |  -  |   ✓   | 附加元素类型（React 专用） |
+| className | `string`           | -        |  ✓  |   ✓   | 自定义类名                 |
 
 ### Slots / Children
 
@@ -255,7 +263,7 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 | noDataText    | `string`                                   | `'No options available'` |  ✓  |   ✓   | 选项为空时提示文案       |
 | maxTagCount   | `number`                                   | -                        |  ✓  |   ✓   | 多选模式下最大显示标签数 |
 | virtual       | `boolean`                                  | `false`                  |  ✓  |   ✓   | 启用虚拟滚动（大数据量） |
-| listHeight    | `number`                                   | `256`                    |  ✓  |   ✓   | 下拉列表最大高度（px）     |
+| listHeight    | `number`                                   | `256`                    |  ✓  |   ✓   | 下拉列表最大高度（px）   |
 
 > `SelectOption = { label: string, value: string | number, disabled?: boolean }`
 > `SelectOptionGroup = { label: string, options: SelectOption[] }`
@@ -570,29 +578,29 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop           | Type                                | Default   | Vue | React | Description                  |
-| -------------- | ----------------------------------- | --------- | :-: | :---: | ---------------------------- |
-| modelValue     | `CascaderValue`                     | -         |  ✓  |   -   | 绑定值 (v-model)             |
-| value          | `CascaderValue`                     | -         |  -  |   ✓   | 绑定值（受控）               |
-| defaultValue   | `CascaderValue`                     | -         |  -  |   ✓   | 默认值（非受控）             |
-| options        | `CascaderOption[]`                  | `[]`      |  ✓  |   ✓   | 层级选项数据                 |
-| placeholder    | `string`                            | -         |  ✓  |   ✓   | 占位符                       |
-| size           | `'sm' \| 'md' \| 'lg'`              | `'md'`    |  ✓  |   ✓   | 尺寸                         |
-| disabled       | `boolean`                           | `false`   |  ✓  |   ✓   | 禁用状态                     |
-| clearable      | `boolean`                           | `true`    |  ✓  |   ✓   | 可清除                       |
-| showSearch     | `boolean \| CascaderShowSearch`     | `false`   |  ✓  |   ✓   | 显示搜索框（对象可配 filter/render/limit） |
-| expandTrigger  | `'click' \| 'hover'`               | `'click'` |  ✓  |   ✓   | 子级展开触发方式             |
-| changeOnSelect | `boolean`                           | `false`   |  ✓  |   ✓   | 选择即改变（非叶子节点可选） |
-| separator      | `string`                            | `' / '`   |  ✓  |   ✓   | 显示值分隔符                 |
-| notFoundText   | `string`                            | -         |  ✓  |   ✓   | 空数据文案                   |
-| className      | `string`                            | -         |  -  |   ✓   | 自定义类名                   |
+| Prop           | Type                            | Default   | Vue | React | Description                                |
+| -------------- | ------------------------------- | --------- | :-: | :---: | ------------------------------------------ |
+| modelValue     | `CascaderValue`                 | -         |  ✓  |   -   | 绑定值 (v-model)                           |
+| value          | `CascaderValue`                 | -         |  -  |   ✓   | 绑定值（受控）                             |
+| defaultValue   | `CascaderValue`                 | -         |  -  |   ✓   | 默认值（非受控）                           |
+| options        | `CascaderOption[]`              | `[]`      |  ✓  |   ✓   | 层级选项数据                               |
+| placeholder    | `string`                        | -         |  ✓  |   ✓   | 占位符                                     |
+| size           | `'sm' \| 'md' \| 'lg'`          | `'md'`    |  ✓  |   ✓   | 尺寸                                       |
+| disabled       | `boolean`                       | `false`   |  ✓  |   ✓   | 禁用状态                                   |
+| clearable      | `boolean`                       | `true`    |  ✓  |   ✓   | 可清除                                     |
+| showSearch     | `boolean \| CascaderShowSearch` | `false`   |  ✓  |   ✓   | 显示搜索框（对象可配 filter/render/limit） |
+| expandTrigger  | `'click' \| 'hover'`            | `'click'` |  ✓  |   ✓   | 子级展开触发方式                           |
+| changeOnSelect | `boolean`                       | `false`   |  ✓  |   ✓   | 选择即改变（非叶子节点可选）               |
+| separator      | `string`                        | `' / '`   |  ✓  |   ✓   | 显示值分隔符                               |
+| notFoundText   | `string`                        | -         |  ✓  |   ✓   | 空数据文案                                 |
+| className      | `string`                        | -         |  -  |   ✓   | 自定义类名                                 |
 
 ### Events
 
-| Vue Event | React Prop | Payload                  | Description |
-| --------- | ---------- | ------------------------ | ----------- |
-| `@update:modelValue` | -  | `CascaderValue`          | 值变更      |
-| `@change` | `onChange` | `(value: CascaderValue)` | 值变更      |
+| Vue Event            | React Prop | Payload                  | Description |
+| -------------------- | ---------- | ------------------------ | ----------- |
+| `@update:modelValue` | -          | `CascaderValue`          | 值变更      |
+| `@change`            | `onChange` | `(value: CascaderValue)` | 值变更      |
 
 ---
 
@@ -600,17 +608,17 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop      | Type                      | Default | Vue | React | Description    |
-| --------- | ------------------------- | ------- | :-: | :---: | -------------- |
-| modelValue| `string`                  | -       |  ✓  |   -   | 绑定值 (v-model)  |
-| value     | `string`                  | -       |  -  |   ✓   | 绑定值（受控）    |
-| defaultValue | `string`               | -       |  -  |   ✓   | 默认值（非受控）  |
-| disabled  | `boolean`                 | `false` |  ✓  |   ✓   | 禁用状态       |
-| size      | `'sm' \| 'md' \| 'lg'`    | `'md'`  |  ✓  |   ✓   | 尺寸           |
-| showAlpha | `boolean`                 | `false` |  ✓  |   ✓   | 显示透明度调节 |
-| format    | `'hex' \| 'rgb' \| 'hsl'` | `'hex'` |  ✓  |   ✓   | 颜色值输出格式 |
-| presets   | `string[]`                | -       |  ✓  |   ✓   | 预设色板       |
-| className | `string`                  | -       |  -  |   ✓   | 自定义类名     |
+| Prop         | Type                      | Default | Vue | React | Description      |
+| ------------ | ------------------------- | ------- | :-: | :---: | ---------------- |
+| modelValue   | `string`                  | -       |  ✓  |   -   | 绑定值 (v-model) |
+| value        | `string`                  | -       |  -  |   ✓   | 绑定值（受控）   |
+| defaultValue | `string`                  | -       |  -  |   ✓   | 默认值（非受控） |
+| disabled     | `boolean`                 | `false` |  ✓  |   ✓   | 禁用状态         |
+| size         | `'sm' \| 'md' \| 'lg'`    | `'md'`  |  ✓  |   ✓   | 尺寸             |
+| showAlpha    | `boolean`                 | `false` |  ✓  |   ✓   | 显示透明度调节   |
+| format       | `'hex' \| 'rgb' \| 'hsl'` | `'hex'` |  ✓  |   ✓   | 颜色值输出格式   |
+| presets      | `string[]`                | -       |  ✓  |   ✓   | 预设色板         |
+| className    | `string`                  | -       |  -  |   ✓   | 自定义类名       |
 
 ### Events
 
@@ -625,18 +633,18 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop        | Type                   | Default | Vue | React | Description |
-| ----------- | ---------------------- | ------- | :-: | :---: | ----------- |
-| modelValue  | `string`               | -       |  ✓  |   -   | 绑定值 (v-model) |
-| value       | `string`               | -       |  -  |   ✓   | 绑定值（受控）   |
-| defaultValue| `string`               | -       |  -  |   ✓   | 默认值（非受控） |
-| prefix      | `string`               | `'@'`   |  ✓  |   ✓   | 触发字符    |
-| options     | `MentionOption[]`      | `[]`    |  ✓  |   ✓   | 候选项列表  |
-| placeholder | `string`               | -       |  ✓  |   ✓   | 占位符      |
-| disabled    | `boolean`              | `false` |  ✓  |   ✓   | 禁用状态    |
-| size        | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸        |
-| rows        | `number`               | `1`     |  ✓  |   ✓   | 文本框行数  |
-| className   | `string`               | -       |  -  |   ✓   | 自定义类名  |
+| Prop         | Type                   | Default | Vue | React | Description      |
+| ------------ | ---------------------- | ------- | :-: | :---: | ---------------- |
+| modelValue   | `string`               | -       |  ✓  |   -   | 绑定值 (v-model) |
+| value        | `string`               | -       |  -  |   ✓   | 绑定值（受控）   |
+| defaultValue | `string`               | -       |  -  |   ✓   | 默认值（非受控） |
+| prefix       | `string`               | `'@'`   |  ✓  |   ✓   | 触发字符         |
+| options      | `MentionOption[]`      | `[]`    |  ✓  |   ✓   | 候选项列表       |
+| placeholder  | `string`               | -       |  ✓  |   ✓   | 占位符           |
+| disabled     | `boolean`              | `false` |  ✓  |   ✓   | 禁用状态         |
+| size         | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸             |
+| rows         | `number`               | `1`     |  ✓  |   ✓   | 文本框行数       |
+| className    | `string`               | -       |  -  |   ✓   | 自定义类名       |
 
 ### Events
 
@@ -652,26 +660,26 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop       | Type                   | Default | Vue | React | Description          |
-| ---------- | ---------------------- | ------- | :-: | :---: | -------------------- |
-| modelValue | `number`               | `0`     |  ✓  |   -   | 绑定值 (v-model)     |
-| value      | `number`               | -       |  -  |   ✓   | 绑定值（受控）       |
-| defaultValue | `number`             | `0`     |  -  |   ✓   | 默认值（非受控）     |
-| count      | `number`               | `5`     |  ✓  |   ✓   | 星星总数             |
-| allowHalf  | `boolean`              | `false` |  ✓  |   ✓   | 允许半选             |
-| disabled   | `boolean`              | `false` |  ✓  |   ✓   | 禁用状态             |
-| size       | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                 |
-| allowClear | `boolean`              | `true`  |  ✓  |   ✓   | 允许清除（再次点击） |
-| character  | `string`               | -       |  ✓  |   ✓   | 自定义字符           |
-| className  | `string`               | -       |  -  |   ✓   | 自定义类名           |
+| Prop         | Type                   | Default | Vue | React | Description          |
+| ------------ | ---------------------- | ------- | :-: | :---: | -------------------- |
+| modelValue   | `number`               | `0`     |  ✓  |   -   | 绑定值 (v-model)     |
+| value        | `number`               | -       |  -  |   ✓   | 绑定值（受控）       |
+| defaultValue | `number`               | `0`     |  -  |   ✓   | 默认值（非受控）     |
+| count        | `number`               | `5`     |  ✓  |   ✓   | 星星总数             |
+| allowHalf    | `boolean`              | `false` |  ✓  |   ✓   | 允许半选             |
+| disabled     | `boolean`              | `false` |  ✓  |   ✓   | 禁用状态             |
+| size         | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                 |
+| allowClear   | `boolean`              | `true`  |  ✓  |   ✓   | 允许清除（再次点击） |
+| character    | `string`               | -       |  ✓  |   ✓   | 自定义字符           |
+| className    | `string`               | -       |  -  |   ✓   | 自定义类名           |
 
 ### Events
 
-| Vue Event            | React Prop     | Payload           | Description |
-| -------------------- | -------------- | ----------------- | ----------- |
-| `@update:modelValue` | -              | `number`          | 值变更      |
-| `@change`            | `onChange`     | `(value: number)` | 评分变更    |
-| `@hover-change`      | `onHoverChange`| `(value: number)` | 悬停值变化  |
+| Vue Event            | React Prop      | Payload           | Description |
+| -------------------- | --------------- | ----------------- | ----------- |
+| `@update:modelValue` | -               | `number`          | 值变更      |
+| `@change`            | `onChange`      | `(value: number)` | 评分变更    |
+| `@hover-change`      | `onHoverChange` | `(value: number)` | 悬停值变化  |
 
 ---
 
@@ -681,9 +689,9 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 | Prop         | Type                   | Default     | Vue | React | Description        |
 | ------------ | ---------------------- | ----------- | :-: | :---: | ------------------ |
-| modelValue   | `number`               | `0`         |  ✓  |   -   | 绑定值 (v-model)     |
-| value        | `number`               | -           |  -  |   ✓   | 绑定值（受控）       |
-| defaultValue | `number`               | `0`         |  -  |   ✓   | 默认值（非受控）     |
+| modelValue   | `number`               | `0`         |  ✓  |   -   | 绑定值 (v-model)   |
+| value        | `number`               | -           |  -  |   ✓   | 绑定值（受控）     |
+| defaultValue | `number`               | `0`         |  -  |   ✓   | 默认值（非受控）   |
 | min          | `number`               | `-Infinity` |  ✓  |   ✓   | 最小值             |
 | max          | `number`               | `Infinity`  |  ✓  |   ✓   | 最大值             |
 | step         | `number`               | `1`         |  ✓  |   ✓   | 步长               |
@@ -732,9 +740,9 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 | Prop             | Type                   | Default | Vue | React | Description      |
 | ---------------- | ---------------------- | ------- | :-: | :---: | ---------------- |
-| modelValue       | `TreeSelectValue`      | -       |  ✓  |   -   | 绑定值 (v-model)  |
-| value            | `TreeSelectValue`      | -       |  -  |   ✓   | 绑定值（受控）    |
-| defaultValue     | `TreeSelectValue`      | -       |  -  |   ✓   | 默认值（非受控）  |
+| modelValue       | `TreeSelectValue`      | -       |  ✓  |   -   | 绑定值 (v-model) |
+| value            | `TreeSelectValue`      | -       |  -  |   ✓   | 绑定值（受控）   |
+| defaultValue     | `TreeSelectValue`      | -       |  -  |   ✓   | 默认值（非受控） |
 | treeData         | `TreeSelectNode[]`     | `[]`    |  ✓  |   ✓   | 树形数据         |
 | placeholder      | `string`               | -       |  ✓  |   ✓   | 占位符           |
 | size             | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸             |
@@ -763,33 +771,33 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Options
 
-| Option         | Type        | Default | Description              |
-| -------------- | ----------- | ------- | ------------------------ |
-| initialValues  | `object`    | `{}`    | 初始值                   |
-| rules          | `FormRules` | -       | 校验规则                 |
-| undoable       | `boolean`   | `false` | 启用撤销/重做            |
-| maxHistorySize | `number`    | `50`    | 最大历史记录数           |
+| Option         | Type        | Default | Description    |
+| -------------- | ----------- | ------- | -------------- |
+| initialValues  | `object`    | `{}`    | 初始值         |
+| rules          | `FormRules` | -       | 校验规则       |
+| undoable       | `boolean`   | `false` | 启用撤销/重做  |
+| maxHistorySize | `number`    | `50`    | 最大历史记录数 |
 
 ### 返回值 (FormController)
 
-| Field / Method | Type                                          | Description      |
-| -------------- | --------------------------------------------- | ---------------- |
-| values         | `Reactive<object>` / `object`                 | 当前表单值       |
-| errors         | `Record<string, string>`                      | 字段错误映射     |
-| errorsByField  | `(name: string) => string \| undefined`       | 获取指定字段错误 |
-| hasErrors      | `boolean`                                     | 是否存在错误     |
-| setFieldValue  | `(name: string, value: unknown) => void`      | 设置单个字段值   |
-| setValues      | `(values: object) => void`                    | 批量设置值       |
-| getFieldValue  | `(name: string) => unknown`                   | 获取字段值       |
-| validate       | `() => Promise<boolean>`                      | 验证全部字段     |
-| validateFields | `(fields: string[]) => Promise<boolean>`      | 验证指定字段     |
-| validateField  | `(name: string) => Promise<boolean>`          | 验证单个字段     |
-| clearValidate  | `(fields?: string \| string[]) => void`       | 清除校验状态     |
-| reset          | `() => void`                                  | 重置到初始值     |
-| undo           | `() => void`                                  | 撤销（需 undoable） |
-| redo           | `() => void`                                  | 重做（需 undoable） |
-| canUndo        | `boolean`                                     | 是否可撤销       |
-| canRedo        | `boolean`                                     | 是否可重做       |
+| Field / Method | Type                                     | Description         |
+| -------------- | ---------------------------------------- | ------------------- |
+| values         | `Reactive<object>` / `object`            | 当前表单值          |
+| errors         | `Record<string, string>`                 | 字段错误映射        |
+| errorsByField  | `(name: string) => string \| undefined`  | 获取指定字段错误    |
+| hasErrors      | `boolean`                                | 是否存在错误        |
+| setFieldValue  | `(name: string, value: unknown) => void` | 设置单个字段值      |
+| setValues      | `(values: object) => void`               | 批量设置值          |
+| getFieldValue  | `(name: string) => unknown`              | 获取字段值          |
+| validate       | `() => Promise<boolean>`                 | 验证全部字段        |
+| validateFields | `(fields: string[]) => Promise<boolean>` | 验证指定字段        |
+| validateField  | `(name: string) => Promise<boolean>`     | 验证单个字段        |
+| clearValidate  | `(fields?: string \| string[]) => void`  | 清除校验状态        |
+| reset          | `() => void`                             | 重置到初始值        |
+| undo           | `() => void`                             | 撤销（需 undoable） |
+| redo           | `() => void`                             | 重做（需 undoable） |
+| canUndo        | `boolean`                                | 是否可撤销          |
+| canRedo        | `boolean`                                | 是否可重做          |
 
 ### Usage
 

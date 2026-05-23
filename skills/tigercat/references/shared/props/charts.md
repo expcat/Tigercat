@@ -3,6 +3,13 @@ name: tigercat-charts-shared
 description: Shared charts props and concepts
 ---
 
+<!-- LLM-INDEX
+type: props-reference
+category: charts
+components: 17
+key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, responsive
+-->
+
 # Charts 通用概念
 
 ## 技术选型
@@ -32,19 +39,19 @@ description: Shared charts props and concepts
 
 ## 通用 Props
 
-| Prop        | Type                                         | Default  | Description    |
-| ----------- | -------------------------------------------- | -------- | -------------- |
-| width       | `number`                                     | `320`    | 宽度 (px)      |
-| height      | `number`                                     | `200`    | 高度 (px)      |
-| responsive  | `boolean`                                    | `false`  | 跟随父容器尺寸 |
-| padding     | `number \| { top?, right?, bottom?, left? }` | `24`     | 内边距         |
-| colors      | `string[]`                                   | 主题色板 | 系列/扇形颜色  |
-| showGrid    | `boolean`                                    | `true`   | 显示网格       |
-| showAxis    | `boolean`                                    | `true`   | 显示坐标轴     |
-| showLegend  | `boolean`                                    | `false`  | 显示图例       |
-| showTooltip | `boolean`                                    | `true`   | 显示提示       |
-| hoverable   | `boolean`                                    | `false`  | 悬停交互       |
-| selectable  | `boolean`                                    | `false`  | 点击选择       |
+| Prop        | Type                                         | Default  | Description         |
+| ----------- | -------------------------------------------- | -------- | ------------------- |
+| width       | `number`                                     | `320`    | 宽度 (px)           |
+| height      | `number`                                     | `200`    | 高度 (px)           |
+| responsive  | `boolean`                                    | `false`  | 跟随父容器尺寸      |
+| padding     | `number \| { top?, right?, bottom?, left? }` | `24`     | 内边距              |
+| colors      | `string[]`                                   | 主题色板 | 系列/扇形颜色       |
+| showGrid    | `boolean`                                    | `true`   | 显示网格            |
+| showAxis    | `boolean`                                    | `true`   | 显示坐标轴          |
+| showLegend  | `boolean`                                    | `false`  | 显示图例            |
+| showTooltip | `boolean`                                    | `true`   | 显示提示            |
+| hoverable   | `boolean`                                    | `false`  | 悬停交互            |
+| selectable  | `boolean`                                    | `false`  | 点击选择            |
 | title       | `string`                                     | -        | SVG title（无障碍） |
 | desc        | `string`                                     | -        | SVG desc（无障碍）  |
 
@@ -183,14 +190,14 @@ description: Shared charts props and concepts
 
 漏斗图，从宽到窄展示转化过程。
 
-| Prop     | Type                             | Default      | Vue | React |
-| -------- | -------------------------------- | ------------ | --- | ----- |
-| data     | `FunnelChartDatum[]`             | *required*   | ✓   | ✓     |
-| direction| `'vertical' \| 'horizontal'`     | `'vertical'` | ✓   | ✓     |
-| gap      | `number`                         | `2`          | ✓   | ✓     |
-| pinch    | `boolean`                        | `false`      | ✓   | ✓     |
-| colors   | `string[]`                       | 主题色板     | ✓   | ✓     |
-| gradient | `boolean`                        | `false`      | ✓   | ✓     |
+| Prop      | Type                         | Default      | Vue | React |
+| --------- | ---------------------------- | ------------ | --- | ----- |
+| data      | `FunnelChartDatum[]`         | _required_   | ✓   | ✓     |
+| direction | `'vertical' \| 'horizontal'` | `'vertical'` | ✓   | ✓     |
+| gap       | `number`                     | `2`          | ✓   | ✓     |
+| pinch     | `boolean`                    | `false`      | ✓   | ✓     |
+| colors    | `string[]`                   | 主题色板     | ✓   | ✓     |
+| gradient  | `boolean`                    | `false`      | ✓   | ✓     |
 
 **FunnelChartDatum**: `{ label?: string, value: number, color?: string }`
 
@@ -198,35 +205,35 @@ description: Shared charts props and concepts
 
 仪表盘图，展示单一指标在范围内的位置。
 
-| Prop           | Type                                               | Default                              | Vue | React |
-| -------------- | -------------------------------------------------- | ------------------------------------ | --- | ----- |
-| value          | `number`                                           | *required*                           | ✓   | ✓     |
-| min            | `number`                                           | `0`                                  | ✓   | ✓     |
-| max            | `number`                                           | `100`                                | ✓   | ✓     |
-| startAngle     | `number`                                           | `135`                                | ✓   | ✓     |
-| endAngle       | `number`                                           | `405`                                | ✓   | ✓     |
-| arcWidth       | `number`                                           | `20`                                 | ✓   | ✓     |
-| showTicks      | `boolean`                                          | `true`                               | ✓   | ✓     |
-| tickCount      | `number`                                           | `5`                                  | ✓   | ✓     |
-| valueFormatter | `(value: number) => string`                        | -                                    | ✓   | ✓     |
-| label          | `string`                                           | -                                    | ✓   | ✓     |
-| segments       | `Array<{ range: [number, number]; color: string }>`| -                                    | ✓   | ✓     |
-| trackColor     | `string`                                           | `'var(--tiger-border,#e5e7eb)'`      | ✓   | ✓     |
-| color          | `string`                                           | `'var(--tiger-primary,#2563eb)'`     | ✓   | ✓     |
-| colors         | `string[]`                                         | -                                    | ✓   | ✓     |
-| gradient       | `boolean`                                          | `false`                              | ✓   | ✓     |
+| Prop           | Type                                                | Default                          | Vue | React |
+| -------------- | --------------------------------------------------- | -------------------------------- | --- | ----- |
+| value          | `number`                                            | _required_                       | ✓   | ✓     |
+| min            | `number`                                            | `0`                              | ✓   | ✓     |
+| max            | `number`                                            | `100`                            | ✓   | ✓     |
+| startAngle     | `number`                                            | `135`                            | ✓   | ✓     |
+| endAngle       | `number`                                            | `405`                            | ✓   | ✓     |
+| arcWidth       | `number`                                            | `20`                             | ✓   | ✓     |
+| showTicks      | `boolean`                                           | `true`                           | ✓   | ✓     |
+| tickCount      | `number`                                            | `5`                              | ✓   | ✓     |
+| valueFormatter | `(value: number) => string`                         | -                                | ✓   | ✓     |
+| label          | `string`                                            | -                                | ✓   | ✓     |
+| segments       | `Array<{ range: [number, number]; color: string }>` | -                                | ✓   | ✓     |
+| trackColor     | `string`                                            | `'var(--tiger-border,#e5e7eb)'`  | ✓   | ✓     |
+| color          | `string`                                            | `'var(--tiger-primary,#2563eb)'` | ✓   | ✓     |
+| colors         | `string[]`                                          | -                                | ✓   | ✓     |
+| gradient       | `boolean`                                           | `false`                          | ✓   | ✓     |
 
 ### SunburstChart
 
 旭日图，以同心环展示分层数据。
 
-| Prop             | Type                     | Default  | Vue | React |
-| ---------------- | ------------------------ | -------- | --- | ----- |
-| data             | `SunburstChartDatum[]`   | *required*| ✓   | ✓     |
-| innerRadiusRatio | `number`                 | `0`      | ✓   | ✓     |
-| showLabels       | `boolean`                | `true`   | ✓   | ✓     |
-| colors           | `string[]`               | 主题色板 | ✓   | ✓     |
-| gradient         | `boolean`                | `false`  | ✓   | ✓     |
+| Prop             | Type                   | Default    | Vue | React |
+| ---------------- | ---------------------- | ---------- | --- | ----- |
+| data             | `SunburstChartDatum[]` | _required_ | ✓   | ✓     |
+| innerRadiusRatio | `number`               | `0`        | ✓   | ✓     |
+| showLabels       | `boolean`              | `true`     | ✓   | ✓     |
+| colors           | `string[]`             | 主题色板   | ✓   | ✓     |
+| gradient         | `boolean`              | `false`    | ✓   | ✓     |
 
 **SunburstChartDatum**: `{ label: string, value: number, color?: string, children?: SunburstChartDatum[] }`
 
@@ -234,14 +241,14 @@ description: Shared charts props and concepts
 
 矩形树图，按面积比例展示分层数据。
 
-| Prop         | Type                   | Default  | Vue | React |
-| ------------ | ---------------------- | -------- | --- | ----- |
-| data         | `TreeMapChartDatum[]`  | *required*| ✓   | ✓     |
-| gap          | `number`               | `2`      | ✓   | ✓     |
-| showLabels   | `boolean`              | `true`   | ✓   | ✓     |
-| minLabelSize | `number`               | `10`     | ✓   | ✓     |
-| colors       | `string[]`             | 主题色板 | ✓   | ✓     |
-| gradient     | `boolean`              | `false`  | ✓   | ✓     |
+| Prop         | Type                  | Default    | Vue | React |
+| ------------ | --------------------- | ---------- | --- | ----- |
+| data         | `TreeMapChartDatum[]` | _required_ | ✓   | ✓     |
+| gap          | `number`              | `2`        | ✓   | ✓     |
+| showLabels   | `boolean`             | `true`     | ✓   | ✓     |
+| minLabelSize | `number`              | `10`       | ✓   | ✓     |
+| colors       | `string[]`            | 主题色板   | ✓   | ✓     |
+| gradient     | `boolean`             | `false`    | ✓   | ✓     |
 
 **TreeMapChartDatum**: `{ label: string, value: number, color?: string, children?: TreeMapChartDatum[] }`
 

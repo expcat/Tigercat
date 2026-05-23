@@ -3,6 +3,13 @@ name: tigercat-shared-props-composite
 description: Shared props definitions for composite components - ChatWindow / ActivityFeed / CommentThread / NotificationCenter / FormWizard / DataTableWithToolbar / CropUpload
 ---
 
+<!-- LLM-INDEX
+type: props-reference
+category: composite
+components: 7
+key-apis: messages, items, comments, notifications, steps, columns, uploads, value, onChange
+-->
+
 # Composite Components - Props Reference
 
 共享 Props 定义，框架差异在表格中标注。
@@ -324,23 +331,23 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 
 ### Props
 
-| Prop           | Type                         | Default        | Vue | React | Description                               |
-| -------------- | ---------------------------- | -------------- | :-: | :---: | ----------------------------------------- |
-| steps          | `WizardStep[]`               | `[]`           |  ✓  |   ✓   | 步骤配置                                  |
-| current        | `number`                     | -              |  ✓  |   ✓   | 当前步骤（受控）                          |
-| defaultCurrent | `number`                     | `0`            |  ✓  |   ✓   | 默认步骤（非受控）                        |
-| clickable      | `boolean`                    | `false`        |  ✓  |   ✓   | 允许点击步骤切换                          |
-| direction      | `'horizontal' \| 'vertical'` | `'horizontal'` |  ✓  |   ✓   | 步骤方向                                  |
-| size           | `'small' \| 'default'`       | `'default'`    |  ✓  |   ✓   | 步骤尺寸                                  |
-| simple         | `boolean`                    | `false`        |  ✓  |   ✓   | Steps 简洁模式                            |
-| showSteps      | `boolean`                    | `true`         |  ✓  |   ✓   | 显示步骤条                                |
-| showActions    | `boolean`                    | `true`         |  ✓  |   ✓   | 显示操作按钮                              |
-| prevText       | `string`                     | `'Previous'`   |  ✓  |   ✓   | 上一步按钮文案                            |
-| nextText       | `string`                     | `'Next'`       |  ✓  |   ✓   | 下一步按钮文案                            |
-| finishText     | `string`                     | `'Finish'`     |  ✓  |   ✓   | 完成按钮文案                              |
-| beforeNext     | `FormWizardValidator`        | -              |  ✓  |   ✓   | 下一步校验（返回 false 或 string 阻断）   |
-| autoSave       | `(current, step) => void \| Promise<void>` | - |  ✓  |   ✓   | 步骤切换时自动保存回调                    |
-| locale         | `Partial<TigerLocale>`       | -              |  ✓  |   ✓   | 语言包覆盖（优先级低于 prev/next/finish） |
+| Prop           | Type                                       | Default        | Vue | React | Description                               |
+| -------------- | ------------------------------------------ | -------------- | :-: | :---: | ----------------------------------------- |
+| steps          | `WizardStep[]`                             | `[]`           |  ✓  |   ✓   | 步骤配置                                  |
+| current        | `number`                                   | -              |  ✓  |   ✓   | 当前步骤（受控）                          |
+| defaultCurrent | `number`                                   | `0`            |  ✓  |   ✓   | 默认步骤（非受控）                        |
+| clickable      | `boolean`                                  | `false`        |  ✓  |   ✓   | 允许点击步骤切换                          |
+| direction      | `'horizontal' \| 'vertical'`               | `'horizontal'` |  ✓  |   ✓   | 步骤方向                                  |
+| size           | `'small' \| 'default'`                     | `'default'`    |  ✓  |   ✓   | 步骤尺寸                                  |
+| simple         | `boolean`                                  | `false`        |  ✓  |   ✓   | Steps 简洁模式                            |
+| showSteps      | `boolean`                                  | `true`         |  ✓  |   ✓   | 显示步骤条                                |
+| showActions    | `boolean`                                  | `true`         |  ✓  |   ✓   | 显示操作按钮                              |
+| prevText       | `string`                                   | `'Previous'`   |  ✓  |   ✓   | 上一步按钮文案                            |
+| nextText       | `string`                                   | `'Next'`       |  ✓  |   ✓   | 下一步按钮文案                            |
+| finishText     | `string`                                   | `'Finish'`     |  ✓  |   ✓   | 完成按钮文案                              |
+| beforeNext     | `FormWizardValidator`                      | -              |  ✓  |   ✓   | 下一步校验（返回 false 或 string 阻断）   |
+| autoSave       | `(current, step) => void \| Promise<void>` | -              |  ✓  |   ✓   | 步骤切换时自动保存回调                    |
+| locale         | `Partial<TigerLocale>`                     | -              |  ✓  |   ✓   | 语言包覆盖（优先级低于 prev/next/finish） |
 
 ### Behavior
 
@@ -365,16 +372,16 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 
 ### WizardStep
 
-| Prop        | Type                                         | Default | Description                  |
-| ----------- | -------------------------------------------- | ------- | ---------------------------- |
-| key         | `string \| number`                           | -       | 唯一标识                     |
-| title       | `string`                                     | -       | 标题                         |
-| description | `string`                                     | -       | 描述                         |
-| status      | `'wait' \| 'process' \| 'finish' \| 'error'` | -       | 步骤状态                     |
-| icon        | `unknown`                                    | -       | 自定义图标                   |
-| disabled    | `boolean`                                    | `false` | 禁用步骤                     |
-| content     | `unknown`                                    | -       | 自定义内容                   |
-| fields      | `string[]`                                   | -       | 当前步骤字段（用于分步校验） |
+| Prop          | Type                                         | Default | Description                  |
+| ------------- | -------------------------------------------- | ------- | ---------------------------- |
+| key           | `string \| number`                           | -       | 唯一标识                     |
+| title         | `string`                                     | -       | 标题                         |
+| description   | `string`                                     | -       | 描述                         |
+| status        | `'wait' \| 'process' \| 'finish' \| 'error'` | -       | 步骤状态                     |
+| icon          | `unknown`                                    | -       | 自定义图标                   |
+| disabled      | `boolean`                                    | `false` | 禁用步骤                     |
+| content       | `unknown`                                    | -       | 自定义内容                   |
+| fields        | `string[]`                                   | -       | 当前步骤字段（用于分步校验） |
 | skipCondition | `() => boolean`                              | -       | 条件跳过此步骤               |
 
 ---
@@ -455,15 +462,15 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 
 ### Props
 
-| Prop         | Type                                 | Default       | Vue | React | Description                       |
-| ------------ | ------------------------------------ | ------------- | :-: | :---: | --------------------------------- |
-| accept       | `string`                             | `'image/*'`   |  ✓  |   ✓   | 文件类型过滤                      |
-| disabled     | `boolean`                            | `false`       |  ✓  |   ✓   | 禁用                              |
-| maxSize      | `number`                             | -             |  ✓  |   ✓   | 最大文件大小（bytes）             |
-| cropperProps | `Partial<Omit<ImageCropperProps, 'src'>>` | -        |  ✓  |   ✓   | 透传给内部 ImageCropper 的 props  |
-| modalTitle   | `string`                             | `'裁剪图片'`  |  ✓  |   ✓   | 弹窗标题                          |
-| modalWidth   | `number`                             | `520`         |  ✓  |   ✓   | 弹窗宽度                          |
-| className    | `string`                             | -             |  ✓  |   ✓   | 自定义类名                        |
+| Prop         | Type                                      | Default      | Vue | React | Description                      |
+| ------------ | ----------------------------------------- | ------------ | :-: | :---: | -------------------------------- |
+| accept       | `string`                                  | `'image/*'`  |  ✓  |   ✓   | 文件类型过滤                     |
+| disabled     | `boolean`                                 | `false`      |  ✓  |   ✓   | 禁用                             |
+| maxSize      | `number`                                  | -            |  ✓  |   ✓   | 最大文件大小（bytes）            |
+| cropperProps | `Partial<Omit<ImageCropperProps, 'src'>>` | -            |  ✓  |   ✓   | 透传给内部 ImageCropper 的 props |
+| modalTitle   | `string`                                  | `'裁剪图片'` |  ✓  |   ✓   | 弹窗标题                         |
+| modalWidth   | `number`                                  | `520`        |  ✓  |   ✓   | 弹窗宽度                         |
+| className    | `string`                                  | -            |  ✓  |   ✓   | 自定义类名                       |
 
 > 裁剪相关配置（`aspectRatio`, `outputType`, `quality`, `guides` 等）通过 `cropperProps` 透传，不再作为顶层 prop。
 

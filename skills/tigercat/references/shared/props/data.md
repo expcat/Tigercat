@@ -3,6 +3,13 @@ name: tigercat-shared-props-data
 description: Shared props definitions for data display components - Calendar, ImageViewer, Table, Timeline
 ---
 
+<!-- LLM-INDEX
+type: props-reference
+category: data
+components: 4
+key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, expandable, value
+-->
+
 # Data Display Components - Props Reference
 
 共享 Props 定义。

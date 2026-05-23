@@ -451,6 +451,83 @@ describe('CLI Dry Run', () => {
   })
 })
 
+describe('CLI E2E Output', () => {
+  const originalCwd = process.cwd()
+  const testDir = join(tmpdir(), `tigercat-cli-e2e-test-${Date.now()}`)
+  let logSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    ensureDir(testDir)
+    process.chdir(testDir)
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    logSpy.mockRestore()
+    process.chdir(originalCwd)
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true })
+    }
+  })
+
+  it('creates the expected Vue project files from create', async () => {
+    await runCreate('e2e-vue', 'vue3')
+
+    const projectDir = join(testDir, 'e2e-vue')
+    const packageJson = JSON.parse(readFileSync(join(projectDir, 'package.json'), 'utf-8'))
+
+    expect(packageJson.name).toBe('e2e-vue')
+    expect(packageJson.dependencies).toHaveProperty('@expcat/tigercat-vue')
+    expect(readFileSync(join(projectDir, 'src/App.vue'), 'utf-8')).toContain(
+      "from '@expcat/tigercat-vue'"
+    )
+    expect(readFileSync(join(projectDir, 'src/style.css'), 'utf-8')).toContain(
+      '@expcat/tigercat-core/tailwind/modern'
+    )
+  })
+
+  it('creates React demo files and import output from add', async () => {
+    writeFileSafe(
+      join(testDir, 'package.json'),
+      JSON.stringify({ dependencies: { '@expcat/tigercat-react': '^1.0.0' } })
+    )
+    ensureDir(join(testDir, 'src/components'))
+
+    await runAdd(['button', 'Input'])
+
+    const buttonDemo = readFileSync(join(testDir, 'src/components/ButtonDemo.tsx'), 'utf-8')
+    const inputDemo = readFileSync(join(testDir, 'src/components/InputDemo.tsx'), 'utf-8')
+    const output = logSpy.mock.calls.map((call) => call.join(' ')).join('\n')
+
+    expect(buttonDemo).toContain("import { Button } from '@expcat/tigercat-react'")
+    expect(inputDemo).toContain('<Input />')
+    expect(output).toContain("import { Button, Input } from '@expcat/tigercat-react'")
+  })
+
+  it('generates component markdown and index output from generate docs', async () => {
+    writeFileSafe(
+      join(testDir, 'types/button.ts'),
+      `export interface ButtonProps {
+  /** Button label */
+  label?: string
+  variant: 'primary' | 'secondary'
+}
+`
+    )
+
+    await runGenerateDocs('types', 'api')
+
+    const buttonDoc = readFileSync(join(testDir, 'api/button.md'), 'utf-8')
+    const indexDoc = readFileSync(join(testDir, 'api/index.md'), 'utf-8')
+
+    expect(buttonDoc).toContain('# Button')
+    expect(buttonDoc).toContain('Source: `button.ts`')
+    expect(buttonDoc).toContain('`variant`')
+    expect(buttonDoc).toContain("`'primary' \\| 'secondary'`")
+    expect(indexDoc).toContain('- [Button](./button.md)')
+  })
+})
+
 describe('CLI Integration - Create Project', () => {
   const testDir = join(tmpdir(), `tigercat-create-test-${Date.now()}`)
 

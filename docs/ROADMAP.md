@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-23）：§4.2 CLI 增强 — 添加 CLI `--dry-run` 模式，覆盖 create/add/playground/generate docs 的预览流程并补充测试。
+> **最近完成**（2026-05-23）：§5.1 Skills 文档精简 — 统一术语入口，建立 `glossary.md` 与 common patterns 的简写引用约定。
 
 ## 基线 v1.1.0
 
@@ -139,7 +139,7 @@ source: project audit and planning
 
 - [x] 补充 CLI README 使用示例
 - [x] 添加 `--dry-run` 模式（预览变更不写入文件）
-- [ ] CLI E2E 测试（验证 create/add/generate 输出正确）
+- [x] CLI E2E 测试（验证 create/add/generate 输出正确）
 
 ### 4.3 发布流程自动化
 
@@ -167,13 +167,13 @@ source: project audit and planning
 - [ ] 合并重复描述：`SKILL.md` 导航表 + `copilot-instructions.md` 模板 → 去重，SKILL.md 仅保留索引
 - [ ] Props 文档压缩：移除重复的"支持 Vue/React"列（全组件双端，无需逐行标注）
 - [ ] 示例代码精简：每组件保留 1 个最小可运行示例 + 1 个进阶示例，删除冗余变体
-- [ ] 统一术语：建立术语表（slot/children、emit/callback、attrs/props 等），文档中用简写引用
+- [x] 统一术语：建立术语表（slot/children、emit/callback、attrs/props 等），文档中用简写引用
 
 ### 5.2 LLM-INDEX 标注增强
 
-- [ ] 每个 Props 文档头部添加 `<!-- LLM-INDEX -->` 摘要（组件数量、关键 API 列表）
+- [x] 每个 Props 文档头部添加 `<!-- LLM-INDEX -->` 摘要（组件数量、关键 API 列表）
 - [ ] `copilot-instructions.md` 精简：移除历史决策说明，保留可执行规则
-- [ ] 新增 `skills/tigercat/references/shared/glossary.md`：组件术语速查，减少重复解释
+- [x] 新增 `skills/tigercat/references/shared/glossary.md`：组件术语速查，减少重复解释
 
 ### 5.3 文档自动化
 

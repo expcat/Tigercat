@@ -3,6 +3,13 @@ name: tigercat-shared-props-navigation
 description: Shared props definitions for navigation components - Affix, Breadcrumb, Dropdown, FloatButton, Menu, Pagination, Segmented, Steps, Tabs, Tree
 ---
 
+<!-- LLM-INDEX
+type: props-reference
+category: navigation
+components: 10
+key-apis: items, activeKey, selectedKeys, openKeys, current, href, offsetTop, pageSize, treeData
+-->
+
 # Navigation Components - Props Reference
 
 共享 Props 定义。
@@ -57,15 +64,15 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 
 ### Dropdown Props
 
-| Prop         | Type                 | Default          | Vue | React | Description          |
-| ------------ | -------------------- | ---------------- | :-: | :---: | -------------------- |
-| trigger      | `'hover' \| 'click'` | `'hover'`        |  ✓  |   ✓   | 触发方式             |
-| disabled     | `boolean`            | `false`          |  ✓  |   ✓   | 禁用                 |
-| open         | `boolean`            | -                |  ✓  |   ✓   | 显示状态（受控）     |
-| defaultOpen  | `boolean`            | `false`          |  ✓  |   ✓   | 默认显示状态         |
-| closeOnClick | `boolean`            | `true`           |  ✓  |   ✓   | 点击菜单项后关闭     |
-| showArrow    | `boolean`            | `true`           |  ✓  |   ✓   | 显示下拉箭头指示器   |
-| className    | `string`             | -                |  ✓  |   ✓   | 自定义 CSS 类名      |
+| Prop         | Type                 | Default   | Vue | React | Description        |
+| ------------ | -------------------- | --------- | :-: | :---: | ------------------ |
+| trigger      | `'hover' \| 'click'` | `'hover'` |  ✓  |   ✓   | 触发方式           |
+| disabled     | `boolean`            | `false`   |  ✓  |   ✓   | 禁用               |
+| open         | `boolean`            | -         |  ✓  |   ✓   | 显示状态（受控）   |
+| defaultOpen  | `boolean`            | `false`   |  ✓  |   ✓   | 默认显示状态       |
+| closeOnClick | `boolean`            | `true`    |  ✓  |   ✓   | 点击菜单项后关闭   |
+| showArrow    | `boolean`            | `true`    |  ✓  |   ✓   | 显示下拉箭头指示器 |
+| className    | `string`             | -         |  ✓  |   ✓   | 自定义 CSS 类名    |
 
 ### DropdownMenu Props
 
@@ -346,10 +353,10 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 
 ### Props
 
-| Prop             | Type                          | Default        | Vue | React | Description                            |
-| ---------------- | ----------------------------- | -------------- | :-: | :---: | -------------------------------------- |
-| visibilityHeight | `number`                      | `400`          |  ✓  |   ✓   | 滚动高度达到此值显示                   |
-| duration         | `number`                      | `450`          |  ✓  |   ✓   | `0` 立即滚动；正数使用原生 smooth 滚动 |
+| Prop             | Type     | Default | Vue | React | Description                            |
+| ---------------- | -------- | ------- | :-: | :---: | -------------------------------------- |
+| visibilityHeight | `number` | `400`   |  ✓  |   ✓   | 滚动高度达到此值显示                   |
+| duration         | `number` | `450`   |  ✓  |   ✓   | `0` 立即滚动；正数使用原生 smooth 滚动 |
 
 ### Events
 

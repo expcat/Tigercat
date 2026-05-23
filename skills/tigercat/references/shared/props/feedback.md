@@ -3,6 +3,13 @@ name: tigercat-shared-props-feedback
 description: Shared props definitions for feedback components - Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Result, Tooltip, Tour, Watermark
 ---
 
+<!-- LLM-INDEX
+type: props-reference
+category: feedback
+components: 12
+key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progress, zIndex, closable
+-->
+
 # Feedback Components - Props Reference
 
 共享 Props 定义，框架差异在表格中标注。

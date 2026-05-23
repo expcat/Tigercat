@@ -3,6 +3,13 @@ name: tigercat-shared-props-layout
 description: Shared props definitions for layout components - Card, Container, Descriptions, Divider, Grid, Layout, List, PrintLayout, Skeleton, Space, Statistic
 ---
 
+<!-- LLM-INDEX
+type: props-reference
+category: layout
+components: 11
+key-apis: variant, size, direction, gutter, span, loading, rows, columns, className
+-->
+
 # Layout Components - Props Reference
 
 共享 Props 定义。
@@ -38,12 +45,12 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop     | Type                                                         | Default | Vue | React | Description              |
-| -------- | ------------------------------------------------------------ | ------- | :-: | :---: | ------------------------ |
-| as       | `string \| Component`                                       | `'div'` |  ✓  |   ✓   | 渲染的 HTML 标签或组件    |
-| maxWidth | `'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| 'full' \| false` | `false` |  ✓  |   ✓   | 最大宽度约束             |
-| center   | `boolean`                                                    | `true`  |  ✓  |   ✓   | 水平居中                 |
-| padding  | `boolean`                                                    | `true`  |  ✓  |   ✓   | 响应式水平内边距         |
+| Prop     | Type                                                       | Default | Vue | React | Description            |
+| -------- | ---------------------------------------------------------- | ------- | :-: | :---: | ---------------------- |
+| as       | `string \| Component`                                      | `'div'` |  ✓  |   ✓   | 渲染的 HTML 标签或组件 |
+| maxWidth | `'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| 'full' \| false` | `false` |  ✓  |   ✓   | 最大宽度约束           |
+| center   | `boolean`                                                  | `true`  |  ✓  |   ✓   | 水平居中               |
+| padding  | `boolean`                                                  | `true`  |  ✓  |   ✓   | 响应式水平内边距       |
 
 ---
 
@@ -176,10 +183,10 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Events
 
-| Vue Event     | React Prop     | Payload                                 | Description |
-| ------------- | -------------- | --------------------------------------- | ----------- |
-| `item-click`  | `onItemClick`  | `(item: ListItem, index: number)`       | 点击列表项  |
-| `page-change` | `onPageChange` | `{ current: number, pageSize: number }` | 分页变化    |
+| Vue Event     | React Prop     | Payload                                 | Description  |
+| ------------- | -------------- | --------------------------------------- | ------------ |
+| `item-click`  | `onItemClick`  | `(item: ListItem, index: number)`       | 点击列表项   |
+| `page-change` | `onPageChange` | `{ current: number, pageSize: number }` | 分页变化     |
 | `reorder`     | `onReorder`    | `(items, fromIndex, toIndex)`           | 拖拽排序完成 |
 
 ---
@@ -188,19 +195,19 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop         | Type                         | Default        | Vue | React | Description      |
-| ------------ | ---------------------------- | -------------- | :-: | :---: | ---------------- |
-| title        | `string` / `ReactNode`       | -              |  ✓  |   ✓   | 标题             |
-| extra        | `unknown` / `ReactNode`      | -              |  ✓  |   ✓   | 标题右侧额外内容 |
-| bordered     | `boolean`                    | `false`        |  ✓  |   ✓   | 显示边框         |
+| Prop         | Type                                            | Default        | Vue | React | Description                |
+| ------------ | ----------------------------------------------- | -------------- | :-: | :---: | -------------------------- |
+| title        | `string` / `ReactNode`                          | -              |  ✓  |   ✓   | 标题                       |
+| extra        | `unknown` / `ReactNode`                         | -              |  ✓  |   ✓   | 标题右侧额外内容           |
+| bordered     | `boolean`                                       | `false`        |  ✓  |   ✓   | 显示边框                   |
 | column       | `number \| Partial<Record<Breakpoint, number>>` | `3`            |  ✓  |   ✓   | 每行列数（支持响应式对象） |
-| size         | `'sm' \| 'md' \| 'lg'`       | `'md'`         |  ✓  |   ✓   | 尺寸             |
-| layout       | `'horizontal' \| 'vertical'` | `'horizontal'` |  ✓  |   ✓   | 布局方向         |
-| colon        | `boolean`                    | `true`         |  ✓  |   ✓   | 标签后显示冒号   |
-| labelStyle   | `CSSProperties`              | -              |  ✓  |   ✓   | 标签全局样式     |
-| contentStyle | `CSSProperties`              | -              |  ✓  |   ✓   | 内容全局样式     |
-| items        | `DescriptionsItem[]`         | `[]`           |  ✓  |   ✓   | 数据项           |
-| className    | `string`                     | -              |  ✓  |   ✓   | 额外 CSS class   |
+| size         | `'sm' \| 'md' \| 'lg'`                          | `'md'`         |  ✓  |   ✓   | 尺寸                       |
+| layout       | `'horizontal' \| 'vertical'`                    | `'horizontal'` |  ✓  |   ✓   | 布局方向                   |
+| colon        | `boolean`                                       | `true`         |  ✓  |   ✓   | 标签后显示冒号             |
+| labelStyle   | `CSSProperties`                                 | -              |  ✓  |   ✓   | 标签全局样式               |
+| contentStyle | `CSSProperties`                                 | -              |  ✓  |   ✓   | 内容全局样式               |
+| items        | `DescriptionsItem[]`                            | `[]`           |  ✓  |   ✓   | 数据项                     |
+| className    | `string`                                        | -              |  ✓  |   ✓   | 额外 CSS class             |
 
 ### DescriptionsItem
 
@@ -289,10 +296,10 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Slots / Children
 
-| Vue Slot | React Prop | Description    |
-| -------- | ---------- | -------------- |
-| `prefix` | -          | 自定义前缀内容（Vue slot）|
-| `suffix` | -          | 自定义后缀内容（Vue slot）|
+| Vue Slot | React Prop | Description                |
+| -------- | ---------- | -------------------------- |
+| `prefix` | -          | 自定义前缀内容（Vue slot） |
+| `suffix` | -          | 自定义后缀内容（Vue slot） |
 
 > `prefix` 和 `suffix` 在 core 类型中为 `string` 类型 prop，Vue 也支持同名 slot 覆盖
 

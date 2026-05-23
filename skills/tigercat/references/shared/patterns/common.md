@@ -7,6 +7,8 @@ description: Common patterns and framework differences for Tigercat UI component
 
 框架共通模式与差异速查。
 
+术语统一见 [shared/glossary.md](../glossary.md)。文档中优先使用 `slot / children`、`emit / callback`、`attrs / native props`、`v-model / controlled` 等简写。
+
 ---
 
 ## 框架差异速查表
