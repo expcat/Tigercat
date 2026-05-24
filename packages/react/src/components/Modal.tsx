@@ -9,6 +9,8 @@ import {
   closeIconPathStrokeLinejoin,
   closeIconPathStrokeWidth,
   getModalContentClasses,
+  getGestureTouchPoint,
+  isModalSheetSwipeCloseGesture,
   resolveLocaleText,
   modalWrapperClasses,
   modalMaskClasses,
@@ -20,6 +22,8 @@ import {
   modalFooterClasses,
   restoreFocus,
   shouldCloseOnMaskClick,
+  resolveSwipeGesture,
+  type GesturePoint,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
@@ -99,6 +103,7 @@ export const Modal: React.FC<ModalProps> = ({
   mask = true,
   maskClosable = true,
   centered = false,
+  mobileSheet = false,
   destroyOnClose = false,
   zIndex = 1000,
   className,
@@ -179,7 +184,10 @@ export const Modal: React.FC<ModalProps> = ({
     [maskClosable, handleClose]
   )
 
-  const contentClasses = useMemo(() => getModalContentClasses(size, className), [size, className])
+  const contentClasses = useMemo(
+    () => getModalContentClasses(size, className, mobileSheet),
+    [size, className, mobileSheet]
+  )
 
   const containerClasses = useMemo(() => getModalContainerClasses(centered), [centered])
 
@@ -223,6 +231,8 @@ export const Modal: React.FC<ModalProps> = ({
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
+  const touchStartRef = useRef<GesturePoint | null>(null)
+  const touchCurrentRef = useRef<GesturePoint | null>(null)
 
   useEffect(() => {
     if (open) {
@@ -241,6 +251,62 @@ export const Modal: React.FC<ModalProps> = ({
   useEscapeKey({ enabled: open, onEscape: handleClose })
   useBodyScrollLock({ enabled: open })
   useFocusTrap({ enabled: open, containerRef: dialogRef })
+
+  const resetTouchGesture = useCallback(() => {
+    touchStartRef.current = null
+    touchCurrentRef.current = null
+  }, [])
+
+  const handleTouchStart = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      dialogDivProps.onTouchStart?.(event)
+      if (!open || !mobileSheet) return
+
+      const point = getGestureTouchPoint(event.touches)
+      touchStartRef.current = point
+      touchCurrentRef.current = point
+    },
+    [dialogDivProps, mobileSheet, open]
+  )
+
+  const handleTouchMove = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      dialogDivProps.onTouchMove?.(event)
+      if (!touchStartRef.current) return
+
+      const point = getGestureTouchPoint(event.touches)
+      if (point) {
+        touchCurrentRef.current = point
+      }
+    },
+    [dialogDivProps]
+  )
+
+  const handleTouchEnd = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      dialogDivProps.onTouchEnd?.(event)
+      const gesture = resolveSwipeGesture(
+        touchStartRef.current,
+        getGestureTouchPoint(event.changedTouches) ?? touchCurrentRef.current,
+        { minDistance: 48, minVelocity: 0.15 }
+      )
+
+      resetTouchGesture()
+
+      if (mobileSheet && isModalSheetSwipeCloseGesture(gesture)) {
+        handleClose()
+      }
+    },
+    [dialogDivProps, handleClose, mobileSheet, resetTouchGesture]
+  )
+
+  const handleTouchCancel = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      dialogDivProps.onTouchCancel?.(event)
+      resetTouchGesture()
+    },
+    [dialogDivProps, resetTouchGesture]
+  )
 
   // Close icon component
   const CloseIcon = (
@@ -298,6 +364,10 @@ export const Modal: React.FC<ModalProps> = ({
           aria-labelledby={ariaLabelledby}
           tabIndex={-1}
           ref={dialogRef}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
           data-tiger-modal="">
           {/* Header */}
           {(title || titleContent || closable) && (

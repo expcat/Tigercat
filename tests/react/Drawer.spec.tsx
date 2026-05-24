@@ -3,7 +3,7 @@
  */
 
 import { afterEach, describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Drawer } from '@expcat/tigercat-react'
@@ -123,6 +123,30 @@ describe('Drawer', () => {
       const root = document.querySelector('[data-tiger-drawer-root]')
       expect(root).toHaveStyle({ zIndex: '2000' })
     })
+  })
+
+  it('should include mobile fullscreen classes', async () => {
+    render(<Drawer open={true} title="Mobile Drawer" />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog').className).toContain('max-md:!w-screen')
+      expect(screen.getByRole('dialog').className).toContain('max-md:!h-[100dvh]')
+    })
+  })
+
+  it('should close on outward swipe gesture', async () => {
+    const onOpenChange = vi.fn()
+
+    render(
+      <Drawer open={true} title="Swipe Drawer" placement="right" onOpenChange={onOpenChange} />
+    )
+
+    const dialog = screen.getByRole('dialog')
+    fireEvent.touchStart(dialog, { touches: [{ clientX: 260, clientY: 120 }] })
+    fireEvent.touchMove(dialog, { touches: [{ clientX: 330, clientY: 124 }] })
+    fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 330, clientY: 124 }] })
+
+    expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
   it('should lock body scroll while open and restore it when closed', async () => {

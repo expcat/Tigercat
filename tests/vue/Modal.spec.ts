@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Modal } from '@expcat/tigercat-vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
@@ -212,6 +212,21 @@ describe('Modal', () => {
         expect(wrapper).toHaveStyle({ zIndex: '2000' })
       })
     })
+
+    it('should include mobile sheet classes when mobileSheet is true', async () => {
+      const { container } = renderWithProps(Modal, {
+        open: true,
+        title: 'Mobile Sheet',
+        mobileSheet: true,
+        disableTeleport: true
+      })
+
+      await waitFor(() => {
+        const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+        expect(dialog.className).toContain('max-md:fixed')
+        expect(dialog.className).toContain('max-md:bottom-0')
+      })
+    })
   })
 
   describe('Events', () => {
@@ -237,6 +252,30 @@ describe('Modal', () => {
 
       const closeButton = container.querySelector('button[aria-label="Close"]')!
       await user.click(closeButton)
+
+      expect(onUpdateOpen).toHaveBeenCalledWith(false)
+      expect(onCancel).toHaveBeenCalled()
+    })
+
+    it('should emit update:open and cancel when mobile sheet is swiped down', async () => {
+      const onUpdateOpen = vi.fn()
+      const onCancel = vi.fn()
+
+      const { container } = render(Modal, {
+        props: {
+          open: true,
+          title: 'Swipe Sheet',
+          mobileSheet: true,
+          disableTeleport: true,
+          'onUpdate:open': onUpdateOpen,
+          onCancel
+        }
+      })
+
+      const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+      await fireEvent.touchStart(dialog, { touches: [{ clientX: 120, clientY: 160 }] })
+      await fireEvent.touchMove(dialog, { touches: [{ clientX: 124, clientY: 240 }] })
+      await fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 124, clientY: 240 }] })
 
       expect(onUpdateOpen).toHaveBeenCalledWith(false)
       expect(onCancel).toHaveBeenCalled()

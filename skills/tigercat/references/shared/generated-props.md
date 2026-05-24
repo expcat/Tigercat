@@ -801,6 +801,7 @@ update-command: pnpm docs:api
 | mask? | `boolean` | true | Whether to show the mask (overlay) |
 | maskClosable? | `boolean` | true | Whether clicking the mask should close the modal |
 | centered? | `boolean` | false | Whether the modal should be centered vertically |
+| mobileSheet? | `boolean` | false | Whether the modal should render as a mobile bottom sheet below the md breakpoint. |
 | destroyOnClose? | `boolean` | false | Whether to destroy the modal content when closed |
 | zIndex? | `number` | 1000 | z-index of the modal |
 | className? | `string` | - | Custom class name for modal content |

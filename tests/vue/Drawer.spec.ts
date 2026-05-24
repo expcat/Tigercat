@@ -163,6 +163,37 @@ describe('Drawer', () => {
     })
   })
 
+  it('should include mobile fullscreen classes', async () => {
+    render(Drawer, {
+      props: { open: true, title: 'Mobile Drawer' }
+    })
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog').className).toContain('max-md:!w-screen')
+      expect(screen.getByRole('dialog').className).toContain('max-md:!h-[100dvh]')
+    })
+  })
+
+  it('should close on outward swipe gesture', async () => {
+    const onUpdateOpen = vi.fn()
+
+    render(Drawer, {
+      props: {
+        open: true,
+        title: 'Swipe Drawer',
+        placement: 'right',
+        'onUpdate:open': onUpdateOpen
+      }
+    })
+
+    const dialog = screen.getByRole('dialog')
+    await fireEvent.touchStart(dialog, { touches: [{ clientX: 260, clientY: 120 }] })
+    await fireEvent.touchMove(dialog, { touches: [{ clientX: 330, clientY: 124 }] })
+    await fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 330, clientY: 124 }] })
+
+    expect(onUpdateOpen).toHaveBeenCalledWith(false)
+  })
+
   it('should lock body scroll while open and restore it when closed', async () => {
     const { rerender } = render(Drawer, {
       props: { open: true, title: 'Test Drawer' }

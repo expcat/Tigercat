@@ -4,6 +4,7 @@
 
 import { classNames } from './class-names'
 import type { DrawerPlacement, DrawerSize } from '../types/drawer'
+import type { SwipeGesture, SwipeDirection } from './gesture-utils'
 
 /**
  * Get mask/backdrop classes
@@ -32,6 +33,7 @@ export function getDrawerPanelClasses(
 ): string {
   const baseClasses =
     'absolute bg-[var(--tiger-surface,#ffffff)] shadow-xl transition-transform duration-300 ease-in-out pointer-events-auto'
+  const mobileFullscreenClasses = 'max-md:inset-0 max-md:!w-screen max-md:!h-[100dvh]'
 
   // Size mappings
   const sizeMap: Record<DrawerSize, { width: string; height: string }> = {
@@ -66,7 +68,25 @@ export function getDrawerPanelClasses(
     )
   }
 
-  return classNames(baseClasses, placementClasses[placement])
+  return classNames(baseClasses, placementClasses[placement], mobileFullscreenClasses)
+}
+
+export function getDrawerSwipeCloseDirection(placement: DrawerPlacement): SwipeDirection {
+  const directionMap: Record<DrawerPlacement, SwipeDirection> = {
+    left: 'left',
+    right: 'right',
+    top: 'up',
+    bottom: 'down'
+  }
+
+  return directionMap[placement]
+}
+
+export function isDrawerSwipeCloseGesture(
+  placement: DrawerPlacement,
+  gesture: SwipeGesture | null | undefined
+): boolean {
+  return Boolean(gesture && gesture.direction === getDrawerSwipeCloseDirection(placement))
 }
 
 /**

@@ -5,6 +5,8 @@
 
 import type { CarouselDotPosition } from '../types/carousel'
 import { isBrowser } from './env'
+import { getGestureTouchPoint, resolveSwipeGesture } from './gesture-utils'
+import type { GesturePoint } from './gesture-utils'
 
 export type CarouselFrameCallback = (timestamp: number) => void
 
@@ -72,10 +74,6 @@ function getDefaultVisibilityDocument(): CarouselVisibilityDocument | undefined 
 
 function normalizeAutoplayInterval(interval: number): number {
   return Number.isFinite(interval) && interval > 0 ? interval : 0
-}
-
-function normalizeMinSwipeDistance(distance: number | undefined): number {
-  return Number.isFinite(distance) && (distance ?? 0) > 0 ? (distance as number) : 24
 }
 
 /**
@@ -252,13 +250,8 @@ export function getScrollTransform(currentIndex: number): string {
 export function getCarouselTouchPoint(
   touches: ArrayLike<{ clientX: number; clientY: number }> | null | undefined
 ): CarouselTouchPoint | null {
-  if (!touches || touches.length === 0) return null
-
-  const touch = touches[0]
-  return {
-    x: touch.clientX,
-    y: touch.clientY
-  }
+  const point = getGestureTouchPoint(touches)
+  return point ? { x: point.x, y: point.y } : null
 }
 
 export function resolveCarouselSwipeDirection(
@@ -266,19 +259,18 @@ export function resolveCarouselSwipeDirection(
   endPoint: CarouselTouchPoint | null,
   options: CarouselSwipeOptions = {}
 ): CarouselSwipeDirection | null {
-  if (!startPoint || !endPoint) return null
+  const gesture = resolveSwipeGesture(
+    startPoint as GesturePoint | null,
+    endPoint as GesturePoint | null,
+    {
+      minDistance: options.minSwipeDistance
+    }
+  )
 
-  const deltaX = endPoint.x - startPoint.x
-  const deltaY = endPoint.y - startPoint.y
-  const absX = Math.abs(deltaX)
-  const absY = Math.abs(deltaY)
-  const minSwipeDistance = normalizeMinSwipeDistance(options.minSwipeDistance)
-
-  if (absX < minSwipeDistance || absX <= absY) {
-    return null
-  }
-
-  return deltaX < 0 ? 'next' : 'prev'
+  if (!gesture) return null
+  if (gesture.direction === 'left') return 'next'
+  if (gesture.direction === 'right') return 'prev'
+  return null
 }
 
 export function createCarouselAutoplayController(

@@ -4,6 +4,7 @@
 
 import { classNames } from './class-names'
 import type { ModalSize } from '../types/modal'
+import type { SwipeGesture } from './gesture-utils'
 
 /**
  * Base modal wrapper classes
@@ -31,6 +32,9 @@ export const getModalContainerClasses = (centered: boolean) => {
  */
 export const modalContentWrapperClasses =
   'relative transform overflow-hidden rounded-[var(--tiger-radius-xl,1rem)] bg-[var(--tiger-surface,#ffffff)] shadow-xl transition-all'
+
+export const modalMobileSheetClasses =
+  'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:top-auto max-md:!w-screen max-md:max-w-none max-md:rounded-t-[var(--tiger-radius-xl,1rem)] max-md:rounded-b-none'
 
 /**
  * Modal size classes
@@ -74,6 +78,19 @@ export const modalFooterClasses =
 /**
  * Get complete modal content classes
  */
-export function getModalContentClasses(size: ModalSize, className?: string): string {
-  return classNames(modalContentWrapperClasses, modalSizeClasses[size], className)
+export function getModalContentClasses(
+  size: ModalSize,
+  className?: string,
+  mobileSheet = false
+): string {
+  return classNames(
+    modalContentWrapperClasses,
+    modalSizeClasses[size],
+    mobileSheet && modalMobileSheetClasses,
+    className
+  )
+}
+
+export function isModalSheetSwipeCloseGesture(gesture: SwipeGesture | null | undefined): boolean {
+  return Boolean(gesture && gesture.direction === 'down')
 }

@@ -19,6 +19,8 @@ import {
   closeIconPathStrokeLinejoin,
   closeIconPathStrokeWidth,
   getModalContentClasses,
+  getGestureTouchPoint,
+  isModalSheetSwipeCloseGesture,
   modalWrapperClasses,
   modalMaskClasses,
   getModalContainerClasses,
@@ -29,6 +31,8 @@ import {
   modalFooterClasses,
   resolveLocaleText,
   shouldCloseOnMaskClick,
+  resolveSwipeGesture,
+  type GesturePoint,
   type TigerLocale,
   type ModalSize
 } from '@expcat/tigercat-core'
@@ -52,6 +56,7 @@ export interface VueModalProps {
   mask?: boolean
   maskClosable?: boolean
   centered?: boolean
+  mobileSheet?: boolean
   destroyOnClose?: boolean
   zIndex?: number
   className?: string
@@ -125,6 +130,14 @@ export const Modal = defineComponent({
      * @default false
      */
     centered: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Whether to render as a mobile bottom sheet below the md breakpoint
+     * @default false
+     */
+    mobileSheet: {
       type: Boolean,
       default: false
     },
@@ -229,6 +242,8 @@ export const Modal = defineComponent({
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
+    let touchStartPoint: GesturePoint | null = null
+    let touchCurrentPoint: GesturePoint | null = null
 
     // Drag state
     const dragOffset = ref({ x: 0, y: 0 })
@@ -275,6 +290,41 @@ export const Modal = defineComponent({
       }
     }
 
+    const resetTouchGesture = () => {
+      touchStartPoint = null
+      touchCurrentPoint = null
+    }
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (!props.open || !props.mobileSheet) return
+      const point = getGestureTouchPoint(event.touches)
+      touchStartPoint = point
+      touchCurrentPoint = point
+    }
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (!touchStartPoint) return
+
+      const point = getGestureTouchPoint(event.touches)
+      if (point) {
+        touchCurrentPoint = point
+      }
+    }
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      const gesture = resolveSwipeGesture(
+        touchStartPoint,
+        getGestureTouchPoint(event.changedTouches) ?? touchCurrentPoint,
+        { minDistance: 48, minVelocity: 0.15 }
+      )
+
+      resetTouchGesture()
+
+      if (props.mobileSheet && isModalSheetSwipeCloseGesture(gesture)) {
+        handleClose()
+      }
+    }
+
     const overlayOpen = computed(() => props.open)
     let cleanupEscape: (() => void) | undefined
 
@@ -310,7 +360,7 @@ export const Modal = defineComponent({
     )
 
     const contentClasses = computed(() => {
-      return getModalContentClasses(props.size, props.className)
+      return getModalContentClasses(props.size, props.className, props.mobileSheet)
     })
 
     const containerClasses = computed(() => {
@@ -483,6 +533,10 @@ export const Modal = defineComponent({
                   'aria-labelledby': ariaLabelledby,
                   tabindex: -1,
                   ref: dialogRef,
+                  onTouchstart: handleTouchStart,
+                  onTouchmove: handleTouchMove,
+                  onTouchend: handleTouchEnd,
+                  onTouchcancel: resetTouchGesture,
                   'data-tiger-modal': ''
                 },
                 [header, body, footer]

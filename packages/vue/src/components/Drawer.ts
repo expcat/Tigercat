@@ -31,8 +31,12 @@ import {
   getDrawerFooterClasses,
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
+  getGestureTouchPoint,
+  isDrawerSwipeCloseGesture,
   restoreFocus,
+  resolveSwipeGesture,
   shouldCloseOnMaskClick,
+  type GesturePoint,
   type DrawerPlacement,
   type DrawerSize
 } from '@expcat/tigercat-core'
@@ -203,6 +207,8 @@ export const Drawer = defineComponent({
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
+    let touchStartPoint: GesturePoint | null = null
+    let touchCurrentPoint: GesturePoint | null = null
 
     const titleId = computed(() => `${instanceId.value}-title`)
 
@@ -223,6 +229,41 @@ export const Drawer = defineComponent({
 
     const handleMaskClick = (event: MouseEvent) => {
       if (shouldCloseOnMaskClick(event, props.maskClosable)) {
+        handleClose()
+      }
+    }
+
+    const resetTouchGesture = () => {
+      touchStartPoint = null
+      touchCurrentPoint = null
+    }
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (!props.open) return
+      const point = getGestureTouchPoint(event.touches)
+      touchStartPoint = point
+      touchCurrentPoint = point
+    }
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (!touchStartPoint) return
+
+      const point = getGestureTouchPoint(event.touches)
+      if (point) {
+        touchCurrentPoint = point
+      }
+    }
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      const gesture = resolveSwipeGesture(
+        touchStartPoint,
+        getGestureTouchPoint(event.changedTouches) ?? touchCurrentPoint,
+        { minDistance: 48, minVelocity: 0.15 }
+      )
+
+      resetTouchGesture()
+
+      if (isDrawerSwipeCloseGesture(props.placement, gesture)) {
         handleClose()
       }
     }
@@ -398,6 +439,10 @@ export const Drawer = defineComponent({
           'aria-labelledby': ariaLabelledby,
           tabindex: -1,
           ref: dialogRef,
+          onTouchstart: handleTouchStart,
+          onTouchmove: handleTouchMove,
+          onTouchend: handleTouchEnd,
+          onTouchcancel: resetTouchGesture,
           'data-tiger-drawer': ''
         },
         [header, body, footer]

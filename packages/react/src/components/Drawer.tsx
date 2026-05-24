@@ -17,9 +17,13 @@ import {
   getDrawerFooterClasses,
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
+  getGestureTouchPoint,
+  isDrawerSwipeCloseGesture,
   resolveLocaleText,
+  resolveSwipeGesture,
   restoreFocus,
   shouldCloseOnMaskClick,
+  type GesturePoint,
   type DrawerProps as CoreDrawerProps
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
@@ -140,6 +144,8 @@ export const Drawer: React.FC<DrawerProps> = ({
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
+  const touchStartRef = useRef<GesturePoint | null>(null)
+  const touchCurrentRef = useRef<GesturePoint | null>(null)
 
   const resolvedCloseAriaLabel = resolveLocaleText(
     'Close drawer',
@@ -162,6 +168,62 @@ export const Drawer: React.FC<DrawerProps> = ({
   }, [open])
 
   useFocusTrap({ enabled: open, containerRef: dialogRef })
+
+  const resetTouchGesture = useCallback(() => {
+    touchStartRef.current = null
+    touchCurrentRef.current = null
+  }, [])
+
+  const handleTouchStart = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      dialogDivProps.onTouchStart?.(event)
+      if (!open) return
+
+      const point = getGestureTouchPoint(event.touches)
+      touchStartRef.current = point
+      touchCurrentRef.current = point
+    },
+    [dialogDivProps, open]
+  )
+
+  const handleTouchMove = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      dialogDivProps.onTouchMove?.(event)
+      if (!touchStartRef.current) return
+
+      const point = getGestureTouchPoint(event.touches)
+      if (point) {
+        touchCurrentRef.current = point
+      }
+    },
+    [dialogDivProps]
+  )
+
+  const handleTouchEnd = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      dialogDivProps.onTouchEnd?.(event)
+      const gesture = resolveSwipeGesture(
+        touchStartRef.current,
+        getGestureTouchPoint(event.changedTouches) ?? touchCurrentRef.current,
+        { minDistance: 48, minVelocity: 0.15 }
+      )
+
+      resetTouchGesture()
+
+      if (isDrawerSwipeCloseGesture(placement, gesture)) {
+        handleClose()
+      }
+    },
+    [dialogDivProps, handleClose, placement, resetTouchGesture]
+  )
+
+  const handleTouchCancel = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      dialogDivProps.onTouchCancel?.(event)
+      resetTouchGesture()
+    },
+    [dialogDivProps, resetTouchGesture]
+  )
 
   const containerClasses = classNames(getDrawerContainerClasses(), !open && 'pointer-events-none')
 
@@ -215,6 +277,10 @@ export const Drawer: React.FC<DrawerProps> = ({
         aria-labelledby={ariaLabelledby}
         tabIndex={-1}
         ref={dialogRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
         data-tiger-drawer="">
         {(title || header || closable) && (
           <div className={headerClasses}>

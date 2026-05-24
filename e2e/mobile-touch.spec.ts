@@ -4,7 +4,8 @@ async function dispatchSwipe(
   page: Page,
   selector: string,
   startX: number,
-  endX: number
+  endX: number,
+  y = 120
 ): Promise<void> {
   await page
     .locator(selector)
@@ -16,18 +17,23 @@ async function dispatchSwipe(
             identifier: 1,
             target: element,
             clientX: x,
-            clientY: 120
+            clientY: points.y
           })
 
         element.dispatchEvent(
-          new TouchEvent('touchstart', { touches: [createTouch(points.startX)] })
+          new TouchEvent('touchstart', { bubbles: true, touches: [createTouch(points.startX)] })
         )
-        element.dispatchEvent(new TouchEvent('touchmove', { touches: [createTouch(points.endX)] }))
         element.dispatchEvent(
-          new TouchEvent('touchend', { changedTouches: [createTouch(points.endX)] })
+          new TouchEvent('touchmove', { bubbles: true, touches: [createTouch(points.endX)] })
+        )
+        element.dispatchEvent(
+          new TouchEvent('touchend', {
+            bubbles: true,
+            changedTouches: [createTouch(points.endX)]
+          })
         )
       },
-      { startX, endX }
+      { startX, endX, y }
     )
 }
 
@@ -48,5 +54,22 @@ test.describe('Mobile touch interactions', () => {
       'aria-current',
       'true'
     )
+  })
+
+  test('drawer closes with an outward swipe on mobile Chromium', async ({ page }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== 'mobile-chromium',
+      'Touch gesture coverage runs on mobile project'
+    )
+
+    await page.goto('http://localhost:5174/drawer', { waitUntil: 'networkidle' })
+    await page.getByRole('button', { name: '打开抽屉' }).first().click()
+
+    const drawerSelector = '[data-tiger-drawer]'
+    await expect(page.locator(drawerSelector)).toBeVisible()
+
+    await dispatchSwipe(page, drawerSelector, 260, 360)
+
+    await expect(page.locator('[data-tiger-drawer-root]')).toBeHidden()
   })
 })

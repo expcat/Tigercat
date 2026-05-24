@@ -79,7 +79,21 @@ export const THEME_CSS_VARS = {
   chart3: '--tiger-chart-3',
   chart4: '--tiger-chart-4',
   chart5: '--tiger-chart-5',
-  chart6: '--tiger-chart-6'
+  chart6: '--tiger-chart-6',
+  // Breakpoints
+  breakpointXs: '--tiger-breakpoint-xs',
+  breakpointSm: '--tiger-breakpoint-sm',
+  breakpointMd: '--tiger-breakpoint-md',
+  breakpointLg: '--tiger-breakpoint-lg',
+  breakpointXl: '--tiger-breakpoint-xl'
+} as const
+
+export const TIGER_BREAKPOINT_CSS_VALUES = {
+  breakpointXs: '0px',
+  breakpointSm: '640px',
+  breakpointMd: '768px',
+  breakpointLg: '1024px',
+  breakpointXl: '1280px'
 } as const
 
 /**

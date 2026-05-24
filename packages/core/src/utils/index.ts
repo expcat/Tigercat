@@ -92,6 +92,8 @@ export * from './form-history-utils'
 
 // Responsive utilities
 export * from './responsive'
+export * from './viewport-utils'
+export * from './gesture-utils'
 
 // Drag & Drop utilities (v0.8.0+)
 export * from './drag'

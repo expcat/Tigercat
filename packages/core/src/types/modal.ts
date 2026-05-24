@@ -60,6 +60,12 @@ export interface ModalProps {
   centered?: boolean
 
   /**
+   * Whether the modal should render as a mobile bottom sheet below the md breakpoint.
+   * @default false
+   */
+  mobileSheet?: boolean
+
+  /**
    * Whether to destroy the modal content when closed
    * @default false
    */

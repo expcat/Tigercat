@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Modal } from '@expcat/tigercat-react'
@@ -174,6 +174,16 @@ describe('Modal', () => {
         expect(wrapper).toHaveStyle({ zIndex: '2000' })
       })
     })
+
+    it('should include mobile sheet classes when mobileSheet is true', async () => {
+      render(<Modal open={true} title="Mobile Sheet" mobileSheet={true} />)
+
+      await waitFor(() => {
+        const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+        expect(dialog.className).toContain('max-md:fixed')
+        expect(dialog.className).toContain('max-md:bottom-0')
+      })
+    })
   })
 
   describe('Events', () => {
@@ -191,6 +201,29 @@ describe('Modal', () => {
       const closeButton = document.querySelector('button[aria-label="Close"]')!
       await user.click(closeButton)
 
+      expect(onCancel).toHaveBeenCalled()
+    })
+
+    it('should call onOpenChange and onCancel when mobile sheet is swiped down', async () => {
+      const onOpenChange = vi.fn()
+      const onCancel = vi.fn()
+
+      render(
+        <Modal
+          open={true}
+          title="Swipe Sheet"
+          mobileSheet={true}
+          onOpenChange={onOpenChange}
+          onCancel={onCancel}
+        />
+      )
+
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+      fireEvent.touchStart(dialog, { touches: [{ clientX: 120, clientY: 160 }] })
+      fireEvent.touchMove(dialog, { touches: [{ clientX: 124, clientY: 240 }] })
+      fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 124, clientY: 240 }] })
+
+      expect(onOpenChange).toHaveBeenCalledWith(false)
       expect(onCancel).toHaveBeenCalled()
     })
 
