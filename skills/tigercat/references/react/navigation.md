@@ -246,6 +246,9 @@ const [activeKey, setActiveKey] = useState('1')
 <Tabs centered />
 <Tabs size="small" />
 <Tabs destroyInactiveTabPane />
+
+{/* 移动端默认支持左右滑动切换；可关闭 */}
+<Tabs swipeable={false} />
 ```
 
 ---

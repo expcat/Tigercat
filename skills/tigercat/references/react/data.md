@@ -77,6 +77,9 @@ const tableData = [
 ]
 
 <Table columns={columns} dataSource={tableData} pagination={false} />
+
+{/* 小屏横向滚动（默认）或切换为卡片列表 */}
+<Table columns={columns} dataSource={tableData} responsiveMode="card" />
 ```
 
 ### 选择、分页、渲染与导出

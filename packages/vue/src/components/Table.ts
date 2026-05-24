@@ -1,10 +1,16 @@
-import { defineComponent, h, onBeforeUnmount, onMounted, ref } from 'vue'
+import { defineComponent, h, onBeforeUnmount, onMounted, ref, type VNodeChild } from 'vue'
 import {
   classNames,
   createTableResizeObserverController,
   getTableWrapperClasses,
+  getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
   tableBaseClasses,
+  tableResponsiveCardClasses,
+  tableResponsiveCardLabelClasses,
+  tableResponsiveCardListClasses,
+  tableResponsiveCardRowClasses,
+  tableResponsiveCardValueClasses,
   tableLoadingOverlayClasses
 } from '@expcat/tigercat-core'
 import { tableExportButtonClasses } from '@expcat/tigercat-core'
@@ -81,6 +87,7 @@ export const Table = defineComponent({
           ref: tableRef,
           class: classNames(
             tableBaseClasses,
+            getTableResponsiveTableClasses(resolvedProps.responsiveMode),
             resolvedProps.tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
           ),
           style:
@@ -103,6 +110,104 @@ export const Table = defineComponent({
             [tableInner]
           )
         : tableInner
+
+      const cardContent =
+        resolvedProps.responsiveMode === 'card'
+          ? h(
+              'div',
+              { class: tableResponsiveCardListClasses, 'data-tiger-table-mobile': 'card' },
+              ctx.paginatedData.value.length === 0
+                ? [h('div', { class: tableResponsiveCardClasses }, resolvedProps.emptyText)]
+                : ctx.paginatedData.value.map((record, index) => {
+                    const key = ctx.paginatedRowKeys.value[index]
+                    const isExpanded = ctx.expandedRowKeySet.value.has(key)
+                    const isRowExpandable = resolvedProps.expandable
+                      ? resolvedProps.expandable.rowExpandable
+                        ? resolvedProps.expandable.rowExpandable(record)
+                        : true
+                      : false
+
+                    const rows = ctx.displayColumns.value.map((column) => {
+                      const dataKey = column.dataKey || column.key
+                      const cellValue = record[dataKey]
+                      const cellContent =
+                        slots[`cell-${column.key}`]?.({ record, index }) ??
+                        (column.render
+                          ? (column.render(record, index) as string)
+                          : (cellValue as string))
+
+                      return h('div', { key: column.key, class: tableResponsiveCardRowClasses }, [
+                        h('div', { class: tableResponsiveCardLabelClasses }, column.title),
+                        h('div', { class: tableResponsiveCardValueClasses }, [cellContent])
+                      ])
+                    })
+
+                    const controls = []
+                    if (
+                      resolvedProps.rowSelection &&
+                      resolvedProps.rowSelection.showCheckbox !== false
+                    ) {
+                      const checkboxProps =
+                        resolvedProps.rowSelection.getCheckboxProps?.(record) || {}
+                      controls.push(
+                        h('input', {
+                          type: resolvedProps.rowSelection.type === 'radio' ? 'radio' : 'checkbox',
+                          checked: ctx.selectedRowKeySet.value.has(key),
+                          disabled: checkboxProps.disabled,
+                          onClick: (event: Event) => event.stopPropagation(),
+                          onChange: (event: Event) =>
+                            ctx.handleSelectRow(key, (event.target as HTMLInputElement).checked)
+                        })
+                      )
+                    }
+                    if (resolvedProps.expandable && isRowExpandable) {
+                      controls.push(
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            class: 'text-sm text-[var(--tiger-primary,#2563eb)]',
+                            'aria-expanded': isExpanded,
+                            onClick: (event: Event) => {
+                              event.stopPropagation()
+                              ctx.handleToggleExpand(key, record)
+                            }
+                          },
+                          isExpanded ? 'Collapse' : 'Expand'
+                        )
+                      )
+                    }
+
+                    const expandedContent =
+                      resolvedProps.expandable && isExpanded && isRowExpandable
+                        ? (slots['expanded-row']?.({ record, index }) ??
+                          resolvedProps.expandable.expandedRowRender?.(record, index))
+                        : null
+
+                    return h(
+                      'div',
+                      {
+                        key,
+                        class: tableResponsiveCardClasses,
+                        onClick: () => ctx.handleRowClick(record, index, key)
+                      },
+                      [
+                        controls.length
+                          ? h('div', { class: 'mb-2 flex items-center gap-3' }, controls)
+                          : null,
+                        ...rows,
+                        expandedContent
+                          ? h(
+                              'div',
+                              { class: 'mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3' },
+                              [expandedContent as VNodeChild]
+                            )
+                          : null
+                      ]
+                    )
+                  })
+            )
+          : null
 
       return h(
         'div',
@@ -136,6 +241,7 @@ export const Table = defineComponent({
             ]),
 
           tableContent,
+          cardContent,
 
           resolvedProps.loading &&
             h(

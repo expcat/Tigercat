@@ -87,7 +87,41 @@ export const datePickerCalendarClasses = classNames(
   'rounded-[var(--tiger-radius-md,0.5rem)]',
   'shadow-lg',
   'p-4',
-  'w-80'
+  'w-80',
+  'max-sm:hidden'
+)
+
+export const datePickerMobileWheelClasses = classNames(
+  'sm:hidden',
+  'fixed',
+  'inset-x-0',
+  'bottom-0',
+  'z-50',
+  'rounded-t-[var(--tiger-radius-lg,0.75rem)]',
+  'border',
+  'border-gray-200',
+  'bg-white',
+  'p-4',
+  'shadow-2xl',
+  'pb-[calc(1rem+env(safe-area-inset-bottom))]'
+)
+
+export const datePickerMobileWheelGridClasses = classNames('grid', 'grid-cols-3', 'gap-2')
+
+export const datePickerMobileWheelSelectClasses = classNames(
+  'w-full',
+  'rounded-[var(--tiger-radius-md,0.5rem)]',
+  'border',
+  'border-gray-300',
+  'bg-white',
+  'px-3',
+  'py-3',
+  'text-center',
+  'text-base',
+  'text-gray-900',
+  'focus:outline-none',
+  'focus:ring-2',
+  'focus:ring-[var(--tiger-primary,#2563eb)]'
 )
 
 /**

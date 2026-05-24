@@ -93,7 +93,7 @@ export const imagePreviewWrapperClasses =
  * Preview image classes
  */
 export const imagePreviewImgClasses =
-  'max-w-none transition-transform duration-150 ease-out cursor-grab active:cursor-grabbing'
+  'max-w-none transition-transform duration-150 ease-out cursor-grab active:cursor-grabbing touch-none'
 
 /**
  * Preview toolbar classes

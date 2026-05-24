@@ -3,8 +3,14 @@ import {
   classNames,
   createTableResizeObserverController,
   getTableWrapperClasses,
+  getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
   tableBaseClasses,
+  tableResponsiveCardClasses,
+  tableResponsiveCardLabelClasses,
+  tableResponsiveCardListClasses,
+  tableResponsiveCardRowClasses,
+  tableResponsiveCardValueClasses,
   tableLoadingOverlayClasses,
   type RowSelectionConfig,
   type ExpandableConfig
@@ -50,6 +56,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   stickyHeader = false,
   maxHeight,
   tableLayout = 'auto',
+  responsiveMode = 'scroll',
   // v0.6.0 props
   virtual = false,
   autoVirtual = true,
@@ -212,6 +219,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         ref={tableRef}
         className={classNames(
           tableBaseClasses,
+          getTableResponsiveTableClasses(responsiveMode),
           tableLayout === 'fixed' ? 'table-fixed' : 'table-auto',
           className
         )}
@@ -250,6 +258,84 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           summaryRow
         })}
       </table>
+
+      {responsiveMode === 'card' && (
+        <div className={tableResponsiveCardListClasses} data-tiger-table-mobile="card">
+          {ctx.paginatedData.length === 0 ? (
+            <div className={tableResponsiveCardClasses}>{emptyText}</div>
+          ) : (
+            ctx.paginatedData.map((record, index) => {
+              const key = ctx.pageRowKeys[index]
+              const isExpanded = ctx.expandedRowKeySet.has(key)
+              const isRowExpandable = internalExpandable
+                ? internalExpandable.rowExpandable
+                  ? internalExpandable.rowExpandable(record)
+                  : true
+                : false
+              const expandedContent =
+                internalExpandable && isExpanded && isRowExpandable
+                  ? internalExpandable.expandedRowRender?.(record, index)
+                  : null
+              const expandedNode = expandedContent as React.ReactNode
+
+              return (
+                <div
+                  key={key}
+                  className={tableResponsiveCardClasses}
+                  onClick={() => ctx.handleRowClick(record, index, key)}>
+                  {(internalRowSelection?.showCheckbox !== false && internalRowSelection) ||
+                  (internalExpandable && isRowExpandable) ? (
+                    <div className="mb-2 flex items-center gap-3">
+                      {internalRowSelection && internalRowSelection.showCheckbox !== false && (
+                        <input
+                          type={internalRowSelection.type === 'radio' ? 'radio' : 'checkbox'}
+                          checked={ctx.selectedRowKeySet.has(key)}
+                          disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
+                          onClick={(event) => event.stopPropagation()}
+                          onChange={(event) => ctx.handleSelectRow(key, event.target.checked)}
+                        />
+                      )}
+                      {internalExpandable && isRowExpandable && (
+                        <button
+                          type="button"
+                          className="text-sm text-[var(--tiger-primary,#2563eb)]"
+                          aria-expanded={isExpanded}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            ctx.handleToggleExpand(key, record)
+                          }}>
+                          {isExpanded ? 'Collapse' : 'Expand'}
+                        </button>
+                      )}
+                    </div>
+                  ) : null}
+
+                  {ctx.displayColumns.map((column) => {
+                    const dataKey = column.dataKey || column.key
+                    const cellValue = record[dataKey]
+                    const cellContent = column.render
+                      ? (column.render(record, index) as React.ReactNode)
+                      : (cellValue as React.ReactNode)
+
+                    return (
+                      <div key={column.key} className={tableResponsiveCardRowClasses}>
+                        <div className={tableResponsiveCardLabelClasses}>{column.title}</div>
+                        <div className={tableResponsiveCardValueClasses}>{cellContent}</div>
+                      </div>
+                    )
+                  })}
+
+                  {expandedNode && (
+                    <div className="mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3">
+                      {expandedNode}
+                    </div>
+                  )}
+                </div>
+              )
+            })
+          )}
+        </div>
+      )}
 
       {loading && (
         <div

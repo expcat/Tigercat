@@ -231,6 +231,7 @@ const groupedOptions = [
   <Select v-model="value" :options="groupedOptions" />
   <Select v-model="value" :options="options" size="sm" />
   <Select v-model="value" :options="[]" no-data-text="暂无数据" />
+  <!-- 移动端下拉面板自动切换为全屏选择面板 -->
 </template>
 ```
 
@@ -336,6 +337,7 @@ const value = ref('male')
   <DatePicker v-model="date" clearable @clear="onClear" />
   <DatePicker v-model="date" locale="zh-CN" :labels="{ today: '今日' }" />
   <DatePicker v-model="date" :locale="ZH_CN_DATEPICKER_LOCALE" />
+  <!-- 移动端自动使用滚轮选择器 -->
 </template>
 ```
 
@@ -356,6 +358,7 @@ const value = ref('male')
   <TimePicker v-model="time" readonly />
   <TimePicker v-model="time" clearable @clear="onClear" />
   <TimePicker v-model="time" locale="zh-CN" :labels="{ now: '此刻' }" />
+  <!-- 移动端自动使用滚轮选择器 -->
 </template>
 ```
 
@@ -395,6 +398,7 @@ const value = ref('male')
 <template>
   <Cascader v-model="city" :options="cityOptions" placeholder="选择城市" />
   <Cascader v-model="city" :options="cityOptions" show-search clearable />
+  <!-- 移动端面板自动切换为全屏级联选择 -->
 </template>
 ```
 

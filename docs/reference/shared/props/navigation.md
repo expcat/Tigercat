@@ -175,6 +175,7 @@ key-apis: items, activeKey, selectedKeys, openKeys, current, href, offsetTop, pa
 | size                   | `'small' \| 'medium' \| 'large'`                 | `'medium'` | 尺寸                           |
 | closable               | `boolean`                                        | `false`    | 标签可关闭（仅 editable-card） |
 | centered               | `boolean`                                        | `false`    | 标签居中                       |
+| swipeable              | `boolean`                                        | `true`     | 移动端左右滑动切换相邻可用面板 |
 | destroyInactiveTabPane | `boolean`                                        | `false`    | 销毁非激活面板                 |
 | lazy                   | `boolean`                                        | `false`    | 懒加载面板（首次激活后才渲染） |
 

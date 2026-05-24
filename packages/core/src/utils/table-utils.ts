@@ -3,7 +3,13 @@
  */
 
 import { classNames } from './class-names'
-import type { TableSize, ColumnAlign, SortDirection, TableColumn } from '../types/table'
+import type {
+  TableSize,
+  ColumnAlign,
+  SortDirection,
+  TableColumn,
+  TableResponsiveMode
+} from '../types/table'
 
 /**
  * Base table container classes
@@ -14,6 +20,26 @@ export const tableContainerClasses = 'relative w-full overflow-auto'
  * Base table classes
  */
 export const tableBaseClasses = 'w-full border-collapse'
+
+export const tableResponsiveTableClasses = 'max-sm:min-w-max'
+
+export const tableResponsiveCardListClasses = 'hidden max-sm:grid max-sm:gap-3 max-sm:p-3'
+
+export const tableResponsiveCardClasses =
+  'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-3 shadow-sm'
+
+export const tableResponsiveCardRowClasses =
+  'grid grid-cols-[minmax(7rem,40%)_1fr] gap-3 border-b border-[var(--tiger-border,#e5e7eb)] py-2 last:border-b-0'
+
+export const tableResponsiveCardLabelClasses =
+  'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)]'
+
+export const tableResponsiveCardValueClasses =
+  'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words'
+
+export function getTableResponsiveTableClasses(mode: TableResponsiveMode): string {
+  return mode === 'card' ? 'max-sm:hidden' : tableResponsiveTableClasses
+}
 
 /**
  * Parse a column width into a pixel number.

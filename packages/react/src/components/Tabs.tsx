@@ -20,6 +20,8 @@ import {
   getTabPaneClasses,
   getTabIndicatorClasses,
   getTabIndicatorStyle,
+  getGestureTouchPoint,
+  resolveSwipeGesture,
   isKeyActive,
   tabAddButtonClasses,
   tabCloseButtonClasses,
@@ -38,6 +40,7 @@ export interface TabsContextValue {
   closable: boolean
   destroyInactiveTabPane: boolean
   lazy: boolean
+  swipeable: boolean
   idBase: string
   handleTabClick: (key: string | number) => void
   handleTabClose: (key: string | number, event: React.SyntheticEvent) => void
@@ -353,6 +356,11 @@ export interface TabsProps {
    */
   lazy?: boolean
   /**
+   * Whether horizontal touch swipes switch tabs.
+   * @default true
+   */
+  swipeable?: boolean
+  /**
    * Additional CSS classes
    */
   className?: string
@@ -388,6 +396,7 @@ export const Tabs: React.FC<TabsProps> = ({
   centered = false,
   destroyInactiveTabPane = false,
   lazy = false,
+  swipeable = true,
   className,
   style,
   onChange,
@@ -402,6 +411,7 @@ export const Tabs: React.FC<TabsProps> = ({
   const [internalActiveKey, setInternalActiveKey] = useState<string | number | undefined>(
     defaultActiveKey
   )
+  const swipeStartRef = useRef<ReturnType<typeof getGestureTouchPoint> | null>(null)
 
   // Container classes
   const containerClasses = useMemo(() => {
@@ -419,10 +429,11 @@ export const Tabs: React.FC<TabsProps> = ({
   }, [tabPosition, centered])
 
   // Extract tab items and tab panes from children (single pass)
-  const { tabItems, tabPanes, firstTabKey, tabKeys } = useMemo(() => {
+  const { tabItems, tabPanes, firstTabKey, tabKeys, enabledTabKeys } = useMemo(() => {
     const items: ReactElement[] = []
     const panes: ReactElement[] = []
     const keys: Array<string | number> = []
+    const enabledKeys: Array<string | number> = []
     let firstKey: string | number | undefined
 
     React.Children.forEach(children, (child) => {
@@ -431,6 +442,7 @@ export const Tabs: React.FC<TabsProps> = ({
       const key = child.props.tabKey
       if (firstKey === undefined) firstKey = key
       keys.push(key)
+      if (!child.props.disabled) enabledKeys.push(key)
 
       const resolvedActiveKey = controlledActiveKey ?? defaultActiveKey ?? firstKey
       const tabId = `${idBase}-tab-${String(key)}`
@@ -455,7 +467,13 @@ export const Tabs: React.FC<TabsProps> = ({
       )
     })
 
-    return { tabItems: items, tabPanes: panes, firstTabKey: firstKey, tabKeys: keys }
+    return {
+      tabItems: items,
+      tabPanes: panes,
+      firstTabKey: firstKey,
+      tabKeys: keys,
+      enabledTabKeys: enabledKeys
+    }
   }, [children, controlledActiveKey, defaultActiveKey, idBase])
 
   // Use controlled or uncontrolled state, defaulting to the first tab if none is specified
@@ -501,6 +519,42 @@ export const Tabs: React.FC<TabsProps> = ({
     onEdit?.({ targetKey: undefined, action: 'add' })
   }, [onEdit])
 
+  const activateAdjacentTab = useCallback(
+    (direction: 1 | -1) => {
+      if (enabledTabKeys.length <= 1) return
+      const currentIndex = enabledTabKeys.indexOf(activeKey ?? enabledTabKeys[0])
+      const baseIndex = currentIndex >= 0 ? currentIndex : 0
+      const nextKey =
+        enabledTabKeys[(baseIndex + direction + enabledTabKeys.length) % enabledTabKeys.length]
+      handleTabClick(nextKey)
+    },
+    [activeKey, enabledTabKeys, handleTabClick]
+  )
+
+  const handleContentTouchStart = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (!swipeable || event.touches.length !== 1) return
+      swipeStartRef.current = getGestureTouchPoint(event.touches, event.timeStamp)
+    },
+    [swipeable]
+  )
+
+  const handleContentTouchEnd = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (!swipeable || !swipeStartRef.current || event.changedTouches.length !== 1) return
+      const endPoint = getGestureTouchPoint(event.changedTouches, event.timeStamp)
+      const swipe = resolveSwipeGesture(swipeStartRef.current, endPoint, {
+        minDistance: 48,
+        maxCrossAxisRatio: 0.75
+      })
+      swipeStartRef.current = null
+      if (!swipe) return
+      if (swipe.direction === 'left') activateAdjacentTab(1)
+      if (swipe.direction === 'right') activateAdjacentTab(-1)
+    },
+    [activateAdjacentTab, swipeable]
+  )
+
   // Context value
   const contextValue = useMemo<TabsContextValue>(
     () => ({
@@ -511,6 +565,7 @@ export const Tabs: React.FC<TabsProps> = ({
       closable,
       destroyInactiveTabPane,
       lazy,
+      swipeable,
       idBase,
       handleTabClick,
       handleTabClose
@@ -523,6 +578,7 @@ export const Tabs: React.FC<TabsProps> = ({
       closable,
       destroyInactiveTabPane,
       lazy,
+      swipeable,
       idBase,
       handleTabClick,
       handleTabClose
@@ -563,7 +619,17 @@ export const Tabs: React.FC<TabsProps> = ({
   )
 
   // Render tab content
-  const tabContent = <div className={tabContentBaseClasses}>{tabPanes}</div>
+  const tabContent = (
+    <div
+      className={tabContentBaseClasses}
+      onTouchStart={handleContentTouchStart}
+      onTouchEnd={handleContentTouchEnd}
+      onTouchCancel={() => {
+        swipeStartRef.current = null
+      }}>
+      {tabPanes}
+    </div>
+  )
 
   return (
     <TabsContext.Provider value={contextValue}>

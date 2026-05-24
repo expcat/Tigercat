@@ -202,23 +202,23 @@ source: project audit and planning
   - Pinch-to-zoom（缩放因子）
   - Long Press（长按阈值可配置）
   - Pan（拖拽偏移量）
-- [ ] 手势接入组件：
+- [x] 手势接入组件：
 
 | 组件         | 手势        | 行为                          | 状态   |
 | ------------ | ----------- | ----------------------------- | ------ |
 | Carousel     | Swipe       | 已有，迁移到统一手势工具      | 已完成 |
 | Drawer       | Swipe       | 向边缘滑动关闭                | 已完成 |
-| ImagePreview | Pinch + Pan | 缩放 + 平移                   | 待办   |
-| Tabs         | Swipe       | 左右滑动切换                  | 待办   |
+| ImagePreview | Pinch + Pan | 缩放 + 平移                   | 已完成 |
+| Tabs         | Swipe       | 左右滑动切换                  | 已完成 |
 | Modal        | Swipe Down  | 下滑关闭（移动端 Sheet 模式） | 已完成 |
 
 ### 6.2 移动端布局适配
 
 - [x] Drawer：移动端自动全屏（`<768px` 时 `placement` 忽略，覆盖全屏）
 - [x] Modal：移动端底部弹出 Sheet 模式（可选 prop `mobileSheet`）
-- [ ] Table：响应式模式（`<640px` 时切换为卡片列表或横向滚动，可选 `responsiveMode: 'card' | 'scroll'`）
-- [ ] DatePicker / TimePicker：移动端使用滚轮选择器替代下拉面板
-- [ ] Select / Cascader：移动端使用全屏选择面板
+- [x] Table：响应式模式（`<640px` 时切换为卡片列表或横向滚动，可选 `responsiveMode: 'card' | 'scroll'`）
+- [x] DatePicker / TimePicker：移动端使用滚轮选择器替代下拉面板
+- [x] Select / Cascader：移动端使用全屏选择面板
 
 ### 6.3 移动端基础设施
 

@@ -59,6 +59,7 @@ const handleChange = (keys) => console.log(keys)
 ```vue
 <template>
   <Table :columns="columns" :dataSource="tableData" :pagination="false" />
+  <Table :columns="columns" :dataSource="tableData" responsive-mode="card" />
 </template>
 <script setup>
 const columns = [

@@ -290,6 +290,9 @@ const collapsed = ref(false)
   <Tabs v-model:activeKey="activeKey" centered />
   <Tabs v-model:activeKey="activeKey" size="small" />
 
+  <!-- 移动端默认支持左右滑动切换；可关闭 -->
+  <Tabs v-model:activeKey="activeKey" :swipeable="false" />
+
   <!-- 销毁非激活面板 -->
   <Tabs v-model:activeKey="activeKey" destroyInactiveTabPane>
     <TabPane tabKey="1" label="标签 1">仅激活时渲染</TabPane>

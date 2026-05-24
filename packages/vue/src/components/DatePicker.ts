@@ -17,6 +17,9 @@ import {
   getDatePickerInputClasses,
   getDatePickerIconButtonClasses,
   datePickerCalendarClasses,
+  datePickerMobileWheelClasses,
+  datePickerMobileWheelGridClasses,
+  datePickerMobileWheelSelectClasses,
   datePickerCalendarHeaderClasses,
   datePickerNavButtonClasses,
   datePickerMonthYearClasses,
@@ -244,10 +247,12 @@ export const DatePicker = defineComponent({
   setup(props, { emit, attrs }) {
     const isOpen = ref(false)
     const calendarRef = ref<HTMLElement | null>(null)
+    const mobileCalendarRef = ref<HTMLElement | null>(null)
     const inputWrapperRef = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
 
     const activeDateIso = ref<string | null>(null)
+    const activeRangePart = ref<'start' | 'end'>('start')
     const pendingFocusIso = ref<string | null>(null)
     const restoreFocusEl = ref<HTMLElement | null>(null)
 
@@ -313,6 +318,28 @@ export const DatePicker = defineComponent({
     const nextMonthIcon = computed(() => (isRtl.value ? ChevronLeftIcon : ChevronRightIcon))
 
     const labels = computed(() => getDatePickerLabels(props.locale, props.labels))
+
+    const mobileDate = computed(() => {
+      if (!isRangeMode.value) return selectedDate.value ?? normalizeDate(new Date())
+      const [start, end] = selectedRange.value
+      return (
+        (activeRangePart.value === 'start' ? start : end) ??
+        start ??
+        end ??
+        normalizeDate(new Date())
+      )
+    })
+
+    const mobileYears = computed(() => {
+      const baseYear = mobileDate.value.getFullYear()
+      return Array.from({ length: 101 }, (_, index) => baseYear - 50 + index)
+    })
+
+    const mobileDays = computed(() => {
+      const date = mobileDate.value
+      const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+      return Array.from({ length: daysInMonth }, (_, index) => index + 1)
+    })
 
     /** Emit both update:modelValue and change in one call */
     const emitValue = (value: DatePickerModelValue | null) => {
@@ -509,6 +536,37 @@ export const DatePicker = defineComponent({
       emitValue([start, normalizedDate < start ? start : normalizedDate])
     }
 
+    function commitMobileDate(date: Date) {
+      const normalized = normalizeDate(date)
+      if (!isDateInRange(normalized, minDateParsed.value, maxDateParsed.value)) return
+
+      viewingYear.value = normalized.getFullYear()
+      viewingMonth.value = normalized.getMonth()
+
+      if (!isRangeMode.value) {
+        emitValue(normalized)
+        return
+      }
+
+      const [start, end] = selectedRange.value
+      if (activeRangePart.value === 'start') {
+        emitValue([normalized, end && end < normalized ? normalized : end])
+        activeRangePart.value = 'end'
+        return
+      }
+
+      emitValue([start ?? normalized, start && normalized < start ? start : normalized])
+    }
+
+    function updateMobileDate(part: 'year' | 'month' | 'day', value: number) {
+      const base = mobileDate.value
+      const nextYear = part === 'year' ? value : base.getFullYear()
+      const nextMonth = part === 'month' ? value : base.getMonth()
+      const maxDay = new Date(nextYear, nextMonth + 1, 0).getDate()
+      const nextDay = Math.min(part === 'day' ? value : base.getDate(), maxDay)
+      commitMobileDate(new Date(nextYear, nextMonth, nextDay))
+    }
+
     function clearDate(event: Event) {
       event.stopPropagation()
       emitValue(!isRangeMode.value ? null : [null, null])
@@ -545,9 +603,9 @@ export const DatePicker = defineComponent({
 
     function handleClickOutside(event: Event) {
       if (
-        calendarRef.value &&
         inputWrapperRef.value &&
-        !calendarRef.value.contains(event.target as Node) &&
+        !calendarRef.value?.contains(event.target as Node) &&
+        !mobileCalendarRef.value?.contains(event.target as Node) &&
         !inputWrapperRef.value.contains(event.target as Node)
       ) {
         closeCalendar()
@@ -655,6 +713,91 @@ export const DatePicker = defineComponent({
             ]
           ),
           // Calendar dropdown
+          isOpen.value &&
+            h(
+              'div',
+              {
+                ref: mobileCalendarRef,
+                class: datePickerMobileWheelClasses,
+                role: 'group',
+                'aria-label': labels.value.calendar
+              },
+              [
+                isRangeMode.value
+                  ? h('div', { class: 'mb-3 flex items-center gap-2' }, [
+                      h(
+                        'button',
+                        {
+                          type: 'button',
+                          class: datePickerFooterButtonClasses,
+                          'aria-selected': activeRangePart.value === 'start',
+                          onClick: () => (activeRangePart.value = 'start')
+                        },
+                        'Start'
+                      ),
+                      h(
+                        'button',
+                        {
+                          type: 'button',
+                          class: datePickerFooterButtonClasses,
+                          'aria-selected': activeRangePart.value === 'end',
+                          onClick: () => (activeRangePart.value = 'end')
+                        },
+                        'End'
+                      )
+                    ])
+                  : null,
+                h('div', { class: datePickerMobileWheelGridClasses }, [
+                  h(
+                    'select',
+                    {
+                      class: datePickerMobileWheelSelectClasses,
+                      value: mobileDate.value.getFullYear(),
+                      'aria-label': 'Year',
+                      onChange: (event: Event) =>
+                        updateMobileDate('year', Number((event.target as HTMLSelectElement).value))
+                    },
+                    mobileYears.value.map((year) => h('option', { value: year }, year))
+                  ),
+                  h(
+                    'select',
+                    {
+                      class: datePickerMobileWheelSelectClasses,
+                      value: mobileDate.value.getMonth(),
+                      'aria-label': 'Month',
+                      onChange: (event: Event) =>
+                        updateMobileDate('month', Number((event.target as HTMLSelectElement).value))
+                    },
+                    Array.from({ length: 12 }, (_, month) =>
+                      h('option', { value: month }, month + 1)
+                    )
+                  ),
+                  h(
+                    'select',
+                    {
+                      class: datePickerMobileWheelSelectClasses,
+                      value: mobileDate.value.getDate(),
+                      'aria-label': 'Day',
+                      onChange: (event: Event) =>
+                        updateMobileDate('day', Number((event.target as HTMLSelectElement).value))
+                    },
+                    mobileDays.value.map((day) => h('option', { value: day }, day))
+                  )
+                ]),
+                h('div', { class: 'mt-4 flex justify-end gap-2' }, [
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: datePickerFooterButtonClasses,
+                      'aria-label': `Mobile ${labels.value.ok}`,
+                      onClick: closeCalendar
+                    },
+                    labels.value.ok
+                  )
+                ])
+              ]
+            ),
           isOpen.value &&
             h(
               'div',

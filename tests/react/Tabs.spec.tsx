@@ -244,6 +244,33 @@ describe('Tabs', () => {
   })
 
   describe('Events', () => {
+    it('switches to the next enabled tab on left swipe', () => {
+      const onChange = vi.fn()
+      render(
+        <Tabs defaultActiveKey="1" onChange={onChange}>
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2" disabled>
+            Content 2
+          </TabPane>
+          <TabPane tabKey="3" label="Tab 3">
+            Content 3
+          </TabPane>
+        </Tabs>
+      )
+
+      const content = screen.getByText('Content 1').parentElement as HTMLElement
+      fireEvent.touchStart(content, { touches: [{ clientX: 120, clientY: 20 }], timeStamp: 0 })
+      fireEvent.touchEnd(content, {
+        changedTouches: [{ clientX: 40, clientY: 24 }],
+        timeStamp: 100
+      })
+
+      expect(onChange).toHaveBeenCalledWith('3')
+      expect(screen.getByRole('tab', { name: 'Tab 3' })).toHaveAttribute('aria-selected', 'true')
+    })
+
     it('should call onChange when tab is clicked', async () => {
       const onChange = vi.fn()
 

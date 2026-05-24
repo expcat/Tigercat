@@ -83,6 +83,15 @@ describe('Select', () => {
 
       expect(container.querySelector('[data-tiger-select-clear]')).toBeInTheDocument()
     })
+
+    it('uses fullscreen panel classes for mobile dropdown', async () => {
+      const user = userEvent.setup()
+      const { container } = render(<Select options={testOptions} />)
+
+      await user.click(container.querySelector('button')!)
+
+      expect(container.querySelector('[role="listbox"]')).toHaveClass('max-sm:fixed')
+    })
   })
 
   describe('Events', () => {

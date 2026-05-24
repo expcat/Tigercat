@@ -124,6 +124,22 @@ describe('DatePicker', () => {
       })
     })
 
+    it('renders mobile wheel selects and emits date changes from them', async () => {
+      const { container, emitted } = renderWithProps(DatePicker, {
+        modelValue: new Date('2024-03-15')
+      })
+
+      await fireEvent.click(container.querySelector('input') as HTMLInputElement)
+
+      const daySelect = container.querySelector('select[aria-label="Day"]') as HTMLSelectElement
+      expect(daySelect).toBeInTheDocument()
+      await fireEvent.update(daySelect, '16')
+
+      const emittedValue = emitted().change?.at(-1)?.[0] as Date
+      expect(emittedValue).toBeInstanceOf(Date)
+      expect(emittedValue.getDate()).toBe(16)
+    })
+
     it('should navigate to previous/next month', async () => {
       const { container } = renderWithProps(DatePicker, {
         modelValue: new Date('2024-03-15')

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { DatePicker } from '@expcat/tigercat-react'
@@ -115,6 +115,23 @@ describe('DatePicker', () => {
         const calendar = container.querySelector('[role="dialog"]')
         expect(calendar).toBeInTheDocument()
       })
+    })
+
+    it('renders mobile wheel selects and updates date from them', async () => {
+      const user = userEvent.setup()
+      const onChange = vi.fn()
+      const { container } = render(
+        <DatePicker value={new Date('2024-03-15')} onChange={onChange} />
+      )
+
+      await user.click(container.querySelector('input') as HTMLInputElement)
+
+      const daySelect = container.querySelector('select[aria-label="Day"]') as HTMLSelectElement
+      expect(daySelect).toBeInTheDocument()
+      fireEvent.change(daySelect, { target: { value: '16' } })
+
+      expect(onChange).toHaveBeenCalledWith(expect.any(Date))
+      expect(onChange.mock.calls.at(-1)?.[0].getDate()).toBe(16)
     })
 
     it('should navigate to previous/next month', async () => {

@@ -9,6 +9,8 @@ export type TableSize = 'sm' | 'md' | 'lg'
 
 export type TableExportFormat = 'csv' | 'excel'
 
+export type TableResponsiveMode = 'card' | 'scroll'
+
 /**
  * Sort direction
  */
@@ -426,6 +428,13 @@ export interface TableProps<T = Record<string, unknown>> {
    * @default 'auto'
    */
   tableLayout?: 'auto' | 'fixed'
+
+  /**
+   * Mobile layout below 640px. `scroll` keeps the table horizontally scrollable;
+   * `card` renders each row as a stacked card list.
+   * @default 'scroll'
+   */
+  responsiveMode?: TableResponsiveMode
 
   // --- v0.6.0 additions ---
 

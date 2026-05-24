@@ -42,6 +42,7 @@ key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, 
 | stickyHeader        | `boolean`                                          | `false`     | 固定表头                             |
 | maxHeight           | `string \| number`                                 | -           | 最大高度（启用滚动）                 |
 | tableLayout         | `'auto' \| 'fixed'`                                | `'auto'`    | 表格布局算法                         |
+| responsiveMode      | `'card' \| 'scroll'`                               | `'scroll'`  | 小屏响应式模式：卡片列表或横向滚动   |
 | virtual             | `boolean`                                          | `false`     | 启用 Table 滚动视口                  |
 | virtualHeight       | `number`                                           | `400`       | virtual 视口高度                     |
 | virtualItemHeight   | `number`                                           | `40`        | virtual 行高提示                     |

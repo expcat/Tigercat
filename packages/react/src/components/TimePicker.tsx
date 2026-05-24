@@ -22,7 +22,9 @@ import {
   getTimePickerIconButtonClasses,
   timePickerClearButtonClasses,
   timePickerPanelClasses,
-  timePickerPanelContentClasses,
+  timePickerDesktopPanelContentClasses,
+  timePickerMobileWheelClasses,
+  timePickerMobileWheelSelectClasses,
   timePickerRangeHeaderClasses,
   getTimePickerRangeTabButtonClasses,
   timePickerColumnClasses,
@@ -588,8 +590,56 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
             </div>
           )}
 
+          <div className={timePickerMobileWheelClasses}>
+            <select
+              className={timePickerMobileWheelSelectClasses}
+              value={format === '12' ? to12HourFormat(selectedHours).hours : selectedHours}
+              aria-label={labels.hour}
+              onChange={(event) => selectHour(Number(event.target.value))}>
+              {hoursList.map((hour) => (
+                <option key={hour} value={hour} disabled={isHourDisabled(hour)}>
+                  {padTwo(hour)}
+                </option>
+              ))}
+            </select>
+            <select
+              className={timePickerMobileWheelSelectClasses}
+              value={selectedMinutes}
+              aria-label={labels.minute}
+              onChange={(event) => selectMinute(Number(event.target.value))}>
+              {minutesList.map((minute) => (
+                <option key={minute} value={minute} disabled={isMinuteDisabled(minute)}>
+                  {padTwo(minute)}
+                </option>
+              ))}
+            </select>
+            {showSeconds && (
+              <select
+                className={timePickerMobileWheelSelectClasses}
+                value={selectedSeconds}
+                aria-label={labels.second}
+                onChange={(event) => selectSecond(Number(event.target.value))}>
+                {secondsList.map((second) => (
+                  <option key={second} value={second}>
+                    {padTwo(second)}
+                  </option>
+                ))}
+              </select>
+            )}
+            {format === '12' && (
+              <select
+                className={timePickerMobileWheelSelectClasses}
+                value={selectedPeriod}
+                aria-label="Period"
+                onChange={(event) => selectPeriod(event.target.value as 'AM' | 'PM')}>
+                <option value="AM">{periodLabels.am}</option>
+                <option value="PM">{periodLabels.pm}</option>
+              </select>
+            )}
+          </div>
+
           {/* Columns container */}
-          <div className={timePickerPanelContentClasses}>
+          <div className={timePickerDesktopPanelContentClasses}>
             {/* Hours column */}
             <div className={timePickerColumnClasses}>
               <div className={timePickerColumnHeaderClasses}>{labels.hour}</div>

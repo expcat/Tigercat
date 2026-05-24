@@ -21,6 +21,12 @@ import {
   calculateTransform,
   getPreviewNavState,
   normalizeRotation,
+  createPanState,
+  startPan,
+  movePan,
+  createPinchState,
+  startPinch,
+  movePinch,
   type ImagePreviewProps as CoreImagePreviewProps
 } from '@expcat/tigercat-core'
 import { useEscapeKey } from '../utils/overlay'
@@ -76,12 +82,16 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   const [index, setIndex] = useState(currentIndex)
   const draggingRef = useRef(false)
   const dragStartRef = useRef({ x: 0, y: 0, ox: 0, oy: 0 })
+  const panRef = useRef(createPanState())
+  const pinchRef = useRef(createPinchState())
 
   const resetTransform = useCallback(() => {
     setScale(1)
     setRotation(0)
     setOffsetX(0)
     setOffsetY(0)
+    panRef.current = createPanState()
+    pinchRef.current = createPinchState()
   }, [])
 
   useEffect(() => {
@@ -201,6 +211,45 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     draggingRef.current = false
   }, [])
 
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault()
+        pinchRef.current = startPinch(e.touches[0], e.touches[1], scale)
+        return
+      }
+
+      if (e.touches.length === 1) {
+        panRef.current = startPan(e.touches[0].clientX, e.touches[0].clientY, offsetX, offsetY)
+      }
+    },
+    [offsetX, offsetY, scale]
+  )
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (e.touches.length === 2 && pinchRef.current.isPinching) {
+        e.preventDefault()
+        const next = movePinch(pinchRef.current, e.touches[0], e.touches[1], minScale, maxScale)
+        setScale(next)
+        onScaleChange?.(next)
+        return
+      }
+
+      if (e.touches.length === 1 && panRef.current.isPanning) {
+        const next = movePan(panRef.current, e.touches[0].clientX, e.touches[0].clientY)
+        setOffsetX(next.translateX)
+        setOffsetY(next.translateY)
+      }
+    },
+    [maxScale, minScale, onScaleChange]
+  )
+
+  const handleTouchEnd = useCallback(() => {
+    panRef.current = createPanState()
+    pinchRef.current = createPinchState()
+  }, [])
+
   const handleMaskClick = useCallback(
     (e: React.MouseEvent) => {
       if (maskClosable && e.target === e.currentTarget) {
@@ -239,6 +288,10 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
       />
       <button
         className={imagePreviewCloseBtnClasses}

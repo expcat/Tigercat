@@ -66,6 +66,11 @@ export interface TabsProps {
    */
   lazy?: boolean
   /**
+   * Whether horizontal touch swipes switch tabs.
+   * @default true
+   */
+  swipeable?: boolean
+  /**
    * Additional CSS classes
    */
   className?: string

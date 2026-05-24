@@ -112,6 +112,14 @@ describe('Cascader', () => {
       expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
     })
 
+    it('uses fullscreen panel classes for mobile dropdown', () => {
+      const { container } = render(<Cascader options={simpleOptions} />)
+
+      fireEvent.click(container.querySelector('button')!)
+
+      expect(container.querySelector('.max-sm\\:fixed')).toBeInTheDocument()
+    })
+
     it('should show first level options', async () => {
       const { container, getByText } = render(<Cascader options={simpleOptions} />)
 

@@ -29,7 +29,13 @@ import {
   clampScale,
   calculateTransform,
   getPreviewNavState,
-  normalizeRotation
+  normalizeRotation,
+  createPanState,
+  startPan,
+  movePan,
+  createPinchState,
+  startPinch,
+  movePinch
 } from '@expcat/tigercat-core'
 
 export interface VueImagePreviewProps {
@@ -85,12 +91,16 @@ export const ImagePreview = defineComponent({
     const index = ref(props.currentIndex)
     const dragging = ref(false)
     const dragStart = ref({ x: 0, y: 0, ox: 0, oy: 0 })
+    let panState = createPanState()
+    let pinchState = createPinchState()
 
     const resetTransform = () => {
       scale.value = 1
       rotation.value = 0
       offsetX.value = 0
       offsetY.value = 0
+      panState = createPanState()
+      pinchState = createPinchState()
     }
 
     watch(
@@ -190,6 +200,49 @@ export const ImagePreview = defineComponent({
       dragging.value = false
     }
 
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault()
+        pinchState = startPinch(e.touches[0], e.touches[1], scale.value)
+        return
+      }
+
+      if (e.touches.length === 1) {
+        panState = startPan(
+          e.touches[0].clientX,
+          e.touches[0].clientY,
+          offsetX.value,
+          offsetY.value
+        )
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && pinchState.isPinching) {
+        e.preventDefault()
+        scale.value = movePinch(
+          pinchState,
+          e.touches[0],
+          e.touches[1],
+          props.minScale,
+          props.maxScale
+        )
+        emit('scale-change', scale.value)
+        return
+      }
+
+      if (e.touches.length === 1 && panState.isPanning) {
+        const next = movePan(panState, e.touches[0].clientX, e.touches[0].clientY)
+        offsetX.value = next.translateX
+        offsetY.value = next.translateY
+      }
+    }
+
+    const handleTouchEnd = () => {
+      panState = createPanState()
+      pinchState = createPinchState()
+    }
+
     const handleMaskClick = (e: MouseEvent) => {
       if (props.maskClosable && e.target === e.currentTarget) {
         handleClose()
@@ -244,7 +297,11 @@ export const ImagePreview = defineComponent({
         onMousedown: handleMouseDown,
         onMousemove: handleMouseMove,
         onMouseup: handleMouseUp,
-        onMouseleave: handleMouseUp
+        onMouseleave: handleMouseUp,
+        onTouchstart: handleTouchStart,
+        onTouchmove: handleTouchMove,
+        onTouchend: handleTouchEnd,
+        onTouchcancel: handleTouchEnd
       })
 
       const closeBtn = h(

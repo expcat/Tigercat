@@ -66,6 +66,18 @@ describe('Table', () => {
 
       expect(container.querySelector('.custom-table')).toBeInTheDocument()
     })
+
+    it('renders mobile card markup when responsiveMode is card', () => {
+      const { container, getAllByText } = render(
+        <Table columns={columns} dataSource={dataSource} responsiveMode="card" pagination={false} />
+      )
+
+      const cardList = container.querySelector('[data-tiger-table-mobile="card"]')
+      expect(cardList).toBeInTheDocument()
+      expect(cardList).toHaveClass('max-sm:grid')
+      expect(container.querySelector('table')).toHaveClass('max-sm:hidden')
+      expect(getAllByText('Name').length).toBeGreaterThan(1)
+    })
   })
 
   describe('Props', () => {

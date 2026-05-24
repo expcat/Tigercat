@@ -249,13 +249,22 @@ export const timePickerClearButtonClasses = [
  */
 export const timePickerPanelClasses = [
   'absolute z-10 mt-1 bg-white border border-gray-200 rounded-[var(--tiger-radius-md,0.5rem)] shadow-lg',
-  'w-max'
+  'w-max max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-50 max-sm:mt-0 max-sm:w-auto max-sm:rounded-t-[var(--tiger-radius-lg,0.75rem)] max-sm:rounded-b-none max-sm:p-4 max-sm:shadow-2xl max-sm:pb-[calc(1rem+env(safe-area-inset-bottom))]'
 ].join(' ')
 
 /**
  * Dropdown panel content classes
  */
 export const timePickerPanelContentClasses = 'flex divide-x divide-gray-200'
+
+export const timePickerDesktopPanelContentClasses = 'max-sm:hidden flex divide-x divide-gray-200'
+
+export const timePickerMobileWheelClasses = 'sm:hidden grid grid-cols-3 gap-2'
+
+export const timePickerMobileWheelSelectClasses = [
+  'w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-300 bg-white px-3 py-3',
+  'text-center text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]'
+].join(' ')
 
 /**
  * Range mode header classes

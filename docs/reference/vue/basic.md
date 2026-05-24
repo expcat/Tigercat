@@ -304,6 +304,8 @@ const images = ['/a.jpg', '/b.jpg', '/c.jpg']
 
   <!-- 多张预览 -->
   <ImagePreview v-model:open="show" :images="images" :currentIndex="0" />
+
+  <!-- 移动端支持双指缩放与单指平移 -->
 </template>
 ```
 

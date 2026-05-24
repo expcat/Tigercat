@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { TimePicker } from '@expcat/tigercat-react'
@@ -54,6 +54,20 @@ describe('TimePicker', () => {
 
     await user.click(screen.getByRole('textbox'))
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+  })
+
+  it('renders mobile wheel selects and changes time from them', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<TimePicker defaultValue="10:15" onChange={onChange} />)
+
+    await user.click(screen.getByRole('textbox'))
+    const dialog = await screen.findByRole('dialog')
+    const hourSelect = dialog.querySelector('select[aria-label="Hour"]') as HTMLSelectElement
+
+    expect(hourSelect).toBeInTheDocument()
+    fireEvent.change(hourSelect, { target: { value: '11' } })
+    expect(onChange).toHaveBeenCalledWith('11:15')
   })
 
   it('closes on Escape and restores focus to input', async () => {

@@ -49,13 +49,13 @@ const CASCADER_TRIGGER_DISABLED_CLASSES =
  * Cascader dropdown panel classes
  */
 export const cascaderDropdownClasses =
-  'absolute z-50 mt-1 flex bg-[var(--tiger-cascader-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-cascader-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg'
+  'absolute z-50 mt-1 flex bg-[var(--tiger-cascader-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-cascader-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg max-sm:fixed max-sm:inset-0 max-sm:mt-0 max-sm:flex-col max-sm:rounded-none max-sm:border-0 max-sm:shadow-none max-sm:pt-[env(safe-area-inset-top)] max-sm:pb-[env(safe-area-inset-bottom)]'
 
 /**
  * Cascader column (single level) classes
  */
 export const cascaderColumnClasses =
-  'min-w-[160px] max-h-64 overflow-auto border-r border-[var(--tiger-cascader-column-border,var(--tiger-border,#e5e7eb))] last:border-r-0'
+  'min-w-[160px] max-h-64 overflow-auto border-r border-[var(--tiger-cascader-column-border,var(--tiger-border,#e5e7eb))] last:border-r-0 max-sm:min-w-0 max-sm:flex-1 max-sm:max-h-none'
 
 /**
  * Cascader option base classes

@@ -164,6 +164,34 @@ describe('ImagePreview', () => {
     expect(img.style.transform).toContain('translate(0px, 0px) scale(1) rotate(0deg)')
   })
 
+  it('supports touch pinch zoom and pan', () => {
+    const onScaleChange = vi.fn()
+    render(<ImagePreview open images={images} onScaleChange={onScaleChange} />)
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+
+    fireEvent.touchStart(img, {
+      touches: [
+        { clientX: 0, clientY: 0 },
+        { clientX: 100, clientY: 0 }
+      ]
+    })
+    fireEvent.touchMove(img, {
+      touches: [
+        { clientX: 0, clientY: 0 },
+        { clientX: 150, clientY: 0 }
+      ]
+    })
+
+    expect(onScaleChange).toHaveBeenCalledWith(1.5)
+    expect(img.style.transform).toContain('scale(1.5)')
+
+    fireEvent.touchEnd(img)
+    fireEvent.touchStart(img, { touches: [{ clientX: 10, clientY: 10 }] })
+    fireEvent.touchMove(img, { touches: [{ clientX: 30, clientY: 40 }] })
+    expect(img.style.transform).toContain('translate(20px, 30px)')
+  })
+
   it('shows image counter for multiple images', () => {
     render(<ImagePreview open images={images} currentIndex={1} />)
 

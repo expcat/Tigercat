@@ -2,6 +2,7 @@ import { type PropType } from 'vue'
 import type {
   TableColumn,
   TableSize,
+  TableResponsiveMode,
   SortState,
   PaginationConfig,
   RowSelectionConfig,
@@ -33,6 +34,8 @@ export interface VueTableProps {
   rowClassName?: string | ((record: Record<string, unknown>, index: number) => string)
   stickyHeader?: boolean
   maxHeight?: string | number
+  tableLayout?: 'auto' | 'fixed'
+  responsiveMode?: TableResponsiveMode
   // v0.6.0
   virtual?: boolean
   virtualHeight?: number
@@ -151,6 +154,10 @@ export const tableProps = {
   tableLayout: {
     type: String as PropType<'auto' | 'fixed'>,
     default: 'auto'
+  },
+  responsiveMode: {
+    type: String as PropType<TableResponsiveMode>,
+    default: 'scroll' as TableResponsiveMode
   },
   // --- v0.6.0 props ---
   virtual: { type: Boolean, default: false },

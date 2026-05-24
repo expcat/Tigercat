@@ -33,7 +33,9 @@ import {
   getTimePickerIconButtonClasses,
   timePickerClearButtonClasses,
   timePickerPanelClasses,
-  timePickerPanelContentClasses,
+  timePickerDesktopPanelContentClasses,
+  timePickerMobileWheelClasses,
+  timePickerMobileWheelSelectClasses,
   timePickerRangeHeaderClasses,
   getTimePickerRangeTabButtonClasses,
   timePickerColumnClasses,
@@ -752,7 +754,72 @@ export const TimePicker = defineComponent({
                 ]),
 
               // Columns container
-              h('div', { class: timePickerPanelContentClasses }, [
+              h('div', { class: timePickerMobileWheelClasses }, [
+                h(
+                  'select',
+                  {
+                    class: timePickerMobileWheelSelectClasses,
+                    value:
+                      props.format === '12'
+                        ? to12HourFormat(selectedHours.value).hours
+                        : selectedHours.value,
+                    'aria-label': labels.value.hour,
+                    onChange: (event: Event) =>
+                      selectHour(Number((event.target as HTMLSelectElement).value))
+                  },
+                  hoursList.value.map((hour) =>
+                    h('option', { value: hour, disabled: isHourDisabled(hour) }, padTwo(hour))
+                  )
+                ),
+                h(
+                  'select',
+                  {
+                    class: timePickerMobileWheelSelectClasses,
+                    value: selectedMinutes.value,
+                    'aria-label': labels.value.minute,
+                    onChange: (event: Event) =>
+                      selectMinute(Number((event.target as HTMLSelectElement).value))
+                  },
+                  minutesList.value.map((minute) =>
+                    h(
+                      'option',
+                      { value: minute, disabled: isMinuteDisabled(minute) },
+                      padTwo(minute)
+                    )
+                  )
+                ),
+                props.showSeconds &&
+                  h(
+                    'select',
+                    {
+                      class: timePickerMobileWheelSelectClasses,
+                      value: selectedSeconds.value,
+                      'aria-label': labels.value.second,
+                      onChange: (event: Event) =>
+                        selectSecond(Number((event.target as HTMLSelectElement).value))
+                    },
+                    secondsList.value.map((second) =>
+                      h('option', { value: second }, padTwo(second))
+                    )
+                  ),
+                props.format === '12' &&
+                  h(
+                    'select',
+                    {
+                      class: timePickerMobileWheelSelectClasses,
+                      value: selectedPeriod.value,
+                      'aria-label': 'Period',
+                      onChange: (event: Event) =>
+                        selectPeriod((event.target as HTMLSelectElement).value as 'AM' | 'PM')
+                    },
+                    [
+                      h('option', { value: 'AM' }, periodLabels.value.am),
+                      h('option', { value: 'PM' }, periodLabels.value.pm)
+                    ]
+                  )
+              ]),
+
+              h('div', { class: timePickerDesktopPanelContentClasses }, [
                 // Hours column
                 h('div', { class: timePickerColumnClasses }, [
                   h('div', { class: timePickerColumnHeaderClasses }, labels.value.hour),

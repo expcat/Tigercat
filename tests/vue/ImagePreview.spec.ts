@@ -235,6 +235,37 @@ describe('ImagePreview', () => {
     expect(img.style.transform).toContain('translate(0px, 0px) scale(1) rotate(0deg)')
   })
 
+  it('supports touch pinch zoom and pan', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: {
+        open: true,
+        images
+      }
+    })
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await fireEvent.touchStart(img, {
+      touches: [
+        { clientX: 0, clientY: 0 },
+        { clientX: 100, clientY: 0 }
+      ]
+    })
+    await fireEvent.touchMove(img, {
+      touches: [
+        { clientX: 0, clientY: 0 },
+        { clientX: 150, clientY: 0 }
+      ]
+    })
+
+    expect(emitted()['scale-change'][0]).toEqual([1.5])
+    expect(img.style.transform).toContain('scale(1.5)')
+
+    await fireEvent.touchEnd(img)
+    await fireEvent.touchStart(img, { touches: [{ clientX: 10, clientY: 10 }] })
+    await fireEvent.touchMove(img, { touches: [{ clientX: 30, clientY: 40 }] })
+    expect(img.style.transform).toContain('translate(20px, 30px)')
+  })
+
   it('shows image counter for multiple images', () => {
     render(ImagePreview, {
       props: {

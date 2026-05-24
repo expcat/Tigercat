@@ -114,6 +114,16 @@ describe('Select', () => {
       const trigger = container.querySelector('button')
       expect(trigger).toBeInTheDocument()
     })
+
+    it('uses fullscreen panel classes for mobile dropdown', async () => {
+      const { container } = render(Select, {
+        props: { options: testOptions }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+
+      expect(container.querySelector('[role="listbox"]')).toHaveClass('max-sm:fixed')
+    })
   })
 
   describe('Events', () => {

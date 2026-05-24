@@ -56,6 +56,19 @@ describe('TimePicker', () => {
     await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
   })
 
+  it('renders mobile wheel selects and emits time changes from them', async () => {
+    const { container, emitted } = renderWithProps(TimePicker, {
+      modelValue: '10:15'
+    })
+
+    await fireEvent.click(container.querySelector('input') as HTMLInputElement)
+    const hourSelect = container.querySelector('select[aria-label="Hour"]') as HTMLSelectElement
+
+    expect(hourSelect).toBeInTheDocument()
+    await fireEvent.update(hourSelect, '11')
+    expect(emitted().change?.at(-1)).toEqual(['11:15'])
+  })
+
   it('closes on Escape and restores focus to input', async () => {
     const { container } = render(TimePicker)
     const input = container.querySelector('input') as HTMLInputElement

@@ -299,6 +299,8 @@ const images = ['/a.jpg', '/b.jpg', '/c.jpg']
 
 {/* 多张预览 */}
 <ImagePreview open={show} images={images} currentIndex={0} onOpenChange={setShow} />
+
+{/* 移动端支持双指缩放与单指平移 */}
 ```
 
 ---

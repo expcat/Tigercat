@@ -24,6 +24,8 @@ import {
   getTabPaneClasses,
   getTabIndicatorClasses,
   getTabIndicatorStyle,
+  getGestureTouchPoint,
+  resolveSwipeGesture,
   isKeyActive,
   tabAddButtonClasses,
   tabCloseButtonClasses,
@@ -45,6 +47,7 @@ export interface TabsContext {
   closable: boolean
   destroyInactiveTabPane: boolean
   lazy: boolean
+  swipeable: boolean
   idBase: string
   handleTabClick: (key: string | number) => void
   handleTabClose: (key: string | number, event: Event) => void
@@ -59,6 +62,7 @@ export interface VueTabsProps {
   closable?: boolean
   centered?: boolean
   destroyInactiveTabPane?: boolean
+  swipeable?: boolean
   className?: string
   style?: Record<string, string | number>
 }
@@ -423,6 +427,14 @@ export const Tabs = defineComponent({
       default: false
     },
     /**
+     * Whether horizontal touch swipes switch tabs.
+     * @default true
+     */
+    swipeable: {
+      type: Boolean,
+      default: true
+    },
+    /**
      * Additional CSS classes
      */
     className: {
@@ -444,6 +456,7 @@ export const Tabs = defineComponent({
 
     // Internal state for uncontrolled mode
     const internalActiveKey = ref<string | number | undefined>(props.defaultActiveKey)
+    const swipeStart = ref<ReturnType<typeof getGestureTouchPoint> | null>(null)
 
     // Computed active key (controlled or uncontrolled)
     const currentActiveKey = computed(() => {
@@ -469,6 +482,33 @@ export const Tabs = defineComponent({
     const handleTabClose = (key: string | number, event: Event) => {
       event.stopPropagation()
       emit('edit', { targetKey: key, action: 'remove' })
+    }
+
+    const activateAdjacentTab = (direction: 1 | -1, enabledTabKeys: Array<string | number>) => {
+      if (enabledTabKeys.length <= 1) return
+      const currentIndex = enabledTabKeys.indexOf(currentActiveKey.value ?? enabledTabKeys[0])
+      const baseIndex = currentIndex >= 0 ? currentIndex : 0
+      const nextKey =
+        enabledTabKeys[(baseIndex + direction + enabledTabKeys.length) % enabledTabKeys.length]
+      handleTabClick(nextKey)
+    }
+
+    const handleContentTouchStart = (event: TouchEvent) => {
+      if (!props.swipeable || event.touches.length !== 1) return
+      swipeStart.value = getGestureTouchPoint(event.touches, event.timeStamp)
+    }
+
+    const handleContentTouchEnd = (event: TouchEvent, enabledTabKeys: Array<string | number>) => {
+      if (!props.swipeable || !swipeStart.value || event.changedTouches.length !== 1) return
+      const endPoint = getGestureTouchPoint(event.changedTouches, event.timeStamp)
+      const swipe = resolveSwipeGesture(swipeStart.value, endPoint, {
+        minDistance: 48,
+        maxCrossAxisRatio: 0.75
+      })
+      swipeStart.value = null
+      if (!swipe) return
+      if (swipe.direction === 'left') activateAdjacentTab(1, enabledTabKeys)
+      if (swipe.direction === 'right') activateAdjacentTab(-1, enabledTabKeys)
     }
 
     // Container classes
@@ -510,6 +550,9 @@ export const Tabs = defineComponent({
       get lazy() {
         return props.lazy
       },
+      get swipeable() {
+        return props.swipeable
+      },
       idBase,
       handleTabClick,
       handleTabClose
@@ -535,6 +578,7 @@ export const Tabs = defineComponent({
       const tabItems: VNode[] = []
       const tabPanes: VNode[] = []
       const tabKeys: Array<string | number> = []
+      const enabledTabKeys: Array<string | number> = []
       let firstTabKey: string | number | undefined
 
       // First pass: collect valid TabPane children and determine firstTabKey
@@ -561,6 +605,9 @@ export const Tabs = defineComponent({
         }
         if (typeof k === 'string' || typeof k === 'number') {
           tabKeys.push(k)
+          if (childProps.disabled !== true) {
+            enabledTabKeys.push(k)
+          }
         }
 
         const tabPaneType =
@@ -653,7 +700,18 @@ export const Tabs = defineComponent({
       )
 
       // Render tab content
-      const tabContent = h('div', { class: tabContentBaseClasses }, tabPanes)
+      const tabContent = h(
+        'div',
+        {
+          class: tabContentBaseClasses,
+          onTouchstart: handleContentTouchStart,
+          onTouchend: (event: TouchEvent) => handleContentTouchEnd(event, enabledTabKeys),
+          onTouchcancel: () => {
+            swipeStart.value = null
+          }
+        },
+        tabPanes
+      )
 
       return h(
         'div',

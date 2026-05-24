@@ -256,6 +256,8 @@ const groupedOptions = [
 <Select value={value} onChange={setValue} options={groupedOptions} />
 <Select value={value} onChange={setValue} options={options} size="sm" />
 <Select value={value} onChange={setValue} options={[]} noDataText="暂无数据" />
+
+{/* 移动端下拉面板自动切换为全屏选择面板 */}
 ```
 
 ---
@@ -358,6 +360,8 @@ const [value, setValue] = useState('male')
 <DatePicker defaultValue={new Date()} />
 <DatePicker value={date} onChange={setDate} locale="zh-CN" labels={{ today: '今日' }} />
 <DatePicker value={date} onChange={setDate} locale={ZH_CN_DATEPICKER_LOCALE} />
+
+{/* 移动端自动使用滚轮选择器 */}
 ```
 
 ---
@@ -377,6 +381,8 @@ const [value, setValue] = useState('male')
 <TimePicker value={time} onChange={setTime} clearable onClear={onClear} />
 <TimePicker defaultValue="10:00" />
 <TimePicker value={time} onChange={setTime} locale="zh-CN" labels={{ now: '此刻' }} />
+
+{/* 移动端自动使用滚轮选择器 */}
 ```
 
 ---
@@ -418,6 +424,8 @@ const [value, setValue] = useState('male')
 ```tsx
 <Cascader value={city} onChange={setCity} options={cityOptions} placeholder="选择城市" />
 <Cascader value={city} onChange={setCity} options={cityOptions} showSearch clearable />
+
+{/* 移动端面板自动切换为全屏级联选择 */}
 ```
 
 ---

@@ -16,6 +16,9 @@ import {
   getDatePickerInputClasses,
   getDatePickerIconButtonClasses,
   datePickerCalendarClasses,
+  datePickerMobileWheelClasses,
+  datePickerMobileWheelGridClasses,
+  datePickerMobileWheelSelectClasses,
   datePickerCalendarHeaderClasses,
   datePickerNavButtonClasses,
   datePickerMonthYearClasses,
@@ -119,6 +122,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [activeDateIso, setActiveDateIso] = useState<string | null>(null)
+  const [activeRangePart, setActiveRangePart] = useState<'start' | 'end'>('start')
   const [internalValue, setInternalValue] = useState<Date | null>(() => {
     if (isRangeMode) return null
     return parseDate((props as DatePickerSingleProps).defaultValue ?? null)
@@ -133,6 +137,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
   })
 
   const calendarRef = useRef<HTMLDivElement>(null)
+  const mobileCalendarRef = useRef<HTMLDivElement>(null)
   const inputWrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const pendingFocusIsoRef = useRef<string | null>(null)
@@ -211,6 +216,22 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     () => getDatePickerLabels(props.locale, props.labels),
     [props.locale, props.labels]
   )
+
+  const mobileDate = useMemo(() => {
+    if (!isRangeMode) return selectedDate ?? normalizeDate(new Date())
+    const [start, end] = selectedRange
+    return (activeRangePart === 'start' ? start : end) ?? start ?? end ?? normalizeDate(new Date())
+  }, [activeRangePart, isRangeMode, selectedDate, selectedRange])
+
+  const mobileYears = useMemo(() => {
+    const baseYear = mobileDate.getFullYear()
+    return Array.from({ length: 101 }, (_, index) => baseYear - 50 + index)
+  }, [mobileDate])
+
+  const mobileDays = useMemo(() => {
+    const daysInMonth = new Date(mobileDate.getFullYear(), mobileDate.getMonth() + 1, 0).getDate()
+    return Array.from({ length: daysInMonth }, (_, index) => index + 1)
+  }, [mobileDate])
 
   const toggleCalendar = () => {
     if (!disabled && !readonly) {
@@ -407,6 +428,40 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     selectDate(new Date())
   }
 
+  const commitMobileDate = (date: Date) => {
+    const normalized = normalizeDate(date)
+    if (!isDateInRange(normalized, minDateParsed, maxDateParsed)) return
+
+    setViewingYear(normalized.getFullYear())
+    setViewingMonth(normalized.getMonth())
+
+    if (!isRangeMode) {
+      if (!isControlled) {
+        setInternalValue(normalized)
+      }
+      ;(props as DatePickerSingleProps).onChange?.(normalized)
+      return
+    }
+
+    const [start, end] = selectedRange
+    if (activeRangePart === 'start') {
+      const next: DatePickerRangeValue = [normalized, end && end < normalized ? normalized : end]
+      setRangeValue(next)
+      setActiveRangePart('end')
+      return
+    }
+
+    setRangeValue([start ?? normalized, start && normalized < start ? start : normalized])
+  }
+
+  const updateMobileDate = (part: 'year' | 'month' | 'day', value: number) => {
+    const nextYear = part === 'year' ? value : mobileDate.getFullYear()
+    const nextMonth = part === 'month' ? value : mobileDate.getMonth()
+    const maxDay = new Date(nextYear, nextMonth + 1, 0).getDate()
+    const nextDay = Math.min(part === 'day' ? value : mobileDate.getDate(), maxDay)
+    commitMobileDate(new Date(nextYear, nextMonth, nextDay))
+  }
+
   const handleShortcut = (shortcut: DatePickerShortcut) => {
     const val = typeof shortcut.value === 'function' ? shortcut.value() : shortcut.value
     if (!isRangeMode) {
@@ -479,8 +534,10 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
       const handleClickOutside = (event: MouseEvent) => {
         if (
           calendarRef.current &&
+          mobileCalendarRef.current &&
           inputWrapperRef.current &&
           !calendarRef.current.contains(event.target as Node) &&
+          !mobileCalendarRef.current.contains(event.target as Node) &&
           !inputWrapperRef.current.contains(event.target as Node)
         ) {
           closeCalendar()
@@ -573,6 +630,76 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
       </div>
 
       {/* Calendar dropdown */}
+      {isOpen && (
+        <div
+          ref={mobileCalendarRef}
+          className={datePickerMobileWheelClasses}
+          role="group"
+          aria-label={labels.calendar}>
+          {isRangeMode && (
+            <div className="mb-3 flex items-center gap-2">
+              <button
+                type="button"
+                className={datePickerFooterButtonClasses}
+                aria-selected={activeRangePart === 'start'}
+                onClick={() => setActiveRangePart('start')}>
+                Start
+              </button>
+              <button
+                type="button"
+                className={datePickerFooterButtonClasses}
+                aria-selected={activeRangePart === 'end'}
+                onClick={() => setActiveRangePart('end')}>
+                End
+              </button>
+            </div>
+          )}
+          <div className={datePickerMobileWheelGridClasses}>
+            <select
+              className={datePickerMobileWheelSelectClasses}
+              value={mobileDate.getFullYear()}
+              aria-label="Year"
+              onChange={(event) => updateMobileDate('year', Number(event.target.value))}>
+              {mobileYears.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+            <select
+              className={datePickerMobileWheelSelectClasses}
+              value={mobileDate.getMonth()}
+              aria-label="Month"
+              onChange={(event) => updateMobileDate('month', Number(event.target.value))}>
+              {Array.from({ length: 12 }, (_, month) => (
+                <option key={month} value={month}>
+                  {month + 1}
+                </option>
+              ))}
+            </select>
+            <select
+              className={datePickerMobileWheelSelectClasses}
+              value={mobileDate.getDate()}
+              aria-label="Day"
+              onChange={(event) => updateMobileDate('day', Number(event.target.value))}>
+              {mobileDays.map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mt-4 flex justify-end gap-2">
+            <button
+              type="button"
+              className={datePickerFooterButtonClasses}
+              aria-label={`Mobile ${labels.ok}`}
+              onClick={closeCalendar}>
+              {labels.ok}
+            </button>
+          </div>
+        </div>
+      )}
       {isOpen && (
         <div
           ref={calendarRef}
