@@ -3,7 +3,7 @@
  * Shared styles and positioning helpers for Tour
  */
 
-import type { TourPlacement } from '../types/tour'
+import type { TourPlacement, TourStep } from '../types/tour'
 import { isBrowser } from './env'
 
 // ---------------------------------------------------------------------------
@@ -15,7 +15,52 @@ export const tourMaskClasses = 'fixed inset-0 z-[1000] bg-black/45 transition-op
 
 /** Popover card */
 export const tourPopoverClasses =
-  'absolute z-[1001] w-80 rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-surface-raised,#ffffff)] shadow-xl border border-[var(--tiger-border,#e5e7eb)] p-4'
+  'absolute z-[1001] w-[min(20rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-surface-raised,#ffffff)] shadow-xl border border-[var(--tiger-border,#e5e7eb)] p-4'
+
+export interface ActiveTourStep {
+  step: TourStep
+  index: number
+}
+
+export function isTourStepSkipped(step: TourStep): boolean {
+  const skippedByPredicate =
+    typeof step.skipWhen === 'function' ? step.skipWhen() : step.skipWhen === true
+
+  return step.skip === true || skippedByPredicate
+}
+
+export function getActiveTourSteps(steps: TourStep[]): ActiveTourStep[] {
+  return steps.reduce<ActiveTourStep[]>((activeSteps, step, index) => {
+    if (!isTourStepSkipped(step)) {
+      activeSteps.push({ step, index })
+    }
+
+    return activeSteps
+  }, [])
+}
+
+export function getCurrentActiveTourStep(
+  activeSteps: ActiveTourStep[],
+  current: number,
+  stepCount?: number
+): ActiveTourStep | undefined {
+  if (activeSteps.length === 0) return undefined
+  if (stepCount !== undefined && (current < 0 || current >= stepCount)) return undefined
+
+  return (
+    activeSteps.find((item) => item.index === current) ??
+    activeSteps.find((item) => item.index > current) ??
+    activeSteps[activeSteps.length - 1]
+  )
+}
+
+export function getActiveTourStepPosition(
+  activeSteps: ActiveTourStep[],
+  currentIndex: number | undefined
+): number {
+  if (currentIndex === undefined) return -1
+  return activeSteps.findIndex((item) => item.index === currentIndex)
+}
 
 /** Title */
 export const tourTitleClasses = 'text-base font-semibold text-[var(--tiger-text,#111827)] mb-1'
@@ -58,31 +103,62 @@ export function getTourPopoverPosition(
   const cx = targetRect.left + targetRect.width / 2
   const cy = targetRect.top + targetRect.height / 2
 
+  let position: { top: number; left: number }
+
   switch (placement) {
     case 'top':
-      return { top: targetRect.top - popoverHeight - OFFSET, left: cx - popoverWidth / 2 }
+      position = { top: targetRect.top - popoverHeight - OFFSET, left: cx - popoverWidth / 2 }
+      break
     case 'top-start':
-      return { top: targetRect.top - popoverHeight - OFFSET, left: targetRect.left }
+      position = { top: targetRect.top - popoverHeight - OFFSET, left: targetRect.left }
+      break
     case 'top-end':
-      return {
+      position = {
         top: targetRect.top - popoverHeight - OFFSET,
         left: targetRect.left + targetRect.width - popoverWidth
       }
+      break
     case 'bottom':
-      return { top: targetRect.top + targetRect.height + OFFSET, left: cx - popoverWidth / 2 }
+      position = { top: targetRect.top + targetRect.height + OFFSET, left: cx - popoverWidth / 2 }
+      break
     case 'bottom-start':
-      return { top: targetRect.top + targetRect.height + OFFSET, left: targetRect.left }
+      position = { top: targetRect.top + targetRect.height + OFFSET, left: targetRect.left }
+      break
     case 'bottom-end':
-      return {
+      position = {
         top: targetRect.top + targetRect.height + OFFSET,
         left: targetRect.left + targetRect.width - popoverWidth
       }
+      break
     case 'left':
-      return { top: cy - popoverHeight / 2, left: targetRect.left - popoverWidth - OFFSET }
+      position = { top: cy - popoverHeight / 2, left: targetRect.left - popoverWidth - OFFSET }
+      break
     case 'right':
-      return { top: cy - popoverHeight / 2, left: targetRect.left + targetRect.width + OFFSET }
+      position = { top: cy - popoverHeight / 2, left: targetRect.left + targetRect.width + OFFSET }
+      break
     default:
-      return { top: targetRect.top + targetRect.height + OFFSET, left: cx - popoverWidth / 2 }
+      position = { top: targetRect.top + targetRect.height + OFFSET, left: cx - popoverWidth / 2 }
+  }
+
+  return clampTourPopoverPosition(position, popoverWidth, popoverHeight)
+}
+
+function clampTourPopoverPosition(
+  position: { top: number; left: number },
+  popoverWidth: number,
+  popoverHeight: number
+): { top: number; left: number } {
+  if (!isBrowser()) return position
+
+  const margin = 8
+  const minLeft = window.scrollX + margin
+  const minTop = window.scrollY + margin
+  const maxLeft = Math.max(minLeft, window.scrollX + window.innerWidth - popoverWidth - margin)
+  const maxTop = Math.max(minTop, window.scrollY + window.innerHeight - popoverHeight - margin)
+
+  return {
+    top: Math.min(Math.max(position.top, minTop), maxTop),
+    left: Math.min(Math.max(position.left, minLeft), maxLeft)
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import ReactDOM from 'react-dom'
 import {
   classNames,
@@ -12,6 +12,9 @@ import {
   getTourTargetRect,
   getTourPopoverPosition,
   getTourSpotlightStyle,
+  getActiveTourSteps,
+  getCurrentActiveTourStep,
+  getActiveTourStepPosition,
   closeIconPathD,
   type TourProps as CoreTourProps,
   type TourPlacement,
@@ -47,7 +50,13 @@ export const Tour: React.FC<TourProps> = ({
 }) => {
   const [internalStep, setInternalStep] = useState(0)
   const currentStep = controlledCurrent ?? internalStep
-  const step = steps[currentStep]
+  const activeSteps = useMemo(() => getActiveTourSteps(steps), [steps])
+  const activeStepInfo = useMemo(
+    () => getCurrentActiveTourStep(activeSteps, currentStep, steps.length),
+    [activeSteps, currentStep, steps.length]
+  )
+  const activeStepPosition = getActiveTourStepPosition(activeSteps, activeStepInfo?.index)
+  const step = activeStepInfo?.step
   const [targetRect, setTargetRect] = useState<TourRect | undefined>()
   const popoverRef = useRef<HTMLDivElement>(null)
 
@@ -83,18 +92,20 @@ export const Tour: React.FC<TourProps> = ({
   )
 
   const next = useCallback(() => {
-    if (currentStep < steps.length - 1) {
-      goTo(currentStep + 1)
+    const nextStep = activeSteps[activeStepPosition + 1]
+    if (nextStep) {
+      goTo(nextStep.index)
     } else {
       onFinish?.()
       onOpenChange?.(false)
       onClose?.()
     }
-  }, [currentStep, steps.length, goTo, onFinish, onOpenChange, onClose])
+  }, [activeSteps, activeStepPosition, goTo, onFinish, onOpenChange, onClose])
 
   const prev = useCallback(() => {
-    if (currentStep > 0) goTo(currentStep - 1)
-  }, [currentStep, goTo])
+    const prevStep = activeSteps[activeStepPosition - 1]
+    if (prevStep) goTo(prevStep.index)
+  }, [activeSteps, activeStepPosition, goTo])
 
   const close = useCallback(() => {
     onOpenChange?.(false)
@@ -106,8 +117,8 @@ export const Tour: React.FC<TourProps> = ({
 
   const placement: TourPlacement = step.placement ?? 'bottom'
   const showMask = step.mask !== false
-  const isLast = currentStep === steps.length - 1
-  const isFirst = currentStep === 0
+  const isLast = activeStepPosition === activeSteps.length - 1
+  const isFirst = activeStepPosition <= 0
 
   let popoverStyle: React.CSSProperties
   if (targetRect) {
@@ -155,7 +166,7 @@ export const Tour: React.FC<TourProps> = ({
         <div className={tourFooterClasses}>
           {showIndicators && (
             <span className={tourIndicatorClasses}>
-              {currentStep + 1} / {steps.length}
+              {activeStepPosition + 1} / {activeSteps.length}
             </span>
           )}
           <div className="flex items-center">

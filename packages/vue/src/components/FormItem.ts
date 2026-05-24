@@ -15,6 +15,7 @@ import {
 import {
   classNames,
   type FormRule,
+  type FormFieldCondition,
   type FormSize,
   type FormErrorDisplayMode,
   getFormItemClasses,
@@ -53,6 +54,7 @@ export interface VueFormItemProps {
   showMessage?: boolean
   size?: FormSize
   errorDisplayMode?: FormErrorDisplayMode
+  condition?: FormFieldCondition
 }
 
 export const FormItem = defineComponent({
@@ -115,6 +117,10 @@ export const FormItem = defineComponent({
     errorDisplayMode: {
       type: String as PropType<FormErrorDisplayMode>,
       default: 'inline' as FormErrorDisplayMode
+    },
+    condition: {
+      type: Object as PropType<FormFieldCondition>,
+      default: undefined
     }
   },
   setup(props, { slots }) {
@@ -187,8 +193,19 @@ export const FormItem = defineComponent({
       return false
     })
 
+    const conditionState = computed(() => {
+      const ctx = formContext.value
+      if (!props.name || !ctx) {
+        return { shown: true, disabled: false, required: false }
+      }
+      return ctx.getFieldConditionState(props.name, props.condition)
+    })
+
     const isRequired = computed(() => {
-      return showRequiredAsterisk.value && (formContext.value?.showRequiredAsterisk ?? true)
+      return (
+        (showRequiredAsterisk.value || conditionState.value.required) &&
+        (formContext.value?.showRequiredAsterisk ?? true)
+      )
     })
 
     // Watch for errors in form context
@@ -223,12 +240,13 @@ export const FormItem = defineComponent({
       const ctx = formContext.value
       if (props.name && ctx) {
         ctx.registerFieldRules(props.name, undefined)
+        ctx.registerFieldCondition(props.name, undefined)
       }
     }
 
     watch(
-      () => [props.name, props.rules] as const,
-      ([name, rules]) => {
+      () => [props.name, props.rules, props.condition] as const,
+      ([name, rules, condition]) => {
         const ctx = formContext.value
         if (!name || !ctx) {
           return
@@ -239,6 +257,8 @@ export const FormItem = defineComponent({
         } else {
           ctx.registerFieldRules(name, undefined)
         }
+
+        ctx.registerFieldCondition(name, condition)
       },
       { immediate: true }
     )
@@ -272,7 +292,7 @@ export const FormItem = defineComponent({
         size: actualSize.value,
         labelPosition: labelPosition.value,
         hasError: hasError.value,
-        disabled: formContext.value?.disabled
+        disabled: formContext.value?.disabled || conditionState.value.disabled
       })
     })
 
@@ -302,6 +322,10 @@ export const FormItem = defineComponent({
     const asteriskClasses = getFormItemAsteriskClasses()
 
     return () => {
+      if (!conditionState.value.shown) {
+        return null
+      }
+
       const defaultSlot = slots.default?.() ?? []
       const only = defaultSlot.length === 1 ? defaultSlot[0] : undefined
       const isSingleVNode = only != null && isVNode(only)
@@ -346,6 +370,10 @@ export const FormItem = defineComponent({
             _shakeTrigger: !isNativeElement && hasError.value ? shakeTrigger.value : undefined,
             'aria-invalid': hasError.value ? 'true' : existingProps['aria-invalid'],
             'aria-required': isRequired.value ? 'true' : existingProps['aria-required'],
+            disabled:
+              conditionState.value.disabled || formContext.value?.disabled
+                ? true
+                : (existingProps.disabled as boolean | undefined),
             'aria-describedby': mergeAriaDescribedBy(
               existingProps['aria-describedby'] as string | undefined,
               describedById.value

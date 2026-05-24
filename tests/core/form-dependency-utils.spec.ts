@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { getDependentFields, getFieldDependencies, getValidationOrder } from '@expcat/tigercat-core'
+import {
+  createFormConditionDependencies,
+  evaluateFormCondition,
+  evaluateFormConditions,
+  getDependentFields,
+  getFieldDependencies,
+  getValidationOrder,
+  resolveConditionalFormRules,
+  resolveFormConditionState,
+  type FormConditions,
+  type FormRules
+} from '@expcat/tigercat-core'
 
 describe('form-dependency-utils', () => {
   describe('getDependentFields', () => {
@@ -65,5 +76,76 @@ describe('form-dependency-utils', () => {
       const order = getValidationOrder(['a', 'b'], deps)
       expect(order).toHaveLength(2)
     })
+  })
+})
+
+describe('form conditional DSL', () => {
+  const values = {
+    accountType: 'company',
+    age: 18,
+    tags: ['vip'],
+    newsletter: true,
+    companyName: ''
+  }
+
+  it('evaluates comparison, truthy, includes, and numeric operators', () => {
+    expect(evaluateFormCondition({ field: 'accountType', value: 'company' }, values)).toBe(true)
+    expect(evaluateFormCondition({ field: 'newsletter', operator: 'truthy' }, values)).toBe(true)
+    expect(
+      evaluateFormCondition({ field: 'tags', operator: 'includes', value: 'vip' }, values)
+    ).toBe(true)
+    expect(evaluateFormCondition({ field: 'age', operator: 'gte', value: 18 }, values)).toBe(true)
+  })
+
+  it('combines multiple conditions with all or any logic', () => {
+    const conditions = [
+      { field: 'accountType', value: 'personal' },
+      { field: 'newsletter', value: true }
+    ]
+
+    expect(evaluateFormConditions(conditions, values, 'all')).toBe(false)
+    expect(evaluateFormConditions(conditions, values, 'any')).toBe(true)
+  })
+
+  it('resolves visible, disabled, and required field state', () => {
+    const conditions: FormConditions = {
+      companyName: {
+        showWhen: { field: 'accountType', value: 'company' },
+        disabledWhen: { field: 'age', operator: 'lt', value: 18 },
+        requiredWhen: { field: 'newsletter', value: true }
+      }
+    }
+
+    expect(resolveFormConditionState('companyName', values, conditions)).toEqual({
+      shown: true,
+      disabled: false,
+      required: true
+    })
+  })
+
+  it('removes hidden fields and adds required rules for requiredWhen', () => {
+    const rules: FormRules = {
+      companyName: { min: 2 },
+      vatId: { required: true }
+    }
+    const conditions: FormConditions = {
+      companyName: { requiredWhen: { field: 'newsletter', value: true } },
+      vatId: { showWhen: { field: 'accountType', value: 'enterprise' } }
+    }
+
+    expect(resolveConditionalFormRules(values, rules, conditions)).toEqual({
+      companyName: [{ required: true }, { min: 2 }]
+    })
+  })
+
+  it('creates dependency maps from field conditions', () => {
+    const dependencies = createFormConditionDependencies({
+      companyName: {
+        showWhen: { field: 'accountType', value: 'company' },
+        requiredWhen: { field: 'newsletter', value: true }
+      }
+    })
+
+    expect(dependencies.get('companyName')).toEqual(['accountType', 'newsletter'])
   })
 })

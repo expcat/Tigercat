@@ -32,6 +32,7 @@ type FieldLikeProps = {
   _shakeTrigger?: number
   onBlur?: React.FocusEventHandler<unknown>
   onChange?: React.ChangeEventHandler<unknown>
+  disabled?: boolean
   'aria-invalid'?: boolean | 'true' | 'false'
   'aria-describedby'?: string
   'aria-required'?: boolean | 'true' | 'false'
@@ -72,7 +73,8 @@ export const FormItem: React.FC<FormItemProps> = ({
   errorDisplayMode = 'inline',
   size,
   children,
-  className
+  className,
+  condition
 }) => {
   const formContext = useFormContext()
   const [errorMessage, setErrorMessage] = useState<string>('')
@@ -89,6 +91,13 @@ export const FormItem: React.FC<FormItemProps> = ({
   const actualSize: FormSize = size || formContext?.size || 'md'
   const labelPosition = formContext?.labelPosition || 'right'
   const labelAlign = formContext?.labelAlign || 'right'
+
+  const conditionState = useMemo(() => {
+    if (!name || !formContext) {
+      return { shown: true, disabled: false, required: false }
+    }
+    return formContext.getFieldConditionState(name, condition)
+  }, [name, formContext, condition])
 
   const actualLabelWidth = useMemo(() => {
     const width = labelWidth || formContext?.labelWidth
@@ -120,8 +129,10 @@ export const FormItem: React.FC<FormItemProps> = ({
   }, [required, rules, name, formContext?.rules])
 
   const isRequired = useMemo(
-    () => showRequiredAsterisk && (formContext?.showRequiredAsterisk ?? true),
-    [showRequiredAsterisk, formContext?.showRequiredAsterisk]
+    () =>
+      (showRequiredAsterisk || conditionState.required) &&
+      (formContext?.showRequiredAsterisk ?? true),
+    [showRequiredAsterisk, conditionState.required, formContext?.showRequiredAsterisk]
   )
 
   // Watch for errors in form context
@@ -155,10 +166,13 @@ export const FormItem: React.FC<FormItemProps> = ({
       formContext.registerFieldRules(name, rules)
     }
 
+    formContext.registerFieldCondition(name, condition)
+
     return () => {
       formContext.registerFieldRules(name, undefined)
+      formContext.registerFieldCondition(name, undefined)
     }
-  }, [name, rules, formContext])
+  }, [name, rules, condition, formContext])
 
   const handleBlur = useCallback(() => {
     if (name && formContext) {
@@ -201,6 +215,7 @@ export const FormItem: React.FC<FormItemProps> = ({
       id: effectiveFieldId,
       'aria-invalid': hasError ? true : onlyChild.props['aria-invalid'],
       'aria-required': isRequired ? true : onlyChild.props['aria-required'],
+      disabled: conditionState.disabled || formContext?.disabled ? true : onlyChild.props.disabled,
       'aria-describedby': mergeAriaDescribedBy(onlyChild.props['aria-describedby'], describedById),
       onBlur: (event) => {
         onlyChild.props.onBlur?.(event)
@@ -230,6 +245,8 @@ export const FormItem: React.FC<FormItemProps> = ({
     showMessage,
     shakeTrigger,
     isRequired,
+    conditionState.disabled,
+    formContext?.disabled,
     isNativeElement,
     describedById,
     handleBlur,
@@ -243,11 +260,11 @@ export const FormItem: React.FC<FormItemProps> = ({
           size: actualSize,
           labelPosition,
           hasError,
-          disabled: formContext?.disabled
+          disabled: formContext?.disabled || conditionState.disabled
         }),
         className
       ),
-    [actualSize, labelPosition, hasError, formContext?.disabled, className]
+    [actualSize, labelPosition, hasError, formContext?.disabled, conditionState.disabled, className]
   )
 
   const labelClasses = useMemo(
@@ -281,6 +298,10 @@ export const FormItem: React.FC<FormItemProps> = ({
       ),
     [labelPosition, errorDisplayMode]
   )
+
+  if (!conditionState.shown) {
+    return null
+  }
 
   return (
     <div className={formItemClasses}>

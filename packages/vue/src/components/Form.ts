@@ -15,6 +15,9 @@ import {
   type FormRules,
   type FormValues,
   type FormError,
+  type FormConditions,
+  type FormFieldCondition,
+  type FormConditionState,
   type FormLabelPosition,
   type FormLabelAlign,
   type FormSize,
@@ -25,6 +28,9 @@ import {
   getValueByPath,
   createFormErrorMap,
   getDependentFields,
+  createFormConditionDependencies,
+  resolveConditionalFormRules,
+  resolveFormFieldConditionState,
   createFormValidationDebouncer,
   createFormHistory,
   pushFormHistory,
@@ -54,6 +60,11 @@ export interface FormContext {
   errors: FormError[]
   errorsByField: Record<string, string | undefined>
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
+  registerFieldCondition: (fieldName: string, condition?: FormFieldCondition) => void
+  getFieldConditionState: (
+    fieldName: string,
+    conditionOverride?: FormFieldCondition
+  ) => FormConditionState
   validateField: (
     fieldName: string,
     rulesOverride?: FormRule | FormRule[],
@@ -74,6 +85,7 @@ export interface VueFormProps {
   disabled?: boolean
   loading?: boolean
   fieldDependencies?: Map<string, string[]>
+  conditions?: FormConditions
   validateDebounce?: number
   undoable?: boolean
   maxHistorySize?: number
@@ -163,6 +175,10 @@ export const Form = defineComponent({
       type: Object as PropType<Map<string, string[]>>,
       default: undefined
     },
+    conditions: {
+      type: Object as PropType<FormConditions>,
+      default: undefined
+    },
     validateDebounce: {
       type: Number,
       default: 0
@@ -190,6 +206,7 @@ export const Form = defineComponent({
   setup(props, { slots, emit, expose }) {
     const errors = reactive<FormError[]>([])
     const fieldRules = reactive<Record<string, FormRule | FormRule[]>>({})
+    const fieldConditions = reactive<FormConditions>({})
     const errorsByField = computed(() => createFormErrorMap(errors))
     let validationDebouncer: FormValidationDebouncer = createFormValidationDebouncer({
       delay: props.validateDebounce
@@ -213,16 +230,78 @@ export const Form = defineComponent({
       fieldRules[fieldName] = rules
     }
 
-    const getEffectiveRules = (): FormRules | undefined => {
+    const registerFieldCondition = (fieldName: string, condition?: FormFieldCondition): void => {
+      if (!fieldName) {
+        return
+      }
+
+      if (!condition) {
+        delete fieldConditions[fieldName]
+        return
+      }
+
+      fieldConditions[fieldName] = condition
+    }
+
+    const getEffectiveConditions = (): FormConditions | undefined => {
       const merged = {
-        ...(props.rules ?? {}),
-        ...fieldRules
+        ...(props.conditions ?? {}),
+        ...fieldConditions
       }
       return Object.keys(merged).length > 0 ? merged : undefined
     }
 
+    const getMergedFieldCondition = (
+      fieldName: string,
+      conditionOverride?: FormFieldCondition
+    ): FormFieldCondition | undefined => {
+      const base = getEffectiveConditions()?.[fieldName]
+      return base || conditionOverride
+        ? { ...(base ?? {}), ...(conditionOverride ?? {}) }
+        : undefined
+    }
+
+    const getFieldConditionState = (
+      fieldName: string,
+      conditionOverride?: FormFieldCondition
+    ): FormConditionState => {
+      return resolveFormFieldConditionState(
+        props.model,
+        getMergedFieldCondition(fieldName, conditionOverride)
+      )
+    }
+
+    const getEffectiveRules = (): FormRules | undefined => {
+      const mergedRules = {
+        ...(props.rules ?? {}),
+        ...fieldRules
+      }
+      const rules = Object.keys(mergedRules).length > 0 ? mergedRules : undefined
+      return resolveConditionalFormRules(props.model, rules, getEffectiveConditions())
+    }
+
     const resolveFieldRules = (fieldName: string, rulesOverride?: FormRule | FormRule[]) => {
-      return rulesOverride ?? fieldRules[fieldName] ?? props.rules?.[fieldName]
+      const fieldRulesValue = rulesOverride ?? fieldRules[fieldName] ?? props.rules?.[fieldName]
+      const resolved = resolveConditionalFormRules(
+        props.model,
+        fieldRulesValue ? { [fieldName]: fieldRulesValue } : undefined,
+        getEffectiveConditions()
+      )
+      return resolved?.[fieldName]
+    }
+
+    const getDependencyMap = (): Map<string, string[]> | undefined => {
+      const conditionDependencies = createFormConditionDependencies(getEffectiveConditions())
+      if (!props.fieldDependencies && conditionDependencies.size === 0) {
+        return undefined
+      }
+
+      const merged = new Map<string, string[]>(props.fieldDependencies ?? [])
+      for (const [fieldName, dependencies] of conditionDependencies.entries()) {
+        const current = merged.get(fieldName) ?? []
+        merged.set(fieldName, Array.from(new Set([...current, ...dependencies])))
+      }
+      return merged
     }
 
     const runFieldValidation = async (
@@ -244,6 +323,13 @@ export const Form = defineComponent({
       rulesOverride?: FormRule | FormRule[],
       trigger?: FormRuleTrigger
     ): Promise<void> => {
+      const conditionState = getFieldConditionState(fieldName)
+      if (!conditionState.shown || conditionState.disabled) {
+        clearValidate(fieldName)
+        emit('validate', fieldName, true, undefined)
+        return
+      }
+
       const effectiveFieldRules = resolveFieldRules(fieldName, rulesOverride)
       if (effectiveFieldRules) {
         const error = await runFieldValidation(fieldName, rulesOverride, trigger)
@@ -276,8 +362,9 @@ export const Form = defineComponent({
       }
 
       // v0.6.0: revalidate dependent fields (even if current field has no rules)
-      if (props.fieldDependencies) {
-        const dependents = getDependentFields(fieldName, props.fieldDependencies)
+      const dependencyMap = getDependencyMap()
+      if (dependencyMap) {
+        const dependents = getDependentFields(fieldName, dependencyMap)
         for (const dep of dependents) {
           await validateFieldNow(dep)
         }
@@ -447,6 +534,8 @@ export const Form = defineComponent({
       errors,
       errorsByField: errorsByField.value,
       registerFieldRules,
+      registerFieldCondition,
+      getFieldConditionState,
       validateField,
       clearValidate
     }))

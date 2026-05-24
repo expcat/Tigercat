@@ -250,6 +250,107 @@ describe('Form', () => {
 
   // ==================== Validation Functionality ====================
   describe('Validation Functionality', () => {
+    it('supports conditional visibility and skips hidden field validation', async () => {
+      let formApi: { validate: () => Promise<boolean> } | undefined
+
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ accountType: 'personal', companyName: '' })
+          const rules: FormRules = {
+            companyName: [{ required: true, message: 'Company is required' }]
+          }
+          return () =>
+            h(
+              Form,
+              {
+                model,
+                rules,
+                conditions: {
+                  companyName: { showWhen: { field: 'accountType', value: 'company' } }
+                },
+                ref: (el) => {
+                  formApi = (el as typeof formApi) ?? undefined
+                }
+              },
+              {
+                default: () => [
+                  h(
+                    'button',
+                    { type: 'button', onClick: () => (model.accountType = 'company') },
+                    'Company'
+                  ),
+                  h(
+                    FormItem,
+                    { label: 'Company', name: 'companyName' },
+                    {
+                      default: () =>
+                        h('input', { 'aria-label': 'companyName', value: model.companyName })
+                    }
+                  )
+                ]
+              }
+            )
+        }
+      })
+
+      render(Demo)
+
+      expect(screen.queryByLabelText('companyName')).not.toBeInTheDocument()
+      expect(await formApi?.validate()).toBe(true)
+
+      await fireEvent.click(screen.getByRole('button', { name: 'Company' }))
+      await nextTick()
+
+      expect(screen.getByLabelText('companyName')).toBeInTheDocument()
+      expect(await formApi?.validate()).toBe(false)
+      expect(await screen.findByText('Company is required')).toBeInTheDocument()
+    })
+
+    it('supports conditional disabled and required state on FormItem', async () => {
+      let formApi: { validateField: (name: string) => Promise<void> } | undefined
+
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ newsletter: true, locked: true, email: '' })
+          return () =>
+            h(
+              Form,
+              {
+                model,
+                ref: (el) => {
+                  formApi = (el as typeof formApi) ?? undefined
+                }
+              },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    {
+                      label: 'Email',
+                      name: 'email',
+                      condition: {
+                        requiredWhen: { field: 'newsletter', value: true },
+                        disabledWhen: { field: 'locked', value: true }
+                      }
+                    },
+                    {
+                      default: () => h('input', { 'aria-label': 'email', value: model.email })
+                    }
+                  )
+              }
+            )
+        }
+      })
+
+      const { container } = render(Demo)
+
+      expect(container.querySelector('.tiger-form-item__asterisk')).toBeInTheDocument()
+      expect(screen.getByLabelText('email')).toBeDisabled()
+
+      await formApi?.validateField('email')
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+
     it('validates with FormItem rules override on blur', async () => {
       const rules: FormRule[] = [{ required: true, message: 'Username is required' }]
       const Demo = defineComponent({

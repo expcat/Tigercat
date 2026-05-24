@@ -5,7 +5,7 @@ description: Compact generated API summary for Tigercat core types
 
 <!-- LLM-INDEX
 type: generated-api-summary
-total-exported-types: 526
+total-exported-types: 534
 source: packages/core/src/types/*.ts
 -->
 
@@ -59,7 +59,7 @@ source: packages/core/src/types/*.ts
 | checkbox.ts.ts | CheckboxProps, CheckboxGroupProps | CheckboxValue, CheckboxGroupValue, CheckboxSize, CheckboxProps, CheckboxGroupProps |
 | color-picker.ts.ts | ColorPickerProps | ColorPickerSize, ColorFormat, ColorPickerProps |
 | datepicker.ts.ts | DatePickerProps | DatePickerInputDate, DatePickerSingleModelValue, DatePickerRangeModelValue, DatePickerModelValue, DatePickerSingleValue, DatePickerRangeValue, DatePickerLabels, DatePickerLocalePreset, DatePickerLocaleConfig, DatePickerLocaleInput, DatePickerSize, DateFormat, DatePickerProps, DatePickerShortcut |
-| form.ts.ts | FormProps, FormItemProps | FormRuleType, FormRuleTrigger, FormRule, FormRules, FormError, FormValues, FormValidationResult, FormLabelAlign, FormLabelPosition, FormSize, FormProps, FormErrorDisplayMode, FormItemProps, FormControllerOptions, FormController |
+| form.ts.ts | FormProps, FormItemProps | FormRuleType, FormRuleTrigger, FormRule, FormRules, FormError, FormValues, FormConditionOperator, FormCondition, FormConditionInput, FormConditionLogic, FormFieldCondition, FormConditions, FormConditionState, FormValidationResult, FormLabelAlign, FormLabelPosition, +6 |
 | input.ts.ts | InputProps | InputSize, InputType, InputStatus, InputProps |
 | input-group.ts.ts | InputGroupProps, InputGroupAddonProps | InputGroupSize, InputGroupProps, InputGroupAddonProps |
 | input-number.ts.ts | InputNumberProps | InputNumberProps |
@@ -88,7 +88,7 @@ source: packages/core/src/types/*.ts
 | popover.ts.ts | PopoverProps | PopoverTrigger, PopoverProps |
 | progress.ts.ts | ProgressProps | ProgressVariant, ProgressSize, ProgressType, ProgressStatus, ProgressProps |
 | tooltip.ts.ts | TooltipProps | TooltipTrigger, TooltipProps |
-| tour.ts.ts | TourProps | TourPlacement, TourStep, TourProps |
+| tour.ts.ts | TourProps | TourPlacement, TourStepSkipPredicate, TourStep, TourProps |
 
 ## Layout
 

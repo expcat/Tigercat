@@ -34,7 +34,7 @@
 | checkbox.ts.ts | `CheckboxValue`, `CheckboxGroupValue`, `CheckboxSize`, `CheckboxProps`, `CheckboxGroupProps` |
 | color-picker.ts.ts | `ColorPickerSize`, `ColorFormat`, `ColorPickerProps` |
 | datepicker.ts.ts | `DatePickerInputDate`, `DatePickerSingleModelValue`, `DatePickerRangeModelValue`, `DatePickerModelValue`, `DatePickerSingleValue`, `DatePickerRangeValue`, `DatePickerLabels`, `DatePickerLocalePreset`, `DatePickerLocaleConfig`, `DatePickerLocaleInput`, `DatePickerSize`, `DateFormat`, `DatePickerProps`, `DatePickerShortcut` |
-| form.ts.ts | `FormRuleType`, `FormRuleTrigger`, `FormRule`, `FormRules`, `FormError`, `FormValues`, `FormValidationResult`, `FormLabelAlign`, `FormLabelPosition`, `FormSize`, `FormProps`, `FormErrorDisplayMode`, `FormItemProps`, `FormControllerOptions`, `FormController` |
+| form.ts.ts | `FormRuleType`, `FormRuleTrigger`, `FormRule`, `FormRules`, `FormError`, `FormValues`, `FormConditionOperator`, `FormCondition`, `FormConditionInput`, `FormConditionLogic`, `FormFieldCondition`, `FormConditions`, `FormConditionState`, `FormValidationResult`, `FormLabelAlign`, `FormLabelPosition`, `FormSize`, `FormProps`, `FormErrorDisplayMode`, `FormItemProps`, `FormControllerOptions`, `FormController` |
 | input.ts.ts | `InputSize`, `InputType`, `InputStatus`, `InputProps` |
 | input-group.ts.ts | `InputGroupSize`, `InputGroupProps`, `InputGroupAddonProps` |
 | input-number.ts.ts | `InputNumberProps` |
@@ -63,7 +63,7 @@
 | popover.ts.ts | `PopoverTrigger`, `PopoverProps` |
 | progress.ts.ts | `ProgressVariant`, `ProgressSize`, `ProgressType`, `ProgressStatus`, `ProgressProps` |
 | tooltip.ts.ts | `TooltipTrigger`, `TooltipProps` |
-| tour.ts.ts | `TourPlacement`, `TourStep`, `TourProps` |
+| tour.ts.ts | `TourPlacement`, `TourStepSkipPredicate`, `TourStep`, `TourProps` |
 
 ## Layout
 
@@ -152,4 +152,4 @@
 
 ---
 
-Total exported types: **526**
+Total exported types: **534**

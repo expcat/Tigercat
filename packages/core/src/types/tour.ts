@@ -15,6 +15,8 @@ export type TourPlacement =
   | 'left'
   | 'right'
 
+export type TourStepSkipPredicate = () => boolean
+
 /**
  * A single step in the tour
  */
@@ -39,6 +41,18 @@ export interface TourStep {
    * @default true
    */
   mask?: boolean
+
+  /**
+   * Whether to skip this step when navigating the tour.
+   * @default false
+   */
+  skip?: boolean
+
+  /**
+   * Conditionally skip this step. A boolean is evaluated directly; a function
+   * is evaluated each time the visible step list is resolved.
+   */
+  skipWhen?: boolean | TourStepSkipPredicate
 }
 
 /**

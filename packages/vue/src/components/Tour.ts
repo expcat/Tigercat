@@ -20,6 +20,9 @@ import {
   getTourTargetRect,
   getTourPopoverPosition,
   getTourSpotlightStyle,
+  getActiveTourSteps,
+  getCurrentActiveTourStep,
+  getActiveTourStepPosition,
   closeIconPathD,
   type TourStep,
   type TourPlacement,
@@ -66,7 +69,14 @@ export const Tour = defineComponent({
   setup(props, { emit }) {
     const internalStep = ref(0)
     const currentStep = computed(() => props.current ?? internalStep.value)
-    const step = computed(() => props.steps[currentStep.value])
+    const activeSteps = computed(() => getActiveTourSteps(props.steps))
+    const activeStepInfo = computed(() =>
+      getCurrentActiveTourStep(activeSteps.value, currentStep.value, props.steps.length)
+    )
+    const activeStepPosition = computed(() =>
+      getActiveTourStepPosition(activeSteps.value, activeStepInfo.value?.index)
+    )
+    const step = computed(() => activeStepInfo.value?.step)
     const targetRect = ref<TourRect | undefined>()
     const popoverRef = ref<HTMLElement | null>(null)
 
@@ -110,8 +120,9 @@ export const Tour = defineComponent({
     }
 
     const next = () => {
-      if (currentStep.value < props.steps.length - 1) {
-        goTo(currentStep.value + 1)
+      const nextStep = activeSteps.value[activeStepPosition.value + 1]
+      if (nextStep) {
+        goTo(nextStep.index)
       } else {
         emit('finish')
         emit('update:open', false)
@@ -119,8 +130,9 @@ export const Tour = defineComponent({
     }
 
     const prev = () => {
-      if (currentStep.value > 0) {
-        goTo(currentStep.value - 1)
+      const prevStep = activeSteps.value[activeStepPosition.value - 1]
+      if (prevStep) {
+        goTo(prevStep.index)
       }
     }
 
@@ -134,8 +146,8 @@ export const Tour = defineComponent({
 
       const placement: TourPlacement = step.value.placement ?? 'bottom'
       const showMask = step.value.mask !== false
-      const isLast = currentStep.value === props.steps.length - 1
-      const isFirst = currentStep.value === 0
+      const isLast = activeStepPosition.value === activeSteps.value.length - 1
+      const isFirst = activeStepPosition.value <= 0
 
       // Position
       let popoverStyle: Record<string, string> = {}
@@ -208,7 +220,7 @@ export const Tour = defineComponent({
           h(
             'span',
             { class: tourIndicatorClasses },
-            `${currentStep.value + 1} / ${props.steps.length}`
+            `${activeStepPosition.value + 1} / ${activeSteps.value.length}`
           )
         )
       }

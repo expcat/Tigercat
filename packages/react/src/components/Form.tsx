@@ -13,6 +13,9 @@ import {
   type FormRules,
   type FormValues,
   type FormError,
+  type FormConditions,
+  type FormFieldCondition,
+  type FormConditionState,
   type FormLabelPosition,
   type FormLabelAlign,
   type FormSize,
@@ -23,6 +26,9 @@ import {
   getValueByPath,
   createFormErrorMap,
   getDependentFields,
+  createFormConditionDependencies,
+  resolveConditionalFormRules,
+  resolveFormFieldConditionState,
   createFormValidationDebouncer,
   createFormHistory,
   pushFormHistory,
@@ -48,6 +54,11 @@ export interface FormContextValue {
   errors: FormError[]
   errorsByField: Record<string, string | undefined>
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
+  registerFieldCondition: (fieldName: string, condition?: FormFieldCondition) => void
+  getFieldConditionState: (
+    fieldName: string,
+    conditionOverride?: FormFieldCondition
+  ) => FormConditionState
   validateField: (
     fieldName: string,
     rulesOverride?: FormRule | FormRule[],
@@ -129,6 +140,11 @@ export interface FormProps extends CoreFormProps {
   fieldDependencies?: Map<string, string[]>
 
   /**
+   * Conditional field behavior DSL for visibility, disabled state, and dynamic required rules.
+   */
+  conditions?: FormConditions
+
+  /**
    * Debounce delay for change-triggered field validation in milliseconds
    */
   validateDebounce?: number
@@ -163,6 +179,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
       onChange,
       className,
       fieldDependencies,
+      conditions,
       validateDebounce = 0,
       undoable = false,
       maxHistorySize = 50,
@@ -173,6 +190,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
     const [errors, setErrors] = useState<FormError[]>([])
     const [formValues, setFormValues] = useState<FormValues>(model)
     const fieldRulesRef = React.useRef<FormRules>({})
+    const fieldConditionsRef = React.useRef<FormConditions>({})
     const formValuesRef = React.useRef<FormValues>(model)
     const validationDebouncerRef = React.useRef<FormValidationDebouncer>(
       createFormValidationDebouncer({ delay: validateDebounce })
@@ -213,19 +231,84 @@ export const Form = forwardRef<FormHandle, FormProps>(
       []
     )
 
+    const registerFieldCondition = useCallback(
+      (fieldName: string, condition?: FormFieldCondition) => {
+        if (!fieldName) {
+          return
+        }
+
+        if (!condition) {
+          delete fieldConditionsRef.current[fieldName]
+          return
+        }
+
+        fieldConditionsRef.current[fieldName] = condition
+      },
+      []
+    )
+
+    const getEffectiveConditions = useCallback((): FormConditions | undefined => {
+      const merged = { ...(conditions ?? {}), ...fieldConditionsRef.current }
+      return Object.keys(merged).length > 0 ? merged : undefined
+    }, [conditions])
+
+    const getMergedFieldCondition = useCallback(
+      (
+        fieldName: string,
+        conditionOverride?: FormFieldCondition
+      ): FormFieldCondition | undefined => {
+        const base = getEffectiveConditions()?.[fieldName]
+        return base || conditionOverride
+          ? { ...(base ?? {}), ...(conditionOverride ?? {}) }
+          : undefined
+      },
+      [getEffectiveConditions]
+    )
+
+    const getFieldConditionState = useCallback(
+      (fieldName: string, conditionOverride?: FormFieldCondition): FormConditionState => {
+        return resolveFormFieldConditionState(
+          formValuesRef.current,
+          getMergedFieldCondition(fieldName, conditionOverride)
+        )
+      },
+      [getMergedFieldCondition]
+    )
+
     const getEffectiveRules = useCallback((): FormRules | undefined => {
       const fromForm = rules ?? {}
       const fromItems = fieldRulesRef.current
       const merged = { ...fromForm, ...fromItems }
-      return Object.keys(merged).length > 0 ? merged : undefined
-    }, [rules])
+      const nextRules = Object.keys(merged).length > 0 ? merged : undefined
+      return resolveConditionalFormRules(formValuesRef.current, nextRules, getEffectiveConditions())
+    }, [rules, getEffectiveConditions])
 
     const resolveFieldRules = useCallback(
       (fieldName: string, rulesOverride?: FormRule | FormRule[]) => {
-        return rulesOverride ?? fieldRulesRef.current[fieldName] ?? rules?.[fieldName]
+        const fieldRules = rulesOverride ?? fieldRulesRef.current[fieldName] ?? rules?.[fieldName]
+        const resolved = resolveConditionalFormRules(
+          formValuesRef.current,
+          fieldRules ? { [fieldName]: fieldRules } : undefined,
+          getEffectiveConditions()
+        )
+        return resolved?.[fieldName]
       },
-      [rules]
+      [rules, getEffectiveConditions]
     )
+
+    const getDependencyMap = useCallback((): Map<string, string[]> | undefined => {
+      const conditionDependencies = createFormConditionDependencies(getEffectiveConditions())
+      if (!fieldDependencies && conditionDependencies.size === 0) {
+        return undefined
+      }
+
+      const merged = new Map<string, string[]>(fieldDependencies ?? [])
+      for (const [fieldName, dependencies] of conditionDependencies.entries()) {
+        const current = merged.get(fieldName) ?? []
+        merged.set(fieldName, Array.from(new Set([...current, ...dependencies])))
+      }
+      return merged
+    }, [fieldDependencies, getEffectiveConditions])
 
     const runFieldValidation = useCallback(
       async (
@@ -251,6 +334,13 @@ export const Form = forwardRef<FormHandle, FormProps>(
         rulesOverride?: FormRule | FormRule[],
         trigger?: FormRuleTrigger
       ): Promise<void> => {
+        const conditionState = getFieldConditionState(fieldName)
+        if (!conditionState.shown || conditionState.disabled) {
+          setErrors((prevErrors) => prevErrors.filter((error) => error.field !== fieldName))
+          onValidate?.(fieldName, true, null)
+          return
+        }
+
         const fieldRules = resolveFieldRules(fieldName, rulesOverride)
         if (fieldRules) {
           const error = await runFieldValidation(fieldName, rulesOverride, trigger)
@@ -277,14 +367,15 @@ export const Form = forwardRef<FormHandle, FormProps>(
         }
 
         // v0.6.0: revalidate dependent fields (even if current field has no rules)
-        if (fieldDependencies) {
-          const dependents = getDependentFields(fieldName, fieldDependencies)
+        const dependencyMap = getDependencyMap()
+        if (dependencyMap) {
+          const dependents = getDependentFields(fieldName, dependencyMap)
           for (const dep of dependents) {
             await validateFieldNow(dep)
           }
         }
       },
-      [resolveFieldRules, runFieldValidation, onValidate, fieldDependencies]
+      [resolveFieldRules, runFieldValidation, onValidate, getFieldConditionState, getDependencyMap]
     )
 
     const validateField = useCallback(
@@ -545,6 +636,8 @@ export const Form = forwardRef<FormHandle, FormProps>(
         errors,
         errorsByField,
         registerFieldRules,
+        registerFieldCondition,
+        getFieldConditionState,
         validateField,
         clearValidate,
         updateValue
@@ -563,6 +656,8 @@ export const Form = forwardRef<FormHandle, FormProps>(
         errors,
         errorsByField,
         registerFieldRules,
+        registerFieldCondition,
+        getFieldConditionState,
         validateField,
         clearValidate,
         updateValue

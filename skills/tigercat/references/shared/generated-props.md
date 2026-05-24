@@ -436,6 +436,7 @@ update-command: pnpm docs:api
 | loading? | `boolean` | false | Whether the form is in a loading state (prevents submit) |
 | dynamicFields? | `boolean` | false | Enable dynamic field management (addField/removeField) |
 | fieldDependencies? | `Map<string, string[]>` | - | Field dependency map: key is the dependent field, value is array of fields it depends on When a dependency changes, the dependent field is re-validated |
+| conditions? | `FormConditions` | - | Conditional field behavior DSL for visibility, disabled state, and dynamic required rules. |
 | validateDebounce? | `number` | 0 | Debounce delay for change-triggered field validation in milliseconds. Blur, submit, and imperative validation still run immediately. |
 | undoable? | `boolean` | false | Enable undo/redo for form values |
 | maxHistorySize? | `number` | 50 | Maximum undo history size |
@@ -453,6 +454,7 @@ update-command: pnpm docs:api
 | showMessage? | `boolean` | true | Whether to show validation message |
 | size? | `FormSize` | - | Size (overrides form's size) |
 | errorDisplayMode? | `FormErrorDisplayMode` | 'inline' | Error display mode - 'inline': shows error below the field (default) - 'popup': shows error in a tooltip/popup on hover - 'block': shows error in a block-level alert |
+| condition? | `FormFieldCondition` | - | Conditional behavior for this field. Merged over form-level `conditions[name]`. |
 
 ### input.ts.ts
 

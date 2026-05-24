@@ -158,6 +158,77 @@ describe('Form', () => {
 
   // ==================== Validation Functionality ====================
   describe('Validation Functionality', () => {
+    it('supports conditional visibility and skips hidden field validation', async () => {
+      const formRef = React.createRef<FormHandle>()
+
+      function Demo() {
+        const [model, setModel] = useState({ accountType: 'personal', companyName: '' })
+        const rules: FormRules = {
+          companyName: [{ required: true, message: 'Company is required' }]
+        }
+
+        return (
+          <Form
+            ref={formRef}
+            model={model}
+            rules={rules}
+            conditions={{
+              companyName: { showWhen: { field: 'accountType', value: 'company' } }
+            }}>
+            <button
+              type="button"
+              onClick={() => setModel((current) => ({ ...current, accountType: 'company' }))}>
+              Company
+            </button>
+            <FormItem label="Company" name="companyName">
+              <input aria-label="companyName" value={model.companyName} readOnly />
+            </FormItem>
+          </Form>
+        )
+      }
+
+      render(<Demo />)
+
+      expect(screen.queryByLabelText('companyName')).not.toBeInTheDocument()
+      await act(async () => {
+        expect(await formRef.current?.validate()).toBe(true)
+      })
+
+      await userEvent.click(screen.getByRole('button', { name: 'Company' }))
+
+      expect(screen.getByLabelText('companyName')).toBeInTheDocument()
+      await act(async () => {
+        expect(await formRef.current?.validate()).toBe(false)
+      })
+      expect(await screen.findByText('Company is required')).toBeInTheDocument()
+    })
+
+    it('supports conditional disabled and required state on FormItem', async () => {
+      const formRef = React.createRef<FormHandle>()
+
+      render(
+        <Form ref={formRef} model={{ newsletter: true, locked: true, email: '' }}>
+          <FormItem
+            label="Email"
+            name="email"
+            condition={{
+              requiredWhen: { field: 'newsletter', value: true },
+              disabledWhen: { field: 'locked', value: true }
+            }}>
+            <input aria-label="email" readOnly />
+          </FormItem>
+        </Form>
+      )
+
+      expect(document.querySelector('.tiger-form-item__asterisk')).toBeInTheDocument()
+      expect(screen.getByLabelText('email')).toBeDisabled()
+
+      await act(async () => {
+        await formRef.current?.validateField('email')
+      })
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+
     it('validates with FormItem rules override on blur', async () => {
       const rules: FormRule[] = [{ required: true, message: 'Username is required' }]
       const formRef = React.createRef<FormHandle>()

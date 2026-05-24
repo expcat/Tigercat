@@ -113,6 +113,77 @@ export interface FormError {
 export type FormValues = Record<string, unknown>
 
 /**
+ * Operators supported by the Form conditional DSL.
+ */
+export type FormConditionOperator =
+  | 'equals'
+  | 'notEquals'
+  | 'truthy'
+  | 'falsy'
+  | 'empty'
+  | 'notEmpty'
+  | 'includes'
+  | 'notIncludes'
+  | 'gt'
+  | 'gte'
+  | 'lt'
+  | 'lte'
+
+/**
+ * A single condition evaluated against the form model.
+ */
+export interface FormCondition {
+  /** Field path to read from the form model. Supports dotted paths. */
+  field: string
+  /** Comparison operator. Defaults to `equals` when value is provided, otherwise `truthy`. */
+  operator?: FormConditionOperator
+  /** Comparison value for operators that need one. */
+  value?: unknown
+}
+
+/**
+ * One or more conditions. Arrays are evaluated with the field condition's `logic`.
+ */
+export type FormConditionInput = FormCondition | FormCondition[]
+
+/**
+ * How multiple conditions should be combined.
+ */
+export type FormConditionLogic = 'all' | 'any'
+
+/**
+ * Conditional behavior for a field.
+ */
+export interface FormFieldCondition {
+  /** Show the field only when these conditions pass. */
+  showWhen?: FormConditionInput
+  /** Hide the field when these conditions pass. */
+  hiddenWhen?: FormConditionInput
+  /** Disable the field when these conditions pass. */
+  disabledWhen?: FormConditionInput
+  /** Enable the field only when these conditions pass. */
+  enabledWhen?: FormConditionInput
+  /** Treat the field as required when these conditions pass. */
+  requiredWhen?: FormConditionInput
+  /** Logic for array conditions. @default 'all' */
+  logic?: FormConditionLogic
+}
+
+/**
+ * Conditional behavior mapped by field name.
+ */
+export type FormConditions = Record<string, FormFieldCondition>
+
+/**
+ * Resolved conditional state for a field.
+ */
+export interface FormConditionState {
+  shown: boolean
+  disabled: boolean
+  required: boolean
+}
+
+/**
  * Form validation result containing validity status and any errors
  */
 export interface FormValidationResult {
@@ -218,6 +289,11 @@ export interface FormProps {
   fieldDependencies?: Map<string, string[]>
 
   /**
+   * Conditional field behavior DSL for visibility, disabled state, and dynamic required rules.
+   */
+  conditions?: FormConditions
+
+  /**
    * Debounce delay for change-triggered field validation in milliseconds.
    * Blur, submit, and imperative validation still run immediately.
    * @default 0
@@ -295,6 +371,11 @@ export interface FormItemProps {
    * @default 'inline'
    */
   errorDisplayMode?: FormErrorDisplayMode
+
+  /**
+   * Conditional behavior for this field. Merged over form-level `conditions[name]`.
+   */
+  condition?: FormFieldCondition
 }
 
 // ---------------------------------------------------------------------------

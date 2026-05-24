@@ -113,6 +113,28 @@ describe('Tour', () => {
     })
   })
 
+  it('should skip conditional steps while navigating', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <Tour
+        steps={[baseSteps[0], { ...baseSteps[1], skipWhen: true }, baseSteps[2]]}
+        open={true}
+        onChange={onChange}
+      />
+    )
+
+    await waitFor(() => expect(screen.getByText('1 / 2')).toBeInTheDocument())
+    await user.click(screen.getByText('Next'))
+
+    expect(onChange).toHaveBeenCalledWith(2)
+    await waitFor(() => {
+      expect(screen.getByText('Step 3')).toBeInTheDocument()
+      expect(screen.getByText('2 / 2')).toBeInTheDocument()
+      expect(screen.queryByText('Step 2')).not.toBeInTheDocument()
+    })
+  })
+
   it('should render close button by default and emit onClose', async () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
