@@ -67,6 +67,34 @@ describe('Tabs', () => {
       expect(tab).toHaveClass('border')
       expect(tab).toHaveClass('rounded-t')
     })
+
+    it('handles icons, ignored non-pane children, and lazy destroyed panes', async () => {
+      render(
+        <Tabs type="editable-card" closable lazy destroyInactiveTabPane defaultActiveKey="1">
+          ignored child
+          <TabPane tabKey="1" label="Tab 1" icon={<span data-testid="tab-icon">I</span>}>
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2" closable={false}>
+            Content 2
+          </TabPane>
+          <TabPane tabKey="3" label="Tab 3" disabled>
+            Content 3
+          </TabPane>
+        </Tabs>
+      )
+
+      expect(screen.getByTestId('tab-icon')).toBeInTheDocument()
+      expect(screen.queryByText('ignored child')).not.toBeInTheDocument()
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
+      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Close Tab 2' })).not.toBeInTheDocument()
+
+      await fireEvent.click(screen.getByRole('tab', { name: 'Tab 2' }))
+
+      expect(screen.queryByText('Content 1')).not.toBeInTheDocument()
+      expect(screen.getByText('Content 2')).toBeInTheDocument()
+    })
   })
 
   describe('Props', () => {
@@ -298,6 +326,43 @@ describe('Tabs', () => {
 
       await fireEvent.keyDown(tab1, { key: 'Delete' })
       expect(onEdit).toHaveBeenCalledWith({ targetKey: '1', action: 'remove' })
+
+      await fireEvent.keyDown(tab1, { key: 'Backspace' })
+      expect(onEdit).toHaveBeenCalledWith({ targetKey: '1', action: 'remove' })
+    })
+
+    it('navigates vertical tabs and parses numeric tab keys from keyboard focus', async () => {
+      const onChange = vi.fn()
+      render(
+        <Tabs tabPosition="left" defaultActiveKey="1" onChange={onChange}>
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey={2} label="Tab 2">
+            Content 2
+          </TabPane>
+          <TabPane tabKey="3" label="Tab 3" disabled>
+            Content 3
+          </TabPane>
+        </Tabs>
+      )
+
+      const tab1 = screen.getByRole('tab', { name: 'Tab 1' })
+      const tab2 = screen.getByRole('tab', { name: 'Tab 2' })
+      tab1.focus()
+
+      await fireEvent.keyDown(tab1, { key: 'ArrowDown' })
+      expect(document.activeElement).toBe(tab2)
+      expect(onChange).toHaveBeenCalledWith(2)
+
+      await fireEvent.keyDown(tab2, { key: 'ArrowUp' })
+      expect(document.activeElement).toBe(tab1)
+
+      await fireEvent.keyDown(tab1, { key: 'End' })
+      expect(document.activeElement).toBe(tab2)
+
+      await fireEvent.keyDown(tab2, { key: 'Home' })
+      expect(document.activeElement).toBe(tab1)
     })
 
     it('should not call onChange when clicking the active tab', async () => {

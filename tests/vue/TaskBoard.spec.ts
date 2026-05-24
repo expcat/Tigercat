@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { h } from 'vue'
 import { TaskBoard } from '@expcat/tigercat-vue'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
@@ -146,6 +146,18 @@ describe('TaskBoard (Vue)', () => {
       })
       expect(screen.getAllByTestId('custom-header')).toHaveLength(3)
     })
+
+    it('renders custom column-footer slot', () => {
+      render(TaskBoard, {
+        props: { columns },
+        slots: {
+          'column-footer': ({ column }: { column: TaskBoardColumn }) =>
+            h('div', { 'data-testid': 'custom-footer' }, `Footer: ${column.title}`)
+        }
+      })
+      expect(screen.getAllByTestId('custom-footer')).toHaveLength(3)
+      expect(screen.getByText('Footer: Done')).toBeInTheDocument()
+    })
   })
 
   describe('Add card', () => {
@@ -162,6 +174,60 @@ describe('TaskBoard (Vue)', () => {
       const addBtns = screen.getAllByText('Add task')
       await fireEvent.click(addBtns[0])
       expect(emitted()['card-add']).toBeTruthy()
+    })
+
+    it('fires card-add emit from keyboard activation', async () => {
+      const { emitted } = render(TaskBoard, { props: { columns, allowAddCard: true } })
+      const addBtns = screen.getAllByText('Add task')
+
+      await fireEvent.keyDown(addBtns[1].closest('[role="button"]')!, { key: 'Enter' })
+      await fireEvent.keyDown(addBtns[2].closest('[role="button"]')!, { key: ' ' })
+
+      expect(emitted()['card-add']).toEqual([['doing'], ['done']])
+    })
+  })
+
+  describe('DnD events', () => {
+    it('emits card-move after drag and drop', async () => {
+      const { container, emitted } = render(TaskBoard, { props: { columns } })
+      const card = container.querySelector('[data-tiger-taskboard-card-id="c1"]')!
+      const targetBody = container
+        .querySelectorAll('[data-tiger-taskboard-column]')[1]
+        .querySelector('[role="list"]')!
+      const dragData = JSON.stringify({ type: 'card', cardId: 'c1', columnId: 'todo', index: 0 })
+
+      await fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      await fireEvent.dragOver(targetBody, { clientY: 150 })
+      await fireEvent.drop(targetBody, {
+        dataTransfer: { getData: () => dragData, effectAllowed: '' }
+      })
+
+      await waitFor(() => expect(emitted()['card-move']).toBeTruthy())
+      expect(emitted()['card-move'][0][0]).toMatchObject({
+        cardId: 'c1',
+        fromColumnId: 'todo',
+        toColumnId: 'doing'
+      })
+    })
+
+    it('honors beforeCardMove cancellation', async () => {
+      const beforeCardMove = vi.fn(() => false)
+      const { container, emitted } = render(TaskBoard, { props: { columns, beforeCardMove } })
+      const card = container.querySelector('[data-tiger-taskboard-card-id="c1"]')!
+      const targetBody = container
+        .querySelectorAll('[data-tiger-taskboard-column]')[1]
+        .querySelector('[role="list"]')!
+      const dragData = JSON.stringify({ type: 'card', cardId: 'c1', columnId: 'todo', index: 0 })
+
+      await fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      await fireEvent.dragOver(targetBody, { clientY: 150 })
+      await fireEvent.drop(targetBody, {
+        dataTransfer: { getData: () => dragData, effectAllowed: '' }
+      })
+
+      await waitFor(() => expect(beforeCardMove).toHaveBeenCalled())
+      expect(emitted()['card-move']).toBeUndefined()
+      expect(emitted()['update:columns']).toBeUndefined()
     })
   })
 
@@ -310,6 +376,19 @@ describe('TaskBoard (Vue)', () => {
       expect(emitted()['column-add']).toBeTruthy()
     })
 
+    it('emits column-add from keyboard activation', async () => {
+      const { container, emitted } = render(TaskBoard, {
+        props: { columns, allowAddColumn: true }
+      })
+      const buttons = container.querySelectorAll('[role="button"][tabindex="0"]')
+      const addColBtn = buttons[buttons.length - 1]
+
+      await fireEvent.keyDown(addColBtn, { key: 'Enter' })
+      await fireEvent.keyDown(addColBtn, { key: ' ' })
+
+      expect(emitted()['column-add']).toHaveLength(2)
+    })
+
     it('does not render add-column button by default', () => {
       const { container } = render(TaskBoard, { props: { columns } })
       // Without allowAddColumn, the add-column button should not exist
@@ -336,6 +415,17 @@ describe('TaskBoard (Vue)', () => {
       ]
       render(TaskBoard, { props: { columns: colsWithDesc } })
       expect(screen.getByText('Column description text')).toBeInTheDocument()
+    })
+  })
+  describe('Controlled columns', () => {
+    it('updates rendered columns when controlled columns change', async () => {
+      const { rerender } = render(TaskBoard, { props: { columns: columns.slice(0, 1) } })
+      expect(screen.getByText('To Do')).toBeInTheDocument()
+      expect(screen.queryByText('Done')).not.toBeInTheDocument()
+
+      await rerender({ columns })
+
+      expect(screen.getByText('Done')).toBeInTheDocument()
     })
   })
   describe('Accessibility', () => {

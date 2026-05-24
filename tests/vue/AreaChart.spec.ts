@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
+import { fireEvent } from '@testing-library/vue'
 import { AreaChart } from '@expcat/tigercat-vue'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -184,6 +185,47 @@ describe('AreaChart', () => {
 
     const seriesGroup = container.querySelector('g[data-series-type="area"]')
     expect(seriesGroup?.getAttribute('class')).toContain('outline-none')
+  })
+
+  it('handles series, legend, point, and keyboard interactions', async () => {
+    const { container, emitted } = renderWithProps(AreaChart, {
+      series: [
+        { name: 'Series A', data: basicData, showPoints: true, pointHollow: true },
+        { name: 'Series B', data: basicData, showPoints: true, strokeDasharray: '4 2' }
+      ],
+      showPoints: true,
+      hoverable: true,
+      selectable: true,
+      showLegend: true,
+      pointGradient: true,
+      strokeGradient: true,
+      animated: true,
+      legendFormatter: (series: { name?: string }, index: number) => `${index}:${series.name}`,
+      tooltipFormatter: (datum: { y: number }, seriesIndex: number) => `s${seriesIndex}:${datum.y}`,
+      ...defaultSize
+    })
+
+    const seriesGroups = container.querySelectorAll('g[data-series-type="area"]')
+    await fireEvent.mouseEnter(seriesGroups[0])
+    await fireEvent.mouseLeave(seriesGroups[0])
+    await fireEvent.click(seriesGroups[0])
+    await fireEvent.keyDown(seriesGroups[0], { key: 'Enter' })
+    await fireEvent.keyDown(seriesGroups[0], { key: 'Escape' })
+
+    expect(emitted()['series-hover']).toBeTruthy()
+    expect(emitted()['series-click']).toBeTruthy()
+    expect(emitted()['update:selectedIndex']).toBeTruthy()
+
+    const point = container.querySelector('circle[data-point-index="0"]')!
+    await fireEvent.mouseEnter(point, { clientX: 10, clientY: 20 })
+    await fireEvent.mouseMove(point, { clientX: 30, clientY: 40 })
+    await fireEvent.click(point)
+    await fireEvent.mouseLeave(point)
+
+    expect(emitted()['point-hover']).toBeTruthy()
+    expect(emitted()['point-click']).toBeTruthy()
+    expect(container.querySelector('radialGradient')).toBeInTheDocument()
+    expect(container.querySelector('linearGradient[id*="stroke"]')).toBeInTheDocument()
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {

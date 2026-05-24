@@ -9,7 +9,9 @@ const coreComponentCases = [
   { component: 'button', path: '/button', sectionTitle: '按钮类型' },
   { component: 'input', path: '/input', sectionTitle: '基础用法' },
   { component: 'card', path: '/card', sectionTitle: '卡片变体' },
-  { component: 'form', path: '/form', sectionTitle: '基础用法' }
+  { component: 'form', path: '/form', sectionTitle: '基础用法' },
+  { component: 'table', path: '/table', sectionTitle: '基础用法' },
+  { component: 'tabs', path: '/tabs', sectionTitle: '基本用法' }
 ] as const
 
 async function preparePage(page: Page, url: string): Promise<void> {

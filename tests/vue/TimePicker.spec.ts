@@ -146,6 +146,123 @@ describe('TimePicker', () => {
     expect(emitted()).toHaveProperty('update:modelValue')
   })
 
+  it('renders seconds column and selects a second value', async () => {
+    const { container, emitted } = renderWithProps(TimePicker, {
+      showSeconds: true,
+      modelValue: '10:15:20'
+    })
+
+    await fireEvent.click(container.querySelector('input') as HTMLInputElement)
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+    const secondButton = dialog.querySelector<HTMLButtonElement>(
+      'button[data-tiger-timepicker-unit="second"][aria-label="5 seconds"]'
+    )!
+
+    await fireEvent.click(secondButton)
+    const updates = emitted()['update:modelValue'] as Array<[string]>
+    expect(updates.at(-1)?.[0]).toBe('10:15:05')
+  })
+
+  it('supports 12-hour period selection and Home/End keyboard movement', async () => {
+    const { container, emitted } = renderWithProps(TimePicker, {
+      format: '12',
+      modelValue: '02:30'
+    })
+
+    await fireEvent.click(container.querySelector('input') as HTMLInputElement)
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+    const pmButton = dialog.querySelector<HTMLButtonElement>(
+      'button[data-tiger-timepicker-unit="period"][aria-label="PM"]'
+    )!
+
+    pmButton.focus()
+    await fireEvent.keyDown(dialog, { key: 'Home' })
+    await fireEvent.keyDown(dialog, { key: 'End' })
+    await fireEvent.keyDown(dialog, { key: 'Enter' })
+    const updates = emitted()['update:modelValue'] as Array<[string]>
+    expect(updates.at(-1)?.[0]).toBe('14:30')
+  })
+
+  it('keeps range values ordered when selecting start or end out of order', async () => {
+    const { container, emitted } = renderWithProps(TimePicker, {
+      range: true,
+      modelValue: ['10:00', '11:00']
+    })
+
+    await fireEvent.click(container.querySelector('input') as HTMLInputElement)
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+
+    await fireEvent.click(dialog.querySelector<HTMLButtonElement>('button[aria-label="Start"]')!)
+    await fireEvent.click(
+      dialog.querySelector<HTMLButtonElement>(
+        'button[data-tiger-timepicker-unit="hour"][aria-label="12 hours"]'
+      )!
+    )
+    let updates = emitted()['update:modelValue'] as Array<[unknown]>
+    expect(updates.at(-1)?.[0]).toEqual(['12:00', '12:00'])
+
+    await fireEvent.click(dialog.querySelector<HTMLButtonElement>('button[aria-label="End"]')!)
+    await fireEvent.click(
+      dialog.querySelector<HTMLButtonElement>(
+        'button[data-tiger-timepicker-unit="hour"][aria-label="9 hours"]'
+      )!
+    )
+    updates = emitted()['update:modelValue'] as Array<[unknown]>
+    expect(updates.at(-1)?.[0]).toEqual(['10:00', '10:00'])
+  })
+
+  it('does not open when disabled or readonly', async () => {
+    const { container, rerender } = renderWithProps(TimePicker, { disabled: true })
+
+    await fireEvent.click(container.querySelector('button[aria-label="Toggle time picker"]')!)
+    expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+
+    await rerender({ disabled: false, readonly: true })
+    await fireEvent.click(container.querySelector('button[aria-label="Toggle time picker"]')!)
+    expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+  })
+
+  it('closes on outside click and supports Now/OK footer actions', async () => {
+    const { container, emitted } = renderWithProps(TimePicker, { modelValue: null })
+
+    await fireEvent.click(container.querySelector('input') as HTMLInputElement)
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const nowButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Now'
+    ) as HTMLButtonElement
+    await fireEvent.click(nowButton)
+    expect(emitted()).toHaveProperty('update:modelValue')
+
+    const okButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === 'OK'
+    ) as HTMLButtonElement
+    await fireEvent.click(okButton)
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument())
+
+    await fireEvent.click(container.querySelector('input') as HTMLInputElement)
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    await fireEvent.click(document.body)
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument())
+  })
+
+  it('passes native input attributes and custom class to the wrapper', () => {
+    const { container } = renderWithProps(TimePicker, {
+      id: 'meeting-time',
+      name: 'meeting',
+      required: true,
+      class: 'custom-picker'
+    })
+    const input = container.querySelector('input') as HTMLInputElement
+
+    expect(input).toHaveAttribute('id', 'meeting-time')
+    expect(input).toHaveAttribute('name', 'meeting')
+    expect(input).toBeRequired()
+    expect(container.firstElementChild).toHaveClass('custom-picker')
+  })
+
   it('passes accessibility checks', async () => {
     const { container } = renderWithProps(TimePicker, { modelValue: '14:30' })
     await expectNoA11yViolationsIsolated(container)

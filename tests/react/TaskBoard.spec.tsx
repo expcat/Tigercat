@@ -4,7 +4,7 @@
 
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { TaskBoard } from '@expcat/tigercat-react'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
@@ -136,6 +136,17 @@ describe('TaskBoard (React)', () => {
       )
       expect(screen.getAllByTestId('custom-header')).toHaveLength(3)
     })
+
+    it('renders custom column footer via renderColumnFooter', () => {
+      render(
+        <TaskBoard
+          columns={columns}
+          renderColumnFooter={(col) => <div data-testid="custom-footer">Footer: {col.title}</div>}
+        />
+      )
+      expect(screen.getAllByTestId('custom-footer')).toHaveLength(3)
+      expect(screen.getByText('Footer: Done')).toBeInTheDocument()
+    })
   })
 
   describe('Add card', () => {
@@ -152,6 +163,18 @@ describe('TaskBoard (React)', () => {
       const addBtns = screen.getAllByText('Add task')
       await fireEvent.click(addBtns[0])
       expect(onCardAdd).toHaveBeenCalledWith('todo')
+    })
+
+    it('calls onCardAdd from keyboard activation', async () => {
+      const onCardAdd = vi.fn()
+      render(<TaskBoard columns={columns} allowAddCard onCardAdd={onCardAdd} />)
+      const addBtns = screen.getAllByText('Add task')
+
+      await fireEvent.keyDown(addBtns[1].closest('[role="button"]')!, { key: 'Enter' })
+      await fireEvent.keyDown(addBtns[2].closest('[role="button"]')!, { key: ' ' })
+
+      expect(onCardAdd).toHaveBeenCalledWith('doing')
+      expect(onCardAdd).toHaveBeenCalledWith('done')
     })
   })
 
@@ -174,7 +197,7 @@ describe('TaskBoard (React)', () => {
   })
 
   describe('DnD events', () => {
-    it('calls onCardMove after drag and drop', () => {
+    it('calls onCardMove after drag and drop', async () => {
       const onCardMove = vi.fn()
       const { container } = render(<TaskBoard columns={columns} onCardMove={onCardMove} />)
 
@@ -204,13 +227,43 @@ describe('TaskBoard (React)', () => {
         }
       })
 
-      expect(onCardMove).toHaveBeenCalledWith(
-        expect.objectContaining({
-          cardId: 'c1',
-          fromColumnId: 'todo',
-          toColumnId: 'doing'
-        })
+      await waitFor(() => {
+        expect(onCardMove).toHaveBeenCalledWith(
+          expect.objectContaining({
+            cardId: 'c1',
+            fromColumnId: 'todo',
+            toColumnId: 'doing'
+          })
+        )
+      })
+    })
+
+    it('honors beforeCardMove cancellation', async () => {
+      const beforeCardMove = vi.fn(() => false)
+      const onCardMove = vi.fn()
+      const onColumnsChange = vi.fn()
+      const { container } = render(
+        <TaskBoard
+          columns={columns}
+          beforeCardMove={beforeCardMove}
+          onCardMove={onCardMove}
+          onColumnsChange={onColumnsChange}
+        />
       )
+
+      const card = container.querySelector('[data-tiger-taskboard-card-id="c1"]')!
+      const targetBody = container
+        .querySelectorAll('[data-tiger-taskboard-column]')[1]
+        .querySelector('[role="list"]')!
+      const dragData = JSON.stringify({ type: 'card', cardId: 'c1', columnId: 'todo', index: 0 })
+
+      fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      fireEvent.dragOver(targetBody, { clientY: 150 })
+      fireEvent.drop(targetBody, { dataTransfer: { getData: () => dragData, effectAllowed: '' } })
+
+      await waitFor(() => expect(beforeCardMove).toHaveBeenCalled())
+      expect(onCardMove).not.toHaveBeenCalled()
+      expect(onColumnsChange).not.toHaveBeenCalled()
     })
 
     it('calls onColumnMove after column drag and drop', () => {
@@ -388,6 +441,17 @@ describe('TaskBoard (React)', () => {
       expect(onColumnAdd).toHaveBeenCalled()
     })
 
+    it('calls onColumnAdd from keyboard activation', async () => {
+      const onColumnAdd = vi.fn()
+      render(<TaskBoard columns={columns} allowAddColumn onColumnAdd={onColumnAdd} />)
+      const addBtn = screen.getByText('+ Add column')
+
+      await fireEvent.keyDown(addBtn, { key: 'Enter' })
+      await fireEvent.keyDown(addBtn, { key: ' ' })
+
+      expect(onColumnAdd).toHaveBeenCalledTimes(2)
+    })
+
     it('does not show add-column button by default', () => {
       render(<TaskBoard columns={columns} />)
       expect(screen.queryByText('+ Add column')).not.toBeInTheDocument()
@@ -406,6 +470,17 @@ describe('TaskBoard (React)', () => {
       ]
       render(<TaskBoard columns={colsWithDesc} />)
       expect(screen.getByText('Column description text')).toBeInTheDocument()
+    })
+  })
+  describe('Controlled columns', () => {
+    it('updates rendered columns when controlled columns change', () => {
+      const { rerender } = render(<TaskBoard columns={columns.slice(0, 1)} />)
+      expect(screen.getByText('To Do')).toBeInTheDocument()
+      expect(screen.queryByText('Done')).not.toBeInTheDocument()
+
+      rerender(<TaskBoard columns={columns} />)
+
+      expect(screen.getByText('Done')).toBeInTheDocument()
     })
   })
   describe('Accessibility', () => {

@@ -8,6 +8,7 @@ import {
   type TaskBoardColumn,
   type TaskBoardCard
 } from '@expcat/tigercat-core'
+import { installFrameScheduler } from '../utils/frame-scheduler'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -74,6 +75,39 @@ function makeDT(json?: string): DataTransfer {
   } as unknown as DataTransfer
 }
 
+function makeRect(left: number, top: number, width: number, height: number): DOMRect {
+  return { left, top, width, height, right: left + width, bottom: top + height } as DOMRect
+}
+
+function makeTouchEvent(x: number, y: number): TouchEvent {
+  return {
+    touches: [{ clientX: x, clientY: y }],
+    preventDefault: vi.fn()
+  } as unknown as TouchEvent
+}
+
+function makeBoardWithColumns() {
+  const board = document.createElement('div')
+  const todo = document.createElement('div')
+  const doing = document.createElement('div')
+  todo.setAttribute('data-tiger-taskboard-column', '')
+  todo.setAttribute('data-tiger-taskboard-column-id', 'todo')
+  doing.setAttribute('data-tiger-taskboard-column', '')
+  doing.setAttribute('data-tiger-taskboard-column-id', 'doing')
+  vi.spyOn(todo, 'getBoundingClientRect').mockReturnValue(makeRect(0, 0, 100, 200))
+  vi.spyOn(doing, 'getBoundingClientRect').mockReturnValue(makeRect(100, 0, 100, 200))
+
+  for (let index = 0; index < 2; index++) {
+    const card = document.createElement('div')
+    card.setAttribute('data-tiger-taskboard-card', '')
+    vi.spyOn(card, 'getBoundingClientRect').mockReturnValue(makeRect(0, index * 40, 100, 40))
+    doing.appendChild(card)
+  }
+
+  board.append(todo, doing)
+  return { board, todo, doing }
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -133,6 +167,38 @@ describe('createTaskBoardDragController', () => {
       expect(cbs.applyCardMoveFn).toHaveBeenCalledWith('c1', 'todo', 'doing', 1)
     })
 
+    it('cardDragOver updates drop target and insertion index', () => {
+      const body = document.createElement('div')
+      const first = document.createElement('div')
+      const second = document.createElement('div')
+      first.setAttribute('data-tiger-taskboard-card', '')
+      second.setAttribute('data-tiger-taskboard-card', '')
+      vi.spyOn(first, 'getBoundingClientRect').mockReturnValue(makeRect(0, 0, 100, 40))
+      vi.spyOn(second, 'getBoundingClientRect').mockReturnValue(makeRect(0, 40, 100, 40))
+      body.append(first, second)
+
+      ctrl.cardDragStart(makeDT(), card0, col0)
+      ctrl.cardDragOver(10, body, cols[1])
+
+      expect(cbs.lastSnap.dropTargetColumnId).toBe('doing')
+      expect(cbs.lastSnap.dropIndex).toBe(0)
+    })
+
+    it('cardDragOver ignores non-card drags', () => {
+      ctrl.columnDragStart(makeDT(), col0, 0)
+      ctrl.cardDragOver(10, document.createElement('div'), cols[1])
+
+      expect(cbs.lastSnap.dropTargetColumnId).toBeNull()
+      expect(cbs.lastSnap.dropIndex).toBe(-1)
+    })
+
+    it('cardDrop ignores invalid and non-card data', () => {
+      ctrl.cardDrop(makeDT('not-json'), cols[1])
+      ctrl.cardDrop(makeDT(JSON.stringify({ type: 'column', columnId: 'todo', index: 0 })), cols[1])
+
+      expect(cbs.applyCardMoveFn).not.toHaveBeenCalled()
+    })
+
     it('dragEnd resets state', () => {
       ctrl.cardDragStart(makeDT(), card0, col0)
       expect(cbs.lastSnap.drag).not.toBeNull()
@@ -184,6 +250,24 @@ describe('createTaskBoardDragController', () => {
       const before = ctrl.getSnapshot()
       ctrl.columnDragOver()
       expect(ctrl.getSnapshot()).toBe(before)
+    })
+
+    it('columnDrop computes destination index from board columns', () => {
+      const { board } = makeBoardWithColumns()
+      cbs = createMockCallbacks({ getBoardEl: () => board })
+      ctrl = createTaskBoardDragController(cbs)
+
+      ctrl.columnDrop(makeDT(JSON.stringify({ type: 'column', columnId: 'todo', index: 0 })), 175)
+
+      expect(cbs.applyColumnMoveFn).toHaveBeenCalledWith(0, 2)
+    })
+
+    it('columnDrop ignores invalid data and missing board columns', () => {
+      ctrl.columnDrop(makeDT('not-json'), 100)
+      ctrl.columnDrop(makeDT(JSON.stringify({ type: 'card', cardId: 'c1' })), 100)
+      ctrl.columnDrop(makeDT(JSON.stringify({ type: 'column', columnId: 'todo', index: 0 })), 100)
+
+      expect(cbs.applyColumnMoveFn).not.toHaveBeenCalled()
     })
   })
 
@@ -242,7 +326,10 @@ describe('createTaskBoardDragController', () => {
   describe('touch card drag', () => {
     it('cardTouchStart does nothing without init', () => {
       // touch tracker not created until init()
-      const evt = { touches: [{ clientX: 0, clientY: 0 }], preventDefault: vi.fn() } as unknown as TouchEvent
+      const evt = {
+        touches: [{ clientX: 0, clientY: 0 }],
+        preventDefault: vi.fn()
+      } as unknown as TouchEvent
       ctrl.cardTouchStart(evt, document.createElement('div'), card0, col0)
       expect(cbs.lastSnap.drag).toBeNull()
     })
@@ -250,6 +337,55 @@ describe('createTaskBoardDragController', () => {
     it('cardTouchEnd does nothing without active drag', () => {
       // Should not throw
       ctrl.cardTouchEnd()
+      expect(cbs.lastSnap.drag).toBeNull()
+    })
+
+    it('moves a touched card to the detected column', () => {
+      const frames = installFrameScheduler()
+      const { board, doing } = makeBoardWithColumns()
+      const elementFromPoint = vi.spyOn(document, 'elementFromPoint').mockReturnValue(doing)
+      Object.defineProperty(navigator, 'maxTouchPoints', { value: 1, configurable: true })
+      cbs = createMockCallbacks({ getBoardEl: () => board })
+      ctrl = createTaskBoardDragController(cbs)
+      ctrl.init()
+
+      ctrl.cardTouchStart(makeTouchEvent(10, 10), document.createElement('div'), card0, col0)
+      ctrl.cardTouchMove(makeTouchEvent(150, 70))
+      frames.flush()
+      ctrl.cardTouchEnd()
+
+      expect(cbs.applyCardMoveFn).toHaveBeenCalledWith('c1', 'todo', 'doing', 2)
+
+      elementFromPoint.mockRestore()
+      vi.unstubAllGlobals()
+    })
+  })
+
+  describe('touch column drag', () => {
+    it('moves a touched column by final x position', () => {
+      const { board } = makeBoardWithColumns()
+      Object.defineProperty(navigator, 'maxTouchPoints', { value: 1, configurable: true })
+      cbs = createMockCallbacks({ getBoardEl: () => board })
+      ctrl = createTaskBoardDragController(cbs)
+      ctrl.init()
+
+      ctrl.columnTouchStart(makeTouchEvent(10, 10), document.createElement('div'), col0, 0)
+      ctrl.columnTouchMove(makeTouchEvent(175, 10))
+      ctrl.columnTouchEnd()
+
+      expect(cbs.applyColumnMoveFn).toHaveBeenCalledWith(0, 2)
+    })
+
+    it('resets a touched column when the board has no columns', () => {
+      Object.defineProperty(navigator, 'maxTouchPoints', { value: 1, configurable: true })
+      cbs = createMockCallbacks({ getBoardEl: () => null })
+      ctrl = createTaskBoardDragController(cbs)
+      ctrl.init()
+
+      ctrl.columnTouchStart(makeTouchEvent(10, 10), document.createElement('div'), col0, 0)
+      ctrl.columnTouchEnd()
+
+      expect(cbs.applyColumnMoveFn).not.toHaveBeenCalled()
       expect(cbs.lastSnap.drag).toBeNull()
     })
   })

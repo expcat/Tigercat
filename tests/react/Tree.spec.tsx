@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Tree } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
@@ -67,6 +67,21 @@ describe('Tree', () => {
       expect(screen.getByText('Child 1-1')).toBeInTheDocument()
       expect(screen.getByText('Child 1-2')).toBeInTheDocument()
       expect(screen.getByText('Child 2-1')).toBeInTheDocument()
+    })
+
+    it('renders node icons and connector lines', () => {
+      const iconData = [
+        {
+          key: '1',
+          label: 'Parent 1',
+          icon: <span data-testid="tree-icon">I</span>,
+          children: [{ key: '1-1', label: 'Child 1-1' }]
+        }
+      ]
+      const { container } = render(<Tree treeData={iconData} defaultExpandAll showLine />)
+
+      expect(screen.getByTestId('tree-icon')).toBeInTheDocument()
+      expect(container.querySelector('.border-l')).toBeInTheDocument()
     })
   })
 
@@ -259,6 +274,60 @@ describe('Tree', () => {
       const checkedKeys = last?.[0] as Array<string | number>
       expect(checkedKeys).toContain('1')
       expect(checkedKeys).not.toContain('1-1')
+    })
+
+    it('handles Home, End, ArrowUp, ArrowLeft, Escape, and expandable Space paths', async () => {
+      const user = userEvent.setup()
+
+      render(<Tree treeData={sampleTreeData} defaultExpandAll selectable={false} />)
+
+      const items = screen.getAllByRole('treeitem')
+      act(() => {
+        items[2].focus()
+      })
+
+      await user.keyboard('{Home}')
+      await waitFor(() => expect(document.activeElement).toBe(items[0]))
+
+      await user.keyboard('{End}')
+      await waitFor(() => expect(document.activeElement).toBe(items[4]))
+
+      await user.keyboard('{ArrowUp}')
+      await waitFor(() => expect(document.activeElement).toBe(items[3]))
+
+      await user.keyboard('{ArrowLeft}')
+      await waitFor(() => expect(screen.queryByText('Child 2-1')).not.toBeInTheDocument())
+
+      const child = screen.getByText('Child 1-1').closest('[role="treeitem"]') as HTMLElement
+      act(() => {
+        child.focus()
+      })
+      await user.keyboard('{Escape}')
+      await waitFor(() => expect(screen.queryByText('Child 1-1')).not.toBeInTheDocument())
+
+      const parent = screen.getByText('Parent 1').closest('[role="treeitem"]') as HTMLElement
+      act(() => {
+        parent.focus()
+      })
+      await user.keyboard(' ')
+      await waitFor(() => expect(screen.getByText('Child 1-1')).toBeInTheDocument())
+    })
+
+    it('uses Enter to expand when selection is disabled', async () => {
+      const user = userEvent.setup()
+
+      render(<Tree treeData={sampleTreeData} selectionMode="none" />)
+      const parent = screen.getAllByRole('treeitem')[0]
+      act(() => {
+        parent.focus()
+      })
+
+      await user.keyboard('{Enter}')
+
+      await waitFor(() => {
+        expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+        expect(parent).not.toHaveAttribute('aria-selected')
+      })
     })
   })
 
@@ -544,6 +613,60 @@ describe('Tree', () => {
         ) as HTMLInputElement
         expect(updatedCheckbox.checked).toBe(true)
       })
+    })
+
+    it('supports controlled selected keys and multiple selection mode', () => {
+      render(
+        <Tree
+          treeData={sampleTreeData}
+          defaultExpandAll
+          selectionMode="multiple"
+          selectedKeys={['1', '1-1']}
+        />
+      )
+
+      expect(screen.getByText('Parent 1').closest('[role="treeitem"]')).toHaveAttribute(
+        'aria-selected',
+        'true'
+      )
+      expect(screen.getByText('Child 1-1').closest('[role="treeitem"]')).toHaveAttribute(
+        'aria-selected',
+        'true'
+      )
+      expect(screen.getByRole('tree')).toHaveAttribute('aria-multiselectable', 'true')
+    })
+  })
+
+  describe('Drag and drop', () => {
+    it('emits onDrop for different draggable tree nodes', () => {
+      const onDrop = vi.fn()
+      const { container } = render(
+        <Tree treeData={sampleTreeData} defaultExpandAll draggable onDrop={onDrop} />
+      )
+      const items = container.querySelectorAll('[role="treeitem"]')
+
+      fireEvent.dragStart(items[1])
+      fireEvent.dragOver(items[2])
+      fireEvent.drop(items[2])
+
+      expect(onDrop).toHaveBeenCalledWith({ dragKey: '1-1', dropKey: '1-2' })
+    })
+
+    it('ignores self drops and disabled draggable nodes', () => {
+      const onDrop = vi.fn()
+      const disabledData = [
+        { key: 'disabled', label: 'Disabled', disabled: true },
+        { key: 'target', label: 'Target' }
+      ]
+      const { container } = render(<Tree treeData={disabledData} draggable onDrop={onDrop} />)
+      const items = container.querySelectorAll('[role="treeitem"]')
+
+      expect(items[0]).not.toHaveAttribute('draggable')
+      fireEvent.dragStart(items[1])
+      fireEvent.drop(items[1])
+      fireEvent.dragEnd(items[1])
+
+      expect(onDrop).not.toHaveBeenCalled()
     })
   })
 

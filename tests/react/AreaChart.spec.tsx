@@ -2,7 +2,8 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+import { fireEvent } from '@testing-library/react'
 import { AreaChart } from '@expcat/tigercat-react'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 
@@ -184,6 +185,63 @@ describe('AreaChart', () => {
 
     const seriesGroup = container.querySelector('g[data-series-type="area"]')
     expect(seriesGroup?.getAttribute('class')).toContain('outline-none')
+  })
+
+  it('handles series, legend, point, and keyboard interactions', () => {
+    const onHoveredIndexChange = vi.fn()
+    const onSelectedIndexChange = vi.fn()
+    const onSeriesHover = vi.fn()
+    const onSeriesClick = vi.fn()
+    const onPointHover = vi.fn()
+    const onPointClick = vi.fn()
+
+    const { container } = renderWithProps(AreaChart, {
+      series: [
+        { name: 'Series A', data: basicData, showPoints: true, pointHollow: true },
+        { name: 'Series B', data: basicData, showPoints: true, strokeDasharray: '4 2' }
+      ],
+      showPoints: true,
+      hoverable: true,
+      selectable: true,
+      showLegend: true,
+      pointGradient: true,
+      strokeGradient: true,
+      animated: true,
+      legendFormatter: (series, index) => `${index}:${series.name}`,
+      tooltipFormatter: (datum, seriesIndex) => `s${seriesIndex}:${datum.y}`,
+      onHoveredIndexChange,
+      onSelectedIndexChange,
+      onSeriesHover,
+      onSeriesClick,
+      onPointHover,
+      onPointClick,
+      ...defaultSize
+    })
+
+    const seriesGroups = container.querySelectorAll('g[data-series-type="area"]')
+    fireEvent.mouseEnter(seriesGroups[0])
+    fireEvent.mouseLeave(seriesGroups[0])
+    fireEvent.click(seriesGroups[0])
+    fireEvent.keyDown(seriesGroups[0], { key: 'Enter' })
+    fireEvent.keyDown(seriesGroups[0], { key: 'Escape' })
+
+    expect(onHoveredIndexChange).toHaveBeenCalledWith(expect.any(Number))
+    expect(onSeriesHover).toHaveBeenCalledWith(expect.any(Number), expect.any(Object))
+    expect(onSeriesHover).toHaveBeenCalledWith(null, null)
+    expect(onSelectedIndexChange).toHaveBeenCalledWith(expect.any(Number))
+    expect(onSeriesClick).toHaveBeenCalled()
+
+    const point = container.querySelector('circle[data-point-index="0"]')!
+    fireEvent.mouseEnter(point, { clientX: 10, clientY: 20 })
+    fireEvent.mouseMove(point, { clientX: 30, clientY: 40 })
+    fireEvent.click(point)
+    fireEvent.mouseLeave(point)
+
+    expect(onPointHover).toHaveBeenCalledWith(expect.any(Number), 0, expect.any(Object))
+    expect(onPointHover).toHaveBeenCalledWith(null, null, null)
+    expect(onPointClick).toHaveBeenCalledWith(expect.any(Number), 0, expect.any(Object))
+    expect(container.querySelector('radialGradient')).toBeInTheDocument()
+    expect(container.querySelector('linearGradient[id*="stroke"]')).toBeInTheDocument()
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {

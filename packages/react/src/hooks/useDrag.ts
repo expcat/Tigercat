@@ -118,15 +118,12 @@ export function useDrag(options: UseDragOptions = {}): UseDragReturn {
   const drop = useCallback(
     (event?: React.DragEvent): DragDropEvent | null => {
       if (event) event.preventDefault()
-      let result: DragDropEvent | null = null
-      setState((prev) => {
-        const next = { ...prev }
-        result = handleDrop(next, callbacks)
-        return next
-      })
+      const next = { ...state }
+      const result = handleDrop(next, callbacks)
+      setState(next)
       return result
     },
-    [callbacks]
+    [callbacks, state]
   )
 
   const endDrag = useCallback(

@@ -743,5 +743,105 @@ describe('Menu', () => {
       // Baseline: component renders without crashing with no/minimal props
       expect(true).toBe(true)
     })
+
+    it('warns for child components rendered outside Menu context', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      const { rerender } = render(MenuItem, {
+        props: { itemKey: 'orphan' },
+        slots: { default: () => 'Orphan item' }
+      })
+      expect(screen.getByRole('menuitem', { name: 'Orphan item' })).toBeInTheDocument()
+      expect(warn).toHaveBeenCalledWith('MenuItem must be used within Menu component')
+
+      rerender({ itemKey: 'orphan-sub', title: 'Orphan submenu' })
+      render(SubMenu, {
+        props: { itemKey: 'orphan-sub', title: 'Orphan submenu' },
+        slots: { default: () => [h(MenuItem, { itemKey: 'child' }, () => 'Child')] }
+      })
+      expect(warn).toHaveBeenCalledWith('SubMenu must be used within Menu component')
+      expect(screen.queryByRole('menuitem', { name: 'Orphan submenu' })).not.toBeInTheDocument()
+
+      warn.mockRestore()
+    })
+
+    it('renders collapsed item labels and icon-only items', () => {
+      const icon = '<svg aria-hidden="true"><path d="M0 0h1v1H0z" /></svg>'
+      render(Menu, {
+        props: { collapsed: true },
+        slots: {
+          default: () => [
+            h(MenuItem, { itemKey: 'alpha' }, () => 'alpha'),
+            h(MenuItem, { itemKey: 'icon', icon }, () => 'Icon label'),
+            h(SubMenu, { itemKey: 'reports', title: 'reports' }, () => [
+              h(MenuItem, { itemKey: 'daily' }, () => 'Daily')
+            ]),
+            h(
+              SubMenu,
+              {
+                itemKey: 'settings',
+                title: 'Settings',
+                icon: h('span', { 'data-testid': 'settings-icon' })
+              },
+              () => [h(MenuItem, { itemKey: 'profile' }, () => 'Profile')]
+            )
+          ]
+        }
+      })
+
+      expect(screen.getByRole('menuitem', { name: 'A' })).toBeInTheDocument()
+      expect(screen.getByRole('menuitem', { name: 'R' })).toBeInTheDocument()
+      expect(screen.getByTestId('settings-icon')).toBeInTheDocument()
+      expect(screen.queryByText('Icon label')).not.toBeInTheDocument()
+    })
+
+    it('opens horizontal submenu as a popup on hover and keyboard', async () => {
+      const { container } = render(Menu, {
+        props: { mode: 'horizontal' },
+        slots: {
+          default: () => [
+            h(SubMenu, { itemKey: 'sub1', title: 'Submenu' }, () => [
+              'text child',
+              h(MenuItem, { itemKey: '1' }, () => 'Sub Item 1')
+            ]),
+            h(MenuItem, { itemKey: '2' }, () => 'Peer')
+          ]
+        }
+      })
+
+      const trigger = screen.getByRole('menuitem', { name: 'Submenu' })
+      const popup = container.querySelector('ul[aria-hidden="true"]') as HTMLElement
+      expect(popup).toBeInTheDocument()
+
+      await fireEvent.mouseEnter(trigger.parentElement as HTMLElement)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      expect(popup).not.toHaveAttribute('aria-hidden')
+
+      await fireEvent.mouseLeave(trigger.parentElement as HTMLElement)
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+      trigger.focus()
+      await fireEvent.keyDown(trigger, { key: 'Enter' })
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      await fireEvent.keyDown(trigger, { key: 'Escape' })
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('keeps non-menu children in groups unchanged', () => {
+      const { container } = render(Menu, {
+        slots: {
+          default: () => [
+            h(MenuItemGroup, null, () => [
+              'plain text',
+              h('span', { 'data-testid': 'custom-child' }, 'Custom child'),
+              h(MenuItem, { itemKey: '1' }, () => 'Item 1')
+            ])
+          ]
+        }
+      })
+
+      expect(screen.getByTestId('custom-child')).toHaveTextContent('Custom child')
+      expect(container.querySelector('[role="group"]')).toHaveTextContent('plain text')
+    })
   })
 })

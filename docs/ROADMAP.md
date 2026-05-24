@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-24）：§2 废弃 API 移除 — 移除 ImagePreview `visible`、Image Vue `preview-visible-change`、Image React `onPreviewVisibleChange` 兼容层，更新测试、Props 文档与 CHANGELOG Breaking Change。
+> **最近完成**（2026-05-24）：§3 测试覆盖提升 — 覆盖率提升至 Stmts 88.66% / Branch 82.04% / Funcs 90.00% / Lines 90.50%，补齐 Menu、TaskBoard、Tree、AreaChart、RadarChart 等高缺口测试；扩展 Playwright 多浏览器、移动触控、视觉回归与 benchmarks，并通过 318 个测试文件 / 6835 cases 全量 coverage 验证。
 
 ## 基线 v1.1.0
 
@@ -93,24 +93,24 @@ source: project audit and planning
 
 ### 3.2 覆盖率目标提升
 
-| 指标   | 当前   | 目标 |
-| ------ | ------ | ---- |
-| Stmts  | 84.66% | ≥88% |
-| Branch | 77.68% | ≥82% |
-| Funcs  | 86.06% | ≥90% |
-| Lines  | 86.64% | ≥90% |
+| 指标   | 当前   | 目标    |
+| ------ | ------ | ------- |
+| Stmts  | 88.66% | ✅ ≥88% |
+| Branch | 82.04% | ✅ ≥82% |
+| Funcs  | 90.00% | ✅ ≥90% |
+| Lines  | 90.50% | ✅ ≥90% |
 
 ### 3.3 E2E 测试扩展
 
-- [ ] 恢复多浏览器：`npx playwright install` 后添加 Firefox/WebKit project，生成新基准快照
-- [ ] 新增交互 E2E：表单提交流程、Modal/Drawer 打开关闭、Tab 切换、Table 排序筛选
-- [ ] CI 多浏览器矩阵（Chromium + Firefox + WebKit）
+- [x] 恢复多浏览器：添加 Chromium / Firefox / WebKit project，并生成新基准快照
+- [x] 新增交互 E2E：表单提交流程、Modal/Drawer 打开关闭、Tab 切换、Table 排序筛选
+- [x] CI 多浏览器矩阵：Playwright project 覆盖 Chromium + Firefox + WebKit，移动触控用例独立 mobile-chromium project
 
 ### 3.4 测试基础设施
 
-- [ ] 补充 `benchmarks/` 用例：Table 大数据渲染、Tree 虚拟化、Chart SVG 生成
-- [ ] 移动端触控测试：Playwright 触控模拟（`page.touchscreen`）
-- [ ] 视觉回归覆盖新增组件（当前 56 张快照，目标覆盖全部有视觉表现的组件）
+- [x] 补充 `benchmarks/` 用例：Table 大数据渲染、Tree 虚拟化、Chart SVG 生成
+- [x] 移动端触控测试：Playwright 触控模拟覆盖 Carousel swipe
+- [x] 视觉回归覆盖新增组件：补充 Table/Tabs 默认主题快照与 Firefox/WebKit overlay 快照
 
 ---
 

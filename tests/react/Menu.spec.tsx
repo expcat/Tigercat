@@ -695,5 +695,91 @@ describe('Menu', () => {
       // Baseline: component renders without crashing with no/minimal props
       expect(true).toBe(true)
     })
+
+    it('warns for child components rendered outside Menu context', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      const { rerender } = render(<MenuItem itemKey="orphan">Orphan item</MenuItem>)
+      expect(screen.getByRole('menuitem', { name: 'Orphan item' })).toBeInTheDocument()
+      expect(warn).toHaveBeenCalledWith('MenuItem must be used within Menu component')
+
+      rerender(
+        <SubMenu itemKey="orphan-sub" title="Orphan submenu">
+          <MenuItem itemKey="child">Child</MenuItem>
+        </SubMenu>
+      )
+      expect(warn).toHaveBeenCalledWith('SubMenu must be used within Menu component')
+      expect(screen.queryByRole('menuitem', { name: 'Orphan submenu' })).not.toBeInTheDocument()
+
+      warn.mockRestore()
+    })
+
+    it('renders collapsed item labels and icon-only items', () => {
+      const icon = '<svg aria-hidden="true"><path d="M0 0h1v1H0z" /></svg>'
+      render(
+        <Menu collapsed>
+          <MenuItem itemKey="alpha">alpha</MenuItem>
+          <MenuItem itemKey="icon" icon={icon}>
+            Icon label
+          </MenuItem>
+          <SubMenu itemKey="reports" title="reports">
+            <MenuItem itemKey="daily">Daily</MenuItem>
+          </SubMenu>
+          <SubMenu itemKey="settings" title="Settings" icon={<span data-testid="settings-icon" />}>
+            <MenuItem itemKey="profile">Profile</MenuItem>
+          </SubMenu>
+        </Menu>
+      )
+
+      expect(screen.getByRole('menuitem', { name: 'A' })).toBeInTheDocument()
+      expect(screen.getByRole('menuitem', { name: 'R' })).toBeInTheDocument()
+      expect(screen.getByTestId('settings-icon')).toBeInTheDocument()
+      expect(screen.queryByText('Icon label')).not.toBeInTheDocument()
+    })
+
+    it('opens horizontal submenu as a popup on hover and keyboard', async () => {
+      const user = userEvent.setup()
+      const { container } = render(
+        <Menu mode="horizontal">
+          <SubMenu itemKey="sub1" title="Submenu">
+            text child
+            <MenuItem itemKey="1">Sub Item 1</MenuItem>
+          </SubMenu>
+          <MenuItem itemKey="2">Peer</MenuItem>
+        </Menu>
+      )
+
+      const trigger = screen.getByRole('menuitem', { name: 'Submenu' })
+      const popup = container.querySelector('ul[aria-hidden="true"]') as HTMLElement
+      expect(popup).toBeInTheDocument()
+
+      await user.hover(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      expect(popup).not.toHaveAttribute('aria-hidden')
+
+      await user.unhover(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+      trigger.focus()
+      await user.keyboard('{Enter}')
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      await user.keyboard('{Escape}')
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('keeps non-menu children in groups unchanged', () => {
+      const { container } = render(
+        <Menu>
+          <MenuItemGroup>
+            plain text
+            <span data-testid="custom-child">Custom child</span>
+            <MenuItem itemKey="1">Item 1</MenuItem>
+          </MenuItemGroup>
+        </Menu>
+      )
+
+      expect(screen.getByTestId('custom-child')).toHaveTextContent('Custom child')
+      expect(container.querySelector('[role="group"]')).toHaveTextContent('plain text')
+    })
   })
 })

@@ -144,6 +144,109 @@ describe('TimePicker', () => {
     expect(onChange).toHaveBeenCalledWith([null, null])
   })
 
+  it('renders seconds column and selects a second value', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<TimePicker showSeconds defaultValue="10:15:20" onChange={onChange} />)
+
+    await user.click(screen.getByRole('textbox'))
+    const dialog = await screen.findByRole('dialog')
+    const secondButton = dialog.querySelector<HTMLButtonElement>(
+      'button[data-tiger-timepicker-unit="second"][aria-label="5 seconds"]'
+    )!
+
+    await user.click(secondButton)
+    expect(onChange).toHaveBeenLastCalledWith('10:15:05')
+  })
+
+  it('supports 12-hour period selection and Home/End keyboard movement', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<TimePicker format="12" defaultValue="02:30" onChange={onChange} />)
+
+    await user.click(screen.getByRole('textbox'))
+    const dialog = await screen.findByRole('dialog')
+    const pmButton = dialog.querySelector<HTMLButtonElement>(
+      'button[data-tiger-timepicker-unit="period"][aria-label="PM"]'
+    )!
+
+    pmButton.focus()
+    await user.keyboard('{Home}{End}{Enter}')
+    expect(onChange).toHaveBeenLastCalledWith('14:30')
+  })
+
+  it('keeps range values ordered when selecting start or end out of order', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<TimePicker range defaultValue={['10:00', '11:00']} onChange={onChange} />)
+
+    await user.click(screen.getByRole('textbox'))
+    const dialog = await screen.findByRole('dialog')
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await user.click(
+      dialog.querySelector<HTMLButtonElement>(
+        'button[data-tiger-timepicker-unit="hour"][aria-label="12 hours"]'
+      )!
+    )
+    expect(onChange).toHaveBeenLastCalledWith(['12:00', '12:00'])
+
+    await user.click(screen.getByRole('button', { name: 'End' }))
+    await user.click(
+      dialog.querySelector<HTMLButtonElement>(
+        'button[data-tiger-timepicker-unit="hour"][aria-label="9 hours"]'
+      )!
+    )
+    expect(onChange).toHaveBeenLastCalledWith(['12:00', '12:00'])
+  })
+
+  it('does not open when disabled or readonly', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(<TimePicker disabled />)
+
+    await user.click(screen.getByRole('button', { name: 'Toggle time picker' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    rerender(<TimePicker readonly />)
+    await user.click(screen.getByRole('button', { name: 'Toggle time picker' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('closes on outside click and supports Now/OK footer actions', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <div>
+        <button type="button">Outside</button>
+        <TimePicker onChange={onChange} />
+      </div>
+    )
+
+    await user.click(screen.getByRole('textbox'))
+    await screen.findByRole('dialog')
+    await user.click(screen.getByRole('button', { name: 'Now' }))
+    expect(onChange).toHaveBeenCalled()
+
+    await user.click(screen.getByRole('button', { name: 'OK' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
+    await user.click(screen.getByRole('textbox'))
+    await screen.findByRole('dialog')
+    await user.click(screen.getByRole('button', { name: 'Outside' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('passes native input attributes and custom className to the wrapper', () => {
+    const { container } = render(
+      <TimePicker id="meeting-time" name="meeting" required className="custom-picker" />
+    )
+    const input = screen.getByRole('textbox')
+
+    expect(input).toHaveAttribute('id', 'meeting-time')
+    expect(input).toHaveAttribute('name', 'meeting')
+    expect(input).toBeRequired()
+    expect(container.firstElementChild).toHaveClass('custom-picker')
+  })
+
   it('passes accessibility checks', async () => {
     const { container } = render(<TimePicker value="14:30" />)
     await expectNoA11yViolationsIsolated(container)

@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { RadarChart } from '@expcat/tigercat-vue'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
@@ -188,6 +189,75 @@ describe('RadarChart', () => {
     })
 
     expect(container.querySelectorAll('[data-radar-split-area]').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('handles series, legend, point, and keyboard interactions', async () => {
+    const { container, emitted } = renderWithProps(RadarChart, {
+      series: multiSeriesData.map((item, index) => ({
+        ...item,
+        color: index === 0 ? '#2563eb' : '#16a34a',
+        fillOpacity: 0.35,
+        pointSize: 4,
+        pointColor: index === 0 ? '#1d4ed8' : '#15803d'
+      })),
+      hoverable: true,
+      selectable: true,
+      showLegend: true,
+      showTooltip: true,
+      gradient: true,
+      strokeGradient: true,
+      pointGradient: true,
+      showSplitArea: true,
+      splitAreaColors: ['#f8fafc', '#eef2ff'],
+      showLevelLabels: true,
+      levelLabelFormatter: (value: number, level: number) => `${level}:${Math.round(value)}`,
+      labelFormatter: (datum: { label?: string }, index: number) => `${index}-${datum.label}`,
+      legendFormatter: (series: { name?: string }, index: number) => `${index}:${series.name}`,
+      tooltipFormatter: (datum: { value: number }, seriesIndex: number) =>
+        `s${seriesIndex}:${datum.value}`,
+      labelAutoAlign: false
+    })
+
+    const seriesGroups = container.querySelectorAll('g[data-series-type="radar"]')
+    await fireEvent.mouseEnter(seriesGroups[0], { clientX: 10, clientY: 20 })
+    await fireEvent.mouseMove(seriesGroups[0], { clientX: 20, clientY: 30 })
+    await fireEvent.mouseLeave(seriesGroups[0])
+    await fireEvent.click(seriesGroups[0])
+    await fireEvent.keyDown(seriesGroups[0], { key: 'Enter' })
+    await fireEvent.keyDown(seriesGroups[0], { key: 'Escape' })
+
+    expect(emitted()['series-hover']).toBeTruthy()
+    expect(emitted()['series-click']).toBeTruthy()
+    expect(emitted()['update:selectedIndex']).toBeTruthy()
+
+    const point = container.querySelector('circle[data-radar-point][data-point-index="0"]')!
+    await fireEvent.mouseEnter(point, { clientX: 30, clientY: 40 })
+    await fireEvent.mouseMove(point, { clientX: 40, clientY: 50 })
+    await fireEvent.mouseLeave(point)
+
+    expect(container.querySelector('linearGradient[id*="stroke"]')).toBeInTheDocument()
+    expect(container.querySelector('radialGradient')).toBeInTheDocument()
+    expect(container.querySelectorAll('text[data-radar-level-label]')).toHaveLength(5)
+    expect(container.textContent).toContain('0-A')
+  })
+
+  it('can hide grid, axis, labels, points, legend, and tooltip layers', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      showGrid: false,
+      showAxis: false,
+      showLabels: false,
+      showPoints: false,
+      showTooltip: false,
+      maxValue: 0,
+      levels: 0,
+      fillColor: '#f00',
+      strokeColor: '#0f0'
+    })
+
+    expect(container.querySelectorAll('circle[data-radar-point]')).toHaveLength(0)
+    expect(container.querySelectorAll('text')).toHaveLength(0)
+    expect(container.querySelector('path[data-radar-area]')).toBeInTheDocument()
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
