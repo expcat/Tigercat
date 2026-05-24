@@ -10,7 +10,9 @@ import {
   selectEmptyStateClasses,
   isOptionGroup,
   createSelectSearchDebouncer,
+  getCreateSelectOptionLabel,
   flattenSelectOptions,
+  resolveCreatableSelectOption,
   resolveSelectFilteredOptions,
   findFirstEnabledIndex as pickerFindFirstEnabledIndex,
   findLastEnabledIndex as pickerFindLastEnabledIndex,
@@ -99,6 +101,8 @@ export interface VueSelectProps {
   virtual?: boolean
   remote?: boolean
   searchDebounce?: number
+  creatable?: boolean
+  createOptionText?: string
   listHeight?: number
 }
 
@@ -197,6 +201,18 @@ export const Select = defineComponent({
       default: 0
     },
     /**
+     * Whether users can create a new option from the search query
+     */
+    creatable: Boolean,
+    /**
+     * Prefix text used for the creatable option row
+     * @default 'Create'
+     */
+    createOptionText: {
+      type: String,
+      default: 'Create'
+    },
+    /**
      * Height of the dropdown panel in pixels
      * @default 256
      * @since 0.5.0
@@ -206,7 +222,7 @@ export const Select = defineComponent({
       default: 256
     }
   },
-  emits: ['update:modelValue', 'change', 'search'],
+  emits: ['update:modelValue', 'change', 'search', 'create'],
   setup(props, { emit }) {
     const instanceId = ++selectInstanceId
     const listboxId = `tiger-select-listbox-${instanceId}`
@@ -215,6 +231,7 @@ export const Select = defineComponent({
     const isOpen = ref(false)
     const searchQuery = ref('')
     const activeIndex = ref(-1)
+    const createdOptions = ref<SelectOption[]>([])
     const dropdownRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const searchInputRef = ref<HTMLInputElement | null>(null)
@@ -232,6 +249,16 @@ export const Select = defineComponent({
 
     const allOptions = computed(() => flattenSelectOptions(props.options))
     const flatFilteredOptions = computed(() => flattenSelectOptions(filteredOptions.value))
+    const creatableOption = computed(() =>
+      resolveCreatableSelectOption([...props.options, ...createdOptions.value], searchQuery.value, {
+        creatable: props.creatable && props.searchable
+      })
+    )
+    const flatSelectableOptions = computed(() => {
+      return creatableOption.value
+        ? [...flatFilteredOptions.value, creatableOption.value]
+        : flatFilteredOptions.value
+    })
 
     const displayText = computed(() => {
       if (props.multiple && Array.isArray(props.modelValue)) {
@@ -239,7 +266,9 @@ export const Select = defineComponent({
           return props.placeholder
         }
         const currentValue = props.modelValue
-        const selectedOptions = allOptions.value.filter((opt) => currentValue.includes(opt.value))
+        const selectedOptions = [...allOptions.value, ...createdOptions.value].filter((opt) =>
+          currentValue.includes(opt.value)
+        )
         const labels = selectedOptions.map((opt) => opt.label)
         if (props.maxTagCount !== undefined && labels.length > props.maxTagCount) {
           const visible = labels.slice(0, props.maxTagCount)
@@ -252,7 +281,9 @@ export const Select = defineComponent({
       if (value === undefined || value === null || value === '') {
         return props.placeholder
       }
-      const option = allOptions.value.find((opt) => opt.value === value)
+      const option = [...allOptions.value, ...createdOptions.value].find(
+        (opt) => opt.value === value
+      )
       return option ? option.label : props.placeholder
     })
 
@@ -275,12 +306,13 @@ export const Select = defineComponent({
     }
 
     const findFirstEnabledIndex = (): number =>
-      pickerFindFirstEnabledIndex(flatFilteredOptions.value)
+      pickerFindFirstEnabledIndex(flatSelectableOptions.value)
 
-    const findLastEnabledIndex = (): number => pickerFindLastEnabledIndex(flatFilteredOptions.value)
+    const findLastEnabledIndex = (): number =>
+      pickerFindLastEnabledIndex(flatSelectableOptions.value)
 
     const findNextEnabledIndex = (current: number, direction: 1 | -1): number =>
-      pickerFindNextEnabledIndex(flatFilteredOptions.value, current, direction)
+      pickerFindNextEnabledIndex(flatSelectableOptions.value, current, direction)
 
     const focusOptionAt = (index: number) => {
       if (index < 0) {
@@ -320,6 +352,11 @@ export const Select = defineComponent({
     function selectOption(option: SelectOption) {
       if (option.disabled) {
         return
+      }
+
+      if (creatableOption.value && option.value === creatableOption.value.value) {
+        createdOptions.value = [...createdOptions.value, option]
+        emit('create', option)
       }
 
       if (props.multiple) {
@@ -372,7 +409,7 @@ export const Select = defineComponent({
       if (activeIndex.value < 0) {
         return undefined
       }
-      return flatFilteredOptions.value[activeIndex.value]
+      return flatSelectableOptions.value[activeIndex.value]
     }
 
     function selectActiveOption() {
@@ -534,7 +571,7 @@ export const Select = defineComponent({
               if (values.length === 0) {
                 return -1
               }
-              return flatFilteredOptions.value.findIndex(
+              return flatSelectableOptions.value.findIndex(
                 (opt) => values.includes(opt.value) && !opt.disabled
               )
             }
@@ -543,7 +580,7 @@ export const Select = defineComponent({
             if (value === undefined || value === null || value === '') {
               return -1
             }
-            return flatFilteredOptions.value.findIndex(
+            return flatSelectableOptions.value.findIndex(
               (opt) => opt.value === value && !opt.disabled
             )
           })()
@@ -560,6 +597,14 @@ export const Select = defineComponent({
       },
       { immediate: true }
     )
+
+    watch(flatSelectableOptions, () => {
+      if (!isOpen.value) {
+        return
+      }
+
+      activeIndex.value = findFirstEnabledIndex()
+    })
 
     watch(
       () => props.searchDebounce,
@@ -660,7 +705,11 @@ export const Select = defineComponent({
                 ? (() => {
                     let optionIndex = -1
 
-                    const renderOptionItem = (option: SelectOption, idx: number) => {
+                    const renderOptionItem = (
+                      option: SelectOption,
+                      idx: number,
+                      displayLabel = option.label
+                    ) => {
                       const selected = isSelected(option)
                       const active = idx === activeIndex.value
 
@@ -684,14 +733,14 @@ export const Select = defineComponent({
                         },
                         [
                           h('span', { class: 'flex items-center justify-between w-full' }, [
-                            h('span', option.label),
+                            h('span', displayLabel),
                             selected && h('span', CheckIcon)
                           ])
                         ]
                       )
                     }
 
-                    return filteredOptions.value.map((item) => {
+                    const optionNodes = filteredOptions.value.map((item) => {
                       if (isOptionGroup(item)) {
                         return h('div', { key: item.label }, [
                           h('div', { class: selectGroupLabelClasses }, item.label),
@@ -705,12 +754,55 @@ export const Select = defineComponent({
                       optionIndex += 1
                       return renderOptionItem(item, optionIndex)
                     })
+
+                    if (creatableOption.value) {
+                      optionIndex += 1
+                      optionNodes.push(
+                        renderOptionItem(
+                          creatableOption.value,
+                          optionIndex,
+                          getCreateSelectOptionLabel(creatableOption.value, props.createOptionText)
+                        )
+                      )
+                    }
+
+                    return optionNodes
                   })()
-                : h(
-                    'div',
-                    { class: selectEmptyStateClasses },
-                    props.options.length === 0 ? props.noDataText : props.noOptionsText
-                  )
+                : creatableOption.value
+                  ? (() => {
+                      const optionLabel = getCreateSelectOptionLabel(
+                        creatableOption.value,
+                        props.createOptionText
+                      )
+                      return h(
+                        'div',
+                        {
+                          key: creatableOption.value.value,
+                          id: getOptionId(0),
+                          'data-option-index': 0,
+                          role: 'option',
+                          'aria-selected': false,
+                          tabindex: activeIndex.value === 0 ? 0 : -1,
+                          class: getSelectOptionClasses(false, false, props.size),
+                          onMouseenter: () => {
+                            activeIndex.value = 0
+                          },
+                          onClick: () => selectOption(creatableOption.value!)
+                        },
+                        [
+                          h(
+                            'span',
+                            { class: 'flex items-center justify-between w-full' },
+                            optionLabel
+                          )
+                        ]
+                      )
+                    })()
+                  : h(
+                      'div',
+                      { class: selectEmptyStateClasses },
+                      props.options.length === 0 ? props.noDataText : props.noOptionsText
+                    )
             ]
           )
       ])

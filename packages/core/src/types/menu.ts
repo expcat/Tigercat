@@ -49,6 +49,11 @@ export interface MenuItem {
  */
 export interface MenuProps {
   /**
+   * Data-driven menu items. Slot/children based usage is still supported.
+   */
+  items?: MenuItem[]
+
+  /**
    * Menu mode - horizontal, vertical, or inline
    * @default 'vertical'
    */
@@ -85,8 +90,8 @@ export interface MenuProps {
    */
   multiple?: boolean
   /**
-   * Whether to allow inline indentation of submenus
-   * @default true
+   * Inline indentation for submenu items
+   * @default 24
    */
   inlineIndent?: number
   /**
@@ -97,6 +102,34 @@ export interface MenuProps {
    * Custom styles
    */
   style?: Record<string, string | number>
+
+  /**
+   * Whether to render a built-in search field for filtering data-driven `items`.
+   * @default false
+   */
+  searchable?: boolean
+
+  /**
+   * Controlled search value used to filter data-driven `items`.
+   */
+  searchValue?: string
+
+  /**
+   * Default search value for uncontrolled searchable menus.
+   */
+  defaultSearchValue?: string
+
+  /**
+   * Search input placeholder.
+   * @default 'Search menu'
+   */
+  searchPlaceholder?: string
+
+  /**
+   * Empty text shown when `items` are filtered to no results.
+   * @default 'No menu items found'
+   */
+  emptyText?: string
 }
 
 /**

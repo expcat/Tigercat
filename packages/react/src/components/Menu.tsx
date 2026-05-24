@@ -16,10 +16,14 @@ import {
   getSubMenuTitleClasses,
   getSubMenuExpandIconClasses,
   getSubmenuPopupZIndex,
+  filterMenuItems,
   isKeySelected,
   isKeyOpen,
   menuItemIconClasses,
   menuItemGroupTitleClasses,
+  menuSearchFieldClasses,
+  menuSearchEmptyClasses,
+  menuSearchInputClasses,
   submenuContentHorizontalClasses,
   submenuContentHorizontalNestedClasses,
   submenuContentPopupClasses,
@@ -37,6 +41,7 @@ import {
   type SubmenuHeightTransitionController,
   type MenuMode,
   type MenuTheme,
+  type MenuItem as CoreMenuItem,
   type MenuProps as CoreMenuProps,
   type MenuItemProps as CoreMenuItemProps,
   type MenuItemGroupProps as CoreMenuItemGroupProps,
@@ -75,12 +80,18 @@ export interface MenuProps extends CoreMenuProps {
   onOpenChange?: (key: string | number, info: { openKeys: (string | number)[] }) => void
 
   /**
+   * Search value change handler
+   */
+  onSearch?: (value: string) => void
+
+  /**
    * Menu content
    */
   children?: React.ReactNode
 }
 
 export const Menu: React.FC<MenuProps> = ({
+  items,
   mode = 'vertical',
   theme = 'light',
   selectedKeys: controlledSelectedKeys,
@@ -94,6 +105,12 @@ export const Menu: React.FC<MenuProps> = ({
   style,
   onSelect,
   onOpenChange,
+  onSearch,
+  searchable = false,
+  searchValue: controlledSearchValue,
+  defaultSearchValue = '',
+  searchPlaceholder = 'Search menu',
+  emptyText = 'No menu items found',
   children
 }) => {
   const menuRef = useRef<HTMLUListElement | null>(null)
@@ -102,11 +119,14 @@ export const Menu: React.FC<MenuProps> = ({
   const [internalSelectedKeys, setInternalSelectedKeys] =
     useState<(string | number)[]>(defaultSelectedKeys)
   const [internalOpenKeys, setInternalOpenKeys] = useState<(string | number)[]>(defaultOpenKeys)
+  const [internalSearchValue, setInternalSearchValue] = useState(defaultSearchValue)
 
   // Use controlled or uncontrolled state
   const selectedKeys =
     controlledSelectedKeys !== undefined ? controlledSelectedKeys : internalSelectedKeys
   const openKeys = controlledOpenKeys !== undefined ? controlledOpenKeys : internalOpenKeys
+  const searchValue =
+    controlledSearchValue !== undefined ? controlledSearchValue : internalSearchValue
 
   // Handle menu item selection
   const handleSelect = useCallback(
@@ -141,6 +161,19 @@ export const Menu: React.FC<MenuProps> = ({
     [openKeys, multiple, controlledOpenKeys, onOpenChange]
   )
 
+  const handleSearchInput = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value
+
+      if (controlledSearchValue === undefined) {
+        setInternalSearchValue(value)
+      }
+
+      onSearch?.(value)
+    },
+    [controlledSearchValue, onSearch]
+  )
+
   // Menu classes
   const menuClasses = useMemo(() => {
     return classNames(getMenuClasses(mode, theme, collapsed), className)
@@ -161,9 +194,44 @@ export const Menu: React.FC<MenuProps> = ({
     [mode, theme, collapsed, inlineIndent, selectedKeys, openKeys, handleSelect, handleOpenChange]
   )
 
+  const filteredItems = useMemo(
+    () => filterMenuItems(items ?? [], searchValue),
+    [items, searchValue]
+  )
+
+  function renderDataItem(item: CoreMenuItem): React.ReactNode {
+    if (item.children && item.children.length > 0) {
+      return (
+        <SubMenu
+          key={item.key}
+          itemKey={item.key}
+          title={item.label}
+          icon={item.icon}
+          disabled={item.disabled}>
+          {item.children.map(renderDataItem)}
+        </SubMenu>
+      )
+    }
+
+    return (
+      <MenuItem key={item.key} itemKey={item.key} icon={item.icon} disabled={item.disabled}>
+        {item.label}
+      </MenuItem>
+    )
+  }
+
+  const dataChildren = filteredItems.map(renderDataItem)
+  const hasSlotChildren = React.Children.count(children) > 0
+  const emptyChild =
+    items && items.length > 0 && dataChildren.length === 0 && !hasSlotChildren ? (
+      <li role="none">
+        <div className={menuSearchEmptyClasses}>{emptyText}</div>
+      </li>
+    ) : null
+
   useEffect(() => {
     if (menuRef.current) initRovingTabIndex(menuRef.current)
-  }, [mode, collapsed, selectedKeys, openKeys])
+  }, [mode, collapsed, selectedKeys, openKeys, filteredItems])
 
   return (
     <MenuContext.Provider value={contextValue}>
@@ -174,7 +242,21 @@ export const Menu: React.FC<MenuProps> = ({
         role="menu"
         data-tiger-menu-root="true"
         data-tiger-menu-mode={mode}>
+        {searchable && (
+          <li role="none" className={menuSearchFieldClasses}>
+            <input
+              type="search"
+              value={searchValue}
+              placeholder={searchPlaceholder}
+              aria-label={searchPlaceholder}
+              className={menuSearchInputClasses}
+              onChange={handleSearchInput}
+            />
+          </li>
+        )}
+        {dataChildren}
         {children}
+        {emptyChild}
       </ul>
     </MenuContext.Provider>
   )

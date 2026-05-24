@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   createSelectSearchDebouncer,
+  getCreateSelectOptionLabel,
+  resolveCreatableSelectOption,
   resolveSelectFilteredOptions,
   type SelectOptions
 } from '@expcat/tigercat-core'
@@ -21,6 +23,25 @@ describe('select-utils', () => {
     expect(resolveSelectFilteredOptions(options, 'Alpha', { searchable: true })).toEqual([
       { label: 'Alpha', value: 'alpha' }
     ])
+  })
+
+  it('creates a new option from a unique query', () => {
+    expect(resolveCreatableSelectOption(options, 'Gamma', { creatable: true })).toEqual({
+      label: 'Gamma',
+      value: 'Gamma'
+    })
+  })
+
+  it('does not create duplicate options by label or value', () => {
+    expect(resolveCreatableSelectOption(options, 'Alpha', { creatable: true })).toBe(null)
+    expect(resolveCreatableSelectOption(options, 'alpha', { creatable: true })).toBe(null)
+  })
+
+  it('formats the creatable option label', () => {
+    expect(getCreateSelectOptionLabel({ label: 'Gamma', value: 'Gamma' })).toBe('Create "Gamma"')
+    expect(getCreateSelectOptionLabel({ label: 'Gamma', value: 'Gamma' }, 'Add')).toBe(
+      'Add "Gamma"'
+    )
   })
 
   it('debounces search callbacks and keeps only the latest query', () => {

@@ -10,7 +10,9 @@ import {
   selectEmptyStateClasses,
   isOptionGroup,
   createSelectSearchDebouncer,
+  getCreateSelectOptionLabel,
   flattenSelectOptions,
+  resolveCreatableSelectOption,
   resolveSelectFilteredOptions,
   findFirstEnabledIndex as pickerFindFirstEnabledIndex,
   findLastEnabledIndex as pickerFindLastEnabledIndex,
@@ -37,6 +39,8 @@ export interface SelectBaseProps
   options?: SelectOptions
 
   onSearch?: (query: string) => void
+
+  onCreate?: (option: SelectOption) => void
 
   className?: string
 }
@@ -71,7 +75,10 @@ export const Select: React.FC<SelectProps> = (props) => {
     maxTagCount,
     remote = false,
     searchDebounce = 0,
+    creatable = false,
+    createOptionText = 'Create',
     onSearch,
+    onCreate,
     className,
     value,
     onChange,
@@ -93,8 +100,11 @@ export const Select: React.FC<SelectProps> = (props) => {
     'virtual',
     'remote',
     'searchDebounce',
+    'creatable',
+    'createOptionText',
     'listHeight',
     'onSearch',
+    'onCreate',
     'className',
     'value',
     'onChange',
@@ -111,6 +121,7 @@ export const Select: React.FC<SelectProps> = (props) => {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(-1)
+  const [createdOptions, setCreatedOptions] = useState<SelectOption[]>([])
   const dropdownRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -126,13 +137,28 @@ export const Select: React.FC<SelectProps> = (props) => {
     [filteredOptions]
   )
 
+  const creatableOption = useMemo(
+    () =>
+      resolveCreatableSelectOption([...options, ...createdOptions], searchQuery, {
+        creatable: creatable && searchable
+      }),
+    [creatable, createdOptions, options, searchable, searchQuery]
+  )
+
+  const flatSelectableOptions = useMemo(
+    () => (creatableOption ? [...flatFilteredOptions, creatableOption] : flatFilteredOptions),
+    [creatableOption, flatFilteredOptions]
+  )
+
   const allOptions = useMemo(() => flattenSelectOptions(options), [options])
 
   const displayText = useMemo(() => {
     if (isMultiple) {
       const values = Array.isArray(value) ? value : []
       if (values.length === 0) return placeholder
-      const labels = allOptions.filter((opt) => values.includes(opt.value)).map((opt) => opt.label)
+      const labels = [...allOptions, ...createdOptions]
+        .filter((opt) => values.includes(opt.value))
+        .map((opt) => opt.label)
       if (maxTagCount !== undefined && labels.length > maxTagCount) {
         const visible = labels.slice(0, maxTagCount)
         return `${visible.join(', ')} +${labels.length - maxTagCount}`
@@ -141,8 +167,10 @@ export const Select: React.FC<SelectProps> = (props) => {
     }
 
     if (value === undefined || value === null || value === '') return placeholder
-    return allOptions.find((opt) => opt.value === value)?.label ?? placeholder
-  }, [isMultiple, value, allOptions, placeholder, maxTagCount])
+    return (
+      [...allOptions, ...createdOptions].find((opt) => opt.value === value)?.label ?? placeholder
+    )
+  }, [isMultiple, value, allOptions, createdOptions, placeholder, maxTagCount])
 
   const showClearButton = useMemo(
     () =>
@@ -165,14 +193,14 @@ export const Select: React.FC<SelectProps> = (props) => {
   const getOptionId = (index: number) => `tiger-select-option-${instanceId}-${index}`
 
   const findFirstEnabledIndex = useCallback(
-    (): number => pickerFindFirstEnabledIndex(flatFilteredOptions),
-    [flatFilteredOptions]
+    (): number => pickerFindFirstEnabledIndex(flatSelectableOptions),
+    [flatSelectableOptions]
   )
 
-  const findLastEnabledIndex = (): number => pickerFindLastEnabledIndex(flatFilteredOptions)
+  const findLastEnabledIndex = (): number => pickerFindLastEnabledIndex(flatSelectableOptions)
 
   const findNextEnabledIndex = (current: number, direction: 1 | -1): number =>
-    pickerFindNextEnabledIndex(flatFilteredOptions, current, direction)
+    pickerFindNextEnabledIndex(flatSelectableOptions, current, direction)
 
   const focusOptionAt = useCallback((index: number) => {
     if (index < 0) {
@@ -207,7 +235,7 @@ export const Select: React.FC<SelectProps> = (props) => {
     if (activeIndex < 0) {
       return undefined
     }
-    return flatFilteredOptions[activeIndex]
+    return flatSelectableOptions[activeIndex]
   }
 
   const selectActiveOption = () => {
@@ -221,6 +249,11 @@ export const Select: React.FC<SelectProps> = (props) => {
   const selectOption = (option: SelectOption) => {
     if (option.disabled) {
       return
+    }
+
+    if (creatableOption && option.value === creatableOption.value) {
+      setCreatedOptions((current) => [...current, option])
+      onCreate?.(option)
     }
 
     if (isMultiple) {
@@ -413,7 +446,7 @@ export const Select: React.FC<SelectProps> = (props) => {
       return
     }
 
-    if (flatFilteredOptions.length === 0) {
+    if (flatSelectableOptions.length === 0) {
       setActiveIndex(-1)
       return
     }
@@ -424,13 +457,13 @@ export const Select: React.FC<SelectProps> = (props) => {
         if (values.length === 0) {
           return -1
         }
-        return flatFilteredOptions.findIndex((opt) => values.includes(opt.value) && !opt.disabled)
+        return flatSelectableOptions.findIndex((opt) => values.includes(opt.value) && !opt.disabled)
       }
 
       if (value === undefined || value === null || value === '') {
         return -1
       }
-      return flatFilteredOptions.findIndex((opt) => opt.value === value && !opt.disabled)
+      return flatSelectableOptions.findIndex((opt) => opt.value === value && !opt.disabled)
     })()
 
     const nextActive = selectedIndex >= 0 ? selectedIndex : findFirstEnabledIndex()
@@ -442,7 +475,7 @@ export const Select: React.FC<SelectProps> = (props) => {
   }, [
     isOpen,
     searchable,
-    flatFilteredOptions,
+    flatSelectableOptions,
     isMultiple,
     value,
     findFirstEnabledIndex,
@@ -474,7 +507,7 @@ export const Select: React.FC<SelectProps> = (props) => {
 
   const triggerClasses = getSelectTriggerClasses(size, disabled, isOpen)
 
-  const renderOption = (option: SelectOption, index: number) => {
+  const renderOption = (option: SelectOption, index: number, displayLabel = option.label) => {
     const optionSelected = isSelected(option)
     const optionActive = index === activeIndex
 
@@ -495,7 +528,7 @@ export const Select: React.FC<SelectProps> = (props) => {
         }}
         onClick={() => selectOption(option)}>
         <span className="flex items-center justify-between w-full">
-          <span>{option.label}</span>
+          <span>{displayLabel}</span>
           {optionSelected && (
             <svg
               className="w-5 h-5 text-[var(--tiger-select-check-icon,var(--tiger-primary,#2563eb))]"
@@ -513,7 +546,7 @@ export const Select: React.FC<SelectProps> = (props) => {
   const hasOptions = filteredOptions.length > 0
 
   const renderOptions = () => {
-    if (!hasOptions) {
+    if (!hasOptions && !creatableOption) {
       return (
         <div className={selectEmptyStateClasses}>
           {options.length === 0 ? noDataText : noOptionsText}
@@ -523,7 +556,7 @@ export const Select: React.FC<SelectProps> = (props) => {
 
     let optionIndex = -1
 
-    return filteredOptions.map((item) => {
+    const optionNodes = filteredOptions.map((item) => {
       if (isOptionGroup(item)) {
         return (
           <div key={item.label}>
@@ -539,6 +572,19 @@ export const Select: React.FC<SelectProps> = (props) => {
       optionIndex += 1
       return renderOption(item, optionIndex)
     })
+
+    if (creatableOption) {
+      optionIndex += 1
+      optionNodes.push(
+        renderOption(
+          creatableOption,
+          optionIndex,
+          getCreateSelectOptionLabel(creatableOption, createOptionText)
+        )
+      )
+    }
+
+    return optionNodes
   }
 
   const containerClasses = classNames(selectBaseClasses, className)

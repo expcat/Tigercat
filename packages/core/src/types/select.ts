@@ -135,6 +135,18 @@ export interface SelectProps {
   searchDebounce?: number
 
   /**
+   * Whether users can create a new option from the current search query.
+   * @default false
+   */
+  creatable?: boolean
+
+  /**
+   * Prefix text used for the creatable option row.
+   * @default 'Create'
+   */
+  createOptionText?: string
+
+  /**
    * Height of the dropdown panel in pixels (relevant when virtual is true)
    * @default 256
    * @since 0.5.0

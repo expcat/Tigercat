@@ -1,8 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   createSubmenuHeightTransitionController,
+  filterMenuItems,
   getInitialSubmenuHeightTransitionStyle,
+  matchesMenuSearch,
+  normalizeMenuSearchQuery,
   submenuHeightTransitionClasses,
+  type MenuItem,
   type SubmenuHeightTransitionElement
 } from '@expcat/tigercat-core'
 
@@ -131,5 +135,43 @@ describe('menu-utils submenu height transition', () => {
 
     expect(scheduler.cancelAnimationFrame).toHaveBeenCalledWith(1)
     expect(element.removeEventListener).toHaveBeenCalledWith('transitionend', expect.any(Function))
+  })
+})
+
+describe('menu-utils search filtering', () => {
+  const items: MenuItem[] = [
+    { key: 'dashboard', label: 'Dashboard' },
+    {
+      key: 'admin',
+      label: 'Administration',
+      children: [
+        { key: 'users', label: 'Users' },
+        { key: 'roles', label: 'Roles' }
+      ]
+    },
+    { key: 'settings', label: 'Settings' }
+  ]
+
+  it('normalizes search queries', () => {
+    expect(normalizeMenuSearchQuery('  Users  ')).toBe('users')
+  })
+
+  it('matches labels case-insensitively', () => {
+    expect(matchesMenuSearch('Dashboard', 'dash')).toBe(true)
+    expect(matchesMenuSearch('Dashboard', 'settings')).toBe(false)
+  })
+
+  it('preserves ancestors of matching children', () => {
+    expect(filterMenuItems(items, 'roles')).toEqual([
+      {
+        key: 'admin',
+        label: 'Administration',
+        children: [{ key: 'roles', label: 'Roles' }]
+      }
+    ])
+  })
+
+  it('returns the original items for an empty query', () => {
+    expect(filterMenuItems(items, '   ')).toBe(items)
   })
 })

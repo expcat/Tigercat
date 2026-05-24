@@ -24,10 +24,14 @@ import {
   getSubMenuTitleClasses,
   getSubMenuExpandIconClasses,
   getSubmenuPopupZIndex,
+  filterMenuItems,
   isKeySelected,
   isKeyOpen,
   menuItemIconClasses,
   menuItemGroupTitleClasses,
+  menuSearchFieldClasses,
+  menuSearchEmptyClasses,
+  menuSearchInputClasses,
   mergeStyleValues,
   moveFocusInMenu,
   focusMenuEdge,
@@ -44,6 +48,7 @@ import {
   type MenuMode,
   type MenuTheme,
   type MenuKey,
+  type MenuItem as CoreMenuItem,
   type MenuProps as CoreMenuProps,
   replaceKeys,
   toggleKey,
@@ -66,6 +71,7 @@ export interface MenuContext {
 }
 
 export interface VueMenuProps {
+  items?: CoreMenuItem[]
   mode?: MenuMode
   theme?: MenuTheme
   selectedKeys?: MenuKey[]
@@ -77,12 +83,24 @@ export interface VueMenuProps {
   inlineIndent?: number
   className?: string
   style?: CoreMenuProps['style']
+  searchable?: boolean
+  searchValue?: string
+  defaultSearchValue?: string
+  searchPlaceholder?: string
+  emptyText?: string
 }
 
 export const Menu = defineComponent({
   name: 'TigerMenu',
   inheritAttrs: false,
   props: {
+    /**
+     * Data-driven menu items
+     */
+    items: {
+      type: Array as PropType<CoreMenuItem[]>,
+      default: undefined
+    },
     /**
      * Menu mode - horizontal, vertical, or inline
      * @default 'vertical'
@@ -158,15 +176,43 @@ export const Menu = defineComponent({
     style: {
       type: Object as PropType<CoreMenuProps['style']>,
       default: undefined
+    },
+    searchable: {
+      type: Boolean,
+      default: false
+    },
+    searchValue: {
+      type: String,
+      default: undefined
+    },
+    defaultSearchValue: {
+      type: String,
+      default: ''
+    },
+    searchPlaceholder: {
+      type: String,
+      default: 'Search menu'
+    },
+    emptyText: {
+      type: String,
+      default: 'No menu items found'
     }
   },
-  emits: ['update:selectedKeys', 'update:openKeys', 'select', 'open-change'],
+  emits: [
+    'update:selectedKeys',
+    'update:openKeys',
+    'update:searchValue',
+    'select',
+    'open-change',
+    'search'
+  ],
   setup(props, { slots, emit, attrs }) {
     const menuEl = ref<HTMLElement | null>(null)
 
     // Internal state for uncontrolled mode
     const internalSelectedKeys = ref<MenuKey[]>(props.defaultSelectedKeys)
     const internalOpenKeys = ref<MenuKey[]>(props.defaultOpenKeys)
+    const internalSearchValue = ref(props.defaultSearchValue)
 
     // Computed selected keys (controlled or uncontrolled)
     const currentSelectedKeys = computed(() => {
@@ -207,6 +253,17 @@ export const Menu = defineComponent({
       emit('open-change', key, { openKeys: newOpenKeys })
     }
 
+    const handleSearchInput = (event: Event) => {
+      const value = (event.target as HTMLInputElement).value
+
+      if (props.searchValue === undefined) {
+        internalSearchValue.value = value
+      }
+
+      emit('update:searchValue', value)
+      emit('search', value)
+    }
+
     // Menu classes
     const menuClasses = computed(() => {
       return classNames(
@@ -217,6 +274,14 @@ export const Menu = defineComponent({
     })
 
     const menuStyle = computed(() => mergeStyleValues(attrs.style, props.style))
+
+    const currentSearchValue = computed(() => {
+      return props.searchValue !== undefined ? props.searchValue : internalSearchValue.value
+    })
+
+    const filteredItems = computed(() =>
+      filterMenuItems(props.items ?? [], currentSearchValue.value)
+    )
 
     const passthroughAttrs = computed(() => {
       const { class: _class, style: _style, ...rest } = attrs
@@ -250,7 +315,7 @@ export const Menu = defineComponent({
     })
 
     watch(
-      [modeRef, collapsedRef, currentSelectedKeys, currentOpenKeys],
+      [modeRef, collapsedRef, currentSelectedKeys, currentOpenKeys, filteredItems],
       () => {
         void runRovingTabIndex()
       },
@@ -258,6 +323,61 @@ export const Menu = defineComponent({
     )
 
     return () => {
+      const renderDataItem = (item: CoreMenuItem): VNode => {
+        if (item.children && item.children.length > 0) {
+          return h(
+            SubMenu,
+            {
+              key: item.key,
+              itemKey: item.key,
+              title: item.label,
+              icon: item.icon,
+              disabled: item.disabled
+            },
+            () => item.children!.map(renderDataItem)
+          )
+        }
+
+        return h(
+          MenuItem,
+          {
+            key: item.key,
+            itemKey: item.key,
+            icon: item.icon,
+            disabled: item.disabled
+          },
+          () => item.label
+        )
+      }
+
+      const dataChildren = filteredItems.value.map(renderDataItem)
+      const slotChildren = slots.default?.() ?? []
+      const searchChild = props.searchable
+        ? [
+            h('li', { role: 'none', class: menuSearchFieldClasses }, [
+              h('input', {
+                type: 'search',
+                value: currentSearchValue.value,
+                placeholder: props.searchPlaceholder,
+                class: menuSearchInputClasses,
+                'aria-label': props.searchPlaceholder,
+                onInput: handleSearchInput
+              })
+            ])
+          ]
+        : []
+      const emptyChild =
+        props.items &&
+        props.items.length > 0 &&
+        dataChildren.length === 0 &&
+        slotChildren.length === 0
+          ? [
+              h('li', { role: 'none' }, [
+                h('div', { class: menuSearchEmptyClasses }, props.emptyText)
+              ])
+            ]
+          : []
+
       return h(
         'ul',
         {
@@ -269,7 +389,7 @@ export const Menu = defineComponent({
           'data-tiger-menu-mode': props.mode,
           ...passthroughAttrs.value
         },
-        slots.default?.()
+        [...searchChild, ...dataChildren, ...slotChildren, ...emptyChild]
       )
     }
   }
@@ -355,7 +475,12 @@ export const MenuItem = defineComponent({
       const effectiveCollapsed = props.collapsed ?? menuContext.collapsed.value
 
       return classNames(
-        getMenuItemClasses(isSelected.value, props.disabled, menuContext.theme.value, effectiveCollapsed),
+        getMenuItemClasses(
+          isSelected.value,
+          props.disabled,
+          menuContext.theme.value,
+          effectiveCollapsed
+        ),
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -426,7 +551,8 @@ export const MenuItem = defineComponent({
       const children = []
       type HChildren = Parameters<typeof h>[2]
 
-      const effectiveCollapsed = props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
+      const effectiveCollapsed =
+        props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
 
       // Render icon if provided
       if (props.icon) {

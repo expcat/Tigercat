@@ -6,6 +6,10 @@ export interface ResolveSelectOptionsOptions {
   remote?: boolean
 }
 
+export interface ResolveCreatableSelectOptionOptions {
+  creatable?: boolean
+}
+
 export interface SelectSearchDebouncerOptions {
   delay?: number
   onSearch: (query: string) => void
@@ -239,6 +243,50 @@ export function resolveSelectFilteredOptions(
   }
 
   return filterOptions(options, query)
+}
+
+export function createSelectOptionFromQuery(query: string): SelectOption | null {
+  const trimmed = query.trim()
+
+  if (!trimmed) {
+    return null
+  }
+
+  return {
+    label: trimmed,
+    value: trimmed
+  }
+}
+
+export function resolveCreatableSelectOption(
+  options: SelectOptions,
+  query: string,
+  resolveOptions: ResolveCreatableSelectOptionOptions = {}
+): SelectOption | null {
+  if (!resolveOptions.creatable) {
+    return null
+  }
+
+  const candidate = createSelectOptionFromQuery(query)
+  if (!candidate) {
+    return null
+  }
+
+  const normalizedLabel = candidate.label.toLowerCase()
+  const exists = flattenSelectOptions(options).some((option) => {
+    return (
+      option.label.toLowerCase() === normalizedLabel || String(option.value) === candidate.label
+    )
+  })
+
+  return exists ? null : candidate
+}
+
+export function getCreateSelectOptionLabel(
+  option: SelectOption,
+  createOptionText = 'Create'
+): string {
+  return `${createOptionText} "${option.label}"`
 }
 
 export function createSelectSearchDebouncer(

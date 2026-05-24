@@ -3,7 +3,7 @@
  * Shared styles and helpers for Menu components
  */
 
-import type { MenuMode, MenuTheme } from '../types/menu'
+import type { MenuItem, MenuMode, MenuTheme } from '../types/menu'
 
 /**
  * Base menu container classes
@@ -127,6 +127,23 @@ export const submenuHeightTransitionClasses =
  */
 export const menuItemGroupTitleClasses =
   'px-4 py-2 text-xs font-semibold text-[var(--tiger-text-muted,#6b7280)] uppercase tracking-wider'
+
+/**
+ * Menu search field wrapper classes.
+ */
+export const menuSearchFieldClasses = 'px-2 py-2'
+
+/**
+ * Menu search input classes.
+ */
+export const menuSearchInputClasses =
+  'w-full rounded border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-1.5 text-sm text-[var(--tiger-text,#111827)] outline-none focus:border-[var(--tiger-primary,#2563eb)] focus:ring-2 focus:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/20'
+
+/**
+ * Menu search empty state classes.
+ */
+export const menuSearchEmptyClasses =
+  'px-4 py-6 text-sm text-center text-[var(--tiger-text-muted,#6b7280)]'
 
 /**
  * Menu collapsed classes
@@ -269,6 +286,47 @@ export function replaceKeys(key: string | number, keys: (string | number)[]): (s
     return keys
   }
   return [key]
+}
+
+/**
+ * Normalize a menu search query for case-insensitive matching.
+ */
+export function normalizeMenuSearchQuery(query?: string): string {
+  return query?.trim().toLowerCase() ?? ''
+}
+
+/**
+ * Check whether a menu label matches a normalized search query.
+ */
+export function matchesMenuSearch(label: string, normalizedQuery: string): boolean {
+  return normalizedQuery === '' || label.toLowerCase().includes(normalizedQuery)
+}
+
+/**
+ * Filter a tree of menu items while preserving ancestors of matching children.
+ */
+export function filterMenuItems(items: MenuItem[], query?: string): MenuItem[] {
+  const normalizedQuery = normalizeMenuSearchQuery(query)
+
+  if (!normalizedQuery) {
+    return items
+  }
+
+  const filtered: MenuItem[] = []
+
+  for (const item of items) {
+    const children = item.children ? filterMenuItems(item.children, normalizedQuery) : undefined
+    const matchesSelf = matchesMenuSearch(item.label, normalizedQuery)
+
+    if (matchesSelf || (children && children.length > 0)) {
+      filtered.push({
+        ...item,
+        children
+      })
+    }
+  }
+
+  return filtered
 }
 
 // ============================================================================

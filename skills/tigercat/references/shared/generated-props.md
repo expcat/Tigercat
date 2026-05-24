@@ -579,6 +579,8 @@ update-command: pnpm docs:api
 | virtual? | `boolean` | false | Whether to use virtual scrolling for large option lists. When enabled, only visible options are rendered for better performance. |
 | remote? | `boolean` | false | Whether search is handled remotely. When true, local option filtering is skipped. |
 | searchDebounce? | `number` | 0 | Debounce delay for search callbacks in milliseconds. |
+| creatable? | `boolean` | false | Whether users can create a new option from the current search query. |
+| createOptionText? | `string` | 'Create' | Prefix text used for the creatable option row. |
 | listHeight? | `number` | 256 | Height of the dropdown panel in pixels (relevant when virtual is true) |
 
 ### slider.ts.ts
@@ -1252,6 +1254,7 @@ update-command: pnpm docs:api
 
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
+| items? | `MenuItem[]` | - | Data-driven menu items. Slot/children based usage is still supported. |
 | mode? | `MenuMode` | 'vertical' | Menu mode - horizontal, vertical, or inline |
 | theme? | `MenuTheme` | 'light' | Menu theme - light or dark |
 | selectedKeys? | `MenuKey[]` | - | Currently selected menu item keys |
@@ -1260,9 +1263,14 @@ update-command: pnpm docs:api
 | defaultOpenKeys? | `MenuKey[]` | - | Default opened submenu keys |
 | collapsed? | `boolean` | false | Whether the menu is collapsed (for vertical mode) |
 | multiple? | `boolean` | true | Whether multiple submenus can be opened at once |
-| inlineIndent? | `number` | true | Whether to allow inline indentation of submenus |
+| inlineIndent? | `number` | 24 | Inline indentation for submenu items |
 | className? | `string` | - | Additional CSS classes |
 | style? | `Record<string, string \| number>` | - | Custom styles |
+| searchable? | `boolean` | false | Whether to render a built-in search field for filtering data-driven `items`. |
+| searchValue? | `string` | - | Controlled search value used to filter data-driven `items`. |
+| defaultSearchValue? | `string` | - | Default search value for uncontrolled searchable menus. |
+| searchPlaceholder? | `string` | 'Search menu' | Search input placeholder. |
+| emptyText? | `string` | 'No menu items found' | Empty text shown when `items` are filtered to no results. |
 
 #### MenuItemProps
 

@@ -6,8 +6,22 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Menu, MenuItem, SubMenu, MenuItemGroup } from '@expcat/tigercat-react'
+import type { MenuItem as CoreMenuItem } from '@expcat/tigercat-core'
 import React from 'react'
 import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'
+
+const dataItems: CoreMenuItem[] = [
+  { key: 'dashboard', label: 'Dashboard' },
+  {
+    key: 'admin',
+    label: 'Administration',
+    children: [
+      { key: 'users', label: 'Users' },
+      { key: 'roles', label: 'Roles' }
+    ]
+  },
+  { key: 'settings', label: 'Settings' }
+]
 
 describe('Menu', () => {
   describe('Rendering', () => {
@@ -84,6 +98,43 @@ describe('Menu', () => {
       const menu = container.querySelector('ul')
       // Light theme sets CSS variables for light colors
       expect(menu?.className).toContain('[--tiger-surface:#ffffff]')
+    })
+
+    it('renders data-driven items', () => {
+      render(<Menu items={dataItems} defaultOpenKeys={['admin']} />)
+
+      expect(screen.getByRole('menuitem', { name: 'Dashboard' })).toBeInTheDocument()
+      expect(screen.getByRole('menuitem', { name: 'Administration' })).toBeInTheDocument()
+      expect(screen.getByRole('menuitem', { name: 'Users' })).toBeInTheDocument()
+    })
+
+    it('filters data-driven items by search value while preserving matching ancestors', () => {
+      render(<Menu items={dataItems} defaultSearchValue="roles" defaultOpenKeys={['admin']} />)
+
+      expect(screen.queryByText('Dashboard')).not.toBeInTheDocument()
+      expect(screen.getByRole('menuitem', { name: 'Administration' })).toBeInTheDocument()
+      expect(screen.getByRole('menuitem', { name: 'Roles' })).toBeInTheDocument()
+      expect(screen.queryByText('Users')).not.toBeInTheDocument()
+    })
+
+    it('renders built-in search input and filters data-driven items', async () => {
+      const user = userEvent.setup()
+      const onSearch = vi.fn()
+
+      render(<Menu items={dataItems} searchable onSearch={onSearch} />)
+
+      await user.type(screen.getByRole('searchbox', { name: 'Search menu' }), 'settings')
+
+      expect(onSearch).toHaveBeenLastCalledWith('settings')
+      expect(screen.getByText('Settings')).toBeInTheDocument()
+      expect(screen.queryByText('Dashboard')).not.toBeInTheDocument()
+    })
+
+    it('shows empty text when data-driven search has no matches', () => {
+      render(<Menu items={dataItems} defaultSearchValue="missing" emptyText="No matches" />)
+
+      expect(screen.getByText('No matches')).toBeInTheDocument()
+      expect(screen.queryByText('Dashboard')).not.toBeInTheDocument()
     })
   })
 

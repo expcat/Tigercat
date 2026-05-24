@@ -244,6 +244,41 @@ describe('Select', () => {
       expect(onSearch).toHaveBeenCalledWith('Option 2')
       vi.useRealTimers()
     })
+
+    it('should create a new option from the search query when creatable', async () => {
+      const user = userEvent.setup()
+      const onCreate = vi.fn()
+      const onChange = vi.fn()
+
+      const { container, getByText } = render(
+        <Select
+          options={testOptions}
+          searchable
+          creatable
+          onCreate={onCreate}
+          onChange={onChange}
+        />
+      )
+
+      await user.click(container.querySelector('button')!)
+      fireEvent.change(container.querySelector('input')!, { target: { value: 'New option' } })
+      fireEvent.click(getByText('Create "New option"'))
+
+      expect(onCreate).toHaveBeenCalledWith({ label: 'New option', value: 'New option' })
+      expect(onChange).toHaveBeenCalledWith('New option')
+    })
+
+    it('should not show creatable option for existing labels', async () => {
+      const user = userEvent.setup()
+      const { container, queryByText } = render(
+        <Select options={testOptions} searchable creatable />
+      )
+
+      await user.click(container.querySelector('button')!)
+      fireEvent.change(container.querySelector('input')!, { target: { value: 'Option 1' } })
+
+      expect(queryByText('Create "Option 1"')).not.toBeInTheDocument()
+    })
   })
 
   describe('Keyboard Interaction', () => {
