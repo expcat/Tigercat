@@ -28,11 +28,21 @@ export interface RenderBodyViewProps {
   rowSelection?: RowSelectionConfig
   expandable?: ExpandableConfig
   rowClassName?: string | ((record: Record<string, unknown>, index: number) => string) | undefined
+  rowDraggable?: boolean
 }
 
 export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): React.ReactNode {
-  const { size, hoverable, striped, loading, emptyText, rowSelection, expandable, rowClassName } =
-    view
+  const {
+    size,
+    hoverable,
+    striped,
+    loading,
+    emptyText,
+    rowSelection,
+    expandable,
+    rowClassName,
+    rowDraggable
+  } = view
 
   if (loading) {
     return null
@@ -50,6 +60,51 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
         </tr>
       </tbody>
     )
+  }
+
+  function getDelegatedRow(event: React.SyntheticEvent): {
+    key: string | number
+    record: Record<string, unknown>
+    index: number
+  } | null {
+    const row = (event.target as HTMLElement | null)?.closest<HTMLTableRowElement>(
+      'tr[data-tiger-table-row-index]'
+    )
+    if (!row) return null
+
+    const index = Number(row.dataset.tigerTableRowIndex)
+    if (!Number.isInteger(index)) return null
+
+    const record = ctx.paginatedData[index]
+    const key = ctx.pageRowKeys[index]
+    if (!record || key === undefined) return null
+
+    return { key, record, index }
+  }
+
+  function handleBodyClick(event: React.MouseEvent<HTMLTableSectionElement>) {
+    const row = getDelegatedRow(event)
+    if (!row) return
+    ctx.handleRowClick(row.record, row.index, row.key)
+  }
+
+  function handleBodyDragStart(event: React.DragEvent<HTMLTableSectionElement>) {
+    if (!rowDraggable) return
+    const row = getDelegatedRow(event)
+    if (!row) return
+    ctx.handleRowDragStart(row.key)
+  }
+
+  function handleBodyDragOver(event: React.DragEvent<HTMLTableSectionElement>) {
+    if (!rowDraggable) return
+    event.preventDefault()
+  }
+
+  function handleBodyDrop(event: React.DragEvent<HTMLTableSectionElement>) {
+    if (!rowDraggable) return
+    const row = getDelegatedRow(event)
+    if (!row) return
+    ctx.handleRowDrop(row.key)
   }
 
   function renderDataRow(record: Record<string, unknown>, index: number): React.ReactNode {
@@ -91,7 +146,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           getTableRowClasses(hoverable, striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.hasFixedColumns && 'group'
         )}
-        onClick={() => ctx.handleRowClick(record, index, key)}>
+        draggable={rowDraggable ? true : undefined}>
         {expandAtStart && expandToggleCell}
 
         {rowSelection && rowSelection.showCheckbox !== false && (
@@ -215,7 +270,11 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
 
   if (ctx.groupedData) {
     return (
-      <tbody>
+      <tbody
+        onClick={handleBodyClick}
+        onDragStart={rowDraggable ? handleBodyDragStart : undefined}
+        onDragOver={rowDraggable ? handleBodyDragOver : undefined}
+        onDrop={rowDraggable ? handleBodyDrop : undefined}>
         {Array.from(ctx.groupedData.entries()).map(([groupKey, groupItems]) => (
           <React.Fragment key={`group-${groupKey}`}>
             <tr className={tableGroupHeaderClasses}>
@@ -233,5 +292,13 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     )
   }
 
-  return <tbody>{ctx.paginatedData.map((record, index) => renderDataRow(record, index))}</tbody>
+  return (
+    <tbody
+      onClick={handleBodyClick}
+      onDragStart={rowDraggable ? handleBodyDragStart : undefined}
+      onDragOver={rowDraggable ? handleBodyDragOver : undefined}
+      onDrop={rowDraggable ? handleBodyDrop : undefined}>
+      {ctx.paginatedData.map((record, index) => renderDataRow(record, index))}
+    </tbody>
+  )
 }

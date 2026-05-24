@@ -17,8 +17,13 @@ import {
   type UploadListType,
   type UploadRequestOptions,
   type UploadLabels,
+  type UploadChunk,
   prepareUploadFiles,
   fileToUploadFile,
+  createUploadChunks,
+  createUploadQueueItem,
+  getUploadResumeKey,
+  runUploadQueue,
   handleUploadDragOver,
   handleUploadDragLeave,
   handleUploadDrop,
@@ -43,6 +48,10 @@ export interface VueUploadProps {
   fileList?: UploadFile[]
   showFileList?: boolean
   autoUpload?: boolean
+  queue?: boolean
+  maxConcurrent?: number
+  chunkSize?: number
+  resumable?: boolean
   customRequest?: (options: UploadRequestOptions) => void
   beforeUpload?: (file: File) => boolean | Promise<boolean>
   className?: string
@@ -144,6 +153,10 @@ export const Upload = defineComponent({
       type: Boolean,
       default: true
     },
+    queue: { type: Boolean, default: false },
+    maxConcurrent: { type: Number, default: 2 },
+    chunkSize: { type: Number, default: undefined },
+    resumable: { type: Boolean, default: false },
     /**
      * Custom upload request function
      */
@@ -203,6 +216,9 @@ export const Upload = defineComponent({
      * Emitted on upload error
      */
     error: (error: Error, _file: UploadFile) => error instanceof Error,
+    'chunk-progress': (_chunk: UploadChunk, progress: number, _file: UploadFile) =>
+      typeof progress === 'number',
+    'queue-change': (queue: unknown[]) => Array.isArray(queue),
     /**
      * Emitted when file limit is exceeded
      */
@@ -290,32 +306,124 @@ export const Upload = defineComponent({
         setFileList(nextFileList)
         emit('change', uploadFile, nextFileList)
 
-        // Auto upload if enabled
-        if (props.autoUpload) {
-          uploadFile.status = 'uploading'
-          if (props.customRequest) {
-            props.customRequest({
-              file,
-              onProgress: (progress: number) => {
-                uploadFile.progress = progress
-                emit('progress', progress, uploadFile)
-              },
-              onSuccess: (response: unknown) => {
-                uploadFile.status = 'success'
-                emit('success', response, uploadFile)
-              },
-              onError: (error: Error) => {
-                uploadFile.status = 'error'
-                uploadFile.error = error.message
-                emit('error', error, uploadFile)
-              }
-            })
-          } else {
-            // Simulate upload for demo purposes
-            uploadFile.status = 'success'
-          }
+        if (props.autoUpload && !props.queue) {
+          await uploadOne(file, uploadFile, () => setFileList([...nextFileList]))
         }
       }
+
+      if (props.autoUpload && props.queue) {
+        const queueItems = prepared.acceptedFiles.map((file) =>
+          createUploadQueueItem(
+            file,
+            nextFileList.find((item) => item.file === file)?.uid,
+            props.chunkSize
+          )
+        )
+        emit('queue-change', queueItems)
+        await runUploadQueue(
+          queueItems,
+          async (item) => {
+            const uploadFile = nextFileList.find((candidate) => candidate.uid === item.id)
+            if (!uploadFile) return
+            await uploadOne(item.file, uploadFile, () => setFileList([...nextFileList]))
+          },
+          { concurrency: props.maxConcurrent, onChange: (items) => emit('queue-change', items) }
+        )
+      }
+    }
+
+    const uploadOne = async (
+      file: File,
+      uploadFile: UploadFile,
+      notify: () => void
+    ): Promise<void> => {
+      uploadFile.status = 'uploading'
+      notify()
+
+      if (!props.customRequest) {
+        uploadFile.progress = 100
+        uploadFile.status = 'success'
+        notify()
+        return
+      }
+
+      const chunks = props.chunkSize ? createUploadChunks(file, props.chunkSize) : []
+      const resumeKey = props.resumable ? getUploadResumeKey(file) : undefined
+
+      if (chunks.length <= 1) {
+        await requestUpload(file, uploadFile, notify, { resumeKey })
+        return
+      }
+
+      for (const chunk of chunks) {
+        const chunkFile = new File([chunk.blob], file.name, {
+          type: file.type,
+          lastModified: file.lastModified
+        })
+        await requestUpload(chunkFile, uploadFile, notify, {
+          originalFile: file,
+          chunk,
+          totalChunks: chunks.length,
+          resumeKey
+        })
+      }
+
+      uploadFile.progress = 100
+      uploadFile.status = 'success'
+      emit('success', { chunks: chunks.length, resumeKey }, uploadFile)
+      notify()
+    }
+
+    const requestUpload = (
+      file: File,
+      uploadFile: UploadFile,
+      notify: () => void,
+      options: {
+        originalFile?: File
+        chunk?: UploadChunk
+        totalChunks?: number
+        resumeKey?: string
+      }
+    ): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        props.customRequest?.({
+          file,
+          originalFile: options.originalFile,
+          chunk: options.chunk,
+          chunkIndex: options.chunk?.index,
+          totalChunks: options.totalChunks,
+          resumeKey: options.resumeKey,
+          onProgress: (progress: number) => {
+            const nextProgress = options.chunk
+              ? Math.round(
+                  ((options.chunk.index + progress / 100) / (options.totalChunks ?? 1)) * 100
+                )
+              : progress
+            uploadFile.progress = nextProgress
+            if (options.chunk) {
+              emit('chunk-progress', options.chunk, progress, uploadFile)
+            }
+            emit('progress', nextProgress, uploadFile)
+            notify()
+          },
+          onSuccess: (response: unknown) => {
+            if (!options.chunk) {
+              uploadFile.status = 'success'
+              uploadFile.progress = 100
+              emit('success', response, uploadFile)
+              notify()
+            }
+            resolve()
+          },
+          onError: (error: Error) => {
+            uploadFile.status = 'error'
+            uploadFile.error = error.message
+            emit('error', error, uploadFile)
+            notify()
+            reject(error)
+          }
+        })
+      })
     }
 
     const handleRemove = (file: UploadFile) => {

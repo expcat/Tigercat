@@ -14,7 +14,7 @@ import {
   type SortDirection,
   type PaginationConfig
 } from '@expcat/tigercat-core'
-import { exportTableToCsv, downloadCsv } from '@expcat/tigercat-core'
+import { exportTableData, downloadTableExport } from '@expcat/tigercat-core'
 import type { TableContext, TableEmitFn, TableInternalProps } from './types'
 
 /**
@@ -413,9 +413,9 @@ export function useTableState(
 
   // --- v0.6.0: export ---
   function handleExport() {
-    const csv = exportTableToCsv(displayColumns.value, processedData.value)
-    downloadCsv(csv, props.exportFilename)
-    emit('export', csv)
+    const content = exportTableData(displayColumns.value, processedData.value, props.exportFormat)
+    downloadTableExport(content, props.exportFilename, props.exportFormat)
+    emit('export', content)
   }
 
   // --- v0.6.0: column drag ---
@@ -436,6 +436,25 @@ export function useTableState(
       emit('column-order-change', cols)
     }
     dragColumnKey.value = null
+  }
+
+  const dragRowKey = ref<string | number | null>(null)
+
+  function handleRowDragStart(rowKeyValue: string | number) {
+    dragRowKey.value = rowKeyValue
+  }
+
+  function handleRowDrop(targetKey: string | number) {
+    if (dragRowKey.value === null || dragRowKey.value === targetKey) return
+    const rows = [...paginatedData.value]
+    const fromIdx = paginatedRowKeys.value.findIndex((key) => key === dragRowKey.value)
+    const toIdx = paginatedRowKeys.value.findIndex((key) => key === targetKey)
+    if (fromIdx >= 0 && toIdx >= 0) {
+      const [moved] = rows.splice(fromIdx, 1)
+      rows.splice(toIdx, 0, moved)
+      emit('row-order-change', rows)
+    }
+    dragRowKey.value = null
   }
 
   // --- v0.6.0: virtual scroll ---
@@ -490,6 +509,8 @@ export function useTableState(
     cancelEdit,
     handleExport,
     handleDragStart,
-    handleDrop
+    handleDrop,
+    handleRowDragStart,
+    handleRowDrop
   }
 }

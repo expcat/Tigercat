@@ -14,6 +14,10 @@ import {
   mergeTigerLocale,
   prepareUploadFiles,
   fileToUploadFile,
+  createUploadChunks,
+  createUploadQueueItem,
+  getUploadResumeKey,
+  runUploadQueue,
   handleUploadDragOver,
   handleUploadDragLeave,
   handleUploadDrop,
@@ -57,7 +61,13 @@ export const Upload: React.FC<UploadProps> = ({
   fileList: controlledFileList,
   showFileList = true,
   autoUpload = true,
+  queue = false,
+  maxConcurrent = 2,
+  chunkSize,
+  resumable = false,
   customRequest,
+  onQueueChange,
+  onChunkProgress,
   onChange,
   onRemove,
   onPreview,
@@ -144,38 +154,120 @@ export const Upload: React.FC<UploadProps> = ({
         onChange(uploadFile, nextFileList)
       }
 
-      // Auto upload if enabled
-      if (autoUpload) {
-        uploadFile.status = 'uploading'
-        if (customRequest) {
-          customRequest({
-            file,
-            onProgress: (progress: number) => {
-              uploadFile.progress = progress
-              if (onProgress) {
-                onProgress(progress, uploadFile)
-              }
-            },
-            onSuccess: (response: unknown) => {
-              uploadFile.status = 'success'
-              if (onSuccess) {
-                onSuccess(response, uploadFile)
-              }
-            },
-            onError: (error: Error) => {
-              uploadFile.status = 'error'
-              uploadFile.error = error.message
-              if (onError) {
-                onError(error, uploadFile)
-              }
-            }
-          })
-        } else {
-          // Simulate upload for demo purposes
-          uploadFile.status = 'success'
-        }
+      if (autoUpload && !queue) {
+        await uploadOne(file, uploadFile, () => updateFileList([...nextFileList]))
       }
     }
+
+    if (autoUpload && queue) {
+      const queueItems = prepared.acceptedFiles.map((file) =>
+        createUploadQueueItem(file, nextFileList.find((item) => item.file === file)?.uid, chunkSize)
+      )
+      onQueueChange?.(queueItems)
+      await runUploadQueue(
+        queueItems,
+        async (item) => {
+          const uploadFile = nextFileList.find((candidate) => candidate.uid === item.id)
+          if (!uploadFile) return
+          await uploadOne(item.file, uploadFile, () => updateFileList([...nextFileList]))
+        },
+        { concurrency: maxConcurrent, onChange: onQueueChange }
+      )
+    }
+  }
+
+  const uploadOne = async (
+    file: File,
+    uploadFile: UploadFile,
+    notify: () => void
+  ): Promise<void> => {
+    uploadFile.status = 'uploading'
+    notify()
+
+    if (!customRequest) {
+      uploadFile.progress = 100
+      uploadFile.status = 'success'
+      notify()
+      return
+    }
+
+    const chunks = chunkSize ? createUploadChunks(file, chunkSize) : []
+    const resumeKey = resumable ? getUploadResumeKey(file) : undefined
+
+    if (chunks.length <= 1) {
+      await requestUpload(file, uploadFile, notify, { resumeKey })
+      return
+    }
+
+    for (const chunk of chunks) {
+      const chunkFile = new File([chunk.blob], file.name, {
+        type: file.type,
+        lastModified: file.lastModified
+      })
+      await requestUpload(chunkFile, uploadFile, notify, {
+        originalFile: file,
+        chunk,
+        totalChunks: chunks.length,
+        resumeKey
+      })
+    }
+
+    uploadFile.progress = 100
+    uploadFile.status = 'success'
+    onSuccess?.({ chunks: chunks.length, resumeKey }, uploadFile)
+    notify()
+  }
+
+  const requestUpload = (
+    file: File,
+    uploadFile: UploadFile,
+    notify: () => void,
+    options: {
+      originalFile?: File
+      chunk?: ReturnType<typeof createUploadChunks>[number]
+      totalChunks?: number
+      resumeKey?: string
+    }
+  ): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      customRequest?.({
+        file,
+        originalFile: options.originalFile,
+        chunk: options.chunk,
+        chunkIndex: options.chunk?.index,
+        totalChunks: options.totalChunks,
+        resumeKey: options.resumeKey,
+        onProgress: (progress: number) => {
+          const nextProgress = options.chunk
+            ? Math.round(
+                ((options.chunk.index + progress / 100) / (options.totalChunks ?? 1)) * 100
+              )
+            : progress
+          uploadFile.progress = nextProgress
+          if (options.chunk) {
+            onChunkProgress?.(options.chunk, progress, uploadFile)
+          }
+          onProgress?.(nextProgress, uploadFile)
+          notify()
+        },
+        onSuccess: (response: unknown) => {
+          if (!options.chunk) {
+            uploadFile.status = 'success'
+            uploadFile.progress = 100
+            onSuccess?.(response, uploadFile)
+            notify()
+          }
+          resolve()
+        },
+        onError: (error: Error) => {
+          uploadFile.status = 'error'
+          uploadFile.error = error.message
+          onError?.(error, uploadFile)
+          notify()
+          reject(error)
+        }
+      })
+    })
   }
 
   const handleRemove = (file: UploadFile) => {

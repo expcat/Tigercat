@@ -60,4 +60,6 @@ export interface TableContext {
   handleExport: () => void
   handleDragStart: (columnKey: string) => void
   handleDrop: (targetKey: string) => void
+  handleRowDragStart: (rowKey: string | number) => void
+  handleRowDrop: (targetKey: string | number) => void
 }

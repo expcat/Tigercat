@@ -128,9 +128,10 @@ export const Table = defineComponent({
                   type: 'button',
                   class: tableExportButtonClasses,
                   onClick: ctx.handleExport,
-                  'aria-label': 'Export to CSV'
+                  'aria-label':
+                    resolvedProps.exportFormat === 'excel' ? 'Export to Excel' : 'Export to CSV'
                 },
-                'Export CSV'
+                resolvedProps.exportFormat === 'excel' ? 'Export Excel' : 'Export CSV'
               )
             ]),
 

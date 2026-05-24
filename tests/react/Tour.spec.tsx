@@ -135,6 +135,18 @@ describe('Tour', () => {
     })
   })
 
+  it('should load steps asynchronously when opened', async () => {
+    const loadSteps = vi.fn().mockResolvedValue([{ title: 'Loaded', description: 'Async step' }])
+
+    render(<Tour steps={[]} open={true} loadSteps={loadSteps} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Loaded')).toBeInTheDocument()
+      expect(screen.getByText('Async step')).toBeInTheDocument()
+    })
+    expect(loadSteps).toHaveBeenCalled()
+  })
+
   it('should render close button by default and emit onClose', async () => {
     const user = userEvent.setup()
     const onClose = vi.fn()

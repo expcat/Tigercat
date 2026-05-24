@@ -34,6 +34,13 @@ export interface ChartTooltipPosition {
   y: number
 }
 
+export interface ChartBrushRange {
+  startIndex: number
+  endIndex: number
+}
+
+export type ChartLinkListener<T = unknown> = (payload: T) => void
+
 export interface ChartPointerMoveSchedulerOptions {
   onPositionChange: (position: ChartTooltipPosition) => void
   requestFrame?: ChartFrameRequest
@@ -214,6 +221,59 @@ export const chartInteractiveClasses = {
   selectable: 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
   active: 'ring-2 ring-[color:var(--tiger-primary,#2563eb)] ring-offset-1'
 }
+
+export function normalizeChartBrushRange(
+  startIndex: number,
+  endIndex: number,
+  dataLength: number
+): ChartBrushRange {
+  const max = Math.max(0, dataLength - 1)
+  const start = Math.min(Math.max(Math.min(startIndex, endIndex), 0), max)
+  const end = Math.min(Math.max(Math.max(startIndex, endIndex), 0), max)
+  return { startIndex: start, endIndex: end }
+}
+
+export function applyChartBrush<T>(data: T[], range?: ChartBrushRange | null): T[] {
+  if (!range) return data
+  const normalized = normalizeChartBrushRange(range.startIndex, range.endIndex, data.length)
+  return data.slice(normalized.startIndex, normalized.endIndex + 1)
+}
+
+export function createChartLinkController<T = unknown>() {
+  const listeners = new Map<string, Set<ChartLinkListener<T>>>()
+
+  return {
+    subscribe(group: string, listener: ChartLinkListener<T>): () => void {
+      const groupListeners = listeners.get(group) ?? new Set<ChartLinkListener<T>>()
+      groupListeners.add(listener)
+      listeners.set(group, groupListeners)
+      return () => {
+        groupListeners.delete(listener)
+        if (groupListeners.size === 0) listeners.delete(group)
+      }
+    },
+    publish(group: string, payload: T): void {
+      listeners.get(group)?.forEach((listener) => listener(payload))
+    },
+    getListenerCount(group?: string): number {
+      if (group) return listeners.get(group)?.size ?? 0
+      let total = 0
+      listeners.forEach((groupListeners) => {
+        total += groupListeners.size
+      })
+      return total
+    },
+    clear(group?: string): void {
+      if (group) {
+        listeners.delete(group)
+        return
+      }
+      listeners.clear()
+    }
+  }
+}
+
+export const defaultChartLinkController = createChartLinkController()
 
 function requestDefaultFrame(callback: ChartFrameCallback): number {
   if (globalThis.requestAnimationFrame) {

@@ -49,6 +49,58 @@ export function renderTableBody(
     ])
   }
 
+  function getDelegatedRow(event: Event): {
+    key: string | number
+    record: Record<string, unknown>
+    index: number
+  } | null {
+    const row = (event.target as HTMLElement | null)?.closest<HTMLTableRowElement>(
+      'tr[data-tiger-table-row-index]'
+    )
+    if (!row) return null
+
+    const index = Number(row.dataset.tigerTableRowIndex)
+    if (!Number.isInteger(index)) return null
+
+    const record = ctx.paginatedData.value[index]
+    const key = ctx.paginatedRowKeys.value[index]
+    if (!record || key === undefined) return null
+
+    return { key, record, index }
+  }
+
+  function handleBodyClick(event: MouseEvent) {
+    const row = getDelegatedRow(event)
+    if (!row) return
+    ctx.handleRowClick(row.record, row.index, row.key)
+  }
+
+  function handleBodyDragStart(event: DragEvent) {
+    if (!props.rowDraggable) return
+    const row = getDelegatedRow(event)
+    if (!row) return
+    ctx.handleRowDragStart(row.key)
+  }
+
+  function handleBodyDragOver(event: DragEvent) {
+    if (!props.rowDraggable) return
+    event.preventDefault()
+  }
+
+  function handleBodyDrop(event: DragEvent) {
+    if (!props.rowDraggable) return
+    const row = getDelegatedRow(event)
+    if (!row) return
+    ctx.handleRowDrop(row.key)
+  }
+
+  const delegatedBodyHandlers = {
+    onClick: handleBodyClick,
+    onDragstart: props.rowDraggable ? handleBodyDragStart : undefined,
+    onDragover: props.rowDraggable ? handleBodyDragOver : undefined,
+    onDrop: props.rowDraggable ? handleBodyDrop : undefined
+  }
+
   function renderDataRow(record: Record<string, unknown>, index: number): VNodeChild {
     const key = ctx.paginatedRowKeys.value[index]
     const isSelected = ctx.selectedRowKeySet.value.has(key)
@@ -220,7 +272,7 @@ export function renderTableBody(
           getTableRowClasses(props.hoverable, props.striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.value.hasFixedColumns && 'group'
         ),
-        onClick: () => ctx.handleRowClick(record, index, key)
+        draggable: props.rowDraggable ? 'true' : undefined
       },
       cells
     )
@@ -281,10 +333,10 @@ export function renderTableBody(
         }
       })
     }
-    return h('tbody', groupRows)
+    return h('tbody', delegatedBodyHandlers, groupRows)
   }
 
   const rows = ctx.paginatedData.value.flatMap((record, index) => renderDataRow(record, index))
 
-  return h('tbody', rows)
+  return h('tbody', delegatedBodyHandlers, rows)
 }

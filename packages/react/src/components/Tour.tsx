@@ -35,6 +35,7 @@ export interface TourProps extends CoreTourProps {
 
 export const Tour: React.FC<TourProps> = ({
   steps,
+  loadSteps,
   open = false,
   current: controlledCurrent,
   nextText = 'Next',
@@ -49,16 +50,36 @@ export const Tour: React.FC<TourProps> = ({
   onChange
 }) => {
   const [internalStep, setInternalStep] = useState(0)
+  const [resolvedSteps, setResolvedSteps] = useState(steps)
   const currentStep = controlledCurrent ?? internalStep
-  const activeSteps = useMemo(() => getActiveTourSteps(steps), [steps])
+  const activeSteps = useMemo(() => getActiveTourSteps(resolvedSteps), [resolvedSteps])
   const activeStepInfo = useMemo(
-    () => getCurrentActiveTourStep(activeSteps, currentStep, steps.length),
-    [activeSteps, currentStep, steps.length]
+    () => getCurrentActiveTourStep(activeSteps, currentStep, resolvedSteps.length),
+    [activeSteps, currentStep, resolvedSteps.length]
   )
   const activeStepPosition = getActiveTourStepPosition(activeSteps, activeStepInfo?.index)
   const step = activeStepInfo?.step
   const [targetRect, setTargetRect] = useState<TourRect | undefined>()
   const popoverRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!loadSteps) {
+      setResolvedSteps(steps)
+      return
+    }
+    if (!open) return
+
+    let cancelled = false
+    Promise.resolve(loadSteps()).then((nextSteps) => {
+      if (!cancelled) {
+        setResolvedSteps(nextSteps)
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [loadSteps, open, steps])
 
   const updateRect = useCallback(() => {
     if (step?.target) {

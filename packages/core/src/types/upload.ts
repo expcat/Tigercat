@@ -9,6 +9,25 @@ import type { TigerLocale } from './locale'
  */
 export type UploadFileStatus = 'ready' | 'uploading' | 'success' | 'error'
 
+export type UploadQueueStatus = 'queued' | 'uploading' | 'success' | 'error'
+
+export interface UploadChunk {
+  index: number
+  start: number
+  end: number
+  size: number
+  blob: Blob
+}
+
+export interface UploadQueueItem {
+  id: string
+  file: File
+  status: UploadQueueStatus
+  progress: number
+  chunks: UploadChunk[]
+  error?: string
+}
+
 /**
  * List type for file display
  */
@@ -126,9 +145,42 @@ export interface UploadProps {
   autoUpload?: boolean
 
   /**
+   * Enable queued upload execution for selected files.
+   * @default false
+   */
+  queue?: boolean
+
+  /**
+   * Maximum concurrent uploads when queue is enabled.
+   * @default 2
+   */
+  maxConcurrent?: number
+
+  /**
+   * Chunk size in bytes. When set, customRequest is called once per chunk.
+   */
+  chunkSize?: number
+
+  /**
+   * Whether chunked uploads should expose a stable resume key.
+   * @default false
+   */
+  resumable?: boolean
+
+  /**
    * Custom upload request
    */
   customRequest?: (options: UploadRequestOptions) => void
+
+  /**
+   * Queue change callback.
+   */
+  onQueueChange?: (queue: UploadQueueItem[]) => void
+
+  /**
+   * Chunk progress callback.
+   */
+  onChunkProgress?: (chunk: UploadChunk, progress: number, file: UploadFile) => void
 
   /**
    * File change callback
@@ -206,6 +258,21 @@ export interface UploadRequestOptions {
    * The file to upload
    */
   file: File
+
+  /** Original selected file when `file` is a chunk wrapper. */
+  originalFile?: File
+
+  /** Current chunk metadata for chunked uploads. */
+  chunk?: UploadChunk
+
+  /** Current chunk index, 0-based. */
+  chunkIndex?: number
+
+  /** Total chunk count for the original file. */
+  totalChunks?: number
+
+  /** Stable resume key for the original file. */
+  resumeKey?: string
 
   /**
    * Progress callback

@@ -48,7 +48,7 @@
 | timepicker.ts.ts | `TimePickerSize`, `TimeFormat`, `TimePickerSingleValue`, `TimePickerRangeValue`, `TimePickerModelValue`, `TimePickerLabels`, `TimePickerProps` |
 | transfer.ts.ts | `TransferItem`, `TransferSize`, `TransferDirection`, `TransferProps` |
 | tree-select.ts.ts | `TreeSelectSize`, `TreeSelectValue`, `TreeSelectProps` |
-| upload.ts.ts | `UploadFileStatus`, `UploadListType`, `UploadFile`, `UploadProps`, `UploadLabels`, `UploadRequestOptions` |
+| upload.ts.ts | `UploadFileStatus`, `UploadQueueStatus`, `UploadChunk`, `UploadQueueItem`, `UploadListType`, `UploadFile`, `UploadProps`, `UploadLabels`, `UploadRequestOptions` |
 
 ## Feedback
 
@@ -63,7 +63,7 @@
 | popover.ts.ts | `PopoverTrigger`, `PopoverProps` |
 | progress.ts.ts | `ProgressVariant`, `ProgressSize`, `ProgressType`, `ProgressStatus`, `ProgressProps` |
 | tooltip.ts.ts | `TooltipTrigger`, `TooltipProps` |
-| tour.ts.ts | `TourPlacement`, `TourStepSkipPredicate`, `TourStep`, `TourProps` |
+| tour.ts.ts | `TourPlacement`, `TourStepSkipPredicate`, `TourStepLoader`, `TourStep`, `TourProps` |
 
 ## Layout
 
@@ -103,7 +103,7 @@
 | ---- | -------------- |
 | calendar.ts.ts | `CalendarMode`, `CalendarProps` |
 | collapse.ts.ts | `ExpandIconPosition`, `CollapseProps`, `CollapsePanelProps` |
-| table.ts.ts | `TableSize`, `SortDirection`, `SortState`, `ColumnAlign`, `FilterType`, `FilterOption`, `ColumnFilter`, `TableColumn`, `PaginationConfig`, `RowSelectionConfig`, `ExpandableConfig`, `TableProps`, `FilterRule` |
+| table.ts.ts | `TableSize`, `TableExportFormat`, `SortDirection`, `SortState`, `ColumnAlign`, `FilterType`, `FilterOption`, `ColumnFilter`, `TableColumn`, `PaginationConfig`, `RowSelectionConfig`, `ExpandableConfig`, `TableProps`, `FilterRule` |
 
 ## Charts
 
@@ -152,4 +152,4 @@
 
 ---
 
-Total exported types: **534**
+Total exported types: **539**

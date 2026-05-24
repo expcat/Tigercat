@@ -139,6 +139,8 @@ export * from './group-utils'
 
 // Chart resize utilities (v0.9.0+)
 export * from './chart-resize-utils'
+export * from './chart-export-utils'
+export * from './chart-interaction'
 
 // SVG chart utilities
 export * from './chart'

@@ -728,7 +728,13 @@ update-command: pnpm docs:api
 | fileList? | `UploadFile[]` | - | List of uploaded files |
 | showFileList? | `boolean` | true | Whether to show the file list |
 | autoUpload? | `boolean` | true | Whether to auto upload when file is selected |
+| queue? | `boolean` | false | Enable queued upload execution for selected files. |
+| maxConcurrent? | `number` | 2 | Maximum concurrent uploads when queue is enabled. |
+| chunkSize? | `number` | - | Chunk size in bytes. When set, customRequest is called once per chunk. |
+| resumable? | `boolean` | false | Whether chunked uploads should expose a stable resume key. |
 | customRequest? | `(options: UploadRequestOptions) => void` | - | Custom upload request |
+| onQueueChange? | `(queue: UploadQueueItem[]) => void` | - | Queue change callback. |
+| onChunkProgress? | `(chunk: UploadChunk, progress: number, file: UploadFile) => void` | - | Chunk progress callback. |
 | onChange? | `(file: UploadFile, fileList: UploadFile[]) => void` | - | File change callback |
 | onRemove? | `(file: UploadFile, fileList: UploadFile[]) => void \| boolean` | - | File remove callback |
 | onPreview? | `(file: UploadFile) => void` | - | File preview callback |
@@ -913,6 +919,7 @@ update-command: pnpm docs:api
 | Prop | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | steps | `TourStep[]` | - | Array of tour steps |
+| loadSteps? | `TourStepLoader` | - | Load tour steps asynchronously when the tour opens. |
 | open? | `boolean` | false | Whether the tour is open |
 | current? | `number` | - | Current step index (controlled) |
 | nextText? | `string` | 'Next' | Text for the "Next" button |
@@ -1484,9 +1491,11 @@ update-command: pnpm docs:api
 | filterMode? | `'basic' \| 'advanced'` | 'basic' | Filter mode |
 | advancedFilterRules? | `FilterRule[]` | - | Advanced filter rules (used when filterMode='advanced') |
 | columnDraggable? | `boolean` | false | Enable column drag reorder |
+| rowDraggable? | `boolean` | false | Enable row drag reorder. |
 | summaryRow? | `{ show: boolean; data: Record<string, unknown> }` | - | Summary row configuration |
 | groupBy? | `string` | - | Group rows by column key |
-| exportable? | `boolean` | false | Enable CSV export |
+| exportable? | `boolean` | false | Enable table export |
+| exportFormat? | `TableExportFormat` | 'csv' | Export format. |
 | exportFilename? | `string` | 'export' | Export filename (without extension) |
 
 ## Charts

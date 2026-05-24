@@ -25,6 +25,7 @@ export interface TableProps<T = Record<string, unknown>> extends CoreTableProps<
   onExpandChange?: (expandedKeys: (string | number)[], record: T, expanded: boolean) => void
   onCellChange?: (rowIndex: number, columnKey: string, newValue: string) => void
   onColumnOrderChange?: (columns: CoreTableProps<T>['columns']) => void
+  onRowOrderChange?: (rows: T[]) => void
   onExport?: (csv: string) => void
   className?: string
 }
@@ -77,4 +78,6 @@ export interface TableContext {
   handleExport: () => void
   handleDragStart: (columnKey: string) => void
   handleDrop: (targetKey: string) => void
+  handleRowDragStart: (rowKey: string | number) => void
+  handleRowDrop: (targetKey: string | number) => void
 }

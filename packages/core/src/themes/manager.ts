@@ -12,7 +12,7 @@
  */
 
 import type { ThemePreset, ThemeSemanticColors, ColorScheme } from '../types/theme'
-import { THEME_CSS_VARS } from '../theme'
+import { THEME_CSS_VARS, removeCssVarsCached, setCssVarsCached } from '../theme'
 import { isBrowser } from '../utils/env'
 
 // ---------------------------------------------------------------------------
@@ -20,18 +20,18 @@ import { isBrowser } from '../utils/env'
 // ---------------------------------------------------------------------------
 
 function applyColors(colors: Partial<ThemeSemanticColors>, target: HTMLElement): void {
+  const vars: Record<string, string> = {}
   for (const [key, value] of Object.entries(colors)) {
     const varName = THEME_CSS_VARS[key as keyof ThemeSemanticColors]
     if (varName && value) {
-      target.style.setProperty(varName, value)
+      vars[varName] = value
     }
   }
+  setCssVarsCached(target, vars)
 }
 
 function clearColors(target: HTMLElement): void {
-  for (const varName of Object.values(THEME_CSS_VARS)) {
-    target.style.removeProperty(varName)
-  }
+  removeCssVarsCached(target, Object.values(THEME_CSS_VARS))
 }
 
 function resolveSystemDark(): boolean {

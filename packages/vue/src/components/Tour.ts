@@ -25,6 +25,7 @@ import {
   getActiveTourStepPosition,
   closeIconPathD,
   type TourStep,
+  type TourStepLoader,
   type TourPlacement,
   type TourRect
 } from '@expcat/tigercat-core'
@@ -32,6 +33,7 @@ import { createStatusIcon } from '../utils/icon-helpers'
 
 export interface VueTourProps {
   steps: TourStep[]
+  loadSteps?: TourStepLoader
   open?: boolean
   current?: number
   nextText?: string
@@ -49,6 +51,10 @@ export const Tour = defineComponent({
     steps: {
       type: Array as PropType<TourStep[]>,
       required: true
+    },
+    loadSteps: {
+      type: Function as PropType<TourStepLoader>,
+      default: undefined
     },
     open: {
       type: Boolean,
@@ -68,10 +74,11 @@ export const Tour = defineComponent({
   emits: ['update:open', 'update:current', 'close', 'finish', 'change'],
   setup(props, { emit }) {
     const internalStep = ref(0)
+    const resolvedSteps = ref<TourStep[]>(props.steps)
     const currentStep = computed(() => props.current ?? internalStep.value)
-    const activeSteps = computed(() => getActiveTourSteps(props.steps))
+    const activeSteps = computed(() => getActiveTourSteps(resolvedSteps.value))
     const activeStepInfo = computed(() =>
-      getCurrentActiveTourStep(activeSteps.value, currentStep.value, props.steps.length)
+      getCurrentActiveTourStep(activeSteps.value, currentStep.value, resolvedSteps.value.length)
     )
     const activeStepPosition = computed(() =>
       getActiveTourStepPosition(activeSteps.value, activeStepInfo.value?.index)
@@ -87,6 +94,32 @@ export const Tour = defineComponent({
         targetRect.value = undefined
       }
     }
+
+    const loadSteps = async () => {
+      if (!props.loadSteps) {
+        resolvedSteps.value = props.steps
+        return
+      }
+
+      resolvedSteps.value = await props.loadSteps()
+    }
+
+    watch(
+      () => props.steps,
+      (next) => {
+        if (!props.loadSteps) {
+          resolvedSteps.value = next
+        }
+      }
+    )
+
+    watch(
+      () => props.open,
+      (open) => {
+        if (open) void loadSteps()
+      },
+      { immediate: true }
+    )
 
     watch(
       () => [props.open, currentStep.value],

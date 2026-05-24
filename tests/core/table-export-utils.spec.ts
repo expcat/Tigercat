@@ -5,7 +5,10 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   exportTableToCsv,
+  exportTableToExcel,
+  exportTableData,
   downloadCsv,
+  downloadExcel,
   tableExportButtonClasses
 } from '@expcat/tigercat-core/utils/table-export'
 
@@ -83,6 +86,56 @@ describe('downloadCsv', () => {
     downloadCsv('a,b,c', 'test')
 
     expect(createElementSpy).toHaveBeenCalledWith('a')
+    expect(clickSpy).toHaveBeenCalled()
+
+    createElementSpy.mockRestore()
+    appendSpy.mockRestore()
+    removeSpy.mockRestore()
+    revokeURL.mockRestore()
+  })
+})
+
+describe('exportTableToExcel', () => {
+  it('should generate an Excel-compatible HTML worksheet', () => {
+    const excel = exportTableToExcel(columns, data)
+
+    expect(excel).toContain('<table>')
+    expect(excel).toContain('<th>Name</th>')
+    expect(excel).toContain('<td>Alice</td>')
+  })
+
+  it('should escape HTML in values', () => {
+    const excel = exportTableToExcel(columns, [{ name: '<Alice>', age: 25, city: 'A&B' }])
+
+    expect(excel).toContain('&lt;Alice&gt;')
+    expect(excel).toContain('A&amp;B')
+  })
+
+  it('should dispatch by export format', () => {
+    expect(exportTableData(columns, data, 'csv')).toContain('Name,Age,City')
+    expect(exportTableData(columns, data, 'excel')).toContain('<table>')
+  })
+})
+
+describe('downloadExcel', () => {
+  it('should create an xls download link', () => {
+    const clickSpy = vi.fn()
+    const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue({
+      href: '',
+      download: '',
+      style: { display: '' },
+      click: clickSpy
+    } as any)
+    const appendSpy = vi.spyOn(document.body, 'appendChild').mockImplementation((n) => n)
+    const removeSpy = vi.spyOn(document.body, 'removeChild').mockImplementation((n) => n)
+    const revokeURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
+
+    downloadExcel('<table></table>', 'report')
+
+    expect(createElementSpy).toHaveBeenCalledWith('a')
+    expect((createElementSpy.mock.results[0].value as HTMLAnchorElement).download).toBe(
+      'report.xls'
+    )
     expect(clickSpy).toHaveBeenCalled()
 
     createElementSpy.mockRestore()

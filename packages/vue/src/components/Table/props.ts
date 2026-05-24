@@ -45,9 +45,11 @@ export interface VueTableProps {
   filterMode?: 'basic' | 'advanced'
   advancedFilterRules?: FilterRule[]
   columnDraggable?: boolean
+  rowDraggable?: boolean
   summaryRow?: { show: boolean; data: Record<string, unknown> }
   groupBy?: string
   exportable?: boolean
+  exportFormat?: 'csv' | 'excel'
   exportFilename?: string
 }
 
@@ -162,9 +164,11 @@ export const tableProps = {
   filterMode: { type: String as PropType<'basic' | 'advanced'>, default: 'basic' },
   advancedFilterRules: { type: Array as PropType<FilterRule[]>, default: () => [] },
   columnDraggable: { type: Boolean, default: false },
+  rowDraggable: { type: Boolean, default: false },
   summaryRow: { type: Object as PropType<{ show: boolean; data: Record<string, unknown> }> },
   groupBy: { type: String },
   exportable: { type: Boolean, default: false },
+  exportFormat: { type: String as PropType<'csv' | 'excel'>, default: 'csv' },
   exportFilename: { type: String, default: 'export' }
 } as const
 
@@ -178,6 +182,7 @@ export const tableEmits = [
   'expand-change',
   'cell-change',
   'column-order-change',
+  'row-order-change',
   'export'
 ] as const
 

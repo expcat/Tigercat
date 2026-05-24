@@ -62,9 +62,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   filterMode = 'basic',
   advancedFilterRules = [],
   columnDraggable = false,
+  rowDraggable = false,
   summaryRow,
   groupBy,
   exportable = false,
+  exportFormat = 'csv',
   exportFilename = 'export',
   onChange,
   onRowClick,
@@ -75,6 +77,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   onExpandChange,
   onCellChange,
   onColumnOrderChange,
+  onRowOrderChange,
   onExport,
   className,
   ...props
@@ -108,6 +111,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     filterMode,
     advancedFilterRules,
     groupBy,
+    exportFormat,
     exportFilename,
     measuredColumnWidths,
     onChange,
@@ -127,6 +131,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       | undefined,
     onCellChange,
     onColumnOrderChange,
+    onRowOrderChange: onRowOrderChange as ((rows: Record<string, unknown>[]) => void) | undefined,
     onExport
   })
 
@@ -198,7 +203,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       {exportable && (
         <div className="mb-2 flex justify-end">
           <button type="button" className={tableExportButtonClasses} onClick={ctx.handleExport}>
-            Export CSV
+            {exportFormat === 'excel' ? 'Export Excel' : 'Export CSV'}
           </button>
         </div>
       )}
@@ -235,7 +240,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           emptyText,
           rowSelection: internalRowSelection,
           expandable: internalExpandable,
-          rowClassName: internalRowClassName
+          rowClassName: internalRowClassName,
+          rowDraggable
         })}
         {renderSummaryRow(ctx, {
           size,

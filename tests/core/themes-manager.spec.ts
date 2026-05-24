@@ -3,7 +3,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { ThemeManager, type ThemeChangeEvent } from '@expcat/tigercat-core'
+import {
+  ThemeManager,
+  setCssVarsCached,
+  removeCssVarsCached,
+  type ThemeChangeEvent
+} from '@expcat/tigercat-core'
 import type { ThemePreset } from '@expcat/tigercat-core'
 
 const ALL_VAR_NAMES = [
@@ -154,6 +159,26 @@ describe('themes/manager — ThemeManager', () => {
       // Previous primary value must have been cleared.
       expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('')
       expect(document.documentElement.style.getPropertyValue('--tiger-surface')).toBe('#111111')
+    })
+  })
+
+  describe('cached CSS variable updates', () => {
+    it('skips duplicate setProperty calls and clears cached entries', () => {
+      const target = document.createElement('div')
+      const setSpy = vi.spyOn(target.style, 'setProperty')
+      const removeSpy = vi.spyOn(target.style, 'removeProperty')
+
+      setCssVarsCached(target, { '--tiger-primary': '#123456' })
+      setCssVarsCached(target, { '--tiger-primary': '#123456' })
+      setCssVarsCached(target, { '--tiger-primary': '#654321' })
+
+      expect(setSpy).toHaveBeenCalledTimes(2)
+      expect(target.style.getPropertyValue('--tiger-primary')).toBe('#654321')
+
+      removeCssVarsCached(target, ['--tiger-primary'])
+
+      expect(removeSpy).toHaveBeenCalledWith('--tiger-primary')
+      expect(target.style.getPropertyValue('--tiger-primary')).toBe('')
     })
   })
 

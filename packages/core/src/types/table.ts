@@ -7,6 +7,8 @@
  */
 export type TableSize = 'sm' | 'md' | 'lg'
 
+export type TableExportFormat = 'csv' | 'excel'
+
 /**
  * Sort direction
  */
@@ -495,6 +497,12 @@ export interface TableProps<T = Record<string, unknown>> {
   columnDraggable?: boolean
 
   /**
+   * Enable row drag reorder.
+   * @default false
+   */
+  rowDraggable?: boolean
+
+  /**
    * Summary row configuration
    */
   summaryRow?: { show: boolean; data: Record<string, unknown> }
@@ -505,10 +513,16 @@ export interface TableProps<T = Record<string, unknown>> {
   groupBy?: string
 
   /**
-   * Enable CSV export
+   * Enable table export
    * @default false
    */
   exportable?: boolean
+
+  /**
+   * Export format.
+   * @default 'csv'
+   */
+  exportFormat?: TableExportFormat
 
   /**
    * Export filename (without extension)

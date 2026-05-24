@@ -15,7 +15,7 @@ import {
   type RowSelectionConfig,
   type ExpandableConfig
 } from '@expcat/tigercat-core'
-import { exportTableToCsv, downloadCsv } from '@expcat/tigercat-core'
+import { exportTableData, downloadTableExport, type TableExportFormat } from '@expcat/tigercat-core'
 import type { TableContext, TableProps } from './types'
 
 /**
@@ -39,6 +39,7 @@ export interface UseTableStateInput {
   filterMode: 'basic' | 'advanced'
   advancedFilterRules: FilterRule[]
   groupBy?: string
+  exportFormat: TableExportFormat
   exportFilename: string
   measuredColumnWidths?: Record<string, number>
 
@@ -56,6 +57,7 @@ export interface UseTableStateInput {
   ) => void
   onCellChange?: TableProps['onCellChange']
   onColumnOrderChange?: (columns: TableColumn[]) => void
+  onRowOrderChange?: (rows: Record<string, unknown>[]) => void
   onExport?: TableProps['onExport']
 }
 
@@ -76,6 +78,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     filterMode,
     advancedFilterRules,
     groupBy,
+    exportFormat,
     exportFilename,
     measuredColumnWidths,
     onChange,
@@ -87,6 +90,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     onExpandChange,
     onCellChange,
     onColumnOrderChange,
+    onRowOrderChange,
     onExport
   } = input
 
@@ -433,9 +437,9 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }
 
   function handleExport() {
-    const csv = exportTableToCsv(displayColumns, processedData)
-    downloadCsv(csv, exportFilename)
-    onExport?.(csv)
+    const content = exportTableData(displayColumns, processedData, exportFormat)
+    downloadTableExport(content, exportFilename, exportFormat)
+    onExport?.(content)
   }
 
   // column drag
@@ -456,6 +460,25 @@ export function useTableState(input: UseTableStateInput): TableContext {
       onColumnOrderChange?.(cols)
     }
     setDragColumnKey(null)
+  }
+
+  const [dragRowKey, setDragRowKey] = useState<string | number | null>(null)
+
+  function handleRowDragStart(rowKeyValue: string | number) {
+    setDragRowKey(rowKeyValue)
+  }
+
+  function handleRowDrop(targetKey: string | number) {
+    if (dragRowKey === null || dragRowKey === targetKey) return
+    const rows = [...paginatedData]
+    const fromIdx = pageRowKeys.findIndex((key) => key === dragRowKey)
+    const toIdx = pageRowKeys.findIndex((key) => key === targetKey)
+    if (fromIdx >= 0 && toIdx >= 0) {
+      const [moved] = rows.splice(fromIdx, 1)
+      rows.splice(toIdx, 0, moved)
+      onRowOrderChange?.(rows)
+    }
+    setDragRowKey(null)
   }
 
   // grouping
@@ -499,6 +522,8 @@ export function useTableState(input: UseTableStateInput): TableContext {
     cancelEdit,
     handleExport,
     handleDragStart,
-    handleDrop
+    handleDrop,
+    handleRowDragStart,
+    handleRowDrop
   }
 }

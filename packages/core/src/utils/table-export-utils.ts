@@ -1,8 +1,8 @@
 /**
- * Table export utilities (CSV)
+ * Table export utilities (CSV / Excel-compatible HTML worksheet)
  */
 
-import type { TableColumn } from '../types/table'
+import type { TableColumn, TableExportFormat } from '../types/table'
 
 /**
  * Escape a value for CSV output
@@ -37,6 +37,34 @@ export function exportTableToCsv<T>(
   return [headers.join(','), ...rows].join('\n')
 }
 
+function escapeHtmlValue(value: unknown): string {
+  const str = value === null || value === undefined ? '' : String(value)
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+export function exportTableToExcel<T>(columns: TableColumn<T>[], data: T[]): string {
+  const headerCells = columns.map((column) => `<th>${escapeHtmlValue(column.title)}</th>`).join('')
+  const bodyRows = data
+    .map((record) => {
+      const cells = columns
+        .map((column) => {
+          const key = column.dataKey || column.key
+          const value = (record as Record<string, unknown>)[key]
+          return `<td>${escapeHtmlValue(value)}</td>`
+        })
+        .join('')
+
+      return `<tr>${cells}</tr>`
+    })
+    .join('')
+
+  return `<!doctype html><html><head><meta charset="utf-8"></head><body><table><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table></body></html>`
+}
+
 /**
  * Trigger a CSV file download in the browser
  */
@@ -51,6 +79,40 @@ export function downloadCsv(csvContent: string, filename: string = 'export'): vo
   link.click()
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
+}
+
+export function downloadExcel(excelContent: string, filename: string = 'export'): void {
+  const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${filename}.xls`
+  link.style.display = 'none'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+export function exportTableData<T>(
+  columns: TableColumn<T>[],
+  data: T[],
+  format: TableExportFormat = 'csv'
+): string {
+  return format === 'excel' ? exportTableToExcel(columns, data) : exportTableToCsv(columns, data)
+}
+
+export function downloadTableExport(
+  content: string,
+  filename: string = 'export',
+  format: TableExportFormat = 'csv'
+): void {
+  if (format === 'excel') {
+    downloadExcel(content, filename)
+    return
+  }
+
+  downloadCsv(content, filename)
 }
 
 /**

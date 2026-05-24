@@ -935,6 +935,20 @@ describe('Table', () => {
 
       expect(queryByText('Export CSV')).not.toBeInTheDocument()
     })
+
+    it('should render Excel export label when exportFormat is excel', () => {
+      const { getByText } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          exportable={true}
+          exportFormat="excel"
+          pagination={false}
+        />
+      )
+
+      expect(getByText('Export Excel')).toBeInTheDocument()
+    })
   })
 
   describe('v0.6.0 - Column Draggable', () => {
@@ -952,6 +966,30 @@ describe('Table', () => {
       headers.forEach((th) => {
         expect(th.getAttribute('draggable')).toBe('true')
       })
+    })
+  })
+
+  describe('v0.6.0 - Row Draggable', () => {
+    it('should emit reordered rows when dropping a row', () => {
+      const onRowOrderChange = vi.fn()
+      const { container } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          rowDraggable={true}
+          pagination={false}
+          onRowOrderChange={onRowOrderChange}
+        />
+      )
+
+      const rows = container.querySelectorAll('tbody tr')
+      expect(rows[0]).toHaveAttribute('draggable', 'true')
+
+      fireEvent.dragStart(rows[0])
+      fireEvent.dragOver(rows[2])
+      fireEvent.drop(rows[2])
+
+      expect(onRowOrderChange).toHaveBeenCalledWith([dataSource[1], dataSource[2], dataSource[0]])
     })
   })
 

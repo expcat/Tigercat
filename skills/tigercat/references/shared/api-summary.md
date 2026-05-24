@@ -5,7 +5,7 @@ description: Compact generated API summary for Tigercat core types
 
 <!-- LLM-INDEX
 type: generated-api-summary
-total-exported-types: 534
+total-exported-types: 539
 source: packages/core/src/types/*.ts
 -->
 
@@ -73,7 +73,7 @@ source: packages/core/src/types/*.ts
 | timepicker.ts.ts | TimePickerProps | TimePickerSize, TimeFormat, TimePickerSingleValue, TimePickerRangeValue, TimePickerModelValue, TimePickerLabels, TimePickerProps |
 | transfer.ts.ts | TransferProps | TransferItem, TransferSize, TransferDirection, TransferProps |
 | tree-select.ts.ts | TreeSelectProps | TreeSelectSize, TreeSelectValue, TreeSelectProps |
-| upload.ts.ts | UploadProps | UploadFileStatus, UploadListType, UploadFile, UploadProps, UploadLabels, UploadRequestOptions |
+| upload.ts.ts | UploadProps | UploadFileStatus, UploadQueueStatus, UploadChunk, UploadQueueItem, UploadListType, UploadFile, UploadProps, UploadLabels, UploadRequestOptions |
 
 ## Feedback
 
@@ -88,7 +88,7 @@ source: packages/core/src/types/*.ts
 | popover.ts.ts | PopoverProps | PopoverTrigger, PopoverProps |
 | progress.ts.ts | ProgressProps | ProgressVariant, ProgressSize, ProgressType, ProgressStatus, ProgressProps |
 | tooltip.ts.ts | TooltipProps | TooltipTrigger, TooltipProps |
-| tour.ts.ts | TourProps | TourPlacement, TourStepSkipPredicate, TourStep, TourProps |
+| tour.ts.ts | TourProps | TourPlacement, TourStepSkipPredicate, TourStepLoader, TourStep, TourProps |
 
 ## Layout
 
@@ -128,7 +128,7 @@ source: packages/core/src/types/*.ts
 | --------- | ---------------- | ----------- |
 | calendar.ts.ts | CalendarProps | CalendarMode, CalendarProps |
 | collapse.ts.ts | CollapseProps, CollapsePanelProps | ExpandIconPosition, CollapseProps, CollapsePanelProps |
-| table.ts.ts | TableProps | TableSize, SortDirection, SortState, ColumnAlign, FilterType, FilterOption, ColumnFilter, TableColumn, PaginationConfig, RowSelectionConfig, ExpandableConfig, TableProps, FilterRule |
+| table.ts.ts | TableProps | TableSize, TableExportFormat, SortDirection, SortState, ColumnAlign, FilterType, FilterOption, ColumnFilter, TableColumn, PaginationConfig, RowSelectionConfig, ExpandableConfig, TableProps, FilterRule |
 
 ## Charts
 

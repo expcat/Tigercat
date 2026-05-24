@@ -17,6 +17,8 @@ export type TourPlacement =
 
 export type TourStepSkipPredicate = () => boolean
 
+export type TourStepLoader = () => TourStep[] | Promise<TourStep[]>
+
 /**
  * A single step in the tour
  */
@@ -63,6 +65,11 @@ export interface TourProps {
    * Array of tour steps
    */
   steps: TourStep[]
+
+  /**
+   * Load tour steps asynchronously when the tour opens.
+   */
+  loadSteps?: TourStepLoader
 
   /**
    * Whether the tour is open

@@ -88,6 +88,34 @@ export const THEME_CSS_VARS = {
   breakpointXl: '--tiger-breakpoint-xl'
 } as const
 
+const cssVarCache = new WeakMap<HTMLElement, Map<string, string>>()
+
+export function setCssVarsCached(
+  element: HTMLElement,
+  vars: Record<string, string | undefined>
+): void {
+  let cache = cssVarCache.get(element)
+  if (!cache) {
+    cache = new Map()
+    cssVarCache.set(element, cache)
+  }
+
+  for (const [name, value] of Object.entries(vars)) {
+    if (!value) continue
+    if (cache.get(name) === value) continue
+    element.style.setProperty(name, value)
+    cache.set(name, value)
+  }
+}
+
+export function removeCssVarsCached(element: HTMLElement, names: string[]): void {
+  const cache = cssVarCache.get(element)
+  for (const name of names) {
+    element.style.removeProperty(name)
+    cache?.delete(name)
+  }
+}
+
 export const TIGER_BREAKPOINT_CSS_VALUES = {
   breakpointXs: '0px',
   breakpointSm: '640px',
@@ -132,12 +160,12 @@ export function setThemeColors(
     return
   }
 
+  const vars: Record<string, string> = {}
   Object.entries(colors).forEach(([key, value]) => {
     const varName = THEME_CSS_VARS[key as keyof typeof THEME_CSS_VARS]
-    if (varName && value) {
-      target.style.setProperty(varName, value)
-    }
+    if (varName && value) vars[varName] = value
   })
+  setCssVarsCached(target, vars)
 }
 
 /**
