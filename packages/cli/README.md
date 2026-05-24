@@ -42,9 +42,12 @@ Run from a project that already depends on `@expcat/tigercat-vue` or `@expcat/ti
 
 ```bash
 tigercat add Button Form Input Select
+tigercat add --framework vue3 --install --snippet src/tigercat-components.ts
 ```
 
-The command prints the correct package import and creates `src/components/*Demo.vue` or
+When no component names are provided, `add` opens an interactive multi-select prompt.
+The command prints the correct package import, detects missing peer dependencies,
+can install them with `--install`, and creates `src/components/*Demo.vue` or
 `src/components/*Demo.tsx` files when a `src/components` directory exists.
 
 ```bash
@@ -56,6 +59,7 @@ tigercat add Button Form Input Select --dry-run
 ```bash
 tigercat playground --template vue3 --port 3456
 tigercat playground --template react --port 3457
+tigercat playground --template react --no-open
 ```
 
 Playground files are created under `.tigercat-playground/` in the current working directory.
@@ -69,16 +73,20 @@ tigercat playground --template react --port 3457 --dry-run
 ```bash
 tigercat generate docs --input packages/core/src/types --output docs/api
 tigercat generate docs --input packages/core/src/types --output docs/api --dry-run
+tigercat generate test Button --framework both
+tigercat generate doc-template Button --output docs/components
 ```
 
 ### Check project compatibility
 
 ```bash
 tigercat doctor
+tigercat doctor --json
 ```
 
 `doctor` verifies `package.json`, Node.js, pnpm, Tailwind CSS, Tigercat peer dependencies,
-and template dependency compatibility.
+template dependency compatibility, and the supported version compatibility matrix. JSON output is
+designed for CI and automated diagnostics.
 
 ## Commands
 
@@ -99,6 +107,7 @@ Add a component to your project with import boilerplate.
 ```bash
 tigercat add Button
 tigercat add Form Input Select DatePicker
+tigercat add --framework react --install --snippet src/tigercat-components.ts
 tigercat add Button --dry-run
 ```
 
@@ -109,6 +118,7 @@ Launch an interactive playground for testing components.
 ```bash
 tigercat playground
 tigercat playground --template react
+tigercat playground --template react --no-open
 tigercat playground --template react --dry-run
 ```
 
@@ -122,12 +132,32 @@ tigercat generate docs --output ./docs/api
 tigercat generate docs --output ./docs/api --dry-run
 ```
 
+### `tigercat generate test`
+
+Generate Vue and/or React starter test templates for a component.
+
+```bash
+tigercat generate test Button --framework both
+tigercat generate test Button --framework vue3
+tigercat generate test Button --framework react --dry-run
+```
+
+### `tigercat generate doc-template`
+
+Generate a component documentation page template.
+
+```bash
+tigercat generate doc-template Button
+tigercat generate doc-template Button --output docs/components --dry-run
+```
+
 ### `tigercat doctor`
 
 Check whether the current project has compatible Node, pnpm, Tailwind CSS, Tigercat peer dependencies, and template tooling.
 
 ```bash
 tigercat doctor
+tigercat doctor --json
 ```
 
 ## Windows Support

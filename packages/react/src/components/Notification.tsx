@@ -159,6 +159,9 @@ export interface NotificationContainerProps {
   position?: NotificationPosition
 }
 
+/** Options accepted by the React global notification API. */
+export type NotificationProps = NotificationOptions
+
 /**
  * Notification container component
  */

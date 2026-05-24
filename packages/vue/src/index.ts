@@ -17,6 +17,7 @@ export type {
 
 // Global config
 export { ConfigProvider, useTigerConfig } from './components/ConfigProvider'
+export type { TigerConfig, VueConfigProviderProps } from './components/ConfigProvider'
 
 // Components
 export { Button } from './components/Button'
@@ -155,9 +156,9 @@ export type { VueModalProps } from './components/Modal'
 export { Alert } from './components/Alert'
 export type { VueAlertProps } from './components/Alert'
 export { MessageContainer, Message } from './components/Message'
-export type { VueMessageContainerProps } from './components/Message'
+export type { VueMessageContainerProps, VueMessageProps } from './components/Message'
 export { NotificationContainer, notification } from './components/Notification'
-export type { VueNotificationContainerProps } from './components/Notification'
+export type { VueNotificationContainerProps, VueNotificationProps } from './components/Notification'
 export { Loading } from './components/Loading'
 export type { VueLoadingProps } from './components/Loading'
 export { Popconfirm } from './components/Popconfirm'

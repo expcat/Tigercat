@@ -11,6 +11,7 @@ export interface DoctorCheck {
   status: DoctorStatus
   message: string
   details?: string[]
+  suggestions?: string[]
 }
 
 export interface DoctorOptions {
@@ -33,6 +34,14 @@ const MIN_PNPM_MAJOR = 8
 const REQUIRED_TAILWIND_MAJOR = 4
 const REQUIRED_TIGERCAT_MAJOR = 1
 
+const VERSION_COMPATIBILITY_MATRIX = [
+  { name: 'Node.js', range: '>=20.11.0', reason: 'Matches workspace engines and CLI templates' },
+  { name: 'pnpm', range: '>=8.0.0', reason: 'Required by workspace package management' },
+  { name: 'Tailwind CSS', range: '>=4.0.0', reason: 'Required by Tigercat theme utilities' },
+  { name: 'Vue', range: '^3.0.0', reason: 'Peer range for @expcat/tigercat-vue' },
+  { name: 'React', range: '^19.0.0', reason: 'Peer range for @expcat/tigercat-react' }
+] as const
+
 const FRAMEWORK_REQUIREMENTS: Record<Framework, { peers: string[]; templateDeps: string[] }> = {
   vue3: {
     peers: ['@expcat/tigercat-vue', '@expcat/tigercat-core', 'vue'],
@@ -46,9 +55,10 @@ const FRAMEWORK_REQUIREMENTS: Record<Framework, { peers: string[]; templateDeps:
 
 export function createDoctorCommand() {
   return new Command('doctor')
+    .option('--json', 'Print structured JSON output')
     .description('Check whether the current project is compatible with Tigercat')
-    .action(() => {
-      runDoctor()
+    .action((opts: { json?: boolean }) => {
+      runDoctor(Boolean(opts.json))
     })
 }
 
@@ -70,12 +80,32 @@ export function collectDoctorChecks(options: DoctorOptions = {}): DoctorCheck[] 
   checks.push(createTailwindCheck(packageResult.packageJson))
   checks.push(createPeerDepsCheck(packageResult.packageJson))
   checks.push(createTemplateCompatibilityCheck(packageResult.packageJson))
+  checks.push(createCompatibilityMatrixCheck(packageResult.packageJson))
 
   return checks
 }
 
-function runDoctor() {
+function runDoctor(json = false) {
   const checks = collectDoctorChecks()
+
+  if (json) {
+    const failures = checks.filter((check) => check.status === 'fail')
+    const warnings = checks.filter((check) => check.status === 'warn')
+    console.log(
+      JSON.stringify(
+        {
+          status: failures.length > 0 ? 'fail' : warnings.length > 0 ? 'warn' : 'pass',
+          checks,
+          compatibilityMatrix: VERSION_COMPATIBILITY_MATRIX
+        },
+        null,
+        2
+      )
+    )
+
+    if (failures.length > 0) process.exit(1)
+    return
+  }
 
   logInfo('Running Tigercat project checks...')
   console.log()
@@ -125,7 +155,8 @@ function createPackageCheck(result: {
     return {
       name: 'Project package',
       status: 'fail',
-      message: result.error ?? 'package.json could not be read'
+      message: result.error ?? 'package.json could not be read',
+      suggestions: ['Run this command from a project root that contains package.json']
     }
   }
 
@@ -143,7 +174,8 @@ function createNodeCheck(version: string): DoctorCheck {
     return {
       name: 'Node.js',
       status: 'fail',
-      message: `Node ${MIN_NODE_MAJOR}+ is required, current version is ${version}`
+      message: `Node ${MIN_NODE_MAJOR}+ is required, current version is ${version}`,
+      suggestions: [`Install Node ${MIN_NODE_MAJOR}+ and rerun tigercat doctor`]
     }
   }
 
@@ -161,7 +193,8 @@ function createPnpmCheck(packageJson: ProjectPackage | null, env: NodeJS.Process
     return {
       name: 'pnpm',
       status: 'warn',
-      message: `Could not detect pnpm version; Tigercat templates expect pnpm ${MIN_PNPM_MAJOR}+`
+      message: `Could not detect pnpm version; Tigercat templates expect pnpm ${MIN_PNPM_MAJOR}+`,
+      suggestions: ['Add packageManager: pnpm@10.26.2 to package.json or run through pnpm']
     }
   }
 
@@ -171,7 +204,8 @@ function createPnpmCheck(packageJson: ProjectPackage | null, env: NodeJS.Process
     return {
       name: 'pnpm',
       status: 'fail',
-      message: `pnpm ${MIN_PNPM_MAJOR}+ is required, detected ${version}`
+      message: `pnpm ${MIN_PNPM_MAJOR}+ is required, detected ${version}`,
+      suggestions: [`Upgrade pnpm to ${MIN_PNPM_MAJOR}+`]
     }
   }
 
@@ -191,7 +225,8 @@ function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
     return {
       name: 'Tailwind CSS',
       status: 'fail',
-      message: 'tailwindcss is missing; Tigercat requires Tailwind CSS 4+'
+      message: 'tailwindcss is missing; Tigercat requires Tailwind CSS 4+',
+      suggestions: ['Install tailwindcss and @tailwindcss/vite']
     }
   }
 
@@ -202,7 +237,8 @@ function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
     return {
       name: 'Tailwind CSS',
       status: 'fail',
-      message: `tailwindcss ${tailwindRange} is not compatible; use Tailwind CSS ${REQUIRED_TAILWIND_MAJOR}+`
+      message: `tailwindcss ${tailwindRange} is not compatible; use Tailwind CSS ${REQUIRED_TAILWIND_MAJOR}+`,
+      suggestions: [`Upgrade tailwindcss to ${REQUIRED_TAILWIND_MAJOR}+`]
     }
   }
 
@@ -210,7 +246,8 @@ function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
     return {
       name: 'Tailwind CSS',
       status: 'warn',
-      message: `Could not verify tailwindcss range ${tailwindRange}; expected ${REQUIRED_TAILWIND_MAJOR}+`
+      message: `Could not verify tailwindcss range ${tailwindRange}; expected ${REQUIRED_TAILWIND_MAJOR}+`,
+      suggestions: ['Use an explicit Tailwind CSS semver range when possible']
     }
   }
 
@@ -218,7 +255,8 @@ function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
     return {
       name: 'Tailwind CSS',
       status: 'fail',
-      message: `@tailwindcss/vite ${vitePluginRange} is not compatible; use ${REQUIRED_TAILWIND_MAJOR}+`
+      message: `@tailwindcss/vite ${vitePluginRange} is not compatible; use ${REQUIRED_TAILWIND_MAJOR}+`,
+      suggestions: [`Upgrade @tailwindcss/vite to ${REQUIRED_TAILWIND_MAJOR}+`]
     }
   }
 
@@ -230,7 +268,8 @@ function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
     name: 'Tailwind CSS',
     status: vitePluginRange ? 'pass' : 'warn',
     message: `tailwindcss ${tailwindRange} satisfies Tigercat requirements`,
-    details
+    details,
+    suggestions: vitePluginRange ? undefined : ['Install @tailwindcss/vite for Vite projects']
   }
 }
 
@@ -242,7 +281,8 @@ function createPeerDepsCheck(packageJson: ProjectPackage): DoctorCheck {
     return {
       name: 'Peer dependencies',
       status: 'warn',
-      message: 'No Tigercat Vue or React package was detected'
+      message: 'No Tigercat Vue or React package was detected',
+      suggestions: ['Install @expcat/tigercat-vue or @expcat/tigercat-react']
     }
   }
 
@@ -265,7 +305,8 @@ function createPeerDepsCheck(packageJson: ProjectPackage): DoctorCheck {
       name: 'Peer dependencies',
       status: 'fail',
       message: 'Tigercat peer dependencies are incomplete or incompatible',
-      details: [...missing.map((dependency) => `Missing ${dependency}`), ...incompatible]
+      details: [...missing.map((dependency) => `Missing ${dependency}`), ...incompatible],
+      suggestions: ['Run tigercat add --install or install the listed dependencies manually']
     }
   }
 
@@ -284,7 +325,8 @@ function createTemplateCompatibilityCheck(packageJson: ProjectPackage): DoctorCh
     return {
       name: 'Template compatibility',
       status: 'warn',
-      message: 'Skipped because no supported Tigercat framework package was detected'
+      message: 'Skipped because no supported Tigercat framework package was detected',
+      suggestions: ['Install a Tigercat framework package to enable template compatibility checks']
     }
   }
 
@@ -301,7 +343,8 @@ function createTemplateCompatibilityCheck(packageJson: ProjectPackage): DoctorCh
       name: 'Template compatibility',
       status: 'warn',
       message: 'Project differs from current CLI template dependencies',
-      details: missing.map((dependency) => `Template dependency not found: ${dependency}`)
+      details: missing.map((dependency) => `Template dependency not found: ${dependency}`),
+      suggestions: ['Compare your project dependencies with the latest tigercat create template']
     }
   }
 
@@ -309,6 +352,31 @@ function createTemplateCompatibilityCheck(packageJson: ProjectPackage): DoctorCh
     name: 'Template compatibility',
     status: 'pass',
     message: `${frameworks.map(formatFramework).join(' + ')} template dependencies are present`
+  }
+}
+
+function createCompatibilityMatrixCheck(packageJson: ProjectPackage): DoctorCheck {
+  const dependencies = collectDependencies(packageJson)
+  const details = VERSION_COMPATIBILITY_MATRIX.map(
+    (item) => `${item.name} ${item.range} - ${item.reason}`
+  )
+  const frameworks = detectTigercatFrameworks(dependencies)
+
+  if (frameworks.length === 0) {
+    return {
+      name: 'Version compatibility matrix',
+      status: 'warn',
+      message: 'Framework-specific matrix checks were skipped',
+      details,
+      suggestions: ['Install a Tigercat Vue or React package to validate framework peer ranges']
+    }
+  }
+
+  return {
+    name: 'Version compatibility matrix',
+    status: 'pass',
+    message: `${frameworks.map(formatFramework).join(' + ')} compatibility matrix is available`,
+    details
   }
 }
 
@@ -385,5 +453,9 @@ function printCheck(check: DoctorCheck) {
 
   for (const detail of check.details ?? []) {
     console.log(`  ${pc.dim('-')} ${detail}`)
+  }
+
+  for (const suggestion of check.suggestions ?? []) {
+    console.log(`  ${pc.dim('fix:')} ${suggestion}`)
   }
 }

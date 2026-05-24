@@ -116,26 +116,28 @@ source: project audit and planning
 
 ## 四、开发者体验
 
+> **已完成**（2026-05-24）：新增 VitePress 文档站、Reference 同步脚本、StackBlitz Playground、主题预览、Changesets 发布流、预发布 workflow、CLI 交互增强、doctor JSON 输出与公共 Props 类型检查。
+
 ### 4.1 公共文档站
 
 当前文档仅作为 Agent Skills 存在（`skills/tigercat/`），缺少可浏览文档站。
 
-- [ ] 选型：VitePress（Vue 生态一致）或 Astro Starlight（框架无关）
-- [ ] 组件 API 页面：复用 `scripts/generate-api-docs.mjs` 自动生成
-- [ ] 在线 Playground：嵌入 StackBlitz WebContainer，支持 Vue/React 切换
-- [ ] 主题预览：6 预设（含高对比度）+ 暗色模式实时切换
-- [ ] 全文搜索：MiniSearch / Algolia DocSearch
-- [ ] 代码示例：从 `skills/tigercat/references/vue/` 和 `react/` 同步，保持单一数据源
-- [ ] 部署：GitHub Pages / Vercel，CI 自动构建
+- [x] 选型：VitePress（Vue 生态一致），配置本地搜索与 `docs/.vitepress/`
+- [x] 组件 API 页面：复用 `scripts/generate-api-docs.mjs` 自动生成，并在 `pnpm docs:build` 前刷新
+- [x] 在线 Playground：StackBlitz Vue/React 切换入口 + CLI 本地 playground
+- [x] 主题预览：6 预设（含高对比度）+ 实时 CSS 变量切换
+- [x] 全文搜索：VitePress local search（MiniSearch）
+- [x] 代码示例：`scripts/sync-doc-site.mjs` 从 `skills/tigercat/references/` 同步，保持单一数据源
+- [x] 部署：GitHub Pages workflow 自动构建 VitePress 文档站并附带 Vue/React 示例
 
 ### 4.2 CLI 增强
 
-| 命令         | 增强方向                                             |
-| ------------ | ---------------------------------------------------- |
-| `add`        | 交互式多选组件 + 依赖自动解析 + 按需导入代码片段生成 |
-| `playground` | 热更新预览 + 自动打开浏览器                          |
-| `generate`   | 支持生成测试模板、文档模板                           |
-| `doctor`     | 结构化 JSON 输出 + 修复建议 + 版本兼容矩阵检查       |
+| 命令         | 增强方向                                                |
+| ------------ | ------------------------------------------------------- |
+| `add`        | ✅ 交互式多选组件 + 依赖自动解析 + 按需导入代码片段生成 |
+| `playground` | ✅ 热更新预览 + 自动打开浏览器                          |
+| `generate`   | ✅ 支持生成测试模板、文档模板                           |
+| `doctor`     | ✅ 结构化 JSON 输出 + 修复建议 + 版本兼容矩阵检查       |
 
 - [x] 补充 CLI README 使用示例
 - [x] 添加 `--dry-run` 模式（预览变更不写入文件）
@@ -143,16 +145,16 @@ source: project audit and planning
 
 ### 4.3 发布流程自动化
 
-- [ ] 引入 changesets：PR 附带 changeset 文件，合并时自动聚合版本
-- [ ] CI workflow：tag push → `pnpm release` → npm publish → GitHub Release + CHANGELOG
-- [ ] 预发布渠道：`next`（预览版）/ `canary`（每日构建）
-- [ ] 四包版本同步：core/vue/react/cli 统一升版
+- [x] 引入 changesets：PR 附带 changeset 文件，合并时自动聚合版本
+- [x] CI workflow：tag push → `pnpm release` → npm publish → GitHub Release + CHANGELOG
+- [x] 预发布渠道：`next`（预览版）/ `canary`（每日构建）
+- [x] 四包版本同步：core/vue/react/cli 统一升版
 
 ### 4.4 TypeScript 开发体验
 
-- [ ] 导出所有组件 Props 类型（React 已完成，Vue 侧检查补齐）
-- [ ] 补充 JSDoc 到公共 API（组件 props、工具函数入参/返回值）
-- [ ] 发布 `.d.ts` sourcemap 方便跳转到源码
+- [x] 导出所有组件 Props 类型（新增 `pnpm types:check` 自动校验 Vue/React 入口）
+- [x] 补充 JSDoc 到公共 API（组件 props、工具函数入参/返回值）
+- [x] 发布 `.d.ts` sourcemap 方便跳转到源码（各 package 显式开启 `declarationMap` / `sourceMap`）
 
 ---
 

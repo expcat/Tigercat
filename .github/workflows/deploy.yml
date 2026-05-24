@@ -38,28 +38,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build packages
-        run: pnpm build
+      - name: Build packages and docs
+        run: pnpm build && pnpm docs:build
 
-      - name: Build Vue example
-        run: pnpm --filter @expcat/tigercat-example-vue3 build
+      - name: Build examples
+        run: pnpm example:build
 
-      - name: Build React example
-        run: pnpm --filter @expcat/tigercat-example-react build
-
-      - name: Prepare public_html
+      - name: Prepare Pages artifact
         run: |
-          mkdir -p public_html
-          cp examples/index.html public_html/index.html
+          mkdir -p docs/.vitepress/dist/examples
           cp examples/example/vue3/dist/index.html examples/example/vue3/dist/404.html
           cp examples/example/react/dist/index.html examples/example/react/dist/404.html
-          mv examples/example/vue3/dist public_html/vue
-          mv examples/example/react/dist public_html/react
+          mv examples/example/vue3/dist docs/.vitepress/dist/examples/vue
+          mv examples/example/react/dist docs/.vitepress/dist/examples/react
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: public_html
+          path: docs/.vitepress/dist
 
   deploy:
     needs: build

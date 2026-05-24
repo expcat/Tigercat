@@ -66,6 +66,9 @@ export interface VueMessageContainerProps {
   position?: MessagePosition
 }
 
+/** Options accepted by the Vue global Message API. */
+export type VueMessageProps = MessageOptions
+
 /**
  * Message container component
  */

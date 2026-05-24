@@ -7,6 +7,7 @@ import {
   ref,
   watch,
   type ComputedRef,
+  type ExtractPropTypes,
   type InjectionKey,
   type PropType
 } from 'vue'
@@ -40,26 +41,30 @@ export function useTigerConfig(): ComputedRef<TigerConfig> {
   )
 }
 
+export const configProviderProps = {
+  locale: {
+    type: [Object, Function, Promise] as PropType<TigerLocaleInput>,
+    default: undefined
+  },
+  direction: {
+    type: String as PropType<TigerLocaleDirection>,
+    default: undefined
+  },
+  theme: {
+    type: String,
+    default: undefined
+  },
+  colorScheme: {
+    type: String as PropType<ColorScheme>,
+    default: undefined
+  }
+}
+
+export type VueConfigProviderProps = ExtractPropTypes<typeof configProviderProps>
+
 export const ConfigProvider = defineComponent({
   name: 'TigerConfigProvider',
-  props: {
-    locale: {
-      type: [Object, Function, Promise] as PropType<TigerLocaleInput>,
-      default: undefined
-    },
-    direction: {
-      type: String as PropType<TigerLocaleDirection>,
-      default: undefined
-    },
-    theme: {
-      type: String,
-      default: undefined
-    },
-    colorScheme: {
-      type: String as PropType<ColorScheme>,
-      default: undefined
-    }
-  },
+  props: configProviderProps,
   setup(props, { slots }) {
     const parent = useTigerConfig()
 

@@ -96,6 +96,9 @@ export interface VueNotificationContainerProps {
   position?: NotificationPosition
 }
 
+/** Options accepted by the Vue global notification API. */
+export type VueNotificationProps = NotificationOptions
+
 /**
  * Notification container component for a specific position
  */

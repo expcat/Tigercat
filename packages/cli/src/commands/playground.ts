@@ -13,14 +13,20 @@ export function createPlaygroundCommand() {
   return new Command('playground')
     .option('-t, --template <template>', 'Framework template (vue3 | react)')
     .option('-p, --port <port>', 'Dev server port', '3456')
+    .option('--no-open', 'Do not open the playground in the default browser')
     .option('--dry-run', 'Preview playground setup without writing files or starting Vite')
     .description('Launch an interactive playground for testing components')
-    .action(async (opts: { template?: string; port: string; dryRun?: boolean }) => {
-      await runPlayground(opts.template, opts.port, Boolean(opts.dryRun))
+    .action(async (opts: { template?: string; port: string; open?: boolean; dryRun?: boolean }) => {
+      await runPlayground(opts.template, opts.port, opts.open !== false, Boolean(opts.dryRun))
     })
 }
 
-export async function runPlayground(templateArg?: string, port = '3456', dryRun = false) {
+export async function runPlayground(
+  templateArg?: string,
+  port = '3456',
+  open = true,
+  dryRun = false
+) {
   let template: TemplateName
 
   if (templateArg && TEMPLATES.includes(templateArg as TemplateName)) {
@@ -56,7 +62,7 @@ export async function runPlayground(templateArg?: string, port = '3456', dryRun 
       }
       logInfo('Would run pnpm install')
     }
-    logInfo(`Would start Vite on port ${safePort}`)
+    logInfo(`Would start Vite on port ${safePort}${open ? ' and open the browser' : ''}`)
     return
   }
 
@@ -88,7 +94,8 @@ export async function runPlayground(templateArg?: string, port = '3456', dryRun 
 
   try {
     const safePort = /^\d+$/.test(port) ? port : '3456'
-    execSync(`npx vite --port ${safePort}`, { cwd: projectDir, stdio: 'inherit' })
+    const openFlag = open ? ' --open' : ''
+    execSync(`npx vite --port ${safePort}${openFlag}`, { cwd: projectDir, stdio: 'inherit' })
   } catch {
     // user terminated with Ctrl+C
   }

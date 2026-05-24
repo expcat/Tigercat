@@ -34,13 +34,13 @@
 | radio.ts | `RadioSize`, `RadioProps`, `RadioGroupProps` |
 | switch.ts | `SwitchSize`, `SwitchProps` |
 | slider.ts | `SliderSize`, `SliderProps` |
-| datepicker.ts | `DatePickerInputDate`, `DatePickerSingleModelValue`, `DatePickerRangeModelValue`, `DatePickerModelValue`, `DatePickerSingleValue`, `DatePickerRangeValue`, `DatePickerLabels`, `DatePickerSize`, `DateFormat`, `DatePickerProps`, `DatePickerShortcut` |
+| datepicker.ts | `DatePickerInputDate`, `DatePickerSingleModelValue`, `DatePickerRangeModelValue`, `DatePickerModelValue`, `DatePickerSingleValue`, `DatePickerRangeValue`, `DatePickerLabels`, `DatePickerLocalePreset`, `DatePickerLocaleConfig`, `DatePickerLocaleInput`, `DatePickerSize`, `DateFormat`, `DatePickerProps`, `DatePickerShortcut` |
 | timepicker.ts | `TimePickerSize`, `TimeFormat`, `TimePickerSingleValue`, `TimePickerRangeValue`, `TimePickerModelValue`, `TimePickerLabels`, `TimePickerProps` |
 | color-picker.ts | `ColorPickerSize`, `ColorFormat`, `ColorPickerProps` |
 | rate.ts | `RateSize`, `RateProps` |
 | upload.ts | `UploadFileStatus`, `UploadListType`, `UploadFile`, `UploadProps`, `UploadLabels`, `UploadRequestOptions` |
 | mentions.ts | `MentionsSize`, `MentionOption`, `MentionsProps` |
-| form.ts | `FormRuleType`, `FormRuleTrigger`, `FormRule`, `FormRules`, `FormError`, `FormValues`, `FormValidationResult`, `FormLabelAlign`, `FormLabelPosition`, `FormSize`, `FormProps`, `FormErrorDisplayMode`, `FormItemProps` |
+| form.ts | `FormRuleType`, `FormRuleTrigger`, `FormRule`, `FormRules`, `FormError`, `FormValues`, `FormValidationResult`, `FormLabelAlign`, `FormLabelPosition`, `FormSize`, `FormProps`, `FormErrorDisplayMode`, `FormItemProps`, `FormControllerOptions`, `FormController` |
 | stepper.ts | `StepperSize`, `StepperProps` |
 
 ## Data Display
@@ -70,8 +70,8 @@
 | menu.ts | `MenuMode`, `MenuTheme`, `MenuKey`, `MenuItem`, `MenuProps`, `MenuItemProps`, `SubMenuProps`, `MenuItemGroupProps` |
 | tabs.ts | `TabType`, `TabPosition`, `TabSize`, `TabsProps`, `TabPaneProps`, `TabChangeInfo`, `TabEditInfo` |
 | breadcrumb.ts | `BreadcrumbSeparator`, `BreadcrumbProps`, `BreadcrumbItemProps` |
-| dropdown.ts | `DropdownTrigger`, `DropdownPlacement`, `DropdownProps`, `DropdownMenuProps`, `DropdownItemProps` |
-| pagination.ts | `PaginationSize`, `PaginationAlign`, `PaginationPageSizeOption`, `PaginationPageSizeOptionItem`, `PaginationProps`, `PageChangeInfo`, `PageSizeChangeInfo` |
+| dropdown.ts | `DropdownTrigger`, `DropdownProps`, `DropdownMenuProps`, `DropdownItemProps` |
+| pagination.ts | `PaginationSize`, `PaginationAlign`, `PaginationPageSizeOption`, `PaginationPageSizeOptionItem`, `PaginationQuickJumperValidationOptions`, `PaginationProps`, `PageChangeInfo`, `PageSizeChangeInfo` |
 | steps.ts | `StepsDirection`, `StepStatus`, `StepSize`, `StepItem`, `StepsProps` |
 | anchor.ts | `AnchorDirection`, `AnchorProps`, `AnchorLinkProps`, `AnchorClickInfo`, `AnchorChangeInfo` |
 
@@ -113,12 +113,12 @@
 | File | Exported Types |
 |------|---------------|
 | code-editor.ts | `CodeLanguage`, `CodeEditorTheme`, `CodeEditorProps` |
-| rich-text-editor.ts | `RichTextEditorMode`, `ToolbarButton`, `ToolbarAction`, `RichTextEditorProps` |
+| rich-text-editor.ts | `RichTextEditorMode`, `ToolbarButton`, `ToolbarSeparator`, `ToolbarItem`, `ToolbarAction`, `RichTextEditorProps` |
 | kanban.ts | `KanbanCard`, `KanbanColumn`, `KanbanCardMoveEvent`, `KanbanColumnMoveEvent`, `KanbanSwimlane`, `KanbanProps` |
 | file-manager.ts | `FileType`, `FileViewMode`, `FileSortField`, `FileSortOrder`, `FileItem`, `FileManagerProps` |
-| virtual-list.ts | `VirtualListItemSize`, `VirtualListProps` |
+| virtual-list.ts | `VirtualListItemSize`, `VirtualRange`, `VirtualListSizeStrategy`, `VirtualListProps` |
 | infinite-scroll.ts | `InfiniteScrollProps` |
-| drag.ts | `DragItem`, `DragDirection`, `DragAxis`, `DragConfig`, `DragState`, `DragStartEvent`, `DragOverEvent`, `DragDropEvent`, `DragEndEvent`, `DragCallbacks`, `DragReorderResult`, `DragMoveResult` |
+| drag.ts | `DragItem`, `DragDirection`, `DragAxis`, `DragConfig`, `DragState`, `DragStartEvent`, `DragOverEvent`, `DragDropEvent`, `DragEndEvent`, `DragCallbacks`, `DocumentDragSessionEvent`, `DocumentDragSessionOptions`, `DocumentDragSession`, `DragReorderResult`, `DragMoveResult` |
 | tour.ts | `TourPlacement`, `TourStep`, `TourProps` |
 | float-button.ts | `FloatButtonShape`, `FloatButtonSize`, `FloatButtonProps`, `FloatButtonGroupProps` |
 | affix.ts | `AffixProps` |
@@ -129,7 +129,6 @@
 
 | File | Exported Types |
 |------|---------------|
-| composite.ts | `ChatMessageDirection`, `ChatMessageStatus`, `ChatUser`, `ChatMessage`, `ChatWindowProps`, `ActivityUser`, `ActivityStatusTag`, `ActivityAction`, `ActivityItem`, `ActivityGroup`, `ActivityFeedProps`, `CommentUser`, `CommentTag`, `CommentAction`, `CommentNode`, `CommentThreadProps`, `NotificationReadFilter`, `NotificationItem`, `NotificationGroup`, `NotificationCenterProps`, `TableToolbarFilterValue`, `TableToolbarFilter`, `TableToolbarAction`, `TableToolbarProps`, `DataTableWithToolbarProps`, `WizardStep`, `FormWizardValidateResult`, `FormWizardValidator`, `FormWizardProps`, `TaskBoardCard` |
 
 ## Core
 
@@ -138,9 +137,9 @@
 | generics.ts | `GenericTableColumn`, `GenericRowSelection`, `GenericExpandable`, `GenericTableProps`, `GenericSelectOption`, `GenericSelectOptionGroup`, `GenericSelectProps`, `GenericFormRule`, `GenericFormFieldProps` |
 | events.ts | `StringChangeHandler`, `NumberChangeHandler`, `BooleanChangeHandler`, `SelectChangeHandler`, `MultiSelectChangeHandler`, `OpenChangeHandler`, `FormValidateHandler`, `FormSubmitHandler`, `FormFieldChangeHandler`, `TableSortChangeHandler`, `TableFilterChangeHandler`, `TableSelectionChangeHandler`, `TableExpandChangeHandler`, `PaginationChangeHandler`, `TableRowClickHandler`, `MenuSelectHandler`, `TabChangeHandler`, `StepChangeHandler`, `ItemClickHandler`, `CloseHandler`, `ConfirmHandler`, `CancelHandler`, `SearchHandler` |
 | slots.ts | `TableEmptySlotContext`, `TableCellSlotContext`, `TableExpandSlotContext`, `OverlayFooterSlotContext`, `OverlayHeaderSlotContext`, `FormItemSlotContext`, `SelectOptionSlotContext`, `MenuItemSlotContext`, `ListItemSlotContext`, `EmptySlotContext` |
-| locale.ts | `TigerLocaleCommon`, `TigerLocaleModal`, `TigerLocaleDrawer`, `TigerLocaleUpload`, `TigerLocalePagination`, `TigerLocaleFormWizard`, `TigerLocaleTaskBoard`, `TigerLocale` |
+| locale.ts | `TigerLocaleDirection`, `TigerLocaleCommon`, `TigerLocaleModal`, `TigerLocaleDrawer`, `TigerLocaleUpload`, `TigerLocalePagination`, `TigerLocaleFormWizard`, `TigerLocaleTaskBoard`, `TigerLocale`, `TigerLocaleLazyModule`, `TigerLocaleLoader`, `TigerLocaleInput` |
 | theme.ts | `ThemeColorScale`, `ThemeSemanticColors`, `ThemeTypography`, `ThemeRadius`, `ThemeShadows`, `ThemeSpacing`, `ThemeMotion`, `ThemeConfig`, `ThemePresetName`, `ThemePreset`, `ColorScheme` |
 
 ---
 
-Total exported types: **490+**
+Total exported types: **478**

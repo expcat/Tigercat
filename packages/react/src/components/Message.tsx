@@ -121,6 +121,9 @@ export interface MessageContainerProps {
   position?: MessagePosition
 }
 
+/** Options accepted by the React global Message API. */
+export type MessageProps = MessageOptions
+
 /**
  * Message container component
  */

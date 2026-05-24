@@ -138,6 +138,9 @@ export * from './group-utils'
 // Chart resize utilities (v0.9.0+)
 export * from './chart-resize-utils'
 
+// SVG chart utilities
+export * from './chart'
+
 // PrintLayout utilities (v0.9.0+)
 export * from './print-layout-utils'
 
