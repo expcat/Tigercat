@@ -7,6 +7,8 @@ description: Tigercat theme configuration - CSS variables, dark mode, JS API
 
 Tigercat 使用 CSS 变量控制主题颜色，支持自动注入、手动配置和 JS API。
 
+完整 token 分层、Figma 导出和变量清单见 [tokens.md](tokens.md)。
+
 ## 自动注入（推荐）
 
 ```js
@@ -15,6 +17,17 @@ import { tigercatPlugin } from '@expcat/tigercat-core'
 
 export default { plugins: [tigercatPlugin] }
 ```
+
+## 主题 CSS 预加载
+
+组件库发布 `@expcat/tigercat-core/tokens.css`，包含分层 token、兼容变量和 `color-scheme`。为了避免首帧主题闪烁，把它放在应用样式之前：
+
+```html
+<link rel="preload" href="/node_modules/@expcat/tigercat-core/tokens.css" as="style" />
+<link rel="stylesheet" href="/node_modules/@expcat/tigercat-core/tokens.css" />
+```
+
+服务端可在 `<html>` 上提前输出 `class="dark"`，浏览器会在 JS 启动前应用暗色 `color-scheme`。运行时切换仍交给 `ThemeManager.setColorScheme()`。
 
 ---
 

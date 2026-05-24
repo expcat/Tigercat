@@ -12,15 +12,15 @@ npx @expcat/tigercat-cli <command>
 
 ## 命令一览
 
-| 命令                     | 说明                           | 关键选项                  |
-| ------------------------ | ------------------------------ | ------------------------- |
-| `tigercat create <name>` | 创建新项目                     | `--template vue3\|react`  |
-| `tigercat add [comp...]` | 向现有项目添加组件（支持交互多选） | `--framework`, `--install`, `--snippet` |
-| `tigercat playground`    | 启动交互式开发预览                | `--template`, `--port`, `--no-open`     |
-| `tigercat generate docs` | 从 Props 类型生成 API 文档        | `--input`, `--output`                  |
-| `tigercat generate test` | 生成组件测试模板                  | `--framework vue3\|react\|both`       |
-| `tigercat generate doc-template` | 生成组件文档模板          | `--output`                             |
-| `tigercat doctor`        | 检查项目工具链与依赖兼容性        | `--json`                               |
+| 命令                             | 说明                               | 关键选项                                |
+| -------------------------------- | ---------------------------------- | --------------------------------------- |
+| `tigercat create <name>`         | 创建新项目                         | `--template vue3\|react`                |
+| `tigercat add [comp...]`         | 向现有项目添加组件（支持交互多选） | `--framework`, `--install`, `--snippet` |
+| `tigercat playground`            | 启动交互式开发预览                 | `--template`, `--port`, `--no-open`     |
+| `tigercat generate docs`         | 从 Props 类型生成 API 文档         | `--input`, `--output`                   |
+| `tigercat generate test`         | 生成组件测试模板                   | `--framework vue3\|react\|both`         |
+| `tigercat generate doc-template` | 生成组件文档模板                   | `--output`                              |
+| `tigercat doctor`                | 检查项目工具链与依赖兼容性         | `--json`                                |
 
 ---
 

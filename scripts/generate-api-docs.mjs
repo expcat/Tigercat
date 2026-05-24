@@ -139,6 +139,8 @@ function markdown(value) {
     .replace(/\r?\n/g, ' ')
     .replace(/\s+/g, ' ')
     .replace(/\|/g, '\\|')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
     .trim()
 }
 

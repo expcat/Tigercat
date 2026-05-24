@@ -6,6 +6,7 @@ export default defineConfig({
   base: '/Tigercat/',
   cleanUrls: true,
   lastUpdated: true,
+  srcExclude: ['reference/shared/generated-props.md'],
   themeConfig: {
     logo: '/logo.svg',
     search: {
@@ -49,7 +50,17 @@ export default defineConfig({
           { text: 'Vue', link: '/reference/vue/' },
           { text: 'React', link: '/reference/react/' },
           { text: 'Framework Playground', link: '/playground' },
-          { text: 'Theme Preview', link: '/theme-preview' }
+          { text: 'Theme Preview', link: '/theme-preview' },
+          { text: 'Design Tokens', link: '/reference/tokens' }
+        ]
+      },
+      {
+        text: 'Reference',
+        items: [
+          { text: 'Theme', link: '/reference/theme' },
+          { text: 'Design Tokens', link: '/reference/tokens' },
+          { text: 'i18n', link: '/reference/i18n' },
+          { text: 'SSR', link: '/reference/ssr' }
         ]
       }
     ],

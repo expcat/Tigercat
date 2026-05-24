@@ -192,6 +192,7 @@ describe('themes/manager — ThemeManager', () => {
       expect(ThemeManager.getColorScheme()).toBe('dark')
       expect(ThemeManager.getResolvedColorScheme()).toBe('dark')
       expect(document.documentElement.classList.contains('dark')).toBe(true)
+      expect(document.documentElement.style.colorScheme).toBe('dark')
     })
 
     it('forces light mode and removes the .dark class on <html>', () => {
@@ -200,6 +201,7 @@ describe('themes/manager — ThemeManager', () => {
       expect(ThemeManager.getColorScheme()).toBe('light')
       expect(ThemeManager.getResolvedColorScheme()).toBe('light')
       expect(document.documentElement.classList.contains('dark')).toBe(false)
+      expect(document.documentElement.style.colorScheme).toBe('light')
     })
 
     it('applies the dark color set when current preset has dark colors', () => {

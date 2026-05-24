@@ -180,6 +180,7 @@ class ThemeManagerImpl {
     } else {
       root.classList.remove('dark')
     }
+    root.style.colorScheme = this.resolvedDark ? 'dark' : 'light'
 
     this.notify()
   }

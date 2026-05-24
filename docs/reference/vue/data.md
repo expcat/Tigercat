@@ -5,7 +5,7 @@ description: Vue data display components usage
 
 # Data Components (Vue)
 
-数据展示组件：Table, Timeline, Collapse
+数据展示组件：Collapse, Table, Timeline, Carousel, Descriptions
 
 > **Props Reference**: [shared/props/data.md](../shared/props/data.md)
 
@@ -25,78 +25,11 @@ description: Vue data display components usage
 </template>
 ```
 
-### 手风琴模式（Accordion）
-
-```vue
-<template>
-  <Collapse accordion :default-active-key="'1'">
-    <CollapsePanel panel-key="1" header="Panel 1">
-      Only one panel can be expanded at a time
-    </CollapsePanel>
-    <CollapsePanel panel-key="2" header="Panel 2"> Click to expand this panel </CollapsePanel>
-  </Collapse>
-</template>
-```
-
-### 受控模式
+### 受控与自定义标题
 
 ```vue
 <template>
   <Collapse v-model:active-key="activeKeys" @change="handleChange">
-    <CollapsePanel panel-key="1" header="Panel 1"> Content 1 </CollapsePanel>
-    <CollapsePanel panel-key="2" header="Panel 2"> Content 2 </CollapsePanel>
-  </Collapse>
-</template>
-<script setup>
-import { ref } from 'vue'
-
-const activeKeys = ref(['1'])
-
-const handleChange = (keys) => {
-  console.log('Active keys:', keys)
-}
-</script>
-```
-
-### 自定义样式
-
-```vue
-<template>
-  <!-- 无边框 -->
-  <Collapse :bordered="false">
-    <CollapsePanel panel-key="1" header="No Border"> Content without border </CollapsePanel>
-  </Collapse>
-
-  <!-- Ghost 模式（透明背景） -->
-  <Collapse ghost>
-    <CollapsePanel panel-key="1" header="Ghost Style"> Transparent background </CollapsePanel>
-  </Collapse>
-
-  <!-- 箭头在右侧 -->
-  <Collapse expand-icon-position="end">
-    <CollapsePanel panel-key="1" header="Arrow on right"> Content </CollapsePanel>
-  </Collapse>
-</template>
-```
-
-### 禁用面板
-
-```vue
-<template>
-  <Collapse>
-    <CollapsePanel panel-key="1" header="Normal Panel"> This panel can be expanded </CollapsePanel>
-    <CollapsePanel panel-key="2" header="Disabled Panel" disabled>
-      This panel is disabled
-    </CollapsePanel>
-  </Collapse>
-</template>
-```
-
-### 自定义标题与额外内容
-
-```vue
-<template>
-  <Collapse>
     <CollapsePanel panel-key="1">
       <template #header>
         <span class="font-bold text-blue-600">Custom Header</span>
@@ -106,8 +39,15 @@ const handleChange = (keys) => {
       </template>
       Panel content
     </CollapsePanel>
+    <CollapsePanel panel-key="2" header="Disabled" disabled>Disabled content</CollapsePanel>
   </Collapse>
 </template>
+<script setup>
+import { ref } from 'vue'
+
+const activeKeys = ref(['1'])
+const handleChange = (keys) => console.log(keys)
+</script>
 ```
 
 ---
@@ -133,22 +73,7 @@ const tableData = [
 </script>
 ```
 
-### 性能与导出
-
-```vue
-<script setup>
-import { exportTableToCsv } from '@expcat/tigercat-core/utils/table-export'
-
-// Table 不会自动打开 virtual；超过阈值时根节点会暴露 data-tiger-virtual-recommended="true"。
-const csv = exportTableToCsv(columns, tableData)
-</script>
-
-<template>
-  <Table :columns="columns" :dataSource="largeRows" :pagination="false" :virtualThreshold="1000" />
-</template>
-```
-
-### 行选择、分页、自定义渲染
+### 选择、分页、渲染与导出
 
 ```vue
 <template>
@@ -165,13 +90,11 @@ const csv = exportTableToCsv(columns, tableData)
 </template>
 <script setup>
 import { ref, h } from 'vue'
+import { exportTableToCsv } from '@expcat/tigercat-core/utils/table-export'
+
 const selectedRowKeys = ref([])
-const handleSelect = (keys) => {
-  selectedRowKeys.value = keys
-}
-const handlePage = ({ current, pageSize }) => {
-  /* ... */
-}
+const handleSelect = (keys) => (selectedRowKeys.value = keys)
+const handlePage = ({ current, pageSize }) => console.log(current, pageSize)
 const columns = [
   { key: 'name', title: 'Name' },
   {
@@ -192,50 +115,7 @@ const columns = [
     render: (record) => h(Button, { size: 'sm', onClick: () => edit(record) }, () => 'Edit')
   }
 ]
-</script>
-```
-
-### 行展开（Expandable Row）
-
-```vue
-<template>
-  <!-- 方式一：使用 expandedRowRender 函数 -->
-  <Table
-    :columns="columns"
-    :dataSource="tableData"
-    :expandable="{
-      expandedRowRender: (record) => h('div', `Email: ${record.email}, Age: ${record.age}`)
-    }"
-    @expand-change="handleExpandChange" />
-
-  <!-- 方式二：使用 #expanded-row slot -->
-  <Table :columns="columns" :dataSource="tableData" :expandable="{}">
-    <template #expanded-row="{ record }">
-      <div class="p-4">
-        <p>Name: {{ record.name }}</p>
-        <p>Email: {{ record.email }}</p>
-      </div>
-    </template>
-  </Table>
-
-  <!-- 受控模式 + expandIconPosition -->
-  <Table
-    :columns="columns"
-    :dataSource="tableData"
-    :expandable="{
-      expandedRowKeys,
-      expandedRowRender: (record) => h('div', `Details: ${record.email}`),
-      rowExpandable: (record) => record.age > 25,
-      expandIconPosition: 'end'
-    }"
-    @expand-change="(keys) => (expandedRowKeys = keys)" />
-</template>
-<script setup>
-import { ref, h } from 'vue'
-const expandedRowKeys = ref([])
-const handleExpandChange = (keys, record, expanded) => {
-  console.log('Expand changed:', { keys, record, expanded })
-}
+const csv = exportTableToCsv(columns, tableData)
 </script>
 ```
 
@@ -257,53 +137,18 @@ const handleExpandChange = (keys, record, expanded) => {
 </template>
 ```
 
-### 布局模式
+### 自定义渲染与等待状态
 
 ```vue
 <template>
-  <Timeline :items="items" mode="right" />
-  <Timeline :items="items" mode="alternate" />
-</template>
-```
-
-### 自定义渲染（slot）
-
-```vue
-<template>
-  <!-- 自定义节点 -->
-  <Timeline :items="items">
-    <template #dot="{ item }">
-      <div class="w-4 h-4 bg-green-500 rounded-full" />
-    </template>
-  </Timeline>
-
-  <!-- 自定义内容 -->
-  <Timeline :items="items">
+  <Timeline :items="items" mode="alternate" pending>
+    <template #dot="{ item }"><div class="w-4 h-4 bg-green-500 rounded-full" /></template>
     <template #item="{ item, index }">
       <div class="font-medium">{{ item.label }}</div>
       <div class="text-gray-600">{{ item.content }}</div>
     </template>
+    <template #pending><span>正在处理...</span></template>
   </Timeline>
-</template>
-```
-
-### 等待中状态
-
-```vue
-<template>
-  <Timeline :items="items" :pending="true">
-    <template #pending>
-      <span>正在处理...</span>
-    </template>
-  </Timeline>
-</template>
-```
-
-### 反转顺序
-
-```vue
-<template>
-  <Timeline :items="items" :reverse="true" />
 </template>
 ```
 
@@ -325,65 +170,17 @@ const handleExpandChange = (keys, record, expanded) => {
 </template>
 ```
 
-### 显示箭头
+### 自动播放、事件与 ref
 
 ```vue
 <template>
-  <Carousel arrows>
-    <div class="h-48 bg-blue-500">Slide 1</div>
-    <div class="h-48 bg-green-500">Slide 2</div>
-    <div class="h-48 bg-red-500">Slide 3</div>
-  </Carousel>
-</template>
-```
-
-### 自动播放
-
-```vue
-<template>
-  <Carousel autoplay :autoplay-speed="3000" pause-on-hover>
-    <div class="h-48 bg-blue-500">Slide 1</div>
-    <div class="h-48 bg-green-500">Slide 2</div>
-    <div class="h-48 bg-red-500">Slide 3</div>
-  </Carousel>
-</template>
-```
-
-### 淡入淡出效果
-
-```vue
-<template>
-  <Carousel effect="fade" arrows>
-    <div class="h-48 bg-blue-500">Slide 1</div>
-    <div class="h-48 bg-green-500">Slide 2</div>
-    <div class="h-48 bg-red-500">Slide 3</div>
-  </Carousel>
-</template>
-```
-
-### 指示点位置
-
-```vue
-<template>
-  <!-- 指示点在上方 -->
-  <Carousel dot-position="top">
-    <div class="h-48 bg-blue-500">Slide 1</div>
-    <div class="h-48 bg-green-500">Slide 2</div>
-  </Carousel>
-
-  <!-- 指示点在左侧 -->
-  <Carousel dot-position="left">
-    <div class="h-48 bg-blue-500">Slide 1</div>
-    <div class="h-48 bg-green-500">Slide 2</div>
-  </Carousel>
-</template>
-```
-
-### 使用 ref 调用方法
-
-```vue
-<template>
-  <Carousel ref="carouselRef">
+  <Carousel
+    ref="carouselRef"
+    arrows
+    autoplay
+    :autoplay-speed="3000"
+    pause-on-hover
+    @change="handleChange">
     <div class="h-48 bg-blue-500">Slide 1</div>
     <div class="h-48 bg-green-500">Slide 2</div>
     <div class="h-48 bg-red-500">Slide 3</div>
@@ -398,26 +195,7 @@ const handleExpandChange = (keys, record, expanded) => {
 import { ref } from 'vue'
 
 const carouselRef = ref()
-</script>
-```
-
-### 事件监听
-
-```vue
-<template>
-  <Carousel @change="handleChange" @before-change="handleBeforeChange">
-    <div class="h-48 bg-blue-500">Slide 1</div>
-    <div class="h-48 bg-green-500">Slide 2</div>
-  </Carousel>
-</template>
-<script setup>
-const handleChange = (current, prev) => {
-  console.log(`Changed from slide ${prev} to slide ${current}`)
-}
-
-const handleBeforeChange = (current, next) => {
-  console.log(`About to change from slide ${current} to slide ${next}`)
-}
+const handleChange = (current, prev) => console.log(current, prev)
 </script>
 ```
 
@@ -440,23 +218,6 @@ const items = [
 </script>
 ```
 
-### 带边框 + 自定义列数
-
-```vue
-<template>
-  <Descriptions bordered :column="2" :items="items" />
-</template>
-```
-
-### 垂直布局
-
-```vue
-<template>
-  <Descriptions layout="vertical" :items="items" />
-  <Descriptions layout="vertical" bordered :items="items" />
-</template>
-```
-
 ### Extra 插槽 + 跨列 + 无冒号
 
 ```vue
@@ -464,19 +225,6 @@ const items = [
   <Descriptions title="订单" bordered :column="3" :colon="false" :items="orderItems">
     <template #extra><Button size="sm">编辑</Button></template>
   </Descriptions>
-</template>
-<script setup>
-const orderItems = [
-  { label: '订单号', content: 'ORDER-001' },
-  { label: '地址', content: '上海市浦东新区', span: 2 }
-]
-</script>
-```
-
-### 自定义样式 + Item 级 class
-
-```vue
-<template>
   <Descriptions
     bordered
     :column="2"
@@ -494,4 +242,15 @@ const items = [
   }
 ]
 </script>
+```
+
+---
+
+## Calendar 日历
+
+```vue
+<template>
+  <Calendar v-model="date" />
+  <Calendar v-model="date" mode="month" :date-cell-render="renderDateCell" />
+</template>
 ```

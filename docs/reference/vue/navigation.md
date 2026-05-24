@@ -71,6 +71,35 @@ const homeIcon = h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewBox: '0 
 
 ---
 
+## Affix 固钉
+
+```vue
+<template>
+  <Affix :offset-top="72">
+    <Button>固定操作</Button>
+  </Affix>
+  <Affix :target="() => containerRef" @change="handleAffixChange">
+    <Button variant="outline">容器内固定</Button>
+  </Affix>
+</template>
+```
+
+---
+
+## FloatButton 悬浮按钮
+
+```vue
+<template>
+  <FloatButton icon="+" @click="handleCreate" />
+  <FloatButtonGroup trigger="hover" placement="top">
+    <FloatButton icon="?" />
+    <FloatButton icon="↑" />
+  </FloatButtonGroup>
+</template>
+```
+
+---
+
 ## Dropdown 下拉菜单
 
 ```vue

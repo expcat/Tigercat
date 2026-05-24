@@ -267,6 +267,50 @@ const heatmapData = [
 
 ---
 
+## FunnelChart
+
+```vue
+<template>
+  <FunnelChart :data="funnelData" :width="360" :height="240" />
+  <FunnelChart :data="funnelData" sort="desc" show-labels hoverable />
+</template>
+```
+
+---
+
+## GaugeChart
+
+```vue
+<template>
+  <GaugeChart :value="72" :min="0" :max="100" />
+  <GaugeChart :value="72" label="完成率" unit="%" show-thresholds animated />
+</template>
+```
+
+---
+
+## SunburstChart
+
+```vue
+<template>
+  <SunburstChart :data="hierarchyData" :width="360" :height="280" />
+  <SunburstChart :data="hierarchyData" show-labels hoverable @node-click="handleNodeClick" />
+</template>
+```
+
+---
+
+## TreeMapChart
+
+```vue
+<template>
+  <TreeMapChart :data="hierarchyData" :width="360" :height="240" />
+  <TreeMapChart :data="hierarchyData" show-labels hoverable @node-click="handleNodeClick" />
+</template>
+```
+
+---
+
 ## 底层组件
 
 ```vue
@@ -276,6 +320,8 @@ import {
   ChartAxis,
   ChartGrid,
   ChartSeries,
+  ChartLegend,
+  ChartTooltip,
   createLinearScale
 } from '@expcat/tigercat-vue'
 
@@ -293,6 +339,8 @@ const yScale = createLinearScale([0, 100], [160, 0])
         <circle v-for="(pt, i) in data" :key="i" :cx="pt.x" :cy="pt.y" r="4" :fill="color" />
       </template>
     </ChartSeries>
+    <ChartLegend :items="legendItems" position="bottom" />
+    <ChartTooltip :content="tooltipContent" />
   </ChartCanvas>
 </template>
 ```

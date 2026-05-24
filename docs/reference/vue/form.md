@@ -375,3 +375,94 @@ const value = ref('male')
   <Upload v-model:file-list="fileList" :custom-request="simulateUpload" drag />
 </template>
 ```
+
+---
+
+## AutoComplete 自动完成
+
+```vue
+<template>
+  <AutoComplete v-model="keyword" :options="options" placeholder="Search users" />
+  <AutoComplete v-model="keyword" :options="options" clearable @search="handleSearch" />
+</template>
+```
+
+---
+
+## Cascader 级联选择
+
+```vue
+<template>
+  <Cascader v-model="city" :options="cityOptions" placeholder="选择城市" />
+  <Cascader v-model="city" :options="cityOptions" show-search clearable />
+</template>
+```
+
+---
+
+## ColorPicker 颜色选择器
+
+```vue
+<template>
+  <ColorPicker v-model="color" />
+  <ColorPicker v-model="color" format="rgba" show-alpha :presets="presets" />
+</template>
+```
+
+---
+
+## InputGroup 输入框组
+
+```vue
+<template>
+  <InputGroup>
+    <InputGroupAddon>https://</InputGroupAddon>
+    <Input v-model="domain" />
+    <InputGroupAddon>.com</InputGroupAddon>
+  </InputGroup>
+</template>
+```
+
+---
+
+## Mentions 提及
+
+```vue
+<template>
+  <Mentions v-model="message" :options="mentionOptions" placeholder="输入 @ 提及成员" />
+  <Mentions v-model="message" :options="mentionOptions" prefix="#" />
+</template>
+```
+
+---
+
+## Stepper 步进器
+
+```vue
+<template>
+  <Stepper v-model="count" :min="0" :max="10" />
+  <Stepper v-model="count" :step="0.5" :precision="1" size="sm" />
+</template>
+```
+
+---
+
+## Transfer 穿梭框
+
+```vue
+<template>
+  <Transfer v-model="selectedKeys" :data-source="items" />
+  <Transfer v-model="selectedKeys" :data-source="items" filterable show-select-all />
+</template>
+```
+
+---
+
+## TreeSelect 树选择
+
+```vue
+<template>
+  <TreeSelect v-model="node" :tree-data="treeData" placeholder="选择节点" />
+  <TreeSelect v-model="nodes" :tree-data="treeData" multiple checkable searchable />
+</template>
+```

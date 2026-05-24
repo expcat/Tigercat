@@ -20,63 +20,63 @@ key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, 
 
 ### Props
 
-| Prop                | Type                                               | Default     | Vue | React | Description             |
-| ------------------- | -------------------------------------------------- | ----------- | :-: | :---: | ----------------------- |
-| columns             | `TableColumn[]`                                    | required    |  ✓  |   ✓   | 列配置                  |
-| dataSource          | `T[]`                                              | `[]`        |  ✓  |   ✓   | 数据源                  |
-| rowKey              | `string \| ((record: T) => string \| number)`      | `'id'`      |  ✓  |   ✓   | 行唯一键                |
-| size                | `'sm' \| 'md' \| 'lg'`                             | `'md'`      |  ✓  |   ✓   | 尺寸                    |
-| bordered            | `boolean`                                          | `false`     |  ✓  |   ✓   | 显示边框                |
-| striped             | `boolean`                                          | `false`     |  ✓  |   ✓   | 斑马纹                  |
-| hoverable           | `boolean`                                          | `true`      |  ✓  |   ✓   | 行悬停高亮              |
-| loading             | `boolean`                                          | `false`     |  ✓  |   ✓   | 加载状态                |
-| emptyText           | `string`                                           | `'No data'` |  ✓  |   ✓   | 空数据文案              |
-| sort                | `SortState`                                        | -           |  ✓  |   ✓   | 受控排序状态            |
-| defaultSort         | `SortState`                                        | -           |  ✓  |   ✓   | 非受控默认排序          |
-| filters             | `Record<string, unknown>`                          | -           |  ✓  |   ✓   | 受控筛选状态            |
-| defaultFilters      | `Record<string, unknown>`                          | -           |  ✓  |   ✓   | 非受控默认筛选          |
-| pagination          | `PaginationConfig \| false`                        | `{...}`     |  ✓  |   ✓   | 分页配置，false 禁用    |
-| rowSelection        | `RowSelectionConfig`                               | -           |  ✓  |   ✓   | 行选择配置              |
-| expandable          | `ExpandableConfig`                                 | -           |  ✓  |   ✓   | 行展开配置              |
-| rowClassName        | `string \| ((record, index) => string)`            | -           |  ✓  |   ✓   | 自定义行 class          |
-| stickyHeader        | `boolean`                                          | `false`     |  ✓  |   ✓   | 固定表头                |
-| maxHeight           | `string \| number`                                 | -           |  ✓  |   ✓   | 最大高度（启用滚动）    |
-| tableLayout         | `'auto' \| 'fixed'`                                | `'auto'`    |  ✓  |   ✓   | 表格布局算法            |
-| virtual             | `boolean`                                          | `false`     |  ✓  |   ✓   | 启用 Table 滚动视口     |
-| virtualHeight       | `number`                                           | `400`       |  ✓  |   ✓   | virtual 视口高度        |
-| virtualItemHeight   | `number`                                           | `40`        |  ✓  |   ✓   | virtual 行高提示        |
-| virtualThreshold    | `number`                                           | `1000`      |  ✓  |   ✓   | 大数据 virtual 推荐阈值 |
-| columnLockable      | `boolean`                                          | `false`     |  ✓  |   ✓   | 显示列锁定按钮          |
-| exportable          | `boolean`                                          | `false`     |  ✓  |   ✓   | 显示 CSV 导出按钮       |
-| exportFilename      | `string`                                           | `'export'`  |  ✓  |   ✓   | CSV 导出文件名          |
-| editable            | `boolean`                                          | `false`     |  ✓  |   ✓   | 启用单元格编辑          |
-| editableCells       | `Map<string, Set<number>>`                         | -           |  ✓  |   ✓   | 可编辑单元格集合        |
-| filterMode          | `'basic' \| 'advanced'`                            | `'basic'`   |  ✓  |   ✓   | 筛选模式                |
-| advancedFilterRules | `FilterRule[]`                                     | -           |  ✓  |   ✓   | 高级筛选规则            |
-| columnDraggable     | `boolean`                                          | `false`     |  ✓  |   ✓   | 启用列拖拽排序          |
-| summaryRow          | `{ show: boolean; data: Record<string, unknown> }` | -           |  ✓  |   ✓   | 汇总行配置              |
-| groupBy             | `string`                                           | -           |  ✓  |   ✓   | 按列键分组              |
-| className           | `string`                                           | -           |  ✗  |   ✓   | 额外 CSS class（React） |
+| Prop                | Type                                               | Default     | Description                          |
+| ------------------- | -------------------------------------------------- | ----------- | ------------------------------------ |
+| columns             | `TableColumn[]`                                    | required    | 列配置                               |
+| dataSource          | `T[]`                                              | `[]`        | 数据源                               |
+| rowKey              | `string \| ((record: T) => string \| number)`      | `'id'`      | 行唯一键                             |
+| size                | `'sm' \| 'md' \| 'lg'`                             | `'md'`      | 尺寸                                 |
+| bordered            | `boolean`                                          | `false`     | 显示边框                             |
+| striped             | `boolean`                                          | `false`     | 斑马纹                               |
+| hoverable           | `boolean`                                          | `true`      | 行悬停高亮                           |
+| loading             | `boolean`                                          | `false`     | 加载状态                             |
+| emptyText           | `string`                                           | `'No data'` | 空数据文案                           |
+| sort                | `SortState`                                        | -           | 受控排序状态                         |
+| defaultSort         | `SortState`                                        | -           | 非受控默认排序                       |
+| filters             | `Record<string, unknown>`                          | -           | 受控筛选状态                         |
+| defaultFilters      | `Record<string, unknown>`                          | -           | 非受控默认筛选                       |
+| pagination          | `PaginationConfig \| false`                        | `{...}`     | 分页配置，false 禁用                 |
+| rowSelection        | `RowSelectionConfig`                               | -           | 行选择配置                           |
+| expandable          | `ExpandableConfig`                                 | -           | 行展开配置                           |
+| rowClassName        | `string \| ((record, index) => string)`            | -           | 自定义行 class                       |
+| stickyHeader        | `boolean`                                          | `false`     | 固定表头                             |
+| maxHeight           | `string \| number`                                 | -           | 最大高度（启用滚动）                 |
+| tableLayout         | `'auto' \| 'fixed'`                                | `'auto'`    | 表格布局算法                         |
+| virtual             | `boolean`                                          | `false`     | 启用 Table 滚动视口                  |
+| virtualHeight       | `number`                                           | `400`       | virtual 视口高度                     |
+| virtualItemHeight   | `number`                                           | `40`        | virtual 行高提示                     |
+| virtualThreshold    | `number`                                           | `1000`      | 大数据 virtual 推荐阈值              |
+| columnLockable      | `boolean`                                          | `false`     | 显示列锁定按钮                       |
+| exportable          | `boolean`                                          | `false`     | 显示 CSV 导出按钮                    |
+| exportFilename      | `string`                                           | `'export'`  | CSV 导出文件名                       |
+| editable            | `boolean`                                          | `false`     | 启用单元格编辑                       |
+| editableCells       | `Map<string, Set<number>>`                         | -           | 可编辑单元格集合                     |
+| filterMode          | `'basic' \| 'advanced'`                            | `'basic'`   | 筛选模式                             |
+| advancedFilterRules | `FilterRule[]`                                     | -           | 高级筛选规则                         |
+| columnDraggable     | `boolean`                                          | `false`     | 启用列拖拽排序                       |
+| summaryRow          | `{ show: boolean; data: Record<string, unknown> }` | -           | 汇总行配置                           |
+| groupBy             | `string`                                           | -           | 按列键分组                           |
+| className           | `string`                                           | -           | 额外 CSS class（React） (React only) |
 
 > Table 不会自动打开 virtual，以避免布局行为突变；当 `dataSource.length >= virtualThreshold` 且未启用 `virtual` 时，组件会在根节点提供 `data-tiger-virtual-recommended="true"` 作为可检测建议。超大数据表优先使用 `VirtualTable`。
 
 ### TableColumn
 
-| Prop            | Type                                    | Default  | Vue | React | Description      |
-| --------------- | --------------------------------------- | -------- | :-: | :---: | ---------------- |
-| key             | `string`                                | required |  ✓  |   ✓   | 唯一字段名       |
-| title           | `string`                                | required |  ✓  |   ✓   | 列标题           |
-| dataKey         | `string`                                | `key`    |  ✓  |   ✓   | 数据字段名       |
-| width           | `number \| string`                      | -        |  ✓  |   ✓   | 列宽             |
-| align           | `'left' \| 'center' \| 'right'`         | `'left'` |  ✓  |   ✓   | 对齐方式         |
-| sortable        | `boolean`                               | `false`  |  ✓  |   ✓   | 可排序           |
-| sortFn          | `(a: unknown, b: unknown) => number`    | -        |  ✓  |   ✓   | 自定义排序函数   |
-| filter          | `ColumnFilter`                          | -        |  ✓  |   ✓   | 筛选配置         |
-| fixed           | `'left' \| 'right' \| false`            | `false`  |  ✓  |   ✓   | 固定列           |
-| render          | `(record: T, index: number) => unknown` | -        |  ✓  |   ✓   | 自定义单元格渲染 |
-| renderHeader    | `() => unknown`                         | -        |  ✓  |   ✓   | 自定义表头渲染   |
-| className       | `string`                                | -        |  ✓  |   ✓   | 单元格 CSS class |
-| headerClassName | `string`                                | -        |  ✓  |   ✓   | 表头 CSS class   |
+| Prop            | Type                                    | Default  | Description      |
+| --------------- | --------------------------------------- | -------- | ---------------- |
+| key             | `string`                                | required | 唯一字段名       |
+| title           | `string`                                | required | 列标题           |
+| dataKey         | `string`                                | `key`    | 数据字段名       |
+| width           | `number \| string`                      | -        | 列宽             |
+| align           | `'left' \| 'center' \| 'right'`         | `'left'` | 对齐方式         |
+| sortable        | `boolean`                               | `false`  | 可排序           |
+| sortFn          | `(a: unknown, b: unknown) => number`    | -        | 自定义排序函数   |
+| filter          | `ColumnFilter`                          | -        | 筛选配置         |
+| fixed           | `'left' \| 'right' \| false`            | `false`  | 固定列           |
+| render          | `(record: T, index: number) => unknown` | -        | 自定义单元格渲染 |
+| renderHeader    | `() => unknown`                         | -        | 自定义表头渲染   |
+| className       | `string`                                | -        | 单元格 CSS class |
+| headerClassName | `string`                                | -        | 表头 CSS class   |
 
 ### ColumnFilter
 
@@ -135,13 +135,13 @@ key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, 
 
 ### Props
 
-| Prop       | Type                               | Default  | Vue | React | Description        |
-| ---------- | ---------------------------------- | -------- | :-: | :---: | ------------------ |
-| mode       | `'left' \| 'right' \| 'alternate'` | `'left'` |  ✓  |   ✓   | 布局模式           |
-| pending    | `boolean`                          | `false`  |  ✓  |   ✓   | 是否显示等待中状态 |
-| pendingDot | `VNode / ReactNode`                | -        |  ✓  |   ✓   | 自定义等待节点内容 |
-| reverse    | `boolean`                          | `false`  |  ✓  |   ✓   | 是否反转时间线顺序 |
-| className  | `string`                           | -        |  ✓  |   ✓   | 额外 CSS 类名      |
+| Prop       | Type                               | Default  | Description        |
+| ---------- | ---------------------------------- | -------- | ------------------ |
+| mode       | `'left' \| 'right' \| 'alternate'` | `'left'` | 布局模式           |
+| pending    | `boolean`                          | `false`  | 是否显示等待中状态 |
+| pendingDot | `VNode / ReactNode`                | -        | 自定义等待节点内容 |
+| reverse    | `boolean`                          | `false`  | 是否反转时间线顺序 |
+| className  | `string`                           | -        | 额外 CSS 类名      |
 
 > Timeline 使用子组件模式（`TimelineItem`），不通过 `items` prop 传数据。
 
@@ -172,26 +172,26 @@ key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, 
 
 ### Collapse Props
 
-| Prop               | Type                                     | Default   | Vue | React | Description                |
-| ------------------ | ---------------------------------------- | --------- | :-: | :---: | -------------------------- |
-| activeKey          | `string \| number \| (string\|number)[]` | -         |  ✓  |   ✓   | 当前激活的面板 key         |
-| defaultActiveKey   | `string \| number \| (string\|number)[]` | -         |  ✓  |   ✓   | 默认激活的面板 key         |
-| accordion          | `boolean`                                | `false`   |  ✓  |   ✓   | 手风琴模式（只能展开一个） |
-| bordered           | `boolean`                                | `true`    |  ✓  |   ✓   | 是否有边框                 |
-| expandIconPosition | `'start' \| 'end'`                       | `'start'` |  ✓  |   ✓   | 展开图标位置               |
-| ghost              | `boolean`                                | `false`   |  ✓  |   ✓   | 透明无边框样式             |
+| Prop               | Type                                     | Default   | Description                |
+| ------------------ | ---------------------------------------- | --------- | -------------------------- |
+| activeKey          | `string \| number \| (string\|number)[]` | -         | 当前激活的面板 key         |
+| defaultActiveKey   | `string \| number \| (string\|number)[]` | -         | 默认激活的面板 key         |
+| accordion          | `boolean`                                | `false`   | 手风琴模式（只能展开一个） |
+| bordered           | `boolean`                                | `true`    | 是否有边框                 |
+| expandIconPosition | `'start' \| 'end'`                       | `'start'` | 展开图标位置               |
+| ghost              | `boolean`                                | `false`   | 透明无边框样式             |
 
 > **Vue**: 使用 `v-model:active-key` 或 `@change` 监听变化
 > **React**: 使用 `activeKey` + `onChange` 控制
 
 ### CollapsePanel Props
 
-| Prop      | Type               | Default | Vue | React | Description      |
-| --------- | ------------------ | ------- | :-: | :---: | ---------------- |
-| panelKey  | `string \| number` | -       |  ✓  |   ✓   | 唯一标识（必需） |
-| header    | `string \| slot`   | -       |  ✓  |   ✓   | 面板标题         |
-| disabled  | `boolean`          | `false` |  ✓  |   ✓   | 禁用状态         |
-| showArrow | `boolean`          | `true`  |  ✓  |   ✓   | 是否显示箭头     |
+| Prop      | Type               | Default | Description      |
+| --------- | ------------------ | ------- | ---------------- |
+| panelKey  | `string \| number` | -       | 唯一标识（必需） |
+| header    | `string \| slot`   | -       | 面板标题         |
+| disabled  | `boolean`          | `false` | 禁用状态         |
+| showArrow | `boolean`          | `true`  | 是否显示箭头     |
 
 ### Events
 
@@ -216,19 +216,19 @@ key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, 
 
 ### Props
 
-| Prop          | Type                                     | Default    | Vue | React | Description        |
-| ------------- | ---------------------------------------- | ---------- | :-: | :---: | ------------------ |
-| autoplay      | `boolean`                                | `false`    |  ✓  |   ✓   | 是否自动播放       |
-| autoplaySpeed | `number`                                 | `3000`     |  ✓  |   ✓   | 自动播放间隔（ms） |
-| dots          | `boolean`                                | `true`     |  ✓  |   ✓   | 是否显示指示点     |
-| dotPosition   | `'top' \| 'bottom' \| 'left' \| 'right'` | `'bottom'` |  ✓  |   ✓   | 指示点位置         |
-| effect        | `'scroll' \| 'fade'`                     | `'scroll'` |  ✓  |   ✓   | 切换效果           |
-| arrows        | `boolean`                                | `false`    |  ✓  |   ✓   | 是否显示切换箭头   |
-| infinite      | `boolean`                                | `true`     |  ✓  |   ✓   | 是否无限循环       |
-| speed         | `number`                                 | `500`      |  ✓  |   ✓   | 切换动画速度（ms） |
-| initialSlide  | `number`                                 | `0`        |  ✓  |   ✓   | 初始幻灯片索引     |
-| pauseOnHover  | `boolean`                                | `true`     |  ✓  |   ✓   | 鼠标悬停时暂停     |
-| pauseOnFocus  | `boolean`                                | `true`     |  ✓  |   ✓   | 聚焦时暂停         |
+| Prop          | Type                                     | Default    | Description        |
+| ------------- | ---------------------------------------- | ---------- | ------------------ |
+| autoplay      | `boolean`                                | `false`    | 是否自动播放       |
+| autoplaySpeed | `number`                                 | `3000`     | 自动播放间隔（ms） |
+| dots          | `boolean`                                | `true`     | 是否显示指示点     |
+| dotPosition   | `'top' \| 'bottom' \| 'left' \| 'right'` | `'bottom'` | 指示点位置         |
+| effect        | `'scroll' \| 'fade'`                     | `'scroll'` | 切换效果           |
+| arrows        | `boolean`                                | `false`    | 是否显示切换箭头   |
+| infinite      | `boolean`                                | `true`     | 是否无限循环       |
+| speed         | `number`                                 | `500`      | 切换动画速度（ms） |
+| initialSlide  | `number`                                 | `0`        | 初始幻灯片索引     |
+| pauseOnHover  | `boolean`                                | `true`     | 鼠标悬停时暂停     |
+| pauseOnFocus  | `boolean`                                | `true`     | 聚焦时暂停         |
 
 ### Events
 
@@ -272,19 +272,19 @@ key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, 
 
 ### Props
 
-| Prop         | Type       | Default | Vue | React | Description                  |
-| ------------ | ---------- | ------- | :-: | :---: | ---------------------------- |
-| images       | `string[]` | -       |  ✓  |   ✓   | 图片 URL 数组（必填）        |
-| open         | `boolean`  | `false` |  ✓  |   ✓   | 显示状态 (Vue: v-model:open) |
-| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前图片索引                 |
-| zoomable     | `boolean`  | `true`  |  ✓  |   ✓   | 启用缩放                     |
-| rotatable    | `boolean`  | `true`  |  ✓  |   ✓   | 启用旋转                     |
-| showNav      | `boolean`  | `true`  |  ✓  |   ✓   | 显示前后导航按钮             |
-| showCounter  | `boolean`  | `true`  |  ✓  |   ✓   | 显示图片计数 (1/3)           |
-| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭                 |
-| minZoom      | `number`   | `0.5`   |  ✓  |   ✓   | 最小缩放倍率                 |
-| maxZoom      | `number`   | `3`     |  ✓  |   ✓   | 最大缩放倍率                 |
-| className    | `string`   | -       |  ✓  |   ✓   | 自定义类名                   |
+| Prop         | Type       | Default | Description                  |
+| ------------ | ---------- | ------- | ---------------------------- |
+| images       | `string[]` | -       | 图片 URL 数组（必填）        |
+| open         | `boolean`  | `false` | 显示状态 (Vue: v-model:open) |
+| currentIndex | `number`   | `0`     | 当前图片索引                 |
+| zoomable     | `boolean`  | `true`  | 启用缩放                     |
+| rotatable    | `boolean`  | `true`  | 启用旋转                     |
+| showNav      | `boolean`  | `true`  | 显示前后导航按钮             |
+| showCounter  | `boolean`  | `true`  | 显示图片计数 (1/3)           |
+| maskClosable | `boolean`  | `true`  | 点击遮罩关闭                 |
+| minZoom      | `number`   | `0.5`   | 最小缩放倍率                 |
+| maxZoom      | `number`   | `3`     | 最大缩放倍率                 |
+| className    | `string`   | -       | 自定义类名                   |
 
 ### Events
 
@@ -308,12 +308,12 @@ key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, 
 
 ### Props
 
-| Prop         | Type                      | Default   | Vue | React | Description       |
-| ------------ | ------------------------- | --------- | :-: | :---: | ----------------- |
-| mode         | `'month' \| 'year'`       | `'month'` |  ✓  |   ✓   | 显示模式（月/年） |
-| fullscreen   | `boolean`                 | `true`    |  ✓  |   ✓   | 全屏或卡片样式    |
-| disabledDate | `(date: Date) => boolean` | -         |  ✓  |   ✓   | 日期禁用函数      |
-| className    | `string`                  | -         |  -  |   ✓   | 自定义类名        |
+| Prop         | Type                      | Default   | Description             |
+| ------------ | ------------------------- | --------- | ----------------------- |
+| mode         | `'month' \| 'year'`       | `'month'` | 显示模式（月/年）       |
+| fullscreen   | `boolean`                 | `true`    | 全屏或卡片样式          |
+| disabledDate | `(date: Date) => boolean` | -         | 日期禁用函数            |
+| className    | `string`                  | -         | 自定义类名 (React only) |
 
 ### Events
 

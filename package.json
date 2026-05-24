@@ -47,6 +47,7 @@
     "docs:dev": "pnpm docs:api && pnpm docs:sync && vitepress dev docs",
     "docs:build": "pnpm docs:api && pnpm docs:sync && vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "tokens:build": "node ./packages/core/scripts/generate-tokens.mjs",
     "types:check": "node ./scripts/check-public-types.mjs",
     "example:vue": "pnpm --filter @expcat/tigercat-example-vue3 dev",
     "example:react": "pnpm --filter @expcat/tigercat-example-react dev",

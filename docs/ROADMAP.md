@@ -320,10 +320,10 @@ source: project audit and planning
 
 当前 token 系统：`tokens/tokens.ts` + `tokens/tokens.css` + 5 主题预设。
 
-- [ ] 分层重构：primitive（颜色/间距/字号原始值）→ semantic（intent: primary/danger/success）→ component（button-bg/input-border）
-- [ ] 主题切换零闪烁：`color-scheme` + CSS 变量优先加载（`<link rel="preload">`）
-- [ ] Figma Token 导出：生成 Figma Variables JSON，设计稿与代码 token 单一数据源
-- [ ] Token 文档页面：可视化展示所有 token 及其在组件中的引用关系
+- [x] 分层重构：primitive（颜色/间距/字号原始值）→ semantic（intent: primary/danger/success）→ component（button-bg/input-border）
+- [x] 主题切换零闪烁：`color-scheme` + CSS 变量优先加载（`<link rel="preload">`）
+- [x] Figma Token 导出：生成 Figma Variables JSON，设计稿与代码 token 单一数据源
+- [x] Token 文档页面：可视化展示所有 token 及其在组件中的引用关系
 
 ### 9.2 动画系统
 

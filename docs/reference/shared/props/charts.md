@@ -67,13 +67,13 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 
 ## 事件对照
 
-| 概念       | Vue             | React           |
-| ---------- | --------------- | --------------- |
-| 点击数据点 | `@point-click`  | `onPointClick`  |
-| 悬停数据点 | `@point-hover`  | `onPointHover`  |
-| 点击柱子   | `@bar-click`    | `onBarClick`    |
-| 点击扇形   | `@slice-click`  | `onSliceClick`  |
-| 点击图例   | `@legend-click` | `onLegendClick` |
+| 概念       | Notes                                        |
+| ---------- | -------------------------------------------- |
+| 点击数据点 | Vue: `@point-click`, React: `onPointClick`   |
+| 悬停数据点 | Vue: `@point-hover`, React: `onPointHover`   |
+| 点击柱子   | Vue: `@bar-click`, React: `onBarClick`       |
+| 点击扇形   | Vue: `@slice-click`, React: `onSliceClick`   |
+| 点击图例   | Vue: `@legend-click`, React: `onLegendClick` |
 
 ## 曲线类型 (LineChart/AreaChart)
 
@@ -88,101 +88,101 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 
 ### LineChart
 
-| Prop        | Type                                            | Default    | Vue | React |
-| ----------- | ----------------------------------------------- | ---------- | --- | ----- |
-| curve       | `'linear' \| 'monotone' \| 'step' \| 'natural'` | `'linear'` | ✓   | ✓     |
-| showPoints  | `boolean`                                       | `true`     | ✓   | ✓     |
-| pointSize   | `number`                                        | `4`        | ✓   | ✓     |
-| pointHollow | `boolean`                                       | `false`    | ✓   | ✓     |
-| showArea    | `boolean`                                       | `false`    | ✓   | ✓     |
-| areaOpacity | `number`                                        | `0.15`     | ✓   | ✓     |
-| animated    | `boolean`                                       | `false`    | ✓   | ✓     |
+| Prop        | Type                                            | Default    | Notes |
+| ----------- | ----------------------------------------------- | ---------- | ----- |
+| curve       | `'linear' \| 'monotone' \| 'step' \| 'natural'` | `'linear'` |       |
+| showPoints  | `boolean`                                       | `true`     |       |
+| pointSize   | `number`                                        | `4`        |       |
+| pointHollow | `boolean`                                       | `false`    |       |
+| showArea    | `boolean`                                       | `false`    |       |
+| areaOpacity | `number`                                        | `0.15`     |       |
+| animated    | `boolean`                                       | `false`    |       |
 
 ### BarChart
 
-| Prop                | Type                    | Default | Vue | React |
-| ------------------- | ----------------------- | ------- | --- | ----- |
-| barRadius           | `number`                | `4`     | ✓   | ✓     |
-| barPaddingInner     | `number`                | `0.2`   | ✓   | ✓     |
-| barPaddingOuter     | `number`                | `0.1`   | ✓   | ✓     |
-| barMinHeight        | `number`                | `0`     | ✓   | ✓     |
-| barMaxWidth         | `number`                | -       | ✓   | ✓     |
-| gradient            | `boolean`               | `false` | ✓   | ✓     |
-| animated            | `boolean`               | `false` | ✓   | ✓     |
-| showValueLabels     | `boolean`               | `false` | ✓   | ✓     |
-| valueLabelPosition  | `'top' \| 'inside'`     | `'top'` | ✓   | ✓     |
-| valueLabelFormatter | `(datum, index) => str` | -       | ✓   | ✓     |
+| Prop                | Type                    | Default | Notes |
+| ------------------- | ----------------------- | ------- | ----- |
+| barRadius           | `number`                | `4`     |       |
+| barPaddingInner     | `number`                | `0.2`   |       |
+| barPaddingOuter     | `number`                | `0.1`   |       |
+| barMinHeight        | `number`                | `0`     |       |
+| barMaxWidth         | `number`                | -       |       |
+| gradient            | `boolean`               | `false` |       |
+| animated            | `boolean`               | `false` |       |
+| showValueLabels     | `boolean`               | `false` |       |
+| valueLabelPosition  | `'top' \| 'inside'`     | `'top'` |       |
+| valueLabelFormatter | `(datum, index) => str` | -       |       |
 
 ### PieChart / DonutChart
 
-| Prop             | Type                    | Default     | Vue    | React   |
-| ---------------- | ----------------------- | ----------- | ------ | ------- |
-| showLabels       | `boolean`               | `false`     | ✓      | ✓       |
-| labelPosition    | `'inside' \| 'outside'` | `'inside'`  | ✓      | ✓       |
-| innerRadius      | `number`                | `0` / `0.6` | ✓ (px) | ✓ (0-1) |
-| innerRadiusRatio | `number`                | `0.6`       | ✓      | ✓       |
-| padAngle         | `number`                | `0`         | ✓      | ✓       |
-| borderWidth      | `number`                | `2`         | ✓      | ✓       |
-| borderColor      | `string`                | `'#ffffff'` | ✓      | ✓       |
-| hoverOffset      | `number`                | `8`         | ✓      | ✓       |
-| shadow           | `boolean`               | `false`     | ✓      | ✓       |
-| centerValue      | `string \| number`      | -           | ✓      | ✓       |
-| centerLabel      | `string`                | -           | ✓      | ✓       |
-| animated         | `boolean`               | `false`     | ✓      | ✓       |
-| centerContent    | `ReactNode`             | -           | -      | ✓       |
+| Prop             | Type                    | Default     | Notes                       |
+| ---------------- | ----------------------- | ----------- | --------------------------- |
+| showLabels       | `boolean`               | `false`     |                             |
+| labelPosition    | `'inside' \| 'outside'` | `'inside'`  |                             |
+| innerRadius      | `number`                | `0` / `0.6` | Vue: ✓ (px), React: ✓ (0-1) |
+| innerRadiusRatio | `number`                | `0.6`       |                             |
+| padAngle         | `number`                | `0`         |                             |
+| borderWidth      | `number`                | `2`         |                             |
+| borderColor      | `string`                | `'#ffffff'` |                             |
+| hoverOffset      | `number`                | `8`         |                             |
+| shadow           | `boolean`               | `false`     |                             |
+| centerValue      | `string \| number`      | -           |                             |
+| centerLabel      | `string`                | -           |                             |
+| animated         | `boolean`               | `false`     |                             |
+| centerContent    | `ReactNode`             | -           | React only                  |
 
 ### AreaChart
 
-| Prop        | Type      | Default | Vue | React |
-| ----------- | --------- | ------- | --- | ----- |
-| fillOpacity | `number`  | `0.2`   | ✓   | ✓     |
-| stacked     | `boolean` | `false` | ✓   | ✓     |
-| gradient    | `boolean` | `false` | ✓   | ✓     |
-| pointHollow | `boolean` | `false` | ✓   | ✓     |
-| animated    | `boolean` | `false` | ✓   | ✓     |
+| Prop        | Type      | Default | Notes |
+| ----------- | --------- | ------- | ----- |
+| fillOpacity | `number`  | `0.2`   |       |
+| stacked     | `boolean` | `false` |       |
+| gradient    | `boolean` | `false` |       |
+| pointHollow | `boolean` | `false` |       |
+| animated    | `boolean` | `false` |       |
 
 ### ScatterChart
 
-| Prop             | Type                                              | Default    | Vue | React |
-| ---------------- | ------------------------------------------------- | ---------- | --- | ----- |
-| pointSize        | `number`                                          | `6`        | ✓   | ✓     |
-| pointStyle       | `'circle' \| 'square' \| 'triangle' \| 'diamond'` | `'circle'` | ✓   | ✓     |
-| gradient         | `boolean`                                         | `false`    | ✓   | ✓     |
-| animated         | `boolean`                                         | `false`    | ✓   | ✓     |
-| pointBorderWidth | `number`                                          | `0`        | ✓   | ✓     |
-| pointBorderColor | `string`                                          | `'white'`  | ✓   | ✓     |
+| Prop             | Type                                              | Default    | Notes |
+| ---------------- | ------------------------------------------------- | ---------- | ----- |
+| pointSize        | `number`                                          | `6`        |       |
+| pointStyle       | `'circle' \| 'square' \| 'triangle' \| 'diamond'` | `'circle'` |       |
+| gradient         | `boolean`                                         | `false`    |       |
+| animated         | `boolean`                                         | `false`    |       |
+| pointBorderWidth | `number`                                          | `0`        |       |
+| pointBorderColor | `string`                                          | `'white'`  |       |
 
 ### RadarChart
 
-| Prop             | Type                    | Default     | Vue | React |
-| ---------------- | ----------------------- | ----------- | --- | ----- |
-| maxValue         | `number`                | auto        | ✓   | ✓     |
-| levels           | `number`                | `5`         | ✓   | ✓     |
-| fillOpacity      | `number`                | `0.2`       | ✓   | ✓     |
-| gridShape        | `'polygon' \| 'circle'` | `'polygon'` | ✓   | ✓     |
-| showSplitArea    | `boolean`               | `false`     | ✓   | ✓     |
-| splitAreaOpacity | `number`                | `0.06`      | ✓   | ✓     |
-| splitAreaColors  | `string[]`              | -           | ✓   | ✓     |
-| pointBorderWidth | `number`                | `2`         | ✓   | ✓     |
-| pointBorderColor | `string`                | `'#fff'`    | ✓   | ✓     |
-| pointHoverSize   | `number`                | pointSize+2 | ✓   | ✓     |
-| labelAutoAlign   | `boolean`               | `true`      | ✓   | ✓     |
+| Prop             | Type                    | Default     | Notes |
+| ---------------- | ----------------------- | ----------- | ----- |
+| maxValue         | `number`                | auto        |       |
+| levels           | `number`                | `5`         |       |
+| fillOpacity      | `number`                | `0.2`       |       |
+| gridShape        | `'polygon' \| 'circle'` | `'polygon'` |       |
+| showSplitArea    | `boolean`               | `false`     |       |
+| splitAreaOpacity | `number`                | `0.06`      |       |
+| splitAreaColors  | `string[]`              | -           |       |
+| pointBorderWidth | `number`                | `2`         |       |
+| pointBorderColor | `string`                | `'#fff'`    |       |
+| pointHoverSize   | `number`                | pointSize+2 |       |
+| labelAutoAlign   | `boolean`               | `true`      |       |
 
 ### HeatmapChart
 
-| Prop            | Type                          | Default   | Vue | React |
-| --------------- | ----------------------------- | --------- | --- | ----- |
-| xLabels         | `string[]`                    | -         | ✓   | ✓     |
-| yLabels         | `string[]`                    | -         | ✓   | ✓     |
-| minColor        | `string`                      | `#f0f9ff` | ✓   | ✓     |
-| maxColor        | `string`                      | `#2563eb` | ✓   | ✓     |
-| colorSpace      | `'rgb' \| 'oklch'`            | `'rgb'`   | ✓   | ✓     |
-| cellRadius      | `number`                      | `2`       | ✓   | ✓     |
-| cellGap         | `number`                      | `1`       | ✓   | ✓     |
-| showValues      | `boolean`                     | `false`   | ✓   | ✓     |
-| valueFormatter  | `(value) => string`           | -         | ✓   | ✓     |
-| renderMode      | `'svg' \| 'canvas' \| 'auto'` | `'auto'`  | ✓   | ✓     |
-| canvasThreshold | `number`                      | `1000`    | ✓   | ✓     |
+| Prop            | Type                          | Default   | Notes |
+| --------------- | ----------------------------- | --------- | ----- |
+| xLabels         | `string[]`                    | -         |       |
+| yLabels         | `string[]`                    | -         |       |
+| minColor        | `string`                      | `#f0f9ff` |       |
+| maxColor        | `string`                      | `#2563eb` |       |
+| colorSpace      | `'rgb' \| 'oklch'`            | `'rgb'`   |       |
+| cellRadius      | `number`                      | `2`       |       |
+| cellGap         | `number`                      | `1`       |       |
+| showValues      | `boolean`                     | `false`   |       |
+| valueFormatter  | `(value) => string`           | -         |       |
+| renderMode      | `'svg' \| 'canvas' \| 'auto'` | `'auto'`  |       |
+| canvasThreshold | `number`                      | `1000`    |       |
 
 `renderMode="auto"` 会在 cell 数量超过 `canvasThreshold` 时把 cell 层绘制到 canvas，轴标签和无障碍 SVG 容器仍保留；小矩阵默认继续使用 SVG rect，方便 CSS 和 DOM 级交互检查。
 
@@ -190,14 +190,14 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 
 漏斗图，从宽到窄展示转化过程。
 
-| Prop      | Type                         | Default      | Vue | React |
-| --------- | ---------------------------- | ------------ | --- | ----- |
-| data      | `FunnelChartDatum[]`         | _required_   | ✓   | ✓     |
-| direction | `'vertical' \| 'horizontal'` | `'vertical'` | ✓   | ✓     |
-| gap       | `number`                     | `2`          | ✓   | ✓     |
-| pinch     | `boolean`                    | `false`      | ✓   | ✓     |
-| colors    | `string[]`                   | 主题色板     | ✓   | ✓     |
-| gradient  | `boolean`                    | `false`      | ✓   | ✓     |
+| Prop      | Type                         | Default      | Notes |
+| --------- | ---------------------------- | ------------ | ----- |
+| data      | `FunnelChartDatum[]`         | _required_   |       |
+| direction | `'vertical' \| 'horizontal'` | `'vertical'` |       |
+| gap       | `number`                     | `2`          |       |
+| pinch     | `boolean`                    | `false`      |       |
+| colors    | `string[]`                   | 主题色板     |       |
+| gradient  | `boolean`                    | `false`      |       |
 
 **FunnelChartDatum**: `{ label?: string, value: number, color?: string }`
 
@@ -205,35 +205,35 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 
 仪表盘图，展示单一指标在范围内的位置。
 
-| Prop           | Type                                                | Default                          | Vue | React |
-| -------------- | --------------------------------------------------- | -------------------------------- | --- | ----- |
-| value          | `number`                                            | _required_                       | ✓   | ✓     |
-| min            | `number`                                            | `0`                              | ✓   | ✓     |
-| max            | `number`                                            | `100`                            | ✓   | ✓     |
-| startAngle     | `number`                                            | `135`                            | ✓   | ✓     |
-| endAngle       | `number`                                            | `405`                            | ✓   | ✓     |
-| arcWidth       | `number`                                            | `20`                             | ✓   | ✓     |
-| showTicks      | `boolean`                                           | `true`                           | ✓   | ✓     |
-| tickCount      | `number`                                            | `5`                              | ✓   | ✓     |
-| valueFormatter | `(value: number) => string`                         | -                                | ✓   | ✓     |
-| label          | `string`                                            | -                                | ✓   | ✓     |
-| segments       | `Array<{ range: [number, number]; color: string }>` | -                                | ✓   | ✓     |
-| trackColor     | `string`                                            | `'var(--tiger-border,#e5e7eb)'`  | ✓   | ✓     |
-| color          | `string`                                            | `'var(--tiger-primary,#2563eb)'` | ✓   | ✓     |
-| colors         | `string[]`                                          | -                                | ✓   | ✓     |
-| gradient       | `boolean`                                           | `false`                          | ✓   | ✓     |
+| Prop           | Type                                                | Default                          | Notes |
+| -------------- | --------------------------------------------------- | -------------------------------- | ----- |
+| value          | `number`                                            | _required_                       |       |
+| min            | `number`                                            | `0`                              |       |
+| max            | `number`                                            | `100`                            |       |
+| startAngle     | `number`                                            | `135`                            |       |
+| endAngle       | `number`                                            | `405`                            |       |
+| arcWidth       | `number`                                            | `20`                             |       |
+| showTicks      | `boolean`                                           | `true`                           |       |
+| tickCount      | `number`                                            | `5`                              |       |
+| valueFormatter | `(value: number) => string`                         | -                                |       |
+| label          | `string`                                            | -                                |       |
+| segments       | `Array<{ range: [number, number]; color: string }>` | -                                |       |
+| trackColor     | `string`                                            | `'var(--tiger-border,#e5e7eb)'`  |       |
+| color          | `string`                                            | `'var(--tiger-primary,#2563eb)'` |       |
+| colors         | `string[]`                                          | -                                |       |
+| gradient       | `boolean`                                           | `false`                          |       |
 
 ### SunburstChart
 
 旭日图，以同心环展示分层数据。
 
-| Prop             | Type                   | Default    | Vue | React |
-| ---------------- | ---------------------- | ---------- | --- | ----- |
-| data             | `SunburstChartDatum[]` | _required_ | ✓   | ✓     |
-| innerRadiusRatio | `number`               | `0`        | ✓   | ✓     |
-| showLabels       | `boolean`              | `true`     | ✓   | ✓     |
-| colors           | `string[]`             | 主题色板   | ✓   | ✓     |
-| gradient         | `boolean`              | `false`    | ✓   | ✓     |
+| Prop             | Type                   | Default    | Notes |
+| ---------------- | ---------------------- | ---------- | ----- |
+| data             | `SunburstChartDatum[]` | _required_ |       |
+| innerRadiusRatio | `number`               | `0`        |       |
+| showLabels       | `boolean`              | `true`     |       |
+| colors           | `string[]`             | 主题色板   |       |
+| gradient         | `boolean`              | `false`    |       |
 
 **SunburstChartDatum**: `{ label: string, value: number, color?: string, children?: SunburstChartDatum[] }`
 
@@ -241,14 +241,14 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 
 矩形树图，按面积比例展示分层数据。
 
-| Prop         | Type                  | Default    | Vue | React |
-| ------------ | --------------------- | ---------- | --- | ----- |
-| data         | `TreeMapChartDatum[]` | _required_ | ✓   | ✓     |
-| gap          | `number`              | `2`        | ✓   | ✓     |
-| showLabels   | `boolean`             | `true`     | ✓   | ✓     |
-| minLabelSize | `number`              | `10`       | ✓   | ✓     |
-| colors       | `string[]`            | 主题色板   | ✓   | ✓     |
-| gradient     | `boolean`             | `false`    | ✓   | ✓     |
+| Prop         | Type                  | Default    | Notes |
+| ------------ | --------------------- | ---------- | ----- |
+| data         | `TreeMapChartDatum[]` | _required_ |       |
+| gap          | `number`              | `2`        |       |
+| showLabels   | `boolean`             | `true`     |       |
+| minLabelSize | `number`              | `10`       |       |
+| colors       | `string[]`            | 主题色板   |       |
+| gradient     | `boolean`             | `false`    |       |
 
 **TreeMapChartDatum**: `{ label: string, value: number, color?: string, children?: TreeMapChartDatum[] }`
 

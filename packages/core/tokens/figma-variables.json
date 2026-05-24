@@ -1,0 +1,2553 @@
+{
+  "schemaVersion": "1.0.0",
+  "name": "Tigercat Design Tokens",
+  "source": "packages/core/tokens/tokens.json",
+  "collections": [
+    {
+      "name": "Tigercat Primitive",
+      "mode": "Default",
+      "variables": [
+        {
+          "name": "primitive/color/primary/50",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-50",
+          "value": {
+            "r": 0.9411764705882353,
+            "g": 0.9764705882352941,
+            "b": 1,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/primary/100",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-100",
+          "value": {
+            "r": 0.8784313725490196,
+            "g": 0.9490196078431372,
+            "b": 0.996078431372549,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/primary/200",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-200",
+          "value": {
+            "r": 0.7294117647058823,
+            "g": 0.9019607843137255,
+            "b": 0.9921568627450981,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/primary/300",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-300",
+          "value": {
+            "r": 0.49019607843137253,
+            "g": 0.8274509803921568,
+            "b": 0.9882352941176471,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/primary/400",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-400",
+          "value": {
+            "r": 0.2196078431372549,
+            "g": 0.7411764705882353,
+            "b": 0.9725490196078431,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/primary/500",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-500",
+          "value": {
+            "r": 0.054901960784313725,
+            "g": 0.6470588235294118,
+            "b": 0.9137254901960784,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/primary/600",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-600",
+          "value": {
+            "r": 0.00784313725490196,
+            "g": 0.5176470588235295,
+            "b": 0.7803921568627451,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/primary/700",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-700",
+          "value": {
+            "r": 0.011764705882352941,
+            "g": 0.4117647058823529,
+            "b": 0.6313725490196078,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/primary/800",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-800",
+          "value": {
+            "r": 0.027450980392156862,
+            "g": 0.34901960784313724,
+            "b": 0.5215686274509804,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/primary/950",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-primary-950",
+          "value": {
+            "r": 0.047058823529411764,
+            "g": 0.23921568627450981,
+            "b": 0.4,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/50",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-50",
+          "value": {
+            "r": 0.9725490196078431,
+            "g": 0.9803921568627451,
+            "b": 0.9882352941176471,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/100",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-100",
+          "value": {
+            "r": 0.9450980392156862,
+            "g": 0.9607843137254902,
+            "b": 0.9764705882352941,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/200",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-200",
+          "value": {
+            "r": 0.8862745098039215,
+            "g": 0.9098039215686274,
+            "b": 0.9411764705882353,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/300",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-300",
+          "value": {
+            "r": 0.796078431372549,
+            "g": 0.8352941176470589,
+            "b": 0.8823529411764706,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/400",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-400",
+          "value": {
+            "r": 0.5803921568627451,
+            "g": 0.6392156862745098,
+            "b": 0.7215686274509804,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/500",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-500",
+          "value": {
+            "r": 0.39215686274509803,
+            "g": 0.4549019607843137,
+            "b": 0.5450980392156862,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/600",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-600",
+          "value": {
+            "r": 0.2784313725490196,
+            "g": 0.3333333333333333,
+            "b": 0.4117647058823529,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/700",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-700",
+          "value": {
+            "r": 0.2,
+            "g": 0.2549019607843137,
+            "b": 0.3333333333333333,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/800",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-800",
+          "value": {
+            "r": 0.11764705882352941,
+            "g": 0.1607843137254902,
+            "b": 0.23137254901960785,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/secondary/950",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-secondary-950",
+          "value": {
+            "r": 0.058823529411764705,
+            "g": 0.09019607843137255,
+            "b": 0.16470588235294117,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/50",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-50",
+          "value": {
+            "r": 0.9411764705882353,
+            "g": 0.9921568627450981,
+            "b": 0.9568627450980393,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/100",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-100",
+          "value": {
+            "r": 0.8627450980392157,
+            "g": 0.9882352941176471,
+            "b": 0.9058823529411765,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/200",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-200",
+          "value": {
+            "r": 0.7333333333333333,
+            "g": 0.9686274509803922,
+            "b": 0.8156862745098039,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/300",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-300",
+          "value": {
+            "r": 0.5254901960784314,
+            "g": 0.9372549019607843,
+            "b": 0.6745098039215687,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/400",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-400",
+          "value": {
+            "r": 0.2901960784313726,
+            "g": 0.8705882352941177,
+            "b": 0.5019607843137255,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/500",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-500",
+          "value": {
+            "r": 0.13333333333333333,
+            "g": 0.7725490196078432,
+            "b": 0.3686274509803922,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/600",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-600",
+          "value": {
+            "r": 0.08627450980392157,
+            "g": 0.6392156862745098,
+            "b": 0.2901960784313726,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/700",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-700",
+          "value": {
+            "r": 0.08235294117647059,
+            "g": 0.5019607843137255,
+            "b": 0.23921568627450981,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/800",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-800",
+          "value": {
+            "r": 0.08627450980392157,
+            "g": 0.396078431372549,
+            "b": 0.20392156862745098,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/success/950",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-success-950",
+          "value": {
+            "r": 0.0196078431372549,
+            "g": 0.1803921568627451,
+            "b": 0.08627450980392157,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/50",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-50",
+          "value": {
+            "r": 1,
+            "g": 0.984313725490196,
+            "b": 0.9215686274509803,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/100",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-100",
+          "value": {
+            "r": 0.996078431372549,
+            "g": 0.9529411764705882,
+            "b": 0.7803921568627451,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/200",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-200",
+          "value": {
+            "r": 0.9921568627450981,
+            "g": 0.9019607843137255,
+            "b": 0.5411764705882353,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/300",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-300",
+          "value": {
+            "r": 0.9882352941176471,
+            "g": 0.8274509803921568,
+            "b": 0.30196078431372547,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/400",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-400",
+          "value": {
+            "r": 0.984313725490196,
+            "g": 0.7490196078431373,
+            "b": 0.1411764705882353,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/500",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-500",
+          "value": {
+            "r": 0.9607843137254902,
+            "g": 0.6196078431372549,
+            "b": 0.043137254901960784,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/600",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-600",
+          "value": {
+            "r": 0.8509803921568627,
+            "g": 0.4666666666666667,
+            "b": 0.023529411764705882,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/700",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-700",
+          "value": {
+            "r": 0.7058823529411765,
+            "g": 0.3254901960784314,
+            "b": 0.03529411764705882,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/800",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-800",
+          "value": {
+            "r": 0.5725490196078431,
+            "g": 0.25098039215686274,
+            "b": 0.054901960784313725,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/warning/950",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-warning-950",
+          "value": {
+            "r": 0.27058823529411763,
+            "g": 0.10196078431372549,
+            "b": 0.011764705882352941,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/50",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-50",
+          "value": {
+            "r": 0.996078431372549,
+            "g": 0.9490196078431372,
+            "b": 0.9490196078431372,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/100",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-100",
+          "value": {
+            "r": 0.996078431372549,
+            "g": 0.8862745098039215,
+            "b": 0.8862745098039215,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/200",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-200",
+          "value": {
+            "r": 0.996078431372549,
+            "g": 0.792156862745098,
+            "b": 0.792156862745098,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/300",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-300",
+          "value": {
+            "r": 0.9882352941176471,
+            "g": 0.6470588235294118,
+            "b": 0.6470588235294118,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/400",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-400",
+          "value": {
+            "r": 0.9725490196078431,
+            "g": 0.44313725490196076,
+            "b": 0.44313725490196076,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/500",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-500",
+          "value": {
+            "r": 0.9372549019607843,
+            "g": 0.26666666666666666,
+            "b": 0.26666666666666666,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/600",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-600",
+          "value": {
+            "r": 0.8627450980392157,
+            "g": 0.14901960784313725,
+            "b": 0.14901960784313725,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/700",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-700",
+          "value": {
+            "r": 0.7254901960784313,
+            "g": 0.10980392156862745,
+            "b": 0.10980392156862745,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/800",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-800",
+          "value": {
+            "r": 0.6,
+            "g": 0.10588235294117647,
+            "b": 0.10588235294117647,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/error/950",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-error-950",
+          "value": {
+            "r": 0.27058823529411763,
+            "g": 0.0392156862745098,
+            "b": 0.0392156862745098,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/50",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-50",
+          "value": {
+            "r": 0.9372549019607843,
+            "g": 0.9647058823529412,
+            "b": 1,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/100",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-100",
+          "value": {
+            "r": 0.8588235294117647,
+            "g": 0.9176470588235294,
+            "b": 0.996078431372549,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/200",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-200",
+          "value": {
+            "r": 0.7490196078431373,
+            "g": 0.8588235294117647,
+            "b": 0.996078431372549,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/300",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-300",
+          "value": {
+            "r": 0.5764705882352941,
+            "g": 0.7725490196078432,
+            "b": 0.9921568627450981,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/400",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-400",
+          "value": {
+            "r": 0.3764705882352941,
+            "g": 0.6470588235294118,
+            "b": 0.9803921568627451,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/500",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-500",
+          "value": {
+            "r": 0.23137254901960785,
+            "g": 0.5098039215686274,
+            "b": 0.9647058823529412,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/600",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-600",
+          "value": {
+            "r": 0.1450980392156863,
+            "g": 0.38823529411764707,
+            "b": 0.9215686274509803,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/700",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-700",
+          "value": {
+            "r": 0.11372549019607843,
+            "g": 0.3058823529411765,
+            "b": 0.8470588235294118,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/800",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-800",
+          "value": {
+            "r": 0.11764705882352941,
+            "g": 0.25098039215686274,
+            "b": 0.6862745098039216,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/info/950",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-info-950",
+          "value": {
+            "r": 0.09019607843137255,
+            "g": 0.1450980392156863,
+            "b": 0.32941176470588235,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/50",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-50",
+          "value": {
+            "r": 0.9803921568627451,
+            "g": 0.9803921568627451,
+            "b": 0.9803921568627451,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/100",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-100",
+          "value": {
+            "r": 0.9607843137254902,
+            "g": 0.9607843137254902,
+            "b": 0.9607843137254902,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/200",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-200",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.8980392156862745,
+            "b": 0.8980392156862745,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/300",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-300",
+          "value": {
+            "r": 0.8313725490196079,
+            "g": 0.8313725490196079,
+            "b": 0.8313725490196079,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/400",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-400",
+          "value": {
+            "r": 0.6392156862745098,
+            "g": 0.6392156862745098,
+            "b": 0.6392156862745098,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/500",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-500",
+          "value": {
+            "r": 0.45098039215686275,
+            "g": 0.45098039215686275,
+            "b": 0.45098039215686275,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/600",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-600",
+          "value": {
+            "r": 0.3215686274509804,
+            "g": 0.3215686274509804,
+            "b": 0.3215686274509804,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/700",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-700",
+          "value": {
+            "r": 0.25098039215686274,
+            "g": 0.25098039215686274,
+            "b": 0.25098039215686274,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/800",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-800",
+          "value": {
+            "r": 0.14901960784313725,
+            "g": 0.14901960784313725,
+            "b": 0.14901960784313725,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/color/neutral/950",
+          "type": "COLOR",
+          "cssVariable": "--tiger-primitive-color-neutral-950",
+          "value": {
+            "r": 0.0392156862745098,
+            "g": 0.0392156862745098,
+            "b": 0.0392156862745098,
+            "a": 1
+          }
+        },
+        {
+          "name": "primitive/space/xs",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-space-xs",
+          "value": "2px"
+        },
+        {
+          "name": "primitive/space/sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-space-sm",
+          "value": "4px"
+        },
+        {
+          "name": "primitive/space/md",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-space-md",
+          "value": "8px"
+        },
+        {
+          "name": "primitive/space/lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-space-lg",
+          "value": "16px"
+        },
+        {
+          "name": "primitive/space/xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-space-xl",
+          "value": "24px"
+        },
+        {
+          "name": "primitive/space/2xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-space-2xl",
+          "value": "32px"
+        },
+        {
+          "name": "primitive/space/3xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-space-3xl",
+          "value": "48px"
+        },
+        {
+          "name": "primitive/space/4xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-space-4xl",
+          "value": "64px"
+        },
+        {
+          "name": "primitive/radius/none",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-radius-none",
+          "value": "0"
+        },
+        {
+          "name": "primitive/radius/sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-radius-sm",
+          "value": "2px"
+        },
+        {
+          "name": "primitive/radius/md",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-radius-md",
+          "value": "4px"
+        },
+        {
+          "name": "primitive/radius/lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-radius-lg",
+          "value": "8px"
+        },
+        {
+          "name": "primitive/radius/xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-radius-xl",
+          "value": "12px"
+        },
+        {
+          "name": "primitive/radius/full",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-radius-full",
+          "value": "9999px"
+        },
+        {
+          "name": "primitive/shadow/xs",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-shadow-xs",
+          "value": "0 1px 2px 0 rgba(0,0,0,0.05)"
+        },
+        {
+          "name": "primitive/shadow/sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-shadow-sm",
+          "value": "0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)"
+        },
+        {
+          "name": "primitive/shadow/md",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-shadow-md",
+          "value": "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)"
+        },
+        {
+          "name": "primitive/shadow/lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-shadow-lg",
+          "value": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)"
+        },
+        {
+          "name": "primitive/shadow/xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-shadow-xl",
+          "value": "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)"
+        },
+        {
+          "name": "primitive/font/family/base",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-family-base",
+          "value": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+        },
+        {
+          "name": "primitive/font/family/mono",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-family-mono",
+          "value": "'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
+        },
+        {
+          "name": "primitive/font/size/xs",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-size-xs",
+          "value": "12px"
+        },
+        {
+          "name": "primitive/font/size/sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-size-sm",
+          "value": "14px"
+        },
+        {
+          "name": "primitive/font/size/base",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-size-base",
+          "value": "16px"
+        },
+        {
+          "name": "primitive/font/size/lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-size-lg",
+          "value": "18px"
+        },
+        {
+          "name": "primitive/font/size/xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-size-xl",
+          "value": "20px"
+        },
+        {
+          "name": "primitive/font/size/2xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-size-2xl",
+          "value": "24px"
+        },
+        {
+          "name": "primitive/font/size/3xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-size-3xl",
+          "value": "30px"
+        },
+        {
+          "name": "primitive/font/size/4xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-size-4xl",
+          "value": "36px"
+        },
+        {
+          "name": "primitive/font/weight/normal",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-weight-normal",
+          "value": "400"
+        },
+        {
+          "name": "primitive/font/weight/medium",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-weight-medium",
+          "value": "500"
+        },
+        {
+          "name": "primitive/font/weight/semibold",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-weight-semibold",
+          "value": "600"
+        },
+        {
+          "name": "primitive/font/weight/bold",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-weight-bold",
+          "value": "700"
+        },
+        {
+          "name": "primitive/font/lineHeight/tight",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-lineHeight-tight",
+          "value": "1.25"
+        },
+        {
+          "name": "primitive/font/lineHeight/normal",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-lineHeight-normal",
+          "value": "1.5"
+        },
+        {
+          "name": "primitive/font/lineHeight/relaxed",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-lineHeight-relaxed",
+          "value": "1.625"
+        },
+        {
+          "name": "primitive/font/lineHeight/loose",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-font-lineHeight-loose",
+          "value": "2"
+        },
+        {
+          "name": "primitive/duration/fast",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-duration-fast",
+          "value": "100ms"
+        },
+        {
+          "name": "primitive/duration/base",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-duration-base",
+          "value": "200ms"
+        },
+        {
+          "name": "primitive/duration/slow",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-duration-slow",
+          "value": "300ms"
+        },
+        {
+          "name": "primitive/duration/slower",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-duration-slower",
+          "value": "500ms"
+        },
+        {
+          "name": "primitive/easing/in",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-easing-in",
+          "value": "cubic-bezier(0.4, 0, 1, 1)"
+        },
+        {
+          "name": "primitive/easing/out",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-easing-out",
+          "value": "cubic-bezier(0, 0, 0.2, 1)"
+        },
+        {
+          "name": "primitive/easing/in-out",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-easing-in-out",
+          "value": "cubic-bezier(0.4, 0, 0.2, 1)"
+        },
+        {
+          "name": "primitive/easing/spring",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-easing-spring",
+          "value": "cubic-bezier(0.34, 1.56, 0.64, 1)"
+        },
+        {
+          "name": "primitive/easing/smooth",
+          "type": "STRING",
+          "cssVariable": "--tiger-primitive-easing-smooth",
+          "value": "cubic-bezier(0.25, 0.1, 0.25, 1)"
+        }
+      ]
+    },
+    {
+      "name": "Tigercat Semantic",
+      "mode": "Default",
+      "variables": [
+        {
+          "name": "semantic/color/bg-primary",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-bg-primary",
+          "value": {
+            "r": 0.9411764705882353,
+            "g": 0.9764705882352941,
+            "b": 1,
+            "a": 1
+          },
+          "reference": "primitive/color/primary/50"
+        },
+        {
+          "name": "semantic/color/bg-secondary",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-bg-secondary",
+          "value": {
+            "r": 0.9803921568627451,
+            "g": 0.9803921568627451,
+            "b": 0.9803921568627451,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/50"
+        },
+        {
+          "name": "semantic/color/bg-success",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-bg-success",
+          "value": {
+            "r": 0.9411764705882353,
+            "g": 0.9921568627450981,
+            "b": 0.9568627450980393,
+            "a": 1
+          },
+          "reference": "primitive/color/success/50"
+        },
+        {
+          "name": "semantic/color/bg-warning",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-bg-warning",
+          "value": {
+            "r": 1,
+            "g": 0.984313725490196,
+            "b": 0.9215686274509803,
+            "a": 1
+          },
+          "reference": "primitive/color/warning/50"
+        },
+        {
+          "name": "semantic/color/bg-error",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-bg-error",
+          "value": {
+            "r": 0.996078431372549,
+            "g": 0.9490196078431372,
+            "b": 0.9490196078431372,
+            "a": 1
+          },
+          "reference": "primitive/color/error/50"
+        },
+        {
+          "name": "semantic/color/bg-info",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-bg-info",
+          "value": {
+            "r": 0.9372549019607843,
+            "g": 0.9647058823529412,
+            "b": 1,
+            "a": 1
+          },
+          "reference": "primitive/color/info/50"
+        },
+        {
+          "name": "semantic/color/bg-surface",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-bg-surface",
+          "value": {
+            "r": 0.9803921568627451,
+            "g": 0.9803921568627451,
+            "b": 0.9803921568627451,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/50"
+        },
+        {
+          "name": "semantic/color/bg-surface-raised",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-bg-surface-raised",
+          "value": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 1
+          }
+        },
+        {
+          "name": "semantic/color/bg-overlay",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-bg-overlay",
+          "value": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.45
+          }
+        },
+        {
+          "name": "semantic/color/text-primary",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-primary",
+          "value": {
+            "r": 0.0392156862745098,
+            "g": 0.0392156862745098,
+            "b": 0.0392156862745098,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/950"
+        },
+        {
+          "name": "semantic/color/text-secondary",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-secondary",
+          "value": {
+            "r": 0.3215686274509804,
+            "g": 0.3215686274509804,
+            "b": 0.3215686274509804,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/600"
+        },
+        {
+          "name": "semantic/color/text-tertiary",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-tertiary",
+          "value": {
+            "r": 0.6392156862745098,
+            "g": 0.6392156862745098,
+            "b": 0.6392156862745098,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/400"
+        },
+        {
+          "name": "semantic/color/text-disabled",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-disabled",
+          "value": {
+            "r": 0.8313725490196079,
+            "g": 0.8313725490196079,
+            "b": 0.8313725490196079,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/300"
+        },
+        {
+          "name": "semantic/color/text-inverse",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-inverse",
+          "value": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 1
+          }
+        },
+        {
+          "name": "semantic/color/text-link",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-link",
+          "value": {
+            "r": 0.00784313725490196,
+            "g": 0.5176470588235295,
+            "b": 0.7803921568627451,
+            "a": 1
+          },
+          "reference": "primitive/color/primary/600"
+        },
+        {
+          "name": "semantic/color/text-link-hover",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-link-hover",
+          "value": {
+            "r": 0.011764705882352941,
+            "g": 0.4117647058823529,
+            "b": 0.6313725490196078,
+            "a": 1
+          },
+          "reference": "primitive/color/primary/700"
+        },
+        {
+          "name": "semantic/color/text-success",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-success",
+          "value": {
+            "r": 0.08235294117647059,
+            "g": 0.5019607843137255,
+            "b": 0.23921568627450981,
+            "a": 1
+          },
+          "reference": "primitive/color/success/700"
+        },
+        {
+          "name": "semantic/color/text-warning",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-warning",
+          "value": {
+            "r": 0.7058823529411765,
+            "g": 0.3254901960784314,
+            "b": 0.03529411764705882,
+            "a": 1
+          },
+          "reference": "primitive/color/warning/700"
+        },
+        {
+          "name": "semantic/color/text-error",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-text-error",
+          "value": {
+            "r": 0.8627450980392157,
+            "g": 0.14901960784313725,
+            "b": 0.14901960784313725,
+            "a": 1
+          },
+          "reference": "primitive/color/error/600"
+        },
+        {
+          "name": "semantic/color/border-default",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-border-default",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.8980392156862745,
+            "b": 0.8980392156862745,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/200"
+        },
+        {
+          "name": "semantic/color/border-strong",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-border-strong",
+          "value": {
+            "r": 0.6392156862745098,
+            "g": 0.6392156862745098,
+            "b": 0.6392156862745098,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/400"
+        },
+        {
+          "name": "semantic/color/border-focus",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-border-focus",
+          "value": {
+            "r": 0.054901960784313725,
+            "g": 0.6470588235294118,
+            "b": 0.9137254901960784,
+            "a": 1
+          },
+          "reference": "primitive/color/primary/500"
+        },
+        {
+          "name": "semantic/color/border-error",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-border-error",
+          "value": {
+            "r": 0.9372549019607843,
+            "g": 0.26666666666666666,
+            "b": 0.26666666666666666,
+            "a": 1
+          },
+          "reference": "primitive/color/error/500"
+        },
+        {
+          "name": "semantic/color/border-success",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-border-success",
+          "value": {
+            "r": 0.13333333333333333,
+            "g": 0.7725490196078432,
+            "b": 0.3686274509803922,
+            "a": 1
+          },
+          "reference": "primitive/color/success/500"
+        },
+        {
+          "name": "semantic/color/icon-primary",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-icon-primary",
+          "value": {
+            "r": 0.25098039215686274,
+            "g": 0.25098039215686274,
+            "b": 0.25098039215686274,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/700"
+        },
+        {
+          "name": "semantic/color/icon-secondary",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-icon-secondary",
+          "value": {
+            "r": 0.6392156862745098,
+            "g": 0.6392156862745098,
+            "b": 0.6392156862745098,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/400"
+        },
+        {
+          "name": "semantic/color/icon-disabled",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-icon-disabled",
+          "value": {
+            "r": 0.8313725490196079,
+            "g": 0.8313725490196079,
+            "b": 0.8313725490196079,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/300"
+        },
+        {
+          "name": "semantic/color/interactive-primary",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-interactive-primary",
+          "value": {
+            "r": 0.00784313725490196,
+            "g": 0.5176470588235295,
+            "b": 0.7803921568627451,
+            "a": 1
+          },
+          "reference": "primitive/color/primary/600"
+        },
+        {
+          "name": "semantic/color/interactive-primary-hover",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-interactive-primary-hover",
+          "value": {
+            "r": 0.011764705882352941,
+            "g": 0.4117647058823529,
+            "b": 0.6313725490196078,
+            "a": 1
+          },
+          "reference": "primitive/color/primary/700"
+        },
+        {
+          "name": "semantic/color/interactive-primary-active",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-interactive-primary-active",
+          "value": {
+            "r": 0.027450980392156862,
+            "g": 0.34901960784313724,
+            "b": 0.5215686274509804,
+            "a": 1
+          },
+          "reference": "primitive/color/primary/800"
+        },
+        {
+          "name": "semantic/color/interactive-secondary",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-interactive-secondary",
+          "value": {
+            "r": 0.2784313725490196,
+            "g": 0.3333333333333333,
+            "b": 0.4117647058823529,
+            "a": 1
+          },
+          "reference": "primitive/color/secondary/600"
+        },
+        {
+          "name": "semantic/color/interactive-secondary-hover",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-interactive-secondary-hover",
+          "value": {
+            "r": 0.2,
+            "g": 0.2549019607843137,
+            "b": 0.3333333333333333,
+            "a": 1
+          },
+          "reference": "primitive/color/secondary/700"
+        },
+        {
+          "name": "semantic/color/interactive-danger",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-interactive-danger",
+          "value": {
+            "r": 0.8627450980392157,
+            "g": 0.14901960784313725,
+            "b": 0.14901960784313725,
+            "a": 1
+          },
+          "reference": "primitive/color/error/600"
+        },
+        {
+          "name": "semantic/color/interactive-danger-hover",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-interactive-danger-hover",
+          "value": {
+            "r": 0.7254901960784313,
+            "g": 0.10980392156862745,
+            "b": 0.10980392156862745,
+            "a": 1
+          },
+          "reference": "primitive/color/error/700"
+        },
+        {
+          "name": "semantic/color/focus-ring",
+          "type": "COLOR",
+          "cssVariable": "--tiger-semantic-color-focus-ring",
+          "value": {
+            "r": 0.054901960784313725,
+            "g": 0.6470588235294118,
+            "b": 0.9137254901960784,
+            "a": 1
+          },
+          "reference": "primitive/color/primary/500"
+        },
+        {
+          "name": "semantic/space/component-gap",
+          "type": "STRING",
+          "cssVariable": "--tiger-semantic-space-component-gap",
+          "value": "8px",
+          "reference": "primitive/space/md"
+        },
+        {
+          "name": "semantic/space/section-gap",
+          "type": "STRING",
+          "cssVariable": "--tiger-semantic-space-section-gap",
+          "value": "24px",
+          "reference": "primitive/space/xl"
+        },
+        {
+          "name": "semantic/space/page-padding",
+          "type": "STRING",
+          "cssVariable": "--tiger-semantic-space-page-padding",
+          "value": "32px",
+          "reference": "primitive/space/2xl"
+        },
+        {
+          "name": "semantic/radius/component",
+          "type": "STRING",
+          "cssVariable": "--tiger-semantic-radius-component",
+          "value": "8px",
+          "reference": "primitive/radius/lg"
+        },
+        {
+          "name": "semantic/radius/card",
+          "type": "STRING",
+          "cssVariable": "--tiger-semantic-radius-card",
+          "value": "12px",
+          "reference": "primitive/radius/xl"
+        },
+        {
+          "name": "semantic/radius/pill",
+          "type": "STRING",
+          "cssVariable": "--tiger-semantic-radius-pill",
+          "value": "9999px",
+          "reference": "primitive/radius/full"
+        }
+      ]
+    },
+    {
+      "name": "Tigercat Component",
+      "mode": "Default",
+      "variables": [
+        {
+          "name": "component/button/height-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-height-sm",
+          "value": "32px"
+        },
+        {
+          "name": "component/button/height-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-height-md",
+          "value": "36px"
+        },
+        {
+          "name": "component/button/height-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-height-lg",
+          "value": "40px"
+        },
+        {
+          "name": "component/button/padding-x-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-padding-x-sm",
+          "value": "8px",
+          "reference": "primitive/space/md"
+        },
+        {
+          "name": "component/button/padding-x-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-padding-x-md",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/button/padding-x-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-padding-x-lg",
+          "value": "24px",
+          "reference": "primitive/space/xl"
+        },
+        {
+          "name": "component/button/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-border-radius",
+          "value": "8px",
+          "reference": "semantic/radius/component"
+        },
+        {
+          "name": "component/button/font-size-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-font-size-sm",
+          "value": "14px",
+          "reference": "primitive/font/size/sm"
+        },
+        {
+          "name": "component/button/font-size-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-font-size-md",
+          "value": "16px",
+          "reference": "primitive/font/size/base"
+        },
+        {
+          "name": "component/button/font-size-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-font-size-lg",
+          "value": "18px",
+          "reference": "primitive/font/size/lg"
+        },
+        {
+          "name": "component/button/font-weight",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-button-font-weight",
+          "value": "500",
+          "reference": "primitive/font/weight/medium"
+        },
+        {
+          "name": "component/input/height-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-input-height-sm",
+          "value": "32px"
+        },
+        {
+          "name": "component/input/height-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-input-height-md",
+          "value": "36px"
+        },
+        {
+          "name": "component/input/height-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-input-height-lg",
+          "value": "40px"
+        },
+        {
+          "name": "component/input/padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-input-padding-x",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/input/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-input-border-radius",
+          "value": "8px",
+          "reference": "semantic/radius/component"
+        },
+        {
+          "name": "component/input/font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-input-font-size",
+          "value": "16px",
+          "reference": "primitive/font/size/base"
+        },
+        {
+          "name": "component/input/border-color",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-input-border-color",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.8980392156862745,
+            "b": 0.8980392156862745,
+            "a": 1
+          },
+          "reference": "semantic/color/border-default"
+        },
+        {
+          "name": "component/input/border-color-focus",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-input-border-color-focus",
+          "value": {
+            "r": 0.054901960784313725,
+            "g": 0.6470588235294118,
+            "b": 0.9137254901960784,
+            "a": 1
+          },
+          "reference": "semantic/color/border-focus"
+        },
+        {
+          "name": "component/input/border-color-error",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-input-border-color-error",
+          "value": {
+            "r": 0.9372549019607843,
+            "g": 0.26666666666666666,
+            "b": 0.26666666666666666,
+            "a": 1
+          },
+          "reference": "semantic/color/border-error"
+        },
+        {
+          "name": "component/select/height-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-select-height-sm",
+          "value": "32px"
+        },
+        {
+          "name": "component/select/height-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-select-height-md",
+          "value": "36px"
+        },
+        {
+          "name": "component/select/height-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-select-height-lg",
+          "value": "40px"
+        },
+        {
+          "name": "component/select/padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-select-padding-x",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/select/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-select-border-radius",
+          "value": "8px",
+          "reference": "semantic/radius/component"
+        },
+        {
+          "name": "component/select/dropdown-shadow",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-select-dropdown-shadow",
+          "value": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+          "reference": "primitive/shadow/lg"
+        },
+        {
+          "name": "component/select/option-height",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-select-option-height",
+          "value": "36px"
+        },
+        {
+          "name": "component/select/option-padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-select-option-padding-x",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/modal/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-modal-border-radius",
+          "value": "12px",
+          "reference": "semantic/radius/card"
+        },
+        {
+          "name": "component/modal/padding",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-modal-padding",
+          "value": "24px",
+          "reference": "primitive/space/xl"
+        },
+        {
+          "name": "component/modal/shadow",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-modal-shadow",
+          "value": "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)",
+          "reference": "primitive/shadow/xl"
+        },
+        {
+          "name": "component/modal/header-font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-modal-header-font-size",
+          "value": "18px",
+          "reference": "primitive/font/size/lg"
+        },
+        {
+          "name": "component/modal/header-font-weight",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-modal-header-font-weight",
+          "value": "600",
+          "reference": "primitive/font/weight/semibold"
+        },
+        {
+          "name": "component/modal/overlay-bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-modal-overlay-bg",
+          "value": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.45
+          },
+          "reference": "semantic/color/bg-overlay"
+        },
+        {
+          "name": "component/modal/width-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-modal-width-sm",
+          "value": "400px"
+        },
+        {
+          "name": "component/modal/width-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-modal-width-md",
+          "value": "520px"
+        },
+        {
+          "name": "component/modal/width-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-modal-width-lg",
+          "value": "680px"
+        },
+        {
+          "name": "component/modal/width-xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-modal-width-xl",
+          "value": "860px"
+        },
+        {
+          "name": "component/drawer/padding",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-drawer-padding",
+          "value": "24px",
+          "reference": "primitive/space/xl"
+        },
+        {
+          "name": "component/drawer/shadow",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-drawer-shadow",
+          "value": "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)",
+          "reference": "primitive/shadow/xl"
+        },
+        {
+          "name": "component/drawer/header-font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-drawer-header-font-size",
+          "value": "18px",
+          "reference": "primitive/font/size/lg"
+        },
+        {
+          "name": "component/drawer/header-font-weight",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-drawer-header-font-weight",
+          "value": "600",
+          "reference": "primitive/font/weight/semibold"
+        },
+        {
+          "name": "component/drawer/overlay-bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-drawer-overlay-bg",
+          "value": {
+            "r": 0,
+            "g": 0,
+            "b": 0,
+            "a": 0.45
+          },
+          "reference": "semantic/color/bg-overlay"
+        },
+        {
+          "name": "component/drawer/width-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-drawer-width-sm",
+          "value": "256px"
+        },
+        {
+          "name": "component/drawer/width-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-drawer-width-md",
+          "value": "378px"
+        },
+        {
+          "name": "component/drawer/width-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-drawer-width-lg",
+          "value": "520px"
+        },
+        {
+          "name": "component/drawer/width-xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-drawer-width-xl",
+          "value": "680px"
+        },
+        {
+          "name": "component/card/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-card-border-radius",
+          "value": "12px",
+          "reference": "semantic/radius/card"
+        },
+        {
+          "name": "component/card/padding",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-card-padding",
+          "value": "24px",
+          "reference": "primitive/space/xl"
+        },
+        {
+          "name": "component/card/shadow",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-card-shadow",
+          "value": "0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)",
+          "reference": "primitive/shadow/sm"
+        },
+        {
+          "name": "component/card/border-color",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-card-border-color",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.8980392156862745,
+            "b": 0.8980392156862745,
+            "a": 1
+          },
+          "reference": "semantic/color/border-default"
+        },
+        {
+          "name": "component/badge/font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-badge-font-size",
+          "value": "12px",
+          "reference": "primitive/font/size/xs"
+        },
+        {
+          "name": "component/badge/font-weight",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-badge-font-weight",
+          "value": "500",
+          "reference": "primitive/font/weight/medium"
+        },
+        {
+          "name": "component/badge/padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-badge-padding-x",
+          "value": "8px",
+          "reference": "primitive/space/md"
+        },
+        {
+          "name": "component/badge/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-badge-border-radius",
+          "value": "9999px",
+          "reference": "semantic/radius/pill"
+        },
+        {
+          "name": "component/avatar/size-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-avatar-size-sm",
+          "value": "32px"
+        },
+        {
+          "name": "component/avatar/size-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-avatar-size-md",
+          "value": "40px"
+        },
+        {
+          "name": "component/avatar/size-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-avatar-size-lg",
+          "value": "48px"
+        },
+        {
+          "name": "component/avatar/size-xl",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-avatar-size-xl",
+          "value": "64px"
+        },
+        {
+          "name": "component/avatar/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-avatar-border-radius",
+          "value": "9999px",
+          "reference": "semantic/radius/pill"
+        },
+        {
+          "name": "component/avatar/font-size-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-avatar-font-size-sm",
+          "value": "12px",
+          "reference": "primitive/font/size/xs"
+        },
+        {
+          "name": "component/avatar/font-size-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-avatar-font-size-md",
+          "value": "14px",
+          "reference": "primitive/font/size/sm"
+        },
+        {
+          "name": "component/avatar/font-size-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-avatar-font-size-lg",
+          "value": "16px",
+          "reference": "primitive/font/size/base"
+        },
+        {
+          "name": "component/table/header-bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-table-header-bg",
+          "value": {
+            "r": 0.9803921568627451,
+            "g": 0.9803921568627451,
+            "b": 0.9803921568627451,
+            "a": 1
+          },
+          "reference": "semantic/color/bg-surface"
+        },
+        {
+          "name": "component/table/header-font-weight",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-table-header-font-weight",
+          "value": "600",
+          "reference": "primitive/font/weight/semibold"
+        },
+        {
+          "name": "component/table/cell-padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-table-cell-padding-x",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/table/cell-padding-y-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-table-cell-padding-y-sm",
+          "value": "8px",
+          "reference": "primitive/space/md"
+        },
+        {
+          "name": "component/table/cell-padding-y-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-table-cell-padding-y-md",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/table/cell-padding-y-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-table-cell-padding-y-lg",
+          "value": "24px",
+          "reference": "primitive/space/xl"
+        },
+        {
+          "name": "component/table/border-color",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-table-border-color",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.8980392156862745,
+            "b": 0.8980392156862745,
+            "a": 1
+          },
+          "reference": "semantic/color/border-default"
+        },
+        {
+          "name": "component/table/stripe-bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-table-stripe-bg",
+          "value": {
+            "r": 0.9803921568627451,
+            "g": 0.9803921568627451,
+            "b": 0.9803921568627451,
+            "a": 1
+          },
+          "reference": "semantic/color/bg-surface"
+        },
+        {
+          "name": "component/table/hover-bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-table-hover-bg",
+          "value": {
+            "r": 0.9411764705882353,
+            "g": 0.9764705882352941,
+            "b": 1,
+            "a": 1
+          },
+          "reference": "semantic/color/bg-primary"
+        },
+        {
+          "name": "component/tooltip/bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-tooltip-bg",
+          "value": {
+            "r": 0.14901960784313725,
+            "g": 0.14901960784313725,
+            "b": 0.14901960784313725,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/800"
+        },
+        {
+          "name": "component/tooltip/text-color",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-tooltip-text-color",
+          "value": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 1
+          }
+        },
+        {
+          "name": "component/tooltip/font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tooltip-font-size",
+          "value": "14px",
+          "reference": "primitive/font/size/sm"
+        },
+        {
+          "name": "component/tooltip/padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tooltip-padding-x",
+          "value": "8px",
+          "reference": "primitive/space/md"
+        },
+        {
+          "name": "component/tooltip/padding-y",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tooltip-padding-y",
+          "value": "4px",
+          "reference": "primitive/space/sm"
+        },
+        {
+          "name": "component/tooltip/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tooltip-border-radius",
+          "value": "8px",
+          "reference": "semantic/radius/component"
+        },
+        {
+          "name": "component/tooltip/shadow",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tooltip-shadow",
+          "value": "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)",
+          "reference": "primitive/shadow/md"
+        },
+        {
+          "name": "component/tooltip/max-width",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tooltip-max-width",
+          "value": "280px"
+        },
+        {
+          "name": "component/alert/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-alert-border-radius",
+          "value": "8px",
+          "reference": "semantic/radius/component"
+        },
+        {
+          "name": "component/alert/padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-alert-padding-x",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/alert/padding-y",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-alert-padding-y",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/alert/font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-alert-font-size",
+          "value": "16px",
+          "reference": "primitive/font/size/base"
+        },
+        {
+          "name": "component/alert/icon-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-alert-icon-size",
+          "value": "20px"
+        },
+        {
+          "name": "component/tabs/height",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tabs-height",
+          "value": "40px"
+        },
+        {
+          "name": "component/tabs/font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tabs-font-size",
+          "value": "16px",
+          "reference": "primitive/font/size/base"
+        },
+        {
+          "name": "component/tabs/font-weight-active",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tabs-font-weight-active",
+          "value": "500",
+          "reference": "primitive/font/weight/medium"
+        },
+        {
+          "name": "component/tabs/indicator-height",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tabs-indicator-height",
+          "value": "2px"
+        },
+        {
+          "name": "component/tabs/gap",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tabs-gap",
+          "value": "24px",
+          "reference": "primitive/space/xl"
+        },
+        {
+          "name": "component/pagination/item-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-pagination-item-size",
+          "value": "32px"
+        },
+        {
+          "name": "component/pagination/font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-pagination-font-size",
+          "value": "14px",
+          "reference": "primitive/font/size/sm"
+        },
+        {
+          "name": "component/pagination/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-pagination-border-radius",
+          "value": "8px",
+          "reference": "semantic/radius/component"
+        },
+        {
+          "name": "component/pagination/gap",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-pagination-gap",
+          "value": "4px",
+          "reference": "primitive/space/sm"
+        },
+        {
+          "name": "component/tag/height-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tag-height-sm",
+          "value": "22px"
+        },
+        {
+          "name": "component/tag/height-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tag-height-md",
+          "value": "26px"
+        },
+        {
+          "name": "component/tag/height-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tag-height-lg",
+          "value": "32px"
+        },
+        {
+          "name": "component/tag/padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tag-padding-x",
+          "value": "8px",
+          "reference": "primitive/space/md"
+        },
+        {
+          "name": "component/tag/font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tag-font-size",
+          "value": "12px",
+          "reference": "primitive/font/size/xs"
+        },
+        {
+          "name": "component/tag/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-tag-border-radius",
+          "value": "6px"
+        },
+        {
+          "name": "component/progress/height-sm",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-progress-height-sm",
+          "value": "4px"
+        },
+        {
+          "name": "component/progress/height-md",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-progress-height-md",
+          "value": "8px"
+        },
+        {
+          "name": "component/progress/height-lg",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-progress-height-lg",
+          "value": "12px"
+        },
+        {
+          "name": "component/progress/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-progress-border-radius",
+          "value": "9999px",
+          "reference": "semantic/radius/pill"
+        },
+        {
+          "name": "component/progress/track-bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-progress-track-bg",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.8980392156862745,
+            "b": 0.8980392156862745,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/200"
+        },
+        {
+          "name": "component/skeleton/bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-skeleton-bg",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.8980392156862745,
+            "b": 0.8980392156862745,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/200"
+        },
+        {
+          "name": "component/skeleton/shimmer-bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-skeleton-shimmer-bg",
+          "value": {
+            "r": 0.9607843137254902,
+            "g": 0.9607843137254902,
+            "b": 0.9607843137254902,
+            "a": 1
+          },
+          "reference": "primitive/color/neutral/100"
+        },
+        {
+          "name": "component/skeleton/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-skeleton-border-radius",
+          "value": "8px",
+          "reference": "semantic/radius/component"
+        },
+        {
+          "name": "component/divider/color",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-divider-color",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.8980392156862745,
+            "b": 0.8980392156862745,
+            "a": 1
+          },
+          "reference": "semantic/color/border-default"
+        },
+        {
+          "name": "component/divider/text-padding",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-divider-text-padding",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/collapse/header-padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-collapse-header-padding-x",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/collapse/header-padding-y",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-collapse-header-padding-y",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/collapse/content-padding",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-collapse-content-padding",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/collapse/border-color",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-collapse-border-color",
+          "value": {
+            "r": 0.8980392156862745,
+            "g": 0.8980392156862745,
+            "b": 0.8980392156862745,
+            "a": 1
+          },
+          "reference": "semantic/color/border-default"
+        },
+        {
+          "name": "component/steps/icon-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-steps-icon-size",
+          "value": "32px"
+        },
+        {
+          "name": "component/steps/font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-steps-font-size",
+          "value": "16px",
+          "reference": "primitive/font/size/base"
+        },
+        {
+          "name": "component/steps/connector-width",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-steps-connector-width",
+          "value": "1px"
+        },
+        {
+          "name": "component/breadcrumb/font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-breadcrumb-font-size",
+          "value": "14px",
+          "reference": "primitive/font/size/sm"
+        },
+        {
+          "name": "component/breadcrumb/separator-margin",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-breadcrumb-separator-margin",
+          "value": "8px",
+          "reference": "primitive/space/md"
+        },
+        {
+          "name": "component/dropdown/min-width",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-dropdown-min-width",
+          "value": "120px"
+        },
+        {
+          "name": "component/dropdown/padding-y",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-dropdown-padding-y",
+          "value": "4px",
+          "reference": "primitive/space/sm"
+        },
+        {
+          "name": "component/dropdown/item-height",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-dropdown-item-height",
+          "value": "36px"
+        },
+        {
+          "name": "component/dropdown/item-padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-dropdown-item-padding-x",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/dropdown/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-dropdown-border-radius",
+          "value": "12px",
+          "reference": "semantic/radius/card"
+        },
+        {
+          "name": "component/dropdown/shadow",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-dropdown-shadow",
+          "value": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+          "reference": "primitive/shadow/lg"
+        },
+        {
+          "name": "component/menu/item-height",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-menu-item-height",
+          "value": "40px"
+        },
+        {
+          "name": "component/menu/item-padding-x",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-menu-item-padding-x",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/menu/group-title-padding",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-menu-group-title-padding",
+          "value": "8px",
+          "reference": "primitive/space/md"
+        },
+        {
+          "name": "component/menu/indent-width",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-menu-indent-width",
+          "value": "24px",
+          "reference": "primitive/space/xl"
+        },
+        {
+          "name": "component/menu/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-menu-border-radius",
+          "value": "8px",
+          "reference": "semantic/radius/component"
+        },
+        {
+          "name": "component/notification/width",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-notification-width",
+          "value": "384px"
+        },
+        {
+          "name": "component/notification/padding",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-notification-padding",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/notification/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-notification-border-radius",
+          "value": "12px",
+          "reference": "semantic/radius/card"
+        },
+        {
+          "name": "component/notification/shadow",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-notification-shadow",
+          "value": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+          "reference": "primitive/shadow/lg"
+        },
+        {
+          "name": "component/notification/title-font-size",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-notification-title-font-size",
+          "value": "16px",
+          "reference": "primitive/font/size/base"
+        },
+        {
+          "name": "component/notification/title-font-weight",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-notification-title-font-weight",
+          "value": "500",
+          "reference": "primitive/font/weight/medium"
+        },
+        {
+          "name": "component/popover/padding",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-popover-padding",
+          "value": "16px",
+          "reference": "primitive/space/lg"
+        },
+        {
+          "name": "component/popover/border-radius",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-popover-border-radius",
+          "value": "12px",
+          "reference": "semantic/radius/card"
+        },
+        {
+          "name": "component/popover/shadow",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-popover-shadow",
+          "value": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+          "reference": "primitive/shadow/lg"
+        },
+        {
+          "name": "component/popover/max-width",
+          "type": "STRING",
+          "cssVariable": "--tiger-component-popover-max-width",
+          "value": "320px"
+        }
+      ]
+    }
+  ]
+}

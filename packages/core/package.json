@@ -47,6 +47,8 @@
       "import": "./dist/tailwind/modern.js",
       "require": "./dist/tailwind/modern.cjs"
     },
+    "./tokens.css": "./tokens/tokens.css",
+    "./figma-variables.json": "./tokens/figma-variables.json",
     "./locales/en-US": {
       "types": "./dist/locales/en-US.d.ts",
       "import": "./dist/locales/en-US.js",
@@ -204,7 +206,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "tokens"
   ],
   "publishConfig": {
     "access": "public"
@@ -212,7 +215,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "clean": "node ../../scripts/rimraf.mjs dist"
+    "clean": "node ../../scripts/rimraf.mjs dist",
+    "tokens": "node ./scripts/generate-tokens.mjs"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6"
