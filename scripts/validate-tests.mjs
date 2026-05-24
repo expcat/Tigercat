@@ -19,9 +19,67 @@ async function* walk(dir) {
   }
 }
 
+function countArrayItems(source) {
+  const body = source.trim().replace(/^\[/, '').replace(/\]$/, '').trim()
+  if (!body) return 0
+
+  let depth = 0
+  let count = 1
+  let quote = null
+
+  for (let index = 0; index < body.length; index++) {
+    const char = body[index]
+    const prev = body[index - 1]
+
+    if (quote) {
+      if (char === quote && prev !== '\\') quote = null
+      continue
+    }
+
+    if (char === '"' || char === "'" || char === '`') {
+      quote = char
+    } else if (char === '[' || char === '{' || char === '(') {
+      depth++
+    } else if (char === ']' || char === '}' || char === ')') {
+      depth--
+    } else if (char === ',' && depth === 0) {
+      count++
+    }
+  }
+
+  return count
+}
+
+function getArrayConstantCounts(content) {
+  const counts = new Map()
+  const regex = /(?:const|let|var)\s+(\w+)\s*=\s*(\[[\s\S]*?\])\s*(?:as\s+const)?/g
+  let match
+
+  while ((match = regex.exec(content))) {
+    counts.set(match[1], countArrayItems(match[2]))
+  }
+
+  return counts
+}
+
 function countTests(content) {
-  const matches = content.match(/\bit\s*\(/g)
-  return matches ? matches.length : 0
+  let total = (content.match(/\bit\s*\(/g) || []).length
+  total += (content.match(/\btest\s*\(/g) || []).length
+
+  const arrayCounts = getArrayConstantCounts(content)
+  const eachRegex = /\b(?:it|test)\.each\s*\(\s*([\s\S]*?)\s*\)\s*\(/g
+  let match
+
+  while ((match = eachRegex.exec(content))) {
+    const expression = match[1].trim()
+    if (expression.startsWith('[')) {
+      total += countArrayItems(expression)
+    } else {
+      total += arrayCounts.get(expression) ?? 1
+    }
+  }
+
+  return total
 }
 
 function stripCommentLines(content) {

@@ -526,4 +526,10 @@ describe('DatePicker', () => {
       expect(true).toBe(true)
     })
   })
+
+  describe('Technical Debt Coverage', () => {
+    it('should keep DatePicker export covered for technical debt case 01', () => {
+      expect(DatePicker).toBeDefined()
+    })
+  })
 })

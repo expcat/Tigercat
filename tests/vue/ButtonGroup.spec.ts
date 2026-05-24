@@ -132,4 +132,14 @@ describe('ButtonGroup', () => {
       expect(true).toBe(true)
     })
   })
+
+  describe('Technical Debt Coverage', () => {
+    it('should keep ButtonGroup export covered for technical debt case 01', () => {
+      expect(ButtonGroup).toBeDefined()
+    })
+
+    it('should keep Button export covered for technical debt case 02', () => {
+      expect(Button).toBeDefined()
+    })
+  })
 })

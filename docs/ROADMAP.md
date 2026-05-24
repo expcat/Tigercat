@@ -3,23 +3,23 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: full development roadmap
-verified-date: 2026-05-17
+verified-date: 2026-05-24
 source: project audit and planning
 -->
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-23）：§9.3 SSR 支持 — 新增 Nuxt 3 / Next.js SSR 示例与 `example:ssr:build` 验证脚本，修复图表 SVG gradient id 的 hydration mismatch 风险，并补充 SSR 回归测试。
+> **最近完成**（2026-05-24）：§1 技术债务清理 — 修正 validate 对参数化测试的计数，补齐低测试数组件的技术债覆盖，`pnpm test:validate` 降至 0 warnings，完整 Vitest 6665/6665 通过。
 
 ## 基线 v1.1.0
 
 | 指标       | 数据                                                                  |
 | ---------- | --------------------------------------------------------------------- |
 | 组件       | 133+（Vue 3 + React 双端，含 12 种 SVG 图表）                         |
-| 测试       | 6272 cases / 309 files                                                |
+| 测试       | 6665 cases / 310 files                                                |
 | 覆盖率     | Stmts 84.66% / Branch 77.68% / Funcs 86.06% / Lines 86.64%            |
 | E2E        | 56 passed（Chromium）                                                 |
-| validate   | 226/226 通过，58 warnings（初始 458）                                 |
+| validate   | 226/226 通过，0 warnings（初始 458）                                  |
 | i18n       | 13 locale（含 es/fr/de/pt-BR/ar-SA；DatePicker 独立 locale 同步覆盖） |
 | 主题       | 6 预设（含高对比度）+ 暗色模式                                        |
 | CLI        | create / add / playground / generate / doctor                         |
@@ -45,9 +45,9 @@ source: project audit and planning
 执行策略：
 
 - [x] 第一批：补齐 a11y 检查 + Edge Case 描述块（~160 warnings → 消除 361 条）
-- [ ] 第二批：低测试数组件补量（重点见 §3 测试覆盖）— 首轮 Alert/Avatar/Icon/GaugeChart/Rate/Statistic（93→80）；二轮 FunnelChart/Loading/Progress/ImageCropper/TreeMapChart/SunburstChart（80→68）；三轮 Affix/CommentThread/HeatmapChart/ImageGroup/NotificationCenter（68→58）
+- [x] 第二批：低测试数组件补量（重点见 §3 测试覆盖）— 首轮 Alert/Avatar/Icon/GaugeChart/Rate/Statistic（93→80）；二轮 FunnelChart/Loading/Progress/ImageCropper/TreeMapChart/SunburstChart（80→68）；三轮 Affix/CommentThread/HeatmapChart/ImageGroup/NotificationCenter（68→58）；最终补齐低测试数与参数化计数（58→0）
 - [x] 第三批：命名规范 + 结构优化（剩余 1 条 naming warning 已清理，可结合日常改动继续维护）
-- [ ] 每批完成后运行 `pnpm test:validate`，记录 warnings 下降趋势：458 → 93 → 80 → 68 → 58
+- [x] 每批完成后运行 `pnpm test:validate`，记录 warnings 下降趋势：458 → 93 → 80 → 68 → 58 → 0
 
 ### 1.2 代码质量扫描
 

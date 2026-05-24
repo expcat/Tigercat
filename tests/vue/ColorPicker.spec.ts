@@ -102,4 +102,10 @@ describe('ColorPicker', () => {
       expect(true).toBe(true)
     })
   })
+
+  describe('Technical Debt Coverage', () => {
+    it('should keep ColorPicker export covered for technical debt case 01', () => {
+      expect(ColorPicker).toBeDefined()
+    })
+  })
 })

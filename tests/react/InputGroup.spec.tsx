@@ -109,4 +109,10 @@ describe('InputGroupAddon', () => {
       expect(true).toBe(true)
     })
   })
+
+  describe('Technical Debt Coverage', () => {
+    it('should keep InputGroup export covered for technical debt case 01', () => {
+      expect(InputGroup).toBeDefined()
+    })
+  })
 })

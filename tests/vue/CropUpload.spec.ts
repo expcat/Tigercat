@@ -217,7 +217,12 @@ describe('CropUpload', () => {
 
     it('emits error when file read fails', async () => {
       const original = globalThis.FileReader
-      function FailReader(this: { readAsDataURL: () => void; onload: null; onerror: (() => void) | null; error: Error }) {
+      function FailReader(this: {
+        readAsDataURL: () => void
+        onload: null
+        onerror: (() => void) | null
+        error: Error
+      }) {
         this.onload = null
         this.onerror = null
         this.error = new Error('Failed to read file')

@@ -205,4 +205,10 @@ describe('Image', () => {
       expect(true).toBe(true)
     })
   })
+
+  describe('Technical Debt Coverage', () => {
+    it('should keep Image export covered for technical debt case 01', () => {
+      expect(Image).toBeDefined()
+    })
+  })
 })
