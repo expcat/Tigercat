@@ -9,8 +9,9 @@ import {
   selectSearchInputClasses,
   selectEmptyStateClasses,
   isOptionGroup,
-  filterOptions,
+  createSelectSearchDebouncer,
   flattenSelectOptions,
+  resolveSelectFilteredOptions,
   findFirstEnabledIndex as pickerFindFirstEnabledIndex,
   findLastEnabledIndex as pickerFindLastEnabledIndex,
   findNextEnabledIndex as pickerFindNextEnabledIndex,
@@ -21,6 +22,7 @@ import {
   type SelectOption,
   type SelectOptions,
   type SelectProps as CoreSelectProps,
+  type SelectSearchDebouncer,
   type SelectValue,
   type SelectValues
 } from '@expcat/tigercat-core'
@@ -67,6 +69,8 @@ export const Select: React.FC<SelectProps> = (props) => {
     noOptionsText = 'No options found',
     noDataText = 'No options available',
     maxTagCount,
+    remote = false,
+    searchDebounce = 0,
     onSearch,
     className,
     value,
@@ -87,6 +91,8 @@ export const Select: React.FC<SelectProps> = (props) => {
     'noDataText',
     'maxTagCount',
     'virtual',
+    'remote',
+    'searchDebounce',
     'listHeight',
     'onSearch',
     'className',
@@ -108,10 +114,11 @@ export const Select: React.FC<SelectProps> = (props) => {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const searchDebouncerRef = useRef<SelectSearchDebouncer | null>(null)
 
   const filteredOptions = useMemo(
-    () => (searchable && searchQuery ? filterOptions(options, searchQuery) : options),
-    [options, searchable, searchQuery]
+    () => resolveSelectFilteredOptions(options, searchQuery, { searchable, remote }),
+    [options, remote, searchable, searchQuery]
   )
 
   const flatFilteredOptions = useMemo(
@@ -247,8 +254,18 @@ export const Select: React.FC<SelectProps> = (props) => {
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value
     setSearchQuery(query)
-    onSearch?.(query)
+    searchDebouncerRef.current?.schedule(query)
   }
+
+  useEffect(() => {
+    searchDebouncerRef.current?.cancel()
+    searchDebouncerRef.current = createSelectSearchDebouncer({
+      delay: searchDebounce,
+      onSearch: (query) => onSearch?.(query)
+    })
+
+    return () => searchDebouncerRef.current?.cancel()
+  }, [onSearch, searchDebounce])
 
   const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (disabled) {

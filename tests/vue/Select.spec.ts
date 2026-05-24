@@ -292,6 +292,43 @@ describe('Select', () => {
       expect(getByText('Option 2')).toBeInTheDocument()
       expect(queryByText('Option 1')).not.toBeInTheDocument()
     })
+
+    it('should keep local options unfiltered when remote search is enabled', async () => {
+      const { container, getByText } = render(Select, {
+        props: {
+          options: testOptions,
+          searchable: true,
+          remote: true
+        }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+      await fireEvent.update(container.querySelector('input')!, 'Option 2')
+
+      expect(getByText('Option 1')).toBeInTheDocument()
+      expect(getByText('Option 2')).toBeInTheDocument()
+    })
+
+    it('should debounce search events when searchDebounce is set', async () => {
+      vi.useFakeTimers()
+      const onSearch = vi.fn()
+      const { container } = render(Select, {
+        props: {
+          options: testOptions,
+          searchable: true,
+          searchDebounce: 200,
+          onSearch
+        }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+      await fireEvent.update(container.querySelector('input')!, 'Option 2')
+
+      expect(onSearch).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(200)
+      expect(onSearch).toHaveBeenCalledWith('Option 2')
+      vi.useRealTimers()
+    })
   })
 
   describe('Keyboard Interaction', () => {

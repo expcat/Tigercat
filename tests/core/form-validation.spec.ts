@@ -8,7 +8,10 @@ import {
   createFormErrorMap,
   clearFieldErrors,
   hasErrors,
-  getErrorFields
+  getErrorFields,
+  FORM_VALIDATION_PRESETS,
+  createFormValidationRule,
+  validateFormFields
 } from '@expcat/tigercat-core'
 
 describe('form-validation', () => {
@@ -115,6 +118,13 @@ describe('form-validation', () => {
         )
       })
 
+      it('validates phone type', async () => {
+        expect(await validateRule('+1 (555) 123-4567', { type: 'phone' })).toBe(null)
+        expect(await validateRule('12-34', { type: 'phone' })).toBe(
+          'Please enter a valid phone number'
+        )
+      })
+
       it('validates url type', async () => {
         expect(await validateRule('https://example.com', { type: 'url' })).toBe(null)
         expect(await validateRule('not-a-url', { type: 'url' })).toBe('Please enter a valid URL')
@@ -126,6 +136,32 @@ describe('form-validation', () => {
         expect(await validateRule('invalid-date', { type: 'date' })).toBe(
           'Please enter a valid date'
         )
+      })
+
+      it('validates id-card type', async () => {
+        expect(await validateRule('11010519491231002X', { type: 'id-card' })).toBe(null)
+        expect(await validateRule('not-an-id', { type: 'id-card' })).toBe(
+          'Please enter a valid ID card number'
+        )
+      })
+    })
+
+    describe('validation presets', () => {
+      it('exports built-in reusable rules', async () => {
+        expect(FORM_VALIDATION_PRESETS.email).toEqual({ type: 'email' })
+        expect(await validateRule('invalid', FORM_VALIDATION_PRESETS.email)).toBe(
+          'Please enter a valid email address'
+        )
+      })
+
+      it('creates preset rules with overrides', async () => {
+        const rule = createFormValidationRule('phone', {
+          required: true,
+          message: 'Phone is required'
+        })
+
+        expect(rule).toEqual({ type: 'phone', required: true, message: 'Phone is required' })
+        expect(await validateRule('', rule)).toBe('Phone is required')
       })
     })
 
@@ -310,6 +346,22 @@ describe('form-validation', () => {
 
       expect(result.valid).toBe(false)
       expect(getFieldError('user.name', result.errors)).toBe('This field is required')
+    })
+
+    it('validates only requested fields for on-demand validation', async () => {
+      const values = { name: '', email: 'invalid', phone: '1234567' }
+      const rules = {
+        name: { required: true },
+        email: { type: 'email' as const },
+        phone: { type: 'phone' as const }
+      }
+
+      const result = await validateFormFields(values, rules, ['email'])
+
+      expect(result.valid).toBe(false)
+      expect(result.errors).toEqual([
+        { field: 'email', message: 'Please enter a valid email address' }
+      ])
     })
   })
 

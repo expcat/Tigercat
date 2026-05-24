@@ -123,6 +123,18 @@ export interface SelectProps {
   virtual?: boolean
 
   /**
+   * Whether search is handled remotely. When true, local option filtering is skipped.
+   * @default false
+   */
+  remote?: boolean
+
+  /**
+   * Debounce delay for search callbacks in milliseconds.
+   * @default 0
+   */
+  searchDebounce?: number
+
+  /**
    * Height of the dropdown panel in pixels (relevant when virtual is true)
    * @default 256
    * @since 0.5.0

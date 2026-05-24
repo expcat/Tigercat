@@ -100,8 +100,10 @@ describe('table-utils', () => {
     it('recommends virtual mode at or above the threshold without enabling it', () => {
       expect(getTableVirtualRecommendation({ dataLength: 1000 })).toEqual({
         enabled: false,
+        autoEnabled: false,
         recommended: true,
         threshold: 1000,
+        autoThreshold: 10000,
         dataLength: 1000
       })
     })
@@ -109,9 +111,33 @@ describe('table-utils', () => {
     it('does not recommend when virtual mode is already enabled', () => {
       expect(getTableVirtualRecommendation({ virtual: true, dataLength: 2000 })).toEqual({
         enabled: true,
+        autoEnabled: false,
         recommended: false,
         threshold: 1000,
+        autoThreshold: 10000,
         dataLength: 2000
+      })
+    })
+
+    it('auto-enables virtual mode at the auto threshold', () => {
+      expect(getTableVirtualRecommendation({ dataLength: 10000 })).toEqual({
+        enabled: true,
+        autoEnabled: true,
+        recommended: false,
+        threshold: 1000,
+        autoThreshold: 10000,
+        dataLength: 10000
+      })
+    })
+
+    it('allows auto virtual mode to be disabled', () => {
+      expect(getTableVirtualRecommendation({ autoVirtual: false, dataLength: 10000 })).toEqual({
+        enabled: false,
+        autoEnabled: false,
+        recommended: true,
+        threshold: 1000,
+        autoThreshold: 10000,
+        dataLength: 10000
       })
     })
   })

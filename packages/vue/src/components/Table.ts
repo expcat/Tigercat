@@ -54,9 +54,12 @@ export const Table = defineComponent({
       const resolvedProps = props as TableInternalProps
       const virtualRecommendation = getTableVirtualRecommendation({
         virtual: resolvedProps.virtual,
+        autoVirtual: resolvedProps.autoVirtual,
         dataLength: resolvedProps.dataSource.length,
-        threshold: resolvedProps.virtualThreshold
+        threshold: resolvedProps.virtualThreshold,
+        autoThreshold: resolvedProps.autoVirtualThreshold
       })
+      const effectiveVirtual = virtualRecommendation.enabled
       const wrapperStyle = resolvedProps.maxHeight
         ? {
             maxHeight:
@@ -88,7 +91,7 @@ export const Table = defineComponent({
         tableChildren
       )
 
-      const tableContent = resolvedProps.virtual
+      const tableContent = effectiveVirtual
         ? h(
             'div',
             {
@@ -108,6 +111,7 @@ export const Table = defineComponent({
           class: getTableWrapperClasses(resolvedProps.bordered, resolvedProps.maxHeight),
           style: wrapperStyle,
           'data-tiger-virtual': virtualRecommendation.enabled ? 'enabled' : undefined,
+          'data-tiger-virtual-auto': virtualRecommendation.autoEnabled ? 'true' : undefined,
           'data-tiger-virtual-recommended': virtualRecommendation.recommended ? 'true' : undefined,
           'data-tiger-virtual-threshold': virtualRecommendation.recommended
             ? virtualRecommendation.threshold

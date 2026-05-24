@@ -9,8 +9,9 @@ import {
   selectSearchInputClasses,
   selectEmptyStateClasses,
   isOptionGroup,
-  filterOptions,
+  createSelectSearchDebouncer,
   flattenSelectOptions,
+  resolveSelectFilteredOptions,
   findFirstEnabledIndex as pickerFindFirstEnabledIndex,
   findLastEnabledIndex as pickerFindLastEnabledIndex,
   findNextEnabledIndex as pickerFindNextEnabledIndex,
@@ -21,7 +22,8 @@ import {
   type SelectOption,
   type SelectOptions,
   type SelectSize,
-  type SelectModelValue
+  type SelectModelValue,
+  type SelectSearchDebouncer
 } from '@expcat/tigercat-core'
 
 let selectInstanceId = 0
@@ -95,6 +97,8 @@ export interface VueSelectProps {
   noDataText?: string
   maxTagCount?: number
   virtual?: boolean
+  remote?: boolean
+  searchDebounce?: number
   listHeight?: number
 }
 
@@ -181,6 +185,18 @@ export const Select = defineComponent({
      */
     virtual: Boolean,
     /**
+     * Whether search is handled remotely
+     */
+    remote: Boolean,
+    /**
+     * Debounce delay for search callbacks in milliseconds
+     * @default 0
+     */
+    searchDebounce: {
+      type: Number,
+      default: 0
+    },
+    /**
      * Height of the dropdown panel in pixels
      * @default 256
      * @since 0.5.0
@@ -202,12 +218,16 @@ export const Select = defineComponent({
     const dropdownRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const searchInputRef = ref<HTMLInputElement | null>(null)
+    let searchDebouncer: SelectSearchDebouncer = createSelectSearchDebouncer({
+      delay: props.searchDebounce,
+      onSearch: (query) => emit('search', query)
+    })
 
     const filteredOptions = computed(() => {
-      if (!props.searchable || !searchQuery.value) {
-        return props.options
-      }
-      return filterOptions(props.options, searchQuery.value)
+      return resolveSelectFilteredOptions(props.options, searchQuery.value, {
+        searchable: props.searchable,
+        remote: props.remote
+      })
     })
 
     const allOptions = computed(() => flattenSelectOptions(props.options))
@@ -345,7 +365,7 @@ export const Select = defineComponent({
     function handleSearchInput(event: Event) {
       const target = event.target as HTMLInputElement
       searchQuery.value = target.value
-      emit('search', target.value)
+      searchDebouncer.schedule(target.value)
     }
 
     function getActiveOption(): SelectOption | undefined {
@@ -541,8 +561,20 @@ export const Select = defineComponent({
       { immediate: true }
     )
 
+    watch(
+      () => props.searchDebounce,
+      (delay) => {
+        searchDebouncer.cancel()
+        searchDebouncer = createSelectSearchDebouncer({
+          delay,
+          onSearch: (query) => emit('search', query)
+        })
+      }
+    )
+
     onBeforeUnmount(() => {
       document.removeEventListener('click', handleClickOutside)
+      searchDebouncer.cancel()
     })
 
     return () => {

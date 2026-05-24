@@ -120,6 +120,29 @@ describe('Table', () => {
         '4'
       )
     })
+
+    it('auto-enables virtual mode at the autoVirtualThreshold', () => {
+      const largeData = Array.from({ length: 4 }, (_, index) => ({
+        id: index,
+        name: `User ${index}`,
+        age: index,
+        email: `user${index}@example.com`
+      }))
+
+      const { container } = render(
+        <Table
+          columns={columns}
+          dataSource={largeData}
+          pagination={false}
+          autoVirtualThreshold={4}
+        />
+      )
+
+      expect(container.querySelector('[data-tiger-virtual="enabled"]')).toHaveAttribute(
+        'data-tiger-virtual-auto',
+        'true'
+      )
+    })
   })
 
   describe('Fixed Columns', () => {

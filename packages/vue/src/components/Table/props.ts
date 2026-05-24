@@ -37,6 +37,8 @@ export interface VueTableProps {
   virtual?: boolean
   virtualHeight?: number
   virtualItemHeight?: number
+  autoVirtual?: boolean
+  autoVirtualThreshold?: number
   virtualThreshold?: number
   editable?: boolean
   editableCells?: Map<string, Set<number>>
@@ -150,8 +152,10 @@ export const tableProps = {
   },
   // --- v0.6.0 props ---
   virtual: { type: Boolean, default: false },
+  autoVirtual: { type: Boolean, default: true },
   virtualHeight: { type: Number, default: 400 },
   virtualItemHeight: { type: Number, default: 40 },
+  autoVirtualThreshold: { type: Number, default: 10000 },
   virtualThreshold: { type: Number, default: 1000 },
   editable: { type: Boolean, default: false },
   editableCells: { type: Object as PropType<Map<string, Set<number>>> },

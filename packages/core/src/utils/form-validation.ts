@@ -8,8 +8,11 @@ import type {
   FormValues,
   FormError,
   FormValidationResult,
-  FormRuleTrigger
+  FormRuleTrigger,
+  FormRuleType
 } from '../types/form'
+
+export type FormValidationPreset = Extract<FormRuleType, 'email' | 'phone' | 'url' | 'id-card'>
 
 export function getValueByPath(values: FormValues | undefined, path: string): unknown {
   if (!values || !path) {
@@ -40,11 +43,32 @@ export function getValueByPath(values: FormValues | undefined, path: string): un
  */
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
+const PHONE_PATTERN = /^\+?[0-9][0-9\s\-()]{6,19}$/
+
 /**
  * URL validation pattern (supports http and https)
  */
 const URL_PATTERN =
   /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/
+
+const ID_CARD_PATTERN = /^(\d{15}|\d{17}[0-9Xx])$/
+
+export const FORM_VALIDATION_PRESETS: Record<FormValidationPreset, FormRule> = {
+  email: { type: 'email' },
+  phone: { type: 'phone' },
+  url: { type: 'url' },
+  'id-card': { type: 'id-card' }
+}
+
+export function createFormValidationRule(
+  preset: FormValidationPreset,
+  overrides: FormRule = {}
+): FormRule {
+  return {
+    ...FORM_VALIDATION_PRESETS[preset],
+    ...overrides
+  }
+}
 
 /**
  * Check if a value is considered empty for form validation
@@ -112,6 +136,14 @@ function validateType(
         return customMessage || 'Please enter a valid email address'
       }
       break
+    case 'phone':
+      if (typeof value === 'string') {
+        const digits = value.replace(/\D/g, '')
+        if (!PHONE_PATTERN.test(value) || digits.length < 7) {
+          return customMessage || 'Please enter a valid phone number'
+        }
+      }
+      break
     case 'url':
       if (typeof value === 'string' && !URL_PATTERN.test(value)) {
         return customMessage || 'Please enter a valid URL'
@@ -120,6 +152,11 @@ function validateType(
     case 'date':
       if (!(value instanceof Date) && isNaN(Date.parse(String(value)))) {
         return customMessage || 'Please enter a valid date'
+      }
+      break
+    case 'id-card':
+      if (typeof value === 'string' && !ID_CARD_PATTERN.test(value)) {
+        return customMessage || 'Please enter a valid ID card number'
       }
       break
   }
@@ -293,6 +330,33 @@ export async function validateForm(
         field: fieldName,
         message: error
       })
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  }
+}
+
+export async function validateFormFields(
+  values: FormValues,
+  rules: FormRules,
+  fieldNames: string[],
+  trigger?: FormRuleTrigger
+): Promise<FormValidationResult> {
+  const errors: FormError[] = []
+  const uniqueFieldNames = Array.from(new Set(fieldNames))
+
+  for (const fieldName of uniqueFieldNames) {
+    const fieldRules = rules[fieldName]
+    if (!fieldRules) continue
+
+    const value = getValueByPath(values, fieldName)
+    const error = await validateField(fieldName, value, fieldRules, values, trigger)
+
+    if (error) {
+      errors.push({ field: fieldName, message: error })
     }
   }
 

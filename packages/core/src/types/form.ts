@@ -12,8 +12,10 @@ export type FormRuleType =
   | 'array'
   | 'object'
   | 'email'
+  | 'phone'
   | 'url'
   | 'date'
+  | 'id-card'
 
 /**
  * When to trigger form validation

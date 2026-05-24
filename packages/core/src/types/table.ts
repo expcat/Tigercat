@@ -434,6 +434,12 @@ export interface TableProps<T = Record<string, unknown>> {
   virtual?: boolean
 
   /**
+   * Automatically enable Table's virtual scroll container for very large data sets.
+   * @default true
+   */
+  autoVirtual?: boolean
+
+  /**
    * Virtual scroll viewport height (px)
    * @default 400
    */
@@ -444,6 +450,12 @@ export interface TableProps<T = Record<string, unknown>> {
    * @default 40
    */
   virtualItemHeight?: number
+
+  /**
+   * Row count at which Table enables virtual mode automatically when `autoVirtual` is true.
+   * @default 10000
+   */
+  autoVirtualThreshold?: number
 
   /**
    * Row count at which Table marks virtual rendering as recommended.

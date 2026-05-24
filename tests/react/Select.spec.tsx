@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, waitFor } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Select } from '@expcat/tigercat-react'
@@ -216,6 +216,33 @@ describe('Select', () => {
       expect(onSearch).toHaveBeenCalled()
       expect(getByText('Option 2')).toBeInTheDocument()
       expect(queryByText('Option 1')).not.toBeInTheDocument()
+    })
+
+    it('should keep local options unfiltered when remote search is enabled', async () => {
+      const user = userEvent.setup()
+      const { container, getByText } = render(<Select options={testOptions} searchable remote />)
+
+      await user.click(container.querySelector('button')!)
+      fireEvent.change(container.querySelector('input')!, { target: { value: 'Option 2' } })
+
+      expect(getByText('Option 1')).toBeInTheDocument()
+      expect(getByText('Option 2')).toBeInTheDocument()
+    })
+
+    it('should debounce search events when searchDebounce is set', async () => {
+      vi.useFakeTimers()
+      const onSearch = vi.fn()
+      const { container } = render(
+        <Select options={testOptions} searchable searchDebounce={200} onSearch={onSearch} />
+      )
+
+      fireEvent.click(container.querySelector('button')!)
+      fireEvent.change(container.querySelector('input')!, { target: { value: 'Option 2' } })
+
+      expect(onSearch).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(200)
+      expect(onSearch).toHaveBeenCalledWith('Option 2')
+      vi.useRealTimers()
     })
   })
 

@@ -1,6 +1,25 @@
 import type { SelectOptions, SelectSize, SelectOption, SelectOptionGroup } from '../types/select'
 import { classNames } from './class-names'
 
+export interface ResolveSelectOptionsOptions {
+  searchable?: boolean
+  remote?: boolean
+}
+
+export interface SelectSearchDebouncerOptions {
+  delay?: number
+  onSearch: (query: string) => void
+  setTimer?: (callback: () => void, delay: number) => number
+  clearTimer?: (handle: number) => void
+}
+
+export interface SelectSearchDebouncer {
+  schedule: (query: string) => void
+  flush: () => void
+  cancel: () => void
+  isPending: () => boolean
+}
+
 /**
  * Base select container classes
  */
@@ -208,4 +227,63 @@ export function filterOptions(options: SelectOptions, query: string): SelectOpti
     }
     return filtered
   }, [])
+}
+
+export function resolveSelectFilteredOptions(
+  options: SelectOptions,
+  query: string,
+  resolveOptions: ResolveSelectOptionsOptions = {}
+): SelectOptions {
+  if (!resolveOptions.searchable || !query || resolveOptions.remote) {
+    return options
+  }
+
+  return filterOptions(options, query)
+}
+
+export function createSelectSearchDebouncer(
+  options: SelectSearchDebouncerOptions
+): SelectSearchDebouncer {
+  const delay = Number.isFinite(options.delay) && (options.delay ?? 0) > 0 ? options.delay! : 0
+  const setTimer =
+    options.setTimer ?? ((callback, timeout) => globalThis.setTimeout(callback, timeout))
+  const clearTimer = options.clearTimer ?? ((handle) => globalThis.clearTimeout(handle))
+  let timerHandle: number | undefined
+  let pendingQuery = ''
+
+  const cancel = (): void => {
+    if (timerHandle === undefined) return
+    clearTimer(timerHandle)
+    timerHandle = undefined
+  }
+
+  const flush = (): void => {
+    if (timerHandle !== undefined) {
+      cancel()
+      options.onSearch(pendingQuery)
+    }
+  }
+
+  const schedule = (query: string): void => {
+    pendingQuery = query
+
+    if (delay <= 0) {
+      cancel()
+      options.onSearch(query)
+      return
+    }
+
+    cancel()
+    timerHandle = setTimer(() => {
+      timerHandle = undefined
+      options.onSearch(pendingQuery)
+    }, delay)
+  }
+
+  return {
+    schedule,
+    flush,
+    cancel,
+    isPending: () => timerHandle !== undefined
+  }
 }

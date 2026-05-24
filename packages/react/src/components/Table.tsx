@@ -52,8 +52,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   tableLayout = 'auto',
   // v0.6.0 props
   virtual = false,
+  autoVirtual = true,
   virtualHeight = 400,
   virtualItemHeight: _virtualItemHeight = 40,
+  autoVirtualThreshold = 10000,
   virtualThreshold = 1000,
   editable = false,
   editableCells,
@@ -128,8 +130,22 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     onExport
   })
 
+  const virtualRecommendation = useMemo(
+    () =>
+      getTableVirtualRecommendation({
+        virtual,
+        autoVirtual,
+        dataLength: dataSource.length,
+        threshold: virtualThreshold,
+        autoThreshold: autoVirtualThreshold
+      }),
+    [autoVirtual, autoVirtualThreshold, dataSource.length, virtual, virtualThreshold]
+  )
+
+  const effectiveVirtual = virtualRecommendation.enabled
+
   const wrapperStyle = useMemo(() => {
-    if (virtual) {
+    if (effectiveVirtual) {
       return {
         height: typeof virtualHeight === 'number' ? `${virtualHeight}px` : virtualHeight,
         overflow: 'auto' as const
@@ -140,17 +156,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight
         }
       : undefined
-  }, [maxHeight, virtual, virtualHeight])
-
-  const virtualRecommendation = useMemo(
-    () =>
-      getTableVirtualRecommendation({
-        virtual,
-        dataLength: dataSource.length,
-        threshold: virtualThreshold
-      }),
-    [dataSource.length, virtual, virtualThreshold]
-  )
+  }, [effectiveVirtual, maxHeight, virtualHeight])
 
   useEffect(() => {
     const wrapper = wrapperRef.current
@@ -182,6 +188,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       )}
       style={wrapperStyle}
       data-tiger-virtual={virtualRecommendation.enabled ? 'enabled' : undefined}
+      data-tiger-virtual-auto={virtualRecommendation.autoEnabled ? 'true' : undefined}
       data-tiger-virtual-recommended={virtualRecommendation.recommended ? 'true' : undefined}
       data-tiger-virtual-threshold={
         virtualRecommendation.recommended ? virtualRecommendation.threshold : undefined

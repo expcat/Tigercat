@@ -576,6 +576,8 @@ update-command: pnpm docs:api
 | noDataText? | `string` | 'No options available' | Text to display when options list is empty |
 | maxTagCount? | `number` | - | Maximum number of tags to display in multi-select mode. Remaining selections are shown as "+N more". |
 | virtual? | `boolean` | false | Whether to use virtual scrolling for large option lists. When enabled, only visible options are rendered for better performance. |
+| remote? | `boolean` | false | Whether search is handled remotely. When true, local option filtering is skipped. |
+| searchDebounce? | `number` | 0 | Debounce delay for search callbacks in milliseconds. |
 | listHeight? | `number` | 256 | Height of the dropdown panel in pixels (relevant when virtual is true) |
 
 ### slider.ts.ts
@@ -1461,8 +1463,10 @@ update-command: pnpm docs:api
 | maxHeight? | `string \| number` | - | Max height for scrollable table |
 | tableLayout? | `'auto' \| 'fixed'` | 'auto' | Table layout algorithm |
 | virtual? | `boolean` | false | Enable virtual scrolling for large datasets |
+| autoVirtual? | `boolean` | true | Automatically enable Table's virtual scroll container for very large data sets. |
 | virtualHeight? | `number` | 400 | Virtual scroll viewport height (px) |
 | virtualItemHeight? | `number` | 40 | Virtual scroll row height (px) |
+| autoVirtualThreshold? | `number` | 10000 | Row count at which Table enables virtual mode automatically when `autoVirtual` is true. |
 | virtualThreshold? | `number` | 1000 | Row count at which Table marks virtual rendering as recommended. Table does not enable virtualization automatically; use this signal to switch to `virtual` or the dedicated `VirtualTable` component. |
 | editable? | `boolean` | false | Enable cell editing |
 | editableCells? | `Map<string, Set<number>>` | - | Set of editable cells: Map<columnKey, Set<rowIndex>> If not provided and editable=true, all cells are editable |
