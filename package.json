@@ -41,6 +41,7 @@
     "size": "size-limit",
     "size:check": "size-limit --json",
     "bench": "vitest bench",
+    "api:validate": "node ./scripts/validate-api.mjs",
     "docs:api": "node ./scripts/generate-api-docs.mjs",
     "docs:sync": "node ./scripts/sync-doc-site.mjs",
     "docs:dev": "pnpm docs:api && pnpm docs:sync && vitepress dev docs",

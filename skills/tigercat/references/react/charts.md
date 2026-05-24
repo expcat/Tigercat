@@ -127,8 +127,6 @@ const total = data.reduce((s, d) => s + d.value, 0)
 />
 ```
 
-````
-
 ---
 
 ## AreaChart
@@ -148,7 +146,7 @@ const total = data.reduce((s, d) => s + d.value, 0)
   /* 渐变填充 + 曲线平滑 + 空心点 + 入场动画 */
 }
 ;<AreaChart data={data} gradient curve="monotone" showPoints pointHollow animated />
-````
+```
 
 ---
 
@@ -260,6 +258,42 @@ const heatmapData = [
 {/* 大矩阵自动切到 canvas cell 层；小矩阵仍用 SVG rect */}
 <HeatmapChart data={largeData} xLabels={xLabels} yLabels={yLabels} canvasThreshold={1000} />
 <HeatmapChart data={largeData} xLabels={xLabels} yLabels={yLabels} renderMode="canvas" />
+```
+
+---
+
+## FunnelChart
+
+```tsx
+<FunnelChart data={funnelData} width={360} height={240} />
+<FunnelChart data={funnelData} sort="desc" showLabels hoverable />
+```
+
+---
+
+## GaugeChart
+
+```tsx
+<GaugeChart value={72} min={0} max={100} />
+<GaugeChart value={72} label="完成率" unit="%" showThresholds animated />
+```
+
+---
+
+## SunburstChart
+
+```tsx
+<SunburstChart data={hierarchyData} width={360} height={280} />
+<SunburstChart data={hierarchyData} showLabels hoverable onNodeClick={handleNodeClick} />
+```
+
+---
+
+## TreeMapChart
+
+```tsx
+<TreeMapChart data={hierarchyData} width={360} height={240} />
+<TreeMapChart data={hierarchyData} showLabels hoverable onNodeClick={handleNodeClick} />
 ```
 
 ---

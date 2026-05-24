@@ -41,6 +41,15 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+      - name: Generate API docs
+        run: pnpm docs:api
+
+      - name: Check generated docs are current
+        run: git diff --exit-code docs/api-summary.md skills/tigercat/references/shared/api-summary.md skills/tigercat/references/shared/generated-props.md
+
+      - name: Validate API and LLM docs
+        run: pnpm api:validate
+
       - name: Run axe accessibility regression
         run: pnpm test:a11y
 

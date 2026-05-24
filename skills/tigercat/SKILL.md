@@ -5,9 +5,19 @@ description: Tigercat UI component library for Vue 3 and React
 
 # Tigercat UI Component Library
 
-Tailwind CSS 驱动的跨框架组件库，支持 Vue 3 和 React。
+Tailwind CSS 驱动的跨框架组件库。此文件只做 LLM 导航索引；编码规则见 `.github/copilot-instructions.md`。
 
-## Quick Navigation
+## Open First
+
+| Need                     | File                                                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| 术语与 Vue/React 映射    | [shared/glossary.md](references/shared/glossary.md)                                                                      |
+| 常用跨框架模式           | [shared/patterns/common.md](references/shared/patterns/common.md)                                                        |
+| TS 派生 API 摘要         | [shared/api-summary.md](references/shared/api-summary.md)                                                                |
+| TS 派生 Props 摘要       | [shared/generated-props.md](references/shared/generated-props.md)                                                        |
+| Theme / i18n / SSR / CLI | [theme.md](references/theme.md), [i18n.md](references/i18n.md), [ssr.md](references/ssr.md), [cli.md](references/cli.md) |
+
+## Category Index
 
 | Category   | Shared Props                                                        | Vue Examples                                      | React Examples                                        |
 | ---------- | ------------------------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------- |
@@ -43,68 +53,3 @@ Tailwind CSS 驱动的跨框架组件库，支持 Vue 3 和 React。
 | Charts     | AreaChart, BarChart, ChartCanvas, ChartLegend, ChartTooltip, DonutChart, FunnelChart, GaugeChart, HeatmapChart, LineChart, PieChart, RadarChart, ScatterChart, SunburstChart, TreeMapChart                                             | [Props](references/shared/props/charts.md)     | [Vue](references/vue/charts.md)     | [React](references/react/charts.md)     |
 | Advanced   | CodeEditor, FileManager, ImageViewer, InfiniteScroll, Kanban, PrintLayout, RichTextEditor, TaskBoard, VirtualList, VirtualTable                                                                                                        | [Props](references/shared/props/advanced.md)   | [Vue](references/vue/advanced.md)   | [React](references/react/advanced.md)   |
 | Composite  | ActivityFeed, ChatWindow, CommentThread, CropUpload, DataTableWithToolbar, FormWizard, NotificationCenter                                                                                                                              | [Props](references/shared/props/composite.md)  | [Vue](references/vue/composite.md)  | [React](references/react/composite.md)  |
-
-## Installation
-
-```bash
-# Vue 3
-pnpm add @expcat/tigercat-vue @expcat/tigercat-core
-
-# React
-pnpm add @expcat/tigercat-react @expcat/tigercat-core
-```
-
-## Tailwind Setup
-
-```js
-// tailwind.config.js
-import { tigercatPlugin } from '@expcat/tigercat-core'
-export default {
-  content: [
-    './src/**/*.{vue,js,ts,jsx,tsx}',
-    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
-  ],
-  plugins: [tigercatPlugin]
-}
-```
-
-## Import
-
-```ts
-// Vue
-import { Button, Input } from '@expcat/tigercat-vue'
-
-// React
-import { Button, Input } from '@expcat/tigercat-react'
-```
-
-## Vue vs React Differences
-
-详见 [shared/patterns/common.md](references/shared/patterns/common.md)
-
-| Concept      | Vue                       | React                   |
-| ------------ | ------------------------- | ----------------------- |
-| Two-way bind | `v-model` / `v-model:xxx` | `value` + `onChange`    |
-| Visibility   | `open` (v-model:open)     | `open` + `onOpenChange` |
-| Events       | `@click`, `@change`       | `onClick`, `onChange`   |
-| Slots        | `<template #name>`        | `xxxRender` props       |
-
-## Components (133+)
-
-**Basic (16)**: Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, Code, Divider, Empty, Icon, Image, ImageCropper, Link, QRCode, Tag, Text
-
-**Form (22)**: AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, DatePicker, Form, Input, InputGroup, InputNumber, Mentions, Radio, RadioGroup, Rate, Select, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
-
-**Feedback (12)**: Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Result, Tooltip, Tour, Watermark
-
-**Layout (14)**: Card, Carousel, Container, Descriptions, Grid (Row/Col), Layout (Header/Sidebar/Content/Footer), List, Resizable, Skeleton, Space, Splitter, Statistic
-
-**Navigation (13)**: Affix, Anchor, BackTop, Breadcrumb, Dropdown, FloatButton, Menu, Pagination, Segmented, Steps, Tabs, Tree
-
-**Data (4)**: Calendar, Collapse, Table, Timeline
-
-**Charts (17)**: AreaChart, BarChart, ChartCanvas, ChartLegend, ChartTooltip, DonutChart, FunnelChart, GaugeChart, HeatmapChart, LineChart, PieChart, RadarChart, ScatterChart, SunburstChart, TreeMapChart
-
-**Advanced (10)**: CodeEditor, FileManager, ImageViewer, InfiniteScroll, Kanban, PrintLayout, RichTextEditor, TaskBoard, VirtualList, VirtualTable
-
-**Composite (7)**: ActivityFeed, ChatWindow, CommentThread, CropUpload, DataTableWithToolbar, FormWizard, NotificationCenter

@@ -12,7 +12,7 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 # Feedback Components - Props Reference
 
-共享 Props 定义，框架差异在表格中标注。
+共享 Props 定义。Vue/React 默认双端支持，差异仅在 Type 或 Description 中标注。
 
 > **显示状态 (v0.5.0)**: 所有组件统一使用 `open` prop（原 `visible` 已废弃）。详见 [CHANGELOG.md](../../../../CHANGELOG.md) 和 [patterns/common.md](../patterns/common.md)
 >
@@ -24,25 +24,25 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop              | Type                                     | Default  | Vue | React | Description                  |
-| ----------------- | ---------------------------------------- | -------- | :-: | :---: | ---------------------------- |
-| open              | `boolean`                                | `false`  |  ✓  |   ✓   | 显示状态 (Vue: v-model:open) |
-| title             | `string`                                 | -        |  ✓  |   ✓   | 标题                         |
-| width             | `string \| number`                       | -        |  ✓  |   ✓   | 自定义宽度                   |
-| size              | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | `'md'`   |  ✓  |   ✓   | 尺寸                         |
-| closable          | `boolean`                                | `true`   |  ✓  |   ✓   | 显示关闭按钮                 |
-| mask              | `boolean`                                | `true`   |  ✓  |   ✓   | 显示遮罩层                   |
-| maskClosable      | `boolean`                                | `true`   |  ✓  |   ✓   | 点击遮罩关闭                 |
-| centered          | `boolean`                                | `false`  |  ✓  |   ✓   | 垂直居中                     |
-| destroyOnClose    | `boolean`                                | `false`  |  ✓  |   ✓   | 关闭时销毁内容               |
-| zIndex            | `number`                                 | `1000`   |  ✓  |   ✓   | 层级                         |
-| showDefaultFooter | `boolean`                                | `false`  |  ✓  |   ✓   | 显示内置确定/取消页脚        |
-| okText            | `string`                                 | `'确定'` |  ✓  |   ✓   | 确认按钮文案                 |
-| cancelText        | `string`                                 | `'取消'` |  ✓  |   ✓   | 取消按钮文案                 |
-| className         | `string`                                 | -        |  ✓  |   ✓   | 自定义类名                   |
-| draggable         | `boolean`                                | `false`  |  ✓  |   ✓   | 可拖拽移动                   |
-| closeAriaLabel    | `string`                                 | -        |  ✓  |   ✓   | 关闭按钮 aria-label          |
-| locale            | `{ modal: ModalLocale }`                 | -        |  ✓  |   ✓   | 国际化                       |
+| Prop              | Type                                     | Default  | Description                  |
+| ----------------- | ---------------------------------------- | -------- | ---------------------------- |
+| open              | `boolean`                                | `false`  | 显示状态 (Vue: v-model:open) |
+| title             | `string`                                 | -        | 标题                         |
+| width             | `string \| number`                       | -        | 自定义宽度                   |
+| size              | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | `'md'`   | 尺寸                         |
+| closable          | `boolean`                                | `true`   | 显示关闭按钮                 |
+| mask              | `boolean`                                | `true`   | 显示遮罩层                   |
+| maskClosable      | `boolean`                                | `true`   | 点击遮罩关闭                 |
+| centered          | `boolean`                                | `false`  | 垂直居中                     |
+| destroyOnClose    | `boolean`                                | `false`  | 关闭时销毁内容               |
+| zIndex            | `number`                                 | `1000`   | 层级                         |
+| showDefaultFooter | `boolean`                                | `false`  | 显示内置确定/取消页脚        |
+| okText            | `string`                                 | `'确定'` | 确认按钮文案                 |
+| cancelText        | `string`                                 | `'取消'` | 取消按钮文案                 |
+| className         | `string`                                 | -        | 自定义类名                   |
+| draggable         | `boolean`                                | `false`  | 可拖拽移动                   |
+| closeAriaLabel    | `string`                                 | -        | 关闭按钮 aria-label          |
+| locale            | `{ modal: ModalLocale }`                 | -        | 国际化                       |
 
 ### Events
 
@@ -66,22 +66,22 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop           | Type                                     | Default          | Vue | React | Description                                  |
-| -------------- | ---------------------------------------- | ---------------- | :-: | :---: | -------------------------------------------- |
-| open           | `boolean`                                | `false`          |  ✓  |   ✓   | 显示状态 (Vue: v-model:open)                 |
-| title          | `string`                                 | -                |  ✓  |   ✓   | 标题                                         |
-| width          | `string \| number`                       | -                |  ✓  |   ✓   | 自定义宽度                                   |
-| placement      | `'left' \| 'right' \| 'top' \| 'bottom'` | `'right'`        |  ✓  |   ✓   | 弹出位置                                     |
-| size           | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | `'md'`           |  ✓  |   ✓   | 尺寸（left/right 为宽度，top/bottom 为高度） |
-| closable       | `boolean`                                | `true`           |  ✓  |   ✓   | 显示关闭按钮                                 |
-| mask           | `boolean`                                | `true`           |  ✓  |   ✓   | 显示遮罩层                                   |
-| maskClosable   | `boolean`                                | `true`           |  ✓  |   ✓   | 点击遮罩关闭                                 |
-| zIndex         | `number`                                 | `1000`           |  ✓  |   ✓   | 层级                                         |
-| destroyOnClose | `boolean`                                | `false`          |  ✓  |   ✓   | 关闭时销毁内容                               |
-| className      | `string`                                 | -                |  ✓  |   ✓   | 面板自定义类名                               |
-| bodyClassName  | `string`                                 | -                |  ✓  |   ✓   | 内容区域自定义类名                           |
-| closeAriaLabel | `string`                                 | `'Close drawer'` |  ✓  |   ✓   | 关闭按钮 aria-label                          |
-| locale         | `{ drawer: DrawerLocale }`               | -                |  ✓  |   ✓   | 国际化                                       |
+| Prop           | Type                                     | Default          | Description                                  |
+| -------------- | ---------------------------------------- | ---------------- | -------------------------------------------- |
+| open           | `boolean`                                | `false`          | 显示状态 (Vue: v-model:open)                 |
+| title          | `string`                                 | -                | 标题                                         |
+| width          | `string \| number`                       | -                | 自定义宽度                                   |
+| placement      | `'left' \| 'right' \| 'top' \| 'bottom'` | `'right'`        | 弹出位置                                     |
+| size           | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | `'md'`           | 尺寸（left/right 为宽度，top/bottom 为高度） |
+| closable       | `boolean`                                | `true`           | 显示关闭按钮                                 |
+| mask           | `boolean`                                | `true`           | 显示遮罩层                                   |
+| maskClosable   | `boolean`                                | `true`           | 点击遮罩关闭                                 |
+| zIndex         | `number`                                 | `1000`           | 层级                                         |
+| destroyOnClose | `boolean`                                | `false`          | 关闭时销毁内容                               |
+| className      | `string`                                 | -                | 面板自定义类名                               |
+| bodyClassName  | `string`                                 | -                | 内容区域自定义类名                           |
+| closeAriaLabel | `string`                                 | `'Close drawer'` | 关闭按钮 aria-label                          |
+| locale         | `{ drawer: DrawerLocale }`               | -                | 国际化                                       |
 
 ### Events
 
@@ -167,20 +167,20 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop        | Type                                                                                                      | Default     | Vue | React | Description        |
-| ----------- | --------------------------------------------------------------------------------------------------------- | ----------- | :-: | :---: | ------------------ |
-| open        | `boolean`                                                                                                 | -           |  ✓  |   ✓   | 受控显示状态       |
-| defaultOpen | `boolean`                                                                                                 | `false`     |  ✓  |   ✓   | 默认显示状态       |
-| title       | `string`                                                                                                  | -           |  ✓  |   ✓   | 确认标题           |
-| description | `string`                                                                                                  | -           |  ✓  |   ✓   | 描述文本           |
-| icon        | `'warning' \| 'info' \| 'error' \| 'success' \| 'question'`                                               | `'warning'` |  ✓  |   ✓   | 图标类型           |
-| showIcon    | `boolean`                                                                                                 | `true`      |  ✓  |   ✓   | 是否显示图标       |
-| okText      | `string`                                                                                                  | `'确定'`    |  ✓  |   ✓   | 确认按钮文案       |
-| cancelText  | `string`                                                                                                  | `'取消'`    |  ✓  |   ✓   | 取消按钮文案       |
-| okType      | `'primary' \| 'danger'`                                                                                   | `'primary'` |  ✓  |   ✓   | 确认按钮类型       |
-| placement   | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| ... \| 'left' \| 'left-start' \| ... \| 'right' \| ...` | `'top'`     |  ✓  |   ✓   | 弹出位置           |
-| offset      | `number`                                                                                                  | `8`         |  ✓  |   ✓   | 距触发元素偏移(px) |
-| disabled    | `boolean`                                                                                                 | `false`     |  ✓  |   ✓   | 是否禁用           |
+| Prop        | Type                                                                                                      | Default     | Description        |
+| ----------- | --------------------------------------------------------------------------------------------------------- | ----------- | ------------------ |
+| open        | `boolean`                                                                                                 | -           | 受控显示状态       |
+| defaultOpen | `boolean`                                                                                                 | `false`     | 默认显示状态       |
+| title       | `string`                                                                                                  | -           | 确认标题           |
+| description | `string`                                                                                                  | -           | 描述文本           |
+| icon        | `'warning' \| 'info' \| 'error' \| 'success' \| 'question'`                                               | `'warning'` | 图标类型           |
+| showIcon    | `boolean`                                                                                                 | `true`      | 是否显示图标       |
+| okText      | `string`                                                                                                  | `'确定'`    | 确认按钮文案       |
+| cancelText  | `string`                                                                                                  | `'取消'`    | 取消按钮文案       |
+| okType      | `'primary' \| 'danger'`                                                                                   | `'primary'` | 确认按钮类型       |
+| placement   | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| ... \| 'left' \| 'left-start' \| ... \| 'right' \| ...` | `'top'`     | 弹出位置           |
+| offset      | `number`                                                                                                  | `8`         | 距触发元素偏移(px) |
+| disabled    | `boolean`                                                                                                 | `false`     | 是否禁用           |
 
 ### Events
 
@@ -204,19 +204,19 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop        | Type                                        | Default   | Vue | React | Description          |
-| ----------- | ------------------------------------------- | --------- | :-: | :---: | -------------------- |
-| open        | `boolean`                                   | -         |  ✓  |   ✓   | 受控显示状态         |
-| defaultOpen | `boolean`                                   | `false`   |  ✓  |   ✓   | 默认显示状态         |
-| title       | `string`                                    | -         |  ✓  |   ✓   | 标题文本             |
-| content     | `string`                                    | -         |  ✓  |   ✓   | 内容文本             |
-| trigger     | `'click' \| 'hover' \| 'focus' \| 'manual'` | `'click'` |  ✓  |   ✓   | 触发方式             |
-| placement   | `FloatingPlacement`                         | `'top'`   |  ✓  |   ✓   | 弹出位置             |
-| disabled    | `boolean`                                   | `false`   |  ✓  |   ✓   | 禁用状态             |
-| width       | `string \| number`                          | -         |  ✓  |   ✓   | 宽度（像素数或类名） |
-| offset      | `number`                                    | `8`       |  ✓  |   ✓   | 偏移距离 (px)        |
-| className   | `string`                                    | -         |  ✓  |   ✓   | 自定义 CSS 类        |
-| style       | `StyleValue` / `CSSProperties`              | -         |  ✓  |   ✓   | 自定义样式           |
+| Prop        | Type                                        | Default   | Description          |
+| ----------- | ------------------------------------------- | --------- | -------------------- |
+| open        | `boolean`                                   | -         | 受控显示状态         |
+| defaultOpen | `boolean`                                   | `false`   | 默认显示状态         |
+| title       | `string`                                    | -         | 标题文本             |
+| content     | `string`                                    | -         | 内容文本             |
+| trigger     | `'click' \| 'hover' \| 'focus' \| 'manual'` | `'click'` | 触发方式             |
+| placement   | `FloatingPlacement`                         | `'top'`   | 弹出位置             |
+| disabled    | `boolean`                                   | `false`   | 禁用状态             |
+| width       | `string \| number`                          | -         | 宽度（像素数或类名） |
+| offset      | `number`                                    | `8`       | 偏移距离 (px)        |
+| className   | `string`                                    | -         | 自定义 CSS 类        |
+| style       | `StyleValue` / `CSSProperties`              | -         | 自定义样式           |
 
 ### Slots / Children
 
@@ -239,16 +239,16 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop        | Type                                                                                                   | Default   | Vue | React | Description        |
-| ----------- | ------------------------------------------------------------------------------------------------------ | --------- | :-: | :---: | ------------------ |
-| open        | `boolean`                                                                                              | -         |  ✓  |   ✓   | 受控显示状态       |
-| defaultOpen | `boolean`                                                                                              | `false`   |  ✓  |   ✓   | 默认显示（非受控） |
-| content     | `string` (Vue) / `ReactNode` (React)                                                                   | -         |  ✓  |   ✓   | 提示内容           |
-| placement   | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| 'bottom-start' \| 'bottom-end' \| 'left' \| 'right'` | `'top'`   |  ✓  |   ✓   | 位置               |
-| trigger     | `'hover' \| 'click' \| 'focus' \| 'manual'`                                                            | `'hover'` |  ✓  |   ✓   | 触发方式           |
-| disabled    | `boolean`                                                                                              | `false`   |  ✓  |   ✓   | 禁用               |
-| offset      | `number`                                                                                               | `8`       |  ✓  |   ✓   | 偏移距离 (px)      |
-| className   | `string`                                                                                               | -         |  ✓  |   ✓   | 自定义 class       |
+| Prop        | Type                                                                                                   | Default   | Description        |
+| ----------- | ------------------------------------------------------------------------------------------------------ | --------- | ------------------ |
+| open        | `boolean`                                                                                              | -         | 受控显示状态       |
+| defaultOpen | `boolean`                                                                                              | `false`   | 默认显示（非受控） |
+| content     | `string` (Vue) / `ReactNode` (React)                                                                   | -         | 提示内容           |
+| placement   | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| 'bottom-start' \| 'bottom-end' \| 'left' \| 'right'` | `'top'`   | 位置               |
+| trigger     | `'hover' \| 'click' \| 'focus' \| 'manual'`                                                            | `'hover'` | 触发方式           |
+| disabled    | `boolean`                                                                                              | `false`   | 禁用               |
+| offset      | `number`                                                                                               | `8`       | 偏移距离 (px)      |
+| className   | `string`                                                                                               | -         | 自定义 class       |
 
 ### Slots (Vue) / Children (React)
 
@@ -270,18 +270,18 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop        | Type                                                                                    | Default                   | Vue | React | Description              |
-| ----------- | --------------------------------------------------------------------------------------- | ------------------------- | :-: | :---: | ------------------------ |
-| variant     | `'spinner' \| 'dots' \| 'bars' \| 'ring' \| 'pulse'`                                    | `'spinner'`               |  ✓  |   ✓   | 动画样式                 |
-| size        | `'sm' \| 'md' \| 'lg' \| 'xl'`                                                          | `'md'`                    |  ✓  |   ✓   | 尺寸                     |
-| color       | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'danger' \| 'info' \| 'default'` | `'primary'`               |  ✓  |   ✓   | 颜色变体                 |
-| text        | `string`                                                                                | -                         |  ✓  |   ✓   | 加载文案                 |
-| fullscreen  | `boolean`                                                                               | `false`                   |  ✓  |   ✓   | 全屏遮罩模式             |
-| delay       | `number`                                                                                | `0`                       |  ✓  |   ✓   | 延迟显示 (ms)，避免闪烁  |
-| background  | `string`                                                                                | `'rgba(255,255,255,0.9)'` |  ✓  |   ✓   | 全屏模式背景色           |
-| customColor | `string`                                                                                | -                         |  ✓  |   ✓   | 自定义颜色（覆盖 color） |
-| className   | `string`                                                                                | -                         |  ✓  |   ✓   | 自定义类名               |
-| lockScroll  | `boolean`                                                                               | `true`                    |  ✓  |   ✓   | 全屏模式下锁定文档滚动   |
+| Prop        | Type                                                                                    | Default                   | Description              |
+| ----------- | --------------------------------------------------------------------------------------- | ------------------------- | ------------------------ |
+| variant     | `'spinner' \| 'dots' \| 'bars' \| 'ring' \| 'pulse'`                                    | `'spinner'`               | 动画样式                 |
+| size        | `'sm' \| 'md' \| 'lg' \| 'xl'`                                                          | `'md'`                    | 尺寸                     |
+| color       | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'danger' \| 'info' \| 'default'` | `'primary'`               | 颜色变体                 |
+| text        | `string`                                                                                | -                         | 加载文案                 |
+| fullscreen  | `boolean`                                                                               | `false`                   | 全屏遮罩模式             |
+| delay       | `number`                                                                                | `0`                       | 延迟显示 (ms)，避免闪烁  |
+| background  | `string`                                                                                | `'rgba(255,255,255,0.9)'` | 全屏模式背景色           |
+| customColor | `string`                                                                                | -                         | 自定义颜色（覆盖 color） |
+| className   | `string`                                                                                | -                         | 自定义类名               |
+| lockScroll  | `boolean`                                                                               | `true`                    | 全屏模式下锁定文档滚动   |
 
 ---
 
@@ -289,22 +289,22 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop             | Type                                                                     | Default                      | Vue | React | Description                 |
-| ---------------- | ------------------------------------------------------------------------ | ---------------------------- | :-: | :---: | --------------------------- |
-| percentage       | `number`                                                                 | `0`                          |  ✓  |   ✓   | 进度值 (0-100)，自动 clamp  |
-| type             | `'line' \| 'circle'`                                                     | `'line'`                     |  ✓  |   ✓   | 类型                        |
-| variant          | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'primary'`                  |  ✓  |   ✓   | 颜色变体                    |
-| size             | `'sm' \| 'md' \| 'lg'`                                                   | `'md'`                       |  ✓  |   ✓   | 尺寸                        |
-| status           | `'normal' \| 'success' \| 'exception' \| 'paused'`                       | `'normal'`                   |  ✓  |   ✓   | 状态（覆盖 variant 颜色）   |
-| showText         | `boolean`                                                                | line:`true` / circle:`false` |  ✓  |   ✓   | 显示进度文本                |
-| text             | `string`                                                                 | —                            |  ✓  |   ✓   | 自定义文本                  |
-| format           | `(percentage: number) => string`                                         | —                            |  ✓  |   ✓   | 自定义格式化函数            |
-| striped          | `boolean`                                                                | `false`                      |  ✓  |   ✓   | 条纹样式（仅 line）         |
-| stripedAnimation | `boolean`                                                                | `false`                      |  ✓  |   ✓   | 条纹动画（需 striped=true） |
-| strokeWidth      | `number`                                                                 | `6`                          |  ✓  |   ✓   | 圆形进度条线条宽度          |
-| width            | `string \| number`                                                       | `'auto'`                     |  ✓  |   ✓   | 线形进度条宽度              |
-| height           | `number`                                                                 | —                            |  ✓  |   ✓   | 线形进度条高度（覆盖 size） |
-| className        | `string`                                                                 | —                            |  ✓  |   ✓   | 附加 CSS 类名               |
+| Prop             | Type                                                                     | Default                      | Description                 |
+| ---------------- | ------------------------------------------------------------------------ | ---------------------------- | --------------------------- |
+| percentage       | `number`                                                                 | `0`                          | 进度值 (0-100)，自动 clamp  |
+| type             | `'line' \| 'circle'`                                                     | `'line'`                     | 类型                        |
+| variant          | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'primary'`                  | 颜色变体                    |
+| size             | `'sm' \| 'md' \| 'lg'`                                                   | `'md'`                       | 尺寸                        |
+| status           | `'normal' \| 'success' \| 'exception' \| 'paused'`                       | `'normal'`                   | 状态（覆盖 variant 颜色）   |
+| showText         | `boolean`                                                                | line:`true` / circle:`false` | 显示进度文本                |
+| text             | `string`                                                                 | —                            | 自定义文本                  |
+| format           | `(percentage: number) => string`                                         | —                            | 自定义格式化函数            |
+| striped          | `boolean`                                                                | `false`                      | 条纹样式（仅 line）         |
+| stripedAnimation | `boolean`                                                                | `false`                      | 条纹动画（需 striped=true） |
+| strokeWidth      | `number`                                                                 | `6`                          | 圆形进度条线条宽度          |
+| width            | `string \| number`                                                       | `'auto'`                     | 线形进度条宽度              |
+| height           | `number`                                                                 | —                            | 线形进度条高度（覆盖 size） |
+| className        | `string`                                                                 | —                            | 附加 CSS 类名               |
 
 ---
 
@@ -312,12 +312,12 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop      | Type                                                                     | Default  | Vue | React | Description |
-| --------- | ------------------------------------------------------------------------ | -------- | :-: | :---: | ----------- |
-| status    | `'success' \| 'error' \| 'info' \| 'warning' \| '403' \| '404' \| '500'` | `'info'` |  ✓  |   ✓   | 结果状态    |
-| title     | `string`                                                                 | -        |  ✓  |   ✓   | 标题        |
-| subTitle  | `string`                                                                 | -        |  ✓  |   ✓   | 副标题      |
-| className | `string`                                                                 | -        |  ✓  |   ✓   | 自定义类名  |
+| Prop      | Type                                                                     | Default  | Description |
+| --------- | ------------------------------------------------------------------------ | -------- | ----------- |
+| status    | `'success' \| 'error' \| 'info' \| 'warning' \| '403' \| '404' \| '500'` | `'info'` | 结果状态    |
+| title     | `string`                                                                 | -        | 标题        |
+| subTitle  | `string`                                                                 | -        | 副标题      |
+| className | `string`                                                                 | -        | 自定义类名  |
 
 ### Slots / Children
 
@@ -345,17 +345,17 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop           | Type         | Default      | Vue | React | Description                  |
-| -------------- | ------------ | ------------ | :-: | :---: | ---------------------------- |
-| steps          | `TourStep[]` | required     |  ✓  |   ✓   | 步骤数组                     |
-| open           | `boolean`    | `false`      |  ✓  |   ✓   | 显示状态 (Vue: v-model:open) |
-| current        | `number`     | -            |  ✓  |   ✓   | 受控当前步骤索引             |
-| nextText       | `string`     | `'Next'`     |  ✓  |   ✓   | "下一步"按钮文案             |
-| prevText       | `string`     | `'Previous'` |  ✓  |   ✓   | "上一步"按钮文案             |
-| finishText     | `string`     | `'Finish'`   |  ✓  |   ✓   | "完成"按钮文案（最后一步）   |
-| closable       | `boolean`    | `true`       |  ✓  |   ✓   | 显示关闭按钮                 |
-| showIndicators | `boolean`    | `true`       |  ✓  |   ✓   | 显示步骤指示器（如 1/3）     |
-| className      | `string`     | -            |  -  |   ✓   | 自定义类名                   |
+| Prop           | Type         | Default      | Description                  |
+| -------------- | ------------ | ------------ | ---------------------------- |
+| steps          | `TourStep[]` | required     | 步骤数组                     |
+| open           | `boolean`    | `false`      | 显示状态 (Vue: v-model:open) |
+| current        | `number`     | -            | 受控当前步骤索引             |
+| nextText       | `string`     | `'Next'`     | "下一步"按钮文案             |
+| prevText       | `string`     | `'Previous'` | "上一步"按钮文案             |
+| finishText     | `string`     | `'Finish'`   | "完成"按钮文案（最后一步）   |
+| closable       | `boolean`    | `true`       | 显示关闭按钮                 |
+| showIndicators | `boolean`    | `true`       | 显示步骤指示器（如 1/3）     |
+| className      | `string`     | -            | 自定义类名 (React only)      |
 
 ### Events
 
@@ -384,19 +384,19 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 ### Props
 
-| Prop      | Type                 | Default | Vue | React | Description                |
-| --------- | -------------------- | ------- | :-: | :---: | -------------------------- |
-| content   | `string \| string[]` | -       |  ✓  |   ✓   | 水印文字内容（多行传数组） |
-| image     | `string`             | -       |  ✓  |   ✓   | 水印图片 URL（优先于文字） |
-| width     | `number`             | `120`   |  ✓  |   ✓   | 水印宽度（px）             |
-| height    | `number`             | `64`    |  ✓  |   ✓   | 水印高度（px）             |
-| rotate    | `number`             | `-22`   |  ✓  |   ✓   | 旋转角度                   |
-| zIndex    | `number`             | `9`     |  ✓  |   ✓   | z-index                    |
-| gapX      | `number`             | `100`   |  ✓  |   ✓   | 水平间距（px）             |
-| gapY      | `number`             | `100`   |  ✓  |   ✓   | 垂直间距（px）             |
-| offsetX   | `number`             | `0`     |  ✓  |   ✓   | X 轴偏移（px）             |
-| offsetY   | `number`             | `0`     |  ✓  |   ✓   | Y 轴偏移（px）             |
-| font      | `WatermarkFont`      | -       |  ✓  |   ✓   | 字体配置                   |
-| className | `string`             | -       |  -  |   ✓   | 自定义类名                 |
+| Prop      | Type                 | Default | Description                |
+| --------- | -------------------- | ------- | -------------------------- |
+| content   | `string \| string[]` | -       | 水印文字内容（多行传数组） |
+| image     | `string`             | -       | 水印图片 URL（优先于文字） |
+| width     | `number`             | `120`   | 水印宽度（px）             |
+| height    | `number`             | `64`    | 水印高度（px）             |
+| rotate    | `number`             | `-22`   | 旋转角度                   |
+| zIndex    | `number`             | `9`     | z-index                    |
+| gapX      | `number`             | `100`   | 水平间距（px）             |
+| gapY      | `number`             | `100`   | 垂直间距（px）             |
+| offsetX   | `number`             | `0`     | X 轴偏移（px）             |
+| offsetY   | `number`             | `0`     | Y 轴偏移（px）             |
+| font      | `WatermarkFont`      | -       | 字体配置                   |
+| className | `string`             | -       | 自定义类名 (React only)    |
 
 > **See also**: [Vue examples](../vue/feedback.md) · [React examples](../react/feedback.md)

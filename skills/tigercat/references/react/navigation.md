@@ -458,3 +458,28 @@ const containerRef = useRef<HTMLDivElement>(null)
   </AnchorLink>
 </Anchor>
 ```
+
+---
+
+## Affix 固钉
+
+```tsx
+<Affix offsetTop={72}>
+  <Button>固定操作</Button>
+</Affix>
+<Affix target={() => containerRef.current!} onChange={handleAffixChange}>
+  <Button variant="outline">容器内固定</Button>
+</Affix>
+```
+
+---
+
+## FloatButton 悬浮按钮
+
+```tsx
+<FloatButton icon="+" onClick={handleCreate} />
+<FloatButtonGroup trigger="hover" placement="top">
+  <FloatButton icon="?" />
+  <FloatButton icon="↑" />
+</FloatButtonGroup>
+```

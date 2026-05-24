@@ -61,9 +61,7 @@ export default function VirtualListDemo() {
       itemHeight={40}
       height={400}
       overscan={5}
-      renderItem={({ index }) => (
-        <div className="px-4 py-2 border-b">Item {index}</div>
-      )}
+      renderItem={({ index }) => <div className="px-4 py-2 border-b">Item {index}</div>}
     />
   )
 }
@@ -90,14 +88,7 @@ const data = Array.from({ length: 5000 }, (_, i) => ({
 
 export default function VirtualTableDemo() {
   return (
-    <VirtualTable
-      data={data}
-      columns={columns}
-      rowHeight={48}
-      height={400}
-      stickyHeader
-      striped
-    />
+    <VirtualTable data={data} columns={columns} rowHeight={48} height={400} stickyHeader striped />
   )
 }
 ```
@@ -111,9 +102,7 @@ import React, { useState, useCallback } from 'react'
 import { InfiniteScroll } from '@expcat/tigercat-react'
 
 export default function InfiniteScrollDemo() {
-  const [items, setItems] = useState(
-    Array.from({ length: 20 }, (_, i) => `Item ${i + 1}`)
-  )
+  const [items, setItems] = useState(Array.from({ length: 20 }, (_, i) => `Item ${i + 1}`))
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
 
@@ -121,7 +110,10 @@ export default function InfiniteScrollDemo() {
     setLoading(true)
     setTimeout(() => {
       setItems((prev) => {
-        const next = [...prev, ...Array.from({ length: 20 }, (_, i) => `Item ${prev.length + i + 1}`)]
+        const next = [
+          ...prev,
+          ...Array.from({ length: 20 }, (_, i) => `Item ${prev.length + i + 1}`)
+        ]
         if (next.length >= 100) setHasMore(false)
         return next
       })
@@ -137,7 +129,9 @@ export default function InfiniteScrollDemo() {
       endText="没有更多了"
       onLoadMore={loadMore}>
       {items.map((item) => (
-        <div key={item} className="p-3 border-b">{item}</div>
+        <div key={item} className="p-3 border-b">
+          {item}
+        </div>
       ))}
     </InfiniteScroll>
   )
@@ -251,3 +245,15 @@ export default function KanbanDemo() {
 ```
 
 > Kanban 与 TaskBoard 功能类似但 API 更简化，适合轻量使用场景。完整看板功能参见 [composite.md](composite.md#taskboard-任务看板)。
+
+---
+
+## PrintLayout 打印布局
+
+```tsx
+<PrintLayout title="Invoice">
+  <section>第一页内容</section>
+  <PrintPageBreak />
+  <section>第二页内容</section>
+</PrintLayout>
+```

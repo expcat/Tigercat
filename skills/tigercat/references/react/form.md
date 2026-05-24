@@ -401,3 +401,78 @@ const [value, setValue] = useState('male')
 }
 ;<Upload fileList={fileList} onChange={handleChange} customRequest={simulateUpload} drag />
 ```
+
+---
+
+## AutoComplete 自动完成
+
+```tsx
+<AutoComplete value={keyword} onChange={setKeyword} options={options} placeholder="Search users" />
+<AutoComplete value={keyword} onChange={setKeyword} options={options} clearable onSearch={handleSearch} />
+```
+
+---
+
+## Cascader 级联选择
+
+```tsx
+<Cascader value={city} onChange={setCity} options={cityOptions} placeholder="选择城市" />
+<Cascader value={city} onChange={setCity} options={cityOptions} showSearch clearable />
+```
+
+---
+
+## ColorPicker 颜色选择器
+
+```tsx
+<ColorPicker value={color} onChange={setColor} />
+<ColorPicker value={color} onChange={setColor} format="rgba" showAlpha presets={presets} />
+```
+
+---
+
+## InputGroup 输入框组
+
+```tsx
+<InputGroup>
+  <InputGroupAddon>https://</InputGroupAddon>
+  <Input value={domain} onChange={(event) => setDomain(event.target.value)} />
+  <InputGroupAddon>.com</InputGroupAddon>
+</InputGroup>
+```
+
+---
+
+## Mentions 提及
+
+```tsx
+<Mentions value={message} onChange={setMessage} options={mentionOptions} placeholder="输入 @ 提及成员" />
+<Mentions value={message} onChange={setMessage} options={mentionOptions} prefix="#" />
+```
+
+---
+
+## Stepper 步进器
+
+```tsx
+<Stepper value={count} onChange={setCount} min={0} max={10} />
+<Stepper value={count} onChange={setCount} step={0.5} precision={1} size="sm" />
+```
+
+---
+
+## Transfer 穿梭框
+
+```tsx
+<Transfer value={selectedKeys} onChange={setSelectedKeys} dataSource={items} />
+<Transfer value={selectedKeys} onChange={setSelectedKeys} dataSource={items} filterable showSelectAll />
+```
+
+---
+
+## TreeSelect 树选择
+
+```tsx
+<TreeSelect value={node} onChange={setNode} treeData={treeData} placeholder="选择节点" />
+<TreeSelect value={nodes} onChange={setNodes} treeData={treeData} multiple checkable searchable />
+```

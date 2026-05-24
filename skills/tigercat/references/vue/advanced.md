@@ -61,11 +61,7 @@ import { VirtualList } from '@expcat/tigercat-vue'
 </script>
 
 <template>
-  <VirtualList
-    :item-count="10000"
-    :item-height="40"
-    :height="400"
-    :overscan="5">
+  <VirtualList :item-count="10000" :item-height="40" :height="400" :overscan="5">
     <template #default="{ index }">
       <div class="px-4 py-2 border-b">Item {{ index }}</div>
     </template>
@@ -251,3 +247,17 @@ const columns = ref([
 ```
 
 > Kanban 与 TaskBoard 功能类似但 API 更简化，适合轻量使用场景。完整看板功能参见 [composite.md](composite.md#taskboard-任务看板)。
+
+---
+
+## PrintLayout 打印布局
+
+```vue
+<template>
+  <PrintLayout title="Invoice">
+    <section>第一页内容</section>
+    <PrintPageBreak />
+    <section>第二页内容</section>
+  </PrintLayout>
+</template>
+```

@@ -20,6 +20,7 @@
 - [ ] `pnpm test:vue`
 - [ ] `pnpm test:react`
 - [ ] `pnpm test:validate`
+- [ ] `pnpm api:validate`
 - [ ] `pnpm size`
 - [ ] `pnpm example:build`
 - [ ] `npx playwright test`

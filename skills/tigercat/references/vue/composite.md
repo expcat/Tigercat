@@ -70,8 +70,6 @@ const handleSend = (value: string) => {
 </template>
 ```
 
-````
-
 ---
 
 ## ActivityFeed 活动动态流
@@ -416,11 +414,9 @@ function handleCrop(result) {
   <CropUpload disabled />
 </template>
 ```
-````
 
 ## TaskBoard 任务看板
 
-````md
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -469,4 +465,3 @@ const handleCardMove = (e: TaskBoardCardMoveEvent) => {
     " />
 </template>
 ```
-````

@@ -12,7 +12,7 @@ key-apis: messages, items, comments, notifications, steps, columns, uploads, val
 
 # Composite Components - Props Reference
 
-共享 Props 定义，框架差异在表格中标注。
+共享 Props 定义。Vue/React 默认双端支持，差异仅在 Type 或 Description 中标注。
 
 ---
 
@@ -20,35 +20,35 @@ key-apis: messages, items, comments, notifications, steps, columns, uploads, val
 
 ### Props
 
-| Prop                 | Type                    | Default        | Vue | React | Description          |
-| -------------------- | ----------------------- | -------------- | :-: | :---: | -------------------- |
-| messages             | `ChatMessage[]`         | `[]`           |  ✓  |   ✓   | 消息列表             |
-| modelValue           | `string`                | -              |  ✓  |   -   | 输入内容（v-model）  |
-| value                | `string`                | -              |  -  |   ✓   | 输入内容（受控）     |
-| defaultValue         | `string`                | `''`           |  ✓  |   ✓   | 输入默认值（非受控） |
-| placeholder          | `string`                | `'请输入消息'` |  ✓  |   ✓   | 输入占位             |
-| disabled             | `boolean`               | `false`        |  ✓  |   ✓   | 输入区禁用           |
-| maxLength            | `number`                | -              |  ✓  |   ✓   | 最大字数             |
-| emptyText            | `string`                | `'暂无消息'`   |  ✓  |   ✓   | 空态文案             |
-| sendText             | `string`                | `'发送'`       |  ✓  |   ✓   | 发送按钮文案         |
-| messageListAriaLabel | `string`                | `'消息列表'`   |  ✓  |   ✓   | 消息列表无障碍标签   |
-| inputAriaLabel       | `string`                | `placeholder`  |  ✓  |   ✓   | 输入框无障碍标签     |
-| sendAriaLabel        | `string`                | `sendText`     |  ✓  |   ✓   | 发送按钮无障碍标签   |
-| statusText           | `string`                | -              |  ✓  |   ✓   | 状态区文案           |
-| statusVariant        | `BadgeVariant`          | `'info'`       |  ✓  |   ✓   | 状态区 Badge 颜色    |
-| showAvatar           | `boolean`               | `true`         |  ✓  |   ✓   | 显示头像             |
-| showName             | `boolean`               | `true`         |  ✓  |   ✓   | 显示名称             |
-| showTime             | `boolean`               | `false`        |  ✓  |   ✓   | 显示时间             |
-| inputType            | `'input' \| 'textarea'` | `'textarea'`   |  ✓  |   ✓   | 输入组件类型         |
-| inputRows            | `number`                | `3`            |  ✓  |   ✓   | Textarea 行数        |
-| sendOnEnter          | `boolean`               | `true`         |  ✓  |   ✓   | Enter 快捷发送       |
-| allowShiftEnter      | `boolean`               | `true`         |  ✓  |   ✓   | Shift+Enter 换行     |
-| allowEmpty           | `boolean`               | `false`        |  ✓  |   ✓   | 允许发送空内容       |
-| clearOnSend          | `boolean`               | `true`         |  ✓  |   ✓   | 发送后清空输入       |
-| virtual              | `boolean`               | `false`        |  ✓  |   ✓   | 启用消息列表虚拟化   |
-| virtualItemHeight    | `number`                | `88`           |  ✓  |   ✓   | 虚拟化消息行高       |
-| virtualHeight        | `number`                | `400`          |  ✓  |   ✓   | 虚拟化列表视口高度   |
-| autoScrollToBottom   | `boolean`               | `true`         |  ✓  |   ✓   | 自动滚动到最新消息   |
+| Prop                 | Type                    | Default        | Description                    |
+| -------------------- | ----------------------- | -------------- | ------------------------------ |
+| messages             | `ChatMessage[]`         | `[]`           | 消息列表                       |
+| modelValue           | `string`                | -              | 输入内容（v-model） (Vue only) |
+| value                | `string`                | -              | 输入内容（受控） (React only)  |
+| defaultValue         | `string`                | `''`           | 输入默认值（非受控）           |
+| placeholder          | `string`                | `'请输入消息'` | 输入占位                       |
+| disabled             | `boolean`               | `false`        | 输入区禁用                     |
+| maxLength            | `number`                | -              | 最大字数                       |
+| emptyText            | `string`                | `'暂无消息'`   | 空态文案                       |
+| sendText             | `string`                | `'发送'`       | 发送按钮文案                   |
+| messageListAriaLabel | `string`                | `'消息列表'`   | 消息列表无障碍标签             |
+| inputAriaLabel       | `string`                | `placeholder`  | 输入框无障碍标签               |
+| sendAriaLabel        | `string`                | `sendText`     | 发送按钮无障碍标签             |
+| statusText           | `string`                | -              | 状态区文案                     |
+| statusVariant        | `BadgeVariant`          | `'info'`       | 状态区 Badge 颜色              |
+| showAvatar           | `boolean`               | `true`         | 显示头像                       |
+| showName             | `boolean`               | `true`         | 显示名称                       |
+| showTime             | `boolean`               | `false`        | 显示时间                       |
+| inputType            | `'input' \| 'textarea'` | `'textarea'`   | 输入组件类型                   |
+| inputRows            | `number`                | `3`            | Textarea 行数                  |
+| sendOnEnter          | `boolean`               | `true`         | Enter 快捷发送                 |
+| allowShiftEnter      | `boolean`               | `true`         | Shift+Enter 换行               |
+| allowEmpty           | `boolean`               | `false`        | 允许发送空内容                 |
+| clearOnSend          | `boolean`               | `true`         | 发送后清空输入                 |
+| virtual              | `boolean`               | `false`        | 启用消息列表虚拟化             |
+| virtualItemHeight    | `number`                | `88`           | 虚拟化消息行高                 |
+| virtualHeight        | `number`                | `400`          | 虚拟化列表视口高度             |
+| autoScrollToBottom   | `boolean`               | `true`         | 自动滚动到最新消息             |
 
 ### Behavior
 
@@ -99,18 +99,18 @@ key-apis: messages, items, comments, notifications, steps, columns, uploads, val
 
 ### Props
 
-| Prop           | Type               | Default       | Vue | React | Description      |
-| -------------- | ------------------ | ------------- | :-: | :---: | ---------------- |
-| items          | `ActivityItem[]`   | `[]`          |  ✓  |   ✓   | 动态列表（扁平） |
-| groups         | `ActivityGroup[]`  | -             |  ✓  |   ✓   | 分组数据         |
-| groupBy        | `(item) => string` | -             |  ✓  |   ✓   | 分组函数         |
-| groupOrder     | `string[]`         | -             |  ✓  |   ✓   | 分组顺序         |
-| loading        | `boolean`          | `false`       |  ✓  |   ✓   | 加载中状态       |
-| loadingText    | `string`           | `'加载中...'` |  ✓  |   ✓   | 加载文案         |
-| emptyText      | `string`           | `'暂无动态'`  |  ✓  |   ✓   | 空态文案         |
-| showAvatar     | `boolean`          | `true`        |  ✓  |   ✓   | 显示头像         |
-| showTime       | `boolean`          | `true`        |  ✓  |   ✓   | 显示时间         |
-| showGroupTitle | `boolean`          | `true`        |  ✓  |   ✓   | 显示分组标题     |
+| Prop           | Type               | Default       | Description      |
+| -------------- | ------------------ | ------------- | ---------------- |
+| items          | `ActivityItem[]`   | `[]`          | 动态列表（扁平） |
+| groups         | `ActivityGroup[]`  | -             | 分组数据         |
+| groupBy        | `(item) => string` | -             | 分组函数         |
+| groupOrder     | `string[]`         | -             | 分组顺序         |
+| loading        | `boolean`          | `false`       | 加载中状态       |
+| loadingText    | `string`           | `'加载中...'` | 加载文案         |
+| emptyText      | `string`           | `'暂无动态'`  | 空态文案         |
+| showAvatar     | `boolean`          | `true`        | 显示头像         |
+| showTime       | `boolean`          | `true`        | 显示时间         |
+| showGroupTitle | `boolean`          | `true`        | 显示分组标题     |
 
 ### Behavior
 
@@ -179,28 +179,28 @@ key-apis: messages, items, comments, notifications, steps, columns, uploads, val
 
 ### Props
 
-| Prop                | Type                   | Default         | Vue | React | Description                    |
-| ------------------- | ---------------------- | --------------- | :-: | :---: | ------------------------------ |
-| nodes               | `CommentNode[]`        | -               |  ✓  |   ✓   | 树形数据                       |
-| items               | `CommentNode[]`        | -               |  ✓  |   ✓   | 扁平数据（通过 parentId 组装） |
-| maxDepth            | `number`               | `3`             |  ✓  |   ✓   | 最大嵌套层级                   |
-| maxReplies          | `number`               | `3`             |  ✓  |   ✓   | 单条最大展示回复数             |
-| defaultExpandedKeys | `(string \| number)[]` | `[]`            |  ✓  |   ✓   | 默认展开回复                   |
-| expandedKeys        | `(string \| number)[]` | -               |  ✓  |   ✓   | 展开回复（受控）               |
-| emptyText           | `string`               | `'暂无评论'`    |  ✓  |   ✓   | 空态文案                       |
-| replyPlaceholder    | `string`               | `'写下回复...'` |  ✓  |   ✓   | 回复输入占位                   |
-| replyButtonText     | `string`               | `'回复'`        |  ✓  |   ✓   | 回复提交文案                   |
-| cancelReplyText     | `string`               | `'取消'`        |  ✓  |   ✓   | 取消回复文案                   |
-| likeText            | `string`               | `'点赞'`        |  ✓  |   ✓   | 点赞文案                       |
-| likedText           | `string`               | `'已赞'`        |  ✓  |   ✓   | 已点赞文案                     |
-| replyText           | `string`               | `'回复'`        |  ✓  |   ✓   | 操作栏回复文案                 |
-| moreText            | `string`               | `'更多'`        |  ✓  |   ✓   | 操作栏更多文案                 |
-| loadMoreText        | `string`               | `'加载更多'`    |  ✓  |   ✓   | 加载更多文案                   |
-| showAvatar          | `boolean`              | `true`          |  ✓  |   ✓   | 显示头像                       |
-| showDivider         | `boolean`              | `true`          |  ✓  |   ✓   | 显示分隔线                     |
-| showLike            | `boolean`              | `true`          |  ✓  |   ✓   | 显示点赞                       |
-| showReply           | `boolean`              | `true`          |  ✓  |   ✓   | 显示回复                       |
-| showMore            | `boolean`              | `true`          |  ✓  |   ✓   | 显示更多                       |
+| Prop                | Type                   | Default         | Description                    |
+| ------------------- | ---------------------- | --------------- | ------------------------------ |
+| nodes               | `CommentNode[]`        | -               | 树形数据                       |
+| items               | `CommentNode[]`        | -               | 扁平数据（通过 parentId 组装） |
+| maxDepth            | `number`               | `3`             | 最大嵌套层级                   |
+| maxReplies          | `number`               | `3`             | 单条最大展示回复数             |
+| defaultExpandedKeys | `(string \| number)[]` | `[]`            | 默认展开回复                   |
+| expandedKeys        | `(string \| number)[]` | -               | 展开回复（受控）               |
+| emptyText           | `string`               | `'暂无评论'`    | 空态文案                       |
+| replyPlaceholder    | `string`               | `'写下回复...'` | 回复输入占位                   |
+| replyButtonText     | `string`               | `'回复'`        | 回复提交文案                   |
+| cancelReplyText     | `string`               | `'取消'`        | 取消回复文案                   |
+| likeText            | `string`               | `'点赞'`        | 点赞文案                       |
+| likedText           | `string`               | `'已赞'`        | 已点赞文案                     |
+| replyText           | `string`               | `'回复'`        | 操作栏回复文案                 |
+| moreText            | `string`               | `'更多'`        | 操作栏更多文案                 |
+| loadMoreText        | `string`               | `'加载更多'`    | 加载更多文案                   |
+| showAvatar          | `boolean`              | `true`          | 显示头像                       |
+| showDivider         | `boolean`              | `true`          | 显示分隔线                     |
+| showLike            | `boolean`              | `true`          | 显示点赞                       |
+| showReply           | `boolean`              | `true`          | 显示回复                       |
+| showMore            | `boolean`              | `true`          | 显示更多                       |
 
 ### Behavior
 
@@ -268,26 +268,26 @@ key-apis: messages, items, comments, notifications, steps, columns, uploads, val
 
 ### Props
 
-| Prop                  | Type                          | Default          | Vue | React | Description        |
-| --------------------- | ----------------------------- | ---------------- | :-: | :---: | ------------------ |
-| items                 | `NotificationItem[]`          | `[]`             |  ✓  |   ✓   | 通知列表（扁平）   |
-| groups                | `NotificationGroup[]`         | -                |  ✓  |   ✓   | 分组数据           |
-| groupBy               | `(item) => string`            | -                |  ✓  |   ✓   | 分组函数           |
-| groupOrder            | `string[]`                    | -                |  ✓  |   ✓   | 分组顺序           |
-| activeGroupKey        | `string \| number`            | -                |  ✓  |   ✓   | 当前分组（受控）   |
-| defaultActiveGroupKey | `string \| number`            | -                |  ✓  |   ✓   | 默认分组（非受控） |
-| readFilter            | `'all' \| 'unread' \| 'read'` | `'all'`          |  ✓  |   ✓   | 已读筛选（受控）   |
-| defaultReadFilter     | `'all' \| 'unread' \| 'read'` | `'all'`          |  ✓  |   ✓   | 已读筛选（非受控） |
-| loading               | `boolean`                     | `false`          |  ✓  |   ✓   | 加载中状态         |
-| loadingText           | `string`                      | `'加载中...'`    |  ✓  |   ✓   | 加载文案           |
-| emptyText             | `string`                      | `'暂无通知'`     |  ✓  |   ✓   | 空态文案           |
-| title                 | `string`                      | `'通知中心'`     |  ✓  |   ✓   | 标题               |
-| allLabel              | `string`                      | `'全部'`         |  ✓  |   ✓   | 全部筛选文案       |
-| unreadLabel           | `string`                      | `'未读'`         |  ✓  |   ✓   | 未读筛选文案       |
-| readLabel             | `string`                      | `'已读'`         |  ✓  |   ✓   | 已读筛选文案       |
-| markAllReadText       | `string`                      | `'全部标记已读'` |  ✓  |   ✓   | 批量标记已读文案   |
-| markReadText          | `string`                      | `'标记已读'`     |  ✓  |   ✓   | 单条标记已读文案   |
-| markUnreadText        | `string`                      | `'标记未读'`     |  ✓  |   ✓   | 单条标记未读文案   |
+| Prop                  | Type                          | Default          | Description        |
+| --------------------- | ----------------------------- | ---------------- | ------------------ |
+| items                 | `NotificationItem[]`          | `[]`             | 通知列表（扁平）   |
+| groups                | `NotificationGroup[]`         | -                | 分组数据           |
+| groupBy               | `(item) => string`            | -                | 分组函数           |
+| groupOrder            | `string[]`                    | -                | 分组顺序           |
+| activeGroupKey        | `string \| number`            | -                | 当前分组（受控）   |
+| defaultActiveGroupKey | `string \| number`            | -                | 默认分组（非受控） |
+| readFilter            | `'all' \| 'unread' \| 'read'` | `'all'`          | 已读筛选（受控）   |
+| defaultReadFilter     | `'all' \| 'unread' \| 'read'` | `'all'`          | 已读筛选（非受控） |
+| loading               | `boolean`                     | `false`          | 加载中状态         |
+| loadingText           | `string`                      | `'加载中...'`    | 加载文案           |
+| emptyText             | `string`                      | `'暂无通知'`     | 空态文案           |
+| title                 | `string`                      | `'通知中心'`     | 标题               |
+| allLabel              | `string`                      | `'全部'`         | 全部筛选文案       |
+| unreadLabel           | `string`                      | `'未读'`         | 未读筛选文案       |
+| readLabel             | `string`                      | `'已读'`         | 已读筛选文案       |
+| markAllReadText       | `string`                      | `'全部标记已读'` | 批量标记已读文案   |
+| markReadText          | `string`                      | `'标记已读'`     | 单条标记已读文案   |
+| markUnreadText        | `string`                      | `'标记未读'`     | 单条标记未读文案   |
 
 ### Behavior
 
@@ -331,23 +331,23 @@ key-apis: messages, items, comments, notifications, steps, columns, uploads, val
 
 ### Props
 
-| Prop           | Type                                       | Default        | Vue | React | Description                               |
-| -------------- | ------------------------------------------ | -------------- | :-: | :---: | ----------------------------------------- |
-| steps          | `WizardStep[]`                             | `[]`           |  ✓  |   ✓   | 步骤配置                                  |
-| current        | `number`                                   | -              |  ✓  |   ✓   | 当前步骤（受控）                          |
-| defaultCurrent | `number`                                   | `0`            |  ✓  |   ✓   | 默认步骤（非受控）                        |
-| clickable      | `boolean`                                  | `false`        |  ✓  |   ✓   | 允许点击步骤切换                          |
-| direction      | `'horizontal' \| 'vertical'`               | `'horizontal'` |  ✓  |   ✓   | 步骤方向                                  |
-| size           | `'small' \| 'default'`                     | `'default'`    |  ✓  |   ✓   | 步骤尺寸                                  |
-| simple         | `boolean`                                  | `false`        |  ✓  |   ✓   | Steps 简洁模式                            |
-| showSteps      | `boolean`                                  | `true`         |  ✓  |   ✓   | 显示步骤条                                |
-| showActions    | `boolean`                                  | `true`         |  ✓  |   ✓   | 显示操作按钮                              |
-| prevText       | `string`                                   | `'Previous'`   |  ✓  |   ✓   | 上一步按钮文案                            |
-| nextText       | `string`                                   | `'Next'`       |  ✓  |   ✓   | 下一步按钮文案                            |
-| finishText     | `string`                                   | `'Finish'`     |  ✓  |   ✓   | 完成按钮文案                              |
-| beforeNext     | `FormWizardValidator`                      | -              |  ✓  |   ✓   | 下一步校验（返回 false 或 string 阻断）   |
-| autoSave       | `(current, step) => void \| Promise<void>` | -              |  ✓  |   ✓   | 步骤切换时自动保存回调                    |
-| locale         | `Partial<TigerLocale>`                     | -              |  ✓  |   ✓   | 语言包覆盖（优先级低于 prev/next/finish） |
+| Prop           | Type                                       | Default        | Description                               |
+| -------------- | ------------------------------------------ | -------------- | ----------------------------------------- |
+| steps          | `WizardStep[]`                             | `[]`           | 步骤配置                                  |
+| current        | `number`                                   | -              | 当前步骤（受控）                          |
+| defaultCurrent | `number`                                   | `0`            | 默认步骤（非受控）                        |
+| clickable      | `boolean`                                  | `false`        | 允许点击步骤切换                          |
+| direction      | `'horizontal' \| 'vertical'`               | `'horizontal'` | 步骤方向                                  |
+| size           | `'small' \| 'default'`                     | `'default'`    | 步骤尺寸                                  |
+| simple         | `boolean`                                  | `false`        | Steps 简洁模式                            |
+| showSteps      | `boolean`                                  | `true`         | 显示步骤条                                |
+| showActions    | `boolean`                                  | `true`         | 显示操作按钮                              |
+| prevText       | `string`                                   | `'Previous'`   | 上一步按钮文案                            |
+| nextText       | `string`                                   | `'Next'`       | 下一步按钮文案                            |
+| finishText     | `string`                                   | `'Finish'`     | 完成按钮文案                              |
+| beforeNext     | `FormWizardValidator`                      | -              | 下一步校验（返回 false 或 string 阻断）   |
+| autoSave       | `(current, step) => void \| Promise<void>` | -              | 步骤切换时自动保存回调                    |
+| locale         | `Partial<TigerLocale>`                     | -              | 语言包覆盖（优先级低于 prev/next/finish） |
 
 ### Behavior
 
@@ -392,17 +392,17 @@ key-apis: messages, items, comments, notifications, steps, columns, uploads, val
 
 ### Props
 
-| Prop             | Type                          | Default | Vue | React | Description             |
-| ---------------- | ----------------------------- | ------- | :-: | :---: | ----------------------- |
-| columns          | `TableColumn[]`               | -       |  ✓  |   ✓   | 表格列配置（同 Table）  |
-| dataSource       | `any[]`                       | `[]`    |  ✓  |   ✓   | 数据源                  |
-| rowSelection     | `RowSelectionConfig`          | -       |  ✓  |   ✓   | 行选择配置              |
-| rowKey           | `string \| ((row) => string)` | `'id'`  |  ✓  |   ✓   | 行唯一键                |
-| loading          | `boolean`                     | `false` |  ✓  |   ✓   | 加载状态                |
-| toolbar          | `TableToolbarProps`           | -       |  ✓  |   ✓   | 工具栏配置              |
-| pagination       | `PaginationConfig \| false`   | `false` |  ✓  |   ✓   | 透传给 Table 的分页配置 |
-| onPageChange     | `(current, pageSize) => void` | -       |  -  |   ✓   | 分页变化回调（React）   |
-| onPageSizeChange | `(current, pageSize) => void` | -       |  -  |   ✓   | 页大小变化回调（React） |
+| Prop             | Type                          | Default | Description                          |
+| ---------------- | ----------------------------- | ------- | ------------------------------------ |
+| columns          | `TableColumn[]`               | -       | 表格列配置（同 Table）               |
+| dataSource       | `any[]`                       | `[]`    | 数据源                               |
+| rowSelection     | `RowSelectionConfig`          | -       | 行选择配置                           |
+| rowKey           | `string \| ((row) => string)` | `'id'`  | 行唯一键                             |
+| loading          | `boolean`                     | `false` | 加载状态                             |
+| toolbar          | `TableToolbarProps`           | -       | 工具栏配置                           |
+| pagination       | `PaginationConfig \| false`   | `false` | 透传给 Table 的分页配置              |
+| onPageChange     | `(current, pageSize) => void` | -       | 分页变化回调（React） (React only)   |
+| onPageSizeChange | `(current, pageSize) => void` | -       | 页大小变化回调（React） (React only) |
 
 > 其余 Table 相关 Props（如 `striped`/`hoverable`/`stickyHeader`）保持一致。
 
@@ -462,15 +462,15 @@ key-apis: messages, items, comments, notifications, steps, columns, uploads, val
 
 ### Props
 
-| Prop         | Type                                      | Default      | Vue | React | Description                      |
-| ------------ | ----------------------------------------- | ------------ | :-: | :---: | -------------------------------- |
-| accept       | `string`                                  | `'image/*'`  |  ✓  |   ✓   | 文件类型过滤                     |
-| disabled     | `boolean`                                 | `false`      |  ✓  |   ✓   | 禁用                             |
-| maxSize      | `number`                                  | -            |  ✓  |   ✓   | 最大文件大小（bytes）            |
-| cropperProps | `Partial<Omit<ImageCropperProps, 'src'>>` | -            |  ✓  |   ✓   | 透传给内部 ImageCropper 的 props |
-| modalTitle   | `string`                                  | `'裁剪图片'` |  ✓  |   ✓   | 弹窗标题                         |
-| modalWidth   | `number`                                  | `520`        |  ✓  |   ✓   | 弹窗宽度                         |
-| className    | `string`                                  | -            |  ✓  |   ✓   | 自定义类名                       |
+| Prop         | Type                                      | Default      | Description                      |
+| ------------ | ----------------------------------------- | ------------ | -------------------------------- |
+| accept       | `string`                                  | `'image/*'`  | 文件类型过滤                     |
+| disabled     | `boolean`                                 | `false`      | 禁用                             |
+| maxSize      | `number`                                  | -            | 最大文件大小（bytes）            |
+| cropperProps | `Partial<Omit<ImageCropperProps, 'src'>>` | -            | 透传给内部 ImageCropper 的 props |
+| modalTitle   | `string`                                  | `'裁剪图片'` | 弹窗标题                         |
+| modalWidth   | `number`                                  | `520`        | 弹窗宽度                         |
+| className    | `string`                                  | -            | 自定义类名                       |
 
 > 裁剪相关配置（`aspectRatio`, `outputType`, `quality`, `guides` 等）通过 `cropperProps` 透传，不再作为顶层 prop。
 
@@ -514,18 +514,18 @@ key-apis: messages, items, comments, notifications, steps, columns, uploads, val
 
 ### TaskBoardProps
 
-| Prop             | Type                   | Default | Vue | React | Description                     |
-| ---------------- | ---------------------- | ------- | --- | ----- | ------------------------------- |
-| columns          | `TaskBoardColumn[]`    | -       | ✓   | ✓     | 受控列数据                      |
-| defaultColumns   | `TaskBoardColumn[]`    | `[]`    | ✓   | ✓     | 非受控初始值                    |
-| draggable        | `boolean`              | `true`  | ✓   | ✓     | 启用卡片拖拽                    |
-| columnDraggable  | `boolean`              | `true`  | ✓   | ✓     | 启用列拖拽排序                  |
-| enforceWipLimit  | `boolean`              | `false` | ✓   | ✓     | 严格阻止超 WIP 的跨列移入       |
-| beforeCardMove   | `(e) => bool\|Promise` | -       | ✓   | ✓     | 卡片移动前验证，返回 false 取消 |
-| beforeColumnMove | `(e) => bool\|Promise` | -       | ✓   | ✓     | 列移动前验证，返回 false 取消   |
-| locale           | `Partial<TigerLocale>` | -       | ✓   | ✓     | i18n 覆盖                       |
-| className        | `string`               | -       | ✓   | ✓     | 自定义类名                      |
-| style            | `Record / CSSProp`     | -       | ✓   | ✓     | 自定义样式                      |
+| Prop             | Type                   | Default | Description               |
+| ---------------- | ---------------------- | ------- | ------------------------- | --- | ------------------------------- |
+| columns          | `TaskBoardColumn[]`    | -       | 受控列数据                |
+| defaultColumns   | `TaskBoardColumn[]`    | `[]`    | 非受控初始值              |
+| draggable        | `boolean`              | `true`  | 启用卡片拖拽              |
+| columnDraggable  | `boolean`              | `true`  | 启用列拖拽排序            |
+| enforceWipLimit  | `boolean`              | `false` | 严格阻止超 WIP 的跨列移入 |
+| beforeCardMove   | `(e) => bool\|Promise` | -       | ✓                         | ✓   | 卡片移动前验证，返回 false 取消 |
+| beforeColumnMove | `(e) => bool\|Promise` | -       | ✓                         | ✓   | 列移动前验证，返回 false 取消   |
+| locale           | `Partial<TigerLocale>` | -       | ✓                         | ✓   | i18n 覆盖                       |
+| className        | `string`               | -       | ✓                         | ✓   | 自定义类名                      |
+| style            | `Record / CSSProp`     | -       | ✓                         | ✓   | 自定义样式                      |
 
 ### Events
 

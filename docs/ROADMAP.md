@@ -166,9 +166,9 @@ source: project audit and planning
 
 当前 `skills/tigercat/` 已有 9 类 Props 文档 + Vue/React 示例 + theme/i18n/cli 文档，但存在冗余。
 
-- [ ] 合并重复描述：`SKILL.md` 导航表 + `copilot-instructions.md` 模板 → 去重，SKILL.md 仅保留索引
-- [ ] Props 文档压缩：移除重复的"支持 Vue/React"列（全组件双端，无需逐行标注）
-- [ ] 示例代码精简：每组件保留 1 个最小可运行示例 + 1 个进阶示例，删除冗余变体
+- [x] 合并重复描述：`SKILL.md` 导航表 + `copilot-instructions.md` 模板 → 去重，SKILL.md 仅保留索引
+- [x] Props 文档压缩：移除重复的"支持 Vue/React"列（全组件双端，无需逐行标注）
+- [x] 示例代码精简：每组件保留 1 个最小可运行示例 + 1 个进阶示例，删除冗余变体
 - [x] 统一术语：建立术语表（slot/children、emit/callback、attrs/props 等），文档中用简写引用
 
 ### 5.2 LLM-INDEX 标注增强
@@ -179,9 +179,9 @@ source: project audit and planning
 
 ### 5.3 文档自动化
 
-- [ ] `scripts/generate-api-docs.mjs` 同时输出 LLM 摘要格式（精简版 API 表）
-- [ ] CI 检查：文档与源码 API 一致性校验（新增/删除组件时自动检测文档遗漏）
-- [ ] Props 文档从 TypeScript 类型定义自动生成，减少手写维护成本
+- [x] `scripts/generate-api-docs.mjs` 同时输出 LLM 摘要格式（精简版 API 表）
+- [x] CI 检查：文档与源码 API 一致性校验（新增/删除组件时自动检测文档遗漏）
+- [x] Props 文档从 TypeScript 类型定义自动生成，减少手写维护成本
 
 ### 5.4 Context 文件优化
 

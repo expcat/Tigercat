@@ -16,6 +16,7 @@ import { fileURLToPath } from 'url'
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const ROOT = join(__dirname, '..')
 const TYPES_DIR = join(ROOT, 'packages', 'core', 'src', 'types')
+const SKILL_REFERENCES_DIR = join(ROOT, 'skills', 'tigercat', 'references')
 const jsonMode = process.argv.includes('--json')
 
 // ----- Rules -----
@@ -419,6 +420,125 @@ if (deprecatedAPIs.length > 0) {
   }
 }
 
+// ----- LLM docs coverage check -----
+
+const DOC_SECTION_ALIASES = new Map([
+  ['Header', 'Layout'],
+  ['Sidebar', 'Layout'],
+  ['Content', 'Layout'],
+  ['Footer', 'Layout'],
+  ['Row', 'Grid'],
+  ['Col', 'Grid'],
+  ['CollapsePanel', 'Collapse'],
+  ['MenuItem', 'Menu'],
+  ['SubMenu', 'Menu'],
+  ['MenuItemGroup', 'Menu'],
+  ['TabPane', 'Tabs'],
+  ['BreadcrumbItem', 'Breadcrumb'],
+  ['StepsItem', 'Steps'],
+  ['DropdownMenu', 'Dropdown'],
+  ['DropdownItem', 'Dropdown'],
+  ['FloatButtonGroup', 'FloatButton'],
+  ['InputGroupAddon', 'InputGroup'],
+  ['PrintPageBreak', 'PrintLayout'],
+  ['MessageContainer', 'Message'],
+  ['NotificationContainer', 'Notification']
+])
+
+function collectMarkdownContent(dir, options = {}) {
+  const markdownFiles = collectFiles(dir, ['.md']).filter((file) => {
+    if (options.excludeIndex && basename(file) === 'index.md') return false
+    if (options.includePattern && !options.includePattern.test(file)) return false
+    return true
+  })
+  return markdownFiles.map((file) => readFileSync(file, 'utf-8')).join('\n')
+}
+
+function collectPublicComponentExports(indexFile) {
+  const content = readFileSync(indexFile, 'utf-8')
+  const componentExports = new Set()
+  const exportRegex = /export\s+\{([^}]+)\}\s+from\s+['"]\.\/components\//g
+  let match
+
+  while ((match = exportRegex.exec(content)) !== null) {
+    const specifiers = match[1].split(',').map((specifier) => specifier.trim())
+    for (const specifier of specifiers) {
+      const name = specifier.split(/\s+as\s+/)[0].trim()
+      if (!/^[A-Z]/.test(name)) continue
+      if (/Context$/.test(name)) continue
+      componentExports.add(name)
+    }
+  }
+
+  return componentExports
+}
+
+function getDocTarget(componentName) {
+  return DOC_SECTION_ALIASES.get(componentName) || componentName
+}
+
+function hasHeadingOrMention(content, target) {
+  const escaped = escapeRegExp(target)
+  return (
+    new RegExp(`^#{2,4}\\s+.*\\b${escaped}\\b`, 'm').test(content) ||
+    new RegExp(`\\b${escaped}\\b`).test(content)
+  )
+}
+
+const vuePublicComponents = collectPublicComponentExports(
+  join(ROOT, 'packages', 'vue', 'src', 'index.ts')
+)
+const reactPublicComponents = collectPublicComponentExports(
+  join(ROOT, 'packages', 'react', 'src', 'index.tsx')
+)
+const allPublicComponents = new Set([...vuePublicComponents, ...reactPublicComponents])
+
+const sharedPropsDocs = collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'shared', 'props'))
+const vueExampleDocs = `${collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'vue'), {
+  excludeIndex: true
+})}\n${collectMarkdownContent(SKILL_REFERENCES_DIR, {
+  includePattern: /\/(i18n|theme|ssr)\.md$/
+})}`
+const reactExampleDocs = `${collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'react'), {
+  excludeIndex: true
+})}\n${collectMarkdownContent(SKILL_REFERENCES_DIR, {
+  includePattern: /\/(i18n|theme|ssr)\.md$/
+})}`
+
+for (const componentName of [...allPublicComponents].sort()) {
+  const docTarget = getDocTarget(componentName)
+
+  if (!hasHeadingOrMention(sharedPropsDocs, docTarget)) {
+    addIssue(
+      'skills/tigercat/references/shared/props',
+      0,
+      'docs-api',
+      `公开组件 "${componentName}" 缺少 shared Props 文档（期望匹配：${docTarget}）`
+    )
+  }
+
+  if (vuePublicComponents.has(componentName) && !hasHeadingOrMention(vueExampleDocs, docTarget)) {
+    addIssue(
+      'skills/tigercat/references/vue',
+      0,
+      'docs-api',
+      `Vue 公开组件 "${componentName}" 缺少示例文档（期望匹配：${docTarget}）`
+    )
+  }
+
+  if (
+    reactPublicComponents.has(componentName) &&
+    !hasHeadingOrMention(reactExampleDocs, docTarget)
+  ) {
+    addIssue(
+      'skills/tigercat/references/react',
+      0,
+      'docs-api',
+      `React 公开组件 "${componentName}" 缺少示例文档（期望匹配：${docTarget}）`
+    )
+  }
+}
+
 // ----- Report -----
 
 if (jsonMode) {
@@ -455,7 +575,8 @@ if (jsonMode) {
       'missing-react': '缺失 React 实现',
       'missing-vue': '缺失 Vue 实现',
       'overlay-api': '弹出层 API 一致性',
-      'deprecated-in-example': '废弃 API 仍在 Example 中使用'
+      'deprecated-in-example': '废弃 API 仍在 Example 中使用',
+      'docs-api': 'LLM 文档与公开 API 覆盖'
     }
 
     for (const [rule, items] of Object.entries(grouped)) {

@@ -30,6 +30,21 @@ import { Button } from '@expcat/tigercat-react'
 
 ---
 
+## ButtonGroup 按钮组
+
+```tsx
+<ButtonGroup size="sm">
+  <Button>Save</Button>
+  <Button variant="outline">Cancel</Button>
+</ButtonGroup>
+<ButtonGroup vertical>
+  <Button>Up</Button>
+  <Button>Down</Button>
+</ButtonGroup>
+```
+
+---
+
 ## Alert 警告提示
 
 ```tsx
@@ -82,6 +97,19 @@ import { Button } from '@expcat/tigercat-react'
 <Badge content={5} standalone={false}><Avatar /></Badge>
 <Badge type="dot" standalone={false}><Avatar /></Badge>
 <Badge type="text" content="NEW" variant="primary" />
+```
+
+---
+
+## AvatarGroup 头像组
+
+```tsx
+<AvatarGroup max={3} size="sm">
+  <Avatar src="/a.png" alt="A" />
+  <Avatar src="/b.png" alt="B" />
+  <Avatar text="CD" />
+  <Avatar text="EF" />
+</AvatarGroup>
 ```
 
 ---
