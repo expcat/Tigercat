@@ -5,6 +5,8 @@ import {
   computed,
   h,
   ref,
+  watch,
+  onBeforeUnmount,
   PropType,
   type ComputedRef
 } from 'vue'
@@ -23,12 +25,14 @@ import {
   getValueByPath,
   createFormErrorMap,
   getDependentFields,
+  createFormValidationDebouncer,
   createFormHistory,
   pushFormHistory,
   undoFormHistory,
   redoFormHistory,
   canUndo,
   canRedo,
+  type FormValidationDebouncer,
   type FormHistoryState
 } from '@expcat/tigercat-core'
 
@@ -70,6 +74,7 @@ export interface VueFormProps {
   disabled?: boolean
   loading?: boolean
   fieldDependencies?: Map<string, string[]>
+  validateDebounce?: number
   undoable?: boolean
   maxHistorySize?: number
 }
@@ -158,6 +163,10 @@ export const Form = defineComponent({
       type: Object as PropType<Map<string, string[]>>,
       default: undefined
     },
+    validateDebounce: {
+      type: Number,
+      default: 0
+    },
     undoable: {
       type: Boolean,
       default: false
@@ -182,6 +191,9 @@ export const Form = defineComponent({
     const errors = reactive<FormError[]>([])
     const fieldRules = reactive<Record<string, FormRule | FormRule[]>>({})
     const errorsByField = computed(() => createFormErrorMap(errors))
+    let validationDebouncer: FormValidationDebouncer = createFormValidationDebouncer({
+      delay: props.validateDebounce
+    })
 
     // v0.6.0: undo/redo history
     const history = ref<FormHistoryState>(
@@ -227,7 +239,7 @@ export const Form = defineComponent({
       return validateFieldUtil(fieldName, value, effectiveFieldRules, props.model, trigger)
     }
 
-    const validateField = async (
+    const validateFieldNow = async (
       fieldName: string,
       rulesOverride?: FormRule | FormRule[],
       trigger?: FormRuleTrigger
@@ -267,12 +279,28 @@ export const Form = defineComponent({
       if (props.fieldDependencies) {
         const dependents = getDependentFields(fieldName, props.fieldDependencies)
         for (const dep of dependents) {
-          await validateField(dep)
+          await validateFieldNow(dep)
         }
       }
     }
 
+    const validateField = async (
+      fieldName: string,
+      rulesOverride?: FormRule | FormRule[],
+      trigger?: FormRuleTrigger
+    ): Promise<void> => {
+      if (trigger === 'change' && props.validateDebounce > 0) {
+        return validationDebouncer.schedule(fieldName, () =>
+          validateFieldNow(fieldName, rulesOverride, trigger)
+        )
+      }
+
+      validationDebouncer.cancel(fieldName)
+      return validateFieldNow(fieldName, rulesOverride, trigger)
+    }
+
     const validate = async (): Promise<boolean> => {
+      validationDebouncer.cancel()
       errors.splice(0, errors.length)
       const effectiveRules = getEffectiveRules()
       if (!effectiveRules) {
@@ -288,6 +316,8 @@ export const Form = defineComponent({
       if (!fieldNames || fieldNames.length === 0) {
         return true
       }
+
+      fieldNames.forEach((fieldName) => validationDebouncer.cancel(fieldName))
 
       const nextErrors: FormError[] = []
       const fieldSet = new Set(fieldNames)
@@ -320,11 +350,13 @@ export const Form = defineComponent({
 
     const clearValidate = (fieldNames?: string | string[]): void => {
       if (!fieldNames) {
+        validationDebouncer.cancel()
         errors.splice(0, errors.length)
         return
       }
 
       const fields = Array.isArray(fieldNames) ? fieldNames : [fieldNames]
+      fields.forEach((fieldName) => validationDebouncer.cancel(fieldName))
 
       fields.forEach((fieldName) => {
         const index = errors.findIndex((e) => e.field === fieldName)
@@ -335,6 +367,7 @@ export const Form = defineComponent({
     }
 
     const resetFields = (): void => {
+      validationDebouncer.cancel()
       clearValidate()
     }
 
@@ -350,6 +383,18 @@ export const Form = defineComponent({
         clearValidate(fieldName)
       }
     }
+
+    watch(
+      () => props.validateDebounce,
+      (delay) => {
+        validationDebouncer.cancel()
+        validationDebouncer = createFormValidationDebouncer({ delay })
+      }
+    )
+
+    onBeforeUnmount(() => {
+      validationDebouncer.cancel()
+    })
 
     // v0.6.0: undo/redo
     const snapshotHistory = (): void => {

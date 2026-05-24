@@ -23,12 +23,14 @@ import {
   getValueByPath,
   createFormErrorMap,
   getDependentFields,
+  createFormValidationDebouncer,
   createFormHistory,
   pushFormHistory,
   undoFormHistory,
   redoFormHistory,
   canUndo,
-  canRedo
+  canRedo,
+  type FormValidationDebouncer
 } from '@expcat/tigercat-core'
 
 // Form context type
@@ -127,6 +129,11 @@ export interface FormProps extends CoreFormProps {
   fieldDependencies?: Map<string, string[]>
 
   /**
+   * Debounce delay for change-triggered field validation in milliseconds
+   */
+  validateDebounce?: number
+
+  /**
    * Enable undo/redo for form values
    */
   undoable?: boolean
@@ -156,6 +163,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
       onChange,
       className,
       fieldDependencies,
+      validateDebounce = 0,
       undoable = false,
       maxHistorySize = 50,
       ...props
@@ -166,6 +174,9 @@ export const Form = forwardRef<FormHandle, FormProps>(
     const [formValues, setFormValues] = useState<FormValues>(model)
     const fieldRulesRef = React.useRef<FormRules>({})
     const formValuesRef = React.useRef<FormValues>(model)
+    const validationDebouncerRef = React.useRef<FormValidationDebouncer>(
+      createFormValidationDebouncer({ delay: validateDebounce })
+    )
     const errorsByField = useMemo(() => createFormErrorMap(errors), [errors])
 
     // v0.6.0: undo/redo history
@@ -175,6 +186,13 @@ export const Form = forwardRef<FormHandle, FormProps>(
     React.useEffect(() => {
       setFormValues(model)
     }, [model])
+
+    React.useEffect(() => {
+      validationDebouncerRef.current.cancel()
+      validationDebouncerRef.current = createFormValidationDebouncer({ delay: validateDebounce })
+
+      return () => validationDebouncerRef.current.cancel()
+    }, [validateDebounce])
 
     // Keep ref always in sync with the latest model for imperative methods
     formValuesRef.current = model
@@ -227,7 +245,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
       [resolveFieldRules]
     )
 
-    const validateField = useCallback(
+    const validateFieldNow = useCallback(
       async (
         fieldName: string,
         rulesOverride?: FormRule | FormRule[],
@@ -262,17 +280,36 @@ export const Form = forwardRef<FormHandle, FormProps>(
         if (fieldDependencies) {
           const dependents = getDependentFields(fieldName, fieldDependencies)
           for (const dep of dependents) {
-            await validateField(dep)
+            await validateFieldNow(dep)
           }
         }
       },
       [resolveFieldRules, runFieldValidation, onValidate, fieldDependencies]
     )
 
+    const validateField = useCallback(
+      async (
+        fieldName: string,
+        rulesOverride?: FormRule | FormRule[],
+        trigger?: FormRuleTrigger
+      ): Promise<void> => {
+        if (trigger === 'change' && validateDebounce > 0) {
+          return validationDebouncerRef.current.schedule(fieldName, () =>
+            validateFieldNow(fieldName, rulesOverride, trigger)
+          )
+        }
+
+        validationDebouncerRef.current.cancel(fieldName)
+        return validateFieldNow(fieldName, rulesOverride, trigger)
+      },
+      [validateDebounce, validateFieldNow]
+    )
+
     const runValidation = useCallback(async (): Promise<{
       valid: boolean
       errors: FormError[]
     }> => {
+      validationDebouncerRef.current.cancel()
       const effectiveRules = getEffectiveRules()
       if (!effectiveRules) {
         setErrors([])
@@ -293,6 +330,8 @@ export const Form = forwardRef<FormHandle, FormProps>(
         if (!fieldNames || fieldNames.length === 0) {
           return true
         }
+
+        fieldNames.forEach((fieldName) => validationDebouncerRef.current.cancel(fieldName))
 
         const nextErrors: FormError[] = []
         const fieldSet = new Set(fieldNames)
@@ -325,11 +364,13 @@ export const Form = forwardRef<FormHandle, FormProps>(
 
     const clearValidate = useCallback((fieldNames?: string | string[]): void => {
       if (!fieldNames) {
+        validationDebouncerRef.current.cancel()
         setErrors([])
         return
       }
 
       const fields = Array.isArray(fieldNames) ? fieldNames : [fieldNames]
+      fields.forEach((fieldName) => validationDebouncerRef.current.cancel(fieldName))
       setErrors((prevErrors) => prevErrors.filter((error) => !fields.includes(error.field)))
     }, [])
 

@@ -218,6 +218,13 @@ export interface FormProps {
   fieldDependencies?: Map<string, string[]>
 
   /**
+   * Debounce delay for change-triggered field validation in milliseconds.
+   * Blur, submit, and imperative validation still run immediately.
+   * @default 0
+   */
+  validateDebounce?: number
+
+  /**
    * Enable undo/redo for form values
    * @default false
    */

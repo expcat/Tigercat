@@ -16,7 +16,11 @@ function makePoints(count: number): Array<{ x: number; y: number }> {
 }
 
 describe('Chart SVG path generation', () => {
-  const points = makePoints(1000)
+  const pointSets = {
+    100: makePoints(100),
+    500: makePoints(500),
+    1000: makePoints(1000)
+  }
   const pieData = Array.from({ length: 120 }, (_, index) => ({
     name: `Slice ${index}`,
     value: (index % 9) + 1
@@ -26,13 +30,15 @@ describe('Chart SVG path generation', () => {
     value: (index % 12) + 1
   }))
 
-  bench('line path with 1000 points', () => {
-    createLinePath(points, 'linear')
-  })
+  for (const [label, points] of Object.entries(pointSets)) {
+    bench(`line path with ${label} points`, () => {
+      createLinePath(points, 'linear')
+    })
 
-  bench('monotone area path with 1000 points', () => {
-    createAreaPath(points, 180, 'monotone')
-  })
+    bench(`monotone area path with ${label} points`, () => {
+      createAreaPath(points, 180, 'monotone')
+    })
+  }
 
   bench('pie arcs and donut paths for 120 slices', () => {
     const arcs = getPieArcs(pieData, { padAngle: 0.005 })

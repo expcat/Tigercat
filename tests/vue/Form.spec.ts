@@ -684,6 +684,57 @@ describe('Form', () => {
       expect(await screen.findByText('Name is required')).toBeInTheDocument()
     })
 
+    it('debounces change-triggered validation when validateDebounce is set', async () => {
+      vi.useFakeTimers()
+      const onValidate = vi.fn()
+
+      try {
+        const Demo = defineComponent({
+          setup() {
+            const model = reactive({ name: '' })
+            const rules: FormRules = {
+              name: [{ min: 3, message: 'Name must be at least 3 characters', trigger: 'change' }]
+            }
+
+            return () =>
+              h(
+                Form,
+                { model, rules, validateDebounce: 200, onValidate },
+                {
+                  default: () =>
+                    h(
+                      FormItem,
+                      { label: 'Name', name: 'name' },
+                      {
+                        default: () =>
+                          h('input', {
+                            'aria-label': 'name',
+                            value: model.name,
+                            onInput: (event: Event) => {
+                              model.name = (event.target as HTMLInputElement).value
+                            }
+                          })
+                      }
+                    )
+                }
+              )
+          }
+        })
+
+        render(Demo)
+        await fireEvent.update(screen.getByLabelText('name'), 'Jo')
+
+        expect(onValidate).not.toHaveBeenCalled()
+        await vi.advanceTimersByTimeAsync(199)
+        expect(onValidate).not.toHaveBeenCalled()
+        await vi.advanceTimersByTimeAsync(1)
+
+        expect(onValidate).toHaveBeenCalledWith('name', false, 'Name must be at least 3 characters')
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+
     it('clears error when valid value is entered', async () => {
       const Demo = defineComponent({
         setup() {

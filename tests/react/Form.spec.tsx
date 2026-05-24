@@ -477,6 +477,48 @@ describe('Form', () => {
       expect(await screen.findByText('Name is required')).toBeInTheDocument()
     })
 
+    it('debounces change-triggered validation when validateDebounce is set', async () => {
+      vi.useFakeTimers()
+      const onValidate = vi.fn()
+
+      try {
+        function Demo() {
+          const [model, setModel] = useState({ name: '' })
+          const rules: FormRules = {
+            name: [{ min: 3, message: 'Name must be at least 3 characters', trigger: 'change' }]
+          }
+
+          return (
+            <Form model={model} rules={rules} validateDebounce={200} onValidate={onValidate}>
+              <FormItem label="Name" name="name">
+                <input
+                  aria-label="name"
+                  value={model.name}
+                  onChange={(event) => setModel({ name: event.target.value })}
+                />
+              </FormItem>
+            </Form>
+          )
+        }
+
+        render(<Demo />)
+        fireEvent.change(screen.getByLabelText('name'), { target: { value: 'Jo' } })
+
+        expect(onValidate).not.toHaveBeenCalled()
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(199)
+        })
+        expect(onValidate).not.toHaveBeenCalled()
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1)
+        })
+
+        expect(onValidate).toHaveBeenCalledWith('name', false, 'Name must be at least 3 characters')
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+
     it('clears error when valid value is entered', async () => {
       const user = userEvent.setup()
       const formRef = React.createRef<FormHandle>()

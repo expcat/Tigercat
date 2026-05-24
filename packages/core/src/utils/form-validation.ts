@@ -14,6 +14,26 @@ import type {
 
 export type FormValidationPreset = Extract<FormRuleType, 'email' | 'phone' | 'url' | 'id-card'>
 
+export interface FormValidationDebouncerOptions {
+  delay?: number
+  setTimer?: (callback: () => void, delay: number) => number
+  clearTimer?: (handle: number) => void
+}
+
+export interface FormValidationDebouncer {
+  schedule: (fieldName: string, validate: () => Promise<void> | void) => Promise<void>
+  flush: (fieldName?: string) => Promise<void>
+  cancel: (fieldName?: string) => void
+  isPending: (fieldName?: string) => boolean
+}
+
+interface PendingValidation {
+  timerHandle: number
+  validate: () => Promise<void> | void
+  resolveCallbacks: Array<() => void>
+  rejectCallbacks: Array<(error: unknown) => void>
+}
+
 export function getValueByPath(values: FormValues | undefined, path: string): unknown {
   if (!values || !path) {
     return undefined
@@ -67,6 +87,91 @@ export function createFormValidationRule(
   return {
     ...FORM_VALIDATION_PRESETS[preset],
     ...overrides
+  }
+}
+
+export function createFormValidationDebouncer(
+  options: FormValidationDebouncerOptions = {}
+): FormValidationDebouncer {
+  const delay = Number.isFinite(options.delay) && (options.delay ?? 0) > 0 ? options.delay! : 0
+  const setTimer =
+    options.setTimer ?? ((callback, timeout) => globalThis.setTimeout(callback, timeout))
+  const clearTimer = options.clearTimer ?? ((handle) => globalThis.clearTimeout(handle))
+  const pending = new Map<string, PendingValidation>()
+
+  const runPending = async (fieldName: string): Promise<void> => {
+    const entry = pending.get(fieldName)
+    if (!entry) return
+
+    pending.delete(fieldName)
+    clearTimer(entry.timerHandle)
+
+    try {
+      await entry.validate()
+      entry.resolveCallbacks.forEach((resolve) => resolve())
+    } catch (error) {
+      entry.rejectCallbacks.forEach((reject) => reject(error))
+    }
+  }
+
+  const cancel = (fieldName?: string): void => {
+    const fieldNames = fieldName ? [fieldName] : Array.from(pending.keys())
+
+    for (const name of fieldNames) {
+      const entry = pending.get(name)
+      if (!entry) continue
+
+      pending.delete(name)
+      clearTimer(entry.timerHandle)
+      entry.resolveCallbacks.forEach((resolve) => resolve())
+    }
+  }
+
+  const flush = async (fieldName?: string): Promise<void> => {
+    const fieldNames = fieldName ? [fieldName] : Array.from(pending.keys())
+
+    for (const name of fieldNames) {
+      await runPending(name)
+    }
+  }
+
+  const schedule = (fieldName: string, validate: () => Promise<void> | void): Promise<void> => {
+    if (delay <= 0) {
+      return Promise.resolve(validate())
+    }
+
+    return new Promise((resolve, reject) => {
+      const existing = pending.get(fieldName)
+
+      if (existing) {
+        clearTimer(existing.timerHandle)
+        existing.validate = validate
+        existing.resolveCallbacks.push(resolve)
+        existing.rejectCallbacks.push(reject)
+        existing.timerHandle = setTimer(() => {
+          void runPending(fieldName)
+        }, delay)
+        return
+      }
+
+      pending.set(fieldName, {
+        timerHandle: setTimer(() => {
+          void runPending(fieldName)
+        }, delay),
+        validate,
+        resolveCallbacks: [resolve],
+        rejectCallbacks: [reject]
+      })
+    })
+  }
+
+  return {
+    schedule,
+    flush,
+    cancel,
+    isPending: (fieldName?: string) => {
+      return fieldName ? pending.has(fieldName) : pending.size > 0
+    }
   }
 }
 

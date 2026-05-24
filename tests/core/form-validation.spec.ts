@@ -11,7 +11,8 @@ import {
   getErrorFields,
   FORM_VALIDATION_PRESETS,
   createFormValidationRule,
-  validateFormFields
+  validateFormFields,
+  createFormValidationDebouncer
 } from '@expcat/tigercat-core'
 
 describe('form-validation', () => {
@@ -434,6 +435,49 @@ describe('form-validation', () => {
       it('returns empty array for no errors', () => {
         expect(getErrorFields([])).toEqual([])
       })
+    })
+  })
+
+  describe('createFormValidationDebouncer', () => {
+    it('debounces validation per field and runs the latest task', async () => {
+      const firstValidation = vi.fn()
+      const latestValidation = vi.fn()
+      const callbacks = new Map<number, () => void>()
+      let nextHandle = 0
+      const debouncer = createFormValidationDebouncer({
+        delay: 200,
+        setTimer: (callback) => {
+          nextHandle += 1
+          callbacks.set(nextHandle, callback)
+          return nextHandle
+        },
+        clearTimer: (handle) => callbacks.delete(handle)
+      })
+
+      const firstPromise = debouncer.schedule('name', firstValidation)
+      const latestPromise = debouncer.schedule('name', latestValidation)
+
+      expect(debouncer.isPending('name')).toBe(true)
+      expect(callbacks.size).toBe(1)
+
+      callbacks.get(nextHandle)?.()
+      await Promise.all([firstPromise, latestPromise])
+
+      expect(firstValidation).not.toHaveBeenCalled()
+      expect(latestValidation).toHaveBeenCalledTimes(1)
+      expect(debouncer.isPending()).toBe(false)
+    })
+
+    it('flushes pending validation immediately', async () => {
+      const validate = vi.fn()
+      const debouncer = createFormValidationDebouncer({ delay: 200 })
+
+      const promise = debouncer.schedule('email', validate)
+      await debouncer.flush('email')
+      await promise
+
+      expect(validate).toHaveBeenCalledTimes(1)
+      expect(debouncer.isPending('email')).toBe(false)
     })
   })
 })
