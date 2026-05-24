@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-24）：§1 技术债务清理 — 修正 validate 对参数化测试的计数，补齐低测试数组件的技术债覆盖，`pnpm test:validate` 降至 0 warnings，完整 Vitest 6665/6665 通过。
+> **最近完成**（2026-05-24）：§2 废弃 API 移除 — 移除 ImagePreview `visible`、Image Vue `preview-visible-change`、Image React `onPreviewVisibleChange` 兼容层，更新测试、Props 文档与 CHANGELOG Breaking Change。
 
 ## 基线 v1.1.0
 
@@ -58,20 +58,20 @@ source: project audit and planning
 
 ## 二、废弃 API 移除
 
-### 2.1 当前废弃清单
+### 2.1 已移除废弃清单
 
-| 组件          | 废弃 API                      | 替代                  | 引入版本 | 计划移除 |
-| ------------- | ----------------------------- | --------------------- | -------- | -------- |
-| ImagePreview  | `visible` prop                | `open`                | v0.5.0   | v2.0     |
-| Image (Vue)   | `preview-visible-change` 事件 | `preview-open-change` | v1.0.0   | v2.0     |
-| Image (React) | `onPreviewVisibleChange` prop | `onPreviewOpenChange` | v1.0.0   | v2.0     |
+| 组件          | 废弃 API                      | 替代                  | 引入版本 | 移除版本 | 状态      |
+| ------------- | ----------------------------- | --------------------- | -------- | -------- | --------- |
+| ImagePreview  | `visible` prop                | `open`                | v0.5.0   | v2.0     | ✅ 已移除 |
+| Image (Vue)   | `preview-visible-change` 事件 | `preview-open-change` | v1.0.0   | v2.0     | ✅ 已移除 |
+| Image (React) | `onPreviewVisibleChange` prop | `onPreviewOpenChange` | v1.0.0   | v2.0     | ✅ 已移除 |
 
 ### 2.2 执行步骤
 
 - [x] v1.2：开发环境 console.warn 输出 deprecation 提示，生产环境静默
 - [x] v1.2：`skills/tigercat/references/shared/props/basic.md` Image 部分添加迁移说明
 - [x] v1.x：Example 中所有用法已使用新 API，旧别名仅保留为兼容层
-- [ ] v2.0：删除废弃 prop/事件、移除兼容层代码，CHANGELOG 标注 Breaking Change
+- [x] v2.0：删除废弃 prop/事件、移除兼容层代码，CHANGELOG 标注 Breaking Change
 
 ### 2.3 预防机制
 

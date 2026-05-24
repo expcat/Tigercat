@@ -96,38 +96,29 @@ describe('Image', () => {
     expect(container.querySelector('[data-testid="custom-error"]')).toBeInTheDocument()
   })
 
-  it('calls new and deprecated preview callbacks when preview opens', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+  it('calls onPreviewOpenChange when preview opens', () => {
     const onPreviewOpenChange = vi.fn()
-    const onPreviewVisibleChange = vi.fn()
 
     const { container } = render(
-      <Image
-        src="/test.jpg"
-        onPreviewOpenChange={onPreviewOpenChange}
-        onPreviewVisibleChange={onPreviewVisibleChange}
-      />
+      <Image src="/test.jpg" onPreviewOpenChange={onPreviewOpenChange} />
     )
 
     fireEvent.click(container.firstElementChild as Element)
 
     expect(onPreviewOpenChange).toHaveBeenCalledWith(true)
-    expect(onPreviewVisibleChange).toHaveBeenCalledWith(true)
-    expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn).toHaveBeenCalledWith(
-      '[Tigercat] Image: "onPreviewVisibleChange" prop is deprecated and will be removed in v2.0. Use "onPreviewOpenChange" instead.'
-    )
-
-    warn.mockRestore()
   })
 
-  it('does not warn when deprecated preview callback is not used', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+  it('calls onPreviewOpenChange when standalone preview closes', () => {
+    const onPreviewOpenChange = vi.fn()
 
-    render(<Image src="/test.jpg" onPreviewOpenChange={vi.fn()} />)
+    const { container } = render(
+      <Image src="/test.jpg" onPreviewOpenChange={onPreviewOpenChange} />
+    )
 
-    expect(warn).not.toHaveBeenCalled()
-    warn.mockRestore()
+    fireEvent.click(container.firstElementChild as Element)
+    fireEvent.click(document.querySelector('[aria-label="Close preview"]') as HTMLElement)
+
+    expect(onPreviewOpenChange).toHaveBeenLastCalledWith(false)
   })
 
   it('passes accessibility checks', async () => {

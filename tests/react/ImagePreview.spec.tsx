@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { ImagePreview } from '@expcat/tigercat-react'
@@ -25,27 +25,20 @@ describe('ImagePreview', () => {
     expect(dialog).toHaveAttribute('aria-modal', 'true')
   })
 
-  it('supports deprecated visible prop with warning', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-
-    render(<ImagePreview visible images={images} />)
-
-    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
-    expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn).toHaveBeenCalledWith(
-      '[Tigercat] ImagePreview: "visible" prop is deprecated and will be removed in v2.0. Use "open" instead.'
-    )
-
-    warn.mockRestore()
-  })
-
-  it('prefers open over deprecated visible prop', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-
-    render(<ImagePreview open={false} visible images={images} />)
+  it('uses open prop as the only controlled visibility API', () => {
+    const { rerender } = render(<ImagePreview open={false} images={images} />)
 
     expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
-    warn.mockRestore()
+
+    rerender(<ImagePreview open images={images} />)
+
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+  })
+
+  it('renders nothing when images list is empty', () => {
+    render(<ImagePreview open images={[]} />)
+
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
   })
 
   it('displays current image', () => {

@@ -5,7 +5,6 @@ import {
   computed,
   onMounted,
   onBeforeUnmount,
-  getCurrentInstance,
   inject,
   PropType
 } from 'vue'
@@ -58,9 +57,8 @@ export const Image = defineComponent({
       default: undefined
     }
   },
-  emits: ['load', 'error', 'preview-open-change', 'preview-visible-change'],
+  emits: ['load', 'error', 'preview-open-change'],
   setup(props, { slots, emit, attrs }) {
-    const instance = getCurrentInstance()
     const loading = ref(true)
     const error = ref(false)
     const actualSrc = ref(props.lazy ? '' : props.src)
@@ -117,27 +115,6 @@ export const Image = defineComponent({
       emit('error')
     }
 
-    let deprecationWarned = false
-    const hasDeprecatedPreviewVisibleListener = () => {
-      const vnodeProps = instance?.vnode.props as Record<string, unknown> | null
-      return Boolean(vnodeProps?.onPreviewVisibleChange || vnodeProps?.['onPreview-visible-change'])
-    }
-
-    const warnDeprecation = () => {
-      const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
-        ?.env
-      if (
-        env?.NODE_ENV !== 'production' &&
-        !deprecationWarned &&
-        hasDeprecatedPreviewVisibleListener()
-      ) {
-        deprecationWarned = true
-        console.warn(
-          '[Tigercat] Image: "preview-visible-change" event is deprecated and will be removed in v2.0. Use "preview-open-change" instead.'
-        )
-      }
-    }
-
     const handleClick = () => {
       if (!props.preview) return
       if (group) {
@@ -145,8 +122,6 @@ export const Image = defineComponent({
       } else {
         previewVisible.value = true
         emit('preview-open-change', true)
-        warnDeprecation()
-        emit('preview-visible-change', true)
       }
     }
 
@@ -245,8 +220,6 @@ export const Image = defineComponent({
               'onUpdate:open': (val: boolean) => {
                 previewVisible.value = val
                 emit('preview-open-change', val)
-                warnDeprecation()
-                emit('preview-visible-change', val)
               }
             })
           : null

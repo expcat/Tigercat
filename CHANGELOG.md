@@ -2,6 +2,14 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.0.0 — Breaking Changes
+
+### Removed
+
+- **ImagePreview**: 移除已废弃的 `visible` prop，请使用 `open`。
+- **Image (Vue)**: 移除已废弃的 `preview-visible-change` 事件，请使用 `preview-open-change`。
+- **Image (React)**: 移除已废弃的 `onPreviewVisibleChange` prop，请使用 `onPreviewOpenChange`。
+
 ## v1.0.0 — 正式发布 🎉
 
 Tigercat 首个正式版本，标志着从实验阶段进入稳定阶段。从 v1.0.0 起遵循 SemVer 语义化版本：

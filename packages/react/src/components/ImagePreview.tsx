@@ -55,8 +55,6 @@ const SvgIcon: React.FC<{ d: string; cls?: string }> = ({ d, cls = 'w-5 h-5' }) 
 
 export const ImagePreview: React.FC<ImagePreviewProps> = ({
   open,
-  visible,
-
   images,
   currentIndex = 0,
   zIndex = 1050,
@@ -69,19 +67,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   onCurrentIndexChange,
   onScaleChange
 }) => {
-  const deprecationWarnedRef = useRef(false)
-  const isOpen = open ?? visible ?? false
-
-  useEffect(() => {
-    const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
-      ?.env
-    if (env?.NODE_ENV !== 'production' && visible !== undefined && !deprecationWarnedRef.current) {
-      deprecationWarnedRef.current = true
-      console.warn(
-        '[Tigercat] ImagePreview: "visible" prop is deprecated and will be removed in v2.0. Use "open" instead.'
-      )
-    }
-  }, [visible])
+  const isOpen = open ?? false
 
   const [scale, setScale] = useState(1)
   const [rotation, setRotation] = useState(0)

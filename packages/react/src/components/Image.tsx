@@ -29,10 +29,6 @@ export interface ImageProps
    * Callback when preview visibility changes
    */
   onPreviewOpenChange?: (open: boolean) => void
-  /**
-   * @deprecated Use `onPreviewOpenChange` instead
-   */
-  onPreviewVisibleChange?: (visible: boolean) => void
 }
 
 const SvgIcon: React.FC<{ d: string; className?: string }> = ({ d, className = 'w-8 h-8' }) => (
@@ -59,7 +55,6 @@ export const Image: React.FC<ImageProps> = ({
   errorRender,
   placeholderRender,
   onPreviewOpenChange,
-  onPreviewVisibleChange,
   onClick,
   onKeyDown,
   style,
@@ -72,19 +67,6 @@ export const Image: React.FC<ImageProps> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const group = useContext(ImageGroupContext)
   const registeredIndexRef = useRef(-1)
-  const deprecationWarnedRef = useRef(false)
-
-  // Deprecation warning for onPreviewVisibleChange
-  useEffect(() => {
-    const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
-      ?.env
-    if (env?.NODE_ENV !== 'production' && onPreviewVisibleChange && !deprecationWarnedRef.current) {
-      deprecationWarnedRef.current = true
-      console.warn(
-        '[Tigercat] Image: "onPreviewVisibleChange" prop is deprecated and will be removed in v2.0. Use "onPreviewOpenChange" instead.'
-      )
-    }
-  }, [onPreviewVisibleChange])
 
   // Register/unregister with group
   useEffect(() => {
@@ -145,10 +127,9 @@ export const Image: React.FC<ImageProps> = ({
       } else {
         setPreviewVisible(true)
         onPreviewOpenChange?.(true)
-        onPreviewVisibleChange?.(true)
       }
     },
-    [preview, group, onClick, onPreviewOpenChange, onPreviewVisibleChange]
+    [preview, group, onClick, onPreviewOpenChange]
   )
 
   const handleKeyDown = useCallback(
@@ -225,7 +206,6 @@ export const Image: React.FC<ImageProps> = ({
           onOpenChange={(val) => {
             setPreviewVisible(val)
             onPreviewOpenChange?.(val)
-            onPreviewVisibleChange?.(val)
           }}
         />
       )}

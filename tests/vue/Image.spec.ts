@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Image } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -149,34 +149,8 @@ describe('Image', () => {
     expect(emitted()).toHaveProperty('error')
   })
 
-  it('emits new and deprecated preview events when preview opens', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-    const onPreviewVisibleChange = vi.fn()
-
+  it('emits preview-open-change when preview opens', async () => {
     const { container, emitted } = render(Image, {
-      props: {
-        src: '/test.jpg',
-        onPreviewVisibleChange
-      }
-    })
-
-    await fireEvent.click(container.firstElementChild as Element)
-
-    expect(emitted()['preview-open-change'][0]).toEqual([true])
-    expect(emitted()['preview-visible-change'][0]).toEqual([true])
-    expect(onPreviewVisibleChange).toHaveBeenCalledWith(true)
-    expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn).toHaveBeenCalledWith(
-      '[Tigercat] Image: "preview-visible-change" event is deprecated and will be removed in v2.0. Use "preview-open-change" instead.'
-    )
-
-    warn.mockRestore()
-  })
-
-  it('does not warn when deprecated preview event is not used', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-
-    const { container } = render(Image, {
       props: {
         src: '/test.jpg'
       }
@@ -184,8 +158,20 @@ describe('Image', () => {
 
     await fireEvent.click(container.firstElementChild as Element)
 
-    expect(warn).not.toHaveBeenCalled()
-    warn.mockRestore()
+    expect(emitted()['preview-open-change'][0]).toEqual([true])
+  })
+
+  it('emits preview-open-change when standalone preview closes', async () => {
+    const { container, emitted } = render(Image, {
+      props: {
+        src: '/test.jpg'
+      }
+    })
+
+    await fireEvent.click(container.firstElementChild as Element)
+    await fireEvent.click(document.querySelector('[aria-label="Close preview"]') as HTMLElement)
+
+    expect(emitted()['preview-open-change'][1]).toEqual([false])
   })
 
   it('passes accessibility checks', async () => {

@@ -5,7 +5,6 @@ import {
   ref,
   computed,
   watch,
-  getCurrentInstance,
   onMounted,
   onBeforeUnmount,
   PropType
@@ -35,8 +34,6 @@ import {
 
 export interface VueImagePreviewProps {
   open?: boolean
-  /** @deprecated Use `open` instead. This compatibility alias will be removed in v2.0. */
-  visible?: boolean
   images?: string[]
   currentIndex?: number
   zIndex?: number
@@ -71,7 +68,6 @@ export const ImagePreview = defineComponent({
   inheritAttrs: false,
   props: {
     open: { type: Boolean, default: undefined },
-    visible: { type: Boolean, default: undefined },
     images: { type: Array as PropType<string[]>, default: () => [] },
     currentIndex: { type: Number, default: 0 },
     zIndex: { type: Number, default: 1050 },
@@ -80,9 +76,8 @@ export const ImagePreview = defineComponent({
     minScale: { type: Number, default: 0.25 },
     maxScale: { type: Number, default: 5 }
   },
-  emits: ['update:open', 'update:visible', 'update:currentIndex', 'scale-change'],
+  emits: ['update:open', 'update:currentIndex', 'scale-change'],
   setup(props, { emit }) {
-    const instance = getCurrentInstance()
     const scale = ref(1)
     const rotation = ref(0)
     const offsetX = ref(0)
@@ -106,26 +101,7 @@ export const ImagePreview = defineComponent({
       }
     )
 
-    const isUsingDeprecatedVisible = () => {
-      const vnodeProps = instance?.vnode.props as Record<string, unknown> | null
-      return Boolean(vnodeProps && 'visible' in vnodeProps)
-    }
-
-    let deprecationWarned = false
-    const warnDeprecation = () => {
-      const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
-        ?.env
-      if (env?.NODE_ENV !== 'production' && isUsingDeprecatedVisible() && !deprecationWarned) {
-        deprecationWarned = true
-        console.warn(
-          '[Tigercat] ImagePreview: "visible" prop is deprecated and will be removed in v2.0. Use "open" instead.'
-        )
-      }
-    }
-
-    warnDeprecation()
-
-    const isOpen = computed(() => props.open ?? props.visible ?? false)
+    const isOpen = computed(() => props.open ?? false)
 
     watch(
       () => isOpen.value,
@@ -144,9 +120,6 @@ export const ImagePreview = defineComponent({
 
     const handleClose = () => {
       emit('update:open', false)
-      if (isUsingDeprecatedVisible()) {
-        emit('update:visible', false)
-      }
     }
 
     const handleZoomIn = () => {
