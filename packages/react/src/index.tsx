@@ -81,6 +81,8 @@ export { AutoComplete } from './components/AutoComplete'
 export type { AutoCompleteProps } from './components/AutoComplete'
 export { Signature } from './components/Signature'
 export type { SignatureProps, SignatureRef } from './components/Signature'
+export { NumberKeyboard } from './components/NumberKeyboard'
+export type { NumberKeyboardProps } from './components/NumberKeyboard'
 
 export { Transfer } from './components/Transfer'
 export type { TransferProps } from './components/Transfer'

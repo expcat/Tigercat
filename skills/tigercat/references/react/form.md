@@ -462,6 +462,25 @@ const signatureRef = useRef<SignatureRef>(null)
 
 ---
 
+## NumberKeyboard 数字键盘
+
+```tsx
+const [amount, setAmount] = useState('')
+const [phone, setPhone] = useState('')
+const [idCard, setIdCard] = useState('')
+
+<Input value={amount} readonly prefix="¥" placeholder="输入金额" />
+<NumberKeyboard mode="amount" value={amount} onChange={setAmount} />
+
+<Input value={phone} readonly placeholder="手机号" />
+<NumberKeyboard mode="phone" value={phone} onChange={setPhone} />
+
+<Input value={idCard} readonly placeholder="身份证号" />
+<NumberKeyboard mode="id-card" value={idCard} onChange={setIdCard} />
+```
+
+---
+
 ## InputGroup 输入框组
 
 ```tsx

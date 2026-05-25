@@ -62,6 +62,9 @@ export * from './auto-complete-utils'
 // Signature utilities
 export * from './signature-utils'
 
+// NumberKeyboard utilities
+export * from './number-keyboard-utils'
+
 // Picker (Select / AutoComplete / Cascader / ...) shared helpers
 export * from './picker-utils'
 

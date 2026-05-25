@@ -5,7 +5,7 @@ description: Compact generated API summary for Tigercat core types
 
 <!-- LLM-INDEX
 type: generated-api-summary
-total-exported-types: 549
+total-exported-types: 555
 source: packages/core/src/types/*.ts
 -->
 
@@ -38,29 +38,30 @@ source: packages/core/src/types/*.ts
 
 ## Form
 
-| Type File        | Props Interfaces                      | Components                  | Exports |
-| ---------------- | ------------------------------------- | --------------------------- | ------- |
-| auto-complete.ts | AutoCompleteProps                     | AutoComplete                | 3       |
-| cascader.ts      | CascaderProps                         | Cascader                    | 8       |
-| checkbox.ts      | CheckboxProps, CheckboxGroupProps     | Checkbox, CheckboxGroup     | 5       |
-| color-picker.ts  | ColorPickerProps                      | ColorPicker                 | 3       |
-| datepicker.ts    | DatePickerProps                       | DatePicker                  | 14      |
-| form.ts          | FormProps, FormItemProps              | Form, FormItem              | 22      |
-| input.ts         | InputProps                            | Input                       | 4       |
-| input-group.ts   | InputGroupProps, InputGroupAddonProps | InputGroup, InputGroupAddon | 3       |
-| input-number.ts  | InputNumberProps                      | InputNumber                 | 1       |
-| mentions.ts      | MentionsProps                         | Mentions                    | 3       |
-| radio.ts         | RadioProps, RadioGroupProps           | Radio, RadioGroup           | 3       |
-| select.ts        | SelectProps                           | Select                      | 8       |
-| signature.ts     | SignatureProps                        | Signature                   | 5       |
-| slider.ts        | SliderProps                           | Slider                      | 2       |
-| stepper.ts       | StepperProps                          | Stepper                     | 2       |
-| switch.ts        | SwitchProps                           | Switch                      | 2       |
-| textarea.ts      | TextareaProps                         | Textarea                    | 2       |
-| timepicker.ts    | TimePickerProps                       | TimePicker                  | 7       |
-| transfer.ts      | TransferProps                         | Transfer                    | 4       |
-| tree-select.ts   | TreeSelectProps                       | TreeSelect                  | 3       |
-| upload.ts        | UploadProps                           | Upload                      | 9       |
+| Type File          | Props Interfaces                      | Components                  | Exports |
+| ------------------ | ------------------------------------- | --------------------------- | ------- |
+| auto-complete.ts   | AutoCompleteProps                     | AutoComplete                | 3       |
+| cascader.ts        | CascaderProps                         | Cascader                    | 8       |
+| checkbox.ts        | CheckboxProps, CheckboxGroupProps     | Checkbox, CheckboxGroup     | 5       |
+| color-picker.ts    | ColorPickerProps                      | ColorPicker                 | 3       |
+| datepicker.ts      | DatePickerProps                       | DatePicker                  | 14      |
+| form.ts            | FormProps, FormItemProps              | Form, FormItem              | 22      |
+| input.ts           | InputProps                            | Input                       | 4       |
+| input-group.ts     | InputGroupProps, InputGroupAddonProps | InputGroup, InputGroupAddon | 3       |
+| input-number.ts    | InputNumberProps                      | InputNumber                 | 1       |
+| mentions.ts        | MentionsProps                         | Mentions                    | 3       |
+| number-keyboard.ts | NumberKeyboardProps                   | NumberKeyboard              | 6       |
+| radio.ts           | RadioProps, RadioGroupProps           | Radio, RadioGroup           | 3       |
+| select.ts          | SelectProps                           | Select                      | 8       |
+| signature.ts       | SignatureProps                        | Signature                   | 5       |
+| slider.ts          | SliderProps                           | Slider                      | 2       |
+| stepper.ts         | StepperProps                          | Stepper                     | 2       |
+| switch.ts          | SwitchProps                           | Switch                      | 2       |
+| textarea.ts        | TextareaProps                         | Textarea                    | 2       |
+| timepicker.ts      | TimePickerProps                       | TimePicker                  | 7       |
+| transfer.ts        | TransferProps                         | Transfer                    | 4       |
+| tree-select.ts     | TreeSelectProps                       | TreeSelect                  | 3       |
+| upload.ts          | UploadProps                           | Upload                      | 9       |
 
 ## Feedback
 

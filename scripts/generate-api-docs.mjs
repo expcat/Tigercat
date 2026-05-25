@@ -56,6 +56,7 @@ const CATEGORIES = {
     'input-group',
     'input-number',
     'mentions',
+    'number-keyboard',
     'radio',
     'select',
     'signature',

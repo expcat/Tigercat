@@ -122,6 +122,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'Signature 手写签名', 'en-US': 'Signature' }
       },
       {
+        key: 'number-keyboard',
+        path: '/number-keyboard',
+        label: { 'zh-CN': 'NumberKeyboard 数字键盘', 'en-US': 'NumberKeyboard' }
+      },
+      {
         key: 'mentions',
         path: '/mentions',
         label: { 'zh-CN': 'Mentions 提及', 'en-US': 'Mentions' }

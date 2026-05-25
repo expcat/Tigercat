@@ -442,6 +442,31 @@ const signatureValue = ref('')
 
 ---
 
+## NumberKeyboard 数字键盘
+
+```vue
+<script setup>
+import { ref } from 'vue'
+
+const amount = ref('')
+const phone = ref('')
+const idCard = ref('')
+</script>
+
+<template>
+  <Input v-model="amount" readonly prefix="¥" placeholder="输入金额" />
+  <NumberKeyboard v-model="amount" mode="amount" />
+
+  <Input v-model="phone" readonly placeholder="手机号" />
+  <NumberKeyboard v-model="phone" mode="phone" />
+
+  <Input v-model="idCard" readonly placeholder="身份证号" />
+  <NumberKeyboard v-model="idCard" mode="id-card" />
+</template>
+```
+
+---
+
 ## InputGroup 输入框组
 
 ```vue

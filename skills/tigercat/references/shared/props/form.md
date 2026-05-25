@@ -1,12 +1,12 @@
 ---
 name: tigercat-shared-props-form
-description: Shared props definitions for form components - AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, DatePicker, Form, FormItem, Input, InputGroup, Mentions, Radio, RadioGroup, Rate, Select, Signature, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
+description: Shared props definitions for form components - AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, DatePicker, Form, FormItem, Input, InputGroup, Mentions, NumberKeyboard, Radio, RadioGroup, Rate, Select, Signature, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
 ---
 
 <!-- LLM-INDEX
 type: props-reference
 category: form
-components: 24
+components: 25
 key-apis: modelValue, value, checked, onChange, rules, validation, options, placeholder, disabled
 -->
 
@@ -668,6 +668,39 @@ key-apis: modelValue, value, checked, onChange, rules, validation, options, plac
 | isEmpty   | `() => boolean`                                            | 当前是否为空           |
 | toDataURL | `(type?: SignatureExportType, quality?: number) => string` | 导出 PNG/JPEG/WebP/SVG |
 | toSVG     | `() => string`                                             | 导出 SVG 字符串        |
+
+---
+
+## NumberKeyboard 数字键盘
+
+### Props
+
+| Prop             | Type                                           | Default             | Description                         |
+| ---------------- | ---------------------------------------------- | ------------------- | ----------------------------------- |
+| modelValue       | `string`                                       | -                   | 绑定值 (v-model) (Vue only)         |
+| value            | `string`                                       | -                   | 绑定值（受控） (React only)         |
+| defaultValue     | `string`                                       | `''`                | 默认值（非受控）                    |
+| mode             | `'number' \| 'amount' \| 'phone' \| 'id-card'` | `'number'`          | 输入模式                            |
+| maxLength        | `number`                                       | 模式默认            | 最大长度，phone 默认 11，id-card 18 |
+| precision        | `number`                                       | `2` (amount only)   | amount 模式小数位限制               |
+| decimalSeparator | `string`                                       | `'.'`               | amount 模式小数分隔符               |
+| disabled         | `boolean`                                      | `false`             | 禁用状态                            |
+| readonly         | `boolean`                                      | `false`             | 只读状态                            |
+| confirmText      | `string`                                       | `'Done'`            | 确认按钮文本                        |
+| deleteText       | `string`                                       | `'Delete'`          | 删除按钮文本                        |
+| ariaLabel        | `string`                                       | `'Number keyboard'` | 键盘无障碍标签                      |
+| showConfirm      | `boolean`                                      | `true`              | 是否显示确认按钮                    |
+| className        | `string`                                       | -                   | 自定义类名 (React only)             |
+
+### Events
+
+| Vue Event            | React Prop   | Payload                                         | Description       |
+| -------------------- | ------------ | ----------------------------------------------- | ----------------- |
+| `@update:modelValue` | -            | `string`                                        | 值变更 (Vue only) |
+| `@change`            | `onChange`   | `(value, payload: NumberKeyboardChangePayload)` | 值变更            |
+| `@key-press`         | `onKeyPress` | `(key, payload)`                                | 按键触发          |
+| `@delete`            | `onDelete`   | `(value, payload)`                              | 删除键触发        |
+| `@confirm`           | `onConfirm`  | `(value, payload)`                              | 确认键触发        |
 
 ---
 
