@@ -9,6 +9,13 @@ source: current repository audit and planning
 
 本文只保留未完成任务与持续守护项。已经交付的历史清单不再保留在 Roadmap 中，后续回溯以 `CHANGELOG.md`、发布记录和对应文档为准。
 
+## 文档职责边界
+
+- Roadmap 只记录当前优先级、待办任务、持续守护项和短期完成状态；阶段归档或发布后，已完成条目应移入 `CHANGELOG.md` 或发布记录。
+- `CHANGELOG.md` 记录已经交付且影响用户、贡献者或发布流程的变更，包括 Breaking change、迁移说明、新功能、修复和基础设施门禁变化。
+- `scripts/README.md` 只维护命令入口和脚本职责；组件 API、示例、主题、i18n、SSR 规则继续以 `skills/tigercat/references/` 与正式文档为准。
+- 完成 Roadmap 任务时先同步勾选状态；若变更会进入发布说明，再补充 `CHANGELOG.md`，避免把完成历史长期堆回 Roadmap。
+
 ## 当前基线
 
 | 项目       | 状态                                                             |
@@ -41,9 +48,10 @@ source: current repository audit and planning
 
 ### P0：基线守护
 
-- [ ] 增加 Tailwind v4-only 检查：校验 workspace catalog、CLI 模板版本、core peer dependency、example package 版本保持一致。
-- [ ] 将发布前验证拆成可复用的“快速门禁”：lint、类型/API 校验、核心单测、size、示例构建分层执行。
-- [ ] 梳理 Roadmap 与 docs/changelog 的职责边界，避免完成历史再次堆回 Roadmap。
+- [x] 增加 Tailwind v4-only 检查：校验 workspace catalog、CLI 模板版本、core peer dependency、example package 版本保持一致。
+- [x] 将发布前验证拆成可复用门禁：快速门禁覆盖 lint、类型/API 校验、核心单测，size 与示例构建作为独立层执行。
+- [x] 收敛当前 size-limit 基线：React full 限制调整为 253 kB，Vue Button subpath 限制调整为 16 kB，并保留独立 `pnpm quality:size` 门禁。
+- [x] 梳理 Roadmap 与 docs/changelog 的职责边界，避免完成历史再次堆回 Roadmap。
 
 ### P1：v1.3-v1.5 近期组件
 
@@ -115,7 +123,7 @@ source: current repository audit and planning
 | -------------------------- | ------------------------------------------------------------------------------ |
 | Roadmap / docs only        | `pnpm exec prettier --check docs/ROADMAP.md`                                   |
 | CLI 模板 / Tailwind v4     | CLI 模板单测、`pnpm --filter @expcat/tigercat-cli build`、`pnpm example:build` |
-| core 工具 / token / plugin | `pnpm --filter @expcat/tigercat-core build`、相关 core 单测                    |
+| core 工具 / token / plugin | `pnpm --filter @expcat/tigercat-core build`、`pnpm test:core`                  |
 | Vue/React 组件             | 对应组件单测、`pnpm test:vue` / `pnpm test:react` 的窄范围                     |
 | 复杂交互或移动端           | 相关 Playwright spec，必要时补视觉回归                                         |
-| 发布链路                   | `pnpm build`、`pnpm test:validate`、`pnpm size`、发布后 smoke                  |
+| 发布链路                   | `pnpm quality:release`、`pnpm build`、发布后 smoke                             |

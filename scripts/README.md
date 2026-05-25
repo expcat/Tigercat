@@ -4,13 +4,18 @@
 
 ## 常用入口
 
-| 命令                 | 脚本                            | 说明                                                                |
-| -------------------- | ------------------------------- | ------------------------------------------------------------------- |
-| `pnpm setup`         | `scripts/setup.mjs`             | 安装依赖、构建包并运行环境检查                                      |
-| `pnpm dev:check`     | `scripts/check-env.mjs`         | 检查 Node、pnpm、依赖安装和构建产物                                 |
-| `pnpm example:all`   | `scripts/run-examples.mjs`      | 同时运行 Vue3 与 React 示例                                         |
-| `pnpm test:validate` | `scripts/validate-tests.mjs`    | 按 [测试质量指南](../tests/TEST_QUALITY_GUIDELINES.md) 检查测试文件 |
-| `pnpm docs:api`      | `scripts/generate-api-docs.mjs` | 生成 skills API 摘要                                                |
+| 命令                    | 脚本                            | 说明                                                                |
+| ----------------------- | ------------------------------- | ------------------------------------------------------------------- |
+| `pnpm setup`            | `scripts/setup.mjs`             | 安装依赖、构建包并运行环境检查                                      |
+| `pnpm dev:check`        | `scripts/check-env.mjs`         | 检查 Node、pnpm、依赖安装和构建产物                                 |
+| `pnpm example:all`      | `scripts/run-examples.mjs`      | 同时运行 Vue3 与 React 示例                                         |
+| `pnpm quality:quick`    | 根 package scripts              | 快速门禁：lint、公开类型/API 校验、core 单测                        |
+| `pnpm quality:size`     | 根 package scripts              | size-limit 包体积门禁                                               |
+| `pnpm quality:examples` | 根 package scripts              | 示例构建门禁：React 与 Vue3 example build                           |
+| `pnpm quality:release`  | 根 package scripts              | 发布前分层门禁：快速门禁、size、测试清单校验、示例构建              |
+| `pnpm test:core`        | 根 package scripts              | 运行 core 测试集合                                                  |
+| `pnpm test:validate`    | `scripts/validate-tests.mjs`    | 按 [测试质量指南](../tests/TEST_QUALITY_GUIDELINES.md) 检查测试文件 |
+| `pnpm docs:api`         | `scripts/generate-api-docs.mjs` | 生成 skills API 摘要                                                |
 
 ## 示例应用
 

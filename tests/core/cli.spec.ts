@@ -13,7 +13,8 @@ import {
   TEMPLATES,
   COMPONENT_CATEGORIES,
   CLI_NAME,
-  CLI_VERSION
+  CLI_VERSION,
+  TEMPLATE_VERSIONS
 } from '@expcat/tigercat-cli/constants'
 
 // Test utils
@@ -23,6 +24,16 @@ import { runAdd } from '@expcat/tigercat-cli/commands/add'
 import { runPlayground } from '@expcat/tigercat-cli/commands/playground'
 import { runGenerateDocs } from '@expcat/tigercat-cli/commands/generate'
 import { collectDoctorChecks } from '@expcat/tigercat-cli/commands/doctor'
+
+function readWorkspaceCatalogValue(packageName: string): string | undefined {
+  const workspaceYaml = readFileSync(resolve(process.cwd(), 'pnpm-workspace.yaml'), 'utf-8')
+  const escapedPackageName = packageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const match = new RegExp(`^\\s*['"]?${escapedPackageName}['"]?:\\s*(\\S+)`, 'm').exec(
+    workspaceYaml
+  )
+
+  return match?.[1]
+}
 
 describe('CLI Constants', () => {
   it('should export correct CLI name and version', () => {
@@ -70,6 +81,40 @@ describe('CLI Constants', () => {
     expect(packageJson.main).toBe('./dist/index.js')
     expect(packageJson.module).toBe('./dist/index.js')
     expect(packageJson.types).toBe('./dist/index.d.ts')
+  })
+
+  it('keeps the Tailwind v4 baseline aligned across workspace, templates, core and examples', () => {
+    expect(readWorkspaceCatalogValue('tailwindcss')).toBe(TEMPLATE_VERSIONS.tailwindcss)
+    expect(readWorkspaceCatalogValue('@tailwindcss/vite')).toBe(TEMPLATE_VERSIONS.tailwindcssVite)
+
+    const vueTemplatePackage = JSON.parse(getVue3Template('vue-app')['package.json'])
+    const reactTemplatePackage = JSON.parse(getReactTemplate('react-app')['package.json'])
+
+    expect(vueTemplatePackage.devDependencies.tailwindcss).toBe(TEMPLATE_VERSIONS.tailwindcss)
+    expect(vueTemplatePackage.devDependencies['@tailwindcss/vite']).toBe(
+      TEMPLATE_VERSIONS.tailwindcssVite
+    )
+    expect(reactTemplatePackage.devDependencies.tailwindcss).toBe(TEMPLATE_VERSIONS.tailwindcss)
+    expect(reactTemplatePackage.devDependencies['@tailwindcss/vite']).toBe(
+      TEMPLATE_VERSIONS.tailwindcssVite
+    )
+
+    const corePackageJson = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'packages/core/package.json'), 'utf-8')
+    )
+    expect(corePackageJson.peerDependencies.tailwindcss).toBe('^4.0.0')
+
+    for (const packagePath of [
+      'examples/example/react/package.json',
+      'examples/example/vue3/package.json'
+    ]) {
+      const examplePackageJson = JSON.parse(
+        readFileSync(resolve(process.cwd(), packagePath), 'utf-8')
+      )
+
+      expect(examplePackageJson.devDependencies.tailwindcss).toBe('catalog:')
+      expect(examplePackageJson.devDependencies['@tailwindcss/vite']).toBe('catalog:')
+    }
   })
 })
 
@@ -469,14 +514,14 @@ describe('CLI Dry Run', () => {
     )
     ensureDir(join(testDir, 'src/components'))
 
-    await runAdd(['Button'], true)
+    await runAdd(['Button'], { dryRun: true })
 
     expect(existsSync(join(testDir, 'src/components/ButtonDemo.tsx'))).toBe(false)
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Dry run'))
   })
 
   it('previews playground without creating the temporary project', async () => {
-    await runPlayground('react', '3457', true)
+    await runPlayground('react', '3457', true, true)
 
     expect(existsSync(join(testDir, '.tigercat-playground'))).toBe(false)
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Would start Vite on port 3457'))

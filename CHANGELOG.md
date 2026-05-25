@@ -2,6 +2,15 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## Unreleased
+
+### Infrastructure
+
+- 新增 Tailwind v4-only 基线检查，覆盖 workspace catalog、CLI 模板版本、core peer dependency 与示例项目依赖入口。
+- 新增分层质量门禁：`pnpm quality:quick`、`pnpm quality:size`、`pnpm quality:examples`、`pnpm quality:release`。
+- 更新 size-limit 当前基线：React full 限制为 253 kB，Vue Button subpath 限制为 16 kB。
+- 明确 Roadmap、CHANGELOG、脚本文档和 API 文档的职责边界，避免完成历史长期堆回 Roadmap。
+
 ## v2.0.0 — Breaking Changes
 
 ### Removed

@@ -5,7 +5,7 @@
 ## 开始之前
 
 - 阅读 [README.md](README.md) 了解包结构、兼容性和常用命令。
-- 阅读 [docs/ROADMAP.md](docs/ROADMAP.md) 确认当前优先级，避免重复实现已经规划或完成的工作。
+- 阅读 [docs/ROADMAP.md](docs/ROADMAP.md) 确认当前优先级与文档职责边界，避免重复实现已经规划或完成的工作。
 - 组件 API、示例、主题、i18n 和术语以 [skills/tigercat/SKILL.md](skills/tigercat/SKILL.md) 为准。
 - 大改动先开 issue 讨论；新组件请使用 Component Proposal 模板。
 
@@ -90,7 +90,7 @@ npx playwright test
 - 验证命令已在 PR 模板中勾选或说明未运行原因。
 - 改动没有回退他人的未合并工作。
 - 新增或修改 API 时，Vue/React、Core、测试、示例和文档保持一致。
-- Roadmap 中对应任务状态已经同步更新；已完成任务需要记录在顶部“最近完成”。
+- Roadmap 中对应任务状态已经同步更新；已经交付且影响用户、贡献者或发布流程的变更记录到 `CHANGELOG.md` 或发布记录。
 
 ## Issue 使用
 

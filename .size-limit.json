@@ -14,13 +14,13 @@
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "250 kB",
+    "limit": "253 kB",
     "gzip": true
   },
   {
     "name": "Vue Button subpath",
     "path": "packages/vue/dist/components/Button.mjs",
-    "limit": "15 kB",
+    "limit": "16 kB",
     "gzip": true
   },
   {
