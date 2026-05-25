@@ -439,6 +439,29 @@ const [value, setValue] = useState('male')
 
 ---
 
+## Signature 手写签名
+
+```tsx
+const signatureRef = useRef<SignatureRef>(null)
+
+<Signature
+  ref={signatureRef}
+  width={420}
+  height={180}
+  penColor="#0f766e"
+  lineWidth={3}
+  exportType="image/svg+xml"
+  onChange={(payload) => setSignatureValue(payload.value)}
+/>
+
+<Button onClick={() => setPreviewUrl(signatureRef.current?.toDataURL('image/png') ?? '')}>
+  导出 PNG
+</Button>
+<Button onClick={() => setSvgText(signatureRef.current?.toSVG() ?? '')}>导出 SVG</Button>
+```
+
+---
+
 ## InputGroup 输入框组
 
 ```tsx

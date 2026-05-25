@@ -79,6 +79,8 @@ export type { CascaderProps } from './components/Cascader'
 
 export { AutoComplete } from './components/AutoComplete'
 export type { AutoCompleteProps } from './components/AutoComplete'
+export { Signature } from './components/Signature'
+export type { SignatureProps, SignatureRef } from './components/Signature'
 
 export { Transfer } from './components/Transfer'
 export type { TransferProps } from './components/Transfer'

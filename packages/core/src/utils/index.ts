@@ -59,6 +59,9 @@ export * from './cascader-utils'
 // AutoComplete utilities
 export * from './auto-complete-utils'
 
+// Signature utilities
+export * from './signature-utils'
+
 // Picker (Select / AutoComplete / Cascader / ...) shared helpers
 export * from './picker-utils'
 

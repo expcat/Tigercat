@@ -58,6 +58,7 @@ const CATEGORIES = {
     'mentions',
     'radio',
     'select',
+    'signature',
     'slider',
     'stepper',
     'switch',

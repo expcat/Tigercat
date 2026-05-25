@@ -1,12 +1,12 @@
 ---
 name: tigercat-shared-props-form
-description: Shared props definitions for form components - AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, DatePicker, Form, FormItem, Input, InputGroup, Mentions, Radio, RadioGroup, Rate, Select, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
+description: Shared props definitions for form components - AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, DatePicker, Form, FormItem, Input, InputGroup, Mentions, Radio, RadioGroup, Rate, Select, Signature, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
 ---
 
 <!-- LLM-INDEX
 type: props-reference
 category: form
-components: 23
+components: 24
 key-apis: modelValue, value, checked, onChange, rules, validation, options, placeholder, disabled
 -->
 
@@ -626,6 +626,48 @@ key-apis: modelValue, value, checked, onChange, rules, validation, options, plac
 | -------------------- | ---------- | ----------------- | ----------- |
 | `@update:modelValue` | -          | `string`          | 值变更      |
 | `@change`            | `onChange` | `(color: string)` | 颜色值变更  |
+
+---
+
+## Signature 手写签名
+
+### Props
+
+| Prop            | Type                                                             | Default           | Description                     |
+| --------------- | ---------------------------------------------------------------- | ----------------- | ------------------------------- |
+| modelValue      | `string`                                                         | -                 | 绑定导出值 (v-model) (Vue only) |
+| width           | `number`                                                         | `480`             | 画布逻辑宽度                    |
+| height          | `number`                                                         | `180`             | 画布逻辑高度                    |
+| penColor        | `string`                                                         | `'#111827'`       | 笔迹颜色                        |
+| backgroundColor | `string`                                                         | -                 | 背景色；不传则透明              |
+| lineWidth       | `number`                                                         | `2`               | 笔迹宽度，自动限制在 1-24       |
+| disabled        | `boolean`                                                        | `false`           | 禁用状态                        |
+| readonly        | `boolean`                                                        | `false`           | 只读状态                        |
+| clearable       | `boolean`                                                        | `true`            | 显示清空按钮                    |
+| exportType      | `'image/png' \| 'image/jpeg' \| 'image/webp' \| 'image/svg+xml'` | `'image/png'`     | `change` 输出格式               |
+| quality         | `number`                                                         | `0.92`            | PNG/JPEG/WebP 导出质量          |
+| ariaLabel       | `string`                                                         | `'Signature pad'` | 画布无障碍标签                  |
+| clearText       | `string`                                                         | `'Clear'`         | 清空按钮文本                    |
+| className       | `string`                                                         | -                 | 自定义类名 (React only)         |
+
+### Events
+
+| Vue Event            | React Prop | Payload                  | Description           |
+| -------------------- | ---------- | ------------------------ | --------------------- |
+| `@update:modelValue` | -          | `string`                 | 导出值变更 (Vue only) |
+| `@change`            | `onChange` | `SignatureChangePayload` | 签名结束或清空后触发  |
+| `@begin`             | `onBegin`  | -                        | 开始绘制              |
+| `@end`               | `onEnd`    | `SignatureChangePayload` | 单次绘制结束          |
+| `@clear`             | -          | -                        | 清空画板 (Vue only)   |
+
+### Methods (Vue expose / React SignatureRef)
+
+| Method    | Type                                                       | Description            |
+| --------- | ---------------------------------------------------------- | ---------------------- |
+| clear     | `() => void`                                               | 清空画板               |
+| isEmpty   | `() => boolean`                                            | 当前是否为空           |
+| toDataURL | `(type?: SignatureExportType, quality?: number) => string` | 导出 PNG/JPEG/WebP/SVG |
+| toSVG     | `() => string`                                             | 导出 SVG 字符串        |
 
 ---
 

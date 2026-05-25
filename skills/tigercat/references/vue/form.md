@@ -415,6 +415,33 @@ const value = ref('male')
 
 ---
 
+## Signature 手写签名
+
+```vue
+<script setup>
+import { ref } from 'vue'
+
+const signatureRef = ref()
+const signatureValue = ref('')
+</script>
+
+<template>
+  <Signature
+    ref="signatureRef"
+    v-model="signatureValue"
+    :width="420"
+    :height="180"
+    pen-color="#0f766e"
+    :line-width="3"
+    export-type="image/svg+xml" />
+
+  <Button @click="previewUrl = signatureRef?.toDataURL('image/png')">导出 PNG</Button>
+  <Button @click="svgText = signatureRef?.toSVG()">导出 SVG</Button>
+</template>
+```
+
+---
+
 ## InputGroup 输入框组
 
 ```vue

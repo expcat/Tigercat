@@ -5,7 +5,7 @@ description: Compact generated API summary for Tigercat core types
 
 <!-- LLM-INDEX
 type: generated-api-summary
-total-exported-types: 544
+total-exported-types: 549
 source: packages/core/src/types/*.ts
 -->
 
@@ -52,6 +52,7 @@ source: packages/core/src/types/*.ts
 | mentions.ts      | MentionsProps                         | Mentions                    | 3       |
 | radio.ts         | RadioProps, RadioGroupProps           | Radio, RadioGroup           | 3       |
 | select.ts        | SelectProps                           | Select                      | 8       |
+| signature.ts     | SignatureProps                        | Signature                   | 5       |
 | slider.ts        | SliderProps                           | Slider                      | 2       |
 | stepper.ts       | StepperProps                          | Stepper                     | 2       |
 | switch.ts        | SwitchProps                           | Switch                      | 2       |
