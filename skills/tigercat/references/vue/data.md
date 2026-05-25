@@ -5,9 +5,39 @@ description: Vue data display components usage
 
 # Data Components (Vue)
 
-数据展示组件：Collapse, Table, Timeline, Carousel, Descriptions
+数据展示组件：Collapse, Table, Timeline, Carousel, Descriptions, Countdown
 
 > **Props Reference**: [shared/props/data.md](../shared/props/data.md)
+
+---
+
+## Countdown 倒计时
+
+### 基础用法
+
+```vue
+<template>
+  <Countdown title="活动结束" :value="Date.now() + 2 * 60 * 60 * 1000" />
+  <Countdown title="发售倒计时" :value="Date.now() + 15 * 60 * 1000" format="mm:ss" />
+</template>
+```
+
+### 格式化与结束事件
+
+```vue
+<script setup>
+const initialNow = Date.now()
+</script>
+
+<template>
+  <Countdown
+    title="跨天任务"
+    :value="initialNow + 26 * 60 * 60 * 1000"
+    :now="initialNow"
+    format="D 天 HH:mm:ss"
+    @finish="console.log('finished')" />
+</template>
+```
 
 ---
 

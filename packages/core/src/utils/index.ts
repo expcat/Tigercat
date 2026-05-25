@@ -47,6 +47,9 @@ export * from './comment-thread-utils'
 // Composite time helpers
 export * from './composite-time-utils'
 
+// Countdown utilities
+export * from './countdown-utils'
+
 // TaskBoard utilities
 export * from './task-board-utils'
 

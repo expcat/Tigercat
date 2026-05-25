@@ -87,6 +87,7 @@ const router = createRouter({
         { path: 'collapse', component: lazyPage(() => import('./pages/CollapseDemo.vue')) },
         { path: 'carousel', component: lazyPage(() => import('./pages/CarouselDemo.vue')) },
         { path: 'calendar', component: lazyPage(() => import('./pages/CalendarDemo.vue')) },
+        { path: 'countdown', component: lazyPage(() => import('./pages/CountdownDemo.vue')) },
         // Navigation
         { path: 'menu', component: lazyPage(() => import('./pages/MenuDemo.vue')) },
         { path: 'breadcrumb', component: lazyPage(() => import('./pages/BreadcrumbDemo.vue')) },

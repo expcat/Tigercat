@@ -68,6 +68,7 @@ const TreeDemo = lazy(() => import('./pages/TreeDemo'))
 const CollapseDemo = lazy(() => import('./pages/CollapseDemo'))
 const CarouselDemo = lazy(() => import('./pages/CarouselDemo'))
 const CalendarDemo = lazy(() => import('./pages/CalendarDemo'))
+const CountdownDemo = lazy(() => import('./pages/CountdownDemo'))
 
 // Navigation
 const MenuDemo = lazy(() => import('./pages/MenuDemo'))
@@ -201,6 +202,7 @@ const router = createBrowserRouter(
         { path: 'collapse', element: <CollapseDemo /> },
         { path: 'carousel', element: <CarouselDemo /> },
         { path: 'calendar', element: <CalendarDemo /> },
+        { path: 'countdown', element: <CountdownDemo /> },
         // Navigation
         { path: 'menu', element: <MenuDemo /> },
         { path: 'breadcrumb', element: <BreadcrumbDemo /> },

@@ -109,7 +109,7 @@ const CATEGORIES = {
     'tabs',
     'tree'
   ],
-  Data: ['calendar', 'collapse', 'table'],
+  Data: ['calendar', 'collapse', 'countdown', 'table'],
   Charts: ['chart'],
   Advanced: [
     'code-editor',

@@ -133,6 +133,8 @@ export type { DescriptionsProps } from './components/Descriptions'
 
 export { Timeline } from './components/Timeline'
 export type { TimelineProps } from './components/Timeline'
+export { Countdown } from './components/Countdown'
+export type { CountdownProps } from './components/Countdown'
 
 export { Tree } from './components/Tree'
 export type { TreeProps } from './components/Tree'

@@ -216,6 +216,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'calendar',
         path: '/calendar',
         label: { 'zh-CN': 'Calendar 日历', 'en-US': 'Calendar' }
+      },
+      {
+        key: 'countdown',
+        path: '/countdown',
+        label: { 'zh-CN': 'Countdown 倒计时', 'en-US': 'Countdown' }
       }
     ]
   },

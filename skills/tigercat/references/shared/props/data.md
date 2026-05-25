@@ -1,18 +1,46 @@
 ---
 name: tigercat-shared-props-data
-description: Shared props definitions for data display components - Calendar, ImageViewer, Table, Timeline
+description: Shared props definitions for data display components - Calendar, Countdown, ImageViewer, Table, Timeline
 ---
 
 <!-- LLM-INDEX
 type: props-reference
 category: data
-components: 4
-key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, expandable, value
+components: 5
+key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, expandable, value, format, now
 -->
 
 # Data Display Components - Props Reference
 
 共享 Props 定义。
+
+---
+
+## Countdown 倒计时
+
+### Props
+
+| Prop      | Type                       | Default    | Description                                                  |
+| --------- | -------------------------- | ---------- | ------------------------------------------------------------ |
+| value     | `number \| string \| Date` | -          | 目标时间，支持时间戳、ISO 字符串或 Date                      |
+| now       | `number \| string \| Date` | `Date.now` | 初始当前时间；用于 SSR 或首屏稳定渲染                        |
+| format    | `string`                   | `HH:mm:ss` | 格式模板，支持 `D`/`DD`、`H`/`HH`、`m`/`mm`、`s`/`ss`、`SSS` |
+| interval  | `number`                   | `1000`     | 更新间隔（ms）；设为 `0` 或负数时不自动更新                  |
+| title     | `string`                   | -          | 标题文本                                                     |
+| prefix    | `string`                   | -          | 数值前缀                                                     |
+| suffix    | `string`                   | -          | 数值后缀                                                     |
+| size      | `'sm' \| 'md' \| 'lg'`     | `'md'`     | 尺寸                                                         |
+| ariaLabel | `string`                   | -          | 倒计时读屏标签                                               |
+| className | `string`                   | -          | 额外 CSS 类名（React / Vue 均支持）                          |
+
+> `format` 不包含 `D`/`DD` 时，`HH`/`H` 表示总小时数；包含天数 token 时，小时数为当天剩余小时。`now` 只用于初始展示和 prop 更新，组件挂载后的 tick 使用当前系统时间。
+
+### Events
+
+| Vue Event | React Callback | Payload                                        | Description        |
+| --------- | -------------- | ---------------------------------------------- | ------------------ |
+| `@change` | `onChange`     | `{ remaining, formatted, parts, finished }`    | 每次自动更新时触发 |
+| `@finish` | `onFinish`     | `{ remaining: 0, formatted, parts, finished }` | 首次倒计时归零触发 |
 
 ---
 

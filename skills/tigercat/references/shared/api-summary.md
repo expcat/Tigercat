@@ -5,7 +5,7 @@ description: Compact generated API summary for Tigercat core types
 
 <!-- LLM-INDEX
 type: generated-api-summary
-total-exported-types: 560
+total-exported-types: 565
 source: packages/core/src/types/*.ts
 -->
 
@@ -114,11 +114,12 @@ source: packages/core/src/types/*.ts
 
 ## Data
 
-| Type File   | Props Interfaces                  | Components              | Exports |
-| ----------- | --------------------------------- | ----------------------- | ------- |
-| calendar.ts | CalendarProps                     | Calendar                | 2       |
-| collapse.ts | CollapseProps, CollapsePanelProps | Collapse, CollapsePanel | 3       |
-| table.ts    | TableProps                        | Table                   | 15      |
+| Type File    | Props Interfaces                  | Components              | Exports |
+| ------------ | --------------------------------- | ----------------------- | ------- |
+| calendar.ts  | CalendarProps                     | Calendar                | 2       |
+| collapse.ts  | CollapseProps, CollapsePanelProps | Collapse, CollapsePanel | 3       |
+| countdown.ts | CountdownProps                    | Countdown               | 5       |
+| table.ts     | TableProps                        | Table                   | 15      |
 
 ## Charts
 
