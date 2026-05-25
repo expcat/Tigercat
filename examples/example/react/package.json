@@ -13,7 +13,7 @@
     "@expcat/tigercat-react": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-router-dom": "^7.14.2"
+    "react-router-dom": "^7.15.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
