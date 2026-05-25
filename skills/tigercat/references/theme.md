@@ -62,9 +62,28 @@ export default {
 | 渐变                 | 平铺                  | OKLab `color-mix` 渐变                       |
 | Spring easing        | `cubic-bezier`        | `linear()` 弹簧（Chrome 113+）               |
 
-`prefers-reduced-motion: reduce` 自动将所有 `--tiger-motion-duration-*` 收敛为 `0ms`。
+`prefers-reduced-motion: reduce` 默认生效，自动将所有 `--tiger-motion-duration-*` 与 `--tiger-transition-*` 收敛为零时长；Dropdown、Loading、图表入场动画等内置动画也会响应该媒体查询。
 
 > Vue / React 用法相同——只需切换 `<html>` 上的 `data-tiger-style` 属性即可热切换。
+
+---
+
+## Motion API
+
+Core 导出框架无关 motion helper，Vue / React 可直接复用：
+
+```ts
+import {
+  getComponentMotionStyle,
+  getComponentMotionTransition,
+  getStaggeredMotionStyle,
+  createMotionSequence,
+  startTigercatViewTransition,
+  injectViewTransitionStyles
+} from '@expcat/tigercat-core'
+```
+
+组件级动画建议通过 `getComponentMotionStyle({ duration, easing, direction })` 输出 CSS 变量，或用 `getComponentMotionTransition()` 生成 transition 字符串。多元素入场用 `getStaggeredMotionStyle()`，跨组件流程用 `createMotionSequence()`。页面/路由过渡用 `startTigercatViewTransition()` 包装状态更新；浏览器不支持 View Transitions 或用户启用 reduced motion 时会直接执行更新。
 
 ---
 

@@ -281,11 +281,11 @@ export const animationDelayStyles = `
 }
 
 .animate-bounce-dot {
-  animation: bounce-dot 0.6s ease-in-out infinite;
+  animation: bounce-dot var(--tiger-motion-duration-slow,0.6s) var(--tiger-motion-ease-standard,ease-in-out) infinite;
 }
 
 .animate-scale-bar {
-  animation: scale-bar 0.6s ease-in-out infinite;
+  animation: scale-bar var(--tiger-motion-duration-slow,0.6s) var(--tiger-motion-ease-standard,ease-in-out) infinite;
 }
 
 .animation-delay-0 {
@@ -298,6 +298,14 @@ export const animationDelayStyles = `
 
 .animation-delay-300 {
   animation-delay: 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bounce-dot,
+  .animate-scale-bar {
+    animation-duration: 0ms;
+    animation-delay: 0ms;
+  }
 }
 `
 

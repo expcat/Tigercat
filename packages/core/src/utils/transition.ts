@@ -190,7 +190,7 @@ export function getComponentTransition(componentName: string): TransitionClasses
  * Returns false in SSR environments.
  */
 export function prefersReducedMotion(): boolean {
-  if (!isBrowser()) return false
+  if (!isBrowser() || typeof window.matchMedia !== 'function') return false
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 

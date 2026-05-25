@@ -186,7 +186,8 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                 className={classNames(interactive && 'cursor-pointer')}
                 style={
                   {
-                    transition: 'opacity 0.2s ease-out, filter 0.2s ease-out',
+                    transition:
+                      'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)',
                     rx: 'var(--tiger-chart-block-radius, 2px)',
                     filter:
                       activeIndex === node.index

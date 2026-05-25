@@ -316,7 +316,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
             ...(filterStyle ? { filter: filterStyle } : {}),
             ...(animDelay
               ? {
-                  animation: `${SCATTER_ENTRANCE_CLASS} 500ms cubic-bezier(.34,1.56,.64,1) ${animDelay} both`
+                  animation: `${SCATTER_ENTRANCE_CLASS} var(--tiger-motion-duration-slow,500ms) var(--tiger-motion-ease-spring,cubic-bezier(.34,1.56,.64,1)) ${animDelay} both`
                 }
               : {})
           }
@@ -326,7 +326,11 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
             opacity: point.opacity,
             stroke: pointBorderColor,
             strokeWidth: pointBorderWidth,
-            className: classNames(scatterPointTransitionClasses, interactive && 'cursor-pointer'),
+            className: classNames(
+              scatterPointTransitionClasses,
+              animDelay && SCATTER_ENTRANCE_CLASS,
+              interactive && 'cursor-pointer'
+            ),
             style: Object.keys(styleObj).length > 0 ? styleObj : undefined,
             tabIndex: selectable ? 0 : undefined,
             role: selectable ? 'button' : ('img' as const),

@@ -74,7 +74,7 @@ export const DONUT_BASE_SHADOW = 'drop-shadow(0 2px 8px rgba(0,0,0,0.10))'
  * mirrors `scatterPointTransitionClasses` from PR-19k(f)).
  */
 export const linePointTransitionClasses =
-  'transition-all duration-200 [transition-timing-function:var(--tiger-motion-ease-spring,cubic-bezier(0,0,0.2,1))]'
+  'transition-all [transition-duration:var(--tiger-motion-duration-base,200ms)] [transition-timing-function:var(--tiger-motion-ease-spring,cubic-bezier(0,0,0.2,1))]'
 
 /** CSS classes for value labels displayed on bars */
 export const barValueLabelClasses =
@@ -86,7 +86,7 @@ export const barValueLabelInsideClasses =
 
 /** CSS transition string for animated bars */
 export const barAnimatedTransition =
-  'transition: y var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), height var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), opacity 200ms ease-out, filter 200ms ease-out'
+  'transition: y var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), height var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), opacity var(--tiger-motion-duration-base,200ms) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,200ms) var(--tiger-motion-ease-decelerate,ease-out)'
 
 /**
  * CSS transition for scatter point hover.
@@ -97,7 +97,7 @@ export const barAnimatedTransition =
  * on hover scaling (matches phase2.7 §3 ScatterChart "spring 缩放").
  */
 export const scatterPointTransitionClasses =
-  'transition-all duration-200 [transition-timing-function:var(--tiger-motion-ease-spring,cubic-bezier(0,0,0.2,1))]'
+  'transition-all [transition-duration:var(--tiger-motion-duration-base,200ms)] [transition-timing-function:var(--tiger-motion-ease-spring,cubic-bezier(0,0,0.2,1))]'
 
 /**
  * Drop shadow filter for hovered scatter points.
@@ -118,5 +118,5 @@ export function getScatterHoverSize(baseSize: number): number {
  * CSS animation keyframes and class for scatter entrance animation.
  * Inject once via <style> tag.
  */
-export const SCATTER_ENTRANCE_KEYFRAMES = `@keyframes tiger-scatter-entrance{from{opacity:0;transform:scale(0)}60%{transform:scale(1.15)}to{opacity:1;transform:scale(1)}}`
+export const SCATTER_ENTRANCE_KEYFRAMES = `@keyframes tiger-scatter-entrance{from{opacity:0;transform:scale(0)}60%{transform:scale(1.15)}to{opacity:1;transform:scale(1)}}@media (prefers-reduced-motion: reduce){.tiger-scatter-entrance{animation-duration:0ms;animation-delay:0ms}}`
 export const SCATTER_ENTRANCE_CLASS = 'tiger-scatter-entrance'

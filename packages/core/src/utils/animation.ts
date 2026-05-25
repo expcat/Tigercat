@@ -7,6 +7,299 @@
 import { isBrowser } from './env'
 
 // ============================================================================
+// Token-backed Motion Configuration
+// ============================================================================
+
+export type MotionDurationToken = 'instant' | 'quick' | 'base' | 'relaxed' | 'slow'
+export type MotionEasingToken = 'standard' | 'decelerate' | 'accelerate' | 'emphasized' | 'spring'
+export type MotionDuration = MotionDurationToken | number | string
+export type MotionEasing = MotionEasingToken | string
+export type MotionDirection = 'none' | 'up' | 'down' | 'left' | 'right'
+
+export interface ComponentMotionConfig {
+  /** Duration token, CSS time value, or millisecond number. */
+  duration?: MotionDuration
+  /** Delay token, CSS time value, or millisecond number. */
+  delay?: MotionDuration
+  /** Easing token or CSS timing function. */
+  easing?: MotionEasing
+  /** Direction used by slide/translate-based component entrances. */
+  direction?: MotionDirection
+  /** Disable this component's animation without removing its transition styles. */
+  disabled?: boolean
+  /** Respect `prefers-reduced-motion`; enabled by default. */
+  respectReducedMotion?: boolean
+}
+
+export const MOTION_DURATION_TOKEN_VARS: Record<MotionDurationToken, string> = {
+  instant: '--tiger-motion-duration-instant',
+  quick: '--tiger-motion-duration-quick',
+  base: '--tiger-motion-duration-base',
+  relaxed: '--tiger-motion-duration-relaxed',
+  slow: '--tiger-motion-duration-slow'
+}
+
+export const MOTION_DURATION_TOKEN_FALLBACKS: Record<MotionDurationToken, string> = {
+  instant: '80ms',
+  quick: '150ms',
+  base: '200ms',
+  relaxed: '300ms',
+  slow: '450ms'
+}
+
+export const MOTION_EASING_TOKEN_VARS: Record<MotionEasingToken, string> = {
+  standard: '--tiger-motion-ease-standard',
+  decelerate: '--tiger-motion-ease-decelerate',
+  accelerate: '--tiger-motion-ease-accelerate',
+  emphasized: '--tiger-motion-ease-emphasized',
+  spring: '--tiger-motion-ease-spring'
+}
+
+export const MOTION_EASING_TOKEN_FALLBACKS: Record<MotionEasingToken, string> = {
+  standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  decelerate: 'cubic-bezier(0, 0, 0.2, 1)',
+  accelerate: 'cubic-bezier(0.4, 0, 1, 1)',
+  emphasized: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+}
+
+export const COMPONENT_MOTION_VARS = {
+  duration: '--tiger-component-motion-duration',
+  delay: '--tiger-component-motion-delay',
+  easing: '--tiger-component-motion-easing',
+  translateX: '--tiger-component-motion-translate-x',
+  translateY: '--tiger-component-motion-translate-y'
+} as const
+
+const MOTION_DIRECTION_OFFSETS: Record<MotionDirection, { x: string; y: string }> = {
+  none: { x: '0', y: '0' },
+  up: { x: '0', y: '0.5rem' },
+  down: { x: '0', y: '-0.5rem' },
+  left: { x: '0.5rem', y: '0' },
+  right: { x: '-0.5rem', y: '0' }
+}
+
+function hasReducedMotionPreference(): boolean {
+  if (!isBrowser() || typeof window.matchMedia !== 'function') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+export function resolveMotionDuration(
+  duration: MotionDuration | undefined,
+  fallback: MotionDurationToken = 'base'
+): string {
+  if (typeof duration === 'number') return `${duration}ms`
+  if (duration && duration in MOTION_DURATION_TOKEN_VARS) {
+    const token = duration as MotionDurationToken
+    return `var(${MOTION_DURATION_TOKEN_VARS[token]},${MOTION_DURATION_TOKEN_FALLBACKS[token]})`
+  }
+  if (typeof duration === 'string') return duration
+
+  return `var(${MOTION_DURATION_TOKEN_VARS[fallback]},${MOTION_DURATION_TOKEN_FALLBACKS[fallback]})`
+}
+
+export function resolveMotionEasing(
+  easing: MotionEasing | undefined,
+  fallback: MotionEasingToken = 'standard'
+): string {
+  if (easing && easing in MOTION_EASING_TOKEN_VARS) {
+    const token = easing as MotionEasingToken
+    return `var(${MOTION_EASING_TOKEN_VARS[token]},${MOTION_EASING_TOKEN_FALLBACKS[token]})`
+  }
+  if (typeof easing === 'string') return easing
+
+  return `var(${MOTION_EASING_TOKEN_VARS[fallback]},${MOTION_EASING_TOKEN_FALLBACKS[fallback]})`
+}
+
+export function shouldReduceMotion(
+  config: Pick<ComponentMotionConfig, 'disabled' | 'respectReducedMotion'> = {}
+): boolean {
+  if (config.disabled) return true
+  if (config.respectReducedMotion === false) return false
+  return hasReducedMotionPreference()
+}
+
+export function getComponentMotionStyle(
+  config: ComponentMotionConfig = {}
+): Record<string, string> {
+  const reduce = shouldReduceMotion(config)
+  const direction = reduce ? 'none' : (config.direction ?? 'none')
+  const offset = MOTION_DIRECTION_OFFSETS[direction]
+
+  return {
+    [COMPONENT_MOTION_VARS.duration]: reduce ? '0ms' : resolveMotionDuration(config.duration),
+    [COMPONENT_MOTION_VARS.delay]: reduce ? '0ms' : resolveMotionDuration(config.delay, 'instant'),
+    [COMPONENT_MOTION_VARS.easing]: resolveMotionEasing(config.easing),
+    [COMPONENT_MOTION_VARS.translateX]: offset.x,
+    [COMPONENT_MOTION_VARS.translateY]: offset.y
+  }
+}
+
+export function getComponentMotionTransition(
+  properties: string | string[] = 'all',
+  config: ComponentMotionConfig = {}
+): string {
+  const props = Array.isArray(properties) ? properties : [properties]
+  const duration = shouldReduceMotion(config) ? '0ms' : resolveMotionDuration(config.duration)
+  const delay = shouldReduceMotion(config) ? '0ms' : resolveMotionDuration(config.delay, 'instant')
+  const easing = resolveMotionEasing(config.easing)
+
+  return props.map((prop) => `${prop} ${duration} ${easing} ${delay}`).join(', ')
+}
+
+export interface MotionStaggerOptions {
+  stepMs?: number
+  initialDelayMs?: number
+  disabled?: boolean
+  respectReducedMotion?: boolean
+}
+
+export function getStaggerDelay(index: number, options: MotionStaggerOptions = {}): string {
+  if (shouldReduceMotion(options)) return '0ms'
+  const stepMs = options.stepMs ?? 40
+  const initialDelayMs = options.initialDelayMs ?? 0
+  return `${Math.max(0, initialDelayMs + Math.max(0, index) * stepMs)}ms`
+}
+
+export function getStaggeredMotionStyle(
+  index: number,
+  config: ComponentMotionConfig & MotionStaggerOptions = {}
+): Record<string, string> {
+  const delay = getStaggerDelay(index, config)
+  return {
+    ...getComponentMotionStyle({ ...config, delay }),
+    animationDelay: delay,
+    transitionDelay: delay
+  }
+}
+
+export interface MotionSequenceStep {
+  id: string
+  durationMs?: number
+  gapAfterMs?: number
+}
+
+export interface ResolvedMotionSequenceStep extends Required<MotionSequenceStep> {
+  index: number
+  startMs: number
+  style: Record<string, string>
+}
+
+export interface MotionSequenceOptions {
+  durationMs?: number
+  gapMs?: number
+  initialDelayMs?: number
+  disabled?: boolean
+  respectReducedMotion?: boolean
+}
+
+export function createMotionSequence(
+  steps: MotionSequenceStep[],
+  options: MotionSequenceOptions = {}
+): ResolvedMotionSequenceStep[] {
+  const reduce = shouldReduceMotion(options)
+  let cursor = reduce ? 0 : (options.initialDelayMs ?? 0)
+
+  return steps.map((step, index) => {
+    const durationMs = reduce ? 0 : (step.durationMs ?? options.durationMs ?? 200)
+    const gapAfterMs = reduce ? 0 : (step.gapAfterMs ?? options.gapMs ?? 40)
+    const startMs = cursor
+    cursor += durationMs + gapAfterMs
+
+    return {
+      id: step.id,
+      index,
+      durationMs,
+      gapAfterMs,
+      startMs,
+      style: {
+        [COMPONENT_MOTION_VARS.duration]: `${durationMs}ms`,
+        [COMPONENT_MOTION_VARS.delay]: `${startMs}ms`,
+        animationDelay: `${startMs}ms`,
+        transitionDelay: `${startMs}ms`
+      }
+    }
+  })
+}
+
+// ============================================================================
+// View Transitions API
+// ============================================================================
+
+export interface ViewTransitionLike {
+  ready: Promise<void>
+  finished: Promise<void>
+  updateCallbackDone: Promise<void>
+  skipTransition(): void
+}
+
+type DocumentWithViewTransition = Document & {
+  startViewTransition?: (updateCallback: () => void | Promise<void>) => ViewTransitionLike
+}
+
+export interface ViewTransitionOptions {
+  disabled?: boolean
+  respectReducedMotion?: boolean
+}
+
+export function supportsViewTransitions(options: ViewTransitionOptions = {}): boolean {
+  if (shouldReduceMotion(options)) return false
+  return (
+    isBrowser() &&
+    typeof (document as DocumentWithViewTransition).startViewTransition === 'function'
+  )
+}
+
+export async function startTigercatViewTransition(
+  updateCallback: () => void | Promise<void>,
+  options: ViewTransitionOptions = {}
+): Promise<ViewTransitionLike | undefined> {
+  if (!supportsViewTransitions(options)) {
+    await updateCallback()
+    return undefined
+  }
+
+  return (document as DocumentWithViewTransition).startViewTransition?.(updateCallback)
+}
+
+export function getViewTransitionNameStyle(name: string): Record<string, string> {
+  return { viewTransitionName: name }
+}
+
+export const VIEW_TRANSITION_CSS = `
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--tiger-motion-duration-relaxed, 300ms);
+  animation-timing-function: var(--tiger-motion-ease-standard, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0ms;
+  }
+}
+`
+
+let isViewTransitionStyleInjected = false
+
+export function injectViewTransitionStyles(): void {
+  if (!isBrowser() || isViewTransitionStyleInjected) return
+
+  const styleId = 'tiger-ui-view-transition-styles'
+  if (document.getElementById(styleId)) {
+    isViewTransitionStyleInjected = true
+    return
+  }
+
+  const style = document.createElement('style')
+  style.id = styleId
+  style.textContent = VIEW_TRANSITION_CSS
+  document.head.appendChild(style)
+  isViewTransitionStyleInjected = true
+}
+
+// ============================================================================
 // Animation Duration Constants
 // ============================================================================
 
@@ -110,6 +403,12 @@ const SHAKE_ANIMATION_CSS = `
 
 .tiger-animate-shake {
   animation: tiger-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tiger-animate-shake {
+    animation-duration: 0ms;
+  }
 }
 `
 
@@ -226,6 +525,17 @@ export const SVG_PATH_ANIMATION_CSS = `
 
 .tiger-animate-pie-draw {
   animation: tiger-pie-draw var(--tiger-pie-duration, 0.8s) ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tiger-animate-path-draw,
+  .tiger-animate-fade-in,
+  .tiger-animate-scale-in,
+  .tiger-animate-bar-grow,
+  .tiger-animate-pie-draw {
+    animation-duration: 0ms;
+    animation-delay: 0ms;
+  }
 }
 `
 

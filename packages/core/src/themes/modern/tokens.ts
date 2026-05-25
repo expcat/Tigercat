@@ -188,5 +188,8 @@ export const MODERN_REDUCED_MOTION_TOKENS: Record<string, string> = {
   '--tiger-motion-duration-quick': '0ms',
   '--tiger-motion-duration-base': '0ms',
   '--tiger-motion-duration-relaxed': '0ms',
-  '--tiger-motion-duration-slow': '0ms'
+  '--tiger-motion-duration-slow': '0ms',
+  '--tiger-transition-base': 'all 0ms linear',
+  '--tiger-transition-quick': 'all 0ms linear',
+  '--tiger-transition-emphasized': 'transform 0ms linear'
 }

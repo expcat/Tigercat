@@ -194,7 +194,8 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
               strokeWidth={1}
               className={classNames(interactive && 'cursor-pointer')}
               style={{
-                transition: 'opacity 0.2s ease-out, filter 0.2s ease-out',
+                transition:
+                  'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)',
                 filter:
                   activeIndex === arc.index
                     ? 'var(--tiger-chart-block-active-filter, none)'

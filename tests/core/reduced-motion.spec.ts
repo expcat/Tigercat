@@ -15,7 +15,7 @@ import {
  *  1. `prefersReducedMotion()` runtime helper reads the media query.
  *  2. `getAccessibleTransitionClasses()` collapses to a duration-0 fade
  *     when the user opts out of motion.
- *  3. `createTigercatPlugin({ modern: true })` emits a
+ *  3. `createTigercatPlugin()` emits a
  *     `@media (prefers-reduced-motion: reduce)` block that pins every
  *     `--tiger-motion-duration-*` token to `0ms`, for both `:root` and
  *     `[data-tiger-style="modern"]`.
@@ -110,7 +110,7 @@ describe('getAccessibleTransitionClasses()', () => {
   })
 })
 
-describe('createTigercatPlugin({ modern: true }) — reduced-motion CSS block', () => {
+describe('createTigercatPlugin() — reduced-motion CSS block', () => {
   type CssBlock = Record<string, string>
   type AddBaseFn = (rule: Record<string, unknown>) => void
   type PluginCallback = (api: { addBase: AddBaseFn }) => void
@@ -129,26 +129,34 @@ describe('createTigercatPlugin({ modern: true }) — reduced-motion CSS block', 
   }
 
   it('emits @media (prefers-reduced-motion: reduce) targeting :root + modern subtree', () => {
-    const rules = captureRules(createTigercatPlugin({ modern: true }) as PluginInstance)
+    const rules = captureRules(createTigercatPlugin() as PluginInstance)
     const mediaRule = rules['@media (prefers-reduced-motion: reduce)'] as Record<string, CssBlock>
     expect(mediaRule).toBeDefined()
     expect(mediaRule[':root, [data-tiger-style="modern"]']).toBeDefined()
+    expect(
+      mediaRule[
+        '.tiger-motion-aware, .tiger-motion-aware::before, .tiger-motion-aware::after, [data-tiger-motion]'
+      ]
+    ).toBeDefined()
   })
 
   it('every motion-duration token is pinned to 0ms inside the media block', () => {
-    const rules = captureRules(createTigercatPlugin({ modern: true }) as PluginInstance)
+    const rules = captureRules(createTigercatPlugin() as PluginInstance)
     const inner = (rules['@media (prefers-reduced-motion: reduce)'] as Record<string, CssBlock>)[
       ':root, [data-tiger-style="modern"]'
     ]
     for (const [key, value] of Object.entries(MODERN_REDUCED_MOTION_TOKENS)) {
-      expect(inner[key]).toBe('0ms')
-      expect(value).toBe('0ms')
+      expect(inner[key]).toBe(value)
+      if (key.includes('duration')) {
+        expect(value).toBe('0ms')
+      }
     }
   })
 
-  it('does NOT emit the reduced-motion block when modern flag is off', () => {
-    const rules = captureRules(createTigercatPlugin() as PluginInstance)
-    expect(rules['@media (prefers-reduced-motion: reduce)']).toBeUndefined()
+  it('still emits modern override tokens separately when modern flag is on', () => {
+    const rules = captureRules(createTigercatPlugin({ modern: true }) as PluginInstance)
+    expect(rules['[data-tiger-style="modern"]']).toBeDefined()
+    expect(rules['@media (prefers-reduced-motion: reduce)']).toBeDefined()
   })
 })
 

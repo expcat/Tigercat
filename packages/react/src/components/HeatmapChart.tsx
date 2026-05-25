@@ -294,7 +294,8 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
                 className={classNames(interactive && 'cursor-pointer')}
                 style={
                   {
-                    transition: 'opacity 0.2s ease-out',
+                    transition:
+                      'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)',
                     rx: `var(--tiger-chart-block-radius, ${cellRadius}px)`
                   } as React.CSSProperties
                 }

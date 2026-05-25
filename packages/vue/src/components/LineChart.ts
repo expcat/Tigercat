@@ -494,11 +494,14 @@ export const LineChart = defineComponent({
                           null,
                           `
                           .tiger-line-animated {
-                            animation: tiger-line-draw 1.2s cubic-bezier(.4,0,.2,1) forwards;
+                            animation: tiger-line-draw var(--tiger-motion-duration-slow,1.2s) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)) forwards;
                           }
                           @keyframes tiger-line-draw {
                             from { stroke-dashoffset: 1; }
                             to { stroke-dashoffset: 0; }
+                          }
+                          @media (prefers-reduced-motion: reduce) {
+                            .tiger-line-animated { animation-duration: 0ms; }
                           }
                         `
                         )
@@ -642,7 +645,7 @@ export const LineChart = defineComponent({
                         'stroke-linejoin': 'round',
                         pathLength: props.animated ? 1 : undefined,
                         class: classNames(
-                          'transition-opacity duration-200',
+                          'transition-opacity [transition-duration:var(--tiger-motion-duration-base,200ms)]',
                           props.animated && 'tiger-line-animated'
                         ),
                         'data-line-series': sd.seriesIndex,

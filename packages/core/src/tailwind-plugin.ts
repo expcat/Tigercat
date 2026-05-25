@@ -104,6 +104,20 @@ const tigercatDirectionBase = {
   }
 }
 
+const tigercatReducedMotionBase = {
+  '@media (prefers-reduced-motion: reduce)': {
+    ':root, [data-tiger-style="modern"]': MODERN_REDUCED_MOTION_TOKENS,
+    '.tiger-motion-aware, .tiger-motion-aware::before, .tiger-motion-aware::after, [data-tiger-motion]':
+      {
+        animationDuration: '0ms',
+        animationDelay: '0ms',
+        transitionDuration: '0ms',
+        transitionDelay: '0ms',
+        scrollBehavior: 'auto'
+      }
+  }
+}
+
 /**
  * Tailwind CSS plugin for Tigercat
  * Injects the default CSS variables into the root scope
@@ -116,7 +130,8 @@ export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
     'svg [tabindex], svg [role="button"]': {
       outline: 'none'
     },
-    ...tigercatDirectionBase
+    ...tigercatDirectionBase,
+    ...tigercatReducedMotionBase
   })
 })
 
@@ -184,17 +199,15 @@ export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
       'svg [tabindex], svg [role="button"]': {
         outline: 'none'
       },
-      ...tigercatDirectionBase
+      ...tigercatDirectionBase,
+      ...tigercatReducedMotionBase
     })
 
     if (options.modern) {
       addBase({
         '[data-tiger-style="modern"]': MODERN_OVERRIDE_TOKENS_LIGHT,
         '.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark':
-          MODERN_OVERRIDE_TOKENS_DARK,
-        '@media (prefers-reduced-motion: reduce)': {
-          ':root, [data-tiger-style="modern"]': MODERN_REDUCED_MOTION_TOKENS
-        }
+          MODERN_OVERRIDE_TOKENS_DARK
       })
     }
   })

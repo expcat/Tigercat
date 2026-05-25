@@ -327,12 +327,12 @@ source: project audit and planning
 
 ### 9.2 动画系统
 
-当前：`EASING_SPRING` / `EASING_SMOOTH` 常量 + `motion/` 工具集。
+当前：已形成 token 驱动的 motion API、View Transitions 包装、stagger/sequence 编排与 reduced-motion 全局适配。
 
-- [ ] View Transitions API 集成：页面级路由过渡
-- [ ] 组件动画可配置：通过 prop 或 CSS 变量控制进出场动画（duration/easing/direction）
-- [ ] `prefers-reduced-motion` 全面适配：所有动画组件响应此媒体查询
-- [ ] 动画编排 API：多组件协调动画（stagger、sequence）
+- [x] View Transitions API 集成：页面级路由过渡
+- [x] 组件动画可配置：通过 prop 或 CSS 变量控制进出场动画（duration/easing/direction）
+- [x] `prefers-reduced-motion` 全面适配：所有动画组件响应此媒体查询
+- [x] 动画编排 API：多组件协调动画（stagger、sequence）
 
 ### 9.3 SSR 支持
 

@@ -309,7 +309,7 @@ export const BarChart: React.FC<BarChartProps> = ({
             fill={gradient ? `url(#${gradientPrefix}-${bar.index})` : bar.color}
             opacity={bar.opacity}
             className={classNames(
-              'transition-[opacity,filter] duration-200',
+              'transition-[opacity,filter] [transition-duration:var(--tiger-motion-duration-base,200ms)] [transition-timing-function:var(--tiger-motion-ease-decelerate,ease-out)]',
               (hoverable || selectable) && 'cursor-pointer hover:brightness-110'
             )}
             style={
@@ -319,7 +319,7 @@ export const BarChart: React.FC<BarChartProps> = ({
                 ...(animated
                   ? {
                       transition:
-                        'y var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), height var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), opacity 200ms ease-out, filter 200ms ease-out'
+                        'y var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), height var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), opacity var(--tiger-motion-duration-base,200ms) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-base,200ms) var(--tiger-motion-ease-decelerate,ease-out)'
                     }
                   : null)
               } as React.CSSProperties

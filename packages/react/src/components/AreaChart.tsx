@@ -378,11 +378,14 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           {animated && (
             <style>{`
               .tiger-area-animated {
-                animation: tiger-area-draw 1.2s cubic-bezier(.4,0,.2,1) forwards;
+                animation: tiger-area-draw var(--tiger-motion-duration-slow,1.2s) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)) forwards;
               }
               @keyframes tiger-area-draw {
                 from { stroke-dashoffset: 1; }
                 to { stroke-dashoffset: 0; }
+              }
+              @media (prefers-reduced-motion: reduce) {
+                .tiger-area-animated { animation-duration: 0ms; }
               }
             `}</style>
           )}
@@ -504,7 +507,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
             strokeLinejoin="round"
             pathLength={animated ? 1 : undefined}
             className={classNames(
-              'transition-opacity duration-200',
+              'transition-opacity [transition-duration:var(--tiger-motion-duration-base,200ms)]',
               animated && 'tiger-area-animated'
             )}
           />

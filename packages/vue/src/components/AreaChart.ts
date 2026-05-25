@@ -506,11 +506,14 @@ export const AreaChart = defineComponent({
                           null,
                           `
                           .tiger-area-animated {
-                            animation: tiger-area-draw 1.2s cubic-bezier(.4,0,.2,1) forwards;
+                            animation: tiger-area-draw var(--tiger-motion-duration-slow,1.2s) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)) forwards;
                           }
                           @keyframes tiger-area-draw {
                             from { stroke-dashoffset: 1; }
                             to { stroke-dashoffset: 0; }
+                          }
+                          @media (prefers-reduced-motion: reduce) {
+                            .tiger-area-animated { animation-duration: 0ms; }
                           }
                         `
                         )
@@ -690,7 +693,7 @@ export const AreaChart = defineComponent({
                         'stroke-linejoin': 'round',
                         pathLength: props.animated ? 1 : undefined,
                         class: classNames(
-                          'transition-opacity duration-200',
+                          'transition-opacity [transition-duration:var(--tiger-motion-duration-base,200ms)]',
                           props.animated && 'tiger-area-animated'
                         )
                       })

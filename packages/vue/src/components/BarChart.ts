@@ -470,7 +470,7 @@ export const BarChart = defineComponent({
                         fill: props.gradient ? `url(#${gradientPrefix}-${index})` : bar.color,
                         opacity: bar.opacity,
                         class: classNames(
-                          'transition-[opacity,filter] duration-200',
+                          'transition-[opacity,filter] [transition-duration:var(--tiger-motion-duration-base,200ms)] [transition-timing-function:var(--tiger-motion-ease-decelerate,ease-out)]',
                           (props.hoverable || props.selectable) &&
                             'cursor-pointer hover:brightness-110'
                         ),

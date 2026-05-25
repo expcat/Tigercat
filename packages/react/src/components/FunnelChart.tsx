@@ -177,7 +177,10 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               fill={gradient ? `url(#${gradientPrefix}-${seg.index})` : seg.color}
               opacity={opacity}
               className={classNames(interactive && 'cursor-pointer')}
-              style={{ transition: 'opacity 0.2s ease-out' }}
+              style={{
+                transition:
+                  'opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out)'
+              }}
               tabIndex={selectable ? 0 : undefined}
               role={selectable ? 'button' : 'img'}
               aria-label={seg.label}

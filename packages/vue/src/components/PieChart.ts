@@ -342,7 +342,7 @@ export const PieChart = defineComponent({
                           : `translate(${dx}px, ${dy}px)`,
                         transformOrigin: `${cx}px ${cy}px`,
                         transition:
-                          'transform var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-spring,cubic-bezier(0.4,0,0.2,1)), opacity 0.2s ease-out, filter 0.3s ease-out',
+                          'transform var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-spring,cubic-bezier(0.4,0,0.2,1)), opacity var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-decelerate,ease-out), filter var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-decelerate,ease-out)',
                         filter: props.shadow
                           ? isEmphasized
                             ? PIE_EMPHASIS_SHADOW

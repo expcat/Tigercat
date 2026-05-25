@@ -324,7 +324,7 @@ export const ScatterChart = defineComponent({
                       const styleStr = [
                         filterStyle ? `filter:${filterStyle}` : '',
                         animDelay
-                          ? `animation:${SCATTER_ENTRANCE_CLASS} 500ms cubic-bezier(.34,1.56,.64,1) ${animDelay} both`
+                          ? `animation:${SCATTER_ENTRANCE_CLASS} var(--tiger-motion-duration-slow,500ms) var(--tiger-motion-ease-spring,cubic-bezier(.34,1.56,.64,1)) ${animDelay} both`
                           : ''
                       ]
                         .filter(Boolean)
@@ -337,6 +337,7 @@ export const ScatterChart = defineComponent({
                         'stroke-width': props.pointBorderWidth,
                         class: classNames(
                           scatterPointTransitionClasses,
+                          animDelay && SCATTER_ENTRANCE_CLASS,
                           interactive && 'cursor-pointer'
                         ),
                         style: styleStr || undefined,

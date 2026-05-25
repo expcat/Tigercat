@@ -122,4 +122,127 @@ describe('animation utilities', () => {
       [SVG_ANIMATION_VARS.pieDuration]: '800ms'
     })
   })
+
+  it('resolves token-backed component motion styles and transitions', async () => {
+    const {
+      COMPONENT_MOTION_VARS,
+      getComponentMotionStyle,
+      getComponentMotionTransition,
+      resolveMotionDuration,
+      resolveMotionEasing
+    } = await loadAnimation()
+
+    expect(resolveMotionDuration('slow')).toBe('var(--tiger-motion-duration-slow,450ms)')
+    expect(resolveMotionDuration(125)).toBe('125ms')
+    expect(resolveMotionEasing('spring')).toBe(
+      'var(--tiger-motion-ease-spring,cubic-bezier(0.34, 1.56, 0.64, 1))'
+    )
+
+    const style = getComponentMotionStyle({
+      duration: 'relaxed',
+      easing: 'emphasized',
+      direction: 'up'
+    })
+    expect(style[COMPONENT_MOTION_VARS.duration]).toBe('var(--tiger-motion-duration-relaxed,300ms)')
+    expect(style[COMPONENT_MOTION_VARS.translateY]).toBe('0.5rem')
+    expect(getComponentMotionTransition(['opacity', 'transform'], { duration: 180 })).toContain(
+      'opacity 180ms'
+    )
+  })
+
+  it('collapses component motion, stagger, and sequence timing when disabled', async () => {
+    const {
+      COMPONENT_MOTION_VARS,
+      getComponentMotionStyle,
+      getStaggerDelay,
+      getStaggeredMotionStyle,
+      createMotionSequence
+    } = await loadAnimation()
+
+    expect(getComponentMotionStyle({ disabled: true })[COMPONENT_MOTION_VARS.duration]).toBe('0ms')
+    expect(getStaggerDelay(3, { disabled: true })).toBe('0ms')
+    expect(getStaggeredMotionStyle(2, { disabled: true }).animationDelay).toBe('0ms')
+
+    expect(
+      createMotionSequence([{ id: 'panel' }, { id: 'items', durationMs: 300 }], { disabled: true })
+    ).toEqual([
+      expect.objectContaining({ id: 'panel', startMs: 0, durationMs: 0, gapAfterMs: 0 }),
+      expect.objectContaining({ id: 'items', startMs: 0, durationMs: 0, gapAfterMs: 0 })
+    ])
+  })
+
+  it('creates staggered and sequenced animation timing styles', async () => {
+    const {
+      COMPONENT_MOTION_VARS,
+      getStaggerDelay,
+      getStaggeredMotionStyle,
+      createMotionSequence
+    } = await loadAnimation()
+
+    expect(getStaggerDelay(3, { stepMs: 25, initialDelayMs: 10 })).toBe('85ms')
+    expect(getStaggeredMotionStyle(2, { stepMs: 30 }).animationDelay).toBe('60ms')
+
+    const sequence = createMotionSequence(
+      [{ id: 'overlay' }, { id: 'panel', durationMs: 300, gapAfterMs: 20 }],
+      { durationMs: 200, gapMs: 50, initialDelayMs: 15 }
+    )
+
+    expect(sequence[0]).toEqual(
+      expect.objectContaining({
+        id: 'overlay',
+        index: 0,
+        startMs: 15,
+        durationMs: 200,
+        gapAfterMs: 50
+      })
+    )
+    expect(sequence[1]?.style[COMPONENT_MOTION_VARS.delay]).toBe('265ms')
+  })
+
+  it('runs View Transition callbacks through the browser API when available', async () => {
+    const {
+      injectViewTransitionStyles,
+      startTigercatViewTransition,
+      supportsViewTransitions,
+      getViewTransitionNameStyle
+    } = await loadAnimation()
+
+    const transition = {
+      ready: Promise.resolve(),
+      finished: Promise.resolve(),
+      updateCallbackDone: Promise.resolve(),
+      skipTransition: vi.fn()
+    }
+    const startViewTransition = vi.fn((callback: () => void) => {
+      callback()
+      return transition
+    })
+    Object.defineProperty(document, 'startViewTransition', {
+      value: startViewTransition,
+      configurable: true
+    })
+
+    const update = vi.fn()
+    await expect(startTigercatViewTransition(update)).resolves.toBe(transition)
+    expect(startViewTransition).toHaveBeenCalledTimes(1)
+    expect(update).toHaveBeenCalledTimes(1)
+    expect(supportsViewTransitions()).toBe(true)
+    expect(getViewTransitionNameStyle('route-main')).toEqual({ viewTransitionName: 'route-main' })
+
+    injectViewTransitionStyles()
+    injectViewTransitionStyles()
+    expect(document.querySelectorAll('#tiger-ui-view-transition-styles')).toHaveLength(1)
+  })
+
+  it('falls back to direct updates when View Transitions are unavailable', async () => {
+    const { startTigercatViewTransition } = await loadAnimation()
+    Object.defineProperty(document, 'startViewTransition', {
+      value: undefined,
+      configurable: true
+    })
+
+    const update = vi.fn()
+    await expect(startTigercatViewTransition(update)).resolves.toBeUndefined()
+    expect(update).toHaveBeenCalledTimes(1)
+  })
 })

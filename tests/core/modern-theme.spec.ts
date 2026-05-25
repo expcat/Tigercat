@@ -70,6 +70,7 @@ describe('Modern theme tokens', () => {
   it('reduced-motion overrides collapse all durations to 0ms', () => {
     expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-motion-duration-base']).toBe('0ms')
     expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-motion-duration-slow']).toBe('0ms')
+    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-transition-base']).toBe('all 0ms linear')
   })
 
   it('modernTheme preset exposes name + label + radius + shadows + motion', () => {
@@ -107,6 +108,7 @@ describe('createTigercatPlugin modern option', () => {
   it('createTigercatPlugin without modern flag does NOT emit override block', () => {
     const rules = captureRules(createTigercatPlugin())
     expect(rules['[data-tiger-style="modern"]']).toBeUndefined()
+    expect(rules['@media (prefers-reduced-motion: reduce)']).toBeDefined()
   })
 
   it('createTigercatPlugin({ modern: true }) emits override + reduced-motion block', () => {

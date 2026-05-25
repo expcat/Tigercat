@@ -95,7 +95,13 @@ const DROPDOWN_ANIMATION_CSS = `
   }
 }
 .tiger-dropdown-enter {
-  animation: tiger-dropdown-in 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  animation: tiger-dropdown-in var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-standard,cubic-bezier(0.25, 0.1, 0.25, 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tiger-dropdown-enter {
+    animation-duration: 0ms;
+  }
 }
 `
 
