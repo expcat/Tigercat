@@ -62,6 +62,9 @@ export * from './auto-complete-utils'
 // Picker (Select / AutoComplete / Cascader / ...) shared helpers
 export * from './picker-utils'
 
+// Spotlight utilities
+export * from './spotlight-utils'
+
 // Transfer utilities
 export * from './transfer-utils'
 

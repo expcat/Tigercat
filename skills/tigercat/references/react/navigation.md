@@ -5,7 +5,7 @@ description: React navigation components usage
 
 # Navigation Components (React)
 
-导航组件：Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree, BackTop, Anchor
+导航组件：Breadcrumb, Dropdown, Menu, Pagination, Spotlight, Steps, Tabs, Tree, BackTop, Anchor
 
 > **Props Reference**: [shared/props/navigation.md](../shared/props/navigation.md)
 
@@ -214,6 +214,36 @@ const [openKeys, setOpenKeys] = useState<(string | number)[]>(['sub1'])
     <MenuItem itemKey="3">选项 3</MenuItem>
   </MenuItemGroup>
 </Menu>
+```
+
+---
+
+## Spotlight 命令面板
+
+```tsx
+import { useState } from 'react'
+import { Button, Spotlight, type SpotlightItem } from '@expcat/tigercat-react'
+
+const commands: SpotlightItem[] = [
+  { key: 'dashboard', label: '打开仪表盘', group: '导航', shortcut: ['⌘', 'D'] },
+  { key: 'invite', label: '邀请成员', group: '操作' },
+  { key: 'billing', label: '账单设置', group: '设置', disabled: true }
+]
+
+const [open, setOpen] = useState(false)
+const [query, setQuery] = useState('')
+
+<Button onClick={() => setOpen(true)}>打开命令面板</Button>
+<Spotlight
+  open={open}
+  query={query}
+  items={commands}
+  title="命令面板"
+  placeholder="搜索页面或操作"
+  onOpenChange={setOpen}
+  onQueryChange={setQuery}
+  onSelect={(item) => console.log(item.key)}
+/>
 ```
 
 ---

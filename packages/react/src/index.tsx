@@ -179,6 +179,8 @@ export type { DropdownMenuProps } from './components/Dropdown'
 
 export { DropdownItem } from './components/DropdownItem'
 export type { DropdownItemProps } from './components/DropdownItem'
+export { Spotlight } from './components/Spotlight'
+export type { SpotlightProps } from './components/Spotlight'
 
 export { Drawer } from './components/Drawer'
 export type { DrawerProps } from './components/Drawer'

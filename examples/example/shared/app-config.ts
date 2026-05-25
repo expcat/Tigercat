@@ -243,6 +243,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'float-button',
         path: '/float-button',
         label: { 'zh-CN': 'FloatButton 浮动按钮', 'en-US': 'FloatButton' }
+      },
+      {
+        key: 'spotlight',
+        path: '/spotlight',
+        label: { 'zh-CN': 'Spotlight 命令面板', 'en-US': 'Spotlight' }
       }
     ]
   },

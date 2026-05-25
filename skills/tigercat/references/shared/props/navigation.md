@@ -1,12 +1,12 @@
 ---
 name: tigercat-shared-props-navigation
-description: Shared props definitions for navigation components - Affix, Breadcrumb, Dropdown, FloatButton, Menu, Pagination, Segmented, Steps, Tabs, Tree
+description: Shared props definitions for navigation components - Affix, Breadcrumb, Dropdown, FloatButton, Menu, Pagination, Segmented, Spotlight, Steps, Tabs, Tree
 ---
 
 <!-- LLM-INDEX
 type: props-reference
 category: navigation
-components: 10
+components: 11
 key-apis: items, activeKey, selectedKeys, openKeys, current, href, offsetTop, pageSize, treeData
 -->
 
@@ -159,6 +159,66 @@ key-apis: items, activeKey, selectedKeys, openKeys, current, href, offsetTop, pa
 | `@open-change`         | `onOpenChange` | `(key, { openKeys })`     | 子菜单展开/收起 |
 | `@update:selectedKeys` | -              | `selectedKeys`            | v-model 更新    |
 | `@update:openKeys`     | -              | `openKeys`                | v-model 更新    |
+
+---
+
+## Spotlight 命令面板
+
+### SpotlightItem
+
+| Prop        | Type                 | Default | Description            |
+| ----------- | -------------------- | ------- | ---------------------- |
+| key         | `string \| number`   | -       | 唯一标识               |
+| label       | `string`             | -       | 命令标题               |
+| description | `string`             | -       | 命令说明               |
+| group       | `string`             | -       | 分组名称               |
+| keywords    | `string[]`           | -       | 额外搜索关键词         |
+| disabled    | `boolean`            | `false` | 禁用，键盘导航自动跳过 |
+| icon        | `unknown`            | -       | 图标内容               |
+| shortcut    | `string \| string[]` | -       | 快捷键提示             |
+| data        | `unknown`            | -       | 业务侧附加数据         |
+
+### Spotlight Props
+
+| Prop                   | Type                       | Default              | Description                    |
+| ---------------------- | -------------------------- | -------------------- | ------------------------------ |
+| open                   | `boolean`                  | -                    | 显示状态（受控）               |
+| defaultOpen            | `boolean`                  | `false`              | 默认显示状态（非受控）         |
+| query                  | `string`                   | -                    | 搜索词（受控）                 |
+| defaultQuery           | `string`                   | `''`                 | 默认搜索词（非受控）           |
+| items                  | `SpotlightItem[]`          | `[]`                 | 命令列表                       |
+| title                  | `string`                   | `'Spotlight'`        | 面板标题                       |
+| placeholder            | `string`                   | `'Search'`           | 搜索输入占位文本               |
+| emptyText              | `string`                   | `'No results found'` | 空结果文本                     |
+| inputAriaLabel         | `string`                   | -                    | 搜索输入无障碍标签             |
+| listboxLabel           | `string`                   | -                    | 结果列表无障碍标签             |
+| closeOnSelect          | `boolean`                  | `true`               | 选择命令后是否关闭             |
+| mask                   | `boolean`                  | `true`               | 是否显示遮罩                   |
+| maskClosable           | `boolean`                  | `true`               | 点击遮罩是否关闭               |
+| zIndex                 | `number`                   | `1000`               | 层级                           |
+| defaultActiveFirstItem | `boolean`                  | `true`               | 打开或搜索后默认激活首个可用项 |
+| filterItem             | `(query, item) => boolean` | -                    | 自定义过滤逻辑                 |
+| limit                  | `number`                   | -                    | 最大结果数                     |
+| className              | `string`                   | -                    | 自定义 CSS 类名                |
+
+### Events
+
+| Vue Event       | React Callback  | Payload               | Description  |
+| --------------- | --------------- | --------------------- | ------------ |
+| `@update:open`  | -               | `open: boolean`       | v-model 更新 |
+| `@open-change`  | `onOpenChange`  | `open: boolean`       | 显示状态变化 |
+| `@update:query` | -               | `query: string`       | v-model 更新 |
+| `@query-change` | `onQueryChange` | `query: string`       | 搜索词变化   |
+| `@select`       | `onSelect`      | `item: SpotlightItem` | 选择命令     |
+
+### Keyboard
+
+| Key                     | Behavior            |
+| ----------------------- | ------------------- |
+| `ArrowUp` / `ArrowDown` | 切换结果项          |
+| `Home` / `End`          | 跳到首个/末个可用项 |
+| `Enter`                 | 选择当前激活项      |
+| `Escape`                | 关闭面板            |
 
 ---
 

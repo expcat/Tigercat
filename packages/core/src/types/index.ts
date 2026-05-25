@@ -60,6 +60,7 @@ export * from './breadcrumb'
 export * from './steps'
 export * from './pagination'
 export * from './dropdown'
+export * from './spotlight'
 
 // Feedback components
 export * from './drawer'

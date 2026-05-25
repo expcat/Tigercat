@@ -5,7 +5,7 @@ description: Vue navigation components usage
 
 # Navigation Components (Vue)
 
-导航组件：Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree, BackTop, Anchor
+导航组件：Breadcrumb, Dropdown, Menu, Pagination, Spotlight, Steps, Tabs, Tree, BackTop, Anchor
 
 > **Props Reference**: [shared/props/navigation.md](../shared/props/navigation.md)
 
@@ -258,6 +258,39 @@ import { Menu, MenuItem, SubMenu, MenuItemGroup } from '@expcat/tigercat-vue'
 const selectedKeys = ref(['home'])
 const openKeys = ref(['sub1'])
 const collapsed = ref(false)
+</script>
+```
+
+---
+
+## Spotlight 命令面板
+
+```vue
+<template>
+  <Button @click="open = true">打开命令面板</Button>
+  <Spotlight
+    v-model:open="open"
+    v-model:query="query"
+    :items="commands"
+    title="命令面板"
+    placeholder="搜索页面或操作"
+    @select="handleSelect" />
+</template>
+<script setup lang="ts">
+import { ref } from 'vue'
+import { Button, Spotlight, type SpotlightItem } from '@expcat/tigercat-vue'
+
+const open = ref(false)
+const query = ref('')
+const commands: SpotlightItem[] = [
+  { key: 'dashboard', label: '打开仪表盘', group: '导航', shortcut: ['⌘', 'D'] },
+  { key: 'invite', label: '邀请成员', group: '操作' },
+  { key: 'billing', label: '账单设置', group: '设置', disabled: true }
+]
+
+const handleSelect = (item: SpotlightItem) => {
+  console.log(item.key)
+}
 </script>
 ```
 

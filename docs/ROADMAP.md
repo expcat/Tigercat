@@ -59,7 +59,7 @@ source: current repository audit and planning
 
 | 组件           | 类别       | 目标                                               | 优先级 |
 | -------------- | ---------- | -------------------------------------------------- | ------ |
-| Spotlight      | Navigation | 命令面板，支持模糊搜索、分组结果、键盘导航         | 高     |
+| Spotlight      | Navigation | 命令面板，支持模糊搜索、分组结果、键盘导航         | 已完成 |
 | Signature      | Form       | 手写签名画板，支持颜色、线宽、清空、导出 PNG/SVG   | 高     |
 | NumberKeyboard | Form       | 移动端数字键盘，支持金额、手机号、身份证输入模式   | 中     |
 | ScrollSpy      | Navigation | 滚动监听并自动高亮 Anchor/导航项                   | 中     |

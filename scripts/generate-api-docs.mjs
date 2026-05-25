@@ -101,6 +101,7 @@ const CATEGORIES = {
     'float-button',
     'menu',
     'pagination',
+    'spotlight',
     'steps',
     'tabs',
     'tree'
