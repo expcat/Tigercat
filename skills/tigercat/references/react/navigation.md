@@ -248,6 +248,33 @@ const [query, setQuery] = useState('')
 
 ---
 
+## ScrollSpy 滚动监听
+
+```tsx
+import { useState } from 'react'
+import { ScrollSpy, type ScrollSpyItem } from '@expcat/tigercat-react'
+
+const items: ScrollSpyItem[] = [
+  { key: 'overview', href: '#overview', label: '概览' },
+  { key: 'usage', href: '#usage', label: '用法' },
+  { key: 'api', href: '#api', label: 'API', children: [{ key: 'events', href: '#events', label: '事件' }] }
+]
+
+const getContainer = () => document.querySelector('main > div.overflow-y-auto') as HTMLElement || window
+const [activeKey, setActiveKey] = useState<string | number>('overview')
+
+<ScrollSpy
+  sticky
+  items={items}
+  activeKey={activeKey}
+  getContainer={getContainer}
+  targetOffset={80}
+  onChange={(key) => setActiveKey(key)}
+/>
+```
+
+---
+
 ## Tabs 标签页
 
 ```tsx

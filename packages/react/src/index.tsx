@@ -185,6 +185,8 @@ export { DropdownItem } from './components/DropdownItem'
 export type { DropdownItemProps } from './components/DropdownItem'
 export { Spotlight } from './components/Spotlight'
 export type { SpotlightProps } from './components/Spotlight'
+export { ScrollSpy } from './components/ScrollSpy'
+export type { ScrollSpyProps } from './components/ScrollSpy'
 
 export { Drawer } from './components/Drawer'
 export type { DrawerProps } from './components/Drawer'

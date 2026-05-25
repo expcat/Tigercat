@@ -296,6 +296,40 @@ const handleSelect = (item: SpotlightItem) => {
 
 ---
 
+## ScrollSpy 滚动监听
+
+```vue
+<template>
+  <ScrollSpy
+    sticky
+    v-model:active-key="activeKey"
+    :items="items"
+    :get-container="getContainer"
+    :target-offset="80" />
+</template>
+<script setup lang="ts">
+import { ref } from 'vue'
+import { ScrollSpy, type ScrollSpyItem } from '@expcat/tigercat-vue'
+
+const activeKey = ref<string | number>('overview')
+const items: ScrollSpyItem[] = [
+  { key: 'overview', href: '#overview', label: '概览' },
+  { key: 'usage', href: '#usage', label: '用法' },
+  {
+    key: 'api',
+    href: '#api',
+    label: 'API',
+    children: [{ key: 'events', href: '#events', label: '事件' }]
+  }
+]
+
+const getContainer = () =>
+  (document.querySelector('main > div.overflow-y-auto') as HTMLElement) || window
+</script>
+```
+
+---
+
 ## Tabs 标签页
 
 ```vue

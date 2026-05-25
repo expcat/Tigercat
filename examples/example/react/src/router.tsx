@@ -82,6 +82,7 @@ const AffixDemo = lazy(() => import('./pages/AffixDemo'))
 const TourDemo = lazy(() => import('./pages/TourDemo'))
 const FloatButtonDemo = lazy(() => import('./pages/FloatButtonDemo'))
 const SpotlightDemo = lazy(() => import('./pages/SpotlightDemo'))
+const ScrollSpyDemo = lazy(() => import('./pages/ScrollSpyDemo'))
 
 // Feedback
 const AlertDemo = lazy(() => import('./pages/AlertDemo'))
@@ -213,6 +214,7 @@ const router = createBrowserRouter(
         { path: 'tour', element: <TourDemo /> },
         { path: 'float-button', element: <FloatButtonDemo /> },
         { path: 'spotlight', element: <SpotlightDemo /> },
+        { path: 'scroll-spy', element: <ScrollSpyDemo /> },
         // Feedback
         { path: 'alert', element: <AlertDemo /> },
         { path: 'message', element: <MessageDemo /> },

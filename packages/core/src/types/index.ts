@@ -63,6 +63,7 @@ export * from './steps'
 export * from './pagination'
 export * from './dropdown'
 export * from './spotlight'
+export * from './scroll-spy'
 
 // Feedback components
 export * from './drawer'

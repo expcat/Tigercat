@@ -258,6 +258,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'spotlight',
         path: '/spotlight',
         label: { 'zh-CN': 'Spotlight 命令面板', 'en-US': 'Spotlight' }
+      },
+      {
+        key: 'scroll-spy',
+        path: '/scroll-spy',
+        label: { 'zh-CN': 'ScrollSpy 滚动监听', 'en-US': 'ScrollSpy' }
       }
     ]
   },

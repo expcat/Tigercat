@@ -5,7 +5,7 @@ description: Compact generated API summary for Tigercat core types
 
 <!-- LLM-INDEX
 type: generated-api-summary
-total-exported-types: 555
+total-exported-types: 560
 source: packages/core/src/types/*.ts
 -->
 
@@ -106,6 +106,7 @@ source: packages/core/src/types/*.ts
 | float-button.ts | FloatButtonProps, FloatButtonGroupProps                    | FloatButton, FloatButtonGroup          | 4       |
 | menu.ts         | MenuProps, MenuItemProps, SubMenuProps, MenuItemGroupProps | Menu, MenuItem, SubMenu, MenuItemGroup | 8       |
 | pagination.ts   | PaginationProps                                            | Pagination                             | 8       |
+| scroll-spy.ts   | ScrollSpyProps                                             | ScrollSpy                              | 5       |
 | spotlight.ts    | SpotlightProps                                             | Spotlight                              | 4       |
 | steps.ts        | StepsProps                                                 | Steps                                  | 5       |
 | tabs.ts         | TabsProps, TabPaneProps                                    | Tabs, TabPane                          | 7       |

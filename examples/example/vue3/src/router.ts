@@ -100,6 +100,7 @@ const router = createRouter({
         { path: 'tour', component: lazyPage(() => import('./pages/TourDemo.vue')) },
         { path: 'float-button', component: lazyPage(() => import('./pages/FloatButtonDemo.vue')) },
         { path: 'spotlight', component: lazyPage(() => import('./pages/SpotlightDemo.vue')) },
+        { path: 'scroll-spy', component: lazyPage(() => import('./pages/ScrollSpyDemo.vue')) },
         // Feedback
         { path: 'alert', component: lazyPage(() => import('./pages/AlertDemo.vue')) },
         { path: 'message', component: lazyPage(() => import('./pages/MessageDemo.vue')) },

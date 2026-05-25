@@ -71,6 +71,9 @@ export * from './picker-utils'
 // Spotlight utilities
 export * from './spotlight-utils'
 
+// ScrollSpy utilities
+export * from './scroll-spy-utils'
+
 // Transfer utilities
 export * from './transfer-utils'
 

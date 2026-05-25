@@ -1,12 +1,12 @@
 ---
 name: tigercat-shared-props-navigation
-description: Shared props definitions for navigation components - Affix, Breadcrumb, Dropdown, FloatButton, Menu, Pagination, Segmented, Spotlight, Steps, Tabs, Tree
+description: Shared props definitions for navigation components - Affix, Breadcrumb, Dropdown, FloatButton, Menu, Pagination, ScrollSpy, Segmented, Spotlight, Steps, Tabs, Tree
 ---
 
 <!-- LLM-INDEX
 type: props-reference
 category: navigation
-components: 11
+components: 12
 key-apis: items, activeKey, selectedKeys, openKeys, current, href, offsetTop, pageSize, treeData
 -->
 
@@ -219,6 +219,44 @@ key-apis: items, activeKey, selectedKeys, openKeys, current, href, offsetTop, pa
 | `Home` / `End`          | 跳到首个/末个可用项 |
 | `Enter`                 | 选择当前激活项      |
 | `Escape`                | 关闭面板            |
+
+---
+
+## ScrollSpy 滚动监听
+
+### ScrollSpyItem
+
+| Prop     | Type               | Default | Description              |
+| -------- | ------------------ | ------- | ------------------------ |
+| key      | `string \| number` | -       | 唯一标识                 |
+| href     | `string`           | -       | 目标锚点，如 `#overview` |
+| label    | `string`           | -       | 导航文字                 |
+| disabled | `boolean`          | `false` | 禁用且不参与滚动监听     |
+| children | `ScrollSpyItem[]`  | -       | 子级导航项               |
+
+### ScrollSpy Props
+
+| Prop             | Type                          | Default               | Description            |
+| ---------------- | ----------------------------- | --------------------- | ---------------------- |
+| items            | `ScrollSpyItem[]`             | `[]`                  | 导航项                 |
+| activeKey        | `string \| number`            | -                     | 当前激活项（受控）     |
+| defaultActiveKey | `string \| number`            | 首个可用项            | 默认激活项（非受控）   |
+| offsetTop        | `number`                      | `0`                   | 监听顶部偏移           |
+| targetOffset     | `number`                      | -                     | 点击滚动偏移           |
+| bounds           | `number`                      | `5`                   | fallback 边界          |
+| direction        | `'vertical' \| 'horizontal'`  | `'vertical'`          | 导航方向               |
+| sticky           | `boolean`                     | `false`               | 是否使用 sticky 定位   |
+| ariaLabel        | `string`                      | `'Scroll navigation'` | 无障碍标签             |
+| getContainer     | `() => HTMLElement \| Window` | `() => window`        | 滚动容器（框架层提供） |
+| className        | `string`                      | -                     | 自定义 CSS 类名        |
+
+### Events
+
+| Vue Event           | React Callback | Payload                       | Description  |
+| ------------------- | -------------- | ----------------------------- | ------------ |
+| `@update:activeKey` | -              | `activeKey: string \| number` | v-model 更新 |
+| `@change`           | `onChange`     | `(activeKey, item, payload)`  | 激活项变化   |
+| `@click`            | `onClick`      | `(item, event)`               | 点击导航项   |
 
 ---
 
