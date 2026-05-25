@@ -33,7 +33,7 @@ key-apis: variant, size, disabled, loading, closable, open, preview, copyable, c
 | loadingIcon  | `ReactNode`                                                  | -           | 自定义加载图标 (React only) |
 | className    | `string`                                                     | -           | 自定义类名 (React only)     |
 
-> **Breaking**: `type` 已重命名为 `htmlType`（迁移摘要见 [CHANGELOG.md](../../../../CHANGELOG.md)）
+> **Breaking**: `type` 已重命名为 `htmlType`（迁移摘要见 [CHANGELOG.md](../../../../../CHANGELOG.md)）
 
 ---
 
@@ -649,8 +649,8 @@ key-apis: variant, size, disabled, loading, closable, open, preview, copyable, c
 - **Vue**: `inject(TigerConfigKey)` 获取 `ComputedRef<TigerConfig>`
 - **React**: `useTigerConfig()` hook 获取 `TigerConfig`
 
-> 详见 [i18n.md](../i18n.md) 和 [theme.md](../theme.md)
+> 详见 [i18n.md](../../i18n.md) 和 [theme.md](../../theme.md)
 
 ---
 
-> **See also**: [Vue examples](../vue/basic.md) · [React examples](../react/basic.md)
+> **See also**: [Vue examples](../../vue/basic.md) · [React examples](../../react/basic.md)

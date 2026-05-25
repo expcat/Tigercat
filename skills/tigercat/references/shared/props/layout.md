@@ -305,4 +305,4 @@ key-apis: variant, size, direction, gutter, span, loading, rows, columns, classN
 
 ---
 
-> **See also**: [Vue examples](../vue/layout.md) · [React examples](../react/layout.md)
+> **See also**: [Vue examples](../../vue/layout.md) · [React examples](../../react/layout.md)

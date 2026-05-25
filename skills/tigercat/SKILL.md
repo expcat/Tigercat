@@ -9,17 +9,17 @@ Tailwind CSS 驱动的跨框架组件库。此文件只做 LLM 导航索引；�
 
 ## Open First
 
-| Need                              | File                                                                                                                                                        |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 术语与 Vue/React 映射             | [shared/glossary.md](references/shared/glossary.md)                                                                                                         |
-| 常用跨框架模式                    | [shared/patterns/common.md](references/shared/patterns/common.md)                                                                                           |
-| TS 派生 API 摘要                  | [shared/api-summary.md](references/shared/api-summary.md)                                                                                                   |
-| TS 派生 Props 摘要                | [shared/generated-props.md](references/shared/generated-props.md)                                                                                           |
-| Theme / Tokens / i18n / SSR / CLI | [theme.md](references/theme.md), [tokens.md](references/tokens.md), [i18n.md](references/i18n.md), [ssr.md](references/ssr.md), [cli.md](references/cli.md) |
+| Need                                      | File                                                                                                                                                                                                             |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 术语与 Vue/React 映射                     | [shared/glossary.md](references/shared/glossary.md)                                                                                                                                                              |
+| 常用跨框架模式                            | [shared/patterns/common.md](references/shared/patterns/common.md)                                                                                                                                                |
+| TS 派生 API 摘要                          | [shared/api-summary.md](references/shared/api-summary.md)                                                                                                                                                        |
+| Setup / Theme / Tokens / i18n / SSR / CLI | [getting-started.md](references/getting-started.md), [theme.md](references/theme.md), [tokens.md](references/tokens.md), [i18n.md](references/i18n.md), [ssr.md](references/ssr.md), [cli.md](references/cli.md) |
+| Accessibility / Performance / Release     | [accessibility.md](references/accessibility.md), [performance.md](references/performance.md), [release.md](references/release.md)                                                                                |
 
 ## Category Index
 
-| Category   | Shared Props                                                        | Vue Examples                                      | React Examples                                        |
+| Category   | Shared Props                                                        | Vue                                               | React                                                 |
 | ---------- | ------------------------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------- |
 | Basic      | [shared/props/basic.md](references/shared/props/basic.md)           | [vue/basic.md](references/vue/basic.md)           | [react/basic.md](references/react/basic.md)           |
 | Form       | [shared/props/form.md](references/shared/props/form.md)             | [vue/form.md](references/vue/form.md)             | [react/form.md](references/react/form.md)             |
@@ -28,15 +28,8 @@ Tailwind CSS 驱动的跨框架组件库。此文件只做 LLM 导航索引；�
 | Navigation | [shared/props/navigation.md](references/shared/props/navigation.md) | [vue/navigation.md](references/vue/navigation.md) | [react/navigation.md](references/react/navigation.md) |
 | Data       | [shared/props/data.md](references/shared/props/data.md)             | [vue/data.md](references/vue/data.md)             | [react/data.md](references/react/data.md)             |
 | Charts     | [shared/props/charts.md](references/shared/props/charts.md)         | [vue/charts.md](references/vue/charts.md)         | [react/charts.md](references/react/charts.md)         |
+| Advanced   | [shared/props/advanced.md](references/shared/props/advanced.md)     | [vue/advanced.md](references/vue/advanced.md)     | [react/advanced.md](references/react/advanced.md)     |
 | Composite  | [shared/props/composite.md](references/shared/props/composite.md)   | [vue/composite.md](references/vue/composite.md)   | [react/composite.md](references/react/composite.md)   |
-| Advanced   | [shared/props/advanced.md](references/shared/props/advanced.md)     | -                                                 | -                                                     |
-| Theme      | [theme.md](references/theme.md)                                     | -                                                 | -                                                     |
-| Tokens     | [tokens.md](references/tokens.md)                                   | -                                                 | -                                                     |
-| i18n       | [i18n.md](references/i18n.md)                                       | -                                                 | -                                                     |
-| SSR        | [ssr.md](references/ssr.md)                                         | -                                                 | -                                                     |
-| Patterns   | [shared/patterns/common.md](references/shared/patterns/common.md)   | -                                                 | -                                                     |
-| Glossary   | [shared/glossary.md](references/shared/glossary.md)                 | -                                                 | -                                                     |
-| CLI        | [cli.md](references/cli.md)                                         | -                                                 | -                                                     |
 
 ## 2-Step Component Lookup
 

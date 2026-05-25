@@ -492,4 +492,4 @@ key-apis: items, activeKey, selectedKeys, openKeys, current, href, offsetTop, pa
 
 ---
 
-> **See also**: [Vue examples](../vue/navigation.md) · [React examples](../react/navigation.md)
+> **See also**: [Vue examples](../../vue/navigation.md) · [React examples](../../react/navigation.md)

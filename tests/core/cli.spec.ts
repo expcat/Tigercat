@@ -112,6 +112,17 @@ describe('CLI Templates - Vue 3', () => {
     expect(pkg.devDependencies).toHaveProperty('tailwindcss')
     expect(pkg.devDependencies).toHaveProperty('vite')
     expect(pkg.devDependencies).toHaveProperty('@vitejs/plugin-vue')
+    expect(pkg.devDependencies.tailwindcss).toMatch(/^\^4\./)
+    expect(pkg.devDependencies['@tailwindcss/vite']).toMatch(/^\^4\./)
+  })
+
+  it('should wire Tailwind v4 through the Vite plugin and CSS plugin entry', () => {
+    const files = getVue3Template('test')
+
+    expect(files['vite.config.ts']).toContain("from '@tailwindcss/vite'")
+    expect(files['vite.config.ts']).toContain('tailwindcss()')
+    expect(files['src/style.css']).toContain('@import "tailwindcss"')
+    expect(files['src/style.css']).toContain('@expcat/tigercat-core/tailwind/modern')
   })
 
   it('should have dev/build/preview scripts', () => {
@@ -195,6 +206,17 @@ describe('CLI Templates - React', () => {
     expect(pkg.devDependencies).toHaveProperty('tailwindcss')
     expect(pkg.devDependencies).toHaveProperty('vite')
     expect(pkg.devDependencies).toHaveProperty('@vitejs/plugin-react')
+    expect(pkg.devDependencies.tailwindcss).toMatch(/^\^4\./)
+    expect(pkg.devDependencies['@tailwindcss/vite']).toMatch(/^\^4\./)
+  })
+
+  it('should wire Tailwind v4 through the Vite plugin and CSS plugin entry', () => {
+    const files = getReactTemplate('test')
+
+    expect(files['vite.config.ts']).toContain("from '@tailwindcss/vite'")
+    expect(files['vite.config.ts']).toContain('tailwindcss()')
+    expect(files['src/style.css']).toContain('@import "tailwindcss"')
+    expect(files['src/style.css']).toContain('@expcat/tigercat-core/tailwind/modern')
   })
 
   it('should import tigercat-react in App.tsx', () => {
@@ -310,7 +332,7 @@ describe('CLI Doctor', () => {
     expect(checks.every((check) => check.status === 'pass')).toBe(true)
   })
 
-  it('fails when Node, pnpm, and Tailwind are too old', () => {
+  it('fails when Node and pnpm are too old', () => {
     const projectDir = writePackage('old-toolchain', {
       packageManager: 'pnpm@7.33.0',
       dependencies: {
@@ -319,19 +341,44 @@ describe('CLI Doctor', () => {
       },
       devDependencies: {
         '@expcat/tigercat-core': '^1.0.0',
-        '@tailwindcss/vite': '^3.4.0',
+        '@tailwindcss/vite': '^4.2.4',
         '@vitejs/plugin-vue': '^6.0.3',
-        tailwindcss: '^3.4.17',
-        typescript: '^5.9.3',
-        vite: '^7.3.0',
-        'vue-tsc': '^2.2.0'
+        tailwindcss: '^4.2.4',
+        typescript: '^6.0.3',
+        vite: '^8.0.10',
+        'vue-tsc': '^3.2.7'
       }
     })
 
     const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '16.20.2', env: {} })
     const failedNames = checks.filter((check) => check.status === 'fail').map((check) => check.name)
 
-    expect(failedNames).toEqual(expect.arrayContaining(['Node.js', 'pnpm', 'Tailwind CSS']))
+    expect(failedNames).toEqual(expect.arrayContaining(['Node.js', 'pnpm']))
+    expect(failedNames).not.toContain('Tailwind CSS')
+  })
+
+  it('fails when the Tailwind v4 Vite plugin is missing', () => {
+    const projectDir = writePackage('missing-tailwind-vite-plugin', {
+      packageManager: 'pnpm@10.26.2',
+      dependencies: {
+        '@expcat/tigercat-vue': '^1.0.0',
+        vue: '^3.5.26'
+      },
+      devDependencies: {
+        '@expcat/tigercat-core': '^1.0.0',
+        '@vitejs/plugin-vue': '^6.0.3',
+        tailwindcss: '^4.2.4',
+        typescript: '^6.0.3',
+        vite: '^8.0.10',
+        'vue-tsc': '^3.2.7'
+      }
+    })
+
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '20.0.0', env: {} })
+    const tailwindCheck = checks.find((check) => check.name === 'Tailwind CSS')
+
+    expect(tailwindCheck?.status).toBe('fail')
+    expect(tailwindCheck?.message).toContain('@tailwindcss/vite is required')
   })
 
   it('warns when a supported framework is not detected', () => {

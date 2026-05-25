@@ -1,0 +1,39 @@
+name: Post Release Smoke
+
+on:
+  workflow_run:
+    workflows: ['Publish Packages']
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Published Tigercat package version to smoke test
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: post-release-smoke-${{ github.event_name == 'workflow_dispatch' && inputs.version || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Smoke test published packages
+        run: npm run smoke:published
+        env:
+          TIGERCAT_SMOKE_VERSION: ${{ inputs.version }}

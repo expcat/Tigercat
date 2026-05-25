@@ -1,8 +1,13 @@
-# 性能与按需加载
+---
+name: tigercat-performance
+description: Tigercat import strategy, lazy loading, chart entries, and performance validation
+---
 
-Tigercat 的 Vue、React、Core 包都提供子路径入口，推荐在大型应用中按组件导入，减少首屏 bundle 体积。
+# Performance
 
-## 子路径导入
+Prefer package-level imports for ordinary usage and component subpath imports for large applications that need stricter bundle control.
+
+## Subpath Imports
 
 ```ts
 import { Button } from '@expcat/tigercat-vue/Button'
@@ -14,9 +19,9 @@ import { Button } from '@expcat/tigercat-react/Button'
 import { Select } from '@expcat/tigercat-react/Select'
 ```
 
-## 重型组件懒加载
+## Lazy Loading
 
-弹层、日期时间选择器、颜色选择器和图表适合按页面或交互时机懒加载。
+Heavy components such as overlays, date/time pickers, color pickers, editors, and charts should be loaded by route or interaction boundary.
 
 ```ts
 import { defineAsyncComponent } from 'vue'
@@ -32,9 +37,9 @@ export const LazyDatePicker = lazy(() => import('@expcat/tigercat-react/DatePick
 export const LazyLineChart = lazy(() => import('@expcat/tigercat-react/LineChart'))
 ```
 
-## 图表按需入口
+## Chart Entries
 
-图表组件支持独立入口，业务页可以只加载当前需要的图表类型。
+Chart components expose independent entries so product pages can load only the chart types they use.
 
 ```ts
 import { LineChart } from '@expcat/tigercat-vue/LineChart'
@@ -46,11 +51,4 @@ import { LineChart } from '@expcat/tigercat-react/LineChart'
 import { BarChart } from '@expcat/tigercat-react/BarChart'
 ```
 
-## Size Limit
-
-仓库的 size-limit 配置同时覆盖完整包和代表性单组件子路径。Button 子路径入口目标为 gzip 后小于 15KB，修改 shared utils 或组件依赖后建议运行：
-
-```bash
-pnpm build
-pnpm size
-```
+Run `pnpm build` and `pnpm size` after changing shared utils, chart code, exports, or component dependencies.

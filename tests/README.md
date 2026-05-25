@@ -405,7 +405,6 @@ screen.debug()
 - Read [Vue Testing Library docs](https://testing-library.com/docs/vue-testing-library/intro/)
 - Read [React Testing Library docs](https://testing-library.com/docs/react-testing-library/intro/)
 - Search [GitHub Issues](https://github.com/expcats/Tigercat/issues)
-- Ask in [GitHub Discussions](https://github.com/expcats/Tigercat/discussions)
 
 ## Debugging Tests
 

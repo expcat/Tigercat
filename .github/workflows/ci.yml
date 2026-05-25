@@ -41,11 +41,14 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      - name: Generate API docs
+      - name: Validate test quality
+        run: pnpm test:validate
+
+      - name: Generate LLM API docs
         run: pnpm docs:api
 
-      - name: Check generated docs are current
-        run: git diff --exit-code docs/api-summary.md skills/tigercat/references/shared/api-summary.md skills/tigercat/references/shared/generated-props.md
+      - name: Check generated skill references are current
+        run: git diff --exit-code skills/tigercat/references/shared/api-summary.md
 
       - name: Validate API and LLM docs
         run: pnpm api:validate

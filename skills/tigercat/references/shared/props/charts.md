@@ -254,4 +254,4 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 
 ---
 
-> **See also**: [Vue examples](../vue/charts.md) · [React examples](../react/charts.md)
+> **See also**: [Vue examples](../../vue/charts.md) · [React examples](../../react/charts.md)

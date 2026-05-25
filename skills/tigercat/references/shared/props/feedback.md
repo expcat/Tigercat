@@ -14,7 +14,7 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 
 共享 Props 定义。Vue/React 默认双端支持，差异仅在 Type 或 Description 中标注。
 
-> **显示状态 (v0.5.0)**: 所有组件统一使用 `open` prop（原 `visible` 已废弃）。详见 [CHANGELOG.md](../../../../CHANGELOG.md) 和 [patterns/common.md](../patterns/common.md)
+> **显示状态 (v0.5.0)**: 所有组件统一使用 `open` prop（原 `visible` 已废弃）。详见 [CHANGELOG.md](../../../../../CHANGELOG.md) 和 [patterns/common.md](../patterns/common.md)
 >
 > **Floating Popup 共享架构**: Tooltip、Popover、Popconfirm 共享 `useFloatingPopup` (Vue) / `usePopup` (React) hook，统一管理 visibility、定位、dismiss 与 trigger 事件。详见 [patterns/common.md](../patterns/common.md#floating-popup-共享架构)
 
@@ -399,4 +399,4 @@ key-apis: open, onOpenChange, placement, trigger, maskClosable, duration, progre
 | font      | `WatermarkFont`      | -       | 字体配置                   |
 | className | `string`             | -       | 自定义类名 (React only)    |
 
-> **See also**: [Vue examples](../vue/feedback.md) · [React examples](../react/feedback.md)
+> **See also**: [Vue examples](../../vue/feedback.md) · [React examples](../../react/feedback.md)

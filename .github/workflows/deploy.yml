@@ -25,37 +25,42 @@ jobs:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build packages and docs
-        run: pnpm build && pnpm docs:build
+      - name: Build packages
+        run: pnpm build
 
-      - name: Build examples
-        run: pnpm example:build
+      - name: Build Vue example
+        run: pnpm --filter @expcat/tigercat-example-vue3 build
 
-      - name: Prepare Pages artifact
+      - name: Build React example
+        run: pnpm --filter @expcat/tigercat-example-react build
+
+      - name: Prepare public_html
         run: |
-          mkdir -p docs/.vitepress/dist/examples
+          mkdir -p public_html
+          cp examples/index.html public_html/index.html
           cp examples/example/vue3/dist/index.html examples/example/vue3/dist/404.html
           cp examples/example/react/dist/index.html examples/example/react/dist/404.html
-          mv examples/example/vue3/dist docs/.vitepress/dist/examples/vue
-          mv examples/example/react/dist docs/.vitepress/dist/examples/react
+          mv examples/example/vue3/dist public_html/vue
+          mv examples/example/react/dist public_html/react
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/.vitepress/dist
+          path: public_html
 
   deploy:
     needs: build

@@ -10,7 +10,7 @@
 | `pnpm dev:check`     | `scripts/check-env.mjs`         | 检查 Node、pnpm、依赖安装和构建产物                                 |
 | `pnpm example:all`   | `scripts/run-examples.mjs`      | 同时运行 Vue3 与 React 示例                                         |
 | `pnpm test:validate` | `scripts/validate-tests.mjs`    | 按 [测试质量指南](../tests/TEST_QUALITY_GUIDELINES.md) 检查测试文件 |
-| `pnpm docs:api`      | `scripts/generate-api-docs.mjs` | 生成 [API 摘要](../docs/api-summary.md)                             |
+| `pnpm docs:api`      | `scripts/generate-api-docs.mjs` | 生成 skills API 摘要                                                |
 
 ## 示例应用
 

@@ -257,7 +257,7 @@ key-apis: columns, dataSource, rowKey, pagination, sort, filters, rowSelection, 
 
 ---
 
-> **See also**: [Vue examples](../vue/data.md) · [React examples](../react/data.md)
+> **See also**: [Vue examples](../../vue/data.md) · [React examples](../../react/data.md)
 
 ---
 

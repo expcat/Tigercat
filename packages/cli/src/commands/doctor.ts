@@ -231,7 +231,6 @@ function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
   }
 
   const tailwindMajor = getRangeMajor(tailwindRange)
-  const pluginMajor = vitePluginRange ? getRangeMajor(vitePluginRange) : null
 
   if (tailwindMajor !== null && tailwindMajor < REQUIRED_TAILWIND_MAJOR) {
     return {
@@ -245,13 +244,24 @@ function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
   if (tailwindMajor === null) {
     return {
       name: 'Tailwind CSS',
-      status: 'warn',
-      message: `Could not verify tailwindcss range ${tailwindRange}; expected ${REQUIRED_TAILWIND_MAJOR}+`,
-      suggestions: ['Use an explicit Tailwind CSS semver range when possible']
+      status: 'fail',
+      message: `Could not verify tailwindcss range ${tailwindRange}; Tigercat builds with Tailwind CSS ${REQUIRED_TAILWIND_MAJOR}+ only`,
+      suggestions: [`Use an explicit Tailwind CSS ${REQUIRED_TAILWIND_MAJOR}+ semver range`]
     }
   }
 
-  if (vitePluginRange && pluginMajor !== null && pluginMajor < REQUIRED_TAILWIND_MAJOR) {
+  if (!vitePluginRange) {
+    return {
+      name: 'Tailwind CSS',
+      status: 'fail',
+      message: '@tailwindcss/vite is required; Tigercat builds with Tailwind CSS 4 only',
+      suggestions: ['Install @tailwindcss/vite 4+']
+    }
+  }
+
+  const pluginMajor = getRangeMajor(vitePluginRange)
+
+  if (pluginMajor !== null && pluginMajor < REQUIRED_TAILWIND_MAJOR) {
     return {
       name: 'Tailwind CSS',
       status: 'fail',
@@ -260,16 +270,20 @@ function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
     }
   }
 
-  const details = vitePluginRange
-    ? [`@tailwindcss/vite ${vitePluginRange}`]
-    : ['@tailwindcss/vite is recommended for Vite templates']
+  if (pluginMajor === null) {
+    return {
+      name: 'Tailwind CSS',
+      status: 'fail',
+      message: `Could not verify @tailwindcss/vite range ${vitePluginRange}; Tigercat builds with Tailwind CSS ${REQUIRED_TAILWIND_MAJOR}+ only`,
+      suggestions: [`Use an explicit @tailwindcss/vite ${REQUIRED_TAILWIND_MAJOR}+ semver range`]
+    }
+  }
 
   return {
     name: 'Tailwind CSS',
-    status: vitePluginRange ? 'pass' : 'warn',
-    message: `tailwindcss ${tailwindRange} satisfies Tigercat requirements`,
-    details,
-    suggestions: vitePluginRange ? undefined : ['Install @tailwindcss/vite for Vite projects']
+    status: 'pass',
+    message: `tailwindcss ${tailwindRange} uses the Tailwind CSS ${REQUIRED_TAILWIND_MAJOR} build pipeline`,
+    details: [`@tailwindcss/vite ${vitePluginRange}`]
   }
 }
 
