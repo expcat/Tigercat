@@ -22,6 +22,6 @@
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vue-tsc": "^3.2.7"
+    "vue-tsc": "^3.3.1"
   }
 }
