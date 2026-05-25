@@ -19,7 +19,7 @@
     "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-react": "^6.0.2",
     "axe-core": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
