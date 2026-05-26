@@ -161,6 +161,9 @@ export * from './image-annotation'
 // OrgChart types (v1.6+)
 export * from './org-chart'
 
+// Gantt types (v1.6+)
+export * from './gantt'
+
 // InputGroup types (v0.9.0+)
 export * from './input-group'
 

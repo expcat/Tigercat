@@ -309,6 +309,17 @@ import { OrgChart } from '@expcat/tigercat-react'
 
 ---
 
+## Gantt
+
+```tsx
+import { Gantt } from '@expcat/tigercat-react'
+
+<Gantt data={tasks} width={760} height={320} hoverable selectable />
+<Gantt data={tasks} scale="month" showDependencies={false} />
+```
+
+---
+
 ## 底层组件
 
 ```tsx

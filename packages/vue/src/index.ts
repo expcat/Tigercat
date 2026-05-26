@@ -322,6 +322,8 @@ export type { VueFileManagerProps } from './components/FileManager'
 // OrgChart (v1.6+)
 export { OrgChart } from './components/OrgChart'
 export type { VueOrgChartProps } from './components/OrgChart'
+export { Gantt } from './components/Gantt'
+export type { VueGanttProps } from './components/Gantt'
 
 // InputGroup (v0.9.0+)
 export { InputGroup, InputGroupAddon } from './components/InputGroup'

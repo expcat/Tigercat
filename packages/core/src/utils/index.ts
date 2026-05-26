@@ -153,6 +153,9 @@ export * from './image-annotation-utils'
 // OrgChart utilities (v1.6+)
 export * from './org-chart-utils'
 
+// Gantt utilities (v1.6+)
+export * from './gantt-utils'
+
 // InputGroup utilities (v0.9.0+)
 export * from './input-group-utils'
 

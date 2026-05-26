@@ -5,7 +5,7 @@ description: Compact generated API summary for Tigercat core types
 
 <!-- LLM-INDEX
 type: generated-api-summary
-total-exported-types: 577
+total-exported-types: 581
 source: packages/core/src/types/*.ts
 -->
 
@@ -129,6 +129,7 @@ source: packages/core/src/types/*.ts
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
 | chart.ts     | BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps, ChartWithAxesProps, ChartCanvasProps, ChartAxisProps, ChartGridProps, ChartSeriesProps, BarChartProps, ScatterChartProps, PieChartProps, DonutChartProps, LineChartProps, AreaChartProps, RadarChartProps, FunnelChartProps, GaugeChartProps, HeatmapChartProps, TreeMapChartProps, SunburstChartProps | ChartInteraction, ChartLegend, ChartTooltip, ChartWithAxes, ChartCanvas, ChartAxis, ChartGrid, ChartSeries, BarChart, ScatterChart, PieChart, DonutChart, LineChart, AreaChart, RadarChart, FunnelChart, GaugeChart, HeatmapChart, TreeMapChart, SunburstChart | 51      |
 | org-chart.ts | OrgChartProps                                                                                                                                                                                                                                                                                                                                                                      | OrgChart                                                                                                                                                                                                                                                       | 3       |
+| gantt.ts     | GanttProps                                                                                                                                                                                                                                                                                                                                                                         | Gantt                                                                                                                                                                                                                                                          | 4       |
 
 ## Advanced
 

@@ -74,6 +74,6 @@ See [../shared/patterns/common.md](../shared/patterns/common.md) for framework c
 **Layout**: Card · Carousel · Container · Descriptions · Grid (Row/Col) · Layout · List · Resizable · Skeleton · Space · Splitter · Statistic
 **Navigation**: Affix · Anchor · BackTop · Breadcrumb · Dropdown · FloatButton · Menu · Pagination · Segmented · Steps · Tabs · Tree
 **Data**: Calendar · Collapse · Table · Timeline
-**Charts**: AreaChart · BarChart · DonutChart · FunnelChart · GaugeChart · HeatmapChart · LineChart · OrgChart · PieChart · RadarChart · ScatterChart · SunburstChart · TreeMapChart
+**Charts**: AreaChart · BarChart · DonutChart · FunnelChart · Gantt · GaugeChart · HeatmapChart · LineChart · OrgChart · PieChart · RadarChart · ScatterChart · SunburstChart · TreeMapChart
 **Advanced**: CodeEditor · FileManager · ImageAnnotation · ImageViewer · InfiniteScroll · Kanban · PrintLayout · RichTextEditor · TaskBoard · VirtualList · VirtualTable
 **Composite**: ActivityFeed · ChatWindow · CommentThread · CropUpload · DataTableWithToolbar · FormWizard · NotificationCenter

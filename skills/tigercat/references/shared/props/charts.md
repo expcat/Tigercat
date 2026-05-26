@@ -6,7 +6,7 @@ description: Shared charts props and concepts
 <!-- LLM-INDEX
 type: props-reference
 category: charts
-components: 18
+components: 20
 key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, responsive
 -->
 
@@ -22,7 +22,7 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 
 ## 组件列表
 
-**高级组件 (13)**: LineChart, BarChart, PieChart, DonutChart, AreaChart, ScatterChart, RadarChart, HeatmapChart, FunnelChart, GaugeChart, SunburstChart, TreeMapChart, OrgChart
+**高级组件 (14)**: LineChart, BarChart, PieChart, DonutChart, AreaChart, ScatterChart, RadarChart, HeatmapChart, FunnelChart, GaugeChart, SunburstChart, TreeMapChart, OrgChart, Gantt
 
 **底层组件 (6)**: ChartCanvas, ChartAxis, ChartGrid, ChartSeries, ChartLegend, ChartTooltip
 
@@ -270,6 +270,28 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 | colors        | `string[]`                       | 主题色板     | 默认节点色板     |
 
 **OrgChartNode**: `{ id: string | number, label: string, title?: string, subtitle?: string, avatar?: string, color?: string, children?: OrgChartNode[] }`
+
+### Gantt
+
+甘特图，按时间轴展示任务排期、进度与依赖关系。
+
+| Prop             | Type                         | Default    | Notes        |
+| ---------------- | ---------------------------- | ---------- | ------------ |
+| data             | `GanttTask[]`                | _required_ | 任务列表     |
+| scale            | `'day' \| 'week' \| 'month'` | `'week'`   | 时间刻度     |
+| rowHeight        | `number`                     | `40`       | 行高         |
+| barHeight        | `number`                     | `18`       | 任务条高度   |
+| taskLabelWidth   | `number`                     | `140`      | 左侧标签宽度 |
+| timelineHeight   | `number`                     | `36`       | 时间轴高度   |
+| minDate          | `Date \| string \| number`   | -          | 受控起始时间 |
+| maxDate          | `Date \| string \| number`   | -          | 受控结束时间 |
+| showToday        | `boolean`                    | `false`    | 显示今天线   |
+| showProgress     | `boolean`                    | `true`     | 显示进度条   |
+| showDependencies | `boolean`                    | `true`     | 显示依赖线   |
+| selectedId       | `string \| number \| null`   | -          | 受控选中任务 |
+| colors           | `string[]`                   | 主题色板   | 默认任务色板 |
+
+**GanttTask**: `{ id: string | number, label: string, start: Date | string | number, end: Date | string | number, progress?: number, color?: string, group?: string, dependencies?: Array<string | number> }`
 
 ---
 

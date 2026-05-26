@@ -322,6 +322,17 @@ const heatmapData = [
 
 ---
 
+## Gantt
+
+```vue
+<template>
+  <Gantt :data="tasks" :width="760" :height="320" hoverable selectable />
+  <Gantt :data="tasks" scale="month" :show-dependencies="false" />
+</template>
+```
+
+---
+
 ## 底层组件
 
 ```vue

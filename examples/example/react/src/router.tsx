@@ -112,6 +112,7 @@ const HeatmapChartDemo = lazy(() => import('./pages/HeatmapChartDemo'))
 const TreeMapChartDemo = lazy(() => import('./pages/TreeMapChartDemo'))
 const SunburstChartDemo = lazy(() => import('./pages/SunburstChartDemo'))
 const OrgChartDemo = lazy(() => import('./pages/OrgChartDemo'))
+const GanttDemo = lazy(() => import('./pages/GanttDemo'))
 
 // Advanced
 const ResizableDemo = lazy(() => import('./pages/ResizableDemo'))
@@ -247,6 +248,7 @@ const router = createBrowserRouter(
         { path: 'treemap-chart', element: <TreeMapChartDemo /> },
         { path: 'sunburst-chart', element: <SunburstChartDemo /> },
         { path: 'org-chart', element: <OrgChartDemo /> },
+        { path: 'gantt', element: <GanttDemo /> },
         // Advanced
         { path: 'resizable', element: <ResizableDemo /> },
         { path: 'virtual-list', element: <VirtualListDemo /> },

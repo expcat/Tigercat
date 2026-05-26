@@ -140,6 +140,7 @@ const router = createRouter({
           component: lazyPage(() => import('./pages/SunburstChartDemo.vue'))
         },
         { path: 'org-chart', component: lazyPage(() => import('./pages/OrgChartDemo.vue')) },
+        { path: 'gantt', component: lazyPage(() => import('./pages/GanttDemo.vue')) },
         // Advanced
         { path: 'resizable', component: lazyPage(() => import('./pages/ResizableDemo.vue')) },
         { path: 'virtual-list', component: lazyPage(() => import('./pages/VirtualListDemo.vue')) },

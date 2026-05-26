@@ -380,6 +380,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'org-chart',
         path: '/org-chart',
         label: { 'zh-CN': 'OrgChart 组织结构图', 'en-US': 'OrgChart' }
+      },
+      {
+        key: 'gantt',
+        path: '/gantt',
+        label: { 'zh-CN': 'Gantt 甘特图', 'en-US': 'Gantt' }
       }
     ]
   },
