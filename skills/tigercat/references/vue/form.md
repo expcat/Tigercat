@@ -433,6 +433,24 @@ const value = ref('male')
 
 ---
 
+## CronEditor Cron 编辑器
+
+```vue
+<template>
+  <CronEditor v-model="cron" />
+
+  <CronEditor
+    v-model="cron"
+    @change="
+      (_, validation) => {
+        isValid = validation.valid
+      }
+    " />
+</template>
+```
+
+---
+
 ## Signature 手写签名
 
 ```vue

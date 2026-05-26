@@ -457,6 +457,22 @@ const [value, setValue] = useState('male')
 
 ---
 
+## CronEditor Cron 编辑器
+
+```tsx
+<CronEditor value={cron} onChange={setCron} />
+
+<CronEditor
+  value={cron}
+  onChange={(next, validation) => {
+    setCron(next)
+    setIsValid(validation.valid)
+  }}
+/>
+```
+
+---
+
 ## Signature 手写签名
 
 ```tsx

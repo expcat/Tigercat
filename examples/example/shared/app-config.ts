@@ -122,6 +122,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'ColorSwatch 色板', 'en-US': 'ColorSwatch' }
       },
       {
+        key: 'cron-editor',
+        path: '/cron-editor',
+        label: { 'zh-CN': 'CronEditor Cron 编辑', 'en-US': 'CronEditor' }
+      },
+      {
         key: 'signature',
         path: '/signature',
         label: { 'zh-CN': 'Signature 手写签名', 'en-US': 'Signature' }

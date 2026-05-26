@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-form
-description: Shared props definitions for form components - AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, ColorSwatch, DatePicker, Form, FormItem, Input, InputGroup, Mentions, NumberKeyboard, Radio, RadioGroup, Rate, Select, Signature, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
+description: Shared props definitions for form components - AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, ColorSwatch, CronEditor, DatePicker, Form, FormItem, Input, InputGroup, Mentions, NumberKeyboard, Radio, RadioGroup, Rate, Select, Signature, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
 ---
 
 <!-- LLM-INDEX
@@ -660,6 +660,42 @@ key-apis: modelValue, value, checked, onChange, rules, validation, options, plac
 | -------------------- | ---------- | ------------------------------------ | ----------- |
 | `@update:modelValue` | -          | `string`                             | 值变更      |
 | `@change`            | `onChange` | `(value, option: ColorSwatchOption)` | 颜色值变更  |
+
+---
+
+## CronEditor Cron 编辑器
+
+### Props
+
+| Prop         | Type                   | Default         | Description                 |
+| ------------ | ---------------------- | --------------- | --------------------------- |
+| modelValue   | `string`               | -               | 绑定值 (v-model) (Vue only) |
+| value        | `string`               | -               | 绑定值（受控） (React only) |
+| defaultValue | `string`               | `'* * * * *'`   | 默认值                      |
+| disabled     | `boolean`              | `false`         | 禁用状态                    |
+| readonly     | `boolean`              | `false`         | 只读状态                    |
+| size         | `'sm' \| 'md' \| 'lg'` | `'md'`          | 控件尺寸                    |
+| presets      | `CronPreset[]`         | 内置常用预设    | 预设表达式                  |
+| ariaLabel    | `string`               | `'Cron editor'` | 编辑器无障碍标签            |
+| className    | `string`               | -               | 自定义类名 (React only)     |
+
+### Types
+
+| Type                   | Definition                                                     |
+| ---------------------- | -------------------------------------------------------------- |
+| `CronFieldKey`         | `'minute' \| 'hour' \| 'dayOfMonth' \| 'month' \| 'dayOfWeek'` |
+| `CronFieldMode`        | `'any' \| 'every' \| 'specific' \| 'range' \| 'custom'`        |
+| `CronPreset`           | `{ label: string; value: string; description?: string }`       |
+| `CronValidationResult` | `{ valid: boolean; issues: CronValidationIssue[] }`            |
+| `CronValidationIssue`  | `{ field: CronFieldKey \| 'expression'; message: string }`     |
+
+### Events
+
+| Vue Event            | React Prop   | Payload                | Description  |
+| -------------------- | ------------ | ---------------------- | ------------ |
+| `@update:modelValue` | -            | `string`               | 值变更       |
+| `@change`            | `onChange`   | `(value, validation)`  | 值与校验变更 |
+| `@validate`          | `onValidate` | `CronValidationResult` | 校验结果变更 |
 
 ---
 

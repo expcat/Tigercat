@@ -83,7 +83,7 @@ source: current repository audit and planning
 | OrgChart        | Charts   | 组织结构图，复用 Tree 数据结构与 SVG 连线布局             | 高     | 待办   |
 | MarkdownEditor  | Advanced | Markdown 编辑、预览、工具栏、可插拔扩展点                 | 高     | 待办   |
 | ImageAnnotation | Advanced | 图片标注，支持矩形、圆形、多边形、自由画笔                | 中     | 待办   |
-| CronEditor      | Form     | Cron 表达式可视化编辑与校验                               | 中     | 待办   |
+| CronEditor      | Form     | Cron 表达式可视化编辑与校验                               | 中     | 已完成 |
 | ColorSwatch     | Form     | 色板选择器，支持预设色组与自定义色组                      | 低     | 已完成 |
 
 执行步骤：

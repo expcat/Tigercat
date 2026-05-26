@@ -39,6 +39,7 @@ const CascaderDemo = lazy(() => import('./pages/CascaderDemo'))
 const TreeSelectDemo = lazy(() => import('./pages/TreeSelectDemo'))
 const ColorPickerDemo = lazy(() => import('./pages/ColorPickerDemo'))
 const ColorSwatchDemo = lazy(() => import('./pages/ColorSwatchDemo'))
+const CronEditorDemo = lazy(() => import('./pages/CronEditorDemo'))
 const SignatureDemo = lazy(() => import('./pages/SignatureDemo'))
 const NumberKeyboardDemo = lazy(() => import('./pages/NumberKeyboardDemo'))
 const MentionsDemo = lazy(() => import('./pages/MentionsDemo'))
@@ -176,6 +177,7 @@ const router = createBrowserRouter(
         { path: 'tree-select', element: <TreeSelectDemo /> },
         { path: 'color-picker', element: <ColorPickerDemo /> },
         { path: 'color-swatch', element: <ColorSwatchDemo /> },
+        { path: 'cron-editor', element: <CronEditorDemo /> },
         { path: 'signature', element: <SignatureDemo /> },
         { path: 'number-keyboard', element: <NumberKeyboardDemo /> },
         { path: 'mentions', element: <MentionsDemo /> },
