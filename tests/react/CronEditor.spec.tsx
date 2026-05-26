@@ -97,4 +97,56 @@ describe('CronEditor', () => {
 
     await expectNoA11yViolationsIsolated(container)
   })
+
+  describe('Edge Cases and Boundary', () => {
+    it('hides preset select when presets are empty', () => {
+      render(<CronEditor presets={[]} />)
+
+      expect(screen.queryByLabelText('Cron preset')).not.toBeInTheDocument()
+    })
+
+    it('makes controls inactive when readonly', () => {
+      render(<CronEditor readonly />)
+
+      expect(screen.getByLabelText('Cron expression')).toHaveAttribute('readonly')
+      expect(screen.getByLabelText('Cron preset')).toBeDisabled()
+      expect(screen.getByLabelText('Minute mode')).toBeDisabled()
+    })
+
+    it('clamps specific values to field boundaries', () => {
+      const onChange = vi.fn()
+      render(<CronEditor onChange={onChange} />)
+
+      fireEvent.change(screen.getByLabelText('Hour mode'), { target: { value: 'specific' } })
+      fireEvent.change(screen.getByLabelText('Hour value'), { target: { value: '99' } })
+
+      expect(onChange).toHaveBeenLastCalledWith(
+        '* 23 * * *',
+        expect.objectContaining({ valid: true })
+      )
+    })
+
+    it('normalizes reversed ranges to ascending order', () => {
+      const onChange = vi.fn()
+      render(<CronEditor onChange={onChange} />)
+
+      fireEvent.change(screen.getByLabelText('Month mode'), { target: { value: 'range' } })
+      fireEvent.change(screen.getByLabelText('Month range start'), { target: { value: '12' } })
+      fireEvent.change(screen.getByLabelText('Month range end'), { target: { value: '1' } })
+
+      expect(onChange).toHaveBeenLastCalledWith(
+        '* * * 1-12 *',
+        expect.objectContaining({ valid: true })
+      )
+    })
+
+    it('reports invalid custom field values', () => {
+      render(<CronEditor value="* * * * MON" />)
+
+      expect(
+        screen.getByText('Weekday must be *, a number, a range, a step, or a comma list')
+      ).toBeInTheDocument()
+      expect(screen.getByLabelText('Weekday custom value')).toHaveValue('MON')
+    })
+  })
 })

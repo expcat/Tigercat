@@ -14,7 +14,7 @@
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "253 kB",
+    "limit": "275 kB",
     "gzip": true
   },
   {

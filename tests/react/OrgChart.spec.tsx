@@ -99,4 +99,59 @@ describe('OrgChart', () => {
     const { container } = render(<OrgChart data={data} title="Org chart" />)
     await expectNoA11yViolationsIsolated(container)
   })
+
+  describe('Edge Cases and Boundary', () => {
+    it.each(['vertical', 'horizontal'] as const)('renders %s direction boundary', (direction) => {
+      const { container } = render(<OrgChart data={data} direction={direction} />)
+
+      expect(container.querySelector('[data-series-type="org-chart"]')).toBeInTheDocument()
+    })
+
+    it('renders multiple root nodes', () => {
+      const roots: OrgChartNode[] = [data, { id: 'finance', label: 'Noor', title: 'Finance' }]
+      const { container, getByText } = render(<OrgChart data={roots} />)
+
+      expect(container.querySelectorAll('[data-org-chart-nodes="true"] > g')).toHaveLength(4)
+      expect(getByText('Noor')).toBeInTheDocument()
+    })
+
+    it('renders node avatars when enabled', () => {
+      const avatarData: OrgChartNode = { ...data, avatar: '/ada.png' }
+      const { container } = render(<OrgChart data={avatarData} />)
+
+      expect(container.querySelector('image[href="/ada.png"]')).toBeInTheDocument()
+    })
+
+    it('hides node avatars when showAvatars is false', () => {
+      const avatarData: OrgChartNode = { ...data, avatar: '/ada.png' }
+      const { container } = render(<OrgChart data={avatarData} showAvatars={false} />)
+
+      expect(container.querySelector('image')).not.toBeInTheDocument()
+    })
+
+    it('prevents disabled nodes from becoming selectable', () => {
+      const onSelectedIdChange = vi.fn()
+      const onNodeClick = vi.fn()
+      const disabledData: OrgChartNode = { ...data, disabled: true }
+      const { getByRole } = render(
+        <OrgChart
+          data={disabledData}
+          selectable
+          onSelectedIdChange={onSelectedIdChange}
+          onNodeClick={onNodeClick}
+        />
+      )
+
+      fireEvent.click(getByRole('group', { name: 'Ada, CEO, Platform' }))
+
+      expect(onSelectedIdChange).not.toHaveBeenCalled()
+      expect(onNodeClick).toHaveBeenCalledWith(disabledData)
+    })
+
+    it('applies custom aria label to the chart image', () => {
+      const { getByRole } = render(<OrgChart data={data} ariaLabel="Leadership chart" />)
+
+      expect(getByRole('img', { name: 'Leadership chart' })).toBeInTheDocument()
+    })
+  })
 })

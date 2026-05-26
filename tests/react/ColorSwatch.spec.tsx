@@ -4,7 +4,7 @@
 
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { ColorSwatch } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -74,8 +74,12 @@ describe('ColorSwatch', () => {
     )
 
     const first = screen.getByRole('radio', { name: '#111111' })
-    first.focus()
-    fireEvent.keyDown(first, { key: 'ArrowRight' })
+    act(() => {
+      first.focus()
+    })
+    act(() => {
+      fireEvent.keyDown(first, { key: 'ArrowRight' })
+    })
     fireEvent.keyDown(screen.getByRole('radio', { name: '#333333' }), { key: 'Enter' })
 
     expect(onChange).toHaveBeenCalledWith('#333333', expect.objectContaining({ value: '#333333' }))
@@ -94,5 +98,46 @@ describe('ColorSwatch', () => {
     const { container } = render(<ColorSwatch colors={['#111111', '#222222']} />)
 
     await expectNoA11yViolationsIsolated(container)
+  })
+
+  describe('Edge Cases and Boundary', () => {
+    it.each([
+      ['sm', 'h-6 w-6'],
+      ['md', 'h-8 w-8'],
+      ['lg', 'h-10 w-10']
+    ] as const)('renders %s size boundary', (size, expectedClass) => {
+      render(<ColorSwatch size={size} colors={['#111111']} />)
+
+      expect(screen.getByRole('radio', { name: '#111111' }).className).toContain(expectedClass)
+    })
+
+    it('renders an empty custom color list without fallback swatches', () => {
+      render(<ColorSwatch ariaLabel="Theme swatches" colors={[]} />)
+
+      expect(screen.getByRole('radiogroup', { name: 'Theme swatches' })).toBeInTheDocument()
+      expect(screen.queryAllByRole('radio')).toHaveLength(0)
+    })
+
+    it('matches selected colors case-insensitively', () => {
+      render(<ColorSwatch value="#ABCDEF" colors={['#abcdef']} />)
+
+      expect(screen.getByRole('radio', { name: '#abcdef' })).toHaveAttribute('aria-checked', 'true')
+    })
+
+    it('ignores keyboard selection when disabled', () => {
+      const onChange = vi.fn()
+      render(<ColorSwatch disabled colors={['#111111', '#222222']} onChange={onChange} />)
+
+      fireEvent.keyDown(screen.getByRole('radio', { name: '#111111' }), { key: 'Enter' })
+
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('keeps disabled options out of the tab sequence', () => {
+      render(<ColorSwatch colors={[{ value: '#111111', disabled: true }, '#222222']} />)
+
+      expect(screen.getByRole('radio', { name: '#111111' })).toHaveAttribute('tabindex', '-1')
+      expect(screen.getByRole('radio', { name: '#222222' })).toHaveAttribute('tabindex', '0')
+    })
   })
 })

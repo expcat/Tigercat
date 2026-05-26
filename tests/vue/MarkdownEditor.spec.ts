@@ -159,6 +159,15 @@ describe('MarkdownEditor', () => {
     })
   })
 
+  describe('Edge Cases and Boundary', () => {
+    it('handles empty uncontrolled content without renderer output', () => {
+      const { container } = renderEditor({ value: undefined, defaultValue: '', placeholder: '' })
+
+      expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('')
+      expect(container.querySelector('[aria-label="Markdown preview"]')?.textContent).toBe('')
+    })
+  })
+
   describe('Accessibility', () => {
     it('labels editor and preview regions', () => {
       const { container } = renderEditor()

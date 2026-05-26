@@ -105,4 +105,51 @@ describe('Gantt', () => {
     const { container } = render(<Gantt data={data} title="Gantt chart" />)
     await expectNoA11yViolationsIsolated(container)
   })
+
+  describe('Edge Cases and Boundary', () => {
+    it.each(['day', 'week', 'month'] as const)('renders %s scale boundary', (scale) => {
+      const { container } = render(<Gantt data={data} scale={scale} />)
+
+      expect(container.querySelectorAll('[data-gantt-axis="true"] text').length).toBeGreaterThan(0)
+    })
+
+    it('renders empty data without task or dependency nodes', () => {
+      const { container } = render(<Gantt data={[]} />)
+
+      expect(container.querySelectorAll('[data-gantt-tasks="true"] > g')).toHaveLength(0)
+      expect(container.querySelectorAll('[data-gantt-dependencies="true"] path')).toHaveLength(0)
+    })
+
+    it('prevents disabled tasks from becoming selectable', () => {
+      const onSelectedIdChange = vi.fn()
+      const onTaskClick = vi.fn()
+      const disabledData: GanttTask[] = [{ ...data[0], disabled: true }]
+      const { getByRole } = render(
+        <Gantt
+          data={disabledData}
+          selectable
+          onSelectedIdChange={onSelectedIdChange}
+          onTaskClick={onTaskClick}
+        />
+      )
+
+      fireEvent.click(getByRole('group', { name: 'Design, 01-01 to 01-05, 40%' }))
+
+      expect(onSelectedIdChange).not.toHaveBeenCalled()
+      expect(onTaskClick).toHaveBeenCalledWith(disabledData[0])
+    })
+
+    it('renders today marker when the range includes today', () => {
+      const today = new Date()
+      const minDate = new Date(today)
+      minDate.setDate(today.getDate() - 1)
+      const maxDate = new Date(today)
+      maxDate.setDate(today.getDate() + 1)
+      const { container } = render(
+        <Gantt data={data} showToday minDate={minDate} maxDate={maxDate} />
+      )
+
+      expect(container.querySelector('[data-gantt-today="true"]')).toBeInTheDocument()
+    })
+  })
 })

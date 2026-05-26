@@ -148,4 +148,80 @@ describe('ImageAnnotation', () => {
     const { container } = await renderLoadedAnnotation({ props: { src: '/scene.jpg' } })
     await expectNoA11yViolationsIsolated(container)
   })
+
+  describe('Edge Cases and Boundary', () => {
+    it('emits ready after the image loads', async () => {
+      const { emitted } = await renderLoadedAnnotation({ props: { src: '/scene.jpg' } })
+
+      expect(emitted().ready).toEqual([[]])
+    })
+
+    it('renders custom image alt text', async () => {
+      const { getByAltText } = await renderLoadedAnnotation({
+        props: { src: '/scene.jpg', alt: 'Floor plan' }
+      })
+
+      expect(getByAltText('Floor plan')).toBeInTheDocument()
+    })
+
+    it('disables tools and delete when disabled', async () => {
+      const { getByRole } = await renderLoadedAnnotation({
+        props: { src: '/scene.jpg', disabled: true }
+      })
+
+      expect(getByRole('button', { name: 'Rectangle' })).toBeDisabled()
+      expect(getByRole('button', { name: 'Delete' })).toBeDisabled()
+    })
+
+    it('hides annotation labels when showLabels is false', async () => {
+      const annotations: CoreImageAnnotation[] = [
+        { id: 'face', type: 'rectangle', x: 0.1, y: 0.1, width: 0.2, height: 0.2, label: 'Face' }
+      ]
+      const { queryByText } = await renderLoadedAnnotation({
+        props: { src: '/scene.jpg', modelValue: annotations, showLabels: false }
+      })
+
+      expect(queryByText('Face')).not.toBeInTheDocument()
+    })
+
+    it('does not commit rectangles below the minimum size', async () => {
+      const { getByRole, getByLabelText, emitted } = await renderLoadedAnnotation({
+        props: { src: '/scene.jpg', minSize: 0.1 }
+      })
+
+      await fireEvent.click(getByRole('button', { name: 'Rectangle' }))
+      const canvas = getByLabelText('Image annotation canvas')
+      await fireEvent.mouseDown(canvas, { clientX: 80, clientY: 60 })
+      await fireEvent.mouseUp(document, { clientX: 82, clientY: 62 })
+
+      expect(emitted().change).toBeUndefined()
+    })
+
+    it('commits polygon annotations after three points and Enter', async () => {
+      const { getByRole, getByLabelText, emitted } = await renderLoadedAnnotation({
+        props: { src: '/scene.jpg' }
+      })
+
+      await fireEvent.click(getByRole('button', { name: 'Polygon' }))
+      const canvas = getByLabelText('Image annotation canvas')
+      await fireEvent.click(canvas, { clientX: 80, clientY: 60 })
+      await fireEvent.click(canvas, { clientX: 240, clientY: 60 })
+      await fireEvent.click(canvas, { clientX: 240, clientY: 180 })
+      await fireEvent.keyDown(canvas, { key: 'Enter' })
+
+      expect(emitted().change.at(-1)?.[0][0]).toMatchObject({ id: 'polygon-1', type: 'polygon' })
+    })
+
+    it('prevents drawing while readonly', async () => {
+      const { getByLabelText, emitted } = await renderLoadedAnnotation({
+        props: { src: '/scene.jpg', readonly: true, tool: 'rectangle' }
+      })
+
+      const canvas = getByLabelText('Image annotation canvas')
+      await fireEvent.mouseDown(canvas, { clientX: 80, clientY: 60 })
+      await fireEvent.mouseUp(document, { clientX: 240, clientY: 180 })
+
+      expect(emitted().change).toBeUndefined()
+    })
+  })
 })

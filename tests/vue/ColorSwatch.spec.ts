@@ -96,4 +96,49 @@ describe('ColorSwatch', () => {
 
     await expectNoA11yViolationsIsolated(container)
   })
+
+  describe('Edge Cases and Boundary', () => {
+    it.each([
+      ['sm', 'h-6 w-6'],
+      ['md', 'h-8 w-8'],
+      ['lg', 'h-10 w-10']
+    ] as const)('renders %s size boundary', (size, expectedClass) => {
+      renderWithProps(ColorSwatch, { size, colors: ['#111111'] })
+
+      expect(screen.getByRole('radio', { name: '#111111' }).className).toContain(expectedClass)
+    })
+
+    it('renders an empty custom color list without fallback swatches', () => {
+      renderWithProps(ColorSwatch, { ariaLabel: 'Theme swatches', colors: [] })
+
+      expect(screen.getByRole('radiogroup', { name: 'Theme swatches' })).toBeInTheDocument()
+      expect(screen.queryAllByRole('radio')).toHaveLength(0)
+    })
+
+    it('matches selected colors case-insensitively', () => {
+      renderWithProps(ColorSwatch, { modelValue: '#ABCDEF', colors: ['#abcdef'] })
+
+      expect(screen.getByRole('radio', { name: '#abcdef' })).toHaveAttribute('aria-checked', 'true')
+    })
+
+    it('ignores keyboard selection when disabled', async () => {
+      const onChange = vi.fn()
+      render(ColorSwatch, {
+        props: { disabled: true, colors: ['#111111', '#222222'], onChange }
+      })
+
+      await fireEvent.keyDown(screen.getByRole('radio', { name: '#111111' }), { key: 'Enter' })
+
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('keeps disabled options out of the tab sequence', () => {
+      renderWithProps(ColorSwatch, {
+        colors: [{ value: '#111111', disabled: true }, '#222222']
+      })
+
+      expect(screen.getByRole('radio', { name: '#111111' })).toHaveAttribute('tabindex', '-1')
+      expect(screen.getByRole('radio', { name: '#222222' })).toHaveAttribute('tabindex', '0')
+    })
+  })
 })

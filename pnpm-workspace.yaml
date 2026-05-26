@@ -31,4 +31,7 @@ catalog:
   axe-core: ^4.11.3
 
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - esbuild
+  - sharp
+  - unrs-resolver

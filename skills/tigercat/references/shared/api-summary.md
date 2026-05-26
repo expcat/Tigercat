@@ -5,7 +5,7 @@ description: Compact generated API summary for Tigercat core types
 
 <!-- LLM-INDEX
 type: generated-api-summary
-total-exported-types: 581
+total-exported-types: 606
 source: packages/core/src/types/*.ts
 -->
 
@@ -44,8 +44,6 @@ source: packages/core/src/types/*.ts
 | cascader.ts        | CascaderProps                         | Cascader                    | 8       |
 | checkbox.ts        | CheckboxProps, CheckboxGroupProps     | Checkbox, CheckboxGroup     | 5       |
 | color-picker.ts    | ColorPickerProps                      | ColorPicker                 | 3       |
-| color-swatch.ts    | ColorSwatchProps, ColorSwatchGroup    | ColorSwatch                 | 7       |
-| cron-editor.ts     | CronEditorProps, CronValidationResult | CronEditor                  | 7       |
 | datepicker.ts      | DatePickerProps                       | DatePicker                  | 14      |
 | form.ts            | FormProps, FormItemProps              | Form, FormItem              | 22      |
 | input.ts           | InputProps                            | Input                       | 4       |
@@ -125,28 +123,24 @@ source: packages/core/src/types/*.ts
 
 ## Charts
 
-| Type File    | Props Interfaces                                                                                                                                                                                                                                                                                                                                                                   | Components                                                                                                                                                                                                                                                     | Exports |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| chart.ts     | BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps, ChartWithAxesProps, ChartCanvasProps, ChartAxisProps, ChartGridProps, ChartSeriesProps, BarChartProps, ScatterChartProps, PieChartProps, DonutChartProps, LineChartProps, AreaChartProps, RadarChartProps, FunnelChartProps, GaugeChartProps, HeatmapChartProps, TreeMapChartProps, SunburstChartProps | ChartInteraction, ChartLegend, ChartTooltip, ChartWithAxes, ChartCanvas, ChartAxis, ChartGrid, ChartSeries, BarChart, ScatterChart, PieChart, DonutChart, LineChart, AreaChart, RadarChart, FunnelChart, GaugeChart, HeatmapChart, TreeMapChart, SunburstChart | 51      |
-| org-chart.ts | OrgChartProps                                                                                                                                                                                                                                                                                                                                                                      | OrgChart                                                                                                                                                                                                                                                       | 3       |
-| gantt.ts     | GanttProps                                                                                                                                                                                                                                                                                                                                                                         | Gantt                                                                                                                                                                                                                                                          | 4       |
+| Type File | Props Interfaces                                                                                                                                                                                                                                                                                                                                                                   | Components                                                                                                                                                                                                                                                     | Exports |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| chart.ts  | BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps, ChartWithAxesProps, ChartCanvasProps, ChartAxisProps, ChartGridProps, ChartSeriesProps, BarChartProps, ScatterChartProps, PieChartProps, DonutChartProps, LineChartProps, AreaChartProps, RadarChartProps, FunnelChartProps, GaugeChartProps, HeatmapChartProps, TreeMapChartProps, SunburstChartProps | ChartInteraction, ChartLegend, ChartTooltip, ChartWithAxes, ChartCanvas, ChartAxis, ChartGrid, ChartSeries, BarChart, ScatterChart, PieChart, DonutChart, LineChart, AreaChart, RadarChart, FunnelChart, GaugeChart, HeatmapChart, TreeMapChart, SunburstChart | 51      |
 
 ## Advanced
 
-| Type File           | Props Interfaces     | Components      | Exports |
-| ------------------- | -------------------- | --------------- | ------- |
-| code-editor.ts      | CodeEditorProps      | CodeEditor      | 3       |
-| drag.ts             | -                    | -               | 15      |
-| file-manager.ts     | FileManagerProps     | FileManager     | 6       |
-| image-annotation.ts | ImageAnnotationProps | ImageAnnotation | 9       |
-| image-viewer.ts     | ImageViewerProps     | ImageViewer     | 1       |
-| infinite-scroll.ts  | InfiniteScrollProps  | InfiniteScroll  | 1       |
-| kanban.ts           | KanbanProps          | Kanban          | 6       |
-| markdown-editor.ts  | MarkdownEditorProps  | MarkdownEditor  | 9       |
-| print-layout.ts     | PrintLayoutProps     | PrintLayout     | 3       |
-| rich-text-editor.ts | RichTextEditorProps  | RichTextEditor  | 6       |
-| virtual-list.ts     | VirtualListProps     | VirtualList     | 4       |
-| virtual-table.ts    | VirtualTableProps    | VirtualTable    | 2       |
+| Type File           | Props Interfaces    | Components     | Exports |
+| ------------------- | ------------------- | -------------- | ------- |
+| code-editor.ts      | CodeEditorProps     | CodeEditor     | 3       |
+| drag.ts             | -                   | -              | 15      |
+| file-manager.ts     | FileManagerProps    | FileManager    | 6       |
+| image-viewer.ts     | ImageViewerProps    | ImageViewer    | 1       |
+| infinite-scroll.ts  | InfiniteScrollProps | InfiniteScroll | 1       |
+| kanban.ts           | KanbanProps         | Kanban         | 6       |
+| print-layout.ts     | PrintLayoutProps    | PrintLayout    | 3       |
+| rich-text-editor.ts | RichTextEditorProps | RichTextEditor | 6       |
+| virtual-list.ts     | VirtualListProps    | VirtualList    | 4       |
+| virtual-table.ts    | VirtualTableProps   | VirtualTable   | 2       |
 
 ## Composite
 
@@ -168,6 +162,12 @@ source: packages/core/src/types/*.ts
 
 ## Other
 
-| Type File   | Props Interfaces | Components | Exports |
-| ----------- | ---------------- | ---------- | ------- |
-| timeline.ts | TimelineProps    | Timeline   | 4       |
+| Type File           | Props Interfaces     | Components      | Exports |
+| ------------------- | -------------------- | --------------- | ------- |
+| color-swatch.ts     | ColorSwatchProps     | ColorSwatch     | 7       |
+| cron-editor.ts      | CronEditorProps      | CronEditor      | 9       |
+| gantt.ts            | GanttProps           | Gantt           | 4       |
+| image-annotation.ts | ImageAnnotationProps | ImageAnnotation | 9       |
+| markdown-editor.ts  | MarkdownEditorProps  | MarkdownEditor  | 9       |
+| org-chart.ts        | OrgChartProps        | OrgChart        | 3       |
+| timeline.ts         | TimelineProps        | Timeline        | 4       |

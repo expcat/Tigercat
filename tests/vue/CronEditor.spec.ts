@@ -100,4 +100,56 @@ describe('CronEditor', () => {
 
     await expectNoA11yViolationsIsolated(container)
   })
+
+  describe('Edge Cases and Boundary', () => {
+    it('hides preset select when presets are empty', () => {
+      renderWithProps(CronEditor, { presets: [] })
+
+      expect(screen.queryByLabelText('Cron preset')).not.toBeInTheDocument()
+    })
+
+    it('makes controls inactive when readonly', () => {
+      renderWithProps(CronEditor, { readonly: true })
+
+      expect(screen.getByLabelText('Cron expression')).toHaveAttribute('readonly')
+      expect(screen.getByLabelText('Cron preset')).toBeDisabled()
+      expect(screen.getByLabelText('Minute mode')).toBeDisabled()
+    })
+
+    it('clamps specific values to field boundaries', async () => {
+      const onChange = vi.fn()
+      render(CronEditor, { props: { onChange } })
+
+      await fireEvent.update(screen.getByLabelText('Hour mode'), 'specific')
+      await fireEvent.update(screen.getByLabelText('Hour value'), '99')
+
+      expect(onChange).toHaveBeenLastCalledWith(
+        '* 23 * * *',
+        expect.objectContaining({ valid: true })
+      )
+    })
+
+    it('normalizes reversed ranges to ascending order', async () => {
+      const onChange = vi.fn()
+      render(CronEditor, { props: { onChange } })
+
+      await fireEvent.update(screen.getByLabelText('Month mode'), 'range')
+      await fireEvent.update(screen.getByLabelText('Month range start'), '12')
+      await fireEvent.update(screen.getByLabelText('Month range end'), '1')
+
+      expect(onChange).toHaveBeenLastCalledWith(
+        '* * * 1-12 *',
+        expect.objectContaining({ valid: true })
+      )
+    })
+
+    it('reports invalid custom field values', () => {
+      renderWithProps(CronEditor, { modelValue: '* * * * MON' })
+
+      expect(
+        screen.getByText('Weekday must be *, a number, a range, a step, or a comma list')
+      ).toBeInTheDocument()
+      expect(screen.getByLabelText('Weekday custom value')).toHaveValue('MON')
+    })
+  })
 })
