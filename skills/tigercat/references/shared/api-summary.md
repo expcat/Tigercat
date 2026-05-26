@@ -44,6 +44,7 @@ source: packages/core/src/types/*.ts
 | cascader.ts        | CascaderProps                         | Cascader                    | 8       |
 | checkbox.ts        | CheckboxProps, CheckboxGroupProps     | Checkbox, CheckboxGroup     | 5       |
 | color-picker.ts    | ColorPickerProps                      | ColorPicker                 | 3       |
+| color-swatch.ts    | ColorSwatchProps, ColorSwatchGroup    | ColorSwatch                 | 7       |
 | datepicker.ts      | DatePickerProps                       | DatePicker                  | 14      |
 | form.ts            | FormProps, FormItemProps              | Form, FormItem              | 22      |
 | input.ts           | InputProps                            | Input                       | 4       |

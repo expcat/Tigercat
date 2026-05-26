@@ -77,7 +77,7 @@ See [../shared/patterns/common.md](../shared/patterns/common.md) for framework c
 ## Component Quick Links
 
 **Basic**: Alert · Avatar · AvatarGroup · Badge · Button · ButtonGroup · Code · Divider · Empty · Icon · Image · ImageCropper · Link · QRCode · Tag · Text
-**Form**: AutoComplete · Cascader · Checkbox · ColorPicker · DatePicker · Form · Input · InputGroup · InputNumber · Mentions · Radio · Rate · Select · Slider · Stepper · Switch · Textarea · TimePicker · Transfer · TreeSelect · Upload
+**Form**: AutoComplete · Cascader · Checkbox · ColorPicker · ColorSwatch · DatePicker · Form · Input · InputGroup · InputNumber · Mentions · Radio · Rate · Select · Slider · Stepper · Switch · Textarea · TimePicker · Transfer · TreeSelect · Upload
 **Feedback**: Drawer · Loading · Message · Modal · Notification · Popconfirm · Popover · Progress · Result · Tooltip · Tour · Watermark
 **Layout**: Card · Carousel · Container · Descriptions · Grid (Row/Col) · Layout · List · Resizable · Skeleton · Space · Splitter · Statistic
 **Navigation**: Affix · Anchor · BackTop · Breadcrumb · Dropdown · FloatButton · Menu · Pagination · Segmented · Steps · Tabs · Tree

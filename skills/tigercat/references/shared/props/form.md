@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-form
-description: Shared props definitions for form components - AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, DatePicker, Form, FormItem, Input, InputGroup, Mentions, NumberKeyboard, Radio, RadioGroup, Rate, Select, Signature, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
+description: Shared props definitions for form components - AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, ColorSwatch, DatePicker, Form, FormItem, Input, InputGroup, Mentions, NumberKeyboard, Radio, RadioGroup, Rate, Select, Signature, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
 ---
 
 <!-- LLM-INDEX
@@ -626,6 +626,40 @@ key-apis: modelValue, value, checked, onChange, rules, validation, options, plac
 | -------------------- | ---------- | ----------------- | ----------- |
 | `@update:modelValue` | -          | `string`          | 值变更      |
 | `@change`            | `onChange` | `(color: string)` | 颜色值变更  |
+
+---
+
+## ColorSwatch 色板选择器
+
+### Props
+
+| Prop         | Type                       | Default            | Description                   |
+| ------------ | -------------------------- | ------------------ | ----------------------------- |
+| modelValue   | `string`                   | -                  | 绑定值 (v-model) (Vue only)   |
+| value        | `string`                   | -                  | 绑定值（受控） (React only)   |
+| defaultValue | `string`                   | -                  | 默认值（非受控） (React only) |
+| disabled     | `boolean`                  | `false`            | 禁用状态                      |
+| size         | `'sm' \| 'md' \| 'lg'`     | `'md'`             | 色块尺寸                      |
+| colors       | `ColorSwatchOptionInput[]` | 默认预设色组       | 单组色板                      |
+| groups       | `ColorSwatchGroup[]`       | 默认预设色组       | 自定义色组                    |
+| columns      | `number`                   | `6`                | 每组列数                      |
+| ariaLabel    | `string`                   | `'Color swatches'` | 色板组无障碍标签              |
+| className    | `string`                   | -                  | 自定义类名 (React only)       |
+
+### Types
+
+| Type                     | Definition                                              |
+| ------------------------ | ------------------------------------------------------- |
+| `ColorSwatchOption`      | `{ value: string; label?: string; disabled?: boolean }` |
+| `ColorSwatchOptionInput` | `string \| ColorSwatchOption`                           |
+| `ColorSwatchGroup`       | `{ label?: string; colors: ColorSwatchOptionInput[] }`  |
+
+### Events
+
+| Vue Event            | React Prop | Payload                              | Description |
+| -------------------- | ---------- | ------------------------------------ | ----------- |
+| `@update:modelValue` | -          | `string`                             | 值变更      |
+| `@change`            | `onChange` | `(value, option: ColorSwatchOption)` | 颜色值变更  |
 
 ---
 

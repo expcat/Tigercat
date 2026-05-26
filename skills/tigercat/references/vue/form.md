@@ -415,6 +415,24 @@ const value = ref('male')
 
 ---
 
+## ColorSwatch 色板选择器
+
+```vue
+<template>
+  <ColorSwatch v-model="color" />
+
+  <ColorSwatch
+    v-model="brandColor"
+    :columns="4"
+    :groups="[
+      { label: 'Brand', colors: ['#0f172a', '#2563eb', '#0891b2', '#059669'] },
+      { label: 'Neutral', colors: ['#f8fafc', '#cbd5e1', '#64748b', '#1e293b'] }
+    ]" />
+</template>
+```
+
+---
+
 ## Signature 手写签名
 
 ```vue

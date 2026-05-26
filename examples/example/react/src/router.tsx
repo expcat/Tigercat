@@ -38,6 +38,7 @@ const AutoCompleteDemo = lazy(() => import('./pages/AutoCompleteDemo'))
 const CascaderDemo = lazy(() => import('./pages/CascaderDemo'))
 const TreeSelectDemo = lazy(() => import('./pages/TreeSelectDemo'))
 const ColorPickerDemo = lazy(() => import('./pages/ColorPickerDemo'))
+const ColorSwatchDemo = lazy(() => import('./pages/ColorSwatchDemo'))
 const SignatureDemo = lazy(() => import('./pages/SignatureDemo'))
 const NumberKeyboardDemo = lazy(() => import('./pages/NumberKeyboardDemo'))
 const MentionsDemo = lazy(() => import('./pages/MentionsDemo'))
@@ -174,6 +175,7 @@ const router = createBrowserRouter(
         { path: 'cascader', element: <CascaderDemo /> },
         { path: 'tree-select', element: <TreeSelectDemo /> },
         { path: 'color-picker', element: <ColorPickerDemo /> },
+        { path: 'color-swatch', element: <ColorSwatchDemo /> },
         { path: 'signature', element: <SignatureDemo /> },
         { path: 'number-keyboard', element: <NumberKeyboardDemo /> },
         { path: 'mentions', element: <MentionsDemo /> },

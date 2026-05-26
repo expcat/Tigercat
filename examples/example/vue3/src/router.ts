@@ -53,6 +53,7 @@ const router = createRouter({
         { path: 'cascader', component: lazyPage(() => import('./pages/CascaderDemo.vue')) },
         { path: 'tree-select', component: lazyPage(() => import('./pages/TreeSelectDemo.vue')) },
         { path: 'color-picker', component: lazyPage(() => import('./pages/ColorPickerDemo.vue')) },
+        { path: 'color-swatch', component: lazyPage(() => import('./pages/ColorSwatchDemo.vue')) },
         { path: 'signature', component: lazyPage(() => import('./pages/SignatureDemo.vue')) },
         {
           path: 'number-keyboard',

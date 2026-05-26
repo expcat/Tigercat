@@ -439,6 +439,24 @@ const [value, setValue] = useState('male')
 
 ---
 
+## ColorSwatch 色板选择器
+
+```tsx
+<ColorSwatch value={color} onChange={setColor} />
+
+<ColorSwatch
+  value={brandColor}
+  onChange={setBrandColor}
+  columns={4}
+  groups={[
+    { label: 'Brand', colors: ['#0f172a', '#2563eb', '#0891b2', '#059669'] },
+    { label: 'Neutral', colors: ['#f8fafc', '#cbd5e1', '#64748b', '#1e293b'] }
+  ]}
+/>
+```
+
+---
+
 ## Signature 手写签名
 
 ```tsx

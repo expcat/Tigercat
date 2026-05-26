@@ -77,14 +77,14 @@ source: current repository audit and planning
 
 中期目标集中在复杂数据展示和高级输入，必须先完成核心抽象设计，避免 Vue/React 两端重复实现业务逻辑。
 
-| 组件            | 类别     | 目标                                                      | 复杂度 |
-| --------------- | -------- | --------------------------------------------------------- | ------ |
-| Gantt           | Charts   | 甘特图，复用 SVG chart 基础设施，支持时间轴、依赖线、缩放 | 高     |
-| OrgChart        | Charts   | 组织结构图，复用 Tree 数据结构与 SVG 连线布局             | 高     |
-| MarkdownEditor  | Advanced | Markdown 编辑、预览、工具栏、可插拔扩展点                 | 高     |
-| ImageAnnotation | Advanced | 图片标注，支持矩形、圆形、多边形、自由画笔                | 中     |
-| CronEditor      | Form     | Cron 表达式可视化编辑与校验                               | 中     |
-| ColorSwatch     | Form     | 色板选择器，支持预设色组与自定义色组                      | 低     |
+| 组件            | 类别     | 目标                                                      | 复杂度 | 状态   |
+| --------------- | -------- | --------------------------------------------------------- | ------ | ------ |
+| Gantt           | Charts   | 甘特图，复用 SVG chart 基础设施，支持时间轴、依赖线、缩放 | 高     | 待办   |
+| OrgChart        | Charts   | 组织结构图，复用 Tree 数据结构与 SVG 连线布局             | 高     | 待办   |
+| MarkdownEditor  | Advanced | Markdown 编辑、预览、工具栏、可插拔扩展点                 | 高     | 待办   |
+| ImageAnnotation | Advanced | 图片标注，支持矩形、圆形、多边形、自由画笔                | 中     | 待办   |
+| CronEditor      | Form     | Cron 表达式可视化编辑与校验                               | 中     | 待办   |
+| ColorSwatch     | Form     | 色板选择器，支持预设色组与自定义色组                      | 低     | 已完成 |
 
 执行步骤：
 

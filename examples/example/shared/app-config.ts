@@ -117,6 +117,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'ColorPicker 颜色选择', 'en-US': 'ColorPicker' }
       },
       {
+        key: 'color-swatch',
+        path: '/color-swatch',
+        label: { 'zh-CN': 'ColorSwatch 色板', 'en-US': 'ColorSwatch' }
+      },
+      {
         key: 'signature',
         path: '/signature',
         label: { 'zh-CN': 'Signature 手写签名', 'en-US': 'Signature' }
