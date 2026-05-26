@@ -18,7 +18,7 @@
 - 更新 size-limit 当前基线：React full 限制为 253 kB，Vue Button subpath 限制为 16 kB。
 - 明确 Roadmap、CHANGELOG、脚本文档和 API 文档的职责边界，避免完成历史长期堆回 Roadmap。
 
-## v2.0.0 — Breaking Changes
+## v1.2.0 — Breaking Changes
 
 ### Removed
 
@@ -29,7 +29,7 @@
 ## v1.0.0 — 正式发布 🎉
 
 Tigercat 首个正式版本，标志着从实验阶段进入稳定阶段。从 v1.0.0 起遵循 SemVer 语义化版本：
-v1.x.x (patch) — Bug 修复；v1.y.0 (minor) — 新特性/新组件；v2.0.0 — 破坏性变更。
+patch — Bug 修复；minor — 新特性/新组件；major — 破坏性变更。
 
 ### 亮点
 

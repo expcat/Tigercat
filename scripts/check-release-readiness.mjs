@@ -112,6 +112,14 @@ function checkRootScripts() {
   }
 }
 
+function checkRootVersion(expectedVersion) {
+  const rootPackage = readJson('package.json')
+  check(
+    rootPackage.version === expectedVersion,
+    `root package.json version ${rootPackage.version}, expected ${expectedVersion}`
+  )
+}
+
 function checkChangesetConfig(packages) {
   const config = readJson('.changeset/config.json')
   const fixedGroups = config.fixed ?? []
@@ -125,7 +133,7 @@ function checkChangesetConfig(packages) {
   }
 }
 
-function checkReleaseDocs() {
+function checkReleaseDocs(expectedVersion) {
   const requiredDocs = [
     'CHANGELOG.md',
     'docs/MIGRATION.md',
@@ -141,13 +149,28 @@ function checkReleaseDocs() {
 
   if (existsSync(join(root, 'docs/MIGRATION.md'))) {
     const migration = readText('docs/MIGRATION.md')
-    check(migration.includes('## v2.0.0'), 'docs/MIGRATION.md must include v2.0.0')
+    check(
+      migration.includes(`## v${expectedVersion}`),
+      `docs/MIGRATION.md must include v${expectedVersion}`
+    )
+  }
+
+  if (existsSync(join(root, 'CHANGELOG.md'))) {
+    const changelog = readText('CHANGELOG.md')
+    check(
+      changelog.includes(`## v${expectedVersion}`),
+      `CHANGELOG.md must include v${expectedVersion}`
+    )
   }
 
   const releaseDocPath = 'skills/tigercat/references/release.md'
   if (existsSync(join(root, releaseDocPath))) {
     const releaseDoc = readText(releaseDocPath)
     check(releaseDoc.includes('Release Candidate'), `${releaseDocPath} must document RC flow`)
+    check(
+      releaseDoc.includes(`Current v${expectedVersion}`),
+      `${releaseDocPath} must document v${expectedVersion}`
+    )
     check(
       releaseDoc.includes('pnpm quality:release'),
       `${releaseDocPath} must document release gate`
@@ -163,8 +186,9 @@ const expectedVersion = checkPackageVersions(packages)
 checkSourceVersions(expectedVersion)
 checkPackageExports(packages)
 checkRootScripts()
+checkRootVersion(expectedVersion)
 checkChangesetConfig(packages)
-checkReleaseDocs()
+checkReleaseDocs(expectedVersion)
 
 if (errors.length > 0) {
   console.error('Release readiness check failed:')

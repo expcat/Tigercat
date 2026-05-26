@@ -341,4 +341,4 @@ export type { VuePrintLayoutProps } from './components/PrintLayout'
 export { ImageViewer } from './components/ImageViewer'
 export type { VueImageViewerProps } from './components/ImageViewer'
 
-export const version = '1.1.0'
+export const version = '1.2.0'

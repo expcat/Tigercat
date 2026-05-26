@@ -1,6 +1,6 @@
 {
   "name": "tigercat",
-  "version": "0.0.1",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "description": "A Tailwind CSS-based UI library supporting Vue 3 and React",
