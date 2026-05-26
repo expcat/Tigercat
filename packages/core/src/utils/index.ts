@@ -150,6 +150,9 @@ export * from './file-manager-utils'
 // ImageAnnotation utilities (v1.6+)
 export * from './image-annotation-utils'
 
+// OrgChart utilities (v1.6+)
+export * from './org-chart-utils'
+
 // InputGroup utilities (v0.9.0+)
 export * from './input-group-utils'
 

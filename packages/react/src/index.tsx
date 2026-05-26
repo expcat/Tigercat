@@ -351,6 +351,10 @@ export type { InfiniteScrollProps } from './components/InfiniteScroll'
 export { FileManager } from './components/FileManager'
 export type { FileManagerProps } from './components/FileManager'
 
+// OrgChart (v1.6+)
+export { OrgChart } from './components/OrgChart'
+export type { OrgChartProps } from './components/OrgChart'
+
 // InputGroup (v0.9.0+)
 export { InputGroup, InputGroupAddon } from './components/InputGroup'
 export type { InputGroupProps, InputGroupAddonProps } from './components/InputGroup'

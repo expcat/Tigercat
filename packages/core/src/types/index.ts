@@ -158,6 +158,9 @@ export * from './file-manager'
 // ImageAnnotation types (v1.6+)
 export * from './image-annotation'
 
+// OrgChart types (v1.6+)
+export * from './org-chart'
+
 // InputGroup types (v0.9.0+)
 export * from './input-group'
 

@@ -375,6 +375,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'sunburst-chart',
         path: '/sunburst-chart',
         label: { 'zh-CN': 'SunburstChart 旭日图', 'en-US': 'SunburstChart' }
+      },
+      {
+        key: 'org-chart',
+        path: '/org-chart',
+        label: { 'zh-CN': 'OrgChart 组织结构图', 'en-US': 'OrgChart' }
       }
     ]
   },

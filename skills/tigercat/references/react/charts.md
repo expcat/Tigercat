@@ -298,6 +298,17 @@ const heatmapData = [
 
 ---
 
+## OrgChart
+
+```tsx
+import { OrgChart } from '@expcat/tigercat-react'
+
+<OrgChart data={orgData} width={720} height={420} hoverable selectable />
+<OrgChart data={orgData} direction="horizontal" onNodeClick={handleNodeClick} />
+```
+
+---
+
 ## 底层组件
 
 ```tsx

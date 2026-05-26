@@ -311,6 +311,17 @@ const heatmapData = [
 
 ---
 
+## OrgChart
+
+```vue
+<template>
+  <OrgChart :data="orgData" :width="720" :height="420" hoverable selectable />
+  <OrgChart :data="orgData" direction="horizontal" @node-click="handleNodeClick" />
+</template>
+```
+
+---
+
 ## 底层组件
 
 ```vue

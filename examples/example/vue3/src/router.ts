@@ -139,6 +139,7 @@ const router = createRouter({
           path: 'sunburst-chart',
           component: lazyPage(() => import('./pages/SunburstChartDemo.vue'))
         },
+        { path: 'org-chart', component: lazyPage(() => import('./pages/OrgChartDemo.vue')) },
         // Advanced
         { path: 'resizable', component: lazyPage(() => import('./pages/ResizableDemo.vue')) },
         { path: 'virtual-list', component: lazyPage(() => import('./pages/VirtualListDemo.vue')) },

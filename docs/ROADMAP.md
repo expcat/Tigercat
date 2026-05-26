@@ -80,7 +80,7 @@ source: current repository audit and planning
 | 组件            | 类别     | 目标                                                      | 复杂度 | 状态   |
 | --------------- | -------- | --------------------------------------------------------- | ------ | ------ |
 | Gantt           | Charts   | 甘特图，复用 SVG chart 基础设施，支持时间轴、依赖线、缩放 | 高     | 待办   |
-| OrgChart        | Charts   | 组织结构图，复用 Tree 数据结构与 SVG 连线布局             | 高     | 待办   |
+| OrgChart        | Charts   | 组织结构图，复用 Tree 数据结构与 SVG 连线布局             | 高     | 已完成 |
 | MarkdownEditor  | Advanced | Markdown 编辑、预览、工具栏、可插拔扩展点                 | 高     | 待办   |
 | ImageAnnotation | Advanced | 图片标注，支持矩形、圆形、多边形、自由画笔                | 中     | 已完成 |
 | CronEditor      | Form     | Cron 表达式可视化编辑与校验                               | 中     | 已完成 |

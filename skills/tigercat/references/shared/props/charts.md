@@ -6,7 +6,7 @@ description: Shared charts props and concepts
 <!-- LLM-INDEX
 type: props-reference
 category: charts
-components: 17
+components: 18
 key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, responsive
 -->
 
@@ -22,7 +22,7 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 
 ## 组件列表
 
-**高级组件 (11)**: LineChart, BarChart, PieChart, DonutChart, AreaChart, ScatterChart, RadarChart, HeatmapChart, FunnelChart, GaugeChart, SunburstChart, TreeMapChart
+**高级组件 (13)**: LineChart, BarChart, PieChart, DonutChart, AreaChart, ScatterChart, RadarChart, HeatmapChart, FunnelChart, GaugeChart, SunburstChart, TreeMapChart, OrgChart
 
 **底层组件 (6)**: ChartCanvas, ChartAxis, ChartGrid, ChartSeries, ChartLegend, ChartTooltip
 
@@ -251,6 +251,25 @@ key-apis: data, xKey, yKey, series, width, height, colors, legend, tooltip, resp
 | gradient     | `boolean`             | `false`    |       |
 
 **TreeMapChartDatum**: `{ label: string, value: number, color?: string, children?: TreeMapChartDatum[] }`
+
+### OrgChart
+
+组织结构图，按 Tree 数据结构生成 SVG 节点与连线布局。
+
+| Prop          | Type                             | Default      | Notes            |
+| ------------- | -------------------------------- | ------------ | ---------------- |
+| data          | `OrgChartNode \| OrgChartNode[]` | _required_   | 单根或多根组织树 |
+| nodeWidth     | `number`                         | `160`        | 节点宽度         |
+| nodeHeight    | `number`                         | `72`         | 节点高度         |
+| levelGap      | `number`                         | `80`         | 层级间距         |
+| siblingGap    | `number`                         | `32`         | 兄弟节点间距     |
+| direction     | `'vertical' \| 'horizontal'`     | `'vertical'` | 布局方向         |
+| showAvatars   | `boolean`                        | `true`       | 显示头像         |
+| showSubtitles | `boolean`                        | `true`       | 显示副标题       |
+| selectedId    | `string \| number \| null`       | -            | 受控选中节点     |
+| colors        | `string[]`                       | 主题色板     | 默认节点色板     |
+
+**OrgChartNode**: `{ id: string | number, label: string, title?: string, subtitle?: string, avatar?: string, color?: string, children?: OrgChartNode[] }`
 
 ---
 
