@@ -7,6 +7,9 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ command }) => ({
   base: command === 'serve' ? '/' : '/Tigercat/react/',
   plugins: [react(), tailwindcss()],
+  build: {
+    chunkSizeWarningLimit: 650
+  },
   resolve: {
     alias: {
       '@demo-shared': path.resolve(__dirname, '../shared'),

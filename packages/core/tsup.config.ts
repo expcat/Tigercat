@@ -44,6 +44,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: false,
-  splitting: false,
-  treeshake: true
+  splitting: false
 })
