@@ -142,6 +142,7 @@ source: packages/core/src/types/*.ts
 | image-viewer.ts     | ImageViewerProps     | ImageViewer     | 1       |
 | infinite-scroll.ts  | InfiniteScrollProps  | InfiniteScroll  | 1       |
 | kanban.ts           | KanbanProps          | Kanban          | 6       |
+| markdown-editor.ts  | MarkdownEditorProps  | MarkdownEditor  | 9       |
 | print-layout.ts     | PrintLayoutProps     | PrintLayout     | 3       |
 | rich-text-editor.ts | RichTextEditorProps  | RichTextEditor  | 6       |
 | virtual-list.ts     | VirtualListProps     | VirtualList     | 4       |

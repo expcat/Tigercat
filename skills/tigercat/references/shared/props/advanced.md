@@ -1,12 +1,12 @@
 ---
 name: tigercat-shared-props-advanced
-description: Shared props definitions for advanced interaction components - Splitter, Resizable, CodeEditor, RichTextEditor, Kanban, VirtualTable, InfiniteScroll, FileManager, ImageAnnotation
+description: Shared props definitions for advanced interaction components - Splitter, Resizable, CodeEditor, RichTextEditor, MarkdownEditor, Kanban, VirtualTable, InfiniteScroll, FileManager, ImageAnnotation
 ---
 
 <!-- LLM-INDEX
 type: props-reference
 category: advanced
-components: 9
+components: 10
 key-apis: direction, sizes, value, language, columns, dataSource, virtual, loadMore, files, annotations
 -->
 
@@ -119,6 +119,46 @@ key-apis: direction, sizes, value, language, columns, dataSource, virtual, loadM
 | className          | `string`                          | -       | 自定义类名         |
 
 > `ToolbarItem` = `ToolbarButton | ToolbarSeparator`，支持按钮和分隔符
+
+---
+
+## MarkdownEditor Markdown 编辑器
+
+### Props
+
+| Prop               | Type                                   | Default   | Description                    |
+| ------------------ | -------------------------------------- | --------- | ------------------------------ |
+| value / modelValue | `string`                               | `''`      | Markdown 内容                  |
+| defaultValue       | `string`                               | -         | 初始内容（非受控）             |
+| placeholder        | `string`                               | -         | 占位文本                       |
+| mode               | `'edit' \| 'split' \| 'preview'`       | -         | 受控显示模式                   |
+| defaultMode        | `'edit' \| 'split' \| 'preview'`       | `'split'` | 非受控初始显示模式             |
+| toolbar            | `MarkdownToolbarItem[] \| false`       | 内置工具  | 自定义工具栏或隐藏格式化工具栏 |
+| showModeSwitch     | `boolean`                              | `true`    | 显示编辑/分屏/预览切换         |
+| height             | `string \| number`                     | `360`     | 编辑器高度                     |
+| readOnly           | `boolean`                              | `false`   | 只读模式                       |
+| disabled           | `boolean`                              | `false`   | 禁用状态                       |
+| renderer           | `{ render(markdown: string): string }` | -         | 自定义预览渲染器               |
+| className          | `string`                               | -         | 自定义类名                     |
+
+### Types
+
+| Type                  | Definition                                                                        |
+| --------------------- | --------------------------------------------------------------------------------- |
+| MarkdownEditorMode    | `'edit' \| 'split' \| 'preview'`                                                  |
+| MarkdownToolbarItem   | `MarkdownToolbarButton \| MarkdownToolbarSeparator`                               |
+| MarkdownToolbarButton | `{ name, label, icon?, tooltip?, hotkey?, action? }`                              |
+| MarkdownToolbarAction | `'bold' \| 'italic' \| 'heading' \| 'blockquote' \| 'link' \| 'table'` 等内置动作 |
+| MarkdownRenderer      | `{ render(markdown: string): string }`，输出会经过内置 HTML 清理                  |
+
+### Events
+
+| Vue Event       | React Prop     | Payload              | Description  |
+| --------------- | -------------- | -------------------- | ------------ |
+| `@update:value` | -              | `string`             | v-model 更新 |
+| `@change`       | `onChange`     | `string`             | 内容变化     |
+| `@update:mode`  | -              | `MarkdownEditorMode` | v-model 更新 |
+| `@mode-change`  | `onModeChange` | `MarkdownEditorMode` | 显示模式变化 |
 
 ---
 

@@ -5,7 +5,7 @@ description: Vue 3 advanced components usage
 
 # Advanced Components (Vue 3)
 
-高级组件：Splitter / Resizable / CodeEditor / RichTextEditor / Kanban / VirtualTable / InfiniteScroll / FileManager / ImageAnnotation / VirtualList
+高级组件：Splitter / Resizable / CodeEditor / RichTextEditor / MarkdownEditor / Kanban / VirtualTable / InfiniteScroll / FileManager / ImageAnnotation / VirtualList
 
 > **Props Reference**: [shared/props/advanced.md](../shared/props/advanced.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -196,6 +196,41 @@ const toolbar: ToolbarItem[] = [
 
 <template>
   <RichTextEditor v-model="content" :toolbar="toolbar" />
+</template>
+```
+
+---
+
+## MarkdownEditor Markdown 编辑器
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { MarkdownEditor } from '@expcat/tigercat-vue'
+
+const content = ref('# Hello Tigercat\n\nWrite **Markdown** with live preview.')
+</script>
+
+<template>
+  <MarkdownEditor v-model:value="content" default-mode="split" :height="360" />
+</template>
+```
+
+自定义预览渲染器：
+
+```vue
+<script setup lang="ts">
+import { MarkdownEditor } from '@expcat/tigercat-vue'
+
+const renderer = {
+  render(markdown: string) {
+    return `<p>${markdown}</p>`
+  }
+}
+</script>
+
+<template>
+  <MarkdownEditor value="custom" mode="preview" :renderer="renderer" />
 </template>
 ```
 

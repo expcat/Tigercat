@@ -132,6 +132,9 @@ export * from './code-highlighter'
 // RichTextEditor utilities (v0.8.0+)
 export * from './rich-text-editor-utils'
 
+// MarkdownEditor utilities (v1.6+)
+export * from './markdown-editor-utils'
+
 // RichTextEditor engine (PR-17)
 export * from './rich-text-engine'
 

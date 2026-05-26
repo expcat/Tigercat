@@ -303,6 +303,10 @@ export type { VueCodeEditorProps } from './components/CodeEditor'
 export { RichTextEditor } from './components/RichTextEditor'
 export type { VueRichTextEditorProps } from './components/RichTextEditor'
 
+// MarkdownEditor (v1.6+)
+export { MarkdownEditor } from './components/MarkdownEditor'
+export type { VueMarkdownEditorProps } from './components/MarkdownEditor'
+
 // Kanban (v0.8.0+)
 export { Kanban } from './components/Kanban'
 export type { VueKanbanProps } from './components/Kanban'

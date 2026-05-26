@@ -153,6 +153,10 @@ const router = createRouter({
           path: 'rich-text-editor',
           component: lazyPage(() => import('./pages/RichTextEditorDemo.vue'))
         },
+        {
+          path: 'markdown-editor',
+          component: lazyPage(() => import('./pages/MarkdownEditorDemo.vue'))
+        },
         { path: 'kanban', component: lazyPage(() => import('./pages/KanbanDemo.vue')) },
         { path: 'file-manager', component: lazyPage(() => import('./pages/FileManagerDemo.vue')) },
         {

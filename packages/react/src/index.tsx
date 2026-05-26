@@ -335,6 +335,10 @@ export type { CodeEditorProps } from './components/CodeEditor'
 export { RichTextEditor } from './components/RichTextEditor'
 export type { RichTextEditorProps } from './components/RichTextEditor'
 
+// MarkdownEditor (v1.6+)
+export { MarkdownEditor } from './components/MarkdownEditor'
+export type { MarkdownEditorProps } from './components/MarkdownEditor'
+
 // Kanban (v0.8.0+)
 export { Kanban } from './components/Kanban'
 export type { KanbanProps } from './components/Kanban'

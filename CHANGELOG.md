@@ -4,6 +4,10 @@
 
 ## Unreleased
 
+### Added
+
+- 新增 **MarkdownEditor** 高级组件：支持 Markdown 编辑、编辑/分屏/预览模式、内置工具栏、快捷键、预览渲染与自定义 renderer 扩展点，并提供 Vue/React 双端实现、示例与测试。
+
 ### Infrastructure
 
 - 新增 Tailwind v4-only 基线检查，覆盖 workspace catalog、CLI 模板版本、core peer dependency 与示例项目依赖入口。

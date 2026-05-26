@@ -408,6 +408,7 @@ All phases completed ✅
 - [x] **Resizable** — `tests/react/Resizable.spec.tsx` (31 tests) ⭐⭐⭐⭐
 - [x] **CodeEditor** — `tests/react/CodeEditor.spec.tsx` (33 tests) ⭐⭐⭐⭐
 - [x] **RichTextEditor** — `tests/react/RichTextEditor.spec.tsx` (39 tests) ⭐⭐⭐⭐
+- [x] **MarkdownEditor** — `tests/react/MarkdownEditor.spec.tsx` (21 tests) ⭐⭐⭐⭐
 - [x] **Kanban** — `tests/react/Kanban.spec.tsx` (31 tests) ⭐⭐⭐⭐
 - [x] **VirtualTable** — `tests/react/VirtualTable.spec.tsx` (24 tests) ⭐⭐⭐⭐
 - [x] **InfiniteScroll** — `tests/react/InfiniteScroll.spec.tsx` (25 tests) ⭐⭐⭐⭐

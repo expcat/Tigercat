@@ -143,6 +143,9 @@ export * from './code-editor'
 // RichTextEditor types (v0.8.0+)
 export * from './rich-text-editor'
 
+// MarkdownEditor types (v1.6+)
+export * from './markdown-editor'
+
 // Kanban types (v0.8.0+)
 export * from './kanban'
 

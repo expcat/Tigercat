@@ -120,6 +120,7 @@ const VirtualListDemo = lazy(() => import('./pages/VirtualListDemo'))
 const InfiniteScrollDemo = lazy(() => import('./pages/InfiniteScrollDemo'))
 const CodeEditorDemo = lazy(() => import('./pages/CodeEditorDemo'))
 const RichTextEditorDemo = lazy(() => import('./pages/RichTextEditorDemo'))
+const MarkdownEditorDemo = lazy(() => import('./pages/MarkdownEditorDemo'))
 const KanbanDemo = lazy(() => import('./pages/KanbanDemo'))
 const FileManagerDemo = lazy(() => import('./pages/FileManagerDemo'))
 const ImageAnnotationDemo = lazy(() => import('./pages/ImageAnnotationDemo'))
@@ -255,6 +256,7 @@ const router = createBrowserRouter(
         { path: 'infinite-scroll', element: <InfiniteScrollDemo /> },
         { path: 'code-editor', element: <CodeEditorDemo /> },
         { path: 'rich-text-editor', element: <RichTextEditorDemo /> },
+        { path: 'markdown-editor', element: <MarkdownEditorDemo /> },
         { path: 'kanban', element: <KanbanDemo /> },
         { path: 'file-manager', element: <FileManagerDemo /> },
         { path: 'image-annotation', element: <ImageAnnotationDemo /> },

@@ -5,7 +5,7 @@ description: React advanced components usage
 
 # Advanced Components (React)
 
-高级组件：Splitter / Resizable / CodeEditor / RichTextEditor / Kanban / VirtualTable / InfiniteScroll / FileManager / ImageAnnotation / VirtualList
+高级组件：Splitter / Resizable / CodeEditor / RichTextEditor / MarkdownEditor / Kanban / VirtualTable / InfiniteScroll / FileManager / ImageAnnotation / VirtualList
 
 > **Props Reference**: [shared/props/advanced.md](../shared/props/advanced.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -195,6 +195,39 @@ export default function CustomToolbarDemo() {
   const [content, setContent] = useState('')
 
   return <RichTextEditor value={content} onChange={setContent} toolbar={toolbar} />
+}
+```
+
+---
+
+## MarkdownEditor Markdown 编辑器
+
+```tsx
+import React, { useState } from 'react'
+import { MarkdownEditor } from '@expcat/tigercat-react'
+
+export default function MarkdownEditorDemo() {
+  const [content, setContent] = useState(
+    '# Hello Tigercat\n\nWrite **Markdown** with live preview.'
+  )
+
+  return <MarkdownEditor value={content} onChange={setContent} defaultMode="split" height={360} />
+}
+```
+
+自定义预览渲染器：
+
+```tsx
+import { MarkdownEditor } from '@expcat/tigercat-react'
+
+const renderer = {
+  render(markdown: string) {
+    return `<p>${markdown}</p>`
+  }
+}
+
+export default function CustomRendererDemo() {
+  return <MarkdownEditor value="custom" mode="preview" renderer={renderer} />
 }
 ```
 

@@ -422,6 +422,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         path: '/rich-text-editor',
         label: { 'zh-CN': 'RichTextEditor 富文本', 'en-US': 'RichTextEditor' }
       },
+      {
+        key: 'markdown-editor',
+        path: '/markdown-editor',
+        label: { 'zh-CN': 'MarkdownEditor Markdown 编辑器', 'en-US': 'MarkdownEditor' }
+      },
       { key: 'kanban', path: '/kanban', label: { 'zh-CN': 'Kanban 看板', 'en-US': 'Kanban' } },
       {
         key: 'file-manager',
