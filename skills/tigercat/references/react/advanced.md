@@ -5,7 +5,7 @@ description: React advanced components usage
 
 # Advanced Components (React)
 
-高级组件：Splitter / Resizable / CodeEditor / RichTextEditor / Kanban / VirtualTable / InfiniteScroll / FileManager / VirtualList
+高级组件：Splitter / Resizable / CodeEditor / RichTextEditor / Kanban / VirtualTable / InfiniteScroll / FileManager / ImageAnnotation / VirtualList
 
 > **Props Reference**: [shared/props/advanced.md](../shared/props/advanced.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -220,6 +220,33 @@ export default function FileManagerDemo() {
       viewMode="grid"
       onItemClick={(item) => console.log('click:', item.name)}
       onItemDelete={(item) => console.log('delete:', item.name)}
+    />
+  )
+}
+```
+
+---
+
+## ImageAnnotation 图片标注
+
+```tsx
+import React, { useState } from 'react'
+import { ImageAnnotation } from '@expcat/tigercat-react'
+import type { ImageAnnotation as ImageAnnotationItem } from '@expcat/tigercat-core'
+
+const initialAnnotations: ImageAnnotationItem[] = [
+  { id: 'face', type: 'rectangle', x: 0.12, y: 0.18, width: 0.24, height: 0.2, label: 'Face' }
+]
+
+export default function ImageAnnotationDemo() {
+  const [annotations, setAnnotations] = useState(initialAnnotations)
+
+  return (
+    <ImageAnnotation
+      src="/sample.jpg"
+      value={annotations}
+      defaultTool="rectangle"
+      onChange={setAnnotations}
     />
   )
 }

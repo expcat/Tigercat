@@ -124,6 +124,8 @@ export { ImageGroup, ImageGroupContext } from './components/ImageGroup'
 export type { ImageGroupProps, ImageGroupContextValue } from './components/ImageGroup'
 export { ImageCropper } from './components/ImageCropper'
 export type { ImageCropperProps, ImageCropperRef } from './components/ImageCropper'
+export { ImageAnnotation } from './components/ImageAnnotation'
+export type { ImageAnnotationProps } from './components/ImageAnnotation'
 
 export { List } from './components/List'
 export type { ListProps } from './components/List'

@@ -155,6 +155,9 @@ export * from './infinite-scroll'
 // FileManager types (v0.8.0+)
 export * from './file-manager'
 
+// ImageAnnotation types (v1.6+)
+export * from './image-annotation'
+
 // InputGroup types (v0.9.0+)
 export * from './input-group'
 

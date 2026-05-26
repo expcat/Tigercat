@@ -120,6 +120,7 @@ const CodeEditorDemo = lazy(() => import('./pages/CodeEditorDemo'))
 const RichTextEditorDemo = lazy(() => import('./pages/RichTextEditorDemo'))
 const KanbanDemo = lazy(() => import('./pages/KanbanDemo'))
 const FileManagerDemo = lazy(() => import('./pages/FileManagerDemo'))
+const ImageAnnotationDemo = lazy(() => import('./pages/ImageAnnotationDemo'))
 
 // Composite
 const DataTableWithToolbarDemo = lazy(() => import('./pages/DataTableWithToolbarDemo'))
@@ -252,6 +253,7 @@ const router = createBrowserRouter(
         { path: 'rich-text-editor', element: <RichTextEditorDemo /> },
         { path: 'kanban', element: <KanbanDemo /> },
         { path: 'file-manager', element: <FileManagerDemo /> },
+        { path: 'image-annotation', element: <ImageAnnotationDemo /> },
         // Composite
         { path: 'data-table-with-toolbar', element: <DataTableWithToolbarDemo /> },
         { path: 'form-wizard', element: <FormWizardDemo /> },
@@ -268,9 +270,7 @@ const router = createBrowserRouter(
       ]
     }
   ],
-  {
-    basename: import.meta.env.BASE_URL
-  }
+  { basename: import.meta.env.BASE_URL }
 )
 
 export default router

@@ -153,6 +153,10 @@ const router = createRouter({
         },
         { path: 'kanban', component: lazyPage(() => import('./pages/KanbanDemo.vue')) },
         { path: 'file-manager', component: lazyPage(() => import('./pages/FileManagerDemo.vue')) },
+        {
+          path: 'image-annotation',
+          component: lazyPage(() => import('./pages/ImageAnnotationDemo.vue'))
+        },
         // Composite
         {
           path: 'data-table-with-toolbar',

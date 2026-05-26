@@ -1,13 +1,13 @@
 ---
 name: tigercat-shared-props-advanced
-description: Shared props definitions for advanced interaction components - Splitter, Resizable, CodeEditor, RichTextEditor, Kanban, VirtualTable, InfiniteScroll, FileManager
+description: Shared props definitions for advanced interaction components - Splitter, Resizable, CodeEditor, RichTextEditor, Kanban, VirtualTable, InfiniteScroll, FileManager, ImageAnnotation
 ---
 
 <!-- LLM-INDEX
 type: props-reference
 category: advanced
-components: 8
-key-apis: direction, sizes, value, language, columns, dataSource, virtual, loadMore, files
+components: 9
+key-apis: direction, sizes, value, language, columns, dataSource, virtual, loadMore, files, annotations
 -->
 
 # Advanced Interaction Components - Props Reference (v0.8.0)
@@ -212,6 +212,50 @@ key-apis: direction, sizes, value, language, columns, dataSource, virtual, loadM
 | select   | `FileItem` | 选择文件 (Vue: `@select`, React: `onSelect`)       |
 | open     | `FileItem` | 打开文件 (Vue: `@open`, React: `onOpen`)           |
 | navigate | `string`   | 导航到目录 (Vue: `@navigate`, React: `onNavigate`) |
+
+---
+
+## ImageAnnotation 图片标注
+
+### Props
+
+| Prop               | Type                    | Default  | Description             |
+| ------------------ | ----------------------- | -------- | ----------------------- |
+| src                | `string`                | -        | 图片地址                |
+| alt                | `string`                | -        | 图片替代文本            |
+| value / modelValue | `ImageAnnotation[]`     | -        | 受控标注列表            |
+| defaultValue       | `ImageAnnotation[]`     | `[]`     | 非受控初始标注          |
+| selectedId         | `string`                | -        | 受控选中标注            |
+| defaultSelectedId  | `string`                | -        | 非受控初始选中标注      |
+| tool               | `ImageAnnotationTool`   | -        | 受控当前工具            |
+| defaultTool        | `ImageAnnotationTool`   | `select` | 非受控初始工具          |
+| tools              | `ImageAnnotationTool[]` | 全部工具 | 可用工具                |
+| disabled           | `boolean`               | `false`  | 禁用交互                |
+| readonly           | `boolean`               | `false`  | 只读查看                |
+| minSize            | `number`                | `0.01`   | 矩形/圆形最小归一化宽高 |
+| strokeWidth        | `number`                | `2`      | SVG 标注描边宽度        |
+| showLabels         | `boolean`               | `true`   | 显示标注标签            |
+| className          | `string`                | -        | 自定义类名              |
+
+### Types
+
+| Type                 | Definition                                                            |
+| -------------------- | --------------------------------------------------------------------- |
+| ImageAnnotationTool  | `'select' \| 'rectangle' \| 'ellipse' \| 'polygon' \| 'freehand'`     |
+| ImageAnnotation      | `ImageAnnotationBox \| ImageAnnotationPath`                           |
+| ImageAnnotationBox   | `{ id, type: 'rectangle' \| 'ellipse', x, y, width, height, label? }` |
+| ImageAnnotationPath  | `{ id, type: 'polygon' \| 'freehand', points, label? }`               |
+| ImageAnnotationPoint | `{ x: number, y: number }`，坐标为 0-1 归一化值                       |
+
+### Events
+
+| Vue Event             | React Prop     | Payload                   | Description  |
+| --------------------- | -------------- | ------------------------- | ------------ |
+| `@update:model-value` | -              | `ImageAnnotation[]`       | v-model 更新 |
+| `@change`             | `onChange`     | `(annotations, meta)`     | 标注变化     |
+| `@select`             | `onSelect`     | `ImageAnnotation \| null` | 选择标注     |
+| `@tool-change`        | `onToolChange` | `ImageAnnotationTool`     | 工具切换     |
+| `@ready`              | `onReady`      | -                         | 图片加载完成 |
 
 ---
 

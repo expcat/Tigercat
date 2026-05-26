@@ -5,7 +5,7 @@ description: Compact generated API summary for Tigercat core types
 
 <!-- LLM-INDEX
 type: generated-api-summary
-total-exported-types: 565
+total-exported-types: 574
 source: packages/core/src/types/*.ts
 -->
 
@@ -131,18 +131,19 @@ source: packages/core/src/types/*.ts
 
 ## Advanced
 
-| Type File           | Props Interfaces    | Components     | Exports |
-| ------------------- | ------------------- | -------------- | ------- |
-| code-editor.ts      | CodeEditorProps     | CodeEditor     | 3       |
-| drag.ts             | -                   | -              | 15      |
-| file-manager.ts     | FileManagerProps    | FileManager    | 6       |
-| image-viewer.ts     | ImageViewerProps    | ImageViewer    | 1       |
-| infinite-scroll.ts  | InfiniteScrollProps | InfiniteScroll | 1       |
-| kanban.ts           | KanbanProps         | Kanban         | 6       |
-| print-layout.ts     | PrintLayoutProps    | PrintLayout    | 3       |
-| rich-text-editor.ts | RichTextEditorProps | RichTextEditor | 6       |
-| virtual-list.ts     | VirtualListProps    | VirtualList    | 4       |
-| virtual-table.ts    | VirtualTableProps   | VirtualTable   | 2       |
+| Type File           | Props Interfaces     | Components      | Exports |
+| ------------------- | -------------------- | --------------- | ------- |
+| code-editor.ts      | CodeEditorProps      | CodeEditor      | 3       |
+| drag.ts             | -                    | -               | 15      |
+| file-manager.ts     | FileManagerProps     | FileManager     | 6       |
+| image-annotation.ts | ImageAnnotationProps | ImageAnnotation | 9       |
+| image-viewer.ts     | ImageViewerProps     | ImageViewer     | 1       |
+| infinite-scroll.ts  | InfiniteScrollProps  | InfiniteScroll  | 1       |
+| kanban.ts           | KanbanProps          | Kanban          | 6       |
+| print-layout.ts     | PrintLayoutProps     | PrintLayout     | 3       |
+| rich-text-editor.ts | RichTextEditorProps  | RichTextEditor  | 6       |
+| virtual-list.ts     | VirtualListProps     | VirtualList     | 4       |
+| virtual-table.ts    | VirtualTableProps    | VirtualTable    | 2       |
 
 ## Composite
 

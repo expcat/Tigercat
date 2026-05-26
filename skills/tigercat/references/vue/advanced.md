@@ -5,7 +5,7 @@ description: Vue 3 advanced components usage
 
 # Advanced Components (Vue 3)
 
-高级组件：Splitter / Resizable / CodeEditor / RichTextEditor / Kanban / VirtualTable / InfiniteScroll / FileManager / VirtualList
+高级组件：Splitter / Resizable / CodeEditor / RichTextEditor / Kanban / VirtualTable / InfiniteScroll / FileManager / ImageAnnotation / VirtualList
 
 > **Props Reference**: [shared/props/advanced.md](../shared/props/advanced.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -222,6 +222,26 @@ const files = ref<FileManagerItem[]>([
     view-mode="grid"
     @item-click="(item) => console.log('click:', item.name)"
     @item-delete="(item) => console.log('delete:', item.name)" />
+</template>
+```
+
+---
+
+## ImageAnnotation 图片标注
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { ImageAnnotation } from '@expcat/tigercat-vue'
+import type { ImageAnnotation as ImageAnnotationItem } from '@expcat/tigercat-core'
+
+const annotations = ref<ImageAnnotationItem[]>([
+  { id: 'face', type: 'rectangle', x: 0.12, y: 0.18, width: 0.24, height: 0.2, label: 'Face' }
+])
+</script>
+
+<template>
+  <ImageAnnotation v-model="annotations" src="/sample.jpg" default-tool="rectangle" />
 </template>
 ```
 

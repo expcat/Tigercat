@@ -417,6 +417,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'file-manager',
         path: '/file-manager',
         label: { 'zh-CN': 'FileManager 文件管理', 'en-US': 'FileManager' }
+      },
+      {
+        key: 'image-annotation',
+        path: '/image-annotation',
+        label: { 'zh-CN': 'ImageAnnotation 图片标注', 'en-US': 'ImageAnnotation' }
       }
     ]
   },

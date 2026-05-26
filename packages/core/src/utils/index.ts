@@ -147,6 +147,9 @@ export * from './infinite-scroll-utils'
 // FileManager utilities (v0.8.0+)
 export * from './file-manager-utils'
 
+// ImageAnnotation utilities (v1.6+)
+export * from './image-annotation-utils'
+
 // InputGroup utilities (v0.9.0+)
 export * from './input-group-utils'
 
