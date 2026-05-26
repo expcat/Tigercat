@@ -3,7 +3,7 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: pending development roadmap only
-verified-date: 2026-05-25
+verified-date: 2026-05-26
 source: current repository audit and planning
 -->
 
@@ -94,13 +94,13 @@ source: current repository audit and planning
 4. 对高复杂组件补充性能基准与大数据场景测试。
 5. 发布前补齐迁移说明、API 文档、Example 和可访问性说明。
 
-### P3：v2.0 发布准备
+### P3：发布准备
 
-- [ ] 公共 API 冻结审查：核对所有 package exports、Props 类型、事件命名、子路径导入。
-- [ ] Breaking change 清单：将不兼容变化集中到迁移指南和 changelog。
-- [ ] SSR 与 hydration 回归矩阵：覆盖 Nuxt、Next.js、Vue/React 示例构建。
-- [ ] 主题与 token 稳定性审查：确保 CSS 变量命名、Tailwind plugin entry、Figma token 输出可长期维护。
-- [ ] Release Candidate 流程：预发布、安装验证、文档构建、发布后 smoke test 全链路演练。
+- [x] 公共 API 冻结审查：新增 `pnpm release:check`，并通过 `pnpm types:check`、`pnpm api:validate` 核对 package exports、Props 类型、事件命名与子路径导入。
+- [x] Breaking change 清单：新增 `docs/MIGRATION.md`，并在 `CHANGELOG.md` 集中记录迁移入口。
+- [x] SSR 与 hydration 回归矩阵：新增 `pnpm quality:ssr` 覆盖 Nuxt 与 Next.js，并纳入 `pnpm quality:release`。
+- [x] 主题与 token 稳定性审查：发布检查覆盖 Tailwind plugin 与 token assets 导出，`pnpm tokens:build` 可验证 CSS、TS、Tailwind 与 Figma token 输出。
+- [x] Release Candidate 流程：在 release reference 中固化预发布、安装验证、文档构建、发布后 smoke test 全链路。
 
 ## 新组件 Definition of Done
 

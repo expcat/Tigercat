@@ -12,6 +12,9 @@
 
 - 新增 Tailwind v4-only 基线检查，覆盖 workspace catalog、CLI 模板版本、core peer dependency 与示例项目依赖入口。
 - 新增分层质量门禁：`pnpm quality:quick`、`pnpm quality:size`、`pnpm quality:examples`、`pnpm quality:release`。
+- 新增发布准备检查：`pnpm release:check` 校验包版本、运行时 `version` 导出、公开 package exports、Changesets fixed group 与发布文档入口。
+- 新增 SSR 发布门禁：`pnpm quality:ssr` 覆盖 Nuxt 与 Next.js 示例构建，并纳入 `pnpm quality:release`。
+- 新增 [迁移指南](docs/MIGRATION.md) 作为 Breaking change 与迁移路径集中入口。
 - 更新 size-limit 当前基线：React full 限制为 253 kB，Vue Button subpath 限制为 16 kB。
 - 明确 Roadmap、CHANGELOG、脚本文档和 API 文档的职责边界，避免完成历史长期堆回 Roadmap。
 

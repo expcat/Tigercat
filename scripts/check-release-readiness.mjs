@@ -1,0 +1,179 @@
+#!/usr/bin/env node
+
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+const root = join(import.meta.dirname, '..')
+
+const packageFiles = {
+  core: 'packages/core/package.json',
+  vue: 'packages/vue/package.json',
+  react: 'packages/react/package.json',
+  cli: 'packages/cli/package.json'
+}
+
+const sourceVersionFiles = {
+  core: 'packages/core/src/index.ts',
+  vue: 'packages/vue/src/index.ts',
+  react: 'packages/react/src/index.tsx'
+}
+
+const errors = []
+
+function readText(path) {
+  return readFileSync(join(root, path), 'utf8')
+}
+
+function readJson(path) {
+  return JSON.parse(readText(path))
+}
+
+function check(condition, message) {
+  if (!condition) errors.push(message)
+}
+
+function checkPackageVersions(packages) {
+  const versions = new Set(Object.values(packages).map((pkg) => pkg.version))
+  check(versions.size === 1, `package versions are not aligned: ${[...versions].join(', ')}`)
+  return [...versions][0]
+}
+
+function checkSourceVersions(expectedVersion) {
+  for (const path of Object.values(sourceVersionFiles)) {
+    const content = readText(path)
+    const match = content.match(/export const version = ['"]([^'"]+)['"]/)
+    check(match, `${path} must export a version constant`)
+    if (match) {
+      check(
+        match[1] === expectedVersion,
+        `${path} exports version ${match[1]}, expected ${expectedVersion}`
+      )
+    }
+  }
+}
+
+function checkPackageExports(packages) {
+  const coreExports = packages.core.exports ?? {}
+  const requiredCoreExports = [
+    '.',
+    './types',
+    './theme',
+    './tailwind',
+    './tailwind/modern',
+    './tokens.css',
+    './figma-variables.json'
+  ]
+
+  for (const exportName of requiredCoreExports) {
+    check(exportName in coreExports, `@expcat/tigercat-core missing export ${exportName}`)
+  }
+
+  for (const packageName of ['vue', 'react']) {
+    const packageExports = packages[packageName].exports ?? {}
+    check('.' in packageExports, `@expcat/tigercat-${packageName} missing root export`)
+    check(
+      `./*` in packageExports,
+      `@expcat/tigercat-${packageName} missing component subpath export`
+    )
+  }
+}
+
+function checkRootScripts() {
+  const rootPackage = readJson('package.json')
+  const scripts = rootPackage.scripts ?? {}
+  const requiredScripts = [
+    'release:check',
+    'quality:quick',
+    'quality:size',
+    'quality:examples',
+    'quality:ssr',
+    'quality:release',
+    'example:ssr:build',
+    'docs:api',
+    'smoke:published'
+  ]
+
+  for (const scriptName of requiredScripts) {
+    check(scriptName in scripts, `root package.json missing script ${scriptName}`)
+  }
+
+  const releaseGate = scripts['quality:release'] ?? ''
+  const requiredReleaseSteps = [
+    'release:check',
+    'quality:quick',
+    'quality:size',
+    'test:validate',
+    'quality:examples',
+    'quality:ssr'
+  ]
+
+  for (const step of requiredReleaseSteps) {
+    check(releaseGate.includes(step), `quality:release must include ${step}`)
+  }
+}
+
+function checkChangesetConfig(packages) {
+  const config = readJson('.changeset/config.json')
+  const fixedGroups = config.fixed ?? []
+  const fixedPackages = new Set(fixedGroups.flat())
+
+  for (const packageInfo of Object.values(packages)) {
+    check(
+      fixedPackages.has(packageInfo.name),
+      `.changeset/config.json fixed group missing ${packageInfo.name}`
+    )
+  }
+}
+
+function checkReleaseDocs() {
+  const requiredDocs = [
+    'CHANGELOG.md',
+    'docs/MIGRATION.md',
+    'skills/tigercat/references/release.md',
+    'skills/tigercat/references/ssr.md',
+    'skills/tigercat/references/theme.md',
+    'skills/tigercat/references/tokens.md'
+  ]
+
+  for (const docPath of requiredDocs) {
+    check(existsSync(join(root, docPath)), `${docPath} is missing`)
+  }
+
+  if (existsSync(join(root, 'docs/MIGRATION.md'))) {
+    const migration = readText('docs/MIGRATION.md')
+    check(migration.includes('## v2.0.0'), 'docs/MIGRATION.md must include v2.0.0')
+  }
+
+  const releaseDocPath = 'skills/tigercat/references/release.md'
+  if (existsSync(join(root, releaseDocPath))) {
+    const releaseDoc = readText(releaseDocPath)
+    check(releaseDoc.includes('Release Candidate'), `${releaseDocPath} must document RC flow`)
+    check(
+      releaseDoc.includes('pnpm quality:release'),
+      `${releaseDocPath} must document release gate`
+    )
+  }
+}
+
+const packages = Object.fromEntries(
+  Object.entries(packageFiles).map(([name, path]) => [name, readJson(path)])
+)
+const expectedVersion = checkPackageVersions(packages)
+
+checkSourceVersions(expectedVersion)
+checkPackageExports(packages)
+checkRootScripts()
+checkChangesetConfig(packages)
+checkReleaseDocs()
+
+if (errors.length > 0) {
+  console.error('Release readiness check failed:')
+  for (const error of errors) {
+    console.error(`- ${error}`)
+  }
+  process.exit(1)
+}
+
+console.log(
+  `Release readiness check passed for ${Object.keys(packages).join(', ')} at ${expectedVersion}.`
+)

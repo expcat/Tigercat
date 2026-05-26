@@ -42,3 +42,10 @@ test-results/
 .vscode/
 
 .vitepress/
+
+# next.js
+.next/
+
+# nuxt.js
+.nuxt/
+.output/
