@@ -37,7 +37,10 @@ const EmptyDemo: React.FC = () => {
       <DemoBlock title="自定义内容" description="自定义描述文字和操作按钮" code={customSnippet}>
         <Space direction="vertical" size={24} className="w-full">
           <div className="border rounded-lg p-6">
-            <Empty description="这里什么都没有" extra={<Button variant="primary">立即创建</Button>} />
+            <Empty
+              description="这里什么都没有"
+              extra={<Button variant="primary">立即创建</Button>}
+            />
           </div>
           <div className="border rounded-lg p-6">
             <Empty showImage={false} description="无图片模式，仅显示文字描述" />

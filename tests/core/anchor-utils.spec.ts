@@ -146,16 +146,16 @@ describe('anchor-utils', () => {
 
     it('should work with different scroll positions', () => {
       const links = ['#section1', '#section2', '#section3']
-      
+
       // Test at different scroll positions
       container.scrollTop = 0
       const result1 = findActiveAnchor(links, container, 5, 0)
       expect(links).toContain(result1)
-      
+
       container.scrollTop = 200
       const result2 = findActiveAnchor(links, container, 5, 0)
       expect(links).toContain(result2)
-      
+
       container.scrollTop = 600
       const result3 = findActiveAnchor(links, container, 5, 0)
       expect(links).toContain(result3)
@@ -190,9 +190,11 @@ describe('anchor-utils', () => {
     it('should pass smooth behavior to scrollTo', () => {
       const scrollToSpy = vi.spyOn(container, 'scrollTo')
       scrollToAnchor('#section1', container, 0)
-      expect(scrollToSpy).toHaveBeenCalledWith(expect.objectContaining({
-        behavior: 'smooth'
-      }))
+      expect(scrollToSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          behavior: 'smooth'
+        })
+      )
     })
   })
 

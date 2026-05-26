@@ -112,9 +112,7 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock title="基本用法"
-               description="基础的标签展示。"
-               :code="basicSnippet">
+    <DemoBlock title="基本用法" description="基础的标签展示。" :code="basicSnippet">
       <Space>
         <Tag>Default Tag</Tag>
         <Tag>标签二</Tag>
@@ -123,9 +121,10 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     </DemoBlock>
 
     <!-- 标签类型 -->
-    <DemoBlock title="标签类型"
-               description="标签有六种类型：默认、主要、成功、警告、危险和信息。"
-               :code="variantSnippet">
+    <DemoBlock
+      title="标签类型"
+      description="标签有六种类型：默认、主要、成功、警告、危险和信息。"
+      :code="variantSnippet">
       <Space wrap>
         <Tag variant="default">默认标签</Tag>
         <Tag variant="primary">主要标签</Tag>
@@ -137,103 +136,82 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     </DemoBlock>
 
     <!-- 标签大小 -->
-    <DemoBlock title="标签大小"
-               description="标签有三种尺寸：小、中、大。"
-               :code="sizeSnippet">
+    <DemoBlock title="标签大小" description="标签有三种尺寸：小、中、大。" :code="sizeSnippet">
       <Space align="center">
-        <Tag size="sm"
-             variant="primary">小标签</Tag>
-        <Tag size="md"
-             variant="primary">中标签</Tag>
-        <Tag size="lg"
-             variant="primary">大标签</Tag>
+        <Tag size="sm" variant="primary">小标签</Tag>
+        <Tag size="md" variant="primary">中标签</Tag>
+        <Tag size="lg" variant="primary">大标签</Tag>
       </Space>
     </DemoBlock>
 
     <!-- 可关闭标签 -->
-    <DemoBlock title="可关闭标签"
-               description="设置 closable 属性可以定义一个标签是否可移除。"
-               :code="closableSnippet"
-               :script="closableScriptSnippet">
+    <DemoBlock
+      title="可关闭标签"
+      description="设置 closable 属性可以定义一个标签是否可移除。"
+      :code="closableSnippet"
+      :script="closableScriptSnippet">
       <Space wrap>
-        <Tag v-for="(tag, index) in tags"
-             :key="tag"
-             variant="primary"
-             closable
-             @close="handleClose(index)">
+        <Tag
+          v-for="(tag, index) in tags"
+          :key="tag"
+          variant="primary"
+          closable
+          @close="handleClose(index)">
           {{ tag }}
         </Tag>
-        <p v-if="tags.length === 0"
-           class="text-gray-500">所有标签已被移除</p>
+        <p v-if="tags.length === 0" class="text-gray-500">所有标签已被移除</p>
       </Space>
     </DemoBlock>
 
     <!-- 关闭按钮无障碍标签 -->
-    <DemoBlock title="关闭按钮无障碍标签"
-               description="使用 closeAriaLabel 自定义关闭按钮的 aria-label（便于无障碍与多语言）。"
-               :code="closeAriaSnippet">
+    <DemoBlock
+      title="关闭按钮无障碍标签"
+      description="使用 closeAriaLabel 自定义关闭按钮的 aria-label（便于无障碍与多语言）。"
+      :code="closeAriaSnippet">
       <Space wrap>
-        <Tag variant="info"
-             closable
-             closeAriaLabel="移除标签：JavaScript">JavaScript</Tag>
-        <Tag variant="success"
-             closable
-             closeAriaLabel="移除标签：已完成">已完成</Tag>
+        <Tag variant="info" closable closeAriaLabel="移除标签：JavaScript">JavaScript</Tag>
+        <Tag variant="success" closable closeAriaLabel="移除标签：已完成">已完成</Tag>
       </Space>
     </DemoBlock>
 
     <!-- 阻止关闭 -->
-    <DemoBlock title="阻止关闭"
-               description="通过 preventDefault() 阻止标签自动关闭，适用于二次确认等场景。"
-               :code="preventCloseSnippet">
-      <Tag closable
-           @close="$event.preventDefault()">点击关闭按钮不会消失</Tag>
+    <DemoBlock
+      title="阻止关闭"
+      description="通过 preventDefault() 阻止标签自动关闭，适用于二次确认等场景。"
+      :code="preventCloseSnippet">
+      <Tag closable @close="$event.preventDefault()">点击关闭按钮不会消失</Tag>
     </DemoBlock>
 
     <!-- 不同类型的可关闭标签 -->
-    <DemoBlock title="不同类型的可关闭标签"
-               description="展示不同变体的可关闭标签。"
-               :code="closableVariantSnippet">
+    <DemoBlock
+      title="不同类型的可关闭标签"
+      description="展示不同变体的可关闭标签。"
+      :code="closableVariantSnippet">
       <Space wrap>
-        <Tag variant="default"
-             closable>默认标签</Tag>
-        <Tag variant="primary"
-             closable>主要标签</Tag>
-        <Tag variant="success"
-             closable>成功标签</Tag>
-        <Tag variant="warning"
-             closable>警告标签</Tag>
-        <Tag variant="danger"
-             closable>危险标签</Tag>
-        <Tag variant="info"
-             closable>信息标签</Tag>
+        <Tag variant="default" closable>默认标签</Tag>
+        <Tag variant="primary" closable>主要标签</Tag>
+        <Tag variant="success" closable>成功标签</Tag>
+        <Tag variant="warning" closable>警告标签</Tag>
+        <Tag variant="danger" closable>危险标签</Tag>
+        <Tag variant="info" closable>信息标签</Tag>
       </Space>
     </DemoBlock>
 
     <!-- 不同大小的可关闭标签 -->
-    <DemoBlock title="不同大小的可关闭标签"
-               description="不同尺寸的可关闭标签组合。"
-               :code="closableSizeSnippet">
-      <Space align="center"
-             wrap>
-        <Tag size="sm"
-             variant="success"
-             closable>小标签</Tag>
-        <Tag size="md"
-             variant="success"
-             closable>中标签</Tag>
-        <Tag size="lg"
-             variant="success"
-             closable>大标签</Tag>
+    <DemoBlock
+      title="不同大小的可关闭标签"
+      description="不同尺寸的可关闭标签组合。"
+      :code="closableSizeSnippet">
+      <Space align="center" wrap>
+        <Tag size="sm" variant="success" closable>小标签</Tag>
+        <Tag size="md" variant="success" closable>中标签</Tag>
+        <Tag size="lg" variant="success" closable>大标签</Tag>
       </Space>
     </DemoBlock>
 
     <!-- 实际应用场景 -->
-    <DemoBlock title="应用场景"
-               description="标签在实际应用中的常见使用场景。"
-               :code="usageSnippet">
-      <Space direction="vertical"
-             class="w-full">
+    <DemoBlock title="应用场景" description="标签在实际应用中的常见使用场景。" :code="usageSnippet">
+      <Space direction="vertical" class="w-full">
         <div>
           <h3 class="text-sm font-semibold mb-2 text-gray-700">状态标签</h3>
           <Space>
@@ -255,16 +233,11 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
         <div>
           <h3 class="text-sm font-semibold mb-2 text-gray-700">可移除的兴趣标签</h3>
           <Space wrap>
-            <Tag variant="info"
-                 closable>JavaScript</Tag>
-            <Tag variant="info"
-                 closable>TypeScript</Tag>
-            <Tag variant="info"
-                 closable>React</Tag>
-            <Tag variant="info"
-                 closable>Vue</Tag>
-            <Tag variant="info"
-                 closable>Node.js</Tag>
+            <Tag variant="info" closable>JavaScript</Tag>
+            <Tag variant="info" closable>TypeScript</Tag>
+            <Tag variant="info" closable>React</Tag>
+            <Tag variant="info" closable>Vue</Tag>
+            <Tag variant="info" closable>Node.js</Tag>
           </Space>
         </div>
       </Space>

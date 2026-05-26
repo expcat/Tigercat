@@ -3,21 +3,27 @@
     <h1 class="text-3xl font-bold mb-2">InfiniteScroll 无限滚动</h1>
     <p class="text-gray-500 mb-8">滚动到底部自动加载更多内容。</p>
 
-    <DemoBlock title="基础用法" description="滚动到底部触发 load-more" :code="basicSnippet" :script="basicScriptSnippet">
-      <InfiniteScroll :has-more="hasMore" :loading="loading" @load-more="loadMore"
+    <DemoBlock
+      title="基础用法"
+      description="滚动到底部触发 load-more"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
+      <InfiniteScroll
+        :has-more="hasMore"
+        :loading="loading"
+        @load-more="loadMore"
         class-name="h-[300px] border border-gray-200 rounded-lg">
-        <div v-for="item in items" :key="item" class="px-4 py-3 border-b">
-          项目 {{ item }}
-        </div>
+        <div v-for="item in items" :key="item" class="px-4 py-3 border-b">项目 {{ item }}</div>
       </InfiniteScroll>
     </DemoBlock>
 
     <DemoBlock title="自定义文案" description="loadingText / endText" :code="customSnippet">
-      <InfiniteScroll :has-more="false" loading-text="拼命加载中..." end-text="— 到底了 —"
+      <InfiniteScroll
+        :has-more="false"
+        loading-text="拼命加载中..."
+        end-text="— 到底了 —"
         class-name="h-[200px] border border-gray-200 rounded-lg">
-        <div v-for="i in 5" :key="i" class="px-4 py-3 border-b">
-          项目 {{ i }}
-        </div>
+        <div v-for="i in 5" :key="i" class="px-4 py-3 border-b">项目 {{ i }}</div>
       </InfiniteScroll>
     </DemoBlock>
   </div>

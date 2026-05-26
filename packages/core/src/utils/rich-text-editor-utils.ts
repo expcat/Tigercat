@@ -56,8 +56,7 @@ export const richTextToolbarButtonBase =
 export const richTextToolbarButtonActive =
   'bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)]'
 
-export const richTextToolbarSeparatorClasses =
-  'w-px h-5 mx-1 bg-[var(--tiger-border,#d1d5db)]'
+export const richTextToolbarSeparatorClasses = 'w-px h-5 mx-1 bg-[var(--tiger-border,#d1d5db)]'
 
 export const richTextEditorAreaBase =
   'flex-1 p-4 outline-none text-[var(--tiger-text,#111827)] text-sm leading-relaxed overflow-y-auto'

@@ -37,10 +37,20 @@ const HeatmapChartDemo: React.FC = () => {
       <p className="text-gray-500 mb-8">矩阵热力图，用颜色深浅展示数据密度。</p>
 
       <DemoBlock title="基础用法" description="xLabels / yLabels 定义坐标轴" code={basicSnippet}>
-        <HeatmapChart data={heatData} xLabels={days} yLabels={hours} width={500} height={280} hoverable />
+        <HeatmapChart
+          data={heatData}
+          xLabels={days}
+          yLabels={hours}
+          width={500}
+          height={280}
+          hoverable
+        />
       </DemoBlock>
 
-      <DemoBlock title="显示数值 & 自定义颜色" description="showValues、minColor、maxColor" code={customSnippet}>
+      <DemoBlock
+        title="显示数值 & 自定义颜色"
+        description="showValues、minColor、maxColor"
+        code={customSnippet}>
         <HeatmapChart
           data={heatData}
           xLabels={days}
@@ -50,7 +60,8 @@ const HeatmapChartDemo: React.FC = () => {
           showValues
           minColor="#fef3c7"
           maxColor="#dc2626"
-          cellRadius={4} />
+          cellRadius={4}
+        />
       </DemoBlock>
     </div>
   )

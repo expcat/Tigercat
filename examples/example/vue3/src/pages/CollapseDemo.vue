@@ -78,10 +78,16 @@ const activeKey9 = ref<string[]>([])
   <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Collapse 折叠面板</h1>
-      <p class="text-gray-600 dark:text-gray-400">可以折叠/展开的内容区域，用于将复杂的区域折叠起来。</p>
+      <p class="text-gray-600 dark:text-gray-400">
+        可以折叠/展开的内容区域，用于将复杂的区域折叠起来。
+      </p>
     </div>
 
-    <DemoBlock title="基本用法" description="可以同时展开多个面板。" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="可以同时展开多个面板。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse v-model:activeKey="activeKey1">
           <CollapsePanel panelKey="1" header="面板标题 1">
@@ -97,10 +103,7 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock
-      title="手风琴模式"
-      description="每次只能展开一个面板。"
-      :code="accordionSnippet">
+    <DemoBlock title="手风琴模式" description="每次只能展开一个面板。" :code="accordionSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse accordion v-model:activeKey="activeKey2">
           <CollapsePanel panelKey="1" header="手风琴面板 1">
@@ -142,10 +145,7 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock
-      title="图标位置"
-      description="可以将展开图标放在右侧。"
-      :code="iconPositionSnippet">
+    <DemoBlock title="图标位置" description="可以将展开图标放在右侧。" :code="iconPositionSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse expandIconPosition="end" v-model:activeKey="activeKey5">
           <CollapsePanel panelKey="1" header="箭头在右侧">
@@ -194,7 +194,10 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock title="自定义标题与额外内容" description="通过 slot 自定义面板标题和右侧额外内容。" :code="customHeaderSnippet">
+    <DemoBlock
+      title="自定义标题与额外内容"
+      description="通过 slot 自定义面板标题和右侧额外内容。"
+      :code="customHeaderSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse v-model:activeKey="activeKey8">
           <CollapsePanel panelKey="1">
@@ -216,7 +219,10 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock title="隐藏箭头" description="通过 showArrow 属性隐藏展开/收起箭头图标。" :code="hideArrowSnippet">
+    <DemoBlock
+      title="隐藏箭头"
+      description="通过 showArrow 属性隐藏展开/收起箭头图标。"
+      :code="hideArrowSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse v-model:activeKey="activeKey9">
           <CollapsePanel panelKey="1" header="无箭头面板 1" :showArrow="false">

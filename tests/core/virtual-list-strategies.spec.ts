@@ -3,11 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import {
-  fixedSizeStrategy,
-  variableSizeStrategy,
-  dynamicSizeStrategy
-} from '@expcat/tigercat-core'
+import { fixedSizeStrategy, variableSizeStrategy, dynamicSizeStrategy } from '@expcat/tigercat-core'
 
 describe('fixedSizeStrategy', () => {
   const strategy = fixedSizeStrategy(50)
@@ -50,7 +46,7 @@ describe('variableSizeStrategy', () => {
   it('returns correct offsets via prefix sum', () => {
     expect(strategy.getItemOffset(0)).toBe(0)
     expect(strategy.getItemOffset(1)).toBe(20)
-    expect(strategy.getItemOffset(2)).toBe(60)  // 20 + 40
+    expect(strategy.getItemOffset(2)).toBe(60) // 20 + 40
     expect(strategy.getItemOffset(3)).toBe(120) // 20 + 40 + 60
   })
 

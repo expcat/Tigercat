@@ -216,7 +216,9 @@ export default function PopconfirmDemo() {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Popconfirm title="此操作已禁用" disabled>
-              <Button variant="secondary" disabled>禁用按钮</Button>
+              <Button variant="secondary" disabled>
+                禁用按钮
+              </Button>
             </Popconfirm>
 
             <Popconfirm title="Popconfirm 已禁用" disabled>

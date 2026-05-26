@@ -62,7 +62,11 @@ const jpegSnippet = `<!-- 输出 JPEG 格式，质量 0.8 -->
       交互式图片裁剪组件，支持自由裁剪、固定宽高比、辅助线、Canvas 输出。
     </p>
 
-    <DemoBlock title="基本用法" description="自由裁剪，拖拽和缩放裁剪区域" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="自由裁剪，拖拽和缩放裁剪区域"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <div class="space-y-4">
         <ImageCropper
           ref="cropperRef"
@@ -86,7 +90,10 @@ const jpegSnippet = `<!-- 输出 JPEG 格式，质量 0.8 -->
       </div>
     </DemoBlock>
 
-    <DemoBlock title="固定宽高比" description="设置 aspectRatio 为 1 实现正方形裁剪" :code="aspectRatioSnippet">
+    <DemoBlock
+      title="固定宽高比"
+      description="设置 aspectRatio 为 1 实现正方形裁剪"
+      :code="aspectRatioSnippet">
       <div class="space-y-4">
         <ImageCropper ref="cropperSquareRef" :src="PHOTO" :aspect-ratio="1" />
         <button
@@ -96,7 +103,10 @@ const jpegSnippet = `<!-- 输出 JPEG 格式，质量 0.8 -->
         </button>
         <div v-if="squareResultUrl" class="mt-4">
           <p class="text-sm text-gray-600 mb-2">裁剪结果：</p>
-          <img :src="squareResultUrl" class="max-w-[200px] border border-gray-200 rounded" alt="裁剪结果" />
+          <img
+            :src="squareResultUrl"
+            class="max-w-[200px] border border-gray-200 rounded"
+            alt="裁剪结果" />
         </div>
       </div>
     </DemoBlock>
@@ -105,7 +115,10 @@ const jpegSnippet = `<!-- 输出 JPEG 格式，质量 0.8 -->
       <ImageCropper :src="PHOTO" :guides="false" />
     </DemoBlock>
 
-    <DemoBlock title="JPEG 输出" description="指定 outputType='image/jpeg' 和 quality" :code="jpegSnippet">
+    <DemoBlock
+      title="JPEG 输出"
+      description="指定 outputType='image/jpeg' 和 quality"
+      :code="jpegSnippet">
       <ImageCropper :src="PHOTO" output-type="image/jpeg" :quality="0.8" />
     </DemoBlock>
   </div>

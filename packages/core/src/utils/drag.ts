@@ -303,8 +303,7 @@ export function resolveDragConfig(config?: DragConfig): Required<DragConfig> {
 export function createDocumentDragSession(
   options: DocumentDragSessionOptions
 ): DocumentDragSession {
-  const ownerDocument =
-    options.ownerDocument ?? (isBrowser() ? document : undefined)
+  const ownerDocument = options.ownerDocument ?? (isBrowser() ? document : undefined)
 
   if (!ownerDocument) {
     return { dispose: () => undefined }

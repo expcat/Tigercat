@@ -38,9 +38,7 @@ export const Divider = defineComponent({
       getDividerClasses(props.orientation, props.lineStyle, props.spacing)
     )
 
-    const style = computed(() =>
-      getDividerStyle(props.orientation, props.color, props.thickness)
-    )
+    const style = computed(() => getDividerStyle(props.orientation, props.color, props.thickness))
 
     return () =>
       h('div', {

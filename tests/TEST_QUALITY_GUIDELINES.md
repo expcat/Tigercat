@@ -44,10 +44,12 @@ High-quality tests are essential for maintaining a reliable component library. T
 The validation script checks two severity levels:
 
 **Hard checks** (cause validation failure):
+
 - Test count below hard minimum (3)
 - Usage of `: any` type annotation in non-comment code
 
 **Soft checks** (warnings only, informational):
+
 - Test count below recommended minimum
 - No `describe` blocks for grouping
 - Low descriptive naming ratio (less than 50% of test names contain action verbs)

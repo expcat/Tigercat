@@ -3,12 +3,24 @@
     <h1 class="text-3xl font-bold mb-2">Kanban 看板</h1>
     <p class="text-gray-500 mb-8">可拖拽的看板面板，支持卡片和列拖拽排序。</p>
 
-    <DemoBlock title="基础用法" description="columns 定义列和卡片，支持拖拽" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="columns 定义列和卡片，支持拖拽"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Kanban v-model:columns="columns" allow-add-card :style="{ height: '400px' }" />
     </DemoBlock>
 
-    <DemoBlock title="禁用拖拽 & WIP 限制" description="draggable=false 禁用，enforceWipLimit 限制列容量" :code="wipSnippet">
-      <Kanban :default-columns="wipColumns" :draggable="false" enforce-wip-limit :show-card-count="true" :style="{ height: '350px' }" />
+    <DemoBlock
+      title="禁用拖拽 & WIP 限制"
+      description="draggable=false 禁用，enforceWipLimit 限制列容量"
+      :code="wipSnippet">
+      <Kanban
+        :default-columns="wipColumns"
+        :draggable="false"
+        enforce-wip-limit
+        :show-card-count="true"
+        :style="{ height: '350px' }" />
     </DemoBlock>
   </div>
 </template>
@@ -30,16 +42,12 @@ const columns = ref([
   {
     id: 'doing',
     title: '进行中',
-    cards: [
-      { id: '3', title: '开发 Kanban', description: '实现看板组件' }
-    ]
+    cards: [{ id: '3', title: '开发 Kanban', description: '实现看板组件' }]
   },
   {
     id: 'done',
     title: '已完成',
-    cards: [
-      { id: '4', title: '项目搭建', description: '初始化项目结构' }
-    ]
+    cards: [{ id: '4', title: '项目搭建', description: '初始化项目结构' }]
   }
 ])
 

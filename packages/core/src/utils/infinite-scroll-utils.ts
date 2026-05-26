@@ -84,17 +84,10 @@ export function createInfiniteScrollObserver(
 ): (() => void) | null {
   if (typeof IntersectionObserver === 'undefined') return null
 
-  const {
-    threshold = 100,
-    direction = 'vertical',
-    root = null,
-    onLoadMore
-  } = options
+  const { threshold = 100, direction = 'vertical', root = null, onLoadMore } = options
 
   const rootMargin =
-    direction === 'horizontal'
-      ? `0px ${threshold}px 0px 0px`
-      : `0px 0px ${threshold}px 0px`
+    direction === 'horizontal' ? `0px ${threshold}px 0px 0px` : `0px 0px ${threshold}px 0px`
 
   const observer = new IntersectionObserver(
     (entries) => {

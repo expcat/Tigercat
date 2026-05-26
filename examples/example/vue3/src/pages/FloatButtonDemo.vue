@@ -5,13 +5,26 @@
 
     <DemoBlock title="基础用法" description="shape、size、type 和 tooltip" :code="basicSnippet">
       <div class="relative h-64 border rounded-lg overflow-hidden">
-        <FloatButton tooltip="默认" style="position: absolute; right: 24px; bottom: 24px" @click="onClick" />
-        <FloatButton shape="square" type="default" tooltip="方形" style="position: absolute; right: 24px; bottom: 80px" />
-        <FloatButton size="lg" tooltip="大号" style="position: absolute; right: 24px; bottom: 136px" />
+        <FloatButton
+          tooltip="默认"
+          style="position: absolute; right: 24px; bottom: 24px"
+          @click="onClick" />
+        <FloatButton
+          shape="square"
+          type="default"
+          tooltip="方形"
+          style="position: absolute; right: 24px; bottom: 80px" />
+        <FloatButton
+          size="lg"
+          tooltip="大号"
+          style="position: absolute; right: 24px; bottom: 136px" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="按钮组" description="FloatButtonGroup 分组展开，支持 click / hover 触发" :code="groupSnippet">
+    <DemoBlock
+      title="按钮组"
+      description="FloatButtonGroup 分组展开，支持 click / hover 触发"
+      :code="groupSnippet">
       <div class="relative h-64 border rounded-lg overflow-hidden">
         <FloatButtonGroup trigger="hover" style="position: absolute; right: 24px; bottom: 24px">
           <template #trigger>
@@ -25,7 +38,10 @@
 
     <DemoBlock title="禁用" :code="disabledSnippet">
       <div class="relative h-40 border rounded-lg overflow-hidden">
-        <FloatButton disabled tooltip="不可用" style="position: absolute; right: 24px; bottom: 24px" />
+        <FloatButton
+          disabled
+          tooltip="不可用"
+          style="position: absolute; right: 24px; bottom: 24px" />
       </div>
     </DemoBlock>
   </div>

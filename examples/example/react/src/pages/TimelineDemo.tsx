@@ -253,7 +253,9 @@ export default function TimelineDemo() {
     <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Timeline 时间线</h1>
-        <p className="text-gray-600 dark:text-gray-400">垂直展示时间流信息的时间线组件，支持多种模式与自定义渲染。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          垂直展示时间流信息的时间线组件，支持多种模式与自定义渲染。
+        </p>
       </div>
 
       <DemoBlock

@@ -4,10 +4,28 @@ import { TreeSelect, Space } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const treeData = [
-  { key: 'dev', label: '研发部', value: 'dev', children: [
-    { key: 'fe', label: '前端组', value: 'fe', children: [{ key: 'zs', label: '张三', value: 'zs' }, { key: 'ls', label: '李四', value: 'ls' }] },
-    { key: 'be', label: '后端组', value: 'be', children: [{ key: 'ww', label: '王五', value: 'ww' }] }
-  ] },
+  {
+    key: 'dev',
+    label: '研发部',
+    value: 'dev',
+    children: [
+      {
+        key: 'fe',
+        label: '前端组',
+        value: 'fe',
+        children: [
+          { key: 'zs', label: '张三', value: 'zs' },
+          { key: 'ls', label: '李四', value: 'ls' }
+        ]
+      },
+      {
+        key: 'be',
+        label: '后端组',
+        value: 'be',
+        children: [{ key: 'ww', label: '王五', value: 'ww' }]
+      }
+    ]
+  },
   { key: 'pm', label: '产品部', value: 'pm', children: [{ key: 'zl', label: '赵六', value: 'zl' }] }
 ]
 
@@ -36,7 +54,13 @@ const TreeSelectDemo: React.FC = () => {
       </DemoBlock>
 
       <DemoBlock title="可搜索" description="showSearch 开启搜索" code={searchSnippet}>
-        <TreeSelect value={val2} onChange={setVal2} treeData={treeData} placeholder="搜索成员" showSearch />
+        <TreeSelect
+          value={val2}
+          onChange={setVal2}
+          treeData={treeData}
+          placeholder="搜索成员"
+          showSearch
+        />
       </DemoBlock>
 
       <DemoBlock title="尺寸与禁用" code={sizeSnippet}>

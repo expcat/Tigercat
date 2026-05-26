@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "../../../../packages/core/src/tailwind-plugin.ts";
 @source "../../../../packages/react/src";
 @source "../../../../packages/core/src";
@@ -58,12 +58,20 @@ h2[data-demo-anchor='true'] {
 
 /* Mobile sider overlay animations */
 @keyframes demo-sider-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes demo-sider-slide-in {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 .demo-sider-overlay-enter {
   animation: demo-sider-fade-in 0.3s ease;

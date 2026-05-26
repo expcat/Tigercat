@@ -36,11 +36,24 @@ const FunnelChartDemo: React.FC = () => {
         <FunnelChart data={funnelData} width={400} height={280} hoverable showLegend />
       </DemoBlock>
 
-      <DemoBlock title="水平方向 & 收尖" description="direction='horizontal'，pinch 收尖末端" code={horizontalSnippet}>
-        <FunnelChart data={funnelData} width={500} height={200} direction="horizontal" pinch hoverable />
+      <DemoBlock
+        title="水平方向 & 收尖"
+        description="direction='horizontal'，pinch 收尖末端"
+        code={horizontalSnippet}>
+        <FunnelChart
+          data={funnelData}
+          width={500}
+          height={200}
+          direction="horizontal"
+          pinch
+          hoverable
+        />
       </DemoBlock>
 
-      <DemoBlock title="自定义颜色 & 间距" description="colors 调色板，gap 段间距" code={customSnippet}>
+      <DemoBlock
+        title="自定义颜色 & 间距"
+        description="colors 调色板，gap 段间距"
+        code={customSnippet}>
         <FunnelChart
           data={funnelData}
           width={400}
@@ -48,7 +61,8 @@ const FunnelChartDemo: React.FC = () => {
           colors={['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe']}
           gap={4}
           hoverable
-          selectable />
+          selectable
+        />
       </DemoBlock>
     </div>
   )

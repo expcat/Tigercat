@@ -39,20 +39,34 @@ const InfiniteScrollDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">InfiniteScroll 无限滚动</h1>
       <p className="text-gray-500 mb-8">滚动到底部自动加载更多内容。</p>
 
-      <DemoBlock title="基础用法" description="滚动到底部触发 onLoadMore" code={basicSnippet} script={basicScriptSnippet}>
-        <InfiniteScroll hasMore={hasMore} loading={loading} onLoadMore={loadMore}
+      <DemoBlock
+        title="基础用法"
+        description="滚动到底部触发 onLoadMore"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
+        <InfiniteScroll
+          hasMore={hasMore}
+          loading={loading}
+          onLoadMore={loadMore}
           className="h-[300px] border border-gray-200 rounded-lg">
           {items.map((i) => (
-            <div key={i} className="px-4 py-3 border-b">项目 {i}</div>
+            <div key={i} className="px-4 py-3 border-b">
+              项目 {i}
+            </div>
           ))}
         </InfiniteScroll>
       </DemoBlock>
 
       <DemoBlock title="自定义文案" description="loadingText / endText" code={customSnippet}>
-        <InfiniteScroll hasMore={false} loadingText="拼命加载中..." endText="— 到底了 —"
+        <InfiniteScroll
+          hasMore={false}
+          loadingText="拼命加载中..."
+          endText="— 到底了 —"
           className="h-[200px] border border-gray-200 rounded-lg">
           {Array.from({ length: 5 }, (_, i) => (
-            <div key={i} className="px-4 py-3 border-b">项目 {i + 1}</div>
+            <div key={i} className="px-4 py-3 border-b">
+              项目 {i + 1}
+            </div>
           ))}
         </InfiniteScroll>
       </DemoBlock>

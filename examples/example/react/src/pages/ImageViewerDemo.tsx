@@ -43,12 +43,20 @@ const ImageViewerDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">ImageViewer 图片查看器</h1>
       <p className="text-gray-500 mb-8">全屏图片预览，支持缩放、旋转和多图切换。</p>
 
-      <DemoBlock title="基本用法" description="点击按钮打开图片查看器" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="点击按钮打开图片查看器"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Button onClick={() => setOpen(true)}>查看图片</Button>
         <ImageViewer open={open} onClose={() => setOpen(false)} images={images} />
       </DemoBlock>
 
-      <DemoBlock title="全部功能" description="缩放、旋转、导航按钮和计数器" code={featureSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="全部功能"
+        description="缩放、旋转、导航按钮和计数器"
+        code={featureSnippet}
+        script={basicScriptSnippet}>
         <Button onClick={() => setOpen2(true)}>打开查看器（第2张）</Button>
         <ImageViewer
           open={open2}
@@ -58,7 +66,8 @@ const ImageViewerDemo: React.FC = () => {
           zoomable
           rotatable
           showNav
-          showCounter />
+          showCounter
+        />
       </DemoBlock>
     </div>
   )

@@ -1,5 +1,9 @@
 import React from 'react'
-import { classNames, layoutRootClasses, type LayoutProps as CoreLayoutProps } from '@expcat/tigercat-core'
+import {
+  classNames,
+  layoutRootClasses,
+  type LayoutProps as CoreLayoutProps
+} from '@expcat/tigercat-core'
 
 export interface ReactLayoutProps
   extends CoreLayoutProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {

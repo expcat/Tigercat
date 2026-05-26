@@ -31,10 +31,17 @@ const ColorPickerDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="透明度、预设与尺寸" description="showAlpha 透明度，presets 预设色板" code={featureSnippet}>
+      <DemoBlock
+        title="透明度、预设与尺寸"
+        description="showAlpha 透明度，presets 预设色板"
+        code={featureSnippet}>
         <Space direction="vertical" size={12}>
           <ColorPicker value={color2} onChange={setColor2} showAlpha format="rgb" />
-          <ColorPicker value={color2} onChange={setColor2} presets={['#f5222d', '#fa8c16', '#52c41a', '#1677ff', '#722ed1']} />
+          <ColorPicker
+            value={color2}
+            onChange={setColor2}
+            presets={['#f5222d', '#fa8c16', '#52c41a', '#1677ff', '#722ed1']}
+          />
           <Space size={12}>
             <ColorPicker value="#ccc" size="sm" />
             <ColorPicker value="#ccc" size="lg" />

@@ -202,7 +202,11 @@ const ButtonDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 事件处理 */}
-      <DemoBlock title="事件处理" description="通过 onClick 监听按钮点击事件。" code={eventSnippet} script={eventScriptSnippet}>
+      <DemoBlock
+        title="事件处理"
+        description="通过 onClick 监听按钮点击事件。"
+        code={eventSnippet}
+        script={eventScriptSnippet}>
         <Space align="center">
           <Button variant="primary" onClick={() => setClickCount((c) => c + 1)}>
             已点击 {clickCount} 次

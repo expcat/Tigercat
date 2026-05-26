@@ -38,12 +38,7 @@ import {
  * ```
  */
 export function useFormController(options: FormControllerOptions = {}): FormController {
-  const {
-    initialValues = {},
-    rules,
-    undoable = false,
-    maxHistorySize = 50
-  } = options
+  const { initialValues = {}, rules, undoable = false, maxHistorySize = 50 } = options
 
   const [values, setValues] = useState<FormValues>(() => ({ ...initialValues }))
   const [errors, setErrors] = useState<FormError[]>([])
@@ -70,7 +65,9 @@ export function useFormController(options: FormControllerOptions = {}): FormCont
         return next
       })
       if (undoable) {
-        setHistory((h) => (h ? pushFormHistory(h, { ...valuesRef.current, [fieldName]: value }) : h))
+        setHistory((h) =>
+          h ? pushFormHistory(h, { ...valuesRef.current, [fieldName]: value }) : h
+        )
       }
     },
     [undoable]
@@ -114,15 +111,17 @@ export function useFormController(options: FormControllerOptions = {}): FormCont
     for (const name of fieldNames) {
       const fieldRules = r[name]
       if (!fieldRules) continue
-      const error = await validateFieldUtil(name, getValueByPath(valuesRef.current, name), fieldRules, valuesRef.current)
+      const error = await validateFieldUtil(
+        name,
+        getValueByPath(valuesRef.current, name),
+        fieldRules,
+        valuesRef.current
+      )
       if (error) nextErrors.push({ field: name, message: error })
     }
 
     const fieldSet = new Set(fieldNames)
-    setErrors((prev) => [
-      ...prev.filter((e) => !fieldSet.has(e.field)),
-      ...nextErrors
-    ])
+    setErrors((prev) => [...prev.filter((e) => !fieldSet.has(e.field)), ...nextErrors])
     return nextErrors.length === 0
   }, [])
 

@@ -93,12 +93,12 @@ const handleClick = (event: MouseEvent) => {
   <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Breadcrumb 面包屑</h1>
-      <p class="text-gray-600 dark:text-gray-400">显示当前页面在系统层级结构中的位置，并能向上返回。</p>
+      <p class="text-gray-600 dark:text-gray-400">
+        显示当前页面在系统层级结构中的位置，并能向上返回。
+      </p>
     </div>
 
-    <DemoBlock title="基本用法"
-               description="最简单的面包屑导航。"
-               :code="basicSnippet">
+    <DemoBlock title="基本用法" description="最简单的面包屑导航。" :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -108,9 +108,7 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="箭头分隔符"
-               description="使用箭头作为分隔符。"
-               :code="arrowSnippet">
+    <DemoBlock title="箭头分隔符" description="使用箭头作为分隔符。" :code="arrowSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb separator="arrow">
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -120,9 +118,7 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="尖括号分隔符"
-               description="使用尖括号作为分隔符。"
-               :code="chevronSnippet">
+    <DemoBlock title="尖括号分隔符" description="使用尖括号作为分隔符。" :code="chevronSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb separator="chevron">
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -133,9 +129,10 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="自定义分隔符"
-               description="可以使用任意字符串作为分隔符。"
-               :code="customSnippet">
+    <DemoBlock
+      title="自定义分隔符"
+      description="可以使用任意字符串作为分隔符。"
+      :code="customSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb separator=">">
           <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -145,50 +142,40 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="带图标"
-               description="可以在面包屑项中添加图标。"
-               :code="iconSnippet">
+    <DemoBlock title="带图标" description="可以在面包屑项中添加图标。" :code="iconSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
-          <BreadcrumbItem href="/"
-                          :icon="homeIcon">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products"
-                          :icon="bagIcon">产品</BreadcrumbItem>
+          <BreadcrumbItem href="/" :icon="homeIcon">首页</BreadcrumbItem>
+          <BreadcrumbItem href="/products" :icon="bagIcon">产品</BreadcrumbItem>
           <BreadcrumbItem current>详情</BreadcrumbItem>
         </Breadcrumb>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="外部链接"
-               description="支持在新窗口打开链接。"
-               :code="externalSnippet">
+    <DemoBlock title="外部链接" description="支持在新窗口打开链接。" :code="externalSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
-          <BreadcrumbItem href="https://github.com"
-                          target="_blank"> GitHub </BreadcrumbItem>
+          <BreadcrumbItem href="https://github.com" target="_blank"> GitHub </BreadcrumbItem>
           <BreadcrumbItem current>当前页面</BreadcrumbItem>
         </Breadcrumb>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="点击事件"
-               description="面包屑项可以监听点击事件（查看控制台）。"
-               :code="clickSnippet">
+    <DemoBlock
+      title="点击事件"
+      description="面包屑项可以监听点击事件（查看控制台）。"
+      :code="clickSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
-          <BreadcrumbItem href="/"
-                          @click="handleClick">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products"
-                          @click="handleClick">产品</BreadcrumbItem>
+          <BreadcrumbItem href="/" @click="handleClick">首页</BreadcrumbItem>
+          <BreadcrumbItem href="/products" @click="handleClick">产品</BreadcrumbItem>
           <BreadcrumbItem current>详情</BreadcrumbItem>
         </Breadcrumb>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="多级层次"
-               description="支持任意层级的面包屑导航。"
-               :code="multiSnippet">
+    <DemoBlock title="多级层次" description="支持任意层级的面包屑导航。" :code="multiSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb separator="chevron">
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -201,23 +188,23 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="单独设置分隔符"
-               description="每个面包屑项可以单独设置分隔符。"
-               :code="itemSeparatorSnippet">
+    <DemoBlock
+      title="单独设置分隔符"
+      description="每个面包屑项可以单独设置分隔符。"
+      :code="itemSeparatorSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
-          <BreadcrumbItem href="/"
-                          separator="arrow">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products"
-                          separator="chevron">产品</BreadcrumbItem>
+          <BreadcrumbItem href="/" separator="arrow">首页</BreadcrumbItem>
+          <BreadcrumbItem href="/products" separator="chevron">产品</BreadcrumbItem>
           <BreadcrumbItem current>详情</BreadcrumbItem>
         </Breadcrumb>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="扩展区域"
-               description="通过 extra 插槽在面包屑末尾添加操作按钮等扩展内容。"
-               :code="extraSnippet">
+    <DemoBlock
+      title="扩展区域"
+      description="通过 extra 插槽在面包屑末尾添加操作按钮等扩展内容。"
+      :code="extraSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
           <template #extra>

@@ -41,9 +41,7 @@ export const GAUGE_ANIMATION_DURATION_MS = 600
  * Animate a gauge value (angle) from `from` to `to` using rAF + easeOutCubic.
  * Returns a controller with a `stop()` method to cancel the animation.
  */
-export function createGaugeAnimation(
-  options: GaugeAnimationOptions
-): GaugeAnimationController {
+export function createGaugeAnimation(options: GaugeAnimationOptions): GaugeAnimationController {
   const duration = options.duration ?? GAUGE_ANIMATION_DURATION_MS
   const requestFrame =
     options.requestAnimationFrame ??

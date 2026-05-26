@@ -136,71 +136,62 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock title="基本用法"
-               description="最简单的用法，悬停显示提示。"
-               :code="basicSnippet">
+    <DemoBlock title="基本用法" description="最简单的用法，悬停显示提示。" :code="basicSnippet">
       <Tooltip content="这是一个气泡提示">
         <Button>悬停显示提示</Button>
       </Tooltip>
     </DemoBlock>
 
     <!-- 不同位置 -->
-    <DemoBlock title="不同位置"
-               description="通过 placement 属性设置气泡提示的显示位置。"
-               :code="placementSnippet">
+    <DemoBlock
+      title="不同位置"
+      description="通过 placement 属性设置气泡提示的显示位置。"
+      :code="placementSnippet">
       <div class="grid grid-cols-4 gap-4">
         <div class="flex justify-center">
-          <Tooltip content="顶部提示"
-                   placement="top">
+          <Tooltip content="顶部提示" placement="top">
             <Button>Top</Button>
           </Tooltip>
         </div>
 
         <div class="flex justify-center">
-          <Tooltip content="顶部开始"
-                   placement="top-start">
+          <Tooltip content="顶部开始" placement="top-start">
             <Button>Top Start</Button>
           </Tooltip>
         </div>
 
         <div class="flex justify-center">
-          <Tooltip content="顶部结束"
-                   placement="top-end">
+          <Tooltip content="顶部结束" placement="top-end">
             <Button>Top End</Button>
           </Tooltip>
         </div>
 
         <div class="flex justify-center">
-          <Tooltip content="底部提示"
-                   placement="bottom">
+          <Tooltip content="底部提示" placement="bottom">
             <Button>Bottom</Button>
           </Tooltip>
         </div>
 
         <div class="flex justify-center">
-          <Tooltip content="底部开始"
-                   placement="bottom-start">
+          <Tooltip content="底部开始" placement="bottom-start">
             <Button>Bottom Start</Button>
           </Tooltip>
         </div>
 
         <div class="flex justify-center">
-          <Tooltip content="底部结束"
-                   placement="bottom-end">
+          <Tooltip content="底部结束" placement="bottom-end">
             <Button>Bottom End</Button>
           </Tooltip>
         </div>
 
         <div class="flex justify-center">
-          <Tooltip content="左侧提示"
-                   placement="left">
+          <Tooltip content="左侧提示" placement="left">
             <Button>Left</Button>
           </Tooltip>
         </div>
 
         <div class="flex justify-center">
-          <Tooltip content="右侧提示"
-                   placement="right">
+          <Tooltip content="右侧提示" placement="right">
             <Button>Right</Button>
           </Tooltip>
         </div>
@@ -208,31 +199,27 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     </DemoBlock>
 
     <!-- 触发方式 -->
-    <DemoBlock title="触发方式"
-               description="支持 hover（默认）、click、focus 三种触发方式。"
-               :code="triggerSnippet">
+    <DemoBlock
+      title="触发方式"
+      description="支持 hover（默认）、click、focus 三种触发方式。"
+      :code="triggerSnippet">
       <Space :size="16">
-        <Tooltip content="悬停触发（默认）"
-                 trigger="hover">
+        <Tooltip content="悬停触发（默认）" trigger="hover">
           <Button>Hover</Button>
         </Tooltip>
 
-        <Tooltip content="点击触发"
-                 trigger="click">
+        <Tooltip content="点击触发" trigger="click">
           <Button>Click</Button>
         </Tooltip>
 
-        <Tooltip content="聚焦触发"
-                 trigger="focus">
+        <Tooltip content="聚焦触发" trigger="focus">
           <Button>Focus</Button>
         </Tooltip>
       </Space>
     </DemoBlock>
 
     <!-- 自定义内容 -->
-    <DemoBlock title="自定义内容"
-               description="可以通过插槽自定义提示内容。"
-               :code="contentSnippet">
+    <DemoBlock title="自定义内容" description="可以通过插槽自定义提示内容。" :code="contentSnippet">
       <Tooltip>
         <template #content>
           <div>
@@ -245,13 +232,13 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     </DemoBlock>
 
     <!-- 受控模式 -->
-    <DemoBlock title="受控模式"
-               description="可以通过 visible 属性控制气泡提示的显示和隐藏。"
-               :code="controlledSnippet"
-               :script="controlledScriptSnippet">
+    <DemoBlock
+      title="受控模式"
+      description="可以通过 visible 属性控制气泡提示的显示和隐藏。"
+      :code="controlledSnippet"
+      :script="controlledScriptSnippet">
       <Space :size="16">
-        <Tooltip v-model:visible="visible1"
-                 content="受控的气泡提示">
+        <Tooltip v-model:visible="visible1" content="受控的气泡提示">
           <Button>受控提示</Button>
         </Tooltip>
 
@@ -262,50 +249,49 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     </DemoBlock>
 
     <!-- 禁用状态 -->
-    <DemoBlock title="禁用状态"
-               description="通过 disabled 属性禁用气泡提示。"
-               :code="disabledSnippet">
+    <DemoBlock
+      title="禁用状态"
+      description="通过 disabled 属性禁用气泡提示。"
+      :code="disabledSnippet">
       <Space :size="16">
         <Tooltip content="正常提示">
           <Button>正常</Button>
         </Tooltip>
 
-        <Tooltip content="禁用提示"
-                 disabled>
+        <Tooltip content="禁用提示" disabled>
           <Button>禁用</Button>
         </Tooltip>
       </Space>
     </DemoBlock>
 
     <!-- 偏移距离 -->
-    <DemoBlock title="偏移距离"
-               description="通过 offset 属性设置提示与触发元素的距离（单位 px）。"
-               :code="offsetSnippet">
+    <DemoBlock
+      title="偏移距离"
+      description="通过 offset 属性设置提示与触发元素的距离（单位 px）。"
+      :code="offsetSnippet">
       <Space :size="16">
         <Tooltip content="默认偏移 (8px)">
           <Button>默认</Button>
         </Tooltip>
 
-        <Tooltip content="偏移 16px"
-                 :offset="16">
+        <Tooltip content="偏移 16px" :offset="16">
           <Button>offset=16</Button>
         </Tooltip>
 
-        <Tooltip content="偏移 24px"
-                 :offset="24">
+        <Tooltip content="偏移 24px" :offset="24">
           <Button>offset=24</Button>
         </Tooltip>
       </Space>
     </DemoBlock>
 
     <!-- 自动翻转 -->
-    <DemoBlock title="自动翻转 (Floating UI)"
-               description="当弹出位置空间不足时，Tooltip 会自动翻转到对侧显示。这是通过 Floating UI 的 flip 中间件实现的。"
-               :code="flipSnippet">
+    <DemoBlock
+      title="自动翻转 (Floating UI)"
+      description="当弹出位置空间不足时，Tooltip 会自动翻转到对侧显示。这是通过 Floating UI 的 flip 中间件实现的。"
+      :code="flipSnippet">
       <div class="p-4 bg-gray-100 rounded overflow-auto h-32">
         <div class="pt-16">
-          <Tooltip content="空间不足时自动翻转"
-                   placement="top">
+          <Tooltip content="空间不足时自动翻转" placement="top">
             <Button>试试滚动容器</Button>
           </Tooltip>
         </div>

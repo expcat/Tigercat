@@ -74,7 +74,12 @@ const serverConfig = [
 
 // Items with per-item custom classes
 const highlightItems = [
-  { label: '状态', content: '运行中', labelClassName: 'text-blue-600', contentClassName: 'text-green-600 font-semibold' },
+  {
+    label: '状态',
+    content: '运行中',
+    labelClassName: 'text-blue-600',
+    contentClassName: 'text-green-600 font-semibold'
+  },
   { label: '告警', content: '2 条未处理', contentClassName: 'text-amber-600' },
   { label: '错误', content: '无', contentClassName: 'text-gray-400' },
   { label: 'CPU 使用率', content: '68%' }
@@ -88,111 +93,85 @@ const highlightItems = [
       <p class="text-gray-600 dark:text-gray-400">用于展示结构化数据、详情信息的描述列表组件。</p>
     </div>
 
-    <DemoBlock title="基本用法"
-               description="最简单的描述列表展示。"
-               :code="basicSnippet">
+    <DemoBlock title="基本用法" description="最简单的描述列表展示。" :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="用户信息"
-                      :items="userInfo" />
+        <Descriptions title="用户信息" :items="userInfo" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="带边框"
-               description="使用 bordered 属性添加边框。"
-               :code="borderedSnippet">
+    <DemoBlock title="带边框" description="使用 bordered 属性添加边框。" :code="borderedSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="用户信息"
-                      bordered
-                      :items="userInfo" />
+        <Descriptions title="用户信息" bordered :items="userInfo" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="不同尺寸"
-               description="支持三种尺寸：small、medium、large。"
-               :code="sizeSnippet">
+    <DemoBlock
+      title="不同尺寸"
+      description="支持三种尺寸：small、medium、large。"
+      :code="sizeSnippet">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">小尺寸</h3>
-          <Descriptions size="sm"
-                        bordered
-                        :items="userInfo"
-                        :column="2" />
+          <Descriptions size="sm" bordered :items="userInfo" :column="2" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">中等尺寸（默认）</h3>
-          <Descriptions size="md"
-                        bordered
-                        :items="userInfo"
-                        :column="2" />
+          <Descriptions size="md" bordered :items="userInfo" :column="2" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">大尺寸</h3>
-          <Descriptions size="lg"
-                        bordered
-                        :items="userInfo"
-                        :column="2" />
+          <Descriptions size="lg" bordered :items="userInfo" :column="2" />
         </div>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="垂直布局"
-               description='使用 layout="vertical" 设置垂直布局。'
-               :code="verticalSnippet">
+    <DemoBlock
+      title="垂直布局"
+      description='使用 layout="vertical" 设置垂直布局。'
+      :code="verticalSnippet">
       <div class="space-y-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">垂直布局（无边框）</h3>
-          <Descriptions layout="vertical"
-                        :items="serverConfig"
-                        :column="2" />
+          <Descriptions layout="vertical" :items="serverConfig" :column="2" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">垂直布局（带边框）</h3>
-          <Descriptions layout="vertical"
-                        bordered
-                        :items="serverConfig"
-                        :column="2" />
+          <Descriptions layout="vertical" bordered :items="serverConfig" :column="2" />
         </div>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="自定义列数"
-               description="通过 column 属性设置每行显示的列数。"
-               :code="columnSnippet">
+    <DemoBlock
+      title="自定义列数"
+      description="通过 column 属性设置每行显示的列数。"
+      :code="columnSnippet">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">2 列布局</h3>
-          <Descriptions bordered
-                        :column="2"
-                        :items="userInfo" />
+          <Descriptions bordered :column="2" :items="userInfo" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">4 列布局</h3>
-          <Descriptions bordered
-                        :column="4"
-                        :items="userInfo" />
+          <Descriptions bordered :column="4" :items="userInfo" />
         </div>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="跨列显示"
-               description="描述项可以通过 span 属性实现跨列显示。"
-               :code="spanSnippet">
+    <DemoBlock
+      title="跨列显示"
+      description="描述项可以通过 span 属性实现跨列显示。"
+      :code="spanSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="产品详情"
-                      bordered
-                      :column="3"
-                      :items="productDetails" />
+        <Descriptions title="产品详情" bordered :column="3" :items="productDetails" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="带操作区域"
-               description="可以通过 extra 插槽添加操作按钮。"
-               :code="extraSnippet">
+    <DemoBlock
+      title="带操作区域"
+      description="可以通过 extra 插槽添加操作按钮。"
+      :code="extraSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="订单详情"
-                      bordered
-                      :column="3"
-                      :items="orderInfo">
+        <Descriptions title="订单详情" bordered :column="3" :items="orderInfo">
           <template #extra>
             <Button size="sm">编辑</Button>
           </template>
@@ -200,33 +179,34 @@ const highlightItems = [
       </div>
     </DemoBlock>
 
-    <DemoBlock title="自定义样式"
-               description="通过 labelStyle 和 contentStyle 自定义标签/内容样式。"
-               :code="styleSnippet">
+    <DemoBlock
+      title="自定义样式"
+      description="通过 labelStyle 和 contentStyle 自定义标签/内容样式。"
+      :code="styleSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="用户信息（自定义样式）"
-                      bordered
-                      :column="2"
-                      :items="userInfo"
-                      :labelStyle="{ fontWeight: '600', color: '#1f2937' }"
-                      :contentStyle="{ color: '#6b7280' }" />
+        <Descriptions
+          title="用户信息（自定义样式）"
+          bordered
+          :column="2"
+          :items="userInfo"
+          :labelStyle="{ fontWeight: '600', color: '#1f2937' }"
+          :contentStyle="{ color: '#6b7280' }" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="无冒号"
-               description="通过设置 colon 为 false 隐藏标签后的冒号。"
-               :code="colonSnippet">
+    <DemoBlock
+      title="无冒号"
+      description="通过设置 colon 为 false 隐藏标签后的冒号。"
+      :code="colonSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="服务器配置"
-                      :colon="false"
-                      bordered
-                      :items="serverConfig" />
+        <Descriptions title="服务器配置" :colon="false" bordered :items="serverConfig" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="Item 级自定义 class"
-               description="通过 labelClassName / contentClassName 为单个描述项设置独立样式。"
-               :code="itemClassSnippet">
+    <DemoBlock
+      title="Item 级自定义 class"
+      description="通过 labelClassName / contentClassName 为单个描述项设置独立样式。"
+      :code="itemClassSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Descriptions bordered :column="2" :items="highlightItems" />
       </div>

@@ -156,10 +156,7 @@ export function createTaskBoardDragController(
 
     // ---- lifecycle ----
     init() {
-      if (
-        isBrowser() &&
-        ('ontouchstart' in window || navigator.maxTouchPoints > 0)
-      ) {
+      if (isBrowser() && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
         touchTracker = createTouchDragTracker()
       }
     },

@@ -25,10 +25,7 @@ export function getStepsContainerClasses(direction: StepsDirection): string {
 /**
  * Get Step item container classes
  */
-export function getStepItemClasses(
-  direction: StepsDirection,
-  isLast: boolean
-): string {
+export function getStepItemClasses(direction: StepsDirection, isLast: boolean): string {
   const baseClasses = 'tiger-step-item relative'
 
   if (direction === 'vertical') {
@@ -61,7 +58,8 @@ export function getStepIconClasses(
   const iconClasses = isCustomIcon ? '' : 'font-medium'
 
   // Status-based colors using CSS variables with fallbacks
-  const activeClasses = 'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white'
+  const activeClasses =
+    'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white'
   const statusClasses = {
     wait: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text-muted,#6b7280)]',
     process: activeClasses,
@@ -157,9 +155,10 @@ export function getStepDescriptionClasses(status: StepStatus, size: StepSize): s
 
   const sizeClasses = size === 'small' ? 'text-xs' : 'text-sm'
 
-  const statusClass = status === 'error'
-    ? 'text-[var(--tiger-error,#ef4444)]'
-    : 'text-[var(--tiger-text-muted,#6b7280)]'
+  const statusClass =
+    status === 'error'
+      ? 'text-[var(--tiger-error,#ef4444)]'
+      : 'text-[var(--tiger-text-muted,#6b7280)]'
 
   return `${baseClasses} ${sizeClasses} ${statusClass}`
 }

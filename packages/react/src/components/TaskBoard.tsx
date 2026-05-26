@@ -49,16 +49,7 @@ interface CardItemProps {
 }
 
 const CardItem = React.memo<CardItemProps>(
-  ({
-    card,
-    column,
-    isDragging,
-    isKbGrabbed,
-    draggable,
-    dragHintText,
-    renderCard,
-    dragCtrl
-  }) => {
+  ({ card, column, isDragging, isKbGrabbed, draggable, dragHintText, renderCard, dragCtrl }) => {
     const cardClasses = classNames(
       taskBoardCardClasses,
       isDragging && taskBoardCardDraggingClasses,
@@ -75,12 +66,18 @@ const CardItem = React.memo<CardItemProps>(
         aria-grabbed={isKbGrabbed ? 'true' : undefined}
         data-tiger-taskboard-card=""
         data-tiger-taskboard-card-id={String(card.id)}
-        onDragStart={(e) => { if (e.dataTransfer) dragCtrl.cardDragStart(e.dataTransfer, card, column) }}
+        onDragStart={(e) => {
+          if (e.dataTransfer) dragCtrl.cardDragStart(e.dataTransfer, card, column)
+        }}
         onDragEnd={() => dragCtrl.dragEnd()}
-        onTouchStart={(e) => dragCtrl.cardTouchStart(e.nativeEvent, e.currentTarget as HTMLElement, card, column)}
+        onTouchStart={(e) =>
+          dragCtrl.cardTouchStart(e.nativeEvent, e.currentTarget as HTMLElement, card, column)
+        }
         onTouchMove={(e) => dragCtrl.cardTouchMove(e.nativeEvent)}
         onTouchEnd={() => dragCtrl.cardTouchEnd()}
-        onKeyDown={(e) => { if (dragCtrl.cardKeyDown(e.key, card, column)) e.preventDefault() }}>
+        onKeyDown={(e) => {
+          if (dragCtrl.cardKeyDown(e.key, card, column)) e.preventDefault()
+        }}>
         {renderCard ? (
           renderCard(card, column.id)
         ) : (
@@ -206,15 +203,38 @@ const ColumnItem = React.memo<ColumnItemProps>(
         className={colClasses}
         data-tiger-taskboard-column=""
         data-tiger-taskboard-column-id={String(column.id)}
-        onDragOver={dragType === 'column' ? (e: React.DragEvent) => { e.preventDefault(); dragCtrl.columnDragOver() } : undefined}
-        onDrop={dragType === 'column' ? (e: React.DragEvent) => { e.preventDefault(); if (e.dataTransfer) dragCtrl.columnDrop(e.dataTransfer, e.clientX) } : undefined}>
+        onDragOver={
+          dragType === 'column'
+            ? (e: React.DragEvent) => {
+                e.preventDefault()
+                dragCtrl.columnDragOver()
+              }
+            : undefined
+        }
+        onDrop={
+          dragType === 'column'
+            ? (e: React.DragEvent) => {
+                e.preventDefault()
+                if (e.dataTransfer) dragCtrl.columnDrop(e.dataTransfer, e.clientX)
+              }
+            : undefined
+        }>
         {/* Column header */}
         <div
           className={taskBoardColumnHeaderClasses}
           draggable={columnDraggable}
-          onDragStart={(e) => { if (e.dataTransfer) dragCtrl.columnDragStart(e.dataTransfer, column, colIndex) }}
+          onDragStart={(e) => {
+            if (e.dataTransfer) dragCtrl.columnDragStart(e.dataTransfer, column, colIndex)
+          }}
           onDragEnd={() => dragCtrl.dragEnd()}
-          onTouchStart={(e) => dragCtrl.columnTouchStart(e.nativeEvent, e.currentTarget as HTMLElement, column, colIndex)}
+          onTouchStart={(e) =>
+            dragCtrl.columnTouchStart(
+              e.nativeEvent,
+              e.currentTarget as HTMLElement,
+              column,
+              colIndex
+            )
+          }
           onTouchMove={(e) => dragCtrl.columnTouchMove(e.nativeEvent)}
           onTouchEnd={() => dragCtrl.columnTouchEnd()}
           style={columnDraggable ? { cursor: 'grab' } : undefined}>
@@ -224,15 +244,13 @@ const ColumnItem = React.memo<ColumnItemProps>(
             <>
               <span className={wipOver ? taskBoardWipExceededClasses : undefined}>
                 {column.title}
-                {showCardCount && cardCount
-                  ? null
-                  : column.wipLimit != null ? (
-                    <span className="ml-2 text-xs font-normal opacity-70" title={wipTitle}>
-                      ({column.cards.length}/{column.wipLimit})
-                    </span>
-                  ) : (
-                    <span className="ml-2 text-xs font-normal opacity-50">{column.cards.length}</span>
-                  )}
+                {showCardCount && cardCount ? null : column.wipLimit != null ? (
+                  <span className="ml-2 text-xs font-normal opacity-70" title={wipTitle}>
+                    ({column.cards.length}/{column.wipLimit})
+                  </span>
+                ) : (
+                  <span className="ml-2 text-xs font-normal opacity-50">{column.cards.length}</span>
+                )}
               </span>
               {showCardCount && cardCount && (
                 <span
@@ -240,9 +258,7 @@ const ColumnItem = React.memo<ColumnItemProps>(
                     kanbanCardCountClasses,
                     wipOver && taskBoardWipExceededClasses
                   )}>
-                  {cardCount.limit
-                    ? `${cardCount.count}/${cardCount.limit}`
-                    : `${cardCount.count}`}
+                  {cardCount.limit ? `${cardCount.count}/${cardCount.limit}` : `${cardCount.count}`}
                 </span>
               )}
               {column.description && (
@@ -259,16 +275,24 @@ const ColumnItem = React.memo<ColumnItemProps>(
           className={taskBoardColumnBodyClasses}
           role="list"
           aria-label={column.title}
-          onDragOver={(e) => { e.preventDefault(); dragCtrl.cardDragOver(e.clientY, e.currentTarget as HTMLElement, column) }}
-          onDrop={(e) => { e.preventDefault(); if (e.dataTransfer) dragCtrl.cardDrop(e.dataTransfer, column) }}
-          onDragLeave={(e) => dragCtrl.dragLeave(e.currentTarget as HTMLElement, e.relatedTarget as Element | null)}>
+          onDragOver={(e) => {
+            e.preventDefault()
+            dragCtrl.cardDragOver(e.clientY, e.currentTarget as HTMLElement, column)
+          }}
+          onDrop={(e) => {
+            e.preventDefault()
+            if (e.dataTransfer) dragCtrl.cardDrop(e.dataTransfer, column)
+          }}
+          onDragLeave={(e) =>
+            dragCtrl.dragLeave(e.currentTarget as HTMLElement, e.relatedTarget as Element | null)
+          }>
           {cardsContent}
         </div>
 
         {/* Column footer */}
         {renderColumnFooter ? (
           renderColumnFooter(column)
-        ) : (onCardAdd || allowAddCard) ? (
+        ) : onCardAdd || allowAddCard ? (
           <div
             className={classNames(
               'border-t border-[var(--tiger-border,#e5e7eb)]',
@@ -480,7 +504,10 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   const wrapperClasses = useMemo(() => classNames(taskBoardBaseClasses, className), [className])
 
   const dragType = dragSnap.drag?.type ?? null
-  const dragStateId = (dragSnap.drag?.type === 'card' ? dragSnap.drag.id : null) as string | number | null
+  const dragStateId = (dragSnap.drag?.type === 'card' ? dragSnap.drag.id : null) as
+    | string
+    | number
+    | null
   const kbDragStateId = (dragSnap.kbDrag?.id ?? null) as string | number | null
 
   return (
@@ -493,7 +520,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       data-tiger-task-board=""
       {...rest}>
       {visibleColumns.map((col, i) => {
-        const isDropTarget = dragSnap.drag?.type === 'card' && dragSnap.dropTargetColumnId === col.id
+        const isDropTarget =
+          dragSnap.drag?.type === 'card' && dragSnap.dropTargetColumnId === col.id
         const isColDragging = dragSnap.drag?.type === 'column' && dragSnap.drag.id === col.id
 
         return (

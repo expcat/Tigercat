@@ -141,10 +141,16 @@ export default function ListDemo() {
     <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">List 列表</h1>
-        <p className="text-gray-600 dark:text-gray-400">通用列表组件，用于展示一系列相似的数据项。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          通用列表组件，用于展示一系列相似的数据项。
+        </p>
       </div>
 
-      <DemoBlock title="基本用法" description="最简单的列表展示。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="最简单的列表展示。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={basicData} />
         </div>

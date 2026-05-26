@@ -38,11 +38,17 @@ const SwitchDemo: React.FC = () => {
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Switch 开关</h1>
-        <p className="text-gray-600 dark:text-gray-400">表示两种相互对立的状态间的切换，多用于触发「开/关」。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          表示两种相互对立的状态间的切换，多用于触发「开/关」。
+        </p>
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="绑定到一个 Boolean 类型的变量。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基础用法"
+        description="绑定到一个 Boolean 类型的变量。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Space direction="vertical">
           <div className="flex items-center gap-3">
             <Switch checked={basicEnabled} onChange={setBasicEnabled} />

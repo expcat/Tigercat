@@ -34,10 +34,15 @@ const featureSnippet = `<Space direction="vertical" :size="12">
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="透明度、预设与尺寸" description="showAlpha 透明度，presets 预设色板" :code="featureSnippet">
+    <DemoBlock
+      title="透明度、预设与尺寸"
+      description="showAlpha 透明度，presets 预设色板"
+      :code="featureSnippet">
       <Space direction="vertical" :size="12">
         <ColorPicker v-model="color2" show-alpha format="rgb" />
-        <ColorPicker v-model="color2" :presets="['#f5222d', '#fa8c16', '#52c41a', '#1677ff', '#722ed1']" />
+        <ColorPicker
+          v-model="color2"
+          :presets="['#f5222d', '#fa8c16', '#52c41a', '#1677ff', '#722ed1']" />
         <Space :size="12">
           <ColorPicker :model-value="'#ccc'" size="sm" />
           <ColorPicker :model-value="'#ccc'" size="lg" />

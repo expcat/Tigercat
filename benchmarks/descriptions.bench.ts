@@ -11,7 +11,7 @@ function makeItems(n: number, spanVariant: 'uniform' | 'mixed' = 'uniform') {
   return Array.from({ length: n }, (_, i) => ({
     label: `Label ${i}`,
     content: `Content ${i}`,
-    span: spanVariant === 'mixed' ? ((i % 3) + 1) : 1
+    span: spanVariant === 'mixed' ? (i % 3) + 1 : 1
   }))
 }
 

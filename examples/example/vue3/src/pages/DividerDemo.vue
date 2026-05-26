@@ -36,9 +36,7 @@ const verticalSnippet = `<div class="flex items-center h-12">
       <p class="text-gray-600 dark:text-gray-400">区隔内容的分割线。</p>
     </div>
 
-    <DemoBlock title="基础用法"
-               description="默认水平分割线。"
-               :code="basicSnippet">
+    <DemoBlock title="基础用法" description="默认水平分割线。" :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="text-gray-700 dark:text-gray-300">上方内容</div>
         <Divider />
@@ -46,9 +44,10 @@ const verticalSnippet = `<div class="flex items-center h-12">
       </div>
     </DemoBlock>
 
-    <DemoBlock title="线条样式"
-               description="lineStyle 支持 solid / dashed / dotted。"
-               :code="lineStyleSnippet">
+    <DemoBlock
+      title="线条样式"
+      description="lineStyle 支持 solid / dashed / dotted。"
+      :code="lineStyleSnippet">
       <div class="p-6 bg-gray-50 rounded-lg space-y-4">
         <div>
           <div class="text-gray-700 mb-2">solid</div>
@@ -65,9 +64,10 @@ const verticalSnippet = `<div class="flex items-center h-12">
       </div>
     </DemoBlock>
 
-    <DemoBlock title="间距"
-               description="spacing 控制分割线周围留白（none / xs / sm / md / lg / xl）。"
-               :code="spacingSnippet">
+    <DemoBlock
+      title="间距"
+      description="spacing 控制分割线周围留白（none / xs / sm / md / lg / xl）。"
+      :code="spacingSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="text-gray-700 dark:text-gray-300">none</div>
         <Divider spacing="none" />
@@ -84,32 +84,30 @@ const verticalSnippet = `<div class="flex items-center h-12">
       </div>
     </DemoBlock>
 
-    <DemoBlock title="自定义颜色与粗细"
-               description="通过 color / thickness 自定义边框颜色与宽度。"
-               :code="customSnippet">
+    <DemoBlock
+      title="自定义颜色与粗细"
+      description="通过 color / thickness 自定义边框颜色与宽度。"
+      :code="customSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="text-gray-700 dark:text-gray-300">color="#2563eb" thickness="2px"</div>
-        <Divider color="#2563eb"
-                 thickness="2px" />
-        <div class="text-gray-700 dark:text-gray-300">color="#10b981" thickness="4px"（dashed）</div>
-        <Divider color="#10b981"
-                 thickness="4px"
-                 line-style="dashed" />
+        <Divider color="#2563eb" thickness="2px" />
+        <div class="text-gray-700 dark:text-gray-300">
+          color="#10b981" thickness="4px"（dashed）
+        </div>
+        <Divider color="#10b981" thickness="4px" line-style="dashed" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="垂直分割线"
-               description='orientation="vertical" 用于行内内容分隔。'
-               :code="verticalSnippet">
+    <DemoBlock
+      title="垂直分割线"
+      description='orientation="vertical" 用于行内内容分隔。'
+      :code="verticalSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="flex items-center h-12">
           <span class="text-gray-700 dark:text-gray-300">Left</span>
-          <Divider orientation="vertical"
-                   class="h-6" />
+          <Divider orientation="vertical" class="h-6" />
           <span class="text-gray-700 dark:text-gray-300">Middle</span>
-          <Divider orientation="vertical"
-                   class="h-6"
-                   line-style="dashed" />
+          <Divider orientation="vertical" class="h-6" line-style="dashed" />
           <span class="text-gray-700 dark:text-gray-300">Right</span>
         </div>
       </div>

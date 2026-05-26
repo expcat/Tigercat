@@ -15,16 +15,12 @@ const defaultColumns: TaskBoardColumn[] = [
   {
     id: 'doing',
     title: '进行中',
-    cards: [
-      { id: '3', title: '开发 Kanban', description: '实现看板组件' }
-    ]
+    cards: [{ id: '3', title: '开发 Kanban', description: '实现看板组件' }]
   },
   {
     id: 'done',
     title: '已完成',
-    cards: [
-      { id: '4', title: '项目搭建', description: '初始化项目结构' }
-    ]
+    cards: [{ id: '4', title: '项目搭建', description: '初始化项目结构' }]
   }
 ]
 
@@ -71,12 +67,27 @@ const KanbanDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Kanban 看板</h1>
       <p className="text-gray-500 mb-8">可拖拽的看板面板，支持卡片和列拖拽排序。</p>
 
-      <DemoBlock title="基础用法" description="columns 定义列和卡片" code={basicSnippet} script={basicScriptSnippet}>
-        <Kanban columns={columns} onColumnsChange={setColumns} allowAddCard style={{ height: 400 }} />
+      <DemoBlock
+        title="基础用法"
+        description="columns 定义列和卡片"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
+        <Kanban
+          columns={columns}
+          onColumnsChange={setColumns}
+          allowAddCard
+          style={{ height: 400 }}
+        />
       </DemoBlock>
 
       <DemoBlock title="禁用拖拽 & WIP 限制" code={wipSnippet}>
-        <Kanban defaultColumns={wipColumns} draggable={false} enforceWipLimit showCardCount style={{ height: 350 }} />
+        <Kanban
+          defaultColumns={wipColumns}
+          draggable={false}
+          enforceWipLimit
+          showCardCount
+          style={{ height: 350 }}
+        />
       </DemoBlock>
     </div>
   )

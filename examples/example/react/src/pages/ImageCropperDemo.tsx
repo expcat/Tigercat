@@ -77,7 +77,11 @@ export default function ImageCropperDemo() {
         交互式图片裁剪组件，支持自由裁剪、固定宽高比、辅助线、Canvas 输出。
       </p>
 
-      <DemoBlock title="基本用法" description="自由裁剪，拖拽和缩放裁剪区域" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="自由裁剪，拖拽和缩放裁剪区域"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <div className="space-y-4">
           <ImageCropper ref={cropperRef} src={PHOTO} onCropChange={(rect) => setCropRect(rect)} />
           <div className="flex items-center gap-4">

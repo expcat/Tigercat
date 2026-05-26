@@ -380,11 +380,17 @@ const TableDemo: React.FC = () => {
     <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Table 表格</h1>
-        <p className="text-gray-600 dark:text-gray-400">用于展示行列数据的表格组件，支持排序、筛选、分页等功能。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          用于展示行列数据的表格组件，支持排序、筛选、分页等功能。
+        </p>
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的表格展示用法。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基础用法"
+        description="基础的表格展示用法。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Table<UserData> columns={basicColumns} dataSource={basicData} pagination={false} />
       </DemoBlock>
 
@@ -441,7 +447,11 @@ const TableDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 行选择 */}
-      <DemoBlock title="行选择" description="选择单行或多行数据。" code={selectionSnippet} script={selectionScriptSnippet}>
+      <DemoBlock
+        title="行选择"
+        description="选择单行或多行数据。"
+        code={selectionSnippet}
+        script={selectionScriptSnippet}>
         <div className="mb-4">
           <p className="text-sm text-gray-600">已选择: {selectedRowKeys.join(', ') || '无'}</p>
         </div>

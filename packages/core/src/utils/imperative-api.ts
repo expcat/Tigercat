@@ -7,10 +7,7 @@
  * @example
  * normalizeStringOption('hello', 'content')  // → { content: 'hello' }
  */
-export function normalizeStringOption<T extends object>(
-  options: string | T,
-  key: string
-): T {
+export function normalizeStringOption<T extends object>(options: string | T, key: string): T {
   if (typeof options === 'string') {
     return { [key]: options } as T
   }

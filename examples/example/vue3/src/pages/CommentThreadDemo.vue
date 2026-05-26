@@ -208,10 +208,11 @@ const minimalSnippet = `<CommentThread
       </p>
     </div>
 
-    <DemoBlock title="嵌套回复"
-               description="支持多层嵌套、展开/收起、加载更多和实时回复。点击回复按钮试试。"
-               :code="basicSnippet"
-               :script="basicScriptSnippet">
+    <DemoBlock
+      title="嵌套回复"
+      description="支持多层嵌套、展开/收起、加载更多和实时回复。点击回复按钮试试。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <CommentThread
         :nodes="comments"
         :default-expanded-keys="[1]"
@@ -221,20 +222,22 @@ const minimalSnippet = `<CommentThread
         @like="handleLike" />
     </DemoBlock>
 
-    <DemoBlock title="扁平数据"
-               description="传入 items（带 parentId）即可自动构建嵌套层级。"
-               :code="flatSnippet">
-      <CommentThread :items="flatItems"
-                     :default-expanded-keys="[100]" />
+    <DemoBlock
+      title="扁平数据"
+      description="传入 items（带 parentId）即可自动构建嵌套层级。"
+      :code="flatSnippet">
+      <CommentThread :items="flatItems" :default-expanded-keys="[100]" />
     </DemoBlock>
 
-    <DemoBlock title="精简模式"
-               description="隐藏点赞、更多按钮和分割线，适合轻量展示。"
-               :code="minimalSnippet">
-      <CommentThread :nodes="minimalNodes"
-                     :show-like="false"
-                     :show-more="false"
-                     :show-divider="false" />
+    <DemoBlock
+      title="精简模式"
+      description="隐藏点赞、更多按钮和分割线，适合轻量展示。"
+      :code="minimalSnippet">
+      <CommentThread
+        :nodes="minimalNodes"
+        :show-like="false"
+        :show-more="false"
+        :show-divider="false" />
     </DemoBlock>
 
     <DemoBlock title="空态" description="无数据时展示空状态文案。" :code="emptySnippet">

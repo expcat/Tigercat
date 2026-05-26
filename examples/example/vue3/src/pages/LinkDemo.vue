@@ -54,7 +54,10 @@ const clickCount = ref(0)`
     </div>
 
     <!-- 链接变体 -->
-    <DemoBlock title="链接变体" description="展示 primary / secondary / default 三种变体。" :code="variantSnippet">
+    <DemoBlock
+      title="链接变体"
+      description="展示 primary / secondary / default 三种变体。"
+      :code="variantSnippet">
       <Space>
         <Link href="#" variant="primary" @click="handlePreventNavigate">Primary</Link>
         <Link href="#" variant="secondary" @click="handlePreventNavigate">Secondary</Link>
@@ -72,7 +75,10 @@ const clickCount = ref(0)`
     </DemoBlock>
 
     <!-- 禁用状态 -->
-    <DemoBlock title="禁用状态" description="禁用后不可点击，移除 href，并从 Tab 顺序移除。" :code="disabledSnippet">
+    <DemoBlock
+      title="禁用状态"
+      description="禁用后不可点击，移除 href，并从 Tab 顺序移除。"
+      :code="disabledSnippet">
       <Space>
         <Link href="#" disabled>Disabled Primary</Link>
         <Link href="#" variant="secondary" disabled>Disabled Secondary</Link>
@@ -81,7 +87,10 @@ const clickCount = ref(0)`
     </DemoBlock>
 
     <!-- 下划线 -->
-    <DemoBlock title="下划线" description="underline=true（默认）悬停显示下划线；underline=false 无下划线。" :code="underlineSnippet">
+    <DemoBlock
+      title="下划线"
+      description="underline=true（默认）悬停显示下划线；underline=false 无下划线。"
+      :code="underlineSnippet">
       <Space>
         <Link href="#" @click="handlePreventNavigate">有下划线（悬停）</Link>
         <Link href="#" :underline="false" @click="handlePreventNavigate">无下划线</Link>
@@ -89,8 +98,9 @@ const clickCount = ref(0)`
     </DemoBlock>
 
     <!-- 外部链接 -->
-    <DemoBlock title="外部链接"
-      description="target=&quot;_blank&quot; 时自动添加 rel=&quot;noopener noreferrer&quot;；也可传入自定义 rel。"
+    <DemoBlock
+      title="外部链接"
+      description='target="_blank" 时自动添加 rel="noopener noreferrer"；也可传入自定义 rel。'
       :code="externalSnippet">
       <Space>
         <Link href="https://github.com" target="_blank">GitHub（自动添加 rel）</Link>
@@ -99,8 +109,19 @@ const clickCount = ref(0)`
     </DemoBlock>
 
     <!-- 点击事件 -->
-    <DemoBlock title="点击事件" description="监听 @click 事件处理交互逻辑。" :code="eventSnippet" :script="eventScriptSnippet">
-      <Link href="#" @click="(e: MouseEvent) => { e.preventDefault(); clickCount++ }">
+    <DemoBlock
+      title="点击事件"
+      description="监听 @click 事件处理交互逻辑。"
+      :code="eventSnippet"
+      :script="eventScriptSnippet">
+      <Link
+        href="#"
+        @click="
+          (e: MouseEvent) => {
+            e.preventDefault()
+            clickCount++
+          }
+        ">
         点击计数：{{ clickCount }}
       </Link>
     </DemoBlock>

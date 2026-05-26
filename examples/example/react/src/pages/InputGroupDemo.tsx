@@ -31,17 +31,40 @@ const InputGroupDemo: React.FC = () => {
 
       <DemoBlock title="混合组件" description="Select + Input + Select 组合" code={addonSnippet}>
         <InputGroup>
-          <Select options={[{ label: 'http://', value: 'http' }, { label: 'https://', value: 'https' }]} value="https" style={{ width: 120 }} />
+          <Select
+            options={[
+              { label: 'http://', value: 'http' },
+              { label: 'https://', value: 'https' }
+            ]}
+            value="https"
+            style={{ width: 120 }}
+          />
           <Input placeholder="请输入域名" style={{ flex: 1 }} />
-          <Select options={[{ label: '.com', value: 'com' }, { label: '.cn', value: 'cn' }]} value="com" style={{ width: 80 }} />
+          <Select
+            options={[
+              { label: '.com', value: 'com' },
+              { label: '.cn', value: 'cn' }
+            ]}
+            value="com"
+            style={{ width: 80 }}
+          />
         </InputGroup>
       </DemoBlock>
 
       <DemoBlock title="尺寸" description="sm / md / lg 三种尺寸" code={sizeSnippet}>
         <div className="space-y-3">
-          <InputGroup size="sm"><Input placeholder="小尺寸" style={{ flex: 1 }} /><Button variant="primary">确定</Button></InputGroup>
-          <InputGroup size="md"><Input placeholder="中尺寸" style={{ flex: 1 }} /><Button variant="primary">确定</Button></InputGroup>
-          <InputGroup size="lg"><Input placeholder="大尺寸" style={{ flex: 1 }} /><Button variant="primary">确定</Button></InputGroup>
+          <InputGroup size="sm">
+            <Input placeholder="小尺寸" style={{ flex: 1 }} />
+            <Button variant="primary">确定</Button>
+          </InputGroup>
+          <InputGroup size="md">
+            <Input placeholder="中尺寸" style={{ flex: 1 }} />
+            <Button variant="primary">确定</Button>
+          </InputGroup>
+          <InputGroup size="lg">
+            <Input placeholder="大尺寸" style={{ flex: 1 }} />
+            <Button variant="primary">确定</Button>
+          </InputGroup>
         </div>
       </DemoBlock>
     </div>

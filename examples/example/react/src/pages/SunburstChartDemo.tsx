@@ -48,8 +48,19 @@ const SunburstChartDemo: React.FC = () => {
         <SunburstChart data={sunburstData} width={360} height={360} hoverable showLegend />
       </DemoBlock>
 
-      <DemoBlock title="内径 & 标签" description="innerRadiusRatio 创建甜甜圈效果" code={donutSnippet}>
-        <SunburstChart data={sunburstData} width={360} height={360} innerRadiusRatio={0.3} showLabels hoverable selectable />
+      <DemoBlock
+        title="内径 & 标签"
+        description="innerRadiusRatio 创建甜甜圈效果"
+        code={donutSnippet}>
+        <SunburstChart
+          data={sunburstData}
+          width={360}
+          height={360}
+          innerRadiusRatio={0.3}
+          showLabels
+          hoverable
+          selectable
+        />
       </DemoBlock>
 
       <DemoBlock title="自定义颜色" code={colorSnippet}>
@@ -58,7 +69,8 @@ const SunburstChartDemo: React.FC = () => {
           width={360}
           height={360}
           colors={['#6366f1', '#ec4899', '#14b8a6', '#f59e0b']}
-          hoverable />
+          hoverable
+        />
       </DemoBlock>
     </div>
   )

@@ -44,7 +44,8 @@ const GaugeChartDemo: React.FC = () => {
           height={220}
           label="健康指数"
           segments={segments}
-          valueFormatter={(v) => v + '%'} />
+          valueFormatter={(v) => v + '%'}
+        />
       </DemoBlock>
 
       <DemoBlock title="自定义弧形" description="arcWidth、startAngle、endAngle" code={arcSnippet}>
@@ -56,7 +57,8 @@ const GaugeChartDemo: React.FC = () => {
           startAngle={180}
           endAngle={360}
           showTicks={false}
-          color="#10b981" />
+          color="#10b981"
+        />
       </DemoBlock>
     </div>
   )

@@ -39,14 +39,17 @@ const sizeSnippet = `<Space align="center">
   <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Switch 开关</h1>
-      <p class="text-gray-600 dark:text-gray-400">表示两种相互对立的状态间的切换，多用于触发「开/关」。</p>
+      <p class="text-gray-600 dark:text-gray-400">
+        表示两种相互对立的状态间的切换，多用于触发「开/关」。
+      </p>
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法"
-               description="绑定 v-model 到一个 Boolean 类型的变量。"
-               :code="basicSnippet"
-               :script="basicScriptSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="绑定 v-model 到一个 Boolean 类型的变量。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Space direction="vertical">
         <div class="flex items-center gap-3">
           <Switch v-model:checked="basicEnabled" />
@@ -56,28 +59,22 @@ const sizeSnippet = `<Space align="center">
     </DemoBlock>
 
     <!-- 禁用状态 -->
-    <DemoBlock title="禁用状态"
-               description="通过设置 disabled 属性来禁用开关。"
-               :code="disabledSnippet">
+    <DemoBlock
+      title="禁用状态"
+      description="通过设置 disabled 属性来禁用开关。"
+      :code="disabledSnippet">
       <Space>
-        <Switch v-model:checked="disabledOn"
-                disabled />
-        <Switch v-model:checked="disabledOff"
-                disabled />
+        <Switch v-model:checked="disabledOn" disabled />
+        <Switch v-model:checked="disabledOff" disabled />
       </Space>
     </DemoBlock>
 
     <!-- 不同尺寸 -->
-    <DemoBlock title="不同尺寸"
-               description="开关有三种尺寸。"
-               :code="sizeSnippet">
+    <DemoBlock title="不同尺寸" description="开关有三种尺寸。" :code="sizeSnippet">
       <Space align="center">
-        <Switch v-model:checked="sizeSm"
-                size="sm" />
-        <Switch v-model:checked="sizeMd"
-                size="md" />
-        <Switch v-model:checked="sizeLg"
-                size="lg" />
+        <Switch v-model:checked="sizeSm" size="sm" />
+        <Switch v-model:checked="sizeMd" size="md" />
+        <Switch v-model:checked="sizeLg" size="lg" />
       </Space>
     </DemoBlock>
   </div>

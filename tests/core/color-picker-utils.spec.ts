@@ -33,7 +33,9 @@ describe('color-picker-utils — class generators', () => {
       expect(cls).toContain('overflow-hidden')
       expect(cls).toContain(sizeFragment)
       expect(cls).toContain('cursor-pointer')
-      expect(cls).toContain('hover:border-[var(--tiger-colorpicker-border-hover,var(--tiger-primary,#2563eb))]')
+      expect(cls).toContain(
+        'hover:border-[var(--tiger-colorpicker-border-hover,var(--tiger-primary,#2563eb))]'
+      )
       expect(cls).not.toContain('opacity-50')
       expect(cls).not.toContain('cursor-not-allowed')
     }

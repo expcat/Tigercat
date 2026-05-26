@@ -24,9 +24,7 @@ const notificationItems: NotificationItem[] = [
   { id: 1, title: '系统通知', type: '系统', read: false }
 ]
 
-const commentNodes: CommentNode[] = [
-  { id: 1, content: 'Hello', user: { name: 'A' } }
-]
+const commentNodes: CommentNode[] = [{ id: 1, content: 'Hello', user: { name: 'A' } }]
 
 const columns: TableColumn[] = [{ key: 'name', title: 'Name' }]
 
@@ -40,9 +38,7 @@ describe('NotificationCenter ARIA roles', () => {
   })
 
   it('React: respects custom aria-label', () => {
-    renderReact(
-      <ReactNotificationCenter items={notificationItems} aria-label="Notifications" />
-    )
+    renderReact(<ReactNotificationCenter items={notificationItems} aria-label="Notifications" />)
     const region = reactScreen.getByRole('region')
     expect(region).toHaveAttribute('aria-label', 'Notifications')
   })
@@ -66,9 +62,7 @@ describe('NotificationCenter ARIA roles', () => {
 
 describe('ActivityFeed ARIA roles', () => {
   it('React: has role=feed and default aria-label', () => {
-    renderReact(
-      <ReactActivityFeed items={[{ id: 1, title: 'Activity', type: '更新' }]} />
-    )
+    renderReact(<ReactActivityFeed items={[{ id: 1, title: 'Activity', type: '更新' }]} />)
     const feed = reactScreen.getByRole('feed')
     expect(feed).toHaveAttribute('aria-label', '动态')
   })

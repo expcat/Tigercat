@@ -31,7 +31,8 @@ const baseMessages: ChatMessage[] = [
   },
   {
     id: 4,
-    content: 'ChatWindow 是一个开箱即用的聊天窗口组件，支持 textarea 和 input 两种输入模式，可以自定义消息气泡渲染。',
+    content:
+      'ChatWindow 是一个开箱即用的聊天窗口组件，支持 textarea 和 input 两种输入模式，可以自定义消息气泡渲染。',
     direction: 'other',
     user: { name: 'Tigercat', avatar: 'https://i.pravatar.cc/40?img=3' },
     time: new Date(Date.now() - 1000 * 60 * 2),
@@ -118,14 +119,30 @@ const inputSnippet = `<ChatWindow
       <p class="text-gray-600 dark:text-gray-400">组合组件，用于构建完整聊天交互区域。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="默认 textarea 输入，支持 Shift+Enter 换行。" :code="basicSnippet" :script="basicScriptSnippet">
-      <ChatWindow v-model="input" class="h-[480px]" :messages="messages" show-time allow-shift-enter
-        status-text="对方正在输入..." @send="handleSend" />
+    <DemoBlock
+      title="基础用法"
+      description="默认 textarea 输入，支持 Shift+Enter 换行。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
+      <ChatWindow
+        v-model="input"
+        class="h-[480px]"
+        :messages="messages"
+        show-time
+        allow-shift-enter
+        status-text="对方正在输入..."
+        @send="handleSend" />
     </DemoBlock>
 
     <DemoBlock title="单行输入" description="使用 input 模式，回车即可发送。" :code="inputSnippet">
-      <ChatWindow v-model="quickInput" class="h-[380px]" input-type="input" placeholder="输入并回车发送"
-        :messages="quickMessages" send-on-enter @send="handleQuickSend" />
+      <ChatWindow
+        v-model="quickInput"
+        class="h-[380px]"
+        input-type="input"
+        placeholder="输入并回车发送"
+        :messages="quickMessages"
+        send-on-enter
+        @send="handleQuickSend" />
     </DemoBlock>
   </div>
 </template>

@@ -164,7 +164,11 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="适用广泛的基础选择器。" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="适用广泛的基础选择器。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="basicValue" :options="options" placeholder="请选择" />
         <p class="text-sm text-gray-600">选中的值：{{ basicValue || '未选择' }}</p>
@@ -187,7 +191,10 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 不同尺寸 -->
-    <DemoBlock title="不同尺寸" description="Select 支持 sm / md / lg 三种尺寸。" :code="sizeSnippet">
+    <DemoBlock
+      title="不同尺寸"
+      description="Select 支持 sm / md / lg 三种尺寸。"
+      :code="sizeSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="w-full">
           <p class="text-sm text-gray-600 mb-2">sm</p>
@@ -213,7 +220,10 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 可清空 -->
-    <DemoBlock title="可清空" description="默认支持清空，也可以关闭清空功能。" :code="clearableSnippet">
+    <DemoBlock
+      title="可清空"
+      description="默认支持清空，也可以关闭清空功能。"
+      :code="clearableSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="w-full">
           <p class="text-sm text-gray-600 mb-2">clearable: true</p>
@@ -227,9 +237,16 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 可搜索 -->
-    <DemoBlock title="可搜索" description="启用 searchable 后可在下拉中输入关键字过滤选项。" :code="searchableSnippet">
+    <DemoBlock
+      title="可搜索"
+      description="启用 searchable 后可在下拉中输入关键字过滤选项。"
+      :code="searchableSnippet">
       <Space direction="vertical" class="w-full max-w-md">
-        <Select v-model="searchableValue" :options="countries" searchable placeholder="搜索国家"
+        <Select
+          v-model="searchableValue"
+          :options="countries"
+          searchable
+          placeholder="搜索国家"
           @search="(q) => (lastSearchQuery = q)" />
         <p class="text-sm text-gray-600">最近一次搜索：{{ lastSearchQuery || '（无）' }}</p>
       </Space>
@@ -246,9 +263,17 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 多选 + 可搜索 -->
-    <DemoBlock title="多选 + 可搜索" description="同时启用 multiple 和 searchable，支持搜索并多选。" :code="multipleSearchableSnippet">
+    <DemoBlock
+      title="多选 + 可搜索"
+      description="同时启用 multiple 和 searchable，支持搜索并多选。"
+      :code="multipleSearchableSnippet">
       <Space direction="vertical" class="w-full max-w-md">
-        <Select v-model="multiSearchValue" :options="countries" multiple searchable placeholder="搜索并多选" />
+        <Select
+          v-model="multiSearchValue"
+          :options="countries"
+          multiple
+          searchable
+          placeholder="搜索并多选" />
         <p class="text-sm text-gray-600">
           选中：{{ multiSearchValue.length ? multiSearchValue.join(', ') : '未选择' }}
         </p>
@@ -256,7 +281,10 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 分组选项 -->
-    <DemoBlock title="分组选项" description="支持传入分组数据（group label + options）。" :code="groupedSnippet">
+    <DemoBlock
+      title="分组选项"
+      description="支持传入分组数据（group label + options）。"
+      :code="groupedSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="groupedValue" :options="groupedOptions" />
         <p class="text-sm text-gray-600">选中的值：{{ groupedValue }}</p>
@@ -264,9 +292,16 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 空状态 -->
-    <DemoBlock title="空状态" description="当 options 为空时，会显示空提示文案。" :code="emptySnippet">
+    <DemoBlock
+      title="空状态"
+      description="当 options 为空时，会显示空提示文案。"
+      :code="emptySnippet">
       <Space direction="vertical" class="w-full max-w-md">
-        <Select v-model="emptyValue" :options="[]" no-data-text="暂无数据" placeholder="无可用选项" />
+        <Select
+          v-model="emptyValue"
+          :options="[]"
+          no-data-text="暂无数据"
+          placeholder="无可用选项" />
       </Space>
     </DemoBlock>
   </div>

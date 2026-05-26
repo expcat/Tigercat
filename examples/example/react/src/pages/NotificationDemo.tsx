@@ -271,7 +271,9 @@ export default function NotificationDemo() {
     <div className="p-6 space-y-8">
       <div>
         <h1 className="text-2xl font-bold mb-2">Notification 通知</h1>
-        <p className="text-gray-600 dark:text-gray-400">全局显示通知提示信息，支持多种展示位置、关闭与定时消失。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          全局显示通知提示信息，支持多种展示位置、关闭与定时消失。
+        </p>
       </div>
 
       <DemoBlock title="基本类型" description="展示四种基础通知类型。" code={basicSnippet}>
@@ -448,7 +450,10 @@ export default function NotificationDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="自定义外观" description="通过 icon 和 className 自定义通知外观。" code={customSnippet}>
+      <DemoBlock
+        title="自定义外观"
+        description="通过 icon 和 className 自定义通知外观。"
+        code={customSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showCustomIcon}

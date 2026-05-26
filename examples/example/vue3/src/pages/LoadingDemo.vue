@@ -81,9 +81,7 @@ const handleSubmit = () => {
       </p>
     </div>
 
-    <DemoBlock title="基本用法"
-               description="最简单的用法，显示加载动画。"
-               :code="basicSnippet">
+    <DemoBlock title="基本用法" description="最简单的用法，显示加载动画。" :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="flex gap-8 items-center justify-center">
           <Loading />
@@ -92,9 +90,10 @@ const handleSubmit = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="加载动画变体"
-               description="Loading 组件支持 5 种不同的动画样式。"
-               :code="variantSnippet">
+    <DemoBlock
+      title="加载动画变体"
+      description="Loading 组件支持 5 种不同的动画样式。"
+      :code="variantSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-5 gap-8">
           <div class="flex flex-col items-center gap-2">
@@ -121,9 +120,10 @@ const handleSubmit = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="尺寸大小"
-               description="Loading 组件支持 4 种不同的尺寸：sm、md（默认）、lg、xl。"
-               :code="sizeSnippet">
+    <DemoBlock
+      title="尺寸大小"
+      description="Loading 组件支持 4 种不同的尺寸：sm、md（默认）、lg、xl。"
+      :code="sizeSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="flex gap-8 items-center justify-center">
           <div class="flex flex-col items-center gap-2">
@@ -146,9 +146,10 @@ const handleSubmit = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="颜色变体"
-               description="Loading 组件支持 7 种颜色变体，也可以自定义颜色。"
-               :code="colorSnippet">
+    <DemoBlock
+      title="颜色变体"
+      description="Loading 组件支持 7 种颜色变体，也可以自定义颜色。"
+      :code="colorSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-4 gap-6">
           <div class="flex flex-col items-center gap-2">
@@ -187,26 +188,24 @@ const handleSubmit = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="全屏加载"
-               description="使用 fullscreen 属性可以创建全屏加载遮罩层。"
-               :code="fullscreenSnippet"
-               :script="fullscreenScriptSnippet">
+    <DemoBlock
+      title="全屏加载"
+      description="使用 fullscreen 属性可以创建全屏加载遮罩层。"
+      :code="fullscreenSnippet"
+      :script="fullscreenScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Button @click="showPageLoading">显示全屏加载</Button>
-        <Loading v-if="pageLoading"
-                 fullscreen
-                 text="页面加载中..." />
+        <Loading v-if="pageLoading" fullscreen text="页面加载中..." />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="区域加载"
-               description="在某个区域内显示加载状态。"
-               :code="cardSnippet">
+    <DemoBlock title="区域加载" description="在某个区域内显示加载状态。" :code="cardSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Card title="数据统计">
           <div class="relative min-h-[200px]">
-            <div v-if="cardLoading"
-                 class="absolute inset-0 flex items-center justify-center bg-white/80">
+            <div
+              v-if="cardLoading"
+              class="absolute inset-0 flex items-center justify-center bg-white/80">
               <Loading text="刷新中..." />
             </div>
             <div v-else>
@@ -220,32 +219,29 @@ const handleSubmit = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="按钮加载"
-               description="与按钮组合使用，展示操作进行中的状态。"
-               :code="buttonSnippet">
+    <DemoBlock
+      title="按钮加载"
+      description="与按钮组合使用，展示操作进行中的状态。"
+      :code="buttonSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="flex gap-4">
-          <Button :loading="buttonLoading"
-                  @click="handleSubmit"> 提交 </Button>
-          <Button variant="secondary"
-                  :loading="buttonLoading"
-                  @click="handleSubmit"> 保存 </Button>
+          <Button :loading="buttonLoading" @click="handleSubmit"> 提交 </Button>
+          <Button variant="secondary" :loading="buttonLoading" @click="handleSubmit"> 保存 </Button>
         </div>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="延迟显示"
-               description="使用 delay 属性可以延迟显示加载器，避免闪烁（延迟 300ms）。"
-               :code="delaySnippet">
+    <DemoBlock
+      title="延迟显示"
+      description="使用 delay 属性可以延迟显示加载器，避免闪烁（延迟 300ms）。"
+      :code="delaySnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="flex gap-8 items-center justify-center">
           <div class="flex flex-col items-center gap-2">
-            <Loading :delay="0"
-                     text="无延迟" />
+            <Loading :delay="0" text="无延迟" />
           </div>
           <div class="flex flex-col items-center gap-2">
-            <Loading :delay="300"
-                     text="延迟 300ms" />
+            <Loading :delay="300" text="延迟 300ms" />
           </div>
         </div>
       </div>

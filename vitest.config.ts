@@ -21,7 +21,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@expcat/tigercat-core/locales': resolve(__dirname, './packages/core/src/utils/i18n/locales'),
-      '@expcat/tigercat-core/datepicker-locales': resolve(__dirname, './packages/core/src/utils/i18n/datepicker-locales'),
+      '@expcat/tigercat-core/datepicker-locales': resolve(
+        __dirname,
+        './packages/core/src/utils/i18n/datepicker-locales'
+      ),
       '@expcat/tigercat-core': resolve(__dirname, './packages/core/src'),
       '@expcat/tigercat-vue': resolve(__dirname, './packages/vue/src'),
       '@expcat/tigercat-react': resolve(__dirname, './packages/react/src'),

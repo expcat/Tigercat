@@ -282,11 +282,17 @@ const DrawerDemo: React.FC = () => {
     <div className="max-w-5xl mx-auto p-6 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Drawer 抽屉</h1>
-        <p className="text-gray-600 dark:text-gray-400">从页面边缘滑出的面板，用于展示详细信息或进行操作。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          从页面边缘滑出的面板，用于展示详细信息或进行操作。
+        </p>
       </div>
 
       {/* 基本使用 */}
-      <DemoBlock title="基本使用" description="最基本的抽屉使用示例。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本使用"
+        description="最基本的抽屉使用示例。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openBasic}>打开抽屉</Button>
           <Drawer

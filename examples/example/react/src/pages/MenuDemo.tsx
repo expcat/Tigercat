@@ -153,7 +153,11 @@ const MenuDemo: React.FC = () => {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock title="基本用法" description="垂直菜单，默认模式。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="垂直菜单，默认模式。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <div className="bg-gray-50 p-6 rounded-lg">
           <div className="bg-white inline-block">
             <Menu selectedKeys={selectedKeys1} onSelect={(key) => setSelectedKeys1([key])}>

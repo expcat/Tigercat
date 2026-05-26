@@ -96,10 +96,16 @@ export default function CollapseDemo() {
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Collapse 折叠面板</h1>
-        <p className="text-gray-600 dark:text-gray-400">可以折叠/展开的内容区域，用于将复杂的区域折叠起来。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          可以折叠/展开的内容区域，用于将复杂的区域折叠起来。
+        </p>
       </div>
 
-      <DemoBlock title="基本用法" description="可以同时展开多个面板。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="可以同时展开多个面板。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             activeKey={activeKey1}
@@ -224,7 +230,10 @@ export default function CollapseDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="自定义标题与额外内容" description="通过 props 自定义面板标题和右侧额外内容。" code={customHeaderSnippet}>
+      <DemoBlock
+        title="自定义标题与额外内容"
+        description="通过 props 自定义面板标题和右侧额外内容。"
+        code={customHeaderSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             activeKey={activeKey8}
@@ -244,7 +253,10 @@ export default function CollapseDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="隐藏箭头" description="通过 showArrow 属性隐藏展开/收起箭头图标。" code={hideArrowSnippet}>
+      <DemoBlock
+        title="隐藏箭头"
+        description="通过 showArrow 属性隐藏展开/收起箭头图标。"
+        code={hideArrowSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             activeKey={activeKey9}

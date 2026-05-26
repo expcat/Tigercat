@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "../../../../packages/core/src/tailwind-plugin.ts";
 @source "../../../../packages/vue/src";
 @source "../../../../packages/core/src";

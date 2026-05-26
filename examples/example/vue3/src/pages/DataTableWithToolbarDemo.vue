@@ -152,17 +152,31 @@ const handleBulkAction = (actionKey: string) => {
       <p class="text-gray-600 dark:text-gray-400">搜索、筛选、批量操作与分页联动的组合组件。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="搜索/筛选/批量操作 + 分页联动" :code="basicSnippet" :script="basicScriptSnippet">
-      <DataTableWithToolbar :columns="columns" :dataSource="pagedData" table-layout="fixed"
-        :rowSelection="{ selectedRowKeys, type: 'checkbox' }" :toolbar="toolbar" :pagination="{
+    <DemoBlock
+      title="基础用法"
+      description="搜索/筛选/批量操作 + 分页联动"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
+      <DataTableWithToolbar
+        :columns="columns"
+        :dataSource="pagedData"
+        table-layout="fixed"
+        :rowSelection="{ selectedRowKeys, type: 'checkbox' }"
+        :toolbar="toolbar"
+        :pagination="{
           current: pagination.current,
           pageSize: pagination.pageSize,
           total: filteredData.length,
           showSizeChanger: true,
           showTotal: true
-        }" @search-change="(value) => (keyword = value)" @search="(value) => (keyword = value)"
-        @filters-change="handleFiltersChange" @page-change="handlePageChange" @page-size-change="handlePageChange"
-        @selection-change="handleSelectionChange" @bulk-action="(action) => handleBulkAction(action.key as string)" />
+        }"
+        @search-change="(value) => (keyword = value)"
+        @search="(value) => (keyword = value)"
+        @filters-change="handleFiltersChange"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageChange"
+        @selection-change="handleSelectionChange"
+        @bulk-action="(action) => handleBulkAction(action.key as string)" />
     </DemoBlock>
   </div>
 </template>

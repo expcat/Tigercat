@@ -86,7 +86,8 @@ const impactColor = (impact?: string | null) => {
       role="dialog"
       :aria-label="t('A11y 调试面板', 'A11y debug panel')"
       class="absolute bottom-14 right-0 w-[min(420px,calc(100vw-2rem))] max-h-[70vh] flex flex-col rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-950">
-      <header class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-800">
+      <header
+        class="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-800">
         <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">
           {{ t('无障碍扫描 (axe-core)', 'A11y scan (axe-core)') }}
         </div>
@@ -114,9 +115,16 @@ const impactColor = (impact?: string | null) => {
       <div class="flex-1 overflow-y-auto p-3 space-y-2 text-sm">
         <p v-if="error" class="text-red-600 dark:text-red-400">{{ error }}</p>
         <p v-else-if="!results" class="text-gray-500 dark:text-gray-400">
-          {{ t('点击「运行扫描」查看当前页面的无障碍问题。', 'Click "Run scan" to inspect the current page.') }}
+          {{
+            t(
+              '点击「运行扫描」查看当前页面的无障碍问题。',
+              'Click "Run scan" to inspect the current page.'
+            )
+          }}
         </p>
-        <p v-else-if="results.violations.length === 0" class="text-emerald-700 dark:text-emerald-300">
+        <p
+          v-else-if="results.violations.length === 0"
+          class="text-emerald-700 dark:text-emerald-300">
           {{ t('未发现问题 ✓', 'No violations found ✓') }}
         </p>
         <ul v-else class="space-y-3">
@@ -125,7 +133,9 @@ const impactColor = (impact?: string | null) => {
             :key="v.id"
             class="rounded-md border border-gray-200 p-2 dark:border-gray-800">
             <div class="flex items-center gap-2 mb-1">
-              <span class="text-[10px] font-semibold uppercase rounded px-1.5 py-0.5" :class="impactColor(v.impact)">
+              <span
+                class="text-[10px] font-semibold uppercase rounded px-1.5 py-0.5"
+                :class="impactColor(v.impact)">
                 {{ v.impact ?? 'n/a' }}
               </span>
               <span class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ v.id }}</span>

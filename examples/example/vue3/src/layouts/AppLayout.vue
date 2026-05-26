@@ -3,8 +3,19 @@ import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 
 import { useRoute } from 'vue-router'
 import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
-import { Anchor, AnchorLink, Breadcrumb, BreadcrumbItem, ConfigProvider } from '@expcat/tigercat-vue'
-import { getStoredLang, getStoredSiderCollapsed, setStoredLang, setStoredSiderCollapsed } from '@demo-shared/prefs'
+import {
+  Anchor,
+  AnchorLink,
+  Breadcrumb,
+  BreadcrumbItem,
+  ConfigProvider
+} from '@expcat/tigercat-vue'
+import {
+  getStoredLang,
+  getStoredSiderCollapsed,
+  setStoredLang,
+  setStoredSiderCollapsed
+} from '@demo-shared/prefs'
 import AppHeader from '../components/AppHeader.vue'
 import AppSider from '../components/AppSider.vue'
 import A11yDebugPanel from '../components/A11yDebugPanel.vue'
@@ -184,42 +195,47 @@ watch(
 <template>
   <ConfigProvider :locale="tigerLocale">
     <div class="h-screen overflow-hidden box-border bg-gray-50 dark:bg-gray-950 pt-14">
-      <AppHeader :lang="lang"
-                 :is-sider-collapsed="isSiderCollapsed"
-                 :is-mobile="isMobile"
-                 right-hint="Vue 3"
-                 @update:lang="handleLangChange"
-                 @toggle-sider="toggleSider" />
+      <AppHeader
+        :lang="lang"
+        :is-sider-collapsed="isSiderCollapsed"
+        :is-mobile="isMobile"
+        right-hint="Vue 3"
+        @update:lang="handleLangChange"
+        @toggle-sider="toggleSider" />
 
       <div class="flex h-full">
-        <AppSider :lang="lang"
-                  :is-sider-collapsed="isSiderCollapsed"
-                  :is-mobile="isMobile"
-                  @close="closeSider" />
+        <AppSider
+          :lang="lang"
+          :is-sider-collapsed="isSiderCollapsed"
+          :is-mobile="isMobile"
+          @close="closeSider" />
 
         <main class="flex-1 min-w-0 h-full overflow-hidden">
-          <div ref="mainScrollRef"
-               class="h-full overflow-y-auto overflow-x-hidden">
-            <div v-if="!isHome && (headerTitle || sections.length > 0)"
-                 class="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
+          <div ref="mainScrollRef" class="h-full overflow-y-auto overflow-x-hidden">
+            <div
+              v-if="!isHome && (headerTitle || sections.length > 0)"
+              class="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
               <div class="px-6 py-3">
                 <div class="flex items-center justify-between gap-4">
-                  <div class="min-w-0 text-sm font-semibold text-gray-900 truncate dark:text-gray-100">
+                  <div
+                    class="min-w-0 text-sm font-semibold text-gray-900 truncate dark:text-gray-100">
                     <Breadcrumb>
                       <BreadcrumbItem href="/">{{ homeLabel }}</BreadcrumbItem>
                       <BreadcrumbItem current>{{ headerTitle }}</BreadcrumbItem>
                       <template #extra>
-                        <Anchor v-if="sections.length > 0"
-                                :affix="false"
-                                direction="horizontal"
-                                :getContainer="getMainContainer"
-                                class="flex items-center justify-end"
-                                @click="handleAnchorClick">
-                          <AnchorLink v-for="s in sections"
-                                      :key="s.id"
-                                      :href="`#${s.id}`"
-                                      :title="s.label"
-                                      class="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800" />
+                        <Anchor
+                          v-if="sections.length > 0"
+                          :affix="false"
+                          direction="horizontal"
+                          :getContainer="getMainContainer"
+                          class="flex items-center justify-end"
+                          @click="handleAnchorClick">
+                          <AnchorLink
+                            v-for="s in sections"
+                            :key="s.id"
+                            :href="`#${s.id}`"
+                            :title="s.label"
+                            class="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800" />
                         </Anchor>
                       </template>
                     </Breadcrumb>
@@ -228,8 +244,7 @@ watch(
               </div>
             </div>
 
-            <div ref="pageRootRef"
-                 class="px-6 py-6">
+            <div ref="pageRootRef" class="px-6 py-6">
               <router-view />
             </div>
           </div>

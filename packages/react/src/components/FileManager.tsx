@@ -175,9 +175,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
           {model.processedItems.map((item, index) => {
             const isSelected = model.selectedSet.has(item.key)
             const itemClass = getFileItemClasses(viewMode, isSelected)
-            const dragItem = draggable && !item.disabled
-              ? toFileDragItem(item, index)
-              : undefined
+            const dragItem = draggable && !item.disabled ? toFileDragItem(item, index) : undefined
 
             return (
               <div

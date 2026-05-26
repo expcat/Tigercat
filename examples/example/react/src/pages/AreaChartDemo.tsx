@@ -124,7 +124,9 @@ const AreaChartDemo: React.FC = () => {
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">AreaChart 面积图</h1>
-        <p className="text-gray-600 dark:text-gray-400">用于展示数据随时间变化的趋势，强调数量累积。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          用于展示数据随时间变化的趋势，强调数量累积。
+        </p>
       </div>
 
       <DemoBlock title="基础用法" description="单系列面积图。" code={basicSnippet}>

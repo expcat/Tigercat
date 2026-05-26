@@ -70,7 +70,10 @@ const a11ySnippet = `<!-- 装饰性图标（默认 aria-hidden） -->
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="基础的 Icon 用法，传入 SVG 内容即可。组件自动注入默认的 stroke 样式属性。" :code="basicSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="基础的 Icon 用法，传入 SVG 内容即可。组件自动注入默认的 stroke 样式属性。"
+      :code="basicSnippet">
       <div class="flex items-center gap-6">
         <Icon>
           <svg>
@@ -117,7 +120,10 @@ const a11ySnippet = `<!-- 装饰性图标（默认 aria-hidden） -->
     </DemoBlock>
 
     <!-- 颜色定制 -->
-    <DemoBlock title="颜色定制" description="默认继承文本颜色，也可以通过 color 属性指定。" :code="colorSnippet">
+    <DemoBlock
+      title="颜色定制"
+      description="默认继承文本颜色，也可以通过 color 属性指定。"
+      :code="colorSnippet">
       <div class="flex items-center gap-8">
         <div class="text-blue-600">
           <Icon>
@@ -136,7 +142,10 @@ const a11ySnippet = `<!-- 装饰性图标（默认 aria-hidden） -->
     </DemoBlock>
 
     <!-- 填充图标 -->
-    <DemoBlock title="填充图标" description="通过 SVG 属性 fill='currentColor' stroke='none' 切换为填充风格。" :code="filledSnippet">
+    <DemoBlock
+      title="填充图标"
+      description="通过 SVG 属性 fill='currentColor' stroke='none' 切换为填充风格。"
+      :code="filledSnippet">
       <div class="flex items-center gap-6">
         <Icon size="lg">
           <svg viewBox="0 0 20 20" fill="currentColor" stroke="none">
@@ -154,7 +163,10 @@ const a11ySnippet = `<!-- 装饰性图标（默认 aria-hidden） -->
     </DemoBlock>
 
     <!-- 无障碍 -->
-    <DemoBlock title="无障碍" description="无 aria-label 时自动隐藏（装饰性）；提供 aria-label 后获得 role=img（语义化）。" :code="a11ySnippet">
+    <DemoBlock
+      title="无障碍"
+      description="无 aria-label 时自动隐藏（装饰性）；提供 aria-label 后获得 role=img（语义化）。"
+      :code="a11ySnippet">
       <div class="flex items-center gap-8">
         <Icon>
           <svg>

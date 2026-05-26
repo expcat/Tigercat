@@ -75,7 +75,9 @@ const BreadcrumbDemo: React.FC = () => {
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Breadcrumb 面包屑</h1>
-        <p className="text-gray-600 dark:text-gray-400">显示当前页面在系统层级结构中的位置，并能向上返回。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          显示当前页面在系统层级结构中的位置，并能向上返回。
+        </p>
       </div>
 
       <DemoBlock title="基本用法" description="最简单的面包屑导航。" code={basicSnippet}>
@@ -219,9 +221,7 @@ const BreadcrumbDemo: React.FC = () => {
         code={extraSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb
-            extra={
-              <button className="text-sm text-blue-600 hover:underline">Edit</button>
-            }>
+            extra={<button className="text-sm text-blue-600 hover:underline">Edit</button>}>
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
             <BreadcrumbItem href="/products">Products</BreadcrumbItem>
             <BreadcrumbItem current>Details</BreadcrumbItem>

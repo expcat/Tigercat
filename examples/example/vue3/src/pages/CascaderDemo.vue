@@ -8,14 +8,32 @@ const val2 = ref<(string | number)[]>([])
 
 const options = [
   {
-    label: '浙江', value: 'zj', children: [
-      { label: '杭州', value: 'hz', children: [{ label: '西湖区', value: 'xh' }, { label: '余杭区', value: 'yh' }] },
+    label: '浙江',
+    value: 'zj',
+    children: [
+      {
+        label: '杭州',
+        value: 'hz',
+        children: [
+          { label: '西湖区', value: 'xh' },
+          { label: '余杭区', value: 'yh' }
+        ]
+      },
       { label: '宁波', value: 'nb', children: [{ label: '鄞州区', value: 'yz' }] }
     ]
   },
   {
-    label: '江苏', value: 'js', children: [
-      { label: '南京', value: 'nj', children: [{ label: '鼓楼区', value: 'gl' }, { label: '玄武区', value: 'xw' }] },
+    label: '江苏',
+    value: 'js',
+    children: [
+      {
+        label: '南京',
+        value: 'nj',
+        children: [
+          { label: '鼓楼区', value: 'gl' },
+          { label: '玄武区', value: 'xw' }
+        ]
+      },
       { label: '苏州', value: 'sz', children: [{ label: '虎丘区', value: 'hq' }] }
     ]
   }
@@ -42,7 +60,11 @@ const sizeSnippet = `<Space direction="vertical" :size="12">
     <h1 class="text-3xl font-bold mb-2">Cascader 级联选择</h1>
     <p class="text-gray-500 mb-8">多级联动选择器，适用于省市区等层级数据。</p>
 
-    <DemoBlock title="基本用法" description="逐级选择，v-model 绑定选中路径" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="逐级选择，v-model 绑定选中路径"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Cascader v-model="val" :options="options" placeholder="请选择地区" />
     </DemoBlock>
 

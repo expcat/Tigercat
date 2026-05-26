@@ -96,7 +96,11 @@ const groupSizeSnippet = `<Space direction="vertical">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="单独使用可以表示两种状态之间的切换。" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="单独使用可以表示两种状态之间的切换。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Space direction="vertical">
         <Checkbox v-model="checked">复选框</Checkbox>
         <p class="text-sm text-gray-600">选中状态：{{ checked }}</p>
@@ -104,7 +108,10 @@ const groupSizeSnippet = `<Space direction="vertical">
     </DemoBlock>
 
     <!-- 非受控模式 -->
-    <DemoBlock title="非受控模式" description="使用 defaultChecked 设置默认选中，组件内部管理状态。" :code="uncontrolledSnippet">
+    <DemoBlock
+      title="非受控模式"
+      description="使用 defaultChecked 设置默认选中，组件内部管理状态。"
+      :code="uncontrolledSnippet">
       <Space>
         <Checkbox :default-checked="true">默认选中</Checkbox>
         <Checkbox>默认未选中</Checkbox>
@@ -120,9 +127,15 @@ const groupSizeSnippet = `<Space direction="vertical">
     </DemoBlock>
 
     <!-- 不确定状态 -->
-    <DemoBlock title="不确定状态" description="通过 indeterminate 实现“全选/半选”效果。" :code="indeterminateSnippet">
+    <DemoBlock
+      title="不确定状态"
+      description="通过 indeterminate 实现“全选/半选”效果。"
+      :code="indeterminateSnippet">
       <Space direction="vertical">
-        <Checkbox :model-value="allChecked" :indeterminate="indeterminate" @change="handleCheckAllChange">
+        <Checkbox
+          :model-value="allChecked"
+          :indeterminate="indeterminate"
+          @change="handleCheckAllChange">
           全选
         </Checkbox>
         <CheckboxGroup v-model="fruitsIndeterminate">
@@ -137,7 +150,10 @@ const groupSizeSnippet = `<Space direction="vertical">
     </DemoBlock>
 
     <!-- 多选框组 -->
-    <DemoBlock title="多选框组" description="适用于多个勾选框绑定到同一个数组的情景。" :code="groupSnippet">
+    <DemoBlock
+      title="多选框组"
+      description="适用于多个勾选框绑定到同一个数组的情景。"
+      :code="groupSnippet">
       <Space direction="vertical">
         <CheckboxGroup v-model="fruits">
           <div class="flex flex-wrap gap-4">
@@ -152,7 +168,10 @@ const groupSizeSnippet = `<Space direction="vertical">
     </DemoBlock>
 
     <!-- 尺寸 -->
-    <DemoBlock title="尺寸" description="支持 sm / md / lg 三种尺寸，可在 CheckboxGroup 中统一设置。" :code="sizeSnippet">
+    <DemoBlock
+      title="尺寸"
+      description="支持 sm / md / lg 三种尺寸，可在 CheckboxGroup 中统一设置。"
+      :code="sizeSnippet">
       <Space>
         <Checkbox size="sm">Small</Checkbox>
         <Checkbox size="md">Medium</Checkbox>
@@ -161,7 +180,10 @@ const groupSizeSnippet = `<Space direction="vertical">
     </DemoBlock>
 
     <!-- 分组禁用 -->
-    <DemoBlock title="分组禁用" description="设置 CheckboxGroup 的 disabled 可禁用所有子复选框。" :code="groupDisabledSnippet">
+    <DemoBlock
+      title="分组禁用"
+      description="设置 CheckboxGroup 的 disabled 可禁用所有子复选框。"
+      :code="groupDisabledSnippet">
       <Space direction="vertical">
         <CheckboxGroup disabled :model-value="['apple']">
           <Checkbox value="apple">苹果</Checkbox>
@@ -172,7 +194,10 @@ const groupSizeSnippet = `<Space direction="vertical">
     </DemoBlock>
 
     <!-- 分组尺寸继承 -->
-    <DemoBlock title="分组尺寸继承" description="CheckboxGroup 设置 size 后子复选框继承，个别子项可通过自身 size 覆盖。" :code="groupSizeSnippet">
+    <DemoBlock
+      title="分组尺寸继承"
+      description="CheckboxGroup 设置 size 后子复选框继承，个别子项可通过自身 size 覆盖。"
+      :code="groupSizeSnippet">
       <Space direction="vertical">
         <CheckboxGroup size="lg" v-model="groupSizeValues">
           <Checkbox value="apple">苹果</Checkbox>

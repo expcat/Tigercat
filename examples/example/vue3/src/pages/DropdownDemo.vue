@@ -210,9 +210,7 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock title="基本用法"
-               description="悬停在触发元素上时显示下拉菜单。"
-               :code="basicSnippet">
+    <DemoBlock title="基本用法" description="悬停在触发元素上时显示下拉菜单。" :code="basicSnippet">
       <Dropdown>
         <Button>悬浮触发</Button>
         <DropdownMenu>
@@ -224,9 +222,7 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 触发方式 -->
-    <DemoBlock title="触发方式"
-               description="支持点击和悬浮两种触发方式。"
-               :code="triggerSnippet">
+    <DemoBlock title="触发方式" description="支持点击和悬浮两种触发方式。" :code="triggerSnippet">
       <div class="flex gap-4">
         <Dropdown trigger="hover">
           <Button>悬浮触发</Button>
@@ -249,9 +245,7 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 弹出位置 -->
-    <DemoBlock title="弹出位置"
-               description="支持 12 种弹出位置。"
-               :code="placementSnippet">
+    <DemoBlock title="弹出位置" description="支持 12 种弹出位置。" :code="placementSnippet">
       <div class="flex flex-col gap-4">
         <div class="flex gap-4">
           <Dropdown placement="bottom-start">
@@ -308,9 +302,10 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 禁用状态 -->
-    <DemoBlock title="禁用状态"
-               description="禁用整个下拉菜单或单个菜单项。"
-               :code="disabledSnippet">
+    <DemoBlock
+      title="禁用状态"
+      description="禁用整个下拉菜单或单个菜单项。"
+      :code="disabledSnippet">
       <div class="flex gap-4">
         <Dropdown disabled>
           <Button disabled>禁用的下拉菜单</Button>
@@ -332,9 +327,10 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 分割线 -->
-    <DemoBlock title="分割线"
-               description="使用 divided 属性在菜单项之间添加分割线。"
-               :code="dividedSnippet">
+    <DemoBlock
+      title="分割线"
+      description="使用 divided 属性在菜单项之间添加分割线。"
+      :code="dividedSnippet">
       <Dropdown>
         <Button>操作菜单</Button>
         <DropdownMenu>
@@ -347,25 +343,26 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 点击事件 -->
-    <DemoBlock title="点击事件"
-               description="监听菜单项的点击事件（查看控制台）。"
-               :code="clickSnippet">
+    <DemoBlock
+      title="点击事件"
+      description="监听菜单项的点击事件（查看控制台）。"
+      :code="clickSnippet">
       <Dropdown>
         <Button>操作</Button>
         <DropdownMenu>
           <DropdownItem @click="handleCommand('edit')">编辑</DropdownItem>
           <DropdownItem @click="handleCommand('copy')">复制</DropdownItem>
-          <DropdownItem @click="handleCommand('delete')"
-                        divided>删除</DropdownItem>
+          <DropdownItem @click="handleCommand('delete')" divided>删除</DropdownItem>
         </DropdownMenu>
       </Dropdown>
     </DemoBlock>
 
     <!-- 受控模式 -->
-    <DemoBlock title="受控模式"
-               description="通过 v-model:visible 控制下拉菜单的显示隐藏。"
-               :code="controlledSnippet"
-               :script="controlledScriptSnippet">
+    <DemoBlock
+      title="受控模式"
+      description="通过 v-model:visible 控制下拉菜单的显示隐藏。"
+      :code="controlledSnippet"
+      :script="controlledScriptSnippet">
       <div class="flex gap-4 items-center">
         <Dropdown v-model:visible="visible1">
           <Button>受控下拉菜单</Button>
@@ -380,9 +377,10 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 多种按钮 -->
-    <DemoBlock title="多种按钮样式"
-               description="下拉菜单可以搭配不同样式的按钮使用。"
-               :code="variantSnippet">
+    <DemoBlock
+      title="多种按钮样式"
+      description="下拉菜单可以搭配不同样式的按钮使用。"
+      :code="variantSnippet">
       <div class="flex gap-4">
         <Dropdown>
           <Button variant="primary">主要按钮</Button>
@@ -414,9 +412,10 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 无箭头 -->
-    <DemoBlock title="无箭头指示器"
-               description="通过 show-arrow=false 隐藏下拉箭头。"
-               :code="noArrowSnippet">
+    <DemoBlock
+      title="无箭头指示器"
+      description="通过 show-arrow=false 隐藏下拉箭头。"
+      :code="noArrowSnippet">
       <Dropdown :show-arrow="false">
         <Button>无箭头指示器</Button>
         <DropdownMenu>
@@ -428,9 +427,10 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 点击不关闭 -->
-    <DemoBlock title="点击不关闭"
-               description="设置 close-on-click=false，点击菜单项不会自动关闭。"
-               :code="closeOnClickSnippet">
+    <DemoBlock
+      title="点击不关闭"
+      description="设置 close-on-click=false，点击菜单项不会自动关闭。"
+      :code="closeOnClickSnippet">
       <Dropdown :close-on-click="false" trigger="click">
         <Button>点击不关闭</Button>
         <DropdownMenu>
@@ -442,9 +442,10 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 默认展开 -->
-    <DemoBlock title="默认展开"
-               description="通过 default-visible 设置初始展开状态。"
-               :code="defaultVisibleSnippet">
+    <DemoBlock
+      title="默认展开"
+      description="通过 default-visible 设置初始展开状态。"
+      :code="defaultVisibleSnippet">
       <Dropdown :default-visible="true" trigger="click">
         <Button>默认展开</Button>
         <DropdownMenu>

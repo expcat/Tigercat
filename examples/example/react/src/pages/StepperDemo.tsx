@@ -24,7 +24,11 @@ const StepperDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Stepper 步进器</h1>
       <p className="text-gray-500 mb-8">数值增减控制器，支持步长、范围和精度。</p>
 
-      <DemoBlock title="基本用法" description="value + onChange 受控，min/max 范围" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="value + onChange 受控，min/max 范围"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Space direction="vertical" size={12}>
           <Stepper value={val} onChange={setVal} />
           <Stepper value={val} onChange={setVal} min={0} max={10} step={2} />

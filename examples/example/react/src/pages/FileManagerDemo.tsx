@@ -11,13 +11,21 @@ const files = [
 ]
 
 const nestedFiles = [
-  { key: '1', name: 'docs', type: 'folder' as const, children: [
-    { key: '1-1', name: 'guide.md', type: 'file' as const, size: 1500 },
-    { key: '1-2', name: 'api.md', type: 'file' as const, size: 3200 }
-  ]},
-  { key: '2', name: 'src', type: 'folder' as const, children: [
-    { key: '2-1', name: 'index.ts', type: 'file' as const, size: 800 }
-  ]},
+  {
+    key: '1',
+    name: 'docs',
+    type: 'folder' as const,
+    children: [
+      { key: '1-1', name: 'guide.md', type: 'file' as const, size: 1500 },
+      { key: '1-2', name: 'api.md', type: 'file' as const, size: 3200 }
+    ]
+  },
+  {
+    key: '2',
+    name: 'src',
+    type: 'folder' as const,
+    children: [{ key: '2-1', name: 'index.ts', type: 'file' as const, size: 800 }]
+  },
   { key: '3', name: 'README.md', type: 'file' as const, size: 2048 }
 ]
 
@@ -55,7 +63,11 @@ const FileManagerDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="多选 & 面包屑导航" description="multiple 多选" code={multiSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="多选 & 面包屑导航"
+        description="multiple 多选"
+        code={multiSnippet}
+        script={basicScriptSnippet}>
         <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
           <FileManager
             files={nestedFiles}

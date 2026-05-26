@@ -93,79 +93,85 @@ const flatSnippet = `<ScatterChart
   <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">ScatterChart 散点图</h1>
-      <p class="text-gray-600 dark:text-gray-400">用于展示二维数值分布，默认扁平风格，可选渐变填充与入场动画。</p>
+      <p class="text-gray-600 dark:text-gray-400">
+        用于展示二维数值分布，默认扁平风格，可选渐变填充与入场动画。
+      </p>
     </div>
 
-    <DemoBlock title="基础用法"
-               description="默认扁平纯色填充，简洁朴素。"
-               :code="basicSnippet">
-      <ScatterChart :data="basicData"
-                    :width="420"
-                    :height="260"
-                    x-axis-label="X"
-                    y-axis-label="Y" />
+    <DemoBlock title="基础用法" description="默认扁平纯色填充，简洁朴素。" :code="basicSnippet">
+      <ScatterChart
+        :data="basicData"
+        :width="420"
+        :height="260"
+        x-axis-label="X"
+        y-axis-label="Y" />
     </DemoBlock>
 
-    <DemoBlock title="自定义样式"
-               description="通过 datum.size / datum.color 控制每个点的样式。"
-               :code="customSnippet">
-      <ScatterChart :data="customData"
-                    :width="420"
-                    :height="260"
-                    includeZero
-                    grid-line-style="dotted"
-                    hoverable />
+    <DemoBlock
+      title="自定义样式"
+      description="通过 datum.size / datum.color 控制每个点的样式。"
+      :code="customSnippet">
+      <ScatterChart
+        :data="customData"
+        :width="420"
+        :height="260"
+        includeZero
+        grid-line-style="dotted"
+        hoverable />
     </DemoBlock>
 
-    <DemoBlock title="入场动画"
-               description="启用 animated 后数据点依次弹入。"
-               :code="animatedSnippet">
-      <ScatterChart :data="interactiveData"
-                    :width="420"
-                    :height="260"
-                    animated
-                    hoverable />
+    <DemoBlock
+      title="入场动画"
+      description="启用 animated 后数据点依次弹入。"
+      :code="animatedSnippet">
+      <ScatterChart :data="interactiveData" :width="420" :height="260" animated hoverable />
     </DemoBlock>
 
-    <DemoBlock title="悬停 + 选中"
-               description="悬停时数据点放大高亮，支持点击选中。"
-               :code="hoverableSnippet">
+    <DemoBlock
+      title="悬停 + 选中"
+      description="悬停时数据点放大高亮，支持点击选中。"
+      :code="hoverableSnippet">
       <div class="space-y-4">
-        <ScatterChart :data="interactiveData"
-                      :width="420"
-                      :height="260"
-                      hoverable
-                      selectable
-                      v-model:hoveredIndex="hoveredIndex"
-                      v-model:selectedIndex="selectedIndex" />
+        <ScatterChart
+          :data="interactiveData"
+          :width="420"
+          :height="260"
+          hoverable
+          selectable
+          v-model:hoveredIndex="hoveredIndex"
+          v-model:selectedIndex="selectedIndex" />
         <p class="text-sm text-gray-500">
-          悬停: {{ hoveredIndex !== null ? interactiveData[hoveredIndex]?.label : '无' }}
-          · 选中: {{ selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无' }}
+          悬停: {{ hoveredIndex !== null ? interactiveData[hoveredIndex]?.label : '无' }} · 选中:
+          {{ selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无' }}
         </p>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="菱形散点"
-               description="通过 pointStyle 切换形状，diamond / square / triangle 均可用。"
-               :code="diamondSnippet">
-      <ScatterChart :data="interactiveData"
-                    :width="420"
-                    :height="260"
-                    point-style="diamond"
-                    :point-size="8"
-                    hoverable />
+    <DemoBlock
+      title="菱形散点"
+      description="通过 pointStyle 切换形状，diamond / square / triangle 均可用。"
+      :code="diamondSnippet">
+      <ScatterChart
+        :data="interactiveData"
+        :width="420"
+        :height="260"
+        point-style="diamond"
+        :point-size="8"
+        hoverable />
     </DemoBlock>
 
-    <DemoBlock title="渐变风格"
-               description="启用 gradient 与 pointBorderWidth 呈现立体效果。"
-               :code="flatSnippet">
-      <ScatterChart :data="basicData"
-                    :width="420"
-                    :height="260"
-                    gradient
-                    :pointBorderWidth="1.5"
-                    hoverable
-                    show-tooltip />
+    <DemoBlock
+      title="渐变风格"
+      description="启用 gradient 与 pointBorderWidth 呈现立体效果。"
+      :code="flatSnippet">
+      <ScatterChart
+        :data="basicData"
+        :width="420"
+        :height="260"
+        gradient
+        :pointBorderWidth="1.5"
+        hoverable
+        show-tooltip />
     </DemoBlock>
   </div>
 </template>

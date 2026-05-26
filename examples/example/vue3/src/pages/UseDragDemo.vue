@@ -83,16 +83,17 @@ const items = ref<TodoItem[]>([
       </p>
     </div>
 
-    <DemoBlock title="基础列表排序"
-               description="拖动条目即可重新排序，松开时通过 reorder() 计算新顺序。"
-               :code="reorderSnippet"
-               :script="reorderScriptSnippet">
-      <div class="space-y-3"
-           v-bind="drag.getDropZoneAttrs()">
-        <Card v-for="item in items"
-              :key="item.id"
-              v-bind="drag.getDragItemAttrs(item)"
-              class="cursor-move select-none">
+    <DemoBlock
+      title="基础列表排序"
+      description="拖动条目即可重新排序，松开时通过 reorder() 计算新顺序。"
+      :code="reorderSnippet"
+      :script="reorderScriptSnippet">
+      <div class="space-y-3" v-bind="drag.getDropZoneAttrs()">
+        <Card
+          v-for="item in items"
+          :key="item.id"
+          v-bind="drag.getDragItemAttrs(item)"
+          class="cursor-move select-none">
           <div class="flex items-center justify-between">
             <span>{{ item.title }}</span>
             <Tag color="blue">序号 {{ item.index + 1 }}</Tag>

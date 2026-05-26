@@ -46,12 +46,7 @@ export const VirtualList = defineComponent({
     })
 
     const range = computed(() =>
-      strategy.value.getRange(
-        scrollTop.value,
-        props.height,
-        props.itemCount,
-        props.overscan
-      )
+      strategy.value.getRange(scrollTop.value, props.height, props.itemCount, props.overscan)
     )
 
     function handleScroll() {

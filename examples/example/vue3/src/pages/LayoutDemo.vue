@@ -75,9 +75,10 @@ const complexSnippet = `<Layout>
       <p class="text-gray-600 dark:text-gray-400">协助进行页面级整体布局。</p>
     </div>
 
-    <DemoBlock title="Container 容器"
-               description="用于约束内容宽度并提供响应式内边距。"
-               :code="containerSnippet">
+    <DemoBlock
+      title="Container 容器"
+      description="用于约束内容宽度并提供响应式内边距。"
+      :code="containerSnippet">
       <div class="bg-gray-50 rounded-lg py-6">
         <Container maxWidth="lg">
           <div class="bg-white border border-gray-200 rounded-lg p-4">
@@ -90,9 +91,7 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="基础布局"
-               description="典型的页面布局。"
-               :code="basicSnippet">
+    <DemoBlock title="基础布局" description="典型的页面布局。" :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -102,9 +101,10 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="自定义高度"
-               description="自定义 Header 和 Footer 的高度。"
-               :code="heightSnippet">
+    <DemoBlock
+      title="自定义高度"
+      description="自定义 Header 和 Footer 的高度。"
+      :code="heightSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header height="48px" class-name="!bg-blue-600 !text-white !p-4">Header (48px)</Header>
@@ -114,15 +114,12 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="侧边栏布局"
-               description="带有侧边栏的布局。"
-               :code="sidebarSnippet">
+    <DemoBlock title="侧边栏布局" description="带有侧边栏的布局。" :code="sidebarSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
-            <Sidebar width="192px"
-                     class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
+            <Sidebar width="192px" class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
             <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
           </div>
           <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
@@ -130,22 +127,27 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="Sidebar 折叠"
-               description="可折叠的侧边栏，通过 collapsed-width 设置折叠后的宽度（默认 64px）。"
-               :code="collapsedSnippet"
-               :script="collapsedScriptSnippet">
+    <DemoBlock
+      title="Sidebar 折叠"
+      description="可折叠的侧边栏，通过 collapsed-width 设置折叠后的宽度（默认 64px）。"
+      :code="collapsedSnippet"
+      :script="collapsedScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <button class="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
-                @click="collapsed = !collapsed">
+        <button
+          class="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
+          @click="collapsed = !collapsed">
           {{ collapsed ? '展开侧边栏' : '折叠侧边栏' }}
         </button>
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
-            <Sidebar width="192px"
-                     collapsed-width="64px"
-                     :collapsed="collapsed"
-                     class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
+            <Sidebar
+              width="192px"
+              collapsed-width="64px"
+              :collapsed="collapsed"
+              class-name="!bg-gray-200 !p-4"
+              >Sidebar</Sidebar
+            >
             <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
           </div>
           <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
@@ -153,21 +155,24 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="Mini 模式侧边栏"
-               description="collapsed-width 设为更小的值（如 48px）实现 mini 模式，折叠时仅显示图标。"
-               :code="miniSnippet">
+    <DemoBlock
+      title="Mini 模式侧边栏"
+      description="collapsed-width 设为更小的值（如 48px）实现 mini 模式，折叠时仅显示图标。"
+      :code="miniSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <button class="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
-                @click="miniCollapsed = !miniCollapsed">
+        <button
+          class="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
+          @click="miniCollapsed = !miniCollapsed">
           {{ miniCollapsed ? '展开' : '折叠为 Mini' }}
         </button>
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
-            <Sidebar width="192px"
-                     collapsed-width="48px"
-                     :collapsed="miniCollapsed"
-                     class-name="!bg-gray-200 !p-4">
+            <Sidebar
+              width="192px"
+              collapsed-width="48px"
+              :collapsed="miniCollapsed"
+              class-name="!bg-gray-200 !p-4">
               <div v-if="miniCollapsed" class="text-center text-xl">☰</div>
               <div v-else>
                 <div class="font-medium mb-2">导航菜单</div>
@@ -182,15 +187,12 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="复杂布局"
-               description="更复杂的页面布局。"
-               :code="complexSnippet">
+    <DemoBlock title="复杂布局" description="更复杂的页面布局。" :code="complexSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[400px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
-            <Sidebar width="192px"
-                     class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
+            <Sidebar width="192px" class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
             <Layout class-name="min-h-0 flex-1">
               <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
               <Footer class-name="!bg-gray-100 !p-4">Inner Footer</Footer>

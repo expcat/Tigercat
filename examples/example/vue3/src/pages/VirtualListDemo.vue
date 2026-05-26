@@ -4,7 +4,11 @@
     <p class="text-gray-500 mb-8">虚拟滚动渲染大量列表项，只渲染可视区域内的元素。</p>
 
     <DemoBlock title="基础用法" description="10000 条数据，itemHeight=40" :code="basicSnippet">
-      <VirtualList :item-count="10000" :item-height="40" :height="300" style="border: 1px solid #e5e7eb; border-radius: 8px">
+      <VirtualList
+        :item-count="10000"
+        :item-height="40"
+        :height="300"
+        style="border: 1px solid #e5e7eb; border-radius: 8px">
         <template #default="{ index }">
           <div class="px-4 flex items-center h-full" :class="index % 2 === 0 ? 'bg-gray-50' : ''">
             第 {{ index + 1 }} 行
@@ -13,7 +17,10 @@
       </VirtualList>
     </DemoBlock>
 
-    <DemoBlock title="自定义高度 & overscan" description="itemHeight=60，overscan=10" :code="customSnippet">
+    <DemoBlock
+      title="自定义高度 & overscan"
+      description="itemHeight=60，overscan=10"
+      :code="customSnippet">
       <VirtualList :item-count="5000" :item-height="60" :height="360" :overscan="10">
         <template #default="{ index }">
           <div class="px-4 py-2 border-b">

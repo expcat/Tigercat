@@ -33,8 +33,13 @@ const WatermarkDemo: React.FC = () => {
         </Watermark>
       </DemoBlock>
 
-      <DemoBlock title="多行水印" description="content 传数组实现多行，自定义字体" code={multiSnippet}>
-        <Watermark content={['Tigercat', '2024-01-01']} font={{ fontSize: 14, color: 'rgba(0,0,0,0.1)' }}>
+      <DemoBlock
+        title="多行水印"
+        description="content 传数组实现多行，自定义字体"
+        code={multiSnippet}>
+        <Watermark
+          content={['Tigercat', '2024-01-01']}
+          font={{ fontSize: 14, color: 'rgba(0,0,0,0.1)' }}>
           <div style={{ height: 300 }} className="bg-gray-50 rounded-lg p-4">
             <p>多行水印文字，每行独立显示。可自定义字体大小和颜色。</p>
           </div>

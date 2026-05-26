@@ -184,7 +184,12 @@ export const ImageViewer = defineComponent({
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return
       e.preventDefault()
-      panState = startPan(e.clientX, e.clientY, transform.value.translateX, transform.value.translateY)
+      panState = startPan(
+        e.clientX,
+        e.clientY,
+        transform.value.translateX,
+        transform.value.translateY
+      )
     }
 
     const handleMouseMove = (e: MouseEvent) => {

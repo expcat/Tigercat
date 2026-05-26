@@ -139,7 +139,11 @@ const LinkDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 点击事件 */}
-      <DemoBlock title="点击事件" description="通过 onClick 回调处理交互逻辑。" code={eventSnippet} script={eventScriptSnippet}>
+      <DemoBlock
+        title="点击事件"
+        description="通过 onClick 回调处理交互逻辑。"
+        code={eventSnippet}
+        script={eventScriptSnippet}>
         <Link
           href="#"
           onClick={(e) => {

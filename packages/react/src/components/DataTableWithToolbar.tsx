@@ -195,7 +195,10 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     if (!hasSearch && !hasFilters && !hasBulkActions) return null
 
     return (
-      <div className="tiger-data-table-toolbar flex flex-wrap items-center gap-2 pb-3" role="toolbar" aria-label="数据表格工具栏">
+      <div
+        className="tiger-data-table-toolbar flex flex-wrap items-center gap-2 pb-3"
+        role="toolbar"
+        aria-label="数据表格工具栏">
         <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
           {hasSearch ? (
             <div className="flex items-center gap-2 w-full sm:w-auto sm:min-w-[200px] sm:max-w-[320px]">

@@ -178,11 +178,17 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
   <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Input 输入框</h1>
-      <p class="text-gray-600 dark:text-gray-400">通过鼠标或键盘输入内容，是最基础的表单域的包装。</p>
+      <p class="text-gray-600 dark:text-gray-400">
+        通过鼠标或键盘输入内容，是最基础的表单域的包装。
+      </p>
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="基础的输入框组件。" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="基础的输入框组件。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Input v-model="basicText" placeholder="请输入内容" />
         <p class="text-sm text-gray-600">输入的内容：{{ basicText }}</p>
@@ -190,7 +196,10 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
     </DemoBlock>
 
     <!-- 受控与非受控 -->
-    <DemoBlock title="受控与非受控" description="受控模式绑定值（v-model）；非受控模式不绑定值，仅监听 input 事件。" :code="controlledSnippet">
+    <DemoBlock
+      title="受控与非受控"
+      description="受控模式绑定值（v-model）；非受控模式不绑定值，仅监听 input 事件。"
+      :code="controlledSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="受控输入">
           <Input v-model="controlledText" placeholder="受控输入" />
@@ -203,7 +212,10 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
     </DemoBlock>
 
     <!-- 不同类型 -->
-    <DemoBlock title="不同类型" description="Input 支持多种类型，如文本、密码、数字等。" :code="typeSnippet">
+    <DemoBlock
+      title="不同类型"
+      description="Input 支持多种类型，如文本、密码、数字等。"
+      :code="typeSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="文本输入">
           <Input v-model="typeText" type="text" placeholder="文本输入" />
@@ -239,7 +251,10 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
     </DemoBlock>
 
     <!-- 禁用和只读 -->
-    <DemoBlock title="禁用和只读" description="输入框可以设置为禁用或只读状态。" :code="disabledSnippet">
+    <DemoBlock
+      title="禁用和只读"
+      description="输入框可以设置为禁用或只读状态。"
+      :code="disabledSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Input v-model="disabled" disabled />
         <Input v-model="readonly" readonly />
@@ -247,20 +262,30 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
     </DemoBlock>
 
     <!-- 必填与长度限制 -->
-    <DemoBlock title="必填与长度限制" description="使用 required / minLength / maxLength 约束输入。" :code="limitSnippet">
+    <DemoBlock
+      title="必填与长度限制"
+      description="使用 required / minLength / maxLength 约束输入。"
+      :code="limitSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="必填输入">
           <Input required placeholder="必填项" />
         </FormItem>
         <FormItem label="长度限制（3~10）">
-          <Input v-model="limited" :minLength="3" :maxLength="10" placeholder="请输入 3~10 个字符" />
+          <Input
+            v-model="limited"
+            :minLength="3"
+            :maxLength="10"
+            placeholder="请输入 3~10 个字符" />
           <p class="text-sm text-gray-600">当前长度：{{ limited.length }}</p>
         </FormItem>
       </Space>
     </DemoBlock>
 
     <!-- 前缀与后缀 -->
-    <DemoBlock title="前缀与后缀" description="可以在输入框前后添加图标或文本。" :code="affixSnippet">
+    <DemoBlock
+      title="前缀与后缀"
+      description="可以在输入框前后添加图标或文本。"
+      :code="affixSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Input placeholder="前缀图标">
           <template #prefix>👤</template>
@@ -273,7 +298,10 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
     </DemoBlock>
 
     <!-- 状态与错误提示 -->
-    <DemoBlock title="状态与错误提示" description="支持 error、warning、success 状态，error 状态下可显示内部错误信息。" :code="statusSnippet">
+    <DemoBlock
+      title="状态与错误提示"
+      description="支持 error、warning、success 状态，error 状态下可显示内部错误信息。"
+      :code="statusSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Input status="error" placeholder="错误状态" />
         <Input status="warning" placeholder="警告状态" />
@@ -283,9 +311,15 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
     </DemoBlock>
 
     <!-- 错误抖动 -->
-    <DemoBlock title="错误抖动" description="当状态变为 error 时会自动触发抖动动画。" :code="shakeSnippet">
+    <DemoBlock
+      title="错误抖动"
+      description="当状态变为 error 时会自动触发抖动动画。"
+      :code="shakeSnippet">
       <Space direction="vertical" class="w-full max-w-md">
-        <Input :status="shakeStatus" :errorMessage="shakeError" placeholder="点击按钮触发错误抖动" />
+        <Input
+          :status="shakeStatus"
+          :errorMessage="shakeError"
+          placeholder="点击按钮触发错误抖动" />
         <Space>
           <Button @click="triggerShake" variant="primary">触发错误</Button>
           <Button @click="resetShake">重置</Button>
@@ -294,7 +328,10 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
     </DemoBlock>
 
     <!-- 数字输入框 InputNumber -->
-    <DemoBlock title="数字输入框 InputNumber" description="专用的数字输入组件，支持范围限制、精度、多种尺寸和状态。" :code="inputNumberSnippet">
+    <DemoBlock
+      title="数字输入框 InputNumber"
+      description="专用的数字输入组件，支持范围限制、精度、多种尺寸和状态。"
+      :code="inputNumberSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="基础">
           <InputNumber v-model="numValue" />
@@ -323,7 +360,10 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
     </DemoBlock>
 
     <!-- 步进按钮与格式化 -->
-    <DemoBlock title="步进按钮与格式化" description="InputNumber 支持不同按钮布局和自定义格式化。" :code="inputNumberControlsSnippet">
+    <DemoBlock
+      title="步进按钮与格式化"
+      description="InputNumber 支持不同按钮布局和自定义格式化。"
+      :code="inputNumberControlsSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="右侧按钮（默认）">
           <InputNumber v-model="numValue" />

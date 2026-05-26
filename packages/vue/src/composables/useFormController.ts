@@ -37,12 +37,7 @@ import {
  * ```
  */
 export function useFormController(options: FormControllerOptions = {}): FormController {
-  const {
-    initialValues = {},
-    rules,
-    undoable = false,
-    maxHistorySize = 50
-  } = options
+  const { initialValues = {}, rules, undoable = false, maxHistorySize = 50 } = options
 
   const values = reactive<FormValues>({ ...initialValues })
   const errors = ref<FormError[]>([])
@@ -91,15 +86,17 @@ export function useFormController(options: FormControllerOptions = {}): FormCont
     for (const name of fieldNames) {
       const fieldRules = r[name]
       if (!fieldRules) continue
-      const error = await validateFieldUtil(name, getValueByPath(snapshot, name), fieldRules, snapshot)
+      const error = await validateFieldUtil(
+        name,
+        getValueByPath(snapshot, name),
+        fieldRules,
+        snapshot
+      )
       if (error) nextErrors.push({ field: name, message: error })
     }
 
     const fieldSet = new Set(fieldNames)
-    errors.value = [
-      ...errors.value.filter((e) => !fieldSet.has(e.field)),
-      ...nextErrors
-    ]
+    errors.value = [...errors.value.filter((e) => !fieldSet.has(e.field)), ...nextErrors]
     return nextErrors.length === 0
   }
 
@@ -159,10 +156,18 @@ export function useFormController(options: FormControllerOptions = {}): FormCont
   }
 
   return {
-    get values() { return values },
-    get errors() { return errors.value },
-    get errorsByField() { return errorsByField.value },
-    get hasErrors() { return hasErrors.value },
+    get values() {
+      return values
+    },
+    get errors() {
+      return errors.value
+    },
+    get errorsByField() {
+      return errorsByField.value
+    },
+    get hasErrors() {
+      return hasErrors.value
+    },
     setFieldValue,
     setValues,
     getFieldValue,
@@ -173,7 +178,11 @@ export function useFormController(options: FormControllerOptions = {}): FormCont
     reset,
     undo,
     redo,
-    get canUndo() { return undoable && history != null && canUndoFn(history) },
-    get canRedo() { return undoable && history != null && canRedoFn(history) }
+    get canUndo() {
+      return undoable && history != null && canUndoFn(history)
+    },
+    get canRedo() {
+      return undoable && history != null && canRedoFn(history)
+    }
   }
 }

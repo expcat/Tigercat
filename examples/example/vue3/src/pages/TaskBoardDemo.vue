@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { TaskBoard } from '@expcat/tigercat-vue'
-import type { TaskBoardColumn, TaskBoardCardMoveEvent, TaskBoardColumnMoveEvent } from '@expcat/tigercat-core'
+import type {
+  TaskBoardColumn,
+  TaskBoardCardMoveEvent,
+  TaskBoardColumnMoveEvent
+} from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const columns = ref<TaskBoardColumn[]>([
@@ -26,9 +30,7 @@ const columns = ref<TaskBoardColumn[]>([
   {
     id: 'done',
     title: '已完成',
-    cards: [
-      { id: 6, title: '项目初始化', description: '搭建 monorepo 框架' }
-    ]
+    cards: [{ id: 6, title: '项目初始化', description: '搭建 monorepo 框架' }]
   }
 ])
 
@@ -56,8 +58,20 @@ const slotColumns = ref<TaskBoardColumn[]>([
     id: 'backlog',
     title: 'Backlog',
     cards: [
-      { id: 's1', title: 'Design System', description: '建立设计规范', tag: '设计', priority: 'high' },
-      { id: 's2', title: 'API 对接', description: '完成后端 API 集成', tag: '开发', priority: 'medium' }
+      {
+        id: 's1',
+        title: 'Design System',
+        description: '建立设计规范',
+        tag: '设计',
+        priority: 'high'
+      },
+      {
+        id: 's2',
+        title: 'API 对接',
+        description: '完成后端 API 集成',
+        tag: '开发',
+        priority: 'medium'
+      }
     ]
   },
   {

@@ -207,9 +207,7 @@ export const FileManager = defineComponent({
               ]
             : []
 
-        const dragItem = props.draggable && !item.disabled
-          ? toFileDragItem(item, index)
-          : undefined
+        const dragItem = props.draggable && !item.disabled ? toFileDragItem(item, index) : undefined
 
         return h(
           'div',

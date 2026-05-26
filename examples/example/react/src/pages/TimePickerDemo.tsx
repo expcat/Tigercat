@@ -121,7 +121,11 @@ const TimePickerDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的时间选择器组件。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基础用法"
+        description="基础的时间选择器组件。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <div className="max-w-md space-y-4">
           <TimePicker
             className={PICKER_WIDTH}

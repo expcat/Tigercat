@@ -33,10 +33,7 @@ const flattenCache = new WeakMap<readonly TreeMapChartDatum[], FlatItem[]>()
  * Flatten hierarchical data to a single level (sum children values).
  * Results are cached per data array reference.
  */
-function flattenData(
-  data: readonly TreeMapChartDatum[],
-  depth: number = 0
-): FlatItem[] {
+function flattenData(data: readonly TreeMapChartDatum[], depth: number = 0): FlatItem[] {
   if (depth === 0) {
     const cached = flattenCache.get(data)
     if (cached) return cached

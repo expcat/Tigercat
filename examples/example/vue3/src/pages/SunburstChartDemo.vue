@@ -7,8 +7,18 @@
       <SunburstChart :data="sunburstData" :width="360" :height="360" hoverable show-legend />
     </DemoBlock>
 
-    <DemoBlock title="内径 & 标签" description="innerRadiusRatio 创建甜甜圈效果" :code="donutSnippet">
-      <SunburstChart :data="sunburstData" :width="360" :height="360" :inner-radius-ratio="0.3" show-labels hoverable selectable />
+    <DemoBlock
+      title="内径 & 标签"
+      description="innerRadiusRatio 创建甜甜圈效果"
+      :code="donutSnippet">
+      <SunburstChart
+        :data="sunburstData"
+        :width="360"
+        :height="360"
+        :inner-radius-ratio="0.3"
+        show-labels
+        hoverable
+        selectable />
     </DemoBlock>
 
     <DemoBlock title="自定义颜色" :code="colorSnippet">

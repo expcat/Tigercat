@@ -25,8 +25,6 @@ onMounted(() => {
     <span class="text-sm font-medium text-gray-700 whitespace-nowrap shrink-0 dark:text-gray-200">
       {{ lang === 'zh-CN' ? '暗色：' : 'Dark:' }}
     </span>
-    <Switch :checked="enabled"
-            size="sm"
-            @update:checked="handleChange" />
+    <Switch :checked="enabled" size="sm" @update:checked="handleChange" />
   </div>
 </template>

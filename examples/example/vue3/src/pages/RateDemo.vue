@@ -36,7 +36,11 @@ const customSnippet = `<Space direction="vertical" :size="12">
     <h1 class="text-3xl font-bold mb-2">Rate 评分</h1>
     <p class="text-gray-500 mb-8">评分组件，支持半星、自定义字符和禁用状态。</p>
 
-    <DemoBlock title="基本与半星" description="v-model 双向绑定，allow-half 半星" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基本与半星"
+      description="v-model 双向绑定，allow-half 半星"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Space direction="vertical" :size="16">
         <Rate v-model="val1" />
         <Rate v-model="val2" allow-half />
@@ -52,7 +56,10 @@ const customSnippet = `<Space direction="vertical" :size="12">
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="自定义字符与数量" description="character 自定义图标，count 控制星星数" :code="customSnippet">
+    <DemoBlock
+      title="自定义字符与数量"
+      description="character 自定义图标，count 控制星星数"
+      :code="customSnippet">
       <Space direction="vertical" :size="12">
         <Rate v-model="val3" character="♥" />
         <Rate :model-value="4" :count="10" disabled />

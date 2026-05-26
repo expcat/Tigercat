@@ -131,170 +131,153 @@ const fullSnippet = `<Pagination
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock title="基本用法"
-               description="最简单的分页组件。"
-               :code="basicSnippet"
-               :script="basicScriptSnippet">
-      <Pagination v-model:current="current1"
-                  :total="100"
-                  :pageSize="10" />
+    <DemoBlock
+      title="基本用法"
+      description="最简单的分页组件。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
+      <Pagination v-model:current="current1" :total="100" :pageSize="10" />
     </DemoBlock>
 
     <!-- 快速跳页 -->
-    <DemoBlock title="快速跳页"
-               description="显示快速跳页输入框，方便快速跳转到指定页。"
-               :code="quickSnippet">
-      <Pagination v-model:current="current2"
-                  :total="500"
-                  :pageSize="10"
-                  showQuickJumper />
+    <DemoBlock
+      title="快速跳页"
+      description="显示快速跳页输入框，方便快速跳转到指定页。"
+      :code="quickSnippet">
+      <Pagination v-model:current="current2" :total="500" :pageSize="10" showQuickJumper />
     </DemoBlock>
 
     <!-- 改变每页条数 -->
-    <DemoBlock title="改变每页条数"
-               description="可以改变每页显示的条数。"
-               :code="sizeChangeSnippet">
-      <Pagination v-model:current="current3"
-                  v-model:pageSize="pageSize"
-                  :total="500"
-                  :pageSizeOptions="[10, 20, 50, 100]"
-                  showSizeChanger
-                  @page-size-change="handlePageSizeChange" />
+    <DemoBlock
+      title="改变每页条数"
+      description="可以改变每页显示的条数。"
+      :code="sizeChangeSnippet">
+      <Pagination
+        v-model:current="current3"
+        v-model:pageSize="pageSize"
+        :total="500"
+        :pageSizeOptions="[10, 20, 50, 100]"
+        showSizeChanger
+        @page-size-change="handlePageSizeChange" />
     </DemoBlock>
 
     <!-- 简单模式 -->
-    <DemoBlock title="简单模式"
-               description="只显示上一页、下一页和当前页/总页数。"
-               :code="simpleSnippet">
-      <Pagination v-model:current="current4"
-                  :total="500"
-                  simple />
+    <DemoBlock
+      title="简单模式"
+      description="只显示上一页、下一页和当前页/总页数。"
+      :code="simpleSnippet">
+      <Pagination v-model:current="current4" :total="500" simple />
     </DemoBlock>
 
     <!-- 不同尺寸 -->
-    <DemoBlock title="不同尺寸"
-               description="提供三种尺寸：小、中、大。"
-               :code="sizeSnippet">
+    <DemoBlock title="不同尺寸" description="提供三种尺寸：小、中、大。" :code="sizeSnippet">
       <div class="space-y-4">
         <div>
           <p class="text-sm text-gray-500 mb-2">小尺寸</p>
-          <Pagination v-model:current="current5"
-                      :total="100"
-                      size="small" />
+          <Pagination v-model:current="current5" :total="100" size="small" />
         </div>
         <div>
           <p class="text-sm text-gray-500 mb-2">中等尺寸（默认）</p>
-          <Pagination v-model:current="current5"
-                      :total="100"
-                      size="medium" />
+          <Pagination v-model:current="current5" :total="100" size="medium" />
         </div>
         <div>
           <p class="text-sm text-gray-500 mb-2">大尺寸</p>
-          <Pagination v-model:current="current5"
-                      :total="100"
-                      size="large" />
+          <Pagination v-model:current="current5" :total="100" size="large" />
         </div>
       </div>
     </DemoBlock>
 
     <!-- 自定义对齐方式 -->
-    <DemoBlock title="自定义对齐方式"
-               description="可以设置分页组件的对齐方式。"
-               :code="alignSnippet">
+    <DemoBlock
+      title="自定义对齐方式"
+      description="可以设置分页组件的对齐方式。"
+      :code="alignSnippet">
       <div class="space-y-4">
         <div>
           <p class="text-sm text-gray-500 mb-2">左对齐</p>
-          <Pagination v-model:current="current6"
-                      :total="100"
-                      align="left" />
+          <Pagination v-model:current="current6" :total="100" align="left" />
         </div>
         <div>
           <p class="text-sm text-gray-500 mb-2">居中对齐（默认）</p>
-          <Pagination v-model:current="current6"
-                      :total="100"
-                      align="center" />
+          <Pagination v-model:current="current6" :total="100" align="center" />
         </div>
         <div>
           <p class="text-sm text-gray-500 mb-2">右对齐</p>
-          <Pagination v-model:current="current6"
-                      :total="100"
-                      align="right" />
+          <Pagination v-model:current="current6" :total="100" align="right" />
         </div>
       </div>
     </DemoBlock>
 
     <!-- 自定义总数文本 -->
-    <DemoBlock title="自定义总数文本"
-               description="可以自定义显示总条数的文本。"
-               :code="totalTextSnippet">
-      <Pagination v-model:current="current7"
-                  :total="100"
-                  :totalText="customTotalText" />
+    <DemoBlock
+      title="自定义总数文本"
+      description="可以自定义显示总条数的文本。"
+      :code="totalTextSnippet">
+      <Pagination v-model:current="current7" :total="100" :totalText="customTotalText" />
     </DemoBlock>
 
     <!-- 禁用状态 -->
-    <DemoBlock title="禁用状态"
-               description="禁用分页组件的所有交互。"
-               :code="disabledSnippet">
-      <Pagination v-model:current="current8"
-                  :total="100"
-                  disabled />
+    <DemoBlock title="禁用状态" description="禁用分页组件的所有交互。" :code="disabledSnippet">
+      <Pagination v-model:current="current8" :total="100" disabled />
     </DemoBlock>
 
     <!-- 单页隐藏 -->
-    <DemoBlock title="单页隐藏"
-               description="当只有一页时自动隐藏分页组件。"
-               :code="hideOnSinglePageSnippet">
+    <DemoBlock
+      title="单页隐藏"
+      description="当只有一页时自动隐藏分页组件。"
+      :code="hideOnSinglePageSnippet">
       <div class="space-y-2">
         <p class="text-sm text-gray-500">下方分页组件因为只有 1 页而被隐藏：</p>
-        <Pagination v-model:current="current10"
-                    :total="5"
-                    :pageSize="10"
-                    hideOnSinglePage />
-        <p class="text-sm text-gray-400 italic">（如果看不到分页组件，说明 hideOnSinglePage 生效了）</p>
+        <Pagination v-model:current="current10" :total="5" :pageSize="10" hideOnSinglePage />
+        <p class="text-sm text-gray-400 italic">
+          （如果看不到分页组件，说明 hideOnSinglePage 生效了）
+        </p>
       </div>
     </DemoBlock>
 
     <!-- 紧凑页码 -->
-    <DemoBlock title="紧凑页码 (showLessItems)"
-               description="显示更少的页码按钮，适合空间有限的场景。"
-               :code="showLessItemsSnippet">
-      <Pagination v-model:current="current11"
-                  :total="500"
-                  showLessItems />
+    <DemoBlock
+      title="紧凑页码 (showLessItems)"
+      description="显示更少的页码按钮，适合空间有限的场景。"
+      :code="showLessItemsSnippet">
+      <Pagination v-model:current="current11" :total="500" showLessItems />
     </DemoBlock>
 
     <!-- 国际化 -->
-    <DemoBlock title="国际化 (i18n)"
-               description="通过 locale 属性自定义国际化文本。切换顶部的语言开关可查看效果。"
-               :code="i18nSnippet">
+    <DemoBlock
+      title="国际化 (i18n)"
+      description="通过 locale 属性自定义国际化文本。切换顶部的语言开关可查看效果。"
+      :code="i18nSnippet">
       <div class="space-y-2">
         <p class="text-sm text-gray-500">
           当前语言：{{ demoLang === 'zh-CN' ? '中文' : 'English' }}
         </p>
-        <Pagination v-model:current="current9"
-                    :total="500"
-                    :locale="{ pagination: customLabels }"
-                    showQuickJumper
-                    showSizeChanger />
+        <Pagination
+          v-model:current="current9"
+          :total="500"
+          :locale="{ pagination: customLabels }"
+          showQuickJumper
+          showSizeChanger />
       </div>
     </DemoBlock>
 
     <!-- 完整示例 -->
-    <DemoBlock title="完整示例"
-               description="包含所有功能的完整示例（查看控制台）。"
-               :code="fullSnippet">
-      <Pagination v-model:current="current3"
-                  v-model:pageSize="pageSize"
-                  :total="500"
-                  :pageSizeOptions="[10, 20, 50, 100]"
-                  showQuickJumper
-                  showSizeChanger
-                  :totalText="customTotalText"
-                  size="medium"
-                  align="center"
-                  @change="handleChange"
-                  @page-size-change="handlePageSizeChange" />
+    <DemoBlock
+      title="完整示例"
+      description="包含所有功能的完整示例（查看控制台）。"
+      :code="fullSnippet">
+      <Pagination
+        v-model:current="current3"
+        v-model:pageSize="pageSize"
+        :total="500"
+        :pageSizeOptions="[10, 20, 50, 100]"
+        showQuickJumper
+        showSizeChanger
+        :totalText="customTotalText"
+        size="medium"
+        align="center"
+        @change="handleChange"
+        @page-size-change="handlePageSizeChange" />
     </DemoBlock>
   </div>
 </template>

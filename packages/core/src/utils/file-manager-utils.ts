@@ -232,10 +232,7 @@ export interface FileOpenResult {
  * Determine the action when a file item is activated (double-click / Enter).
  * Returns `null` if the item is disabled.
  */
-export function resolveFileOpen(
-  item: FileItem,
-  currentPath: string[]
-): FileOpenResult | null {
+export function resolveFileOpen(item: FileItem, currentPath: string[]): FileOpenResult | null {
   if (item.disabled) return null
   if (item.type === 'folder') {
     return { type: 'navigate', path: [...currentPath, item.name] }
@@ -246,10 +243,7 @@ export function resolveFileOpen(
 /**
  * Compute breadcrumb path after clicking an ancestor segment.
  */
-export function sliceBreadcrumbPath(
-  currentPath: string[],
-  index: number
-): string[] {
+export function sliceBreadcrumbPath(currentPath: string[], index: number): string[] {
   return currentPath.slice(0, index)
 }
 
@@ -258,11 +252,7 @@ export function sliceBreadcrumbPath(
 /**
  * Convert a FileItem to the generic DragItem interface used by drag utils.
  */
-export function toFileDragItem(
-  item: FileItem,
-  index: number,
-  containerId?: string
-): DragItem {
+export function toFileDragItem(item: FileItem, index: number, containerId?: string): DragItem {
   return {
     id: item.key,
     index,
@@ -275,10 +265,7 @@ export function toFileDragItem(
  * Apply a drag-drop reorder to a flat list of file items.
  * Returns the new array with the moved item in its new position.
  */
-export function applyFileDragReorder(
-  items: FileItem[],
-  event: DragDropEvent
-): FileItem[] {
+export function applyFileDragReorder(items: FileItem[], event: DragDropEvent): FileItem[] {
   const { fromIndex, toIndex } = event
   if (fromIndex === toIndex) return items
   const result = [...items]

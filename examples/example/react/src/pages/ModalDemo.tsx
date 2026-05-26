@@ -131,7 +131,9 @@ export default function ModalDemo() {
     <div className="max-w-5xl mx-auto p-6 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Modal 对话框</h1>
-        <p className="text-gray-600 dark:text-gray-400">用于显示重要信息或需要用户交互的浮层对话框。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          用于显示重要信息或需要用户交互的浮层对话框。
+        </p>
       </div>
 
       <DemoBlock
@@ -277,10 +279,7 @@ export default function ModalDemo() {
         code={nestedSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleNested(true)}>打开嵌套对话框</Button>
-          <Modal
-            open={visibleNested}
-            title="第一层对话框"
-            onCancel={() => setVisibleNested(false)}>
+          <Modal open={visibleNested} title="第一层对话框" onCancel={() => setVisibleNested(false)}>
             <p>这是第一层对话框的内容。</p>
             <Button onClick={() => setVisibleNested2(true)} className="mt-4">
               打开第二层对话框
@@ -373,7 +372,9 @@ export default function ModalDemo() {
             <h3 className="text-lg font-semibold mb-3">确认对话框</h3>
             <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-gray-700 dark:text-gray-300">用于需要用户确认的操作（示例：删除）。</p>
+                <p className="text-gray-700 dark:text-gray-300">
+                  用于需要用户确认的操作（示例：删除）。
+                </p>
                 <Button variant="outline" onClick={() => setVisibleConfirm(true)}>
                   删除确认
                 </Button>
@@ -416,7 +417,9 @@ export default function ModalDemo() {
             <h3 className="text-lg font-semibold mb-3">信息展示</h3>
             <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-gray-700 dark:text-gray-300">用于展示较长内容（用户协议/隐私政策等）。</p>
+                <p className="text-gray-700 dark:text-gray-300">
+                  用于展示较长内容（用户协议/隐私政策等）。
+                </p>
                 <Button onClick={() => setVisibleInfo(true)}>查看详情</Button>
               </div>
 
@@ -435,7 +438,9 @@ export default function ModalDemo() {
             <h3 className="text-lg font-semibold mb-3">表单输入</h3>
             <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-gray-700 dark:text-gray-300">在对话框中嵌入表单，用于数据收集和编辑。</p>
+                <p className="text-gray-700 dark:text-gray-300">
+                  在对话框中嵌入表单，用于数据收集和编辑。
+                </p>
                 <Button onClick={() => setVisibleForm(true)}>编辑资料</Button>
               </div>
 

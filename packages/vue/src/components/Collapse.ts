@@ -1,12 +1,4 @@
-import {
-  defineComponent,
-  computed,
-  ref,
-  provide,
-  PropType,
-  h,
-  reactive
-} from 'vue'
+import { defineComponent, computed, ref, provide, PropType, h, reactive } from 'vue'
 import {
   classNames,
   getCollapseContainerClasses,
@@ -107,9 +99,7 @@ export const Collapse = defineComponent({
   emits: ['update:activeKey', 'change'],
   setup(props, { slots, emit, attrs }) {
     // Internal state for uncontrolled mode
-    const internalActiveKeys = ref<(string | number)[]>(
-      normalizeActiveKeys(props.defaultActiveKey)
-    )
+    const internalActiveKeys = ref<(string | number)[]>(normalizeActiveKeys(props.defaultActiveKey))
 
     // Computed active keys (controlled or uncontrolled)
     const currentActiveKeys = computed(() => {
@@ -149,11 +139,21 @@ export const Collapse = defineComponent({
 
     // Provide collapse context to child components (reactive getters auto-track dependencies)
     const collapseContextValue = reactive<CollapseContext>({
-      get activeKeys() { return currentActiveKeys.value },
-      get accordion() { return props.accordion },
-      get expandIconPosition() { return props.expandIconPosition },
-      get bordered() { return props.bordered },
-      get ghost() { return props.ghost },
+      get activeKeys() {
+        return currentActiveKeys.value
+      },
+      get accordion() {
+        return props.accordion
+      },
+      get expandIconPosition() {
+        return props.expandIconPosition
+      },
+      get bordered() {
+        return props.bordered
+      },
+      get ghost() {
+        return props.ghost
+      },
       handlePanelClick
     })
 

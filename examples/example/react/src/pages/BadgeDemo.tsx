@@ -336,7 +336,11 @@ export default function BadgeDemo() {
       </DemoBlock>
 
       {/* 实际应用示例 */}
-      <DemoBlock title="实际应用示例" description="模拟真实的使用场景。" code={usageSnippet} script={usageScriptSnippet}>
+      <DemoBlock
+        title="实际应用示例"
+        description="模拟真实的使用场景。"
+        code={usageSnippet}
+        script={usageScriptSnippet}>
         <div>
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3">通知中心</h3>

@@ -7,11 +7,23 @@
       <FunnelChart :data="funnelData" :width="400" :height="280" hoverable show-legend />
     </DemoBlock>
 
-    <DemoBlock title="水平方向 & 收尖" description="direction='horizontal'，pinch 收尖末端" :code="horizontalSnippet">
-      <FunnelChart :data="funnelData" :width="500" :height="200" direction="horizontal" pinch hoverable />
+    <DemoBlock
+      title="水平方向 & 收尖"
+      description="direction='horizontal'，pinch 收尖末端"
+      :code="horizontalSnippet">
+      <FunnelChart
+        :data="funnelData"
+        :width="500"
+        :height="200"
+        direction="horizontal"
+        pinch
+        hoverable />
     </DemoBlock>
 
-    <DemoBlock title="自定义颜色 & 间距" description="colors 调色板，gap 段间距" :code="customSnippet">
+    <DemoBlock
+      title="自定义颜色 & 间距"
+      description="colors 调色板，gap 段间距"
+      :code="customSnippet">
       <FunnelChart
         :data="funnelData"
         :width="400"

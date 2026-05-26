@@ -92,7 +92,11 @@ const TextareaDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的文本域组件。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基础用法"
+        description="基础的文本域组件。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Textarea
             value={text}

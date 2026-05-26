@@ -33,7 +33,10 @@ const idCardSnippet = `const idCard = ref('')
     <h1 class="text-3xl font-bold mb-2">NumberKeyboard 数字键盘</h1>
     <p class="text-gray-500 mb-8">移动端数字键盘，支持金额、手机号和身份证输入模式。</p>
 
-    <DemoBlock title="金额输入" description="amount 模式支持小数点和默认两位小数" :code="amountSnippet">
+    <DemoBlock
+      title="金额输入"
+      description="amount 模式支持小数点和默认两位小数"
+      :code="amountSnippet">
       <div class="max-w-sm space-y-3">
         <Input v-model="amount" readonly prefix="¥" placeholder="输入金额" />
         <NumberKeyboard

@@ -201,7 +201,9 @@ export const TaskBoard = defineComponent({
 
     const dragCtrl = createTaskBoardDragController(
       {
-        onStateChange: (s) => { dragSnap.value = s },
+        onStateChange: (s) => {
+          dragSnap.value = s
+        },
         applyCardMove,
         applyColumnMove,
         getBoardEl: () => boardRef.value,
@@ -213,7 +215,8 @@ export const TaskBoard = defineComponent({
     // Keep controller options in sync with props
     watch(
       () => [props.draggable, props.columnDraggable],
-      () => dragCtrl.setOptions({ draggable: props.draggable, columnDraggable: props.columnDraggable })
+      () =>
+        dragCtrl.setOptions({ draggable: props.draggable, columnDraggable: props.columnDraggable })
     )
 
     // ----- lifecycle -----
@@ -257,12 +260,17 @@ export const TaskBoard = defineComponent({
         'aria-grabbed': isKbGrabbed ? 'true' : undefined,
         'data-tiger-taskboard-card': '',
         'data-tiger-taskboard-card-id': String(card.id),
-        onDragstart: (e: DragEvent) => { if (e.dataTransfer) dragCtrl.cardDragStart(e.dataTransfer, card, column) },
+        onDragstart: (e: DragEvent) => {
+          if (e.dataTransfer) dragCtrl.cardDragStart(e.dataTransfer, card, column)
+        },
         onDragend: () => dragCtrl.dragEnd(),
-        onTouchstart: (e: TouchEvent) => dragCtrl.cardTouchStart(e, e.currentTarget as HTMLElement, card, column),
+        onTouchstart: (e: TouchEvent) =>
+          dragCtrl.cardTouchStart(e, e.currentTarget as HTMLElement, card, column),
         onTouchmove: (e: TouchEvent) => dragCtrl.cardTouchMove(e),
         onTouchend: () => dragCtrl.cardTouchEnd(),
-        onKeydown: (e: KeyboardEvent) => { if (dragCtrl.cardKeyDown(e.key, card, column)) e.preventDefault() }
+        onKeydown: (e: KeyboardEvent) => {
+          if (dragCtrl.cardKeyDown(e.key, card, column)) e.preventDefault()
+        }
       }
 
       if (slots.card) {
@@ -284,7 +292,8 @@ export const TaskBoard = defineComponent({
     const renderColumnNode = (column: TaskBoardColumn, colIndex: number) => {
       const isDropTarget =
         dragSnap.value.drag?.type === 'card' && dragSnap.value.dropTargetColumnId === column.id
-      const isColDragging = dragSnap.value.drag?.type === 'column' && dragSnap.value.drag.id === column.id
+      const isColDragging =
+        dragSnap.value.drag?.type === 'column' && dragSnap.value.drag.id === column.id
       const wipOver = isWipExceeded(column)
       const cardCount = props.showCardCount ? getColumnCardCount(column) : null
 
@@ -330,9 +339,7 @@ export const TaskBoard = defineComponent({
                       wipOver && taskBoardWipExceededClasses
                     )
                   },
-                  cardCount.limit
-                    ? `${cardCount.count}/${cardCount.limit}`
-                    : `${cardCount.count}`
+                  cardCount.limit ? `${cardCount.count}/${cardCount.limit}` : `${cardCount.count}`
                 )
               : null,
             column.description
@@ -352,9 +359,12 @@ export const TaskBoard = defineComponent({
         {
           class: taskBoardColumnHeaderClasses,
           draggable: props.columnDraggable,
-          onDragstart: (e: DragEvent) => { if (e.dataTransfer) dragCtrl.columnDragStart(e.dataTransfer, column, colIndex) },
+          onDragstart: (e: DragEvent) => {
+            if (e.dataTransfer) dragCtrl.columnDragStart(e.dataTransfer, column, colIndex)
+          },
           onDragend: () => dragCtrl.dragEnd(),
-          onTouchstart: (e: TouchEvent) => dragCtrl.columnTouchStart(e, e.currentTarget as HTMLElement, column, colIndex),
+          onTouchstart: (e: TouchEvent) =>
+            dragCtrl.columnTouchStart(e, e.currentTarget as HTMLElement, column, colIndex),
           onTouchmove: (e: TouchEvent) => dragCtrl.columnTouchMove(e),
           onTouchend: () => dragCtrl.columnTouchEnd(),
           style: props.columnDraggable ? 'cursor: grab' : undefined
@@ -397,9 +407,16 @@ export const TaskBoard = defineComponent({
           class: taskBoardColumnBodyClasses,
           role: 'list',
           'aria-label': column.title,
-          onDragover: (e: DragEvent) => { e.preventDefault(); dragCtrl.cardDragOver(e.clientY, e.currentTarget as HTMLElement, column) },
-          onDrop: (e: DragEvent) => { e.preventDefault(); if (e.dataTransfer) dragCtrl.cardDrop(e.dataTransfer, column) },
-          onDragleave: (e: DragEvent) => dragCtrl.dragLeave(e.currentTarget as HTMLElement, e.relatedTarget as Element | null)
+          onDragover: (e: DragEvent) => {
+            e.preventDefault()
+            dragCtrl.cardDragOver(e.clientY, e.currentTarget as HTMLElement, column)
+          },
+          onDrop: (e: DragEvent) => {
+            e.preventDefault()
+            if (e.dataTransfer) dragCtrl.cardDrop(e.dataTransfer, column)
+          },
+          onDragleave: (e: DragEvent) =>
+            dragCtrl.dragLeave(e.currentTarget as HTMLElement, e.relatedTarget as Element | null)
         },
         cards
       )
@@ -439,8 +456,20 @@ export const TaskBoard = defineComponent({
           class: colClasses,
           'data-tiger-taskboard-column': '',
           'data-tiger-taskboard-column-id': String(column.id),
-          onDragover: dragSnap.value.drag?.type === 'column' ? (e: DragEvent) => { e.preventDefault(); dragCtrl.columnDragOver() } : undefined,
-          onDrop: dragSnap.value.drag?.type === 'column' ? (e: DragEvent) => { e.preventDefault(); if (e.dataTransfer) dragCtrl.columnDrop(e.dataTransfer, e.clientX) } : undefined
+          onDragover:
+            dragSnap.value.drag?.type === 'column'
+              ? (e: DragEvent) => {
+                  e.preventDefault()
+                  dragCtrl.columnDragOver()
+                }
+              : undefined,
+          onDrop:
+            dragSnap.value.drag?.type === 'column'
+              ? (e: DragEvent) => {
+                  e.preventDefault()
+                  if (e.dataTransfer) dragCtrl.columnDrop(e.dataTransfer, e.clientX)
+                }
+              : undefined
         },
         [header, body, footer]
       )

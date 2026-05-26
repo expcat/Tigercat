@@ -25,7 +25,9 @@ export default function CardDemo() {
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Card 卡片</h1>
-        <p className="text-gray-600 dark:text-gray-400">用于内容展示的卡片容器组件，支持多种样式和布局选项。</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          用于内容展示的卡片容器组件，支持多种样式和布局选项。
+        </p>
       </div>
 
       <DemoBlock title="基本用法" description="最简单的卡片，包含基本内容。" code={basicSnippet}>
@@ -134,7 +136,9 @@ export default function CardDemo() {
             <Card
               header={<h3 className="text-lg font-semibold">卡片标题</h3>}
               footer={<p className="text-sm text-gray-500">创建于 2024-01-01</p>}>
-              <p className="text-gray-600 dark:text-gray-400">这是卡片的主体内容区域，可以放置任何内容。</p>
+              <p className="text-gray-600 dark:text-gray-400">
+                这是卡片的主体内容区域，可以放置任何内容。
+              </p>
             </Card>
 
             <Card

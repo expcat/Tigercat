@@ -28,7 +28,11 @@ const precisionSnippet = `<Stepper :model-value="1.5" :step="0.1" :precision="2"
     <h1 class="text-3xl font-bold mb-2">Stepper 步进器</h1>
     <p class="text-gray-500 mb-8">数值增减控制器，支持步长、范围和精度。</p>
 
-    <DemoBlock title="基本用法" description="v-model 双向绑定，min/max 范围，step 步长" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="v-model 双向绑定，min/max 范围，step 步长"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Space direction="vertical" :size="12">
         <Stepper v-model="val" />
         <Stepper v-model="val" :min="0" :max="10" :step="2" />
@@ -36,7 +40,10 @@ const precisionSnippet = `<Stepper :model-value="1.5" :step="0.1" :precision="2"
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸，disabled 禁用" :code="sizeSnippet">
+    <DemoBlock
+      title="尺寸与禁用"
+      description="sm/md/lg 三种尺寸，disabled 禁用"
+      :code="sizeSnippet">
       <Space direction="vertical" :size="12">
         <Stepper :model-value="1" size="sm" />
         <Stepper :model-value="1" size="md" />

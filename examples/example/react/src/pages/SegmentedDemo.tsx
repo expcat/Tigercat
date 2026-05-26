@@ -46,7 +46,11 @@ const SegmentedDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Segmented 分段控制器</h1>
       <p className="text-gray-500 mb-8">分段选择器，类似 iOS UISegmentedControl。</p>
 
-      <DemoBlock title="基本用法" description="value + onChange 受控" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="value + onChange 受控"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Space direction="vertical" size={12}>
           <Segmented
             value={selected}
@@ -56,7 +60,8 @@ const SegmentedDemo: React.FC = () => {
               { label: '周', value: 'weekly' },
               { label: '月', value: 'monthly' },
               { label: '年', value: 'yearly' }
-            ]} />
+            ]}
+          />
           <Text>当前选中: {String(selected)}</Text>
         </Space>
       </DemoBlock>
@@ -78,7 +83,8 @@ const SegmentedDemo: React.FC = () => {
               { label: '禁用B', value: 'b', disabled: true },
               { label: '可选C', value: 'c' }
             ]}
-            value="a" />
+            value="a"
+          />
           <Segmented disabled options={simpleOpts} value="a" />
         </Space>
       </DemoBlock>

@@ -31,12 +31,23 @@ const TransferDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Transfer 穿梭框</h1>
       <p className="text-gray-500 mb-8">双栏穿梭选择，将数据在两栏之间移动。</p>
 
-      <DemoBlock title="基本用法" description="双向穿梭选择" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="双向穿梭选择"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Transfer targetKeys={targetKeys1} onChange={setTargetKeys1} dataSource={dataSource} />
       </DemoBlock>
 
       <DemoBlock title="搜索与标题" description="showSearch 开启搜索" code={searchSnippet}>
-        <Transfer targetKeys={targetKeys2} onChange={setTargetKeys2} dataSource={dataSource} showSearch sourceTitle="可选" targetTitle="已选" />
+        <Transfer
+          targetKeys={targetKeys2}
+          onChange={setTargetKeys2}
+          dataSource={dataSource}
+          showSearch
+          sourceTitle="可选"
+          targetTitle="已选"
+        />
       </DemoBlock>
     </div>
   )

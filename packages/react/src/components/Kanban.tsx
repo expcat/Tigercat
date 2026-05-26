@@ -51,7 +51,10 @@ export interface KanbanProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   /** Column add callback */
   onColumnAdd?: () => void
   /** Custom card renderer */
-  renderCard?: (card: import('@expcat/tigercat-core').TaskBoardCard, columnId: string | number) => React.ReactNode
+  renderCard?: (
+    card: import('@expcat/tigercat-core').TaskBoardCard,
+    columnId: string | number
+  ) => React.ReactNode
   /** Custom column header renderer */
   renderColumnHeader?: (column: TaskBoardColumn) => React.ReactNode
 }

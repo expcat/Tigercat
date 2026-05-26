@@ -34,7 +34,10 @@ const QRCodeDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="颜色与纠错等级" description="自定义颜色，level 控制纠错等级 L/M/Q/H" code={styleSnippet}>
+      <DemoBlock
+        title="颜色与纠错等级"
+        description="自定义颜色，level 控制纠错等级 L/M/Q/H"
+        code={styleSnippet}>
         <Space wrap>
           <QRCode value="https://github.com" color="#1677ff" />
           <QRCode value="https://github.com" color="#52c41a" bgColor="#f6ffed" />
@@ -43,7 +46,10 @@ const QRCodeDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="状态" description="active（正常）、expired（已过期）、loading（加载中）" code={statusSnippet}>
+      <DemoBlock
+        title="状态"
+        description="active（正常）、expired（已过期）、loading（加载中）"
+        code={statusSnippet}>
         <Space wrap>
           <QRCode value="https://github.com" status="active" />
           <QRCode value="https://github.com" status="expired" />

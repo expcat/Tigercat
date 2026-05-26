@@ -278,7 +278,11 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="完整的表单示例，包含多种表单控件。" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="完整的表单示例，包含多种表单控件。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Form :model="basicForm" @submit="handleBasicSubmit" class="max-w-md">
         <FormItem label="用户名" name="username" required>
           <Input v-model="basicForm.username" placeholder="请输入用户名" />
@@ -318,9 +322,16 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
     </DemoBlock>
 
     <!-- 表单验证 -->
-    <DemoBlock title="表单验证" description="通过 rules + name 实现校验，支持提交校验与手动校验。" :code="validateSnippet">
+    <DemoBlock
+      title="表单验证"
+      description="通过 rules + name 实现校验，支持提交校验与手动校验。"
+      :code="validateSnippet">
       <Space direction="vertical" class="w-full">
-        <Form ref="validateFormRef" :model="validateForm" :rules="validateRules" @submit="handleValidateSubmit"
+        <Form
+          ref="validateFormRef"
+          :model="validateForm"
+          :rules="validateRules"
+          @submit="handleValidateSubmit"
           class="max-w-md">
           <FormItem label="用户名" name="username">
             <Input v-model="validateForm.username" placeholder="至少 3 个字符" />
@@ -342,7 +353,9 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
             <Space>
               <Button type="submit" variant="primary">提交并校验</Button>
               <Button type="button" variant="secondary" @click="validateManually">手动校验</Button>
-              <Button type="button" variant="secondary" @click="clearValidateManually">清除校验</Button>
+              <Button type="button" variant="secondary" @click="clearValidateManually"
+                >清除校验</Button
+              >
               <Button type="button" variant="secondary" @click="resetValidateForm">重置</Button>
             </Space>
           </FormItem>
@@ -358,15 +371,30 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
     </DemoBlock>
 
     <!-- 布局模式 -->
-    <DemoBlock title="布局模式" description="通过 labelPosition 切换标签位置：right（默认）、left、top。" :code="layoutSnippet">
+    <DemoBlock
+      title="布局模式"
+      description="通过 labelPosition 切换标签位置：right（默认）、left、top。"
+      :code="layoutSnippet">
       <div class="max-w-md">
         <Space class="mb-4">
-          <Button :variant="layoutPosition === 'right' ? 'primary' : 'secondary'" size="sm"
-            @click="layoutPosition = 'right'">Right</Button>
-          <Button :variant="layoutPosition === 'left' ? 'primary' : 'secondary'" size="sm"
-            @click="layoutPosition = 'left'">Left</Button>
-          <Button :variant="layoutPosition === 'top' ? 'primary' : 'secondary'" size="sm"
-            @click="layoutPosition = 'top'">Top</Button>
+          <Button
+            :variant="layoutPosition === 'right' ? 'primary' : 'secondary'"
+            size="sm"
+            @click="layoutPosition = 'right'"
+            >Right</Button
+          >
+          <Button
+            :variant="layoutPosition === 'left' ? 'primary' : 'secondary'"
+            size="sm"
+            @click="layoutPosition = 'left'"
+            >Left</Button
+          >
+          <Button
+            :variant="layoutPosition === 'top' ? 'primary' : 'secondary'"
+            size="sm"
+            @click="layoutPosition = 'top'"
+            >Top</Button
+          >
         </Space>
         <Form :model="layoutModel" :labelPosition="layoutPosition" :labelWidth="100">
           <FormItem label="姓名" name="name">
@@ -380,15 +408,30 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
     </DemoBlock>
 
     <!-- 表单尺寸 -->
-    <DemoBlock title="表单尺寸" description="通过 size 设置表单整体尺寸：sm、md（默认）、lg。" :code="sizeSnippet">
+    <DemoBlock
+      title="表单尺寸"
+      description="通过 size 设置表单整体尺寸：sm、md（默认）、lg。"
+      :code="sizeSnippet">
       <div class="max-w-md">
         <Space class="mb-4">
-          <Button :variant="sizeValue === 'sm' ? 'primary' : 'secondary'" size="sm"
-            @click="sizeValue = 'sm'">Small</Button>
-          <Button :variant="sizeValue === 'md' ? 'primary' : 'secondary'" size="sm"
-            @click="sizeValue = 'md'">Medium</Button>
-          <Button :variant="sizeValue === 'lg' ? 'primary' : 'secondary'" size="sm"
-            @click="sizeValue = 'lg'">Large</Button>
+          <Button
+            :variant="sizeValue === 'sm' ? 'primary' : 'secondary'"
+            size="sm"
+            @click="sizeValue = 'sm'"
+            >Small</Button
+          >
+          <Button
+            :variant="sizeValue === 'md' ? 'primary' : 'secondary'"
+            size="sm"
+            @click="sizeValue = 'md'"
+            >Medium</Button
+          >
+          <Button
+            :variant="sizeValue === 'lg' ? 'primary' : 'secondary'"
+            size="sm"
+            @click="sizeValue = 'lg'"
+            >Large</Button
+          >
         </Space>
         <Form :model="sizeModel" :size="sizeValue">
           <FormItem label="姓名" name="name">
@@ -411,9 +454,15 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
     </DemoBlock>
 
     <!-- 自定义校验器 -->
-    <DemoBlock title="自定义校验器" description="通过 validator 函数实现自定义校验，支持同步和异步。输入 admin 触发异步校验。"
+    <DemoBlock
+      title="自定义校验器"
+      description="通过 validator 函数实现自定义校验，支持同步和异步。输入 admin 触发异步校验。"
       :code="customValidatorSnippet">
-      <Form ref="customValidatorFormRef" :model="customValidatorModel" :rules="customValidatorRules" class="max-w-md">
+      <Form
+        ref="customValidatorFormRef"
+        :model="customValidatorModel"
+        :rules="customValidatorRules"
+        class="max-w-md">
         <FormItem label="用户名" name="username">
           <Input v-model="customValidatorModel.username" placeholder="输入 admin 试试" />
         </FormItem>
@@ -421,15 +470,23 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
           <Input v-model="customValidatorModel.age" type="number" placeholder="18-120" />
         </FormItem>
         <FormItem>
-          <Button type="button" variant="primary" @click="customValidatorFormRef?.validate()">校验</Button>
+          <Button type="button" variant="primary" @click="customValidatorFormRef?.validate()"
+            >校验</Button
+          >
         </FormItem>
       </Form>
     </DemoBlock>
 
     <!-- 错误消息模式 -->
-    <DemoBlock title="错误消息模式" description="showMessage 控制错误提示位置。默认在 FormItem 下方显示；设为 false 则让 Input 内部显示错误（抖动 + 红色边框）。"
+    <DemoBlock
+      title="错误消息模式"
+      description="showMessage 控制错误提示位置。默认在 FormItem 下方显示；设为 false 则让 Input 内部显示错误（抖动 + 红色边框）。"
       :code="showMessageSnippet">
-      <Form ref="showMessageFormRef" :model="showMessageModel" :rules="showMessageRules" class="max-w-md">
+      <Form
+        ref="showMessageFormRef"
+        :model="showMessageModel"
+        :rules="showMessageRules"
+        class="max-w-md">
         <FormItem label="默认模式" name="email">
           <Input v-model="showMessageModel.email" placeholder="错误显示在输入框下方" />
         </FormItem>
@@ -437,7 +494,9 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
           <Input v-model="showMessageModel.email" placeholder="错误在输入框内显示" />
         </FormItem>
         <FormItem>
-          <Button type="button" variant="primary" @click="showMessageFormRef?.validate()">校验对比</Button>
+          <Button type="button" variant="primary" @click="showMessageFormRef?.validate()"
+            >校验对比</Button
+          >
         </FormItem>
       </Form>
     </DemoBlock>

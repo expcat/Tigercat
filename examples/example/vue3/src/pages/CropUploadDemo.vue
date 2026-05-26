@@ -57,36 +57,59 @@ const maxSizeSnippet = `<!-- 限制文件大小 2MB -->
       {{ errorMsg }}
     </div>
 
-    <DemoBlock title="基本用法" description="点击按钮选择图片，弹窗中裁剪后获取结果" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="点击按钮选择图片，弹窗中裁剪后获取结果"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <div class="space-y-4">
         <CropUpload @crop-complete="handleCropComplete" @error="handleError" />
         <div v-if="result1" class="mt-4">
           <p class="text-sm text-gray-600 mb-2">裁剪结果：</p>
-          <img :src="result1.dataUrl" class="max-w-xs border border-gray-200 rounded" alt="裁剪结果" />
+          <img
+            :src="result1.dataUrl"
+            class="max-w-xs border border-gray-200 rounded"
+            alt="裁剪结果" />
         </div>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="固定宽高比" description="通过 cropperProps 传递 aspectRatio 实现正方形裁剪" :code="aspectRatioSnippet">
+    <DemoBlock
+      title="固定宽高比"
+      description="通过 cropperProps 传递 aspectRatio 实现正方形裁剪"
+      :code="aspectRatioSnippet">
       <div class="space-y-4">
         <CropUpload :cropper-props="{ aspectRatio: 1 }" @crop-complete="handleSquareCrop" />
         <div v-if="result2" class="mt-4">
           <p class="text-sm text-gray-600 mb-2">裁剪结果：</p>
-          <img :src="result2.dataUrl" class="max-w-[200px] border border-gray-200 rounded" alt="裁剪结果" />
+          <img
+            :src="result2.dataUrl"
+            class="max-w-[200px] border border-gray-200 rounded"
+            alt="裁剪结果" />
         </div>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="自定义触发按钮" description="通过默认插槽自定义触发按钮" :code="customTriggerSnippet">
+    <DemoBlock
+      title="自定义触发按钮"
+      description="通过默认插槽自定义触发按钮"
+      :code="customTriggerSnippet">
       <CropUpload @crop-complete="handleCropComplete">
-        <span class="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded cursor-pointer hover:bg-green-600 transition-colors">
+        <span
+          class="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded cursor-pointer hover:bg-green-600 transition-colors">
           📷 上传头像
         </span>
       </CropUpload>
     </DemoBlock>
 
-    <DemoBlock title="限制文件大小" description="maxSize 限制文件大小（字节），超出触发 error 事件" :code="maxSizeSnippet">
-      <CropUpload :max-size="2 * 1024 * 1024" @crop-complete="handleCropComplete" @error="handleError" />
+    <DemoBlock
+      title="限制文件大小"
+      description="maxSize 限制文件大小（字节），超出触发 error 事件"
+      :code="maxSizeSnippet">
+      <CropUpload
+        :max-size="2 * 1024 * 1024"
+        @crop-complete="handleCropComplete"
+        @error="handleError" />
     </DemoBlock>
 
     <DemoBlock title="禁用状态" description="disabled 禁用触发按钮" :code="disabledSnippet">

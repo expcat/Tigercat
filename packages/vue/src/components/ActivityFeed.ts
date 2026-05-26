@@ -198,7 +198,12 @@ export const ActivityFeed = defineComponent({
               descriptionText
                 ? h(
                     Text,
-                    { tag: 'div', size: 'sm', color: 'muted', class: activityItemDescriptionClasses },
+                    {
+                      tag: 'div',
+                      size: 'sm',
+                      color: 'muted',
+                      class: activityItemDescriptionClasses
+                    },
                     { default: () => descriptionText }
                   )
                 : null,
@@ -212,13 +217,12 @@ export const ActivityFeed = defineComponent({
     }
 
     const feedRole = computed(() => (attrs.role as string | undefined) ?? 'feed')
-    const feedAriaLabel = computed(() =>
-      (attrs['aria-label'] as string | undefined) ??
-      (attrs['aria-labelledby'] ? undefined : '动态')
+    const feedAriaLabel = computed(
+      () =>
+        (attrs['aria-label'] as string | undefined) ??
+        (attrs['aria-labelledby'] ? undefined : '动态')
     )
-    const feedAriaBusy = computed(() =>
-      attrs['aria-busy'] ?? (props.loading ? 'true' : undefined)
-    )
+    const feedAriaBusy = computed(() => attrs['aria-busy'] ?? (props.loading ? 'true' : undefined))
 
     return () => {
       if (props.loading) {

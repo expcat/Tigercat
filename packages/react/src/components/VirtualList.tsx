@@ -34,7 +34,8 @@ export const VirtualList: React.FC<VirtualListProps> = ({
   const strategy = useMemo(() => {
     if (customStrategy) return customStrategy
     if (getItemHeight) return variableSizeStrategy(getItemHeight, itemCount)
-    if (estimatedItemHeight !== undefined) return dynamicSizeStrategy(estimatedItemHeight, itemCount)
+    if (estimatedItemHeight !== undefined)
+      return dynamicSizeStrategy(estimatedItemHeight, itemCount)
     return fixedSizeStrategy(itemHeight)
   }, [customStrategy, getItemHeight, estimatedItemHeight, itemHeight, itemCount])
 

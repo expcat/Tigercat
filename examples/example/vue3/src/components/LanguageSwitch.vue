@@ -17,10 +17,11 @@ const handleChange = (value: string) => {
     <span class="text-sm font-medium text-gray-700 whitespace-nowrap shrink-0 dark:text-gray-200">
       Lang:
     </span>
-    <Select :model-value="props.modelValue"
-            @update:model-value="handleChange"
-            :options="options"
-            size="sm"
-            class="w-28 max-w-full" />
+    <Select
+      :model-value="props.modelValue"
+      @update:model-value="handleChange"
+      :options="options"
+      size="sm"
+      class="w-28 max-w-full" />
   </div>
 </template>

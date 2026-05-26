@@ -40,9 +40,7 @@ describe('image-utils — class generators', () => {
 
   it('CROP_HANDLES exposes all 8 directions', () => {
     expect(CROP_HANDLES).toHaveLength(8)
-    expect(new Set(CROP_HANDLES)).toEqual(
-      new Set(['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'])
-    )
+    expect(new Set(CROP_HANDLES)).toEqual(new Set(['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w']))
   })
 
   it('getCropperHandleClasses includes correct cursor and position for each handle', () => {

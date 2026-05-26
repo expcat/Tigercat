@@ -70,44 +70,46 @@ const interaction = useChartInteraction<BarDatum>({
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">useChartInteraction 图表交互</h1>
       <p class="text-gray-600 dark:text-gray-400">
-        统一管理图表的悬停高亮、选中态、键盘可达性与图例联动，被内置的 BarChart / LineChart 等组件使用。
+        统一管理图表的悬停高亮、选中态、键盘可达性与图例联动，被内置的 BarChart / LineChart
+        等组件使用。
       </p>
     </div>
 
-    <DemoBlock title="自定义柱状图"
-               description="使用该组合式函数实现自定义图表的悬停高亮和点击选中。"
-               :code="snippet">
+    <DemoBlock
+      title="自定义柱状图"
+      description="使用该组合式函数实现自定义图表的悬停高亮和点击选中。"
+      :code="snippet">
       <Card>
-        <svg viewBox="0 0 400 200"
-             class="w-full h-48">
-          <g v-for="(d, i) in data"
-             :key="d.label">
-            <rect :x="20 + i * 70"
-                  :y="200 - (d.value / max) * 160"
-                  width="50"
-                  :height="(d.value / max) * 160"
-                  :fill="d.color"
-                  :opacity="interaction.getElementOpacity(i)"
-                  rx="4"
-                  tabindex="0"
-                  role="button"
-                  :aria-label="`${d.label}: ${d.value}`"
-                  class="cursor-pointer transition-opacity"
-                  @mouseenter="interaction.handleMouseEnter(i, $event)"
-                  @mouseleave="interaction.handleMouseLeave"
-                  @click="interaction.handleClick(i)"
-                  @keydown="interaction.handleKeyDown($event, i)" />
-            <text :x="45 + i * 70"
-                  y="195"
-                  text-anchor="middle"
-                  class="text-xs fill-gray-600">
+        <svg viewBox="0 0 400 200" class="w-full h-48">
+          <g v-for="(d, i) in data" :key="d.label">
+            <rect
+              :x="20 + i * 70"
+              :y="200 - (d.value / max) * 160"
+              width="50"
+              :height="(d.value / max) * 160"
+              :fill="d.color"
+              :opacity="interaction.getElementOpacity(i)"
+              rx="4"
+              tabindex="0"
+              role="button"
+              :aria-label="`${d.label}: ${d.value}`"
+              class="cursor-pointer transition-opacity"
+              @mouseenter="interaction.handleMouseEnter(i, $event)"
+              @mouseleave="interaction.handleMouseLeave"
+              @click="interaction.handleClick(i)"
+              @keydown="interaction.handleKeyDown($event, i)" />
+            <text :x="45 + i * 70" y="195" text-anchor="middle" class="text-xs fill-gray-600">
               {{ d.label }}
             </text>
           </g>
         </svg>
         <div class="mt-2 grid grid-cols-2 gap-2 text-sm text-gray-600">
-          <div>当前悬停：<strong>{{ activeLabel }}</strong></div>
-          <div>当前选中：<strong>{{ selectedLabel }}</strong></div>
+          <div>
+            当前悬停：<strong>{{ activeLabel }}</strong>
+          </div>
+          <div>
+            当前选中：<strong>{{ selectedLabel }}</strong>
+          </div>
         </div>
       </Card>
     </DemoBlock>

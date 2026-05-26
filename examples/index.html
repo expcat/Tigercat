@@ -27,7 +27,10 @@
         --tc-shadow: rgba(0, 0, 0, 0.3);
       }
 
-      * { box-sizing: border-box; margin: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         background: var(--tc-bg);
@@ -40,8 +43,17 @@
         padding: 48px 16px 32px;
         text-align: center;
       }
-      .header h1 { font-size: 36px; font-weight: 800; margin-bottom: 8px; }
-      .header p { font-size: 16px; color: var(--tc-text-muted); max-width: 600px; margin: 0 auto; }
+      .header h1 {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+      .header p {
+        font-size: 16px;
+        color: var(--tc-text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+      }
       .version-badge {
         display: inline-block;
         background: var(--tc-primary);
@@ -75,7 +87,10 @@
         color: var(--tc-text);
         outline: none;
       }
-      .search-input:focus { border-color: var(--tc-primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+      .search-input:focus {
+        border-color: var(--tc-primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
       .theme-toggle {
         padding: 8px 16px;
         border: 1px solid var(--tc-border);
@@ -85,7 +100,9 @@
         cursor: pointer;
         font-size: 14px;
       }
-      .theme-toggle:hover { border-color: var(--tc-primary); }
+      .theme-toggle:hover {
+        border-color: var(--tc-primary);
+      }
 
       /* Framework Cards */
       .fw-section {
@@ -105,16 +122,42 @@
         box-shadow: 0 12px 30px var(--tc-shadow);
         text-decoration: none;
         color: inherit;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
       }
-      .fw-card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px var(--tc-shadow); }
-      .fw-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-      .fw-card p { font-size: 14px; color: var(--tc-text-muted); margin-bottom: 16px; }
-      .fw-card .link { font-weight: 600; color: var(--tc-primary); }
+      .fw-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 36px var(--tc-shadow);
+      }
+      .fw-card h2 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .fw-card p {
+        font-size: 14px;
+        color: var(--tc-text-muted);
+        margin-bottom: 16px;
+      }
+      .fw-card .link {
+        font-weight: 600;
+        color: var(--tc-primary);
+      }
 
       /* Component Overview */
-      .section { max-width: 960px; margin: 0 auto 40px; padding: 0 16px; }
-      .section h2 { font-size: 22px; font-weight: 700; margin-bottom: 16px; border-bottom: 2px solid var(--tc-border); padding-bottom: 8px; }
+      .section {
+        max-width: 960px;
+        margin: 0 auto 40px;
+        padding: 0 16px;
+      }
+      .section h2 {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        border-bottom: 2px solid var(--tc-border);
+        padding-bottom: 8px;
+      }
       .component-grid {
         display: grid;
         gap: 8px;
@@ -130,8 +173,12 @@
         text-align: center;
         transition: border-color 0.15s;
       }
-      .component-tag:hover { border-color: var(--tc-primary); }
-      .component-tag.hidden { display: none; }
+      .component-tag:hover {
+        border-color: var(--tc-primary);
+      }
+      .component-tag.hidden {
+        display: none;
+      }
 
       /* Stats */
       .stats {
@@ -149,8 +196,16 @@
         text-align: center;
         box-shadow: 0 4px 12px var(--tc-shadow);
       }
-      .stat-value { font-size: 28px; font-weight: 800; color: var(--tc-primary); }
-      .stat-label { font-size: 13px; color: var(--tc-text-muted); margin-top: 4px; }
+      .stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--tc-primary);
+      }
+      .stat-label {
+        font-size: 13px;
+        color: var(--tc-text-muted);
+        margin-top: 4px;
+      }
 
       /* Footer */
       .footer {
@@ -160,7 +215,10 @@
         font-size: 13px;
         border-top: 1px solid var(--tc-border);
       }
-      .footer a { color: var(--tc-primary); text-decoration: none; }
+      .footer a {
+        color: var(--tc-primary);
+        text-decoration: none;
+      }
     </style>
   </head>
   <body>
@@ -170,10 +228,22 @@
     </div>
 
     <div class="stats">
-      <div class="stat"><div class="stat-value">133+</div><div class="stat-label">组件</div></div>
-      <div class="stat"><div class="stat-value">4619+</div><div class="stat-label">测试用例</div></div>
-      <div class="stat"><div class="stat-value">8</div><div class="stat-label">语言</div></div>
-      <div class="stat"><div class="stat-value">5</div><div class="stat-label">预设主题</div></div>
+      <div class="stat">
+        <div class="stat-value">133+</div>
+        <div class="stat-label">组件</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">4619+</div>
+        <div class="stat-label">测试用例</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">8</div>
+        <div class="stat-label">语言</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">5</div>
+        <div class="stat-label">预设主题</div>
+      </div>
     </div>
 
     <div class="toolbar">
@@ -199,50 +269,76 @@
     <div class="section" id="basic">
       <h2>基础组件 (Basic)</h2>
       <div class="component-grid" data-category="basic">
-        <div class="component-tag">Button</div><div class="component-tag">ButtonGroup</div>
-        <div class="component-tag">Link</div><div class="component-tag">Icon</div>
-        <div class="component-tag">Text</div><div class="component-tag">Image</div>
-        <div class="component-tag">Avatar</div><div class="component-tag">AvatarGroup</div>
-        <div class="component-tag">Badge</div><div class="component-tag">Tag</div>
-        <div class="component-tag">Divider</div><div class="component-tag">Code</div>
+        <div class="component-tag">Button</div>
+        <div class="component-tag">ButtonGroup</div>
+        <div class="component-tag">Link</div>
+        <div class="component-tag">Icon</div>
+        <div class="component-tag">Text</div>
+        <div class="component-tag">Image</div>
+        <div class="component-tag">Avatar</div>
+        <div class="component-tag">AvatarGroup</div>
+        <div class="component-tag">Badge</div>
+        <div class="component-tag">Tag</div>
+        <div class="component-tag">Divider</div>
+        <div class="component-tag">Code</div>
       </div>
     </div>
 
     <div class="section" id="form">
       <h2>表单组件 (Form)</h2>
       <div class="component-grid" data-category="form">
-        <div class="component-tag">Input</div><div class="component-tag">InputNumber</div>
-        <div class="component-tag">InputGroup</div><div class="component-tag">Textarea</div>
-        <div class="component-tag">Select</div><div class="component-tag">Cascader</div>
-        <div class="component-tag">TreeSelect</div><div class="component-tag">AutoComplete</div>
-        <div class="component-tag">Checkbox</div><div class="component-tag">Radio</div>
-        <div class="component-tag">Switch</div><div class="component-tag">Slider</div>
-        <div class="component-tag">DatePicker</div><div class="component-tag">TimePicker</div>
-        <div class="component-tag">ColorPicker</div><div class="component-tag">Rate</div>
-        <div class="component-tag">Upload</div><div class="component-tag">Transfer</div>
-        <div class="component-tag">Mentions</div><div class="component-tag">Form</div>
+        <div class="component-tag">Input</div>
+        <div class="component-tag">InputNumber</div>
+        <div class="component-tag">InputGroup</div>
+        <div class="component-tag">Textarea</div>
+        <div class="component-tag">Select</div>
+        <div class="component-tag">Cascader</div>
+        <div class="component-tag">TreeSelect</div>
+        <div class="component-tag">AutoComplete</div>
+        <div class="component-tag">Checkbox</div>
+        <div class="component-tag">Radio</div>
+        <div class="component-tag">Switch</div>
+        <div class="component-tag">Slider</div>
+        <div class="component-tag">DatePicker</div>
+        <div class="component-tag">TimePicker</div>
+        <div class="component-tag">ColorPicker</div>
+        <div class="component-tag">Rate</div>
+        <div class="component-tag">Upload</div>
+        <div class="component-tag">Transfer</div>
+        <div class="component-tag">Mentions</div>
+        <div class="component-tag">Form</div>
       </div>
     </div>
 
     <div class="section" id="data">
       <h2>数据展示 (Data Display)</h2>
       <div class="component-grid" data-category="data">
-        <div class="component-tag">Table</div><div class="component-tag">VirtualTable</div>
-        <div class="component-tag">Card</div><div class="component-tag">List</div>
-        <div class="component-tag">Descriptions</div><div class="component-tag">Timeline</div>
-        <div class="component-tag">Tree</div><div class="component-tag">Progress</div>
-        <div class="component-tag">Skeleton</div><div class="component-tag">Statistic</div>
-        <div class="component-tag">Calendar</div><div class="component-tag">QRCode</div>
-        <div class="component-tag">Segmented</div><div class="component-tag">Empty</div>
+        <div class="component-tag">Table</div>
+        <div class="component-tag">VirtualTable</div>
+        <div class="component-tag">Card</div>
+        <div class="component-tag">List</div>
+        <div class="component-tag">Descriptions</div>
+        <div class="component-tag">Timeline</div>
+        <div class="component-tag">Tree</div>
+        <div class="component-tag">Progress</div>
+        <div class="component-tag">Skeleton</div>
+        <div class="component-tag">Statistic</div>
+        <div class="component-tag">Calendar</div>
+        <div class="component-tag">QRCode</div>
+        <div class="component-tag">Segmented</div>
+        <div class="component-tag">Empty</div>
       </div>
     </div>
 
     <div class="section" id="navigation">
       <h2>导航组件 (Navigation)</h2>
       <div class="component-grid" data-category="navigation">
-        <div class="component-tag">Menu</div><div class="component-tag">Tabs</div>
-        <div class="component-tag">Breadcrumb</div><div class="component-tag">Dropdown</div>
-        <div class="component-tag">Pagination</div><div class="component-tag">Steps</div>
+        <div class="component-tag">Menu</div>
+        <div class="component-tag">Tabs</div>
+        <div class="component-tag">Breadcrumb</div>
+        <div class="component-tag">Dropdown</div>
+        <div class="component-tag">Pagination</div>
+        <div class="component-tag">Steps</div>
         <div class="component-tag">Anchor</div>
       </div>
     </div>
@@ -250,11 +346,16 @@
     <div class="section" id="feedback">
       <h2>反馈组件 (Feedback)</h2>
       <div class="component-grid" data-category="feedback">
-        <div class="component-tag">Alert</div><div class="component-tag">Modal</div>
-        <div class="component-tag">Drawer</div><div class="component-tag">Message</div>
-        <div class="component-tag">Notification</div><div class="component-tag">Loading</div>
-        <div class="component-tag">Popconfirm</div><div class="component-tag">Popover</div>
-        <div class="component-tag">Tooltip</div><div class="component-tag">Result</div>
+        <div class="component-tag">Alert</div>
+        <div class="component-tag">Modal</div>
+        <div class="component-tag">Drawer</div>
+        <div class="component-tag">Message</div>
+        <div class="component-tag">Notification</div>
+        <div class="component-tag">Loading</div>
+        <div class="component-tag">Popconfirm</div>
+        <div class="component-tag">Popover</div>
+        <div class="component-tag">Tooltip</div>
+        <div class="component-tag">Result</div>
         <div class="component-tag">Watermark</div>
       </div>
     </div>
@@ -262,43 +363,62 @@
     <div class="section" id="layout">
       <h2>布局组件 (Layout)</h2>
       <div class="component-grid" data-category="layout">
-        <div class="component-tag">Container</div><div class="component-tag">Grid</div>
-        <div class="component-tag">Layout</div><div class="component-tag">Space</div>
-        <div class="component-tag">Splitter</div><div class="component-tag">Resizable</div>
+        <div class="component-tag">Container</div>
+        <div class="component-tag">Grid</div>
+        <div class="component-tag">Layout</div>
+        <div class="component-tag">Space</div>
+        <div class="component-tag">Splitter</div>
+        <div class="component-tag">Resizable</div>
       </div>
     </div>
 
     <div class="section" id="charts">
       <h2>图表组件 (Charts)</h2>
       <div class="component-grid" data-category="charts">
-        <div class="component-tag">BarChart</div><div class="component-tag">LineChart</div>
-        <div class="component-tag">AreaChart</div><div class="component-tag">PieChart</div>
-        <div class="component-tag">DonutChart</div><div class="component-tag">ScatterChart</div>
-        <div class="component-tag">RadarChart</div><div class="component-tag">TreeMapChart</div>
-        <div class="component-tag">HeatmapChart</div><div class="component-tag">FunnelChart</div>
-        <div class="component-tag">GaugeChart</div><div class="component-tag">SunburstChart</div>
+        <div class="component-tag">BarChart</div>
+        <div class="component-tag">LineChart</div>
+        <div class="component-tag">AreaChart</div>
+        <div class="component-tag">PieChart</div>
+        <div class="component-tag">DonutChart</div>
+        <div class="component-tag">ScatterChart</div>
+        <div class="component-tag">RadarChart</div>
+        <div class="component-tag">TreeMapChart</div>
+        <div class="component-tag">HeatmapChart</div>
+        <div class="component-tag">FunnelChart</div>
+        <div class="component-tag">GaugeChart</div>
+        <div class="component-tag">SunburstChart</div>
       </div>
     </div>
 
     <div class="section" id="advanced">
       <h2>高级组件 (Advanced)</h2>
       <div class="component-grid" data-category="advanced">
-        <div class="component-tag">CodeEditor</div><div class="component-tag">RichTextEditor</div>
-        <div class="component-tag">Kanban</div><div class="component-tag">FileManager</div>
-        <div class="component-tag">VirtualList</div><div class="component-tag">InfiniteScroll</div>
-        <div class="component-tag">Tour</div><div class="component-tag">FloatButton</div>
-        <div class="component-tag">Affix</div><div class="component-tag">BackTop</div>
-        <div class="component-tag">PrintLayout</div><div class="component-tag">ImageViewer</div>
+        <div class="component-tag">CodeEditor</div>
+        <div class="component-tag">RichTextEditor</div>
+        <div class="component-tag">Kanban</div>
+        <div class="component-tag">FileManager</div>
+        <div class="component-tag">VirtualList</div>
+        <div class="component-tag">InfiniteScroll</div>
+        <div class="component-tag">Tour</div>
+        <div class="component-tag">FloatButton</div>
+        <div class="component-tag">Affix</div>
+        <div class="component-tag">BackTop</div>
+        <div class="component-tag">PrintLayout</div>
+        <div class="component-tag">ImageViewer</div>
       </div>
     </div>
 
     <div class="section" id="composite">
       <h2>组合组件 (Composite)</h2>
       <div class="component-grid" data-category="composite">
-        <div class="component-tag">ChatWindow</div><div class="component-tag">CommentThread</div>
-        <div class="component-tag">NotificationCenter</div><div class="component-tag">FormWizard</div>
-        <div class="component-tag">DataTableWithToolbar</div><div class="component-tag">ActivityFeed</div>
-        <div class="component-tag">CropUpload</div><div class="component-tag">TaskBoard</div>
+        <div class="component-tag">ChatWindow</div>
+        <div class="component-tag">CommentThread</div>
+        <div class="component-tag">NotificationCenter</div>
+        <div class="component-tag">FormWizard</div>
+        <div class="component-tag">DataTableWithToolbar</div>
+        <div class="component-tag">ActivityFeed</div>
+        <div class="component-tag">CropUpload</div>
+        <div class="component-tag">TaskBoard</div>
       </div>
     </div>
 
@@ -311,7 +431,10 @@
       const toggle = document.getElementById('themeToggle')
       const html = document.documentElement
       const savedTheme = localStorage.getItem('tc-theme')
-      if (savedTheme === 'dark' || (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)) {
+      if (
+        savedTheme === 'dark' ||
+        (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)
+      ) {
         html.dataset.theme = 'dark'
         toggle.textContent = '☀️ 浅色模式'
       }
@@ -332,11 +455,11 @@
       const allSections = document.querySelectorAll('.section')
       searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase().trim()
-        allTags.forEach(tag => {
+        allTags.forEach((tag) => {
           const match = !query || tag.textContent.toLowerCase().includes(query)
           tag.classList.toggle('hidden', !match)
         })
-        allSections.forEach(section => {
+        allSections.forEach((section) => {
           const visibleTags = section.querySelectorAll('.component-tag:not(.hidden)')
           section.style.display = visibleTags.length === 0 && query ? 'none' : ''
         })

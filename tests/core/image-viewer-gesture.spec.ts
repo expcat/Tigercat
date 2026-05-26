@@ -129,62 +129,28 @@ describe('image-viewer gesture utils', () => {
     })
 
     it('startPinch captures initial distance and scale', () => {
-      const s = startPinch(
-        { clientX: 0, clientY: 0 },
-        { clientX: 100, clientY: 0 },
-        1.5
-      )
+      const s = startPinch({ clientX: 0, clientY: 0 }, { clientX: 100, clientY: 0 }, 1.5)
       expect(s.isPinching).toBe(true)
       expect(s.initialDistance).toBe(100)
       expect(s.initialScale).toBe(1.5)
     })
 
     it('movePinch scales proportionally', () => {
-      const s = startPinch(
-        { clientX: 0, clientY: 0 },
-        { clientX: 100, clientY: 0 },
-        1
-      )
+      const s = startPinch({ clientX: 0, clientY: 0 }, { clientX: 100, clientY: 0 }, 1)
       // Double the distance → double the scale
-      const result = movePinch(
-        s,
-        { clientX: 0, clientY: 0 },
-        { clientX: 200, clientY: 0 },
-        0.5,
-        3
-      )
+      const result = movePinch(s, { clientX: 0, clientY: 0 }, { clientX: 200, clientY: 0 }, 0.5, 3)
       expect(result).toBe(2)
     })
 
     it('movePinch clamps to minZoom', () => {
-      const s = startPinch(
-        { clientX: 0, clientY: 0 },
-        { clientX: 100, clientY: 0 },
-        1
-      )
-      const result = movePinch(
-        s,
-        { clientX: 0, clientY: 0 },
-        { clientX: 10, clientY: 0 },
-        0.5,
-        3
-      )
+      const s = startPinch({ clientX: 0, clientY: 0 }, { clientX: 100, clientY: 0 }, 1)
+      const result = movePinch(s, { clientX: 0, clientY: 0 }, { clientX: 10, clientY: 0 }, 0.5, 3)
       expect(result).toBe(0.5)
     })
 
     it('movePinch clamps to maxZoom', () => {
-      const s = startPinch(
-        { clientX: 0, clientY: 0 },
-        { clientX: 100, clientY: 0 },
-        2
-      )
-      const result = movePinch(
-        s,
-        { clientX: 0, clientY: 0 },
-        { clientX: 500, clientY: 0 },
-        0.5,
-        3
-      )
+      const s = startPinch({ clientX: 0, clientY: 0 }, { clientX: 100, clientY: 0 }, 2)
+      const result = movePinch(s, { clientX: 0, clientY: 0 }, { clientX: 500, clientY: 0 }, 0.5, 3)
       expect(result).toBe(3)
     })
 
@@ -194,13 +160,7 @@ describe('image-viewer gesture utils', () => {
         initialDistance: 0,
         initialScale: 1.5
       }
-      const result = movePinch(
-        s,
-        { clientX: 0, clientY: 0 },
-        { clientX: 100, clientY: 0 },
-        0.5,
-        3
-      )
+      const result = movePinch(s, { clientX: 0, clientY: 0 }, { clientX: 100, clientY: 0 }, 0.5, 3)
       expect(result).toBe(1.5)
     })
   })

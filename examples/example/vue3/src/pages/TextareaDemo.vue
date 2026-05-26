@@ -92,7 +92,11 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="基础的文本域组件。" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="基础的文本域组件。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Textarea v-model="text" placeholder="请输入内容" :rows="4" />
         <p class="text-sm text-gray-600">输入的内容：{{ text }}</p>
@@ -130,7 +134,10 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 自动高度 -->
-    <DemoBlock title="自动高度" description="通过 autoResize 启用自动高度，可配合 minRows / maxRows 限制范围。" :code="autoResizeSnippet">
+    <DemoBlock
+      title="自动高度"
+      description="通过 autoResize 启用自动高度，可配合 minRows / maxRows 限制范围。"
+      :code="autoResizeSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="基础自动高度">
           <Textarea v-model="autoResizeText" autoResize placeholder="输入内容后将自动调整高度" />
@@ -142,7 +149,10 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 字符计数 -->
-    <DemoBlock title="字符计数" description="通过 showCount 显示计数，可配合 maxLength 限制最大字符数。" :code="countSnippet">
+    <DemoBlock
+      title="字符计数"
+      description="通过 showCount 显示计数，可配合 maxLength 限制最大字符数。"
+      :code="countSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="仅计数">
           <Textarea showCount placeholder="显示字符数" />
@@ -154,7 +164,10 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 禁用、只读和必填 -->
-    <DemoBlock title="禁用、只读和必填" description="文本域可以设置为禁用、只读或必填状态。" :code="disabledSnippet">
+    <DemoBlock
+      title="禁用、只读和必填"
+      description="文本域可以设置为禁用、只读或必填状态。"
+      :code="disabledSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="禁用">
           <Textarea model-value="禁用的文本域" disabled :rows="3" />
@@ -169,9 +182,18 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 组合功能 -->
-    <DemoBlock title="组合功能" description="autoResize + showCount + maxLength 组合使用。" :code="combinedSnippet">
+    <DemoBlock
+      title="组合功能"
+      description="autoResize + showCount + maxLength 组合使用。"
+      :code="combinedSnippet">
       <Space direction="vertical" class="w-full max-w-md">
-        <Textarea v-model="combined" autoResize :minRows="3" :maxRows="10" showCount :maxLength="500"
+        <Textarea
+          v-model="combined"
+          autoResize
+          :minRows="3"
+          :maxRows="10"
+          showCount
+          :maxLength="500"
           placeholder="自动高度 + 字符计数 + 最大长度" />
       </Space>
     </DemoBlock>

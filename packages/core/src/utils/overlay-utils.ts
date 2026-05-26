@@ -124,8 +124,7 @@ export function getFocusTrapNavigation(
 }
 
 export function lockBodyScroll(targetDocument?: Document): () => void {
-  const resolvedDocument =
-    targetDocument ?? (isBrowser() ? document : undefined)
+  const resolvedDocument = targetDocument ?? (isBrowser() ? document : undefined)
   const body = resolvedDocument?.body
   if (!body) return () => undefined
 

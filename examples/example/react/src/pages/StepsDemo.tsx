@@ -152,7 +152,11 @@ const StepsDemo: React.FC = () => {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock title="基本用法" description="简单的步骤条，展示流程进度。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="简单的步骤条，展示流程进度。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Steps current={current1}>
           <StepsItem title="已完成" description="这是步骤的描述信息" />
           <StepsItem title="进行中" description="这是步骤的描述信息" />

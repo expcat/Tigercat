@@ -43,9 +43,21 @@ const sizeSnippet = `<Space direction="vertical" :size="12" class="w-full">
 
     <DemoBlock title="混合组件" description="Select + Input + Select 组合" :code="addonSnippet">
       <InputGroup>
-        <Select :options="[{ label: 'http://', value: 'http' }, { label: 'https://', value: 'https' }]" model-value="https" style="width: 120px" />
+        <Select
+          :options="[
+            { label: 'http://', value: 'http' },
+            { label: 'https://', value: 'https' }
+          ]"
+          model-value="https"
+          style="width: 120px" />
         <Input placeholder="请输入域名" style="flex: 1" />
-        <Select :options="[{ label: '.com', value: 'com' }, { label: '.cn', value: 'cn' }]" model-value="com" style="width: 80px" />
+        <Select
+          :options="[
+            { label: '.com', value: 'com' },
+            { label: '.cn', value: 'cn' }
+          ]"
+          model-value="com"
+          style="width: 80px" />
       </InputGroup>
     </DemoBlock>
 

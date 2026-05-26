@@ -138,31 +138,31 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock title="基本用法"
-               description="垂直菜单，默认模式。"
-               :code="basicSnippet"
-               :script="basicScriptSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="垂直菜单，默认模式。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu v-model:selectedKeys="selectedKeys1">
             <MenuItem itemKey="1">菜单项 1</MenuItem>
             <MenuItem itemKey="2">菜单项 2</MenuItem>
             <MenuItem itemKey="3">菜单项 3</MenuItem>
-            <MenuItem itemKey="4"
-                      disabled>禁用菜单项</MenuItem>
+            <MenuItem itemKey="4" disabled>禁用菜单项</MenuItem>
           </Menu>
         </div>
       </div>
     </DemoBlock>
 
     <!-- 横向菜单 -->
-    <DemoBlock title="横向菜单"
-               description="水平导航菜单，支持多级嵌套级联展开。"
-               :code="horizontalSnippet">
+    <DemoBlock
+      title="横向菜单"
+      description="水平导航菜单，支持多级嵌套级联展开。"
+      :code="horizontalSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white">
-          <Menu mode="horizontal"
-                v-model:selectedKeys="selectedKeys2">
+          <Menu mode="horizontal" v-model:selectedKeys="selectedKeys2">
             <MenuItem itemKey="home">首页</MenuItem>
             <SubMenu itemKey="products" title="产品">
               <MenuItem itemKey="product-a">产品 A</MenuItem>
@@ -179,21 +179,16 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 子菜单 -->
-    <DemoBlock title="子菜单"
-               description="多级菜单结构。"
-               :code="subMenuSnippet">
+    <DemoBlock title="子菜单" description="多级菜单结构。" :code="subMenuSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
-          <Menu v-model:selectedKeys="selectedKeys3"
-                v-model:openKeys="openKeys3">
-            <SubMenu itemKey="sub1"
-                     title="导航 1">
+          <Menu v-model:selectedKeys="selectedKeys3" v-model:openKeys="openKeys3">
+            <SubMenu itemKey="sub1" title="导航 1">
               <MenuItem itemKey="1">选项 1</MenuItem>
               <MenuItem itemKey="2">选项 2</MenuItem>
               <MenuItem itemKey="3">选项 3</MenuItem>
             </SubMenu>
-            <SubMenu itemKey="sub2"
-                     title="导航 2">
+            <SubMenu itemKey="sub2" title="导航 2">
               <MenuItem itemKey="4">选项 4</MenuItem>
               <MenuItem itemKey="5">选项 5</MenuItem>
             </SubMenu>
@@ -204,21 +199,15 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 内联模式 -->
-    <DemoBlock title="内联模式"
-               description="垂直菜单，子菜单内嵌在菜单中。"
-               :code="inlineSnippet">
+    <DemoBlock title="内联模式" description="垂直菜单，子菜单内嵌在菜单中。" :code="inlineSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
-          <Menu mode="inline"
-                v-model:selectedKeys="selectedKeys4"
-                v-model:openKeys="openKeys4">
-            <SubMenu itemKey="sub1"
-                     title="导航 1">
+          <Menu mode="inline" v-model:selectedKeys="selectedKeys4" v-model:openKeys="openKeys4">
+            <SubMenu itemKey="sub1" title="导航 1">
               <MenuItem itemKey="1">选项 1</MenuItem>
               <MenuItem itemKey="2">选项 2</MenuItem>
             </SubMenu>
-            <SubMenu itemKey="sub2"
-                     title="导航 2">
+            <SubMenu itemKey="sub2" title="导航 2">
               <MenuItem itemKey="3">选项 3</MenuItem>
               <MenuItem itemKey="4">选项 4</MenuItem>
             </SubMenu>
@@ -228,24 +217,20 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 收起菜单 -->
-    <DemoBlock title="收起菜单"
-               description="可以收起的垂直菜单。"
-               :code="collapseSnippet">
+    <DemoBlock title="收起菜单" description="可以收起的垂直菜单。" :code="collapseSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="mb-4">
-          <Button @click="collapsed = !collapsed"
-                  class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          <Button
+            @click="collapsed = !collapsed"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             {{ collapsed ? '展开' : '收起' }}
           </Button>
         </div>
         <div class="bg-white inline-block">
-          <Menu mode="vertical"
-                :collapsed="collapsed"
-                v-model:selectedKeys="selectedKeys5">
+          <Menu mode="vertical" :collapsed="collapsed" v-model:selectedKeys="selectedKeys5">
             <MenuItem itemKey="1">菜单项 1</MenuItem>
             <MenuItem itemKey="2">菜单项 2</MenuItem>
-            <SubMenu itemKey="sub1"
-                     title="子菜单">
+            <SubMenu itemKey="sub1" title="子菜单">
               <MenuItem itemKey="3">选项 3</MenuItem>
               <MenuItem itemKey="4">选项 4</MenuItem>
             </SubMenu>
@@ -255,17 +240,13 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 暗色主题 -->
-    <DemoBlock title="暗色主题"
-               description="使用暗色主题的菜单。"
-               :code="darkSnippet">
+    <DemoBlock title="暗色主题" description="使用暗色主题的菜单。" :code="darkSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="inline-block">
-          <Menu theme="dark"
-                v-model:selectedKeys="selectedKeys6">
+          <Menu theme="dark" v-model:selectedKeys="selectedKeys6">
             <MenuItem itemKey="1">菜单项 1</MenuItem>
             <MenuItem itemKey="2">菜单项 2</MenuItem>
-            <SubMenu itemKey="sub1"
-                     title="子菜单">
+            <SubMenu itemKey="sub1" title="子菜单">
               <MenuItem itemKey="3">选项 3</MenuItem>
               <MenuItem itemKey="4">选项 4</MenuItem>
             </SubMenu>
@@ -275,19 +256,13 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 带图标的菜单 -->
-    <DemoBlock title="带图标的菜单"
-               description="菜单项可以添加图标。"
-               :code="iconSnippet">
+    <DemoBlock title="带图标的菜单" description="菜单项可以添加图标。" :code="iconSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu v-model:selectedKeys="selectedKeys7">
-            <MenuItem itemKey="1"
-                      :icon="homeIcon">首页</MenuItem>
-            <MenuItem itemKey="2"
-                      :icon="userIcon">用户</MenuItem>
-            <SubMenu itemKey="sub1"
-                     title="设置"
-                     :icon="settingsIcon">
+            <MenuItem itemKey="1" :icon="homeIcon">首页</MenuItem>
+            <MenuItem itemKey="2" :icon="userIcon">用户</MenuItem>
+            <SubMenu itemKey="sub1" title="设置" :icon="settingsIcon">
               <MenuItem itemKey="3">常规设置</MenuItem>
               <MenuItem itemKey="4">高级设置</MenuItem>
             </SubMenu>
@@ -297,9 +272,10 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 菜单项分组 -->
-    <DemoBlock title="菜单项分组"
-               description="使用 MenuItemGroup 对菜单项进行分组。"
-               :code="groupSnippet">
+    <DemoBlock
+      title="菜单项分组"
+      description="使用 MenuItemGroup 对菜单项进行分组。"
+      :code="groupSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu>
@@ -317,14 +293,13 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 单一展开模式 -->
-    <DemoBlock title="单一展开模式"
-               description="设置 multiple=false，同时只能展开一个子菜单。"
-               :code="singleOpenSnippet">
+    <DemoBlock
+      title="单一展开模式"
+      description="设置 multiple=false，同时只能展开一个子菜单。"
+      :code="singleOpenSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
-          <Menu :multiple="false"
-                v-model:selectedKeys="selectedKeys8"
-                v-model:openKeys="openKeys8">
+          <Menu :multiple="false" v-model:selectedKeys="selectedKeys8" v-model:openKeys="openKeys8">
             <SubMenu itemKey="sub1" title="导航 1">
               <MenuItem itemKey="1">选项 1</MenuItem>
               <MenuItem itemKey="2">选项 2</MenuItem>

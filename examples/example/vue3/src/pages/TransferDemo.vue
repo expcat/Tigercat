@@ -33,12 +33,23 @@ const searchSnippet = `<Transfer
     <h1 class="text-3xl font-bold mb-2">Transfer 穿梭框</h1>
     <p class="text-gray-500 mb-8">双栏穿梭选择，将数据在两栏之间移动。</p>
 
-    <DemoBlock title="基本用法" description="双向穿梭选择" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="双向穿梭选择"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Transfer v-model="targetKeys1" :data-source="dataSource" />
     </DemoBlock>
 
-    <DemoBlock title="搜索与标题" description="show-search 开启搜索，titles 自定义标题" :code="searchSnippet">
-      <Transfer v-model="targetKeys2" :data-source="dataSource" show-search :titles="['可选', '已选']" />
+    <DemoBlock
+      title="搜索与标题"
+      description="show-search 开启搜索，titles 自定义标题"
+      :code="searchSnippet">
+      <Transfer
+        v-model="targetKeys2"
+        :data-source="dataSource"
+        show-search
+        :titles="['可选', '已选']" />
     </DemoBlock>
   </div>
 </template>

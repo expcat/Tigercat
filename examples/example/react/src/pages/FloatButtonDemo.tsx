@@ -20,15 +20,31 @@ const FloatButtonDemo: React.FC = () => {
 
       <DemoBlock title="基础用法" description="shape、size、type 和 tooltip" code={basicSnippet}>
         <div className="relative h-64 border rounded-lg overflow-hidden">
-          <FloatButton tooltip="默认" style={{ position: 'absolute', right: 24, bottom: 24 }} onClick={() => console.log('clicked')} />
-          <FloatButton shape="square" type="default" tooltip="方形" style={{ position: 'absolute', right: 24, bottom: 80 }} />
-          <FloatButton size="lg" tooltip="大号" style={{ position: 'absolute', right: 24, bottom: 136 }} />
+          <FloatButton
+            tooltip="默认"
+            style={{ position: 'absolute', right: 24, bottom: 24 }}
+            onClick={() => console.log('clicked')}
+          />
+          <FloatButton
+            shape="square"
+            type="default"
+            tooltip="方形"
+            style={{ position: 'absolute', right: 24, bottom: 80 }}
+          />
+          <FloatButton
+            size="lg"
+            tooltip="大号"
+            style={{ position: 'absolute', right: 24, bottom: 136 }}
+          />
         </div>
       </DemoBlock>
 
       <DemoBlock title="按钮组" description="FloatButton.Group 分组展开" code={groupSnippet}>
         <div className="relative h-64 border rounded-lg overflow-hidden">
-          <FloatButtonGroup trigger="hover" triggerNode={<FloatButton tooltip="菜单" />} style={{ position: 'absolute', right: 24, bottom: 24 }}>
+          <FloatButtonGroup
+            trigger="hover"
+            triggerNode={<FloatButton tooltip="菜单" />}
+            style={{ position: 'absolute', right: 24, bottom: 24 }}>
             <FloatButton tooltip="操作 A" type="default" />
             <FloatButton tooltip="操作 B" type="default" />
           </FloatButtonGroup>
@@ -37,7 +53,11 @@ const FloatButtonDemo: React.FC = () => {
 
       <DemoBlock title="禁用" code={disabledSnippet}>
         <div className="relative h-40 border rounded-lg overflow-hidden">
-          <FloatButton disabled tooltip="不可用" style={{ position: 'absolute', right: 24, bottom: 24 }} />
+          <FloatButton
+            disabled
+            tooltip="不可用"
+            style={{ position: 'absolute', right: 24, bottom: 24 }}
+          />
         </div>
       </DemoBlock>
     </div>

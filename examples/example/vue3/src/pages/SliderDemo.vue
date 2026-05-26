@@ -142,7 +142,11 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="基础的滑块用法，显示当前值。" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="基础的滑块用法，显示当前值。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider v-model:value="basicValue" :min="0" :max="100" class="flex-1" />
@@ -182,7 +186,10 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </DemoBlock>
 
     <!-- 范围选择 -->
-    <DemoBlock title="范围选择" description="通过 range 启用范围选择，此时值为 [min, max]。" :code="rangeValueSnippet">
+    <DemoBlock
+      title="范围选择"
+      description="通过 range 启用范围选择，此时值为 [min, max]。"
+      :code="rangeValueSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider v-model:value="rangeValue" range :min="0" :max="100" class="flex-1" />
@@ -202,7 +209,10 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </DemoBlock>
 
     <!-- 工具提示 -->
-    <DemoBlock title="工具提示" description="通过 tooltip 控制是否显示提示（默认开启）。" :code="tooltipSnippet">
+    <DemoBlock
+      title="工具提示"
+      description="通过 tooltip 控制是否显示提示（默认开启）。"
+      :code="tooltipSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">tooltip on（默认）</Text>
@@ -214,7 +224,12 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">tooltip off</Text>
           <div class="flex items-center gap-4 w-full">
-            <Slider v-model:value="tooltipOffValue" :min="0" :max="100" :tooltip="false" class="flex-1" />
+            <Slider
+              v-model:value="tooltipOffValue"
+              :min="0"
+              :max="100"
+              :tooltip="false"
+              class="flex-1" />
             <Text>{{ tooltipOffValue }}</Text>
           </div>
         </div>
@@ -232,7 +247,10 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </DemoBlock>
 
     <!-- 不同尺寸 -->
-    <DemoBlock title="不同尺寸" description="Slider 支持 sm / md / lg 三种尺寸。" :code="sizeSnippet">
+    <DemoBlock
+      title="不同尺寸"
+      description="Slider 支持 sm / md / lg 三种尺寸。"
+      :code="sizeSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">sm</Text>
@@ -259,7 +277,10 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </DemoBlock>
 
     <!-- 默认值（非受控） -->
-    <DemoBlock title="默认值" description="通过 default-value 设置初始值，无需绑定 v-model（非受控模式）。" :code="defaultValueSnippet">
+    <DemoBlock
+      title="默认值"
+      description="通过 default-value 设置初始值，无需绑定 v-model（非受控模式）。"
+      :code="defaultValueSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider :default-value="60" :min="0" :max="100" class="flex-1" />

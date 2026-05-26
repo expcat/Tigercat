@@ -32,7 +32,10 @@ import {
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 
-import type { DropdownProps as CoreDropdownProps, DropdownMenuProps as CoreDropdownMenuProps } from '@expcat/tigercat-core'
+import type {
+  DropdownProps as CoreDropdownProps,
+  DropdownMenuProps as CoreDropdownMenuProps
+} from '@expcat/tigercat-core'
 import { useVueFloating, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
 
 // --- DropdownMenu (child component) ---

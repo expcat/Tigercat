@@ -145,7 +145,11 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的滑块用法，显示当前值。" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基础用法"
+        description="基础的滑块用法，显示当前值。"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="flex items-center gap-4 w-full">
             <Slider

@@ -84,7 +84,11 @@ const FormWizardDemo: React.FC = () => {
         <p className="text-gray-600 dark:text-gray-400">多步表单流，支持校验阻断与完成态。</p>
       </div>
 
-      <DemoBlock title="基础用法" description="多步校验阻断 + 完成态" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基础用法"
+        description="多步校验阻断 + 完成态"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <FormWizard
           steps={steps}
           current={current}

@@ -132,90 +132,90 @@ const customRequestSnippet = `<div class="max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法"
-               description="基础的文件上传组件。"
-               :code="basicSnippet"
-               :script="basicScriptSnippet">
+    <DemoBlock
+      title="基础用法"
+      description="基础的文件上传组件。"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <div class="max-w-md space-y-4">
-        <Upload v-model:file-list="fileList"
-                @change="handleChange">
+        <Upload v-model:file-list="fileList" @change="handleChange">
           <template #default> 选择文件 </template>
         </Upload>
       </div>
     </DemoBlock>
 
     <!-- 拖拽上传 -->
-    <DemoBlock title="拖拽上传"
-               description="将文件拖拽到区域内即可上传。"
-               :code="dragSnippet">
+    <DemoBlock title="拖拽上传" description="将文件拖拽到区域内即可上传。" :code="dragSnippet">
       <div class="max-w-md">
-        <Upload v-model:file-list="fileList2"
-                drag />
+        <Upload v-model:file-list="fileList2" drag />
       </div>
     </DemoBlock>
 
     <!-- 多文件上传 -->
-    <DemoBlock title="多文件上传"
-               description="通过设置 multiple 属性允许同时选择多个文件。"
-               :code="multipleSnippet">
+    <DemoBlock
+      title="多文件上传"
+      description="通过设置 multiple 属性允许同时选择多个文件。"
+      :code="multipleSnippet">
       <div class="max-w-md">
-        <Upload v-model:file-list="fileList3"
-                multiple> 选择多个文件 </Upload>
+        <Upload v-model:file-list="fileList3" multiple> 选择多个文件 </Upload>
       </div>
     </DemoBlock>
 
     <!-- 文件数量限制 -->
-    <DemoBlock title="文件数量限制"
-               description="通过 limit 属性限制上传文件的数量。"
-               :code="limitSnippet">
+    <DemoBlock
+      title="文件数量限制"
+      description="通过 limit 属性限制上传文件的数量。"
+      :code="limitSnippet">
       <div class="max-w-md">
-        <Upload v-model:file-list="fileList4"
-                multiple
-                :limit="3"
-                @exceed="handleExceed">
+        <Upload v-model:file-list="fileList4" multiple :limit="3" @exceed="handleExceed">
           最多上传 3 个文件
         </Upload>
       </div>
     </DemoBlock>
 
     <!-- 文件类型和大小限制 -->
-    <DemoBlock title="文件类型和大小限制"
-               description="通过 accept 和 maxSize 限制文件类型和大小。"
-               :code="validateSnippet">
+    <DemoBlock
+      title="文件类型和大小限制"
+      description="通过 accept 和 maxSize 限制文件类型和大小。"
+      :code="validateSnippet">
       <div class="max-w-md space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">仅允许图片</label>
-          <Upload v-model:file-list="fileList5"
-                  accept="image/*"
-                  drag />
+          <Upload v-model:file-list="fileList5" accept="image/*" drag />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">自定义校验（JPG/PNG，小于2MB）</label>
-          <Upload accept="image/jpeg,image/png"
-                  :max-size="2 * 1024 * 1024"
-                  :before-upload="beforeUpload"
-                  drag />
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >自定义校验（JPG/PNG，小于2MB）</label
+          >
+          <Upload
+            accept="image/jpeg,image/png"
+            :max-size="2 * 1024 * 1024"
+            :before-upload="beforeUpload"
+            drag />
         </div>
       </div>
     </DemoBlock>
 
     <!-- 图片卡片列表 -->
-    <DemoBlock title="图片卡片列表"
-               description='使用 listType="picture-card" 显示图片卡片样式。'
-               :code="pictureCardSnippet">
+    <DemoBlock
+      title="图片卡片列表"
+      description='使用 listType="picture-card" 显示图片卡片样式。'
+      :code="pictureCardSnippet">
       <div class="max-w-2xl">
-        <Upload v-model:file-list="fileList6"
-                accept="image/*"
-                list-type="picture-card"
-                multiple
-                @preview="handlePreview" />
+        <Upload
+          v-model:file-list="fileList6"
+          accept="image/*"
+          list-type="picture-card"
+          multiple
+          @preview="handlePreview" />
       </div>
     </DemoBlock>
 
     <!-- 禁用状态 -->
-    <DemoBlock title="禁用状态"
-               description="设置 disabled 属性禁用上传功能。"
-               :code="disabledSnippet">
+    <DemoBlock
+      title="禁用状态"
+      description="设置 disabled 属性禁用上传功能。"
+      :code="disabledSnippet">
       <div class="max-w-md space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">禁用的按钮上传</label>
@@ -223,21 +223,18 @@ const customRequestSnippet = `<div class="max-w-md">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">禁用的拖拽上传</label>
-          <Upload disabled
-                  drag />
+          <Upload disabled drag />
         </div>
       </div>
     </DemoBlock>
 
     <!-- 自定义上传 -->
-    <DemoBlock title="自定义上传"
-               description="通过 customRequest 实现自定义上传逻辑，可观察上传进度。"
-               :code="customRequestSnippet">
+    <DemoBlock
+      title="自定义上传"
+      description="通过 customRequest 实现自定义上传逻辑，可观察上传进度。"
+      :code="customRequestSnippet">
       <div class="max-w-md">
-        <Upload v-model:file-list="fileList7"
-                :custom-request="simulateUpload"
-                multiple
-                drag />
+        <Upload v-model:file-list="fileList7" :custom-request="simulateUpload" multiple drag />
       </div>
     </DemoBlock>
   </div>

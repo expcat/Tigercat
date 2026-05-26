@@ -29,7 +29,11 @@ const RateDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Rate 评分</h1>
       <p className="text-gray-500 mb-8">评分组件，支持半星、自定义字符和禁用状态。</p>
 
-      <DemoBlock title="基本与半星" description="value + onChange 受控，allowHalf 半星" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock
+        title="基本与半星"
+        description="value + onChange 受控，allowHalf 半星"
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Space direction="vertical" size={16}>
           <Rate value={val} onChange={setVal} />
           <Rate value={halfVal} onChange={setHalfVal} allowHalf />
@@ -45,7 +49,10 @@ const RateDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="自定义字符与数量" description="character 自定义图标，count 控制星星数" code={customSnippet}>
+      <DemoBlock
+        title="自定义字符与数量"
+        description="character 自定义图标，count 控制星星数"
+        code={customSnippet}>
         <Space direction="vertical" size={12}>
           <Rate value={customVal} onChange={setCustomVal} character="♥" />
           <Rate value={4} count={10} disabled />

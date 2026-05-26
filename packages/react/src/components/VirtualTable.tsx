@@ -81,10 +81,7 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
     [bordered, className]
   )
 
-  const fixedInfo = useMemo(
-    () => getVirtualTableFixedInfo(columns),
-    [columns]
-  )
+  const fixedInfo = useMemo(() => getVirtualTableFixedInfo(columns), [columns])
 
   const bottomHeight = Math.max(0, range.totalHeight - range.end * rowHeight)
 

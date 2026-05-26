@@ -39,7 +39,10 @@ const impactColor = (impact?: string | null) => {
   }
 }
 
-export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({ lang = 'zh-CN', targetSelector }) => {
+export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({
+  lang = 'zh-CN',
+  targetSelector
+}) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [ranAt, setRanAt] = useState('')
@@ -116,7 +119,10 @@ export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({ lang = 'zh-CN', 
               <p className="text-red-600 dark:text-red-400">{error}</p>
             ) : !results ? (
               <p className="text-gray-500 dark:text-gray-400">
-                {t('点击「运行扫描」查看当前页面的无障碍问题。', 'Click "Run scan" to inspect the current page.')}
+                {t(
+                  '点击「运行扫描」查看当前页面的无障碍问题。',
+                  'Click "Run scan" to inspect the current page.'
+                )}
               </p>
             ) : results.violations.length === 0 ? (
               <p className="text-emerald-700 dark:text-emerald-300">
@@ -133,7 +139,9 @@ export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({ lang = 'zh-CN', 
                         className={`text-[10px] font-semibold uppercase rounded px-1.5 py-0.5 ${impactColor(v.impact)}`}>
                         {v.impact ?? 'n/a'}
                       </span>
-                      <span className="text-xs font-mono text-gray-500 dark:text-gray-400">{v.id}</span>
+                      <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+                        {v.id}
+                      </span>
                     </div>
                     <div className="text-gray-900 dark:text-gray-100">{v.help}</div>
                     <a

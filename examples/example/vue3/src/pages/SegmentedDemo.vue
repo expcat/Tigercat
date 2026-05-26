@@ -48,7 +48,11 @@ const simpleOpts = [
     <h1 class="text-3xl font-bold mb-2">Segmented 分段控制器</h1>
     <p class="text-gray-500 mb-8">分段选择器，类似 iOS UISegmentedControl。</p>
 
-    <DemoBlock title="基本用法" description="v-model 双向绑定选中值" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="v-model 双向绑定选中值"
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <Space direction="vertical" :size="12">
         <Segmented
           v-model="selected"

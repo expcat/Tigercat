@@ -56,7 +56,14 @@ const CopyButton: React.FC<CopyButtonProps> = ({ code }) => {
   )
 }
 
-const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, script, children, className }) => {
+const DemoBlock: React.FC<DemoBlockProps> = ({
+  title,
+  description,
+  code,
+  script,
+  children,
+  className
+}) => {
   const [activeKey, setActiveKey] = useState('preview')
   const sectionClasses = className ? `mb-12 ${className}` : 'mb-12'
 

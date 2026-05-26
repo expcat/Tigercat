@@ -10,7 +10,10 @@
       </div>
     </DemoBlock>
 
-    <DemoBlock title="颜色分段" description="segments 按区间着色，自定义格式化" :code="segmentsSnippet">
+    <DemoBlock
+      title="颜色分段"
+      description="segments 按区间着色，自定义格式化"
+      :code="segmentsSnippet">
       <GaugeChart
         :value="82"
         :width="320"

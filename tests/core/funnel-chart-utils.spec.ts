@@ -13,7 +13,10 @@ describe('computeFunnelSegments', () => {
   })
 
   it('returns empty array when all values are zero', () => {
-    const zeros = [{ label: 'X', value: 0 }, { label: 'Y', value: 0 }]
+    const zeros = [
+      { label: 'X', value: 0 },
+      { label: 'Y', value: 0 }
+    ]
     expect(computeFunnelSegments(zeros, { width: 200, height: 300 })).toEqual([])
   })
 

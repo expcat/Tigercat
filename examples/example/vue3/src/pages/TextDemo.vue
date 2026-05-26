@@ -130,13 +130,19 @@ const decorateSnippet = `<Space direction="vertical" class="w-full">
           <Text align="right">Right aligned text</Text>
         </div>
         <div class="p-4 bg-white rounded">
-          <Text align="justify">Justify aligned — 两端对齐模式下，较长的文本内容会均匀分布在行内，呈现整齐的段落效果。</Text>
+          <Text align="justify"
+            >Justify aligned —
+            两端对齐模式下，较长的文本内容会均匀分布在行内，呈现整齐的段落效果。</Text
+          >
         </div>
       </div>
     </DemoBlock>
 
     <!-- 文本修饰 -->
-    <DemoBlock title="文本修饰" description="truncate / italic / underline / lineThrough。" :code="decorateSnippet">
+    <DemoBlock
+      title="文本修饰"
+      description="truncate / italic / underline / lineThrough。"
+      :code="decorateSnippet">
       <Space direction="vertical" class="w-full">
         <div class="w-64">
           <Text truncate> 这是一段很长很长的文本，会在容器宽度不足时显示省略号。 </Text>

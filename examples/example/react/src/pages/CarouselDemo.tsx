@@ -127,7 +127,11 @@ export default function CarouselDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="导航点位置" description="可以调整导航点的位置。" code={dotPositionSnippet} script={dotPositionScriptSnippet}>
+      <DemoBlock
+        title="导航点位置"
+        description="可以调整导航点的位置。"
+        code={dotPositionSnippet}
+        script={dotPositionScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="mb-4">
             <Space>
