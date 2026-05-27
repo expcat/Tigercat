@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@expcat/tigercat-core.svg)](https://www.npmjs.com/package/@expcat/tigercat-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Core utilities and shared types for [Tigercat](https://github.com/expcats/Tigercat) UI library.
+Core utilities and shared types for [Tigercat](https://github.com/expcat/Tigercat) UI library.
 
 > ⚠️ **Internal Package** - This package is used internally by `@expcat/tigercat-vue` and `@expcat/tigercat-react`. You typically don't need to install it directly.
 

@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@expcat/tigercat-vue.svg)](https://www.npmjs.com/package/@expcat/tigercat-vue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Vue 3 UI components for [Tigercat](https://github.com/expcats/Tigercat) - A Tailwind CSS based component library.
+Vue 3 UI components for [Tigercat](https://github.com/expcat/Tigercat) - A Tailwind CSS based component library.
 
 ## 📖 Documentation
 

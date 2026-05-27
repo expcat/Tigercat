@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@expcat/tigercat-react.svg)](https://www.npmjs.com/package/@expcat/tigercat-react)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-React UI components for [Tigercat](https://github.com/expcats/Tigercat) - A Tailwind CSS based component library.
+React UI components for [Tigercat](https://github.com/expcat/Tigercat) - A Tailwind CSS based component library.
 
 ## 📖 Documentation
 

@@ -18,6 +18,8 @@ const sourceVersionFiles = {
   react: 'packages/react/src/index.tsx'
 }
 
+const expectedRepositoryUrl = 'https://github.com/expcat/Tigercat'
+
 const errors = []
 
 function readText(path) {
@@ -74,6 +76,18 @@ function checkPackageExports(packages) {
     check(
       `./*` in packageExports,
       `@expcat/tigercat-${packageName} missing component subpath export`
+    )
+  }
+}
+
+function checkPackageRepositoryMetadata(packages) {
+  const rootPackage = readJson('package.json')
+  const packagesWithRoot = { root: rootPackage, ...packages }
+
+  for (const [packageName, packageInfo] of Object.entries(packagesWithRoot)) {
+    check(
+      packageInfo.repository?.url === expectedRepositoryUrl,
+      `${packageName} package.json repository.url must be ${expectedRepositoryUrl}`
     )
   }
 }
@@ -185,6 +199,7 @@ const expectedVersion = checkPackageVersions(packages)
 
 checkSourceVersions(expectedVersion)
 checkPackageExports(packages)
+checkPackageRepositoryMetadata(packages)
 checkRootScripts()
 checkRootVersion(expectedVersion)
 checkChangesetConfig(packages)

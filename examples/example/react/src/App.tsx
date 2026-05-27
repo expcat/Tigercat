@@ -300,7 +300,7 @@ const App: React.FC = () => {
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-3">链接</h3>
               <Space>
-                <Link href="https://github.com/expcats/Tigercat" target="_blank">
+                <Link href="https://github.com/expcat/Tigercat" target="_blank">
                   GitHub 仓库
                 </Link>
                 <Link href="#" disabled>

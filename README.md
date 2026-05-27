@@ -92,7 +92,7 @@ export function App() {
 ## 本地开发
 
 ```bash
-git clone https://github.com/expcats/Tigercat.git
+git clone https://github.com/expcat/Tigercat.git
 cd Tigercat
 pnpm install && pnpm build
 pnpm example:vue    # http://localhost:5173

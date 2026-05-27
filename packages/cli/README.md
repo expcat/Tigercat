@@ -1,6 +1,6 @@
 # @expcat/tigercat-cli
 
-CLI tooling for the [Tigercat](https://github.com/expcats/Tigercat) UI component library.
+CLI tooling for the [Tigercat](https://github.com/expcat/Tigercat) UI component library.
 
 ## Installation
 

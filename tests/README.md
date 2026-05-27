@@ -404,7 +404,7 @@ screen.debug()
 - Check existing test files for examples
 - Read [Vue Testing Library docs](https://testing-library.com/docs/vue-testing-library/intro/)
 - Read [React Testing Library docs](https://testing-library.com/docs/react-testing-library/intro/)
-- Search [GitHub Issues](https://github.com/expcats/Tigercat/issues)
+- Search [GitHub Issues](https://github.com/expcat/Tigercat/issues)
 
 ## Debugging Tests
 

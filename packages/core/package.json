@@ -7,12 +7,12 @@
   "author": "Yizhe Wang",
   "repository": {
     "type": "git",
-    "url": "https://github.com/expcats/Tigercat.git",
+    "url": "https://github.com/expcat/Tigercat",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/expcats/Tigercat/tree/main/packages/core#readme",
+  "homepage": "https://github.com/expcat/Tigercat/tree/main/packages/core#readme",
   "bugs": {
-    "url": "https://github.com/expcats/Tigercat/issues"
+    "url": "https://github.com/expcat/Tigercat/issues"
   },
   "keywords": [
     "tigercat",
