@@ -49,6 +49,11 @@ const customContentItems = [
   { key: 2, title: '支持多种格式' },
   { key: 3, title: '支持任意 Vue 组件' }
 ]
+
+const resetClosableAlerts = () => {
+  showAlert1.value = true
+  showAlert2.value = true
+}
 </script>
 
 <template>
@@ -139,10 +144,7 @@ const customContentItems = [
             class="ml-4"
             size="sm"
             variant="primary"
-            @click="
-              showAlert1 = true
-              showAlert2 = true
-            ">
+            @click="resetClosableAlerts">
             重置
           </Button>
         </div>

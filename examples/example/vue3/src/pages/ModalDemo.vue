@@ -103,6 +103,16 @@ const handleConfirmDelete = async () => {
   }
 }
 
+const cancelConfirmDelete = () => {
+  visibleConfirm.value = false
+  confirmResult.value = '已取消：未执行删除（示例）'
+}
+
+const cancelFormEdit = () => {
+  visibleForm.value = false
+  formError.value = null
+}
+
 const handleFormSubmit = async () => {
   if (formLoading.value) return
   formError.value = null
@@ -336,10 +346,7 @@ const handleFormSubmit = async () => {
                   <Button
                     variant="secondary"
                     :disabled="confirmLoading"
-                    @click="
-                      visibleConfirm = false
-                      confirmResult = '已取消：未执行删除（示例）'
-                    ">
+                    @click="cancelConfirmDelete">
                     取消
                   </Button>
                   <Button :disabled="confirmLoading" @click="handleConfirmDelete">
@@ -405,10 +412,7 @@ const handleFormSubmit = async () => {
                   <Button
                     variant="secondary"
                     :disabled="formLoading"
-                    @click="
-                      visibleForm = false
-                      formError = null
-                    ">
+                    @click="cancelFormEdit">
                     取消
                   </Button>
                   <Button :disabled="formLoading" @click="handleFormSubmit">
