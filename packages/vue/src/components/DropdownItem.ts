@@ -9,21 +9,12 @@ import { DropdownContextKey, type DropdownContext } from './Dropdown'
 
 import type { DropdownItemProps as CoreDropdownItemProps } from '@expcat/tigercat-core'
 
-export interface VueDropdownItemProps extends CoreDropdownItemProps {
-  itemKey?: string | number
-}
+export type VueDropdownItemProps = CoreDropdownItemProps
 
 export const DropdownItem = defineComponent({
   name: 'TigerDropdownItem',
   inheritAttrs: false,
   props: {
-    /**
-     * Unique key for the dropdown item
-     */
-    itemKey: {
-      type: [String, Number] as PropType<string | number>,
-      default: undefined
-    },
     /**
      * Whether the item is disabled
      * @default false

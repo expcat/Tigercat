@@ -35,6 +35,14 @@ import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
   <BreadcrumbItem current>Details</BreadcrumbItem>
 </Breadcrumb>
 
+// maxItems 折叠：超出数量的中间项收起为可点击的省略号
+<Breadcrumb maxItems={3}>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/a">A</BreadcrumbItem>
+  <BreadcrumbItem href="/b">B</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>
+
 // extra 扩展区
 <Breadcrumb extra={<Button size="small">Edit</Button>}>
   <BreadcrumbItem href="/">Home</BreadcrumbItem>

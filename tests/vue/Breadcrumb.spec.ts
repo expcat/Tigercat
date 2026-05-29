@@ -389,10 +389,62 @@ describe('Breadcrumb', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+  describe('maxItems collapse', () => {
+    const items = () => [
+      h(BreadcrumbItem, { href: '/' }, () => 'Home'),
+      h(BreadcrumbItem, { href: '/a' }, () => 'A'),
+      h(BreadcrumbItem, { href: '/b' }, () => 'B'),
+      h(BreadcrumbItem, { href: '/c' }, () => 'C'),
+      h(BreadcrumbItem, { current: true }, () => 'Current')
+    ]
+
+    it('should collapse middle items into an ellipsis when maxItems is set', () => {
+      const { container } = render(Breadcrumb, {
+        props: { maxItems: 3 },
+        slots: { default: items }
+      })
+
+      const ellipsis = container.querySelector(
+        'button[aria-label="Show collapsed breadcrumb items"]'
+      )
+      expect(ellipsis).toBeInTheDocument()
+      // first + ellipsis + last 2 items = 4 <li>
+      expect(container.querySelectorAll('li')).toHaveLength(4)
+      expect(screen.getByText('Home')).toBeInTheDocument()
+      expect(screen.getByText('C')).toBeInTheDocument()
+      expect(screen.getByText('Current')).toBeInTheDocument()
+      expect(screen.queryByText('A')).not.toBeInTheDocument()
+      expect(screen.queryByText('B')).not.toBeInTheDocument()
+    })
+
+    it('should expand all items when ellipsis is clicked', async () => {
+      const user = userEvent.setup()
+      const { container } = render(Breadcrumb, {
+        props: { maxItems: 3 },
+        slots: { default: items }
+      })
+
+      await user.click(
+        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')!
+      )
+
+      expect(screen.getByText('A')).toBeInTheDocument()
+      expect(screen.getByText('B')).toBeInTheDocument()
+      expect(
+        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
+      ).toBeNull()
+    })
+
+    it('should not collapse when maxItems is >= item count', () => {
+      const { container } = render(Breadcrumb, {
+        props: { maxItems: 10 },
+        slots: { default: items }
+      })
+
+      expect(
+        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
+      ).toBeNull()
+      expect(container.querySelectorAll('li')).toHaveLength(5)
     })
   })
 })

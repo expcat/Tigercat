@@ -34,6 +34,14 @@ description: Vue navigation components usage
     <BreadcrumbItem current>详情</BreadcrumbItem>
   </Breadcrumb>
 
+  <!-- maxItems 折叠：超出数量的中间项收起为可点击的省略号 -->
+  <Breadcrumb :max-items="3">
+    <BreadcrumbItem href="/">首页</BreadcrumbItem>
+    <BreadcrumbItem href="/a">A</BreadcrumbItem>
+    <BreadcrumbItem href="/b">B</BreadcrumbItem>
+    <BreadcrumbItem current>详情</BreadcrumbItem>
+  </Breadcrumb>
+
   <!-- extra 扩展区 -->
   <Breadcrumb>
     <template #extra>

@@ -3,6 +3,8 @@ import {
   computed,
   inject,
   provide,
+  ref,
+  Fragment,
   PropType,
   h,
   type VNode,
@@ -11,15 +13,18 @@ import {
 import {
   classNames,
   breadcrumbContainerClasses,
+  breadcrumbEllipsisClasses,
   getBreadcrumbItemClasses,
   getBreadcrumbLinkClasses,
   getBreadcrumbSeparatorClasses,
   getSeparatorContent,
+  getBreadcrumbCollapsedItems,
   type BreadcrumbSeparator
 } from '@expcat/tigercat-core'
 
 export interface VueBreadcrumbProps {
   separator?: BreadcrumbSeparator
+  maxItems?: number
   className?: string
   style?: Record<string, unknown>
   extra?: VNodeChild | VNodeChild[]
@@ -202,6 +207,15 @@ export const Breadcrumb = defineComponent({
       default: '/' as BreadcrumbSeparator
     },
     /**
+     * Maximum number of visible items before collapsing the middle into '...'.
+     * Shows the first item, the last `maxItems - 1` items, and a clickable
+     * ellipsis for the rest. Ignored when `maxItems <= 0` or `>=` item count.
+     */
+    maxItems: {
+      type: Number,
+      default: undefined
+    },
+    /**
      * Additional CSS classes
      */
     className: {
@@ -224,6 +238,8 @@ export const Breadcrumb = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
+    const expanded = ref(false)
+
     const extraContent = computed(() => {
       const slotValue = slots.extra?.()
       if (slotValue && slotValue.length > 0) return slotValue
@@ -241,6 +257,66 @@ export const Breadcrumb = defineComponent({
       separator: props.separator
     })
 
+    const renderItems = (): VNodeChild[] => {
+      const rawChildren = (slots.default?.() || []) as VNode[]
+
+      // Flatten Fragment VNodes (produced by v-for) into a flat list
+      const items: VNode[] = []
+      const flatten = (vnodes: VNode[]) => {
+        for (const vnode of vnodes) {
+          if (vnode.type === Fragment && Array.isArray(vnode.children)) {
+            flatten(vnode.children as VNode[])
+          } else {
+            items.push(vnode)
+          }
+        }
+      }
+      flatten(rawChildren)
+
+      const maxItems = props.maxItems
+      if (expanded.value || maxItems === undefined || maxItems <= 0 || maxItems >= items.length) {
+        return items
+      }
+
+      const { collapsed } = getBreadcrumbCollapsedItems(items.length, maxItems)
+      if (collapsed.length === 0) return items
+
+      const collapsedSet = new Set(collapsed)
+      const result: VNodeChild[] = []
+      let ellipsisInserted = false
+      items.forEach((item, index) => {
+        if (collapsedSet.has(index)) {
+          if (!ellipsisInserted) {
+            ellipsisInserted = true
+            result.push(
+              h('li', { key: '__tiger-breadcrumb-ellipsis', class: getBreadcrumbItemClasses() }, [
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: breadcrumbEllipsisClasses,
+                    'aria-label': 'Show collapsed breadcrumb items',
+                    onClick: () => {
+                      expanded.value = true
+                    }
+                  },
+                  '...'
+                ),
+                h(
+                  'span',
+                  { class: getBreadcrumbSeparatorClasses(), 'aria-hidden': 'true' },
+                  getSeparatorContent(props.separator)
+                )
+              ])
+            )
+          }
+          return
+        }
+        result.push(item)
+      })
+      return result
+    }
+
     return () => {
       return h(
         'nav',
@@ -256,7 +332,7 @@ export const Breadcrumb = defineComponent({
             {
               class: 'flex items-center flex-wrap gap-2'
             },
-            slots.default?.()
+            renderItems()
           ),
           extraContent.value
             ? h(

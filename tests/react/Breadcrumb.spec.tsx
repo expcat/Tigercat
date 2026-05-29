@@ -322,10 +322,60 @@ describe('Breadcrumb', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+  describe('maxItems collapse', () => {
+    const renderItems = (maxItems?: number) =>
+      render(
+        <Breadcrumb maxItems={maxItems}>
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
+          <BreadcrumbItem href="/a">A</BreadcrumbItem>
+          <BreadcrumbItem href="/b">B</BreadcrumbItem>
+          <BreadcrumbItem href="/c">C</BreadcrumbItem>
+          <BreadcrumbItem current>Current</BreadcrumbItem>
+        </Breadcrumb>
+      )
+
+    it('should collapse middle items into an ellipsis when maxItems is set', () => {
+      const { container } = renderItems(3)
+
+      expect(
+        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
+      ).toBeInTheDocument()
+      expect(container.querySelectorAll('li')).toHaveLength(4)
+      expect(screen.getByText('Home')).toBeInTheDocument()
+      expect(screen.getByText('C')).toBeInTheDocument()
+      expect(screen.getByText('Current')).toBeInTheDocument()
+      expect(screen.queryByText('A')).not.toBeInTheDocument()
+      expect(screen.queryByText('B')).not.toBeInTheDocument()
+    })
+
+    it('should expand all items when ellipsis is clicked', async () => {
+      const user = userEvent.setup()
+      const { container } = renderItems(3)
+
+      await user.click(
+        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')!
+      )
+
+      expect(screen.getByText('A')).toBeInTheDocument()
+      expect(screen.getByText('B')).toBeInTheDocument()
+      expect(
+        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
+      ).toBeNull()
+    })
+
+    it('should not collapse when maxItems is >= item count', () => {
+      const { container } = renderItems(10)
+
+      expect(
+        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
+      ).toBeNull()
+      expect(container.querySelectorAll('li')).toHaveLength(5)
+    })
+
+    it('should not leak maxItems to the DOM', () => {
+      const { container } = renderItems(3)
+      const nav = container.querySelector('nav')
+      expect(nav?.hasAttribute('maxitems')).toBe(false)
     })
   })
 })

@@ -1,11 +1,13 @@
-import React, { createContext, useCallback, useContext, useMemo } from 'react'
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import {
   classNames,
   breadcrumbContainerClasses,
+  breadcrumbEllipsisClasses,
   getBreadcrumbItemClasses,
   getBreadcrumbLinkClasses,
   getBreadcrumbSeparatorClasses,
   getSeparatorContent,
+  getBreadcrumbCollapsedItems,
   type BreadcrumbItemProps as CoreBreadcrumbItemProps,
   type BreadcrumbProps as CoreBreadcrumbProps,
   type BreadcrumbSeparator
@@ -137,6 +139,7 @@ export interface BreadcrumbProps
 
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   separator = '/',
+  maxItems,
   className,
   style,
   extra,
@@ -144,6 +147,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   ...props
 }) => {
   const hasExtra = Boolean(extra)
+  const [expanded, setExpanded] = useState(false)
 
   // Container classes
   const containerClasses = React.useMemo(
@@ -154,10 +158,49 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   // Context value
   const contextValue = React.useMemo<BreadcrumbContextValue>(() => ({ separator }), [separator])
 
+  const renderedItems = useMemo(() => {
+    const items = React.Children.toArray(children)
+
+    if (expanded || maxItems === undefined || maxItems <= 0 || maxItems >= items.length) {
+      return items
+    }
+
+    const { collapsed } = getBreadcrumbCollapsedItems(items.length, maxItems)
+    if (collapsed.length === 0) return items
+
+    const collapsedSet = new Set(collapsed)
+    const result: React.ReactNode[] = []
+    let ellipsisInserted = false
+    items.forEach((item, index) => {
+      if (collapsedSet.has(index)) {
+        if (!ellipsisInserted) {
+          ellipsisInserted = true
+          result.push(
+            <li key="__tiger-breadcrumb-ellipsis" className={getBreadcrumbItemClasses()}>
+              <button
+                type="button"
+                className={breadcrumbEllipsisClasses}
+                aria-label="Show collapsed breadcrumb items"
+                onClick={() => setExpanded(true)}>
+                ...
+              </button>
+              <span className={getBreadcrumbSeparatorClasses()} aria-hidden="true">
+                {getSeparatorContent(separator)}
+              </span>
+            </li>
+          )
+        }
+        return
+      }
+      result.push(item)
+    })
+    return result
+  }, [children, expanded, maxItems, separator])
+
   return (
     <BreadcrumbContext.Provider value={contextValue}>
       <nav className={containerClasses} aria-label="Breadcrumb" style={style} {...props}>
-        <ol className="flex items-center flex-wrap gap-2">{children}</ol>
+        <ol className="flex items-center flex-wrap gap-2">{renderedItems}</ol>
         {hasExtra && <div className="ml-auto flex items-center">{extra}</div>}
       </nav>
     </BreadcrumbContext.Provider>
