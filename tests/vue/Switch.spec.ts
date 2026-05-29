@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, fireEvent } from '@testing-library/vue'
 import { Switch } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
@@ -301,8 +301,9 @@ describe('Switch', () => {
         style: { marginLeft: '10px' }
       })
 
-      const switchButton = container.querySelector('[role="switch"]')
+      const switchButton = container.querySelector('[role="switch"]') as HTMLElement
       expect(switchButton).toBeInTheDocument()
+      expect(switchButton.style.marginLeft).toBe('10px')
     })
   })
 })

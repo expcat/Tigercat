@@ -1,5 +1,10 @@
 import { defineComponent, computed, h, PropType } from 'vue'
-import { type SwitchSize, getSwitchClasses, getSwitchThumbClasses } from '@expcat/tigercat-core'
+import {
+  type SwitchSize,
+  getSwitchClasses,
+  getSwitchThumbClasses,
+  mergeStyleValues
+} from '@expcat/tigercat-core'
 
 export interface VueSwitchProps {
   checked?: boolean
@@ -92,7 +97,7 @@ export const Switch = defineComponent({
           'aria-checked': props.checked,
           'aria-disabled': props.disabled ? 'true' : undefined,
           class: switchClasses.value,
-          style: props.style,
+          style: mergeStyleValues(attrs.style, props.style),
           disabled: props.disabled,
           tabindex: props.disabled ? -1 : attrs.tabindex,
           onClick: emitChange,
