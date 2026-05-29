@@ -76,8 +76,8 @@ key-apis: variant, size, disabled, loading, closable, open, preview, copyable, c
 
 ### Events
 
-| Vue Event | React Callback | Payload      | Description                              |
-| --------- | -------------- | ------------ | ---------------------------------------- |
+| Vue Event | React Callback | Payload       | Description                                                                   |
+| --------- | -------------- | ------------- | ----------------------------------------------------------------------------- |
 | `@close`  | `onClose`      | `MouseEvent?` | 关闭事件（可 `preventDefault` 阻止隐藏）；自动关闭时 React 回调不携带事件参数 |
 
 ### Slots / Children
