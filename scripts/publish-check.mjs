@@ -22,6 +22,14 @@ const version = getRootVersion(rootDir)
 const tempDir = mkdtempSync(path.join(tmpdir(), 'tigercat-publish-check-'))
 const tarballsDir = path.join(tempDir, 'tarballs')
 const examplesDir = path.join(tempDir, 'examples')
+const npmEnvSuffixesToStrip = new Set([
+  'catalog',
+  'npm-globalconfig',
+  'verify-deps-before-run',
+  '-jsr-registry'
+])
+
+process.noDeprecation = true
 
 const publishablePackages = [
   { name: '@expcat/tigercat-core', dir: path.join(rootDir, 'packages', 'core') },
@@ -122,7 +130,8 @@ function packPackage(packageDir, destinationDir) {
   const result = spawnSync('pnpm', ['pack', '--pack-destination', destinationDir], {
     cwd: packageDir,
     encoding: 'utf8',
-    shell: process.platform === 'win32'
+    shell: process.platform === 'win32',
+    env: createCommandEnv('pnpm')
   })
 
   if (result.status !== 0) {
@@ -264,12 +273,14 @@ function prepareStandardExample(exampleDir, tarballs) {
 
 function rewriteViteExampleConfig(filePath) {
   const source = readFileSync(filePath, 'utf-8')
-  const next = source.replace(
+  const withAlias = source.replace(
     /resolve:\s*\{\s*alias:\s*\{[\s\S]*?\}\s*\},/m,
     `resolve: {\n    alias: {\n      '@demo-shared': path.resolve(__dirname, './.publish-shared')\n    }\n  },`
   )
 
-  if (next === source) {
+  const next = withAlias.replace(/chunkSizeWarningLimit:\s*\d+/, 'chunkSizeWarningLimit: 1024')
+
+  if (withAlias === source) {
     throw new Error(`Could not rewrite Vite aliases in ${filePath}`)
   }
 
@@ -340,11 +351,7 @@ function runOrThrow(command, args, options) {
   const result = spawnSync(command, args, {
     stdio: 'inherit',
     shell: process.platform === 'win32',
-    env: {
-      ...process.env,
-      NEXT_TELEMETRY_DISABLED: '1',
-      NUXT_TELEMETRY_DISABLED: '1'
-    },
+    env: createCommandEnv(command, options?.env),
     ...options
   })
 
@@ -378,17 +385,21 @@ function readWorkspaceCatalogValue(rootDir, packageName) {
     throw new Error(`Could not resolve catalog version for ${packageName}`)
   }
 
-  return match[1]
+  return match[1].replace(/^['\"]|['\"]$/g, '')
 }
 
 function installWithRetry(args, cwd, waitMs = 3000) {
   const attempts = 3
+  const effectiveArgs = args.some((arg) => arg.startsWith('--loglevel='))
+    ? args
+    : [...args, '--loglevel=error']
 
   for (let attempt = 1; attempt <= attempts; attempt++) {
-    const result = spawnSync('npm', args, {
+    const result = spawnSync('npm', effectiveArgs, {
       cwd,
       stdio: 'inherit',
-      shell: process.platform === 'win32'
+      shell: process.platform === 'win32',
+      env: createCommandEnv('npm')
     })
 
     if (result.status === 0) {
@@ -508,6 +519,50 @@ function toPortablePath(filePath) {
 async function importFromTemp(requireFromTemp, specifier) {
   const resolved = requireFromTemp.resolve(specifier)
   return import(pathToFileURL(resolved).href)
+}
+
+function createCommandEnv(command, extraEnv = {}) {
+  const env = {
+    ...process.env,
+    NEXT_TELEMETRY_DISABLED: '1',
+    NUXT_TELEMETRY_DISABLED: '1',
+    ...extraEnv
+  }
+
+  if (command === 'npm') {
+    stripNpmConfigEnv(env)
+    env.NODE_OPTIONS = appendNodeOption(env.NODE_OPTIONS, '--no-deprecation')
+  }
+
+  return env
+}
+
+function stripNpmConfigEnv(env) {
+  for (const key of Object.keys(env)) {
+    const normalizedKey = key.toLowerCase().replace(/_/g, '-')
+
+    if (!normalizedKey.startsWith('npm-config-')) {
+      continue
+    }
+
+    const suffix = normalizedKey.slice('npm-config-'.length)
+    if (npmEnvSuffixesToStrip.has(suffix)) {
+      delete env[key]
+    }
+  }
+}
+
+function appendNodeOption(existingValue, option) {
+  if (!existingValue) {
+    return option
+  }
+
+  const parts = existingValue.split(/\s+/).filter(Boolean)
+  if (parts.includes(option)) {
+    return existingValue
+  }
+
+  return `${existingValue} ${option}`
 }
 
 function stripJsonComments(source) {
