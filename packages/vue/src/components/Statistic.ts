@@ -18,6 +18,7 @@ export type VueStatisticProps = InstanceType<typeof Statistic>['$props']
 
 export const Statistic = defineComponent({
   name: 'TigerStatistic',
+  inheritAttrs: false,
   props: {
     title: { type: String, default: undefined },
     value: { type: [String, Number] as PropType<string | number>, default: undefined },
@@ -27,7 +28,8 @@ export const Statistic = defineComponent({
     groupSeparator: { type: Boolean, default: false },
     animated: { type: Boolean, default: false },
     animationDuration: { type: Number, default: undefined },
-    size: { type: String as PropType<StatisticSize>, default: 'md' }
+    size: { type: String as PropType<StatisticSize>, default: 'md' },
+    className: { type: String, default: undefined }
   },
   setup(props, { attrs }) {
     const initialValue = props.animated && canAnimateStatisticValue(props.value) ? 0 : props.value
@@ -79,7 +81,12 @@ export const Statistic = defineComponent({
       h(
         'div',
         {
-          class: classNames(statisticBaseClasses, coerceClassValue(attrs.class))
+          ...attrs,
+          class: classNames(
+            statisticBaseClasses,
+            props.className,
+            coerceClassValue((attrs as Record<string, unknown>).class)
+          )
         },
         [
           props.title

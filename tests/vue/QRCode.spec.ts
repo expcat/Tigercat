@@ -34,7 +34,10 @@ describe('QRCode', () => {
 
   it('applies className prop', () => {
     const { container } = renderWithProps(QRCode, { value: 'test', className: 'my-qr' })
-    expect(container.querySelector('.my-qr')).toBeInTheDocument()
+    const root = container.querySelector('.my-qr')
+    expect(root).toBeInTheDocument()
+    // className must merge with base container classes, not replace them
+    expect(root?.className).toContain('relative')
   })
 
   // --- Sizes ---

@@ -292,6 +292,13 @@ export const Tree = defineComponent({
     itemHeight: {
       type: Number,
       default: 32
+    },
+    /**
+     * Additional CSS classes (applied to root element)
+     */
+    className: {
+      type: String,
+      default: undefined
     }
   },
   emits: [
@@ -503,7 +510,6 @@ export const Tree = defineComponent({
             })
             .catch(() => {
               loadingNodes.value.delete(nodeKey)
-              newExpandedKeys.delete(nodeKey)
             })
         }
       }
@@ -858,7 +864,11 @@ export const Tree = defineComponent({
     }
 
     return () => {
-      const rootClass = classNames(treeBaseClasses, coerceClassValue(attrs.class))
+      const rootClass = classNames(
+        treeBaseClasses,
+        props.className,
+        coerceClassValue((attrs as Record<string, unknown>).class)
+      )
 
       if (!props.treeData || props.treeData.length === 0) {
         return h(

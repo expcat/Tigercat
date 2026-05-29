@@ -20,15 +20,18 @@ export interface VueCalendarProps {
   mode?: CalendarMode
   fullscreen?: boolean
   disabledDate?: (date: Date) => boolean
+  className?: string
 }
 
 export const Calendar = defineComponent({
   name: 'TigerCalendar',
+  inheritAttrs: false,
   props: {
     modelValue: { type: Date as PropType<Date>, default: undefined },
     mode: { type: String as PropType<CalendarMode>, default: 'month' },
     fullscreen: { type: Boolean, default: false },
-    disabledDate: { type: Function as PropType<(date: Date) => boolean>, default: undefined }
+    disabledDate: { type: Function as PropType<(date: Date) => boolean>, default: undefined },
+    className: { type: String, default: undefined }
   },
   emits: ['update:modelValue', 'change', 'panel-change'],
   setup(props, { emit, attrs }) {
@@ -82,7 +85,8 @@ export const Calendar = defineComponent({
     return () => {
       const containerClass = classNames(
         getCalendarContainerClasses(!!props.fullscreen),
-        coerceClassValue(attrs.class)
+        props.className,
+        coerceClassValue((attrs as Record<string, unknown>).class)
       )
 
       const header = h('div', { class: calendarHeaderClasses }, [
@@ -173,7 +177,7 @@ export const Calendar = defineComponent({
         body = h('div', {}, [weekdayRow, dayGrid])
       }
 
-      return h('div', { class: containerClass, role: 'group' }, [header, body])
+      return h('div', { ...attrs, class: containerClass, role: 'group' }, [header, body])
     }
   }
 })

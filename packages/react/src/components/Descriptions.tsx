@@ -92,12 +92,16 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
   ...props
 }) => {
   // Responsive column resolution
+  const isResponsive = typeof columnProp === 'object' && columnProp !== null
   const subscribe = useMemo(() => {
+    if (!isResponsive) {
+      return () => () => {}
+    }
     return (cb: () => void) => {
       window.addEventListener('resize', cb)
       return () => window.removeEventListener('resize', cb)
     }
-  }, [])
+  }, [isResponsive])
   const getSnapshot = () => window.innerWidth
   const getServerSnapshot = () => 1024
   const windowWidth = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)

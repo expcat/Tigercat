@@ -467,7 +467,6 @@ export const Tree: React.FC<TreeProps> = ({
                 next.delete(nodeKey)
                 return next
               })
-              newExpandedKeys.delete(nodeKey)
             })
         }
       }

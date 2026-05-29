@@ -1,5 +1,5 @@
 import { defineComponent, h, computed, PropType } from 'vue'
-import { classNames, coerceClassValue } from '@expcat/tigercat-core'
+import { classNames, coerceClassValue, mergeStyleValues } from '@expcat/tigercat-core'
 import type { QRCodeLevel, QRCodeStatus } from '@expcat/tigercat-core'
 import {
   qrcodeContainerClasses,
@@ -16,17 +16,20 @@ export interface VueQRCodeProps {
   bgColor?: string
   level?: QRCodeLevel
   status?: QRCodeStatus
+  className?: string
 }
 
 export const QRCode = defineComponent({
   name: 'TigerQRCode',
+  inheritAttrs: false,
   props: {
     value: { type: String, required: true },
     size: { type: Number, default: 128 },
     color: { type: String, default: '#000000' },
     bgColor: { type: String, default: '#ffffff' },
     level: { type: String as PropType<QRCodeLevel>, default: 'M' },
-    status: { type: String as PropType<QRCodeStatus>, default: 'active' }
+    status: { type: String as PropType<QRCodeStatus>, default: 'active' },
+    className: { type: String, default: undefined }
   },
   emits: ['refresh'],
   setup(props, { emit, attrs }) {
@@ -37,7 +40,12 @@ export const QRCode = defineComponent({
     })
 
     return () => {
-      const containerClass = classNames(qrcodeContainerClasses, coerceClassValue(attrs.class))
+      const attrsRecord = attrs as Record<string, unknown>
+      const containerClass = classNames(
+        qrcodeContainerClasses,
+        props.className,
+        coerceClassValue(attrsRecord.class)
+      )
       const mSize = moduleSize.value
       const modules = matrix.value
 
@@ -100,8 +108,12 @@ export const QRCode = defineComponent({
       return h(
         'div',
         {
+          ...attrs,
           class: containerClass,
-          style: { width: `${props.size}px`, height: `${props.size}px` }
+          style: mergeStyleValues(attrsRecord.style, {
+            width: `${props.size}px`,
+            height: `${props.size}px`
+          })
         },
         children
       )

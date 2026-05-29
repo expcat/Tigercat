@@ -7,13 +7,15 @@ import {
   getSegmentedIndicatorStyle,
   getSegmentedOptionClasses,
   classNames,
-  coerceClassValue
+  coerceClassValue,
+  mergeStyleValues
 } from '@expcat/tigercat-core'
 
 export type VueSegmentedProps = InstanceType<typeof Segmented>['$props']
 
 export const Segmented = defineComponent({
   name: 'TigerSegmented',
+  inheritAttrs: false,
   props: {
     modelValue: {
       type: [String, Number] as PropType<string | number>,
@@ -25,7 +27,8 @@ export const Segmented = defineComponent({
     },
     disabled: { type: Boolean, default: false },
     size: { type: String as PropType<SegmentedSize>, default: 'md' },
-    block: { type: Boolean, default: false }
+    block: { type: Boolean, default: false },
+    className: { type: String, default: undefined }
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
@@ -40,11 +43,16 @@ export const Segmented = defineComponent({
       h(
         'div',
         {
+          ...attrs,
           class: classNames(
             getSegmentedContainerClasses(props.size, props.block),
-            coerceClassValue(attrs.class)
+            props.className,
+            coerceClassValue((attrs as Record<string, unknown>).class)
           ),
-          style: getSegmentedContainerStyle(props.options.length),
+          style: mergeStyleValues(
+            (attrs as Record<string, unknown>).style,
+            getSegmentedContainerStyle(props.options.length)
+          ),
           role: 'radiogroup'
         },
         [

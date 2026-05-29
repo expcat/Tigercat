@@ -45,7 +45,20 @@ describe('Statistic', () => {
 
   it('applies className prop', () => {
     const { container } = renderWithProps(Statistic, { title: 'T', value: 1, className: 'my-stat' })
-    expect(container.querySelector('.my-stat')).toBeInTheDocument()
+    const root = container.querySelector('.my-stat')
+    expect(root).toBeInTheDocument()
+    // className must merge with base classes, not replace them
+    expect(root?.className).toContain('inline-block')
+  })
+
+  it('passes through fallthrough attrs to the root element', () => {
+    const { container } = render(Statistic, {
+      props: { title: 'T', value: 1 },
+      attrs: { id: 'stat-1', 'data-testid': 'stat' }
+    })
+    const root = container.querySelector('#stat-1')
+    expect(root).toBeInTheDocument()
+    expect(root?.getAttribute('data-testid')).toBe('stat')
   })
 
   // --- Sizes ---
