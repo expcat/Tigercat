@@ -3,6 +3,7 @@ import {
   h,
   ref,
   computed,
+  watch,
   onMounted,
   onBeforeUnmount,
   inject,
@@ -97,6 +98,18 @@ export const Image = defineComponent({
         group.unregister(props.src)
       }
     })
+
+    // Reset image state when src changes (non-lazy). Mirrors the React
+    // implementation so a dynamic src updates the rendered <img>.
+    watch(
+      () => props.src,
+      (newSrc) => {
+        if (props.lazy) return
+        actualSrc.value = newSrc
+        error.value = false
+        loading.value = true
+      }
+    )
 
     const handleLoad = () => {
       loading.value = false

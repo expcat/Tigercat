@@ -5,7 +5,8 @@ import {
   type DividerProps as CoreDividerProps
 } from '@expcat/tigercat-core'
 
-export interface DividerProps extends CoreDividerProps {
+export interface DividerProps
+  extends CoreDividerProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
   /** Additional CSS classes */
   className?: string
 }
@@ -18,6 +19,7 @@ export const Divider: React.FC<DividerProps> = React.memo(
     color,
     thickness,
     className,
+    style: styleProp,
     ...props
   }) => {
     const classes = useMemo(() => {
@@ -26,8 +28,11 @@ export const Divider: React.FC<DividerProps> = React.memo(
     }, [orientation, lineStyle, spacing, className])
 
     const style = useMemo(
-      () => getDividerStyle(orientation, color, thickness) as React.CSSProperties | undefined,
-      [color, thickness, orientation]
+      () => ({
+        ...(getDividerStyle(orientation, color, thickness) as React.CSSProperties | undefined),
+        ...styleProp
+      }),
+      [color, thickness, orientation, styleProp]
     )
 
     return (

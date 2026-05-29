@@ -91,28 +91,14 @@ describe('Divider (React)', () => {
     const { container } = render(<Divider />)
     await expectNoA11yViolationsIsolated(container)
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 
-  describe('Technical Debt Coverage', () => {
-    it('should keep Divider export covered for technical debt case 01', () => {
-      expect(Divider).toBeDefined()
-    })
-
-    it('should keep Divider export covered for technical debt case 02', () => {
-      expect(Divider).toBeDefined()
-    })
-
-    it('should keep Divider export covered for technical debt case 03', () => {
-      expect(Divider).toBeDefined()
-    })
-
-    it('should keep Divider export covered for technical debt case 04', () => {
-      expect(Divider).toBeDefined()
-    })
+  it('forwards className, attributes and merges custom style', () => {
+    const { container } = render(
+      <Divider className="custom-divider" data-testid="divider" style={{ opacity: 0.5 }} />
+    )
+    const divider = container.querySelector('[role="separator"]') as HTMLElement
+    expect(divider).toHaveClass('custom-divider')
+    expect(divider).toHaveAttribute('data-testid', 'divider')
+    expect(divider.style.opacity).toBe('0.5')
   })
 })

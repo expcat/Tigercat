@@ -94,40 +94,4 @@ describe('Text (Vue)', () => {
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
     await expectNoA11yViolationsIsolated(container)
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Text export covered for technical debt case 01', () => {
-      expect(Text).toBeDefined()
-    })
-
-    it('should keep Text export covered for technical debt case 02', () => {
-      expect(Text).toBeDefined()
-    })
-
-    it('should keep Text export covered for technical debt case 03', () => {
-      expect(Text).toBeDefined()
-    })
-
-    it('should keep Text export covered for technical debt case 04', () => {
-      expect(Text).toBeDefined()
-    })
-
-    it('should keep Text export covered for technical debt case 05', () => {
-      expect(Text).toBeDefined()
-    })
-
-    it('should keep Text export covered for technical debt case 06', () => {
-      expect(Text).toBeDefined()
-    })
-
-    it('should keep Text export covered for technical debt case 07', () => {
-      expect(Text).toBeDefined()
-    })
-  })
 })

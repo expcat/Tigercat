@@ -22,6 +22,7 @@ export interface VueLinkProps {
 
 export const Link = defineComponent({
   name: 'TigerLink',
+  inheritAttrs: false,
   props: {
     /** @default 'primary' */
     variant: {

@@ -59,22 +59,22 @@ describe('ButtonGroup', () => {
   })
 
   describe('size', () => {
-    it('accepts size prop without error', () => {
+    it('propagates size to child buttons', () => {
       const { container } = render(
         <ButtonGroup size="sm">
           <Button>Small</Button>
         </ButtonGroup>
       )
-      expect(container.firstElementChild).toBeTruthy()
+      expect(container.querySelector('button')!.className).toContain('text-sm')
     })
 
-    it('accepts lg size', () => {
+    it('lets a button override the group size', () => {
       const { container } = render(
-        <ButtonGroup size="lg">
-          <Button>Large</Button>
+        <ButtonGroup size="sm">
+          <Button size="lg">Large</Button>
         </ButtonGroup>
       )
-      expect(container.firstElementChild).toBeTruthy()
+      expect(container.querySelector('button')!.className).toContain('text-lg')
     })
   })
 
@@ -107,26 +107,6 @@ describe('ButtonGroup', () => {
         </ButtonGroup>
       )
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep ButtonGroup export covered for technical debt case 01', () => {
-      expect(ButtonGroup).toBeDefined()
-    })
-
-    it('should keep Button export covered for technical debt case 02', () => {
-      expect(Button).toBeDefined()
-    })
-
-    it('should keep ButtonGroup export covered for technical debt case 03', () => {
-      expect(ButtonGroup).toBeDefined()
     })
   })
 })

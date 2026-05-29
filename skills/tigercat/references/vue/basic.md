@@ -24,7 +24,7 @@ import { Button } from '@expcat/tigercat-vue'
   <Button disabled>Disabled</Button>
   <Button loading>Loading...</Button>
   <Button block>Full Width</Button>
-  <Button type="submit" variant="primary">Submit</Button>
+  <Button htmlType="submit" variant="primary">Submit</Button>
   <Button @click="handleClick">Click Me</Button>
 
   <!-- Custom loading icon (slot) -->

@@ -111,24 +111,4 @@ describe('Link (React)', () => {
     const { container } = render(<Link href="/test">A11y</Link>)
     await expectNoA11yViolationsIsolated(container)
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Link export covered for technical debt case 01', () => {
-      expect(Link).toBeDefined()
-    })
-
-    it('should keep Link export covered for technical debt case 02', () => {
-      expect(Link).toBeDefined()
-    })
-
-    it('should keep Link export covered for technical debt case 03', () => {
-      expect(Link).toBeDefined()
-    })
-  })
 })

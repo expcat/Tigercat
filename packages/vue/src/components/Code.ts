@@ -5,6 +5,7 @@ import {
   copyTextToClipboard,
   getCodeBlockContainerClasses,
   getCodeBlockCopyButtonClasses,
+  mergeStyleValues,
   type CodeProps as CoreCodeProps
 } from '@expcat/tigercat-core'
 
@@ -87,7 +88,7 @@ export const Code = defineComponent({
         {
           ...attrs,
           class: containerClasses.value,
-          style: props.style
+          style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
         },
         [
           h('pre', { class: codeBlockPreClasses }, [h('code', { class: 'block' }, props.code)]),

@@ -13,6 +13,7 @@ export type VueTextProps = TextProps
 
 export const Text = defineComponent({
   name: 'TigerText',
+  inheritAttrs: false,
   props: {
     /**
      * HTML tag to render

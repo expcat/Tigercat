@@ -144,10 +144,4 @@ describe('Tag', () => {
     const root = container.querySelector('[role="status"]')
     expect(root?.className).toContain('bg-[var(--tiger-tag-danger-bg')
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 })

@@ -149,11 +149,4 @@ describe('Icon (Vue)', () => {
     expect(wrapper).toHaveAttribute('aria-labelledby', 'label-id')
     expect(wrapper).not.toHaveAttribute('aria-hidden')
   })
-
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 })

@@ -163,10 +163,30 @@ describe('AvatarGroup', () => {
     expect(screen.queryByText('JD')).not.toBeInTheDocument()
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+  it('propagates group size to child avatars and applies overlap class', () => {
+    const { container } = render(
+      <AvatarGroup size="sm">
+        <Avatar text="AB" />
+        <Avatar text="CD" />
+      </AvatarGroup>
+    )
+
+    const avatars = container.querySelectorAll('[role="img"]')
+    expect(avatars.length).toBe(2)
+    avatars.forEach((avatar) => {
+      expect(avatar.className).toContain('w-8 h-8 text-xs')
+      expect(avatar.className).toContain('-ml-2')
     })
+  })
+
+  it('lets an explicit avatar size override the group size', () => {
+    const { container } = render(
+      <AvatarGroup size="sm">
+        <Avatar text="AB" size="lg" />
+      </AvatarGroup>
+    )
+
+    const avatar = container.querySelector('[role="img"]')
+    expect(avatar?.className).toContain('w-12 h-12 text-base')
   })
 })

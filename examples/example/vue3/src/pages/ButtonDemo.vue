@@ -80,9 +80,9 @@ const clickCount = ref(0)`
 
 const htmlTypeSnippet = `<form @submit.prevent="alert('已提交')">
   <Space>
-    <Button type="submit" variant="primary">提交</Button>
-    <Button type="reset" variant="outline">重置</Button>
-    <Button type="button" variant="ghost">普通按钮</Button>
+    <Button htmlType="submit" variant="primary">提交</Button>
+    <Button htmlType="reset" variant="outline">重置</Button>
+    <Button htmlType="button" variant="ghost">普通按钮</Button>
   </Space>
 </form>`
 </script>
@@ -178,13 +178,13 @@ const htmlTypeSnippet = `<form @submit.prevent="alert('已提交')">
     <!-- 原生类型 -->
     <DemoBlock
       title="原生类型"
-      description="通过 type 属性设置 HTML 原生 button 类型（submit / reset / button）。"
+      description="通过 htmlType 属性设置 HTML 原生 button 类型（submit / reset / button）。"
       :code="htmlTypeSnippet">
       <form @submit.prevent>
         <Space>
-          <Button type="submit" variant="primary">提交</Button>
-          <Button type="reset" variant="outline">重置</Button>
-          <Button type="button" variant="ghost">普通按钮</Button>
+          <Button htmlType="submit" variant="primary">提交</Button>
+          <Button htmlType="reset" variant="outline">重置</Button>
+          <Button htmlType="button" variant="ghost">普通按钮</Button>
         </Space>
       </form>
     </DemoBlock>

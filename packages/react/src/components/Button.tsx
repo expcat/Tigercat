@@ -9,6 +9,7 @@ import {
   getSpinnerSVG,
   type ButtonProps as CoreButtonProps
 } from '@expcat/tigercat-core'
+import { useButtonGroupContext } from './ButtonGroup'
 
 export interface ButtonProps
   extends
@@ -38,7 +39,7 @@ const createDefaultSpinner = (): React.ReactNode => {
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
-  size = 'md',
+  size,
   disabled = false,
   loading = false,
   loadingIcon,
@@ -54,6 +55,8 @@ export const Button: React.FC<ButtonProps> = ({
   'aria-disabled': ariaDisabledProp,
   ...rest
 }) => {
+  const group = useButtonGroupContext()
+  const resolvedSize = size ?? group?.size ?? 'md'
   const isDisabled = disabled || loading
   const ariaBusy = ariaBusyProp ?? (loading ? true : undefined)
   const ariaDisabled = ariaDisabledProp ?? (isDisabled ? true : undefined)
@@ -66,12 +69,12 @@ export const Button: React.FC<ButtonProps> = ({
     return classNames(
       buttonBaseClasses,
       variantClasses,
-      buttonSizeClasses[size],
+      buttonSizeClasses[resolvedSize],
       isDisabled && buttonDisabledClasses,
       block && 'w-full',
       className
     )
-  }, [variant, size, isDisabled, block, danger, className])
+  }, [variant, resolvedSize, isDisabled, block, danger, className])
 
   const iconIsRight = iconPosition === 'right'
 

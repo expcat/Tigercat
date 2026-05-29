@@ -17,6 +17,7 @@ export interface VueDividerProps {
 
 export const Divider = defineComponent({
   name: 'TigerDivider',
+  inheritAttrs: false,
   props: {
     orientation: {
       type: String as PropType<DividerOrientation>,

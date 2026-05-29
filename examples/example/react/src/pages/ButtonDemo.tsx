@@ -220,7 +220,7 @@ const ButtonDemo: React.FC = () => {
       {/* 原生类型 */}
       <DemoBlock
         title="原生类型"
-        description="通过 type 属性设置 HTML 原生 button 类型（submit / reset / button）。"
+        description="通过 htmlType 属性设置 HTML 原生 button 类型（submit / reset / button）。"
         code={htmlTypeSnippet}>
         <form onSubmit={(e) => e.preventDefault()}>
           <Space>

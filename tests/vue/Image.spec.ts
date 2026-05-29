@@ -185,16 +185,16 @@ describe('Image', () => {
 
     await expectNoA11yViolationsIsolated(container)
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 
-  describe('Technical Debt Coverage', () => {
-    it('should keep Image export covered for technical debt case 01', () => {
-      expect(Image).toBeDefined()
+  it('updates the rendered image when src changes', async () => {
+    const { container, rerender } = render(Image, {
+      props: { src: '/first.jpg', preview: false }
     })
+
+    expect(container.querySelector('img')).toHaveAttribute('src', '/first.jpg')
+
+    await rerender({ src: '/second.jpg', preview: false })
+
+    expect(container.querySelector('img')).toHaveAttribute('src', '/second.jpg')
   })
 })

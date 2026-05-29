@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, inject, PropType } from 'vue'
 import {
   composeComponentClasses,
   mergeStyleValues,
@@ -14,6 +14,7 @@ import {
   type ButtonIconPosition,
   type ButtonHtmlType
 } from '@expcat/tigercat-core'
+import { BUTTON_GROUP_INJECTION_KEY, type ButtonGroupContext } from './ButtonGroup'
 
 export interface VueButtonProps {
   variant?: ButtonVariant
@@ -59,12 +60,11 @@ export const Button = defineComponent({
       default: 'primary'
     },
     /**
-     * Button size
-     * @default 'md'
+     * Button size. Falls back to the enclosing ButtonGroup size, then 'md'.
      */
     size: {
       type: String as PropType<ButtonSize>,
-      default: 'md'
+      default: undefined
     },
     /**
      * Whether the button is disabled
@@ -114,6 +114,9 @@ export const Button = defineComponent({
   },
   emits: ['click'],
   setup(props, { slots, emit, attrs }) {
+    const group = inject<ButtonGroupContext | null>(BUTTON_GROUP_INJECTION_KEY, null)
+    const resolvedSize = computed<ButtonSize>(() => props.size ?? group?.size ?? 'md')
+
     const buttonClasses = computed(() => {
       const variantClasses = props.danger
         ? (buttonDangerClasses[props.variant] ?? buttonDangerClasses.primary)
@@ -122,7 +125,7 @@ export const Button = defineComponent({
       return composeComponentClasses(
         buttonBaseClasses,
         variantClasses,
-        buttonSizeClasses[props.size],
+        buttonSizeClasses[resolvedSize.value],
         (props.disabled || props.loading) && buttonDisabledClasses,
         props.block && 'w-full',
         props.className,

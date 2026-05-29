@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useContext } from 'react'
 import {
   classNames,
   avatarBaseClasses,
@@ -10,6 +10,7 @@ import {
   getInitials,
   type AvatarProps as CoreAvatarProps
 } from '@expcat/tigercat-core'
+import { AvatarGroupContext } from './AvatarGroup'
 
 export interface AvatarProps
   extends Omit<CoreAvatarProps, 'icon'>, React.HTMLAttributes<HTMLSpanElement> {
@@ -20,7 +21,7 @@ export interface AvatarProps
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
-  size = 'md',
+  size,
   shape = 'circle',
   src,
   alt = '',
@@ -33,8 +34,11 @@ export const Avatar: React.FC<AvatarProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false)
 
+  const group = useContext(AvatarGroupContext)
+
   const hasImage = Boolean(src) && !imageError
   const displayText = text ? getInitials(text) : ''
+  const resolvedSize = size ?? group?.size ?? 'md'
 
   const ariaLabelProp = props['aria-label']
   const ariaLabelledbyProp = props['aria-labelledby']
@@ -49,13 +53,14 @@ export const Avatar: React.FC<AvatarProps> = ({
     () =>
       classNames(
         avatarBaseClasses,
-        avatarSizeClasses[size],
+        avatarSizeClasses[resolvedSize],
         avatarShapeClasses[shape],
+        group?.itemClass,
         !hasImage && bgColor,
         !hasImage && textColor,
         className
       ),
-    [size, shape, hasImage, bgColor, textColor, className]
+    [resolvedSize, shape, group?.itemClass, hasImage, bgColor, textColor, className]
   )
 
   // Priority: image > text > icon (children)

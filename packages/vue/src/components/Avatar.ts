@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, PropType } from 'vue'
+import { defineComponent, computed, h, ref, inject, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -13,6 +13,7 @@ import {
   type AvatarSize,
   type AvatarShape
 } from '@expcat/tigercat-core'
+import { AVATAR_GROUP_INJECTION_KEY, type AvatarGroupContext } from './AvatarGroup'
 
 export interface VueAvatarProps {
   size?: AvatarSize
@@ -36,7 +37,7 @@ export const Avatar = defineComponent({
      */
     size: {
       type: String as PropType<AvatarSize>,
-      default: 'md' as AvatarSize
+      default: undefined
     },
     /**
      * Avatar shape
@@ -100,13 +101,18 @@ export const Avatar = defineComponent({
   setup(props, { slots, attrs }) {
     const imageError = ref(false)
 
+    const group = inject<AvatarGroupContext | null>(AVATAR_GROUP_INJECTION_KEY, null)
+
     const hasImage = computed(() => Boolean(props.src) && !imageError.value)
+
+    const resolvedSize = computed<AvatarSize>(() => props.size ?? group?.size ?? 'md')
 
     const avatarClasses = computed(() =>
       classNames(
         avatarBaseClasses,
-        avatarSizeClasses[props.size],
+        avatarSizeClasses[resolvedSize.value],
         avatarShapeClasses[props.shape],
+        group?.itemClass,
         !hasImage.value && props.bgColor,
         !hasImage.value && props.textColor
       )

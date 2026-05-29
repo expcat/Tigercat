@@ -89,28 +89,15 @@ describe('Divider (Vue)', () => {
     const { container } = render(Divider)
     await expectNoA11yViolationsIsolated(container)
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 
-  describe('Technical Debt Coverage', () => {
-    it('should keep Divider export covered for technical debt case 01', () => {
-      expect(Divider).toBeDefined()
+  it('applies fallthrough attrs only once (inheritAttrs: false)', () => {
+    const { container } = render(Divider, {
+      attrs: { class: 'custom-divider-class', 'data-testid': 'divider' }
     })
-
-    it('should keep Divider export covered for technical debt case 02', () => {
-      expect(Divider).toBeDefined()
-    })
-
-    it('should keep Divider export covered for technical debt case 03', () => {
-      expect(Divider).toBeDefined()
-    })
-
-    it('should keep Divider export covered for technical debt case 04', () => {
-      expect(Divider).toBeDefined()
-    })
+    const dividers = container.querySelectorAll('[role="separator"]')
+    expect(dividers.length).toBe(1)
+    const cls = dividers[0].className
+    expect(cls.match(/custom-divider-class/g)?.length).toBe(1)
+    expect(dividers[0]).toHaveAttribute('data-testid', 'divider')
   })
 })
