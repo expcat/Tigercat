@@ -177,6 +177,45 @@ function checkReleaseDocs(expectedVersion) {
     )
   }
 
+  const exampleIndexPath = 'examples/index.html'
+  if (existsSync(join(root, exampleIndexPath))) {
+    const exampleIndex = readText(exampleIndexPath)
+    check(
+      exampleIndex.includes(`<span class="version-badge">v${expectedVersion}</span>`),
+      `${exampleIndexPath} must display v${expectedVersion} in the header`
+    )
+    check(
+      exampleIndex.includes(`Tigercat v${expectedVersion} · MIT License`),
+      `${exampleIndexPath} footer must display v${expectedVersion}`
+    )
+  }
+
+  const cliConstantsPath = 'packages/cli/src/constants.ts'
+  if (existsSync(join(root, cliConstantsPath))) {
+    const cliConstants = readText(cliConstantsPath)
+    check(
+      cliConstants.includes(`CLI_VERSION = '${expectedVersion}'`),
+      `${cliConstantsPath} must keep CLI_VERSION aligned with v${expectedVersion}`
+    )
+    check(
+      cliConstants.includes(`tigercat: '^${expectedVersion}'`),
+      `${cliConstantsPath} must keep TEMPLATE_VERSIONS.tigercat aligned with v${expectedVersion}`
+    )
+  }
+
+  const roadmapPath = 'docs/ROADMAP.md'
+  if (existsSync(join(root, roadmapPath))) {
+    const roadmap = readText(roadmapPath)
+    check(
+      roadmap.includes(`| 发布版本 | v${expectedVersion} 发布准备中`),
+      `${roadmapPath} must declare v${expectedVersion} as the current release`
+    )
+    check(
+      roadmap.includes(`- [ ] v${expectedVersion} 发布执行`),
+      `${roadmapPath} must keep the current release task aligned with v${expectedVersion}`
+    )
+  }
+
   const releaseDocPath = 'skills/tigercat/references/release.md'
   if (existsSync(join(root, releaseDocPath))) {
     const releaseDoc = readText(releaseDocPath)

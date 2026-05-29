@@ -49,6 +49,7 @@
     "release:check": "node ./scripts/check-release-readiness.mjs",
     "bench": "vitest bench",
     "api:validate": "node ./scripts/validate-api.mjs",
+    "sync:version": "node ./scripts/sync-version.mjs",
     "smoke:published": "node ./scripts/smoke-published.mjs",
     "docs:api": "node ./scripts/generate-api-docs.mjs",
     "tokens:build": "node ./packages/core/scripts/generate-tokens.mjs",

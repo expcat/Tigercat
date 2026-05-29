@@ -58,7 +58,7 @@ jobs:
           set -euo pipefail
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [[ -z "$LAST_TAG" ]]; then
-            BASE_VERSION=$(node -p "require('./packages/core/package.json').version")
+            BASE_VERSION=$(node -p "require('./package.json').version")
             COMMIT_COUNT=$(git rev-list --count HEAD)
           else
             BASE_VERSION=${LAST_TAG#v}
@@ -85,10 +85,10 @@ jobs:
             exit 1
           fi
 
-          pnpm -r --filter "./packages/**" exec pnpm version "${VERSION}" --no-git-tag-version
+          node ./scripts/sync-version.mjs "${VERSION}"
 
           if [[ -n "$(git status --porcelain)" ]]; then
-            git add packages/*/package.json
+            git add package.json packages/*/package.json packages/cli/src/constants.ts examples/index.html docs/ROADMAP.md
             git commit -m "chore(release): ${TAG}"
           fi
 

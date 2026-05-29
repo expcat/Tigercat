@@ -13,7 +13,7 @@ const tag = version ? `@${version}` : '@latest'
 const tempDir = mkdtempSync(path.join(tmpdir(), 'tigercat-published-smoke-'))
 
 function readPackageVersion() {
-  const packagePath = path.join(rootDir, 'packages', 'core', 'package.json')
+  const packagePath = path.join(rootDir, 'package.json')
   if (!existsSync(packagePath)) return ''
   return JSON.parse(readFileSync(packagePath, 'utf-8')).version
 }

@@ -37,8 +37,12 @@ function readWorkspaceCatalogValue(packageName: string): string | undefined {
 
 describe('CLI Constants', () => {
   it('should export correct CLI name and version', () => {
+    const packageJson = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'packages/cli/package.json'), 'utf-8')
+    )
+
     expect(CLI_NAME).toBe('tigercat')
-    expect(CLI_VERSION).toBe('0.9.0')
+    expect(CLI_VERSION).toBe(packageJson.version)
   })
 
   it('should define supported templates', () => {
