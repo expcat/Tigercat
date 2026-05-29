@@ -189,16 +189,4 @@ describe('Container (Vue)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Container export covered for technical debt case 01', () => {
-      expect(Container).toBeDefined()
-    })
-  })
 })

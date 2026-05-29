@@ -229,10 +229,14 @@ describe('Splitter', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+  describe('Dragging state', () => {
+    it('should apply dragging highlight class to the active gutter on mousedown', () => {
+      const { container } = renderSplitter({ sizes: [400, 400] })
+      const gutter = container.querySelector('[role="separator"]') as HTMLElement
+      const draggingClass = 'bg-[var(--tiger-primary,#2563eb)]'
+      expect(gutter.classList.contains(draggingClass)).toBe(false)
+      fireEvent.mouseDown(gutter, { clientX: 400 })
+      expect(gutter.classList.contains(draggingClass)).toBe(true)
     })
   })
 })

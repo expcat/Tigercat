@@ -123,24 +123,4 @@ describe('Grid (React)', () => {
 
     await expectNoA11yViolationsIsolated(container)
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Row export covered for technical debt case 01', () => {
-      expect(Row).toBeDefined()
-    })
-
-    it('should keep Col export covered for technical debt case 02', () => {
-      expect(Col).toBeDefined()
-    })
-
-    it('should keep Row export covered for technical debt case 03', () => {
-      expect(Row).toBeDefined()
-    })
-  })
 })

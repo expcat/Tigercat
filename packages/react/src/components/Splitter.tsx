@@ -43,6 +43,7 @@ export const Splitter: React.FC<SplitterProps> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const [paneSizes, setPaneSizes] = useState<number[]>([])
+  const [draggingIndex, setDraggingIndex] = useState(-1)
   const draggingRef = useRef<{
     index: number
     startPos: number
@@ -99,6 +100,7 @@ export const Splitter: React.FC<SplitterProps> = ({
         startPos: direction === 'horizontal' ? e.clientX : e.clientY,
         startSizes: [...paneSizes]
       }
+      setDraggingIndex(index)
       onResizeStart?.({ index, sizes: [...paneSizes] })
 
       dragSessionRef.current = createDocumentDragSession({
@@ -128,6 +130,7 @@ export const Splitter: React.FC<SplitterProps> = ({
           }
           draggingRef.current = null
           dragSessionRef.current = null
+          setDraggingIndex(-1)
         }
       })
     },
@@ -185,7 +188,7 @@ export const Splitter: React.FC<SplitterProps> = ({
       {childArray.map((child, i) => {
         const size = paneSizes[i]
         const paneStyle = size != null ? getPaneStyle(size, direction) : undefined
-        const isDragging = draggingRef.current?.index === i
+        const isDragging = draggingIndex === i
 
         return (
           <React.Fragment key={i}>
