@@ -39,9 +39,10 @@ export interface AlertProps
   descriptionSlot?: React.ReactNode
 
   /**
-   * Callback when alert is closed
+   * Callback when alert is closed.
+   * Receives the click event for manual close; called without an event on auto-close.
    */
-  onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 export const Alert: React.FC<AlertProps> = ({
@@ -118,7 +119,7 @@ export const Alert: React.FC<AlertProps> = ({
       setCountdownProgress(100)
       const timer = setTimeout(() => {
         setVisible(false)
-        onClose?.(new MouseEvent('click') as unknown as React.MouseEvent<HTMLButtonElement>)
+        onClose?.()
       }, duration)
 
       let countdownTimer: ReturnType<typeof setInterval> | undefined

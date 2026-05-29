@@ -82,7 +82,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
 
   useEffect(() => {
     // Trigger enter animation
-    setTimeout(() => setIsVisible(true), 10)
+    const timer = setTimeout(() => setIsVisible(true), 10)
+    return () => clearTimeout(timer)
   }, [])
 
   const colorScheme = getNotificationTypeClasses(notification.type)

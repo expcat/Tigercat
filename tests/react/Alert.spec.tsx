@@ -130,6 +130,19 @@ describe('Alert', () => {
       expect(screen.getByRole('alert')).toBeInTheDocument()
       vi.useRealTimers()
     })
+
+    it('should call onClose without an event argument on auto-close', async () => {
+      vi.useFakeTimers()
+      const onClose = vi.fn()
+      render(<Alert title="Auto-close Alert" closable duration={3000} onClose={onClose} />)
+
+      await act(() => {
+        vi.advanceTimersByTime(3000)
+      })
+      expect(onClose).toHaveBeenCalledTimes(1)
+      expect(onClose).toHaveBeenCalledWith()
+      vi.useRealTimers()
+    })
   })
   it('renders in banner mode with full-width styling', () => {
     render(<Alert title="Banner Alert" banner />)
@@ -137,12 +150,5 @@ describe('Alert', () => {
     const alert = screen.getByRole('alert')
     expect(alert).toHaveClass('w-full', 'rounded-none', 'border-x-0')
     expect(screen.getByText('Banner Alert')).toBeInTheDocument()
-  })
-
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
   })
 })
