@@ -96,44 +96,4 @@ describe('ActivityFeed (Vue)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep ActivityFeed export covered for technical debt case 01', () => {
-      expect(ActivityFeed).toBeDefined()
-    })
-
-    it('should keep ActivityFeed export covered for technical debt case 02', () => {
-      expect(ActivityFeed).toBeDefined()
-    })
-
-    it('should keep ActivityFeed export covered for technical debt case 03', () => {
-      expect(ActivityFeed).toBeDefined()
-    })
-
-    it('should keep ActivityFeed export covered for technical debt case 04', () => {
-      expect(ActivityFeed).toBeDefined()
-    })
-
-    it('should keep ActivityFeed export covered for technical debt case 05', () => {
-      expect(ActivityFeed).toBeDefined()
-    })
-
-    it('should keep ActivityFeed export covered for technical debt case 06', () => {
-      expect(ActivityFeed).toBeDefined()
-    })
-
-    it('should keep ActivityFeed export covered for technical debt case 07', () => {
-      expect(ActivityFeed).toBeDefined()
-    })
-
-    it('should keep ActivityFeed export covered for technical debt case 08', () => {
-      expect(ActivityFeed).toBeDefined()
-    })
-  })
 })

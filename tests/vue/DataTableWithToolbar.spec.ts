@@ -165,40 +165,4 @@ describe('DataTableWithToolbar (Vue)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep DataTableWithToolbar export covered for technical debt case 01', () => {
-      expect(DataTableWithToolbar).toBeDefined()
-    })
-
-    it('should keep DataTableWithToolbar export covered for technical debt case 02', () => {
-      expect(DataTableWithToolbar).toBeDefined()
-    })
-
-    it('should keep DataTableWithToolbar export covered for technical debt case 03', () => {
-      expect(DataTableWithToolbar).toBeDefined()
-    })
-
-    it('should keep DataTableWithToolbar export covered for technical debt case 04', () => {
-      expect(DataTableWithToolbar).toBeDefined()
-    })
-
-    it('should keep DataTableWithToolbar export covered for technical debt case 05', () => {
-      expect(DataTableWithToolbar).toBeDefined()
-    })
-
-    it('should keep DataTableWithToolbar export covered for technical debt case 06', () => {
-      expect(DataTableWithToolbar).toBeDefined()
-    })
-
-    it('should keep DataTableWithToolbar export covered for technical debt case 07', () => {
-      expect(DataTableWithToolbar).toBeDefined()
-    })
-  })
 })

@@ -45,7 +45,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   allowShiftEnter = true,
   allowEmpty = false,
   clearOnSend = true,
-  statusVariant: _sv,
   virtual = false,
   virtualItemHeight = 88,
   virtualHeight = 400,
