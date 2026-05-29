@@ -227,10 +227,4 @@ describe('AreaChart', () => {
     expect(container.querySelector('radialGradient')).toBeInTheDocument()
     expect(container.querySelector('linearGradient[id*="stroke"]')).toBeInTheDocument()
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 })

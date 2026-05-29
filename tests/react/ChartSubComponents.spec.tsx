@@ -371,10 +371,4 @@ describe('ChartTooltip', () => {
     expect(tooltip.className).toContain('left-0')
     expect(tooltip.className).toContain('top-0')
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 })

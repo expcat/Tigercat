@@ -165,11 +165,4 @@ describe('FunnelChart (React)', () => {
     expect(svg).toHaveAttribute('width', '100')
     expect(svg).toHaveAttribute('height', '80')
   })
-
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 })

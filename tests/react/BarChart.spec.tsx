@@ -256,10 +256,4 @@ describe('BarChart', () => {
       expect(onHoveredIndexChange).toHaveBeenLastCalledWith(null)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 })

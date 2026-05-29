@@ -172,11 +172,4 @@ describe('GaugeChart (Vue)', () => {
     const valuePath = paths[1].getAttribute('d')
     expect(valuePath).toBe(trackPath)
   })
-
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 })

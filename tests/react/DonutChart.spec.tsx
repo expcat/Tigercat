@@ -98,32 +98,4 @@ describe('DonutChart', () => {
     const style = slice?.getAttribute('style') ?? ''
     expect(style).toContain('drop-shadow')
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep DonutChart export covered for technical debt case 01', () => {
-      expect(DonutChart).toBeDefined()
-    })
-
-    it('should keep DonutChart export covered for technical debt case 02', () => {
-      expect(DonutChart).toBeDefined()
-    })
-
-    it('should keep DonutChart export covered for technical debt case 03', () => {
-      expect(DonutChart).toBeDefined()
-    })
-
-    it('should keep DonutChart export covered for technical debt case 04', () => {
-      expect(DonutChart).toBeDefined()
-    })
-
-    it('should keep DonutChart export covered for technical debt case 05', () => {
-      expect(DonutChart).toBeDefined()
-    })
-  })
 })

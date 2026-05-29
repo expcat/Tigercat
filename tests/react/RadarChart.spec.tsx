@@ -269,20 +269,4 @@ describe('RadarChart', () => {
     expect(container.querySelectorAll('text')).toHaveLength(0)
     expect(container.querySelector('path[data-radar-area]')).toBeInTheDocument()
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep RadarChart export covered for technical debt case 01', () => {
-      expect(RadarChart).toBeDefined()
-    })
-
-    it('should keep RadarChart export covered for technical debt case 02', () => {
-      expect(RadarChart).toBeDefined()
-    })
-  })
 })

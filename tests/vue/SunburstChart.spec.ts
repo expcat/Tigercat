@@ -170,11 +170,4 @@ describe('SunburstChart (Vue)', () => {
     expect(svg).toHaveAttribute('width', '500')
     expect(svg).toHaveAttribute('height', '300')
   })
-
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
 })
