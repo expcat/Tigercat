@@ -120,28 +120,4 @@ describe('BackTop', () => {
       expect(button).toHaveAttribute('aria-label', 'Scroll to top')
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep BackTop export covered for technical debt case 01', () => {
-      expect(BackTop).toBeDefined()
-    })
-
-    it('should keep BackTop export covered for technical debt case 02', () => {
-      expect(BackTop).toBeDefined()
-    })
-
-    it('should keep BackTop export covered for technical debt case 03', () => {
-      expect(BackTop).toBeDefined()
-    })
-
-    it('should keep BackTop export covered for technical debt case 04', () => {
-      expect(BackTop).toBeDefined()
-    })
-  })
 })

@@ -28,6 +28,9 @@ export function getFixedVirtualRange(
   itemCount: number,
   overscan: number
 ): VirtualRange {
+  if (itemHeight <= 0 || itemCount <= 0) {
+    return { startIndex: 0, endIndex: -1, offsetTop: 0, totalHeight: 0 }
+  }
   const totalHeight = itemCount * itemHeight
   const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan)
   const visibleCount = Math.ceil(containerHeight / itemHeight)

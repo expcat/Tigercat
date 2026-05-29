@@ -30,6 +30,17 @@ describe('fixedSizeStrategy', () => {
     expect(range.startIndex).toBe(10)
     expect(range.offsetTop).toBe(500)
   })
+
+  it('returns an empty range for non-positive item height', () => {
+    const zero = fixedSizeStrategy(0)
+    const range = zero.getRange(120, 400, 100, 5)
+    expect(range).toEqual({ startIndex: 0, endIndex: -1, offsetTop: 0, totalHeight: 0 })
+  })
+
+  it('returns an empty range when there are no items', () => {
+    const range = strategy.getRange(0, 200, 0, 2)
+    expect(range).toEqual({ startIndex: 0, endIndex: -1, offsetTop: 0, totalHeight: 0 })
+  })
 })
 
 describe('variableSizeStrategy', () => {
