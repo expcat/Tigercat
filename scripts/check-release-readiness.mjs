@@ -97,6 +97,7 @@ function checkRootScripts() {
   const scripts = rootPackage.scripts ?? {}
   const requiredScripts = [
     'release:check',
+    'publish:check',
     'quality:quick',
     'quality:size',
     'quality:examples',
