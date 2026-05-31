@@ -368,4 +368,59 @@ describe('Message (Vue)', () => {
       expect(true).toBe(true)
     })
   })
+
+  // Guards alignment with React: message items must be direct children of the
+  // container, without an extra TransitionGroup wrapper element. The production
+  // (non-test) render path uses TransitionGroup, so it is exercised explicitly
+  // by stubbing NODE_ENV before importing the source module.
+  describe('Production DOM structure (parity with React)', () => {
+    async function flushProd() {
+      await nextTick()
+      await Promise.resolve()
+      await nextTick()
+    }
+
+    beforeEach(() => {
+      document.body.innerHTML = ''
+      vi.resetModules()
+    })
+
+    afterEach(() => {
+      document.body.innerHTML = ''
+      vi.unstubAllEnvs()
+    })
+
+    it('renders message items as direct container children (no wrapper)', async () => {
+      vi.stubEnv('NODE_ENV', 'production')
+      const mod = await import('../../packages/vue/src/components/Message')
+
+      mod.Message.success({ content: 'Prod A', duration: 0 })
+      mod.Message.info({ content: 'Prod B', duration: 0 })
+      await flushProd()
+
+      const container = document.getElementById('tiger-message-container')
+      expect(container).toBeTruthy()
+
+      const directChildren = Array.from(container!.children)
+      expect(directChildren).toHaveLength(2)
+      directChildren.forEach((child) => {
+        expect(child.hasAttribute('data-tiger-message')).toBe(true)
+      })
+
+      mod.Message.clear()
+    })
+
+    it('renders a single message content node (no duplicate text)', async () => {
+      vi.stubEnv('NODE_ENV', 'production')
+      const mod = await import('../../packages/vue/src/components/Message')
+
+      mod.Message.success({ content: 'UniqueProdContent', duration: 0 })
+      await flushProd()
+
+      const matches = (document.body.innerHTML.match(/UniqueProdContent/g) || []).length
+      expect(matches).toBe(1)
+
+      mod.Message.clear()
+    })
+  })
 })

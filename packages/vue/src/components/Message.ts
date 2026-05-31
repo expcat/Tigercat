@@ -159,7 +159,7 @@ export const MessageContainer = defineComponent({
           },
           IS_TEST_ENV
             ? messageInstances.value.map(renderMessageItem)
-            : h(TransitionGroup, { name: 'message', tag: 'div' }, () =>
+            : h(TransitionGroup, { name: 'message' }, () =>
                 messageInstances.value.map(renderMessageItem)
               )
         )
