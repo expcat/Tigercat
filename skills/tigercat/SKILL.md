@@ -1,49 +1,41 @@
-﻿---
+---
 name: tigercat
-description: Tigercat UI component library for Vue 3 and React
+description: Tigercat component library guidance for React and Vue. Use when an agent needs to choose, implement, migrate, or troubleshoot Tigercat components; look up props, APIs, shared patterns, theme tokens, i18n, SSR, accessibility, performance, CLI, or release guidance; or map equivalent React and Vue implementations.
 ---
 
 # Tigercat UI Component Library
 
-Tailwind CSS 驱动的跨框架组件库。此文件只做 LLM 导航索引；编码规则见 `.github/copilot-instructions.md`。
+Tailwind CSS 驱动的跨框架组件库。将此 skill 作为 Tigercat 文档路由入口：先定位组件或主题，再只打开对应 reference。
 
-## Open First
+## How To Use
 
-| Need                                      | File                                                                                                                                                                                                             |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 术语与 Vue/React 映射                     | [shared/glossary.md](references/shared/glossary.md)                                                                                                                                                              |
-| 常用跨框架模式                            | [shared/patterns/common.md](references/shared/patterns/common.md)                                                                                                                                                |
-| TS 派生 API 摘要                          | [shared/api-summary.md](references/shared/api-summary.md)                                                                                                                                                        |
-| Setup / Theme / Tokens / i18n / SSR / CLI | [getting-started.md](references/getting-started.md), [theme.md](references/theme.md), [tokens.md](references/tokens.md), [i18n.md](references/i18n.md), [ssr.md](references/ssr.md), [cli.md](references/cli.md) |
-| Accessibility / Performance / Release     | [accessibility.md](references/accessibility.md), [performance.md](references/performance.md), [release.md](references/release.md)                                                                                |
+- 查组件：打开 [component-index.md](references/component-index.md)，按组件名找到分类、props、examples 和类型源码。
+- 写组件：打开对应 [examples](references/examples/) 分类文档，再按需要打开同分类 [shared/props](references/shared/props/)。
+- 查类型：打开 [shared/api-summary.md](references/shared/api-summary.md)，再回到类型源码或 props reference。
+- 做跨框架迁移：先读 [shared/patterns/common.md](references/shared/patterns/common.md) 和 [shared/glossary.md](references/shared/glossary.md)，再打开目标组件 examples。
 
-## Category Index
+## Core References
 
-| Category   | Shared Props                                                        | Vue                                               | React                                                 |
-| ---------- | ------------------------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------- |
-| Basic      | [shared/props/basic.md](references/shared/props/basic.md)           | [vue/basic.md](references/vue/basic.md)           | [react/basic.md](references/react/basic.md)           |
-| Form       | [shared/props/form.md](references/shared/props/form.md)             | [vue/form.md](references/vue/form.md)             | [react/form.md](references/react/form.md)             |
-| Feedback   | [shared/props/feedback.md](references/shared/props/feedback.md)     | [vue/feedback.md](references/vue/feedback.md)     | [react/feedback.md](references/react/feedback.md)     |
-| Layout     | [shared/props/layout.md](references/shared/props/layout.md)         | [vue/layout.md](references/vue/layout.md)         | [react/layout.md](references/react/layout.md)         |
-| Navigation | [shared/props/navigation.md](references/shared/props/navigation.md) | [vue/navigation.md](references/vue/navigation.md) | [react/navigation.md](references/react/navigation.md) |
-| Data       | [shared/props/data.md](references/shared/props/data.md)             | [vue/data.md](references/vue/data.md)             | [react/data.md](references/react/data.md)             |
-| Charts     | [shared/props/charts.md](references/shared/props/charts.md)         | [vue/charts.md](references/vue/charts.md)         | [react/charts.md](references/react/charts.md)         |
-| Advanced   | [shared/props/advanced.md](references/shared/props/advanced.md)     | [vue/advanced.md](references/vue/advanced.md)     | [react/advanced.md](references/react/advanced.md)     |
-| Composite  | [shared/props/composite.md](references/shared/props/composite.md)   | [vue/composite.md](references/vue/composite.md)   | [react/composite.md](references/react/composite.md)   |
+| Need                    | Read                                                              |
+| ----------------------- | ----------------------------------------------------------------- |
+| Component route map     | [component-index.md](references/component-index.md)               |
+| Vue usage routes        | [vue/index.md](references/vue/index.md)                           |
+| React usage routes      | [react/index.md](references/react/index.md)                       |
+| Shared props            | [shared/props/](references/shared/props/)                         |
+| Generated API summary   | [shared/api-summary.md](references/shared/api-summary.md)         |
+| Cross-framework terms   | [shared/glossary.md](references/shared/glossary.md)               |
+| Common binding patterns | [shared/patterns/common.md](references/shared/patterns/common.md) |
 
-## 2-Step Component Lookup
+## Topic References
 
-1. 在下表搜索组件名，确认所属分类。
-2. 打开同一行的 Props / Vue / React 分类文档，再搜索组件标题。
-
-| Category   | Components                                                                                                                                                                                                                                                                                 | Props                                          | Vue                                 | React                                   |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- | ----------------------------------- | --------------------------------------- |
-| Basic      | Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, Code, Divider, Empty, Icon, Image, ImageCropper, Link, QRCode, Tag, Text                                                                                                                                                           | [Props](references/shared/props/basic.md)      | [Vue](references/vue/basic.md)      | [React](references/react/basic.md)      |
-| Form       | AutoComplete, Cascader, Checkbox, CheckboxGroup, ColorPicker, ColorSwatch, CronEditor, DatePicker, Form, Input, InputGroup, InputNumber, Mentions, NumberKeyboard, Radio, RadioGroup, Rate, Select, Signature, Slider, Stepper, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload | [Props](references/shared/props/form.md)       | [Vue](references/vue/form.md)       | [React](references/react/form.md)       |
-| Feedback   | Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Result, Tooltip, Tour, Watermark                                                                                                                                                                             | [Props](references/shared/props/feedback.md)   | [Vue](references/vue/feedback.md)   | [React](references/react/feedback.md)   |
-| Layout     | Card, Carousel, Container, Descriptions, Grid, Layout, List, Resizable, Skeleton, Space, Splitter, Statistic                                                                                                                                                                               | [Props](references/shared/props/layout.md)     | [Vue](references/vue/layout.md)     | [React](references/react/layout.md)     |
-| Navigation | Affix, Anchor, BackTop, Breadcrumb, Dropdown, FloatButton, Menu, Pagination, ScrollSpy, Segmented, Spotlight, Steps, Tabs, Tree                                                                                                                                                            | [Props](references/shared/props/navigation.md) | [Vue](references/vue/navigation.md) | [React](references/react/navigation.md) |
-| Data       | Calendar, Collapse, Countdown, Table, Timeline                                                                                                                                                                                                                                             | [Props](references/shared/props/data.md)       | [Vue](references/vue/data.md)       | [React](references/react/data.md)       |
-| Charts     | AreaChart, BarChart, ChartCanvas, ChartLegend, ChartTooltip, DonutChart, FunnelChart, Gantt, GaugeChart, HeatmapChart, LineChart, OrgChart, PieChart, RadarChart, ScatterChart, SunburstChart, TreeMapChart                                                                                | [Props](references/shared/props/charts.md)     | [Vue](references/vue/charts.md)     | [React](references/react/charts.md)     |
-| Advanced   | CodeEditor, FileManager, ImageAnnotation, ImageViewer, InfiniteScroll, Kanban, MarkdownEditor, PrintLayout, RichTextEditor, TaskBoard, VirtualList, VirtualTable                                                                                                                           | [Props](references/shared/props/advanced.md)   | [Vue](references/vue/advanced.md)   | [React](references/react/advanced.md)   |
-| Composite  | ActivityFeed, ChatWindow, CommentThread, CropUpload, DataTableWithToolbar, FormWizard, NotificationCenter                                                                                                                                                                                  | [Props](references/shared/props/composite.md)  | [Vue](references/vue/composite.md)  | [React](references/react/composite.md)  |
+| Need          | Read                                                |
+| ------------- | --------------------------------------------------- |
+| Setup         | [getting-started.md](references/getting-started.md) |
+| CLI           | [cli.md](references/cli.md)                         |
+| Theme         | [theme.md](references/theme.md)                     |
+| Tokens        | [tokens.md](references/tokens.md)                   |
+| i18n          | [i18n.md](references/i18n.md)                       |
+| SSR           | [ssr.md](references/ssr.md)                         |
+| Accessibility | [accessibility.md](references/accessibility.md)     |
+| Performance   | [performance.md](references/performance.md)         |
+| Release       | [release.md](references/release.md)                 |

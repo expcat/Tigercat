@@ -3,27 +3,29 @@
 /**
  * generate-api-docs.mjs
  *
- * Scans packages/core/src/types/*.ts and generates a compact skill reference:
- * - skills/tigercat/references/shared/api-summary.md for LLM lookup
+ * Scans packages/core/src/types/*.ts and generates compact skill references:
+ * - skills/tigercat/references/shared/api-summary.md for type lookup
+ * - skills/tigercat/references/component-index.md as the canonical component route map
+ * - skills/tigercat/references/shared/props/*.md as compact props references
+ * - skills/tigercat/references/examples/*.md as shared Vue/React example routes
  *
  * Usage: node scripts/generate-api-docs.mjs
  */
 
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import prettier from 'prettier'
 import ts from 'typescript'
 
 const ROOT_DIR = join(import.meta.dirname, '..')
 const TYPES_DIR = join(ROOT_DIR, 'packages', 'core', 'src', 'types')
-const LLM_API_SUMMARY = join(
-  ROOT_DIR,
-  'skills',
-  'tigercat',
-  'references',
-  'shared',
-  'api-summary.md'
-)
+const SKILL_REFERENCES_DIR = join(ROOT_DIR, 'skills', 'tigercat', 'references')
+const SHARED_DIR = join(SKILL_REFERENCES_DIR, 'shared')
+const PROPS_DIR = join(SHARED_DIR, 'props')
+const EXAMPLES_DIR = join(SKILL_REFERENCES_DIR, 'examples')
+const LLM_API_SUMMARY = join(SHARED_DIR, 'api-summary.md')
+const COMPONENT_INDEX = join(SKILL_REFERENCES_DIR, 'component-index.md')
+
 const CATEGORIES = {
   Basic: [
     'alert',
@@ -50,6 +52,8 @@ const CATEGORIES = {
     'cascader',
     'checkbox',
     'color-picker',
+    'color-swatch',
+    'cron-editor',
     'datepicker',
     'form',
     'input',
@@ -109,15 +113,17 @@ const CATEGORIES = {
     'tabs',
     'tree'
   ],
-  Data: ['calendar', 'collapse', 'countdown', 'table'],
-  Charts: ['chart'],
+  Data: ['calendar', 'collapse', 'countdown', 'table', 'timeline'],
+  Charts: ['chart', 'gantt', 'org-chart'],
   Advanced: [
     'code-editor',
     'drag',
     'file-manager',
+    'image-annotation',
     'image-viewer',
     'infinite-scroll',
     'kanban',
+    'markdown-editor',
     'print-layout',
     'rich-text-editor',
     'virtual-list',
@@ -126,6 +132,83 @@ const CATEGORIES = {
   Composite: ['composite'],
   Core: ['base', 'events', 'floating-popup', 'generics', 'locale', 'slots', 'theme']
 }
+
+const CATEGORY_SLUGS = Object.fromEntries(
+  Object.keys(CATEGORIES).map((category) => [category, category.toLowerCase()])
+)
+
+const CATEGORY_DESCRIPTIONS = {
+  Basic: '基础展示与低级交互组件。',
+  Form: '表单输入、选择、校验和上传相关组件。',
+  Feedback: '覆盖层、提示、加载、结果和进度反馈组件。',
+  Layout: '布局容器、栅格、列表、分割和尺寸控制组件。',
+  Navigation: '导航、菜单、分页、步骤、锚点和树形导航组件。',
+  Data: '数据展示、表格、时间线、日历和折叠面板组件。',
+  Charts: '图表画布、图例、工具提示和可视化组件。',
+  Advanced: '编辑器、虚拟化、文件、拖拽、看板和高级工具组件。',
+  Composite: '由基础组件组合出的业务型组件。',
+  Core: '核心类型、事件、主题、locale、slot 和泛型工具。'
+}
+
+const EXAMPLE_NOTES = {
+  Basic: 'Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或透传 attrs。',
+  Form: 'Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。',
+  Feedback: '弹层类组件通常使用 `open`/`update:open` 或 `open`/`onOpenChange`。',
+  Layout: '布局组件通常组合使用，先确定容器，再选择 Space/Grid/List 等局部排版组件。',
+  Navigation: '受控导航组件优先维护当前项、页码或展开状态，再传给组件。',
+  Data: '表格和复杂数据组件先定义列、数据和 key，再处理分页、选择、展开等增强项。',
+  Charts: '图表组件共享数据、series、legend、tooltip 和 axes 模式，细节看 chart 类型源。',
+  Advanced: '高级组件通常需要受控数据、回调和性能边界，先看 props 再写示例。',
+  Composite: '组合组件面向业务场景，优先按现有 props 接口配置，而不是拆开重写内部结构。'
+}
+
+const MAX_PROPS_PER_COMPONENT = 3
+const MAX_EVENTS_PER_COMPONENT = 6
+
+const VIRTUAL_COMPONENTS = [
+  {
+    component: 'ConfigProvider',
+    category: 'Basic',
+    props: 'shared/props/basic.md#config-provider',
+    examples: 'examples/basic.md#config-provider',
+    typeSource:
+      'packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts',
+    propsRows: [
+      {
+        name: 'locale?',
+        type: 'TigerLocale',
+        defaultValue: '-',
+        description: 'Locale configuration'
+      },
+      { name: 'theme?', type: 'TigerTheme', defaultValue: '-', description: 'Theme configuration' },
+      { name: 'prefixCls?', type: 'string', defaultValue: 'tiger', description: 'CSS class prefix' }
+    ]
+  }
+]
+
+const COMPONENT_ALIASES = {
+  AutoComplete: 'AutoComplete',
+  QRCode: 'QRCode',
+  DataTableWithToolbar: 'DataTableWithToolbar',
+  ChartCanvas: 'ChartCanvas',
+  ChartAxis: 'ChartAxis',
+  ChartGrid: 'ChartGrid',
+  ChartSeries: 'ChartSeries',
+  ChartLegend: 'ChartLegend',
+  ChartTooltip: 'ChartTooltip'
+}
+
+const EXCLUDED_COMPONENTS = new Set([
+  'BaseChart',
+  'ChartInteraction',
+  'ChartWithAxes',
+  'FormCondition',
+  'FormRule',
+  'FormError',
+  'GenericComponent',
+  'GenericProps',
+  'TigerLocale'
+])
 
 async function formatMarkdown(content) {
   return prettier.format(content, { parser: 'markdown' })
@@ -139,10 +222,114 @@ function getDeclarationName(node) {
   return node.name && ts.isIdentifier(node.name) ? node.name.text : null
 }
 
+function kebabToPascal(value) {
+  return value
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('')
+}
+
+function pascalToKebab(value) {
+  return value
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase()
+}
+
+function normalizeComponentName(name) {
+  return COMPONENT_ALIASES[name] || name
+}
+
+function propsToComponents(propsInterfaces) {
+  return propsInterfaces
+    .map((propsInterface) =>
+      propsInterface
+        .replace(/^Vue/, '')
+        .replace(/^React/, '')
+        .replace(/Props$/, '')
+        .replace(/ConfigProvider$/, 'ConfigProvider')
+    )
+    .map(normalizeComponentName)
+    .filter((name) => /^[A-Z]/.test(name))
+    .filter((name) => !EXCLUDED_COMPONENTS.has(name))
+    .filter((name) => !/^(Base|Generic|Use|Tiger|React|Vue)$/.test(name))
+}
+
+function getJsDocText(node) {
+  const docs = ts.getJSDocCommentsAndTags(node)
+  const comments = []
+
+  for (const doc of docs) {
+    if (ts.isJSDoc(doc)) {
+      if (typeof doc.comment === 'string') comments.push(doc.comment)
+      if (doc.tags) {
+        for (const tag of doc.tags) {
+          if (tag.tagName.text === 'deprecated') comments.push('Deprecated.')
+        }
+      }
+    }
+  }
+
+  return comments.join(' ').replace(/\s+/g, ' ').trim()
+}
+
+function getJsDocTag(node, tagName) {
+  for (const tag of ts.getJSDocTags(node)) {
+    if (tag.tagName.text !== tagName) continue
+    return typeof tag.comment === 'string' ? tag.comment.trim() : ''
+  }
+  return ''
+}
+
+function cleanTypeText(text) {
+  return text
+    .replace(/\s+/g, ' ')
+    .replace(/\s*=>\s*/g, ' => ')
+    .replace(/\s*\|\s*/g, ' | ')
+    .replace(/\s*&\s*/g, ' & ')
+    .trim()
+}
+
+function compactDescription(text) {
+  const value = text.replace(/\|/g, '\\|').trim()
+  if (value.length <= 90) return value
+  return `${value.slice(0, 87).trim()}...`
+}
+
+function tableText(text) {
+  return String(text).replace(/\|/g, '\\|')
+}
+
+function codeText(text) {
+  return tableText(String(text).replace(/`/g, '\\`'))
+}
+
+function extractMembers(node, sourceFile) {
+  if (!node.members) return []
+
+  return node.members
+    .filter((member) => ts.isPropertySignature(member) || ts.isMethodSignature(member))
+    .map((member) => {
+      const name = member.name?.getText(sourceFile) ?? ''
+      const optional = Boolean(member.questionToken)
+      const rawType = ts.isMethodSignature(member)
+        ? member.getText(sourceFile).replace(/^\s*[\w$]+\??\s*/, '')
+        : member.type?.getText(sourceFile) || 'unknown'
+      return {
+        name: `${name}${optional ? '?' : ''}`,
+        type: cleanTypeText(rawType),
+        defaultValue: getJsDocTag(member, 'default') || '-',
+        description: compactDescription(getJsDocText(member) || '-'),
+        kind: /^on[A-Z]/.test(name) ? 'event' : ts.isMethodSignature(member) ? 'method' : 'prop'
+      }
+    })
+}
+
 function extractFileInfo(fileName, content) {
   const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.Latest, true)
   const exports = []
   const propsInterfaces = []
+  const interfaceDetails = []
 
   function visit(node) {
     if (
@@ -168,13 +355,24 @@ function extractFileInfo(fileName, content) {
       node.name.text.endsWith('Props')
     ) {
       propsInterfaces.push(node.name.text)
+      interfaceDetails.push({
+        name: node.name.text,
+        description: compactDescription(getJsDocText(node) || `${node.name.text} definition`),
+        members: extractMembers(node, sourceFile)
+      })
     }
 
     ts.forEachChild(node, visit)
   }
 
   visit(sourceFile)
-  return { fileName, exports, propsInterfaces }
+  return {
+    fileName,
+    typeName: basename(fileName, '.ts'),
+    exports,
+    propsInterfaces,
+    interfaceDetails
+  }
 }
 
 function getCategorizedFiles(fileInfoByName) {
@@ -183,20 +381,14 @@ function getCategorizedFiles(fileInfoByName) {
 
   for (const [category, typeFiles] of Object.entries(CATEGORIES)) {
     const files = typeFiles.map((typeFile) => fileInfoByName.get(typeFile)).filter(Boolean)
-    files.forEach((fileInfo) => used.add(fileInfo.fileName))
+    files.forEach((fileInfo) => used.add(fileInfo.typeName))
     categorized.push({ category, files })
   }
 
-  const otherFiles = [...fileInfoByName.values()].filter((fileInfo) => !used.has(fileInfo.fileName))
+  const otherFiles = [...fileInfoByName.values()].filter((fileInfo) => !used.has(fileInfo.typeName))
   if (otherFiles.length > 0) categorized.push({ category: 'Other', files: otherFiles })
 
   return categorized
-}
-
-function propsToComponents(propsInterfaces) {
-  return propsInterfaces
-    .map((propsInterface) => propsInterface.replace(/Props$/, ''))
-    .filter((name) => !/^(Base|Generic|Use|React|Vue)/.test(name))
 }
 
 function countExportedTypes(categorizedFiles) {
@@ -207,19 +399,45 @@ function countExportedTypes(categorizedFiles) {
   )
 }
 
+function getComponentRows(categorizedFiles) {
+  const rows = []
+  const seen = new Set()
+
+  for (const { category, files } of categorizedFiles) {
+    if (category === 'Core' || category === 'Other') continue
+
+    for (const fileInfo of files) {
+      const components = propsToComponents(fileInfo.propsInterfaces)
+      for (const component of components.length > 0
+        ? components
+        : [kebabToPascal(fileInfo.typeName)]) {
+        if (seen.has(component)) continue
+        seen.add(component)
+        const slug = CATEGORY_SLUGS[category]
+        rows.push({
+          component,
+          category,
+          props: `shared/props/${slug}.md#${pascalToKebab(component)}`,
+          examples: `examples/${slug}.md#${pascalToKebab(component)}`,
+          typeSource: `packages/core/src/types/${fileInfo.fileName}`
+        })
+      }
+    }
+  }
+
+  return rows.sort(
+    (a, b) => a.category.localeCompare(b.category) || a.component.localeCompare(b.component)
+  )
+}
+
 function generateLlmApiSummary(categorizedFiles, totalTypes) {
   let markdownText = '---\n'
-  markdownText += 'name: tigercat-llm-api-summary\n'
+  markdownText += 'name: tigercat-api-summary\n'
   markdownText += 'description: Compact generated API summary for Tigercat core types\n'
   markdownText += '---\n\n'
-  markdownText += '<!-- LLM-INDEX\n'
-  markdownText += 'type: generated-api-summary\n'
-  markdownText += `total-exported-types: ${totalTypes}\n`
-  markdownText += 'source: packages/core/src/types/*.ts\n'
-  markdownText += '-->\n\n'
-  markdownText += '# Tigercat LLM API Summary\n\n'
-  markdownText +=
-    '> 自动生成 — `pnpm docs:api`。只做类型文件与 Props 接口定位；字段细节以源码和分类 Props 文档为准。\n\n'
+  markdownText += '<!-- generated by pnpm docs:api -->\n\n'
+  markdownText += '# Tigercat API Summary\n\n'
+  markdownText += '> 自动生成。用于定位类型文件和 Props 接口；字段细节看分类 props 文档或源码。\n\n'
 
   for (const { category, files } of categorizedFiles) {
     markdownText += `## ${category}\n\n`
@@ -232,6 +450,180 @@ function generateLlmApiSummary(categorizedFiles, totalTypes) {
     markdownText += '\n'
   }
 
+  markdownText += `Total exported types: ${totalTypes}.\n`
+  return markdownText
+}
+
+function generateComponentIndex(componentRows) {
+  let markdownText = '---\n'
+  markdownText += 'name: tigercat-component-index\n'
+  markdownText +=
+    'description: Canonical Tigercat component route map for props, examples, and type source files\n'
+  markdownText += '---\n\n'
+  markdownText += '<!-- generated by pnpm docs:api -->\n\n'
+  markdownText += '# Component Index\n\n'
+  markdownText +=
+    '每个公开组件只在这里路由一次。先查组件，再只打开对应 props 或 examples 文档。\n\n'
+  markdownText += '| Component | Category | Props | Examples | Type Source |\n'
+  markdownText += '| --------- | -------- | ----- | -------- | ----------- |\n'
+
+  for (const row of componentRows) {
+    markdownText += `| ${row.component} | ${row.category} | [props](${row.props}) | [examples](${row.examples}) | \`${row.typeSource}\` |\n`
+  }
+
+  return markdownText
+}
+
+function generatePropsReference(category, files) {
+  const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
+  const componentCount = files.reduce(
+    (count, fileInfo) => count + propsToComponents(fileInfo.propsInterfaces).length,
+    0
+  )
+  let markdownText = '---\n'
+  markdownText += `name: tigercat-props-${slug}\n`
+  markdownText += `description: Compact generated Tigercat ${category} props reference\n`
+  markdownText += '---\n\n'
+  markdownText += '<!-- generated by pnpm docs:api -->\n\n'
+  markdownText += `# ${category} Props\n\n`
+  markdownText += `${CATEGORY_DESCRIPTIONS[category] || 'Tigercat component props.'} 共 ${componentCount} 个组件。字段细节以 \`packages/core/src/types/*.ts\` 为准。\n\n`
+
+  for (const fileInfo of files) {
+    const components = propsToComponents(fileInfo.propsInterfaces)
+    if (components.length === 0) continue
+
+    for (const detail of fileInfo.interfaceDetails) {
+      const component = normalizeComponentName(
+        detail.name
+          .replace(/^Vue/, '')
+          .replace(/^React/, '')
+          .replace(/Props$/, '')
+      )
+      if (!components.includes(component)) continue
+
+      markdownText += `## ${component}\n\n`
+      markdownText += `Source: \`packages/core/src/types/${fileInfo.fileName}\` · Interface: \`${detail.name}\`.\n\n`
+      const propRows = detail.members.filter((member) => member.kind === 'prop')
+      const eventRows = detail.members.filter((member) => member.kind === 'event')
+      const methodRows = detail.members.filter((member) => member.kind === 'method')
+
+      if (propRows.length > 0) {
+        const visiblePropRows = propRows.slice(0, MAX_PROPS_PER_COMPONENT)
+        if (propRows.length > visiblePropRows.length) {
+          markdownText += `Showing ${visiblePropRows.length} key props of ${propRows.length}; see source for the complete interface.\n\n`
+        }
+        markdownText += '| Prop | Type | Default | Notes |\n'
+        markdownText += '| ---- | ---- | ------- | ----- |\n'
+        for (const member of visiblePropRows) {
+          markdownText += `| \`${codeText(member.name)}\` | \`${codeText(member.type)}\` | \`${codeText(member.defaultValue)}\` | ${tableText(member.description)} |\n`
+        }
+        markdownText += '\n'
+      }
+
+      if (eventRows.length > 0) {
+        markdownText += 'Events/callback props: '
+        markdownText += eventRows
+          .slice(0, MAX_EVENTS_PER_COMPONENT)
+          .map((member) => `\`${member.name}\``)
+          .join(', ')
+        if (eventRows.length > MAX_EVENTS_PER_COMPONENT) markdownText += ', ...'
+        markdownText += '.\n\n'
+      }
+
+      if (methodRows.length > 0) {
+        markdownText += 'Method signatures: '
+        markdownText += methodRows.map((member) => `\`${member.name}\``).join(', ')
+        markdownText += '.\n\n'
+      }
+    }
+  }
+
+  for (const virtualComponent of VIRTUAL_COMPONENTS.filter((item) => item.category === category)) {
+    markdownText += `## ${virtualComponent.component}\n\n`
+    markdownText += `Source: \`${virtualComponent.typeSource}\`.\n\n`
+    markdownText += '| Prop | Type | Default | Notes |\n'
+    markdownText += '| ---- | ---- | ------- | ----- |\n'
+    for (const member of virtualComponent.propsRows) {
+      markdownText += `| \`${codeText(member.name)}\` | \`${codeText(member.type)}\` | \`${codeText(member.defaultValue)}\` | ${tableText(member.description)} |\n`
+    }
+    markdownText += '\n'
+  }
+
+  return markdownText
+}
+
+function getVueSnippet(component, category) {
+  if (
+    category === 'Form' &&
+    ['Input', 'Select', 'Checkbox', 'Radio', 'Switch', 'Textarea'].includes(component)
+  ) {
+    return `<${component} v-model=\"value\" />`
+  }
+  if (component === 'Form')
+    return '<Form :model=\"form\"><FormItem name=\"name\"><Input v-model=\"form.name\" /></FormItem></Form>'
+  if (component === 'Table') return '<Table :columns=\"columns\" :data=\"rows\" row-key=\"id\" />'
+  if (category === 'Charts') return `<${component} :data=\"data\" />`
+  return `<${component} />`
+}
+
+function getReactSnippet(component, category) {
+  if (
+    category === 'Form' &&
+    ['Input', 'Select', 'Checkbox', 'Radio', 'Switch', 'Textarea'].includes(component)
+  ) {
+    return `<${component} value={value} onChange={setValue} />`
+  }
+  if (component === 'Form')
+    return '<Form model={form}><FormItem name=\"name\"><Input value={form.name} onChange={onNameChange} /></FormItem></Form>'
+  if (component === 'Table') return '<Table columns={columns} data={rows} rowKey=\"id\" />'
+  if (category === 'Charts') return `<${component} data={data} />`
+  return `<${component} />`
+}
+
+function generateExamples(category, files) {
+  const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
+  const components = [
+    ...files.flatMap((fileInfo) => propsToComponents(fileInfo.propsInterfaces)),
+    ...VIRTUAL_COMPONENTS.filter((item) => item.category === category).map((item) => item.component)
+  ]
+  let markdownText = '---\n'
+  markdownText += `name: tigercat-examples-${slug}\n`
+  markdownText += `description: Compact Tigercat ${category} Vue and React usage routes\n`
+  markdownText += '---\n\n'
+  markdownText += '<!-- generated by pnpm docs:api -->\n\n'
+  markdownText += `# ${category} Examples\n\n`
+  markdownText += `${EXAMPLE_NOTES[category] || 'Use the props reference for exact field names.'}\n\n`
+  markdownText += '| Component | Vue | React |\n'
+  markdownText += '| --------- | --- | ----- |\n'
+
+  for (const component of components) {
+    markdownText += `| ${component} | \`${codeText(getVueSnippet(component, category))}\` | \`${codeText(getReactSnippet(component, category))}\` |\n`
+  }
+
+  markdownText +=
+    '\nImports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.\n'
+  return markdownText
+}
+
+function generateFrameworkIndex(framework) {
+  const packageName = framework === 'vue' ? '@expcat/tigercat-vue' : '@expcat/tigercat-react'
+  const bindingNote =
+    framework === 'vue'
+      ? 'Vue examples use `v-model`, kebab-case events, and template syntax.'
+      : 'React examples use controlled props, camelCase callbacks, and JSX syntax.'
+
+  let markdownText = '---\n'
+  markdownText += `name: tigercat-${framework}\n`
+  markdownText += `description: Tigercat ${framework === 'vue' ? 'Vue 3' : 'React'} routing page for generated examples\n`
+  markdownText += '---\n\n'
+  markdownText += `# Tigercat ${framework === 'vue' ? 'Vue 3' : 'React'}\n\n`
+  markdownText += `${bindingNote} Install from \`${packageName}\` and use [component-index.md](../component-index.md) to find the right category.\n\n`
+  markdownText += '| Category | Examples | Props |\n'
+  markdownText += '| -------- | -------- | ----- |\n'
+  for (const category of Object.keys(CATEGORY_SLUGS).filter((name) => !['Core'].includes(name))) {
+    const slug = CATEGORY_SLUGS[category]
+    markdownText += `| ${category} | [examples](../examples/${slug}.md) | [props](../shared/props/${slug}.md) |\n`
+  }
   return markdownText
 }
 
@@ -249,15 +641,70 @@ async function main() {
 
   const categorizedFiles = getCategorizedFiles(fileInfoByName)
   const totalTypes = countExportedTypes(categorizedFiles)
+  const componentRows = getComponentRows(categorizedFiles)
+  for (const virtualComponent of VIRTUAL_COMPONENTS) {
+    if (!componentRows.some((row) => row.component === virtualComponent.component)) {
+      componentRows.push({
+        component: virtualComponent.component,
+        category: virtualComponent.category,
+        props: virtualComponent.props,
+        examples: virtualComponent.examples,
+        typeSource: virtualComponent.typeSource
+      })
+    }
+  }
+  componentRows.sort(
+    (a, b) => a.category.localeCompare(b.category) || a.component.localeCompare(b.component)
+  )
 
-  await mkdir(join(ROOT_DIR, 'skills', 'tigercat', 'references', 'shared'), { recursive: true })
+  await mkdir(SHARED_DIR, { recursive: true })
+  await mkdir(PROPS_DIR, { recursive: true })
+  await mkdir(EXAMPLES_DIR, { recursive: true })
+  await rm(PROPS_DIR, { recursive: true, force: true })
+  await rm(EXAMPLES_DIR, { recursive: true, force: true })
+  await mkdir(PROPS_DIR, { recursive: true })
+  await mkdir(EXAMPLES_DIR, { recursive: true })
+
   await writeFile(
     LLM_API_SUMMARY,
     await formatMarkdown(generateLlmApiSummary(categorizedFiles, totalTypes)),
     'utf8'
   )
-  console.log(`LLM API summary generated: ${LLM_API_SUMMARY}`)
+  await writeFile(
+    COMPONENT_INDEX,
+    await formatMarkdown(generateComponentIndex(componentRows)),
+    'utf8'
+  )
+
+  for (const { category, files } of categorizedFiles) {
+    if (category === 'Core' || category === 'Other') continue
+    const slug = CATEGORY_SLUGS[category]
+    await writeFile(
+      join(PROPS_DIR, `${slug}.md`),
+      await formatMarkdown(generatePropsReference(category, files)),
+      'utf8'
+    )
+    await writeFile(
+      join(EXAMPLES_DIR, `${slug}.md`),
+      await formatMarkdown(generateExamples(category, files)),
+      'utf8'
+    )
+  }
+
+  await writeFile(
+    join(SKILL_REFERENCES_DIR, 'vue', 'index.md'),
+    await formatMarkdown(generateFrameworkIndex('vue')),
+    'utf8'
+  )
+  await writeFile(
+    join(SKILL_REFERENCES_DIR, 'react', 'index.md'),
+    await formatMarkdown(generateFrameworkIndex('react')),
+    'utf8'
+  )
+
+  console.log(`Skill references generated under: ${SKILL_REFERENCES_DIR}`)
   console.log(`Total exported types: ${totalTypes}`)
+  console.log(`Indexed components: ${componentRows.length}`)
 }
 
 main().catch((error) => {

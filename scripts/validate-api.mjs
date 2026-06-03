@@ -448,7 +448,8 @@ const DOC_SECTION_ALIASES = new Map([
 function collectMarkdownContent(dir, options = {}) {
   const markdownFiles = collectFiles(dir, ['.md']).filter((file) => {
     if (options.excludeIndex && basename(file) === 'index.md') return false
-    if (options.includePattern && !options.includePattern.test(file)) return false
+    const normalized = file.replace(/\\/g, '/')
+    if (options.includePattern && !options.includePattern.test(normalized)) return false
     return true
   })
   return markdownFiles.map((file) => readFileSync(file, 'utf-8')).join('\n')
@@ -494,16 +495,13 @@ const reactPublicComponents = collectPublicComponentExports(
 const allPublicComponents = new Set([...vuePublicComponents, ...reactPublicComponents])
 
 const sharedPropsDocs = collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'shared', 'props'))
-const vueExampleDocs = `${collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'vue'), {
-  excludeIndex: true
-})}\n${collectMarkdownContent(SKILL_REFERENCES_DIR, {
+const generatedExampleDocs = collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'examples'))
+const routeIndexDocs = `${collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'vue'))}\n${collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'react'))}`
+const topicalFrameworkDocs = collectMarkdownContent(SKILL_REFERENCES_DIR, {
   includePattern: /\/(i18n|theme|ssr)\.md$/
-})}`
-const reactExampleDocs = `${collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'react'), {
-  excludeIndex: true
-})}\n${collectMarkdownContent(SKILL_REFERENCES_DIR, {
-  includePattern: /\/(i18n|theme|ssr)\.md$/
-})}`
+})
+const vueExampleDocs = `${generatedExampleDocs}\n${routeIndexDocs}\n${topicalFrameworkDocs}`
+const reactExampleDocs = vueExampleDocs
 
 for (const componentName of [...allPublicComponents].sort()) {
   const docTarget = getDocTarget(componentName)
@@ -535,6 +533,106 @@ for (const componentName of [...allPublicComponents].sort()) {
       0,
       'docs-api',
       `React 公开组件 "${componentName}" 缺少示例文档（期望匹配：${docTarget}）`
+    )
+  }
+}
+
+// ----- Skill docs quality budget -----
+
+const SKILL_DOC_BUDGETS = {
+  entryBytes: 3000,
+  totalMarkdownLines: 6000,
+  propsCategoryLines: 350,
+  handReferenceLines: 120
+}
+
+const skillMarkdownFiles = collectFiles(join(ROOT, 'skills', 'tigercat'), ['.md'])
+let totalSkillMarkdownLines = 0
+const componentHeadingOwners = new Map()
+
+for (const file of skillMarkdownFiles) {
+  const content = readFileSync(file, 'utf-8')
+  const lines = content.split(/\r?\n/)
+  const relativeFile = relative(ROOT, file)
+  totalSkillMarkdownLines += lines.length
+
+  if (relativeFile === join('skills', 'tigercat', 'SKILL.md')) {
+    const bytes = Buffer.byteLength(content, 'utf8')
+    if (bytes > SKILL_DOC_BUDGETS.entryBytes) {
+      addIssue(
+        relativeFile,
+        0,
+        'docs-budget',
+        `SKILL.md is ${bytes} bytes, expected <= ${SKILL_DOC_BUDGETS.entryBytes}`
+      )
+    }
+  }
+
+  if (relativeFile.includes(join('skills', 'tigercat', 'references', 'shared', 'props'))) {
+    if (lines.length > SKILL_DOC_BUDGETS.propsCategoryLines) {
+      addIssue(
+        relativeFile,
+        0,
+        'docs-budget',
+        `Props reference has ${lines.length} lines, expected <= ${SKILL_DOC_BUDGETS.propsCategoryLines}`
+      )
+    }
+  } else if (
+    relativeFile.startsWith(join('skills', 'tigercat', 'references')) &&
+    !relativeFile.includes(join('references', 'examples')) &&
+    !relativeFile.includes(join('references', 'shared')) &&
+    !relativeFile.endsWith('component-index.md') &&
+    !relativeFile.endsWith(join('react', 'index.md')) &&
+    !relativeFile.endsWith(join('vue', 'index.md'))
+  ) {
+    if (lines.length > SKILL_DOC_BUDGETS.handReferenceLines) {
+      addIssue(
+        relativeFile,
+        0,
+        'docs-budget',
+        `Hand-written reference has ${lines.length} lines, expected <= ${SKILL_DOC_BUDGETS.handReferenceLines}`
+      )
+    }
+  }
+
+  lines.forEach((line, index) => {
+    const tableCellCount = (line.match(/(?<!\\)\|/g) || []).length
+    if (line.trim().startsWith('|') && tableCellCount > 10) {
+      addIssue(
+        relativeFile,
+        index + 1,
+        'docs-table',
+        'Markdown table row appears too wide or malformed'
+      )
+    }
+
+    const heading = line.match(/^##\s+([A-Z][A-Za-z0-9]*)\b/)
+    if (!heading) return
+    const name = heading[1]
+    if (!componentHeadingOwners.has(name)) componentHeadingOwners.set(name, [])
+    componentHeadingOwners.get(name).push(relativeFile)
+  })
+}
+
+if (totalSkillMarkdownLines > SKILL_DOC_BUDGETS.totalMarkdownLines) {
+  addIssue(
+    'skills/tigercat',
+    0,
+    'docs-budget',
+    `Skill markdown has ${totalSkillMarkdownLines} lines, expected <= ${SKILL_DOC_BUDGETS.totalMarkdownLines}`
+  )
+}
+
+for (const [componentName, owners] of componentHeadingOwners) {
+  const propsOwners = owners.filter((owner) =>
+    owner.includes(join('references', 'shared', 'props'))
+  )
+  if (propsOwners.length > 1) {
+    addIssue(
+      'skills/tigercat/references/shared/props',
+      0,
+      'docs-duplicate',
+      `Component "${componentName}" appears in multiple props references: ${propsOwners.join(', ')}`
     )
   }
 }
