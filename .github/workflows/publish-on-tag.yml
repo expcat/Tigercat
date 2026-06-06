@@ -9,8 +9,14 @@ on:
     types:
       - completed
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish, for example v1.2.3'
+        required: true
+        type: string
 
 permissions:
+  actions: read
   contents: write
   id-token: write
 
@@ -19,32 +25,15 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - name: Download release tag artifact
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
-          fetch-depth: 0
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.ref }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v5
-        with:
-          version: 10.26.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: pnpm
-          registry-url: https://registry.npmjs.org
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Publish packages
-        run: pnpm release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
+          name: release-tag
+          path: .release
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
 
       - name: Resolve release tag
         id: release_tag
@@ -52,22 +41,65 @@ jobs:
         run: |
           set -euo pipefail
 
+          FOUND=true
+
           if [[ "${GITHUB_EVENT_NAME}" == 'push' && "${GITHUB_REF_TYPE}" == 'tag' ]]; then
             TAG="${GITHUB_REF_NAME}"
+          elif [[ "${GITHUB_EVENT_NAME}" == 'workflow_run' ]]; then
+            if [[ ! -s .release/release-tag.txt ]]; then
+              echo 'No release tag artifact found for the completed Create Release Tags run. Nothing to publish.'
+              FOUND=false
+              TAG=''
+            else
+              TAG=$(head -n 1 .release/release-tag.txt)
+            fi
           else
-            TAG=$(git tag --points-at HEAD | head -n 1)
+            TAG="${{ inputs.tag }}"
           fi
 
-          if [[ -z "${TAG}" ]]; then
-            echo 'No tag points at the checked out commit.' >&2
+          if [[ "${FOUND}" == 'true' && ! "${TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "Invalid release tag: ${TAG}" >&2
             exit 1
           fi
 
+          echo "found=${FOUND}" >> "$GITHUB_OUTPUT"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
+      - name: Checkout
+        if: steps.release_tag.outputs.found == 'true'
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.release_tag.outputs.tag }}
+
+      - name: Setup pnpm
+        if: steps.release_tag.outputs.found == 'true'
+        uses: pnpm/action-setup@v5
+        with:
+          version: 10.26.2
+
+      - name: Setup Node.js
+        if: steps.release_tag.outputs.found == 'true'
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        if: steps.release_tag.outputs.found == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Publish packages
+        if: steps.release_tag.outputs.found == 'true'
+        run: pnpm release
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+
       - name: Create GitHub Release
+        if: steps.release_tag.outputs.found == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.release_tag.outputs.tag }}
-          target_commitish: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           generate_release_notes: true
