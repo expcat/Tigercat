@@ -229,6 +229,7 @@ describe('Menu', () => {
       const menu = container.querySelector('ul')
       // Collapsed mode sets min-w-[64px] instead of w-16
       expect(menu?.className).toContain('min-w-[64px]')
+      expect(menu?.className).not.toContain('min-w-[200px]')
     })
 
     it('supports custom inlineIndent', () => {
@@ -881,6 +882,33 @@ describe('Menu', () => {
       trigger.focus()
       await fireEvent.keyDown(trigger, { key: 'Enter' })
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      await fireEvent.keyDown(trigger, { key: 'Escape' })
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('can render popup submenus through a body teleport', async () => {
+      const { container } = render(Menu, {
+        props: { mode: 'horizontal', popupPortal: true },
+        slots: {
+          default: () => [
+            h(SubMenu, { itemKey: 'sub1', title: 'Submenu' }, () => [
+              h(MenuItem, { itemKey: '1' }, () => 'Sub Item 1')
+            ])
+          ]
+        }
+      })
+
+      const trigger = screen.getByRole('menuitem', { name: 'Submenu' })
+      const popup = document.body.querySelector('[data-tiger-submenu-popup]') as HTMLElement
+
+      expect(popup).toBeInTheDocument()
+      expect(container.querySelector('[data-tiger-submenu-popup]')).not.toBe(popup)
+
+      await fireEvent.mouseEnter(trigger.parentElement as HTMLElement)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      expect(popup).not.toHaveAttribute('aria-hidden')
+
+      trigger.focus()
       await fireEvent.keyDown(trigger, { key: 'Escape' })
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
     })

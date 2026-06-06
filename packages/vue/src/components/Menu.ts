@@ -24,6 +24,7 @@ import {
   getSubMenuTitleClasses,
   getSubMenuExpandIconClasses,
   getSubmenuPopupZIndex,
+  getTransformOrigin,
   filterMenuItems,
   isKeySelected,
   isKeyOpen,
@@ -45,6 +46,7 @@ import {
   getInitialSubmenuHeightTransitionStyle,
   createSubmenuHeightTransitionController,
   type SubmenuHeightTransitionController,
+  type FloatingPlacement,
   type MenuMode,
   type MenuTheme,
   type MenuKey,
@@ -54,6 +56,7 @@ import {
   toggleKey,
   initRovingTabIndex
 } from '@expcat/tigercat-core'
+import { renderVueBodyTeleport, useVueFloating } from '../utils/overlay'
 
 // Menu context key
 export const MenuContextKey = Symbol('MenuContext')
@@ -64,6 +67,7 @@ export interface MenuContext {
   theme: ComputedRef<MenuTheme>
   collapsed: ComputedRef<boolean>
   inlineIndent: ComputedRef<number>
+  popupPortal: ComputedRef<boolean>
   selectedKeys: ComputedRef<MenuKey[]>
   openKeys: ComputedRef<MenuKey[]>
   handleSelect: (key: string | number) => void
@@ -81,6 +85,7 @@ export interface VueMenuProps {
   collapsed?: boolean
   multiple?: boolean
   inlineIndent?: number
+  popupPortal?: boolean
   className?: string
   style?: CoreMenuProps['style']
   searchable?: boolean
@@ -168,6 +173,10 @@ export const Menu = defineComponent({
     inlineIndent: {
       type: Number,
       default: 24
+    },
+    popupPortal: {
+      type: Boolean,
+      default: false
     },
     className: {
       type: String,
@@ -293,12 +302,14 @@ export const Menu = defineComponent({
     const themeRef = computed(() => props.theme)
     const collapsedRef = computed(() => props.collapsed)
     const inlineIndentRef = computed(() => props.inlineIndent)
+    const popupPortalRef = computed(() => props.popupPortal)
 
     provide<MenuContext>(MenuContextKey, {
       mode: modeRef,
       theme: themeRef,
       collapsed: collapsedRef,
       inlineIndent: inlineIndentRef,
+      popupPortal: popupPortalRef,
       selectedKeys: currentSelectedKeys,
       openKeys: currentOpenKeys,
       handleSelect,
@@ -797,8 +808,11 @@ export const SubMenu = defineComponent({
     const isHovered = ref(false)
 
     const isOpenByKeyboard = ref(false)
+    const titleEl = ref<HTMLElement | null>(null)
+    const popupEl = ref<HTMLElement | null>(null)
     const submenuContentEl = ref<HTMLElement | null>(null)
     let heightTransitionController: SubmenuHeightTransitionController | null = null
+    let popupCloseTimer: ReturnType<typeof setTimeout> | null = null
 
     const effectiveCollapsed = computed(() => {
       return props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
@@ -810,6 +824,8 @@ export const SubMenu = defineComponent({
       return menuContext.mode.value === 'vertical' && effectiveCollapsed.value
     })
 
+    const popupPortal = computed(() => Boolean(isPopup.value && menuContext?.popupPortal.value))
+
     // Determine if submenu should be shown
     const isExpanded = computed(() => {
       if (menuContext?.mode.value === 'horizontal' || isPopup.value) {
@@ -819,6 +835,22 @@ export const SubMenu = defineComponent({
     })
 
     const hasRenderedInline = ref(!isPopup.value && isExpanded.value)
+
+    const popupPlacement = computed<FloatingPlacement>(() =>
+      menuContext?.mode.value === 'horizontal' && props.level === 0 ? 'bottom-start' : 'right-start'
+    )
+
+    const {
+      x: popupX,
+      y: popupY,
+      placement: currentPopupPlacement
+    } = useVueFloating({
+      referenceRef: titleEl,
+      floatingRef: popupEl,
+      enabled: computed(() => popupPortal.value && isExpanded.value),
+      placement: popupPlacement.value,
+      offset: 4
+    })
 
     const disposeHeightTransition = () => {
       heightTransitionController?.dispose()
@@ -859,7 +891,10 @@ export const SubMenu = defineComponent({
       void syncHeightTransition()
     })
 
-    onBeforeUnmount(disposeHeightTransition)
+    onBeforeUnmount(() => {
+      disposeHeightTransition()
+      if (popupCloseTimer) clearTimeout(popupCloseTimer)
+    })
 
     // Submenu title classes
     const titleClasses = computed(() => {
@@ -1002,6 +1037,10 @@ export const SubMenu = defineComponent({
 
     // Handle mouse enter for horizontal mode
     const handleMouseEnter = () => {
+      if (popupCloseTimer) {
+        clearTimeout(popupCloseTimer)
+        popupCloseTimer = null
+      }
       if (menuContext?.mode.value === 'horizontal' || isPopup.value) {
         isHovered.value = true
       }
@@ -1010,8 +1049,17 @@ export const SubMenu = defineComponent({
     // Handle mouse leave for horizontal mode
     const handleMouseLeave = () => {
       if (menuContext?.mode.value === 'horizontal' || isPopup.value) {
-        isHovered.value = false
-        isOpenByKeyboard.value = false
+        const close = () => {
+          isHovered.value = false
+          isOpenByKeyboard.value = false
+        }
+
+        if (popupPortal.value) {
+          popupCloseTimer = setTimeout(close, 120)
+          return
+        }
+
+        close()
       }
     }
 
@@ -1091,6 +1139,7 @@ export const SubMenu = defineComponent({
         'button',
         {
           type: 'button',
+          ref: titleEl,
           class: titleClasses.value,
           style: titleStyle.value,
           onClick: handleTitleClick,
@@ -1108,20 +1157,41 @@ export const SubMenu = defineComponent({
       )
 
       // Render submenu content
+      const popupContentNode = () => {
+        const popupStyle = popupPortal.value
+          ? {
+              display: isExpanded.value ? 'block' : 'none',
+              position: 'absolute' as const,
+              left: `${popupX.value}px`,
+              top: `${popupY.value}px`,
+              transformOrigin: getTransformOrigin(currentPopupPlacement.value),
+              ...popupZIndex.value
+            }
+          : {
+              display: isExpanded.value ? 'block' : 'none',
+              ...popupZIndex.value
+            }
+
+        const node = h(
+          'ul',
+          {
+            ref: popupPortal.value ? popupEl : undefined,
+            class: contentClasses.value,
+            style: popupStyle,
+            role: 'menu',
+            'aria-hidden': isExpanded.value ? undefined : 'true',
+            onMouseenter: popupPortal.value ? handleMouseEnter : undefined,
+            onMouseleave: popupPortal.value ? handleMouseLeave : undefined,
+            'data-tiger-submenu-popup': ''
+          },
+          withChildLevel(slots.default?.() as VNode[] | undefined)
+        )
+
+        return popupPortal.value ? renderVueBodyTeleport(node) : node
+      }
+
       const contentNode = isPopup.value
-        ? h(
-            'ul',
-            {
-              class: contentClasses.value,
-              style: {
-                display: isExpanded.value ? 'block' : 'none',
-                ...popupZIndex.value
-              },
-              role: 'menu',
-              'aria-hidden': isExpanded.value ? undefined : 'true'
-            },
-            withChildLevel(slots.default?.() as VNode[] | undefined)
-          )
+        ? popupContentNode()
         : hasRenderedInline.value
           ? h(
               'div',
@@ -1151,7 +1221,7 @@ export const SubMenu = defineComponent({
       return h(
         'li',
         {
-          class: isPopup.value ? 'relative' : '',
+          class: isPopup.value && !popupPortal.value ? 'relative' : '',
           onMouseenter: handleMouseEnter,
           onMouseleave: handleMouseLeave,
           role: 'none'

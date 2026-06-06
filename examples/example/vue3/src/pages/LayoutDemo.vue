@@ -5,6 +5,7 @@ import DemoBlock from '../components/DemoBlock.vue'
 
 const collapsed = ref(false)
 const miniCollapsed = ref(true)
+const shellCollapsed = ref(false)
 
 const containerSnippet = `<Container maxWidth="lg">
   <div>这里是 Container 内容区域</div>
@@ -54,6 +55,25 @@ const miniSnippet = `<Layout>
     <Content>Content</Content>
   </div>
 </Layout>`
+
+const shellSidebarSnippet = `const collapsed = ref(false)
+
+<Sidebar width="240px" collapsed-width="64px" :collapsed="collapsed">
+  <div class="flex h-full flex-col">
+    <div class="flex items-center gap-3 px-4 py-4">
+      <span class="grid size-8 place-items-center rounded-lg bg-[var(--tiger-primary,#2563eb)] text-white">T</span>
+      <span :class="collapsed ? 'max-w-0 opacity-0 -translate-x-2' : 'max-w-32 opacity-100 translate-x-0'">
+        Tigercat Admin
+      </span>
+    </div>
+    <button @click="collapsed = !collapsed">
+      <span>{{ collapsed ? '>' : '<' }}</span>
+      <span :class="collapsed ? 'max-w-0 opacity-0 translate-x-2' : 'max-w-32 opacity-100 translate-x-0'">
+        {{ collapsed ? '展开侧栏' : '收起侧栏' }}
+      </span>
+    </button>
+  </div>
+</Sidebar>`
 
 const complexSnippet = `<Layout>
   <Header>Header</Header>
@@ -151,6 +171,67 @@ const complexSnippet = `<Layout>
             <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
           </div>
           <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
+        </Layout>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock
+      title="后台 Shell 侧栏"
+      description="推荐使用 Sidebar 的 collapsed-width 配合文案 max-width、opacity、transform transition，让 Logo 文案和底部折叠按钮在收缩时平滑淡出。"
+      :code="shellSidebarSnippet">
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <Layout class-name="border border-gray-300 overflow-hidden min-h-[320px]">
+          <Sidebar
+            width="240px"
+            collapsed-width="64px"
+            :collapsed="shellCollapsed"
+            class-name="!bg-white !p-0">
+            <div class="flex h-full flex-col">
+              <div
+                class="flex items-center gap-3 border-b border-[var(--tiger-border,#e5e7eb)] px-4 py-4">
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--tiger-primary,#2563eb)] text-sm font-semibold text-white">
+                  T
+                </span>
+                <span
+                  :class="[
+                    'overflow-hidden whitespace-nowrap text-sm font-semibold text-[var(--tiger-text,#111827)] transition-[max-width,opacity,transform] duration-300',
+                    shellCollapsed
+                      ? 'max-w-0 -translate-x-2 opacity-0'
+                      : 'max-w-32 translate-x-0 opacity-100'
+                  ]">
+                  Tigercat Admin
+                </span>
+              </div>
+              <div class="flex-1 px-2 py-3">
+                <div
+                  class="rounded-lg bg-[var(--tiger-surface-muted,#f9fafb)] px-3 py-2 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+                  {{ shellCollapsed ? 'D' : 'Dashboard' }}
+                </div>
+              </div>
+              <button
+                type="button"
+                class="m-3 flex items-center justify-center gap-2 rounded-lg border border-[var(--tiger-border,#e5e7eb)] px-2 py-2 text-sm text-[var(--tiger-text,#111827)] transition-colors hover:bg-[var(--tiger-surface-muted,#f9fafb)]"
+                @click="shellCollapsed = !shellCollapsed">
+                <span class="shrink-0">{{ shellCollapsed ? '>' : '<' }}</span>
+                <span
+                  :class="[
+                    'overflow-hidden whitespace-nowrap transition-[max-width,opacity,transform] duration-300',
+                    shellCollapsed
+                      ? 'max-w-0 translate-x-2 opacity-0'
+                      : 'max-w-32 translate-x-0 opacity-100'
+                  ]">
+                  {{ shellCollapsed ? '展开侧栏' : '收起侧栏' }}
+                </span>
+              </button>
+            </div>
+          </Sidebar>
+          <Content class-name="!bg-white !p-6">
+            <div
+              class="rounded-xl border border-dashed border-[var(--tiger-border,#e5e7eb)] p-6 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+              Shell 内容区域
+            </div>
+          </Content>
         </Layout>
       </div>
     </DemoBlock>

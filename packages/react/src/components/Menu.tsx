@@ -16,6 +16,7 @@ import {
   getSubMenuTitleClasses,
   getSubMenuExpandIconClasses,
   getSubmenuPopupZIndex,
+  getTransformOrigin,
   filterMenuItems,
   isKeySelected,
   isKeyOpen,
@@ -39,6 +40,7 @@ import {
   toggleKey,
   initRovingTabIndex,
   type SubmenuHeightTransitionController,
+  type FloatingPlacement,
   type MenuMode,
   type MenuTheme,
   type MenuItem as CoreMenuItem,
@@ -47,6 +49,7 @@ import {
   type MenuItemGroupProps as CoreMenuItemGroupProps,
   type SubMenuProps as CoreSubMenuProps
 } from '@expcat/tigercat-core'
+import { renderBodyPortal, useFloating } from '../utils/overlay'
 
 // Menu context interface
 export interface MenuContextValue {
@@ -54,6 +57,7 @@ export interface MenuContextValue {
   theme: MenuTheme
   collapsed: boolean
   inlineIndent: number
+  popupPortal: boolean
   selectedKeys: (string | number)[]
   openKeys: (string | number)[]
   handleSelect: (key: string | number) => void
@@ -101,6 +105,7 @@ export const Menu: React.FC<MenuProps> = ({
   collapsed = false,
   multiple = true,
   inlineIndent = 24,
+  popupPortal = false,
   className,
   style,
   onSelect,
@@ -186,12 +191,23 @@ export const Menu: React.FC<MenuProps> = ({
       theme,
       collapsed,
       inlineIndent,
+      popupPortal,
       selectedKeys,
       openKeys,
       handleSelect,
       handleOpenChange
     }),
-    [mode, theme, collapsed, inlineIndent, selectedKeys, openKeys, handleSelect, handleOpenChange]
+    [
+      mode,
+      theme,
+      collapsed,
+      inlineIndent,
+      popupPortal,
+      selectedKeys,
+      openKeys,
+      handleSelect,
+      handleOpenChange
+    ]
   )
 
   const filteredItems = useMemo(
@@ -498,6 +514,9 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   const [isHovered, setIsHovered] = useState(false)
   const [isOpenByKeyboard, setIsOpenByKeyboard] = useState(false)
+  const popupCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const titleRef = useRef<HTMLButtonElement | null>(null)
+  const popupRef = useRef<HTMLUListElement | null>(null)
   const submenuContentRef = useRef<HTMLDivElement | null>(null)
   const heightTransitionRef = useRef<SubmenuHeightTransitionController | null>(null)
 
@@ -510,6 +529,20 @@ export const SubMenu: React.FC<SubMenuProps> = ({
   const isOpen = !!menuContext && isKeyOpen(itemKey, menuContext.openKeys)
 
   const isExpanded = isPopup ? isHovered || isOpenByKeyboard : isOpen
+  const popupPortal = Boolean(isPopup && menuContext?.popupPortal)
+  const popupPlacement: FloatingPlacement =
+    menuContext?.mode === 'horizontal' && level === 0 ? 'bottom-start' : 'right-start'
+  const {
+    x: popupX,
+    y: popupY,
+    placement: currentPopupPlacement
+  } = useFloating({
+    referenceRef: titleRef,
+    floatingRef: popupRef,
+    enabled: popupPortal && isExpanded,
+    placement: popupPlacement,
+    offset: 4
+  })
 
   const isInlineOrVertical = menuContext?.mode !== 'horizontal' && !isPopup
   const [hasRenderedInline, setHasRenderedInline] = useState(() =>
@@ -526,7 +559,14 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     heightTransitionRef.current = null
   }, [])
 
-  useEffect(() => disposeHeightTransition, [disposeHeightTransition])
+  useEffect(() => {
+    return () => {
+      disposeHeightTransition()
+      if (popupCloseTimerRef.current) {
+        clearTimeout(popupCloseTimerRef.current)
+      }
+    }
+  }, [disposeHeightTransition])
 
   useLayoutEffect(() => {
     if (!isInlineOrVertical || !hasRenderedInline || !submenuContentRef.current) {
@@ -577,16 +617,29 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   // Handle mouse enter for horizontal mode
   const handleMouseEnter = useCallback(() => {
+    if (popupCloseTimerRef.current) {
+      clearTimeout(popupCloseTimerRef.current)
+      popupCloseTimerRef.current = null
+    }
     if (menuContext?.mode === 'horizontal' || isPopup) setIsHovered(true)
   }, [menuContext, isPopup])
 
   // Handle mouse leave for horizontal mode
   const handleMouseLeave = useCallback(() => {
     if (menuContext?.mode === 'horizontal' || isPopup) {
-      setIsHovered(false)
-      setIsOpenByKeyboard(false)
+      const close = () => {
+        setIsHovered(false)
+        setIsOpenByKeyboard(false)
+      }
+
+      if (popupPortal) {
+        popupCloseTimerRef.current = setTimeout(close, 120)
+        return
+      }
+
+      close()
     }
-  }, [menuContext, isPopup])
+  }, [menuContext, isPopup, popupPortal])
 
   const openInline = useCallback(
     (titleEl: HTMLButtonElement) => {
@@ -729,12 +782,42 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     const popupZIndex = isPopup ? getSubmenuPopupZIndex(level) : {}
 
     if (isPopup) {
+      const popupStyle: React.CSSProperties = popupPortal
+        ? {
+            display: isExpanded ? 'block' : 'none',
+            position: 'absolute',
+            left: popupX,
+            top: popupY,
+            transformOrigin: getTransformOrigin(currentPopupPlacement),
+            ...popupZIndex
+          }
+        : { display: isExpanded ? 'block' : 'none', ...popupZIndex }
+
+      const popup = (
+        <ul
+          ref={popupPortal ? popupRef : undefined}
+          className={contentClasses}
+          style={popupStyle}
+          role="menu"
+          aria-hidden={isExpanded ? undefined : 'true'}
+          onMouseEnter={popupPortal ? handleMouseEnter : undefined}
+          onMouseLeave={popupPortal ? handleMouseLeave : undefined}
+          data-tiger-submenu-popup="">
+          {enhancedChildren}
+        </ul>
+      )
+
+      if (popupPortal) {
+        return renderBodyPortal(popup)
+      }
+
       return (
         <ul
           className={contentClasses}
           style={{ display: isExpanded ? 'block' : 'none', ...popupZIndex }}
           role="menu"
-          aria-hidden={isExpanded ? undefined : 'true'}>
+          aria-hidden={isExpanded ? undefined : 'true'}
+          data-tiger-submenu-popup="">
           {enhancedChildren}
         </ul>
       )
@@ -765,11 +848,12 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   return (
     <li
-      className={isPopup ? 'relative' : ''}
+      className={isPopup && !popupPortal ? 'relative' : ''}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       role="none">
       <button
+        ref={titleRef}
         type="button"
         className={titleClasses}
         style={indentStyle}

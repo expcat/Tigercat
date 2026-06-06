@@ -277,6 +277,43 @@ describe('Drawer', () => {
     })
   })
 
+  it('should destroy content after leave animation when requested', async () => {
+    const onAfterLeave = vi.fn()
+    const { rerender } = render(Drawer, {
+      props: {
+        open: true,
+        destroyOnClose: true,
+        destroyOnCloseAfterLeave: true,
+        onAfterLeave
+      },
+      slots: {
+        default: () => h('div', { 'data-testid': 'drawer-content' }, 'Content')
+      }
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('drawer-content')).toBeInTheDocument()
+    })
+
+    await rerender({
+      open: false,
+      destroyOnClose: true,
+      destroyOnCloseAfterLeave: true,
+      onAfterLeave
+    })
+
+    expect(screen.getByTestId('drawer-content')).toBeInTheDocument()
+    expect(document.querySelector('[data-tiger-drawer-root]')).not.toHaveAttribute('hidden')
+
+    await waitFor(
+      () => {
+        expect(onAfterLeave).toHaveBeenCalled()
+        expect(screen.queryByTestId('drawer-content')).not.toBeInTheDocument()
+      },
+      { timeout: 1000 }
+    )
+  })
+
   it('should emit after-enter/after-leave after 300ms', async () => {
     const onAfterEnter = vi.fn()
     const onAfterLeave = vi.fn()
@@ -317,6 +354,30 @@ describe('Drawer', () => {
   })
 
   describe('width prop', () => {
+    it('should allow disabling mobile fullscreen classes', () => {
+      render(Drawer, {
+        props: { open: true, fullscreenOnMobile: false }
+      })
+
+      const dialog = screen.getByRole('dialog')
+      expect(dialog.className).not.toContain('max-md:!w-screen')
+      expect(dialog.className).not.toContain('max-md:!h-[100dvh]')
+    })
+
+    it('should apply panelClassName and panelStyle to the panel', () => {
+      render(Drawer, {
+        props: {
+          open: true,
+          panelClassName: 'custom-panel',
+          panelStyle: { maxWidth: '320px', backgroundColor: 'red' }
+        }
+      })
+
+      const dialog = screen.getByRole('dialog')
+      expect(dialog).toHaveClass('custom-panel')
+      expect(dialog).toHaveStyle({ maxWidth: '320px', backgroundColor: 'red' })
+    })
+
     it('should apply custom width style for right placement', () => {
       render(Drawer, {
         props: { open: true, placement: 'right', width: '400px' }

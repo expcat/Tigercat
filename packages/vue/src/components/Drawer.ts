@@ -38,7 +38,8 @@ import {
   shouldCloseOnMaskClick,
   type GesturePoint,
   type DrawerPlacement,
-  type DrawerSize
+  type DrawerSize,
+  type StyleValue
 } from '@expcat/tigercat-core'
 import {
   renderVueBodyTeleport,
@@ -54,6 +55,7 @@ export interface VueDrawerProps {
   open?: boolean
   placement?: DrawerPlacement
   size?: DrawerSize
+  width?: string | number
   title?: string
   closable?: boolean
   mask?: boolean
@@ -62,6 +64,10 @@ export interface VueDrawerProps {
   className?: string
   bodyClassName?: string
   destroyOnClose?: boolean
+  destroyOnCloseAfterLeave?: boolean
+  fullscreenOnMobile?: boolean
+  panelClassName?: string
+  panelStyle?: StyleValue
   style?: Record<string, unknown>
   closeAriaLabel?: string
   locale?: Partial<TigerLocale>
@@ -165,10 +171,44 @@ export const Drawer = defineComponent({
     },
 
     /**
+     * When destroyOnClose is true, wait for leave animation before unmounting.
+     * @default false
+     */
+    destroyOnCloseAfterLeave: {
+      type: Boolean,
+      default: false
+    },
+
+    /**
+     * Whether the drawer panel should become fullscreen on mobile viewports.
+     * @default true
+     */
+    fullscreenOnMobile: {
+      type: Boolean,
+      default: true
+    },
+
+    /**
+     * Additional CSS class for drawer panel.
+     */
+    panelClassName: {
+      type: String,
+      default: undefined
+    },
+
+    /**
      * Custom inline style for drawer panel
      */
     style: {
       type: Object as PropType<Record<string, unknown>>,
+      default: undefined
+    },
+
+    /**
+     * Custom inline style for drawer panel.
+     */
+    panelStyle: {
+      type: [String, Object, Array] as PropType<StyleValue>,
       default: undefined
     },
 
@@ -203,6 +243,7 @@ export const Drawer = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const instanceId = ref<string>(createDrawerId())
     const hasBeenOpened = ref(false)
+    const deferredRendered = ref(props.open)
 
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
@@ -218,7 +259,9 @@ export const Drawer = defineComponent({
         return true
       }
 
-      if (props.destroyOnClose) return false
+      if (props.destroyOnClose) {
+        return props.destroyOnCloseAfterLeave ? deferredRendered.value : false
+      }
       return hasBeenOpened.value
     })
 
@@ -289,6 +332,7 @@ export const Drawer = defineComponent({
       () => props.open,
       async (nextVisible) => {
         if (nextVisible) {
+          deferredRendered.value = true
           previousActiveElement.value = captureActiveElement()
 
           await nextTick()
@@ -296,6 +340,9 @@ export const Drawer = defineComponent({
           return
         }
 
+        if (props.destroyOnClose && !props.destroyOnCloseAfterLeave) {
+          deferredRendered.value = false
+        }
         restoreFocus(previousActiveElement.value)
       }
     )
@@ -309,6 +356,9 @@ export const Drawer = defineComponent({
 
         const timer = window.setTimeout(() => {
           emit(nextVisible ? 'after-enter' : 'after-leave')
+          if (!nextVisible && props.destroyOnClose && props.destroyOnCloseAfterLeave) {
+            deferredRendered.value = false
+          }
         }, ANIMATION_DURATION_MS)
 
         onCleanup(() => window.clearTimeout(timer))
@@ -339,9 +389,10 @@ export const Drawer = defineComponent({
       const maskClasses = getDrawerMaskClasses(props.open)
 
       const panelClasses = classNames(
-        getDrawerPanelClasses(props.placement, props.open, props.size),
+        getDrawerPanelClasses(props.placement, props.open, props.size, props.fullscreenOnMobile),
         'flex flex-col',
         props.className,
+        props.panelClassName,
         coerceClassValue(attrs.class)
       )
 
@@ -352,7 +403,7 @@ export const Drawer = defineComponent({
               typeof props.width === 'number' ? `${props.width}px` : props.width
           }
         : undefined
-      const mergedStyle = mergeStyleValues(attrs.style, props.style, widthStyle)
+      const mergedStyle = mergeStyleValues(attrs.style, props.panelStyle, props.style, widthStyle)
 
       const headerClasses = getDrawerHeaderClasses()
       const bodyClasses = getDrawerBodyClasses(props.bodyClassName)
@@ -453,7 +504,7 @@ export const Drawer = defineComponent({
         {
           class: containerClasses,
           style: { zIndex: props.zIndex },
-          hidden: !props.open,
+          hidden: !props.open && !(props.destroyOnClose && props.destroyOnCloseAfterLeave),
           'aria-hidden': !props.open ? 'true' : undefined,
           'data-tiger-drawer-root': ''
         },

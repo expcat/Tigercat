@@ -29,7 +29,8 @@ export function getDrawerContainerClasses(): string {
 export function getDrawerPanelClasses(
   placement: DrawerPlacement,
   visible: boolean,
-  size: DrawerSize
+  size: DrawerSize,
+  fullscreenOnMobile: boolean = true
 ): string {
   const baseClasses =
     'absolute bg-[var(--tiger-surface,#ffffff)] shadow-xl transition-transform duration-300 ease-in-out pointer-events-auto'
@@ -68,7 +69,11 @@ export function getDrawerPanelClasses(
     )
   }
 
-  return classNames(baseClasses, placementClasses[placement], mobileFullscreenClasses)
+  return classNames(
+    baseClasses,
+    placementClasses[placement],
+    fullscreenOnMobile && mobileFullscreenClasses
+  )
 }
 
 export function getDrawerSwipeCloseDirection(placement: DrawerPlacement): SwipeDirection {

@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   createSubmenuHeightTransitionController,
   filterMenuItems,
+  getMenuClasses,
   getInitialSubmenuHeightTransitionStyle,
   matchesMenuSearch,
   normalizeMenuSearchQuery,
@@ -173,5 +174,14 @@ describe('menu-utils search filtering', () => {
 
   it('returns the original items for an empty query', () => {
     expect(filterMenuItems(items, '   ')).toBe(items)
+  })
+})
+
+describe('menu-utils classes', () => {
+  it('uses the collapsed width without retaining the default vertical min width', () => {
+    const classes = getMenuClasses('vertical', 'light', true)
+
+    expect(classes).toContain('min-w-[64px]')
+    expect(classes).not.toContain('min-w-[200px]')
   })
 })

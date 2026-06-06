@@ -29,7 +29,9 @@ import {
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 
 export interface DrawerProps
-  extends CoreDrawerProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
+  extends
+    Omit<CoreDrawerProps, 'panelStyle'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
   onOpenChange?: (open: boolean) => void
   onClose?: () => void
   onAfterEnter?: () => void
@@ -37,6 +39,7 @@ export interface DrawerProps
   header?: React.ReactNode
   children?: React.ReactNode
   footer?: React.ReactNode
+  panelStyle?: React.CSSProperties
 
   /**
    * Close button aria-label
@@ -75,6 +78,10 @@ export const Drawer: React.FC<DrawerProps> = ({
   className,
   bodyClassName,
   destroyOnClose = false,
+  destroyOnCloseAfterLeave = false,
+  fullscreenOnMobile = true,
+  panelClassName,
+  panelStyle,
   onClose,
   onOpenChange,
   onAfterEnter,
@@ -87,12 +94,25 @@ export const Drawer: React.FC<DrawerProps> = ({
   ...rest
 }) => {
   const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
+  const [deferredRendered, setDeferredRendered] = React.useState(open)
 
   useEffect(() => {
-    if (open) setHasBeenOpened(true)
-  }, [open])
+    if (open) {
+      setHasBeenOpened(true)
+      setDeferredRendered(true)
+      return
+    }
 
-  const shouldRender = destroyOnClose ? open : hasBeenOpened
+    if (destroyOnClose && !destroyOnCloseAfterLeave) {
+      setDeferredRendered(false)
+    }
+  }, [destroyOnClose, destroyOnCloseAfterLeave, open])
+
+  const shouldRender = destroyOnClose
+    ? destroyOnCloseAfterLeave
+      ? deferredRendered
+      : open
+    : hasBeenOpened
 
   const handleClose = useCallback(() => {
     onOpenChange?.(false)
@@ -121,11 +141,14 @@ export const Drawer: React.FC<DrawerProps> = ({
         onAfterEnter?.()
       } else {
         onAfterLeave?.()
+        if (destroyOnClose && destroyOnCloseAfterLeave) {
+          setDeferredRendered(false)
+        }
       }
     }, ANIMATION_DURATION_MS)
 
     return () => window.clearTimeout(timer)
-  }, [open, onAfterEnter, onAfterLeave])
+  }, [destroyOnClose, destroyOnCloseAfterLeave, open, onAfterEnter, onAfterLeave])
 
   const reactId = useId()
   const drawerId = useMemo(() => `tiger-drawer-${reactId}`, [reactId])
@@ -229,9 +252,10 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const maskClasses = getDrawerMaskClasses(open)
   const panelClasses = classNames(
-    getDrawerPanelClasses(placement, open, size),
+    getDrawerPanelClasses(placement, open, size, fullscreenOnMobile),
     'flex flex-col',
-    className
+    className,
+    panelClassName
   )
 
   const headerClasses = getDrawerHeaderClasses()
@@ -244,11 +268,13 @@ export const Drawer: React.FC<DrawerProps> = ({
     return null
   }
 
+  const isLeavingBeforeDestroy = destroyOnClose && destroyOnCloseAfterLeave && !open
+
   const drawerContent = (
     <div
       className={containerClasses}
       style={{ zIndex }}
-      hidden={!open}
+      hidden={!open && !isLeavingBeforeDestroy}
       aria-hidden={!open ? 'true' : undefined}
       data-tiger-drawer-root="">
       {mask && (
@@ -263,6 +289,7 @@ export const Drawer: React.FC<DrawerProps> = ({
       <div
         className={panelClasses}
         style={{
+          ...panelStyle,
           ...style,
           ...(width
             ? {

@@ -20,6 +20,11 @@ export const menuModeClasses = {
   inline: 'flex-col min-w-[200px]'
 }
 
+export const menuCollapsedModeClasses = {
+  vertical: 'flex-col border-r',
+  inline: 'flex-col'
+}
+
 /**
  * Menu theme classes - light theme
  */
@@ -174,11 +179,15 @@ function themeClass(theme: MenuTheme, light: string, dark: string): string {
  * Get menu classes based on mode and theme
  */
 export function getMenuClasses(mode: MenuMode, theme: MenuTheme, collapsed?: boolean): string {
-  const classes = [menuBaseClasses, menuModeClasses[mode]]
+  const modeClasses =
+    collapsed && (mode === 'vertical' || mode === 'inline')
+      ? menuCollapsedModeClasses[mode]
+      : menuModeClasses[mode]
+  const classes = [menuBaseClasses, modeClasses]
 
   classes.push(themeClass(theme, menuLightThemeClasses, menuDarkThemeClasses))
 
-  if (collapsed && mode === 'vertical') {
+  if (collapsed && (mode === 'vertical' || mode === 'inline')) {
     classes.push(menuCollapsedClasses)
   }
 

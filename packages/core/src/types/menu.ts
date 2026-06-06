@@ -95,6 +95,12 @@ export interface MenuProps {
    */
   inlineIndent?: number
   /**
+   * Whether popup submenus are rendered through a body portal/teleport.
+   * Useful when parent containers clip overflow.
+   * @default false
+   */
+  popupPortal?: boolean
+  /**
    * Additional CSS classes
    */
   className?: string
