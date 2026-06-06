@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-core",
-  "version": "1.2.19",
+  "version": "1.2.23",
   "type": "module",
   "description": "Core utilities for Tigercat UI library",
   "license": "MIT",
