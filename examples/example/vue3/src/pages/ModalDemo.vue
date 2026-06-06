@@ -409,10 +409,7 @@ const handleFormSubmit = async () => {
               </div>
               <template #footer>
                 <Space>
-                  <Button
-                    variant="secondary"
-                    :disabled="formLoading"
-                    @click="cancelFormEdit">
+                  <Button variant="secondary" :disabled="formLoading" @click="cancelFormEdit">
                     取消
                   </Button>
                   <Button :disabled="formLoading" @click="handleFormSubmit">

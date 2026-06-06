@@ -140,11 +140,7 @@ const resetClosableAlerts = () => {
           v-if="!showAlert1 || !showAlert2"
           class="text-gray-500 dark:text-gray-400 text-center py-4">
           提示已关闭
-          <Button
-            class="ml-4"
-            size="sm"
-            variant="primary"
-            @click="resetClosableAlerts">
+          <Button class="ml-4" size="sm" variant="primary" @click="resetClosableAlerts">
             重置
           </Button>
         </div>
