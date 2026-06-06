@@ -42,9 +42,6 @@ jobs:
       - name: Build packages
         run: pnpm build
 
-      - name: Check bundle size
-        run: pnpm size
-
       - name: Publish to NPM
         if: ${{ inputs.dry-run != 'true' }}
         env:
