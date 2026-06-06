@@ -1,5 +1,15 @@
 import React, { useState } from 'react'
-import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-react'
+import {
+  Container,
+  Layout,
+  Header,
+  Sidebar,
+  Content,
+  Footer,
+  Menu,
+  MenuItem,
+  SubMenu
+} from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const containerSnippet = `<Container maxWidth="lg">
@@ -49,6 +59,8 @@ const miniSnippet = `<Layout>
 </Layout>`
 
 const shellSidebarSnippet = `const [collapsed, setCollapsed] = useState(false)
+const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['dashboard'])
+const [openKeys, setOpenKeys] = useState<(string | number)[]>(['system'])
 
 <Sidebar width="240px" collapsedWidth="64px" collapsed={collapsed}>
   <div className="flex h-full flex-col">
@@ -57,6 +69,22 @@ const shellSidebarSnippet = `const [collapsed, setCollapsed] = useState(false)
       <span className={collapsed ? 'max-w-0 opacity-0 -translate-x-2' : 'max-w-32 opacity-100 translate-x-0'}>
         Tigercat Admin
       </span>
+    </div>
+    <div className="flex-1 px-2 py-3">
+      <Menu
+        mode="inline"
+        collapsed={collapsed}
+        popupPortal
+        selectedKeys={selectedKeys}
+        openKeys={collapsed ? [] : openKeys}
+        onSelect={(key) => setSelectedKeys([key])}
+        onOpenChange={(_key, info) => setOpenKeys(info.openKeys)}>
+        <MenuItem itemKey="dashboard" icon={<span className="text-xs">⌂</span>}>Dashboard</MenuItem>
+        <SubMenu itemKey="system" title="System" icon={<span className="text-xs">⚙</span>}>
+          <MenuItem itemKey="users">Users</MenuItem>
+          <MenuItem itemKey="roles">Roles</MenuItem>
+        </SubMenu>
+      </Menu>
     </div>
     <button onClick={() => setCollapsed((value) => !value)}>
       <span>{collapsed ? '>' : '<'}</span>
@@ -85,6 +113,8 @@ const LayoutDemo: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [miniCollapsed, setMiniCollapsed] = useState(true)
   const [shellCollapsed, setShellCollapsed] = useState(false)
+  const [shellSelectedKeys, setShellSelectedKeys] = useState<(string | number)[]>(['dashboard'])
+  const [shellOpenKeys, setShellOpenKeys] = useState<(string | number)[]>(['system'])
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
@@ -180,7 +210,7 @@ const LayoutDemo: React.FC = () => {
 
       <DemoBlock
         title="后台 Shell 侧栏"
-        description="推荐使用 Sidebar 的 collapsedWidth 配合文案 max-width、opacity、transform transition，让 Logo 文案和底部折叠按钮在收缩时平滑淡出。"
+        description="推荐使用 Sidebar 的 collapsedWidth 配合文案 max-width、opacity、transform transition；Menu 在 inline + collapsed + popupPortal 下会自动退化成折叠侧栏常见的 popup 子菜单，无需手动切成 vertical。"
         code={shellSidebarSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[320px]">
@@ -205,9 +235,35 @@ const LayoutDemo: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex-1 px-2 py-3">
-                  <div className="rounded-lg bg-[var(--tiger-surface-muted,#f9fafb)] px-3 py-2 text-sm text-[var(--tiger-text-muted,#6b7280)]">
-                    {shellCollapsed ? 'D' : 'Dashboard'}
-                  </div>
+                  <Menu
+                    mode="inline"
+                    collapsed={shellCollapsed}
+                    popupPortal
+                    selectedKeys={shellSelectedKeys}
+                    openKeys={shellCollapsed ? [] : shellOpenKeys}
+                    onSelect={(key) => setShellSelectedKeys([key])}
+                    onOpenChange={(_key, info) => setShellOpenKeys(info.openKeys)}>
+                    <MenuItem
+                      itemKey="dashboard"
+                      icon={
+                        <span className="inline-flex size-4 items-center justify-center text-[11px]">
+                          ⌂
+                        </span>
+                      }>
+                      Dashboard
+                    </MenuItem>
+                    <SubMenu
+                      itemKey="system"
+                      title="System"
+                      icon={
+                        <span className="inline-flex size-4 items-center justify-center text-[11px]">
+                          ⚙
+                        </span>
+                      }>
+                      <MenuItem itemKey="users">Users</MenuItem>
+                      <MenuItem itemKey="roles">Roles</MenuItem>
+                    </SubMenu>
+                  </Menu>
                 </div>
                 <button
                   type="button"

@@ -1,11 +1,27 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-vue'
+import {
+  Container,
+  Layout,
+  Header,
+  Sidebar,
+  Content,
+  Footer,
+  Menu,
+  MenuItem,
+  SubMenu
+} from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const collapsed = ref(false)
 const miniCollapsed = ref(true)
 const shellCollapsed = ref(false)
+const shellSelectedKeys = ref<(string | number)[]>(['dashboard'])
+const shellOpenKeys = ref<(string | number)[]>(['system'])
+const dashboardIcon =
+  '<span class="inline-flex size-4 items-center justify-center text-[11px]">⌂</span>'
+const systemIcon =
+  '<span class="inline-flex size-4 items-center justify-center text-[11px]">⚙</span>'
 
 const containerSnippet = `<Container maxWidth="lg">
   <div>这里是 Container 内容区域</div>
@@ -57,6 +73,8 @@ const miniSnippet = `<Layout>
 </Layout>`
 
 const shellSidebarSnippet = `const collapsed = ref(false)
+const selectedKeys = ref<(string | number)[]>(['dashboard'])
+const openKeys = ref<(string | number)[]>(['system'])
 
 <Sidebar width="240px" collapsed-width="64px" :collapsed="collapsed">
   <div class="flex h-full flex-col">
@@ -65,6 +83,21 @@ const shellSidebarSnippet = `const collapsed = ref(false)
       <span :class="collapsed ? 'max-w-0 opacity-0 -translate-x-2' : 'max-w-32 opacity-100 translate-x-0'">
         Tigercat Admin
       </span>
+    </div>
+    <div class="flex-1 px-2 py-3">
+      <Menu
+        mode="inline"
+        :collapsed="collapsed"
+        popup-portal
+        v-model:selectedKeys="selectedKeys"
+        :openKeys="collapsed ? [] : openKeys"
+        @open-change="(_key, info) => (openKeys = info.openKeys)">
+        <MenuItem itemKey="dashboard" :icon="dashboardIcon">Dashboard</MenuItem>
+        <SubMenu itemKey="system" title="System" :icon="systemIcon">
+          <MenuItem itemKey="users">Users</MenuItem>
+          <MenuItem itemKey="roles">Roles</MenuItem>
+        </SubMenu>
+      </Menu>
     </div>
     <button @click="collapsed = !collapsed">
       <span>{{ collapsed ? '>' : '<' }}</span>
@@ -177,7 +210,7 @@ const complexSnippet = `<Layout>
 
     <DemoBlock
       title="后台 Shell 侧栏"
-      description="推荐使用 Sidebar 的 collapsed-width 配合文案 max-width、opacity、transform transition，让 Logo 文案和底部折叠按钮在收缩时平滑淡出。"
+      description="推荐使用 Sidebar 的 collapsed-width 配合文案 max-width、opacity、transform transition；Menu 在 inline + collapsed + popup-portal 下会自动退化成折叠侧栏常见的 popup 子菜单，无需手动切成 vertical。"
       :code="shellSidebarSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[320px]">
@@ -204,10 +237,19 @@ const complexSnippet = `<Layout>
                 </span>
               </div>
               <div class="flex-1 px-2 py-3">
-                <div
-                  class="rounded-lg bg-[var(--tiger-surface-muted,#f9fafb)] px-3 py-2 text-sm text-[var(--tiger-text-muted,#6b7280)]">
-                  {{ shellCollapsed ? 'D' : 'Dashboard' }}
-                </div>
+                <Menu
+                  mode="inline"
+                  :collapsed="shellCollapsed"
+                  popup-portal
+                  v-model:selectedKeys="shellSelectedKeys"
+                  :openKeys="shellCollapsed ? [] : shellOpenKeys"
+                  @open-change="(_key, info) => (shellOpenKeys = info.openKeys)">
+                  <MenuItem itemKey="dashboard" :icon="dashboardIcon"> Dashboard </MenuItem>
+                  <SubMenu itemKey="system" title="System" :icon="systemIcon">
+                    <MenuItem itemKey="users">Users</MenuItem>
+                    <MenuItem itemKey="roles">Roles</MenuItem>
+                  </SubMenu>
+                </Menu>
               </div>
               <button
                 type="button"

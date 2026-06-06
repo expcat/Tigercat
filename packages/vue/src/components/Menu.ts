@@ -217,6 +217,9 @@ export const Menu = defineComponent({
   ],
   setup(props, { slots, emit, attrs }) {
     const menuEl = ref<HTMLElement | null>(null)
+    const resolvedMode = computed<MenuMode>(() =>
+      props.collapsed && props.mode === 'inline' ? 'vertical' : props.mode
+    )
 
     // Internal state for uncontrolled mode
     const internalSelectedKeys = ref<MenuKey[]>(props.defaultSelectedKeys)
@@ -276,7 +279,7 @@ export const Menu = defineComponent({
     // Menu classes
     const menuClasses = computed(() => {
       return classNames(
-        getMenuClasses(props.mode, props.theme, props.collapsed),
+        getMenuClasses(resolvedMode.value, props.theme, props.collapsed),
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -298,7 +301,7 @@ export const Menu = defineComponent({
     })
 
     // Provide menu context to child components
-    const modeRef = computed(() => props.mode)
+    const modeRef = computed(() => resolvedMode.value)
     const themeRef = computed(() => props.theme)
     const collapsedRef = computed(() => props.collapsed)
     const inlineIndentRef = computed(() => props.inlineIndent)
@@ -397,7 +400,8 @@ export const Menu = defineComponent({
           style: menuStyle.value,
           role: 'menu',
           'data-tiger-menu-root': 'true',
-          'data-tiger-menu-mode': props.mode,
+          'data-tiger-menu-mode': resolvedMode.value,
+          'data-tiger-menu-requested-mode': props.mode,
           ...passthroughAttrs.value
         },
         [...searchChild, ...dataChildren, ...slotChildren, ...emptyChild]
@@ -627,6 +631,7 @@ export const MenuItem = defineComponent({
 export interface VueMenuItemGroupProps {
   title?: string
   level?: number
+  collapsed?: boolean
   className?: string
   style?: Record<string, string | number>
 }
@@ -645,6 +650,10 @@ export const MenuItemGroup = defineComponent({
     level: {
       type: Number,
       default: 0
+    },
+    collapsed: {
+      type: Boolean,
+      default: undefined
     },
     className: {
       type: String,
@@ -681,9 +690,15 @@ export const MenuItemGroup = defineComponent({
         if (!isTarget) return node
 
         const existingProps = (node.props ?? {}) as Record<string, unknown>
-        if (existingProps.level != null) return node
+        if (existingProps.level != null && existingProps.collapsed != null) return node
 
-        return cloneVNode(node, { level })
+        const nextProps: Record<string, unknown> = {}
+        if (existingProps.level == null) nextProps.level = level
+        if (props.collapsed !== undefined && existingProps.collapsed == null) {
+          nextProps.collapsed = props.collapsed
+        }
+
+        return cloneVNode(node, nextProps)
       })
     }
 
@@ -1093,6 +1108,10 @@ export const SubMenu = defineComponent({
 
         const nextProps: Record<string, unknown> = {
           level: existingProps.level ?? nextLevel
+        }
+
+        if (existingProps.collapsed == null && isPopup.value) {
+          nextProps.collapsed = false
         }
 
         return cloneVNode(node, nextProps)

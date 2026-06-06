@@ -81,6 +81,7 @@ export interface MenuProps {
   defaultOpenKeys?: MenuKey[]
   /**
    * Whether the menu is collapsed (for vertical mode)
+   * When used with `mode="inline"`, collapsed menus automatically use popup-style submenu behavior.
    * @default false
    */
   collapsed?: boolean

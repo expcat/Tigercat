@@ -119,6 +119,7 @@ export const Menu: React.FC<MenuProps> = ({
   children
 }) => {
   const menuRef = useRef<HTMLUListElement | null>(null)
+  const resolvedMode: MenuMode = collapsed && mode === 'inline' ? 'vertical' : mode
 
   // Internal state for uncontrolled mode
   const [internalSelectedKeys, setInternalSelectedKeys] =
@@ -181,13 +182,13 @@ export const Menu: React.FC<MenuProps> = ({
 
   // Menu classes
   const menuClasses = useMemo(() => {
-    return classNames(getMenuClasses(mode, theme, collapsed), className)
-  }, [mode, theme, collapsed, className])
+    return classNames(getMenuClasses(resolvedMode, theme, collapsed), className)
+  }, [resolvedMode, theme, collapsed, className])
 
   // Context value
   const contextValue = useMemo<MenuContextValue>(
     () => ({
-      mode,
+      mode: resolvedMode,
       theme,
       collapsed,
       inlineIndent,
@@ -198,7 +199,7 @@ export const Menu: React.FC<MenuProps> = ({
       handleOpenChange
     }),
     [
-      mode,
+      resolvedMode,
       theme,
       collapsed,
       inlineIndent,
@@ -247,7 +248,7 @@ export const Menu: React.FC<MenuProps> = ({
 
   useEffect(() => {
     if (menuRef.current) initRovingTabIndex(menuRef.current)
-  }, [mode, collapsed, selectedKeys, openKeys, filteredItems])
+  }, [resolvedMode, collapsed, selectedKeys, openKeys, filteredItems])
 
   return (
     <MenuContext.Provider value={contextValue}>
@@ -257,7 +258,8 @@ export const Menu: React.FC<MenuProps> = ({
         style={style}
         role="menu"
         data-tiger-menu-root="true"
-        data-tiger-menu-mode={mode}>
+        data-tiger-menu-mode={resolvedMode}
+        data-tiger-menu-requested-mode={mode}>
         {searchable && (
           <li role="none" className={menuSearchFieldClasses}>
             <input
@@ -436,21 +438,31 @@ export interface MenuItemGroupProps extends CoreMenuItemGroupProps {
    * Nesting level (internal use for indentation)
    */
   level?: number
+
+  /**
+   * Internal override for collapsed rendering (used by SubMenu popup)
+   */
+  collapsed?: boolean
 }
 
 export const MenuItemGroup: React.FC<MenuItemGroupProps> = ({
   title,
   className,
   children,
-  level = 0
+  level = 0,
+  collapsed
 }) => {
   const enhancedChildren = React.Children.map(children, (child) => {
     if (!React.isValidElement(child)) return child
 
     if (child.type === MenuItem || isComponentNamed(child.type, 'SubMenu')) {
-      return React.cloneElement(child as React.ReactElement<{ level?: number }>, {
-        level
-      })
+      return React.cloneElement(
+        child as React.ReactElement<{ level?: number; collapsed?: boolean }>,
+        {
+          level,
+          collapsed
+        }
+      )
     }
 
     return child
@@ -771,7 +783,8 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         return React.cloneElement(
           child as React.ReactElement<{ level?: number; collapsed?: boolean }>,
           {
-            level: nextLevel
+            level: nextLevel,
+            collapsed: isPopup ? false : undefined
           }
         )
       }

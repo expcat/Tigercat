@@ -208,6 +208,34 @@ describe('Menu', () => {
       expect(menu?.className).not.toContain('min-w-[200px]')
     })
 
+    it('falls back to vertical popup behavior when an inline menu is collapsed', async () => {
+      const user = userEvent.setup()
+      const { container } = render(
+        <div className="overflow-hidden">
+          <Menu mode="inline" collapsed popupPortal>
+            <SubMenu itemKey="reports" title="Reports">
+              <MenuItem itemKey="daily">Daily</MenuItem>
+            </SubMenu>
+          </Menu>
+        </div>
+      )
+
+      const menu = container.querySelector('ul[data-tiger-menu-root="true"]')
+      expect(menu).toHaveAttribute('data-tiger-menu-mode', 'vertical')
+      expect(menu).toHaveAttribute('data-tiger-menu-requested-mode', 'inline')
+
+      const trigger = screen.getAllByRole('menuitem')[0]
+      const popup = document.body.querySelector('[data-tiger-submenu-popup]') as HTMLElement
+
+      expect(popup).toBeInTheDocument()
+      expect(container.querySelector('[data-tiger-submenu-popup]')).not.toBe(popup)
+
+      await user.hover(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      expect(popup).not.toHaveAttribute('aria-hidden')
+      expect(screen.getByRole('menuitem', { name: 'Daily' })).toBeInTheDocument()
+    })
+
     it('supports custom inlineIndent', () => {
       render(
         <Menu mode="inline" inlineIndent={32} defaultOpenKeys={['sub1']}>
