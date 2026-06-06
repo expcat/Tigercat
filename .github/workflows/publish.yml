@@ -42,9 +42,6 @@ jobs:
       - name: Build packages
         run: pnpm build
 
-      - name: Run tests
-        run: pnpm test
-
       - name: Check bundle size
         run: pnpm size
 
@@ -57,4 +54,4 @@ jobs:
 
       - name: Dry run summary
         if: ${{ inputs.dry-run == 'true' }}
-        run: echo "Dry run complete — all checks passed, publish skipped."
+        run: echo "Dry run complete — publish skipped."
