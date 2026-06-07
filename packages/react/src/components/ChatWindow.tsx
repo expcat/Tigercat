@@ -11,6 +11,7 @@ import { Textarea } from './Textarea'
 import { Input } from './Input'
 import { Button } from './Button'
 import { VirtualList } from './VirtualList'
+import { Empty } from './Empty'
 
 export interface ChatWindowProps
   extends
@@ -68,7 +69,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const wrapperClasses = useMemo(
     () =>
       classNames(
-        'tiger-chat-window flex flex-col w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]',
+        'tiger-chat-window flex flex-col w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden transition-all duration-300',
         className
       ),
     [className]
@@ -149,10 +150,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             )}
             <div
               className={classNames(
-                'rounded-[var(--tiger-radius-md,0.5rem)] px-3 py-2 text-sm break-words',
+                'rounded-[var(--tiger-radius-lg,0.75rem)] px-4 py-2.5 text-sm break-words shadow-sm transition-all',
                 isSelf
-                  ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-none'
-                  : 'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text,#111827)] rounded-tl-none'
+                  ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-[var(--tiger-radius-sm,0.375rem)]'
+                  : 'bg-[var(--tiger-surface,#ffffff)] border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] rounded-tl-[var(--tiger-radius-sm,0.375rem)]'
               )}
               data-tiger-chat-bubble>
               {renderMessage?.(message, index) ?? message.content}
@@ -191,6 +192,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       {virtual && messages.length > 0 ? (
         <div
           ref={messageListRef}
+          className="flex-1 overflow-auto bg-[var(--tiger-surface-muted,#f9fafb)]"
           role="log"
           aria-live="polite"
           aria-relevant="additions text"
@@ -205,14 +207,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       ) : (
         <div
           ref={messageListRef}
-          className="flex-1 overflow-auto p-4 space-y-3"
+          className="flex-1 overflow-auto p-5 space-y-4 bg-[var(--tiger-surface-muted,#f9fafb)]"
           role="log"
           aria-live="polite"
           aria-relevant="additions text"
           aria-label={messageListAriaLabel ?? '消息列表'}>
           {messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]">
-              {emptyText}
+            <div className="h-full flex items-center justify-center py-8">
+              <Empty description={emptyText} />
             </div>
           ) : (
             messages.map(renderMessageItem)
@@ -220,11 +222,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
       )}
       {statusText && (
-        <div className="px-4 py-1.5 border-t border-[var(--tiger-border,#e5e7eb)] text-xs italic text-[var(--tiger-text-muted,#6b7280)]">
+        <div className="px-5 py-2 border-t border-[var(--tiger-border,#e5e7eb)] text-xs italic text-[var(--tiger-text-muted,#6b7280)] bg-[var(--tiger-surface-muted,#f9fafb)]">
           {statusText}
         </div>
       )}
-      <div className="flex items-end gap-3 px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] rounded-b-lg">
+      <div className="flex items-end gap-3 px-5 py-4 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] rounded-b-lg">
         <div className="flex-1">
           {inputType === 'input' ? (
             <Input

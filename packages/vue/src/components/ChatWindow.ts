@@ -13,6 +13,7 @@ import { Textarea } from './Textarea'
 import { Input } from './Input'
 import { Button } from './Button'
 import { VirtualList } from './VirtualList'
+import { Empty } from './Empty'
 
 export interface VueChatWindowProps extends Omit<
   CoreChatWindowProps,
@@ -152,7 +153,7 @@ export const ChatWindow = defineComponent({
 
     const wrapperClasses = computed(() =>
       classNames(
-        'tiger-chat-window flex flex-col w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]',
+        'tiger-chat-window flex flex-col w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden transition-all duration-300',
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -265,10 +266,10 @@ export const ChatWindow = defineComponent({
               'div',
               {
                 class: classNames(
-                  'rounded-[var(--tiger-radius-md,0.5rem)] px-3 py-2 text-sm break-words',
+                  'rounded-[var(--tiger-radius-lg,0.75rem)] px-4 py-2.5 text-sm break-words shadow-sm transition-all',
                   isSelf
-                    ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-none'
-                    : 'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text,#111827)] rounded-tl-none'
+                    ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-[var(--tiger-radius-sm,0.375rem)]'
+                    : 'bg-[var(--tiger-surface,#ffffff)] border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] rounded-tl-[var(--tiger-radius-sm,0.375rem)]'
                 ),
                 'data-tiger-chat-bubble': ''
               },
@@ -323,6 +324,7 @@ export const ChatWindow = defineComponent({
                 'div',
                 {
                   ref: virtualWrapperRef,
+                  class: 'flex-1 overflow-auto bg-[var(--tiger-surface-muted,#f9fafb)]',
                   role: 'log',
                   'aria-live': 'polite',
                   'aria-relevant': 'additions text',
@@ -347,7 +349,7 @@ export const ChatWindow = defineComponent({
                 'div',
                 {
                   ref: messageListRef,
-                  class: 'flex-1 overflow-auto p-4 space-y-3',
+                  class: 'flex-1 overflow-auto p-5 space-y-4 bg-[var(--tiger-surface-muted,#f9fafb)]',
                   role: 'log',
                   'aria-live': 'polite',
                   'aria-relevant': 'additions text',
@@ -359,9 +361,11 @@ export const ChatWindow = defineComponent({
                         'div',
                         {
                           class:
-                            'h-full flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]'
+                            'h-full flex items-center justify-center py-8'
                         },
-                        props.emptyText
+                        [
+                          h(Empty, { description: props.emptyText })
+                        ]
                       )
                     ]
                   : props.messages.map((message, index) => renderMessageItem(message, index))
@@ -371,7 +375,7 @@ export const ChatWindow = defineComponent({
                 'div',
                 {
                   class:
-                    'px-4 py-1.5 border-t border-[var(--tiger-border,#e5e7eb)] text-xs italic text-[var(--tiger-text-muted,#6b7280)]'
+                    'px-5 py-2 border-t border-[var(--tiger-border,#e5e7eb)] text-xs italic text-[var(--tiger-text-muted,#6b7280)] bg-[var(--tiger-surface-muted,#f9fafb)]'
                 },
                 props.statusText
               )
@@ -380,7 +384,7 @@ export const ChatWindow = defineComponent({
             'div',
             {
               class:
-                'flex items-end gap-3 px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] rounded-b-lg'
+                'flex items-end gap-3 px-5 py-4 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] rounded-b-lg'
             },
             [
               h('div', { class: 'flex-1' }, [renderInput()]),
