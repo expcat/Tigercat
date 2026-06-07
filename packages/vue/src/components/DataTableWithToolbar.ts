@@ -254,7 +254,10 @@ export const DataTableWithToolbar = defineComponent({
 
     const wrapperClasses = computed(() =>
       classNames(
-        'tiger-data-table-with-toolbar flex flex-col gap-3',
+        'tiger-data-table-with-toolbar flex flex-col',
+        props.bordered
+          ? 'border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-surface,#ffffff)] shadow-sm'
+          : 'gap-3.5',
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -319,28 +322,52 @@ export const DataTableWithToolbar = defineComponent({
         leftNodes.push(
           h(
             'div',
-            { class: 'flex items-center gap-2 w-full sm:w-auto sm:min-w-[200px] sm:max-w-[320px]' },
+            { class: 'flex items-center gap-2 w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]' },
             [
-              h(Input, {
-                type: 'search',
-                size: 'sm',
-                modelValue: searchValue.value,
-                placeholder: props.toolbar?.searchPlaceholder ?? '搜索',
-                'onUpdate:modelValue': (value: string | number) =>
-                  handleSearchChange(String(value ?? '')),
-                onKeydown: (event: KeyboardEvent) => {
-                  if (event.key === 'Enter') {
-                    handleSearchSubmit()
+              h(
+                Input,
+                {
+                  type: 'search',
+                  size: 'sm',
+                  modelValue: searchValue.value,
+                  placeholder: props.toolbar?.searchPlaceholder ?? '搜索',
+                  'onUpdate:modelValue': (value: string | number) =>
+                    handleSearchChange(String(value ?? '')),
+                  onKeydown: (event: KeyboardEvent) => {
+                    if (event.key === 'Enter') {
+                      handleSearchSubmit()
+                    }
                   }
+                },
+                {
+                  prefix: () =>
+                    h(
+                      'svg',
+                      {
+                        class: 'w-3.5 h-3.5 text-[var(--tiger-text-secondary,#6b7280)] shrink-0',
+                        fill: 'none',
+                        stroke: 'currentColor',
+                        'stroke-width': '2',
+                        viewBox: '0 0 24 24',
+                        'aria-hidden': 'true'
+                      },
+                      [
+                        h('path', {
+                          'stroke-linecap': 'round',
+                          'stroke-linejoin': 'round',
+                          d: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+                        })
+                      ]
+                    )
                 }
-              }),
+              ),
               showButton
                 ? h(
                     Button,
                     {
                       size: 'sm',
                       variant: 'primary',
-                      class: 'whitespace-nowrap shrink-0',
+                      class: 'whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md,0.5rem)] px-3',
                       onClick: handleSearchSubmit,
                       disabled: !canSearch.value
                     },
@@ -382,9 +409,17 @@ export const DataTableWithToolbar = defineComponent({
         if (selectedCount.value > 0) {
           bulkChildren.push(
             h(
-              'span',
-              { class: 'text-sm text-[var(--tiger-text-muted,#6b7280)]' },
-              `${bulkLabel.value} ${selectedCount.value} 项`
+              'div',
+              {
+                class:
+                  'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)] text-xs font-medium border border-[var(--tiger-primary,#2563eb)]/15 shrink-0 transition-all duration-300'
+              },
+              [
+                h('span', {
+                  class: 'w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] animate-pulse'
+                }),
+                h('span', null, `${bulkLabel.value} ${selectedCount.value} 项`)
+              ]
             )
           )
         }
@@ -408,16 +443,21 @@ export const DataTableWithToolbar = defineComponent({
       return h(
         'div',
         {
-          class: 'tiger-data-table-toolbar flex flex-wrap items-center gap-2 pb-3',
+          class: classNames(
+            'tiger-data-table-toolbar flex flex-wrap items-center gap-3',
+            props.bordered
+              ? 'bg-[var(--tiger-surface-muted,#f9fafb)] dark:bg-gray-800/10 px-4 py-3.5 border-b border-[var(--tiger-border,#e5e7eb)]'
+              : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 dark:bg-gray-800/30 px-4 py-3.5 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm'
+          ),
           role: 'toolbar',
           'aria-label': '数据表格工具栏'
         },
         [
-          h('div', { class: 'flex items-center gap-2 flex-wrap flex-1 min-w-0' }, leftNodes),
+          h('div', { class: 'flex items-center gap-3 flex-wrap flex-1 min-w-0' }, leftNodes),
           hasBulkActions.value
             ? h(
                 'div',
-                { class: 'flex items-center gap-2 flex-wrap ml-auto shrink-0' },
+                { class: 'flex items-center gap-2.5 flex-wrap ml-auto shrink-0' },
                 bulkChildren
               )
             : null
@@ -437,7 +477,7 @@ export const DataTableWithToolbar = defineComponent({
         ...(props.filters !== undefined ? { filters: props.filters } : {}),
         ...(props.defaultFilters !== undefined ? { defaultFilters: props.defaultFilters } : {}),
         size: props.size,
-        bordered: props.bordered,
+        bordered: false,
         striped: props.striped,
         hoverable: props.hoverable,
         loading: props.loading,
@@ -467,3 +507,4 @@ export const DataTableWithToolbar = defineComponent({
 })
 
 export default DataTableWithToolbar
+

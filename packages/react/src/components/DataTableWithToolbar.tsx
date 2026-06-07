@@ -137,13 +137,22 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   const hasFilters = Boolean(toolbar?.filters && toolbar.filters.length > 0)
   const hasBulkActions = Boolean(toolbar?.bulkActions && toolbar.bulkActions.length > 0)
 
+  const { bordered = false, ...remainingTableProps } = tableProps
+
   const selectedKeys = toolbar?.selectedKeys ?? tableProps.rowSelection?.selectedRowKeys ?? []
   const selectedCount = toolbar?.selectedCount ?? selectedKeys.length
   const bulkLabel = toolbar?.bulkActionsLabel ?? '已选择'
 
   const wrapperClasses = useMemo(
-    () => classNames('tiger-data-table-with-toolbar flex flex-col gap-3', className),
-    [className]
+    () =>
+      classNames(
+        'tiger-data-table-with-toolbar flex flex-col',
+        bordered
+          ? 'border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-surface,#ffffff)] shadow-sm'
+          : 'gap-3.5',
+        className
+      ),
+    [className, bordered]
   )
 
   const handleSearchChange = (value: string) => {
@@ -196,17 +205,37 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 
     return (
       <div
-        className="tiger-data-table-toolbar flex flex-wrap items-center gap-2 pb-3"
+        className={classNames(
+          'tiger-data-table-toolbar flex flex-wrap items-center gap-3',
+          bordered
+            ? 'bg-[var(--tiger-surface-muted,#f9fafb)] dark:bg-gray-800/10 px-4 py-3.5 border-b border-[var(--tiger-border,#e5e7eb)]'
+            : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 dark:bg-gray-800/30 px-4 py-3.5 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm'
+        )}
         role="toolbar"
         aria-label="数据表格工具栏">
-        <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
+        <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0">
           {hasSearch ? (
-            <div className="flex items-center gap-2 w-full sm:w-auto sm:min-w-[200px] sm:max-w-[320px]">
+            <div className="flex items-center gap-2 w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]">
               <Input
                 type="search"
                 size="sm"
                 value={searchValue}
                 placeholder={toolbar?.searchPlaceholder ?? '搜索'}
+                prefix={
+                  <svg
+                    className="w-3.5 h-3.5 text-[var(--tiger-text-secondary,#6b7280)] shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                }
                 onChange={(event) => handleSearchChange(String(event.currentTarget.value))}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter') {
@@ -218,7 +247,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 <Button
                   size="sm"
                   variant="primary"
-                  className="whitespace-nowrap shrink-0"
+                  className="whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md,0.5rem)] px-3"
                   onClick={handleSearchSubmit}
                   disabled={!onSearch && !toolbar?.onSearch}>
                   {toolbar?.searchButtonText ?? '搜索'}
@@ -256,11 +285,14 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         </div>
 
         {hasBulkActions ? (
-          <div className="flex items-center gap-2 flex-wrap ml-auto shrink-0">
+          <div className="flex items-center gap-2.5 flex-wrap ml-auto shrink-0">
             {selectedCount > 0 ? (
-              <span className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
-                {bulkLabel} {selectedCount} 项
-              </span>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)] text-xs font-medium border border-[var(--tiger-primary,#2563eb)]/15 shrink-0 transition-all duration-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] animate-pulse" />
+                <span>
+                  {bulkLabel} {selectedCount} 项
+                </span>
+              </div>
             ) : null}
             {toolbar?.bulkActions?.map((action) => (
               <Button
@@ -282,7 +314,8 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     <div className={wrapperClasses} data-tiger-data-table-with-toolbar>
       {renderToolbar()}
       <Table
-        {...tableProps}
+        {...remainingTableProps}
+        bordered={false}
         pagination={pagination}
         className={tableClassName}
         onPageChange={handleTablePageChange}
@@ -292,3 +325,4 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 }
 
 export default DataTableWithToolbar
+

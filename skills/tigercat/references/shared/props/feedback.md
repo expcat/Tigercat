@@ -13,7 +13,7 @@ description: Compact generated Tigercat Feedback props reference
 
 Source: `packages/core/src/types/drawer.ts` · Interface: `DrawerProps`.
 
-Showing 3 key props of 13; see source for the complete interface.
+Showing 3 key props of 17; see source for the complete interface.
 
 | Prop         | Type              | Default   | Notes                      |
 | ------------ | ----------------- | --------- | -------------------------- |

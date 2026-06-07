@@ -139,7 +139,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 Source: `packages/core/src/types/menu.ts` · Interface: `MenuProps`.
 
-Showing 3 key props of 17; see source for the complete interface.
+Showing 3 key props of 18; see source for the complete interface.
 
 | Prop     | Type         | Default      | Notes                                                                 |
 | -------- | ------------ | ------------ | --------------------------------------------------------------------- |
