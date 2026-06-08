@@ -21,21 +21,10 @@ export interface RenderPaginationOptions {
   disableI18n?: boolean
 }
 
-const DEFAULT_PREV_TEXT = 'Previous'
-const DEFAULT_NEXT_TEXT = 'Next'
-
-function formatDefaultTotalText(total: number, range: [number, number]): string {
-  return `Showing ${range[0]} to ${range[1]} of ${total} results`
-}
-
-function formatDefaultPageIndicatorText(current: number, total: number): string {
-  return `Page ${current} of ${total}`
-}
-
 export function renderPagination(
   ctx: TableContext,
   props: TableInternalProps,
-  options: RenderPaginationOptions = {}
+  view?: RenderPaginationOptions
 ): VNodeChild {
   if (props.pagination === false || !ctx.paginationInfo.value) {
     return null
@@ -48,28 +37,51 @@ export function renderPagination(
       ? paginationConfig.total
       : ctx.processedData.value.length
 
-  const locale = options.disableI18n ? undefined : options.locale
+  const locale = view?.disableI18n ? undefined : view?.locale
   const labels = locale ? getPaginationLabels(locale) : undefined
   const localeCode = locale?.locale
+
+  const isZh =
+    !!localeCode?.startsWith('zh') ||
+    locale?.formWizard?.prevText === '上一步' ||
+    locale?.upload?.clickToUploadText === '点击上传'
+
+  const defaultTotalText = (t: number, range: [number, number]) =>
+    isZh
+      ? `共 ${t} 条`
+      : `Showing ${range[0]} to ${range[1]} of ${t} results`
+
+  const defaultPrevText = isZh ? '上一页' : 'Previous'
+  const defaultNextText = isZh ? '下一页' : 'Next'
+
+  const defaultPageIndicatorText = (current: number, total: number) =>
+    isZh ? `第 ${current} 页 / 共 ${total} 页` : `Page ${current} of ${total}`
+
+  const defaultPageSizeText = (size: number) =>
+    isZh ? `${size} 条/页` : `${size} / page`
 
   const finalTotalText = paginationConfig.totalText
     ? paginationConfig.totalText(total, [startIndex, endIndex])
     : labels
       ? formatPaginationTotal(labels.totalText, total, [startIndex, endIndex], localeCode)
-      : formatDefaultTotalText(total, [startIndex, endIndex])
+      : defaultTotalText(total, [startIndex, endIndex])
 
-  const finalPrevText = paginationConfig.prevText || labels?.prevPageAriaLabel || DEFAULT_PREV_TEXT
-  const finalNextText = paginationConfig.nextText || labels?.nextPageAriaLabel || DEFAULT_NEXT_TEXT
+  const finalPrevText = paginationConfig.prevText || labels?.prevPageAriaLabel || defaultPrevText
+  const finalNextText = paginationConfig.nextText || labels?.nextPageAriaLabel || defaultNextText
 
   const finalPageIndicatorText = paginationConfig.pageIndicatorText
     ? paginationConfig.pageIndicatorText(ctx.currentPage.value, totalPages)
     : labels
       ? `${formatPageAriaLabel(labels.pageAriaLabel, ctx.currentPage.value, localeCode)} / ${formatIntlNumber(totalPages, localeCode)} ${labels.pageText}`
-      : formatDefaultPageIndicatorText(ctx.currentPage.value, totalPages)
+      : defaultPageIndicatorText(ctx.currentPage.value, totalPages)
 
   return h('div', { class: getSimplePaginationContainerClasses() }, [
     paginationConfig.showTotal !== false &&
-      h('div', { class: getSimplePaginationTotalClasses() }, finalTotalText),
+      h(
+        'div',
+        { class: getSimplePaginationTotalClasses() },
+        finalTotalText
+      ),
 
     h('div', { class: getSimplePaginationControlsClasses() }, [
       paginationConfig.showSizeChanger !== false &&
@@ -82,15 +94,11 @@ export function renderPagination(
               ctx.handlePageSizeChange(Number((e.target as HTMLSelectElement).value))
           },
           (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) =>
-            h(
-              'option',
-              { value: size },
-              paginationConfig.pageSizeText
-                ? paginationConfig.pageSizeText(size)
-                : labels
-                  ? `${formatIntlNumber(size, localeCode)} ${labels.itemsPerPageText}`
-                  : `${size} / page`
-            )
+            h('option', { value: size }, paginationConfig.pageSizeText
+              ? paginationConfig.pageSizeText(size)
+              : labels
+                ? `${formatIntlNumber(size, localeCode)} ${labels.itemsPerPageText}`
+                : defaultPageSizeText(size))
           )
         ),
 
@@ -105,7 +113,11 @@ export function renderPagination(
           finalPrevText
         ),
 
-        h('span', { class: getSimplePaginationPageIndicatorClasses() }, finalPageIndicatorText),
+        h(
+          'span',
+          { class: getSimplePaginationPageIndicatorClasses() },
+          finalPageIndicatorText
+        ),
 
         h(
           'button',

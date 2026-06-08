@@ -9,15 +9,28 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 组合组件面向业务场景，优先按现有 props 接口配置，而不是拆开重写内部结构。
 
-| Component            | Vue                        | React                      |
-| -------------------- | -------------------------- | -------------------------- |
-| ChatWindow           | `<ChatWindow />`           | `<ChatWindow />`           |
-| ActivityFeed         | `<ActivityFeed />`         | `<ActivityFeed />`         |
-| CommentThread        | `<CommentThread />`        | `<CommentThread />`        |
-| NotificationCenter   | `<NotificationCenter />`   | `<NotificationCenter />`   |
-| TableToolbar         | `<TableToolbar />`         | `<TableToolbar />`         |
-| DataTableWithToolbar | `<DataTableWithToolbar />` | `<DataTableWithToolbar />` |
-| FormWizard           | `<FormWizard />`           | `<FormWizard />`           |
-| TaskBoard            | `<TaskBoard />`            | `<TaskBoard />`            |
+## Component Notes
+
+| Component            | Uses                                                              | Notes                                                                                                                      |
+| -------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| ChatWindow           | `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`      | `virtual` 开启后消息列表走 `VirtualList`；输入区根据 `inputType` 选择 `Textarea` 或 `Input`。                              |
+| ActivityFeed         | `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`    | 时间线、头像、状态标签和动作链接由组件内部组合，业务侧优先传 `items` 或 `groups`。                                         |
+| CommentThread        | `Avatar`, `Tag`, `Button`, `Textarea`, `Text`                     | 评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。                                              |
+| NotificationCenter   | `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`       | 传 `groups` 时使用 Tabs 分组；平铺通知列表走 List。                                                                        |
+| TableToolbar         | `Input`, `Select`, `Button`                                       | 这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。                                            |
+| DataTableWithToolbar | `Table`, `Input`, `Select`, `Button`                              | 透传 Table props；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。 |
+| FormWizard           | `Steps/StepsItem`, `Button`, `ConfigProvider`                     | 按钮文案优先使用显式 props，其次组件 `locale`，再回退到 `ConfigProvider` locale。                                          |
+| TaskBoard            | `ConfigProvider`, `task-board drag utilities`, `kanban utilities` | 拖拽、WIP、过滤和空状态文案由 core 工具和 locale helpers 共同驱动。                                                        |
+
+| Component            | Vue                                                                                                           | React                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| ChatWindow           | `<ChatWindow :messages="messages" />`                                                                         | `<ChatWindow messages={messages} />`                                                                     |
+| ActivityFeed         | `<ActivityFeed :items="items" />`                                                                             | `<ActivityFeed items={items} />`                                                                         |
+| CommentThread        | `<CommentThread :nodes="nodes" />`                                                                            | `<CommentThread nodes={nodes} />`                                                                        |
+| NotificationCenter   | `<NotificationCenter :items="items" />`                                                                       | `<NotificationCenter items={items} />`                                                                   |
+| TableToolbar         | `<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" />`                          | `<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} />`                         |
+| DataTableWithToolbar | `<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" :pagination="pagination" />` | `<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} pagination={pagination} />` |
+| FormWizard           | `<FormWizard :steps="steps" />`                                                                               | `<FormWizard steps={steps} />`                                                                           |
+| TaskBoard            | `<TaskBoard :columns="columns" />`                                                                            | `<TaskBoard columns={columns} />`                                                                        |
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.

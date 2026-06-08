@@ -13,6 +13,10 @@ description: Compact generated Tigercat Composite props reference
 
 Source: `packages/core/src/types/composite.ts` · Interface: `ChatWindowProps`.
 
+Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
+
+Note: `virtual` 开启后消息列表走 `VirtualList`；输入区根据 `inputType` 选择 `Textarea` 或 `Input`。
+
 Showing 3 key props of 26; see source for the complete interface.
 
 | Prop            | Type            | Default | Notes                              |
@@ -27,6 +31,10 @@ Events/callback props: `onChange?`, `onSend?`.
 
 Source: `packages/core/src/types/composite.ts` · Interface: `ActivityFeedProps`.
 
+Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
+
+Note: 时间线、头像、状态标签和动作链接由组件内部组合，业务侧优先传 `items` 或 `groups`。
+
 Showing 3 key props of 12; see source for the complete interface.
 
 | Prop       | Type                             | Default | Notes                                               |
@@ -38,6 +46,10 @@ Showing 3 key props of 12; see source for the complete interface.
 ## CommentThread
 
 Source: `packages/core/src/types/composite.ts` · Interface: `CommentThreadProps`.
+
+Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
+
+Note: 评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。
 
 Showing 3 key props of 20; see source for the complete interface.
 
@@ -53,6 +65,10 @@ Events/callback props: `onLike?`, `onReply?`, `onMore?`, `onAction?`, `onExpande
 
 Source: `packages/core/src/types/composite.ts` · Interface: `NotificationCenterProps`.
 
+Uses: `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`.
+
+Note: 传 `groups` 时使用 Tabs 分组；平铺通知列表走 List。
+
 Showing 3 key props of 19; see source for the complete interface.
 
 | Prop       | Type                                 | Default | Notes                                               |
@@ -66,6 +82,10 @@ Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`
 ## TableToolbar
 
 Source: `packages/core/src/types/composite.ts` · Interface: `TableToolbarProps`.
+
+Uses: `Input`, `Select`, `Button`.
+
+Note: 这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。
 
 Showing 3 key props of 10; see source for the complete interface.
 
@@ -81,6 +101,10 @@ Events/callback props: `onSearchChange?`, `onSearch?`, `onFiltersChange?`, `onBu
 
 Source: `packages/core/src/types/composite.ts` · Interface: `DataTableWithToolbarProps`.
 
+Uses: `Table`, `Input`, `Select`, `Button`.
+
+Note: 透传 Table props；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。
+
 | Prop          | Type                        | Default | Notes                                            |
 | ------------- | --------------------------- | ------- | ------------------------------------------------ |
 | `toolbar?`    | `TableToolbarProps`         | `-`     | Toolbar configuration                            |
@@ -92,7 +116,11 @@ Events/callback props: `onPageChange?`, `onPageSizeChange?`.
 
 Source: `packages/core/src/types/composite.ts` · Interface: `FormWizardProps`.
 
-Showing 3 key props of 17; see source for the complete interface.
+Uses: `Steps/StepsItem`, `Button`, `ConfigProvider`.
+
+Note: 按钮文案优先使用显式 props，其次组件 `locale`，再回退到 `ConfigProvider` locale。
+
+Showing 3 key props of 18; see source for the complete interface.
 
 | Prop              | Type           | Default | Notes                             |
 | ----------------- | -------------- | ------- | --------------------------------- |
@@ -105,6 +133,10 @@ Events/callback props: `onChange?`, `onFinish?`.
 ## TaskBoard
 
 Source: `packages/core/src/types/composite.ts` · Interface: `TaskBoardProps`.
+
+Uses: `ConfigProvider`, `task-board drag utilities`, `kanban utilities`.
+
+Note: 拖拽、WIP、过滤和空状态文案由 core 工具和 locale helpers 共同驱动。
 
 Showing 3 key props of 19; see source for the complete interface.
 

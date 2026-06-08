@@ -4,6 +4,7 @@ import type { DemoLang } from './app-config'
 export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {
   if (lang === 'zh-CN') {
     return {
+      locale: 'zh-CN',
       formWizard: {
         prevText: '上一步',
         nextText: '下一步',
@@ -28,6 +29,7 @@ export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {
   }
 
   return {
+    locale: 'en-US',
     formWizard: {
       prevText: 'Previous',
       nextText: 'Next',

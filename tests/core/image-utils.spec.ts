@@ -45,14 +45,14 @@ describe('image-utils — class generators', () => {
 
   it('getCropperHandleClasses includes correct cursor and position for each handle', () => {
     const expectations: Array<[CropHandle, string, string]> = [
-      ['nw', 'cursor-nw-resize', '-top-1.5'],
-      ['n', 'cursor-n-resize', '-top-1.5'],
-      ['ne', 'cursor-ne-resize', '-right-1.5'],
-      ['e', 'cursor-e-resize', '-right-1.5'],
-      ['se', 'cursor-se-resize', '-bottom-1.5'],
-      ['s', 'cursor-s-resize', '-bottom-1.5'],
-      ['sw', 'cursor-sw-resize', '-left-1.5'],
-      ['w', 'cursor-w-resize', '-left-1.5']
+      ['nw', 'cursor-nw-resize', '-top-1.75'],
+      ['n', 'cursor-n-resize', '-top-1.75'],
+      ['ne', 'cursor-ne-resize', '-right-1.75'],
+      ['e', 'cursor-e-resize', '-right-1.75'],
+      ['se', 'cursor-se-resize', '-bottom-1.75'],
+      ['s', 'cursor-s-resize', '-bottom-1.75'],
+      ['sw', 'cursor-sw-resize', '-left-1.75'],
+      ['w', 'cursor-w-resize', '-left-1.75']
     ]
     for (const [handle, cursor, position] of expectations) {
       const cls = getCropperHandleClasses(handle)

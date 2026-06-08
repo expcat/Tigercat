@@ -162,6 +162,76 @@ const EXAMPLE_NOTES = {
   Composite: '组合组件面向业务场景，优先按现有 props 接口配置，而不是拆开重写内部结构。'
 }
 
+const COMPONENT_USAGE_NOTES = {
+  ChatWindow: {
+    uses: ['Avatar', 'Textarea/Input', 'Button', 'VirtualList', 'Empty'],
+    notes:
+      '`virtual` 开启后消息列表走 `VirtualList`；输入区根据 `inputType` 选择 `Textarea` 或 `Input`。'
+  },
+  ActivityFeed: {
+    uses: ['Timeline', 'Avatar', 'Tag', 'Card', 'Text', 'Link', 'Loading'],
+    notes: '时间线、头像、状态标签和动作链接由组件内部组合，业务侧优先传 `items` 或 `groups`。'
+  },
+  CommentThread: {
+    uses: ['Avatar', 'Tag', 'Button', 'Textarea', 'Text'],
+    notes: '评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。'
+  },
+  NotificationCenter: {
+    uses: ['Card', 'Tabs/TabPane', 'List', 'Text', 'Button', 'Loading'],
+    notes: '传 `groups` 时使用 Tabs 分组；平铺通知列表走 List。'
+  },
+  TableToolbar: {
+    uses: ['Input', 'Select', 'Button'],
+    notes: '这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。'
+  },
+  DataTableWithToolbar: {
+    uses: ['Table', 'Input', 'Select', 'Button'],
+    notes:
+      '透传 Table props；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。'
+  },
+  FormWizard: {
+    uses: ['Steps/StepsItem', 'Button', 'ConfigProvider'],
+    notes: '按钮文案优先使用显式 props，其次组件 `locale`，再回退到 `ConfigProvider` locale。'
+  },
+  TaskBoard: {
+    uses: ['ConfigProvider', 'task-board drag utilities', 'kanban utilities'],
+    notes: '拖拽、WIP、过滤和空状态文案由 core 工具和 locale helpers 共同驱动。'
+  },
+  Kanban: {
+    uses: ['TaskBoard'],
+    notes:
+      'Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。'
+  }
+}
+
+const COMPONENT_SNIPPETS = {
+  Vue: {
+    ChatWindow: '<ChatWindow :messages="messages" />',
+    ActivityFeed: '<ActivityFeed :items="items" />',
+    CommentThread: '<CommentThread :nodes="nodes" />',
+    NotificationCenter: '<NotificationCenter :items="items" />',
+    TableToolbar:
+      '<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" />',
+    DataTableWithToolbar:
+      '<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" :pagination="pagination" />',
+    FormWizard: '<FormWizard :steps="steps" />',
+    TaskBoard: '<TaskBoard :columns="columns" />',
+    Kanban: '<Kanban :columns="columns" />'
+  },
+  React: {
+    ChatWindow: '<ChatWindow messages={messages} />',
+    ActivityFeed: '<ActivityFeed items={items} />',
+    CommentThread: '<CommentThread nodes={nodes} />',
+    NotificationCenter: '<NotificationCenter items={items} />',
+    TableToolbar: '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} />',
+    DataTableWithToolbar:
+      '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} pagination={pagination} />',
+    FormWizard: '<FormWizard steps={steps} />',
+    TaskBoard: '<TaskBoard columns={columns} />',
+    Kanban: '<Kanban columns={columns} />'
+  }
+}
+
 const MAX_PROPS_PER_COMPONENT = 3
 const MAX_EVENTS_PER_COMPONENT = 6
 
@@ -474,6 +544,38 @@ function generateComponentIndex(componentRows) {
   return markdownText
 }
 
+function getComponentUsageText(component) {
+  const usage = COMPONENT_USAGE_NOTES[component]
+  if (!usage) return ''
+
+  let markdownText = ''
+  if (usage.uses?.length) {
+    markdownText += `Uses: ${usage.uses.map((item) => `\`${codeText(item)}\``).join(', ')}.\n\n`
+  }
+  if (usage.notes) {
+    markdownText += `Note: ${usage.notes}\n\n`
+  }
+  return markdownText
+}
+
+function generateComponentNotesTable(components) {
+  const rows = components
+    .map((component) => ({ component, usage: COMPONENT_USAGE_NOTES[component] }))
+    .filter((row) => row.usage)
+
+  if (rows.length === 0) return ''
+
+  let markdownText = '## Component Notes\n\n'
+  markdownText += '| Component | Uses | Notes |\n'
+  markdownText += '| --------- | ---- | ----- |\n'
+  for (const row of rows) {
+    const uses = row.usage.uses?.map((item) => `\`${codeText(item)}\``).join(', ') || '-'
+    markdownText += `| ${row.component} | ${uses} | ${tableText(row.usage.notes || '-')} |\n`
+  }
+  markdownText += '\n'
+  return markdownText
+}
+
 function generatePropsReference(category, files) {
   const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
   const componentCount = files.reduce(
@@ -503,6 +605,7 @@ function generatePropsReference(category, files) {
 
       markdownText += `## ${component}\n\n`
       markdownText += `Source: \`packages/core/src/types/${fileInfo.fileName}\` · Interface: \`${detail.name}\`.\n\n`
+      markdownText += getComponentUsageText(component)
       const propRows = detail.members.filter((member) => member.kind === 'prop')
       const eventRows = detail.members.filter((member) => member.kind === 'event')
       const methodRows = detail.members.filter((member) => member.kind === 'method')
@@ -541,6 +644,7 @@ function generatePropsReference(category, files) {
   for (const virtualComponent of VIRTUAL_COMPONENTS.filter((item) => item.category === category)) {
     markdownText += `## ${virtualComponent.component}\n\n`
     markdownText += `Source: \`${virtualComponent.typeSource}\`.\n\n`
+    markdownText += getComponentUsageText(virtualComponent.component)
     markdownText += '| Prop | Type | Default | Notes |\n'
     markdownText += '| ---- | ---- | ------- | ----- |\n'
     for (const member of virtualComponent.propsRows) {
@@ -553,6 +657,7 @@ function generatePropsReference(category, files) {
 }
 
 function getVueSnippet(component, category) {
+  if (COMPONENT_SNIPPETS.Vue[component]) return COMPONENT_SNIPPETS.Vue[component]
   if (
     category === 'Form' &&
     ['Input', 'Select', 'Checkbox', 'Radio', 'Switch', 'Textarea'].includes(component)
@@ -561,12 +666,14 @@ function getVueSnippet(component, category) {
   }
   if (component === 'Form')
     return '<Form :model=\"form\"><FormItem name=\"name\"><Input v-model=\"form.name\" /></FormItem></Form>'
-  if (component === 'Table') return '<Table :columns=\"columns\" :data=\"rows\" row-key=\"id\" />'
+  if (component === 'Table')
+    return '<Table :columns=\"columns\" :data-source=\"rows\" row-key=\"id\" />'
   if (category === 'Charts') return `<${component} :data=\"data\" />`
   return `<${component} />`
 }
 
 function getReactSnippet(component, category) {
+  if (COMPONENT_SNIPPETS.React[component]) return COMPONENT_SNIPPETS.React[component]
   if (
     category === 'Form' &&
     ['Input', 'Select', 'Checkbox', 'Radio', 'Switch', 'Textarea'].includes(component)
@@ -575,7 +682,7 @@ function getReactSnippet(component, category) {
   }
   if (component === 'Form')
     return '<Form model={form}><FormItem name=\"name\"><Input value={form.name} onChange={onNameChange} /></FormItem></Form>'
-  if (component === 'Table') return '<Table columns={columns} data={rows} rowKey=\"id\" />'
+  if (component === 'Table') return '<Table columns={columns} dataSource={rows} rowKey=\"id\" />'
   if (category === 'Charts') return `<${component} data={data} />`
   return `<${component} />`
 }
@@ -593,6 +700,7 @@ function generateExamples(category, files) {
   markdownText += '<!-- generated by pnpm docs:api -->\n\n'
   markdownText += `# ${category} Examples\n\n`
   markdownText += `${EXAMPLE_NOTES[category] || 'Use the props reference for exact field names.'}\n\n`
+  markdownText += generateComponentNotesTable(components)
   markdownText += '| Component | Vue | React |\n'
   markdownText += '| --------- | --- | ----- |\n'
 

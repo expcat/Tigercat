@@ -73,6 +73,10 @@ Showing 3 key props of 9; see source for the complete interface.
 
 Source: `packages/core/src/types/kanban.ts` · Interface: `KanbanProps`.
 
+Uses: `TaskBoard`.
+
+Note: Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。
+
 | Prop             | Type               | Default | Notes                                                       |
 | ---------------- | ------------------ | ------- | ----------------------------------------------------------- |
 | `swimlanes?`     | `KanbanSwimlane[]` | `-`     | Enable swim-lane grouping (horizontal lanes across columns) |

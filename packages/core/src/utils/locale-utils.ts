@@ -188,10 +188,12 @@ export const ZH_CN_FORM_WIZARD_LABELS: Required<TigerLocaleFormWizard> = {
 export function getFormWizardLabels(
   locale?: Partial<TigerLocale>
 ): Required<TigerLocaleFormWizard> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_FORM_WIZARD_LABELS : DEFAULT_FORM_WIZARD_LABELS
   return {
-    prevText: locale?.formWizard?.prevText ?? DEFAULT_FORM_WIZARD_LABELS.prevText,
-    nextText: locale?.formWizard?.nextText ?? DEFAULT_FORM_WIZARD_LABELS.nextText,
-    finishText: locale?.formWizard?.finishText ?? DEFAULT_FORM_WIZARD_LABELS.finishText
+    prevText: locale?.formWizard?.prevText ?? defaultLabels.prevText,
+    nextText: locale?.formWizard?.nextText ?? defaultLabels.nextText,
+    finishText: locale?.formWizard?.finishText ?? defaultLabels.finishText
   }
 }
 
@@ -204,17 +206,22 @@ export function getFormWizardLabels(
 export function getPaginationLabels(
   locale?: Partial<TigerLocale>
 ): Required<TigerLocalePagination> {
+  const isZh =
+    !!locale?.locale?.startsWith('zh') ||
+    locale?.formWizard?.prevText === '上一步' ||
+    locale?.upload?.clickToUploadText === '点击上传'
+  const defaultLabels = isZh ? ZH_CN_PAGINATION_LABELS : DEFAULT_PAGINATION_LABELS
   return {
-    totalText: locale?.pagination?.totalText ?? DEFAULT_PAGINATION_LABELS.totalText,
+    totalText: locale?.pagination?.totalText ?? defaultLabels.totalText,
     itemsPerPageText:
-      locale?.pagination?.itemsPerPageText ?? DEFAULT_PAGINATION_LABELS.itemsPerPageText,
-    jumpToText: locale?.pagination?.jumpToText ?? DEFAULT_PAGINATION_LABELS.jumpToText,
-    pageText: locale?.pagination?.pageText ?? DEFAULT_PAGINATION_LABELS.pageText,
+      locale?.pagination?.itemsPerPageText ?? defaultLabels.itemsPerPageText,
+    jumpToText: locale?.pagination?.jumpToText ?? defaultLabels.jumpToText,
+    pageText: locale?.pagination?.pageText ?? defaultLabels.pageText,
     prevPageAriaLabel:
-      locale?.pagination?.prevPageAriaLabel ?? DEFAULT_PAGINATION_LABELS.prevPageAriaLabel,
+      locale?.pagination?.prevPageAriaLabel ?? defaultLabels.prevPageAriaLabel,
     nextPageAriaLabel:
-      locale?.pagination?.nextPageAriaLabel ?? DEFAULT_PAGINATION_LABELS.nextPageAriaLabel,
-    pageAriaLabel: locale?.pagination?.pageAriaLabel ?? DEFAULT_PAGINATION_LABELS.pageAriaLabel
+      locale?.pagination?.nextPageAriaLabel ?? defaultLabels.nextPageAriaLabel,
+    pageAriaLabel: locale?.pagination?.pageAriaLabel ?? defaultLabels.pageAriaLabel
   }
 }
 
@@ -273,12 +280,14 @@ export const ZH_CN_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
 }
 
 export function getTaskBoardLabels(locale?: Partial<TigerLocale>): Required<TigerLocaleTaskBoard> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_TASK_BOARD_LABELS : DEFAULT_TASK_BOARD_LABELS
   return {
     emptyColumnText:
-      locale?.taskBoard?.emptyColumnText ?? DEFAULT_TASK_BOARD_LABELS.emptyColumnText,
-    addCardText: locale?.taskBoard?.addCardText ?? DEFAULT_TASK_BOARD_LABELS.addCardText,
-    wipLimitText: locale?.taskBoard?.wipLimitText ?? DEFAULT_TASK_BOARD_LABELS.wipLimitText,
-    dragHintText: locale?.taskBoard?.dragHintText ?? DEFAULT_TASK_BOARD_LABELS.dragHintText,
-    boardAriaLabel: locale?.taskBoard?.boardAriaLabel ?? DEFAULT_TASK_BOARD_LABELS.boardAriaLabel
+      locale?.taskBoard?.emptyColumnText ?? defaultLabels.emptyColumnText,
+    addCardText: locale?.taskBoard?.addCardText ?? defaultLabels.addCardText,
+    wipLimitText: locale?.taskBoard?.wipLimitText ?? defaultLabels.wipLimitText,
+    dragHintText: locale?.taskBoard?.dragHintText ?? defaultLabels.dragHintText,
+    boardAriaLabel: locale?.taskBoard?.boardAriaLabel ?? defaultLabels.boardAriaLabel
   }
 }
