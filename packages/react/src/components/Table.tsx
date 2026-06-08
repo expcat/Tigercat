@@ -12,11 +12,18 @@ import {
   tableResponsiveCardRowClasses,
   tableResponsiveCardValueClasses,
   tableLoadingOverlayClasses,
+  getImmediateTigerLocale,
+  isLazyTigerLocale,
+  mergeTigerLocale,
+  resolveTigerLocale,
   type RowSelectionConfig,
-  type ExpandableConfig
+  type ExpandableConfig,
+  type TigerLocale,
+  type TigerLocaleInput
 } from '@expcat/tigercat-core'
 import { tableExportButtonClasses } from '@expcat/tigercat-core'
 
+import { useTigerConfig } from './ConfigProvider'
 import { LoadingSpinner } from './Table/icons'
 import { useTableState } from './Table/state'
 import { renderTableHeader } from './Table/render-header'
@@ -89,6 +96,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   className,
   ...props
 }: TableProps<T>) {
+  const config = useTigerConfig()
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   const tableRef = useRef<HTMLTableElement | null>(null)
   const [measuredColumnWidths, setMeasuredColumnWidths] = useState<Record<string, number>>({})
@@ -101,6 +109,50 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     | string
     | ((record: Record<string, unknown>, index: number) => string)
     | undefined
+  const paginationLocaleInput: TigerLocaleInput | false | undefined =
+    pagination !== false && typeof pagination === 'object' ? pagination.locale : undefined
+  const isPaginationI18nDisabled = paginationLocaleInput === false
+  const immediatePaginationLocale = useMemo(
+    () =>
+      paginationLocaleInput && !isPaginationI18nDisabled
+        ? getImmediateTigerLocale(paginationLocaleInput)
+        : undefined,
+    [isPaginationI18nDisabled, paginationLocaleInput]
+  )
+  const [resolvedPaginationLocale, setResolvedPaginationLocale] = useState<
+    Partial<TigerLocale> | undefined
+  >(immediatePaginationLocale)
+
+  useEffect(() => {
+    let active = true
+    setResolvedPaginationLocale(immediatePaginationLocale)
+
+    if (
+      paginationLocaleInput &&
+      !isPaginationI18nDisabled &&
+      isLazyTigerLocale(paginationLocaleInput)
+    ) {
+      resolveTigerLocale(paginationLocaleInput)
+        .then((nextLocale) => {
+          if (active) setResolvedPaginationLocale(nextLocale)
+        })
+        .catch(() => {
+          if (active) setResolvedPaginationLocale(immediatePaginationLocale)
+        })
+    }
+
+    return () => {
+      active = false
+    }
+  }, [isPaginationI18nDisabled, paginationLocaleInput, immediatePaginationLocale])
+
+  const paginationLocale = useMemo(
+    () =>
+      isPaginationI18nDisabled
+        ? undefined
+        : mergeTigerLocale(config.locale, resolvedPaginationLocale),
+    [config.locale, isPaginationI18nDisabled, resolvedPaginationLocale]
+  )
 
   const ctx = useTableState({
     columns: columns as TableProps['columns'],
@@ -348,7 +400,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         </div>
       )}
 
-      {renderPagination(ctx, { pagination })}
+      {renderPagination(ctx, {
+        pagination,
+        locale: paginationLocale,
+        disableI18n: isPaginationI18nDisabled
+      })}
     </div>
   )
 }

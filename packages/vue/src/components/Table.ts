@@ -1,20 +1,36 @@
-import { defineComponent, h, onBeforeUnmount, onMounted, ref, type VNodeChild } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+  type VNodeChild
+} from 'vue'
 import {
   classNames,
   createTableResizeObserverController,
+  getImmediateTigerLocale,
   getTableWrapperClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
+  isLazyTigerLocale,
+  mergeTigerLocale,
+  resolveTigerLocale,
   tableBaseClasses,
   tableResponsiveCardClasses,
   tableResponsiveCardLabelClasses,
   tableResponsiveCardListClasses,
   tableResponsiveCardRowClasses,
   tableResponsiveCardValueClasses,
-  tableLoadingOverlayClasses
+  tableLoadingOverlayClasses,
+  type TigerLocale,
+  type TigerLocaleInput
 } from '@expcat/tigercat-core'
 import { tableExportButtonClasses } from '@expcat/tigercat-core'
 
+import { useTigerConfig } from './ConfigProvider'
 import { tableEmits, tableProps, type VueTableProps } from './Table/props'
 import { useTableState } from './Table/state'
 import { LoadingSpinner } from './Table/icons'
@@ -31,11 +47,57 @@ export const Table = defineComponent({
   props: tableProps,
   emits: tableEmits as unknown as string[],
   setup(props, { emit, slots }) {
+    const config = useTigerConfig()
     const wrapperRef = ref<HTMLElement | null>(null)
     const tableRef = ref<HTMLTableElement | null>(null)
     const measuredColumnWidths = ref<Record<string, number>>({})
     const measuredRowHeights = ref<number[]>([])
     const ctx = useTableState(props as TableInternalProps, emit, measuredColumnWidths)
+    const resolvedPaginationLocale = ref<Partial<TigerLocale> | undefined>()
+    let paginationLocaleResolveId = 0
+
+    const paginationLocaleInput = computed<TigerLocaleInput | false | undefined>(() =>
+      props.pagination !== false && typeof props.pagination === 'object'
+        ? props.pagination.locale
+        : undefined
+    )
+    const isPaginationI18nDisabled = computed(() => paginationLocaleInput.value === false)
+
+    watch(
+      paginationLocaleInput,
+      (locale) => {
+        const resolveId = ++paginationLocaleResolveId
+
+        if (!locale) {
+          resolvedPaginationLocale.value = undefined
+          return
+        }
+
+        const immediateLocale = getImmediateTigerLocale(locale)
+        resolvedPaginationLocale.value = immediateLocale
+
+        if (!isLazyTigerLocale(locale)) return
+
+        resolveTigerLocale(locale)
+          .then((nextLocale) => {
+            if (resolveId === paginationLocaleResolveId) {
+              resolvedPaginationLocale.value = nextLocale
+            }
+          })
+          .catch(() => {
+            if (resolveId === paginationLocaleResolveId) {
+              resolvedPaginationLocale.value = immediateLocale
+            }
+          })
+      },
+      { immediate: true }
+    )
+
+    const paginationLocale = computed(() =>
+      isPaginationI18nDisabled.value
+        ? undefined
+        : mergeTigerLocale(config.value.locale, resolvedPaginationLocale.value)
+    )
 
     const resizeController = createTableResizeObserverController({
       onResize: (snapshot) => {
@@ -255,7 +317,10 @@ export const Table = defineComponent({
               [LoadingSpinner(), h('span', { class: 'sr-only' }, 'Loading')]
             ),
 
-          renderPagination(ctx, resolvedProps)
+          renderPagination(ctx, resolvedProps, {
+            locale: paginationLocale.value,
+            disableI18n: isPaginationI18nDisabled.value
+          })
         ]
       )
     }

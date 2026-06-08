@@ -315,9 +315,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       {renderToolbar()}
       <Table
         {...remainingTableProps}
-        bordered={false}
+        bordered={bordered}
         pagination={pagination}
-        className={tableClassName}
+        className={classNames(tableClassName, bordered && 'border-none rounded-none shadow-none')}
         onPageChange={handleTablePageChange}
       />
     </div>

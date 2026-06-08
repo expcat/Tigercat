@@ -477,7 +477,7 @@ export const DataTableWithToolbar = defineComponent({
         ...(props.filters !== undefined ? { filters: props.filters } : {}),
         ...(props.defaultFilters !== undefined ? { defaultFilters: props.defaultFilters } : {}),
         size: props.size,
-        bordered: false,
+        bordered: props.bordered,
         striped: props.striped,
         hoverable: props.hoverable,
         loading: props.loading,
@@ -489,6 +489,7 @@ export const DataTableWithToolbar = defineComponent({
         stickyHeader: props.stickyHeader,
         maxHeight: props.maxHeight,
         tableLayout: props.tableLayout,
+        class: props.bordered ? 'border-none rounded-none shadow-none' : undefined,
         onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys),
         onPageChange: handleTablePageChange
       }

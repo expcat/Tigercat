@@ -2,6 +2,8 @@
  * Table component types and interfaces
  */
 
+import type { TigerLocaleInput } from './locale'
+
 /**
  * Table size types
  */
@@ -220,6 +222,31 @@ export interface PaginationConfig {
    * Custom total text render function
    */
   totalText?: (total: number, range: [number, number]) => string
+
+  /**
+   * Locale configuration for pagination text. Set to false to ignore i18n.
+   */
+  locale?: TigerLocaleInput | false
+
+  /**
+   * Custom text for 'Previous' button
+   */
+  prevText?: string
+
+  /**
+   * Custom text for 'Next' button
+   */
+  nextText?: string
+
+  /**
+   * Custom text template for page indicator
+   */
+  pageIndicatorText?: (current: number, total: number) => string
+
+  /**
+   * Custom text template for page size option
+   */
+  pageSizeText?: (size: number) => string
 }
 
 /**

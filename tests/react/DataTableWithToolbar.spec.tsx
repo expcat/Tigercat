@@ -6,8 +6,10 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { DataTableWithToolbar } from '@expcat/tigercat-react'
+import { ConfigProvider, DataTableWithToolbar, Table } from '@expcat/tigercat-react'
 import type { TableColumn } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 interface RowData extends Record<string, unknown> {
@@ -151,6 +153,100 @@ describe('DataTableWithToolbar (React)', () => {
 
     expect(onSelectionChange).toHaveBeenCalledWith([1])
   })
+  it('uses ConfigProvider locale for pagination text', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <DataTableWithToolbar<RowData>
+          columns={columns}
+          dataSource={[{ id: 1, name: 'A' }]}
+          pagination={{ current: 1, pageSize: 10, total: 20, showTotal: true }}
+        />
+      </ConfigProvider>
+    )
+
+    expect(screen.getByText('共 20 条')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '上一页' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '下一页' })).toBeInTheDocument()
+    expect(screen.getByText('10 条/页')).toBeInTheDocument()
+  })
+
+  it('lets pagination locale override ConfigProvider locale', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <DataTableWithToolbar<RowData>
+          columns={columns}
+          dataSource={[{ id: 1, name: 'A' }]}
+          pagination={{ current: 1, pageSize: 10, total: 20, showTotal: true, locale: enUS }}
+        />
+      </ConfigProvider>
+    )
+
+    expect(screen.getByText('Total 20 items')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Previous page' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Next page' })).toBeInTheDocument()
+    expect(screen.getByText('10 / page')).toBeInTheDocument()
+  })
+
+  it('can disable pagination i18n and use custom text overrides', () => {
+    const { rerender } = render(
+      <ConfigProvider locale={zhCN}>
+        <DataTableWithToolbar<RowData>
+          columns={columns}
+          dataSource={[{ id: 1, name: 'A' }]}
+          pagination={{
+            current: 1,
+            pageSize: 10,
+            total: 20,
+            showTotal: true,
+            locale: false,
+            prevText: 'Back',
+            nextText: 'Forward',
+            pageIndicatorText: (cur, tot) => `P.${cur}/${tot}`,
+            pageSizeText: (size) => `${size} items/page`
+          }}
+        />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('Showing 1 to 10 of 20 results')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Forward' })).toBeInTheDocument()
+    expect(screen.getByText('P.1/2')).toBeInTheDocument()
+    expect(screen.getByText('10 items/page')).toBeInTheDocument()
+
+    rerender(
+      <ConfigProvider locale={zhCN}>
+        <DataTableWithToolbar<RowData>
+          columns={columns}
+          dataSource={[{ id: 1, name: 'A' }]}
+          pagination={{
+            current: 1,
+            pageSize: 10,
+            total: 20,
+            showTotal: true,
+            locale: false,
+            totalText: (total, range) => `Rows ${range[0]}-${range[1]} / ${total}`
+          }}
+        />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('Rows 1-10 / 20')).toBeInTheDocument()
+  })
+
+  it('uses ConfigProvider locale for plain Table pagination text', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <Table<RowData>
+          columns={columns}
+          dataSource={[{ id: 1, name: 'A' }]}
+          pagination={{ current: 1, pageSize: 10, total: 20, showTotal: true }}
+        />
+      </ConfigProvider>
+    )
+
+    expect(screen.getByText('共 20 条')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '下一页' })).toBeInTheDocument()
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(
