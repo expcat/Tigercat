@@ -206,6 +206,7 @@ export const CropUpload = defineComponent({
           closable: true,
           maskClosable: false,
           showDefaultFooter: false,
+          className: 'tiger-crop-upload-modal',
           'onUpdate:open': (val: boolean) => {
             if (!val) handleCancel()
           }

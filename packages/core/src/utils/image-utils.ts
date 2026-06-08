@@ -132,7 +132,7 @@ export const imagePreviewCounterClasses = 'text-sm text-white/80 mx-2 tabular-nu
  * Cropper container classes
  */
 export const imageCropperContainerClasses =
-  'relative overflow-hidden bg-[var(--tiger-image-cropper-bg,#1a1a2e)] select-none touch-none'
+  'relative overflow-hidden bg-[var(--tiger-image-cropper-bg,#0f172a)] rounded-[var(--tiger-radius-lg,0.75rem)] select-none touch-none shadow-inner border border-white/10 tiger-image-cropper-checkerboard'
 
 /**
  * Cropper image classes (the source image)
@@ -148,13 +148,13 @@ export const imageCropperMaskClasses = 'absolute inset-0 pointer-events-none'
  * Cropper selection border classes (the crop box border)
  */
 export const imageCropperSelectionClasses =
-  'absolute border-2 border-[var(--tiger-image-cropper-border,#ffffff)] pointer-events-none'
+  'absolute border-2 border-[var(--tiger-image-cropper-border,#ffffff)] pointer-events-none shadow-[0_0_0_9999px_rgba(0,0,0,0.65),0_0_15px_rgba(255,255,255,0.4)] transition-shadow duration-300'
 
 /**
  * Cropper guide line classes
  */
 export const imageCropperGuideClasses =
-  'absolute border-[var(--tiger-image-cropper-border,rgba(255,255,255,0.4))] pointer-events-none'
+  'absolute border-[var(--tiger-image-cropper-border,rgba(255,255,255,0.25))] pointer-events-none opacity-40 transition-opacity duration-300'
 
 /**
  * Cropper drag area classes (inside the crop box, handles moving)
@@ -166,17 +166,17 @@ export const imageCropperDragAreaClasses = 'absolute cursor-move'
  */
 export function getCropperHandleClasses(handle: CropHandle): string {
   const base =
-    'absolute w-3 h-3 bg-[var(--tiger-image-cropper-border,#ffffff)] border border-[var(--tiger-image-cropper-handle-border,rgba(0,0,0,0.3))]'
+    'absolute w-3.5 h-3.5 rounded-full bg-white border-2 border-[var(--tiger-primary,#2563eb)] shadow-md hover:scale-125 hover:bg-[var(--tiger-primary,#2563eb)] hover:border-white transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]'
 
   const positionMap: Record<CropHandle, string> = {
-    nw: '-top-1.5 -left-1.5 cursor-nw-resize',
-    n: '-top-1.5 left-1/2 -translate-x-1/2 cursor-n-resize',
-    ne: '-top-1.5 -right-1.5 cursor-ne-resize',
-    e: 'top-1/2 -right-1.5 -translate-y-1/2 cursor-e-resize',
-    se: '-bottom-1.5 -right-1.5 cursor-se-resize',
-    s: '-bottom-1.5 left-1/2 -translate-x-1/2 cursor-s-resize',
-    sw: '-bottom-1.5 -left-1.5 cursor-sw-resize',
-    w: 'top-1/2 -left-1.5 -translate-y-1/2 cursor-w-resize'
+    nw: '-top-1.75 -left-1.75 cursor-nw-resize',
+    n: '-top-1.75 left-1/2 -translate-x-1/2 cursor-n-resize',
+    ne: '-top-1.75 -right-1.75 cursor-ne-resize',
+    e: 'top-1/2 -right-1.75 -translate-y-1/2 cursor-e-resize',
+    se: '-bottom-1.75 -right-1.75 cursor-se-resize',
+    s: '-bottom-1.75 left-1/2 -translate-x-1/2 cursor-s-resize',
+    sw: '-bottom-1.75 -left-1.75 cursor-sw-resize',
+    w: 'top-1/2 -left-1.75 -translate-y-1/2 cursor-w-resize'
   }
 
   return classNames(base, positionMap[handle])
@@ -195,13 +195,13 @@ export const CROP_HANDLES: CropHandle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw'
  * CropUpload trigger button classes
  */
 export const cropUploadTriggerClasses =
-  'inline-flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] text-[var(--tiger-text-muted,#6b7280)] hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-2'
+  'inline-flex items-center justify-center gap-2.5 px-5 py-2.5 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-lg,0.75rem)] text-[var(--tiger-text-secondary,#4b5563)] bg-[var(--tiger-surface-muted,#f9fafb)] hover:bg-[var(--tiger-surface,#ffffff)] hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] hover:scale-[1.02] active:scale-[0.98] hover:shadow-md transition-all duration-300 ease-out cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-2 dark:bg-neutral-900 dark:hover:bg-neutral-800'
 
 /**
  * CropUpload disabled trigger classes
  */
 export const cropUploadTriggerDisabledClasses =
-  'inline-flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] text-[var(--tiger-text-muted,#9ca3af)] cursor-not-allowed opacity-50'
+  'inline-flex items-center justify-center gap-2.5 px-5 py-2.5 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-lg,0.75rem)] text-[var(--tiger-text-disabled,#9ca3af)] bg-[var(--tiger-surface-muted,#f9fafb)] cursor-not-allowed opacity-60 dark:bg-neutral-900/50'
 
 /**
  * Upload icon path (plus sign in a frame)

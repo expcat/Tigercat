@@ -187,6 +187,7 @@ export const CropUpload: React.FC<CropUploadProps> = ({
         open={modalVisible}
         size="lg"
         title={modalTitle}
+        className="tiger-crop-upload-modal"
         closable
         maskClosable={false}
         onClose={handleCancel}
