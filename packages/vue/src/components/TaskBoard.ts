@@ -247,7 +247,7 @@ export const TaskBoard = defineComponent({
       const cardClasses = classNames(
         taskBoardCardClasses,
         isDragging && taskBoardCardDraggingClasses,
-        isKbGrabbed && 'ring-2 ring-[var(--tiger-primary,#2563eb)]'
+        isKbGrabbed && 'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
       )
 
       const cardAttrs = {
@@ -316,7 +316,12 @@ export const TaskBoard = defineComponent({
                   ? h(
                       'span',
                       {
-                        class: 'ml-2 text-xs font-normal opacity-70',
+                        class: classNames(
+                          'ml-2 text-xs font-normal transition-all duration-200 px-1.5 py-0.5 rounded',
+                          wipOver
+                            ? 'bg-red-50 dark:bg-red-950/30 text-[var(--tiger-error,#ef4444)] font-semibold border border-red-200/30 dark:border-red-900/30 shadow-xs'
+                            : 'opacity-70 bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)]'
+                        ),
                         title: resolveLocaleText(
                           labels.value.wipLimitText.replace('{limit}', String(column.wipLimit))
                         )
@@ -325,7 +330,7 @@ export const TaskBoard = defineComponent({
                     )
                   : h(
                       'span',
-                      { class: 'ml-2 text-xs font-normal opacity-50' },
+                      { class: 'ml-2 text-xs font-normal px-1.5 py-0.5 rounded bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)] opacity-70' },
                       String(column.cards.length)
                     )
             ]),
@@ -336,7 +341,8 @@ export const TaskBoard = defineComponent({
                   {
                     class: classNames(
                       kanbanCardCountClasses,
-                      wipOver && taskBoardWipExceededClasses
+                      wipOver &&
+                        `${taskBoardWipExceededClasses} bg-red-50 dark:bg-red-950/30 border border-red-200/50 dark:border-red-900/30 font-semibold shadow-xs`
                     )
                   },
                   cardCount.limit ? `${cardCount.count}/${cardCount.limit}` : `${cardCount.count}`

@@ -16,7 +16,7 @@ import { taskBoardBaseClasses, taskBoardAddCardClasses } from './task-board-util
 
 /** Card count badge */
 export const kanbanCardCountClasses =
-  'inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-xs font-medium bg-[var(--tiger-bg-secondary,#f3f4f6)] text-[var(--tiger-text-secondary,#6b7280)]'
+  'inline-flex items-center justify-center h-5 min-w-[22px] px-2 rounded-full text-xs font-semibold bg-[var(--tiger-border,#e5e7eb)]/60 text-[var(--tiger-text-secondary,#6b7280)]/90 backdrop-blur-xs shadow-inner'
 
 /** Swimlane row wrapper */
 export const kanbanSwimlaneClasses = 'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0'
@@ -36,7 +36,7 @@ export const kanbanFilterHighlightClasses = 'bg-[var(--tiger-warning,#fbbf24)]/2
 
 /** Add column button */
 export const kanbanAddColumnClasses =
-  'flex items-center justify-center shrink-0 w-72 min-h-[80px] rounded-[var(--tiger-radius-md,0.5rem)] border-2 border-dashed border-[var(--tiger-border,#d1d5db)] text-[var(--tiger-text-muted,#9ca3af)] hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] cursor-pointer transition-colors'
+  'flex items-center justify-center shrink-0 w-76 min-h-[120px] rounded-[var(--tiger-radius-lg,0.75rem)] border-2 border-dashed border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)]/40 text-sm font-medium text-[var(--tiger-text-muted,#6b7280)] hover:border-[var(--tiger-primary,#2563eb)]/80 hover:text-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-surface,#ffffff)] hover:shadow-sm cursor-pointer transition-all duration-300 active:scale-98'
 
 // Backward-compat aliases (deprecated — use taskBoard* equivalents directly)
 /** @deprecated Use `taskBoardAddCardClasses` instead */

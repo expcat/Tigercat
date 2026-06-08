@@ -53,7 +53,7 @@ const CardItem = React.memo<CardItemProps>(
     const cardClasses = classNames(
       taskBoardCardClasses,
       isDragging && taskBoardCardDraggingClasses,
-      isKbGrabbed && 'ring-2 ring-[var(--tiger-primary,#2563eb)]'
+      isKbGrabbed && 'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
     )
 
     return (
@@ -245,18 +245,28 @@ const ColumnItem = React.memo<ColumnItemProps>(
               <span className={wipOver ? taskBoardWipExceededClasses : undefined}>
                 {column.title}
                 {showCardCount && cardCount ? null : column.wipLimit != null ? (
-                  <span className="ml-2 text-xs font-normal opacity-70" title={wipTitle}>
+                  <span
+                    className={classNames(
+                      'ml-2 text-xs font-normal transition-all duration-200 px-1.5 py-0.5 rounded',
+                      wipOver
+                        ? 'bg-red-50 dark:bg-red-950/30 text-[var(--tiger-error,#ef4444)] font-semibold border border-red-200/30 dark:border-red-900/30 shadow-xs'
+                        : 'opacity-70 bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)]'
+                    )}
+                    title={wipTitle}>
                     ({column.cards.length}/{column.wipLimit})
                   </span>
                 ) : (
-                  <span className="ml-2 text-xs font-normal opacity-50">{column.cards.length}</span>
+                  <span className="ml-2 text-xs font-normal px-1.5 py-0.5 rounded bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)] opacity-70">
+                    {column.cards.length}
+                  </span>
                 )}
               </span>
               {showCardCount && cardCount && (
                 <span
                   className={classNames(
                     kanbanCardCountClasses,
-                    wipOver && taskBoardWipExceededClasses
+                    wipOver &&
+                      `${taskBoardWipExceededClasses} bg-red-50 dark:bg-red-950/30 border border-red-200/50 dark:border-red-900/30 font-semibold shadow-xs`
                   )}>
                   {cardCount.limit ? `${cardCount.count}/${cardCount.limit}` : `${cardCount.count}`}
                 </span>

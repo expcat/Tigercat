@@ -9,33 +9,33 @@ import type {
 // ============================================================================
 
 /** Root wrapper — horizontal scroll container */
-export const taskBoardBaseClasses = 'tiger-task-board flex gap-4 overflow-x-auto p-4 min-h-[400px]'
+export const taskBoardBaseClasses = 'tiger-task-board flex gap-5 overflow-x-auto p-6 min-h-[450px] scroll-smooth antialiased'
 
 /** Single column shell */
 export const taskBoardColumnClasses =
-  'tiger-task-board-column flex flex-col shrink-0 w-72 rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm transition-shadow'
+  'tiger-task-board-column flex flex-col shrink-0 w-76 rounded-[var(--tiger-radius-lg,0.75rem)] border border-[var(--tiger-border,#e5e7eb)]/80 bg-[var(--tiger-surface-muted,#f9fafb)] shadow-xs transition-all duration-300 hover:shadow-md'
 
 /** Column header (sticky, never scrolls) */
 export const taskBoardColumnHeaderClasses =
-  'flex items-center justify-between px-3 py-2 border-b border-[var(--tiger-border,#e5e7eb)] text-sm font-semibold text-[var(--tiger-text,#1f2937)] select-none'
+  'flex items-center justify-between px-4 py-3.5 border-b border-[var(--tiger-border,#e5e7eb)]/60 text-sm font-semibold text-[var(--tiger-text,#1f2937)] select-none transition-colors'
 
 /** Scrollable card area */
-export const taskBoardColumnBodyClasses = 'flex-1 overflow-y-auto p-2 space-y-2 min-h-[80px]'
+export const taskBoardColumnBodyClasses = 'flex-1 overflow-y-auto p-3 space-y-3 min-h-[100px] transition-colors'
 
 /** Card base styles */
 export const taskBoardCardClasses =
-  'tiger-task-board-card rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-3 shadow-sm cursor-grab select-none transition-opacity'
+  'tiger-task-board-card rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)]/80 bg-[var(--tiger-surface,#ffffff)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),_0_1px_2px_rgba(0,0,0,0.02)] cursor-grab select-none transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--tiger-primary,#2563eb)]/30 active:cursor-grabbing'
 
 /** Card while being dragged */
-export const taskBoardCardDraggingClasses = 'opacity-50 shadow-lg'
+export const taskBoardCardDraggingClasses = 'opacity-40 shadow-xl scale-[0.98] rotate-1'
 
 /** Thin line indicating the drop position */
 export const taskBoardDropIndicatorClasses =
-  'h-1 rounded-full bg-[var(--tiger-primary,#2563eb)] my-1 transition-all'
+  'h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] my-2 shadow-[0_0_8px_var(--tiger-primary,#2563eb)] transition-all duration-200'
 
 /** Column highlighted when a card hovers over it */
 export const taskBoardColumnDropTargetClasses =
-  'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-opacity-50'
+  'ring-2 ring-[var(--tiger-primary,#2563eb)]/60 bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_4%,transparent)]'
 
 /** Column being dragged */
 export const taskBoardColumnDraggingClasses = 'opacity-50'
@@ -49,7 +49,7 @@ export const taskBoardWipExceededClasses = 'text-[var(--tiger-error,#ef4444)]'
 
 /** Add-card button inside column footer */
 export const taskBoardAddCardClasses =
-  'flex items-center justify-center gap-1 w-full py-1.5 text-sm text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] rounded transition-colors cursor-pointer'
+  'flex items-center justify-center gap-1.5 w-[calc(100%-16px)] mx-2 my-2 py-2.5 text-xs font-semibold text-[var(--tiger-text-muted,#6b7280)] border border-dashed border-[var(--tiger-border,#e5e7eb)] hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-surface,#ffffff)] hover:shadow-xs rounded-[var(--tiger-radius-md,0.5rem)] transition-all duration-200 cursor-pointer active:scale-98'
 
 // ============================================================================
 // Drag-data serialisation (used by both HTML5 DnD and touch fallback)
