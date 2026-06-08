@@ -150,7 +150,7 @@ describe('Steps', () => {
     })
 
     it('should show checkmark for finished steps', () => {
-      render(Steps, {
+      const { container } = render(Steps, {
         props: { current: 2 },
         slots: {
           default: () => [
@@ -161,9 +161,9 @@ describe('Steps', () => {
         }
       })
 
-      // Finished steps should show checkmark character
-      const checkmarks = screen.getAllByText('✓')
-      expect(checkmarks).toHaveLength(2)
+      // Finished steps should show checkmark SVG
+      const svgs = container.querySelectorAll('.tiger-step-icon svg')
+      expect(svgs).toHaveLength(2)
     })
 
     it('should allow custom status override', () => {

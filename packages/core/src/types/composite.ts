@@ -1077,6 +1077,11 @@ export interface FormWizardProps {
    */
   simple?: boolean
   /**
+   * Whether to show border around the wizard card
+   * @default true
+   */
+  bordered?: boolean
+  /**
    * Whether to show steps header
    * @default true
    */

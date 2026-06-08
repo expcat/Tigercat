@@ -26,7 +26,7 @@ export function getStepsContainerClasses(direction: StepsDirection): string {
  * Get Step item container classes
  */
 export function getStepItemClasses(direction: StepsDirection, isLast: boolean): string {
-  const baseClasses = 'tiger-step-item relative'
+  const baseClasses = 'tiger-step-item relative group'
 
   if (direction === 'vertical') {
     return `${baseClasses} flex flex-row ${!isLast ? 'pb-6' : ''}`
@@ -59,13 +59,13 @@ export function getStepIconClasses(
 
   // Status-based colors using CSS variables with fallbacks
   const activeClasses =
-    'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white'
+    'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white ring-4 ring-[var(--tiger-primary,#2563eb)]/15 scale-105 shadow-sm transition-all duration-300'
   const statusClasses = {
-    wait: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text-muted,#6b7280)]',
+    wait: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text-muted,#6b7280)] transition-all duration-300 group-hover:border-[var(--tiger-primary,#2563eb)]/60 group-hover:text-[var(--tiger-primary,#2563eb)]/80',
     process: activeClasses,
-    finish: activeClasses,
+    finish: 'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:bg-[var(--tiger-primary-hover,#0369a1)]',
     error:
-      'bg-[var(--tiger-error-bg,#fef2f2)] border-[var(--tiger-error,#ef4444)] text-[var(--tiger-error,#ef4444)]'
+      'bg-[var(--tiger-error-bg,#fef2f2)] border-[var(--tiger-error,#ef4444)] text-[var(--tiger-error,#ef4444)] transition-all duration-300'
   }
 
   return `${baseClasses} ${sizeClasses} ${iconClasses} ${statusClasses[status]}`
@@ -134,9 +134,9 @@ export function getStepTitleClasses(
   const sizeClasses = size === 'small' ? 'text-sm' : 'text-base'
 
   const statusClasses = {
-    wait: 'text-[var(--tiger-text-muted,#6b7280)]',
-    process: 'text-[var(--tiger-text,#111827)]',
-    finish: 'text-[var(--tiger-text,#111827)]',
+    wait: 'text-[var(--tiger-text-muted,#6b7280)] transition-colors duration-300 group-hover:text-[var(--tiger-text,#111827)]',
+    process: 'text-[var(--tiger-text,#111827)] font-semibold transition-colors duration-300',
+    finish: 'text-[var(--tiger-text,#111827)] transition-colors duration-300 group-hover:text-[var(--tiger-primary,#2563eb)]',
     error: 'text-[var(--tiger-error,#ef4444)]'
   }
 
