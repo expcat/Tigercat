@@ -78,6 +78,28 @@ describe('DataTableWithToolbar (React)', () => {
     expect(onPageChange).toHaveBeenCalledWith(2, 10)
   })
 
+  it('threads responsiveMode, cardBreakpoint and hideInCard through to Table', () => {
+    const cardColumns: TableColumn<RowData>[] = [
+      { key: 'name', title: 'Name' },
+      { key: 'id', title: 'ID', hideInCard: true }
+    ]
+
+    const { container } = render(
+      <DataTableWithToolbar<RowData>
+        columns={cardColumns}
+        dataSource={[{ id: 1, name: 'A' }]}
+        responsiveMode="card"
+        cardBreakpoint="lg"
+        pagination={false}
+      />
+    )
+
+    const cardList = container.querySelector('[data-tiger-table-mobile="card"]')!
+    expect(cardList).toHaveClass('max-lg:grid')
+    expect(container.querySelector('table')).toHaveClass('max-lg:hidden')
+    expect(cardList.textContent).not.toContain('ID')
+  })
+
   it('renders bulk actions with selected count', () => {
     render(
       <DataTableWithToolbar<RowData>

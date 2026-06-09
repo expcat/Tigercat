@@ -9,6 +9,7 @@ import type {
   SortDirection,
   TableColumn,
   TableResponsiveMode,
+  TableCardBreakpoint,
   TableFixedCellClassNameContext,
   TableFixedHeaderClassNameContext,
   TableFixedPosition
@@ -28,6 +29,30 @@ export const tableResponsiveTableClasses = 'max-sm:min-w-max'
 
 export const tableResponsiveCardListClasses = 'hidden max-sm:grid max-sm:gap-3 max-sm:p-3'
 
+/**
+ * Static breakpoint → class maps for responsive card mode.
+ *
+ * Tailwind's JIT compiler only sees literal class strings, so each breakpoint
+ * must be spelled out in full — never build `max-${bp}:hidden` dynamically.
+ */
+const CARD_HIDE_CLASSES: Record<TableCardBreakpoint, string> = {
+  sm: 'max-sm:hidden',
+  md: 'max-md:hidden',
+  lg: 'max-lg:hidden'
+}
+
+const CARD_MINW_CLASSES: Record<TableCardBreakpoint, string> = {
+  sm: 'max-sm:min-w-max',
+  md: 'max-md:min-w-max',
+  lg: 'max-lg:min-w-max'
+}
+
+const CARD_LIST_CLASSES: Record<TableCardBreakpoint, string> = {
+  sm: 'hidden max-sm:grid max-sm:gap-3 max-sm:p-3',
+  md: 'hidden max-md:grid max-md:gap-3 max-md:p-3',
+  lg: 'hidden max-lg:grid max-lg:gap-3 max-lg:p-3'
+}
+
 export const tableResponsiveCardClasses =
   'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-3 shadow-sm'
 
@@ -39,6 +64,9 @@ export const tableResponsiveCardLabelClasses =
 
 export const tableResponsiveCardValueClasses =
   'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words'
+
+export const tableResponsiveCardTitleClasses =
+  'mb-2 text-sm font-semibold text-[var(--tiger-text,#111827)] break-words'
 
 export const tableBackgroundClasses =
   'bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff)))]'
@@ -55,8 +83,46 @@ export const tableRowGroupHoverClasses =
 export const tableRowStripedClasses =
   'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
 
-export function getTableResponsiveTableClasses(mode: TableResponsiveMode): string {
-  return mode === 'card' ? 'max-sm:hidden' : tableResponsiveTableClasses
+export function getTableResponsiveTableClasses(
+  mode: TableResponsiveMode,
+  breakpoint: TableCardBreakpoint = 'sm'
+): string {
+  return mode === 'card' ? CARD_HIDE_CLASSES[breakpoint] : CARD_MINW_CLASSES[breakpoint]
+}
+
+/**
+ * Resolve the card-list container classes for the configured breakpoint.
+ */
+export function getTableResponsiveCardListClasses(breakpoint: TableCardBreakpoint = 'sm'): string {
+  return CARD_LIST_CLASSES[breakpoint]
+}
+
+/**
+ * Split visible columns into the card heading column and the body columns.
+ *
+ * - Columns flagged `hideInCard` are dropped entirely.
+ * - The first remaining column flagged `cardTitle` becomes the heading.
+ * - Body columns are ordered by `cardPriority` (ascending); columns without a
+ *   priority keep their original relative order (Array.sort is stable).
+ */
+export interface CardColumnLayout<T = Record<string, unknown>> {
+  titleColumn?: TableColumn<T>
+  bodyColumns: TableColumn<T>[]
+}
+
+export function getCardColumns<T = Record<string, unknown>>(
+  columns: TableColumn<T>[]
+): CardColumnLayout<T> {
+  const visible = columns.filter((column) => !column.hideInCard)
+  const titleColumn = visible.find((column) => column.cardTitle)
+  const bodyColumns = visible
+    .filter((column) => column !== titleColumn)
+    .sort(
+      (a, b) =>
+        (a.cardPriority ?? Number.POSITIVE_INFINITY) - (b.cardPriority ?? Number.POSITIVE_INFINITY)
+    )
+
+  return { titleColumn, bodyColumns }
 }
 
 /**

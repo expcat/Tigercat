@@ -92,6 +92,69 @@ describe('Table', () => {
       expect(container.querySelector('table')).toHaveClass('max-sm:hidden')
       expect(getAllByText('Name').length).toBeGreaterThan(1)
     })
+
+    it('hides hideInCard columns in card mode while keeping them in the table', () => {
+      const { container } = renderWithProps(Table, {
+        columns: [
+          { key: 'name', title: 'Name' },
+          { key: 'age', title: 'Age', hideInCard: true }
+        ],
+        dataSource,
+        responsiveMode: 'card',
+        pagination: false
+      })
+
+      const cardList = container.querySelector('[data-tiger-table-mobile="card"]')!
+      expect(container.querySelector('table')?.textContent).toContain('Age')
+      expect(cardList.textContent).not.toContain('Age')
+    })
+
+    it('orders card body columns by cardPriority', () => {
+      const { container } = renderWithProps(Table, {
+        columns: [
+          { key: 'name', title: 'Name', cardPriority: 2 },
+          { key: 'age', title: 'Age', cardPriority: 1 }
+        ],
+        dataSource: [dataSource[0]],
+        responsiveMode: 'card',
+        pagination: false
+      })
+
+      const labels = Array.from(
+        container.querySelectorAll('[data-tiger-table-mobile="card"] .uppercase')
+      ).map((node) => node.textContent)
+      expect(labels).toEqual(['Age', 'Name'])
+    })
+
+    it('renders a cardTitle column as the card heading instead of a row', () => {
+      const { container } = renderWithProps(Table, {
+        columns: [
+          { key: 'name', title: 'Name', cardTitle: true },
+          { key: 'age', title: 'Age' }
+        ],
+        dataSource: [dataSource[0]],
+        responsiveMode: 'card',
+        pagination: false
+      })
+
+      const card = container.querySelector('[data-tiger-table-mobile="card"] > div')!
+      expect(card.querySelector('.font-semibold')?.textContent).toBe('John Doe')
+      const labels = Array.from(card.querySelectorAll('.uppercase')).map((n) => n.textContent)
+      expect(labels).toEqual(['Age'])
+    })
+
+    it('respects a configurable cardBreakpoint', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        responsiveMode: 'card',
+        cardBreakpoint: 'md',
+        pagination: false
+      })
+
+      expect(container.querySelector('[data-tiger-table-mobile="card"]')).toHaveClass('max-md:grid')
+      expect(container.querySelector('table')).toHaveClass('max-md:hidden')
+    })
   })
 
   describe('Props', () => {
@@ -456,8 +519,15 @@ describe('Table', () => {
           width: 140,
           fixed: 'left',
           fixedHeaderClassName: 'custom-fixed-header',
-          fixedClassName: ({ selected, view, fixed }: { selected: boolean; view: string; fixed: string }) =>
-            selected ? `${view}-${fixed}-selected` : 'custom-fixed-cell'
+          fixedClassName: ({
+            selected,
+            view,
+            fixed
+          }: {
+            selected: boolean
+            view: string
+            fixed: string
+          }) => (selected ? `${view}-${fixed}-selected` : 'custom-fixed-cell')
         },
         { key: 'age', title: 'Age', width: 120 }
       ]

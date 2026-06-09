@@ -15,6 +15,8 @@ import {
   mergeStyleValues,
   type TableColumn,
   type TableSize,
+  type TableResponsiveMode,
+  type TableCardBreakpoint,
   type SortState,
   type PaginationConfig,
   type RowSelectionConfig,
@@ -52,6 +54,8 @@ export interface VueDataTableWithToolbarProps {
   rowClassName?: string | ((record: Record<string, unknown>, index: number) => string)
   stickyHeader?: boolean
   maxHeight?: string | number
+  responsiveMode?: TableResponsiveMode
+  cardBreakpoint?: TableCardBreakpoint
   toolbar?: VueTableToolbarProps
   pagination?: PaginationConfig | false
   className?: string
@@ -137,6 +141,14 @@ export const DataTableWithToolbar = defineComponent({
     maxHeight: {
       type: [String, Number] as PropType<string | number>,
       default: undefined
+    },
+    responsiveMode: {
+      type: String as PropType<TableResponsiveMode>,
+      default: 'scroll' as TableResponsiveMode
+    },
+    cardBreakpoint: {
+      type: String as PropType<TableCardBreakpoint>,
+      default: 'sm' as TableCardBreakpoint
     },
     toolbar: {
       type: Object as PropType<VueTableToolbarProps>,
@@ -367,7 +379,8 @@ export const DataTableWithToolbar = defineComponent({
                     {
                       size: 'sm',
                       variant: 'primary',
-                      class: 'whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md,0.5rem)] px-3',
+                      class:
+                        'whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md,0.5rem)] px-3',
                       onClick: handleSearchSubmit,
                       disabled: !canSearch.value
                     },
@@ -489,6 +502,8 @@ export const DataTableWithToolbar = defineComponent({
         stickyHeader: props.stickyHeader,
         maxHeight: props.maxHeight,
         tableLayout: props.tableLayout,
+        responsiveMode: props.responsiveMode,
+        cardBreakpoint: props.cardBreakpoint,
         class: props.bordered ? 'border-none rounded-none shadow-none' : undefined,
         onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys),
         onPageChange: handleTablePageChange
@@ -508,4 +523,3 @@ export const DataTableWithToolbar = defineComponent({
 })
 
 export default DataTableWithToolbar
-

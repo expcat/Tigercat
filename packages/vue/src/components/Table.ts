@@ -11,8 +11,10 @@ import {
 import {
   classNames,
   createTableResizeObserverController,
+  getCardColumns,
   getImmediateTigerLocale,
   getTableWrapperClasses,
+  getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
   isLazyTigerLocale,
@@ -21,10 +23,11 @@ import {
   tableBaseClasses,
   tableResponsiveCardClasses,
   tableResponsiveCardLabelClasses,
-  tableResponsiveCardListClasses,
   tableResponsiveCardRowClasses,
+  tableResponsiveCardTitleClasses,
   tableResponsiveCardValueClasses,
   tableLoadingOverlayClasses,
+  type TableColumn,
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
@@ -149,7 +152,10 @@ export const Table = defineComponent({
           ref: tableRef,
           class: classNames(
             tableBaseClasses,
-            getTableResponsiveTableClasses(resolvedProps.responsiveMode),
+            getTableResponsiveTableClasses(
+              resolvedProps.responsiveMode,
+              resolvedProps.cardBreakpoint
+            ),
             resolvedProps.tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
           ),
           style:
@@ -177,7 +183,10 @@ export const Table = defineComponent({
         resolvedProps.responsiveMode === 'card'
           ? h(
               'div',
-              { class: tableResponsiveCardListClasses, 'data-tiger-table-mobile': 'card' },
+              {
+                class: getTableResponsiveCardListClasses(resolvedProps.cardBreakpoint),
+                'data-tiger-table-mobile': 'card'
+              },
               ctx.paginatedData.value.length === 0
                 ? [h('div', { class: tableResponsiveCardClasses }, resolvedProps.emptyText)]
                 : ctx.paginatedData.value.map((record, index) => {
@@ -189,20 +198,31 @@ export const Table = defineComponent({
                         : true
                       : false
 
-                    const rows = ctx.displayColumns.value.map((column) => {
+                    const { titleColumn, bodyColumns } = getCardColumns(ctx.displayColumns.value)
+                    const renderCardCellContent = (column: TableColumn) => {
                       const dataKey = column.dataKey || column.key
-                      const cellValue = record[dataKey]
-                      const cellContent =
+                      return (
                         slots[`cell-${column.key}`]?.({ record, index }) ??
                         (column.render
                           ? (column.render(record, index) as string)
-                          : (cellValue as string))
+                          : (record[dataKey] as string))
+                      )
+                    }
 
-                      return h('div', { key: column.key, class: tableResponsiveCardRowClasses }, [
+                    const titleNode = titleColumn
+                      ? h('div', { class: tableResponsiveCardTitleClasses }, [
+                          renderCardCellContent(titleColumn)
+                        ])
+                      : null
+
+                    const rows = bodyColumns.map((column) =>
+                      h('div', { key: column.key, class: tableResponsiveCardRowClasses }, [
                         h('div', { class: tableResponsiveCardLabelClasses }, column.title),
-                        h('div', { class: tableResponsiveCardValueClasses }, [cellContent])
+                        h('div', { class: tableResponsiveCardValueClasses }, [
+                          renderCardCellContent(column)
+                        ])
                       ])
-                    })
+                    )
 
                     const controls = []
                     if (
@@ -257,6 +277,7 @@ export const Table = defineComponent({
                         controls.length
                           ? h('div', { class: 'mb-2 flex items-center gap-3' }, controls)
                           : null,
+                        titleNode,
                         ...rows,
                         expandedContent
                           ? h(

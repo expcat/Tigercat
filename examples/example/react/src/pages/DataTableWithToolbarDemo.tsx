@@ -59,6 +59,33 @@ const columns: TableColumn<UserRow>[] = [
   { key: 'status', title: '状态', width: '20%' }
 ]
 
+// Card-mode customization: promote 名称 to the card heading, hide secondary
+// fields (ID), and order the remaining fields with cardPriority.
+const cardColumns: TableColumn<UserRow>[] = [
+  { key: 'id', title: 'ID', width: '10%', hideInCard: true },
+  { key: 'name', title: '姓名', width: '25%', cardTitle: true },
+  { key: 'status', title: '状态', width: '20%', cardPriority: 1 },
+  { key: 'role', title: '角色', width: '20%', cardPriority: 2 },
+  { key: 'email', title: '邮箱', width: '25%' }
+]
+
+const cardSnippet = `// Card-mode field customization (activates below cardBreakpoint)
+const cardColumns: TableColumn<UserRow>[] = [
+  { key: 'id', title: 'ID', hideInCard: true },          // hidden in cards
+  { key: 'name', title: '姓名', cardTitle: true },        // card heading
+  { key: 'status', title: '状态', cardPriority: 1 },      // first body field
+  { key: 'role', title: '角色', cardPriority: 2 },
+  { key: 'email', title: '邮箱' }
+]
+
+<DataTableWithToolbar
+  columns={cardColumns}
+  dataSource={pagedData}
+  responsiveMode="card"
+  cardBreakpoint="lg"
+  /* ...toolbar / pagination as above... */
+/>`
+
 const statusOptions = [
   { label: '启用', value: 'active' },
   { label: '禁用', value: 'disabled' }
@@ -182,6 +209,37 @@ const DataTableWithToolbarDemo: React.FC = () => {
             showTotal: true
           }}
           onSelectionChange={setSelectedRowKeys}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageChange}
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="卡片模式字段定制"
+        description="窄屏（小于 cardBreakpoint，此处为 lg/1024px）自动切换为卡片：name 作为标题、id 隐藏、status/role 按 cardPriority 排序。缩窄窗口可预览。"
+        code={cardSnippet}>
+        <DataTableWithToolbar<UserRow>
+          columns={cardColumns}
+          dataSource={pagedData}
+          responsiveMode="card"
+          cardBreakpoint="lg"
+          toolbar={{
+            searchValue: keyword,
+            searchPlaceholder: '搜索姓名/邮箱',
+            filters: [
+              { key: 'status', label: '状态', options: statusOptions },
+              { key: 'role', label: '角色', options: roleOptions }
+            ]
+          }}
+          onSearchChange={setKeyword}
+          onSearch={setKeyword}
+          onFiltersChange={handleFiltersChange}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: filteredData.length,
+            showTotal: true
+          }}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageChange}
         />

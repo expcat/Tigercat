@@ -83,6 +83,83 @@ describe('Table', () => {
       expect(container.querySelector('table')).toHaveClass('max-sm:hidden')
       expect(getAllByText('Name').length).toBeGreaterThan(1)
     })
+
+    it('hides hideInCard columns in card mode while keeping them in the table', () => {
+      const cardColumns: TableColumn[] = [
+        { key: 'name', title: 'Name' },
+        { key: 'age', title: 'Age', hideInCard: true }
+      ]
+      const { container } = render(
+        <Table
+          columns={cardColumns}
+          dataSource={dataSource}
+          responsiveMode="card"
+          pagination={false}
+        />
+      )
+
+      const cardList = container.querySelector('[data-tiger-table-mobile="card"]')!
+      // Age label rendered in the table header but never as a card label.
+      expect(container.querySelector('table')?.textContent).toContain('Age')
+      expect(cardList.textContent).not.toContain('Age')
+    })
+
+    it('orders card body columns by cardPriority', () => {
+      const cardColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', cardPriority: 2 },
+        { key: 'age', title: 'Age', cardPriority: 1 }
+      ]
+      const { container } = render(
+        <Table
+          columns={cardColumns}
+          dataSource={[dataSource[0]]}
+          responsiveMode="card"
+          pagination={false}
+        />
+      )
+
+      const labels = Array.from(
+        container.querySelectorAll('[data-tiger-table-mobile="card"] .uppercase')
+      ).map((node) => node.textContent)
+      expect(labels).toEqual(['Age', 'Name'])
+    })
+
+    it('renders a cardTitle column as the card heading instead of a row', () => {
+      const cardColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', cardTitle: true },
+        { key: 'age', title: 'Age' }
+      ]
+      const { container } = render(
+        <Table
+          columns={cardColumns}
+          dataSource={[dataSource[0]]}
+          responsiveMode="card"
+          pagination={false}
+        />
+      )
+
+      const card = container.querySelector('[data-tiger-table-mobile="card"] > div')!
+      const heading = card.querySelector('.font-semibold')
+      expect(heading?.textContent).toBe('John Doe')
+      // The title column must not also appear as a label/value row.
+      const labels = Array.from(card.querySelectorAll('.uppercase')).map((n) => n.textContent)
+      expect(labels).toEqual(['Age'])
+    })
+
+    it('respects a configurable cardBreakpoint', () => {
+      const { container } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          responsiveMode="card"
+          cardBreakpoint="md"
+          pagination={false}
+        />
+      )
+
+      expect(container.querySelector('[data-tiger-table-mobile="card"]')).toHaveClass('max-md:grid')
+      expect(container.querySelector('table')).toHaveClass('max-md:hidden')
+    })
   })
 
   describe('Props', () => {

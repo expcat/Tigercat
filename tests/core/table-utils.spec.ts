@@ -1,11 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   createTableRowKeyCache,
+  getCardColumns,
   getFixedColumnOffsets,
   getFixedColumnPosition,
   getFixedColumnStyle,
   getTableFixedCellClasses,
   getTableFixedHeaderCellClasses,
+  getTableResponsiveCardListClasses,
+  getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
   getRowKey,
   tableBackgroundClasses,
@@ -267,6 +270,63 @@ describe('table-utils', () => {
         autoThreshold: 10000,
         dataLength: 10000
       })
+    })
+  })
+
+  describe('getCardColumns', () => {
+    const cols: TableColumn[] = [
+      { key: 'id', title: 'ID', hideInCard: true },
+      { key: 'name', title: 'Name', cardTitle: true },
+      { key: 'status', title: 'Status', cardPriority: 2 },
+      { key: 'role', title: 'Role', cardPriority: 1 },
+      { key: 'note', title: 'Note' }
+    ]
+
+    it('drops hideInCard columns', () => {
+      const { titleColumn, bodyColumns } = getCardColumns(cols)
+      const keys = bodyColumns.map((c) => c.key)
+      expect(keys).not.toContain('id')
+      expect(titleColumn?.key).toBe('name')
+    })
+
+    it('extracts the first cardTitle column as the heading', () => {
+      const { titleColumn, bodyColumns } = getCardColumns(cols)
+      expect(titleColumn?.key).toBe('name')
+      expect(bodyColumns.map((c) => c.key)).not.toContain('name')
+    })
+
+    it('orders body columns by cardPriority, keeping unprioritized in original order', () => {
+      const { bodyColumns } = getCardColumns(cols)
+      // role (1), status (2), then note (no priority → last, original order).
+      expect(bodyColumns.map((c) => c.key)).toEqual(['role', 'status', 'note'])
+    })
+
+    it('passes all columns through when no card options are set', () => {
+      const plain: TableColumn[] = [
+        { key: 'a', title: 'A' },
+        { key: 'b', title: 'B' }
+      ]
+      const { titleColumn, bodyColumns } = getCardColumns(plain)
+      expect(titleColumn).toBeUndefined()
+      expect(bodyColumns.map((c) => c.key)).toEqual(['a', 'b'])
+    })
+  })
+
+  describe('responsive card classes', () => {
+    it('maps card mode + breakpoint to the matching max-* hide class', () => {
+      expect(getTableResponsiveTableClasses('card')).toBe('max-sm:hidden')
+      expect(getTableResponsiveTableClasses('card', 'md')).toBe('max-md:hidden')
+      expect(getTableResponsiveTableClasses('card', 'lg')).toBe('max-lg:hidden')
+    })
+
+    it('maps scroll mode to the matching min-w class', () => {
+      expect(getTableResponsiveTableClasses('scroll')).toBe('max-sm:min-w-max')
+      expect(getTableResponsiveTableClasses('scroll', 'md')).toBe('max-md:min-w-max')
+    })
+
+    it('resolves the card list container classes per breakpoint', () => {
+      expect(getTableResponsiveCardListClasses()).toContain('max-sm:grid')
+      expect(getTableResponsiveCardListClasses('lg')).toContain('max-lg:grid')
     })
   })
 })

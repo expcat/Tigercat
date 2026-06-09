@@ -57,6 +57,32 @@ const columns: TableColumn<Record<string, unknown>>[] = [
   { key: 'status', title: '状态', width: '20%' }
 ]
 
+// Card-mode customization: promote 姓名 to the card heading, hide secondary
+// fields (ID), and order the remaining fields with cardPriority.
+const cardColumns: TableColumn<Record<string, unknown>>[] = [
+  { key: 'id', title: 'ID', width: '10%', hideInCard: true },
+  { key: 'name', title: '姓名', width: '25%', cardTitle: true },
+  { key: 'status', title: '状态', width: '20%', cardPriority: 1 },
+  { key: 'role', title: '角色', width: '20%', cardPriority: 2 },
+  { key: 'email', title: '邮箱', width: '25%' }
+]
+
+const cardSnippet = `// 卡片模式字段定制（窄于 cardBreakpoint 时启用）
+const cardColumns = [
+  { key: 'id', title: 'ID', hideInCard: true },     // 卡片中隐藏
+  { key: 'name', title: '姓名', cardTitle: true },   // 卡片标题
+  { key: 'status', title: '状态', cardPriority: 1 }, // 首个内容字段
+  { key: 'role', title: '角色', cardPriority: 2 },
+  { key: 'email', title: '邮箱' }
+]
+
+<DataTableWithToolbar
+  :columns="cardColumns"
+  :dataSource="pagedData"
+  responsive-mode="card"
+  card-breakpoint="lg"
+/>`
+
 const statusOptions = [
   { label: '启用', value: 'active' },
   { label: '禁用', value: 'disabled' }
@@ -177,6 +203,36 @@ const handleBulkAction = (actionKey: string) => {
         @page-size-change="handlePageChange"
         @selection-change="handleSelectionChange"
         @bulk-action="(action) => handleBulkAction(action.key as string)" />
+    </DemoBlock>
+
+    <DemoBlock
+      title="卡片模式字段定制"
+      description="窄屏（小于 cardBreakpoint，此处为 lg/1024px）自动切换为卡片：姓名作为标题、ID 隐藏、状态/角色按 cardPriority 排序。缩窄窗口可预览。"
+      :code="cardSnippet">
+      <DataTableWithToolbar
+        :columns="cardColumns"
+        :dataSource="pagedData"
+        responsive-mode="card"
+        card-breakpoint="lg"
+        :toolbar="{
+          searchValue: keyword,
+          searchPlaceholder: '搜索姓名/邮箱',
+          filters: [
+            { key: 'status', label: '状态', options: statusOptions },
+            { key: 'role', label: '角色', options: roleOptions }
+          ]
+        }"
+        :pagination="{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: filteredData.length,
+          showTotal: true
+        }"
+        @search-change="(value) => (keyword = value)"
+        @search="(value) => (keyword = value)"
+        @filters-change="handleFiltersChange"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageChange" />
     </DemoBlock>
   </div>
 </template>

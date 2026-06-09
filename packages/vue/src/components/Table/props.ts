@@ -3,6 +3,7 @@ import type {
   TableColumn,
   TableSize,
   TableResponsiveMode,
+  TableCardBreakpoint,
   SortState,
   PaginationConfig,
   RowSelectionConfig,
@@ -36,6 +37,7 @@ export interface VueTableProps {
   maxHeight?: string | number
   tableLayout?: 'auto' | 'fixed'
   responsiveMode?: TableResponsiveMode
+  cardBreakpoint?: TableCardBreakpoint
   // v0.6.0
   virtual?: boolean
   virtualHeight?: number
@@ -158,6 +160,10 @@ export const tableProps = {
   responsiveMode: {
     type: String as PropType<TableResponsiveMode>,
     default: 'scroll' as TableResponsiveMode
+  },
+  cardBreakpoint: {
+    type: String as PropType<TableCardBreakpoint>,
+    default: 'sm' as TableCardBreakpoint
   },
   // --- v0.6.0 props ---
   virtual: { type: Boolean, default: false },

@@ -14,6 +14,12 @@ export type TableExportFormat = 'csv' | 'excel'
 
 export type TableResponsiveMode = 'card' | 'scroll'
 
+/**
+ * Viewport breakpoint below which `responsiveMode="card"` activates.
+ * Maps to Tailwind's `sm` (640px), `md` (768px), and `lg` (1024px) widths.
+ */
+export type TableCardBreakpoint = 'sm' | 'md' | 'lg'
+
 export type TableFixedPosition = 'left' | 'right'
 
 /**
@@ -171,6 +177,27 @@ export interface TableColumn<T = Record<string, unknown>> {
    * @default false
    */
   fixed?: TableFixedPosition | false
+
+  /**
+   * Hide this column when the table renders as cards (`responsiveMode="card"`).
+   * Useful for omitting secondary fields (id, timestamps) on narrow screens.
+   * @default false
+   */
+  hideInCard?: boolean
+
+  /**
+   * Ordering weight in card mode; columns with a lower value render first.
+   * Columns without a priority keep their original relative order and sort
+   * after prioritized ones.
+   */
+  cardPriority?: number
+
+  /**
+   * Render this column as the card's heading instead of a label/value row.
+   * The first visible column with `cardTitle` wins.
+   * @default false
+   */
+  cardTitle?: boolean
 
   /**
    * Custom render function for cell content
@@ -496,11 +523,19 @@ export interface TableProps<T = Record<string, unknown>> {
   tableLayout?: 'auto' | 'fixed'
 
   /**
-   * Mobile layout below 640px. `scroll` keeps the table horizontally scrollable;
-   * `card` renders each row as a stacked card list.
+   * Mobile layout below the `cardBreakpoint` width (640px by default).
+   * `scroll` keeps the table horizontally scrollable; `card` renders each row
+   * as a stacked card list.
    * @default 'scroll'
    */
   responsiveMode?: TableResponsiveMode
+
+  /**
+   * Viewport breakpoint below which `responsiveMode="card"` activates.
+   * `sm` = 640px, `md` = 768px, `lg` = 1024px.
+   * @default 'sm'
+   */
+  cardBreakpoint?: TableCardBreakpoint
 
   // --- v0.6.0 additions ---
 

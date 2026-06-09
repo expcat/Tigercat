@@ -3,13 +3,15 @@ import {
   classNames,
   createTableResizeObserverController,
   getTableWrapperClasses,
+  getCardColumns,
+  getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
   tableBaseClasses,
   tableResponsiveCardClasses,
   tableResponsiveCardLabelClasses,
-  tableResponsiveCardListClasses,
   tableResponsiveCardRowClasses,
+  tableResponsiveCardTitleClasses,
   tableResponsiveCardValueClasses,
   tableLoadingOverlayClasses,
   getImmediateTigerLocale,
@@ -65,6 +67,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   maxHeight,
   tableLayout = 'auto',
   responsiveMode = 'scroll',
+  cardBreakpoint = 'sm',
   // v0.6.0 props
   virtual = false,
   autoVirtual = true,
@@ -272,7 +275,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         ref={tableRef}
         className={classNames(
           tableBaseClasses,
-          getTableResponsiveTableClasses(responsiveMode),
+          getTableResponsiveTableClasses(responsiveMode, cardBreakpoint),
           tableLayout === 'fixed' ? 'table-fixed' : 'table-auto',
           className
         )}
@@ -313,7 +316,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       </table>
 
       {responsiveMode === 'card' && (
-        <div className={tableResponsiveCardListClasses} data-tiger-table-mobile="card">
+        <div
+          className={getTableResponsiveCardListClasses(cardBreakpoint)}
+          data-tiger-table-mobile="card">
           {ctx.paginatedData.length === 0 ? (
             <div className={tableResponsiveCardClasses}>{emptyText}</div>
           ) : (
@@ -363,20 +368,33 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                     </div>
                   ) : null}
 
-                  {ctx.displayColumns.map((column) => {
-                    const dataKey = column.dataKey || column.key
-                    const cellValue = record[dataKey]
-                    const cellContent = column.render
-                      ? (column.render(record, index) as React.ReactNode)
-                      : (cellValue as React.ReactNode)
+                  {(() => {
+                    const { titleColumn, bodyColumns } = getCardColumns(ctx.displayColumns)
+                    const renderCellContent = (column: TableColumn) => {
+                      const dataKey = column.dataKey || column.key
+                      return column.render
+                        ? (column.render(record, index) as React.ReactNode)
+                        : (record[dataKey] as React.ReactNode)
+                    }
 
                     return (
-                      <div key={column.key} className={tableResponsiveCardRowClasses}>
-                        <div className={tableResponsiveCardLabelClasses}>{column.title}</div>
-                        <div className={tableResponsiveCardValueClasses}>{cellContent}</div>
-                      </div>
+                      <>
+                        {titleColumn && (
+                          <div className={tableResponsiveCardTitleClasses}>
+                            {renderCellContent(titleColumn)}
+                          </div>
+                        )}
+                        {bodyColumns.map((column) => (
+                          <div key={column.key} className={tableResponsiveCardRowClasses}>
+                            <div className={tableResponsiveCardLabelClasses}>{column.title}</div>
+                            <div className={tableResponsiveCardValueClasses}>
+                              {renderCellContent(column)}
+                            </div>
+                          </div>
+                        ))}
+                      </>
                     )
-                  })}
+                  })()}
 
                   {expandedNode && (
                     <div className="mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3">
