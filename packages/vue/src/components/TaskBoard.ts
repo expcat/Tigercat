@@ -33,6 +33,7 @@ import {
   type TaskBoardColumnMoveEvent,
   type TaskBoardMoveValidator,
   type TigerLocale,
+  type TigerLocaleTaskBoard,
   type TaskBoardDragSnapshot
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
@@ -52,6 +53,7 @@ export interface VueTaskBoardProps {
   allowAddCard?: boolean
   allowAddColumn?: boolean
   locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleTaskBoard>
   className?: string
   style?: Record<string, string | number>
 }
@@ -104,6 +106,10 @@ export const TaskBoard = defineComponent({
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
     },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleTaskBoard>>,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -117,7 +123,7 @@ export const TaskBoard = defineComponent({
   setup(props, { slots, attrs, emit }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const labels = computed(() => getTaskBoardLabels(mergedLocale.value))
+    const labels = computed(() => getTaskBoardLabels(mergedLocale.value, props.labels))
 
     // ----- controlled / uncontrolled -----
     const innerColumns = ref<TaskBoardColumn[]>(props.columns ?? props.defaultColumns ?? [])
@@ -247,7 +253,8 @@ export const TaskBoard = defineComponent({
       const cardClasses = classNames(
         taskBoardCardClasses,
         isDragging && taskBoardCardDraggingClasses,
-        isKbGrabbed && 'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
+        isKbGrabbed &&
+          'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
       )
 
       const cardAttrs = {
@@ -330,7 +337,10 @@ export const TaskBoard = defineComponent({
                     )
                   : h(
                       'span',
-                      { class: 'ml-2 text-xs font-normal px-1.5 py-0.5 rounded bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)] opacity-70' },
+                      {
+                        class:
+                          'ml-2 text-xs font-normal px-1.5 py-0.5 rounded bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)] opacity-70'
+                      },
                       String(column.cards.length)
                     )
             ]),

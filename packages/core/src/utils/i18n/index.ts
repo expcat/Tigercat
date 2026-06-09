@@ -17,4 +17,4 @@ export {
   type TimePickerOptionUnit
 } from '../timepicker-utils'
 export * from '../upload-labels'
-export { defineLocale } from './define-locale'
+export { defineLocale, defineText } from './define-locale'

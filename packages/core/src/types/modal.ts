@@ -2,7 +2,7 @@
  * Modal/Dialog component types and interfaces
  */
 
-import type { TigerLocale } from './locale'
+import type { TigerLocale, TigerLocaleModal } from './locale'
 
 /**
  * Modal size types
@@ -92,4 +92,10 @@ export interface ModalProps {
    * Locale overrides for common texts
    */
   locale?: Partial<TigerLocale>
+
+  /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<TigerLocaleModal>
 }

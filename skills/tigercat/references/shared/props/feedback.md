@@ -13,7 +13,7 @@ description: Compact generated Tigercat Feedback props reference
 
 Source: `packages/core/src/types/drawer.ts` · Interface: `DrawerProps`.
 
-Showing 3 key props of 17; see source for the complete interface.
+Showing 3 key props of 18; see source for the complete interface.
 
 | Prop         | Type              | Default   | Notes                      |
 | ------------ | ----------------- | --------- | -------------------------- |
@@ -51,7 +51,7 @@ Events/callback props: `onClose?`.
 
 Source: `packages/core/src/types/modal.ts` · Interface: `ModalProps`.
 
-Showing 3 key props of 14; see source for the complete interface.
+Showing 3 key props of 15; see source for the complete interface.
 
 | Prop     | Type               | Default | Notes                                                                   |
 | -------- | ------------------ | ------- | ----------------------------------------------------------------------- |

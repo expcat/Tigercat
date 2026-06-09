@@ -2,7 +2,7 @@
  * Pagination component types and interfaces
  */
 
-import type { TigerLocaleInput } from './locale'
+import type { TigerLocaleInput, TigerLocalePagination } from './locale'
 
 /**
  * Pagination size type
@@ -162,6 +162,12 @@ export interface PaginationProps {
    * Locale configuration. Accepts a sync locale, promise, or lazy loader.
    */
   locale?: TigerLocaleInput
+
+  /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<TigerLocalePagination>
 }
 
 /**

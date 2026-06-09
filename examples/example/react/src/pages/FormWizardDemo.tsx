@@ -49,6 +49,17 @@ const basicScriptSnippet = `const [current, setCurrent] = useState(0)
 const [model, setModel] = useState({ name: '', email: '', phone: '' })
 const [finished, setFinished] = useState(false)`
 
+const labelsSnippet = `// 单语言项目：无需 locale，直接用扁平 labels 覆盖按钮文案
+<FormWizard
+  steps={steps}
+  current={currentLabels}
+  onChange={setCurrentLabels}
+  labels={{ prevText: '返回', nextText: '继续', finishText: '提交完成' }}
+  renderStep={(_step, index) => (
+    <div className="text-sm text-gray-600">第 {index + 1} 步内容</div>
+  )}
+/>`
+
 const FormWizardDemo: React.FC = () => {
   const steps = useMemo<WizardStep[]>(
     () => [
@@ -62,6 +73,7 @@ const FormWizardDemo: React.FC = () => {
   const [current, setCurrent] = useState(0)
   const [model, setModel] = useState({ name: '', email: '', phone: '' })
   const [finished, setFinished] = useState(false)
+  const [currentLabels, setCurrentLabels] = useState(0)
   const formRef = useRef<FormHandle | null>(null)
 
   const handleBeforeNext = async (_current: number, step: WizardStep) => {
@@ -160,6 +172,21 @@ const FormWizardDemo: React.FC = () => {
                 </div>
               )}
             </Form>
+          )}
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="自定义文案 (labels)"
+        description="单语言项目无需引入 locale，直接用扁平 labels 覆盖上一步/下一步/完成按钮文案。"
+        code={labelsSnippet}>
+        <FormWizard
+          steps={steps}
+          current={currentLabels}
+          onChange={setCurrentLabels}
+          labels={{ prevText: '返回', nextText: '继续', finishText: '提交完成' }}
+          renderStep={(_step, index) => (
+            <div className="text-sm text-gray-600">第 {index + 1} 步内容</div>
           )}
         />
       </DemoBlock>

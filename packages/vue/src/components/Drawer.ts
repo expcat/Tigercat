@@ -21,10 +21,12 @@ import {
   closeIconPathStrokeWidth,
   focusFirst,
   resolveLocaleText,
+  mergeTigerLocale,
   mergeStyleValues,
   getDrawerMaskClasses,
   getDrawerContainerClasses,
   type TigerLocale,
+  type TigerLocaleDrawer,
   getDrawerPanelClasses,
   getDrawerHeaderClasses,
   getDrawerBodyClasses,
@@ -47,6 +49,7 @@ import {
   useVueEscapeKey,
   useVueFocusTrap
 } from '../utils/overlay'
+import { useTigerConfig } from './ConfigProvider'
 
 let drawerIdCounter = 0
 const createDrawerId = () => `tiger-drawer-${++drawerIdCounter}`
@@ -71,6 +74,7 @@ export interface VueDrawerProps {
   style?: Record<string, unknown>
   closeAriaLabel?: string
   locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleDrawer>
 }
 
 export const Drawer = defineComponent({
@@ -230,6 +234,14 @@ export const Drawer = defineComponent({
     },
 
     /**
+     * Flat custom-text overrides for single-language use (no i18n needed).
+     */
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleDrawer>>,
+      default: undefined
+    },
+
+    /**
      * Disable teleport (useful for testing)
      * @default false
      * @internal
@@ -241,6 +253,9 @@ export const Drawer = defineComponent({
   },
   emits: ['update:open', 'close', 'after-enter', 'after-leave'],
   setup(props, { slots, emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+
     const instanceId = ref<string>(createDrawerId())
     const hasBeenOpened = ref(false)
     const deferredRendered = ref(props.open)
@@ -414,8 +429,9 @@ export const Drawer = defineComponent({
       const resolvedCloseAriaLabel = resolveLocaleText(
         'Close drawer',
         props.closeAriaLabel,
-        props.locale?.drawer?.closeAriaLabel,
-        props.locale?.common?.closeText
+        props.labels?.closeAriaLabel,
+        mergedLocale.value?.drawer?.closeAriaLabel,
+        mergedLocale.value?.common?.closeText
       )
 
       const closeIcon = h(

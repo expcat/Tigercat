@@ -23,10 +23,12 @@ import {
   resolveSwipeGesture,
   restoreFocus,
   shouldCloseOnMaskClick,
+  mergeTigerLocale,
   type GesturePoint,
   type DrawerProps as CoreDrawerProps
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface DrawerProps
   extends
@@ -88,11 +90,17 @@ export const Drawer: React.FC<DrawerProps> = ({
   onAfterLeave,
   closeAriaLabel,
   locale,
+  labels,
   children,
   footer,
   style,
   ...rest
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
   const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
   const [deferredRendered, setDeferredRendered] = React.useState(open)
 
@@ -173,8 +181,9 @@ export const Drawer: React.FC<DrawerProps> = ({
   const resolvedCloseAriaLabel = resolveLocaleText(
     'Close drawer',
     closeAriaLabel,
-    locale?.drawer?.closeAriaLabel,
-    locale?.common?.closeText
+    labels?.closeAriaLabel,
+    mergedLocale?.drawer?.closeAriaLabel,
+    mergedLocale?.common?.closeText
   )
 
   useEffect(() => {

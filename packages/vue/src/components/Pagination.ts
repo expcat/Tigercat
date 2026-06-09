@@ -35,13 +35,16 @@ import {
   getValidatedPaginationJumperValue,
   isLazyTigerLocale,
   resolveTigerLocale,
+  mergeTigerLocale,
   type PaginationSize,
   type PaginationAlign,
   type PaginationPageSizeOptionItem,
   type PaginationIdleValidationScheduler,
   type TigerLocale,
-  type TigerLocaleInput
+  type TigerLocaleInput,
+  type TigerLocalePagination
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VuePaginationProps {
   current?: number
@@ -70,6 +73,11 @@ export interface VuePaginationProps {
    * Locale configuration for i18n support
    */
   locale?: TigerLocaleInput
+  /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<TigerLocalePagination>
 }
 
 export const Pagination = defineComponent({
@@ -221,6 +229,13 @@ export const Pagination = defineComponent({
       type: [Object, Function] as PropType<TigerLocaleInput>,
       default: undefined
     },
+    /**
+     * Flat custom-text overrides for single-language use (no i18n needed).
+     */
+    labels: {
+      type: Object as PropType<Partial<TigerLocalePagination>>,
+      default: undefined
+    },
     quickJumperValidation: {
       type: Object as PropType<{
         delay?: number
@@ -234,6 +249,8 @@ export const Pagination = defineComponent({
     const attrsRecord = attrs as Record<string, unknown>
     const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
+
+    const config = useTigerConfig()
 
     const resolvedLocale = ref<Partial<TigerLocale> | undefined>(
       getImmediateTigerLocale(props.locale)
@@ -265,10 +282,13 @@ export const Pagination = defineComponent({
       { immediate: true }
     )
 
-    // Get resolved locale labels
-    const labels = computed(() => getPaginationLabels(resolvedLocale.value))
-    const localeCode = computed(() => resolvedLocale.value?.locale)
-    const isRtl = computed(() => getLocaleDirection(resolvedLocale.value) === 'rtl')
+    // Merge global ConfigProvider locale with the component-level locale
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, resolvedLocale.value))
+
+    // Get resolved locale labels (props.labels has highest precedence)
+    const labels = computed(() => getPaginationLabels(mergedLocale.value, props.labels))
+    const localeCode = computed(() => mergedLocale.value?.locale)
+    const isRtl = computed(() => getLocaleDirection(mergedLocale.value) === 'rtl')
 
     // Internal state for uncontrolled mode
     const internalCurrent = ref<number>(props.defaultCurrent)
@@ -434,7 +454,7 @@ export const Pagination = defineComponent({
       if (props.showTotal) {
         const totalTextFn =
           props.totalText ||
-          (resolvedLocale.value?.pagination?.totalText
+          (props.labels?.totalText || mergedLocale.value?.pagination?.totalText
             ? (value: number, range: [number, number]) =>
                 formatPaginationTotal(labels.value.totalText, value, range, localeCode.value)
             : defaultTotalText)

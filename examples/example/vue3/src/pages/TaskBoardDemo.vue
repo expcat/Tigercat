@@ -84,11 +84,24 @@ const slotColumns = ref<TaskBoardColumn[]>([
   }
 ])
 
+// ---- columns for labels (custom text) demo ----
+const labelsColumns = ref<TaskBoardColumn[]>([
+  { id: 'empty', title: '空列', cards: [] },
+  { id: 'busy', title: '有卡片', cards: [{ id: 'l1', title: '示例卡片' }] }
+])
+
 const basicSnippet = `<TaskBoard
   v-model:columns="columns"
   @card-move="handleCardMove"
   @column-move="handleColumnMove"
   :on-card-add="handleCardAdd"
+/>`
+
+const labelsSnippet = `<!-- 单语言项目：无需 locale，直接用扁平 labels 覆盖空列与新增卡片文案 -->
+<TaskBoard
+  v-model:columns="labelsColumns"
+  allow-add-card
+  :labels="{ emptyColumnText: '空空如也', addCardText: '新增卡片' }"
 />`
 
 const basicScriptSnippet = `import { ref } from 'vue'
@@ -150,6 +163,17 @@ const slotSnippet = `<TaskBoard v-model:columns="slotColumns">
           </div>
         </template>
       </TaskBoard>
+    </DemoBlock>
+
+    <DemoBlock
+      title="自定义文案 (labels)"
+      description="单语言项目无需引入 locale，直接用扁平 labels 覆盖空列占位与新增卡片按钮文案。"
+      :code="labelsSnippet"
+      class="mt-8">
+      <TaskBoard
+        v-model:columns="labelsColumns"
+        allow-add-card
+        :labels="{ emptyColumnText: '空空如也', addCardText: '新增卡片' }" />
     </DemoBlock>
   </div>
 </template>

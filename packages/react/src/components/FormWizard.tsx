@@ -21,8 +21,7 @@ const ArrowLeftIcon = () => (
     stroke="currentColor"
     strokeWidth="2"
     viewBox="0 0 24 24"
-    aria-hidden="true"
-  >
+    aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
   </svg>
 )
@@ -34,8 +33,7 @@ const ArrowRightIcon = () => (
     stroke="currentColor"
     strokeWidth="2"
     viewBox="0 0 24 24"
-    aria-hidden="true"
-  >
+    aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
   </svg>
 )
@@ -47,8 +45,7 @@ const CheckIcon = () => (
     stroke="currentColor"
     strokeWidth="2.5"
     viewBox="0 0 24 24"
-    aria-hidden="true"
-  >
+    aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
   </svg>
 )
@@ -76,6 +73,7 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   nextText,
   finishText,
   locale,
+  labels: labelsOverride,
   beforeNext,
   autoSave,
   onChange,
@@ -90,7 +88,10 @@ export const FormWizard: React.FC<FormWizardProps> = ({
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const labels = useMemo(() => getFormWizardLabels(mergedLocale), [mergedLocale])
+  const labels = useMemo(
+    () => getFormWizardLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
 
   const [innerCurrent, setInnerCurrent] = useState(defaultCurrent)
 
@@ -201,10 +202,11 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   return (
     <div className={wrapperClasses} style={style} data-tiger-form-wizard {...props}>
       {showSteps && steps.length > 0 && (
-        <div className={classNames(
-          'px-6 py-5 bg-[var(--tiger-surface-muted,#f9fafb)]/95 backdrop-blur-sm transition-all duration-300',
-          bordered ? 'border-b border-[var(--tiger-border,#e5e7eb)]' : ''
-        )}>
+        <div
+          className={classNames(
+            'px-6 py-5 bg-[var(--tiger-surface-muted,#f9fafb)]/95 backdrop-blur-sm transition-all duration-300',
+            bordered ? 'border-b border-[var(--tiger-border,#e5e7eb)]' : ''
+          )}>
           <Steps
             current={currentIndex}
             direction={direction}
@@ -220,10 +222,11 @@ export const FormWizard: React.FC<FormWizardProps> = ({
         {contentNode}
       </div>
       {showActions && (
-        <div className={classNames(
-          'flex items-center justify-between gap-3 px-8 py-4 bg-[var(--tiger-surface-muted,#f9fafb)]/95 backdrop-blur-sm transition-all duration-300',
-          bordered ? 'border-t border-[var(--tiger-border,#e5e7eb)]' : ''
-        )}>
+        <div
+          className={classNames(
+            'flex items-center justify-between gap-3 px-8 py-4 bg-[var(--tiger-surface-muted,#f9fafb)]/95 backdrop-blur-sm transition-all duration-300',
+            bordered ? 'border-t border-[var(--tiger-border,#e5e7eb)]' : ''
+          )}>
           {!isFirst ? (
             <Button
               htmlType="button"
@@ -231,8 +234,7 @@ export const FormWizard: React.FC<FormWizardProps> = ({
               className="group"
               onClick={handlePrev}
               size={size === 'small' ? 'sm' : 'md'}
-              icon={<ArrowLeftIcon />}
-            >
+              icon={<ArrowLeftIcon />}>
               {resolveLocaleText(labels.prevText, prevText)}
             </Button>
           ) : (
@@ -245,8 +247,7 @@ export const FormWizard: React.FC<FormWizardProps> = ({
             onClick={handleNext}
             size={size === 'small' ? 'sm' : 'md'}
             icon={isLast ? <CheckIcon /> : <ArrowRightIcon />}
-            iconPosition={isLast ? 'left' : 'right'}
-          >
+            iconPosition={isLast ? 'left' : 'right'}>
             {isLast
               ? resolveLocaleText(labels.finishText, finishText)
               : resolveLocaleText(labels.nextText, nextText)}

@@ -105,6 +105,17 @@ export interface TigerLocale {
   taskBoard?: TigerLocaleTaskBoard
 }
 
+/**
+ * Flat custom-text overlay for single-language projects that do not need i18n.
+ *
+ * Same shape as `TigerLocale` but without the `locale` code / `direction`
+ * fields — it carries only the component text. Pass it to
+ * `<ConfigProvider locale={defineText({...})} />` for app-wide custom text, or
+ * to a component's `labels` prop for a one-off override. No locale data files
+ * are pulled in, so the bundle stays small.
+ */
+export type TigerText = Omit<Partial<TigerLocale>, 'locale' | 'direction'>
+
 export type TigerLocaleLazyModule =
   | Partial<TigerLocale>
   | { default?: Partial<TigerLocale> }

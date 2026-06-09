@@ -159,8 +159,8 @@ description: Compact generated API summary for Tigercat core types
 | events.ts         | -                                                            | -                                             | 23      |
 | floating-popup.ts | BaseFloatingPopupProps                                       | BaseFloatingPopup                             | 2       |
 | generics.ts       | GenericTableProps, GenericSelectProps, GenericFormFieldProps | GenericTable, GenericSelect, GenericFormField | 9       |
-| locale.ts         | -                                                            | -                                             | 12      |
+| locale.ts         | -                                                            | -                                             | 13      |
 | slots.ts          | -                                                            | -                                             | 10      |
 | theme.ts          | -                                                            | -                                             | 11      |
 
-Total exported types: 611.
+Total exported types: 612.

@@ -23,11 +23,13 @@ import {
   restoreFocus,
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
+  mergeTigerLocale,
   type GesturePoint,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ModalProps
   extends
@@ -118,10 +120,16 @@ export const Modal: React.FC<ModalProps> = ({
   okText,
   cancelText,
   locale,
+  labels,
   style,
   draggable: isDraggable = false,
   ...rest
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
   const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 })
 
@@ -194,22 +202,25 @@ export const Modal: React.FC<ModalProps> = ({
   const resolvedCloseAriaLabel = resolveLocaleText(
     'Close',
     closeAriaLabel,
-    locale?.modal?.closeAriaLabel,
-    locale?.common?.closeText
+    labels?.closeAriaLabel,
+    mergedLocale?.modal?.closeAriaLabel,
+    mergedLocale?.common?.closeText
   )
 
   const resolvedCancelText = resolveLocaleText(
     '取消',
     cancelText,
-    locale?.modal?.cancelText,
-    locale?.common?.cancelText
+    labels?.cancelText,
+    mergedLocale?.modal?.cancelText,
+    mergedLocale?.common?.cancelText
   )
 
   const resolvedOkText = resolveLocaleText(
     '确定',
     okText,
-    locale?.modal?.okText,
-    locale?.common?.okText
+    labels?.okText,
+    mergedLocale?.modal?.okText,
+    mergedLocale?.common?.okText
   )
 
   // Unique ids for a11y

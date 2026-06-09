@@ -13,7 +13,8 @@ import {
   type StepsDirection,
   type StepSize,
   type FormWizardValidator,
-  type TigerLocale
+  type TigerLocale,
+  type TigerLocaleFormWizard
 } from '@expcat/tigercat-core'
 import { Steps, StepsItem } from './Steps'
 import { Button } from './Button'
@@ -21,62 +22,65 @@ import { useTigerConfig } from './ConfigProvider'
 
 type HChildren = Parameters<typeof h>[2]
 
-const renderArrowLeftIcon = () => h(
-  'svg',
-  {
-    class: 'w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-0.5',
-    fill: 'none',
-    stroke: 'currentColor',
-    'stroke-width': '2',
-    viewBox: '0 0 24 24',
-    'aria-hidden': 'true'
-  },
-  [
-    h('path', {
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      d: 'M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18'
-    })
-  ]
-)
+const renderArrowLeftIcon = () =>
+  h(
+    'svg',
+    {
+      class: 'w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-0.5',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      viewBox: '0 0 24 24',
+      'aria-hidden': 'true'
+    },
+    [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        d: 'M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18'
+      })
+    ]
+  )
 
-const renderArrowRightIcon = () => h(
-  'svg',
-  {
-    class: 'w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5',
-    fill: 'none',
-    stroke: 'currentColor',
-    'stroke-width': '2',
-    viewBox: '0 0 24 24',
-    'aria-hidden': 'true'
-  },
-  [
-    h('path', {
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      d: 'M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3'
-    })
-  ]
-)
+const renderArrowRightIcon = () =>
+  h(
+    'svg',
+    {
+      class: 'w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      viewBox: '0 0 24 24',
+      'aria-hidden': 'true'
+    },
+    [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        d: 'M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3'
+      })
+    ]
+  )
 
-const renderCheckIcon = () => h(
-  'svg',
-  {
-    class: 'w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110',
-    fill: 'none',
-    stroke: 'currentColor',
-    'stroke-width': '2.5',
-    viewBox: '0 0 24 24',
-    'aria-hidden': 'true'
-  },
-  [
-    h('path', {
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      d: 'M4.5 12.75l6 6 9-13.5'
-    })
-  ]
-)
+const renderCheckIcon = () =>
+  h(
+    'svg',
+    {
+      class: 'w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2.5',
+      viewBox: '0 0 24 24',
+      'aria-hidden': 'true'
+    },
+    [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        d: 'M4.5 12.75l6 6 9-13.5'
+      })
+    ]
+  )
 
 export interface VueFormWizardProps {
   steps?: WizardStep[]
@@ -93,6 +97,7 @@ export interface VueFormWizardProps {
   finishText?: string
   beforeNext?: FormWizardValidator
   locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleFormWizard>
   className?: string
   style?: Record<string, string | number>
 }
@@ -157,6 +162,10 @@ export const FormWizard = defineComponent({
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
     },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleFormWizard>>,
+      default: undefined
+    },
     bordered: {
       type: Boolean,
       default: true
@@ -178,7 +187,7 @@ export const FormWizard = defineComponent({
   setup(props, { slots, attrs, emit }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const labels = computed(() => getFormWizardLabels(mergedLocale.value))
+    const labels = computed(() => getFormWizardLabels(mergedLocale.value, props.labels))
 
     const innerCurrent = ref(props.current ?? props.defaultCurrent)
 
@@ -340,48 +349,47 @@ export const FormWizard = defineComponent({
             : null,
           h(
             'div',
-            { class: 'px-8 py-6 flex flex-col items-center w-full min-h-[120px] transition-all duration-300' },
+            {
+              class:
+                'px-8 py-6 flex flex-col items-center w-full min-h-[120px] transition-all duration-300'
+            },
             { default: () => renderContent() }
           ),
           props.showActions
-            ? h(
-                'div',
-                { class: actionsContainerClass },
-                [
-                  !isFirst
-                    ? h(
-                        Button,
-                        {
-                          type: 'button',
-                          variant: 'secondary',
-                          class: 'group',
-                          onClick: handlePrev,
-                          size: props.size === 'small' ? 'sm' : 'md',
-                          icon: renderArrowLeftIcon()
-                        },
-                        { default: () => resolveLocaleText(labels.value.prevText, props.prevText) }
-                      )
-                    : h('div'),
-                  h(
-                    Button,
-                    {
-                      type: 'button',
-                      variant: 'primary',
-                      class: 'group',
-                      onClick: handleNext,
-                      size: props.size === 'small' ? 'sm' : 'md',
-                      icon: isLast ? renderCheckIcon() : renderArrowRightIcon(),
-                      iconPosition: isLast ? 'left' : 'right'
-                    },
-                    {
-                      default: () =>
-                        isLast
-                          ? resolveLocaleText(labels.value.finishText, props.finishText)
-                          : resolveLocaleText(labels.value.nextText, props.nextText)
-                    }
-                  )
-                ]
-              )
+            ? h('div', { class: actionsContainerClass }, [
+                !isFirst
+                  ? h(
+                      Button,
+                      {
+                        type: 'button',
+                        variant: 'secondary',
+                        class: 'group',
+                        onClick: handlePrev,
+                        size: props.size === 'small' ? 'sm' : 'md',
+                        icon: renderArrowLeftIcon()
+                      },
+                      { default: () => resolveLocaleText(labels.value.prevText, props.prevText) }
+                    )
+                  : h('div'),
+                h(
+                  Button,
+                  {
+                    type: 'button',
+                    variant: 'primary',
+                    class: 'group',
+                    onClick: handleNext,
+                    size: props.size === 'small' ? 'sm' : 'md',
+                    icon: isLast ? renderCheckIcon() : renderArrowRightIcon(),
+                    iconPosition: isLast ? 'left' : 'right'
+                  },
+                  {
+                    default: () =>
+                      isLast
+                        ? resolveLocaleText(labels.value.finishText, props.finishText)
+                        : resolveLocaleText(labels.value.nextText, props.nextText)
+                  }
+                )
+              ])
             : null
         ]
       )

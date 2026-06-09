@@ -30,14 +30,17 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   resolveLocaleText,
+  mergeTigerLocale,
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
   type GesturePoint,
   type TigerLocale,
+  type TigerLocaleModal,
   type ModalSize
 } from '@expcat/tigercat-core'
 
 import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 import {
   renderVueBodyTeleport,
   useVueBodyScrollLock,
@@ -65,6 +68,7 @@ export interface VueModalProps {
   okText?: string
   cancelText?: string
   locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleModal>
 }
 
 export const Modal = defineComponent({
@@ -209,6 +213,14 @@ export const Modal = defineComponent({
     },
 
     /**
+     * Flat custom-text overrides for single-language use (no i18n needed).
+     */
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleModal>>,
+      default: undefined
+    },
+
+    /**
      * Whether to render a default footer when no `footer` slot is provided
      * @default false
      */
@@ -236,6 +248,9 @@ export const Modal = defineComponent({
   },
   emits: ['update:open', 'close', 'cancel', 'ok'],
   setup(props, { slots, emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+
     const instanceId = ref<string>(createModalId())
     const hasBeenOpened = ref(props.open)
 
@@ -448,8 +463,9 @@ export const Modal = defineComponent({
                         'aria-label': resolveLocaleText(
                           'Close',
                           props.closeAriaLabel,
-                          props.locale?.modal?.closeAriaLabel,
-                          props.locale?.common?.closeText
+                          props.labels?.closeAriaLabel,
+                          mergedLocale.value?.modal?.closeAriaLabel,
+                          mergedLocale.value?.common?.closeText
                         ),
                         ref: closeButtonRef
                       },
@@ -478,8 +494,9 @@ export const Modal = defineComponent({
                     resolveLocaleText(
                       '取消',
                       props.cancelText,
-                      props.locale?.modal?.cancelText,
-                      props.locale?.common?.cancelText
+                      props.labels?.cancelText,
+                      mergedLocale.value?.modal?.cancelText,
+                      mergedLocale.value?.common?.cancelText
                     )
                 }
               ),
@@ -491,8 +508,9 @@ export const Modal = defineComponent({
                     resolveLocaleText(
                       '确定',
                       props.okText,
-                      props.locale?.modal?.okText,
-                      props.locale?.common?.okText
+                      props.labels?.okText,
+                      mergedLocale.value?.modal?.okText,
+                      mergedLocale.value?.common?.okText
                     )
                 }
               )

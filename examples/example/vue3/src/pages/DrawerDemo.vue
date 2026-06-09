@@ -35,6 +35,9 @@ const noCloseButtonVisible = ref(false)
 // Destroy on close
 const destroyVisible = ref(false)
 
+// Custom text via labels (no i18n)
+const labelsVisible = ref(false)
+
 const closeAll = () => {
   basicVisible.value = false
   placementVisible.value = false
@@ -44,6 +47,7 @@ const closeAll = () => {
   notClosableVisible.value = false
   noCloseButtonVisible.value = false
   destroyVisible.value = false
+  labelsVisible.value = false
 }
 
 const openBasic = () => {
@@ -86,6 +90,11 @@ const openNoCloseButton = () => {
 const openDestroy = () => {
   closeAll()
   destroyVisible.value = true
+}
+
+const openLabels = () => {
+  closeAll()
+  labelsVisible.value = true
 }
 
 const basicSnippet = `<Button @click="openBasic">打开抽屉</Button>
@@ -204,6 +213,12 @@ const destroySnippet = `<Button @click="openDestroy">打开抽屉</Button>
       <Button variant="secondary" @click="destroyVisible = false">关闭</Button>
     </Space>
   </template>
+</Drawer>`
+
+const labelsSnippet = `<!-- 单语言项目：无需 locale，直接用扁平 labels 覆盖关闭按钮的 aria-label -->
+<Button @click="openLabels">打开抽屉</Button>
+<Drawer v-model:open="labelsVisible" title="自定义文案" :labels="{ closeAriaLabel: '关闭抽屉' }">
+  <p>右上角关闭按钮的 aria-label 已被 labels 覆盖为「关闭抽屉」。</p>
 </Drawer>`
 
 const DestroyOnCloseContent = defineComponent({
@@ -463,6 +478,27 @@ const DestroyOnCloseContent = defineComponent({
           <template #footer>
             <Space>
               <Button variant="secondary" @click="noCloseButtonVisible = false">关闭</Button>
+            </Space>
+          </template>
+        </Drawer>
+      </div>
+    </DemoBlock>
+
+    <!-- 自定义文案 (labels) -->
+    <DemoBlock
+      title="自定义文案 (labels)"
+      description="单语言项目无需引入 locale，直接用扁平 labels 覆盖关闭按钮的 aria-label。"
+      :code="labelsSnippet">
+      <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <Button @click="openLabels">打开抽屉</Button>
+        <Drawer
+          v-model:open="labelsVisible"
+          title="自定义文案"
+          :labels="{ closeAriaLabel: '关闭抽屉' }">
+          <p>右上角关闭按钮的 aria-label 已被 labels 覆盖为「关闭抽屉」。</p>
+          <template #footer>
+            <Space>
+              <Button variant="secondary" @click="labelsVisible = false">关闭</Button>
             </Space>
           </template>
         </Drawer>

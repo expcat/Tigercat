@@ -19,7 +19,7 @@
  * `undefined`) ready to pass to `<ConfigProvider locale={myLocale} />`.
  */
 
-import type { TigerLocale } from '../../types/locale'
+import type { TigerLocale, TigerText } from '../../types/locale'
 import { enUS } from './locales/en-US'
 
 type PlainObject = Record<string, unknown>
@@ -63,4 +63,27 @@ function deepMerge(base: PlainObject, override: PlainObject | undefined): PlainO
  */
 export function defineLocale(overrides: Partial<TigerLocale> = {}): TigerLocale {
   return deepMerge(enUS as unknown as PlainObject, overrides as PlainObject) as TigerLocale
+}
+
+/**
+ * `defineText` — author app-wide custom text without engaging the i18n system.
+ *
+ * Thin alias over {@link defineLocale} for single-language projects: takes a
+ * flat {@link TigerText} overlay (no `locale` code / `direction` needed) and
+ * returns a fully-populated `TigerLocale` ready for
+ * `<ConfigProvider locale={...} />`. Use this when you just want to override the
+ * built-in wording and never ship multiple languages.
+ *
+ * @example
+ * ```ts
+ * import { defineText } from '@expcat/tigercat-core'
+ *
+ * export const appText = defineText({
+ *   modal: { okText: 'Confirm', cancelText: 'Dismiss' },
+ *   pagination: { totalText: '{total} results' }
+ * })
+ * ```
+ */
+export function defineText(text: TigerText = {}): TigerLocale {
+  return defineLocale(text as Partial<TigerLocale>)
 }

@@ -32,6 +32,14 @@ const defaultFooterSnippet = `<Modal
   @cancel="handleCancel"
 >...</Modal>`
 
+const labelsSnippet = `<!-- 单语言项目：无需 locale，直接用扁平 labels 覆盖按钮与关闭文案 -->
+<Modal
+  v-model:open="visibleLabels"
+  title="自定义文案"
+  show-default-footer
+  :labels="{ okText: '提交', cancelText: '关闭', closeAriaLabel: '关闭对话框' }"
+>...</Modal>`
+
 const nestedSnippet = `<Modal title="第一层对话框">
   <Modal title="第二层对话框" :z-index="1100">...</Modal>
 </Modal>`
@@ -63,6 +71,7 @@ const visibleNoMask = ref(false)
 const visibleDestroyOnClose = ref(false)
 const visibleCustomFooter = ref(false)
 const visibleDefaultFooter = ref(false)
+const visibleLabels = ref(false)
 
 const visibleConfirm = ref(false)
 const confirmLoading = ref(false)
@@ -250,6 +259,22 @@ const handleFormSubmit = async () => {
             }
           ">
           <p>这个对话框使用内置的默认页脚按钮。</p>
+        </Modal>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock
+      title="自定义文案 (labels)"
+      description="单语言项目无需引入 locale，直接用扁平 labels 覆盖默认页脚按钮与关闭按钮文案。"
+      :code="labelsSnippet">
+      <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+        <Button @click="visibleLabels = true">自定义文案对话框</Button>
+        <Modal
+          v-model:open="visibleLabels"
+          title="自定义文案"
+          show-default-footer
+          :labels="{ okText: '提交', cancelText: '关闭', closeAriaLabel: '关闭对话框' }">
+          <p>页脚按钮与右上角关闭按钮的文案均由 labels 提供。</p>
         </Modal>
       </div>
     </DemoBlock>

@@ -15,6 +15,7 @@ const current8 = ref(1)
 const current9 = ref(1)
 const current10 = ref(1)
 const current11 = ref(1)
+const currentLabels = ref(1)
 const pageSize = ref(10)
 
 const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
@@ -106,6 +107,13 @@ const i18nSnippet = `<Pagination
   :locale="{ pagination: customLabels }"
   showQuickJumper
   showSizeChanger />`
+
+const labelsSnippet = `<!-- 单语言项目：无需 locale，直接用扁平 labels 覆盖文案 -->
+<Pagination
+  v-model:current="currentLabels"
+  :total="500"
+  :labels="{ totalText: '共 {total} 条记录', prevPageAriaLabel: '上一页', nextPageAriaLabel: '下一页' }"
+  showQuickJumper />`
 
 const fullSnippet = `<Pagination
   v-model:current="current3"
@@ -259,6 +267,22 @@ const fullSnippet = `<Pagination
           showQuickJumper
           showSizeChanger />
       </div>
+    </DemoBlock>
+
+    <!-- 自定义文案 (labels) -->
+    <DemoBlock
+      title="自定义文案 (labels)"
+      description="单语言项目无需引入 locale，直接用扁平 labels 覆盖文案（优先级高于 locale 与全局 ConfigProvider）。"
+      :code="labelsSnippet">
+      <Pagination
+        v-model:current="currentLabels"
+        :total="500"
+        :labels="{
+          totalText: '共 {total} 条记录',
+          prevPageAriaLabel: '上一页',
+          nextPageAriaLabel: '下一页'
+        }"
+        showQuickJumper />
     </DemoBlock>
 
     <!-- 完整示例 -->

@@ -184,7 +184,7 @@ Source: `packages/core/src/types/menu.ts` · Interface: `MenuItemGroupProps`.
 
 Source: `packages/core/src/types/pagination.ts` · Interface: `PaginationProps`.
 
-Showing 3 key props of 20; see source for the complete interface.
+Showing 3 key props of 21; see source for the complete interface.
 
 | Prop              | Type     | Default | Notes                                        |
 | ----------------- | -------- | ------- | -------------------------------------------- |

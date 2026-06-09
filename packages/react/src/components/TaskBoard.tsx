@@ -53,7 +53,8 @@ const CardItem = React.memo<CardItemProps>(
     const cardClasses = classNames(
       taskBoardCardClasses,
       isDragging && taskBoardCardDraggingClasses,
-      isKbGrabbed && 'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
+      isKbGrabbed &&
+        'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
     )
 
     return (
@@ -382,6 +383,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   renderColumnFooter,
   renderEmptyColumn,
   locale,
+  labels: labelsOverride,
   className,
   style,
   ...rest
@@ -391,7 +393,10 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const labels = useMemo(() => getTaskBoardLabels(mergedLocale), [mergedLocale])
+  const labels = useMemo(
+    () => getTaskBoardLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
 
   // ---- controlled / uncontrolled ----
   const [innerColumns, setInnerColumns] = useState<TaskBoardColumn[]>(defaultColumns)

@@ -149,6 +149,16 @@ const destroySnippet = `<Button onClick={openDestroy}>打开抽屉</Button>
   <DestroyOnCloseContent />
 </Drawer>`
 
+const labelsSnippet = `// 单语言项目：无需 locale，直接用扁平 labels 覆盖关闭按钮的 aria-label
+<Button onClick={openLabels}>打开抽屉</Button>
+<Drawer
+  open={labelsVisible}
+  title="自定义文案"
+  labels={{ closeAriaLabel: '关闭抽屉' }}
+  onClose={() => setLabelsVisible(false)}>
+  <p>右上角关闭按钮的 aria-label 已被 labels 覆盖为「关闭抽屉」。</p>
+</Drawer>`
+
 const basicScriptSnippet = `const [basicVisible, setBasicVisible] = useState(false)`
 
 const DestroyOnCloseContent: React.FC = () => {
@@ -225,6 +235,9 @@ const DrawerDemo: React.FC = () => {
   // Destroy on close
   const [destroyVisible, setDestroyVisible] = useState(false)
 
+  // Custom text via labels (no i18n)
+  const [labelsVisible, setLabelsVisible] = useState(false)
+
   const closeAll = () => {
     setBasicVisible(false)
     setPlacementVisible(false)
@@ -234,6 +247,7 @@ const DrawerDemo: React.FC = () => {
     setNotClosableVisible(false)
     setNoCloseButtonVisible(false)
     setDestroyVisible(false)
+    setLabelsVisible(false)
   }
 
   const openBasic = () => {
@@ -276,6 +290,11 @@ const DrawerDemo: React.FC = () => {
   const openDestroy = () => {
     closeAll()
     setDestroyVisible(true)
+  }
+
+  const openLabels = () => {
+    closeAll()
+    setLabelsVisible(true)
   }
 
   return (
@@ -486,6 +505,24 @@ const DrawerDemo: React.FC = () => {
             onClose={() => setNoCloseButtonVisible(false)}>
             <p>这个抽屉没有关闭按钮</p>
             <p className="mt-2">仍可使用 ESC 或底部按钮关闭</p>
+          </Drawer>
+        </div>
+      </DemoBlock>
+
+      {/* 自定义文案 (labels) */}
+      <DemoBlock
+        title="自定义文案 (labels)"
+        description="单语言项目无需引入 locale，直接用扁平 labels 覆盖关闭按钮的 aria-label。"
+        code={labelsSnippet}>
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <Button onClick={openLabels}>打开抽屉</Button>
+          <Drawer
+            open={labelsVisible}
+            title="自定义文案"
+            labels={{ closeAriaLabel: '关闭抽屉' }}
+            footer={getCloseFooter(() => setLabelsVisible(false))}
+            onClose={() => setLabelsVisible(false)}>
+            <p>右上角关闭按钮的 aria-label 已被 labels 覆盖为「关闭抽屉」。</p>
           </Drawer>
         </div>
       </DemoBlock>

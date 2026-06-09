@@ -188,14 +188,15 @@ export const ZH_CN_FORM_WIZARD_LABELS: Required<TigerLocaleFormWizard> = {
 }
 
 export function getFormWizardLabels(
-  locale?: Partial<TigerLocale>
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleFormWizard>
 ): Required<TigerLocaleFormWizard> {
   const isZh = locale?.locale?.startsWith('zh')
   const defaultLabels = isZh ? ZH_CN_FORM_WIZARD_LABELS : DEFAULT_FORM_WIZARD_LABELS
   return {
-    prevText: locale?.formWizard?.prevText ?? defaultLabels.prevText,
-    nextText: locale?.formWizard?.nextText ?? defaultLabels.nextText,
-    finishText: locale?.formWizard?.finishText ?? defaultLabels.finishText
+    prevText: overrides?.prevText ?? locale?.formWizard?.prevText ?? defaultLabels.prevText,
+    nextText: overrides?.nextText ?? locale?.formWizard?.nextText ?? defaultLabels.nextText,
+    finishText: overrides?.finishText ?? locale?.formWizard?.finishText ?? defaultLabels.finishText
   }
 }
 
@@ -206,7 +207,8 @@ export function getFormWizardLabels(
  * @returns Resolved pagination labels
  */
 export function getPaginationLabels(
-  locale?: Partial<TigerLocale>
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocalePagination>
 ): Required<TigerLocalePagination> {
   const isZh =
     !!locale?.locale?.startsWith('zh') ||
@@ -214,18 +216,27 @@ export function getPaginationLabels(
     locale?.upload?.clickToUploadText === '点击上传'
   const defaultLabels = isZh ? ZH_CN_PAGINATION_LABELS : DEFAULT_PAGINATION_LABELS
   return {
-    totalText: locale?.pagination?.totalText ?? defaultLabels.totalText,
+    totalText: overrides?.totalText ?? locale?.pagination?.totalText ?? defaultLabels.totalText,
     itemsPerPageText:
-      locale?.pagination?.itemsPerPageText ?? defaultLabels.itemsPerPageText,
-    jumpToText: locale?.pagination?.jumpToText ?? defaultLabels.jumpToText,
-    pageText: locale?.pagination?.pageText ?? defaultLabels.pageText,
+      overrides?.itemsPerPageText ??
+      locale?.pagination?.itemsPerPageText ??
+      defaultLabels.itemsPerPageText,
+    jumpToText: overrides?.jumpToText ?? locale?.pagination?.jumpToText ?? defaultLabels.jumpToText,
+    pageText: overrides?.pageText ?? locale?.pagination?.pageText ?? defaultLabels.pageText,
     prevPageAriaLabel:
-      locale?.pagination?.prevPageAriaLabel ?? defaultLabels.prevPageAriaLabel,
+      overrides?.prevPageAriaLabel ??
+      locale?.pagination?.prevPageAriaLabel ??
+      defaultLabels.prevPageAriaLabel,
     nextPageAriaLabel:
-      locale?.pagination?.nextPageAriaLabel ?? defaultLabels.nextPageAriaLabel,
-    pageAriaLabel: locale?.pagination?.pageAriaLabel ?? defaultLabels.pageAriaLabel,
+      overrides?.nextPageAriaLabel ??
+      locale?.pagination?.nextPageAriaLabel ??
+      defaultLabels.nextPageAriaLabel,
+    pageAriaLabel:
+      overrides?.pageAriaLabel ?? locale?.pagination?.pageAriaLabel ?? defaultLabels.pageAriaLabel,
     pageIndicatorText:
-      locale?.pagination?.pageIndicatorText ?? defaultLabels.pageIndicatorText
+      overrides?.pageIndicatorText ??
+      locale?.pagination?.pageIndicatorText ??
+      defaultLabels.pageIndicatorText
   }
 }
 
@@ -294,15 +305,24 @@ export const ZH_CN_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
   boardAriaLabel: '任务看板'
 }
 
-export function getTaskBoardLabels(locale?: Partial<TigerLocale>): Required<TigerLocaleTaskBoard> {
+export function getTaskBoardLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleTaskBoard>
+): Required<TigerLocaleTaskBoard> {
   const isZh = locale?.locale?.startsWith('zh')
   const defaultLabels = isZh ? ZH_CN_TASK_BOARD_LABELS : DEFAULT_TASK_BOARD_LABELS
   return {
     emptyColumnText:
-      locale?.taskBoard?.emptyColumnText ?? defaultLabels.emptyColumnText,
-    addCardText: locale?.taskBoard?.addCardText ?? defaultLabels.addCardText,
-    wipLimitText: locale?.taskBoard?.wipLimitText ?? defaultLabels.wipLimitText,
-    dragHintText: locale?.taskBoard?.dragHintText ?? defaultLabels.dragHintText,
-    boardAriaLabel: locale?.taskBoard?.boardAriaLabel ?? defaultLabels.boardAriaLabel
+      overrides?.emptyColumnText ??
+      locale?.taskBoard?.emptyColumnText ??
+      defaultLabels.emptyColumnText,
+    addCardText:
+      overrides?.addCardText ?? locale?.taskBoard?.addCardText ?? defaultLabels.addCardText,
+    wipLimitText:
+      overrides?.wipLimitText ?? locale?.taskBoard?.wipLimitText ?? defaultLabels.wipLimitText,
+    dragHintText:
+      overrides?.dragHintText ?? locale?.taskBoard?.dragHintText ?? defaultLabels.dragHintText,
+    boardAriaLabel:
+      overrides?.boardAriaLabel ?? locale?.taskBoard?.boardAriaLabel ?? defaultLabels.boardAriaLabel
   }
 }

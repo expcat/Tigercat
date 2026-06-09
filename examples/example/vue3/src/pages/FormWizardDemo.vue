@@ -12,6 +12,7 @@ const steps: WizardStep[] = [
 
 const current = ref(0)
 const finished = ref(false)
+const currentLabels = ref(0)
 
 const basicScriptSnippet = `import { reactive, ref } from 'vue'
 
@@ -66,6 +67,16 @@ const basicSnippet = `<FormWizard
         <div>确认信息无误后点击完成。</div>
       </template>
     </Form>
+  </template>
+</FormWizard>`
+
+const labelsSnippet = `<!-- 单语言项目：无需 locale，直接用扁平 labels 覆盖按钮文案 -->
+<FormWizard
+  v-model:current="currentLabels"
+  :steps="steps"
+  :labels="{ prevText: '返回', nextText: '继续', finishText: '提交完成' }">
+  <template #step="{ index }">
+    <div class="text-sm text-gray-600">第 {{ index + 1 }} 步内容</div>
   </template>
 </FormWizard>`
 </script>
@@ -129,6 +140,20 @@ const basicSnippet = `<FormWizard
               </div>
             </template>
           </Form>
+        </template>
+      </FormWizard>
+    </DemoBlock>
+
+    <DemoBlock
+      title="自定义文案 (labels)"
+      description="单语言项目无需引入 locale，直接用扁平 labels 覆盖上一步/下一步/完成按钮文案。"
+      :code="labelsSnippet">
+      <FormWizard
+        v-model:current="currentLabels"
+        :steps="steps"
+        :labels="{ prevText: '返回', nextText: '继续', finishText: '提交完成' }">
+        <template #step="{ index }">
+          <div class="text-sm text-gray-600">第 {{ index + 1 }} 步内容</div>
         </template>
       </FormWizard>
     </DemoBlock>

@@ -16,6 +16,7 @@ const PaginationDemo: React.FC = () => {
   const [current9, setCurrent9] = useState(1)
   const [current10, setCurrent10] = useState(1)
   const [current11, setCurrent11] = useState(1)
+  const [currentLabels, setCurrentLabels] = useState(1)
   const [demoLang, setDemoLang] = useState<'en-US' | 'zh-CN'>('zh-CN')
 
   const handlePageSizeChange = (page: number, size: number) => {
@@ -134,6 +135,19 @@ const customLabels: Partial<TigerLocalePagination> = {
   labels={customLabels}
   showQuickJumper
   showSizeChanger
+/>`
+
+  const labelsSnippet = `// 单语言项目：无需 locale，直接用扁平 labels 覆盖文案
+<Pagination
+  current={currentLabels}
+  onChange={setCurrentLabels}
+  total={500}
+  labels={{
+    totalText: '共 {total} 条记录',
+    prevPageAriaLabel: '上一页',
+    nextPageAriaLabel: '下一页'
+  }}
+  showQuickJumper
 />`
 
   const fullSnippet = `<Pagination
@@ -316,6 +330,24 @@ const customLabels: Partial<TigerLocalePagination> = {
             showSizeChanger
           />
         </div>
+      </DemoBlock>
+
+      {/* 自定义文案 (labels) */}
+      <DemoBlock
+        title="自定义文案 (labels)"
+        description="单语言项目无需引入 locale，直接用扁平 labels 覆盖文案（优先级高于 locale 与全局 ConfigProvider）。"
+        code={labelsSnippet}>
+        <Pagination
+          current={currentLabels}
+          onChange={setCurrentLabels}
+          total={500}
+          labels={{
+            totalText: '共 {total} 条记录',
+            prevPageAriaLabel: '上一页',
+            nextPageAriaLabel: '下一页'
+          }}
+          showQuickJumper
+        />
       </DemoBlock>
 
       {/* 完整示例 */}

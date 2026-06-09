@@ -120,7 +120,7 @@ Uses: `Steps/StepsItem`, `Button`, `ConfigProvider`.
 
 Note: 按钮文案优先使用显式 props，其次组件 `locale`，再回退到 `ConfigProvider` locale。
 
-Showing 3 key props of 18; see source for the complete interface.
+Showing 3 key props of 19; see source for the complete interface.
 
 | Prop              | Type           | Default | Notes                             |
 | ----------------- | -------------- | ------- | --------------------------------- |
@@ -138,7 +138,7 @@ Uses: `ConfigProvider`, `task-board drag utilities`, `kanban utilities`.
 
 Note: 拖拽、WIP、过滤和空状态文案由 core 工具和 locale helpers 共同驱动。
 
-Showing 3 key props of 19; see source for the complete interface.
+Showing 3 key props of 20; see source for the complete interface.
 
 | Prop              | Type                | Default | Notes                                                                                      |
 | ----------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |

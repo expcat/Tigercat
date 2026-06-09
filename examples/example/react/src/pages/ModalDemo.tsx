@@ -26,6 +26,14 @@ const defaultFooterSnippet = `<Modal
   onCancel={handleCancel}
 >...</Modal>`
 
+const labelsSnippet = `// 单语言项目：无需 locale，直接用扁平 labels 覆盖按钮与关闭文案
+<Modal
+  open={visibleLabels}
+  title="自定义文案"
+  showDefaultFooter
+  labels={{ okText: '提交', cancelText: '关闭', closeAriaLabel: '关闭对话框' }}
+>...</Modal>`
+
 const nestedSnippet = `<Modal title="第一层对话框">
   <Modal title="第二层对话框" zIndex={1100}>...</Modal>
 </Modal>`
@@ -67,6 +75,7 @@ export default function ModalDemo() {
   const [visibleDestroyOnClose, setVisibleDestroyOnClose] = useState(false)
   const [visibleCustomFooter, setVisibleCustomFooter] = useState(false)
   const [visibleDefaultFooter, setVisibleDefaultFooter] = useState(false)
+  const [visibleLabels, setVisibleLabels] = useState(false)
 
   const [visibleConfirm, setVisibleConfirm] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
@@ -269,6 +278,24 @@ export default function ModalDemo() {
             }}
             onCancel={() => setVisibleDefaultFooter(false)}>
             <p>这个对话框使用内置的默认页脚按钮。</p>
+          </Modal>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="自定义文案 (labels)"
+        description="单语言项目无需引入 locale，直接用扁平 labels 覆盖默认页脚按钮与关闭按钮文案。"
+        code={labelsSnippet}>
+        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+          <Button onClick={() => setVisibleLabels(true)}>自定义文案对话框</Button>
+          <Modal
+            open={visibleLabels}
+            title="自定义文案"
+            showDefaultFooter
+            labels={{ okText: '提交', cancelText: '关闭', closeAriaLabel: '关闭对话框' }}
+            onOk={() => setVisibleLabels(false)}
+            onCancel={() => setVisibleLabels(false)}>
+            <p>页脚按钮与右上角关闭按钮的文案均由 labels 提供。</p>
           </Modal>
         </div>
       </DemoBlock>

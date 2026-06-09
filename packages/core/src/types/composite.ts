@@ -1108,6 +1108,11 @@ export interface FormWizardProps {
    */
   locale?: Partial<TigerLocale>
   /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<import('./locale').TigerLocaleFormWizard>
+  /**
    * Validation hook before moving to next step
    */
   beforeNext?: FormWizardValidator
@@ -1312,6 +1317,11 @@ export interface TaskBoardProps {
    * Locale overrides for TaskBoard UI text
    */
   locale?: Partial<import('./locale').TigerLocale>
+  /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<import('./locale').TigerLocaleTaskBoard>
   /**
    * Additional CSS classes
    */

@@ -24,12 +24,14 @@ import {
   getValidatedPaginationJumperValue,
   isLazyTigerLocale,
   resolveTigerLocale,
+  mergeTigerLocale,
   type PaginationProps as CorePaginationProps,
   type PaginationPageSizeOptionItem,
   type PaginationIdleValidationScheduler,
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface PaginationProps
   extends Omit<CorePaginationProps, 'style'>, Omit<React.HTMLAttributes<HTMLElement>, 'onChange'> {
@@ -67,9 +69,11 @@ export const Pagination: React.FC<PaginationProps> = ({
   onChange,
   onPageSizeChange,
   locale,
+  labels: labelsOverride,
   ...props
 }) => {
   const { 'aria-label': ariaLabelProp, ...navProps } = props
+  const config = useTigerConfig()
 
   const immediateLocale = useMemo(() => getImmediateTigerLocale(locale), [locale])
   const [loadedLocale, setLoadedLocale] = useState<Partial<TigerLocale> | undefined>(
@@ -97,10 +101,19 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   const resolvedLocale = isLazyTigerLocale(locale) ? loadedLocale : immediateLocale
 
-  // Get resolved locale labels
-  const labels = useMemo(() => getPaginationLabels(resolvedLocale), [resolvedLocale])
-  const localeCode = resolvedLocale?.locale
-  const isRtl = getLocaleDirection(resolvedLocale) === 'rtl'
+  // Merge global ConfigProvider locale with the component-level locale
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, resolvedLocale),
+    [config.locale, resolvedLocale]
+  )
+
+  // Get resolved locale labels (labelsOverride has highest precedence)
+  const labels = useMemo(
+    () => getPaginationLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const localeCode = mergedLocale?.locale
+  const isRtl = getLocaleDirection(mergedLocale) === 'rtl'
 
   // Internal state for uncontrolled mode
   const [internalCurrent, setInternalCurrent] = useState<number>(defaultCurrent)
@@ -249,7 +262,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   if (showTotal) {
     const totalTextFn =
       totalText ||
-      (resolvedLocale?.pagination?.totalText
+      (labelsOverride?.totalText || mergedLocale?.pagination?.totalText
         ? (value: number, range: [number, number]) =>
             formatPaginationTotal(labels.totalText, value, range, localeCode)
         : defaultTotalText)

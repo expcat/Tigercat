@@ -2,7 +2,7 @@
  * Drawer component types
  */
 
-import type { TigerLocale } from './locale'
+import type { TigerLocale, TigerLocaleDrawer } from './locale'
 
 /**
  * Drawer placement - where the drawer appears from
@@ -104,6 +104,12 @@ export interface DrawerProps {
    * Locale overrides for common texts
    */
   locale?: Partial<TigerLocale>
+
+  /**
+   * Flat custom-text overrides for single-language use (no i18n needed).
+   * Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<TigerLocaleDrawer>
 
   /**
    * Additional CSS class for the drawer panel.
