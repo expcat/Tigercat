@@ -2,8 +2,16 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createTableRowKeyCache,
   getFixedColumnOffsets,
+  getFixedColumnPosition,
+  getFixedColumnStyle,
+  getTableFixedCellClasses,
+  getTableFixedHeaderCellClasses,
   getTableVirtualRecommendation,
   getRowKey,
+  tableBackgroundClasses,
+  tableHeaderBackgroundClasses,
+  tableRowGroupHoverClasses,
+  tableRowStripedClasses,
   type TableColumn
 } from '@expcat/tigercat-core'
 
@@ -93,6 +101,126 @@ describe('table-utils', () => {
         minTableWidth: 350,
         hasFixedColumns: true
       })
+    })
+
+    it('resolves fixed column position and sticky styles', () => {
+      const columns: TableColumn[] = [
+        { key: 'name', title: 'Name', width: 120, fixed: 'left' },
+        { key: 'age', title: 'Age', width: 80 },
+        { key: 'actions', title: 'Actions', width: 100, fixed: 'right' }
+      ]
+      const fixedInfo = getFixedColumnOffsets(columns)
+
+      expect(getFixedColumnPosition(columns[0], fixedInfo)).toBe('left')
+      expect(getFixedColumnPosition(columns[2], fixedInfo)).toBe('right')
+      expect(getFixedColumnPosition(columns[1], fixedInfo)).toBeUndefined()
+
+      expect(getFixedColumnStyle(columns[0], fixedInfo, 15)).toEqual({
+        position: 'sticky',
+        left: '0px',
+        zIndex: 15
+      })
+      expect(getFixedColumnStyle(columns[2], fixedInfo, 12)).toEqual({
+        position: 'sticky',
+        right: '0px',
+        zIndex: 12
+      })
+    })
+  })
+
+  describe('fixed column class helpers', () => {
+    it('builds default and custom classes for fixed body cells', () => {
+      const columns: TableColumn<{ id: number }>[] = [
+        {
+          key: 'name',
+          title: 'Name',
+          fixed: 'left',
+          fixedClassName: ({ view, fixed, rowIndex, selected }) =>
+            selected ? `selected-${view}-${fixed}-${rowIndex}` : 'plain-fixed'
+        }
+      ]
+      const fixedInfo = getFixedColumnOffsets(columns)
+
+      const classes = getTableFixedCellClasses({
+        view: 'table',
+        column: columns[0],
+        record: { id: 1 },
+        rowIndex: 0,
+        striped: true,
+        stripedActive: true,
+        selected: true,
+        hoverable: true,
+        fixedInfo,
+        selectedClassName: 'selected-row-bg'
+      })
+
+      expect(classes).toContain(tableRowStripedClasses)
+      expect(classes).toContain(tableRowGroupHoverClasses)
+      expect(classes).toContain('selected-row-bg')
+      expect(classes).toContain('selected-table-left-0')
+      expect(
+        getTableFixedCellClasses({
+          view: 'table',
+          column: { key: 'age', title: 'Age' },
+          record: { id: 1 },
+          rowIndex: 0,
+          striped: false,
+          stripedActive: false,
+          selected: false,
+          hoverable: true,
+          fixedInfo
+        })
+      ).toBeUndefined()
+    })
+
+    it('builds default and custom classes for fixed header cells', () => {
+      const columns: TableColumn[] = [
+        {
+          key: 'actions',
+          title: 'Actions',
+          fixed: 'right',
+          fixedHeaderClassName: ({ view, fixed, stickyHeader }) =>
+            `${view}-${fixed}-${stickyHeader ? 'sticky' : 'static'}`
+        }
+      ]
+      const fixedInfo = getFixedColumnOffsets(columns)
+
+      const classes = getTableFixedHeaderCellClasses({
+        view: 'virtual-table',
+        column: columns[0],
+        stickyHeader: true,
+        fixedInfo
+      })
+
+      expect(classes).toContain(tableHeaderBackgroundClasses)
+      expect(classes).toContain('virtual-table-right-sticky')
+      expect(
+        getTableFixedHeaderCellClasses({
+          view: 'table',
+          column: { key: 'name', title: 'Name' },
+          stickyHeader: false,
+          fixedInfo
+        })
+      ).toBeUndefined()
+    })
+
+    it('falls back to the table background for non-striped fixed cells', () => {
+      const columns: TableColumn[] = [{ key: 'name', title: 'Name', fixed: 'left' }]
+      const fixedInfo = getFixedColumnOffsets(columns)
+
+      const classes = getTableFixedCellClasses({
+        view: 'table',
+        column: columns[0],
+        record: { id: 1 },
+        rowIndex: 1,
+        striped: true,
+        stripedActive: false,
+        selected: false,
+        hoverable: false,
+        fixedInfo
+      })
+
+      expect(classes).toContain(tableBackgroundClasses)
     })
   })
 

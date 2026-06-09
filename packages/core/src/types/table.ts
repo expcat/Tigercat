@@ -14,6 +14,8 @@ export type TableExportFormat = 'csv' | 'excel'
 
 export type TableResponsiveMode = 'card' | 'scroll'
 
+export type TableFixedPosition = 'left' | 'right'
+
 /**
  * Sort direction
  */
@@ -38,6 +40,32 @@ export interface SortState {
  * Column alignment
  */
 export type ColumnAlign = 'left' | 'center' | 'right'
+
+export interface TableFixedHeaderClassNameContext<T = Record<string, unknown>> {
+  view: 'table' | 'virtual-table'
+  column: TableColumn<T>
+  fixed: TableFixedPosition
+  stickyHeader: boolean
+}
+
+export interface TableFixedCellClassNameContext<T = Record<string, unknown>> {
+  view: 'table' | 'virtual-table'
+  column: TableColumn<T>
+  fixed: TableFixedPosition
+  record: T
+  rowIndex: number
+  striped: boolean
+  selected: boolean
+  hoverable: boolean
+}
+
+export type TableFixedHeaderClassName<T = Record<string, unknown>> =
+  | string
+  | ((context: TableFixedHeaderClassNameContext<T>) => string | undefined | null | false)
+
+export type TableFixedCellClassName<T = Record<string, unknown>> =
+  | string
+  | ((context: TableFixedCellClassNameContext<T>) => string | undefined | null | false)
 
 /**
  * Filter type
@@ -142,7 +170,7 @@ export interface TableColumn<T = Record<string, unknown>> {
    * Whether column is fixed
    * @default false
    */
-  fixed?: 'left' | 'right' | false
+  fixed?: TableFixedPosition | false
 
   /**
    * Custom render function for cell content
@@ -161,9 +189,19 @@ export interface TableColumn<T = Record<string, unknown>> {
   className?: string
 
   /**
+   * CSS class for fixed column cells, or a resolver based on row state.
+   */
+  fixedClassName?: TableFixedCellClassName<T>
+
+  /**
    * CSS class for header cell
    */
   headerClassName?: string
+
+  /**
+   * CSS class for fixed column header cells, or a resolver for sticky header state.
+   */
+  fixedHeaderClassName?: TableFixedHeaderClassName<T>
 }
 
 /**

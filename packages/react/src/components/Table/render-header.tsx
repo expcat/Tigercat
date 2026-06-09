@@ -3,6 +3,8 @@ import {
   classNames,
   getTableHeaderClasses,
   getTableHeaderCellClasses,
+  getTableFixedHeaderCellClasses,
+  getFixedColumnStyle,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
   type RowSelectionConfig,
@@ -59,21 +61,7 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                 : 'none'
             : undefined
 
-          const isFixedLeft = column.fixed === 'left'
-          const isFixedRight = column.fixed === 'right'
-          const fixedStyle = isFixedLeft
-            ? {
-                position: 'sticky' as const,
-                left: `${ctx.fixedColumnsInfo.leftOffsets[column.key] || 0}px`,
-                zIndex: 15
-              }
-            : isFixedRight
-              ? {
-                  position: 'sticky' as const,
-                  right: `${ctx.fixedColumnsInfo.rightOffsets[column.key] || 0}px`,
-                  zIndex: 15
-                }
-              : undefined
+          const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo, 15)
 
           const widthStyle = column.width
             ? {
@@ -95,7 +83,12 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                   !!column.sortable,
                   column.headerClassName
                 ),
-                (isFixedLeft || isFixedRight) && 'bg-[var(--tiger-surface-muted,#f9fafb)]'
+                getTableFixedHeaderCellClasses({
+                  view: 'table',
+                  column,
+                  stickyHeader,
+                  fixedInfo: ctx.fixedColumnsInfo
+                })
               )}
               style={style}
               draggable={columnDraggable ? true : undefined}

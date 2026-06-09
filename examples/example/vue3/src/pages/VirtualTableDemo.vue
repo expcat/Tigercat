@@ -11,6 +11,19 @@
       <VirtualTable :data="basicData" :columns="basicColumns" :height="300" striped bordered />
     </DemoBlock>
 
+    <DemoBlock
+      title="固定列样式自定义"
+      description="固定列支持 fixedClassName / fixedHeaderClassName，可根据 selected 状态自定义 sticky 单元格外观。"
+      :code="fixedSnippet">
+      <VirtualTable
+        :data="basicData.slice(0, 24)"
+        :columns="fixedColumns"
+        :height="280"
+        :row-height="48"
+        striped
+        :selected-keys="[2, 4]" />
+    </DemoBlock>
+
     <DemoBlock title="加载 & 空状态" description="loading 和 emptyText" :code="stateSnippet">
       <div class="flex gap-4">
         <div class="flex-1">
@@ -27,14 +40,43 @@
 </template>
 
 <script setup lang="ts">
-import { VirtualTable } from '@expcat/tigercat-vue'
+import { VirtualTable, type TableColumn } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
-const basicColumns = [
+const basicColumns: TableColumn[] = [
   { key: 'id', title: 'ID', width: 80 },
   { key: 'name', title: '姓名', width: 150 },
   { key: 'email', title: '邮箱' },
   { key: 'status', title: '状态', width: 100 }
+]
+
+const fixedColumns: TableColumn[] = [
+  {
+    key: 'id',
+    title: 'ID',
+    width: 96,
+    fixed: 'left',
+    fixedHeaderClassName:
+      'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)]',
+    fixedClassName: ({ selected }) =>
+      selected
+        ? 'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)] ring-2 ring-inset ring-sky-200/70'
+        : 'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)]'
+  },
+  { key: 'name', title: '姓名', width: 180 },
+  { key: 'email', title: '邮箱', width: 240 },
+  {
+    key: 'status',
+    title: '状态',
+    width: 120,
+    fixed: 'right',
+    fixedHeaderClassName:
+      'shadow-[inset_1px_0_0_var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)]',
+    fixedClassName: ({ selected }) =>
+      selected
+        ? 'shadow-[inset_1px_0_0_var(--tiger-border,#e5e7eb)] ring-2 ring-inset ring-sky-200/70'
+        : 'shadow-[inset_1px_0_0_var(--tiger-border,#e5e7eb)]'
+  }
 ]
 
 const basicData = Array.from({ length: 1000 }, (_, i) => ({
@@ -57,6 +99,14 @@ const data = Array.from({ length: 1000 }, (_, i) => ({
 <VirtualTable :data="data" :columns="columns" :height="400" :row-height="48" />`
 
 const styledSnippet = `<VirtualTable :data="data" :columns="columns" :height="300" striped bordered />`
+
+const fixedSnippet = `<VirtualTable
+  :data="data"
+  :columns="fixedColumns"
+  :height="280"
+  :row-height="48"
+  striped
+  :selected-keys="[2, 4]" />`
 
 const stateSnippet = `<VirtualTable :data="[]" :columns="columns" :height="200" loading />
 <VirtualTable :data="[]" :columns="columns" :height="200" empty-text="暂无数据" />`

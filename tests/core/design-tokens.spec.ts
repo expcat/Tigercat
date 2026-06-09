@@ -20,6 +20,7 @@ describe('design tokens', () => {
     expect(globalColors).toBe(primitiveColors)
     expect(aliasTokens).toBe(semanticTokens)
     expect(componentTokens.tag['border-radius']).toBe('6px')
+    expect(componentTokens.table.bg).toBe('#fafafa')
   })
 
   it('generates Figma collections with token references', () => {
@@ -41,5 +42,8 @@ describe('design tokens', () => {
       component?.variables.find((variable) => variable.name === 'component/button/border-radius')
         ?.reference
     ).toBe('semantic/radius/component')
+    expect(component?.variables.find((variable) => variable.name === 'component/table/bg')?.reference).toBe(
+      'semantic/color/bg-surface'
+    )
   })
 })

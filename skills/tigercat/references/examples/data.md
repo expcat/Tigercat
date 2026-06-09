@@ -9,13 +9,19 @@ description: Compact Tigercat Data Vue and React usage routes
 
 表格和复杂数据组件先定义列、数据和 key，再处理分页、选择、展开等增强项。
 
-| Component     | Vue                                                             | React                                                       |
-| ------------- | --------------------------------------------------------------- | ----------------------------------------------------------- |
-| Calendar      | `<Calendar />`                                                  | `<Calendar />`                                              |
-| Collapse      | `<Collapse />`                                                  | `<Collapse />`                                              |
-| CollapsePanel | `<CollapsePanel />`                                             | `<CollapsePanel />`                                         |
-| Countdown     | `<Countdown />`                                                 | `<Countdown />`                                             |
-| Table         | `<Table :columns="columns" :data-source="rows" row-key="id" />` | `<Table columns={columns} dataSource={rows} rowKey="id" />` |
-| Timeline      | `<Timeline />`                                                  | `<Timeline />`                                              |
+## Component Notes
+
+| Component | Uses                                                            | Notes                                                                                                                                           |
+| --------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Table     | `TableColumn`, `Pagination`, `row selection`, `expandable rows` | 固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。 |
+
+| Component     | Vue                                                                                       | React                                                                                |
+| ------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Calendar      | `<Calendar />`                                                                            | `<Calendar />`                                                                       |
+| Collapse      | `<Collapse />`                                                                            | `<Collapse />`                                                                       |
+| CollapsePanel | `<CollapsePanel />`                                                                       | `<CollapsePanel />`                                                                  |
+| Countdown     | `<Countdown />`                                                                           | `<Countdown />`                                                                      |
+| Table         | `<Table :columns="fixedColumns" :data-source="rows" sticky-header :pagination="false" />` | `<Table columns={fixedColumns} dataSource={rows} stickyHeader pagination={false} />` |
+| Timeline      | `<Timeline />`                                                                            | `<Timeline />`                                                                       |
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.

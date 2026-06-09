@@ -1974,6 +1974,18 @@
           "reference": "primitive/font/size/base"
         },
         {
+          "name": "component/table/bg",
+          "type": "COLOR",
+          "cssVariable": "--tiger-component-table-bg",
+          "value": {
+            "r": 0.9803921568627451,
+            "g": 0.9803921568627451,
+            "b": 0.9803921568627451,
+            "a": 1
+          },
+          "reference": "semantic/color/bg-surface"
+        },
+        {
           "name": "component/table/header-bg",
           "type": "COLOR",
           "cssVariable": "--tiger-component-table-header-bg",

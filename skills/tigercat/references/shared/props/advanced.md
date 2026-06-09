@@ -134,6 +134,10 @@ Showing 3 key props of 8; see source for the complete interface.
 
 Source: `packages/core/src/types/virtual-table.ts` · Interface: `VirtualTableProps`.
 
+Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
+
+Note: 复用 `TableColumn` 类型；固定列同样支持 `fixedClassName` / `fixedHeaderClassName`，用于跟随 striped、selected 和 hover 状态定制 sticky 单元格样式。
+
 Showing 3 key props of 17; see source for the complete interface.
 
 | Prop         | Type               | Default | Notes                                                         |

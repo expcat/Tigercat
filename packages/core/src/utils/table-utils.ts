@@ -8,7 +8,10 @@ import type {
   ColumnAlign,
   SortDirection,
   TableColumn,
-  TableResponsiveMode
+  TableResponsiveMode,
+  TableFixedCellClassNameContext,
+  TableFixedHeaderClassNameContext,
+  TableFixedPosition
 } from '../types/table'
 
 /**
@@ -36,6 +39,21 @@ export const tableResponsiveCardLabelClasses =
 
 export const tableResponsiveCardValueClasses =
   'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words'
+
+export const tableBackgroundClasses =
+  'bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff)))]'
+
+export const tableHeaderBackgroundClasses =
+  'bg-[var(--tiger-table-header-bg,var(--tiger-component-table-header-bg,var(--tiger-surface-muted,#f9fafb)))]'
+
+export const tableRowHoverClasses =
+  'hover:bg-[var(--tiger-table-hover-bg,var(--tiger-component-table-hover-bg,var(--tiger-surface-muted,#f9fafb)))] transition-colors'
+
+export const tableRowGroupHoverClasses =
+  'group-hover:bg-[var(--tiger-table-hover-bg,var(--tiger-component-table-hover-bg,var(--tiger-surface-muted,#f9fafb)))]'
+
+export const tableRowStripedClasses =
+  'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
 
 export function getTableResponsiveTableClasses(mode: TableResponsiveMode): string {
   return mode === 'card' ? 'max-sm:hidden' : tableResponsiveTableClasses
@@ -109,6 +127,144 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
   return { leftOffsets, rightOffsets, minTableWidth, hasFixedColumns }
 }
 
+export interface TableFixedColumnStyle {
+  position: 'sticky'
+  left?: string
+  right?: string
+  zIndex: number
+}
+
+export interface TableFixedColumnOffsetInfo {
+  leftOffsets: Record<string, number>
+  rightOffsets: Record<string, number>
+}
+
+export function getFixedColumnPosition<T = Record<string, unknown>>(
+  column: Pick<TableColumn<T>, 'key' | 'fixed'>,
+  fixedInfo: TableFixedColumnOffsetInfo
+): TableFixedPosition | undefined {
+  if (column.fixed === 'left' || column.key in fixedInfo.leftOffsets) {
+    return 'left'
+  }
+
+  if (column.fixed === 'right' || column.key in fixedInfo.rightOffsets) {
+    return 'right'
+  }
+
+  return undefined
+}
+
+export function getFixedColumnStyle<T = Record<string, unknown>>(
+  column: Pick<TableColumn<T>, 'key' | 'fixed'>,
+  fixedInfo: TableFixedColumnOffsetInfo,
+  zIndex: number
+): TableFixedColumnStyle | undefined {
+  const fixed = getFixedColumnPosition(column, fixedInfo)
+  if (fixed === 'left') {
+    return {
+      position: 'sticky',
+      left: `${fixedInfo.leftOffsets[column.key] || 0}px`,
+      zIndex
+    }
+  }
+
+  if (fixed === 'right') {
+    return {
+      position: 'sticky',
+      right: `${fixedInfo.rightOffsets[column.key] || 0}px`,
+      zIndex
+    }
+  }
+
+  return undefined
+}
+
+function resolveFixedCellClassName<T = Record<string, unknown>>(
+  column: TableColumn<T>,
+  context: TableFixedCellClassNameContext<T>
+): string | undefined {
+  if (typeof column.fixedClassName === 'function') {
+    return column.fixedClassName(context) || undefined
+  }
+
+  return column.fixedClassName || undefined
+}
+
+function resolveFixedHeaderClassName<T = Record<string, unknown>>(
+  column: TableColumn<T>,
+  context: TableFixedHeaderClassNameContext<T>
+): string | undefined {
+  if (typeof column.fixedHeaderClassName === 'function') {
+    return column.fixedHeaderClassName(context) || undefined
+  }
+
+  return column.fixedHeaderClassName || undefined
+}
+
+export interface TableFixedCellClassOptions<T = Record<string, unknown>> {
+  view: 'table' | 'virtual-table'
+  column: TableColumn<T>
+  record: T
+  rowIndex: number
+  striped: boolean
+  stripedActive: boolean
+  selected: boolean
+  hoverable: boolean
+  fixedInfo: TableFixedColumnOffsetInfo
+  selectedClassName?: string
+}
+
+export function getTableFixedCellClasses<T = Record<string, unknown>>(
+  options: TableFixedCellClassOptions<T>
+): string | undefined {
+  const fixed = getFixedColumnPosition(options.column, options.fixedInfo)
+  if (!fixed) return undefined
+
+  const context: TableFixedCellClassNameContext<T> = {
+    view: options.view,
+    column: options.column,
+    fixed,
+    record: options.record,
+    rowIndex: options.rowIndex,
+    striped: options.striped,
+    selected: options.selected,
+    hoverable: options.hoverable
+  }
+
+  return classNames(
+    options.stripedActive ? tableRowStripedClasses : tableBackgroundClasses,
+    options.hoverable && tableRowGroupHoverClasses,
+    options.selected && options.selectedClassName,
+    resolveFixedCellClassName(options.column, context)
+  )
+}
+
+export interface TableFixedHeaderClassOptions<T = Record<string, unknown>> {
+  view: 'table' | 'virtual-table'
+  column: TableColumn<T>
+  stickyHeader: boolean
+  fixedInfo: TableFixedColumnOffsetInfo
+}
+
+export function getTableFixedHeaderCellClasses<T = Record<string, unknown>>(
+  options: TableFixedHeaderClassOptions<T>
+): string | undefined {
+  const fixed = getFixedColumnPosition(options.column, options.fixedInfo)
+  if (!fixed) return undefined
+
+  const context: TableFixedHeaderClassNameContext<T> = {
+    view: options.view,
+    column: options.column,
+    fixed,
+    stickyHeader: options.stickyHeader
+  }
+
+  return classNames(
+    tableHeaderBackgroundClasses,
+    resolveFixedHeaderClassName(options.column, context)
+  )
+}
+
 export const TABLE_VIRTUAL_RECOMMENDATION_THRESHOLD = 1000
 export const TABLE_AUTO_VIRTUAL_THRESHOLD = 10000
 
@@ -173,7 +329,8 @@ export function getTableWrapperClasses(bordered: boolean, maxHeight?: string | n
  */
 export function getTableHeaderClasses(stickyHeader: boolean): string {
   return classNames(
-    'bg-[var(--tiger-surface-muted,#f9fafb)] border-b border-[var(--tiger-border,#e5e7eb)]',
+    tableHeaderBackgroundClasses,
+    'border-b border-[var(--tiger-border,#e5e7eb)]',
     stickyHeader && 'sticky top-0 z-10'
   )
 }
@@ -204,7 +361,7 @@ export function getTableHeaderCellClasses(
     paddingClasses[size],
     alignClasses[align],
     sortable &&
-      'cursor-pointer select-none hover:bg-[var(--tiger-surface,#ffffff)]/50 transition-colors',
+      'cursor-pointer select-none hover:bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff)))]/60 transition-colors',
     customClassName
   )
 }
@@ -220,8 +377,8 @@ export function getTableRowClasses(
 ): string {
   return classNames(
     'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0',
-    hoverable && 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors',
-    striped && isEven && 'bg-[var(--tiger-surface-muted,#f9fafb)]/50',
+    hoverable && tableRowHoverClasses,
+    striped && isEven && tableRowStripedClasses,
     customClassName
   )
 }

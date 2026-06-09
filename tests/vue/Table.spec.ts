@@ -20,6 +20,11 @@ const dataSource = [
   { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' }
 ]
 
+const tableHeaderBgClass =
+  'bg-[var(--tiger-table-header-bg,var(--tiger-component-table-header-bg,var(--tiger-surface-muted,#f9fafb)))]'
+const tableStripeBgClass =
+  'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
+
 describe('Table', () => {
   describe('Rendering', () => {
     it('should render with default props', () => {
@@ -125,7 +130,7 @@ describe('Table', () => {
 
       const rows = container.querySelectorAll('tbody tr')
       // Check even rows (0-indexed, so row[0] is index 0 which is even)
-      expect(rows[0]).toHaveClass('bg-[var(--tiger-surface-muted,#f9fafb)]/50')
+      expect(rows[0]).toHaveClass(tableStripeBgClass)
     })
 
     it('should disable pagination when pagination is false', () => {
@@ -315,13 +320,13 @@ describe('Table', () => {
 
   describe('Pagination', () => {
     it('should render pagination controls by default', () => {
-      const { getByText } = renderWithProps(Table, {
+      const { getByRole } = renderWithProps(Table, {
         columns,
         dataSource
       })
 
-      expect(getByText('Previous')).toBeInTheDocument()
-      expect(getByText('Next')).toBeInTheDocument()
+      expect(getByRole('button', { name: 'Previous page' })).toBeInTheDocument()
+      expect(getByRole('button', { name: 'Next page' })).toBeInTheDocument()
     })
 
     it('should show page size selector', () => {
@@ -345,7 +350,7 @@ describe('Table', () => {
         email: `person${i + 1}@example.com`
       }))
 
-      const { getByText } = render(Table, {
+      const { getByRole } = render(Table, {
         props: {
           columns,
           dataSource: largeDataSource
@@ -355,7 +360,7 @@ describe('Table', () => {
         }
       })
 
-      const nextButton = getByText('Next')
+      const nextButton = getByRole('button', { name: 'Next page' })
       await fireEvent.click(nextButton)
 
       expect(onPageChange).toHaveBeenCalledWith({
@@ -365,12 +370,12 @@ describe('Table', () => {
     })
 
     it('should disable previous button on first page', () => {
-      const { getByText } = renderWithProps(Table, {
+      const { getByRole } = renderWithProps(Table, {
         columns,
         dataSource
       })
 
-      const prevButton = getByText('Previous')
+      const prevButton = getByRole('button', { name: 'Previous page' })
       expect(prevButton).toBeDisabled()
     })
 
@@ -414,14 +419,61 @@ describe('Table', () => {
       const nameHeader = getByText('Name').closest('th')!
       expect(nameHeader).toHaveStyle('position: sticky')
       expect(nameHeader).toHaveStyle('left: 0px')
+      expect(nameHeader).toHaveClass(tableHeaderBgClass)
 
       const actionsHeader = getByText('Actions').closest('th')!
       expect(actionsHeader).toHaveStyle('position: sticky')
       expect(actionsHeader).toHaveStyle('right: 0px')
+      expect(actionsHeader).toHaveClass(tableHeaderBgClass)
 
       const firstNameCell = getByText('John Doe').closest('td')!
       expect(firstNameCell).toHaveStyle('position: sticky')
       expect(firstNameCell).toHaveStyle('left: 0px')
+    })
+
+    it('keeps striped background on fixed body cells', () => {
+      const fixedColumns = [
+        { key: 'name', title: 'Name', width: 140, fixed: 'left' },
+        { key: 'age', title: 'Age', width: 120 },
+        { key: 'email', title: 'Email', width: 220 }
+      ]
+
+      const { getByText } = renderWithProps(Table, {
+        columns: fixedColumns,
+        dataSource,
+        striped: true,
+        pagination: false
+      })
+
+      expect(getByText('John Doe').closest('td')).toHaveClass(tableStripeBgClass)
+    })
+
+    it('supports fixedClassName and fixedHeaderClassName overrides', () => {
+      const fixedColumns = [
+        {
+          key: 'name',
+          title: 'Name',
+          width: 140,
+          fixed: 'left',
+          fixedHeaderClassName: 'custom-fixed-header',
+          fixedClassName: ({ selected, view, fixed }: { selected: boolean; view: string; fixed: string }) =>
+            selected ? `${view}-${fixed}-selected` : 'custom-fixed-cell'
+        },
+        { key: 'age', title: 'Age', width: 120 }
+      ]
+
+      const { getByText } = renderWithProps(Table, {
+        columns: fixedColumns,
+        dataSource,
+        pagination: false,
+        rowSelection: {
+          selectedRowKeys: [1],
+          type: 'checkbox'
+        }
+      })
+
+      expect(getByText('Name').closest('th')).toHaveClass('custom-fixed-header')
+      expect(getByText('John Doe').closest('td')).toHaveClass('table-left-selected')
     })
   })
 
@@ -447,6 +499,7 @@ describe('Table', () => {
       const emailHeaderLocked = getByText('Email').closest('th')!
       expect(emailHeaderLocked).toHaveStyle('position: sticky')
       expect(emailHeaderLocked).toHaveStyle('left: 260px')
+      expect(emailHeaderLocked).toHaveClass(tableHeaderBgClass)
 
       await fireEvent.click(getByLabelText('Unlock column Email'))
 

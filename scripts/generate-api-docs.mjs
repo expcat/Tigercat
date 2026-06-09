@@ -189,6 +189,16 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '透传 Table props；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。'
   },
+  Table: {
+    uses: ['TableColumn', 'Pagination', 'row selection', 'expandable rows'],
+    notes:
+      '固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。'
+  },
+  VirtualTable: {
+    uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
+    notes:
+      '复用 `TableColumn` 类型；固定列同样支持 `fixedClassName` / `fixedHeaderClassName`，用于跟随 striped、selected 和 hover 状态定制 sticky 单元格样式。'
+  },
   FormWizard: {
     uses: ['Steps/StepsItem', 'Button', 'ConfigProvider'],
     notes: '按钮文案优先使用显式 props，其次组件 `locale`，再回退到 `ConfigProvider` locale。'
@@ -214,9 +224,12 @@ const COMPONENT_SNIPPETS = {
       '<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" />',
     DataTableWithToolbar:
       '<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" :pagination="pagination" />',
+    Table:
+      '<Table :columns="fixedColumns" :data-source="rows" sticky-header :pagination="false" />',
     FormWizard: '<FormWizard :steps="steps" />',
     TaskBoard: '<TaskBoard :columns="columns" />',
-    Kanban: '<Kanban :columns="columns" />'
+    Kanban: '<Kanban :columns="columns" />',
+    VirtualTable: '<VirtualTable :data="rows" :columns="fixedColumns" :row-height="40" :height="320" />'
   },
   React: {
     ChatWindow: '<ChatWindow messages={messages} />',
@@ -226,9 +239,11 @@ const COMPONENT_SNIPPETS = {
     TableToolbar: '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} />',
     DataTableWithToolbar:
       '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} pagination={pagination} />',
+    Table: '<Table columns={fixedColumns} dataSource={rows} stickyHeader pagination={false} />',
     FormWizard: '<FormWizard steps={steps} />',
     TaskBoard: '<TaskBoard columns={columns} />',
-    Kanban: '<Kanban columns={columns} />'
+    Kanban: '<Kanban columns={columns} />',
+    VirtualTable: '<VirtualTable data={rows} columns={fixedColumns} rowHeight={40} height={320} />'
   }
 }
 

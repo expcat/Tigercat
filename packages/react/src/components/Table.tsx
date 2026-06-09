@@ -18,6 +18,7 @@ import {
   resolveTigerLocale,
   type RowSelectionConfig,
   type ExpandableConfig,
+  type TableColumn,
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
@@ -189,7 +190,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         ) => void)
       | undefined,
     onCellChange,
-    onColumnOrderChange,
+    onColumnOrderChange: onColumnOrderChange as ((columns: TableColumn[]) => void) | undefined,
     onRowOrderChange: onRowOrderChange as ((rows: Record<string, unknown>[]) => void) | undefined,
     onExport
   })

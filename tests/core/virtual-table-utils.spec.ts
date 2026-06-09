@@ -3,13 +3,18 @@ import {
   calculateVirtualRange,
   getVirtualRowKey,
   getVirtualTableContainerClasses,
+  getVirtualTableFixedCellClasses,
+  getVirtualTableFixedHeaderCellClasses,
+  getVirtualTableFixedInfo,
+  getVirtualTableFixedColumnPosition,
   getVirtualTableRowClasses,
   virtualTableContainerClasses,
   virtualTableBorderedClasses,
   virtualTableRowClasses,
   virtualTableRowHoverClasses,
   virtualTableRowStripedClasses,
-  virtualTableRowSelectedClasses
+  virtualTableRowSelectedClasses,
+  type TableColumn
 } from '@expcat/tigercat-core'
 
 describe('virtual-table-utils', () => {
@@ -121,6 +126,50 @@ describe('virtual-table-utils', () => {
     it('adds selected class', () => {
       const cls = getVirtualTableRowClasses(0, false, true)
       expect(cls).toContain(virtualTableRowSelectedClasses)
+    })
+  })
+
+  describe('fixed column helpers', () => {
+    const fixedColumns: TableColumn[] = [
+      {
+        key: 'id',
+        title: 'ID',
+        width: 80,
+        fixed: 'left',
+        fixedClassName: ({ selected, view }) => (selected ? `${view}-selected` : 'fixed-cell'),
+        fixedHeaderClassName: ({ fixed }) => `header-${fixed}`
+      },
+      { key: 'name', title: 'Name', width: 160 },
+      { key: 'action', title: 'Action', width: 100, fixed: 'right' }
+    ]
+
+    it('resolves fixed positions from virtual table metadata', () => {
+      const fixedInfo = getVirtualTableFixedInfo(fixedColumns)
+      expect(getVirtualTableFixedColumnPosition(fixedColumns[0], fixedInfo)).toBe('left')
+      expect(getVirtualTableFixedColumnPosition(fixedColumns[2], fixedInfo)).toBe('right')
+      expect(getVirtualTableFixedColumnPosition(fixedColumns[1], fixedInfo)).toBeUndefined()
+    })
+
+    it('builds fixed body classes with selected state support', () => {
+      const fixedInfo = getVirtualTableFixedInfo(fixedColumns)
+      const classes = getVirtualTableFixedCellClasses({
+        column: fixedColumns[0],
+        record: { id: 1, name: 'Row 1' },
+        rowIndex: 1,
+        striped: true,
+        selected: true,
+        fixedInfo
+      })
+
+      expect(classes).toContain(virtualTableRowSelectedClasses)
+      expect(classes).toContain('virtual-table-selected')
+    })
+
+    it('builds fixed header classes with custom overrides', () => {
+      const fixedInfo = getVirtualTableFixedInfo(fixedColumns)
+      const classes = getVirtualTableFixedHeaderCellClasses(fixedColumns[0], fixedInfo, true)
+
+      expect(classes).toContain('header-left')
     })
   })
 })

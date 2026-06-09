@@ -61,6 +61,10 @@ Showing 3 key props of 10; see source for the complete interface.
 
 Source: `packages/core/src/types/table.ts` · Interface: `TableProps`.
 
+Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
+
+Note: 固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。
+
 Showing 3 key props of 39; see source for the complete interface.
 
 | Prop              | Type               | Default | Notes                                                                                      |

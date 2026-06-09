@@ -7,11 +7,14 @@ import {
   getVirtualRowKey,
   getVirtualTableFixedInfo,
   getVirtualTableFixedCellStyle,
+  getTableFixedCellClasses,
+  getTableFixedHeaderCellClasses,
   virtualTableHeaderClasses,
   virtualTableHeaderCellClasses,
   virtualTableCellClasses,
   virtualTableEmptyClasses,
   virtualTableLoadingClasses,
+  virtualTableRowSelectedClasses,
   type TableColumn
 } from '@expcat/tigercat-core'
 
@@ -107,7 +110,15 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
               return (
                 <th
                   key={col.key as string}
-                  className={virtualTableHeaderCellClasses}
+                  className={classNames(
+                    virtualTableHeaderCellClasses,
+                    getTableFixedHeaderCellClasses({
+                      view: 'virtual-table',
+                      column: col,
+                      stickyHeader,
+                      fixedInfo
+                    })
+                  )}
                   style={{ ...widthStyle, ...stickyStyle }}>
                   {col.title ?? ''}
                 </th>
@@ -133,7 +144,21 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                 {columns.map((col) => (
                   <td
                     key={col.key as string}
-                    className={virtualTableCellClasses}
+                    className={classNames(
+                      virtualTableCellClasses,
+                      getTableFixedCellClasses({
+                        view: 'virtual-table',
+                        column: col,
+                        record: row,
+                        rowIndex: globalIdx,
+                        striped,
+                        stripedActive: striped && globalIdx % 2 === 1,
+                        selected: isSelected,
+                        hoverable: true,
+                        fixedInfo,
+                        selectedClassName: virtualTableRowSelectedClasses
+                      })
+                    )}
                     style={getVirtualTableFixedCellStyle(col.key, fixedInfo)}>
                     {renderCell
                       ? renderCell(row[col.key as keyof T], row, col)

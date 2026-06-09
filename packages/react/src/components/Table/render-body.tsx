@@ -3,6 +3,8 @@ import {
   classNames,
   getTableRowClasses,
   getTableCellClasses,
+  getTableFixedCellClasses,
+  getFixedColumnStyle,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
   getExpandedRowClasses,
@@ -170,21 +172,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           const dataKey = column.dataKey || column.key
           const cellValue = record[dataKey]
 
-          const isFixedLeft = column.fixed === 'left'
-          const isFixedRight = column.fixed === 'right'
-          const fixedStyle = isFixedLeft
-            ? {
-                position: 'sticky' as const,
-                left: `${ctx.fixedColumnsInfo.leftOffsets[column.key] || 0}px`,
-                zIndex: 10
-              }
-            : isFixedRight
-              ? {
-                  position: 'sticky' as const,
-                  right: `${ctx.fixedColumnsInfo.rightOffsets[column.key] || 0}px`,
-                  zIndex: 10
-                }
-              : undefined
+          const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo, 10)
 
           const widthStyle = column.width
             ? {
@@ -194,18 +182,17 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
 
           const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
 
-          const stickyBgClass =
-            striped && index % 2 === 0
-              ? 'bg-[var(--tiger-surface-muted,#f9fafb)]/50'
-              : 'bg-[var(--tiger-surface,#ffffff)]'
-
-          const stickyCellClass =
-            isFixedLeft || isFixedRight
-              ? classNames(
-                  stickyBgClass,
-                  hoverable && 'group-hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
-                )
-              : undefined
+          const stickyCellClass = getTableFixedCellClasses({
+            view: 'table',
+            column,
+            record,
+            rowIndex: index,
+            striped,
+            stripedActive: striped && index % 2 === 0,
+            selected: isSelected,
+            hoverable,
+            fixedInfo: ctx.fixedColumnsInfo
+          })
 
           const isEditing =
             ctx.editingCell?.rowIndex === index && ctx.editingCell?.columnKey === column.key

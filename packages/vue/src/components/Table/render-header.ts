@@ -3,6 +3,8 @@ import {
   classNames,
   getTableHeaderClasses,
   getTableHeaderCellClasses,
+  getTableFixedHeaderCellClasses,
+  getFixedColumnStyle,
   getCheckboxCellClasses,
   getExpandIconCellClasses
 } from '@expcat/tigercat-core'
@@ -65,21 +67,7 @@ export function renderTableHeader(
           : 'none'
       : undefined
 
-    const isFixedLeft = column.fixed === 'left'
-    const isFixedRight = column.fixed === 'right'
-    const fixedStyle = isFixedLeft
-      ? {
-          position: 'sticky',
-          left: `${ctx.fixedColumnsInfo.value.leftOffsets[column.key] || 0}px`,
-          zIndex: 15
-        }
-      : isFixedRight
-        ? {
-            position: 'sticky',
-            right: `${ctx.fixedColumnsInfo.value.rightOffsets[column.key] || 0}px`,
-            zIndex: 15
-          }
-        : undefined
+    const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo.value, 15)
 
     const widthStyle = column.width
       ? {
@@ -144,7 +132,12 @@ export function renderTableHeader(
               !!column.sortable,
               column.headerClassName
             ),
-            (isFixedLeft || isFixedRight) && 'bg-[var(--tiger-surface-muted,#f9fafb)]'
+            getTableFixedHeaderCellClasses({
+              view: 'table',
+              column,
+              stickyHeader: props.stickyHeader,
+              fixedInfo: ctx.fixedColumnsInfo.value
+            })
           ),
           style,
           draggable: props.columnDraggable ? 'true' : undefined,

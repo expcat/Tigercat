@@ -74,7 +74,7 @@ export default {
 新增或修改组件 API 时，同步检查：
 
 1. `examples/example/shared/app-config.ts` 中的分类、描述和路径。
-2. `examples/example/vue3/src` 与 `examples/example/react/src` 中的用法是否仍可复制运行。
+2. `examples/example/vue3/src` 与 `examples/example/react/src` 中的用法是否仍可复制运行，尤其是 `Table` / `VirtualTable` 的固定列与锁列示例。
 3. `pnpm example:build` 是否通过。
 
 组件 API 文档入口见 [skills/tigercat/SKILL.md](../skills/tigercat/SKILL.md)，测试入口见 [tests/README.md](../tests/README.md)。

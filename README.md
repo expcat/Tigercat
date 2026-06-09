@@ -69,6 +69,7 @@ export function App() {
 
 - 所有包配置为 `sideEffects: false`，支持 tree shaking；高级组件优先使用子路径导入以减小 bundle。
 - 大数据列表/表格优先使用 `VirtualList`、`VirtualTable` 或 `InfiniteScroll`；`Table` 不会因数据量自动切换布局，只通过 `data-tiger-virtual-recommended="true"` 暴露建议状态。
+- `Table` 与 `VirtualTable` 的固定列默认会跟随表格 token、条纹行和 hover 状态；需要覆盖 sticky 单元格外观时，优先在列定义上使用 `fixedClassName` / `fixedHeaderClassName`，而不是写全局 `[style*="position: sticky"]` 选择器。
 - 图表基于纯 SVG，无第三方图表运行时依赖；超过 1000 点建议启用降采样，超过 5000 点建议服务端聚合。
 - 主题基于 CSS 变量，推荐使用 `setThemeColors` 批量更新变量，减少重复重绘。
 - 浏览器支持范围为现代浏览器最新两个主要版本；当前 E2E 配置只运行 Chromium，如需恢复 Firefox/WebKit，可在 [playwright.config.ts](./playwright.config.ts) 中重新添加 project 并生成对应快照。

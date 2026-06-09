@@ -8,6 +8,11 @@ const columns = [
   { key: 'name', title: 'Name' }
 ]
 
+const tableHeaderBgClass =
+  'bg-[var(--tiger-table-header-bg,var(--tiger-component-table-header-bg,var(--tiger-surface-muted,#f9fafb)))]'
+const tableStripeBgClass =
+  'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
+
 function makeData(count: number) {
   return Array.from({ length: count }, (_, i) => ({
     id: i + 1,
@@ -201,6 +206,7 @@ describe('VirtualTable (Vue)', () => {
       const th = getByText('ID').closest('th')!
       expect(th.style.position).toBe('sticky')
       expect(th.style.left).toBe('0px')
+      expect(th).toHaveClass(tableHeaderBgClass)
     })
 
     it('applies sticky right style to fixed-right header cell', () => {
@@ -210,6 +216,7 @@ describe('VirtualTable (Vue)', () => {
       const th = getByText('Action').closest('th')!
       expect(th.style.position).toBe('sticky')
       expect(th.style.right).toBe('0px')
+      expect(th).toHaveClass(tableHeaderBgClass)
     })
 
     it('does not apply sticky style to non-fixed header cell', () => {
@@ -254,6 +261,52 @@ describe('VirtualTable (Vue)', () => {
         expect(lastCell.style.position).toBe('sticky')
         expect(lastCell.style.right).toBe('0px')
       }
+    })
+
+    it('keeps striped background on fixed body cells', () => {
+      const { getAllByRole } = render(VirtualTable, {
+        props: { data: makeFixedData(3), columns: fixedColumns, striped: true, rowHeight: 40, height: 400 }
+      })
+      const rows = getAllByRole('row')
+      const dataRows = rows.filter(
+        (r) =>
+          !r.querySelector('th') &&
+          r.getAttribute('aria-hidden') !== 'true' &&
+          r.getAttribute('aria-hidden') !== ''
+      )
+
+      if (dataRows.length > 1) {
+        expect(dataRows[1].querySelectorAll('td')[0]).toHaveClass(tableStripeBgClass)
+      }
+    })
+
+    it('supports fixedClassName and fixedHeaderClassName overrides', () => {
+      const styledColumns = [
+        {
+          key: 'id',
+          title: 'ID',
+          width: 80,
+          fixed: 'left' as const,
+          fixedHeaderClassName: 'custom-fixed-header',
+          fixedClassName: ({ selected, view, fixed }: { selected: boolean; view: string; fixed: string }) =>
+            selected ? `${view}-${fixed}-selected` : 'custom-fixed-cell'
+        },
+        { key: 'name', title: 'Name', width: 150 }
+      ]
+
+      const { getByText, getAllByRole } = render(VirtualTable, {
+        props: {
+          data: makeFixedData(3),
+          columns: styledColumns,
+          rowHeight: 40,
+          height: 240,
+          selectedKeys: [0]
+        }
+      })
+
+      expect(getByText('ID').closest('th')).toHaveClass('custom-fixed-header')
+      const dataRows = getAllByRole('row').filter((row) => row.querySelector('td'))
+      expect(dataRows[0].querySelectorAll('td')[0]).toHaveClass('virtual-table-left-selected')
     })
 
     it('supports sticky header + sticky columns simultaneously', () => {

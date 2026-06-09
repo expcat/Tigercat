@@ -77,6 +77,16 @@ const stickySnippet = `<Table
 
 const fixedSnippet = `<Table :columns="fixedColumns" :dataSource="basicData" :pagination="false" />`
 
+const fixedStyleSnippet = `<Table
+  :columns="styledFixedColumns"
+  :dataSource="basicData"
+  :rowSelection="{
+    selectedRowKeys: selectedRowKeys,
+    type: 'checkbox'
+  }"
+  :pagination="false"
+  @selection-change="handleSelectionChange" />`
+
 const lockableSnippet = `<Table
   :columns="lockableColumns"
   :dataSource="basicData"
@@ -296,6 +306,59 @@ const fixedColumns: TableColumn[] = [
   }
 ]
 
+const styledFixedColumns: TableColumn[] = [
+  {
+    key: 'name',
+    title: 'Name',
+    width: 180,
+    fixed: 'left',
+    fixedHeaderClassName:
+      'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)]',
+    fixedClassName: ({ selected }) =>
+      selected
+        ? 'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)] ring-2 ring-inset ring-sky-200/70'
+        : 'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)]'
+  },
+  { key: 'age', title: 'Age', width: 120 },
+  { key: 'email', title: 'Email', width: 240 },
+  { key: 'address', title: 'Address', width: 180 },
+  {
+    key: 'actions',
+    title: 'Actions',
+    align: 'center',
+    width: 180,
+    fixed: 'right',
+    fixedHeaderClassName:
+      'shadow-[inset_1px_0_0_var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)]',
+    fixedClassName: ({ selected }) =>
+      selected
+        ? 'shadow-[inset_1px_0_0_var(--tiger-border,#e5e7eb)] ring-2 ring-inset ring-sky-200/70'
+        : 'shadow-[inset_1px_0_0_var(--tiger-border,#e5e7eb)]',
+    render: (record: Record<string, unknown>) => {
+      const typedRecord = record as UserData
+      return h(Space, {}, () => [
+        h(
+          Button,
+          {
+            size: 'sm',
+            onClick: () => handleEdit(typedRecord)
+          },
+          () => 'Edit'
+        ),
+        h(
+          Button,
+          {
+            size: 'sm',
+            variant: 'secondary',
+            onClick: () => handleDelete(typedRecord)
+          },
+          () => 'Delete'
+        )
+      ])
+    }
+  }
+]
+
 // Lockable columns (toggle fixed via header lock button)
 const lockableColumns: TableColumn[] = [
   { key: 'name', title: 'Name', width: 160 },
@@ -453,6 +516,21 @@ const pagedData = computed(() => {
       description="左右滚动时固定列保持可见（需为固定列设置 width）。"
       :code="fixedSnippet">
       <Table :columns="fixedColumns" :dataSource="basicData" :pagination="false" />
+    </DemoBlock>
+
+    <DemoBlock
+      title="固定列样式自定义"
+      description="通过 fixedClassName / fixedHeaderClassName 按列覆盖 sticky 单元格外观；下面示例会在勾选行后高亮固定列。"
+      :code="fixedStyleSnippet">
+      <Table
+        :columns="styledFixedColumns"
+        :dataSource="basicData"
+        :rowSelection="{
+          selectedRowKeys: selectedRowKeys,
+          type: 'checkbox'
+        }"
+        :pagination="false"
+        @selection-change="handleSelectionChange" />
     </DemoBlock>
 
     <!-- 表头锁按钮 -->

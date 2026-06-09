@@ -119,6 +119,17 @@ const fixedSnippet = `<Table<UserData>
   pagination={false}
 />`
 
+const fixedStyleSnippet = `<Table<UserData>
+  columns={styledFixedColumns}
+  dataSource={basicData}
+  rowSelection={{
+    selectedRowKeys,
+    type: 'checkbox'
+  }}
+  pagination={false}
+  onSelectionChange={handleSelectionChange}
+/>`
+
 const lockableSnippet = `<Table<UserData>
   columns={lockableColumns}
   dataSource={basicData}
@@ -351,6 +362,47 @@ const TableDemo: React.FC = () => {
     }
   ]
 
+  const styledFixedColumns: TableColumn<UserData>[] = [
+    {
+      key: 'name',
+      title: 'Name',
+      width: 180,
+      fixed: 'left',
+      fixedHeaderClassName:
+        'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)]',
+      fixedClassName: ({ selected }) =>
+        selected
+          ? 'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)] ring-2 ring-inset ring-sky-200/70'
+          : 'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)]'
+    },
+    { key: 'age', title: 'Age', width: 120 },
+    { key: 'email', title: 'Email', width: 240 },
+    { key: 'address', title: 'Address', width: 180 },
+    {
+      key: 'actions',
+      title: 'Actions',
+      align: 'center',
+      width: 180,
+      fixed: 'right',
+      fixedHeaderClassName:
+        'shadow-[inset_1px_0_0_var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)]',
+      fixedClassName: ({ selected }) =>
+        selected
+          ? 'shadow-[inset_1px_0_0_var(--tiger-border,#e5e7eb)] ring-2 ring-inset ring-sky-200/70'
+          : 'shadow-[inset_1px_0_0_var(--tiger-border,#e5e7eb)]',
+      render: (record: UserData) => (
+        <Space>
+          <Button size="sm" onClick={() => handleEdit(record)}>
+            Edit
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => handleDelete(record)}>
+            Delete
+          </Button>
+        </Space>
+      )
+    }
+  ]
+
   // Lockable columns (toggle fixed via header lock button)
   const lockableColumns: TableColumn<UserData>[] = [
     { key: 'name', title: 'Name', width: 160 },
@@ -484,6 +536,22 @@ const TableDemo: React.FC = () => {
         description="左右滚动时固定列保持可见（需为固定列设置 width）。"
         code={fixedSnippet}>
         <Table<UserData> columns={fixedColumns} dataSource={basicData} pagination={false} />
+      </DemoBlock>
+
+      <DemoBlock
+        title="固定列样式自定义"
+        description="通过 fixedClassName / fixedHeaderClassName 按列覆盖 sticky 单元格外观；下面示例会在勾选行后高亮固定列。"
+        code={fixedStyleSnippet}>
+        <Table<UserData>
+          columns={styledFixedColumns}
+          dataSource={basicData}
+          rowSelection={{
+            selectedRowKeys,
+            type: 'checkbox'
+          }}
+          pagination={false}
+          onSelectionChange={handleSelectionChange}
+        />
       </DemoBlock>
 
       {/* 表头锁按钮 */}

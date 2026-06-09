@@ -11,22 +11,23 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## Component Notes
 
-| Component | Uses        | Notes                                                                                                  |
-| --------- | ----------- | ------------------------------------------------------------------------------------------------------ |
-| Kanban    | `TaskBoard` | Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。 |
+| Component    | Uses                                                          | Notes                                                                                                                                               |
+| ------------ | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Kanban       | `TaskBoard`                                                   | Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。                                              |
+| VirtualTable | `TableColumn`, `virtual scroll range`, `fixed column offsets` | 复用 `TableColumn` 类型；固定列同样支持 `fixedClassName` / `fixedHeaderClassName`，用于跟随 striped、selected 和 hover 状态定制 sticky 单元格样式。 |
 
-| Component       | Vue                             | React                          |
-| --------------- | ------------------------------- | ------------------------------ |
-| CodeEditor      | `<CodeEditor />`                | `<CodeEditor />`               |
-| FileManager     | `<FileManager />`               | `<FileManager />`              |
-| ImageAnnotation | `<ImageAnnotation />`           | `<ImageAnnotation />`          |
-| ImageViewer     | `<ImageViewer />`               | `<ImageViewer />`              |
-| InfiniteScroll  | `<InfiniteScroll />`            | `<InfiniteScroll />`           |
-| Kanban          | `<Kanban :columns="columns" />` | `<Kanban columns={columns} />` |
-| MarkdownEditor  | `<MarkdownEditor />`            | `<MarkdownEditor />`           |
-| PrintLayout     | `<PrintLayout />`               | `<PrintLayout />`              |
-| RichTextEditor  | `<RichTextEditor />`            | `<RichTextEditor />`           |
-| VirtualList     | `<VirtualList />`               | `<VirtualList />`              |
-| VirtualTable    | `<VirtualTable />`              | `<VirtualTable />`             |
+| Component       | Vue                                                                                    | React                                                                             |
+| --------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| CodeEditor      | `<CodeEditor />`                                                                       | `<CodeEditor />`                                                                  |
+| FileManager     | `<FileManager />`                                                                      | `<FileManager />`                                                                 |
+| ImageAnnotation | `<ImageAnnotation />`                                                                  | `<ImageAnnotation />`                                                             |
+| ImageViewer     | `<ImageViewer />`                                                                      | `<ImageViewer />`                                                                 |
+| InfiniteScroll  | `<InfiniteScroll />`                                                                   | `<InfiniteScroll />`                                                              |
+| Kanban          | `<Kanban :columns="columns" />`                                                        | `<Kanban columns={columns} />`                                                    |
+| MarkdownEditor  | `<MarkdownEditor />`                                                                   | `<MarkdownEditor />`                                                              |
+| PrintLayout     | `<PrintLayout />`                                                                      | `<PrintLayout />`                                                                 |
+| RichTextEditor  | `<RichTextEditor />`                                                                   | `<RichTextEditor />`                                                              |
+| VirtualList     | `<VirtualList />`                                                                      | `<VirtualList />`                                                                 |
+| VirtualTable    | `<VirtualTable :data="rows" :columns="fixedColumns" :row-height="40" :height="320" />` | `<VirtualTable data={rows} columns={fixedColumns} rowHeight={40} height={320} />` |
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.

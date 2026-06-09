@@ -8,11 +8,14 @@ import {
   getVirtualRowKey,
   getVirtualTableFixedInfo,
   getVirtualTableFixedCellStyle,
+  getTableFixedCellClasses,
+  getTableFixedHeaderCellClasses,
   virtualTableHeaderClasses,
   virtualTableHeaderCellClasses,
   virtualTableCellClasses,
   virtualTableEmptyClasses,
   virtualTableLoadingClasses,
+  virtualTableRowSelectedClasses,
   type TableColumn,
   type VirtualTableRange
 } from '@expcat/tigercat-core'
@@ -112,7 +115,15 @@ export const VirtualTable = defineComponent({
           'th',
           {
             key: col.key as string,
-            class: virtualTableHeaderCellClasses,
+            class: classNames(
+              virtualTableHeaderCellClasses,
+              getTableFixedHeaderCellClasses({
+                view: 'virtual-table',
+                column: col,
+                stickyHeader: props.stickyHeader,
+                fixedInfo: fi
+              })
+            ),
             style: { ...widthStyle, ...stickyStyle }
           },
           col.title ?? ''
@@ -141,7 +152,21 @@ export const VirtualTable = defineComponent({
             'td',
             {
               key: col.key as string,
-              class: virtualTableCellClasses,
+              class: classNames(
+                virtualTableCellClasses,
+                getTableFixedCellClasses({
+                  view: 'virtual-table',
+                  column: col,
+                  record: row,
+                  rowIndex: globalIdx,
+                  striped: props.striped,
+                  stripedActive: props.striped && globalIdx % 2 === 1,
+                  selected: isSelected,
+                  hoverable: true,
+                  fixedInfo: fi,
+                  selectedClassName: virtualTableRowSelectedClasses
+                })
+              ),
               style: getVirtualTableFixedCellStyle(col.key, fi)
             },
             String((row as Record<string, unknown>)[col.key as string] ?? '')

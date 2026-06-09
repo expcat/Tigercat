@@ -6,25 +6,33 @@
 
 import type { VirtualTableRange } from '../types/virtual-table'
 import type { TableColumn } from '../types/table'
-import { getFixedColumnOffsets } from './table-utils'
+import {
+  getFixedColumnOffsets,
+  getTableFixedCellClasses,
+  getTableFixedHeaderCellClasses,
+  getFixedColumnPosition,
+  tableHeaderBackgroundClasses
+} from './table-utils'
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
 export const virtualTableContainerClasses =
-  'tiger-virtual-table relative overflow-auto border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-bg,#ffffff)]'
+  `tiger-virtual-table relative overflow-auto border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff))))]`
 
 export const virtualTableHeaderClasses =
-  'sticky top-0 z-10 bg-[var(--tiger-bg-secondary,#f9fafb)] border-b border-[var(--tiger-border,#e5e7eb)]'
+  `${tableHeaderBackgroundClasses} sticky top-0 z-10 border-b border-[var(--tiger-border,#e5e7eb)]`
 
 export const virtualTableHeaderCellClasses =
   'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--tiger-text-secondary,#6b7280)]'
 
 export const virtualTableRowClasses =
-  'border-b border-[var(--tiger-border,#f3f4f6)] transition-colors'
+  'group border-b border-[var(--tiger-border,#f3f4f6)] transition-colors'
 
-export const virtualTableRowHoverClasses = 'hover:bg-[var(--tiger-bg-hover,#f9fafb)]'
+export const virtualTableRowHoverClasses =
+  'hover:bg-[var(--tiger-table-hover-bg,var(--tiger-component-table-hover-bg,var(--tiger-bg-hover,var(--tiger-surface-muted,#f9fafb))))] transition-colors'
 
-export const virtualTableRowStripedClasses = 'bg-[var(--tiger-bg-secondary,#f9fafb)]/50'
+export const virtualTableRowStripedClasses =
+  'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-bg-secondary,var(--tiger-surface-muted,#f9fafb))))]/50'
 
 export const virtualTableRowSelectedClasses = 'bg-[var(--tiger-primary,#2563eb)]/5'
 
@@ -38,7 +46,7 @@ export const virtualTableEmptyClasses =
   'flex items-center justify-center py-12 text-sm text-[var(--tiger-text-muted,#9ca3af)]'
 
 export const virtualTableLoadingClasses =
-  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-bg,#ffffff)]/60 z-20'
+  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff))))]/60 z-20'
 
 // ─── Virtual range calculation ────────────────────────────────────
 
@@ -144,4 +152,51 @@ export function getVirtualTableFixedCellStyle(
     }
   }
   return undefined
+}
+
+export interface VirtualTableFixedCellClassOptions<T = Record<string, unknown>> {
+  column: TableColumn<T>
+  record: T
+  rowIndex: number
+  striped: boolean
+  selected: boolean
+  hoverable?: boolean
+  fixedInfo: VirtualTableFixedInfo
+}
+
+export function getVirtualTableFixedCellClasses<T = Record<string, unknown>>(
+  options: VirtualTableFixedCellClassOptions<T>
+): string | undefined {
+  return getTableFixedCellClasses({
+    view: 'virtual-table',
+    column: options.column,
+    record: options.record,
+    rowIndex: options.rowIndex,
+    striped: options.striped,
+    stripedActive: options.striped && options.rowIndex % 2 === 1,
+    selected: options.selected,
+    hoverable: options.hoverable ?? true,
+    fixedInfo: options.fixedInfo,
+    selectedClassName: virtualTableRowSelectedClasses
+  })
+}
+
+export function getVirtualTableFixedHeaderCellClasses<T = Record<string, unknown>>(
+  column: TableColumn<T>,
+  fixedInfo: VirtualTableFixedInfo,
+  stickyHeader: boolean
+): string | undefined {
+  return getTableFixedHeaderCellClasses({
+    view: 'virtual-table',
+    column,
+    stickyHeader,
+    fixedInfo
+  })
+}
+
+export function getVirtualTableFixedColumnPosition<T = Record<string, unknown>>(
+  column: TableColumn<T>,
+  fixedInfo: VirtualTableFixedInfo
+) {
+  return getFixedColumnPosition(column, fixedInfo)
 }

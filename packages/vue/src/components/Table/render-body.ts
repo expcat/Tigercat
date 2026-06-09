@@ -3,6 +3,8 @@ import {
   classNames,
   getTableRowClasses,
   getTableCellClasses,
+  getTableFixedCellClasses,
+  getFixedColumnStyle,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
   getExpandedRowClasses,
@@ -180,21 +182,7 @@ export function renderTableBody(
       const dataKey = column.dataKey || column.key
       const cellValue = record[dataKey]
 
-      const isFixedLeft = column.fixed === 'left'
-      const isFixedRight = column.fixed === 'right'
-      const fixedStyle = isFixedLeft
-        ? {
-            position: 'sticky',
-            left: `${ctx.fixedColumnsInfo.value.leftOffsets[column.key] || 0}px`,
-            zIndex: 10
-          }
-        : isFixedRight
-          ? {
-              position: 'sticky',
-              right: `${ctx.fixedColumnsInfo.value.rightOffsets[column.key] || 0}px`,
-              zIndex: 10
-            }
-          : undefined
+      const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo.value, 10)
 
       const widthStyle = column.width
         ? {
@@ -204,17 +192,17 @@ export function renderTableBody(
 
       const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
 
-      const stickyBgClass =
-        props.striped && index % 2 === 0
-          ? 'bg-[var(--tiger-surface-muted,#f9fafb)]/50'
-          : 'bg-[var(--tiger-surface,#ffffff)]'
-      const stickyCellClass =
-        isFixedLeft || isFixedRight
-          ? classNames(
-              stickyBgClass,
-              props.hoverable && 'group-hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
-            )
-          : undefined
+      const stickyCellClass = getTableFixedCellClasses({
+        view: 'table',
+        column,
+        record,
+        rowIndex: index,
+        striped: props.striped,
+        stripedActive: props.striped && index % 2 === 0,
+        selected: isSelected,
+        hoverable: props.hoverable,
+        fixedInfo: ctx.fixedColumnsInfo.value
+      })
 
       const isEditing =
         ctx.editingCell.value?.rowIndex === index && ctx.editingCell.value?.columnKey === column.key
