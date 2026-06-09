@@ -45,7 +45,8 @@ export const ptBR: TigerLocale = defineLocale({
     pageText: 'página',
     prevPageAriaLabel: 'Página anterior',
     nextPageAriaLabel: 'Próxima página',
-    pageAriaLabel: 'Página {page}'
+    pageAriaLabel: 'Página {page}',
+    pageIndicatorText: 'Página {current} de {total}'
   },
   formWizard: {
     prevText: 'Anterior',

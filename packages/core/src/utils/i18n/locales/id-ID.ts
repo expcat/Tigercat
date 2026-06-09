@@ -29,7 +29,8 @@ export const idID: TigerLocale = {
     pageText: 'halaman',
     prevPageAriaLabel: 'Halaman sebelumnya',
     nextPageAriaLabel: 'Halaman berikutnya',
-    pageAriaLabel: 'Halaman {page}'
+    pageAriaLabel: 'Halaman {page}',
+    pageIndicatorText: 'Halaman {current} dari {total}'
   },
   formWizard: {
     prevText: 'Sebelumnya',

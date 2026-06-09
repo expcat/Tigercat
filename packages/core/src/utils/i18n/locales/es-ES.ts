@@ -45,7 +45,8 @@ export const esES: TigerLocale = defineLocale({
     pageText: 'página',
     prevPageAriaLabel: 'Página anterior',
     nextPageAriaLabel: 'Página siguiente',
-    pageAriaLabel: 'Página {page}'
+    pageAriaLabel: 'Página {page}',
+    pageIndicatorText: 'Página {current} de {total}'
   },
   formWizard: {
     prevText: 'Anterior',

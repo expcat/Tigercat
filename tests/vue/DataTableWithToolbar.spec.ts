@@ -55,7 +55,7 @@ describe('DataTableWithToolbar (Vue)', () => {
 
     expect(onFiltersChange).toHaveBeenCalledWith({ status: 'active' })
 
-    await userEvent.click(screen.getByRole('button', { name: 'Next' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
     expect(onPageChange).toHaveBeenCalledWith(2, 10)
 
     await userEvent.selectOptions(screen.getByRole('combobox'), '20')
@@ -76,9 +76,9 @@ describe('DataTableWithToolbar (Vue)', () => {
       }
     })
 
-    expect(screen.getByText('Showing 1 to 10 of 20 results')).toBeInTheDocument()
+    expect(screen.getByText('Total 20 items')).toBeInTheDocument()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Next' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
     expect(onPageChange).toHaveBeenCalledWith(2, 10)
   })
 
@@ -179,6 +179,26 @@ describe('DataTableWithToolbar (Vue)', () => {
     expect(screen.getByText('10 条/页')).toBeInTheDocument()
   })
 
+  it('uses Chinese locale for simple pagination text and aria labels', () => {
+    render({
+      render() {
+        return h(ConfigProvider, { locale: zhCN }, () =>
+          h(DataTableWithToolbar, {
+            columns,
+            dataSource: [{ id: 1, name: 'A' }],
+            pagination: { current: 1, pageSize: 10, total: 1, showTotal: true }
+          })
+        )
+      }
+    })
+
+    expect(screen.getByRole('button', { name: '上一页' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: '下一页' })).toBeDisabled()
+    expect(screen.getByText('第 1 页，共 1 页')).toBeInTheDocument()
+    expect(screen.getByLabelText('第 1 页，共 1 页')).toBeInTheDocument()
+    expect(screen.getByText('10 条/页')).toBeInTheDocument()
+  })
+
   it('lets pagination locale override ConfigProvider locale', () => {
     render({
       render() {
@@ -220,7 +240,7 @@ describe('DataTableWithToolbar (Vue)', () => {
         )
       }
     })
-    expect(screen.getByText('Showing 1 to 10 of 20 results')).toBeInTheDocument()
+    expect(screen.getByText('Total 20 items')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Forward' })).toBeInTheDocument()
     expect(screen.getByText('P.1/2')).toBeInTheDocument()
@@ -248,6 +268,28 @@ describe('DataTableWithToolbar (Vue)', () => {
       }
     })
     expect(screen.getByText('Rows 1-10 / 20')).toBeInTheDocument()
+  })
+
+  it('uses custom page size option labels without appending locale text', () => {
+    render({
+      render() {
+        return h(ConfigProvider, { locale: zhCN }, () =>
+          h(DataTableWithToolbar, {
+            columns,
+            dataSource: [{ id: 1, name: 'A' }],
+            pagination: {
+              current: 1,
+              pageSize: 10,
+              total: 20,
+              showTotal: true,
+              pageSizeOptions: [{ value: 10, label: '10 条/页（默认）' }]
+            }
+          })
+        )
+      }
+    })
+
+    expect(screen.getByText('10 条/页（默认）')).toBeInTheDocument()
   })
 
   it('uses ConfigProvider locale for plain Table pagination text', () => {

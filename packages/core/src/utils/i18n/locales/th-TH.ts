@@ -29,7 +29,8 @@ export const thTH: TigerLocale = {
     pageText: 'หน้า',
     prevPageAriaLabel: 'หน้าก่อนหน้า',
     nextPageAriaLabel: 'หน้าถัดไป',
-    pageAriaLabel: 'หน้า {page}'
+    pageAriaLabel: 'หน้า {page}',
+    pageIndicatorText: 'หน้า {current} จาก {total}'
   },
   formWizard: {
     prevText: 'ก่อนหน้า',

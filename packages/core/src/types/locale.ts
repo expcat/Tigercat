@@ -67,6 +67,8 @@ export interface TigerLocalePagination {
   nextPageAriaLabel?: string
   /** Page button aria-label template: supports {page} */
   pageAriaLabel?: string
+  /** Simple pagination page indicator template: supports {current}, {total} */
+  pageIndicatorText?: string
 }
 
 export interface TigerLocaleFormWizard {

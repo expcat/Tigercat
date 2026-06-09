@@ -29,7 +29,8 @@ export const enUS: TigerLocale = {
     pageText: 'page',
     prevPageAriaLabel: 'Previous page',
     nextPageAriaLabel: 'Next page',
-    pageAriaLabel: 'Page {page}'
+    pageAriaLabel: 'Page {page}',
+    pageIndicatorText: 'Page {current} of {total}'
   },
   formWizard: {
     prevText: 'Previous',

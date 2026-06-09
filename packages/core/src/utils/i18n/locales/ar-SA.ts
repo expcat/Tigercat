@@ -45,7 +45,8 @@ export const arSA: TigerLocale = defineLocale({
     pageText: 'صفحة',
     prevPageAriaLabel: 'الصفحة السابقة',
     nextPageAriaLabel: 'الصفحة التالية',
-    pageAriaLabel: 'الصفحة {page}'
+    pageAriaLabel: 'الصفحة {page}',
+    pageIndicatorText: 'الصفحة {current} من {total}'
   },
   formWizard: {
     prevText: 'السابق',

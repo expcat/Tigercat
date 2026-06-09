@@ -153,7 +153,8 @@ export const DEFAULT_PAGINATION_LABELS: Required<TigerLocalePagination> = {
   pageText: 'page',
   prevPageAriaLabel: 'Previous page',
   nextPageAriaLabel: 'Next page',
-  pageAriaLabel: 'Page {page}'
+  pageAriaLabel: 'Page {page}',
+  pageIndicatorText: 'Page {current} of {total}'
 }
 
 /**
@@ -166,7 +167,8 @@ export const ZH_CN_PAGINATION_LABELS: Required<TigerLocalePagination> = {
   pageText: '页',
   prevPageAriaLabel: '上一页',
   nextPageAriaLabel: '下一页',
-  pageAriaLabel: '第 {page} 页'
+  pageAriaLabel: '第 {page} 页',
+  pageIndicatorText: '第 {current} 页，共 {total} 页'
 }
 
 // ============================================================================
@@ -221,7 +223,9 @@ export function getPaginationLabels(
       locale?.pagination?.prevPageAriaLabel ?? defaultLabels.prevPageAriaLabel,
     nextPageAriaLabel:
       locale?.pagination?.nextPageAriaLabel ?? defaultLabels.nextPageAriaLabel,
-    pageAriaLabel: locale?.pagination?.pageAriaLabel ?? defaultLabels.pageAriaLabel
+    pageAriaLabel: locale?.pagination?.pageAriaLabel ?? defaultLabels.pageAriaLabel,
+    pageIndicatorText:
+      locale?.pagination?.pageIndicatorText ?? defaultLabels.pageIndicatorText
   }
 }
 
@@ -257,6 +261,17 @@ export function formatPaginationTotal(
  */
 export function formatPageAriaLabel(template: string, page: number, locale?: string): string {
   return template.replace('{page}', formatIntlNumber(page, locale))
+}
+
+export function formatPaginationPageIndicator(
+  template: string,
+  current: number,
+  total: number,
+  locale?: string
+): string {
+  return template
+    .replace('{current}', formatIntlNumber(current, locale))
+    .replace('{total}', formatIntlNumber(total, locale))
 }
 
 // ============================================================================

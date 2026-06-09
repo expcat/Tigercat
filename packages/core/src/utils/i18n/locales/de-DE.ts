@@ -45,7 +45,8 @@ export const deDE: TigerLocale = defineLocale({
     pageText: 'Seite',
     prevPageAriaLabel: 'Vorherige Seite',
     nextPageAriaLabel: 'Nächste Seite',
-    pageAriaLabel: 'Seite {page}'
+    pageAriaLabel: 'Seite {page}',
+    pageIndicatorText: 'Seite {current} von {total}'
   },
   formWizard: {
     prevText: 'Zurück',

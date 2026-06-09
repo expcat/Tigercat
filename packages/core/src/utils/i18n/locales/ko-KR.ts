@@ -29,7 +29,8 @@ export const koKR: TigerLocale = {
     pageText: '페이지',
     prevPageAriaLabel: '이전 페이지',
     nextPageAriaLabel: '다음 페이지',
-    pageAriaLabel: '{page} 페이지'
+    pageAriaLabel: '{page} 페이지',
+    pageIndicatorText: '전체 {total}페이지 중 {current}페이지'
   },
   formWizard: {
     prevText: '이전',

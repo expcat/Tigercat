@@ -29,7 +29,8 @@ export const jaJP: TigerLocale = {
     pageText: 'ページ',
     prevPageAriaLabel: '前のページ',
     nextPageAriaLabel: '次のページ',
-    pageAriaLabel: '{page} ページ'
+    pageAriaLabel: '{page} ページ',
+    pageIndicatorText: '全 {total} ページ中 {current} ページ'
   },
   formWizard: {
     prevText: '前へ',

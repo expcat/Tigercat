@@ -29,7 +29,8 @@ export const zhTW: TigerLocale = {
     pageText: '頁',
     prevPageAriaLabel: '上一頁',
     nextPageAriaLabel: '下一頁',
-    pageAriaLabel: '第 {page} 頁'
+    pageAriaLabel: '第 {page} 頁',
+    pageIndicatorText: '第 {current} 頁，共 {total} 頁'
   },
   formWizard: {
     prevText: '上一步',

@@ -3,6 +3,7 @@
  */
 
 import type { TigerLocaleInput } from './locale'
+import type { PaginationPageSizeOptionItem } from './pagination'
 
 /**
  * Table size types
@@ -204,7 +205,7 @@ export interface PaginationConfig {
    * Available page size options
    * @default [10, 20, 50, 100]
    */
-  pageSizeOptions?: number[]
+  pageSizeOptions?: PaginationPageSizeOptionItem[]
 
   /**
    * Whether to show page size selector

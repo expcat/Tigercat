@@ -29,7 +29,8 @@ export const viVN: TigerLocale = {
     pageText: 'trang',
     prevPageAriaLabel: 'Trang trước',
     nextPageAriaLabel: 'Trang sau',
-    pageAriaLabel: 'Trang {page}'
+    pageAriaLabel: 'Trang {page}',
+    pageIndicatorText: 'Trang {current} / {total}'
   },
   formWizard: {
     prevText: 'Trước',

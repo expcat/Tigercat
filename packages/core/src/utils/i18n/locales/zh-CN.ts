@@ -29,7 +29,8 @@ export const zhCN: TigerLocale = {
     pageText: '页',
     prevPageAriaLabel: '上一页',
     nextPageAriaLabel: '下一页',
-    pageAriaLabel: '第 {page} 页'
+    pageAriaLabel: '第 {page} 页',
+    pageIndicatorText: '第 {current} 页，共 {total} 页'
   },
   formWizard: {
     prevText: '上一步',
