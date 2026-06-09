@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createHashRouter } from 'react-router-dom'
 import { lazy } from 'react'
 import AppLayout from './layouts/AppLayout'
 
@@ -140,7 +140,7 @@ const UseDragDemo = lazy(() => import('./pages/UseDragDemo'))
 const UseControlledStateDemo = lazy(() => import('./pages/UseControlledStateDemo'))
 const UseChartInteractionDemo = lazy(() => import('./pages/UseChartInteractionDemo'))
 
-const router = createBrowserRouter(
+const router = createHashRouter(
   [
     {
       path: '/',
@@ -275,8 +275,7 @@ const router = createBrowserRouter(
         { path: 'use-chart-interaction', element: <UseChartInteractionDemo /> }
       ]
     }
-  ],
-  { basename: import.meta.env.BASE_URL }
+  ]
 )
 
 export default router
