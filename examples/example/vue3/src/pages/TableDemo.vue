@@ -41,6 +41,21 @@ const filterSnippet = `<Table :columns="filterableColumns" :dataSource="basicDat
 
 const customSnippet = `<Table :columns="customColumns" :dataSource="basicData" :pagination="false" />`
 
+const cardModeSnippet = `const cardColumns: TableColumn[] = [
+  { key: 'id', title: 'ID', hideInCard: true },
+  { key: 'name', title: 'Name', cardTitle: true },
+  { key: 'status', title: 'Status', cardPriority: 1 },
+  { key: 'age', title: 'Age', cardPriority: 2 },
+  { key: 'email', title: 'Email' }
+]
+
+<Table
+  :columns="cardColumns"
+  :dataSource="basicData"
+  responsive-mode="card"
+  card-breakpoint="lg"
+  :pagination="false" />`
+
 const paginationSnippet = `<Table
   :columns="basicColumns"
   :dataSource="pagedData"
@@ -174,6 +189,24 @@ const basicColumns: TableColumn[] = [
   { key: 'name', title: 'Name', width: 150 },
   { key: 'age', title: 'Age', width: 100 },
   { key: 'email', title: 'Email', width: 200 }
+]
+
+const cardColumns: TableColumn[] = [
+  { key: 'id', title: 'ID', hideInCard: true },
+  { key: 'name', title: 'Name', cardTitle: true },
+  {
+    key: 'status',
+    title: 'Status',
+    cardPriority: 1,
+    render: (record: Record<string, unknown>) => {
+      const typedRecord = record as UserData
+      const color =
+        typedRecord.status === 'active' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'
+      return h('span', { class: `px-2 py-1 rounded ${color}` }, typedRecord.status)
+    }
+  },
+  { key: 'age', title: 'Age', cardPriority: 2 },
+  { key: 'email', title: 'Email' }
 ]
 
 // Sortable columns
@@ -463,6 +496,18 @@ const pagedData = computed(() => {
       description="通过 render 函数自定义单元格内容。"
       :code="customSnippet">
       <Table :columns="customColumns" :dataSource="basicData" :pagination="false" />
+    </DemoBlock>
+
+    <DemoBlock
+      title="响应式卡片模式"
+      description='显式设置 responsive-mode="card" 后，窄于 card-breakpoint 时切换为卡片；列定义可隐藏字段、设置标题和排序。'
+      :code="cardModeSnippet">
+      <Table
+        :columns="cardColumns"
+        :dataSource="basicData"
+        responsive-mode="card"
+        card-breakpoint="lg"
+        :pagination="false" />
     </DemoBlock>
 
     <!-- 分页 -->

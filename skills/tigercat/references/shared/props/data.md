@@ -63,7 +63,7 @@ Source: `packages/core/src/types/table.ts` · Interface: `TableProps`.
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 
-Note: 固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。
+Note: 固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制。
 
 Showing 3 key props of 40; see source for the complete interface.
 

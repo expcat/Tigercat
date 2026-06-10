@@ -86,7 +86,8 @@ export function useVueBodyScrollLock(enabled: Ref<boolean>): void {
 }
 
 export function renderVueBodyTeleport(children: VNodeChild, disabled = false): VNodeChild {
-  return h(Teleport, { to: 'body', disabled }, children)
+  const normalizedChildren = children == null ? [] : Array.isArray(children) ? children : [children]
+  return h(Teleport as never, { to: 'body', disabled }, normalizedChildren)
 }
 
 export interface UseVueFocusTrapOptions {

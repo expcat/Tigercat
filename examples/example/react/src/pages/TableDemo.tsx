@@ -67,6 +67,22 @@ const customSnippet = `<Table<UserData>
   pagination={false}
 />`
 
+const cardModeSnippet = `const cardColumns: TableColumn<UserData>[] = [
+  { key: 'id', title: 'ID', hideInCard: true },
+  { key: 'name', title: 'Name', cardTitle: true },
+  { key: 'status', title: 'Status', cardPriority: 1 },
+  { key: 'age', title: 'Age', cardPriority: 2 },
+  { key: 'email', title: 'Email' }
+]
+
+<Table<UserData>
+  columns={cardColumns}
+  dataSource={basicData}
+  responsiveMode="card"
+  cardBreakpoint="lg"
+  pagination={false}
+/>`
+
 const paginationSnippet = `<Table<UserData>
   columns={basicColumns}
   dataSource={pagedData}
@@ -256,6 +272,23 @@ const TableDemo: React.FC = () => {
     { key: 'name', title: 'Name', width: 150 },
     { key: 'age', title: 'Age', width: 100 },
     { key: 'email', title: 'Email', width: 200 }
+  ]
+
+  const cardColumns: TableColumn<UserData>[] = [
+    { key: 'id', title: 'ID', hideInCard: true },
+    { key: 'name', title: 'Name', cardTitle: true },
+    {
+      key: 'status',
+      title: 'Status',
+      cardPriority: 1,
+      render: (record: UserData) => {
+        const color =
+          record.status === 'active' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'
+        return <span className={`px-2 py-1 rounded ${color}`}>{record.status}</span>
+      }
+    },
+    { key: 'age', title: 'Age', cardPriority: 2 },
+    { key: 'email', title: 'Email' }
   ]
 
   // Sortable columns
@@ -476,6 +509,19 @@ const TableDemo: React.FC = () => {
         description="通过 render 函数自定义单元格内容。"
         code={customSnippet}>
         <Table<UserData> columns={customColumns} dataSource={basicData} pagination={false} />
+      </DemoBlock>
+
+      <DemoBlock
+        title="响应式卡片模式"
+        description="显式设置 responsiveMode=&quot;card&quot; 后，窄于 cardBreakpoint 时切换为卡片；列定义可隐藏字段、设置标题和排序。"
+        code={cardModeSnippet}>
+        <Table<UserData>
+          columns={cardColumns}
+          dataSource={basicData}
+          responsiveMode="card"
+          cardBreakpoint="lg"
+          pagination={false}
+        />
       </DemoBlock>
 
       {/* 分页 */}

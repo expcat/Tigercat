@@ -187,12 +187,12 @@ const COMPONENT_USAGE_NOTES = {
   DataTableWithToolbar: {
     uses: ['Table', 'Input', 'Select', 'Button'],
     notes:
-      '透传 Table props；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。'
+      '透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。'
   },
   Table: {
     uses: ['TableColumn', 'Pagination', 'row selection', 'expandable rows'],
     notes:
-      '固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。'
+      '固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制。'
   },
   VirtualTable: {
     uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
@@ -223,9 +223,9 @@ const COMPONENT_SNIPPETS = {
     TableToolbar:
       '<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" />',
     DataTableWithToolbar:
-      '<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" :pagination="pagination" />',
+      '<DataTableWithToolbar :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :toolbar="toolbar" />',
     Table:
-      '<Table :columns="fixedColumns" :data-source="rows" sticky-header :pagination="false" />',
+      '<Table :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :pagination="false" />',
     FormWizard: '<FormWizard :steps="steps" />',
     TaskBoard: '<TaskBoard :columns="columns" />',
     Kanban: '<Kanban :columns="columns" />',
@@ -238,8 +238,9 @@ const COMPONENT_SNIPPETS = {
     NotificationCenter: '<NotificationCenter items={items} />',
     TableToolbar: '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} />',
     DataTableWithToolbar:
-      '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} pagination={pagination} />',
-    Table: '<Table columns={fixedColumns} dataSource={rows} stickyHeader pagination={false} />',
+      '<DataTableWithToolbar columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" toolbar={toolbar} />',
+    Table:
+      '<Table columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" pagination={false} />',
     FormWizard: '<FormWizard steps={steps} />',
     TaskBoard: '<TaskBoard columns={columns} />',
     Kanban: '<Kanban columns={columns} />',
