@@ -9,7 +9,6 @@ import {
   getStepTitleClasses,
   getStepsContainerClasses,
   calculateStepStatus,
-  stepFinishChar,
   type StepsDirection,
   type StepStatus,
   type StepSize,

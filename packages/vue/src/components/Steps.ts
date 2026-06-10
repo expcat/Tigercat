@@ -22,7 +22,6 @@ import {
   getStepDescriptionClasses,
   getStepsContainerClasses,
   calculateStepStatus,
-  stepFinishChar,
   type StepsDirection,
   type StepStatus,
   type StepSize
