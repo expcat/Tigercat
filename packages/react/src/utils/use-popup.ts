@@ -10,6 +10,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useFloating, useClickOutside, useEscapeKey } from './overlay'
 import {
   getTransformOrigin,
+  FLOATING_OVERLAY_Z_INDEX,
   buildTriggerHandlerMap,
   restoreFocus,
   type FloatingPlacement,
@@ -150,7 +151,7 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
       left: x,
       top: y,
       transformOrigin: getTransformOrigin(actualPlacement),
-      zIndex: 1000
+      zIndex: FLOATING_OVERLAY_Z_INDEX
     }),
     [x, y, actualPlacement]
   )

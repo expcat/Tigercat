@@ -61,7 +61,9 @@ export const ptBR: TigerLocale = defineLocale({
     searchPlaceholder: 'Pesquisar',
     searchButtonText: 'Pesquisar',
     selectedText: 'Selecionado',
-    selectedItemsText: 'itens'
+    selectedItemsText: 'itens',
+    columnSettingsText: 'Configurações de colunas',
+    columnSettingsAriaLabel: 'Configurações de colunas'
   },
   formWizard: {
     prevText: 'Anterior',

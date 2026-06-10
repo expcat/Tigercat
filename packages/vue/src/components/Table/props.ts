@@ -21,6 +21,8 @@ export interface VueTableProps {
   columns: TableColumn[]
   columnLockable?: boolean
   dataSource?: Record<string, unknown>[]
+  hiddenColumnKeys?: string[]
+  defaultHiddenColumnKeys?: string[]
   sort?: SortState
   defaultSort?: SortState
   filters?: Record<string, unknown>
@@ -43,9 +45,7 @@ export interface VueTableProps {
   tableLayout?: 'auto' | 'fixed'
   responsiveMode?: TableResponsiveMode
   cardBreakpoint?: TableCardBreakpoint
-  cardClassName?:
-    | string
-    | ((record: Record<string, unknown>, index: number) => string | undefined)
+  cardClassName?: string | ((record: Record<string, unknown>, index: number) => string | undefined)
   renderCard?: (context: TableCardRenderContext<Record<string, unknown>>) => unknown
   // v0.6.0
   virtual?: boolean
@@ -85,6 +85,14 @@ export const tableProps = {
   dataSource: {
     type: Array as PropType<Record<string, unknown>[]>,
     default: () => []
+  },
+  hiddenColumnKeys: {
+    type: Array as PropType<string[]>,
+    default: undefined
+  },
+  defaultHiddenColumnKeys: {
+    type: Array as PropType<string[]>,
+    default: undefined
   },
   sort: {
     type: Object as PropType<SortState>
@@ -216,6 +224,8 @@ export const tableEmits = [
   'selection-change',
   'sort-change',
   'filter-change',
+  'update:hiddenColumnKeys',
+  'hidden-columns-change',
   'page-change',
   'expand-change',
   'cell-change',

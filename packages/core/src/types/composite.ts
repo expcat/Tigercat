@@ -951,6 +951,31 @@ export interface TableToolbarProps {
    * Bulk action click callback
    */
   onBulkAction?: (action: TableToolbarAction, selectedKeys: (string | number)[]) => void
+  /**
+   * Whether to show the column-settings entry (a popover with checkboxes
+   * toggling column visibility via the table's `hiddenColumnKeys`).
+   * @default false
+   */
+  showColumnSettings?: boolean
+  /**
+   * Column-settings panel configuration
+   */
+  columnSettings?: TableToolbarColumnSettings
+}
+
+/**
+ * Column-settings panel configuration for the table toolbar
+ */
+export interface TableToolbarColumnSettings {
+  /**
+   * Panel title; defaults to the locale's `columnSettingsText`
+   */
+  title?: string
+  /**
+   * Columns that cannot be hidden from the panel.
+   * Takes precedence over `column.hideable`.
+   */
+  lockedColumnKeys?: string[]
 }
 
 /**

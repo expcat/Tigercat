@@ -184,9 +184,9 @@ describe('Table', () => {
       expect(getByText('All rows')).toBeInTheDocument()
       expect(getByText('More')).toBeInTheDocument()
       expect(getByLabelText('Pick row 1')).toBeInTheDocument()
-      expect(container.querySelector('[data-tiger-table-mobile="card"] input[type="checkbox"]')).toHaveClass(
-        'rounded'
-      )
+      expect(
+        container.querySelector('[data-tiger-table-mobile="card"] input[type="checkbox"]')
+      ).toHaveClass('rounded')
 
       await fireEvent.click(getByText('All rows'))
       expect(onSelectionChange).toHaveBeenCalledWith([1])
@@ -399,6 +399,81 @@ describe('Table', () => {
 
       expect(getByText('Name').closest('th')).toHaveClass('custom-fixed-header')
       expect(getByText('John Doe').closest('td')).toHaveClass('table-left-selected')
+    })
+  })
+
+  describe('Hidden Columns', () => {
+    it('hides columns listed in defaultHiddenColumnKeys (uncontrolled)', () => {
+      const { queryByText, getByText } = render(
+        <Table columns={columns} dataSource={dataSource} defaultHiddenColumnKeys={['email']} />
+      )
+
+      expect(getByText('Name')).toBeInTheDocument()
+      expect(queryByText('Email')).not.toBeInTheDocument()
+      expect(queryByText('john@example.com')).not.toBeInTheDocument()
+    })
+
+    it('hides columns via the controlled hiddenColumnKeys prop and reacts to updates', () => {
+      const { queryByText, getByText, rerender } = render(
+        <Table columns={columns} dataSource={dataSource} hiddenColumnKeys={['age']} />
+      )
+
+      expect(queryByText('Age')).not.toBeInTheDocument()
+      expect(getByText('Name')).toBeInTheDocument()
+
+      rerender(<Table columns={columns} dataSource={dataSource} hiddenColumnKeys={[]} />)
+      expect(getByText('Age')).toBeInTheDocument()
+    })
+
+    it('recalculates fixed column offsets based on visible columns only', () => {
+      const fixedColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', width: 140, fixed: 'left' },
+        { key: 'age', title: 'Age', width: 120, fixed: 'left' },
+        { key: 'email', title: 'Email', width: 220 }
+      ]
+
+      const { getByText } = render(
+        <Table
+          columns={fixedColumns}
+          dataSource={dataSource}
+          pagination={false}
+          hiddenColumnKeys={['name']}
+        />
+      )
+
+      const ageHeader = getByText('Age').closest('th')
+      expect(ageHeader!).toHaveStyle('position: sticky')
+      expect(ageHeader!).toHaveStyle('left: 0px')
+    })
+
+    it('renders portaled dropdown menus from fixed action columns into document.body', async () => {
+      const { Dropdown, DropdownMenu, DropdownItem } = await import('@expcat/tigercat-react')
+      const fixedColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', width: 140 },
+        {
+          key: 'actions',
+          title: 'Actions',
+          width: 140,
+          fixed: 'right',
+          render: () => (
+            <Dropdown trigger="click" showArrow={false}>
+              <button>Open menu</button>
+              <DropdownMenu>
+                <DropdownItem>Edit</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )
+        }
+      ]
+
+      const { getAllByText } = render(
+        <Table columns={fixedColumns} dataSource={dataSource} pagination={false} />
+      )
+
+      await fireEvent.click(getAllByText('Open menu')[0])
+      const menuWrapper = document.querySelector('[data-tiger-dropdown-menu]:not([hidden])')
+      expect(menuWrapper).not.toBeNull()
+      expect(menuWrapper!.parentElement).toBe(document.body)
     })
   })
 

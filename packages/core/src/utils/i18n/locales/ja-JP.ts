@@ -45,7 +45,9 @@ export const jaJP: TigerLocale = {
     searchPlaceholder: '検索',
     searchButtonText: '検索',
     selectedText: '選択済み',
-    selectedItemsText: '件'
+    selectedItemsText: '件',
+    columnSettingsText: '列の設定',
+    columnSettingsAriaLabel: '列の設定'
   },
   formWizard: {
     prevText: '前へ',

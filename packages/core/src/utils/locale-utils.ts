@@ -305,7 +305,9 @@ export const DEFAULT_TABLE_LABELS: Required<TigerLocaleTable> = {
   searchPlaceholder: 'Search',
   searchButtonText: 'Search',
   selectedText: 'Selected',
-  selectedItemsText: 'items'
+  selectedItemsText: 'items',
+  columnSettingsText: 'Column settings',
+  columnSettingsAriaLabel: 'Column settings'
 }
 
 export const ZH_CN_TABLE_LABELS: Required<TigerLocaleTable> = {
@@ -321,7 +323,9 @@ export const ZH_CN_TABLE_LABELS: Required<TigerLocaleTable> = {
   searchPlaceholder: '搜索',
   searchButtonText: '搜索',
   selectedText: '已选择',
-  selectedItemsText: '项'
+  selectedItemsText: '项',
+  columnSettingsText: '列设置',
+  columnSettingsAriaLabel: '列设置'
 }
 
 export function getTableLabels(
@@ -366,7 +370,15 @@ export function getTableLabels(
     selectedItemsText:
       overrides?.selectedItemsText ??
       locale?.table?.selectedItemsText ??
-      defaultLabels.selectedItemsText
+      defaultLabels.selectedItemsText,
+    columnSettingsText:
+      overrides?.columnSettingsText ??
+      locale?.table?.columnSettingsText ??
+      defaultLabels.columnSettingsText,
+    columnSettingsAriaLabel:
+      overrides?.columnSettingsAriaLabel ??
+      locale?.table?.columnSettingsAriaLabel ??
+      defaultLabels.columnSettingsAriaLabel
   }
 }
 

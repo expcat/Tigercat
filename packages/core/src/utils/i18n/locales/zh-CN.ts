@@ -45,7 +45,9 @@ export const zhCN: TigerLocale = {
     searchPlaceholder: '搜索',
     searchButtonText: '搜索',
     selectedText: '已选择',
-    selectedItemsText: '项'
+    selectedItemsText: '项',
+    columnSettingsText: '列设置',
+    columnSettingsAriaLabel: '列设置'
   },
   formWizard: {
     prevText: '上一步',

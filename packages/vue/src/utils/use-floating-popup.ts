@@ -10,6 +10,7 @@ import { computed, ref, watch, onBeforeUnmount, type Ref } from 'vue'
 import { useVueFloating, useVueClickOutside, useVueEscapeKey } from './overlay'
 import {
   getTransformOrigin,
+  FLOATING_OVERLAY_Z_INDEX,
   buildTriggerHandlerMap,
   restoreFocus,
   type FloatingPlacement,
@@ -182,7 +183,7 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
     left: `${x.value}px`,
     top: `${y.value}px`,
     transformOrigin: getTransformOrigin(actualPlacement.value),
-    zIndex: 1000
+    zIndex: FLOATING_OVERLAY_Z_INDEX
   }))
 
   // ─── Trigger handlers ────────────────────────────────────────────────

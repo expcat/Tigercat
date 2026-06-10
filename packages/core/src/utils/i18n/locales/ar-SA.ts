@@ -61,7 +61,9 @@ export const arSA: TigerLocale = defineLocale({
     searchPlaceholder: 'بحث',
     searchButtonText: 'بحث',
     selectedText: 'محدد',
-    selectedItemsText: 'عناصر'
+    selectedItemsText: 'عناصر',
+    columnSettingsText: 'إعدادات الأعمدة',
+    columnSettingsAriaLabel: 'إعدادات الأعمدة'
   },
   formWizard: {
     prevText: 'السابق',

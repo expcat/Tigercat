@@ -86,6 +86,32 @@ const cardColumns: TableColumn<UserRow>[] = [
   /* ...toolbar / pagination as above... */
 />`
 
+const columnSettingsSnippet = `// 工具栏列设置：内置 Popover + Checkbox 面板，驱动 Table 的 hiddenColumnKeys
+const settingsColumns: TableColumn<UserRow>[] = [
+  { key: 'name', title: '姓名', hideable: false },  // 不可隐藏
+  { key: 'email', title: '邮箱' },
+  { key: 'role', title: '角色' },
+  { key: 'status', title: '状态' }
+]
+
+<DataTableWithToolbar
+  columns={settingsColumns}
+  dataSource={pagedData}
+  toolbar={{ showColumnSettings: true }}
+  defaultHiddenColumnKeys={['role']}
+  onHiddenColumnsChange={(keys) => console.log('hidden:', keys)}
+/>
+
+// 受控模式：传 hiddenColumnKeys（配合 onHiddenColumnsChange 更新状态）
+// 锁定特定列：toolbar={{ showColumnSettings: true, columnSettings: { lockedColumnKeys: ['name'] } }}`
+
+const settingsColumns: TableColumn<UserRow>[] = [
+  { key: 'name', title: '姓名', width: '25%', hideable: false },
+  { key: 'email', title: '邮箱', width: '35%' },
+  { key: 'role', title: '角色', width: '20%' },
+  { key: 'status', title: '状态', width: '20%' }
+]
+
 const statusOptions = [
   { label: '启用', value: 'active' },
   { label: '禁用', value: 'disabled' }
@@ -211,6 +237,26 @@ const DataTableWithToolbarDemo: React.FC = () => {
           onSelectionChange={setSelectedRowKeys}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageChange}
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="列设置"
+        description="开启 showColumnSettings 后，工具栏右侧出现列设置入口，可勾选控制列显隐;hideable: false 的列不可隐藏。支持受控（hiddenColumnKeys）与非受控（defaultHiddenColumnKeys）两种模式。"
+        code={columnSettingsSnippet}>
+        <DataTableWithToolbar<UserRow>
+          columns={settingsColumns}
+          dataSource={pagedData}
+          tableLayout="fixed"
+          toolbar={{ showColumnSettings: true }}
+          defaultHiddenColumnKeys={['role']}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: filteredData.length,
+            showTotal: true
+          }}
+          onPageChange={handlePageChange}
         />
       </DemoBlock>
 

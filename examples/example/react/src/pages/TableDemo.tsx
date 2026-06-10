@@ -1,5 +1,14 @@
 import React, { useState } from 'react'
-import { Table, Button, Space, Pagination, type TableColumn } from '@expcat/tigercat-react'
+import {
+  Table,
+  Button,
+  Space,
+  Pagination,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  type TableColumn
+} from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 interface UserData extends Record<string, unknown> {
@@ -145,6 +154,28 @@ const fixedStyleSnippet = `<Table<UserData>
   pagination={false}
   onSelectionChange={handleSelectionChange}
 />`
+
+const fixedDropdownSnippet = `// Dropdown 菜单默认渲染到 body（portal），
+// 不会被后续行的固定列 sticky 单元格遮挡
+const dropdownColumns: TableColumn<UserData>[] = [
+  { key: 'name', title: 'Name', width: 160, fixed: 'left' },
+  /* ...更多列... */
+  {
+    key: 'actions',
+    title: 'Actions',
+    width: 120,
+    fixed: 'right',
+    render: (record) => (
+      <Dropdown trigger="click" showArrow={false}>
+        <Button size="sm" variant="outline">操作</Button>
+        <DropdownMenu>
+          <DropdownItem onClick={() => handleEdit(record)}>编辑</DropdownItem>
+          <DropdownItem onClick={() => handleDelete(record)}>删除</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    )
+  }
+]`
 
 const lockableSnippet = `<Table<UserData>
   columns={lockableColumns}
@@ -436,6 +467,33 @@ const TableDemo: React.FC = () => {
     }
   ]
 
+  // Fixed action column with inline dropdown menus (portaled to body)
+  const fixedDropdownColumns: TableColumn<UserData>[] = [
+    { key: 'name', title: 'Name', width: 160, fixed: 'left' },
+    { key: 'age', title: 'Age', width: 120 },
+    { key: 'email', title: 'Email', width: 240 },
+    { key: 'address', title: 'Address', width: 200 },
+    { key: 'status', title: 'Status', width: 140 },
+    {
+      key: 'actions',
+      title: 'Actions',
+      align: 'center',
+      width: 120,
+      fixed: 'right',
+      render: (record: UserData) => (
+        <Dropdown trigger="click" showArrow={false}>
+          <Button size="sm" variant="outline">
+            操作
+          </Button>
+          <DropdownMenu>
+            <DropdownItem onClick={() => handleEdit(record)}>编辑</DropdownItem>
+            <DropdownItem onClick={() => handleDelete(record)}>删除</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+    }
+  ]
+
   // Lockable columns (toggle fixed via header lock button)
   const lockableColumns: TableColumn<UserData>[] = [
     { key: 'name', title: 'Name', width: 160 },
@@ -513,7 +571,7 @@ const TableDemo: React.FC = () => {
 
       <DemoBlock
         title="响应式卡片模式"
-        description="显式设置 responsiveMode=&quot;card&quot; 后，窄于 cardBreakpoint 时切换为卡片；列定义可隐藏字段、设置标题和排序。"
+        description='显式设置 responsiveMode="card" 后，窄于 cardBreakpoint 时切换为卡片；列定义可隐藏字段、设置标题和排序。'
         code={cardModeSnippet}>
         <Table<UserData>
           columns={cardColumns}
@@ -598,6 +656,13 @@ const TableDemo: React.FC = () => {
           pagination={false}
           onSelectionChange={handleSelectionChange}
         />
+      </DemoBlock>
+
+      <DemoBlock
+        title="固定列内的下拉菜单"
+        description="行内 Dropdown 菜单默认渲染到 body（portal），展开后不会被后续行的固定列遮挡，也不会被表格滚动容器裁剪。如需回到旧的原位渲染，可设置 portal={false}。"
+        code={fixedDropdownSnippet}>
+        <Table<UserData> columns={fixedDropdownColumns} dataSource={basicData} pagination={false} />
       </DemoBlock>
 
       {/* 表头锁按钮 */}

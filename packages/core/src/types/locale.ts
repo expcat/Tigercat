@@ -87,6 +87,10 @@ export interface TigerLocaleTable {
   searchButtonText?: string
   selectedText?: string
   selectedItemsText?: string
+  /** Column-settings panel title / trigger label */
+  columnSettingsText?: string
+  /** Aria label for the column-settings trigger button */
+  columnSettingsAriaLabel?: string
 }
 
 export interface TigerLocaleFormWizard {

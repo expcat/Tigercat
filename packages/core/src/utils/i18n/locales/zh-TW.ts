@@ -45,7 +45,9 @@ export const zhTW: TigerLocale = {
     searchPlaceholder: '搜尋',
     searchButtonText: '搜尋',
     selectedText: '已選擇',
-    selectedItemsText: '筆'
+    selectedItemsText: '筆',
+    columnSettingsText: '欄位設定',
+    columnSettingsAriaLabel: '欄位設定'
   },
   formWizard: {
     prevText: '上一步',

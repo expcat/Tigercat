@@ -177,9 +177,9 @@ describe('Table', () => {
       expect(getByText('All rows')).toBeInTheDocument()
       expect(getByText('More')).toBeInTheDocument()
       expect(getByLabelText('Pick row 1')).toBeInTheDocument()
-      expect(container.querySelector('[data-tiger-table-mobile="card"] input[type="checkbox"]')).toHaveClass(
-        'rounded'
-      )
+      expect(
+        container.querySelector('[data-tiger-table-mobile="card"] input[type="checkbox"]')
+      ).toHaveClass('rounded')
 
       await fireEvent.click(getByText('All rows'))
       expect(onSelectionChange).toHaveBeenCalledWith([1])
@@ -626,6 +626,53 @@ describe('Table', () => {
 
       expect(getByText('Name').closest('th')).toHaveClass('custom-fixed-header')
       expect(getByText('John Doe').closest('td')).toHaveClass('table-left-selected')
+    })
+  })
+
+  describe('Hidden Columns', () => {
+    it('hides columns listed in defaultHiddenColumnKeys (uncontrolled)', () => {
+      const { queryByText, getByText } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        defaultHiddenColumnKeys: ['email']
+      })
+
+      expect(getByText('Name')).toBeInTheDocument()
+      expect(queryByText('Email')).not.toBeInTheDocument()
+      expect(queryByText('john@example.com')).not.toBeInTheDocument()
+    })
+
+    it('hides columns via the controlled hiddenColumnKeys prop and reacts to updates', async () => {
+      const { queryByText, getByText, rerender } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        hiddenColumnKeys: ['age']
+      })
+
+      expect(queryByText('Age')).not.toBeInTheDocument()
+      expect(getByText('Name')).toBeInTheDocument()
+
+      await rerender({ hiddenColumnKeys: [] })
+      expect(getByText('Age')).toBeInTheDocument()
+    })
+
+    it('recalculates fixed column offsets based on visible columns only', () => {
+      const fixedColumns = [
+        { key: 'name', title: 'Name', width: 140, fixed: 'left' as const },
+        { key: 'age', title: 'Age', width: 120, fixed: 'left' as const },
+        { key: 'email', title: 'Email', width: 220 }
+      ]
+
+      const { getByText } = renderWithProps(Table, {
+        columns: fixedColumns,
+        dataSource,
+        pagination: false,
+        hiddenColumnKeys: ['name']
+      })
+
+      const ageHeader = getByText('Age').closest('th')!
+      expect(ageHeader).toHaveStyle('position: sticky')
+      expect(ageHeader).toHaveStyle('left: 0px')
     })
   })
 

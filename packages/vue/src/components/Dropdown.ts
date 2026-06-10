@@ -22,6 +22,7 @@ import {
   getDropdownMenuClasses,
   getTransformOrigin,
   injectDropdownStyles,
+  FLOATING_OVERLAY_Z_INDEX,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
   handleMenuNavigation,
@@ -36,7 +37,12 @@ import type {
   DropdownProps as CoreDropdownProps,
   DropdownMenuProps as CoreDropdownMenuProps
 } from '@expcat/tigercat-core'
-import { useVueFloating, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
+import {
+  useVueFloating,
+  useVueClickOutside,
+  useVueEscapeKey,
+  renderVueBodyTeleport
+} from '../utils/overlay'
 
 // --- DropdownMenu (child component) ---
 
@@ -189,6 +195,15 @@ export const Dropdown = defineComponent({
       default: true
     },
     /**
+     * Render the menu into document.body (Teleport) so it is not clipped or
+     * covered by overflow/sticky ancestors (e.g. fixed table columns).
+     * @default true
+     */
+    portal: {
+      type: Boolean,
+      default: true
+    },
+    /**
      * Additional CSS classes
      */
     className: {
@@ -308,7 +323,7 @@ export const Dropdown = defineComponent({
         if (enabled) {
           cleanupClickOutside = useVueClickOutside({
             enabled: currentVisible,
-            containerRef,
+            refs: [containerRef, floatingRef],
             onOutsideClick: () => setVisible(false),
             defer: true
           })
@@ -352,12 +367,13 @@ export const Dropdown = defineComponent({
 
     const triggerClasses = computed(() => getDropdownTriggerClasses(props.disabled))
 
-    const menuWrapperClasses = classNames('absolute z-50', DROPDOWN_ENTER_CLASS)
+    const menuWrapperClasses = classNames('absolute', DROPDOWN_ENTER_CLASS)
 
     const menuWrapperStyles = computed(() => ({
       position: 'absolute' as const,
       left: `${x.value}px`,
       top: `${y.value}px`,
+      zIndex: FLOATING_OVERLAY_Z_INDEX,
       transformOrigin: getTransformOrigin(currentPlacement.value)
     }))
 
@@ -420,13 +436,14 @@ export const Dropdown = defineComponent({
         : null
 
       // Clone menuNode with id for aria-controls
-      const menu = menuNode
+      const menuWrapper = menuNode
         ? h(
             'div',
             {
               ref: floatingRef,
               class: menuWrapperClasses,
               style: menuWrapperStyles.value,
+              'data-tiger-dropdown-menu': '',
               onMouseenter: handleMouseEnter,
               onMouseleave: handleMouseLeave,
               onKeydown: handleMenuKeyDown,
@@ -435,6 +452,8 @@ export const Dropdown = defineComponent({
             [cloneVNode(menuNode as VNode, { id: menuId })]
           )
         : null
+
+      const menu = menuWrapper ? renderVueBodyTeleport(menuWrapper, !props.portal) : null
 
       const {
         class: _class,

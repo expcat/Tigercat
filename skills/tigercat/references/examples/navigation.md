@@ -9,6 +9,12 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 受控导航组件优先维护当前项、页码或展开状态，再传给组件。
 
+## Component Notes
+
+| Component | Uses                           | Notes                                                                                                                                                                                                                            |
+| --------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dropdown  | `DropdownMenu`, `DropdownItem` | 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。 |
+
 | Component        | Vue                    | React                  |
 | ---------------- | ---------------------- | ---------------------- |
 | Affix            | `<Affix />`            | `<Affix />`            |

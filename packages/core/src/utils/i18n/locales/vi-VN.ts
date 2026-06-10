@@ -45,7 +45,9 @@ export const viVN: TigerLocale = {
     searchPlaceholder: 'Tìm kiếm',
     searchButtonText: 'Tìm kiếm',
     selectedText: 'Đã chọn',
-    selectedItemsText: 'mục'
+    selectedItemsText: 'mục',
+    columnSettingsText: 'Cài đặt cột',
+    columnSettingsAriaLabel: 'Cài đặt cột'
   },
   formWizard: {
     prevText: 'Trước',

@@ -61,7 +61,9 @@ export const deDE: TigerLocale = defineLocale({
     searchPlaceholder: 'Suchen',
     searchButtonText: 'Suchen',
     selectedText: 'Ausgewählt',
-    selectedItemsText: 'Einträge'
+    selectedItemsText: 'Einträge',
+    columnSettingsText: 'Spalteneinstellungen',
+    columnSettingsAriaLabel: 'Spalteneinstellungen'
   },
   formWizard: {
     prevText: 'Zurück',

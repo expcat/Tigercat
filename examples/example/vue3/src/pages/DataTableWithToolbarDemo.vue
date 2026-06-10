@@ -83,6 +83,37 @@ const cardColumns = [
   card-breakpoint="lg"
 />`
 
+const columnSettingsSnippet = `<!-- 工具栏列设置：内置 Popover + Checkbox 面板，驱动 Table 的 hiddenColumnKeys -->
+<DataTableWithToolbar
+  :columns="settingsColumns"
+  :dataSource="pagedData"
+  :toolbar="{ showColumnSettings: true }"
+  v-model:hidden-column-keys="hiddenColumnKeys"
+/>
+
+<!-- settingsColumns 中 hideable: false 的列不可隐藏 -->
+<!-- 锁定特定列：:toolbar="{ showColumnSettings: true, columnSettings: { lockedColumnKeys: ['name'] } }" -->`
+
+const columnSettingsScriptSnippet = `import { ref } from 'vue'
+
+const hiddenColumnKeys = ref<string[]>(['role'])
+
+const settingsColumns = [
+  { key: 'name', title: '姓名', hideable: false }, // 不可隐藏
+  { key: 'email', title: '邮箱' },
+  { key: 'role', title: '角色' },
+  { key: 'status', title: '状态' }
+]`
+
+const settingsColumns: TableColumn<Record<string, unknown>>[] = [
+  { key: 'name', title: '姓名', width: '25%', hideable: false },
+  { key: 'email', title: '邮箱', width: '35%' },
+  { key: 'role', title: '角色', width: '20%' },
+  { key: 'status', title: '状态', width: '20%' }
+]
+
+const hiddenColumnKeys = ref<string[]>(['role'])
+
 const statusOptions = [
   { label: '启用', value: 'active' },
   { label: '禁用', value: 'disabled' }
@@ -203,6 +234,26 @@ const handleBulkAction = (actionKey: string) => {
         @page-size-change="handlePageChange"
         @selection-change="handleSelectionChange"
         @bulk-action="(action) => handleBulkAction(action.key as string)" />
+    </DemoBlock>
+
+    <DemoBlock
+      title="列设置"
+      description="开启 showColumnSettings 后，工具栏右侧出现列设置入口，可勾选控制列显隐；hideable: false 的列不可隐藏。支持 v-model:hidden-column-keys 双向绑定。"
+      :code="columnSettingsSnippet"
+      :script="columnSettingsScriptSnippet">
+      <DataTableWithToolbar
+        :columns="settingsColumns"
+        :dataSource="pagedData"
+        table-layout="fixed"
+        :toolbar="{ showColumnSettings: true }"
+        v-model:hidden-column-keys="hiddenColumnKeys"
+        :pagination="{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: filteredData.length,
+          showTotal: true
+        }"
+        @page-change="handlePageChange" />
     </DemoBlock>
 
     <DemoBlock

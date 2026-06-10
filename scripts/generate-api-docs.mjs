@@ -163,6 +163,11 @@ const EXAMPLE_NOTES = {
 }
 
 const COMPONENT_USAGE_NOTES = {
+  Dropdown: {
+    uses: ['DropdownMenu', 'DropdownItem'],
+    notes:
+      '菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。'
+  },
   ChatWindow: {
     uses: ['Avatar', 'Textarea/Input', 'Button', 'VirtualList', 'Empty'],
     notes:
@@ -181,18 +186,19 @@ const COMPONENT_USAGE_NOTES = {
     notes: '传 `groups` 时使用 Tabs 分组；平铺通知列表走 List。'
   },
   TableToolbar: {
-    uses: ['Input', 'Select', 'Button'],
-    notes: '这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。'
+    uses: ['Input', 'Select', 'Button', 'Popover', 'Checkbox'],
+    notes:
+      '这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列。'
   },
   DataTableWithToolbar: {
-    uses: ['Table', 'Input', 'Select', 'Button'],
+    uses: ['Table', 'Input', 'Select', 'Button', 'Popover', 'Checkbox'],
     notes:
-      '透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。'
+      '透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。'
   },
   Table: {
     uses: ['TableColumn', 'Pagination', 'row selection', 'expandable rows'],
     notes:
-      '固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制。'
+      '固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。'
   },
   VirtualTable: {
     uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
@@ -229,7 +235,8 @@ const COMPONENT_SNIPPETS = {
     FormWizard: '<FormWizard :steps="steps" />',
     TaskBoard: '<TaskBoard :columns="columns" />',
     Kanban: '<Kanban :columns="columns" />',
-    VirtualTable: '<VirtualTable :data="rows" :columns="fixedColumns" :row-height="40" :height="320" />'
+    VirtualTable:
+      '<VirtualTable :data="rows" :columns="fixedColumns" :row-height="40" :height="320" />'
   },
   React: {
     ChatWindow: '<ChatWindow messages={messages} />',

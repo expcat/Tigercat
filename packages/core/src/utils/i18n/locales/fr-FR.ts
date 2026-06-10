@@ -61,7 +61,9 @@ export const frFR: TigerLocale = defineLocale({
     searchPlaceholder: 'Rechercher',
     searchButtonText: 'Rechercher',
     selectedText: 'Sélectionné',
-    selectedItemsText: 'éléments'
+    selectedItemsText: 'éléments',
+    columnSettingsText: 'Paramètres des colonnes',
+    columnSettingsAriaLabel: 'Paramètres des colonnes'
   },
   formWizard: {
     prevText: 'Précédent',

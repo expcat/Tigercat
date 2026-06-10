@@ -8,6 +8,7 @@ import {
   filterDataAdvanced,
   groupDataByColumn,
   getFixedColumnOffsets,
+  filterHiddenColumns,
   type SortState,
   type PaginationConfig,
   type TableColumn,
@@ -26,6 +27,8 @@ import type { TableContext, TableProps } from './types'
 export interface UseTableStateInput {
   columns: TableProps['columns']
   dataSource: Record<string, unknown>[]
+  hiddenColumnKeys?: string[]
+  defaultHiddenColumnKeys?: string[]
   sort?: SortState
   defaultSort?: SortState
   filters?: Record<string, unknown>
@@ -49,6 +52,7 @@ export interface UseTableStateInput {
   onSelectionChange?: TableProps['onSelectionChange']
   onSortChange?: TableProps['onSortChange']
   onFilterChange?: TableProps['onFilterChange']
+  onHiddenColumnsChange?: TableProps['onHiddenColumnsChange']
   onPageChange?: TableProps['onPageChange']
   onExpandChange?: (
     expandedKeys: (string | number)[],
@@ -65,6 +69,8 @@ export function useTableState(input: UseTableStateInput): TableContext {
   const {
     columns,
     dataSource,
+    hiddenColumnKeys,
+    defaultHiddenColumnKeys,
     sort,
     defaultSort,
     filters,
@@ -86,6 +92,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     onSelectionChange,
     onSortChange,
     onFilterChange,
+    onHiddenColumnsChange,
     onPageChange,
     onExpandChange,
     onCellChange,
@@ -96,6 +103,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   const isSortControlled = sort !== undefined
   const isFiltersControlled = filters !== undefined
+  const isHiddenColumnsControlled = hiddenColumnKeys !== undefined
 
   const paginationConfig: PaginationConfig | null =
     pagination !== false && typeof pagination === 'object' ? pagination : null
@@ -110,6 +118,10 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   const [uncontrolledSortState, setUncontrolledSortState] = useState<SortState>(
     defaultSort ?? { key: null, direction: null }
+  )
+
+  const [uncontrolledHiddenColumnKeys, setUncontrolledHiddenColumnKeys] = useState<string[]>(
+    defaultHiddenColumnKeys ?? hiddenColumnKeys ?? []
   )
 
   const [uncontrolledFilterState, setUncontrolledFilterState] = useState<Record<string, unknown>>(
@@ -133,6 +145,9 @@ export function useTableState(input: UseTableStateInput): TableContext {
   >(expandable?.defaultExpandedRowKeys ?? expandable?.expandedRowKeys ?? [])
 
   const sortState = isSortControlled ? (sort as SortState) : uncontrolledSortState
+  const effectiveHiddenColumnKeys = isHiddenColumnsControlled
+    ? (hiddenColumnKeys as string[])
+    : uncontrolledHiddenColumnKeys
   const filterState = isFiltersControlled
     ? (filters as Record<string, unknown>)
     : uncontrolledFilterState
@@ -183,6 +198,12 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }, [isSelectionControlled, rowSelection?.selectedRowKeys])
 
   useEffect(() => {
+    if (isHiddenColumnsControlled && hiddenColumnKeys) {
+      setUncontrolledHiddenColumnKeys(hiddenColumnKeys)
+    }
+  }, [isHiddenColumnsControlled, hiddenColumnKeys])
+
+  useEffect(() => {
     if (isExpandControlled) {
       setUncontrolledExpandedRowKeys((expandable?.expandedRowKeys as (string | number)[]) ?? [])
     }
@@ -191,14 +212,15 @@ export function useTableState(input: UseTableStateInput): TableContext {
   const [fixedOverrides, setFixedOverrides] = useState<Record<string, 'left' | 'right' | false>>({})
 
   const displayColumns = useMemo<TableColumn[]>(() => {
-    return columns.map((column) => {
+    const mapped = columns.map((column) => {
       const hasOverride = Object.prototype.hasOwnProperty.call(fixedOverrides, column.key)
       return {
         ...column,
         fixed: hasOverride ? fixedOverrides[column.key] : column.fixed
       }
     })
-  }, [columns, fixedOverrides])
+    return filterHiddenColumns(mapped, effectiveHiddenColumnKeys)
+  }, [columns, fixedOverrides, effectiveHiddenColumnKeys])
 
   const totalColumnCount = useMemo(() => {
     let count = displayColumns.length
@@ -219,6 +241,13 @@ export function useTableState(input: UseTableStateInput): TableContext {
     () => getFixedColumnOffsets(displayColumns, measuredColumnWidths),
     [displayColumns, measuredColumnWidths]
   )
+
+  function handleSetHiddenColumns(hiddenKeys: string[]) {
+    if (!isHiddenColumnsControlled) {
+      setUncontrolledHiddenColumnKeys(hiddenKeys)
+    }
+    onHiddenColumnsChange?.(hiddenKeys)
+  }
 
   function toggleColumnLock(columnKey: string) {
     setFixedOverrides((prev) => {
@@ -506,10 +535,12 @@ export function useTableState(input: UseTableStateInput): TableContext {
     sortState,
     currentPage,
     currentPageSize,
+    hiddenColumnKeys: effectiveHiddenColumnKeys,
     editingCell,
     editingValue,
     setEditingValue,
     toggleColumnLock,
+    handleSetHiddenColumns,
     handleSort,
     handleFilter,
     handlePageChange,

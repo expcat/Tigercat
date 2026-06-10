@@ -61,7 +61,9 @@ export const esES: TigerLocale = defineLocale({
     searchPlaceholder: 'Buscar',
     searchButtonText: 'Buscar',
     selectedText: 'Seleccionado',
-    selectedItemsText: 'elementos'
+    selectedItemsText: 'elementos',
+    columnSettingsText: 'Configuración de columnas',
+    columnSettingsAriaLabel: 'Configuración de columnas'
   },
   formWizard: {
     prevText: 'Anterior',

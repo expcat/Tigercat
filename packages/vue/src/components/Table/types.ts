@@ -35,6 +35,7 @@ export interface TableContext {
   filterState: ComputedRef<Record<string, unknown>>
   currentPage: ComputedRef<number>
   currentPageSize: ComputedRef<number>
+  hiddenColumnKeys: ComputedRef<string[]>
   selectedRowKeys: ComputedRef<(string | number)[]>
   expandedRowKeys: ComputedRef<(string | number)[]>
 
@@ -45,6 +46,7 @@ export interface TableContext {
 
   // --- Handlers ---
   toggleColumnLock: (key: string) => void
+  handleSetHiddenColumns: (hiddenKeys: string[]) => void
   handleSetSort: (sort: SortState) => void
   handleSort: (columnKey: string) => void
   handleFilter: (columnKey: string, value: unknown) => void

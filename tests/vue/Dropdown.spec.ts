@@ -28,7 +28,7 @@ describe('Dropdown', () => {
   })
 
   it('is hidden by default (hover trigger)', () => {
-    const { container } = render(Dropdown, {
+    render(Dropdown, {
       slots: {
         default: () => [
           h('button', null, 'Trigger'),
@@ -38,12 +38,12 @@ describe('Dropdown', () => {
     })
 
     // Floating UI uses `hidden` attribute now
-    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+    const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
     expect(wrapper).toHaveAttribute('hidden')
   })
 
   it('supports offset prop', () => {
-    const { container } = render(Dropdown, {
+    render(Dropdown, {
       props: { placement: 'top-end', offset: 12 },
       slots: {
         default: () => [
@@ -54,12 +54,12 @@ describe('Dropdown', () => {
     })
 
     // Verify component renders with offset prop
-    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+    const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
     expect(wrapper).toBeInTheDocument()
   })
 
   it('toggles visibility in click trigger mode and closes on outside click / Escape', async () => {
-    const { container } = render(Dropdown, {
+    render(Dropdown, {
       props: { trigger: 'click' },
       slots: {
         default: () => [
@@ -73,7 +73,7 @@ describe('Dropdown', () => {
     })
 
     // Floating UI uses `hidden` attribute now
-    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+    const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
     expect(wrapper).toHaveAttribute('hidden')
 
     await fireEvent.click(screen.getByText('Trigger'))
@@ -225,7 +225,7 @@ describe('Dropdown', () => {
 
   describe('disabled', () => {
     it('does not open when disabled', async () => {
-      const { container } = render(Dropdown, {
+      render(Dropdown, {
         props: { trigger: 'click', disabled: true },
         slots: {
           default: () => [
@@ -236,7 +236,7 @@ describe('Dropdown', () => {
       })
 
       await fireEvent.click(screen.getByText('Trigger'))
-      const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
       expect(wrapper).toHaveAttribute('hidden')
     })
   })
@@ -260,6 +260,22 @@ describe('Dropdown', () => {
 
   describe('defaultOpen', () => {
     it('renders open when defaultOpen is true', () => {
+      render(Dropdown, {
+        props: { defaultOpen: true },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      expect(wrapper).not.toHaveAttribute('hidden')
+    })
+  })
+  describe('portal', () => {
+    it('renders the menu into document.body by default', () => {
       const { container } = render(Dropdown, {
         props: { defaultOpen: true },
         slots: {
@@ -270,13 +286,33 @@ describe('Dropdown', () => {
         }
       })
 
-      const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      expect(wrapper?.parentElement).toBe(document.body)
+      expect(container.querySelector('[data-tiger-dropdown-menu]')).toBeNull()
+    })
+
+    it('renders the menu in place when portal is false', () => {
+      const { container } = render(Dropdown, {
+        props: { defaultOpen: true, portal: false },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      const wrapper = container.querySelector(
+        '.tiger-dropdown-container [data-tiger-dropdown-menu]'
+      )
+      expect(wrapper).toBeInTheDocument()
       expect(wrapper).not.toHaveAttribute('hidden')
     })
   })
+
   describe('Edge Cases', () => {
     it('does not close on item click when closeOnClick is false', async () => {
-      const { container } = render(Dropdown, {
+      render(Dropdown, {
         props: { trigger: 'click', closeOnClick: false },
         slots: {
           default: () => [
@@ -286,7 +322,7 @@ describe('Dropdown', () => {
         }
       })
 
-      const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
       await fireEvent.click(screen.getByText('Trigger'))
       expect(wrapper).not.toHaveAttribute('hidden')
 

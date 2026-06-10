@@ -126,6 +126,24 @@ export function getCardColumns<T = Record<string, unknown>>(
 }
 
 /**
+ * Filter out columns whose key is listed in `hiddenKeys`.
+ *
+ * Returns the original array reference when no key matches, so memoized
+ * consumers (fixed-column offsets, card layout) keep referential stability.
+ */
+export function filterHiddenColumns<T = Record<string, unknown>>(
+  columns: TableColumn<T>[],
+  hiddenKeys?: readonly string[]
+): TableColumn<T>[] {
+  if (!hiddenKeys || hiddenKeys.length === 0) {
+    return columns
+  }
+  const hidden = new Set(hiddenKeys)
+  const visible = columns.filter((column) => !hidden.has(column.key))
+  return visible.length === columns.length ? columns : visible
+}
+
+/**
  * Parse a column width into a pixel number.
  *
  * Notes:

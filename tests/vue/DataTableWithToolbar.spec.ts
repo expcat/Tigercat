@@ -402,6 +402,90 @@ describe('DataTableWithToolbar (Vue)', () => {
     expect(screen.getByText('共 20 条')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '下一页' })).toBeInTheDocument()
   })
+  describe('Column Settings', () => {
+    const multiColumns: TableColumn<RowData>[] = [
+      { key: 'name', title: 'Name' },
+      { key: 'email', title: 'Email' },
+      { key: 'actions', title: 'Actions', hideable: false }
+    ]
+
+    it('renders the column settings entry and toggles column visibility', async () => {
+      const onHiddenColumnsChange = vi.fn()
+      const onUpdateHiddenColumnKeys = vi.fn()
+
+      render(DataTableWithToolbar, {
+        props: {
+          columns: multiColumns,
+          dataSource: [{ id: 1, name: 'A', email: 'a@example.com' }],
+          toolbar: { showColumnSettings: true },
+          pagination: false
+        },
+        attrs: {
+          onHiddenColumnsChange,
+          'onUpdate:hiddenColumnKeys': onUpdateHiddenColumnKeys
+        }
+      })
+
+      await userEvent.click(screen.getByRole('button', { name: 'Column settings' }))
+
+      const emailCheckbox = screen.getByRole('checkbox', { name: 'Email' })
+      expect(emailCheckbox).toBeChecked()
+
+      await userEvent.click(emailCheckbox)
+      expect(onHiddenColumnsChange).toHaveBeenCalledWith(['email'])
+      expect(onUpdateHiddenColumnKeys).toHaveBeenCalledWith(['email'])
+      expect(screen.queryByRole('columnheader', { name: 'Email' })).not.toBeInTheDocument()
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Email' }))
+      expect(onHiddenColumnsChange).toHaveBeenLastCalledWith([])
+      expect(screen.getByRole('columnheader', { name: 'Email' })).toBeInTheDocument()
+    })
+
+    it('disables checkboxes for non-hideable and locked columns', async () => {
+      render(DataTableWithToolbar, {
+        props: {
+          columns: multiColumns,
+          dataSource: [{ id: 1, name: 'A', email: 'a@example.com' }],
+          toolbar: {
+            showColumnSettings: true,
+            columnSettings: { lockedColumnKeys: ['name'] }
+          },
+          pagination: false
+        }
+      })
+
+      await userEvent.click(screen.getByRole('button', { name: 'Column settings' }))
+
+      expect(screen.getByRole('checkbox', { name: 'Name' })).toBeDisabled()
+      expect(screen.getByRole('checkbox', { name: 'Actions' })).toBeDisabled()
+      expect(screen.getByRole('checkbox', { name: 'Email' })).toBeEnabled()
+    })
+
+    it('keeps internal state untouched in controlled mode and only emits', async () => {
+      const onHiddenColumnsChange = vi.fn()
+
+      render(DataTableWithToolbar, {
+        props: {
+          columns: multiColumns,
+          dataSource: [{ id: 1, name: 'A', email: 'a@example.com' }],
+          toolbar: { showColumnSettings: true },
+          hiddenColumnKeys: [],
+          pagination: false
+        },
+        attrs: {
+          onHiddenColumnsChange
+        }
+      })
+
+      await userEvent.click(screen.getByRole('button', { name: 'Column settings' }))
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Email' }))
+
+      expect(onHiddenColumnsChange).toHaveBeenCalledWith(['email'])
+      // Controlled: parent did not update the prop, so the column stays visible
+      expect(screen.getByRole('columnheader', { name: 'Email' })).toBeInTheDocument()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(DataTableWithToolbar, {

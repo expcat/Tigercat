@@ -9,6 +9,7 @@ import {
   groupDataByColumn,
   getFixedColumnOffsets,
   getFixedVirtualRange,
+  filterHiddenColumns,
   type TableColumn,
   type SortState,
   type SortDirection,
@@ -36,11 +37,15 @@ export function useTableState(
   })
 
   const isSortControlled = computed(() => props.sort !== undefined)
+  const isHiddenColumnsControlled = computed(() => props.hiddenColumnKeys !== undefined)
   const isFiltersControlled = computed(() => props.filters !== undefined)
   const isSelectionControlled = computed(() => props.rowSelection?.selectedRowKeys !== undefined)
   const isExpandControlled = computed(() => props.expandable?.expandedRowKeys !== undefined)
 
   const uncontrolledSortState = ref<SortState>(props.defaultSort ?? { key: null, direction: null })
+  const uncontrolledHiddenColumnKeys = ref<string[]>(
+    props.defaultHiddenColumnKeys ?? props.hiddenColumnKeys ?? []
+  )
   const uncontrolledFilterState = ref<Record<string, unknown>>(props.defaultFilters ?? {})
 
   const uncontrolledCurrentPage = ref(
@@ -60,6 +65,9 @@ export function useTableState(
   )
 
   const sortState = computed(() => props.sort ?? uncontrolledSortState.value)
+  const hiddenColumnKeys = computed(
+    () => props.hiddenColumnKeys ?? uncontrolledHiddenColumnKeys.value
+  )
   const filterState = computed(() => props.filters ?? uncontrolledFilterState.value)
   const currentPage = computed(() => {
     return paginationConfig.value?.current ?? uncontrolledCurrentPage.value
@@ -88,6 +96,15 @@ export function useTableState(
     (next) => {
       if (next !== undefined) {
         uncontrolledFilterState.value = next
+      }
+    }
+  )
+
+  watch(
+    () => props.hiddenColumnKeys,
+    (next) => {
+      if (next !== undefined) {
+        uncontrolledHiddenColumnKeys.value = next
       }
     }
   )
@@ -131,13 +148,14 @@ export function useTableState(
   const fixedOverrides = ref<Record<string, 'left' | 'right' | false>>({})
 
   const displayColumns = computed<TableColumn[]>(() => {
-    return props.columns.map((column) => {
+    const mapped = props.columns.map((column) => {
       const hasOverride = column.key in fixedOverrides.value
       return {
         ...column,
         fixed: hasOverride ? fixedOverrides.value[column.key] : column.fixed
       }
     })
+    return filterHiddenColumns(mapped, hiddenColumnKeys.value)
   })
 
   const fixedColumnsInfo = computed(() => {
@@ -151,6 +169,14 @@ export function useTableState(
     }
     return map
   })
+
+  function handleSetHiddenColumns(hiddenKeys: string[]) {
+    if (!isHiddenColumnsControlled.value) {
+      uncontrolledHiddenColumnKeys.value = hiddenKeys
+    }
+    emit('update:hiddenColumnKeys', hiddenKeys)
+    emit('hidden-columns-change', hiddenKeys)
+  }
 
   function toggleColumnLock(columnKey: string) {
     const original = props.columns.find((c) => c.key === columnKey)?.fixed
@@ -491,12 +517,14 @@ export function useTableState(
     filterState,
     currentPage,
     currentPageSize,
+    hiddenColumnKeys,
     selectedRowKeys,
     expandedRowKeys,
     editingCell,
     editingValue,
     virtualScrollTop,
     toggleColumnLock,
+    handleSetHiddenColumns,
     handleSetSort,
     handleSort,
     handleFilter,

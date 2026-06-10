@@ -45,7 +45,9 @@ export const thTH: TigerLocale = {
     searchPlaceholder: 'ค้นหา',
     searchButtonText: 'ค้นหา',
     selectedText: 'เลือกแล้ว',
-    selectedItemsText: 'รายการ'
+    selectedItemsText: 'รายการ',
+    columnSettingsText: 'ตั้งค่าคอลัมน์',
+    columnSettingsAriaLabel: 'ตั้งค่าคอลัมน์'
   },
   formWizard: {
     prevText: 'ก่อนหน้า',

@@ -45,7 +45,9 @@ export const idID: TigerLocale = {
     searchPlaceholder: 'Cari',
     searchButtonText: 'Cari',
     selectedText: 'Dipilih',
-    selectedItemsText: 'item'
+    selectedItemsText: 'item',
+    columnSettingsText: 'Pengaturan kolom',
+    columnSettingsAriaLabel: 'Pengaturan kolom'
   },
   formWizard: {
     prevText: 'Sebelumnya',

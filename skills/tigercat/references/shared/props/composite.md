@@ -83,11 +83,11 @@ Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`
 
 Source: `packages/core/src/types/composite.ts` · Interface: `TableToolbarProps`.
 
-Uses: `Input`, `Select`, `Button`.
+Uses: `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
-Note: 这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。
+Note: 这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列。
 
-Showing 3 key props of 10; see source for the complete interface.
+Showing 3 key props of 12; see source for the complete interface.
 
 | Prop                  | Type     | Default | Notes                               |
 | --------------------- | -------- | ------- | ----------------------------------- |
@@ -101,9 +101,9 @@ Events/callback props: `onSearchChange?`, `onSearch?`, `onFiltersChange?`, `onBu
 
 Source: `packages/core/src/types/composite.ts` · Interface: `DataTableWithToolbarProps`.
 
-Uses: `Table`, `Input`, `Select`, `Button`.
+Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
-Note: 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。
+Note: 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。
 
 | Prop          | Type                        | Default | Notes                                            |
 | ------------- | --------------------------- | ------- | ------------------------------------------------ |

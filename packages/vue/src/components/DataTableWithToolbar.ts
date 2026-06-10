@@ -38,6 +38,8 @@ import { useTigerConfig } from './ConfigProvider'
 import { Input } from './Input'
 import { Select } from './Select'
 import { Button } from './Button'
+import { Popover } from './Popover'
+import { Checkbox } from './Checkbox'
 
 export interface VueTableToolbarProps extends Omit<
   CoreTableToolbarProps,
@@ -48,6 +50,8 @@ export interface VueDataTableWithToolbarProps {
   columns: TableColumn[]
   columnLockable?: boolean
   dataSource?: Record<string, unknown>[]
+  hiddenColumnKeys?: string[]
+  defaultHiddenColumnKeys?: string[]
   sort?: SortState
   defaultSort?: SortState
   filters?: Record<string, unknown>
@@ -88,6 +92,14 @@ export const DataTableWithToolbar = defineComponent({
     dataSource: {
       type: Array as PropType<Record<string, unknown>[]>,
       default: () => []
+    },
+    hiddenColumnKeys: {
+      type: Array as PropType<string[]>,
+      default: undefined
+    },
+    defaultHiddenColumnKeys: {
+      type: Array as PropType<string[]>,
+      default: undefined
     },
     sort: {
       type: Object as PropType<SortState>,
@@ -197,11 +209,16 @@ export const DataTableWithToolbar = defineComponent({
     'bulk-action': (_action: TableToolbarAction, _keys: (string | number)[]) => true,
     'selection-change': (_keys: (string | number)[]) => true,
     'page-change': (_current: number, _pageSize: number) => true,
-    'page-size-change': (_current: number, _pageSize: number) => true
+    'page-size-change': (_current: number, _pageSize: number) => true,
+    'update:hiddenColumnKeys': (_hiddenKeys: string[]) => true,
+    'hidden-columns-change': (_hiddenKeys: string[]) => true
   },
   setup(props, { attrs, emit }) {
     const config = useTigerConfig()
     const internalSearch = ref<string>(props.toolbar?.defaultSearchValue ?? '')
+    const internalHiddenKeys = ref<string[]>(
+      props.defaultHiddenColumnKeys ?? props.hiddenColumnKeys ?? []
+    )
     const internalFilters = ref<Record<string, TableToolbarFilterValue>>({})
     const previousPageSize = ref(
       props.pagination && typeof props.pagination === 'object'
@@ -268,6 +285,15 @@ export const DataTableWithToolbar = defineComponent({
     )
 
     watch(
+      () => props.hiddenColumnKeys,
+      (nextValue) => {
+        if (nextValue !== undefined) {
+          internalHiddenKeys.value = nextValue
+        }
+      }
+    )
+
+    watch(
       () => props.toolbar?.filters,
       (filters) => {
         if (!filters) return
@@ -310,6 +336,24 @@ export const DataTableWithToolbar = defineComponent({
 
     const hasFilters = computed(() => Boolean(props.toolbar?.filters?.length))
     const hasBulkActions = computed(() => Boolean(props.toolbar?.bulkActions?.length))
+    const hasColumnSettings = computed(() => Boolean(props.toolbar?.showColumnSettings))
+
+    const resolvedHiddenKeys = computed(() => props.hiddenColumnKeys ?? internalHiddenKeys.value)
+
+    const handleHiddenColumnsChange = (nextHiddenKeys: string[]) => {
+      if (props.hiddenColumnKeys === undefined) {
+        internalHiddenKeys.value = nextHiddenKeys
+      }
+      emit('update:hiddenColumnKeys', nextHiddenKeys)
+      emit('hidden-columns-change', nextHiddenKeys)
+    }
+
+    const handleToggleColumnVisibility = (columnKey: string, visible: boolean) => {
+      const nextHiddenKeys = visible
+        ? resolvedHiddenKeys.value.filter((key) => key !== columnKey)
+        : [...resolvedHiddenKeys.value, columnKey]
+      handleHiddenColumnsChange(nextHiddenKeys)
+    }
     const canSearch = computed(() => Boolean(vnodeProps.onSearch))
 
     const selectedKeys = computed(
@@ -320,7 +364,9 @@ export const DataTableWithToolbar = defineComponent({
         ? props.toolbar.selectedCount
         : selectedKeys.value.length
     )
-    const bulkLabel = computed(() => props.toolbar?.bulkActionsLabel ?? tableLabels.value.selectedText)
+    const bulkLabel = computed(
+      () => props.toolbar?.bulkActionsLabel ?? tableLabels.value.selectedText
+    )
 
     const wrapperClasses = computed(() =>
       classNames(
@@ -382,8 +428,87 @@ export const DataTableWithToolbar = defineComponent({
       previousPageSize.value = pageSize
     }
 
+    const renderColumnSettings = () => {
+      const lockedKeys = new Set(props.toolbar?.columnSettings?.lockedColumnKeys ?? [])
+      const panelTitle =
+        props.toolbar?.columnSettings?.title ?? tableLabels.value.columnSettingsText
+
+      return h(
+        Popover,
+        {
+          trigger: 'click',
+          placement: 'bottom-end'
+        },
+        {
+          default: () =>
+            h(
+              Button,
+              {
+                size: 'sm',
+                variant: 'outline',
+                class: 'shrink-0 px-2',
+                'aria-label': tableLabels.value.columnSettingsAriaLabel
+              },
+              {
+                default: () =>
+                  h(
+                    'svg',
+                    {
+                      class: 'w-3.5 h-3.5',
+                      fill: 'none',
+                      stroke: 'currentColor',
+                      'stroke-width': '2',
+                      viewBox: '0 0 24 24',
+                      'aria-hidden': 'true'
+                    },
+                    [
+                      h('path', {
+                        'stroke-linecap': 'round',
+                        'stroke-linejoin': 'round',
+                        d: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'
+                      }),
+                      h('path', {
+                        'stroke-linecap': 'round',
+                        'stroke-linejoin': 'round',
+                        d: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'
+                      })
+                    ]
+                  )
+              }
+            ),
+          title: () => panelTitle,
+          content: () =>
+            h(
+              'div',
+              { class: 'flex flex-col gap-2 min-w-[160px]' },
+              props.columns.map((column) => {
+                const locked = lockedKeys.has(column.key) || column.hideable === false
+                return h(
+                  Checkbox,
+                  {
+                    key: column.key,
+                    size: 'sm',
+                    modelValue: !resolvedHiddenKeys.value.includes(column.key),
+                    disabled: locked,
+                    'onUpdate:modelValue': (checked: boolean) =>
+                      handleToggleColumnVisibility(column.key, checked)
+                  },
+                  { default: () => column.title }
+                )
+              })
+            )
+        }
+      )
+    }
+
     const renderToolbar = () => {
-      if (!hasSearch.value && !hasFilters.value && !hasBulkActions.value) return null
+      if (
+        !hasSearch.value &&
+        !hasFilters.value &&
+        !hasBulkActions.value &&
+        !hasColumnSettings.value
+      )
+        return null
 
       const leftNodes: VNodeArrayChildren = []
 
@@ -400,7 +525,8 @@ export const DataTableWithToolbar = defineComponent({
                   type: 'search',
                   size: 'sm',
                   modelValue: searchValue.value,
-                  placeholder: props.toolbar?.searchPlaceholder ?? tableLabels.value.searchPlaceholder,
+                  placeholder:
+                    props.toolbar?.searchPlaceholder ?? tableLabels.value.searchPlaceholder,
                   'onUpdate:modelValue': (value: string | number) =>
                     handleSearchChange(String(value ?? '')),
                   onKeydown: (event: KeyboardEvent) => {
@@ -442,7 +568,10 @@ export const DataTableWithToolbar = defineComponent({
                       onClick: handleSearchSubmit,
                       disabled: !canSearch.value
                     },
-                    { default: () => props.toolbar?.searchButtonText ?? tableLabels.value.searchButtonText }
+                    {
+                      default: () =>
+                        props.toolbar?.searchButtonText ?? tableLabels.value.searchButtonText
+                    }
                   )
                 : null
             ]
@@ -535,6 +664,11 @@ export const DataTableWithToolbar = defineComponent({
                 { class: 'flex items-center gap-2.5 flex-wrap ml-auto shrink-0' },
                 bulkChildren
               )
+            : null,
+          hasColumnSettings.value
+            ? h('div', { class: classNames('shrink-0', !hasBulkActions.value && 'ml-auto') }, [
+                renderColumnSettings()
+              ])
             : null
         ]
       )
@@ -547,6 +681,7 @@ export const DataTableWithToolbar = defineComponent({
         columns: props.columns,
         columnLockable: props.columnLockable,
         dataSource: props.dataSource,
+        hiddenColumnKeys: resolvedHiddenKeys.value,
         ...(props.sort !== undefined ? { sort: props.sort } : {}),
         ...(props.defaultSort !== undefined ? { defaultSort: props.defaultSort } : {}),
         ...(props.filters !== undefined ? { filters: props.filters } : {}),

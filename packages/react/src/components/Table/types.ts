@@ -21,6 +21,7 @@ export interface TableProps<T = Record<string, unknown>> extends CoreTableProps<
   onSelectionChange?: (selectedKeys: (string | number)[]) => void
   onSortChange?: (sort: SortState) => void
   onFilterChange?: (filters: Record<string, unknown>) => void
+  onHiddenColumnsChange?: (hiddenKeys: string[]) => void
   onPageChange?: (page: { current: number; pageSize: number }) => void
   onExpandChange?: (expandedKeys: (string | number)[], record: T, expanded: boolean) => void
   onCellChange?: (rowIndex: number, columnKey: string, newValue: string) => void
@@ -55,6 +56,7 @@ export interface TableContext {
   sortState: SortState
   currentPage: number
   currentPageSize: number
+  hiddenColumnKeys: string[]
 
   // editable state
   editingCell: { rowIndex: number; columnKey: string } | null
@@ -63,6 +65,7 @@ export interface TableContext {
 
   // handlers
   toggleColumnLock: (key: string) => void
+  handleSetHiddenColumns: (hiddenKeys: string[]) => void
   handleSort: (columnKey: string) => void
   handleFilter: (columnKey: string, value: unknown) => void
   handlePageChange: (page: number) => void

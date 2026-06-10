@@ -45,7 +45,9 @@ export const koKR: TigerLocale = {
     searchPlaceholder: '검색',
     searchButtonText: '검색',
     selectedText: '선택됨',
-    selectedItemsText: '개'
+    selectedItemsText: '개',
+    columnSettingsText: '열 설정',
+    columnSettingsAriaLabel: '열 설정'
   },
   formWizard: {
     prevText: '이전',

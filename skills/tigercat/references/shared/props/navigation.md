@@ -82,7 +82,11 @@ Showing 3 key props of 6; see source for the complete interface.
 
 Source: `packages/core/src/types/dropdown.ts` · Interface: `DropdownProps`.
 
-Showing 3 key props of 8; see source for the complete interface.
+Uses: `DropdownMenu`, `DropdownItem`.
+
+Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。
+
+Showing 3 key props of 9; see source for the complete interface.
 
 | Prop        | Type              | Default   | Notes                                          |
 | ----------- | ----------------- | --------- | ---------------------------------------------- |

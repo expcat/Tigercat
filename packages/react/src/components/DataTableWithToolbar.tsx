@@ -16,6 +16,8 @@ import { Table, type TableProps } from './Table'
 import { Input } from './Input'
 import { Select } from './Select'
 import { Button } from './Button'
+import { Popover } from './Popover'
+import { Checkbox } from './Checkbox'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface DataTableWithToolbarProps<T = Record<string, unknown>>
@@ -68,6 +70,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   onSearch,
   onFiltersChange,
   onBulkAction,
+  hiddenColumnKeys,
+  defaultHiddenColumnKeys,
+  onHiddenColumnsChange,
   pagination = false,
   onPageChange,
   onPageSizeChange,
@@ -82,6 +87,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       : undefined
   )
   const [internalSearch, setInternalSearch] = useState<string>(toolbar?.defaultSearchValue ?? '')
+  const [internalHiddenKeys, setInternalHiddenKeys] = useState<string[]>(
+    defaultHiddenColumnKeys ?? hiddenColumnKeys ?? []
+  )
   const [internalFilters, setInternalFilters] = useState<Record<string, TableToolbarFilterValue>>(
     () => {
       const initial: Record<string, TableToolbarFilterValue> = {}
@@ -97,9 +105,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     () => (locale ? getImmediateTigerLocale(locale) : undefined),
     [locale]
   )
-  const [resolvedTableLocale, setResolvedTableLocale] = useState<
-    Partial<TigerLocale> | undefined
-  >(immediateTableLocale)
+  const [resolvedTableLocale, setResolvedTableLocale] = useState<Partial<TigerLocale> | undefined>(
+    immediateTableLocale
+  )
 
   useEffect(() => {
     let active = true
@@ -125,16 +133,19 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     [config.locale, resolvedTableLocale]
   )
 
-  const tableLabels = useMemo(
-    () => getTableLabels(tableLocale, labels),
-    [labels, tableLocale]
-  )
+  const tableLabels = useMemo(() => getTableLabels(tableLocale, labels), [labels, tableLocale])
 
   useEffect(() => {
     if (toolbar?.searchValue !== undefined) {
       setInternalSearch(toolbar.searchValue ?? '')
     }
   }, [toolbar?.searchValue])
+
+  useEffect(() => {
+    if (hiddenColumnKeys !== undefined) {
+      setInternalHiddenKeys(hiddenColumnKeys)
+    }
+  }, [hiddenColumnKeys])
 
   useEffect(() => {
     if (pagination && typeof pagination === 'object') {
@@ -182,6 +193,23 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   )
   const hasFilters = Boolean(toolbar?.filters && toolbar.filters.length > 0)
   const hasBulkActions = Boolean(toolbar?.bulkActions && toolbar.bulkActions.length > 0)
+  const hasColumnSettings = Boolean(toolbar?.showColumnSettings)
+
+  const resolvedHiddenKeys = hiddenColumnKeys ?? internalHiddenKeys
+
+  const handleHiddenColumnsChange = (nextHiddenKeys: string[]) => {
+    if (hiddenColumnKeys === undefined) {
+      setInternalHiddenKeys(nextHiddenKeys)
+    }
+    onHiddenColumnsChange?.(nextHiddenKeys)
+  }
+
+  const handleToggleColumnVisibility = (columnKey: string, visible: boolean) => {
+    const nextHiddenKeys = visible
+      ? resolvedHiddenKeys.filter((key) => key !== columnKey)
+      : [...resolvedHiddenKeys, columnKey]
+    handleHiddenColumnsChange(nextHiddenKeys)
+  }
 
   const { bordered = false, ...remainingTableProps } = tableProps
 
@@ -246,8 +274,62 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     previousPageSizeRef.current = pageSize
   }
 
+  const renderColumnSettings = () => {
+    const lockedKeys = new Set(toolbar?.columnSettings?.lockedColumnKeys ?? [])
+    const panelTitle = toolbar?.columnSettings?.title ?? tableLabels.columnSettingsText
+
+    return (
+      <Popover
+        trigger="click"
+        placement="bottom-end"
+        titleContent={panelTitle}
+        contentContent={
+          <div className="flex flex-col gap-2 min-w-[160px]">
+            {tableProps.columns.map((column) => {
+              const locked = lockedKeys.has(column.key) || column.hideable === false
+              return (
+                <Checkbox
+                  key={column.key}
+                  size="sm"
+                  checked={!resolvedHiddenKeys.includes(column.key)}
+                  disabled={locked}
+                  onChange={(checked) => handleToggleColumnVisibility(column.key, checked)}>
+                  {column.title}
+                </Checkbox>
+              )
+            })}
+          </div>
+        }>
+        <Button
+          size="sm"
+          variant="outline"
+          className="shrink-0 px-2"
+          aria-label={tableLabels.columnSettingsAriaLabel}>
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+            aria-hidden="true">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+        </Button>
+      </Popover>
+    )
+  }
+
   const renderToolbar = () => {
-    if (!hasSearch && !hasFilters && !hasBulkActions) return null
+    if (!hasSearch && !hasFilters && !hasBulkActions && !hasColumnSettings) return null
 
     return (
       <div
@@ -352,6 +434,12 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
             ))}
           </div>
         ) : null}
+
+        {hasColumnSettings ? (
+          <div className={classNames('shrink-0', !hasBulkActions && 'ml-auto')}>
+            {renderColumnSettings()}
+          </div>
+        ) : null}
       </div>
     )
   }
@@ -364,6 +452,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         locale={locale}
         labels={labels}
         bordered={bordered}
+        hiddenColumnKeys={resolvedHiddenKeys}
         pagination={pagination}
         className={classNames(tableClassName, bordered && 'border-none rounded-none shadow-none')}
         onPageChange={handleTablePageChange}
@@ -373,4 +462,3 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 }
 
 export default DataTableWithToolbar
-

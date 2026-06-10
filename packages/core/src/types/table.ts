@@ -186,6 +186,14 @@ export interface TableColumn<T = Record<string, unknown>> {
   hideInCard?: boolean
 
   /**
+   * Whether this column can be hidden via `hiddenColumnKeys` UIs such as the
+   * toolbar column-settings panel. Set to false for columns that must stay
+   * visible (e.g. action columns).
+   * @default true
+   */
+  hideable?: boolean
+
+  /**
    * Ordering weight in card mode; columns with a lower value render first.
    * Columns without a priority keep their original relative order and sort
    * after prioritized ones.
@@ -428,6 +436,17 @@ export interface TableProps<T = Record<string, unknown>> {
    * @default []
    */
   dataSource?: T[]
+
+  /**
+   * Controlled hidden column keys (matched against `columns[].key`).
+   * When provided, internal hidden-column state will not be mutated.
+   */
+  hiddenColumnKeys?: string[]
+
+  /**
+   * Default hidden column keys for uncontrolled mode.
+   */
+  defaultHiddenColumnKeys?: string[]
 
   /**
    * Controlled sort state.

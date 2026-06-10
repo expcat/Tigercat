@@ -48,6 +48,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   columns,
   columnLockable = false,
   dataSource = [],
+  hiddenColumnKeys,
+  defaultHiddenColumnKeys,
   sort,
   defaultSort,
   filters,
@@ -102,6 +104,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   onSelectionChange,
   onSortChange,
   onFilterChange,
+  onHiddenColumnsChange,
   onPageChange,
   onExpandChange,
   onCellChange,
@@ -142,9 +145,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     () => (tableLocaleInput ? getImmediateTigerLocale(tableLocaleInput) : undefined),
     [tableLocaleInput]
   )
-  const [resolvedTableLocale, setResolvedTableLocale] = useState<
-    Partial<TigerLocale> | undefined
-  >(immediateTableLocale)
+  const [resolvedTableLocale, setResolvedTableLocale] = useState<Partial<TigerLocale> | undefined>(
+    immediateTableLocale
+  )
 
   useEffect(() => {
     let active = true
@@ -214,6 +217,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const ctx = useTableState({
     columns: columns as TableProps['columns'],
     dataSource: dataSource as Record<string, unknown>[],
+    hiddenColumnKeys,
+    defaultHiddenColumnKeys,
     sort,
     defaultSort,
     filters,
@@ -237,6 +242,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     onSelectionChange,
     onSortChange,
     onFilterChange,
+    onHiddenColumnsChange,
     onPageChange,
     onExpandChange: onExpandChange as
       | ((
@@ -465,89 +471,95 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                   className={classNames(tableResponsiveCardClasses, resolvedCardClassName)}
                   onClick={() => ctx.handleRowClick(record, index, key)}>
                   {customCard !== undefined && customCard !== null ? (
-                    customCard as React.ReactNode
+                    (customCard as React.ReactNode)
                   ) : (
                     <>
                       {(internalRowSelection?.showCheckbox !== false && internalRowSelection) ||
-                  (internalExpandable && isRowExpandable) ? (
-                    <div className="mb-2 flex items-center gap-3">
-                      {internalRowSelection && internalRowSelection.showCheckbox !== false && (
-                        <span onClick={(event) => event.stopPropagation()}>
-                          {internalRowSelection.type === 'radio' ? (
-                            <Radio
-                              value={key}
-                              checked={isSelected}
-                              disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
-                              aria-label={formatTableSelectRowAriaLabel(
-                                tableLabels.selectRowAriaLabel,
-                                index + 1,
-                                tableLocale?.locale
+                      (internalExpandable && isRowExpandable) ? (
+                        <div className="mb-2 flex items-center gap-3">
+                          {internalRowSelection && internalRowSelection.showCheckbox !== false && (
+                            <span onClick={(event) => event.stopPropagation()}>
+                              {internalRowSelection.type === 'radio' ? (
+                                <Radio
+                                  value={key}
+                                  checked={isSelected}
+                                  disabled={
+                                    internalRowSelection.getCheckboxProps?.(record)?.disabled
+                                  }
+                                  aria-label={formatTableSelectRowAriaLabel(
+                                    tableLabels.selectRowAriaLabel,
+                                    index + 1,
+                                    tableLocale?.locale
+                                  )}
+                                  onChange={() => ctx.handleSelectRow(key, true)}
+                                />
+                              ) : (
+                                <Checkbox
+                                  size="sm"
+                                  checked={isSelected}
+                                  disabled={
+                                    internalRowSelection.getCheckboxProps?.(record)?.disabled
+                                  }
+                                  aria-label={formatTableSelectRowAriaLabel(
+                                    tableLabels.selectRowAriaLabel,
+                                    index + 1,
+                                    tableLocale?.locale
+                                  )}
+                                  onChange={(checked) => ctx.handleSelectRow(key, checked)}
+                                />
                               )}
-                              onChange={() => ctx.handleSelectRow(key, true)}
-                            />
-                          ) : (
-                            <Checkbox
-                              size="sm"
-                              checked={isSelected}
-                              disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
-                              aria-label={formatTableSelectRowAriaLabel(
-                                tableLabels.selectRowAriaLabel,
-                                index + 1,
-                                tableLocale?.locale
-                              )}
-                              onChange={(checked) => ctx.handleSelectRow(key, checked)}
-                            />
+                            </span>
                           )}
-                        </span>
+                          {internalExpandable && isRowExpandable && (
+                            <button
+                              type="button"
+                              className="text-sm text-[var(--tiger-primary,#2563eb)]"
+                              aria-expanded={isExpanded}
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                ctx.handleToggleExpand(key, record)
+                              }}>
+                              {isExpanded ? tableLabels.collapseText : tableLabels.expandText}
+                            </button>
+                          )}
+                        </div>
+                      ) : null}
+
+                      {(() => {
+                        const { titleColumn, bodyColumns } = getCardColumns(ctx.displayColumns)
+                        const renderCellContent = (column: TableColumn) => {
+                          const dataKey = column.dataKey || column.key
+                          return column.render
+                            ? (column.render(record, index) as React.ReactNode)
+                            : (record[dataKey] as React.ReactNode)
+                        }
+
+                        return (
+                          <>
+                            {titleColumn && (
+                              <div className={tableResponsiveCardTitleClasses}>
+                                {renderCellContent(titleColumn)}
+                              </div>
+                            )}
+                            {bodyColumns.map((column) => (
+                              <div key={column.key} className={tableResponsiveCardRowClasses}>
+                                <div className={tableResponsiveCardLabelClasses}>
+                                  {column.title}
+                                </div>
+                                <div className={tableResponsiveCardValueClasses}>
+                                  {renderCellContent(column)}
+                                </div>
+                              </div>
+                            ))}
+                          </>
+                        )
+                      })()}
+
+                      {expandedNode && (
+                        <div className="mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3">
+                          {expandedNode}
+                        </div>
                       )}
-                      {internalExpandable && isRowExpandable && (
-                        <button
-                          type="button"
-                          className="text-sm text-[var(--tiger-primary,#2563eb)]"
-                          aria-expanded={isExpanded}
-                          onClick={(event) => {
-                            event.stopPropagation()
-                            ctx.handleToggleExpand(key, record)
-                          }}>
-                          {isExpanded ? tableLabels.collapseText : tableLabels.expandText}
-                        </button>
-                      )}
-                    </div>
-                  ) : null}
-
-                  {(() => {
-                    const { titleColumn, bodyColumns } = getCardColumns(ctx.displayColumns)
-                    const renderCellContent = (column: TableColumn) => {
-                      const dataKey = column.dataKey || column.key
-                      return column.render
-                        ? (column.render(record, index) as React.ReactNode)
-                        : (record[dataKey] as React.ReactNode)
-                    }
-
-                    return (
-                      <>
-                        {titleColumn && (
-                          <div className={tableResponsiveCardTitleClasses}>
-                            {renderCellContent(titleColumn)}
-                          </div>
-                        )}
-                        {bodyColumns.map((column) => (
-                          <div key={column.key} className={tableResponsiveCardRowClasses}>
-                            <div className={tableResponsiveCardLabelClasses}>{column.title}</div>
-                            <div className={tableResponsiveCardValueClasses}>
-                              {renderCellContent(column)}
-                            </div>
-                          </div>
-                        ))}
-                      </>
-                    )
-                  })()}
-
-                  {expandedNode && (
-                    <div className="mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3">
-                      {expandedNode}
-                    </div>
-                  )}
                     </>
                   )}
                 </div>

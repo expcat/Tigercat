@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   createTableRowKeyCache,
+  filterHiddenColumns,
   getCardColumns,
   getFixedColumnOffsets,
   getFixedColumnPosition,
@@ -127,6 +128,47 @@ describe('table-utils', () => {
         position: 'sticky',
         right: '0px',
         zIndex: 12
+      })
+    })
+  })
+
+  describe('filterHiddenColumns', () => {
+    const columns: TableColumn[] = [
+      { key: 'name', title: 'Name', width: 120, fixed: 'left' },
+      { key: 'age', title: 'Age', width: 80, fixed: 'left' },
+      { key: 'email', title: 'Email', width: 200 },
+      { key: 'actions', title: 'Actions', width: 100, fixed: 'right' }
+    ]
+
+    it('returns the same array reference when no keys are hidden', () => {
+      expect(filterHiddenColumns(columns)).toBe(columns)
+      expect(filterHiddenColumns(columns, [])).toBe(columns)
+      expect(filterHiddenColumns(columns, ['unknown'])).toBe(columns)
+    })
+
+    it('filters out hidden columns by key', () => {
+      expect(filterHiddenColumns(columns, ['email']).map((c) => c.key)).toEqual([
+        'name',
+        'age',
+        'actions'
+      ])
+      expect(filterHiddenColumns(columns, ['name', 'actions']).map((c) => c.key)).toEqual([
+        'age',
+        'email'
+      ])
+    })
+
+    it('can hide every column', () => {
+      expect(filterHiddenColumns(columns, ['name', 'age', 'email', 'actions'])).toEqual([])
+    })
+
+    it('shrinks fixed column offsets when a fixed column is hidden', () => {
+      const visible = filterHiddenColumns(columns, ['name'])
+      expect(getFixedColumnOffsets(visible)).toEqual({
+        leftOffsets: { age: 0 },
+        rightOffsets: { actions: 0 },
+        minTableWidth: 380,
+        hasFixedColumns: true
       })
     })
   })

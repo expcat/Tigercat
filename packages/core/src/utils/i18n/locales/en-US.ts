@@ -45,7 +45,9 @@ export const enUS: TigerLocale = {
     searchPlaceholder: 'Search',
     searchButtonText: 'Search',
     selectedText: 'Selected',
-    selectedItemsText: 'items'
+    selectedItemsText: 'items',
+    columnSettingsText: 'Column settings',
+    columnSettingsAriaLabel: 'Column settings'
   },
   formWizard: {
     prevText: 'Previous',

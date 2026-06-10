@@ -15,6 +15,7 @@ import {
   getDropdownMenuClasses,
   getTransformOrigin,
   injectDropdownStyles,
+  FLOATING_OVERLAY_Z_INDEX,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
   handleMenuNavigation,
@@ -25,7 +26,7 @@ import {
   type DropdownMenuProps as CoreDropdownMenuProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
-import { useClickOutside, useEscapeKey, useFloating } from '../utils/overlay'
+import { renderBodyPortal, useClickOutside, useEscapeKey, useFloating } from '../utils/overlay'
 
 // Dropdown context interface
 export interface DropdownContextValue {
@@ -86,6 +87,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   defaultOpen = false,
   closeOnClick = true,
   showArrow = true,
+  portal = true,
   className,
   style,
   onOpenChange,
@@ -197,7 +199,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   // Handle outside click to close dropdown
   useClickOutside({
     enabled: trigger === 'click' && visible,
-    refs: [containerRef],
+    refs: [containerRef, floatingRef],
     onOutsideClick: () => setVisible(false)
   })
 
@@ -231,13 +233,14 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   const triggerClasses = useMemo(() => getDropdownTriggerClasses(disabled), [disabled])
 
-  const menuWrapperClasses = classNames('absolute z-50', DROPDOWN_ENTER_CLASS)
+  const menuWrapperClasses = classNames('absolute', DROPDOWN_ENTER_CLASS)
 
   const menuWrapperStyles = useMemo<React.CSSProperties>(
     () => ({
       position: 'absolute',
       left: x,
       top: y,
+      zIndex: FLOATING_OVERLAY_Z_INDEX,
       transformOrigin: getTransformOrigin(placement)
     }),
     [x, y, placement]
@@ -283,6 +286,24 @@ export const Dropdown: React.FC<DropdownProps> = ({
     </svg>
   ) : null
 
+  const menuWrapperNode = (
+    <div
+      ref={floatingRef}
+      className={menuWrapperClasses}
+      style={menuWrapperStyles}
+      hidden={!visible}
+      data-tiger-dropdown-menu=""
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onKeyDown={handleMenuKeyDown}>
+      {menuElement && React.isValidElement(menuElement)
+        ? React.cloneElement(menuElement as React.ReactElement<Record<string, unknown>>, {
+            id: menuId
+          })
+        : menuElement}
+    </div>
+  )
+
   return (
     <DropdownContext.Provider value={contextValue}>
       <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
@@ -298,20 +319,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           {triggerElement}
           {chevronNode}
         </div>
-        <div
-          ref={floatingRef}
-          className={menuWrapperClasses}
-          style={menuWrapperStyles}
-          hidden={!visible}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          onKeyDown={handleMenuKeyDown}>
-          {menuElement && React.isValidElement(menuElement)
-            ? React.cloneElement(menuElement as React.ReactElement<Record<string, unknown>>, {
-                id: menuId
-              })
-            : menuElement}
-        </div>
+        {portal ? renderBodyPortal(menuWrapperNode) : menuWrapperNode}
       </div>
     </DropdownContext.Provider>
   )

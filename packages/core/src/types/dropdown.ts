@@ -41,6 +41,13 @@ export interface DropdownProps {
    */
   showArrow?: boolean
   /**
+   * Render the menu into document.body (portal/Teleport) so it is not
+   * clipped or covered by overflow/sticky ancestors (e.g. fixed table columns).
+   * Set to false to render in place with the legacy DOM structure.
+   * @default true
+   */
+  portal?: boolean
+  /**
    * Additional CSS classes
    */
   className?: string
