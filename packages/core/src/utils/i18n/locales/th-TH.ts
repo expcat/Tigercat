@@ -32,6 +32,21 @@ export const thTH: TigerLocale = {
     pageAriaLabel: 'หน้า {page}',
     pageIndicatorText: 'หน้า {current} จาก {total}'
   },
+  table: {
+    emptyText: 'ไม่มีข้อมูล',
+    loadingText: 'กำลังโหลด',
+    expandText: 'ขยาย',
+    collapseText: 'ยุบ',
+    selectAllText: 'เลือกทั้งหมด',
+    selectRowAriaLabel: 'เลือกแถว {row}',
+    sortByText: 'เรียงตาม {column}',
+    clearSortText: 'ล้างการเรียง',
+    toolbarAriaLabel: 'แถบเครื่องมือตารางข้อมูล',
+    searchPlaceholder: 'ค้นหา',
+    searchButtonText: 'ค้นหา',
+    selectedText: 'เลือกแล้ว',
+    selectedItemsText: 'รายการ'
+  },
   formWizard: {
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',

@@ -117,8 +117,56 @@ describe('DataTableWithToolbar (Vue)', () => {
       }
     })
 
-    expect(screen.getByText('已选择 2 项')).toBeInTheDocument()
+    expect(screen.getByText('Selected 2 items')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '导出' })).toBeInTheDocument()
+  })
+
+  it('uses table labels for toolbar text and keeps toolbar overrides first', () => {
+    const initial = render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [],
+        labels: {
+          searchPlaceholder: 'Find rows',
+          searchButtonText: 'Find',
+          selectedText: 'Chosen',
+          selectedItemsText: 'rows'
+        },
+        toolbar: {
+          bulkActions: [{ key: 'export', label: 'Export' }],
+          selectedKeys: [1],
+          defaultSearchValue: ''
+        },
+        pagination: false
+      },
+      attrs: { onSearch: vi.fn() }
+    })
+
+    expect(screen.getByPlaceholderText('Find rows')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Find' })).toBeInTheDocument()
+    expect(screen.getByText('Chosen 1 rows')).toBeInTheDocument()
+
+    initial.unmount()
+
+    render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [],
+        labels: { searchButtonText: 'Find', selectedText: 'Chosen' },
+        toolbar: {
+          bulkActions: [{ key: 'export', label: 'Export' }],
+          selectedKeys: [1],
+          defaultSearchValue: '',
+          searchButtonText: 'Go',
+          bulkActionsLabel: 'Picked'
+        },
+        pagination: false
+      },
+      attrs: { onSearch: vi.fn() }
+    })
+
+    expect(screen.getByRole('button', { name: 'Go' })).toBeInTheDocument()
+    expect(screen.getByText('Picked 1 items')).toBeInTheDocument()
   })
 
   it('renders search input when only search-change listener is provided', () => {
@@ -135,7 +183,7 @@ describe('DataTableWithToolbar (Vue)', () => {
       }
     })
 
-    expect(screen.getByPlaceholderText('搜索')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument()
   })
 
   it('submits search on enter without search button', async () => {
@@ -156,7 +204,7 @@ describe('DataTableWithToolbar (Vue)', () => {
     await userEvent.type(input, 'Alpha{enter}')
 
     expect(onSearch).toHaveBeenCalledWith('Alpha')
-    expect(screen.queryByRole('button', { name: '搜索' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Search' })).not.toBeInTheDocument()
   })
 
   it('forwards selection-change event', async () => {
@@ -199,6 +247,30 @@ describe('DataTableWithToolbar (Vue)', () => {
     expect(screen.getByRole('button', { name: '上一页' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '下一页' })).toBeInTheDocument()
     expect(screen.getByText('10 条/页')).toBeInTheDocument()
+  })
+
+  it('uses ConfigProvider locale for toolbar text', () => {
+    render({
+      render() {
+        return h(ConfigProvider, { locale: zhCN }, () =>
+          h(DataTableWithToolbar, {
+            columns,
+            dataSource: [],
+            toolbar: {
+              bulkActions: [{ key: 'export', label: '导出' }],
+              selectedKeys: [1],
+              defaultSearchValue: ''
+            },
+            pagination: false,
+            onSearch: vi.fn()
+          })
+        )
+      }
+    })
+
+    expect(screen.getByPlaceholderText('搜索')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '搜索' })).toBeInTheDocument()
+    expect(screen.getByText('已选择 1 项')).toBeInTheDocument()
   })
 
   it('uses Chinese locale for simple pagination text and aria labels', () => {

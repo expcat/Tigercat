@@ -5,7 +5,7 @@
 /**
  * Card variant types
  */
-export type CardVariant = 'default' | 'bordered' | 'shadow' | 'elevated'
+export type CardVariant = 'default' | 'bordered' | 'shadow' | 'elevated' | 'transparent'
 
 /**
  * Card size types

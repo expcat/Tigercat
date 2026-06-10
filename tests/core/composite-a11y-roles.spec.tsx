@@ -125,7 +125,7 @@ describe('DataTableWithToolbar ARIA roles', () => {
       />
     )
     const toolbar = reactScreen.getByRole('toolbar')
-    expect(toolbar).toHaveAttribute('aria-label', '数据表格工具栏')
+    expect(toolbar).toHaveAttribute('aria-label', 'Data table toolbar')
   })
 
   it('Vue: toolbar has role=toolbar and aria-label', () => {
@@ -146,6 +146,6 @@ describe('DataTableWithToolbar ARIA roles', () => {
       }
     })
     const toolbar = vueScreen.getByRole('toolbar')
-    expect(toolbar).toHaveAttribute('aria-label', '数据表格工具栏')
+    expect(toolbar).toHaveAttribute('aria-label', 'Data table toolbar')
   })
 })

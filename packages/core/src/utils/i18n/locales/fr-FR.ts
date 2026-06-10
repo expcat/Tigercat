@@ -48,6 +48,21 @@ export const frFR: TigerLocale = defineLocale({
     pageAriaLabel: 'Page {page}',
     pageIndicatorText: 'Page {current} sur {total}'
   },
+  table: {
+    emptyText: 'Aucune donnée',
+    loadingText: 'Chargement',
+    expandText: 'Développer',
+    collapseText: 'Réduire',
+    selectAllText: 'Tout sélectionner',
+    selectRowAriaLabel: 'Sélectionner la ligne {row}',
+    sortByText: 'Trier par {column}',
+    clearSortText: 'Effacer le tri',
+    toolbarAriaLabel: 'Barre d’outils du tableau de données',
+    searchPlaceholder: 'Rechercher',
+    searchButtonText: 'Rechercher',
+    selectedText: 'Sélectionné',
+    selectedItemsText: 'éléments'
+  },
   formWizard: {
     prevText: 'Précédent',
     nextText: 'Suivant',

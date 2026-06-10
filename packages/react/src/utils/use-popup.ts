@@ -11,6 +11,7 @@ import { useFloating, useClickOutside, useEscapeKey } from './overlay'
 import {
   getTransformOrigin,
   buildTriggerHandlerMap,
+  restoreFocus,
   type FloatingPlacement,
   type FloatingTrigger
 } from '@expcat/tigercat-core'
@@ -97,6 +98,23 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     [disabled, isControlled, onOpenChange]
   )
 
+  const restoreTriggerFocus = useCallback(() => {
+    const trigger = triggerRef.current
+    const target =
+      trigger?.querySelector<HTMLElement>(
+        'button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'
+      ) ?? trigger
+
+    window.setTimeout(() => {
+      restoreFocus(target, { preventScroll: true })
+    }, 0)
+  }, [])
+
+  const closeAndRestoreFocus = useCallback(() => {
+    setVisible(false)
+    restoreTriggerFocus()
+  }, [restoreTriggerFocus, setVisible])
+
   // ─── Trigger handlers ────────────────────────────────────────────────
   const handleToggle = useCallback(() => {
     if (!disabled) setVisible(!currentVisible)
@@ -116,13 +134,13 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   useClickOutside({
     enabled: currentVisible && effectiveTrigger === 'click',
     refs: [containerRef, floatingRef],
-    onOutsideClick: () => setVisible(false),
+    onOutsideClick: closeAndRestoreFocus,
     defer: true
   })
 
   useEscapeKey({
     enabled: currentVisible && effectiveTrigger !== 'manual',
-    onEscape: () => setVisible(false)
+    onEscape: closeAndRestoreFocus
   })
 
   // ─── Floating styles ─────────────────────────────────────────────────

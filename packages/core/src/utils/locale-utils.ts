@@ -17,6 +17,7 @@ import type {
   TigerLocaleLoader,
   TigerLocaleLazyModule,
   TigerLocalePagination,
+  TigerLocaleTable,
   TigerLocaleFormWizard,
   TigerLocaleTaskBoard,
   TigerLocaleDirection
@@ -30,6 +31,7 @@ const TIGER_LOCALE_KEYS = [
   'drawer',
   'upload',
   'pagination',
+  'table',
   'datePicker',
   'formWizard',
   'taskBoard'
@@ -99,6 +101,7 @@ export function mergeTigerLocale(
     drawer: { ...base?.drawer, ...override?.drawer },
     upload: { ...base?.upload, ...override?.upload },
     pagination: { ...base?.pagination, ...override?.pagination },
+    table: { ...base?.table, ...override?.table },
     datePicker: { ...base?.datePicker, ...override?.datePicker },
     formWizard: { ...base?.formWizard, ...override?.formWizard },
     taskBoard: { ...base?.taskBoard, ...override?.taskBoard }
@@ -283,6 +286,100 @@ export function formatPaginationPageIndicator(
   return template
     .replace('{current}', formatIntlNumber(current, locale))
     .replace('{total}', formatIntlNumber(total, locale))
+}
+
+// ============================================================================
+// Table Labels
+// ============================================================================
+
+export const DEFAULT_TABLE_LABELS: Required<TigerLocaleTable> = {
+  emptyText: 'No data',
+  loadingText: 'Loading',
+  expandText: 'Expand',
+  collapseText: 'Collapse',
+  selectAllText: 'Select all',
+  selectRowAriaLabel: 'Select row {row}',
+  sortByText: 'Sort by {column}',
+  clearSortText: 'Clear sort',
+  toolbarAriaLabel: 'Data table toolbar',
+  searchPlaceholder: 'Search',
+  searchButtonText: 'Search',
+  selectedText: 'Selected',
+  selectedItemsText: 'items'
+}
+
+export const ZH_CN_TABLE_LABELS: Required<TigerLocaleTable> = {
+  emptyText: '暂无数据',
+  loadingText: '加载中',
+  expandText: '展开',
+  collapseText: '收起',
+  selectAllText: '全选',
+  selectRowAriaLabel: '选择第 {row} 行',
+  sortByText: '按 {column} 排序',
+  clearSortText: '不排序',
+  toolbarAriaLabel: '数据表格工具栏',
+  searchPlaceholder: '搜索',
+  searchButtonText: '搜索',
+  selectedText: '已选择',
+  selectedItemsText: '项'
+}
+
+export function getTableLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleTable>
+): Required<TigerLocaleTable> {
+  const isZh =
+    !!locale?.locale?.startsWith('zh') ||
+    locale?.common?.emptyText === '暂无数据' ||
+    locale?.table?.searchButtonText === '搜索'
+  const defaultLabels = isZh ? ZH_CN_TABLE_LABELS : DEFAULT_TABLE_LABELS
+
+  return {
+    emptyText: overrides?.emptyText ?? locale?.table?.emptyText ?? defaultLabels.emptyText,
+    loadingText: overrides?.loadingText ?? locale?.table?.loadingText ?? defaultLabels.loadingText,
+    expandText: overrides?.expandText ?? locale?.table?.expandText ?? defaultLabels.expandText,
+    collapseText:
+      overrides?.collapseText ?? locale?.table?.collapseText ?? defaultLabels.collapseText,
+    selectAllText:
+      overrides?.selectAllText ?? locale?.table?.selectAllText ?? defaultLabels.selectAllText,
+    selectRowAriaLabel:
+      overrides?.selectRowAriaLabel ??
+      locale?.table?.selectRowAriaLabel ??
+      defaultLabels.selectRowAriaLabel,
+    sortByText: overrides?.sortByText ?? locale?.table?.sortByText ?? defaultLabels.sortByText,
+    clearSortText:
+      overrides?.clearSortText ?? locale?.table?.clearSortText ?? defaultLabels.clearSortText,
+    toolbarAriaLabel:
+      overrides?.toolbarAriaLabel ??
+      locale?.table?.toolbarAriaLabel ??
+      defaultLabels.toolbarAriaLabel,
+    searchPlaceholder:
+      overrides?.searchPlaceholder ??
+      locale?.table?.searchPlaceholder ??
+      defaultLabels.searchPlaceholder,
+    searchButtonText:
+      overrides?.searchButtonText ??
+      locale?.table?.searchButtonText ??
+      defaultLabels.searchButtonText,
+    selectedText:
+      overrides?.selectedText ?? locale?.table?.selectedText ?? defaultLabels.selectedText,
+    selectedItemsText:
+      overrides?.selectedItemsText ??
+      locale?.table?.selectedItemsText ??
+      defaultLabels.selectedItemsText
+  }
+}
+
+export function formatTableSelectRowAriaLabel(
+  template: string,
+  row: number,
+  locale?: string
+): string {
+  return template.replace('{row}', formatIntlNumber(row, locale))
+}
+
+export function formatTableSortByText(template: string, column: string): string {
+  return template.replace('{column}', column)
 }
 
 // ============================================================================

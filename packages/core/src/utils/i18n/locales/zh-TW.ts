@@ -32,6 +32,21 @@ export const zhTW: TigerLocale = {
     pageAriaLabel: '第 {page} 頁',
     pageIndicatorText: '第 {current} 頁，共 {total} 頁'
   },
+  table: {
+    emptyText: '暫無資料',
+    loadingText: '載入中',
+    expandText: '展開',
+    collapseText: '收合',
+    selectAllText: '全選',
+    selectRowAriaLabel: '選擇第 {row} 列',
+    sortByText: '依 {column} 排序',
+    clearSortText: '不排序',
+    toolbarAriaLabel: '資料表格工具列',
+    searchPlaceholder: '搜尋',
+    searchButtonText: '搜尋',
+    selectedText: '已選擇',
+    selectedItemsText: '筆'
+  },
   formWizard: {
     prevText: '上一步',
     nextText: '下一步',

@@ -216,6 +216,25 @@ export function useTableState(
     return calculatePagination(total, currentPage.value, currentPageSize.value)
   })
 
+  function handleSetSort(nextSortState: SortState) {
+    if (!isSortControlled.value) {
+      uncontrolledSortState.value = nextSortState
+    }
+
+    emit('sort-change', nextSortState)
+    emit('change', {
+      sort: nextSortState,
+      filters: filterState.value,
+      pagination:
+        props.pagination !== false
+          ? {
+              current: currentPage.value,
+              pageSize: currentPageSize.value
+            }
+          : null
+    })
+  }
+
   function handleSort(columnKey: string) {
     const column = displayColumns.value.find((col) => col.key === columnKey)
     if (!column || !column.sortable) {
@@ -232,26 +251,9 @@ export function useTableState(
       }
     }
 
-    const nextSortState: SortState = {
+    handleSetSort({
       key: newDirection ? columnKey : null,
       direction: newDirection
-    }
-
-    if (!isSortControlled.value) {
-      uncontrolledSortState.value = nextSortState
-    }
-
-    emit('sort-change', nextSortState)
-    emit('change', {
-      sort: nextSortState,
-      filters: filterState.value,
-      pagination:
-        props.pagination !== false
-          ? {
-              current: currentPage.value,
-              pageSize: currentPageSize.value
-            }
-          : null
     })
   }
 
@@ -495,6 +497,7 @@ export function useTableState(
     editingValue,
     virtualScrollTop,
     toggleColumnLock,
+    handleSetSort,
     handleSort,
     handleFilter,
     handlePageChange,

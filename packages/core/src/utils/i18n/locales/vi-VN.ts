@@ -32,6 +32,21 @@ export const viVN: TigerLocale = {
     pageAriaLabel: 'Trang {page}',
     pageIndicatorText: 'Trang {current} / {total}'
   },
+  table: {
+    emptyText: 'Không có dữ liệu',
+    loadingText: 'Đang tải',
+    expandText: 'Mở rộng',
+    collapseText: 'Thu gọn',
+    selectAllText: 'Chọn tất cả',
+    selectRowAriaLabel: 'Chọn hàng {row}',
+    sortByText: 'Sắp xếp theo {column}',
+    clearSortText: 'Xóa sắp xếp',
+    toolbarAriaLabel: 'Thanh công cụ bảng dữ liệu',
+    searchPlaceholder: 'Tìm kiếm',
+    searchButtonText: 'Tìm kiếm',
+    selectedText: 'Đã chọn',
+    selectedItemsText: 'mục'
+  },
   formWizard: {
     prevText: 'Trước',
     nextText: 'Tiếp',

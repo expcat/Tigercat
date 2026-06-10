@@ -17,7 +17,7 @@ import { getLocaleDirection, isRtlLocale } from '@expcat/tigercat-core'
 const locales = { enUS, zhCN, zhTW, jaJP, koKR, thTH, viVN, idID, esES, frFR, deDE, ptBR, arSA }
 
 describe('i18n locale presets', () => {
-  const requiredKeys = ['common', 'modal', 'drawer', 'pagination', 'formWizard', 'taskBoard']
+  const requiredKeys = ['common', 'modal', 'drawer', 'pagination', 'table', 'formWizard', 'taskBoard']
 
   for (const [name, locale] of Object.entries(locales)) {
     it(`${name} contains all required sub-interfaces`, () => {
@@ -61,6 +61,12 @@ describe('i18n locale presets', () => {
   it('all locales have pagination.totalText', () => {
     for (const [, locale] of Object.entries(locales)) {
       expect(locale.pagination.totalText).toBeDefined()
+    }
+  })
+
+  it('all locales have table searchButtonText', () => {
+    for (const [, locale] of Object.entries(locales)) {
+      expect(locale.table.searchButtonText).toBeDefined()
     }
   })
 })

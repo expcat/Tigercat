@@ -11,8 +11,11 @@ import {
 import {
   classNames,
   createTableResizeObserverController,
+  formatTableSelectRowAriaLabel,
+  formatTableSortByText,
   getCardColumns,
   getImmediateTigerLocale,
+  getTableLabels,
   getTableWrapperClasses,
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
@@ -34,6 +37,10 @@ import {
 import { tableExportButtonClasses } from '@expcat/tigercat-core'
 
 import { useTigerConfig } from './ConfigProvider'
+import { Checkbox } from './Checkbox'
+import { Empty } from './Empty'
+import { Radio } from './Radio'
+import { Select } from './Select'
 import { tableEmits, tableProps, type VueTableProps } from './Table/props'
 import { useTableState } from './Table/state'
 import { LoadingSpinner } from './Table/icons'
@@ -57,7 +64,9 @@ export const Table = defineComponent({
     const measuredRowHeights = ref<number[]>([])
     const ctx = useTableState(props as TableInternalProps, emit, measuredColumnWidths)
     const resolvedPaginationLocale = ref<Partial<TigerLocale> | undefined>()
+    const resolvedTableLocale = ref<Partial<TigerLocale> | undefined>()
     let paginationLocaleResolveId = 0
+    let tableLocaleResolveId = 0
 
     const paginationLocaleInput = computed<TigerLocaleInput | false | undefined>(() =>
       props.pagination !== false && typeof props.pagination === 'object'
@@ -65,6 +74,7 @@ export const Table = defineComponent({
         : undefined
     )
     const isPaginationI18nDisabled = computed(() => paginationLocaleInput.value === false)
+    const tableLocaleInput = computed<TigerLocaleInput | undefined>(() => props.locale)
 
     watch(
       paginationLocaleInput,
@@ -101,6 +111,46 @@ export const Table = defineComponent({
         ? undefined
         : mergeTigerLocale(config.value.locale, resolvedPaginationLocale.value)
     )
+
+    watch(
+      tableLocaleInput,
+      (locale) => {
+        const resolveId = ++tableLocaleResolveId
+
+        if (!locale) {
+          resolvedTableLocale.value = undefined
+          return
+        }
+
+        const immediateLocale = getImmediateTigerLocale(locale)
+        resolvedTableLocale.value = immediateLocale
+
+        if (!isLazyTigerLocale(locale)) return
+
+        resolveTigerLocale(locale)
+          .then((nextLocale) => {
+            if (resolveId === tableLocaleResolveId) {
+              resolvedTableLocale.value = nextLocale
+            }
+          })
+          .catch(() => {
+            if (resolveId === tableLocaleResolveId) {
+              resolvedTableLocale.value = immediateLocale
+            }
+          })
+      },
+      { immediate: true }
+    )
+
+    const tableLocale = computed(() =>
+      mergeTigerLocale(config.value.locale, resolvedTableLocale.value)
+    )
+
+    const tableLabels = computed(() => {
+      const overrides =
+        props.emptyText === undefined ? props.labels : { ...props.labels, emptyText: props.emptyText }
+      return getTableLabels(tableLocale.value, overrides)
+    })
 
     const resizeController = createTableResizeObserverController({
       onResize: (snapshot) => {
@@ -140,10 +190,15 @@ export const Table = defineComponent({
           }
         : undefined
 
+      const renderProps = {
+        ...resolvedProps,
+        emptyText: tableLabels.value.emptyText
+      } as TableInternalProps
+
       const tableChildren = [
-        renderTableHeader(ctx, resolvedProps, slots),
-        renderTableBody(ctx, resolvedProps, slots),
-        renderSummaryRow(ctx, resolvedProps)
+        renderTableHeader(ctx, renderProps, slots),
+        renderTableBody(ctx, renderProps, slots),
+        renderSummaryRow(ctx, renderProps)
       ]
 
       const tableInner = h(
@@ -179,19 +234,95 @@ export const Table = defineComponent({
           )
         : tableInner
 
-      const cardContent =
-        resolvedProps.responsiveMode === 'card'
-          ? h(
+      const cardContent = (() => {
+        if (resolvedProps.responsiveMode !== 'card') return null
+
+        const cardChildren: VNodeChild[] = []
+        const sortableColumns = ctx.displayColumns.value.filter((column) => column.sortable)
+
+        if (
+          resolvedProps.rowSelection &&
+          resolvedProps.rowSelection.type !== 'radio' &&
+          resolvedProps.rowSelection.showCheckbox !== false &&
+          ctx.paginatedData.value.length > 0
+        ) {
+          cardChildren.push(
+            h(
               'div',
               {
-                class: getTableResponsiveCardListClasses(resolvedProps.cardBreakpoint),
-                'data-tiger-table-mobile': 'card'
+                class:
+                  'flex items-center justify-between rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2'
               },
-              ctx.paginatedData.value.length === 0
-                ? [h('div', { class: tableResponsiveCardClasses }, resolvedProps.emptyText)]
-                : ctx.paginatedData.value.map((record, index) => {
+              [
+                h(
+                  Checkbox,
+                  {
+                    size: 'sm',
+                    modelValue: ctx.allSelected.value,
+                    indeterminate: ctx.someSelected.value,
+                    onChange: (checked: boolean) => ctx.handleSelectAll(checked)
+                  },
+                  { default: () => tableLabels.value.selectAllText }
+                )
+              ]
+            )
+          )
+        }
+
+        if (sortableColumns.length > 0) {
+          cardChildren.push(
+            h('div', {
+              class:
+                'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2'
+            }, [
+              h(Select, {
+                size: 'sm',
+                modelValue:
+                  ctx.sortState.value.key && ctx.sortState.value.direction
+                    ? `${ctx.sortState.value.key}:${ctx.sortState.value.direction}`
+                    : '',
+                options: [
+                  { label: tableLabels.value.clearSortText, value: '' },
+                  ...sortableColumns.flatMap((column) => [
+                    {
+                      label: `${formatTableSortByText(tableLabels.value.sortByText, column.title)} ↑`,
+                      value: `${column.key}:asc`
+                    },
+                    {
+                      label: `${formatTableSortByText(tableLabels.value.sortByText, column.title)} ↓`,
+                      value: `${column.key}:desc`
+                    }
+                  ])
+                ],
+                clearable: false,
+                'onUpdate:modelValue': (value: string | number | undefined) => {
+                  const nextValue = String(value ?? '')
+                  if (!nextValue) {
+                    ctx.handleSetSort({ key: null, direction: null })
+                    return
+                  }
+                  const separatorIndex = nextValue.lastIndexOf(':')
+                  const key = nextValue.slice(0, separatorIndex)
+                  const direction = nextValue.slice(separatorIndex + 1) as 'asc' | 'desc'
+                  ctx.handleSetSort({ key, direction })
+                }
+              })
+            ])
+          )
+        }
+
+        if (ctx.paginatedData.value.length === 0) {
+          cardChildren.push(
+            h('div', { class: tableResponsiveCardClasses }, [
+              h(Empty, { showImage: false, description: tableLabels.value.emptyText })
+            ])
+          )
+        } else {
+          cardChildren.push(
+            ...ctx.paginatedData.value.map((record, index) => {
                     const key = ctx.paginatedRowKeys.value[index]
                     const isExpanded = ctx.expandedRowKeySet.value.has(key)
+                    const isSelected = ctx.selectedRowKeySet.value.has(key)
                     const isRowExpandable = resolvedProps.expandable
                       ? resolvedProps.expandable.rowExpandable
                         ? resolvedProps.expandable.rowExpandable(record)
@@ -232,14 +363,36 @@ export const Table = defineComponent({
                       const checkboxProps =
                         resolvedProps.rowSelection.getCheckboxProps?.(record) || {}
                       controls.push(
-                        h('input', {
-                          type: resolvedProps.rowSelection.type === 'radio' ? 'radio' : 'checkbox',
-                          checked: ctx.selectedRowKeySet.value.has(key),
-                          disabled: checkboxProps.disabled,
-                          onClick: (event: Event) => event.stopPropagation(),
-                          onChange: (event: Event) =>
-                            ctx.handleSelectRow(key, (event.target as HTMLInputElement).checked)
-                        })
+                        h(
+                          'span',
+                          { onClick: (event: Event) => event.stopPropagation() },
+                          [
+                            resolvedProps.rowSelection.type === 'radio'
+                              ? h(Radio, {
+                                  value: key,
+                                  checked: isSelected,
+                                  disabled: checkboxProps.disabled,
+                                  'aria-label': formatTableSelectRowAriaLabel(
+                                    tableLabels.value.selectRowAriaLabel,
+                                    index + 1,
+                                    tableLocale.value?.locale
+                                  ),
+                                  onChange: () => ctx.handleSelectRow(key, true)
+                                })
+                              : h(Checkbox, {
+                                  size: 'sm',
+                                  modelValue: isSelected,
+                                  disabled: checkboxProps.disabled,
+                                  'aria-label': formatTableSelectRowAriaLabel(
+                                    tableLabels.value.selectRowAriaLabel,
+                                    index + 1,
+                                    tableLocale.value?.locale
+                                  ),
+                                  onChange: (checked: boolean) =>
+                                    ctx.handleSelectRow(key, checked)
+                                })
+                          ]
+                        )
                       )
                     }
                     if (resolvedProps.expandable && isRowExpandable) {
@@ -255,7 +408,7 @@ export const Table = defineComponent({
                               ctx.handleToggleExpand(key, record)
                             }
                           },
-                          isExpanded ? 'Collapse' : 'Expand'
+                          isExpanded ? tableLabels.value.collapseText : tableLabels.value.expandText
                         )
                       )
                     }
@@ -266,31 +419,62 @@ export const Table = defineComponent({
                           resolvedProps.expandable.expandedRowRender?.(record, index))
                         : null
 
+                    const cardContext = {
+                      record,
+                      index,
+                      columns: ctx.displayColumns.value,
+                      selected: isSelected,
+                      expanded: isExpanded,
+                      toggleExpand: () => ctx.handleToggleExpand(key, record),
+                      selectRow: (checked: boolean) => ctx.handleSelectRow(key, checked)
+                    }
+                    const customCard =
+                      slots.card?.(cardContext) ?? resolvedProps.renderCard?.(cardContext)
+                    const resolvedCardClassName =
+                      typeof resolvedProps.cardClassName === 'function'
+                        ? resolvedProps.cardClassName(record, index)
+                        : resolvedProps.cardClassName
+
                     return h(
                       'div',
                       {
                         key,
-                        class: tableResponsiveCardClasses,
+                        class: classNames(tableResponsiveCardClasses, resolvedCardClassName),
                         onClick: () => ctx.handleRowClick(record, index, key)
                       },
-                      [
-                        controls.length
-                          ? h('div', { class: 'mb-2 flex items-center gap-3' }, controls)
-                          : null,
-                        titleNode,
-                        ...rows,
-                        expandedContent
-                          ? h(
-                              'div',
-                              { class: 'mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3' },
-                              [expandedContent as VNodeChild]
-                            )
-                          : null
-                      ]
+                      customCard !== undefined && customCard !== null
+                        ? [customCard as VNodeChild]
+                        : [
+                            controls.length
+                              ? h('div', { class: 'mb-2 flex items-center gap-3' }, controls)
+                              : null,
+                            titleNode,
+                            ...rows,
+                            expandedContent
+                              ? h(
+                                  'div',
+                                  {
+                                    class:
+                                      'mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                                  },
+                                  [expandedContent as VNodeChild]
+                                )
+                              : null
+                          ]
                     )
                   })
-            )
-          : null
+          )
+        }
+
+        return h(
+          'div',
+          {
+            class: getTableResponsiveCardListClasses(resolvedProps.cardBreakpoint),
+            'data-tiger-table-mobile': 'card'
+          },
+          cardChildren
+        )
+      })()
 
       return h(
         'div',
@@ -333,12 +517,12 @@ export const Table = defineComponent({
                 class: tableLoadingOverlayClasses,
                 role: 'status',
                 'aria-live': 'polite',
-                'aria-label': 'Loading'
+                'aria-label': tableLabels.value.loadingText
               },
-              [LoadingSpinner(), h('span', { class: 'sr-only' }, 'Loading')]
+              [LoadingSpinner(), h('span', { class: 'sr-only' }, tableLabels.value.loadingText)]
             ),
 
-          renderPagination(ctx, resolvedProps, {
+          renderPagination(ctx, renderProps, {
             locale: paginationLocale.value,
             disableI18n: isPaginationI18nDisabled.value
           })

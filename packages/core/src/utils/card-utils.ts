@@ -13,7 +13,8 @@ export const cardVariantClasses: Record<CardVariant, string> = {
   default: 'border border-[var(--tiger-border,#e5e7eb)]',
   bordered: 'border-2 border-[var(--tiger-border,#e5e7eb)]',
   shadow: 'border border-[var(--tiger-border,#e5e7eb)] shadow-md',
-  elevated: 'border border-[var(--tiger-border,#e5e7eb)] shadow-lg'
+  elevated: 'border border-[var(--tiger-border,#e5e7eb)] shadow-lg',
+  transparent: 'bg-transparent border-0 shadow-none'
 } as const
 
 export const cardHoverClasses = 'cursor-pointer hover:shadow-lg hover:-translate-y-1'

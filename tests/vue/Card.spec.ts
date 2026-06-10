@@ -61,7 +61,8 @@ describe('Card', () => {
       { variant: 'default', expected: 'border ' },
       { variant: 'bordered', expected: 'border-2' },
       { variant: 'shadow', expected: 'shadow-md' },
-      { variant: 'elevated', expected: 'shadow-lg' }
+      { variant: 'elevated', expected: 'shadow-lg' },
+      { variant: 'transparent', expected: 'bg-transparent' }
     ] as const
 
     for (const { variant, expected } of variants) {

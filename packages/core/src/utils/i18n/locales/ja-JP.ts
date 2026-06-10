@@ -32,6 +32,21 @@ export const jaJP: TigerLocale = {
     pageAriaLabel: '{page} ページ',
     pageIndicatorText: '全 {total} ページ中 {current} ページ'
   },
+  table: {
+    emptyText: 'データなし',
+    loadingText: '読み込み中',
+    expandText: '展開',
+    collapseText: '折りたたむ',
+    selectAllText: 'すべて選択',
+    selectRowAriaLabel: '{row} 行目を選択',
+    sortByText: '{column} で並べ替え',
+    clearSortText: '並べ替えを解除',
+    toolbarAriaLabel: 'データテーブルツールバー',
+    searchPlaceholder: '検索',
+    searchButtonText: '検索',
+    selectedText: '選択済み',
+    selectedItemsText: '件'
+  },
   formWizard: {
     prevText: '前へ',
     nextText: '次へ',

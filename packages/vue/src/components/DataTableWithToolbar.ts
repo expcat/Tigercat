@@ -12,7 +12,12 @@ import {
 import {
   classNames,
   coerceClassValue,
+  getImmediateTigerLocale,
+  getTableLabels,
+  isLazyTigerLocale,
   mergeStyleValues,
+  mergeTigerLocale,
+  resolveTigerLocale,
   type TableColumn,
   type TableSize,
   type TableResponsiveMode,
@@ -20,12 +25,16 @@ import {
   type SortState,
   type PaginationConfig,
   type RowSelectionConfig,
+  type TigerLocale,
+  type TigerLocaleInput,
+  type TigerLocaleTable,
   type TableToolbarProps as CoreTableToolbarProps,
   type TableToolbarFilter,
   type TableToolbarFilterValue,
   type TableToolbarAction
 } from '@expcat/tigercat-core'
 import { Table } from './Table'
+import { useTigerConfig } from './ConfigProvider'
 import { Input } from './Input'
 import { Select } from './Select'
 import { Button } from './Button'
@@ -48,6 +57,8 @@ export interface VueDataTableWithToolbarProps {
   striped?: boolean
   hoverable?: boolean
   loading?: boolean
+  locale?: TigerLocaleInput
+  labels?: Partial<TigerLocaleTable>
   emptyText?: string
   rowSelection?: RowSelectionConfig
   rowKey?: string | ((record: Record<string, unknown>) => string | number)
@@ -114,9 +125,17 @@ export const DataTableWithToolbar = defineComponent({
       type: Boolean,
       default: false
     },
+    locale: {
+      type: [Object, Function] as PropType<TigerLocaleInput>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleTable>>,
+      default: undefined
+    },
     emptyText: {
       type: String,
-      default: 'No data'
+      default: undefined
     },
     rowSelection: {
       type: Object as PropType<RowSelectionConfig>,
@@ -181,6 +200,7 @@ export const DataTableWithToolbar = defineComponent({
     'page-size-change': (_current: number, _pageSize: number) => true
   },
   setup(props, { attrs, emit }) {
+    const config = useTigerConfig()
     const internalSearch = ref<string>(props.toolbar?.defaultSearchValue ?? '')
     const internalFilters = ref<Record<string, TableToolbarFilterValue>>({})
     const previousPageSize = ref(
@@ -190,6 +210,44 @@ export const DataTableWithToolbar = defineComponent({
     )
     const vnodeProps = (getCurrentInstance()?.vnode.props ?? {}) as Record<string, unknown>
     const hasSearchListener = Boolean(vnodeProps.onSearch || vnodeProps.onSearchChange)
+    const resolvedTableLocale = ref<Partial<TigerLocale> | undefined>()
+    let tableLocaleResolveId = 0
+
+    watch(
+      () => props.locale,
+      (locale) => {
+        const resolveId = ++tableLocaleResolveId
+
+        if (!locale) {
+          resolvedTableLocale.value = undefined
+          return
+        }
+
+        const immediateLocale = getImmediateTigerLocale(locale)
+        resolvedTableLocale.value = immediateLocale
+
+        if (!isLazyTigerLocale(locale)) return
+
+        resolveTigerLocale(locale)
+          .then((nextLocale) => {
+            if (resolveId === tableLocaleResolveId) {
+              resolvedTableLocale.value = nextLocale
+            }
+          })
+          .catch(() => {
+            if (resolveId === tableLocaleResolveId) {
+              resolvedTableLocale.value = immediateLocale
+            }
+          })
+      },
+      { immediate: true }
+    )
+
+    const tableLocale = computed(() =>
+      mergeTigerLocale(config.value.locale, resolvedTableLocale.value)
+    )
+
+    const tableLabels = computed(() => getTableLabels(tableLocale.value, props.labels))
 
     watch(
       () => props.toolbar?.searchValue,
@@ -262,7 +320,7 @@ export const DataTableWithToolbar = defineComponent({
         ? props.toolbar.selectedCount
         : selectedKeys.value.length
     )
-    const bulkLabel = computed(() => props.toolbar?.bulkActionsLabel ?? '已选择')
+    const bulkLabel = computed(() => props.toolbar?.bulkActionsLabel ?? tableLabels.value.selectedText)
 
     const wrapperClasses = computed(() =>
       classNames(
@@ -342,7 +400,7 @@ export const DataTableWithToolbar = defineComponent({
                   type: 'search',
                   size: 'sm',
                   modelValue: searchValue.value,
-                  placeholder: props.toolbar?.searchPlaceholder ?? '搜索',
+                  placeholder: props.toolbar?.searchPlaceholder ?? tableLabels.value.searchPlaceholder,
                   'onUpdate:modelValue': (value: string | number) =>
                     handleSearchChange(String(value ?? '')),
                   onKeydown: (event: KeyboardEvent) => {
@@ -384,7 +442,7 @@ export const DataTableWithToolbar = defineComponent({
                       onClick: handleSearchSubmit,
                       disabled: !canSearch.value
                     },
-                    { default: () => props.toolbar?.searchButtonText ?? '搜索' }
+                    { default: () => props.toolbar?.searchButtonText ?? tableLabels.value.searchButtonText }
                   )
                 : null
             ]
@@ -431,7 +489,11 @@ export const DataTableWithToolbar = defineComponent({
                 h('span', {
                   class: 'w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] animate-pulse'
                 }),
-                h('span', null, `${bulkLabel.value} ${selectedCount.value} 项`)
+                h(
+                  'span',
+                  null,
+                  `${bulkLabel.value} ${selectedCount.value} ${tableLabels.value.selectedItemsText}`
+                )
               ]
             )
           )
@@ -463,7 +525,7 @@ export const DataTableWithToolbar = defineComponent({
               : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 dark:bg-gray-800/30 px-4 py-3.5 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm'
           ),
           role: 'toolbar',
-          'aria-label': '数据表格工具栏'
+          'aria-label': tableLabels.value.toolbarAriaLabel
         },
         [
           h('div', { class: 'flex items-center gap-3 flex-wrap flex-1 min-w-0' }, leftNodes),
@@ -494,6 +556,8 @@ export const DataTableWithToolbar = defineComponent({
         striped: props.striped,
         hoverable: props.hoverable,
         loading: props.loading,
+        locale: props.locale,
+        labels: props.labels,
         emptyText: props.emptyText,
         pagination: props.pagination,
         rowSelection: props.rowSelection,

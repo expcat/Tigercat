@@ -32,6 +32,21 @@ export const idID: TigerLocale = {
     pageAriaLabel: 'Halaman {page}',
     pageIndicatorText: 'Halaman {current} dari {total}'
   },
+  table: {
+    emptyText: 'Tidak ada data',
+    loadingText: 'Memuat',
+    expandText: 'Perluas',
+    collapseText: 'Ciutkan',
+    selectAllText: 'Pilih semua',
+    selectRowAriaLabel: 'Pilih baris {row}',
+    sortByText: 'Urutkan berdasarkan {column}',
+    clearSortText: 'Hapus urutan',
+    toolbarAriaLabel: 'Toolbar tabel data',
+    searchPlaceholder: 'Cari',
+    searchButtonText: 'Cari',
+    selectedText: 'Dipilih',
+    selectedItemsText: 'item'
+  },
   formWizard: {
     prevText: 'Sebelumnya',
     nextText: 'Selanjutnya',

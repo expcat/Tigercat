@@ -2,7 +2,7 @@
  * Table component types and interfaces
  */
 
-import type { TigerLocaleInput } from './locale'
+import type { TigerLocaleInput, TigerLocaleTable } from './locale'
 import type { PaginationPageSizeOptionItem } from './pagination'
 
 /**
@@ -397,6 +397,16 @@ export interface ExpandableConfig<T = Record<string, unknown>> {
   expandIconPosition?: 'start' | 'end'
 }
 
+export interface TableCardRenderContext<T = Record<string, unknown>> {
+  record: T
+  index: number
+  columns: TableColumn<T>[]
+  selected: boolean
+  expanded: boolean
+  toggleExpand: () => void
+  selectRow: (checked: boolean) => void
+}
+
 /**
  * Base table props interface
  */
@@ -472,6 +482,16 @@ export interface TableProps<T = Record<string, unknown>> {
   loading?: boolean
 
   /**
+   * Locale configuration for table text.
+   */
+  locale?: TigerLocaleInput
+
+  /**
+   * Flat table text overrides for this instance.
+   */
+  labels?: Partial<TigerLocaleTable>
+
+  /**
    * Empty state text
    * @default 'No data'
    */
@@ -536,6 +556,16 @@ export interface TableProps<T = Record<string, unknown>> {
    * @default 'sm'
    */
   cardBreakpoint?: TableCardBreakpoint
+
+  /**
+   * Additional class for mobile card rows, or a resolver per record.
+   */
+  cardClassName?: string | ((record: T, index: number) => string)
+
+  /**
+   * Custom mobile card renderer for `responsiveMode="card"`.
+   */
+  renderCard?: (context: TableCardRenderContext<T>) => unknown
 
   // --- v0.6.0 additions ---
 

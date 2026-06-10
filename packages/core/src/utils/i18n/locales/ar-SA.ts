@@ -48,6 +48,21 @@ export const arSA: TigerLocale = defineLocale({
     pageAriaLabel: 'الصفحة {page}',
     pageIndicatorText: 'الصفحة {current} من {total}'
   },
+  table: {
+    emptyText: 'لا توجد بيانات',
+    loadingText: 'جار التحميل',
+    expandText: 'توسيع',
+    collapseText: 'طي',
+    selectAllText: 'تحديد الكل',
+    selectRowAriaLabel: 'تحديد الصف {row}',
+    sortByText: 'فرز حسب {column}',
+    clearSortText: 'مسح الفرز',
+    toolbarAriaLabel: 'شريط أدوات جدول البيانات',
+    searchPlaceholder: 'بحث',
+    searchButtonText: 'بحث',
+    selectedText: 'محدد',
+    selectedItemsText: 'عناصر'
+  },
   formWizard: {
     prevText: 'السابق',
     nextText: 'التالي',

@@ -32,6 +32,21 @@ export const enUS: TigerLocale = {
     pageAriaLabel: 'Page {page}',
     pageIndicatorText: 'Page {current} of {total}'
   },
+  table: {
+    emptyText: 'No data',
+    loadingText: 'Loading',
+    expandText: 'Expand',
+    collapseText: 'Collapse',
+    selectAllText: 'Select all',
+    selectRowAriaLabel: 'Select row {row}',
+    sortByText: 'Sort by {column}',
+    clearSortText: 'Clear sort',
+    toolbarAriaLabel: 'Data table toolbar',
+    searchPlaceholder: 'Search',
+    searchButtonText: 'Search',
+    selectedText: 'Selected',
+    selectedItemsText: 'items'
+  },
   formWizard: {
     prevText: 'Previous',
     nextText: 'Next',

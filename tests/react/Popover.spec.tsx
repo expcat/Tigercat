@@ -429,6 +429,32 @@ describe('Popover', () => {
       })
     })
 
+    it('restores trigger focus after Escape and outside-click close', async () => {
+      const user = userEvent.setup()
+      const { getByText } = renderWithProps(Popover, {
+        trigger: 'click',
+        contentContent: <button>Inside</button>,
+        children: <button>Trigger</button>
+      })
+
+      const trigger = getByText('Trigger')
+      await user.click(trigger)
+      await user.click(getByText('Inside'))
+      expect(getByText('Inside')).toHaveFocus()
+
+      await user.keyboard('{Escape}')
+      await waitFor(() => {
+        expect(trigger).toHaveFocus()
+      })
+
+      await user.click(trigger)
+      await user.click(getByText('Inside'))
+      await user.click(document.body)
+      await waitFor(() => {
+        expect(trigger).toHaveFocus()
+      })
+    })
+
     it('should passthrough div attributes to container', () => {
       const { container } = renderWithProps(Popover, {
         'data-testid': 'popover-root',

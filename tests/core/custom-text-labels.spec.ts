@@ -2,9 +2,11 @@ import { describe, it, expect } from 'vitest'
 import {
   defineText,
   getPaginationLabels,
+  getTableLabels,
   getFormWizardLabels,
   getTaskBoardLabels,
   DEFAULT_PAGINATION_LABELS,
+  DEFAULT_TABLE_LABELS,
   DEFAULT_FORM_WIZARD_LABELS,
   DEFAULT_TASK_BOARD_LABELS
 } from '@expcat/tigercat-core'
@@ -46,6 +48,28 @@ describe('custom-text overrides on label resolvers', () => {
     })
   })
 
+  describe('getTableLabels', () => {
+    it('falls back to English table defaults with no locale or overrides', () => {
+      expect(getTableLabels()).toEqual(DEFAULT_TABLE_LABELS)
+    })
+
+    it('uses Chinese table defaults for zh locales', () => {
+      const labels = getTableLabels({ locale: 'zh-CN' })
+      expect(labels.searchButtonText).toBe('搜索')
+      expect(labels.expandText).toBe('展开')
+    })
+
+    it('ranks overrides above locale and default', () => {
+      const labels = getTableLabels(
+        { table: { searchButtonText: 'locale-search', selectedText: 'locale-selected' } },
+        { searchButtonText: 'override-search' }
+      )
+      expect(labels.searchButtonText).toBe('override-search')
+      expect(labels.selectedText).toBe('locale-selected')
+      expect(labels.emptyText).toBe(DEFAULT_TABLE_LABELS.emptyText)
+    })
+  })
+
   describe('getTaskBoardLabels', () => {
     it('ranks overrides above locale and default', () => {
       const labels = getTaskBoardLabels(
@@ -63,10 +87,12 @@ describe('defineText()', () => {
   it('produces a fully-populated locale from a flat text overlay', () => {
     const text = defineText({
       modal: { okText: 'Confirm' },
+      table: { searchButtonText: 'Find' },
       pagination: { totalText: '{total} items found' }
     })
     expect(text.modal?.okText).toBe('Confirm')
     expect(text.pagination?.totalText).toBe('{total} items found')
+    expect(text.table?.searchButtonText).toBe('Find')
     // Untouched fields inherit the enUS baseline
     expect(text.modal?.cancelText).toBe(enUS.modal?.cancelText)
     expect(text.formWizard?.finishText).toBe(enUS.formWizard?.finishText)

@@ -1,15 +1,22 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  getImmediateTigerLocale,
+  getTableLabels,
+  isLazyTigerLocale,
+  mergeTigerLocale,
+  resolveTigerLocale,
   type TableToolbarProps,
   type TableToolbarFilter,
   type TableToolbarFilterValue,
-  type TableToolbarAction
+  type TableToolbarAction,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { Table, type TableProps } from './Table'
 import { Input } from './Input'
 import { Select } from './Select'
 import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface DataTableWithToolbarProps<T = Record<string, unknown>>
   extends
@@ -55,6 +62,8 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>>
 
 export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<string, unknown>>({
   toolbar,
+  locale,
+  labels,
   onSearchChange,
   onSearch,
   onFiltersChange,
@@ -66,6 +75,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   tableClassName,
   ...tableProps
 }: DataTableWithToolbarProps<T>) => {
+  const config = useTigerConfig()
   const previousPageSizeRef = useRef(
     pagination && typeof pagination === 'object'
       ? (pagination.pageSize ?? pagination.defaultPageSize ?? 10)
@@ -82,6 +92,42 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       })
       return initial
     }
+  )
+  const immediateTableLocale = useMemo(
+    () => (locale ? getImmediateTigerLocale(locale) : undefined),
+    [locale]
+  )
+  const [resolvedTableLocale, setResolvedTableLocale] = useState<
+    Partial<TigerLocale> | undefined
+  >(immediateTableLocale)
+
+  useEffect(() => {
+    let active = true
+    setResolvedTableLocale(immediateTableLocale)
+
+    if (locale && isLazyTigerLocale(locale)) {
+      resolveTigerLocale(locale)
+        .then((nextLocale) => {
+          if (active) setResolvedTableLocale(nextLocale)
+        })
+        .catch(() => {
+          if (active) setResolvedTableLocale(immediateTableLocale)
+        })
+    }
+
+    return () => {
+      active = false
+    }
+  }, [locale, immediateTableLocale])
+
+  const tableLocale = useMemo(
+    () => mergeTigerLocale(config.locale, resolvedTableLocale),
+    [config.locale, resolvedTableLocale]
+  )
+
+  const tableLabels = useMemo(
+    () => getTableLabels(tableLocale, labels),
+    [labels, tableLocale]
   )
 
   useEffect(() => {
@@ -141,7 +187,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 
   const selectedKeys = toolbar?.selectedKeys ?? tableProps.rowSelection?.selectedRowKeys ?? []
   const selectedCount = toolbar?.selectedCount ?? selectedKeys.length
-  const bulkLabel = toolbar?.bulkActionsLabel ?? '已选择'
+  const bulkLabel = toolbar?.bulkActionsLabel ?? tableLabels.selectedText
 
   const wrapperClasses = useMemo(
     () =>
@@ -212,7 +258,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
             : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 dark:bg-gray-800/30 px-4 py-3.5 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm'
         )}
         role="toolbar"
-        aria-label="数据表格工具栏">
+        aria-label={tableLabels.toolbarAriaLabel}>
         <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0">
           {hasSearch ? (
             <div className="flex items-center gap-2 w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]">
@@ -220,7 +266,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 type="search"
                 size="sm"
                 value={searchValue}
-                placeholder={toolbar?.searchPlaceholder ?? '搜索'}
+                placeholder={toolbar?.searchPlaceholder ?? tableLabels.searchPlaceholder}
                 prefix={
                   <svg
                     className="w-3.5 h-3.5 text-[var(--tiger-text-secondary,#6b7280)] shrink-0"
@@ -250,7 +296,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                   className="whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md,0.5rem)] px-3"
                   onClick={handleSearchSubmit}
                   disabled={!onSearch && !toolbar?.onSearch}>
-                  {toolbar?.searchButtonText ?? '搜索'}
+                  {toolbar?.searchButtonText ?? tableLabels.searchButtonText}
                 </Button>
               ) : null}
             </div>
@@ -290,7 +336,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)] text-xs font-medium border border-[var(--tiger-primary,#2563eb)]/15 shrink-0 transition-all duration-300">
                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] animate-pulse" />
                 <span>
-                  {bulkLabel} {selectedCount} 项
+                  {bulkLabel} {selectedCount} {tableLabels.selectedItemsText}
                 </span>
               </div>
             ) : null}
@@ -315,6 +361,8 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       {renderToolbar()}
       <Table
         {...remainingTableProps}
+        locale={locale}
+        labels={labels}
         bordered={bordered}
         pagination={pagination}
         className={classNames(tableClassName, bordered && 'border-none rounded-none shadow-none')}

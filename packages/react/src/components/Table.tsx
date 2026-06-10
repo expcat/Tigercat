@@ -7,6 +7,9 @@ import {
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
+  formatTableSelectRowAriaLabel,
+  formatTableSortByText,
+  getTableLabels,
   tableBaseClasses,
   tableResponsiveCardClasses,
   tableResponsiveCardLabelClasses,
@@ -27,7 +30,11 @@ import {
 import { tableExportButtonClasses } from '@expcat/tigercat-core'
 
 import { useTigerConfig } from './ConfigProvider'
+import { Checkbox } from './Checkbox'
+import { Empty } from './Empty'
 import { LoadingSpinner } from './Table/icons'
+import { Radio } from './Radio'
+import { Select } from './Select'
 import { useTableState } from './Table/state'
 import { renderTableHeader } from './Table/render-header'
 import { renderTableBody } from './Table/render-body'
@@ -50,7 +57,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   striped = false,
   hoverable = true,
   loading = false,
-  emptyText = 'No data',
+  locale,
+  labels,
+  emptyText,
   pagination = {
     current: 1,
     pageSize: 10,
@@ -68,6 +77,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   tableLayout = 'auto',
   responsiveMode = 'scroll',
   cardBreakpoint = 'sm',
+  cardClassName,
+  renderCard,
   // v0.6.0 props
   virtual = false,
   autoVirtual = true,
@@ -115,6 +126,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     | undefined
   const paginationLocaleInput: TigerLocaleInput | false | undefined =
     pagination !== false && typeof pagination === 'object' ? pagination.locale : undefined
+  const tableLocaleInput: TigerLocaleInput | undefined = locale
   const isPaginationI18nDisabled = paginationLocaleInput === false
   const immediatePaginationLocale = useMemo(
     () =>
@@ -126,6 +138,13 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const [resolvedPaginationLocale, setResolvedPaginationLocale] = useState<
     Partial<TigerLocale> | undefined
   >(immediatePaginationLocale)
+  const immediateTableLocale = useMemo(
+    () => (tableLocaleInput ? getImmediateTigerLocale(tableLocaleInput) : undefined),
+    [tableLocaleInput]
+  )
+  const [resolvedTableLocale, setResolvedTableLocale] = useState<
+    Partial<TigerLocale> | undefined
+  >(immediateTableLocale)
 
   useEffect(() => {
     let active = true
@@ -150,12 +169,46 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     }
   }, [isPaginationI18nDisabled, paginationLocaleInput, immediatePaginationLocale])
 
+  useEffect(() => {
+    let active = true
+    setResolvedTableLocale(immediateTableLocale)
+
+    if (tableLocaleInput && isLazyTigerLocale(tableLocaleInput)) {
+      resolveTigerLocale(tableLocaleInput)
+        .then((nextLocale) => {
+          if (active) setResolvedTableLocale(nextLocale)
+        })
+        .catch(() => {
+          if (active) setResolvedTableLocale(immediateTableLocale)
+        })
+    }
+
+    return () => {
+      active = false
+    }
+  }, [tableLocaleInput, immediateTableLocale])
+
   const paginationLocale = useMemo(
     () =>
       isPaginationI18nDisabled
         ? undefined
         : mergeTigerLocale(config.locale, resolvedPaginationLocale),
     [config.locale, isPaginationI18nDisabled, resolvedPaginationLocale]
+  )
+
+  const tableLocale = useMemo(
+    () => mergeTigerLocale(config.locale, resolvedTableLocale),
+    [config.locale, resolvedTableLocale]
+  )
+
+  const tableLabelOverrides = useMemo(
+    () => (emptyText === undefined ? labels : { ...labels, emptyText }),
+    [emptyText, labels]
+  )
+
+  const tableLabels = useMemo(
+    () => getTableLabels(tableLocale, tableLabelOverrides),
+    [tableLabelOverrides, tableLocale]
   )
 
   const ctx = useTableState({
@@ -301,7 +354,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           hoverable,
           striped,
           loading,
-          emptyText,
+          emptyText: tableLabels.emptyText,
           rowSelection: internalRowSelection,
           expandable: internalExpandable,
           rowClassName: internalRowClassName,
@@ -319,12 +372,68 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         <div
           className={getTableResponsiveCardListClasses(cardBreakpoint)}
           data-tiger-table-mobile="card">
+          {internalRowSelection?.type !== 'radio' &&
+          internalRowSelection?.showCheckbox !== false &&
+          internalRowSelection &&
+          ctx.paginatedData.length > 0 ? (
+            <div className="flex items-center justify-between rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2">
+              <Checkbox
+                size="sm"
+                checked={ctx.allSelected}
+                indeterminate={ctx.someSelected}
+                onChange={(checked) => ctx.handleSelectAll(checked)}>
+                {tableLabels.selectAllText}
+              </Checkbox>
+            </div>
+          ) : null}
+          {ctx.displayColumns.some((column) => column.sortable) ? (
+            <div className="rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2">
+              <Select
+                size="sm"
+                value={
+                  ctx.sortState.key && ctx.sortState.direction
+                    ? `${ctx.sortState.key}:${ctx.sortState.direction}`
+                    : ''
+                }
+                options={[
+                  { label: tableLabels.clearSortText, value: '' },
+                  ...ctx.displayColumns
+                    .filter((column) => column.sortable)
+                    .flatMap((column) => [
+                      {
+                        label: `${formatTableSortByText(tableLabels.sortByText, column.title)} ↑`,
+                        value: `${column.key}:asc`
+                      },
+                      {
+                        label: `${formatTableSortByText(tableLabels.sortByText, column.title)} ↓`,
+                        value: `${column.key}:desc`
+                      }
+                    ])
+                ]}
+                clearable={false}
+                onChange={(value) => {
+                  const nextValue = String(value ?? '')
+                  if (!nextValue) {
+                    ctx.handleSetSort({ key: null, direction: null })
+                    return
+                  }
+                  const separatorIndex = nextValue.lastIndexOf(':')
+                  const key = nextValue.slice(0, separatorIndex)
+                  const direction = nextValue.slice(separatorIndex + 1) as 'asc' | 'desc'
+                  ctx.handleSetSort({ key, direction })
+                }}
+              />
+            </div>
+          ) : null}
           {ctx.paginatedData.length === 0 ? (
-            <div className={tableResponsiveCardClasses}>{emptyText}</div>
+            <div className={tableResponsiveCardClasses}>
+              <Empty showImage={false} description={tableLabels.emptyText} />
+            </div>
           ) : (
             ctx.paginatedData.map((record, index) => {
               const key = ctx.pageRowKeys[index]
               const isExpanded = ctx.expandedRowKeySet.has(key)
+              const isSelected = ctx.selectedRowKeySet.has(key)
               const isRowExpandable = internalExpandable
                 ? internalExpandable.rowExpandable
                   ? internalExpandable.rowExpandable(record)
@@ -335,23 +444,61 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                   ? internalExpandable.expandedRowRender?.(record, index)
                   : null
               const expandedNode = expandedContent as React.ReactNode
+              const renderContext = {
+                record: record as T,
+                index,
+                columns: ctx.displayColumns as TableColumn<T>[],
+                selected: isSelected,
+                expanded: isExpanded,
+                toggleExpand: () => ctx.handleToggleExpand(key, record),
+                selectRow: (checked: boolean) => ctx.handleSelectRow(key, checked)
+              }
+              const customCard = renderCard?.(renderContext)
+              const resolvedCardClassName =
+                typeof cardClassName === 'function'
+                  ? cardClassName(record as T, index)
+                  : cardClassName
 
               return (
                 <div
                   key={key}
-                  className={tableResponsiveCardClasses}
+                  className={classNames(tableResponsiveCardClasses, resolvedCardClassName)}
                   onClick={() => ctx.handleRowClick(record, index, key)}>
-                  {(internalRowSelection?.showCheckbox !== false && internalRowSelection) ||
+                  {customCard !== undefined && customCard !== null ? (
+                    customCard as React.ReactNode
+                  ) : (
+                    <>
+                      {(internalRowSelection?.showCheckbox !== false && internalRowSelection) ||
                   (internalExpandable && isRowExpandable) ? (
                     <div className="mb-2 flex items-center gap-3">
                       {internalRowSelection && internalRowSelection.showCheckbox !== false && (
-                        <input
-                          type={internalRowSelection.type === 'radio' ? 'radio' : 'checkbox'}
-                          checked={ctx.selectedRowKeySet.has(key)}
-                          disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
-                          onClick={(event) => event.stopPropagation()}
-                          onChange={(event) => ctx.handleSelectRow(key, event.target.checked)}
-                        />
+                        <span onClick={(event) => event.stopPropagation()}>
+                          {internalRowSelection.type === 'radio' ? (
+                            <Radio
+                              value={key}
+                              checked={isSelected}
+                              disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
+                              aria-label={formatTableSelectRowAriaLabel(
+                                tableLabels.selectRowAriaLabel,
+                                index + 1,
+                                tableLocale?.locale
+                              )}
+                              onChange={() => ctx.handleSelectRow(key, true)}
+                            />
+                          ) : (
+                            <Checkbox
+                              size="sm"
+                              checked={isSelected}
+                              disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
+                              aria-label={formatTableSelectRowAriaLabel(
+                                tableLabels.selectRowAriaLabel,
+                                index + 1,
+                                tableLocale?.locale
+                              )}
+                              onChange={(checked) => ctx.handleSelectRow(key, checked)}
+                            />
+                          )}
+                        </span>
                       )}
                       {internalExpandable && isRowExpandable && (
                         <button
@@ -362,7 +509,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                             event.stopPropagation()
                             ctx.handleToggleExpand(key, record)
                           }}>
-                          {isExpanded ? 'Collapse' : 'Expand'}
+                          {isExpanded ? tableLabels.collapseText : tableLabels.expandText}
                         </button>
                       )}
                     </div>
@@ -401,6 +548,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                       {expandedNode}
                     </div>
                   )}
+                    </>
+                  )}
                 </div>
               )
             })
@@ -413,9 +562,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           className={tableLoadingOverlayClasses}
           role="status"
           aria-live="polite"
-          aria-label="Loading">
+          aria-label={tableLabels.loadingText}>
           <LoadingSpinner />
-          <span className="sr-only">Loading</span>
+          <span className="sr-only">{tableLabels.loadingText}</span>
         </div>
       )}
 

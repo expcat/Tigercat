@@ -155,6 +155,88 @@ describe('Table', () => {
       expect(container.querySelector('[data-tiger-table-mobile="card"]')).toHaveClass('max-md:grid')
       expect(container.querySelector('table')).toHaveClass('max-md:hidden')
     })
+
+    it('uses table labels and themed selection controls in card mode', async () => {
+      const onSelectionChange = vi.fn()
+      const { getByText, getByLabelText, container } = renderWithProps(Table, {
+        columns,
+        dataSource: [dataSource[0]],
+        responsiveMode: 'card',
+        pagination: false,
+        rowSelection: { type: 'checkbox' },
+        expandable: { expandedRowRender: () => h('div', 'Expanded details') },
+        labels: {
+          expandText: 'More',
+          collapseText: 'Less',
+          selectAllText: 'All rows',
+          selectRowAriaLabel: 'Pick row {row}'
+        },
+        onSelectionChange
+      })
+
+      expect(getByText('All rows')).toBeInTheDocument()
+      expect(getByText('More')).toBeInTheDocument()
+      expect(getByLabelText('Pick row 1')).toBeInTheDocument()
+      expect(container.querySelector('[data-tiger-table-mobile="card"] input[type="checkbox"]')).toHaveClass(
+        'rounded'
+      )
+
+      await fireEvent.click(getByText('All rows'))
+      expect(onSelectionChange).toHaveBeenCalledWith([1])
+
+      await fireEvent.click(getByText('More'))
+      expect(getByText('Less')).toBeInTheDocument()
+    })
+
+    it('renders Empty and custom card slot in card mode', () => {
+      const empty = renderWithProps(Table, {
+        columns,
+        dataSource: [],
+        responsiveMode: 'card',
+        pagination: false,
+        labels: { emptyText: 'Nothing here' }
+      })
+      expect(empty.getAllByText('Nothing here').length).toBeGreaterThan(1)
+      empty.unmount()
+
+      const { getByTestId } = render(Table, {
+        props: {
+          columns,
+          dataSource: [dataSource[0]],
+          responsiveMode: 'card',
+          pagination: false,
+          cardClassName: 'custom-card'
+        },
+        slots: {
+          card: ({ record }: { record: Record<string, unknown> }) =>
+            h('div', { 'data-testid': 'custom-card' }, String(record.name))
+        }
+      })
+
+      expect(getByTestId('custom-card')).toHaveTextContent('John Doe')
+      expect(getByTestId('custom-card').closest('.custom-card')).toBeInTheDocument()
+    })
+
+    it('exposes a card-mode sort selector', async () => {
+      const onSortChange = vi.fn()
+      const sortableColumns = [
+        { key: 'name', title: 'Name', sortable: true },
+        { key: 'age', title: 'Age', sortable: true }
+      ]
+      const { container, getByText } = renderWithProps(Table, {
+        columns: sortableColumns,
+        dataSource,
+        responsiveMode: 'card',
+        pagination: false,
+        onSortChange
+      })
+
+      const sortTrigger = container.querySelector('[data-tiger-table-mobile="card"] button')!
+      await fireEvent.click(sortTrigger)
+      await fireEvent.click(getByText('Sort by Age ↓'))
+
+      expect(onSortChange).toHaveBeenCalledWith({ key: 'age', direction: 'desc' })
+    })
   })
 
   describe('Props', () => {

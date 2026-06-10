@@ -32,6 +32,21 @@ export const koKR: TigerLocale = {
     pageAriaLabel: '{page} 페이지',
     pageIndicatorText: '전체 {total}페이지 중 {current}페이지'
   },
+  table: {
+    emptyText: '데이터 없음',
+    loadingText: '로딩 중',
+    expandText: '펼치기',
+    collapseText: '접기',
+    selectAllText: '전체 선택',
+    selectRowAriaLabel: '{row}행 선택',
+    sortByText: '{column} 기준 정렬',
+    clearSortText: '정렬 해제',
+    toolbarAriaLabel: '데이터 테이블 도구 모음',
+    searchPlaceholder: '검색',
+    searchButtonText: '검색',
+    selectedText: '선택됨',
+    selectedItemsText: '개'
+  },
   formWizard: {
     prevText: '이전',
     nextText: '다음',

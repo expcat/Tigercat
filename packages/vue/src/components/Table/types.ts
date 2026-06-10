@@ -45,6 +45,7 @@ export interface TableContext {
 
   // --- Handlers ---
   toggleColumnLock: (key: string) => void
+  handleSetSort: (sort: SortState) => void
   handleSort: (columnKey: string) => void
   handleFilter: (columnKey: string, value: unknown) => void
   handlePageChange: (page: number) => void

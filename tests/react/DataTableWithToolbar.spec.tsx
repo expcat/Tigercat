@@ -113,8 +113,54 @@ describe('DataTableWithToolbar (React)', () => {
       />
     )
 
-    expect(screen.getByText('已选择 2 项')).toBeInTheDocument()
+    expect(screen.getByText('Selected 2 items')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '导出' })).toBeInTheDocument()
+  })
+
+  it('uses table labels for toolbar text and keeps toolbar overrides first', () => {
+    const { rerender } = render(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[]}
+        labels={{
+          searchPlaceholder: 'Find rows',
+          searchButtonText: 'Find',
+          selectedText: 'Chosen',
+          selectedItemsText: 'rows'
+        }}
+        toolbar={{
+          bulkActions: [{ key: 'export', label: 'Export' }],
+          selectedKeys: [1],
+          defaultSearchValue: ''
+        }}
+        onSearch={vi.fn()}
+        pagination={false}
+      />
+    )
+
+    expect(screen.getByPlaceholderText('Find rows')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Find' })).toBeInTheDocument()
+    expect(screen.getByText('Chosen 1 rows')).toBeInTheDocument()
+
+    rerender(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[]}
+        labels={{ searchButtonText: 'Find', selectedText: 'Chosen' }}
+        toolbar={{
+          bulkActions: [{ key: 'export', label: 'Export' }],
+          selectedKeys: [1],
+          defaultSearchValue: '',
+          searchButtonText: 'Go',
+          bulkActionsLabel: 'Picked'
+        }}
+        onSearch={vi.fn()}
+        pagination={false}
+      />
+    )
+
+    expect(screen.getByRole('button', { name: 'Go' })).toBeInTheDocument()
+    expect(screen.getByText('Picked 1 items')).toBeInTheDocument()
   })
 
   it('updates search value on change', async () => {
@@ -154,7 +200,7 @@ describe('DataTableWithToolbar (React)', () => {
     await userEvent.type(input, 'Alpha{enter}')
 
     expect(onSearch).toHaveBeenCalledWith('Alpha')
-    expect(screen.queryByRole('button', { name: '搜索' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Search' })).not.toBeInTheDocument()
   })
 
   it('forwards selection change', async () => {
@@ -190,6 +236,28 @@ describe('DataTableWithToolbar (React)', () => {
     expect(screen.getByRole('button', { name: '上一页' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '下一页' })).toBeInTheDocument()
     expect(screen.getByText('10 条/页')).toBeInTheDocument()
+  })
+
+  it('uses ConfigProvider locale for toolbar text', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <DataTableWithToolbar<RowData>
+          columns={columns}
+          dataSource={[]}
+          toolbar={{
+            bulkActions: [{ key: 'export', label: '导出' }],
+            selectedKeys: [1],
+            defaultSearchValue: ''
+          }}
+          onSearch={vi.fn()}
+          pagination={false}
+        />
+      </ConfigProvider>
+    )
+
+    expect(screen.getByPlaceholderText('搜索')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '搜索' })).toBeInTheDocument()
+    expect(screen.getByText('已选择 1 项')).toBeInTheDocument()
   })
 
   it('uses Chinese locale for simple pagination text and aria labels', () => {

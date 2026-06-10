@@ -11,6 +11,7 @@ import { useVueFloating, useVueClickOutside, useVueEscapeKey } from './overlay'
 import {
   getTransformOrigin,
   buildTriggerHandlerMap,
+  restoreFocus,
   type FloatingPlacement,
   type FloatingTrigger
 } from '@expcat/tigercat-core'
@@ -106,6 +107,23 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
   const triggerRef = ref<HTMLElement | null>(null)
   const floatingRef = ref<HTMLElement | null>(null)
 
+  const restoreTriggerFocus = () => {
+    const trigger = triggerRef.value
+    const target =
+      trigger?.querySelector<HTMLElement>(
+        'button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'
+      ) ?? trigger
+
+    window.setTimeout(() => {
+      restoreFocus(target, { preventScroll: true })
+    }, 0)
+  }
+
+  const closeAndRestoreFocus = () => {
+    setVisible(false)
+    restoreTriggerFocus()
+  }
+
   // ─── Floating positioning ────────────────────────────────────────────
   const {
     x,
@@ -139,14 +157,14 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
         outsideClickCleanup = useVueClickOutside({
           enabled: currentVisible,
           refs: [containerRef, floatingRef],
-          onOutsideClick: () => setVisible(false),
+          onOutsideClick: closeAndRestoreFocus,
           defer: true
         })
       }
       if (visible && trigger !== 'manual') {
         escapeKeyCleanup = useVueEscapeKey({
           enabled: currentVisible,
-          onEscape: () => setVisible(false)
+          onEscape: closeAndRestoreFocus
         })
       }
     },

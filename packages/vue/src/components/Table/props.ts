@@ -8,7 +8,10 @@ import type {
   PaginationConfig,
   RowSelectionConfig,
   ExpandableConfig,
-  FilterRule
+  FilterRule,
+  TigerLocaleInput,
+  TigerLocaleTable,
+  TableCardRenderContext
 } from '@expcat/tigercat-core'
 
 /**
@@ -27,6 +30,8 @@ export interface VueTableProps {
   striped?: boolean
   hoverable?: boolean
   loading?: boolean
+  locale?: TigerLocaleInput
+  labels?: Partial<TigerLocaleTable>
   emptyText?: string
   pagination?: PaginationConfig | false
   rowSelection?: RowSelectionConfig
@@ -38,6 +43,10 @@ export interface VueTableProps {
   tableLayout?: 'auto' | 'fixed'
   responsiveMode?: TableResponsiveMode
   cardBreakpoint?: TableCardBreakpoint
+  cardClassName?:
+    | string
+    | ((record: Record<string, unknown>, index: number) => string | undefined)
+  renderCard?: (context: TableCardRenderContext<Record<string, unknown>>) => unknown
   // v0.6.0
   virtual?: boolean
   virtualHeight?: number
@@ -114,9 +123,15 @@ export const tableProps = {
     type: Boolean,
     default: false
   },
+  locale: {
+    type: [Object, Function] as PropType<TigerLocaleInput>
+  },
+  labels: {
+    type: Object as PropType<Partial<TigerLocaleTable>>
+  },
   emptyText: {
     type: String,
-    default: 'No data'
+    default: undefined
   },
   pagination: {
     type: [Object, Boolean] as PropType<PaginationConfig | false>,
@@ -164,6 +179,16 @@ export const tableProps = {
   cardBreakpoint: {
     type: String as PropType<TableCardBreakpoint>,
     default: 'sm' as TableCardBreakpoint
+  },
+  cardClassName: {
+    type: [String, Function] as PropType<
+      string | ((record: Record<string, unknown>, index: number) => string | undefined)
+    >
+  },
+  renderCard: {
+    type: Function as PropType<
+      (context: TableCardRenderContext<Record<string, unknown>>) => unknown
+    >
   },
   // --- v0.6.0 props ---
   virtual: { type: Boolean, default: false },

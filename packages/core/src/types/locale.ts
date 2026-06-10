@@ -71,6 +71,24 @@ export interface TigerLocalePagination {
   pageIndicatorText?: string
 }
 
+export interface TigerLocaleTable {
+  emptyText?: string
+  loadingText?: string
+  expandText?: string
+  collapseText?: string
+  selectAllText?: string
+  /** Template: supports {row} */
+  selectRowAriaLabel?: string
+  /** Template: supports {column} */
+  sortByText?: string
+  clearSortText?: string
+  toolbarAriaLabel?: string
+  searchPlaceholder?: string
+  searchButtonText?: string
+  selectedText?: string
+  selectedItemsText?: string
+}
+
 export interface TigerLocaleFormWizard {
   prevText?: string
   nextText?: string
@@ -100,6 +118,7 @@ export interface TigerLocale {
   drawer?: TigerLocaleDrawer
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination
+  table?: TigerLocaleTable
   datePicker?: Partial<DatePickerLocalePreset>
   formWizard?: TigerLocaleFormWizard
   taskBoard?: TigerLocaleTaskBoard

@@ -7,6 +7,7 @@ describe('defineLocale()', () => {
     const locale = defineLocale()
     expect(locale.common?.okText).toBe(enUS.common?.okText)
     expect(locale.pagination?.totalText).toBe(enUS.pagination?.totalText)
+    expect(locale.table?.searchButtonText).toBe(enUS.table?.searchButtonText)
     expect(locale.taskBoard?.boardAriaLabel).toBe(enUS.taskBoard?.boardAriaLabel)
   })
 
@@ -19,14 +20,17 @@ describe('defineLocale()', () => {
   it('deep-merges nested overrides on top of the baseline', () => {
     const locale = defineLocale({
       common: { okText: 'はい' },
+      table: { searchButtonText: '探す' },
       pagination: { totalText: '{total} 件' }
     })
     // Overridden fields take the new value
     expect(locale.common?.okText).toBe('はい')
     expect(locale.pagination?.totalText).toBe('{total} 件')
+    expect(locale.table?.searchButtonText).toBe('探す')
     // Unspecified siblings still inherit from enUS
     expect(locale.common?.cancelText).toBe(enUS.common?.cancelText)
     expect(locale.pagination?.itemsPerPageText).toBe(enUS.pagination?.itemsPerPageText)
+    expect(locale.table?.emptyText).toBe(enUS.table?.emptyText)
     // Untouched sections are preserved from enUS
     expect(locale.modal?.closeAriaLabel).toBe(enUS.modal?.closeAriaLabel)
     expect(locale.formWizard?.finishText).toBe(enUS.formWizard?.finishText)
