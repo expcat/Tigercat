@@ -23,12 +23,12 @@ source: current repository audit and planning
 | 组件库   | Vue 3 + React 双端组件库，核心逻辑沉淀在 `@expcat/tigercat-core` |
 | 包管理   | pnpm workspace，统一 catalog 管理核心工具链版本                  |
 | 样式体系 | Tailwind CSS v4 + CSS Variables + Tigercat Tailwind plugin       |
-| 发布版本 | v1.2.41 发布准备中                                               |
+| 发布版本 | v1.2.43 发布准备中                                               |
 | 质量门禁 | Vitest、Playwright、a11y、size-limit、API/test validate          |
 
 ## 当前待办
 
-- [ ] v1.2.41 发布执行：运行 `pnpm quality:release`、`pnpm build`，发布后执行 `pnpm smoke:published`。
+- [ ] v1.2.43 发布执行：运行 `pnpm quality:release`、`pnpm build`，发布后执行 `pnpm smoke:published`。
 - [ ] 发布后归档：确认 `CHANGELOG.md`、迁移指南、发布记录和 Roadmap 状态与实际发布结果一致。
 
 ## 持续守护
