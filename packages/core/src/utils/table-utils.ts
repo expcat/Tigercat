@@ -83,6 +83,17 @@ export const tableRowGroupHoverClasses =
 export const tableRowStripedClasses =
   'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
 
+/**
+ * Opaque striped background for sticky fixed cells.
+ *
+ * Fixed cells float above other columns, so the translucent
+ * `tableRowStripedClasses` would let underlying content show through while
+ * scrolling horizontally. color-mix yields the same visual color as the
+ * 50% stripe overlay sitting on the table background.
+ */
+export const tableFixedCellStripedClasses =
+  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))_50%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff))))]'
+
 export function getTableResponsiveTableClasses(
   mode: TableResponsiveMode,
   breakpoint: TableCardBreakpoint = 'sm'
@@ -316,7 +327,7 @@ export function getTableFixedCellClasses<T = Record<string, unknown>>(
   }
 
   return classNames(
-    options.stripedActive ? tableRowStripedClasses : tableBackgroundClasses,
+    options.stripedActive ? tableFixedCellStripedClasses : tableBackgroundClasses,
     options.hoverable && tableRowGroupHoverClasses,
     options.selected && options.selectedClassName,
     resolveFixedCellClassName(options.column, context)

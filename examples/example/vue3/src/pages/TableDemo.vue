@@ -99,7 +99,7 @@ const stickySnippet = `<Table
   :maxHeight="400"
   :pagination="false" />`
 
-const fixedSnippet = `<Table :columns="fixedColumns" :dataSource="basicData" :pagination="false" />`
+const fixedSnippet = `<Table :columns="fixedColumns" :dataSource="basicData" striped :pagination="false" />`
 
 const fixedStyleSnippet = `<Table
   :columns="styledFixedColumns"
@@ -614,9 +614,9 @@ const pagedData = computed(() => {
     <!-- 锁定列（固定列） -->
     <DemoBlock
       title="锁定列（固定列）"
-      description="左右滚动时固定列保持可见（需为固定列设置 width）。"
+      description="左右滚动时固定列保持可见（需为固定列设置 width）；开启 striped 时斑马纹行的固定单元格保持不透明。"
       :code="fixedSnippet">
-      <Table :columns="fixedColumns" :dataSource="basicData" :pagination="false" />
+      <Table :columns="fixedColumns" :dataSource="basicData" striped :pagination="false" />
     </DemoBlock>
 
     <DemoBlock

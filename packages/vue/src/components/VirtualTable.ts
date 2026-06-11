@@ -15,7 +15,7 @@ import {
   virtualTableCellClasses,
   virtualTableEmptyClasses,
   virtualTableLoadingClasses,
-  virtualTableRowSelectedClasses,
+  virtualTableFixedCellSelectedClasses,
   type TableColumn,
   type VirtualTableRange
 } from '@expcat/tigercat-core'
@@ -164,7 +164,7 @@ export const VirtualTable = defineComponent({
                   selected: isSelected,
                   hoverable: true,
                   fixedInfo: fi,
-                  selectedClassName: virtualTableRowSelectedClasses
+                  selectedClassName: virtualTableFixedCellSelectedClasses
                 })
               ),
               style: getVirtualTableFixedCellStyle(col.key, fi)

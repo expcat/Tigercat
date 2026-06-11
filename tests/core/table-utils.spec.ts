@@ -13,6 +13,7 @@ import {
   getTableVirtualRecommendation,
   getRowKey,
   tableBackgroundClasses,
+  tableFixedCellStripedClasses,
   tableHeaderBackgroundClasses,
   tableRowGroupHoverClasses,
   tableRowStripedClasses,
@@ -199,7 +200,11 @@ describe('table-utils', () => {
         selectedClassName: 'selected-row-bg'
       })
 
-      expect(classes).toContain(tableRowStripedClasses)
+      expect(classes).toContain(tableFixedCellStripedClasses)
+      // Sticky cells must stay opaque — the translucent row stripe class
+      // would let underlying columns show through while scrolling.
+      expect(classes).not.toContain(tableRowStripedClasses)
+      expect(tableFixedCellStripedClasses).not.toContain('/50')
       expect(classes).toContain(tableRowGroupHoverClasses)
       expect(classes).toContain('selected-row-bg')
       expect(classes).toContain('selected-table-left-0')

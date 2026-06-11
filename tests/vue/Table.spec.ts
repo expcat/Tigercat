@@ -24,6 +24,8 @@ const tableHeaderBgClass =
   'bg-[var(--tiger-table-header-bg,var(--tiger-component-table-header-bg,var(--tiger-surface-muted,#f9fafb)))]'
 const tableStripeBgClass =
   'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
+const tableFixedStripeBgClass =
+  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))_50%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff))))]'
 
 describe('Table', () => {
   describe('Rendering', () => {
@@ -590,7 +592,7 @@ describe('Table', () => {
         pagination: false
       })
 
-      expect(getByText('John Doe').closest('td')).toHaveClass(tableStripeBgClass)
+      expect(getByText('John Doe').closest('td')).toHaveClass(tableFixedStripeBgClass)
     })
 
     it('supports fixedClassName and fixedHeaderClassName overrides', () => {

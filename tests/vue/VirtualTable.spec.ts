@@ -10,8 +10,10 @@ const columns = [
 
 const tableHeaderBgClass =
   'bg-[var(--tiger-table-header-bg,var(--tiger-component-table-header-bg,var(--tiger-surface-muted,#f9fafb)))]'
-const tableStripeBgClass =
-  'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
+const tableFixedStripeBgClass =
+  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))_50%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff))))]'
+const tableFixedSelectedBgClass =
+  'bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_5%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff)))))]'
 
 function makeData(count: number) {
   return Array.from({ length: count }, (_, i) => ({
@@ -276,7 +278,7 @@ describe('VirtualTable (Vue)', () => {
       )
 
       if (dataRows.length > 1) {
-        expect(dataRows[1].querySelectorAll('td')[0]).toHaveClass(tableStripeBgClass)
+        expect(dataRows[1].querySelectorAll('td')[0]).toHaveClass(tableFixedStripeBgClass)
       }
     })
 
@@ -307,6 +309,7 @@ describe('VirtualTable (Vue)', () => {
       expect(getByText('ID').closest('th')).toHaveClass('custom-fixed-header')
       const dataRows = getAllByRole('row').filter((row) => row.querySelector('td'))
       expect(dataRows[0].querySelectorAll('td')[0]).toHaveClass('virtual-table-left-selected')
+      expect(dataRows[0].querySelectorAll('td')[0]).toHaveClass(tableFixedSelectedBgClass)
     })
 
     it('supports sticky header + sticky columns simultaneously', () => {

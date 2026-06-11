@@ -14,6 +14,7 @@ import {
   virtualTableRowHoverClasses,
   virtualTableRowStripedClasses,
   virtualTableRowSelectedClasses,
+  virtualTableFixedCellSelectedClasses,
   type TableColumn
 } from '@expcat/tigercat-core'
 
@@ -161,7 +162,11 @@ describe('virtual-table-utils', () => {
         fixedInfo
       })
 
-      expect(classes).toContain(virtualTableRowSelectedClasses)
+      expect(classes).toContain(virtualTableFixedCellSelectedClasses)
+      // Sticky cells must stay opaque — the translucent row selected class
+      // would let underlying columns show through while scrolling.
+      expect(classes).not.toContain(virtualTableRowSelectedClasses)
+      expect(virtualTableFixedCellSelectedClasses).not.toContain('/5')
       expect(classes).toContain('virtual-table-selected')
     })
 

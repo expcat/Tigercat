@@ -36,6 +36,17 @@ export const virtualTableRowStripedClasses =
 
 export const virtualTableRowSelectedClasses = 'bg-[var(--tiger-primary,#2563eb)]/5'
 
+/**
+ * Opaque selected background for sticky fixed cells.
+ *
+ * Fixed cells float above other columns, so the translucent
+ * `virtualTableRowSelectedClasses` would let underlying content show through
+ * while scrolling horizontally. color-mix yields the same visual color as the
+ * 5% primary overlay sitting on the table background.
+ */
+export const virtualTableFixedCellSelectedClasses =
+  'bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_5%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff)))))]'
+
 export const virtualTableCellClasses =
   'px-4 py-3 text-sm text-[var(--tiger-text,#1f2937)] whitespace-nowrap'
 
@@ -177,7 +188,7 @@ export function getVirtualTableFixedCellClasses<T = Record<string, unknown>>(
     selected: options.selected,
     hoverable: options.hoverable ?? true,
     fixedInfo: options.fixedInfo,
-    selectedClassName: virtualTableRowSelectedClasses
+    selectedClassName: virtualTableFixedCellSelectedClasses
   })
 }
 
