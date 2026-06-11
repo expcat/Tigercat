@@ -122,6 +122,34 @@ export interface ColumnFilter {
   filterFn?: (value: unknown, filterValue: unknown) => boolean
 }
 
+export type TableCardColSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+export type TableCardRowSpan = 1 | 2 | 3 | 4 | 5 | 6
+
+export interface TableColumnCardGrid {
+  /**
+   * Grid column span in card mode (1-12).
+   * @default 12
+   */
+  colSpan?: TableCardColSpan
+
+  /**
+   * Grid row span in card mode (1-6).
+   */
+  rowSpan?: TableCardRowSpan
+
+  /**
+   * Whether to hide the field title/label.
+   * @default false
+   */
+  hideLabel?: boolean
+
+  /**
+   * Layout direction of the field label and value.
+   * @default 'left'
+   */
+  labelPosition?: 'left' | 'top'
+}
+
 /**
  * Table column configuration
  */
@@ -206,6 +234,11 @@ export interface TableColumn<T = Record<string, unknown>> {
    * @default false
    */
   cardTitle?: boolean
+
+  /**
+   * Custom grid layout configuration for card mode.
+   */
+  cardGrid?: TableColumnCardGrid
 
   /**
    * Custom render function for cell content
@@ -415,6 +448,33 @@ export interface TableCardRenderContext<T = Record<string, unknown>> {
   selectRow: (checked: boolean) => void
 }
 
+export interface TableCardLayoutItem {
+  /**
+   * Target column key.
+   */
+  key: string
+
+  /**
+   * Grid column span in card mode (1-12).
+   */
+  colSpan?: TableCardColSpan
+
+  /**
+   * Grid row span in card mode (1-6).
+   */
+  rowSpan?: TableCardRowSpan
+
+  /**
+   * Whether to hide the field title/label.
+   */
+  hideLabel?: boolean
+
+  /**
+   * Layout direction of the field label and value.
+   */
+  labelPosition?: 'left' | 'top'
+}
+
 /**
  * Base table props interface
  */
@@ -585,6 +645,11 @@ export interface TableProps<T = Record<string, unknown>> {
    * Custom mobile card renderer for `responsiveMode="card"`.
    */
   renderCard?: (context: TableCardRenderContext<T>) => unknown
+
+  /**
+   * Dedicated layout definitions for card grid mode.
+   */
+  cardLayout?: TableCardLayoutItem[]
 
   // --- v0.6.0 additions ---
 

@@ -5,7 +5,7 @@ import {
   type TableColumn,
   type TableToolbarFilterValue
 } from '@expcat/tigercat-vue'
-import type { TableToolbarAction } from '@expcat/tigercat-core'
+import type { TableToolbarAction, TableCardLayoutItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 
 interface UserRow extends Record<string, unknown> {
@@ -81,6 +81,64 @@ const cardColumns = [
   :dataSource="pagedData"
   responsive-mode="card"
   card-breakpoint="lg"
+/>`
+
+const gridCardColumns: TableColumn<Record<string, unknown>>[] = [
+  { key: 'id', title: 'ID', width: '10%', hideInCard: true },
+  {
+    key: 'name',
+    title: '姓名',
+    width: '25%',
+    cardTitle: true
+  },
+  {
+    key: 'email',
+    title: '邮箱',
+    width: '35%',
+    cardGrid: { colSpan: 6, labelPosition: 'top' }
+  },
+  {
+    key: 'role',
+    title: '角色',
+    width: '20%',
+    cardGrid: { colSpan: 6, labelPosition: 'top' }
+  },
+  {
+    key: 'status',
+    title: '状态',
+    width: '20%',
+    cardGrid: { colSpan: 4, labelPosition: 'top' }
+  }
+]
+
+const gridCardLayout: TableCardLayoutItem[] = [
+  { key: 'email', colSpan: 6, labelPosition: 'top' },
+  { key: 'role', colSpan: 3, labelPosition: 'top' },
+  { key: 'status', colSpan: 3, labelPosition: 'top' }
+]
+
+const gridCardSnippet = `// 自定义卡片网格布局 — 使用 cardGrid 列属性或 cardLayout 集中配置
+const gridCardColumns = [
+  { key: 'id', title: 'ID', hideInCard: true },
+  { key: 'name', title: '姓名', cardTitle: true },
+  { key: 'email', title: '邮箱', cardGrid: { colSpan: 6, labelPosition: 'top' } },
+  { key: 'role', title: '角色', cardGrid: { colSpan: 6, labelPosition: 'top' } },
+  { key: 'status', title: '状态', cardGrid: { colSpan: 4, labelPosition: 'top' } }
+]
+
+// 或使用 cardLayout 集中定义（覆盖 cardGrid）
+const gridCardLayout: TableCardLayoutItem[] = [
+  { key: 'email', colSpan: 6, labelPosition: 'top' },
+  { key: 'role', colSpan: 3, labelPosition: 'top' },
+  { key: 'status', colSpan: 3, labelPosition: 'top' }
+]
+
+<DataTableWithToolbar
+  :columns="gridCardColumns"
+  :dataSource="pagedData"
+  responsive-mode="card"
+  card-breakpoint="lg"
+  :card-layout="gridCardLayout"
 />`
 
 const columnSettingsSnippet = `<!-- 工具栏列设置：内置 Popover + Checkbox 面板，驱动 Table 的 hiddenColumnKeys -->
@@ -282,6 +340,26 @@ const handleBulkAction = (actionKey: string) => {
         @search-change="(value) => (keyword = value)"
         @search="(value) => (keyword = value)"
         @filters-change="handleFiltersChange"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageChange" />
+    </DemoBlock>
+
+    <DemoBlock
+      title="自定义卡片网格布局"
+      description="使用 cardGrid 列属性或 cardLayout 集中配置，实现双列/三列混排的卡片网格布局。cardLayout 配置优先于 cardGrid；最窄屏默认单列，sm 及以上按 colSpan 混排。缩窄窗口到 lg/1024px 以下可预览效果。"
+      :code="gridCardSnippet">
+      <DataTableWithToolbar
+        :columns="gridCardColumns"
+        :dataSource="pagedData"
+        responsive-mode="card"
+        card-breakpoint="lg"
+        :card-layout="gridCardLayout"
+        :pagination="{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: filteredData.length,
+          showTotal: true
+        }"
         @page-change="handlePageChange"
         @page-size-change="handlePageChange" />
     </DemoBlock>

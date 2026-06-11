@@ -25,6 +25,7 @@ import {
   type SortState,
   type PaginationConfig,
   type RowSelectionConfig,
+  type TableCardLayoutItem,
   type TigerLocale,
   type TigerLocaleInput,
   type TigerLocaleTable,
@@ -71,6 +72,7 @@ export interface VueDataTableWithToolbarProps {
   maxHeight?: string | number
   responsiveMode?: TableResponsiveMode
   cardBreakpoint?: TableCardBreakpoint
+  cardLayout?: TableCardLayoutItem[]
   toolbar?: VueTableToolbarProps
   pagination?: PaginationConfig | false
   className?: string
@@ -180,6 +182,10 @@ export const DataTableWithToolbar = defineComponent({
     cardBreakpoint: {
       type: String as PropType<TableCardBreakpoint>,
       default: 'sm' as TableCardBreakpoint
+    },
+    cardLayout: {
+      type: Array as PropType<TableCardLayoutItem[]>,
+      default: undefined
     },
     toolbar: {
       type: Object as PropType<VueTableToolbarProps>,
@@ -703,6 +709,7 @@ export const DataTableWithToolbar = defineComponent({
         tableLayout: props.tableLayout,
         responsiveMode: props.responsiveMode,
         cardBreakpoint: props.cardBreakpoint,
+        cardLayout: props.cardLayout,
         class: props.bordered ? 'border-none rounded-none shadow-none' : undefined,
         onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys),
         onPageChange: handleTablePageChange

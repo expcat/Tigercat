@@ -12,7 +12,8 @@ import type {
   TableCardBreakpoint,
   TableFixedCellClassNameContext,
   TableFixedHeaderClassNameContext,
-  TableFixedPosition
+  TableFixedPosition,
+  TableCardLayoutItem
 } from '../types/table'
 
 /**
@@ -785,3 +786,61 @@ export const columnDragHandleClasses =
  * Column drag over indicator classes
  */
 export const columnDragOverClasses = 'border-l-2 border-[var(--tiger-primary,#2563eb)]'
+
+const COL_SPAN_CLASSES: Record<number, string> = {
+  1: 'sm:col-span-1',
+  2: 'sm:col-span-2',
+  3: 'sm:col-span-3',
+  4: 'sm:col-span-4',
+  5: 'sm:col-span-5',
+  6: 'sm:col-span-6',
+  7: 'sm:col-span-7',
+  8: 'sm:col-span-8',
+  9: 'sm:col-span-9',
+  10: 'sm:col-span-10',
+  11: 'sm:col-span-11',
+  12: 'sm:col-span-12'
+}
+
+const ROW_SPAN_CLASSES: Record<number, string> = {
+  1: 'row-span-1',
+  2: 'row-span-2',
+  3: 'row-span-3',
+  4: 'row-span-4',
+  5: 'row-span-5',
+  6: 'row-span-6'
+}
+
+export interface CardGridInfo {
+  className: string
+  hideLabel: boolean
+  labelPosition: 'left' | 'top'
+}
+
+export function getCardGridInfo(
+  column: TableColumn,
+  layoutItem?: TableCardLayoutItem
+): CardGridInfo {
+  const colSpan = layoutItem?.colSpan !== undefined ? layoutItem.colSpan : column.cardGrid?.colSpan
+  const rowSpan = layoutItem?.rowSpan !== undefined ? layoutItem.rowSpan : column.cardGrid?.rowSpan
+  const hideLabel =
+    layoutItem?.hideLabel !== undefined
+      ? layoutItem.hideLabel
+      : (column.cardGrid?.hideLabel ?? false)
+  const labelPosition =
+    layoutItem?.labelPosition !== undefined
+      ? layoutItem.labelPosition
+      : (column.cardGrid?.labelPosition ?? 'left')
+
+  const colClass =
+    colSpan && COL_SPAN_CLASSES[colSpan]
+      ? classNames('col-span-12', COL_SPAN_CLASSES[colSpan])
+      : 'col-span-12'
+  const rowClass = rowSpan && ROW_SPAN_CLASSES[rowSpan] ? ROW_SPAN_CLASSES[rowSpan] : ''
+
+  return {
+    className: classNames(colClass, rowClass, 'min-w-0 break-words'),
+    hideLabel,
+    labelPosition
+  }
+}

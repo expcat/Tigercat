@@ -11,7 +11,8 @@ import type {
   FilterRule,
   TigerLocaleInput,
   TigerLocaleTable,
-  TableCardRenderContext
+  TableCardRenderContext,
+  TableCardLayoutItem
 } from '@expcat/tigercat-core'
 
 /**
@@ -65,6 +66,7 @@ export interface VueTableProps {
   exportable?: boolean
   exportFormat?: 'csv' | 'excel'
   exportFilename?: string
+  cardLayout?: TableCardLayoutItem[]
 }
 
 /**
@@ -215,7 +217,11 @@ export const tableProps = {
   groupBy: { type: String },
   exportable: { type: Boolean, default: false },
   exportFormat: { type: String as PropType<'csv' | 'excel'>, default: 'csv' },
-  exportFilename: { type: String, default: 'export' }
+  exportFilename: { type: String, default: 'export' },
+  cardLayout: {
+    type: Array as PropType<TableCardLayoutItem[]>,
+    default: undefined
+  }
 } as const
 
 export const tableEmits = [

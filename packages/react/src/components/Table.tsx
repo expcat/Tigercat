@@ -4,6 +4,7 @@ import {
   createTableResizeObserverController,
   getTableWrapperClasses,
   getCardColumns,
+  getCardGridInfo,
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
@@ -81,6 +82,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   cardBreakpoint = 'sm',
   cardClassName,
   renderCard,
+  cardLayout,
   // v0.6.0 props
   virtual = false,
   autoVirtual = true,
@@ -256,6 +258,23 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     onRowOrderChange: onRowOrderChange as ((rows: Record<string, unknown>[]) => void) | undefined,
     onExport
   })
+
+  const cardLayoutMap = useMemo(() => {
+    const map = new Map<string, any>()
+    if (cardLayout) {
+      for (const item of cardLayout) {
+        map.set(item.key, item)
+      }
+    }
+    return map
+  }, [cardLayout])
+
+  const hasCustomCardLayout = useMemo(() => {
+    return (
+      ctx.displayColumns.some((col) => col.cardGrid) ||
+      (cardLayout && cardLayout.length > 0)
+    )
+  }, [ctx.displayColumns, cardLayout])
 
   const virtualRecommendation = useMemo(
     () =>
@@ -532,6 +551,61 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                           return column.render
                             ? (column.render(record, index) as React.ReactNode)
                             : (record[dataKey] as React.ReactNode)
+                        }
+
+                        if (hasCustomCardLayout) {
+                          return (
+                            <>
+                              {titleColumn && (
+                                <div className={tableResponsiveCardTitleClasses}>
+                                  {renderCellContent(titleColumn)}
+                                </div>
+                              )}
+                              <div className="grid grid-cols-12 gap-3 mt-2">
+                                {bodyColumns.map((column) => {
+                                  const layoutItem = cardLayoutMap.get(column.key)
+                                  const gridInfo = getCardGridInfo(column, layoutItem)
+
+                                  if (gridInfo.hideLabel) {
+                                    return (
+                                      <div key={column.key} className={gridInfo.className}>
+                                        {renderCellContent(column)}
+                                      </div>
+                                    )
+                                  }
+
+                                  if (gridInfo.labelPosition === 'top') {
+                                    return (
+                                      <div key={column.key} className={gridInfo.className}>
+                                        <div className="text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] mb-1">
+                                          {column.title}
+                                        </div>
+                                        <div className="min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words">
+                                          {renderCellContent(column)}
+                                        </div>
+                                      </div>
+                                    )
+                                  }
+
+                                  return (
+                                    <div
+                                      key={column.key}
+                                      className={classNames(
+                                        gridInfo.className,
+                                        'grid grid-cols-[auto_1fr] gap-2 items-baseline'
+                                      )}>
+                                      <div className="text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] shrink-0">
+                                        {column.title}
+                                      </div>
+                                      <div className="min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words">
+                                        {renderCellContent(column)}
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </>
+                          )
                         }
 
                         return (

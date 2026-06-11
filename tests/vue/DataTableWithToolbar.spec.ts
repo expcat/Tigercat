@@ -104,6 +104,28 @@ describe('DataTableWithToolbar (Vue)', () => {
     expect(cardList.textContent).not.toContain('ID')
   })
 
+  it('threads cardLayout through to the responsive card grid', () => {
+    const cardColumns: TableColumn<RowData>[] = [
+      { key: 'name', title: 'Name', cardTitle: true },
+      { key: 'id', title: 'ID', cardGrid: { colSpan: 6, labelPosition: 'top' } }
+    ]
+
+    const { container } = render(DataTableWithToolbar, {
+      props: {
+        columns: cardColumns,
+        dataSource: [{ id: 1, name: 'A' }],
+        responsiveMode: 'card',
+        pagination: false,
+        cardLayout: [{ key: 'id', colSpan: 3, hideLabel: true }]
+      }
+    })
+
+    const idField = container.querySelector('[data-tiger-table-mobile="card"] .grid-cols-12 > div')!
+    expect(idField).toHaveClass('col-span-12', 'sm:col-span-3')
+    expect(idField).toHaveTextContent('1')
+    expect(idField).not.toHaveTextContent('ID')
+  })
+
   it('renders bulk actions with selected count', () => {
     render(DataTableWithToolbar, {
       props: {
