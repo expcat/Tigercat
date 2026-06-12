@@ -3,6 +3,7 @@ import {
   createTableRowKeyCache,
   filterHiddenColumns,
   getCardColumns,
+  getCardGridInfo,
   getFixedColumnOffsets,
   getFixedColumnPosition,
   getFixedColumnStyle,
@@ -356,6 +357,54 @@ describe('table-utils', () => {
       const { titleColumn, bodyColumns } = getCardColumns(plain)
       expect(titleColumn).toBeUndefined()
       expect(bodyColumns.map((c) => c.key)).toEqual(['a', 'b'])
+    })
+  })
+
+  describe('getCardGridInfo', () => {
+    it('defaults to a full-width card field', () => {
+      expect(getCardGridInfo({ key: 'name', title: 'Name' }).className).toBe(
+        'col-span-12 min-w-0 break-words'
+      )
+    })
+
+    it('keeps fields full-width on the smallest screens and applies custom spans from sm', () => {
+      const info = getCardGridInfo({
+        key: 'email',
+        title: 'Email',
+        cardGrid: { colSpan: 6, rowSpan: 2, labelPosition: 'top' }
+      })
+
+      expect(info).toEqual({
+        className: 'col-span-12 sm:col-span-6 row-span-2 min-w-0 break-words',
+        hideLabel: false,
+        labelPosition: 'top'
+      })
+    })
+
+    it('lets cardLayout override column-level cardGrid options', () => {
+      const info = getCardGridInfo(
+        {
+          key: 'status',
+          title: 'Status',
+          cardGrid: { colSpan: 6, rowSpan: 2, hideLabel: false, labelPosition: 'left' }
+        },
+        { key: 'status', colSpan: 3, rowSpan: 4, hideLabel: true, labelPosition: 'top' }
+      )
+
+      expect(info).toEqual({
+        className: 'col-span-12 sm:col-span-3 row-span-4 min-w-0 break-words',
+        hideLabel: true,
+        labelPosition: 'top'
+      })
+    })
+
+    it('falls back safely for invalid runtime span values', () => {
+      const info = getCardGridInfo(
+        { key: 'notes', title: 'Notes' },
+        { key: 'notes', colSpan: 99, rowSpan: 99 } as Parameters<typeof getCardGridInfo>[1]
+      )
+
+      expect(info.className).toBe('col-span-12 min-w-0 break-words')
     })
   })
 

@@ -108,7 +108,11 @@ Source: `packages/core/src/types/composite.ts` · Interface: `DataTableWithToolb
 
 Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
+<<<<<<< HEAD
 Note: 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.filters[].render`、Vue `#filters-extra` 和 React `toolbar.filtersExtra` 可在工具栏过滤区放入自定义控件。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。
+=======
+Note: 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；自定义网格可用列级 `cardGrid` 或表级 `cardLayout`，`cardLayout` 优先于 `cardGrid`，最窄屏默认单列，`sm` 及以上按 `colSpan` 混排。`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。
+>>>>>>> fd68b9678718f07730c865410b9ad7d8b3d6165c
 
 | Prop          | Type                        | Default | Notes                                            |
 | ------------- | --------------------------- | ------- | ------------------------------------------------ |

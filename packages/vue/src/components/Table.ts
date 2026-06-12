@@ -14,6 +14,7 @@ import {
   formatTableSelectRowAriaLabel,
   formatTableSortByText,
   getCardColumns,
+  getCardGridInfo,
   getImmediateTigerLocale,
   getTableLabels,
   getTableWrapperClasses,
@@ -150,6 +151,23 @@ export const Table = defineComponent({
       const overrides =
         props.emptyText === undefined ? props.labels : { ...props.labels, emptyText: props.emptyText }
       return getTableLabels(tableLocale.value, overrides)
+    })
+
+    const cardLayoutMap = computed(() => {
+      const map = new Map<string, any>()
+      if (props.cardLayout) {
+        for (const item of props.cardLayout) {
+          map.set(item.key, item)
+        }
+      }
+      return map
+    })
+
+    const hasCustomCardLayout = computed(() => {
+      return (
+        ctx.displayColumns.value.some((col) => col.cardGrid) ||
+        (props.cardLayout && props.cardLayout.length > 0)
+      )
     })
 
     const resizeController = createTableResizeObserverController({
@@ -346,14 +364,91 @@ export const Table = defineComponent({
                         ])
                       : null
 
-                    const rows = bodyColumns.map((column) =>
-                      h('div', { key: column.key, class: tableResponsiveCardRowClasses }, [
-                        h('div', { class: tableResponsiveCardLabelClasses }, column.title),
-                        h('div', { class: tableResponsiveCardValueClasses }, [
-                          renderCardCellContent(column)
-                        ])
-                      ])
-                    )
+                    const rows = hasCustomCardLayout.value
+                      ? [
+                          h(
+                            'div',
+                            { class: 'grid grid-cols-12 gap-3 mt-2' },
+                            bodyColumns.map((column) => {
+                              const layoutItem = cardLayoutMap.value.get(column.key)
+                              const gridInfo = getCardGridInfo(column, layoutItem)
+
+                              if (gridInfo.hideLabel) {
+                                return h(
+                                  'div',
+                                  { key: column.key, class: gridInfo.className },
+                                  [renderCardCellContent(column)]
+                                )
+                              }
+
+                              if (gridInfo.labelPosition === 'top') {
+                                return h(
+                                  'div',
+                                  { key: column.key, class: gridInfo.className },
+                                  [
+                                    h(
+                                      'div',
+                                      {
+                                        class:
+                                          'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] mb-1'
+                                      },
+                                      column.title
+                                    ),
+                                    h(
+                                      'div',
+                                      {
+                                        class:
+                                          'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words'
+                                      },
+                                      [renderCardCellContent(column)]
+                                    )
+                                  ]
+                                )
+                              }
+
+                              return h(
+                                'div',
+                                {
+                                  key: column.key,
+                                  class: classNames(
+                                    gridInfo.className,
+                                    'grid grid-cols-[auto_1fr] gap-2 items-baseline'
+                                  )
+                                },
+                                [
+                                  h(
+                                    'div',
+                                    {
+                                      class:
+                                        'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] shrink-0'
+                                    },
+                                    column.title
+                                  ),
+                                  h(
+                                    'div',
+                                    {
+                                      class:
+                                        'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words'
+                                    },
+                                    [renderCardCellContent(column)]
+                                  )
+                                ]
+                              )
+                            })
+                          )
+                        ]
+                      : bodyColumns.map((column) =>
+                          h(
+                            'div',
+                            { key: column.key, class: tableResponsiveCardRowClasses },
+                            [
+                              h('div', { class: tableResponsiveCardLabelClasses }, column.title),
+                              h('div', { class: tableResponsiveCardValueClasses }, [
+                                renderCardCellContent(column)
+                              ])
+                            ]
+                          )
+                        )
 
                     const controls = []
                     if (

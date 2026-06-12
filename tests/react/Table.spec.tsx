@@ -163,6 +163,57 @@ describe('Table', () => {
       expect(container.querySelector('table')).toHaveClass('max-md:hidden')
     })
 
+    it('renders configured card fields in a responsive grid layout', () => {
+      const cardColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', cardTitle: true },
+        { key: 'email', title: 'Email', cardGrid: { colSpan: 6, labelPosition: 'top' } },
+        { key: 'age', title: 'Age', cardGrid: { colSpan: 4, hideLabel: true } }
+      ]
+      const { container } = render(
+        <Table
+          columns={cardColumns}
+          dataSource={[dataSource[0]]}
+          responsiveMode="card"
+          pagination={false}
+        />
+      )
+
+      const grid = container.querySelector('[data-tiger-table-mobile="card"] .grid-cols-12')!
+      const [emailField, ageField] = Array.from(grid.children) as HTMLElement[]
+
+      expect(grid).toHaveClass('grid', 'grid-cols-12')
+      expect(emailField).toHaveClass('col-span-12', 'sm:col-span-6')
+      expect(emailField.querySelector('.mb-1')).toHaveTextContent('Email')
+      expect(ageField).toHaveClass('col-span-12', 'sm:col-span-4')
+      expect(ageField).toHaveTextContent('28')
+      expect(ageField).not.toHaveTextContent('Age')
+    })
+
+    it('uses cardLayout ahead of column-level cardGrid options', () => {
+      const cardColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', cardTitle: true },
+        { key: 'email', title: 'Email', cardGrid: { colSpan: 6, labelPosition: 'top' } }
+      ]
+      const { container } = render(
+        <Table
+          columns={cardColumns}
+          dataSource={[dataSource[0]]}
+          responsiveMode="card"
+          pagination={false}
+          cardLayout={[
+            { key: 'email', colSpan: 3, rowSpan: 2, hideLabel: true, labelPosition: 'left' }
+          ]}
+        />
+      )
+
+      const emailField = container.querySelector(
+        '[data-tiger-table-mobile="card"] .grid-cols-12 > div'
+      )!
+      expect(emailField).toHaveClass('col-span-12', 'sm:col-span-3', 'row-span-2')
+      expect(emailField).toHaveTextContent('john@example.com')
+      expect(emailField).not.toHaveTextContent('Email')
+    })
+
     it('uses table labels and themed selection controls in card mode', async () => {
       const onSelectionChange = vi.fn()
       const { getByText, getByLabelText, container } = render(

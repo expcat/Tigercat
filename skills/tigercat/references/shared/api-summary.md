@@ -117,7 +117,7 @@ description: Compact generated API summary for Tigercat core types
 | calendar.ts  | CalendarProps                     | Calendar                | 2       |
 | collapse.ts  | CollapseProps, CollapsePanelProps | Collapse, CollapsePanel | 3       |
 | countdown.ts | CountdownProps                    | Countdown               | 5       |
-| table.ts     | TableProps                        | Table                   | 22      |
+| table.ts     | TableProps                        | Table                   | 26      |
 | timeline.ts  | TimelineProps                     | Timeline                | 4       |
 
 ## Charts
@@ -163,4 +163,4 @@ description: Compact generated API summary for Tigercat core types
 | slots.ts          | -                                                            | -                                             | 10      |
 | theme.ts          | -                                                            | -                                             | 11      |
 
-Total exported types: 616.
+Total exported types: 620.
