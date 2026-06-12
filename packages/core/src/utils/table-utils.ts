@@ -839,7 +839,7 @@ export function getCardGridInfo(
   const rowClass = rowSpan && ROW_SPAN_CLASSES[rowSpan] ? ROW_SPAN_CLASSES[rowSpan] : ''
 
   return {
-    className: classNames(colClass, rowClass, 'min-w-0 break-words'),
+    className: classNames(colClass, rowClass, 'min-w-0 break-words', layoutItem?.className),
     hideLabel,
     labelPosition
   }

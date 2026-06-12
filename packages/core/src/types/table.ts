@@ -473,6 +473,11 @@ export interface TableCardLayoutItem {
    * Layout direction of the field label and value.
    */
   labelPosition?: 'left' | 'top'
+
+  /**
+   * Custom CSS class name for card item container.
+   */
+  className?: string
 }
 
 /**
