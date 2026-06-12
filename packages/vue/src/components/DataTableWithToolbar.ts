@@ -782,7 +782,7 @@ export const DataTableWithToolbar = defineComponent({
           style: wrapperStyle.value,
           'data-tiger-data-table-with-toolbar': ''
         },
-        [renderToolbar(), h(Table as unknown as Component, tableProps)]
+        [renderToolbar(), h(Table as unknown as Component, tableProps, slots)]
       )
     }
   }
