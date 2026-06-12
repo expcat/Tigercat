@@ -7,7 +7,7 @@ import { h } from 'vue'
 import { render, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { ConfigProvider, DataTableWithToolbar, Table } from '@expcat/tigercat-vue'
-import type { TableColumn } from '@expcat/tigercat-core'
+import type { TableColumn, TableToolbarFilterValue } from '@expcat/tigercat-core'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -60,6 +60,100 @@ describe('DataTableWithToolbar (Vue)', () => {
 
     await userEvent.selectOptions(screen.getByRole('combobox'), '20')
     expect(onPageSizeChange).toHaveBeenCalledWith(1, 20)
+  })
+
+  it('renders custom toolbar filters and emits object filter values', async () => {
+    const onFiltersChange = vi.fn()
+
+    render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [{ id: 1, name: 'A' }],
+        toolbar: {
+          filters: [
+            {
+              key: 'ageRange',
+              label: '年龄段',
+              render: ({ value, setValue }) => {
+                const range =
+                  value && typeof value === 'object'
+                    ? (value as { min?: string; max?: string })
+                    : {}
+                return h('div', { class: 'flex items-center gap-1' }, [
+                  h('input', {
+                    'aria-label': '最小年龄',
+                    value: range.min ?? '',
+                    onInput: (event: Event) =>
+                      setValue({
+                        ...range,
+                        min: (event.target as HTMLInputElement).value
+                      })
+                  }),
+                  h('input', {
+                    'aria-label': '最大年龄',
+                    value: range.max ?? '',
+                    onInput: (event: Event) =>
+                      setValue({
+                        ...range,
+                        max: (event.target as HTMLInputElement).value
+                      })
+                  })
+                ])
+              }
+            }
+          ]
+        },
+        pagination: false
+      },
+      attrs: {
+        onFiltersChange
+      }
+    })
+
+    await userEvent.type(screen.getByLabelText('最小年龄'), '18')
+    await userEvent.type(screen.getByLabelText('最大年龄'), '35')
+
+    expect(onFiltersChange).toHaveBeenLastCalledWith({
+      ageRange: { min: '18', max: '35' }
+    })
+  })
+
+  it('renders filters-extra slot and lets it update filters', async () => {
+    const onFiltersChange = vi.fn()
+
+    render({
+      render() {
+        return h(
+          DataTableWithToolbar,
+          {
+            columns,
+            dataSource: [{ id: 1, name: 'A' }],
+            pagination: false,
+            onFiltersChange
+          },
+          {
+            'filters-extra': ({
+              setFilter
+            }: {
+              setFilter: (key: string, value: TableToolbarFilterValue) => void
+            }) =>
+              h('input', {
+                'aria-label': '额外最小年龄',
+                onInput: (event: Event) =>
+                  setFilter('ageRange', {
+                    min: (event.target as HTMLInputElement).value
+                  })
+              })
+          }
+        )
+      }
+    })
+
+    await userEvent.type(screen.getByLabelText('额外最小年龄'), '21')
+
+    expect(onFiltersChange).toHaveBeenLastCalledWith({
+      ageRange: { min: '21' }
+    })
   })
 
   it('delegates pagination rendering to Table', async () => {

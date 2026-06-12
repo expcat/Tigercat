@@ -8,6 +8,8 @@ import {
   resolveTigerLocale,
   type TableToolbarProps,
   type TableToolbarFilter,
+  type TableToolbarFilterRenderContext,
+  type TableToolbarFiltersExtraContext,
   type TableToolbarFilterValue,
   type TableToolbarAction,
   type TigerLocale
@@ -20,6 +22,24 @@ import { Popover } from './Popover'
 import { Checkbox } from './Checkbox'
 import { useTigerConfig } from './ConfigProvider'
 
+export interface ReactTableToolbarFilterRenderContext
+  extends Omit<TableToolbarFilterRenderContext, 'filter'> {
+  filter: ReactTableToolbarFilter
+}
+
+export interface ReactTableToolbarFiltersExtraContext extends TableToolbarFiltersExtraContext {}
+
+export interface ReactTableToolbarFilter extends Omit<TableToolbarFilter, 'render'> {
+  render?: (context: ReactTableToolbarFilterRenderContext) => React.ReactNode
+}
+
+export interface ReactTableToolbarProps extends Omit<TableToolbarProps, 'filters' | 'filtersExtra'> {
+  filters?: ReactTableToolbarFilter[]
+  filtersExtra?:
+    | React.ReactNode
+    | ((context: ReactTableToolbarFiltersExtraContext) => React.ReactNode)
+}
+
 export interface DataTableWithToolbarProps<T = Record<string, unknown>>
   extends
     Omit<TableProps<T>, 'className' | 'onPageChange'>,
@@ -27,7 +47,7 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>>
   /**
    * Toolbar configuration
    */
-  toolbar?: TableToolbarProps
+  toolbar?: ReactTableToolbarProps
   /**
    * Search change handler
    */
@@ -170,7 +190,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   const searchValue = toolbar?.searchValue !== undefined ? toolbar.searchValue : internalSearch
 
   const resolvedFilters = useMemo<Record<string, TableToolbarFilterValue>>(() => {
-    const next: Record<string, TableToolbarFilterValue> = {}
+    const next: Record<string, TableToolbarFilterValue> = { ...internalFilters }
     toolbar?.filters?.forEach((filter) => {
       next[filter.key] =
         filter.value !== undefined
@@ -192,6 +212,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       onSearch)
   )
   const hasFilters = Boolean(toolbar?.filters && toolbar.filters.length > 0)
+  const hasFiltersExtra = Boolean(toolbar?.filtersExtra)
   const hasBulkActions = Boolean(toolbar?.bulkActions && toolbar.bulkActions.length > 0)
   const hasColumnSettings = Boolean(toolbar?.showColumnSettings)
 
@@ -242,21 +263,32 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     toolbar?.onSearch?.(searchValue ?? '')
   }
 
-  const handleFilterSelect = (filter: TableToolbarFilter, value: TableToolbarFilterValue) => {
+  const setFilterValue = (
+    key: string,
+    value: TableToolbarFilterValue,
+    filter?: ReactTableToolbarFilter
+  ) => {
     const nextFilters = {
       ...resolvedFilters,
-      [filter.key]: value
+      [key]: value
     }
 
-    if (filter.value === undefined) {
+    if (!filter || filter.value === undefined) {
       setInternalFilters((prev) => ({
         ...prev,
-        [filter.key]: value
+        [key]: value
       }))
     }
 
     onFiltersChange?.(nextFilters)
     toolbar?.onFiltersChange?.(nextFilters)
+  }
+
+  const handleFilterSelect = (
+    filter: ReactTableToolbarFilter,
+    value: TableToolbarFilterValue
+  ) => {
+    setFilterValue(filter.key, value, filter)
   }
 
   const handleBulkAction = (action: TableToolbarAction) => {
@@ -329,7 +361,18 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   }
 
   const renderToolbar = () => {
-    if (!hasSearch && !hasFilters && !hasBulkActions && !hasColumnSettings) return null
+    if (!hasSearch && !hasFilters && !hasFiltersExtra && !hasBulkActions && !hasColumnSettings) {
+      return null
+    }
+
+    const filtersExtraContext: ReactTableToolbarFiltersExtraContext = {
+      filters: resolvedFilters,
+      setFilter: (key: string, value: TableToolbarFilterValue) => setFilterValue(key, value)
+    }
+    const filtersExtra =
+      typeof toolbar?.filtersExtra === 'function'
+        ? toolbar.filtersExtra(filtersExtraContext)
+        : toolbar?.filtersExtra
 
     return (
       <div
@@ -389,17 +432,37 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 const currentValue = resolvedFilters[filter.key]
                 const clearable = filter.clearable !== false
 
+                if (filter.render) {
+                  return (
+                    <div key={filter.key} className="w-full sm:w-auto">
+                      {filter.render({
+                        filter,
+                        value: currentValue,
+                        filters: resolvedFilters,
+                        setValue: (value: TableToolbarFilterValue) =>
+                          setFilterValue(filter.key, value, filter),
+                        setFilter: (key: string, value: TableToolbarFilterValue) =>
+                          setFilterValue(key, value)
+                      })}
+                    </div>
+                  )
+                }
+
                 return (
                   <div
                     key={filter.key}
                     className="w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]">
                     <Select
                       size="sm"
-                      options={filter.options.map((opt) => ({
+                      options={(filter.options ?? []).map((opt) => ({
                         label: opt.label,
                         value: opt.value
                       }))}
-                      value={currentValue ?? undefined}
+                      value={
+                        typeof currentValue === 'string' || typeof currentValue === 'number'
+                          ? currentValue
+                          : undefined
+                      }
                       placeholder={filter.placeholder ?? filter.label}
                       clearable={clearable}
                       onChange={(value) => {
@@ -410,6 +473,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 )
               })
             : null}
+          {filtersExtra}
         </div>
 
         {hasBulkActions ? (

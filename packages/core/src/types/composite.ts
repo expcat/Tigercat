@@ -818,7 +818,22 @@ export interface NotificationCenterProps {
 /**
  * Toolbar filter value
  */
-export type TableToolbarFilterValue = string | number | null
+export type TableToolbarFilterObjectValue = Record<string, unknown>
+
+export type TableToolbarFilterValue = string | number | TableToolbarFilterObjectValue | null
+
+export interface TableToolbarFilterRenderContext {
+  filter: TableToolbarFilter
+  value: TableToolbarFilterValue
+  filters: Record<string, TableToolbarFilterValue>
+  setValue: (value: TableToolbarFilterValue) => void
+  setFilter: (key: string, value: TableToolbarFilterValue) => void
+}
+
+export interface TableToolbarFiltersExtraContext {
+  filters: Record<string, TableToolbarFilterValue>
+  setFilter: (key: string, value: TableToolbarFilterValue) => void
+}
 
 /**
  * Table toolbar filter definition
@@ -833,9 +848,9 @@ export interface TableToolbarFilter {
    */
   label: string
   /**
-   * Filter options
+   * Filter options. When omitted, provide `render` to render a custom filter control.
    */
-  options: FilterOption[]
+  options?: FilterOption[]
   /**
    * Placeholder text for the trigger
    */
@@ -858,6 +873,10 @@ export interface TableToolbarFilter {
    * Default filter value (uncontrolled)
    */
   defaultValue?: TableToolbarFilterValue
+  /**
+   * Custom filter renderer.
+   */
+  render?: (context: TableToolbarFilterRenderContext) => unknown
 }
 
 /**
@@ -930,6 +949,10 @@ export interface TableToolbarProps {
    * Filters change callback
    */
   onFiltersChange?: (filters: Record<string, TableToolbarFilterValue>) => void
+  /**
+   * Extra content rendered after configured filters.
+   */
+  filtersExtra?: unknown | ((context: TableToolbarFiltersExtraContext) => unknown)
   /**
    * Bulk actions
    */

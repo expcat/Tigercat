@@ -7,6 +7,7 @@ import {
   ref,
   watch,
   type VNodeArrayChildren,
+  type VNodeChild,
   type Component
 } from 'vue'
 import {
@@ -30,6 +31,8 @@ import {
   type TigerLocaleTable,
   type TableToolbarProps as CoreTableToolbarProps,
   type TableToolbarFilter,
+  type TableToolbarFilterRenderContext,
+  type TableToolbarFiltersExtraContext,
   type TableToolbarFilterValue,
   type TableToolbarAction
 } from '@expcat/tigercat-core'
@@ -43,8 +46,21 @@ import { Checkbox } from './Checkbox'
 
 export interface VueTableToolbarProps extends Omit<
   CoreTableToolbarProps,
-  'onSearchChange' | 'onSearch' | 'onFiltersChange' | 'onBulkAction'
-> {}
+  'filters' | 'filtersExtra' | 'onSearchChange' | 'onSearch' | 'onFiltersChange' | 'onBulkAction'
+> {
+  filters?: VueTableToolbarFilter[]
+}
+
+export interface VueTableToolbarFilterRenderContext
+  extends Omit<TableToolbarFilterRenderContext, 'filter'> {
+  filter: VueTableToolbarFilter
+}
+
+export interface VueTableToolbarFiltersExtraContext extends TableToolbarFiltersExtraContext {}
+
+export interface VueTableToolbarFilter extends Omit<TableToolbarFilter, 'render'> {
+  render?: (context: VueTableToolbarFilterRenderContext) => VNodeChild
+}
 
 export interface VueDataTableWithToolbarProps {
   columns: TableColumn[]
@@ -213,7 +229,7 @@ export const DataTableWithToolbar = defineComponent({
     'update:hiddenColumnKeys': (_hiddenKeys: string[]) => true,
     'hidden-columns-change': (_hiddenKeys: string[]) => true
   },
-  setup(props, { attrs, emit }) {
+  setup(props, { attrs, emit, slots }) {
     const config = useTigerConfig()
     const internalSearch = ref<string>(props.toolbar?.defaultSearchValue ?? '')
     const internalHiddenKeys = ref<string[]>(
@@ -313,7 +329,7 @@ export const DataTableWithToolbar = defineComponent({
     )
 
     const resolvedFilters = computed<Record<string, TableToolbarFilterValue>>(() => {
-      const next: Record<string, TableToolbarFilterValue> = {}
+      const next: Record<string, TableToolbarFilterValue> = { ...internalFilters.value }
       props.toolbar?.filters?.forEach((filter) => {
         next[filter.key] =
           filter.value !== undefined
@@ -335,6 +351,7 @@ export const DataTableWithToolbar = defineComponent({
     })
 
     const hasFilters = computed(() => Boolean(props.toolbar?.filters?.length))
+    const hasFiltersExtra = computed(() => Boolean(slots['filters-extra']))
     const hasBulkActions = computed(() => Boolean(props.toolbar?.bulkActions?.length))
     const hasColumnSettings = computed(() => Boolean(props.toolbar?.showColumnSettings))
 
@@ -392,20 +409,31 @@ export const DataTableWithToolbar = defineComponent({
       emit('search', searchValue.value ?? '')
     }
 
-    const handleFilterSelect = (filter: TableToolbarFilter, value: TableToolbarFilterValue) => {
+    const setFilterValue = (
+      key: string,
+      value: TableToolbarFilterValue,
+      filter?: VueTableToolbarFilter
+    ) => {
       const nextFilters = {
         ...resolvedFilters.value,
-        [filter.key]: value
+        [key]: value
       }
 
-      if (filter.value === undefined) {
+      if (!filter || filter.value === undefined) {
         internalFilters.value = {
           ...internalFilters.value,
-          [filter.key]: value
+          [key]: value
         }
       }
 
       emit('filters-change', nextFilters)
+    }
+
+    const handleFilterSelect = (
+      filter: VueTableToolbarFilter,
+      value: TableToolbarFilterValue
+    ) => {
+      setFilterValue(filter.key, value, filter)
     }
 
     const handleBulkAction = (action: TableToolbarAction) => {
@@ -505,6 +533,7 @@ export const DataTableWithToolbar = defineComponent({
       if (
         !hasSearch.value &&
         !hasFilters.value &&
+        !hasFiltersExtra.value &&
         !hasBulkActions.value &&
         !hasColumnSettings.value
       )
@@ -584,15 +613,38 @@ export const DataTableWithToolbar = defineComponent({
           const currentValue = resolvedFilters.value[filter.key]
           const clearable = filter.clearable !== false
 
+          if (filter.render) {
+            const filterNode = filter.render({
+              filter,
+              value: currentValue,
+              filters: resolvedFilters.value,
+              setValue: (value: TableToolbarFilterValue) =>
+                setFilterValue(filter.key, value, filter),
+              setFilter: (key: string, value: TableToolbarFilterValue) =>
+                setFilterValue(key, value)
+            })
+            leftNodes.push(
+              h(
+                'div',
+                { key: filter.key, class: 'w-full sm:w-auto' },
+                filterNode == null ? [] : [filterNode]
+              )
+            )
+            return
+          }
+
           leftNodes.push(
-            h('div', { class: 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]' }, [
+            h('div', { key: filter.key, class: 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]' }, [
               h(Select, {
                 size: 'sm',
-                options: filter.options.map((opt) => ({
+                options: (filter.options ?? []).map((opt) => ({
                   label: opt.label,
                   value: opt.value
                 })),
-                modelValue: currentValue ?? undefined,
+                modelValue:
+                  typeof currentValue === 'string' || typeof currentValue === 'number'
+                    ? currentValue
+                    : undefined,
                 placeholder: filter.placeholder ?? filter.label,
                 clearable,
                 'onUpdate:modelValue': (value: string | number | undefined) => {
@@ -602,6 +654,14 @@ export const DataTableWithToolbar = defineComponent({
             ])
           )
         })
+      }
+
+      const filtersExtra = slots['filters-extra']?.({
+        filters: resolvedFilters.value,
+        setFilter: (key: string, value: TableToolbarFilterValue) => setFilterValue(key, value)
+      } satisfies VueTableToolbarFiltersExtraContext)
+      if (filtersExtra?.length) {
+        leftNodes.push(...filtersExtra)
       }
 
       const bulkChildren: VNodeArrayChildren = []

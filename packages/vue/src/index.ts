@@ -188,7 +188,13 @@ export type { VueCommentThreadProps } from './components/CommentThread'
 export { NotificationCenter } from './components/NotificationCenter'
 export type { VueNotificationCenterProps } from './components/NotificationCenter'
 export { DataTableWithToolbar } from './components/DataTableWithToolbar'
-export type { VueDataTableWithToolbarProps } from './components/DataTableWithToolbar'
+export type {
+  VueDataTableWithToolbarProps,
+  VueTableToolbarFilter,
+  VueTableToolbarFilterRenderContext,
+  VueTableToolbarFiltersExtraContext,
+  VueTableToolbarProps
+} from './components/DataTableWithToolbar'
 export { FormWizard } from './components/FormWizard'
 export type { VueFormWizardProps } from './components/FormWizard'
 export { CropUpload } from './components/CropUpload'

@@ -60,6 +60,95 @@ describe('DataTableWithToolbar (React)', () => {
     expect(onPageSizeChange).toHaveBeenCalledWith(1, 20)
   })
 
+  it('renders custom toolbar filters and emits object filter values', async () => {
+    const onFiltersChange = vi.fn()
+
+    render(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[{ id: 1, name: 'A' }]}
+        toolbar={{
+          filters: [
+            {
+              key: 'ageRange',
+              label: '年龄段',
+              render: ({ value, setValue }) => {
+                const range =
+                  value && typeof value === 'object'
+                    ? (value as { min?: string; max?: string })
+                    : {}
+                return (
+                  <div className="flex items-center gap-1">
+                    <input
+                      aria-label="最小年龄"
+                      value={range.min ?? ''}
+                      onChange={(event) =>
+                        setValue({
+                          ...range,
+                          min: event.currentTarget.value
+                        })
+                      }
+                    />
+                    <input
+                      aria-label="最大年龄"
+                      value={range.max ?? ''}
+                      onChange={(event) =>
+                        setValue({
+                          ...range,
+                          max: event.currentTarget.value
+                        })
+                      }
+                    />
+                  </div>
+                )
+              }
+            }
+          ],
+          onFiltersChange
+        }}
+        pagination={false}
+      />
+    )
+
+    await userEvent.type(screen.getByLabelText('最小年龄'), '18')
+    await userEvent.type(screen.getByLabelText('最大年龄'), '35')
+
+    expect(onFiltersChange).toHaveBeenLastCalledWith({
+      ageRange: { min: '18', max: '35' }
+    })
+  })
+
+  it('renders filtersExtra and lets it update filters', async () => {
+    const onFiltersChange = vi.fn()
+
+    render(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[{ id: 1, name: 'A' }]}
+        toolbar={{
+          filtersExtra: ({ setFilter }) => (
+            <input
+              aria-label="额外最小年龄"
+              onChange={(event) =>
+                setFilter('ageRange', {
+                  min: event.currentTarget.value
+                })
+              }
+            />
+          ),
+          onFiltersChange
+        }}
+        pagination={false}
+      />
+    )
+
+    await userEvent.type(screen.getByLabelText('额外最小年龄'), '21')
+
+    expect(onFiltersChange).toHaveBeenLastCalledWith({
+      ageRange: { min: '21' }
+    })
+  })
+
   it('delegates pagination rendering to Table', async () => {
     const onPageChange = vi.fn()
 

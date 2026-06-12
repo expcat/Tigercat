@@ -17,8 +17,8 @@ description: Compact Tigercat Composite Vue and React usage routes
 | ActivityFeed         | `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`    | 时间线、头像、状态标签和动作链接由组件内部组合，业务侧优先传 `items` 或 `groups`。                                                                                                                                                                                                                                                                                                                                                                                                   |
 | CommentThread        | `Avatar`, `Tag`, `Button`, `Textarea`, `Text`                     | 评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。                                                                                                                                                                                                                                                                                                                                                                                                        |
 | NotificationCenter   | `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`       | 传 `groups` 时使用 Tabs 分组；平铺通知列表走 List。                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| TableToolbar         | `Input`, `Select`, `Button`, `Popover`, `Checkbox`                | 这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列。                                                                                                                                                                                                                                                         |
-| DataTableWithToolbar | `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`       | 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。 |
+| TableToolbar         | `Input`, `Select`, `Button`, `Popover`, `Checkbox`                | 这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`filters` 默认渲染 Select；自定义过滤控件用 `filters[].render(context)`，或在尾部注入 Vue `#filters-extra` / React `toolbar.filtersExtra`。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列。                                                                                                      |
+| DataTableWithToolbar | `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`       | 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。自定义过滤值可为对象，例如 `{ ageRange: { min, max } }`。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。 |
 | FormWizard           | `Steps/StepsItem`, `Button`, `ConfigProvider`                     | 按钮文案优先使用显式 props，其次组件 `locale`，再回退到 `ConfigProvider` locale。                                                                                                                                                                                                                                                                                                                                                                                                    |
 | TaskBoard            | `ConfigProvider`, `task-board drag utilities`, `kanban utilities` | 拖拽、WIP、过滤和空状态文案由 core 工具和 locale helpers 共同驱动。                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
@@ -34,3 +34,85 @@ description: Compact Tigercat Composite Vue and React usage routes
 | TaskBoard            | `<TaskBoard :columns="columns" />`                                                                                                   | `<TaskBoard columns={columns} />`                                                                                              |
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.
+
+## DataTableWithToolbar Custom Filters
+
+Use `toolbar.filters[].render(context)` when the custom control belongs to a filter definition. Use the extra area when app code already owns the control state or needs to append several controls after configured Select filters.
+
+Vue `filters-extra` age range:
+
+```vue
+<script setup lang="ts">
+const getAgeRange = (value: unknown) =>
+  value && typeof value === 'object' ? (value as { min?: string; max?: string }) : {}
+</script>
+
+<DataTableWithToolbar
+  :columns="columns"
+  :data-source="rows"
+  :toolbar="{
+    filters: [
+      { key: 'status', label: '状态', options: statusOptions }
+    ]
+  }"
+  @filters-change="filters = $event">
+  <template #filters-extra="{ filters, setFilter }">
+    <div class="flex items-center gap-2">
+      <span>年龄段</span>
+      <Input
+        :model-value="getAgeRange(filters.ageRange).min ?? ''"
+        placeholder="最小"
+        @update:model-value="(min) =>
+          setFilter('ageRange', { ...getAgeRange(filters.ageRange), min })" />
+      <span>-</span>
+      <Input
+        :model-value="getAgeRange(filters.ageRange).max ?? ''"
+        placeholder="最大"
+        @update:model-value="(max) =>
+          setFilter('ageRange', { ...getAgeRange(filters.ageRange), max })" />
+    </div>
+  </template>
+</DataTableWithToolbar>
+```
+
+React `filtersExtra` age range:
+
+```tsx
+<DataTableWithToolbar
+  columns={columns}
+  dataSource={rows}
+  toolbar={{
+    filters: [{ key: 'status', label: '状态', options: statusOptions }],
+    filtersExtra: ({ filters, setFilter }) => {
+      const ageRange =
+        filters.ageRange && typeof filters.ageRange === 'object'
+          ? (filters.ageRange as { min?: string; max?: string })
+          : {}
+
+      return (
+        <div className="flex items-center gap-2">
+          <span>年龄段</span>
+          <Input
+            value={ageRange.min ?? ''}
+            placeholder="最小"
+            onChange={(event) =>
+              setFilter('ageRange', { ...ageRange, min: event.currentTarget.value })
+            }
+          />
+          <span>-</span>
+          <Input
+            value={ageRange.max ?? ''}
+            placeholder="最大"
+            onChange={(event) =>
+              setFilter('ageRange', { ...ageRange, max: event.currentTarget.value })
+            }
+          />
+        </div>
+      )
+    }
+  }}
+  onFiltersChange={setFilters}
+/>
+```
+
+`filters[].render` receives `{ filter, value, filters, setValue, setFilter }`; call `setValue({ min, max })` to emit an object value for the current filter key.

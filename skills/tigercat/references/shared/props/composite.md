@@ -85,17 +85,22 @@ Source: `packages/core/src/types/composite.ts` · Interface: `TableToolbarProps`
 
 Uses: `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
-Note: 这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列。
+Note: 这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`filters` 默认渲染 Select；需要 Input、DatePicker、年龄段等复合控件时用 `filters[].render(context)`，或在尾部注入 Vue `#filters-extra` / React `toolbar.filtersExtra`。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列。
 
-Showing 3 key props of 12; see source for the complete interface.
+Showing 6 key props; see source for the complete interface.
 
-| Prop                  | Type     | Default | Notes                               |
-| --------------------- | -------- | ------- | ----------------------------------- |
-| `searchValue?`        | `string` | `-`     | Search value (controlled)           |
-| `defaultSearchValue?` | `string` | `-`     | Default search value (uncontrolled) |
-| `searchPlaceholder?`  | `string` | `-`     | Search input placeholder            |
+| Prop                  | Type                                                               | Default | Notes                               |
+| --------------------- | ------------------------------------------------------------------ | ------- | ----------------------------------- |
+| `searchValue?`        | `string`                                                           | `-`     | Search value (controlled)           |
+| `defaultSearchValue?` | `string`                                                           | `-`     | Default search value (uncontrolled) |
+| `searchPlaceholder?`  | `string`                                                           | `-`     | Search input placeholder            |
+| `filters?`            | `TableToolbarFilter[]`                                             | `-`     | Select filters or custom renderers  |
+| `filtersExtra?`       | `unknown \| ((context: TableToolbarFiltersExtraContext) => unknown)` | `-`     | Extra content after filters         |
+| `showColumnSettings?` | `boolean`                                                          | `false` | Show column settings popover        |
 
 Events/callback props: `onSearchChange?`, `onSearch?`, `onFiltersChange?`, `onBulkAction?`.
+
+Custom filter context: `filters[].render({ filter, value, filters, setValue, setFilter })`. Use `setValue(value)` to update the current filter key, or `setFilter(key, value)` when one custom control updates another key. `TableToolbarFilterValue` accepts `string | number | Record<string, unknown> | null`, so range filters can emit `{ ageRange: { min, max } }`.
 
 ## DataTableWithToolbar
 
@@ -103,7 +108,7 @@ Source: `packages/core/src/types/composite.ts` · Interface: `DataTableWithToolb
 
 Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
-Note: 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。
+Note: 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.filters[].render`、Vue `#filters-extra` 和 React `toolbar.filtersExtra` 可在工具栏过滤区放入自定义控件。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。
 
 | Prop          | Type                        | Default | Notes                                            |
 | ------------- | --------------------------- | ------- | ------------------------------------------------ |

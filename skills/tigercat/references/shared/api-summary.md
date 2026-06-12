@@ -149,7 +149,7 @@ description: Compact generated API summary for Tigercat core types
 
 | Type File    | Props Interfaces                                                                                                                                               | Components                                                                                                             | Exports |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------- |
-| composite.ts | ChatWindowProps, ActivityFeedProps, CommentThreadProps, NotificationCenterProps, TableToolbarProps, DataTableWithToolbarProps, FormWizardProps, TaskBoardProps | ChatWindow, ActivityFeed, CommentThread, NotificationCenter, TableToolbar, DataTableWithToolbar, FormWizard, TaskBoard | 36      |
+| composite.ts | ChatWindowProps, ActivityFeedProps, CommentThreadProps, NotificationCenterProps, TableToolbarProps, TableToolbarFilter, DataTableWithToolbarProps, FormWizardProps, TaskBoardProps | ChatWindow, ActivityFeed, CommentThread, NotificationCenter, TableToolbar, DataTableWithToolbar, FormWizard, TaskBoard | 41      |
 
 ## Core
 

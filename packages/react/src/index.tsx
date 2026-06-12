@@ -219,7 +219,13 @@ export type { CommentThreadProps } from './components/CommentThread'
 export { NotificationCenter } from './components/NotificationCenter'
 export type { NotificationCenterProps } from './components/NotificationCenter'
 export { DataTableWithToolbar } from './components/DataTableWithToolbar'
-export type { DataTableWithToolbarProps } from './components/DataTableWithToolbar'
+export type {
+  DataTableWithToolbarProps,
+  ReactTableToolbarFilter,
+  ReactTableToolbarFilterRenderContext,
+  ReactTableToolbarFiltersExtraContext,
+  ReactTableToolbarProps
+} from './components/DataTableWithToolbar'
 export { FormWizard } from './components/FormWizard'
 export type { FormWizardProps } from './components/FormWizard'
 export { CropUpload } from './components/CropUpload'

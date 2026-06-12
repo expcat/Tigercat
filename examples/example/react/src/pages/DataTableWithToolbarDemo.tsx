@@ -12,6 +12,7 @@ interface UserRow extends Record<string, unknown> {
   role: 'admin' | 'editor' | 'viewer'
   status: 'active' | 'disabled'
   email: string
+  age: number
 }
 
 const basicSnippet = `<DataTableWithToolbar
@@ -53,10 +54,11 @@ const [pagination, setPagination] = useState({ current: 1, pageSize: 6 })
 const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([])`
 
 const columns: TableColumn<UserRow>[] = [
-  { key: 'name', title: '姓名', width: '25%' },
-  { key: 'email', title: '邮箱', width: '35%' },
-  { key: 'role', title: '角色', width: '20%' },
-  { key: 'status', title: '状态', width: '20%' }
+  { key: 'name', title: '姓名', width: '22%' },
+  { key: 'email', title: '邮箱', width: '32%' },
+  { key: 'age', title: '年龄', width: '12%' },
+  { key: 'role', title: '角色', width: '17%' },
+  { key: 'status', title: '状态', width: '17%' }
 ]
 
 // Card-mode customization: promote 名称 to the card heading, hide secondary
@@ -66,7 +68,8 @@ const cardColumns: TableColumn<UserRow>[] = [
   { key: 'name', title: '姓名', width: '25%', cardTitle: true },
   { key: 'status', title: '状态', width: '20%', cardPriority: 1 },
   { key: 'role', title: '角色', width: '20%', cardPriority: 2 },
-  { key: 'email', title: '邮箱', width: '25%' }
+  { key: 'age', title: '年龄', width: '10%', cardPriority: 3 },
+  { key: 'email', title: '邮箱', width: '15%' }
 ]
 
 const cardSnippet = `// Card-mode field customization (activates below cardBreakpoint)
@@ -105,11 +108,42 @@ const settingsColumns: TableColumn<UserRow>[] = [
 // 受控模式：传 hiddenColumnKeys（配合 onHiddenColumnsChange 更新状态）
 // 锁定特定列：toolbar={{ showColumnSettings: true, columnSettings: { lockedColumnKeys: ['name'] } }}`
 
+const ageRangeSnippet = `<DataTableWithToolbar
+  columns={columns}
+  dataSource={pagedData}
+  toolbar={{
+    ...toolbar,
+    filtersExtra: ({ filters, setFilter }) => {
+      const ageRange = getAgeRange(filters.ageRange)
+      return (
+        <div className="flex items-center gap-2">
+          <span>年龄段</span>
+          <input
+            value={ageRange.min ?? ''}
+            onChange={(event) =>
+              setFilter('ageRange', { ...ageRange, min: event.currentTarget.value })
+            }
+          />
+          <span>-</span>
+          <input
+            value={ageRange.max ?? ''}
+            onChange={(event) =>
+              setFilter('ageRange', { ...ageRange, max: event.currentTarget.value })
+            }
+          />
+        </div>
+      )
+    }
+  }}
+  onFiltersChange={setFilters}
+/>`
+
 const settingsColumns: TableColumn<UserRow>[] = [
-  { key: 'name', title: '姓名', width: '25%', hideable: false },
-  { key: 'email', title: '邮箱', width: '35%' },
-  { key: 'role', title: '角色', width: '20%' },
-  { key: 'status', title: '状态', width: '20%' }
+  { key: 'name', title: '姓名', width: '22%', hideable: false },
+  { key: 'email', title: '邮箱', width: '32%' },
+  { key: 'age', title: '年龄', width: '12%' },
+  { key: 'role', title: '角色', width: '17%' },
+  { key: 'status', title: '状态', width: '17%' }
 ]
 
 const statusOptions = [
@@ -131,25 +165,33 @@ const seedData: UserRow[] = Array.from({ length: 26 }).map((_, index) => {
     name: `用户 ${index + 1}`,
     role,
     status,
+    age: 22 + (index % 18),
     email: `user${index + 1}@example.com`
   }
 })
+
+const getAgeRange = (value: TableToolbarFilterValue) =>
+  value && typeof value === 'object' ? (value as { min?: string; max?: string }) : {}
 
 const DataTableWithToolbarDemo: React.FC = () => {
   const [keyword, setKeyword] = useState('')
   const [filters, setFilters] = useState<Record<string, TableToolbarFilterValue>>({
     status: null,
-    role: null
+    role: null,
+    ageRange: null
   })
   const [pagination, setPagination] = useState({ current: 1, pageSize: 6 })
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([])
 
   useEffect(() => {
     setPagination((prev) => ({ ...prev, current: 1 }))
-  }, [keyword, filters.status, filters.role])
+  }, [keyword, filters.status, filters.role, filters.ageRange])
 
   const filteredData = useMemo(() => {
     const lowerKeyword = keyword.trim().toLowerCase()
+    const ageRange = getAgeRange(filters.ageRange)
+    const minAge = ageRange.min ? Number(ageRange.min) : undefined
+    const maxAge = ageRange.max ? Number(ageRange.max) : undefined
     return seedData.filter((item) => {
       const matchKeyword =
         !lowerKeyword ||
@@ -157,7 +199,10 @@ const DataTableWithToolbarDemo: React.FC = () => {
         item.email.toLowerCase().includes(lowerKeyword)
       const matchStatus = !filters.status || item.status === filters.status
       const matchRole = !filters.role || item.role === filters.role
-      return matchKeyword && matchStatus && matchRole
+      const matchAge =
+        (minAge === undefined || item.age >= minAge) &&
+        (maxAge === undefined || item.age <= maxAge)
+      return matchKeyword && matchStatus && matchRole && matchAge
     })
   }, [keyword, filters])
 
@@ -237,6 +282,68 @@ const DataTableWithToolbarDemo: React.FC = () => {
           onSelectionChange={setSelectedRowKeys}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageChange}
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="自定义过滤器"
+        description="filtersExtra 可把年龄段等复合控件放入工具栏，并通过 setFilter 发出对象型过滤值。"
+        code={ageRangeSnippet}>
+        <DataTableWithToolbar<UserRow>
+          columns={columns}
+          dataSource={pagedData}
+          tableLayout="fixed"
+          toolbar={{
+            searchValue: keyword,
+            searchPlaceholder: '搜索姓名/邮箱',
+            filters: [
+              { key: 'status', label: '状态', options: statusOptions },
+              { key: 'role', label: '角色', options: roleOptions }
+            ],
+            filtersExtra: ({ filters, setFilter }) => {
+              const ageRange = getAgeRange(filters.ageRange)
+              return (
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <span className="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                    年龄段
+                  </span>
+                  <input
+                    className="w-16 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900"
+                    value={ageRange.min ?? ''}
+                    placeholder="最小"
+                    onChange={(event) =>
+                      setFilter('ageRange', {
+                        ...ageRange,
+                        min: event.currentTarget.value
+                      })
+                    }
+                  />
+                  <span className="text-gray-400">-</span>
+                  <input
+                    className="w-16 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900"
+                    value={ageRange.max ?? ''}
+                    placeholder="最大"
+                    onChange={(event) =>
+                      setFilter('ageRange', {
+                        ...ageRange,
+                        max: event.currentTarget.value
+                      })
+                    }
+                  />
+                </div>
+              )
+            }
+          }}
+          onSearchChange={setKeyword}
+          onSearch={setKeyword}
+          onFiltersChange={handleFiltersChange}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: filteredData.length,
+            showTotal: true
+          }}
+          onPageChange={handlePageChange}
         />
       </DemoBlock>
 

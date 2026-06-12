@@ -14,6 +14,7 @@ interface UserRow extends Record<string, unknown> {
   role: 'admin' | 'editor' | 'viewer'
   status: 'active' | 'disabled'
   email: string
+  age: number
 }
 
 const basicSnippet = `<DataTableWithToolbar
@@ -51,10 +52,11 @@ const keyword = ref('')
 const filters = ref<Record<string, unknown>>({ status: null, role: null })`
 
 const columns: TableColumn<Record<string, unknown>>[] = [
-  { key: 'name', title: '姓名', width: '25%' },
-  { key: 'email', title: '邮箱', width: '35%' },
-  { key: 'role', title: '角色', width: '20%' },
-  { key: 'status', title: '状态', width: '20%' }
+  { key: 'name', title: '姓名', width: '22%' },
+  { key: 'email', title: '邮箱', width: '32%' },
+  { key: 'age', title: '年龄', width: '12%' },
+  { key: 'role', title: '角色', width: '17%' },
+  { key: 'status', title: '状态', width: '17%' }
 ]
 
 // Card-mode customization: promote 姓名 to the card heading, hide secondary
@@ -64,7 +66,8 @@ const cardColumns: TableColumn<Record<string, unknown>>[] = [
   { key: 'name', title: '姓名', width: '25%', cardTitle: true },
   { key: 'status', title: '状态', width: '20%', cardPriority: 1 },
   { key: 'role', title: '角色', width: '20%', cardPriority: 2 },
-  { key: 'email', title: '邮箱', width: '25%' }
+  { key: 'age', title: '年龄', width: '10%', cardPriority: 3 },
+  { key: 'email', title: '邮箱', width: '15%' }
 ]
 
 const cardSnippet = `// 卡片模式字段定制（窄于 cardBreakpoint 时启用）
@@ -105,11 +108,31 @@ const settingsColumns = [
   { key: 'status', title: '状态' }
 ]`
 
+const ageRangeSnippet = `<DataTableWithToolbar
+  :columns="columns"
+  :dataSource="pagedData"
+  :toolbar="toolbar"
+  @filters-change="handleFiltersChange">
+  <template #filters-extra="{ filters, setFilter }">
+    <div class="flex items-center gap-2">
+      <span>年龄段</span>
+      <input
+        :value="getAgeRange(filters.ageRange).min ?? ''"
+        @input="(event) => setAgeRangeFilter(setFilter, filters.ageRange, 'min', event)" />
+      <span>-</span>
+      <input
+        :value="getAgeRange(filters.ageRange).max ?? ''"
+        @input="(event) => setAgeRangeFilter(setFilter, filters.ageRange, 'max', event)" />
+    </div>
+  </template>
+</DataTableWithToolbar>`
+
 const settingsColumns: TableColumn<Record<string, unknown>>[] = [
-  { key: 'name', title: '姓名', width: '25%', hideable: false },
-  { key: 'email', title: '邮箱', width: '35%' },
-  { key: 'role', title: '角色', width: '20%' },
-  { key: 'status', title: '状态', width: '20%' }
+  { key: 'name', title: '姓名', width: '22%', hideable: false },
+  { key: 'email', title: '邮箱', width: '32%' },
+  { key: 'age', title: '年龄', width: '12%' },
+  { key: 'role', title: '角色', width: '17%' },
+  { key: 'status', title: '状态', width: '17%' }
 ]
 
 const hiddenColumnKeys = ref<string[]>(['role'])
@@ -133,6 +156,7 @@ const seedData: UserRow[] = Array.from({ length: 26 }).map((_, index) => {
     name: `用户 ${index + 1}`,
     role,
     status,
+    age: 22 + (index % 18),
     email: `user${index + 1}@example.com`
   }
 })
@@ -140,17 +164,36 @@ const seedData: UserRow[] = Array.from({ length: 26 }).map((_, index) => {
 const keyword = ref('')
 const filters = ref<Record<string, TableToolbarFilterValue>>({
   status: null,
-  role: null
+  role: null,
+  ageRange: null
 })
 const pagination = ref({ current: 1, pageSize: 6 })
 const selectedRowKeys = ref<(string | number)[]>([])
 
-watch([keyword, () => filters.value.status, () => filters.value.role], () => {
+watch([keyword, () => filters.value.status, () => filters.value.role, () => filters.value.ageRange], () => {
   pagination.value.current = 1
 })
 
+const getAgeRange = (value: TableToolbarFilterValue) =>
+  value && typeof value === 'object' ? (value as { min?: string; max?: string }) : {}
+
+const setAgeRangeFilter = (
+  setFilter: (key: string, value: TableToolbarFilterValue) => void,
+  value: TableToolbarFilterValue,
+  key: 'min' | 'max',
+  event: Event
+) => {
+  setFilter('ageRange', {
+    ...getAgeRange(value),
+    [key]: (event.target as HTMLInputElement).value
+  })
+}
+
 const filteredData = computed(() => {
   const lowerKeyword = keyword.value.trim().toLowerCase()
+  const ageRange = getAgeRange(filters.value.ageRange)
+  const minAge = ageRange.min ? Number(ageRange.min) : undefined
+  const maxAge = ageRange.max ? Number(ageRange.max) : undefined
   return seedData.filter((item) => {
     const matchKeyword =
       !lowerKeyword ||
@@ -158,7 +201,10 @@ const filteredData = computed(() => {
       item.email.toLowerCase().includes(lowerKeyword)
     const matchStatus = !filters.value.status || item.status === filters.value.status
     const matchRole = !filters.value.role || item.role === filters.value.role
-    return matchKeyword && matchStatus && matchRole
+    const matchAge =
+      (minAge === undefined || item.age >= minAge) &&
+      (maxAge === undefined || item.age <= maxAge)
+    return matchKeyword && matchStatus && matchRole && matchAge
   })
 })
 
@@ -234,6 +280,44 @@ const handleBulkAction = (actionKey: string) => {
         @page-size-change="handlePageChange"
         @selection-change="handleSelectionChange"
         @bulk-action="(action) => handleBulkAction(action.key as string)" />
+    </DemoBlock>
+
+    <DemoBlock
+      title="自定义过滤器"
+      description="filters-extra 插槽可把年龄段等复合控件放入工具栏，并通过 setFilter 发出对象型过滤值。"
+      :code="ageRangeSnippet">
+      <DataTableWithToolbar
+        :columns="columns"
+        :dataSource="pagedData"
+        table-layout="fixed"
+        :toolbar="toolbar"
+        :pagination="{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: filteredData.length,
+          showTotal: true
+        }"
+        @search-change="(value) => (keyword = value)"
+        @search="(value) => (keyword = value)"
+        @filters-change="handleFiltersChange"
+        @page-change="handlePageChange">
+        <template #filters-extra="{ filters, setFilter }">
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <span class="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">年龄段</span>
+            <input
+              class="w-16 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900"
+              :value="getAgeRange(filters.ageRange).min ?? ''"
+              placeholder="最小"
+              @input="(event) => setAgeRangeFilter(setFilter, filters.ageRange, 'min', event)" />
+            <span class="text-gray-400">-</span>
+            <input
+              class="w-16 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900"
+              :value="getAgeRange(filters.ageRange).max ?? ''"
+              placeholder="最大"
+              @input="(event) => setAgeRangeFilter(setFilter, filters.ageRange, 'max', event)" />
+          </div>
+        </template>
+      </DataTableWithToolbar>
     </DemoBlock>
 
     <DemoBlock
