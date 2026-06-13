@@ -17,7 +17,11 @@ const createPopoverId = createFloatingIdFactory('popover')
 
 export type PopoverProps = Omit<CorePopoverProps, 'style' | 'placement'> &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'title'> & {
-    children?: React.ReactNode
+    /**
+     * Trigger content. May be a render function receiving `{ open }` so the
+     * trigger can be styled/rendered by open state without attribute selectors.
+     */
+    children?: React.ReactNode | ((state: { open: boolean }) => React.ReactNode)
     titleContent?: React.ReactNode
     contentContent?: React.ReactNode
     className?: string
@@ -75,8 +79,12 @@ export const Popover: React.FC<PopoverProps> = ({
         className={triggerClasses}
         aria-haspopup="dialog"
         aria-disabled={disabled ? 'true' : undefined}
+        // `data-state` is the stable styling hook. `aria-expanded` is
+        // intentionally omitted: the trigger is a generic wrapper without an
+        // interactive role, where `aria-expanded` is invalid.
+        data-state={currentVisible ? 'open' : 'closed'}
         {...triggerHandlers}>
-        {children}
+        {typeof children === 'function' ? children({ open: Boolean(currentVisible) }) : children}
       </div>
 
       {currentVisible &&

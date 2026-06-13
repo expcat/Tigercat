@@ -44,7 +44,11 @@ const PopconfirmIcon: React.FC<{ type: PopconfirmIconType }> = ({ type }) => (
 
 export type PopconfirmProps = Omit<CorePopconfirmProps, 'style' | 'placement'> &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style'> & {
-    children?: React.ReactNode
+    /**
+     * Trigger content. May be a render function receiving `{ open }` so the
+     * trigger can be styled/rendered by open state without attribute selectors.
+     */
+    children?: React.ReactNode | ((state: { open: boolean }) => React.ReactNode)
     titleContent?: React.ReactNode
     descriptionContent?: React.ReactNode
     onOpenChange?: (open: boolean) => void
@@ -147,12 +151,16 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
 
   if (!children) return null
 
+  // The trigger may be a render function receiving `{ open }`.
+  const resolvedChildren =
+    typeof children === 'function' ? children({ open: Boolean(currentVisible) }) : children
+
   const mergedStyle = mergeStyleValues(style) as React.CSSProperties | undefined
 
   const triggerProps = {
     className: triggerClasses,
     onClick: (event: React.MouseEvent) => {
-      const target = children
+      const target = resolvedChildren
       if (React.isValidElement<{ onClick?: unknown }>(target)) {
         const onChildClick = target.props.onClick
         if (typeof onChildClick === 'function') {
@@ -164,16 +172,17 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     },
     'aria-haspopup': 'dialog' as const,
     'aria-expanded': Boolean(currentVisible),
-    'aria-controls': currentVisible ? popconfirmId : undefined
+    'aria-controls': currentVisible ? popconfirmId : undefined,
+    'data-state': (currentVisible ? 'open' : 'closed') as 'open' | 'closed'
   }
 
   type TriggerChildProps = { className?: string; onClick?: unknown }
 
   const triggerNode = (() => {
-    if (React.isValidElement<TriggerChildProps>(children)) {
-      return React.cloneElement(children, {
+    if (React.isValidElement<TriggerChildProps>(resolvedChildren)) {
+      return React.cloneElement(resolvedChildren, {
         ...triggerProps,
-        className: classNames(children.props.className, triggerProps.className)
+        className: classNames(resolvedChildren.props.className, triggerProps.className)
       })
     }
     return (
@@ -189,7 +198,7 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
             handleTriggerClick()
           }
         }}>
-        {children}
+        {resolvedChildren}
       </div>
     )
   })()

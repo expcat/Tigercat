@@ -3,6 +3,7 @@ import {
   findFirstEnabledIndex,
   findLastEnabledIndex,
   findNextEnabledIndex,
+  getDisclosureStateAttr,
   getInitialPickerActiveIndex,
   getPickerComboboxAria,
   getPickerListboxAria,
@@ -107,7 +108,8 @@ describe('picker-utils', () => {
         'aria-expanded': true,
         'aria-haspopup': 'listbox',
         'aria-controls': 'list',
-        'aria-activedescendant': 'list-option-2'
+        'aria-activedescendant': 'list-option-2',
+        'data-state': 'open'
       })
       expect(getPickerComboboxAria({ expanded: false, listboxId: 'list', activeIndex: 2 })).toEqual(
         {
@@ -115,9 +117,15 @@ describe('picker-utils', () => {
           'aria-expanded': false,
           'aria-haspopup': 'listbox',
           'aria-controls': undefined,
-          'aria-activedescendant': undefined
+          'aria-activedescendant': undefined,
+          'data-state': 'closed'
         }
       )
+    })
+
+    it('getDisclosureStateAttr maps open state to data-state', () => {
+      expect(getDisclosureStateAttr(true)).toEqual({ 'data-state': 'open' })
+      expect(getDisclosureStateAttr(false)).toEqual({ 'data-state': 'closed' })
     })
 
     it('builds listbox and option aria props', () => {

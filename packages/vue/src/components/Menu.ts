@@ -1193,6 +1193,7 @@ export const SubMenu = defineComponent({
           'aria-expanded': isExpanded.value ? 'true' : 'false',
           'aria-haspopup': 'true',
           'aria-disabled': props.disabled ? 'true' : undefined,
+          'data-state': isExpanded.value ? 'open' : 'closed',
           disabled: props.disabled,
           tabindex: -1,
           ...passthroughAttrs.value

@@ -601,7 +601,8 @@ export const Select: React.FC<SelectProps> = (props) => {
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-controls={listboxId}
-        aria-activedescendant={isOpen && activeIndex >= 0 ? getOptionId(activeIndex) : undefined}>
+        aria-activedescendant={isOpen && activeIndex >= 0 ? getOptionId(activeIndex) : undefined}
+        data-state={isOpen ? 'open' : 'closed'}>
         <span
           className={classNames(
             'flex-1 text-left truncate',

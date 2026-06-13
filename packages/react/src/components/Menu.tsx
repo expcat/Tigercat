@@ -903,6 +903,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         aria-expanded={isExpanded ? 'true' : 'false'}
         aria-haspopup="true"
         aria-disabled={disabled ? 'true' : undefined}
+        data-state={isExpanded ? 'open' : 'closed'}
         disabled={disabled}
         tabIndex={-1}>
         {renderTitle()}

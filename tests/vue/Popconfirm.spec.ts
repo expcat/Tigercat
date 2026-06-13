@@ -36,6 +36,31 @@ describe.sequential('Popconfirm', () => {
     await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
   })
 
+  it('exposes data-state on the trigger reflecting open state', async () => {
+    const user = userEvent.setup()
+    const { getByText } = render(Popconfirm, {
+      props: { title: 'Confirm?' },
+      slots: { default: () => h('button', {}, 'Action') }
+    })
+    const trigger = getByText('Action')
+    expect(trigger).toHaveAttribute('data-state', 'closed')
+    await user.click(trigger)
+    await waitFor(() => expect(trigger).toHaveAttribute('data-state', 'open'))
+  })
+
+  it('passes open state to the #trigger scoped slot', async () => {
+    const user = userEvent.setup()
+    const { container, getByText } = render(Popconfirm, {
+      props: { title: 'Confirm?' },
+      slots: { trigger: (p: { open: boolean }) => h('span', {}, `open:${p.open}`) }
+    })
+    expect(getByText('open:false')).toBeInTheDocument()
+    const wrapper = container.querySelector('[data-state]') as HTMLElement
+    expect(wrapper).toHaveAttribute('data-state', 'closed')
+    await user.click(wrapper)
+    await waitFor(() => expect(getByText('open:true')).toBeInTheDocument())
+  })
+
   it('respects disabled (cannot open)', async () => {
     const user = userEvent.setup()
     const { getByText, queryByText } = renderWithSlots(

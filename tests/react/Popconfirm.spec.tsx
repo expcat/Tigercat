@@ -31,6 +31,29 @@ describe('Popconfirm', () => {
     await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
   })
 
+  it('exposes data-state on the trigger reflecting open state', async () => {
+    const user = userEvent.setup()
+    const { getByText } = renderWithChildren(Popconfirm, <button>Action</button>, {
+      title: 'Confirm?'
+    })
+    const trigger = getByText('Action')
+    expect(trigger).toHaveAttribute('data-state', 'closed')
+    await user.click(trigger)
+    await waitFor(() => expect(trigger).toHaveAttribute('data-state', 'open'))
+  })
+
+  it('passes open state to function children', async () => {
+    const user = userEvent.setup()
+    const { getByText } = render(
+      <Popconfirm title="Confirm?">
+        {({ open }: { open: boolean }) => <button>{`open:${open}`}</button>}
+      </Popconfirm>
+    )
+    const trigger = getByText('open:false')
+    await user.click(trigger)
+    await waitFor(() => expect(getByText('open:true')).toBeInTheDocument())
+  })
+
   it('respects disabled (cannot open)', async () => {
     const user = userEvent.setup()
     const { getByText, queryByText } = renderWithChildren(Popconfirm, <button>Delete</button>, {

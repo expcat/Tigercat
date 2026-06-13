@@ -148,7 +148,13 @@ export const Popconfirm = defineComponent({
     const okButtonClasses = computed(() => getPopconfirmOkButtonClasses(props.okType))
 
     return () => {
-      const defaultSlot = slots.default?.()
+      // The `trigger` scoped slot (receives `{ open }`) takes precedence over
+      // the default slot, letting consumers style/render the trigger by open
+      // state without relying on attribute selectors.
+      const useTriggerSlot = Boolean(slots.trigger)
+      const defaultSlot = useTriggerSlot
+        ? slots.trigger!({ open: currentVisible.value })
+        : slots.default?.()
       if (!defaultSlot || defaultSlot.length === 0) return null
 
       const {
@@ -164,11 +170,12 @@ export const Popconfirm = defineComponent({
         'aria-haspopup': 'dialog',
         'aria-expanded': Boolean(currentVisible.value),
         'aria-controls': currentVisible.value ? popconfirmId : undefined,
-        'aria-disabled': props.disabled ? 'true' : undefined
+        'aria-disabled': props.disabled ? 'true' : undefined,
+        'data-state': currentVisible.value ? 'open' : 'closed'
       } as const
 
       const trigger = (() => {
-        if (defaultSlot.length === 1) {
+        if (!useTriggerSlot && defaultSlot.length === 1) {
           const only = defaultSlot[0]
           if (isVNode(only)) {
             const existingProps = (only.props ?? {}) as {

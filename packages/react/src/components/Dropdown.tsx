@@ -76,6 +76,13 @@ export interface DropdownProps
   offset?: number
   onOpenChange?: (open: boolean) => void
   children?: React.ReactNode
+  /**
+   * Render the trigger from open state. Receives `{ open }` so the trigger can
+   * be styled/rendered by open state without attribute selectors. When given,
+   * `children` only needs to provide the `DropdownMenu`. (Named `renderTrigger`
+   * because `trigger` already configures the open event.)
+   */
+  renderTrigger?: (state: { open: boolean }) => React.ReactNode
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -92,6 +99,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   style,
   onOpenChange,
   children,
+  renderTrigger,
   ...divProps
 }) => {
   // Internal state for uncontrolled mode
@@ -251,14 +259,15 @@ export const Dropdown: React.FC<DropdownProps> = ({
     [closeOnClick, handleItemClick]
   )
 
-  // Parse children to find trigger and menu
+  // Parse children to find trigger and menu. When `renderTrigger` is given it
+  // supplies the trigger (receiving open state) and children only carry the menu.
   const childrenArray = React.Children.toArray(children)
-  let triggerElement: React.ReactNode = null
+  let triggerElement: React.ReactNode = renderTrigger ? renderTrigger({ open: visible }) : null
   let menuElement: React.ReactNode = null
 
   childrenArray.forEach((child) => {
     if (!React.isValidElement(child)) {
-      if (triggerElement == null) triggerElement = child
+      if (!renderTrigger && triggerElement == null) triggerElement = child
       return
     }
 
@@ -267,7 +276,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
       return
     }
 
-    if (triggerElement == null) {
+    if (!renderTrigger && triggerElement == null) {
       triggerElement = child
     }
   })

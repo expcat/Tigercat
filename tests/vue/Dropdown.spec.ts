@@ -45,6 +45,20 @@ describe('Dropdown', () => {
     expect(trigger).toHaveAttribute('data-state', 'open')
   })
 
+  it('passes open state to the #trigger scoped slot', async () => {
+    const { container } = render(Dropdown, {
+      props: { trigger: 'click' },
+      slots: {
+        trigger: (p: { open: boolean }) => h('button', null, `open:${p.open}`),
+        default: () => [h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])]
+      }
+    })
+
+    expect(screen.getByText('open:false')).toBeInTheDocument()
+    await fireEvent.click(container.querySelector('[data-state]') as HTMLElement)
+    expect(screen.getByText('open:true')).toBeInTheDocument()
+  })
+
   it('is hidden by default (hover trigger)', () => {
     render(Dropdown, {
       slots: {

@@ -39,6 +39,19 @@ describe('Popover', () => {
       expect(queryByText('Popover content')).toBeNull()
     })
 
+    it('exposes data-state on the trigger reflecting open state', async () => {
+      const user = userEvent.setup()
+      const { container } = renderWithSlots(
+        Popover,
+        { default: '<button>Trigger</button>' },
+        { content: 'Popover content', trigger: 'click' }
+      )
+      const trigger = container.querySelector('[aria-haspopup="dialog"]') as HTMLElement
+      expect(trigger).toHaveAttribute('data-state', 'closed')
+      await user.click(trigger)
+      await waitFor(() => expect(trigger).toHaveAttribute('data-state', 'open'))
+    })
+
     it('should show popover content when trigger is clicked', async () => {
       const user = userEvent.setup()
       const { getByText } = renderWithSlots(

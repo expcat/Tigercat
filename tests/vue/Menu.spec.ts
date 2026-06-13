@@ -200,6 +200,22 @@ describe('Menu', () => {
 
       const trigger = screen.getByRole('menuitem', { name: 'Submenu' })
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      expect(trigger).toHaveAttribute('data-state', 'open')
+    })
+
+    it('exposes data-state on a collapsed submenu trigger', () => {
+      render(Menu, {
+        slots: {
+          default: () => [
+            h(SubMenu, { itemKey: 'sub1', title: 'Submenu' }, () => [
+              h(MenuItem, { itemKey: '1' }, () => 'Sub Item 1')
+            ])
+          ]
+        }
+      })
+
+      const trigger = screen.getByRole('menuitem', { name: 'Submenu' })
+      expect(trigger).toHaveAttribute('data-state', 'closed')
     })
 
     it('respects controlled openKeys prop', () => {

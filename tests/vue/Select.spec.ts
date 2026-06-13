@@ -45,6 +45,14 @@ describe('Select', () => {
       expect(trigger).toBeInTheDocument()
     })
 
+    it('exposes data-state on the trigger reflecting open state', async () => {
+      const { container } = render(Select, { props: { options: testOptions } })
+      const trigger = container.querySelector('button')!
+      expect(trigger).toHaveAttribute('data-state', 'closed')
+      await fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('data-state', 'open')
+    })
+
     it('should render with placeholder', () => {
       const { getByText } = render(Select, {
         props: {

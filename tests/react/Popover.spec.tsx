@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { waitFor } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Popover } from '@expcat/tigercat-react'
 import {
@@ -30,6 +30,30 @@ describe('Popover', () => {
 
       // Content should not be rendered initially (conditional rendering)
       expect(queryByText('Popover content')).toBeNull()
+    })
+
+    it('exposes data-state on the trigger reflecting open state', async () => {
+      const user = userEvent.setup()
+      const { container } = renderWithChildren(Popover, <button>Trigger</button>, {
+        content: 'Popover content',
+        trigger: 'click'
+      })
+      const trigger = container.querySelector('[aria-haspopup="dialog"]') as HTMLElement
+      expect(trigger).toHaveAttribute('data-state', 'closed')
+      await user.click(trigger)
+      await waitFor(() => expect(trigger).toHaveAttribute('data-state', 'open'))
+    })
+
+    it('passes open state to function children', async () => {
+      const user = userEvent.setup()
+      const { getByText } = render(
+        <Popover content="Popover content" trigger="click">
+          {({ open }: { open: boolean }) => <button>{`open:${open}`}</button>}
+        </Popover>
+      )
+      const trigger = getByText('open:false')
+      await user.click(trigger)
+      await waitFor(() => expect(getByText('open:true')).toBeInTheDocument())
     })
 
     it('should show popover content when trigger is clicked', async () => {

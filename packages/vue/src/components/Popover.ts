@@ -74,8 +74,13 @@ export const Popover = defineComponent({
     const contentClasses = computed(() => getPopoverContentClasses(props.width))
 
     return () => {
-      const defaultSlot = slots.default?.()
-      if (!defaultSlot || defaultSlot.length === 0) return null
+      // Trigger content: the `trigger` scoped slot (receives `{ open }`) takes
+      // precedence over the default slot so consumers can style/render the
+      // trigger by open state without relying on attribute selectors.
+      const triggerSlotContent = slots.trigger
+        ? slots.trigger({ open: currentVisible.value })
+        : slots.default?.()
+      if (!triggerSlotContent || triggerSlotContent.length === 0) return null
 
       const {
         class: _class,
@@ -103,9 +108,14 @@ export const Popover = defineComponent({
               class: triggerClasses.value,
               'aria-haspopup': 'dialog',
               'aria-disabled': props.disabled ? 'true' : undefined,
+              // `data-state` is the stable styling hook. `aria-expanded` is
+              // intentionally omitted: the trigger is a generic wrapper without
+              // an interactive role, where `aria-expanded` is invalid (the
+              // user's own interactive element carries the real semantics).
+              'data-state': currentVisible.value ? 'open' : 'closed',
               ...triggerHandlers.value
             },
-            defaultSlot
+            triggerSlotContent
           ),
           // Floating content
           currentVisible.value

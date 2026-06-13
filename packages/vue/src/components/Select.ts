@@ -640,7 +640,8 @@ export const Select = defineComponent({
             'aria-expanded': isOpen.value,
             'aria-controls': listboxId,
             'aria-activedescendant':
-              isOpen.value && activeIndex.value >= 0 ? getOptionId(activeIndex.value) : undefined
+              isOpen.value && activeIndex.value >= 0 ? getOptionId(activeIndex.value) : undefined,
+            'data-state': isOpen.value ? 'open' : 'closed'
           },
           [
             h(

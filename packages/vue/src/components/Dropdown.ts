@@ -388,17 +388,32 @@ export const Dropdown = defineComponent({
 
     return () => {
       const defaultSlot = slots.default?.()
-      if (!defaultSlot || defaultSlot.length === 0) return null
+      const triggerSlot = slots.trigger?.({ open: currentVisible.value })
+      if (
+        (!defaultSlot || defaultSlot.length === 0) &&
+        (!triggerSlot || triggerSlot.length === 0)
+      ) {
+        return null
+      }
 
       let triggerNode: VNode | null = null
       let menuNode: VNode | null = null
 
-      defaultSlot.forEach((node: VNode) => {
+      // The `trigger` scoped slot (receives `{ open }`) supplies the trigger so
+      // consumers can style/render it by open state without attribute-selector
+      // hacks; the menu is still taken from the default slot.
+      if (triggerSlot && triggerSlot.length > 0) {
+        triggerNode = triggerSlot.length === 1 ? triggerSlot[0] : (h('span', triggerSlot) as VNode)
+      }
+
+      defaultSlot?.forEach((node: VNode) => {
         if (node.type === DropdownMenu) {
           menuNode = node
           return
         }
-        triggerNode = node
+        if (!triggerSlot) {
+          triggerNode = node
+        }
       })
 
       const chevronNode = props.showArrow

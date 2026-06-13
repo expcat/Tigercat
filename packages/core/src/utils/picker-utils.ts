@@ -115,6 +115,17 @@ export function getPickerOptionId(listboxId: string, index: number): string {
   return `${listboxId}-option-${index}`
 }
 
+/**
+ * Stable `data-state` attribute for a disclosure-style overlay trigger.
+ *
+ * Returns `{ 'data-state': 'open' | 'closed' }` so trigger elements can be
+ * styled by open state via a documented, framework-agnostic hook (mirrors the
+ * value Dropdown exposes). This is part of the public, stable trigger API.
+ */
+export function getDisclosureStateAttr(open: boolean): { 'data-state': 'open' | 'closed' } {
+  return { 'data-state': open ? 'open' : 'closed' }
+}
+
 export function getPickerComboboxAria({
   expanded,
   listboxId,
@@ -126,6 +137,7 @@ export function getPickerComboboxAria({
   'aria-haspopup': 'listbox'
   'aria-controls': string | undefined
   'aria-activedescendant': string | undefined
+  'data-state': 'open' | 'closed'
 } {
   return {
     role: 'combobox',
@@ -135,7 +147,8 @@ export function getPickerComboboxAria({
     'aria-activedescendant': expanded
       ? (activeOptionId ??
         (activeIndex >= 0 ? getPickerOptionId(listboxId, activeIndex) : undefined))
-      : undefined
+      : undefined,
+    'data-state': expanded ? 'open' : 'closed'
   }
 }
 
