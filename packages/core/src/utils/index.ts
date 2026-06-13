@@ -32,6 +32,9 @@ export * from './motion'
 // Floating UI positioning utilities
 export * from './floating'
 
+// Development-only warnings
+export * from './dev-warn'
+
 // ChatWindow utilities
 export * from './chat-window-utils'
 

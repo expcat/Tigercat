@@ -13,6 +13,7 @@ import {
   tagSizeClasses,
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
+  warnUnsupportedColorProp,
   type TagVariant,
   type TagSize
 } from '@expcat/tigercat-core'
@@ -47,14 +48,6 @@ const CloseIcon = () =>
       })
     ]
   )
-
-let warnedUnsupportedColorProp = false
-
-function warnUnsupportedColorPropIfNeeded(attrs: Record<string, unknown>): void {
-  if (!('color' in attrs) || warnedUnsupportedColorProp) return
-  warnedUnsupportedColorProp = true
-  console.warn('[Tigercat] Tag does not support color. Use variant instead.')
-}
 
 export const Tag = defineComponent({
   name: 'TigerTag',
@@ -138,7 +131,7 @@ export const Tag = defineComponent({
     }
 
     return () => {
-      warnUnsupportedColorPropIfNeeded(attrs as Record<string, unknown>)
+      warnUnsupportedColorProp('Tag', attrs as Record<string, unknown>)
       if (!isVisible.value) {
         return null
       }

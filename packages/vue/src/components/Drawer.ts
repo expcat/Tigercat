@@ -66,6 +66,7 @@ export interface VueDrawerProps {
   zIndex?: number
   className?: string
   bodyClassName?: string
+  bodyPadding?: boolean | string
   destroyOnClose?: boolean
   destroyOnCloseAfterLeave?: boolean
   fullscreenOnMobile?: boolean
@@ -163,6 +164,14 @@ export const Drawer = defineComponent({
      */
     bodyClassName: {
       type: String,
+      default: undefined
+    },
+    /**
+     * Padding override for the drawer body. `false` removes the built-in
+     * padding; a string supplies a custom padding utility class.
+     */
+    bodyPadding: {
+      type: [Boolean, String] as PropType<boolean | string>,
       default: undefined
     },
     /**
@@ -421,7 +430,7 @@ export const Drawer = defineComponent({
       const mergedStyle = mergeStyleValues(attrs.style, props.panelStyle, props.style, widthStyle)
 
       const headerClasses = getDrawerHeaderClasses()
-      const bodyClasses = getDrawerBodyClasses(props.bodyClassName)
+      const bodyClasses = getDrawerBodyClasses(props.bodyClassName, props.bodyPadding)
       const footerClasses = getDrawerFooterClasses()
       const closeButtonClasses = getDrawerCloseButtonClasses()
       const titleClasses = getDrawerTitleClasses()

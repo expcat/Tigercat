@@ -51,6 +51,7 @@ export interface VueTableProps {
   renderCard?: (context: TableCardRenderContext<Record<string, unknown>>) => unknown
   cardSelectionPosition?: TableCardSelectionPosition
   cardPadding?: string | false
+  cardFieldGap?: string
   // v0.6.0
   virtual?: boolean
   virtualHeight?: number
@@ -210,6 +211,10 @@ export const tableProps = {
   cardPadding: {
     type: [String, Boolean] as PropType<string | false>,
     default: undefined
+  },
+  cardFieldGap: {
+    type: String,
+    default: 'gap-3'
   },
   // --- v0.6.0 props ---
   virtual: { type: Boolean, default: false },

@@ -8,14 +8,17 @@ import {
   iconSvgDefaultStrokeLinejoin,
   iconSvgDefaultStrokeWidth,
   iconWrapperClasses,
+  getIconDefinition,
   SVG_DEFAULT_FILL,
   SVG_DEFAULT_STROKE,
   SVG_DEFAULT_VIEWBOX_24,
   SVG_DEFAULT_XMLNS,
-  type IconSize
+  type IconSize,
+  type IconName
 } from '@expcat/tigercat-core'
 
 export interface VueIconProps {
+  name?: IconName
   size?: IconSize
   color?: string
 }
@@ -24,6 +27,14 @@ export const Icon = defineComponent({
   name: 'TigerIcon',
   inheritAttrs: false,
   props: {
+    /**
+     * Built-in icon name. Renders the matching glyph from the built-in icon
+     * set when no custom SVG children are provided.
+     */
+    name: {
+      type: String as PropType<IconName>,
+      default: undefined
+    },
     /**
      * Icon size
      * @default 'md'
@@ -50,13 +61,33 @@ export const Icon = defineComponent({
 
     return () => {
       const defaultSlot = slots.default?.()
+      const hasSlotContent = Array.isArray(defaultSlot) && defaultSlot.length > 0
       const isDecorative =
         attrs['aria-label'] == null && attrs['aria-labelledby'] == null && attrs.role == null
 
-      const children = (defaultSlot ?? []).map((node) => {
-        if (node && typeof node === 'object' && (node as VNode).type === 'svg') {
-          const svgNode = node as VNode
-          const svgProps = (svgNode.props ?? {}) as Record<string, unknown>
+      // Built-in icon: render the registered glyph when a `name` is provided and
+      // no custom children override it.
+      const definition = !hasSlotContent && props.name ? getIconDefinition(props.name) : undefined
+      const builtInSvg = definition
+        ? h(
+            'svg',
+            {
+              class: svgClasses.value,
+              xmlns: SVG_DEFAULT_XMLNS,
+              viewBox: definition.viewBox,
+              fill: definition.mode === 'fill' ? 'currentColor' : SVG_DEFAULT_FILL,
+              stroke: definition.mode === 'stroke' ? 'currentColor' : SVG_DEFAULT_STROKE,
+              'stroke-width': definition.mode === 'stroke' ? 1.5 : undefined,
+              'stroke-linecap': definition.mode === 'stroke' ? iconSvgDefaultStrokeLinecap : undefined,
+              'stroke-linejoin': definition.mode === 'stroke' ? iconSvgDefaultStrokeLinejoin : undefined
+            },
+            definition.paths.map((d) => h('path', { d }))
+          )
+        : null
+
+      const normalizeSlotNode = (node: VNode): VNode => {
+        if (node && typeof node === 'object' && node.type === 'svg') {
+          const svgProps = (node.props ?? {}) as Record<string, unknown>
           type HChildren = Parameters<typeof h>[2]
 
           return h(
@@ -75,12 +106,14 @@ export const Icon = defineComponent({
               'stroke-linejoin':
                 (svgProps['stroke-linejoin'] as string) ?? iconSvgDefaultStrokeLinejoin
             },
-            (svgNode.children === null ? undefined : svgNode.children) as HChildren
+            (node.children === null ? undefined : node.children) as HChildren
           )
         }
 
         return node
-      })
+      }
+
+      const children = builtInSvg ? [builtInSvg] : (defaultSlot ?? []).map(normalizeSlotNode)
 
       return h(
         'span',

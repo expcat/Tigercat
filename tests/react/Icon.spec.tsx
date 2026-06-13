@@ -23,6 +23,19 @@ describe('Icon (React)', () => {
     expect(svg).toHaveClass('inline-block', 'w-5', 'h-5')
   })
 
+  it('renders a built-in icon by name', () => {
+    const { container } = render(<Icon name="check" />)
+    const svg = container.querySelector('svg')
+    expect(svg).toBeInTheDocument()
+    expect(svg).toHaveAttribute('viewBox', '0 0 24 24')
+    expect(svg?.querySelector('path')).toHaveAttribute('d', 'm4.5 12.75 6 6 9-13.5')
+  })
+
+  it('prefers custom children over the name prop', () => {
+    const { container } = render(<Icon name="check">{SimpleSVG}</Icon>)
+    expect(container.querySelector('svg path')).toHaveAttribute('d', 'M5 12h14')
+  })
+
   it('applies each size correctly', () => {
     const sizes = {
       sm: ['w-4', 'h-4'],

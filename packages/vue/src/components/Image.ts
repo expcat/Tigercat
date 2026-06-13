@@ -20,8 +20,11 @@ import {
   imagePreviewCursorClass,
   imageErrorIconPath,
   toCSSSize,
-  type ImageFit
+  type ImageFit,
+  type ImagePreviewTrigger
 } from '@expcat/tigercat-core'
+import { useFloatingPopup } from '../utils/use-floating-popup'
+import { renderVueBodyTeleport } from '../utils/overlay'
 import type { ImageGroupContext } from './ImageGroup'
 import { ImagePreview } from './ImagePreview'
 
@@ -33,6 +36,7 @@ export interface VueImageProps {
   fit?: ImageFit
   fallbackSrc?: string
   preview?: boolean
+  previewTrigger?: ImagePreviewTrigger
   lazy?: boolean
   className?: string
   style?: Record<string, string | number>
@@ -51,6 +55,10 @@ export const Image = defineComponent({
     fit: { type: String as PropType<ImageFit>, default: 'cover' as ImageFit },
     fallbackSrc: { type: String, default: undefined },
     preview: { type: Boolean, default: true },
+    previewTrigger: {
+      type: String as PropType<ImagePreviewTrigger>,
+      default: 'click' as ImagePreviewTrigger
+    },
     lazy: { type: Boolean, default: false },
     className: { type: String, default: undefined },
     style: {
@@ -68,6 +76,41 @@ export const Image = defineComponent({
     let observer: IntersectionObserver | null = null
 
     const group = inject<ImageGroupContext | null>(IMAGE_GROUP_INJECTION_KEY, null)
+
+    // Preview behaviour: click opens the full-screen viewer, hover shows a
+    // floating enlarged overlay.
+    const hoverPreviewEnabled = computed(
+      () => props.preview && props.previewTrigger === 'hover' && !group
+    )
+    const clickPreviewEnabled = computed(() => props.preview && props.previewTrigger !== 'hover')
+
+    // Hover preview positioning (reuses the shared floating-popup composable).
+    const floatingPopupProps = {
+      get trigger() {
+        return 'hover' as const
+      },
+      get placement() {
+        return 'right' as const
+      },
+      get offset() {
+        return 12
+      },
+      get disabled() {
+        return !hoverPreviewEnabled.value
+      }
+    }
+    const {
+      currentVisible: hoverVisible,
+      triggerRef: hoverTriggerRef,
+      floatingRef: hoverFloatingRef,
+      floatingStyles: hoverFloatingStyles,
+      triggerHandlers: hoverTriggerHandlers
+    } = useFloatingPopup({ props: floatingPopupProps, emit })
+
+    const setContainerRef = (el: unknown) => {
+      containerRef.value = el as HTMLElement | null
+      hoverTriggerRef.value = el as HTMLElement | null
+    }
 
     // Registration with ImageGroup
     const registeredIndex = ref(-1)
@@ -129,7 +172,7 @@ export const Image = defineComponent({
     }
 
     const handleClick = () => {
-      if (!props.preview) return
+      if (!clickPreviewEnabled.value) return
       if (group) {
         group.openPreview(registeredIndex.value >= 0 ? registeredIndex.value : 0)
       } else {
@@ -237,25 +280,50 @@ export const Image = defineComponent({
             })
           : null
 
+      // Hover preview overlay (enlarged floating image)
+      const hoverPreviewEl =
+        hoverPreviewEnabled.value && hoverVisible.value && props.src
+          ? renderVueBodyTeleport(
+              h(
+                'div',
+                {
+                  ref: hoverFloatingRef,
+                  style: hoverFloatingStyles.value,
+                  'aria-hidden': true,
+                  class:
+                    'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-1 shadow-lg'
+                },
+                [
+                  h('img', {
+                    src: props.src,
+                    alt: '',
+                    class: 'block max-w-[16rem] max-h-[16rem] object-contain'
+                  })
+                ]
+              )
+            )
+          : null
+
       return h(
         'div',
         {
           ...forwardedAttrs,
-          ref: containerRef,
+          ref: setContainerRef,
           class: containerClasses.value,
           style: containerStyle.value,
-          role: props.preview ? 'button' : undefined,
-          tabindex: props.preview ? 0 : undefined,
-          'aria-label': props.preview ? `Preview ${props.alt || 'image'}` : undefined,
+          role: clickPreviewEnabled.value ? 'button' : undefined,
+          tabindex: clickPreviewEnabled.value ? 0 : undefined,
+          'aria-label': clickPreviewEnabled.value ? `Preview ${props.alt || 'image'}` : undefined,
           onClick: handleClick,
           onKeydown: (e: KeyboardEvent) => {
-            if (props.preview && (e.key === 'Enter' || e.key === ' ')) {
+            if (clickPreviewEnabled.value && (e.key === 'Enter' || e.key === ' ')) {
               e.preventDefault()
               handleClick()
             }
-          }
+          },
+          ...(hoverPreviewEnabled.value ? hoverTriggerHandlers.value : {})
         },
-        [content, previewEl]
+        [content, previewEl, hoverPreviewEl]
       )
     }
   }

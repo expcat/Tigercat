@@ -138,9 +138,9 @@ export const Timeline: React.FC<TimelineProps> = ({
         <div className={headClasses}>{renderDotElement(item)}</div>
         <div className={contentClasses}>
           {item.label && <div className={timelineLabelClasses}>{item.label}</div>}
-          {item.content && (
+          {(item.content as React.ReactNode) ? (
             <div className={timelineDescriptionClasses}>{item.content as React.ReactNode}</div>
-          )}
+          ) : null}
         </div>
       </li>
     )

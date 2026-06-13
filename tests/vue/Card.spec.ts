@@ -8,6 +8,28 @@ import { Card } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Card', () => {
+  it('applies size-based padding by default', () => {
+    const { container } = render(Card, { slots: { default: 'Body' } })
+    expect(container.firstElementChild).toHaveClass('p-4')
+  })
+
+  it('overrides padding with a custom class', () => {
+    const { container } = render(Card, {
+      props: { padding: 'p-8' },
+      slots: { default: 'Body' }
+    })
+    expect(container.firstElementChild).toHaveClass('p-8')
+    expect(container.firstElementChild).not.toHaveClass('p-4')
+  })
+
+  it('removes padding when padding is false', () => {
+    const { container } = render(Card, {
+      props: { padding: false },
+      slots: { default: 'Body' }
+    })
+    expect(container.firstElementChild?.className).not.toMatch(/\bp-4\b/)
+  })
+
   it('renders default slot content', () => {
     render(Card, {
       slots: {

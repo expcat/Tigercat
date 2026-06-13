@@ -10,6 +10,8 @@ import {
   toCSSSize,
   type ImageProps as CoreImageProps
 } from '@expcat/tigercat-core'
+import { usePopup } from '../utils/use-popup'
+import { renderBodyPortal } from '../utils/overlay'
 import { ImageGroupContext } from './ImageGroup'
 import { ImagePreview } from './ImagePreview'
 
@@ -50,6 +52,7 @@ export const Image: React.FC<ImageProps> = ({
   fit = 'cover',
   fallbackSrc,
   preview = true,
+  previewTrigger = 'click',
   lazy = false,
   className,
   errorRender,
@@ -67,6 +70,33 @@ export const Image: React.FC<ImageProps> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const group = useContext(ImageGroupContext)
   const registeredIndexRef = useRef(-1)
+
+  // Preview behaviour: click opens the full-screen viewer, hover shows a
+  // floating enlarged overlay.
+  const hoverPreviewEnabled = preview && previewTrigger === 'hover' && !group
+  const clickPreviewEnabled = preview && previewTrigger !== 'hover'
+
+  // Hover preview positioning (reuses the shared popup hook).
+  const {
+    currentVisible: hoverVisible,
+    triggerRef: hoverTriggerRef,
+    floatingRef: hoverFloatingRef,
+    floatingStyles: hoverFloatingStyles,
+    triggerHandlers: hoverTriggerHandlers
+  } = usePopup({
+    trigger: 'hover',
+    placement: 'right',
+    offset: 12,
+    disabled: !hoverPreviewEnabled
+  })
+
+  const setRootRef = useCallback(
+    (el: HTMLDivElement | null) => {
+      containerRef.current = el
+      hoverTriggerRef.current = el
+    },
+    [hoverTriggerRef]
+  )
 
   // Register/unregister with group
   useEffect(() => {
@@ -121,7 +151,7 @@ export const Image: React.FC<ImageProps> = ({
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       onClick?.(e)
-      if (!preview) return
+      if (!clickPreviewEnabled) return
       if (group) {
         group.openPreview(registeredIndexRef.current >= 0 ? registeredIndexRef.current : 0)
       } else {
@@ -129,18 +159,18 @@ export const Image: React.FC<ImageProps> = ({
         onPreviewOpenChange?.(true)
       }
     },
-    [preview, group, onClick, onPreviewOpenChange]
+    [clickPreviewEnabled, group, onClick, onPreviewOpenChange]
   )
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(e)
-      if (preview && (e.key === 'Enter' || e.key === ' ')) {
+      if (clickPreviewEnabled && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault()
         handleClick(e as unknown as React.MouseEvent<HTMLDivElement>)
       }
     },
-    [preview, handleClick, onKeyDown]
+    [clickPreviewEnabled, handleClick, onKeyDown]
   )
 
   const containerClasses = useMemo(
@@ -188,14 +218,15 @@ export const Image: React.FC<ImageProps> = ({
     <>
       <div
         {...props}
-        ref={containerRef}
+        ref={setRootRef}
         className={containerClasses}
         style={containerStyle}
-        role={preview ? 'button' : undefined}
-        tabIndex={preview ? 0 : undefined}
-        aria-label={preview ? `Preview ${alt || 'image'}` : undefined}
+        role={clickPreviewEnabled ? 'button' : undefined}
+        tabIndex={clickPreviewEnabled ? 0 : undefined}
+        aria-label={clickPreviewEnabled ? `Preview ${alt || 'image'}` : undefined}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}>
+        onKeyDown={handleKeyDown}
+        {...(hoverPreviewEnabled ? hoverTriggerHandlers : {})}>
         {content}
       </div>
       {!group && previewVisible && src && (
@@ -209,6 +240,18 @@ export const Image: React.FC<ImageProps> = ({
           }}
         />
       )}
+      {hoverPreviewEnabled &&
+        hoverVisible &&
+        src &&
+        renderBodyPortal(
+          <div
+            ref={hoverFloatingRef}
+            style={hoverFloatingStyles}
+            aria-hidden
+            className="rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-1 shadow-lg">
+            <img src={src} alt="" className="block max-w-[16rem] max-h-[16rem] object-contain" />
+          </div>
+        )}
     </>
   )
 }

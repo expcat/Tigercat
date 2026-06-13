@@ -79,6 +79,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   zIndex = 1000,
   className,
   bodyClassName,
+  bodyPadding,
   destroyOnClose = false,
   destroyOnCloseAfterLeave = false,
   fullscreenOnMobile = true,
@@ -268,7 +269,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   )
 
   const headerClasses = getDrawerHeaderClasses()
-  const bodyClasses = getDrawerBodyClasses(bodyClassName)
+  const bodyClasses = getDrawerBodyClasses(bodyClassName, bodyPadding)
   const footerClasses = getDrawerFooterClasses()
   const closeButtonClasses = getDrawerCloseButtonClasses()
   const titleClasses = getDrawerTitleClasses()

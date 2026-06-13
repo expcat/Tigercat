@@ -2,7 +2,7 @@ import React from 'react'
 import {
   classNames,
   getCardClasses,
-  cardSizeClasses,
+  resolveCardPadding,
   cardHeaderClasses,
   cardFooterClasses,
   cardCoverWrapperClasses,
@@ -49,6 +49,7 @@ export const Card: React.FC<CardProps> = React.memo(
     hoverable = false,
     cover,
     coverAlt = 'Card cover image',
+    padding,
     header,
     footer,
     actions,
@@ -57,11 +58,12 @@ export const Card: React.FC<CardProps> = React.memo(
     ...props
   }) => {
     const isHorizontal = direction === 'horizontal'
-    const sectionSizeClass = cover ? cardSizeClasses[size] : undefined
+    const paddingClass = resolveCardPadding(size, padding)
+    const sectionSizeClass = cover ? paddingClass : undefined
     const cardClasses = classNames(
       getCardClasses(variant, hoverable),
       cardDirectionClasses[direction],
-      !cover && cardSizeClasses[size],
+      !cover && paddingClass,
       className
     )
     const getSectionClasses = (baseClasses: string) => classNames(baseClasses, sectionSizeClass)

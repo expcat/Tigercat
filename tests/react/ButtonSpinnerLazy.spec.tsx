@@ -33,7 +33,8 @@ vi.mock('@expcat/tigercat-core', () => ({
   buttonDisabledClasses: 'btn-disabled',
   buttonDangerClasses: { primary: 'btn-danger-primary' },
   getButtonVariantClasses: () => 'btn-variant',
-  getSpinnerSVG: getSpinnerSVGMock
+  getSpinnerSVG: getSpinnerSVGMock,
+  warnUnsupportedColorProp: () => {}
 }))
 
 describe('React Button default spinner lazy creation', () => {

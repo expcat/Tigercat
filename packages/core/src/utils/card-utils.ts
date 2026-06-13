@@ -36,6 +36,22 @@ export const cardCoverWrapperClasses = 'overflow-hidden'
 
 export const cardActionsClasses = 'flex gap-2 justify-end'
 
+/**
+ * Resolve the padding utility class for a card section.
+ *
+ * - `padding === false` → no padding.
+ * - `padding` is a string → that custom class.
+ * - otherwise → the default `size`-based padding (`cardSizeClasses[size]`).
+ */
+export function resolveCardPadding(
+  size: CardSize,
+  padding: boolean | string | undefined
+): string | undefined {
+  if (padding === false) return undefined
+  if (typeof padding === 'string') return padding
+  return cardSizeClasses[size]
+}
+
 export function getCardClasses(variant: CardVariant, hoverable: boolean): string {
   const classes = [cardBaseClasses, cardVariantClasses[variant]]
 

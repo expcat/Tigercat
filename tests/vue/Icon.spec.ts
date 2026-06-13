@@ -132,6 +132,26 @@ describe('Icon (Vue)', () => {
     expect(container.querySelector('span')).toBeInTheDocument()
   })
 
+  it('renders a built-in icon by name', () => {
+    const { container } = renderWithProps(Icon, { name: 'check' })
+    const svg = container.querySelector('svg')
+    expect(svg).toBeInTheDocument()
+    expect(svg).toHaveAttribute('viewBox', '0 0 24 24')
+    expect(svg).toHaveAttribute('stroke', 'currentColor')
+    expect(svg?.querySelector('path')).toHaveAttribute('d', 'm4.5 12.75 6 6 9-13.5')
+  })
+
+  it('renders nothing for an unknown built-in name', () => {
+    const { container } = renderWithProps(Icon, { name: 'not-a-real-icon' })
+    expect(container.querySelector('svg')).toBeFalsy()
+  })
+
+  it('prefers custom children over the name prop', () => {
+    const { container } = renderWithProps(Icon, { name: 'check' }, { slots: { default: SimpleSVG } })
+    const path = container.querySelector('svg path')
+    expect(path).toHaveAttribute('d', 'M5 12h14')
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = renderWithSlots(Icon, { default: SimpleSVG })

@@ -429,7 +429,8 @@ export const Dropdown = defineComponent({
               onMouseleave: handleMouseLeave,
               'aria-haspopup': 'menu',
               'aria-expanded': currentVisible.value,
-              'aria-controls': currentVisible.value ? menuId : undefined
+              'aria-controls': currentVisible.value ? menuId : undefined,
+              'data-state': currentVisible.value ? 'open' : 'closed'
             },
             [triggerNode, chevronNode]
           )

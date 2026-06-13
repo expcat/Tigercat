@@ -199,6 +199,11 @@
       "import": "./dist/icons/table.js",
       "require": "./dist/icons/table.cjs"
     },
+    "./icons/registry": {
+      "types": "./dist/icons/registry.d.ts",
+      "import": "./dist/icons/registry.js",
+      "require": "./dist/icons/registry.cjs"
+    },
     "./utils/table-export": {
       "types": "./dist/utils/table-export.d.ts",
       "import": "./dist/utils/table-export.js",

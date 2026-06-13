@@ -24,7 +24,7 @@ const datePickerLocaleEntries = Object.fromEntries(
   localeIds.map((id) => [`datepicker-locales/${id}`, `src/utils/i18n/datepicker-locales/${id}.ts`])
 )
 
-const iconGroups = ['common', 'picker', 'status', 'table']
+const iconGroups = ['common', 'picker', 'status', 'table', 'registry']
 
 const iconEntries = Object.fromEntries(
   iconGroups.map((g) => [`icons/${g}`, `src/utils/icons/${g}.ts`])

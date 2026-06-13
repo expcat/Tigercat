@@ -702,6 +702,14 @@ export interface TableProps<T = Record<string, unknown>> {
    */
   cardPadding?: string | false
 
+  /**
+   * Gap utility class applied between fields in the default `cardLayout` grid.
+   * Provide a full Tailwind gap class (e.g. `'gap-2'`, `'gap-y-4'`) since the
+   * class string must be statically present for the JIT compiler.
+   * @default 'gap-3'
+   */
+  cardFieldGap?: string
+
   // --- v0.6.0 additions ---
 
   /**

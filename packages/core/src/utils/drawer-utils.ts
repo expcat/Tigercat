@@ -104,8 +104,17 @@ export function getDrawerHeaderClasses(): string {
 /**
  * Get drawer body classes
  */
-export function getDrawerBodyClasses(customClass?: string): string {
-  return classNames('flex-1 overflow-y-auto px-6 py-4', customClass)
+export function getDrawerBodyClasses(
+  customClass?: string,
+  bodyPadding?: boolean | string
+): string {
+  const padding =
+    bodyPadding === false
+      ? undefined
+      : typeof bodyPadding === 'string'
+        ? bodyPadding
+        : 'px-6 py-4'
+  return classNames('flex-1 overflow-y-auto', padding, customClass)
 }
 
 /**

@@ -85,6 +85,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   cardLayout,
   cardSelectionPosition = 'controls-row',
   cardPadding,
+  cardFieldGap = 'gap-3',
   // v0.6.0 props
   virtual = false,
   autoVirtual = true,
@@ -572,7 +573,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                                 controlsNode && (
                                   <div className="mb-2 flex items-center gap-3">{controlsNode}</div>
                                 )}
-                              <div className="grid grid-cols-12 gap-3 mt-2">
+                              <div className={classNames('grid grid-cols-12 mt-2', cardFieldGap)}>
                                 {bodyColumns.map((column) => {
                                   const layoutItem = cardLayoutMap.get(column.key)
                                   const gridInfo = getCardGridInfo(column, layoutItem)

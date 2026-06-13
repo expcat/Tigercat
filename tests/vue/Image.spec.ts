@@ -3,11 +3,33 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { Image } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Image', () => {
+  it('does not set click-preview affordances when previewTrigger is hover', () => {
+    const { container } = render(Image, {
+      props: { src: '/a.jpg', alt: 'A', previewTrigger: 'hover' }
+    })
+    expect(container.firstElementChild).not.toHaveAttribute('role', 'button')
+  })
+
+  it('shows an enlarged overlay on hover when previewTrigger is hover', async () => {
+    const { container } = render(Image, {
+      props: { src: '/hover.jpg', alt: 'Hover', previewTrigger: 'hover' }
+    })
+    const root = container.firstElementChild as HTMLElement
+
+    await fireEvent.mouseEnter(root)
+
+    await waitFor(() => {
+      const previews = document.querySelectorAll('img[src="/hover.jpg"]')
+      // one inline <img> plus the floating overlay copy
+      expect(previews.length).toBeGreaterThanOrEqual(2)
+    })
+  })
+
   it('renders image with src and alt', () => {
     const { container } = render(Image, {
       props: {

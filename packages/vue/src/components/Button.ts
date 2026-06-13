@@ -9,6 +9,7 @@ import {
   getButtonVariantClasses,
   getSpinnerSVG,
   normalizeSvgAttrs,
+  warnUnsupportedColorProp,
   type ButtonVariant,
   type ButtonSize,
   type ButtonIconPosition,
@@ -45,14 +46,6 @@ const createLoadingSpinner = () => {
     },
     spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
   )
-}
-
-let warnedUnsupportedColorProp = false
-
-function warnUnsupportedColorPropIfNeeded(attrs: Record<string, unknown>): void {
-  if (!('color' in attrs) || warnedUnsupportedColorProp) return
-  warnedUnsupportedColorProp = true
-  console.warn('[Tigercat] Button does not support color. Use variant instead.')
 }
 
 export const Button = defineComponent({
@@ -144,7 +137,7 @@ export const Button = defineComponent({
     const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     return () => {
-      warnUnsupportedColorPropIfNeeded(attrs as Record<string, unknown>)
+      warnUnsupportedColorProp('Button', attrs as Record<string, unknown>)
       const isDisabled = props.disabled || props.loading
       const iconIsRight = props.iconPosition === 'right'
 

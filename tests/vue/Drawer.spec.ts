@@ -15,6 +15,21 @@ describe('Drawer', () => {
     document.body.style.overflow = ''
   })
 
+  it('applies a custom body padding override', async () => {
+    renderWithSlots(
+      Drawer,
+      { default: () => h('div', 'Body') },
+      { props: { open: true, title: 'Padded', bodyPadding: 'p-0' } }
+    )
+
+    await waitFor(() => {
+      const body = document.querySelector('.overflow-y-auto')
+      expect(body).toBeTruthy()
+      expect(body).toHaveClass('p-0')
+      expect(body?.className).not.toContain('px-6')
+    })
+  })
+
   it('should not render when open is false (initial)', () => {
     render(Drawer, {
       props: { open: false, title: 'Test Drawer' }

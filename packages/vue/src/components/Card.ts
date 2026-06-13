@@ -4,7 +4,7 @@ import {
   coerceClassValue,
   mergeStyleValues,
   getCardClasses,
-  cardSizeClasses,
+  resolveCardPadding,
   cardHeaderClasses,
   cardFooterClasses,
   cardCoverWrapperClasses,
@@ -24,6 +24,7 @@ export interface VueCardProps {
   hoverable?: boolean
   cover?: string
   coverAlt?: string
+  padding?: boolean | string
   className?: string
   style?: Record<string, string | number>
 }
@@ -47,6 +48,15 @@ export const Card = defineComponent({
     size: {
       type: String as PropType<CardSize>,
       default: 'md' as CardSize
+    },
+    /**
+     * Padding override for the card content sections. `false` removes the
+     * built-in padding; a string supplies a custom padding utility class.
+     * Takes precedence over `size`.
+     */
+    padding: {
+      type: [Boolean, String] as PropType<boolean | string>,
+      default: undefined
     },
     /**
      * Whether the card is hoverable (shows hover effect)
@@ -96,17 +106,19 @@ export const Card = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
+    const paddingClass = computed(() => resolveCardPadding(props.size, props.padding))
+
     const cardClasses = computed(() =>
       classNames(
         getCardClasses(props.variant, props.hoverable),
         cardDirectionClasses[props.direction],
-        !props.cover && cardSizeClasses[props.size]
+        !props.cover && paddingClass.value
       )
     )
 
     const isHorizontal = computed(() => props.direction === 'horizontal')
 
-    const sectionSizeClass = computed(() => (props.cover ? cardSizeClasses[props.size] : undefined))
+    const sectionSizeClass = computed(() => (props.cover ? paddingClass.value : undefined))
     const getSectionClasses = (baseClasses: string) =>
       classNames(baseClasses, sectionSizeClass.value)
 

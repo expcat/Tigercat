@@ -374,7 +374,12 @@ export const Table = defineComponent({
                 ? [
                     h(
                       'div',
-                      { class: 'grid grid-cols-12 gap-3 mt-2' },
+                      {
+                        class: classNames(
+                          'grid grid-cols-12 mt-2',
+                          resolvedProps.cardFieldGap ?? 'gap-3'
+                        )
+                      },
                       bodyColumns.map((column) => {
                         const layoutItem = cardLayoutMap.value.get(column.key)
                         const gridInfo = getCardGridInfo(column, layoutItem)

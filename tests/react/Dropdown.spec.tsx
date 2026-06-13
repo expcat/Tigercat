@@ -25,6 +25,25 @@ describe('Dropdown', () => {
     expect(screen.getByText('Item 2')).toBeInTheDocument()
   })
 
+  it('exposes data-state on the trigger reflecting open state', () => {
+    const { container } = render(
+      <Dropdown trigger="click">
+        <button>Trigger</button>
+        <DropdownMenu>
+          <DropdownItem>Item 1</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    )
+
+    const trigger = container.querySelector('[data-state]')
+    expect(trigger).toHaveAttribute('data-state', 'closed')
+
+    act(() => {
+      fireEvent.click(screen.getByText('Trigger'))
+    })
+    expect(trigger).toHaveAttribute('data-state', 'open')
+  })
+
   it('is hidden by default (hover trigger)', () => {
     render(
       <Dropdown>

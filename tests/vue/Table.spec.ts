@@ -159,6 +159,34 @@ describe('Table', () => {
       expect(container.querySelector('table')).toHaveClass('max-md:hidden')
     })
 
+    it('uses the default card field gap, overridable via cardFieldGap', () => {
+      const cardColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', cardTitle: true },
+        { key: 'email', title: 'Email', cardGrid: { colSpan: 6 } }
+      ]
+
+      const def = renderWithProps(Table, {
+        columns: cardColumns,
+        dataSource: [dataSource[0]],
+        responsiveMode: 'card',
+        pagination: false
+      })
+      expect(def.container.querySelector('[data-tiger-table-mobile="card"] .grid-cols-12')).toHaveClass(
+        'gap-3'
+      )
+
+      const custom = renderWithProps(Table, {
+        columns: cardColumns,
+        dataSource: [dataSource[0]],
+        responsiveMode: 'card',
+        cardFieldGap: 'gap-1',
+        pagination: false
+      })
+      const grid = custom.container.querySelector('[data-tiger-table-mobile="card"] .grid-cols-12')!
+      expect(grid).toHaveClass('gap-1')
+      expect(grid).not.toHaveClass('gap-3')
+    })
+
     it('renders configured card fields in a responsive grid layout', () => {
       const cardColumns: TableColumn[] = [
         { key: 'name', title: 'Name', cardTitle: true },

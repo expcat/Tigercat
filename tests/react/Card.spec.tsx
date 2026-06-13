@@ -15,6 +15,18 @@ describe('Card', () => {
     expect(container.querySelector('.custom-class')).toBeInTheDocument()
   })
 
+  it('applies size-based padding by default and supports overrides', () => {
+    const { container: def } = render(<Card>Body</Card>)
+    expect(def.firstElementChild).toHaveClass('p-4')
+
+    const { container: custom } = render(<Card padding="p-8">Body</Card>)
+    expect(custom.firstElementChild).toHaveClass('p-8')
+    expect(custom.firstElementChild).not.toHaveClass('p-4')
+
+    const { container: none } = render(<Card padding={false}>Body</Card>)
+    expect(none.firstElementChild?.className).not.toMatch(/\bp-4\b/)
+  })
+
   it('renders header/footer/actions', () => {
     render(
       <Card header="Header" footer="Footer" actions={<button>Action</button>}>

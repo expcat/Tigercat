@@ -82,6 +82,14 @@ export interface DrawerProps {
   bodyClassName?: string
 
   /**
+   * Padding override for the drawer body.
+   * - `false` removes the built-in padding entirely.
+   * - a string supplies a custom padding utility class (e.g. `'p-0'`, `'px-8 py-6'`).
+   * - omitted / `true` keeps the default `px-6 py-4`.
+   */
+  bodyPadding?: boolean | string
+
+  /**
    * Whether to destroy content on close
    * @default false
    */

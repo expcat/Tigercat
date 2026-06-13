@@ -315,7 +315,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
           onMouseLeave={handleMouseLeave}
           aria-haspopup="menu"
           aria-expanded={visible}
-          aria-controls={visible ? menuId : undefined}>
+          aria-controls={visible ? menuId : undefined}
+          data-state={visible ? 'open' : 'closed'}>
           {triggerElement}
           {chevronNode}
         </div>

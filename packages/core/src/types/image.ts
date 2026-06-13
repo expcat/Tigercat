@@ -8,6 +8,13 @@
 export type ImageFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down'
 
 /**
+ * How the image preview is triggered.
+ * - `click`: opens the full-screen preview viewer on click (default).
+ * - `hover`: shows an enlarged floating preview overlay on hover.
+ */
+export type ImagePreviewTrigger = 'click' | 'hover'
+
+/**
  * Crop rectangle describing the cropped area
  */
 export interface CropRect {
@@ -98,10 +105,18 @@ export interface ImageProps {
   fallbackSrc?: string
 
   /**
-   * Whether clicking the image triggers preview
+   * Whether the image triggers preview
    * @default true
    */
   preview?: boolean
+
+  /**
+   * How the preview is triggered when `preview` is enabled.
+   * - `click`: full-screen viewer on click (default).
+   * - `hover`: enlarged floating overlay on hover.
+   * @default 'click'
+   */
+  previewTrigger?: ImagePreviewTrigger
 
   /**
    * Whether to lazy load the image using IntersectionObserver
