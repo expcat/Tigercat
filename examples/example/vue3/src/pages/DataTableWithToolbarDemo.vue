@@ -304,6 +304,53 @@ const handleBulkAction = (actionKey: string) => {
   if (selectedRowKeys.value.length === 0) return
   alert(`执行批量操作: ${actionKey}，选中 ${selectedRowKeys.value.length} 项`)
 }
+
+const itemClassSnippet = `<!-- 自定义 filter 容器宽度 -->
+<DataTableWithToolbar
+  :columns="columns"
+  :dataSource="pagedData"
+  :toolbar="{
+    filters: [
+      {
+        key: 'status', label: '状态',
+        options: statusOptions,
+        itemClass: 'w-full sm:w-auto sm:min-w-[200px] sm:max-w-[280px]',
+        itemStyle: { borderRadius: '8px' }
+      },
+      { key: 'role', label: '角色', options: roleOptions }
+    ],
+    searchClassName: 'w-full sm:w-auto sm:min-w-[300px]',
+    className: 'bg-gray-50 dark:bg-gray-800/50',
+    style: { padding: '12px 16px' }
+  }" />`
+
+const customToolbarSnippet = `<!-- 完全自定义工具栏（替换内置 toolbar 区域） -->
+<DataTableWithToolbar
+  :columns="columns"
+  :dataSource="pagedData"
+  :toolbar="{ filters: [...] }">
+  <template #toolbar="{ searchValue, setSearch, submitSearch, filters, setFilter }">
+    <div role="toolbar" class="flex items-center gap-4 p-4">
+      <input :value="searchValue" @input="setSearch($event.target.value)" />
+      <button @click="submitSearch">搜索</button>
+    </div>
+  </template>
+</DataTableWithToolbar>`
+
+const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
+<DataTableWithToolbar
+  :columns="cardColumns"
+  :dataSource="pagedData"
+  responsive-mode="card"
+  card-breakpoint="lg"
+  card-class-name="shadow-lg rounded-xl">
+  <template #card="{ record, columns }">
+    <div class="p-4">
+      <h3 class="font-bold">{{ record.name }}</h3>
+      <p class="text-sm text-gray-500">{{ record.email }}</p>
+    </div>
+  </template>
+</DataTableWithToolbar>`
 </script>
 
 <template>
@@ -446,6 +493,120 @@ const handleBulkAction = (actionKey: string) => {
         }"
         @page-change="handlePageChange"
         @page-size-change="handlePageChange" />
+    </DemoBlock>
+
+    <DemoBlock
+      title="工具栏布局定制"
+      description="通过 itemClass/itemStyle 定制单个 filter 容器宽度（替换默认尺寸类），searchClassName 定制搜索框尺寸，toolbar.className/style 定制容器样式。"
+      :code="itemClassSnippet">
+      <DataTableWithToolbar
+        :columns="columns"
+        :dataSource="pagedData"
+        table-layout="fixed"
+        :toolbar="{
+          searchValue: keyword,
+          searchPlaceholder: '搜索姓名/邮箱',
+          filters: [
+            {
+              key: 'status', label: '状态',
+              options: statusOptions,
+              itemClass: 'w-full sm:w-auto sm:min-w-[200px] sm:max-w-[280px]',
+              itemStyle: { borderRadius: '8px' }
+            },
+            { key: 'role', label: '角色', options: roleOptions }
+          ],
+          searchClassName: 'w-full sm:w-auto sm:min-w-[300px]',
+          className: 'bg-gray-50 dark:bg-gray-800/50',
+          style: { padding: '12px 16px' }
+        }"
+        :pagination="{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: filteredData.length,
+          showTotal: true
+        }"
+        @search-change="(value) => (keyword = value)"
+        @search="(value) => (keyword = value)"
+        @filters-change="handleFiltersChange"
+        @page-change="handlePageChange" />
+    </DemoBlock>
+
+    <DemoBlock
+      title="完全自定义工具栏"
+      description="#toolbar 插槽完全替换内置工具栏区域（含 role='toolbar' 容器），通过 context 获取搜索/筛选/选择等状态和操作。使用时请自行添加 role='toolbar' 以保持可访问性。"
+      :code="customToolbarSnippet">
+      <DataTableWithToolbar
+        :columns="columns"
+        :dataSource="pagedData"
+        table-layout="fixed"
+        :toolbar="{
+          searchValue: keyword,
+          searchPlaceholder: '搜索姓名/邮箱',
+          filters: [
+            { key: 'status', label: '状态', options: statusOptions },
+            { key: 'role', label: '角色', options: roleOptions }
+          ]
+        }"
+        :pagination="{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: filteredData.length,
+          showTotal: true
+        }"
+        @search-change="(value) => (keyword = value)"
+        @filters-change="handleFiltersChange"
+        @page-change="handlePageChange">
+        <template #toolbar="{ searchValue, setSearch, submitSearch, filters, setFilter }">
+          <div role="toolbar" aria-label="自定义工具栏" class="flex flex-wrap items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div class="flex items-center gap-2">
+              <input
+                class="rounded border border-blue-300 px-3 py-1.5 text-sm dark:border-blue-600 dark:bg-gray-900"
+                :value="searchValue"
+                placeholder="自定义搜索"
+                @input="(e) => setSearch((e.target as HTMLInputElement).value)" />
+              <button
+                class="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+                @click="submitSearch">搜索</button>
+            </div>
+            <span class="text-sm text-gray-500">状态: {{ filters.status ?? '全部' }}</span>
+          </div>
+        </template>
+      </DataTableWithToolbar>
+    </DemoBlock>
+
+    <DemoBlock
+      title="卡片自定义渲染"
+      description="通过 #card 插槽完全自定义卡片内容（优先于 renderCard prop），或使用 cardClassName 添加卡片容器样式。缩窄窗口到 lg/1024px 以下可预览。"
+      :code="cardSlotSnippet">
+      <DataTableWithToolbar
+        :columns="cardColumns"
+        :dataSource="pagedData"
+        responsive-mode="card"
+        card-breakpoint="lg"
+        card-class-name="shadow-lg rounded-xl"
+        :pagination="{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: filteredData.length,
+          showTotal: true
+        }"
+        @page-change="handlePageChange">
+        <template #card="{ record }">
+          <div class="p-4">
+            <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">{{ (record as UserRow).name }}</h3>
+            <p class="text-sm text-gray-500 mt-1">{{ (record as UserRow).email }}</p>
+            <div class="flex items-center gap-3 mt-2">
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
+                :class="(record as UserRow).status === 'active'
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'">
+                {{ (record as UserRow).status === 'active' ? '启用' : '禁用' }}
+              </span>
+              <span class="text-xs text-gray-400">{{ (record as UserRow).role }}</span>
+            </div>
+          </div>
+        </template>
+      </DataTableWithToolbar>
     </DemoBlock>
   </div>
 </template>

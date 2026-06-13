@@ -11,6 +11,7 @@ import {
   type TableToolbarFilterRenderContext,
   type TableToolbarFiltersExtraContext,
   type TableToolbarFilterValue,
+  type TableToolbarRenderContext,
   type TableToolbarAction,
   type TigerLocale
 } from '@expcat/tigercat-core'
@@ -33,11 +34,19 @@ export interface ReactTableToolbarFilter extends Omit<TableToolbarFilter, 'rende
   render?: (context: ReactTableToolbarFilterRenderContext) => React.ReactNode
 }
 
-export interface ReactTableToolbarProps extends Omit<TableToolbarProps, 'filters' | 'filtersExtra'> {
+export interface ReactTableToolbarRenderContext extends TableToolbarRenderContext {}
+
+export interface ReactTableToolbarProps
+  extends Omit<TableToolbarProps, 'filters' | 'filtersExtra' | 'render'> {
   filters?: ReactTableToolbarFilter[]
   filtersExtra?:
     | React.ReactNode
     | ((context: ReactTableToolbarFiltersExtraContext) => React.ReactNode)
+  /**
+   * Full toolbar replacement. When provided, the built-in toolbar region
+   * (including its container and `role="toolbar"`) is not rendered.
+   */
+  render?: React.ReactNode | ((context: ReactTableToolbarRenderContext) => React.ReactNode)
 }
 
 export interface DataTableWithToolbarProps<T = Record<string, unknown>>
@@ -361,6 +370,23 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   }
 
   const renderToolbar = () => {
+    if (toolbar?.render !== undefined) {
+      const toolbarContext: ReactTableToolbarRenderContext = {
+        searchValue: searchValue ?? '',
+        setSearch: handleSearchChange,
+        submitSearch: handleSearchSubmit,
+        filters: resolvedFilters,
+        setFilter: (key: string, value: TableToolbarFilterValue) => setFilterValue(key, value),
+        selectedKeys,
+        selectedCount,
+        hiddenColumnKeys: resolvedHiddenKeys,
+        setHiddenColumnKeys: handleHiddenColumnsChange
+      }
+      return (
+        <>{typeof toolbar.render === 'function' ? toolbar.render(toolbarContext) : toolbar.render}</>
+      )
+    }
+
     if (!hasSearch && !hasFilters && !hasFiltersExtra && !hasBulkActions && !hasColumnSettings) {
       return null
     }
@@ -380,13 +406,19 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
           'tiger-data-table-toolbar flex flex-wrap items-center gap-3',
           bordered
             ? 'bg-[var(--tiger-surface-muted,#f9fafb)] dark:bg-gray-800/10 px-4 py-3.5 border-b border-[var(--tiger-border,#e5e7eb)]'
-            : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 dark:bg-gray-800/30 px-4 py-3.5 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm'
+            : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 dark:bg-gray-800/30 px-4 py-3.5 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm',
+          toolbar?.className
         )}
+        style={toolbar?.style as React.CSSProperties | undefined}
         role="toolbar"
         aria-label={tableLabels.toolbarAriaLabel}>
         <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0">
           {hasSearch ? (
-            <div className="flex items-center gap-2 w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]">
+            <div
+              className={classNames(
+                'flex items-center gap-2',
+                toolbar?.searchClassName ?? 'w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]'
+              )}>
               <Input
                 type="search"
                 size="sm"
@@ -434,7 +466,10 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 
                 if (filter.render) {
                   return (
-                    <div key={filter.key} className="w-full sm:w-auto">
+                    <div
+                      key={filter.key}
+                      className={filter.itemClass ?? 'w-full sm:w-auto'}
+                      style={filter.itemStyle as React.CSSProperties | undefined}>
                       {filter.render({
                         filter,
                         value: currentValue,
@@ -451,7 +486,8 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 return (
                   <div
                     key={filter.key}
-                    className="w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]">
+                    className={filter.itemClass ?? 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]'}
+                    style={filter.itemStyle as React.CSSProperties | undefined}>
                     <Select
                       size="sm"
                       options={(filter.options ?? []).map((opt) => ({

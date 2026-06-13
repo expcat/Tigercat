@@ -5,6 +5,8 @@ import {
   getMenuClasses,
   getInitialSubmenuHeightTransitionStyle,
   matchesMenuSearch,
+  menuCollapsedIconClasses,
+  menuItemIconClasses,
   normalizeMenuSearchQuery,
   submenuHeightTransitionClasses,
   type MenuItem,
@@ -183,5 +185,11 @@ describe('menu-utils classes', () => {
 
     expect(classes).toContain('min-w-[64px]')
     expect(classes).not.toContain('min-w-[200px]')
+  })
+
+  it('drops the icon right margin when collapsed', () => {
+    expect(menuCollapsedIconClasses).toContain('flex-shrink-0')
+    expect(menuCollapsedIconClasses).not.toContain('mr-2')
+    expect(menuItemIconClasses).toContain('mr-2')
   })
 })

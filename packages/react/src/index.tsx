@@ -224,6 +224,7 @@ export type {
   ReactTableToolbarFilter,
   ReactTableToolbarFilterRenderContext,
   ReactTableToolbarFiltersExtraContext,
+  ReactTableToolbarRenderContext,
   ReactTableToolbarProps
 } from './components/DataTableWithToolbar'
 export { FormWizard } from './components/FormWizard'

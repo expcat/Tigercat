@@ -29,6 +29,7 @@ import {
   isKeySelected,
   isKeyOpen,
   menuItemIconClasses,
+  menuCollapsedIconClasses,
   menuItemGroupTitleClasses,
   menuSearchFieldClasses,
   menuSearchEmptyClasses,
@@ -570,29 +571,41 @@ export const MenuItem = defineComponent({
         props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
 
       // Render icon if provided
+      const iconClasses = effectiveCollapsed ? menuCollapsedIconClasses : menuItemIconClasses
       if (props.icon) {
         if (typeof props.icon === 'string') {
           children.push(
             h('span', {
-              class: menuItemIconClasses,
+              class: iconClasses,
               innerHTML: props.icon
             })
           )
         } else {
-          children.push(h('span', { class: menuItemIconClasses }, props.icon as HChildren))
+          children.push(h('span', { class: iconClasses }, props.icon as HChildren))
         }
       }
 
       // Render label (slot content)
       if (!effectiveCollapsed && slots.default) {
         children.push(h('span', { class: 'flex-1' }, slots.default()))
-      } else if (effectiveCollapsed && !props.icon && slots.default) {
-        // Show first letter when collapsed without icon
-        const defaultSlot = slots.default()
-        if (defaultSlot && defaultSlot.length > 0) {
-          const text = String(defaultSlot[0].children || '')
-          children.push(h('span', { class: 'flex-1 text-center' }, text.charAt(0).toUpperCase()))
+      } else if (effectiveCollapsed && slots.default) {
+        if (!props.icon) {
+          // Show first letter when collapsed without icon; the full label is
+          // kept below as sr-only so the accessible name stays complete.
+          const defaultSlot = slots.default()
+          if (defaultSlot && defaultSlot.length > 0) {
+            const text = String(defaultSlot[0].children || '')
+            children.push(
+              h(
+                'span',
+                { class: 'flex-1 text-center', 'aria-hidden': 'true' },
+                text.charAt(0).toUpperCase()
+              )
+            )
+          }
         }
+        // Keep the full label in the DOM for screen readers
+        children.push(h('span', { class: 'sr-only' }, slots.default()))
       }
 
       return h(
@@ -1125,16 +1138,19 @@ export const SubMenu = defineComponent({
       type HChildren = Parameters<typeof h>[2]
 
       // Render icon if provided
+      const submenuIconClasses = effectiveCollapsed.value
+        ? menuCollapsedIconClasses
+        : menuItemIconClasses
       if (props.icon) {
         if (typeof props.icon === 'string') {
           titleChildren.push(
             h('span', {
-              class: menuItemIconClasses,
+              class: submenuIconClasses,
               innerHTML: props.icon
             })
           )
         } else {
-          titleChildren.push(h('span', { class: menuItemIconClasses }, props.icon as HChildren))
+          titleChildren.push(h('span', { class: submenuIconClasses }, props.icon as HChildren))
         }
       }
 
@@ -1146,11 +1162,20 @@ export const SubMenu = defineComponent({
         if (menuContext.mode.value !== 'horizontal' && !isPopup.value) {
           titleChildren.push(ExpandIcon(isExpanded.value))
         }
-      } else if (!props.icon) {
-        // Show first letter when collapsed without icon
-        titleChildren.push(
-          h('span', { class: 'flex-1 text-center' }, props.title.charAt(0).toUpperCase())
-        )
+      } else {
+        if (!props.icon) {
+          // Show first letter when collapsed without icon; the full title is
+          // kept below as sr-only so the accessible name stays complete.
+          titleChildren.push(
+            h(
+              'span',
+              { class: 'flex-1 text-center', 'aria-hidden': 'true' },
+              props.title.charAt(0).toUpperCase()
+            )
+          )
+        }
+        // Keep the full title in the DOM for screen readers
+        titleChildren.push(h('span', { class: 'sr-only' }, props.title))
       }
 
       // Render submenu title

@@ -151,6 +151,16 @@ Showing 3 key props of 18; see source for the complete interface.
 | `mode?`  | `MenuMode`   | `'vertical'` | Menu mode - horizontal, vertical, or inline                           |
 | `theme?` | `MenuTheme`  | `'light'`    | Menu theme - light or dark                                            |
 
+### Collapsed mode behavior
+
+当 `collapsed` 为 `true` 时（仅 vertical 模式），菜单项呈现以下行为：
+
+- **图标居中**：折叠态图标去除 `mr-2` 右间距，仅保留 `flex-shrink-0`，确保图标在容器内视觉居中。
+- **标签 sr-only 保留**：完整标签文本以 `sr-only` 元素保留在 DOM 中，对视觉用户不可见但屏幕阅读器可读。折叠菜单项的可访问名称为完整标签（如 `name: 'alpha'`），而非首字母。
+- **首字母回退**：无图标的菜单项显示首字母（大写），该 span 附带 `aria-hidden="true"` 避免可访问名称出现 "A alpha" 的重复拼接。
+- **子菜单箭头隐藏**：折叠态下 SubMenu 的展开箭头（ExpandIcon）不渲染。
+- **SubMenu 标题**：同样遵循上述图标/标签/首字母/箭头规则。
+
 ## MenuItem
 
 Source: `packages/core/src/types/menu.ts` · Interface: `MenuItemProps`.

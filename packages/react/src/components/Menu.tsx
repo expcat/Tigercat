@@ -21,6 +21,7 @@ import {
   isKeySelected,
   isKeyOpen,
   menuItemIconClasses,
+  menuCollapsedIconClasses,
   menuItemGroupTitleClasses,
   menuSearchFieldClasses,
   menuSearchEmptyClasses,
@@ -382,20 +383,31 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   const renderIcon = () => {
     if (!icon) return null
 
+    const iconClasses = effectiveCollapsed ? menuCollapsedIconClasses : menuItemIconClasses
     if (typeof icon === 'string') {
-      return <span className={menuItemIconClasses} dangerouslySetInnerHTML={{ __html: icon }} />
+      return <span className={iconClasses} dangerouslySetInnerHTML={{ __html: icon }} />
     }
 
-    return <span className={menuItemIconClasses}>{icon as React.ReactNode}</span>
+    return <span className={iconClasses}>{icon as React.ReactNode}</span>
   }
 
   const renderLabel = () => {
     if (!effectiveCollapsed) return <span className="flex-1">{children}</span>
     if (!icon) {
       const text = String(children || '')
-      return <span className="flex-1 text-center">{text.charAt(0).toUpperCase()}</span>
+      // First-letter fallback is aria-hidden; the sr-only full label below
+      // keeps the accessible name complete.
+      return (
+        <>
+          <span className="flex-1 text-center" aria-hidden="true">
+            {text.charAt(0).toUpperCase()}
+          </span>
+          <span className="sr-only">{children}</span>
+        </>
+      )
     }
-    return null
+    // Keep the full label in the DOM for screen readers
+    return <span className="sr-only">{children}</span>
   }
 
   return (
@@ -750,11 +762,12 @@ export const SubMenu: React.FC<SubMenuProps> = ({
   const renderIcon = () => {
     if (!icon) return null
 
+    const iconClasses = effectiveCollapsed ? menuCollapsedIconClasses : menuItemIconClasses
     if (typeof icon === 'string') {
-      return <span className={menuItemIconClasses} dangerouslySetInnerHTML={{ __html: icon }} />
+      return <span className={iconClasses} dangerouslySetInnerHTML={{ __html: icon }} />
     }
 
-    return <span className={menuItemIconClasses}>{icon as React.ReactNode}</span>
+    return <span className={iconClasses}>{icon as React.ReactNode}</span>
   }
 
   const renderTitle = () => {
@@ -767,10 +780,23 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         </>
       )
     } else if (!icon) {
-      // Show first letter when collapsed without icon
-      return <span className="flex-1 text-center">{title.charAt(0).toUpperCase()}</span>
+      // First-letter fallback is aria-hidden; the sr-only full title below
+      // keeps the accessible name complete.
+      return (
+        <>
+          <span className="flex-1 text-center" aria-hidden="true">
+            {title.charAt(0).toUpperCase()}
+          </span>
+          <span className="sr-only">{title}</span>
+        </>
+      )
     } else {
-      return renderIcon()
+      return (
+        <>
+          {renderIcon()}
+          <span className="sr-only">{title}</span>
+        </>
+      )
     }
   }
 

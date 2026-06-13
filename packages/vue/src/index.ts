@@ -193,6 +193,7 @@ export type {
   VueTableToolbarFilter,
   VueTableToolbarFilterRenderContext,
   VueTableToolbarFiltersExtraContext,
+  VueTableToolbarRenderContext,
   VueTableToolbarProps
 } from './components/DataTableWithToolbar'
 export { FormWizard } from './components/FormWizard'

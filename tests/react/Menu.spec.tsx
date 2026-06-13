@@ -811,10 +811,21 @@ describe('Menu', () => {
         </Menu>
       )
 
-      expect(screen.getByRole('menuitem', { name: 'A' })).toBeInTheDocument()
-      expect(screen.getByRole('menuitem', { name: 'R' })).toBeInTheDocument()
+      // First-letter fallbacks stay visible but the accessible name is the full label
+      const alphaItem = screen.getByRole('menuitem', { name: 'alpha' })
+      expect(alphaItem).toBeInTheDocument()
+      expect(alphaItem.querySelector('[aria-hidden="true"]')).toHaveTextContent('A')
+      // Collapsed submenu triggers keep the expand arrow hidden
+      const reportsTrigger = screen.getByRole('menuitem', { name: 'reports' })
+      expect(reportsTrigger).toBeInTheDocument()
+      expect(reportsTrigger.querySelector('svg')).toBeNull()
       expect(screen.getByTestId('settings-icon')).toBeInTheDocument()
-      expect(screen.queryByText('Icon label')).not.toBeInTheDocument()
+      // Icon items keep the full label in the DOM as sr-only
+      const iconItem = screen.getByRole('menuitem', { name: 'Icon label' })
+      const srLabel = screen.getByText('Icon label')
+      expect(srLabel).toHaveClass('sr-only')
+      expect(iconItem).toContainElement(srLabel)
+      expect(screen.getByRole('menuitem', { name: 'Settings' })).toBeInTheDocument()
     })
 
     it('opens horizontal submenu as a popup on hover and keyboard', async () => {

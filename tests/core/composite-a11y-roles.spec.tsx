@@ -148,4 +148,44 @@ describe('DataTableWithToolbar ARIA roles', () => {
     const toolbar = vueScreen.getByRole('toolbar')
     expect(toolbar).toHaveAttribute('aria-label', 'Data table toolbar')
   })
+
+  // A custom toolbar fully replaces the built-in region, including its
+  // role="toolbar" container — adding the role back is the consumer's job.
+  it('React: toolbar.render replaces the built-in role=toolbar region', () => {
+    renderReact(
+      <ReactDataTableWithToolbar
+        columns={columns}
+        dataSource={[]}
+        toolbar={{
+          filters: [
+            { key: 'status', label: '状态', options: [{ label: '启用', value: 'active' }] }
+          ],
+          render: () => <div data-testid="custom-toolbar">custom</div>
+        }}
+        pagination={false}
+      />
+    )
+    expect(reactScreen.queryByRole('toolbar')).not.toBeInTheDocument()
+    expect(reactScreen.getByTestId('custom-toolbar')).toBeInTheDocument()
+  })
+
+  it('Vue: #toolbar slot replaces the built-in role=toolbar region', () => {
+    renderVue(VueDataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [],
+        toolbar: {
+          filters: [
+            { key: 'status', label: '状态', options: [{ label: '启用', value: 'active' }] }
+          ]
+        },
+        pagination: false
+      },
+      slots: {
+        toolbar: '<div data-testid="custom-toolbar">custom</div>'
+      }
+    })
+    expect(vueScreen.queryByRole('toolbar')).not.toBeInTheDocument()
+    expect(vueScreen.getByTestId('custom-toolbar')).toBeInTheDocument()
+  })
 })

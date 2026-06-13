@@ -27,6 +27,7 @@ import {
   type PaginationConfig,
   type RowSelectionConfig,
   type TableCardLayoutItem,
+  type TableCardRenderContext,
   type TigerLocale,
   type TigerLocaleInput,
   type TigerLocaleTable,
@@ -35,6 +36,7 @@ import {
   type TableToolbarFilterRenderContext,
   type TableToolbarFiltersExtraContext,
   type TableToolbarFilterValue,
+  type TableToolbarRenderContext,
   type TableToolbarAction
 } from '@expcat/tigercat-core'
 import { Table } from './Table'
@@ -47,7 +49,13 @@ import { Checkbox } from './Checkbox'
 
 export interface VueTableToolbarProps extends Omit<
   CoreTableToolbarProps,
-  'filters' | 'filtersExtra' | 'onSearchChange' | 'onSearch' | 'onFiltersChange' | 'onBulkAction'
+  | 'filters'
+  | 'filtersExtra'
+  | 'render'
+  | 'onSearchChange'
+  | 'onSearch'
+  | 'onFiltersChange'
+  | 'onBulkAction'
 > {
   filters?: VueTableToolbarFilter[]
 }
@@ -58,6 +66,8 @@ export interface VueTableToolbarFilterRenderContext
 }
 
 export interface VueTableToolbarFiltersExtraContext extends TableToolbarFiltersExtraContext {}
+
+export interface VueTableToolbarRenderContext extends TableToolbarRenderContext {}
 
 export interface VueTableToolbarFilter extends Omit<TableToolbarFilter, 'render'> {
   render?: (context: VueTableToolbarFilterRenderContext) => VNodeChild
@@ -89,6 +99,8 @@ export interface VueDataTableWithToolbarProps {
   responsiveMode?: TableResponsiveMode
   cardBreakpoint?: TableCardBreakpoint
   cardLayout?: TableCardLayoutItem[]
+  cardClassName?: string | ((record: Record<string, unknown>, index: number) => string | undefined)
+  renderCard?: (context: TableCardRenderContext<Record<string, unknown>>) => unknown
   toolbar?: VueTableToolbarProps
   pagination?: PaginationConfig | false
   className?: string
@@ -201,6 +213,18 @@ export const DataTableWithToolbar = defineComponent({
     },
     cardLayout: {
       type: Array as PropType<TableCardLayoutItem[]>,
+      default: undefined
+    },
+    cardClassName: {
+      type: [String, Function] as PropType<
+        string | ((record: Record<string, unknown>, index: number) => string | undefined)
+      >,
+      default: undefined
+    },
+    renderCard: {
+      type: Function as PropType<
+        (context: TableCardRenderContext<Record<string, unknown>>) => unknown
+      >,
       default: undefined
     },
     toolbar: {
@@ -535,7 +559,23 @@ export const DataTableWithToolbar = defineComponent({
       )
     }
 
+    const toolbarRenderContext = (): VueTableToolbarRenderContext => ({
+      searchValue: searchValue.value ?? '',
+      setSearch: handleSearchChange,
+      submitSearch: handleSearchSubmit,
+      filters: resolvedFilters.value,
+      setFilter: (key: string, value: TableToolbarFilterValue) => setFilterValue(key, value),
+      selectedKeys: selectedKeys.value,
+      selectedCount: selectedCount.value,
+      hiddenColumnKeys: resolvedHiddenKeys.value,
+      setHiddenColumnKeys: handleHiddenColumnsChange
+    })
+
     const renderToolbar = () => {
+      if (slots.toolbar) {
+        return slots.toolbar(toolbarRenderContext())
+      }
+
       if (
         !hasSearch.value &&
         !hasFilters.value &&
@@ -552,7 +592,12 @@ export const DataTableWithToolbar = defineComponent({
         leftNodes.push(
           h(
             'div',
-            { class: 'flex items-center gap-2 w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]' },
+            {
+              class: classNames(
+                'flex items-center gap-2',
+                props.toolbar?.searchClassName ?? 'w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]'
+              )
+            },
             [
               h(
                 Input,
@@ -632,7 +677,11 @@ export const DataTableWithToolbar = defineComponent({
             leftNodes.push(
               h(
                 'div',
-                { key: filter.key, class: 'w-full sm:w-auto' },
+                {
+                  key: filter.key,
+                  class: filter.itemClass ?? 'w-full sm:w-auto',
+                  style: filter.itemStyle
+                },
                 filterNode == null ? [] : [filterNode]
               )
             )
@@ -640,7 +689,11 @@ export const DataTableWithToolbar = defineComponent({
           }
 
           leftNodes.push(
-            h('div', { key: filter.key, class: 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]' }, [
+            h('div', {
+              key: filter.key,
+              class: filter.itemClass ?? 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]',
+              style: filter.itemStyle
+            }, [
               h(Select, {
                 size: 'sm',
                 options: (filter.options ?? []).map((opt) => ({
@@ -717,8 +770,10 @@ export const DataTableWithToolbar = defineComponent({
             'tiger-data-table-toolbar flex flex-wrap items-center gap-3',
             props.bordered
               ? 'bg-[var(--tiger-surface-muted,#f9fafb)] dark:bg-gray-800/10 px-4 py-3.5 border-b border-[var(--tiger-border,#e5e7eb)]'
-              : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 dark:bg-gray-800/30 px-4 py-3.5 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm'
+              : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 dark:bg-gray-800/30 px-4 py-3.5 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm',
+            props.toolbar?.className
           ),
+          style: props.toolbar?.style,
           role: 'toolbar',
           'aria-label': tableLabels.value.toolbarAriaLabel
         },
@@ -770,10 +825,18 @@ export const DataTableWithToolbar = defineComponent({
         responsiveMode: props.responsiveMode,
         cardBreakpoint: props.cardBreakpoint,
         cardLayout: props.cardLayout,
+        cardClassName: props.cardClassName,
+        renderCard: props.renderCard,
         class: props.bordered ? 'border-none rounded-none shadow-none' : undefined,
         onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys),
         onPageChange: handleTablePageChange
       }
+
+      const {
+        toolbar: _toolbarSlot,
+        'filters-extra': _filtersExtraSlot,
+        ...tableSlots
+      } = slots
 
       return h(
         'div',
@@ -782,7 +845,7 @@ export const DataTableWithToolbar = defineComponent({
           style: wrapperStyle.value,
           'data-tiger-data-table-with-toolbar': ''
         },
-        [renderToolbar(), h(Table as unknown as Component, tableProps, slots)]
+        [renderToolbar(), h(Table as unknown as Component, tableProps, tableSlots)]
       )
     }
   }

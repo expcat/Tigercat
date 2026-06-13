@@ -77,6 +77,13 @@ export const menuItemDisabledClasses = 'opacity-50 cursor-not-allowed pointer-ev
 export const menuItemIconClasses = 'mr-2 flex-shrink-0'
 
 /**
+ * Menu item icon classes when the menu is collapsed.
+ * No right margin: the label is visually hidden (sr-only) so a margin
+ * would only push the icon off-center.
+ */
+export const menuCollapsedIconClasses = 'flex-shrink-0'
+
+/**
  * Submenu title classes
  * @since 0.2.0 - Added focus-visible ring (inset) and active state
  */
