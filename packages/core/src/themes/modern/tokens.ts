@@ -44,11 +44,14 @@ export const MODERN_BASE_TOKENS_LIGHT: Record<string, string> = {
   '--tiger-blur-glass': '16px',
   '--tiger-blur-glass-strong': '24px',
 
-  // Header variant tuning — overridable without `!important`. `saturate`
+  // Header variant tuning — all overridable without `!important`. `saturate`
   // enriches the blurred backdrop; `--tiger-header-shadow` lets consumers
-  // swap the `blur` variant's shadow via a low-specificity token.
+  // swap the `blur` variant's shadow; `--tiger-header-border` scopes the
+  // header's border color (falls back to the global `--tiger-border`) so the
+  // glass header border can be tuned without touching every other border.
   '--tiger-header-saturate': '1.8',
   '--tiger-header-shadow': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+  '--tiger-header-border': 'var(--tiger-border, #e5e7eb)',
 
   // Gradients — fall back to solid color via a no-op linear-gradient
   '--tiger-gradient-primary': 'linear-gradient(180deg, var(--tiger-primary), var(--tiger-primary))',
@@ -88,7 +91,9 @@ export const MODERN_BASE_TOKENS_DARK: Record<string, string> = {
   '--tiger-shadow-glass-strong': '0 4px 6px -1px rgb(0 0 0 / 0.3)',
 
   // Header `blur` variant shadow — slightly deeper for dark surfaces.
-  '--tiger-header-shadow': '0 1px 2px 0 rgb(0 0 0 / 0.3)'
+  '--tiger-header-shadow': '0 1px 2px 0 rgb(0 0 0 / 0.3)',
+  // Header border tracks the dark-mode global border by default.
+  '--tiger-header-border': 'var(--tiger-border)'
 }
 
 /**

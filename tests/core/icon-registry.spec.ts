@@ -22,6 +22,8 @@ describe('icon registry', () => {
     expect(iconNames).toContain('bell')
     expect(iconNames).toContain('logout')
     expect(iconNames).toContain('map-pin')
+    expect(iconNames).toContain('dashboard')
+    expect(iconNames).toContain('users')
   })
 
   it('supports multi-path glyphs (map-pin pin + dot)', () => {

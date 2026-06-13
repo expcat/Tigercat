@@ -55,6 +55,9 @@ describe('Modern theme tokens', () => {
     // translucent/blur variants) render without consumer-set tokens.
     expect(MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass']).toBe('16px')
     expect(MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass-strong']).toBe('24px')
+    // Header border is scoped to its own token (falling back to the global
+    // border) so the glass header border can be tuned without `!important`.
+    expect(MODERN_BASE_TOKENS_LIGHT['--tiger-header-border']).toContain('--tiger-border')
   })
 
   it('override layer applies modern values (rounder corners, real glass blur)', () => {

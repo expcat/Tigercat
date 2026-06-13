@@ -39,6 +39,7 @@ describe('Layout Sections', () => {
     expect(header).toHaveClass('backdrop-blur-[var(--tiger-blur-glass-strong,24px)]')
     expect(header).toHaveClass('backdrop-saturate-[var(--tiger-header-saturate,1.8)]')
     expect(header).toHaveClass('shadow-[var(--tiger-header-shadow,0_1px_2px_0_rgb(0_0_0/0.05))]')
+    expect(header).toHaveClass('border-[color:var(--tiger-header-border,var(--tiger-border,#e5e7eb))]')
   })
 
   it('handles Sidebar collapsed width', () => {
