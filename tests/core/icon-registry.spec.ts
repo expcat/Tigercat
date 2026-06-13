@@ -17,6 +17,15 @@ describe('icon registry', () => {
     expect(iconNames).toContain('check')
     expect(iconNames).toContain('close')
     expect(iconNames).toContain('search')
+    // Common application glyphs added for app-shell usage.
+    expect(iconNames).toContain('home')
+    expect(iconNames).toContain('bell')
+    expect(iconNames).toContain('logout')
+    expect(iconNames).toContain('map-pin')
+  })
+
+  it('supports multi-path glyphs (map-pin pin + dot)', () => {
+    expect(getIconDefinition('map-pin')?.paths.length).toBe(2)
   })
 
   it('every definition has a viewBox, at least one path, and a render mode', () => {

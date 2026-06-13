@@ -37,7 +37,8 @@ describe('Layout Sections', () => {
     const { container } = render(<Header variant="blur">Header</Header>)
     const header = container.querySelector('header')
     expect(header).toHaveClass('backdrop-blur-[var(--tiger-blur-glass-strong,24px)]')
-    expect(header).toHaveClass('shadow-sm')
+    expect(header).toHaveClass('backdrop-saturate-[var(--tiger-header-saturate,1.8)]')
+    expect(header).toHaveClass('shadow-[var(--tiger-header-shadow,0_1px_2px_0_rgb(0_0_0/0.05))]')
   })
 
   it('handles Sidebar collapsed width', () => {

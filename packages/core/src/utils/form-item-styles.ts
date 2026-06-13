@@ -63,7 +63,13 @@ export function getFormItemClasses(options: FormItemClassOptions = {}): string {
 }
 
 export function getFormItemLabelClasses(options: FormItemLabelClassOptions = {}): string {
-  const { size = 'md', labelPosition = 'right', labelAlign = 'right', isRequired = false } = options
+  const { size = 'md', labelPosition = 'right', isRequired = false } = options
+
+  // Top labels read more naturally left-aligned, so default to `left` when the
+  // caller hasn't picked an alignment and the label sits on top. Horizontal
+  // labels keep the conventional `right` alignment. Mirrors the resolution in
+  // the Vue/React `Form` components.
+  const labelAlign = options.labelAlign ?? (labelPosition === 'top' ? 'left' : 'right')
 
   const alignClass = labelAlign === 'right' ? 'text-right' : 'text-left'
 

@@ -15,8 +15,8 @@ export const layoutHeaderClasses =
 const layoutHeaderVariantClasses: Record<HeaderVariant, string> = {
   default: '',
   translucent:
-    'bg-[var(--tiger-surface,#ffffff)]/80 backdrop-blur-[var(--tiger-blur-glass,16px)] supports-[backdrop-filter]:bg-[var(--tiger-surface,#ffffff)]/70',
-  blur: 'bg-[var(--tiger-surface,#ffffff)]/80 backdrop-blur-[var(--tiger-blur-glass-strong,24px)] supports-[backdrop-filter]:bg-[var(--tiger-surface,#ffffff)]/70 shadow-sm'
+    'bg-[var(--tiger-surface,#ffffff)]/80 backdrop-blur-[var(--tiger-blur-glass,16px)] backdrop-saturate-[var(--tiger-header-saturate,1.8)] supports-[backdrop-filter]:bg-[var(--tiger-surface,#ffffff)]/70',
+  blur: 'bg-[var(--tiger-surface,#ffffff)]/80 backdrop-blur-[var(--tiger-blur-glass-strong,24px)] backdrop-saturate-[var(--tiger-header-saturate,1.8)] supports-[backdrop-filter]:bg-[var(--tiger-surface,#ffffff)]/70 shadow-[var(--tiger-header-shadow,0_1px_2px_0_rgb(0_0_0/0.05))]'
 }
 
 export function getLayoutHeaderClasses(variant: HeaderVariant = 'default'): string {

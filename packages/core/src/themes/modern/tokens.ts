@@ -35,11 +35,20 @@ export const MODERN_BASE_TOKENS_LIGHT: Record<string, string> = {
   '--tiger-shadow-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
   '--tiger-shadow-xl': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
 
-  // Glass — disabled by default (no backdrop blur, no inset highlights)
+  // Glass — inset highlights stay disabled by default (kept flat), but a
+  // sensible backdrop blur is enabled out of the box so opt-in surfaces like
+  // `Header variant="translucent"/"blur"` render glass without the consumer
+  // having to set these tokens. Override to `0px` to fully disable blur.
   '--tiger-shadow-glass': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
   '--tiger-shadow-glass-strong': '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-  '--tiger-blur-glass': '0px',
-  '--tiger-blur-glass-strong': '0px',
+  '--tiger-blur-glass': '16px',
+  '--tiger-blur-glass-strong': '24px',
+
+  // Header variant tuning — overridable without `!important`. `saturate`
+  // enriches the blurred backdrop; `--tiger-header-shadow` lets consumers
+  // swap the `blur` variant's shadow via a low-specificity token.
+  '--tiger-header-saturate': '1.8',
+  '--tiger-header-shadow': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 
   // Gradients — fall back to solid color via a no-op linear-gradient
   '--tiger-gradient-primary': 'linear-gradient(180deg, var(--tiger-primary), var(--tiger-primary))',
@@ -76,7 +85,10 @@ export const MODERN_BASE_TOKENS_DARK: Record<string, string> = {
   '--tiger-shadow-xl': '0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.25)',
 
   '--tiger-shadow-glass': '0 1px 2px 0 rgb(0 0 0 / 0.2)',
-  '--tiger-shadow-glass-strong': '0 4px 6px -1px rgb(0 0 0 / 0.3)'
+  '--tiger-shadow-glass-strong': '0 4px 6px -1px rgb(0 0 0 / 0.3)',
+
+  // Header `blur` variant shadow — slightly deeper for dark surfaces.
+  '--tiger-header-shadow': '0 1px 2px 0 rgb(0 0 0 / 0.3)'
 }
 
 /**

@@ -49,10 +49,12 @@ describe('Modern theme tokens', () => {
     }
   })
 
-  it('base layer fallback values keep current visual (no glass blur, base radius 0.5rem)', () => {
+  it('base layer keeps base radius 0.5rem and enables glass blur out of the box', () => {
     expect(MODERN_BASE_TOKENS_LIGHT['--tiger-radius-md']).toBe('0.5rem')
-    expect(MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass']).toBe('0px')
-    expect(MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass-strong']).toBe('0px')
+    // Glass blur defaults are non-zero so opt-in surfaces (Header
+    // translucent/blur variants) render without consumer-set tokens.
+    expect(MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass']).toBe('16px')
+    expect(MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass-strong']).toBe('24px')
   })
 
   it('override layer applies modern values (rounder corners, real glass blur)', () => {
