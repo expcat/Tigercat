@@ -47,6 +47,14 @@ const createLoadingSpinner = () => {
   )
 }
 
+let warnedUnsupportedColorProp = false
+
+function warnUnsupportedColorPropIfNeeded(attrs: Record<string, unknown>): void {
+  if (!('color' in attrs) || warnedUnsupportedColorProp) return
+  warnedUnsupportedColorProp = true
+  console.warn('[Tigercat] Button does not support color. Use variant instead.')
+}
+
 export const Button = defineComponent({
   name: 'TigerButton',
   inheritAttrs: false,
@@ -136,6 +144,7 @@ export const Button = defineComponent({
     const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     return () => {
+      warnUnsupportedColorPropIfNeeded(attrs as Record<string, unknown>)
       const isDisabled = props.disabled || props.loading
       const iconIsRight = props.iconPosition === 'right'
 

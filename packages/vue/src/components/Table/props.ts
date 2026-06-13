@@ -12,7 +12,8 @@ import type {
   TigerLocaleInput,
   TigerLocaleTable,
   TableCardRenderContext,
-  TableCardLayoutItem
+  TableCardLayoutItem,
+  TableCardSelectionPosition
 } from '@expcat/tigercat-core'
 
 /**
@@ -48,6 +49,8 @@ export interface VueTableProps {
   cardBreakpoint?: TableCardBreakpoint
   cardClassName?: string | ((record: Record<string, unknown>, index: number) => string | undefined)
   renderCard?: (context: TableCardRenderContext<Record<string, unknown>>) => unknown
+  cardSelectionPosition?: TableCardSelectionPosition
+  cardPadding?: string | false
   // v0.6.0
   virtual?: boolean
   virtualHeight?: number
@@ -199,6 +202,14 @@ export const tableProps = {
     type: Function as PropType<
       (context: TableCardRenderContext<Record<string, unknown>>) => unknown
     >
+  },
+  cardSelectionPosition: {
+    type: String as PropType<TableCardSelectionPosition>,
+    default: 'controls-row' as TableCardSelectionPosition
+  },
+  cardPadding: {
+    type: [String, Boolean] as PropType<string | false>,
+    default: undefined
   },
   // --- v0.6.0 props ---
   virtual: { type: Boolean, default: false },

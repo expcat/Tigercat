@@ -14,6 +14,8 @@ export type TableExportFormat = 'csv' | 'excel'
 
 export type TableResponsiveMode = 'card' | 'scroll'
 
+export type TableCardSelectionPosition = 'controls-row' | 'title-inline'
+
 /**
  * Viewport breakpoint below which `responsiveMode="card"` activates.
  * Maps to Tailwind's `sm` (640px), `md` (768px), and `lg` (1024px) widths.
@@ -148,6 +150,22 @@ export interface TableColumnCardGrid {
    * @default 'left'
    */
   labelPosition?: 'left' | 'top'
+
+  /**
+   * Whether to render a divider above this field in card mode.
+   * @default false
+   */
+  divider?: boolean
+
+  /**
+   * Custom CSS class name for the field label in card mode.
+   */
+  labelClassName?: string
+
+  /**
+   * Custom CSS class name for the field value in card mode.
+   */
+  valueClassName?: string
 }
 
 /**
@@ -475,6 +493,21 @@ export interface TableCardLayoutItem {
   labelPosition?: 'left' | 'top'
 
   /**
+   * Whether to render a divider above this field in card mode.
+   */
+  divider?: boolean
+
+  /**
+   * Custom CSS class name for the field label in card mode.
+   */
+  labelClassName?: string
+
+  /**
+   * Custom CSS class name for the field value in card mode.
+   */
+  valueClassName?: string
+
+  /**
    * Custom CSS class name for card item container.
    */
   className?: string
@@ -655,6 +688,19 @@ export interface TableProps<T = Record<string, unknown>> {
    * Dedicated layout definitions for card grid mode.
    */
   cardLayout?: TableCardLayoutItem[]
+
+  /**
+   * Position of row selection controls in default card rendering.
+   * @default 'controls-row'
+   */
+  cardSelectionPosition?: TableCardSelectionPosition
+
+  /**
+   * Padding class for default card containers. Set to false to remove the
+   * built-in padding.
+   * @default 'p-3'
+   */
+  cardPadding?: string | false
 
   // --- v0.6.0 additions ---
 

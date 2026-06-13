@@ -55,7 +55,14 @@ const CARD_LIST_CLASSES: Record<TableCardBreakpoint, string> = {
 }
 
 export const tableResponsiveCardClasses =
-  'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-3 shadow-sm'
+  'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm'
+
+export function getTableResponsiveCardClasses(cardPadding: string | false | undefined): string {
+  return classNames(
+    tableResponsiveCardClasses,
+    cardPadding === false ? undefined : (cardPadding ?? 'p-3')
+  )
+}
 
 export const tableResponsiveCardRowClasses =
   'grid grid-cols-[minmax(7rem,40%)_1fr] gap-3 border-b border-[var(--tiger-border,#e5e7eb)] py-2 last:border-b-0'
@@ -815,6 +822,9 @@ export interface CardGridInfo {
   className: string
   hideLabel: boolean
   labelPosition: 'left' | 'top'
+  divider: boolean
+  labelClassName?: string
+  valueClassName?: string
 }
 
 export function getCardGridInfo(
@@ -831,6 +841,16 @@ export function getCardGridInfo(
     layoutItem?.labelPosition !== undefined
       ? layoutItem.labelPosition
       : (column.cardGrid?.labelPosition ?? 'left')
+  const divider =
+    layoutItem?.divider !== undefined ? layoutItem.divider : (column.cardGrid?.divider ?? false)
+  const labelClassName =
+    layoutItem?.labelClassName !== undefined
+      ? layoutItem.labelClassName
+      : column.cardGrid?.labelClassName
+  const valueClassName =
+    layoutItem?.valueClassName !== undefined
+      ? layoutItem.valueClassName
+      : column.cardGrid?.valueClassName
 
   const colClass =
     colSpan && COL_SPAN_CLASSES[colSpan]
@@ -841,6 +861,9 @@ export function getCardGridInfo(
   return {
     className: classNames(colClass, rowClass, 'min-w-0 break-words', layoutItem?.className),
     hideLabel,
-    labelPosition
+    labelPosition,
+    divider,
+    labelClassName,
+    valueClassName
   }
 }

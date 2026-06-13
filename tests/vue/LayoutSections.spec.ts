@@ -54,6 +54,16 @@ describe('Layout Sections', () => {
     expect(header).toHaveAttribute('aria-label', 'Site header')
   })
 
+  it('applies Header variants', () => {
+    const { container } = render(Header, {
+      props: { variant: 'blur' },
+      slots: { default: () => 'Header' }
+    })
+    const header = container.querySelector('header')
+    expect(header).toHaveClass('backdrop-blur-[var(--tiger-blur-glass-strong,24px)]')
+    expect(header).toHaveClass('shadow-sm')
+  })
+
   it('Sidebar respects collapsed and width', async () => {
     const { container, rerender } = render(Sidebar, {
       props: { width: '300px' },
@@ -80,6 +90,22 @@ describe('Layout Sections', () => {
     expect(main).toBeTruthy()
     expect(main?.className).toContain('tiger-content')
     expect(main?.className).toContain('custom-content')
+  })
+
+  it('supports configurable Content padding', () => {
+    const noPadding = render(Content, {
+      props: { padding: false },
+      slots: { default: () => 'Main' }
+    })
+    expect(noPadding.container.querySelector('main')).not.toHaveClass('p-6')
+    noPadding.unmount()
+
+    const customPadding = render(Content, {
+      props: { padding: 'p-4' },
+      slots: { default: () => 'Main' }
+    })
+    expect(customPadding.container.querySelector('main')).toHaveClass('p-4')
+    expect(customPadding.container.querySelector('main')).not.toHaveClass('p-6')
   })
 
   it('Footer applies default height', () => {

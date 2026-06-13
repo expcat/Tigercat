@@ -22,11 +22,19 @@ export interface HeaderProps {
   className?: string
 
   /**
+   * Header visual style.
+   * @default 'default'
+   */
+  variant?: HeaderVariant
+
+  /**
    * Header height
    * @default '64px'
    */
   height?: string
 }
+
+export type HeaderVariant = 'default' | 'translucent' | 'blur'
 
 /**
  * Sidebar props interface
@@ -65,6 +73,13 @@ export interface ContentProps {
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * Built-in content padding. true keeps the default p-6, false removes it,
+   * and a string is used as the padding class.
+   * @default true
+   */
+  padding?: boolean | string
 }
 
 /**

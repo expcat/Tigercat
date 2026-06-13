@@ -188,17 +188,17 @@ const COMPONENT_USAGE_NOTES = {
   TableToolbar: {
     uses: ['Input', 'Select', 'Button', 'Popover', 'Checkbox'],
     notes:
-      '这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列。'
+      '这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`filters` 默认渲染 Select；需要 Input、DatePicker、年龄段等复合控件时用 `filters[].render(context)`，或在尾部注入 Vue `#filters-extra` / React `toolbar.filtersExtra`。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列。'
   },
   DataTableWithToolbar: {
     uses: ['Table', 'Input', 'Select', 'Button', 'Popover', 'Checkbox'],
     notes:
-      '透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；自定义网格可用列级 `cardGrid` 或表级 `cardLayout`，`cardLayout` 优先于 `cardGrid`，最窄屏默认单列，`sm` 及以上按 `colSpan` 混排。`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。'
+      '透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；自定义网格可用列级 `cardGrid` 或表级 `cardLayout`，`cardLayout` 优先于 `cardGrid`，最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName` 和 `valueClassName` 做轻量布局调整。`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.filters[].render`、Vue `#filters-extra` 和 React `toolbar.filtersExtra` 可在工具栏过滤区放入自定义控件。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。'
   },
   Table: {
     uses: ['TableColumn', 'Pagination', 'row selection', 'expandable rows'],
     notes:
-      '固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制，自定义网格用列级 `cardGrid` 或表级 `cardLayout`（优先级更高），最窄屏默认单列，`sm` 及以上按 `colSpan` 混排。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。'
+      '固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制，自定义网格用列级 `cardGrid` 或表级 `cardLayout`（优先级更高），最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName` 和 `valueClassName` 做轻量布局调整。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。'
   },
   VirtualTable: {
     uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
@@ -218,6 +218,137 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       'Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `allowAddCard`，类型扩展来自 `kanban.ts`。'
   }
+}
+
+const COMPONENT_PROPS_EXTRA = {
+  TableToolbar: `
+Custom filter context: \`filters[].render({ filter, value, filters, setValue, setFilter })\`. Use \`setValue(value)\` to update the current filter key, or \`setFilter(key, value)\` when one custom control updates another key. \`TableToolbarFilterValue\` accepts \`string | number | Record<string, unknown> | null\`, so range filters can emit \`{ ageRange: { min, max } }\`.
+
+### Per-filter container styling
+
+\`filters[].itemClass\` 和 \`filters[].itemStyle\` 可逐项定制 filter 容器样式。 \`itemClass\` 使用**替换语义**——提供时整体替换默认宽度类，不追加。默认宽度类：
+
+- Select 型 filter：\`w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]\`
+- 自定义 render 型 filter：\`w-full sm:w-auto\`
+
+如需保留部分默认类，请在 \`itemClass\` 中手动包含。
+
+### Toolbar container and search styling
+
+| Prop | Semantics | Default classes |
+| ---- | --------- | --------------- |
+| \`className?\` | **追加** | 追加到 \`flex flex-wrap items-center gap-3 p-4\` 之后 |
+| \`style?\` | 内联样式 | 作为 CSS 内联样式确定性覆盖间距等 |
+| \`searchClassName?\` | **替换** | 替换默认 \`w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]\`，结构类 \`flex items-center gap-2\` 保留 |
+
+### Full toolbar replacement
+
+Vue 通过 \`#toolbar\` 作用域插槽，React 通过 \`toolbar.render\`（函数或 ReactNode），完全替换内置工具栏区域（含 \`role="toolbar"\` 容器）。
+
+\`TableToolbarRenderContext\` 字段：\`searchValue\`, \`setSearch\`, \`submitSearch\`, \`filters\`, \`setFilter\`, \`selectedKeys\`, \`selectedCount\`, \`hiddenColumnKeys\`, \`setHiddenColumnKeys\`。
+
+> **a11y 注意**：使用自定义 toolbar 时，内置 \`role="toolbar"\` 容器不再渲染，调用方应自行在自定义 toolbar 根元素上添加 \`role="toolbar"\` 和 \`aria-label\`。
+`,
+  DataTableWithToolbar: `
+卡片自定义（公开 API）：\`renderCard(context)\` / \`cardClassName\`（\`string\` 或 \`(record, index) => string\`）已在 \`DataTableWithToolbar\` 显式声明并转发给内部 Table；Vue 侧另有 \`#card="{ record, index, columns, selected, expanded, toggleExpand, selectRow }"\` 作用域插槽，**插槽优先于 \`renderCard\` prop**。
+`,
+  Menu: `
+### Collapsed mode behavior
+
+当 \`collapsed\` 为 \`true\` 时（仅 vertical 模式），菜单项呈现以下行为：
+
+- **图标居中**：折叠态图标去除 \`mr-2\` 右间距，仅保留 \`flex-shrink-0\`，确保图标在容器内视觉居中。
+- **标签 sr-only 保留**：完整标签文本以 \`sr-only\` 元素保留在 DOM 中，对视觉用户不可见但屏幕阅读器可读。折叠菜单项的可访问名称为完整标签（如 \`name: 'alpha'\`），而非首字母。
+- **首字母回退**：无图标的菜单项显示首字母（大写），该 span 附带 \`aria-hidden="true"\` 避免可访问名称出现 "A alpha" 的重复拼接。
+- **子菜单箭头隐藏**：折叠态下 SubMenu 的展开箭头（ExpandIcon）不渲染。
+- **SubMenu 标题**：同样遵循上述图标/标签/首字母/箭头规则。
+`
+}
+
+const COMPONENT_EXAMPLE_EXTRA = {
+  Composite: `
+## DataTableWithToolbar Custom Filters
+
+Use \`toolbar.filters[].render(context)\` when the custom control belongs to a filter definition. Use the extra area when app code already owns the control state or needs to append several controls after configured Select filters.
+
+Vue \`filters-extra\` age range:
+
+\`\`\`vue
+<script setup lang="ts">
+const getAgeRange = (value: unknown) =>
+  value && typeof value === 'object' ? (value as { min?: string; max?: string }) : {}
+</script>
+
+<DataTableWithToolbar
+  :columns="columns"
+  :data-source="rows"
+  :toolbar="{
+    filters: [
+      { key: 'status', label: '状态', options: statusOptions }
+    ]
+  }"
+  @filters-change="filters = $event">
+  <template #filters-extra="{ filters, setFilter }">
+    <div class="flex items-center gap-2">
+      <span>年龄段</span>
+      <Input
+        :model-value="getAgeRange(filters.ageRange).min ?? ''"
+        placeholder="最小"
+        @update:model-value="(min) =>
+          setFilter('ageRange', { ...getAgeRange(filters.ageRange), min })" />
+      <span>-</span>
+      <Input
+        :model-value="getAgeRange(filters.ageRange).max ?? ''"
+        placeholder="最大"
+        @update:model-value="(max) =>
+          setFilter('ageRange', { ...getAgeRange(filters.ageRange), max })" />
+    </div>
+  </template>
+</DataTableWithToolbar>
+\`\`\`
+
+React \`filtersExtra\` age range:
+
+\`\`\`tsx
+<DataTableWithToolbar
+  columns={columns}
+  dataSource={rows}
+  toolbar={{
+    filters: [{ key: 'status', label: '状态', options: statusOptions }],
+    filtersExtra: ({ filters, setFilter }) => {
+      const ageRange =
+        filters.ageRange && typeof filters.ageRange === 'object'
+          ? (filters.ageRange as { min?: string; max?: string })
+          : {}
+
+      return (
+        <div className="flex items-center gap-2">
+          <span>年龄段</span>
+          <Input
+            value={ageRange.min ?? ''}
+            placeholder="最小"
+            onChange={(event) =>
+              setFilter('ageRange', { ...ageRange, min: event.currentTarget.value })
+            }
+          />
+          <span>-</span>
+          <Input
+            value={ageRange.max ?? ''}
+            placeholder="最大"
+            onChange={(event) =>
+              setFilter('ageRange', { ...ageRange, max: event.currentTarget.value })
+            }
+          />
+        </div>
+      )
+    }
+  }}
+  onFiltersChange={setFilters}
+/>
+\`\`\`
+
+\`filters[].render\` receives \`{ filter, value, filters, setValue, setFilter }\`; call \`setValue({ min, max })\` to emit an object value for the current filter key.
+`
 }
 
 const COMPONENT_SNIPPETS = {
@@ -661,6 +792,10 @@ function generatePropsReference(category, files) {
         markdownText += methodRows.map((member) => `\`${member.name}\``).join(', ')
         markdownText += '.\n\n'
       }
+
+      if (COMPONENT_PROPS_EXTRA[component]) {
+        markdownText += `${COMPONENT_PROPS_EXTRA[component].trim()}\n\n`
+      }
     }
   }
 
@@ -733,6 +868,9 @@ function generateExamples(category, files) {
 
   markdownText +=
     '\nImports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.\n'
+  if (COMPONENT_EXAMPLE_EXTRA[category]) {
+    markdownText += `\n${COMPONENT_EXAMPLE_EXTRA[category].trim()}\n`
+  }
   return markdownText
 }
 

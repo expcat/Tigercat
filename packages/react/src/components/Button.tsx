@@ -37,6 +37,14 @@ const createDefaultSpinner = (): React.ReactNode => {
   )
 }
 
+let warnedUnsupportedColorProp = false
+
+function warnUnsupportedColorPropIfNeeded(props: Record<string, unknown>): void {
+  if (!('color' in props) || warnedUnsupportedColorProp) return
+  warnedUnsupportedColorProp = true
+  console.warn('[Tigercat] Button does not support color. Use variant instead.')
+}
+
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   size,
@@ -55,6 +63,7 @@ export const Button: React.FC<ButtonProps> = ({
   'aria-disabled': ariaDisabledProp,
   ...rest
 }) => {
+  warnUnsupportedColorPropIfNeeded(rest as Record<string, unknown>)
   const group = useButtonGroupContext()
   const resolvedSize = size ?? group?.size ?? 'md'
   const isDisabled = disabled || loading

@@ -1,8 +1,9 @@
 import { defineComponent, h, PropType, computed } from 'vue'
-import { classNames, coerceClassValue, layoutContentClasses } from '@expcat/tigercat-core'
+import { classNames, coerceClassValue, getLayoutContentClasses } from '@expcat/tigercat-core'
 
 export interface VueContentProps {
   className?: string
+  padding?: boolean | string
   style?: Record<string, string | number>
 }
 
@@ -19,6 +20,15 @@ export const Content = defineComponent({
     },
 
     /**
+     * Built-in content padding.
+     * @default true
+     */
+    padding: {
+      type: [Boolean, String] as PropType<boolean | string>,
+      default: true
+    },
+
+    /**
      * Custom styles
      */
     style: {
@@ -29,7 +39,7 @@ export const Content = defineComponent({
   setup(props, { slots, attrs }) {
     const contentClasses = computed(() =>
       classNames(
-        layoutContentClasses,
+        getLayoutContentClasses(props.padding),
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )

@@ -377,7 +377,10 @@ describe('table-utils', () => {
       expect(info).toEqual({
         className: 'col-span-12 sm:col-span-6 row-span-2 min-w-0 break-words',
         hideLabel: false,
-        labelPosition: 'top'
+        labelPosition: 'top',
+        divider: false,
+        labelClassName: undefined,
+        valueClassName: undefined
       })
     })
 
@@ -386,23 +389,44 @@ describe('table-utils', () => {
         {
           key: 'status',
           title: 'Status',
-          cardGrid: { colSpan: 6, rowSpan: 2, hideLabel: false, labelPosition: 'left' }
+          cardGrid: {
+            colSpan: 6,
+            rowSpan: 2,
+            hideLabel: false,
+            labelPosition: 'left',
+            divider: false,
+            labelClassName: 'column-label',
+            valueClassName: 'column-value'
+          }
         },
-        { key: 'status', colSpan: 3, rowSpan: 4, hideLabel: true, labelPosition: 'top' }
+        {
+          key: 'status',
+          colSpan: 3,
+          rowSpan: 4,
+          hideLabel: true,
+          labelPosition: 'top',
+          divider: true,
+          labelClassName: 'layout-label',
+          valueClassName: 'layout-value'
+        }
       )
 
       expect(info).toEqual({
         className: 'col-span-12 sm:col-span-3 row-span-4 min-w-0 break-words',
         hideLabel: true,
-        labelPosition: 'top'
+        labelPosition: 'top',
+        divider: true,
+        labelClassName: 'layout-label',
+        valueClassName: 'layout-value'
       })
     })
 
     it('falls back safely for invalid runtime span values', () => {
-      const info = getCardGridInfo(
-        { key: 'notes', title: 'Notes' },
-        { key: 'notes', colSpan: 99, rowSpan: 99 } as Parameters<typeof getCardGridInfo>[1]
-      )
+      const info = getCardGridInfo({ key: 'notes', title: 'Notes' }, {
+        key: 'notes',
+        colSpan: 99,
+        rowSpan: 99
+      } as Parameters<typeof getCardGridInfo>[1])
 
       expect(info.className).toBe('col-span-12 min-w-0 break-words')
     })

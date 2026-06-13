@@ -48,6 +48,14 @@ const CloseIcon = () =>
     ]
   )
 
+let warnedUnsupportedColorProp = false
+
+function warnUnsupportedColorPropIfNeeded(attrs: Record<string, unknown>): void {
+  if (!('color' in attrs) || warnedUnsupportedColorProp) return
+  warnedUnsupportedColorProp = true
+  console.warn('[Tigercat] Tag does not support color. Use variant instead.')
+}
+
 export const Tag = defineComponent({
   name: 'TigerTag',
   inheritAttrs: false,
@@ -130,6 +138,7 @@ export const Tag = defineComponent({
     }
 
     return () => {
+      warnUnsupportedColorPropIfNeeded(attrs as Record<string, unknown>)
       if (!isVisible.value) {
         return null
       }

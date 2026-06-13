@@ -1,7 +1,7 @@
 import React from 'react'
 import {
   classNames,
-  layoutContentClasses,
+  getLayoutContentClasses,
   type ContentProps as CoreContentProps
 } from '@expcat/tigercat-core'
 
@@ -10,8 +10,13 @@ export interface ReactContentProps
   children?: React.ReactNode
 }
 
-export const Content: React.FC<ReactContentProps> = ({ className, children, ...props }) => {
-  const contentClasses = classNames(layoutContentClasses, className)
+export const Content: React.FC<ReactContentProps> = ({
+  className,
+  padding = true,
+  children,
+  ...props
+}) => {
+  const contentClasses = classNames(getLayoutContentClasses(padding), className)
 
   return (
     <main className={contentClasses} {...props}>

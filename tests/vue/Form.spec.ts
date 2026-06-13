@@ -191,6 +191,33 @@ describe('Form', () => {
 
       const { container } = render(Demo)
       expect(container.querySelector('.tiger-form--label-top')).toBeInTheDocument()
+      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-left')
+    })
+
+    it('keeps explicit top label alignment', () => {
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ name: '' })
+          return () =>
+            h(
+              Form,
+              { model, labelPosition: 'top', labelAlign: 'right' },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name' },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
+        }
+      })
+
+      const { container } = render(Demo)
+      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-right')
     })
 
     it('applies custom label width', () => {

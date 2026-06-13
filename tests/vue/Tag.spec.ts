@@ -38,6 +38,19 @@ describe('Tag', () => {
     expect(root).toHaveClass('from-attrs')
   })
 
+  it('warns when color is passed instead of variant', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+    render(Tag, {
+      attrs: { color: 'green' },
+      slots: { default: 'Color prop' }
+    })
+
+    expect(screen.getByText('Color prop')).toBeInTheDocument()
+    expect(warn).toHaveBeenCalledWith('[Tigercat] Tag does not support color. Use variant instead.')
+    warn.mockRestore()
+  })
+
   it('does not render close button when closable=false', () => {
     const { container } = render(Tag, {
       props: {

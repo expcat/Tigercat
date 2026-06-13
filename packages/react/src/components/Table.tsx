@@ -5,6 +5,7 @@ import {
   getTableWrapperClasses,
   getCardColumns,
   getCardGridInfo,
+  getTableResponsiveCardClasses,
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
@@ -12,7 +13,6 @@ import {
   formatTableSortByText,
   getTableLabels,
   tableBaseClasses,
-  tableResponsiveCardClasses,
   tableResponsiveCardLabelClasses,
   tableResponsiveCardRowClasses,
   tableResponsiveCardTitleClasses,
@@ -83,6 +83,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   cardClassName,
   renderCard,
   cardLayout,
+  cardSelectionPosition = 'controls-row',
+  cardPadding,
   // v0.6.0 props
   virtual = false,
   autoVirtual = true,
@@ -270,10 +272,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   }, [cardLayout])
 
   const hasCustomCardLayout = useMemo(() => {
-    return (
-      ctx.displayColumns.some((col) => col.cardGrid) ||
-      (cardLayout && cardLayout.length > 0)
-    )
+    return ctx.displayColumns.some((col) => col.cardGrid) || (cardLayout && cardLayout.length > 0)
   }, [ctx.displayColumns, cardLayout])
 
   const virtualRecommendation = useMemo(
@@ -451,7 +450,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             </div>
           ) : null}
           {ctx.paginatedData.length === 0 ? (
-            <div className={tableResponsiveCardClasses}>
+            <div className={getTableResponsiveCardClasses(cardPadding)}>
               <Empty showImage={false} description={tableLabels.emptyText} />
             </div>
           ) : (
@@ -483,67 +482,66 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                 typeof cardClassName === 'function'
                   ? cardClassName(record as T, index)
                   : cardClassName
+              const controlsNode =
+                (internalRowSelection?.showCheckbox !== false && internalRowSelection) ||
+                (internalExpandable && isRowExpandable) ? (
+                  <>
+                    {internalRowSelection && internalRowSelection.showCheckbox !== false && (
+                      <span onClick={(event) => event.stopPropagation()}>
+                        {internalRowSelection.type === 'radio' ? (
+                          <Radio
+                            value={key}
+                            checked={isSelected}
+                            disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
+                            aria-label={formatTableSelectRowAriaLabel(
+                              tableLabels.selectRowAriaLabel,
+                              index + 1,
+                              tableLocale?.locale
+                            )}
+                            onChange={() => ctx.handleSelectRow(key, true)}
+                          />
+                        ) : (
+                          <Checkbox
+                            size="sm"
+                            checked={isSelected}
+                            disabled={internalRowSelection.getCheckboxProps?.(record)?.disabled}
+                            aria-label={formatTableSelectRowAriaLabel(
+                              tableLabels.selectRowAriaLabel,
+                              index + 1,
+                              tableLocale?.locale
+                            )}
+                            onChange={(checked) => ctx.handleSelectRow(key, checked)}
+                          />
+                        )}
+                      </span>
+                    )}
+                    {internalExpandable && isRowExpandable && (
+                      <button
+                        type="button"
+                        className="text-sm text-[var(--tiger-primary,#2563eb)]"
+                        aria-expanded={isExpanded}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          ctx.handleToggleExpand(key, record)
+                        }}>
+                        {isExpanded ? tableLabels.collapseText : tableLabels.expandText}
+                      </button>
+                    )}
+                  </>
+                ) : null
 
               return (
                 <div
                   key={key}
-                  className={classNames(tableResponsiveCardClasses, resolvedCardClassName)}
+                  className={classNames(
+                    getTableResponsiveCardClasses(cardPadding),
+                    resolvedCardClassName
+                  )}
                   onClick={() => ctx.handleRowClick(record, index, key)}>
                   {customCard !== undefined && customCard !== null ? (
                     (customCard as React.ReactNode)
                   ) : (
                     <>
-                      {(internalRowSelection?.showCheckbox !== false && internalRowSelection) ||
-                      (internalExpandable && isRowExpandable) ? (
-                        <div className="mb-2 flex items-center gap-3">
-                          {internalRowSelection && internalRowSelection.showCheckbox !== false && (
-                            <span onClick={(event) => event.stopPropagation()}>
-                              {internalRowSelection.type === 'radio' ? (
-                                <Radio
-                                  value={key}
-                                  checked={isSelected}
-                                  disabled={
-                                    internalRowSelection.getCheckboxProps?.(record)?.disabled
-                                  }
-                                  aria-label={formatTableSelectRowAriaLabel(
-                                    tableLabels.selectRowAriaLabel,
-                                    index + 1,
-                                    tableLocale?.locale
-                                  )}
-                                  onChange={() => ctx.handleSelectRow(key, true)}
-                                />
-                              ) : (
-                                <Checkbox
-                                  size="sm"
-                                  checked={isSelected}
-                                  disabled={
-                                    internalRowSelection.getCheckboxProps?.(record)?.disabled
-                                  }
-                                  aria-label={formatTableSelectRowAriaLabel(
-                                    tableLabels.selectRowAriaLabel,
-                                    index + 1,
-                                    tableLocale?.locale
-                                  )}
-                                  onChange={(checked) => ctx.handleSelectRow(key, checked)}
-                                />
-                              )}
-                            </span>
-                          )}
-                          {internalExpandable && isRowExpandable && (
-                            <button
-                              type="button"
-                              className="text-sm text-[var(--tiger-primary,#2563eb)]"
-                              aria-expanded={isExpanded}
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                ctx.handleToggleExpand(key, record)
-                              }}>
-                              {isExpanded ? tableLabels.collapseText : tableLabels.expandText}
-                            </button>
-                          )}
-                        </div>
-                      ) : null}
-
                       {(() => {
                         const { titleColumn, bodyColumns } = getCardColumns(ctx.displayColumns)
                         const renderCellContent = (column: TableColumn) => {
@@ -557,10 +555,23 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                           return (
                             <>
                               {titleColumn && (
-                                <div className={tableResponsiveCardTitleClasses}>
-                                  {renderCellContent(titleColumn)}
+                                <div
+                                  className={classNames(
+                                    tableResponsiveCardTitleClasses,
+                                    cardSelectionPosition === 'title-inline' &&
+                                      controlsNode &&
+                                      'flex items-center gap-3'
+                                  )}>
+                                  {cardSelectionPosition === 'title-inline' && controlsNode}
+                                  <span className="min-w-0 flex-1">
+                                    {renderCellContent(titleColumn)}
+                                  </span>
                                 </div>
                               )}
+                              {(!titleColumn || cardSelectionPosition !== 'title-inline') &&
+                                controlsNode && (
+                                  <div className="mb-2 flex items-center gap-3">{controlsNode}</div>
+                                )}
                               <div className="grid grid-cols-12 gap-3 mt-2">
                                 {bodyColumns.map((column) => {
                                   const layoutItem = cardLayoutMap.get(column.key)
@@ -568,7 +579,13 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
                                   if (gridInfo.hideLabel) {
                                     return (
-                                      <div key={column.key} className={gridInfo.className}>
+                                      <div
+                                        key={column.key}
+                                        className={classNames(
+                                          gridInfo.className,
+                                          gridInfo.divider &&
+                                            'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                                        )}>
                                         {renderCellContent(column)}
                                       </div>
                                     )
@@ -576,11 +593,25 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
                                   if (gridInfo.labelPosition === 'top') {
                                     return (
-                                      <div key={column.key} className={gridInfo.className}>
-                                        <div className="text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] mb-1">
+                                      <div
+                                        key={column.key}
+                                        className={classNames(
+                                          gridInfo.className,
+                                          gridInfo.divider &&
+                                            'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                                        )}>
+                                        <div
+                                          className={classNames(
+                                            'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] mb-1',
+                                            gridInfo.labelClassName
+                                          )}>
                                           {column.title}
                                         </div>
-                                        <div className="min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words">
+                                        <div
+                                          className={classNames(
+                                            'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
+                                            gridInfo.valueClassName
+                                          )}>
                                           {renderCellContent(column)}
                                         </div>
                                       </div>
@@ -592,12 +623,22 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                                       key={column.key}
                                       className={classNames(
                                         gridInfo.className,
-                                        'grid grid-cols-[auto_1fr] gap-2 items-baseline'
+                                        'grid grid-cols-[auto_1fr] gap-2 items-baseline',
+                                        gridInfo.divider &&
+                                          'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
                                       )}>
-                                      <div className="text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] shrink-0">
+                                      <div
+                                        className={classNames(
+                                          'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] shrink-0',
+                                          gridInfo.labelClassName
+                                        )}>
                                         {column.title}
                                       </div>
-                                      <div className="min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words">
+                                      <div
+                                        className={classNames(
+                                          'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
+                                          gridInfo.valueClassName
+                                        )}>
                                         {renderCellContent(column)}
                                       </div>
                                     </div>
@@ -611,10 +652,23 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                         return (
                           <>
                             {titleColumn && (
-                              <div className={tableResponsiveCardTitleClasses}>
-                                {renderCellContent(titleColumn)}
+                              <div
+                                className={classNames(
+                                  tableResponsiveCardTitleClasses,
+                                  cardSelectionPosition === 'title-inline' &&
+                                    controlsNode &&
+                                    'flex items-center gap-3'
+                                )}>
+                                {cardSelectionPosition === 'title-inline' && controlsNode}
+                                <span className="min-w-0 flex-1">
+                                  {renderCellContent(titleColumn)}
+                                </span>
                               </div>
                             )}
+                            {(!titleColumn || cardSelectionPosition !== 'title-inline') &&
+                              controlsNode && (
+                                <div className="mb-2 flex items-center gap-3">{controlsNode}</div>
+                              )}
                             {bodyColumns.map((column) => (
                               <div key={column.key} className={tableResponsiveCardRowClasses}>
                                 <div className={tableResponsiveCardLabelClasses}>

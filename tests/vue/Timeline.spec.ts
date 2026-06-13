@@ -13,6 +13,18 @@ describe('Timeline (Vue)', () => {
     expect(screen.getByText('Create project')).toBeTruthy()
   })
 
+  it('renders VNode item content', () => {
+    const items: TimelineItem[] = [
+      {
+        key: 1,
+        label: 'Now',
+        content: h('strong', { 'data-testid': 'rich-content' }, 'Updated profile')
+      }
+    ]
+    render(Timeline, { props: { items } })
+    expect(screen.getByTestId('rich-content')).toHaveTextContent('Updated profile')
+  })
+
   it('supports mode=right and mode=alternate', () => {
     const items: TimelineItem[] = [
       { key: 1, content: 'Event 1' },
@@ -75,7 +87,7 @@ describe('Timeline (Vue)', () => {
       props: { items },
       slots: {
         dot: () => h('div', {}, 'Dot'),
-        item: ({ item }: { item: TimelineItem }) => h('div', {}, `Custom: ${item.content}`)
+        item: ({ item }: { item: TimelineItem }) => h('div', {}, `Custom: ${String(item.content)}`)
       }
     })
 

@@ -15,6 +15,16 @@ describe('Timeline (React)', () => {
     expect(screen.getByText('Create project')).toBeTruthy()
   })
 
+  it('renders ReactNode item content', () => {
+    const items: TimelineItem[] = [
+      { key: 1, label: 'Now', content: <strong data-testid="rich-content">Updated profile</strong> }
+    ]
+
+    render(<Timeline items={items} />)
+
+    expect(screen.getByTestId('rich-content')).toHaveTextContent('Updated profile')
+  })
+
   it('supports mode=right and mode=alternate', () => {
     const items: TimelineItem[] = [
       { key: 1, content: 'Event 1' },
@@ -69,7 +79,7 @@ describe('Timeline (React)', () => {
       <Timeline
         items={items}
         renderDot={() => <div>Dot</div>}
-        renderItem={(item) => <div>Custom: {item.content}</div>}
+        renderItem={(item) => <div>Custom: {String(item.content)}</div>}
       />
     )
 

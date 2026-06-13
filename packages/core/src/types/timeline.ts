@@ -27,7 +27,7 @@ export interface TimelineItem {
   /**
    * Item content/description
    */
-  content?: string
+  content?: unknown
   /**
    * Item color (supports CSS color values)
    */

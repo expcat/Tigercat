@@ -167,7 +167,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
       rules,
       labelWidth,
       labelPosition = 'right',
-      labelAlign = 'right',
+      labelAlign,
       size = 'md',
       inlineMessage = true,
       showRequiredAsterisk = true,
@@ -187,6 +187,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
     },
     ref
   ) => {
+    const resolvedLabelAlign = labelAlign ?? (labelPosition === 'top' ? 'left' : 'right')
     const [errors, setErrors] = useState<FormError[]>([])
     const [formValues, setFormValues] = useState<FormValues>(model)
     const fieldRulesRef = React.useRef<FormRules>({})
@@ -627,7 +628,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
         rules,
         labelWidth,
         labelPosition,
-        labelAlign,
+        labelAlign: resolvedLabelAlign,
         size,
         inlineMessage,
         showRequiredAsterisk,
@@ -647,7 +648,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
         rules,
         labelWidth,
         labelPosition,
-        labelAlign,
+        resolvedLabelAlign,
         size,
         inlineMessage,
         showRequiredAsterisk,

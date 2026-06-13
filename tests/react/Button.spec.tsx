@@ -34,6 +34,18 @@ describe('Button', () => {
     expect(button).toHaveAttribute('aria-label', 'Custom label')
   })
 
+  it('warns when color is passed instead of variant', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+    render(<Button color="primary">Color prop</Button>)
+
+    expect(screen.getByRole('button', { name: 'Color prop' })).toBeInTheDocument()
+    expect(warn).toHaveBeenCalledWith(
+      '[Tigercat] Button does not support color. Use variant instead.'
+    )
+    warn.mockRestore()
+  })
+
   it('applies variant classes for each variant', () => {
     const variants = ['primary', 'secondary', 'outline', 'ghost', 'link'] as const
     for (const variant of variants) {

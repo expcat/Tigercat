@@ -18,6 +18,7 @@ import {
   getImmediateTigerLocale,
   getTableLabels,
   getTableWrapperClasses,
+  getTableResponsiveCardClasses,
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
@@ -25,7 +26,6 @@ import {
   mergeTigerLocale,
   resolveTigerLocale,
   tableBaseClasses,
-  tableResponsiveCardClasses,
   tableResponsiveCardLabelClasses,
   tableResponsiveCardRowClasses,
   tableResponsiveCardTitleClasses,
@@ -149,7 +149,9 @@ export const Table = defineComponent({
 
     const tableLabels = computed(() => {
       const overrides =
-        props.emptyText === undefined ? props.labels : { ...props.labels, emptyText: props.emptyText }
+        props.emptyText === undefined
+          ? props.labels
+          : { ...props.labels, emptyText: props.emptyText }
       return getTableLabels(tableLocale.value, overrides)
     })
 
@@ -289,275 +291,314 @@ export const Table = defineComponent({
 
         if (sortableColumns.length > 0) {
           cardChildren.push(
-            h('div', {
-              class:
-                'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2'
-            }, [
-              h(Select, {
-                size: 'sm',
-                modelValue:
-                  ctx.sortState.value.key && ctx.sortState.value.direction
-                    ? `${ctx.sortState.value.key}:${ctx.sortState.value.direction}`
-                    : '',
-                options: [
-                  { label: tableLabels.value.clearSortText, value: '' },
-                  ...sortableColumns.flatMap((column) => [
-                    {
-                      label: `${formatTableSortByText(tableLabels.value.sortByText, column.title)} ↑`,
-                      value: `${column.key}:asc`
-                    },
-                    {
-                      label: `${formatTableSortByText(tableLabels.value.sortByText, column.title)} ↓`,
-                      value: `${column.key}:desc`
+            h(
+              'div',
+              {
+                class:
+                  'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2'
+              },
+              [
+                h(Select, {
+                  size: 'sm',
+                  modelValue:
+                    ctx.sortState.value.key && ctx.sortState.value.direction
+                      ? `${ctx.sortState.value.key}:${ctx.sortState.value.direction}`
+                      : '',
+                  options: [
+                    { label: tableLabels.value.clearSortText, value: '' },
+                    ...sortableColumns.flatMap((column) => [
+                      {
+                        label: `${formatTableSortByText(tableLabels.value.sortByText, column.title)} ↑`,
+                        value: `${column.key}:asc`
+                      },
+                      {
+                        label: `${formatTableSortByText(tableLabels.value.sortByText, column.title)} ↓`,
+                        value: `${column.key}:desc`
+                      }
+                    ])
+                  ],
+                  clearable: false,
+                  'onUpdate:modelValue': (value: string | number | undefined) => {
+                    const nextValue = String(value ?? '')
+                    if (!nextValue) {
+                      ctx.handleSetSort({ key: null, direction: null })
+                      return
                     }
-                  ])
-                ],
-                clearable: false,
-                'onUpdate:modelValue': (value: string | number | undefined) => {
-                  const nextValue = String(value ?? '')
-                  if (!nextValue) {
-                    ctx.handleSetSort({ key: null, direction: null })
-                    return
+                    const separatorIndex = nextValue.lastIndexOf(':')
+                    const key = nextValue.slice(0, separatorIndex)
+                    const direction = nextValue.slice(separatorIndex + 1) as 'asc' | 'desc'
+                    ctx.handleSetSort({ key, direction })
                   }
-                  const separatorIndex = nextValue.lastIndexOf(':')
-                  const key = nextValue.slice(0, separatorIndex)
-                  const direction = nextValue.slice(separatorIndex + 1) as 'asc' | 'desc'
-                  ctx.handleSetSort({ key, direction })
-                }
-              })
-            ])
+                })
+              ]
+            )
           )
         }
 
         if (ctx.paginatedData.value.length === 0) {
           cardChildren.push(
-            h('div', { class: tableResponsiveCardClasses }, [
+            h('div', { class: getTableResponsiveCardClasses(resolvedProps.cardPadding) }, [
               h(Empty, { showImage: false, description: tableLabels.value.emptyText })
             ])
           )
         } else {
           cardChildren.push(
             ...ctx.paginatedData.value.map((record, index) => {
-                    const key = ctx.paginatedRowKeys.value[index]
-                    const isExpanded = ctx.expandedRowKeySet.value.has(key)
-                    const isSelected = ctx.selectedRowKeySet.value.has(key)
-                    const isRowExpandable = resolvedProps.expandable
-                      ? resolvedProps.expandable.rowExpandable
-                        ? resolvedProps.expandable.rowExpandable(record)
-                        : true
-                      : false
+              const key = ctx.paginatedRowKeys.value[index]
+              const isExpanded = ctx.expandedRowKeySet.value.has(key)
+              const isSelected = ctx.selectedRowKeySet.value.has(key)
+              const isRowExpandable = resolvedProps.expandable
+                ? resolvedProps.expandable.rowExpandable
+                  ? resolvedProps.expandable.rowExpandable(record)
+                  : true
+                : false
 
-                    const { titleColumn, bodyColumns } = getCardColumns(ctx.displayColumns.value)
-                    const renderCardCellContent = (column: TableColumn) => {
-                      const dataKey = column.dataKey || column.key
-                      return (
-                        slots[`cell-${column.key}`]?.({ record, index }) ??
-                        (column.render
-                          ? (column.render(record, index) as string)
-                          : (record[dataKey] as string))
-                      )
-                    }
+              const { titleColumn, bodyColumns } = getCardColumns(ctx.displayColumns.value)
+              const renderCardCellContent = (column: TableColumn) => {
+                const dataKey = column.dataKey || column.key
+                return (
+                  slots[`cell-${column.key}`]?.({ record, index }) ??
+                  (column.render
+                    ? (column.render(record, index) as string)
+                    : (record[dataKey] as string))
+                )
+              }
 
-                    const titleNode = titleColumn
-                      ? h('div', { class: tableResponsiveCardTitleClasses }, [
-                          renderCardCellContent(titleColumn)
-                        ])
-                      : null
+              const titleNode = titleColumn
+                ? h('div', { class: tableResponsiveCardTitleClasses }, [
+                    renderCardCellContent(titleColumn)
+                  ])
+                : null
 
-                    const rows = hasCustomCardLayout.value
-                      ? [
-                          h(
+              const rows = hasCustomCardLayout.value
+                ? [
+                    h(
+                      'div',
+                      { class: 'grid grid-cols-12 gap-3 mt-2' },
+                      bodyColumns.map((column) => {
+                        const layoutItem = cardLayoutMap.value.get(column.key)
+                        const gridInfo = getCardGridInfo(column, layoutItem)
+
+                        if (gridInfo.hideLabel) {
+                          return h(
                             'div',
-                            { class: 'grid grid-cols-12 gap-3 mt-2' },
-                            bodyColumns.map((column) => {
-                              const layoutItem = cardLayoutMap.value.get(column.key)
-                              const gridInfo = getCardGridInfo(column, layoutItem)
+                            {
+                              key: column.key,
+                              class: classNames(
+                                gridInfo.className,
+                                gridInfo.divider &&
+                                  'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                              )
+                            },
+                            [renderCardCellContent(column)]
+                          )
+                        }
 
-                              if (gridInfo.hideLabel) {
-                                return h(
-                                  'div',
-                                  { key: column.key, class: gridInfo.className },
-                                  [renderCardCellContent(column)]
-                                )
-                              }
-
-                              if (gridInfo.labelPosition === 'top') {
-                                return h(
-                                  'div',
-                                  { key: column.key, class: gridInfo.className },
-                                  [
-                                    h(
-                                      'div',
-                                      {
-                                        class:
-                                          'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] mb-1'
-                                      },
-                                      column.title
-                                    ),
-                                    h(
-                                      'div',
-                                      {
-                                        class:
-                                          'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words'
-                                      },
-                                      [renderCardCellContent(column)]
-                                    )
-                                  ]
-                                )
-                              }
-
-                              return h(
+                        if (gridInfo.labelPosition === 'top') {
+                          return h(
+                            'div',
+                            {
+                              key: column.key,
+                              class: classNames(
+                                gridInfo.className,
+                                gridInfo.divider &&
+                                  'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                              )
+                            },
+                            [
+                              h(
                                 'div',
                                 {
-                                  key: column.key,
                                   class: classNames(
-                                    gridInfo.className,
-                                    'grid grid-cols-[auto_1fr] gap-2 items-baseline'
+                                    'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] mb-1',
+                                    gridInfo.labelClassName
                                   )
                                 },
-                                [
-                                  h(
-                                    'div',
-                                    {
-                                      class:
-                                        'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] shrink-0'
-                                    },
-                                    column.title
-                                  ),
-                                  h(
-                                    'div',
-                                    {
-                                      class:
-                                        'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words'
-                                    },
-                                    [renderCardCellContent(column)]
+                                column.title
+                              ),
+                              h(
+                                'div',
+                                {
+                                  class: classNames(
+                                    'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
+                                    gridInfo.valueClassName
                                   )
-                                ]
+                                },
+                                [renderCardCellContent(column)]
                               )
-                            })
-                          )
-                        ]
-                      : bodyColumns.map((column) =>
-                          h(
-                            'div',
-                            { key: column.key, class: tableResponsiveCardRowClasses },
-                            [
-                              h('div', { class: tableResponsiveCardLabelClasses }, column.title),
-                              h('div', { class: tableResponsiveCardValueClasses }, [
-                                renderCardCellContent(column)
-                              ])
                             ]
                           )
-                        )
+                        }
 
-                    const controls = []
-                    if (
-                      resolvedProps.rowSelection &&
-                      resolvedProps.rowSelection.showCheckbox !== false
-                    ) {
-                      const checkboxProps =
-                        resolvedProps.rowSelection.getCheckboxProps?.(record) || {}
-                      controls.push(
-                        h(
-                          'span',
-                          { onClick: (event: Event) => event.stopPropagation() },
+                        return h(
+                          'div',
+                          {
+                            key: column.key,
+                            class: classNames(
+                              gridInfo.className,
+                              'grid grid-cols-[auto_1fr] gap-2 items-baseline',
+                              gridInfo.divider &&
+                                'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                            )
+                          },
                           [
-                            resolvedProps.rowSelection.type === 'radio'
-                              ? h(Radio, {
-                                  value: key,
-                                  checked: isSelected,
-                                  disabled: checkboxProps.disabled,
-                                  'aria-label': formatTableSelectRowAriaLabel(
-                                    tableLabels.value.selectRowAriaLabel,
-                                    index + 1,
-                                    tableLocale.value?.locale
-                                  ),
-                                  onChange: () => ctx.handleSelectRow(key, true)
-                                })
-                              : h(Checkbox, {
-                                  size: 'sm',
-                                  modelValue: isSelected,
-                                  disabled: checkboxProps.disabled,
-                                  'aria-label': formatTableSelectRowAriaLabel(
-                                    tableLabels.value.selectRowAriaLabel,
-                                    index + 1,
-                                    tableLocale.value?.locale
-                                  ),
-                                  onChange: (checked: boolean) =>
-                                    ctx.handleSelectRow(key, checked)
-                                })
+                            h(
+                              'div',
+                              {
+                                class: classNames(
+                                  'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] shrink-0',
+                                  gridInfo.labelClassName
+                                )
+                              },
+                              column.title
+                            ),
+                            h(
+                              'div',
+                              {
+                                class: classNames(
+                                  'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
+                                  gridInfo.valueClassName
+                                )
+                              },
+                              [renderCardCellContent(column)]
+                            )
                           ]
                         )
-                      )
-                    }
-                    if (resolvedProps.expandable && isRowExpandable) {
-                      controls.push(
-                        h(
-                          'button',
-                          {
-                            type: 'button',
-                            class: 'text-sm text-[var(--tiger-primary,#2563eb)]',
-                            'aria-expanded': isExpanded,
-                            onClick: (event: Event) => {
-                              event.stopPropagation()
-                              ctx.handleToggleExpand(key, record)
-                            }
-                          },
-                          isExpanded ? tableLabels.value.collapseText : tableLabels.value.expandText
-                        )
-                      )
-                    }
+                      })
+                    )
+                  ]
+                : bodyColumns.map((column) =>
+                    h('div', { key: column.key, class: tableResponsiveCardRowClasses }, [
+                      h('div', { class: tableResponsiveCardLabelClasses }, column.title),
+                      h('div', { class: tableResponsiveCardValueClasses }, [
+                        renderCardCellContent(column)
+                      ])
+                    ])
+                  )
 
-                    const expandedContent =
-                      resolvedProps.expandable && isExpanded && isRowExpandable
-                        ? (slots['expanded-row']?.({ record, index }) ??
-                          resolvedProps.expandable.expandedRowRender?.(record, index))
-                        : null
+              const controls = []
+              if (resolvedProps.rowSelection && resolvedProps.rowSelection.showCheckbox !== false) {
+                const checkboxProps = resolvedProps.rowSelection.getCheckboxProps?.(record) || {}
+                controls.push(
+                  h('span', { onClick: (event: Event) => event.stopPropagation() }, [
+                    resolvedProps.rowSelection.type === 'radio'
+                      ? h(Radio, {
+                          value: key,
+                          checked: isSelected,
+                          disabled: checkboxProps.disabled,
+                          'aria-label': formatTableSelectRowAriaLabel(
+                            tableLabels.value.selectRowAriaLabel,
+                            index + 1,
+                            tableLocale.value?.locale
+                          ),
+                          onChange: () => ctx.handleSelectRow(key, true)
+                        })
+                      : h(Checkbox, {
+                          size: 'sm',
+                          modelValue: isSelected,
+                          disabled: checkboxProps.disabled,
+                          'aria-label': formatTableSelectRowAriaLabel(
+                            tableLabels.value.selectRowAriaLabel,
+                            index + 1,
+                            tableLocale.value?.locale
+                          ),
+                          onChange: (checked: boolean) => ctx.handleSelectRow(key, checked)
+                        })
+                  ])
+                )
+              }
+              if (resolvedProps.expandable && isRowExpandable) {
+                controls.push(
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: 'text-sm text-[var(--tiger-primary,#2563eb)]',
+                      'aria-expanded': isExpanded,
+                      onClick: (event: Event) => {
+                        event.stopPropagation()
+                        ctx.handleToggleExpand(key, record)
+                      }
+                    },
+                    isExpanded ? tableLabels.value.collapseText : tableLabels.value.expandText
+                  )
+                )
+              }
 
-                    const cardContext = {
-                      record,
-                      index,
-                      columns: ctx.displayColumns.value,
-                      selected: isSelected,
-                      expanded: isExpanded,
-                      toggleExpand: () => ctx.handleToggleExpand(key, record),
-                      selectRow: (checked: boolean) => ctx.handleSelectRow(key, checked)
-                    }
-                    const customCard =
-                      slots.card?.(cardContext) ?? resolvedProps.renderCard?.(cardContext)
-                    const resolvedCardClassName =
-                      typeof resolvedProps.cardClassName === 'function'
-                        ? resolvedProps.cardClassName(record, index)
-                        : resolvedProps.cardClassName
-
-                    return h(
+              const titleWithInlineControls =
+                titleNode &&
+                resolvedProps.cardSelectionPosition === 'title-inline' &&
+                controls.length
+                  ? h(
                       'div',
                       {
-                        key,
-                        class: classNames(tableResponsiveCardClasses, resolvedCardClassName),
-                        onClick: () => ctx.handleRowClick(record, index, key)
+                        class: classNames(
+                          tableResponsiveCardTitleClasses,
+                          'flex items-center gap-3'
+                        )
                       },
-                      customCard !== undefined && customCard !== null
-                        ? [customCard as VNodeChild]
-                        : [
-                            controls.length
-                              ? h('div', { class: 'mb-2 flex items-center gap-3' }, controls)
-                              : null,
-                            titleNode,
-                            ...rows,
-                            expandedContent
-                              ? h(
-                                  'div',
-                                  {
-                                    class:
-                                      'mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
-                                  },
-                                  [expandedContent as VNodeChild]
-                                )
-                              : null
-                          ]
+                      [
+                        ...controls,
+                        h('span', { class: 'min-w-0 flex-1' }, [
+                          renderCardCellContent(titleColumn!)
+                        ])
+                      ]
                     )
-                  })
+                  : titleNode
+
+              const expandedContent =
+                resolvedProps.expandable && isExpanded && isRowExpandable
+                  ? (slots['expanded-row']?.({ record, index }) ??
+                    resolvedProps.expandable.expandedRowRender?.(record, index))
+                  : null
+
+              const cardContext = {
+                record,
+                index,
+                columns: ctx.displayColumns.value,
+                selected: isSelected,
+                expanded: isExpanded,
+                toggleExpand: () => ctx.handleToggleExpand(key, record),
+                selectRow: (checked: boolean) => ctx.handleSelectRow(key, checked)
+              }
+              const customCard =
+                slots.card?.(cardContext) ?? resolvedProps.renderCard?.(cardContext)
+              const resolvedCardClassName =
+                typeof resolvedProps.cardClassName === 'function'
+                  ? resolvedProps.cardClassName(record, index)
+                  : resolvedProps.cardClassName
+
+              return h(
+                'div',
+                {
+                  key,
+                  class: classNames(
+                    getTableResponsiveCardClasses(resolvedProps.cardPadding),
+                    resolvedCardClassName
+                  ),
+                  onClick: () => ctx.handleRowClick(record, index, key)
+                },
+                customCard !== undefined && customCard !== null
+                  ? [customCard as VNodeChild]
+                  : [
+                      controls.length &&
+                      (!titleNode || resolvedProps.cardSelectionPosition !== 'title-inline')
+                        ? h('div', { class: 'mb-2 flex items-center gap-3' }, controls)
+                        : null,
+                      titleWithInlineControls,
+                      ...rows,
+                      expandedContent
+                        ? h(
+                            'div',
+                            {
+                              class: 'mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                            },
+                            [expandedContent as VNodeChild]
+                          )
+                        : null
+                    ]
+              )
+            })
           )
         }
 

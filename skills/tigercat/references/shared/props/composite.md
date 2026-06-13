@@ -87,16 +87,13 @@ Uses: `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
 Note: 这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`filters` 默认渲染 Select；需要 Input、DatePicker、年龄段等复合控件时用 `filters[].render(context)`，或在尾部注入 Vue `#filters-extra` / React `toolbar.filtersExtra`。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列。
 
-Showing 6 key props; see source for the complete interface.
+Showing 3 key props of 17; see source for the complete interface.
 
-| Prop                  | Type                                                               | Default | Notes                               |
-| --------------------- | ------------------------------------------------------------------ | ------- | ----------------------------------- |
-| `searchValue?`        | `string`                                                           | `-`     | Search value (controlled)           |
-| `defaultSearchValue?` | `string`                                                           | `-`     | Default search value (uncontrolled) |
-| `searchPlaceholder?`  | `string`                                                           | `-`     | Search input placeholder            |
-| `filters?`            | `TableToolbarFilter[]`                                             | `-`     | Select filters or custom renderers  |
-| `filtersExtra?`       | `unknown \| ((context: TableToolbarFiltersExtraContext) => unknown)` | `-`     | Extra content after filters         |
-| `showColumnSettings?` | `boolean`                                                          | `false` | Show column settings popover        |
+| Prop                  | Type     | Default | Notes                               |
+| --------------------- | -------- | ------- | ----------------------------------- |
+| `searchValue?`        | `string` | `-`     | Search value (controlled)           |
+| `defaultSearchValue?` | `string` | `-`     | Default search value (uncontrolled) |
+| `searchPlaceholder?`  | `string` | `-`     | Search input placeholder            |
 
 Events/callback props: `onSearchChange?`, `onSearch?`, `onFiltersChange?`, `onBulkAction?`.
 
@@ -104,7 +101,8 @@ Custom filter context: `filters[].render({ filter, value, filters, setValue, set
 
 ### Per-filter container styling
 
-`filters[].itemClass` 和 `filters[].itemStyle` 可逐项定制 filter 容器样式。`itemClass` 使用**替换语义**——提供时整体替换默认宽度类，不追加。默认宽度类：
+`filters[].itemClass` 和 `filters[].itemStyle` 可逐项定制 filter 容器样式。 `itemClass` 使用**替换语义**——提供时整体替换默认宽度类，不追加。默认宽度类：
+
 - Select 型 filter：`w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]`
 - 自定义 render 型 filter：`w-full sm:w-auto`
 
@@ -112,29 +110,17 @@ Custom filter context: `filters[].render({ filter, value, filters, setValue, set
 
 ### Toolbar container and search styling
 
-| Prop               | Semantics | Default classes                                            |
-| ------------------ | --------- | ---------------------------------------------------------- |
-| `className?`       | **追加**  | 追加到 `flex flex-wrap items-center gap-3 p-4` 之后        |
-| `style?`           | 内联样式  | 作为 CSS 内联样式确定性覆盖间距等                          |
+| Prop               | Semantics | Default classes                                                                                      |
+| ------------------ | --------- | ---------------------------------------------------------------------------------------------------- |
+| `className?`       | **追加**  | 追加到 `flex flex-wrap items-center gap-3 p-4` 之后                                                  |
+| `style?`           | 内联样式  | 作为 CSS 内联样式确定性覆盖间距等                                                                    |
 | `searchClassName?` | **替换**  | 替换默认 `w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]`，结构类 `flex items-center gap-2` 保留 |
 
 ### Full toolbar replacement
 
 Vue 通过 `#toolbar` 作用域插槽，React 通过 `toolbar.render`（函数或 ReactNode），完全替换内置工具栏区域（含 `role="toolbar"` 容器）。
 
-`TableToolbarRenderContext` 字段：
-
-| Field                | Type                                                | Description                                              |
-| -------------------- | --------------------------------------------------- | -------------------------------------------------------- |
-| `searchValue`        | `string`                                            | 当前搜索值                                               |
-| `setSearch`          | `(value: string) => void`                           | 更新搜索值并触发 `search-change`/`onSearchChange`        |
-| `submitSearch`       | `() => void`                                        | 触发 `search`/`onSearch`                                 |
-| `filters`            | `Record<string, TableToolbarFilterValue>`            | 当前筛选值                                               |
-| `setFilter`          | `(key: string, value: TableToolbarFilterValue) => void` | 更新筛选值并触发 `filters-change`/`onFiltersChange`  |
-| `selectedKeys`       | `(string \| number)[]`                              | 当前选中行 keys                                          |
-| `selectedCount`      | `number`                                            | 选中行数量                                               |
-| `hiddenColumnKeys`   | `string[]`                                          | 当前隐藏列 keys                                          |
-| `setHiddenColumnKeys`| `(keys: string[]) => void`                          | 更新隐藏列并触发 `update:hiddenColumnKeys`/`onHiddenColumnsChange` |
+`TableToolbarRenderContext` 字段：`searchValue`, `setSearch`, `submitSearch`, `filters`, `setFilter`, `selectedKeys`, `selectedCount`, `hiddenColumnKeys`, `setHiddenColumnKeys`。
 
 > **a11y 注意**：使用自定义 toolbar 时，内置 `role="toolbar"` 容器不再渲染，调用方应自行在自定义 toolbar 根元素上添加 `role="toolbar"` 和 `aria-label`。
 
@@ -144,18 +130,16 @@ Source: `packages/core/src/types/composite.ts` · Interface: `DataTableWithToolb
 
 Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
-Note: 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；自定义网格可用列级 `cardGrid` 或表级 `cardLayout`，`cardLayout` 优先于 `cardGrid`，最窄屏默认单列，`sm` 及以上按 `colSpan` 混排。`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.filters[].render`、Vue `#filters-extra` 和 React `toolbar.filtersExtra` 可在工具栏过滤区放入自定义控件。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。
+Note: 透传 Table props；卡片模式同样通过 `responsiveMode="card"` / `responsive-mode="card"`、`cardBreakpoint` 和列级 `hideInCard` / `cardTitle` / `cardPriority` 配置；自定义网格可用列级 `cardGrid` 或表级 `cardLayout`，`cardLayout` 优先于 `cardGrid`，最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName` 和 `valueClassName` 做轻量布局调整。`pagination` 沿用 Table 的 `PaginationConfig`、`ConfigProvider` locale 和 `pagination.locale` 覆盖规则。`toolbar.filters[].render`、Vue `#filters-extra` 和 React `toolbar.filtersExtra` 可在工具栏过滤区放入自定义控件。`toolbar.showColumnSettings` 开启列设置入口，列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）驱动，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`。
 
-卡片自定义（公开 API）：`renderCard(context)` / `cardClassName`（`string` 或 `(record, index) => string`）已在 `DataTableWithToolbar` 显式声明并转发给内部 Table；Vue 侧另有 `#card="{ record, index, columns, selected, expanded, toggleExpand, selectRow }"` 作用域插槽，**插槽优先于 `renderCard` prop**。
-
-| Prop             | Type                                                          | Default | Notes                                            |
-| ---------------- | ------------------------------------------------------------- | ------- | ------------------------------------------------ |
-| `toolbar?`       | `TableToolbarProps`                                           | `-`     | Toolbar configuration                            |
-| `pagination?`    | `PaginationConfig \| false`                                   | `-`     | Pagination configuration Set to false to disable |
-| `renderCard?`    | `(context: TableCardRenderContext) => unknown`                | `-`     | Card mode custom renderer (forwarded to Table)   |
-| `cardClassName?` | `string \| ((record, index) => string)`                       | `-`     | Card container class (forwarded to Table)        |
+| Prop          | Type                        | Default | Notes                                            |
+| ------------- | --------------------------- | ------- | ------------------------------------------------ |
+| `toolbar?`    | `TableToolbarProps`         | `-`     | Toolbar configuration                            |
+| `pagination?` | `PaginationConfig \| false` | `-`     | Pagination configuration Set to false to disable |
 
 Events/callback props: `onPageChange?`, `onPageSizeChange?`.
+
+卡片自定义（公开 API）：`renderCard(context)` / `cardClassName`（`string` 或 `(record, index) => string`）已在 `DataTableWithToolbar` 显式声明并转发给内部 Table；Vue 侧另有 `#card="{ record, index, columns, selected, expanded, toggleExpand, selectRow }"` 作用域插槽，**插槽优先于 `renderCard` prop**。
 
 ## FormWizard
 

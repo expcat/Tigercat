@@ -192,7 +192,16 @@ describe('Table', () => {
     it('uses cardLayout ahead of column-level cardGrid options', () => {
       const cardColumns: TableColumn[] = [
         { key: 'name', title: 'Name', cardTitle: true },
-        { key: 'email', title: 'Email', cardGrid: { colSpan: 6, labelPosition: 'top' } }
+        {
+          key: 'email',
+          title: 'Email',
+          cardGrid: {
+            colSpan: 6,
+            labelPosition: 'top',
+            labelClassName: 'column-label',
+            valueClassName: 'column-value'
+          }
+        }
       ]
       const { container } = render(
         <Table
@@ -201,7 +210,15 @@ describe('Table', () => {
           responsiveMode="card"
           pagination={false}
           cardLayout={[
-            { key: 'email', colSpan: 3, rowSpan: 2, hideLabel: true, labelPosition: 'left' }
+            {
+              key: 'email',
+              colSpan: 3,
+              rowSpan: 2,
+              labelPosition: 'top',
+              divider: true,
+              labelClassName: 'layout-label',
+              valueClassName: 'layout-value'
+            }
           ]}
         />
       )
@@ -209,9 +226,57 @@ describe('Table', () => {
       const emailField = container.querySelector(
         '[data-tiger-table-mobile="card"] .grid-cols-12 > div'
       )!
-      expect(emailField).toHaveClass('col-span-12', 'sm:col-span-3', 'row-span-2')
+      expect(emailField).toHaveClass(
+        'col-span-12',
+        'sm:col-span-3',
+        'row-span-2',
+        'border-t',
+        'pt-3'
+      )
       expect(emailField).toHaveTextContent('john@example.com')
-      expect(emailField).not.toHaveTextContent('Email')
+      expect(emailField.querySelector('.layout-label')).toHaveTextContent('Email')
+      expect(emailField.querySelector('.layout-value')).toHaveTextContent('john@example.com')
+      expect(emailField.querySelector('.column-label')).not.toBeInTheDocument()
+    })
+
+    it('supports inline selection controls and configurable card padding', () => {
+      const { container, getByLabelText } = render(
+        <Table
+          columns={[
+            { key: 'name', title: 'Name', cardTitle: true },
+            { key: 'age', title: 'Age' }
+          ]}
+          dataSource={[dataSource[0]]}
+          responsiveMode="card"
+          pagination={false}
+          rowSelection={{ type: 'checkbox' }}
+          cardSelectionPosition="title-inline"
+          cardPadding={false}
+          labels={{ selectRowAriaLabel: 'Pick row {row}' }}
+        />
+      )
+
+      const card = container.querySelector('[data-tiger-table-mobile="card"] > div:nth-child(2)')!
+      const title = card.querySelector('.font-semibold')!
+      expect(card).not.toHaveClass('p-3')
+      expect(title).toHaveClass('flex', 'items-center')
+      expect(title).toContainElement(getByLabelText('Pick row 1'))
+    })
+
+    it('uses custom card padding classes', () => {
+      const { container } = render(
+        <Table
+          columns={columns}
+          dataSource={[dataSource[0]]}
+          responsiveMode="card"
+          pagination={false}
+          cardPadding="p-4"
+        />
+      )
+
+      const card = container.querySelector('[data-tiger-table-mobile="card"] > div')!
+      expect(card).toHaveClass('p-4')
+      expect(card).not.toHaveClass('p-3')
     })
 
     it('uses table labels and themed selection controls in card mode', async () => {

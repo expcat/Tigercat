@@ -2,12 +2,14 @@ import { defineComponent, h, PropType, computed } from 'vue'
 import {
   classNames,
   coerceClassValue,
-  layoutHeaderClasses,
+  getLayoutHeaderClasses,
   mergeStyleValues
 } from '@expcat/tigercat-core'
+import type { HeaderVariant } from '@expcat/tigercat-core'
 
 export interface VueHeaderProps {
   className?: string
+  variant?: HeaderVariant
   height?: string
   style?: Record<string, string | number>
 }
@@ -22,6 +24,14 @@ export const Header = defineComponent({
     className: {
       type: String as PropType<string>,
       default: undefined
+    },
+    /**
+     * Header visual style.
+     * @default 'default'
+     */
+    variant: {
+      type: String as PropType<HeaderVariant>,
+      default: 'default' as HeaderVariant
     },
     /**
      * Header height (CSS value)
@@ -43,7 +53,7 @@ export const Header = defineComponent({
   setup(props, { slots, attrs }) {
     const headerClasses = computed(() =>
       classNames(
-        layoutHeaderClasses,
+        getLayoutHeaderClasses(props.variant),
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )

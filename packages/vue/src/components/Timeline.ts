@@ -173,7 +173,9 @@ export const Timeline = defineComponent({
       }
 
       if (item.content) {
-        contentChildren.push(h('div', { class: timelineDescriptionClasses }, item.content))
+        contentChildren.push(
+          h('div', { class: timelineDescriptionClasses }, item.content as unknown as HChildren)
+        )
       }
 
       return h('li', { key, class: itemClasses }, [

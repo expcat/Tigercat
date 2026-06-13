@@ -45,6 +45,14 @@ const CloseIcon: React.FC = () => (
   </svg>
 )
 
+let warnedUnsupportedColorProp = false
+
+function warnUnsupportedColorPropIfNeeded(props: Record<string, unknown>): void {
+  if (!('color' in props) || warnedUnsupportedColorProp) return
+  warnedUnsupportedColorProp = true
+  console.warn('[Tigercat] Tag does not support color. Use variant instead.')
+}
+
 export const Tag: React.FC<TagProps> = ({
   variant = 'default',
   size = 'md',
@@ -55,6 +63,7 @@ export const Tag: React.FC<TagProps> = ({
   className,
   ...props
 }) => {
+  warnUnsupportedColorPropIfNeeded(props as Record<string, unknown>)
   const [isVisible, setIsVisible] = useState(true)
 
   const tagClasses = useMemo(

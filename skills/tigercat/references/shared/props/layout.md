@@ -91,10 +91,11 @@ Source: `packages/core/src/types/layout.ts` · Interface: `LayoutProps`.
 
 Source: `packages/core/src/types/layout.ts` · Interface: `HeaderProps`.
 
-| Prop         | Type     | Default  | Notes                  |
-| ------------ | -------- | -------- | ---------------------- |
-| `className?` | `string` | `-`      | Additional CSS classes |
-| `height?`    | `string` | `'64px'` | Header height          |
+| Prop         | Type            | Default     | Notes                  |
+| ------------ | --------------- | ----------- | ---------------------- |
+| `className?` | `string`        | `-`         | Additional CSS classes |
+| `variant?`   | `HeaderVariant` | `'default'` | Header visual style.   |
+| `height?`    | `string`        | `'64px'`    | Header height          |
 
 ## Sidebar
 
@@ -112,9 +113,10 @@ Showing 3 key props of 4; see source for the complete interface.
 
 Source: `packages/core/src/types/layout.ts` · Interface: `ContentProps`.
 
-| Prop         | Type     | Default | Notes                  |
-| ------------ | -------- | ------- | ---------------------- |
-| `className?` | `string` | `-`     | Additional CSS classes |
+| Prop         | Type                | Default | Notes                                                                                      |
+| ------------ | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `className?` | `string`            | `-`     | Additional CSS classes                                                                     |
+| `padding?`   | `boolean \| string` | `true`  | Built-in content padding. true keeps the default p-6, false removes it, and a string is... |
 
 ## Footer
 

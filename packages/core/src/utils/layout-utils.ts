@@ -1,3 +1,6 @@
+import { classNames } from './class-names'
+import type { HeaderVariant } from '../types/layout'
+
 /**
  * Layout component shared classes
  *
@@ -8,6 +11,17 @@ export const layoutRootClasses = 'tiger-layout flex flex-col min-h-screen'
 
 export const layoutHeaderClasses =
   'tiger-header bg-[var(--tiger-surface,#ffffff)] border-b border-[var(--tiger-border,#e5e7eb)]'
+
+const layoutHeaderVariantClasses: Record<HeaderVariant, string> = {
+  default: '',
+  translucent:
+    'bg-[var(--tiger-surface,#ffffff)]/80 backdrop-blur-[var(--tiger-blur-glass,16px)] supports-[backdrop-filter]:bg-[var(--tiger-surface,#ffffff)]/70',
+  blur: 'bg-[var(--tiger-surface,#ffffff)]/80 backdrop-blur-[var(--tiger-blur-glass-strong,24px)] supports-[backdrop-filter]:bg-[var(--tiger-surface,#ffffff)]/70 shadow-sm'
+}
+
+export function getLayoutHeaderClasses(variant: HeaderVariant = 'default'): string {
+  return classNames(layoutHeaderClasses, layoutHeaderVariantClasses[variant])
+}
 
 export const layoutSidebarClasses =
   'tiger-sidebar bg-[var(--tiger-surface,#ffffff)] border-r border-[var(--tiger-border,#e5e7eb)] overflow-hidden transition-all duration-300'
@@ -27,7 +41,14 @@ export function getSidebarStyle(
 }
 
 export const layoutContentClasses =
-  'tiger-content flex-1 bg-[var(--tiger-layout-content-bg,#f9fafb)] p-6'
+  'tiger-content flex-1 bg-[var(--tiger-layout-content-bg,#f9fafb)]'
+
+export function getLayoutContentClasses(padding: boolean | string = true): string {
+  return classNames(
+    layoutContentClasses,
+    padding === false ? undefined : typeof padding === 'string' ? padding : 'p-6'
+  )
+}
 
 export const layoutFooterClasses =
   'tiger-footer bg-[var(--tiger-surface,#ffffff)] border-t border-[var(--tiger-border,#e5e7eb)] p-4'

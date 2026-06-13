@@ -127,6 +127,19 @@ describe('Form', () => {
       )
 
       expect(container.querySelector('.tiger-form--label-top')).toBeInTheDocument()
+      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-left')
+    })
+
+    it('keeps explicit top label alignment', () => {
+      const { container } = render(
+        <Form model={{}} labelPosition="top" labelAlign="right">
+          <FormItem label="Name">
+            <input type="text" />
+          </FormItem>
+        </Form>
+      )
+
+      expect(container.querySelector('.tiger-form-item__label')).toHaveClass('text-right')
     })
 
     it('applies custom label width', () => {

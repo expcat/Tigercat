@@ -128,7 +128,7 @@ export const Form = defineComponent({
      */
     labelAlign: {
       type: String as PropType<FormLabelAlign>,
-      default: 'right' as FormLabelAlign
+      default: undefined
     },
     /**
      * Form size (applies to all form items)
@@ -511,6 +511,9 @@ export const Form = defineComponent({
 
     const canUndoNow = computed(() => props.undoable && canUndo(history.value))
     const canRedoNow = computed(() => props.undoable && canRedo(history.value))
+    const resolvedLabelAlign = computed<FormLabelAlign>(
+      () => props.labelAlign ?? (props.labelPosition === 'top' ? 'left' : 'right')
+    )
 
     const handleSubmit = async (event: Event): Promise<void> => {
       event.preventDefault()
@@ -525,7 +528,7 @@ export const Form = defineComponent({
       rules: props.rules,
       labelWidth: props.labelWidth,
       labelPosition: props.labelPosition,
-      labelAlign: props.labelAlign,
+      labelAlign: resolvedLabelAlign.value,
       size: props.size,
       inlineMessage: props.inlineMessage,
       showRequiredAsterisk: props.showRequiredAsterisk,

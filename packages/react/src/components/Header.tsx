@@ -1,7 +1,7 @@
 import React from 'react'
 import {
   classNames,
-  layoutHeaderClasses,
+  getLayoutHeaderClasses,
   type HeaderProps as CoreHeaderProps
 } from '@expcat/tigercat-core'
 
@@ -12,12 +12,13 @@ export interface ReactHeaderProps
 
 export const Header: React.FC<ReactHeaderProps> = ({
   className,
+  variant = 'default',
   height = '64px',
   style,
   children,
   ...props
 }) => {
-  const headerClasses = classNames(layoutHeaderClasses, className)
+  const headerClasses = classNames(getLayoutHeaderClasses(variant), className)
   const headerStyle: React.CSSProperties = { ...style, height }
 
   return (

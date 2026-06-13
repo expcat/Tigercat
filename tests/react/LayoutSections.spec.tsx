@@ -33,6 +33,13 @@ describe('Layout Sections', () => {
     expect(header).toHaveAttribute('aria-label', 'Site header')
   })
 
+  it('applies Header variants', () => {
+    const { container } = render(<Header variant="blur">Header</Header>)
+    const header = container.querySelector('header')
+    expect(header).toHaveClass('backdrop-blur-[var(--tiger-blur-glass-strong,24px)]')
+    expect(header).toHaveClass('shadow-sm')
+  })
+
   it('handles Sidebar collapsed width', () => {
     const { container, rerender } = render(<Sidebar width="300px">Sidebar</Sidebar>)
 
@@ -57,6 +64,16 @@ describe('Layout Sections', () => {
     expect(main).toBeTruthy()
     expect(main?.className).toContain('tiger-content')
     expect(main?.className).toContain('custom-content')
+  })
+
+  it('supports configurable Content padding', () => {
+    const noPadding = render(<Content padding={false}>Content</Content>)
+    expect(noPadding.container.querySelector('main')).not.toHaveClass('p-6')
+    noPadding.unmount()
+
+    const customPadding = render(<Content padding="p-4">Content</Content>)
+    expect(customPadding.container.querySelector('main')).toHaveClass('p-4')
+    expect(customPadding.container.querySelector('main')).not.toHaveClass('p-6')
   })
 
   it('uses default Footer height', () => {

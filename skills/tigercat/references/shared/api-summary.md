@@ -85,7 +85,7 @@ description: Compact generated API summary for Tigercat core types
 | container.ts    | ContainerProps                                                    | Container                                | 2       |
 | descriptions.ts | DescriptionsProps                                                 | Descriptions                             | 4       |
 | grid.ts         | RowProps, ColProps                                                | Row, Col                                 | 7       |
-| layout.ts       | LayoutProps, HeaderProps, SidebarProps, ContentProps, FooterProps | Layout, Header, Sidebar, Content, Footer | 5       |
+| layout.ts       | LayoutProps, HeaderProps, SidebarProps, ContentProps, FooterProps | Layout, Header, Sidebar, Content, Footer | 6       |
 | list.ts         | ListProps                                                         | List                                     | 6       |
 | resizable.ts    | ResizableProps                                                    | Resizable                                | 4       |
 | skeleton.ts     | SkeletonProps                                                     | Skeleton                                 | 4       |
@@ -117,7 +117,7 @@ description: Compact generated API summary for Tigercat core types
 | calendar.ts  | CalendarProps                     | Calendar                | 2       |
 | collapse.ts  | CollapseProps, CollapsePanelProps | Collapse, CollapsePanel | 3       |
 | countdown.ts | CountdownProps                    | Countdown               | 5       |
-| table.ts     | TableProps                        | Table                   | 26      |
+| table.ts     | TableProps                        | Table                   | 27      |
 | timeline.ts  | TimelineProps                     | Timeline                | 4       |
 
 ## Charts
@@ -149,7 +149,7 @@ description: Compact generated API summary for Tigercat core types
 
 | Type File    | Props Interfaces                                                                                                                                               | Components                                                                                                             | Exports |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------- |
-| composite.ts | ChatWindowProps, ActivityFeedProps, CommentThreadProps, NotificationCenterProps, TableToolbarProps, TableToolbarFilter, DataTableWithToolbarProps, FormWizardProps, TaskBoardProps | ChatWindow, ActivityFeed, CommentThread, NotificationCenter, TableToolbar, DataTableWithToolbar, FormWizard, TaskBoard | 41      |
+| composite.ts | ChatWindowProps, ActivityFeedProps, CommentThreadProps, NotificationCenterProps, TableToolbarProps, DataTableWithToolbarProps, FormWizardProps, TaskBoardProps | ChatWindow, ActivityFeed, CommentThread, NotificationCenter, TableToolbar, DataTableWithToolbar, FormWizard, TaskBoard | 40      |
 
 ## Core
 
@@ -163,4 +163,4 @@ description: Compact generated API summary for Tigercat core types
 | slots.ts          | -                                                            | -                                             | 10      |
 | theme.ts          | -                                                            | -                                             | 11      |
 
-Total exported types: 620.
+Total exported types: 626.
