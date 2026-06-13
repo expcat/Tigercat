@@ -57,6 +57,9 @@ const sizeSnippet = `<Space>
   <Button variant={size === 'full' ? 'primary' : 'secondary'} onClick={() => showSizeDrawer('full')}>
     全屏 (full)
   </Button>
+  <Button variant={customPaddingVisible ? 'primary' : 'secondary'} onClick={showCustomPaddingDrawer}>
+    自定义内边距 (p-10)
+  </Button>
 </Space>
 <Drawer
   open={sizeVisible}
@@ -65,6 +68,14 @@ const sizeSnippet = `<Space>
   footer={getCloseFooter(() => setSizeVisible(false))}
   onClose={() => setSizeVisible(false)}>
   <p>尺寸: {size}</p>
+</Drawer>
+<Drawer
+  open={customPaddingVisible}
+  bodyPadding="p-10"
+  title="自定义内容内边距 (p-10)"
+  footer={getCloseFooter(() => setCustomPaddingVisible(false))}
+  onClose={() => setCustomPaddingVisible(false)}>
+  <p>这个抽屉的主体内容区域使用了 bodyPadding="p-10" 属性，内边距比默认情况更大。</p>
 </Drawer>`
 
 const customSnippet = `<Button onClick={openCustom}>打开自定义抽屉</Button>
@@ -214,6 +225,7 @@ const DrawerDemo: React.FC = () => {
   // Size drawers
   const [sizeVisible, setSizeVisible] = useState(false)
   const [size, setSize] = useState<DrawerSize>('md')
+  const [customPaddingVisible, setCustomPaddingVisible] = useState(false)
 
   // Custom content drawer
   const [customVisible, setCustomVisible] = useState(false)
@@ -242,6 +254,7 @@ const DrawerDemo: React.FC = () => {
     setBasicVisible(false)
     setPlacementVisible(false)
     setSizeVisible(false)
+    setCustomPaddingVisible(false)
     setCustomVisible(false)
     setNoMaskVisible(false)
     setNotClosableVisible(false)
@@ -265,6 +278,11 @@ const DrawerDemo: React.FC = () => {
     closeAll()
     setSize(s)
     setSizeVisible(true)
+  }
+
+  const showCustomPaddingDrawer = () => {
+    closeAll()
+    setCustomPaddingVisible(true)
   }
 
   const openCustom = () => {
@@ -364,34 +382,39 @@ const DrawerDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      {/* 不同尺寸 */}
-      <DemoBlock title="不同尺寸" description="通过 size 属性设置抽屉的大小。" code={sizeSnippet}>
+      {/* 不同尺寸与内边距 */}
+      <DemoBlock title="不同尺寸与内边距" description="通过 size 属性设置抽屉的大小，或者使用 bodyPadding 自定义主体区域内边距。" code={sizeSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Space>
             <Button
-              variant={size === 'sm' ? 'primary' : 'secondary'}
+              variant={!customPaddingVisible && size === 'sm' ? 'primary' : 'secondary'}
               onClick={() => showSizeDrawer('sm')}>
               小 (sm)
             </Button>
             <Button
-              variant={size === 'md' ? 'primary' : 'secondary'}
+              variant={!customPaddingVisible && size === 'md' ? 'primary' : 'secondary'}
               onClick={() => showSizeDrawer('md')}>
               中 (md)
             </Button>
             <Button
-              variant={size === 'lg' ? 'primary' : 'secondary'}
+              variant={!customPaddingVisible && size === 'lg' ? 'primary' : 'secondary'}
               onClick={() => showSizeDrawer('lg')}>
               大 (lg)
             </Button>
             <Button
-              variant={size === 'xl' ? 'primary' : 'secondary'}
+              variant={!customPaddingVisible && size === 'xl' ? 'primary' : 'secondary'}
               onClick={() => showSizeDrawer('xl')}>
               超大 (xl)
             </Button>
             <Button
-              variant={size === 'full' ? 'primary' : 'secondary'}
+              variant={!customPaddingVisible && size === 'full' ? 'primary' : 'secondary'}
               onClick={() => showSizeDrawer('full')}>
               全屏 (full)
+            </Button>
+            <Button
+              variant={customPaddingVisible ? 'primary' : 'secondary'}
+              onClick={showCustomPaddingDrawer}>
+              自定义内边距 (p-10)
             </Button>
           </Space>
           <Drawer
@@ -401,6 +424,14 @@ const DrawerDemo: React.FC = () => {
             footer={getCloseFooter(() => setSizeVisible(false))}
             onClose={() => setSizeVisible(false)}>
             <p>尺寸: {size}</p>
+          </Drawer>
+          <Drawer
+            open={customPaddingVisible}
+            bodyPadding="p-10"
+            title="自定义内容内边距 (p-10)"
+            footer={getCloseFooter(() => setCustomPaddingVisible(false))}
+            onClose={() => setCustomPaddingVisible(false)}>
+            <p>这个抽屉的主体内容区域使用了 bodyPadding="p-10" 属性，内边距比默认情况更大。</p>
           </Drawer>
         </div>
       </DemoBlock>

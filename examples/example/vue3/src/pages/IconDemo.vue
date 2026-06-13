@@ -2,7 +2,8 @@
 import { Icon } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
-const basicSnippet = `<div class="flex items-center gap-6">
+const basicSnippet = `<div class="flex items-center gap-6 flex-wrap">
+  <!-- 自定义 SVG 图标 -->
   <Icon>
     <svg>
       <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -13,11 +14,12 @@ const basicSnippet = `<div class="flex items-center gap-6">
       <path d="M5 13l4 4L19 7" />
     </svg>
   </Icon>
-  <Icon>
-    <svg>
-      <path d="M18 8a6 6 0 01-7 5.91A6 6 0 116 8a6 6 0 0112 0z" />
-    </svg>
-  </Icon>
+
+  <!-- 内置图标 -->
+  <Icon name="search" />
+  <Icon name="plus" />
+  <Icon name="edit" />
+  <Icon name="trash" />
 </div>`
 
 const sizeSnippet = `<div class="flex items-center gap-6">
@@ -69,12 +71,12 @@ const a11ySnippet = `<!-- 装饰性图标（默认 aria-hidden） -->
       <p class="text-gray-600 dark:text-gray-400">语义化的矢量图形。</p>
     </div>
 
-    <!-- 基础用法 -->
+    <!-- 基础用法与内置图标 -->
     <DemoBlock
-      title="基础用法"
-      description="基础的 Icon 用法，传入 SVG 内容即可。组件自动注入默认的 stroke 样式属性。"
+      title="基础用法与内置图标"
+      description="支持传入 SVG 子元素来自定义图标，或者直接使用 name 属性指定内置图标（如 search, plus, edit, trash 等）。"
       :code="basicSnippet">
-      <div class="flex items-center gap-6">
+      <div class="flex items-center gap-6 flex-wrap">
         <Icon>
           <svg>
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -85,11 +87,10 @@ const a11ySnippet = `<!-- 装饰性图标（默认 aria-hidden） -->
             <path d="M5 13l4 4L19 7" />
           </svg>
         </Icon>
-        <Icon>
-          <svg>
-            <path d="M18 8a6 6 0 01-7 5.91A6 6 0 116 8a6 6 0 0112 0z" />
-          </svg>
-        </Icon>
+        <Icon name="search" />
+        <Icon name="plus" />
+        <Icon name="edit" />
+        <Icon name="trash" />
       </div>
     </DemoBlock>
 

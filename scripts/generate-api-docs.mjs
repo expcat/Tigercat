@@ -166,7 +166,19 @@ const COMPONENT_USAGE_NOTES = {
   Dropdown: {
     uses: ['DropdownMenu', 'DropdownItem'],
     notes:
-      '菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。'
+      '菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。触发器（trigger）上会暴露稳定的 `data-state="open" | "closed"` 属性（与 `aria-expanded` 同步），可用于自定义样式联动或无障碍钩子。'
+  },
+  Icon: {
+    notes: '内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。'
+  },
+  Image: {
+    notes: '支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。'
+  },
+  Card: {
+    notes: '`padding`（`boolean | string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。'
+  },
+  Drawer: {
+    notes: '`bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。'
   },
   ChatWindow: {
     uses: ['Avatar', 'Textarea/Input', 'Button', 'VirtualList', 'Empty'],
@@ -198,7 +210,7 @@ const COMPONENT_USAGE_NOTES = {
   Table: {
     uses: ['TableColumn', 'Pagination', 'row selection', 'expandable rows'],
     notes:
-      '固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制，自定义网格用列级 `cardGrid` 或表级 `cardLayout`（优先级更高），最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName` 和 `valueClassName` 做轻量布局调整。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。'
+      '固定列通过 `column.fixed` 开启；推荐在列定义上用 `fixedClassName` / `fixedHeaderClassName` 自定义 sticky 背景，而不是依赖全局 sticky CSS 覆盖。卡片模式默认关闭，需显式设置 `responsiveMode="card"` / `responsive-mode="card"`；窄屏断点由 `cardBreakpoint` 控制，卡片字段由列级 `hideInCard`、`cardTitle`、`cardPriority` 控制，自定义网格用列级 `cardGrid` 或表级 `cardLayout`（优先级更高），最窄屏默认单列，`sm` 及以上按 `colSpan` 混排；默认卡片可用 `cardSelectionPosition`、`cardPadding`、`divider`、`labelClassName`、`valueClassName` 做轻量布局调整，且 `cardFieldGap`（默认 "gap-3"，需传完整 Tailwind gap 类以便 Tailwind JIT 静态识别）可调整字段间的间距。列显隐通过 `hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控）控制，React 用 `onHiddenColumnsChange` 回调，Vue 支持 `v-model:hidden-column-keys`；固定列偏移、卡片字段、导出与列拖拽都只作用于可见列（隐藏列上已生效的筛选仍会继续过滤数据）。'
   },
   VirtualTable: {
     uses: ['TableColumn', 'virtual scroll range', 'fixed column offsets'],
@@ -221,6 +233,32 @@ const COMPONENT_USAGE_NOTES = {
 }
 
 const COMPONENT_PROPS_EXTRA = {
+  Icon: `
+### Built-in icon set
+
+内置图标支持通过 \`name\` 属性直接渲染。所有内置图标均注册在图标注册表中，可以通过 \`@expcat/tigercat-core/icons/registry\` 导出相关 API 和定义。
+
+**内置图标名称列表 (\`IconName\`):**
+- \`close\` / \`success\` / \`warning\` / \`error\` / \`info\` / \`check\`
+- \`chevron-up\` / \`chevron-down\` / \`chevron-left\` / \`chevron-right\`
+- \`arrow-up\` / \`arrow-down\` / \`arrow-left\` / \`arrow-right\`
+- \`search\` / \`plus\` / \`minus\` / \`edit\` / \`trash\`
+- \`user\` / \`settings\` / \`eye\` / \`eye-off\` / \`calendar\` / \`clock\`
+- \`menu\` / \`more-horizontal\` / \`more-vertical\` / \`external-link\`
+
+**图标注册表导出的辅助函数与类型:**
+- \`iconRegistry\`: 图标定义全局注册表对象。
+- \`iconNames\`: 包含所有内置图标名称的只读数组。
+- \`getIconDefinition(name: string)\`: 根据名称获取图标定义的方法。
+- \`IconDefinition\`: 图标定义接口类型。
+- \`IconName\`: 包含所有内置图标名称的联合类型。
+- \`IconRenderMode\`: 图标渲染模式联合类型 (\`'svg' | 'font'\`)。
+
+导入路径示例：
+\`\`\`ts
+import { iconRegistry, iconNames, getIconDefinition } from '@expcat/tigercat-core/icons/registry'
+\`\`\`
+`,
   TableToolbar: `
 Custom filter context: \`filters[].render({ filter, value, filters, setValue, setFilter })\`. Use \`setValue(value)\` to update the current filter key, or \`setFilter(key, value)\` when one custom control updates another key. \`TableToolbarFilterValue\` accepts \`string | number | Record<string, unknown> | null\`, so range filters can emit \`{ ageRange: { min, max } }\`.
 
@@ -353,6 +391,7 @@ React \`filtersExtra\` age range:
 
 const COMPONENT_SNIPPETS = {
   Vue: {
+    Icon: '<Icon name="search" />',
     ChatWindow: '<ChatWindow :messages="messages" />',
     ActivityFeed: '<ActivityFeed :items="items" />',
     CommentThread: '<CommentThread :nodes="nodes" />',
@@ -370,6 +409,7 @@ const COMPONENT_SNIPPETS = {
       '<VirtualTable :data="rows" :columns="fixedColumns" :row-height="40" :height="320" />'
   },
   React: {
+    Icon: '<Icon name="search" />',
     ChatWindow: '<ChatWindow messages={messages} />',
     ActivityFeed: '<ActivityFeed items={items} />',
     CommentThread: '<CommentThread nodes={nodes} />',

@@ -116,17 +116,55 @@ Showing 3 key props of 4; see source for the complete interface.
 
 Source: `packages/core/src/types/icon.ts` · Interface: `IconProps`.
 
-| Prop         | Type       | Default | Notes                           |
-| ------------ | ---------- | ------- | ------------------------------- |
-| `size?`      | `IconSize` | `'md'`  | Icon size                       |
-| `color?`     | `string`   | `-`     | Icon color Uses CSS color value |
-| `className?` | `string`   | `-`     | Additional CSS classes          |
+Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。
+
+Showing 3 key props of 4; see source for the complete interface.
+
+| Prop     | Type       | Default | Notes                                                                                      |
+| -------- | ---------- | ------- | ------------------------------------------------------------------------------------------ |
+| `name?`  | `IconName` | `-`     | Built-in icon name. When provided (and no custom SVG children are given), the component... |
+| `size?`  | `IconSize` | `'md'`  | Icon size                                                                                  |
+| `color?` | `string`   | `-`     | Icon color Uses CSS color value                                                            |
+
+### Built-in icon set
+
+内置图标支持通过 `name` 属性直接渲染。所有内置图标均注册在图标注册表中，可以通过 `@expcat/tigercat-core/icons/registry` 导出相关 API 和定义。
+
+**内置图标名称列表 (`IconName`):**
+
+- `close` / `success` / `warning` / `error` / `info` / `check`
+- `chevron-up` / `chevron-down` / `chevron-left` / `chevron-right`
+- `arrow-up` / `arrow-down` / `arrow-left` / `arrow-right`
+- `search` / `plus` / `minus` / `edit` / `trash`
+- `user` / `settings` / `eye` / `eye-off` / `calendar` / `clock`
+- `menu` / `more-horizontal` / `more-vertical` / `external-link`
+
+**图标注册表导出的辅助函数与类型:**
+
+- `iconRegistry`: 图标定义全局注册表对象。
+- `iconNames`: 包含所有内置图标名称的只读数组。
+- `getIconDefinition(name: string)`: 根据名称获取图标定义的方法。
+- `IconDefinition`: 图标定义接口类型。
+- `IconName`: 包含所有内置图标名称的联合类型。
+- `IconRenderMode`: 图标渲染模式联合类型 (`'svg' | 'font'`)。
+
+导入路径示例：
+
+```ts
+import {
+  iconRegistry,
+  iconNames,
+  getIconDefinition,
+} from "@expcat/tigercat-core/icons/registry";
+```
 
 ## Image
 
 Source: `packages/core/src/types/image.ts` · Interface: `ImageProps`.
 
-Showing 3 key props of 9; see source for the complete interface.
+Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。
+
+Showing 3 key props of 10; see source for the complete interface.
 
 | Prop     | Type               | Default | Notes                      |
 | -------- | ------------------ | ------- | -------------------------- |

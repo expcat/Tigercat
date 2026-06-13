@@ -14,6 +14,7 @@ const placement = ref<DrawerPlacement>('right')
 // Size drawers
 const sizeVisible = ref(false)
 const size = ref<DrawerSize>('md')
+const customPaddingVisible = ref(false)
 
 // Custom content drawer
 const customVisible = ref(false)
@@ -42,6 +43,7 @@ const closeAll = () => {
   basicVisible.value = false
   placementVisible.value = false
   sizeVisible.value = false
+  customPaddingVisible.value = false
   customVisible.value = false
   noMaskVisible.value = false
   notClosableVisible.value = false
@@ -65,6 +67,11 @@ const showSizeDrawer = (s: DrawerSize) => {
   closeAll()
   size.value = s
   sizeVisible.value = true
+}
+
+const showCustomPaddingDrawer = () => {
+  closeAll()
+  customPaddingVisible.value = true
 }
 
 const openCustom = () => {
@@ -133,12 +140,21 @@ const sizeSnippet = `<Space>
   <Button :variant="size === 'lg' ? 'primary' : 'secondary'" @click="showSizeDrawer('lg')">大 (lg)</Button>
   <Button :variant="size === 'xl' ? 'primary' : 'secondary'" @click="showSizeDrawer('xl')">超大 (xl)</Button>
   <Button :variant="size === 'full' ? 'primary' : 'secondary'" @click="showSizeDrawer('full')">全屏 (full)</Button>
+  <Button :variant="customPaddingVisible ? 'primary' : 'secondary'" @click="showCustomPaddingDrawer">自定义内边距 (p-10)</Button>
 </Space>
 <Drawer v-model:open="sizeVisible" :size="size" title="不同尺寸的抽屉">
   <p>尺寸: {{ size }}</p>
   <template #footer>
     <Space>
       <Button variant="secondary" @click="sizeVisible = false">关闭</Button>
+    </Space>
+  </template>
+</Drawer>
+<Drawer v-model:open="customPaddingVisible" body-padding="p-10" title="自定义内容内边距 (p-10)">
+  <p>这个抽屉的主体内容区域使用了 body-padding="p-10" 属性，内边距比默认情况更大。</p>
+  <template #footer>
+    <Space>
+      <Button variant="secondary" @click="customPaddingVisible = false">关闭</Button>
     </Space>
   </template>
 </Drawer>`
@@ -351,26 +367,31 @@ const DestroyOnCloseContent = defineComponent({
       </div>
     </DemoBlock>
 
-    <!-- 不同尺寸 -->
-    <DemoBlock title="不同尺寸" description="通过 size 属性设置抽屉的大小。" :code="sizeSnippet">
+    <!-- 不同尺寸与内边距 -->
+    <DemoBlock title="不同尺寸与内边距" description="通过 size 属性设置抽屉的大小，或者使用 body-padding 自定义主体区域内边距。" :code="sizeSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Space>
-          <Button :variant="size === 'sm' ? 'primary' : 'secondary'" @click="showSizeDrawer('sm')"
+          <Button :variant="!customPaddingVisible && size === 'sm' ? 'primary' : 'secondary'" @click="showSizeDrawer('sm')"
             >小 (sm)</Button
           >
-          <Button :variant="size === 'md' ? 'primary' : 'secondary'" @click="showSizeDrawer('md')"
+          <Button :variant="!customPaddingVisible && size === 'md' ? 'primary' : 'secondary'" @click="showSizeDrawer('md')"
             >中 (md)</Button
           >
-          <Button :variant="size === 'lg' ? 'primary' : 'secondary'" @click="showSizeDrawer('lg')"
+          <Button :variant="!customPaddingVisible && size === 'lg' ? 'primary' : 'secondary'" @click="showSizeDrawer('lg')"
             >大 (lg)</Button
           >
-          <Button :variant="size === 'xl' ? 'primary' : 'secondary'" @click="showSizeDrawer('xl')"
+          <Button :variant="!customPaddingVisible && size === 'xl' ? 'primary' : 'secondary'" @click="showSizeDrawer('xl')"
             >超大 (xl)</Button
           >
           <Button
-            :variant="size === 'full' ? 'primary' : 'secondary'"
+            :variant="!customPaddingVisible && size === 'full' ? 'primary' : 'secondary'"
             @click="showSizeDrawer('full')"
             >全屏 (full)</Button
+          >
+          <Button
+            :variant="customPaddingVisible ? 'primary' : 'secondary'"
+            @click="showCustomPaddingDrawer"
+            >自定义内边距 (p-10)</Button
           >
         </Space>
         <Drawer v-model:open="sizeVisible" :size="size" title="不同尺寸的抽屉">
@@ -378,6 +399,14 @@ const DestroyOnCloseContent = defineComponent({
           <template #footer>
             <Space>
               <Button variant="secondary" @click="sizeVisible = false">关闭</Button>
+            </Space>
+          </template>
+        </Drawer>
+        <Drawer v-model:open="customPaddingVisible" body-padding="p-10" title="自定义内容内边距 (p-10)">
+          <p>这个抽屉的主体内容区域使用了 body-padding="p-10" 属性，内边距比默认情况更大。</p>
+          <template #footer>
+            <Space>
+              <Button variant="secondary" @click="customPaddingVisible = false">关闭</Button>
             </Space>
           </template>
         </Drawer>

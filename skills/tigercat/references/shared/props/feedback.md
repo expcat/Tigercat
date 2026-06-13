@@ -13,7 +13,9 @@ description: Compact generated Tigercat Feedback props reference
 
 Source: `packages/core/src/types/drawer.ts` · Interface: `DrawerProps`.
 
-Showing 3 key props of 18; see source for the complete interface.
+Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。
+
+Showing 3 key props of 19; see source for the complete interface.
 
 | Prop         | Type              | Default   | Notes                      |
 | ------------ | ----------------- | --------- | -------------------------- |

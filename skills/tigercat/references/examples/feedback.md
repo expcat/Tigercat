@@ -9,6 +9,12 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 弹层类组件通常使用 `open`/`update:open` 或 `open`/`onOpenChange`。
 
+## Component Notes
+
+| Component | Uses | Notes                                                                        |
+| --------- | ---- | ---------------------------------------------------------------------------- |
+| Drawer    | -    | `bodyPadding`（`boolean \| string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。 |
+
 | Component    | Vue                | React              |
 | ------------ | ------------------ | ------------------ |
 | Drawer       | `<Drawer />`       | `<Drawer />`       |

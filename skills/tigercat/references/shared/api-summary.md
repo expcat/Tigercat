@@ -21,7 +21,7 @@ description: Compact generated API summary for Tigercat core types
 | divider.ts   | DividerProps                                                                       | Divider                                                   | 4       |
 | empty.ts     | EmptyProps                                                                         | Empty                                                     | 2       |
 | icon.ts      | IconProps                                                                          | Icon                                                      | 2       |
-| image.ts     | ImageProps, ImagePreviewProps, ImageGroupProps, ImageCropperProps, CropUploadProps | Image, ImagePreview, ImageGroup, ImageCropper, CropUpload | 11      |
+| image.ts     | ImageProps, ImagePreviewProps, ImageGroupProps, ImageCropperProps, CropUploadProps | Image, ImagePreview, ImageGroup, ImageCropper, CropUpload | 12      |
 | link.ts      | LinkProps                                                                          | Link                                                      | 3       |
 | qrcode.ts    | QRCodeProps                                                                        | QRCode                                                    | 3       |
 | rate.ts      | RateProps                                                                          | Rate                                                      | 2       |
@@ -163,4 +163,4 @@ description: Compact generated API summary for Tigercat core types
 | slots.ts          | -                                                            | -                                             | 10      |
 | theme.ts          | -                                                            | -                                             | 11      |
 
-Total exported types: 626.
+Total exported types: 627.

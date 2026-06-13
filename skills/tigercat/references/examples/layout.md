@@ -9,6 +9,12 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 布局组件通常组合使用，先确定容器，再选择 Space/Grid/List 等局部排版组件。
 
+## Component Notes
+
+| Component | Uses | Notes                                                                                                                                                     |
+| --------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Card      | -    | `padding`（`boolean \| string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。 |
+
 | Component    | Vue                | React              |
 | ------------ | ------------------ | ------------------ |
 | Card         | `<Card />`         | `<Card />`         |

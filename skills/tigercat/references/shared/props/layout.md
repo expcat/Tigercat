@@ -13,13 +13,15 @@ description: Compact generated Tigercat Layout props reference
 
 Source: `packages/core/src/types/card.ts` · Interface: `CardProps`.
 
-Showing 3 key props of 5; see source for the complete interface.
+Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。
 
-| Prop         | Type          | Default     | Notes                                              |
-| ------------ | ------------- | ----------- | -------------------------------------------------- |
-| `variant?`   | `CardVariant` | `'default'` | Card variant style                                 |
-| `size?`      | `CardSize`    | `'md'`      | Card size (affects padding)                        |
-| `hoverable?` | `boolean`     | `false`     | Whether the card is hoverable (shows hover effect) |
+Showing 3 key props of 6; see source for the complete interface.
+
+| Prop       | Type                | Default     | Notes                                                                                      |
+| ---------- | ------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `variant?` | `CardVariant`       | `'default'` | Card variant style                                                                         |
+| `size?`    | `CardSize`          | `'md'`      | Card size (affects padding)                                                                |
+| `padding?` | `boolean \| string` | `-`         | Padding override for the card content sections. Takes precedence over the `size`-derive... |
 
 ## Carousel
 

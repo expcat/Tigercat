@@ -63,6 +63,7 @@ const cardModeSnippet = `const cardColumns: TableColumn[] = [
   :dataSource="basicData"
   responsive-mode="card"
   card-breakpoint="lg"
+  card-field-gap="gap-2"
   :pagination="false" />`
 
 const paginationSnippet = `<Table
@@ -556,13 +557,14 @@ const pagedData = computed(() => {
 
     <DemoBlock
       title="响应式卡片模式"
-      description='显式设置 responsive-mode="card" 后，窄于 card-breakpoint 时切换为卡片；列定义可隐藏字段、设置标题和排序。'
+      description="显式设置 responsive-mode='card' 后，窄于 card-breakpoint 时切换为卡片。列定义可配置布局属性，支持使用 card-field-gap 自定义字段间距（如 gap-2，默认 gap-3）。"
       :code="cardModeSnippet">
       <Table
         :columns="cardColumns"
         :dataSource="basicData"
         responsive-mode="card"
         card-breakpoint="lg"
+        card-field-gap="gap-2"
         :pagination="false" />
     </DemoBlock>
 

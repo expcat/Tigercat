@@ -616,7 +616,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
           responsiveMode="card"
           cardBreakpoint="lg"
           cardClassName="shadow-lg rounded-xl"
-          renderCard={({ row }) => (
+          renderCard={({ record: row }) => (
             <div className="p-4">
               <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">
                 {(row as UserRow).name}

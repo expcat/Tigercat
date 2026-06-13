@@ -89,6 +89,7 @@ const cardModeSnippet = `const cardColumns: TableColumn<UserData>[] = [
   dataSource={basicData}
   responsiveMode="card"
   cardBreakpoint="lg"
+  cardFieldGap="gap-2"
   pagination={false}
 />`
 
@@ -572,13 +573,14 @@ const TableDemo: React.FC = () => {
 
       <DemoBlock
         title="响应式卡片模式"
-        description='显式设置 responsiveMode="card" 后，窄于 cardBreakpoint 时切换为卡片；列定义可隐藏字段、设置标题和排序。'
+        description='显式设置 responsiveMode="card" 后，窄于 cardBreakpoint 时切换为卡片。列定义可配置布局属性，支持使用 cardFieldGap 自定义字段间距（如 gap-2，默认 gap-3）。'
         code={cardModeSnippet}>
         <Table<UserData>
           columns={cardColumns}
           dataSource={basicData}
           responsiveMode="card"
           cardBreakpoint="lg"
+          cardFieldGap="gap-2"
           pagination={false}
         />
       </DemoBlock>

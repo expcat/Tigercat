@@ -60,7 +60,10 @@ const lazySnippet = `<!-- lazy + placeholder 插槽 -->
 const previewSnippet = `<!-- 点击预览（默认开启） -->
 <div class="flex gap-4 flex-wrap">
   <Image v-for="(src, i) in photos" :key="i" :src="src" :width="120" :height="80" alt="预览" />
-</div>`
+</div>
+
+<!-- 悬停预览 -->
+<Image :src="photos[0]" :width="120" :height="80" preview-trigger="hover" alt="悬停预览" />`
 
 const groupSnippet = `<!-- ImageGroup：多图关联预览 -->
 <ImageGroup>
@@ -158,15 +161,21 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
       </div>
     </DemoBlock>
 
-    <DemoBlock title="点击预览" description="默认开启，点击图片进入全屏预览" :code="previewSnippet">
-      <div class="flex gap-4 flex-wrap">
-        <Image
-          v-for="(src, i) in PHOTOS.slice(0, 4)"
-          :key="i"
-          :src="src"
-          :width="120"
-          :height="80"
-          alt="预览" />
+    <DemoBlock title="图片预览模式" description="支持点击图片进入全屏预览（默认），也可通过 preview-trigger='hover' 开启悬停放大预览。" :code="previewSnippet">
+      <div class="flex flex-col gap-4">
+        <div class="flex gap-4 flex-wrap">
+          <Image
+            v-for="(src, i) in PHOTOS.slice(0, 4)"
+            :key="i"
+            :src="src"
+            :width="120"
+            :height="80"
+            alt="点击预览" />
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-gray-500">悬停预览：</span>
+          <Image :src="PHOTOS[0]" :width="120" :height="80" preview-trigger="hover" alt="悬停预览" />
+        </div>
       </div>
     </DemoBlock>
 

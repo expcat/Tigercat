@@ -9,32 +9,39 @@ description: Compact Tigercat Basic Vue and React usage routes
 
 Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或透传 attrs。
 
-| Component      | Vue                  | React                |
-| -------------- | -------------------- | -------------------- |
-| Alert          | `<Alert />`          | `<Alert />`          |
-| Avatar         | `<Avatar />`         | `<Avatar />`         |
-| AvatarGroup    | `<AvatarGroup />`    | `<AvatarGroup />`    |
-| Badge          | `<Badge />`          | `<Badge />`          |
-| Button         | `<Button />`         | `<Button />`         |
-| ButtonGroup    | `<ButtonGroup />`    | `<ButtonGroup />`    |
-| Code           | `<Code />`           | `<Code />`           |
-| Divider        | `<Divider />`        | `<Divider />`        |
-| Empty          | `<Empty />`          | `<Empty />`          |
-| Icon           | `<Icon />`           | `<Icon />`           |
-| Image          | `<Image />`          | `<Image />`          |
-| ImagePreview   | `<ImagePreview />`   | `<ImagePreview />`   |
-| ImageGroup     | `<ImageGroup />`     | `<ImageGroup />`     |
-| ImageCropper   | `<ImageCropper />`   | `<ImageCropper />`   |
-| CropUpload     | `<CropUpload />`     | `<CropUpload />`     |
-| Link           | `<Link />`           | `<Link />`           |
-| QRCode         | `<QRCode />`         | `<QRCode />`         |
-| Rate           | `<Rate />`           | `<Rate />`           |
-| Result         | `<Result />`         | `<Result />`         |
-| Segmented      | `<Segmented />`      | `<Segmented />`      |
-| Statistic      | `<Statistic />`      | `<Statistic />`      |
-| Tag            | `<Tag />`            | `<Tag />`            |
-| Text           | `<Text />`           | `<Text />`           |
-| Watermark      | `<Watermark />`      | `<Watermark />`      |
-| ConfigProvider | `<ConfigProvider />` | `<ConfigProvider />` |
+## Component Notes
+
+| Component | Uses | Notes                                                                                                                                                            |
+| --------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Icon      | -    | 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。 |
+| Image     | -    | 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。                        |
+
+| Component      | Vue                      | React                    |
+| -------------- | ------------------------ | ------------------------ |
+| Alert          | `<Alert />`              | `<Alert />`              |
+| Avatar         | `<Avatar />`             | `<Avatar />`             |
+| AvatarGroup    | `<AvatarGroup />`        | `<AvatarGroup />`        |
+| Badge          | `<Badge />`              | `<Badge />`              |
+| Button         | `<Button />`             | `<Button />`             |
+| ButtonGroup    | `<ButtonGroup />`        | `<ButtonGroup />`        |
+| Code           | `<Code />`               | `<Code />`               |
+| Divider        | `<Divider />`            | `<Divider />`            |
+| Empty          | `<Empty />`              | `<Empty />`              |
+| Icon           | `<Icon name="search" />` | `<Icon name="search" />` |
+| Image          | `<Image />`              | `<Image />`              |
+| ImagePreview   | `<ImagePreview />`       | `<ImagePreview />`       |
+| ImageGroup     | `<ImageGroup />`         | `<ImageGroup />`         |
+| ImageCropper   | `<ImageCropper />`       | `<ImageCropper />`       |
+| CropUpload     | `<CropUpload />`         | `<CropUpload />`         |
+| Link           | `<Link />`               | `<Link />`               |
+| QRCode         | `<QRCode />`             | `<QRCode />`             |
+| Rate           | `<Rate />`               | `<Rate />`               |
+| Result         | `<Result />`             | `<Result />`             |
+| Segmented      | `<Segmented />`          | `<Segmented />`          |
+| Statistic      | `<Statistic />`          | `<Statistic />`          |
+| Tag            | `<Tag />`                | `<Tag />`                |
+| Text           | `<Text />`               | `<Text />`               |
+| Watermark      | `<Watermark />`          | `<Watermark />`          |
+| ConfigProvider | `<ConfigProvider />`     | `<ConfigProvider />`     |
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.
