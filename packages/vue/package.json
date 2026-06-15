@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-vue",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Vue 3 components for Tigercat UI library",
   "license": "MIT",
   "author": "Yizhe Wang",
