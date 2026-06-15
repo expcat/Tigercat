@@ -22,9 +22,17 @@ import type {
 export const tableContainerClasses = 'relative w-full overflow-auto'
 
 /**
- * Base table classes
+ * Base table classes.
+ *
+ * Uses `border-separate` + `border-spacing-0` (not `border-collapse`) on purpose:
+ * `position: sticky` on `<th>`/`<td>` is unreliable under `border-collapse`
+ * (fixed/locked columns drift or jitter while scrolling horizontally). In the
+ * separate model sticky cells pin correctly. The trade-off is that borders on
+ * `<tr>`/`<thead>` are not painted, so every horizontal separator must live on
+ * the cells — see `getTableHeaderClasses`, `getTableRowClasses`,
+ * `getExpandedRowClasses`, `tableSummaryRowClasses` and `tableGroupHeaderClasses`.
  */
-export const tableBaseClasses = 'w-full border-collapse'
+export const tableBaseClasses = 'w-full border-separate border-spacing-0'
 
 export const tableResponsiveTableClasses = 'max-sm:min-w-max'
 
@@ -551,7 +559,8 @@ export function getTableWrapperClasses(bordered: boolean, maxHeight?: string | n
 export function getTableHeaderClasses(stickyHeader: boolean): string {
   return classNames(
     tableHeaderBackgroundClasses,
-    'border-b border-[var(--tiger-border,#e5e7eb)]',
+    // border on cells, not <thead> — the table is `border-separate`
+    '[&_th]:border-b [&_th]:border-[var(--tiger-border,#e5e7eb)]',
     stickyHeader && 'sticky top-0 z-10'
   )
 }
@@ -597,7 +606,9 @@ export function getTableRowClasses(
   customClassName?: string
 ): string {
   return classNames(
-    'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0',
+    // border on cells, not <tr> — the table is `border-separate`; `:not(:last-child)`
+    // reproduces the old `last:border-b-0` (every row except the last gets a bottom rule)
+    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border,#e5e7eb)]',
     hoverable && tableRowHoverClasses,
     striped && isEven && tableRowStripedClasses,
     customClassName
@@ -794,7 +805,8 @@ export function getExpandIconClasses(expanded: boolean): string {
  */
 export function getExpandedRowClasses(): string {
   return classNames(
-    'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0',
+    // border on cells, not <tr> — the table is `border-separate`
+    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border,#e5e7eb)]',
     'bg-[var(--tiger-surface-muted,#f9fafb)]/30'
   )
 }
@@ -882,7 +894,7 @@ export function createTableRowKeyCache<T>(
  * Summary row footer classes
  */
 export const tableSummaryRowClasses =
-  'bg-[var(--tiger-surface-muted,#f3f4f6)] font-semibold border-t-2 border-[var(--tiger-border,#e5e7eb)]'
+  'bg-[var(--tiger-surface-muted,#f3f4f6)] font-semibold [&>td]:border-t-2 [&>td]:border-[var(--tiger-border,#e5e7eb)]'
 
 /**
  * Editable cell classes

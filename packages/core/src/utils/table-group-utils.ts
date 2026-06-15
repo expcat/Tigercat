@@ -25,7 +25,7 @@ export function groupDataByColumn<T>(data: T[], groupBy: string): Map<string, T[
  * Get group header row classes
  */
 export const tableGroupHeaderClasses =
-  'bg-[var(--tiger-surface-muted,#f3f4f6)] font-semibold text-sm text-[var(--tiger-text,#111827)] border-b border-[var(--tiger-border,#e5e7eb)]'
+  'bg-[var(--tiger-surface-muted,#f3f4f6)] font-semibold text-sm text-[var(--tiger-text,#111827)] [&>td]:border-b [&>td]:border-[var(--tiger-border,#e5e7eb)]'
 
 /**
  * Get group header cell padding classes

@@ -15,7 +15,12 @@ import {
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
+  getTableRowClasses,
+  getTableHeaderClasses,
+  getExpandedRowClasses,
   getRowKey,
+  tableBaseClasses,
+  tableSummaryRowClasses,
   tableBackgroundClasses,
   tableFixedCellStripedClasses,
   tableHeaderBackgroundClasses,
@@ -560,6 +565,30 @@ describe('table-utils', () => {
     it('resolves the card list container classes per breakpoint', () => {
       expect(getTableResponsiveCardListClasses()).toContain('max-sm:grid')
       expect(getTableResponsiveCardListClasses('lg')).toContain('max-lg:grid')
+    })
+  })
+
+  describe('separate border model (sticky stability)', () => {
+    it('uses border-separate so sticky/fixed columns pin reliably', () => {
+      expect(tableBaseClasses).toContain('border-separate')
+      expect(tableBaseClasses).toContain('border-spacing-0')
+      expect(tableBaseClasses).not.toContain('border-collapse')
+    })
+
+    it('puts row separators on cells, not on <tr>', () => {
+      const cls = getTableRowClasses(true, true, true)
+      // border lives on direct <td> children of non-last rows
+      expect(cls).toContain('[&:not(:last-child)>td]:border-b')
+      // no bare row-level border that would not paint under border-separate
+      expect(cls).not.toMatch(/(^|\s)border-b(\s|$)/)
+      expect(cls).not.toContain('last:border-b-0')
+    })
+
+    it('puts header + expanded-row + summary separators on cells', () => {
+      expect(getTableHeaderClasses(false)).toContain('[&_th]:border-b')
+      expect(getExpandedRowClasses()).toContain('[&:not(:last-child)>td]:border-b')
+      expect(tableSummaryRowClasses).toContain('[&>td]:border-t-2')
+      expect(tableSummaryRowClasses).not.toMatch(/(^|\s)border-t-2(\s|$)/)
     })
   })
 })
