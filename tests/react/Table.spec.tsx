@@ -624,6 +624,43 @@ describe('Table', () => {
       const emailHeaderUnlocked = getByText('Email').closest('th')!
       expect(emailHeaderUnlocked).not.toHaveStyle('position: sticky')
     })
+
+    it('pins column widths via a colgroup that is stable across lock toggles', async () => {
+      const lockableColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', width: 140 },
+        { key: 'age', title: 'Age', width: 120 },
+        { key: 'email', title: 'Email', width: 220 }
+      ]
+
+      const { container, getByLabelText } = render(
+        <Table
+          columns={lockableColumns}
+          dataSource={dataSource}
+          pagination={false}
+          columnLockable
+        />
+      )
+
+      const colsBefore = Array.from(container.querySelectorAll('table > colgroup col'))
+      expect(colsBefore).toHaveLength(3)
+      const widthsBefore = colsBefore.map((col) => (col as HTMLElement).style.width)
+      expect(widthsBefore).toEqual(['140px', '120px', '220px'])
+
+      await fireEvent.click(getByLabelText('Lock column Email'))
+
+      const widthsAfter = Array.from(container.querySelectorAll('table > colgroup col')).map(
+        (col) => (col as HTMLElement).style.width
+      )
+      expect(widthsAfter).toEqual(widthsBefore)
+    })
+
+    it('does not render a colgroup for a plain table without fixed or lockable columns', () => {
+      const { container } = render(
+        <Table columns={columns} dataSource={dataSource} pagination={false} />
+      )
+
+      expect(container.querySelector('table > colgroup')).toBeNull()
+    })
   })
 
   describe('Sorting', () => {

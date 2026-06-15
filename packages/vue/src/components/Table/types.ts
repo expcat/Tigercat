@@ -20,6 +20,7 @@ export interface TableContext {
   paginationConfig: ComputedRef<PaginationConfig | null>
   displayColumns: ComputedRef<TableColumn[]>
   fixedColumnsInfo: ComputedRef<ReturnType<typeof getFixedColumnOffsets>>
+  frozenColumnWidths: Ref<Record<string, number>>
   columnByKey: ComputedRef<Record<string, TableColumn>>
   processedData: ComputedRef<Record<string, unknown>[]>
   paginatedData: ComputedRef<Record<string, unknown>[]>

@@ -2,11 +2,14 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createTableRowKeyCache,
   filterHiddenColumns,
+  freezeTableColumnWidths,
   getCardColumns,
   getCardGridInfo,
   getFixedColumnOffsets,
   getFixedColumnPosition,
   getFixedColumnStyle,
+  getTableColgroup,
+  resolveTableColumnWidth,
   getTableFixedCellClasses,
   getTableFixedHeaderCellClasses,
   getTableResponsiveCardListClasses,
@@ -131,6 +134,116 @@ describe('table-utils', () => {
         right: '0px',
         zIndex: 12
       })
+    })
+  })
+
+  describe('resolveTableColumnWidth', () => {
+    it('uses the declared width (number → px, string passthrough)', () => {
+      expect(resolveTableColumnWidth({ key: 'a', width: 120 })).toBe('120px')
+      expect(resolveTableColumnWidth({ key: 'a', width: '20%' })).toBe('20%')
+    })
+
+    it('falls back to the frozen measured width, then undefined', () => {
+      expect(resolveTableColumnWidth({ key: 'a' }, { a: 140 })).toBe('140px')
+      expect(resolveTableColumnWidth({ key: 'a' }, { a: 0 })).toBeUndefined()
+      expect(resolveTableColumnWidth({ key: 'a' }, {})).toBeUndefined()
+    })
+  })
+
+  describe('getTableColgroup', () => {
+    const columns: TableColumn[] = [
+      { key: 'name', title: 'Name' },
+      { key: 'age', title: 'Age', width: 80 },
+      { key: 'actions', title: 'Actions', width: 100, fixed: 'right' }
+    ]
+
+    it('emits one entry per data column with resolved widths', () => {
+      expect(
+        getTableColgroup({
+          columns,
+          frozenWidths: { name: 150 },
+          size: 'md',
+          hasSelectionColumn: false,
+          expand: false
+        })
+      ).toEqual([
+        { key: 'name', width: '150px' },
+        { key: 'age', width: '80px' },
+        { key: 'actions', width: '100px' }
+      ])
+    })
+
+    it('prepends selection and leading expand columns with size-based widths', () => {
+      const entries = getTableColgroup({
+        columns,
+        size: 'sm',
+        hasSelectionColumn: true,
+        expand: 'start'
+      })
+
+      expect(entries.slice(0, 2)).toEqual([
+        { key: '__expand__', width: '2rem' },
+        { key: '__selection__', width: '2rem' }
+      ])
+      expect(entries.map((e) => e.key)).toEqual([
+        '__expand__',
+        '__selection__',
+        'name',
+        'age',
+        'actions'
+      ])
+    })
+
+    it('appends a trailing expand column and scales width with size', () => {
+      const entries = getTableColgroup({
+        columns,
+        size: 'lg',
+        hasSelectionColumn: false,
+        expand: 'end'
+      })
+
+      expect(entries[entries.length - 1]).toEqual({ key: '__expand__', width: '3rem' })
+    })
+
+    it('leaves auto-sized columns without a frozen width undefined', () => {
+      const entries = getTableColgroup({
+        columns,
+        size: 'md',
+        hasSelectionColumn: false,
+        expand: false
+      })
+
+      expect(entries[0]).toEqual({ key: 'name', width: undefined })
+    })
+  })
+
+  describe('freezeTableColumnWidths', () => {
+    const columns: TableColumn[] = [
+      { key: 'name', title: 'Name' },
+      { key: 'age', title: 'Age', width: 80 }
+    ]
+
+    it('freezes the first measured width of auto-sized columns only', () => {
+      expect(freezeTableColumnWidths(columns, { name: 150, age: 90 }, {})).toEqual({ name: 150 })
+    })
+
+    it('keeps existing frozen entries instead of re-reading measurements', () => {
+      expect(freezeTableColumnWidths(columns, { name: 200 }, { name: 150 })).toEqual({ name: 150 })
+    })
+
+    it('ignores non-positive measurements until a real width is known', () => {
+      expect(freezeTableColumnWidths(columns, { name: 0 }, {})).toEqual({})
+    })
+
+    it('prunes frozen entries for removed columns', () => {
+      expect(
+        freezeTableColumnWidths([{ key: 'name', title: 'Name' }], {}, { name: 150, gone: 90 })
+      ).toEqual({ name: 150 })
+    })
+
+    it('returns the same reference when nothing changes (loop-safety)', () => {
+      const previous = { name: 150 }
+      expect(freezeTableColumnWidths(columns, { name: 150, age: 90 }, previous)).toBe(previous)
     })
   })
 

@@ -8,6 +8,7 @@ import {
   filterDataAdvanced,
   groupDataByColumn,
   getFixedColumnOffsets,
+  freezeTableColumnWidths,
   filterHiddenColumns,
   type SortState,
   type PaginationConfig,
@@ -241,6 +242,16 @@ export function useTableState(input: UseTableStateInput): TableContext {
     () => getFixedColumnOffsets(displayColumns, measuredColumnWidths),
     [displayColumns, measuredColumnWidths]
   )
+
+  // Freeze each auto-sized column's first measured width so the `<colgroup>` can
+  // pin it — keeps lock toggling from reflowing column widths.
+  const [frozenColumnWidths, setFrozenColumnWidths] = useState<Record<string, number>>({})
+
+  useEffect(() => {
+    setFrozenColumnWidths((prev) =>
+      freezeTableColumnWidths(displayColumns, measuredColumnWidths ?? {}, prev)
+    )
+  }, [displayColumns, measuredColumnWidths])
 
   function handleSetHiddenColumns(hiddenKeys: string[]) {
     if (!isHiddenColumnsControlled) {
@@ -522,6 +533,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     paginationConfig,
     displayColumns,
     fixedColumnsInfo,
+    frozenColumnWidths,
     processedData,
     paginatedData,
     pageRowKeys,

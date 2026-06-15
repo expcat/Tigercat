@@ -10,6 +10,7 @@ import {
   getFixedColumnOffsets,
   getFixedVirtualRange,
   filterHiddenColumns,
+  freezeTableColumnWidths,
   type TableColumn,
   type SortState,
   type SortDirection,
@@ -161,6 +162,22 @@ export function useTableState(
   const fixedColumnsInfo = computed(() => {
     return getFixedColumnOffsets(displayColumns.value, measuredColumnWidths.value)
   })
+
+  // Freeze each auto-sized column's first measured width so the `<colgroup>` can
+  // pin it — keeps lock toggling from reflowing column widths.
+  const frozenColumnWidths = ref<Record<string, number>>({})
+
+  watch(
+    [() => measuredColumnWidths.value, displayColumns],
+    () => {
+      frozenColumnWidths.value = freezeTableColumnWidths(
+        displayColumns.value,
+        measuredColumnWidths.value,
+        frozenColumnWidths.value
+      )
+    },
+    { immediate: true }
+  )
 
   const columnByKey = computed<Record<string, TableColumn>>(() => {
     const map: Record<string, TableColumn> = {}
@@ -502,6 +519,7 @@ export function useTableState(
     paginationConfig,
     displayColumns,
     fixedColumnsInfo,
+    frozenColumnWidths,
     columnByKey,
     processedData,
     paginatedData,

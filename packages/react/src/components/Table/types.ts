@@ -43,6 +43,7 @@ export interface TableContext {
   paginationConfig: PaginationConfig | null
   displayColumns: TableColumn[]
   fixedColumnsInfo: ReturnType<typeof getFixedColumnOffsets>
+  frozenColumnWidths: Record<string, number>
   processedData: Record<string, unknown>[]
   paginatedData: Record<string, unknown>[]
   pageRowKeys: (string | number)[]

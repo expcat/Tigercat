@@ -186,6 +186,124 @@ export function parseWidthToPx(width?: string | number): number {
 }
 
 /**
+ * Tailwind action-column widths used by the selection / expand cells
+ * (`getCheckboxCellClasses` / `getExpandIconCellClasses` → `w-8`/`w-10`/`w-12`).
+ *
+ * Mirrored here so the `<colgroup>` pins those columns to the exact same width
+ * the cells already render at.
+ */
+const TABLE_ACTION_COLUMN_WIDTH: Record<TableSize, string> = {
+  sm: '2rem',
+  md: '2.5rem',
+  lg: '3rem'
+}
+
+/**
+ * Resolve a single column's pinned `<col>` width.
+ *
+ * - Declared `width` wins (number → `"Npx"`, string passed through).
+ * - Otherwise the frozen (first-measured) width is used.
+ * - Returns `undefined` when neither is available so the column stays auto-sized
+ *   until its first measurement is captured.
+ */
+export function resolveTableColumnWidth<T = Record<string, unknown>>(
+  column: Pick<TableColumn<T>, 'key' | 'width'>,
+  frozenWidths: Record<string, number> = {}
+): string | undefined {
+  if (column.width !== undefined) {
+    return typeof column.width === 'number' ? `${column.width}px` : column.width
+  }
+
+  const frozen = frozenWidths[column.key]
+  return frozen && frozen > 0 ? `${frozen}px` : undefined
+}
+
+export interface TableColgroupEntry {
+  key: string
+  width?: string
+}
+
+export interface TableColgroupOptions<T = Record<string, unknown>> {
+  columns: TableColumn<T>[]
+  frozenWidths?: Record<string, number>
+  size: TableSize
+  hasSelectionColumn: boolean
+  expand: 'start' | 'end' | false
+}
+
+/**
+ * Build the ordered `<colgroup>` descriptor for a table.
+ *
+ * The order mirrors the rendered cells: an optional leading expand column, an
+ * optional selection column, the data columns, then an optional trailing expand
+ * column. Pinning every column width via `<col>` decouples column width from a
+ * column's `fixed`/lock state, so toggling a lock no longer reflows widths and
+ * the measure → offset → reflow → re-measure feedback loop is broken.
+ */
+export function getTableColgroup<T = Record<string, unknown>>(
+  options: TableColgroupOptions<T>
+): TableColgroupEntry[] {
+  const { columns, frozenWidths = {}, size, hasSelectionColumn, expand } = options
+  const actionWidth = TABLE_ACTION_COLUMN_WIDTH[size]
+  const entries: TableColgroupEntry[] = []
+
+  if (expand === 'start') {
+    entries.push({ key: '__expand__', width: actionWidth })
+  }
+  if (hasSelectionColumn) {
+    entries.push({ key: '__selection__', width: actionWidth })
+  }
+  for (const column of columns) {
+    entries.push({ key: column.key, width: resolveTableColumnWidth(column, frozenWidths) })
+  }
+  if (expand === 'end') {
+    entries.push({ key: '__expand__', width: actionWidth })
+  }
+
+  return entries
+}
+
+/**
+ * Freeze the first measured width of each auto-sized column.
+ *
+ * Columns with a declared `width` are skipped (they pin to the declared value).
+ * Existing frozen entries are preserved; removed columns are pruned. When the
+ * result is identical to `previousFrozen` the **same reference** is returned so
+ * reactive consumers do not re-render — this is what keeps the ResizeObserver
+ * from looping.
+ */
+export function freezeTableColumnWidths<T = Record<string, unknown>>(
+  columns: Pick<TableColumn<T>, 'key' | 'width'>[],
+  measuredWidths: Record<string, number> = {},
+  previousFrozen: Record<string, number> = {}
+): Record<string, number> {
+  const next: Record<string, number> = {}
+
+  for (const column of columns) {
+    if (column.width !== undefined) {
+      continue
+    }
+    const existing = previousFrozen[column.key]
+    if (existing !== undefined) {
+      next[column.key] = existing
+      continue
+    }
+    const measured = measuredWidths[column.key]
+    if (measured && measured > 0) {
+      next[column.key] = measured
+    }
+  }
+
+  const previousKeys = Object.keys(previousFrozen)
+  const nextKeys = Object.keys(next)
+  const unchanged =
+    previousKeys.length === nextKeys.length &&
+    nextKeys.every((key) => previousFrozen[key] === next[key])
+
+  return unchanged ? previousFrozen : next
+}
+
+/**
  * Calculate sticky offsets for fixed columns.
  */
 export function getFixedColumnOffsets<T = Record<string, unknown>>(

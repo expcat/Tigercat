@@ -5,6 +5,7 @@ import {
   getTableWrapperClasses,
   getCardColumns,
   getCardGridInfo,
+  getTableColgroup,
   getTableResponsiveCardClasses,
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
@@ -366,6 +367,27 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
               }
             : (props as React.HTMLAttributes<HTMLTableElement>).style
         }>
+        {(columnLockable || ctx.fixedColumnsInfo.hasFixedColumns) && (
+          <colgroup>
+            {getTableColgroup({
+              columns: ctx.displayColumns,
+              frozenWidths: ctx.frozenColumnWidths,
+              size,
+              hasSelectionColumn:
+                !!internalRowSelection && internalRowSelection.showCheckbox !== false,
+              expand: internalExpandable
+                ? internalExpandable.expandIconPosition === 'end'
+                  ? 'end'
+                  : 'start'
+                : false
+            }).map((entry, index) => (
+              <col
+                key={`${entry.key}-${index}`}
+                style={entry.width ? { width: entry.width } : undefined}
+              />
+            ))}
+          </colgroup>
+        )}
         {renderTableHeader(ctx, {
           size,
           stickyHeader,

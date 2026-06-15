@@ -15,6 +15,7 @@ import {
   formatTableSortByText,
   getCardColumns,
   getCardGridInfo,
+  getTableColgroup,
   getImmediateTigerLocale,
   getTableLabels,
   getTableWrapperClasses,
@@ -215,7 +216,33 @@ export const Table = defineComponent({
         emptyText: tableLabels.value.emptyText
       } as TableInternalProps
 
+      const shouldPinColumns =
+        resolvedProps.columnLockable || ctx.fixedColumnsInfo.value.hasFixedColumns
+      const colgroup = shouldPinColumns
+        ? h(
+            'colgroup',
+            getTableColgroup({
+              columns: ctx.displayColumns.value,
+              frozenWidths: ctx.frozenColumnWidths.value,
+              size: resolvedProps.size,
+              hasSelectionColumn:
+                !!resolvedProps.rowSelection && resolvedProps.rowSelection.showCheckbox !== false,
+              expand: resolvedProps.expandable
+                ? resolvedProps.expandable.expandIconPosition === 'end'
+                  ? 'end'
+                  : 'start'
+                : false
+            }).map((entry, index) =>
+              h('col', {
+                key: `${entry.key}-${index}`,
+                style: entry.width ? { width: entry.width } : undefined
+              })
+            )
+          )
+        : null
+
       const tableChildren = [
+        colgroup,
         renderTableHeader(ctx, renderProps, slots),
         renderTableBody(ctx, renderProps, slots),
         renderSummaryRow(ctx, renderProps)
