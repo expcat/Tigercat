@@ -7,6 +7,7 @@ import {
   getFixedColumnStyle,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
+  formatTableSortByText,
   type RowSelectionConfig,
   type ExpandableConfig,
   type TableSize
@@ -21,10 +22,21 @@ export interface RenderHeaderViewProps {
   expandable?: ExpandableConfig
   columnLockable: boolean
   columnDraggable: boolean
+  lockColumnAriaLabel: string
+  unlockColumnAriaLabel: string
 }
 
 export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps): React.ReactNode {
-  const { size, stickyHeader, rowSelection, expandable, columnLockable, columnDraggable } = view
+  const {
+    size,
+    stickyHeader,
+    rowSelection,
+    expandable,
+    columnLockable,
+    columnDraggable,
+    lockColumnAriaLabel,
+    unlockColumnAriaLabel
+  } = view
   const expandHeaderTh = expandable ? (
     <th className={getExpandIconCellClasses(size)} aria-label="Expand" />
   ) : null
@@ -102,11 +114,12 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                 {columnLockable && (
                   <button
                     type="button"
-                    aria-label={
+                    aria-label={formatTableSortByText(
                       column.fixed === 'left' || column.fixed === 'right'
-                        ? `Unlock column ${column.title}`
-                        : `Lock column ${column.title}`
-                    }
+                        ? unlockColumnAriaLabel
+                        : lockColumnAriaLabel,
+                      String(column.title)
+                    )}
                     className={classNames(
                       'inline-flex items-center',
                       column.fixed === 'left' || column.fixed === 'right'

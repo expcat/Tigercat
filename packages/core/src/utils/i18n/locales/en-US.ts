@@ -47,7 +47,9 @@ export const enUS: TigerLocale = {
     selectedText: 'Selected',
     selectedItemsText: 'items',
     columnSettingsText: 'Column settings',
-    columnSettingsAriaLabel: 'Column settings'
+    columnSettingsAriaLabel: 'Column settings',
+    lockColumnAriaLabel: 'Lock column {column}',
+    unlockColumnAriaLabel: 'Unlock column {column}'
   },
   formWizard: {
     prevText: 'Previous',

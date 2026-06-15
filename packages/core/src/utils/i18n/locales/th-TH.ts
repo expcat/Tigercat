@@ -47,7 +47,9 @@ export const thTH: TigerLocale = {
     selectedText: 'เลือกแล้ว',
     selectedItemsText: 'รายการ',
     columnSettingsText: 'ตั้งค่าคอลัมน์',
-    columnSettingsAriaLabel: 'ตั้งค่าคอลัมน์'
+    columnSettingsAriaLabel: 'ตั้งค่าคอลัมน์',
+    lockColumnAriaLabel: 'ล็อกคอลัมน์ {column}',
+    unlockColumnAriaLabel: 'ปลดล็อกคอลัมน์ {column}'
   },
   formWizard: {
     prevText: 'ก่อนหน้า',

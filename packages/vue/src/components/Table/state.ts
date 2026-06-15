@@ -8,9 +8,9 @@ import {
   filterDataAdvanced,
   groupDataByColumn,
   getFixedColumnOffsets,
-  getFixedVirtualRange,
   filterHiddenColumns,
   freezeTableColumnWidths,
+  orderTableFixedColumns,
   type TableColumn,
   type SortState,
   type SortDirection,
@@ -156,7 +156,7 @@ export function useTableState(
         fixed: hasOverride ? fixedOverrides.value[column.key] : column.fixed
       }
     })
-    return filterHiddenColumns(mapped, hiddenColumnKeys.value)
+    return orderTableFixedColumns(filterHiddenColumns(mapped, hiddenColumnKeys.value))
   })
 
   const fixedColumnsInfo = computed(() => {
@@ -504,10 +504,6 @@ export function useTableState(
 
   // --- v0.6.0: virtual scroll ---
   const virtualScrollTop = ref(0)
-
-  // Note: getFixedVirtualRange currently used only for future tree-shake/virtual fast path.
-  // Keep reference alive to avoid unused-import warnings in ts strict builds.
-  void getFixedVirtualRange
 
   // --- v0.6.0: grouping ---
   const groupedData = computed(() => {

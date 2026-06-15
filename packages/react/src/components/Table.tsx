@@ -394,7 +394,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           rowSelection: internalRowSelection,
           expandable: internalExpandable,
           columnLockable,
-          columnDraggable
+          columnDraggable,
+          lockColumnAriaLabel: tableLabels.lockColumnAriaLabel,
+          unlockColumnAriaLabel: tableLabels.unlockColumnAriaLabel
         })}
         {renderTableBody(ctx, {
           size,

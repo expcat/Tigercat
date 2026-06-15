@@ -47,7 +47,9 @@ export const zhCN: TigerLocale = {
     selectedText: '已选择',
     selectedItemsText: '项',
     columnSettingsText: '列设置',
-    columnSettingsAriaLabel: '列设置'
+    columnSettingsAriaLabel: '列设置',
+    lockColumnAriaLabel: '锁定{column}列',
+    unlockColumnAriaLabel: '取消锁定{column}列'
   },
   formWizard: {
     prevText: '上一步',

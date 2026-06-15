@@ -10,6 +10,7 @@ import {
   getFixedColumnOffsets,
   freezeTableColumnWidths,
   filterHiddenColumns,
+  orderTableFixedColumns,
   type SortState,
   type PaginationConfig,
   type TableColumn,
@@ -220,7 +221,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
         fixed: hasOverride ? fixedOverrides[column.key] : column.fixed
       }
     })
-    return filterHiddenColumns(mapped, effectiveHiddenColumnKeys)
+    return orderTableFixedColumns(filterHiddenColumns(mapped, effectiveHiddenColumnKeys))
   }, [columns, fixedOverrides, effectiveHiddenColumnKeys])
 
   const totalColumnCount = useMemo(() => {

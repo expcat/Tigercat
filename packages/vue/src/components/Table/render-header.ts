@@ -6,7 +6,9 @@ import {
   getTableFixedHeaderCellClasses,
   getFixedColumnStyle,
   getCheckboxCellClasses,
-  getExpandIconCellClasses
+  getExpandIconCellClasses,
+  formatTableSortByText,
+  type TigerLocaleTable
 } from '@expcat/tigercat-core'
 import { LockIcon, SortIcon } from './icons'
 import type { TableContext, TableInternalProps } from './types'
@@ -14,7 +16,8 @@ import type { TableContext, TableInternalProps } from './types'
 export function renderTableHeader(
   ctx: TableContext,
   props: TableInternalProps,
-  slots: Slots
+  slots: Slots,
+  labels: Required<TigerLocaleTable>
 ): VNodeChild {
   const headerCells: VNodeChild[] = []
   const expandAtStart = props.expandable && props.expandable.expandIconPosition !== 'end'
@@ -100,10 +103,12 @@ export function renderTableHeader(
                 ? 'text-[var(--tiger-primary,#2563eb)]'
                 : 'text-gray-400 hover:text-gray-700'
             ),
-            'aria-label':
+            'aria-label': formatTableSortByText(
               column.fixed === 'left' || column.fixed === 'right'
-                ? `Unlock column ${column.title}`
-                : `Lock column ${column.title}`,
+                ? labels.unlockColumnAriaLabel
+                : labels.lockColumnAriaLabel,
+              String(column.title)
+            ),
             onClick: (e: Event) => {
               e.stopPropagation()
               ctx.toggleColumnLock(column.key)

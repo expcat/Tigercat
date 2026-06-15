@@ -47,7 +47,9 @@ export const idID: TigerLocale = {
     selectedText: 'Dipilih',
     selectedItemsText: 'item',
     columnSettingsText: 'Pengaturan kolom',
-    columnSettingsAriaLabel: 'Pengaturan kolom'
+    columnSettingsAriaLabel: 'Pengaturan kolom',
+    lockColumnAriaLabel: 'Kunci kolom {column}',
+    unlockColumnAriaLabel: 'Buka kunci kolom {column}'
   },
   formWizard: {
     prevText: 'Sebelumnya',

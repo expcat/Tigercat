@@ -9,6 +9,7 @@ import {
   getFixedColumnPosition,
   getFixedColumnStyle,
   getTableColgroup,
+  orderTableFixedColumns,
   resolveTableColumnWidth,
   getTableFixedCellClasses,
   getTableFixedHeaderCellClasses,
@@ -113,6 +114,24 @@ describe('table-utils', () => {
         leftOffsets: { name: 0 },
         rightOffsets: { actions: 0 },
         minTableWidth: 350,
+        hasFixedColumns: true
+      })
+    })
+
+    it('keeps non-contiguous fixed offsets compact', () => {
+      const columns: TableColumn[] = [
+        { key: 'name', title: 'Name', width: 120, fixed: 'left' },
+        { key: 'email', title: 'Email', width: 400 },
+        { key: 'age', title: 'Age', width: 80, fixed: 'left' },
+        { key: 'role', title: 'Role', width: 140, fixed: 'right' },
+        { key: 'status', title: 'Status', width: 100 },
+        { key: 'actions', title: 'Actions', width: 60, fixed: 'right' }
+      ]
+
+      expect(getFixedColumnOffsets(columns)).toEqual({
+        leftOffsets: { name: 0, age: 120 },
+        rightOffsets: { actions: 0, role: 60 },
+        minTableWidth: 900,
         hasFixedColumns: true
       })
     })
@@ -280,6 +299,26 @@ describe('table-utils', () => {
 
     it('can hide every column', () => {
       expect(filterHiddenColumns(columns, ['name', 'age', 'email', 'actions'])).toEqual([])
+    })
+
+    it('orders fixed columns around normal columns after hidden columns are filtered', () => {
+      const visible = filterHiddenColumns(
+        [
+          { key: 'name', title: 'Name', fixed: 'left' },
+          { key: 'email', title: 'Email' },
+          { key: 'age', title: 'Age', fixed: 'left' },
+          { key: 'actions', title: 'Actions', fixed: 'right' },
+          { key: 'status', title: 'Status' }
+        ],
+        ['email']
+      )
+
+      expect(orderTableFixedColumns(visible).map((column) => column.key)).toEqual([
+        'name',
+        'age',
+        'status',
+        'actions'
+      ])
     })
 
     it('shrinks fixed column offsets when a fixed column is hidden', () => {

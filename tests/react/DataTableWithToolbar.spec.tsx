@@ -543,6 +543,54 @@ describe('DataTableWithToolbar (React)', () => {
       expect(screen.getByRole('checkbox', { name: 'Email' })).toBeEnabled()
     })
 
+    it('renders lock buttons and toggles a column fixed state when columnLockable', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <DataTableWithToolbar<RowData>
+          columns={multiColumns}
+          dataSource={[{ id: 1, name: 'A', email: 'a@example.com' }]}
+          columnLockable
+          pagination={false}
+        />
+      )
+
+      const lockButton = screen.getByRole('button', { name: 'Lock column Name' })
+      expect(lockButton).toBeInTheDocument()
+
+      await user.click(lockButton)
+      expect(screen.getByRole('button', { name: 'Unlock column Name' })).toBeInTheDocument()
+    })
+
+    it('localizes the lock-column aria-label via labels override', () => {
+      render(
+        <DataTableWithToolbar<RowData>
+          columns={multiColumns}
+          dataSource={[{ id: 1, name: 'A', email: 'a@example.com' }]}
+          columnLockable
+          labels={{ lockColumnAriaLabel: 'Pin {column}', unlockColumnAriaLabel: 'Unpin {column}' }}
+          pagination={false}
+        />
+      )
+
+      expect(screen.getByRole('button', { name: 'Pin Name' })).toBeInTheDocument()
+    })
+
+    it('localizes the lock-column aria-label from the active locale', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <DataTableWithToolbar<RowData>
+            columns={multiColumns}
+            dataSource={[{ id: 1, name: 'A', email: 'a@example.com' }]}
+            columnLockable
+            pagination={false}
+          />
+        </ConfigProvider>
+      )
+
+      expect(screen.getByRole('button', { name: '锁定Name列' })).toBeInTheDocument()
+    })
+
     it('keeps internal state untouched in controlled mode and only calls back', async () => {
       const user = userEvent.setup()
       const onHiddenColumnsChange = vi.fn()

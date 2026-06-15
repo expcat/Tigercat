@@ -63,7 +63,9 @@ export const ptBR: TigerLocale = defineLocale({
     selectedText: 'Selecionado',
     selectedItemsText: 'itens',
     columnSettingsText: 'Configurações de colunas',
-    columnSettingsAriaLabel: 'Configurações de colunas'
+    columnSettingsAriaLabel: 'Configurações de colunas',
+    lockColumnAriaLabel: 'Bloquear coluna {column}',
+    unlockColumnAriaLabel: 'Desbloquear coluna {column}'
   },
   formWizard: {
     prevText: 'Anterior',

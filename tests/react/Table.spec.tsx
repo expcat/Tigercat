@@ -603,7 +603,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { getByLabelText, getByText } = render(
+      const { container, getByLabelText, getByText } = render(
         <Table
           columns={lockableColumns}
           dataSource={dataSource}
@@ -616,8 +616,11 @@ describe('Table', () => {
 
       const emailHeaderLocked = getByText('Email').closest('th')!
       expect(emailHeaderLocked).toHaveStyle('position: sticky')
-      expect(emailHeaderLocked).toHaveStyle('left: 260px')
+      expect(emailHeaderLocked).toHaveStyle('left: 0px')
       expect(emailHeaderLocked).toHaveClass(tableHeaderBgClass)
+      expect(
+        Array.from(container.querySelectorAll('thead th')).map((th) => th.textContent?.trim())
+      ).toEqual(['Email', 'Name', 'Age'])
 
       await fireEvent.click(getByLabelText('Unlock column Email'))
 
@@ -651,7 +654,38 @@ describe('Table', () => {
       const widthsAfter = Array.from(container.querySelectorAll('table > colgroup col')).map(
         (col) => (col as HTMLElement).style.width
       )
-      expect(widthsAfter).toEqual(widthsBefore)
+      expect(widthsAfter).toEqual(['220px', '140px', '120px'])
+      expect(widthsAfter.sort()).toEqual(widthsBefore.sort())
+    })
+
+    it('moves a newly locked middle column into the compact left fixed area', async () => {
+      const lockableColumns: TableColumn[] = [
+        { key: 'name', title: 'Name', width: 200, fixed: 'left' },
+        { key: 'email', title: 'Email', width: 400 },
+        { key: 'age', title: 'Age', width: 200 },
+        { key: 'role', title: 'Role', width: 240 }
+      ]
+
+      const { container, getByLabelText, getByText } = render(
+        <Table
+          columns={lockableColumns}
+          dataSource={dataSource}
+          pagination={false}
+          columnLockable
+        />
+      )
+
+      await fireEvent.click(getByLabelText('Lock column Age'))
+
+      expect(
+        Array.from(container.querySelectorAll('thead th')).map((th) => th.textContent?.trim())
+      ).toEqual(['Name', 'Age', 'Email', 'Role'])
+
+      const ageHeaderLocked = getByText('Age').closest('th')!
+      const emailHeader = getByText('Email').closest('th')!
+      expect(ageHeaderLocked).toHaveStyle('position: sticky')
+      expect(ageHeaderLocked).toHaveStyle('left: 200px')
+      expect(emailHeader).not.toHaveStyle('position: sticky')
     })
 
     it('does not render a colgroup for a plain table without fixed or lockable columns', () => {

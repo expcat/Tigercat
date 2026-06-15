@@ -47,7 +47,9 @@ export const koKR: TigerLocale = {
     selectedText: '선택됨',
     selectedItemsText: '개',
     columnSettingsText: '열 설정',
-    columnSettingsAriaLabel: '열 설정'
+    columnSettingsAriaLabel: '열 설정',
+    lockColumnAriaLabel: '{column} 열 고정',
+    unlockColumnAriaLabel: '{column} 열 고정 해제'
   },
   formWizard: {
     prevText: '이전',

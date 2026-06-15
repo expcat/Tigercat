@@ -243,7 +243,7 @@ export const Table = defineComponent({
 
       const tableChildren = [
         colgroup,
-        renderTableHeader(ctx, renderProps, slots),
+        renderTableHeader(ctx, renderProps, slots, tableLabels.value),
         renderTableBody(ctx, renderProps, slots),
         renderSummaryRow(ctx, renderProps)
       ]

@@ -63,7 +63,9 @@ export const arSA: TigerLocale = defineLocale({
     selectedText: 'محدد',
     selectedItemsText: 'عناصر',
     columnSettingsText: 'إعدادات الأعمدة',
-    columnSettingsAriaLabel: 'إعدادات الأعمدة'
+    columnSettingsAriaLabel: 'إعدادات الأعمدة',
+    lockColumnAriaLabel: 'تثبيت العمود {column}',
+    unlockColumnAriaLabel: 'إلغاء تثبيت العمود {column}'
   },
   formWizard: {
     prevText: 'السابق',

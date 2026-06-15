@@ -171,6 +171,30 @@ export function filterHiddenColumns<T = Record<string, unknown>>(
 }
 
 /**
+ * Keep fixed columns visually contiguous so sticky offsets never leave gaps.
+ */
+export function orderTableFixedColumns<T = Record<string, unknown>>(
+  columns: TableColumn<T>[]
+): TableColumn<T>[] {
+  const left: TableColumn<T>[] = []
+  const normal: TableColumn<T>[] = []
+  const right: TableColumn<T>[] = []
+
+  for (const column of columns) {
+    if (column.fixed === 'left') {
+      left.push(column)
+    } else if (column.fixed === 'right') {
+      right.push(column)
+    } else {
+      normal.push(column)
+    }
+  }
+
+  if (left.length === 0 && right.length === 0) return columns
+  return [...left, ...normal, ...right]
+}
+
+/**
  * Parse a column width into a pixel number.
  *
  * Notes:
@@ -311,6 +335,13 @@ export function freezeTableColumnWidths<T = Record<string, unknown>>(
   return unchanged ? previousFrozen : next
 }
 
+function getColumnWidthForOffset<T = Record<string, unknown>>(
+  column: Pick<TableColumn<T>, 'key' | 'width'>,
+  measuredColumnWidths: Record<string, number>
+): number {
+  return measuredColumnWidths[column.key] || parseWidthToPx(column.width)
+}
+
 /**
  * Calculate sticky offsets for fixed columns.
  */
@@ -333,8 +364,8 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
     if (column.fixed === 'left') {
       leftOffsets[column.key] = left
       hasLeftFixedColumns = true
+      left += getColumnWidthForOffset(column, measuredColumnWidths)
     }
-    left += measuredColumnWidths[column.key] || parseWidthToPx(column.width)
   }
 
   let right = 0
@@ -343,12 +374,12 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
     if (column.fixed === 'right') {
       rightOffsets[column.key] = right
       hasRightFixedColumns = true
+      right += getColumnWidthForOffset(column, measuredColumnWidths)
     }
-    right += measuredColumnWidths[column.key] || parseWidthToPx(column.width)
   }
 
   const minTableWidth = columns.reduce(
-    (sum, col) => sum + (measuredColumnWidths[col.key] || parseWidthToPx(col.width)),
+    (sum, col) => sum + getColumnWidthForOffset(col, measuredColumnWidths),
     0
   )
   const hasFixedColumns = hasLeftFixedColumns || hasRightFixedColumns

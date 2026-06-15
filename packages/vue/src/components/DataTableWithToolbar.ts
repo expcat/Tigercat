@@ -60,8 +60,10 @@ export interface VueTableToolbarProps extends Omit<
   filters?: VueTableToolbarFilter[]
 }
 
-export interface VueTableToolbarFilterRenderContext
-  extends Omit<TableToolbarFilterRenderContext, 'filter'> {
+export interface VueTableToolbarFilterRenderContext extends Omit<
+  TableToolbarFilterRenderContext,
+  'filter'
+> {
   filter: VueTableToolbarFilter
 }
 
@@ -103,6 +105,7 @@ export interface VueDataTableWithToolbarProps {
   renderCard?: (context: TableCardRenderContext<Record<string, unknown>>) => unknown
   toolbar?: VueTableToolbarProps
   pagination?: PaginationConfig | false
+  tableLayout?: 'auto' | 'fixed'
   className?: string
   style?: Record<string, string | number>
 }
@@ -459,10 +462,7 @@ export const DataTableWithToolbar = defineComponent({
       emit('filters-change', nextFilters)
     }
 
-    const handleFilterSelect = (
-      filter: VueTableToolbarFilter,
-      value: TableToolbarFilterValue
-    ) => {
+    const handleFilterSelect = (filter: VueTableToolbarFilter, value: TableToolbarFilterValue) => {
       setFilterValue(filter.key, value, filter)
     }
 
@@ -595,7 +595,8 @@ export const DataTableWithToolbar = defineComponent({
             {
               class: classNames(
                 'flex items-center gap-2',
-                props.toolbar?.searchClassName ?? 'w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]'
+                props.toolbar?.searchClassName ??
+                  'w-full sm:w-auto sm:min-w-[220px] sm:max-w-[320px]'
               )
             },
             [
@@ -671,8 +672,7 @@ export const DataTableWithToolbar = defineComponent({
               filters: resolvedFilters.value,
               setValue: (value: TableToolbarFilterValue) =>
                 setFilterValue(filter.key, value, filter),
-              setFilter: (key: string, value: TableToolbarFilterValue) =>
-                setFilterValue(key, value)
+              setFilter: (key: string, value: TableToolbarFilterValue) => setFilterValue(key, value)
             })
             leftNodes.push(
               h(
@@ -689,28 +689,32 @@ export const DataTableWithToolbar = defineComponent({
           }
 
           leftNodes.push(
-            h('div', {
-              key: filter.key,
-              class: filter.itemClass ?? 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]',
-              style: filter.itemStyle
-            }, [
-              h(Select, {
-                size: 'sm',
-                options: (filter.options ?? []).map((opt) => ({
-                  label: opt.label,
-                  value: opt.value
-                })),
-                modelValue:
-                  typeof currentValue === 'string' || typeof currentValue === 'number'
-                    ? currentValue
-                    : undefined,
-                placeholder: filter.placeholder ?? filter.label,
-                clearable,
-                'onUpdate:modelValue': (value: string | number | undefined) => {
-                  handleFilterSelect(filter, value ?? null)
-                }
-              })
-            ])
+            h(
+              'div',
+              {
+                key: filter.key,
+                class: filter.itemClass ?? 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]',
+                style: filter.itemStyle
+              },
+              [
+                h(Select, {
+                  size: 'sm',
+                  options: (filter.options ?? []).map((opt) => ({
+                    label: opt.label,
+                    value: opt.value
+                  })),
+                  modelValue:
+                    typeof currentValue === 'string' || typeof currentValue === 'number'
+                      ? currentValue
+                      : undefined,
+                  placeholder: filter.placeholder ?? filter.label,
+                  clearable,
+                  'onUpdate:modelValue': (value: string | number | undefined) => {
+                    handleFilterSelect(filter, value ?? null)
+                  }
+                })
+              ]
+            )
           )
         })
       }
@@ -832,11 +836,7 @@ export const DataTableWithToolbar = defineComponent({
         onPageChange: handleTablePageChange
       }
 
-      const {
-        toolbar: _toolbarSlot,
-        'filters-extra': _filtersExtraSlot,
-        ...tableSlots
-      } = slots
+      const { toolbar: _toolbarSlot, 'filters-extra': _filtersExtraSlot, ...tableSlots } = slots
 
       return h(
         'div',

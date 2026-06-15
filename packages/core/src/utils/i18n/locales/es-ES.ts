@@ -63,7 +63,9 @@ export const esES: TigerLocale = defineLocale({
     selectedText: 'Seleccionado',
     selectedItemsText: 'elementos',
     columnSettingsText: 'Configuración de columnas',
-    columnSettingsAriaLabel: 'Configuración de columnas'
+    columnSettingsAriaLabel: 'Configuración de columnas',
+    lockColumnAriaLabel: 'Bloquear columna {column}',
+    unlockColumnAriaLabel: 'Desbloquear columna {column}'
   },
   formWizard: {
     prevText: 'Anterior',

@@ -91,6 +91,10 @@ export interface TigerLocaleTable {
   columnSettingsText?: string
   /** Aria label for the column-settings trigger button */
   columnSettingsAriaLabel?: string
+  /** Lock-column button aria-label. Template: supports {column} */
+  lockColumnAriaLabel?: string
+  /** Unlock-column button aria-label. Template: supports {column} */
+  unlockColumnAriaLabel?: string
 }
 
 export interface TigerLocaleFormWizard {

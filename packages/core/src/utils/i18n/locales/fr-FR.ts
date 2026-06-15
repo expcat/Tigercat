@@ -63,7 +63,9 @@ export const frFR: TigerLocale = defineLocale({
     selectedText: 'Sélectionné',
     selectedItemsText: 'éléments',
     columnSettingsText: 'Paramètres des colonnes',
-    columnSettingsAriaLabel: 'Paramètres des colonnes'
+    columnSettingsAriaLabel: 'Paramètres des colonnes',
+    lockColumnAriaLabel: 'Verrouiller la colonne {column}',
+    unlockColumnAriaLabel: 'Déverrouiller la colonne {column}'
   },
   formWizard: {
     prevText: 'Précédent',

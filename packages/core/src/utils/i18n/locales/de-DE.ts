@@ -63,7 +63,9 @@ export const deDE: TigerLocale = defineLocale({
     selectedText: 'Ausgewählt',
     selectedItemsText: 'Einträge',
     columnSettingsText: 'Spalteneinstellungen',
-    columnSettingsAriaLabel: 'Spalteneinstellungen'
+    columnSettingsAriaLabel: 'Spalteneinstellungen',
+    lockColumnAriaLabel: 'Spalte {column} sperren',
+    unlockColumnAriaLabel: 'Spalte {column} entsperren'
   },
   formWizard: {
     prevText: 'Zurück',

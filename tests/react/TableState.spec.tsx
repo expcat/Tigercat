@@ -225,7 +225,13 @@ describe('useTableState', () => {
     expect(result.current.displayColumns[0].fixed).toBe(false)
 
     act(() => result.current.toggleColumnLock('age'))
-    expect(result.current.displayColumns[1].fixed).toBe('left')
+    expect(result.current.displayColumns.map((column) => column.key)).toEqual([
+      'age',
+      'name',
+      'status'
+    ])
+    expect(result.current.displayColumns[0].fixed).toBe('left')
+    expect(result.current.fixedColumnsInfo.leftOffsets.age).toBe(0)
 
     act(() => result.current.handleDrop('age'))
     expect(onColumnOrderChange).not.toHaveBeenCalled()
@@ -233,9 +239,9 @@ describe('useTableState', () => {
     act(() => result.current.handleDragStart('status'))
     act(() => result.current.handleDrop('name'))
     expect(onColumnOrderChange).toHaveBeenCalledWith([
+      expect.objectContaining({ key: 'age' }),
       expect.objectContaining({ key: 'status' }),
-      expect.objectContaining({ key: 'name' }),
-      expect.objectContaining({ key: 'age' })
+      expect.objectContaining({ key: 'name' })
     ])
   })
 

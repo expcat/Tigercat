@@ -47,7 +47,9 @@ export const viVN: TigerLocale = {
     selectedText: 'Đã chọn',
     selectedItemsText: 'mục',
     columnSettingsText: 'Cài đặt cột',
-    columnSettingsAriaLabel: 'Cài đặt cột'
+    columnSettingsAriaLabel: 'Cài đặt cột',
+    lockColumnAriaLabel: 'Khóa cột {column}',
+    unlockColumnAriaLabel: 'Bỏ khóa cột {column}'
   },
   formWizard: {
     prevText: 'Trước',

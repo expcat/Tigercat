@@ -577,6 +577,55 @@ describe('DataTableWithToolbar (Vue)', () => {
       expect(screen.getByRole('checkbox', { name: 'Email' })).toBeEnabled()
     })
 
+    it('renders lock buttons and toggles a column fixed state when columnLockable', async () => {
+      render(DataTableWithToolbar, {
+        props: {
+          columns: multiColumns,
+          dataSource: [{ id: 1, name: 'A', email: 'a@example.com' }],
+          columnLockable: true,
+          pagination: false
+        }
+      })
+
+      const lockButton = screen.getByRole('button', { name: 'Lock column Name' })
+      expect(lockButton).toBeInTheDocument()
+
+      await userEvent.click(lockButton)
+      expect(screen.getByRole('button', { name: 'Unlock column Name' })).toBeInTheDocument()
+    })
+
+    it('localizes the lock-column aria-label via labels override', () => {
+      render(DataTableWithToolbar, {
+        props: {
+          columns: multiColumns,
+          dataSource: [{ id: 1, name: 'A', email: 'a@example.com' }],
+          columnLockable: true,
+          labels: { lockColumnAriaLabel: 'Pin {column}', unlockColumnAriaLabel: 'Unpin {column}' },
+          pagination: false
+        }
+      })
+
+      expect(screen.getByRole('button', { name: 'Pin Name' })).toBeInTheDocument()
+    })
+
+    it('localizes the lock-column aria-label from the active locale', () => {
+      render({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () =>
+              h(DataTableWithToolbar, {
+                columns: multiColumns,
+                dataSource: [{ id: 1, name: 'A', email: 'a@example.com' }],
+                columnLockable: true,
+                pagination: false
+              })
+            )
+        }
+      })
+
+      expect(screen.getByRole('button', { name: '锁定Name列' })).toBeInTheDocument()
+    })
+
     it('keeps internal state untouched in controlled mode and only emits', async () => {
       const onHiddenColumnsChange = vi.fn()
 
@@ -739,8 +788,7 @@ describe('DataTableWithToolbar (Vue)', () => {
                   h('input', {
                     'aria-label': '自定义搜索',
                     value: searchValue,
-                    onInput: (event: Event) =>
-                      setSearch((event.target as HTMLInputElement).value)
+                    onInput: (event: Event) => setSearch((event.target as HTMLInputElement).value)
                   }),
                   h('button', { onClick: () => submitSearch() }, '提交'),
                   h('button', { onClick: () => setFilter('status', 'active') }, '筛选'),

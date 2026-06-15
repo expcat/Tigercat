@@ -7,7 +7,6 @@ import {
 import type { TableCardLayoutItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 
-
 interface UserRow extends Record<string, unknown> {
   id: number
   name: string
@@ -215,6 +214,28 @@ const settingsColumns: TableColumn<UserRow>[] = [
 // 受控模式：传 hiddenColumnKeys（配合 onHiddenColumnsChange 更新状态）
 // 锁定特定列：toolbar={{ showColumnSettings: true, columnSettings: { lockedColumnKeys: ['name'] } }}`
 
+const columnLockSnippet = `// 钉列 / 锁定列：
+// 1) column.fixed: 'left' | 'right' —— 横向滚动时把列钉在边缘（sticky）
+// 2) columnLockable —— 表头出现锁定按钮，锁定后该列进入左侧固定区
+// 3) columnSettings.lockedColumnKeys —— 列设置面板中该列不可隐藏
+const lockColumns: TableColumn<UserRow>[] = [
+  { key: 'name', title: '姓名', width: 200, fixed: 'left', hideable: false },
+  { key: 'email', title: '邮箱', width: 400 },
+  { key: 'age', title: '年龄', width: 200 },
+  { key: 'role', title: '角色', width: 240 },
+  { key: 'status', title: '状态', width: 240 }
+]
+
+<DataTableWithToolbar
+  columns={lockColumns}
+  dataSource={pagedData}
+  columnLockable
+  toolbar={{
+    showColumnSettings: true,
+    columnSettings: { lockedColumnKeys: ['name'] }
+  }}
+/>`
+
 const ageRangeSnippet = `<DataTableWithToolbar
   columns={columns}
   dataSource={pagedData}
@@ -251,6 +272,14 @@ const settingsColumns: TableColumn<UserRow>[] = [
   { key: 'age', title: '年龄', width: '12%' },
   { key: 'role', title: '角色', width: '17%' },
   { key: 'status', title: '状态', width: '17%' }
+]
+
+const lockColumns: TableColumn<UserRow>[] = [
+  { key: 'name', title: '姓名', width: 200, fixed: 'left', hideable: false },
+  { key: 'email', title: '邮箱', width: 400 },
+  { key: 'age', title: '年龄', width: 200 },
+  { key: 'role', title: '角色', width: 240 },
+  { key: 'status', title: '状态', width: 240 }
 ]
 
 const statusOptions = [
@@ -307,8 +336,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       const matchStatus = !filters.status || item.status === filters.status
       const matchRole = !filters.role || item.role === filters.role
       const matchAge =
-        (minAge === undefined || item.age >= minAge) &&
-        (maxAge === undefined || item.age <= maxAge)
+        (minAge === undefined || item.age >= minAge) && (maxAge === undefined || item.age <= maxAge)
       return matchKeyword && matchStatus && matchRole && matchAge
     })
   }, [keyword, filters])
@@ -475,6 +503,28 @@ const DataTableWithToolbarDemo: React.FC = () => {
       </DemoBlock>
 
       <DemoBlock
+        title="钉列 / 锁定列"
+        description="column.fixed 让列在横向滚动时钉在边缘（姓名列钉在左侧）；开启 columnLockable 后表头出现锁定按钮，锁定列会进入左侧固定区，未锁定列向右排列；columnSettings.lockedColumnKeys 让该列在列设置面板中不可隐藏。横向滚动表格可观察钉列效果。"
+        code={columnLockSnippet}>
+        <DataTableWithToolbar<UserRow>
+          columns={lockColumns}
+          dataSource={pagedData}
+          columnLockable
+          toolbar={{
+            showColumnSettings: true,
+            columnSettings: { lockedColumnKeys: ['name'] }
+          }}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: filteredData.length,
+            showTotal: true
+          }}
+          onPageChange={handlePageChange}
+        />
+      </DemoBlock>
+
+      <DemoBlock
         title="卡片模式字段定制"
         description="窄屏（小于 cardBreakpoint，此处为 lg/1024px）自动切换为卡片：name 作为标题、id 隐藏、status/role 按 cardPriority 排序。缩窄窗口可预览。"
         code={cardSnippet}>
@@ -539,7 +589,8 @@ const DataTableWithToolbarDemo: React.FC = () => {
             searchPlaceholder: '搜索姓名/邮箱',
             filters: [
               {
-                key: 'status', label: '状态',
+                key: 'status',
+                label: '状态',
                 options: statusOptions,
                 itemClass: 'w-full sm:w-auto sm:min-w-[200px] sm:max-w-[280px]',
                 itemStyle: { borderRadius: '8px' }
@@ -579,16 +630,22 @@ const DataTableWithToolbarDemo: React.FC = () => {
               { key: 'role', label: '角色', options: roleOptions }
             ],
             render: ({ searchValue: sv, setSearch: ss, submitSearch: sub, filters: f }) => (
-              <div role="toolbar" aria-label="自定义工具栏" className="flex flex-wrap items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <div
+                role="toolbar"
+                aria-label="自定义工具栏"
+                className="flex flex-wrap items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <div className="flex items-center gap-2">
                   <input
                     className="rounded border border-blue-300 px-3 py-1.5 text-sm dark:border-blue-600 dark:bg-gray-900"
                     value={sv}
                     placeholder="自定义搜索"
-                    onChange={(e) => ss(e.currentTarget.value)} />
+                    onChange={(e) => ss(e.currentTarget.value)}
+                  />
                   <button
                     className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
-                    onClick={sub}>搜索</button>
+                    onClick={sub}>
+                    搜索
+                  </button>
                 </div>
                 <span className="text-sm text-gray-500">状态: {String(f.status ?? '全部')}</span>
               </div>
@@ -623,11 +680,12 @@ const DataTableWithToolbarDemo: React.FC = () => {
               </h3>
               <p className="text-sm text-gray-500 mt-1">{(row as UserRow).email}</p>
               <div className="flex items-center gap-3 mt-2">
-                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${
-                  (row as UserRow).status === 'active'
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                }`}>
+                <span
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${
+                    (row as UserRow).status === 'active'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                  }`}>
                   {(row as UserRow).status === 'active' ? '启用' : '禁用'}
                 </span>
                 <span className="text-xs text-gray-400">{(row as UserRow).role}</span>

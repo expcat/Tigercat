@@ -307,7 +307,9 @@ export const DEFAULT_TABLE_LABELS: Required<TigerLocaleTable> = {
   selectedText: 'Selected',
   selectedItemsText: 'items',
   columnSettingsText: 'Column settings',
-  columnSettingsAriaLabel: 'Column settings'
+  columnSettingsAriaLabel: 'Column settings',
+  lockColumnAriaLabel: 'Lock column {column}',
+  unlockColumnAriaLabel: 'Unlock column {column}'
 }
 
 export const ZH_CN_TABLE_LABELS: Required<TigerLocaleTable> = {
@@ -325,7 +327,9 @@ export const ZH_CN_TABLE_LABELS: Required<TigerLocaleTable> = {
   selectedText: '已选择',
   selectedItemsText: '项',
   columnSettingsText: '列设置',
-  columnSettingsAriaLabel: '列设置'
+  columnSettingsAriaLabel: '列设置',
+  lockColumnAriaLabel: '锁定{column}列',
+  unlockColumnAriaLabel: '取消锁定{column}列'
 }
 
 export function getTableLabels(
@@ -378,7 +382,15 @@ export function getTableLabels(
     columnSettingsAriaLabel:
       overrides?.columnSettingsAriaLabel ??
       locale?.table?.columnSettingsAriaLabel ??
-      defaultLabels.columnSettingsAriaLabel
+      defaultLabels.columnSettingsAriaLabel,
+    lockColumnAriaLabel:
+      overrides?.lockColumnAriaLabel ??
+      locale?.table?.lockColumnAriaLabel ??
+      defaultLabels.lockColumnAriaLabel,
+    unlockColumnAriaLabel:
+      overrides?.unlockColumnAriaLabel ??
+      locale?.table?.unlockColumnAriaLabel ??
+      defaultLabels.unlockColumnAriaLabel
   }
 }
 

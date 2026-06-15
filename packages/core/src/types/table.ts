@@ -524,7 +524,7 @@ export interface TableProps<T = Record<string, unknown>> {
 
   /**
    * Whether to show a lock button in each column header.
-   * Clicking the lock toggles the column fixed state.
+   * Clicking the lock toggles the column into the compact left fixed area.
    * @default false
    */
   columnLockable?: boolean

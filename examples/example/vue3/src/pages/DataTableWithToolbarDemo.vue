@@ -155,6 +155,28 @@ const columnSettingsSnippet = `<!-- 工具栏列设置：内置 Popover + Checkb
 <!-- settingsColumns 中 hideable: false 的列不可隐藏 -->
 <!-- 锁定特定列：:toolbar="{ showColumnSettings: true, columnSettings: { lockedColumnKeys: ['name'] } }" -->`
 
+const columnLockSnippet = `<!-- 钉列 / 锁定列：
+  1) column.fixed: 'left' | 'right' —— 横向滚动时把列钉在边缘（sticky）
+  2) column-lockable —— 表头出现锁定按钮，锁定后该列进入左侧固定区
+  3) columnSettings.lockedColumnKeys —— 列设置面板中该列不可隐藏 -->
+<DataTableWithToolbar
+  :columns="lockColumns"
+  :dataSource="pagedData"
+  column-lockable
+  :toolbar="{
+    showColumnSettings: true,
+    columnSettings: { lockedColumnKeys: ['name'] }
+  }"
+/>`
+
+const columnLockScriptSnippet = `const lockColumns = [
+  { key: 'name', title: '姓名', width: 200, fixed: 'left', hideable: false },
+  { key: 'email', title: '邮箱', width: 400 },
+  { key: 'age', title: '年龄', width: 200 },
+  { key: 'role', title: '角色', width: 240 },
+  { key: 'status', title: '状态', width: 240 }
+]`
+
 const columnSettingsScriptSnippet = `import { ref } from 'vue'
 
 const hiddenColumnKeys = ref<string[]>(['role'])
@@ -193,6 +215,14 @@ const settingsColumns: TableColumn<Record<string, unknown>>[] = [
   { key: 'status', title: '状态', width: '17%' }
 ]
 
+const lockColumns: TableColumn<Record<string, unknown>>[] = [
+  { key: 'name', title: '姓名', width: 200, fixed: 'left', hideable: false },
+  { key: 'email', title: '邮箱', width: 400 },
+  { key: 'age', title: '年龄', width: 200 },
+  { key: 'role', title: '角色', width: 240 },
+  { key: 'status', title: '状态', width: 240 }
+]
+
 const hiddenColumnKeys = ref<string[]>(['role'])
 
 const statusOptions = [
@@ -228,9 +258,12 @@ const filters = ref<Record<string, TableToolbarFilterValue>>({
 const pagination = ref({ current: 1, pageSize: 6 })
 const selectedRowKeys = ref<(string | number)[]>([])
 
-watch([keyword, () => filters.value.status, () => filters.value.role, () => filters.value.ageRange], () => {
-  pagination.value.current = 1
-})
+watch(
+  [keyword, () => filters.value.status, () => filters.value.role, () => filters.value.ageRange],
+  () => {
+    pagination.value.current = 1
+  }
+)
 
 const getAgeRange = (value: TableToolbarFilterValue) =>
   value && typeof value === 'object' ? (value as { min?: string; max?: string }) : {}
@@ -260,8 +293,7 @@ const filteredData = computed(() => {
     const matchStatus = !filters.value.status || item.status === filters.value.status
     const matchRole = !filters.value.role || item.role === filters.value.role
     const matchAge =
-      (minAge === undefined || item.age >= minAge) &&
-      (maxAge === undefined || item.age <= maxAge)
+      (minAge === undefined || item.age >= minAge) && (maxAge === undefined || item.age <= maxAge)
     return matchKeyword && matchStatus && matchRole && matchAge
   })
 })
@@ -446,6 +478,28 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
     </DemoBlock>
 
     <DemoBlock
+      title="钉列 / 锁定列"
+      description="column.fixed 让列在横向滚动时钉在边缘（姓名列钉在左侧）；开启 column-lockable 后表头出现锁定按钮，锁定列会进入左侧固定区，未锁定列向右排列；columnSettings.lockedColumnKeys 让该列在列设置面板中不可隐藏。横向滚动表格可观察钉列效果。"
+      :code="columnLockSnippet"
+      :script="columnLockScriptSnippet">
+      <DataTableWithToolbar
+        :columns="lockColumns"
+        :dataSource="pagedData"
+        column-lockable
+        :toolbar="{
+          showColumnSettings: true,
+          columnSettings: { lockedColumnKeys: ['name'] }
+        }"
+        :pagination="{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: filteredData.length,
+          showTotal: true
+        }"
+        @page-change="handlePageChange" />
+    </DemoBlock>
+
+    <DemoBlock
       title="卡片模式字段定制"
       description="窄屏（小于 cardBreakpoint，此处为 lg/1024px）自动切换为卡片：姓名作为标题、ID 隐藏、状态/角色按 cardPriority 排序。缩窄窗口可预览。"
       :code="cardSnippet">
@@ -508,7 +562,8 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
           searchPlaceholder: '搜索姓名/邮箱',
           filters: [
             {
-              key: 'status', label: '状态',
+              key: 'status',
+              label: '状态',
               options: statusOptions,
               itemClass: 'w-full sm:w-auto sm:min-w-[200px] sm:max-w-[280px]',
               itemStyle: { borderRadius: '8px' }
@@ -557,7 +612,10 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
         @filters-change="handleFiltersChange"
         @page-change="handlePageChange">
         <template #toolbar="{ searchValue, setSearch, submitSearch, filters, setFilter }">
-          <div role="toolbar" aria-label="自定义工具栏" class="flex flex-wrap items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <div
+            role="toolbar"
+            aria-label="自定义工具栏"
+            class="flex flex-wrap items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <div class="flex items-center gap-2">
               <input
                 class="rounded border border-blue-300 px-3 py-1.5 text-sm dark:border-blue-600 dark:bg-gray-900"
@@ -566,7 +624,9 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
                 @input="(e) => setSearch((e.target as HTMLInputElement).value)" />
               <button
                 class="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
-                @click="submitSearch">搜索</button>
+                @click="submitSearch">
+                搜索
+              </button>
             </div>
             <span class="text-sm text-gray-500">状态: {{ filters.status ?? '全部' }}</span>
           </div>
@@ -593,13 +653,18 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
         @page-change="handlePageChange">
         <template #card="{ record }">
           <div class="p-4">
-            <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">{{ (record as UserRow).name }}</h3>
+            <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">
+              {{ (record as UserRow).name }}
+            </h3>
             <p class="text-sm text-gray-500 mt-1">{{ (record as UserRow).email }}</p>
             <div class="flex items-center gap-3 mt-2">
-              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
-                :class="(record as UserRow).status === 'active'
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'">
+              <span
+                class="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
+                :class="
+                  (record as UserRow).status === 'active'
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                ">
                 {{ (record as UserRow).status === 'active' ? '启用' : '禁用' }}
               </span>
               <span class="text-xs text-gray-400">{{ (record as UserRow).role }}</span>

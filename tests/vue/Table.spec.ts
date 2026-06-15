@@ -171,9 +171,9 @@ describe('Table', () => {
         responsiveMode: 'card',
         pagination: false
       })
-      expect(def.container.querySelector('[data-tiger-table-mobile="card"] .grid-cols-12')).toHaveClass(
-        'gap-3'
-      )
+      expect(
+        def.container.querySelector('[data-tiger-table-mobile="card"] .grid-cols-12')
+      ).toHaveClass('gap-3')
 
       const custom = renderWithProps(Table, {
         columns: cardColumns,
@@ -823,7 +823,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { getByLabelText, getByText } = renderWithProps(Table, {
+      const { container, getByLabelText, getByText } = renderWithProps(Table, {
         columns: lockableColumns,
         dataSource,
         pagination: false,
@@ -836,8 +836,11 @@ describe('Table', () => {
 
       const emailHeaderLocked = getByText('Email').closest('th')!
       expect(emailHeaderLocked).toHaveStyle('position: sticky')
-      expect(emailHeaderLocked).toHaveStyle('left: 260px')
+      expect(emailHeaderLocked).toHaveStyle('left: 0px')
       expect(emailHeaderLocked).toHaveClass(tableHeaderBgClass)
+      expect(
+        Array.from(container.querySelectorAll('thead th')).map((th) => th.textContent?.trim())
+      ).toEqual(['Email', 'Name', 'Age'])
 
       await fireEvent.click(getByLabelText('Unlock column Email'))
 
@@ -872,7 +875,37 @@ describe('Table', () => {
       const widthsAfter = Array.from(container.querySelectorAll('table > colgroup col')).map(
         (col) => (col as HTMLElement).style.width
       )
-      expect(widthsAfter).toEqual(widthsBefore)
+      expect(widthsAfter).toEqual(['220px', '140px', '120px'])
+      expect(widthsAfter.sort()).toEqual(widthsBefore.sort())
+    })
+
+    it('moves a newly locked middle column into the compact left fixed area', async () => {
+      const lockableColumns = [
+        { key: 'name', title: 'Name', width: 200, fixed: 'left' as const },
+        { key: 'email', title: 'Email', width: 400 },
+        { key: 'age', title: 'Age', width: 200 },
+        { key: 'role', title: 'Role', width: 240 }
+      ]
+
+      const { container, getByLabelText, getByText } = renderWithProps(Table, {
+        columns: lockableColumns,
+        dataSource,
+        pagination: false,
+        columnLockable: true
+      })
+
+      await fireEvent.click(getByLabelText('Lock column Age'))
+      await nextTick()
+
+      expect(
+        Array.from(container.querySelectorAll('thead th')).map((th) => th.textContent?.trim())
+      ).toEqual(['Name', 'Age', 'Email', 'Role'])
+
+      const ageHeaderLocked = getByText('Age').closest('th')!
+      const emailHeader = getByText('Email').closest('th')!
+      expect(ageHeaderLocked).toHaveStyle('position: sticky')
+      expect(ageHeaderLocked).toHaveStyle('left: 200px')
+      expect(emailHeader).not.toHaveStyle('position: sticky')
     })
 
     it('does not render a colgroup for a plain table without fixed or lockable columns', () => {

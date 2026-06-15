@@ -47,7 +47,9 @@ export const jaJP: TigerLocale = {
     selectedText: '選択済み',
     selectedItemsText: '件',
     columnSettingsText: '列の設定',
-    columnSettingsAriaLabel: '列の設定'
+    columnSettingsAriaLabel: '列の設定',
+    lockColumnAriaLabel: '{column} 列を固定',
+    unlockColumnAriaLabel: '{column} 列の固定を解除'
   },
   formWizard: {
     prevText: '前へ',

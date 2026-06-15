@@ -47,7 +47,9 @@ export const zhTW: TigerLocale = {
     selectedText: '已選擇',
     selectedItemsText: '筆',
     columnSettingsText: '欄位設定',
-    columnSettingsAriaLabel: '欄位設定'
+    columnSettingsAriaLabel: '欄位設定',
+    lockColumnAriaLabel: '鎖定{column}欄',
+    unlockColumnAriaLabel: '取消鎖定{column}欄'
   },
   formWizard: {
     prevText: '上一步',
