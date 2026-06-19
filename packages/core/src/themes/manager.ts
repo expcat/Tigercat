@@ -12,7 +12,7 @@
  */
 
 import type { ThemePreset, ThemeSemanticColors, ColorScheme } from '../types/theme'
-import { THEME_CSS_VARS, removeCssVarsCached, setCssVarsCached } from '../theme'
+import { THEME_CSS_VARS, removeCssVarsCached, setCssVarsCached } from '../theme-runtime'
 import { isBrowser } from '../utils/env'
 
 // ---------------------------------------------------------------------------

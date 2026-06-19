@@ -10,7 +10,7 @@
 
 import type { TaskBoardColumn, TaskBoardCard } from '../types/composite'
 import type { KanbanSwimlane } from '../types/kanban'
-import { taskBoardBaseClasses, taskBoardAddCardClasses } from './task-board-utils'
+import { taskBoardBaseClasses } from './task-board-utils'
 
 // ─── Kanban-specific class constants ──────────────────────────────
 
@@ -37,10 +37,6 @@ export const kanbanFilterHighlightClasses = 'bg-[var(--tiger-warning,#fbbf24)]/2
 /** Add column button */
 export const kanbanAddColumnClasses =
   'flex items-center justify-center shrink-0 w-76 min-h-[120px] rounded-[var(--tiger-radius-lg,0.75rem)] border-2 border-dashed border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)]/40 text-sm font-medium text-[var(--tiger-text-muted,#6b7280)] hover:border-[var(--tiger-primary,#2563eb)]/80 hover:text-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-surface,#ffffff)] hover:shadow-sm cursor-pointer transition-all duration-300 active:scale-98'
-
-// Backward-compat aliases (deprecated — use taskBoard* equivalents directly)
-/** @deprecated Use `taskBoardAddCardClasses` instead */
-export const kanbanAddCardClasses = taskBoardAddCardClasses
 
 // ─── Filter logic ─────────────────────────────────────────────────
 

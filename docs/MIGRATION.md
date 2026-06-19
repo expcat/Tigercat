@@ -4,6 +4,17 @@
 
 ## Unreleased（v1.2.41）
 
+### 移除废弃别名 `kanbanAddCardClasses`
+
+core 移除了废弃别名 `kanbanAddCardClasses`。它自 v0.9.0 起仅是 `taskBoardAddCardClasses` 的向后兼容别名，现已删除。请直接使用 `taskBoardAddCardClasses`：
+
+```diff
+- import { kanbanAddCardClasses } from '@expcat/tigercat-core'
++ import { taskBoardAddCardClasses } from '@expcat/tigercat-core'
+```
+
+> 说明：本次同时把 core 内部目录 `src/theme/` 重命名为 `src/theme-runtime/`（以区别于命名预设主题目录 `src/themes/`）。该重命名不影响公共 API——`THEME_CSS_VARS` / `setThemeColors` / `getThemeColor` 等仍从主入口 `@expcat/tigercat-core` 导出，无需迁移。
+
 ### Dropdown 菜单默认渲染到 body
 
 Dropdown 菜单包装层默认通过 React portal / Vue Teleport 渲染到 `document.body`（zIndex 1000），与 Tooltip / Popover / Popconfirm 等浮层组件保持一致。展开的菜单不会再被表格固定列（sticky 单元格）遮挡，也不会被 `overflow` 滚动容器裁剪——表格固定操作列中的行内菜单无需再用全局 CSS 覆盖 z-index。

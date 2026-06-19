@@ -1,7 +1,7 @@
 import plugin from 'tailwindcss/plugin'
 import type { PluginAPI } from 'tailwindcss/plugin'
 import type { ThemePreset, ThemeSemanticColors } from './types/theme'
-import { THEME_CSS_VARS } from './theme'
+import { THEME_CSS_VARS } from './theme-runtime'
 import {
   MODERN_BASE_TOKENS_LIGHT,
   MODERN_BASE_TOKENS_DARK,

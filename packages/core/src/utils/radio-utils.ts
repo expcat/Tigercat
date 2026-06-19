@@ -1,6 +1,6 @@
 import { classNames } from './class-names'
 import { type RadioSize } from '../types/radio'
-import { type RadioColorScheme } from '../theme/colors'
+import { type RadioColorScheme } from '../theme-runtime/colors'
 
 export const radioRootBaseClasses = 'inline-flex items-center'
 

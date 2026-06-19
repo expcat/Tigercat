@@ -135,19 +135,7 @@ source: current repository audit and planning
 
 > **扫描结论修正**：Roadmap 原估"core 约 440 处 `any`、散落 `typeof window` 直写"在 core 范围内不成立——该信号集中在 `vue` / `react` 组件层，应由任务 B / C 核查。core 自身类型与 SSR 守卫基本干净（见 A-0）。
 >
-> **进度（2026-06-19）**：非破坏性的 A-1 / A-2 / A-3 已交付，详见 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`——A-1 表单内置校验消息本地化（端到端，新增 `TigerLocaleFormValidation` + `getFormValidationLabels`，Vue/React `Form` 接入 ConfigProvider locale）、A-2 timepicker/upload 默认标签收敛到 `locale-utils`、A-3 撤销 `shouldLoadMore` 的 `@deprecated`（确认为合理回退）。剩余 A-4 / A-5 属破坏性/公共 API 变更，留待允许破坏的版本；任务 A 复选框在 A-4 / A-5 也回填后再勾除。
-
-- [ ] **A-4 废弃别名 `kanbanAddCardClasses` 可清理**（P2）
-  - 维度：死代码/deprecated｜模块：`utils/kanban-utils.ts:43`
-  - 问题：`kanbanAddCardClasses = taskBoardAddCardClasses` 仅为向后兼容别名，全仓除自身定义外无任何引用。
-  - 影响：冗余公共导出，增大 API 表面。
-  - 建议：作为 breaking change 在下一个允许破坏的版本移除，并在 [MIGRATION.md](MIGRATION.md) 注明 `kanban*` → `taskBoard*`。
-
-- [ ] **A-5 `theme/` 与 `themes/` 目录命名易混淆**（P2）
-  - 维度：token/theme｜模块：`packages/core/src/theme/`、`packages/core/src/themes/`
-  - 问题：`theme/` = CSS 变量运行时助手 + 按组件样式表（colors/checkbox/switch/slider）；`themes/` = 命名预设主题 + `ThemeManager` + modern token 层。职责不同但目录名仅差一个 `s`，两者均经各自 `index.ts` `export *`（目录名非公共 API）。
-  - 影响：维护者易混淆两目录用途，定位与改动成本高。
-  - 建议：将 `theme/` 重命名为语义更清晰的目录（如 `css-vars/` 或 `theme-runtime/`），对外导出符号不变，风险低。
+> **进度（2026-06-19）**：任务 A 全部优化项已交付。非破坏性的 A-1 / A-2 / A-3 先行交付（A-1 表单内置校验消息本地化、A-2 timepicker/upload 默认标签收敛到 `locale-utils`、A-3 撤销 `shouldLoadMore` 的 `@deprecated`）；随后 A-4（移除废弃公共别名 `kanbanAddCardClasses`，改用 `taskBoardAddCardClasses`）与 A-5（core 内部 `theme/` 目录重命名为 `theme-runtime/`，对外导出符号不变）作为破坏性变更随下一个允许破坏的版本一并交付，详见 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)。按惯例已交付项移交 CHANGELOG，本节不再保留 A-1～A-5 细目，仅保留 A-0 核查结论。
 
 - [x] **A-0 已核查、core 范围内无需处理**
   - 类型安全：`packages/core/src` 真实 `any` 类型用法 **0** 处（grep 命中的 24 处均为注释里的英文单词或 `'any'` 字符串字面量），`@ts-ignore` / `@ts-expect-error` **0** 处 → `any` 审计移交任务 B/C。

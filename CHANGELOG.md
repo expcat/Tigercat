@@ -17,6 +17,11 @@
 - TimePicker 与 Upload 的默认文案表收敛到 `locale-utils` 单一来源（新增 `DEFAULT_TIME_PICKER_LABELS` / `ZH_CN_TIME_PICKER_LABELS` / `DEFAULT_UPLOAD_LABELS`），消除标签分散；公共 `getTimePickerLabels` / `getUploadLabels` 签名不变。
 - `shouldLoadMore` 撤销 `@deprecated` 标记：它是 InfiniteScroll 在 IntersectionObserver 不可用时的有意滚动回退路径，并非待移除的废弃 API。
 - **Dropdown 行为变更**：菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），解决表格固定列（sticky）遮挡与 overflow 容器裁剪问题；新增 `portal` prop（默认 `true`），设置 `portal: false` 可恢复原位渲染的旧 DOM 结构。菜单包装层新增 `data-tiger-dropdown-menu` 属性便于查询，依赖原 DOM 层级的样式选择器或测试需要相应调整（详见 [迁移指南](docs/MIGRATION.md)）。
+- core 内部 `src/theme/` 目录重命名为 `src/theme-runtime/`，与命名预设主题目录 `src/themes/`（预设 + `ThemeManager` + modern token）区分；`THEME_CSS_VARS` / `setThemeColors` / `getThemeColor` 及各 `*Classes` 仍经主入口 `@expcat/tigercat-core` 导出，公共 API 与导出符号不变。
+
+### Removed
+
+- **Breaking**：移除废弃别名 `kanbanAddCardClasses`（core）。自 v0.9.0 起它仅作为 `taskBoardAddCardClasses` 的向后兼容别名，现已删除；请改用 `taskBoardAddCardClasses`（详见 [迁移指南](docs/MIGRATION.md)）。
 
 ### Fixed
 
