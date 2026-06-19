@@ -8,6 +8,10 @@ export interface TigerLocaleCommon {
   closeText?: string
   loadingText?: string
   emptyText?: string
+  /** Default placeholder for in-component search inputs (Select/Tree/Transfer/Cascader…) */
+  searchPlaceholder?: string
+  /** Default label for clear actions */
+  clearText?: string
 }
 
 export interface TigerLocaleModal {

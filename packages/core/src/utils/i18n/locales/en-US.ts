@@ -12,7 +12,9 @@ export const enUS: TigerLocale = {
     cancelText: 'Cancel',
     closeText: 'Close',
     loadingText: 'Loading...',
-    emptyText: 'No data'
+    emptyText: 'No data',
+    searchPlaceholder: 'Search',
+    clearText: 'Clear'
   },
   modal: {
     closeAriaLabel: 'Close',

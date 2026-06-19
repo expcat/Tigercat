@@ -13,10 +13,14 @@ import {
   timelineListClasses,
   timelineLabelClasses,
   timelineDescriptionClasses,
+  resolveLocaleText,
+  mergeTigerLocale,
   type TimelineMode,
   type TimelineItem,
-  type TimelineItemPosition
+  type TimelineItemPosition,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 type HChildren = Parameters<typeof h>[2]
 
@@ -28,6 +32,7 @@ export interface VueTimelineProps {
   reverse?: boolean
   className?: string
   style?: Record<string, unknown>
+  locale?: Partial<TigerLocale>
 }
 
 export const Timeline = defineComponent({
@@ -76,9 +81,15 @@ export const Timeline = defineComponent({
     style: {
       type: Object as PropType<Record<string, unknown>>,
       default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   setup(props, { slots, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const processedItems = computed(() => {
       let items = [...props.items]
 
@@ -211,7 +222,11 @@ export const Timeline = defineComponent({
       return h('li', { key: 'pending', class: itemClasses }, [
         h('div', { class: headClasses }, [renderDot({}, true)]),
         h('div', { class: contentClasses }, [
-          h('div', { class: timelineDescriptionClasses }, 'Loading...')
+          h(
+            'div',
+            { class: timelineDescriptionClasses },
+            resolveLocaleText('Loading...', mergedLocale.value?.common?.loadingText)
+          )
         ])
       ])
     }

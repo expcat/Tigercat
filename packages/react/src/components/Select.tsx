@@ -23,11 +23,15 @@ import {
   checkSolidIcon20PathD,
   type SelectOption,
   type SelectOptions,
+  resolveLocaleText,
+  mergeTigerLocale,
   type SelectProps as CoreSelectProps,
   type SelectSearchDebouncer,
   type SelectValue,
-  type SelectValues
+  type SelectValues,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 type SelectDivProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
@@ -43,6 +47,8 @@ export interface SelectBaseProps
   onCreate?: (option: SelectOption) => void
 
   className?: string
+
+  locale?: Partial<TigerLocale>
 }
 
 export interface SelectSingleProps extends SelectBaseProps {
@@ -82,10 +88,16 @@ export const Select: React.FC<SelectProps> = (props) => {
     className,
     value,
     onChange,
-    multiple
+    multiple,
+    locale
   } = props
 
   const isMultiple = multiple === true
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
 
   const SELECT_KEYS = new Set([
     'options',
@@ -108,7 +120,8 @@ export const Select: React.FC<SelectProps> = (props) => {
     'className',
     'value',
     'onChange',
-    'multiple'
+    'multiple',
+    'locale'
   ])
   const divProps: Record<string, unknown> = {}
   for (const [k, v] of Object.entries(props)) {
@@ -652,7 +665,7 @@ export const Select: React.FC<SelectProps> = (props) => {
               ref={searchInputRef}
               type="text"
               className={selectSearchInputClasses}
-              placeholder="Search..."
+              placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
               value={searchQuery}
               onChange={handleSearchInput}
               onKeyDown={handleSearchKeyDown}

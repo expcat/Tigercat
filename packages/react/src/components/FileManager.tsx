@@ -20,11 +20,15 @@ import {
   fileManagerEmptyClasses,
   fileManagerLoadingClasses,
   fileManagerSearchClasses,
+  resolveLocaleText,
+  mergeTigerLocale,
   type FileItem,
   type FileViewMode,
   type FileSortField,
-  type FileSortOrder
+  type FileSortOrder,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface FileManagerProps {
   files?: FileItem[]
@@ -48,6 +52,7 @@ export interface FileManagerProps {
   onCurrentPathChange?: (path: string[]) => void
   onSearchTextChange?: (text: string) => void
   renderIcon?: (item: FileItem) => React.ReactNode
+  locale?: Partial<TigerLocale>
 }
 
 export const FileManager: React.FC<FileManagerProps> = ({
@@ -71,8 +76,14 @@ export const FileManager: React.FC<FileManagerProps> = ({
   onSelectedKeysChange,
   onCurrentPathChange,
   onSearchTextChange,
-  renderIcon
+  renderIcon,
+  locale
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
   const [localSearch, setLocalSearch] = useState(searchText)
 
   const model = useMemo(
@@ -160,7 +171,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
           <input
             type="text"
             className={fileManagerSearchClasses}
-            placeholder="Search..."
+            placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
             value={localSearch}
             onChange={(e) => {
               setLocalSearch(e.target.value)

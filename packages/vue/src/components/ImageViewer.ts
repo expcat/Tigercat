@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, PropType, watch, onMounted, onBeforeUnmount } from 'vue'
+import { defineComponent, h, ref, computed, PropType, watch, onMounted, onBeforeUnmount } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -21,8 +21,12 @@ import {
   createPinchState,
   startPinch,
   movePinch,
-  type GestureTransform
+  resolveLocaleText,
+  mergeTigerLocale,
+  type GestureTransform,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueImageViewerProps {
   images: string[]
@@ -102,10 +106,19 @@ export const ImageViewer = defineComponent({
     className: {
       type: String,
       default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: ['update:open', 'update:currentIndex', 'close'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const closeText = computed(() =>
+      resolveLocaleText('Close', mergedLocale.value?.common?.closeText)
+    )
     const index = ref(props.currentIndex)
     const transform = ref<GestureTransform>(createDefaultTransform())
     let panState = createPanState()
@@ -285,10 +298,10 @@ export const ImageViewer = defineComponent({
           {
             class: imageViewerCloseBtnClasses,
             onClick: handleClose,
-            'aria-label': 'Close',
+            'aria-label': closeText.value,
             type: 'button'
           },
-          createSvgIcon(imageViewerIcons.close, 'Close')
+          createSvgIcon(imageViewerIcons.close, closeText.value)
         )
       )
 

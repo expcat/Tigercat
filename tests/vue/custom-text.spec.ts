@@ -14,6 +14,7 @@ import {
   Drawer,
   FormWizard,
   TaskBoard,
+  Transfer,
   ConfigProvider
 } from '@expcat/tigercat-vue'
 
@@ -116,10 +117,49 @@ describe('custom text (no i18n) — Vue', () => {
     })
   })
 
+  describe('common.searchPlaceholder wiring (B-1)', () => {
+    it('Transfer search reads global config searchPlaceholder', () => {
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { common: { searchPlaceholder: '全局搜索' } } }, () =>
+                h(Transfer, { showSearch: true })
+              )
+          }
+        })
+      )
+      expect(screen.getAllByPlaceholderText('全局搜索').length).toBeGreaterThan(0)
+    })
+
+    it('Transfer locale prop wins over global config', () => {
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { common: { searchPlaceholder: '全局搜索' } } }, () =>
+                h(Transfer, {
+                  showSearch: true,
+                  locale: { common: { searchPlaceholder: '局部搜索' } }
+                })
+              )
+          }
+        })
+      )
+      expect(screen.getAllByPlaceholderText('局部搜索').length).toBeGreaterThan(0)
+      expect(screen.queryByPlaceholderText('全局搜索')).toBeNull()
+    })
+  })
+
   describe('backward compatibility', () => {
     it('Pagination outside a ConfigProvider keeps default English text', () => {
       render(Pagination, { props: { total: 100 } })
       expect(screen.getByLabelText('Previous page')).toBeInTheDocument()
+    })
+
+    it('Transfer search outside a ConfigProvider keeps default English placeholder', () => {
+      render(Transfer, { props: { showSearch: true } })
+      expect(screen.getAllByPlaceholderText('Search...').length).toBeGreaterThan(0)
     })
   })
 })

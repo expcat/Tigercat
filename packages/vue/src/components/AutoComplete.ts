@@ -8,8 +8,10 @@ import {
   nextTick,
   type PropType
 } from 'vue'
-import type { AutoCompleteOption, AutoCompleteSize } from '@expcat/tigercat-core'
+import type { AutoCompleteOption, AutoCompleteSize, TigerLocale } from '@expcat/tigercat-core'
 import {
+  resolveLocaleText,
+  mergeTigerLocale,
   autoCompleteBaseClasses,
   autoCompleteDropdownClasses,
   autoCompleteEmptyStateClasses,
@@ -27,6 +29,7 @@ import {
   icon20ViewBox,
   closeSolidIcon20PathD
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 let autoCompleteInstanceId = 0
 
@@ -93,10 +96,16 @@ export const AutoComplete = defineComponent({
     allowFreeInput: {
       type: Boolean,
       default: true
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: ['update:modelValue', 'select', 'search', 'change'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const instanceId = ++autoCompleteInstanceId
     const listboxId = `tiger-autocomplete-listbox-${instanceId}`
 
@@ -254,7 +263,7 @@ export const AutoComplete = defineComponent({
                   type: 'button',
                   class:
                     'absolute right-2 top-1/2 -translate-y-1/2 text-[var(--tiger-autocomplete-clear,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-autocomplete-clear-hover,var(--tiger-text,#111827))] transition-colors',
-                  'aria-label': 'Clear',
+                  'aria-label': resolveLocaleText('Clear', mergedLocale.value?.common?.clearText),
                   onClick: handleClear
                 },
                 [ClearIcon]

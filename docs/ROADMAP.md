@@ -145,24 +145,13 @@ source: current repository audit and planning
 
 > **扫描结论修正**：Roadmap 原估"组件层散落 `typeof window` 直写 + 大量 `any`"在 Vue 范围内不成立——Vue src 类型位 `any` 实际 0 处，window/document 抽样核查也无 SSR 崩溃风险（见 B-0）。真正的高优问题是 **i18n 未接入**（B-1）与 **约 1,500 LOC 死 composable**（B-3）。
 
-- [ ] **B-1 硬编码 UI 文案未接入 TigerLocale**（P1）
-  - 维度：硬编码文案/i18n｜模块：`Select.ts:699`、`Tree.ts:891`、`TreeSelect.ts:309`、`Transfer.ts:194`、`Cascader.ts:363`、`FileManager.ts:167/244`、`VirtualTable.ts:219`、`InfiniteScroll.ts:32`、`QRCode.ts:103`、`Timeline.ts:214`、`ImageViewer.ts:288/291`、`Modal.ts:182/464`、`Spotlight.ts:85`、`Loading.ts:230`、`AutoComplete.ts:257`、`Signature.ts:48`
-  - 问题：仓库已具备 `TigerLocale` + `mergeTigerLocale` + ConfigProvider `locale` 体系，`TigerLocaleCommon` 已定义 `loadingText/emptyText/closeText/okText/cancelText` 槽位，Modal/Drawer 已正确接入（`mergeTigerLocale(config.value.locale, props.locale)`）。但上述组件把 `'Search...'`/`'Loading...'`/`'No data'`/`'Close'`/`'Clear'` 直接写死在 render 中，既无 `locale` prop 也不读 ConfigProvider，无法本地化。
-  - 影响：`<ConfigProvider :locale="ZH_CN">` 下，Select 搜索框、Tree/TreeSelect/Transfer/Cascader 的搜索与空态、各处 Loading/Close 仍显示英文，多语言应用无法整体本地化。
-  - 建议：改走 `mergeTigerLocale` 解析（沿用 Modal 模式：组件加 `locale?: Partial<TigerLocale>` prop + 读 ConfigProvider）。`common` 缺 `searchPlaceholder`（仅 `TigerLocaleTable` 有），需在 `TigerLocaleCommon` 补 `searchPlaceholder`（及必要的 `clearText`）供 Select/Tree/TreeSelect/Transfer/Cascader 搜索框使用；与 A-1/A-2 同源，建议一并规划。
+> **进度（2026-06-19）**：B-1（硬编码 UI 文案接入 TigerLocale）与 B-3（删除未使用 composable）已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。B-1 的 core 前置（`TigerLocaleCommon` 新增 `searchPlaceholder` / `clearText`）与 React 镜像 C-1 一并跨端交付；原 B-1 清单中的 `Signature.ts:48` / `InfiniteScroll.ts:32` / `Spotlight.ts:85` 实为带英文默认值的 prop（非 render 硬编码），并入 B-2 处理。余项 B-2 / B-4 / B-5 / B-6 仍待推进。
 
 - [ ] **B-2 英文 prop 默认值绕过全局 locale**（P2）
   - 维度：i18n｜模块：`Tree.ts:256`(emptyText)、`List.ts:106`、`TreeSelect.ts:102`、`Transfer.ts:79`、`VirtualTable.ts:63`(emptyText)、`InfiniteScroll.ts:32`(loadingText)、`Signature.ts:48`(clearText)、`Spotlight.ts:85`
   - 问题：这些组件把文案做成可覆盖 prop，但默认值为英文（`default: 'No data'`/`'Loading...'`/`'Clear'`），且不回退到 ConfigProvider 的 `TigerLocaleCommon`。可逐实例覆盖，但无法被全局 locale 统一驱动。
   - 影响：即便 app 配了 ZH_CN，这些默认仍是英文，需在每个组件实例手动传文案、易遗漏；与 B-1、A-2 同源。
   - 建议：prop 缺省值改为「未传时回退 `mergedLocale.common.*`」，prop 作为最高优先级覆盖（与 Modal 的 `props.locale` > `config.locale` 优先级一致）。
-
-- [ ] **B-3 composables 大面积未被使用＝死代码**（P1）
-  - 维度：composables 复用/死代码｜模块：`packages/vue/src/composables/`
-  - 问题：10 个 composable 中仅 `useChartInteraction`（10 个图表组件使用）真正被消费；`useFormController`、`useDrag` 仅经 package `index.ts` 公开导出（公共 API、无组件内部使用，保留）；其余 7 个——`usePopup`、`useDateNavigation`、`useDateSelection`、`useTimeSelection`、`useTimePanelKeyboard`、`useSelectOptions`、`useSelectKeyboard`（合计约 1,500 LOC）——仅被 `composables/index.ts` barrel 引用，无任何组件 import、未从 package 公共入口导出、无单测覆盖，该 barrel 本身亦无人 import。对应组件（`Select.ts` 814、`DatePicker.ts` 989、`TimePicker.ts` 980）各自内联实现，Vue 弹层逻辑改走 `utils/use-floating-popup.ts` + `utils/overlay.ts`，使 `usePopup` 冗余。
-  - 影响：约 1,500 LOC 死代码；「逻辑已抽取」实为未接入，造成维护与认知误导。
-  - 建议：二选一——(a) 删除这 7 个未用 composable 并精简 `composables/index.ts`（零消费者、非公共 API，风险低，**推荐**）；或 (b) 若计划重构 Select/DatePicker/TimePicker 使用它们，则补齐接入。另确认公共 API `useFormController`/`useDrag` 的文档与测试覆盖。
-  - parity 注：React `hooks/` 为 `useChartInteraction`/`useControlledState`/`useDrag`/`useFormController`/`usePopup`。React 有 `useControlledState` 而 Vue 无对应物（Vue 多处内联 `isControlled ? props.x! : internalValue`，亦是 B-5 非空断言来源）；`usePopup` 在 React 在用、在 Vue 已死。跨端去重执行归属任务 D。
 
 - [ ] **B-4 SSR 守卫写法不统一**（P2）
   - 维度：SSR guard｜模块：`ConfigProvider.ts`（内联 `typeof document === 'undefined'`）vs `Descriptions`/`Message`/`Notification`（`isBrowser()`）vs 仅靠生命周期时机（`Affix`/`Tour`/`Modal`/`Drawer`/`TimePicker`/`Slider`/`ImageCropper`/`ChartTooltip`）
@@ -178,9 +167,9 @@ source: current repository audit and planning
 
 - [ ] **B-6 复杂度热点抽取评估**（P2）
   - 维度：复杂度热点｜模块：`Menu.ts`(1278)、`DatePicker.ts`(989)、`TimePicker.ts`(980)、`Tree.ts`(934)、`Select.ts`(814)；React 对应 `Menu.tsx`(914)、`Tree.tsx`(897)、`DatePicker.tsx`(847)、`TimePicker.tsx`(775)、`Select.tsx`(666)
-  - 问题：DatePicker/TimePicker/Select 体量大且其专用 composable 已写好却未接入（见 B-3）；Menu/Tree 体量最大却无任何抽取层。
+  - 问题：DatePicker/TimePicker/Select 体量大，其原专用 composable 已随 B-3 删除（从未接入），逻辑全部内联；Menu/Tree 体量最大且无任何抽取层。
   - 影响：大文件维护成本高，双端同类逻辑各自内联、易漂移。
-  - 建议：分两步——(a) DatePicker/TimePicker/Select 的最廉价收敛是接入已有 composable，或按 B-3 删除后将框架无关逻辑沉淀到 `core/src/utils/` 供双端复用；(b) Menu/Tree 评估把键盘导航 + 节点 flatten/过滤逻辑抽到 `core/src/utils/` 与 React Menu/Tree 共享。跨端下沉执行归属任务 D。
+  - 建议：把 DatePicker/TimePicker/Select 与 Menu/Tree 的框架无关逻辑（键盘导航、日期/时间计算、节点 flatten/过滤）下沉到 `core/src/utils/`，经 hooks/composable 包装供双端复用；跨端下沉执行归属任务 D。
 
 - [x] **B-0 已核查、Vue 范围内无需处理**
   - 类型安全：`packages/vue/src` 类型位 `any` **0** 处（唯一类型位为 `Table.ts:160` 的 `new Map<string, any>()`，值类型可收窄但风险极低；`CronEditor.ts` 的 `'any'` 为业务字面量非类型），`@ts-ignore`/`@ts-expect-error` **0** 处 → A-0 移交的 `any` 审计在 Vue 侧基本干净，React 侧移交任务 C。
@@ -190,11 +179,7 @@ source: current repository audit and planning
 
 > **扫描结论修正**：与任务 B 一致——Roadmap 原列的类型安全（`any`）与 SSR 直写在 React 范围内同样基本不成立：React src 类型位 `any` 仅 1 处、`@ts-ignore` 0 处，window/document 抽样均在事件/`useEffect` 内（见 C-0）。点名的 FloatButton/Tour/ChartTooltip 已正确 `isBrowser()` 守卫，真正缺显式守卫仅 ImagePreview（C-3）。React 与 Vue 共用 `TigerLocale`/`mergeTigerLocale`/ConfigProvider 体系，但仅 10 个组件消费，搜索/空态类仍硬编码（C-1/C-2，与 B-1/B-2 同源）。
 
-- [ ] **C-1 内部搜索框 `placeholder="Search..."` 硬编码、不可定制**（P1）
-  - 维度：硬编码文案/i18n｜模块：`Select.tsx:655`、`Tree.tsx:874`、`TreeSelect.tsx:239`、`Transfer.tsx:168`、`Cascader.tsx:272`、`FileManager.tsx:163`
-  - 问题：React 已具备 `mergeTigerLocale(config.locale, props.locale)` + ConfigProvider 体系（`Modal.tsx:130/207` 已正确读 `mergedLocale.common.closeText`），但上述 6 个组件内部搜索 `<input>` 的 placeholder 为 JSX 内联英文字面量 `"Search..."`，既无 prop 覆盖也不读 ConfigProvider。Vue 端同名组件存在逐字一致的硬编码（B-1），属跨框架同源问题。
-  - 影响：`<ConfigProvider locale={ZH_CN}>` 下这些搜索框仍显示英文 "Search..."，无任何定制入口。
-  - 建议：与 B-1 协同——在 `TigerLocaleCommon` 补 `searchPlaceholder`（现仅 `TigerLocaleTable` 有），双端搜索框改读 `mergedLocale.common.searchPlaceholder`，并补可覆盖的 `searchPlaceholder` prop（最高优先级）；core 标签统一与 A-1/A-2 一并规划。
+> **进度（2026-06-19）**：C-1（内部搜索框 `placeholder` 硬编码）已随 Vue B-1 跨端一并交付——6 个 React 搜索框（Select/Tree/TreeSelect/Transfer/Cascader/FileManager）改读 `mergedLocale.common.searchPlaceholder` 并新增 `locale` prop，共享 core `TigerLocaleCommon.searchPlaceholder`，按惯例移交 [CHANGELOG.md](../CHANGELOG.md)。余项 C-2 / C-3 / C-4 / C-5 仍待推进。
 
 - [ ] **C-2 英文 prop 默认值绕过全局 locale**（P2）
   - 维度：i18n｜模块：`List.tsx:176`/`VirtualTable.tsx:50`/`Tree.tsx:287`(emptyText='No data')、`Transfer.tsx:58`/`TreeSelect.tsx:58`(notFoundText='No data')、`InfiniteScroll.tsx:32`(loadingText='Loading...')、`Tour.tsx:41-43`(nextText/prevText/finishText)、`Spotlight.tsx:56`(placeholder='Search')、`NumberKeyboard.tsx:37`(confirmText='Done')、`Signature.tsx:61`(clearText='Clear')、`Select.tsx:70`/`Cascader.tsx:63`/`TreeSelect.tsx:52`(placeholder)、`Loading.tsx:143`(aria-label 回退 'Loading')

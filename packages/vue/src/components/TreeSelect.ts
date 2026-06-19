@@ -21,8 +21,12 @@ import {
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   chevronRightSolidIcon20PathD,
-  closeSolidIcon20PathD
+  closeSolidIcon20PathD,
+  resolveLocaleText,
+  mergeTigerLocale
 } from '@expcat/tigercat-core'
+import type { TigerLocale } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 let treeSelectInstanceId = 0
 
@@ -104,11 +108,20 @@ export const TreeSelect = defineComponent({
     defaultExpandAll: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Locale overrides merged on top of ConfigProvider locale
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
     const instanceId = ++treeSelectInstanceId
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const listboxId = `tiger-treeselect-listbox-${instanceId}`
 
     const isOpen = ref(false)
@@ -306,7 +319,10 @@ export const TreeSelect = defineComponent({
                   ? h('input', {
                       type: 'text',
                       class: treeSelectSearchClasses,
-                      placeholder: 'Search...',
+                      placeholder: resolveLocaleText(
+                        'Search...',
+                        mergedLocale.value?.common?.searchPlaceholder
+                      ),
                       value: searchQuery.value,
                       'aria-label': 'Search tree',
                       onInput: (e: Event) => {

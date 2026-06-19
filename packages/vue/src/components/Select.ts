@@ -25,8 +25,12 @@ import {
   type SelectOptions,
   type SelectSize,
   type SelectModelValue,
-  type SelectSearchDebouncer
+  type SelectSearchDebouncer,
+  resolveLocaleText,
+  mergeTigerLocale,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 let selectInstanceId = 0
 
@@ -104,6 +108,7 @@ export interface VueSelectProps {
   creatable?: boolean
   createOptionText?: string
   listHeight?: number
+  locale?: Partial<TigerLocale>
 }
 
 export const Select = defineComponent({
@@ -220,10 +225,19 @@ export const Select = defineComponent({
     listHeight: {
       type: Number,
       default: 256
+    },
+    /**
+     * Locale overrides merged on top of ConfigProvider locale
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: ['update:modelValue', 'change', 'search', 'create'],
   setup(props, { emit }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const instanceId = ++selectInstanceId
     const listboxId = `tiger-select-listbox-${instanceId}`
     const getOptionId = (index: number) => `tiger-select-option-${instanceId}-${index}`
@@ -696,7 +710,10 @@ export const Select = defineComponent({
                   ref: searchInputRef,
                   type: 'text',
                   class: selectSearchInputClasses,
-                  placeholder: 'Search...',
+                  placeholder: resolveLocaleText(
+                    'Search...',
+                    mergedLocale.value?.common?.searchPlaceholder
+                  ),
                   value: searchQuery.value,
                   onInput: handleSearchInput,
                   onKeydown: handleSearchKeyDown

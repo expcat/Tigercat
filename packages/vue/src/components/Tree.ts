@@ -31,9 +31,13 @@ import {
   type TreeCheckStrategy,
   type TreeCheckedState,
   type TreeLoadDataFn,
-  type TreeFilterFn
+  type TreeFilterFn,
+  resolveLocaleText,
+  mergeTigerLocale,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { VirtualList } from './VirtualList'
+import { useTigerConfig } from './ConfigProvider'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -61,6 +65,7 @@ export interface VueTreeProps {
   blockNode?: boolean
   emptyText?: string
   ariaLabel?: string
+  locale?: Partial<TigerLocale>
 }
 
 // Expand icon component
@@ -299,6 +304,13 @@ export const Tree = defineComponent({
     className: {
       type: String,
       default: undefined
+    },
+    /**
+     * Locale overrides merged on top of ConfigProvider locale
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: [
@@ -315,6 +327,8 @@ export const Tree = defineComponent({
   ],
   setup(props, { emit, attrs }) {
     const rootEl = ref<HTMLElement | null>(null)
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
 
     const effectiveSelectable = computed(() => {
       if (props.selectionMode !== undefined) {
@@ -888,7 +902,10 @@ export const Tree = defineComponent({
             type: 'text',
             class:
               'w-full mb-2 px-2 py-1 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded bg-[var(--tiger-surface,#ffffff)] focus:outline-none focus:ring-1 focus:ring-[var(--tiger-primary,#2563eb)]',
-            placeholder: 'Search...',
+            placeholder: resolveLocaleText(
+              'Search...',
+              mergedLocale.value?.common?.searchPlaceholder
+            ),
             value: internalSearchValue.value,
             onInput: (e: Event) => {
               internalSearchValue.value = (e.target as HTMLInputElement).value

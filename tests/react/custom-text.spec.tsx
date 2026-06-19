@@ -14,6 +14,7 @@ import {
   Drawer,
   FormWizard,
   TaskBoard,
+  Transfer,
   ConfigProvider
 } from '@expcat/tigercat-react'
 
@@ -88,10 +89,36 @@ describe('custom text (no i18n) — React', () => {
     })
   })
 
+  describe('common.searchPlaceholder wiring (C-1)', () => {
+    it('Transfer search reads global config searchPlaceholder', () => {
+      render(
+        <ConfigProvider locale={{ common: { searchPlaceholder: '全局搜索' } }}>
+          <Transfer showSearch />
+        </ConfigProvider>
+      )
+      expect(screen.getAllByPlaceholderText('全局搜索').length).toBeGreaterThan(0)
+    })
+
+    it('Transfer locale prop wins over global config', () => {
+      render(
+        <ConfigProvider locale={{ common: { searchPlaceholder: '全局搜索' } }}>
+          <Transfer showSearch locale={{ common: { searchPlaceholder: '局部搜索' } }} />
+        </ConfigProvider>
+      )
+      expect(screen.getAllByPlaceholderText('局部搜索').length).toBeGreaterThan(0)
+      expect(screen.queryByPlaceholderText('全局搜索')).toBeNull()
+    })
+  })
+
   describe('backward compatibility', () => {
     it('Pagination outside a ConfigProvider keeps default English text', () => {
       render(<Pagination total={100} />)
       expect(screen.getByLabelText('Previous page')).toBeInTheDocument()
+    })
+
+    it('Transfer search outside a ConfigProvider keeps default English placeholder', () => {
+      render(<Transfer showSearch />)
+      expect(screen.getAllByPlaceholderText('Search...').length).toBeGreaterThan(0)
     })
   })
 })

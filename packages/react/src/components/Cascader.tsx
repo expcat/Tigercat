@@ -21,10 +21,14 @@ import {
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
+  resolveLocaleText,
+  mergeTigerLocale,
   type CascaderOption,
   type CascaderValue,
-  type CascaderProps as CoreCascaderProps
+  type CascaderProps as CoreCascaderProps,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 type CascaderDivProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'>
 
@@ -35,6 +39,8 @@ export interface CascaderProps extends Omit<CoreCascaderProps, 'className'>, Cas
   onChange?: (value: CascaderValue) => void
   /** Additional class name */
   className?: string
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
 }
 
 const CASCADER_KEYS = new Set([
@@ -50,7 +56,8 @@ const CASCADER_KEYS = new Set([
   'changeOnSelect',
   'separator',
   'notFoundText',
-  'className'
+  'className',
+  'locale'
 ])
 
 const EMPTY_CASCADER_VALUE: CascaderValue = []
@@ -69,8 +76,15 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
     changeOnSelect = false,
     separator = ' / ',
     notFoundText = 'No results found',
-    className
+    className,
+    locale
   } = props
+
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
 
   const divProps: Record<string, unknown> = {}
   for (const [k, v] of Object.entries(props)) {
@@ -269,7 +283,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
             <input
               type="text"
               className={cascaderSearchInputClasses}
-              placeholder="Search..."
+              placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="Search options"

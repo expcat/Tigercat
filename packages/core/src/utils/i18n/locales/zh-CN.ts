@@ -12,7 +12,9 @@ export const zhCN: TigerLocale = {
     cancelText: '取消',
     closeText: '关闭',
     loadingText: '加载中...',
-    emptyText: '暂无数据'
+    emptyText: '暂无数据',
+    searchPlaceholder: '搜索',
+    clearText: '清除'
   },
   modal: {
     closeAriaLabel: '关闭',

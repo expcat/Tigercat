@@ -15,15 +15,20 @@ import {
   mergeStyleValues,
   normalizeSvgAttrs,
   injectLoadingAnimationStyles,
+  resolveLocaleText,
+  mergeTigerLocale,
   type LoadingProps,
   type LoadingVariant,
   type LoadingSize,
-  type LoadingColor
+  type LoadingColor,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { renderVueBodyTeleport, useVueBodyScrollLock } from '../utils/overlay'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueLoadingProps extends LoadingProps {
   style?: Record<string, string | number>
+  locale?: Partial<TigerLocale>
 }
 
 export const Loading = defineComponent({
@@ -77,10 +82,16 @@ export const Loading = defineComponent({
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   setup(props, { attrs }) {
     injectLoadingAnimationStyles()
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
 
     const visible = ref(false)
     let timer: ReturnType<typeof setTimeout> | null = null
@@ -227,7 +238,8 @@ export const Loading = defineComponent({
         'div',
         {
           role: 'status',
-          'aria-label': props.text || 'Loading',
+          'aria-label':
+            props.text || resolveLocaleText('Loading', mergedLocale.value?.common?.loadingText),
           'aria-live': 'polite',
           'aria-busy': true,
           ...attrs,

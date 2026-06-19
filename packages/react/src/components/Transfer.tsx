@@ -1,6 +1,12 @@
 import React, { useState, useMemo } from 'react'
-import type { TransferItem, TransferProps as CoreTransferProps } from '@expcat/tigercat-core'
+import type {
+  TransferItem,
+  TransferProps as CoreTransferProps,
+  TigerLocale
+} from '@expcat/tigercat-core'
 import {
+  resolveLocaleText,
+  mergeTigerLocale,
   transferBaseClasses,
   transferPanelClasses,
   transferPanelHeaderClasses,
@@ -20,6 +26,7 @@ import {
   chevronLeftSolidIcon20PathD,
   chevronRightSolidIcon20PathD
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface TransferProps
   extends CoreTransferProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
@@ -31,6 +38,8 @@ export interface TransferProps
     direction: 'left' | 'right',
     movedKeys: (string | number)[]
   ) => void
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
 }
 
 const TRANSFER_KEYS = new Set<string>([
@@ -59,8 +68,15 @@ export const Transfer: React.FC<TransferProps> = (props) => {
     filterOption,
     className,
     onChange,
+    locale,
     ...rest
   } = props
+
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
 
   const divProps: Record<string, unknown> = {}
   for (const key of Object.keys(rest)) {
@@ -165,7 +181,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
           <input
             type="text"
             className={transferSearchClasses}
-            placeholder="Search..."
+            placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
             value={searchValue}
             aria-label={`Search ${title}`}
             onChange={(e) => onSearch(e.target.value)}

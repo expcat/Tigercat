@@ -11,6 +11,7 @@
 - core 新增 `filterHiddenColumns` 工具函数与 `FLOATING_OVERLAY_Z_INDEX`（1000）常量。
 - 新增 **MarkdownEditor** 高级组件：支持 Markdown 编辑、编辑/分屏/预览模式、内置工具栏、快捷键、预览渲染与自定义 renderer 扩展点，并提供 Vue/React 双端实现、示例与测试。
 - **Form** 内置校验消息支持本地化：新增 core `TigerLocaleFormValidation` 类型、`getFormValidationLabels` 与 `DEFAULT_FORM_VALIDATION_LABELS` / `ZH_CN_FORM_VALIDATION_LABELS`，`TigerLocale` 新增 `formValidation` 段（en-US / zh-CN 预设已补齐）。Vue/React `Form` 新增可选 `locale` prop 并接入 ConfigProvider locale，`<ConfigProvider :locale="zhCN">` 下必填/类型/范围等内置报错自动显示中文；单条规则 `message` 仍为最高优先级，默认英文行为不变。`validateRule` / `validateField` / `validateForm` / `validateFormFields` 新增可选 `messages` 末参（向后兼容）。
+- **i18n** 组件内置搜索/加载/关闭/清除文案接入 ConfigProvider locale：`TigerLocaleCommon` 新增 `searchPlaceholder` / `clearText`（en-US / zh-CN 预设已补齐）。Vue `Select` / `Tree` / `TreeSelect` / `Transfer` / `Cascader` / `FileManager` / `VirtualTable` / `QRCode` / `Timeline` / `Loading` / `ImageViewer` / `AutoComplete` 与 React `Select` / `Tree` / `TreeSelect` / `Transfer` / `Cascader` / `FileManager` 不再把 `'Search...'` / `'Loading...'` / `'Close'` / `'Clear'` 硬编码在渲染中，改读 `mergeTigerLocale(ConfigProvider locale, props.locale)` 并新增可选 `locale` prop 作最高优先级覆盖。`<ConfigProvider :locale="zhCN">` 下这些文案自动本地化；未包裹 ConfigProvider 时默认英文渲染不变。
 
 ### Changed
 
@@ -39,6 +40,7 @@
 - 新增 [迁移指南](docs/MIGRATION.md) 作为 Breaking change 与迁移路径集中入口。
 - 更新 size-limit 当前基线：React full 限制为 253 kB，Vue Button subpath 限制为 16 kB。
 - 明确 Roadmap、CHANGELOG、脚本文档和 API 文档的职责边界，避免完成历史长期堆回 Roadmap。
+- 清理 Vue 包内 7 个未使用的内部 composable（`usePopup` / `useDateNavigation` / `useDateSelection` / `useTimeSelection` / `useTimePanelKeyboard` / `useSelectOptions` / `useSelectKeyboard`，约 1,529 LOC）及其 barrel `composables/index.ts`：均无组件使用、未从公共入口导出、无测试，属死代码移除；公共 composable `useChartInteraction` / `useFormController` / `useDrag` 不受影响。
 
 ## v1.2.0 — Breaking Changes
 

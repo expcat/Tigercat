@@ -21,11 +21,15 @@ import {
   fileManagerEmptyClasses,
   fileManagerLoadingClasses,
   fileManagerSearchClasses,
+  resolveLocaleText,
+  mergeTigerLocale,
   type FileItem,
   type FileViewMode,
   type FileSortField,
-  type FileSortOrder
+  type FileSortOrder,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueFileManagerProps {
   files?: FileItem[]
@@ -42,6 +46,7 @@ export interface VueFileManagerProps {
   searchable?: boolean
   searchText?: string
   className?: string
+  locale?: Partial<TigerLocale>
 }
 
 export const FileManager = defineComponent({
@@ -76,7 +81,8 @@ export const FileManager = defineComponent({
     emptyText: { type: String, default: 'Empty folder' },
     searchable: { type: Boolean, default: false },
     searchText: { type: String, default: '' },
-    className: { type: String, default: undefined }
+    className: { type: String, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
   emits: [
     'select',
@@ -87,6 +93,8 @@ export const FileManager = defineComponent({
     'update:selectedKeys'
   ],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const localSearch = ref(props.searchText)
 
     const model = computed(() =>
@@ -164,7 +172,10 @@ export const FileManager = defineComponent({
         ? h('input', {
             type: 'text',
             class: fileManagerSearchClasses,
-            placeholder: 'Search...',
+            placeholder: resolveLocaleText(
+              'Search...',
+              mergedLocale.value?.common?.searchPlaceholder
+            ),
             value: localSearch.value,
             onInput: (e: Event) => {
               const val = (e.target as HTMLInputElement).value
@@ -241,7 +252,11 @@ export const FileManager = defineComponent({
           : h('div', { class: fileManagerEmptyClasses }, props.emptyText)
 
       const loadingEl = props.loading
-        ? h('div', { class: fileManagerLoadingClasses }, 'Loading...')
+        ? h(
+            'div',
+            { class: fileManagerLoadingClasses },
+            resolveLocaleText('Loading...', mergedLocale.value?.common?.loadingText)
+          )
         : null
 
       return h('div', { class: containerClasses.value }, [toolbar, content, loadingEl])

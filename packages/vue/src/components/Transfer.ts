@@ -19,8 +19,12 @@ import {
   classNames,
   icon20ViewBox,
   chevronLeftSolidIcon20PathD,
-  chevronRightSolidIcon20PathD
+  chevronRightSolidIcon20PathD,
+  resolveLocaleText,
+  mergeTigerLocale
 } from '@expcat/tigercat-core'
+import type { TigerLocale } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 function ArrowIcon(pathD: string) {
   return h(
@@ -81,10 +85,19 @@ export const Transfer = defineComponent({
     filterOption: {
       type: Function as PropType<(inputValue: string, item: TransferItem) => boolean>,
       default: undefined
+    },
+    /**
+     * Locale overrides merged on top of ConfigProvider locale
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const sourceSelectedKeys = ref<Set<string | number>>(new Set())
     const targetSelectedKeys = ref<Set<string | number>>(new Set())
     const sourceSearch = ref('')
@@ -191,7 +204,10 @@ export const Transfer = defineComponent({
           ? h('input', {
               type: 'text',
               class: transferSearchClasses,
-              placeholder: 'Search...',
+              placeholder: resolveLocaleText(
+                'Search...',
+                mergedLocale.value?.common?.searchPlaceholder
+              ),
               value: searchValue,
               'aria-label': `Search ${title}`,
               onInput: (e: Event) => onSearch((e.target as HTMLInputElement).value)

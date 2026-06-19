@@ -1,7 +1,13 @@
 import React, { useState, useMemo, useRef, useEffect, useId } from 'react'
 import type { TreeNode } from '@expcat/tigercat-core'
-import type { TreeSelectProps as CoreTreeSelectProps, TreeSelectValue } from '@expcat/tigercat-core'
+import type {
+  TreeSelectProps as CoreTreeSelectProps,
+  TreeSelectValue,
+  TigerLocale
+} from '@expcat/tigercat-core'
 import {
+  resolveLocaleText,
+  mergeTigerLocale,
   treeSelectBaseClasses,
   treeSelectDropdownClasses,
   treeSelectSearchClasses,
@@ -22,6 +28,7 @@ import {
   chevronRightSolidIcon20PathD,
   closeSolidIcon20PathD
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface TreeSelectProps
   extends CoreTreeSelectProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
@@ -29,6 +36,8 @@ export interface TreeSelectProps
   value?: TreeSelectValue
   /** Called when value changes */
   onChange?: (value: TreeSelectValue) => void
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
 }
 
 const TREESELECT_KEYS = new Set<string>([
@@ -59,8 +68,15 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     defaultExpandAll = false,
     className,
     onChange,
+    locale,
     ...rest
   } = props
+
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
 
   const divProps: Record<string, unknown> = {}
   for (const key of Object.keys(rest)) {
@@ -236,7 +252,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
             <input
               type="text"
               className={treeSelectSearchClasses}
-              placeholder="Search..."
+              placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
               value={searchQuery}
               aria-label="Search tree"
               onChange={(e) => setSearchQuery(e.target.value)}

@@ -29,9 +29,13 @@ import {
   type TreeCheckStrategy,
   type TreeCheckedState,
   type TreeLoadDataFn,
-  type TreeFilterFn
+  type TreeFilterFn,
+  resolveLocaleText,
+  mergeTigerLocale,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { VirtualList } from './VirtualList'
+import { useTigerConfig } from './ConfigProvider'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -259,6 +263,7 @@ export interface TreeProps {
    * @since 1.x
    */
   itemHeight?: number
+  locale?: Partial<TigerLocale>
 }
 
 export const Tree: React.FC<TreeProps> = ({
@@ -297,10 +302,16 @@ export const Tree: React.FC<TreeProps> = ({
   onDrop,
   virtual = false,
   height = 400,
-  itemHeight = 32
+  itemHeight = 32,
+  locale
 }) => {
   const itemRefs = useRef(new Map<string | number, HTMLDivElement | null>())
   const dragNodeKeyRef = useRef<string | number | null>(null)
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
 
   const effectiveSelectable = useMemo(() => {
     if (selectionMode !== undefined) {
@@ -871,7 +882,7 @@ export const Tree: React.FC<TreeProps> = ({
         <input
           type="text"
           className="w-full mb-2 px-2 py-1 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded bg-[var(--tiger-surface,#ffffff)] focus:outline-none focus:ring-1 focus:ring-[var(--tiger-primary,#2563eb)]"
-          placeholder="Search..."
+          placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
           value={internalSearchValue}
           onChange={(e) => setInternalSearchValue(e.target.value)}
         />

@@ -16,9 +16,13 @@ import {
   virtualTableEmptyClasses,
   virtualTableLoadingClasses,
   virtualTableFixedCellSelectedClasses,
+  resolveLocaleText,
+  mergeTigerLocale,
   type TableColumn,
-  type VirtualTableRange
+  type VirtualTableRange,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueVirtualTableProps {
   data?: unknown[]
@@ -68,10 +72,13 @@ export const VirtualTable = defineComponent({
     },
     striped: { type: Boolean, default: false },
     bordered: { type: Boolean, default: false },
-    className: { type: String, default: undefined }
+    className: { type: String, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
   emits: ['row-click', 'select'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const containerRef = ref<HTMLElement | null>(null)
     const scrollTop = ref(0)
 
@@ -216,7 +223,11 @@ export const VirtualTable = defineComponent({
 
       // Loading overlay
       const loadingEl = props.loading
-        ? h('div', { class: virtualTableLoadingClasses }, 'Loading...')
+        ? h(
+            'div',
+            { class: virtualTableLoadingClasses },
+            resolveLocaleText('Loading...', mergedLocale.value?.common?.loadingText)
+          )
         : null
 
       return h(

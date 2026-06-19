@@ -26,8 +26,12 @@ import {
   type CascaderValue,
   type CascaderSize,
   type CascaderExpandTrigger,
-  type CascaderShowSearch
+  type CascaderShowSearch,
+  resolveLocaleText,
+  mergeTigerLocale,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 let cascaderInstanceId = 0
 
@@ -61,6 +65,7 @@ export interface VueCascaderProps {
   changeOnSelect?: boolean
   separator?: string
   notFoundText?: string
+  locale?: Partial<TigerLocale>
 }
 
 export const Cascader = defineComponent({
@@ -109,11 +114,20 @@ export const Cascader = defineComponent({
     notFoundText: {
       type: String,
       default: 'No results found'
+    },
+    /**
+     * Locale overrides merged on top of ConfigProvider locale
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
     const instanceId = ++cascaderInstanceId
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const isOpen = ref(false)
     const searchQuery = ref('')
     const activePath = ref<CascaderValue>([])
@@ -360,7 +374,10 @@ export const Cascader = defineComponent({
               ref: searchInputRef,
               type: 'text',
               class: cascaderSearchInputClasses,
-              placeholder: 'Search...',
+              placeholder: resolveLocaleText(
+                'Search...',
+                mergedLocale.value?.common?.searchPlaceholder
+              ),
               value: searchQuery.value,
               onInput: handleSearchInput,
               'aria-label': 'Search options'
