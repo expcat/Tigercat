@@ -18,6 +18,19 @@ for (const packageName of ['core', 'vue', 'react', 'cli']) {
   updateJsonVersion(path.join(rootDir, 'packages', packageName, 'package.json'), version)
 }
 
+for (const sourceVersionFile of [
+  ['core', 'src', 'index.ts'],
+  ['vue', 'src', 'index.ts'],
+  ['react', 'src', 'index.tsx']
+]) {
+  replaceInFile(path.join(rootDir, 'packages', ...sourceVersionFile), [
+    {
+      pattern: /export const version = '[^']+'/,
+      next: `export const version = '${version}'`
+    }
+  ])
+}
+
 replaceInFile(path.join(rootDir, 'packages', 'cli', 'src', 'constants.ts'), [
   {
     pattern: /CLI_VERSION = '[^']+'/,
