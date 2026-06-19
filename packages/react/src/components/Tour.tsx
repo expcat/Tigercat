@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom'
 import {
   classNames,
   isBrowser,
+  resolveLocaleText,
+  mergeTigerLocale,
   tourPopoverClasses,
   tourTitleClasses,
   tourDescriptionClasses,
@@ -21,6 +23,7 @@ import {
   type TourRect
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface TourProps extends CoreTourProps {
   /** Callback when open state changes */
@@ -38,17 +41,26 @@ export const Tour: React.FC<TourProps> = ({
   loadSteps,
   open = false,
   current: controlledCurrent,
-  nextText = 'Next',
-  prevText = 'Previous',
-  finishText = 'Finish',
+  nextText,
+  prevText,
+  finishText,
   closable = true,
   showIndicators = true,
+  locale,
   className,
   onOpenChange,
   onClose,
   onFinish,
   onChange
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const nextLabel = resolveLocaleText('Next', nextText, mergedLocale?.formWizard?.nextText)
+  const prevLabel = resolveLocaleText('Previous', prevText, mergedLocale?.formWizard?.prevText)
+  const finishLabel = resolveLocaleText('Finish', finishText, mergedLocale?.formWizard?.finishText)
   const [internalStep, setInternalStep] = useState(0)
   const [resolvedSteps, setResolvedSteps] = useState(steps)
   const currentStep = controlledCurrent ?? internalStep
@@ -196,14 +208,14 @@ export const Tour: React.FC<TourProps> = ({
                 type="button"
                 className="px-3 py-1.5 text-sm rounded-md border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors mr-2"
                 onClick={prev}>
-                {prevText}
+                {prevLabel}
               </button>
             )}
             <button
               type="button"
               className="px-3 py-1.5 text-sm rounded-md bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] transition-colors"
               onClick={next}>
-              {isLast ? finishText : nextText}
+              {isLast ? finishLabel : nextLabel}
             </button>
           </div>
         </div>

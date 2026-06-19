@@ -103,7 +103,7 @@ export const TreeSelect = defineComponent({
     },
     notFoundText: {
       type: String,
-      default: 'No data'
+      default: undefined
     },
     defaultExpandAll: {
       type: Boolean,
@@ -390,7 +390,15 @@ export const TreeSelect = defineComponent({
                         ]
                       )
                     })
-                  : h('div', { class: treeSelectEmptyClasses }, props.notFoundText)
+                  : h(
+                      'div',
+                      { class: treeSelectEmptyClasses },
+                      resolveLocaleText(
+                        'No data',
+                        props.notFoundText,
+                        mergedLocale.value?.common?.emptyText
+                      )
+                    )
               ]
             )
           : null

@@ -80,7 +80,7 @@ export const Transfer = defineComponent({
     },
     notFoundText: {
       type: String,
-      default: 'No data'
+      default: undefined
     },
     filterOption: {
       type: Function as PropType<(inputValue: string, item: TransferItem) => boolean>,
@@ -246,7 +246,17 @@ export const Transfer = defineComponent({
                   ]
                 )
               })
-            : [h('div', { class: transferEmptyClasses }, props.notFoundText)]
+            : [
+                h(
+                  'div',
+                  { class: transferEmptyClasses },
+                  resolveLocaleText(
+                    'No data',
+                    props.notFoundText,
+                    mergedLocale.value?.common?.emptyText
+                  )
+                )
+              ]
         )
       ])
     }

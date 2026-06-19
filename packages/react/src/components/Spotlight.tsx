@@ -12,6 +12,8 @@ import {
   getSpotlightOptionClasses,
   getSpotlightSearchState,
   getSpotlightShortcutLabel,
+  mergeTigerLocale,
+  resolveLocaleText,
   restoreFocus,
   shouldCloseOnMaskClick,
   spotlightEmptyClasses,
@@ -28,6 +30,7 @@ import {
   type SpotlightProps as CoreSpotlightProps
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface SpotlightProps
   extends CoreSpotlightProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onSelect'> {
@@ -53,8 +56,9 @@ export const Spotlight: React.FC<SpotlightProps> = ({
   defaultQuery = '',
   items = EMPTY_ITEMS,
   title = 'Spotlight',
-  placeholder = 'Search',
-  emptyText = 'No results found',
+  placeholder,
+  emptyText,
+  locale,
   inputAriaLabel,
   listboxLabel,
   closeOnSelect = true,
@@ -71,6 +75,16 @@ export const Spotlight: React.FC<SpotlightProps> = ({
   style,
   ...rest
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const placeholderText = resolveLocaleText(
+    'Search',
+    placeholder,
+    mergedLocale?.common?.searchPlaceholder
+  )
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen)
   const [uncontrolledQuery, setUncontrolledQuery] = useState(defaultQuery)
   const [activeIndex, setActiveIndex] = useState(-1)
@@ -226,8 +240,8 @@ export const Spotlight: React.FC<SpotlightProps> = ({
             value={resolvedQuery}
             type="search"
             className={spotlightInputClasses}
-            placeholder={placeholder}
-            aria-label={inputAriaLabel ?? placeholder}
+            placeholder={placeholderText}
+            aria-label={inputAriaLabel ?? placeholderText}
             autoComplete="off"
             {...getPickerComboboxAria({
               expanded: true,
@@ -287,7 +301,9 @@ export const Spotlight: React.FC<SpotlightProps> = ({
             ))}
           </div>
         ) : (
-          <div className={spotlightEmptyClasses}>{emptyText}</div>
+          <div className={spotlightEmptyClasses}>
+            {resolveLocaleText('No results found', emptyText, mergedLocale?.common?.emptyText)}
+          </div>
         )}
       </div>
     </div>

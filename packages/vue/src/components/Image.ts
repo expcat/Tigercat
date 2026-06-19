@@ -199,7 +199,7 @@ export const Image = defineComponent({
       return mergeStyleValues((attrs as Record<string, unknown>).style, props.style, base)
     })
 
-    const imgClasses = computed(() => getImageImgClasses(props.fit!))
+    const imgClasses = computed(() => getImageImgClasses(props.fit ?? 'cover'))
 
     return () => {
       const forwardedAttrs = Object.fromEntries(

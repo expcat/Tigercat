@@ -185,7 +185,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 Source: `packages/core/src/types/number-keyboard.ts` · Interface: `NumberKeyboardProps`.
 
-Showing 3 key props of 14; see source for the complete interface.
+Showing 3 key props of 15; see source for the complete interface.
 
 | Prop            | Type     | Default | Notes |
 | --------------- | -------- | ------- | ----- |
@@ -233,7 +233,7 @@ Showing 3 key props of 16; see source for the complete interface.
 
 Source: `packages/core/src/types/signature.ts` · Interface: `SignatureProps`.
 
-Showing 3 key props of 13; see source for the complete interface.
+Showing 3 key props of 14; see source for the complete interface.
 
 | Prop        | Type     | Default | Notes |
 | ----------- | -------- | ------- | ----- |

@@ -127,7 +127,7 @@ Showing 3 key props of 8; see source for the complete interface.
 
 Source: `packages/core/src/types/tour.ts` · Interface: `TourProps`.
 
-Showing 3 key props of 10; see source for the complete interface.
+Showing 3 key props of 11; see source for the complete interface.
 
 | Prop         | Type             | Default | Notes                                               |
 | ------------ | ---------------- | ------- | --------------------------------------------------- |

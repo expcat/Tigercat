@@ -104,18 +104,19 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   const PRIMARY_BTN = `${BTN_BASE} text-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary-hover,#1d4ed8)] dark:text-blue-400 dark:hover:text-blue-300 font-semibold hover:bg-[var(--tiger-primary,#2563eb)]/10 dark:hover:bg-blue-400/10`
 
   const renderNode = (node: CommentNode, depth: number, isLast: boolean) => {
-    const hasChildren = !!node.children && node.children.length > 0
+    const children = node.children ?? []
+    const hasChildren = children.length > 0
     const isExpanded = expandedSet.has(node.id)
     const showReplies = hasChildren && isExpanded
     const showAllReplies = expandedAllKeys.has(node.id)
     const repliesId = `tiger-comment-replies-${node.id}`
     const visibleChildren = showReplies
       ? maxReplies > 0 && !showAllReplies
-        ? node.children!.slice(0, maxReplies)
-        : node.children!
+        ? children.slice(0, maxReplies)
+        : children
       : []
     const showLoadMoreBtn =
-      showReplies && maxReplies > 0 && node.children!.length > maxReplies && !showAllReplies
+      showReplies && maxReplies > 0 && children.length > maxReplies && !showAllReplies
 
     const actions: React.ReactNode[] = []
 
@@ -299,7 +300,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 aria-expanded={isExpanded}
                 aria-controls={repliesId}
                 onClick={() => toggleExpanded(node.id)}>
-                {isExpanded ? '▾ 收起回复' : `▸ 展开 ${node.children!.length} 条回复`}
+                {isExpanded ? '▾ 收起回复' : `▸ 展开 ${children.length} 条回复`}
               </Button>
             ) : null}
 

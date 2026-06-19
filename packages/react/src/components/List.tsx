@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import {
   classNames,
+  resolveLocaleText,
+  mergeTigerLocale,
   getListClasses,
   getListItemClasses,
   getListHeaderFooterClasses,
@@ -31,9 +33,11 @@ import {
   type ListBorderStyle,
   type ListItemLayout,
   type ListItem,
-  type ListPaginationConfig
+  type ListPaginationConfig,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { VirtualList } from './VirtualList'
+import { useTigerConfig } from './ConfigProvider'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -79,6 +83,10 @@ export interface ListProps<
    * @default 'No data'
    */
   emptyText?: string
+  /**
+   * Locale override; falls back to ConfigProvider locale
+   */
+  locale?: Partial<TigerLocale>
   /**
    * Whether to show split line between items
    * @default true
@@ -173,7 +181,8 @@ export const List = <T extends ListItem = ListItem>({
   size = 'md',
   bordered = 'divided',
   loading = false,
-  emptyText = 'No data',
+  emptyText,
+  locale,
   split = true,
   itemLayout = 'horizontal',
   header,
@@ -194,6 +203,11 @@ export const List = <T extends ListItem = ListItem>({
   onReorder,
   ...divProps
 }: ListProps<T>) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
   const [currentPage, setCurrentPage] = useState(
     pagination && typeof pagination === 'object' ? pagination.current || 1 : 1
   )
@@ -415,7 +429,7 @@ export const List = <T extends ListItem = ListItem>({
     if (paginatedData.length === 0) {
       return (
         <div className={listEmptyStateClasses} role="status" aria-live="polite">
-          {emptyText}
+          {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
         </div>
       )
     }

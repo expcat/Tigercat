@@ -145,31 +145,13 @@ source: current repository audit and planning
 
 > **扫描结论修正**：Roadmap 原估"组件层散落 `typeof window` 直写 + 大量 `any`"在 Vue 范围内不成立——Vue src 类型位 `any` 实际 0 处，window/document 抽样核查也无 SSR 崩溃风险（见 B-0）。真正的高优问题是 **i18n 未接入**（B-1）与 **约 1,500 LOC 死 composable**（B-3）。
 
-> **进度（2026-06-19）**：B-1（硬编码 UI 文案接入 TigerLocale）与 B-3（删除未使用 composable）已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。B-1 的 core 前置（`TigerLocaleCommon` 新增 `searchPlaceholder` / `clearText`）与 React 镜像 C-1 一并跨端交付；原 B-1 清单中的 `Signature.ts:48` / `InfiniteScroll.ts:32` / `Spotlight.ts:85` 实为带英文默认值的 prop（非 render 硬编码），并入 B-2 处理。余项 B-2 / B-4 / B-5 / B-6 仍待推进。
+> **进度（2026-06-19）**：B-1（硬编码 UI 文案接入 TigerLocale）与 B-3（删除未使用 composable）已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。B-1 的 core 前置（`TigerLocaleCommon` 新增 `searchPlaceholder` / `clearText`）与 React 镜像 C-1 一并跨端交付；原 B-1 清单中的 `Signature.ts:48` / `InfiniteScroll.ts:32` / `Spotlight.ts:85` 实为带英文默认值的 prop（非 render 硬编码），并入 B-2 处理。
+>
+> **进度（2026-06-19，续）**：余项 B-2 / B-4 / B-5 / B-6 已全部交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留 B-2 ～ B-6 细目，仅保留 B-0 核查结论与 B-6 评估结论。**B-2**（英文 prop 默认值回退 ConfigProvider locale，连同 React 镜像 **C-2** 跨端一并交付）；**B-4**（`ConfigProvider`/`Signature`/`ImageAnnotation` 内联 `typeof` 守卫统一为 `isBrowser()`）；**B-5**（收窄 `Image`/`QRCode`/`Mentions`/`Alert` 等冗余断言与 `Tree`/`CommentThread`/`Menu` 的 `node.children!` post-check，React 镜像同批）；**B-6** 见下方评估结论。
 
-- [ ] **B-2 英文 prop 默认值绕过全局 locale**（P2）
-  - 维度：i18n｜模块：`Tree.ts:256`(emptyText)、`List.ts:106`、`TreeSelect.ts:102`、`Transfer.ts:79`、`VirtualTable.ts:63`(emptyText)、`InfiniteScroll.ts:32`(loadingText)、`Signature.ts:48`(clearText)、`Spotlight.ts:85`
-  - 问题：这些组件把文案做成可覆盖 prop，但默认值为英文（`default: 'No data'`/`'Loading...'`/`'Clear'`），且不回退到 ConfigProvider 的 `TigerLocaleCommon`。可逐实例覆盖，但无法被全局 locale 统一驱动。
-  - 影响：即便 app 配了 ZH_CN，这些默认仍是英文，需在每个组件实例手动传文案、易遗漏；与 B-1、A-2 同源。
-  - 建议：prop 缺省值改为「未传时回退 `mergedLocale.common.*`」，prop 作为最高优先级覆盖（与 Modal 的 `props.locale` > `config.locale` 优先级一致）。
-
-- [ ] **B-4 SSR 守卫写法不统一**（P2）
-  - 维度：SSR guard｜模块：`ConfigProvider.ts`（内联 `typeof document === 'undefined'`）vs `Descriptions`/`Message`/`Notification`（`isBrowser()`）vs 仅靠生命周期时机（`Affix`/`Tour`/`Modal`/`Drawer`/`TimePicker`/`Slider`/`ImageCropper`/`ChartTooltip`）
-  - 问题：121 处 window/document 访问，抽样核查未见在 SSR setup/render 阶段同步执行者（均位于 onMounted/onBeforeUnmount、事件处理、requestAnimationFrame 回调或显式守卫内），无 SSR 崩溃。但守卫写法三套并存：core 推荐的 `isBrowser()`、内联 `typeof … === 'undefined'`、以及无显式守卫仅依赖生命周期时机。
-  - 影响：当前无 bug，但隐式依赖生命周期较脆——日后把访问移出 onMounted 会静默破坏 SSR；写法不一致抬高 review 成本。即 A-0 移交的「散落 `typeof window` 直写」核查结论：属一致性问题而非正确性问题。
-  - 建议：需显式守卫处统一用 `isBrowser()`（替换 ConfigProvider 的内联 `typeof document`）；生命周期/事件作用域内的访问保持原样（构造上安全），必要处补一行注释说明依赖时机。
-
-- [ ] **B-5 非空断言可类型收窄**（P2）
-  - 维度：非空断言｜模块：全包 21 处，含 `Alert.ts:202`(`props.duration!`)、`Select.ts:791`(`creatableOption.value!`)、`Form.ts:497/507`(`props.model![k]`)、`Notification.ts:281/288`(`containerApps[position]!`)、`Image.ts:202`、`QRCode.ts:39`、`Mentions.ts:56/131`、`Tree.ts:860`、`CommentThread.ts:192/198/480` 等
-  - 问题：多为 `props.X!`（X 类型可选但运行时有默认：duration/fit/size/prefix/disabled）或受控值模式 `props.value!`/`props.modelValue!`，及 `node.children!`（紧跟长度判断之后）。
-  - 影响：低——类型层脆弱；若移除默认或改动守卫，会变成运行时 undefined 而无编译期报错。
-  - 建议：defaulted prop 用 `withDefaults`/解析后类型反映默认值以去掉 `!`；children 在判断后用局部 const 收窄。全包仅 21 处，成本低。
-
-- [ ] **B-6 复杂度热点抽取评估**（P2）
-  - 维度：复杂度热点｜模块：`Menu.ts`(1278)、`DatePicker.ts`(989)、`TimePicker.ts`(980)、`Tree.ts`(934)、`Select.ts`(814)；React 对应 `Menu.tsx`(914)、`Tree.tsx`(897)、`DatePicker.tsx`(847)、`TimePicker.tsx`(775)、`Select.tsx`(666)
-  - 问题：DatePicker/TimePicker/Select 体量大，其原专用 composable 已随 B-3 删除（从未接入），逻辑全部内联；Menu/Tree 体量最大且无任何抽取层。
-  - 影响：大文件维护成本高，双端同类逻辑各自内联、易漂移。
-  - 建议：把 DatePicker/TimePicker/Select 与 Menu/Tree 的框架无关逻辑（键盘导航、日期/时间计算、节点 flatten/过滤）下沉到 `core/src/utils/`，经 hooks/composable 包装供双端复用；跨端下沉执行归属任务 D。
+- [x] **B-6 复杂度热点评估结论（已交付下沉前置）**
+  - 评估：Menu / Tree / Select 的框架无关逻辑（键盘导航 `menu-utils`/`picker-utils`、过滤、`getVisibleTreeItems` flatten）**早已下沉 core**，无可再抽；TimePicker 为列表生成式（`generateHours/Minutes/Seconds`）、无算术可抽。唯一 Vue 端内联且应下沉的是 **DatePicker 的日期算术**——`date-utils` 原缺 `addDays`/`addMonths`/`addYears`，双端各写一份。
+  - 已交付：core `date-utils` 新增 `addDays`/`addMonths`/`addYears`（含单测），双端 DatePicker 改用之（移除内联 `addDays` 与手写月/年 wraparound）。更大范围的「键盘导航 composable/hook 跨端包装」仍属 **D-1**（见下方），本项只交付其 `date-utils` 前置。
 
 - [x] **B-0 已核查、Vue 范围内无需处理**
   - 类型安全：`packages/vue/src` 类型位 `any` **0** 处（唯一类型位为 `Table.ts:160` 的 `new Map<string, any>()`，值类型可收窄但风险极低；`CronEditor.ts` 的 `'any'` 为业务字面量非类型），`@ts-ignore`/`@ts-expect-error` **0** 处 → A-0 移交的 `any` 审计在 Vue 侧基本干净，React 侧移交任务 C。
@@ -179,13 +161,9 @@ source: current repository audit and planning
 
 > **扫描结论修正**：与任务 B 一致——Roadmap 原列的类型安全（`any`）与 SSR 直写在 React 范围内同样基本不成立：React src 类型位 `any` 仅 1 处、`@ts-ignore` 0 处，window/document 抽样均在事件/`useEffect` 内（见 C-0）。点名的 FloatButton/Tour/ChartTooltip 已正确 `isBrowser()` 守卫，真正缺显式守卫仅 ImagePreview（C-3）。React 与 Vue 共用 `TigerLocale`/`mergeTigerLocale`/ConfigProvider 体系，但仅 10 个组件消费，搜索/空态类仍硬编码（C-1/C-2，与 B-1/B-2 同源）。
 
-> **进度（2026-06-19）**：C-1（内部搜索框 `placeholder` 硬编码）已随 Vue B-1 跨端一并交付——6 个 React 搜索框（Select/Tree/TreeSelect/Transfer/Cascader/FileManager）改读 `mergedLocale.common.searchPlaceholder` 并新增 `locale` prop，共享 core `TigerLocaleCommon.searchPlaceholder`，按惯例移交 [CHANGELOG.md](../CHANGELOG.md)。余项 C-2 / C-3 / C-4 / C-5 仍待推进。
-
-- [ ] **C-2 英文 prop 默认值绕过全局 locale**（P2）
-  - 维度：i18n｜模块：`List.tsx:176`/`VirtualTable.tsx:50`/`Tree.tsx:287`(emptyText='No data')、`Transfer.tsx:58`/`TreeSelect.tsx:58`(notFoundText='No data')、`InfiniteScroll.tsx:32`(loadingText='Loading...')、`Tour.tsx:41-43`(nextText/prevText/finishText)、`Spotlight.tsx:56`(placeholder='Search')、`NumberKeyboard.tsx:37`(confirmText='Done')、`Signature.tsx:61`(clearText='Clear')、`Select.tsx:70`/`Cascader.tsx:63`/`TreeSelect.tsx:52`(placeholder)、`Loading.tsx:143`(aria-label 回退 'Loading')
-  - 问题：这些文案做成可覆盖 prop，但默认值为英文，且不回退 ConfigProvider 的 `mergedLocale.common.*`。可逐实例覆盖，无法被全局 locale 统一驱动；与 Vue B-2 同源。
-  - 影响：即便 app 配了 ZH_CN，空态/加载/分步/确认等默认仍英文，需逐组件传文案、易遗漏。
-  - 建议：prop 缺省改为「未传时回退 `mergedLocale.common.*`」，prop 作最高优先级覆盖（对齐 Modal 的 `props.locale` > `config.locale`）。
+> **进度（2026-06-19）**：C-1（内部搜索框 `placeholder` 硬编码）已随 Vue B-1 跨端一并交付——6 个 React 搜索框（Select/Tree/TreeSelect/Transfer/Cascader/FileManager）改读 `mergedLocale.common.searchPlaceholder` 并新增 `locale` prop，共享 core `TigerLocaleCommon.searchPlaceholder`，按惯例移交 [CHANGELOG.md](../CHANGELOG.md)。
+>
+> **进度（2026-06-19，续）**：**C-2** 已随 Vue B-2 跨端一并交付（`List`/`VirtualTable`/`Tree`/`Transfer`/`TreeSelect` 空态、`InfiniteScroll` 加载、`Signature` 清除、`Spotlight` placeholder/空态、`Cascader` 空态改读 `mergedLocale.common.*`；`Tour` 的 next/prev/finish 回退 `formWizard.*`、`NumberKeyboard` 的 confirm 回退 `common.okText`、`Loading` 的 aria 回退 `common.loadingText`；`Select`/`Cascader`/`TreeSelect` 的主 `placeholder`（'Select an option'/'Please select'）因 `common` 无对应 key 暂不改，留待后续视需要新增 key）；C-0 注记的 React 侧非空断言已随 **B-5** 同批收敛（`Image`/`Tree`/`CommentThread` 等）。均移交 [CHANGELOG.md](../CHANGELOG.md)。余项 C-3 / C-4 / C-5 仍待推进。
 
 - [ ] **C-3 ImagePreview 门户挂载缺显式 SSR 守卫**（P2）
   - 维度：SSR guard｜模块：`ImagePreview.tsx:271`（vs Tour/FloatButton/ChartTooltip/`utils/overlay.ts` 已 `isBrowser()` 守卫）
@@ -219,6 +197,7 @@ source: current repository audit and planning
   - 问题：core 已有 `utils/picker-utils.ts`（`findFirst/Last/NextEnabledIndex` + `getPickerNavigationIndex` + ARIA helper），Select/AutoComplete/Spotlight 已接入证明范式可用；但上述 5 组件均**不** import picker-utils，各自内联实现方向键导航。Tree 仅 flatten（`getVisibleTreeItems`）下沉，导航 index 走查与 ArrowLeft/Right 展开收起语义双端重复；DatePicker/Calendar 的 `addDays`、月/年步进等日期算术 `date-utils` 中**不存在**，双端各写一份；Mentions 取模环绕导航双端各写。
   - 影响：同一交互算法跨 2 框架 × 5 组件各存一份，键盘行为易在单端被改而漂移（a11y 回归面大）。与 B-6/C-5 同源，是其「跨端下沉执行归属任务 D」的落点。
   - 建议：分两类下沉到 `core/src/utils/`——(a) 列表型（Menu/Tree/Mentions）复用/扩展 `picker-utils` 的 enabled-index 走查，Tree 的展开收起语义抽 tree 专用 nav helper；(b) DatePicker/TimePicker 的日期/时间算术（`addDays`、月/年步进、时分秒环绕）抽入 `date-utils`/`time-utils`，双端经 hooks/composable 包装共享。属优化、非缺陷。
+  - **前置已交付（2026-06-19，随 B-6）**：`date-utils` 已新增 `addDays`/`addMonths`/`addYears`，双端 DatePicker 的内联 `addDays` 与手写月/年步进已改用之（见 [CHANGELOG.md](../CHANGELOG.md)）。余下 (a) 列表型键盘导航与 TimePicker 时分秒环绕的 composable/hook 跨端包装仍待本任务推进。
 
 - [ ] **D-2 命令式 API 与显示/解析 helper 双端重复**（P2）
   - 维度：重复逻辑下沉｜模块：`Message`/`Notification` 的 `getNextInstanceId`+`normalizeOptions`（vue `Message.ts:61/204`、react `Message.tsx:44/291`，Notification 各一份）、`InputNumber` 的 `toDisplayValue`/`parseValue`（vue/react 各一份，react `InputNumber.tsx:85/95`）

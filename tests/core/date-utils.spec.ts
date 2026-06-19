@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
+  addDays,
+  addMonths,
+  addYears,
   clearCalendarMonthDaysCache,
   formatDate,
   formatDateWithLocale,
@@ -169,5 +172,30 @@ describe('date-utils calendar month cache', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.useRealTimers()
+  })
+})
+
+describe('date-utils arithmetic', () => {
+  it('adds and subtracts days immutably across month boundaries', () => {
+    const base = new Date(2024, 0, 31)
+
+    expect(addDays(base, 1)).toEqual(new Date(2024, 1, 1))
+    expect(addDays(base, -31)).toEqual(new Date(2023, 11, 31))
+    expect(addDays(base, 0)).toEqual(base)
+    // input is not mutated
+    expect(base).toEqual(new Date(2024, 0, 31))
+  })
+
+  it('adds months and clamps the day to the target month length', () => {
+    expect(addMonths(new Date(2024, 0, 31), 1)).toEqual(new Date(2024, 1, 29)) // leap year
+    expect(addMonths(new Date(2023, 0, 31), 1)).toEqual(new Date(2023, 1, 28)) // non-leap
+    expect(addMonths(new Date(2024, 0, 15), -1)).toEqual(new Date(2023, 11, 15)) // year wrap
+    expect(addMonths(new Date(2024, 11, 10), 1)).toEqual(new Date(2025, 0, 10))
+  })
+
+  it('adds years and clamps Feb 29 on non-leap targets', () => {
+    expect(addYears(new Date(2024, 1, 29), 1)).toEqual(new Date(2025, 1, 28))
+    expect(addYears(new Date(2024, 1, 29), 4)).toEqual(new Date(2028, 1, 29))
+    expect(addYears(new Date(2024, 5, 15), -2)).toEqual(new Date(2022, 5, 15))
   })
 })

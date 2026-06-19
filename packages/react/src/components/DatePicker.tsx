@@ -5,6 +5,8 @@ import {
   parseDate,
   formatDate,
   formatMonthYear,
+  addDays,
+  addMonths,
   isSameDay,
   isDateInRange,
   getCalendarDays,
@@ -303,12 +305,6 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     }
   }, [])
 
-  const addDays = (date: Date, days: number): Date => {
-    const next = new Date(date)
-    next.setDate(next.getDate() + days)
-    return next
-  }
-
   const moveFocus = (deltaDays: number) => {
     const activeEl = document.activeElement as HTMLElement | null
     const currentIso = activeEl?.getAttribute('data-date') ?? activeDateIso ?? null
@@ -505,23 +501,15 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     props.onClear?.()
   }
 
-  const previousMonth = () => {
-    if (viewingMonth === 0) {
-      setViewingMonth(11)
-      setViewingYear(viewingYear - 1)
-    } else {
-      setViewingMonth(viewingMonth - 1)
-    }
+  const stepViewingMonth = (delta: number) => {
+    const next = addMonths(new Date(viewingYear, viewingMonth, 1), delta)
+    setViewingYear(next.getFullYear())
+    setViewingMonth(next.getMonth())
   }
 
-  const nextMonth = () => {
-    if (viewingMonth === 11) {
-      setViewingMonth(0)
-      setViewingYear(viewingYear + 1)
-    } else {
-      setViewingMonth(viewingMonth + 1)
-    }
-  }
+  const previousMonth = () => stepViewingMonth(-1)
+
+  const nextMonth = () => stepViewingMonth(1)
 
   const isCurrentMonth = (date: Date | null): boolean => {
     if (!date) return false

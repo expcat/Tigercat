@@ -1,3 +1,5 @@
+import type { TigerLocale } from './locale'
+
 export type SignatureExportType = 'image/png' | 'image/jpeg' | 'image/webp' | 'image/svg+xml'
 
 export interface SignaturePoint {
@@ -32,5 +34,6 @@ export interface SignatureProps {
   quality?: number
   ariaLabel?: string
   clearText?: string
+  locale?: Partial<TigerLocale>
   className?: string
 }

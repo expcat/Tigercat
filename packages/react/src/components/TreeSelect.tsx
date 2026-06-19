@@ -64,7 +64,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     clearable = false,
     multiple = false,
     showSearch = false,
-    notFoundText = 'No data',
+    notFoundText,
     defaultExpandAll = false,
     className,
     onChange,
@@ -298,7 +298,9 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
               )
             })
           ) : (
-            <div className={treeSelectEmptyClasses}>{notFoundText}</div>
+            <div className={treeSelectEmptyClasses}>
+              {resolveLocaleText('No data', notFoundText, mergedLocale?.common?.emptyText)}
+            </div>
           )}
         </div>
       )}

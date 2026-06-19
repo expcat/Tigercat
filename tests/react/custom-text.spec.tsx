@@ -15,6 +15,7 @@ import {
   FormWizard,
   TaskBoard,
   Transfer,
+  List,
   ConfigProvider
 } from '@expcat/tigercat-react'
 
@@ -110,6 +111,27 @@ describe('custom text (no i18n) — React', () => {
     })
   })
 
+  describe('common.emptyText default fallback (C-2)', () => {
+    it('List empty state reads global config emptyText', () => {
+      render(
+        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+          <List dataSource={[]} />
+        </ConfigProvider>
+      )
+      expect(screen.getByText('暂无数据')).toBeInTheDocument()
+    })
+
+    it('List emptyText prop wins over global config', () => {
+      render(
+        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+          <List dataSource={[]} emptyText="空空如也" />
+        </ConfigProvider>
+      )
+      expect(screen.getByText('空空如也')).toBeInTheDocument()
+      expect(screen.queryByText('暂无数据')).toBeNull()
+    })
+  })
+
   describe('backward compatibility', () => {
     it('Pagination outside a ConfigProvider keeps default English text', () => {
       render(<Pagination total={100} />)
@@ -119,6 +141,11 @@ describe('custom text (no i18n) — React', () => {
     it('Transfer search outside a ConfigProvider keeps default English placeholder', () => {
       render(<Transfer showSearch />)
       expect(screen.getAllByPlaceholderText('Search...').length).toBeGreaterThan(0)
+    })
+
+    it('List outside a ConfigProvider keeps default English emptyText', () => {
+      render(<List dataSource={[]} />)
+      expect(screen.getByText('No data')).toBeInTheDocument()
     })
   })
 })

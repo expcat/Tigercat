@@ -12,6 +12,8 @@ import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  resolveLocaleText,
+  mergeTigerLocale,
   getListClasses,
   getListItemClasses,
   getListHeaderFooterClasses,
@@ -44,9 +46,11 @@ import {
   type ListBorderStyle,
   type ListItemLayout,
   type ListItem,
-  type ListPaginationConfig
+  type ListPaginationConfig,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { VirtualList } from './VirtualList'
+import { useTigerConfig } from './ConfigProvider'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -103,7 +107,14 @@ export const List = defineComponent({
      */
     emptyText: {
       type: String,
-      default: 'No data'
+      default: undefined
+    },
+    /**
+     * Locale override; falls back to ConfigProvider locale
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     },
     /**
      * Whether to show split line between items
@@ -212,6 +223,8 @@ export const List = defineComponent({
   },
   emits: ['item-click', 'page-change', 'reorder'],
   setup(props, { emit, slots, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const instance = getCurrentInstance()
     const hasItemClickListener = computed(() => {
       const vnodeProps = (instance?.vnode.props || {}) as Record<string, unknown>
@@ -456,7 +469,7 @@ export const List = defineComponent({
             role: 'status',
             'aria-live': 'polite'
           },
-          props.emptyText
+          resolveLocaleText('No data', props.emptyText, mergedLocale.value?.common?.emptyText)
         )
       }
 

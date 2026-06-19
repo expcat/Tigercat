@@ -108,6 +108,47 @@ export function normalizeDate(date: Date): Date {
 }
 
 /**
+ * Return a new Date offset by the given number of days. Immutable.
+ * @param date - Base date
+ * @param days - Number of days to add (may be negative)
+ * @returns New Date instance
+ */
+export function addDays(date: Date, days: number): Date {
+  const next = new Date(date)
+  next.setDate(next.getDate() + days)
+  return next
+}
+
+/**
+ * Return a new Date offset by the given number of months. Immutable.
+ * The day-of-month is clamped to the last valid day of the target month
+ * (e.g. Jan 31 + 1 month -> Feb 28/29).
+ * @param date - Base date
+ * @param months - Number of months to add (may be negative)
+ * @returns New Date instance
+ */
+export function addMonths(date: Date, months: number): Date {
+  const next = new Date(date)
+  const day = next.getDate()
+  next.setDate(1)
+  next.setMonth(next.getMonth() + months)
+  const maxDay = getDaysInMonth(next.getFullYear(), next.getMonth())
+  next.setDate(Math.min(day, maxDay))
+  return next
+}
+
+/**
+ * Return a new Date offset by the given number of years. Immutable.
+ * Feb 29 is clamped to Feb 28 on non-leap target years.
+ * @param date - Base date
+ * @param years - Number of years to add (may be negative)
+ * @returns New Date instance
+ */
+export function addYears(date: Date, years: number): Date {
+  return addMonths(date, years * 12)
+}
+
+/**
  * Check if a date is within a range
  * @param date - Date to check
  * @param minDate - Minimum allowed date

@@ -75,7 +75,9 @@ export const RichTextEditor = defineComponent({
     let engineInstance: RichTextEngineInstance | null = null
 
     const isControlled = computed(() => props.value !== undefined)
-    const currentContent = computed(() => (isControlled.value ? props.value! : internalValue.value))
+    const currentContent = computed(() =>
+      props.value !== undefined ? props.value : internalValue.value
+    )
     const toolbarItems = computed(() => props.toolbar ?? defaultToolbar)
     const isEmpty = computed(() => isContentEmpty(currentContent.value))
 

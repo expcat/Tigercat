@@ -182,20 +182,21 @@ export const CommentThread = defineComponent({
       depth: number,
       isLast: boolean
     ): ReturnType<typeof h> => {
-      const hasChildren = !!node.children && node.children.length > 0
+      const children = node.children ?? []
+      const hasChildren = children.length > 0
       const isExpanded = expandedSet.value.has(node.id)
       const showReplies = hasChildren && isExpanded
       const showAllReplies = expandedAllKeys.value.has(node.id)
       const repliesId = `tiger-comment-replies-${node.id}`
       const visibleChildren = showReplies
         ? props.maxReplies > 0 && !showAllReplies
-          ? node.children!.slice(0, props.maxReplies)
-          : node.children!
+          ? children.slice(0, props.maxReplies)
+          : children
         : []
       const showLoadMore =
         showReplies &&
         props.maxReplies > 0 &&
-        node.children!.length > props.maxReplies &&
+        children.length > props.maxReplies &&
         !showAllReplies
 
       const actions: Array<ReturnType<typeof h>> = []
@@ -477,7 +478,7 @@ export const CommentThread = defineComponent({
                     },
                     {
                       default: () =>
-                        isExpanded ? '▾ 收起回复' : `▸ 展开 ${node.children!.length} 条回复`
+                        isExpanded ? '▾ 收起回复' : `▸ 展开 ${children.length} 条回复`
                     }
                   )
                 : null,

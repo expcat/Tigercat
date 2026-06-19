@@ -15,6 +15,8 @@ import {
   FormWizard,
   TaskBoard,
   Transfer,
+  List,
+  InfiniteScroll,
   ConfigProvider
 } from '@expcat/tigercat-vue'
 
@@ -151,6 +153,51 @@ describe('custom text (no i18n) — Vue', () => {
     })
   })
 
+  describe('common.empty/loading/clear default fallback (B-2)', () => {
+    it('List empty state reads global config emptyText', () => {
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
+                h(List, { dataSource: [] })
+              )
+          }
+        })
+      )
+      expect(screen.getByText('暂无数据')).toBeInTheDocument()
+    })
+
+    it('List emptyText prop wins over global config', () => {
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
+                h(List, { dataSource: [], emptyText: '空空如也' })
+              )
+          }
+        })
+      )
+      expect(screen.getByText('空空如也')).toBeInTheDocument()
+      expect(screen.queryByText('暂无数据')).toBeNull()
+    })
+
+    it('InfiniteScroll loader reads global config loadingText', () => {
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { common: { loadingText: '加载中' } } }, () =>
+                h(InfiniteScroll, { loading: true })
+              )
+          }
+        })
+      )
+      expect(screen.getByText('加载中')).toBeInTheDocument()
+    })
+  })
+
   describe('backward compatibility', () => {
     it('Pagination outside a ConfigProvider keeps default English text', () => {
       render(Pagination, { props: { total: 100 } })
@@ -160,6 +207,11 @@ describe('custom text (no i18n) — Vue', () => {
     it('Transfer search outside a ConfigProvider keeps default English placeholder', () => {
       render(Transfer, { props: { showSearch: true } })
       expect(screen.getAllByPlaceholderText('Search...').length).toBeGreaterThan(0)
+    })
+
+    it('List outside a ConfigProvider keeps default English emptyText', () => {
+      render(List, { props: { dataSource: [] } })
+      expect(screen.getByText('No data')).toBeInTheDocument()
     })
   })
 })

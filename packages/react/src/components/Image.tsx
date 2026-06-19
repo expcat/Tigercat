@@ -178,7 +178,7 @@ export const Image: React.FC<ImageProps> = ({
     [preview, className]
   )
 
-  const imgClasses = useMemo(() => getImageImgClasses(fit!), [fit])
+  const imgClasses = useMemo(() => getImageImgClasses(fit), [fit])
 
   const containerStyle = useMemo(() => {
     const s: React.CSSProperties = { ...style }

@@ -53,7 +53,7 @@ export const Mentions = defineComponent({
       emit('change', value)
 
       const cursorPos = target.selectionStart ?? value.length
-      const result = extractMentionQuery(value, cursorPos, props.prefix!)
+      const result = extractMentionQuery(value, cursorPos, props.prefix ?? '@')
       if (result && filteredOptions.value.length > 0) {
         query.value = result.query
         mentionStartPos.value = result.startPos
@@ -128,7 +128,7 @@ export const Mentions = defineComponent({
         h('textarea', {
           ref: textareaRef,
           value: props.modelValue,
-          class: getMentionsInputClasses(props.size!, props.disabled!),
+          class: getMentionsInputClasses(props.size ?? 'md', props.disabled ?? false),
           placeholder: props.placeholder,
           disabled: props.disabled,
           rows: props.rows,

@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState
 } from 'react'
@@ -15,6 +16,8 @@ import {
   getSignatureCanvasWrapClasses,
   getSignaturePoint,
   isSignatureEmpty,
+  mergeTigerLocale,
+  resolveLocaleText,
   signatureCanvasClasses,
   signatureClearButtonClasses,
   signatureRootClasses,
@@ -26,6 +29,7 @@ import {
   type SignatureProps as CoreSignatureProps,
   type SignatureStroke
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface SignatureRef {
   clear: () => void
@@ -58,7 +62,8 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       exportType = 'image/png',
       quality = 0.92,
       ariaLabel = 'Signature pad',
-      clearText = 'Clear',
+      clearText,
+      locale,
       className,
       onChange,
       onBegin,
@@ -68,6 +73,11 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
     },
     ref
   ) => {
+    const config = useTigerConfig()
+    const mergedLocale = useMemo(
+      () => mergeTigerLocale(config.locale, locale),
+      [config.locale, locale]
+    )
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const strokesRef = useRef<SignatureStroke[]>([])
     const activeStrokeRef = useRef<SignatureStroke | null>(null)
@@ -235,7 +245,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
               className={signatureClearButtonClasses}
               disabled={isDisabled || isSignatureEmpty(strokesRef.current)}
               onClick={clear}>
-              {clearText}
+              {resolveLocaleText('Clear', clearText, mergedLocale?.common?.clearText)}
             </button>
           </div>
         )}

@@ -190,16 +190,17 @@ export const Alert = defineComponent({
 
     onMounted(() => {
       if (props.duration && props.duration > 0 && props.closable) {
+        const duration = props.duration
         autoCloseTimer = setTimeout(() => {
           visible.value = false
           emit('close', new MouseEvent('click'))
-        }, props.duration)
+        }, duration)
 
         if (props.showCountdown) {
           const startTime = Date.now()
           countdownInterval = setInterval(() => {
             const elapsed = Date.now() - startTime
-            countdownProgress.value = Math.max(0, 100 - (elapsed / props.duration!) * 100)
+            countdownProgress.value = Math.max(0, 100 - (elapsed / duration) * 100)
           }, 50)
         }
       }

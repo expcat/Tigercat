@@ -8,13 +8,17 @@ import {
   getNumberKeyboardKeyClasses,
   getNumberKeyboardKeys,
   mergeStyleValues,
+  mergeTigerLocale,
   normalizeNumberKeyboardValue,
   numberKeyboardGridClasses,
   numberKeyboardRootClasses,
+  resolveLocaleText,
   type NumberKeyboardChangePayload,
   type NumberKeyboardKey,
-  type NumberKeyboardMode
+  type NumberKeyboardMode,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export type VueNumberKeyboardProps = InstanceType<typeof NumberKeyboard>['$props']
 
@@ -30,10 +34,11 @@ export const NumberKeyboard = defineComponent({
     decimalSeparator: { type: String, default: '.' },
     disabled: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false },
-    confirmText: { type: String, default: 'Done' },
+    confirmText: { type: String, default: undefined },
     deleteText: { type: String, default: 'Delete' },
     ariaLabel: { type: String, default: 'Number keyboard' },
     showConfirm: { type: Boolean, default: true },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     className: { type: String, default: undefined },
     style: {
       type: Object as PropType<Record<string, unknown>>,
@@ -42,6 +47,11 @@ export const NumberKeyboard = defineComponent({
   },
   emits: ['update:modelValue', 'change', 'key-press', 'delete', 'confirm'],
   setup(props, { attrs, emit }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const confirmLabel = computed(() =>
+      resolveLocaleText('Done', props.confirmText, mergedLocale.value?.common?.okText)
+    )
     const innerValue = ref(normalizeNumberKeyboardValue(props.defaultValue))
     const isControlled = computed(() => props.modelValue !== undefined)
     const currentValue = computed(() =>
@@ -53,7 +63,7 @@ export const NumberKeyboard = defineComponent({
         mode: props.mode,
         decimalSeparator: props.decimalSeparator,
         deleteText: props.deleteText,
-        confirmText: props.confirmText,
+        confirmText: confirmLabel.value,
         showConfirm: props.showConfirm
       })
     )

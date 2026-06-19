@@ -6,6 +6,8 @@ import {
   parseDate,
   formatDate,
   formatMonthYear,
+  addDays,
+  addMonths,
   isSameDay,
   isDateInRange,
   getCalendarDays,
@@ -347,12 +349,6 @@ export const DatePicker = defineComponent({
       emit('change', value)
     }
 
-    const addDays = (date: Date, days: number): Date => {
-      const next = new Date(date)
-      next.setDate(next.getDate() + days)
-      return next
-    }
-
     const focusDateButtonByIso = (iso: string): boolean => {
       const button = calendarRef.value?.querySelector(
         `button[data-date="${iso}"]`
@@ -573,22 +569,18 @@ export const DatePicker = defineComponent({
       emit('clear')
     }
 
+    function stepViewingMonth(delta: number) {
+      const next = addMonths(new Date(viewingYear.value, viewingMonth.value, 1), delta)
+      viewingYear.value = next.getFullYear()
+      viewingMonth.value = next.getMonth()
+    }
+
     function previousMonth() {
-      if (viewingMonth.value === 0) {
-        viewingMonth.value = 11
-        viewingYear.value--
-      } else {
-        viewingMonth.value--
-      }
+      stepViewingMonth(-1)
     }
 
     function nextMonth() {
-      if (viewingMonth.value === 11) {
-        viewingMonth.value = 0
-        viewingYear.value++
-      } else {
-        viewingMonth.value++
-      }
+      stepViewingMonth(1)
     }
 
     function isDateDisabled(date: Date | null): boolean {

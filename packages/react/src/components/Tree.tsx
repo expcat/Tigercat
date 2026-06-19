@@ -289,7 +289,7 @@ export const Tree: React.FC<TreeProps> = ({
   filterFn,
   autoExpandParent = true,
   blockNode = false,
-  emptyText = 'No data',
+  emptyText,
   ariaLabel = 'Tree',
   onExpand,
   onSelect,
@@ -854,7 +854,7 @@ export const Tree: React.FC<TreeProps> = ({
         {renderTreeRow(node, level)}
         {hasChildren && isExpanded && (
           <div className={classNames(treeNodeChildrenClasses, showLine && treeLineClasses)}>
-            {node.children!.map((child) => renderTreeNode(child, level + 1))}
+            {(node.children ?? []).map((child) => renderTreeNode(child, level + 1))}
           </div>
         )}
       </div>
@@ -867,7 +867,9 @@ export const Tree: React.FC<TreeProps> = ({
         className={classNames(treeBaseClasses, 'p-4', className)}
         role="tree"
         aria-label={ariaLabel}>
-        <div className={treeEmptyStateClasses}>{emptyText}</div>
+        <div className={treeEmptyStateClasses}>
+          {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
+        </div>
       </div>
     )
   }

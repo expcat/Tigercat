@@ -8,8 +8,11 @@ import {
   getSignatureCanvasDataUrl,
   getSignatureCanvasWrapClasses,
   getSignaturePoint,
+  isBrowser,
   isSignatureEmpty,
   mergeStyleValues,
+  mergeTigerLocale,
+  resolveLocaleText,
   signatureCanvasClasses,
   signatureClearButtonClasses,
   signatureRootClasses,
@@ -18,8 +21,10 @@ import {
   signatureToolbarClasses,
   type SignatureChangePayload,
   type SignatureExportType,
-  type SignatureStroke
+  type SignatureStroke,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export type VueSignatureProps = InstanceType<typeof Signature>['$props']
 
@@ -45,7 +50,8 @@ export const Signature = defineComponent({
     },
     quality: { type: Number, default: 0.92 },
     ariaLabel: { type: String, default: 'Signature pad' },
-    clearText: { type: String, default: 'Clear' },
+    clearText: { type: String, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     className: { type: String, default: undefined },
     style: {
       type: Object as PropType<Record<string, unknown>>,
@@ -54,6 +60,8 @@ export const Signature = defineComponent({
   },
   emits: ['update:modelValue', 'change', 'begin', 'end', 'clear'],
   setup(props, { attrs, emit, expose }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const canvasRef = ref<HTMLCanvasElement | null>(null)
     const strokes = ref<SignatureStroke[]>([])
     const activeStroke = ref<SignatureStroke | null>(null)
@@ -65,7 +73,7 @@ export const Signature = defineComponent({
       const context = canvas?.getContext('2d')
       if (!canvas || !context) return
 
-      const ratio = typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1
+      const ratio = !isBrowser() ? 1 : window.devicePixelRatio || 1
       canvas.width = props.width * ratio
       canvas.height = props.height * ratio
       canvas.style.width = `${props.width}px`
@@ -250,7 +258,7 @@ export const Signature = defineComponent({
                     disabled: isDisabled.value || isSignatureEmpty(strokes.value),
                     onClick: clear
                   },
-                  props.clearText
+                  resolveLocaleText('Clear', props.clearText, mergedLocale.value?.common?.clearText)
                 )
               ])
             : null

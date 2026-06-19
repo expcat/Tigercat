@@ -64,7 +64,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
     showSearch = false,
     sourceTitle = 'Source',
     targetTitle = 'Target',
-    notFoundText = 'No data',
+    notFoundText,
     filterOption,
     className,
     onChange,
@@ -214,7 +214,9 @@ export const Transfer: React.FC<TransferProps> = (props) => {
               )
             })
           ) : (
-            <div className={transferEmptyClasses}>{notFoundText}</div>
+            <div className={transferEmptyClasses}>
+              {resolveLocaleText('No data', notFoundText, mergedLocale?.common?.emptyText)}
+            </div>
           )}
         </div>
       </div>

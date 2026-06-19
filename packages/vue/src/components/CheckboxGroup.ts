@@ -92,7 +92,7 @@ export const CheckboxGroup = defineComponent({
 
     // Current selected values
     const value = computed(() => {
-      return isControlled.value ? props.modelValue! : internalValue.value
+      return props.modelValue !== undefined ? props.modelValue : internalValue.value
     })
 
     const updateValue = (val: CheckboxGroupValue[number], checked: boolean) => {

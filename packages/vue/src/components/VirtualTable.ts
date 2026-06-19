@@ -64,7 +64,7 @@ export const VirtualTable = defineComponent({
       default: undefined
     },
     loading: { type: Boolean, default: false },
-    emptyText: { type: String, default: 'No data' },
+    emptyText: { type: String, default: undefined },
     selectable: { type: Boolean, default: false },
     selectedKeys: {
       type: Array as PropType<(string | number)[]>,
@@ -218,7 +218,11 @@ export const VirtualTable = defineComponent({
       // Empty state
       const emptyEl =
         props.data.length === 0 && !props.loading
-          ? h('div', { class: virtualTableEmptyClasses }, props.emptyText)
+          ? h(
+              'div',
+              { class: virtualTableEmptyClasses },
+              resolveLocaleText('No data', props.emptyText, mergedLocale.value?.common?.emptyText)
+            )
           : null
 
       // Loading overlay

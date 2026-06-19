@@ -75,7 +75,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
     expandTrigger = 'click',
     changeOnSelect = false,
     separator = ' / ',
-    notFoundText = 'No results found',
+    notFoundText,
     className,
     locale
   } = props
@@ -293,7 +293,13 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
           {isSearchMode ? (
             // Search results
             searchResults.length === 0 ? (
-              <div className={cascaderEmptyStateClasses}>{notFoundText}</div>
+              <div className={cascaderEmptyStateClasses}>
+                {resolveLocaleText(
+                  'No results found',
+                  notFoundText,
+                  mergedLocale?.common?.emptyText
+                )}
+              </div>
             ) : (
               <div className="max-h-64 overflow-auto" {...getPickerListboxAria({ id: listboxId })}>
                 {searchResults.map((item) => (

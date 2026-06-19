@@ -20,6 +20,7 @@ import {
   imageAnnotationReadonlyOverlayClasses,
   imageAnnotationStageClasses,
   imageAnnotationToolbarClasses,
+  isBrowser,
   mergeStyleValues,
   shouldCommitImageAnnotationBox,
   type ImageAnnotation as CoreImageAnnotation,
@@ -105,7 +106,7 @@ export const ImageAnnotation = defineComponent({
     const loadImage = () => {
       imageLoaded.value = false
       draft.value = null
-      if (typeof window === 'undefined' || typeof window.Image !== 'function') return
+      if (!isBrowser() || typeof window.Image !== 'function') return
 
       const img = new window.Image()
       img.onload = () => {

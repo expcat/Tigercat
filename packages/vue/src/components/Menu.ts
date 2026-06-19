@@ -340,6 +340,7 @@ export const Menu = defineComponent({
     return () => {
       const renderDataItem = (item: CoreMenuItem): VNode => {
         if (item.children && item.children.length > 0) {
+          const children = item.children
           return h(
             SubMenu,
             {
@@ -349,7 +350,7 @@ export const Menu = defineComponent({
               icon: item.icon,
               disabled: item.disabled
             },
-            () => item.children!.map(renderDataItem)
+            () => children.map(renderDataItem)
           )
         }
 

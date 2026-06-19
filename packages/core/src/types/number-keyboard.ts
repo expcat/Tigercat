@@ -1,3 +1,5 @@
+import type { TigerLocale } from './locale'
+
 export type NumberKeyboardMode = 'number' | 'amount' | 'phone' | 'id-card'
 
 export type NumberKeyboardKeyType =
@@ -39,5 +41,6 @@ export interface NumberKeyboardProps {
   deleteText?: string
   ariaLabel?: string
   showConfirm?: boolean
+  locale?: Partial<TigerLocale>
   className?: string
 }

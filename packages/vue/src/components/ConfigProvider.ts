@@ -17,6 +17,7 @@ import {
   getImmediateTigerLocale,
   resolveTigerLocale,
   getLocaleDirection,
+  isBrowser,
   ThemeManager,
   type TigerLocale,
   type TigerLocaleInput,
@@ -139,7 +140,7 @@ export const ConfigProvider = defineComponent({
     watch(
       () => merged.value.direction,
       (direction) => {
-        if (!direction || typeof document === 'undefined') return
+        if (!direction || !isBrowser()) return
 
         const root = document.documentElement
         if (previousDir === null && previousDataDir === null) {
@@ -153,7 +154,7 @@ export const ConfigProvider = defineComponent({
     )
 
     onBeforeUnmount(() => {
-      if (typeof document === 'undefined') return
+      if (!isBrowser()) return
       const root = document.documentElement
       if (previousDir === null) root.removeAttribute('dir')
       else root.setAttribute('dir', previousDir)

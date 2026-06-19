@@ -25,6 +25,8 @@ import {
   getSpotlightSearchState,
   getSpotlightShortcutLabel,
   mergeStyleValues,
+  mergeTigerLocale,
+  resolveLocaleText,
   restoreFocus,
   shouldCloseOnMaskClick,
   spotlightEmptyClasses,
@@ -38,8 +40,10 @@ import {
   spotlightRootClasses,
   spotlightTitleClasses,
   type SpotlightItem,
-  type SpotlightItemFilter
+  type SpotlightItemFilter,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 import {
   renderVueBodyTeleport,
   useVueBodyScrollLock,
@@ -82,11 +86,15 @@ export const Spotlight = defineComponent({
     },
     placeholder: {
       type: String,
-      default: 'Search'
+      default: undefined
     },
     emptyText: {
       type: String,
-      default: 'No results found'
+      default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     },
     inputAriaLabel: {
       type: String,
@@ -139,6 +147,11 @@ export const Spotlight = defineComponent({
   },
   emits: ['update:open', 'open-change', 'close', 'update:query', 'query-change', 'select'],
   setup(props, { emit, attrs, slots }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const placeholderText = computed(() =>
+      resolveLocaleText('Search', props.placeholder, mergedLocale.value?.common?.searchPlaceholder)
+    )
     const uncontrolledOpen = ref(props.defaultOpen)
     const uncontrolledQuery = ref(props.defaultQuery)
     const activeIndex = ref(-1)
@@ -306,8 +319,8 @@ export const Spotlight = defineComponent({
                   value: resolvedQuery.value,
                   type: 'search',
                   class: spotlightInputClasses,
-                  placeholder: props.placeholder,
-                  'aria-label': props.inputAriaLabel ?? props.placeholder,
+                  placeholder: placeholderText.value,
+                  'aria-label': props.inputAriaLabel ?? placeholderText.value,
                   autocomplete: 'off',
                   ...getPickerComboboxAria({
                     expanded: true,
@@ -401,7 +414,15 @@ export const Spotlight = defineComponent({
                       )
                     )
                   )
-                : h('div', { class: spotlightEmptyClasses }, props.emptyText)
+                : h(
+                    'div',
+                    { class: spotlightEmptyClasses },
+                    resolveLocaleText(
+                      'No results found',
+                      props.emptyText,
+                      mergedLocale.value?.common?.emptyText
+                    )
+                  )
             ]
           )
         ]

@@ -2,6 +2,8 @@
  * Tour component types and interfaces
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Placement for the tour step popover
  */
@@ -111,6 +113,11 @@ export interface TourProps {
    * @default true
    */
   showIndicators?: boolean
+
+  /**
+   * Locale override; falls back to ConfigProvider locale
+   */
+  locale?: Partial<TigerLocale>
 
   /**
    * Additional CSS class name

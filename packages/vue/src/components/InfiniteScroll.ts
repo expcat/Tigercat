@@ -4,11 +4,15 @@ import {
   coerceClassValue,
   shouldLoadMore,
   createInfiniteScrollObserver,
+  resolveLocaleText,
+  mergeTigerLocale,
   getInfiniteScrollContainerClasses,
   infiniteScrollLoaderClasses,
   infiniteScrollEndClasses,
-  infiniteScrollSentinelClasses
+  infiniteScrollSentinelClasses,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueInfiniteScrollProps {
   hasMore?: boolean
@@ -20,6 +24,7 @@ export interface VueInfiniteScrollProps {
   inverse?: boolean
   disabled?: boolean
   className?: string
+  locale?: Partial<TigerLocale>
 }
 
 export const InfiniteScroll = defineComponent({
@@ -29,8 +34,9 @@ export const InfiniteScroll = defineComponent({
     hasMore: { type: Boolean, default: true },
     loading: { type: Boolean, default: false },
     threshold: { type: Number, default: 100 },
-    loadingText: { type: String, default: 'Loading...' },
+    loadingText: { type: String, default: undefined },
     endText: { type: String, default: 'No more data' },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     direction: {
       type: String as PropType<'vertical' | 'horizontal'>,
       default: 'vertical'
@@ -41,6 +47,8 @@ export const InfiniteScroll = defineComponent({
   },
   emits: ['load-more'],
   setup(props, { emit, slots, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const containerRef = ref<HTMLElement | null>(null)
     const sentinelRef = ref<HTMLElement | null>(null)
     let cleanupObserver: (() => void) | null = null
@@ -128,7 +136,12 @@ export const InfiniteScroll = defineComponent({
               role: 'status',
               'aria-live': 'polite'
             },
-            slots.loader?.() ?? props.loadingText
+            slots.loader?.() ??
+              resolveLocaleText(
+                'Loading...',
+                props.loadingText,
+                mergedLocale.value?.common?.loadingText
+              )
           )
         : null
 

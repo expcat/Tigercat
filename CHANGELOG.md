@@ -12,6 +12,8 @@
 - 新增 **MarkdownEditor** 高级组件：支持 Markdown 编辑、编辑/分屏/预览模式、内置工具栏、快捷键、预览渲染与自定义 renderer 扩展点，并提供 Vue/React 双端实现、示例与测试。
 - **Form** 内置校验消息支持本地化：新增 core `TigerLocaleFormValidation` 类型、`getFormValidationLabels` 与 `DEFAULT_FORM_VALIDATION_LABELS` / `ZH_CN_FORM_VALIDATION_LABELS`，`TigerLocale` 新增 `formValidation` 段（en-US / zh-CN 预设已补齐）。Vue/React `Form` 新增可选 `locale` prop 并接入 ConfigProvider locale，`<ConfigProvider :locale="zhCN">` 下必填/类型/范围等内置报错自动显示中文；单条规则 `message` 仍为最高优先级，默认英文行为不变。`validateRule` / `validateField` / `validateForm` / `validateFormFields` 新增可选 `messages` 末参（向后兼容）。
 - **i18n** 组件内置搜索/加载/关闭/清除文案接入 ConfigProvider locale：`TigerLocaleCommon` 新增 `searchPlaceholder` / `clearText`（en-US / zh-CN 预设已补齐）。Vue `Select` / `Tree` / `TreeSelect` / `Transfer` / `Cascader` / `FileManager` / `VirtualTable` / `QRCode` / `Timeline` / `Loading` / `ImageViewer` / `AutoComplete` 与 React `Select` / `Tree` / `TreeSelect` / `Transfer` / `Cascader` / `FileManager` 不再把 `'Search...'` / `'Loading...'` / `'Close'` / `'Clear'` 硬编码在渲染中，改读 `mergeTigerLocale(ConfigProvider locale, props.locale)` 并新增可选 `locale` prop 作最高优先级覆盖。`<ConfigProvider :locale="zhCN">` 下这些文案自动本地化；未包裹 ConfigProvider 时默认英文渲染不变。
+- **i18n** 空态 / 加载 / 清除等带英文默认值的文案 prop 不再绕过全局 locale：双端 `List` / `Tree` / `TreeSelect` / `Transfer` / `VirtualTable`（`emptyText` / `notFoundText`）、`InfiniteScroll`（`loadingText`）、`Signature`（`clearText`）、`Spotlight`（`placeholder` / `emptyText`）、`Cascader`（`notFoundText`）、`Tour`（`nextText` / `prevText` / `finishText` → `formWizard`）、`NumberKeyboard`（`confirmText` → `common.okText`）与 React `Loading`（aria 回退 → `common.loadingText`）的默认值改为「未传时回退 `mergeTigerLocale(ConfigProvider locale, props.locale)` 的 `common.*` / `formWizard.*`」，显式 prop 仍为最高优先级。`List` / `InfiniteScroll` / `Signature` / `Spotlight` / `Tour` / `NumberKeyboard`（含 React `VirtualTable`）新增可选 `locale` prop（`SignatureProps` / `SpotlightProps` / `TourProps` / `NumberKeyboardProps` 类型新增 `locale` 字段）。`<ConfigProvider :locale="zhCN">` 下空态/加载/清除等默认文案自动本地化；未配置时默认英文渲染不变，无需逐实例传文案。
+- core `date-utils` 新增不可变日期算术 `addDays` / `addMonths` / `addYears`（`addMonths` / `addYears` 按目标月长度裁剪日期，如 1 月 31 日 +1 月 → 2 月 28/29 日），供双端 DatePicker 与后续跨端键盘导航复用。
 
 ### Changed
 
@@ -19,8 +21,9 @@
 - `shouldLoadMore` 撤销 `@deprecated` 标记：它是 InfiniteScroll 在 IntersectionObserver 不可用时的有意滚动回退路径，并非待移除的废弃 API。
 - **Dropdown 行为变更**：菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），解决表格固定列（sticky）遮挡与 overflow 容器裁剪问题；新增 `portal` prop（默认 `true`），设置 `portal: false` 可恢复原位渲染的旧 DOM 结构。菜单包装层新增 `data-tiger-dropdown-menu` 属性便于查询，依赖原 DOM 层级的样式选择器或测试需要相应调整（详见 [迁移指南](docs/MIGRATION.md)）。
 - core 内部 `src/theme/` 目录重命名为 `src/theme-runtime/`，与命名预设主题目录 `src/themes/`（预设 + `ThemeManager` + modern token）区分；`THEME_CSS_VARS` / `setThemeColors` / `getThemeColor` 及各 `*Classes` 仍经主入口 `@expcat/tigercat-core` 导出，公共 API 与导出符号不变。
-
-### Removed
+- 双端 **DatePicker** 的内联日期算术下沉到 core：移除各自实现的 `addDays`、手写月/年步进 wraparound，改用 `date-utils` 的 `addDays` / `addMonths`，键盘导航与翻月行为不变。
+- 统一 Vue 组件的 SSR 守卫写法：`ConfigProvider` / `Signature` / `ImageAnnotation` 中的内联 `typeof window/document === 'undefined'` 改用 core `isBrowser()`（`ImageAnnotation` 保留 `window.Image` 特性检测）；生命周期/事件作用域内的访问保持原样，无行为变更。
+- 收窄双端组件中冗余 / 脆弱的非空断言（`!`）：去除 `Image` / `QRCode` / `Mentions` / `Alert` 等带默认值 prop 的断言，`Tree` / `CommentThread` / `Menu` 在守卫分支内改用局部 const 收窄 `node.children`，类型更安全，无行为变更。
 
 - **Breaking**：移除废弃别名 `kanbanAddCardClasses`（core）。自 v0.9.0 起它仅作为 `taskBoardAddCardClasses` 的向后兼容别名，现已删除；请改用 `taskBoardAddCardClasses`（详见 [迁移指南](docs/MIGRATION.md)）。
 

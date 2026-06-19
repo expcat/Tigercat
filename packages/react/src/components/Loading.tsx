@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import {
   classNames,
+  resolveLocaleText,
   getLoadingBarClasses,
   getLoadingBarsWrapperClasses,
   getLoadingClasses,
@@ -15,6 +16,7 @@ import {
   type LoadingProps as CoreLoadingProps
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock } from '../utils/overlay'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface LoadingProps
   extends CoreLoadingProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLoadingProps> {}
@@ -33,6 +35,7 @@ export const Loading: React.FC<LoadingProps> = ({
   style,
   ...props
 }) => {
+  const config = useTigerConfig()
   const [visible, setVisible] = useState(delay <= 0)
 
   useEffect(() => {
@@ -140,7 +143,7 @@ export const Loading: React.FC<LoadingProps> = ({
       className={containerClasses}
       style={mergedStyle}
       role="status"
-      aria-label={text || 'Loading'}
+      aria-label={text || resolveLocaleText('Loading', config.locale?.common?.loadingText)}
       aria-live="polite"
       aria-busy={true}
       {...props}>

@@ -151,11 +151,7 @@ Showing 3 key props of 4; see source for the complete interface.
 导入路径示例：
 
 ```ts
-import {
-  iconRegistry,
-  iconNames,
-  getIconDefinition,
-} from "@expcat/tigercat-core/icons/registry";
+import { iconRegistry, iconNames, getIconDefinition } from '@expcat/tigercat-core/icons/registry'
 ```
 
 ## Image

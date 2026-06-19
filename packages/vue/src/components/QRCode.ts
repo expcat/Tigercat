@@ -47,7 +47,7 @@ export const QRCode = defineComponent({
     const matrix = computed(() => generateQRMatrix(props.value))
     const moduleSize = computed(() => {
       const mLen = matrix.value.length
-      return props.size! / mLen
+      return (props.size ?? 128) / mLen
     })
 
     return () => {

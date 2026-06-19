@@ -3,11 +3,15 @@ import {
   classNames,
   shouldLoadMore,
   createInfiniteScrollObserver,
+  resolveLocaleText,
+  mergeTigerLocale,
   getInfiniteScrollContainerClasses,
   infiniteScrollLoaderClasses,
   infiniteScrollEndClasses,
-  infiniteScrollSentinelClasses
+  infiniteScrollSentinelClasses,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface InfiniteScrollProps {
   hasMore?: boolean
@@ -19,6 +23,7 @@ export interface InfiniteScrollProps {
   inverse?: boolean
   disabled?: boolean
   className?: string
+  locale?: Partial<TigerLocale>
   children?: React.ReactNode
   loader?: React.ReactNode
   end?: React.ReactNode
@@ -29,18 +34,24 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   hasMore = true,
   loading = false,
   threshold = 100,
-  loadingText = 'Loading...',
+  loadingText,
   endText = 'No more data',
   direction = 'vertical',
   inverse = false,
   disabled = false,
   className,
+  locale,
   children,
   loader,
   end,
   onLoadMore,
   ...rest
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
   const containerRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
@@ -103,7 +114,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
 
   const loaderEl = loading ? (
     <div className={infiniteScrollLoaderClasses} role="status" aria-live="polite">
-      {loader ?? loadingText}
+      {loader ?? resolveLocaleText('Loading...', loadingText, mergedLocale?.common?.loadingText)}
     </div>
   ) : null
 

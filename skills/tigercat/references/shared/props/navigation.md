@@ -222,7 +222,7 @@ Showing 3 key props of 11; see source for the complete interface.
 
 Source: `packages/core/src/types/spotlight.ts` · Interface: `SpotlightProps`.
 
-Showing 3 key props of 18; see source for the complete interface.
+Showing 3 key props of 19; see source for the complete interface.
 
 | Prop           | Type      | Default | Notes |
 | -------------- | --------- | ------- | ----- |

@@ -1,3 +1,5 @@
+import type { TigerLocale } from './locale'
+
 export type SpotlightItemKey = string | number
 
 export interface SpotlightItem {
@@ -33,4 +35,5 @@ export interface SpotlightProps {
   defaultActiveFirstItem?: boolean
   filterItem?: SpotlightItemFilter
   limit?: number
+  locale?: Partial<TigerLocale>
 }

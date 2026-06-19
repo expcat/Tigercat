@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  resolveLocaleText,
+  mergeTigerLocale,
   calculateVirtualRange,
   getVirtualTableContainerClasses,
   getVirtualTableRowClasses,
@@ -15,8 +17,10 @@ import {
   virtualTableEmptyClasses,
   virtualTableLoadingClasses,
   virtualTableFixedCellSelectedClasses,
-  type TableColumn
+  type TableColumn,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VirtualTableProps<T = Record<string, unknown>> {
   data?: T[]
@@ -28,6 +32,7 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   rowKey?: keyof T | ((row: T, index: number) => string | number)
   loading?: boolean
   emptyText?: string
+  locale?: Partial<TigerLocale>
   selectable?: boolean
   selectedKeys?: (string | number)[]
   striped?: boolean
@@ -47,7 +52,8 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   stickyHeader = true,
   rowKey,
   loading = false,
-  emptyText = 'No data',
+  emptyText,
+  locale,
   selectable = false,
   selectedKeys = [],
   striped = false,
@@ -58,6 +64,11 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   renderCell,
   ...rest
 }: VirtualTableProps<T>) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollTop, setScrollTop] = useState(0)
 
@@ -171,7 +182,11 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
           {bottomHeight > 0 && <tr style={{ height: `${bottomHeight}px` }} aria-hidden />}
         </tbody>
       </table>
-      {data.length === 0 && !loading && <div className={virtualTableEmptyClasses}>{emptyText}</div>}
+      {data.length === 0 && !loading && (
+        <div className={virtualTableEmptyClasses}>
+          {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
+        </div>
+      )}
       {loading && <div className={virtualTableLoadingClasses}>Loading...</div>}
     </div>
   )

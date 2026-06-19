@@ -24,12 +24,16 @@ import {
   getCurrentActiveTourStep,
   getActiveTourStepPosition,
   closeIconPathD,
+  mergeTigerLocale,
+  resolveLocaleText,
   type TourStep,
   type TourStepLoader,
   type TourPlacement,
-  type TourRect
+  type TourRect,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueTourProps {
   steps: TourStep[]
@@ -41,6 +45,7 @@ export interface VueTourProps {
   finishText?: string
   closable?: boolean
   showIndicators?: boolean
+  locale?: Partial<TigerLocale>
   className?: string
 }
 
@@ -64,15 +69,27 @@ export const Tour = defineComponent({
       type: Number,
       default: undefined
     },
-    nextText: { type: String, default: 'Next' },
-    prevText: { type: String, default: 'Previous' },
-    finishText: { type: String, default: 'Finish' },
+    nextText: { type: String, default: undefined },
+    prevText: { type: String, default: undefined },
+    finishText: { type: String, default: undefined },
     closable: { type: Boolean, default: true },
     showIndicators: { type: Boolean, default: true },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     className: { type: String, default: undefined }
   },
   emits: ['update:open', 'update:current', 'close', 'finish', 'change'],
   setup(props, { emit }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const nextLabel = computed(() =>
+      resolveLocaleText('Next', props.nextText, mergedLocale.value?.formWizard?.nextText)
+    )
+    const prevLabel = computed(() =>
+      resolveLocaleText('Previous', props.prevText, mergedLocale.value?.formWizard?.prevText)
+    )
+    const finishLabel = computed(() =>
+      resolveLocaleText('Finish', props.finishText, mergedLocale.value?.formWizard?.finishText)
+    )
     const internalStep = ref(0)
     const resolvedSteps = ref<TourStep[]>(props.steps)
     const currentStep = computed(() => props.current ?? internalStep.value)
@@ -269,7 +286,7 @@ export const Tour = defineComponent({
                 'px-3 py-1.5 text-sm rounded-md border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors mr-2',
               onClick: prev
             },
-            props.prevText
+            prevLabel.value
           )
         )
       }
@@ -282,7 +299,7 @@ export const Tour = defineComponent({
               'px-3 py-1.5 text-sm rounded-md bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] transition-colors',
             onClick: next
           },
-          isLast ? props.finishText : props.nextText
+          isLast ? finishLabel.value : nextLabel.value
         )
       )
 

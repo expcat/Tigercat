@@ -258,7 +258,7 @@ export const Tree = defineComponent({
      */
     emptyText: {
       type: String,
-      default: 'No data'
+      default: undefined
     },
 
     /**
@@ -846,7 +846,8 @@ export const Tree = defineComponent({
     }
 
     function renderTreeNode(node: TreeNode, level: number): VNodeChild {
-      const hasChildren = !!(node.children && node.children.length > 0)
+      const children = node.children ?? []
+      const hasChildren = children.length > 0
       const isExpanded = computedExpandedKeys.value.has(node.key)
       const isFiltered = filteredNodeKeys.value.size > 0
       const isMatched = filteredNodeKeys.value.has(node.key)
@@ -871,7 +872,7 @@ export const Tree = defineComponent({
               {
                 class: classNames(treeNodeChildrenClasses, props.showLine && treeLineClasses)
               },
-              node.children!.map((child) => renderTreeNode(child, level + 1))
+              children.map((child) => renderTreeNode(child, level + 1))
             )
         ]
       )
@@ -893,7 +894,13 @@ export const Tree = defineComponent({
             role: 'tree',
             'aria-label': props.ariaLabel
           },
-          [h('div', { class: treeEmptyStateClasses }, props.emptyText)]
+          [
+            h(
+              'div',
+              { class: treeEmptyStateClasses },
+              resolveLocaleText('No data', props.emptyText, mergedLocale.value?.common?.emptyText)
+            )
+          ]
         )
       }
 

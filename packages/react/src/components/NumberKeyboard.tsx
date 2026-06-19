@@ -6,13 +6,16 @@ import {
   getNumberKeyboardAction,
   getNumberKeyboardKeyClasses,
   getNumberKeyboardKeys,
+  mergeTigerLocale,
   normalizeNumberKeyboardValue,
   numberKeyboardGridClasses,
   numberKeyboardRootClasses,
+  resolveLocaleText,
   type NumberKeyboardChangePayload,
   type NumberKeyboardKey,
   type NumberKeyboardProps as CoreNumberKeyboardProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface NumberKeyboardProps
   extends
@@ -34,10 +37,11 @@ export const NumberKeyboard: React.FC<NumberKeyboardProps> = ({
   decimalSeparator = '.',
   disabled = false,
   readonly = false,
-  confirmText = 'Done',
+  confirmText,
   deleteText = 'Delete',
   ariaLabel = 'Number keyboard',
   showConfirm = true,
+  locale,
   className,
   style,
   onChange,
@@ -46,14 +50,27 @@ export const NumberKeyboard: React.FC<NumberKeyboardProps> = ({
   onConfirm,
   ...rest
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const confirmLabel = resolveLocaleText('Done', confirmText, mergedLocale?.common?.okText)
   const isControlled = value !== undefined
   const [innerValue, setInnerValue] = useState(() => normalizeNumberKeyboardValue(defaultValue))
   const currentValue = isControlled ? normalizeNumberKeyboardValue(value) : innerValue
   const isDisabled = disabled || readonly
 
   const keys = useMemo(
-    () => getNumberKeyboardKeys({ mode, decimalSeparator, deleteText, confirmText, showConfirm }),
-    [confirmText, decimalSeparator, deleteText, mode, showConfirm]
+    () =>
+      getNumberKeyboardKeys({
+        mode,
+        decimalSeparator,
+        deleteText,
+        confirmText: confirmLabel,
+        showConfirm
+      }),
+    [confirmLabel, decimalSeparator, deleteText, mode, showConfirm]
   )
 
   function emitChange(nextValue: string, payload: NumberKeyboardChangePayload) {
