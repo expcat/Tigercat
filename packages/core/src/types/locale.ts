@@ -116,6 +116,48 @@ export interface TigerLocaleTaskBoard {
   boardAriaLabel?: string
 }
 
+/**
+ * Built-in form-validation messages.
+ *
+ * Used by `validateRule`/`validateField`/`validateForm` to localize the
+ * default error messages. A per-rule `message` always takes precedence over
+ * these. Range messages support `{min}` / `{max}` placeholders.
+ */
+export interface TigerLocaleFormValidation {
+  /** Required-field message */
+  required?: string
+  /** Type errors */
+  typeString?: string
+  typeNumber?: string
+  typeBoolean?: string
+  typeArray?: string
+  typeObject?: string
+  /** Preset type errors */
+  email?: string
+  phone?: string
+  url?: string
+  date?: string
+  idCard?: string
+  /** Range errors — template: supports {min} */
+  minLength?: string
+  /** Template: supports {max} */
+  maxLength?: string
+  /** Template: supports {min} */
+  minValue?: string
+  /** Template: supports {max} */
+  maxValue?: string
+  /** Template: supports {min} */
+  minItems?: string
+  /** Template: supports {max} */
+  maxItems?: string
+  /** Pattern mismatch message */
+  patternMismatch?: string
+  /** Custom validator returned false */
+  validatorFailed?: string
+  /** Custom validator threw */
+  validatorError?: string
+}
+
 export interface TigerLocale {
   /** BCP 47 locale identifier, for Intl formatting and direction inference. */
   locale?: string
@@ -130,6 +172,7 @@ export interface TigerLocale {
   datePicker?: Partial<DatePickerLocalePreset>
   formWizard?: TigerLocaleFormWizard
   taskBoard?: TigerLocaleTaskBoard
+  formValidation?: TigerLocaleFormValidation
 }
 
 /**

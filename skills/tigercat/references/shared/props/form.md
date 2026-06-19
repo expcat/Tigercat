@@ -106,7 +106,7 @@ Showing 3 key props of 17; see source for the complete interface.
 
 Source: `packages/core/src/types/form.ts` · Interface: `FormProps`.
 
-Showing 3 key props of 16; see source for the complete interface.
+Showing 3 key props of 17; see source for the complete interface.
 
 | Prop          | Type               | Default | Notes                                                         |
 | ------------- | ------------------ | ------- | ------------------------------------------------------------- |

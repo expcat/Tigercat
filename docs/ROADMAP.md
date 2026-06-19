@@ -134,24 +134,8 @@ source: current repository audit and planning
 #### 来自任务 A — Core 包扫描（2026-06-19）
 
 > **扫描结论修正**：Roadmap 原估"core 约 440 处 `any`、散落 `typeof window` 直写"在 core 范围内不成立——该信号集中在 `vue` / `react` 组件层，应由任务 B / C 核查。core 自身类型与 SSR 守卫基本干净（见 A-0）。
-
-- [ ] **A-1 form-validation 内置校验消息无法本地化**（P1）
-  - 维度：i18n｜模块：`packages/core/src/utils/form-validation.ts`
-  - 问题：`validateType` 等内置规则消息（`'Please enter a valid email address'` 等）为硬编码英文，仅支持每次调用传 `customMessage` 覆盖，无 `locale` 参数、无 ZH_CN 变体。
-  - 影响：中文/多语言应用的表单内置校验报错只能显示英文，除非每条规则手动传文案；与 `locale-utils` 的本地化体系脱节。
-  - 建议：为校验消息引入 locale 解析（参照 `locale-utils` 的 `DEFAULT_*` / `ZH_CN_*` + getter 模式），消息走 `resolveLocaleText`，保留 `customMessage` 最高优先级。
-
-- [ ] **A-2 i18n 默认文案表分散**（P2）
-  - 维度：i18n｜模块：`utils/locale-utils.ts`、`utils/timepicker-utils.ts`、`utils/upload-labels.ts`
-  - 问题：`locale-utils` 已集中 pagination/form-wizard/table/task-board 标签，但 timepicker、upload 各自维护独立默认标签表（含各自 ZH_CN），模式不统一。
-  - 影响：新增语言或调整文案需多处改动、易遗漏；标签体系认知成本偏高。
-  - 建议：将 timepicker/upload 默认标签迁入 `locale-utils` 统一的 `DEFAULT_*` / `ZH_CN_*` + getter 模式，或抽一层公共标签注册。
-
-- [ ] **A-3 InfiniteScroll 仍依赖已废弃的 `shouldLoadMore`**（P2）
-  - 维度：死代码/deprecated｜模块：`utils/infinite-scroll-utils.ts` ↔ `vue/react` 的 InfiniteScroll
-  - 问题：`shouldLoadMore` 标注 `@deprecated`（建议改用 `createInfiniteScrollObserver`），但 Vue（`InfiniteScroll.ts:66`）与 React（`InfiniteScroll.tsx:61`）组件仍在调用它。
-  - 影响：废弃 API 被自身组件持续使用，废弃标记名存实亡；IntersectionObserver 路径未被采用。
-  - 建议：将两端 InfiniteScroll 迁移到 `createInfiniteScrollObserver` 后移除 `shouldLoadMore`；若有意保留滚动事件回退路径，则撤销其 `@deprecated`。
+>
+> **进度（2026-06-19）**：非破坏性的 A-1 / A-2 / A-3 已交付，详见 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`——A-1 表单内置校验消息本地化（端到端，新增 `TigerLocaleFormValidation` + `getFormValidationLabels`，Vue/React `Form` 接入 ConfigProvider locale）、A-2 timepicker/upload 默认标签收敛到 `locale-utils`、A-3 撤销 `shouldLoadMore` 的 `@deprecated`（确认为合理回退）。剩余 A-4 / A-5 属破坏性/公共 API 变更，留待允许破坏的版本；任务 A 复选框在 A-4 / A-5 也回填后再勾除。
 
 - [ ] **A-4 废弃别名 `kanbanAddCardClasses` 可清理**（P2）
   - 维度：死代码/deprecated｜模块：`utils/kanban-utils.ts:43`

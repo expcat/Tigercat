@@ -38,9 +38,13 @@ import {
   redoFormHistory,
   canUndo,
   canRedo,
+  mergeTigerLocale,
+  getFormValidationLabels,
+  type TigerLocale,
   type FormValidationDebouncer,
   type FormHistoryState
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 // Form context key
 export const FormContextKey = Symbol('FormContext')
@@ -190,6 +194,14 @@ export const Form = defineComponent({
     maxHistorySize: {
       type: Number,
       default: 50
+    },
+    /**
+     * Locale override for built-in validation messages. Merged on top of the
+     * ConfigProvider locale; a per-rule `message` still takes precedence.
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: {
@@ -208,6 +220,12 @@ export const Form = defineComponent({
     const fieldRules = reactive<Record<string, FormRule | FormRule[]>>({})
     const fieldConditions = reactive<FormConditions>({})
     const errorsByField = computed(() => createFormErrorMap(errors))
+
+    // Localized built-in validation messages (ConfigProvider locale + prop override)
+    const config = useTigerConfig()
+    const validationMessages = computed(() =>
+      getFormValidationLabels(mergeTigerLocale(config.value.locale, props.locale))
+    )
     let validationDebouncer: FormValidationDebouncer = createFormValidationDebouncer({
       delay: props.validateDebounce
     })
@@ -315,7 +333,14 @@ export const Form = defineComponent({
       }
 
       const value = getValueByPath(props.model, fieldName)
-      return validateFieldUtil(fieldName, value, effectiveFieldRules, props.model, trigger)
+      return validateFieldUtil(
+        fieldName,
+        value,
+        effectiveFieldRules,
+        props.model,
+        trigger,
+        validationMessages.value
+      )
     }
 
     const validateFieldNow = async (
@@ -394,7 +419,7 @@ export const Form = defineComponent({
         return true
       }
 
-      const result = await validateForm(props.model, effectiveRules)
+      const result = await validateForm(props.model, effectiveRules, validationMessages.value)
       errors.push(...result.errors)
       return result.valid
     }

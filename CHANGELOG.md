@@ -10,9 +10,12 @@
 - **DataTableWithToolbar** 工具栏新增列设置入口：`toolbar.showColumnSettings` 开启内置 Popover + Checkbox 面板，`toolbar.columnSettings.lockedColumnKeys` 可锁定不可隐藏的列，面板标题支持 `toolbar.columnSettings.title` 与 locale（`table.columnSettingsText` / `columnSettingsAriaLabel`，13 种语言预设已补齐）。
 - core 新增 `filterHiddenColumns` 工具函数与 `FLOATING_OVERLAY_Z_INDEX`（1000）常量。
 - 新增 **MarkdownEditor** 高级组件：支持 Markdown 编辑、编辑/分屏/预览模式、内置工具栏、快捷键、预览渲染与自定义 renderer 扩展点，并提供 Vue/React 双端实现、示例与测试。
+- **Form** 内置校验消息支持本地化：新增 core `TigerLocaleFormValidation` 类型、`getFormValidationLabels` 与 `DEFAULT_FORM_VALIDATION_LABELS` / `ZH_CN_FORM_VALIDATION_LABELS`，`TigerLocale` 新增 `formValidation` 段（en-US / zh-CN 预设已补齐）。Vue/React `Form` 新增可选 `locale` prop 并接入 ConfigProvider locale，`<ConfigProvider :locale="zhCN">` 下必填/类型/范围等内置报错自动显示中文；单条规则 `message` 仍为最高优先级，默认英文行为不变。`validateRule` / `validateField` / `validateForm` / `validateFormFields` 新增可选 `messages` 末参（向后兼容）。
 
 ### Changed
 
+- TimePicker 与 Upload 的默认文案表收敛到 `locale-utils` 单一来源（新增 `DEFAULT_TIME_PICKER_LABELS` / `ZH_CN_TIME_PICKER_LABELS` / `DEFAULT_UPLOAD_LABELS`），消除标签分散；公共 `getTimePickerLabels` / `getUploadLabels` 签名不变。
+- `shouldLoadMore` 撤销 `@deprecated` 标记：它是 InfiniteScroll 在 IntersectionObserver 不可用时的有意滚动回退路径，并非待移除的废弃 API。
 - **Dropdown 行为变更**：菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），解决表格固定列（sticky）遮挡与 overflow 容器裁剪问题；新增 `portal` prop（默认 `true`），设置 `portal: false` 可恢复原位渲染的旧 DOM 结构。菜单包装层新增 `data-tiger-dropdown-menu` 属性便于查询，依赖原 DOM 层级的样式选择器或测试需要相应调整（详见 [迁移指南](docs/MIGRATION.md)）。
 
 ### Fixed

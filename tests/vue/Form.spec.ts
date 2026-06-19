@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, reactive, ref, h, nextTick } from 'vue'
-import { Form, FormItem, type FormRule, type FormRules } from '@expcat/tigercat-vue'
+import { Form, FormItem, ConfigProvider, type FormRule, type FormRules } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Form', () => {
@@ -458,6 +458,38 @@ describe('Form', () => {
       await fireEvent.focusOut(screen.getByLabelText('email'))
 
       expect(await screen.findByText('Email is required')).toBeInTheDocument()
+    })
+
+    it('localizes built-in validation messages via ConfigProvider locale', async () => {
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ email: '' })
+          // No per-rule message → falls back to the localized built-in message
+          const rules: FormRules = { email: [{ required: true }] }
+          return () =>
+            h(ConfigProvider, { locale: { locale: 'zh-CN' } }, () =>
+              h(
+                Form,
+                { model, rules },
+                {
+                  default: () =>
+                    h(
+                      FormItem,
+                      { label: 'Email', name: 'email' },
+                      {
+                        default: () => h('input', { 'aria-label': 'email', value: model.email })
+                      }
+                    )
+                }
+              )
+            )
+        }
+      })
+
+      render(Demo)
+      await fireEvent.focusOut(screen.getByLabelText('email'))
+
+      expect(await screen.findByText('此字段为必填项')).toBeInTheDocument()
     })
 
     it('validates email format', async () => {

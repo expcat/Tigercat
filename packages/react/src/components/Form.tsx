@@ -36,8 +36,11 @@ import {
   redoFormHistory,
   canUndo,
   canRedo,
+  mergeTigerLocale,
+  getFormValidationLabels,
   type FormValidationDebouncer
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 // Form context type
 export interface FormContextValue {
@@ -183,11 +186,18 @@ export const Form = forwardRef<FormHandle, FormProps>(
       validateDebounce = 0,
       undoable = false,
       maxHistorySize = 50,
+      locale,
       ...props
     },
     ref
   ) => {
     const resolvedLabelAlign = labelAlign ?? (labelPosition === 'top' ? 'left' : 'right')
+    // Localized built-in validation messages (ConfigProvider locale + prop override)
+    const config = useTigerConfig()
+    const validationMessages = useMemo(
+      () => getFormValidationLabels(mergeTigerLocale(config.locale, locale)),
+      [config.locale, locale]
+    )
     const [errors, setErrors] = useState<FormError[]>([])
     const [formValues, setFormValues] = useState<FormValues>(model)
     const fieldRulesRef = React.useRef<FormRules>({})
@@ -324,9 +334,16 @@ export const Form = forwardRef<FormHandle, FormProps>(
 
         const currentValues = formValuesRef.current
         const value = getValueByPath(currentValues, fieldName)
-        return validateFieldUtil(fieldName, value, fieldRules, currentValues, trigger)
+        return validateFieldUtil(
+          fieldName,
+          value,
+          fieldRules,
+          currentValues,
+          trigger,
+          validationMessages
+        )
       },
-      [resolveFieldRules]
+      [resolveFieldRules, validationMessages]
     )
 
     const validateFieldNow = useCallback(
@@ -407,10 +424,10 @@ export const Form = forwardRef<FormHandle, FormProps>(
         setErrors([])
         return { valid: true, errors: [] }
       }
-      const result = await validateForm(formValuesRef.current, effectiveRules)
+      const result = await validateForm(formValuesRef.current, effectiveRules, validationMessages)
       setErrors(result.errors)
       return result
-    }, [getEffectiveRules])
+    }, [getEffectiveRules, validationMessages])
 
     const validate = useCallback(async (): Promise<boolean> => {
       const result = await runValidation()

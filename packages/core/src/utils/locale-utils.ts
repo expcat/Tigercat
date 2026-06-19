@@ -20,8 +20,11 @@ import type {
   TigerLocaleTable,
   TigerLocaleFormWizard,
   TigerLocaleTaskBoard,
+  TigerLocaleFormValidation,
   TigerLocaleDirection
 } from '../types/locale'
+import type { TimePickerLabels } from '../types/timepicker'
+import type { UploadLabels } from '../types/upload'
 
 const TIGER_LOCALE_KEYS = [
   'locale',
@@ -34,7 +37,8 @@ const TIGER_LOCALE_KEYS = [
   'table',
   'datePicker',
   'formWizard',
-  'taskBoard'
+  'taskBoard',
+  'formValidation'
 ]
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -104,7 +108,8 @@ export function mergeTigerLocale(
     table: { ...base?.table, ...override?.table },
     datePicker: { ...base?.datePicker, ...override?.datePicker },
     formWizard: { ...base?.formWizard, ...override?.formWizard },
-    taskBoard: { ...base?.taskBoard, ...override?.taskBoard }
+    taskBoard: { ...base?.taskBoard, ...override?.taskBoard },
+    formValidation: { ...base?.formValidation, ...override?.formValidation }
   }
 }
 
@@ -446,4 +451,134 @@ export function getTaskBoardLabels(
     boardAriaLabel:
       overrides?.boardAriaLabel ?? locale?.taskBoard?.boardAriaLabel ?? defaultLabels.boardAriaLabel
   }
+}
+
+// ============================================================================
+// Form Validation Labels
+// ============================================================================
+
+/**
+ * Default English form-validation messages. Range messages use {min}/{max}.
+ */
+export const DEFAULT_FORM_VALIDATION_LABELS: Required<TigerLocaleFormValidation> = {
+  required: 'This field is required',
+  typeString: 'Value must be a string',
+  typeNumber: 'Value must be a number',
+  typeBoolean: 'Value must be a boolean',
+  typeArray: 'Value must be an array',
+  typeObject: 'Value must be an object',
+  email: 'Please enter a valid email address',
+  phone: 'Please enter a valid phone number',
+  url: 'Please enter a valid URL',
+  date: 'Please enter a valid date',
+  idCard: 'Please enter a valid ID card number',
+  minLength: 'Minimum length is {min} characters',
+  maxLength: 'Maximum length is {max} characters',
+  minValue: 'Minimum value is {min}',
+  maxValue: 'Maximum value is {max}',
+  minItems: 'Minimum {min} items required',
+  maxItems: 'Maximum {max} items allowed',
+  patternMismatch: 'Value does not match the required pattern',
+  validatorFailed: 'Validation failed',
+  validatorError: 'Validation error occurred'
+}
+
+/**
+ * Chinese (Simplified) form-validation messages.
+ */
+export const ZH_CN_FORM_VALIDATION_LABELS: Required<TigerLocaleFormValidation> = {
+  required: '此字段为必填项',
+  typeString: '值必须是字符串',
+  typeNumber: '值必须是数字',
+  typeBoolean: '值必须是布尔值',
+  typeArray: '值必须是数组',
+  typeObject: '值必须是对象',
+  email: '请输入有效的邮箱地址',
+  phone: '请输入有效的电话号码',
+  url: '请输入有效的网址',
+  date: '请输入有效的日期',
+  idCard: '请输入有效的身份证号码',
+  minLength: '长度不能少于 {min} 个字符',
+  maxLength: '长度不能超过 {max} 个字符',
+  minValue: '数值不能小于 {min}',
+  maxValue: '数值不能大于 {max}',
+  minItems: '至少需要 {min} 项',
+  maxItems: '最多允许 {max} 项',
+  patternMismatch: '格式不正确',
+  validatorFailed: '校验未通过',
+  validatorError: '校验时发生错误'
+}
+
+/**
+ * Resolve form-validation messages with fallback to defaults.
+ *
+ * Priority per field: overrides > locale.formValidation > locale default.
+ */
+export function getFormValidationLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleFormValidation>
+): Required<TigerLocaleFormValidation> {
+  const isZh = !!locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_FORM_VALIDATION_LABELS : DEFAULT_FORM_VALIDATION_LABELS
+  const fv = locale?.formValidation
+  const resolved = {} as Required<TigerLocaleFormValidation>
+  for (const key of Object.keys(defaultLabels) as Array<keyof TigerLocaleFormValidation>) {
+    resolved[key] = overrides?.[key] ?? fv?.[key] ?? defaultLabels[key]
+  }
+  return resolved
+}
+
+// ============================================================================
+// TimePicker Labels (centralized defaults; see timepicker-utils for the
+// per-language map that consumes these for the en/zh baselines)
+// ============================================================================
+
+export const DEFAULT_TIME_PICKER_LABELS: TimePickerLabels = {
+  hour: 'Hour',
+  minute: 'Min',
+  second: 'Sec',
+  now: 'Now',
+  ok: 'OK',
+  start: 'Start',
+  end: 'End',
+  clear: 'Clear time',
+  toggle: 'Toggle time picker',
+  dialog: 'Time picker',
+  selectTime: 'Select time',
+  selectTimeRange: 'Select time range'
+}
+
+export const ZH_CN_TIME_PICKER_LABELS: TimePickerLabels = {
+  hour: '时',
+  minute: '分',
+  second: '秒',
+  now: '现在',
+  ok: '确定',
+  start: '开始',
+  end: '结束',
+  clear: '清除时间',
+  toggle: '打开时间选择器',
+  dialog: '时间选择器',
+  selectTime: '请选择时间',
+  selectTimeRange: '请选择时间范围'
+}
+
+// ============================================================================
+// Upload Labels (centralized English defaults consumed by getUploadLabels)
+// ============================================================================
+
+export const DEFAULT_UPLOAD_LABELS: UploadLabels = {
+  dragAreaAriaLabel: 'Upload file by clicking or dragging',
+  buttonAriaLabel: 'Upload file',
+  clickToUploadText: 'Click to upload',
+  dragAndDropText: 'or drag and drop',
+  acceptInfoText: 'Accepted: {accept}',
+  maxSizeInfoText: 'Max size: {maxSize}',
+  selectFileText: 'Select File',
+  uploadedFilesAriaLabel: 'Uploaded files',
+  successAriaLabel: 'Success',
+  errorAriaLabel: 'Error',
+  uploadingAriaLabel: 'Uploading',
+  removeFileAriaLabel: 'Remove {fileName}',
+  previewFileAriaLabel: 'Preview {fileName}'
 }

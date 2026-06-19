@@ -11,8 +11,17 @@ import type {
   FormRuleTrigger,
   FormRuleType
 } from '../types/form'
+import type { TigerLocaleFormValidation } from '../types/locale'
+import { DEFAULT_FORM_VALIDATION_LABELS } from './locale-utils'
 
 export type FormValidationPreset = Extract<FormRuleType, 'email' | 'phone' | 'url' | 'id-card'>
+
+/**
+ * Fully-resolved set of built-in validation messages. Obtain one via
+ * `getFormValidationLabels(locale)` and pass it to the validate* functions to
+ * localize the default messages. Defaults to English when omitted.
+ */
+export type FormValidationMessages = Required<TigerLocaleFormValidation>
 
 export interface FormValidationDebouncerOptions {
   delay?: number
@@ -208,60 +217,61 @@ function isEmpty(value: unknown): boolean {
 function validateType(
   value: unknown,
   type: FormRule['type'],
-  customMessage?: string
+  customMessage?: string,
+  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
 ): string | null {
   switch (type) {
     case 'string':
       if (typeof value !== 'string') {
-        return customMessage || 'Value must be a string'
+        return customMessage || messages.typeString
       }
       break
     case 'number':
       if (typeof value !== 'number' && isNaN(Number(value))) {
-        return customMessage || 'Value must be a number'
+        return customMessage || messages.typeNumber
       }
       break
     case 'boolean':
       if (typeof value !== 'boolean') {
-        return customMessage || 'Value must be a boolean'
+        return customMessage || messages.typeBoolean
       }
       break
     case 'array':
       if (!Array.isArray(value)) {
-        return customMessage || 'Value must be an array'
+        return customMessage || messages.typeArray
       }
       break
     case 'object':
       if (typeof value !== 'object' || Array.isArray(value)) {
-        return customMessage || 'Value must be an object'
+        return customMessage || messages.typeObject
       }
       break
     case 'email':
       if (typeof value === 'string' && !EMAIL_PATTERN.test(value)) {
-        return customMessage || 'Please enter a valid email address'
+        return customMessage || messages.email
       }
       break
     case 'phone':
       if (typeof value === 'string') {
         const digits = value.replace(/\D/g, '')
         if (!PHONE_PATTERN.test(value) || digits.length < 7) {
-          return customMessage || 'Please enter a valid phone number'
+          return customMessage || messages.phone
         }
       }
       break
     case 'url':
       if (typeof value === 'string' && !URL_PATTERN.test(value)) {
-        return customMessage || 'Please enter a valid URL'
+        return customMessage || messages.url
       }
       break
     case 'date':
       if (!(value instanceof Date) && isNaN(Date.parse(String(value)))) {
-        return customMessage || 'Please enter a valid date'
+        return customMessage || messages.date
       }
       break
     case 'id-card':
       if (typeof value === 'string' && !ID_CARD_PATTERN.test(value)) {
-        return customMessage || 'Please enter a valid ID card number'
+        return customMessage || messages.idCard
       }
       break
   }
@@ -280,35 +290,36 @@ function validateRange(
   value: unknown,
   min: number | undefined,
   max: number | undefined,
-  customMessage?: string
+  customMessage?: string,
+  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
 ): string | null {
   // String length validation
   if (typeof value === 'string') {
     if (min !== undefined && value.length < min) {
-      return customMessage || `Minimum length is ${min} characters`
+      return customMessage || messages.minLength.replace('{min}', String(min))
     }
     if (max !== undefined && value.length > max) {
-      return customMessage || `Maximum length is ${max} characters`
+      return customMessage || messages.maxLength.replace('{max}', String(max))
     }
   }
 
   // Number range validation
   if (typeof value === 'number') {
     if (min !== undefined && value < min) {
-      return customMessage || `Minimum value is ${min}`
+      return customMessage || messages.minValue.replace('{min}', String(min))
     }
     if (max !== undefined && value > max) {
-      return customMessage || `Maximum value is ${max}`
+      return customMessage || messages.maxValue.replace('{max}', String(max))
     }
   }
 
   // Array length validation
   if (Array.isArray(value)) {
     if (min !== undefined && value.length < min) {
-      return customMessage || `Minimum ${min} items required`
+      return customMessage || messages.minItems.replace('{min}', String(min))
     }
     if (max !== undefined && value.length > max) {
-      return customMessage || `Maximum ${max} items allowed`
+      return customMessage || messages.maxItems.replace('{max}', String(max))
     }
   }
 
@@ -325,7 +336,8 @@ function validateRange(
 export async function validateRule(
   value: unknown,
   rule: FormRule,
-  allValues?: FormValues
+  allValues?: FormValues,
+  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
 ): Promise<string | null> {
   // Skip validation if value is empty and not required
   if (!rule.required && isEmpty(value)) {
@@ -337,25 +349,25 @@ export async function validateRule(
 
   // Required validation
   if (rule.required && isEmpty(transformedValue)) {
-    return rule.message || 'This field is required'
+    return rule.message || messages.required
   }
 
   // Type validation
   if (rule.type && !isEmpty(transformedValue)) {
-    const typeError = validateType(transformedValue, rule.type, rule.message)
+    const typeError = validateType(transformedValue, rule.type, rule.message, messages)
     if (typeError) return typeError
   }
 
   // Min/Max validation based on value type
   if (!isEmpty(transformedValue)) {
-    const rangeError = validateRange(transformedValue, rule.min, rule.max, rule.message)
+    const rangeError = validateRange(transformedValue, rule.min, rule.max, rule.message, messages)
     if (rangeError) return rangeError
   }
 
   // Pattern validation
   if (rule.pattern && typeof transformedValue === 'string') {
     if (!rule.pattern.test(transformedValue)) {
-      return rule.message || 'Value does not match the required pattern'
+      return rule.message || messages.patternMismatch
     }
   }
 
@@ -364,13 +376,13 @@ export async function validateRule(
     try {
       const result = await rule.validator(transformedValue, allValues)
       if (result === false) {
-        return rule.message || 'Validation failed'
+        return rule.message || messages.validatorFailed
       }
       if (typeof result === 'string') {
         return result
       }
     } catch {
-      return rule.message || 'Validation error occurred'
+      return rule.message || messages.validatorError
     }
   }
 
@@ -385,7 +397,8 @@ export async function validateField(
   value: unknown,
   rules: FormRule | FormRule[] | undefined,
   allValues?: FormValues,
-  trigger?: FormRuleTrigger
+  trigger?: FormRuleTrigger,
+  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
 ): Promise<string | null> {
   if (!rules) {
     return null
@@ -407,7 +420,7 @@ export async function validateField(
       }
     }
 
-    const error = await validateRule(value, rule, allValues)
+    const error = await validateRule(value, rule, allValues, messages)
     if (error) {
       return error
     }
@@ -421,14 +434,15 @@ export async function validateField(
  */
 export async function validateForm(
   values: FormValues,
-  rules: FormRules
+  rules: FormRules,
+  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
 ): Promise<FormValidationResult> {
   const errors: FormError[] = []
 
   // Validate all fields with rules
   for (const [fieldName, fieldRules] of Object.entries(rules)) {
     const value = getValueByPath(values, fieldName)
-    const error = await validateField(fieldName, value, fieldRules, values)
+    const error = await validateField(fieldName, value, fieldRules, values, undefined, messages)
 
     if (error) {
       errors.push({
@@ -448,7 +462,8 @@ export async function validateFormFields(
   values: FormValues,
   rules: FormRules,
   fieldNames: string[],
-  trigger?: FormRuleTrigger
+  trigger?: FormRuleTrigger,
+  messages: FormValidationMessages = DEFAULT_FORM_VALIDATION_LABELS
 ): Promise<FormValidationResult> {
   const errors: FormError[] = []
   const uniqueFieldNames = Array.from(new Set(fieldNames))
@@ -458,7 +473,7 @@ export async function validateFormFields(
     if (!fieldRules) continue
 
     const value = getValueByPath(values, fieldName)
-    const error = await validateField(fieldName, value, fieldRules, values, trigger)
+    const error = await validateField(fieldName, value, fieldRules, values, trigger, messages)
 
     if (error) {
       errors.push({ field: fieldName, message: error })

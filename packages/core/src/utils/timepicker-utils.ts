@@ -9,7 +9,12 @@
 
 import type { TimePickerLabels } from '../types/timepicker'
 import { clockSolidIcon20PathD, closeSolidIcon20PathD } from './common-icons'
-import { formatIntlNumber, getIntlPluralCategory } from './locale-utils'
+import {
+  formatIntlNumber,
+  getIntlPluralCategory,
+  DEFAULT_TIME_PICKER_LABELS,
+  ZH_CN_TIME_PICKER_LABELS
+} from './locale-utils'
 
 // ============================================================================
 // Icons (re-exports for backward compatibility)
@@ -29,35 +34,10 @@ export const TimePickerCloseIconPath = closeSolidIcon20PathD
 // Labels / i18n
 // ============================================================================
 
-const ZH_LABELS: TimePickerLabels = {
-  hour: '时',
-  minute: '分',
-  second: '秒',
-  now: '现在',
-  ok: '确定',
-  start: '开始',
-  end: '结束',
-  clear: '清除时间',
-  toggle: '打开时间选择器',
-  dialog: '时间选择器',
-  selectTime: '请选择时间',
-  selectTimeRange: '请选择时间范围'
-}
-
-const EN_LABELS: TimePickerLabels = {
-  hour: 'Hour',
-  minute: 'Min',
-  second: 'Sec',
-  now: 'Now',
-  ok: 'OK',
-  start: 'Start',
-  end: 'End',
-  clear: 'Clear time',
-  toggle: 'Toggle time picker',
-  dialog: 'Time picker',
-  selectTime: 'Select time',
-  selectTimeRange: 'Select time range'
-}
+// EN/ZH baselines live in locale-utils (single source of truth shared with
+// the rest of the locale system); this file only adds the extra languages.
+const EN_LABELS = DEFAULT_TIME_PICKER_LABELS
+const ZH_LABELS = ZH_CN_TIME_PICKER_LABELS
 
 const TIME_PICKER_LABELS_BY_LANGUAGE: Record<string, TimePickerLabels> = {
   en: EN_LABELS,

@@ -12,7 +12,8 @@ import {
   FORM_VALIDATION_PRESETS,
   createFormValidationRule,
   validateFormFields,
-  createFormValidationDebouncer
+  createFormValidationDebouncer,
+  getFormValidationLabels
 } from '@expcat/tigercat-core'
 
 describe('form-validation', () => {
@@ -478,6 +479,46 @@ describe('form-validation', () => {
 
       expect(validate).toHaveBeenCalledTimes(1)
       expect(debouncer.isPending('email')).toBe(false)
+    })
+  })
+
+  describe('localized messages', () => {
+    const zh = getFormValidationLabels({ locale: 'zh-CN' })
+
+    it('defaults to English when no messages passed', async () => {
+      expect(await validateRule('', { required: true })).toBe('This field is required')
+      expect(await validateRule(123, { type: 'string' })).toBe('Value must be a string')
+    })
+
+    it('uses provided messages for required/type/preset errors', async () => {
+      expect(await validateRule('', { required: true }, undefined, zh)).toBe('此字段为必填项')
+      expect(await validateRule(123, { type: 'string' }, undefined, zh)).toBe('值必须是字符串')
+      expect(await validateRule('bad', { type: 'email' }, undefined, zh)).toBe(
+        '请输入有效的邮箱地址'
+      )
+    })
+
+    it('interpolates {min}/{max} in localized range messages', async () => {
+      expect(await validateRule('a', { min: 3 }, undefined, zh)).toBe('长度不能少于 3 个字符')
+      expect(await validateRule([1, 2, 3, 4], { type: 'array', max: 2 }, undefined, zh)).toBe(
+        '最多允许 2 项'
+      )
+    })
+
+    it('keeps per-rule message at the highest priority over locale', async () => {
+      expect(await validateRule('', { required: true, message: 'Custom' }, undefined, zh)).toBe(
+        'Custom'
+      )
+    })
+
+    it('threads messages through validateField and validateForm', async () => {
+      expect(await validateField('name', '', { required: true }, undefined, undefined, zh)).toBe(
+        '此字段为必填项'
+      )
+
+      const result = await validateForm({ name: '' }, { name: { required: true } }, zh)
+      expect(result.valid).toBe(false)
+      expect(result.errors[0].message).toBe('此字段为必填项')
     })
   })
 })

@@ -2,6 +2,8 @@
  * Form component types and interfaces
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Supported form validation rule types
  */
@@ -311,6 +313,12 @@ export interface FormProps {
    * @default 50
    */
   maxHistorySize?: number
+
+  /**
+   * Locale override for built-in validation messages. Merged on top of the
+   * ConfigProvider locale; a per-rule `message` still takes precedence.
+   */
+  locale?: Partial<TigerLocale>
 }
 
 /**

@@ -9,6 +9,7 @@ import React, { useState } from 'react'
 import {
   Form,
   FormItem,
+  ConfigProvider,
   type FormHandle,
   type FormRule,
   type FormRules
@@ -277,6 +278,32 @@ describe('Form', () => {
       const describedBy = input.getAttribute('aria-describedby')
       expect(describedBy).toBeTruthy()
       expect(errorElement.getAttribute('id')).toBe(describedBy)
+    })
+
+    it('localizes built-in validation messages via ConfigProvider locale', async () => {
+      const formRef = React.createRef<FormHandle>()
+
+      function Demo() {
+        const [model] = useState({ username: '' })
+        // No per-rule message → falls back to the localized built-in message
+        const rules: FormRules = { username: [{ required: true }] }
+        return (
+          <ConfigProvider locale={{ locale: 'zh-CN' }}>
+            <Form ref={formRef} model={model} rules={rules}>
+              <FormItem label="Username" name="username">
+                <input aria-label="username" value={model.username} readOnly />
+              </FormItem>
+            </Form>
+          </ConfigProvider>
+        )
+      }
+
+      render(<Demo />)
+      await act(async () => {
+        await formRef.current?.validateField('username', undefined, 'blur')
+      })
+
+      expect(await screen.findByText('此字段为必填项')).toBeInTheDocument()
     })
 
     it('validates required field', async () => {

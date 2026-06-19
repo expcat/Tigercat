@@ -62,5 +62,27 @@ export const enUS: TigerLocale = {
     wipLimitText: 'WIP limit: {limit}',
     dragHintText: 'Drag to move',
     boardAriaLabel: 'Task Board'
+  },
+  formValidation: {
+    required: 'This field is required',
+    typeString: 'Value must be a string',
+    typeNumber: 'Value must be a number',
+    typeBoolean: 'Value must be a boolean',
+    typeArray: 'Value must be an array',
+    typeObject: 'Value must be an object',
+    email: 'Please enter a valid email address',
+    phone: 'Please enter a valid phone number',
+    url: 'Please enter a valid URL',
+    date: 'Please enter a valid date',
+    idCard: 'Please enter a valid ID card number',
+    minLength: 'Minimum length is {min} characters',
+    maxLength: 'Maximum length is {max} characters',
+    minValue: 'Minimum value is {min}',
+    maxValue: 'Maximum value is {max}',
+    minItems: 'Minimum {min} items required',
+    maxItems: 'Maximum {max} items allowed',
+    patternMismatch: 'Value does not match the required pattern',
+    validatorFailed: 'Validation failed',
+    validatorError: 'Validation error occurred'
   }
 }

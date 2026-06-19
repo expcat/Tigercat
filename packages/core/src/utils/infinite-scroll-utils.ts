@@ -16,13 +16,16 @@ export const infiniteScrollEndClasses =
 
 export const infiniteScrollSentinelClasses = 'tiger-infinite-scroll-sentinel'
 
-// ─── Scroll detection (legacy, kept for backward compat) ──────────
+// ─── Scroll detection (IntersectionObserver fallback) ─────────────
 
 /**
  * Check whether the scroll position is within the threshold of the end.
  *
- * @deprecated Prefer `createInfiniteScrollObserver` which uses
- * IntersectionObserver and avoids scroll event overhead.
+ * This is the scroll-event fallback used by InfiniteScroll when
+ * `IntersectionObserver` is unavailable (e.g. older browsers or test
+ * environments). Prefer `createInfiniteScrollObserver` when IO is present;
+ * this function is intentionally retained as the progressive-enhancement
+ * fallback path and is not deprecated.
  */
 export function shouldLoadMore(
   el: {
