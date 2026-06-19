@@ -33,6 +33,7 @@
 - 修复 React **Notification** 入场动画 `setTimeout` 缺少清理函数的问题，组件在动画前卸载不再触发对已卸载组件的状态更新。
 - 修复 React **Splitter** 拖拽时分隔条高亮失效的问题：拖拽状态改用 state 追踪（与 Vue 端及 React Resizable 保持一致），按下分隔条即可正确显示拖拽高亮。
 - 修复 **VirtualList** 固定高度列表在 `itemHeight` 为 0（或非正值）时可见范围计算产生 `Infinity`/`NaN` 的问题：`getFixedVirtualRange` 现对非正项高与空数据返回安全的空范围，避免一次性渲染全部项导致卡顿。
+- 修复 **CLI** `tigercat generate test` / `generate doc-template` 在目标文件已存在时因 `logWarn` 未导入而抛 `ReferenceError` 崩溃的问题：现正确告警并跳过已存在文件；同时将 CLI 源级 `tsc --noEmit` 类型检查纳入验证，避免仅靠 tsup 转译漏掉此类未定义引用。
 
 ### Infrastructure
 
@@ -41,9 +42,10 @@
 - 新增发布准备检查：`pnpm release:check` 校验包版本、运行时 `version` 导出、公开 package exports、Changesets fixed group 与发布文档入口。
 - 新增 SSR 发布门禁：`pnpm quality:ssr` 覆盖 Nuxt 与 Next.js 示例构建，并纳入 `pnpm quality:release`。
 - 新增 [迁移指南](docs/MIGRATION.md) 作为 Breaking change 与迁移路径集中入口。
-- 更新 size-limit 当前基线：React full 限制为 253 kB，Vue Button subpath 限制为 16 kB。
+- 重设 size-limit 基线并扩展覆盖：随 MarkdownEditor、Table 列显隐与多组件 i18n 接入等新功能，full bundle 体积自然增长（已核对增量来自新功能源码而非依赖膨胀，运行时依赖仅 `@floating-ui/dom`），按实测 +~10% 余量上调三个主入口与 Button 子路径预算（Core 118 kB、Vue 284 kB、React 320 kB、Vue Button 22 kB、React Button 20 kB）；新增重组件子路径（Menu/DatePicker/Table/Tree/TimePicker 双端）与 core 子路径（`tailwind/modern`、`locales/zh-CN`、`icons/common`）的体积回归护栏，避免单组件膨胀绕过门禁。
 - 明确 Roadmap、CHANGELOG、脚本文档和 API 文档的职责边界，避免完成历史长期堆回 Roadmap。
 - 清理 Vue 包内 7 个未使用的内部 composable（`usePopup` / `useDateNavigation` / `useDateSelection` / `useTimeSelection` / `useTimePanelKeyboard` / `useSelectOptions` / `useSelectKeyboard`，约 1,529 LOC）及其 barrel `composables/index.ts`：均无组件使用、未从公共入口导出、无测试，属死代码移除；公共 composable `useChartInteraction` / `useFormController` / `useDrag` 不受影响。
+- 收敛 `@expcat/tigercat-core` 包导出与字段一致性：移除失效且冗余的 `./types` / `./theme` 子路径导出（二者目标文件从未由 tsup 产出、内容已由主入口 `@expcat/tigercat-core` 导出且无内部/外部消费者），并将 `module` 字段由不存在的 `./dist/index.mjs` 修正为实际 ESM 产物 `./dist/index.js`；`release:check` 的必需 core 导出清单同步移除上述两项。公共 API 与主入口导出符号不变。
 
 ## v1.2.0 — Breaking Changes
 

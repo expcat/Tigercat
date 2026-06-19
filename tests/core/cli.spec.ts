@@ -22,7 +22,11 @@ import { ensureDir, writeFileSafe, isDirEmpty, readFileSafe } from '@expcat/tige
 import { runCreate } from '@expcat/tigercat-cli/commands/create'
 import { runAdd } from '@expcat/tigercat-cli/commands/add'
 import { runPlayground } from '@expcat/tigercat-cli/commands/playground'
-import { runGenerateDocs } from '@expcat/tigercat-cli/commands/generate'
+import {
+  runGenerateDocs,
+  runGenerateTest,
+  runGenerateDocTemplate
+} from '@expcat/tigercat-cli/commands/generate'
 import { collectDoctorChecks } from '@expcat/tigercat-cli/commands/doctor'
 
 function readWorkspaceCatalogValue(packageName: string): string | undefined {
@@ -544,6 +548,46 @@ describe('CLI Dry Run', () => {
 
     expect(existsSync(join(testDir, 'api'))).toBe(false)
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Dry run'))
+  })
+})
+
+describe('CLI Generate - existing files', () => {
+  const originalCwd = process.cwd()
+  const testDir = join(tmpdir(), `tigercat-generate-existing-test-${Date.now()}`)
+  let logSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    ensureDir(testDir)
+    process.chdir(testDir)
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    logSpy.mockRestore()
+    process.chdir(originalCwd)
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true })
+    }
+  })
+
+  it('skips generate test when target spec already exists without crashing', async () => {
+    const specPath = join(testDir, 'tests', 'vue', 'Button.spec.ts')
+    writeFileSafe(specPath, '// existing spec, must not be overwritten')
+
+    await expect(runGenerateTest('Button', 'vue3', 'tests')).resolves.toBeUndefined()
+
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('already exists'))
+    expect(readFileSync(specPath, 'utf-8')).toBe('// existing spec, must not be overwritten')
+  })
+
+  it('skips generate doc-template when target markdown already exists without crashing', async () => {
+    const docPath = join(testDir, 'docs', 'button.md')
+    writeFileSafe(docPath, '# existing doc, must not be overwritten')
+
+    await expect(runGenerateDocTemplate('Button', 'docs')).resolves.toBeUndefined()
+
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('already exists'))
+    expect(readFileSync(docPath, 'utf-8')).toBe('# existing doc, must not be overwritten')
   })
 })
 

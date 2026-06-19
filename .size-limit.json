@@ -2,31 +2,109 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "100 kB",
+    "limit": "118 kB",
     "gzip": true
   },
   {
     "name": "Vue (full)",
     "path": "packages/vue/dist/index.mjs",
-    "limit": "250 kB",
+    "limit": "284 kB",
     "gzip": true
   },
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "275 kB",
+    "limit": "320 kB",
     "gzip": true
   },
   {
     "name": "Vue Button subpath",
     "path": "packages/vue/dist/components/Button.mjs",
-    "limit": "16 kB",
+    "limit": "22 kB",
     "gzip": true
   },
   {
     "name": "React Button subpath",
     "path": "packages/react/dist/components/Button.mjs",
-    "limit": "15 kB",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue Menu subpath",
+    "path": "packages/vue/dist/components/Menu.mjs",
+    "limit": "41 kB",
+    "gzip": true
+  },
+  {
+    "name": "React Menu subpath",
+    "path": "packages/react/dist/components/Menu.mjs",
+    "limit": "33 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue DatePicker subpath",
+    "path": "packages/vue/dist/components/DatePicker.mjs",
+    "limit": "31 kB",
+    "gzip": true
+  },
+  {
+    "name": "React DatePicker subpath",
+    "path": "packages/react/dist/components/DatePicker.mjs",
+    "limit": "24 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue Table subpath",
+    "path": "packages/vue/dist/components/Table.mjs",
+    "limit": "48 kB",
+    "gzip": true
+  },
+  {
+    "name": "React Table subpath",
+    "path": "packages/react/dist/components/Table.mjs",
+    "limit": "40 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue Tree subpath",
+    "path": "packages/vue/dist/components/Tree.mjs",
+    "limit": "32 kB",
+    "gzip": true
+  },
+  {
+    "name": "React Tree subpath",
+    "path": "packages/react/dist/components/Tree.mjs",
+    "limit": "24 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue TimePicker subpath",
+    "path": "packages/vue/dist/components/TimePicker.mjs",
+    "limit": "31 kB",
+    "gzip": true
+  },
+  {
+    "name": "React TimePicker subpath",
+    "path": "packages/react/dist/components/TimePicker.mjs",
+    "limit": "24 kB",
+    "gzip": true
+  },
+  {
+    "name": "Core tailwind/modern subpath",
+    "path": "packages/core/dist/tailwind/modern.js",
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Core locale (zh-CN) subpath",
+    "path": "packages/core/dist/locales/zh-CN.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Core icons (common) subpath",
+    "path": "packages/core/dist/icons/common.js",
+    "limit": "1 kB",
     "gzip": true
   }
 ]

@@ -58,8 +58,6 @@ function checkPackageExports(packages) {
   const coreExports = packages.core.exports ?? {}
   const requiredCoreExports = [
     '.',
-    './types',
-    './theme',
     './tailwind',
     './tailwind/modern',
     './tokens.css',

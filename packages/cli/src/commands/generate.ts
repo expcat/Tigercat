@@ -2,7 +2,7 @@ import { Command } from 'commander'
 import { resolve, join, basename } from 'node:path'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { ALL_COMPONENTS } from '../constants'
-import { logSuccess, logError, logInfo, logStep } from '../utils/logger'
+import { logSuccess, logError, logInfo, logStep, logWarn } from '../utils/logger'
 import { ensureDir, writeFileSafe } from '../utils/fs'
 
 type FrameworkTarget = 'vue3' | 'react' | 'both'

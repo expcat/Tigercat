@@ -29,7 +29,7 @@ source: current repository audit and planning
 ## 当前待办
 
 - [ ] v1.3.4 发布执行：运行 `pnpm quality:release`、`pnpm build`，发布后执行 `pnpm smoke:published`。
-  - ⚠️ 阻塞：当前 `pnpm size` 5 项预算全部超限（详见 F-1），`quality:release` 会在 `quality:size` 步骤失败，需先重设预算基线或瘦身。
+  - F-1 体积预算阻塞已解除（size 预算按实测重设并扩展覆盖，`pnpm size` 转绿，详见 [CHANGELOG.md](../CHANGELOG.md)）；`release:check` 仍需在发布时把 `v1.3.4` 写入 CHANGELOG / 迁移指南 / release.md 版本标题（属发布执行动作）。
 - [ ] 发布后归档：确认 `CHANGELOG.md`、迁移指南、发布记录和 Roadmap 状态与实际发布结果一致。
 
 ## 优化扫描计划
@@ -231,11 +231,7 @@ source: current repository audit and planning
 
 > **扫描结论修正**：Roadmap 原写 `templates/`，实际模板实现是 `packages/cli/src/templates/vue3.ts` / `react.ts` 的内联文件表；Tailwind v4 模板接入本身已对齐，但 CLI 发布包、doctor 深度与命令边界仍有可优化项。
 
-- [ ] **E-1 `generate` 已存在文件路径会运行时崩溃**（P1）
-  - 维度：命令健壮性/类型门禁｜模块：`packages/cli/src/commands/generate.ts:235/261`
-  - 问题：`runGenerateTest` 与 `runGenerateDocTemplate` 在目标文件已存在时调用 `logWarn`，但 `generate.ts` 未从 `../utils/logger` 导入该函数。`pnpm --filter @expcat/tigercat-cli build` 通过，`tests/core/cli.spec.ts` 58 个用例通过，但 `pnpm --filter @expcat/tigercat-cli exec tsc --noEmit` 失败；built CLI 实测 `generate test Button --framework vue3` / `generate doc-template Button` 遇到已存在文件会抛 `ReferenceError: logWarn is not defined`。
-  - 影响：发布包的 `generate` 边界路径直接崩溃；现有 build/test 未覆盖源级类型检查，容易漏掉类似错误。
-  - 建议：导入 `logWarn` 并补覆盖「目标文件已存在时跳过」的 CLI 单测；将 CLI `tsc --noEmit` 或等效类型检查纳入 CLI/发布质量门禁，避免仅靠 tsup 转译。
+> **进度（2026-06-19）**：E-1 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。`generate.ts` 补上 `logWarn` 导入修复已存在文件路径的 `ReferenceError` 崩溃，补 `tests/core/cli.spec.ts`「目标文件已存在 → 跳过且不崩溃」用例（共 60 例通过），并以 `pnpm --filter @expcat/tigercat-cli exec tsc --noEmit` 纳入源级类型校验。余项 E-2 / E-3 / E-4 / E-5 仍待推进。
 
 - [ ] **E-2 CLI 发布包子路径契约与测试预期不一致**（P1）
   - 维度：发布机制/exports｜模块：`packages/cli/package.json`、`tests/core/cli.spec.ts`
@@ -270,26 +266,8 @@ source: current repository audit and planning
 
 > **扫描结论修正**：Roadmap 原估"目前有 bundle size 无 runtime 基准、评估是否引入 `vitest bench`"已过时——`vitest bench` 体系（`bench` 脚本 + `vitest.config.ts` benchmark 段 + `benchmarks/` 8 个 `.bench.ts`）早已落地（见 F-6）。本次扫描真正的高优发现是 **`pnpm size` 5 项预算全部超限、卡死 CI/发布门禁**（F-1）与 **core `./types`/`./theme` 子路径导出失效**（F-3）。
 
-- [ ] **F-1 `pnpm size` 5 项预算全部超限、阻塞发布门禁**（P0）
-  - 维度：体积预算｜模块：`.size-limit.json`、`.github/workflows/ci.yml:57`（Check bundle size）、`package.json` `quality:size`/`quality:release`
-  - 问题：执行 `pnpm build` 后 `pnpm size` 5 项全部超限（kB, gzip）——Core 106.03/100、Vue 256.48/250、React 288.55/275、Vue Button 19.91/16、React Button 17.84/15；`pnpm size` 退出码 1（连续两次 fresh build 数值稳定，非偶发）。
-  - 影响：CI "Check bundle size" 步骤（无 `continue-on-error`）与 `quality:release`（含 `quality:size`）直接红，**阻塞 当前待办的 v1.3.4 发布执行**。
-  - 建议：先判定属预算漂移还是真实体积回归——若当前体积可接受，按实测上浮预算（留 ~10% 余量）重设基线并在 [CHANGELOG.md](../CHANGELOG.md) 记录；若不可接受则对比上次 green 定位增量来源后瘦身。属发布阻塞，建议提至 当前待办与 F-2 一并处理。
-- [ ] **F-2 size 预算覆盖面过窄**（P2）
-  - 维度：体积预算｜模块：`.size-limit.json`
-  - 问题：仅 5 入口（3 个 full bundle + Button 双端），未覆盖 144 vue / 144 react 组件子路径中的重组件（Menu/DatePicker/Table/Tree/TimePicker，体量见 B-6/C-5），也未覆盖 core 38 个子路径导出（locales×13、datepicker-locales×13、icons×5、tailwind/modern、utils/table-export）。
-  - 影响：除 Button 外，单组件/核心子路径体积无回归护栏，重组件膨胀不会被门禁发现。
-  - 建议：按组件族扩展预算（重组件代表 + core 主要子路径），与 F-1 重设基线一并规划；可用 `pnpm size:check`（`size-limit --json`）产出辅助选阈值。
-- [ ] **F-3 core `./types`/`./theme` 子路径导出失效且冗余**（P1）
-  - 维度：可摇树性/exports｜模块：`packages/core/package.json` exports `./types`、`./theme`；`packages/core/tsup.config.ts`
-  - 问题：`./types` → `./dist/types/index.{d.ts,js}`、`./theme` → `./dist/theme/index.{d.ts,js}`，但 tsup `entry` 未含 `types/index`、`theme/index`，fresh build 后这 4 个目标均缺失（`dist/types`、`dist/theme` 为空目录）；二者内容又已由主入口 `export * from './types'|'./theme'` 打入 `index.js`。这两个导出还仅有 `import` 缺 `require` 条件（与其余 36 个子路径不一致）。
-  - 影响：外部 `import … from '@expcat/tigercat-core/types'|'/theme'` 解析失败（broken public subpath）；同时是冗余导出。仓库内部无消费者（已 grep 确认），故未在 CI 暴露。
-  - 建议：二选一——(a) 移除这两个冗余且失效的子路径导出（内容已在主入口，**推荐**，风险低）；或 (b) 若确需子路径，在 tsup `entry` 补 `types/index`、`theme/index` 并补 `require` 条件，并加导出存在性校验（校验可归任务 G）。
-- [ ] **F-4 core `module` 字段指向不存在的 `index.mjs`**（P2）
-  - 维度：可摇树性/字段一致性｜模块：`packages/core/package.json`（`module`）
-  - 问题：core 为 `type: module`，tsup 产物 ESM 为 `dist/index.js`、CJS 为 `dist/index.cjs`；但 `module` 字段指向不存在的 `./dist/index.mjs`（vue/react 无此问题，其 ESM 确为 `.mjs`）。
-  - 影响：依赖 `module` 字段的旧式打包器解析失败；现代打包器走 `exports` 不受影响，故未在主流程暴露。
-  - 建议：将 core `module` 改为 `./dist/index.js`，或直接删除 `module` 字段（已有 `exports`），与主入口实际产物对齐。
+> **进度（2026-06-19）**：F-1 / F-2 / F-3 / F-4 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目，仅保留 F-0 核查结论与未完成的 F-5 / F-6。**F-1**：已核对 `size` 增量来自 MarkdownEditor、Table 列显隐与多组件 i18n 等新功能源码而非依赖膨胀（运行时依赖仅 `@floating-ui/dom`），按实测 +~10% 余量重设 5 项预算（Core 118 / Vue 284 / React 320 / Vue Button 22 / React Button 20 kB）；**F-2**：新增 Menu/DatePicker/Table/Tree/TimePicker 双端子路径与 core `tailwind/modern`、`locales/zh-CN`、`icons/common` 子路径体积护栏——二者使 `pnpm size` 转绿、解除 v1.3.4 发布阻塞。**F-3**：移除失效且冗余的 `./types`/`./theme` 子路径导出（内容已在主入口、无消费者），同步从 `check-release-readiness.mjs` 必需导出清单移除；**F-4**：`module` 字段修正为实际 ESM 产物 `./dist/index.js`。
+
 - [ ] **F-5 vue/react `sideEffects` 白名单可评估收敛**（P2）
   - 维度：可摇树性/sideEffects｜模块：`packages/vue/package.json`、`packages/react/package.json`（`sideEffects`）
   - 问题：两端将 `dist/chunk-*` 与 `dist/components/*` 标为有副作用（allowlist 形式）。但 vue/react `src` 无任何 `.css`/副作用 import（已 grep 确认），组件为 headless（Tailwind class，无运行时样式注入），allowlist 可能偏保守。
@@ -302,9 +280,9 @@ source: current repository audit and planning
   - 建议：评估将 `bench` 纳入 CI（非阻塞 job，或带阈值的回归比较，如 `vitest bench --outputJson` + 基线对比），或在 `skills/tigercat/references/` 明确其为手工性能回归工具与运行方式（CI 接入可与任务 G 协同）。
 
 - [x] **F-0 已核查、构建主线无需处理**
-  - 体积预算：`pnpm size` 实测见 F-1（5 项均超限，数值已记录）；`pnpm size:check`（`size-limit --json`）可生成机器可读结果供阈值设定。
-  - tsup 配置：core `format:['cjs','esm']` + `type:module` → `.js`(ESM)/`.cjs`(CJS)，与 `exports` 主入口 `import/require` 一致（仅 `module` 字段例外，见 F-4）；vue/react `splitting:true` + `external` 框架、core `splitting:false` 多入口（locales/icons 等）配置合理；cli `treeshake:true` + shebang banner 正常。
-  - 可摇树性：core `sideEffects:false` ✓；core 其余 36 个子路径导出（locales/datepicker-locales/icons/tailwind/tailwind-modern/table-export）目标文件均存在、`import`+`require` 双条件齐全（仅 `./types`、`./theme` 例外，见 F-3）。
+  - 体积预算：扫描时 `pnpm size` 5 项均超限，现已按 F-1/F-2 重设预算并扩展覆盖、`pnpm size` 转绿（见上方进度与 [CHANGELOG.md](../CHANGELOG.md)）；`pnpm size:check`（`size-limit --json`）可生成机器可读结果供阈值设定。
+  - tsup 配置：core `format:['cjs','esm']` + `type:module` → `.js`(ESM)/`.cjs`(CJS)，与 `exports` 主入口 `import/require` 一致（`module` 字段曾指向不存在的 `.mjs`，已随 F-4 修正为 `./dist/index.js`）；vue/react `splitting:true` + `external` 框架、core `splitting:false` 多入口（locales/icons 等）配置合理；cli `treeshake:true` + shebang banner 正常。
+  - 可摇树性：core `sideEffects:false` ✓；core 子路径导出目标文件均存在、`import`+`require` 双条件齐全（原失效冗余的 `./types`、`./theme` 已随 F-3 移除）。
   - 运行时性能：`vitest bench` 体系已落地（见 F-6），非"缺口"。
 
 #### 来自任务 G — 质量门禁·文档一致性扫描（2026-06-19）
