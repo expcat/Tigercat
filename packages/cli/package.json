@@ -39,7 +39,7 @@
     "clean": "node ../../scripts/rimraf.mjs dist"
   },
   "dependencies": {
-    "commander": "^13.1.0",
+    "commander": "^15.0.0",
     "picocolors": "^1.1.1",
     "prompts": "^2.4.2"
   },
