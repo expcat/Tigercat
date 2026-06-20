@@ -3,6 +3,7 @@ import {
   findFirstEnabledIndex,
   findLastEnabledIndex,
   findNextEnabledIndex,
+  getCyclicIndex,
   getDisclosureStateAttr,
   getInitialPickerActiveIndex,
   getPickerComboboxAria,
@@ -155,6 +156,29 @@ describe('picker-utils', () => {
       expect(getPickerTriggerKeyAction('ArrowDown', true)).toBe('none')
       expect(getPickerTriggerKeyAction('Escape', true)).toBe('close')
       expect(getPickerTriggerKeyAction('Escape', false)).toBe('none')
+    })
+  })
+
+  describe('getCyclicIndex', () => {
+    it('advances and wraps around the end', () => {
+      expect(getCyclicIndex(3, 0, 1)).toBe(1)
+      expect(getCyclicIndex(3, 1, 1)).toBe(2)
+      expect(getCyclicIndex(3, 2, 1)).toBe(0)
+    })
+
+    it('retreats and wraps around the start', () => {
+      expect(getCyclicIndex(3, 2, -1)).toBe(1)
+      expect(getCyclicIndex(3, 0, -1)).toBe(2)
+    })
+
+    it('treats an uninitialized index as before the first item', () => {
+      expect(getCyclicIndex(3, -1, 1)).toBe(0)
+      expect(getCyclicIndex(3, -1, -1)).toBe(1)
+    })
+
+    it('returns -1 for an empty list', () => {
+      expect(getCyclicIndex(0, 0, 1)).toBe(-1)
+      expect(getCyclicIndex(0, 0, -1)).toBe(-1)
     })
   })
 })

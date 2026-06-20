@@ -6,7 +6,8 @@ import {
   mentionsDropdownClasses,
   getMentionsOptionClasses,
   extractMentionQuery,
-  positionMentionsDropdown
+  positionMentionsDropdown,
+  getCyclicIndex
 } from '@expcat/tigercat-core'
 
 export interface MentionsProps {
@@ -86,10 +87,10 @@ export const Mentions: React.FC<MentionsProps> = ({
       if (!isOpen) return
       if (e.key === 'ArrowDown') {
         e.preventDefault()
-        setActiveIndex((prev) => (prev + 1) % filteredOptions.length)
+        setActiveIndex((prev) => getCyclicIndex(filteredOptions.length, prev, 1))
       } else if (e.key === 'ArrowUp') {
         e.preventDefault()
-        setActiveIndex((prev) => (prev - 1 + filteredOptions.length) % filteredOptions.length)
+        setActiveIndex((prev) => getCyclicIndex(filteredOptions.length, prev, -1))
       } else if (e.key === 'Enter') {
         e.preventDefault()
         const opt = filteredOptions[activeIndex]

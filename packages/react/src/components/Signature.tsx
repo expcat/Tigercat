@@ -43,6 +43,7 @@ export interface SignatureProps
   onChange?: (payload: SignatureChangePayload) => void
   onBegin?: () => void
   onEnd?: (payload: SignatureChangePayload) => void
+  onClear?: () => void
 }
 
 const DEFAULT_WIDTH = 480
@@ -68,6 +69,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       onChange,
       onBegin,
       onEnd,
+      onClear,
       style,
       ...rest
     },
@@ -157,7 +159,8 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       setStrokes([])
       draw([])
       emitChange([])
-    }, [draw, emitChange])
+      onClear?.()
+    }, [draw, emitChange, onClear])
 
     useImperativeHandle(
       ref,

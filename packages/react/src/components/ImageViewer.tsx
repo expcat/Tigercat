@@ -37,7 +37,7 @@ export interface ImageViewerProps {
   className?: string
   onOpenChange?: (open: boolean) => void
   onClose?: () => void
-  onIndexChange?: (index: number) => void
+  onCurrentIndexChange?: (index: number) => void
 }
 
 function SvgIcon({ pathD, label }: { pathD: string; label: string }) {
@@ -70,7 +70,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   className,
   onOpenChange,
   onClose,
-  onIndexChange
+  onCurrentIndexChange
 }) => {
   const [index, setIndex] = useState(currentIndex)
   const [transform, setTransform] = useState<GestureTransform>(createDefaultTransform)
@@ -96,15 +96,15 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
     const newIndex = (index - 1 + images.length) % images.length
     setIndex(newIndex)
     resetTransform()
-    onIndexChange?.(newIndex)
-  }, [index, images.length, onIndexChange, resetTransform])
+    onCurrentIndexChange?.(newIndex)
+  }, [index, images.length, onCurrentIndexChange, resetTransform])
 
   const handleNext = useCallback(() => {
     const newIndex = (index + 1) % images.length
     setIndex(newIndex)
     resetTransform()
-    onIndexChange?.(newIndex)
-  }, [index, images.length, onIndexChange, resetTransform])
+    onCurrentIndexChange?.(newIndex)
+  }, [index, images.length, onCurrentIndexChange, resetTransform])
 
   useEffect(() => {
     if (!open) return

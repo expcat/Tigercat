@@ -83,6 +83,21 @@ export function findNextEnabledIndex<T>(
   return current
 }
 
+/**
+ * Cyclic (wrap-around) index navigation for a flat list, e.g. the Mentions
+ * suggestion dropdown where ArrowDown past the last item returns to the first.
+ *
+ * Unlike {@link findNextEnabledIndex} (which clamps and stays at the ends),
+ * this wraps around and does not skip disabled items — the caller is expected
+ * to pass an already-filtered list.
+ *
+ * @returns the wrapped index, or -1 when the list is empty.
+ */
+export function getCyclicIndex(length: number, current: number, direction: 1 | -1): number {
+  if (length <= 0) return -1
+  return (current + direction + length) % length
+}
+
 export function getInitialPickerActiveIndex<T>(
   items: readonly T[],
   activeFirst: boolean,

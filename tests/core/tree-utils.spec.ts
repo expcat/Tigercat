@@ -8,12 +8,15 @@ import {
   getAutoExpandKeys,
   getCheckedKeysByStrategy,
   getDescendantKeys,
+  getFirstVisibleChildKey,
   getLeafKeys,
   getParentKeys,
+  getTreeKeyboardAction,
   getTreeNodeClasses,
   getTreeNodeExpandIconClasses,
   getVisibleTreeItems,
   handleNodeCheck,
+  type TreeKeyboardContext,
   treeBaseClasses,
   treeEmptyStateClasses,
   treeLineClasses,
@@ -222,5 +225,233 @@ describe('tree-utils filtering', () => {
       'root',
       'child-b'
     ])
+  })
+})
+
+describe('getFirstVisibleChildKey', () => {
+  const expanded = new Set<string | number>(['root', 'child-b'])
+  const visible = getVisibleTreeItems(treeData, expanded)
+
+  it('returns the first visible child of an expanded node', () => {
+    expect(getFirstVisibleChildKey(visible, 'root')).toBe('child-a')
+    expect(getFirstVisibleChildKey(visible, 'child-b')).toBe('leaf-b1')
+  })
+
+  it('returns undefined for leaves and unknown keys', () => {
+    expect(getFirstVisibleChildKey(visible, 'child-a')).toBeUndefined()
+    expect(getFirstVisibleChildKey(visible, 'leaf-b2')).toBeUndefined()
+    expect(getFirstVisibleChildKey(visible, 'missing')).toBeUndefined()
+  })
+
+  it('skips disabled children', () => {
+    const data: TreeNode[] = [
+      {
+        key: 'p',
+        label: 'P',
+        children: [
+          { key: 'c1', label: 'C1', disabled: true },
+          { key: 'c2', label: 'C2' }
+        ]
+      }
+    ]
+    const items = getVisibleTreeItems(data, new Set(['p']))
+    expect(getFirstVisibleChildKey(items, 'p')).toBe('c2')
+  })
+})
+
+describe('getTreeKeyboardAction', () => {
+  // Expanded tree, disabled `standalone` excluded from the focus ring.
+  const focusableKeys: (string | number)[] = ['root', 'child-a', 'child-b', 'leaf-b1', 'leaf-b2']
+
+  const makeCtx = (overrides: Partial<TreeKeyboardContext>): TreeKeyboardContext => ({
+    key: 'ArrowDown',
+    nodeKey: 'root',
+    currentKey: 'root',
+    focusableKeys,
+    parentKey: undefined,
+    firstChildKey: undefined,
+    isExpandable: false,
+    isExpanded: false,
+    isParentExpanded: false,
+    isChecked: false,
+    selectable: false,
+    checkable: false,
+    ...overrides
+  })
+
+  it('returns null for keys the tree does not handle', () => {
+    expect(getTreeKeyboardAction(makeCtx({ key: 'a' }))).toBeNull()
+    expect(getTreeKeyboardAction(makeCtx({ key: 'Tab' }))).toBeNull()
+  })
+
+  describe('linear navigation', () => {
+    it('moves down and up within the focus ring', () => {
+      expect(getTreeKeyboardAction(makeCtx({ key: 'ArrowDown', currentKey: 'root' }))).toEqual({
+        type: 'focus',
+        key: 'child-a'
+      })
+      expect(getTreeKeyboardAction(makeCtx({ key: 'ArrowUp', currentKey: 'child-a' }))).toEqual({
+        type: 'focus',
+        key: 'root'
+      })
+    })
+
+    it('stays on the current key at the boundaries', () => {
+      expect(getTreeKeyboardAction(makeCtx({ key: 'ArrowUp', currentKey: 'root' }))).toEqual({
+        type: 'focus',
+        key: 'root'
+      })
+      expect(getTreeKeyboardAction(makeCtx({ key: 'ArrowDown', currentKey: 'leaf-b2' }))).toEqual({
+        type: 'focus',
+        key: 'leaf-b2'
+      })
+    })
+
+    it('jumps to the first/last focusable key', () => {
+      expect(getTreeKeyboardAction(makeCtx({ key: 'Home', currentKey: 'leaf-b2' }))).toEqual({
+        type: 'focus',
+        key: 'root'
+      })
+      expect(getTreeKeyboardAction(makeCtx({ key: 'End', currentKey: 'root' }))).toEqual({
+        type: 'focus',
+        key: 'leaf-b2'
+      })
+    })
+  })
+
+  describe('ArrowRight', () => {
+    it('expands a collapsed expandable node', () => {
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({ key: 'ArrowRight', nodeKey: 'child-b', isExpandable: true, isExpanded: false })
+        )
+      ).toEqual({ type: 'toggleExpand', key: 'child-b' })
+    })
+
+    it('focuses the first child of an expanded node', () => {
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({
+            key: 'ArrowRight',
+            nodeKey: 'child-b',
+            currentKey: 'child-b',
+            isExpandable: true,
+            isExpanded: true,
+            firstChildKey: 'leaf-b1'
+          })
+        )
+      ).toEqual({ type: 'focus', key: 'leaf-b1' })
+    })
+
+    it('is a no-op on a leaf', () => {
+      expect(getTreeKeyboardAction(makeCtx({ key: 'ArrowRight', nodeKey: 'leaf-b1' }))).toEqual({
+        type: 'none'
+      })
+    })
+  })
+
+  describe('ArrowLeft', () => {
+    it('collapses an expanded expandable node', () => {
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({ key: 'ArrowLeft', nodeKey: 'child-b', isExpandable: true, isExpanded: true })
+        )
+      ).toEqual({ type: 'toggleExpand', key: 'child-b' })
+    })
+
+    it('focuses the parent of a leaf', () => {
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({
+            key: 'ArrowLeft',
+            nodeKey: 'leaf-b1',
+            currentKey: 'leaf-b1',
+            parentKey: 'child-b'
+          })
+        )
+      ).toEqual({ type: 'focus', key: 'child-b' })
+    })
+
+    it('stays on the current key when there is no parent', () => {
+      expect(
+        getTreeKeyboardAction(makeCtx({ key: 'ArrowLeft', nodeKey: 'root', currentKey: 'root' }))
+      ).toEqual({ type: 'focus', key: 'root' })
+    })
+  })
+
+  describe('Escape', () => {
+    it('collapses an expanded expandable node', () => {
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({ key: 'Escape', nodeKey: 'child-b', isExpandable: true, isExpanded: true })
+        )
+      ).toEqual({ type: 'toggleExpand', key: 'child-b' })
+    })
+
+    it('collapses and focuses an expanded parent from a leaf', () => {
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({
+            key: 'Escape',
+            nodeKey: 'leaf-b1',
+            parentKey: 'child-b',
+            isParentExpanded: true
+          })
+        )
+      ).toEqual({ type: 'collapseAndFocus', collapseKey: 'child-b', focusKey: 'child-b' })
+    })
+
+    it('only focuses the parent when it is already collapsed', () => {
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({
+            key: 'Escape',
+            nodeKey: 'leaf-b1',
+            parentKey: 'child-b',
+            isParentExpanded: false
+          })
+        )
+      ).toEqual({ type: 'collapseAndFocus', collapseKey: undefined, focusKey: 'child-b' })
+    })
+
+    it('is a no-op on a root leaf', () => {
+      expect(getTreeKeyboardAction(makeCtx({ key: 'Escape', nodeKey: 'root' }))).toEqual({
+        type: 'none'
+      })
+    })
+  })
+
+  describe('Enter and Space', () => {
+    it('selects on Enter when selectable', () => {
+      expect(
+        getTreeKeyboardAction(makeCtx({ key: 'Enter', nodeKey: 'child-a', selectable: true }))
+      ).toEqual({ type: 'select', key: 'child-a' })
+    })
+
+    it('toggles expand on Enter when not selectable but expandable', () => {
+      expect(
+        getTreeKeyboardAction(makeCtx({ key: 'Enter', nodeKey: 'child-b', isExpandable: true }))
+      ).toEqual({ type: 'toggleExpand', key: 'child-b' })
+    })
+
+    it('is a no-op on Enter for a non-selectable leaf', () => {
+      expect(getTreeKeyboardAction(makeCtx({ key: 'Enter', nodeKey: 'leaf-b1' }))).toEqual({
+        type: 'none'
+      })
+    })
+
+    it('checks on Space when checkable', () => {
+      expect(
+        getTreeKeyboardAction(
+          makeCtx({ key: ' ', nodeKey: 'child-a', checkable: true, isChecked: false })
+        )
+      ).toEqual({ type: 'check', key: 'child-a', checked: true })
+    })
+
+    it('toggles expand on Space when not checkable but expandable', () => {
+      expect(
+        getTreeKeyboardAction(makeCtx({ key: ' ', nodeKey: 'child-b', isExpandable: true }))
+      ).toEqual({ type: 'toggleExpand', key: 'child-b' })
+    })
   })
 })

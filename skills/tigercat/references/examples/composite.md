@@ -94,10 +94,7 @@ React `filtersExtra` age range:
             value={ageRange.min ?? ''}
             placeholder="最小"
             onChange={(event) =>
-              setFilter('ageRange', {
-                ...ageRange,
-                min: event.currentTarget.value
-              })
+              setFilter('ageRange', { ...ageRange, min: event.currentTarget.value })
             }
           />
           <span>-</span>
@@ -105,10 +102,7 @@ React `filtersExtra` age range:
             value={ageRange.max ?? ''}
             placeholder="最大"
             onChange={(event) =>
-              setFilter('ageRange', {
-                ...ageRange,
-                max: event.currentTarget.value
-              })
+              setFilter('ageRange', { ...ageRange, max: event.currentTarget.value })
             }
           />
         </div>

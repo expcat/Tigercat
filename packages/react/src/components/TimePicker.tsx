@@ -34,6 +34,7 @@ import {
   getTimePickerPeriodButtonClasses,
   timePickerFooterClasses,
   timePickerFooterButtonClasses,
+  focusTimePickerOption,
   ClockIconPath,
   TimePickerCloseIconPath,
   type TimePickerRangeValue as CoreTimePickerRangeValue,
@@ -260,29 +261,7 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
     unit: 'hour' | 'minute' | 'second' | 'period',
     action: 'prev' | 'next' | 'first' | 'last'
   ) => {
-    const panel = panelRef.current
-    if (!panel) return
-
-    const nodes = Array.from(
-      panel.querySelectorAll<HTMLButtonElement>(`button[data-tiger-timepicker-unit="${unit}"]`)
-    ).filter((button) => !button.disabled)
-
-    if (nodes.length === 0) return
-
-    const active = document.activeElement as HTMLButtonElement | null
-    const activeIndex = active ? nodes.indexOf(active) : -1
-    const selectedIndex = nodes.findIndex(
-      (button) => button.getAttribute('aria-selected') === 'true'
-    )
-    const baseIndex = activeIndex >= 0 ? activeIndex : Math.max(0, selectedIndex)
-
-    let nextIndex = baseIndex
-    if (action === 'prev') nextIndex = Math.max(0, baseIndex - 1)
-    if (action === 'next') nextIndex = Math.min(nodes.length - 1, baseIndex + 1)
-    if (action === 'first') nextIndex = 0
-    if (action === 'last') nextIndex = nodes.length - 1
-
-    nodes[nextIndex]?.focus()
+    focusTimePickerOption(panelRef.current, unit, action)
   }
 
   const handlePanelKeyDown = (event: React.KeyboardEvent) => {

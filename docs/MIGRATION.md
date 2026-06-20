@@ -4,6 +4,41 @@
 
 ## Unreleased（v1.2.41）
 
+### 跨端 API 对称：受控量 / 事件回调统一命名
+
+为消除受控量与事件回调的双端命名/对称不一致，以下三处做了破坏性改名。准则：受控 prop `X` → Vue `update:X`（可 `v-model:x`）/ React `on<X>Change`。
+
+**ImageViewer（React）**：索引变更回调与受控 prop `currentIndex` 对齐。
+
+```diff
+- <ImageViewer images={images} currentIndex={i} onIndexChange={setI} />
++ <ImageViewer images={images} currentIndex={i} onCurrentIndexChange={setI} />
+```
+
+**CommentThread（Vue）**：展开事件改为受控量 `update:expandedKeys`，可直接 `v-model`。
+
+```diff
+- <CommentThread :nodes="nodes" :expanded-keys="keys" @expand-change="keys = $event" />
++ <CommentThread :nodes="nodes" v-model:expanded-keys="keys" />
+```
+
+```diff
+  <!-- 或显式监听 -->
+- <CommentThread :nodes="nodes" @expand-change="onChange" />
++ <CommentThread :nodes="nodes" @update:expanded-keys="onChange" />
+```
+
+> React 端回调名保持不变（`onExpandedChange`）。
+
+**Spotlight（Vue）**：移除冗余的 `close` 事件，统一用 `open-change`（`open-change(false)` 即关闭）。
+
+```diff
+- <Spotlight :items="items" @close="onClose" />
++ <Spotlight :items="items" @open-change="(open) => { if (!open) onClose() }" />
+```
+
+> 仍支持 `v-model:open`，关闭时会发 `update:open(false)` 与 `open-change(false)`。
+
 ### 移除废弃别名 `kanbanAddCardClasses`
 
 core 移除了废弃别名 `kanbanAddCardClasses`。它自 v0.9.0 起仅是 `taskBoardAddCardClasses` 的向后兼容别名，现已删除。请直接使用 `taskBoardAddCardClasses`：

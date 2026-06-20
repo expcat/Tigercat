@@ -246,6 +246,78 @@ for (const compName of componentsWithOpen) {
   }
 }
 
+// ----- Controlled-prop parity audit (受控量双端对称) -----
+//
+// 把上面的 open overlay 规则推广为一张「受控量 parity 表」。对登记的受控量 X：
+//   Vue   → emits 含 `update:X`（可 v-model:X）
+//   React → 存在 `on<Prop>Change` 回调（默认按 prop 名派生，可按条目覆盖）
+//
+// 命名按 prop 名派生，因此 onIndexChange / onHiddenColumnsChange 这类与受控
+// prop 名不一致的回调会被自动发现。注意：不做全自动派生——Vue `update:modelValue`
+// ↔ React `value`+`onChange`、React 主 `onChange`、以及 `x-change` 普通事件等
+// 框架惯用差异会产生大量误报；故采用「显式登记 + 白名单」，可随新增受控组件扩充。
+//
+// 组件实现可能拆分到 `<Comp>/` 子目录（如 Table），故读取主文件 + 同名子目录。
+
+const CONTROLLED_PARITY = [
+  { prop: 'currentIndex', components: ['ImageViewer'] },
+  // React 端历史回调名为 onExpandedChange（非派生的 onExpandedKeysChange），显式登记。
+  { prop: 'expandedKeys', components: ['CommentThread'], reactCallback: 'onExpandedChange' },
+  { prop: 'query', components: ['Spotlight'] },
+  { prop: 'hiddenColumnKeys', components: ['Table', 'DataTableWithToolbar'] }
+]
+
+// 有意的非对称：登记 `Component:prop`（含理由）后跳过该项校验。
+const PARITY_WHITELIST = new Set([])
+
+function capitalize(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1)
+}
+
+// 读取组件源码：主文件 + 同名子目录下的所有 ts/tsx（兼容拆分组件）。
+function readComponentSource(baseDir, compName, ext) {
+  let content = ''
+  const mainFile = join(baseDir, `${compName}${ext}`)
+  if (existsSync(mainFile)) content += readFileSync(mainFile, 'utf-8')
+  const subDir = join(baseDir, compName)
+  if (existsSync(subDir) && statSync(subDir).isDirectory()) {
+    for (const file of collectFiles(subDir, ['.ts', '.tsx'])) {
+      content += `\n${readFileSync(file, 'utf-8')}`
+    }
+  }
+  return content
+}
+
+for (const entry of CONTROLLED_PARITY) {
+  const { prop, components } = entry
+  const vueEvent = entry.vueEvent ?? `update:${prop}`
+  const reactCallback = entry.reactCallback ?? `on${capitalize(prop)}Change`
+
+  for (const compName of components) {
+    if (PARITY_WHITELIST.has(`${compName}:${prop}`)) continue
+
+    const vueSource = readComponentSource(VUE_COMPONENTS_DIR, compName, '.ts')
+    if (vueSource && !vueSource.includes(`'${vueEvent}'`) && !vueSource.includes(`"${vueEvent}"`)) {
+      addIssue(
+        `${compName}.ts`,
+        0,
+        'controlled-parity',
+        `Vue 组件 "${compName}" 的受控量 "${prop}" 缺少 ${vueEvent} 事件（无法 v-model:${prop}）`
+      )
+    }
+
+    const reactSource = readComponentSource(REACT_COMPONENTS_DIR, compName, '.tsx')
+    if (reactSource && !new RegExp(`\\b${reactCallback}\\b`).test(reactSource)) {
+      addIssue(
+        `${compName}.tsx`,
+        0,
+        'controlled-parity',
+        `React 组件 "${compName}" 的受控量 "${prop}" 缺少 ${reactCallback} 回调（应与 update:${prop} 对称）`
+      )
+    }
+  }
+}
+
 // ----- Deprecated API usage in Examples -----
 
 /**
@@ -673,6 +745,7 @@ if (jsonMode) {
       'missing-react': '缺失 React 实现',
       'missing-vue': '缺失 Vue 实现',
       'overlay-api': '弹出层 API 一致性',
+      'controlled-parity': '受控量双端对称',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',
       'docs-api': 'LLM 文档与公开 API 覆盖'
     }

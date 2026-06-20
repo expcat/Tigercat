@@ -3,6 +3,7 @@ import {
   createSubmenuHeightTransitionController,
   filterMenuItems,
   getMenuClasses,
+  getMenuNavigationKeys,
   getInitialSubmenuHeightTransitionStyle,
   matchesMenuSearch,
   menuCollapsedIconClasses,
@@ -191,5 +192,32 @@ describe('menu-utils classes', () => {
     expect(menuCollapsedIconClasses).toContain('flex-shrink-0')
     expect(menuCollapsedIconClasses).not.toContain('mr-2')
     expect(menuItemIconClasses).toContain('mr-2')
+  })
+})
+
+describe('getMenuNavigationKeys', () => {
+  it('uses horizontal arrows for a horizontal root menu', () => {
+    expect(getMenuNavigationKeys('horizontal', true)).toEqual({
+      nextKey: 'ArrowRight',
+      prevKey: 'ArrowLeft'
+    })
+  })
+
+  it('uses vertical arrows for vertical and inline roots', () => {
+    expect(getMenuNavigationKeys('vertical', true)).toEqual({
+      nextKey: 'ArrowDown',
+      prevKey: 'ArrowUp'
+    })
+    expect(getMenuNavigationKeys('inline', true)).toEqual({
+      nextKey: 'ArrowDown',
+      prevKey: 'ArrowUp'
+    })
+  })
+
+  it('uses vertical arrows for non-root menus regardless of mode', () => {
+    expect(getMenuNavigationKeys('horizontal', false)).toEqual({
+      nextKey: 'ArrowDown',
+      prevKey: 'ArrowUp'
+    })
   })
 })

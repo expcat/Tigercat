@@ -6,7 +6,7 @@
 
 ### Added
 
-- **Table** 新增列显隐控制：`hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控），React 端提供 `onHiddenColumnsChange` 回调，Vue 端支持 `v-model:hidden-column-keys` 与 `hidden-columns-change` 事件；`TableColumn` 新增 `hideable`（默认 `true`，`false` 时列设置面板中不可隐藏）。固定列偏移、卡片字段、导出与列拖拽均只作用于可见列；隐藏列上已生效的筛选仍会继续过滤数据。
+- **Table** 新增列显隐控制：`hiddenColumnKeys`（受控）/ `defaultHiddenColumnKeys`（非受控），React 端提供 `onHiddenColumnKeysChange` 回调，Vue 端支持 `v-model:hidden-column-keys` 与 `hidden-column-keys-change` 事件；`TableColumn` 新增 `hideable`（默认 `true`，`false` 时列设置面板中不可隐藏）。固定列偏移、卡片字段、导出与列拖拽均只作用于可见列；隐藏列上已生效的筛选仍会继续过滤数据。
 - **DataTableWithToolbar** 工具栏新增列设置入口：`toolbar.showColumnSettings` 开启内置 Popover + Checkbox 面板，`toolbar.columnSettings.lockedColumnKeys` 可锁定不可隐藏的列，面板标题支持 `toolbar.columnSettings.title` 与 locale（`table.columnSettingsText` / `columnSettingsAriaLabel`，13 种语言预设已补齐）。
 - core 新增 `filterHiddenColumns` 工具函数与 `FLOATING_OVERLAY_Z_INDEX`（1000）常量。
 - 新增 **MarkdownEditor** 高级组件：支持 Markdown 编辑、编辑/分屏/预览模式、内置工具栏、快捷键、预览渲染与自定义 renderer 扩展点，并提供 Vue/React 双端实现、示例与测试。
@@ -14,6 +14,7 @@
 - **i18n** 组件内置搜索/加载/关闭/清除文案接入 ConfigProvider locale：`TigerLocaleCommon` 新增 `searchPlaceholder` / `clearText`（en-US / zh-CN 预设已补齐）。Vue `Select` / `Tree` / `TreeSelect` / `Transfer` / `Cascader` / `FileManager` / `VirtualTable` / `QRCode` / `Timeline` / `Loading` / `ImageViewer` / `AutoComplete` 与 React `Select` / `Tree` / `TreeSelect` / `Transfer` / `Cascader` / `FileManager` 不再把 `'Search...'` / `'Loading...'` / `'Close'` / `'Clear'` 硬编码在渲染中，改读 `mergeTigerLocale(ConfigProvider locale, props.locale)` 并新增可选 `locale` prop 作最高优先级覆盖。`<ConfigProvider :locale="zhCN">` 下这些文案自动本地化；未包裹 ConfigProvider 时默认英文渲染不变。
 - **i18n** 空态 / 加载 / 清除等带英文默认值的文案 prop 不再绕过全局 locale：双端 `List` / `Tree` / `TreeSelect` / `Transfer` / `VirtualTable`（`emptyText` / `notFoundText`）、`InfiniteScroll`（`loadingText`）、`Signature`（`clearText`）、`Spotlight`（`placeholder` / `emptyText`）、`Cascader`（`notFoundText`）、`Tour`（`nextText` / `prevText` / `finishText` → `formWizard`）、`NumberKeyboard`（`confirmText` → `common.okText`）与 React `Loading`（aria 回退 → `common.loadingText`）的默认值改为「未传时回退 `mergeTigerLocale(ConfigProvider locale, props.locale)` 的 `common.*` / `formWizard.*`」，显式 prop 仍为最高优先级。`List` / `InfiniteScroll` / `Signature` / `Spotlight` / `Tour` / `NumberKeyboard`（含 React `VirtualTable`）新增可选 `locale` prop（`SignatureProps` / `SpotlightProps` / `TourProps` / `NumberKeyboardProps` 类型新增 `locale` 字段）。`<ConfigProvider :locale="zhCN">` 下空态/加载/清除等默认文案自动本地化；未配置时默认英文渲染不变，无需逐实例传文案。
 - core `date-utils` 新增不可变日期算术 `addDays` / `addMonths` / `addYears`（`addMonths` / `addYears` 按目标月长度裁剪日期，如 1 月 31 日 +1 月 → 2 月 28/29 日），供双端 DatePicker 与后续跨端键盘导航复用。
+- React **Signature** 新增 `onClear` 回调：清除（工具栏按钮或 ref `clear()`）时触发，与 Vue 端 `clear` 事件对齐。
 
 ### Changed
 
@@ -22,10 +23,15 @@
 - **Dropdown 行为变更**：菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），解决表格固定列（sticky）遮挡与 overflow 容器裁剪问题；新增 `portal` prop（默认 `true`），设置 `portal: false` 可恢复原位渲染的旧 DOM 结构。菜单包装层新增 `data-tiger-dropdown-menu` 属性便于查询，依赖原 DOM 层级的样式选择器或测试需要相应调整（详见 [迁移指南](docs/MIGRATION.md)）。
 - core 内部 `src/theme/` 目录重命名为 `src/theme-runtime/`，与命名预设主题目录 `src/themes/`（预设 + `ThemeManager` + modern token）区分；`THEME_CSS_VARS` / `setThemeColors` / `getThemeColor` 及各 `*Classes` 仍经主入口 `@expcat/tigercat-core` 导出，公共 API 与导出符号不变。
 - 双端 **DatePicker** 的内联日期算术下沉到 core：移除各自实现的 `addDays`、手写月/年步进 wraparound，改用 `date-utils` 的 `addDays` / `addMonths`，键盘导航与翻月行为不变。
+- 跨端键盘导航纯逻辑下沉 core（行为不变）：core 新增 `getTreeKeyboardAction` / `getFirstVisibleChildKey`（`tree-utils`）、`getCyclicIndex`（`picker-utils`）、`focusTimePickerOption` / `TimePickerFocusUnit` / `TimePickerFocusAction`（`timepicker-utils`）、`getMenuNavigationKeys`（`menu-utils`）。双端 **Tree** 的键盘动作决策（方向键/Home/End 走查与展开/收起/聚焦父子/选择/勾选语义）、**Mentions** 的环绕（cyclic）列表导航、**TimePicker** 的列内 roving 焦点（query + clamp + focus）、**Menu** 的方向键映射（horizontal root ↔ ArrowLeft/Right）改为调用同一份 core 实现，消除 Vue/React 各自内联的重复键盘逻辑；a11y 键盘行为保持不变，公共组件 API 与 props 不变。
 - 统一 Vue 组件的 SSR 守卫写法：`ConfigProvider` / `Signature` / `ImageAnnotation` 中的内联 `typeof window/document === 'undefined'` 改用 core `isBrowser()`（`ImageAnnotation` 保留 `window.Image` 特性检测）；生命周期/事件作用域内的访问保持原样，无行为变更。
 - 收窄双端组件中冗余 / 脆弱的非空断言（`!`）：去除 `Image` / `QRCode` / `Mentions` / `Alert` 等带默认值 prop 的断言，`Tree` / `CommentThread` / `Menu` 在守卫分支内改用局部 const 收窄 `node.children`，类型更安全，无行为变更。
 
 - **Breaking**：移除废弃别名 `kanbanAddCardClasses`（core）。自 v0.9.0 起它仅作为 `taskBoardAddCardClasses` 的向后兼容别名，现已删除；请改用 `taskBoardAddCardClasses`（详见 [迁移指南](docs/MIGRATION.md)）。
+- **Breaking · 跨端 API 对称**：统一受控量 / 事件回调的双端命名（详见 [迁移指南](docs/MIGRATION.md)）。
+  - **ImageViewer (React)**：`onIndexChange` 重命名为 `onCurrentIndexChange`，与受控 prop `currentIndex` 及 Vue `update:currentIndex` 对齐。
+  - **CommentThread (Vue)**：展开事件由 `expand-change` 改为 `update:expandedKeys`（支持 `v-model:expanded-keys`），与受控 prop `expandedKeys` 及 React `onExpandedChange` 对齐。
+  - **Spotlight (Vue)**：移除冗余的 `close` 事件，统一改用 `open-change`（`open-change(false)` 即关闭），与 React `onOpenChange` 对齐。
 
 ### Fixed
 
@@ -46,6 +52,9 @@
 - 明确 Roadmap、CHANGELOG、脚本文档和 API 文档的职责边界，避免完成历史长期堆回 Roadmap。
 - 清理 Vue 包内 7 个未使用的内部 composable（`usePopup` / `useDateNavigation` / `useDateSelection` / `useTimeSelection` / `useTimePanelKeyboard` / `useSelectOptions` / `useSelectKeyboard`，约 1,529 LOC）及其 barrel `composables/index.ts`：均无组件使用、未从公共入口导出、无测试，属死代码移除；公共 composable `useChartInteraction` / `useFormController` / `useDrag` 不受影响。
 - 收敛 `@expcat/tigercat-core` 包导出与字段一致性：移除失效且冗余的 `./types` / `./theme` 子路径导出（二者目标文件从未由 tsup 产出、内容已由主入口 `@expcat/tigercat-core` 导出且无内部/外部消费者），并将 `module` 字段由不存在的 `./dist/index.mjs` 修正为实际 ESM 产物 `./dist/index.js`；`release:check` 的必需 core 导出清单同步移除上述两项。公共 API 与主入口导出符号不变。
+- 修复 LLM skill references 漂移护栏：`generate-api-docs.mjs` 的 `formatMarkdown` 此前以 prettier 默认配置（`printWidth` 80）格式化，与仓库 `.prettierrc.json`（`printWidth` 100，经 `pnpm format` 应用）不一致，导致生成物与提交版漂移；现改为经 `prettier.resolveConfig` 加载仓库配置，生成物即 prettier-clean 且幂等。CI 漂移闸由仅 `git diff` 校验 `shared/api-summary.md` 单文件扩展为校验整个 `skills/tigercat/references` 目录，覆盖此前可静默漂移的 component-index / props / examples / 双端 index 等生成物；同步重生成此前漂移的 `examples/composite.md`。
+- 修正 `@expcat/tigercat-cli` 发布文件清单：`files` 移除不存在的 `templates` 目录（实际模板为 `src/templates/*.ts`，由 tsup 内联打包进 `dist/index.js`），发布包稳定提供 bin/root 入口（`dist` + `package.json` + `README`）；测试经 Vitest alias 直接 import 源码子路径，属内部测试机制，不构成发布契约。
+- `validate-api.mjs` 新增「受控量双端对称（controlled-parity）」护栏：把原 `open → update:open / onOpenChange` overlay 规则推广为一张显式受控量 parity 表（`currentIndex` / `expandedKeys` / `query` / `hiddenColumnKeys` …），校验 Vue `update:<prop>` 与 React `on<Prop>Change` 成对且命名一致（命名按 prop 名派生，可按条目覆盖并以白名单登记有意非对称），读取主文件 + `<Comp>/` 子目录以兼容拆分组件（如 Table）。不做全自动派生以规避 `modelValue↔onChange`、主 `onChange`、`x-change` 普通事件等框架惯用差异的误报。
 
 ## v1.2.0 — Breaking Changes
 

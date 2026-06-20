@@ -114,30 +114,30 @@ describe('ImageViewer', () => {
       expect(screen.queryAllByLabelText('Previous image')).toHaveLength(0)
     })
 
-    it('calls onIndexChange on next click', async () => {
-      const onIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={0} onIndexChange={onIndexChange} />)
+    it('calls onCurrentIndexChange on next click', async () => {
+      const onCurrentIndexChange = vi.fn()
+      render(<ImageViewer images={images} open currentIndex={0} onCurrentIndexChange={onCurrentIndexChange} />)
       const nextBtn = screen.getAllByLabelText('Next image').find((el) => el.tagName === 'BUTTON')!
       await fireEvent.click(nextBtn)
-      expect(onIndexChange).toHaveBeenCalledWith(1)
+      expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
     })
 
     it('wraps around on next from last image', async () => {
-      const onIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={2} onIndexChange={onIndexChange} />)
+      const onCurrentIndexChange = vi.fn()
+      render(<ImageViewer images={images} open currentIndex={2} onCurrentIndexChange={onCurrentIndexChange} />)
       const nextBtn = screen.getAllByLabelText('Next image').find((el) => el.tagName === 'BUTTON')!
       await fireEvent.click(nextBtn)
-      expect(onIndexChange).toHaveBeenCalledWith(0)
+      expect(onCurrentIndexChange).toHaveBeenCalledWith(0)
     })
 
     it('wraps around on prev from first image', async () => {
-      const onIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={0} onIndexChange={onIndexChange} />)
+      const onCurrentIndexChange = vi.fn()
+      render(<ImageViewer images={images} open currentIndex={0} onCurrentIndexChange={onCurrentIndexChange} />)
       const prevBtn = screen
         .getAllByLabelText('Previous image')
         .find((el) => el.tagName === 'BUTTON')!
       await fireEvent.click(prevBtn)
-      expect(onIndexChange).toHaveBeenCalledWith(2)
+      expect(onCurrentIndexChange).toHaveBeenCalledWith(2)
     })
   })
 
@@ -176,21 +176,21 @@ describe('ImageViewer', () => {
     })
 
     it('navigates on ArrowRight key', async () => {
-      const onIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={0} onIndexChange={onIndexChange} />)
+      const onCurrentIndexChange = vi.fn()
+      render(<ImageViewer images={images} open currentIndex={0} onCurrentIndexChange={onCurrentIndexChange} />)
       await act(() => {
         fireEvent.keyDown(document, { key: 'ArrowRight' })
       })
-      expect(onIndexChange).toHaveBeenCalled()
+      expect(onCurrentIndexChange).toHaveBeenCalled()
     })
 
     it('navigates on ArrowLeft key', async () => {
-      const onIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={1} onIndexChange={onIndexChange} />)
+      const onCurrentIndexChange = vi.fn()
+      render(<ImageViewer images={images} open currentIndex={1} onCurrentIndexChange={onCurrentIndexChange} />)
       await act(() => {
         fireEvent.keyDown(document, { key: 'ArrowLeft' })
       })
-      expect(onIndexChange).toHaveBeenCalled()
+      expect(onCurrentIndexChange).toHaveBeenCalled()
     })
   })
 
@@ -224,10 +224,10 @@ describe('ImageViewer', () => {
     })
 
     it('does not navigate when closed', () => {
-      const onIndexChange = vi.fn()
-      render(<ImageViewer images={images} open={false} onIndexChange={onIndexChange} />)
+      const onCurrentIndexChange = vi.fn()
+      render(<ImageViewer images={images} open={false} onCurrentIndexChange={onCurrentIndexChange} />)
       fireEvent.keyDown(document, { key: 'ArrowRight' })
-      expect(onIndexChange).not.toHaveBeenCalled()
+      expect(onCurrentIndexChange).not.toHaveBeenCalled()
     })
 
     it('zoom in button changes transform', () => {

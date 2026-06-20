@@ -15,6 +15,7 @@ import {
   DEFAULT_TIME_PICKER_LABELS,
   ZH_CN_TIME_PICKER_LABELS
 } from './locale-utils'
+import { findFirstEnabledIndex, findLastEnabledIndex, findNextEnabledIndex } from './picker-utils'
 
 // ============================================================================
 // Icons (re-exports for backward compatibility)
@@ -153,6 +154,62 @@ export function getTimePickerOptionAriaLabel(
   }
 
   return `${formatIntlNumber(value, locale)} ${unitLabel}`
+}
+
+// ============================================================================
+// Keyboard focus
+// ============================================================================
+
+/** A focusable column within the TimePicker panel. */
+export type TimePickerFocusUnit = 'hour' | 'minute' | 'second' | 'period'
+
+/** Roving-focus direction within a TimePicker column. */
+export type TimePickerFocusAction = 'prev' | 'next' | 'first' | 'last'
+
+/**
+ * Move keyboard focus within a TimePicker column. Shared by the Vue and React
+ * TimePicker components so the roving-focus mechanics live in one place
+ * (mirrors `moveFocusInMenu` for menus).
+ *
+ * Focus moves among the enabled `button[data-tiger-timepicker-unit="<unit>"]`
+ * options inside `panel`, starting from the currently focused option (or the
+ * selected one), and clamps at the column ends. SSR-safe: only invoked from
+ * keyboard handlers, and DOM access is scoped to the supplied `panel`.
+ */
+export function focusTimePickerOption(
+  panel: HTMLElement | null,
+  unit: TimePickerFocusUnit,
+  action: TimePickerFocusAction
+): void {
+  if (!panel) return
+
+  const nodes = Array.from(
+    panel.querySelectorAll<HTMLButtonElement>(`button[data-tiger-timepicker-unit="${unit}"]`)
+  ).filter((button) => !button.disabled)
+  if (nodes.length === 0) return
+
+  const active = panel.ownerDocument.activeElement as HTMLButtonElement | null
+  const activeIndex = active ? nodes.indexOf(active) : -1
+  const selectedIndex = nodes.findIndex((button) => button.getAttribute('aria-selected') === 'true')
+  const baseIndex = activeIndex >= 0 ? activeIndex : Math.max(0, selectedIndex)
+
+  let nextIndex = baseIndex
+  switch (action) {
+    case 'prev':
+      nextIndex = findNextEnabledIndex(nodes, baseIndex, -1)
+      break
+    case 'next':
+      nextIndex = findNextEnabledIndex(nodes, baseIndex, 1)
+      break
+    case 'first':
+      nextIndex = findFirstEnabledIndex(nodes)
+      break
+    case 'last':
+      nextIndex = findLastEnabledIndex(nodes)
+      break
+  }
+
+  nodes[nextIndex]?.focus()
 }
 
 // ============================================================================

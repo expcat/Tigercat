@@ -208,10 +208,10 @@ const settingsColumns: TableColumn<UserRow>[] = [
   dataSource={pagedData}
   toolbar={{ showColumnSettings: true }}
   defaultHiddenColumnKeys={['role']}
-  onHiddenColumnsChange={(keys) => console.log('hidden:', keys)}
+  onHiddenColumnKeysChange={(keys) => console.log('hidden:', keys)}
 />
 
-// 受控模式：传 hiddenColumnKeys（配合 onHiddenColumnsChange 更新状态）
+// 受控模式：传 hiddenColumnKeys（配合 onHiddenColumnKeysChange 更新状态）
 // 锁定特定列：toolbar={{ showColumnSettings: true, columnSettings: { lockedColumnKeys: ['name'] } }}`
 
 const columnLockSnippet = `// 钉列 / 锁定列：

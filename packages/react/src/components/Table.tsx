@@ -110,7 +110,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   onSelectionChange,
   onSortChange,
   onFilterChange,
-  onHiddenColumnsChange,
+  onHiddenColumnKeysChange,
   onPageChange,
   onExpandChange,
   onCellChange,
@@ -248,7 +248,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     onSelectionChange,
     onSortChange,
     onFilterChange,
-    onHiddenColumnsChange,
+    onHiddenColumnKeysChange,
     onPageChange,
     onExpandChange: onExpandChange as
       | ((

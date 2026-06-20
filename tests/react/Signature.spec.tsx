@@ -115,6 +115,16 @@ describe('Signature', () => {
     expect(onChange.mock.calls.at(-1)?.[0]).toMatchObject({ empty: true })
   })
 
+  it('calls onClear when cleared via toolbar button', () => {
+    const onClear = vi.fn()
+    render(<Signature onClear={onClear} />)
+    drawSignature(screen.getByRole('img'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear' }))
+
+    expect(onClear).toHaveBeenCalledTimes(1)
+  })
+
   it('clears drawn strokes with Delete', () => {
     const onChange = vi.fn()
     const canvas = render(<Signature onChange={onChange} />).container.querySelector('canvas')!

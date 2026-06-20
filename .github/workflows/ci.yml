@@ -45,7 +45,7 @@ jobs:
         run: pnpm docs:api
 
       - name: Check generated skill references are current
-        run: git diff --exit-code skills/tigercat/references/shared/api-summary.md
+        run: git diff --exit-code skills/tigercat/references
 
       - name: Validate API and LLM docs
         run: pnpm api:validate

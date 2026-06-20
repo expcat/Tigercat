@@ -484,6 +484,22 @@ export function createSubmenuHeightTransitionController(
  * Query all enabled, visible menu-item buttons that are **direct children**
  * of the given menu container (i.e. not inside a nested sub-menu `<ul>`).
  */
+/**
+ * Resolve the next/previous arrow keys for menu navigation. A horizontal root
+ * menu navigates with ArrowLeft/ArrowRight; every other case (vertical/inline
+ * roots and all submenus) navigates with ArrowUp/ArrowDown. Shared by the Vue
+ * and React Menu components so the orientation-to-key mapping lives in one place.
+ */
+export function getMenuNavigationKeys(
+  mode: MenuMode,
+  isRoot: boolean
+): { nextKey: 'ArrowRight' | 'ArrowDown'; prevKey: 'ArrowLeft' | 'ArrowUp' } {
+  const isHorizontalRoot = isRoot && mode === 'horizontal'
+  return isHorizontalRoot
+    ? { nextKey: 'ArrowRight', prevKey: 'ArrowLeft' }
+    : { nextKey: 'ArrowDown', prevKey: 'ArrowUp' }
+}
+
 export function getMenuButtons(container: HTMLElement): HTMLButtonElement[] {
   return Array.from(
     container.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')

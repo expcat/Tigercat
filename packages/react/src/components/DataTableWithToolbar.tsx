@@ -101,7 +101,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   onBulkAction,
   hiddenColumnKeys,
   defaultHiddenColumnKeys,
-  onHiddenColumnsChange,
+  onHiddenColumnKeysChange,
   pagination = false,
   onPageChange,
   onPageSizeChange,
@@ -231,7 +231,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     if (hiddenColumnKeys === undefined) {
       setInternalHiddenKeys(nextHiddenKeys)
     }
-    onHiddenColumnsChange?.(nextHiddenKeys)
+    onHiddenColumnKeysChange?.(nextHiddenKeys)
   }
 
   const handleToggleColumnVisibility = (columnKey: string, visible: boolean) => {

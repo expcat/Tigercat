@@ -247,7 +247,7 @@ export const tableEmits = [
   'sort-change',
   'filter-change',
   'update:hiddenColumnKeys',
-  'hidden-columns-change',
+  'hidden-column-keys-change',
   'page-change',
   'expand-change',
   'cell-change',

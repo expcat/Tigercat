@@ -526,7 +526,7 @@ describe('DataTableWithToolbar (Vue)', () => {
     ]
 
     it('renders the column settings entry and toggles column visibility', async () => {
-      const onHiddenColumnsChange = vi.fn()
+      const onHiddenColumnKeysChange = vi.fn()
       const onUpdateHiddenColumnKeys = vi.fn()
 
       render(DataTableWithToolbar, {
@@ -537,7 +537,7 @@ describe('DataTableWithToolbar (Vue)', () => {
           pagination: false
         },
         attrs: {
-          onHiddenColumnsChange,
+          onHiddenColumnKeysChange,
           'onUpdate:hiddenColumnKeys': onUpdateHiddenColumnKeys
         }
       })
@@ -548,12 +548,12 @@ describe('DataTableWithToolbar (Vue)', () => {
       expect(emailCheckbox).toBeChecked()
 
       await userEvent.click(emailCheckbox)
-      expect(onHiddenColumnsChange).toHaveBeenCalledWith(['email'])
+      expect(onHiddenColumnKeysChange).toHaveBeenCalledWith(['email'])
       expect(onUpdateHiddenColumnKeys).toHaveBeenCalledWith(['email'])
       expect(screen.queryByRole('columnheader', { name: 'Email' })).not.toBeInTheDocument()
 
       await userEvent.click(screen.getByRole('checkbox', { name: 'Email' }))
-      expect(onHiddenColumnsChange).toHaveBeenLastCalledWith([])
+      expect(onHiddenColumnKeysChange).toHaveBeenLastCalledWith([])
       expect(screen.getByRole('columnheader', { name: 'Email' })).toBeInTheDocument()
     })
 
@@ -627,7 +627,7 @@ describe('DataTableWithToolbar (Vue)', () => {
     })
 
     it('keeps internal state untouched in controlled mode and only emits', async () => {
-      const onHiddenColumnsChange = vi.fn()
+      const onHiddenColumnKeysChange = vi.fn()
 
       render(DataTableWithToolbar, {
         props: {
@@ -638,14 +638,14 @@ describe('DataTableWithToolbar (Vue)', () => {
           pagination: false
         },
         attrs: {
-          onHiddenColumnsChange
+          onHiddenColumnKeysChange
         }
       })
 
       await userEvent.click(screen.getByRole('button', { name: 'Column settings' }))
       await userEvent.click(screen.getByRole('checkbox', { name: 'Email' }))
 
-      expect(onHiddenColumnsChange).toHaveBeenCalledWith(['email'])
+      expect(onHiddenColumnKeysChange).toHaveBeenCalledWith(['email'])
       // Controlled: parent did not update the prop, so the column stays visible
       expect(screen.getByRole('columnheader', { name: 'Email' })).toBeInTheDocument()
     })
@@ -744,7 +744,7 @@ describe('DataTableWithToolbar (Vue)', () => {
       const onFiltersChange = vi.fn()
       const onSearchChange = vi.fn()
       const onSearch = vi.fn()
-      const onHiddenColumnsChange = vi.fn()
+      const onHiddenColumnKeysChange = vi.fn()
 
       const { container } = render({
         render() {
@@ -765,7 +765,7 @@ describe('DataTableWithToolbar (Vue)', () => {
               onFiltersChange,
               onSearchChange,
               onSearch,
-              onHiddenColumnsChange
+              onHiddenColumnKeysChange
             },
             {
               toolbar: ({
@@ -817,7 +817,7 @@ describe('DataTableWithToolbar (Vue)', () => {
       expect(onFiltersChange).toHaveBeenCalledWith({ status: 'active' })
 
       await userEvent.click(screen.getByRole('button', { name: '隐藏列' }))
-      expect(onHiddenColumnsChange).toHaveBeenCalledWith(['name'])
+      expect(onHiddenColumnKeysChange).toHaveBeenCalledWith(['name'])
       expect(screen.queryByRole('columnheader', { name: 'Name' })).not.toBeInTheDocument()
     })
   })

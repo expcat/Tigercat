@@ -192,12 +192,10 @@ source: current repository audit and planning
 
 > **扫描结论修正**：Roadmap 原维度清单举例的「类名生成、过滤」在双端早已下沉 core（`get*Classes` / `filter*` / `flatten*`），无需再抽；真正系统性的跨端重复只剩 **键盘导航**（D-1）。`api:validate` / `types:check` 全绿、组件文件一一对应、`open` 三件套全部成立——双端共用 `core/src/types/*.ts` 的 Props 类型使结构性 prop parity 有保证，剩余分歧集中在 **事件/回调命名与对称**（D-3），且现有 validate-api 仅强校验 `open` 一项（D-4）。本任务承接 B-3/B-6/C-4/C-5 标注的「跨端去重/下沉执行归属任务 D」。
 
-- [ ] **D-1 键盘导航逻辑双端各自内联、未下沉 core**（P1）
-  - 维度：重复逻辑下沉｜模块：`Menu`（vue `Menu.ts:533/996/1050`、react `Menu.tsx:348/687/739`）、`Tree`（vue `Tree.ts:738-774`、react `Tree.tsx:598-634`）、`DatePicker`（vue `DatePicker.ts:350` `addDays`、react `DatePicker.tsx:306`）、`TimePicker`（vue `TimePicker.ts:441/447`、react `TimePicker.tsx:305/311`）、`Mentions`（vue `Mentions.ts:81-87`、react `Mentions.tsx:87-95`）
-  - 问题：core 已有 `utils/picker-utils.ts`（`findFirst/Last/NextEnabledIndex` + `getPickerNavigationIndex` + ARIA helper），Select/AutoComplete/Spotlight 已接入证明范式可用；但上述 5 组件均**不** import picker-utils，各自内联实现方向键导航。Tree 仅 flatten（`getVisibleTreeItems`）下沉，导航 index 走查与 ArrowLeft/Right 展开收起语义双端重复；DatePicker/Calendar 的 `addDays`、月/年步进等日期算术 `date-utils` 中**不存在**，双端各写一份；Mentions 取模环绕导航双端各写。
-  - 影响：同一交互算法跨 2 框架 × 5 组件各存一份，键盘行为易在单端被改而漂移（a11y 回归面大）。与 B-6/C-5 同源，是其「跨端下沉执行归属任务 D」的落点。
-  - 建议：分两类下沉到 `core/src/utils/`——(a) 列表型（Menu/Tree/Mentions）复用/扩展 `picker-utils` 的 enabled-index 走查，Tree 的展开收起语义抽 tree 专用 nav helper；(b) DatePicker/TimePicker 的日期/时间算术（`addDays`、月/年步进、时分秒环绕）抽入 `date-utils`/`time-utils`，双端经 hooks/composable 包装共享。属优化、非缺陷。
-  - **前置已交付（2026-06-19，随 B-6）**：`date-utils` 已新增 `addDays`/`addMonths`/`addYears`，双端 DatePicker 的内联 `addDays` 与手写月/年步进已改用之（见 [CHANGELOG.md](../CHANGELOG.md)）。余下 (a) 列表型键盘导航与 TimePicker 时分秒环绕的 composable/hook 跨端包装仍待本任务推进。
+- [x] **D-1 已交付（2026-06-20）**——跨端键盘导航纯逻辑下沉 core，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
+  - 前置（2026-06-19，随 B-6）：`date-utils` 新增 `addDays`/`addMonths`/`addYears`，双端 DatePicker 改用之。
+  - 本次：core 新增 `getTreeKeyboardAction`/`getFirstVisibleChildKey`（`tree-utils`）、`getCyclicIndex`（`picker-utils`，picker 缺的环绕模式）、`focusTimePickerOption`（`timepicker-utils`，DOM roving 焦点，clamp 复用 `findNext/First/LastEnabledIndex`）、`getMenuNavigationKeys`（`menu-utils`）。Tree（决策语义）/Mentions（环绕）/TimePicker（列内焦点）/Menu（方向键映射）双端改调同一份 core 实现。
+  - **实现判断**：(1) 沿用现行**直接调用 core util** 范式（如 Select 消费 picker-utils），**未引入 hooks/composable 包装层**——roadmap 原建议的包装层与实际落地范式不符，遵循后者以减小面；(2) Tree 线性导航**保留自身 `focusableKeys[i±1] ?? current` clamp 语义**而非套用 `getPickerNavigationIndex`——后者 ArrowUp 在 `index=-1` 时从尾部环绕，与 Tree 现状不一致，行为保持优先；(3) Menu 的重型 DOM 导航（`moveFocusInMenu` 等）早已在 core，本次仅补方向键映射，submenu 展开/收起状态机（风险高、价值低）保持双端内联。`pnpm api:validate`/`types:check`/`size` 全绿，双端 Tree/Mentions/TimePicker/Menu 组件 spec 与新增 core 单测全通过。
 
 - [ ] **D-2 命令式 API 与显示/解析 helper 双端重复**（P2）
   - 维度：重复逻辑下沉｜模块：`Message`/`Notification` 的 `getNextInstanceId`+`normalizeOptions`（vue `Message.ts:61/204`、react `Message.tsx:44/291`，Notification 各一份）、`InputNumber` 的 `toDisplayValue`/`parseValue`（vue/react 各一份，react `InputNumber.tsx:85/95`）
@@ -205,22 +203,9 @@ source: current repository audit and planning
   - 影响：纯逻辑重复，归一化规则改动需多处同步、易漂移。
   - 建议：`getNextInstanceId`/`normalizeOptions` 抽入 `message-utils`/`notification-utils`（或共用一个 instance-id 计数器工具）；InputNumber `toDisplayValue`/`parseValue` 评估并入 `input-number-utils`（依赖 precision/formatter props，以参数传入）。低风险。
 
-- [ ] **D-3 受控量与事件回调跨端命名/对称不一致**（P2）
-  - 维度：API parity & 命名 / 受控事件对称｜模块：`ImageViewer`、`CommentThread`、`Spotlight`、`DataTableWithToolbar`、`Signature`
-  - 问题（逐项）：
-    - ImageViewer：双端共用 `currentIndex` prop，Vue 发 `update:currentIndex`（可 `v-model:currentIndex`），React 回调却命名 `onIndexChange`（丢了 current）——应为 `onCurrentIndexChange` 才与 prop 名对齐。
-    - CommentThread：Vue emit `expand-change`，React 回调 `onExpandedChange`（expand vs expanded 时态不一致），应统一。
-    - Spotlight：Vue 同时 emit `open-change` 与冗余 `close`；React 仅 `onOpenChange`（+`onEscape`）。要么 Vue 去掉 `close`，要么 React 补 `onClose`。
-    - DataTableWithToolbar：Vue 暴露专门的 `selection-change` 事件（转发内层 Table 选择）；React 无顶层 `onSelectionChange`，需用户自行接 `tableProps.rowSelection.onChange`——选择 API 不对称。
-    - Signature：Vue emit 专门的 `clear` 事件；React 仅有 ref 上的命令式 `clear()` 与 `onChange`，无 `onClear` prop。
-  - 影响：公共 API 命名/能力跨端不一致，迁移与文档对照成本高；均落在现有 `validate-api` 规则覆盖不到的盲区（见 D-4）。
-  - 建议：以「prop 名 → Vue `update:<prop>` / React `on<Prop>Change`」为准则统一上述命名；补齐缺失回调（Signature `onClear`、DataTableWithToolbar `onSelectionChange`，或文档明确改用嵌套回调）；破坏性改名走 [MIGRATION.md](MIGRATION.md)。属一致性打磨、非缺陷。
-
-- [ ] **D-4 validate-api 的 parity/对称规则覆盖面窄**（P2）
-  - 维度：API parity & 命名｜模块：`scripts/validate-api.mjs`
-  - 问题：现有 overlay 规则只强校验 `open`→`update:open`/`onOpenChange` 一组；对其余受控量（`currentIndex`/`activeKey`/`selectedKeys`/`expandedKeys`/`current`/`query`…）既不校验 Vue `update:X` 与 React 回调是否成对，也不校验两端命名是否一致——D-3 的所有不一致正是从此盲区漏出。
-  - 影响：跨端 API 漂移缺自动护栏，靠人工脚本对照（如本次扫描）才能发现。
-  - 建议：为 validate-api 增补「受控量 parity 表」：从 core Props 提取候选受控 prop，校验 (a) Vue 存在 `update:<prop>`、(b) React 存在 `on<Prop>Change`（或登记的等价回调）、(c) 两端命名一致；以白名单登记有意的非对称（如 Signature/Spotlight）。属任务 G「breaking-change 自动检测」的近邻，可一并规划。
+- [x] **D-3 + D-4 已交付（2026-06-20）**——跨端 API 对称 + validate-api 受控量 parity 护栏，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)，本节不再保留细目，仅记结论。
+  - **D-3**：硬改名 + 迁移指南统一受控量/回调命名——ImageViewer React `onIndexChange`→`onCurrentIndexChange`（破坏）；CommentThread Vue `expand-change`→`update:expandedKeys`（破坏，支持 `v-model:expanded-keys`）；Spotlight Vue 移除冗余 `close`（破坏，统一用 `open-change`）。**修正**：原列的 DataTableWithToolbar「React 缺 `onSelectionChange`」实已由 `TableProps` 继承并转发给内层 Table（含 React 测试 + 示例），无需改；Signature React 新增 `onClear`（增量）。另顺带拉齐未发布的 `hiddenColumnKeys`——React `onHiddenColumnsChange`→`onHiddenColumnKeysChange`、Vue `hidden-columns-change`→`hidden-column-keys-change`（仅改 CHANGELOG `## Unreleased` 措辞，免迁移）。
+  - **D-4**：把 `open` overlay 规则推广为显式「受控量 parity 表 + 白名单」（`currentIndex`/`expandedKeys`/`query`/`hiddenColumnKeys`），校验 Vue `update:<prop>` 与 React `on<Prop>Change` 成对且命名一致，读取主文件 + `<Comp>/` 子目录兼容拆分组件（Table）。**关键判断**：实测「全部 `update:X`↔`onXChange`」朴素配对产生 ~81 处误报（`modelValue↔onChange`、主 `onChange`、`x-change` 普通事件等框架惯用差异），故不做全自动派生，改显式登记、可逐步扩充。`pnpm api:validate` 全绿，并经临时制造不一致自检确认能报出。
 
 - [x] **D-0 已核查、双端基线一致**
   - 基线：`pnpm api:validate` 0 问题、`pnpm types:check` 全部公共 Props 类型已导出；cross-framework 组件文件 Vue↔React 一一对应（无 `missing-vue`/`missing-react`），`open`/`update:open`/`onOpenChange` 三件套全量成立。
@@ -233,11 +218,7 @@ source: current repository audit and planning
 
 > **进度（2026-06-19）**：E-1 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。`generate.ts` 补上 `logWarn` 导入修复已存在文件路径的 `ReferenceError` 崩溃，补 `tests/core/cli.spec.ts`「目标文件已存在 → 跳过且不崩溃」用例（共 60 例通过），并以 `pnpm --filter @expcat/tigercat-cli exec tsc --noEmit` 纳入源级类型校验。余项 E-2 / E-3 / E-4 / E-5 仍待推进。
 
-- [ ] **E-2 CLI 发布包子路径契约与测试预期不一致**（P1）
-  - 维度：发布机制/exports｜模块：`packages/cli/package.json`、`tests/core/cli.spec.ts`
-  - 问题：测试通过 Vitest alias 直接 import `@expcat/tigercat-cli/templates/vue3`、`commands/create`、`utils/fs`、`constants` 等源内子路径；但 CLI package 未声明 `exports`，`pnpm pack` 产物只包含 `dist/index.js`、`dist/index.d.ts`、`package.json`、`README.md`、`LICENSE`。同时 package `files` 列出 `"templates"`，仓库中却无 `packages/cli/templates/` 目录。
-  - 影响：测试环境暗示这些子路径可用，发布包实际只稳定提供 bin/root entry；未来若用户或内部脚本依赖子路径，会在发布后解析失败。`files: ["templates"]` 属过期发布配置，增加维护误导。
-  - 建议：明确 CLI 公共 API 边界。若子路径需要公开，调整 tsup 多入口与 package `exports` 并在 pack smoke 中验证；若仅测试内部逻辑，则改用相对源码 import，并从 `files` 中移除不存在的 `templates`。
+> **进度（2026-06-20）**：E-2 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。判定 CLI 公共 API 边界为 bin/root（CLI 以二进制消费，无需公开深路径），故采用最小修复：`packages/cli/package.json` 的 `files` 移除不存在的 `templates`（实际模板为 `src/templates/*.ts`，经 tsup 内联进 `dist/index.js`）；测试经 Vitest alias 直 import 源码子路径属内部测试机制、不构成发布契约，保持现状。`pack --dry-run` 确认发布包为 `dist` + `package.json` + `README`（4 文件），CLI 60 例单测通过。余项 E-3 / E-4 / E-5 仍待推进。
 
 - [ ] **E-3 `create` / `add` / `playground` 边界输入处理不够明确**（P2）
   - 维度：命令健壮性｜模块：`commands/create.ts`、`commands/add.ts`、`commands/playground.ts`
@@ -289,6 +270,8 @@ source: current repository audit and planning
 
 > **扫描结论修正**：Roadmap 原维度清单把 references 漂移写作"已有 `git diff` 校验"——实测此闸只覆盖 `shared/api-summary.md` 一个文件，是 `generate-api-docs.mjs` 6 类生成物里的 1 类，其余 ~21 个生成文件无任何漂移护栏，且 `examples/composite.md` 当前已漂移（G-4，本任务唯一 P1）。覆盖率门槛、依赖/CVE、breaking-change 三项均为名副其实的空白（G-1/G-2/G-3）。另发现全量质量门禁不绑定任何自动触发或发布路径（G-6，附加项）。
 
+> **进度（2026-06-20）**：G-4（本任务唯一 P1）已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。根因为 `formatMarkdown` 用 prettier 默认 `printWidth` 80 而非仓库 `.prettierrc.json` 的 100——已改为经 `prettier.resolveConfig` 加载仓库配置使生成物即 prettier-clean 且幂等，CI 漂移闸由单文件扩展为整个 `skills/tigercat/references` 目录，并重生成漂移的 `examples/composite.md` 归零。余项 G-1 / G-2 / G-3 / G-5 / G-6 仍待推进（其中 G-3 可复用本次「生成物经仓库 prettier 配置格式化 + 全目录 `git diff`」范式）。
+
 - [ ] **G-1 无覆盖率门禁、无阈值**（P2）
   - 维度：覆盖率门槛｜模块：`vitest.config.ts`、`.github/workflows/ci.yml`、`package.json`（`test:coverage`）
   - 问题：`test:coverage`=`vitest --coverage`，`@vitest/coverage-v8` 已装，`vitest.config.ts` 的 `coverage` 段只配了 `provider`/`reporter`/`exclude`，**无 `thresholds`**；且覆盖率从未进入 `ci.yml`（无覆盖率步骤）、不在任何 `quality:*` 门禁、不在 `release:check`。即覆盖率既无阈值也根本不在门禁里跑。
@@ -306,12 +289,6 @@ source: current repository audit and planning
   - 问题：现有三道闸只做「当下一致性」校验——`validate-api.mjs` 查命名/双端文件配对/overlay `open` 三件套/deprecated 用法/LLM 文档覆盖；`check-public-types.mjs` 仅查每个组件 `Props` 类型**是否被导出**（存在性，不查形状）；`check-release-readiness.mjs` 查版本对齐/必需 exports 存在/文档版本号。**无任何与上一发布版的 API 快照对比**（无 `@microsoft/api-extractor`、无提交的 api report、无 publint/attw），删除导出、删 prop、改 prop/签名类型等真正的 breaking change 不会被自动发现，只能靠人工记得写进 [MIGRATION.md](MIGRATION.md)。
   - 影响：破坏性变更漏标会静默发布；与 D-4（扩展 validate-api 受控量 parity，防双端漂移）互补但层次不同，本项防版本间回归。
   - 建议：引入公共 API 基线——(a) 用 `@microsoft/api-extractor` 为各包产出 `.api.md` 报告并提交，CI `git diff` 校验（与 references 漂移同范式，亦修复 G-4 的可复用模板）；或 (b) 轻量方案：扩展 `check-public-types.mjs` 落盘「导出符号 + prop 列表」快照 JSON，CI 比对缺失/改名报警。与 D-4 的 parity 表一并规划。
-
-- [ ] **G-4 references 漂移闸只覆盖 1/6 生成物且漏 prettier 步骤**（P1）
-  - 维度：references 漂移｜模块：`.github/workflows/ci.yml:48`、`scripts/generate-api-docs.mjs`
-  - 问题：`generate-api-docs.mjs` 实际生成 6 类产物——`shared/api-summary.md`、`component-index.md`、`shared/props/*.md`（9）、`examples/*.md`（9）、`vue/index.md`、`react/index.md`（共 ~21 文件）；但 CI 仅 `git diff --exit-code skills/tigercat/references/shared/api-summary.md` 校验其中 1 个，其余 ~21 个可静默漂移。实测：`git checkout` 干净树后 `pnpm docs:api` 会让 `examples/composite.md` 产生 diff（提交版是 prettier 对齐过的表格，而生成器原始输出对 `composite.md`/`shared/props/basic.md` 并非 prettier-clean）；CI 这条 check 现在没红，仅因 `api-summary.md` 恰好 prettier-stable。
-  - 影响：源类型变更后只重生成 `api-summary.md` 即可过闸，其余生成文档（组件路由表、props、examples、双端 index）可与源脱节而 CI 不报；当前 `composite.md` 已存在（表格 padding 级别的）漂移，证明闸门失效。
-  - 建议：把 drift 校验扩展到整个生成目录并补 prettier 步骤——CI 改为 `pnpm docs:api && pnpm exec prettier --write skills/tigercat/references && git diff --exit-code skills/tigercat/references`（或在 `generate-api-docs.mjs` 末尾内置 prettier 格式化使生成物即 prettier-clean，再 `git diff` 全目录）；顺带把当前 `composite.md` 漂移重生成并提交归零。
 
 - [ ] **G-5 手维护指南时效：performance.md 漏基准、cli.md 表格损坏**（P2）
   - 维度：references 漂移（手维护指南）｜模块：`skills/tigercat/references/performance.md`、`skills/tigercat/references/cli.md`

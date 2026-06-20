@@ -145,7 +145,7 @@ export const Spotlight = defineComponent({
       default: false
     }
   },
-  emits: ['update:open', 'open-change', 'close', 'update:query', 'query-change', 'select'],
+  emits: ['update:open', 'open-change', 'update:query', 'query-change', 'select'],
   setup(props, { emit, attrs, slots }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
@@ -175,7 +175,6 @@ export const Spotlight = defineComponent({
       if (props.open === undefined) uncontrolledOpen.value = nextOpen
       emit('update:open', nextOpen)
       emit('open-change', nextOpen)
-      if (!nextOpen) emit('close')
     }
 
     const setQueryValue = (nextQuery: string) => {

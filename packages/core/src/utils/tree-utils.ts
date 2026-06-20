@@ -38,6 +38,150 @@ export function getVisibleTreeItems(
   return result
 }
 
+export type TreeNodeKey = string | number
+
+/**
+ * Find the first visible, non-disabled child of `parentKey` within a flattened
+ * `getVisibleTreeItems()` list. Mirrors the inline walk previously duplicated in
+ * the Vue and React Tree components (used by ArrowRight on an expanded node).
+ *
+ * @returns the child key, or `undefined` when the parent is absent or has no
+ *   visible enabled child.
+ */
+export function getFirstVisibleChildKey(
+  visibleItems: VisibleTreeItem[],
+  parentKey: TreeNodeKey
+): TreeNodeKey | undefined {
+  const index = visibleItems.findIndex((item) => item.key === parentKey)
+  if (index < 0) return undefined
+
+  const base = visibleItems[index]
+  for (let i = index + 1; i < visibleItems.length; i++) {
+    const item = visibleItems[i]
+    if (item.level <= base.level) break
+    if (item.parentKey === parentKey && !item.node.disabled) return item.key
+  }
+
+  return undefined
+}
+
+/**
+ * Framework-agnostic description of what a Tree keyboard event should do. The
+ * caller maps each variant onto its own state setters / handlers.
+ */
+export type TreeKeyboardAction =
+  | { type: 'none' }
+  | { type: 'focus'; key: TreeNodeKey }
+  | { type: 'toggleExpand'; key: TreeNodeKey }
+  | { type: 'select'; key: TreeNodeKey }
+  | { type: 'check'; key: TreeNodeKey; checked: boolean }
+  | { type: 'collapseAndFocus'; collapseKey: TreeNodeKey | undefined; focusKey: TreeNodeKey }
+
+/**
+ * Inputs needed to resolve a Tree keyboard event into a {@link TreeKeyboardAction}.
+ * The component computes these from its own reactive/derived state.
+ */
+export interface TreeKeyboardContext {
+  /** The pressed key, i.e. `KeyboardEvent.key`. */
+  key: string
+  /** Key of the node receiving the event. */
+  nodeKey: TreeNodeKey
+  /** Currently active/focused key (`activeKey ?? defaultActiveKey ?? nodeKey`). */
+  currentKey: TreeNodeKey
+  /** Visible, non-disabled keys in DOM order (the roving-focus ring). */
+  focusableKeys: readonly TreeNodeKey[]
+  /** Direct parent key, or `undefined` for a root node. */
+  parentKey?: TreeNodeKey
+  /** First visible, non-disabled child of `nodeKey`, or `undefined`. */
+  firstChildKey?: TreeNodeKey
+  /** Whether the node can expand (has children or is lazily loadable). */
+  isExpandable: boolean
+  /** Whether the node is currently expanded. */
+  isExpanded: boolean
+  /** Whether `parentKey` is currently expanded. */
+  isParentExpanded: boolean
+  /** Whether the node is currently checked. */
+  isChecked: boolean
+  /** Whether node selection is enabled. */
+  selectable: boolean
+  /** Whether checkboxes are enabled. */
+  checkable: boolean
+}
+
+/**
+ * Resolve a Tree keyboard event into a framework-agnostic action, so the Vue
+ * and React Tree components share one keyboard-interaction model (the tree
+ * counterpart of {@link getPickerNavigationIndex} for comboboxes).
+ *
+ * Returns `null` for keys the tree does not handle — the caller should neither
+ * `preventDefault` nor act. For every recognised key it returns an action
+ * (possibly `{ type: 'none' }` for recognised no-ops, e.g. ArrowRight on a
+ * leaf), and the caller should `preventDefault` before applying it.
+ *
+ * Linear navigation (Arrow/Home/End) clamps to the ends of `focusableKeys` and
+ * stays on `currentKey` at the boundaries, matching the prior inline behaviour.
+ */
+export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAction | null {
+  const {
+    key,
+    nodeKey,
+    currentKey,
+    focusableKeys,
+    parentKey,
+    firstChildKey,
+    isExpandable,
+    isExpanded,
+    isParentExpanded,
+    isChecked,
+    selectable,
+    checkable
+  } = ctx
+
+  const currentIndex = focusableKeys.findIndex((k) => k === currentKey)
+  const focusAt = (index: number): TreeKeyboardAction => ({
+    type: 'focus',
+    key: focusableKeys[index] ?? currentKey
+  })
+
+  switch (key) {
+    case 'ArrowDown':
+      return focusAt(currentIndex + 1)
+    case 'ArrowUp':
+      return focusAt(currentIndex - 1)
+    case 'Home':
+      return focusAt(0)
+    case 'End':
+      return focusAt(focusableKeys.length - 1)
+    case 'ArrowRight':
+      if (isExpandable && !isExpanded) return { type: 'toggleExpand', key: nodeKey }
+      if (isExpandable && isExpanded) return { type: 'focus', key: firstChildKey ?? currentKey }
+      return { type: 'none' }
+    case 'ArrowLeft':
+      if (isExpandable && isExpanded) return { type: 'toggleExpand', key: nodeKey }
+      return { type: 'focus', key: parentKey ?? currentKey }
+    case 'Escape':
+      if (isExpandable && isExpanded) return { type: 'toggleExpand', key: nodeKey }
+      if (parentKey !== undefined) {
+        return {
+          type: 'collapseAndFocus',
+          collapseKey: isParentExpanded ? parentKey : undefined,
+          focusKey: parentKey
+        }
+      }
+      return { type: 'none' }
+    case 'Enter':
+      if (selectable) return { type: 'select', key: nodeKey }
+      if (isExpandable) return { type: 'toggleExpand', key: nodeKey }
+      return { type: 'none' }
+    case ' ':
+      if (checkable) return { type: 'check', key: nodeKey, checked: !isChecked }
+      if (isExpandable) return { type: 'toggleExpand', key: nodeKey }
+      return { type: 'none' }
+    default:
+      return null
+  }
+}
+
 /**
  * Base classes for tree container
  */

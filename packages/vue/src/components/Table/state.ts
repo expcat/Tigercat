@@ -192,7 +192,7 @@ export function useTableState(
       uncontrolledHiddenColumnKeys.value = hiddenKeys
     }
     emit('update:hiddenColumnKeys', hiddenKeys)
-    emit('hidden-columns-change', hiddenKeys)
+    emit('hidden-column-keys-change', hiddenKeys)
   }
 
   function toggleColumnLock(columnKey: string) {

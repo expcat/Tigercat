@@ -38,6 +38,7 @@ import {
   moveFocusInMenu,
   focusMenuEdge,
   focusFirstChildItem,
+  getMenuNavigationKeys,
   submenuContentHorizontalClasses,
   submenuContentHorizontalNestedClasses,
   submenuContentPopupClasses,
@@ -529,10 +530,7 @@ export const MenuItem = defineComponent({
       const current = event.currentTarget as HTMLButtonElement
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
       const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
-      const isHorizontalRoot = isRoot && menuContext.mode.value === 'horizontal'
-
-      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown'
-      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp'
+      const { nextKey, prevKey } = getMenuNavigationKeys(menuContext.mode.value, isRoot)
 
       if (event.key === nextKey) {
         event.preventDefault()
@@ -992,10 +990,7 @@ export const SubMenu = defineComponent({
 
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
       const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
-      const isHorizontalRoot = isRoot && menuContext.mode.value === 'horizontal'
-
-      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown'
-      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp'
+      const { nextKey, prevKey } = getMenuNavigationKeys(menuContext.mode.value, isRoot)
 
       if (event.key === nextKey) {
         event.preventDefault()

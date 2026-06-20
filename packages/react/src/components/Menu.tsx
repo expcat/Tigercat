@@ -37,6 +37,7 @@ import {
   moveFocusInMenu,
   focusMenuEdge,
   focusFirstChildItem,
+  getMenuNavigationKeys,
   replaceKeys,
   toggleKey,
   initRovingTabIndex,
@@ -343,10 +344,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       const current = event.currentTarget
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
       const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
-
-      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal'
-      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown'
-      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp'
+      const { nextKey, prevKey } = getMenuNavigationKeys(menuContext.mode, isRoot)
 
       if (event.key === nextKey) {
         event.preventDefault()
@@ -682,10 +680,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
       const current = event.currentTarget
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
       const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
-      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal'
-
-      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown'
-      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp'
+      const { nextKey, prevKey } = getMenuNavigationKeys(menuContext.mode, isRoot)
 
       if (event.key === nextKey) {
         event.preventDefault()

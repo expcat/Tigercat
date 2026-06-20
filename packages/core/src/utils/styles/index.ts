@@ -43,7 +43,11 @@ export {
   getTimePickerItemClasses,
   getTimePickerPeriodButtonClasses,
   timePickerFooterClasses,
-  timePickerFooterButtonClasses
+  timePickerFooterButtonClasses,
+  // Keyboard focus
+  focusTimePickerOption,
+  type TimePickerFocusUnit,
+  type TimePickerFocusAction
 } from '../timepicker-utils'
 export * from '../upload-utils'
 

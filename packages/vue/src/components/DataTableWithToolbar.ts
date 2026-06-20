@@ -260,7 +260,7 @@ export const DataTableWithToolbar = defineComponent({
     'page-change': (_current: number, _pageSize: number) => true,
     'page-size-change': (_current: number, _pageSize: number) => true,
     'update:hiddenColumnKeys': (_hiddenKeys: string[]) => true,
-    'hidden-columns-change': (_hiddenKeys: string[]) => true
+    'hidden-column-keys-change': (_hiddenKeys: string[]) => true
   },
   setup(props, { attrs, emit, slots }) {
     const config = useTigerConfig()
@@ -395,7 +395,7 @@ export const DataTableWithToolbar = defineComponent({
         internalHiddenKeys.value = nextHiddenKeys
       }
       emit('update:hiddenColumnKeys', nextHiddenKeys)
-      emit('hidden-columns-change', nextHiddenKeys)
+      emit('hidden-column-keys-change', nextHiddenKeys)
     }
 
     const handleToggleColumnVisibility = (columnKey: string, visible: boolean) => {

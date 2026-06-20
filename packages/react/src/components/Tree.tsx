@@ -15,6 +15,8 @@ import {
   treeLineClasses,
   getSpinnerSVG,
   getVisibleTreeItems,
+  getFirstVisibleChildKey,
+  getTreeKeyboardAction,
   getParentKeys,
   getAllKeys,
   findNode,
@@ -577,131 +579,64 @@ export const Tree: React.FC<TreeProps> = ({
     [treeData, computedCheckedState, checkStrictly, checkStrategy, controlledCheckedKeys, onCheck]
   )
 
-  const getFirstChildKey = useCallback(
-    (nodeKey: string | number) => {
-      const index = visibleItems.findIndex((i) => i.key === nodeKey)
-      if (index < 0) return undefined
-
-      const base = visibleItems[index]
-      for (let i = index + 1; i < visibleItems.length; i++) {
-        const item = visibleItems[i]
-        if (item.level <= base.level) break
-        if (item.parentKey === nodeKey && !item.node.disabled) return item.key
-      }
-
-      return undefined
-    },
-    [visibleItems]
-  )
-
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, node: TreeNode, isExpanded: boolean, isChecked: boolean) => {
       if (node.disabled) return
 
       const currentKey = activeKey ?? defaultActiveKey ?? node.key
-      const currentIndex = focusableKeys.findIndex((k) => k === currentKey)
       const isExpandable =
         !!(node.children && node.children.length > 0) || !!(loadData && !node.isLeaf)
 
       const parents = getParentKeys(treeData, node.key)
       const parentKey = parents[parents.length - 1]
 
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        setActiveKey(focusableKeys[currentIndex + 1] ?? currentKey)
-        return
-      }
+      const action = getTreeKeyboardAction({
+        key: e.key,
+        nodeKey: node.key,
+        currentKey,
+        focusableKeys,
+        parentKey,
+        firstChildKey: getFirstVisibleChildKey(visibleItems, node.key),
+        isExpandable,
+        isExpanded,
+        isParentExpanded: parentKey !== undefined && computedExpandedKeys.has(parentKey),
+        isChecked,
+        selectable: effectiveSelectable,
+        checkable
+      })
 
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        setActiveKey(focusableKeys[currentIndex - 1] ?? currentKey)
-        return
-      }
+      if (!action) return
+      e.preventDefault()
 
-      if (e.key === 'Home') {
-        e.preventDefault()
-        setActiveKey(focusableKeys[0] ?? currentKey)
-        return
-      }
-
-      if (e.key === 'End') {
-        e.preventDefault()
-        setActiveKey(focusableKeys[focusableKeys.length - 1] ?? currentKey)
-        return
-      }
-
-      if (e.key === 'ArrowRight') {
-        e.preventDefault()
-        if (isExpandable && !isExpanded) {
-          handleExpand(node.key)
-          return
-        }
-        if (isExpandable && isExpanded) {
-          setActiveKey(getFirstChildKey(node.key) ?? currentKey)
-        }
-        return
-      }
-
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault()
-        if (isExpandable && isExpanded) {
-          handleExpand(node.key)
-          return
-        }
-        if (parentKey !== undefined) {
-          setActiveKey(parentKey)
-        }
-        return
-      }
-
-      if (e.key === 'Escape') {
-        e.preventDefault()
-        if (isExpandable && isExpanded) {
-          handleExpand(node.key)
-          return
-        }
-        if (parentKey !== undefined) {
-          if (computedExpandedKeys.has(parentKey)) {
-            handleExpand(parentKey)
-          }
-          setActiveKey(parentKey)
-        }
-        return
-      }
-
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        if (effectiveSelectable) {
-          handleSelect(node.key, e)
-          return
-        }
-        if (isExpandable) {
-          handleExpand(node.key)
-        }
-        return
-      }
-
-      if (e.key === ' ') {
-        e.preventDefault()
-        if (checkable) {
-          handleCheck(node.key, !isChecked)
-          return
-        }
-        if (isExpandable) {
-          handleExpand(node.key)
-        }
+      switch (action.type) {
+        case 'focus':
+          setActiveKey(action.key)
+          break
+        case 'toggleExpand':
+          handleExpand(action.key)
+          break
+        case 'select':
+          handleSelect(action.key, e)
+          break
+        case 'check':
+          handleCheck(action.key, action.checked)
+          break
+        case 'collapseAndFocus':
+          if (action.collapseKey !== undefined) handleExpand(action.collapseKey)
+          setActiveKey(action.focusKey)
+          break
       }
     },
     [
       activeKey,
       defaultActiveKey,
       focusableKeys,
+      visibleItems,
       treeData,
       loadData,
       checkable,
       computedExpandedKeys,
       effectiveSelectable,
-      getFirstChildKey,
       handleExpand,
       handleSelect,
       handleCheck

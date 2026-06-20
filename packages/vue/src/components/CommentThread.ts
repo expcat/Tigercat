@@ -114,7 +114,7 @@ export const CommentThread = defineComponent({
       default: undefined
     }
   },
-  emits: ['like', 'reply', 'more', 'action', 'expand-change', 'load-more'],
+  emits: ['like', 'reply', 'more', 'action', 'update:expandedKeys', 'load-more'],
   setup(props, { emit, attrs }) {
     const innerExpandedKeys = ref<Array<string | number>>([...props.defaultExpandedKeys])
     const expandedAllKeys = ref(new Set<string | number>())
@@ -145,7 +145,7 @@ export const CommentThread = defineComponent({
       if (!props.expandedKeys) {
         innerExpandedKeys.value = next
       }
-      emit('expand-change', next)
+      emit('update:expandedKeys', next)
     }
 
     const toggleExpanded = (id: string | number) => {

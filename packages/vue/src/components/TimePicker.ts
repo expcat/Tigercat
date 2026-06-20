@@ -45,6 +45,7 @@ import {
   getTimePickerPeriodButtonClasses,
   timePickerFooterClasses,
   timePickerFooterButtonClasses,
+  focusTimePickerOption,
   ClockIconPath,
   TimePickerCloseIconPath,
   type TimePickerModelValue,
@@ -395,30 +396,7 @@ export const TimePicker = defineComponent({
       unit: 'hour' | 'minute' | 'second' | 'period',
       action: 'prev' | 'next' | 'first' | 'last'
     ) {
-      const panel = panelRef.value
-      if (!panel) return
-
-      const all = Array.from(
-        panel.querySelectorAll(`button[data-tiger-timepicker-unit="${unit}"]`)
-      ) as HTMLButtonElement[]
-
-      const nodes = all.filter((button) => !button.disabled)
-      if (nodes.length === 0) return
-
-      const active = document.activeElement as HTMLButtonElement | null
-      const activeIndex = active ? nodes.indexOf(active) : -1
-      const selectedIndex = nodes.findIndex(
-        (button) => button.getAttribute('aria-selected') === 'true'
-      )
-      const baseIndex = activeIndex >= 0 ? activeIndex : Math.max(0, selectedIndex)
-
-      let nextIndex = baseIndex
-      if (action === 'prev') nextIndex = Math.max(0, baseIndex - 1)
-      if (action === 'next') nextIndex = Math.min(nodes.length - 1, baseIndex + 1)
-      if (action === 'first') nextIndex = 0
-      if (action === 'last') nextIndex = nodes.length - 1
-
-      nodes[nextIndex]?.focus()
+      focusTimePickerOption(panelRef.value, unit, action)
     }
 
     function handlePanelKeydown(event: KeyboardEvent) {

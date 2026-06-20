@@ -32,6 +32,29 @@ describe('CommentThread (Vue)', () => {
     expect(screen.getByText('Child reply')).toBeInTheDocument()
   })
 
+  it('emits update:expandedKeys when toggling replies', async () => {
+    const onUpdateExpandedKeys = vi.fn()
+    const nodes: CommentNode[] = [
+      {
+        id: 1,
+        content: 'Root comment',
+        user: { name: 'A' },
+        children: [{ id: 2, parentId: 1, content: 'Child reply', user: { name: 'B' } }]
+      }
+    ]
+
+    render(CommentThread, {
+      props: {
+        nodes,
+        'onUpdate:expandedKeys': onUpdateExpandedKeys
+      }
+    })
+
+    await fireEvent.click(screen.getByRole('button', { name: /展开/ }))
+
+    expect(onUpdateExpandedKeys).toHaveBeenCalledWith([1])
+  })
+
   it('submits reply content', async () => {
     const onReply = vi.fn()
     const nodes: CommentNode[] = [

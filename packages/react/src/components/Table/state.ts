@@ -54,7 +54,7 @@ export interface UseTableStateInput {
   onSelectionChange?: TableProps['onSelectionChange']
   onSortChange?: TableProps['onSortChange']
   onFilterChange?: TableProps['onFilterChange']
-  onHiddenColumnsChange?: TableProps['onHiddenColumnsChange']
+  onHiddenColumnKeysChange?: TableProps['onHiddenColumnKeysChange']
   onPageChange?: TableProps['onPageChange']
   onExpandChange?: (
     expandedKeys: (string | number)[],
@@ -94,7 +94,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     onSelectionChange,
     onSortChange,
     onFilterChange,
-    onHiddenColumnsChange,
+    onHiddenColumnKeysChange,
     onPageChange,
     onExpandChange,
     onCellChange,
@@ -258,7 +258,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     if (!isHiddenColumnsControlled) {
       setUncontrolledHiddenColumnKeys(hiddenKeys)
     }
-    onHiddenColumnsChange?.(hiddenKeys)
+    onHiddenColumnKeysChange?.(hiddenKeys)
   }
 
   function toggleColumnLock(columnKey: string) {

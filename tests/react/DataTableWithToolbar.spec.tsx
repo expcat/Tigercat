@@ -495,14 +495,14 @@ describe('DataTableWithToolbar (React)', () => {
 
     it('renders the column settings entry and toggles column visibility', async () => {
       const user = userEvent.setup()
-      const onHiddenColumnsChange = vi.fn()
+      const onHiddenColumnKeysChange = vi.fn()
 
       render(
         <DataTableWithToolbar<RowData>
           columns={multiColumns}
           dataSource={[{ id: 1, name: 'A', email: 'a@example.com' }]}
           toolbar={{ showColumnSettings: true }}
-          onHiddenColumnsChange={onHiddenColumnsChange}
+          onHiddenColumnKeysChange={onHiddenColumnKeysChange}
           pagination={false}
         />
       )
@@ -513,11 +513,11 @@ describe('DataTableWithToolbar (React)', () => {
       expect(emailCheckbox).toBeChecked()
 
       await user.click(emailCheckbox)
-      expect(onHiddenColumnsChange).toHaveBeenCalledWith(['email'])
+      expect(onHiddenColumnKeysChange).toHaveBeenCalledWith(['email'])
       expect(screen.queryByRole('columnheader', { name: 'Email' })).not.toBeInTheDocument()
 
       await user.click(screen.getByRole('checkbox', { name: 'Email' }))
-      expect(onHiddenColumnsChange).toHaveBeenLastCalledWith([])
+      expect(onHiddenColumnKeysChange).toHaveBeenLastCalledWith([])
       expect(screen.getByRole('columnheader', { name: 'Email' })).toBeInTheDocument()
     })
 
@@ -593,7 +593,7 @@ describe('DataTableWithToolbar (React)', () => {
 
     it('keeps internal state untouched in controlled mode and only calls back', async () => {
       const user = userEvent.setup()
-      const onHiddenColumnsChange = vi.fn()
+      const onHiddenColumnKeysChange = vi.fn()
 
       render(
         <DataTableWithToolbar<RowData>
@@ -601,7 +601,7 @@ describe('DataTableWithToolbar (React)', () => {
           dataSource={[{ id: 1, name: 'A', email: 'a@example.com' }]}
           toolbar={{ showColumnSettings: true }}
           hiddenColumnKeys={[]}
-          onHiddenColumnsChange={onHiddenColumnsChange}
+          onHiddenColumnKeysChange={onHiddenColumnKeysChange}
           pagination={false}
         />
       )
@@ -609,7 +609,7 @@ describe('DataTableWithToolbar (React)', () => {
       await user.click(screen.getByRole('button', { name: 'Column settings' }))
       await user.click(screen.getByRole('checkbox', { name: 'Email' }))
 
-      expect(onHiddenColumnsChange).toHaveBeenCalledWith(['email'])
+      expect(onHiddenColumnKeysChange).toHaveBeenCalledWith(['email'])
       // Controlled: parent did not update the prop, so the column stays visible
       expect(screen.getByRole('columnheader', { name: 'Email' })).toBeInTheDocument()
     })
@@ -709,7 +709,7 @@ describe('DataTableWithToolbar (React)', () => {
       const onFiltersChange = vi.fn()
       const onSearchChange = vi.fn()
       const onSearch = vi.fn()
-      const onHiddenColumnsChange = vi.fn()
+      const onHiddenColumnKeysChange = vi.fn()
 
       const { container } = render(
         <DataTableWithToolbar<RowData>
@@ -747,7 +747,7 @@ describe('DataTableWithToolbar (React)', () => {
           onFiltersChange={onFiltersChange}
           onSearchChange={onSearchChange}
           onSearch={onSearch}
-          onHiddenColumnsChange={onHiddenColumnsChange}
+          onHiddenColumnKeysChange={onHiddenColumnKeysChange}
         />
       )
 
@@ -769,7 +769,7 @@ describe('DataTableWithToolbar (React)', () => {
       expect(onFiltersChange).toHaveBeenCalledWith({ status: 'active' })
 
       await user.click(screen.getByRole('button', { name: '隐藏列' }))
-      expect(onHiddenColumnsChange).toHaveBeenCalledWith(['name'])
+      expect(onHiddenColumnKeysChange).toHaveBeenCalledWith(['name'])
       expect(screen.queryByRole('columnheader', { name: 'Name' })).not.toBeInTheDocument()
     })
   })

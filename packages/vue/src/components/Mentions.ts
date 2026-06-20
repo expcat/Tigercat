@@ -6,7 +6,8 @@ import {
   mentionsDropdownClasses,
   getMentionsOptionClasses,
   extractMentionQuery,
-  positionMentionsDropdown
+  positionMentionsDropdown,
+  getCyclicIndex
 } from '@expcat/tigercat-core'
 
 export interface VueMentionsProps {
@@ -80,11 +81,10 @@ export const Mentions = defineComponent({
       if (!isOpen.value) return
       if (e.key === 'ArrowDown') {
         e.preventDefault()
-        activeIndex.value = (activeIndex.value + 1) % filteredOptions.value.length
+        activeIndex.value = getCyclicIndex(filteredOptions.value.length, activeIndex.value, 1)
       } else if (e.key === 'ArrowUp') {
         e.preventDefault()
-        activeIndex.value =
-          (activeIndex.value - 1 + filteredOptions.value.length) % filteredOptions.value.length
+        activeIndex.value = getCyclicIndex(filteredOptions.value.length, activeIndex.value, -1)
       } else if (e.key === 'Enter') {
         e.preventDefault()
         const opt = filteredOptions.value[activeIndex.value]
