@@ -12,7 +12,7 @@
   "dependencies": {
     "@expcat/tigercat-core": "workspace:*",
     "@expcat/tigercat-vue": "workspace:*",
-    "nuxt": "^3.17.5",
+    "nuxt": "^4.4.8",
     "vue": "catalog:"
   },
   "devDependencies": {
