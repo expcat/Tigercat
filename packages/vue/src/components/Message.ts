@@ -23,6 +23,7 @@ import {
   getMessageIconPath,
   messageCloseIconPath,
   normalizeStringOption,
+  createInstanceCounter,
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
@@ -46,7 +47,6 @@ const MESSAGE_CONTAINER_ROOT_ID = `${MESSAGE_CONTAINER_ID}-root`
  * Message instance storage (reactive)
  */
 const messageInstances = ref<MessageInstance[]>([])
-let instanceIdCounter = 0
 
 const IS_TEST_ENV = (() => {
   const proc = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process
@@ -58,9 +58,7 @@ let containerApp: App<Element> | null = null
 /**
  * Get next instance id
  */
-function getNextInstanceId(): number {
-  return ++instanceIdCounter
-}
+const getNextInstanceId = createInstanceCounter()
 
 export interface VueMessageContainerProps {
   position?: MessagePosition

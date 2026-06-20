@@ -184,3 +184,37 @@ export function isAtMax(value: number | null | undefined, max: number = Infinity
   if (value === null || value === undefined) return false
   return value >= max
 }
+
+/**
+ * Convert a numeric value into its display string.
+ *
+ * Resolution order: empty for nullish → custom `formatter` → fixed `precision`
+ * via `toFixed` → plain `String(value)`. Framework-agnostic; the formatter and
+ * precision are injected so it matches `InputNumberProps`.
+ */
+export function formatInputNumberDisplay(
+  value: number | null | undefined,
+  options: { formatter?: (value: number | undefined) => string; precision?: number }
+): string {
+  if (value === null || value === undefined) return ''
+  if (options.formatter) return options.formatter(value)
+  if (options.precision !== undefined) return value.toFixed(options.precision)
+  return String(value)
+}
+
+/**
+ * Parse a display string back into a numeric value (or `null`).
+ *
+ * Empty string and a lone `'-'` (mid-typing) resolve to `null`; a custom
+ * `parser` takes precedence; otherwise `Number()` is used and `NaN` collapses
+ * to `null`. Framework-agnostic; the parser is injected to match `InputNumberProps`.
+ */
+export function parseInputNumberValue(
+  str: string,
+  options: { parser?: (displayValue: string) => number }
+): number | null {
+  if (str === '' || str === '-') return null
+  if (options.parser) return options.parser(str)
+  const num = Number(str)
+  return Number.isNaN(num) ? null : num
+}

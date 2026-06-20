@@ -13,3 +13,20 @@ export function normalizeStringOption<T extends object>(options: string | T, key
   }
   return options
 }
+
+/**
+ * Create a monotonically increasing instance-id generator.
+ *
+ * Each call to the returned function yields the next positive integer,
+ * starting at 1. Used by imperative APIs (Message, Notification) that need
+ * unique, per-module instance ids without sharing a global counter.
+ *
+ * @example
+ * const nextId = createInstanceCounter()
+ * nextId() // → 1
+ * nextId() // → 2
+ */
+export function createInstanceCounter(): () => number {
+  let counter = 0
+  return () => ++counter
+}

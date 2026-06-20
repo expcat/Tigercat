@@ -15,6 +15,7 @@
 - **i18n** 空态 / 加载 / 清除等带英文默认值的文案 prop 不再绕过全局 locale：双端 `List` / `Tree` / `TreeSelect` / `Transfer` / `VirtualTable`（`emptyText` / `notFoundText`）、`InfiniteScroll`（`loadingText`）、`Signature`（`clearText`）、`Spotlight`（`placeholder` / `emptyText`）、`Cascader`（`notFoundText`）、`Tour`（`nextText` / `prevText` / `finishText` → `formWizard`）、`NumberKeyboard`（`confirmText` → `common.okText`）与 React `Loading`（aria 回退 → `common.loadingText`）的默认值改为「未传时回退 `mergeTigerLocale(ConfigProvider locale, props.locale)` 的 `common.*` / `formWizard.*`」，显式 prop 仍为最高优先级。`List` / `InfiniteScroll` / `Signature` / `Spotlight` / `Tour` / `NumberKeyboard`（含 React `VirtualTable`）新增可选 `locale` prop（`SignatureProps` / `SpotlightProps` / `TourProps` / `NumberKeyboardProps` 类型新增 `locale` 字段）。`<ConfigProvider :locale="zhCN">` 下空态/加载/清除等默认文案自动本地化；未配置时默认英文渲染不变，无需逐实例传文案。
 - core `date-utils` 新增不可变日期算术 `addDays` / `addMonths` / `addYears`（`addMonths` / `addYears` 按目标月长度裁剪日期，如 1 月 31 日 +1 月 → 2 月 28/29 日），供双端 DatePicker 与后续跨端键盘导航复用。
 - React **Signature** 新增 `onClear` 回调：清除（工具栏按钮或 ref `clear()`）时触发，与 Vue 端 `clear` 事件对齐。
+- core 新增命令式实例 id 计数器工厂 `createInstanceCounter`（`imperative-api`，每个实例从 1 起单调自增、互相隔离）与 InputNumber 显示/解析工具 `formatInputNumberDisplay` / `parseInputNumberValue`（`input-number-utils`，`formatter` / `precision` / `parser` 以参数注入），供双端命令式 API 与 InputNumber 复用。
 
 ### Changed
 
@@ -26,6 +27,8 @@
 - 跨端键盘导航纯逻辑下沉 core（行为不变）：core 新增 `getTreeKeyboardAction` / `getFirstVisibleChildKey`（`tree-utils`）、`getCyclicIndex`（`picker-utils`）、`focusTimePickerOption` / `TimePickerFocusUnit` / `TimePickerFocusAction`（`timepicker-utils`）、`getMenuNavigationKeys`（`menu-utils`）。双端 **Tree** 的键盘动作决策（方向键/Home/End 走查与展开/收起/聚焦父子/选择/勾选语义）、**Mentions** 的环绕（cyclic）列表导航、**TimePicker** 的列内 roving 焦点（query + clamp + focus）、**Menu** 的方向键映射（horizontal root ↔ ArrowLeft/Right）改为调用同一份 core 实现，消除 Vue/React 各自内联的重复键盘逻辑；a11y 键盘行为保持不变，公共组件 API 与 props 不变。
 - 统一 Vue 组件的 SSR 守卫写法：`ConfigProvider` / `Signature` / `ImageAnnotation` 中的内联 `typeof window/document === 'undefined'` 改用 core `isBrowser()`（`ImageAnnotation` 保留 `window.Image` 特性检测）；生命周期/事件作用域内的访问保持原样，无行为变更。
 - 收窄双端组件中冗余 / 脆弱的非空断言（`!`）：去除 `Image` / `QRCode` / `Mentions` / `Alert` 等带默认值 prop 的断言，`Tree` / `CommentThread` / `Menu` 在守卫分支内改用局部 const 收窄 `node.children`，类型更安全，无行为变更。
+- 下沉双端命令式 API 与 InputNumber 的重复纯逻辑到 core（行为不变）：**Message** / **Notification** 的实例自增 id 计数器（原各自内联 `let instanceIdCounter` + `getNextInstanceId`，双端共 4 份）改用 `createInstanceCounter()`；**InputNumber** 的显示格式化与字符串解析改调 `formatInputNumberDisplay` / `parseInputNumberValue`，消除跨端重复实现。（`normalizeOptions` 早已是 core `normalizeStringOption` 的薄包装，无需改动。）
+- 统一 React **ImagePreview** 的门户 SSR 守卫：门户挂载改用 `utils/overlay` 的 `renderBodyPortal`（内含 `isBrowser()` 守卫）替代直接 `createPortal(…, document.body)`，与 Tour / FloatButton / ChartTooltip 等门户组件写法一致；浏览器端渲染行为不变。
 
 - **Breaking**：移除废弃别名 `kanbanAddCardClasses`（core）。自 v0.9.0 起它仅作为 `taskBoardAddCardClasses` 的向后兼容别名，现已删除；请改用 `taskBoardAddCardClasses`（详见 [迁移指南](docs/MIGRATION.md)）。
 - **Breaking · 跨端 API 对称**：统一受控量 / 事件回调的双端命名（详见 [迁移指南](docs/MIGRATION.md)）。
@@ -60,6 +63,7 @@
 - 新增公共 API 基线快照护栏：`scripts/generate-api-baseline.mjs`（`pnpm api:baseline`）产出确定性的 `api-reports/public-api-baseline.json`（156 个 `*Props` 接口的 props / extends、core 导出名、双端公开组件与命名导出），CI 经「生成 + `git diff --exit-code api-reports`」捕捉删除导出 / 删 prop / 改名 / 改 extends 等版本间破坏性变更——与 `validate-api.mjs`（当下双端一致性）层次互补，本护栏防的是与上一提交版相比的回归。
 - 新增运行时基准工作流 `.github/workflows/bench.yml`（周度 + 手动触发，`pnpm bench --run --outputJson` 并上传结果 JSON 产物供人工对比）；刻意非 PR 门禁、无硬回归阈值（micro-bench 在共享 runner 上抖动大，硬阈值易误红）。
 - 质量门禁绑定触发与发布前置闸：`ci.yml` 增 `push` / `pull_request`（`main`）触发（保留手动 `workflow_dispatch`），使全量门禁随 PR / 合并自动生效；`publish.yml` 与 `publish-on-tag.yml` 在发布前插入 `pnpm release:check`，发布不再绕过版本 / 导出 / 发布文档一致性校验。
+- 修复手维护 skill 指南漂移：`references/cli.md` 命令表此前因选项内未转义的 `|`（`--template vue3 | react` 等）产生幻列、分隔行多列、渲染错位，现转义为 `\|` 并还原为 Command / Purpose / Key options 三列；`references/performance.md` 补充运行时基准段（`pnpm bench` / `benchmarks/` 8 个 `.bench.ts` / `bench.yml`），与 F-6 已落地的基准设施及 frontmatter 的 “performance validation” 声明对齐。
 
 ## v1.2.0 — Breaking Changes
 

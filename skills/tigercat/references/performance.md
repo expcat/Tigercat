@@ -52,3 +52,7 @@ import { BarChart } from '@expcat/tigercat-react/BarChart'
 ```
 
 Run `pnpm build` and `pnpm size` after changing shared utils, chart code, exports, or component dependencies.
+
+## Benchmarks
+
+Run `pnpm bench` (Vitest benchmark mode) to execute the suites under `benchmarks/` (8 `.bench.ts` files; the `benchmark` section of `vitest.config.ts` controls discovery). Results are advisory and not a CI gate — micro-benchmarks are noisy on shared runners, so there is no hard regression threshold. `.github/workflows/bench.yml` runs them weekly and on manual dispatch (`pnpm bench --run --outputJson=bench-results.json`) and uploads the JSON artifact for manual comparison.

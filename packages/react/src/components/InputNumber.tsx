@@ -18,6 +18,8 @@ import {
   formatPrecision,
   isAtMin,
   isAtMax,
+  formatInputNumberDisplay,
+  parseInputNumberValue,
   createRafRepeatActionController,
   type InputNumberProps as CoreInputNumberProps
 } from '@expcat/tigercat-core'
@@ -83,21 +85,12 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   const currentValue = isControlled ? (controlledValue ?? null) : internalValue
 
   const toDisplayValue = useCallback(
-    (val: number | null | undefined): string => {
-      if (val === null || val === undefined) return ''
-      if (formatter) return formatter(val)
-      if (precision !== undefined) return val.toFixed(precision)
-      return String(val)
-    },
+    (val: number | null | undefined): string =>
+      formatInputNumberDisplay(val, { formatter, precision }),
     [formatter, precision]
   )
 
-  const parseValue = (str: string): number | null => {
-    if (str === '' || str === '-') return null
-    if (parser) return parser(str)
-    const num = Number(str)
-    return Number.isNaN(num) ? null : num
-  }
+  const parseValue = (str: string): number | null => parseInputNumberValue(str, { parser })
 
   // Sync display value when value or focus changes
   useEffect(() => {

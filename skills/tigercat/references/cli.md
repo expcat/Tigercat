@@ -8,12 +8,12 @@ description: Tigercat CLI commands, source files, and validation notes
 Package: `@expcat/tigercat-cli`. Source lives in `packages/cli/src` and tests in `tests/core/cli.spec.ts`.
 
 | Command                          | Purpose                         | Key options                             |
-| -------------------------------- | ------------------------------- | --------------------------------------- | ------ | ----- |
-| `tigercat create <name>`         | Create a Vue 3 or React app     | `--template vue3                        | react` |
+| -------------------------------- | ------------------------------- | --------------------------------------- |
+| `tigercat create <name>`         | Create a Vue 3 or React app     | `--template vue3 \| react`              |
 | `tigercat add [components...]`   | Add component demos/imports     | `--framework`, `--install`, `--snippet` |
 | `tigercat playground`            | Start a temporary preview app   | `--template`, `--port`, `--no-open`     |
 | `tigercat generate docs`         | Generate props Markdown from TS | `--input`, `--output`                   |
-| `tigercat generate test`         | Generate component test stubs   | `--framework vue3                       | react  | both` |
+| `tigercat generate test`         | Generate component test stubs   | `--framework vue3 \| react \| both`     |
 | `tigercat generate doc-template` | Generate component doc stubs    | `--output`, `--dry-run`                 |
 | `tigercat doctor`                | Validate app environment        | `--json`                                |
 

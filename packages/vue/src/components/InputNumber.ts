@@ -19,6 +19,8 @@ import {
   formatPrecision,
   isAtMin,
   isAtMax,
+  formatInputNumberDisplay,
+  parseInputNumberValue,
   createRafRepeatActionController,
   type InputSize,
   type InputStatus
@@ -124,17 +126,14 @@ export const InputNumber = defineComponent({
     const displayValue = ref('')
 
     function toDisplayValue(val: number | null | undefined): string {
-      if (val === null || val === undefined) return ''
-      if (props.formatter) return props.formatter(val)
-      if (props.precision !== undefined) return val.toFixed(props.precision)
-      return String(val)
+      return formatInputNumberDisplay(val, {
+        formatter: props.formatter,
+        precision: props.precision
+      })
     }
 
     function parseValue(str: string): number | null {
-      if (str === '' || str === '-') return null
-      if (props.parser) return props.parser(str)
-      const num = Number(str)
-      return Number.isNaN(num) ? null : num
+      return parseInputNumberValue(str, { parser: props.parser })
     }
 
     // Sync display value from modelValue

@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
-import { createPortal } from 'react-dom'
 import {
   classNames,
   imagePreviewMaskClasses,
@@ -29,7 +28,7 @@ import {
   movePinch,
   type ImagePreviewProps as CoreImagePreviewProps
 } from '@expcat/tigercat-core'
-import { useEscapeKey } from '../utils/overlay'
+import { useEscapeKey, renderBodyPortal } from '../utils/overlay'
 
 export interface ImagePreviewProps extends CoreImagePreviewProps {
   /**
@@ -268,7 +267,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   const currentSrc = images[index] || images[0]
 
-  return createPortal(
+  return renderBodyPortal(
     <div
       className={imagePreviewWrapperClasses}
       style={{ zIndex }}
@@ -358,7 +357,6 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         </button>
         {navState.counter && <span className={imagePreviewCounterClasses}>{navState.counter}</span>}
       </div>
-    </div>,
-    document.body
+    </div>
   )
 }
