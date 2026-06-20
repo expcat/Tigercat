@@ -13,6 +13,7 @@ import {
   SHAKE_CLASS,
   type InputProps as CoreInputProps
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface InputProps
   extends
@@ -117,7 +118,7 @@ export const Input: React.FC<InputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const reactId = useId()
   const errorMsgId = `tiger-input-error-${reactId}`
-  const [internalValue, setInternalValue] = useState<string | number>(defaultValue ?? '')
+  const [inputValue, setInputValue] = useControlledState<string | number>(value, defaultValue ?? '')
   const [passwordVisible, setPasswordVisible] = useState(false)
 
   // Trigger shake animation via direct DOM manipulation for reliable re-trigger
@@ -134,29 +135,20 @@ export const Input: React.FC<InputProps> = ({
     wrapperRef.current?.classList.remove(SHAKE_CLASS)
   }, [])
 
-  // Determine if the component is controlled
-  const isControlled = value !== undefined
-  const inputValue = isControlled ? value : internalValue
   const currentValStr = String(inputValue)
 
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
-    if (!isControlled) {
-      setInternalValue(parseInputValue(event.currentTarget, type))
-    }
+    setInputValue(parseInputValue(event.currentTarget, type))
     onInput?.(event)
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isControlled) {
-      setInternalValue(parseInputValue(event.currentTarget, type))
-    }
+    setInputValue(parseInputValue(event.currentTarget, type))
     onChange?.(event)
   }
 
   const handleClear = () => {
-    if (!isControlled) {
-      setInternalValue('')
-    }
+    setInputValue('')
     onClear?.()
     inputRef.current?.focus()
   }

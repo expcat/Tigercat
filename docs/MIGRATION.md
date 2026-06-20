@@ -39,6 +39,33 @@
 
 > 仍支持 `v-model:open`，关闭时会发 `update:open(false)` 与 `open-change(false)`。
 
+### React `useControlledState` 升级为回调透传版（返回 2-tuple）
+
+React 公共 hook `useControlledState` 升级为合并 `onChange` 的版本（参照 Ant Design `useMergedState` / Radix `useControllableState`）：
+
+- 返回值由 3-tuple `[value, setValue, isControlled]` 收敛为 2-tuple `[value, setValue]`。
+- 新增可选第三参 `onChange`；返回的 `setValue(next, ...args)` 在**非受控**时写内部 state，并在两种模式下**始终**调用 `onChange?.(next, ...args)`。
+- `setValue` 还支持 updater 形式 `setValue(prev => next)`，并保持稳定引用（identity）。
+
+绝大多数使用者只消费返回的 `value` 与 setter，无需改动。若你此前读取了第三个返回值 `isControlled`，请自行派生；若你此前手写了「非受控才写内部 + 调用 `onChange`」的样板，可改为把 `onChange` 交给 hook：
+
+```diff
+- const [value, setValue, isControlled] = useControlledState(controlledValue, defaultValue)
+- const handleChange = (next) => {
+-   if (!isControlled) setValue(next)
+-   onChange?.(next)
+- }
++ const [value, setValue] = useControlledState(controlledValue, defaultValue, onChange)
++ const handleChange = (next) => setValue(next)
+```
+
+```diff
+  // 仍需要 isControlled 时自行派生（与 hook 内部判定一致）：
++ const isControlled = controlledValue !== undefined
+```
+
+> 注意：旧版 setter（`setInternalValue`）无论受控与否都会写内部 state；新版 `setValue` 在受控模式下不再写内部 state（由父组件持有值），与受控语义一致。
+
 ### 移除废弃别名 `kanbanAddCardClasses`
 
 core 移除了废弃别名 `kanbanAddCardClasses`。它自 v0.9.0 起仅是 `taskBoardAddCardClasses` 的向后兼容别名，现已删除。请直接使用 `taskBoardAddCardClasses`：

@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react'
+import React, { useContext, useMemo } from 'react'
 import {
   classNames,
   getRadioDotClasses,
@@ -9,6 +9,7 @@ import {
   type RadioProps as CoreRadioProps
 } from '@expcat/tigercat-core'
 import { RadioGroupContext } from './RadioGroup'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface RadioProps
   extends
@@ -48,9 +49,8 @@ export const Radio: React.FC<RadioProps> = ({
 }) => {
   const groupContext = useContext(RadioGroupContext)
 
-  const [internalChecked, setInternalChecked] = useState(defaultChecked)
+  const [checkedState, setChecked] = useControlledState<boolean>(checked, defaultChecked)
 
-  const isCheckedControlled = checked !== undefined
   const isInGroup = !!groupContext
 
   const actualSize = size || groupContext?.size || 'md'
@@ -58,11 +58,9 @@ export const Radio: React.FC<RadioProps> = ({
   const actualName = name || groupContext?.name || ''
 
   const isChecked =
-    checked !== undefined
-      ? checked
-      : groupContext?.value !== undefined
-        ? groupContext.value === value
-        : internalChecked
+    checked === undefined && groupContext?.value !== undefined
+      ? groupContext.value === value
+      : checkedState
 
   const radioClasses = useMemo(
     () =>
@@ -104,8 +102,8 @@ export const Radio: React.FC<RadioProps> = ({
     const newChecked = event.target.checked
     if (!newChecked) return
 
-    if (!isCheckedControlled && !isInGroup) {
-      setInternalChecked(true)
+    if (!isInGroup) {
+      setChecked(true)
     }
 
     onChange?.(value)

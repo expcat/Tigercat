@@ -168,14 +168,14 @@ source: current repository audit and planning
 > **进度（2026-06-19，续）**：**C-2** 已随 Vue B-2 跨端一并交付（`List`/`VirtualTable`/`Tree`/`Transfer`/`TreeSelect` 空态、`InfiniteScroll` 加载、`Signature` 清除、`Spotlight` placeholder/空态、`Cascader` 空态改读 `mergedLocale.common.*`；`Tour` 的 next/prev/finish 回退 `formWizard.*`、`NumberKeyboard` 的 confirm 回退 `common.okText`、`Loading` 的 aria 回退 `common.loadingText`；`Select`/`Cascader`/`TreeSelect` 的主 `placeholder`（'Select an option'/'Please select'）因 `common` 无对应 key 暂不改，留待后续视需要新增 key）；C-0 注记的 React 侧非空断言已随 **B-5** 同批收敛（`Image`/`Tree`/`CommentThread` 等）。均移交 [CHANGELOG.md](../CHANGELOG.md)。
 >
 > **进度（2026-06-20，续）**：C-3 已交付（ImagePreview 门户改用 `renderBodyPortal`，详见下方 C-3 条目与 [CHANGELOG.md](../CHANGELOG.md)）。余项 C-4 / C-5 仍待推进。
+>
+> **进度（2026-06-21，续）**：C-4 已交付（详见下方 C-4 条目、[CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)）。余项仅剩 C-5（React 巨石拆分）。
 
 - [x] **C-3 已交付（2026-06-20）**——React ImagePreview `createPortal(..., document.body)` 改用 `utils/overlay.ts` 的 `renderBodyPortal`（内含 `isBrowser()`），统一门户 SSR 守卫、不再隐式依赖 `isOpen` 兜底；配套为测试基建 `tests/setup.ts` 的 `matchMedia` mock 加 `typeof window` 守卫，新增 node 环境 SSR spec。按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目。
 
-- [ ] **C-4 `useControlledState` 能力不足、受控样板大面积手写重复**（P2）
-  - 维度：hooks 复用｜模块：`hooks/useControlledState.ts` ↔ ~29 个组件
-  - 问题：`useControlledState` 返回 `[value, setInternal, isControlled]`，其 setter 只写内部 state、不合并 `onChange`，故需回调透传的组件（`Input.tsx:120/138`、`Checkbox.tsx:80/89`、InputNumber/Slider/Select/Tabs/Collapse/Dropdown/Menu/DatePicker/TimePicker… 约 29 个）仍手写 `const isControlled = value !== undefined` + `if (!isControlled) setInternal(...)` + `onChange?.()`；该 hook 实际仅 5 个低复杂度组件（MarkdownEditor/CheckboxGroup/RichTextEditor/RadioGroup/Textarea）采用。
-  - 影响：受控/非受控模式逻辑在数十组件重复，初值同步与边界处理易漂移；hook「已抽取」却覆盖面小。
-  - 建议：将 `useControlledState` 升级为带回调透传版（参照 Ant Design `useMergedState` / Radix `useControllableState`：`[value, setValue]`，`setValue` 在非受控写内部并始终触发 `onChange`），再分批迁移手写组件。React `hooks/` 与 Vue `composables/` 的命名/职责对齐及跨端去重归任务 D（呼应 B-3 parity 注）。
+- [x] **C-4 已交付（2026-06-21）**——React 公共 hook `useControlledState` 升级为回调透传版（参照 Ant `useMergedState` / Radix `useControllableState`）：合并 `onChange`、稳定 setter identity、支持 updater 形式，返回值由 `[value, setValue, isControlled]` 收敛为 `[value, setValue]`（移除第三返回位属公共 API 破坏，→ [CHANGELOG.md](../CHANGELOG.md) / [MIGRATION.md](MIGRATION.md)）。`Checkbox` / `Input` / `InputNumber` / `Radio` / `RadioGroup` / `CheckboxGroup` / `Textarea` / `MarkdownEditor` / `RichTextEditor` / `Upload` / `Spotlight` 接入并移除手写受控样板，新增 hook 单测覆盖受控 / 非受控 / updater / extra-args / 稳定性。
+  - **未迁移（非纯样板，有意保留）**：`ScrollSpy`（`isControlled` 兼作 effect 模式开关 + onChange 值类型变性冲突）、`NumberKeyboard`（受控值读取时归一化，非幂等迁移有风险）；`Select` / `DatePicker` / `TimePicker` 的受控迁移并入 **C-5** 拆分一并做。
+  - **实现判断**：onChange 值类型与受控值空间一致者把 `onChange` 交给 hook（值型直接合并，携事件者用 extra-args `setValue(next, event)`）；当受控值空间含 `undefined` 而 `onChange` 不接受（如 `RadioGroup`），或 onChange 参数顺序/语义不符（`Upload` 的 `(file, list)`、`Radio` 发 `value` 非 `checked`），则 hook 仅管 state、`onChange` 保留手写——既消除 `isControlled` 样板又规避函数参数变性误报。按惯例移交 CHANGELOG，本节不再保留问题细目。
 
 - [ ] **C-5 复杂度热点：Menu/Tree/DatePicker/TimePicker 单文件巨石**（P2）
   - 维度：复杂度热点｜模块：`Menu.tsx`(914)、`Tree.tsx`(897)、`DatePicker.tsx`(847)、`TimePicker.tsx`(775)、`Select.tsx`(666)

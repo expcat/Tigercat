@@ -44,7 +44,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   className,
   ...props
 }) => {
-  const [currentValue, setInternalValue, isControlled] = useControlledState(value, defaultValue)
+  const [currentValue, setValue] = useControlledState(value, defaultValue)
 
   const generatedNameRef = useRef(
     `tiger-radio-group-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
@@ -55,14 +55,10 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   const handleChange = useCallback(
     (newValue: string | number) => {
       if (disabled) return
-
-      if (!isControlled) {
-        setInternalValue(newValue)
-      }
-
+      setValue(newValue)
       onChange?.(newValue)
     },
-    [disabled, isControlled, setInternalValue, onChange]
+    [disabled, setValue, onChange]
   )
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {

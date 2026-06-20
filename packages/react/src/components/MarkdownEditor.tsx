@@ -78,11 +78,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   ...restProps
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [currentValue, setInternalValue, isValueControlled] = useControlledState(
-    value,
-    defaultValue
-  )
-  const [currentMode, setInternalMode, isModeControlled] = useControlledState(mode, defaultMode)
+  const [currentValue, commitValue] = useControlledState(value, defaultValue, onChange)
+  const [currentMode, commitMode] = useControlledState(mode, defaultMode, onModeChange)
   const toolbarItems = useMemo(
     () => (toolbar === false ? [] : (toolbar ?? defaultMarkdownToolbar)),
     [toolbar]
@@ -97,22 +94,6 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     const parsedHeight = parseMarkdownHeight(height)
     return { ...(parsedHeight ? { height: parsedHeight } : {}), ...style }
   }, [height, style])
-
-  const commitValue = useCallback(
-    (nextValue: string) => {
-      if (!isValueControlled) setInternalValue(nextValue)
-      onChange?.(nextValue)
-    },
-    [isValueControlled, onChange, setInternalValue]
-  )
-
-  const commitMode = useCallback(
-    (nextMode: MarkdownEditorMode) => {
-      if (!isModeControlled) setInternalMode(nextMode)
-      onModeChange?.(nextMode)
-    },
-    [isModeControlled, onModeChange, setInternalMode]
-  )
 
   const applyToolbarButton = useCallback(
     (button: MarkdownToolbarButton) => {

@@ -31,6 +31,7 @@ import {
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface SpotlightProps
   extends CoreSpotlightProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onSelect'> {
@@ -85,14 +86,17 @@ export const Spotlight: React.FC<SpotlightProps> = ({
     placeholder,
     mergedLocale?.common?.searchPlaceholder
   )
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen)
-  const [uncontrolledQuery, setUncontrolledQuery] = useState(defaultQuery)
+  const [resolvedOpen, setOpenValue] = useControlledState<boolean>(
+    open,
+    defaultOpen ?? false,
+    onOpenChange
+  )
+  const [resolvedQuery, setQueryValue] = useControlledState<string>(
+    query,
+    defaultQuery ?? '',
+    onQueryChange
+  )
   const [activeIndex, setActiveIndex] = useState(-1)
-
-  const isOpenControlled = open !== undefined
-  const isQueryControlled = query !== undefined
-  const resolvedOpen = isOpenControlled ? Boolean(open) : uncontrolledOpen
-  const resolvedQuery = isQueryControlled ? String(query) : uncontrolledQuery
 
   const reactId = useId()
   const dialogId = `tiger-spotlight-${reactId}`
@@ -106,22 +110,6 @@ export const Spotlight: React.FC<SpotlightProps> = ({
   const searchState = useMemo(
     () => getSpotlightSearchState(items, resolvedQuery, { filterItem, limit }),
     [items, resolvedQuery, filterItem, limit]
-  )
-
-  const setOpenValue = useCallback(
-    (nextOpen: boolean) => {
-      if (!isOpenControlled) setUncontrolledOpen(nextOpen)
-      onOpenChange?.(nextOpen)
-    },
-    [isOpenControlled, onOpenChange]
-  )
-
-  const setQueryValue = useCallback(
-    (nextQuery: string) => {
-      if (!isQueryControlled) setUncontrolledQuery(nextQuery)
-      onQueryChange?.(nextQuery)
-    },
-    [isQueryControlled, onQueryChange]
   )
 
   const closeSpotlight = useCallback(() => {

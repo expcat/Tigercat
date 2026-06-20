@@ -23,6 +23,7 @@ import {
   createRafRepeatActionController,
   type InputNumberProps as CoreInputNumberProps
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface InputNumberProps extends CoreInputNumberProps {
   /**
@@ -71,18 +72,17 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   onBlur,
   className
 }) => {
-  const isControlled = controlledValue !== undefined
   const inputRef = useRef<HTMLInputElement>(null)
   const repeatControllerRef = useRef(createRafRepeatActionController())
   const repeatValueRef = useRef<number | null>(null)
   const suppressNextClickRef = useRef(false)
   const [focused, setFocused] = useState(false)
-  const [internalValue, setInternalValue] = useState<number | null>(
-    defaultValue ?? controlledValue ?? null
+  const [currentValue, setValue] = useControlledState<number | null>(
+    controlledValue,
+    defaultValue ?? controlledValue ?? null,
+    onChange
   )
   const [displayValue, setDisplayValue] = useState('')
-
-  const currentValue = isControlled ? (controlledValue ?? null) : internalValue
 
   const toDisplayValue = useCallback(
     (val: number | null | undefined): string =>
@@ -116,10 +116,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
       }
     }
 
-    if (!isControlled) {
-      setInternalValue(finalVal)
-    }
-    onChange?.(finalVal)
+    setValue(finalVal)
     setDisplayValue(toDisplayValue(finalVal))
   }
 

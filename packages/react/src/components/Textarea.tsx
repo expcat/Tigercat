@@ -48,10 +48,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref
   ) => {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-    const [currentValue, setInternalValue, isControlled] = useControlledState(
-      value,
-      defaultValue || ''
-    )
+    const [currentValue, setValue] = useControlledState(value, defaultValue || '')
 
     const setRefs = (node: HTMLTextAreaElement | null) => {
       textareaRef.current = node
@@ -76,10 +73,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     )
 
     const handleInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
-      if (!isControlled) {
-        setInternalValue(event.currentTarget.value)
-      }
-
+      setValue(event.currentTarget.value)
       onInput?.(event)
     }
 

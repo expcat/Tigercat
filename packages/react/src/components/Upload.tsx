@@ -30,6 +30,7 @@ import {
 } from '@expcat/tigercat-core'
 
 import { useTigerConfig } from './ConfigProvider'
+import { useControlledState } from '../hooks/useControlledState'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -94,19 +95,13 @@ export const Upload: React.FC<UploadProps> = ({
   )
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [internalFileList, setInternalFileList] = useState<UploadFile[]>([])
-
-  // Use controlled or uncontrolled mode
-  const isControlled = controlledFileList !== undefined
-  const fileList = isControlled ? controlledFileList : internalFileList
+  const [fileList, setFileList] = useControlledState<UploadFile[]>(controlledFileList, [])
 
   const updateFileList = useCallback(
     (newFileList: UploadFile[]) => {
-      if (!isControlled) {
-        setInternalFileList(newFileList)
-      }
+      setFileList(newFileList)
     },
-    [isControlled]
+    [setFileList]
   )
 
   const handleClick = () => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
   classNames,
   getCheckboxClasses,
@@ -6,6 +6,7 @@ import {
   type CheckboxSize
 } from '@expcat/tigercat-core'
 import { useCheckboxGroup } from './CheckboxGroup'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface CheckboxProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -76,22 +77,14 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   // Get group context if inside CheckboxGroup
   const groupContext = useCheckboxGroup()
 
-  // Internal state for uncontrolled mode
-  const [internalChecked, setInternalChecked] = useState(defaultChecked)
-
-  // Determine if controlled or uncontrolled - simple comparison, no need to memoize
-  const isControlled = controlledChecked !== undefined
+  const [checkedState, setChecked] = useControlledState(controlledChecked, defaultChecked, onChange)
 
   // Determine effective size and disabled state - simple logical operations
   const effectiveSize = propSize || groupContext?.size || 'md'
   const effectiveDisabled = propDisabled || groupContext?.disabled || false
 
   const checked =
-    groupContext && value !== undefined
-      ? groupContext.value.includes(value)
-      : isControlled
-        ? controlledChecked
-        : internalChecked
+    groupContext && value !== undefined ? groupContext.value.includes(value) : checkedState
 
   // Ref for checkbox input element
   const checkboxRef = useRef<HTMLInputElement>(null)
@@ -112,12 +105,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
     if (groupContext && value !== undefined) {
       groupContext.updateValue(value, newValue)
     } else {
-      // Update internal state if uncontrolled
-      if (!isControlled) {
-        setInternalChecked(newValue)
-      }
-
-      onChange?.(newValue, event)
+      setChecked(newValue, event)
     }
   }
 

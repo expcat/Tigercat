@@ -69,21 +69,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const editorRef = useRef<HTMLDivElement>(null)
   const engineRef = useRef<RichTextEngineInstance | null>(null)
-  const [currentContent, setInternalValue, isControlled] = useControlledState(value, defaultValue)
+  const [currentContent, setContent] = useControlledState(value, defaultValue, onChange)
+  const isControlled = value !== undefined
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set())
   const toolbarItems = toolbar ?? defaultToolbar
   const empty = isContentEmpty(currentContent)
-
-  // Stable refs to keep engine callbacks fresh without recreating the
-  // engine each render.
-  const onChangeRef = useRef(onChange)
-  const setInternalValueRef = useRef(setInternalValue)
-  const isControlledRef = useRef(isControlled)
-  useEffect(() => {
-    onChangeRef.current = onChange
-    setInternalValueRef.current = setInternalValue
-    isControlledRef.current = isControlled
-  }, [onChange, setInternalValue, isControlled])
 
   // Mount engine once (per engine identity) on the host element.
   useEffect(() => {
@@ -97,8 +87,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       placeholder,
       toolbar: toolbarItems,
       notifyChange(html) {
-        if (!isControlledRef.current) setInternalValueRef.current(html)
-        onChangeRef.current?.(html)
+        setContent(html)
       },
       notifyActiveFormats(next) {
         setActiveFormats(next)
