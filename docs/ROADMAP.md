@@ -26,6 +26,8 @@ source: current repository audit and planning
 | 发布版本 | v1.3.4 发布准备中                                                |
 | 质量门禁 | Vitest、Playwright、a11y、size-limit、API/test validate          |
 
+> **版本规划（暂定）**：v1.3.4 为当前补丁线发布，仅交付非破坏性工作。`## Unreleased` 中累积的破坏性变更（A-4 / A-5 / D-3 等，详见 [CHANGELOG.md](../CHANGELOG.md) 与 [MIGRATION.md](MIGRATION.md)）随「下一个允许破坏的版本」交付，即当前文档计划全部完成后的发布版本，**暂定为 v1.4.0（minor）**。实际版本号仍以发布时 CI `sync-version` / release 决策为准。
+
 ## 当前待办
 
 - [ ] v1.3.4 发布执行：运行 `pnpm quality:release`、`pnpm build`，发布后执行 `pnpm smoke:published`。
