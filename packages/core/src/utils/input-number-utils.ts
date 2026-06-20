@@ -184,3 +184,37 @@ export function isAtMax(value: number | null | undefined, max: number = Infinity
   if (value === null || value === undefined) return false
   return value >= max
 }
+
+/**
+ * Format a numeric value for display in an InputNumber field.
+ *
+ * Priority: empty string for null/undefined → custom `formatter` → fixed
+ * `precision` (`toFixed`) → plain `String`. Shared by the Vue/React InputNumber
+ * so the display logic stays in one place.
+ */
+export function formatInputNumberDisplay(
+  value: number | null | undefined,
+  options: { formatter?: (value: number | undefined) => string; precision?: number } = {}
+): string {
+  if (value === null || value === undefined) return ''
+  if (options.formatter) return options.formatter(value)
+  if (options.precision !== undefined) return value.toFixed(options.precision)
+  return String(value)
+}
+
+/**
+ * Parse a raw input string into a number (or null) for an InputNumber field.
+ *
+ * An empty string and a lone `-` parse to null (in-progress input). A custom
+ * `parser` takes precedence; otherwise `Number()` is used and `NaN` becomes
+ * null. Shared by the Vue/React InputNumber.
+ */
+export function parseInputNumberInput(
+  raw: string,
+  options: { parser?: (displayValue: string) => number } = {}
+): number | null {
+  if (raw === '' || raw === '-') return null
+  if (options.parser) return options.parser(raw)
+  const num = Number(raw)
+  return Number.isNaN(num) ? null : num
+}

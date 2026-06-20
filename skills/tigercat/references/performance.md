@@ -52,3 +52,24 @@ import { BarChart } from '@expcat/tigercat-react/BarChart'
 ```
 
 Run `pnpm build` and `pnpm size` after changing shared utils, chart code, exports, or component dependencies.
+
+## Runtime Benchmarks
+
+Runtime performance is covered by a Vitest benchmark suite. Run it with:
+
+```bash
+pnpm bench   # = vitest bench
+```
+
+`vitest.config.ts` wires `benchmark.include` to `benchmarks/**/*.bench.{js,ts}`. The suite has 8 benchmarks:
+
+- `core-utils` — hot core utility paths
+- `table-large-data` — large-dataset table state/render
+- `virtual-table` — virtualized table windowing
+- `tree-virtualization` — tree flatten/visible-range
+- `chart-svg-generation` — SVG chart path generation
+- `descriptions` — Descriptions layout
+- `form-validation` — form rule validation
+- `virtual-scroll-fps` — virtual scroll frame budget
+
+Use these as a **manual performance-regression tool** when changing hot paths (shared utils, virtualization, chart generation, validation). The suite is **not** yet wired into CI and has no committed baseline or regression threshold — compare runs locally before/after a change.

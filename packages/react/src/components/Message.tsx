@@ -17,6 +17,7 @@ import {
   isBrowser,
   ANIMATION_DURATION_MS,
   normalizeStringOption,
+  createInstanceIdGenerator,
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
@@ -34,16 +35,13 @@ const MESSAGE_CLOSE_ARIA_LABEL = 'Close message'
  * Message instance storage
  */
 let messageInstances: MessageInstance[] = []
-let instanceIdCounter = 0
 let containerRoot: Root | null = null
 let updateCallback: (() => void) | null = null
 
 /**
  * Get next instance id
  */
-function getNextInstanceId(): number {
-  return ++instanceIdCounter
-}
+const getNextInstanceId = createInstanceIdGenerator()
 
 /**
  * Single message item component

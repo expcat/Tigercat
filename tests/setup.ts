@@ -15,20 +15,24 @@ afterEach(() => {
   cleanupReact()
 })
 
-// Mock matchMedia for components that use responsive features
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: (query: string): MediaQueryList => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {}, // deprecated
-    removeListener: () => {}, // deprecated
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: (): boolean => false
+// Mock matchMedia for components that use responsive features.
+// Guarded so node-environment specs (e.g. SSR rendering tests) can share this
+// setup file without a DOM present.
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string): MediaQueryList => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {}, // deprecated
+      removeListener: () => {}, // deprecated
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: (): boolean => false
+    })
   })
-})
+}
 
 // Setup global console error/warning handlers for debugging
 const originalError = console.error

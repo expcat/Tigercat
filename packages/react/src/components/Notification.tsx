@@ -18,6 +18,7 @@ import {
   isBrowser,
   ANIMATION_DURATION_MS,
   normalizeStringOption,
+  createInstanceIdGenerator,
   type NotificationPosition,
   type NotificationInstance,
   type NotificationOptions,
@@ -40,7 +41,6 @@ const notificationInstancesByPosition: Record<NotificationPosition, Notification
   'bottom-right': []
 }
 
-let instanceIdCounter = 0
 const containerRoots: Record<NotificationPosition, Root | null> = {
   'top-left': null,
   'top-right': null,
@@ -65,9 +65,7 @@ function scheduleNotificationStackUpdate(position: NotificationPosition): void {
 /**
  * Get next instance id
  */
-function getNextInstanceId(): number {
-  return ++instanceIdCounter
-}
+const getNextInstanceId = createInstanceIdGenerator()
 
 /**
  * Single notification item component
