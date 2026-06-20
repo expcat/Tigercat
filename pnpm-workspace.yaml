@@ -13,7 +13,7 @@ catalog:
   # ── Build toolchain ────────────────────────────
   typescript: ^6.0.3
   tsup: ^8.5.1
-  vite: ^8.0.10
+  vite: ^8.0.16
 
   # ── Styling ────────────────────────────────────
   tailwindcss: ^4.2.4
