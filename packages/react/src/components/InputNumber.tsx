@@ -19,7 +19,7 @@ import {
   isAtMin,
   isAtMax,
   formatInputNumberDisplay,
-  parseInputNumberInput,
+  parseInputNumberValue,
   createRafRepeatActionController,
   type InputNumberProps as CoreInputNumberProps
 } from '@expcat/tigercat-core'
@@ -90,7 +90,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
     [formatter, precision]
   )
 
-  const parseValue = (str: string): number | null => parseInputNumberInput(str, { parser })
+  const parseValue = (str: string): number | null => parseInputNumberValue(str, { parser })
 
   // Sync display value when value or focus changes
   useEffect(() => {

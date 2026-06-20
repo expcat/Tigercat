@@ -18,7 +18,7 @@ import {
   isBrowser,
   ANIMATION_DURATION_MS,
   normalizeStringOption,
-  createInstanceIdGenerator,
+  createInstanceCounter,
   type NotificationPosition,
   type NotificationInstance,
   type NotificationOptions,
@@ -65,7 +65,7 @@ function scheduleNotificationStackUpdate(position: NotificationPosition): void {
 /**
  * Get next instance id
  */
-const getNextInstanceId = createInstanceIdGenerator()
+const getNextInstanceId = createInstanceCounter()
 
 /**
  * Single notification item component

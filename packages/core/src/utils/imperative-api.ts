@@ -15,18 +15,23 @@ export function normalizeStringOption<T extends object>(options: string | T, key
 }
 
 /**
- * Create an independent, monotonically increasing instance-id generator.
+ * Create a monotonically increasing instance-id counter.
  *
- * Each call returns a fresh counter closure, so separate imperative APIs
- * (e.g. Message vs Notification, and the Vue vs React builds of each) keep
- * their own id sequences instead of sharing a single global counter.
+ * Each call to the returned function yields the next positive integer,
+ * starting at 1. Used by imperative APIs (Message, Notification) that need
+ * unique, per-module instance ids without sharing a global counter.
  *
  * @example
- * const getNextInstanceId = createInstanceIdGenerator()
- * getNextInstanceId() // 1
- * getNextInstanceId() // 2
+ * const nextId = createInstanceCounter()
+ * nextId() // → 1
+ * nextId() // → 2
  */
-export function createInstanceIdGenerator(): () => number {
+export function createInstanceCounter(): () => number {
   let counter = 0
   return () => ++counter
 }
+
+/**
+ * @deprecated Use `createInstanceCounter`.
+ */
+export const createInstanceIdGenerator = createInstanceCounter

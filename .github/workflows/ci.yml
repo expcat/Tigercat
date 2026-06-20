@@ -35,8 +35,8 @@ jobs:
       - name: Build packages
         run: pnpm build
 
-      - name: Run tests
-        run: pnpm test
+      - name: Run tests with coverage
+        run: pnpm test:coverage
 
       - name: Validate test quality
         run: pnpm test:validate
@@ -46,6 +46,12 @@ jobs:
 
       - name: Check generated skill references are current
         run: git diff --exit-code skills/tigercat/references
+
+      - name: Generate public API baseline
+        run: pnpm api:baseline
+
+      - name: Check public API baseline is current
+        run: git diff --exit-code api-reports
 
       - name: Validate API and LLM docs
         run: pnpm api:validate

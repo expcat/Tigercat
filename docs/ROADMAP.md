@@ -3,7 +3,7 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: pending development roadmap and optimization scan plan
-verified-date: 2026-06-19
+verified-date: 2026-06-20
 source: current repository audit and planning
 -->
 
@@ -171,7 +171,7 @@ source: current repository audit and planning
 >
 > **进度（2026-06-21，续）**：C-4 已交付（详见下方 C-4 条目、[CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)）。余项仅剩 C-5（React 巨石拆分）。
 
-- [x] **C-3 已交付（2026-06-20）**——React ImagePreview `createPortal(..., document.body)` 改用 `utils/overlay.ts` 的 `renderBodyPortal`（内含 `isBrowser()`），统一门户 SSR 守卫、不再隐式依赖 `isOpen` 兜底；配套为测试基建 `tests/setup.ts` 的 `matchMedia` mock 加 `typeof window` 守卫，新增 node 环境 SSR spec。按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目。
+- [x] **C-3 已交付（2026-06-20）**——React `ImagePreview` 门户挂载改用 `utils/overlay` 的 `renderBodyPortal`（内含 `isBrowser()` 守卫）替代直接 `createPortal(…, document.body)`，与 Tour/FloatButton/ChartTooltip 门户写法统一；浏览器端渲染行为不变。配套为测试基建 `tests/setup.ts` 的 `matchMedia` mock 加 `typeof window` 守卫，新增 node 环境 SSR spec；Vue `ImagePreview` 经 Teleport（SSR 安全），无需镜像。按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目。
 
 - [x] **C-4 已交付（2026-06-21）**——React 公共 hook `useControlledState` 升级为回调透传版（参照 Ant `useMergedState` / Radix `useControllableState`）：合并 `onChange`、稳定 setter identity、支持 updater 形式，返回值由 `[value, setValue, isControlled]` 收敛为 `[value, setValue]`（移除第三返回位属公共 API 破坏，→ [CHANGELOG.md](../CHANGELOG.md) / [MIGRATION.md](MIGRATION.md)）。`Checkbox` / `Input` / `InputNumber` / `Radio` / `RadioGroup` / `CheckboxGroup` / `Textarea` / `MarkdownEditor` / `RichTextEditor` / `Upload` / `Spotlight` 接入并移除手写受控样板，新增 hook 单测覆盖受控 / 非受控 / updater / extra-args / 稳定性。
   - **未迁移（非纯样板，有意保留）**：`ScrollSpy`（`isControlled` 兼作 effect 模式开关 + onChange 值类型变性冲突）、`NumberKeyboard`（受控值读取时归一化，非幂等迁移有风险）；`Select` / `DatePicker` / `TimePicker` 的受控迁移并入 **C-5** 拆分一并做。
@@ -199,7 +199,9 @@ source: current repository audit and planning
   - 本次：core 新增 `getTreeKeyboardAction`/`getFirstVisibleChildKey`（`tree-utils`）、`getCyclicIndex`（`picker-utils`，picker 缺的环绕模式）、`focusTimePickerOption`（`timepicker-utils`，DOM roving 焦点，clamp 复用 `findNext/First/LastEnabledIndex`）、`getMenuNavigationKeys`（`menu-utils`）。Tree（决策语义）/Mentions（环绕）/TimePicker（列内焦点）/Menu（方向键映射）双端改调同一份 core 实现。
   - **实现判断**：(1) 沿用现行**直接调用 core util** 范式（如 Select 消费 picker-utils），**未引入 hooks/composable 包装层**——roadmap 原建议的包装层与实际落地范式不符，遵循后者以减小面；(2) Tree 线性导航**保留自身 `focusableKeys[i±1] ?? current` clamp 语义**而非套用 `getPickerNavigationIndex`——后者 ArrowUp 在 `index=-1` 时从尾部环绕，与 Tree 现状不一致，行为保持优先；(3) Menu 的重型 DOM 导航（`moveFocusInMenu` 等）早已在 core，本次仅补方向键映射，submenu 展开/收起状态机（风险高、价值低）保持双端内联。`pnpm api:validate`/`types:check`/`size` 全绿，双端 Tree/Mentions/TimePicker/Menu 组件 spec 与新增 core 单测全通过。
 
-- [x] **D-2 已交付（2026-06-20）**——core `imperative-api` 新增 `createInstanceIdGenerator`（独立自增计数器工厂），Message/Notification 双端各自内联的 `getNextInstanceId`+`instanceIdCounter` 改用之（每处各建独立计数器）；core `input-number-utils` 新增 `formatInputNumberDisplay`/`parseInputNumberInput`，双端 InputNumber 的 `toDisplayValue`/`parseValue` 改调之。**核查修正**：`normalizeOptions` 经确认为对 core `normalizeStringOption` 的薄包装（非重复实现，按 D-0 方法论保持不动）。按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目。
+- [x] **D-2 已交付（2026-06-20）**——双端命令式 API 计数器与 InputNumber 显示/解析纯逻辑下沉 core，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
+  - core 新增 `createInstanceCounter`（`imperative-api`）与 `formatInputNumberDisplay`/`parseInputNumberValue`（`input-number-utils`，formatter/precision/parser 以参数注入，含单测），并保留 `createInstanceIdGenerator` / `parseInputNumberInput` 兼容别名；双端 **Message**/**Notification** 的 `getNextInstanceId`（原 4 份内联计数器）与 **InputNumber** 的 `toDisplayValue`/`parseValue` 改调之，行为不变。
+  - **扫描结论修正**：原列的 `normalizeOptions` 双端重复**不成立**——Vue/React 两端早已 `import { normalizeStringOption }` 并只做一行委派（`Message.ts:25/275`、`Message.tsx:275`），属对 core util 的薄包装（符合 D-0 判定），未改。
 
 - [x] **D-3 + D-4 已交付（2026-06-20）**——跨端 API 对称 + validate-api 受控量 parity 护栏，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)，本节不再保留细目，仅记结论。
   - **D-3**：硬改名 + 迁移指南统一受控量/回调命名——ImageViewer React `onIndexChange`→`onCurrentIndexChange`（破坏）；CommentThread Vue `expand-change`→`update:expandedKeys`（破坏，支持 `v-model:expanded-keys`）；Spotlight Vue 移除冗余 `close`（破坏，统一用 `open-change`）。**修正**：原列的 DataTableWithToolbar「React 缺 `onSelectionChange`」实已由 `TableProps` 继承并转发给内层 Table（含 React 测试 + 示例），无需改；Signature React 新增 `onClear`（增量）。另顺带拉齐未发布的 `hiddenColumnKeys`——React `onHiddenColumnsChange`→`onHiddenColumnKeysChange`、Vue `hidden-columns-change`→`hidden-column-keys-change`（仅改 CHANGELOG `## Unreleased` 措辞，免迁移）。
@@ -247,14 +249,11 @@ source: current repository audit and planning
 
 > **进度（2026-06-19）**：F-1 / F-2 / F-3 / F-4 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目，仅保留 F-0 核查结论与未完成的 F-5 / F-6。**F-1**：已核对 `size` 增量来自 MarkdownEditor、Table 列显隐与多组件 i18n 等新功能源码而非依赖膨胀（运行时依赖仅 `@floating-ui/dom`），按实测 +~10% 余量重设 5 项预算（Core 118 / Vue 284 / React 320 / Vue Button 22 / React Button 20 kB）；**F-2**：新增 Menu/DatePicker/Table/Tree/TimePicker 双端子路径与 core `tailwind/modern`、`locales/zh-CN`、`icons/common` 子路径体积护栏——二者使 `pnpm size` 转绿、解除 v1.3.4 发布阻塞。**F-3**：移除失效且冗余的 `./types`/`./theme` 子路径导出（内容已在主入口、无消费者），同步从 `check-release-readiness.mjs` 必需导出清单移除；**F-4**：`module` 字段修正为实际 ESM 产物 `./dist/index.js`。
 
-> **进度（2026-06-20，续）**：F-5 已交付（vue/react `sideEffects` 收敛为 `false`，详见下方 F-5 条目与 [CHANGELOG.md](../CHANGELOG.md)）。余项仅剩 F-6。
+> **进度（2026-06-20，续）**：F-5 已交付（vue/react `sideEffects` 收敛为 `false`），F-6 已交付（运行时基准接入非阻塞工作流），均按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`。
 
 - [x] **F-5 已交付（2026-06-20）**——评估确认 vue/react `src` 无 CSS/副作用 import、组件为 headless，`sideEffects` 由保守 allowlist 收敛为 `false`（与 core 一致）；`pnpm size` 全部预算仍全绿、`pnpm example:build` 双端构建无回归，barrel import 下未用 chunk 现可被剔除。按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目。
-- [ ] **F-6 运行时基准已落地但未接入门禁、无回归阈值**（P2）
-  - 维度：运行时性能｜模块：`benchmarks/*.bench.ts`、`vitest.config.ts`、root `bench` 脚本、`.github/workflows/`
-  - 问题：Roadmap 原估"无 runtime 基准"已不成立——`vitest bench`（`benchmark.include = benchmarks/**/*.bench.ts`）、`bench` 脚本、8 个基准（core-utils/table-large-data/virtual-table/tree-virtualization/chart-svg-generation/descriptions/form-validation/virtual-scroll-fps）均已存在。残留缺口：`bench` 未接入任何 CI/质量门禁（仅手工跑），无基线/回归阈值，结果不留存对比。
-  - 影响：性能回归无自动护栏；基准存在但价值未被门禁兑现，易随代码演进腐化。
-  - 建议：评估将 `bench` 纳入 CI（非阻塞 job，或带阈值的回归比较，如 `vitest bench --outputJson` + 基线对比），或在 `skills/tigercat/references/` 明确其为手工性能回归工具与运行方式（CI 接入可与任务 G 协同）。
+- [x] **F-6 已交付（2026-06-20）**——`bench` 接入非阻塞工作流，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
+  - 新增 `.github/workflows/bench.yml`（周度 + `workflow_dispatch`，`pnpm bench --run --outputJson=bench-results.json` + `upload-artifact` 留存供人工对比）。**实现判断**：刻意**非 PR 门禁、不设硬回归阈值**——micro-bench 在共享 runner 抖动大，硬阈值易误红；自动 baseline-diff 阈值仍延后。
 
 - [x] **F-0 已核查、构建主线无需处理**
   - 体积预算：扫描时 `pnpm size` 5 项均超限，现已按 F-1/F-2 重设预算并扩展覆盖、`pnpm size` 转绿（见上方进度与 [CHANGELOG.md](../CHANGELOG.md)）；`pnpm size:check`（`size-limit --json`）可生成机器可读结果供阈值设定。
@@ -267,34 +266,24 @@ source: current repository audit and planning
 > **扫描结论修正**：Roadmap 原维度清单把 references 漂移写作"已有 `git diff` 校验"——实测此闸只覆盖 `shared/api-summary.md` 一个文件，是 `generate-api-docs.mjs` 6 类生成物里的 1 类，其余 ~21 个生成文件无任何漂移护栏，且 `examples/composite.md` 当前已漂移（G-4，本任务唯一 P1）。覆盖率门槛、依赖/CVE、breaking-change 三项均为名副其实的空白（G-1/G-2/G-3）。另发现全量质量门禁不绑定任何自动触发或发布路径（G-6，附加项）。
 
 > **进度（2026-06-20）**：G-4（本任务唯一 P1）已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。根因为 `formatMarkdown` 用 prettier 默认 `printWidth` 80 而非仓库 `.prettierrc.json` 的 100——已改为经 `prettier.resolveConfig` 加载仓库配置使生成物即 prettier-clean 且幂等，CI 漂移闸由单文件扩展为整个 `skills/tigercat/references` 目录，并重生成漂移的 `examples/composite.md` 归零。余项 G-1 / G-2 / G-3 / G-5 / G-6 仍待推进（其中 G-3 可复用本次「生成物经仓库 prettier 配置格式化 + 全目录 `git diff`」范式）。
+>
+> **进度（2026-06-20，续）**：CI·质量门禁硬化批次 G-1 / G-2 / G-3 / G-6 已交付（覆盖率阈值门禁、依赖/CVE 扫描 + dependabot、公共 API 基线快照护栏、CI 触发绑定 + 发布前置闸），按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留各项细目，仅保留 `- [x]` 结论。G-3 如规划复用了 G-4 的「生成物 + `git diff --exit-code`」范式。G-5 亦已于低风险清理批交付（见下），任务 G 全部回填完成。
 
-> **进度（2026-06-20，续）**：G-5 已交付（cli.md 表格修复 + performance.md 补基准节，详见下方 G-5 条目与 [CHANGELOG.md](../CHANGELOG.md)）。余项 G-1 / G-2 / G-3 / G-6 仍待推进。
+- [x] **G-1 已交付（2026-06-20）**——覆盖率阈值 + 接入 CI，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
+  - 实测基线 lines 90.3 / statements 88.5 / functions 89.8 / branches 81.9，`vitest.config.ts` `coverage.thresholds` 取略低值 85 / 83 / 84 / 76（留漂移余量同时拦截删测/大段未测代码）；`test:coverage` 改 `vitest run --coverage`（避免 watch）；CI 测试步骤改跑 `pnpm test:coverage` 使阈值在门禁内强制。
 
-- [ ] **G-1 无覆盖率门禁、无阈值**（P2）
-  - 维度：覆盖率门槛｜模块：`vitest.config.ts`、`.github/workflows/ci.yml`、`package.json`（`test:coverage`）
-  - 问题：`test:coverage`=`vitest --coverage`，`@vitest/coverage-v8` 已装，`vitest.config.ts` 的 `coverage` 段只配了 `provider`/`reporter`/`exclude`，**无 `thresholds`**；且覆盖率从未进入 `ci.yml`（无覆盖率步骤）、不在任何 `quality:*` 门禁、不在 `release:check`。即覆盖率既无阈值也根本不在门禁里跑。
-  - 影响：测试覆盖回退（删测、加未测代码）无任何护栏，覆盖率纯靠本地手工查看。
-  - 建议：先 `pnpm test:coverage` 跑出基线，在 `vitest.config.ts` `coverage.thresholds` 设保守全局阈值（lines/functions/statements/branches，从实测略低处起步避免一上来就红），并把覆盖率接入 CI（可将 `pnpm test` 合并为 `vitest run --coverage`）。
+- [x] **G-2 已交付（2026-06-20）**——依赖/CVE 扫描，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
+  - 新增 `.github/dependabot.yml`（npm + github-actions 周更，非破坏性 bump 分组）作为依赖升级/安全补丁的**实际收敛机制**；新增 `.github/workflows/security.yml`（周度 + 手动，`pnpm audit --audit-level=high`）。**实现判断**：发布包运行时仅依赖 `@floating-ui/dom`，现存 high 级告警全部来自 example/dev 工具链（不随产物分发），故 audit 取**报告式**（`continue-on-error` + step summary）+ dependabot 收敛，不对不影响产物的传递依赖设永久红门禁；CodeQL 暂不引入。
 
-- [ ] **G-2 缺依赖/CVE 安全扫描**（P2）
-  - 维度：依赖 / CVE｜模块：`.github/`（无 dependabot/renovate）、`.github/workflows/`、`scripts/`
-  - 问题：仓库无 `dependabot.yml`、无 renovate 配置；CI 与所有脚本中无 `pnpm audit`/CodeQL/Snyk/Trivy/OSV 任何依赖或代码安全扫描（已 grep 全量核查）。
-  - 影响：直接/传递依赖出现已知 CVE 时无自动告警；依赖升级与安全补丁全靠人工。
-  - 建议：低成本择一/组合引入——(a) `.github/dependabot.yml`（npm 周更 + GitHub Actions 版本更新）；(b) CI 增 `pnpm audit --audit-level=high`（必要时配豁免 allowlist）；(c) 启用 GitHub CodeQL。建议至少 dependabot + 一个 audit 门禁。
+- [x] **G-3 已交付（2026-06-20）**——公共 API 基线快照护栏（轻量方案 b），按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
+  - 新增 `scripts/generate-api-baseline.mjs`（`pnpm api:baseline`）产出确定性的 `api-reports/public-api-baseline.json`：156 个 `*Props` 接口的 props/extends（brace-aware 解析）+ core 导出名（沿 `export *` 子模块 walk）+ 双端公开组件与命名导出；CI 经「生成 + `git diff --exit-code api-reports`」捕捉删除导出/删 prop/改名/改 extends 等版本间回归。与 `validate-api.mjs`（当下双端一致性）层次互补。**实现判断**：未采重方案 `@microsoft/api-extractor`（形状级对比）——名级快照已覆盖最常见 breaking，且与 G-4 同范式、零新依赖；已验幂等 + 删 prop 能 trip。
 
-- [ ] **G-3 无公共 API 基线对比、breaking-change 不被自动发现**（P2）
-  - 维度：breaking-change｜模块：`scripts/validate-api.mjs`、`scripts/check-public-types.mjs`、`scripts/check-release-readiness.mjs`
-  - 问题：现有三道闸只做「当下一致性」校验——`validate-api.mjs` 查命名/双端文件配对/overlay `open` 三件套/deprecated 用法/LLM 文档覆盖；`check-public-types.mjs` 仅查每个组件 `Props` 类型**是否被导出**（存在性，不查形状）；`check-release-readiness.mjs` 查版本对齐/必需 exports 存在/文档版本号。**无任何与上一发布版的 API 快照对比**（无 `@microsoft/api-extractor`、无提交的 api report、无 publint/attw），删除导出、删 prop、改 prop/签名类型等真正的 breaking change 不会被自动发现，只能靠人工记得写进 [MIGRATION.md](MIGRATION.md)。
-  - 影响：破坏性变更漏标会静默发布；与 D-4（扩展 validate-api 受控量 parity，防双端漂移）互补但层次不同，本项防版本间回归。
-  - 建议：引入公共 API 基线——(a) 用 `@microsoft/api-extractor` 为各包产出 `.api.md` 报告并提交，CI `git diff` 校验（与 references 漂移同范式，亦修复 G-4 的可复用模板）；或 (b) 轻量方案：扩展 `check-public-types.mjs` 落盘「导出符号 + prop 列表」快照 JSON，CI 比对缺失/改名报警。与 D-4 的 parity 表一并规划。
+- [x] **G-5 已交付（2026-06-20）**——手维护 skill 指南修复，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
+  - `performance.md` 补「Benchmarks」节（`pnpm bench` / `benchmarks/` 8 个 `.bench.ts` / `bench.yml`），与 F-6 基准设施及 frontmatter “performance validation” 声明对齐；`cli.md` 命令表把选项内字面量 `|` 转义为 `\|` 并还原为 Command / Purpose / Key options 三列分隔行，渲染恢复。
+  - **实现判断**：未新增独立 prettier lint gate（`format:check` 即 `prettier . --check` 本已覆盖 `skills/**/*.md`，但 prettier 不会修复表格幻列的语义错误，故手改即可；亦避免叠加 Windows 上已知的 prettier 噪声），仅确保两文件 prettier-clean。其余手维护指南抽查与源一致，无需处理。
 
-- [x] **G-5 已交付（2026-06-20）**——`references/cli.md` 命令表内未转义的 `|`（`--template vue3 | react`、`--framework vue3 | react | both`）撑坏的表格列与表头分隔行已修复（改 `vue3 / react` 文字 + 还原表头 3 列）；`references/performance.md` 补「Runtime Benchmarks」一节（`pnpm bench` / `benchmarks/` 8 个 `.bench.ts` / `vitest.config.ts` benchmark 段），并注明其为手工性能回归工具、尚未接入 CI/无基线阈值（呼应 F-6）。按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目。
-
-- [ ] **G-6 质量门禁不绑定自动触发或发布路径**（P2，确认是否有意）
-  - 维度：门禁触发（附加发现）｜模块：`.github/workflows/{ci,e2e,publish,publish-on-tag,deploy,create-release-tags}.yml`
-  - 问题：`ci.yml`（lint→build→test→test:validate→docs:api+drift→api:validate→test:a11y→size 全量闸）与 `e2e.yml` 均为 `workflow_dispatch` 手动触发，无 `push`/`pull_request`；发布路径 `publish-on-tag.yml` 仅 install+`pnpm release`（=build+changeset publish）、`publish.yml` 仅 lint+build，**都不跑 test/a11y/size/api:validate/release:check**。即全量质量门禁不绑定任何自动事件或发布流程，是否执行完全取决于维护者本地是否跑了 `pnpm quality:release`。
-  - 影响：回归可落 main 而无自动验证；发布也不强制经过完整门禁，靠人工纪律兜底。对单维护者可能是有意的 Actions 成本权衡（呼应记忆「Tigercat 发布机制」），但与「质量门禁」目标存在缺口。
-  - 建议：确认触发策略意图——若希望护栏自动生效，至少给 `ci.yml` 加 `pull_request`/`push` 触发，或在 `publish-on-tag.yml` 发布前串入 `pnpm quality:release`（或其子集）作为发布前置闸；若确为有意手动，建议在 `scripts/README.md`/release.md 明确「发布前必须本地跑 `pnpm quality:release`」的纪律约定。
+- [x] **G-6 已交付（2026-06-20）**——质量门禁绑定触发 + 发布前置闸，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
+  - `ci.yml` 增 `push` / `pull_request`（`main`）触发（保留 `workflow_dispatch`），全量门禁随 PR/合并自动生效；`publish.yml` 与 `publish-on-tag.yml` 在发布前插入 `pnpm release:check`（不需 dist，校验版本/exports/发布文档一致性），发布不再绕过校验。**实现判断**：CI 仍以 PR 闸为主、不给任意分支 push 全量跑（控 Actions 成本）；发布前置取轻量 `release:check` 而非整 `quality:release`（后者含 Nuxt/Next SSR 构建，过重）。e2e 维持手动。
 
 - [x] **G-0 已核查、现有门禁覆盖部分无需处理**
   - CI 主闸（`ci.yml`）已串联 lint→build→test→`test:validate`→`docs:api`+api-summary drift→`api:validate`→`test:a11y`→`size` 八步，覆盖 lint/构建/单测/测试质量/API 校验/a11y/体积。

@@ -20,7 +20,7 @@ import {
   isAtMin,
   isAtMax,
   formatInputNumberDisplay,
-  parseInputNumberInput,
+  parseInputNumberValue,
   createRafRepeatActionController,
   type InputSize,
   type InputStatus
@@ -133,7 +133,7 @@ export const InputNumber = defineComponent({
     }
 
     function parseValue(str: string): number | null {
-      return parseInputNumberInput(str, { parser: props.parser })
+      return parseInputNumberValue(str, { parser: props.parser })
     }
 
     // Sync display value from modelValue

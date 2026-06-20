@@ -17,7 +17,7 @@ import {
   isBrowser,
   ANIMATION_DURATION_MS,
   normalizeStringOption,
-  createInstanceIdGenerator,
+  createInstanceCounter,
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
@@ -41,7 +41,7 @@ let updateCallback: (() => void) | null = null
 /**
  * Get next instance id
  */
-const getNextInstanceId = createInstanceIdGenerator()
+const getNextInstanceId = createInstanceCounter()
 
 /**
  * Single message item component

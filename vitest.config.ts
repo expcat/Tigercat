@@ -15,7 +15,16 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'tests/', 'dist/', '**/*.d.ts', '**/*.config.*', '**/__mocks__']
+      exclude: ['node_modules/', 'tests/', 'dist/', '**/*.d.ts', '**/*.config.*', '**/__mocks__'],
+      // Conservative floors set ~5pts below the measured baseline
+      // (lines 90.3 / statements 88.5 / functions 89.8 / branches 81.9) so normal
+      // drift stays green while regressions (deleted tests, large untested additions) trip the gate.
+      thresholds: {
+        lines: 85,
+        statements: 83,
+        functions: 84,
+        branches: 76
+      }
     }
   },
   resolve: {

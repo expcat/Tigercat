@@ -26,7 +26,7 @@ import {
   notificationTitleClasses,
   createNotificationStackUpdateScheduler,
   normalizeStringOption,
-  createInstanceIdGenerator,
+  createInstanceCounter,
   type NotificationConfig,
   type NotificationInstance,
   type NotificationOptions,
@@ -83,7 +83,7 @@ function scheduleNotificationStackUpdate(position: NotificationPosition): void {
 /**
  * Get next instance id
  */
-const getNextInstanceId = createInstanceIdGenerator()
+const getNextInstanceId = createInstanceCounter()
 
 function getContainerRootId(position: NotificationPosition) {
   return `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`

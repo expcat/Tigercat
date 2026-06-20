@@ -23,7 +23,7 @@ import {
   getMessageIconPath,
   messageCloseIconPath,
   normalizeStringOption,
-  createInstanceIdGenerator,
+  createInstanceCounter,
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
@@ -58,7 +58,7 @@ let containerApp: App<Element> | null = null
 /**
  * Get next instance id
  */
-const getNextInstanceId = createInstanceIdGenerator()
+const getNextInstanceId = createInstanceCounter()
 
 export interface VueMessageContainerProps {
   position?: MessagePosition
