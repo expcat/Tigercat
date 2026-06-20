@@ -200,7 +200,7 @@ source: current repository audit and planning
   - **实现判断**：(1) 沿用现行**直接调用 core util** 范式（如 Select 消费 picker-utils），**未引入 hooks/composable 包装层**——roadmap 原建议的包装层与实际落地范式不符，遵循后者以减小面；(2) Tree 线性导航**保留自身 `focusableKeys[i±1] ?? current` clamp 语义**而非套用 `getPickerNavigationIndex`——后者 ArrowUp 在 `index=-1` 时从尾部环绕，与 Tree 现状不一致，行为保持优先；(3) Menu 的重型 DOM 导航（`moveFocusInMenu` 等）早已在 core，本次仅补方向键映射，submenu 展开/收起状态机（风险高、价值低）保持双端内联。`pnpm api:validate`/`types:check`/`size` 全绿，双端 Tree/Mentions/TimePicker/Menu 组件 spec 与新增 core 单测全通过。
 
 - [x] **D-2 已交付（2026-06-20）**——双端命令式 API 计数器与 InputNumber 显示/解析纯逻辑下沉 core，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
-  - core 新增 `createInstanceCounter`（`imperative-api`）与 `formatInputNumberDisplay`/`parseInputNumberValue`（`input-number-utils`，formatter/precision/parser 以参数注入，含单测），并保留 `createInstanceIdGenerator` / `parseInputNumberInput` 兼容别名；双端 **Message**/**Notification** 的 `getNextInstanceId`（原 4 份内联计数器）与 **InputNumber** 的 `toDisplayValue`/`parseValue` 改调之，行为不变。
+  - core 新增 `createInstanceCounter`（`imperative-api`）与 `formatInputNumberDisplay`/`parseInputNumberValue`（`input-number-utils`，formatter/precision/parser 以参数注入，含单测）；双端 **Message**/**Notification** 的 `getNextInstanceId`（原 4 份内联计数器）与 **InputNumber** 的 `toDisplayValue`/`parseValue` 改调之，行为不变。
   - **扫描结论修正**：原列的 `normalizeOptions` 双端重复**不成立**——Vue/React 两端早已 `import { normalizeStringOption }` 并只做一行委派（`Message.ts:25/275`、`Message.tsx:275`），属对 core util 的薄包装（符合 D-0 判定），未改。
 
 - [x] **D-3 + D-4 已交付（2026-06-20）**——跨端 API 对称 + validate-api 受控量 parity 护栏，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)，本节不再保留细目，仅记结论。

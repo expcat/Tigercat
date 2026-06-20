@@ -30,8 +30,3 @@ export function createInstanceCounter(): () => number {
   let counter = 0
   return () => ++counter
 }
-
-/**
- * @deprecated Use `createInstanceCounter`.
- */
-export const createInstanceIdGenerator = createInstanceCounter

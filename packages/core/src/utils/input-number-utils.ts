@@ -218,13 +218,3 @@ export function parseInputNumberValue(
   const num = Number(str)
   return Number.isNaN(num) ? null : num
 }
-
-/**
- * @deprecated Use `parseInputNumberValue`.
- */
-export function parseInputNumberInput(
-  raw: string,
-  options: { parser?: (displayValue: string) => number } = {}
-): number | null {
-  return parseInputNumberValue(raw, options)
-}

@@ -1,17 +1,17 @@
 import { describe, it, expect } from 'vitest'
-import { createInstanceIdGenerator, normalizeStringOption } from '@expcat/tigercat-core'
+import { createInstanceCounter, normalizeStringOption } from '@expcat/tigercat-core'
 
-describe('createInstanceIdGenerator', () => {
+describe('createInstanceCounter', () => {
   it('starts at 1 and increments monotonically', () => {
-    const next = createInstanceIdGenerator()
+    const next = createInstanceCounter()
     expect(next()).toBe(1)
     expect(next()).toBe(2)
     expect(next()).toBe(3)
   })
 
   it('returns independent counters across generators', () => {
-    const a = createInstanceIdGenerator()
-    const b = createInstanceIdGenerator()
+    const a = createInstanceCounter()
+    const b = createInstanceCounter()
     expect(a()).toBe(1)
     expect(a()).toBe(2)
     // b is unaffected by a's advances

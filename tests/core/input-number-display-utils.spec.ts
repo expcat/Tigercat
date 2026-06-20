@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatInputNumberDisplay, parseInputNumberInput } from '@expcat/tigercat-core'
+import { formatInputNumberDisplay, parseInputNumberValue } from '@expcat/tigercat-core'
 
 describe('formatInputNumberDisplay', () => {
   it('returns empty string for null/undefined', () => {
@@ -28,25 +28,25 @@ describe('formatInputNumberDisplay', () => {
   })
 })
 
-describe('parseInputNumberInput', () => {
+describe('parseInputNumberValue', () => {
   it('treats empty string and a lone minus as null (in-progress input)', () => {
-    expect(parseInputNumberInput('')).toBeNull()
-    expect(parseInputNumberInput('-')).toBeNull()
+    expect(parseInputNumberValue('')).toBeNull()
+    expect(parseInputNumberValue('-')).toBeNull()
   })
 
   it('prefers a custom parser', () => {
-    expect(parseInputNumberInput('$1,000', { parser: (s) => Number(s.replace(/[$,]/g, '')) })).toBe(
+    expect(parseInputNumberValue('$1,000', { parser: (s) => Number(s.replace(/[$,]/g, '')) })).toBe(
       1000
     )
   })
 
   it('parses numbers via Number() by default', () => {
-    expect(parseInputNumberInput('42')).toBe(42)
-    expect(parseInputNumberInput('-7.5')).toBe(-7.5)
-    expect(parseInputNumberInput('0')).toBe(0)
+    expect(parseInputNumberValue('42')).toBe(42)
+    expect(parseInputNumberValue('-7.5')).toBe(-7.5)
+    expect(parseInputNumberValue('0')).toBe(0)
   })
 
   it('returns null for unparseable input', () => {
-    expect(parseInputNumberInput('abc')).toBeNull()
+    expect(parseInputNumberValue('abc')).toBeNull()
   })
 })
