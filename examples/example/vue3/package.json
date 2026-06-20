@@ -12,7 +12,7 @@
   "dependencies": {
     "@expcat/tigercat-vue": "workspace:*",
     "vue": "catalog:",
-    "vue-router": "^5.0.6"
+    "vue-router": "^5.1.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
@@ -22,6 +22,6 @@
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vue-tsc": "^3.2.7"
+    "vue-tsc": "^3.3.5"
   }
 }

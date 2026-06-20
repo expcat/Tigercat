@@ -13,13 +13,13 @@
     "@expcat/tigercat-react": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-router-dom": "^7.14.2"
+    "react-router-dom": "^7.18.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-react": "^6.0.2",
     "axe-core": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
