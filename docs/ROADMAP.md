@@ -172,6 +172,8 @@ source: current repository audit and planning
 > **进度（2026-06-21，续）**：C-4 已交付（详见下方 C-4 条目、[CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)）。余项仅剩 C-5（React 巨石拆分）。
 >
 > **进度（2026-06-21，续）**：C-5 的 **Picker 三件套**（Select / DatePicker / TimePicker）已按 `Table/` 范式拆分交付（详见下方 C-5 条目与 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`），并完成 C-4 遗留的 DatePicker / TimePicker `useControlledState` 迁移。C-5 复选框保持开放，余 **Menu / Tree** 待后续批次。
+>
+> **进度（2026-06-21，收尾）**：C-5 的 **Menu / Tree** 已按同一 `Table/` 范式拆分交付（详见下方 C-5 条目与 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`）——公共导出、props 类型与渲染 / a11y 行为不变，公共 API 基线快照（`api-reports`）无变化。**至此 C-5 复选框勾除，优化扫描任务 A–G 全部回填并交付完毕**，Roadmap 开放项仅余顶部的 v1.3.4 发布执行与发布后归档。
 
 - [x] **C-3 已交付（2026-06-20）**——React `ImagePreview` 门户挂载改用 `utils/overlay` 的 `renderBodyPortal`（内含 `isBrowser()` 守卫）替代直接 `createPortal(…, document.body)`，与 Tour/FloatButton/ChartTooltip 门户写法统一；浏览器端渲染行为不变。配套为测试基建 `tests/setup.ts` 的 `matchMedia` mock 加 `typeof window` 守卫，新增 node 环境 SSR spec；Vue `ImagePreview` 经 Teleport（SSR 安全），无需镜像。按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目。
 
@@ -179,13 +181,13 @@ source: current repository audit and planning
   - **未迁移（非纯样板，有意保留）**：`ScrollSpy`（`isControlled` 兼作 effect 模式开关 + onChange 值类型变性冲突）、`NumberKeyboard`（受控值读取时归一化，非幂等迁移有风险）；`Select` / `DatePicker` / `TimePicker` 的受控迁移并入 **C-5** 拆分一并做。
   - **实现判断**：onChange 值类型与受控值空间一致者把 `onChange` 交给 hook（值型直接合并，携事件者用 extra-args `setValue(next, event)`）；当受控值空间含 `undefined` 而 `onChange` 不接受（如 `RadioGroup`），或 onChange 参数顺序/语义不符（`Upload` 的 `(file, list)`、`Radio` 发 `value` 非 `checked`），则 hook 仅管 state、`onChange` 保留手写——既消除 `isControlled` 样板又规避函数参数变性误报。按惯例移交 CHANGELOG，本节不再保留问题细目。
 
-- [ ] **C-5 复杂度热点：Menu/Tree/DatePicker/TimePicker 单文件巨石**（P2）
+- [x] **C-5 复杂度热点：Menu/Tree/DatePicker/TimePicker 单文件巨石（已交付）**（P2）
   - 维度：复杂度热点｜模块：`Menu.tsx`(914)、`Tree.tsx`(897)、`DatePicker.tsx`(847)、`TimePicker.tsx`(775)、`Select.tsx`(666)
   - 问题：`Table` 已拆为 `Table/`（`state.ts` + `render-header/body/pagination/summary` + `types/icons`），是 React 端已落地的解耦范式；而上述组件仍单文件，渲染/状态/键盘逻辑耦合。
   - 影响：大文件维护成本高、回归面大，与 Vue 同类逻辑各自内联易漂移（Vue 对应文件更大，见 B-6）。
   - 建议：按 `Table/` 模式拆出 `state.ts` 与 render-\* 子模块；框架无关纯逻辑（键盘导航、日期/时间计算、节点 flatten/过滤）下沉 `core/src/utils/` 经 hooks 包装供双端共享——跨端下沉执行归属任务 D。
   - **已交付 Picker 三件套（2026-06-21）**：`Select` / `DatePicker` / `TimePicker` 已拆为 `<Comp>/`（`state.ts` 状态 hook + `render-*` 渲染 + `icons` + `types`），wrapper 文件瘦身（679→82 / 835→71 / 754→116 行），公共导出与 props 类型不变（公共 API 基线无变化）；DatePicker/TimePicker 受控值接入 `useControlledState`（边界解析对齐 onChange 值空间），Select 本即全受控仅结构拆分；纯逻辑续调 core，无新增 core 抽取。详见 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`。
-  - **剩余（后续批次）**：`Menu`（含 `MenuItem` / `SubMenu` / `MenuItemGroup` 多组件导出面）与 `Tree` 仍待按同一范式拆分。
+  - **已交付 Menu / Tree（2026-06-21 收尾）**：`Menu`（含 `MenuItem` / `SubMenu` / `MenuItemGroup` 多组件导出面与共享 `MenuContext`）拆为 `Menu/`（`state.ts` `useMenuRootState` + `context.ts` + `menu-item` / `submenu` / `menu-item-group` 子组件 + `icons` / `types`），wrapper 定义 `Menu` 根组件并原样 re-export 四组件 + `useMenuContext` + 类型；`Tree` 拆为 `Tree/`（`state.ts` `useTreeState` + `render-row` / `render-node` + `icons` / `types`）。纯逻辑续调 core（键盘导航 / 过滤 / 复选框级联 / flatten），无新增 core 抽取；公共 API 基线无变化，React 全量单测（2872）绿。**C-5 全部完成，任务 C 与优化扫描 A–G 收尾。**
 
 - [x] **C-0 已核查、修正与移交回收**
   - 类型安全（A-0/B-0 移交）：`packages/react/src` 类型位 `any` 仅 **1** 处（`Table.tsx:267` `new Map<string, any>()`，与 Vue `Table.ts:160` 镜像，风险极低），`@ts-ignore`/`@ts-expect-error` **0** 处 → React 类型层基本干净。非空断言约 **17** 处（与 Vue B-5 的 21 处镜像，多为 defaulted prop 的 `props.X!`），低优先级，宜随 B-5 同批收敛。
