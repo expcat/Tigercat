@@ -2,12 +2,12 @@
 
 <!-- LLM-INDEX
 type: roadmap-audit
-scope: review of ROADMAP.md completed scan tasks — 任务 A (Core 包扫描, A-0~A-5) + 任务 B (Vue 组件包扫描, B-0~B-6) + 任务 C (React 组件包扫描, C-0~C-5 全部完成) + 任务 D (跨框架一致性扫描, D-0~D-4 全部完成) + 任务 E (CLI 包扫描, E-0~E-5 全部完成)
+scope: review of ROADMAP.md completed scan tasks — 任务 A (Core 包扫描, A-0~A-5) + 任务 B (Vue 组件包扫描, B-0~B-6) + 任务 C (React 组件包扫描, C-0~C-5 全部完成) + 任务 D (跨框架一致性扫描, D-0~D-4 全部完成) + 任务 E (CLI 包扫描, E-0~E-5 全部完成) + 任务 F (构建·体积·性能扫描, F-0~F-6 全部完成) + 任务 G (质量门禁·文档一致性扫描, G-0~G-6；G-2/G-6 有「交付后被后续提交反转」的需修项)
 verified-date: 2026-06-21
-source: code/CHANGELOG/MIGRATION/scripts/git cross-check against packages/core/src, packages/vue/src, packages/react/src, packages/cli/src, scripts/validate-api.mjs, tests/core/cli.spec.ts, pnpm-workspace.yaml
+source: code/CHANGELOG/MIGRATION/scripts/git cross-check against packages/core/src, packages/vue/src, packages/react/src, packages/cli/src, scripts/validate-api.mjs, scripts/check-release-readiness.mjs, scripts/generate-api-baseline.mjs, scripts/generate-api-docs.mjs, scripts/validate-tests.mjs, tests/core/cli.spec.ts, pnpm-workspace.yaml, .size-limit.json, packages/*/tsup.config.ts, vitest.config.ts, api-reports/public-api-baseline.json, .github/workflows/{ci,security,publish,publish-on-tag,bench}.yml, .github/dependabot.yml.disabled, skills/tigercat/references/{performance,cli}.md, CHANGELOG.md; 任务 F 经 `pnpm build && pnpm size` 实跑坐实；任务 G 经 `git show`/`merge-base --is-ancestor` 考古坐实 cfabd219(交付)→345274f8(反转) 均在 HEAD 历史内
 -->
 
-> 本文是对 [ROADMAP.md](ROADMAP.md) 已勾选完成项的独立审查记录，**不修改 ROADMAP 原文、不改组件代码**，结论与建议供维护者取舍。当前覆盖：任务 A（Core 包扫描）、任务 B（Vue 组件包扫描）、任务 C（React 组件包扫描，已完成的 C-0～C-5 全部审毕——C-5 见 §6 补审）、任务 D（跨框架一致性扫描，D-0～D-4 全部审毕）、任务 E（CLI 包扫描，E-0～E-5 全部审毕）。
+> 本文是对 [ROADMAP.md](ROADMAP.md) 已勾选完成项的独立审查记录，**不修改 ROADMAP 原文、不改组件代码**，结论与建议供维护者取舍。当前覆盖：任务 A（Core 包扫描）、任务 B（Vue 组件包扫描）、任务 C（React 组件包扫描，已完成的 C-0～C-5 全部审毕——C-5 见 §6 补审）、任务 D（跨框架一致性扫描，D-0～D-4 全部审毕）、任务 E（CLI 包扫描，E-0～E-5 全部审毕）、任务 F（构建·体积·性能扫描，F-0～F-6 全部审毕，含 `pnpm build && pnpm size` 实跑坐实）、任务 G（质量门禁·文档一致性扫描，G-0～G-6 全部审毕——**G-2/G-6 有「交付后被后续提交反转」的需修项**，详见该节 §3）。
 
 ## 任务 A — Core 包扫描
 
@@ -309,3 +309,124 @@ C-0 原文（节选）：
 2. **（可选，陈述精度）E-5「单一来源」措辞**：可在 ROADMAP E-5 条目把「使 catalog 成为单一来源」改述为「`TEMPLATE_VERSIONS` 与 catalog 双份、由 `cli.spec.ts` 对齐测试锁步防漂移」，与代码注释（`cli.spec.ts:130-131`）口径一致；纯措辞，无需动代码/测试。
 3. **（可选，陈述精度）E-3「12 例」批次口径**：如需逐项精确，可在 ROADMAP 注明该 12 例覆盖 E-3/E-4/E-5 三项（E-3 自身 6 例）。
 4. **（可选，护栏可见性）catalog 锁步约定固化**：可在「持续守护 → Tailwind v4 / 发布门禁」或贡献指南补一行「新增模板工具链依赖须同步登记 `TEMPLATE_VERSIONS` 与 catalog」，把 E-5 的「记得双写」固化为约定（现已有红测拦截漂移，此为锦上添花）。
+
+## 任务 F — 构建·体积·性能扫描
+
+> 本节是对 [ROADMAP.md](ROADMAP.md) 「任务 F — 构建·体积·性能扫描」**已勾选完成项**（F-0 ～ F-6，ROADMAP 标注全部「已交付」，分批于 2026-06-19 / 06-20 交付）的独立审查记录。结论与建议供维护者取舍，**不修改 ROADMAP 原文，也不改构建配置 / 代码**。
+
+### 1. 审查范围与方法
+
+- **范围**：ROADMAP「任务 F — 构建·体积·性能扫描」的核查结论 F-0 与优化项 F-1 ～ F-6（目标路径：各包 `tsup.config.ts` / `.size-limit.json` / `package.json` 的 exports / sideEffects / module）。
+- **方法**：逐条把 ROADMAP / CHANGELOG 声称项对照
+  - `.size-limit.json`、`packages/{core,vue,react}/package.json`、`packages/*/tsup.config.ts`、`scripts/check-release-readiness.mjs`、`.github/workflows/bench.yml`、`vitest.config.ts`、`benchmarks/*.bench.ts`；
+  - [CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 的逐条落地说明（第 61 / 64 / 68 / 72 行）；
+  - **实跑只读门禁坐实预算**：`pnpm build` 后 `pnpm size`（退出码 0、18 项体积预算全绿），区别于扫描期的静态比对；并以 `grep` 量化 vue/react `src` 的 CSS / 副作用 import（F-5 headless 前提）与全仓对 core `./types`/`./theme` 子路径的消费（F-3 删除安全性）。
+
+### 2. 逐条核验结果
+
+| 项  | 声称                                                                                                                                | 核验                    | 证据                                                                                                                                                                                                                                                                                                                                                                                    |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-1 | 5 项主预算按实测 +~10% 余量重设（Core 118 / Vue 284 / React 320 / Vue Button 22 / React Button 20 kB）                              | ✅ 属实                 | `.size-limit.json:1-31` 五项数值完全一致；`pnpm size` 实测 Core 107.64 / Vue 258.19 / React 292.29 / Vue Button 19.91 / React Button 17.84 kB，三主入口上限较实测高 9.5 ～ 10.0%（坐实「+~10% 余量」）；CHANGELOG 第 61 行记录增量来自新功能源码（运行时依赖仅 `@floating-ui/dom`）                                                                                                     |
+| F-2 | 新增重组件子路径（Menu/DatePicker/Table/Tree/TimePicker 双端）+ core 子路径（tailwind/modern、locales/zh-CN、icons/common）体积护栏 | ✅ 属实                 | `.size-limit.json:33-109` 13 条新增护栏在位（10 重组件 + 3 core），`pnpm size` 实测全绿（如 Vue Table 43.15/48、React Menu 29.77/33、core icons/common 0.08/1 kB）；vue/react `tsup.config.ts` 按 `src/components/*` 多入口 + `splitting:true` 产出 `dist/components/<Name>.mjs`，6 组件 wrapper 双端文件均存在；core `tsup.config.ts` 多入口产出三 core 子路径目标；CHANGELOG 第 61 行 |
+| F-3 | 移除失效冗余 `./types`/`./theme` 子路径导出；同步从 `release:check` 必需清单移除                                                    | ✅ 属实                 | `packages/core/package.json` exports 无 `./types`/`./theme`；`check-release-readiness.mjs:59-65` `requiredCoreExports` 仅余 5 项（`.`/`./tailwind`/`./tailwind/modern`/`./tokens.css`/`./figma-variables.json`）；全仓 0 处消费 `@expcat/tigercat-core/types` 或 `/theme`（删除安全）；CHANGELOG 第 64 行                                                                               |
+| F-4 | `module` 字段由不存在的 `./dist/index.mjs` 改为 `./dist/index.js`                                                                   | ✅ 属实                 | `packages/core/package.json:23` `module:"./dist/index.js"`，与主入口 `import` 条件（`:29`）一致、目标文件经 `pnpm build` 实产出；CHANGELOG 第 64 行（与 F-3 合并记述）                                                                                                                                                                                                                  |
+| F-5 | vue/react `sideEffects` 由保守 allowlist 收敛为 `false`                                                                             | ✅ 属实（实跑佐证生效） | 两包 `sideEffects:false`（vue `:26`、react `:25`）；vue/react `src` 0 处 `.css`/副作用 import（headless 确认）；`pnpm size` 中 esbuild 对 tsup split-chunk 的裸 `import "../chunk-*.mjs"` 批量报 `ignored-bare-import`——正是 `sideEffects:false` 生效、可剔除未用 chunk 的预期信号（见 §4 旁注 1）；CHANGELOG 第 68 行声明 example:build 无回归                                         |
+| F-6 | `bench.yml` 接入非阻塞工作流（周度 + 手动，`pnpm bench --run --outputJson` + upload-artifact）                                      | ✅ 属实                 | `.github/workflows/bench.yml` 周度 cron（周一 07:00 Asia/Shanghai）+ `workflow_dispatch`、`pnpm bench --run --outputJson=bench-results.json`、`upload-artifact@v7`（retention 30d），注释明示「非 PR 门禁 / 无硬阈值」；`bench` 脚本 = `vitest bench`、`benchmarks/` 8 个 `.bench.ts`、`vitest.config.ts:12-13` benchmark 段在位；CHANGELOG 第 72 行                                    |
+| F-0 | 构建主线无需处理（core sideEffects:false、tsup 配置合理、子路径目标存在、module 已修正）                                            | ✅ 属实                 | core `sideEffects:false`；core tsup `splitting:false` 多入口、vue/react `splitting:true` + `external` 框架；子路径导出目标 `pnpm build` 后均存在；`module` 已随 F-4 修正                                                                                                                                                                                                                |
+
+**结论**：F-0 ～ F-6 全部属实、CHANGELOG 记录齐全，且体积门禁经 `pnpm build && pnpm size` **实跑 18 项预算全绿**（非仅静态比对）—— **无需返工**。与任务 C / D / E 同属**零返工缺陷**的干净交付，无任务 A（A-0 的 SSR 过度表述 + 无效移交）、任务 B（B-2 的 Vue Cascader 空态漏改 bug）那类缺陷。
+
+### 3. 无可返工缺陷；门禁实跑全绿（与任务 A / B 的正向对照）
+
+任务 F 的已完成项未发现 A/B 那类缺陷，三点佐证其干净：
+
+- **预算是实跑绿、非纸面声称**：`pnpm build` 后 `pnpm size` 退出码 0，18 项预算全部低于上限（三主入口实测处于上限的 ~91%、即上限较实测高 9.5 ～ 10.0%，与 F-1「+~10% 余量」自述吻合），F-2 新增的 10 重组件 + 3 core 子路径护栏同样全绿。门禁红→绿（解除 v1.3.4 发布阻塞）可复现。
+- **删除有据、无消费者**：F-3 移除的 `./types`/`./theme` 子路径全仓 0 处 import 消费，且 `check-release-readiness.mjs` 必需清单同步收敛——删除不破坏发布门禁，与「目标文件从未产出、内容已在主入口」的声称一致。
+- **与 A-0 的正向对照**：F-0 给出的是**有据的窄结论**（core `sideEffects:false`、tsup 配置合理、子路径目标存在），并以 `pnpm build` 后产物存在性坐实；未作「已穷尽 / 已统一」式过度表述，也未把任何问题移交不覆盖本范围的他任务。
+
+**F-5 经实跑确认真生效（而非仅改字段）**：`pnpm size` 期间 esbuild 对 vue/react 各 split-chunk 的裸 `import "../chunk-*.mjs"` 批量报 `ignored-bare-import`，并指明 `"sideEffects" is false`。这正是 `sideEffects:false` 的预期效果——裸 chunk import 仅用于 tsup 的求值排序，对 headless 包无实际副作用，打包器据此可剔除 barrel import 下未用的 chunk（F-5 声称的收益）；需要的绑定仍经 `import { X } from "../chunk"` 保留，故体积测量与运行时均不受损（CHANGELOG 第 68 行的 example:build 无回归即真实消费侧佐证）。
+
+### 4. 旁注（陈述精度 / 范围，不计为缺陷）
+
+- **`ignored-bare-import` 警告是 F-5 的预期产物，非错误**：上述 esbuild 警告在 `pnpm size` 输出中数量较多，易被误读为问题。实为 `sideEffects:false` 生效的标志——仅对**有真实模块级副作用**的包才需担心（会误删初始化代码）；Tigercat vue/react 为 headless（src 0 CSS / 副作用 import，唯一运行时依赖 `@floating-ui/dom` 为 external、不进这些 chunk），故剔除裸 chunk import 安全。属正向信号，非缺陷。
+- **F-2 子路径覆盖是「重组件代表子集」**：新增护栏覆盖每端 5 个重组件 + 3 个 core 子路径，非穷尽 ROADMAP 原列的 144 vue + 144 react + 38 core 全部子路径——属护栏意图（拦最可能膨胀者）下的有意收窄，F-2 条目自述「重组件子路径」已如实界定，非遗漏。
+- **F-6 仅闭合「未接入 CI」、`baseline-diff` 阈值有意延后**：F-6 关闭了 ROADMAP 原缺口的「基准未接入 CI」部分（新增 `bench.yml`），但「无基线回归阈值 / 自动 baseline-diff」是 `bench.yml` 注释（`:6-8`）与 CHANGELOG 第 72 行均明示的**有意延后**（micro-bench 在共享 runner 抖动大、硬阈值易误红）。故运行时性能维度仍留一个**显式 scope-out 的开放面**，非缺陷。
+- **预算总数**：`.size-limit.json` 实为 **18 项**（5 主/Button + 10 重组件 + 3 core），ROADMAP F-2 文字未给总数，此处据实记录。
+
+### 5. 建议
+
+供 ROADMAP 维护者取舍，本审查文档不代改 ROADMAP / 代码：
+
+1. **F-0 ～ F-6 无需返工**（与任务 A / B 各有一处需修不同，F 同任务 C / D / E 为零缺陷）。
+2. **（可选 P3）把 F-6 残留登记为跟踪项**：`bench.yml` 的「无 baseline-diff 回归阈值」是有意延后但仍是开放面；可在「后续优化任务 → 来自任务 F」补一条 P3 跟踪项（如「评估周度 bench 结果的人工 / 半自动 baseline 对比阈值」），避免该 scope-out 随时间被遗忘。
+3. **（可选，陈述精度）F-2 覆盖范围措辞**：可在 ROADMAP F-2 注明体积护栏为「重组件 + 关键 core 子路径代表子集（共 18 项）」，与 `.size-limit.json` 实际项数对齐，避免被读为已穷尽全部子路径。
+
+## 任务 G — 质量门禁·文档一致性扫描
+
+> 本节是对 [ROADMAP.md](ROADMAP.md) 「任务 G — 质量门禁·文档一致性扫描」**已勾选完成项**（G-0 ～ G-6，ROADMAP 标注全部「已交付」，分批于 2026-06-20 交付）的独立审查记录。结论与建议供维护者取舍，**不修改 ROADMAP 原文，也不改工作流 / 脚本 / 代码**。**这是继任务 A / B 之后第三个有需修项的任务，且性质最重**——G-2 与 G-6 的已交付项在交付约 1.5 小时后被后续提交**有意反转**，使 ROADMAP / CHANGELOG 与当前仓库状态矛盾，并连带架空 G-1 / G-3 / G-4 的门禁强制（详见 §3）。
+
+### 1. 审查范围与方法
+
+- **范围**：ROADMAP「任务 G — 质量门禁·文档一致性扫描」的核查结论 G-0 与优化项 G-1 ～ G-6（目标路径：`.github/workflows/` + `scripts/*.mjs` + `skills/tigercat/references/`）。
+- **方法**：逐条把 ROADMAP / CHANGELOG 声称项对照
+  - `.github/workflows/{ci,security,publish,publish-on-tag,bench}.yml`、`.github/dependabot.yml.disabled`、`vitest.config.ts`、`scripts/{generate-api-baseline,generate-api-docs,check-release-readiness,validate-tests}.mjs`、`api-reports/public-api-baseline.json`、`skills/tigercat/references/{performance,cli}.md`、`package.json` 的 `quality:*` / `test:*` 脚本链；
+  - [CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 的逐条落地说明（第 69 ～ 73 行）；
+  - **git 考古坐实交付与反转**：`git show` 读 `cfabd219`（G 批量交付）与 `345274f8`（反转）的实际 diff，`git merge-base --is-ancestor` 确认二者均在 HEAD 历史内 —— 这是判定「已交付项被反转」而非「从未交付」的关键。
+
+### 2. 逐条核验结果
+
+| 项  | 声称                                             | 核验                                 | 证据                                                                                                                                                                                                                                                                                                                                               |
+| --- | ------------------------------------------------ | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| G-1 | 覆盖率阈值 + 接入 CI                             | ✅ 属实（带 CI-only 连带影响）       | `vitest.config.ts:22-26` `coverage.thresholds`（lines 85 / statements 83 / functions 84 / branches 76）；`test:coverage`=`vitest run --coverage`（`package.json:37`）；`ci.yml` 步骤 `Run tests with coverage: pnpm test:coverage`。**连带**：仅 CI 内强制——`quality:release → quality:quick` 跑 `test:core` 而非 `test:coverage`（见 §3 第 3 点） |
+| G-2 | 依赖/CVE 扫描（dependabot + security.yml）       | ⚠️ **已交付但被后续提交反转**        | `security.yml` 在位（周度 + 手动、`pnpm audit --audit-level=high`、`continue-on-error` 报告式）✅；但 `.github/dependabot.yml` 已被 `345274f8` 重命名为 `.disabled` → G-2 自述的「实际收敛机制」已不运行，且 `security.yml:3-4,11` 与 `CHANGELOG.md:70` 仍当它活跃（悬挂引用 + 矛盾，见 §3 第 1 点）                                               |
+| G-3 | 公共 API 基线快照护栏                            | ✅ 属实（同 CI-only 连带）           | `scripts/generate-api-baseline.mjs` 在位；`api-reports/public-api-baseline.json` 顶层键 `core` / `propsInterfaces`（**156** 接口）/ `react` / `vue`，与「156 \*Props」一致；`ci.yml` 有 `Generate public API baseline`（`pnpm api:baseline`）+ `Check public API baseline is current`（`git diff --exit-code api-reports`）。CHANGELOG 第 71 行    |
+| G-4 | references 漂移闸（prettier 配置 + 整目录 diff） | ✅ 属实（同 CI-only 连带）           | `generate-api-docs.mjs:481-484` `formatMarkdown` 经 `prettier.resolveConfig(SKILL_REFERENCES_DIR)` 加载仓库配置后格式化；`ci.yml` `Check generated skill references are current: git diff --exit-code skills/tigercat/references`（整目录、非单文件 api-summary）。CHANGELOG 第 67/71 行范式一致                                                   |
+| G-5 | 手维护指南修复（performance.md / cli.md）        | ✅ 属实                              | `performance.md:56` `## Benchmarks` 节（`pnpm bench` / `benchmarks/` 8 个 `.bench.ts` / `bench.yml`，与 F-6 对齐）；`cli.md:12/16` 选项字面量 `\|` 已转义、还原 Command / Purpose / Key options 三列分隔                                                                                                                                           |
+| G-6 | 质量门禁绑定触发 + 发布前置闸                    | ⚠️ **发布闸属实；CI 自动触发被反转** | 发布前置闸 ✅：`publish.yml` `Verify release readiness: pnpm release:check`、`publish-on-tag.yml:95` `pnpm release:check`，发布不绕过；但 `ci.yml:3-4` 现仅 `workflow_dispatch`——`push`/`pull_request(main)` 已被 `345274f8` 删除，正是 G-6 声称要修的原缺口，`CHANGELOG.md:73` 仍写「随 PR/合并自动生效」（矛盾，见 §3 第 2 点）                  |
+| G-0 | 现有门禁覆盖部分无需处理                         | ✅ 属实（链描述为扫描期快照）        | `check-release-readiness.mjs:59-67` requiredCoreExports 5 项（与 F-3 收敛一致）；`validate-tests.mjs`（`test:validate`）在 CI 与 `quality:release` 内。**陈述精度**：G-0 描述的 8 步 CI 链是扫描期快照，其后被 G-1/G-3/G-4 自身扩充（加入 coverage、api:baseline+diff、references 整目录 diff，现为 11 步）                                        |
+
+**结论**：G-1 / G-3 / G-4 / G-5 与 G-0 属实、相应护栏存在；G-6 的发布前置闸属实。但 **G-2 与 G-6 的另一半已被后续提交有意反转**——dependabot 被禁用、CI 自动触发被移除，且 ROADMAP / CHANGELOG / `security.yml` 仍按已交付口径描述（矛盾 + 悬挂引用），并连带使 G-1/G-3/G-4 三道闸失去自动强制路径。**任务 G 非零返工**——是 A–G 七项中唯一的「已交付后被反转」类缺陷，比任务 A（A-0 文字过度表述）、任务 B（B-2 单点本地化 bug）波及面更大（基础设施级、直接削弱门禁本身）。
+
+### 3. 缺陷：G-2 / G-6 已交付项被后续提交反转（核心发现）
+
+git 考古（三提交均经 `merge-base --is-ancestor` 确认在 HEAD 历史内）：
+
+- `cfabd219`（2026-06-20 15:27，"Harden CI with coverage, API baselines, and release checks"）= **G 批量交付**：为 `ci.yml` **新增** `push` / `pull_request(main)` 触发、重建 `.github/dependabot.yml`，并接入 coverage / api:baseline / release:check 等闸。
+- `345274f8`（2026-06-20 16:51，"ci: 将 CI 与 Dependabot 改为仅手动触发"）= **反转**（diff 仅两文件）：`.github/dependabot.yml` → `dependabot.yml.disabled`（rename 100%），并从 `ci.yml` 删除 `push` / `pull_request`，只留 `workflow_dispatch`。
+
+由此产生三处实际问题：
+
+1. **G-2：dependabot 被禁用，但多处仍当作活跃机制（悬挂引用 + 矛盾）**
+   - `.github/dependabot.yml` 现不存在（仅 `.disabled`）。G-2 自述其为「依赖升级 / 安全补丁的**实际收敛机制**」——该机制已不运行。
+   - `security.yml:3-4,11` 注释**仍写**「Remediation is driven by Dependabot (see .github/dependabot.yml) … Dependabot fixes it」——指向已禁用文件的**悬挂引用**；其「audit 取 report-only（`continue-on-error`）因为 dependabot 会修」的设计前提已不成立 → 报告式 audit **失去补救兜底**（每周出报告，但无任何自动修复机制承接）。
+   - `CHANGELOG.md:70`（`## Unreleased`）仍写 dependabot「作为…驱动机制…由 dependabot 实际收敛」，与仓库现状矛盾。
+
+2. **G-6：CI 自动触发被反转（矛盾）**
+   - `ci.yml:3-4` 现仅 `workflow_dispatch`——正是 G-6 声称已修的「原缺口（CI/E2E 全部手动触发）」。
+   - `CHANGELOG.md:73`（`## Unreleased`）仍写「`ci.yml` 增 `push` / `pull_request`（main）触发…使全量门禁随 PR / 合并自动生效」，与现状矛盾。
+   - G-6 的**发布前置闸**（`publish.yml` / `publish-on-tag.yml` 的 `release:check`）**未被反转**，仍在岗 → G-6 只坏了「CI 自动触发」这一半。
+
+3. **连带影响：G-1 / G-3 / G-4 三道闸被一并架空**
+   - 这三项门禁**只接到 `ci.yml`**，**不在** `quality:release` 链内：`quality:release` = `release:check && quality:quick && quality:size && test:validate && quality:examples && quality:ssr`，其中 `quality:quick` 跑的是 `test:core`（非 `test:coverage`），全链无 `api:baseline`+diff、无 `docs:api`+references diff。
+   - `ci.yml` 既已退回手动触发 → **覆盖率阈值（G-1）、API 基线漂移（G-3）、references 漂移（G-4）三道闸只在有人手动 dispatch CI 时才跑**：既不随 PR / push 自动生效，也无法经 `pnpm quality:release` 走到。G-6 的反转把同批新增的这三道闸一起架空。
+
+> **与任务 B 的对照**：本缺陷与 B-2「实测与 CHANGELOG 矛盾」同类，但更重——B-2 是单组件单点本地化 bug，本项是**基础设施级**：被反转的是质量门禁的触发与补救机制本身，且一次性削弱 G-1/G-2/G-3/G-4/G-6 五项的实际效力。
+
+### 4. 旁注（不计为缺陷）
+
+- **`345274f8` 系有意提交、可能为成本权衡**：提交信息清晰（「将 CI 与 Dependabot 改为仅手动触发」），与 G-6 自陈的「CI 仍以 PR 闸为主、不给任意分支 push 全量跑（控 Actions 成本）」「e2e 维持手动」偏好一致——很可能是刻意把「手动触发」从 e2e 扩展到主 CI。本审查不臆断对错，仅指出它使 ROADMAP / CHANGELOG / `security.yml` 留下过期/矛盾/悬挂描述，需调和（见 §5）。
+- **G-0 的 CI 链描述是扫描期快照**：G-0 写的 8 步链（lint→build→test→test:validate→docs:api+api-summary drift→api:validate→test:a11y→size）在 G-1/G-3/G-4 交付后已自然扩充（coverage、api:baseline+diff、references 整目录 diff），现为 11 步——属陈述精度（扫描期基线），非缺陷。
+- **`dependabot.yml.disabled` 内容完整保留**：仍含 `npm`（`:5`）与 `github-actions`（`:21`）两段周更配置，重命名回 `.yml` 即可重启，重启成本极低。
+
+### 5. 建议
+
+供 ROADMAP 维护者取舍，本审查文档不代改 ROADMAP / 代码 / 工作流：
+
+1. **调和 G-2（二选一，且无论哪种都应修 `security.yml` 悬挂引用）**：
+   - 重启：`git mv .github/dependabot.yml.disabled .github/dependabot.yml`，使 G-2/CHANGELOG 第 70 行的「dependabot 实际收敛」重新成立；或
+   - 如实改述：修订 `CHANGELOG.md:70` 与 `security.yml:3-4,11` 注释，去掉「由 dependabot 实际收敛 / Dependabot fixes it」，改写为「audit 为报告式可见性、当前无自动补救机制（dependabot 已停用）」。
+2. **调和 G-6（二选一）**：
+   - 恢复：给 `ci.yml` 加回 `push` / `pull_request(main)` 触发，兑现 G-6/CHANGELOG 第 73 行；或
+   - 如实改述：修订 ROADMAP G-6 与 `CHANGELOG.md:73`，把「随 PR / 合并自动生效」改为「CI 维持手动 `workflow_dispatch`（控 Actions 成本）」。
+3. **修复连带弱化（建议 P1）**：若 CI 决定保持手动，应把 G-1/G-3/G-4 三道闸纳入**本地可达路径**，避免随 CI 手动化而被架空——例如在 `quality:release` 中把 `quality:quick` 的 `test:core` 替换/补充为 `test:coverage`（强制覆盖率阈值），并新增 `api:baseline`+`git diff api-reports`、`docs:api`+`git diff skills/tigercat/references` 两步漂移校验。
+4. **（可选，陈述精度）G-0 链快照**：可在 ROADMAP G-0 注明所述 CI 步骤链为扫描期快照，已被 G-1/G-3/G-4 扩充。
