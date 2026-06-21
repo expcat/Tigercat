@@ -383,7 +383,10 @@ const DrawerDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 不同尺寸与内边距 */}
-      <DemoBlock title="不同尺寸与内边距" description="通过 size 属性设置抽屉的大小，或者使用 bodyPadding 自定义主体区域内边距。" code={sizeSnippet}>
+      <DemoBlock
+        title="不同尺寸与内边距"
+        description="通过 size 属性设置抽屉的大小，或者使用 bodyPadding 自定义主体区域内边距。"
+        code={sizeSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Space>
             <Button

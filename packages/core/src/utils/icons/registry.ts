@@ -67,9 +67,7 @@ export const iconRegistry = {
   'arrow-right': stroke24('M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3'),
   'arrow-up': stroke24('M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18'),
   'arrow-down': stroke24('M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3'),
-  search: stroke24(
-    'm21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'
-  ),
+  search: stroke24('m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'),
   plus: stroke24('M12 4.5v15m7.5-7.5h-15'),
   minus: stroke24('M5 12h14'),
   edit: stroke24(

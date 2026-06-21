@@ -78,8 +78,10 @@ export const Icon = defineComponent({
               fill: definition.mode === 'fill' ? 'currentColor' : SVG_DEFAULT_FILL,
               stroke: definition.mode === 'stroke' ? 'currentColor' : SVG_DEFAULT_STROKE,
               'stroke-width': definition.mode === 'stroke' ? 1.5 : undefined,
-              'stroke-linecap': definition.mode === 'stroke' ? iconSvgDefaultStrokeLinecap : undefined,
-              'stroke-linejoin': definition.mode === 'stroke' ? iconSvgDefaultStrokeLinejoin : undefined
+              'stroke-linecap':
+                definition.mode === 'stroke' ? iconSvgDefaultStrokeLinecap : undefined,
+              'stroke-linejoin':
+                definition.mode === 'stroke' ? iconSvgDefaultStrokeLinejoin : undefined
             },
             definition.paths.map((d) => h('path', { d }))
           )

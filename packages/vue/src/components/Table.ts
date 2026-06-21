@@ -32,6 +32,7 @@ import {
   tableResponsiveCardTitleClasses,
   tableResponsiveCardValueClasses,
   tableLoadingOverlayClasses,
+  type TableCardLayoutItem,
   type TableColumn,
   type TigerLocale,
   type TigerLocaleInput
@@ -157,7 +158,7 @@ export const Table = defineComponent({
     })
 
     const cardLayoutMap = computed(() => {
-      const map = new Map<string, any>()
+      const map = new Map<string, TableCardLayoutItem>()
       if (props.cardLayout) {
         for (const item of props.cardLayout) {
           map.set(item.key, item)

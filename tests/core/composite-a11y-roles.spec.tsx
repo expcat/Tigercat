@@ -175,9 +175,7 @@ describe('DataTableWithToolbar ARIA roles', () => {
         columns,
         dataSource: [],
         toolbar: {
-          filters: [
-            { key: 'status', label: '状态', options: [{ label: '启用', value: 'active' }] }
-          ]
+          filters: [{ key: 'status', label: '状态', options: [{ label: '启用', value: 'active' }] }]
         },
         pagination: false
       },

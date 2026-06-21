@@ -224,7 +224,10 @@ export default function DropdownDemo() {
       </DemoBlock>
 
       {/* 触发方式 */}
-      <DemoBlock title="触发方式" description="支持点击和悬浮两种触发方式。触发器上会自动暴露稳定的 data-state='open' | 'closed' 属性，支持 Tailwind selector 联动定制样式（如点击触发按钮所示）。" code={triggerSnippet}>
+      <DemoBlock
+        title="触发方式"
+        description="支持点击和悬浮两种触发方式。触发器上会自动暴露稳定的 data-state='open' | 'closed' 属性，支持 Tailwind selector 联动定制样式（如点击触发按钮所示）。"
+        code={triggerSnippet}>
         <div className="flex gap-4">
           <Dropdown trigger="hover">
             <Button>悬浮触发</Button>

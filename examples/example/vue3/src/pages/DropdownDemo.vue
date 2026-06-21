@@ -224,7 +224,10 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     </DemoBlock>
 
     <!-- 触发方式 -->
-    <DemoBlock title="触发方式" description="支持点击和悬浮两种触发方式。触发器上会自动暴露稳定的 data-state='open' | 'closed' 属性，支持 Tailwind selector 联动定制样式（如点击触发按钮所示）。" :code="triggerSnippet">
+    <DemoBlock
+      title="触发方式"
+      description="支持点击和悬浮两种触发方式。触发器上会自动暴露稳定的 data-state='open' | 'closed' 属性，支持 Tailwind selector 联动定制样式（如点击触发按钮所示）。"
+      :code="triggerSnippet">
       <div class="flex gap-4">
         <Dropdown trigger="hover">
           <Button>悬浮触发</Button>
@@ -236,7 +239,8 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
         </Dropdown>
 
         <Dropdown trigger="click">
-          <Button class="data-[state=open]:bg-blue-100 data-[state=open]:text-blue-800 transition-colors">
+          <Button
+            class="data-[state=open]:bg-blue-100 data-[state=open]:text-blue-800 transition-colors">
             点击触发
           </Button>
           <DropdownMenu>

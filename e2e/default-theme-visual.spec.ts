@@ -6,13 +6,17 @@ const targets = [
 ] as const
 
 const coreComponentCases = [
-  { component: 'button', path: '/button', sectionTitle: '按钮类型' },
-  { component: 'input', path: '/input', sectionTitle: '基础用法' },
-  { component: 'card', path: '/card', sectionTitle: '卡片变体' },
-  { component: 'form', path: '/form', sectionTitle: '基础用法' },
-  { component: 'table', path: '/table', sectionTitle: '基础用法' },
-  { component: 'tabs', path: '/tabs', sectionTitle: '基本用法' }
+  { component: 'button', path: 'button', sectionTitle: '按钮类型' },
+  { component: 'input', path: 'input', sectionTitle: '基础用法' },
+  { component: 'card', path: 'card', sectionTitle: '卡片变体' },
+  { component: 'form', path: 'form', sectionTitle: '基础用法' },
+  { component: 'table', path: 'table', sectionTitle: '基础用法' },
+  { component: 'tabs', path: 'tabs', sectionTitle: '基本用法' }
 ] as const
+
+function demoUrl(baseUrl: string, path: string): string {
+  return `${baseUrl}/#/${path}`
+}
 
 async function preparePage(page: Page, url: string): Promise<void> {
   await page.setViewportSize({ width: 1280, height: 900 })
@@ -46,7 +50,7 @@ for (const { framework, label, baseUrl } of targets) {
   test.describe(`${label} — Default theme visual regression`, () => {
     for (const { component, path, sectionTitle } of coreComponentCases) {
       test(`${component} default theme matches snapshot`, async ({ page }) => {
-        await preparePage(page, `${baseUrl}${path}`)
+        await preparePage(page, demoUrl(baseUrl, path))
 
         const section = await getDemoSection(page, sectionTitle)
         await expect(section).toHaveScreenshot(`${framework}-${component}-default-theme.png`, {

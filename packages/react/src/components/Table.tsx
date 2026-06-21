@@ -25,6 +25,7 @@ import {
   resolveTigerLocale,
   type RowSelectionConfig,
   type ExpandableConfig,
+  type TableCardLayoutItem,
   type TableColumn,
   type TigerLocale,
   type TigerLocaleInput
@@ -264,7 +265,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   })
 
   const cardLayoutMap = useMemo(() => {
-    const map = new Map<string, any>()
+    const map = new Map<string, TableCardLayoutItem>()
     if (cardLayout) {
       for (const item of cardLayout) {
         map.set(item.key, item)

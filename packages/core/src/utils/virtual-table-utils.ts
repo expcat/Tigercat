@@ -16,11 +16,9 @@ import {
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
-export const virtualTableContainerClasses =
-  `tiger-virtual-table relative overflow-auto border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff))))]`
+export const virtualTableContainerClasses = `tiger-virtual-table relative overflow-auto border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff))))]`
 
-export const virtualTableHeaderClasses =
-  `${tableHeaderBackgroundClasses} sticky top-0 z-10 border-b border-[var(--tiger-border,#e5e7eb)]`
+export const virtualTableHeaderClasses = `${tableHeaderBackgroundClasses} sticky top-0 z-10 border-b border-[var(--tiger-border,#e5e7eb)]`
 
 export const virtualTableHeaderCellClasses =
   'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--tiger-text-secondary,#6b7280)]'

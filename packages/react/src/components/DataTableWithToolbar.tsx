@@ -23,8 +23,10 @@ import { Popover } from './Popover'
 import { Checkbox } from './Checkbox'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface ReactTableToolbarFilterRenderContext
-  extends Omit<TableToolbarFilterRenderContext, 'filter'> {
+export interface ReactTableToolbarFilterRenderContext extends Omit<
+  TableToolbarFilterRenderContext,
+  'filter'
+> {
   filter: ReactTableToolbarFilter
 }
 
@@ -36,8 +38,10 @@ export interface ReactTableToolbarFilter extends Omit<TableToolbarFilter, 'rende
 
 export interface ReactTableToolbarRenderContext extends TableToolbarRenderContext {}
 
-export interface ReactTableToolbarProps
-  extends Omit<TableToolbarProps, 'filters' | 'filtersExtra' | 'render'> {
+export interface ReactTableToolbarProps extends Omit<
+  TableToolbarProps,
+  'filters' | 'filtersExtra' | 'render'
+> {
   filters?: ReactTableToolbarFilter[]
   filtersExtra?:
     | React.ReactNode
@@ -293,10 +297,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     toolbar?.onFiltersChange?.(nextFilters)
   }
 
-  const handleFilterSelect = (
-    filter: ReactTableToolbarFilter,
-    value: TableToolbarFilterValue
-  ) => {
+  const handleFilterSelect = (filter: ReactTableToolbarFilter, value: TableToolbarFilterValue) => {
     setFilterValue(filter.key, value, filter)
   }
 
@@ -383,7 +384,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         setHiddenColumnKeys: handleHiddenColumnsChange
       }
       return (
-        <>{typeof toolbar.render === 'function' ? toolbar.render(toolbarContext) : toolbar.render}</>
+        <>
+          {typeof toolbar.render === 'function' ? toolbar.render(toolbarContext) : toolbar.render}
+        </>
       )
     }
 
@@ -486,7 +489,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 return (
                   <div
                     key={filter.key}
-                    className={filter.itemClass ?? 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]'}
+                    className={
+                      filter.itemClass ?? 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]'
+                    }
                     style={filter.itemStyle as React.CSSProperties | undefined}>
                     <Select
                       size="sm"

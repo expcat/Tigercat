@@ -5,6 +5,10 @@ const targets = [
   { framework: 'react', label: 'React', baseUrl: 'http://localhost:5174' }
 ] as const
 
+function demoUrl(baseUrl: string, path: string): string {
+  return `${baseUrl}/#/${path}`
+}
+
 async function preparePage(page: Page, url: string): Promise<void> {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto(url, { waitUntil: 'networkidle' })
@@ -29,7 +33,7 @@ async function preparePage(page: Page, url: string): Promise<void> {
 for (const { framework, label, baseUrl } of targets) {
   test.describe(`${label} — Overlay visual regression`, () => {
     test('modal open state matches snapshot', async ({ page }) => {
-      await preparePage(page, `${baseUrl}/modal`)
+      await preparePage(page, demoUrl(baseUrl, 'modal'))
       await page.getByRole('button', { name: '打开对话框' }).first().click()
 
       const modalRoot = page.locator('[data-tiger-modal-root]:not([hidden])')
@@ -42,7 +46,7 @@ for (const { framework, label, baseUrl } of targets) {
     })
 
     test('drawer open state matches snapshot', async ({ page }) => {
-      await preparePage(page, `${baseUrl}/drawer`)
+      await preparePage(page, demoUrl(baseUrl, 'drawer'))
       await page.getByRole('button', { name: '打开抽屉' }).first().click()
 
       const drawerRoot = page.locator('[data-tiger-drawer-root]:not([hidden])')
@@ -57,7 +61,7 @@ for (const { framework, label, baseUrl } of targets) {
     // Skipped: popover renders at different widths across platforms (200px vs 201px),
     // causing persistent size-mismatch failures that maxDiffPixelRatio cannot resolve.
     test.skip('popover open state matches snapshot', async ({ page }) => {
-      await preparePage(page, `${baseUrl}/popover`)
+      await preparePage(page, demoUrl(baseUrl, 'popover'))
       await page.getByRole('button', { name: '触发气泡卡片' }).first().click()
 
       const popover = page.locator('[role="dialog"][aria-modal="false"]').first()

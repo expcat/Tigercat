@@ -186,7 +186,12 @@ describe('Vue useTableState', () => {
     context.toggleColumnLock('name')
     expect(context.displayColumns.value[0].fixed).toBe(false)
     context.toggleColumnLock('age')
-    expect(context.displayColumns.value[1].fixed).toBe('left')
+    expect(context.displayColumns.value.map((column) => column.key)).toEqual([
+      'age',
+      'name',
+      'status'
+    ])
+    expect(context.displayColumns.value[0].fixed).toBe('left')
 
     context.handleDrop('age')
     expect(emit.mock.calls.some(([event]) => event === 'column-order-change')).toBe(false)
@@ -194,9 +199,9 @@ describe('Vue useTableState', () => {
     context.handleDragStart('status')
     context.handleDrop('name')
     expect(emit).toHaveBeenCalledWith('column-order-change', [
+      expect.objectContaining({ key: 'age' }),
       expect.objectContaining({ key: 'status' }),
-      expect.objectContaining({ key: 'name' }),
-      expect.objectContaining({ key: 'age' })
+      expect.objectContaining({ key: 'name' })
     ])
     scope.stop()
   })

@@ -368,19 +368,30 @@ const DestroyOnCloseContent = defineComponent({
     </DemoBlock>
 
     <!-- 不同尺寸与内边距 -->
-    <DemoBlock title="不同尺寸与内边距" description="通过 size 属性设置抽屉的大小，或者使用 body-padding 自定义主体区域内边距。" :code="sizeSnippet">
+    <DemoBlock
+      title="不同尺寸与内边距"
+      description="通过 size 属性设置抽屉的大小，或者使用 body-padding 自定义主体区域内边距。"
+      :code="sizeSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Space>
-          <Button :variant="!customPaddingVisible && size === 'sm' ? 'primary' : 'secondary'" @click="showSizeDrawer('sm')"
+          <Button
+            :variant="!customPaddingVisible && size === 'sm' ? 'primary' : 'secondary'"
+            @click="showSizeDrawer('sm')"
             >小 (sm)</Button
           >
-          <Button :variant="!customPaddingVisible && size === 'md' ? 'primary' : 'secondary'" @click="showSizeDrawer('md')"
+          <Button
+            :variant="!customPaddingVisible && size === 'md' ? 'primary' : 'secondary'"
+            @click="showSizeDrawer('md')"
             >中 (md)</Button
           >
-          <Button :variant="!customPaddingVisible && size === 'lg' ? 'primary' : 'secondary'" @click="showSizeDrawer('lg')"
+          <Button
+            :variant="!customPaddingVisible && size === 'lg' ? 'primary' : 'secondary'"
+            @click="showSizeDrawer('lg')"
             >大 (lg)</Button
           >
-          <Button :variant="!customPaddingVisible && size === 'xl' ? 'primary' : 'secondary'" @click="showSizeDrawer('xl')"
+          <Button
+            :variant="!customPaddingVisible && size === 'xl' ? 'primary' : 'secondary'"
+            @click="showSizeDrawer('xl')"
             >超大 (xl)</Button
           >
           <Button
@@ -402,7 +413,10 @@ const DestroyOnCloseContent = defineComponent({
             </Space>
           </template>
         </Drawer>
-        <Drawer v-model:open="customPaddingVisible" body-padding="p-10" title="自定义内容内边距 (p-10)">
+        <Drawer
+          v-model:open="customPaddingVisible"
+          body-padding="p-10"
+          title="自定义内容内边距 (p-10)">
           <p>这个抽屉的主体内容区域使用了 body-padding="p-10" 属性，内边距比默认情况更大。</p>
           <template #footer>
             <Space>

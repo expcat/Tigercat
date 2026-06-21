@@ -53,8 +53,7 @@ export function useControlledState<T, Args extends unknown[] = []>(
   onChangeRef.current = onChange
 
   const setValue = useCallback<SetControlledState<T, Args>>((next, ...args) => {
-    const resolved =
-      typeof next === 'function' ? (next as (prev: T) => T)(valueRef.current) : next
+    const resolved = typeof next === 'function' ? (next as (prev: T) => T)(valueRef.current) : next
     if (!isControlledRef.current) {
       setInternalValue(resolved)
     }

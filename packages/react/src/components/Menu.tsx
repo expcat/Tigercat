@@ -5,11 +5,10 @@ import {
   menuSearchEmptyClasses,
   type MenuItem as CoreMenuItem
 } from '@expcat/tigercat-core'
-import { MenuContext, useMenuContext } from './Menu/context'
+import { MenuContext } from './Menu/context'
 import { useMenuRootState } from './Menu/state'
 import { MenuItem } from './Menu/menu-item'
 import { SubMenu } from './Menu/submenu'
-import { MenuItemGroup } from './Menu/menu-item-group'
 import type { MenuProps } from './Menu/types'
 
 export { useMenuContext } from './Menu/context'

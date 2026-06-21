@@ -349,7 +349,8 @@ export const ChatWindow = defineComponent({
                 'div',
                 {
                   ref: messageListRef,
-                  class: 'flex-1 overflow-auto p-5 space-y-4 bg-[var(--tiger-surface-muted,#f9fafb)]',
+                  class:
+                    'flex-1 overflow-auto p-5 space-y-4 bg-[var(--tiger-surface-muted,#f9fafb)]',
                   role: 'log',
                   'aria-live': 'polite',
                   'aria-relevant': 'additions text',
@@ -360,12 +361,9 @@ export const ChatWindow = defineComponent({
                       h(
                         'div',
                         {
-                          class:
-                            'h-full flex items-center justify-center py-8'
+                          class: 'h-full flex items-center justify-center py-8'
                         },
-                        [
-                          h(Empty, { description: props.emptyText })
-                        ]
+                        [h(Empty, { description: props.emptyText })]
                       )
                     ]
                   : props.messages.map((message, index) => renderMessageItem(message, index))

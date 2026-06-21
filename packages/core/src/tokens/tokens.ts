@@ -257,8 +257,7 @@ export const componentTokens = {
     'height-lg': '40px',
     'padding-x': '16px',
     'border-radius': '8px',
-    'dropdown-shadow':
-      '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    'dropdown-shadow': '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
     'option-height': '36px',
     'option-padding-x': '16px'
   },
@@ -435,8 +434,7 @@ export const designTokens = {
 } as const
 
 export type PrimitiveColorHue = keyof typeof primitiveColors
-export type PrimitiveColorLevel =
-  keyof (typeof primitiveColors)[PrimitiveColorHue]
+export type PrimitiveColorLevel = keyof (typeof primitiveColors)[PrimitiveColorHue]
 export type PrimitiveSpaceKey = keyof typeof primitiveSpace
 export type PrimitiveRadiusKey = keyof typeof primitiveRadius
 export type PrimitiveShadowKey = keyof typeof primitiveShadow

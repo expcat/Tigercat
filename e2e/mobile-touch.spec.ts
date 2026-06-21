@@ -1,5 +1,11 @@
 import { expect, test, type Page } from '@playwright/test'
 
+const REACT_URL = 'http://localhost:5174'
+
+function demoUrl(path: string): string {
+  return `${REACT_URL}/#/${path}`
+}
+
 async function dispatchSwipe(
   page: Page,
   selector: string,
@@ -44,7 +50,7 @@ test.describe('Mobile touch interactions', () => {
       'Touch gesture coverage runs on mobile project'
     )
 
-    await page.goto('http://localhost:5174/carousel', { waitUntil: 'networkidle' })
+    await page.goto(demoUrl('carousel'), { waitUntil: 'networkidle' })
     const carouselSelector = '[aria-roledescription="carousel"]'
     await expect(page.locator(carouselSelector).first()).toBeVisible()
 
@@ -62,7 +68,7 @@ test.describe('Mobile touch interactions', () => {
       'Touch gesture coverage runs on mobile project'
     )
 
-    await page.goto('http://localhost:5174/drawer', { waitUntil: 'networkidle' })
+    await page.goto(demoUrl('drawer'), { waitUntil: 'networkidle' })
     await page.getByRole('button', { name: '打开抽屉' }).first().click()
 
     const drawerSelector = '[data-tiger-drawer]'

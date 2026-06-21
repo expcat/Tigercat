@@ -262,7 +262,13 @@ describe('VirtualTable (React)', () => {
 
     it('keeps striped background on fixed body cells', () => {
       const { getAllByRole } = render(
-        <VirtualTable data={makeFixedData(3)} columns={fixedColumns} striped rowHeight={40} height={400} />
+        <VirtualTable
+          data={makeFixedData(3)}
+          columns={fixedColumns}
+          striped
+          rowHeight={40}
+          height={400}
+        />
       )
       const rows = getAllByRole('row')
       const dataRows = rows.filter(
@@ -285,8 +291,15 @@ describe('VirtualTable (React)', () => {
           width: 80,
           fixed: 'left' as const,
           fixedHeaderClassName: 'custom-fixed-header',
-          fixedClassName: ({ selected, view, fixed }: { selected: boolean; view: string; fixed: string }) =>
-            selected ? `${view}-${fixed}-selected` : 'custom-fixed-cell'
+          fixedClassName: ({
+            selected,
+            view,
+            fixed
+          }: {
+            selected: boolean
+            view: string
+            fixed: string
+          }) => (selected ? `${view}-${fixed}-selected` : 'custom-fixed-cell')
         },
         { key: 'name', title: 'Name', width: 150 }
       ]

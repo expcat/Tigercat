@@ -230,7 +230,13 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline justify-between gap-2">
             <div className="flex items-center gap-1.5">
-              <Text tag="span" size="sm" weight={isRead ? 'normal' : 'semibold'} className={isRead ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}>
+              <Text
+                tag="span"
+                size="sm"
+                weight={isRead ? 'normal' : 'semibold'}
+                className={
+                  isRead ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'
+                }>
                 {item.title}
               </Text>
               {!isRead && (
@@ -244,10 +250,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             ) : null}
           </div>
           {item.description ? (
-            <div className={classNames(
-              'mt-1 text-xs leading-relaxed line-clamp-2',
-              isRead ? 'text-gray-500 dark:text-gray-400' : 'text-gray-600 dark:text-gray-300'
-            )}>
+            <div
+              className={classNames(
+                'mt-1 text-xs leading-relaxed line-clamp-2',
+                isRead ? 'text-gray-500 dark:text-gray-400' : 'text-gray-600 dark:text-gray-300'
+              )}>
               {item.description}
             </div>
           ) : null}
@@ -278,11 +285,24 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       return (
         <div className="flex flex-col items-center justify-center py-14 px-4 text-center">
           <div className="p-3.5 bg-gray-50 dark:bg-gray-900 rounded-full mb-3 shadow-inner">
-            <svg className="w-8 h-8 text-gray-400 dark:text-gray-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+            <svg
+              className="w-8 h-8 text-gray-400 dark:text-gray-600 animate-pulse"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="1.5">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
+              />
             </svg>
           </div>
-          <Text tag="div" size="sm" color="muted" className="font-semibold text-gray-400 dark:text-gray-500">
+          <Text
+            tag="div"
+            size="sm"
+            color="muted"
+            className="font-semibold text-gray-400 dark:text-gray-500">
             {emptyText}
           </Text>
         </div>
@@ -334,7 +354,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <Text tag="div" size="base" weight="bold" className="text-gray-900 dark:text-gray-100">
+                <Text
+                  tag="div"
+                  size="base"
+                  weight="bold"
+                  className="text-gray-900 dark:text-gray-100">
                   {title}
                 </Text>
                 {totalUnread > 0 ? (

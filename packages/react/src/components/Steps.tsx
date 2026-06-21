@@ -132,7 +132,12 @@ export const StepsItem: React.FC<StepsItemProps> = ({
     if (stepStatus === 'finish') {
       return (
         <div className={iconClasses} aria-hidden="true">
-          <svg className="w-4 h-4 shrink-0 transition-transform duration-300 animate-fade-in" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+          <svg
+            className="w-4 h-4 shrink-0 transition-transform duration-300 animate-fade-in"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
           </svg>
         </div>

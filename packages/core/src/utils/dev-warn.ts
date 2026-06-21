@@ -37,10 +37,7 @@ export function devWarn(key: string, message: string): void {
  * @param component Component display name (e.g. `'Button'`).
  * @param props     The fallthrough props/attrs to inspect.
  */
-export function warnUnsupportedColorProp(
-  component: string,
-  props: Record<string, unknown>
-): void {
+export function warnUnsupportedColorProp(component: string, props: Record<string, unknown>): void {
   if (!('color' in props)) return
   devWarn(
     `${component}.color`,

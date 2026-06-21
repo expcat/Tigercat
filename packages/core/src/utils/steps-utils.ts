@@ -63,7 +63,8 @@ export function getStepIconClasses(
   const statusClasses = {
     wait: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text-muted,#6b7280)] transition-all duration-300 group-hover:border-[var(--tiger-primary,#2563eb)]/60 group-hover:text-[var(--tiger-primary,#2563eb)]/80',
     process: activeClasses,
-    finish: 'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:bg-[var(--tiger-primary-hover,#0369a1)]',
+    finish:
+      'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:bg-[var(--tiger-primary-hover,#0369a1)]',
     error:
       'bg-[var(--tiger-error-bg,#fef2f2)] border-[var(--tiger-error,#ef4444)] text-[var(--tiger-error,#ef4444)] transition-all duration-300'
   }
@@ -136,7 +137,8 @@ export function getStepTitleClasses(
   const statusClasses = {
     wait: 'text-[var(--tiger-text-muted,#6b7280)] transition-colors duration-300 group-hover:text-[var(--tiger-text,#111827)]',
     process: 'text-[var(--tiger-text,#111827)] font-semibold transition-colors duration-300',
-    finish: 'text-[var(--tiger-text,#111827)] transition-colors duration-300 group-hover:text-[var(--tiger-primary,#2563eb)]',
+    finish:
+      'text-[var(--tiger-text,#111827)] transition-colors duration-300 group-hover:text-[var(--tiger-primary,#2563eb)]',
     error: 'text-[var(--tiger-error,#ef4444)]'
   }
 

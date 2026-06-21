@@ -361,7 +361,9 @@ export const NotificationCenter = defineComponent({
                     tag: 'span',
                     size: 'sm',
                     weight: isRead ? 'normal' : 'semibold',
-                    class: isRead ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'
+                    class: isRead
+                      ? 'text-gray-600 dark:text-gray-400'
+                      : 'text-gray-900 dark:text-gray-100'
                   },
                   { default: () => item.title }
                 ),
@@ -389,7 +391,9 @@ export const NotificationCenter = defineComponent({
                   {
                     class: classNames(
                       'mt-1 text-xs leading-relaxed line-clamp-2',
-                      isRead ? 'text-gray-500 dark:text-gray-400' : 'text-gray-600 dark:text-gray-300'
+                      isRead
+                        ? 'text-gray-500 dark:text-gray-400'
+                        : 'text-gray-600 dark:text-gray-300'
                     )
                   },
                   item.description
@@ -514,7 +518,12 @@ export const NotificationCenter = defineComponent({
           h('div', { class: 'flex items-center gap-2.5' }, [
             h(
               Text,
-              { tag: 'div', size: 'base', weight: 'bold', class: 'text-gray-900 dark:text-gray-100' },
+              {
+                tag: 'div',
+                size: 'base',
+                weight: 'bold',
+                class: 'text-gray-900 dark:text-gray-100'
+              },
               { default: () => props.title }
             ),
             totalUnread.value > 0
@@ -550,7 +559,10 @@ export const NotificationCenter = defineComponent({
 
       const content = props.loading
         ? h('div', { class: 'flex items-center justify-center py-16' }, [
-            h(Loading, { text: props.loadingText, class: 'text-blue-500 dark:text-blue-400 font-medium' })
+            h(Loading, {
+              text: props.loadingText,
+              class: 'text-blue-500 dark:text-blue-400 font-medium'
+            })
           ])
         : resolvedGroups.value.length > 0
           ? h('div', { class: '-mx-4 -mb-4' }, [renderTabs()])

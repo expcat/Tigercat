@@ -147,7 +147,11 @@ describe('Icon (Vue)', () => {
   })
 
   it('prefers custom children over the name prop', () => {
-    const { container } = renderWithProps(Icon, { name: 'check' }, { slots: { default: SimpleSVG } })
+    const { container } = renderWithProps(
+      Icon,
+      { name: 'check' },
+      { slots: { default: SimpleSVG } }
+    )
     const path = container.querySelector('svg path')
     expect(path).toHaveAttribute('d', 'M5 12h14')
   })

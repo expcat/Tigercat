@@ -2875,13 +2875,7 @@
     },
     "AffixProps": {
       "extends": [],
-      "props": [
-        "className",
-        "offsetBottom",
-        "offsetTop",
-        "target",
-        "zIndex"
-      ]
+      "props": ["className", "offsetBottom", "offsetTop", "target", "zIndex"]
     },
     "AlertProps": {
       "extends": [],
@@ -2901,12 +2895,7 @@
     },
     "AnchorLinkProps": {
       "extends": [],
-      "props": [
-        "className",
-        "href",
-        "target",
-        "title"
-      ]
+      "props": ["className", "href", "target", "title"]
     },
     "AnchorProps": {
       "extends": [],
@@ -2989,31 +2978,15 @@
     },
     "AvatarGroupProps": {
       "extends": [],
-      "props": [
-        "className",
-        "max",
-        "size"
-      ]
+      "props": ["className", "max", "size"]
     },
     "AvatarProps": {
       "extends": [],
-      "props": [
-        "alt",
-        "bgColor",
-        "className",
-        "shape",
-        "size",
-        "src",
-        "text",
-        "textColor"
-      ]
+      "props": ["alt", "bgColor", "className", "shape", "size", "src", "text", "textColor"]
     },
     "BackTopProps": {
       "extends": [],
-      "props": [
-        "duration",
-        "visibilityHeight"
-      ]
+      "props": ["duration", "visibilityHeight"]
     },
     "BadgeProps": {
       "extends": [],
@@ -3073,82 +3046,35 @@
     },
     "BaseChartProps": {
       "extends": [],
-      "props": [
-        "className",
-        "desc",
-        "height",
-        "padding",
-        "title",
-        "width"
-      ]
+      "props": ["className", "desc", "height", "padding", "title", "width"]
     },
     "BaseFloatingPopupProps": {
       "extends": [],
-      "props": [
-        "className",
-        "defaultOpen",
-        "disabled",
-        "offset",
-        "open",
-        "placement"
-      ]
+      "props": ["className", "defaultOpen", "disabled", "offset", "open", "placement"]
     },
     "BaseFormControlProps": {
       "extends": [],
-      "props": [
-        "defaultValue",
-        "disabled",
-        "name",
-        "placeholder",
-        "required",
-        "size",
-        "value"
-      ]
+      "props": ["defaultValue", "disabled", "name", "placeholder", "required", "size", "value"]
     },
     "BaseInteractiveProps": {
       "extends": [],
-      "props": [
-        "disabled",
-        "loading",
-        "size"
-      ]
+      "props": ["disabled", "loading", "size"]
     },
     "BaseLayoutProps": {
       "extends": [],
-      "props": [
-        "align",
-        "direction",
-        "justify",
-        "wrap"
-      ]
+      "props": ["align", "direction", "justify", "wrap"]
     },
     "BreadcrumbItemProps": {
       "extends": [],
-      "props": [
-        "className",
-        "current",
-        "href",
-        "separator",
-        "style",
-        "target"
-      ]
+      "props": ["className", "current", "href", "separator", "style", "target"]
     },
     "BreadcrumbProps": {
       "extends": [],
-      "props": [
-        "className",
-        "extra",
-        "maxItems",
-        "separator",
-        "style"
-      ]
+      "props": ["className", "extra", "maxItems", "separator", "style"]
     },
     "ButtonGroupProps": {
       "extends": [],
-      "props": [
-        "size",
-        "vertical"
-      ]
+      "props": ["size", "vertical"]
     },
     "ButtonProps": {
       "extends": [],
@@ -3165,23 +3091,11 @@
     },
     "CalendarProps": {
       "extends": [],
-      "props": [
-        "className",
-        "disabledDate",
-        "fullscreen",
-        "mode"
-      ]
+      "props": ["className", "disabledDate", "fullscreen", "mode"]
     },
     "CardProps": {
       "extends": [],
-      "props": [
-        "className",
-        "direction",
-        "hoverable",
-        "padding",
-        "size",
-        "variant"
-      ]
+      "props": ["className", "direction", "hoverable", "padding", "size", "variant"]
     },
     "CarouselProps": {
       "extends": [],
@@ -3236,15 +3150,7 @@
     },
     "ChartCanvasProps": {
       "extends": [],
-      "props": [
-        "className",
-        "desc",
-        "height",
-        "padding",
-        "responsive",
-        "title",
-        "width"
-      ]
+      "props": ["className", "desc", "height", "padding", "responsive", "title", "width"]
     },
     "ChartGridProps": {
       "extends": [],
@@ -3276,29 +3182,15 @@
     },
     "ChartLegendProps": {
       "extends": [],
-      "props": [
-        "legendGap",
-        "legendMarkerSize",
-        "legendPosition",
-        "showLegend"
-      ]
+      "props": ["legendGap", "legendMarkerSize", "legendPosition", "showLegend"]
     },
     "ChartSeriesProps": {
       "extends": [],
-      "props": [
-        "className",
-        "color",
-        "data",
-        "name",
-        "opacity",
-        "type"
-      ]
+      "props": ["className", "color", "data", "name", "opacity", "type"]
     },
     "ChartTooltipProps": {
       "extends": [],
-      "props": [
-        "showTooltip"
-      ]
+      "props": ["showTooltip"]
     },
     "ChartWithAxesProps": {
       "extends": [],
@@ -3356,19 +3248,11 @@
     },
     "CheckboxGroupProps": {
       "extends": [],
-      "props": [
-        "disabled",
-        "size"
-      ]
+      "props": ["disabled", "size"]
     },
     "CheckboxProps": {
       "extends": [],
-      "props": [
-        "disabled",
-        "indeterminate",
-        "size",
-        "value"
-      ]
+      "props": ["disabled", "indeterminate", "size", "value"]
     },
     "CodeEditorProps": {
       "extends": [],
@@ -3392,23 +3276,11 @@
     },
     "CodeProps": {
       "extends": [],
-      "props": [
-        "code",
-        "copiedLabel",
-        "copyable",
-        "copyLabel"
-      ]
+      "props": ["code", "copiedLabel", "copyable", "copyLabel"]
     },
     "CollapsePanelProps": {
       "extends": [],
-      "props": [
-        "className",
-        "disabled",
-        "header",
-        "panelKey",
-        "showArrow",
-        "style"
-      ]
+      "props": ["className", "disabled", "header", "panelKey", "showArrow", "style"]
     },
     "CollapseProps": {
       "extends": [],
@@ -3425,35 +3297,15 @@
     },
     "ColorPickerProps": {
       "extends": [],
-      "props": [
-        "className",
-        "disabled",
-        "format",
-        "presets",
-        "showAlpha",
-        "size"
-      ]
+      "props": ["className", "disabled", "format", "presets", "showAlpha", "size"]
     },
     "ColorSwatchProps": {
       "extends": [],
-      "props": [
-        "ariaLabel",
-        "className",
-        "colors",
-        "columns",
-        "disabled",
-        "groups",
-        "size"
-      ]
+      "props": ["ariaLabel", "className", "colors", "columns", "disabled", "groups", "size"]
     },
     "ColProps": {
       "extends": [],
-      "props": [
-        "flex",
-        "offset",
-        "order",
-        "span"
-      ]
+      "props": ["flex", "offset", "order", "span"]
     },
     "CommentThreadProps": {
       "extends": [],
@@ -3491,18 +3343,11 @@
     },
     "ContainerProps": {
       "extends": [],
-      "props": [
-        "center",
-        "maxWidth",
-        "padding"
-      ]
+      "props": ["center", "maxWidth", "padding"]
     },
     "ContentProps": {
       "extends": [],
-      "props": [
-        "className",
-        "padding"
-      ]
+      "props": ["className", "padding"]
     },
     "CountdownProps": {
       "extends": [],
@@ -3521,14 +3366,7 @@
     },
     "CronEditorProps": {
       "extends": [],
-      "props": [
-        "ariaLabel",
-        "className",
-        "disabled",
-        "presets",
-        "readonly",
-        "size"
-      ]
+      "props": ["ariaLabel", "className", "disabled", "presets", "readonly", "size"]
     },
     "CropUploadProps": {
       "extends": [],
@@ -3543,17 +3381,8 @@
       ]
     },
     "DataTableWithToolbarProps": {
-      "extends": [
-        "'pagination'\n>",
-        "Omit"
-      ],
-      "props": [
-        "onPageChange",
-        "onPageSizeChange",
-        "pageSize",
-        "pagination",
-        "toolbar"
-      ]
+      "extends": ["'pagination'\n>", "Omit"],
+      "props": ["onPageChange", "onPageSizeChange", "pageSize", "pagination", "toolbar"]
     },
     "DatePickerProps": {
       "extends": [],
@@ -3594,24 +3423,11 @@
     },
     "DividerProps": {
       "extends": [],
-      "props": [
-        "color",
-        "lineStyle",
-        "orientation",
-        "spacing",
-        "thickness"
-      ]
+      "props": ["color", "lineStyle", "orientation", "spacing", "thickness"]
     },
     "DonutChartProps": {
-      "extends": [
-        "PieChartProps"
-      ],
-      "props": [
-        "animated",
-        "centerLabel",
-        "centerValue",
-        "innerRadiusRatio"
-      ]
+      "extends": ["PieChartProps"],
+      "props": ["animated", "centerLabel", "centerValue", "innerRadiusRatio"]
     },
     "DrawerProps": {
       "extends": [],
@@ -3639,20 +3455,11 @@
     },
     "DropdownItemProps": {
       "extends": [],
-      "props": [
-        "className",
-        "disabled",
-        "divided",
-        "icon",
-        "key"
-      ]
+      "props": ["className", "disabled", "divided", "icon", "key"]
     },
     "DropdownMenuProps": {
       "extends": [],
-      "props": [
-        "className",
-        "style"
-      ]
+      "props": ["className", "style"]
     },
     "DropdownProps": {
       "extends": [],
@@ -3670,12 +3477,7 @@
     },
     "EmptyProps": {
       "extends": [],
-      "props": [
-        "className",
-        "description",
-        "preset",
-        "showImage"
-      ]
+      "props": ["className", "description", "preset", "showImage"]
     },
     "FileManagerProps": {
       "extends": [],
@@ -3699,31 +3501,15 @@
     },
     "FloatButtonGroupProps": {
       "extends": [],
-      "props": [
-        "className",
-        "open",
-        "shape",
-        "trigger"
-      ]
+      "props": ["className", "open", "shape", "trigger"]
     },
     "FloatButtonProps": {
       "extends": [],
-      "props": [
-        "ariaLabel",
-        "className",
-        "disabled",
-        "shape",
-        "size",
-        "tooltip",
-        "type"
-      ]
+      "props": ["ariaLabel", "className", "disabled", "shape", "size", "tooltip", "type"]
     },
     "FooterProps": {
       "extends": [],
-      "props": [
-        "className",
-        "height"
-      ]
+      "props": ["className", "height"]
     },
     "FormItemProps": {
       "extends": [],
@@ -3797,21 +3583,10 @@
         "ChartLegendProps",
         "ChartTooltipProps"
       ],
-      "props": [
-        "colors",
-        "data",
-        "direction",
-        "gap",
-        "gradient",
-        "pinch"
-      ]
+      "props": ["colors", "data", "direction", "gap", "gradient", "pinch"]
     },
     "GanttProps": {
-      "extends": [
-        "'selectedIndex'>",
-        "BaseChartProps",
-        "Omit<ChartInteractionProps"
-      ],
+      "extends": ["'selectedIndex'>", "BaseChartProps", "Omit<ChartInteractionProps"],
       "props": [
         "ariaLabel",
         "barHeight",
@@ -3832,10 +3607,7 @@
       ]
     },
     "GaugeChartProps": {
-      "extends": [
-        "BaseChartProps",
-        "ChartTooltipProps"
-      ],
+      "extends": ["BaseChartProps", "ChartTooltipProps"],
       "props": [
         "arcWidth",
         "color",
@@ -3856,21 +3628,10 @@
     },
     "GenericFormFieldProps": {
       "extends": [],
-      "props": [
-        "error",
-        "label",
-        "labelWidth",
-        "name",
-        "required",
-        "rules",
-        "showMessage",
-        "size"
-      ]
+      "props": ["error", "label", "labelWidth", "name", "required", "rules", "showMessage", "size"]
     },
     "GenericSelectProps": {
-      "extends": [
-        "string | number = string | number>"
-      ],
+      "extends": ["string | number = string | number>"],
       "props": [
         "clearable",
         "disabled",
@@ -3912,18 +3673,10 @@
     },
     "HeaderProps": {
       "extends": [],
-      "props": [
-        "className",
-        "height",
-        "variant"
-      ]
+      "props": ["className", "height", "variant"]
     },
     "HeatmapChartProps": {
-      "extends": [
-        "BaseChartProps",
-        "ChartInteractionProps",
-        "ChartTooltipProps"
-      ],
+      "extends": ["BaseChartProps", "ChartInteractionProps", "ChartTooltipProps"],
       "props": [
         "canvasThreshold",
         "cellGap",
@@ -3942,12 +3695,7 @@
     },
     "IconProps": {
       "extends": [],
-      "props": [
-        "className",
-        "color",
-        "name",
-        "size"
-      ]
+      "props": ["className", "color", "name", "size"]
     },
     "ImageAnnotationProps": {
       "extends": [],
@@ -3984,9 +3732,7 @@
     },
     "ImageGroupProps": {
       "extends": [],
-      "props": [
-        "preview"
-      ]
+      "props": ["preview"]
     },
     "ImagePreviewProps": {
       "extends": [],
@@ -4048,18 +3794,11 @@
     },
     "InputGroupAddonProps": {
       "extends": [],
-      "props": [
-        "className",
-        "type"
-      ]
+      "props": ["className", "type"]
     },
     "InputGroupProps": {
       "extends": [],
-      "props": [
-        "className",
-        "compact",
-        "size"
-      ]
+      "props": ["className", "compact", "size"]
     },
     "InputNumberProps": {
       "extends": [],
@@ -4110,19 +3849,12 @@
       ]
     },
     "KanbanProps": {
-      "extends": [
-        "TaskBoardProps"
-      ],
-      "props": [
-        "swimlaneField",
-        "swimlanes"
-      ]
+      "extends": ["TaskBoardProps"],
+      "props": ["swimlaneField", "swimlanes"]
     },
     "LayoutProps": {
       "extends": [],
-      "props": [
-        "className"
-      ]
+      "props": ["className"]
     },
     "LineChartProps": {
       "extends": [
@@ -4173,15 +3905,7 @@
     },
     "LinkProps": {
       "extends": [],
-      "props": [
-        "disabled",
-        "href",
-        "rel",
-        "size",
-        "target",
-        "underline",
-        "variant"
-      ]
+      "props": ["disabled", "href", "rel", "size", "target", "underline", "variant"]
     },
     "ListProps": {
       "extends": [],
@@ -4239,31 +3963,15 @@
     },
     "MentionsProps": {
       "extends": [],
-      "props": [
-        "className",
-        "disabled",
-        "options",
-        "placeholder",
-        "prefix",
-        "rows",
-        "size"
-      ]
+      "props": ["className", "disabled", "options", "placeholder", "prefix", "rows", "size"]
     },
     "MenuItemGroupProps": {
       "extends": [],
-      "props": [
-        "className",
-        "title"
-      ]
+      "props": ["className", "title"]
     },
     "MenuItemProps": {
       "extends": [],
-      "props": [
-        "className",
-        "disabled",
-        "icon",
-        "itemKey"
-      ]
+      "props": ["className", "disabled", "icon", "itemKey"]
     },
     "MenuProps": {
       "extends": [],
@@ -4322,9 +4030,7 @@
       ]
     },
     "MyButtonProps": {
-      "extends": [
-        "BaseInteractiveProps"
-      ],
+      "extends": ["BaseInteractiveProps"],
       "props": []
     },
     "NotificationCenterProps": {
@@ -4394,11 +4100,7 @@
       ]
     },
     "OrgChartProps": {
-      "extends": [
-        "'selectedIndex'>",
-        "BaseChartProps",
-        "Omit<ChartInteractionProps"
-      ],
+      "extends": ["'selectedIndex'>", "BaseChartProps", "Omit<ChartInteractionProps"],
       "props": [
         "ariaLabel",
         "colors",
@@ -4537,22 +4239,10 @@
     },
     "QRCodeProps": {
       "extends": [],
-      "props": [
-        "bgColor",
-        "className",
-        "color",
-        "level",
-        "size",
-        "status",
-        "value"
-      ]
+      "props": ["bgColor", "className", "color", "level", "size", "status", "value"]
     },
     "RadarChartProps": {
-      "extends": [
-        "BaseChartProps",
-        "ChartLegendProps",
-        "ChartTooltipProps"
-      ],
+      "extends": ["BaseChartProps", "ChartLegendProps", "ChartTooltipProps"],
       "props": [
         "activeOpacity",
         "colors",
@@ -4603,36 +4293,15 @@
     },
     "RadioGroupProps": {
       "extends": [],
-      "props": [
-        "defaultValue",
-        "disabled",
-        "name",
-        "size",
-        "value"
-      ]
+      "props": ["defaultValue", "disabled", "name", "size", "value"]
     },
     "RadioProps": {
       "extends": [],
-      "props": [
-        "checked",
-        "defaultChecked",
-        "disabled",
-        "name",
-        "size",
-        "value"
-      ]
+      "props": ["checked", "defaultChecked", "disabled", "name", "size", "value"]
     },
     "RateProps": {
       "extends": [],
-      "props": [
-        "allowClear",
-        "allowHalf",
-        "character",
-        "className",
-        "count",
-        "disabled",
-        "size"
-      ]
+      "props": ["allowClear", "allowHalf", "character", "className", "count", "disabled", "size"]
     },
     "ResizableProps": {
       "extends": [],
@@ -4653,12 +4322,7 @@
     },
     "ResultProps": {
       "extends": [],
-      "props": [
-        "className",
-        "status",
-        "subTitle",
-        "title"
-      ]
+      "props": ["className", "status", "subTitle", "title"]
     },
     "RichTextEditorProps": {
       "extends": [],
@@ -4676,12 +4340,7 @@
     },
     "RowProps": {
       "extends": [],
-      "props": [
-        "align",
-        "gutter",
-        "justify",
-        "wrap"
-      ]
+      "props": ["align", "gutter", "justify", "wrap"]
     },
     "ScatterChartProps": {
       "extends": [
@@ -4726,13 +4385,7 @@
     },
     "SegmentedProps": {
       "extends": [],
-      "props": [
-        "block",
-        "className",
-        "disabled",
-        "options",
-        "size"
-      ]
+      "props": ["block", "className", "disabled", "options", "size"]
     },
     "SelectProps": {
       "extends": [],
@@ -4757,12 +4410,7 @@
     },
     "SidebarProps": {
       "extends": [],
-      "props": [
-        "className",
-        "collapsed",
-        "collapsedWidth",
-        "width"
-      ]
+      "props": ["className", "collapsed", "collapsedWidth", "width"]
     },
     "SignatureProps": {
       "extends": [],
@@ -4813,25 +4461,11 @@
     },
     "SpaceProps": {
       "extends": [],
-      "props": [
-        "align",
-        "direction",
-        "size",
-        "wrap"
-      ]
+      "props": ["align", "direction", "size", "wrap"]
     },
     "SplitterProps": {
       "extends": [],
-      "props": [
-        "className",
-        "direction",
-        "disabled",
-        "gutterSize",
-        "max",
-        "min",
-        "sizes",
-        "style"
-      ]
+      "props": ["className", "direction", "disabled", "gutterSize", "max", "min", "sizes", "style"]
     },
     "SpotlightProps": {
       "extends": [],
@@ -4874,15 +4508,7 @@
     },
     "StepperProps": {
       "extends": [],
-      "props": [
-        "className",
-        "disabled",
-        "max",
-        "min",
-        "precision",
-        "size",
-        "step"
-      ]
+      "props": ["className", "disabled", "max", "min", "precision", "size", "step"]
     },
     "StepsProps": {
       "extends": [],
@@ -4899,13 +4525,7 @@
     },
     "SubMenuProps": {
       "extends": [],
-      "props": [
-        "className",
-        "disabled",
-        "icon",
-        "itemKey",
-        "title"
-      ]
+      "props": ["className", "disabled", "icon", "itemKey", "title"]
     },
     "SunburstChartProps": {
       "extends": [
@@ -4914,21 +4534,11 @@
         "ChartLegendProps",
         "ChartTooltipProps"
       ],
-      "props": [
-        "colors",
-        "data",
-        "gradient",
-        "innerRadiusRatio",
-        "showLabels"
-      ]
+      "props": ["colors", "data", "gradient", "innerRadiusRatio", "showLabels"]
     },
     "SwitchProps": {
       "extends": [],
-      "props": [
-        "checked",
-        "disabled",
-        "size"
-      ]
+      "props": ["checked", "disabled", "size"]
     },
     "TableProps": {
       "extends": [],
@@ -5014,15 +4624,7 @@
     },
     "TabPaneProps": {
       "extends": [],
-      "props": [
-        "className",
-        "closable",
-        "disabled",
-        "icon",
-        "label",
-        "style",
-        "tabKey"
-      ]
+      "props": ["className", "closable", "disabled", "icon", "label", "style", "tabKey"]
     },
     "TabsProps": {
       "extends": [],
@@ -5043,12 +4645,7 @@
     },
     "TagProps": {
       "extends": [],
-      "props": [
-        "closable",
-        "closeAriaLabel",
-        "size",
-        "variant"
-      ]
+      "props": ["closable", "closeAriaLabel", "size", "variant"]
     },
     "TaskBoardProps": {
       "extends": [],
@@ -5120,13 +4717,7 @@
     },
     "TimelineProps": {
       "extends": [],
-      "props": [
-        "className",
-        "mode",
-        "pending",
-        "pendingDot",
-        "reverse"
-      ]
+      "props": ["className", "mode", "pending", "pendingDot", "reverse"]
     },
     "TimePickerProps": {
       "extends": [],
@@ -5205,14 +4796,7 @@
         "ChartLegendProps",
         "ChartTooltipProps"
       ],
-      "props": [
-        "colors",
-        "data",
-        "gap",
-        "gradient",
-        "minLabelSize",
-        "showLabels"
-      ]
+      "props": ["colors", "data", "gap", "gradient", "minLabelSize", "showLabels"]
     },
     "TreeProps": {
       "extends": [],

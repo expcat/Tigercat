@@ -99,7 +99,8 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     }
   }
 
-  const BTN_BASE = 'px-2 py-0.5 h-auto min-h-0 text-xs rounded-md transition-all duration-200 ease-out'
+  const BTN_BASE =
+    'px-2 py-0.5 h-auto min-h-0 text-xs rounded-md transition-all duration-200 ease-out'
   const ACTION_BTN = `${BTN_BASE} text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5`
   const PRIMARY_BTN = `${BTN_BASE} text-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary-hover,#1d4ed8)] dark:text-blue-400 dark:hover:text-blue-300 font-semibold hover:bg-[var(--tiger-primary,#2563eb)]/10 dark:hover:bg-blue-400/10`
 
@@ -135,8 +136,18 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               'text-blue-600 dark:text-blue-400 bg-blue-50/30 dark:bg-blue-950/10 font-semibold border-blue-200/40 dark:border-blue-800/30'
           )}
           onClick={() => onLike?.(node, !node.liked)}>
-          <svg className={classNames("w-3.5 h-3.5 transition-transform duration-200 active:scale-125", node.liked ? "fill-current" : "stroke-current fill-none")} viewBox="0 0 24 24" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.421.068.848.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 010-7.764c.26-.85.1083-1.368 1.972-1.368h.908c.445 0 .72.498.523.898a8.963 8.963 0 00-.27.602" />
+          <svg
+            className={classNames(
+              'w-3.5 h-3.5 transition-transform duration-200 active:scale-125',
+              node.liked ? 'fill-current' : 'stroke-current fill-none'
+            )}
+            viewBox="0 0 24 24"
+            strokeWidth="2">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.421.068.848.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 010-7.764c.26-.85.1083-1.368 1.972-1.368h.908c.445 0 .72.498.523.898a8.963 8.963 0 00-.27.602"
+            />
           </svg>
           <span>{`${likeLabel}${likeCount}`}</span>
         </Button>
@@ -157,8 +168,17 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             setReplyingTo((prev) => (prev === node.id ? null : node.id))
             setReplyValue('')
           }}>
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          <svg
+            className="w-3.5 h-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
           </svg>
           <span>{replyText}</span>
         </Button>
@@ -176,8 +196,17 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
           )}
           onClick={() => onMore?.(node)}>
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+          <svg
+            className="w-3.5 h-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+            />
           </svg>
           <span>{moreText}</span>
         </Button>
@@ -192,10 +221,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             key={actionKey}
             size="sm"
             variant={action.variant ?? 'ghost'}
-            className={classNames(
-              ACTION_BTN,
-              'hover:bg-gray-100 dark:hover:bg-gray-800'
-            )}
+            className={classNames(ACTION_BTN, 'hover:bg-gray-100 dark:hover:bg-gray-800')}
             disabled={action.disabled}
             onClick={() => {
               action.onClick?.(node, action)
@@ -213,7 +239,10 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         className={classNames(
           'tiger-comment-thread-item',
           depth === 1 && 'py-5',
-          depth === 1 && !isLast && showDivider && 'border-b border-gray-100 dark:border-gray-800/80'
+          depth === 1 &&
+            !isLast &&
+            showDivider &&
+            'border-b border-gray-100 dark:border-gray-800/80'
         )}>
         <div className="flex gap-3">
           {showAvatar && node.user ? (
@@ -227,27 +256,46 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {node.user?.name ? (
-                <Text tag="span" size="sm" weight="bold" className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                <Text
+                  tag="span"
+                  size="sm"
+                  weight="bold"
+                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
                   {node.user.name}
                 </Text>
               ) : null}
               {node.user?.title ? (
-                <Text tag="span" size="xs" color="muted" className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-medium">
+                <Text
+                  tag="span"
+                  size="xs"
+                  color="muted"
+                  className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-medium">
                   {node.user.title}
                 </Text>
               ) : null}
               {node.tag ? (
-                <Tag size="sm" variant={node.tag.variant ?? 'default'} className="rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-opacity-10">
+                <Tag
+                  size="sm"
+                  variant={node.tag.variant ?? 'default'}
+                  className="rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-opacity-10">
                   {node.tag.label}
                 </Tag>
               ) : null}
               {node.tags?.map((tag, index) => (
-                <Tag key={`${node.id}-tag-${index}`} size="sm" variant={tag.variant ?? 'default'} className="rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-opacity-10">
+                <Tag
+                  key={`${node.id}-tag-${index}`}
+                  size="sm"
+                  variant={tag.variant ?? 'default'}
+                  className="rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-opacity-10">
                   {tag.label}
                 </Tag>
               ))}
               {node.time ? (
-                <Text tag="span" size="xs" color="muted" className="ml-auto text-gray-400 dark:text-gray-500 font-normal">
+                <Text
+                  tag="span"
+                  size="xs"
+                  color="muted"
+                  className="ml-auto text-gray-400 dark:text-gray-500 font-normal">
                   {formatCommentTime(node.time)}
                 </Text>
               ) : null}
@@ -281,9 +329,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                     }}>
                     {cancelReplyText}
                   </Button>
-                  <Button 
-                    size="sm" 
-                    variant="primary" 
+                  <Button
+                    size="sm"
+                    variant="primary"
                     className="px-3 py-1.5 text-xs font-semibold shadow-sm hover:shadow transition-all duration-200 rounded-lg"
                     onClick={() => handleReplySubmit(node)}>
                     {replyButtonText}
@@ -296,7 +344,10 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               <Button
                 size="sm"
                 variant="ghost"
-                className={classNames('mt-2 font-semibold hover:bg-[var(--tiger-primary,#2563eb)]/10 dark:hover:bg-blue-400/10 transition-colors', PRIMARY_BTN)}
+                className={classNames(
+                  'mt-2 font-semibold hover:bg-[var(--tiger-primary,#2563eb)]/10 dark:hover:bg-blue-400/10 transition-colors',
+                  PRIMARY_BTN
+                )}
                 aria-expanded={isExpanded}
                 aria-controls={repliesId}
                 onClick={() => toggleExpanded(node.id)}>
@@ -337,8 +388,17 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       {...divProps}>
       {resolvedNodes.length === 0 ? (
         <div className="flex flex-col items-center justify-center border border-dashed border-gray-200 dark:border-gray-800/80 rounded-xl py-12 px-4 bg-gray-50/20 dark:bg-gray-900/5 transition-colors">
-          <svg className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          <svg
+            className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="1.5">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
           </svg>
           <Text tag="div" size="sm" color="muted" className="font-medium">
             {emptyText}

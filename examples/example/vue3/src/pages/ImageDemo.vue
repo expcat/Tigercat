@@ -161,7 +161,10 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
       </div>
     </DemoBlock>
 
-    <DemoBlock title="图片预览模式" description="支持点击图片进入全屏预览（默认），也可通过 preview-trigger='hover' 开启悬停放大预览。" :code="previewSnippet">
+    <DemoBlock
+      title="图片预览模式"
+      description="支持点击图片进入全屏预览（默认），也可通过 preview-trigger='hover' 开启悬停放大预览。"
+      :code="previewSnippet">
       <div class="flex flex-col gap-4">
         <div class="flex gap-4 flex-wrap">
           <Image
@@ -174,7 +177,12 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
         </div>
         <div class="flex items-center gap-4">
           <span class="text-sm text-gray-500">悬停预览：</span>
-          <Image :src="PHOTOS[0]" :width="120" :height="80" preview-trigger="hover" alt="悬停预览" />
+          <Image
+            :src="PHOTOS[0]"
+            :width="120"
+            :height="80"
+            preview-trigger="hover"
+            alt="悬停预览" />
         </div>
       </div>
     </DemoBlock>

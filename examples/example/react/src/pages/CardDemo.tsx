@@ -66,7 +66,10 @@ export default function CardDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="卡片尺寸与内边距" description="卡片有三种尺寸（主要影响内边距），同时支持 padding 属性完全定制（可为 false 以移除，或传入自定义 Tailwind 类如 p-8）。" code={sizeSnippet}>
+      <DemoBlock
+        title="卡片尺寸与内边距"
+        description="卡片有三种尺寸（主要影响内边距），同时支持 padding 属性完全定制（可为 false 以移除，或传入自定义 Tailwind 类如 p-8）。"
+        code={sizeSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" size={16} className="w-full">
             <Card size="sm">

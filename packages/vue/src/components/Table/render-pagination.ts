@@ -60,17 +60,13 @@ export function renderPagination(
 
   const finalPrevAriaLabel = view?.disableI18n ? finalPrevText : labels.prevPageAriaLabel
   const finalNextAriaLabel = view?.disableI18n ? finalNextText : labels.nextPageAriaLabel
-  const normalizedPageSizeOptions = (
-    paginationConfig.pageSizeOptions || [10, 20, 50, 100]
-  ) as PaginationPageSizeOptionItem[]
+  const normalizedPageSizeOptions = (paginationConfig.pageSizeOptions || [
+    10, 20, 50, 100
+  ]) as PaginationPageSizeOptionItem[]
 
   return h('div', { class: getSimplePaginationContainerClasses() }, [
     paginationConfig.showTotal !== false &&
-      h(
-        'div',
-        { class: getSimplePaginationTotalClasses() },
-        finalTotalText
-      ),
+      h('div', { class: getSimplePaginationTotalClasses() }, finalTotalText),
 
     h('div', { class: getSimplePaginationControlsClasses() }, [
       paginationConfig.showSizeChanger !== false &&
@@ -88,7 +84,8 @@ export function renderPagination(
             const label =
               typeof option === 'number'
                 ? `${formatIntlNumber(value, localeCode)} ${labels.itemsPerPageText}`
-                : option.label ?? `${formatIntlNumber(value, localeCode)} ${labels.itemsPerPageText}`
+                : (option.label ??
+                  `${formatIntlNumber(value, localeCode)} ${labels.itemsPerPageText}`)
 
             return h(
               'option',

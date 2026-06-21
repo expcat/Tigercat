@@ -5,6 +5,10 @@ const targets = [
   { label: 'React', baseUrl: 'http://localhost:5174' }
 ] as const
 
+function demoUrl(baseUrl: string, path: string): string {
+  return `${baseUrl}/#/${path}`
+}
+
 async function preparePage(page: Page, url: string): Promise<void> {
   await page.goto(url, { waitUntil: 'networkidle' })
 }
@@ -12,7 +16,7 @@ async function preparePage(page: Page, url: string): Promise<void> {
 for (const { label, baseUrl } of targets) {
   test.describe(`${label} — Interaction flows`, () => {
     test('modal form validates and submits', async ({ page }) => {
-      await preparePage(page, `${baseUrl}/modal`)
+      await preparePage(page, demoUrl(baseUrl, 'modal'))
 
       await page.getByRole('button', { name: '编辑资料' }).click()
       const dialog = page.getByRole('dialog').filter({ hasText: '编辑资料' })
@@ -29,7 +33,7 @@ for (const { label, baseUrl } of targets) {
     })
 
     test('drawer opens and closes from the footer action', async ({ page }) => {
-      await preparePage(page, `${baseUrl}/drawer`)
+      await preparePage(page, demoUrl(baseUrl, 'drawer'))
 
       await page.getByRole('button', { name: '打开抽屉' }).first().click()
       const drawer = page.getByRole('dialog').filter({ hasText: '基本抽屉' })
@@ -40,7 +44,7 @@ for (const { label, baseUrl } of targets) {
     })
 
     test('tabs switch active panels', async ({ page }) => {
-      await preparePage(page, `${baseUrl}/tabs`)
+      await preparePage(page, demoUrl(baseUrl, 'tabs'))
 
       const tabs = page.getByRole('tab')
       await expect(tabs.nth(1)).toBeVisible()
@@ -50,7 +54,7 @@ for (const { label, baseUrl } of targets) {
     })
 
     test('table sorting and filtering update visible rows', async ({ page }) => {
-      await preparePage(page, `${baseUrl}/table`)
+      await preparePage(page, demoUrl(baseUrl, 'table'))
 
       const sortingTable = page.locator('table').nth(2)
       await sortingTable.getByRole('columnheader', { name: /Name/ }).click()

@@ -116,7 +116,14 @@ describe('ImageViewer', () => {
 
     it('calls onCurrentIndexChange on next click', async () => {
       const onCurrentIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={0} onCurrentIndexChange={onCurrentIndexChange} />)
+      render(
+        <ImageViewer
+          images={images}
+          open
+          currentIndex={0}
+          onCurrentIndexChange={onCurrentIndexChange}
+        />
+      )
       const nextBtn = screen.getAllByLabelText('Next image').find((el) => el.tagName === 'BUTTON')!
       await fireEvent.click(nextBtn)
       expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
@@ -124,7 +131,14 @@ describe('ImageViewer', () => {
 
     it('wraps around on next from last image', async () => {
       const onCurrentIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={2} onCurrentIndexChange={onCurrentIndexChange} />)
+      render(
+        <ImageViewer
+          images={images}
+          open
+          currentIndex={2}
+          onCurrentIndexChange={onCurrentIndexChange}
+        />
+      )
       const nextBtn = screen.getAllByLabelText('Next image').find((el) => el.tagName === 'BUTTON')!
       await fireEvent.click(nextBtn)
       expect(onCurrentIndexChange).toHaveBeenCalledWith(0)
@@ -132,7 +146,14 @@ describe('ImageViewer', () => {
 
     it('wraps around on prev from first image', async () => {
       const onCurrentIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={0} onCurrentIndexChange={onCurrentIndexChange} />)
+      render(
+        <ImageViewer
+          images={images}
+          open
+          currentIndex={0}
+          onCurrentIndexChange={onCurrentIndexChange}
+        />
+      )
       const prevBtn = screen
         .getAllByLabelText('Previous image')
         .find((el) => el.tagName === 'BUTTON')!
@@ -177,7 +198,14 @@ describe('ImageViewer', () => {
 
     it('navigates on ArrowRight key', async () => {
       const onCurrentIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={0} onCurrentIndexChange={onCurrentIndexChange} />)
+      render(
+        <ImageViewer
+          images={images}
+          open
+          currentIndex={0}
+          onCurrentIndexChange={onCurrentIndexChange}
+        />
+      )
       await act(() => {
         fireEvent.keyDown(document, { key: 'ArrowRight' })
       })
@@ -186,7 +214,14 @@ describe('ImageViewer', () => {
 
     it('navigates on ArrowLeft key', async () => {
       const onCurrentIndexChange = vi.fn()
-      render(<ImageViewer images={images} open currentIndex={1} onCurrentIndexChange={onCurrentIndexChange} />)
+      render(
+        <ImageViewer
+          images={images}
+          open
+          currentIndex={1}
+          onCurrentIndexChange={onCurrentIndexChange}
+        />
+      )
       await act(() => {
         fireEvent.keyDown(document, { key: 'ArrowLeft' })
       })
@@ -225,7 +260,9 @@ describe('ImageViewer', () => {
 
     it('does not navigate when closed', () => {
       const onCurrentIndexChange = vi.fn()
-      render(<ImageViewer images={images} open={false} onCurrentIndexChange={onCurrentIndexChange} />)
+      render(
+        <ImageViewer images={images} open={false} onCurrentIndexChange={onCurrentIndexChange} />
+      )
       fireEvent.keyDown(document, { key: 'ArrowRight' })
       expect(onCurrentIndexChange).not.toHaveBeenCalled()
     })

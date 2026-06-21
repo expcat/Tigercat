@@ -42,8 +42,8 @@ describe('design tokens', () => {
       component?.variables.find((variable) => variable.name === 'component/button/border-radius')
         ?.reference
     ).toBe('semantic/radius/component')
-    expect(component?.variables.find((variable) => variable.name === 'component/table/bg')?.reference).toBe(
-      'semantic/color/bg-surface'
-    )
+    expect(
+      component?.variables.find((variable) => variable.name === 'component/table/bg')?.reference
+    ).toBe('semantic/color/bg-surface')
   })
 })

@@ -9,7 +9,8 @@ import type {
 // ============================================================================
 
 /** Root wrapper — horizontal scroll container */
-export const taskBoardBaseClasses = 'tiger-task-board flex gap-5 overflow-x-auto p-6 min-h-[450px] scroll-smooth antialiased'
+export const taskBoardBaseClasses =
+  'tiger-task-board flex gap-5 overflow-x-auto p-6 min-h-[450px] scroll-smooth antialiased'
 
 /** Single column shell */
 export const taskBoardColumnClasses =
@@ -20,7 +21,8 @@ export const taskBoardColumnHeaderClasses =
   'flex items-center justify-between px-4 py-3.5 border-b border-[var(--tiger-border,#e5e7eb)]/60 text-sm font-semibold text-[var(--tiger-text,#1f2937)] select-none transition-colors'
 
 /** Scrollable card area */
-export const taskBoardColumnBodyClasses = 'flex-1 overflow-y-auto p-3 space-y-3 min-h-[100px] transition-colors'
+export const taskBoardColumnBodyClasses =
+  'flex-1 overflow-y-auto p-3 space-y-3 min-h-[100px] transition-colors'
 
 /** Card base styles */
 export const taskBoardCardClasses =
