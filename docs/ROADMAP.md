@@ -2,9 +2,9 @@
 
 <!-- LLM-INDEX
 type: active-roadmap
-scope: pending development roadmap and optimization scan plan
-verified-date: 2026-06-20
-source: current repository audit and planning
+scope: pending development roadmap and post-audit optimization tasks
+verified-date: 2026-06-21
+source: current repository audit and roadmap review (former ROADMAP_CHECK.md, merged 2026-06-21)
 -->
 
 本文只记录仍需推进的任务和长期守护规则。已经完成的阶段、组件和发布准备事项不再保留在 Roadmap 中，回溯以 [CHANGELOG.md](../CHANGELOG.md)、发布记录和对应文档为准。
@@ -31,264 +31,72 @@ source: current repository audit and planning
 ## 当前待办
 
 - [ ] v1.3.4 发布执行：运行 `pnpm quality:release`、`pnpm build`，发布后执行 `pnpm smoke:published`。
-  - F-1 体积预算阻塞已解除（size 预算按实测重设并扩展覆盖，`pnpm size` 转绿，详见 [CHANGELOG.md](../CHANGELOG.md)）；`release:check` 仍需在发布时把 `v1.3.4` 写入 CHANGELOG / 迁移指南 / release.md 版本标题（属发布执行动作）。
+  - 体积预算阻塞已解除（size 预算按实测重设并扩展覆盖，`pnpm size` 转绿，详见 [CHANGELOG.md](../CHANGELOG.md)）；`release:check` 仍需在发布时把 `v1.3.4` 写入 CHANGELOG / 迁移指南 / release.md 版本标题（属发布执行动作）。
 - [ ] 发布后归档：确认 `CHANGELOG.md`、迁移指南、发布记录和 Roadmap 状态与实际发布结果一致。
 
-## 优化扫描计划
-
-以"先扫描定位、再整改"的方式推进全项目优化。下列任务按结构/模块划定范围，每个任务下挂一份维度检查清单（模块 × 维度矩阵），复用现有工具（`grep`、`validate-api.mjs`、`check-public-types.mjs`、size-limit、Explore agent）完成扫描。本节只负责"扫描什么 / 怎么扫 / 怎么回填"，不承载具体修复过程。
-
-### 公共约定
-
-所有扫描任务共用同一套执行与产出流程（各任务只列差异化的目标路径、维度清单与方法）：
-
-1. **扫描**：按任务的目标路径与维度清单逐项核查，用上述工具定位问题。
-2. **归类**：把扫描到的问题与发现的可优化内容按「模块 / 维度」归类，先比对已有条目避免重复。
-3. **回填**：将每条发现更新到本文档下方「后续优化任务」小节，作为后续优化任务内容；体量小、可即时处理的也可直接进 `当前待办`。
-4. **判定**：某个扫描任务的发现全部回填后，方可勾除该任务复选框——扫描阶段只记录、不修复。
-
-每条「后续优化任务」条目建议写明：所属扫描任务与模块、维度、问题描述、影响范围、建议方案、优先级（P0 阻塞 / P1 重要 / P2 改进）。已交付的优化按惯例移交 [CHANGELOG.md](../CHANGELOG.md)，不在本节保留。
-
-### 任务 A — Core 包扫描 ✅ 已扫描（2026-06-19）
-
-- 目标路径：`packages/core/src/`
-- 维度清单：
-  - [x] 类型安全：core 实际 `any` 类型用法 0 处、`@ts-ignore` 0 处（详见 A-0），`any` 审计移交任务 B/C。
-  - [x] i18n：核对 `utils/locale-utils.ts` 覆盖面，发现 form-validation 不可本地化与标签表分散（A-1、A-2）。
-  - [x] SSR：core 已统一 `isBrowser()`，残留 `typeof window/document` 均为合理特性检测（A-0），散落直写移交任务 B/C。
-  - [x] token/theme：核对 `tokens/`、`themes/`、`theme/`，发现 `theme/` 与 `themes/` 命名易混淆（A-5）。
-  - [x] 死代码 / deprecated：定位 2 处 `@deprecated`——`shouldLoadMore` 仍被使用、`kanbanAddCardClasses` 可清理（A-3、A-4）。
-- 方法：`grep` 定位 + `pnpm --filter @expcat/tigercat-core build`、`pnpm test:core` 验证收敛后类型与单测仍通过。
-- 产出：见下方「后续优化任务 → 来自任务 A」（A-0 核查结论、A-1～A-5 优化项）。
-
-### 任务 B — Vue 组件包扫描 ✅ 已扫描（2026-06-19）
-
-- 目标路径：`packages/vue/src/`
-- 维度清单：
-  - [x] 复杂度热点：最大文件 Menu(1278)/DatePicker(989)/TimePicker(980)/Tree(934)/Select(814)；DatePicker/TimePicker/Select 已有 composable 却未接入，Menu/Tree 无任何抽取层（B-6）。
-  - [x] 硬编码文案：定位 render 内写死串（B-1）与英文 prop 默认值绕过 ConfigProvider locale（B-2）；`TigerLocaleCommon` 已含 loadingText/emptyText/closeText 槽位待接入。
-  - [x] SSR guard：121 处 window/document 访问，抽样核查未见在 SSR setup/render 同步执行者（均在 onMounted/事件处理/守卫内，无崩溃风险），但守卫写法不统一（B-4）。
-  - [x] 非空断言：全包仅 21 处 `!`（`Alert.ts:202`、`Select.ts:791` 等），多为 defaulted prop 与受控值模式，可类型收窄（B-5）。
-  - [x] composables 复用：10 个 composable 中仅 `useChartInteraction` 被组件使用，7 个仅被自身 barrel 引用＝死代码，并与 React hooks 存在 parity 缺口（B-3）。
-  - [x] 类型安全（A-0 移交）：Vue src 类型位 `any` 实际 0 处（唯一是 `Table.ts:160` 的 `Map<string, any>`），`@ts-ignore` 0 处 → Vue 侧基本干净，余项移交任务 C（见 B-0）。
-- 方法：`grep` 定位 + 计划用 `pnpm test:vue` 窄范围验证（扫描阶段只记录、未跑修复）。
-- 产出：见下方「后续优化任务 → 来自任务 B」（B-0 核查结论、B-1～B-6 优化项）。
-
-### 任务 C — React 组件包扫描 ✅ 已扫描（2026-06-19）
-
-- 目标路径：`packages/react/src/`
-- 维度清单：
-  - [x] 复杂度热点：`Table` 已拆为 `Table/` 子模块（范式），Menu/Tree/DatePicker/TimePicker/Select 仍单文件巨石（C-5、呼应 B-6）。
-  - [x] 硬编码文案：内部搜索框 `"Search..."` 内联硬编码不可定制（C-1）、英文 prop 默认值绕过全局 locale（C-2）——与 B-1/B-2 同源。
-  - [x] SSR guard：点名的 FloatButton/Tour/ChartTooltip 均已 `isBrowser()` 守卫（详见 C-0），真正缺显式守卫仅 ImagePreview（C-3）。
-  - [x] hooks 复用：`useControlledState` 能力不足、仅 5 处采用，~29 组件手写受控/非受控样板（C-4）。
-  - [x] 类型安全（A-0/B-0 移交）：React src 类型位 `any` 仅 1 处、`@ts-ignore` 0 处，非空断言约 17 处（详见 C-0）。
-- 方法：`grep` 定位 + 与 `packages/vue/src/` 对照确认跨框架同源问题；扫描阶段未改动代码，不触发 `pnpm test:react`。
-- 产出：见下方「后续优化任务 → 来自任务 C」（C-0 核查结论、C-1～C-5 优化项）。
-
-### 任务 D — 跨框架一致性扫描 ✅ 已扫描（2026-06-19）
-
-- 目标路径：`packages/core` + `packages/vue` + `packages/react`
-- 维度清单：
-  - [x] 重复逻辑下沉：键盘导航是唯一系统性未下沉的重复逻辑——Menu/Tree/DatePicker/TimePicker/Mentions 双端各自内联，`picker-utils` 已是成熟范式却仅 Select/AutoComplete/Spotlight 接入（D-1）；class 生成与过滤已充分沉淀（`get*Classes`/`filter*`，无需再抽）。另有 Message/Notification 命令式 API helper 与 InputNumber 显示/解析双端重复（D-2）。
-  - [x] API parity & 命名：`api:validate`/`types:check` 跑通且 0 问题；双端共用 `core/src/types/*.ts` 的 Props 类型，结构性 prop parity 有保证，分歧集中在事件/回调命名（D-3）；validate-api 的 parity 规则覆盖面窄（D-4）。
-  - [x] 受控 / 事件对称：`open` 三件套（`open`/`update:open`/`onOpenChange`）全量正确；但 validate-api 仅强校验 `open` 一项，其余受控量与回调命名出现不对称（ImageViewer/CommentThread/Spotlight/DataTableWithToolbar/Signature，详见 D-3）。
-- 方法：`pnpm api:validate` + `pnpm types:check` 跑通基线 + 脚本对照双端 emits/回调 + 同名 helper 双端交叉定位（区分「重复实现」与「对 core util 的薄包装」）。
-- 产出：见下方「后续优化任务 → 来自任务 D」（D-0 核查结论、D-1～D-4 优化项）。
-
-### 任务 E — CLI 包扫描 ✅ 已扫描（2026-06-19）
-
-- 目标路径：`packages/cli/src/`
-- 维度清单：
-  - [x] 模板对齐：实际模板位于 `src/templates/`；Tailwind v4 接入与 catalog / example 对齐（E-0），但 package `files` 仍列不存在的 `templates` 目录（E-2）。
-  - [x] doctor 诊断覆盖：已覆盖 package/Node/pnpm/Tailwind/peer presence/template deps presence，但未校验 Vue/React/Vite 等 peer/template 版本范围与核心 exports/importability（E-4）。
-  - [x] 命令健壮性：发现 `generate` 已存在文件路径运行时崩溃（E-1），以及 `create` / `add` / `playground` 若干边界行为不清晰（E-3）。
-  - [x] 版本同步：`CLI_VERSION` 与 `TEMPLATE_VERSIONS.tigercat` 已由 `sync-version.mjs` / `release:check` 守护；其余模板工具链版本仍靠手工同步，覆盖不完整（E-5）。
-- 方法：`rg` 定位 + CLI 单测 + `pnpm --filter @expcat/tigercat-cli build` + `pnpm --filter @expcat/tigercat-cli exec tsc --noEmit` + `pnpm --filter @expcat/tigercat-cli pack --pack-destination /tmp` + built CLI 边界路径 smoke。
-- 产出：见下方「后续优化任务 → 来自任务 E」（E-0 核查结论、E-1～E-5 优化项）。
-
-### 任务 F — 构建·体积·性能扫描 ✅ 已扫描（2026-06-19）
-
-- 目标路径：构建与产物（各包 `tsup.config.ts`、`.size-limit.json`、`package.json` exports/sideEffects）
-- 维度清单：
-  - [x] 体积预算：fresh build 下 `.size-limit.json` 5 项预算**全部超限**（`pnpm size` 退出码 1 → CI/`quality:release` 门禁红，F-1）；且仅 5 入口，未覆盖 144 vue + 144 react 组件子路径中的重组件与 38 个 core 子路径（F-2）。
-  - [x] 可摇树性：core `./types`/`./theme` 子路径导出指向未产出文件且与主入口重复（F-3）、core `module` 字段指向不存在的 `index.mjs`（F-4）；vue/react `sideEffects` 白名单偏保守、src 无 CSS/副作用导入可评估收敛为 `false`（F-5）。
-  - [x] 运行时性能：**Roadmap 原估"无 runtime 基准"已不成立**——`vitest bench` + `benchmarks/`（8 个 `.bench.ts`）+ `bench` 脚本 + `vitest.config.ts` benchmark 段均已就位；残留缺口是未接入 CI/门禁、无基线回归阈值（F-6）。
-- 方法：`pnpm build` + `pnpm size` 实测 + 对照各包 `tsup.config.ts` / `package.json`（exports/sideEffects/module）+ `pnpm --filter @expcat/tigercat-core build` 复核子路径产物 + `grep` 核对副作用导入与 benchmark 配置。
-- 产出：见下方「后续优化任务 → 来自任务 F」（F-0 核查结论、F-1～F-6 优化项）。
-
-### 任务 G — 质量门禁·文档一致性扫描 ✅ 已扫描（2026-06-19）
-
-- 目标路径：`.github/workflows/` + `scripts/*.mjs` + `skills/tigercat/references/`
-- 维度清单：
-  - [x] 覆盖率门槛：`test:coverage`=`vitest --coverage`（已装 `@vitest/coverage-v8`），但 `vitest.config.ts` `coverage` 段无 `thresholds`，且覆盖率从未进入 CI/任何 `quality:*`/`release:check`——既无阈值也不在门禁里跑（G-1）。
-  - [x] 依赖 / CVE：无 `dependabot.yml`/renovate，CI 与脚本无 `pnpm audit`/CodeQL/Snyk/Trivy/OSV，依赖与代码安全扫描完全缺位（G-2）。
-  - [x] breaking-change：`validate-api.mjs`（命名/双端配对/overlay/deprecated/文档覆盖）+ `check-public-types.mjs`（仅查 Props 类型导出存在性）+ `check-release-readiness.mjs`（版本/exports 存在性）皆为「当下一致性」校验，无与上一发布版的 API 快照对比，删除导出/删 prop/改签名不被发现（G-3，与 D-4 互补）。
-  - [x] references 漂移：CI `git diff --exit-code` 仅校验 6 类生成物中的 `api-summary.md` 1 类，其余 ~21 个生成文件可静默漂移、且漏 prettier 步骤——`examples/composite.md` 已存在实测漂移（G-4，P1）；手维护指南 `performance.md` 漏基准、`cli.md` 表格损坏（G-5），`ssr.md`/`accessibility.md` 等抽查与源一致。
-  - [x] 门禁触发与发布路径（附加发现）：CI/E2E 全部 `workflow_dispatch` 手动触发（无 push/PR 自动跑），publish 路径仅跑 lint+build——全量门禁不绑定任何自动/发布路径，靠本地 `pnpm quality:release`（G-6，确认是否有意）。
-- 方法：审阅 `.github/workflows/`（6 个 workflow）+ `scripts/*.mjs` + `vitest.config.ts` + 干净树 `pnpm docs:api` 实测漂移 + `prettier --check` 生成物 + grep 安全/覆盖率/API 基线工具缺位核查。
-- 产出：见下方「后续优化任务 → 来自任务 G」（G-0 核查结论、G-1～G-6 优化项）。
-
-### 后续优化任务
-
-由上述扫描任务执行后回填，每条按「公共约定」注明所属任务 / 模块、维度、问题、影响、建议方案与优先级（P0 阻塞 / P1 重要 / P2 改进）。
-
-#### 来自任务 A — Core 包扫描（2026-06-19）
-
-> **扫描结论修正**：Roadmap 原估"core 约 440 处 `any`、散落 `typeof window` 直写"在 core 范围内不成立——该信号集中在 `vue` / `react` 组件层，应由任务 B / C 核查。core 自身类型与 SSR 守卫基本干净（见 A-0）。
->
-> **进度（2026-06-19）**：任务 A 全部优化项已交付。非破坏性的 A-1 / A-2 / A-3 先行交付（A-1 表单内置校验消息本地化、A-2 timepicker/upload 默认标签收敛到 `locale-utils`、A-3 撤销 `shouldLoadMore` 的 `@deprecated`）；随后 A-4（移除废弃公共别名 `kanbanAddCardClasses`，改用 `taskBoardAddCardClasses`）与 A-5（core 内部 `theme/` 目录重命名为 `theme-runtime/`，对外导出符号不变）作为破坏性变更随下一个允许破坏的版本一并交付，详见 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)。按惯例已交付项移交 CHANGELOG，本节不再保留 A-1～A-5 细目，仅保留 A-0 核查结论。
-
-- [x] **A-0 已核查、core 范围内无需处理**
-  - 类型安全：`packages/core/src` 真实 `any` 类型用法 **0** 处（grep 命中的 24 处均为注释里的英文单词或 `'any'` 字符串字面量），`@ts-ignore` / `@ts-expect-error` **0** 处 → `any` 审计移交任务 B/C。
-  - SSR：core 已统一使用 `env.ts` 的 `isBrowser()`；残留 `typeof window/document` 仅为 `matchMedia`（`animation.ts`、`transition.ts`）与 `queryCommandState`（`rich-text-engine.ts`）特性检测，且都在 `isBrowser()` 之后，属合理用法 → 散落直写问题移交任务 B/C。
-
-#### 来自任务 B — Vue 组件包扫描（2026-06-19）
-
-> **扫描结论修正**：Roadmap 原估"组件层散落 `typeof window` 直写 + 大量 `any`"在 Vue 范围内不成立——Vue src 类型位 `any` 实际 0 处，window/document 抽样核查也无 SSR 崩溃风险（见 B-0）。真正的高优问题是 **i18n 未接入**（B-1）与 **约 1,500 LOC 死 composable**（B-3）。
-
-> **进度（2026-06-19）**：B-1（硬编码 UI 文案接入 TigerLocale）与 B-3（删除未使用 composable）已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。B-1 的 core 前置（`TigerLocaleCommon` 新增 `searchPlaceholder` / `clearText`）与 React 镜像 C-1 一并跨端交付；原 B-1 清单中的 `Signature.ts:48` / `InfiniteScroll.ts:32` / `Spotlight.ts:85` 实为带英文默认值的 prop（非 render 硬编码），并入 B-2 处理。
->
-> **进度（2026-06-19，续）**：余项 B-2 / B-4 / B-5 / B-6 已全部交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留 B-2 ～ B-6 细目，仅保留 B-0 核查结论与 B-6 评估结论。**B-2**（英文 prop 默认值回退 ConfigProvider locale，连同 React 镜像 **C-2** 跨端一并交付）；**B-4**（`ConfigProvider`/`Signature`/`ImageAnnotation` 内联 `typeof` 守卫统一为 `isBrowser()`）；**B-5**（收窄 `Image`/`QRCode`/`Mentions`/`Alert` 等冗余断言与 `Tree`/`CommentThread`/`Menu` 的 `node.children!` post-check，React 镜像同批）；**B-6** 见下方评估结论。
-
-- [x] **B-6 复杂度热点评估结论（已交付下沉前置）**
-  - 评估：Menu / Tree / Select 的框架无关逻辑（键盘导航 `menu-utils`/`picker-utils`、过滤、`getVisibleTreeItems` flatten）**早已下沉 core**，无可再抽；TimePicker 为列表生成式（`generateHours/Minutes/Seconds`）、无算术可抽。唯一 Vue 端内联且应下沉的是 **DatePicker 的日期算术**——`date-utils` 原缺 `addDays`/`addMonths`/`addYears`，双端各写一份。
-  - 已交付：core `date-utils` 新增 `addDays`/`addMonths`/`addYears`（含单测），双端 DatePicker 改用之（移除内联 `addDays` 与手写月/年 wraparound）。更大范围的「键盘导航 composable/hook 跨端包装」仍属 **D-1**（见下方），本项只交付其 `date-utils` 前置。
-
-- [x] **B-0 已核查、Vue 范围内无需处理**
-  - 类型安全：`packages/vue/src` 类型位 `any` **0** 处（唯一类型位为 `Table.ts:160` 的 `new Map<string, any>()`，值类型可收窄但风险极低；`CronEditor.ts` 的 `'any'` 为业务字面量非类型），`@ts-ignore`/`@ts-expect-error` **0** 处 → A-0 移交的 `any` 审计在 Vue 侧基本干净，React 侧移交任务 C。
-  - SSR：抽样核查 window/document 高密度文件（Affix/Tour/Modal/Drawer/TimePicker/Slider/ImageCropper/ChartTooltip/ConfigProvider 等），未发现会在 SSR setup/render 阶段同步执行的访问 → 无 SSR 崩溃风险，仅守卫写法不统一（详见 B-4）。
-
-#### 来自任务 C — React 组件包扫描（2026-06-19）
-
-> **扫描结论修正**：与任务 B 一致——Roadmap 原列的类型安全（`any`）与 SSR 直写在 React 范围内同样基本不成立：React src 类型位 `any` 仅 1 处、`@ts-ignore` 0 处，window/document 抽样均在事件/`useEffect` 内（见 C-0）。点名的 FloatButton/Tour/ChartTooltip 已正确 `isBrowser()` 守卫，真正缺显式守卫仅 ImagePreview（C-3）。React 与 Vue 共用 `TigerLocale`/`mergeTigerLocale`/ConfigProvider 体系，但仅 10 个组件消费，搜索/空态类仍硬编码（C-1/C-2，与 B-1/B-2 同源）。
-
-> **进度（2026-06-19）**：C-1（内部搜索框 `placeholder` 硬编码）已随 Vue B-1 跨端一并交付——6 个 React 搜索框（Select/Tree/TreeSelect/Transfer/Cascader/FileManager）改读 `mergedLocale.common.searchPlaceholder` 并新增 `locale` prop，共享 core `TigerLocaleCommon.searchPlaceholder`，按惯例移交 [CHANGELOG.md](../CHANGELOG.md)。
->
-> **进度（2026-06-19，续）**：**C-2** 已随 Vue B-2 跨端一并交付（`List`/`VirtualTable`/`Tree`/`Transfer`/`TreeSelect` 空态、`InfiniteScroll` 加载、`Signature` 清除、`Spotlight` placeholder/空态、`Cascader` 空态改读 `mergedLocale.common.*`；`Tour` 的 next/prev/finish 回退 `formWizard.*`、`NumberKeyboard` 的 confirm 回退 `common.okText`、`Loading` 的 aria 回退 `common.loadingText`；`Select`/`Cascader`/`TreeSelect` 的主 `placeholder`（'Select an option'/'Please select'）因 `common` 无对应 key 暂不改，留待后续视需要新增 key）；C-0 注记的 React 侧非空断言已随 **B-5** 同批收敛（`Image`/`Tree`/`CommentThread` 等）。均移交 [CHANGELOG.md](../CHANGELOG.md)。
->
-> **进度（2026-06-20，续）**：C-3 已交付（ImagePreview 门户改用 `renderBodyPortal`，详见下方 C-3 条目与 [CHANGELOG.md](../CHANGELOG.md)）。余项 C-4 / C-5 仍待推进。
->
-> **进度（2026-06-21，续）**：C-4 已交付（详见下方 C-4 条目、[CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)）。余项仅剩 C-5（React 巨石拆分）。
->
-> **进度（2026-06-21，续）**：C-5 的 **Picker 三件套**（Select / DatePicker / TimePicker）已按 `Table/` 范式拆分交付（详见下方 C-5 条目与 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`），并完成 C-4 遗留的 DatePicker / TimePicker `useControlledState` 迁移。C-5 复选框保持开放，余 **Menu / Tree** 待后续批次。
->
-> **进度（2026-06-21，收尾）**：C-5 的 **Menu / Tree** 已按同一 `Table/` 范式拆分交付（详见下方 C-5 条目与 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`）——公共导出、props 类型与渲染 / a11y 行为不变，公共 API 基线快照（`api-reports`）无变化。**至此 C-5 复选框勾除，优化扫描任务 A–G 全部回填并交付完毕**，Roadmap 开放项仅余顶部的 v1.3.4 发布执行与发布后归档。
-
-- [x] **C-3 已交付（2026-06-20）**——React `ImagePreview` 门户挂载改用 `utils/overlay` 的 `renderBodyPortal`（内含 `isBrowser()` 守卫）替代直接 `createPortal(…, document.body)`，与 Tour/FloatButton/ChartTooltip 门户写法统一；浏览器端渲染行为不变。配套为测试基建 `tests/setup.ts` 的 `matchMedia` mock 加 `typeof window` 守卫，新增 node 环境 SSR spec；Vue `ImagePreview` 经 Teleport（SSR 安全），无需镜像。按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目。
-
-- [x] **C-4 已交付（2026-06-21）**——React 公共 hook `useControlledState` 升级为回调透传版（参照 Ant `useMergedState` / Radix `useControllableState`）：合并 `onChange`、稳定 setter identity、支持 updater 形式，返回值由 `[value, setValue, isControlled]` 收敛为 `[value, setValue]`（移除第三返回位属公共 API 破坏，→ [CHANGELOG.md](../CHANGELOG.md) / [MIGRATION.md](MIGRATION.md)）。`Checkbox` / `Input` / `InputNumber` / `Radio` / `RadioGroup` / `CheckboxGroup` / `Textarea` / `MarkdownEditor` / `RichTextEditor` / `Upload` / `Spotlight` 接入并移除手写受控样板，新增 hook 单测覆盖受控 / 非受控 / updater / extra-args / 稳定性。
-  - **未迁移（非纯样板，有意保留）**：`ScrollSpy`（`isControlled` 兼作 effect 模式开关 + onChange 值类型变性冲突）、`NumberKeyboard`（受控值读取时归一化，非幂等迁移有风险）；`Select` / `DatePicker` / `TimePicker` 的受控迁移并入 **C-5** 拆分一并做。
-  - **实现判断**：onChange 值类型与受控值空间一致者把 `onChange` 交给 hook（值型直接合并，携事件者用 extra-args `setValue(next, event)`）；当受控值空间含 `undefined` 而 `onChange` 不接受（如 `RadioGroup`），或 onChange 参数顺序/语义不符（`Upload` 的 `(file, list)`、`Radio` 发 `value` 非 `checked`），则 hook 仅管 state、`onChange` 保留手写——既消除 `isControlled` 样板又规避函数参数变性误报。按惯例移交 CHANGELOG，本节不再保留问题细目。
-
-- [x] **C-5 复杂度热点：Menu/Tree/DatePicker/TimePicker 单文件巨石（已交付）**（P2）
-  - 维度：复杂度热点｜模块：`Menu.tsx`(914)、`Tree.tsx`(897)、`DatePicker.tsx`(847)、`TimePicker.tsx`(775)、`Select.tsx`(666)
-  - 问题：`Table` 已拆为 `Table/`（`state.ts` + `render-header/body/pagination/summary` + `types/icons`），是 React 端已落地的解耦范式；而上述组件仍单文件，渲染/状态/键盘逻辑耦合。
-  - 影响：大文件维护成本高、回归面大，与 Vue 同类逻辑各自内联易漂移（Vue 对应文件更大，见 B-6）。
-  - 建议：按 `Table/` 模式拆出 `state.ts` 与 render-\* 子模块；框架无关纯逻辑（键盘导航、日期/时间计算、节点 flatten/过滤）下沉 `core/src/utils/` 经 hooks 包装供双端共享——跨端下沉执行归属任务 D。
-  - **已交付 Picker 三件套（2026-06-21）**：`Select` / `DatePicker` / `TimePicker` 已拆为 `<Comp>/`（`state.ts` 状态 hook + `render-*` 渲染 + `icons` + `types`），wrapper 文件瘦身（679→82 / 835→71 / 754→116 行），公共导出与 props 类型不变（公共 API 基线无变化）；DatePicker/TimePicker 受控值接入 `useControlledState`（边界解析对齐 onChange 值空间），Select 本即全受控仅结构拆分；纯逻辑续调 core，无新增 core 抽取。详见 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`。
-  - **已交付 Menu / Tree（2026-06-21 收尾）**：`Menu`（含 `MenuItem` / `SubMenu` / `MenuItemGroup` 多组件导出面与共享 `MenuContext`）拆为 `Menu/`（`state.ts` `useMenuRootState` + `context.ts` + `menu-item` / `submenu` / `menu-item-group` 子组件 + `icons` / `types`），wrapper 定义 `Menu` 根组件并原样 re-export 四组件 + `useMenuContext` + 类型；`Tree` 拆为 `Tree/`（`state.ts` `useTreeState` + `render-row` / `render-node` + `icons` / `types`）。纯逻辑续调 core（键盘导航 / 过滤 / 复选框级联 / flatten），无新增 core 抽取；公共 API 基线无变化，React 全量单测（2872）绿。**C-5 全部完成，任务 C 与优化扫描 A–G 收尾。**
-
-- [x] **C-0 已核查、修正与移交回收**
-  - 类型安全（A-0/B-0 移交）：`packages/react/src` 类型位 `any` 仅 **1** 处（`Table.tsx:267` `new Map<string, any>()`，与 Vue `Table.ts:160` 镜像，风险极低），`@ts-ignore`/`@ts-expect-error` **0** 处 → React 类型层基本干净。非空断言约 **17** 处（与 Vue B-5 的 21 处镜像，多为 defaulted prop 的 `props.X!`），低优先级，宜随 B-5 同批收敛。
-  - SSR：window/document 访问绝大多数位于事件处理器与 `useEffect` 内（仅浏览器执行）；点名的 FloatButton/Tour/ChartTooltip 及 `overlay.ts` 门户均已 `isBrowser()` 守卫，`Descriptions.tsx` 用 `getServerSnapshot` 正确兜底 → 真正缺显式守卫仅 ImagePreview（→C-3）。
-  - i18n：React 与 Vue 共用 `TigerLocale`/`mergeTigerLocale`/ConfigProvider，仅 10 组件消费（Pagination/Drawer/DataTableWithToolbar/Upload/Table/TaskBoard/Modal/FormWizard/ConfigProvider/render-pagination）；搜索/空态类未接入（→C-1/C-2）。
-
-#### 来自任务 D — 跨框架一致性扫描（2026-06-19）
-
-> **扫描结论修正**：Roadmap 原维度清单举例的「类名生成、过滤」在双端早已下沉 core（`get*Classes` / `filter*` / `flatten*`），无需再抽；真正系统性的跨端重复只剩 **键盘导航**（D-1）。`api:validate` / `types:check` 全绿、组件文件一一对应、`open` 三件套全部成立——双端共用 `core/src/types/*.ts` 的 Props 类型使结构性 prop parity 有保证，剩余分歧集中在 **事件/回调命名与对称**（D-3），且现有 validate-api 仅强校验 `open` 一项（D-4）。本任务承接 B-3/B-6/C-4/C-5 标注的「跨端去重/下沉执行归属任务 D」。
-
-> **进度（2026-06-20，续）**：D-2 已交付，至此任务 D（D-1 ～ D-4）全部优化项交付完毕，详见各条目与 [CHANGELOG.md](../CHANGELOG.md)。
-
-- [x] **D-1 已交付（2026-06-20）**——跨端键盘导航纯逻辑下沉 core，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
-  - 前置（2026-06-19，随 B-6）：`date-utils` 新增 `addDays`/`addMonths`/`addYears`，双端 DatePicker 改用之。
-  - 本次：core 新增 `getTreeKeyboardAction`/`getFirstVisibleChildKey`（`tree-utils`）、`getCyclicIndex`（`picker-utils`，picker 缺的环绕模式）、`focusTimePickerOption`（`timepicker-utils`，DOM roving 焦点，clamp 复用 `findNext/First/LastEnabledIndex`）、`getMenuNavigationKeys`（`menu-utils`）。Tree（决策语义）/Mentions（环绕）/TimePicker（列内焦点）/Menu（方向键映射）双端改调同一份 core 实现。
-  - **实现判断**：(1) 沿用现行**直接调用 core util** 范式（如 Select 消费 picker-utils），**未引入 hooks/composable 包装层**——roadmap 原建议的包装层与实际落地范式不符，遵循后者以减小面；(2) Tree 线性导航**保留自身 `focusableKeys[i±1] ?? current` clamp 语义**而非套用 `getPickerNavigationIndex`——后者 ArrowUp 在 `index=-1` 时从尾部环绕，与 Tree 现状不一致，行为保持优先；(3) Menu 的重型 DOM 导航（`moveFocusInMenu` 等）早已在 core，本次仅补方向键映射，submenu 展开/收起状态机（风险高、价值低）保持双端内联。`pnpm api:validate`/`types:check`/`size` 全绿，双端 Tree/Mentions/TimePicker/Menu 组件 spec 与新增 core 单测全通过。
-
-- [x] **D-2 已交付（2026-06-20）**——双端命令式 API 计数器与 InputNumber 显示/解析纯逻辑下沉 core，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
-  - core 新增 `createInstanceCounter`（`imperative-api`）与 `formatInputNumberDisplay`/`parseInputNumberValue`（`input-number-utils`，formatter/precision/parser 以参数注入，含单测）；双端 **Message**/**Notification** 的 `getNextInstanceId`（原 4 份内联计数器）与 **InputNumber** 的 `toDisplayValue`/`parseValue` 改调之，行为不变。
-  - **扫描结论修正**：原列的 `normalizeOptions` 双端重复**不成立**——Vue/React 两端早已 `import { normalizeStringOption }` 并只做一行委派（`Message.ts:25/275`、`Message.tsx:275`），属对 core util 的薄包装（符合 D-0 判定），未改。
-
-- [x] **D-3 + D-4 已交付（2026-06-20）**——跨端 API 对称 + validate-api 受控量 parity 护栏，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased` 与 [MIGRATION.md](MIGRATION.md)，本节不再保留细目，仅记结论。
-  - **D-3**：硬改名 + 迁移指南统一受控量/回调命名——ImageViewer React `onIndexChange`→`onCurrentIndexChange`（破坏）；CommentThread Vue `expand-change`→`update:expandedKeys`（破坏，支持 `v-model:expanded-keys`）；Spotlight Vue 移除冗余 `close`（破坏，统一用 `open-change`）。**修正**：原列的 DataTableWithToolbar「React 缺 `onSelectionChange`」实已由 `TableProps` 继承并转发给内层 Table（含 React 测试 + 示例），无需改；Signature React 新增 `onClear`（增量）。另顺带拉齐未发布的 `hiddenColumnKeys`——React `onHiddenColumnsChange`→`onHiddenColumnKeysChange`、Vue `hidden-columns-change`→`hidden-column-keys-change`（仅改 CHANGELOG `## Unreleased` 措辞，免迁移）。
-  - **D-4**：把 `open` overlay 规则推广为显式「受控量 parity 表 + 白名单」（`currentIndex`/`expandedKeys`/`query`/`hiddenColumnKeys`），校验 Vue `update:<prop>` 与 React `on<Prop>Change` 成对且命名一致，读取主文件 + `<Comp>/` 子目录兼容拆分组件（Table）。**关键判断**：实测「全部 `update:X`↔`onXChange`」朴素配对产生 ~81 处误报（`modelValue↔onChange`、主 `onChange`、`x-change` 普通事件等框架惯用差异），故不做全自动派生，改显式登记、可逐步扩充。`pnpm api:validate` 全绿，并经临时制造不一致自检确认能报出。
-
-- [x] **D-0 已核查、双端基线一致**
-  - 基线：`pnpm api:validate` 0 问题、`pnpm types:check` 全部公共 Props 类型已导出；cross-framework 组件文件 Vue↔React 一一对应（无 `missing-vue`/`missing-react`），`open`/`update:open`/`onOpenChange` 三件套全量成立。
-  - 结构性 parity：双端组件 `extends` 同一份 `core/src/types/*.ts` Props 类型，shared prop 的存在性与类型有保证，无需逐 prop 对照——真正分歧在事件/回调层（→D-3）。
-  - 方法论提示：同名 helper 双端并存多为对 core util 的**薄包装**（如 FormWizard `findNextUnskipped`→core `findNextUnskippedStep`、Select `find*EnabledIndex`→`picker-utils`），非重复实现；判定重复须确认「未 import core 且 core 无对应物」，避免误报（D-1/D-2 均已据此确认）。
-
-#### 来自任务 E — CLI 包扫描（2026-06-19）
-
-> **扫描结论修正**：Roadmap 原写 `templates/`，实际模板实现是 `packages/cli/src/templates/vue3.ts` / `react.ts` 的内联文件表；Tailwind v4 模板接入本身已对齐，但 CLI 发布包、doctor 深度与命令边界仍有可优化项。
-
-> **进度（2026-06-19）**：E-1 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。`generate.ts` 补上 `logWarn` 导入修复已存在文件路径的 `ReferenceError` 崩溃，补 `tests/core/cli.spec.ts`「目标文件已存在 → 跳过且不崩溃」用例（共 60 例通过），并以 `pnpm --filter @expcat/tigercat-cli exec tsc --noEmit` 纳入源级类型校验。余项 E-2 / E-3 / E-4 / E-5 仍待推进。
-
-> **进度（2026-06-20）**：E-2 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。判定 CLI 公共 API 边界为 bin/root（CLI 以二进制消费，无需公开深路径），故采用最小修复：`packages/cli/package.json` 的 `files` 移除不存在的 `templates`（实际模板为 `src/templates/*.ts`，经 tsup 内联进 `dist/index.js`）；测试经 Vitest alias 直 import 源码子路径属内部测试机制、不构成发布契约，保持现状。`pack --dry-run` 确认发布包为 `dist` + `package.json` + `README`（4 文件），CLI 60 例单测通过。余项 E-3 / E-4 / E-5 仍待推进。
-
-> **进度（2026-06-21）**：CLI 健壮性批次 E-3 / E-4 / E-5 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留各项细目，仅保留 `- [x]` 结论。至此任务 E（E-0 ～ E-5）全部回填完成，Roadmap 开放项仅余 **C-5（React 巨石拆分）**。**顺带修复**：C-4（React `useControlledState` 收敛为 2-tuple）遗留的 example `UseControlledStateDemo.tsx` 仍按旧 3-tuple 解构，使 `pnpm example:build`（属 `quality:release` 闸）在 main 上已红——本批同步把该 demo 与展示 snippet 改用新签名 `useControlledState(value, defaultValue, onChange)`，恢复 example 构建绿。
-
-- [x] **E-3 已交付（2026-06-21）**——命令参数校验，移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，仅记结论。
-  - 新增 `cli/src/utils/validate.ts`（`validateProjectName` / `suggestProjectName` / `resolveTemplateOption` / `isFramework`）。`create` 对非法 npm 包名**校验后快速失败**并给出建议名（不静默规范化）、非法 `--template` 不再静默落入交互 prompt、非空目录确认文案改为诚实表述「Overwrite conflicting template files? (other files are kept)」；`playground` 复用同一模板解析；`add` 显式非法 `--framework` 快速失败不再静默回退自动检测。补 12 例单测（含纯函数 + `process.exit` 捕获的快速失败路径）。
-
-- [x] **E-4 已交付（2026-06-21）**——doctor 深度诊断，移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，仅记结论。
-  - 兼容矩阵动真格：按 `FRAMEWORK_PEER_RANGES` 校验已检测 framework 的 peer 主版本（vue `^3`、react + react-dom `^19`），过旧即 `fail`（复用 `getRangeMajor`/`isOlderMajor`）。新增注入式 `Core exports` 检查（`DoctorOptions.readCorePackageJson` DI，与既有 `cwd`/`nodeVersion`/`env` 同范式）：core 在 deps 且可解析时校验其 `exports` 含 `.`/`./tailwind`/`./tailwind/modern`/`./tokens.css`/`./figma-variables.json`，缺失 `fail`；不可解析（未安装）则跳过，不破坏既有「全 pass」用例。补单测。
-
-- [x] **E-5 已交付（2026-06-21）**——模板版本单一来源，移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，仅记结论。
-  - workspace catalog 补 `@vitejs/plugin-react` / `@vue/tsconfig` / `vue-tsc` 三项，example 三处改 `catalog:`，使 catalog 成为全部模板 toolchain 的单一来源；`cli.spec.ts` 的 Tailwind 对齐用例扩展为「全部 13 个可 catalog 化 `TEMPLATE_VERSIONS` ↔ catalog 对齐表」+ example catalog 断言，把版本漂移由「人工记得」变成红色测试（`tigercat` 仍由 `release:check` 守护，不入表）。CLI 模板已 `import TEMPLATE_VERSIONS`，无需改模板。
-
-- [x] **E-0 已核查、模板主路径与版本主线无需处理**
-  - 模板对齐：`src/templates/vue3.ts` 与 `src/templates/react.ts` 均使用 `@tailwindcss/vite`，CSS 使用 `@import "tailwindcss";` + `@plugin "@expcat/tigercat-core/tailwind/modern";`，与持续守护规则一致。
-  - 版本主线：`packages/cli/package.json`、root package、`CLI_VERSION`、`TEMPLATE_VERSIONS.tigercat` 均为 `1.3.4`；`scripts/sync-version.mjs` 和 `scripts/check-release-readiness.mjs` 已覆盖该主线。
-  - 验证：`pnpm --filter @expcat/tigercat-cli build` 通过；`pnpm vitest run tests/core/cli.spec.ts` 通过（58 tests）；`pnpm pack` 显示 bin/root 发布主路径存在。
-
-#### 来自任务 F — 构建·体积·性能扫描（2026-06-19）
-
-> **扫描结论修正**：Roadmap 原估"目前有 bundle size 无 runtime 基准、评估是否引入 `vitest bench`"已过时——`vitest bench` 体系（`bench` 脚本 + `vitest.config.ts` benchmark 段 + `benchmarks/` 8 个 `.bench.ts`）早已落地（见 F-6）。本次扫描真正的高优发现是 **`pnpm size` 5 项预算全部超限、卡死 CI/发布门禁**（F-1）与 **core `./types`/`./theme` 子路径导出失效**（F-3）。
-
-> **进度（2026-06-19）**：F-1 / F-2 / F-3 / F-4 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目，仅保留 F-0 核查结论与未完成的 F-5 / F-6。**F-1**：已核对 `size` 增量来自 MarkdownEditor、Table 列显隐与多组件 i18n 等新功能源码而非依赖膨胀（运行时依赖仅 `@floating-ui/dom`），按实测 +~10% 余量重设 5 项预算（Core 118 / Vue 284 / React 320 / Vue Button 22 / React Button 20 kB）；**F-2**：新增 Menu/DatePicker/Table/Tree/TimePicker 双端子路径与 core `tailwind/modern`、`locales/zh-CN`、`icons/common` 子路径体积护栏——二者使 `pnpm size` 转绿、解除 v1.3.4 发布阻塞。**F-3**：移除失效且冗余的 `./types`/`./theme` 子路径导出（内容已在主入口、无消费者），同步从 `check-release-readiness.mjs` 必需导出清单移除；**F-4**：`module` 字段修正为实际 ESM 产物 `./dist/index.js`。
-
-> **进度（2026-06-20，续）**：F-5 已交付（vue/react `sideEffects` 收敛为 `false`），F-6 已交付（运行时基准接入非阻塞工作流），均按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`。
-
-- [x] **F-5 已交付（2026-06-20）**——评估确认 vue/react `src` 无 CSS/副作用 import、组件为 headless，`sideEffects` 由保守 allowlist 收敛为 `false`（与 core 一致）；`pnpm size` 全部预算仍全绿、`pnpm example:build` 双端构建无回归，barrel import 下未用 chunk 现可被剔除。按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目。
-- [x] **F-6 已交付（2026-06-20）**——`bench` 接入非阻塞工作流，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
-  - 新增 `.github/workflows/bench.yml`（周度 + `workflow_dispatch`，`pnpm bench --run --outputJson=bench-results.json` + `upload-artifact` 留存供人工对比）。**实现判断**：刻意**非 PR 门禁、不设硬回归阈值**——micro-bench 在共享 runner 抖动大，硬阈值易误红；自动 baseline-diff 阈值仍延后。
-
-- [x] **F-0 已核查、构建主线无需处理**
-  - 体积预算：扫描时 `pnpm size` 5 项均超限，现已按 F-1/F-2 重设预算并扩展覆盖、`pnpm size` 转绿（见上方进度与 [CHANGELOG.md](../CHANGELOG.md)）；`pnpm size:check`（`size-limit --json`）可生成机器可读结果供阈值设定。
-  - tsup 配置：core `format:['cjs','esm']` + `type:module` → `.js`(ESM)/`.cjs`(CJS)，与 `exports` 主入口 `import/require` 一致（`module` 字段曾指向不存在的 `.mjs`，已随 F-4 修正为 `./dist/index.js`）；vue/react `splitting:true` + `external` 框架、core `splitting:false` 多入口（locales/icons 等）配置合理；cli `treeshake:true` + shebang banner 正常。
-  - 可摇树性：core `sideEffects:false` ✓；core 子路径导出目标文件均存在、`import`+`require` 双条件齐全（原失效冗余的 `./types`、`./theme` 已随 F-3 移除）。
-  - 运行时性能：`vitest bench` 体系已落地（见 F-6），非"缺口"。
-
-#### 来自任务 G — 质量门禁·文档一致性扫描（2026-06-19）
-
-> **扫描结论修正**：Roadmap 原维度清单把 references 漂移写作"已有 `git diff` 校验"——实测此闸只覆盖 `shared/api-summary.md` 一个文件，是 `generate-api-docs.mjs` 6 类生成物里的 1 类，其余 ~21 个生成文件无任何漂移护栏，且 `examples/composite.md` 当前已漂移（G-4，本任务唯一 P1）。覆盖率门槛、依赖/CVE、breaking-change 三项均为名副其实的空白（G-1/G-2/G-3）。另发现全量质量门禁不绑定任何自动触发或发布路径（G-6，附加项）。
-
-> **进度（2026-06-20）**：G-4（本任务唯一 P1）已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。根因为 `formatMarkdown` 用 prettier 默认 `printWidth` 80 而非仓库 `.prettierrc.json` 的 100——已改为经 `prettier.resolveConfig` 加载仓库配置使生成物即 prettier-clean 且幂等，CI 漂移闸由单文件扩展为整个 `skills/tigercat/references` 目录，并重生成漂移的 `examples/composite.md` 归零。余项 G-1 / G-2 / G-3 / G-5 / G-6 仍待推进（其中 G-3 可复用本次「生成物经仓库 prettier 配置格式化 + 全目录 `git diff`」范式）。
->
-> **进度（2026-06-20，续）**：CI·质量门禁硬化批次 G-1 / G-2 / G-3 / G-6 已交付（覆盖率阈值门禁、依赖/CVE 扫描 + dependabot、公共 API 基线快照护栏、CI 触发绑定 + 发布前置闸），按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留各项细目，仅保留 `- [x]` 结论。G-3 如规划复用了 G-4 的「生成物 + `git diff --exit-code`」范式。G-5 亦已于低风险清理批交付（见下），任务 G 全部回填完成。
-
-- [x] **G-1 已交付（2026-06-20）**——覆盖率阈值 + 接入 CI，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
-  - 实测基线 lines 90.3 / statements 88.5 / functions 89.8 / branches 81.9，`vitest.config.ts` `coverage.thresholds` 取略低值 85 / 83 / 84 / 76（留漂移余量同时拦截删测/大段未测代码）；`test:coverage` 改 `vitest run --coverage`（避免 watch）；CI 测试步骤改跑 `pnpm test:coverage` 使阈值在门禁内强制。
-
-- [x] **G-2 已交付（2026-06-20）**——依赖/CVE 扫描，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
-  - 新增 `.github/dependabot.yml`（npm + github-actions 周更，非破坏性 bump 分组）作为依赖升级/安全补丁的**实际收敛机制**；新增 `.github/workflows/security.yml`（周度 + 手动，`pnpm audit --audit-level=high`）。**实现判断**：发布包运行时仅依赖 `@floating-ui/dom`，现存 high 级告警全部来自 example/dev 工具链（不随产物分发），故 audit 取**报告式**（`continue-on-error` + step summary）+ dependabot 收敛，不对不影响产物的传递依赖设永久红门禁；CodeQL 暂不引入。
-
-- [x] **G-3 已交付（2026-06-20）**——公共 API 基线快照护栏（轻量方案 b），按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
-  - 新增 `scripts/generate-api-baseline.mjs`（`pnpm api:baseline`）产出确定性的 `api-reports/public-api-baseline.json`：156 个 `*Props` 接口的 props/extends（brace-aware 解析）+ core 导出名（沿 `export *` 子模块 walk）+ 双端公开组件与命名导出；CI 经「生成 + `git diff --exit-code api-reports`」捕捉删除导出/删 prop/改名/改 extends 等版本间回归。与 `validate-api.mjs`（当下双端一致性）层次互补。**实现判断**：未采重方案 `@microsoft/api-extractor`（形状级对比）——名级快照已覆盖最常见 breaking，且与 G-4 同范式、零新依赖；已验幂等 + 删 prop 能 trip。
-
-- [x] **G-5 已交付（2026-06-20）**——手维护 skill 指南修复，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
-  - `performance.md` 补「Benchmarks」节（`pnpm bench` / `benchmarks/` 8 个 `.bench.ts` / `bench.yml`），与 F-6 基准设施及 frontmatter “performance validation” 声明对齐；`cli.md` 命令表把选项内字面量 `|` 转义为 `\|` 并还原为 Command / Purpose / Key options 三列分隔行，渲染恢复。
-  - **实现判断**：未新增独立 prettier lint gate（`format:check` 即 `prettier . --check` 本已覆盖 `skills/**/*.md`，但 prettier 不会修复表格幻列的语义错误，故手改即可；亦避免叠加 Windows 上已知的 prettier 噪声），仅确保两文件 prettier-clean。其余手维护指南抽查与源一致，无需处理。
-
-- [x] **G-6 已交付（2026-06-20）**——质量门禁绑定触发 + 发布前置闸，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留细目，仅记结论。
-  - `ci.yml` 增 `push` / `pull_request`（`main`）触发（保留 `workflow_dispatch`），全量门禁随 PR/合并自动生效；`publish.yml` 与 `publish-on-tag.yml` 在发布前插入 `pnpm release:check`（不需 dist，校验版本/exports/发布文档一致性），发布不再绕过校验。**实现判断**：CI 仍以 PR 闸为主、不给任意分支 push 全量跑（控 Actions 成本）；发布前置取轻量 `release:check` 而非整 `quality:release`（后者含 Nuxt/Next SSR 构建，过重）。e2e 维持手动。
-
-- [x] **G-0 已核查、现有门禁覆盖部分无需处理**
-  - CI 主闸（`ci.yml`）已串联 lint→build→test→`test:validate`→`docs:api`+api-summary drift→`api:validate`→`test:a11y`→`size` 八步，覆盖 lint/构建/单测/测试质量/API 校验/a11y/体积。
-  - `check-release-readiness.mjs` 较完备：4 包+root 版本对齐、源码与 CLI version 常量、必需 core/vue/react exports 存在、repo 元数据、必需 scripts 与 `quality:release` 步骤、changeset fixed group、发布文档（CHANGELOG/MIGRATION/release.md 含当前版本号、example/roadmap 版本号）。
-  - `validate-tests.mjs`（`test:validate`）按测试质量指南校验测试文件，已接入 CI 与 `quality:release`。
-  - 手维护指南 `ssr.md`/`accessibility.md`/`theme.md`/`tokens.md`/`i18n.md` 抽查与源一致（除 G-5 两处）。
+## 优化任务
+
+全项目优化扫描（任务 A–G，2026-06-19 ～ 06-21）已完成并归档，已交付项按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，扫描框架与已交付明细不在本文保留。
+
+本节是对已交付项做**独立复审**（路线图审查，2026-06-21）后筛出的**仍需推进项**。复审确认任务 C / D / E / F **零返工**；任务 A / B 各有一处需修；任务 G 有一处**基础设施级反转**需调和，且连带架空三道已交付门禁。下列条目按优先级（P0 阻塞 / P1 重要 / P2 改进 / P3 可选）组织，每条注明来源、证据位置与建议方案；全部回填后方可勾除。
+
+### P1 — 质量门禁基础设施一致性（源自任务 G 复审）
+
+- [ ] **G-R1 调和「dependabot / CI 自动触发被反转」与文档的矛盾**
+  - 来源 / 维度：任务 G 复审（依赖·CVE / 门禁触发）。
+  - 问题：commit `345274f8`（2026-06-20 16:51）把同日 `cfabd219` 交付的两项门禁基础设施**有意反转**——`.github/dependabot.yml` 重命名为 `.disabled`、`.github/workflows/ci.yml` 删除 `push` / `pull_request(main)` 触发仅留 `workflow_dispatch`。当前仓库状态已与文档矛盾，并留下悬挂引用：
+    - `security.yml`（注释 `:3-4,11`）仍写「Remediation is driven by Dependabot (see .github/dependabot.yml)」，指向已禁用文件 → 报告式 `pnpm audit` 失去补救兜底（每周出报告、无自动修复承接）。
+    - `CHANGELOG.md` `## Unreleased` 仍写 dependabot「作为依赖升级 / 安全补丁的实际收敛机制」与「`ci.yml` 增 `push` / `pull_request`（main）触发…随 PR / 合并自动生效」。
+  - 影响：P1，基础设施级——质量门禁的触发与补救机制本身与文档不一致。
+  - 建议（二选一，且无论哪种都应修 `security.yml` 悬挂引用）：
+    - **重启**：`git mv .github/dependabot.yml.disabled .github/dependabot.yml`（内容完整，含 npm / github-actions 周更两段），并给 `ci.yml` 加回 `push` / `pull_request(main)` 触发；或
+    - **如实改述**：修订 `CHANGELOG.md` `## Unreleased` 与 `security.yml:3-4,11` 注释，去掉「dependabot 实际收敛 / Dependabot fixes it」「随 PR / 合并自动生效」，改写为「audit 报告式可见性、当前无自动补救（dependabot 已停用）」「CI 维持手动 `workflow_dispatch`（控 Actions 成本）」。
+
+- [ ] **G-R2 将覆盖率 / API 基线 / references 三道闸纳入本地可达路径**
+  - 来源 / 维度：任务 G 复审（连带影响）。
+  - 问题：G-1（覆盖率阈值）/ G-3（公共 API 基线漂移）/ G-4（references 漂移）三道已交付门禁**只接到 `ci.yml`、不在 `quality:release` 链内**——`quality:release` → `quality:quick` 跑的是 `test:core`（非 `test:coverage`），全链无 `api:baseline` + diff、无 `docs:api` + references diff。CI 退回手动触发后（见 G-R1），这三道闸只在有人手动 dispatch CI 时才跑，既不随 PR / push 自动生效，也无法经本地 `pnpm quality:release` 走到。
+  - 影响：P1，三道已交付门禁被一并架空（与 G-R1 的 CI 决策解耦——无论 CI 是否恢复自动触发，本地门禁都应可达）。
+  - 建议：在 `quality:release` 中以 `test:coverage` 替换 / 补充 `quality:quick` 的 `test:core`（强制覆盖率阈值），并新增 `api:baseline` + `git diff --exit-code api-reports`、`docs:api` + `git diff --exit-code skills/tigercat/references` 两步漂移校验。
+
+### P2 — i18n 本地化补全（源自任务 B / C 复审）
+
+- [ ] **I18N-1 修复 Vue Cascader 空态未本地化（确凿缺陷）**
+  - 来源 / 维度：任务 B 复审（i18n / 跨端对称）。
+  - 问题：Vue `Cascader.ts:391` 空态**直接渲染 `props.notFoundText`**，未经 `resolveLocaleText`、无 locale 候选；且 `notFoundText` 默认值（`:116`）仍硬编码 `'No results found'`。两重成因叠加 → `<ConfigProvider :locale="zhCN">` 下空态仍渲染英文。React `Cascader.tsx:297-300` 已正确本地化（跨端漏改为 **Vue 独有**），与 CHANGELOG `## Unreleased`「双端 Cascader `notFoundText` 回退 `common.*`」承诺矛盾。
+  - 影响：P2，单组件单点本地化 bug + 与已发布说明不一致。
+  - 建议：`Cascader.ts:391` 改 `resolveLocaleText('No results found', props.notFoundText, mergedLocale.value?.common?.emptyText)`，`notFoundText` 默认值（`:116`）改 `undefined`，与 React 对齐；补一条 `<ConfigProvider :locale="zhCN">` 下空态渲染中文的断言用例。验证 `pnpm test:vue` 窄范围。
+
+- [ ] **I18N-2 收敛跨端未本地化残留**
+  - 来源 / 维度：任务 B 复审 §4 + 任务 C 复审 §4（跨端同源，未在 B-2 / C-2 声称清单内）。
+  - 问题：以下英文默认值仍被直接渲染、绕过 locale：双端 `Select` 的 `noOptionsText` / `noDataText`（`'No options found'` / `'No options available'`）、双端 `FileManager` 的 `emptyText`（`'Empty folder'`）、Vue `InfiniteScroll.ts:150` 的 `endText`（`'No more data'`）。
+  - 影响：P2（跨端）。
+  - 建议：统一接入 `resolveLocaleText(..., mergedLocale.common.*)` 并把默认值改 `undefined`，双端同批改；`common` 无对应 key 者在 `TigerLocaleCommon` + en-US / zh-CN locale 文件新增 key。`Select` / `Cascader` / `TreeSelect` 的主 `placeholder`（`'Select an option'` / `'Please select'`）属 C-2 明示的刻意延后——可与本项一并评估是否新增 `common` key，亦可继续延后。
+
+### P3 — 守卫一致性与长期跟踪（源自任务 A / F 复审）
+
+- [ ] **SSR-1 统一 core 内 browser-only 命令式助手的 `isBrowser()` 守卫**
+  - 来源 / 维度：任务 A 复审（SSR）。
+  - 问题：`packages/core/src` 共约 **97 处直接 `document.` / `window.` 成员访问、分布 22 文件**，其中若干**导出的浏览器端命令式助手未加 `isBrowser()` 守卫**：`utils/a11y-utils.ts`（`createFocusTrap` / `announceToScreenReader` / live-region）、`utils/anchor-utils.ts`（`getAnchorTargetElement` 等）、`utils/chart-export-utils.ts`、`utils/table-export-utils.ts`、`utils/focus-utils.ts`、`utils/image-utils.ts`、`utils/rich-text-editor-utils.ts`。无 SSR 崩溃风险（仅浏览器运行时调用），但守卫写法不统一。A-0 原「core 已统一 `isBrowser()`」「移交任务 B / C」表述不准确——B / C 目标路径不含 `packages/core/src`，该残留实则无人接管，须在本任务内承接。
+  - 影响：P3，一致性 / 防御性（非崩溃）。
+  - 建议：统一加 `isBrowser()` 早退守卫或显式 browser-only 标注。验证 `pnpm --filter @expcat/tigercat-core build` + `pnpm test:core`。
+
+- [ ] **I18N-3 TimePicker / Upload 深层 i18n 集成（可选）**
+  - 来源 / 维度：任务 A 复审 §4 旁注。
+  - 问题：(a) TimePicker 标签未并入 `TigerLocale` 类型——`types/locale.ts` 的 `TigerLocale` 无 `timePicker` 区块，标签经 `getTimePickerLabels()`（locale 串 + overrides）单独解析，不走主 locale 配置体系；(b) Upload 在 `locale-utils` 无 zh-CN 默认值（仅 `DEFAULT_UPLOAD_LABELS` 英文，无 `ZH_CN_UPLOAD_LABELS`），en-US / zh-CN locale 文件也无 `upload` 区块。
+  - 影响：P3，i18n 集成深度（可选）。
+  - 建议：视需要把 TimePicker 标签并入 `TigerLocale`、补 `ZH_CN_UPLOAD_LABELS` 与 locale 文件 `upload` 区块。
+
+- [ ] **BENCH-1 评估周度 bench 的 baseline 回归阈值（可选）**
+  - 来源 / 维度：任务 F 复审（运行时性能）。
+  - 问题：`bench.yml` 已闭合「基准未接入 CI」缺口（周度 + 手动 + `upload-artifact`），但「无基线回归阈值 / 自动 baseline-diff」是 `bench.yml`（注释 `:6-8`）与 CHANGELOG 均明示的有意延后（micro-bench 在共享 runner 抖动大、硬阈值易误红），仍是运行时性能维度的一个显式开放面。
+  - 影响：P3，显式 scope-out（避免随时间被遗忘）。
+  - 建议：评估周度 bench 结果的人工 / 半自动 baseline 对比阈值，再决定是否纳入门禁。
+
+- [ ] **DOC-1 跨端 API 命名可见性补注（可选）**
+  - 来源 / 维度：任务 D 复审 §5（陈述精度）。
+  - 问题：CommentThread 跨端回调命名为已文档化的有意非对称——Vue `update:expandedKeys` ↔ React `onExpandedChange`（`validate-api.mjs:264-265` 显式登记 + CHANGELOG 已记），但对组件消费者不够显眼。
+  - 影响：P3，可选文档可见性。
+  - 建议：在 skill reference / MIGRATION 补一句「CommentThread 的 React 回调为 `onExpandedChange`（对应 Vue `update:expandedKeys`）」。
 
 ## 持续守护
 
@@ -305,6 +113,11 @@ source: current repository audit and planning
 - SSR 与 hydration 矩阵使用 `pnpm quality:ssr` 覆盖 Nuxt 与 Next.js。
 - 主题与 token 变更后运行 `pnpm tokens:build`，并确认生成物只包含预期变化。
 - Breaking change 必须同步到 [docs/MIGRATION.md](MIGRATION.md) 和 [CHANGELOG.md](../CHANGELOG.md)。
+
+### 跨端一致性约定
+
+- **新增受控组件 / 受控量**：须同步在 `scripts/validate-api.mjs` 的 `CONTROLLED_PARITY` 表登记，否则其双端 `update:<prop>` ↔ `on<Prop>Change` 不对称会静默逃逸 `api:validate` 的 parity 校验（护栏有意仅守卫登记项，可逐步扩充）。
+- **新增模板工具链依赖**：须同步登记 `packages/cli/src/constants.ts` 的 `TEMPLATE_VERSIONS` 与 `pnpm-workspace.yaml` catalog——二者为双份权威（`TEMPLATE_VERSIONS` 服务 CLI 模板发布、catalog 服务 workspace / example），由 `tests/core/cli.spec.ts` 对齐测试锁步防漂移。
 
 ### 组件 Definition of Done
 
