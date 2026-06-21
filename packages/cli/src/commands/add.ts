@@ -6,12 +6,11 @@ import prompts from 'prompts'
 import { ALL_COMPONENTS } from '../constants'
 import { logSuccess, logError, logInfo, logWarn } from '../utils/logger'
 import { readFileSafe, writeFileSafe } from '../utils/fs'
-
-type Framework = 'vue3' | 'react'
+import { isFramework, type Framework } from '../utils/validate'
 
 interface AddOptions {
   dryRun?: boolean
-  framework?: Framework
+  framework?: string
   install?: boolean
   snippet?: string
 }
@@ -45,8 +44,7 @@ function detectFramework(cwd: string): Framework | null {
 }
 
 function normalizeFramework(value: string | undefined): Framework | null {
-  if (value === 'vue3' || value === 'react') return value
-  return null
+  return value !== undefined && isFramework(value) ? value : null
 }
 
 async function resolveComponents(components: string[]): Promise<string[]> {
@@ -110,6 +108,12 @@ function validateComponents(names: string[]): { valid: string[]; invalid: string
 
 export async function runAdd(components: string[], options: AddOptions = {}) {
   const cwd = process.cwd()
+
+  if (options.framework !== undefined && !isFramework(options.framework)) {
+    logError(`Invalid framework "${options.framework}". Valid frameworks: vue3, react`)
+    process.exit(1)
+  }
+
   const framework = normalizeFramework(options.framework) ?? detectFramework(cwd)
   const dryRun = Boolean(options.dryRun)
 

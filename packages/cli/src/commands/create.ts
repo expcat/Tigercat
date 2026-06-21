@@ -2,9 +2,10 @@ import { Command } from 'commander'
 import prompts from 'prompts'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { TEMPLATES, type TemplateName } from '../constants'
+import { type TemplateName } from '../constants'
 import { logSuccess, logError, logInfo, logStep } from '../utils/logger'
 import { ensureDir, isDirEmpty, writeFileSafe } from '../utils/fs'
+import { resolveTemplateOption, suggestProjectName, validateProjectName } from '../utils/validate'
 import { getVue3Template } from '../templates/vue3'
 import { getReactTemplate } from '../templates/react'
 
@@ -20,26 +21,13 @@ export function createCreateCommand() {
 }
 
 export async function runCreate(name: string, templateArg?: string, dryRun = false) {
-  let template: TemplateName
-
-  if (templateArg && TEMPLATES.includes(templateArg as TemplateName)) {
-    template = templateArg as TemplateName
-  } else {
-    const response = await prompts({
-      type: 'select',
-      name: 'template',
-      message: 'Select a framework',
-      choices: [
-        { title: 'Vue 3', value: 'vue3' },
-        { title: 'React', value: 'react' }
-      ]
-    })
-    if (!response.template) {
-      logError('Operation cancelled')
-      process.exit(1)
-    }
-    template = response.template
+  const nameError = validateProjectName(name)
+  if (nameError) {
+    logError(`${nameError}. Try "${suggestProjectName(name)}" instead.`)
+    process.exit(1)
   }
+
+  const template: TemplateName = await resolveTemplateOption(templateArg, 'Select a framework')
 
   const targetDir = resolve(process.cwd(), name)
 
@@ -47,7 +35,7 @@ export async function runCreate(name: string, templateArg?: string, dryRun = fal
     const { overwrite } = await prompts({
       type: 'confirm',
       name: 'overwrite',
-      message: `Directory "${name}" is not empty. Remove existing files and continue?`,
+      message: `Directory "${name}" is not empty. Overwrite conflicting template files? (other files are kept)`,
       initial: false
     })
     if (!overwrite) {

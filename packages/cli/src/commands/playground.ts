@@ -2,10 +2,10 @@ import { Command } from 'commander'
 import { resolve, join } from 'node:path'
 import { execSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import prompts from 'prompts'
-import { TEMPLATES, type TemplateName } from '../constants'
+import { type TemplateName } from '../constants'
 import { logSuccess, logError, logInfo, logStep } from '../utils/logger'
 import { ensureDir, writeFileSafe } from '../utils/fs'
+import { resolveTemplateOption } from '../utils/validate'
 import { getVue3Template } from '../templates/vue3'
 import { getReactTemplate } from '../templates/react'
 
@@ -27,26 +27,10 @@ export async function runPlayground(
   open = true,
   dryRun = false
 ) {
-  let template: TemplateName
-
-  if (templateArg && TEMPLATES.includes(templateArg as TemplateName)) {
-    template = templateArg as TemplateName
-  } else {
-    const response = await prompts({
-      type: 'select',
-      name: 'template',
-      message: 'Select a framework for playground',
-      choices: [
-        { title: 'Vue 3', value: 'vue3' },
-        { title: 'React', value: 'react' }
-      ]
-    })
-    if (!response.template) {
-      logError('Operation cancelled')
-      process.exit(1)
-    }
-    template = response.template
-  }
+  const template: TemplateName = await resolveTemplateOption(
+    templateArg,
+    'Select a framework for playground'
+  )
 
   const tmpDir = resolve(process.cwd(), '.tigercat-playground')
   const projectDir = join(tmpDir, `playground-${template}`)

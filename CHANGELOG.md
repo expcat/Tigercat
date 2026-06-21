@@ -37,6 +37,8 @@
   - **ImageViewer (React)**：`onIndexChange` 重命名为 `onCurrentIndexChange`，与受控 prop `currentIndex` 及 Vue `update:currentIndex` 对齐。
   - **CommentThread (Vue)**：展开事件由 `expand-change` 改为 `update:expandedKeys`（支持 `v-model:expanded-keys`），与受控 prop `expandedKeys` 及 React `onExpandedChange` 对齐。
   - **Spotlight (Vue)**：移除冗余的 `close` 事件，统一改用 `open-change`（`open-change(false)` 即关闭），与 React `onOpenChange` 对齐。
+- **CLI** 命令参数校验更严格、反馈更可预测：`tigercat create` 对非法 npm 包名（含大写 / 空格 / 非法字符）直接报错退出并给出建议名（不再原样写入 `package.json.name`）；`create` / `playground` 对非法 `--template` 立即失败并列出可选值（不再静默落入交互 prompt）；`add` 对显式非法 `--framework` 立即失败（不再静默回退自动检测）；`create` 非空目录确认文案改为「Overwrite conflicting template files? (other files are kept)」以诚实反映「仅覆盖同名模板文件、保留其它文件」的行为。新增内部工具 `cli/src/utils/validate.ts`。
+- **CLI** `tigercat doctor` 诊断更深：`Version compatibility matrix` 由静态展示升级为对已检测 framework 的 peer 主版本实际校验（Vue `^3`、React 与 react-dom `^19`，过旧即失败）；新增 `Core exports` 检查——当 `@expcat/tigercat-core` 已安装且可解析时，校验其 `exports` 是否暴露 `.` / `./tailwind` / `./tailwind/modern` / `./tokens.css` / `./figma-variables.json`，缺失则失败（未安装/不可解析则跳过，待 build 阶段暴露）。
 
 ### Fixed
 
@@ -45,6 +47,7 @@
 - 修复 React **Splitter** 拖拽时分隔条高亮失效的问题：拖拽状态改用 state 追踪（与 Vue 端及 React Resizable 保持一致），按下分隔条即可正确显示拖拽高亮。
 - 修复 **VirtualList** 固定高度列表在 `itemHeight` 为 0（或非正值）时可见范围计算产生 `Infinity`/`NaN` 的问题：`getFixedVirtualRange` 现对非正项高与空数据返回安全的空范围，避免一次性渲染全部项导致卡顿。
 - 修复 **CLI** `tigercat generate test` / `generate doc-template` 在目标文件已存在时因 `logWarn` 未导入而抛 `ReferenceError` 崩溃的问题：现正确告警并跳过已存在文件；同时将 CLI 源级 `tsc --noEmit` 类型检查纳入验证，避免仅靠 tsup 转译漏掉此类未定义引用。
+- 修复 React 示例 `UseControlledStateDemo.tsx` 仍按旧 3-tuple 解构 `useControlledState`（C-4 已将其收敛为 `[value, setValue]`）导致 `pnpm example:build`（属 `quality:release` 闸）类型报错的问题：demo 与展示 snippet 改用新签名 `useControlledState(value, defaultValue, onChange)`，受控态由 `value !== undefined` 派生，恢复 example 构建绿。
 
 ### Infrastructure
 
@@ -66,6 +69,7 @@
 - 新增公共 API 基线快照护栏：`scripts/generate-api-baseline.mjs`（`pnpm api:baseline`）产出确定性的 `api-reports/public-api-baseline.json`（156 个 `*Props` 接口的 props / extends、core 导出名、双端公开组件与命名导出），CI 经「生成 + `git diff --exit-code api-reports`」捕捉删除导出 / 删 prop / 改名 / 改 extends 等版本间破坏性变更——与 `validate-api.mjs`（当下双端一致性）层次互补，本护栏防的是与上一提交版相比的回归。
 - 新增运行时基准工作流 `.github/workflows/bench.yml`（周度 + 手动触发，`pnpm bench --run --outputJson` 并上传结果 JSON 产物供人工对比）；刻意非 PR 门禁、无硬回归阈值（micro-bench 在共享 runner 上抖动大，硬阈值易误红）。
 - 质量门禁绑定触发与发布前置闸：`ci.yml` 增 `push` / `pull_request`（`main`）触发（保留手动 `workflow_dispatch`），使全量门禁随 PR / 合并自动生效；`publish.yml` 与 `publish-on-tag.yml` 在发布前插入 `pnpm release:check`，发布不再绕过版本 / 导出 / 发布文档一致性校验。
+- CLI 模板版本单一来源化：workspace catalog 补 `@vitejs/plugin-react` / `@vue/tsconfig` / `vue-tsc` 三项，example 项目对应依赖改用 `catalog:`，使 catalog 成为全部模板 toolchain 依赖的单一来源；`tests/core/cli.spec.ts` 的 Tailwind 对齐用例扩展为「全部 13 个可 catalog 化的 `TEMPLATE_VERSIONS` ↔ workspace catalog 对齐表」并新增 example `catalog:` 断言，把模板版本漂移由人工同步变为红色测试（CLI 模板已 `import TEMPLATE_VERSIONS`，`tigercat` 版本仍由 `release:check` 守护）。
 - 修复手维护 skill 指南漂移：`references/cli.md` 命令表此前因选项内未转义的 `|`（`--template vue3 | react` 等）产生幻列、分隔行多列、渲染错位，现转义为 `\|` 并还原为 Command / Purpose / Key options 三列；`references/performance.md` 补充运行时基准段（`pnpm bench` / `benchmarks/` 8 个 `.bench.ts` / `bench.yml`），与 F-6 已落地的基准设施及 frontmatter 的 “performance validation” 声明对齐。
 
 ## v1.2.0 — Breaking Changes

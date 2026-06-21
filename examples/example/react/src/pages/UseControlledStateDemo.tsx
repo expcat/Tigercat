@@ -9,18 +9,14 @@ interface CounterProps {
 }
 
 const Counter: React.FC<CounterProps> = ({ value, defaultValue = 0, onChange }) => {
-  const [count, setCount, isControlled] = useControlledState<number>(value, defaultValue)
-
-  const update = (next: number) => {
-    if (!isControlled) setCount(next)
-    onChange?.(next)
-  }
+  const isControlled = value !== undefined
+  const [count, setCount] = useControlledState<number>(value, defaultValue, onChange)
 
   return (
     <Space>
-      <Button onClick={() => update(count - 1)}>-</Button>
+      <Button onClick={() => setCount(count - 1)}>-</Button>
       <span className="w-10 text-center text-base font-medium">{count}</span>
-      <Button onClick={() => update(count + 1)}>+</Button>
+      <Button onClick={() => setCount(count + 1)}>+</Button>
       <span className="text-xs text-gray-500">{isControlled ? '受控' : '非受控'}</span>
     </Space>
   )
@@ -35,15 +31,10 @@ interface CounterProps {
 }
 
 const Counter: React.FC<CounterProps> = ({ value, defaultValue = 0, onChange }) => {
-  const [count, setCount, isControlled] = useControlledState<number>(value, defaultValue)
-
-  const update = (next: number) => {
-    if (!isControlled) setCount(next)
-    onChange?.(next)
-  }
+  const [count, setCount] = useControlledState<number>(value, defaultValue, onChange)
 
   return (
-    <button onClick={() => update(count + 1)}>{count}</button>
+    <button onClick={() => setCount(count + 1)}>{count}</button>
   )
 }`
 

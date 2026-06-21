@@ -17,11 +17,11 @@
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
-    "@vue/tsconfig": "^0.9.1",
+    "@vue/tsconfig": "catalog:",
     "axe-core": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vue-tsc": "^3.2.7"
+    "vue-tsc": "catalog:"
   }
 }

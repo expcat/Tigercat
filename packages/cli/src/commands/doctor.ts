@@ -1,6 +1,8 @@
 import { Command } from 'commander'
 import pc from 'picocolors'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { createRequire } from 'node:module'
+import { pathToFileURL } from 'node:url'
 import { logError, logInfo, logSuccess, logWarn } from '../utils/logger'
 import { readFileSafe } from '../utils/fs'
 
@@ -14,10 +16,16 @@ export interface DoctorCheck {
   suggestions?: string[]
 }
 
+interface CorePackageJson {
+  exports?: Record<string, unknown>
+}
+
 export interface DoctorOptions {
   cwd?: string
   nodeVersion?: string
   env?: NodeJS.ProcessEnv
+  /** Injectable reader for the installed @expcat/tigercat-core package.json (for tests). */
+  readCorePackageJson?: (cwd: string) => CorePackageJson | null
 }
 
 interface ProjectPackage {
@@ -33,6 +41,24 @@ const MIN_NODE_MAJOR = 20
 const MIN_PNPM_MAJOR = 8
 const REQUIRED_TAILWIND_MAJOR = 4
 const REQUIRED_TIGERCAT_MAJOR = 1
+
+/** Minimum supported major versions for framework peers, enforced by the compatibility matrix check. */
+const FRAMEWORK_PEER_RANGES: Record<Framework, { dep: string; major: number }[]> = {
+  vue3: [{ dep: 'vue', major: 3 }],
+  react: [
+    { dep: 'react', major: 19 },
+    { dep: 'react-dom', major: 19 }
+  ]
+}
+
+/** Subpath exports @expcat/tigercat-core must continue to expose (see Roadmap Tailwind guard). */
+const REQUIRED_CORE_EXPORTS = [
+  '.',
+  './tailwind',
+  './tailwind/modern',
+  './tokens.css',
+  './figma-variables.json'
+]
 
 const VERSION_COMPATIBILITY_MATRIX = [
   { name: 'Node.js', range: '>=20.11.0', reason: 'Matches workspace engines and CLI templates' },
@@ -65,6 +91,7 @@ export function createDoctorCommand() {
 export function collectDoctorChecks(options: DoctorOptions = {}): DoctorCheck[] {
   const cwd = options.cwd ?? process.cwd()
   const env = options.env ?? process.env
+  const readCorePackageJson = options.readCorePackageJson ?? defaultReadCorePackageJson
   const packageResult = readProjectPackage(cwd)
   const nodeVersion = options.nodeVersion ?? process.versions.node
 
@@ -81,6 +108,15 @@ export function collectDoctorChecks(options: DoctorOptions = {}): DoctorCheck[] 
   checks.push(createPeerDepsCheck(packageResult.packageJson))
   checks.push(createTemplateCompatibilityCheck(packageResult.packageJson))
   checks.push(createCompatibilityMatrixCheck(packageResult.packageJson))
+
+  const coreExportsCheck = createCoreExportsCheck(
+    packageResult.packageJson,
+    cwd,
+    readCorePackageJson
+  )
+  if (coreExportsCheck) {
+    checks.push(coreExportsCheck)
+  }
 
   return checks
 }
@@ -386,11 +422,85 @@ function createCompatibilityMatrixCheck(packageJson: ProjectPackage): DoctorChec
     }
   }
 
+  const incompatible = frameworks.flatMap((framework) =>
+    FRAMEWORK_PEER_RANGES[framework]
+      .filter(({ dep, major }) => isOlderMajor(dependencies[dep], major))
+      .map(({ dep, major }) => `${dep}@${dependencies[dep]} is below the supported major ${major}`)
+  )
+
+  if (incompatible.length > 0) {
+    return {
+      name: 'Version compatibility matrix',
+      status: 'fail',
+      message: 'Installed framework versions are outside the supported range',
+      details: [...incompatible, ...details],
+      suggestions: ['Upgrade the listed framework packages to the supported major versions']
+    }
+  }
+
   return {
     name: 'Version compatibility matrix',
     status: 'pass',
-    message: `${frameworks.map(formatFramework).join(' + ')} compatibility matrix is available`,
+    message: `${frameworks.map(formatFramework).join(' + ')} versions satisfy the compatibility matrix`,
     details
+  }
+}
+
+function createCoreExportsCheck(
+  packageJson: ProjectPackage,
+  cwd: string,
+  readCorePackageJson: (cwd: string) => CorePackageJson | null
+): DoctorCheck | null {
+  const dependencies = collectDependencies(packageJson)
+  if (!dependencies['@expcat/tigercat-core']) {
+    return null
+  }
+
+  const corePackageJson = readCorePackageJson(cwd)
+  if (!corePackageJson) {
+    // Not installed/resolvable yet — nothing to verify; a real build would surface broken exports.
+    return null
+  }
+
+  const exportsMap = corePackageJson.exports ?? {}
+  const missing = REQUIRED_CORE_EXPORTS.filter((subpath) => !(subpath in exportsMap))
+
+  if (missing.length > 0) {
+    return {
+      name: 'Core exports',
+      status: 'fail',
+      message: '@expcat/tigercat-core is missing required export subpaths',
+      details: missing.map((subpath) => `Missing export: ${subpath}`),
+      suggestions: ['Upgrade @expcat/tigercat-core or reinstall dependencies']
+    }
+  }
+
+  return {
+    name: 'Core exports',
+    status: 'pass',
+    message: '@expcat/tigercat-core exposes the required Tailwind, token and entry exports'
+  }
+}
+
+function defaultReadCorePackageJson(cwd: string): CorePackageJson | null {
+  try {
+    const requireFromProject = createRequire(pathToFileURL(join(cwd, 'package.json')))
+    const mainEntry = requireFromProject.resolve('@expcat/tigercat-core')
+
+    let dir = dirname(mainEntry)
+    for (let depth = 0; depth < 6; depth++) {
+      const content = readFileSafe(join(dir, 'package.json'))
+      if (content) {
+        const parsed = JSON.parse(content) as CorePackageJson & { name?: string }
+        if (parsed.name === '@expcat/tigercat-core') return parsed
+      }
+      const parent = dirname(dir)
+      if (parent === dir) break
+      dir = parent
+    }
+    return null
+  } catch {
+    return null
   }
 }
 

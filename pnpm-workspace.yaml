@@ -21,11 +21,16 @@ catalog:
 
   # ── Vite plugins ───────────────────────────────
   '@vitejs/plugin-vue': ^6.0.6
+  '@vitejs/plugin-react': ^6.0.1
 
   # ── Type definitions ───────────────────────────
   '@types/node': ^25.6.0
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
+
+  # ── Vue tooling ────────────────────────────────
+  '@vue/tsconfig': ^0.9.1
+  vue-tsc: ^3.2.7
 
   # ── Testing ────────────────────────────────────
   axe-core: ^4.11.3

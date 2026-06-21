@@ -220,23 +220,16 @@ source: current repository audit and planning
 
 > **进度（2026-06-20）**：E-2 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留其细目。判定 CLI 公共 API 边界为 bin/root（CLI 以二进制消费，无需公开深路径），故采用最小修复：`packages/cli/package.json` 的 `files` 移除不存在的 `templates`（实际模板为 `src/templates/*.ts`，经 tsup 内联进 `dist/index.js`）；测试经 Vitest alias 直 import 源码子路径属内部测试机制、不构成发布契约，保持现状。`pack --dry-run` 确认发布包为 `dist` + `package.json` + `README`（4 文件），CLI 60 例单测通过。余项 E-3 / E-4 / E-5 仍待推进。
 
-- [ ] **E-3 `create` / `add` / `playground` 边界输入处理不够明确**（P2）
-  - 维度：命令健壮性｜模块：`commands/create.ts`、`commands/add.ts`、`commands/playground.ts`
-  - 问题：`create 'Bad Name' --template react --dry-run` 会继续生成 `package.json.name = "Bad Name"`，该名称不是合法 npm package name；`create` 在非空目录提示 "Remove existing files and continue?"，实际只覆盖模板同名文件、不清理旧文件；`add --framework <invalid>` 会静默回退自动检测；`create/playground --template <invalid>` 会进入交互 prompt，在非交互环境不够直观。
-  - 影响：生成项目可能安装失败或携带旧文件污染；CI/脚本调用时错误参数反馈不稳定，用户难以判断到底使用了哪个 framework/template。
-  - 建议：引入统一参数校验：项目名按 npm package name 规则校验或规范化；无效 framework/template 直接失败并列出可选值；非空目录文案改为「overwrite template files」或真正清理；补充对应 dry-run / 非交互单测。
+> **进度（2026-06-21）**：CLI 健壮性批次 E-3 / E-4 / E-5 已交付，按惯例移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，本节不再保留各项细目，仅保留 `- [x]` 结论。至此任务 E（E-0 ～ E-5）全部回填完成，Roadmap 开放项仅余 **C-5（React 巨石拆分）**。**顺带修复**：C-4（React `useControlledState` 收敛为 2-tuple）遗留的 example `UseControlledStateDemo.tsx` 仍按旧 3-tuple 解构，使 `pnpm example:build`（属 `quality:release` 闸）在 main 上已红——本批同步把该 demo 与展示 snippet 改用新签名 `useControlledState(value, defaultValue, onChange)`，恢复 example 构建绿。
 
-- [ ] **E-4 `doctor` 版本与 exports 诊断偏浅**（P2）
-  - 维度：doctor 诊断覆盖｜模块：`commands/doctor.ts`
-  - 问题：doctor 已检查 package 可读、Node/pnpm、Tailwind v4 与 `@tailwindcss/vite`、Tigercat peer presence、模板依赖 presence。但 Vue/React/Vite/TypeScript/Vite plugin 只查存在、不查版本范围；`VERSION_COMPATIBILITY_MATRIX` 是展示信息，不实际校验 React `^19` / Vue `^3` 等范围；也未检测已安装 `@expcat/tigercat-core` 是否可解析 `./tailwind/modern`、`./tokens.css`、locale 等关键 exports。
-  - 影响：过旧或不兼容的 framework/toolchain 可能被 doctor 判为 pass；Tailwind plugin/core exports 损坏时，用户要到 build 阶段才发现。
-  - 建议：将 compatibility matrix 从静态详情升级为实际检查；对 framework/toolchain 做 semver 范围校验；可选地用 `createRequire(...).resolve()` 检查关键 core exports/importability，并把失败建议指向升级 Tigercat 或修复依赖安装。
+- [x] **E-3 已交付（2026-06-21）**——命令参数校验，移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，仅记结论。
+  - 新增 `cli/src/utils/validate.ts`（`validateProjectName` / `suggestProjectName` / `resolveTemplateOption` / `isFramework`）。`create` 对非法 npm 包名**校验后快速失败**并给出建议名（不静默规范化）、非法 `--template` 不再静默落入交互 prompt、非空目录确认文案改为诚实表述「Overwrite conflicting template files? (other files are kept)」；`playground` 复用同一模板解析；`add` 显式非法 `--framework` 快速失败不再静默回退自动检测。补 12 例单测（含纯函数 + `process.exit` 捕获的快速失败路径）。
 
-- [ ] **E-5 模板工具链版本常量仍需人工同步**（P2）
-  - 维度：版本同步｜模块：`constants.ts`、`pnpm-workspace.yaml`、`scripts/sync-version.mjs`、`scripts/check-release-readiness.mjs`
-  - 问题：`sync-version.mjs` 与 `release:check` 已守护 `CLI_VERSION` 和 `TEMPLATE_VERSIONS.tigercat`；CLI 单测只强校验 Tailwind v4 两个版本与 workspace catalog 对齐。`TEMPLATE_VERSIONS` 中 Vue/React/TypeScript/Vite/`@vitejs/plugin-vue`/types 等仍是硬编码重复；`@vitejs/plugin-react`、`@vue/tsconfig`、`vue-tsc` 在 example 与 CLI 常量间也靠人工保持一致（部分不在 catalog）。
-  - 影响：依赖升级时模板版本容易漂移，生成项目与 example/workspace 基线不一致；doctor 的 template compatibility 也会跟着使用过期基线。
-  - 建议：为所有可 catalog 化的模板依赖补 catalog 对齐检查，或让 CLI 模板版本生成自单一清单；把 `@vitejs/plugin-react` 等未入 catalog 的共享模板依赖纳入 catalog 或 release readiness 检查。
+- [x] **E-4 已交付（2026-06-21）**——doctor 深度诊断，移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，仅记结论。
+  - 兼容矩阵动真格：按 `FRAMEWORK_PEER_RANGES` 校验已检测 framework 的 peer 主版本（vue `^3`、react + react-dom `^19`），过旧即 `fail`（复用 `getRangeMajor`/`isOlderMajor`）。新增注入式 `Core exports` 检查（`DoctorOptions.readCorePackageJson` DI，与既有 `cwd`/`nodeVersion`/`env` 同范式）：core 在 deps 且可解析时校验其 `exports` 含 `.`/`./tailwind`/`./tailwind/modern`/`./tokens.css`/`./figma-variables.json`，缺失 `fail`；不可解析（未安装）则跳过，不破坏既有「全 pass」用例。补单测。
+
+- [x] **E-5 已交付（2026-06-21）**——模板版本单一来源，移交 [CHANGELOG.md](../CHANGELOG.md) `## Unreleased`，仅记结论。
+  - workspace catalog 补 `@vitejs/plugin-react` / `@vue/tsconfig` / `vue-tsc` 三项，example 三处改 `catalog:`，使 catalog 成为全部模板 toolchain 的单一来源；`cli.spec.ts` 的 Tailwind 对齐用例扩展为「全部 13 个可 catalog 化 `TEMPLATE_VERSIONS` ↔ catalog 对齐表」+ example catalog 断言，把版本漂移由「人工记得」变成红色测试（`tigercat` 仍由 `release:check` 守护，不入表）。CLI 模板已 `import TEMPLATE_VERSIONS`，无需改模板。
 
 - [x] **E-0 已核查、模板主路径与版本主线无需处理**
   - 模板对齐：`src/templates/vue3.ts` 与 `src/templates/react.ts` 均使用 `@tailwindcss/vite`，CSS 使用 `@import "tailwindcss";` + `@plugin "@expcat/tigercat-core/tailwind/modern";`，与持续守护规则一致。

@@ -19,6 +19,7 @@ import {
 
 // Test utils
 import { ensureDir, writeFileSafe, isDirEmpty, readFileSafe } from '@expcat/tigercat-cli/utils/fs'
+import { validateProjectName, suggestProjectName } from '@expcat/tigercat-cli/utils/validate'
 import { runCreate } from '@expcat/tigercat-cli/commands/create'
 import { runAdd } from '@expcat/tigercat-cli/commands/add'
 import { runPlayground } from '@expcat/tigercat-cli/commands/playground'
@@ -123,6 +124,45 @@ describe('CLI Constants', () => {
       expect(examplePackageJson.devDependencies.tailwindcss).toBe('catalog:')
       expect(examplePackageJson.devDependencies['@tailwindcss/vite']).toBe('catalog:')
     }
+  })
+
+  it('keeps every catalog-able template version aligned with the workspace catalog', () => {
+    // TEMPLATE_VERSIONS is the single source for CLI templates; the catalog is the single
+    // source for example/workspace deps. This guard turns silent drift into a red test.
+    const templateVersionToCatalog: Record<string, string> = {
+      vue: 'vue',
+      react: 'react',
+      reactDom: 'react-dom',
+      typescript: 'typescript',
+      vite: 'vite',
+      tailwindcss: 'tailwindcss',
+      tailwindcssVite: '@tailwindcss/vite',
+      vitejsPluginVue: '@vitejs/plugin-vue',
+      vitejsPluginReact: '@vitejs/plugin-react',
+      typesReact: '@types/react',
+      typesReactDom: '@types/react-dom',
+      vueTsconfig: '@vue/tsconfig',
+      vueTsc: 'vue-tsc'
+    }
+
+    for (const [versionKey, catalogName] of Object.entries(templateVersionToCatalog)) {
+      expect(readWorkspaceCatalogValue(catalogName)).toBe(
+        TEMPLATE_VERSIONS[versionKey as keyof typeof TEMPLATE_VERSIONS]
+      )
+    }
+  })
+
+  it('keeps shared template toolchain deps on the workspace catalog in example projects', () => {
+    const reactExample = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'examples/example/react/package.json'), 'utf-8')
+    )
+    const vueExample = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'examples/example/vue3/package.json'), 'utf-8')
+    )
+
+    expect(reactExample.devDependencies['@vitejs/plugin-react']).toBe('catalog:')
+    expect(vueExample.devDependencies['@vue/tsconfig']).toBe('catalog:')
+    expect(vueExample.devDependencies['vue-tsc']).toBe('catalog:')
   })
 })
 
@@ -486,6 +526,185 @@ describe('CLI Doctor', () => {
 
     expect(checks.find((check) => check.name === 'Project package')?.status).toBe('fail')
     expect(checks.some((check) => check.name === 'Tailwind CSS')).toBe(false)
+  })
+})
+
+describe('CLI Validate - project name', () => {
+  it('accepts valid npm package names', () => {
+    expect(validateProjectName('my-app')).toBeNull()
+    expect(validateProjectName('@scope/my-app')).toBeNull()
+    expect(validateProjectName('app_1.2')).toBeNull()
+  })
+
+  it('rejects invalid project names with a message', () => {
+    expect(validateProjectName('')).toBeTruthy()
+    expect(validateProjectName(' leading')).toBeTruthy()
+    expect(validateProjectName('Bad Name')).toBeTruthy()
+    expect(validateProjectName('UPPER')).toBeTruthy()
+  })
+
+  it('suggests a valid npm package name', () => {
+    expect(suggestProjectName('Bad Name')).toBe('bad-name')
+    expect(suggestProjectName('  My App!! ')).toBe('my-app')
+    expect(suggestProjectName('@Scope/My App')).toBe('@scope/my-app')
+  })
+})
+
+describe('CLI Argument validation', () => {
+  const originalCwd = process.cwd()
+  const testDir = join(tmpdir(), `tigercat-arg-validate-${Date.now()}`)
+  let logSpy: ReturnType<typeof vi.spyOn>
+  let errSpy: ReturnType<typeof vi.spyOn>
+  let exitSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    ensureDir(testDir)
+    process.chdir(testDir)
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      throw new Error(`process.exit:${code}`)
+    }) as never)
+  })
+
+  afterEach(() => {
+    logSpy.mockRestore()
+    errSpy.mockRestore()
+    exitSpy.mockRestore()
+    process.chdir(originalCwd)
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true })
+    }
+  })
+
+  it('create fails fast on an invalid project name and writes nothing', async () => {
+    await expect(runCreate('Bad Name', 'vue3')).rejects.toThrow('process.exit:1')
+    expect(existsSync(join(testDir, 'Bad Name'))).toBe(false)
+    expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('bad-name'))
+  })
+
+  it('create fails fast on an invalid template instead of prompting', async () => {
+    await expect(runCreate('valid-app', 'svelte')).rejects.toThrow('process.exit:1')
+    expect(existsSync(join(testDir, 'valid-app'))).toBe(false)
+    expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid template'))
+  })
+
+  it('add fails fast on an invalid framework instead of auto-detecting', async () => {
+    writeFileSafe(
+      join(testDir, 'package.json'),
+      JSON.stringify({ dependencies: { '@expcat/tigercat-react': '^1.0.0' } })
+    )
+    await expect(runAdd(['Button'], { framework: 'angular' })).rejects.toThrow('process.exit:1')
+    expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid framework'))
+  })
+})
+
+describe('CLI Doctor - deep checks', () => {
+  const testDir = join(tmpdir(), `tigercat-doctor-deep-${Date.now()}`)
+
+  afterEach(() => {
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true })
+    }
+  })
+
+  function writeProject(name: string, pkg: Record<string, unknown>) {
+    const projectDir = join(testDir, name)
+    ensureDir(projectDir)
+    writeFileSafe(join(projectDir, 'package.json'), JSON.stringify(pkg, null, 2))
+    return projectDir
+  }
+
+  const REQUIRED_CORE_EXPORTS = {
+    '.': './dist/index.js',
+    './tailwind': './dist/tailwind.js',
+    './tailwind/modern': './dist/tailwind-modern.js',
+    './tokens.css': './dist/tokens.css',
+    './figma-variables.json': './figma-variables.json'
+  }
+
+  it('fails the compatibility matrix when a framework is below the supported major', () => {
+    const projectDir = writeProject('old-react', {
+      packageManager: 'pnpm@10.26.2',
+      dependencies: {
+        '@expcat/tigercat-react': '^1.0.0',
+        react: '^18.2.0',
+        'react-dom': '^18.2.0'
+      },
+      devDependencies: {
+        '@expcat/tigercat-core': '^1.0.0',
+        '@tailwindcss/vite': '^4.2.4',
+        '@vitejs/plugin-react': '^6.0.1',
+        tailwindcss: '^4.2.4',
+        typescript: '^6.0.3',
+        vite: '^8.0.10'
+      }
+    })
+
+    const checks = collectDoctorChecks({
+      cwd: projectDir,
+      nodeVersion: '22.0.0',
+      env: {},
+      readCorePackageJson: () => ({ exports: REQUIRED_CORE_EXPORTS })
+    })
+    const matrix = checks.find((check) => check.name === 'Version compatibility matrix')
+
+    expect(matrix?.status).toBe('fail')
+    expect(matrix?.details?.some((detail) => detail.includes('react@^18.2.0'))).toBe(true)
+  })
+
+  it('flags missing core export subpaths', () => {
+    const projectDir = writeProject('broken-core', {
+      dependencies: {
+        '@expcat/tigercat-react': '^1.0.0',
+        react: '^19.2.5',
+        'react-dom': '^19.2.5'
+      },
+      devDependencies: { '@expcat/tigercat-core': '^1.0.0' }
+    })
+
+    const checks = collectDoctorChecks({
+      cwd: projectDir,
+      nodeVersion: '22.0.0',
+      env: {},
+      readCorePackageJson: () => ({
+        exports: { '.': './dist/index.js', './tailwind': './dist/tailwind.js' }
+      })
+    })
+    const coreCheck = checks.find((check) => check.name === 'Core exports')
+
+    expect(coreCheck?.status).toBe('fail')
+    expect(coreCheck?.details?.some((detail) => detail.includes('./tailwind/modern'))).toBe(true)
+  })
+
+  it('passes core exports when every required subpath is present', () => {
+    const projectDir = writeProject('good-core', {
+      dependencies: { '@expcat/tigercat-core': '^1.0.0' }
+    })
+
+    const checks = collectDoctorChecks({
+      cwd: projectDir,
+      nodeVersion: '22.0.0',
+      env: {},
+      readCorePackageJson: () => ({ exports: REQUIRED_CORE_EXPORTS })
+    })
+
+    expect(checks.find((check) => check.name === 'Core exports')?.status).toBe('pass')
+  })
+
+  it('skips the core exports check when core cannot be resolved', () => {
+    const projectDir = writeProject('uninstalled-core', {
+      dependencies: { '@expcat/tigercat-core': '^1.0.0' }
+    })
+
+    const checks = collectDoctorChecks({
+      cwd: projectDir,
+      nodeVersion: '22.0.0',
+      env: {},
+      readCorePackageJson: () => null
+    })
+
+    expect(checks.find((check) => check.name === 'Core exports')).toBeUndefined()
   })
 })
 
