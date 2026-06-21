@@ -12,7 +12,8 @@ export const idID: TigerLocale = {
     cancelText: 'Batal',
     closeText: 'Tutup',
     loadingText: 'Memuat...',
-    emptyText: 'Tidak ada data'
+    emptyText: 'Tidak ada data',
+    noMoreText: 'Tidak ada data lagi'
   },
   modal: {
     closeAriaLabel: 'Tutup',

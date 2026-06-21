@@ -66,7 +66,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
   showHidden = false,
   draggable = false,
   loading = false,
-  emptyText = 'Empty folder',
+  emptyText,
   searchable = false,
   searchText = '',
   className,
@@ -220,7 +220,9 @@ export const FileManager: React.FC<FileManagerProps> = ({
           })}
         </div>
       ) : (
-        <div className={fileManagerEmptyClasses}>{emptyText}</div>
+        <div className={fileManagerEmptyClasses}>
+          {resolveLocaleText('Empty folder', emptyText, mergedLocale?.common?.emptyText)}
+        </div>
       )}
 
       {loading && <div className={fileManagerLoadingClasses}>Loading...</div>}

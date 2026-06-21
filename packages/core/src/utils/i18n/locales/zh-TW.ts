@@ -12,7 +12,8 @@ export const zhTW: TigerLocale = {
     cancelText: '取消',
     closeText: '關閉',
     loadingText: '載入中...',
-    emptyText: '暫無資料'
+    emptyText: '暫無資料',
+    noMoreText: '沒有更多了'
   },
   modal: {
     closeAriaLabel: '關閉',

@@ -60,13 +60,13 @@ source: current repository audit and roadmap review (former ROADMAP_CHECK.md, me
 
 ### P2 — i18n 本地化补全（源自任务 B / C 复审）
 
-- [ ] **I18N-1 修复 Vue Cascader 空态未本地化（确凿缺陷）**
+- [x] **I18N-1 修复 Vue Cascader 空态未本地化（确凿缺陷）**（已收口：`Cascader.ts` 空态接入 `resolveLocaleText('No results found', props.notFoundText, mergedLocale.common.emptyText)`、`notFoundText` 默认值改 `undefined` 与 React 对齐，补双端 `<ConfigProvider locale=zhCN>` 空态断言。）
   - 来源 / 维度：任务 B 复审（i18n / 跨端对称）。
   - 问题：Vue `Cascader.ts:391` 空态**直接渲染 `props.notFoundText`**，未经 `resolveLocaleText`、无 locale 候选；且 `notFoundText` 默认值（`:116`）仍硬编码 `'No results found'`。两重成因叠加 → `<ConfigProvider :locale="zhCN">` 下空态仍渲染英文。React `Cascader.tsx:297-300` 已正确本地化（跨端漏改为 **Vue 独有**），与 CHANGELOG `## Unreleased`「双端 Cascader `notFoundText` 回退 `common.*`」承诺矛盾。
   - 影响：P2，单组件单点本地化 bug + 与已发布说明不一致。
   - 建议：`Cascader.ts:391` 改 `resolveLocaleText('No results found', props.notFoundText, mergedLocale.value?.common?.emptyText)`，`notFoundText` 默认值（`:116`）改 `undefined`，与 React 对齐；补一条 `<ConfigProvider :locale="zhCN">` 下空态渲染中文的断言用例。验证 `pnpm test:vue` 窄范围。
 
-- [ ] **I18N-2 收敛跨端未本地化残留**
+- [x] **I18N-2 收敛跨端未本地化残留**（已收口：双端 `Select`(`noOptionsText`/`noDataText`) 与 `FileManager`(`emptyText`) 接入 `common.emptyText`、双端 `InfiniteScroll`(`endText`) 接入新增 `common.noMoreText`（14 locale 补齐），默认值统一下沉 `resolveLocaleText` 首参；主 `placeholder` 按 C-2 继续延后。）
   - 来源 / 维度：任务 B 复审 §4 + 任务 C 复审 §4（跨端同源，未在 B-2 / C-2 声称清单内）。
   - 问题：以下英文默认值仍被直接渲染、绕过 locale：双端 `Select` 的 `noOptionsText` / `noDataText`（`'No options found'` / `'No options available'`）、双端 `FileManager` 的 `emptyText`（`'Empty folder'`）、Vue `InfiniteScroll.ts:150` 的 `endText`（`'No more data'`）。
   - 影响：P2（跨端）。

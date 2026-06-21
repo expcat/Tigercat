@@ -13,6 +13,7 @@ export const zhCN: TigerLocale = {
     closeText: '关闭',
     loadingText: '加载中...',
     emptyText: '暂无数据',
+    noMoreText: '没有更多了',
     searchPlaceholder: '搜索',
     clearText: '清除'
   },

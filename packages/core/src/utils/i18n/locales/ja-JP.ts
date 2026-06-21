@@ -12,7 +12,8 @@ export const jaJP: TigerLocale = {
     cancelText: 'キャンセル',
     closeText: '閉じる',
     loadingText: '読み込み中...',
-    emptyText: 'データなし'
+    emptyText: 'データなし',
+    noMoreText: 'これ以上ありません'
   },
   modal: {
     closeAriaLabel: '閉じる',

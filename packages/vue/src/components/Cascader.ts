@@ -113,7 +113,7 @@ export const Cascader = defineComponent({
     },
     notFoundText: {
       type: String,
-      default: 'No results found'
+      default: undefined
     },
     /**
      * Locale overrides merged on top of ConfigProvider locale
@@ -388,7 +388,17 @@ export const Cascader = defineComponent({
         if (isSearchMode.value) {
           // Search results mode
           if (searchResults.value.length === 0) {
-            children.push(h('div', { class: cascaderEmptyStateClasses }, props.notFoundText))
+            children.push(
+              h(
+                'div',
+                { class: cascaderEmptyStateClasses },
+                resolveLocaleText(
+                  'No results found',
+                  props.notFoundText,
+                  mergedLocale.value?.common?.emptyText
+                )
+              )
+            )
           } else {
             const searchList = h(
               'div',

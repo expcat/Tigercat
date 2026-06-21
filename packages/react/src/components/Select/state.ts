@@ -53,8 +53,8 @@ export function useSelectState(props: SelectProps): SelectContext {
     placeholder = 'Select an option',
     searchable = false,
     clearable = true,
-    noOptionsText = 'No options found',
-    noDataText = 'No options available',
+    noOptionsText,
+    noDataText,
     maxTagCount,
     remote = false,
     searchDebounce = 0,
@@ -487,8 +487,16 @@ export function useSelectState(props: SelectProps): SelectContext {
     placeholder,
     searchable,
     clearable,
-    noDataText,
-    noOptionsText,
+    noDataText: resolveLocaleText(
+      'No options available',
+      noDataText,
+      mergedLocale?.common?.emptyText
+    ),
+    noOptionsText: resolveLocaleText(
+      'No options found',
+      noOptionsText,
+      mergedLocale?.common?.emptyText
+    ),
     createOptionText,
     className,
     divProps,

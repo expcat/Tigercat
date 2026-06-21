@@ -7,7 +7,7 @@
 
 import React from 'react'
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import {
   Pagination,
   Modal,
@@ -16,6 +16,10 @@ import {
   TaskBoard,
   Transfer,
   List,
+  InfiniteScroll,
+  Select,
+  Cascader,
+  FileManager,
   ConfigProvider
 } from '@expcat/tigercat-react'
 
@@ -132,10 +136,124 @@ describe('custom text (no i18n) — React', () => {
     })
   })
 
+  describe('common.empty/noMore empty-state fallback (I18N-1 / I18N-2)', () => {
+    it('Cascader search empty state reads global config emptyText', () => {
+      const { container, getByText } = render(
+        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+          <Cascader options={[{ label: 'Beijing', value: 'bj' }]} showSearch />
+        </ConfigProvider>
+      )
+      fireEvent.click(container.querySelector('button')!)
+      fireEvent.change(container.querySelector('input[aria-label="Search options"]')!, {
+        target: { value: 'zzz' }
+      })
+      expect(getByText('暂无数据')).toBeInTheDocument()
+    })
+
+    it('Cascader notFoundText prop wins over global config', () => {
+      const { container, getByText, queryByText } = render(
+        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+          <Cascader
+            options={[{ label: 'Beijing', value: 'bj' }]}
+            showSearch
+            notFoundText="查无此项"
+          />
+        </ConfigProvider>
+      )
+      fireEvent.click(container.querySelector('button')!)
+      fireEvent.change(container.querySelector('input[aria-label="Search options"]')!, {
+        target: { value: 'zzz' }
+      })
+      expect(getByText('查无此项')).toBeInTheDocument()
+      expect(queryByText('暂无数据')).toBeNull()
+    })
+
+    it('Select noDataText (empty options) reads global config emptyText', () => {
+      const { container, getByText } = render(
+        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+          <Select options={[]} />
+        </ConfigProvider>
+      )
+      fireEvent.click(container.querySelector('button')!)
+      expect(getByText('暂无数据')).toBeInTheDocument()
+    })
+
+    it('Select noOptionsText (no search results) reads global config emptyText', () => {
+      const { container, getByText } = render(
+        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+          <Select options={[{ label: 'One', value: 1 }]} searchable />
+        </ConfigProvider>
+      )
+      fireEvent.click(container.querySelector('button')!)
+      fireEvent.change(container.querySelector('input')!, { target: { value: 'zzz' } })
+      expect(getByText('暂无数据')).toBeInTheDocument()
+    })
+
+    it('Select noDataText prop wins over global config', () => {
+      const { container, getByText, queryByText } = render(
+        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+          <Select options={[]} noDataText="没有可选项" />
+        </ConfigProvider>
+      )
+      fireEvent.click(container.querySelector('button')!)
+      expect(getByText('没有可选项')).toBeInTheDocument()
+      expect(queryByText('暂无数据')).toBeNull()
+    })
+
+    it('FileManager empty state reads global config emptyText', () => {
+      render(
+        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+          <FileManager files={[]} />
+        </ConfigProvider>
+      )
+      expect(screen.getByText('暂无数据')).toBeInTheDocument()
+    })
+
+    it('FileManager emptyText prop wins over global config', () => {
+      render(
+        <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
+          <FileManager files={[]} emptyText="空文件夹" />
+        </ConfigProvider>
+      )
+      expect(screen.getByText('空文件夹')).toBeInTheDocument()
+      expect(screen.queryByText('暂无数据')).toBeNull()
+    })
+
+    it('InfiniteScroll end state reads global config noMoreText', () => {
+      render(
+        <ConfigProvider locale={{ common: { noMoreText: '没有更多了' } }}>
+          <InfiniteScroll hasMore={false} loading={false} />
+        </ConfigProvider>
+      )
+      expect(screen.getByText('没有更多了')).toBeInTheDocument()
+    })
+
+    it('InfiniteScroll endText prop wins over global config', () => {
+      render(
+        <ConfigProvider locale={{ common: { noMoreText: '没有更多了' } }}>
+          <InfiniteScroll hasMore={false} loading={false} endText="到底啦" />
+        </ConfigProvider>
+      )
+      expect(screen.getByText('到底啦')).toBeInTheDocument()
+      expect(screen.queryByText('没有更多了')).toBeNull()
+    })
+  })
+
   describe('backward compatibility', () => {
     it('Pagination outside a ConfigProvider keeps default English text', () => {
       render(<Pagination total={100} />)
       expect(screen.getByLabelText('Previous page')).toBeInTheDocument()
+    })
+
+    it('Select empty options outside a ConfigProvider keeps default English text', () => {
+      const { container, getByText } = render(<Select options={[]} />)
+      fireEvent.click(container.querySelector('button')!)
+      expect(getByText('No options available')).toBeInTheDocument()
+    })
+
+    it('InfiniteScroll end state outside a ConfigProvider keeps default English text', () => {
+      render(<InfiniteScroll hasMore={false} loading={false} />)
+      expect(screen.getByText('No more data')).toBeInTheDocument()
     })
 
     it('Transfer search outside a ConfigProvider keeps default English placeholder', () => {

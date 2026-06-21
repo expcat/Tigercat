@@ -13,7 +13,8 @@ export const frFR: TigerLocale = defineLocale({
     cancelText: 'Annuler',
     closeText: 'Fermer',
     loadingText: 'Chargement...',
-    emptyText: 'Aucune donnée'
+    emptyText: 'Aucune donnée',
+    noMoreText: 'Plus de données'
   },
   modal: {
     closeAriaLabel: 'Fermer',

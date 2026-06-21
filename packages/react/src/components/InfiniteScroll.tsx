@@ -35,7 +35,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   loading = false,
   threshold = 100,
   loadingText,
-  endText = 'No more data',
+  endText,
   direction = 'vertical',
   inverse = false,
   disabled = false,
@@ -119,7 +119,11 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   ) : null
 
   const endEl =
-    !hasMore && !loading ? <div className={infiniteScrollEndClasses}>{end ?? endText}</div> : null
+    !hasMore && !loading ? (
+      <div className={infiniteScrollEndClasses}>
+        {end ?? resolveLocaleText('No more data', endText, mergedLocale?.common?.noMoreText)}
+      </div>
+    ) : null
 
   return (
     <div ref={containerRef} className={classNames(containerClasses)} {...rest}>

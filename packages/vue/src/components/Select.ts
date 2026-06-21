@@ -170,7 +170,7 @@ export const Select = defineComponent({
      */
     noOptionsText: {
       type: String,
-      default: 'No options found'
+      default: undefined
     },
     /**
      * Text shown when no data available
@@ -178,7 +178,7 @@ export const Select = defineComponent({
      */
     noDataText: {
       type: String,
-      default: 'No options available'
+      default: undefined
     },
     /**
      * Maximum number of tags in multi-select display
@@ -819,7 +819,17 @@ export const Select = defineComponent({
                   : h(
                       'div',
                       { class: selectEmptyStateClasses },
-                      props.options.length === 0 ? props.noDataText : props.noOptionsText
+                      props.options.length === 0
+                        ? resolveLocaleText(
+                            'No options available',
+                            props.noDataText,
+                            mergedLocale.value?.common?.emptyText
+                          )
+                        : resolveLocaleText(
+                            'No options found',
+                            props.noOptionsText,
+                            mergedLocale.value?.common?.emptyText
+                          )
                     )
             ]
           )

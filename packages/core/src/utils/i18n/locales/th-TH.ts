@@ -12,7 +12,8 @@ export const thTH: TigerLocale = {
     cancelText: 'ยกเลิก',
     closeText: 'ปิด',
     loadingText: 'กำลังโหลด...',
-    emptyText: 'ไม่มีข้อมูล'
+    emptyText: 'ไม่มีข้อมูล',
+    noMoreText: 'ไม่มีข้อมูลเพิ่มเติม'
   },
   modal: {
     closeAriaLabel: 'ปิด',

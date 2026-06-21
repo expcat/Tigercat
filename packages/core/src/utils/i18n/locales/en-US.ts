@@ -13,6 +13,7 @@ export const enUS: TigerLocale = {
     closeText: 'Close',
     loadingText: 'Loading...',
     emptyText: 'No data',
+    noMoreText: 'No more data',
     searchPlaceholder: 'Search',
     clearText: 'Clear'
   },

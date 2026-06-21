@@ -12,7 +12,8 @@ export const viVN: TigerLocale = {
     cancelText: 'Hủy',
     closeText: 'Đóng',
     loadingText: 'Đang tải...',
-    emptyText: 'Không có dữ liệu'
+    emptyText: 'Không có dữ liệu',
+    noMoreText: 'Không còn dữ liệu'
   },
   modal: {
     closeAriaLabel: 'Đóng',

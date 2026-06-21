@@ -13,7 +13,8 @@ export const ptBR: TigerLocale = defineLocale({
     cancelText: 'Cancelar',
     closeText: 'Fechar',
     loadingText: 'Carregando...',
-    emptyText: 'Sem dados'
+    emptyText: 'Sem dados',
+    noMoreText: 'Sem mais dados'
   },
   modal: {
     closeAriaLabel: 'Fechar',

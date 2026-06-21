@@ -12,7 +12,8 @@ export const koKR: TigerLocale = {
     cancelText: '취소',
     closeText: '닫기',
     loadingText: '로딩 중...',
-    emptyText: '데이터 없음'
+    emptyText: '데이터 없음',
+    noMoreText: '더 이상 없습니다'
   },
   modal: {
     closeAriaLabel: '닫기',

@@ -78,7 +78,7 @@ export const FileManager = defineComponent({
     showHidden: { type: Boolean, default: false },
     draggable: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
-    emptyText: { type: String, default: 'Empty folder' },
+    emptyText: { type: String, default: undefined },
     searchable: { type: Boolean, default: false },
     searchText: { type: String, default: '' },
     className: { type: String, default: undefined },
@@ -249,7 +249,15 @@ export const FileManager = defineComponent({
               { class: contentClass, role: 'listbox', 'aria-multiselectable': props.multiple },
               model.value.processedItems.map(renderItem)
             )
-          : h('div', { class: fileManagerEmptyClasses }, props.emptyText)
+          : h(
+              'div',
+              { class: fileManagerEmptyClasses },
+              resolveLocaleText(
+                'Empty folder',
+                props.emptyText,
+                mergedLocale.value?.common?.emptyText
+              )
+            )
 
       const loadingEl = props.loading
         ? h(

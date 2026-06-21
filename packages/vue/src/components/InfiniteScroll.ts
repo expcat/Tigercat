@@ -35,7 +35,7 @@ export const InfiniteScroll = defineComponent({
     loading: { type: Boolean, default: false },
     threshold: { type: Number, default: 100 },
     loadingText: { type: String, default: undefined },
-    endText: { type: String, default: 'No more data' },
+    endText: { type: String, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     direction: {
       type: String as PropType<'vertical' | 'horizontal'>,
@@ -147,7 +147,16 @@ export const InfiniteScroll = defineComponent({
 
       const end =
         !props.hasMore && !props.loading
-          ? h('div', { class: infiniteScrollEndClasses }, slots.end?.() ?? props.endText)
+          ? h(
+              'div',
+              { class: infiniteScrollEndClasses },
+              slots.end?.() ??
+                resolveLocaleText(
+                  'No more data',
+                  props.endText,
+                  mergedLocale.value?.common?.noMoreText
+                )
+            )
           : null
 
       const children = props.inverse

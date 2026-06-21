@@ -13,7 +13,8 @@ export const arSA: TigerLocale = defineLocale({
     cancelText: 'إلغاء',
     closeText: 'إغلاق',
     loadingText: 'جار التحميل...',
-    emptyText: 'لا توجد بيانات'
+    emptyText: 'لا توجد بيانات',
+    noMoreText: 'لا مزيد من البيانات'
   },
   modal: {
     closeAriaLabel: 'إغلاق',
