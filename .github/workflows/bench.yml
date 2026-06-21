@@ -2,10 +2,11 @@ name: Benchmarks
 
 # Runtime performance benchmarks (benchmarks/*.bench.ts via `vitest bench`).
 #
-# Intentionally NOT a PR gate: micro-benchmark timings are noisy on shared CI
-# runners, so a hard regression threshold would flake. This job runs on demand
-# (and weekly) and uploads the result JSON as an artifact for manual comparison
-# against a previous run. Automated baseline-diff thresholds are deferred.
+# Intentionally NOT a PR gate: a P3 review kept these benchmarks advisory
+# because micro-benchmark timings are noisy on shared CI runners and a hard
+# regression threshold would flake. This job runs on demand (and weekly) and
+# uploads the result JSON as an artifact for manual comparison against a
+# previous run; automated baseline-diff thresholds remain deferred.
 
 on:
   schedule:

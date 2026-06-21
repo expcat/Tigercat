@@ -1,3 +1,5 @@
+import { isBrowser } from './env'
+
 export interface KeyLikeEvent {
   key?: string
   code?: string
@@ -78,6 +80,13 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
 }
 
 export function createFocusTrap(container: HTMLElement, options: FocusTrapOptions = {}): FocusTrap {
+  if (!isBrowser()) {
+    return {
+      activate() {},
+      deactivate() {}
+    }
+  }
+
   const {
     initialFocus = null,
     returnFocusOnDeactivate = true,
@@ -177,6 +186,8 @@ function getOrCreateLiveRegion(level: AriaLiveLevel): HTMLElement {
 }
 
 export function announceToScreenReader(message: string, level: AriaLiveLevel = 'polite'): void {
+  if (!isBrowser()) return
+
   const region = getOrCreateLiveRegion(level)
   // Clear first to ensure re-announcing the same message works
   region.textContent = ''
@@ -193,6 +204,14 @@ export interface LiveRegion {
 }
 
 export function manageLiveRegion(level: AriaLiveLevel = 'polite'): LiveRegion {
+  if (!isBrowser()) {
+    return {
+      announce() {},
+      clear() {},
+      destroy() {}
+    }
+  }
+
   const region = getOrCreateLiveRegion(level)
 
   return {

@@ -22,7 +22,12 @@
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/chunk-*.mjs",
+    "./dist/chunk-*.js",
+    "./dist/components/*.mjs",
+    "./dist/components/*.js"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",

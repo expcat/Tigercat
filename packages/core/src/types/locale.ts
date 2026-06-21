@@ -1,4 +1,5 @@
 import type { DatePickerLocalePreset } from './datepicker'
+import type { TimePickerLabels } from './timepicker'
 
 export type TigerLocaleDirection = 'ltr' | 'rtl'
 
@@ -109,6 +110,8 @@ export interface TigerLocaleFormWizard {
   finishText?: string
 }
 
+export type TigerLocaleTimePicker = Partial<TimePickerLabels>
+
 export interface TigerLocaleTaskBoard {
   /** Placeholder shown inside an empty column */
   emptyColumnText?: string
@@ -176,6 +179,7 @@ export interface TigerLocale {
   pagination?: TigerLocalePagination
   table?: TigerLocaleTable
   datePicker?: Partial<DatePickerLocalePreset>
+  timePicker?: TigerLocaleTimePicker
   formWizard?: TigerLocaleFormWizard
   taskBoard?: TigerLocaleTaskBoard
   formValidation?: TigerLocaleFormValidation

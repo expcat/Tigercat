@@ -3,6 +3,7 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
+import { DEFAULT_TIME_PICKER_LABELS, DEFAULT_UPLOAD_LABELS } from '../../locale-utils'
 
 export const enUS: TigerLocale = {
   locale: 'en-US',
@@ -25,6 +26,7 @@ export const enUS: TigerLocale = {
   drawer: {
     closeAriaLabel: 'Close'
   },
+  upload: DEFAULT_UPLOAD_LABELS,
   pagination: {
     totalText: 'Total {total} items',
     itemsPerPageText: '/ page',
@@ -54,6 +56,7 @@ export const enUS: TigerLocale = {
     lockColumnAriaLabel: 'Lock column {column}',
     unlockColumnAriaLabel: 'Unlock column {column}'
   },
+  timePicker: DEFAULT_TIME_PICKER_LABELS,
   formWizard: {
     prevText: 'Previous',
     nextText: 'Next',

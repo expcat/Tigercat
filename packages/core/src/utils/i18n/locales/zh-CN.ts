@@ -3,6 +3,7 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
+import { ZH_CN_TIME_PICKER_LABELS, ZH_CN_UPLOAD_LABELS } from '../../locale-utils'
 
 export const zhCN: TigerLocale = {
   locale: 'zh-CN',
@@ -25,6 +26,7 @@ export const zhCN: TigerLocale = {
   drawer: {
     closeAriaLabel: '关闭'
   },
+  upload: ZH_CN_UPLOAD_LABELS,
   pagination: {
     totalText: '共 {total} 条',
     itemsPerPageText: '条/页',
@@ -54,6 +56,7 @@ export const zhCN: TigerLocale = {
     lockColumnAriaLabel: '锁定{column}列',
     unlockColumnAriaLabel: '取消锁定{column}列'
   },
+  timePicker: ZH_CN_TIME_PICKER_LABELS,
   formWizard: {
     prevText: '上一步',
     nextText: '下一步',

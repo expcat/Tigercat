@@ -4,7 +4,9 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
-import { TimePicker } from '@expcat/tigercat-vue'
+import { TimePicker, ConfigProvider } from '@expcat/tigercat-vue'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { defineComponent, h } from 'vue'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('TimePicker', () => {
@@ -17,6 +19,25 @@ describe('TimePicker', () => {
 
   it('uses locale-based default placeholder', () => {
     const { container } = renderWithProps(TimePicker, { locale: 'zh-CN' })
+    const input = container.querySelector('input')
+    expect(input).toHaveAttribute('placeholder', '请选择时间')
+  })
+
+  it('uses ConfigProvider locale labels', () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(
+            ConfigProvider,
+            { locale: zhCN },
+            {
+              default: () => h(TimePicker)
+            }
+          )
+      }
+    })
+
+    const { container } = render(Wrapper)
     const input = container.querySelector('input')
     expect(input).toHaveAttribute('placeholder', '请选择时间')
   })

@@ -83,4 +83,11 @@ describe('i18n locale presets', () => {
       expect(locale.common.noMoreText).toBeDefined()
     }
   })
+
+  it('enUS and zhCN expose built-in Upload and TimePicker labels', () => {
+    expect(enUS.upload?.selectFileText).toBe('Select File')
+    expect(enUS.timePicker?.selectTime).toBe('Select time')
+    expect(zhCN.upload?.selectFileText).toBe('选择文件')
+    expect(zhCN.timePicker?.selectTime).toBe('请选择时间')
+  })
 })

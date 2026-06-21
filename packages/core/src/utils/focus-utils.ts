@@ -1,3 +1,5 @@
+import { isBrowser } from './env'
+
 export interface FocusElementOptions {
   preventScroll?: boolean
 }
@@ -12,8 +14,8 @@ export function getActiveElement(doc?: Document): HTMLElement | null {
   return isHTMLElement(active) ? active : null
 }
 
-export function captureActiveElement(doc: Document = document): HTMLElement | null {
-  return getActiveElement(doc)
+export function captureActiveElement(doc?: Document): HTMLElement | null {
+  return getActiveElement(doc ?? (isBrowser() ? document : undefined))
 }
 
 export function focusElement(
@@ -67,7 +69,9 @@ export function handleMenuNavigation(container: HTMLElement, event: KeyboardEven
   const items = getMenuItems(container)
   if (items.length === 0) return false
 
-  const currentIndex = items.indexOf(document.activeElement as HTMLElement)
+  const activeElement =
+    container.ownerDocument?.activeElement ?? (isBrowser() ? document.activeElement : null)
+  const currentIndex = items.indexOf(activeElement as HTMLElement)
   let nextIndex = -1
 
   switch (event.key) {

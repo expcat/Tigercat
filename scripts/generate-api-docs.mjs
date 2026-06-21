@@ -194,7 +194,8 @@ const COMPONENT_USAGE_NOTES = {
   },
   CommentThread: {
     uses: ['Avatar', 'Tag', 'Button', 'Textarea', 'Text'],
-    notes: '评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。'
+    notes:
+      '评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。展开状态受控量为 `expandedKeys`：Vue 使用 `update:expandedKeys` / `v-model:expanded-keys`，React 对应历史回调名 `onExpandedChange`。'
   },
   NotificationCenter: {
     uses: ['Card', 'Tabs/TabPane', 'List', 'Text', 'Button', 'Loading'],

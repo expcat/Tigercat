@@ -7,6 +7,7 @@ import { act, render, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Upload, ConfigProvider, type UploadFile } from '@expcat/tigercat-react'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 async function dispatchUploadEvent(action: () => Promise<boolean>): Promise<void> {
@@ -119,6 +120,18 @@ describe('Upload', () => {
 
       expect(container).toHaveTextContent('点击上传')
       expect(container).toHaveTextContent('或拖拽到此处')
+    })
+
+    it('should use built-in zhCN Upload labels from ConfigProvider', () => {
+      const { container } = render(
+        <ConfigProvider locale={zhCN}>
+          <Upload drag accept="image/*" />
+        </ConfigProvider>
+      )
+
+      expect(container).toHaveTextContent('点击上传')
+      expect(container).toHaveTextContent('或拖拽到此处')
+      expect(container).toHaveTextContent('支持：image/*')
     })
   })
 

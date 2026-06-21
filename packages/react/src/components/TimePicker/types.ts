@@ -4,6 +4,7 @@ import type {
   TimePickerSingleValue,
   TimePickerLabels,
   TimePickerProps as CoreTimePickerProps,
+  TigerLocale,
   getTimePeriodLabels
 } from '@expcat/tigercat-core'
 
@@ -64,7 +65,7 @@ export interface TimePickerContext {
   id?: string
   format: '12' | '24'
   showSeconds: boolean
-  locale?: string
+  locale?: string | Partial<TigerLocale>
   labelsOverrides?: Partial<TimePickerLabels>
   containerClasses: string
   divProps: Record<string, unknown>

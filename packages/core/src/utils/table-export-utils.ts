@@ -3,6 +3,7 @@
  */
 
 import type { TableColumn, TableExportFormat } from '../types/table'
+import { isBrowser } from './env'
 
 /**
  * Escape a value for CSV output
@@ -69,6 +70,8 @@ export function exportTableToExcel<T>(columns: TableColumn<T>[], data: T[]): str
  * Trigger a CSV file download in the browser
  */
 export function downloadCsv(csvContent: string, filename: string = 'export'): void {
+  if (!isBrowser()) return
+
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
@@ -82,6 +85,8 @@ export function downloadCsv(csvContent: string, filename: string = 'export'): vo
 }
 
 export function downloadExcel(excelContent: string, filename: string = 'export'): void {
+  if (!isBrowser()) return
+
   const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')

@@ -28,7 +28,7 @@
 + <CommentThread :nodes="nodes" @update:expanded-keys="onChange" />
 ```
 
-> React 端回调名保持不变（`onExpandedChange`）。
+> React 端回调名保持不变（`onExpandedChange`），对应同一个受控量 `expandedKeys`；不要改成 `onExpandedKeysChange`。
 
 **Spotlight（Vue）**：移除冗余的 `close` 事件，统一用 `open-change`（`open-change(false)` 即关闭）。
 

@@ -6,7 +6,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { TimePicker } from '@expcat/tigercat-react'
+import { TimePicker, ConfigProvider } from '@expcat/tigercat-react'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('TimePicker', () => {
@@ -17,6 +18,16 @@ describe('TimePicker', () => {
 
   it('uses locale-based default placeholder', () => {
     render(<TimePicker locale="zh-CN" />)
+    expect(screen.getByPlaceholderText('请选择时间')).toBeInTheDocument()
+  })
+
+  it('uses ConfigProvider locale labels', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <TimePicker />
+      </ConfigProvider>
+    )
+
     expect(screen.getByPlaceholderText('请选择时间')).toBeInTheDocument()
   })
 

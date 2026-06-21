@@ -25,6 +25,8 @@ export function getChartSvgDataUrl(svg: SVGSVGElement): string {
 }
 
 export function downloadChartSvg(svg: SVGSVGElement, filename: string = 'chart'): void {
+  if (!isBrowser()) return
+
   downloadChartBlob(
     new Blob([serializeChartSvg(svg)], { type: 'image/svg+xml;charset=utf-8' }),
     `${filename}.svg`
@@ -78,6 +80,8 @@ export async function downloadChartPng(
   svg: SVGSVGElement,
   options: ChartDownloadOptions = {}
 ): Promise<void> {
+  if (!isBrowser()) return
+
   const blob = await exportChartPng(svg, options)
   downloadChartBlob(blob, `${options.filename ?? 'chart'}.png`)
 }

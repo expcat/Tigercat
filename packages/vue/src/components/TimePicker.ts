@@ -19,6 +19,7 @@ import {
   getTimePeriodLabels,
   getTimePickerLabels,
   getTimePickerOptionAriaLabel,
+  mergeTigerLocale,
   to12HourFormat,
   to24HourFormat,
   isTimeInRange,
@@ -52,10 +53,12 @@ import {
   type TimePickerLabels,
   type TimePickerRangeValue,
   type TimePickerSize,
-  type TimeFormat
+  type TimeFormat,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 
 import { createFilledIcon } from '../utils/icon-helpers'
+import { useTigerConfig } from './ConfigProvider'
 
 // Icons
 const ClockIcon = createFilledIcon(ClockIconPath, 'w-5 h-5')
@@ -65,7 +68,7 @@ export type VueTimePickerModelValue = TimePickerModelValue
 
 export interface VueTimePickerProps {
   modelValue?: VueTimePickerModelValue
-  locale?: string
+  locale?: string | Partial<TigerLocale>
   labels?: Partial<TimePickerLabels>
   range?: boolean
   size?: TimePickerSize
@@ -103,7 +106,7 @@ export const TimePicker = defineComponent({
      * Locale used for UI labels and display formatting.
      */
     locale: {
-      type: String,
+      type: [String, Object] as PropType<string | Partial<TigerLocale>>,
       default: undefined
     },
 
@@ -264,6 +267,7 @@ export const TimePicker = defineComponent({
     clear: () => true
   },
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
     const isOpen = ref(false)
     const panelRef = ref<HTMLElement | null>(null)
     const inputWrapperRef = ref<HTMLElement | null>(null)
@@ -320,7 +324,13 @@ export const TimePicker = defineComponent({
       immediate: true
     })
 
-    const labels = computed(() => getTimePickerLabels(props.locale, props.labels))
+    const localeOverride = computed(() =>
+      typeof props.locale === 'string' ? { locale: props.locale } : props.locale
+    )
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, localeOverride.value))
+    const localeCode = computed(() => mergedLocale.value?.locale)
+
+    const labels = computed(() => getTimePickerLabels(mergedLocale.value, props.labels))
 
     const computedPlaceholder = computed(
       () =>
@@ -328,7 +338,7 @@ export const TimePicker = defineComponent({
         (isRangeMode.value ? labels.value.selectTimeRange : labels.value.selectTime)
     )
 
-    const periodLabels = computed(() => getTimePeriodLabels(props.locale))
+    const periodLabels = computed(() => getTimePeriodLabels(localeCode.value))
 
     const rootClasses = computed(() =>
       classNames(timePickerBaseClasses, props.className, coerceClassValue(attrs.class))
@@ -345,7 +355,7 @@ export const TimePicker = defineComponent({
           parsedTime.value.seconds,
           props.format,
           props.showSeconds,
-          props.locale
+          localeCode.value
         )
       }
 
@@ -358,7 +368,7 @@ export const TimePicker = defineComponent({
           parsed.seconds,
           props.format,
           props.showSeconds,
-          props.locale
+          localeCode.value
         )
       }
 
@@ -822,7 +832,7 @@ export const TimePicker = defineComponent({
                           'aria-label': getTimePickerOptionAriaLabel(
                             hour,
                             'hour',
-                            props.locale,
+                            mergedLocale.value,
                             props.labels
                           ),
                           'aria-selected': isSelected
@@ -854,7 +864,7 @@ export const TimePicker = defineComponent({
                           'aria-label': getTimePickerOptionAriaLabel(
                             minute,
                             'minute',
-                            props.locale,
+                            mergedLocale.value,
                             props.labels
                           ),
                           'aria-selected': isSelected
@@ -885,7 +895,7 @@ export const TimePicker = defineComponent({
                             'aria-label': getTimePickerOptionAriaLabel(
                               second,
                               'second',
-                              props.locale,
+                              mergedLocale.value,
                               props.labels
                             ),
                             'aria-selected': isSelected

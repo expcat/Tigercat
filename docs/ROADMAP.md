@@ -74,25 +74,25 @@ source: current repository audit and roadmap review (former ROADMAP_CHECK.md, me
 
 ### P3 — 守卫一致性与长期跟踪（源自任务 A / F 复审）
 
-- [ ] **SSR-1 统一 core 内 browser-only 命令式助手的 `isBrowser()` 守卫**
+- [x] **SSR-1 统一 core 内 browser-only 命令式助手的 `isBrowser()` 守卫**（已收口：`a11y-utils` / `anchor-utils` / `chart-export-utils` / `table-export-utils` / `focus-utils` / `image-utils` 增加非浏览器早退、稳定 fallback 或明确 browser-only 错误，补 `tests/core/browser-only-guards.spec.ts` Node 环境回归；`rich-text-editor-utils` 当前无运行时 DOM 副作用，保持纯函数。）
   - 来源 / 维度：任务 A 复审（SSR）。
   - 问题：`packages/core/src` 共约 **97 处直接 `document.` / `window.` 成员访问、分布 22 文件**，其中若干**导出的浏览器端命令式助手未加 `isBrowser()` 守卫**：`utils/a11y-utils.ts`（`createFocusTrap` / `announceToScreenReader` / live-region）、`utils/anchor-utils.ts`（`getAnchorTargetElement` 等）、`utils/chart-export-utils.ts`、`utils/table-export-utils.ts`、`utils/focus-utils.ts`、`utils/image-utils.ts`、`utils/rich-text-editor-utils.ts`。无 SSR 崩溃风险（仅浏览器运行时调用），但守卫写法不统一。A-0 原「core 已统一 `isBrowser()`」「移交任务 B / C」表述不准确——B / C 目标路径不含 `packages/core/src`，该残留实则无人接管，须在本任务内承接。
   - 影响：P3，一致性 / 防御性（非崩溃）。
   - 建议：统一加 `isBrowser()` 早退守卫或显式 browser-only 标注。验证 `pnpm --filter @expcat/tigercat-core build` + `pnpm test:core`。
 
-- [ ] **I18N-3 TimePicker / Upload 深层 i18n 集成（可选）**
+- [x] **I18N-3 TimePicker / Upload 深层 i18n 集成（可选）**（已收口：`TigerLocale` 新增 `timePicker` 区块，双端 TimePicker 接入 `ConfigProvider` locale 且保留字符串 locale 兼容；新增 `ZH_CN_UPLOAD_LABELS`，en-US / zh-CN locale pack 补 `upload` + `timePicker`，双端补 `<ConfigProvider locale=zhCN>` 断言。）
   - 来源 / 维度：任务 A 复审 §4 旁注。
   - 问题：(a) TimePicker 标签未并入 `TigerLocale` 类型——`types/locale.ts` 的 `TigerLocale` 无 `timePicker` 区块，标签经 `getTimePickerLabels()`（locale 串 + overrides）单独解析，不走主 locale 配置体系；(b) Upload 在 `locale-utils` 无 zh-CN 默认值（仅 `DEFAULT_UPLOAD_LABELS` 英文，无 `ZH_CN_UPLOAD_LABELS`），en-US / zh-CN locale 文件也无 `upload` 区块。
   - 影响：P3，i18n 集成深度（可选）。
   - 建议：视需要把 TimePicker 标签并入 `TigerLocale`、补 `ZH_CN_UPLOAD_LABELS` 与 locale 文件 `upload` 区块。
 
-- [ ] **BENCH-1 评估周度 bench 的 baseline 回归阈值（可选）**
+- [x] **BENCH-1 评估周度 bench 的 baseline 回归阈值（可选）**（已按 advisory 策略收口：共享 runner 下 micro-bench 抖动大，暂不设置硬阈值 / 不作为 PR 或发布门禁；保留周度 + 手动 workflow 上传 JSON artifact，供人工比较。）
   - 来源 / 维度：任务 F 复审（运行时性能）。
   - 问题：`bench.yml` 已闭合「基准未接入 CI」缺口（周度 + 手动 + `upload-artifact`），但「无基线回归阈值 / 自动 baseline-diff」是 `bench.yml`（注释 `:6-8`）与 CHANGELOG 均明示的有意延后（micro-bench 在共享 runner 抖动大、硬阈值易误红），仍是运行时性能维度的一个显式开放面。
   - 影响：P3，显式 scope-out（避免随时间被遗忘）。
   - 建议：评估周度 bench 结果的人工 / 半自动 baseline 对比阈值，再决定是否纳入门禁。
 
-- [ ] **DOC-1 跨端 API 命名可见性补注（可选）**
+- [x] **DOC-1 跨端 API 命名可见性补注（可选）**（已收口：在 `generate-api-docs.mjs` 的 CommentThread note 源头补充 Vue `update:expandedKeys` / `v-model:expanded-keys` ↔ React `onExpandedChange`，重新生成 skill references，并同步强化 `MIGRATION.md`。）
   - 来源 / 维度：任务 D 复审 §5（陈述精度）。
   - 问题：CommentThread 跨端回调命名为已文档化的有意非对称——Vue `update:expandedKeys` ↔ React `onExpandedChange`（`validate-api.mjs:264-265` 显式登记 + CHANGELOG 已记），但对组件消费者不够显眼。
   - 影响：P3，可选文档可见性。

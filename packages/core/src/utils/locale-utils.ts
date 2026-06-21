@@ -36,6 +36,7 @@ const TIGER_LOCALE_KEYS = [
   'pagination',
   'table',
   'datePicker',
+  'timePicker',
   'formWizard',
   'taskBoard',
   'formValidation'
@@ -107,6 +108,7 @@ export function mergeTigerLocale(
     pagination: { ...base?.pagination, ...override?.pagination },
     table: { ...base?.table, ...override?.table },
     datePicker: { ...base?.datePicker, ...override?.datePicker },
+    timePicker: { ...base?.timePicker, ...override?.timePicker },
     formWizard: { ...base?.formWizard, ...override?.formWizard },
     taskBoard: { ...base?.taskBoard, ...override?.taskBoard },
     formValidation: { ...base?.formValidation, ...override?.formValidation }
@@ -581,4 +583,20 @@ export const DEFAULT_UPLOAD_LABELS: UploadLabels = {
   uploadingAriaLabel: 'Uploading',
   removeFileAriaLabel: 'Remove {fileName}',
   previewFileAriaLabel: 'Preview {fileName}'
+}
+
+export const ZH_CN_UPLOAD_LABELS: UploadLabels = {
+  dragAreaAriaLabel: '点击或拖拽上传文件',
+  buttonAriaLabel: '上传文件',
+  clickToUploadText: '点击上传',
+  dragAndDropText: '或拖拽到此处',
+  acceptInfoText: '支持：{accept}',
+  maxSizeInfoText: '最大大小：{maxSize}',
+  selectFileText: '选择文件',
+  uploadedFilesAriaLabel: '已上传文件',
+  successAriaLabel: '成功',
+  errorAriaLabel: '错误',
+  uploadingAriaLabel: '上传中',
+  removeFileAriaLabel: '移除 {fileName}',
+  previewFileAriaLabel: '预览 {fileName}'
 }

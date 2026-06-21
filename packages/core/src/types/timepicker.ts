@@ -1,4 +1,6 @@
 /** TimePicker shared types */
+import type { TigerLocale } from './locale'
+
 export type TimePickerSize = 'sm' | 'md' | 'lg'
 
 export type TimeFormat = '12' | '24'
@@ -27,9 +29,9 @@ export interface TimePickerLabels {
 export interface TimePickerProps {
   /**
    * Locale used for UI labels (e.g. AM/PM) and display formatting.
-   * Example: 'zh-CN', 'en-US'
+   * Example: 'zh-CN', 'en-US', or a Tigercat locale object.
    */
-  locale?: string
+  locale?: string | Partial<TigerLocale>
 
   /**
    * UI labels for i18n.

@@ -106,6 +106,10 @@ export function getAnchorLinkClasses(active: boolean, className?: string): strin
  * Get target element from href
  */
 export function getAnchorTargetElement(href: string): HTMLElement | null {
+  if (!isBrowser()) {
+    return null
+  }
+
   if (!href || !href.startsWith('#')) {
     return null
   }
@@ -122,6 +126,10 @@ export function getAnchorTargetElement(href: string): HTMLElement | null {
  * Get scroll top of container
  */
 export function getContainerScrollTop(container: HTMLElement | Window): number {
+  if (!isBrowser()) {
+    return (container as HTMLElement | undefined)?.scrollTop ?? 0
+  }
+
   if (container === window) {
     return window.scrollY || document.documentElement.scrollTop
   }
@@ -132,6 +140,10 @@ export function getContainerScrollTop(container: HTMLElement | Window): number {
  * Get container height
  */
 export function getContainerHeight(container: HTMLElement | Window): number {
+  if (!isBrowser()) {
+    return (container as HTMLElement | undefined)?.clientHeight ?? 0
+  }
+
   if (container === window) {
     return window.innerHeight
   }
@@ -142,6 +154,10 @@ export function getContainerHeight(container: HTMLElement | Window): number {
  * Get element offset relative to container
  */
 export function getElementOffsetTop(element: HTMLElement, container: HTMLElement | Window): number {
+  if (!isBrowser()) {
+    return 0
+  }
+
   if (container === window) {
     const rect = element.getBoundingClientRect()
     return rect.top + window.scrollY
@@ -175,6 +191,10 @@ export function scrollToAnchor(
   container: HTMLElement | Window,
   targetOffset: number = 0
 ): void {
+  if (!isBrowser()) {
+    return
+  }
+
   const element = getAnchorTargetElement(href)
   if (!element) {
     return
@@ -196,6 +216,10 @@ export function findActiveAnchor(
 ): string {
   if (links.length === 0) {
     return ''
+  }
+
+  if (!isBrowser()) {
+    return links[0] || ''
   }
 
   const scrollTop = getContainerScrollTop(container)
@@ -243,10 +267,10 @@ export interface AnchorObserverOptions {
  * (returns no-op) or no targets resolve.
  */
 export function createAnchorObserver(links: string[], options: AnchorObserverOptions): () => void {
+  if (!isBrowser()) return () => {}
   if (typeof IntersectionObserver === 'undefined') return () => {}
 
   const { offsetTop = 0, root = null, onChange } = options
-  if (!isBrowser()) return () => {}
 
   const targets = new Map<Element, string>()
   for (const href of links) {

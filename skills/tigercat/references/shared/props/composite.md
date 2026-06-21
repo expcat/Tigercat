@@ -49,7 +49,7 @@ Source: `packages/core/src/types/composite.ts` · Interface: `CommentThreadProps
 
 Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
 
-Note: 评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。
+Note: 评论树、回复框和 action 文案通过自身 props 控制；`items` 可作为扁平数据输入。展开状态受控量为 `expandedKeys`：Vue 使用 `update:expandedKeys` / `v-model:expanded-keys`，React 对应历史回调名 `onExpandedChange`。
 
 Showing 3 key props of 20; see source for the complete interface.
 

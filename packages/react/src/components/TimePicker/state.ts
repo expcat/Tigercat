@@ -6,6 +6,7 @@ import {
   formatTimeDisplayWithLocale,
   getTimePeriodLabels,
   getTimePickerLabels,
+  mergeTigerLocale,
   to12HourFormat,
   to24HourFormat,
   isTimeInRange,
@@ -20,9 +21,11 @@ import {
   type TimePickerSingleValue
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../../hooks/useControlledState'
+import { useTigerConfig } from '../ConfigProvider'
 import type { TimePickerContext, TimePickerProps, TimePickerRangeValue } from './types'
 
 export function useTimePickerState(allProps: TimePickerProps): TimePickerContext {
+  const config = useTigerConfig()
   const {
     size = 'md',
     format = '24',
@@ -110,6 +113,13 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
   const [selectedSeconds, setSelectedSeconds] = useState<number>(parsedTime?.seconds ?? 0)
   const [selectedPeriod, setSelectedPeriod] = useState<'AM' | 'PM'>('AM')
 
+  const localeOverride = useMemo(() => (typeof locale === 'string' ? { locale } : locale), [locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, localeOverride),
+    [config.locale, localeOverride]
+  )
+  const localeCode = mergedLocale?.locale
+
   // Update internal state when value changes (or active part changes in range mode)
   const syncFromActiveValue = useCallback(() => {
     const parsed = parseTime(activeValue)
@@ -130,14 +140,14 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
   }, [syncFromActiveValue])
 
   const labels = useMemo(
-    () => getTimePickerLabels(locale, labelsOverrides),
-    [locale, labelsOverrides]
+    () => getTimePickerLabels(mergedLocale, labelsOverrides),
+    [mergedLocale, labelsOverrides]
   )
 
   const placeholder =
     allProps.placeholder ?? (isRangeMode ? labels.selectTimeRange : labels.selectTime)
 
-  const periodLabels = useMemo(() => getTimePeriodLabels(locale), [locale])
+  const periodLabels = useMemo(() => getTimePeriodLabels(localeCode), [localeCode])
 
   const displayValue = (() => {
     if (!isRangeMode) {
@@ -148,7 +158,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
             parsedTime.seconds,
             format,
             showSeconds,
-            locale
+            localeCode
           )
         : ''
     }
@@ -162,7 +172,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
         parsed.seconds,
         format,
         showSeconds,
-        locale
+        localeCode
       )
     }
 
@@ -443,7 +453,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
     id,
     format,
     showSeconds,
-    locale,
+    locale: mergedLocale,
     labelsOverrides,
     containerClasses: classNames(timePickerBaseClasses, className),
     divProps,

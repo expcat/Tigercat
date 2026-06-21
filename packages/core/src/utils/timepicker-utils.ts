@@ -8,6 +8,7 @@
  */
 
 import type { TimePickerLabels } from '../types/timepicker'
+import type { TigerLocale } from '../types/locale'
 import { clockSolidIcon20PathD, closeSolidIcon20PathD } from './common-icons'
 import {
   formatIntlNumber,
@@ -115,17 +116,25 @@ const TIME_PICKER_LABELS_BY_LANGUAGE: Record<string, TimePickerLabels> = {
   }
 }
 
-function isZhLocale(locale?: string): boolean {
-  return (locale ?? '').toLowerCase().startsWith('zh')
+type TimePickerLocaleInput = string | Partial<TigerLocale>
+
+function getTimePickerLocaleCode(locale?: TimePickerLocaleInput): string | undefined {
+  return typeof locale === 'string' ? locale : locale?.locale
+}
+
+function isZhLocale(locale?: TimePickerLocaleInput): boolean {
+  return (getTimePickerLocaleCode(locale) ?? '').toLowerCase().startsWith('zh')
 }
 
 export function getTimePickerLabels(
-  locale?: string,
+  locale?: TimePickerLocaleInput,
   overrides?: Partial<TimePickerLabels>
 ): TimePickerLabels {
-  const language = (locale ?? '').split('-')[0]?.toLowerCase()
+  const localeCode = getTimePickerLocaleCode(locale)
+  const language = (localeCode ?? '').split('-')[0]?.toLowerCase()
   const base = language ? (TIME_PICKER_LABELS_BY_LANGUAGE[language] ?? EN_LABELS) : EN_LABELS
-  return { ...base, ...(overrides ?? {}) }
+  const localeLabels = typeof locale === 'string' ? undefined : locale?.timePicker
+  return { ...base, ...(localeLabels ?? {}), ...(overrides ?? {}) }
 }
 
 export type TimePickerOptionUnit = 'hour' | 'minute' | 'second'
@@ -137,23 +146,24 @@ function pluralizeEn(value: number, singular: string): string {
 export function getTimePickerOptionAriaLabel(
   value: number,
   unit: TimePickerOptionUnit,
-  locale?: string,
+  locale?: TimePickerLocaleInput,
   labelOverrides?: Partial<TimePickerLabels>
 ): string {
   const labels = getTimePickerLabels(locale, labelOverrides)
+  const localeCode = getTimePickerLocaleCode(locale)
   const unitLabel =
     unit === 'hour' ? labels.hour : unit === 'minute' ? labels.minute : labels.second
 
   // Chinese: no space between value and unit
-  if (isZhLocale(locale)) return `${formatIntlNumber(value, locale)}${unitLabel}`
+  if (isZhLocale(locale)) return `${formatIntlNumber(value, localeCode)}${unitLabel}`
 
   // English pluralization when locale is explicitly English or using default EN labels
-  const lc = (locale ?? '').toLowerCase()
+  const lc = (localeCode ?? '').toLowerCase()
   if (lc.startsWith('en') || (!lc && !labelOverrides)) {
-    return `${formatIntlNumber(value, locale)} ${pluralizeEn(value, unit)}`
+    return `${formatIntlNumber(value, localeCode)} ${pluralizeEn(value, unit)}`
   }
 
-  return `${formatIntlNumber(value, locale)} ${unitLabel}`
+  return `${formatIntlNumber(value, localeCode)} ${unitLabel}`
 }
 
 // ============================================================================

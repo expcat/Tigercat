@@ -293,11 +293,11 @@ Source: `packages/core/src/types/timepicker.ts` · Interface: `TimePickerProps`.
 
 Showing 3 key props of 20; see source for the complete interface.
 
-| Prop      | Type                        | Default | Notes                                                                                    |
-| --------- | --------------------------- | ------- | ---------------------------------------------------------------------------------------- |
-| `locale?` | `string`                    | `-`     | Locale used for UI labels (e.g. AM/PM) and display formatting. Example: 'zh-CN', 'en-US' |
-| `labels?` | `Partial<TimePickerLabels>` | `-`     | UI labels for i18n. When provided, merges with locale-based defaults.                    |
-| `size?`   | `TimePickerSize`            | `'md'`  | TimePicker size                                                                          |
+| Prop      | Type                             | Default | Notes                                                                                      |
+| --------- | -------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `locale?` | `string \| Partial<TigerLocale>` | `-`     | Locale used for UI labels (e.g. AM/PM) and display formatting. Example: 'zh-CN', 'en-US... |
+| `labels?` | `Partial<TimePickerLabels>`      | `-`     | UI labels for i18n. When provided, merges with locale-based defaults.                      |
+| `size?`   | `TimePickerSize`                 | `'md'`  | TimePicker size                                                                            |
 
 ## Transfer
 

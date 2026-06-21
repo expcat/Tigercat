@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { Upload, ConfigProvider } from '@expcat/tigercat-vue'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { defineComponent, h } from 'vue'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -120,6 +121,26 @@ describe('Upload', () => {
       const { container } = render(Wrapper)
       expect(container).toHaveTextContent('点击上传')
       expect(container).toHaveTextContent('或拖拽到此处')
+    })
+
+    it('should use built-in zhCN Upload labels from ConfigProvider', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(
+              ConfigProvider,
+              { locale: zhCN },
+              {
+                default: () => h(Upload, { drag: true, accept: 'image/*' })
+              }
+            )
+        }
+      })
+
+      const { container } = render(Wrapper)
+      expect(container).toHaveTextContent('点击上传')
+      expect(container).toHaveTextContent('或拖拽到此处')
+      expect(container).toHaveTextContent('支持：image/*')
     })
   })
 

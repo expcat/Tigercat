@@ -4,6 +4,7 @@
  */
 
 import { classNames } from './class-names'
+import { isBrowser } from './env'
 import type { ImageFit, CropRect, CropHandle, PreviewNavState } from '../types/image'
 
 // ============================================================================
@@ -418,6 +419,10 @@ export function cropCanvas(
   outputType: string = 'image/png',
   quality: number = 0.92
 ): { canvas: HTMLCanvasElement; dataUrl: string } {
+  if (!isBrowser()) {
+    throw new Error('Image canvas cropping is only available in the browser')
+  }
+
   // Calculate the ratio between natural and displayed size
   const scaleX = image.naturalWidth / displayWidth
   const scaleY = image.naturalHeight / displayHeight
