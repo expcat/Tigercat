@@ -1,677 +1,84 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import React from 'react'
 import {
   classNames,
-  getSelectTriggerClasses,
-  getSelectOptionClasses,
-  selectBaseClasses,
   selectDropdownBaseClasses,
-  selectGroupLabelClasses,
-  selectSearchInputClasses,
-  selectEmptyStateClasses,
-  isOptionGroup,
-  createSelectSearchDebouncer,
-  getCreateSelectOptionLabel,
-  flattenSelectOptions,
-  resolveCreatableSelectOption,
-  resolveSelectFilteredOptions,
-  findFirstEnabledIndex as pickerFindFirstEnabledIndex,
-  findLastEnabledIndex as pickerFindLastEnabledIndex,
-  findNextEnabledIndex as pickerFindNextEnabledIndex,
-  icon20ViewBox,
-  chevronDownSolidIcon20PathD,
-  closeSolidIcon20PathD,
-  checkSolidIcon20PathD,
-  type SelectOption,
-  type SelectOptions,
-  resolveLocaleText,
-  mergeTigerLocale,
-  type SelectProps as CoreSelectProps,
-  type SelectSearchDebouncer,
-  type SelectValue,
-  type SelectValues,
-  type TigerLocale
+  selectSearchInputClasses
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useSelectState } from './Select/state'
+import { renderOptions } from './Select/render-option'
+import { SelectClearIcon, SelectChevronIcon } from './Select/icons'
+import type { SelectProps } from './Select/types'
 
-type SelectDivProps = Omit<
-  React.HTMLAttributes<HTMLDivElement>,
-  'defaultValue' | 'value' | 'onChange'
->
-
-export interface SelectBaseProps
-  extends Omit<CoreSelectProps, 'multiple' | 'options'>, SelectDivProps {
-  options?: SelectOptions
-
-  onSearch?: (query: string) => void
-
-  onCreate?: (option: SelectOption) => void
-
-  className?: string
-
-  locale?: Partial<TigerLocale>
-}
-
-export interface SelectSingleProps extends SelectBaseProps {
-  multiple?: false
-  value?: SelectValue
-  onChange?: (value: SelectValue | undefined) => void
-}
-
-export interface SelectMultipleProps extends SelectBaseProps {
-  multiple: true
-  value?: SelectValues
-  onChange?: (value: SelectValues) => void
-}
-
-export type SelectProps = SelectSingleProps | SelectMultipleProps
-
-const isMultipleSelect = (props: SelectProps): props is SelectMultipleProps =>
-  props.multiple === true
+export type {
+  SelectBaseProps,
+  SelectSingleProps,
+  SelectMultipleProps,
+  SelectProps
+} from './Select/types'
 
 export const Select: React.FC<SelectProps> = (props) => {
-  const {
-    options = [],
-    size = 'md',
-    disabled = false,
-    placeholder = 'Select an option',
-    searchable = false,
-    clearable = true,
-    noOptionsText = 'No options found',
-    noDataText = 'No options available',
-    maxTagCount,
-    remote = false,
-    searchDebounce = 0,
-    creatable = false,
-    createOptionText = 'Create',
-    onSearch,
-    onCreate,
-    className,
-    value,
-    onChange,
-    multiple,
-    locale
-  } = props
-
-  const isMultiple = multiple === true
-  const config = useTigerConfig()
-  const mergedLocale = useMemo(
-    () => mergeTigerLocale(config.locale, locale),
-    [config.locale, locale]
-  )
-
-  const SELECT_KEYS = new Set([
-    'options',
-    'size',
-    'disabled',
-    'placeholder',
-    'searchable',
-    'clearable',
-    'noOptionsText',
-    'noDataText',
-    'maxTagCount',
-    'virtual',
-    'remote',
-    'searchDebounce',
-    'creatable',
-    'createOptionText',
-    'listHeight',
-    'onSearch',
-    'onCreate',
-    'className',
-    'value',
-    'onChange',
-    'multiple',
-    'locale'
-  ])
-  const divProps: Record<string, unknown> = {}
-  for (const [k, v] of Object.entries(props)) {
-    if (!SELECT_KEYS.has(k)) divProps[k] = v
-  }
-
-  const instanceId = useId()
-  const listboxId = `tiger-select-listbox-${instanceId}`
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [activeIndex, setActiveIndex] = useState(-1)
-  const [createdOptions, setCreatedOptions] = useState<SelectOption[]>([])
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLButtonElement>(null)
-  const searchInputRef = useRef<HTMLInputElement>(null)
-  const searchDebouncerRef = useRef<SelectSearchDebouncer | null>(null)
-
-  const filteredOptions = useMemo(
-    () => resolveSelectFilteredOptions(options, searchQuery, { searchable, remote }),
-    [options, remote, searchable, searchQuery]
-  )
-
-  const flatFilteredOptions = useMemo(
-    () => flattenSelectOptions(filteredOptions),
-    [filteredOptions]
-  )
-
-  const creatableOption = useMemo(
-    () =>
-      resolveCreatableSelectOption([...options, ...createdOptions], searchQuery, {
-        creatable: creatable && searchable
-      }),
-    [creatable, createdOptions, options, searchable, searchQuery]
-  )
-
-  const flatSelectableOptions = useMemo(
-    () => (creatableOption ? [...flatFilteredOptions, creatableOption] : flatFilteredOptions),
-    [creatableOption, flatFilteredOptions]
-  )
-
-  const allOptions = useMemo(() => flattenSelectOptions(options), [options])
-
-  const displayText = useMemo(() => {
-    if (isMultiple) {
-      const values = Array.isArray(value) ? value : []
-      if (values.length === 0) return placeholder
-      const labels = [...allOptions, ...createdOptions]
-        .filter((opt) => values.includes(opt.value))
-        .map((opt) => opt.label)
-      if (maxTagCount !== undefined && labels.length > maxTagCount) {
-        const visible = labels.slice(0, maxTagCount)
-        return `${visible.join(', ')} +${labels.length - maxTagCount}`
-      }
-      return labels.join(', ')
-    }
-
-    if (value === undefined || value === null || value === '') return placeholder
-    return (
-      [...allOptions, ...createdOptions].find((opt) => opt.value === value)?.label ?? placeholder
-    )
-  }, [isMultiple, value, allOptions, createdOptions, placeholder, maxTagCount])
-
-  const showClearButton = useMemo(
-    () =>
-      clearable &&
-      !disabled &&
-      value !== undefined &&
-      value !== null &&
-      value !== '' &&
-      (!Array.isArray(value) || value.length > 0),
-    [clearable, disabled, value]
-  )
-
-  const isSelected = (option: SelectOption): boolean => {
-    if (isMultiple) {
-      return (Array.isArray(value) ? value : []).includes(option.value)
-    }
-    return value === option.value
-  }
-
-  const getOptionId = (index: number) => `tiger-select-option-${instanceId}-${index}`
-
-  const findFirstEnabledIndex = useCallback(
-    (): number => pickerFindFirstEnabledIndex(flatSelectableOptions),
-    [flatSelectableOptions]
-  )
-
-  const findLastEnabledIndex = (): number => pickerFindLastEnabledIndex(flatSelectableOptions)
-
-  const findNextEnabledIndex = (current: number, direction: 1 | -1): number =>
-    pickerFindNextEnabledIndex(flatSelectableOptions, current, direction)
-
-  const focusOptionAt = useCallback((index: number) => {
-    if (index < 0) {
-      return
-    }
-
-    requestAnimationFrame(() => {
-      const el = dropdownRef.current?.querySelector<HTMLElement>(`[data-option-index="${index}"]`)
-      el?.focus()
-      el?.scrollIntoView({ block: 'nearest' })
-    })
-  }, [])
-
-  const setActiveAndFocus = (index: number) => {
-    setActiveIndex(index)
-    focusOptionAt(index)
-  }
-
-  const closeDropdown = () => {
-    setIsOpen(false)
-    setSearchQuery('')
-    setActiveIndex(-1)
-  }
-
-  const toggleDropdown = () => {
-    if (!disabled) {
-      setIsOpen((prev) => !prev)
-    }
-  }
-
-  const getActiveOption = (): SelectOption | undefined => {
-    if (activeIndex < 0) {
-      return undefined
-    }
-    return flatSelectableOptions[activeIndex]
-  }
-
-  const selectActiveOption = () => {
-    const option = getActiveOption()
-    if (!option || option.disabled) {
-      return
-    }
-    selectOption(option)
-  }
-
-  const selectOption = (option: SelectOption) => {
-    if (option.disabled) {
-      return
-    }
-
-    if (creatableOption && option.value === creatableOption.value) {
-      setCreatedOptions((current) => [...current, option])
-      onCreate?.(option)
-    }
-
-    if (isMultiple) {
-      const currentValue = Array.isArray(value) ? value : []
-      const nextValue = currentValue.includes(option.value)
-        ? currentValue.filter((v) => v !== option.value)
-        : [...currentValue, option.value]
-
-      ;(onChange as ((value: SelectValues) => void) | undefined)?.(nextValue)
-      return
-    }
-
-    ;(onChange as ((value: SelectValue | undefined) => void) | undefined)?.(option.value)
-    closeDropdown()
-    requestAnimationFrame(() => {
-      triggerRef.current?.focus()
-    })
-  }
-
-  const clearSelection = (event: React.MouseEvent) => {
-    event.stopPropagation()
-
-    if (isMultiple) {
-      ;(onChange as ((value: SelectValues) => void) | undefined)?.([])
-      return
-    }
-
-    ;(onChange as ((value: SelectValue | undefined) => void) | undefined)?.(undefined)
-  }
-
-  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value
-    setSearchQuery(query)
-    searchDebouncerRef.current?.schedule(query)
-  }
-
-  useEffect(() => {
-    searchDebouncerRef.current?.cancel()
-    searchDebouncerRef.current = createSelectSearchDebouncer({
-      delay: searchDebounce,
-      onSearch: (query) => onSearch?.(query)
-    })
-
-    return () => searchDebouncerRef.current?.cancel()
-  }, [onSearch, searchDebounce])
-
-  const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (disabled) {
-      return
-    }
-
-    switch (event.key) {
-      case 'ArrowDown': {
-        event.preventDefault()
-        if (!isOpen) {
-          setIsOpen(true)
-          return
-        }
-        const next = findNextEnabledIndex(activeIndex, 1)
-        setActiveAndFocus(next)
-        return
-      }
-      case 'ArrowUp': {
-        event.preventDefault()
-        if (!isOpen) {
-          setIsOpen(true)
-          return
-        }
-        const next = findNextEnabledIndex(activeIndex, -1)
-        setActiveAndFocus(next)
-        return
-      }
-      case 'Enter':
-      case ' ': {
-        event.preventDefault()
-        if (!isOpen) {
-          setIsOpen(true)
-          return
-        }
-        selectActiveOption()
-        return
-      }
-      case 'Escape': {
-        if (isOpen) {
-          event.preventDefault()
-          closeDropdown()
-        }
-        return
-      }
-      default:
-        return
-    }
-  }
-
-  const handleDropdownKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    switch (event.key) {
-      case 'ArrowDown': {
-        event.preventDefault()
-        const next = findNextEnabledIndex(activeIndex, 1)
-        setActiveAndFocus(next)
-        return
-      }
-      case 'ArrowUp': {
-        event.preventDefault()
-        const next = findNextEnabledIndex(activeIndex, -1)
-        setActiveAndFocus(next)
-        return
-      }
-      case 'Home': {
-        event.preventDefault()
-        const next = findFirstEnabledIndex()
-        setActiveAndFocus(next)
-        return
-      }
-      case 'End': {
-        event.preventDefault()
-        const next = findLastEnabledIndex()
-        setActiveAndFocus(next)
-        return
-      }
-      case 'Enter':
-      case ' ': {
-        event.preventDefault()
-        selectActiveOption()
-        return
-      }
-      case 'Escape': {
-        event.preventDefault()
-        closeDropdown()
-        triggerRef.current?.focus()
-        return
-      }
-      case 'Tab': {
-        closeDropdown()
-        return
-      }
-      default:
-        return
-    }
-  }
-
-  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    switch (event.key) {
-      case ' ': {
-        event.stopPropagation()
-        return
-      }
-      case 'ArrowDown': {
-        event.preventDefault()
-        event.stopPropagation()
-        const next = activeIndex >= 0 ? activeIndex : findFirstEnabledIndex()
-        setActiveAndFocus(next)
-        return
-      }
-      case 'ArrowUp': {
-        event.preventDefault()
-        event.stopPropagation()
-        const next = activeIndex >= 0 ? activeIndex : findLastEnabledIndex()
-        setActiveAndFocus(next)
-        return
-      }
-      case 'Enter': {
-        if (activeIndex >= 0) {
-          event.preventDefault()
-          event.stopPropagation()
-          selectActiveOption()
-        }
-        return
-      }
-      case 'Escape': {
-        event.preventDefault()
-        event.stopPropagation()
-        closeDropdown()
-        triggerRef.current?.focus()
-        return
-      }
-      default:
-        return
-    }
-  }
-
-  useEffect(() => {
-    if (isOpen && searchable) {
-      searchInputRef.current?.focus()
-    }
-  }, [isOpen, searchable])
-
-  useEffect(() => {
-    if (!isOpen) {
-      return
-    }
-
-    if (flatSelectableOptions.length === 0) {
-      setActiveIndex(-1)
-      return
-    }
-
-    const selectedIndex = (() => {
-      if (isMultiple) {
-        const values = Array.isArray(value) ? value : []
-        if (values.length === 0) {
-          return -1
-        }
-        return flatSelectableOptions.findIndex((opt) => values.includes(opt.value) && !opt.disabled)
-      }
-
-      if (value === undefined || value === null || value === '') {
-        return -1
-      }
-      return flatSelectableOptions.findIndex((opt) => opt.value === value && !opt.disabled)
-    })()
-
-    const nextActive = selectedIndex >= 0 ? selectedIndex : findFirstEnabledIndex()
-    setActiveIndex(nextActive)
-
-    if (!searchable) {
-      focusOptionAt(nextActive)
-    }
-  }, [
-    isOpen,
-    searchable,
-    flatSelectableOptions,
-    isMultiple,
-    value,
-    findFirstEnabledIndex,
-    focusOptionAt
-  ])
-
-  useEffect(() => {
-    if (!isOpen) {
-      return
-    }
-
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node
-      if (
-        dropdownRef.current &&
-        triggerRef.current &&
-        !dropdownRef.current.contains(target) &&
-        !triggerRef.current.contains(target)
-      ) {
-        closeDropdown()
-      }
-    }
-
-    document.addEventListener('click', handleClickOutside)
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [isOpen])
-
-  const triggerClasses = getSelectTriggerClasses(size, disabled, isOpen)
-
-  const renderOption = (option: SelectOption, index: number, displayLabel = option.label) => {
-    const optionSelected = isSelected(option)
-    const optionActive = index === activeIndex
-
-    return (
-      <div
-        key={option.value}
-        id={getOptionId(index)}
-        data-option-index={index}
-        role="option"
-        aria-selected={optionSelected}
-        aria-disabled={option.disabled ? true : undefined}
-        tabIndex={optionActive ? 0 : -1}
-        className={getSelectOptionClasses(optionSelected, !!option.disabled, size)}
-        onMouseEnter={() => {
-          if (!option.disabled) {
-            setActiveIndex(index)
-          }
-        }}
-        onClick={() => selectOption(option)}>
-        <span className="flex items-center justify-between w-full">
-          <span>{displayLabel}</span>
-          {optionSelected && (
-            <svg
-              className="w-5 h-5 text-[var(--tiger-select-check-icon,var(--tiger-primary,#2563eb))]"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox={icon20ViewBox}
-              fill="currentColor">
-              <path fillRule="evenodd" d={checkSolidIcon20PathD} clipRule="evenodd" />
-            </svg>
-          )}
-        </span>
-      </div>
-    )
-  }
-
-  const hasOptions = filteredOptions.length > 0
-
-  const renderOptions = () => {
-    if (!hasOptions && !creatableOption) {
-      return (
-        <div className={selectEmptyStateClasses}>
-          {options.length === 0 ? noDataText : noOptionsText}
-        </div>
-      )
-    }
-
-    let optionIndex = -1
-
-    const optionNodes = filteredOptions.map((item) => {
-      if (isOptionGroup(item)) {
-        return (
-          <div key={item.label}>
-            <div className={selectGroupLabelClasses}>{item.label}</div>
-            {item.options.map((option) => {
-              optionIndex += 1
-              return renderOption(option, optionIndex)
-            })}
-          </div>
-        )
-      }
-
-      optionIndex += 1
-      return renderOption(item, optionIndex)
-    })
-
-    if (creatableOption) {
-      optionIndex += 1
-      optionNodes.push(
-        renderOption(
-          creatableOption,
-          optionIndex,
-          getCreateSelectOptionLabel(creatableOption, createOptionText)
-        )
-      )
-    }
-
-    return optionNodes
-  }
-
-  const containerClasses = classNames(selectBaseClasses, className)
+  const ctx = useSelectState(props)
 
   return (
-    <div {...divProps} className={containerClasses}>
+    <div {...ctx.divProps} className={ctx.containerClasses}>
       <button
-        ref={triggerRef}
+        ref={ctx.triggerRef}
         type="button"
-        className={triggerClasses}
-        disabled={disabled}
-        onClick={toggleDropdown}
-        onKeyDown={handleTriggerKeyDown}
+        className={ctx.triggerClasses}
+        disabled={ctx.disabled}
+        onClick={ctx.toggleDropdown}
+        onKeyDown={ctx.handleTriggerKeyDown}
         aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-controls={listboxId}
-        aria-activedescendant={isOpen && activeIndex >= 0 ? getOptionId(activeIndex) : undefined}
-        data-state={isOpen ? 'open' : 'closed'}>
+        aria-expanded={ctx.isOpen}
+        aria-controls={ctx.listboxId}
+        aria-activedescendant={
+          ctx.isOpen && ctx.activeIndex >= 0 ? ctx.getOptionId(ctx.activeIndex) : undefined
+        }
+        data-state={ctx.isOpen ? 'open' : 'closed'}>
         <span
           className={classNames(
             'flex-1 text-left truncate',
-            displayText === placeholder &&
+            ctx.displayText === ctx.placeholder &&
               'text-[var(--tiger-select-placeholder,var(--tiger-text-muted,#9ca3af))]'
           )}>
-          {displayText}
+          {ctx.displayText}
         </span>
         <span className="flex items-center gap-1">
-          {showClearButton && (
+          {ctx.showClearButton && (
             <span
               className="inline-flex"
               data-tiger-select-clear
               aria-label="Clear selection"
-              onClick={clearSelection}>
-              <svg
-                className="w-4 h-4 text-[var(--tiger-select-icon,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-select-icon-hover,var(--tiger-text-muted,#6b7280))]"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox={icon20ViewBox}
-                fill="currentColor">
-                <path fillRule="evenodd" d={closeSolidIcon20PathD} clipRule="evenodd" />
-              </svg>
+              onClick={ctx.clearSelection}>
+              <SelectClearIcon />
             </span>
           )}
-          <span className={classNames('inline-flex', isOpen && 'rotate-180')}>
-            <svg
-              className="w-5 h-5 text-[var(--tiger-select-icon,var(--tiger-text-muted,#9ca3af))] transition-transform"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox={icon20ViewBox}
-              fill="currentColor">
-              <path fillRule="evenodd" d={chevronDownSolidIcon20PathD} clipRule="evenodd" />
-            </svg>
+          <span className={classNames('inline-flex', ctx.isOpen && 'rotate-180')}>
+            <SelectChevronIcon />
           </span>
         </span>
       </button>
 
-      {isOpen && (
+      {ctx.isOpen && (
         <div
-          ref={dropdownRef}
+          ref={ctx.dropdownRef}
           className={selectDropdownBaseClasses}
           role="listbox"
-          id={listboxId}
-          aria-multiselectable={isMultipleSelect(props) ? true : undefined}
-          onKeyDown={handleDropdownKeyDown}>
-          {searchable && (
+          id={ctx.listboxId}
+          aria-multiselectable={ctx.isMultiple ? true : undefined}
+          onKeyDown={ctx.handleDropdownKeyDown}>
+          {ctx.searchable && (
             <input
-              ref={searchInputRef}
+              ref={ctx.searchInputRef}
               type="text"
               className={selectSearchInputClasses}
-              placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
-              value={searchQuery}
-              onChange={handleSearchInput}
-              onKeyDown={handleSearchKeyDown}
+              placeholder={ctx.searchPlaceholder}
+              value={ctx.searchQuery}
+              onChange={ctx.handleSearchInput}
+              onKeyDown={ctx.handleSearchKeyDown}
             />
           )}
-          {renderOptions()}
+          {renderOptions(ctx)}
         </div>
       )}
     </div>
