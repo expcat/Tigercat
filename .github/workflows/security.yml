@@ -1,14 +1,15 @@
 name: Security Audit
 
-# Weekly dependency advisory visibility. Remediation is driven by Dependabot
-# (see .github/dependabot.yml), which opens PRs to bump affected packages.
+# Weekly dependency advisory visibility. Report-only — there is currently no
+# automated remediation: Dependabot is disabled (see
+# .github/dependabot.yml.disabled), so advisories are triaged manually.
 #
 # This job is intentionally report-only (continue-on-error): the workspace
 # pulls a large dev/example toolchain (Nuxt, Vite, Playwright, etc.) whose
 # transitive advisories are not shipped to consumers — the published packages
 # (core/vue/react/cli) only carry `@floating-ui/dom` at runtime. A hard block
 # would stay perpetually red on example/dev-only advisories and train everyone
-# to ignore it. The audit surfaces the current advisory set; Dependabot fixes it.
+# to ignore it. The audit surfaces the current advisory set for manual triage.
 
 on:
   schedule:

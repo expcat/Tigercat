@@ -114,6 +114,9 @@ function checkRootScripts() {
   const requiredReleaseSteps = [
     'release:check',
     'quality:quick',
+    'test:coverage',
+    'api:baseline:check',
+    'docs:api:check',
     'quality:size',
     'test:validate',
     'quality:examples',

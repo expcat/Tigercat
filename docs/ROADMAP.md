@@ -42,7 +42,7 @@ source: current repository audit and roadmap review (former ROADMAP_CHECK.md, me
 
 ### P1 — 质量门禁基础设施一致性（源自任务 G 复审）
 
-- [ ] **G-R1 调和「dependabot / CI 自动触发被反转」与文档的矛盾**
+- [x] **G-R1 调和「dependabot / CI 自动触发被反转」与文档的矛盾**（已按「如实改述」收口：保留 dependabot 停用 + CI 手动 `workflow_dispatch`，修订 `security.yml` 注释与 `CHANGELOG.md` 去掉 dependabot 自动收敛 / 随 PR 自动生效的失效承诺。）
   - 来源 / 维度：任务 G 复审（依赖·CVE / 门禁触发）。
   - 问题：commit `345274f8`（2026-06-20 16:51）把同日 `cfabd219` 交付的两项门禁基础设施**有意反转**——`.github/dependabot.yml` 重命名为 `.disabled`、`.github/workflows/ci.yml` 删除 `push` / `pull_request(main)` 触发仅留 `workflow_dispatch`。当前仓库状态已与文档矛盾，并留下悬挂引用：
     - `security.yml`（注释 `:3-4,11`）仍写「Remediation is driven by Dependabot (see .github/dependabot.yml)」，指向已禁用文件 → 报告式 `pnpm audit` 失去补救兜底（每周出报告、无自动修复承接）。
@@ -52,7 +52,7 @@ source: current repository audit and roadmap review (former ROADMAP_CHECK.md, me
     - **重启**：`git mv .github/dependabot.yml.disabled .github/dependabot.yml`（内容完整，含 npm / github-actions 周更两段），并给 `ci.yml` 加回 `push` / `pull_request(main)` 触发；或
     - **如实改述**：修订 `CHANGELOG.md` `## Unreleased` 与 `security.yml:3-4,11` 注释，去掉「dependabot 实际收敛 / Dependabot fixes it」「随 PR / 合并自动生效」，改写为「audit 报告式可见性、当前无自动补救（dependabot 已停用）」「CI 维持手动 `workflow_dispatch`（控 Actions 成本）」。
 
-- [ ] **G-R2 将覆盖率 / API 基线 / references 三道闸纳入本地可达路径**
+- [x] **G-R2 将覆盖率 / API 基线 / references 三道闸纳入本地可达路径**（已收口：`quality:release` 补 `test:coverage` + 新增 `api:baseline:check` / `docs:api:check` 两道漂移闸，`release:check` 的必含步骤校验同步登记三项固化为红门禁。）
   - 来源 / 维度：任务 G 复审（连带影响）。
   - 问题：G-1（覆盖率阈值）/ G-3（公共 API 基线漂移）/ G-4（references 漂移）三道已交付门禁**只接到 `ci.yml`、不在 `quality:release` 链内**——`quality:release` → `quality:quick` 跑的是 `test:core`（非 `test:coverage`），全链无 `api:baseline` + diff、无 `docs:api` + references diff。CI 退回手动触发后（见 G-R1），这三道闸只在有人手动 dispatch CI 时才跑，既不随 PR / push 自动生效，也无法经本地 `pnpm quality:release` 走到。
   - 影响：P1，三道已交付门禁被一并架空（与 G-R1 的 CI 决策解耦——无论 CI 是否恢复自动触发，本地门禁都应可达）。
