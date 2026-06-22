@@ -7,154 +7,158 @@ description: Canonical Tigercat component route map for props, examples, and typ
 
 # Component Index
 
-每个公开组件只在这里路由一次。先查组件，再只打开对应 props 或 examples 文档。
+每个公开组件只在这里路由一次。定位组件后按以下规则打开文档（`{cat}` = Category 列小写，`{Component}` = 组件名）：
 
-| Component            | Category   | Props                                                      | Examples                                                  | Type Source                                                                                          |
-| -------------------- | ---------- | ---------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| CodeEditor           | Advanced   | [props](shared/props/advanced.md#code-editor)              | [examples](examples/advanced.md#code-editor)              | `packages/core/src/types/code-editor.ts`                                                             |
-| Drag                 | Advanced   | [props](shared/props/advanced.md#drag)                     | [examples](examples/advanced.md#drag)                     | `packages/core/src/types/drag.ts`                                                                    |
-| FileManager          | Advanced   | [props](shared/props/advanced.md#file-manager)             | [examples](examples/advanced.md#file-manager)             | `packages/core/src/types/file-manager.ts`                                                            |
-| ImageAnnotation      | Advanced   | [props](shared/props/advanced.md#image-annotation)         | [examples](examples/advanced.md#image-annotation)         | `packages/core/src/types/image-annotation.ts`                                                        |
-| ImageViewer          | Advanced   | [props](shared/props/advanced.md#image-viewer)             | [examples](examples/advanced.md#image-viewer)             | `packages/core/src/types/image-viewer.ts`                                                            |
-| InfiniteScroll       | Advanced   | [props](shared/props/advanced.md#infinite-scroll)          | [examples](examples/advanced.md#infinite-scroll)          | `packages/core/src/types/infinite-scroll.ts`                                                         |
-| Kanban               | Advanced   | [props](shared/props/advanced.md#kanban)                   | [examples](examples/advanced.md#kanban)                   | `packages/core/src/types/kanban.ts`                                                                  |
-| MarkdownEditor       | Advanced   | [props](shared/props/advanced.md#markdown-editor)          | [examples](examples/advanced.md#markdown-editor)          | `packages/core/src/types/markdown-editor.ts`                                                         |
-| PrintLayout          | Advanced   | [props](shared/props/advanced.md#print-layout)             | [examples](examples/advanced.md#print-layout)             | `packages/core/src/types/print-layout.ts`                                                            |
-| RichTextEditor       | Advanced   | [props](shared/props/advanced.md#rich-text-editor)         | [examples](examples/advanced.md#rich-text-editor)         | `packages/core/src/types/rich-text-editor.ts`                                                        |
-| VirtualList          | Advanced   | [props](shared/props/advanced.md#virtual-list)             | [examples](examples/advanced.md#virtual-list)             | `packages/core/src/types/virtual-list.ts`                                                            |
-| VirtualTable         | Advanced   | [props](shared/props/advanced.md#virtual-table)            | [examples](examples/advanced.md#virtual-table)            | `packages/core/src/types/virtual-table.ts`                                                           |
-| Alert                | Basic      | [props](shared/props/basic.md#alert)                       | [examples](examples/basic.md#alert)                       | `packages/core/src/types/alert.ts`                                                                   |
-| Avatar               | Basic      | [props](shared/props/basic.md#avatar)                      | [examples](examples/basic.md#avatar)                      | `packages/core/src/types/avatar.ts`                                                                  |
-| AvatarGroup          | Basic      | [props](shared/props/basic.md#avatar-group)                | [examples](examples/basic.md#avatar-group)                | `packages/core/src/types/avatar.ts`                                                                  |
-| Badge                | Basic      | [props](shared/props/basic.md#badge)                       | [examples](examples/basic.md#badge)                       | `packages/core/src/types/badge.ts`                                                                   |
-| Button               | Basic      | [props](shared/props/basic.md#button)                      | [examples](examples/basic.md#button)                      | `packages/core/src/types/button.ts`                                                                  |
-| ButtonGroup          | Basic      | [props](shared/props/basic.md#button-group)                | [examples](examples/basic.md#button-group)                | `packages/core/src/types/button.ts`                                                                  |
-| Code                 | Basic      | [props](shared/props/basic.md#code)                        | [examples](examples/basic.md#code)                        | `packages/core/src/types/code.ts`                                                                    |
-| ConfigProvider       | Basic      | [props](shared/props/basic.md#config-provider)             | [examples](examples/basic.md#config-provider)             | `packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts` |
-| CropUpload           | Basic      | [props](shared/props/basic.md#crop-upload)                 | [examples](examples/basic.md#crop-upload)                 | `packages/core/src/types/image.ts`                                                                   |
-| Divider              | Basic      | [props](shared/props/basic.md#divider)                     | [examples](examples/basic.md#divider)                     | `packages/core/src/types/divider.ts`                                                                 |
-| Empty                | Basic      | [props](shared/props/basic.md#empty)                       | [examples](examples/basic.md#empty)                       | `packages/core/src/types/empty.ts`                                                                   |
-| Icon                 | Basic      | [props](shared/props/basic.md#icon)                        | [examples](examples/basic.md#icon)                        | `packages/core/src/types/icon.ts`                                                                    |
-| Image                | Basic      | [props](shared/props/basic.md#image)                       | [examples](examples/basic.md#image)                       | `packages/core/src/types/image.ts`                                                                   |
-| ImageCropper         | Basic      | [props](shared/props/basic.md#image-cropper)               | [examples](examples/basic.md#image-cropper)               | `packages/core/src/types/image.ts`                                                                   |
-| ImageGroup           | Basic      | [props](shared/props/basic.md#image-group)                 | [examples](examples/basic.md#image-group)                 | `packages/core/src/types/image.ts`                                                                   |
-| ImagePreview         | Basic      | [props](shared/props/basic.md#image-preview)               | [examples](examples/basic.md#image-preview)               | `packages/core/src/types/image.ts`                                                                   |
-| Link                 | Basic      | [props](shared/props/basic.md#link)                        | [examples](examples/basic.md#link)                        | `packages/core/src/types/link.ts`                                                                    |
-| QRCode               | Basic      | [props](shared/props/basic.md#qr-code)                     | [examples](examples/basic.md#qr-code)                     | `packages/core/src/types/qrcode.ts`                                                                  |
-| Rate                 | Basic      | [props](shared/props/basic.md#rate)                        | [examples](examples/basic.md#rate)                        | `packages/core/src/types/rate.ts`                                                                    |
-| Result               | Basic      | [props](shared/props/basic.md#result)                      | [examples](examples/basic.md#result)                      | `packages/core/src/types/result.ts`                                                                  |
-| Segmented            | Basic      | [props](shared/props/basic.md#segmented)                   | [examples](examples/basic.md#segmented)                   | `packages/core/src/types/segmented.ts`                                                               |
-| Statistic            | Basic      | [props](shared/props/basic.md#statistic)                   | [examples](examples/basic.md#statistic)                   | `packages/core/src/types/statistic.ts`                                                               |
-| Tag                  | Basic      | [props](shared/props/basic.md#tag)                         | [examples](examples/basic.md#tag)                         | `packages/core/src/types/tag.ts`                                                                     |
-| Text                 | Basic      | [props](shared/props/basic.md#text)                        | [examples](examples/basic.md#text)                        | `packages/core/src/types/text.ts`                                                                    |
-| Watermark            | Basic      | [props](shared/props/basic.md#watermark)                   | [examples](examples/basic.md#watermark)                   | `packages/core/src/types/watermark.ts`                                                               |
-| AreaChart            | Charts     | [props](shared/props/charts.md#area-chart)                 | [examples](examples/charts.md#area-chart)                 | `packages/core/src/types/chart.ts`                                                                   |
-| BarChart             | Charts     | [props](shared/props/charts.md#bar-chart)                  | [examples](examples/charts.md#bar-chart)                  | `packages/core/src/types/chart.ts`                                                                   |
-| ChartAxis            | Charts     | [props](shared/props/charts.md#chart-axis)                 | [examples](examples/charts.md#chart-axis)                 | `packages/core/src/types/chart.ts`                                                                   |
-| ChartCanvas          | Charts     | [props](shared/props/charts.md#chart-canvas)               | [examples](examples/charts.md#chart-canvas)               | `packages/core/src/types/chart.ts`                                                                   |
-| ChartGrid            | Charts     | [props](shared/props/charts.md#chart-grid)                 | [examples](examples/charts.md#chart-grid)                 | `packages/core/src/types/chart.ts`                                                                   |
-| ChartLegend          | Charts     | [props](shared/props/charts.md#chart-legend)               | [examples](examples/charts.md#chart-legend)               | `packages/core/src/types/chart.ts`                                                                   |
-| ChartSeries          | Charts     | [props](shared/props/charts.md#chart-series)               | [examples](examples/charts.md#chart-series)               | `packages/core/src/types/chart.ts`                                                                   |
-| ChartTooltip         | Charts     | [props](shared/props/charts.md#chart-tooltip)              | [examples](examples/charts.md#chart-tooltip)              | `packages/core/src/types/chart.ts`                                                                   |
-| DonutChart           | Charts     | [props](shared/props/charts.md#donut-chart)                | [examples](examples/charts.md#donut-chart)                | `packages/core/src/types/chart.ts`                                                                   |
-| FunnelChart          | Charts     | [props](shared/props/charts.md#funnel-chart)               | [examples](examples/charts.md#funnel-chart)               | `packages/core/src/types/chart.ts`                                                                   |
-| Gantt                | Charts     | [props](shared/props/charts.md#gantt)                      | [examples](examples/charts.md#gantt)                      | `packages/core/src/types/gantt.ts`                                                                   |
-| GaugeChart           | Charts     | [props](shared/props/charts.md#gauge-chart)                | [examples](examples/charts.md#gauge-chart)                | `packages/core/src/types/chart.ts`                                                                   |
-| HeatmapChart         | Charts     | [props](shared/props/charts.md#heatmap-chart)              | [examples](examples/charts.md#heatmap-chart)              | `packages/core/src/types/chart.ts`                                                                   |
-| LineChart            | Charts     | [props](shared/props/charts.md#line-chart)                 | [examples](examples/charts.md#line-chart)                 | `packages/core/src/types/chart.ts`                                                                   |
-| OrgChart             | Charts     | [props](shared/props/charts.md#org-chart)                  | [examples](examples/charts.md#org-chart)                  | `packages/core/src/types/org-chart.ts`                                                               |
-| PieChart             | Charts     | [props](shared/props/charts.md#pie-chart)                  | [examples](examples/charts.md#pie-chart)                  | `packages/core/src/types/chart.ts`                                                                   |
-| RadarChart           | Charts     | [props](shared/props/charts.md#radar-chart)                | [examples](examples/charts.md#radar-chart)                | `packages/core/src/types/chart.ts`                                                                   |
-| ScatterChart         | Charts     | [props](shared/props/charts.md#scatter-chart)              | [examples](examples/charts.md#scatter-chart)              | `packages/core/src/types/chart.ts`                                                                   |
-| SunburstChart        | Charts     | [props](shared/props/charts.md#sunburst-chart)             | [examples](examples/charts.md#sunburst-chart)             | `packages/core/src/types/chart.ts`                                                                   |
-| TreeMapChart         | Charts     | [props](shared/props/charts.md#tree-map-chart)             | [examples](examples/charts.md#tree-map-chart)             | `packages/core/src/types/chart.ts`                                                                   |
-| ActivityFeed         | Composite  | [props](shared/props/composite.md#activity-feed)           | [examples](examples/composite.md#activity-feed)           | `packages/core/src/types/composite.ts`                                                               |
-| ChatWindow           | Composite  | [props](shared/props/composite.md#chat-window)             | [examples](examples/composite.md#chat-window)             | `packages/core/src/types/composite.ts`                                                               |
-| CommentThread        | Composite  | [props](shared/props/composite.md#comment-thread)          | [examples](examples/composite.md#comment-thread)          | `packages/core/src/types/composite.ts`                                                               |
-| DataTableWithToolbar | Composite  | [props](shared/props/composite.md#data-table-with-toolbar) | [examples](examples/composite.md#data-table-with-toolbar) | `packages/core/src/types/composite.ts`                                                               |
-| FormWizard           | Composite  | [props](shared/props/composite.md#form-wizard)             | [examples](examples/composite.md#form-wizard)             | `packages/core/src/types/composite.ts`                                                               |
-| NotificationCenter   | Composite  | [props](shared/props/composite.md#notification-center)     | [examples](examples/composite.md#notification-center)     | `packages/core/src/types/composite.ts`                                                               |
-| TableToolbar         | Composite  | [props](shared/props/composite.md#table-toolbar)           | [examples](examples/composite.md#table-toolbar)           | `packages/core/src/types/composite.ts`                                                               |
-| TaskBoard            | Composite  | [props](shared/props/composite.md#task-board)              | [examples](examples/composite.md#task-board)              | `packages/core/src/types/composite.ts`                                                               |
-| Calendar             | Data       | [props](shared/props/data.md#calendar)                     | [examples](examples/data.md#calendar)                     | `packages/core/src/types/calendar.ts`                                                                |
-| Collapse             | Data       | [props](shared/props/data.md#collapse)                     | [examples](examples/data.md#collapse)                     | `packages/core/src/types/collapse.ts`                                                                |
-| CollapsePanel        | Data       | [props](shared/props/data.md#collapse-panel)               | [examples](examples/data.md#collapse-panel)               | `packages/core/src/types/collapse.ts`                                                                |
-| Countdown            | Data       | [props](shared/props/data.md#countdown)                    | [examples](examples/data.md#countdown)                    | `packages/core/src/types/countdown.ts`                                                               |
-| Table                | Data       | [props](shared/props/data.md#table)                        | [examples](examples/data.md#table)                        | `packages/core/src/types/table.ts`                                                                   |
-| Timeline             | Data       | [props](shared/props/data.md#timeline)                     | [examples](examples/data.md#timeline)                     | `packages/core/src/types/timeline.ts`                                                                |
-| Drawer               | Feedback   | [props](shared/props/feedback.md#drawer)                   | [examples](examples/feedback.md#drawer)                   | `packages/core/src/types/drawer.ts`                                                                  |
-| Loading              | Feedback   | [props](shared/props/feedback.md#loading)                  | [examples](examples/feedback.md#loading)                  | `packages/core/src/types/loading.ts`                                                                 |
-| Message              | Feedback   | [props](shared/props/feedback.md#message)                  | [examples](examples/feedback.md#message)                  | `packages/core/src/types/message.ts`                                                                 |
-| Modal                | Feedback   | [props](shared/props/feedback.md#modal)                    | [examples](examples/feedback.md#modal)                    | `packages/core/src/types/modal.ts`                                                                   |
-| Notification         | Feedback   | [props](shared/props/feedback.md#notification)             | [examples](examples/feedback.md#notification)             | `packages/core/src/types/notification.ts`                                                            |
-| Popconfirm           | Feedback   | [props](shared/props/feedback.md#popconfirm)               | [examples](examples/feedback.md#popconfirm)               | `packages/core/src/types/popconfirm.ts`                                                              |
-| Popover              | Feedback   | [props](shared/props/feedback.md#popover)                  | [examples](examples/feedback.md#popover)                  | `packages/core/src/types/popover.ts`                                                                 |
-| Progress             | Feedback   | [props](shared/props/feedback.md#progress)                 | [examples](examples/feedback.md#progress)                 | `packages/core/src/types/progress.ts`                                                                |
-| Tooltip              | Feedback   | [props](shared/props/feedback.md#tooltip)                  | [examples](examples/feedback.md#tooltip)                  | `packages/core/src/types/tooltip.ts`                                                                 |
-| Tour                 | Feedback   | [props](shared/props/feedback.md#tour)                     | [examples](examples/feedback.md#tour)                     | `packages/core/src/types/tour.ts`                                                                    |
-| AutoComplete         | Form       | [props](shared/props/form.md#auto-complete)                | [examples](examples/form.md#auto-complete)                | `packages/core/src/types/auto-complete.ts`                                                           |
-| Cascader             | Form       | [props](shared/props/form.md#cascader)                     | [examples](examples/form.md#cascader)                     | `packages/core/src/types/cascader.ts`                                                                |
-| Checkbox             | Form       | [props](shared/props/form.md#checkbox)                     | [examples](examples/form.md#checkbox)                     | `packages/core/src/types/checkbox.ts`                                                                |
-| CheckboxGroup        | Form       | [props](shared/props/form.md#checkbox-group)               | [examples](examples/form.md#checkbox-group)               | `packages/core/src/types/checkbox.ts`                                                                |
-| ColorPicker          | Form       | [props](shared/props/form.md#color-picker)                 | [examples](examples/form.md#color-picker)                 | `packages/core/src/types/color-picker.ts`                                                            |
-| ColorSwatch          | Form       | [props](shared/props/form.md#color-swatch)                 | [examples](examples/form.md#color-swatch)                 | `packages/core/src/types/color-swatch.ts`                                                            |
-| CronEditor           | Form       | [props](shared/props/form.md#cron-editor)                  | [examples](examples/form.md#cron-editor)                  | `packages/core/src/types/cron-editor.ts`                                                             |
-| DatePicker           | Form       | [props](shared/props/form.md#date-picker)                  | [examples](examples/form.md#date-picker)                  | `packages/core/src/types/datepicker.ts`                                                              |
-| Form                 | Form       | [props](shared/props/form.md#form)                         | [examples](examples/form.md#form)                         | `packages/core/src/types/form.ts`                                                                    |
-| FormItem             | Form       | [props](shared/props/form.md#form-item)                    | [examples](examples/form.md#form-item)                    | `packages/core/src/types/form.ts`                                                                    |
-| Input                | Form       | [props](shared/props/form.md#input)                        | [examples](examples/form.md#input)                        | `packages/core/src/types/input.ts`                                                                   |
-| InputGroup           | Form       | [props](shared/props/form.md#input-group)                  | [examples](examples/form.md#input-group)                  | `packages/core/src/types/input-group.ts`                                                             |
-| InputGroupAddon      | Form       | [props](shared/props/form.md#input-group-addon)            | [examples](examples/form.md#input-group-addon)            | `packages/core/src/types/input-group.ts`                                                             |
-| InputNumber          | Form       | [props](shared/props/form.md#input-number)                 | [examples](examples/form.md#input-number)                 | `packages/core/src/types/input-number.ts`                                                            |
-| Mentions             | Form       | [props](shared/props/form.md#mentions)                     | [examples](examples/form.md#mentions)                     | `packages/core/src/types/mentions.ts`                                                                |
-| NumberKeyboard       | Form       | [props](shared/props/form.md#number-keyboard)              | [examples](examples/form.md#number-keyboard)              | `packages/core/src/types/number-keyboard.ts`                                                         |
-| Radio                | Form       | [props](shared/props/form.md#radio)                        | [examples](examples/form.md#radio)                        | `packages/core/src/types/radio.ts`                                                                   |
-| RadioGroup           | Form       | [props](shared/props/form.md#radio-group)                  | [examples](examples/form.md#radio-group)                  | `packages/core/src/types/radio.ts`                                                                   |
-| Select               | Form       | [props](shared/props/form.md#select)                       | [examples](examples/form.md#select)                       | `packages/core/src/types/select.ts`                                                                  |
-| Signature            | Form       | [props](shared/props/form.md#signature)                    | [examples](examples/form.md#signature)                    | `packages/core/src/types/signature.ts`                                                               |
-| Slider               | Form       | [props](shared/props/form.md#slider)                       | [examples](examples/form.md#slider)                       | `packages/core/src/types/slider.ts`                                                                  |
-| Stepper              | Form       | [props](shared/props/form.md#stepper)                      | [examples](examples/form.md#stepper)                      | `packages/core/src/types/stepper.ts`                                                                 |
-| Switch               | Form       | [props](shared/props/form.md#switch)                       | [examples](examples/form.md#switch)                       | `packages/core/src/types/switch.ts`                                                                  |
-| Textarea             | Form       | [props](shared/props/form.md#textarea)                     | [examples](examples/form.md#textarea)                     | `packages/core/src/types/textarea.ts`                                                                |
-| TimePicker           | Form       | [props](shared/props/form.md#time-picker)                  | [examples](examples/form.md#time-picker)                  | `packages/core/src/types/timepicker.ts`                                                              |
-| Transfer             | Form       | [props](shared/props/form.md#transfer)                     | [examples](examples/form.md#transfer)                     | `packages/core/src/types/transfer.ts`                                                                |
-| TreeSelect           | Form       | [props](shared/props/form.md#tree-select)                  | [examples](examples/form.md#tree-select)                  | `packages/core/src/types/tree-select.ts`                                                             |
-| Upload               | Form       | [props](shared/props/form.md#upload)                       | [examples](examples/form.md#upload)                       | `packages/core/src/types/upload.ts`                                                                  |
-| Card                 | Layout     | [props](shared/props/layout.md#card)                       | [examples](examples/layout.md#card)                       | `packages/core/src/types/card.ts`                                                                    |
-| Carousel             | Layout     | [props](shared/props/layout.md#carousel)                   | [examples](examples/layout.md#carousel)                   | `packages/core/src/types/carousel.ts`                                                                |
-| Col                  | Layout     | [props](shared/props/layout.md#col)                        | [examples](examples/layout.md#col)                        | `packages/core/src/types/grid.ts`                                                                    |
-| Container            | Layout     | [props](shared/props/layout.md#container)                  | [examples](examples/layout.md#container)                  | `packages/core/src/types/container.ts`                                                               |
-| Content              | Layout     | [props](shared/props/layout.md#content)                    | [examples](examples/layout.md#content)                    | `packages/core/src/types/layout.ts`                                                                  |
-| Descriptions         | Layout     | [props](shared/props/layout.md#descriptions)               | [examples](examples/layout.md#descriptions)               | `packages/core/src/types/descriptions.ts`                                                            |
-| Footer               | Layout     | [props](shared/props/layout.md#footer)                     | [examples](examples/layout.md#footer)                     | `packages/core/src/types/layout.ts`                                                                  |
-| Header               | Layout     | [props](shared/props/layout.md#header)                     | [examples](examples/layout.md#header)                     | `packages/core/src/types/layout.ts`                                                                  |
-| Layout               | Layout     | [props](shared/props/layout.md#layout)                     | [examples](examples/layout.md#layout)                     | `packages/core/src/types/layout.ts`                                                                  |
-| List                 | Layout     | [props](shared/props/layout.md#list)                       | [examples](examples/layout.md#list)                       | `packages/core/src/types/list.ts`                                                                    |
-| Resizable            | Layout     | [props](shared/props/layout.md#resizable)                  | [examples](examples/layout.md#resizable)                  | `packages/core/src/types/resizable.ts`                                                               |
-| Row                  | Layout     | [props](shared/props/layout.md#row)                        | [examples](examples/layout.md#row)                        | `packages/core/src/types/grid.ts`                                                                    |
-| Sidebar              | Layout     | [props](shared/props/layout.md#sidebar)                    | [examples](examples/layout.md#sidebar)                    | `packages/core/src/types/layout.ts`                                                                  |
-| Skeleton             | Layout     | [props](shared/props/layout.md#skeleton)                   | [examples](examples/layout.md#skeleton)                   | `packages/core/src/types/skeleton.ts`                                                                |
-| Space                | Layout     | [props](shared/props/layout.md#space)                      | [examples](examples/layout.md#space)                      | `packages/core/src/types/space.ts`                                                                   |
-| Splitter             | Layout     | [props](shared/props/layout.md#splitter)                   | [examples](examples/layout.md#splitter)                   | `packages/core/src/types/splitter.ts`                                                                |
-| Affix                | Navigation | [props](shared/props/navigation.md#affix)                  | [examples](examples/navigation.md#affix)                  | `packages/core/src/types/affix.ts`                                                                   |
-| Anchor               | Navigation | [props](shared/props/navigation.md#anchor)                 | [examples](examples/navigation.md#anchor)                 | `packages/core/src/types/anchor.ts`                                                                  |
-| AnchorLink           | Navigation | [props](shared/props/navigation.md#anchor-link)            | [examples](examples/navigation.md#anchor-link)            | `packages/core/src/types/anchor.ts`                                                                  |
-| BackTop              | Navigation | [props](shared/props/navigation.md#back-top)               | [examples](examples/navigation.md#back-top)               | `packages/core/src/types/back-top.ts`                                                                |
-| Breadcrumb           | Navigation | [props](shared/props/navigation.md#breadcrumb)             | [examples](examples/navigation.md#breadcrumb)             | `packages/core/src/types/breadcrumb.ts`                                                              |
-| BreadcrumbItem       | Navigation | [props](shared/props/navigation.md#breadcrumb-item)        | [examples](examples/navigation.md#breadcrumb-item)        | `packages/core/src/types/breadcrumb.ts`                                                              |
-| Dropdown             | Navigation | [props](shared/props/navigation.md#dropdown)               | [examples](examples/navigation.md#dropdown)               | `packages/core/src/types/dropdown.ts`                                                                |
-| DropdownItem         | Navigation | [props](shared/props/navigation.md#dropdown-item)          | [examples](examples/navigation.md#dropdown-item)          | `packages/core/src/types/dropdown.ts`                                                                |
-| DropdownMenu         | Navigation | [props](shared/props/navigation.md#dropdown-menu)          | [examples](examples/navigation.md#dropdown-menu)          | `packages/core/src/types/dropdown.ts`                                                                |
-| FloatButton          | Navigation | [props](shared/props/navigation.md#float-button)           | [examples](examples/navigation.md#float-button)           | `packages/core/src/types/float-button.ts`                                                            |
-| FloatButtonGroup     | Navigation | [props](shared/props/navigation.md#float-button-group)     | [examples](examples/navigation.md#float-button-group)     | `packages/core/src/types/float-button.ts`                                                            |
-| Menu                 | Navigation | [props](shared/props/navigation.md#menu)                   | [examples](examples/navigation.md#menu)                   | `packages/core/src/types/menu.ts`                                                                    |
-| MenuItem             | Navigation | [props](shared/props/navigation.md#menu-item)              | [examples](examples/navigation.md#menu-item)              | `packages/core/src/types/menu.ts`                                                                    |
-| MenuItemGroup        | Navigation | [props](shared/props/navigation.md#menu-item-group)        | [examples](examples/navigation.md#menu-item-group)        | `packages/core/src/types/menu.ts`                                                                    |
-| Pagination           | Navigation | [props](shared/props/navigation.md#pagination)             | [examples](examples/navigation.md#pagination)             | `packages/core/src/types/pagination.ts`                                                              |
-| ScrollSpy            | Navigation | [props](shared/props/navigation.md#scroll-spy)             | [examples](examples/navigation.md#scroll-spy)             | `packages/core/src/types/scroll-spy.ts`                                                              |
-| Spotlight            | Navigation | [props](shared/props/navigation.md#spotlight)              | [examples](examples/navigation.md#spotlight)              | `packages/core/src/types/spotlight.ts`                                                               |
-| Steps                | Navigation | [props](shared/props/navigation.md#steps)                  | [examples](examples/navigation.md#steps)                  | `packages/core/src/types/steps.ts`                                                                   |
-| SubMenu              | Navigation | [props](shared/props/navigation.md#sub-menu)               | [examples](examples/navigation.md#sub-menu)               | `packages/core/src/types/menu.ts`                                                                    |
-| TabPane              | Navigation | [props](shared/props/navigation.md#tab-pane)               | [examples](examples/navigation.md#tab-pane)               | `packages/core/src/types/tabs.ts`                                                                    |
-| Tabs                 | Navigation | [props](shared/props/navigation.md#tabs)                   | [examples](examples/navigation.md#tabs)                   | `packages/core/src/types/tabs.ts`                                                                    |
-| Tree                 | Navigation | [props](shared/props/navigation.md#tree)                   | [examples](examples/navigation.md#tree)                   | `packages/core/src/types/tree.ts`                                                                    |
+- Props：在 `shared/props/{cat}.md` 内找 `## {Component}` 段。
+- Examples：在 `examples/{cat}.md` 内找 `## {Component}` 段或同名片段。
+- 类型源码：`packages/core/src/types/` + Type 列；个别跨包组件（如 ConfigProvider）以各框架包内同名文件为准，详见其 props 段。
+
+| Component            | Category   | Type                                  |
+| -------------------- | ---------- | ------------------------------------- |
+| CodeEditor           | Advanced   | code-editor.ts                        |
+| Drag                 | Advanced   | drag.ts                               |
+| FileManager          | Advanced   | file-manager.ts                       |
+| ImageAnnotation      | Advanced   | image-annotation.ts                   |
+| ImageViewer          | Advanced   | image-viewer.ts                       |
+| InfiniteScroll       | Advanced   | infinite-scroll.ts                    |
+| Kanban               | Advanced   | kanban.ts                             |
+| MarkdownEditor       | Advanced   | markdown-editor.ts                    |
+| PrintLayout          | Advanced   | print-layout.ts                       |
+| RichTextEditor       | Advanced   | rich-text-editor.ts                   |
+| VirtualList          | Advanced   | virtual-list.ts                       |
+| VirtualTable         | Advanced   | virtual-table.ts                      |
+| Alert                | Basic      | alert.ts                              |
+| Avatar               | Basic      | avatar.ts                             |
+| AvatarGroup          | Basic      | avatar.ts                             |
+| Badge                | Basic      | badge.ts                              |
+| Button               | Basic      | button.ts                             |
+| ButtonGroup          | Basic      | button.ts                             |
+| Code                 | Basic      | code.ts                               |
+| ConfigProvider       | Basic      | ConfigProvider.tsx, ConfigProvider.ts |
+| CropUpload           | Basic      | image.ts                              |
+| Divider              | Basic      | divider.ts                            |
+| Empty                | Basic      | empty.ts                              |
+| Icon                 | Basic      | icon.ts                               |
+| Image                | Basic      | image.ts                              |
+| ImageCropper         | Basic      | image.ts                              |
+| ImageGroup           | Basic      | image.ts                              |
+| ImagePreview         | Basic      | image.ts                              |
+| Link                 | Basic      | link.ts                               |
+| QRCode               | Basic      | qrcode.ts                             |
+| Rate                 | Basic      | rate.ts                               |
+| Result               | Basic      | result.ts                             |
+| Segmented            | Basic      | segmented.ts                          |
+| Statistic            | Basic      | statistic.ts                          |
+| Tag                  | Basic      | tag.ts                                |
+| Text                 | Basic      | text.ts                               |
+| Watermark            | Basic      | watermark.ts                          |
+| AreaChart            | Charts     | chart.ts                              |
+| BarChart             | Charts     | chart.ts                              |
+| ChartAxis            | Charts     | chart.ts                              |
+| ChartCanvas          | Charts     | chart.ts                              |
+| ChartGrid            | Charts     | chart.ts                              |
+| ChartLegend          | Charts     | chart.ts                              |
+| ChartSeries          | Charts     | chart.ts                              |
+| ChartTooltip         | Charts     | chart.ts                              |
+| DonutChart           | Charts     | chart.ts                              |
+| FunnelChart          | Charts     | chart.ts                              |
+| Gantt                | Charts     | gantt.ts                              |
+| GaugeChart           | Charts     | chart.ts                              |
+| HeatmapChart         | Charts     | chart.ts                              |
+| LineChart            | Charts     | chart.ts                              |
+| OrgChart             | Charts     | org-chart.ts                          |
+| PieChart             | Charts     | chart.ts                              |
+| RadarChart           | Charts     | chart.ts                              |
+| ScatterChart         | Charts     | chart.ts                              |
+| SunburstChart        | Charts     | chart.ts                              |
+| TreeMapChart         | Charts     | chart.ts                              |
+| ActivityFeed         | Composite  | composite.ts                          |
+| ChatWindow           | Composite  | composite.ts                          |
+| CommentThread        | Composite  | composite.ts                          |
+| DataTableWithToolbar | Composite  | composite.ts                          |
+| FormWizard           | Composite  | composite.ts                          |
+| NotificationCenter   | Composite  | composite.ts                          |
+| TableToolbar         | Composite  | composite.ts                          |
+| TaskBoard            | Composite  | composite.ts                          |
+| Calendar             | Data       | calendar.ts                           |
+| Collapse             | Data       | collapse.ts                           |
+| CollapsePanel        | Data       | collapse.ts                           |
+| Countdown            | Data       | countdown.ts                          |
+| Table                | Data       | table.ts                              |
+| Timeline             | Data       | timeline.ts                           |
+| Drawer               | Feedback   | drawer.ts                             |
+| Loading              | Feedback   | loading.ts                            |
+| Message              | Feedback   | message.ts                            |
+| Modal                | Feedback   | modal.ts                              |
+| Notification         | Feedback   | notification.ts                       |
+| Popconfirm           | Feedback   | popconfirm.ts                         |
+| Popover              | Feedback   | popover.ts                            |
+| Progress             | Feedback   | progress.ts                           |
+| Tooltip              | Feedback   | tooltip.ts                            |
+| Tour                 | Feedback   | tour.ts                               |
+| AutoComplete         | Form       | auto-complete.ts                      |
+| Cascader             | Form       | cascader.ts                           |
+| Checkbox             | Form       | checkbox.ts                           |
+| CheckboxGroup        | Form       | checkbox.ts                           |
+| ColorPicker          | Form       | color-picker.ts                       |
+| ColorSwatch          | Form       | color-swatch.ts                       |
+| CronEditor           | Form       | cron-editor.ts                        |
+| DatePicker           | Form       | datepicker.ts                         |
+| Form                 | Form       | form.ts                               |
+| FormItem             | Form       | form.ts                               |
+| Input                | Form       | input.ts                              |
+| InputGroup           | Form       | input-group.ts                        |
+| InputGroupAddon      | Form       | input-group.ts                        |
+| InputNumber          | Form       | input-number.ts                       |
+| Mentions             | Form       | mentions.ts                           |
+| NumberKeyboard       | Form       | number-keyboard.ts                    |
+| Radio                | Form       | radio.ts                              |
+| RadioGroup           | Form       | radio.ts                              |
+| Select               | Form       | select.ts                             |
+| Signature            | Form       | signature.ts                          |
+| Slider               | Form       | slider.ts                             |
+| Stepper              | Form       | stepper.ts                            |
+| Switch               | Form       | switch.ts                             |
+| Textarea             | Form       | textarea.ts                           |
+| TimePicker           | Form       | timepicker.ts                         |
+| Transfer             | Form       | transfer.ts                           |
+| TreeSelect           | Form       | tree-select.ts                        |
+| Upload               | Form       | upload.ts                             |
+| Card                 | Layout     | card.ts                               |
+| Carousel             | Layout     | carousel.ts                           |
+| Col                  | Layout     | grid.ts                               |
+| Container            | Layout     | container.ts                          |
+| Content              | Layout     | layout.ts                             |
+| Descriptions         | Layout     | descriptions.ts                       |
+| Footer               | Layout     | layout.ts                             |
+| Header               | Layout     | layout.ts                             |
+| Layout               | Layout     | layout.ts                             |
+| List                 | Layout     | list.ts                               |
+| Resizable            | Layout     | resizable.ts                          |
+| Row                  | Layout     | grid.ts                               |
+| Sidebar              | Layout     | layout.ts                             |
+| Skeleton             | Layout     | skeleton.ts                           |
+| Space                | Layout     | space.ts                              |
+| Splitter             | Layout     | splitter.ts                           |
+| Affix                | Navigation | affix.ts                              |
+| Anchor               | Navigation | anchor.ts                             |
+| AnchorLink           | Navigation | anchor.ts                             |
+| BackTop              | Navigation | back-top.ts                           |
+| Breadcrumb           | Navigation | breadcrumb.ts                         |
+| BreadcrumbItem       | Navigation | breadcrumb.ts                         |
+| Dropdown             | Navigation | dropdown.ts                           |
+| DropdownItem         | Navigation | dropdown.ts                           |
+| DropdownMenu         | Navigation | dropdown.ts                           |
+| FloatButton          | Navigation | float-button.ts                       |
+| FloatButtonGroup     | Navigation | float-button.ts                       |
+| Menu                 | Navigation | menu.ts                               |
+| MenuItem             | Navigation | menu.ts                               |
+| MenuItemGroup        | Navigation | menu.ts                               |
+| Pagination           | Navigation | pagination.ts                         |
+| ScrollSpy            | Navigation | scroll-spy.ts                         |
+| Spotlight            | Navigation | spotlight.ts                          |
+| Steps                | Navigation | steps.ts                              |
+| SubMenu              | Navigation | menu.ts                               |
+| TabPane              | Navigation | tabs.ts                               |
+| Tabs                 | Navigation | tabs.ts                               |
+| Tree                 | Navigation | tree.ts                               |

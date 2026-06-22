@@ -11,9 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartLegend
 
-Source: `packages/core/src/types/chart.ts` · Interface: `ChartLegendProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`chart.ts` · `ChartLegendProps` · 3/4 props
 
 | Prop                | Type                  | Default    | Notes                    |
 | ------------------- | --------------------- | ---------- | ------------------------ |
@@ -23,7 +21,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## ChartTooltip
 
-Source: `packages/core/src/types/chart.ts` · Interface: `ChartTooltipProps`.
+`chart.ts` · `ChartTooltipProps`
 
 | Prop           | Type      | Default | Notes                   |
 | -------------- | --------- | ------- | ----------------------- |
@@ -31,9 +29,7 @@ Source: `packages/core/src/types/chart.ts` · Interface: `ChartTooltipProps`.
 
 ## ChartCanvas
 
-Source: `packages/core/src/types/chart.ts` · Interface: `ChartCanvasProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`chart.ts` · `ChartCanvasProps` · 3/7 props
 
 | Prop          | Type      | Default | Notes                                                       |
 | ------------- | --------- | ------- | ----------------------------------------------------------- |
@@ -43,9 +39,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## ChartAxis
 
-Source: `packages/core/src/types/chart.ts` · Interface: `ChartAxisProps`.
-
-Showing 3 key props of 12; see source for the complete interface.
+`chart.ts` · `ChartAxisProps` · 3/12 props
 
 | Prop           | Type                   | Default    | Notes                                   |
 | -------------- | ---------------------- | ---------- | --------------------------------------- |
@@ -55,9 +49,7 @@ Showing 3 key props of 12; see source for the complete interface.
 
 ## ChartGrid
 
-Source: `packages/core/src/types/chart.ts` · Interface: `ChartGridProps`.
-
-Showing 3 key props of 12; see source for the complete interface.
+`chart.ts` · `ChartGridProps` · 3/12 props
 
 | Prop      | Type            | Default  | Notes           |
 | --------- | --------------- | -------- | --------------- |
@@ -67,9 +59,7 @@ Showing 3 key props of 12; see source for the complete interface.
 
 ## ChartSeries
 
-Source: `packages/core/src/types/chart.ts` · Interface: `ChartSeriesProps`.
-
-Showing 3 key props of 6; see source for the complete interface.
+`chart.ts` · `ChartSeriesProps` · 3/6 props
 
 | Prop     | Type     | Default | Notes        |
 | -------- | -------- | ------- | ------------ |
@@ -79,9 +69,7 @@ Showing 3 key props of 6; see source for the complete interface.
 
 ## BarChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `BarChartProps`.
-
-Showing 3 key props of 31; see source for the complete interface.
+`chart.ts` · `BarChartProps` · 3/31 props
 
 | Prop      | Type              | Default | Notes          |
 | --------- | ----------------- | ------- | -------------- |
@@ -91,9 +79,7 @@ Showing 3 key props of 31; see source for the complete interface.
 
 ## ScatterChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `ScatterChartProps`.
-
-Showing 3 key props of 13; see source for the complete interface.
+`chart.ts` · `ScatterChartProps` · 3/13 props
 
 | Prop          | Type                  | Default | Notes               |
 | ------------- | --------------------- | ------- | ------------------- |
@@ -103,9 +89,7 @@ Showing 3 key props of 13; see source for the complete interface.
 
 ## PieChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `PieChartProps`.
-
-Showing 3 key props of 17; see source for the complete interface.
+`chart.ts` · `PieChartProps` · 3/17 props
 
 | Prop           | Type              | Default | Notes                  |
 | -------------- | ----------------- | ------- | ---------------------- |
@@ -115,9 +99,7 @@ Showing 3 key props of 17; see source for the complete interface.
 
 ## DonutChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `DonutChartProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`chart.ts` · `DonutChartProps` · 3/4 props
 
 | Prop                | Type               | Default | Notes                                                         |
 | ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
@@ -127,9 +109,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## LineChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `LineChartProps`.
-
-Showing 3 key props of 34; see source for the complete interface.
+`chart.ts` · `LineChartProps` · 3/34 props
 
 | Prop      | Type                | Default | Notes                      |
 | --------- | ------------------- | ------- | -------------------------- |
@@ -139,9 +119,7 @@ Showing 3 key props of 34; see source for the complete interface.
 
 ## AreaChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `AreaChartProps`.
-
-Showing 3 key props of 35; see source for the complete interface.
+`chart.ts` · `AreaChartProps` · 3/35 props
 
 | Prop      | Type                | Default | Notes                      |
 | --------- | ------------------- | ------- | -------------------------- |
@@ -151,9 +129,7 @@ Showing 3 key props of 35; see source for the complete interface.
 
 ## RadarChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `RadarChartProps`.
-
-Showing 3 key props of 41; see source for the complete interface.
+`chart.ts` · `RadarChartProps` · 3/41 props
 
 | Prop        | Type                 | Default | Notes                        |
 | ----------- | -------------------- | ------- | ---------------------------- |
@@ -163,9 +139,7 @@ Showing 3 key props of 41; see source for the complete interface.
 
 ## FunnelChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `FunnelChartProps`.
-
-Showing 3 key props of 6; see source for the complete interface.
+`chart.ts` · `FunnelChartProps` · 3/6 props
 
 | Prop         | Type                         | Default      | Notes                                         |
 | ------------ | ---------------------------- | ------------ | --------------------------------------------- |
@@ -175,9 +149,7 @@ Showing 3 key props of 6; see source for the complete interface.
 
 ## GaugeChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `GaugeChartProps`.
-
-Showing 3 key props of 15; see source for the complete interface.
+`chart.ts` · `GaugeChartProps` · 3/15 props
 
 | Prop    | Type     | Default | Notes                      |
 | ------- | -------- | ------- | -------------------------- |
@@ -187,9 +159,7 @@ Showing 3 key props of 15; see source for the complete interface.
 
 ## HeatmapChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `HeatmapChartProps`.
-
-Showing 3 key props of 13; see source for the complete interface.
+`chart.ts` · `HeatmapChartProps` · 3/13 props
 
 | Prop      | Type                  | Default | Notes         |
 | --------- | --------------------- | ------- | ------------- |
@@ -199,9 +169,7 @@ Showing 3 key props of 13; see source for the complete interface.
 
 ## TreeMapChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `TreeMapChartProps`.
-
-Showing 3 key props of 6; see source for the complete interface.
+`chart.ts` · `TreeMapChartProps` · 3/6 props
 
 | Prop          | Type                  | Default | Notes                               |
 | ------------- | --------------------- | ------- | ----------------------------------- |
@@ -211,9 +179,7 @@ Showing 3 key props of 6; see source for the complete interface.
 
 ## SunburstChart
 
-Source: `packages/core/src/types/chart.ts` · Interface: `SunburstChartProps`.
-
-Showing 3 key props of 5; see source for the complete interface.
+`chart.ts` · `SunburstChartProps` · 3/5 props
 
 | Prop                | Type                   | Default | Notes                                              |
 | ------------------- | ---------------------- | ------- | -------------------------------------------------- |
@@ -223,9 +189,7 @@ Showing 3 key props of 5; see source for the complete interface.
 
 ## Gantt
 
-Source: `packages/core/src/types/gantt.ts` · Interface: `GanttProps`.
-
-Showing 3 key props of 16; see source for the complete interface.
+`gantt.ts` · `GanttProps` · 3/16 props
 
 | Prop         | Type          | Default | Notes |
 | ------------ | ------------- | ------- | ----- |
@@ -235,9 +199,7 @@ Showing 3 key props of 16; see source for the complete interface.
 
 ## OrgChart
 
-Source: `packages/core/src/types/org-chart.ts` · Interface: `OrgChartProps`.
-
-Showing 3 key props of 11; see source for the complete interface.
+`org-chart.ts` · `OrgChartProps` · 3/11 props
 
 | Prop          | Type                             | Default | Notes |
 | ------------- | -------------------------------- | ------- | ----- |

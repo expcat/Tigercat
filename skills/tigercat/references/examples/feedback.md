@@ -15,17 +15,6 @@ description: Compact Tigercat Feedback Vue and React usage routes
 | --------- | ---- | ---------------------------------------------------------------------------- |
 | Drawer    | -    | `bodyPadding`（`boolean \| string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。 |
 
-| Component    | Vue                | React              |
-| ------------ | ------------------ | ------------------ |
-| Drawer       | `<Drawer />`       | `<Drawer />`       |
-| Loading      | `<Loading />`      | `<Loading />`      |
-| Message      | `<Message />`      | `<Message />`      |
-| Modal        | `<Modal />`        | `<Modal />`        |
-| Notification | `<Notification />` | `<Notification />` |
-| Popconfirm   | `<Popconfirm />`   | `<Popconfirm />`   |
-| Popover      | `<Popover />`      | `<Popover />`      |
-| Progress     | `<Progress />`     | `<Progress />`     |
-| Tooltip      | `<Tooltip />`      | `<Tooltip />`      |
-| Tour         | `<Tour />`         | `<Tour />`         |
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Tooltip, Tour.
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.

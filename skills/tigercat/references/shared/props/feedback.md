@@ -11,11 +11,9 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Drawer
 
-Source: `packages/core/src/types/drawer.ts` · Interface: `DrawerProps`.
+`drawer.ts` · `DrawerProps` · 3/19 props
 
 Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。
-
-Showing 3 key props of 19; see source for the complete interface.
 
 | Prop         | Type              | Default   | Notes                      |
 | ------------ | ----------------- | --------- | -------------------------- |
@@ -25,9 +23,7 @@ Showing 3 key props of 19; see source for the complete interface.
 
 ## Loading
 
-Source: `packages/core/src/types/loading.ts` · Interface: `LoadingProps`.
-
-Showing 3 key props of 10; see source for the complete interface.
+`loading.ts` · `LoadingProps` · 3/10 props
 
 | Prop       | Type             | Default     | Notes                                                |
 | ---------- | ---------------- | ----------- | ---------------------------------------------------- |
@@ -37,9 +33,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## Message
 
-Source: `packages/core/src/types/message.ts` · Interface: `MessageProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`message.ts` · `MessageProps` · 3/7 props
 
 | Prop        | Type          | Default  | Notes                                                              |
 | ----------- | ------------- | -------- | ------------------------------------------------------------------ |
@@ -51,9 +45,7 @@ Events/callback props: `onClose?`.
 
 ## Modal
 
-Source: `packages/core/src/types/modal.ts` · Interface: `ModalProps`.
-
-Showing 3 key props of 15; see source for the complete interface.
+`modal.ts` · `ModalProps` · 3/15 props
 
 | Prop     | Type               | Default | Notes                                                                   |
 | -------- | ------------------ | ------- | ----------------------------------------------------------------------- |
@@ -63,9 +55,7 @@ Showing 3 key props of 15; see source for the complete interface.
 
 ## Notification
 
-Source: `packages/core/src/types/notification.ts` · Interface: `NotificationProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`notification.ts` · `NotificationProps` · 3/8 props
 
 | Prop           | Type               | Default  | Notes                            |
 | -------------- | ------------------ | -------- | -------------------------------- |
@@ -77,9 +67,7 @@ Events/callback props: `onClose?`, `onClick?`.
 
 ## Popconfirm
 
-Source: `packages/core/src/types/popconfirm.ts` · Interface: `PopconfirmProps`.
-
-Showing 3 key props of 13; see source for the complete interface.
+`popconfirm.ts` · `PopconfirmProps` · 3/13 props
 
 | Prop           | Type      | Default | Notes                                            |
 | -------------- | --------- | ------- | ------------------------------------------------ |
@@ -89,9 +77,7 @@ Showing 3 key props of 13; see source for the complete interface.
 
 ## Popover
 
-Source: `packages/core/src/types/popover.ts` · Interface: `PopoverProps`.
-
-Showing 3 key props of 11; see source for the complete interface.
+`popover.ts` · `PopoverProps` · 3/11 props
 
 | Prop           | Type      | Default | Notes                                         |
 | -------------- | --------- | ------- | --------------------------------------------- |
@@ -101,9 +87,7 @@ Showing 3 key props of 11; see source for the complete interface.
 
 ## Progress
 
-Source: `packages/core/src/types/progress.ts` · Interface: `ProgressProps`.
-
-Showing 3 key props of 14; see source for the complete interface.
+`progress.ts` · `ProgressProps` · 3/14 props
 
 | Prop       | Type              | Default     | Notes                  |
 | ---------- | ----------------- | ----------- | ---------------------- |
@@ -113,9 +97,7 @@ Showing 3 key props of 14; see source for the complete interface.
 
 ## Tooltip
 
-Source: `packages/core/src/types/tooltip.ts` · Interface: `TooltipProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`tooltip.ts` · `TooltipProps` · 3/8 props
 
 | Prop           | Type      | Default | Notes                                         |
 | -------------- | --------- | ------- | --------------------------------------------- |
@@ -125,9 +107,7 @@ Showing 3 key props of 8; see source for the complete interface.
 
 ## Tour
 
-Source: `packages/core/src/types/tour.ts` · Interface: `TourProps`.
-
-Showing 3 key props of 11; see source for the complete interface.
+`tour.ts` · `TourProps` · 3/11 props
 
 | Prop         | Type             | Default | Notes                                               |
 | ------------ | ---------------- | ------- | --------------------------------------------------- |

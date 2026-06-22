@@ -11,9 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Affix
 
-Source: `packages/core/src/types/affix.ts` · Interface: `AffixProps`.
-
-Showing 3 key props of 5; see source for the complete interface.
+`affix.ts` · `AffixProps` · 3/5 props
 
 | Prop            | Type     | Default | Notes                                                                                      |
 | --------------- | -------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -23,9 +21,7 @@ Showing 3 key props of 5; see source for the complete interface.
 
 ## Anchor
 
-Source: `packages/core/src/types/anchor.ts` · Interface: `AnchorProps`.
-
-Showing 3 key props of 10; see source for the complete interface.
+`anchor.ts` · `AnchorProps` · 3/10 props
 
 | Prop         | Type      | Default | Notes                                     |
 | ------------ | --------- | ------- | ----------------------------------------- |
@@ -35,9 +31,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## AnchorLink
 
-Source: `packages/core/src/types/anchor.ts` · Interface: `AnchorLinkProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`anchor.ts` · `AnchorLinkProps` · 3/4 props
 
 | Prop      | Type     | Default | Notes                     |
 | --------- | -------- | ------- | ------------------------- |
@@ -47,7 +41,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## BackTop
 
-Source: `packages/core/src/types/back-top.ts` · Interface: `BackTopProps`.
+`back-top.ts` · `BackTopProps`
 
 | Prop                | Type     | Default | Notes                                                                           |
 | ------------------- | -------- | ------- | ------------------------------------------------------------------------------- |
@@ -56,9 +50,7 @@ Source: `packages/core/src/types/back-top.ts` · Interface: `BackTopProps`.
 
 ## Breadcrumb
 
-Source: `packages/core/src/types/breadcrumb.ts` · Interface: `BreadcrumbProps`.
-
-Showing 3 key props of 5; see source for the complete interface.
+`breadcrumb.ts` · `BreadcrumbProps` · 3/5 props
 
 | Prop         | Type                  | Default | Notes                                                                                      |
 | ------------ | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -68,9 +60,7 @@ Showing 3 key props of 5; see source for the complete interface.
 
 ## BreadcrumbItem
 
-Source: `packages/core/src/types/breadcrumb.ts` · Interface: `BreadcrumbItemProps`.
-
-Showing 3 key props of 6; see source for the complete interface.
+`breadcrumb.ts` · `BreadcrumbItemProps` · 3/6 props
 
 | Prop       | Type                                         | Default | Notes                                 |
 | ---------- | -------------------------------------------- | ------- | ------------------------------------- |
@@ -80,13 +70,11 @@ Showing 3 key props of 6; see source for the complete interface.
 
 ## Dropdown
 
-Source: `packages/core/src/types/dropdown.ts` · Interface: `DropdownProps`.
+`dropdown.ts` · `DropdownProps` · 3/9 props
 
 Uses: `DropdownMenu`, `DropdownItem`.
 
 Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。触发器（trigger）上会暴露稳定的 `data-state="open" | "closed"` 属性（与 `aria-expanded` 同步），可用于自定义样式联动或无障碍钩子（此约定对所有浮层触发器统一适用，详见 patterns/common 的“浮层触发器状态属性”）。需要在渲染自定义触发器时拿到开启状态，可用 Vue `#trigger="{ open }"` 作用域插槽 / React `renderTrigger={({ open }) => …}` prop。
-
-Showing 3 key props of 9; see source for the complete interface.
 
 | Prop        | Type              | Default   | Notes                                          |
 | ----------- | ----------------- | --------- | ---------------------------------------------- |
@@ -96,7 +84,7 @@ Showing 3 key props of 9; see source for the complete interface.
 
 ## DropdownMenu
 
-Source: `packages/core/src/types/dropdown.ts` · Interface: `DropdownMenuProps`.
+`dropdown.ts` · `DropdownMenuProps`
 
 | Prop         | Type                      | Default | Notes                  |
 | ------------ | ------------------------- | ------- | ---------------------- |
@@ -105,9 +93,7 @@ Source: `packages/core/src/types/dropdown.ts` · Interface: `DropdownMenuProps`.
 
 ## DropdownItem
 
-Source: `packages/core/src/types/dropdown.ts` · Interface: `DropdownItemProps`.
-
-Showing 3 key props of 5; see source for the complete interface.
+`dropdown.ts` · `DropdownItemProps` · 3/5 props
 
 | Prop        | Type               | Default | Notes                                          |
 | ----------- | ------------------ | ------- | ---------------------------------------------- |
@@ -117,9 +103,7 @@ Showing 3 key props of 5; see source for the complete interface.
 
 ## FloatButton
 
-Source: `packages/core/src/types/float-button.ts` · Interface: `FloatButtonProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`float-button.ts` · `FloatButtonProps` · 3/7 props
 
 | Prop       | Type               | Default    | Notes                       |
 | ---------- | ------------------ | ---------- | --------------------------- |
@@ -129,9 +113,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## FloatButtonGroup
 
-Source: `packages/core/src/types/float-button.ts` · Interface: `FloatButtonGroupProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`float-button.ts` · `FloatButtonGroupProps` · 3/4 props
 
 | Prop       | Type                 | Default    | Notes                                  |
 | ---------- | -------------------- | ---------- | -------------------------------------- |
@@ -141,9 +123,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## Menu
 
-Source: `packages/core/src/types/menu.ts` · Interface: `MenuProps`.
-
-Showing 3 key props of 18; see source for the complete interface.
+`menu.ts` · `MenuProps` · 3/18 props
 
 | Prop     | Type         | Default      | Notes                                                                 |
 | -------- | ------------ | ------------ | --------------------------------------------------------------------- |
@@ -163,9 +143,7 @@ Showing 3 key props of 18; see source for the complete interface.
 
 ## MenuItem
 
-Source: `packages/core/src/types/menu.ts` · Interface: `MenuItemProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`menu.ts` · `MenuItemProps` · 3/4 props
 
 | Prop        | Type      | Default | Notes                             |
 | ----------- | --------- | ------- | --------------------------------- |
@@ -175,9 +153,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## SubMenu
 
-Source: `packages/core/src/types/menu.ts` · Interface: `SubMenuProps`.
-
-Showing 3 key props of 5; see source for the complete interface.
+`menu.ts` · `SubMenuProps` · 3/5 props
 
 | Prop      | Type      | Default | Notes                      |
 | --------- | --------- | ------- | -------------------------- |
@@ -187,7 +163,7 @@ Showing 3 key props of 5; see source for the complete interface.
 
 ## MenuItemGroup
 
-Source: `packages/core/src/types/menu.ts` · Interface: `MenuItemGroupProps`.
+`menu.ts` · `MenuItemGroupProps`
 
 | Prop         | Type     | Default | Notes                  |
 | ------------ | -------- | ------- | ---------------------- |
@@ -196,9 +172,7 @@ Source: `packages/core/src/types/menu.ts` · Interface: `MenuItemGroupProps`.
 
 ## Pagination
 
-Source: `packages/core/src/types/pagination.ts` · Interface: `PaginationProps`.
-
-Showing 3 key props of 21; see source for the complete interface.
+`pagination.ts` · `PaginationProps` · 3/21 props
 
 | Prop              | Type     | Default | Notes                                        |
 | ----------------- | -------- | ------- | -------------------------------------------- |
@@ -208,9 +182,7 @@ Showing 3 key props of 21; see source for the complete interface.
 
 ## ScrollSpy
 
-Source: `packages/core/src/types/scroll-spy.ts` · Interface: `ScrollSpyProps`.
-
-Showing 3 key props of 11; see source for the complete interface.
+`scroll-spy.ts` · `ScrollSpyProps` · 3/11 props
 
 | Prop                | Type              | Default | Notes |
 | ------------------- | ----------------- | ------- | ----- |
@@ -220,9 +192,7 @@ Showing 3 key props of 11; see source for the complete interface.
 
 ## Spotlight
 
-Source: `packages/core/src/types/spotlight.ts` · Interface: `SpotlightProps`.
-
-Showing 3 key props of 19; see source for the complete interface.
+`spotlight.ts` · `SpotlightProps` · 3/19 props
 
 | Prop           | Type      | Default | Notes |
 | -------------- | --------- | ------- | ----- |
@@ -232,9 +202,7 @@ Showing 3 key props of 19; see source for the complete interface.
 
 ## Steps
 
-Source: `packages/core/src/types/steps.ts` · Interface: `StepsProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`steps.ts` · `StepsProps` · 3/8 props
 
 | Prop         | Type             | Default        | Notes                          |
 | ------------ | ---------------- | -------------- | ------------------------------ |
@@ -244,9 +212,7 @@ Showing 3 key props of 8; see source for the complete interface.
 
 ## Tabs
 
-Source: `packages/core/src/types/tabs.ts` · Interface: `TabsProps`.
-
-Showing 3 key props of 12; see source for the complete interface.
+`tabs.ts` · `TabsProps` · 3/12 props
 
 | Prop                | Type               | Default  | Notes                                          |
 | ------------------- | ------------------ | -------- | ---------------------------------------------- |
@@ -256,9 +222,7 @@ Showing 3 key props of 12; see source for the complete interface.
 
 ## TabPane
 
-Source: `packages/core/src/types/tabs.ts` · Interface: `TabPaneProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`tabs.ts` · `TabPaneProps` · 3/7 props
 
 | Prop        | Type               | Default | Notes                                  |
 | ----------- | ------------------ | ------- | -------------------------------------- |
@@ -268,9 +232,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## Tree
 
-Source: `packages/core/src/types/tree.ts` · Interface: `TreeProps`.
-
-Showing 3 key props of 28; see source for the complete interface.
+`tree.ts` · `TreeProps` · 3/28 props
 
 | Prop             | Type                | Default  | Notes                      |
 | ---------------- | ------------------- | -------- | -------------------------- |

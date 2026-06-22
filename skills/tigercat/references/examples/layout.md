@@ -15,23 +15,6 @@ description: Compact Tigercat Layout Vue and React usage routes
 | --------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Card      | -    | `padding`（`boolean \| string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。 |
 
-| Component    | Vue                | React              |
-| ------------ | ------------------ | ------------------ |
-| Card         | `<Card />`         | `<Card />`         |
-| Carousel     | `<Carousel />`     | `<Carousel />`     |
-| Container    | `<Container />`    | `<Container />`    |
-| Descriptions | `<Descriptions />` | `<Descriptions />` |
-| Row          | `<Row />`          | `<Row />`          |
-| Col          | `<Col />`          | `<Col />`          |
-| Layout       | `<Layout />`       | `<Layout />`       |
-| Header       | `<Header />`       | `<Header />`       |
-| Sidebar      | `<Sidebar />`      | `<Sidebar />`      |
-| Content      | `<Content />`      | `<Content />`      |
-| Footer       | `<Footer />`       | `<Footer />`       |
-| List         | `<List />`         | `<List />`         |
-| Resizable    | `<Resizable />`    | `<Resizable />`    |
-| Skeleton     | `<Skeleton />`     | `<Skeleton />`     |
-| Space        | `<Space />`        | `<Space />`        |
-| Splitter     | `<Splitter />`     | `<Splitter />`     |
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Card, Carousel, Container, Descriptions, Row, Col, Layout, Header, Sidebar, Content, Footer, List, Resizable, Skeleton, Space, Splitter.
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.

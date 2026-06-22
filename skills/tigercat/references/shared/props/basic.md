@@ -11,9 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Alert
 
-Source: `packages/core/src/types/alert.ts` · Interface: `AlertProps`.
-
-Showing 3 key props of 11; see source for the complete interface.
+`alert.ts` · `AlertProps` · 3/11 props
 
 | Prop     | Type        | Default  | Notes                                      |
 | -------- | ----------- | -------- | ------------------------------------------ |
@@ -23,9 +21,7 @@ Showing 3 key props of 11; see source for the complete interface.
 
 ## Avatar
 
-Source: `packages/core/src/types/avatar.ts` · Interface: `AvatarProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`avatar.ts` · `AvatarProps` · 3/8 props
 
 | Prop     | Type          | Default    | Notes            |
 | -------- | ------------- | ---------- | ---------------- |
@@ -35,7 +31,7 @@ Showing 3 key props of 8; see source for the complete interface.
 
 ## AvatarGroup
 
-Source: `packages/core/src/types/avatar.ts` · Interface: `AvatarGroupProps`.
+`avatar.ts` · `AvatarGroupProps`
 
 | Prop         | Type         | Default | Notes                                                                                 |
 | ------------ | ------------ | ------- | ------------------------------------------------------------------------------------- |
@@ -45,9 +41,7 @@ Source: `packages/core/src/types/avatar.ts` · Interface: `AvatarGroupProps`.
 
 ## Badge
 
-Source: `packages/core/src/types/badge.ts` · Interface: `BadgeProps`.
-
-Showing 3 key props of 9; see source for the complete interface.
+`badge.ts` · `BadgeProps` · 3/9 props
 
 | Prop       | Type           | Default    | Notes               |
 | ---------- | -------------- | ---------- | ------------------- |
@@ -57,9 +51,7 @@ Showing 3 key props of 9; see source for the complete interface.
 
 ## Button
 
-Source: `packages/core/src/types/button.ts` · Interface: `ButtonProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`button.ts` · `ButtonProps` · 3/8 props
 
 | Prop        | Type            | Default     | Notes                          |
 | ----------- | --------------- | ----------- | ------------------------------ |
@@ -69,7 +61,7 @@ Showing 3 key props of 8; see source for the complete interface.
 
 ## ButtonGroup
 
-Source: `packages/core/src/types/button.ts` · Interface: `ButtonGroupProps`.
+`button.ts` · `ButtonGroupProps`
 
 | Prop        | Type         | Default | Notes                                    |
 | ----------- | ------------ | ------- | ---------------------------------------- |
@@ -78,9 +70,7 @@ Source: `packages/core/src/types/button.ts` · Interface: `ButtonGroupProps`.
 
 ## Code
 
-Source: `packages/core/src/types/code.ts` · Interface: `CodeProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`code.ts` · `CodeProps` · 3/4 props
 
 | Prop         | Type      | Default | Notes |
 | ------------ | --------- | ------- | ----- |
@@ -90,9 +80,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## Divider
 
-Source: `packages/core/src/types/divider.ts` · Interface: `DividerProps`.
-
-Showing 3 key props of 5; see source for the complete interface.
+`divider.ts` · `DividerProps` · 3/5 props
 
 | Prop           | Type                 | Default        | Notes                               |
 | -------------- | -------------------- | -------------- | ----------------------------------- |
@@ -102,9 +90,7 @@ Showing 3 key props of 5; see source for the complete interface.
 
 ## Empty
 
-Source: `packages/core/src/types/empty.ts` · Interface: `EmptyProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`empty.ts` · `EmptyProps` · 3/4 props
 
 | Prop           | Type          | Default     | Notes                                         |
 | -------------- | ------------- | ----------- | --------------------------------------------- |
@@ -114,11 +100,9 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## Icon
 
-Source: `packages/core/src/types/icon.ts` · Interface: `IconProps`.
+`icon.ts` · `IconProps` · 3/4 props
 
 Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。
-
-Showing 3 key props of 4; see source for the complete interface.
 
 | Prop     | Type       | Default | Notes                                                                                      |
 | -------- | ---------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -156,11 +140,9 @@ import { iconRegistry, iconNames, getIconDefinition } from '@expcat/tigercat-cor
 
 ## Image
 
-Source: `packages/core/src/types/image.ts` · Interface: `ImageProps`.
+`image.ts` · `ImageProps` · 3/10 props
 
 Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。
-
-Showing 3 key props of 10; see source for the complete interface.
 
 | Prop     | Type               | Default | Notes                      |
 | -------- | ------------------ | ------- | -------------------------- |
@@ -170,9 +152,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## ImagePreview
 
-Source: `packages/core/src/types/image.ts` · Interface: `ImagePreviewProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`image.ts` · `ImagePreviewProps` · 3/8 props
 
 | Prop            | Type       | Default | Notes                                         |
 | --------------- | ---------- | ------- | --------------------------------------------- |
@@ -182,7 +162,7 @@ Showing 3 key props of 8; see source for the complete interface.
 
 ## ImageGroup
 
-Source: `packages/core/src/types/image.ts` · Interface: `ImageGroupProps`.
+`image.ts` · `ImageGroupProps`
 
 | Prop       | Type      | Default | Notes                                          |
 | ---------- | --------- | ------- | ---------------------------------------------- |
@@ -190,9 +170,7 @@ Source: `packages/core/src/types/image.ts` · Interface: `ImageGroupProps`.
 
 ## ImageCropper
 
-Source: `packages/core/src/types/image.ts` · Interface: `ImageCropperProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`image.ts` · `ImageCropperProps` · 3/8 props
 
 | Prop           | Type     | Default | Notes                                                                   |
 | -------------- | -------- | ------- | ----------------------------------------------------------------------- |
@@ -202,9 +180,7 @@ Showing 3 key props of 8; see source for the complete interface.
 
 ## CropUpload
 
-Source: `packages/core/src/types/image.ts` · Interface: `CropUploadProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`image.ts` · `CropUploadProps` · 3/7 props
 
 | Prop        | Type      | Default     | Notes                             |
 | ----------- | --------- | ----------- | --------------------------------- |
@@ -214,9 +190,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## Link
 
-Source: `packages/core/src/types/link.ts` · Interface: `LinkProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`link.ts` · `LinkProps` · 3/7 props
 
 | Prop        | Type          | Default     | Notes                        |
 | ----------- | ------------- | ----------- | ---------------------------- |
@@ -226,9 +200,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## QRCode
 
-Source: `packages/core/src/types/qrcode.ts` · Interface: `QRCodeProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`qrcode.ts` · `QRCodeProps` · 3/7 props
 
 | Prop     | Type     | Default | Notes                |
 | -------- | -------- | ------- | -------------------- |
@@ -238,9 +210,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## Rate
 
-Source: `packages/core/src/types/rate.ts` · Interface: `RateProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`rate.ts` · `RateProps` · 3/7 props
 
 | Prop         | Type      | Default | Notes                                         |
 | ------------ | --------- | ------- | --------------------------------------------- |
@@ -250,9 +220,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## Result
 
-Source: `packages/core/src/types/result.ts` · Interface: `ResultProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`result.ts` · `ResultProps` · 3/4 props
 
 | Prop        | Type           | Default  | Notes                                                |
 | ----------- | -------------- | -------- | ---------------------------------------------------- |
@@ -262,9 +230,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## Segmented
 
-Source: `packages/core/src/types/segmented.ts` · Interface: `SegmentedProps`.
-
-Showing 3 key props of 5; see source for the complete interface.
+`segmented.ts` · `SegmentedProps` · 3/5 props
 
 | Prop        | Type                | Default | Notes                                 |
 | ----------- | ------------------- | ------- | ------------------------------------- |
@@ -274,9 +240,7 @@ Showing 3 key props of 5; see source for the complete interface.
 
 ## Statistic
 
-Source: `packages/core/src/types/statistic.ts` · Interface: `StatisticProps`.
-
-Showing 3 key props of 10; see source for the complete interface.
+`statistic.ts` · `StatisticProps` · 3/10 props
 
 | Prop         | Type               | Default | Notes                                         |
 | ------------ | ------------------ | ------- | --------------------------------------------- |
@@ -286,9 +250,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## Tag
 
-Source: `packages/core/src/types/tag.ts` · Interface: `TagProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`tag.ts` · `TagProps` · 3/4 props
 
 | Prop        | Type         | Default     | Notes                         |
 | ----------- | ------------ | ----------- | ----------------------------- |
@@ -298,9 +260,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## Text
 
-Source: `packages/core/src/types/text.ts` · Interface: `TextProps`.
-
-Showing 3 key props of 9; see source for the complete interface.
+`text.ts` · `TextProps` · 3/9 props
 
 | Prop      | Type         | Default    | Notes              |
 | --------- | ------------ | ---------- | ------------------ |
@@ -310,9 +270,7 @@ Showing 3 key props of 9; see source for the complete interface.
 
 ## Watermark
 
-Source: `packages/core/src/types/watermark.ts` · Interface: `WatermarkProps`.
-
-Showing 3 key props of 12; see source for the complete interface.
+`watermark.ts` · `WatermarkProps` · 3/12 props
 
 | Prop       | Type                 | Default | Notes                                                       |
 | ---------- | -------------------- | ------- | ----------------------------------------------------------- |
@@ -322,7 +280,7 @@ Showing 3 key props of 12; see source for the complete interface.
 
 ## ConfigProvider
 
-Source: `packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts`.
+`packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts`
 
 | Prop         | Type          | Default | Notes                |
 | ------------ | ------------- | ------- | -------------------- |

@@ -11,9 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## CodeEditor
 
-Source: `packages/core/src/types/code-editor.ts` · Interface: `CodeEditorProps`.
-
-Showing 3 key props of 15; see source for the complete interface.
+`code-editor.ts` · `CodeEditorProps` · 3/15 props
 
 | Prop            | Type           | Default   | Notes                                        |
 | --------------- | -------------- | --------- | -------------------------------------------- |
@@ -23,9 +21,7 @@ Showing 3 key props of 15; see source for the complete interface.
 
 ## FileManager
 
-Source: `packages/core/src/types/file-manager.ts` · Interface: `FileManagerProps`.
-
-Showing 3 key props of 15; see source for the complete interface.
+`file-manager.ts` · `FileManagerProps` · 3/15 props
 
 | Prop            | Type                   | Default | Notes                        |
 | --------------- | ---------------------- | ------- | ---------------------------- |
@@ -35,9 +31,7 @@ Showing 3 key props of 15; see source for the complete interface.
 
 ## ImageAnnotation
 
-Source: `packages/core/src/types/image-annotation.ts` · Interface: `ImageAnnotationProps`.
-
-Showing 3 key props of 15; see source for the complete interface.
+`image-annotation.ts` · `ImageAnnotationProps` · 3/15 props
 
 | Prop     | Type                | Default | Notes |
 | -------- | ------------------- | ------- | ----- |
@@ -47,9 +41,7 @@ Showing 3 key props of 15; see source for the complete interface.
 
 ## ImageViewer
 
-Source: `packages/core/src/types/image-viewer.ts` · Interface: `ImageViewerProps`.
-
-Showing 3 key props of 11; see source for the complete interface.
+`image-viewer.ts` · `ImageViewerProps` · 3/11 props
 
 | Prop            | Type       | Default | Notes                          |
 | --------------- | ---------- | ------- | ------------------------------ |
@@ -59,9 +51,7 @@ Showing 3 key props of 11; see source for the complete interface.
 
 ## InfiniteScroll
 
-Source: `packages/core/src/types/infinite-scroll.ts` · Interface: `InfiniteScrollProps`.
-
-Showing 3 key props of 9; see source for the complete interface.
+`infinite-scroll.ts` · `InfiniteScrollProps` · 3/9 props
 
 | Prop         | Type      | Default | Notes                                     |
 | ------------ | --------- | ------- | ----------------------------------------- |
@@ -71,7 +61,7 @@ Showing 3 key props of 9; see source for the complete interface.
 
 ## Kanban
 
-Source: `packages/core/src/types/kanban.ts` · Interface: `KanbanProps`.
+`kanban.ts` · `KanbanProps`
 
 Uses: `TaskBoard`.
 
@@ -84,9 +74,7 @@ Note: Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `al
 
 ## MarkdownEditor
 
-Source: `packages/core/src/types/markdown-editor.ts` · Interface: `MarkdownEditorProps`.
-
-Showing 3 key props of 13; see source for the complete interface.
+`markdown-editor.ts` · `MarkdownEditorProps` · 3/13 props
 
 | Prop            | Type     | Default | Notes                                   |
 | --------------- | -------- | ------- | --------------------------------------- |
@@ -96,9 +84,7 @@ Showing 3 key props of 13; see source for the complete interface.
 
 ## PrintLayout
 
-Source: `packages/core/src/types/print-layout.ts` · Interface: `PrintLayoutProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`print-layout.ts` · `PrintLayoutProps` · 3/8 props
 
 | Prop           | Type               | Default      | Notes                             |
 | -------------- | ------------------ | ------------ | --------------------------------- |
@@ -108,9 +94,7 @@ Showing 3 key props of 8; see source for the complete interface.
 
 ## RichTextEditor
 
-Source: `packages/core/src/types/rich-text-editor.ts` · Interface: `RichTextEditorProps`.
-
-Showing 3 key props of 9; see source for the complete interface.
+`rich-text-editor.ts` · `RichTextEditorProps` · 3/9 props
 
 | Prop            | Type     | Default | Notes                             |
 | --------------- | -------- | ------- | --------------------------------- |
@@ -120,9 +104,7 @@ Showing 3 key props of 9; see source for the complete interface.
 
 ## VirtualList
 
-Source: `packages/core/src/types/virtual-list.ts` · Interface: `VirtualListProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`virtual-list.ts` · `VirtualListProps` · 3/8 props
 
 | Prop                   | Type     | Default | Notes                                                  |
 | ---------------------- | -------- | ------- | ------------------------------------------------------ |
@@ -132,13 +114,11 @@ Showing 3 key props of 8; see source for the complete interface.
 
 ## VirtualTable
 
-Source: `packages/core/src/types/virtual-table.ts` · Interface: `VirtualTableProps`.
+`virtual-table.ts` · `VirtualTableProps` · 3/17 props
 
 Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
 
 Note: 复用 `TableColumn` 类型；固定列同样支持 `fixedClassName` / `fixedHeaderClassName`，用于跟随 striped、selected 和 hover 状态定制 sticky 单元格样式。
-
-Showing 3 key props of 17; see source for the complete interface.
 
 | Prop         | Type               | Default | Notes                                                         |
 | ------------ | ------------------ | ------- | ------------------------------------------------------------- |

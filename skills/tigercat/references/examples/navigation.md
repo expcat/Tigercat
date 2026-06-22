@@ -15,29 +15,6 @@ description: Compact Tigercat Navigation Vue and React usage routes
 | --------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Dropdown  | `DropdownMenu`, `DropdownItem` | 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zIndex 1000），不会被 overflow 容器裁剪或表格固定列遮挡；设置 `portal: false` 可回退到原位渲染。依赖菜单 DOM 层级的选择器可改用 `[data-tiger-dropdown-menu]` 查询。触发器（trigger）上会暴露稳定的 `data-state="open" \| "closed"` 属性（与 `aria-expanded` 同步），可用于自定义样式联动或无障碍钩子（此约定对所有浮层触发器统一适用，详见 patterns/common 的“浮层触发器状态属性”）。需要在渲染自定义触发器时拿到开启状态，可用 Vue `#trigger="{ open }"` 作用域插槽 / React `renderTrigger={({ open }) => …}` prop。 |
 
-| Component        | Vue                    | React                  |
-| ---------------- | ---------------------- | ---------------------- |
-| Affix            | `<Affix />`            | `<Affix />`            |
-| Anchor           | `<Anchor />`           | `<Anchor />`           |
-| AnchorLink       | `<AnchorLink />`       | `<AnchorLink />`       |
-| BackTop          | `<BackTop />`          | `<BackTop />`          |
-| Breadcrumb       | `<Breadcrumb />`       | `<Breadcrumb />`       |
-| BreadcrumbItem   | `<BreadcrumbItem />`   | `<BreadcrumbItem />`   |
-| Dropdown         | `<Dropdown />`         | `<Dropdown />`         |
-| DropdownMenu     | `<DropdownMenu />`     | `<DropdownMenu />`     |
-| DropdownItem     | `<DropdownItem />`     | `<DropdownItem />`     |
-| FloatButton      | `<FloatButton />`      | `<FloatButton />`      |
-| FloatButtonGroup | `<FloatButtonGroup />` | `<FloatButtonGroup />` |
-| Menu             | `<Menu />`             | `<Menu />`             |
-| MenuItem         | `<MenuItem />`         | `<MenuItem />`         |
-| SubMenu          | `<SubMenu />`          | `<SubMenu />`          |
-| MenuItemGroup    | `<MenuItemGroup />`    | `<MenuItemGroup />`    |
-| Pagination       | `<Pagination />`       | `<Pagination />`       |
-| ScrollSpy        | `<ScrollSpy />`        | `<ScrollSpy />`        |
-| Spotlight        | `<Spotlight />`        | `<Spotlight />`        |
-| Steps            | `<Steps />`            | `<Steps />`            |
-| Tabs             | `<Tabs />`             | `<Tabs />`             |
-| TabPane          | `<TabPane />`          | `<TabPane />`          |
-| Tree             | `<Tree />`             | `<Tree />`             |
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Affix, Anchor, AnchorLink, BackTop, Breadcrumb, BreadcrumbItem, Dropdown, DropdownMenu, DropdownItem, FloatButton, FloatButtonGroup, Menu, MenuItem, SubMenu, MenuItemGroup, Pagination, ScrollSpy, Spotlight, Steps, Tabs, TabPane, Tree.
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.

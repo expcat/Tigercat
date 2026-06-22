@@ -9,35 +9,18 @@ description: Compact Tigercat Form Vue and React usage routes
 
 Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
-| Component       | Vue                                                                                         | React                                                                                                            |
-| --------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| AutoComplete    | `<AutoComplete />`                                                                          | `<AutoComplete />`                                                                                               |
-| Cascader        | `<Cascader />`                                                                              | `<Cascader />`                                                                                                   |
-| Checkbox        | `<Checkbox v-model="value" />`                                                              | `<Checkbox value={value} onChange={setValue} />`                                                                 |
-| CheckboxGroup   | `<CheckboxGroup />`                                                                         | `<CheckboxGroup />`                                                                                              |
-| ColorPicker     | `<ColorPicker />`                                                                           | `<ColorPicker />`                                                                                                |
-| ColorSwatch     | `<ColorSwatch />`                                                                           | `<ColorSwatch />`                                                                                                |
-| CronEditor      | `<CronEditor />`                                                                            | `<CronEditor />`                                                                                                 |
-| DatePicker      | `<DatePicker />`                                                                            | `<DatePicker />`                                                                                                 |
-| Form            | `<Form :model="form"><FormItem name="name"><Input v-model="form.name" /></FormItem></Form>` | `<Form model={form}><FormItem name="name"><Input value={form.name} onChange={onNameChange} /></FormItem></Form>` |
-| FormItem        | `<FormItem />`                                                                              | `<FormItem />`                                                                                                   |
-| Input           | `<Input v-model="value" />`                                                                 | `<Input value={value} onChange={setValue} />`                                                                    |
-| InputGroup      | `<InputGroup />`                                                                            | `<InputGroup />`                                                                                                 |
-| InputGroupAddon | `<InputGroupAddon />`                                                                       | `<InputGroupAddon />`                                                                                            |
-| InputNumber     | `<InputNumber />`                                                                           | `<InputNumber />`                                                                                                |
-| Mentions        | `<Mentions />`                                                                              | `<Mentions />`                                                                                                   |
-| NumberKeyboard  | `<NumberKeyboard />`                                                                        | `<NumberKeyboard />`                                                                                             |
-| Radio           | `<Radio v-model="value" />`                                                                 | `<Radio value={value} onChange={setValue} />`                                                                    |
-| RadioGroup      | `<RadioGroup />`                                                                            | `<RadioGroup />`                                                                                                 |
-| Select          | `<Select v-model="value" />`                                                                | `<Select value={value} onChange={setValue} />`                                                                   |
-| Signature       | `<Signature />`                                                                             | `<Signature />`                                                                                                  |
-| Slider          | `<Slider />`                                                                                | `<Slider />`                                                                                                     |
-| Stepper         | `<Stepper />`                                                                               | `<Stepper />`                                                                                                    |
-| Switch          | `<Switch v-model="value" />`                                                                | `<Switch value={value} onChange={setValue} />`                                                                   |
-| Textarea        | `<Textarea v-model="value" />`                                                              | `<Textarea value={value} onChange={setValue} />`                                                                 |
-| TimePicker      | `<TimePicker />`                                                                            | `<TimePicker />`                                                                                                 |
-| Transfer        | `<Transfer />`                                                                              | `<Transfer />`                                                                                                   |
-| TreeSelect      | `<TreeSelect />`                                                                            | `<TreeSelect />`                                                                                                 |
-| Upload          | `<Upload />`                                                                                | `<Upload />`                                                                                                     |
+只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
+
+| Component | Vue                                                                                         | React                                                                                                            |
+| --------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Checkbox  | `<Checkbox v-model="value" />`                                                              | `<Checkbox value={value} onChange={setValue} />`                                                                 |
+| Form      | `<Form :model="form"><FormItem name="name"><Input v-model="form.name" /></FormItem></Form>` | `<Form model={form}><FormItem name="name"><Input value={form.name} onChange={onNameChange} /></FormItem></Form>` |
+| Input     | `<Input v-model="value" />`                                                                 | `<Input value={value} onChange={setValue} />`                                                                    |
+| Radio     | `<Radio v-model="value" />`                                                                 | `<Radio value={value} onChange={setValue} />`                                                                    |
+| Select    | `<Select v-model="value" />`                                                                | `<Select value={value} onChange={setValue} />`                                                                   |
+| Switch    | `<Switch v-model="value" />`                                                                | `<Switch value={value} onChange={setValue} />`                                                                   |
+| Textarea  | `<Textarea v-model="value" />`                                                              | `<Textarea value={value} onChange={setValue} />`                                                                 |
+
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AutoComplete, Cascader, CheckboxGroup, ColorPicker, ColorSwatch, CronEditor, DatePicker, FormItem, InputGroup, InputGroupAddon, InputNumber, Mentions, NumberKeyboard, RadioGroup, Signature, Slider, Stepper, TimePicker, Transfer, TreeSelect, Upload.
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.

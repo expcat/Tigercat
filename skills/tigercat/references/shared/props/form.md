@@ -11,9 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## AutoComplete
 
-Source: `packages/core/src/types/auto-complete.ts` · Interface: `AutoCompleteProps`.
-
-Showing 3 key props of 10; see source for the complete interface.
+`auto-complete.ts` · `AutoCompleteProps` · 3/10 props
 
 | Prop           | Type                   | Default | Notes            |
 | -------------- | ---------------------- | ------- | ---------------- |
@@ -23,9 +21,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## Cascader
 
-Source: `packages/core/src/types/cascader.ts` · Interface: `CascaderProps`.
-
-Showing 3 key props of 11; see source for the complete interface.
+`cascader.ts` · `CascaderProps` · 3/11 props
 
 | Prop           | Type               | Default           | Notes                 |
 | -------------- | ------------------ | ----------------- | --------------------- |
@@ -35,9 +31,7 @@ Showing 3 key props of 11; see source for the complete interface.
 
 ## Checkbox
 
-Source: `packages/core/src/types/checkbox.ts` · Interface: `CheckboxProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`checkbox.ts` · `CheckboxProps` · 3/4 props
 
 | Prop        | Type            | Default | Notes                                       |
 | ----------- | --------------- | ------- | ------------------------------------------- |
@@ -47,7 +41,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## CheckboxGroup
 
-Source: `packages/core/src/types/checkbox.ts` · Interface: `CheckboxGroupProps`.
+`checkbox.ts` · `CheckboxGroupProps`
 
 | Prop        | Type           | Default | Notes                                         |
 | ----------- | -------------- | ------- | --------------------------------------------- |
@@ -56,9 +50,7 @@ Source: `packages/core/src/types/checkbox.ts` · Interface: `CheckboxGroupProps`
 
 ## ColorPicker
 
-Source: `packages/core/src/types/color-picker.ts` · Interface: `ColorPickerProps`.
-
-Showing 3 key props of 6; see source for the complete interface.
+`color-picker.ts` · `ColorPickerProps` · 3/6 props
 
 | Prop         | Type              | Default | Notes                          |
 | ------------ | ----------------- | ------- | ------------------------------ |
@@ -68,9 +60,7 @@ Showing 3 key props of 6; see source for the complete interface.
 
 ## ColorSwatch
 
-Source: `packages/core/src/types/color-swatch.ts` · Interface: `ColorSwatchProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`color-swatch.ts` · `ColorSwatchProps` · 3/7 props
 
 | Prop        | Type                       | Default | Notes |
 | ----------- | -------------------------- | ------- | ----- |
@@ -80,9 +70,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## CronEditor
 
-Source: `packages/core/src/types/cron-editor.ts` · Interface: `CronEditorProps`.
-
-Showing 3 key props of 6; see source for the complete interface.
+`cron-editor.ts` · `CronEditorProps` · 3/6 props
 
 | Prop        | Type             | Default | Notes |
 | ----------- | ---------------- | ------- | ----- |
@@ -92,9 +80,7 @@ Showing 3 key props of 6; see source for the complete interface.
 
 ## DatePicker
 
-Source: `packages/core/src/types/datepicker.ts` · Interface: `DatePickerProps`.
-
-Showing 3 key props of 17; see source for the complete interface.
+`datepicker.ts` · `DatePickerProps` · 3/17 props
 
 | Prop      | Type                        | Default | Notes                                                                         |
 | --------- | --------------------------- | ------- | ----------------------------------------------------------------------------- |
@@ -104,9 +90,7 @@ Showing 3 key props of 17; see source for the complete interface.
 
 ## Form
 
-Source: `packages/core/src/types/form.ts` · Interface: `FormProps`.
-
-Showing 3 key props of 17; see source for the complete interface.
+`form.ts` · `FormProps` · 3/17 props
 
 | Prop          | Type               | Default | Notes                                                         |
 | ------------- | ------------------ | ------- | ------------------------------------------------------------- |
@@ -116,9 +100,7 @@ Showing 3 key props of 17; see source for the complete interface.
 
 ## FormItem
 
-Source: `packages/core/src/types/form.ts` · Interface: `FormItemProps`.
-
-Showing 3 key props of 10; see source for the complete interface.
+`form.ts` · `FormItemProps` · 3/10 props
 
 | Prop          | Type               | Default | Notes                                     |
 | ------------- | ------------------ | ------- | ----------------------------------------- |
@@ -128,9 +110,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## Input
 
-Source: `packages/core/src/types/input.ts` · Interface: `InputProps`.
-
-Showing 3 key props of 19; see source for the complete interface.
+`input.ts` · `InputProps` · 3/19 props
 
 | Prop            | Type          | Default     | Notes                    |
 | --------------- | ------------- | ----------- | ------------------------ |
@@ -140,7 +120,7 @@ Showing 3 key props of 19; see source for the complete interface.
 
 ## InputGroup
 
-Source: `packages/core/src/types/input-group.ts` · Interface: `InputGroupProps`.
+`input-group.ts` · `InputGroupProps`
 
 | Prop         | Type             | Default | Notes                                        |
 | ------------ | ---------------- | ------- | -------------------------------------------- |
@@ -150,7 +130,7 @@ Source: `packages/core/src/types/input-group.ts` · Interface: `InputGroupProps`
 
 ## InputGroupAddon
 
-Source: `packages/core/src/types/input-group.ts` · Interface: `InputGroupAddonProps`.
+`input-group.ts` · `InputGroupAddonProps`
 
 | Prop         | Type               | Default  | Notes                  |
 | ------------ | ------------------ | -------- | ---------------------- |
@@ -159,9 +139,7 @@ Source: `packages/core/src/types/input-group.ts` · Interface: `InputGroupAddonP
 
 ## InputNumber
 
-Source: `packages/core/src/types/input-number.ts` · Interface: `InputNumberProps`.
-
-Showing 3 key props of 19; see source for the complete interface.
+`input-number.ts` · `InputNumberProps` · 3/19 props
 
 | Prop      | Type             | Default     | Notes                           |
 | --------- | ---------------- | ----------- | ------------------------------- |
@@ -171,9 +149,7 @@ Showing 3 key props of 19; see source for the complete interface.
 
 ## Mentions
 
-Source: `packages/core/src/types/mentions.ts` · Interface: `MentionsProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`mentions.ts` · `MentionsProps` · 3/7 props
 
 | Prop           | Type              | Default | Notes                     |
 | -------------- | ----------------- | ------- | ------------------------- |
@@ -183,9 +159,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## NumberKeyboard
 
-Source: `packages/core/src/types/number-keyboard.ts` · Interface: `NumberKeyboardProps`.
-
-Showing 3 key props of 15; see source for the complete interface.
+`number-keyboard.ts` · `NumberKeyboardProps` · 3/15 props
 
 | Prop            | Type     | Default | Notes |
 | --------------- | -------- | ------- | ----- |
@@ -195,9 +169,7 @@ Showing 3 key props of 15; see source for the complete interface.
 
 ## Radio
 
-Source: `packages/core/src/types/radio.ts` · Interface: `RadioProps`.
-
-Showing 3 key props of 6; see source for the complete interface.
+`radio.ts` · `RadioProps` · 3/6 props
 
 | Prop        | Type               | Default | Notes                         |
 | ----------- | ------------------ | ------- | ----------------------------- |
@@ -207,9 +179,7 @@ Showing 3 key props of 6; see source for the complete interface.
 
 ## RadioGroup
 
-Source: `packages/core/src/types/radio.ts` · Interface: `RadioGroupProps`.
-
-Showing 3 key props of 5; see source for the complete interface.
+`radio.ts` · `RadioGroupProps` · 3/5 props
 
 | Prop            | Type               | Default | Notes                                        |
 | --------------- | ------------------ | ------- | -------------------------------------------- |
@@ -219,9 +189,7 @@ Showing 3 key props of 5; see source for the complete interface.
 
 ## Select
 
-Source: `packages/core/src/types/select.ts` · Interface: `SelectProps`.
-
-Showing 3 key props of 16; see source for the complete interface.
+`select.ts` · `SelectProps` · 3/16 props
 
 | Prop           | Type         | Default | Notes                                       |
 | -------------- | ------------ | ------- | ------------------------------------------- |
@@ -231,9 +199,7 @@ Showing 3 key props of 16; see source for the complete interface.
 
 ## Signature
 
-Source: `packages/core/src/types/signature.ts` · Interface: `SignatureProps`.
-
-Showing 3 key props of 14; see source for the complete interface.
+`signature.ts` · `SignatureProps` · 3/14 props
 
 | Prop        | Type     | Default | Notes |
 | ----------- | -------- | ------- | ----- |
@@ -243,9 +209,7 @@ Showing 3 key props of 14; see source for the complete interface.
 
 ## Slider
 
-Source: `packages/core/src/types/slider.ts` · Interface: `SliderProps`.
-
-Showing 3 key props of 10; see source for the complete interface.
+`slider.ts` · `SliderProps` · 3/10 props
 
 | Prop            | Type                         | Default | Notes                                                                                     |
 | --------------- | ---------------------------- | ------- | ----------------------------------------------------------------------------------------- |
@@ -255,9 +219,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## Stepper
 
-Source: `packages/core/src/types/stepper.ts` · Interface: `StepperProps`.
-
-Showing 3 key props of 7; see source for the complete interface.
+`stepper.ts` · `StepperProps` · 3/7 props
 
 | Prop    | Type     | Default | Notes          |
 | ------- | -------- | ------- | -------------- |
@@ -267,7 +229,7 @@ Showing 3 key props of 7; see source for the complete interface.
 
 ## Switch
 
-Source: `packages/core/src/types/switch.ts` · Interface: `SwitchProps`.
+`switch.ts` · `SwitchProps`
 
 | Prop        | Type         | Default | Notes                          |
 | ----------- | ------------ | ------- | ------------------------------ |
@@ -277,9 +239,7 @@ Source: `packages/core/src/types/switch.ts` · Interface: `SwitchProps`.
 
 ## Textarea
 
-Source: `packages/core/src/types/textarea.ts` · Interface: `TextareaProps`.
-
-Showing 3 key props of 18; see source for the complete interface.
+`textarea.ts` · `TextareaProps` · 3/18 props
 
 | Prop            | Type           | Default | Notes                                 |
 | --------------- | -------------- | ------- | ------------------------------------- |
@@ -289,9 +249,7 @@ Showing 3 key props of 18; see source for the complete interface.
 
 ## TimePicker
 
-Source: `packages/core/src/types/timepicker.ts` · Interface: `TimePickerProps`.
-
-Showing 3 key props of 20; see source for the complete interface.
+`timepicker.ts` · `TimePickerProps` · 3/20 props
 
 | Prop      | Type                             | Default | Notes                                                                                      |
 | --------- | -------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -301,9 +259,7 @@ Showing 3 key props of 20; see source for the complete interface.
 
 ## Transfer
 
-Source: `packages/core/src/types/transfer.ts` · Interface: `TransferProps`.
-
-Showing 3 key props of 10; see source for the complete interface.
+`transfer.ts` · `TransferProps` · 3/10 props
 
 | Prop          | Type                   | Default | Notes                                    |
 | ------------- | ---------------------- | ------- | ---------------------------------------- |
@@ -313,9 +269,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## TreeSelect
 
-Source: `packages/core/src/types/tree-select.ts` · Interface: `TreeSelectProps`.
-
-Showing 3 key props of 10; see source for the complete interface.
+`tree-select.ts` · `TreeSelectProps` · 3/10 props
 
 | Prop           | Type             | Default | Notes            |
 | -------------- | ---------------- | ------- | ---------------- |
@@ -325,9 +279,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## Upload
 
-Source: `packages/core/src/types/upload.ts` · Interface: `UploadProps`.
-
-Showing 3 key props of 18; see source for the complete interface.
+`upload.ts` · `UploadProps` · 3/18 props
 
 | Prop        | Type      | Default | Notes                                               |
 | ----------- | --------- | ------- | --------------------------------------------------- |

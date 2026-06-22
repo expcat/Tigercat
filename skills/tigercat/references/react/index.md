@@ -5,16 +5,6 @@ description: Tigercat React routing page for generated examples
 
 # Tigercat React
 
-React examples use controlled props, camelCase callbacks, and JSX syntax. Install from `@expcat/tigercat-react` and use [component-index.md](../component-index.md) to find the right category.
+React examples use controlled props, camelCase callbacks, and JSX syntax. Install from `@expcat/tigercat-react`.
 
-| Category   | Examples                              | Props                                  |
-| ---------- | ------------------------------------- | -------------------------------------- |
-| Basic      | [examples](../examples/basic.md)      | [props](../shared/props/basic.md)      |
-| Form       | [examples](../examples/form.md)       | [props](../shared/props/form.md)       |
-| Feedback   | [examples](../examples/feedback.md)   | [props](../shared/props/feedback.md)   |
-| Layout     | [examples](../examples/layout.md)     | [props](../shared/props/layout.md)     |
-| Navigation | [examples](../examples/navigation.md) | [props](../shared/props/navigation.md) |
-| Data       | [examples](../examples/data.md)       | [props](../shared/props/data.md)       |
-| Charts     | [examples](../examples/charts.md)     | [props](../shared/props/charts.md)     |
-| Advanced   | [examples](../examples/advanced.md)   | [props](../shared/props/advanced.md)   |
-| Composite  | [examples](../examples/composite.md)  | [props](../shared/props/composite.md)  |
+查组件用法：先开 [component-index.md](../component-index.md) 定位组件与 Category，再按其规则打开 `shared/props/{cat}.md` 与 `examples/{cat}.md`。跨框架绑定差异见 [shared/patterns/common.md](../shared/patterns/common.md) 与 [shared/glossary.md](../shared/glossary.md)。

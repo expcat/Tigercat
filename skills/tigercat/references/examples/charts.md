@@ -9,6 +9,8 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 图表组件共享数据、series、legend、tooltip 和 axes 模式，细节看 chart 类型源。
 
+只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
+
 | Component     | Vue                              | React                           |
 | ------------- | -------------------------------- | ------------------------------- |
 | ChartLegend   | `<ChartLegend :data="data" />`   | `<ChartLegend data={data} />`   |

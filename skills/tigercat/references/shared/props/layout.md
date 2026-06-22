@@ -11,11 +11,9 @@ description: Compact generated Tigercat Layout props reference
 
 ## Card
 
-Source: `packages/core/src/types/card.ts` · Interface: `CardProps`.
+`card.ts` · `CardProps` · 3/6 props
 
 Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。
-
-Showing 3 key props of 6; see source for the complete interface.
 
 | Prop       | Type                | Default     | Notes                                                                                      |
 | ---------- | ------------------- | ----------- | ------------------------------------------------------------------------------------------ |
@@ -25,9 +23,7 @@ Showing 3 key props of 6; see source for the complete interface.
 
 ## Carousel
 
-Source: `packages/core/src/types/carousel.ts` · Interface: `CarouselProps`.
-
-Showing 3 key props of 13; see source for the complete interface.
+`carousel.ts` · `CarouselProps` · 3/13 props
 
 | Prop             | Type      | Default | Notes                                       |
 | ---------------- | --------- | ------- | ------------------------------------------- |
@@ -37,7 +33,7 @@ Showing 3 key props of 13; see source for the complete interface.
 
 ## Container
 
-Source: `packages/core/src/types/container.ts` · Interface: `ContainerProps`.
+`container.ts` · `ContainerProps`
 
 | Prop        | Type                | Default | Notes                                                                                      |
 | ----------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -47,9 +43,7 @@ Source: `packages/core/src/types/container.ts` · Interface: `ContainerProps`.
 
 ## Descriptions
 
-Source: `packages/core/src/types/descriptions.ts` · Interface: `DescriptionsProps`.
-
-Showing 3 key props of 10; see source for the complete interface.
+`descriptions.ts` · `DescriptionsProps` · 3/10 props
 
 | Prop        | Type      | Default | Notes                                |
 | ----------- | --------- | ------- | ------------------------------------ |
@@ -59,9 +53,7 @@ Showing 3 key props of 10; see source for the complete interface.
 
 ## Row
 
-Source: `packages/core/src/types/grid.ts` · Interface: `RowProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`grid.ts` · `RowProps` · 3/4 props
 
 | Prop       | Type         | Default   | Notes                                                      |
 | ---------- | ------------ | --------- | ---------------------------------------------------------- |
@@ -71,9 +63,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## Col
 
-Source: `packages/core/src/types/grid.ts` · Interface: `ColProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`grid.ts` · `ColProps` · 3/4 props
 
 | Prop      | Type                                            | Default | Notes                                         |
 | --------- | ----------------------------------------------- | ------- | --------------------------------------------- |
@@ -83,7 +73,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## Layout
 
-Source: `packages/core/src/types/layout.ts` · Interface: `LayoutProps`.
+`layout.ts` · `LayoutProps`
 
 | Prop         | Type     | Default | Notes                  |
 | ------------ | -------- | ------- | ---------------------- |
@@ -91,7 +81,7 @@ Source: `packages/core/src/types/layout.ts` · Interface: `LayoutProps`.
 
 ## Header
 
-Source: `packages/core/src/types/layout.ts` · Interface: `HeaderProps`.
+`layout.ts` · `HeaderProps`
 
 | Prop         | Type            | Default     | Notes                  |
 | ------------ | --------------- | ----------- | ---------------------- |
@@ -101,9 +91,7 @@ Source: `packages/core/src/types/layout.ts` · Interface: `HeaderProps`.
 
 ## Sidebar
 
-Source: `packages/core/src/types/layout.ts` · Interface: `SidebarProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`layout.ts` · `SidebarProps` · 3/4 props
 
 | Prop              | Type     | Default   | Notes                                                                                    |
 | ----------------- | -------- | --------- | ---------------------------------------------------------------------------------------- |
@@ -113,7 +101,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## Content
 
-Source: `packages/core/src/types/layout.ts` · Interface: `ContentProps`.
+`layout.ts` · `ContentProps`
 
 | Prop         | Type                | Default | Notes                                                                                      |
 | ------------ | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -122,7 +110,7 @@ Source: `packages/core/src/types/layout.ts` · Interface: `ContentProps`.
 
 ## Footer
 
-Source: `packages/core/src/types/layout.ts` · Interface: `FooterProps`.
+`layout.ts` · `FooterProps`
 
 | Prop         | Type     | Default  | Notes                  |
 | ------------ | -------- | -------- | ---------------------- |
@@ -131,9 +119,7 @@ Source: `packages/core/src/types/layout.ts` · Interface: `FooterProps`.
 
 ## List
 
-Source: `packages/core/src/types/list.ts` · Interface: `ListProps`.
-
-Showing 3 key props of 16; see source for the complete interface.
+`list.ts` · `ListProps` · 3/16 props
 
 | Prop        | Type              | Default     | Notes             |
 | ----------- | ----------------- | ----------- | ----------------- |
@@ -143,9 +129,7 @@ Showing 3 key props of 16; see source for the complete interface.
 
 ## Resizable
 
-Source: `packages/core/src/types/resizable.ts` · Interface: `ResizableProps`.
-
-Showing 3 key props of 12; see source for the complete interface.
+`resizable.ts` · `ResizableProps` · 3/12 props
 
 | Prop             | Type     | Default | Notes                    |
 | ---------------- | -------- | ------- | ------------------------ |
@@ -155,9 +139,7 @@ Showing 3 key props of 12; see source for the complete interface.
 
 ## Skeleton
 
-Source: `packages/core/src/types/skeleton.ts` · Interface: `SkeletonProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`skeleton.ts` · `SkeletonProps` · 3/8 props
 
 | Prop         | Type                | Default                             | Notes                                                                   |
 | ------------ | ------------------- | ----------------------------------- | ----------------------------------------------------------------------- |
@@ -167,9 +149,7 @@ Showing 3 key props of 8; see source for the complete interface.
 
 ## Space
 
-Source: `packages/core/src/types/space.ts` · Interface: `SpaceProps`.
-
-Showing 3 key props of 4; see source for the complete interface.
+`space.ts` · `SpaceProps` · 3/4 props
 
 | Prop         | Type             | Default        | Notes                                                  |
 | ------------ | ---------------- | -------------- | ------------------------------------------------------ | ------- | --------------------------- |
@@ -179,9 +159,7 @@ Showing 3 key props of 4; see source for the complete interface.
 
 ## Splitter
 
-Source: `packages/core/src/types/splitter.ts` · Interface: `SplitterProps`.
-
-Showing 3 key props of 8; see source for the complete interface.
+`splitter.ts` · `SplitterProps` · 3/8 props
 
 | Prop         | Type             | Default        | Notes                                                                       |
 | ------------ | ---------------- | -------------- | --------------------------------------------------------------------------- |
