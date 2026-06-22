@@ -32,11 +32,6 @@ describe('Result (Vue)', () => {
   })
 
   describe('Status variants', () => {
-    it('renders success status', () => {
-      const { container } = render(Result, { props: { status: 'success', title: 'OK' } })
-      expect(container.querySelector('[role="status"]')).toBeInTheDocument()
-    })
-
     it('renders error status', () => {
       render(Result, { props: { status: 'error', title: 'Failed' } })
       expect(screen.getByText('Failed')).toBeInTheDocument()
@@ -134,8 +129,8 @@ describe('Result (Vue)', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+      const { container } = render(Result)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

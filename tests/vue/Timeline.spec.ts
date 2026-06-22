@@ -111,38 +111,8 @@ describe('Timeline (Vue)', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Timeline export covered for technical debt case 01', () => {
-      expect(Timeline).toBeDefined()
-    })
-
-    it('should keep Timeline export covered for technical debt case 02', () => {
-      expect(Timeline).toBeDefined()
-    })
-
-    it('should keep Timeline export covered for technical debt case 03', () => {
-      expect(Timeline).toBeDefined()
-    })
-
-    it('should keep Timeline export covered for technical debt case 04', () => {
-      expect(Timeline).toBeDefined()
-    })
-
-    it('should keep Timeline export covered for technical debt case 05', () => {
-      expect(Timeline).toBeDefined()
-    })
-
-    it('should keep Timeline export covered for technical debt case 06', () => {
-      expect(Timeline).toBeDefined()
-    })
-
-    it('should keep Timeline export covered for technical debt case 07', () => {
-      expect(Timeline).toBeDefined()
+      const { container } = render(Timeline)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

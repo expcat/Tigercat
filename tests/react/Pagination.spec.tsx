@@ -145,14 +145,8 @@ describe('Pagination', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Pagination export covered for technical debt case 01', () => {
-      expect(Pagination).toBeDefined()
+      const { container } = render(<Pagination />)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

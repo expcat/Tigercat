@@ -166,26 +166,8 @@ describe('List', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep List export covered for technical debt case 01', () => {
-      expect(List).toBeDefined()
-    })
-
-    it('should keep List export covered for technical debt case 02', () => {
-      expect(List).toBeDefined()
-    })
-
-    it('should keep List export covered for technical debt case 03', () => {
-      expect(List).toBeDefined()
-    })
-
-    it('should keep List export covered for technical debt case 04', () => {
-      expect(List).toBeDefined()
+      const { container } = render(List)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

@@ -98,34 +98,8 @@ describe('Watermark', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Watermark export covered for technical debt case 01', () => {
-      expect(Watermark).toBeDefined()
-    })
-
-    it('should keep Watermark export covered for technical debt case 02', () => {
-      expect(Watermark).toBeDefined()
-    })
-
-    it('should keep Watermark export covered for technical debt case 03', () => {
-      expect(Watermark).toBeDefined()
-    })
-
-    it('should keep Watermark export covered for technical debt case 04', () => {
-      expect(Watermark).toBeDefined()
-    })
-
-    it('should keep Watermark export covered for technical debt case 05', () => {
-      expect(Watermark).toBeDefined()
-    })
-
-    it('should keep Watermark export covered for technical debt case 06', () => {
-      expect(Watermark).toBeDefined()
+      const { container } = render(<Watermark />)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

@@ -260,22 +260,8 @@ describe.sequential('Popconfirm', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Popconfirm export covered for technical debt case 01', () => {
-      expect(Popconfirm).toBeDefined()
-    })
-
-    it('should keep Popconfirm export covered for technical debt case 02', () => {
-      expect(Popconfirm).toBeDefined()
-    })
-
-    it('should keep Popconfirm export covered for technical debt case 03', () => {
-      expect(Popconfirm).toBeDefined()
+      const { container } = render(Popconfirm)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

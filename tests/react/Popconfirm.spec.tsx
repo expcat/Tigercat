@@ -209,18 +209,8 @@ describe('Popconfirm', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Popconfirm export covered for technical debt case 01', () => {
-      expect(Popconfirm).toBeDefined()
-    })
-
-    it('should keep Popconfirm export covered for technical debt case 02', () => {
-      expect(Popconfirm).toBeDefined()
+      const { getByText } = renderWithChildren(Popconfirm, <button>Action</button>, {})
+      expect(getByText('Action')).toBeInTheDocument()
     })
   })
 })

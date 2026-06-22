@@ -538,14 +538,8 @@ describe('DatePicker', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep DatePicker export covered for technical debt case 01', () => {
-      expect(DatePicker).toBeDefined()
+      const { container } = render(DatePicker)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

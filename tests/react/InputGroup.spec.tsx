@@ -105,14 +105,8 @@ describe('InputGroupAddon', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep InputGroup export covered for technical debt case 01', () => {
-      expect(InputGroup).toBeDefined()
+      const { container } = render(<InputGroup />)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

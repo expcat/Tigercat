@@ -137,18 +137,8 @@ describe('Transfer', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep Transfer export covered for technical debt case 01', () => {
-      expect(Transfer).toBeDefined()
-    })
-
-    it('should keep Transfer export covered for technical debt case 02', () => {
-      expect(Transfer).toBeDefined()
+      const { container } = render(<Transfer />)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

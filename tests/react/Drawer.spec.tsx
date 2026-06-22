@@ -373,8 +373,7 @@ describe('Drawer', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+      expect(() => render(<Drawer open={false} />)).not.toThrow()
     })
   })
 })

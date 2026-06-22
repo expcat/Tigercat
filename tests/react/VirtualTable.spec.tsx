@@ -433,8 +433,8 @@ describe('VirtualTable (React)', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+      const { container } = render(<VirtualTable />)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

@@ -98,14 +98,8 @@ describe('ColorPicker', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep ColorPicker export covered for technical debt case 01', () => {
-      expect(ColorPicker).toBeDefined()
+      const { container } = render(ColorPicker)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

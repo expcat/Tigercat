@@ -187,26 +187,12 @@ describe('ConfigProvider', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
-    })
-  })
-
-  describe('Technical Debt Coverage', () => {
-    it('should keep ConfigProvider export covered for technical debt case 01', () => {
-      expect(ConfigProvider).toBeDefined()
-    })
-
-    it('should keep useTigerConfig export covered for technical debt case 02', () => {
-      expect(useTigerConfig).toBeDefined()
-    })
-
-    it('should keep ConfigProvider export covered for technical debt case 03', () => {
-      expect(ConfigProvider).toBeDefined()
-    })
-
-    it('should keep useTigerConfig export covered for technical debt case 04', () => {
-      expect(useTigerConfig).toBeDefined()
+      const { container } = render(
+        <ConfigProvider>
+          <div>content</div>
+        </ConfigProvider>
+      )
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

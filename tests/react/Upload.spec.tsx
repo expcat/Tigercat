@@ -694,8 +694,8 @@ describe('Upload', () => {
   // 快照测试在组件重构后容易变脆；保留关键行为断言即可
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+      const { container } = render(<Upload />)
+      expect(container.firstChild).toBeTruthy()
     })
   })
 })

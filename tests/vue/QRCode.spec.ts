@@ -114,8 +114,8 @@ describe('QRCode', () => {
   })
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      // Baseline: component renders without crashing with no/minimal props
-      expect(true).toBe(true)
+      const { container } = renderWithProps(QRCode, { value: 'https://example.com' })
+      expect(container.querySelector('svg')).toBeInTheDocument()
     })
   })
 })
