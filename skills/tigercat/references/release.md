@@ -27,7 +27,7 @@ pnpm build
 ## API Freeze Checklist
 
 - Run `pnpm release:check`, `pnpm types:check`, and `pnpm api:validate`.
-- Confirm root package exports: core `.` / `./types` / `./theme` / Tailwind plugin entries / token assets, plus Vue and React root and component subpath exports.
+- Confirm root package exports: core `.` / `./tailwind` / `./tailwind/modern` / `./tokens.css` / `./figma-variables.json` and locale subpaths, plus Vue and React root and component subpath exports.
 - Confirm Vue and React public component files have matching props type exports.
 - Do not rename props, events, slots, children, or subpath imports after the freeze unless the change is explicitly listed as Breaking.
 
@@ -35,13 +35,16 @@ pnpm build
 
 Breaking changes must be centralized in [docs/MIGRATION.md](../../../docs/MIGRATION.md) and [CHANGELOG.md](../../../CHANGELOG.md). Each entry should include affected package or component, removed API, replacement API, and a minimal diff when possible.
 
-Current v1.2.16 breaking changes are the Image preview visibility removals:
+Current v1.4.0 breaking changes are:
 
-| Area         | Removed                  | Replacement           |
-| ------------ | ------------------------ | --------------------- |
-| ImagePreview | `visible`                | `open`                |
-| Image Vue    | `preview-visible-change` | `preview-open-change` |
-| Image React  | `onPreviewVisibleChange` | `onPreviewOpenChange` |
+| Area                       | Removed or changed                 | Replacement or action                                                 |
+| -------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
+| React `useControlledState` | 3-tuple return with `isControlled` | 2-tuple return; derive `isControlled` locally                         |
+| core                       | `kanbanAddCardClasses` alias       | `taskBoardAddCardClasses`                                             |
+| Dropdown                   | in-place menu DOM by default       | default body portal; use `portal: false` to restore old DOM placement |
+| ImageViewer React          | `onIndexChange`                    | `onCurrentIndexChange`                                                |
+| CommentThread Vue          | `expand-change`                    | `update:expandedKeys` / `v-model:expanded-keys`                       |
+| Spotlight Vue              | `close` event                      | `open-change(false)`                                                  |
 
 ## SSR And Hydration Matrix
 

@@ -2,7 +2,7 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
-## Unreleased（v1.2.41）
+## v1.4.0
 
 ### 跨端 API 对称：受控量 / 事件回调统一命名
 

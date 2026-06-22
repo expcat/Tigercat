@@ -23,15 +23,15 @@ source: current repository state; delivered work archived to CHANGELOG.md
 | 组件库   | Vue 3 + React 双端组件库，核心逻辑沉淀在 `@expcat/tigercat-core` |
 | 包管理   | pnpm workspace，统一 catalog 管理核心工具链版本                  |
 | 样式体系 | Tailwind CSS v4 + CSS Variables + Tigercat Tailwind plugin       |
-| 发布版本 | v1.3.4 发布准备中                                                |
+| 发布版本 | v1.4.0 发布准备中                                                |
 | 质量门禁 | Vitest、Playwright、a11y、size-limit、API/test validate          |
 
-> **版本规划（暂定）**：v1.3.4 为当前补丁线发布，仅交付非破坏性工作。`## Unreleased` 中累积的破坏性变更（A-4 / A-5 / D-3 等，详见 [CHANGELOG.md](../CHANGELOG.md) 与 [MIGRATION.md](MIGRATION.md)）随「下一个允许破坏的版本」交付，即当前文档计划全部完成后的发布版本，**暂定为 v1.4.0（minor）**。实际版本号仍以发布时 CI `sync-version` / release 决策为准。
+> **版本规划**：v1.4.0 为当前发布版本，包含 [CHANGELOG.md](../CHANGELOG.md) 与 [MIGRATION.md](MIGRATION.md) 中记录的 Breaking changes。实际版本号仍以发布时 CI `sync-version` / release 决策为准。
 
 ## 当前待办
 
-- [ ] v1.3.4 发布执行：运行 `pnpm quality:release`、`pnpm build`，发布后执行 `pnpm smoke:published`。
-  - 体积预算阻塞已解除（size 预算按实测重设并扩展覆盖，`pnpm size` 转绿，详见 [CHANGELOG.md](../CHANGELOG.md)）；`release:check` 仍需在发布时把 `v1.3.4` 写入 CHANGELOG / 迁移指南 / release.md 版本标题（属发布执行动作）。
+- [ ] v1.4.0 发布执行：运行 `pnpm quality:release`、`pnpm build`，发布后执行 `pnpm smoke:published`。
+  - 体积预算阻塞已解除（size 预算按实测重设并扩展覆盖，`pnpm size` 转绿，详见 [CHANGELOG.md](../CHANGELOG.md)）；`release:check` 要求 CHANGELOG / 迁移指南 / release.md 版本标题与当前版本保持一致。
 - [ ] 发布后归档：确认 `CHANGELOG.md`、迁移指南、发布记录和 Roadmap 状态与实际发布结果一致。
 
 ## 持续守护
