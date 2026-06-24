@@ -17,7 +17,9 @@ source: current repository state; v1.4.0 has been released
 
 扫描目标是分批发现并记录 Bug、冗余、重复实现、无用代码、低效路径、过度设计、复杂逻辑，以及公共内容该拆未拆或该合未合的问题。每个扫描任务只产出可验证的发现和修复建议，不在扫描阶段直接重构公共 API。
 
-#### 任务 A：公共 API、导出面与文档生成链路扫描
+#### 任务 A：公共 API、导出面与文档生成链路扫描 ✅ 已扫描（2026-06-24）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 A 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 范围：`packages/*/src/index*`、`packages/*/package.json`、`api-reports`、`scripts/check-public-types.mjs`、`scripts/validate-api.mjs`、`scripts/generate-api-docs.mjs`、`skills/tigercat/references`。
 - 目标：找缺失/多余导出、React/Vue 公共组件不对称、废弃 API 残留、generated references 与生成器规则漂移。
