@@ -37,8 +37,10 @@ interface ProjectPackage {
 
 type Framework = 'vue3' | 'react'
 
-const MIN_NODE_MAJOR = 20
-const MIN_PNPM_MAJOR = 8
+const MIN_NODE_VERSION = { major: 22, minor: 13, patch: 0 } as const
+const MIN_PNPM_VERSION = { major: 11, minor: 9, patch: 0 } as const
+const MIN_NODE_RANGE = '22.13.0'
+const MIN_PNPM_RANGE = '11.9.0'
 const REQUIRED_TAILWIND_MAJOR = 4
 const REQUIRED_TIGERCAT_MAJOR = 1
 
@@ -61,8 +63,16 @@ const REQUIRED_CORE_EXPORTS = [
 ]
 
 const VERSION_COMPATIBILITY_MATRIX = [
-  { name: 'Node.js', range: '>=20.11.0', reason: 'Matches workspace engines and CLI templates' },
-  { name: 'pnpm', range: '>=8.0.0', reason: 'Required by workspace package management' },
+  {
+    name: 'Node.js',
+    range: `>=${MIN_NODE_RANGE}`,
+    reason: 'Matches workspace engines and CLI templates'
+  },
+  {
+    name: 'pnpm',
+    range: `>=${MIN_PNPM_RANGE}`,
+    reason: 'Required by workspace package management'
+  },
   { name: 'Tailwind CSS', range: '>=4.0.0', reason: 'Required by Tigercat theme utilities' },
   { name: 'Vue', range: '^3.0.0', reason: 'Peer range for @expcat/tigercat-vue' },
   { name: 'React', range: '^19.0.0', reason: 'Peer range for @expcat/tigercat-react' }
@@ -206,19 +216,19 @@ function createPackageCheck(result: {
 function createNodeCheck(version: string): DoctorCheck {
   const parsed = parseVersion(version)
 
-  if (!parsed || parsed.major < MIN_NODE_MAJOR) {
+  if (!parsed || isVersionLessThan(parsed, MIN_NODE_VERSION)) {
     return {
       name: 'Node.js',
       status: 'fail',
-      message: `Node ${MIN_NODE_MAJOR}+ is required, current version is ${version}`,
-      suggestions: [`Install Node ${MIN_NODE_MAJOR}+ and rerun tigercat doctor`]
+      message: `Node ${MIN_NODE_RANGE}+ is required, current version is ${version}`,
+      suggestions: [`Install Node ${MIN_NODE_RANGE}+ and rerun tigercat doctor`]
     }
   }
 
   return {
     name: 'Node.js',
     status: 'pass',
-    message: `Node ${version} satisfies >=${MIN_NODE_MAJOR}`
+    message: `Node ${version} satisfies >=${MIN_NODE_RANGE}`
   }
 }
 
@@ -229,26 +239,26 @@ function createPnpmCheck(packageJson: ProjectPackage | null, env: NodeJS.Process
     return {
       name: 'pnpm',
       status: 'warn',
-      message: `Could not detect pnpm version; Tigercat templates expect pnpm ${MIN_PNPM_MAJOR}+`,
-      suggestions: ['Add packageManager: pnpm@10.26.2 to package.json or run through pnpm']
+      message: `Could not detect pnpm version; Tigercat templates expect pnpm ${MIN_PNPM_RANGE}+`,
+      suggestions: ['Add packageManager: pnpm@11.9.0 to package.json or run through pnpm']
     }
   }
 
   const parsed = parseVersion(version)
 
-  if (!parsed || parsed.major < MIN_PNPM_MAJOR) {
+  if (!parsed || isVersionLessThan(parsed, MIN_PNPM_VERSION)) {
     return {
       name: 'pnpm',
       status: 'fail',
-      message: `pnpm ${MIN_PNPM_MAJOR}+ is required, detected ${version}`,
-      suggestions: [`Upgrade pnpm to ${MIN_PNPM_MAJOR}+`]
+      message: `pnpm ${MIN_PNPM_RANGE}+ is required, detected ${version}`,
+      suggestions: [`Upgrade pnpm to ${MIN_PNPM_RANGE}+`]
     }
   }
 
   return {
     name: 'pnpm',
     status: 'pass',
-    message: `pnpm ${version} satisfies >=${MIN_PNPM_MAJOR}`
+    message: `pnpm ${version} satisfies >=${MIN_PNPM_RANGE}`
   }
 }
 
@@ -550,6 +560,15 @@ function parseVersion(value: string): { major: number; minor: number; patch: num
     minor: Number(match[2] ?? 0),
     patch: Number(match[3] ?? 0)
   }
+}
+
+function isVersionLessThan(
+  current: { major: number; minor: number; patch: number },
+  minimum: { major: number; minor: number; patch: number }
+): boolean {
+  if (current.major !== minimum.major) return current.major < minimum.major
+  if (current.minor !== minimum.minor) return current.minor < minimum.minor
+  return current.patch < minimum.patch
 }
 
 function getRangeMajor(range: string | undefined): number | null {

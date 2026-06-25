@@ -88,7 +88,7 @@ export function App() {
 - **Vue:** >= 3.3.0
 - **React:** >= 18.0.0
 - **Tailwind CSS:** >= 4.0.0
-- **Node.js:** >= 20.11.0
+- **Node.js:** >= 22.13.0
 
 ## 本地开发
 

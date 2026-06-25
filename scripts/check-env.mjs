@@ -91,16 +91,16 @@ function main() {
   console.log('Checking Node.js...')
   const nodeVersion = process.versions.node
   const pkg = safeReadJson('package.json')
-  const requiredNode = String(pkg?.engines?.node ?? '>=20.11.0').replace(/^>=\s*/, '')
+  const requiredNode = String(pkg?.engines?.node ?? '>=22.13.0').replace(/^>=\s*/, '')
   if (!checkVersion('Node.js', nodeVersion, requiredNode)) hasErrors = true
   console.log('')
 
   console.log('Checking pnpm...')
   const pnpmVersion = getPnpmVersion()
-  const requiredPnpm = String(pkg?.engines?.pnpm ?? '>=8.0.0').replace(/^>=\s*/, '')
+  const requiredPnpm = String(pkg?.engines?.pnpm ?? '>=11.9.0').replace(/^>=\s*/, '')
   if (!pnpmVersion) {
     console.log(`${c('red', '✗')} pnpm is not installed`)
-    console.log(`${c('yellow', 'ℹ')} Install pnpm: npm install -g pnpm@10.26.2`)
+    console.log(`${c('yellow', 'ℹ')} Install pnpm: npm install -g pnpm@11.9.0`)
     hasErrors = true
   } else if (!checkVersion('pnpm', pnpmVersion, requiredPnpm)) {
     hasErrors = true

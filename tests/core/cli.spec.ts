@@ -404,23 +404,23 @@ describe('CLI Doctor', () => {
 
   it('passes for a current React template-style project', () => {
     const projectDir = writePackage('react-pass', {
-      packageManager: 'pnpm@10.26.2',
+      packageManager: 'pnpm@11.9.0',
       dependencies: {
         '@expcat/tigercat-react': '^1.0.0',
-        react: '^19.2.5',
-        'react-dom': '^19.2.5'
+        react: '^19.2.7',
+        'react-dom': '^19.2.7'
       },
       devDependencies: {
         '@expcat/tigercat-core': '^1.0.0',
-        '@tailwindcss/vite': '^4.2.4',
-        '@vitejs/plugin-react': '^6.0.1',
-        tailwindcss: '^4.2.4',
+        '@tailwindcss/vite': '^4.3.1',
+        '@vitejs/plugin-react': '^6.0.3',
+        tailwindcss: '^4.3.1',
         typescript: '^6.0.3',
-        vite: '^8.0.10'
+        vite: '^8.1.0'
       }
     })
 
-    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '20.0.0', env: {} })
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '22.23.1', env: {} })
 
     expect(checks.every((check) => check.status === 'pass')).toBe(true)
   })
@@ -434,12 +434,12 @@ describe('CLI Doctor', () => {
       },
       devDependencies: {
         '@expcat/tigercat-core': '^1.0.0',
-        '@tailwindcss/vite': '^4.2.4',
-        '@vitejs/plugin-vue': '^6.0.3',
-        tailwindcss: '^4.2.4',
+        '@tailwindcss/vite': '^4.3.1',
+        '@vitejs/plugin-vue': '^6.0.7',
+        tailwindcss: '^4.3.1',
         typescript: '^6.0.3',
-        vite: '^8.0.10',
-        'vue-tsc': '^3.2.7'
+        vite: '^8.1.0',
+        'vue-tsc': '^3.3.5'
       }
     })
 
@@ -452,22 +452,22 @@ describe('CLI Doctor', () => {
 
   it('fails when the Tailwind v4 Vite plugin is missing', () => {
     const projectDir = writePackage('missing-tailwind-vite-plugin', {
-      packageManager: 'pnpm@10.26.2',
+      packageManager: 'pnpm@11.9.0',
       dependencies: {
         '@expcat/tigercat-vue': '^1.0.0',
         vue: '^3.5.26'
       },
       devDependencies: {
         '@expcat/tigercat-core': '^1.0.0',
-        '@vitejs/plugin-vue': '^6.0.3',
-        tailwindcss: '^4.2.4',
+        '@vitejs/plugin-vue': '^6.0.7',
+        tailwindcss: '^4.3.1',
         typescript: '^6.0.3',
-        vite: '^8.0.10',
-        'vue-tsc': '^3.2.7'
+        vite: '^8.1.0',
+        'vue-tsc': '^3.3.5'
       }
     })
 
-    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '20.0.0', env: {} })
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '22.23.1', env: {} })
     const tailwindCheck = checks.find((check) => check.name === 'Tailwind CSS')
 
     expect(tailwindCheck?.status).toBe('fail')
@@ -476,7 +476,7 @@ describe('CLI Doctor', () => {
 
   it('warns when a supported framework is not detected', () => {
     const projectDir = writePackage('plain-vite', {
-      packageManager: 'pnpm@10.26.2',
+      packageManager: 'pnpm@11.9.0',
       devDependencies: {
         '@tailwindcss/vite': '^4.1.18',
         tailwindcss: '^4.1.18',
@@ -485,7 +485,7 @@ describe('CLI Doctor', () => {
       }
     })
 
-    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '20.0.0', env: {} })
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '22.23.1', env: {} })
 
     expect(checks.find((check) => check.name === 'Peer dependencies')?.status).toBe('warn')
     expect(checks.find((check) => check.name === 'Template compatibility')?.status).toBe('warn')
@@ -500,7 +500,7 @@ describe('CLI Doctor', () => {
       devDependencies: {
         '@expcat/tigercat-core': '^1.0.0',
         '@tailwindcss/vite': '^4.1.18',
-        '@vitejs/plugin-vue': '^6.0.3',
+        '@vitejs/plugin-vue': '^6.0.7',
         tailwindcss: '^4.1.18',
         typescript: '^5.9.3',
         vite: '^7.3.0',
@@ -510,8 +510,8 @@ describe('CLI Doctor', () => {
 
     const checks = collectDoctorChecks({
       cwd: projectDir,
-      nodeVersion: '20.0.0',
-      env: { npm_config_user_agent: 'pnpm/10.26.2 npm/? node/v20.0.0 darwin arm64' }
+      nodeVersion: '22.23.1',
+      env: { npm_config_user_agent: 'pnpm/11.9.0 npm/? node/v22.23.1 darwin arm64' }
     })
 
     expect(checks.find((check) => check.name === 'pnpm')?.status).toBe('pass')
@@ -522,7 +522,7 @@ describe('CLI Doctor', () => {
     ensureDir(projectDir)
     writeFileSafe(join(projectDir, 'package.json'), '{ nope')
 
-    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '20.0.0', env: {} })
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '22.23.1', env: {} })
 
     expect(checks.find((check) => check.name === 'Project package')?.status).toBe('fail')
     expect(checks.some((check) => check.name === 'Tailwind CSS')).toBe(false)
@@ -625,7 +625,7 @@ describe('CLI Doctor - deep checks', () => {
 
   it('fails the compatibility matrix when a framework is below the supported major', () => {
     const projectDir = writeProject('old-react', {
-      packageManager: 'pnpm@10.26.2',
+      packageManager: 'pnpm@11.9.0',
       dependencies: {
         '@expcat/tigercat-react': '^1.0.0',
         react: '^18.2.0',
@@ -633,17 +633,17 @@ describe('CLI Doctor - deep checks', () => {
       },
       devDependencies: {
         '@expcat/tigercat-core': '^1.0.0',
-        '@tailwindcss/vite': '^4.2.4',
-        '@vitejs/plugin-react': '^6.0.1',
-        tailwindcss: '^4.2.4',
+        '@tailwindcss/vite': '^4.3.1',
+        '@vitejs/plugin-react': '^6.0.3',
+        tailwindcss: '^4.3.1',
         typescript: '^6.0.3',
-        vite: '^8.0.10'
+        vite: '^8.1.0'
       }
     })
 
     const checks = collectDoctorChecks({
       cwd: projectDir,
-      nodeVersion: '22.0.0',
+      nodeVersion: '22.23.1',
       env: {},
       readCorePackageJson: () => ({ exports: REQUIRED_CORE_EXPORTS })
     })
@@ -657,15 +657,15 @@ describe('CLI Doctor - deep checks', () => {
     const projectDir = writeProject('broken-core', {
       dependencies: {
         '@expcat/tigercat-react': '^1.0.0',
-        react: '^19.2.5',
-        'react-dom': '^19.2.5'
+        react: '^19.2.7',
+        'react-dom': '^19.2.7'
       },
       devDependencies: { '@expcat/tigercat-core': '^1.0.0' }
     })
 
     const checks = collectDoctorChecks({
       cwd: projectDir,
-      nodeVersion: '22.0.0',
+      nodeVersion: '22.23.1',
       env: {},
       readCorePackageJson: () => ({
         exports: { '.': './dist/index.js', './tailwind': './dist/tailwind.js' }
@@ -684,7 +684,7 @@ describe('CLI Doctor - deep checks', () => {
 
     const checks = collectDoctorChecks({
       cwd: projectDir,
-      nodeVersion: '22.0.0',
+      nodeVersion: '22.23.1',
       env: {},
       readCorePackageJson: () => ({ exports: REQUIRED_CORE_EXPORTS })
     })
@@ -699,7 +699,7 @@ describe('CLI Doctor - deep checks', () => {
 
     const checks = collectDoctorChecks({
       cwd: projectDir,
-      nodeVersion: '22.0.0',
+      nodeVersion: '22.23.1',
       env: {},
       readCorePackageJson: () => null
     })
@@ -994,19 +994,19 @@ describe('CLI Cross-Platform Paths', () => {
     writeFileSafe(
       join(projectDir, 'package.json'),
       JSON.stringify({
-        packageManager: 'pnpm@10.26.2',
-        dependencies: { '@expcat/tigercat-vue': '^1.0.0', vue: '^3.5.33' },
+        packageManager: 'pnpm@11.9.0',
+        dependencies: { '@expcat/tigercat-vue': '^1.0.0', vue: '^3.5.38' },
         devDependencies: {
           '@expcat/tigercat-core': '^1.0.0',
-          '@tailwindcss/vite': '^4.2.4',
-          tailwindcss: '^4.2.4',
+          '@tailwindcss/vite': '^4.3.1',
+          tailwindcss: '^4.3.1',
           typescript: '^6.0.3',
-          vite: '^8.0.10'
+          vite: '^8.1.0'
         }
       })
     )
 
-    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '22.0.0', env: {} })
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '22.23.1', env: {} })
 
     expect(checks.find((c) => c.name === 'Project package')?.status).toBe('pass')
     expect(checks.find((c) => c.name === 'Node.js')?.status).toBe('pass')

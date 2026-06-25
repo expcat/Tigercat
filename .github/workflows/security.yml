@@ -27,12 +27,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 10.26.2
+          version: 11.9.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6

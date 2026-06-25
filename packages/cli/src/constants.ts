@@ -15,27 +15,27 @@ export const TEMPLATE_VERSIONS = {
   tigercat: '^1.4.0',
 
   // Frameworks
-  vue: '^3.5.33',
-  react: '^19.2.5',
-  reactDom: '^19.2.5',
+  vue: '^3.5.38',
+  react: '^19.2.7',
+  reactDom: '^19.2.7',
 
   // Build toolchain
   typescript: '^6.0.3',
-  vite: '^8.0.10',
-  tailwindcss: '^4.2.4',
-  tailwindcssVite: '^4.2.4',
+  vite: '^8.1.0',
+  tailwindcss: '^4.3.1',
+  tailwindcssVite: '^4.3.1',
 
   // Vite plugins
-  vitejsPluginVue: '^6.0.6',
-  vitejsPluginReact: '^6.0.1',
+  vitejsPluginVue: '^6.0.7',
+  vitejsPluginReact: '^6.0.3',
 
   // Type definitions
-  typesReact: '^19.2.14',
+  typesReact: '^19.2.17',
   typesReactDom: '^19.2.3',
 
   // Vue-specific
   vueTsconfig: '^0.9.1',
-  vueTsc: '^3.2.7'
+  vueTsc: '^3.3.5'
 } as const
 
 export const COMPONENT_CATEGORIES = {
