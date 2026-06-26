@@ -224,7 +224,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：PieChart、DonutChart、RadarChart、GaugeChart。
 - 重点：角度计算、label 布局、重复 SVG 逻辑、空值和极值。
 
-##### C28 专用图表组
+##### C28 专用图表组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C28 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：FunnelChart、HeatmapChart、TreeMapChart、SunburstChart、OrgChart、Gantt。
 - 重点：专用布局算法、层级/时间轴计算、颜色映射、复杂数据边界。
