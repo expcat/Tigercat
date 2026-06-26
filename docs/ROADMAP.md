@@ -104,7 +104,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Modal、Drawer、Loading、Progress、Tour。
 - 重点：open API、portal、scroll lock、focus restore、遮罩/层级、进度状态。
 
-##### C10 消息通知
+##### C10 消息通知 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C10 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Message、Notification、NotificationCenter。
 - 重点：全局容器、重复节点、队列清理、定时器、严格模式重复渲染。

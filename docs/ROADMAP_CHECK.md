@@ -2,9 +2,9 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）
 verified-date: 2026-06-26
-source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
+source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -1663,3 +1663,167 @@ const getDefaultTarget = () => window
 | `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C09 基线 |
 
 > 本轮 C09 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，C09 阶段执行目标 vitest、`corepack pnpm api:validate` 与 `corepack pnpm types:check`（均通过）。
+
+---
+
+### C10 消息通知
+
+**扫描范围**：Message / Notification / NotificationCenter 三个组件的 core 类型 [message.ts](../packages/core/src/types/message.ts)、[notification.ts](../packages/core/src/types/notification.ts)（NotificationCenter 的 `NotificationItem`/`NotificationGroup`/`NotificationCenterProps` 在 [composite.ts](../packages/core/src/types/composite.ts)），core 工具 [message-utils.ts](../packages/core/src/utils/message-utils.ts)、[notification-utils.ts](../packages/core/src/utils/notification-utils.ts)、[notification-center-utils.ts](../packages/core/src/utils/notification-center-utils.ts) 与共享 imperative helper [imperative-api.ts](../packages/core/src/utils/imperative-api.ts)，React/Vue 三组件实现、`packages/{react,vue}/src/index` 导出，tests/{core,react,vue} 8 个定向 spec，generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）。
+
+**结论速览**：基础面健康——imperative API 公共管线（`normalizeStringOption`、`createInstanceCounter`、`ANIMATION_DURATION_MS`、`isBrowser`）、Notification 栈位更新调度器（`createNotificationStackUpdateScheduler`，rAF 批处理）、NotificationCenter 分组逻辑（`buildNotificationGroups`/`sortNotificationGroups`）、全部 class/颜色/图标常量均已沉 core 并双端共享、有 core spec；Notification 的 per-position 容器生命周期与 clear 双端对称、测试镜像；单例守卫在 DOM 被外部清空时复位 root，未发现严格模式重复容器节点。**无 P1**。发现集中在 2 条 **P2**（Message `position` 公共字段被 imperative API 静默忽略、与 Notification 不对称；Message/Notification 双端四实现各自手写近乎相同的 imperative 栈簿记，「该合未合」、合并决策延后 H）+ 5 条 P3（定时器/队列清理、Message 空容器不销毁、NotificationCenter 死代码、硬编码中文默认文案重复、一组首渲染/回退/动画/命名/属性写法的 parity 清理）。
+
+---
+
+#### C10-1 Message `position` 被 imperative API 静默忽略，与 Notification 不对称 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜公共 `MessageProps`（[message.ts:108](../packages/core/src/types/message.ts)）与 imperative 入参 `MessageConfig` 都带 `position?: MessagePosition`，`messagePositionClasses` 提供 6 个方位（[message-utils.ts:23](../packages/core/src/utils/message-utils.ts)），feedback.md 把 Message 记作 `3/7 props`。但 React `addMessage` 只把 `{id,type,content,duration,closable,onClose,icon,className}` 写入实例，**从不读 `config.position`**（[Message.tsx:199](../packages/react/src/components/Message.tsx)），单例容器恒以默认 `'top'` 渲染（[Message.tsx:128](../packages/react/src/components/Message.tsx)、`containerRoot?.render(<MessageContainer />)` 无 position [Message.tsx:191](../packages/react/src/components/Message.tsx)）。
+- 🟠 P2｜Vue 同型：`addMessage` 不读 position（[Message.ts:201](../packages/vue/src/components/Message.ts)），`ensureContainer` 用 `createApp(MessageContainer)` 不传 props（[Message.ts:194](../packages/vue/src/components/Message.ts)），容器 `position` prop 默认 `'top'`（[Message.ts:76](../packages/vue/src/components/Message.ts)）。因此 `Message.info({ content, position: 'bottom-right' })` 双端都被静默落到 `'top'`。
+- 🟠 P2｜Notification 则真正按 position 分区建容器（[Notification.tsx:271](../packages/react/src/components/Notification.tsx)、[Notification.ts:300](../packages/vue/src/components/Notification.ts)），有测试锁定（`respects position by creating a container per position`，[tests/react/Notification.spec.tsx:84](../tests/react/Notification.spec.tsx)、[tests/vue/Notification.spec.ts:73](../tests/vue/Notification.spec.ts)）。Message 双端均无任何 position 测试。
+
+**公共内容决策**：属框架层 imperative API 语义修正，不新增 core 逻辑。两条路线二选一：① Message imperative API 真正支持 position（与 Notification 对齐，可顺势复用 C10-2 的共享 controller，按方位分容器）；② 把 `position` 从 `MessageProps`/`MessageConfig` 标 `@deprecated` 并精简 `messagePositionClasses`。涉及 public type 时走 baseline。
+
+**建议修复顺序**：P2。先定产品语义（Message 是否需要多方位）；落地前补「`Message.x({position})` 渲染到对应容器」或「position 已弃用」的双端测试，再改实现或类型。
+
+**目标验证命令**：`pnpm vitest run tests/react/Message.spec.tsx tests/vue/Message.spec.ts`、`pnpm api:validate`、`pnpm types:check`，涉及 public type 追加 `pnpm api:baseline:check`。
+
+---
+
+#### C10-2 Message 与 Notification 双端各自手写近乎相同的 imperative 栈簿记（该合未合，决策延后 H）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜四份实现（React/Vue × Message/Notification）重复同一套簿记骨架：实例存储、单调 id（都用 core `createInstanceCounter`）、`ensureContainer`/`destroyContainer`、`addX`/`removeX`/`clearAll`、自动关闭 `setTimeout`、DOM 被外部清空时复位 root。Message 用单一扁平数组 + 单例容器（[Message.tsx:37](../packages/react/src/components/Message.tsx)），Notification 多一层 per-position 分区 + rAF 调度器（[Notification.tsx:37](../packages/react/src/components/Notification.tsx)），其余结构高度同形。
+- 🟠 P2｜纯簿记（实例表、id、定时器跟踪、clear、按 key 分区）与框架无关，目前在 4 个文件各写一遍；只有 render + root 挂载（createRoot/createApp、flushSync/Teleport）才是真正框架层。属典型「该合未合」。
+
+**公共内容决策**：候选抽取 core 框架无关的「imperative stack controller」（管理 instances-by-key、id、timer、ensure/destroy 回调、clear），框架仅注入「挂载/卸载容器」与「触发重渲染」。与 C10-1 的 position 决策强耦合（Message 是否也要 per-key 分区）。**合并决策延后任务 H**——届时 Message + Notification 双端四实现同时在视野，参照 C07-2/C08 的延后处理。本组不单独动。
+
+**建议修复顺序**：P2，记录待 H 取舍；非 C10 单独行动项。
+
+**目标验证命令**：（决策项，无新增测试）届时 `pnpm vitest run tests/react/Message.spec.tsx tests/react/Notification.spec.tsx tests/vue/Message.spec.ts tests/vue/Notification.spec.ts tests/core/notification-utils.spec.ts`。
+
+---
+
+#### C10-3 自动关闭定时器未跟踪、手动关闭/clear 不清除 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜`addX` 里 `setTimeout(() => removeX(id), duration)` 的 handle 被丢弃，未存入实例也无从清除（[Message.tsx:228](../packages/react/src/components/Message.tsx)、[Notification.tsx:295](../packages/react/src/components/Notification.tsx)、[Message.ts:221](../packages/vue/src/components/Message.ts)、[Notification.ts:325](../packages/vue/src/components/Notification.ts)）。
+- 🟢 P3｜手动 close（关闭按钮 / 返回的 close fn）与 `clear()` 只移除实例，不取消定时器；定时器仍到点触发 `removeX(id)`，但 `findIndex` 已命中不到该 id 故为 no-op。因 id 由 `createInstanceCounter` 单调自增、永不复用，**不会误删后续实例，当前 benign**。
+- 🟢 P3｜但这正是 C10 重点「定时器/队列清理」：`clear()` 后仍可能残留悬挂定时器，fake-timer 测试中 `advanceTimersByTime` 会触发这些已无效的回调；现有测试未断言「手动关闭/clear 应清除待触发定时器」。
+
+**公共内容决策**：定时器跟踪属框架层簿记（或并入 C10-2 的共享 controller）。建议把每实例 timer handle 存入实例/Map，`removeX`/`clearAll` 时 `clearTimeout`。无需新增 core 纯逻辑。
+
+**建议修复顺序**：P3。可与 C10-2 一并处理；先补「手动关闭后推进定时器不应二次触发 / 不留悬挂回调」的双端测试。
+
+**目标验证命令**：`pnpm vitest run tests/react/Message.spec.tsx tests/react/Notification.spec.tsx tests/vue/Message.spec.ts tests/vue/Notification.spec.ts`。
+
+---
+
+#### C10-4 Message 空时不销毁全局容器，与 Notification 清空即销毁不一致 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜Message `removeMessage` 在队列清空后不销毁容器（[Message.tsx:241](../packages/react/src/components/Message.tsx)、[Message.ts:234](../packages/vue/src/components/Message.ts)）；空的 `#tiger-message-container-root` 与已挂载的 React root / Vue app 常驻 `document.body`，直到显式 `Message.clear()` 才 unmount 并移除节点（[Message.tsx:271](../packages/react/src/components/Message.tsx)、[Message.ts:248](../packages/vue/src/components/Message.ts)）。
+- 🟢 P3｜Notification 相反：某 position 队列清空即 `destroyContainer`（unmount + 移除节点 + 取消调度）（[Notification.tsx:321](../packages/react/src/components/Notification.tsx)、[Notification.ts:351](../packages/vue/src/components/Notification.ts)）。两个同类全局容器组件生命周期策略不一致；Message 留一个空容器节点（非重复节点，单例守卫避免重复创建）。
+
+**公共内容决策**：属框架层容器生命周期策略。二选一并双端统一：① Message 跟随 Notification，空时 `destroyContainer`；② 明确「Message 单例容器有意常驻以省去频繁重建」并文档说明。无 core 改动。
+
+**建议修复顺序**：P3，与 C10-2 一起决定（共享 controller 可统一容器生命周期）。
+
+**目标验证命令**：`pnpm vitest run tests/react/Message.spec.tsx tests/vue/Message.spec.ts`。
+
+---
+
+#### C10-5 NotificationCenter `_currentGroup` 计算属性双端死代码 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜React `const _currentGroup = useMemo(...)`（[NotificationCenter.tsx:93](../packages/react/src/components/NotificationCenter.tsx)）与 Vue `const _currentGroup = computed(...)`（[NotificationCenter.ts:170](../packages/vue/src/components/NotificationCenter.ts)）声明后从未被读取——下划线前缀即标记其闲置；实际使用的是带读态覆盖的 `effectiveCurrentGroup`。属纯死代码，连同其 memo/computed 计算开销可安全删除。
+
+**公共内容决策**：双端删除即可，不涉及 core 或公共 API。
+
+**建议修复顺序**：P3，独立小清理。
+
+**目标验证命令**：`pnpm vitest run tests/react/NotificationCenter.spec.tsx tests/vue/NotificationCenter.spec.ts`、`pnpm types:check`。
+
+---
+
+#### C10-6 NotificationCenter 默认文案硬编码中文且双端重复 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜9 条界面默认串（`加载中...`、`暂无通知`、`通知中心`、`全部`、`未读`、`已读`、`全部标记已读`、`标记已读`、`标记未读`）作为 props 默认值在两端各写一份（[NotificationCenter.tsx:44](../packages/react/src/components/NotificationCenter.tsx)、[NotificationCenter.ts:74](../packages/vue/src/components/NotificationCenter.ts)）。
+- 🟢 P3｜这与库内其它组件「英文默认 + `TigerLocale` 覆盖」方向不一致（同组 Message/Notification 的 aria-label 用英文 `Close message`/`Close notification`）；默认值重复且无法经 ConfigProvider locale 本地化。
+
+**公共内容决策**：默认文案可沉到 core 共享常量或 `TigerLocale` 的 notificationCenter 命名空间（候选），双端从同一来源读取；渲染留框架层。属「该合未合 / i18n 一致性」。
+
+**建议修复顺序**：P3。若新增 locale 命名空间需改 core 类型与 preset、刷新 baseline、由 `docs:api` 生成 references（不手改）。
+
+**目标验证命令**：`pnpm vitest run tests/react/NotificationCenter.spec.tsx tests/vue/NotificationCenter.spec.ts`，涉及 core locale 追加 `pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C10-7 一组双端 parity / 清理项（合并） — **P3**
+
+**发现问题**
+
+- 🟢 P3｜① React 首渲染策略不一致：Message 用 `flushSync` 包裹容器渲染（[Message.tsx:191](../packages/react/src/components/Message.tsx)），Notification 用普通 `.render()` 并依赖容器 mount effect 的初次同步（[Notification.tsx:246](../packages/react/src/components/Notification.tsx)、[Notification.tsx:179](../packages/react/src/components/Notification.tsx)）；两者都能工作但机制不同。
+- 🟢 P3｜② core 回退不对称：`getNotificationTypeClasses`/`getNotificationIconPath` 带 `|| info` 兜底（[notification-utils.ts:93](../packages/core/src/utils/notification-utils.ts)、[notification-utils.ts:110](../packages/core/src/utils/notification-utils.ts)），`getMessageTypeClasses`/`getMessageIconPath` 无（[message-utils.ts:91](../packages/core/src/utils/message-utils.ts)、[message-utils.ts:110](../packages/core/src/utils/message-utils.ts)）；两个 type 都是严格联合，要么 notification 侧兜底冗余、要么 message 侧缺一致兜底。
+- 🟢 P3｜③ 自动关闭路径跳过退出动画：手动 close 先 `setIsVisible(false)` 再延时移除（React）/ 经 TransitionGroup（Vue），自动关闭直接 `removeX(id)`，无退出过渡。
+- 🟢 P3｜④ imperative 导出命名 `Message`（大写）vs `notification`（小写）双端一致但彼此不一致（[index.tsx:201](../packages/react/src/index.tsx)、[index.ts:170](../packages/vue/src/index.ts)）；改名属 breaking，倾向保留 + 文档说明。
+- 🟢 P3｜⑤ data 属性写法不一：React Message 用裸 `data-tiger-message`（渲染为 `="true"`）、Notification 用显式 `data-tiger-notification=""`；选择器多按「属性存在」匹配故无 bug，但约定不统一。
+
+**公共内容决策**：均为框架层一致性/清理；纯逻辑已在 core，无需新增 core。回退不对称（②）若统一，应在 core 两侧取齐。
+
+**建议修复顺序**：P3，低优先批量清理；先决定回退/动画/命名是否统一，再补少量断言。
+
+**目标验证命令**：`pnpm vitest run tests/react/Message.spec.tsx tests/react/Notification.spec.tsx tests/vue/Message.spec.ts tests/vue/Notification.spec.ts`、`pnpm types:check`。
+
+---
+
+#### C10 健康项
+
+- ✅ imperative API 公共管线 `normalizeStringOption` / `createInstanceCounter`（[imperative-api.ts:10](../packages/core/src/utils/imperative-api.ts)、[imperative-api.ts:29](../packages/core/src/utils/imperative-api.ts)）、`ANIMATION_DURATION_MS`（[animation.ts:310](../packages/core/src/utils/animation.ts)）、`isBrowser`（[env.ts:1](../packages/core/src/utils/env.ts)）已沉 core，双端共享。
+- ✅ `createNotificationStackUpdateScheduler`（[notification-utils.ts:187](../packages/core/src/utils/notification-utils.ts)，rAF 批处理、多 position 合帧、cancel）在 core，有 core spec（[notification-utils.spec.ts](../tests/core/notification-utils.spec.ts)）双端同构消费。
+- ✅ `buildNotificationGroups`/`sortNotificationGroups`（[notification-center-utils.ts](../packages/core/src/utils/notification-center-utils.ts)）在 core，有 core spec（[notification-center-utils.spec.ts](../tests/core/notification-center-utils.spec.ts)）双端共享。
+- ✅ 全部 message/notification class/颜色/图标常量在 core-utils；NotificationCenter 双端结构（分组、读态过滤、`manageReadState` 覆盖、mark-all-read、Tabs/List）对称，测试镜像。
+- ✅ 单例守卫在 DOM 被外部清空（测试 `innerHTML=''`）时自动复位 root（[Message.tsx:174](../packages/react/src/components/Message.tsx)、[Notification.tsx:227](../packages/react/src/components/Notification.tsx)、[Message.ts:179](../packages/vue/src/components/Message.ts)、[Notification.ts:260](../packages/vue/src/components/Notification.ts)），避免悬挂 root 并使 React StrictMode/测试重置安全——未发现严格模式重复容器节点。
+- ✅ Feedback references 当前能列出 Message/Notification/NotificationCenter，未发现 C10 组件索引漏列。
+
+---
+
+#### C10 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| Message position 被忽略（C10-1） | 框架层落实 position 或弃用字段；走 baseline | **P2** |
+| imperative 栈簿记四实现重复（C10-2） | 候选抽 core 框架无关 controller；决策延后 H | **P2** |
+| 自动关闭定时器未清（C10-3） | 框架层跟踪并 clearTimeout（或并入 C10-2） | P3 |
+| Message 空容器不销毁（C10-4） | 双端统一生命周期或文档说明 | P3 |
+| NotificationCenter `_currentGroup` 死代码（C10-5） | 双端删除 | P3 |
+| NotificationCenter 中文默认重复（C10-6） | 沉 core 常量/locale（候选） | P3 |
+| 一组 parity/清理（C10-7） | 框架层统一，core 无改动 | P3 |
+| imperative helper / scheduler / 分组 / class 常量已在 core | 已在 core，保持 | - |
+
+---
+
+#### C10 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| React/Vue addMessage 入参 | 不读 `config.position`；单例容器恒 `top` | C10-1 |
+| Notification addNotification | 按 position 分容器，有双端测试锁定 | C10-1 |
+| 四实现结构比对 | instances/id/ensure-destroy/add-remove-clear/timeout 同形重复 | C10-2 |
+| 自动关闭 setTimeout handle | 丢弃、不清除；id 单调故触发时 no-op、benign | C10-3 |
+| removeMessage vs removeNotification 空队列 | Message 不销毁容器；Notification `destroyContainer` | C10-4 |
+| grep `_currentGroup` | 仅声明、双端无读取点 | C10-5 |
+| NotificationCenter props 默认 | 9 条中文默认双端各写一份 | C10-6 |
+| flushSync / 回退 / 动画 / 命名 / data-attr 比对 | 五处双端或组件间不一致 | C10-7 |
+| grep imperative helper 消费 | `normalizeStringOption`/`createInstanceCounter`/`ANIMATION_DURATION_MS`/`isBrowser` 双端共享 | 健康项 |
+| `corepack pnpm vitest run tests/react/Message.spec.tsx tests/react/Notification.spec.tsx tests/react/NotificationCenter.spec.tsx tests/vue/Message.spec.ts tests/vue/Notification.spec.ts tests/vue/NotificationCenter.spec.ts tests/core/notification-utils.spec.ts tests/core/notification-center-utils.spec.ts` | ✅ 8 个测试文件、112 个测试通过 | C10 基线 |
+| `corepack pnpm api:validate` | ✅ 通过；API 一致性检查 0 问题 | C10 基线 |
+| `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C10 基线 |
+
+> 本轮 C10 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，C10 阶段只执行目标 vitest、`corepack pnpm api:validate` 与 `corepack pnpm types:check`（均通过）。
