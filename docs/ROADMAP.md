@@ -233,7 +233,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：FunnelChart、HeatmapChart、TreeMapChart、SunburstChart、OrgChart、Gantt。
 - 重点：专用布局算法、层级/时间轴计算、颜色映射、复杂数据边界。
 
-##### C29 复合内容组
+##### C29 复合内容组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C29 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：ActivityFeed、ChatWindow、CommentThread。
 - 重点：Avatar/Input/Textarea/Button/VirtualList 等依赖复用、列表性能、空态、交互回调。
