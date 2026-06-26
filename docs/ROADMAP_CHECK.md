@@ -2,9 +2,9 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）
 verified-date: 2026-06-26
-source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
+source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -1978,3 +1978,150 @@ const getDefaultTarget = () => window
 | `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C11 基线 |
 
 > 本轮 C11 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，C11 阶段只执行目标 vitest、`corepack pnpm api:validate` 与 `corepack pnpm types:check`（均通过）。FormWizard（C30）不在本组范围。
+
+---
+
+### C12 输入基础组
+
+**扫描范围**：Input / Textarea / InputGroup / InputGroupAddon / InputNumber / NumberKeyboard / Mentions 七个组件的 core 类型 [input.ts](../packages/core/src/types/input.ts)、[textarea.ts](../packages/core/src/types/textarea.ts)、[input-group.ts](../packages/core/src/types/input-group.ts)、[input-number.ts](../packages/core/src/types/input-number.ts)、[number-keyboard.ts](../packages/core/src/types/number-keyboard.ts)、[mentions.ts](../packages/core/src/types/mentions.ts)，core 工具 [input-styles.ts](../packages/core/src/utils/input-styles.ts)、[textarea-auto-resize.ts](../packages/core/src/utils/textarea-auto-resize.ts)、[input-group-utils.ts](../packages/core/src/utils/input-group-utils.ts)、[input-number-utils.ts](../packages/core/src/utils/input-number-utils.ts)、[number-keyboard-utils.ts](../packages/core/src/utils/number-keyboard-utils.ts)、[mentions-utils.ts](../packages/core/src/utils/mentions-utils.ts)，React/Vue 对应组件实现，tests/{core,react,vue} 16 个定向 spec，generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）。
+
+**结论速览**：C12 基线健康：目标 vitest、API 校验、公共类型导出检查均通过；输入样式、数值解析/格式化、数字键盘输入规则、Mentions 查询/定位等主要纯逻辑已沉 core 并被双端复用。未发现 P1。主要问题集中在 **文档/契约准确性与双端 parity**：InputGroup 的 size 上下文承诺与实际不符、React Input/Textarea reference 示例的 `onChange` 形态错误、Vue InputNumber 缺少 core/React 已具备的 `defaultValue` 非受控语义。另有 3 个 P3：Mentions 过滤边界、InputNumber 重复 core spec、NumberKeyboard 删除文案 i18n 边界。
+
+---
+
+#### C12-1 InputGroup `size` 上下文只影响 Addon，不影响 Input/Textarea/InputNumber，与类型描述不符 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜core 类型说明 `InputGroupProps.size` 是 “Size applied to all children in the group”（[input-group.ts:16](../packages/core/src/types/input-group.ts)），React/Vue 也分别 provide size/compact 上下文（[InputGroup.tsx:40](../packages/react/src/components/InputGroup.tsx)、[InputGroup.ts:46](../packages/vue/src/components/InputGroup.ts)）。
+- 🟠 P2｜但消费端只有 `InputGroupAddon` 读取上下文并传给 `getInputGroupAddonClasses`（[InputGroup.tsx:58](../packages/react/src/components/InputGroup.tsx)、[InputGroup.ts:89](../packages/vue/src/components/InputGroup.ts)）。Input、Textarea、InputNumber 均没有读取 InputGroup context，仍使用自身 `size = 'md'` 默认值（[Input.tsx:84](../packages/react/src/components/Input.tsx)、[Textarea.tsx:27](../packages/react/src/components/Textarea.tsx)、[InputNumber.tsx:53](../packages/react/src/components/InputNumber.tsx)、[Input.ts:61](../packages/vue/src/components/Input.ts)、[Textarea.ts:47](../packages/vue/src/components/Textarea.ts)、[InputNumber.ts:58](../packages/vue/src/components/InputNumber.ts)）。
+- 🟠 P2｜现有 InputGroup 测试只断言 group 接受 size、Addon class 存在，未覆盖「子 Input 自动继承 size」（[InputGroup.spec.tsx:62](../tests/react/InputGroup.spec.tsx)、[InputGroup.spec.ts:79](../tests/vue/InputGroup.spec.ts)）。因此当前实现是可通过测试但与公开说明不一致。
+
+**公共内容决策**：二选一并双端统一：① 修改文档/类型说明为「size applies to InputGroupAddon; form controls should set size explicitly」；② 让 Input/Textarea/InputNumber 消费 InputGroup 上下文并仅在自身未显式传 size 时继承。若新增 context 消费属框架层行为变更，core 只保留已有 class helper。
+
+**建议修复顺序**：P2。优先定语义；若选择继承，先补双端 InputGroup+Input/Textarea/InputNumber 组合测试，再改实现。
+
+**目标验证命令**：`corepack pnpm vitest run tests/react/InputGroup.spec.tsx tests/react/Input.spec.tsx tests/react/Textarea.spec.tsx tests/react/InputNumber.spec.tsx tests/vue/InputGroup.spec.ts tests/vue/Input.spec.ts tests/vue/Textarea.spec.ts tests/vue/InputNumber.spec.ts`、`corepack pnpm types:check`。
+
+---
+
+#### C12-2 React Input/Textarea reference 示例把 `onChange` 写成值回调，实际组件传 DOM event — **P2**
+
+**发现问题**
+
+- 🟠 P2｜generated reference 的通用绑定示例写 `<Input value={value} onChange={setValue} />`（[common.md:95](../skills/tigercat/references/shared/patterns/common.md)），form 示例也写 Input/Textarea 的 React 用法为 `onChange={setValue}`（[form.md:18](../skills/tigercat/references/examples/form.md)、[form.md:22](../skills/tigercat/references/examples/form.md)）。
+- 🟠 P2｜真实 React Input 类型是 `onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void`（[Input.tsx:43](../packages/react/src/components/Input.tsx)），实现直接 `onChange?.(event)`（[Input.tsx:145](../packages/react/src/components/Input.tsx)）；Textarea 同理传 `React.ChangeEvent<HTMLTextAreaElement>`（[Textarea.tsx:18](../packages/react/src/components/Textarea.tsx)、[Textarea.tsx:80](../packages/react/src/components/Textarea.tsx)）。
+- 🟠 P2｜React 示例页和测试都按 event 用法写：`onChange={(e) => setBasicText(e.target.value)}`（[InputDemo.tsx:7](../examples/example/react/src/pages/InputDemo.tsx)），Textarea 测试同样读取 `e.target.value`（[Textarea.spec.tsx:377](../tests/react/Textarea.spec.tsx)）。因此 reference 示例会误导消费者把 React state setter 直接接到 event。
+
+**公共内容决策**：属于 generated references/示例文档准确性问题，不改公共 API。后续应从生成源修正（不要手改 generated references）：React Input/Textarea 绑定示例写成 `(event) => setValue(event.target.value)`；保留 InputNumber/Mentions 等值回调组件的 `onChange={setValue}` 示例。
+
+**建议修复顺序**：P2。优先修文档生成源，避免继续生成错误示例。
+
+**目标验证命令**：修复生成源后运行 `corepack pnpm docs:api:check`；若只改文档源，补 `corepack pnpm types:check`。
+
+---
+
+#### C12-3 Vue InputNumber 缺 `defaultValue` 非受控运行时 prop，且本地接口含未实现 `className` — **P2 / P3**
+
+**发现问题**
+
+- 🟠 P2｜core `InputNumberProps` 定义 `defaultValue?: number | null`（[input-number.ts:31](../packages/core/src/types/input-number.ts)），React InputNumber 实现并测试了非受控 `defaultValue`（[InputNumber.tsx:52](../packages/react/src/components/InputNumber.tsx)、[InputNumber.spec.tsx:23](../tests/react/InputNumber.spec.tsx)）。
+- 🟠 P2｜Vue InputNumber 运行时 props 只有 `modelValue`，没有 `defaultValue`（[InputNumber.ts:55](../packages/vue/src/components/InputNumber.ts)）；内部 `internalValue` 初始化为 `props.modelValue ?? null`（[InputNumber.ts:152](../packages/vue/src/components/InputNumber.ts)）。因此 Vue 侧无法用 `defaultValue` 初始化非受控值，与 core/React 语义不一致。
+- 🟢 P3｜Vue 本地接口 `VueInputNumberProps` 声明了 `className?: string`（[InputNumber.ts:48](../packages/vue/src/components/InputNumber.ts)），但运行时 props 没有 `className`，wrapper class 只合并 `attrs.class`（[InputNumber.ts:264](../packages/vue/src/components/InputNumber.ts)）。这与同组 Textarea/NumberKeyboard 显式支持 `className` 的 Vue 组件不一致，属于类型/实现清理项。
+
+**公共内容决策**：`defaultValue` 属 core 公开 props，应补齐 Vue 运行时能力或在 generated references 明确 Vue 仅用 `modelValue`。建议补齐 Vue `defaultValue`，保持与 NumberKeyboard Vue 的非受控模式一致；`className` 则二选一：运行时补 prop，或从本地接口删除并统一推荐 `class`。
+
+**建议修复顺序**：P2 先补 Vue `defaultValue` + 测试；P3 再处理 `className` 一致性。
+
+**目标验证命令**：`corepack pnpm vitest run tests/vue/InputNumber.spec.ts tests/react/InputNumber.spec.tsx tests/core/input-number-utils.spec.ts tests/core/input-number-display-utils.spec.ts`、`corepack pnpm types:check`。
+
+---
+
+#### C12-4 Mentions 打开条件与过滤结果使用不同口径，无匹配/禁用项时进入不可见打开态 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜React `handleInput` 判断 `result && options.length > 0` 就 `setIsOpen(true)`（[Mentions.tsx:58](../packages/react/src/components/Mentions.tsx)），但渲染 listbox 需要 `isOpen && filteredOptions.length > 0`（[Mentions.tsx:138](../packages/react/src/components/Mentions.tsx)）。过滤本身排除 disabled option（[Mentions.tsx:49](../packages/react/src/components/Mentions.tsx)）。
+- 🟢 P3｜Vue `handleInput` 在设置新 query 前读取 `filteredOptions.value.length`（[Mentions.ts:57](../packages/vue/src/components/Mentions.ts)），此时 computed 仍基于旧 query；随后设置 query 后渲染又看新的 `filteredOptions.value.length`（[Mentions.ts:138](../packages/vue/src/components/Mentions.ts)）。因此输入一个无匹配 query 或只匹配禁用项时，可能短暂进入 `isOpen=true` 但无 listbox 渲染的状态。
+- 🟢 P3｜现有测试覆盖下拉定位、键盘导航、过滤和自定义 prefix；React disabled-option 测试只确认组件存在，没有断言无 listbox / 不进入打开态（[Mentions.spec.tsx:188](../tests/react/Mentions.spec.tsx)）。Vue 侧无 disabled option 分支测试。
+
+**公共内容决策**：过滤和打开条件应统一复用同一 core helper 或至少同一份 filtered result。无须改公共 API；建议把「计算 query + 过滤候选 + 是否打开」整理成框架无关 helper，双端消费。
+
+**建议修复顺序**：P3。先补无匹配/disabled-only 双端测试，再收敛打开条件。
+
+**目标验证命令**：`corepack pnpm vitest run tests/react/Mentions.spec.tsx tests/vue/Mentions.spec.ts tests/core/mentions-utils.spec.ts`。
+
+---
+
+#### C12-5 InputNumber core 解析/格式化 helper 有两份近重复 spec — **P3**
+
+**发现问题**
+
+- 🟢 P3｜[input-number-utils.spec.ts](../tests/core/input-number-utils.spec.ts) 与 [input-number-display-utils.spec.ts](../tests/core/input-number-display-utils.spec.ts) 都测试 `formatInputNumberDisplay` / `parseInputNumberValue`，覆盖点高度重合：null/undefined、formatter 优先、precision、默认 Number 解析、空串/单 `-`、非法输入。
+- 🟢 P3｜这两份测试都能通过，但未来修改格式化/解析行为时需要同步维护两处断言，增加噪音。实际 helper 已在 [input-number-utils.ts:195](../packages/core/src/utils/input-number-utils.ts) / [:212](../packages/core/src/utils/input-number-utils.ts) 单源实现，测试也应单源。
+
+**公共内容决策**：纯测试清理；保留一个 core spec 文件即可。建议把较完整的边界用例合并到 `input-number-utils.spec.ts`，删除 `input-number-display-utils.spec.ts` 或改为覆盖真正缺口（如 parser 返回 NaN、precision 非整数策略）。
+
+**建议修复顺序**：P3，低风险清理。
+
+**目标验证命令**：`corepack pnpm vitest run tests/core/input-number-utils.spec.ts tests/react/InputNumber.spec.tsx tests/vue/InputNumber.spec.ts`。
+
+---
+
+#### C12-6 NumberKeyboard confirm 文案接 locale，delete 默认文案未接 locale，i18n 边界不对称 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜React/Vue NumberKeyboard 的 confirm 文案通过 `resolveLocaleText('Done', confirmText, mergedLocale?.common?.okText)` 接入 ConfigProvider locale（[NumberKeyboard.tsx:58](../packages/react/src/components/NumberKeyboard.tsx)、[NumberKeyboard.ts:52](../packages/vue/src/components/NumberKeyboard.ts)）。
+- 🟢 P3｜delete 文案只有 prop 默认值 `deleteText = 'Delete'` / `default: 'Delete'`，传给 core key layout（[NumberKeyboard.tsx:41](../packages/react/src/components/NumberKeyboard.tsx)、[NumberKeyboard.ts:38](../packages/vue/src/components/NumberKeyboard.ts)、[number-keyboard-utils.ts:160](../packages/core/src/utils/number-keyboard-utils.ts)），不会从 locale 派生。当前 `TigerLocaleCommon` 只有 `okText` / `cancelText` / `emptyText` 等字段，无 deleteText（[locale.ts:7](../packages/core/src/types/locale.ts)）。
+- 🟢 P3｜这不是现有测试红灯：双端测试覆盖默认 Delete/Done、自定义 deleteText/confirmText、showConfirm=false（[NumberKeyboard.spec.tsx:12](../tests/react/NumberKeyboard.spec.tsx)、[NumberKeyboard.spec.ts:11](../tests/vue/NumberKeyboard.spec.ts)），但未覆盖 locale 下 delete label 的预期。
+
+**公共内容决策**：可保持现状并在文档说明「deleteText 需显式传入」；若要统一 i18n，则需要给 `TigerLocale` 增加 numberKeyboard/deleteText 命名空间或 common deleteText，属于 core 类型/API 扩展，需 baseline 与 references 更新。
+
+**建议修复顺序**：P3。先文档说明；若产品要求全局本地化，再走 locale 类型扩展。
+
+**目标验证命令**：`corepack pnpm vitest run tests/react/NumberKeyboard.spec.tsx tests/vue/NumberKeyboard.spec.ts tests/core/number-keyboard-utils.spec.ts`，若改 locale 类型追加 `corepack pnpm api:validate`、`corepack pnpm types:check`、`corepack pnpm api:baseline:check`。
+
+---
+
+#### C12 健康项
+
+- ✅ Input 基础 class、状态、prefix/suffix、clearable、password toggle、showCount、number 解析统一走 core `input-styles`（[input-styles.ts](../packages/core/src/utils/input-styles.ts)），React/Vue 行为镜像；error `aria-describedby` / `aria-invalid` 已覆盖。
+- ✅ Textarea 自动尺寸逻辑沉到 core `autoResizeTextarea`（[textarea-auto-resize.ts](../packages/core/src/utils/textarea-auto-resize.ts)），双端分别在 `useLayoutEffect` / `watch + nextTick` 调用，minRows/maxRows 逻辑一致。
+- ✅ InputNumber 的 clamp/step/precision、重复按压 rAF controller、display format/parse 已在 core（[input-number-utils.ts](../packages/core/src/utils/input-number-utils.ts)），双端同构消费；长按 repeat 测试双端覆盖。
+- ✅ NumberKeyboard 输入规则、布局、mode-specific maxLength/precision、delete/confirm payload 均在 core（[number-keyboard-utils.ts](../packages/core/src/utils/number-keyboard-utils.ts)），React/Vue 事件 payload 对齐，ConfigProvider locale 能覆盖 confirm 文案。
+- ✅ Mentions 的输入 class、option class、query 提取、dropdown floating position 与 cyclic index helper 已在 core（[mentions-utils.ts](../packages/core/src/utils/mentions-utils.ts)、[picker-utils.ts:96](../packages/core/src/utils/picker-utils.ts)），双端复用。
+- ✅ component-index 与 form props/api-summary 能列出 C12 组件；`api:validate` 与 `types:check` 均通过，未发现导出缺口。
+
+---
+
+#### C12 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| InputGroup size 上下文未影响子输入（C12-1） | 文档澄清 Addon-only 或双端实现未显式 size 时继承 | **P2** |
+| React Input/Textarea reference `onChange={setValue}` 错误（C12-2） | 修生成源示例；React DOM event handler 与值回调组件分开 | **P2** |
+| Vue InputNumber 缺 `defaultValue`（C12-3） | 补齐 Vue 非受控默认值语义；`className` 单独清理 | **P2** |
+| Mentions 打开条件/过滤口径不一（C12-4） | 双端统一 filtered result；可沉 core helper | P3 |
+| InputNumber helper 重复 spec（C12-5） | 合并测试文件，保留单源覆盖 | P3 |
+| NumberKeyboard delete 文案未接 locale（C12-6） | 文档说明显式 deleteText；或扩展 locale 类型 | P3 |
+| 输入样式/自动尺寸/数值解析/数字键盘/Mentions 定位等核心逻辑已在 core | 已在 core，保持 | - |
+
+---
+
+#### C12 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| grep InputGroup context 消费者 + Input/Textarea/InputNumber size 默认 | 只有 Addon 消费 context；子输入不继承 group size | C12-1 |
+| references `onChange={setValue}` vs React 组件类型/示例页 | reference 写值回调；真实组件传 DOM event，示例页使用 `event.target.value` | C12-2 |
+| core/React InputNumber `defaultValue` vs Vue runtime props | core/React 有 defaultValue；Vue 没有 runtime prop，内部值从 modelValue 初始化 | C12-3 |
+| Vue InputNumber `className` 接口 vs props/wrapper class | interface 有 `className`，runtime 只合并 `attrs.class` | C12-3 |
+| Mentions handleInput/open/render/filter 分支 | 打开口径与渲染过滤口径不同；无匹配/disabled-only 缺测试锁定 | C12-4 |
+| core InputNumber 两份 spec 文件 | `input-number-utils.spec.ts` 与 `input-number-display-utils.spec.ts` 覆盖高度重复 | C12-5 |
+| NumberKeyboard confirm/delete 文案路径 | confirm 走 locale common.okText；delete 只走 prop/default `Delete` | C12-6 |
+| `corepack pnpm vitest run tests/react/Input.spec.tsx tests/react/Textarea.spec.tsx tests/react/InputGroup.spec.tsx tests/react/InputNumber.spec.tsx tests/react/NumberKeyboard.spec.tsx tests/react/Mentions.spec.tsx tests/vue/Input.spec.ts tests/vue/Textarea.spec.ts tests/vue/InputGroup.spec.ts tests/vue/InputNumber.spec.ts tests/vue/NumberKeyboard.spec.ts tests/vue/Mentions.spec.ts tests/core/input-number-utils.spec.ts tests/core/input-number-display-utils.spec.ts tests/core/number-keyboard-utils.spec.ts tests/core/mentions-utils.spec.ts` | ✅ 16 个测试文件、473 个测试通过 | C12 基线 |
+| `corepack pnpm api:validate` | ✅ 通过；API 一致性检查 0 问题 | C12 基线 |
+| `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C12 基线 |
+
+> 本轮 C12 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，C12 阶段只执行目标 vitest、`corepack pnpm api:validate` 与 `corepack pnpm types:check`（均通过）。

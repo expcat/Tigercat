@@ -118,7 +118,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Form、FormItem、useFormController。
 - 重点：体量较大，单独检查表单上下文、校验、依赖字段、受控/非受控、错误状态公共逻辑。
 
-##### C12 输入基础组
+##### C12 输入基础组 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C12 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Input、Textarea、InputGroup、InputGroupAddon、InputNumber、NumberKeyboard、Mentions。
 - 重点：输入展示/解析、自动尺寸、组合输入结构、数字边界、Mentions 导航和过滤公共逻辑。
