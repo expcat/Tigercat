@@ -2,7 +2,7 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C19「图片展示组」（C19-1~C19-6）、C20「图片编辑组」（C20-1~C20-6）、C21「Table 单组」（C21-1~C21-6）、C22「DataTableWithToolbar 单组」（C22-1~C22-4）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C19「图片展示组」（C19-1~C19-6）、C20「图片编辑组」（C20-1~C20-6）、C21「Table 单组」（C21-1~C21-6）、C22「DataTableWithToolbar 单组」（C22-1~C22-4）、C23「VirtualTable 单组」（C23-1~C23-5）
 verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
@@ -14,6 +14,7 @@ source-c18: 实读 Upload/FileManager/Signature 全链路——core 类型 types
 source-c19: 实读 Image/ImagePreview/ImageGroup/ImageViewer 全链路——core 类型 types/{image,image-viewer}.ts、core 工具 utils/{image-utils,image-viewer-utils,group-utils}.ts、React components/{Image,ImagePreview,ImageGroup,ImageViewer}.tsx 与 index 导出、Vue components/{Image,ImagePreview,ImageGroup,ImageViewer}.ts 与 index 导出、tests/core/{image-utils,image-viewer-gesture,group-utils}.spec.ts 与 tests/{react,vue} 9 个组件 spec（含 ImagePreview.ssr）、examples {Image,ImageViewer}Demo、generated component-index；grep 取证 ImagePreview/ImageViewer 两套近重复全屏查看器（ImageViewer 双端无 portal/无 body 滚动锁/nav 环绕 vs ImagePreview 夹紧）、image-utils vs image-viewer-utils 手势/图标重复（clampScale≡clampZoom、calculateTransform⊂getImageTransformStyle、5/7 图标 path 字节相同）、getTouchDistance 零组件消费、Vue ImageViewer locale prop 未声明在 VueImageViewerProps/core 且 React 无 locale、core ImageGroupProps 仅 preview 漂移、getImageGroupClasses 替换语义、previewTrigger='hover' 在 ImageGroup 内预览失效（latent）；以 packageManager pnpm 11.9.0 实跑 C19 目标 vitest（12 文件 244 测试通过）与 api:validate / types:check（均通过），未改动源码。ImageCropper/ImageAnnotation/CropUpload 属 C20 排除。
 source-c20: 实读 ImageCropper/ImageAnnotation/CropUpload 全链路——core 类型 types/{image,image-annotation}.ts、core 工具 utils/{image-utils,image-annotation-utils,crop-upload-utils}.ts、React components/{ImageCropper,ImageAnnotation,CropUpload}.tsx、Vue components/{ImageCropper,ImageAnnotation,CropUpload}.ts、tests/{core,react,vue} 9 个定向 spec、examples {ImageCropper,ImageAnnotation,CropUpload}Demo、generated component-index/shared props/api-summary；grep 取证 ImageCropper 静态 SVG mask id、CropUpload modalWidth 零消费、ImageAnnotation SVG role=button 键盘激活缺口、Vue selectedId/tool 无 update 事件、ImageAnnotationChangeMeta 未实现分支、硬编码编辑文案/aria；以 packageManager pnpm 11.9.0 实跑 C20 目标 vitest（9 文件 187 测试通过）与 api:validate / types:check（均通过），未改动源码。
 source-c22: 实读 DataTableWithToolbar / TableToolbar 全链路——core 类型 composite.ts（TableToolbar* 系列 + DataTableWithToolbarProps）与 types/table.ts 的 TableProps（共享边界对照）、React components/DataTableWithToolbar.tsx（569 行，extends Omit<TableProps,'className'|'onPageChange'> 全量透传）、Vue components/DataTableWithToolbar.ts（854 行，VueDataTableWithToolbarProps 手维子集 + inheritAttrs:false restAttrs 透传）、双端 index 导出、tests/{react,vue}/DataTableWithToolbar.spec.*（812/877 行）、examples DataTableWithToolbarDemo.{tsx,vue}、generated component-index/api-summary/props/composite 与 generator generate-api-docs.mjs；grep 取证 Vue 声明 props 缺 ~20 个 Table 能力（expandable/virtual 系/editable/filterMode/advancedFilterRules/列行拖拽/summaryRow/groupBy/export 系/cardSelectionPosition/cardPadding/cardFieldGap）、core DataTableWithToolbarProps 两端零消费且 Vue export * 反向不一致、hasSearch 无 toolbar 时双端分歧、setFilterValue 过滤值更新双端一致、TableToolbar 在 index/api-summary 列为组件而 props 文档注明非独立导出；以本机 pnpm 11.9.0（与 packageManager 一致）实跑 C22 目标 vitest（2 文件 63 测试通过）与 api:validate / types:check（均通过），未改动源码。Table 自身实现属 C21。
+source-c23: 实读 VirtualTable 全链路——core 类型 types/virtual-table.ts、core 工具 utils/virtual-table-utils.ts（对照 table-utils.ts 的 fixed column/colgroup/tableBaseClasses 逻辑）、React components/VirtualTable.tsx、Vue components/VirtualTable.ts、tests/core/virtual-table-utils.spec.ts、tests/{react,vue}/VirtualTable.spec.*、examples {react,vue3} VirtualTableDemo、benchmarks/virtual-table.bench.ts、generated component-index/shared props data+advanced/examples advanced；grep 取证 core VirtualTableProps 的 width/virtualizeColumns/rowClassName 与双端组件 props 漂移、React loading 硬编码 vs Vue locale、grid a11y/键盘事件缺口、table-fixed 与 Table border-separate/colgroup 复用差异、calculateVirtualRange 异常输入覆盖缺口；实跑 C23 目标 vitest（3 文件 86 测试通过）与 api:validate / types:check（均通过），未改动源码。C21/C22 已由远端更新合并；C23 本轮只扫描 VirtualTable。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -3474,3 +3475,141 @@ pnpm run types:check
 | 目标 vitest、`api:validate`、`types:check` | ✅ vitest 2 文件 63 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出（注：现有门禁不校验 Vue 导出型 vs 组件实参的反向漂移，故 C22-2 不被门禁拦截） | C22 基线 |
 
 > 本轮 C22 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用本机 pnpm 11.9.0（与 `packageManager` 声明的 `pnpm@11.9.0` 一致）实跑 C22 目标 vitest（2 文件 63 测试通过）、`pnpm api:validate`（一致性检查通过，0 问题）、`pnpm types:check`（全部 props 类型导出）与 `git diff --check -- docs/ROADMAP.md docs/ROADMAP_CHECK.md`（通过），均为只读校验、未改动源码。
+---
+
+### C23 VirtualTable 单组 — 已扫描（2026-06-27）
+
+**扫描范围**：VirtualTable 的全链路——core 类型 [virtual-table.ts](../packages/core/src/types/virtual-table.ts)、core 工具 [virtual-table-utils.ts](../packages/core/src/utils/virtual-table-utils.ts)（对照 [table-utils.ts](../packages/core/src/utils/table-utils.ts) 的 fixed column、`tableBaseClasses` 与 colgroup 逻辑）、React 实现 [VirtualTable.tsx](../packages/react/src/components/VirtualTable.tsx)、Vue 实现 [VirtualTable.ts](../packages/vue/src/components/VirtualTable.ts)、`tests/core/virtual-table-utils.spec.ts`、`tests/{react,vue}/VirtualTable.spec.*`、examples `VirtualTableDemo`、[virtual-table.bench.ts](../benchmarks/virtual-table.bench.ts)，以及 generated references（component-index、shared props data/advanced、examples advanced）。C21 Table 与 C22 DataTableWithToolbar 未在本轮执行。
+
+**结论速览**：VirtualTable 的基础虚拟行窗口、固定列 offset、固定列自定义 class、空/加载态和当前 a11y smoke test 均有覆盖，C23 目标 vitest/API/type 门禁均通过。**无 P1**。需处理项集中在 public surface 与 Table 复用边界：① core `VirtualTableProps` 声明 `width`/`virtualizeColumns`/`rowClassName`，但双端组件未实现或未暴露（P2）；② VirtualTable 未复用 Table 固定列场景的 `border-separate` 与 colgroup 钉宽逻辑（P2）；③ `selectable`/row click 只有鼠标路径，`role="grid"` 语义下缺键盘和选中态 aria（P2）；④ React loading 文案硬编码，Vue 已接 `common.loadingText`（P2）；⑤ virtual range 对负数 overscan 与异常 viewport/scroll 输入缺少规范化和测试（P3）。
+
+---
+
+#### C23-1 core `VirtualTableProps` 声明的 `width` / `virtualizeColumns` / `rowClassName` 与双端实现漂移 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜core [VirtualTableProps](../packages/core/src/types/virtual-table.ts) 暴露 `width?: number | 'auto'`、`virtualizeColumns?: boolean`、`rowClassName?: string | ((row, index) => string)`，文件注释还写明 VirtualTable 支持 “column virtualization”。但 React [VirtualTable.tsx](../packages/react/src/components/VirtualTable.tsx) 与 Vue [VirtualTable.ts](../packages/vue/src/components/VirtualTable.ts) 的公开组件 props 均没有 `width` / `virtualizeColumns` / `rowClassName`，实现也没有列虚拟化或行级自定义 class 消费。
+- 🟠 P2｜generated reference 仍显示 `VirtualTableProps · 3/17 props`，说明这些字段已经属于 core public surface。消费者如果按 core 类型或注释预期使用列虚拟化/宽度/行 class，会在框架组件运行时无效。
+- ℹ️ 现有 React/Vue spec 覆盖 `height`、`overscan`、`selectedKeys`、`renderCell`（React-only）和固定列，但没有覆盖上述 3 个 core 字段；`benchmarks/virtual-table.bench.ts` 也只计算所有列 cell style，未模拟列窗口。
+
+**公共内容决策**：走 API 收敛。`width` 与 `rowClassName` 成本低，建议补到 React/Vue 组件并加双端 spec；`virtualizeColumns` 需要明确列窗口、横向 scroll、固定列保留策略和 aria 列索引后再实现。若短期不做列虚拟化，应先从 public type 注释中降级为未实现计划项或标注保留字段，避免继续承诺不存在的能力。
+
+**建议修复顺序**：P2。先处理死字段/错误能力声明，再决定列虚拟化真实契约。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts
+pnpm run api:validate
+pnpm run types:check
+```
+
+---
+
+#### C23-2 固定列未复用 Table 的 `border-separate` 与 colgroup 钉宽逻辑，横向滚动稳定性存在风险 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜VirtualTable 双端 `<table>` 使用 `class="w-full table-fixed"`；Table 则明确使用 `tableBaseClasses = 'w-full border-separate border-spacing-0'`，注释说明 `border-collapse` 下 sticky `<th>/<td>` 不稳定，固定/锁定列需要把分隔线落到 cell 上。
+- 🟠 P2｜Table 在存在 fixed/lockable columns 时会渲染 `<colgroup>` 钉死列宽，并有 React/Vue spec 覆盖“锁定切换后 colgroup 宽度稳定”。VirtualTable 只给 header cell 写 `width`，body cell 只写 sticky style；没有 colgroup，也没有冻结 auto width 的路径。
+- ℹ️ generated advanced props 明确说 VirtualTable 复用 `TableColumn` 与 `fixedClassName` / `fixedHeaderClassName`；当前固定列 class 复用已做，但底层 table layout 与宽度钉住策略未共享。
+
+**公共内容决策**：Table 固定列基础能力应继续共享。建议把可复用的 table base class、colgroup descriptor 或固定列宽度策略下沉/提取为可被 VirtualTable 消费的 helper；VirtualTable 保留虚拟行窗口特有逻辑，不复制 Table 全量状态机。
+
+**建议修复顺序**：P2。与 C23-1 同批评估；优先保证 fixed columns 在真实横向滚动和自动宽度列下稳定。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/Table.spec.tsx tests/vue/Table.spec.ts tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts
+```
+
+---
+
+#### C23-3 `selectable` / row click 仅鼠标路径，`role="grid"` 缺键盘与选中态语义 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜React/Vue VirtualTable 根节点设置 `role="grid"` 与 `aria-rowcount`，但可点击行只绑定 `onClick` / `onClick` emit；数据行没有 `tabIndex`、`onKeyDown`、`aria-selected`、`aria-rowindex`，cell 也没有 `aria-colindex`。
+- 🟠 P2｜`selectable` 打开时 `selectedKeys` 只改变 class；屏幕阅读器无法读取选中态，键盘用户也无法用 Enter/Space 触发 `onSelect` / `select`。当前 axe smoke test 不会捕获这类交互不可达。
+- ℹ️ 现有 spec 只点击 data row 并断言回调/事件；没有键盘激活、aria-selected、rowindex/colindex 或 roving focus 覆盖。
+
+**公共内容决策**：框架层补交互与 aria；core 可提供轻量 grid row/cell aria helper，但不需要改 public API。默认非 selectable 场景可保持不可聚焦；当存在 `onRowClick`、`selectable` 或行级交互时，数据行应可键盘激活。
+
+**建议修复顺序**：P2。紧随 fixed layout 后处理，补双端键盘 spec 和 aria 断言。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts
+```
+
+---
+
+#### C23-4 React loading 文案硬编码，Vue 已接 `common.loadingText`，双端 i18n 不对称 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜React [VirtualTable.tsx](../packages/react/src/components/VirtualTable.tsx) loading overlay 直接渲染 `Loading...`；Vue [VirtualTable.ts](../packages/vue/src/components/VirtualTable.ts) 已用 `resolveLocaleText('Loading...', mergedLocale.value?.common?.loadingText)`。
+- 🟠 P2｜React VirtualTable 已接 `useTigerConfig`、`mergeTigerLocale` 并用 `common.emptyText` 处理 empty 文案，唯独 loading 漏接。现有 React spec 多处断言 `Loading...`，把硬编码英文锁进测试。
+- ℹ️ core locale 已有 `common.loadingText`，不需要新增 key；与 C18 FileManager、C04/C09/C14 的 locale 发现同型。
+
+**公共内容决策**：复用既有 `common.loadingText`。React 改为 `resolveLocaleText('Loading...', mergedLocale?.common?.loadingText)`；Vue 保持现状并补自定义 locale 断言，双端测试从硬编码英文改为默认 fallback + locale override。
+
+**建议修复顺序**：P2。局部修复，低风险，可与其他 i18n 漏接项合并。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts
+pnpm run api:validate
+pnpm run types:check
+```
+
+---
+
+#### C23-5 `calculateVirtualRange` 对负数 overscan 与异常 viewport/scroll 输入缺少规范化 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜[calculateVirtualRange](../packages/core/src/utils/virtual-table-utils.ts) 只在 `totalRows === 0 || rowHeight <= 0` 时返回空范围；`overscan`、`viewportHeight`、`scrollTop` 没有 clamp。负数 overscan 会让 `start` 增大、`end` 减小，极端值可能出现 `start > end` 或渲染空窗口；负数 scrollTop 也会产生负 `startRaw` 后再进入 end 计算。
+- 🟢 P3｜当前 tests/core 只覆盖 0 rows、0 rowHeight、顶部/中部/底部、默认 overscan；React/Vue 只覆盖大正数 overscan。没有负数 overscan、负 scrollTop、0/负 viewportHeight、NaN/Infinity 输入的契约。
+- ℹ️ benchmark 重点是正常大数据路径，不替代边界规范。组件默认 props 不会触发异常，但 public utility 是 core 导出函数，消费者可直接调用。
+
+**公共内容决策**：在 core utility 层规范化输入：`scrollTop >= 0`、`viewportHeight >= 0`、`overscan >= 0` 且只接受有限数；异常输入回退到安全空/最小窗口。框架组件无需单独兜底。
+
+**建议修复顺序**：P3。补 core spec 后改 helper；不影响当前发布门禁。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/core/virtual-table-utils.spec.ts tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts
+```
+
+---
+
+#### C23 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| core VirtualTableProps 与双端组件漂移（C23-1） | `width`/`rowClassName` 补实现；`virtualizeColumns` 先定契约，无法短期实现则降级 public 承诺 | **P2** |
+| 固定列 table layout / colgroup 复用缺口（C23-2） | 共享 Table 固定列基础类与钉宽 helper，避免 VirtualTable 自行漂移 | **P2** |
+| grid 行交互 a11y 缺口（C23-3） | 框架层补键盘激活与 `aria-selected`/索引语义；可抽 core aria helper | **P2** |
+| React loading locale 漏接（C23-4） | 复用 `common.loadingText`，双端补 locale override spec | **P2** |
+| virtual range 异常输入（C23-5） | core utility 规范化输入并补边界 spec | P3 |
+
+---
+
+#### C23 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| grep `width` / `virtualizeColumns` / `rowClassName` | core `VirtualTableProps` 有声明；React/Vue 组件 props 与实现无消费；generated props 仍计入 17 个字段 | C23-1 |
+| grep `table-fixed` / `tableBaseClasses` / `colgroup` | VirtualTable 双端为 `w-full table-fixed` 且无 colgroup；Table 为 `border-separate border-spacing-0` 并有 colgroup 稳定性测试 | C23-2 |
+| grep `role` / `aria-rowcount` / `tabIndex` / `onKeyDown` | VirtualTable 只有根 `role="grid"`/`aria-rowcount`；数据行无键盘事件、选中态 aria 或行列索引 | C23-3 |
+| grep `Loading...` / `common.loadingText` | React loading 硬编码；Vue 走 `common.loadingText`；双端 spec 都锁定默认英文 | C23-4 |
+| grep `calculateVirtualRange` 边界测试 | core spec 覆盖正常窗口/默认 overscan/超大正 overscan；未覆盖负数/NaN/Infinity/异常 viewport | C23-5 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 3 文件 86 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C23 基线 |
+
+> 本轮 C23 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮实跑 C23 目标 vitest（3 文件 86 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动源码。C21/C22 已由远端更新合并，状态不再标记为未扫描。
