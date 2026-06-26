@@ -2,7 +2,7 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C20「图片编辑组」（C20-1~C20-6）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C19「图片展示组」（C19-1~C19-6）、C20「图片编辑组」（C20-1~C20-6）
 verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
@@ -11,6 +11,7 @@ source-c15: 实读 Tree/TreeSelect/Cascader/Transfer 全链路——core 类型 
 source-c16: 实读 DatePicker/Calendar 全链路——core 类型 types/{datepicker,calendar}.ts、core 工具 utils/{date-utils,calendar-utils,datepicker-i18n,datepicker-styles}.ts 与 utils/i18n/datepicker-locales/*、React 实现 components/DatePicker.tsx + DatePicker/{state,render-calendar,render-mobile,types}.ts(x)、components/Calendar.tsx、Vue 实现 components/{DatePicker,Calendar}.ts、tests/{core/date-utils,core/datepicker-i18n,react/DatePicker,vue/DatePicker,react/Calendar,vue/Calendar}.spec.*、examples DatePickerDemo/CalendarDemo、generated component-index/i18n；grep 取证 core CalendarProps 双端零消费、WEEKDAYS/MONTHS/getMonthDays 仅 Calendar 消费、getDatePickerLabels 仅 DatePicker 消费、getIntlOptionsFromDateFormat 五分支全等、datepicker-i18n 7 语言 inline map vs 13 preset 的 6 个 preset-only 语言回落英文；以本机 pnpm 11.9.0 实跑 C16 目标 vitest（6 文件 117 测试通过）、api:validate（一致性 0 问题）、types:check（全部 props 类型导出），均通过，未改动源码。
 source-c17: 实读 TimePicker/Countdown/CronEditor 全链路——core 类型 types/{timepicker,countdown,cron-editor}.ts、core 工具 utils/{time-utils,timepicker-utils,countdown-utils,cron-editor-utils}.ts、React 实现 components/TimePicker.tsx 与 TimePicker/{state,render-desktop,render-mobile,types,icons}、components/{Countdown,CronEditor}.tsx、Vue 实现 components/{TimePicker,Countdown,CronEditor}.ts、tests/{core,react,vue} 9 个定向 spec、examples TimePickerDemo/CountdownDemo/CronEditorDemo、generated component-index 与 shared/props/{form,data}.md；grep 取证 TimePicker 秒级范围判断、秒列禁用逻辑、CronEditor className 透传、Countdown now/tick 测试契约；实跑 C17 目标 vitest（9 文件 174 测试通过）、pnpm run api:validate、pnpm run types:check（均通过），未改动源码。
 source-c18: 实读 Upload/FileManager/Signature 全链路——core 类型 types/{upload,signature,file-manager}.ts、core 工具 utils/{upload-utils,upload-labels,signature-utils,file-manager-utils}.ts（对照 locale-utils 的 DEFAULT_UPLOAD_LABELS/ZH_CN_UPLOAD_LABELS、tailwind-entry）、React components/{Upload,FileManager,Signature}.tsx 与 index.tsx 导出、Vue components/{Upload,FileManager,Signature}.ts 与 index.ts 导出、tests/{core,react,vue} 9 个定向 spec、examples {Upload,FileManager,Signature}Demo、generated component-index；grep 取证 Tailwind v4（core/package.json tailwindcss ^4.0.0）下 Upload 4 处 bg-opacity-* 失效、applyFileDragReorder 零组件消费、FileManager draggable 半接线、React FileManager Loading 硬编码 vs Vue locale、core FileManagerProps/columns 漂移死字段、formatFileSize vs formatFileSizeLabel 双实现、getFileExtension 重名异义；以 packageManager pnpm 11.9.0 实跑 C18 目标 vitest（9 文件 238 测试通过）与 api:validate / types:check（均通过），未改动源码。CropUpload 属 C20 排除。
+source-c19: 实读 Image/ImagePreview/ImageGroup/ImageViewer 全链路——core 类型 types/{image,image-viewer}.ts、core 工具 utils/{image-utils,image-viewer-utils,group-utils}.ts、React components/{Image,ImagePreview,ImageGroup,ImageViewer}.tsx 与 index 导出、Vue components/{Image,ImagePreview,ImageGroup,ImageViewer}.ts 与 index 导出、tests/core/{image-utils,image-viewer-gesture,group-utils}.spec.ts 与 tests/{react,vue} 9 个组件 spec（含 ImagePreview.ssr）、examples {Image,ImageViewer}Demo、generated component-index；grep 取证 ImagePreview/ImageViewer 两套近重复全屏查看器（ImageViewer 双端无 portal/无 body 滚动锁/nav 环绕 vs ImagePreview 夹紧）、image-utils vs image-viewer-utils 手势/图标重复（clampScale≡clampZoom、calculateTransform⊂getImageTransformStyle、5/7 图标 path 字节相同）、getTouchDistance 零组件消费、Vue ImageViewer locale prop 未声明在 VueImageViewerProps/core 且 React 无 locale、core ImageGroupProps 仅 preview 漂移、getImageGroupClasses 替换语义、previewTrigger='hover' 在 ImageGroup 内预览失效（latent）；以 packageManager pnpm 11.9.0 实跑 C19 目标 vitest（12 文件 244 测试通过）与 api:validate / types:check（均通过），未改动源码。ImageCropper/ImageAnnotation/CropUpload 属 C20 排除。
 source-c20: 实读 ImageCropper/ImageAnnotation/CropUpload 全链路——core 类型 types/{image,image-annotation}.ts、core 工具 utils/{image-utils,image-annotation-utils,crop-upload-utils}.ts、React components/{ImageCropper,ImageAnnotation,CropUpload}.tsx、Vue components/{ImageCropper,ImageAnnotation,CropUpload}.ts、tests/{core,react,vue} 9 个定向 spec、examples {ImageCropper,ImageAnnotation,CropUpload}Demo、generated component-index/shared props/api-summary；grep 取证 ImageCropper 静态 SVG mask id、CropUpload modalWidth 零消费、ImageAnnotation SVG role=button 键盘激活缺口、Vue selectedId/tool 无 update 事件、ImageAnnotationChangeMeta 未实现分支、硬编码编辑文案/aria；以 packageManager pnpm 11.9.0 实跑 C20 目标 vitest（9 文件 187 测试通过）与 api:validate / types:check（均通过），未改动源码。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
@@ -2929,6 +2930,143 @@ pnpm vitest run tests/core/countdown-utils.spec.ts tests/react/Countdown.spec.ts
 | 目标 vitest、`api:validate`、`types:check` | ✅ vitest 9 文件 238 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C18 基线 |
 
 > 本轮 C18 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0（本机无 corepack）实跑 C18 目标 vitest（9 文件 238 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动仓库。
+
+---
+
+### C19 图片展示组（Image / ImagePreview / ImageGroup / ImageViewer）
+
+**扫描范围**：Image、ImagePreview、ImageGroup、ImageViewer 的全链路——core 类型 [image.ts](../packages/core/src/types/image.ts)、[image-viewer.ts](../packages/core/src/types/image-viewer.ts)，core 工具 [image-utils.ts](../packages/core/src/utils/image-utils.ts)、[image-viewer-utils.ts](../packages/core/src/utils/image-viewer-utils.ts)、[group-utils.ts](../packages/core/src/utils/group-utils.ts)，React 实现 [Image.tsx](../packages/react/src/components/Image.tsx)、[ImagePreview.tsx](../packages/react/src/components/ImagePreview.tsx)、[ImageGroup.tsx](../packages/react/src/components/ImageGroup.tsx)、[ImageViewer.tsx](../packages/react/src/components/ImageViewer.tsx) 与 index 导出，Vue 实现 [Image.ts](../packages/vue/src/components/Image.ts)、[ImagePreview.ts](../packages/vue/src/components/ImagePreview.ts)、[ImageGroup.ts](../packages/vue/src/components/ImageGroup.ts)、[ImageViewer.ts](../packages/vue/src/components/ImageViewer.ts) 与 index 导出，`tests/core/{image-utils,image-viewer-gesture,group-utils}.spec.ts`、`tests/react/{Image,ImagePreview,ImagePreview.ssr,ImageGroup,ImageViewer}.spec.tsx`、`tests/vue/{Image,ImagePreview,ImageGroup,ImageViewer}.spec.ts`，examples `{ImageDemo,ImageViewerDemo}`（双端对称，无 ImagePreviewDemo——ImagePreview 经 Image 间接演示），generated `component-index.md`。ImageCropper / ImageAnnotation / CropUpload 属 C20，排除。
+
+**结论速览**：图片展示组在 happy path 与受控量上双端基本对称、核心手势纯逻辑已沉到 core 且有 `tests/core` 直测，**无 P1**。两条 **P2**：① ImagePreview 与 ImageViewer 是两套近重复的「全屏图片查看器」（zoom/rotate/pan/pinch/wheel/nav/counter/mask/Escape 各做一遍），且行为不一致（wrap vs clamp、是否锁 body 滚动、是否走 portal、有无 reset），其中 ImageViewer 双端不走 portal 属 latent 全屏定位隐患；② ImageViewer i18n 双端不对称（Vue 有 `locale` prop 但只本地化 close，React 完全无 locale），且该 `locale` prop 未声明在 `VueImageViewerProps`/core `ImageViewerProps`。其余 P3：core 手势/图标两套重复 + `getTouchDistance` 零消费（`image-utils` vs `image-viewer-utils`，含 5/7 图标 path 逐字重复）、core 图片类型漂移 + ImageGroup 公共面不一致、`previewTrigger="hover"` 在 ImageGroup 内预览完全失效（latent）、a11y（两查看器声明 `aria-modal` 但无 focus trap/restore）与杂项 parity。
+
+---
+
+#### C19-1 ImagePreview 与 ImageViewer 两套近重复全屏查看器（重复实现 + 行为不一致）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜`ImagePreview`（[ImagePreview.tsx](../packages/react/src/components/ImagePreview.tsx)/[.ts](../packages/vue/src/components/ImagePreview.ts)）与 `ImageViewer`（[ImageViewer.tsx](../packages/react/src/components/ImageViewer.tsx)/[.ts](../packages/vue/src/components/ImageViewer.ts)）是两个**职责高度重叠**的公开全屏查看器：均实现 全屏遮罩 + 缩放（按钮/滚轮）+ 旋转 + 鼠标拖拽平移 + 双指 pinch + 上一张/下一张 + 计数器 + 点遮罩关闭 + Escape/Arrow 键 + `role="dialog" aria-modal`。双端各写一遍，合计 ~4 个 ~300 行实现。
+- 🟠 P2（latent）｜**ImageViewer 不走 portal**：React `ImageViewer` 直接内联返回根 div（[ImageViewer.tsx:135](../packages/react/src/components/ImageViewer.tsx)），Vue 同样无 `Teleport`（[ImageViewer.ts:410](../packages/vue/src/components/ImageViewer.ts)）；而 `ImagePreview` 双端用 `renderBodyPortal`/`Teleport`（[ImagePreview.tsx:270](../packages/react/src/components/ImagePreview.tsx)、[ImagePreview.ts:418](../packages/vue/src/components/ImagePreview.ts)）。ImageViewer 的 `fixed inset-0` 全屏遮罩若被带 `transform`/`filter`/`will-change` 的祖先包裹会被**困在该祖先内**而非视口——标准全屏 modal 隐患，双端共有。
+- 🟢 行为不一致（双端各自一致、但两查看器之间分歧）：
+  - 翻页：ImageViewer **环绕**（`(i±1+n)%n`，[ImageViewer.tsx:95](../packages/react/src/components/ImageViewer.tsx)，且被 [ImageViewer.spec.tsx:132](../tests/react/ImageViewer.spec.tsx) 锁定）；ImagePreview **夹紧**（`hasPrev/hasNext`、端点禁用按钮，[ImagePreview.tsx:151](../packages/react/src/components/ImagePreview.tsx)）。
+  - body 滚动锁：ImagePreview 打开时 `document.body.style.overflow='hidden'`（[ImagePreview.tsx:105](../packages/react/src/components/ImagePreview.tsx)、[ImagePreview.ts:122](../packages/vue/src/components/ImagePreview.ts)）；ImageViewer **不锁**，背景可滚。
+  - reset：ImagePreview 工具栏有「重置」按钮（[ImagePreview.tsx:331](../packages/react/src/components/ImagePreview.tsx)）；ImageViewer 无，缩放/旋转/平移后只能靠翻页隐式重置。
+
+**公共内容决策**：走任务 H（两者均为已发布公开组件，不直接删）。(a) **先消除 latent 与 parity 缺口**（框架层、无 API 变更）：给 ImageViewer 双端补 portal/Teleport 与 body 滚动锁，对齐 ImagePreview。(b) **中期评估合并**：抽一个框架无关的「viewer 状态/手势编排」共享层，让两组件共用 transform/nav/手势逻辑，仅保留各自 props 外形（ImagePreview：`zIndex`/`scaleStep`/内部被 Image/ImageGroup 复用；ImageViewer：`zoomable`/`rotatable`/`showNav`/`showCounter` 开关）；纯逻辑沉 core，DOM/portal 留框架层。翻页 wrap vs clamp 需先定一致策略（两端测试已各自锁定，改动需同步改 spec）。
+
+**建议修复顺序**：P2。先做 (a) ImageViewer 补 portal + 滚动锁（低风险，先对齐 ImagePreview）；(b) 合并查看器逻辑作为更大重构，随 C19-2 的 core 工具合并一并设计。
+
+**目标验证命令**：`pnpm exec vitest run tests/react/ImageViewer.spec.tsx tests/vue/ImageViewer.spec.ts tests/react/ImagePreview.spec.tsx tests/vue/ImagePreview.spec.ts tests/react/ImagePreview.ssr.spec.tsx`、`pnpm run api:validate`、`pnpm run types:check`。
+
+---
+
+#### C19-2 core 手势/变换/图标两套重复 + `getTouchDistance` 零消费公共导出（该合未合）— **P3**
+
+**发现问题**
+
+- 🟢 P3｜两个 core 工具模块对同一手势域**各做一套**：`image-utils.ts`（`clampScale`/`calculateTransform`/`getTouchDistance`，[:219](../packages/core/src/utils/image-utils.ts)/[:226](../packages/core/src/utils/image-utils.ts)/[:451](../packages/core/src/utils/image-utils.ts)）与 `image-viewer-utils.ts`（`clampZoom`/`getImageTransformStyle`/私有 `touchDistance` + 完整 pan/pinch/wheel 状态机，[:64](../packages/core/src/utils/image-viewer-utils.ts)/[:94](../packages/core/src/utils/image-viewer-utils.ts)/[:176](../packages/core/src/utils/image-viewer-utils.ts)）。`clampScale`≡`clampZoom`（同一 min/max 夹紧）；`calculateTransform`(translate+scale) 是 `getImageTransformStyle`(translate+scale+rotate) 的子集——ImagePreview 用前者再**手工拼接** ` rotate(${rotation}deg)`（[ImagePreview.tsx:262](../packages/react/src/components/ImagePreview.tsx)）重造了后者。`image-viewer-utils.ts:172` 注释甚至自承「与 image-utils 的 getTouchDistance 同公式」。
+- 🟢 P3｜**5/7 图标 path 逐字重复**：`image-utils` 的 `zoomInIconPath`/`zoomOutIconPath`/`prevIconPath`/`nextIconPath`/`previewCloseIconPath` 与 `image-viewer-utils.imageViewerIcons` 的 `zoomIn`/`zoomOut`/`prev`/`next`/`close` **字节相同**；`rotateLeft`/`rotateRight` 只在 `imageViewerIcons`——导致 ImagePreview 不得不**同时从两个模块**取图标（[ImagePreview.tsx:12-28](../packages/react/src/components/ImagePreview.tsx) 既导入 `zoomInIconPath…` 又导入 `imageViewerIcons`）。
+- 🟢 P3｜`getTouchDistance`（[image-utils.ts:451](../packages/core/src/utils/image-utils.ts)，公开导出）**零组件消费**：grep 全仓仅 定义 + `tests/core/image-utils.spec.ts` + `api-reports` 基线 + `image-viewer-utils.ts` 的注释；实际 pinch 用的是 `image-viewer-utils` 的私有 `touchDistance`。属「公开但无人调用」的死 helper（与 C14 `allowFreeInput`、C18 `applyFileDragReorder` 同型）。
+
+**公共内容决策**：**合并到 core 单一手势/图标来源**（纯逻辑，沉 core）。统一 `clamp`、统一 `transform` 串、把图标并入一处（评估并入 core `common-icons` 或单一 `imageViewerIcons`），让 ImagePreview/ImageViewer 共用；`getTouchDistance` 改为复用 `image-viewer-utils` 公式或标 deprecated 后回收，走 `api:baseline:check`。`image-utils.spec.ts`/`image-viewer-gesture.spec.ts` 已覆盖，合并时同步收敛测试。
+
+**建议修复顺序**：P3，与 C19-1(b) 同批设计。先合 `clamp`/`transform`/图标（无 API 破坏，可保留旧名别名），再决 `getTouchDistance` 去留（走 H + baseline）。
+
+**目标验证命令**：`pnpm exec vitest run tests/core/image-utils.spec.ts tests/core/image-viewer-gesture.spec.ts`、`pnpm run api:validate`、`pnpm run api:baseline:check`。
+
+---
+
+#### C19-3 ImageViewer i18n 双端不对称 + `locale` prop 未声明在类型 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜**双端不对称**：Vue `ImageViewer` 接 `useTigerConfig` + `mergeTigerLocale`，把关闭按钮文案本地化为 `resolveLocaleText('Close', …common?.closeText)`（[ImageViewer.ts:117-121](../packages/vue/src/components/ImageViewer.ts)）；React `ImageViewer` **完全无 locale**，`aria-label="Close"` 等全硬编码（[ImageViewer.tsx:153](../packages/react/src/components/ImageViewer.tsx)）。与 C02-2(QRCode)/C18-3(FileManager) 同型。
+- 🟠 P2｜Vue 该 `locale` prop 在运行时声明（[ImageViewer.ts:110-113](../packages/vue/src/components/ImageViewer.ts)），却**未出现在导出的 `VueImageViewerProps` 接口**（[:31-43](../packages/vue/src/components/ImageViewer.ts)），也不在 core `ImageViewerProps`（[image-viewer.ts](../packages/core/src/types/image-viewer.ts)）——类型与运行时漂移。
+- 🟢 P3｜即使 Vue 端，也只本地化了 close；`Previous`/`Next`/`Zoom in`/`Zoom out`/`Rotate left/right`/`Image viewer` 双端仍硬编码英文；ImagePreview 双端**全部**硬编码（`Image preview`/`Close preview`/`Zoom out`/`Reset`/`Rotate left`…）。取证：`ImageViewer.spec.tsx:41/79/102…` 把英文 label 锁进测试，本地化时需同步改。
+
+**公共内容决策**：locale 链路（`resolveLocaleText`/`mergeTigerLocale`/`useTigerConfig`）已在 core，框架层消费。React `ImageViewer` 接入 locale 与 Vue 对齐；两端把全部 aria-label 走 `common.*`（评估新增 `common.zoomInText` 等或就近复用）。`locale` prop 要么补进 `VueImageViewerProps`/core 类型，要么移除——消除类型漂移（走 H）。
+
+**建议修复顺序**：P2。先补 React `ImageViewer` locale（与 Vue 对齐 close），并把 `locale` prop 声明补齐/统一；其余 label 本地化随后批量做（同步改 spec）。
+
+**目标验证命令**：`pnpm exec vitest run tests/react/ImageViewer.spec.tsx tests/vue/ImageViewer.spec.ts`、`pnpm run types:check`、`pnpm run api:validate`。
+
+---
+
+#### C19-4 core 图片类型漂移 + ImageGroup 公共面双端不一致（公共 API 卫生）— **P3**
+
+**发现问题**
+
+- 🟢 P3｜**core 类型与组件实际 props 漂移**（与 C18-4/C04-6/C12-3 同型）：core `ImageGroupProps` 仅 `preview`（[image.ts:188](../packages/core/src/types/image.ts)），而 React 本地 `ImageGroupProps` 多出 `onPreviewVisibleChange`/`children`/`className`（[ImageGroup.tsx:17](../packages/react/src/components/ImageGroup.tsx)）、Vue `VueImageGroupProps` 又只有 `preview`（[ImageGroup.ts:17](../packages/vue/src/components/ImageGroup.ts)）。React `ImageViewer` 干脆**内联重定义** `ImageViewerProps` 不引用 core（[ImageViewer.tsx:26](../packages/react/src/components/ImageViewer.tsx)）；Vue `VueImagePreviewProps` 逐字**复制** core `ImagePreviewProps` 字段而非 extends（[ImagePreview.ts:41](../packages/vue/src/components/ImagePreview.ts)），React 则 `extends CoreImagePreviewProps`（[ImagePreview.tsx:33](../packages/react/src/components/ImagePreview.tsx)）——类型来源各端不一。
+- 🟢 P3｜`getImageGroupClasses(className?) => className || base`（[group-utils.ts:77](../packages/core/src/utils/group-utils.ts)）语义是**替换**而非合并：React 传 `className` 时 `tiger-image-group` 基类被丢弃（[ImageGroup.tsx:74](../packages/react/src/components/ImageGroup.tsx)）；Vue 不传参（恒基类，[ImageGroup.ts:73](../packages/vue/src/components/ImageGroup.ts)）且 `ImageGroup` 根本没有 `className` prop（靠 attr 透传）。双端外形不对称，且基类标记可能被无声丢弃。
+
+**公共内容决策**：走任务 H。统一类型来源以 core 为单一事实源（core 补框架无关回调/`className` 签名，框架层只加各自 ref/v-model 形）；`getImageGroupClasses` 改为 `classNames(base, className)`（合并语义）并给 Vue `ImageGroup` 补 `className` prop，对齐 React。纯类型/工具卫生，无运行逻辑变更。
+
+**建议修复顺序**：P3，与 C18-4/C04-6 同批处理「core 数据型 vs 组件富型」漂移。
+
+**目标验证命令**：`pnpm run types:check`、`pnpm run api:validate`、`pnpm run api:baseline:check`、`pnpm exec vitest run tests/core/group-utils.spec.ts tests/react/ImageGroup.spec.tsx tests/vue/ImageGroup.spec.ts`。
+
+---
+
+#### C19-5 `previewTrigger="hover"` 在 ImageGroup 内 → 预览完全失效（latent 双端）— **P3**
+
+**发现问题**
+
+- 🟢 P3（latent）｜`Image` 的两个开关互斥导致死角：`hoverPreviewEnabled = preview && previewTrigger==='hover' && !group`、`clickPreviewEnabled = preview && previewTrigger!=='hover'`（[Image.tsx:76-77](../packages/react/src/components/Image.tsx)、[Image.ts:82-85](../packages/vue/src/components/Image.ts)）。当一个 `previewTrigger="hover"` 的 Image **放进 ImageGroup** 时：hover 被 `!group` 关掉、click 被 `previewTrigger!=='hover'` 关掉 → 两者皆 false。该图片仍被 `group.register` 注册进图片数组，但 `role`/`tabIndex` 为 undefined、`handleClick` 首行 `if(!clickPreviewEnabled) return`（[Image.tsx:154](../packages/react/src/components/Image.tsx)）→ **点它毫无反应，无法打开组预览**，纯键盘用户也不可达。双端逻辑一致、同病。
+
+**公共内容决策**：框架层修复（不涉及 core）。在 group 上下文里应让 `previewTrigger="hover"` **回退为 click 打开组预览**（即 `clickPreviewEnabled` 在 `group` 存在时忽略 hover 限制），或在组内显式忽略 `previewTrigger`。双端对齐同一回退规则，补双端用例覆盖「hover 图片在组内仍可点开预览」。
+
+**建议修复顺序**：P3，低优先（非默认组合）。修时双端同改 + 加用例。
+
+**目标验证命令**：`pnpm exec vitest run tests/react/ImageGroup.spec.tsx tests/vue/ImageGroup.spec.ts tests/react/Image.spec.tsx tests/vue/Image.spec.ts`。
+
+---
+
+#### C19-6 一组低优先 a11y/parity latent + 健康面（观察）— **P3 / 观察**
+
+**发现问题**
+
+- 🟢 P3（a11y）｜`ImagePreview` 与 `ImageViewer` 双端均声明 `role="dialog" aria-modal="true"`，但**都没有 focus trap、初始聚焦、关闭后焦点恢复**；仓库已有 `focus-utils`（C08/C09 overlay 在用），这两个全屏查看器未接入。键盘可达性弱于声明的 modal 语义。
+- 🟢 P3（冗余）｜`ImagePreview` 鼠标拖拽**手搓** `draggingRef`/`dragStartRef`（[ImagePreview.tsx:193-207](../packages/react/src/components/ImagePreview.tsx)、[ImagePreview.ts:181-201](../packages/vue/src/components/ImagePreview.ts)），却同时 import 了 `startPan`/`movePan` 只用于 touch；`ImageViewer` 鼠标+触摸**统一**用 `startPan`/`movePan`（[ImageViewer.tsx:189](../packages/react/src/components/ImageViewer.tsx)）。ImagePreview 鼠标平移可改用同一 helper，去掉手搓状态。
+- 🟢 P3（parity）｜`Image` 加载/错误事件不对称：Vue `Image` 显式 `emit('load')`/`emit('error')`（[Image.ts:160](../packages/vue/src/components/Image.ts)/[:171](../packages/vue/src/components/Image.ts)），React `Image` 内部 `handleLoad/handleError` 不回调用户（消费者只能靠 `...props` 落到容器 div 上，拿不到 `<img>` 的 load/error）。
+- 🟢 P3（观察）｜`Image` 的 loading 占位仅在 `loading && !actualSrc` 显示（[Image.tsx:199](../packages/react/src/components/Image.tsx)），即只在 lazy 触发前出现；非 lazy 图片网络加载期间不显示 `animate-pulse` 占位——`placeholderRender`/`imageLoadingClasses` 对非 lazy 基本是死路径（双端一致，设计取舍，记录备查）。
+- ✅ 健康面（无需动作）：受控量/事件双端对称——`Image` `preview`/`previewTrigger`/`lazy`/`fallbackSrc` 与 hover 浮层（复用 `usePopup`/`useFloatingPopup`）双端一致；`ImagePreview` `open`+`onOpenChange`/`update:open`、`currentIndex`+`onCurrentIndexChange`、`scale-change` 对称；`ImageGroup` register/unregister/openPreview 上下文双端一致且 `group-utils` 纯逻辑有 `tests/core/group-utils.spec.ts` 直测；手势纯逻辑（clamp/pan/pinch/wheel/transform）由 `tests/core/{image-utils,image-viewer-gesture}.spec.ts` 覆盖；示例与生成 references 双端对称无漂移。
+
+**公共内容决策**：均框架层/局部清理。(a) 两查看器接 `focus-utils` 做 trap+restore（a11y 行为留框架层，可共享「下一焦点」纯计算评估沉 core）；(b) ImagePreview 鼠标平移改用 `startPan`/`movePan`；(c) React `Image` 评估补 `onLoad`/`onError`（与 Vue parity）；(d) loading 占位仅作观察。
+
+**建议修复顺序**：P3，随各组件下次改动顺手；健康面保持。
+
+**目标验证命令**：`pnpm exec vitest run tests/react/Image.spec.tsx tests/vue/Image.spec.ts tests/react/ImagePreview.spec.tsx tests/vue/ImagePreview.spec.ts`。
+
+---
+
+#### C19 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| ImagePreview/ImageViewer 两套全屏查看器重复 + ImageViewer 无 portal/滚动锁 + nav 行为分歧（C19-1） | 先补 ImageViewer portal/滚动锁（框架层）；中期合并查看器逻辑（走 H） | **P2** |
+| ImageViewer i18n 不对称 + `locale` prop 未声明（C19-3） | React 接 locale 与 Vue 对齐；`locale` prop 补进类型或移除（走 H + baseline） | **P2** |
+| `image-utils` vs `image-viewer-utils` 手势/图标重复 + `getTouchDistance` 零消费（C19-2） | 合并→core 单一手势/图标来源；`getTouchDistance` 复用或废弃 | P3 |
+| core 图片类型漂移 + ImageGroup className 替换语义/Vue 无 className（C19-4） | 类型以 core 为源；`getImageGroupClasses` 改合并、Vue 补 className | P3 |
+| `previewTrigger="hover"` 在组内预览失效（C19-5） | 框架层：组内 hover 回退为 click，双端对齐 | P3 |
+| 两查看器无 focus trap/restore；ImagePreview 手搓鼠标平移；React Image 无 load/error 事件（C19-6） | 框架层补 a11y/复用 helper/parity；健康面保持 | P3/观察 |
+
+---
+
+#### C19 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| 比对 ImagePreview vs ImageViewer 渲染/手势 | 同域查看器各做一遍；ImageViewer 无 portal、无 body 滚动锁、无 reset、nav 环绕 | C19-1 |
+| grep portal/Teleport | ImagePreview 双端 portal；ImageViewer 双端内联 | C19-1 |
+| 比对 `clampScale`/`clampZoom`、`calculateTransform`/`getImageTransformStyle`、`imageViewerIcons` | clamp 等价；transform 子集；zoomIn/zoomOut/prev/next/close 5 路径字节相同 | C19-2 |
+| grep `getTouchDistance` 消费者 | 仅 def + `image-utils.spec` + baseline + 注释；零组件消费 | C19-2 |
+| 比对 React/Vue ImageViewer locale | Vue 有 `locale` prop+本地化 close；React 无 locale；`locale` 未在 `VueImageViewerProps`/core | C19-3 |
+| grep core `ImageGroupProps`/`ImageViewerProps` 引用 | 组件用本地/内联接口，core 类型偏「数据型」漂移；`getImageGroupClasses` 替换语义 | C19-4 |
+| 推演 `previewTrigger='hover'` + group | hover 被 `!group` 关、click 被 `!=='hover'` 关 → 图片注册却不可交互 | C19-5 |
+| grep `aria-modal`/focus | 两查看器声明 aria-modal 但无 focus trap/restore；ImagePreview 鼠标平移手搓 | C19-6 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 12 文件 244 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C19 基线 |
+
+> 本轮 C19 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0（本机无 corepack）实跑 C19 目标 vitest（12 文件 244 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动仓库。
 
 ---
 
