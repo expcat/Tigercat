@@ -2,7 +2,7 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C19「图片展示组」（C19-1~C19-6）、C20「图片编辑组」（C20-1~C20-6）、C21「Table 单组」（C21-1~C21-6）、C22「DataTableWithToolbar 单组」（C22-1~C22-4）、C23「VirtualTable 单组」（C23-1~C23-5）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C19「图片展示组」（C19-1~C19-6）、C20「图片编辑组」（C20-1~C20-6）、C21「Table 单组」（C21-1~C21-6）、C22「DataTableWithToolbar 单组」（C22-1~C22-4）、C23「VirtualTable 单组」（C23-1~C23-5）、C24「虚拟列表组」（C24-1~C24-5）
 verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
@@ -15,6 +15,7 @@ source-c19: 实读 Image/ImagePreview/ImageGroup/ImageViewer 全链路——core
 source-c20: 实读 ImageCropper/ImageAnnotation/CropUpload 全链路——core 类型 types/{image,image-annotation}.ts、core 工具 utils/{image-utils,image-annotation-utils,crop-upload-utils}.ts、React components/{ImageCropper,ImageAnnotation,CropUpload}.tsx、Vue components/{ImageCropper,ImageAnnotation,CropUpload}.ts、tests/{core,react,vue} 9 个定向 spec、examples {ImageCropper,ImageAnnotation,CropUpload}Demo、generated component-index/shared props/api-summary；grep 取证 ImageCropper 静态 SVG mask id、CropUpload modalWidth 零消费、ImageAnnotation SVG role=button 键盘激活缺口、Vue selectedId/tool 无 update 事件、ImageAnnotationChangeMeta 未实现分支、硬编码编辑文案/aria；以 packageManager pnpm 11.9.0 实跑 C20 目标 vitest（9 文件 187 测试通过）与 api:validate / types:check（均通过），未改动源码。
 source-c22: 实读 DataTableWithToolbar / TableToolbar 全链路——core 类型 composite.ts（TableToolbar* 系列 + DataTableWithToolbarProps）与 types/table.ts 的 TableProps（共享边界对照）、React components/DataTableWithToolbar.tsx（569 行，extends Omit<TableProps,'className'|'onPageChange'> 全量透传）、Vue components/DataTableWithToolbar.ts（854 行，VueDataTableWithToolbarProps 手维子集 + inheritAttrs:false restAttrs 透传）、双端 index 导出、tests/{react,vue}/DataTableWithToolbar.spec.*（812/877 行）、examples DataTableWithToolbarDemo.{tsx,vue}、generated component-index/api-summary/props/composite 与 generator generate-api-docs.mjs；grep 取证 Vue 声明 props 缺 ~20 个 Table 能力（expandable/virtual 系/editable/filterMode/advancedFilterRules/列行拖拽/summaryRow/groupBy/export 系/cardSelectionPosition/cardPadding/cardFieldGap）、core DataTableWithToolbarProps 两端零消费且 Vue export * 反向不一致、hasSearch 无 toolbar 时双端分歧、setFilterValue 过滤值更新双端一致、TableToolbar 在 index/api-summary 列为组件而 props 文档注明非独立导出；以本机 pnpm 11.9.0（与 packageManager 一致）实跑 C22 目标 vitest（2 文件 63 测试通过）与 api:validate / types:check（均通过），未改动源码。Table 自身实现属 C21。
 source-c23: 实读 VirtualTable 全链路——core 类型 types/virtual-table.ts、core 工具 utils/virtual-table-utils.ts（对照 table-utils.ts 的 fixed column/colgroup/tableBaseClasses 逻辑）、React components/VirtualTable.tsx、Vue components/VirtualTable.ts、tests/core/virtual-table-utils.spec.ts、tests/{react,vue}/VirtualTable.spec.*、examples {react,vue3} VirtualTableDemo、benchmarks/virtual-table.bench.ts、generated component-index/shared props data+advanced/examples advanced；grep 取证 core VirtualTableProps 的 width/virtualizeColumns/rowClassName 与双端组件 props 漂移、React loading 硬编码 vs Vue locale、grid a11y/键盘事件缺口、table-fixed 与 Table border-separate/colgroup 复用差异、calculateVirtualRange 异常输入覆盖缺口；实跑 C23 目标 vitest（3 文件 86 测试通过）与 api:validate / types:check（均通过），未改动源码。C21/C22 已由远端更新合并；C23 本轮只扫描 VirtualTable。
+source-c24: 实读 VirtualList / InfiniteScroll 全链路——core 类型 types/{virtual-list,infinite-scroll}.ts、core 工具 utils/{virtual-list-utils,infinite-scroll-utils}.ts、React components/{VirtualList,InfiniteScroll}.tsx、Vue components/{VirtualList,InfiniteScroll}.ts、tests/core/{virtual-list-strategies,infinite-scroll-utils}.spec.ts、tests/{react,vue}/{VirtualList,InfiniteScroll}.spec.*、examples {react,vue3} {VirtualList,InfiniteScroll}Demo、benchmarks/{virtual-scroll-fps,core-utils}.bench.ts、generated component-index/shared props advanced/examples advanced；grep 取证 dynamicSizeStrategy/updateItemHeight 仅 core 测试消费、双端 VirtualList 未做 DOM measurement 回写、IntersectionObserver rootMargin 只覆盖 bottom/right、scroll fallback 已支持 inverse top/left、Vue VirtualList className 走 attrs 合并、advanced props 仅列 InfiniteScroll 3/9 与 VirtualList 3/8；实跑 C24 目标 vitest（6 文件 109 测试通过）与 api:validate / types:check（均通过），未改动源码。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -3613,3 +3614,139 @@ pnpm vitest run tests/core/virtual-table-utils.spec.ts tests/react/VirtualTable.
 | 目标 vitest、`api:validate`、`types:check` | ✅ vitest 3 文件 86 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C23 基线 |
 
 > 本轮 C23 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮实跑 C23 目标 vitest（3 文件 86 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动源码。C21/C22 已由远端更新合并，状态不再标记为未扫描。
+
+### C24 虚拟列表组（VirtualList / InfiniteScroll）— 已扫描（2026-06-27）
+
+**扫描范围**：VirtualList / InfiniteScroll 的全链路——core 类型 [virtual-list.ts](../packages/core/src/types/virtual-list.ts)、[infinite-scroll.ts](../packages/core/src/types/infinite-scroll.ts)，core 工具 [virtual-list-utils.ts](../packages/core/src/utils/virtual-list-utils.ts)、[infinite-scroll-utils.ts](../packages/core/src/utils/infinite-scroll-utils.ts)，React 实现 [VirtualList.tsx](../packages/react/src/components/VirtualList.tsx)、[InfiniteScroll.tsx](../packages/react/src/components/InfiniteScroll.tsx)，Vue 实现 [VirtualList.ts](../packages/vue/src/components/VirtualList.ts)、[InfiniteScroll.ts](../packages/vue/src/components/InfiniteScroll.ts)，`tests/core/{virtual-list-strategies,infinite-scroll-utils}.spec.ts`、`tests/{react,vue}/{VirtualList,InfiniteScroll}.spec.*`、examples `{VirtualList,InfiniteScroll}Demo`、benchmarks [virtual-scroll-fps.bench.ts](../benchmarks/virtual-scroll-fps.bench.ts) 与 [core-utils.bench.ts](../benchmarks/core-utils.bench.ts)，以及 generated references（component-index、shared props advanced、examples advanced）。List、Tree、ChatWindow 等 VirtualList 消费者不在本轮执行，只在边界处取证。
+
+**结论速览**：C24 基础门禁健康，固定高度窗口、variable strategy、InfiniteScroll 默认文案/slot/locale、scroll fallback 与双端 smoke test 均通过。**无 P1**。待处理项集中在“已公开语义与真实运行路径不一致”：① VirtualList dynamic strategy 暴露 DOM 测量回写，但双端组件没有测量与刷新（P2）；② InfiniteScroll observer 路径未感知 `inverse`，与 scroll fallback 的 top/left 触发逻辑不一致（P2）；③ Vue VirtualList 的 public props 与 core/React 轻微漂移，`className` 只走 attrs 合并（P3）；④ generated props 与示例没有覆盖高级能力和 inverse/horizontal 组合（P3）。
+
+---
+
+#### C24-1 VirtualList dynamic strategy 暴露 DOM 测量语义，但双端组件未回写实测高度 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜core [VirtualListSizeStrategy](../packages/core/src/types/virtual-list.ts) 注释明确 `dynamicSizeStrategy` “updates after DOM measurement”，并公开 `updateItemHeight?(index, measuredHeight)`；core 测试也覆盖 `updateItemHeight` 后 totalHeight / offset 更新。
+- 🟠 P2｜React [VirtualList.tsx](../packages/react/src/components/VirtualList.tsx) 与 Vue [VirtualList.ts](../packages/vue/src/components/VirtualList.ts) 在传入 `estimatedItemHeight` 时会创建 `dynamicSizeStrategy`，但渲染项只用 `strategy.getItemHeight(i)` 设置固定 `height`，没有 `ref`/ResizeObserver/DOM measurement，也没有调用 `strategy.updateItemHeight` 后触发 range 重新计算。
+- 🟠 P2｜因此 `estimatedItemHeight` 实际行为更接近“估算固定高”：真实内容高度不会反哺 totalHeight、offsetTop 或可见窗口。现有双端 spec 只断言 `estimatedItemHeight={60}` 时 inner height 是 `50 * 60 = 3000px`，没有覆盖内容真实高度变化。
+
+**公共内容决策**：保留 core strategy 抽象，但需要二选一收敛语义：要么在 React/Vue VirtualList 中实现测量回写和刷新；要么把 `estimatedItemHeight` / dynamic 文档降级为估算模式，避免承诺“动态高度”。若实现测量，建议用共享 hook/composable 边界保持双端行为一致，core 继续只负责策略与纯计算。
+
+**建议修复顺序**：P2。优先明确 dynamic mode 真实契约，再补双端测量/刷新 spec。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/core/virtual-list-strategies.spec.ts tests/react/VirtualList.spec.tsx tests/vue/VirtualList.spec.ts
+pnpm run api:validate
+pnpm run types:check
+```
+
+---
+
+#### C24-2 InfiniteScroll observer 路径未感知 `inverse`，与 scroll fallback 触发边界不一致 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜core [shouldLoadMore](../packages/core/src/utils/infinite-scroll-utils.ts) 已支持 `inverse`：垂直时检查 `scrollTop <= threshold`，水平时检查 `scrollLeft <= threshold`；tests/core 覆盖了 vertical inverse 与 horizontal inverse。
+- 🟠 P2｜但 [createInfiniteScrollObserver](../packages/core/src/utils/infinite-scroll-utils.ts) options 没有 `inverse`，rootMargin 只按 direction 写成 vertical bottom `0px 0px ${threshold}px 0px` 或 horizontal right `0px ${threshold}px 0px 0px`。React/Vue 组件即使 props 有 `inverse`，也只把 sentinel 放到内容前方，没有把 inverse 传入 observer。
+- 🟠 P2｜在支持 IntersectionObserver 的现代浏览器中，InfiniteScroll 会优先走 observer 路径；只有 IO 不可用时才回退 scroll event。因此 inverse 场景的“接近顶部/左侧提前加载”只在 fallback 中完全表达，主路径可能等 sentinel 真正进入视口才触发，且不会按顶部/左侧 threshold 提前触发。
+
+**公共内容决策**：扩展 core observer helper 的 options（例如 `inverse?: boolean`）并生成 top/left rootMargin；React/Vue 组件同步传入 `inverse`。这属于内部 helper 行为增强，不需要改变用户层 public prop。
+
+**建议修复顺序**：P2。与 C24-1 分开处理，先补 core rootMargin tests，再改双端组件传参。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/core/infinite-scroll-utils.spec.ts tests/react/InfiniteScroll.spec.tsx tests/vue/InfiniteScroll.spec.ts
+```
+
+---
+
+#### C24-3 Vue VirtualList public props 与 core/React 轻微漂移，`className` 只走 attrs 合并 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜core [VirtualListProps](../packages/core/src/types/virtual-list.ts) 与 React `VirtualListProps extends CoreVirtualListProps` 都包含 `className?: string`；Vue [VirtualList.ts](../packages/vue/src/components/VirtualList.ts) props 只声明 `itemCount`、`itemHeight`、`estimatedItemHeight`、`getItemHeight`、`sizeStrategy`、`height`、`overscan`，没有声明 `className`。
+- 🟢 P3｜Vue 实现通过 `coerceClassValue(attrs.class)` 支持标准 `class` attrs，因此 `className` 不是运行时必需字段；但 tests/vue 仍用 `renderWithProps(VirtualList, { className: 'my-vl' })` 并通过 attrs 透传生效。这个行为依赖测试工具/attrs 透传，而不是组件声明式 public props。
+- ℹ️ `types:check` 当前通过，因为 Vue 导出的是 `InstanceType<typeof VirtualList>['$props']`，不会强制对齐 core `VirtualListProps`。这属于公共面卫生和文档一致性问题，不是当前门禁失败。
+
+**公共内容决策**：Vue 侧建议统一对齐轻量 `className` prop，或在 generated/docs 中明确 Vue 使用 `class` attrs 而不是 `className`。若继续保留 attrs-only 行为，测试应改成验证 `class`，避免把非声明 prop 误当 public API。
+
+**建议修复顺序**：P3。可与 generated docs 清理一起处理。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/vue/VirtualList.spec.ts
+pnpm run types:check
+```
+
+---
+
+#### C24-4 generated props 与示例没有覆盖 VirtualList / InfiniteScroll 高级能力 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜generated [shared/props/advanced.md](../skills/tigercat/references/shared/props/advanced.md) 只展示 `InfiniteScrollProps · 3/9 props`（`hasMore` / `loading` / `threshold`）与 `VirtualListProps · 3/8 props`（`itemCount` / `itemHeight` / `estimatedItemHeight`），没有列出 `direction`、`inverse`、`disabled`、`loadingText`、`endText`、`getItemHeight`、`sizeStrategy`、`height`、`overscan` 等关键能力。
+- 🟢 P3｜examples 的 VirtualList 只演示固定高度，InfiniteScroll 只演示默认方向与自定义文案；没有 `inverse`、horizontal、variable height 或 dynamic estimate 的示例。与 C24-1/C24-2 的真实风险点相比，文档和示例无法帮助使用者区分“推荐稳定路径”和“高级/待收敛路径”。
+- ℹ️ `pnpm docs:api:check` 未在本轮运行，符合 ROADMAP 对扫描文档更新的约束；本项只记录 generated 覆盖不足，不手改 generated references。
+
+**公共内容决策**：生成器层补 advanced props 覆盖与说明优先级；示例层增加 inverse/horizontal 或 variable height 示例前，应先完成 C24-1/C24-2 的契约收敛，避免示例推广不稳定组合。
+
+**建议修复顺序**：P3。等行为契约确定后由 `scripts/generate-api-docs.mjs` 驱动 references 更新。
+
+**目标验证命令**：
+
+```bash
+pnpm docs:api:check
+pnpm example:build
+```
+
+---
+
+#### C24-5 固定高度 range、variable strategy、InfiniteScroll 基础路径当前健康 — **P3 / 观察**
+
+**发现问题**
+
+- ℹ️ 固定高度 VirtualList 基线清晰：`getFixedVirtualRange` 有 core benchmark 与双端组件 spec 覆盖，100k item 场景只渲染窗口内节点，`overscan=0`、empty、single item、height=0 均有测试。
+- ℹ️ `variableSizeStrategy(getItemHeight, itemCount)` 通过 prefix sum 支持已知高度模式，core spec 覆盖 offset/range，React/Vue spec 覆盖 `getItemHeight` 总高与首项高度。
+- ℹ️ InfiniteScroll 的基础文案/slot/locale 路径双端一致：默认 `Loading...` / `No more data`、自定义 `loadingText`/`endText`、React `loader`/`end` 与 Vue `loader`/`end` slot、`role="status"`、sentinel 渲染/隐藏均有测试覆盖。
+
+**公共内容决策**：这些健康面不需要重构。后续修复 C24-1/C24-2 时应保持固定高度、known variable height 与默认 infinite scroll 行为不回退。
+
+**建议修复顺序**：观察项。作为后续修复的回归基线。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/core/virtual-list-strategies.spec.ts tests/core/infinite-scroll-utils.spec.ts tests/react/VirtualList.spec.tsx tests/vue/VirtualList.spec.ts tests/react/InfiniteScroll.spec.tsx tests/vue/InfiniteScroll.spec.ts
+```
+
+---
+
+#### C24 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| VirtualList dynamic measurement 契约（C24-1） | 保留 core strategy；双端要么实现 DOM measurement 回写，要么降级文档承诺 | **P2** |
+| InfiniteScroll inverse observer rootMargin（C24-2） | 扩展 core observer helper 的 `inverse` 语义，React/Vue 同步传参 | **P2** |
+| Vue VirtualList className / attrs 边界（C24-3） | 对齐声明式 prop 或改测试/文档只承诺 Vue `class` attrs | P3 |
+| generated props/examples 覆盖（C24-4） | 行为收敛后由 generator 补 advanced props 与示例说明，不手改 generated references | P3 |
+| 固定高度与基础 infinite scroll 健康面（C24-5） | 保持现状，作为后续修复回归基线 | 观察 |
+
+---
+
+#### C24 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| grep `dynamicSizeStrategy` / `updateItemHeight` / `estimatedItemHeight` | core strategy 与测试有测量回写语义；React/Vue 只创建 strategy 和读取估算高度，无 DOM measurement 回写 | C24-1 |
+| grep `createInfiniteScrollObserver` / `rootMargin` / `shouldLoadMore` | scroll fallback 支持 inverse top/left；observer options 无 inverse，rootMargin 只覆盖 bottom/right | C24-2 |
+| grep Vue VirtualList props / `coerceClassValue(attrs.class)` | Vue 未声明 `className` prop，但 attrs/class 可透传；测试把 `className` 当 props 使用 | C24-3 |
+| generated advanced props / examples | InfiniteScroll 仅 3/9 props、VirtualList 仅 3/8 props；示例只覆盖固定高度与默认方向 | C24-4 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 6 文件 109 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C24 基线 |
+
+> 本轮 C24 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮实跑 C24 目标 vitest（6 文件 109 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动源码。

@@ -202,7 +202,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：VirtualTable。
 - 重点：虚拟滚动、固定列、可访问性、Table 复用关系、滚动性能。
 
-##### C24 虚拟列表组
+##### C24 虚拟列表组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C24 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：VirtualList、InfiniteScroll。
 - 重点：viewport、observer、scroll 性能、占位测量、加载触发条件。
