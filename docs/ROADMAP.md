@@ -125,12 +125,16 @@ source: current repository state; v1.4.0 has been released
 - 组件：Input、Textarea、InputGroup、InputGroupAddon、InputNumber、NumberKeyboard、Mentions。
 - 重点：输入展示/解析、自动尺寸、组合输入结构、数字边界、Mentions 导航和过滤公共逻辑。
 
-##### C13 选择/切换基础组
+##### C13 选择/切换基础组 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C13 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Checkbox、CheckboxGroup、Radio、RadioGroup、Switch、Slider、Stepper、Rate、Segmented。
 - 重点：受控状态、键盘交互、禁用态、组选项、滑动/步进公共计算。
 
-##### C14 Select 单组
+##### C14 Select 单组 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C14 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Select、AutoComplete。
 - 重点：option state、过滤、键盘导航、popup、受控量 parity、与 TreeSelect/Cascader 的可共享边界。

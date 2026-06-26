@@ -2,10 +2,11 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）
 verified-date: 2026-06-26
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
+source-c14: 实读 Select/AutoComplete 全链路——core 类型 types/{select,auto-complete}.ts、core 工具 utils/{select-utils,auto-complete-utils,picker-utils}.ts、React 实现 components/Select.tsx 与 Select/{state,render-option,types,icons}、components/AutoComplete.tsx、Vue 实现 components/{Select,AutoComplete}.ts、tests/{react,vue}/{Select,AutoComplete}.spec.* 与 tests/core/{picker-utils,select-utils}.spec.ts、examples SelectDemo/AutoCompleteDemo、generated component-index；grep 取证 allowFreeInput 双端零消费、Select virtual/listHeight 双端零消费、getPickerTriggerKeyAction 仅 TreeSelect/Cascader 消费而 Select 未用；以 packageManager pnpm 11.9.0 实跑 C14 目标 vitest（6 文件 190 测试通过）与 api:validate / types:check（均通过），未改动源码。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -2223,3 +2224,166 @@ const getDefaultTarget = () => window
 | 目标 vitest、`pnpm api:validate`、`pnpm types:check` | ⚠️ 未运行：本机 `node_modules` 缺失，冻结安装在下载 `typescript@6.0.3` 及平台二进制包时超时；不作为组件结论 | C13 基线 |
 
 > 本轮 C13 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，目标 vitest、`pnpm api:validate` 与 `pnpm types:check` 因本机依赖重建的下载超时未能启动；该环境问题不作为组件结论。
+
+---
+
+### C14 Select 单组
+
+**扫描范围**：Select、AutoComplete 的全链路——core 类型 `packages/core/src/types/{select,auto-complete}.ts`，core 工具 `utils/{select-utils,auto-complete-utils,picker-utils}.ts`，React 实现 `components/Select.tsx` + `Select/{state,render-option,types,icons}`、`components/AutoComplete.tsx`，Vue 实现 `components/{Select,AutoComplete}.ts`，双端定向 spec、`tests/core/{picker-utils,select-utils}.spec.ts`，examples `SelectDemo`/`AutoCompleteDemo`，generated component-index。
+
+**结论速览**：Select/AutoComplete 核心行为健康、双端对称且测试充分——受控量（`value`/`onChange` ↔ `modelValue`/`update:modelValue`）、多选切换、clearable、过滤、creatable、remote、debounce、键盘导航均双端锁定。**无 P1**。需处理项集中在两类：① **公共 props 名实不符**——`allowFreeInput` 双端声明零实现、Select `virtual`/`listHeight` 双端 no-op、React AutoComplete 整体缺 `locale`（与 Vue 不对称）；② **该合未合**——Select 绕开同族 picker helpers（连 TreeSelect/Cascader 都用的 `getPickerTriggerKeyAction`），把导航/trigger/aria 在 React+Vue 各手写一遍。其余为 a11y / i18n / 一致性 P3。
+
+---
+
+#### C14-1 AutoComplete `allowFreeInput` 死 prop、`defaultActiveFirstOption` JSDoc 名实不符（公共 API 卫生）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜`allowFreeInput` 为**双端声明、零实现、零测试、零示例**的公共 prop：定义于 [auto-complete.ts:41](../packages/core/src/types/auto-complete.ts)（注释「Whether to allow free-form text input」），Vue 声明默认 `true`（[AutoComplete.ts:96](../packages/vue/src/components/AutoComplete.ts)）、React 只把它放进 `AUTOCOMPLETE_KEYS` 过滤集（[AutoComplete.tsx:48](../packages/react/src/components/AutoComplete.tsx)），但两端 setup/render **从不读取**它。语义上 AutoComplete 本就是自由输入框，该 prop 既无效果又含义含糊。
+- 🟢 P3｜`defaultActiveFirstOption` 的 JSDoc 写「Whether to select the first match automatically **when losing focus**」（[auto-complete.ts:38](../packages/core/src/types/auto-complete.ts)），但实现只用它在**打开/输入时**设置高亮 active 索引（React [AutoComplete.tsx:104](../packages/react/src/components/AutoComplete.tsx)/[:122](../packages/react/src/components/AutoComplete.tsx)、Vue [AutoComplete.ts:137](../packages/vue/src/components/AutoComplete.ts)/[:156](../packages/vue/src/components/AutoComplete.ts)）；全代码没有任何 blur-select 行为。文档与实现不符。
+
+**公共内容决策**：属公共 API 卫生，走任务 H 策略（不直接删公开内容）。`allowFreeInput` 二选一——要么按文档实现（失焦/回车时是否限定为 options 内的值），要么标 deprecated + migration + changeset 后移除，并过 `api:baseline:check`。`defaultActiveFirstOption` 先修 JSDoc 以匹配实际「打开时高亮首项」语义。
+
+**建议修复顺序**：P2。先定 `allowFreeInput` 去留（实现 or 废弃）；JSDoc 修正可随手并入。
+
+**目标验证命令**：`pnpm api:validate`、`pnpm types:check`、`pnpm api:baseline:check`、`pnpm vitest run tests/react/AutoComplete.spec.tsx tests/vue/AutoComplete.spec.ts`。
+
+---
+
+#### C14-2 Select `virtual` / `listHeight` 是双端 no-op 的公共 API，且 `virtual` 文档承诺性能优化（过度设计 / 未实现）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜`virtual`（`@since 0.5.0`，注释「only visible options are rendered for better performance」）与 `listHeight`（`@since 0.5.0`，默认 256）是公开 props（[select.ts:117](../packages/core/src/types/select.ts)/[:149](../packages/core/src/types/select.ts)），但两端**均未实现虚拟滚动**：React 只把二者放进 `SELECT_KEYS` 过滤集（[state.ts:33](../packages/react/src/components/Select/state.ts)/[:38](../packages/react/src/components/Select/state.ts)）、从不消费；Vue 声明了 props（[Select.ts:195](../packages/vue/src/components/Select.ts)/[:225](../packages/vue/src/components/Select.ts)）也从不引用。dropdown 始终一次性渲染全部选项。
+- ℹ️ 测试「should handle large number of options」对 100 项**全量渲染**断言（[tests/react/Select.spec.tsx:519](../tests/react/Select.spec.tsx)、[tests/vue/Select.spec.ts:653](../tests/vue/Select.spec.ts)），反证无虚拟化。对照：同批 `@since 0.5.0` 的 `maxTagCount` 已实现并测试。
+
+**公共内容决策**：公共 API 变更走任务 H。二选一——要么接入真实虚拟滚动（C24 已有 `VirtualList` 可复用，属框架层接入，纯滚动/测量计算可沉 core），要么把 `virtual`/`listHeight` 标 deprecated + migration、修正 `virtual` 注释中的性能承诺，过 `api:baseline:check`。不可继续保留「声明了性能优化但无效果」的 props。
+
+**建议修复顺序**：P2，独立成项。先决策实现 vs 废弃。
+
+**目标验证命令**：`pnpm api:validate`、`pnpm types:check`、`pnpm api:baseline:check`、`pnpm vitest run tests/react/Select.spec.tsx tests/vue/Select.spec.ts`。
+
+---
+
+#### C14-3 React AutoComplete 缺 `locale`，与 Vue 不对称；Vue `notFoundText` 又未走 locale（i18n 不对称）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜**双端不对称**：Vue AutoComplete 接 `locale` prop 并经 `useTigerConfig` + `mergeTigerLocale` + `resolveLocaleText` 本地化 clear 按钮 `aria-label`（[AutoComplete.ts:100](../packages/vue/src/components/AutoComplete.ts)/[:266](../packages/vue/src/components/AutoComplete.ts)）；**React AutoComplete 完全没有 `locale` prop**，clear `aria-label="Clear"` 硬编码英文、无法本地化（[AutoComplete.tsx:205](../packages/react/src/components/AutoComplete.tsx)）。与 B-1（DatePicker 未接 ConfigProvider locale）同向、与 C02-2（React QRCode 缺 locale）同型。注意 Select 双端均已接 `locale`，唯 AutoComplete 不对称。
+- 🟢 P3｜Vue AutoComplete 虽有 `mergedLocale`，但空态 `notFoundText` 直接用 prop 默认英文（[AutoComplete.ts:310](../packages/vue/src/components/AutoComplete.ts)），**未走 locale**；而 Vue Select 的空态走 `mergedLocale?.common?.emptyText`（[Select.ts:826](../packages/vue/src/components/Select.ts)）——同组内空态本地化策略不一致。
+
+**公共内容决策**：locale 解析留 core（`mergeTigerLocale`/`resolveLocaleText` 已在 core），框架层消费。React AutoComplete 应补 `locale` prop 并对齐 Vue 的「显式 prop > ConfigProvider locale > 默认」优先级；clear/notFoundText 文案统一接 `common`（如 `clearText`/`emptyText`）。属公共 API 新增（React 加 prop），双端 parity 收敛。
+
+**建议修复顺序**：P2。先给 React AutoComplete 补 locale 接入与 clear 文案本地化，再统一两端空态走 locale，补 ConfigProvider 回归测试。
+
+**目标验证命令**：`pnpm api:validate`、`pnpm types:check`、`pnpm vitest run tests/react/AutoComplete.spec.tsx tests/vue/AutoComplete.spec.ts`。
+
+---
+
+#### C14-4 Select 绕开共享 picker helpers，把导航/trigger/aria 在双端各手写一遍（该合未合 + 双端重复）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜[picker-utils.ts:1](../packages/core/src/utils/picker-utils.ts) 自述为「Select、AutoComplete、Cascader、TreeSelect、Transfer」的**共享键盘导航/aria 层**，提供 `getPickerNavigationIndex`、`getPickerComboboxAria`/`getPickerListboxAria`/`getPickerOptionAria`、`getPickerTriggerKeyAction`、`getInitialPickerActiveIndex` 等。AutoComplete、Cascader、TreeSelect、Transfer、Mentions、Spotlight 都消费这些高层 helper；**唯独 Select 只用底层 `findFirstEnabledIndex`/`findLastEnabledIndex`/`findNextEnabledIndex`**（[state.ts:10](../packages/react/src/components/Select/state.ts)、[Select.ts:17](../packages/vue/src/components/Select.ts)），把导航键派发、option/listbox aria 在两端**逐处内联**。
+- 🟠 P2｜尤其 `getPickerTriggerKeyAction(key, expanded)` 连 Select 的**同族** TreeSelect、Cascader 都在用（[TreeSelect.tsx:176](../packages/react/src/components/TreeSelect.tsx)、[TreeSelect.ts:223](../packages/vue/src/components/TreeSelect.ts)、[Cascader.tsx:211](../packages/react/src/components/Cascader.tsx)、[Cascader.ts:240](../packages/vue/src/components/Cascader.ts)），Select 却在 trigger handler 里另写一套 Enter/Space/Arrow/Escape 分支（[state.ts:269](../packages/react/src/components/Select/state.ts)、[Select.ts:437](../packages/vue/src/components/Select.ts)）。
+- 🟠 P2｜后果是**跨框架重复**：Select 的 trigger/dropdown/search 三个键盘 switch 在 React `state.ts` 与 Vue `Select.ts` 之间近乎逐字重复；option/listbox 的 `role`/`aria-selected`/`aria-disabled` 也在两端各写一遍（React [render-option.tsx:27](../packages/react/src/components/Select/render-option.tsx)、Vue [Select.ts:741](../packages/vue/src/components/Select.ts)），而这正是 `getPickerOptionAria` 已封装的内容。
+- ℹ️ ARIA 模式差异（非缺陷，限定可合范围）：Select 是 **button 触发 + 焦点移入选项（roving tabindex + DOM focus + scrollIntoView）**；AutoComplete 是 **combobox + `aria-activedescendant`（焦点留输入框）**。故 `getPickerComboboxAria`（输出 `role="combobox"`）**不应**套到 Select 触发器。可安全共享的是：dropdown 的方向键派发改用 `getPickerNavigationIndex`、option aria 改用 `getPickerOptionAria`；`getPickerTriggerKeyAction` 可评估接入（行为敏感、双端 spec 已锁，需谨慎）。
+
+**公共内容决策**：**合并到已有 core picker-utils**。纯逻辑（导航索引派发、trigger 键意图、option aria）沉 core 共享，焦点/DOM/事件编排留框架层。优先低风险项（`getPickerNavigationIndex`、`getPickerOptionAria`），`getPickerTriggerKeyAction` 接入需对照现有键盘 spec 逐项验证等价。无公共 API 破坏（纯内部重构）。
+
+**建议修复顺序**：P3→P2 渐进。先用 `getPickerNavigationIndex` 收敛 Select dropdown 的 4 个方向键分支（与底层 finder 行为等价、零风险），再用 `getPickerOptionAria` 收敛 option aria；最后评估 trigger 键合并。每步跑双端 Select spec 保证行为不变。
+
+**目标验证命令**：`pnpm vitest run tests/core/picker-utils.spec.ts tests/react/Select.spec.tsx tests/vue/Select.spec.ts`、`pnpm types:check`、`pnpm api:validate`。
+
+---
+
+#### C14-5 同组 clear 控件 a11y 模式不一致：Select 用不可聚焦 `<span>`，AutoComplete 用 `<button>`（a11y）— **P3**
+
+**发现问题**
+
+- 🟢 P3｜Select 的清除控件是嵌在触发 `<button>` 内的 `<span data-tiger-select-clear onClick>`（[Select.tsx:47](../packages/react/src/components/Select.tsx)、[Select.ts:673](../packages/vue/src/components/Select.ts)），**不可聚焦、无键盘路径**——键盘用户无法清除（Select 也未提供 Delete/Backspace 清除）。且交互元素（span onClick）嵌套在 button 内，语义不佳。
+- 🟢 P3｜对照同组 AutoComplete 的清除控件是真正的 `<button aria-label>`（[AutoComplete.tsx:202](../packages/react/src/components/AutoComplete.tsx)、[AutoComplete.ts:259](../packages/vue/src/components/AutoComplete.ts)），键盘可达。同一 C14 组内两套清除模式。
+
+**公共内容决策**：框架层 a11y 修复，不入 core。Select clear 宜改为可聚焦控件（独立 `<button>` 或补键盘路径），并避免 button 内嵌 onClick span。属行为/结构调整，双端 spec 仅断言 `[data-tiger-select-clear]` 存在与点击清除，改造空间可控。
+
+**建议修复顺序**：P3。补 Select 键盘清除回归测试后再调结构，双端对齐。
+
+**目标验证命令**：`pnpm vitest run tests/react/Select.spec.tsx tests/vue/Select.spec.ts`。
+
+---
+
+#### C14-6 Select clear 的 `aria-label` 硬编码英文未本地化（i18n）— **P3**
+
+**发现问题**
+
+- 🟢 P3｜Select 清除控件 `aria-label="Clear selection"` 双端硬编码（[Select.tsx:51](../packages/react/src/components/Select.tsx)、[Select.ts:679](../packages/vue/src/components/Select.ts)），**未走 locale**——即便 Vue Select 已有 `mergedLocale`、且仓库已有 `common.clearText` 这一 key（Vue AutoComplete 正用它本地化 clear）。结果 Select 的清除标签无法本地化。
+
+**公共内容决策**：接入已有 locale 链路（`resolveLocaleText('Clear selection', mergedLocale?.common?.clearText)` 之类），与 Vue AutoComplete 统一。core 已有 helper，无需新增。与 C14-3、C01-4（默认标签本地化）同向，可合并到一次 i18n 收敛。
+
+**建议修复顺序**：P3，随 C14-3 / a11y 标签本地化一并处理。
+
+**目标验证命令**：`pnpm vitest run tests/react/Select.spec.tsx tests/vue/Select.spec.ts`、`pnpm api:validate`。
+
+---
+
+#### C14-7 AutoComplete 三处双端一致但与 Select 不一致的小问题（一致性）— **P3**
+
+**发现问题**
+
+- 🟢 P3｜**hover 高亮禁用项**：AutoComplete option 的 `onMouseEnter` 无条件 `setActiveIndex`（[AutoComplete.tsx:233](../packages/react/src/components/AutoComplete.tsx)、[AutoComplete.ts:296](../packages/vue/src/components/AutoComplete.ts)），可把 active 落到 disabled 项（Enter 仍被 `handleSelect` 拦截，仅视觉/语义瑕疵）；Select 的 hover 有 `!option.disabled` 判断（[render-option.tsx:32](../packages/react/src/components/Select/render-option.tsx)、[Select.ts:745](../packages/vue/src/components/Select.ts)）。
+- 🟢 P3｜**键盘导航不滚动**：AutoComplete 走 `aria-activedescendant` 但方向键导航**从不 scrollIntoView**，长列表 active 项可能在视口外；Select 会 `scrollIntoView({block:'nearest'})`（[state.ts:179](../packages/react/src/components/Select/state.ts)、[Select.ts:339](../packages/vue/src/components/Select.ts)）。combobox 模式同样需手动滚动 active 项。
+- 🟢 P3｜**Vue 多一个 `change` 事件**：Vue AutoComplete 在 emits 声明并在输入/选择/清除时额外发 `change`（[AutoComplete.ts:105](../packages/vue/src/components/AutoComplete.ts)/[:153](../packages/vue/src/components/AutoComplete.ts)），React 无对应 `onChange`-distinct 事件（React `onChange` 等价 Vue `update:modelValue`）——事件面双端不完全对称。
+- ℹ️ 另：`auto-complete-utils.ts` 的 `filterAutoCompleteOptions`/`defaultAutoCompleteFilter` 无 `tests/core` direct spec，仅经组件测试间接覆盖（对照 `select-utils`/`picker-utils` 均有 core spec）。
+
+**公共内容决策**：(a)(b) 框架层补 disabled 判断与 scrollIntoView，与 Select 对齐；(c) 评估 Vue `change` 是保留（文档化为非 v-model 事件）还是移除以对齐 React，属事件契约取舍；core filter helper 可补 direct spec。均不涉及公共拆合到 core 的结构变更。
+
+**建议修复顺序**：P3，低优先，随 AutoComplete 下次改动顺手处理；补 `tests/core/auto-complete-utils.spec.ts`。
+
+**目标验证命令**：`pnpm vitest run tests/react/AutoComplete.spec.tsx tests/vue/AutoComplete.spec.ts`（如补 core spec 追加 `tests/core/auto-complete-utils.spec.ts`）。
+
+---
+
+#### C14-8 受控量 / 双端 parity 健康面 + active-index 重算策略细微差异（观察）— **P3 / 观察**
+
+**发现问题**
+
+- ✅ 受控量/事件双端对称：`value`/`onChange` ↔ `modelValue`/`update:modelValue`；多选 toggle、clear 回值（单选 `undefined` / 多选 `[]`）、`maxTagCount` 截断、`creatable`（去重 + `create` 回调）、`remote`（跳过本地过滤）、`searchDebounce`、键盘（Arrow/Home/End/Enter/Space/Escape/Tab）均双端 spec 锁定且行为一致。option 过滤、空态、分组渲染一致。
+- 🟢 P3｜**active-index 重算策略**：打开时两端都「优先选中项、否则首个可用项」；但**选项变化时**——React 用单 effect 仍偏向选中项（[state.ts:410](../packages/react/src/components/Select/state.ts)），Vue 的 `flatSelectableOptions` watch 无条件回到 `findFirstEnabledIndex`、忽略选中项（[Select.ts:615](../packages/vue/src/components/Select.ts)）。实时过滤时选中值通常已不在结果内，差异概率低，但属双端不完全一致，列为观察。
+
+**公共内容决策**：parity 健康面无需动作。active-index 差异如要统一，可在 C14-4 收敛键盘/状态逻辑时一并对齐两端「选项变化后是否保留选中高亮」的语义。
+
+**建议修复顺序**：P3 观察，随 C14-4 顺带评估。
+
+**目标验证命令**：`pnpm vitest run tests/react/Select.spec.tsx tests/vue/Select.spec.ts`。
+
+---
+
+#### C14 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| AutoComplete `allowFreeInput` 死 prop（C14-1） | 实现 or 废弃（走 H 流程）；`defaultActiveFirstOption` 修 JSDoc | **P2** |
+| Select `virtual`/`listHeight` 双端 no-op（C14-2） | 接入真实虚拟滚动（复用 VirtualList）或废弃 + 改注释 | **P2** |
+| React AutoComplete 缺 `locale`（C14-3） | React 补 locale 接入；空态/clear 文案双端统一走 locale | **P2** |
+| Select 绕开 picker-utils 高层 helper（C14-4） | 合并→core 共享（先 `getPickerNavigationIndex`/`getPickerOptionAria`，再评估 `getPickerTriggerKeyAction`） | **P2** |
+| Select clear `<span>` 不可键盘聚焦（C14-5） | 框架层改可聚焦控件 + 键盘路径 | P3 |
+| Select clear `aria-label` 硬编码英文（C14-6） | 接入已有 `common.clearText` locale key | P3 |
+| AutoComplete hover 禁用项 / 无 scrollIntoView / Vue 多 change 事件（C14-7） | 框架层对齐 Select；补 core filter direct spec | P3 |
+| 受控量/parity 健康面 + active-index 重算差异（C14-8） | 健康面保持；差异随 C14-4 顺带统一 | P3/观察 |
+
+---
+
+#### C14 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| grep `allowFreeInput` 全仓 | 仅类型 + 双端声明出现，setup/render 零消费 | C14-1 |
+| grep Select `virtual`/`listHeight` 消费者 | 仅 React `SELECT_KEYS` 过滤集；双端无虚拟渲染；100 项全量渲染测试反证 | C14-2 |
+| 比对 React/Vue AutoComplete `locale` | Vue 有 locale + 本地化 clear；React 无 locale、clear 硬编码英文 | C14-3 |
+| grep picker-utils 高层 helper 消费者 | AutoComplete/Cascader/TreeSelect/Transfer/Mentions/Spotlight 用；Select 仅用底层 finder；`getPickerTriggerKeyAction` 被 TreeSelect/Cascader 用而 Select 未用 | C14-4 |
+| 比对 Select vs AutoComplete clear 控件 | Select=不可聚焦 `<span onClick>`；AutoComplete=`<button>` | C14-5 |
+| grep Select clear `aria-label` | 双端硬编码 `Clear selection`，未走 `common.clearText` | C14-6 |
+| 比对 onMouseEnter/scrollIntoView/emits | AutoComplete hover 不滤 disabled、无 scrollIntoView、Vue 多 `change`；Select 反之 | C14-7 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 6 文件 190 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C14 基线 |
+
+> 本轮 C14 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0（本机无 corepack）实跑 C14 目标 vitest（6 文件 190 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动仓库。
