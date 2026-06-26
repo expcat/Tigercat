@@ -221,7 +221,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：LineChart、AreaChart、BarChart、ScatterChart。
 - 重点：scale、path、tooltip、降采样、点/线/柱复用边界。
 
-##### C27 径向图表组
+##### C27 径向图表组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C27 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：PieChart、DonutChart、RadarChart、GaugeChart。
 - 重点：角度计算、label 布局、重复 SVG 逻辑、空值和极值。
