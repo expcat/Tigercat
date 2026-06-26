@@ -2,7 +2,7 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C19「图片展示组」（C19-1~C19-6）、C20「图片编辑组」（C20-1~C20-6）、C21「Table 单组」（C21-1~C21-6）、C22「DataTableWithToolbar 单组」（C22-1~C22-4）、C23「VirtualTable 单组」（C23-1~C23-5）、C26「笛卡尔图表组」（C26-1~C26-4）、C27「径向图表组」（C27-1~C27-5）、C29「复合内容组」（C29-1~C29-4）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C19「图片展示组」（C19-1~C19-6）、C20「图片编辑组」（C20-1~C20-6）、C21「Table 单组」（C21-1~C21-6）、C22「DataTableWithToolbar 单组」（C22-1~C22-4）、C23「VirtualTable 单组」（C23-1~C23-5）、C26「笛卡尔图表组」（C26-1~C26-4）、C27「径向图表组」（C27-1~C27-5）、C29「复合内容组」（C29-1~C29-4）、C31「高级编辑器组」（C31-1~C31-5）
 verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
@@ -18,6 +18,7 @@ source-c23: 实读 VirtualTable 全链路——core 类型 types/virtual-table.t
 source-c26: 实读 LineChart/AreaChart/BarChart/ScatterChart 全链路——core 类型 types/chart.ts（Line/Area/Bar/Scatter props）、core 工具 utils/{chart-utils,chart-shared,chart-interaction}.ts 与 utils/chart/{scale,path,axis,format,color}.ts、React components/{LineChart,AreaChart,BarChart,ScatterChart}.tsx 与 hooks/useChartInteraction.ts、Vue components/{LineChart,AreaChart,BarChart,ScatterChart}.ts 与 composables/useChartInteraction.ts、tests/core/{chart-utils,chart-shared,chart-interaction}.spec.ts、tests/{react,vue}/{LineChart,AreaChart,BarChart,ScatterChart}.spec.*、generated component-index/shared props/examples charts；grep 取证 Line/Area single-series color props 零消费、point hover/tooltip 不受 hoverable 控制且点级无键盘激活、降采样 API/helper/spec 零命中、React Bar rect 缺 role/aria label 而 Vue Bar/Scatter 已标注；实跑 C26 目标 vitest（11 文件 293 测试通过）与 api:validate / types:check（均通过），未改动源码。C24/C25 尚未扫描；C26 本轮按 ROADMAP 可独立扫描。
 source-c27: 实读 PieChart/DonutChart/RadarChart/GaugeChart 全链路——core 类型 types/chart.ts（Pie/Donut/Radar/Gauge props）、core 工具 utils/{chart-utils,chart-shared,chart-interaction,gauge-chart-utils}.ts 与 utils/chart/{scale,path,format,color}.ts、React components/{PieChart,DonutChart,RadarChart,GaugeChart}.tsx 与 hooks/useChartInteraction.ts、Vue components/{PieChart,DonutChart,RadarChart,GaugeChart}.ts 与 composables/useChartInteraction.ts、tests/core/{chart-utils,chart-shared,chart-interaction,gauge-chart-utils}.spec.ts、tests/{react,vue}/{PieChart,DonutChart,RadarChart,GaugeChart}.spec.*、generated component-index/shared props/examples charts 与 examples demo；grep 取证 Gauge tooltip props 无实现、Donut animated 公开 no-op、Vue Pie/Donut legendFormatter 缺口、Gauge min=max/tickCount=0/小半径极值、React Pie/Donut slice a11y 与 Radar point 键盘路径缺口、Pie mixed zero/negative value 空 path；实跑 C27 目标 vitest（12 文件 297 测试通过）与 api:validate / types:check（均通过），未改动源码。C24 尚未扫描；C27 本轮按 ROADMAP 可独立扫描。
 source-c29: 实读 ActivityFeed/ChatWindow/CommentThread 全链路——core 类型 types/composite.ts（C29 三组件 props）、core 工具 utils/{activity-feed-utils,chat-window-utils,comment-thread-utils}.ts、React components/{ActivityFeed,ChatWindow,CommentThread}.tsx、Vue components/{ActivityFeed,ChatWindow,CommentThread}.ts、底层 Timeline 对照、tests/{react,vue}/{ActivityFeed,ChatWindow,CommentThread}.spec.*、tests/core/composite-a11y-roles.spec.tsx、tests/core/modern-theme-interaction.spec.ts、examples demo、generated component-index/shared props/examples composite 与 release notes；grep 取证 ChatWindow statusVariant 零消费、CommentThread Vue onExpandedChange 类型/文档漂移、ActivityFeed/Timeline 全量 map 渲染、custom render/action callback 覆盖缺口；实跑 C29 目标 vitest（8 文件 81 测试通过）与 api:validate / types:check（均通过），未改动源码。C24/C28 尚未扫描；C29 本轮按 ROADMAP 可独立扫描。
+source-c31: 实读 CodeEditor/RichTextEditor/MarkdownEditor 全链路——core 类型 types/{code-editor,rich-text-editor,markdown-editor}.ts、core 工具/引擎 utils/{code-editor-utils,code-highlighter,rich-text-editor-utils,rich-text-engine,markdown-editor-utils}.ts、React components/{CodeEditor,RichTextEditor,MarkdownEditor}.tsx、Vue components/{CodeEditor,RichTextEditor,MarkdownEditor}.ts、tests/core/{code-highlighter,code-editor-utils,rich-text-engine,rich-text-editor-utils,markdown-editor-utils}.spec.ts、tests/{react,vue}/{CodeEditor,RichTextEditor,MarkdownEditor}.spec.*、examples demo、generated component-index/shared props advanced/examples advanced/api-summary；grep 取证 MarkdownEditor 空 preview placeholder 直入 innerHTML、CodeEditor highlightActiveLine 零消费、RichTextEditor mode 零消费、RichTextEditor custom toolbar action 绕过 engine notifyChange、engine/highlighter props 与 generated references 漂移；实跑 C31 目标 vitest（11 文件 275 测试通过）与 api:validate / types:check（均通过），未改动源码。C24/C28/C30 尚未扫描；C31 本轮按 ROADMAP 可独立扫描。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -4157,3 +4158,156 @@ corepack pnpm vitest run tests/react/ActivityFeed.spec.tsx tests/vue/ActivityFee
 | 目标 vitest、`api:validate`、`types:check` | ✅ vitest 8 文件 81 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出 | C29 基线 |
 
 > 本轮 C29 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用仓库声明的 `corepack pnpm` / pnpm 11.9.0 实跑 C29 目标 vitest（8 文件 81 测试通过）、`corepack pnpm api:validate`（一致性检查通过，0 问题）与 `corepack pnpm types:check`（全部 props 类型导出），均为只读校验、未改动源码。C24/C28 尚未扫描；C29 本轮按 ROADMAP 可独立扫描。
+
+---
+
+### 任务 C / C31：高级编辑器组扫描结果（2026-06-27）
+
+**扫描范围**：CodeEditor / RichTextEditor / MarkdownEditor 全链路——core 类型 [code-editor.ts](../packages/core/src/types/code-editor.ts)、[rich-text-editor.ts](../packages/core/src/types/rich-text-editor.ts)、[markdown-editor.ts](../packages/core/src/types/markdown-editor.ts)，core 工具与引擎 [code-editor-utils.ts](../packages/core/src/utils/code-editor-utils.ts)、[code-highlighter.ts](../packages/core/src/utils/code-highlighter.ts)、[rich-text-editor-utils.ts](../packages/core/src/utils/rich-text-editor-utils.ts)、[rich-text-engine.ts](../packages/core/src/utils/rich-text-engine.ts)、[markdown-editor-utils.ts](../packages/core/src/utils/markdown-editor-utils.ts)，React 实现 `components/{CodeEditor,RichTextEditor,MarkdownEditor}.tsx`，Vue 实现 `components/{CodeEditor,RichTextEditor,MarkdownEditor}.ts`，`tests/core/{code-highlighter,code-editor-utils,rich-text-engine,rich-text-editor-utils,markdown-editor-utils}.spec.ts`、`tests/{react,vue}/{CodeEditor,RichTextEditor,MarkdownEditor}.spec.*`，双端 demo，以及 generated references（component-index、shared props advanced、examples advanced、api-summary）。C17 CronEditor 属时间组，C30 FormWizard/TaskBoard/Kanban 未在本轮执行。
+
+**结论速览**：C31 目标 vitest/API/type 门禁均通过；CodeEditor 的内置 tokenizer 与可插拔 highlighter、RichTextEditor 的 engine 抽象、MarkdownEditor 的内置 renderer/toolbar helper 都有 core 或双端测试覆盖。**无发布门禁失败**。需处理项集中在 public prop 与危险 HTML 边界：① MarkdownEditor 空 preview 把 `placeholder` 直接写入 `innerHTML`，绕过 markdown sanitize（P1）；② CodeEditor `highlightActiveLine` 公开但双端没有运行时效果（P2）；③ RichTextEditor `mode` 公开但双端没有内容转换或渲染差异（P2）；④ RichTextEditor 自定义 toolbar action 在组件层执行时不会触发 change 同步（P2）；⑤ engine/highlighter 已进入运行时 API，但 core shared props 与 generated references 未同步揭示（P3）。
+
+---
+
+#### C31-1 MarkdownEditor 空 preview 将 `placeholder` 直写 `innerHTML` — **P1**
+
+**发现问题**
+
+- 🔴 P1｜core [renderMarkdownToHtml](../packages/core/src/utils/markdown-editor-utils.ts) 会对 markdown 或自定义 renderer 输出执行 `sanitizeHtml`，对应 core spec 也覆盖了自定义 renderer 的 `onclick` / `<script>` 清理。
+- 🔴 P1｜React [MarkdownEditor.tsx](../packages/react/src/components/MarkdownEditor.tsx) 的 preview 在 `currentValue` 为空时执行 `dangerouslySetInnerHTML={{ __html: currentValue ? previewHtml : placeholder || '' }}`，此分支没有经过 `renderMarkdownToHtml` / `sanitizeHtml`。
+- 🔴 P1｜Vue [MarkdownEditor.ts](../packages/vue/src/components/MarkdownEditor.ts) 同样在空值 preview 分支使用 `innerHTML: currentValue.value ? previewHtml.value : props.placeholder || ''`。双端 spec 只断言普通文本 placeholder，没有覆盖 HTML placeholder。
+
+**公共内容决策**：空 preview 的 placeholder 应按纯文本渲染，或至少复用同一个 sanitize/escape 边界；不要让 placeholder 成为独立的 HTML 注入通道。修复时双端保持一致，并补 `placeholder="<img ...>"` / `<script>` 类断言。
+
+**建议修复顺序**：P1。先修 preview 空态 HTML 边界，再处理其他 C31 API 收敛项。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm vitest run tests/react/MarkdownEditor.spec.tsx tests/vue/MarkdownEditor.spec.ts tests/core/markdown-editor-utils.spec.ts
+corepack pnpm api:validate
+corepack pnpm types:check
+```
+
+---
+
+#### C31-2 CodeEditor `highlightActiveLine` 公开但双端没有运行时效果 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜core [CodeEditorProps](../packages/core/src/types/code-editor.ts) 公开 `highlightActiveLine?: boolean`，注释为是否高亮当前行，默认 true。
+- 🟠 P2｜Vue [CodeEditor.ts](../packages/vue/src/components/CodeEditor.ts) 声明并暴露 `highlightActiveLine` prop，但 render/highlight/textarea 逻辑没有读取它；React [CodeEditor.tsx](../packages/react/src/components/CodeEditor.tsx) 继承 core props，却没有解构或消费该字段。
+- 🟠 P2｜当前双端 spec 覆盖 language/theme/lineNumbers/disabled/readOnly/tab/高亮 token，但没有任何 active line 行为断言；core utils 也没有 current-line class helper。
+
+**公共内容决策**：走 API 收敛。若保留该 prop，应抽 core helper 生成 active-line class，并在双端基于 selection/caret 所在行渲染；若短期不实现，应从 shared type/generated references 中移除或标注暂未支持，避免 no-op prop 继续扩散。
+
+**建议修复顺序**：P2。建议与 CodeEditor 高亮层/textarea scroll 同步测试同批处理。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm vitest run tests/core/code-editor-utils.spec.ts tests/react/CodeEditor.spec.tsx tests/vue/CodeEditor.spec.ts
+corepack pnpm api:validate
+corepack pnpm types:check
+```
+
+---
+
+#### C31-3 RichTextEditor `mode` 公开但未参与渲染、存储或转换 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜core [RichTextEditorProps](../packages/core/src/types/rich-text-editor.ts) 公开 `mode?: 'html' | 'markdown' | 'plain'`，ROADMAP C31 也要求扫描“内容转换”。
+- 🟠 P2｜React [RichTextEditor.tsx](../packages/react/src/components/RichTextEditor.tsx) 解构 `mode: _mode = 'html'` 后没有消费；Vue [RichTextEditor.ts](../packages/vue/src/components/RichTextEditor.ts) 声明 `mode` prop，但 setup/render/engine context 都没有读取。
+- 🟠 P2｜内置 [rich-text-engine.ts](../packages/core/src/utils/rich-text-engine.ts) 的 mount context 只接收 HTML initialValue，`setValue/getValue/notifyChange` 都按 HTML 处理；双端 spec 覆盖 toolbar/contenteditable/height/input，但没有 markdown/plain 模式差异。
+
+**公共内容决策**：不要在组件里临时写三套转换。先决定 RichTextEditor 是否只作为 HTML editor；如果要保留 `mode`，应把输入/输出格式写入 RichTextEngine 契约，明确 markdown/plain 与 HTML 的转换边界，并补双端 tests/docs。
+
+**建议修复顺序**：P2。与 engine 契约版本化一起处理，避免只实现一个框架或只改文档。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm vitest run tests/core/rich-text-engine.spec.ts tests/react/RichTextEditor.spec.tsx tests/vue/RichTextEditor.spec.ts
+corepack pnpm api:validate
+corepack pnpm types:check
+```
+
+---
+
+#### C31-4 RichTextEditor 自定义 toolbar action 绕过 change 同步 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜core [ToolbarButton.action](../packages/core/src/types/rich-text-editor.ts) 允许自定义 action 修改 contentEditable host；[rich-text-engine.ts](../packages/core/src/utils/rich-text-engine.ts) 内置 engine 若执行到 `btn.action` 分支，会随后调用 `handleInput()` 与 `refreshActiveFormats()`。
+- 🟠 P2｜React [RichTextEditor.tsx](../packages/react/src/components/RichTextEditor.tsx) 的 `execButtonAction` 在组件层先判断 `btn.action && editorRef.current`，直接调用 `btn.action(editorRef.current)` 后 return，不会走 engine 的 notifyChange 路径。
+- 🟠 P2｜Vue [RichTextEditor.ts](../packages/vue/src/components/RichTextEditor.ts) 同样在组件层直接执行 `btn.action(editorRef.value)` 并 return。现有双端 spec 只覆盖普通 input 事件和 toolbar button 渲染，未覆盖 custom action 是否触发 `onChange` / `update:value`。
+
+**公共内容决策**：自定义 action 应统一交给 engine 执行，或组件执行后显式读取 `engine.getValue()` / host `innerHTML` 并走同一 notifyChange/sanitize/active-format 路径。优先收敛到 engine，避免组件层和 engine 层两套 action 语义。
+
+**建议修复顺序**：P2。与 C31-3 的 engine 契约修复同批处理，并补 React/Vue custom toolbar action change 断言。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm vitest run tests/core/rich-text-engine.spec.ts tests/react/RichTextEditor.spec.tsx tests/vue/RichTextEditor.spec.ts
+corepack pnpm api:validate
+corepack pnpm types:check
+```
+
+---
+
+#### C31-5 engine/highlighter 运行时 API 与 generated references 发现性不足 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜CodeEditor 双端已公开 `highlighter?: CodeHighlighter`，core 也导出 [code-highlighter.ts](../packages/core/src/utils/code-highlighter.ts) 与 `builtinCodeHighlighter`；RichTextEditor 双端已公开 `engine?: RichTextEngine`，core 也导出 [rich-text-engine.ts](../packages/core/src/utils/rich-text-engine.ts)。
+- 🟢 P3｜core shared prop 类型 [code-editor.ts](../packages/core/src/types/code-editor.ts) / [rich-text-editor.ts](../packages/core/src/types/rich-text-editor.ts) 不包含 `highlighter` / `engine`；generated [shared/props/advanced.md](../skills/tigercat/references/shared/props/advanced.md) 对 CodeEditor / RichTextEditor 只展示 3 个核心字段，[examples/advanced.md](../skills/tigercat/references/examples/advanced.md) 也只把三编辑器列为标准 `<Component />`。
+- 🟢 P3｜测试覆盖了 core engine/helper 合同，但双端 component spec 没有断言 CodeEditor highlighter path 或 RichTextEditor custom engine path；示例也没有展示“无第三方运行时边界”的 opt-in 接入方式。
+
+**公共内容决策**：这是 public docs/reference 的同步问题，不需要立即改 runtime。后续可让 generated references 识别框架层扩展 props，或在 advanced examples 中为 highlighter/engine 增加最小 opt-in 示例，并补双端组件层 smoke tests。
+
+**建议修复顺序**：P3。放在 C31-1~C31-4 后处理；若调整 generator，归任务 G/H 时同步审计。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm vitest run tests/core/code-highlighter.spec.ts tests/core/rich-text-engine.spec.ts tests/react/CodeEditor.spec.tsx tests/vue/CodeEditor.spec.ts tests/react/RichTextEditor.spec.tsx tests/vue/RichTextEditor.spec.ts
+corepack pnpm docs:api:check
+corepack pnpm api:validate
+```
+
+---
+
+#### C31 健康面：高级编辑器的基础输入同步与零依赖边界可用
+
+- ✅ CodeEditor 双端复用 core tokenizer、line number、tab 插入与 class helper；内置 highlighter 有单独 core spec，组件层基础 language/theme/lineNumbers/disabled/readOnly/placeholder/a11y 路径均有双端覆盖。
+- ✅ RichTextEditor 已把 contentEditable/execCommand 行为抽为 `RichTextEngine`，内置 engine 覆盖 mount、set/get value、sanitize、readOnly/disabled、selectionchange、link/image URL 校验、destroy 清理等路径。
+- ✅ MarkdownEditor 的 toolbar action、hotkey、表格/列表/blockquote/code fence 渲染、custom renderer sanitize、受控/非受控 value 与 mode 切换已有 core + 双端测试；本轮未发现需要扫描阶段改 public API 的发布门禁问题。
+
+---
+
+#### C31 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| MarkdownEditor 空 preview placeholder HTML 注入（C31-1） | placeholder 按纯文本/escape 渲染，或复用同一 sanitize 边界 | **P1** |
+| CodeEditor `highlightActiveLine` 公开 no-op（C31-2） | 保留并实现 active-line helper，或从 shared type/docs 移除/降级说明 | **P2** |
+| RichTextEditor `mode` 公开 no-op（C31-3） | 明确 HTML-only，或把 markdown/plain 转换纳入 engine 契约 | **P2** |
+| RichTextEditor custom action 不触发 change（C31-4） | 统一走 engine action/notifyChange 路径，补双端断言 | **P2** |
+| engine/highlighter docs 发现性不足（C31-5） | generated references/examples 补 opt-in engine/highlighter 说明与组件 smoke tests | P3 |
+
+---
+
+#### C31 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| grep `placeholder || ''` / `innerHTML: currentValue.value ? previewHtml.value : props.placeholder` | Markdown preview 的 markdown/custom renderer 路径会 sanitize；空值 placeholder 分支双端直接写入 HTML | C31-1 |
+| grep `highlightActiveLine` | core/Vue props 暴露；React 继承 core props；双端实现和 tests 无消费/断言 | C31-2 |
+| grep `mode: _mode` / RichText `mode` prop | React 解构 `_mode` 后未用；Vue 声明 prop 后未用；engine 契约只处理 HTML | C31-3 |
+| 读 RichText `execButtonAction` + engine `exec` | engine 的 custom action 会 notifyChange；双端组件先拦截 custom action，执行后不读取/同步内容 | C31-4 |
+| 读 generated advanced refs + component specs | highlighter/engine 已是双端运行时 API；shared props/examples 未展示，组件 spec 未覆盖 opt-in engine path | C31-5 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 11 文件 275 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出 | C31 基线 |
+
+> 本轮 C31 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用仓库声明的 `corepack pnpm` / pnpm 11.9.0 实跑 C31 目标 vitest（11 文件 275 测试通过）、`corepack pnpm api:validate`（一致性检查通过，0 问题）与 `corepack pnpm types:check`（全部 props 类型导出），均为只读校验、未改动源码。C24/C28/C30 尚未扫描；C31 本轮按 ROADMAP 可独立扫描。

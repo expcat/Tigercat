@@ -245,7 +245,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：FormWizard、TaskBoard、Kanban。
 - 重点：Steps、ConfigProvider、drag/task-board utilities、Kanban 与 TaskBoard 的薄封装边界。
 
-##### C31 高级编辑器组
+##### C31 高级编辑器组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C31 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：CodeEditor、RichTextEditor、MarkdownEditor。
 - 重点：引擎抽象、输入同步、内容转换、示例复杂度、无第三方运行时边界。
