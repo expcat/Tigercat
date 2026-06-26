@@ -2,9 +2,10 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）
 verified-date: 2026-06-26
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
+source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -2125,3 +2126,100 @@ const getDefaultTarget = () => window
 | `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C12 基线 |
 
 > 本轮 C12 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，C12 阶段只执行目标 vitest、`corepack pnpm api:validate` 与 `corepack pnpm types:check`（均通过）。
+
+---
+
+### C13 选择/切换基础组
+
+**扫描范围**：Checkbox、CheckboxGroup、Radio、RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的全链路——core 类型 `packages/core/src/types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts`，core 工具 `utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts`、`utils/helpers/slider-utils.ts`，React/Vue 对应组件实现、双端定向 spec、`tests/core/{segmented-utils,switch-theme}.spec.ts`，以及 generated component index 与 `shared/props/{form,basic}.md`。
+
+**结论速览**：Checkbox/Radio 保持原生输入语义，组内受控/非受控值、禁用继承和 Radio 箭头键导航双端对称；Slider 的键盘、范围约束和 ARIA thumb 也已有双端覆盖。**无 P1**。需处理的发现为：Rate/Segmented 仅披露 radio 角色而不提供实际键盘操作，且 Rate 把多个星标同时标为已选；Slider 的 `marks={true}` 是空渲染；Slider/Stepper 的数值契约对零/负 step 与反向边界没有保护，核心计算又无直接单测；Vue Switch 覆盖调用方传入的 click/keydown 监听器。
+
+---
+
+#### C13-1 Rate / Segmented 的 ARIA radio 语义没有可键盘操作实现，Rate 还会产生多选 radio 状态（a11y）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜Rate 两端将每个星标渲染为 `span role="radio"`（[Rate.tsx:119](../packages/react/src/components/Rate.tsx)、[Rate.ts:143](../packages/vue/src/components/Rate.ts)），没有 `tabIndex`、`onKeyDown` 或原生可聚焦控件；只能鼠标点击。`value=3` 时前三个星都按 `full || half` 赋 `aria-checked=true`，不符合单选组只能有一个选项被选中的语义。
+- 🟠 P2｜Segmented 两端同样以不可聚焦的 `label role="radio"` 表示选项（[Segmented.tsx:57](../packages/react/src/components/Segmented.tsx)、[Segmented.ts:80](../packages/vue/src/components/Segmented.ts)），只绑定 click，没有 roving tabindex、方向键、Home/End 或 Enter/Space 选择。React 组件也不透传根节点属性，调用方不能提供 `aria-label` / `aria-labelledby`；Vue 虽透传 attrs，但默认组没有名称。
+- 🟠 P2｜现有 Rate/Segmented 双端 spec 只验证 click、静态 aria 属性和 axe 结果；没有键盘、焦点顺序、radio 单选基数或可定制组名称断言。axe 无法证明自定义角色可以由键盘操作。
+
+**公共内容决策**：这是框架层交互与 ARIA 模式问题，不应把 DOM 焦点管理沉入 core。Rate 先确定正确模式：更适合以一个 `role="slider"` 表达 0～count（含 half）评分；若保留 radiogroup，必须只让精确值对应一个 radio。Segmented 应使用原生 radio 或 button + roving-tabindex，并在双端统一命名入口。共享的选项索引/跳过禁用项计算可在确认两端需求后沉入 core。
+
+**建议修复顺序**：P2。先确定 Rate 的 ARIA 模式，再为两组件补键盘和焦点行为，最后补 React/Vue 对等的键盘、禁用跳过、名称和半分值测试。
+
+**目标验证命令**：`pnpm vitest run tests/react/Rate.spec.tsx tests/vue/Rate.spec.ts tests/react/Segmented.spec.tsx tests/vue/Segmented.spec.ts`、`pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C13-2 Slider 的 `marks={true}` 是静默空实现，测试未锁定承诺的可见标记 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜React/Vue 都把布尔 `marks` 转为空对象（[Slider.tsx:287](../packages/react/src/components/Slider.tsx)、[Slider.ts:364](../packages/vue/src/components/Slider.ts)），随后只遍历对象条目；因此 `marks={true}` 仅渲染空容器，不显示任何标记或标签。
+- 🟠 P2｜props 注释承诺 boolean 用于“show marks”，但没有默认 marks 集合。两端测试的 `marks=true` 用例只断言 slider thumb 存在（[Slider.spec.tsx:338](../tests/react/Slider.spec.tsx)、[Slider.spec.ts:405](../tests/vue/Slider.spec.ts)），注释称 DOM 是实现细节，未验证该布尔值的实际效果。
+
+**公共内容决策**：marks 的布局仍属框架组件；默认 marks 的纯派生规则若需要双端一致，可抽为 core helper。先确定兼容语义：让 `true` 至少派生 min/max 标记，或收窄类型和文档，只接受显式 map；不能继续保留无效果的 boolean 分支。
+
+**建议修复顺序**：P2。先确定 `true` 的默认标记策略，双端接入同一派生结果，并补可见文本/位置断言和空区间边界测试。
+
+**目标验证命令**：`pnpm vitest run tests/react/Slider.spec.tsx tests/vue/Slider.spec.ts`、`pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C13-3 Slider / Stepper 数值参数缺少有效域保护，核心计算没有直接单测 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜`sliderNormalizeValue` 直接以 `step` 作除数（[slider-utils.ts:22](../packages/core/src/utils/helpers/slider-utils.ts)）；`step=0` 会经 `Infinity * 0` 产生 `NaN`，并传播到键盘、轨道点击和拖动路径。Slider props 未限制 `step > 0` 或 `min <= max`，双端实现也未归一化外部 value/defaultValue。
+- 🟠 P2｜Stepper 同样接受任意 `step`、min/max 与 precision（[Stepper.tsx:22](../packages/react/src/components/Stepper.tsx)、[Stepper.ts:20](../packages/vue/src/components/Stepper.ts)）；零 step 使动作无效，负 step 会让加减方向反转，`min > max` 会令按钮边界和 `clampStepperValue` 语义冲突。
+- 🟠 P2｜核心 `sliderNormalizeValue` / `sliderGetValueFromPosition` / `sliderGetKeyboardValue` 与 `clampStepperValue` 只由组件消费，仓库没有 core direct spec；现有组件 spec 覆盖正常整数、小数、范围交叉和键盘路径，但不覆盖零/负 step、反向区间或非有限数。
+
+**公共内容决策**：有效域归一化是跨框架纯逻辑，应保持在 core；框架层只处理 DOM 事件与受控值通知。不要在 React/Vue 分别补不同的 guard。后续需先定义无效 props 的兼容策略（开发期告警并安全回退，或显式约束/抛错），再由 core helper 统一实施。
+
+**建议修复顺序**：P2。先给 Slider/Stepper 的数值参数定契约，补 core 单测，再让两端在挂载和交互时复用归一化结果；这项不改 public API 前也可作为防御性修复。
+
+**目标验证命令**：新增 `tests/core/slider-utils.spec.ts`、`tests/core/stepper-utils.spec.ts` 后运行 `pnpm vitest run tests/core/slider-utils.spec.ts tests/core/stepper-utils.spec.ts tests/react/Slider.spec.tsx tests/vue/Slider.spec.ts tests/react/Stepper.spec.tsx tests/vue/Stepper.spec.ts`。
+
+---
+
+#### C13-4 Vue Switch 覆盖调用方的原生 click / keydown 监听器，和 React 透传语义不一致 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜Vue Switch 先展开 `attrs`，随后同一 vnode 又写入 `onClick: emitChange`、`onKeydown: handleKeyDown`（[Switch.ts:101](../packages/vue/src/components/Switch.ts)）；未声明为组件 emits 的 `@click` / `@keydown` 会作为 attrs 到达，但被内部 handler 覆盖，调用方监听器不会执行。
+- 🟢 P3｜React Switch 明确先调用外部 `onClick` / `onKeyDown`，再在事件未取消时 toggle（[Switch.tsx:36](../packages/react/src/components/Switch.tsx)），可以保留业务拦截和默认阻止语义。Vue spec 仅验证切换和 disabled，不覆盖调用方监听器与 preventDefault。
+
+**公共内容决策**：保持事件编排在框架层；Vue 应采用合并 listener 的方式并与 React 保持“外部监听器先运行、`defaultPrevented` 时不切换”的契约。无需新增 core helper 或公共 API。
+
+**建议修复顺序**：P3。补 Vue click/keydown 透传与 preventDefault 回归测试后，最小化调整 vnode listener 合并。
+
+**目标验证命令**：`pnpm vitest run tests/vue/Switch.spec.ts tests/react/Switch.spec.tsx`、`pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C13 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| Rate / Segmented 键盘与 ARIA 状态（C13-1） | DOM/focus 留框架层；候选选项索引/跳过禁用计算按需沉 core | **P2** |
+| Slider `marks=true`（C13-2） | 先确定 boolean 语义；若派生默认 marks，再抽 core 纯规则 | **P2** |
+| Slider / Stepper 数值契约（C13-3） | 归一化和有效域 guard 合入 core，框架层复用 | **P2** |
+| Vue Switch listener 覆盖（C13-4） | 框架层最小修复，保持 React 对等事件契约 | P3 |
+| Checkbox/Radio 原生输入、组选项、禁用继承与箭头键导航 | 已健康，保持双端现状 | - |
+
+---
+
+#### C13 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| Rate / Segmented 双端 render | 自定义 radio 均无焦点/键盘路径；Rate value=3 可产生 3 个 `aria-checked=true` | C13-1 |
+| Rate / Segmented 双端 spec | 覆盖 click/静态 aria/axe；无键盘、焦点、单选基数或可配置名称断言 | C13-1 |
+| Slider `marks` 分支与双端 spec | boolean 分支转 `{}`；测试只验证 thumb 存在 | C13-2 |
+| slider-utils / stepper-utils 消费者与 tests/core | helper 只被双端组件消费；无 direct core spec；无无效数值参数用例 | C13-3 |
+| Vue / React Switch 事件处理 | Vue 后写 handler 覆盖 attrs listener；React 先回调调用方并尊重 defaultPrevented | C13-4 |
+| 目标 vitest、`pnpm api:validate`、`pnpm types:check` | ⚠️ 未运行：本机 `node_modules` 缺失，冻结安装在下载 `typescript@6.0.3` 及平台二进制包时超时；不作为组件结论 | C13 基线 |
+
+> 本轮 C13 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，目标 vitest、`pnpm api:validate` 与 `pnpm types:check` 因本机依赖重建的下载超时未能启动；该环境问题不作为组件结论。
