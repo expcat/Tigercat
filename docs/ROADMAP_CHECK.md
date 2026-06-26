@@ -2928,3 +2928,139 @@ pnpm vitest run tests/core/countdown-utils.spec.ts tests/react/Countdown.spec.ts
 | 目标 vitest、`api:validate`、`types:check` | ✅ vitest 9 文件 238 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C18 基线 |
 
 > 本轮 C18 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0（本机无 corepack）实跑 C18 目标 vitest（9 文件 238 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动仓库。
+
+---
+
+### 任务 C / C21：Table 单组扫描结果（2026-06-27）
+
+**扫描范围**：Table 全链路——core 类型 `packages/core/src/types/table.ts`，core 工具 `utils/{table-utils,table-filter-utils,table-group-utils,table-resize-utils,table-export-utils}.ts` 与 `utils/locale-utils.ts` 的 Table labels，React 实现 `components/Table.tsx`、`components/Table/{state,types,render-header,render-body,render-summary,render-pagination}.tsx`，Vue 实现 `components/Table.ts`、`components/Table/{props,state,types,render-header,render-body,render-summary,render-pagination}.ts`，Table demos，`tests/core/table-*.spec.ts`、`tests/{react,vue}/Table*.spec.*`。C22 DataTableWithToolbar 与 C23 VirtualTable 独立成组，本轮只在边界处取证，不纳入实现扫描。
+
+#### C21-1 `ColumnFilter.filterFn` 是公开 API 但 Table 未消费 — **P2**
+
+**发现问题**
+
+- 🟡 P2｜`ColumnFilter` 公开 `filterFn?: (value, filterValue) => boolean`（[table.ts:119](../packages/core/src/types/table.ts)–[:124](../packages/core/src/types/table.ts)），但 React/Vue state 都只调用 `filterData(data, filterState)`（[state.tsx:283](../packages/react/src/components/Table/state.ts)、[state.ts:212](../packages/vue/src/components/Table/state.ts)），没有把 `column.filter.filterFn` 传入 core 过滤逻辑。
+- 🟡 P2｜`filterData` 只按字符串包含或严格相等过滤（[table-utils.ts:758](../packages/core/src/utils/table-utils.ts)–[:777](../packages/core/src/utils/table-utils.ts)），因此配置了 `filterFn` 的列行为与类型承诺不一致；现有 React/Vue filtering spec 只覆盖 `placeholder`、输入/选择过滤，没有覆盖 `filterFn`（[Table.spec.tsx:761](../tests/react/Table.spec.tsx)、[Table.spec.ts:556](../tests/vue/Table.spec.ts)）。
+
+**公共内容决策**：应在 core 增加「按列配置过滤」的纯函数（如 `filterTableData(data, columns, filters)`），由双端 state 共用；保留现有 `filterData` 兼容导出或作为简单 helper。
+
+**建议修复顺序**：P2。先补 core 单测锁定 `filterFn`、select/text 默认行为，再改 React/Vue state 消费同一 helper。
+
+**目标验证命令**：`pnpm vitest run tests/core/table-utils.spec.ts tests/react/TableState.spec.tsx tests/vue/TableState.spec.ts tests/react/Table.spec.tsx tests/vue/Table.spec.ts`。
+
+---
+
+#### C21-2 Table `virtual`/`autoVirtual` 只加滚动容器，未做行窗口化 — **P2**
+
+**发现问题**
+
+- 🟡 P2｜`virtualItemHeight` 在 React 中被解构为 `_virtualItemHeight` 后未使用（[Table.tsx:95](../packages/react/src/components/Table.tsx)），Vue 虽保存 `virtualScrollTop`（[state.ts:506](../packages/vue/src/components/Table/state.ts)）并在虚拟容器滚动时写入（[Table.ts:276](../packages/vue/src/components/Table.ts)–[:279](../packages/vue/src/components/Table.ts)），但没有任何渲染路径根据 scrollTop/itemHeight 裁剪 `paginatedData`。
+- 🟡 P2｜`getTableVirtualRecommendation` 会在 `autoVirtualThreshold` 后自动置 `enabled: true`（[table-utils.ts:555](../packages/core/src/utils/table-utils.ts)–[:572](../packages/core/src/utils/table-utils.ts)；测试 [table-utils.spec.ts:458](../tests/core/table-utils.spec.ts)），React/Vue 组件只加高度/overflow（[Table.tsx:295](../packages/react/src/components/Table.tsx)–[:307](../packages/react/src/components/Table.tsx)、[Table.ts:272](../packages/vue/src/components/Table.ts)–[:282](../packages/vue/src/components/Table.ts)），仍渲染全部行。`autoVirtual` 名称容易让用户以为 10000 行会自动窗口化，实际只是滚动容器。
+- ℹ️ 边界健康面：`virtualThreshold` 推荐信号与 `VirtualTable` 独立组件边界是清晰的（[table.ts:746](../packages/core/src/types/table.ts)–[:751](../packages/core/src/types/table.ts)，[virtual-table.ts:4](../packages/core/src/types/virtual-table.ts)–[:9](../packages/core/src/types/virtual-table.ts)），但 Table 自身的 `virtual` 命名/实现需要收敛。
+
+**公共内容决策**：二选一并明确公共语义：(a) 若 Table 要保留“轻量虚拟”，把窗口计算纯逻辑沉 core 并让双端只渲染 visible slice；(b) 若推荐用户使用 C23 `VirtualTable`，则把 Table 的 `virtual/autoVirtual` 改名或降级为 scroll container/recommendation，并走 API 兼容策略。
+
+**建议修复顺序**：P2。先定 API 语义，再补大数据行数渲染断言；避免继续扩大 `autoVirtual` 的误导面。
+
+**目标验证命令**：`pnpm vitest run tests/core/table-utils.spec.ts tests/react/Table.spec.tsx tests/vue/Table.spec.ts`。
+
+---
+
+#### C21-3 Select all 未排除 disabled 行，选择状态也不按可选行计算 — **P2**
+
+**发现问题**
+
+- 🟡 P2｜行级 checkbox/radio 会读取 `rowSelection.getCheckboxProps(record)?.disabled`（React [render-body.tsx:164](../packages/react/src/components/Table/render-body.tsx)、Vue [render-body.ts:171](../packages/vue/src/components/Table/render-body.ts)），但 `handleSelectAll(true)` 直接使用当前页全部 row keys（React [state.ts:429](../packages/react/src/components/Table/state.ts)–[:435](../packages/react/src/components/Table/state.ts)、Vue [state.ts:402](../packages/vue/src/components/Table/state.ts)–[:408](../packages/vue/src/components/Table/state.ts)），会把禁用行也加入 `selectedRowKeys`。
+- 🟡 P2｜`allSelected` / `someSelected` 同样按 `pageRowKeys` 与 `selectedRowKeys.length` 计算（React [state.ts:444](../packages/react/src/components/Table/state.ts)–[:451](../packages/react/src/components/Table/state.ts)、Vue [state.ts:417](../packages/vue/src/components/Table/state.ts)–[:425](../packages/vue/src/components/Table/state.ts)），未区分可选行、禁用行和当前页外的已选行；header/card select-all 可能显示错误的全选/半选状态。
+- ℹ️ 取证：现有 selection spec 覆盖 checkbox、radio、受控 selectedRowKeys rerender（[Table.spec.tsx:880](../tests/react/Table.spec.tsx)–[:960](../tests/react/Table.spec.tsx)、[Table.spec.ts:923](../tests/vue/Table.spec.ts)–[:999](../tests/vue/Table.spec.ts)），但没有 disabled selection/select-all 用例。
+
+**公共内容决策**：把「当前页可选 keys / allSelected / someSelected / toggleAll」抽成 core selection helper，双端 state 共用；保留框架层事件发射。
+
+**建议修复顺序**：P2。与 C21-1 同批改 state 最省事；先补 core helper 测试，再补 React/Vue disabled selection 用例。
+
+**目标验证命令**：`pnpm vitest run tests/react/TableState.spec.tsx tests/vue/TableState.spec.ts tests/react/Table.spec.tsx tests/vue/Table.spec.ts`。
+
+---
+
+#### C21-4 Vue `totalColumnCount` 与 React 在 `showCheckbox=false` 时不一致 — **P2**
+
+**发现问题**
+
+- 🟡 P2｜React `totalColumnCount` 只在 `rowSelection && rowSelection.showCheckbox !== false` 时加选择列（[state.ts:227](../packages/react/src/components/Table/state.ts)–[:232](../packages/react/src/components/Table/state.ts)），与 header/body/summary 是否实际渲染选择列一致。
+- 🟡 P2｜Vue `totalColumnCount` 只判断 `props.rowSelection` 就加 1（[state.ts:244](../packages/vue/src/components/Table/state.ts)–[:248](../packages/vue/src/components/Table/state.ts)），但 Vue header/body 同样在 `showCheckbox !== false` 才渲染选择列（[render-header.ts:36](../packages/vue/src/components/Table/render-header.ts)–[:40](../packages/vue/src/components/Table/render-header.ts)、[render-body.ts:154](../packages/vue/src/components/Table/render-body.ts)）。当 `rowSelection={{ showCheckbox: false }}` 且 empty/expanded/group/summary 需要 `colspan` 时，Vue 会多跨一列，React 不会。
+- ℹ️ 取证：现有 colspan spec 只覆盖普通 rowSelection + expandable（React [Table.spec.tsx:1255](../tests/react/Table.spec.tsx)–[:1270](../tests/react/Table.spec.tsx)、Vue [Table.spec.ts:1337](../tests/vue/Table.spec.ts)–[:1351](../tests/vue/Table.spec.ts)），没有 `showCheckbox=false` 分支。
+
+**公共内容决策**：把 action column count 规则沉到 core（selection/expand/summary 都复用），或至少双端 state 使用完全相同的 `hasSelectionColumn` 判断。
+
+**建议修复顺序**：P2。改动小、双端 parity 风险明确，适合先修并补 `showCheckbox=false` colspan 用例。
+
+**目标验证命令**：`pnpm vitest run tests/react/TableState.spec.tsx tests/vue/TableState.spec.ts tests/react/Table.spec.tsx tests/vue/Table.spec.ts`。
+
+---
+
+#### C21-5 Table i18n 覆盖不完整：过滤器、导出与部分 aria 仍硬编码英文 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜Table 已有完整 `DEFAULT_TABLE_LABELS` / `ZH_CN_TABLE_LABELS` 与 `getTableLabels`（[locale-utils.ts:302](../packages/core/src/utils/locale-utils.ts)–[:401](../packages/core/src/utils/locale-utils.ts)），且 empty/loading/card select-all/lock button 已接入 labels（React [Table.tsx:399](../packages/react/src/components/Table.tsx)、[:407](../packages/react/src/components/Table.tsx)、[:435](../packages/react/src/components/Table.tsx)；Vue [Table.ts:313](../packages/vue/src/components/Table.ts)、[:689](../packages/vue/src/components/Table.ts)）。
+- 🟢 P3｜过滤器下拉默认项和文本过滤 placeholder 仍硬编码英文 `All` / `Filter...`（React [render-header.tsx:147](../packages/react/src/components/Table/render-header.tsx)、[:158](../packages/react/src/components/Table/render-header.tsx)；Vue [render-header.ts:169](../packages/vue/src/components/Table/render-header.ts)、[:178](../packages/vue/src/components/Table/render-header.ts)）。导出按钮/aria 仍硬编码 `Export CSV` / `Export Excel` / `Export to CSV` / `Export to Excel`（React [Table.tsx:348](../packages/react/src/components/Table.tsx)–[:350](../packages/react/src/components/Table.tsx)，Vue [Table.ts:664](../packages/vue/src/components/Table.ts)–[:675](../packages/vue/src/components/Table.ts)）。展开列 header 与行按钮 aria 仍硬编码 `Expand` / `Expand row` / `Collapse row`（React [render-header.tsx:41](../packages/react/src/components/Table/render-header.tsx)、[render-body.tsx:129](../packages/react/src/components/Table/render-body.tsx)；Vue [render-header.ts:28](../packages/vue/src/components/Table/render-header.ts)、[render-body.ts:136](../packages/vue/src/components/Table/render-body.ts)）。
+- ℹ️ 取证：当前 labels spec 覆盖 card mode 文案与 emptyText（React [Table.spec.tsx:282](../tests/react/Table.spec.tsx)–[:326](../tests/react/Table.spec.tsx)、Vue [Table.spec.ts:305](../tests/vue/Table.spec.ts)–[:338](../tests/vue/Table.spec.ts)），但 export/filter/expand aria 仍被测试锁在英文（React [Table.spec.tsx:1096](../tests/react/Table.spec.tsx)、[:1414](../tests/react/Table.spec.tsx)，Vue [Table.spec.ts:1163](../tests/vue/Table.spec.ts)、[:1526](../tests/vue/Table.spec.ts)）。
+
+**公共内容决策**：扩展 `TigerLocaleTable` 增加 filter/export/expand aria 文案，或复用现有 table labels 增加 formatter；双端 render-header/body/export button 只消费 labels，不内联英文。
+
+**建议修复顺序**：P3。作为 i18n 收敛批处理，需同步 locale files、public types、API baseline 和双端测试。
+
+**目标验证命令**：`pnpm vitest run tests/react/Table.spec.tsx tests/vue/Table.spec.ts`、`pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C21-6 导出与拖拽语义有低优先级清理空间 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜React `onExport?: (csv: string) => void`（[types.ts:30](../packages/react/src/components/Table/types.ts)）命名为 csv，但 `exportFormat='excel'` 时 `exportTableData` 返回 Excel-compatible HTML（[table-export-utils.ts:102](../packages/core/src/utils/table-export-utils.ts)–[:107](../packages/core/src/utils/table-export-utils.ts)）。类型不影响运行，但公共回调语义不准确。
+- 🟢 P3｜`columnDraggable`/`rowDraggable` 当前只设置 HTML draggable 并在 drop 时发出重排结果（React [render-header.tsx:106](../packages/react/src/components/Table/render-header.tsx)–[:109](../packages/react/src/components/Table/render-header.tsx)、[state.ts:495](../packages/react/src/components/Table/state.ts)–[:523](../packages/react/src/components/Table/state.ts)；Vue [render-header.ts:148](../packages/vue/src/components/Table/render-header.ts)–[:151](../packages/vue/src/components/Table/render-header.ts)、[state.ts:473](../packages/vue/src/components/Table/state.ts)–[:500](../packages/vue/src/components/Table/state.ts)），组件不维护新的列/行顺序，也没有键盘拖拽或 aria 描述。测试也只覆盖 draggable attribute 和 drop callback（React [Table.spec.tsx:1441](../tests/react/Table.spec.tsx)–[:1478](../tests/react/Table.spec.tsx)、Vue [Table.spec.ts:1553](../tests/vue/Table.spec.ts)–[:1591](../tests/vue/Table.spec.ts)）。
+
+**公共内容决策**：(a) 将 `onExport` 参数命名/类型升级为 `content` 或 `{ content, format, filename }`，需兼容旧回调；(b) 拖拽如果保持“只发事件、不内置重排”，应在文档/类型注释中明确；可访问键盘 reorder 逻辑若要实现，应抽 core helper。
+
+**建议修复顺序**：P3。先改文档/类型注释最小化误解；真正的键盘 reorder 可与 a11y 专项合并。
+
+**目标验证命令**：`pnpm vitest run tests/core/table-export-utils.spec.ts tests/react/Table.spec.tsx tests/vue/Table.spec.ts`。
+
+---
+
+#### C21 健康面：fixed columns、pagination、card mode、resize 基线较稳
+
+- ✅ fixed columns：`orderTableFixedColumns`、`getFixedColumnOffsets`、`freezeTableColumnWidths`、`getTableColgroup` 已在 core 承担主要计算（[table-utils.ts:176](../packages/core/src/utils/table-utils.ts)–[:388](../packages/core/src/utils/table-utils.ts)），React/Vue 均消费同一 helper；测试覆盖非连续 fixed columns、隐藏列后 offset、锁定中间列移动、colgroup 稳定性和 fixed class override（React [Table.spec.tsx:445](../tests/react/Table.spec.tsx)–[:691](../tests/react/Table.spec.tsx)、Vue [Table.spec.ts:689](../tests/vue/Table.spec.ts)–[:915](../tests/vue/Table.spec.ts)）。
+- ✅ pagination：状态层支持受控/非受控 current/pageSize，分页渲染复用 pagination locale helper（React [render-pagination.tsx:26](../packages/react/src/components/Table/render-pagination.tsx)–[:123](../packages/react/src/components/Table/render-pagination.tsx)、Vue [render-pagination.ts:25](../packages/vue/src/components/Table/render-pagination.ts)–[:132](../packages/vue/src/components/Table/render-pagination.ts)），并有 rerender/disabled pagination 覆盖。
+- ✅ card mode：`getCardColumns`、`getCardGridInfo`、breakpoint class map 均在 core，双端覆盖 cardTitle、hideInCard、cardPriority、cardLayout、cardSelectionPosition、custom card 与 empty card。
+- ✅ resize：`createTableResizeObserverController` 把 column/row 测量封装到 core，并用 rAF 合批（[table-resize-utils.ts:105](../packages/core/src/utils/table-resize-utils.ts)–[:160](../packages/core/src/utils/table-resize-utils.ts)），有 core burst batching 测试（[table-resize-utils.spec.ts:62](../tests/core/table-resize-utils.spec.ts)）。
+
+---
+
+#### C21 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| `ColumnFilter.filterFn` 公开但未消费（C21-1） | 新增/升级 core 表格过滤 helper，双端 state 共用 | **P2** |
+| Table `virtual` 只加滚动容器（C21-2） | 定义 Table vs VirtualTable 边界；要么实现 core 窗口计算，要么降级/重命名语义 | **P2** |
+| select-all 选中 disabled 行（C21-3） | 抽 core selection helper，按可选行计算 all/some/toggle-all | **P2** |
+| Vue `showCheckbox=false` colspan parity（C21-4） | 抽 action column count 或统一 `hasSelectionColumn` 判断 | **P2** |
+| Table i18n 硬编码英文（C21-5） | 扩展 `TigerLocaleTable` 或 formatter，双端 render 消费 labels | P3 |
+| export callback 命名 + drag 语义（C21-6） | 类型/文档先澄清；键盘 reorder 后续 a11y 专项 | P3 |
+
+---
+
+#### C21 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| grep `filterFn` 消费者 | 仅类型定义出现；React/Vue state 只调用 `filterData(data, filters)` | C21-1 |
+| grep `virtualItemHeight` / `virtualScrollTop` | React `_virtualItemHeight` 未用；Vue `virtualScrollTop` 写入后无人读取；渲染仍 map 全量 `paginatedData` | C21-2 |
+| grep `getCheckboxProps` / `handleSelectAll` | 行 checkbox 读取 disabled；select-all 直接使用当前页全部 row keys | C21-3 |
+| 比对 `totalColumnCount` | React 判断 `showCheckbox !== false`；Vue 只判断 `rowSelection` | C21-4 |
+| grep `All` / `Filter...` / `Export CSV` / `Expand row` | filter/export/expand aria 仍双端英文硬编码；Table labels 未覆盖 | C21-5 |
+| grep `columnDraggable` / `rowDraggable` | 只设置 draggable + drop callback；无内置 reorder 状态/键盘 reorder | C21-6 |
+| 目标 vitest | ✅ `corepack pnpm vitest run tests/core/table-utils.spec.ts tests/core/table-filter-utils.spec.ts tests/core/table-group-utils.spec.ts tests/core/table-resize-utils.spec.ts tests/core/table-export-utils.spec.ts tests/react/Table.spec.tsx tests/react/TableState.spec.tsx tests/vue/Table.spec.ts tests/vue/TableState.spec.ts`：9 文件 280 测试通过 | C21 基线 |
+
+> 本轮 C21 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用仓库声明的 `corepack pnpm` / pnpm 11.9.0 实跑 C21 目标 vitest（9 文件 280 测试通过）、`corepack pnpm api:validate`（一致性检查通过，0 问题）、`corepack pnpm types:check`（全部 props 类型导出）与 `git diff --check -- docs/ROADMAP.md docs/ROADMAP_CHECK.md`（通过），均为只读校验、未改动源码。

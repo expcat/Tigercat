@@ -177,7 +177,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：ImageCropper、ImageAnnotation、CropUpload。
 - 重点：裁剪/标注纯逻辑是否可沉到 core、上传接入、坐标计算、撤销/重置。
 
-##### C21 Table 单组
+##### C21 Table 单组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C21 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Table。
 - 重点：体量最大，单独扫描 fixed columns、pagination、selection、resize、export、i18n、card/virtual 推荐边界。
