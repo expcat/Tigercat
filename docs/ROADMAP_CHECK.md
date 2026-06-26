@@ -3617,6 +3617,151 @@ pnpm vitest run tests/core/virtual-table-utils.spec.ts tests/react/VirtualTable.
 
 ---
 
+### 任务 C / C25：图表基础组扫描结果（2026-06-27）
+
+### C25 图表基础组 单组 — 已扫描（2026-06-27）
+
+**扫描范围**：6 个图表基础原语的全链路——core 类型 [chart.ts](../packages/core/src/types/chart.ts)（`ChartCanvasProps`/`ChartAxisProps`/`ChartGridProps`/`ChartSeriesProps` 与高层配置 mixin `ChartLegendProps`/`ChartTooltipProps`/`ChartLegendItem`）、core 工具 [chart/axis.ts](../packages/core/src/utils/chart/axis.ts)、[scale.ts](../packages/core/src/utils/chart/scale.ts)、[color.ts](../packages/core/src/utils/chart/color.ts)、[format.ts](../packages/core/src/utils/chart/format.ts)、React 实现 [ChartCanvas.tsx](../packages/react/src/components/ChartCanvas.tsx)/[ChartAxis.tsx](../packages/react/src/components/ChartAxis.tsx)/[ChartGrid.tsx](../packages/react/src/components/ChartGrid.tsx)/[ChartSeries.tsx](../packages/react/src/components/ChartSeries.tsx)/[ChartLegend.tsx](../packages/react/src/components/ChartLegend.tsx)/[ChartTooltip.tsx](../packages/react/src/components/ChartTooltip.tsx)、Vue 同名实现、`tests/{react,vue}/ChartSubComponents.spec.*`、`tests/core/chart-utils.spec.ts`、`tests/core/chart-shared.spec.ts`、examples Chart* demo，以及 generated references（[shared/props/charts.md](../skills/tigercat/references/shared/props/charts.md)、component-index）。LineChart/AreaChart/BarChart/ScatterChart 等高层图表与 `format.ts` 的 gradient-prefix、`color.ts` 的点/柱过渡类归 C26–C28，本轮不展开。
+
+**结论速览**：6 个原语的坐标数学双端逐行一致、由 core 守卫（`getChartAxisTicks` 对 `min===max`/非有限值回退、scale 工厂处理 `span===0`/n=0,1），无硬编码用户可见文案，ResizeObserver 生命周期对称，Canvas 有 `<title>`/`<desc>`，C25 目标 vitest/API/type 门禁均通过。**无 P1**。需处理项集中在 public surface 与双端一致性：① ChartLegend/ChartTooltip 的 generated 文档渲染了 core 配置 mixin 而非组件实际 props，文档误导（P2）；② ChartLegend `gap` prop 双端行为分歧 + 冗余 marginRight（P2）；③ 交互态 legend 项 `<button>` 带 `role="listitem"` 覆盖按钮语义、切换态无 `aria-pressed`（P3）；④ ChartTooltip 视口溢出定位逻辑双端逐行重复，未沉 core（P3）；⑤ Vue legend hover/leave emit 未测 + ChartSeries 弱断言 + Canvas slot / Vue list key 小幅 parity（P3）。
+
+---
+
+#### C25-1 ChartLegend / ChartTooltip 的 generated 文档渲染了 core 配置 mixin 而非组件实际 props — **P2**
+
+**发现问题**
+
+- 🟠 P2｜6 个原语的类型绑定分两种模式。Canvas/Axis/Grid/Series 的双端组件 props `extends` 各自 core 类型——React [ChartCanvas.tsx:13](../packages/react/src/components/ChartCanvas.tsx)/[ChartAxis.tsx:12](../packages/react/src/components/ChartAxis.tsx)/[ChartGrid.tsx](../packages/react/src/components/ChartGrid.tsx)/[ChartSeries.tsx:16](../packages/react/src/components/ChartSeries.tsx) 分别 extends core `ChartCanvasProps`/`ChartAxisProps`/`ChartGridProps`/`ChartSeriesProps`（[chart.ts:265/343/422/502](../packages/core/src/types/chart.ts)）✓。
+- 🟠 P2｜但 ChartLegend/ChartTooltip 双端各自定义**组件本地**接口，不引用同名 core 类型：React [ChartLegend.tsx:4](../packages/react/src/components/ChartLegend.tsx) `ChartLegendProps` = `items/position/markerSize/gap/interactive/onItem*`，[ChartTooltip.tsx:5](../packages/react/src/components/ChartTooltip.tsx) `ChartTooltipProps` = `content/visible/x/y/className`。而 core 的同名类型是**高层图表的 legend/tooltip 配置 mixin**：[chart.ts:110](../packages/core/src/types/chart.ts) `ChartLegendProps` = `showLegend/legendPosition/legendMarkerSize/legendGap`、[chart.ts:139](../packages/core/src/types/chart.ts) `ChartTooltipProps` = `showTooltip`，被约 10 个高层图表 props 接口（Bar/Line/Area/Radar/Pie/Heatmap/Sunburst…）在 [chart.ts:547/732/815/1097/1317/1522/1779/2025/2078](../packages/core/src/types/chart.ts) 等处 `extends`——是真实消费者，不能删。
+- 🟠 P2｜后果落到生成文档：[shared/props/charts.md:12-28](../skills/tigercat/references/shared/props/charts.md) 的 `ChartLegend` 节展示 `showLegend/legendPosition/legendMarkerSize`（`ChartLegendProps · 3/4 props`）、`ChartTooltip` 节展示 `showTooltip`，**这是 core 配置类型而非组件实际 props**。消费者照文档写 `<ChartLegend showLegend legendPosition="bottom" />` 完全无效（实际要 `items` / `position` / `interactive`）。Canvas/Axis/Grid/Series 因走 core 同名类型，文档映射正确。
+
+**公共内容决策**：公共 API 卫生。两条路二选一——(a) 改 `scripts/generate-api-docs.mjs` 的「组件名→props 类型」映射，让 ChartLegend/ChartTooltip 指向其实际组件 props 类型；(b) 重命名以消除跨包同名冲突（如 core 配置 mixin 改名 `ChartLegendConfigProps`/`ChartTooltipConfigProps`，原语组件保留 `ChartLegendProps`/`ChartTooltipProps`）。按 ROADMAP「references 视为生成结果，先改源/生成器再生成」，修生成器或类型来源后重跑 `pnpm docs:api`。与 C19-4/C22-2 同型。
+
+**建议修复顺序**：P2。先定「哪个类型是 ChartLegend/ChartTooltip 的公开 props」，再决定改生成器映射或改名，最后重生成 references。
+
+**目标验证命令**：
+
+```bash
+pnpm run api:validate
+pnpm run types:check
+pnpm run docs:api:check
+```
+
+---
+
+#### C25-2 ChartLegend `gap` prop 双端行为分歧 + 冗余 marginRight — **P2**
+
+**发现问题**
+
+- 🟠 P2｜React [ChartLegend.tsx:31](../packages/react/src/components/ChartLegend.tsx) 容器用固定 Tailwind `position l/r ? 'flex-col gap-2' : 'flex-row gap-3'`，**不消费 `gap` prop** 控制行间距；`gap` 仅落到 label span 的 `marginRight`（[:96](../packages/react/src/components/ChartLegend.tsx) `style={{ marginRight: `${gap}px` }}`）。
+- 🟠 P2｜Vue [ChartLegend.ts:45-52](../packages/vue/src/components/ChartLegend.ts) 容器无 gap class（`flex-col`/`flex-row`），改用 `containerStyle = { gap: `${props.gap}px` }` 控制 flex 行间距，**并且**同样给 label span 加 `marginRight: ${props.gap}px`（[:111](../packages/vue/src/components/ChartLegend.ts)）。
+- 🟠 P2｜后果：设 `gap={20}` 时 React 项间距不变（恒为 `gap-2`=8px / `gap-3`=12px），Vue 项间距变为 20px 且叠加 label 尾边距（双重）。两端 label span 后的 `marginRight: gap`（item 内最后一个可见元素之后的尾边距）都属冗余/疑似无意。现有 spec 只断言 `flex-row`/`flex-col`（React [:247/253](../tests/react/ChartSubComponents.spec.tsx)）与 marker/gap 样式（Vue [:244](../tests/vue/ChartSubComponents.spec.ts)），未锁定 `gap` 对项间距的真实效果，故分歧未被测试捕获。
+
+**公共内容决策**：纯样式一致性问题，双端对齐 `gap` 语义——统一让 `gap` 只表达「容器 flex 行间距」（React 把固定 `gap-2`/`gap-3` 换成由 `gap` prop 驱动的 inline style，与 Vue 一致），移除两端 label span 的冗余 `marginRight`。可在 core 提供一个返回容器布局 style 的小 helper 供双端共用，避免再次漂移。
+
+**建议修复顺序**：P2。与 C25-1 同批处理 ChartLegend；改完补「`gap` 改变项间距」的双端断言。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/ChartSubComponents.spec.tsx tests/vue/ChartSubComponents.spec.ts
+```
+
+---
+
+#### C25-3 交互态 legend 项是 `<button>` 却带 `role="listitem"`，切换态只有 opacity — **P3**
+
+**发现问题**
+
+- 🟢 P3｜`interactive` 时 legend 项渲染为 `<button>`，却同时写 `role="listitem"`——React [:65/78](../packages/react/src/components/ChartLegend.tsx)、Vue [:81/93](../packages/vue/src/components/ChartLegend.ts)。`role="listitem"` 覆盖了 `<button>` 的隐式按钮角色，AT 把可点击项读成「列表项」而非「按钮」，丢失可激活语义。
+- 🟢 P3｜切换态 `item.active === false` 仅以 `opacity-50` class 体现（React [:76](../packages/react/src/components/ChartLegend.tsx)、Vue [:91](../packages/vue/src/components/ChartLegend.ts)），无 `aria-pressed`/`aria-disabled`，屏幕阅读器无法获知该系列被关闭。现有 spec 只断言 `className` 含 `opacity`（React [:239](../tests/react/ChartSubComponents.spec.tsx)），未覆盖 aria 切换态。
+- ℹ️ 原生 `<button>` 的键盘激活（Enter/Space → click）仍有效，故这是语义/状态缺口而非完全不可达；非交互态 `<div role="listitem">` 在 `<div role="list">` 内是合理结构。
+
+**公共内容决策**：框架层补 a11y，无需改 public API。非交互态保留 `role="listitem"`；交互态去掉 `role="listitem"` 让 `<button>` 语义生效，并按 `item.active` 补 `aria-pressed`。可在 core 抽轻量 aria helper，但非必须。
+
+**建议修复顺序**：P3。低风险局部修复，可与 C25-2 同批。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/ChartSubComponents.spec.tsx tests/vue/ChartSubComponents.spec.ts
+```
+
+---
+
+#### C25-4 ChartTooltip 视口溢出定位逻辑双端逐行重复，未沉 core — **P3**
+
+**发现问题**
+
+- 🟢 P3｜React [ChartTooltip.tsx:28-53](../packages/react/src/components/ChartTooltip.tsx) 与 Vue [ChartTooltip.ts:46-71](../packages/vue/src/components/ChartTooltip.ts) 的定位算法**逐行相同**：`+12/-8` 光标偏移、右溢出 `x - rect.width - 12`、下溢出 `y - rect.height - 8`、左/上 `Math.max(8, …)` clamp（约 30 行纯数学）。core 仅共享了 `getChartTooltipTransform`（只把 `{x,y}` 转 `translate3d`），溢出/翻转/clamp 的核心逻辑没沉下去。
+- ℹ️ 这段是框架无关纯函数，可抽 core `resolveChartTooltipPosition({ x, y, rect, viewport })` → `{ x, y }`，双端在 rAF 回调里只调用并 set state/ref。
+- ℹ️ 附带低优先：tooltip 有 `role="tooltip"` 但无 `aria-live`（React [:85](../packages/react/src/components/ChartTooltip.tsx)、Vue [:106](../packages/vue/src/components/ChartTooltip.ts)）；`whitespace-nowrap`（[:67](../packages/react/src/components/ChartTooltip.tsx)）下超宽 content 仍可溢出（clamp 下限 8、无截断），属 latent。
+
+**公共内容决策**：把溢出/clamp 数学沉到 core helper，双端复用，移除重复；框架层只留 portal/Teleport、ref 测量、rAF 调度等运行时细节。`aria-live`/截断列为观察项，按需补。
+
+**建议修复顺序**：P3。先补 core helper 的边界 spec（超宽/超高/视口极小），再替换双端调用。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/ChartSubComponents.spec.tsx tests/vue/ChartSubComponents.spec.ts
+pnpm run types:check
+```
+
+---
+
+#### C25-5 Vue legend hover/leave emit 未测 + ChartSeries 弱断言 + Canvas slot / Vue list key 小幅 parity — **P3**
+
+**发现问题**
+
+- 🟢 P3｜测试不对称：React [ChartSubComponents.spec.tsx:270-286](../tests/react/ChartSubComponents.spec.tsx) 覆盖 `onItemClick`+`onItemHover`+`onItemLeave`；Vue [ChartSubComponents.spec.ts:230](../tests/vue/ChartSubComponents.spec.ts) 只断言 `item-click` emit，`item-hover`/`item-leave`（[ChartLegend.ts:59-67](../packages/vue/src/components/ChartLegend.ts)）的 emit 路径未测。
+- 🟢 P3｜ChartSeries 双端 spec 只断言 `data-series-name`/`data-series-type`（React [:304-305](../tests/react/ChartSubComponents.spec.tsx)、Vue [:264](../tests/vue/ChartSubComponents.spec.ts)），未覆盖 `opacity`/`color`（fill/stroke）/`className`/空数据。
+- 🟢 P3｜ChartCanvas slot/children parity：Vue 默认 slot 收到作用域参数 `{ innerRect }`（[ChartCanvas.ts:112](../packages/vue/src/components/ChartCanvas.ts)），React `children` 不传任何参数（[ChartCanvas.tsx:73](../packages/react/src/components/ChartCanvas.tsx) `{children}`）——React 消费者无法从 Canvas 拿到内框矩形，只能自行 `getChartInnerRect`。
+- 🟢 P3｜Vue list 元素缺 `key`：ChartAxis tick `<g>`（[ChartAxis.ts:135](../packages/vue/src/components/ChartAxis.ts)）、ChartGrid `<line>`（[ChartGrid.ts:100/116](../packages/vue/src/components/ChartGrid.ts) 经 `lines.push(h('line', …))`）均未带 key；React 两处都带（[ChartAxis.tsx:92](../packages/react/src/components/ChartAxis.tsx) `key={`${tick.value}`}`、[ChartGrid.tsx:54/68](../packages/react/src/components/ChartGrid.tsx) `key={`x-${tick.value}`}`）。属 reconciliation/parity 小瑕，ticks 整体重算时风险低。
+
+**公共内容决策**：补 Vue legend hover/leave emit 断言与双端 ChartSeries 属性/空数据断言；Canvas slot 参数与 Vue list key 作为低优先 parity 项，决定是否给 React children 也暴露 `innerRect`（render-prop）并给 Vue list 补 key，统一双端契约。
+
+**建议修复顺序**：P3。测试补全可独立先做；slot/key parity 与其他双端一致性项合并评估。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/ChartSubComponents.spec.tsx tests/vue/ChartSubComponents.spec.ts
+```
+
+---
+
+#### C25 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| ChartLegend/ChartTooltip generated 文档渲染 core 配置 mixin（C25-1） | 改生成器「组件名→props 类型」映射或重命名消歧，再重生成 references | **P2** |
+| ChartLegend `gap` prop 双端行为分歧 + 冗余 marginRight（C25-2） | 双端统一 `gap` 语义为容器 flex 间距，移除冗余 marginRight，可抽 core 布局 helper | **P2** |
+| 交互态 legend `role="listitem"` 覆盖 button + 缺 `aria-pressed`（C25-3） | 框架层补 a11y：交互态去 listitem 角色、补 aria-pressed | P3 |
+| ChartTooltip 溢出定位逻辑双端重复（C25-4） | 抽 core `resolveChartTooltipPosition` 合并重复，框架层只留运行时 | P3 |
+| Vue legend hover/leave 未测 + ChartSeries 弱断言 + Canvas slot / Vue key parity（C25-5） | 补双端测试；slot 参数与 list key 统一为低优先 parity | P3 |
+| `format.ts` gradient-prefix 计数样板、`color.ts` 过渡类重复（观察） | 不被 6 基础原语消费，归 C26–C28 评估 | 延后 |
+
+---
+
+#### C25 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| grep `extends.*ChartXxxProps` / 组件本地 props 接口 | Canvas/Axis/Grid/Series 双端 extends core 同名类型；Legend/Tooltip 双端各自定义本地接口，core 同名类型是高层图表配置 mixin（被 ~10 个 chart props extends） | C25-1 |
+| 读 [shared/props/charts.md:12-28](../skills/tigercat/references/shared/props/charts.md) | ChartLegend 节列 `showLegend/legendPosition/legendMarkerSize`、ChartTooltip 节列 `showTooltip`——均为 core 配置而非组件实际 props；Canvas/Axis/Grid/Series 映射正确 | C25-1 |
+| grep `gap` / `gap-2` / `gap-3` / `marginRight` | React 容器固定 `gap-2`/`gap-3` 不消费 `gap` prop、`gap` 仅作 label marginRight；Vue 容器用 `gap` 控 flex 间距并叠加 label marginRight | C25-2 |
+| grep `role="listitem"` / `aria-pressed` / `opacity-50` | 交互态 `<button role="listitem">` 覆盖按钮语义；切换态仅 `opacity-50`，双端均无 `aria-pressed` | C25-3 |
+| diff React/Vue ChartTooltip 定位段 | offset/翻转/`Math.max(8,…)` clamp 约 30 行逐行相同；core 仅共享 `getChartTooltipTransform`；无 `aria-live` | C25-4 |
+| grep 测试 `item-hover`/`item-leave`、`data-series-*`；grep slot `innerRect`、list `key` | Vue spec 缺 hover/leave 断言；ChartSeries 仅断言 data-series-*；Vue slot 传 `{innerRect}`、React children 不传；Vue Axis/Grid list 元素缺 key（React 有） | C25-5 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 4 文件 176 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C25 基线 |
+
+> 本轮 C25 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮实跑 C25 目标 vitest（4 文件 176 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动源码。C24 虚拟列表组本轮按用户要求跳过，仍为未扫描。
+
+> 本轮 C23 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮实跑 C23 目标 vitest（3 文件 86 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动源码。C21/C22 已由远端更新合并，状态不再标记为未扫描。
+
+---
+
 ### 任务 C / C26：笛卡尔图表组扫描结果（2026-06-27）
 
 **扫描范围**：LineChart / AreaChart / BarChart / ScatterChart 全链路——core 类型 [chart.ts](../packages/core/src/types/chart.ts) 的 C26 props，core 工具 [chart-utils.ts](../packages/core/src/utils/chart-utils.ts)、[chart-shared.ts](../packages/core/src/utils/chart-shared.ts)、[chart-interaction.ts](../packages/core/src/utils/chart-interaction.ts) 与 `utils/chart/{scale,path,axis,format,color}.ts`，React 实现 `components/{LineChart,AreaChart,BarChart,ScatterChart}.tsx` 与 [useChartInteraction.ts](../packages/react/src/hooks/useChartInteraction.ts)，Vue 实现 `components/{LineChart,AreaChart,BarChart,ScatterChart}.ts` 与 [useChartInteraction.ts](../packages/vue/src/composables/useChartInteraction.ts)，`tests/core/{chart-utils,chart-shared,chart-interaction}.spec.ts`、`tests/{react,vue}/{LineChart,AreaChart,BarChart,ScatterChart}.spec.*`，以及 generated references（component-index、shared props charts、examples charts）。C24 VirtualList / InfiniteScroll 与 C25 图表基础子组件未在本轮执行。
