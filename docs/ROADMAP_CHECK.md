@@ -2,9 +2,9 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）
 verified-date: 2026-06-26
-source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
+source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -1827,3 +1827,154 @@ const getDefaultTarget = () => window
 | `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C10 基线 |
 
 > 本轮 C10 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，C10 阶段只执行目标 vitest、`corepack pnpm api:validate` 与 `corepack pnpm types:check`（均通过）。
+
+---
+
+### C11 Form 单组
+
+**扫描范围**：Form / FormItem / useFormController 三者的 core 类型 [form.ts](../packages/core/src/types/form.ts)，core 工具 [form-validation.ts](../packages/core/src/utils/form-validation.ts)、[form-dependency-utils.ts](../packages/core/src/utils/form-dependency-utils.ts)、[form-item-styles.ts](../packages/core/src/utils/form-item-styles.ts)、[form-history-utils.ts](../packages/core/src/utils/form-history-utils.ts)，React 实现 [Form.tsx](../packages/react/src/components/Form.tsx)、[FormItem.tsx](../packages/react/src/components/FormItem.tsx)、[useFormController.ts](../packages/react/src/hooks/useFormController.ts)，Vue 实现 [Form.ts](../packages/vue/src/components/Form.ts)、[FormItem.ts](../packages/vue/src/components/FormItem.ts)、[useFormController.ts](../packages/vue/src/composables/useFormController.ts)，tests/{core,react,vue} 8 个定向 spec，generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）。**FormWizard 属 C30，本组排除**（form-wizard-utils 同排除）。
+
+**结论速览**：纯逻辑沉降良好——校验（form-validation）、条件 DSL/依赖图（form-dependency-utils）、撤销/重做历史（form-history-utils）、表单项样式（form-item-styles，token 化 class）全在 core，双端共享并各有 core spec；防抖器 setTimer/clearTimer 可注入；i18n（`mergeTigerLocale`+`getFormValidationLabels`）与 a11y（label for、aria-invalid/required/describedby、`role=alert`/`role=group`）双端镜像；`FormController` 类型 core 统一、React hook/Vue composable 同构。**无 P1**。发现集中在 **3 条 P2**（① React 维护无人读取的 `formValues` 影子状态 + `updateValue` 上下文方法，与 Vue 单一数据源不对称；② `resetFields` 不重置字段值仅清错误，与方法名/常规语义不符且双端实现不一致；③ `addField/removeField/undo/redo` 的受控数据流双端契约不一致——C11 重点「受控/非受控」核心）+ 3 条 P3（core 表单工具公开面偏宽且与组件 hand-rolled 重复、点路径不支持数组段、一组低优先观察）。多数公共拆合判断指向「双端契约统一 / 公开面精简」，且因涉及公开类型而**延后任务 H**。
+
+---
+
+#### C11-1 React Form 维护无人读取的 `formValues` 影子状态 + `updateValue` 上下文方法（冗余受控层 / 双端不对称）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜React Form 有内部 `formValues` useState（[Form.tsx:202](../packages/react/src/components/Form.tsx)）、`setFormValues(model)` 同步 effect（[Form.tsx:215](../packages/react/src/components/Form.tsx)）、`updateValue`（[Form.tsx:516](../packages/react/src/components/Form.tsx)），并把 `model: formValues` 与 `updateValue` 放进 `FormContextValue`（[Form.tsx:642](../packages/react/src/components/Form.tsx)）。但校验/条件求值读的是 `formValuesRef.current`，而该 ref 在**每次渲染被无条件重置为 `model` prop**（[Form.tsx:227](../packages/react/src/components/Form.tsx)）。
+- 🟠 P2｜grep 取证：`useFormContext` 消费者只有 [FormItem.tsx](../packages/react/src/components/FormItem.tsx) 与 index re-export；FormItem **从不读 `context.model`、从不调用 `context.updateValue`**（`formContext.model` / `formContext.updateValue` 消费端 0 命中）。即 `context.model`（影子 state）与 `context.updateValue` 被 provide 却无人消费——相对实际数据流是冗余受控层。
+- 🟠 P2｜Vue 端 FormContext 既无 `updateValue`，`context.model` 直接是 `props.model`（[Form.ts:552](../packages/vue/src/components/Form.ts)，单一数据源，无影子 state）。文档用法（[examples/form.md](../skills/tigercat/references/examples/form.md) 行 17）也是消费者把每个 Input 的 value/onChange（React）或 v-model（Vue）直接绑到自有 model，不经 Form 的 updateValue。
+
+**公共内容决策**：`FormContextValue.model` / `updateValue` 是 React 包公开类型（`FormContextValue`、`useFormContext` 均公开），删除属 breaking。记为「该简化未简化 / 双端不对称」：候选方向是 React 也以 `model` prop 为单一数据源、移除影子 `formValues` + `updateValue`（或反向把它做成有文档的受控写入口，并让 Vue 对齐）。涉及公开类型与受控语义，**延后任务 H** 统一取舍；本组不动。
+
+**建议修复顺序**：P2，记录待 H；非本组单独行动项。
+
+**目标验证命令**：（决策项）届时 `corepack pnpm vitest run tests/react/Form.spec.tsx tests/vue/Form.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`，涉及公开类型追加 `corepack pnpm api:baseline:check`。
+
+---
+
+#### C11-2 `resetFields` 不重置字段值、仅清校验错误，且与方法名常规语义不符、双端实现不一致 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜React `resetFields` = `clearValidate()` + `setFormValues(model)`（[Form.tsx:486](../packages/react/src/components/Form.tsx)）；受控用法下 `model` 即当前值，`setFormValues(model)` ≈ 无值变化（且只改无人读取的影子 state，见 C11-1）。
+- 🟠 P2｜Vue `resetFields` = `validationDebouncer.cancel()` + `clearValidate()`（[Form.ts:481](../packages/vue/src/components/Form.ts)），**完全不碰字段值**。
+- 🟠 P2｜两端测试都只断言「清除校验错误」（[tests/react/Form.spec.tsx:975](../tests/react/Form.spec.tsx)、[tests/vue/Form.spec.ts:1441](../tests/vue/Form.spec.ts) 标题均为 `resetFields clears validation errors`），未断言值被重置。
+- 🟠 P2｜Form 不存初始值（只有 `useFormController` 用 `initialRef`/`initialValues` 存了快照、其 `reset()` 能恢复初值——[useFormController.ts:51](../packages/react/src/hooks/useFormController.ts)、[useFormController.ts:131](../packages/vue/src/composables/useFormController.ts)）；故两端 `resetFields` 都无法恢复初值，而方法名 `resetFields` 易被理解为「重置字段值 + 清校验」（Element Plus 语义）。
+
+**公共内容决策**：属框架层语义对齐，纯逻辑无需新增 core。二选一并双端统一：① 明确「`resetFields` 仅清校验」并改文档/或考虑改名（如 `clearValidate` 别名）；② 真正支持「重置值到初始」——需双端存初始快照（参照 useFormController 的 initialRef），并补值重置测试。
+
+**建议修复顺序**：P2。先定语义，再双端对齐实现与测试。
+
+**目标验证命令**：`corepack pnpm vitest run tests/react/Form.spec.tsx tests/vue/Form.spec.ts`、`corepack pnpm types:check`。
+
+---
+
+#### C11-3 `addField`/`removeField`/`undo`/`redo` 的受控数据流双端契约不一致（受控/非受控）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜React：`addField`/`removeField`（[Form.tsx:491](../packages/react/src/components/Form.tsx)）与 `undo`/`redo`（[Form.tsx:572](../packages/react/src/components/Form.tsx)）走 `setFormValues` + `onChange(next)` 通知父级，**不改 `model`**；影子 state 在 `model` 引用变化时被 effect 重置，且校验读 `formValuesRef.current`（=`model`）看不到这些变更（见 C11-1）。
+- 🟠 P2｜Vue：`addField`/`removeField`（[Form.ts:486](../packages/vue/src/components/Form.ts)）与 `undo`/`redo`（[Form.ts:517](../packages/vue/src/components/Form.ts)）**直接就地突变 `props.model`**（`delete` / 赋值 / `Object.assign`），**不 emit 任何事件**。
+- 🟠 P2｜取证：React 测试断言 `onChange` 被调用并带新增/移除后的对象（[tests/react/Form.spec.tsx:1463](../tests/react/Form.spec.tsx)、[:1480](../tests/react/Form.spec.tsx)）；Vue 测试断言 `model.age===25` / `model.email===undefined`（[tests/vue/Form.spec.ts:2136](../tests/vue/Form.spec.ts)、[:2166](../tests/vue/Form.spec.ts)）。即同名命令集成契约不同：React「内部 state + onChange 回传」，Vue「直接突变共享 reactive model + 无事件」。
+
+**公共内容决策**：纯逻辑（`createFormHistory`/`pushFormHistory`/`undoFormHistory`/`redoFormHistory`）已在 core 且双端共享；差异在框架层数据所有权模型。与 C11-1 同根——React 影子 state vs Vue 直接突变 model。建议随 C11-1 一并在任务 H 决定统一契约（如双端都以 model 为单一数据源 + 统一变更事件），并补「addField/undo 后值与校验一致」的双端断言。
+
+**建议修复顺序**：P2，与 C11-1 合并决策，延后 H。
+
+**目标验证命令**：（决策项）届时 `corepack pnpm vitest run tests/react/Form.spec.tsx tests/vue/Form.spec.ts`。
+
+---
+
+#### C11-4 core 表单工具公开面偏宽：多个 helper 仅测试消费 + 与组件 hand-rolled 重复 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜以下 core 公开导出**无生产消费者，仅被单元测试引用**（grep packages/{react,vue}/src + examples 生产代码 0 命中；nuxt `.output` 为构建产物不计）：`validateFormFields`、`getFieldError`、`getErrorFields`、`getFieldDependencies`、`getValidationOrder`、`resolveFormConditionState`、`createFormValidationRule`、`FORM_VALIDATION_PRESETS`。
+- 🟢 P3｜`validateFormFields`（[form-validation.ts:461](../packages/core/src/utils/form-validation.ts)，含 `Array.from(new Set(...))` dedupe）功能上等价于 React/Vue Form 各自 hand-roll 的 `validateFields`（[Form.tsx:437](../packages/react/src/components/Form.tsx)、[Form.ts:427](../packages/vue/src/components/Form.ts)），但**两端都没用它**（该用未用 + 重复实现）；React inline 版迭代原始 `fieldNames` 不 dedupe，与 core 版口径不一。
+- 🟢 P3｜`getValidationOrder`（拓扑序，[form-dependency-utils.ts:54](../packages/core/src/utils/form-dependency-utils.ts)）**从未用于排序校验**：`validateForm` 按 `Object.entries(rules)` 插入序执行（[form-validation.ts:443](../packages/core/src/utils/form-validation.ts)），依赖只驱动 `getDependentFields` 的「再校验触发」，不影响顺序 → 拓扑序 helper 实为死路径。`resolveFormConditionState` 被组件以 `resolveFormFieldConditionState`（合并 conditions 后）替代。
+- 🟢 P3｜公开 headless API `useFormController`/`FormController` **无 generated reference 覆盖**（[shared/props/form.md](../skills/tigercat/references/shared/props/form.md) 只列组件 Props，[api-summary.md](../skills/tigercat/references/shared/api-summary.md) form.ts 行只列 `FormProps, FormItemProps`），文档缺口。
+
+**公共内容决策**：与 B-5「core utils 兼容 barrel 公开面过宽」同源。均为 core 公开导出，删除属 breaking → 两条路线：① 作为面向消费者的公开工具保留并补文档（含 useFormController reference）；② 对确认无用者（如 `getValidationOrder`/`resolveFormConditionState`）标 `@deprecated` 并走 baseline。本组只记录，统一并入 B-5/任务 H。
+
+**建议修复顺序**：P3，随 B-5 一并处理。
+
+**目标验证命令**：`corepack pnpm api:validate`、`corepack pnpm types:check`，标 deprecated 时追加 `corepack pnpm api:baseline:check`。
+
+---
+
+#### C11-5 `getValueByPath` / `setValueByPath` 不支持数组路径段（嵌套数组字段受限）— **P3**
+
+**发现问题**
+
+- 🟢 P3｜`getValueByPath` 遇到数组即返回 undefined：`if (!current || typeof current !== 'object' || Array.isArray(current)) return undefined`（[form-validation.ts:59](../packages/core/src/utils/form-validation.ts)）→ 形如 `items.0.name` 的点路径取不到值。
+- 🟢 P3｜React `updateValue` 内联 `setValueByPath`（[Form.tsx:544](../packages/react/src/components/Form.tsx)）中间段只创建普通对象、不创建数组，写嵌套数组路径同样不可行。校验读路径用同一个 `getValueByPath` → 嵌套数组字段无法按点路径校验。可能是有意（表单偏扁平），但与类型注释「Supports dotted paths」（[form.ts:138](../packages/core/src/types/form.ts)）承诺有出入。
+- 🟢 P3｜注：Vue 端无 `setValueByPath`（直接突变 model），故这是「React 写路径 + 双端读路径（core）」的共同限制。
+
+**公共内容决策**：若要支持数组段，写/读路径解析应统一沉到 core 一个 `getValueByPath`/`setValueByPath` 对（当前 set 只在 React 内联），双端共享；否则在类型注释明确「仅对象点路径」。属能力边界说明。
+
+**建议修复顺序**：P3，低优先；先文档澄清，必要时再扩展并补 core spec。
+
+**目标验证命令**：`corepack pnpm vitest run tests/core/form-validation.spec.ts`、`corepack pnpm types:check`。
+
+---
+
+#### C11-6 一组低优先观察（合并）— **P3**
+
+**发现问题**
+
+- 🟢 P3｜① `isEmpty`（[form-validation.ts:200](../packages/core/src/utils/form-validation.ts)）不把纯空白串视为空：`required` + 空格串会通过 required 校验（除非规则配 `transform: (v)=>v.trim()`）；常见表单期望先 trim。属行为说明。
+- 🟢 P3｜② `validateType` 的 `number` 分支 `typeof value !== 'number' && isNaN(Number(value))`——字符串数字（如 `'12'`）按 number 通过，而 `boolean`/`array`/`object` 走严格 `typeof`（[form-validation.ts:229](../packages/core/src/utils/form-validation.ts)）；type 宽严不一，文档可说明。
+- 🟢 P3｜③ undo 历史不克隆 `present`：`undoFormHistory` 直接 `present: previous`（[form-history-utils.ts:65](../packages/core/src/utils/form-history-utils.ts)），而 `pushFormHistory`/`redoFormHistory` 用 `{ ...newValues }` 克隆（[:49](../packages/core/src/utils/form-history-utils.ts)、[:83](../packages/core/src/utils/form-history-utils.ts)）；因 past 条目本就是历史快照、当前 benign，但不对称。
+- 🟢 P3｜④ `form-item-styles` 仅 3 个测试 / 21 行覆盖（[tests/core/form-item-styles.spec.ts](../tests/core/form-item-styles.spec.ts)）偏弱，但样式逻辑简单、风险低。
+
+**公共内容决策**：均为 core 纯逻辑的行为/一致性说明，无需新增 core 或改公共 API；如统一行为（trim、type 宽严、克隆）应在 core 两侧取齐并补少量断言。
+
+**建议修复顺序**：P3，低优先批量清理。
+
+**目标验证命令**：`corepack pnpm vitest run tests/core/form-validation.spec.ts tests/core/form-history-utils.spec.ts tests/core/form-item-styles.spec.ts`。
+
+---
+
+#### C11 健康项
+
+- ✅ 校验 / 条件 DSL / 依赖图 / 历史 / 表单项样式 纯逻辑全在 core（[form-validation.ts](../packages/core/src/utils/form-validation.ts)、[form-dependency-utils.ts](../packages/core/src/utils/form-dependency-utils.ts)、[form-history-utils.ts](../packages/core/src/utils/form-history-utils.ts)、[form-item-styles.ts](../packages/core/src/utils/form-item-styles.ts)），双端共享，各有 core spec；`form-item-styles` 用 token 化 class（`text-[var(--tiger-text,#111827)]`/`var(--tiger-error,#ef4444)`），无裸主题色。
+- ✅ 防抖器 `createFormValidationDebouncer`（[form-validation.ts:102](../packages/core/src/utils/form-validation.ts)）在 core，`setTimer`/`clearTimer` 可注入（测试友好）；React 用 ref + 重建 effect（[Form.tsx:219](../packages/react/src/components/Form.tsx)）、Vue 用 watch 重建（[Form.ts:499](../packages/vue/src/components/Form.ts)），卸载/依赖变更时 `cancel`。
+- ✅ i18n 双端一致：`mergeTigerLocale` + `getFormValidationLabels`（ConfigProvider locale + prop `locale` + 每规则 `message` 优先）双端同构接入（[Form.tsx:197](../packages/react/src/components/Form.tsx)、[Form.ts:226](../packages/vue/src/components/Form.ts)），校验默认消息走 locale。
+- ✅ a11y 双端镜像：label `for`/`htmlFor` 绑定字段 id、`aria-invalid`/`aria-required`、`aria-describedby`（`mergeAriaDescribedBy` 去重合并）、错误容器 `role="alert"`、field wrapper `role="group"`+`aria-labelledby`（[FormItem.tsx](../packages/react/src/components/FormItem.tsx)、[FormItem.ts](../packages/vue/src/components/FormItem.ts)）。
+- ✅ FormItem「错误状态未变则不触发更新」优化两端镜像（React `setErrors` 返回同引用 [FormItem 源同款逻辑 Form.tsx:366](../packages/react/src/components/Form.tsx)、Vue 比较后跳过 splice [Form.ts:364](../packages/vue/src/components/Form.ts)），并据此只对真正新出现的错误触发 shake。
+- ✅ `FormController` 类型在 core 统一（[form.ts:415](../packages/core/src/types/form.ts)），React hook（[useFormController.ts](../packages/react/src/hooks/useFormController.ts)）/ Vue composable（[useFormController.ts](../packages/vue/src/composables/useFormController.ts)）同构实现，且 `reset()` 正确恢复 `initialValues`（与 Form 的 resetFields 形成对照，见 C11-2）。
+- ✅ 单文件多导出（Form/FormItem 同源 form.ts）双端 Props 类型齐全，`types:check` 通过（FormItem 作为 `${prefix}FormItemProps` 走文件名校验覆盖）。
+
+---
+
+#### C11 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| React 影子 `formValues` + `updateValue` 无人读、与 Vue 不对称（C11-1） | 统一以 model 为单一数据源 / 精简上下文；公开类型走 baseline；延后 H | **P2** |
+| `resetFields` 不重置值、双端不一致（C11-2） | 双端统一语义（仅清校验或真重置到初值） | **P2** |
+| addField/removeField/undo/redo 受控契约双端不一致（C11-3） | 随 C11-1 统一框架层数据所有权；延后 H | **P2** |
+| core 表单工具公开面偏宽 + 与组件 hand-rolled 重复（C11-4） | 并入 B-5：保留并补文档 或 标 deprecated；useFormController 补 reference | P3 |
+| 点路径不支持数组段（C11-5） | 文档澄清「仅对象点路径」或统一 core get/set 路径并扩展 | P3 |
+| 一组低优先观察（C11-6） | core 行为/一致性说明，按需取齐 | P3 |
+| 校验/DSL/依赖/历史/样式/防抖/i18n/a11y/FormController 已在 core 双端共享 | 已在 core，保持 | - |
+
+---
+
+#### C11 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| grep `useFormContext` 消费者 + `formContext.model`/`.updateValue` 读取点 | 仅 FormItem/index；FormItem 不读 model、不调 updateValue（0 命中） | C11-1 |
+| React vs Vue resetFields 实现 + 两端测试标题 | React clearValidate+setFormValues(model)、Vue 仅 clearValidate；测试均只断言清错误 | C11-2 |
+| React vs Vue addField/removeField/undo/redo + 测试断言 | React onChange 通知不改 model；Vue 直接突变 props.model 无事件 | C11-3 |
+| grep 8 个 core helper 的生产消费者 | 0 生产命中（仅测试 + nuxt 构建产物）；validateFormFields 与组件 validateFields 重复 | C11-4 |
+| `getValueByPath` 数组分支 + React `setValueByPath` 中间段 | 数组返回 undefined；中间段只建对象 → 嵌套数组点路径不支持 | C11-5 |
+| `isEmpty`/`validateType` number/undo present 克隆/form-item-styles 测试数 | 空白串非空、字符串数字通过、undo 不克隆、3 测试 | C11-6 |
+| `corepack pnpm vitest run tests/core/form-validation.spec.ts tests/core/form-dependency-utils.spec.ts tests/core/form-history-utils.spec.ts tests/core/form-item-styles.spec.ts tests/react/Form.spec.tsx tests/react/useFormController.spec.tsx tests/vue/Form.spec.ts tests/vue/useFormController.spec.ts` | ✅ 8 个测试文件、248 个测试通过 | C11 基线 |
+| `corepack pnpm api:validate` | ✅ 通过；API 一致性检查 0 问题 | C11 基线 |
+| `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C11 基线 |
+
+> 本轮 C11 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，C11 阶段只执行目标 vitest、`corepack pnpm api:validate` 与 `corepack pnpm types:check`（均通过）。FormWizard（C30）不在本组范围。

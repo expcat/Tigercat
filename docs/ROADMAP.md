@@ -111,7 +111,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Message、Notification、NotificationCenter。
 - 重点：全局容器、重复节点、队列清理、定时器、严格模式重复渲染。
 
-##### C11 Form 单组
+##### C11 Form 单组 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C11 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Form、FormItem、useFormController。
 - 重点：体量较大，单独检查表单上下文、校验、依赖字段、受控/非受控、错误状态公共逻辑。
