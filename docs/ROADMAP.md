@@ -160,7 +160,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：TimePicker、Countdown、CronEditor。
 - 重点：TimePicker 体量较大，检查 timepicker-utils、格式/解析、步进、倒计时和 cron 纯逻辑。
 
-##### C18 Upload 单组
+##### C18 Upload 单组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C18 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Upload、FileManager、Signature。
 - 重点：Upload 体量较大，检查文件状态、校验、拖放、可访问性、文件管理和签名输入的复用边界。

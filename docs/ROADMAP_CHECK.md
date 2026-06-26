@@ -2,7 +2,7 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）
 verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
@@ -10,6 +10,7 @@ source-c14: 实读 Select/AutoComplete 全链路——core 类型 types/{select,
 source-c15: 实读 Tree/TreeSelect/Cascader/Transfer 全链路——core 类型 types/{tree,tree-select,cascader,transfer}.ts、core 工具 utils/{tree-utils,tree-select-utils,cascader-utils,transfer-utils,picker-utils}.ts、React 实现 components/Tree.tsx 与 Tree/{state,render-node,render-row,types,icons}、components/{TreeSelect,Cascader,Transfer}.tsx、Vue 实现 components/{Tree,TreeSelect,Cascader,Transfer}.ts、tests/{react,vue}/{Tree,TreeSelect,Cascader,Transfer}.spec.* 与 tests/core/{tree-utils,picker-utils}.spec.ts、examples Tree/TreeSelect/Cascader/Transfer demo、generated component-index/shared props/api-summary；grep 取证 virtual/VirtualList、showSearch/filter、clear aria、Transfer split/filter、core direct spec 覆盖；实跑 C15 目标 vitest（10 文件 285 测试通过）、api:validate、types:check（均通过），未改动源码。
 source-c16: 实读 DatePicker/Calendar 全链路——core 类型 types/{datepicker,calendar}.ts、core 工具 utils/{date-utils,calendar-utils,datepicker-i18n,datepicker-styles}.ts 与 utils/i18n/datepicker-locales/*、React 实现 components/DatePicker.tsx + DatePicker/{state,render-calendar,render-mobile,types}.ts(x)、components/Calendar.tsx、Vue 实现 components/{DatePicker,Calendar}.ts、tests/{core/date-utils,core/datepicker-i18n,react/DatePicker,vue/DatePicker,react/Calendar,vue/Calendar}.spec.*、examples DatePickerDemo/CalendarDemo、generated component-index/i18n；grep 取证 core CalendarProps 双端零消费、WEEKDAYS/MONTHS/getMonthDays 仅 Calendar 消费、getDatePickerLabels 仅 DatePicker 消费、getIntlOptionsFromDateFormat 五分支全等、datepicker-i18n 7 语言 inline map vs 13 preset 的 6 个 preset-only 语言回落英文；以本机 pnpm 11.9.0 实跑 C16 目标 vitest（6 文件 117 测试通过）、api:validate（一致性 0 问题）、types:check（全部 props 类型导出），均通过，未改动源码。
 source-c17: 实读 TimePicker/Countdown/CronEditor 全链路——core 类型 types/{timepicker,countdown,cron-editor}.ts、core 工具 utils/{time-utils,timepicker-utils,countdown-utils,cron-editor-utils}.ts、React 实现 components/TimePicker.tsx 与 TimePicker/{state,render-desktop,render-mobile,types,icons}、components/{Countdown,CronEditor}.tsx、Vue 实现 components/{TimePicker,Countdown,CronEditor}.ts、tests/{core,react,vue} 9 个定向 spec、examples TimePickerDemo/CountdownDemo/CronEditorDemo、generated component-index 与 shared/props/{form,data}.md；grep 取证 TimePicker 秒级范围判断、秒列禁用逻辑、CronEditor className 透传、Countdown now/tick 测试契约；实跑 C17 目标 vitest（9 文件 174 测试通过）、pnpm run api:validate、pnpm run types:check（均通过），未改动源码。
+source-c18: 实读 Upload/FileManager/Signature 全链路——core 类型 types/{upload,signature,file-manager}.ts、core 工具 utils/{upload-utils,upload-labels,signature-utils,file-manager-utils}.ts（对照 locale-utils 的 DEFAULT_UPLOAD_LABELS/ZH_CN_UPLOAD_LABELS、tailwind-entry）、React components/{Upload,FileManager,Signature}.tsx 与 index.tsx 导出、Vue components/{Upload,FileManager,Signature}.ts 与 index.ts 导出、tests/{core,react,vue} 9 个定向 spec、examples {Upload,FileManager,Signature}Demo、generated component-index；grep 取证 Tailwind v4（core/package.json tailwindcss ^4.0.0）下 Upload 4 处 bg-opacity-* 失效、applyFileDragReorder 零组件消费、FileManager draggable 半接线、React FileManager Loading 硬编码 vs Vue locale、core FileManagerProps/columns 漂移死字段、formatFileSize vs formatFileSizeLabel 双实现、getFileExtension 重名异义；以 packageManager pnpm 11.9.0 实跑 C18 目标 vitest（9 文件 238 测试通过）与 api:validate / types:check（均通过），未改动源码。CropUpload 属 C20 排除。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -2755,3 +2756,175 @@ pnpm vitest run tests/core/countdown-utils.spec.ts tests/react/Countdown.spec.ts
 | 目标 vitest、`api:validate`、`types:check` | ✅ vitest 9 文件 174 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C17 基线 |
 
 > 本轮 C17 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0 实跑 C17 目标 vitest（9 文件 174 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动仓库。
+
+---
+
+### C18 Upload 单组
+
+**扫描范围**：Upload、FileManager、Signature 的全链路——core 类型 `packages/core/src/types/{upload,signature,file-manager}.ts`，core 工具 `utils/{upload-utils,upload-labels,signature-utils,file-manager-utils}.ts`（对照 `locale-utils.ts` 的 `DEFAULT_UPLOAD_LABELS`/`ZH_CN_UPLOAD_LABELS`、`tailwind-entry.ts`），React 实现 `components/{Upload.tsx,FileManager.tsx,Signature.tsx}` 与 `index.tsx` 导出，Vue 实现 `components/{Upload.ts,FileManager.ts,Signature.ts}` 与 `index.ts` 导出，`tests/core/{upload-utils,file-manager-utils,signature-utils}.spec.ts`、`tests/{react,vue}/{Upload,FileManager,Signature}.spec.*`，examples `{Upload,FileManager,Signature}Demo`。CropUpload 属 C20，排除。
+
+**结论速览**：Signature 双端健康对称（React `forwardRef`+`onChange` / Vue `v-model`+`expose` 属惯例差异，非缺陷），笔画/导出/清除/键盘双端一致且测试充分。问题集中在 Upload 与 FileManager。**无 P1**（不阻断发布门禁）。需处理项：① Upload picture-card/上传遮罩用 Tailwind v3 `bg-opacity-*`（v4 已移除）→ 半透明遮罩退化为纯色（P2，全仓 ~18 文件共性，FileManager/Signature 已用 v4 正确写法）；② FileManager `draggable` 半接线（仅设 `draggable` 属性 + `data-drag-id`，无 drop/reorder 处理），`applyFileDragReorder` 公共 core helper 零生产消费（P2）；③ React FileManager `Loading...`/`Root` 硬编码、Vue loading 走 locale → i18n 不对称（P2）；④ core `FileManagerProps` 公共类型漂移 + `columns` 死字段（P2）。其余为 core 文件大小/扩展名重复（P3）、FileManager 键盘 a11y 缺口（P3）、Upload 主题 token 与内联 SVG 重复（P3）、一组低优先 latent（P3/观察）。
+
+---
+
+#### C18-1 Upload picture-card / 上传遮罩用 Tailwind v3 `bg-opacity-*`（v4 已移除）→ 半透明退化为纯色 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜本仓 Tailwind 为 **v4**（[package.json:222](../packages/core/package.json) `tailwindcss ^4.0.0`；[tailwind-entry.ts:1](../packages/core/src/tailwind-entry.ts) 注释自称「Tailwind v4 `@plugin` entry」）。v4 **移除**了 `bg-opacity-*` 等独立不透明度工具类，须改用 `/<alpha>` 斜杠写法。Upload 仍用 v3 写法：
+  - picture-card 悬浮遮罩 `bg-black bg-opacity-0 hover:bg-opacity-50`（[Upload.tsx:476](../packages/react/src/components/Upload.tsx)、[Upload.ts:719](../packages/vue/src/components/Upload.ts)）——`bg-opacity-*` 不生成 → 遮罩底色恒为**纯黑 `bg-black`**；遮罩可见性虽另由有效的 `opacity-0 hover:opacity-100` 控制，但 hover 时呈现 100% 纯黑而非 50% 半透明，盖住图片。
+  - 上传中指示层 `bg-white bg-opacity-75`（[Upload.tsx:524](../packages/react/src/components/Upload.tsx)、[Upload.ts:797](../packages/vue/src/components/Upload.ts)）→ 退化为**纯白**盖住缩略图（本应 75% 半透明）。
+- ℹ️ 同组对照：FileManager 的 loading 遮罩已用 v4 正确写法 `bg-[var(--tiger-bg,#ffffff)]/60`（[file-manager-utils.ts:52](../packages/core/src/utils/file-manager-utils.ts)），Signature 类也全用 CSS 变量——**Upload 是本组唯一的 v3 残留**。
+- ℹ️ 全仓共性（非 C18 独有）：`bg-opacity-*` 在约 18 个文件出现（ActivityFeed/CommentThread/Tour/NotificationCenter、carousel/image/qrcode/spotlight/tour/code/color-swatch-utils 等），宜作一次全仓 v4 迁移；C18 仅认领 Upload 的 4 处。
+
+**公共内容决策**：框架层/core 工具类样式修复，不涉及公共 API。Upload 4 处 `bg-opacity-x` → `bg-black/0`、`hover:bg-black/50`、`bg-white/75`。归入「全仓 Tailwind v4 `bg-opacity-*` 迁移」专项（供任务 F/H 汇总统一处理），避免逐组重复发现。
+
+**建议修复顺序**：P2。先修 Upload 这 4 处（与 FileManager 既有斜杠写法对齐），再随任务 F 扫出的其余文件统一迁移。
+
+**目标验证命令**：`pnpm example:build`（确认生成 CSS 含斜杠透明度类、不再引用 `bg-opacity-*`）、`pnpm vitest run tests/react/Upload.spec.tsx tests/vue/Upload.spec.ts`。
+
+---
+
+#### C18-2 FileManager `draggable` 半接线 + `applyFileDragReorder` 公共 core helper 零消费（未实现 / 死代码）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜`draggable` 是双端公开 prop（[FileManager.tsx:201](../packages/react/src/components/FileManager.tsx)、[FileManager.ts:233](../packages/vue/src/components/FileManager.ts)、core 类型 [file-manager.ts:57](../packages/core/src/types/file-manager.ts)），但两端只做了**半截**：开启后给每个 item 设 `draggable={true}` 与 `data-drag-id`（来自 `toFileDragItem(item,index)`），**没有任何 `onDragStart`/`onDragOver`/`onDrop` 处理器**，也不发出任何拖拽事件/回调。即「能拖起来，但放不下、不会重排、外部拿不到拖拽结果」——`draggable` 实际无功能。
+- 🟠 P2｜core 为此准备的 `applyFileDragReorder(items, event)`（[file-manager-utils.ts:268](../packages/core/src/utils/file-manager-utils.ts)）**零生产消费**：grep 全仓仅 `file-manager-utils.ts`（定义）、`tests/core/file-manager-utils.spec.ts`（测试）、`api-reports/public-api-baseline.json`（基线）出现，两个组件都没用它。属「声明并测试但无人调用」的公共 helper。
+- ℹ️ 取证：[tests/react/FileManager.spec.tsx](../tests/react/FileManager.spec.tsx) 无任何 `draggable`/`onDrop`/`drag` 用例；`examples/.../FileManagerDemo.*` 不演示 `draggable`，佐证该路径未被使用。
+
+**公共内容决策**：走任务 H（不直接删公开内容）。二选一——(a) **补全实现**：双端接入 drag 事件并消费已存在的 `applyFileDragReorder`（纯重排逻辑留 core，DOM 事件编排留框架层），新增 `onReorder`/`update:files` 出口；(b) 若暂不做，把 `draggable` 标 deprecated + migration、并对 `applyFileDragReorder` 标注/回收，过 `api:baseline:check`。不可保留「公开但无效」的 prop + 无消费 helper。
+
+**建议修复顺序**：P2。先定去留；若补全，纯逻辑已就绪（`toFileDragItem`/`applyFileDragReorder`），主要补双端 DOM 事件 + 重排回调 + 双端用例。
+
+**目标验证命令**：`pnpm vitest run tests/core/file-manager-utils.spec.ts tests/react/FileManager.spec.tsx tests/vue/FileManager.spec.ts`、`pnpm api:validate`、`pnpm api:baseline:check`。
+
+---
+
+#### C18-3 React FileManager `Loading...` / `Root` 硬编码，Vue loading 走 locale → i18n 不对称 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜**双端不对称**：Vue FileManager loading 文案 `resolveLocaleText('Loading...', mergedLocale?.common?.loadingText)`（[FileManager.ts:266](../packages/vue/src/components/FileManager.ts)）已本地化；**React 直接渲染硬编码 `Loading...`**（[FileManager.tsx:228](../packages/react/src/components/FileManager.tsx)），未走 locale。React FileManager 其实已有 `locale` 且对 empty/search placeholder 本地化（[FileManager.tsx:174](../packages/react/src/components/FileManager.tsx)/[:224](../packages/react/src/components/FileManager.tsx)），唯独 loading 漏接。与 C04-1 / C09-3 / C14-3 同型。
+- ℹ️ 取证：[tests/react/FileManager.spec.tsx:90](../tests/react/FileManager.spec.tsx) 的 `shows loading overlay` 断言 `getByText('Loading...')`，把硬编码英文**锁进了测试**——本地化时需同步改用例。
+- 🟢 P3｜面包屑根节点 `Root` 双端硬编码（[FileManager.tsx:143](../packages/react/src/components/FileManager.tsx)、[FileManager.ts:149](../packages/vue/src/components/FileManager.ts)），未走 locale。
+
+**公共内容决策**：locale 解析链路（`resolveLocaleText`/`mergeTigerLocale`）已在 core，框架层消费。React loading 改用 `common.loadingText`（与 Vue 对齐）；`Root` 双端接入一个 `common` key（如 `common.rootText`，core 已有 `common` 容器，新增 key 即可）。属双端 parity 收敛 + i18n 补缺。
+
+**建议修复顺序**：P2。先对齐 React loading 本地化（同步改 `FileManager.spec.tsx` 断言），`Root` 本地化随手并入。
+
+**目标验证命令**：`pnpm vitest run tests/react/FileManager.spec.tsx tests/vue/FileManager.spec.ts`、`pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C18-4 core `FileManagerProps` 公共类型漂移 + `columns` 死字段（公共 API 卫生）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜core 导出的 `FileManagerProps`（[file-manager.ts:38](../packages/core/src/types/file-manager.ts)）与**实际组件 props 漂移**：两个组件都各自声明本地接口（React `FileManagerProps`、Vue `VueFileManagerProps`）而**不继承/不引用** core 的 `FileManagerProps`。core 版是「纯数据」形（含 `columns`、`searchText` 等），缺组件实有的回调（`onSelect`/`onOpen`/`onNavigate`/`onSelectedKeysChange`/`onCurrentPathChange`/`onSearchTextChange`）、`renderIcon`、`locale`；与 C04-6（VueListProps 漂移）、C12-3 同型。
+- 🟠 P2｜`columns?: FileSortField[]`（[file-manager.ts:48](../packages/core/src/types/file-manager.ts)「Which columns to show in list view」）是**无人实现的死字段**：两端 list 视图把 name/size/modified **写死渲染**（[FileManager.tsx:210](../packages/react/src/components/FileManager.tsx)、[FileManager.ts:209](../packages/vue/src/components/FileManager.ts)），从不读 `columns`；grep 全仓仅类型定义出现。
+- ℹ️ 导出取证：React index 显式再导出**本地** `FileManagerProps`（[index.tsx:363](../packages/react/src/index.tsx)），与 `export *` 带出的 core 同名类型在 React 命名空间内冲突、由显式导出胜出；Vue 则同时暴露 core `FileManagerProps`（经 `export *`）与 `VueFileManagerProps`（[index.ts:331](../packages/vue/src/index.ts)）。无论哪端，core `FileManagerProps.columns` 都是「对外可见但零实现」。
+
+**公共内容决策**：走任务 H。`columns` 二选一——按语义实现可配置列，或标 deprecated + 从 core 类型移除并过 `api:baseline:check`。`FileManagerProps` 类型来源宜统一：让组件 props 以 core 类型为单一事实源（core 补回调/`renderIcon` 的框架无关签名，框架层只加各自 ref/v-model 形），消除「core 数据型 vs 组件富型」两套漂移。
+
+**建议修复顺序**：P2。先决 `columns` 去留；再收敛类型来源（与 C04-6/C12-3 同批处理公共类型漂移）。
+
+**目标验证命令**：`pnpm types:check`、`pnpm api:validate`、`pnpm api:baseline:check`。
+
+---
+
+#### C18-5 core 两套文件大小格式化（输出不一致）+ `getFileExtension` 重名异义（该合未合）— **P3**
+
+**发现问题**
+
+- 🟢 P3｜core 有**两个**公开的「字节→人类可读」函数，输出格式不同：`formatFileSize`（[upload-utils.ts:364](../packages/core/src/utils/upload-utils.ts)，恒 `toFixed(2)` → `1.00 KB`/`2.50 MB`，参数必填、`0`→`0 B`）与 `formatFileSizeLabel`（[file-manager-utils.ts:116](../packages/core/src/utils/file-manager-utils.ts)，整数不带小数、否则 `toFixed(1)` → `1 KB`/`2.5 MB`，且容忍 `undefined`→`''`）。后者注释自称「Uses the same format as upload-utils」，**实则不同**（2 位 vs 1 位小数）。结果：Upload 显示 `1.00 KB`、FileManager 显示 `1 KB`——同库两组件文件大小观感不一致，且逻辑重复。
+- 🟢 P3｜`getFileExtension` **重名异义**：[upload-utils.ts:222](../packages/core/src/utils/upload-utils.ts)（模块私有）返回**带点小写** `.png`；[file-manager-utils.ts:131](../packages/core/src/utils/file-manager-utils.ts)（导出）返回**不带点小写** `png`，且对前导点名（`.gitignore`）返回 `''`。两者同名、语义相反（带/不带点）。导出版（file-manager）grep 仅自身 spec 消费，组件未用。
+
+**公共内容决策**：**合并到 core 单一实现**。统一一个 `formatFileSize(bytes?, opts?)`（支持 `undefined`、可选精度），两组件共用，消除显示分歧；旧名按任务 H 处理（保留别名或 deprecated）。`getFileExtension` 统一为一份带明确「是否含点」语义的实现，私有版改调用公共版。纯逻辑，沉 core。
+
+**建议修复顺序**：P3。先合 `formatFileSize`（影响显示，先定精度口径），再合 `getFileExtension`；补/改对应 core spec。
+
+**目标验证命令**：`pnpm vitest run tests/core/upload-utils.spec.ts tests/core/file-manager-utils.spec.ts`、`pnpm api:validate`、`pnpm api:baseline:check`。
+
+---
+
+#### C18-6 FileManager 键盘 a11y 缺口 + loading 遮罩定位缺 `relative` 容器 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜FileManager 列表用 `role="listbox"` + item `role="option"` + `aria-selected`/`aria-multiselectable`（[FileManager.tsx:185](../packages/react/src/components/FileManager.tsx)、[FileManager.ts:249](../packages/vue/src/components/FileManager.ts)），但 item 是 `<div>`，**无 `tabIndex`、无任何键盘处理器**（无 roving tabindex、无 ↑↓/Home/End 导航、无 Enter/Space 选择、无 Enter 打开/进入文件夹）。键盘用户既不能聚焦也不能操作；与声明的 listbox 语义不符。与 C13-1 / C07-8（a11y 键盘缺口）同向。
+- ℹ️ 取证：[tests/react/FileManager.spec.tsx](../tests/react/FileManager.spec.tsx) 无 `keydown`/`tabIndex`/`role` 相关用例（仅 `loading`/选择/导航点击路径），键盘可达性未被任何测试覆盖。
+- 🟢 P3｜loading 遮罩 `fileManagerLoadingClasses`（[file-manager-utils.ts:51](../packages/core/src/utils/file-manager-utils.ts)）用 `absolute inset-0`，但容器 `fileManagerContainerClasses`（[file-manager-utils.ts:13](../packages/core/src/utils/file-manager-utils.ts)）**无 `relative`**，遮罩会相对最近定位祖先（可能是页面）而非 FileManager 定位。属 latent CSS 缺陷，双端共有（现有测试只断言文案存在、不验定位）。
+
+**公共内容决策**：框架层补键盘交互（roving tabindex + 方向键/Enter/Space，复用 core 既有 list/menu 导航 helper 评估）、core 类常量给容器补 `relative`。a11y 行为留框架层，可共享的「下一焦点索引」纯计算可评估沉 core。
+
+**建议修复顺序**：P3。先给容器加 `relative`（零风险）；键盘导航补全后补双端用例。
+
+**目标验证命令**：`pnpm vitest run tests/react/FileManager.spec.tsx tests/vue/FileManager.spec.ts`。
+
+---
+
+#### C18-7 Upload 主题 token 不一致（裸 Tailwind 调色板）+ 内联 SVG 双端重复（该提取未提取）— **P3**
+
+**发现问题**
+
+- 🟢 P3｜Upload 大量用**裸 Tailwind 调色板**而非 `var(--tiger-*)` token：core 的 `getUploadButtonClasses`/`getDragAreaClasses`/`FILE_LIST_STATUS_CLASSES`/`PICTURE_CARD_STATUS_CLASSES`（[upload-utils.ts:379](../packages/core/src/utils/upload-utils.ts)–[:530](../packages/core/src/utils/upload-utils.ts)，`border-gray-300`/`bg-gray-100`/`bg-blue-50`/`text-green-700`/`bg-red-50`…），以及组件内联（`text-gray-400`/`text-gray-500`/`hover:text-red-500`/`hover:text-blue-200`…）。对照同文件的 `uploadStatusIconColorClasses`（[upload-utils.ts:17](../packages/core/src/utils/upload-utils.ts) 用 `var(--tiger-*)`）与 FileManager/Signature 全量 token——Upload 主题一致性最差。与 C02-3 / C03-3 / C04-3 同向。
+- 🟢 P3｜**内联 SVG 双端重复**：拖拽区云图标、文件图标、预览眼图标、删除垃圾桶图标在 React [Upload.tsx:326](../packages/react/src/components/Upload.tsx)/[:396](../packages/react/src/components/Upload.tsx)/[:485](../packages/react/src/components/Upload.tsx)/[:513](../packages/react/src/components/Upload.tsx) 与 Vue [Upload.ts:500](../packages/vue/src/components/Upload.ts)/[:588](../packages/vue/src/components/Upload.ts)/[:734](../packages/vue/src/components/Upload.ts)/[:772](../packages/vue/src/components/Upload.ts) 逐字重复，未抽到 core `common-icons`；而状态图标（success/error/close）已用 core 常量（`successCircleSolidIcon20PathD` 等）。同组件内一半图标走常量、一半内联，且双端各抄一遍。与 C01-2（内联 SVG 重复）同向。
+
+**公共内容决策**：(a) Upload 颜色类改走 `var(--tiger-*)` token（与 dark/modern 主题一致），属 core 工具类样式收敛；(b) 把 4 个内联图标补进 core `common-icons` 并双端引用（纯常量沉 core）。均无公共 API 变更。
+
+**建议修复顺序**：P3，低优先。token 收敛与图标抽取可随 Upload 下次改动一并处理；与 C18-1 的 v4 迁移同批最省事。
+
+**目标验证命令**：`pnpm vitest run tests/react/Upload.spec.tsx tests/vue/Upload.spec.ts`、`pnpm example:build`。
+
+---
+
+#### C18-8 一组低优先 latent + 健康面（观察）— **P3 / 观察**
+
+**发现问题**
+
+- 🟢 P3｜**queue 模式重复计算 chunk**：queue+chunk 模式下 `createUploadQueueItem(file, uid, chunkSize)`（[upload-utils.ts:265](../packages/core/src/utils/upload-utils.ts)）已为 queue item 生成 `chunks`，但实际上传走 `uploadOne` 又 `createUploadChunks(file, chunkSize)` 重算一遍（[Upload.tsx:189](../packages/react/src/components/Upload.tsx)、[Upload.ts:350](../packages/vue/src/components/Upload.ts)），queue item 的 `chunks` 字段从不被读取——重复计算 + 字段冗余。
+- 🟢 P3｜**picture-card object URL 泄漏**：`renderPictureCard` 每次渲染对无 `url` 的文件 `URL.createObjectURL(file.file)`（[Upload.tsx:469](../packages/react/src/components/Upload.tsx)、[Upload.ts:698](../packages/vue/src/components/Upload.ts)），**从不 `revokeObjectURL`**；列表重渲染会累积 blob URL（轻量内存泄漏，双端一致）。
+- 🟢 P3｜**0 字节文件渲染杂散 `0`**：文件大小用 `file.size && …`（[Upload.tsx:412](../packages/react/src/components/Upload.tsx)、[Upload.ts:609](../packages/vue/src/components/Upload.ts)），`size===0` 时 `0 && …` 求值为 `0`，React/Vue 都会把数字 `0` 渲染成文本节点（应改 `file.size != null` 或 `typeof === 'number'`）。边缘但双端共有。
+- 🟢 P3｜**Signature 无 `setPointerCapture`**：`handlePointerDown` 未捕获指针（[Signature.tsx:181](../packages/react/src/components/Signature.tsx)、[Signature.ts:168](../packages/vue/src/components/Signature.ts)），指针在画布外释放时 `pointerup` 不触发 `finishStroke`，`activeStroke` 残留、`onEnd`/`update:modelValue` 该轮不发；下次按下才隐式接续。健壮性小缺陷，双端一致。
+- 🟢 P3｜**Signature `ariaLabel` 未本地化**：默认 `'Signature pad'`（[Signature.tsx:65](../packages/react/src/components/Signature.tsx)、[Signature.ts:52](../packages/vue/src/components/Signature.ts)）不走 locale（同组 `clearText` 已 `resolveLocaleText('Clear', …, common.clearText)`）。只能逐实例覆盖，无法经 ConfigProvider locale。
+- ✅ 健康面（无需动作）：受控量/事件双端对称——Upload `fileList`/`onChange` ↔ `fileList`/`update:file-list`+`change`；Signature React `forwardRef`(`SignatureRef`) + `onChange/onBegin/onEnd/onClear` ↔ Vue v-model + `expose` + `begin/end/clear`（属框架惯例差异，非缺陷）。Upload 的 `prepareUploadFiles`（limit/type/size/beforeUpload）、drag、queue/chunk/resumable 双端一致且 `tests/{react,vue}/Upload.spec.*` 充分覆盖（各 60+ queue/chunk/drag 断言）。Signature 笔画/导出/清除/键盘 Delete-Backspace 双端一致。
+
+**公共内容决策**：均为框架层/局部清理，不涉及公共拆合到 core。(a) queue 模式直接复用 queue item 已算的 `chunks`，去掉 `uploadOne` 重算；(b) picture-card 缓存并在卸载/列表变更时 `revokeObjectURL`；(c) `file.size != null` 判定；(d) Signature 加 `setPointerCapture`/`releasePointerCapture`；(e) `ariaLabel` 接 `common`（如 `signatureAriaLabel`）。
+
+**建议修复顺序**：P3，随各组件下次改动顺手清理；健康面保持。
+
+**目标验证命令**：`pnpm vitest run tests/react/Upload.spec.tsx tests/vue/Upload.spec.ts tests/react/Signature.spec.tsx tests/vue/Signature.spec.ts`。
+
+---
+
+#### C18 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| Upload `bg-opacity-*` v4 失效（C18-1） | 框架层改斜杠透明度；归入全仓 v4 迁移专项（F/H） | **P2** |
+| FileManager `draggable` 半接线 + `applyFileDragReorder` 死 helper（C18-2） | 补全实现（消费 core helper）或废弃 prop+helper（走 H + baseline） | **P2** |
+| React FileManager `Loading...`/`Root` 硬编码（C18-3） | React 接 `common.loadingText`、双端 `Root` 接 locale；同步改测试 | **P2** |
+| core `FileManagerProps` 漂移 + `columns` 死字段（C18-4） | `columns` 实现或废弃；类型来源统一以 core 为源（合 C04-6/C12-3） | **P2** |
+| core 两套 file-size 格式化 + `getFileExtension` 重名异义（C18-5） | 合并→core 单一实现，消除显示分歧 | P3 |
+| FileManager 键盘 a11y 缺口 + loading 缺 `relative`（C18-6） | 框架层补键盘交互；容器加 `relative` | P3 |
+| Upload 裸 Tailwind 调色板 + 内联 SVG 双端重复（C18-7） | 颜色走 `var(--tiger-*)`；图标抽 core `common-icons` | P3 |
+| queue 重复算 chunk / objectURL 泄漏 / 0 字节渲染 0 / Signature 无 pointerCapture / ariaLabel 未本地化（C18-8） | 框架层/局部清理；健康面保持 | P3/观察 |
+
+---
+
+#### C18 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| `tailwindcss` 版本 + `tailwind-entry` 注释 | v4（`core/package.json:222` + entry 自述 v4）；`bg-opacity-*` 已移除 | C18-1 |
+| grep `bg-opacity-*` 分布 | Upload 4 处（React 476/524、Vue 719/797）；全仓约 18 文件；FileManager 已用 `…/60` 斜杠 | C18-1/C18-7 |
+| grep `applyFileDragReorder` 消费者 | 仅 core 定义 + core spec + baseline；两组件零消费（仅用 `toFileDragItem` 设 data 属性） | C18-2 |
+| 比对 React/Vue FileManager loading | Vue 走 `common.loadingText`；React 硬编码 `Loading...`（spec 锁定） | C18-3 |
+| grep `FileManagerProps`/`columns` 消费者 | 组件各用本地接口、不继承 core；`columns` 仅类型定义出现、零实现 | C18-4 |
+| 比对 `formatFileSize` vs `formatFileSizeLabel` / 两个 `getFileExtension` | 两套格式化（2 位 vs 1 位小数）、注释误称同格式；扩展名带点 vs 不带点 | C18-5 |
+| grep FileManager spec 键盘/drag | 无 keydown/tabIndex/draggable 用例（仅 loading/点击） | C18-6/C18-2 |
+| grep Upload spec queue/chunk/drag | 双端各 60+ 断言（queue/chunk/drag 已覆盖） | C18-8 健康面 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 9 文件 238 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C18 基线 |
+
+> 本轮 C18 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0（本机无 corepack）实跑 C18 目标 vitest（9 文件 238 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动仓库。
