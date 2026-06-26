@@ -97,7 +97,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Dropdown、DropdownMenu、DropdownItem、Popover、Popconfirm、Tooltip。
 - 重点：floating/overlay/focus 公共逻辑、触发方式、关闭时机、定位更新、事件穿透。
 
-##### C09 Feedback 容器
+##### C09 Feedback 容器 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C09 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Modal、Drawer、Loading、Progress、Tour。
 - 重点：open API、portal、scroll lock、focus restore、遮罩/层级、进度状态。

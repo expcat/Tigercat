@@ -2,9 +2,9 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）
 verified-date: 2026-06-26
-source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
+source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -1501,3 +1501,165 @@ const getDefaultTarget = () => window
 | `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C08 基线 |
 
 > 本轮 C08 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，C08 阶段只执行目标 vitest、`corepack pnpm api:validate` 与 `corepack pnpm types:check`（均通过）。
+
+### C09 Feedback 容器
+
+**扫描范围**：Modal / Drawer / Loading / Progress / Tour 五个组件的 core 类型 [modal.ts](../packages/core/src/types/modal.ts)、[drawer.ts](../packages/core/src/types/drawer.ts)、[loading.ts](../packages/core/src/types/loading.ts)、[progress.ts](../packages/core/src/types/progress.ts)、[tour.ts](../packages/core/src/types/tour.ts)，core 工具 [modal-utils.ts](../packages/core/src/utils/modal-utils.ts)、[drawer-utils.ts](../packages/core/src/utils/drawer-utils.ts)、[loading-utils.ts](../packages/core/src/utils/loading-utils.ts)、[progress-utils.ts](../packages/core/src/utils/progress-utils.ts)、[tour-utils.ts](../packages/core/src/utils/tour-utils.ts)、[overlay-utils.ts](../packages/core/src/utils/overlay-utils.ts)、[focus-utils.ts](../packages/core/src/utils/focus-utils.ts)，React/Vue 对应组件实现、双端 overlay helper、feedback generated references 与相关 spec。
+
+**结论速览**：Modal / Drawer / Loading / Progress 的基础面健康：scroll lock、focus trap、focus restore、mask click 判定、Loading 动画注入、Progress clamp/format/circle 计算均有 core helper 或双端镜像实现；C09 目标 vitest 13 文件 243 测试通过，`api:validate` / `types:check` 均通过。**无 P1**。发现主要集中在 3 条 P2：React Modal open callback 语义偏 observer、React Loading 缺少组件级 locale prop、Tour 宣称 `aria-modal` 但没有复用 overlay lifecycle；其余为遮罩语义、Tour i18n、Progress a11y 结构等 P3 清理项。
+
+---
+
+#### C09-1 React Modal 把 `onOpenChange` / `onClose` 当作 prop observer 调用 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜React Modal 在 effect 中对每次 `open` prop 变化调用 `onOpenChange?.(open)`，并在 `open=false` 时调用 `onClose?.()`（[Modal.tsx:166](../packages/react/src/components/Modal.tsx)）。这意味着 `<Modal open={false} onClose={...} />` 初次挂载后也会触发 `onClose`，`open={true}` 初次挂载会触发 `onOpenChange(true)`。
+- 🟠 P2｜Vue Modal 没有 immediate observer：只在关闭动作里 `emit('update:open', false)` / `emit('cancel')`，并在 `open` 从 true 变 false 的 watcher 中 `emit('close')`（[Modal.ts:292](../packages/vue/src/components/Modal.ts)、[Modal.ts:357](../packages/vue/src/components/Modal.ts)）。因此双端 callback 语义不一致。
+- 🟠 P2｜现有 React 测试明确锁住了该 observer 行为（[tests/react/Modal.spec.tsx:304](../tests/react/Modal.spec.tsx)），但这和 Drawer / Tour / 大多数受控组件的 `onOpenChange` 语义不同：回调通常代表用户请求变更，而不是父级 prop 已变化。
+
+**公共内容决策**：属于 React 框架层 open API 语义修正，不沉 core。若保留 observer 行为，需要在文档中明确；若改为 action-only，应按兼容变更处理并同步测试。
+
+**建议修复顺序**：P2。先决定是否要 breaking-compatible 迁移：推荐让 `onOpenChange` 只在内部关闭/确认动作时触发，`onClose` 只在从 open 到 closed 的有效过渡或内部 close action 后触发；补“初始 closed 不触发 onClose”的回归测试。
+
+**目标验证命令**：`pnpm vitest run tests/react/Modal.spec.tsx tests/vue/Modal.spec.ts`、`pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C09-2 Modal `mask=false` 仍保留外层点击关闭区域 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜React Modal 的 mask 节点只负责视觉遮罩；真正的关闭点击挂在 content container（[Modal.tsx:351](../packages/react/src/components/Modal.tsx)、[Modal.tsx:360](../packages/react/src/components/Modal.tsx)）。Vue Modal 同型，mask 节点没有 click handler，container 有 `onClick: handleMaskClick`（[Modal.ts:530](../packages/vue/src/components/Modal.ts)、[Modal.ts:540](../packages/vue/src/components/Modal.ts)）。
+- 🟢 P3｜因此 `mask={false}` 时视觉遮罩消失，但固定定位 wrapper/container 仍覆盖视口；点击内容外空白区域仍会因为 `event.target === event.currentTarget` 触发关闭。Drawer 不同：Drawer 的关闭点击只挂在 mask 节点上，`mask=false` 后没有外层关闭点击（[Drawer.tsx:290](../packages/react/src/components/Drawer.tsx)、[Drawer.ts:498](../packages/vue/src/components/Drawer.ts)）。
+- 🟢 P3｜现有测试只覆盖 “mask 节点不渲染”，没有覆盖 `mask=false` 时外部点击是否应关闭。
+
+**公共内容决策**：属于 Modal/Drawer 行为语义统一问题，关闭判定 helper `shouldCloseOnMaskClick` 已在 core，无需新增 core 逻辑。若希望 `mask=false` 后仍可点空白关闭，应文档写明；若语义是“没有 mask 就没有 mask click”，则 Modal 框架层把 container click guard 改成 `mask && shouldCloseOnMaskClick(...)`。
+
+**建议修复顺序**：P3。先补双端测试固定预期，再改 Modal 或文档；同时确认 `maskClosable=false` 与 `mask=false` 的组合语义。
+
+**目标验证命令**：`pnpm vitest run tests/react/Modal.spec.tsx tests/vue/Modal.spec.ts`。
+
+---
+
+#### C09-3 React Loading 缺少组件级 `locale` prop，与 Vue 不对称 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜Vue Loading 扩展了 `locale?: Partial<TigerLocale>`，并用 `mergeTigerLocale(config.value.locale, props.locale)` 解析无文本时的 aria-label（[Loading.ts:29](../packages/vue/src/components/Loading.ts)、[Loading.ts:93](../packages/vue/src/components/Loading.ts)、[Loading.ts:241](../packages/vue/src/components/Loading.ts)）。
+- 🟠 P2｜React Loading 只读取 ConfigProvider locale（[Loading.tsx:38](../packages/react/src/components/Loading.tsx)、[Loading.tsx:146](../packages/react/src/components/Loading.tsx)），React `LoadingProps` 继承 core `LoadingProps`，core 类型没有 `locale` 字段（[loading.ts](../packages/core/src/types/loading.ts)）。单个 Loading 实例无法像 Vue 一样用组件级 locale 覆盖无文本 aria-label，只能传 `text` 或包一层 ConfigProvider。
+- 🟠 P2｜这与 Modal / Drawer 的双端 locale+labels API 方向不一致，也不会被现有 Loading 测试覆盖：测试只断言默认 aria-label 与 `text` 覆盖。
+
+**公共内容决策**：locale 语义应合到 core `LoadingProps` 或至少双端 wrapper props 对齐。渲染仍留框架层，`resolveLocaleText`/`mergeTigerLocale` 已在 core 可复用。
+
+**建议修复顺序**：P2。给 core `LoadingProps` 补 `locale?: Partial<TigerLocale>`（或 React wrapper 补同名 prop并与 Vue 对齐），React Loading 合并 ConfigProvider + props locale；补双端“组件级 locale 覆盖 aria-label”的测试。若变更 core type，刷新 API baseline。
+
+**目标验证命令**：`pnpm vitest run tests/react/Loading.spec.tsx tests/vue/Loading.spec.ts`、`pnpm api:validate`、`pnpm types:check`、涉及 public type baseline 时追加 `pnpm api:baseline:check`。
+
+---
+
+#### C09-4 Tour 使用 `aria-modal` 但未接入 overlay lifecycle — **P2**
+
+**发现问题**
+
+- 🟠 P2｜React/Vue Tour popover 都设置 `role="dialog"` 和 `aria-modal="true"`（[Tour.tsx:180](../packages/react/src/components/Tour.tsx)、[Tour.ts:310](../packages/vue/src/components/Tour.ts)），但没有像 Modal / Drawer 那样接入 Escape 关闭、focus trap、打开后聚焦、关闭后恢复焦点、body scroll lock。
+- 🟠 P2｜React Tour 直接 `ReactDOM.createPortal(content, document.body)`（[Tour.tsx:226](../packages/react/src/components/Tour.tsx)），Vue Tour 直接 `h(Teleport, { to: 'body' }, children)`（[Tour.ts:323](../packages/vue/src/components/Tour.ts)），没有复用 React/Vue overlay helper，也没有使用 core `captureActiveElement` / `restoreFocus` / `lockBodyScroll`。
+- 🟠 P2｜现有 Tour 双端测试覆盖渲染、导航、mask click、portal 与基础 a11y，但没有覆盖 Escape、Tab 环绕、焦点恢复、scroll lock。
+
+**公共内容决策**：overlay lifecycle 的纯逻辑已在 core 与双端 overlay helper 中，Tour 应复用现有 helper；Tour 定位/step 逻辑继续留在 `tour-utils.ts` 与框架组件内。
+
+**建议修复顺序**：P2。先补双端测试：打开后聚焦 close/primary button、Escape 关闭、Tab 环绕、关闭后恢复触发元素、可选 scroll lock。实现时 React 用 `renderBodyPortal` / `useEscapeKey` / `useFocusTrap` / `useBodyScrollLock`；Vue 用 `renderVueBodyTeleport` / `useVueEscapeKey` / `useVueFocusTrap` / `useVueBodyScrollLock`。若产品语义不希望 Tour 锁滚动或 trap focus，应移除 `aria-modal` 或降为非 modal dialog 语义。
+
+**目标验证命令**：`pnpm vitest run tests/react/Tour.spec.tsx tests/vue/Tour.spec.ts tests/core/overlay-utils.spec.ts tests/core/overlay-scroll-lock.spec.ts`。
+
+---
+
+#### C09-5 Tour target spotlight mask 不拦截背景交互，且不能点击关闭 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜无 target 的 Tour mask 是全屏固定 div，点击会关闭（React [Tour.tsx:175](../packages/react/src/components/Tour.tsx)、Vue [Tour.ts:230](../packages/vue/src/components/Tour.ts)）。有 target 时则渲染 `getTourSpotlightStyle(targetRect)` 的单个 overlay；该 helper 明确设置 `pointerEvents: 'none'`（[tour-utils.ts](../packages/core/src/utils/tour-utils.ts)），所以背景点击会穿透到页面，且不会关闭 Tour。
+- 🟢 P3｜这和 `aria-modal="true"` 的体验不匹配，也和无 target mask 的点击关闭不一致。现有测试只验证 spotlight overlay 存在，没有验证背景点击是否被阻止或关闭。
+
+**公共内容决策**：spotlight 几何/样式 helper 保留 core；是否阻止背景交互是 Tour 组件行为策略。若要可点击关闭，需要额外 overlay layer 或把 spotlight mask 改为 pointer-aware 结构；不能只改 `pointerEvents`，否则 target hole 也会被挡住。
+
+**建议修复顺序**：P3，与 C09-4 一起决策。推荐先定义 `maskClosable` / spotlight 背景交互语义，再补测试。若保留穿透能力，应取消 `aria-modal` 并在文档说明 target step 不阻塞页面。
+
+**目标验证命令**：`pnpm vitest run tests/react/Tour.spec.tsx tests/vue/Tour.spec.ts tests/core/tour-utils.spec.ts`。
+
+---
+
+#### C09-6 Tour 复用 `formWizard` locale 且 close label 硬编码 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜Tour 的 Next / Previous / Finish 文案使用 `mergedLocale.formWizard`（React [Tour.tsx:61](../packages/react/src/components/Tour.tsx)、Vue [Tour.ts:84](../packages/vue/src/components/Tour.ts)），而组件本身不是 FormWizard。`TigerLocale` 也没有 `tour` 命名空间（[locale.ts:170](../packages/core/src/types/locale.ts)）。
+- 🟢 P3｜close button aria-label 两端均硬编码 `"Close tour"`（React [Tour.tsx:190](../packages/react/src/components/Tour.tsx)、Vue [Tour.ts:251](../packages/vue/src/components/Tour.ts)），没有使用 `common.closeText` 或组件级 locale。用户只能覆盖 next/prev/finish，不能本地化 close label。
+
+**公共内容决策**：新增 `TigerLocaleTour` 更清晰；短期也可兼容读取 `tour.*` 后回落到 `formWizard.*`，避免破坏已有使用。close label 可先回落 `common.closeText`。
+
+**建议修复顺序**：P3。补 core locale 类型与 locale preset 字段、React/Vue Tour 文案解析和测试；generated references 由 `docs:api` 生成，不手改。
+
+**目标验证命令**：`pnpm vitest run tests/react/Tour.spec.tsx tests/vue/Tour.spec.ts tests/core/i18n-locales.spec.ts`、`pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C09-7 Progress 语义 attrs 分布不一致，role 落在内部图形节点 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜Progress 的 `role="progressbar"` 与 aria value 属性挂在内部 fill/circle 节点；外层 wrapper 负责接收 `className` / `style` / 宽高（React [Progress.tsx:72](../packages/react/src/components/Progress.tsx)、[Progress.tsx:84](../packages/react/src/components/Progress.tsx)、[Progress.tsx:120](../packages/react/src/components/Progress.tsx)，Vue [Progress.ts:84](../packages/vue/src/components/Progress.ts)、[Progress.ts:111](../packages/vue/src/components/Progress.ts)、[Progress.ts:144](../packages/vue/src/components/Progress.ts)）。
+- 🟢 P3｜React 会从 rest props 中摘出 `aria-label` / `aria-labelledby` / `aria-describedby` 后只放到内部 progressbar；Vue 则先 `...attrs` 到外层，再把相同 aria 字段放到内部 progressbar（[Progress.ts:87](../packages/vue/src/components/Progress.ts)、[Progress.ts:68](../packages/vue/src/components/Progress.ts)）。双端测试目前按内部 progressbar 断言，未覆盖 attrs 是否重复或 `id` / `aria-describedby` 指向外层时的使用体验。
+
+**公共内容决策**：Progress 计算 helper（clamp、format、circle path、status variant）已正确沉 core；语义结构属于框架渲染层。建议统一为“外层根节点就是 progressbar，内部 fill/circle 只负责视觉”，或明确保持内部 progressbar 并确保 attrs 不重复。
+
+**建议修复顺序**：P3。先补 a11y 结构测试，决定 role 所在节点；若迁移到外层 role，注意现有用户依赖 `querySelector('[role="progressbar"]')` 后取父节点的测试/用法可能变化，但公共 API 不变。
+
+**目标验证命令**：`pnpm vitest run tests/react/Progress.spec.tsx tests/vue/Progress.spec.ts`、`pnpm types:check`。
+
+---
+
+#### C09 健康项
+
+- ✅ Modal / Drawer 的视觉样式、尺寸、关闭按钮图标、触摸关闭方向、focus trap、focus restore 与 scroll lock 大体已对齐；纯判定和样式 helper 已在 core。
+- ✅ Loading 的 SVG/点/柱动画配置、文本 class、animation style 注入已在 core，双端实现薄且测试覆盖 delay/fullscreen/lockScroll。
+- ✅ Progress 的百分比 clamp、文本 format、circle path、status variant 已在 core，双端测试镜像完整。
+- ✅ Drawer `destroyOnCloseAfterLeave` 双端已覆盖，动画后销毁路径稳定。
+- ✅ Feedback references 当前能列出 C09 组件，未发现 C09 组件索引漏列。
+
+---
+
+#### C09 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| React Modal open callback observer（C09-1） | React open API 语义修正；不沉 core | **P2** |
+| Modal `mask=false` 仍可外部点击关闭（C09-2） | 行为语义先定，框架层对齐或文档说明 | P3 |
+| Loading 组件级 locale parity（C09-3） | 合入 core `LoadingProps` 或 React wrapper 对齐 Vue | **P2** |
+| Tour overlay lifecycle（C09-4） | 复用现有 overlay helper，或取消 modal 语义 | **P2** |
+| Tour spotlight mask 背景交互（C09-5） | Tour 行为策略；spotlight 几何 helper 保留 core | P3 |
+| Tour locale namespace（C09-6） | 新增 `TigerLocaleTour`，兼容回落 formWizard/common | P3 |
+| Progress role/attrs 结构（C09-7） | 框架层统一语义结构，计算 helper 继续留 core | P3 |
+| Modal/Drawer/Loading/Progress core helper | 已在 core，保持 | - |
+
+---
+
+#### C09 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| React Modal `useEffect([open])` | 初始 closed 也会调用 `onClose`，初始 open 会调用 `onOpenChange(true)` | C09-1 |
+| Vue Modal watcher / close action | 不 immediate；`update:open` 只在内部 action，`close` 在关闭过渡时发出 | C09-1 |
+| Modal mask click 位置 | mask 只视觉；container click 执行 `shouldCloseOnMaskClick`，`mask=false` 仍有空白点击关闭区 | C09-2 |
+| Drawer mask click 位置 | click handler 挂在 mask 节点；`mask=false` 后没有同类关闭区 | C09-2 |
+| Loading locale props | Vue 有组件级 locale 并 merge；React 只读 ConfigProvider locale | C09-3 |
+| Tour portal/Teleport | React/Vue Tour 直接 createPortal/Teleport，未接 overlay helper | C09-4 |
+| Tour focus/Escape/scroll grep | Tour 未使用 `useEscapeKey` / `useFocusTrap` / `useBodyScrollLock` / `captureActiveElement` / `restoreFocus` | C09-4 |
+| Tour spotlight style | target mask 使用 `pointerEvents: 'none'`；无 target mask 可点击关闭 | C09-5 |
+| Tour locale grep | next/prev/finish 读取 `formWizard`，close aria-label 硬编码 `Close tour` | C09-6 |
+| Progress aria 比对 | role/aria 在内部 fill/circle；Vue attrs 同时落外层和内部 | C09-7 |
+| `corepack pnpm vitest run tests/react/Modal.spec.tsx tests/react/Drawer.spec.tsx tests/react/Loading.spec.tsx tests/react/Progress.spec.tsx tests/react/Tour.spec.tsx tests/vue/Modal.spec.ts tests/vue/Drawer.spec.ts tests/vue/Loading.spec.ts tests/vue/Progress.spec.ts tests/vue/Tour.spec.ts tests/core/tour-utils.spec.ts tests/core/overlay-utils.spec.ts tests/core/overlay-scroll-lock.spec.ts` | ✅ 13 个测试文件、243 个测试通过 | C09 基线 |
+| `corepack pnpm api:validate` | ✅ 通过；API 一致性检查 0 问题 | C09 基线 |
+| `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C09 基线 |
+
+> 本轮 C09 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，C09 阶段执行目标 vitest、`corepack pnpm api:validate` 与 `corepack pnpm types:check`（均通过）。
