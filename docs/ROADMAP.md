@@ -46,22 +46,30 @@ source: current repository state; v1.4.0 has been released
 - 组件：Button、ButtonGroup、Link、Text、Code、Icon、Tag、Badge。
 - 重点：尺寸/variant/color 命名、class 生成、aria 属性、图标渲染、轻量组件是否有重复样板。
 
-##### C02 头像与状态展示
+##### C02 头像与状态展示 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C02 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Avatar、AvatarGroup、Empty、Result、Statistic、QRCode、Watermark。
 - 重点：占位/回退内容、状态语义、重复布局 class、SVG/Canvas/水印计算逻辑是否应沉到 core。
 
-##### C03 布局骨架
+##### C03 布局骨架 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C03 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Layout、Header、Sidebar、Content、Footer、Container、Row、Col、Space、Divider。
 - 重点：布局 class 组合、响应式约束、Grid/Space 公共计算、框架实现是否保持对称。
 
-##### C04 内容容器
+##### C04 内容容器 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C04 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Card、List、Descriptions、Skeleton、Collapse、CollapsePanel、Timeline。
 - 重点：容器 variant、列表/描述项结构、折叠状态、Skeleton 重复渲染逻辑、Timeline item 内容类型。
 
-##### C05 导航轻量组
+##### C05 导航轻量组 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C05 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Affix、Anchor、AnchorLink、BackTop、Breadcrumb、BreadcrumbItem、ScrollSpy、FloatButton、FloatButtonGroup。
 - 重点：滚动监听、active 计算、固定定位、键盘/aria、导航 item 公共结构。
