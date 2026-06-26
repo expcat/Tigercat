@@ -3,7 +3,7 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: future planned tasks only
-verified-date: 2026-06-26
+verified-date: 2026-06-27
 source: current repository state; v1.4.0 has been released
 -->
 
@@ -139,7 +139,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Select、AutoComplete。
 - 重点：option state、过滤、键盘导航、popup、受控量 parity、与 TreeSelect/Cascader 的可共享边界。
 
-##### C15 层级选择组
+##### C15 层级选择组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C15 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Tree、TreeSelect、Cascader、Transfer。
 - 重点：tree-utils、展开/选中/过滤、层级数据扁平化、移动项状态、虚拟化接入点。

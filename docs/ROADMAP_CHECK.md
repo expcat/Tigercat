@@ -2,11 +2,12 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）
-verified-date: 2026-06-26
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）
+verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
 source-c14: 实读 Select/AutoComplete 全链路——core 类型 types/{select,auto-complete}.ts、core 工具 utils/{select-utils,auto-complete-utils,picker-utils}.ts、React 实现 components/Select.tsx 与 Select/{state,render-option,types,icons}、components/AutoComplete.tsx、Vue 实现 components/{Select,AutoComplete}.ts、tests/{react,vue}/{Select,AutoComplete}.spec.* 与 tests/core/{picker-utils,select-utils}.spec.ts、examples SelectDemo/AutoCompleteDemo、generated component-index；grep 取证 allowFreeInput 双端零消费、Select virtual/listHeight 双端零消费、getPickerTriggerKeyAction 仅 TreeSelect/Cascader 消费而 Select 未用；以 packageManager pnpm 11.9.0 实跑 C14 目标 vitest（6 文件 190 测试通过）与 api:validate / types:check（均通过），未改动源码。
+source-c15: 实读 Tree/TreeSelect/Cascader/Transfer 全链路——core 类型 types/{tree,tree-select,cascader,transfer}.ts、core 工具 utils/{tree-utils,tree-select-utils,cascader-utils,transfer-utils,picker-utils}.ts、React 实现 components/Tree.tsx 与 Tree/{state,render-node,render-row,types,icons}、components/{TreeSelect,Cascader,Transfer}.tsx、Vue 实现 components/{Tree,TreeSelect,Cascader,Transfer}.ts、tests/{react,vue}/{Tree,TreeSelect,Cascader,Transfer}.spec.* 与 tests/core/{tree-utils,picker-utils}.spec.ts、examples Tree/TreeSelect/Cascader/Transfer demo、generated component-index/shared props/api-summary；grep 取证 virtual/VirtualList、showSearch/filter、clear aria、Transfer split/filter、core direct spec 覆盖；实跑 C15 目标 vitest（10 文件 285 测试通过）、api:validate、types:check（均通过），未改动源码。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -2387,3 +2388,117 @@ const getDefaultTarget = () => window
 | 目标 vitest、`api:validate`、`types:check` | ✅ vitest 6 文件 190 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C14 基线 |
 
 > 本轮 C14 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0（本机无 corepack）实跑 C14 目标 vitest（6 文件 190 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动仓库。
+
+### C15 层级选择组
+
+**扫描范围**：Tree、TreeSelect、Cascader、Transfer 的全链路——core 类型 `types/{tree,tree-select,cascader,transfer}.ts`，core 工具 `utils/{tree-utils,tree-select-utils,cascader-utils,transfer-utils,picker-utils}.ts`，React `Tree/` 状态拆分与 `TreeSelect`/`Cascader`/`Transfer` 实现，Vue 四组件单文件实现，双端定向 spec，`tests/core/{tree-utils,picker-utils}.spec.ts`，examples 与 generated references。
+
+**结论速览**：C15 基线整体健康，目标 vitest、API 校验、公共类型导出检查均通过。Tree 是本组最成熟面：展开/选中/勾选/过滤/键盘行为沉到 `tree-utils` 与双端状态机复用，`virtual` 已真实接入 `VirtualList`，非 no-op。**无 P1**。主要需处理 2 条 **P2** 公共契约问题：Transfer core 文档/类型的 `targetKeys` 未被双端组件实现；Cascader `showSearch.render` 声明后零消费。其余为 P3：Cascader/TreeSelect/Transfer core helper 缺 direct spec、TreeSelect/Cascader clear 控件 a11y/i18n 模式不佳、Vue Transfer 死代码与移动逻辑可继续沉淀。
+
+---
+
+#### C15-1 Transfer `targetKeys` 是 core/文档公共 prop，但双端组件实际只接 `value` / `modelValue` — **P2**
+
+**发现问题**
+
+- 🟠 P2｜core `TransferProps` 暴露 `targetKeys?: (string | number)[]`（[transfer.ts:32](../packages/core/src/types/transfer.ts)），generated form props 也把 Transfer 主值列为 `targetKeys`（[form.md:266](../skills/tigercat/references/shared/props/form.md)）。但 React Transfer 真正受控值是额外声明的 `value`（[Transfer.tsx:33](../packages/react/src/components/Transfer.tsx)），实现只从 `value = []` 拆分数据（[Transfer.tsx:60](../packages/react/src/components/Transfer.tsx)、[Transfer.tsx:93](../packages/react/src/components/Transfer.tsx)），`TRANSFER_KEYS` 还没有 `targetKeys`（[Transfer.tsx:45](../packages/react/src/components/Transfer.tsx)），导致调用方传 `targetKeys` 时不会影响组件状态，还会被当作未知属性透传到 root `div`。
+- 🟠 P2｜Vue Transfer 只声明 `modelValue`，没有 `targetKeys` runtime prop（[Transfer.ts:53](../packages/vue/src/components/Transfer.ts)），拆分也只读 `props.modelValue`（[Transfer.ts:110](../packages/vue/src/components/Transfer.ts)）。这意味着 core/reference 的公共名与双端框架实际契约不一致。
+
+**公共内容决策**：任务 H 统一决策。可选方向：① 在 React 接 `targetKeys` alias、Vue 增 `targetKeys` prop 并明确优先级（框架绑定仍推荐 `value`/`modelValue`）；② 修改 core/reference，把 Transfer 主受控名标为框架绑定专用，`targetKeys` 从共享公共面移除或 deprecated。无论哪种都需过 API baseline 流程，避免继续让 reference 推荐无效 prop。
+
+**建议修复顺序**：P2，优先处理。先决定兼容 alias 还是文档/API 收敛，再补「传 `targetKeys` 可生效或不再出现在 reference」的测试。
+
+**目标验证命令**：`pnpm api:validate`、`pnpm types:check`、`pnpm api:baseline:check`、`pnpm vitest run tests/react/Transfer.spec.tsx tests/vue/Transfer.spec.ts`。
+
+---
+
+#### C15-2 Cascader `showSearch.render` 声明为公共配置但双端零消费；搜索模式不支持 `changeOnSelect` 中间层结果 — **P2 / P3**
+
+**发现问题**
+
+- 🟠 P2｜`CascaderShowSearch.render` 在 core 类型中声明为「render matched options in search result」（[cascader.ts:47](../packages/core/src/types/cascader.ts)），但全链路无实现：`filterCascaderOptions` 只读取 `showSearch.filter` 和 `limit`（[cascader-utils.ts:266](../packages/core/src/utils/cascader-utils.ts)），React/Vue 搜索结果直接渲染 `item.label`（[Cascader.tsx:317](../packages/react/src/components/Cascader.tsx)、[Cascader.ts:420](../packages/vue/src/components/Cascader.ts)），没有任何 `render` 调用或测试。调用方传 `showSearch={{ render }}` 不会改变 UI。
+- 🟢 P3｜`flattenCascaderOptions` 注释写「Add leaf options or all if changeOnSelect」（[cascader-utils.ts:229](../packages/core/src/utils/cascader-utils.ts)），但函数没有 `changeOnSelect` 参数，只把 leaf / `isLeaf` 路径加入搜索结果（[cascader-utils.ts:217](../packages/core/src/utils/cascader-utils.ts)、[cascader-utils.ts:230](../packages/core/src/utils/cascader-utils.ts)）。列模式下 `changeOnSelect` 能选择中间层（React [Cascader.tsx:174](../packages/react/src/components/Cascader.tsx)、Vue [Cascader.ts:206](../packages/vue/src/components/Cascader.ts)），搜索模式则不能展示中间层结果；现有双端搜索测试只覆盖 leaf 命中。
+
+**公共内容决策**：`showSearch.render` 属已公开配置，应二选一：实现自定义搜索结果渲染（框架层渲染函数适配，过滤/limit 仍留 core），或标 deprecated 并从 generated references 中移除/澄清。`changeOnSelect` 搜索语义需文档明确：若希望搜索也可选中间层，应扩展 `flattenCascaderOptions(options, { changeOnSelect })` 这类 core 纯逻辑；若只支持 leaf 搜索，修正注释与 reference。
+
+**建议修复顺序**：P2。先修 `showSearch.render` 名实不符；`changeOnSelect` 搜索语义作为同批 P3 文档/逻辑补齐。
+
+**目标验证命令**：`pnpm vitest run tests/react/Cascader.spec.tsx tests/vue/Cascader.spec.ts`、如补 core direct spec 则追加 `tests/core/cascader-utils.spec.ts`，并跑 `pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C15-3 TreeSelect/Cascader/Transfer core helper 缺 direct spec，只有组件间接覆盖 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜C15 中 Tree 与 picker 基础层有 direct core spec：`tests/core/tree-utils.spec.ts` 覆盖 visible flatten、checked state、filter、keyboard action；`tests/core/picker-utils.spec.ts` 覆盖 trigger/listbox/option aria 与导航。但同组 `tree-select-utils.ts`、`cascader-utils.ts`、`transfer-utils.ts` 没有对应 `tests/core/*-utils.spec.ts`（`rg --files tests/core` 仅命中 tree/picker，没有这三类）。
+- 🟢 P3｜这些 helper 不是纯样式：TreeSelect 包含 `findTreeSelectNode`、display label、flatten/filter（[tree-select-utils.ts:81](../packages/core/src/utils/tree-select-utils.ts)、[tree-select-utils.ts:133](../packages/core/src/utils/tree-select-utils.ts)、[tree-select-utils.ts:153](../packages/core/src/utils/tree-select-utils.ts)）；Cascader 包含路径解析、flatten、filter/limit、columns（[cascader-utils.ts:155](../packages/core/src/utils/cascader-utils.ts)、[cascader-utils.ts:217](../packages/core/src/utils/cascader-utils.ts)、[cascader-utils.ts:259](../packages/core/src/utils/cascader-utils.ts)、[cascader-utils.ts:280](../packages/core/src/utils/cascader-utils.ts)）；Transfer 包含 split/filter（[transfer-utils.ts:103](../packages/core/src/utils/transfer-utils.ts)、[transfer-utils.ts:125](../packages/core/src/utils/transfer-utils.ts)）。目前这些行为只经组件 spec 间接覆盖，回归定位成本偏高。
+
+**公共内容决策**：不需要新增公共 API；补 core direct spec 即可。优先锁定会影响公共契约的纯逻辑：Cascader `filter/limit/render`、Transfer `split/filter`、TreeSelect 搜索祖先路径与 display fallback。
+
+**建议修复顺序**：P3，测试补强项。可与 C15-1/C15-2 的实现或文档修复同批推进。
+
+**目标验证命令**：新增后运行 `pnpm vitest run tests/core/tree-select-utils.spec.ts tests/core/cascader-utils.spec.ts tests/core/transfer-utils.spec.ts`，并保留现有双端组件 spec。
+
+---
+
+#### C15-4 TreeSelect / Cascader clear 控件用嵌套 `span`，键盘与本地化模式不如同族输入组件 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜TreeSelect clear 是嵌在 trigger `<button>` 内的 `<span aria-label="Clear selection" onClick>`（React [TreeSelect.tsx:222](../packages/react/src/components/TreeSelect.tsx)、Vue [TreeSelect.ts:286](../packages/vue/src/components/TreeSelect.ts)），没有 `role="button"` / `tabIndex` / 键盘处理，且 `aria-label` 硬编码英文。Cascader clear 同样嵌在 trigger button 内；它有 `role="button"`，但仍不可独立聚焦、无键盘路径、英文标签硬编码（React [Cascader.tsx:248](../packages/react/src/components/Cascader.tsx)、Vue [Cascader.ts:304](../packages/vue/src/components/Cascader.ts)）。
+- 🟢 P3｜对照 C14 已记录 Select 的相同模式；AutoComplete 则使用真正的 `<button aria-label>`。C15 说明该问题不是 Select 单点，而是 picker/trigger 类组件的统一 a11y/i18n 债务。
+
+**公共内容决策**：框架层修复为主。统一 clear 控件结构（可聚焦按钮或明确键盘清除路径），避免 button 内嵌可点击 span；文案接已有 `common.clearText` 或新增清晰的 clear aria label 策略。core 可只提供文案解析/aria 小 helper，不必承接 DOM 结构。
+
+**建议修复顺序**：P3，可与 C14-5/C14-6 合并做 picker 类 clear 控件统一修复。
+
+**目标验证命令**：`pnpm vitest run tests/react/TreeSelect.spec.tsx tests/vue/TreeSelect.spec.ts tests/react/Cascader.spec.tsx tests/vue/Cascader.spec.ts`，补键盘与 ConfigProvider locale 断言。
+
+---
+
+#### C15-5 健康面与低优先清理：Tree 已真实虚拟化；Transfer 迁移逻辑可继续沉 core，Vue 有一处死代码 — **P3 / 观察**
+
+**发现问题**
+
+- ✅ Tree 的虚拟化不是声明型 no-op：core 类型声明 `virtual`/`height`/`itemHeight`（[tree.ts:181](../packages/core/src/types/tree.ts)、[tree.ts:186](../packages/core/src/types/tree.ts)），React/Vue 均通过 `VirtualList` 渲染 visible items（React [Tree.tsx:47](../packages/react/src/components/Tree.tsx)，Vue [Tree.ts:880](../packages/vue/src/components/Tree.ts)），双端 spec 均断言 500 节点时只渲染子集（React [Tree.spec.tsx:714](../tests/react/Tree.spec.tsx)、Vue [Tree.spec.ts:845](../tests/vue/Tree.spec.ts)）。Tree keyboard 也已统一到 `getTreeKeyboardAction` 并有 core+双端覆盖。
+- 🟢 P3｜Transfer 的 split/filter 已沉 core，但 moveRight/moveLeft 的「过滤 disabled、生成 next target keys、清空 selected keys、返回 movedKeys」仍在 React/Vue 各写一遍（React [Transfer.tsx:140](../packages/react/src/components/Transfer.tsx)、Vue [Transfer.ts:158](../packages/vue/src/components/Transfer.ts)）。当前行为双端一致，属可维护性观察；若后续要扩展批量移动、保序或 filtered-only 语义，可把 move 纯计算沉到 core。
+- 🟢 P3｜Vue Transfer 有一处无消费者的 computed 解构死代码：`const { sourceItems: _sourceItems, targetItems: _targetItems } = computed(...).value`（[Transfer.ts:106](../packages/vue/src/components/Transfer.ts)），真正渲染使用下一行 `computedData`（[Transfer.ts:110](../packages/vue/src/components/Transfer.ts)）。不影响运行，但可随 Transfer 下次清理删除。
+
+**公共内容决策**：Tree 虚拟化与键盘健康面无需动作。Transfer move 逻辑是否沉 core 延后任务 H；Vue 死代码可作为无 API 影响的 P3 清理。
+
+**建议修复顺序**：P3/观察。优先级低于 C15-1/C15-2；如碰 Transfer 修复 `targetKeys`，可顺手抽 move helper 与删 Vue 死代码。
+
+**目标验证命令**：`pnpm vitest run tests/react/Tree.spec.tsx tests/vue/Tree.spec.ts tests/core/tree-utils.spec.ts tests/react/Transfer.spec.tsx tests/vue/Transfer.spec.ts`。
+
+---
+
+#### C15 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| Transfer `targetKeys` core/reference 与双端实际受控名不一致（C15-1） | 实现 alias 或收敛/废弃共享 prop；需 API baseline 流程 | **P2** |
+| Cascader `showSearch.render` 零消费（C15-2） | 实现自定义结果渲染，或 deprecated + 修 reference | **P2** |
+| Cascader `changeOnSelect` 搜索中间层语义不清（C15-2） | 扩展 core flatten 选项或修正文档为 leaf-only | P3 |
+| TreeSelect/Cascader/Transfer helper 缺 direct core spec（C15-3） | 补 core spec，不改 API | P3 |
+| Picker 类 clear 控件 a11y/i18n（C15-4） | 与 C14 同批统一为可键盘操作 + locale 文案 | P3 |
+| Transfer move 纯逻辑与 Vue 死代码（C15-5） | 可沉 core + 清理 Vue 无消费者 computed | P3/观察 |
+
+---
+
+#### C15 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| 比对 Transfer core props/reference 与双端实现 | core/reference 写 `targetKeys`；React 用 `value` 且未过滤 `targetKeys`；Vue 只用 `modelValue` | C15-1 |
+| grep Cascader `showSearch.render` 消费者 | 仅 core 类型声明；filter 只读 `filter/limit`，双端直接渲染 `item.label` | C15-2 |
+| `flattenCascaderOptions` vs `changeOnSelect` | helper 无 `changeOnSelect` 参数；搜索结果只收 leaf/isLeaf 路径；双端列模式可选中间层 | C15-2 |
+| `rg --files tests/core` 对 C15 helper | 有 `tree-utils` / `picker-utils` direct spec；无 `tree-select-utils` / `cascader-utils` / `transfer-utils` direct spec | C15-3 |
+| 比对 TreeSelect/Cascader clear 控件 | 双端均为 trigger button 内嵌 span；硬编码 `Clear selection`，无独立键盘路径 | C15-4 |
+| Tree virtual 与 keyboard | 双端 `VirtualList` 接入 + 500 节点子集渲染 spec；`getTreeKeyboardAction` core+双端覆盖 | C15-5 |
+| Transfer move / Vue dead code | split/filter 进 core；moveRight/moveLeft 双端重复；Vue `_sourceItems/_targetItems` 无消费者 | C15-5 |
+| `corepack pnpm vitest run tests/react/Tree.spec.tsx tests/react/TreeSelect.spec.tsx tests/react/Cascader.spec.tsx tests/react/Transfer.spec.tsx tests/vue/Tree.spec.ts tests/vue/TreeSelect.spec.ts tests/vue/Cascader.spec.ts tests/vue/Transfer.spec.ts tests/core/tree-utils.spec.ts tests/core/picker-utils.spec.ts` | ✅ 10 个测试文件、285 个测试通过 | C15 基线 |
+| `corepack pnpm api:validate` | ✅ 通过；API 一致性检查 0 问题 | C15 基线 |
+| `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C15 基线 |
+
+> 本轮 C15 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮实跑 C15 目标 vitest（10 文件 285 测试通过）、`corepack pnpm api:validate` 与 `corepack pnpm types:check`，均为只读校验、未改动仓库。
