@@ -39,7 +39,9 @@ source: current repository state; v1.4.0 has been released
 - 固定结论格式：每组扫描结果统一记录 `发现问题`、`公共内容决策`、`建议修复顺序`、`目标验证命令`，方便后续对比和执行。
 - 公共拆合判断：纯逻辑和跨框架一致性优先沉到 core；框架生命周期、DOM ref、render/template 细节留在框架层。
 
-##### C01 基础动作与文本
+##### C01 基础动作与文本 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C01 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Button、ButtonGroup、Link、Text、Code、Icon、Tag、Badge。
 - 重点：尺寸/variant/color 命名、class 生成、aria 属性、图标渲染、轻量组件是否有重复样板。
@@ -64,12 +66,16 @@ source: current repository state; v1.4.0 has been released
 - 组件：Affix、Anchor、AnchorLink、BackTop、Breadcrumb、BreadcrumbItem、ScrollSpy、FloatButton、FloatButtonGroup。
 - 重点：滚动监听、active 计算、固定定位、键盘/aria、导航 item 公共结构。
 
-##### C06 Steps/Tabs
+##### C06 Steps/Tabs ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C06 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Steps、StepsItem、Tabs、TabPane。
 - 重点：上下文、受控状态、键盘导航、禁用态、面板挂载策略是否可共享。
 
-##### C07 Menu 单组
+##### C07 Menu 单组 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C07 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Menu、MenuItem、MenuItemGroup、SubMenu。
 - 重点：体量较大，单独检查层级状态、展开/选中、键盘导航、首字母回退、上下文拆分。
