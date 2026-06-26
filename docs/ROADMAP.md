@@ -202,7 +202,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：VirtualTable。
 - 重点：虚拟滚动、固定列、可访问性、Table 复用关系、滚动性能。
 
-##### C24 虚拟列表组
+##### C24 虚拟列表组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C24 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：VirtualList、InfiniteScroll。
 - 重点：viewport、observer、scroll 性能、占位测量、加载触发条件。
@@ -228,7 +230,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：PieChart、DonutChart、RadarChart、GaugeChart。
 - 重点：角度计算、label 布局、重复 SVG 逻辑、空值和极值。
 
-##### C28 专用图表组
+##### C28 专用图表组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C28 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：FunnelChart、HeatmapChart、TreeMapChart、SunburstChart、OrgChart、Gantt。
 - 重点：专用布局算法、层级/时间轴计算、颜色映射、复杂数据边界。
@@ -240,7 +244,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：ActivityFeed、ChatWindow、CommentThread。
 - 重点：Avatar/Input/Textarea/Button/VirtualList 等依赖复用、列表性能、空态、交互回调。
 
-##### C30 工作流复合组
+##### C30 工作流复合组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C30 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：FormWizard、TaskBoard、Kanban。
 - 重点：Steps、ConfigProvider、drag/task-board utilities、Kanban 与 TaskBoard 的薄封装边界。
@@ -252,7 +258,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：CodeEditor、RichTextEditor、MarkdownEditor。
 - 重点：引擎抽象、输入同步、内容转换、示例复杂度、无第三方运行时边界。
 
-##### C32 交互能力组
+##### C32 交互能力组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C32 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Drag、Carousel、Resizable、Splitter。
 - 重点：pointer/keyboard/resize helper、拖拽状态、尺寸约束、动画/过渡公共逻辑。
