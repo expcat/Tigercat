@@ -3,7 +3,7 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: future planned tasks only
-verified-date: 2026-06-24
+verified-date: 2026-06-26
 source: current repository state; v1.4.0 has been released
 -->
 
@@ -25,7 +25,9 @@ source: current repository state; v1.4.0 has been released
 - 目标：找缺失/多余导出、React/Vue 公共组件不对称、废弃 API 残留、generated references 与生成器规则漂移。
 - 公共拆合判断：公开类型、Props、事件命名、受控量 parity 优先沉到 `core` 类型/工具；框架生命周期与渲染细节保留在 React/Vue 包内。
 
-#### 任务 B：Core 工具、类型、主题、i18n、token 扫描
+#### 任务 B：Core 工具、类型、主题、i18n、token 扫描 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 B 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 范围：`packages/core/src/types`、`utils`、`themes`、`theme-runtime`、`tokens`、Tailwind entry。
 - 目标：找重复 helper、过宽工具模块、历史兼容别名、无消费者工具、低效遍历/缓存、locale 与 datepicker locale 重复。
@@ -88,7 +90,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Menu、MenuItem、MenuItemGroup、SubMenu。
 - 重点：体量较大，单独检查层级状态、展开/选中、键盘导航、首字母回退、上下文拆分。
 
-##### C08 Overlay 触发器
+##### C08 Overlay 触发器 ✅ 已扫描（2026-06-26）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C08 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Dropdown、DropdownMenu、DropdownItem、Popover、Popconfirm、Tooltip。
 - 重点：floating/overlay/focus 公共逻辑、触发方式、关闭时机、定位更新、事件穿透。
