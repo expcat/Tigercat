@@ -2,12 +2,13 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）
 verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
 source-c14: 实读 Select/AutoComplete 全链路——core 类型 types/{select,auto-complete}.ts、core 工具 utils/{select-utils,auto-complete-utils,picker-utils}.ts、React 实现 components/Select.tsx 与 Select/{state,render-option,types,icons}、components/AutoComplete.tsx、Vue 实现 components/{Select,AutoComplete}.ts、tests/{react,vue}/{Select,AutoComplete}.spec.* 与 tests/core/{picker-utils,select-utils}.spec.ts、examples SelectDemo/AutoCompleteDemo、generated component-index；grep 取证 allowFreeInput 双端零消费、Select virtual/listHeight 双端零消费、getPickerTriggerKeyAction 仅 TreeSelect/Cascader 消费而 Select 未用；以 packageManager pnpm 11.9.0 实跑 C14 目标 vitest（6 文件 190 测试通过）与 api:validate / types:check（均通过），未改动源码。
 source-c15: 实读 Tree/TreeSelect/Cascader/Transfer 全链路——core 类型 types/{tree,tree-select,cascader,transfer}.ts、core 工具 utils/{tree-utils,tree-select-utils,cascader-utils,transfer-utils,picker-utils}.ts、React 实现 components/Tree.tsx 与 Tree/{state,render-node,render-row,types,icons}、components/{TreeSelect,Cascader,Transfer}.tsx、Vue 实现 components/{Tree,TreeSelect,Cascader,Transfer}.ts、tests/{react,vue}/{Tree,TreeSelect,Cascader,Transfer}.spec.* 与 tests/core/{tree-utils,picker-utils}.spec.ts、examples Tree/TreeSelect/Cascader/Transfer demo、generated component-index/shared props/api-summary；grep 取证 virtual/VirtualList、showSearch/filter、clear aria、Transfer split/filter、core direct spec 覆盖；实跑 C15 目标 vitest（10 文件 285 测试通过）、api:validate、types:check（均通过），未改动源码。
+source-c16: 实读 DatePicker/Calendar 全链路——core 类型 types/{datepicker,calendar}.ts、core 工具 utils/{date-utils,calendar-utils,datepicker-i18n,datepicker-styles}.ts 与 utils/i18n/datepicker-locales/*、React 实现 components/DatePicker.tsx + DatePicker/{state,render-calendar,render-mobile,types}.ts(x)、components/Calendar.tsx、Vue 实现 components/{DatePicker,Calendar}.ts、tests/{core/date-utils,core/datepicker-i18n,react/DatePicker,vue/DatePicker,react/Calendar,vue/Calendar}.spec.*、examples DatePickerDemo/CalendarDemo、generated component-index/i18n；grep 取证 core CalendarProps 双端零消费、WEEKDAYS/MONTHS/getMonthDays 仅 Calendar 消费、getDatePickerLabels 仅 DatePicker 消费、getIntlOptionsFromDateFormat 五分支全等、datepicker-i18n 7 语言 inline map vs 13 preset 的 6 个 preset-only 语言回落英文；以本机 pnpm 11.9.0 实跑 C16 目标 vitest（6 文件 117 测试通过）、api:validate（一致性 0 问题）、types:check（全部 props 类型导出），均通过，未改动源码。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -2502,3 +2503,169 @@ const getDefaultTarget = () => window
 | `corepack pnpm types:check` | ✅ 通过；公共 props 类型导出齐全 | C15 基线 |
 
 > 本轮 C15 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮实跑 C15 目标 vitest（10 文件 285 测试通过）、`corepack pnpm api:validate` 与 `corepack pnpm types:check`，均为只读校验、未改动仓库。
+
+---
+
+### C16 日期组
+
+**扫描范围**：DatePicker、Calendar 的全链路——core 类型 `packages/core/src/types/{datepicker,calendar}.ts`，core 工具 `utils/{date-utils,calendar-utils,datepicker-i18n,datepicker-styles}.ts` 与 `utils/i18n/datepicker-locales/*`，React 实现 `components/DatePicker.tsx` + `DatePicker/{state,render-calendar,render-mobile,types}.ts(x)`、`components/Calendar.tsx`，Vue 实现 `components/{DatePicker,Calendar}.ts`，双端定向 spec、`tests/core/{date-utils,datepicker-i18n}.spec.ts`，examples `DatePickerDemo`/`CalendarDemo`，generated `component-index.md`/`i18n.md`。
+
+**结论速览**：日期组核心受控/范围/键盘行为健康、双端 spec 覆盖充分——受控量（`value`/`onChange` ↔ `modelValue`/`update:modelValue`）、Arrow/Escape/Enter 键盘、跨月聚焦、clear、shortcuts、range 的 OK/Today 均双端锁定且行为一致。**无 P1**。需处理项集中两类：① **该合未合 / 跨框架重复**——DatePicker 的键盘导航·聚焦·范围单元格状态在 React `state.ts` 与 Vue `DatePicker.ts` 各手写一遍，全组没有 picker-utils 式共享层（对照 C14-4）；Calendar 是独立、更弱的第二套日历实现（纯鼠标 + 无 locale）。② **i18n / a11y 缺口**——Calendar 纯鼠标 `<div onClick>` 且无 locale（硬编码英文 `WEEKDAYS`/`MONTHS`），DatePicker 仅接 `props.locale` 不接 ConfigProvider（复核 B-1）、文案双源（复核 B-2）、`format` 在带 locale 时被静默忽略。其余为公共类型卫生与 Vue parity 的 P3。
+
+---
+
+#### C16-1 DatePicker 键盘导航 / 聚焦 / 范围单元格逻辑双端各手写一遍，全组无共享 picker 层（该合未合 + 跨框架重复）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜DatePicker 的整套日历交互纯逻辑在 React 与 Vue 之间**近乎逐字重复**：`moveFocus`（42 次步进、跳过禁用日、跨月翻页）、`handleCalendarKeyDown`（Escape/ArrowLeft/Right/Up/Down/Enter/Space switch）、`getFirstEnabledIsoInView`、`getPreferredFocusIso`、`focusDateButtonByIso`——React [state.ts:210](../packages/react/src/components/DatePicker/state.ts)/[:256](../packages/react/src/components/DatePicker/state.ts)/[:292](../packages/react/src/components/DatePicker/state.ts) 与 Vue [DatePicker.ts:352](../packages/vue/src/components/DatePicker.ts)/[:395](../packages/vue/src/components/DatePicker.ts)/[:438](../packages/vue/src/components/DatePicker.ts) 仅差 React `useCallback`/ref 与 Vue `nextTick`/`ref` 的框架外壳。
+- 🟠 P2｜每个日格的范围状态计算（`isRangeStart`/`isRangeEnd`/`isInRange`/`isBeforeRangeStart`/`isSelected`/`iso`）也在两端重复——React [render-calendar.tsx:63](../packages/react/src/components/DatePicker/render-calendar.tsx)-133 与 Vue [DatePicker.ts:848](../packages/vue/src/components/DatePicker.ts)-926 是同一段派生逻辑写两遍。
+- ℹ️ 对照：Select 家族有 [picker-utils.ts](../packages/core/src/utils/picker-utils.ts) 提供共享导航/aria（C14-4 指出 Select 绕开它去用底层 finder）；DatePicker 家族**连共享层都没有**，纯逻辑全散在框架层。日历键盘 spec 双端已锁（React `DatePicker.spec.tsx:282`/`:316` ArrowRight + 跨月；Vue 对应），故任何抽取需逐项保行为。
+
+**公共内容决策**：**合并到 core**。抽纯函数下沉（`date-utils` 或新 `datepicker-utils`）：`resolveCalendarKeyAction(key)`（键→意图映射，类比 `getPickerTriggerKeyAction`）、`getNextFocusableDateIso(baseIso, deltaDays, isDisabled, maxAttempts)`、`getCalendarCellState(date, ctx)`（返回 `{isSelected,isToday,isInRange,isRangeStart,isRangeEnd,isDisabled,isCurrentMonth,iso}`）；DOM focus/querySelector/setViewing 编排留框架层。无公共 API 破坏（纯内部重构）。
+
+**建议修复顺序**：P3→P2 渐进。先 cell-state（纯派生、零风险），再 key-action 映射，最后 focus 步进；每步跑双端 DatePicker spec 保行为不变。
+
+**目标验证命令**：`pnpm vitest run tests/react/DatePicker.spec.tsx tests/vue/DatePicker.spec.ts`、`pnpm types:check`、`pnpm api:validate`。
+
+---
+
+#### C16-2 Calendar 纯鼠标 `<div onClick>`，无 button/role/tabindex/键盘，与 DatePicker 自带日历的可访问性不对称（a11y）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜Calendar 的日格与月格都是 `<div onClick>`：**无 `role="gridcell"`、无 `tabindex`、无 `onKeyDown`**（React [Calendar.tsx:139](../packages/react/src/components/Calendar.tsx)-148、[:113](../packages/react/src/components/Calendar.tsx)；Vue [Calendar.ts:160](../packages/vue/src/components/Calendar.ts)-172、[:127](../packages/vue/src/components/Calendar.ts)）——键盘用户完全无法操作 Calendar（既不能聚焦也不能选择）。
+- 🟢 P3｜对照同组 DatePicker 的日历用 `<button role="gridcell">` + roving `tabindex` + Arrow/Enter 全键盘（[render-calendar.tsx:105](../packages/react/src/components/DatePicker/render-calendar.tsx)、[DatePicker.ts:895](../packages/vue/src/components/DatePicker.ts)）。同一 C16 组内并存两套可访问性标准。
+- ℹ️ 测试未锁：[tests/react/Calendar.spec.tsx:17](../tests/react/Calendar.spec.tsx)、[tests/vue/Calendar.spec.ts:16](../tests/vue/Calendar.spec.ts) 仅断言 `[role="group"]`，无 button/keyboard 断言，改造空间安全。
+
+**公共内容决策**：框架层 a11y 修复（日/月格改 `<button>` + `role="gridcell"` + roving tabindex + 键盘导航），可复用 C16-1 抽出的 `getNextFocusableDateIso`；不入 core 结构变更。
+
+**建议修复顺序**：P2。先补 Calendar 键盘回归测试，再改结构，双端对齐 DatePicker 的交互模型。
+
+**目标验证命令**：`pnpm vitest run tests/react/Calendar.spec.tsx tests/vue/Calendar.spec.ts`。
+
+---
+
+#### C16-3 Calendar 无 locale，硬编码英文 `WEEKDAYS`/`MONTHS`，而 date-utils 已有 locale 版被 DatePicker 使用（i18n 缺口 + 该合未合）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜[calendar-utils.ts:68](../packages/core/src/utils/calendar-utils.ts)-83 的 `WEEKDAYS`（`Su…Sa`）、`MONTHS`（`Jan…Dec`）为**硬编码英文**，且**仅被 Calendar 两端消费**（React `Calendar.tsx:100`/`:113`/`:125`、Vue `Calendar.ts:107`/`:127`/`:143`）；Calendar 月名/周名永远英文。core `CalendarProps`（[calendar.ts:9](../packages/core/src/types/calendar.ts)）也根本没有 `locale` 字段。
+- 🟠 P2｜对照 [date-utils.ts](../packages/core/src/utils/date-utils.ts) 已提供 locale 感知的 `getShortDayNames(locale)`/`getShortMonthNames(locale)`/`formatMonthYear(y,m,locale)`，DatePicker 正用这些（`state.ts:162`、`DatePicker.ts:317`/`:820`）。Calendar 重造了一套英文专用名，属重复实现 + i18n 缺口。
+- ℹ️ examples `CalendarDemo` 全程无 `locale`，印证 Calendar 当前无本地化入口。
+
+**公共内容决策**：Calendar 应消费已有 locale 感知 helper 并补 `locale` prop（与 DatePicker 一致）；`WEEKDAYS`/`MONTHS` 是 public flat utility，按任务 H 流程列 **deprecation 候选**（不直接删）。`getMonthDays`（[calendar-utils.ts:85](../packages/core/src/utils/calendar-utils.ts)）可保留为 `getCalendarDays` 的 `Date[]` 视图或一并收敛。
+
+**建议修复顺序**：P2。先给 Calendar 接 `locale` + 切到 date-utils 名称源，再评估 `WEEKDAYS`/`MONTHS` 废弃。属公共 API 新增（Calendar 加 prop）+ 旧常量废弃，走 H 流程。
+
+**目标验证命令**：`pnpm vitest run tests/react/Calendar.spec.tsx tests/vue/Calendar.spec.ts tests/core/date-utils.spec.ts`、`pnpm api:validate`。
+
+---
+
+#### C16-4 `getIntlOptionsFromDateFormat` 是无效 switch（五分支全等），导致带 locale 时 `format` 被静默忽略（冗余 + latent 显示问题）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜[date-utils.ts:21](../packages/core/src/utils/date-utils.ts)-33 的 switch 四个 `case` + `default` 返回**完全相同**的 `{ year:'numeric', month:'2-digit', day:'2-digit' }`；故 `formatDate(date, format, locale)` 一旦有 `locale`，输出顺序由 Intl/locale 决定，`format`（`MM/dd/yyyy` vs `dd/MM/yyyy` vs `yyyy-MM-dd`）**无任何作用**（连补零也由 locale 决定）。
+- 🟠 P2｜双端输入框显示都走该路径：`displayValue` = `formatDate(date, props.format, localeCode)`（[state.ts:128](../packages/react/src/components/DatePicker/state.ts)、[DatePicker.ts:289](../packages/vue/src/components/DatePicker.ts)）。用户同时设 `locale` + `format` 时（`DatePickerDemo` 即此用法）`format` 被吞。
+- ℹ️ 测试未覆盖差异：[tests/core/date-utils.spec.ts:76](../tests/core/date-utils.spec.ts) 只锁 `yyyy-MM-dd` + locale；无 locale 时四个 format 都测了（[:107](../tests/core/date-utils.spec.ts)-110），故差异区是「format×locale」矩阵，恰好没测。
+
+**公共内容决策**：core 纯逻辑修正，二选一——要么按 `format` 顺序构造 Intl options（让 format 在 locale 下仍决定 年/月/日 次序），要么删掉无效 switch 并在 JSDoc 明确「带 locale 时由 locale 决定顺序」；补 format×locale 矩阵测试锁定语义。无公共 API 破坏。
+
+**建议修复顺序**：P2。先定语义（format 是否应在 locale 下生效）再落地。
+
+**目标验证命令**：`pnpm vitest run tests/core/date-utils.spec.ts`、`pnpm types:check`。
+
+---
+
+#### C16-5 DatePicker i18n 复核：不接 ConfigProvider（B-1）+ 文案双源（B-2）— **P2**
+
+**发现问题**
+
+- 🟠 P2｜（复核 **B-1**）React [state.ts:116](../packages/react/src/components/DatePicker/state.ts)/[:166](../packages/react/src/components/DatePicker/state.ts) 与 Vue [DatePicker.ts:276](../packages/vue/src/components/DatePicker.ts)/[:322](../packages/vue/src/components/DatePicker.ts) 只读 `props.locale`/`props.labels`，**从不读 `useTigerConfig()`**；`<ConfigProvider locale>` 对日历文案不生效。[references/i18n.md:17](../skills/tigercat/references/i18n.md) 把 DatePicker 列为「Localized component」，实际只是组件 prop 级本地化，措辞偏宽。
+- 🟠 P2｜（复核 **B-2**）文案双源：[datepicker-i18n.ts:34](../packages/core/src/utils/datepicker-i18n.ts)-82 的 `DATEPICKER_LABELS_BY_LANGUAGE` 仅手写 `en/zh/es/fr/de/pt/ar` 7 组 fallback labels；而 [datepicker-locales/index.ts](../packages/core/src/utils/i18n/datepicker-locales/index.ts) 导出 13 个 preset。`getDatePickerLabels('ja-JP'|'ko-KR'|'th-TH'|'vi-VN'|'id-ID'|'zh-TW')` 这 **6 个语言只回落英文 labels**，但直接传对应 preset 又能拿到完整翻译。[tests/core/datepicker-i18n.spec.ts](../tests/core/datepicker-i18n.spec.ts) 只覆盖 7 个 inline 语言（`:28`-33）+ 2 个 preset merge（`:13`/`:36`），未覆盖这 6 个字符串 locale。
+
+**公共内容决策**：同 B-1/B-2——locale 解析留 core，框架层接 ConfigProvider merged locale（优先级 `props.locale` > ConfigProvider locale > 默认）；以 `datepicker-locales/*` preset 为 labels 单一来源，`datepicker-i18n.ts` 只保留解析/合并/fallback。复用现有 `TigerLocale.datePicker` 字段，不新增公共字段。
+
+**建议修复顺序**：P2，走任务 H 流程；本段从组件视角复核并补「6 个 preset-only 语言字符串 locale 回落英文」的覆盖缺口取证。
+
+**目标验证命令**：`pnpm vitest run tests/core/datepicker-i18n.spec.ts tests/react/DatePicker.spec.tsx tests/vue/DatePicker.spec.ts`、`pnpm api:validate`。
+
+---
+
+#### C16-6 core `CalendarProps`（types/calendar.ts）是幽灵共享类型——双端都不消费 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜[types/calendar.ts:9](../packages/core/src/types/calendar.ts) 的 `CalendarProps`（`mode`/`fullscreen`/`disabledDate`/`className`）经 core barrel 导出，但 React/Vue **都不 import 它**：React [Calendar.tsx:18](../packages/react/src/components/Calendar.tsx) 自定义 `CalendarProps`、Vue [Calendar.ts:18](../packages/vue/src/components/Calendar.ts) 用 `VueCalendarProps`，且两端都额外加了核心类型没有的 `value`/`modelValue`/`onChange`/`onPanelChange`。所谓「shared」类型既非真源、也不够用，属漂移/死类型。
+
+**公共内容决策**：要么把它做成真正源头（上提 value/事件契约供双端 extend），要么按 H 流程标 deprecated 后移除（public 类型不直接删）。
+
+**建议修复顺序**：P3，随 C16-3 给 Calendar 补 `locale`/受控量时一并定型。
+
+**目标验证命令**：`pnpm api:validate`、`pnpm types:check`。
+
+---
+
+#### C16-7 Vue parity 簇：shortcut 不归一化 + 多发 `change` + 接口漏 `shortcuts` — **P3**
+
+**发现问题**
+
+- 🟢 P3｜**shortcut 归一化双端不一致**：Vue [DatePicker.ts:502](../packages/vue/src/components/DatePicker.ts)-506 `handleShortcut` 直接 `emitValue(val)`（原样发 shortcut 值）；React [state.ts:395](../packages/react/src/components/DatePicker/state.ts)-420 会 `normalizeDate`/`parseDate`、处理 range 元组。结果：字符串/范围 shortcut 时 Vue 发原值、React 发 `Date`；即便 Date shortcut，Vue 保留时间分量、React 归零到午夜。Vue shortcut 测试只用 Date 值（`DatePicker.spec.ts:494`/`:515`），未锁该差异。
+- 🟢 P3｜**多发 `change` 事件**：Vue `emitValue` 同时发 `update:modelValue` + `change`（[DatePicker.ts:347](../packages/vue/src/components/DatePicker.ts)-350），React 只有 `onChange`（≈ v-model）；Vue Calendar `selectDay` 亦同发两者（[Calendar.ts:76](../packages/vue/src/components/Calendar.ts)-77）。与 C14-7（AutoComplete Vue 多 `change`）同型的双发模式。
+- 🟢 P3｜**接口/运行时漂移**：`VueDatePickerProps` 接口（[DatePicker.ts:59](../packages/vue/src/components/DatePicker.ts)-77）**漏列 `shortcuts`**，但运行时 props（[:226](../packages/vue/src/components/DatePicker.ts)）已声明。同 C12-3（Vue InputNumber 接口漂移）。
+
+**公共内容决策**：框架层对齐——Vue shortcut 比照 React 归一化；`change` 事件契约建议全库统一取舍（保留并文档化为非 v-model 事件，或移除对齐 React）；补 `shortcuts` 到 `VueDatePickerProps`。均不涉及 core 结构。
+
+**建议修复顺序**：P3，随 DatePicker 下次改动顺手。
+
+**目标验证命令**：`pnpm vitest run tests/vue/DatePicker.spec.ts tests/react/DatePicker.spec.tsx`、`pnpm types:check`。
+
+---
+
+#### C16-8 受控量 / 双端 parity 健康面 + 低优先观察 — **P3 / 观察**
+
+**发现问题**
+
+- ✅ 健康：受控量/事件双端对称（React `value`/`onChange` 单/范围判别联合 ↔ Vue `modelValue`/`update:modelValue`）；range 规则（end 不早于 start）、跨月聚焦、Escape 关闭 + 恢复焦点、RTL 镜像导航图标（`getLocaleDirection`，双端一致）、shortcuts 渲染/关闭、`isDateInRange` 禁用边界均双端 spec 锁定且行为一致。
+- 🟢 P3｜移动端 wheel `<select aria-label="Year"/"Month"/"Day">`、Start/End 切换、`aria-label="Mobile OK"` 在双端均**硬编码英文**、未走 `labels.*`（桌面端走了），i18n 边界不对称（React [render-mobile.tsx:39](../packages/react/src/components/DatePicker/render-mobile.tsx)/[:74](../packages/react/src/components/DatePicker/render-mobile.tsx)、Vue [DatePicker.ts:748](../packages/vue/src/components/DatePicker.ts)/[:785](../packages/vue/src/components/DatePicker.ts)）。
+- 🟢 观察｜Calendar 的 `value`/`modelValue` 视图只在初始化读一次（[Calendar.tsx:38](../packages/react/src/components/Calendar.tsx)、[Calendar.ts:39](../packages/vue/src/components/Calendar.ts)），后续 prop 变化不跟随——双端一致（受控视图设计）。
+- 🟢 观察｜`getCalendarDays` 签名 `(Date|null)[]` 但实现恒非空，`getMonthDays` 直接 `as Date[]`（[calendar-utils.ts:85](../packages/core/src/utils/calendar-utils.ts)-87）依赖未文档化不变量；DatePicker 渲染仍 `if (!date) return null` 防御——类型与实现轻微不一致。
+
+**公共内容决策**：mobile aria 文案可随 C16-5 一并接 locale；其余健康面/观察无需动作。
+
+**建议修复顺序**：P3 观察，随相应修复顺带。
+
+**目标验证命令**：随相应修复的 `pnpm vitest run tests/react/DatePicker.spec.tsx tests/vue/DatePicker.spec.ts tests/react/Calendar.spec.tsx tests/vue/Calendar.spec.ts`。
+
+---
+
+#### C16 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| DatePicker 键盘/聚焦/cell-state 双端重复（C16-1） | **合并→core 共享 helper**（cell-state → key-action → focus 步进渐进） | **P2** |
+| Calendar 纯鼠标无键盘（C16-2） | **框架层 a11y 修复**（button + roving tabindex + 键盘），复用 C16-1 helper | **P2** |
+| Calendar 无 locale + `WEEKDAYS`/`MONTHS` 硬编码英文（C16-3） | **Calendar 接 locale 用 date-utils 名称源；旧常量走 H 废弃** | **P2** |
+| `getIntlOptionsFromDateFormat` 无效 switch / format 被吞（C16-4） | **core 修正语义 + 补 format×locale 测试** | **P2** |
+| DatePicker 不接 ConfigProvider + 文案双源（C16-5，复核 B-1/B-2） | **框架层接 merged locale；preset 作 labels 单源（走 H）** | **P2** |
+| core `CalendarProps` 幽灵共享类型（C16-6） | **做成真源 or 走 H 废弃** | P3 |
+| Vue shortcut 不归一化 / 多发 change / 接口漏 shortcuts（C16-7） | **框架层对齐 React；change 契约全库统一** | P3 |
+| 受控量/parity 健康面 + mobile aria 英文 + 类型观察（C16-8） | **健康面保持；mobile aria 随 C16-5 接 locale** | P3/观察 |
+
+---
+
+#### C16 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| 比对 React `state.ts` vs Vue `DatePicker.ts` 键盘/聚焦/cell-state | `moveFocus`/`handleCalendarKeyDown`/`getPreferredFocusIso`/范围 cell 派生近乎逐字重复，全组无共享层 | C16-1 |
+| 比对 Calendar vs DatePicker 日历元素 | Calendar 日/月格 `<div onClick>` 无 role/tabindex/键盘；DatePicker 用 `<button role="gridcell">` + 键盘 | C16-2 |
+| grep `WEEKDAYS`/`MONTHS`/`getMonthDays` 消费者 | 仅 Calendar 两端；硬编码英文；date-utils 已有 locale 版被 DatePicker 用；`CalendarProps` 无 `locale` | C16-3 |
+| 读 `getIntlOptionsFromDateFormat` 五分支 | 四 case + default 返回同一对象；带 locale 时 `format` 无效；spec 仅锁 `yyyy-MM-dd`+locale | C16-4 |
+| grep `getDatePickerLabels` 消费者 + datepicker-i18n 源 | 仅 DatePicker 两端用；inline map 7 语言 vs 13 preset，6 个 preset-only 语言字符串 locale 回落英文且无 spec | C16-5 |
+| grep core `CalendarProps` 消费者 | 双端零 import；React/Vue 各自定义 props 且额外含 value/事件 | C16-6 |
+| 比对 Vue/React `handleShortcut` + emits + 接口 | Vue 原样 emit / 多发 `change` / `VueDatePickerProps` 漏 `shortcuts` | C16-7 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 6 文件 117 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出 | C16 基线 |
+
+> 本轮 C16 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以本机 pnpm 11.9.0 实跑 C16 目标 vitest（6 文件 117 测试通过）、`pnpm api:validate`（一致性 0 问题）与 `pnpm types:check`（全部 props 类型导出），均为只读校验、未改动仓库。

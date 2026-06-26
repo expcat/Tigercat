@@ -146,7 +146,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Tree、TreeSelect、Cascader、Transfer。
 - 重点：tree-utils、展开/选中/过滤、层级数据扁平化、移动项状态、虚拟化接入点。
 
-##### C16 日期组
+##### C16 日期组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C16 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：DatePicker、Calendar。
 - 重点：DatePicker 体量较大，检查 date-utils、datepicker locale、键盘导航、范围/面板状态。
