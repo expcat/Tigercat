@@ -2,7 +2,7 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C21「Table 单组」（C21-1~C21-6）、C22「DataTableWithToolbar 单组」（C22-1~C22-4）
 verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
@@ -11,6 +11,7 @@ source-c15: 实读 Tree/TreeSelect/Cascader/Transfer 全链路——core 类型 
 source-c16: 实读 DatePicker/Calendar 全链路——core 类型 types/{datepicker,calendar}.ts、core 工具 utils/{date-utils,calendar-utils,datepicker-i18n,datepicker-styles}.ts 与 utils/i18n/datepicker-locales/*、React 实现 components/DatePicker.tsx + DatePicker/{state,render-calendar,render-mobile,types}.ts(x)、components/Calendar.tsx、Vue 实现 components/{DatePicker,Calendar}.ts、tests/{core/date-utils,core/datepicker-i18n,react/DatePicker,vue/DatePicker,react/Calendar,vue/Calendar}.spec.*、examples DatePickerDemo/CalendarDemo、generated component-index/i18n；grep 取证 core CalendarProps 双端零消费、WEEKDAYS/MONTHS/getMonthDays 仅 Calendar 消费、getDatePickerLabels 仅 DatePicker 消费、getIntlOptionsFromDateFormat 五分支全等、datepicker-i18n 7 语言 inline map vs 13 preset 的 6 个 preset-only 语言回落英文；以本机 pnpm 11.9.0 实跑 C16 目标 vitest（6 文件 117 测试通过）、api:validate（一致性 0 问题）、types:check（全部 props 类型导出），均通过，未改动源码。
 source-c17: 实读 TimePicker/Countdown/CronEditor 全链路——core 类型 types/{timepicker,countdown,cron-editor}.ts、core 工具 utils/{time-utils,timepicker-utils,countdown-utils,cron-editor-utils}.ts、React 实现 components/TimePicker.tsx 与 TimePicker/{state,render-desktop,render-mobile,types,icons}、components/{Countdown,CronEditor}.tsx、Vue 实现 components/{TimePicker,Countdown,CronEditor}.ts、tests/{core,react,vue} 9 个定向 spec、examples TimePickerDemo/CountdownDemo/CronEditorDemo、generated component-index 与 shared/props/{form,data}.md；grep 取证 TimePicker 秒级范围判断、秒列禁用逻辑、CronEditor className 透传、Countdown now/tick 测试契约；实跑 C17 目标 vitest（9 文件 174 测试通过）、pnpm run api:validate、pnpm run types:check（均通过），未改动源码。
 source-c18: 实读 Upload/FileManager/Signature 全链路——core 类型 types/{upload,signature,file-manager}.ts、core 工具 utils/{upload-utils,upload-labels,signature-utils,file-manager-utils}.ts（对照 locale-utils 的 DEFAULT_UPLOAD_LABELS/ZH_CN_UPLOAD_LABELS、tailwind-entry）、React components/{Upload,FileManager,Signature}.tsx 与 index.tsx 导出、Vue components/{Upload,FileManager,Signature}.ts 与 index.ts 导出、tests/{core,react,vue} 9 个定向 spec、examples {Upload,FileManager,Signature}Demo、generated component-index；grep 取证 Tailwind v4（core/package.json tailwindcss ^4.0.0）下 Upload 4 处 bg-opacity-* 失效、applyFileDragReorder 零组件消费、FileManager draggable 半接线、React FileManager Loading 硬编码 vs Vue locale、core FileManagerProps/columns 漂移死字段、formatFileSize vs formatFileSizeLabel 双实现、getFileExtension 重名异义；以 packageManager pnpm 11.9.0 实跑 C18 目标 vitest（9 文件 238 测试通过）与 api:validate / types:check（均通过），未改动源码。CropUpload 属 C20 排除。
+source-c22: 实读 DataTableWithToolbar / TableToolbar 全链路——core 类型 composite.ts（TableToolbar* 系列 + DataTableWithToolbarProps）与 types/table.ts 的 TableProps（共享边界对照）、React components/DataTableWithToolbar.tsx（569 行，extends Omit<TableProps,'className'|'onPageChange'> 全量透传）、Vue components/DataTableWithToolbar.ts（854 行，VueDataTableWithToolbarProps 手维子集 + inheritAttrs:false restAttrs 透传）、双端 index 导出、tests/{react,vue}/DataTableWithToolbar.spec.*（812/877 行）、examples DataTableWithToolbarDemo.{tsx,vue}、generated component-index/api-summary/props/composite 与 generator generate-api-docs.mjs；grep 取证 Vue 声明 props 缺 ~20 个 Table 能力（expandable/virtual 系/editable/filterMode/advancedFilterRules/列行拖拽/summaryRow/groupBy/export 系/cardSelectionPosition/cardPadding/cardFieldGap）、core DataTableWithToolbarProps 两端零消费且 Vue export * 反向不一致、hasSearch 无 toolbar 时双端分歧、setFilterValue 过滤值更新双端一致、TableToolbar 在 index/api-summary 列为组件而 props 文档注明非独立导出；以本机 pnpm 11.9.0（与 packageManager 一致）实跑 C22 目标 vitest（2 文件 63 测试通过）与 api:validate / types:check（均通过），未改动源码。Table 自身实现属 C21。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -3064,3 +3065,108 @@ pnpm vitest run tests/core/countdown-utils.spec.ts tests/react/Countdown.spec.ts
 | 目标 vitest | ✅ `corepack pnpm vitest run tests/core/table-utils.spec.ts tests/core/table-filter-utils.spec.ts tests/core/table-group-utils.spec.ts tests/core/table-resize-utils.spec.ts tests/core/table-export-utils.spec.ts tests/react/Table.spec.tsx tests/react/TableState.spec.tsx tests/vue/Table.spec.ts tests/vue/TableState.spec.ts`：9 文件 280 测试通过 | C21 基线 |
 
 > 本轮 C21 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用仓库声明的 `corepack pnpm` / pnpm 11.9.0 实跑 C21 目标 vitest（9 文件 280 测试通过）、`corepack pnpm api:validate`（一致性检查通过，0 问题）、`corepack pnpm types:check`（全部 props 类型导出）与 `git diff --check -- docs/ROADMAP.md docs/ROADMAP_CHECK.md`（通过），均为只读校验、未改动源码。
+
+---
+
+### 任务 C / C22：DataTableWithToolbar 单组扫描结果（2026-06-27）
+
+**扫描范围**：DataTableWithToolbar / TableToolbar 全链路——core 类型 `packages/core/src/types/composite.ts`（`TableToolbar*` 系列 + `DataTableWithToolbarProps`，821-1106）与 `types/table.ts`（`TableProps` 全面，519-815，做共享边界对照），React 实现 `components/DataTableWithToolbar.tsx`（569 行），Vue 实现 `components/DataTableWithToolbar.ts`（854 行），双端 `index` 导出，`tests/{react,vue}/DataTableWithToolbar.spec.*`（812/877 行），examples `DataTableWithToolbarDemo.{tsx,vue}`，generated references（`component-index.md`、`shared/api-summary.md`、`shared/props/composite.md`、生成器 `scripts/generate-api-docs.mjs`）。Table 自身实现属 C21，本组只在共享边界处取证。
+
+**结论速览**：toolbar / filter / card mode、列隐藏 / 锁定、过滤值更新双端**逻辑一致且测试充分**（双端 spec 各 ~30 例，本轮实跑 63 例全绿），**无 P1**。问题集中在 **Table 共享边界的「公开面不对称」**：① Vue 的声明 props / 公开类型是 `TableProps` 的手维子集，约 20 个 Table 能力（expandable、virtual 系、editable、filterMode/advancedFilterRules、列/行拖拽、summaryRow、groupBy、export 系、cardSelectionPosition/cardPadding/cardFieldGap）未在 Vue 侧类型化/文档化，而 React 经 `extends TableProps` 全量透传（P2）；② core `DataTableWithToolbarProps` 是两端都不消费的 ghost 型，且 Vue `export *` 把该 core 全量型带进命名空间，与实际 Vue 组件接受面反向不一致（P2）。其余为 `hasSearch` 边缘场景双端分歧（P3）与一处 generated 文档对 `TableToolbar`「组件 / 配置型」口径微瑕（P3 / 观察）。
+
+---
+
+#### C22-1 Table 共享边界：Vue 声明 props / 公开类型是 `TableProps` 手维子集，约 20 个 Table 能力未类型化（该合未合 + 双端不对称）— **P2**
+
+**发现问题**
+
+- 🟡 P2｜React `DataTableWithToolbarProps extends Omit<TableProps<T>, 'className' | 'onPageChange'>`（[DataTableWithToolbar.tsx:56](../packages/react/src/components/DataTableWithToolbar.tsx)–[:59](../packages/react/src/components/DataTableWithToolbar.tsx)），组件 `...tableProps` 解构（114）、`...remainingTableProps` 透传给内部 `<Table>`（556）→ **全量类型化转发** Table 所有 prop。
+- 🟡 P2｜Vue 侧反之：`VueDataTableWithToolbarProps`（[DataTableWithToolbar.ts:78](../packages/vue/src/components/DataTableWithToolbar.ts)–[:111](../packages/vue/src/components/DataTableWithToolbar.ts)）与 runtime `props:{}`（116-252）是**手维子集**，`setup` 返回时只把一份显式 allowlist 映射进 `tableProps`（804-837）。对照 core `TableProps`（[table.ts:519](../packages/core/src/types/table.ts)–[:815](../packages/core/src/types/table.ts)），Vue **未声明 / 未类型化**约 20 个 Table 能力：`expandable`、`virtual`/`autoVirtual`/`virtualHeight`/`virtualItemHeight`/`autoVirtualThreshold`/`virtualThreshold`、`editable`/`editableCells`、`filterMode`/`advancedFilterRules`、`columnDraggable`/`rowDraggable`、`summaryRow`、`groupBy`、`exportable`/`exportFormat`/`exportFilename`、`cardSelectionPosition`/`cardPadding`/`cardFieldGap`。
+- ℹ️ 运行时缓和但不消除：Vue `inheritAttrs: false` + 末尾 `{ class, style, ...restAttrs }` 展开（[DataTableWithToolbar.ts:803](../packages/vue/src/components/DataTableWithToolbar.ts)–[:805](../packages/vue/src/components/DataTableWithToolbar.ts)）会把未声明 attr 透传到 Table，部分能力**运行时可达**；但它们**无类型、无 generated 文档、模板严格模式报未知 prop**，且恰是 Table 较新的增长项（virtual/editable/export/summary/advanced-filter/drag）——Vue 手维清单已落后于 Table。
+- ℹ️ 取证：双端 spec 与双端 example **均未**经 DataTableWithToolbar 演练 expandable/virtual/editable/export/summary/drag（grep 空），该缺口为 latent、未被任一测试锁定。
+
+**公共内容决策**：走任务 H（不直接删改公开 API）。让 Vue 的 props / 公开类型以 core `TableProps` / `DataTableWithToolbarProps` 为单一事实源派生（或直接复用 Table 的 props 定义合并），声明面与 React 对齐；与 C22-2 同批收敛，过 `api:baseline:check`。
+
+**建议修复顺序**：P2。先定 Vue props 派生方式（复用 core 型）再补齐声明面；同步在 generated props 文档体现新增受支持 prop。
+
+**目标验证命令**：`pnpm types:check`、`pnpm api:validate`、`pnpm api:baseline:check`。
+
+---
+
+#### C22-2 core `DataTableWithToolbarProps` 是 ghost 型 + Vue 导出反向不一致（公共 API 卫生）— **P2**
+
+**发现问题**
+
+- 🟡 P2｜core `DataTableWithToolbarProps`（[composite.ts:1085](../packages/core/src/types/composite.ts)，`Omit<TableProps, 'pagination'>` + `toolbar`/`pagination`/`onPageChange`/`onPageSizeChange`）**被两端组件都不消费**：React 用本地同名接口（[DataTableWithToolbar.tsx:56](../packages/react/src/components/DataTableWithToolbar.tsx)），Vue 用 `VueDataTableWithToolbarProps`（[DataTableWithToolbar.ts:78](../packages/vue/src/components/DataTableWithToolbar.ts)）。grep 全仓：仅 core 定义 + React 本地定义 / 再导出，无人 `import` core 版。
+- 🟡 P2｜两端 index 均 `export * from '@expcat/tigercat-core'`（[react index.tsx:8](../packages/react/src/index.tsx)、[vue index.ts:8](../packages/vue/src/index.ts)）。React 另显式 `export { DataTableWithToolbarProps }` 本地版（[index.tsx:223](../packages/react/src/index.tsx)）→ 显式胜出，React 命名空间得到与组件一致的全量本地型（OK）。Vue **无**本地 `DataTableWithToolbarProps` 导出（仅 `VueDataTableWithToolbarProps`，[index.ts:192](../packages/vue/src/index.ts)）→ `export *` 把 **core 全量型（≈50 props）**带进 Vue 命名空间，与实际 Vue 组件接受面（`VueDataTableWithToolbarProps`，≈30 子集）**反向不一致**：类型许诺多于实现。
+- ℹ️ core 型还缺 React 暴露的 toolbar 级回调 `onSearchChange`/`onSearch`/`onFiltersChange`/`onBulkAction` 与 `tableClassName`；属 C18-4 / C04-6 / C12-3 同型「core 数据型 vs 组件富型」漂移族。
+
+**公共内容决策**：走任务 H。收敛类型来源——core `DataTableWithToolbarProps` 作单一事实源并补 toolbar 级回调；Vue 暴露与组件实参一致的 props 型（消除「导出 core 全量 vs 实现子集」反向漂移）；与 C22-1 一并修。
+
+**建议修复顺序**：P2。与 C22-1 同批；先决 core 型补全字段，再统一双端导出。
+
+**目标验证命令**：`pnpm types:check`、`pnpm api:validate`、`pnpm api:baseline:check`。
+
+---
+
+#### C22-3 `hasSearch` 双端分歧：仅给搜索回调而无 `toolbar` 对象时 React 不渲染搜索框、Vue 渲染 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜React `hasSearch = Boolean(toolbar && (... || onSearchChange || onSearch))`（[DataTableWithToolbar.tsx:216](../packages/react/src/components/DataTableWithToolbar.tsx)–[:226](../packages/react/src/components/DataTableWithToolbar.tsx)）→ `toolbar` 为 `undefined` 时整体短路为 `false`，**即便传了顶层 `onSearch`/`onSearchChange` 也不渲染搜索框**。
+- 🟢 P3｜Vue `hasSearch`：`if (!props.toolbar) return hasSearchListener`（[DataTableWithToolbar.ts:375](../packages/vue/src/components/DataTableWithToolbar.ts)–[:384](../packages/vue/src/components/DataTableWithToolbar.ts)），`hasSearchListener = Boolean(vnodeProps.onSearch || vnodeProps.onSearchChange)`（278）→ 无 toolbar 但挂了 `@search`/`@search-change` 时**渲染搜索框**。同样输入双端 UI 不一致（边缘场景）。
+
+**公共内容决策**：框架层一致性收敛——择一语义（是否允许「无 `toolbar` 仅凭顶层 / 监听回调」启用搜索）并两端对齐；不涉及 core / 公共 API。
+
+**建议修复顺序**：P3，低优先。两端取齐 `hasSearch` 判定即可，补一条对应双端用例。
+
+**目标验证命令**：`pnpm vitest run tests/react/DataTableWithToolbar.spec.tsx tests/vue/DataTableWithToolbar.spec.ts`。
+
+---
+
+#### C22-4 健康面（toolbar/filter/card/列隐藏锁定双端一致）+ generated `TableToolbar` 口径微瑕 — **P3 / 观察**
+
+**发现问题**
+
+- ✅ 健康面（无需动作，正面回答 ROADMAP「过滤值更新是否双端一致」「toolbar/filter/card mode」「列隐藏/锁定」关注点）：
+  - **过滤值更新双端一致**：两端 `setFilterValue` 均 `nextFilters = { ...resolvedFilters, [key]: value }`，受控（`filter.value !== undefined`）不写内部状态、非受控才写，载荷经 React `onFiltersChange` + `toolbar.onFiltersChange`（[DataTableWithToolbar.tsx:296](../packages/react/src/components/DataTableWithToolbar.tsx)–[:297](../packages/react/src/components/DataTableWithToolbar.tsx)）↔ Vue `emit('filters-change')`（[DataTableWithToolbar.ts:462](../packages/vue/src/components/DataTableWithToolbar.ts)）一致；双端 spec 各覆盖「emits filter and pagination changes」「object filter values」与 custom-filter `setValue`/`setFilter`。
+  - **列隐藏 / 锁定双端一致**：`columnSettings.lockedColumnKeys` / 列级 `hideable === false` / `columnLockable` 转发一致；spec 覆盖 toggle 可见性、locked / non-hideable 禁用、受控模式只回调不改内部、lock aria-label 的 labels / locale 本地化。
+  - **card mode 转发一致**：`responsiveMode`/`cardBreakpoint`/`cardLayout`/`cardClassName`/`renderCard` 双端转发给内部 Table；Vue 另透传 `#card` 作用域插槽且优先于 `renderCard`（已测）。
+  - `previousPageSize*` 的 page-size-change 追踪、lazy locale 解析（immediate + async resolveId 守卫）、bulk-action 选中徽章双端对称。
+  - `filtersExtra`（React prop 节点 / 函数 ↔ Vue `#filters-extra` 插槽）与 toolbar `render`（React ↔ Vue `#toolbar` 插槽）属**文档化的跨框架惯例映射**（[props/composite.md:80](../skills/tigercat/references/shared/props/composite.md)、composite.ts:1062 注释），非缺陷。
+- 🟢 P3｜generated 文档对 `TableToolbar`「组件 vs 配置型」口径不一：`component-index.md` route map（第 81 行）与 `shared/api-summary.md`（第 152 行 Components 列）仍把 `TableToolbar` 列为**组件**；而 `shared/props/composite.md`（第 80 行，同由 `generate-api-docs.mjs` 生成）已注明「框架实现中**不作为独立组件导出**」。实际双端 `index` **无 `TableToolbar` 导出**，仅 `TableToolbarProps` 配置型 + 由 `DataTableWithToolbar` inline 渲染。属生成器表述口径问题。
+
+**公共内容决策**：健康面保持，不动 core 逻辑。文档口径走「先改 `scripts/generate-api-docs.mjs` 源（让 index / summary 对 `TableToolbar` 的「组件」表述与 props 文档一致，例如标注为配置型 / non-exported），再重新生成 references」。
+
+**建议修复顺序**：P3，随生成器下次维护一并校正；健康面无需动作。
+
+**目标验证命令**：`pnpm vitest run tests/react/DataTableWithToolbar.spec.tsx tests/vue/DataTableWithToolbar.spec.ts`、`pnpm docs:api:check`。
+
+---
+
+#### C22 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| Vue 声明 props / 公开类型是 `TableProps` 手维子集，~20 能力未类型化（C22-1） | 走任务 H：Vue props 以 core `TableProps` 为单一事实源派生，对齐 React 全量面；过 `api:baseline:check` | **P2** |
+| core `DataTableWithToolbarProps` ghost 型 + Vue 导出反向不一致（C22-2） | 走任务 H：core 型作单一事实源并补 toolbar 级回调；Vue 暴露与组件一致的 props 型；合 C18-4/C04-6/C12-3 | **P2** |
+| `hasSearch` 无 `toolbar` 时双端分歧（C22-3） | 框架层一致性收敛，择一语义两端对齐 | P3 |
+| 健康面（过滤 / 列隐藏锁定 / card 转发双端一致）+ generated `TableToolbar` 口径微瑕（C22-4） | 健康面保持；文档口径改 `generate-api-docs.mjs` 源后再生成 | P3 / 观察 |
+
+---
+
+#### C22 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| 比对 React `extends TableProps` vs Vue 声明 props | React `...tableProps`/`...remainingTableProps` 全量透传；Vue 手维 allowlist（116-252 + 804-837）缺约 20 个 Table prop | C22-1 |
+| 列举 Vue 未声明的 Table 能力 | expandable、virtual/autoVirtual/virtualHeight/virtualItemHeight/autoVirtualThreshold/virtualThreshold、editable/editableCells、filterMode/advancedFilterRules、columnDraggable/rowDraggable、summaryRow、groupBy、exportable/exportFormat/exportFilename、cardSelectionPosition/cardPadding/cardFieldGap | C22-1 |
+| grep core `DataTableWithToolbarProps` 消费者 | 仅 composite.ts 定义 + React 本地同名定义 / 再导出；两端组件均不 `import` core 版（ghost） | C22-2 |
+| 比对双端 index 导出 | React 显式导出本地全量型（覆盖 core）；Vue 无本地同名导出，`export *` 带出 core 全量型（≈50）vs 实现子集（≈30）反向不一致 | C22-2 |
+| 比对 `hasSearch`（无 toolbar） | React `toolbar && (...)` 短路为 false 不渲染；Vue `!toolbar` 时返回 `hasSearchListener` 渲染 | C22-3 |
+| grep 双端 spec / example 的 expandable/virtual/editable/export | 均无——C22-1 缺口为 latent、未被测试锁定 | C22-1 |
+| 比对 `setFilterValue` 双端 | `nextFilters = {...resolvedFilters,[key]:value}`、受控不写内部、载荷一致；spec 各覆盖 emits filter / object filter / custom setValue+setFilter | C22-4 健康面 |
+| 比对 generated `TableToolbar` 表述 | `component-index.md`/`api-summary.md` 列为「组件」；`props/composite.md` 注「不作为独立组件导出」；双端 index 无 `TableToolbar` 导出 | C22-4 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 2 文件 63 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出（注：现有门禁不校验 Vue 导出型 vs 组件实参的反向漂移，故 C22-2 不被门禁拦截） | C22 基线 |
+
+> 本轮 C22 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用本机 pnpm 11.9.0（与 `packageManager` 声明的 `pnpm@11.9.0` 一致）实跑 C22 目标 vitest（2 文件 63 测试通过）、`pnpm api:validate`（一致性检查通过，0 问题）、`pnpm types:check`（全部 props 类型导出）与 `git diff --check -- docs/ROADMAP.md docs/ROADMAP_CHECK.md`（通过），均为只读校验、未改动源码。

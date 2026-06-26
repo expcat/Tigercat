@@ -184,7 +184,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Table。
 - 重点：体量最大，单独扫描 fixed columns、pagination、selection、resize、export、i18n、card/virtual 推荐边界。
 
-##### C22 DataTableWithToolbar 单组
+##### C22 DataTableWithToolbar 单组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C22 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：DataTableWithToolbar、TableToolbar。
 - 重点：toolbar/filter/card mode、列隐藏/锁定、Table 共享边界、过滤值更新是否双端一致。
