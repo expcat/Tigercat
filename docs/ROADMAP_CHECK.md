@@ -2,13 +2,14 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）
 verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
 source-c14: 实读 Select/AutoComplete 全链路——core 类型 types/{select,auto-complete}.ts、core 工具 utils/{select-utils,auto-complete-utils,picker-utils}.ts、React 实现 components/Select.tsx 与 Select/{state,render-option,types,icons}、components/AutoComplete.tsx、Vue 实现 components/{Select,AutoComplete}.ts、tests/{react,vue}/{Select,AutoComplete}.spec.* 与 tests/core/{picker-utils,select-utils}.spec.ts、examples SelectDemo/AutoCompleteDemo、generated component-index；grep 取证 allowFreeInput 双端零消费、Select virtual/listHeight 双端零消费、getPickerTriggerKeyAction 仅 TreeSelect/Cascader 消费而 Select 未用；以 packageManager pnpm 11.9.0 实跑 C14 目标 vitest（6 文件 190 测试通过）与 api:validate / types:check（均通过），未改动源码。
 source-c15: 实读 Tree/TreeSelect/Cascader/Transfer 全链路——core 类型 types/{tree,tree-select,cascader,transfer}.ts、core 工具 utils/{tree-utils,tree-select-utils,cascader-utils,transfer-utils,picker-utils}.ts、React 实现 components/Tree.tsx 与 Tree/{state,render-node,render-row,types,icons}、components/{TreeSelect,Cascader,Transfer}.tsx、Vue 实现 components/{Tree,TreeSelect,Cascader,Transfer}.ts、tests/{react,vue}/{Tree,TreeSelect,Cascader,Transfer}.spec.* 与 tests/core/{tree-utils,picker-utils}.spec.ts、examples Tree/TreeSelect/Cascader/Transfer demo、generated component-index/shared props/api-summary；grep 取证 virtual/VirtualList、showSearch/filter、clear aria、Transfer split/filter、core direct spec 覆盖；实跑 C15 目标 vitest（10 文件 285 测试通过）、api:validate、types:check（均通过），未改动源码。
 source-c16: 实读 DatePicker/Calendar 全链路——core 类型 types/{datepicker,calendar}.ts、core 工具 utils/{date-utils,calendar-utils,datepicker-i18n,datepicker-styles}.ts 与 utils/i18n/datepicker-locales/*、React 实现 components/DatePicker.tsx + DatePicker/{state,render-calendar,render-mobile,types}.ts(x)、components/Calendar.tsx、Vue 实现 components/{DatePicker,Calendar}.ts、tests/{core/date-utils,core/datepicker-i18n,react/DatePicker,vue/DatePicker,react/Calendar,vue/Calendar}.spec.*、examples DatePickerDemo/CalendarDemo、generated component-index/i18n；grep 取证 core CalendarProps 双端零消费、WEEKDAYS/MONTHS/getMonthDays 仅 Calendar 消费、getDatePickerLabels 仅 DatePicker 消费、getIntlOptionsFromDateFormat 五分支全等、datepicker-i18n 7 语言 inline map vs 13 preset 的 6 个 preset-only 语言回落英文；以本机 pnpm 11.9.0 实跑 C16 目标 vitest（6 文件 117 测试通过）、api:validate（一致性 0 问题）、types:check（全部 props 类型导出），均通过，未改动源码。
+source-c17: 实读 TimePicker/Countdown/CronEditor 全链路——core 类型 types/{timepicker,countdown,cron-editor}.ts、core 工具 utils/{time-utils,timepicker-utils,countdown-utils,cron-editor-utils}.ts、React 实现 components/TimePicker.tsx 与 TimePicker/{state,render-desktop,render-mobile,types,icons}、components/{Countdown,CronEditor}.tsx、Vue 实现 components/{TimePicker,Countdown,CronEditor}.ts、tests/{core,react,vue} 9 个定向 spec、examples TimePickerDemo/CountdownDemo/CronEditorDemo、generated component-index 与 shared/props/{form,data}.md；grep 取证 TimePicker 秒级范围判断、秒列禁用逻辑、CronEditor className 透传、Countdown now/tick 测试契约；实跑 C17 目标 vitest（9 文件 174 测试通过）、pnpm run api:validate、pnpm run types:check（均通过），未改动源码。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -2669,3 +2670,88 @@ const getDefaultTarget = () => window
 | 目标 vitest、`api:validate`、`types:check` | ✅ vitest 6 文件 117 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出 | C16 基线 |
 
 > 本轮 C16 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以本机 pnpm 11.9.0 实跑 C16 目标 vitest（6 文件 117 测试通过）、`pnpm api:validate`（一致性 0 问题）与 `pnpm types:check`（全部 props 类型导出），均为只读校验、未改动仓库。
+
+---
+
+### C17 时间组（TimePicker / Countdown / CronEditor）— 已扫描（2026-06-27）
+
+**扫描范围**：TimePicker、Countdown、CronEditor 三个组件的全链路——core 类型 [timepicker.ts](../packages/core/src/types/timepicker.ts)、[countdown.ts](../packages/core/src/types/countdown.ts)、[cron-editor.ts](../packages/core/src/types/cron-editor.ts)，core 工具 [time-utils.ts](../packages/core/src/utils/time-utils.ts)、[timepicker-utils.ts](../packages/core/src/utils/timepicker-utils.ts)、[countdown-utils.ts](../packages/core/src/utils/countdown-utils.ts)、[cron-editor-utils.ts](../packages/core/src/utils/cron-editor-utils.ts)，React 实现 [TimePicker.tsx](../packages/react/src/components/TimePicker.tsx) 与 `TimePicker/{state,render-desktop,render-mobile,types,icons}`、[Countdown.tsx](../packages/react/src/components/Countdown.tsx)、[CronEditor.tsx](../packages/react/src/components/CronEditor.tsx)，Vue 实现 [TimePicker.ts](../packages/vue/src/components/TimePicker.ts)、[Countdown.ts](../packages/vue/src/components/Countdown.ts)、[CronEditor.ts](../packages/vue/src/components/CronEditor.ts)，tests/{core,react,vue} 9 个定向 spec，examples TimePickerDemo/CountdownDemo/CronEditorDemo，以及 generated references（component-index.md、shared/props/{form,data}.md、shared/api-summary.md）。
+
+**结论速览**：C17 基线健康：目标 vitest、API 校验、公共类型导出检查均通过；无 P1。TimePicker 的 i18n、键盘 roving focus、12/24 小时显示、范围排序和步进列表已有 core helper + 双端测试覆盖。Countdown 的格式化、payload、finish、interval 与 `now` 初始值行为已由 core/React/Vue 测试锁定。需记录的主要问题是 **TimePicker 秒级值与分钟级范围判断的契约不完整**；另有 CronEditor 的 `className` 透传与 core props 说明存在 Vue 侧小偏差。
+
+#### C17-1 TimePicker `minTime`/`maxTime` 只按分钟比较，秒级值与 `showSeconds` 场景存在契约缺口 — **P2**
+
+- 🟠 P2｜core `TimePickerProps` 允许 `value/defaultValue` 使用 `HH:mm` 或 `HH:mm:ss`，组件也支持 `showSeconds` 与 `secondStep`；[parseTime](../packages/core/src/utils/time-utils.ts) 接受第三段 seconds 并校验 0-59。
+- 🟠 P2｜但 [isTimeInRange](../packages/core/src/utils/time-utils.ts) 只把当前值、`minTime`、`maxTime` 转成 `hours * 60 + minutes` 比较，忽略 seconds。若设置 `minTime="10:00:30"`、`maxTime="10:00:45"` 这类秒级边界，`10:00:00` 与 `10:00:59` 会被视为同一分钟内合法。
+- 🟠 P2｜React/Vue 双端小时、分钟列会调用 `isTimeInRange` 禁用越界项，但秒列没有对应禁用判断：React [render-desktop.tsx](../packages/react/src/components/TimePicker/render-desktop.tsx) 秒按钮始终用 `getTimePickerItemClasses(isSelected, false)`，Vue [TimePicker.ts](../packages/vue/src/components/TimePicker.ts) 秒按钮同样不传 disabled；移动端秒 `<option>` 也不禁用。
+- 🟠 P2｜现有测试覆盖分钟级边界、秒列选择、范围排序，但未覆盖秒级 `minTime/maxTime`。因此当前门禁通过，问题属于公开契约缺口而非现有测试失败。
+
+**公共内容决策**：`minTime/maxTime` 的有效域应由 core 单一 helper 定义，再由双端 UI 复用。后续需二选一：① 明确支持秒级边界，将 `isTimeInRange` 改为总秒比较并补 `isSecondDisabled`/秒列 disabled；② 明确范围 props 只承诺分钟级，收窄 JSDoc/generated references，并在 `showSeconds` 场景说明 seconds 不参与禁用。倾向方案①，因为 `parseTime` 与 value 契约已经接受秒级字符串。
+
+**建议修复顺序**：P2。先补 core `isTimeInRange` 秒级单测，再双端补秒列禁用与组件测试；最后同步 props 文档。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/core/timepicker-utils.spec.ts tests/react/TimePicker.spec.tsx tests/vue/TimePicker.spec.ts
+pnpm run api:validate
+pnpm run types:check
+```
+
+#### C17-2 CronEditor core `className` prop 与 Vue runtime 透传不完全一致 — **P3**
+
+- 🟢 P3｜core [CronEditorProps](../packages/core/src/types/cron-editor.ts) 暴露 `className?: string`，React [CronEditor.tsx](../packages/react/src/components/CronEditor.tsx) 直接合并 `className` 到 root。
+- 🟢 P3｜Vue [CronEditor.ts](../packages/vue/src/components/CronEditor.ts) 运行时 props 没有 `className`，root 只合并 `attrs.class`。这与同组 Vue Countdown（显式支持 `className` 并合并 `attrs.class`）以及 Vue TimePicker（接口/props 都含 `className`）不完全一致。
+- 🟢 P3｜因为 Vue 标准 `class` attr 可正常工作，且 generated props 只列 core 前 3 个 props，当前不是功能性阻断；但 core props 公开了 `className`，Vue 侧没有同名 runtime prop，长期会增加文档与框架 parity 解释成本。
+
+**公共内容决策**：低风险补齐 Vue `className` prop 更符合现有 core/React/同组组件口径；若维护者希望 Vue 只推荐标准 `class`，则应收窄 core/generator 对 Vue 的说明，避免把 React 风格 `className` 暗示为双端一致。
+
+**建议修复顺序**：P3。可随下一批 Vue className 透传清理统一处理，不需要为 C17 单独开 API 变更。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/CronEditor.spec.tsx tests/vue/CronEditor.spec.ts
+pnpm run api:validate
+pnpm run types:check
+```
+
+#### C17-3 Countdown 纯逻辑与双端运行时契约健康（观察）— **无缺陷**
+
+- ✅ core [countdown-utils.ts](../packages/core/src/utils/countdown-utils.ts) 已集中处理 timestamp 解析、remaining clamp、parts 拆分、格式 token、payload 生成；tests/core 覆盖数字/Date/ISO/非法值、day-aware format、毫秒、zero finished。
+- ✅ React/Vue Countdown 都用 core `getCountdownRemaining`、`formatCountdown`、`createCountdownPayload`，并测试了初始 `now`、Date/ISO value、interval tick、`onChange`/`change` payload、finish 只触发一次、interval=0 不启动 timer、value/now rerender。
+- ✅ `now` 的行为在双端测试中明确为“初始/重算使用 `now`，tick 使用实时 `Date.now()`”，本轮按既有测试契约视为设计选择，不记录为缺陷。
+
+**公共内容决策**：保持现状。若未来要支持“完全由 `now` 驱动的受控倒计时”，应新增明确 props 或文档模式，不改变当前 interval tick 语义。
+
+**建议修复顺序**：无。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/core/countdown-utils.spec.ts tests/react/Countdown.spec.tsx tests/vue/Countdown.spec.ts
+```
+
+---
+
+#### C17 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| TimePicker 秒级范围判断（C17-1） | 倾向 core 改总秒比较 + 双端秒列 disabled；或文档明确分钟级契约 | **P2** |
+| CronEditor Vue `className` 透传（C17-2） | 补 Vue runtime prop，或收窄 Vue 文档为标准 `class` attr | P3 |
+| Countdown now/tick 契约（C17-3） | 保持现状；如需受控 now，另设明确模式 | 观察 |
+
+---
+
+#### C17 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| 比对 `parseTime` 与 `isTimeInRange` | `parseTime` 接受 seconds；`isTimeInRange` 只比较小时/分钟 | C17-1 |
+| grep 秒列 disabled / `isSecondDisabled` | 双端仅小时/分钟列禁用；秒列按钮和移动端 option 不禁用 | C17-1 |
+| 比对 CronEditor `className` | core/React 有同名 prop；Vue 只合并 `attrs.class` | C17-2 |
+| 比对 Countdown core + 双端测试 | 格式化、payload、finish、interval、`now` 初始值均有测试锁定 | C17-3 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 9 文件 174 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C17 基线 |
+
+> 本轮 C17 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0 实跑 C17 目标 vitest（9 文件 174 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动仓库。

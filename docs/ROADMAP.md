@@ -153,7 +153,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：DatePicker、Calendar。
 - 重点：DatePicker 体量较大，检查 date-utils、datepicker locale、键盘导航、范围/面板状态。
 
-##### C17 时间组
+##### C17 时间组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C17 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：TimePicker、Countdown、CronEditor。
 - 重点：TimePicker 体量较大，检查 timepicker-utils、格式/解析、步进、倒计时和 cron 纯逻辑。
