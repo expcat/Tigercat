@@ -2,29 +2,76 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C19「图片展示组」（C19-1~C19-6）、C20「图片编辑组」（C20-1~C20-6）、C21「Table 单组」（C21-1~C21-6）、C22「DataTableWithToolbar 单组」（C22-1~C22-4）、C23「VirtualTable 单组」（C23-1~C23-5）、C24「虚拟列表组」（C24-1~C24-5）、C25「图表基础组」（C25-1~C25-5）、C26「笛卡尔图表组」（C26-1~C26-4）、C27「径向图表组」（C27-1~C27-5）、C28「专用图表组」（C28-1~C28-5）、C29「复合内容组」（C29-1~C29-4）、C30「工作流复合组」（C30-1~C30-4）、C31「高级编辑器组」（C31-1~C31-5）、C32「交互能力组」（C32-1~C32-5）
 verified-date: 2026-06-27
-source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
-source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
-source-c14: 实读 Select/AutoComplete 全链路——core 类型 types/{select,auto-complete}.ts、core 工具 utils/{select-utils,auto-complete-utils,picker-utils}.ts、React 实现 components/Select.tsx 与 Select/{state,render-option,types,icons}、components/AutoComplete.tsx、Vue 实现 components/{Select,AutoComplete}.ts、tests/{react,vue}/{Select,AutoComplete}.spec.* 与 tests/core/{picker-utils,select-utils}.spec.ts、examples SelectDemo/AutoCompleteDemo、generated component-index；grep 取证 allowFreeInput 双端零消费、Select virtual/listHeight 双端零消费、getPickerTriggerKeyAction 仅 TreeSelect/Cascader 消费而 Select 未用；以 packageManager pnpm 11.9.0 实跑 C14 目标 vitest（6 文件 190 测试通过）与 api:validate / types:check（均通过），未改动源码。
-source-c15: 实读 Tree/TreeSelect/Cascader/Transfer 全链路——core 类型 types/{tree,tree-select,cascader,transfer}.ts、core 工具 utils/{tree-utils,tree-select-utils,cascader-utils,transfer-utils,picker-utils}.ts、React 实现 components/Tree.tsx 与 Tree/{state,render-node,render-row,types,icons}、components/{TreeSelect,Cascader,Transfer}.tsx、Vue 实现 components/{Tree,TreeSelect,Cascader,Transfer}.ts、tests/{react,vue}/{Tree,TreeSelect,Cascader,Transfer}.spec.* 与 tests/core/{tree-utils,picker-utils}.spec.ts、examples Tree/TreeSelect/Cascader/Transfer demo、generated component-index/shared props/api-summary；grep 取证 virtual/VirtualList、showSearch/filter、clear aria、Transfer split/filter、core direct spec 覆盖；实跑 C15 目标 vitest（10 文件 285 测试通过）、api:validate、types:check（均通过），未改动源码。
-source-c16: 实读 DatePicker/Calendar 全链路——core 类型 types/{datepicker,calendar}.ts、core 工具 utils/{date-utils,calendar-utils,datepicker-i18n,datepicker-styles}.ts 与 utils/i18n/datepicker-locales/*、React 实现 components/DatePicker.tsx + DatePicker/{state,render-calendar,render-mobile,types}.ts(x)、components/Calendar.tsx、Vue 实现 components/{DatePicker,Calendar}.ts、tests/{core/date-utils,core/datepicker-i18n,react/DatePicker,vue/DatePicker,react/Calendar,vue/Calendar}.spec.*、examples DatePickerDemo/CalendarDemo、generated component-index/i18n；grep 取证 core CalendarProps 双端零消费、WEEKDAYS/MONTHS/getMonthDays 仅 Calendar 消费、getDatePickerLabels 仅 DatePicker 消费、getIntlOptionsFromDateFormat 五分支全等、datepicker-i18n 7 语言 inline map vs 13 preset 的 6 个 preset-only 语言回落英文；以本机 pnpm 11.9.0 实跑 C16 目标 vitest（6 文件 117 测试通过）、api:validate（一致性 0 问题）、types:check（全部 props 类型导出），均通过，未改动源码。
-source-c17: 实读 TimePicker/Countdown/CronEditor 全链路——core 类型 types/{timepicker,countdown,cron-editor}.ts、core 工具 utils/{time-utils,timepicker-utils,countdown-utils,cron-editor-utils}.ts、React 实现 components/TimePicker.tsx 与 TimePicker/{state,render-desktop,render-mobile,types,icons}、components/{Countdown,CronEditor}.tsx、Vue 实现 components/{TimePicker,Countdown,CronEditor}.ts、tests/{core,react,vue} 9 个定向 spec、examples TimePickerDemo/CountdownDemo/CronEditorDemo、generated component-index 与 shared/props/{form,data}.md；grep 取证 TimePicker 秒级范围判断、秒列禁用逻辑、CronEditor className 透传、Countdown now/tick 测试契约；实跑 C17 目标 vitest（9 文件 174 测试通过）、pnpm run api:validate、pnpm run types:check（均通过），未改动源码。
-source-c18: 实读 Upload/FileManager/Signature 全链路——core 类型 types/{upload,signature,file-manager}.ts、core 工具 utils/{upload-utils,upload-labels,signature-utils,file-manager-utils}.ts（对照 locale-utils 的 DEFAULT_UPLOAD_LABELS/ZH_CN_UPLOAD_LABELS、tailwind-entry）、React components/{Upload,FileManager,Signature}.tsx 与 index.tsx 导出、Vue components/{Upload,FileManager,Signature}.ts 与 index.ts 导出、tests/{core,react,vue} 9 个定向 spec、examples {Upload,FileManager,Signature}Demo、generated component-index；grep 取证 Tailwind v4（core/package.json tailwindcss ^4.0.0）下 Upload 4 处 bg-opacity-* 失效、applyFileDragReorder 零组件消费、FileManager draggable 半接线、React FileManager Loading 硬编码 vs Vue locale、core FileManagerProps/columns 漂移死字段、formatFileSize vs formatFileSizeLabel 双实现、getFileExtension 重名异义；以 packageManager pnpm 11.9.0 实跑 C18 目标 vitest（9 文件 238 测试通过）与 api:validate / types:check（均通过），未改动源码。CropUpload 属 C20 排除。
-source-c19: 实读 Image/ImagePreview/ImageGroup/ImageViewer 全链路——core 类型 types/{image,image-viewer}.ts、core 工具 utils/{image-utils,image-viewer-utils,group-utils}.ts、React components/{Image,ImagePreview,ImageGroup,ImageViewer}.tsx 与 index 导出、Vue components/{Image,ImagePreview,ImageGroup,ImageViewer}.ts 与 index 导出、tests/core/{image-utils,image-viewer-gesture,group-utils}.spec.ts 与 tests/{react,vue} 9 个组件 spec（含 ImagePreview.ssr）、examples {Image,ImageViewer}Demo、generated component-index；grep 取证 ImagePreview/ImageViewer 两套近重复全屏查看器（ImageViewer 双端无 portal/无 body 滚动锁/nav 环绕 vs ImagePreview 夹紧）、image-utils vs image-viewer-utils 手势/图标重复（clampScale≡clampZoom、calculateTransform⊂getImageTransformStyle、5/7 图标 path 字节相同）、getTouchDistance 零组件消费、Vue ImageViewer locale prop 未声明在 VueImageViewerProps/core 且 React 无 locale、core ImageGroupProps 仅 preview 漂移、getImageGroupClasses 替换语义、previewTrigger='hover' 在 ImageGroup 内预览失效（latent）；以 packageManager pnpm 11.9.0 实跑 C19 目标 vitest（12 文件 244 测试通过）与 api:validate / types:check（均通过），未改动源码。ImageCropper/ImageAnnotation/CropUpload 属 C20 排除。
-source-c20: 实读 ImageCropper/ImageAnnotation/CropUpload 全链路——core 类型 types/{image,image-annotation}.ts、core 工具 utils/{image-utils,image-annotation-utils,crop-upload-utils}.ts、React components/{ImageCropper,ImageAnnotation,CropUpload}.tsx、Vue components/{ImageCropper,ImageAnnotation,CropUpload}.ts、tests/{core,react,vue} 9 个定向 spec、examples {ImageCropper,ImageAnnotation,CropUpload}Demo、generated component-index/shared props/api-summary；grep 取证 ImageCropper 静态 SVG mask id、CropUpload modalWidth 零消费、ImageAnnotation SVG role=button 键盘激活缺口、Vue selectedId/tool 无 update 事件、ImageAnnotationChangeMeta 未实现分支、硬编码编辑文案/aria；以 packageManager pnpm 11.9.0 实跑 C20 目标 vitest（9 文件 187 测试通过）与 api:validate / types:check（均通过），未改动源码。
-source-c22: 实读 DataTableWithToolbar / TableToolbar 全链路——core 类型 composite.ts（TableToolbar* 系列 + DataTableWithToolbarProps）与 types/table.ts 的 TableProps（共享边界对照）、React components/DataTableWithToolbar.tsx（569 行，extends Omit<TableProps,'className'|'onPageChange'> 全量透传）、Vue components/DataTableWithToolbar.ts（854 行，VueDataTableWithToolbarProps 手维子集 + inheritAttrs:false restAttrs 透传）、双端 index 导出、tests/{react,vue}/DataTableWithToolbar.spec.*（812/877 行）、examples DataTableWithToolbarDemo.{tsx,vue}、generated component-index/api-summary/props/composite 与 generator generate-api-docs.mjs；grep 取证 Vue 声明 props 缺 ~20 个 Table 能力（expandable/virtual 系/editable/filterMode/advancedFilterRules/列行拖拽/summaryRow/groupBy/export 系/cardSelectionPosition/cardPadding/cardFieldGap）、core DataTableWithToolbarProps 两端零消费且 Vue export * 反向不一致、hasSearch 无 toolbar 时双端分歧、setFilterValue 过滤值更新双端一致、TableToolbar 在 index/api-summary 列为组件而 props 文档注明非独立导出；以本机 pnpm 11.9.0（与 packageManager 一致）实跑 C22 目标 vitest（2 文件 63 测试通过）与 api:validate / types:check（均通过），未改动源码。Table 自身实现属 C21。
-source-c23: 实读 VirtualTable 全链路——core 类型 types/virtual-table.ts、core 工具 utils/virtual-table-utils.ts（对照 table-utils.ts 的 fixed column/colgroup/tableBaseClasses 逻辑）、React components/VirtualTable.tsx、Vue components/VirtualTable.ts、tests/core/virtual-table-utils.spec.ts、tests/{react,vue}/VirtualTable.spec.*、examples {react,vue3} VirtualTableDemo、benchmarks/virtual-table.bench.ts、generated component-index/shared props data+advanced/examples advanced；grep 取证 core VirtualTableProps 的 width/virtualizeColumns/rowClassName 与双端组件 props 漂移、React loading 硬编码 vs Vue locale、grid a11y/键盘事件缺口、table-fixed 与 Table border-separate/colgroup 复用差异、calculateVirtualRange 异常输入覆盖缺口；实跑 C23 目标 vitest（3 文件 86 测试通过）与 api:validate / types:check（均通过），未改动源码。C21/C22 已由远端更新合并；C23 本轮只扫描 VirtualTable。
-source-c24: 实读 VirtualList / InfiniteScroll 全链路——core 类型 types/{virtual-list,infinite-scroll}.ts、core 工具 utils/{virtual-list-utils,infinite-scroll-utils}.ts、React components/{VirtualList,InfiniteScroll}.tsx、Vue components/{VirtualList,InfiniteScroll}.ts、tests/core/{virtual-list-strategies,infinite-scroll-utils}.spec.ts、tests/{react,vue}/{VirtualList,InfiniteScroll}.spec.*、examples {react,vue3} {VirtualList,InfiniteScroll}Demo、benchmarks/{virtual-scroll-fps,core-utils}.bench.ts、generated component-index/shared props advanced/examples advanced；grep 取证 dynamicSizeStrategy/updateItemHeight 仅 core 测试消费、双端 VirtualList 未做 DOM measurement 回写、IntersectionObserver rootMargin 只覆盖 bottom/right、scroll fallback 已支持 inverse top/left、Vue VirtualList className 走 attrs 合并、advanced props 仅列 InfiniteScroll 3/9 与 VirtualList 3/8；实跑 C24 目标 vitest（6 文件 109 测试通过）与 api:validate / types:check（均通过），未改动源码。
-source-c25: 实读 ChartCanvas/ChartAxis/ChartGrid/ChartSeries/ChartLegend/ChartTooltip 全链路——core 类型 types/chart.ts（ChartCanvas/ChartAxis/ChartGrid/ChartSeries 与 ChartLegend/ChartTooltip 配置 mixin）、core 工具 utils/chart/{axis,scale,color,format}.ts、React/Vue Chart* 基础组件、tests/{react,vue}/ChartSubComponents.spec.*、tests/core/{chart-utils,chart-shared}.spec.ts、examples Chart* demo 与 generated charts references；grep 取证 ChartLegend/ChartTooltip 文档映射、gap 行为、legend a11y、tooltip 定位重复与测试覆盖；实跑 C25 目标 vitest（4 文件 176 测试通过）与 api:validate / types:check（均通过），未改动源码。
-source-c26: 实读 LineChart/AreaChart/BarChart/ScatterChart 全链路——core 类型 types/chart.ts（Line/Area/Bar/Scatter props）、core 工具 utils/{chart-utils,chart-shared,chart-interaction}.ts 与 utils/chart/{scale,path,axis,format,color}.ts、React components/{LineChart,AreaChart,BarChart,ScatterChart}.tsx 与 hooks/useChartInteraction.ts、Vue components/{LineChart,AreaChart,BarChart,ScatterChart}.ts 与 composables/useChartInteraction.ts、tests/core/{chart-utils,chart-shared,chart-interaction}.spec.ts、tests/{react,vue}/{LineChart,AreaChart,BarChart,ScatterChart}.spec.*、generated component-index/shared props/examples charts；grep 取证 Line/Area single-series color props 零消费、point hover/tooltip 不受 hoverable 控制且点级无键盘激活、降采样 API/helper/spec 零命中、React Bar rect 缺 role/aria label 而 Vue Bar/Scatter 已标注；实跑 C26 目标 vitest（11 文件 293 测试通过）与 api:validate / types:check（均通过），未改动源码。C24/C25 已在合并结果中记录；C26 本轮按 ROADMAP 可独立扫描。
-source-c27: 实读 PieChart/DonutChart/RadarChart/GaugeChart 全链路——core 类型 types/chart.ts（Pie/Donut/Radar/Gauge props）、core 工具 utils/{chart-utils,chart-shared,chart-interaction,gauge-chart-utils}.ts 与 utils/chart/{scale,path,format,color}.ts、React components/{PieChart,DonutChart,RadarChart,GaugeChart}.tsx 与 hooks/useChartInteraction.ts、Vue components/{PieChart,DonutChart,RadarChart,GaugeChart}.ts 与 composables/useChartInteraction.ts、tests/core/{chart-utils,chart-shared,chart-interaction,gauge-chart-utils}.spec.ts、tests/{react,vue}/{PieChart,DonutChart,RadarChart,GaugeChart}.spec.*、generated component-index/shared props/examples charts 与 examples demo；grep 取证 Gauge tooltip props 无实现、Donut animated 公开 no-op、Vue Pie/Donut legendFormatter 缺口、Gauge min=max/tickCount=0/小半径极值、React Pie/Donut slice a11y 与 Radar point 键盘路径缺口、Pie mixed zero/negative value 空 path；实跑 C27 目标 vitest（12 文件 297 测试通过）与 api:validate / types:check（均通过），未改动源码。C24 已在合并结果中记录；C27 本轮按 ROADMAP 可独立扫描。
-source-c28: 实读 FunnelChart / HeatmapChart / TreeMapChart / SunburstChart / OrgChart / Gantt 全链路——core 类型 types/{chart,gantt,org-chart}.ts、core 工具 utils/{funnel-chart,heatmap-chart,treemap-chart,sunburst-chart,org-chart,gantt}-utils.ts、React/Vue 对应组件、双端 index 导出、tests/{core,react,vue} 18 个定向 spec、examples {react,vue3} 专用图表 demo、generated component-index/shared props charts/examples charts/api-summary；grep 取证 Heatmap 空矩阵 min/max、Funnel 非正值、Gantt invalid date、TreeMap/Sunburst memo cache、OrgChart/Gantt disabled click/hover、charts props 文档覆盖。直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，corepack 不在 PATH；以 npx -y pnpm@11.9.0 实跑 C28 目标 vitest（18 文件 238 测试通过）与 api:validate / types:check（均通过），未改动源码。
-source-c29: 实读 ActivityFeed/ChatWindow/CommentThread 全链路——core 类型 types/composite.ts（C29 三组件 props）、core 工具 utils/{activity-feed-utils,chat-window-utils,comment-thread-utils}.ts、React components/{ActivityFeed,ChatWindow,CommentThread}.tsx、Vue components/{ActivityFeed,ChatWindow,CommentThread}.ts、底层 Timeline 对照、tests/{react,vue}/{ActivityFeed,ChatWindow,CommentThread}.spec.*、tests/core/composite-a11y-roles.spec.tsx、tests/core/modern-theme-interaction.spec.ts、examples demo、generated component-index/shared props/examples composite 与 release notes；grep 取证 ChatWindow statusVariant 零消费、CommentThread Vue onExpandedChange 类型/文档漂移、ActivityFeed/Timeline 全量 map 渲染、custom render/action callback 覆盖缺口；实跑 C29 目标 vitest（8 文件 81 测试通过）与 api:validate / types:check（均通过），未改动源码。C24/C28 已在合并结果中记录；C29 本轮按 ROADMAP 可独立扫描。
-source-c30: 实读 FormWizard / TaskBoard / Kanban 全链路——core 类型 types/composite.ts 与 types/kanban.ts、core 工具 utils/{form-wizard-utils,task-board-utils,task-board-drag,kanban-utils,locale-utils}.ts、React/Vue 组件 components/{FormWizard,TaskBoard,Kanban}、tests/{core,react,vue} 定向 spec、custom-text spec、examples {FormWizard,TaskBoard,Kanban}Demo，以及 generated component-index/shared props composite+advanced/examples composite+advanced/api-summary；grep 取证 Kanban swimlanes 类型与组件消费、TaskBoard add-column 文案、generated props 覆盖、FormWizard current clamp。以 npx -y pnpm@11.9.0 实跑 C30 目标 vitest（14 文件 314 测试通过）、api:validate 与 types:check（均通过），未改动源码。
-source-c31: 实读 CodeEditor/RichTextEditor/MarkdownEditor 全链路——core 类型 types/{code-editor,rich-text-editor,markdown-editor}.ts、core 工具/引擎 utils/{code-editor-utils,code-highlighter,rich-text-editor-utils,rich-text-engine,markdown-editor-utils}.ts、React components/{CodeEditor,RichTextEditor,MarkdownEditor}.tsx、Vue components/{CodeEditor,RichTextEditor,MarkdownEditor}.ts、tests/core/{code-highlighter,code-editor-utils,rich-text-engine,rich-text-editor-utils,markdown-editor-utils}.spec.ts、tests/{react,vue}/{CodeEditor,RichTextEditor,MarkdownEditor}.spec.*、examples demo、generated component-index/shared props advanced/examples advanced/api-summary；grep 取证 MarkdownEditor 空 preview placeholder 直入 innerHTML、CodeEditor highlightActiveLine 零消费、RichTextEditor mode 零消费、RichTextEditor custom toolbar action 绕过 engine notifyChange、engine/highlighter props 与 generated references 漂移；实跑 C31 目标 vitest（11 文件 275 测试通过）与 api:validate / types:check（均通过），未改动源码。C24/C28/C30 已在合并结果中记录；C31 本轮按 ROADMAP 可独立扫描。
-source-c32: 实读 Drag/useDrag、Carousel、Resizable、Splitter 全链路——core 类型 types/{drag,carousel,resizable,splitter}.ts、core 工具 utils/{drag,carousel-utils,resizable-utils,splitter-utils}.ts、React hook/components {hooks/useDrag,components/{Carousel,Resizable,Splitter}}、Vue composable/components {composables/useDrag,components/{Carousel,Resizable,Splitter}}、tests/{core,react,vue} 14 个定向 spec、examples {UseDrag,Carousel,Resizable,Splitter}Demo、generated component-index/shared props layout+advanced/examples layout+advanced/api-summary、scripts/generate-api-docs.mjs；grep 取证 Splitter sizes 双端语义、Resizable handle keyboard/ARIA、Vue useDrag options 快照、Drag generated refs 缺口。以 npx -y pnpm@11.9.0 实跑 C32 目标 vitest（14 文件 374 测试通过）、api:validate 与 types:check（均通过），未改动源码。
-note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
+scope:
+  - A: 公共 API、导出面与文档生成链路
+  - B: Core 工具、类型、主题、i18n、token
+  - C01: 基础动作与文本（C01-1~C01-8）
+  - C02: 头像与状态展示（C02-1~C02-5）
+  - C03: 布局骨架（C03-1~C03-2）
+  - C04: 内容容器（C04-1~C04-8）
+  - C05: 导航轻量组（C05-1~C05-5）
+  - C06: Steps/Tabs（C06-1~C06-6）
+  - C07: Menu 单组（C07-1~C07-8）
+  - C08: Overlay 触发器（C08-1~C08-7）
+  - C09: Feedback 容器（C09-1~C09-7）
+  - C10: 消息通知（C10-1~C10-7）
+  - C11: Form 单组（C11-1~C11-6）
+  - C12: 输入基础组（C12-1~C12-6）
+  - C13: 选择/切换基础组（C13-1~C13-4）
+  - C14: Select 单组（C14-1~C14-8）
+  - C15: 层级选择组（C15-1~C15-5）
+  - C16: 日期组（C16-1~C16-8）
+  - C17: 时间组（C17-1~C17-3）
+  - C18: Upload 单组（C18-1~C18-8）
+  - C19: 图片展示组（C19-1~C19-6）
+  - C20: 图片编辑组（C20-1~C20-6）
+  - C21: Table 单组（C21-1~C21-6）
+  - C22: DataTableWithToolbar 单组（C22-1~C22-4）
+  - C23: VirtualTable 单组（C23-1~C23-5）
+  - C24: 虚拟列表组（C24-1~C24-5）
+  - C25: 图表基础组（C25-1~C25-5）
+  - C26: 笛卡尔图表组（C26-1~C26-4）
+  - C27: 径向图表组（C27-1~C27-5）
+  - C28: 专用图表组（C28-1~C28-5）
+  - C29: 复合内容组（C29-1~C29-4）
+  - C30: 工作流复合组（C30-1~C30-4）
+  - C31: 高级编辑器组（C31-1~C31-5）
+  - C32: 交互能力组（C32-1~C32-5）
+sources:
+  - id: A
+    read:
+      - packages/*/src/index*、package.json、api-reports
+      - scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs
+      - skills/tigercat/references
+    validation: api:validate、types:check、api:baseline、docs:api
+  - id: B
+    read:
+      - packages/core/src/{types,utils,themes,theme-runtime,tokens}
+      - Tailwind entry/plugin、tokens、ConfigProvider/DatePicker、core tests
+    validation: corepack pnpm 11.9.0；types:check、api:validate、目标 vitest
+  - id: C01-C12
+    read: core 类型/工具、React/Vue 实现、tests、examples、generated references
+    validation: C04、C06-C12 跑目标 vitest/API/type；C01-C03/C05 以静态实读与局部门禁记录为准
+  - id: C13-C20
+    read: core 类型/工具、双端实现、定向 spec、examples、generated references
+    validation: C14-C20 通过目标 vitest、api:validate、types:check
+  - id: C21-C24
+    read: Table、DataTableWithToolbar、VirtualTable、VirtualList、InfiniteScroll 相关链路
+    validation: C22-C24 通过目标 vitest、api:validate、types:check
+  - id: C25-C28
+    read: 图表类型、core chart 工具、双端图表实现、tests、examples、charts references
+    validation: 各组通过目标 vitest、api:validate、types:check
+  - id: C29-C32
+    read: 复合内容、工作流复合、高级编辑器、交互能力相关链路
+    validation: 各组通过目标 vitest、api:validate、types:check
+verification-defaults:
+  - 使用仓库声明的 pnpm 11.9.0；本机 bare pnpm 可能因 engines.pnpm 拦截。
+  - 扫描类任务优先跑目标 vitest、api:validate、types:check，再对文档改动跑 prettier 与 git diff --check。
+note:
+  - 本文仅记录可验证发现与修复建议。
+  - 扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。
+  - 详细证据见各任务正文。
 -->
 
 > 本文是对 [ROADMAP.md](ROADMAP.md)「最新一轮全代码扫描」按任务顺序执行的扫描结果记录。**不改组件代码、不改公共 API**；每条发现给出 `发现问题 / 公共内容决策 / 建议修复顺序 / 目标验证命令`。优先级：P1 影响发布门禁/正确性；P2 影响文档准确性与可维护性；P3 清理项。
@@ -3772,7 +3819,7 @@ pnpm vitest run tests/core/virtual-list-strategies.spec.ts tests/core/infinite-s
 
 ### C25 图表基础组 单组 — 已扫描（2026-06-27）
 
-**扫描范围**：6 个图表基础原语的全链路——core 类型 [chart.ts](../packages/core/src/types/chart.ts)（`ChartCanvasProps`/`ChartAxisProps`/`ChartGridProps`/`ChartSeriesProps` 与高层配置 mixin `ChartLegendProps`/`ChartTooltipProps`/`ChartLegendItem`）、core 工具 [chart/axis.ts](../packages/core/src/utils/chart/axis.ts)、[scale.ts](../packages/core/src/utils/chart/scale.ts)、[color.ts](../packages/core/src/utils/chart/color.ts)、[format.ts](../packages/core/src/utils/chart/format.ts)、React 实现 [ChartCanvas.tsx](../packages/react/src/components/ChartCanvas.tsx)/[ChartAxis.tsx](../packages/react/src/components/ChartAxis.tsx)/[ChartGrid.tsx](../packages/react/src/components/ChartGrid.tsx)/[ChartSeries.tsx](../packages/react/src/components/ChartSeries.tsx)/[ChartLegend.tsx](../packages/react/src/components/ChartLegend.tsx)/[ChartTooltip.tsx](../packages/react/src/components/ChartTooltip.tsx)、Vue 同名实现、`tests/{react,vue}/ChartSubComponents.spec.*`、`tests/core/chart-utils.spec.ts`、`tests/core/chart-shared.spec.ts`、examples Chart* demo，以及 generated references（[shared/props/charts.md](../skills/tigercat/references/shared/props/charts.md)、component-index）。LineChart/AreaChart/BarChart/ScatterChart 等高层图表与 `format.ts` 的 gradient-prefix、`color.ts` 的点/柱过渡类归 C26–C28，本轮不展开。
+**扫描范围**：6 个图表基础原语的全链路——core 类型 [chart.ts](../packages/core/src/types/chart.ts)（`ChartCanvasProps`/`ChartAxisProps`/`ChartGridProps`/`ChartSeriesProps` 与高层配置 mixin `ChartLegendProps`/`ChartTooltipProps`/`ChartLegendItem`）、core 工具 [chart/axis.ts](../packages/core/src/utils/chart/axis.ts)、[scale.ts](../packages/core/src/utils/chart/scale.ts)、[color.ts](../packages/core/src/utils/chart/color.ts)、[format.ts](../packages/core/src/utils/chart/format.ts)、React 实现 [ChartCanvas.tsx](../packages/react/src/components/ChartCanvas.tsx)/[ChartAxis.tsx](../packages/react/src/components/ChartAxis.tsx)/[ChartGrid.tsx](../packages/react/src/components/ChartGrid.tsx)/[ChartSeries.tsx](../packages/react/src/components/ChartSeries.tsx)/[ChartLegend.tsx](../packages/react/src/components/ChartLegend.tsx)/[ChartTooltip.tsx](../packages/react/src/components/ChartTooltip.tsx)、Vue 同名实现、`tests/{react,vue}/ChartSubComponents.spec.*`、`tests/core/chart-utils.spec.ts`、`tests/core/chart-shared.spec.ts`、examples Chart\* demo，以及 generated references（[shared/props/charts.md](../skills/tigercat/references/shared/props/charts.md)、component-index）。LineChart/AreaChart/BarChart/ScatterChart 等高层图表与 `format.ts` 的 gradient-prefix、`color.ts` 的点/柱过渡类归 C26–C28，本轮不展开。
 
 **结论速览**：6 个原语的坐标数学双端逐行一致、由 core 守卫（`getChartAxisTicks` 对 `min===max`/非有限值回退、scale 工厂处理 `span===0`/n=0,1），无硬编码用户可见文案，ResizeObserver 生命周期对称，Canvas 有 `<title>`/`<desc>`，C25 目标 vitest/API/type 门禁均通过。**无 P1**。需处理项集中在 public surface 与双端一致性：① ChartLegend/ChartTooltip 的 generated 文档渲染了 core 配置 mixin 而非组件实际 props，文档误导（P2）；② ChartLegend `gap` prop 双端行为分歧 + 冗余 marginRight（P2）；③ 交互态 legend 项 `<button>` 带 `role="listitem"` 覆盖按钮语义、切换态无 `aria-pressed`（P3）；④ ChartTooltip 视口溢出定位逻辑双端逐行重复，未沉 core（P3）；⑤ Vue legend hover/leave emit 未测 + ChartSeries 弱断言 + Canvas slot / Vue list key 小幅 parity（P3）。
 
@@ -3884,28 +3931,28 @@ pnpm vitest run tests/react/ChartSubComponents.spec.tsx tests/vue/ChartSubCompon
 
 #### C25 公共拆分/合并决策汇总（供任务 H 汇总）
 
-| 项 | 决策 | 优先级 |
-| --- | --- | --- |
-| ChartLegend/ChartTooltip generated 文档渲染 core 配置 mixin（C25-1） | 改生成器「组件名→props 类型」映射或重命名消歧，再重生成 references | **P2** |
-| ChartLegend `gap` prop 双端行为分歧 + 冗余 marginRight（C25-2） | 双端统一 `gap` 语义为容器 flex 间距，移除冗余 marginRight，可抽 core 布局 helper | **P2** |
-| 交互态 legend `role="listitem"` 覆盖 button + 缺 `aria-pressed`（C25-3） | 框架层补 a11y：交互态去 listitem 角色、补 aria-pressed | P3 |
-| ChartTooltip 溢出定位逻辑双端重复（C25-4） | 抽 core `resolveChartTooltipPosition` 合并重复，框架层只留运行时 | P3 |
-| Vue legend hover/leave 未测 + ChartSeries 弱断言 + Canvas slot / Vue key parity（C25-5） | 补双端测试；slot 参数与 list key 统一为低优先 parity | P3 |
-| `format.ts` gradient-prefix 计数样板、`color.ts` 过渡类重复（观察） | 不被 6 基础原语消费，归 C26–C28 评估 | 延后 |
+| 项                                                                                       | 决策                                                                             | 优先级 |
+| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------ |
+| ChartLegend/ChartTooltip generated 文档渲染 core 配置 mixin（C25-1）                     | 改生成器「组件名→props 类型」映射或重命名消歧，再重生成 references               | **P2** |
+| ChartLegend `gap` prop 双端行为分歧 + 冗余 marginRight（C25-2）                          | 双端统一 `gap` 语义为容器 flex 间距，移除冗余 marginRight，可抽 core 布局 helper | **P2** |
+| 交互态 legend `role="listitem"` 覆盖 button + 缺 `aria-pressed`（C25-3）                 | 框架层补 a11y：交互态去 listitem 角色、补 aria-pressed                           | P3     |
+| ChartTooltip 溢出定位逻辑双端重复（C25-4）                                               | 抽 core `resolveChartTooltipPosition` 合并重复，框架层只留运行时                 | P3     |
+| Vue legend hover/leave 未测 + ChartSeries 弱断言 + Canvas slot / Vue key parity（C25-5） | 补双端测试；slot 参数与 list key 统一为低优先 parity                             | P3     |
+| `format.ts` gradient-prefix 计数样板、`color.ts` 过渡类重复（观察）                      | 不被 6 基础原语消费，归 C26–C28 评估                                             | 延后   |
 
 ---
 
 #### C25 取证摘要（静态实读 + 目标命令）
 
-| 取证 | 结果 | 对应发现 |
-| --- | --- | --- |
-| grep `extends.*ChartXxxProps` / 组件本地 props 接口 | Canvas/Axis/Grid/Series 双端 extends core 同名类型；Legend/Tooltip 双端各自定义本地接口，core 同名类型是高层图表配置 mixin（被 ~10 个 chart props extends） | C25-1 |
-| 读 [shared/props/charts.md:12-28](../skills/tigercat/references/shared/props/charts.md) | ChartLegend 节列 `showLegend/legendPosition/legendMarkerSize`、ChartTooltip 节列 `showTooltip`——均为 core 配置而非组件实际 props；Canvas/Axis/Grid/Series 映射正确 | C25-1 |
-| grep `gap` / `gap-2` / `gap-3` / `marginRight` | React 容器固定 `gap-2`/`gap-3` 不消费 `gap` prop、`gap` 仅作 label marginRight；Vue 容器用 `gap` 控 flex 间距并叠加 label marginRight | C25-2 |
-| grep `role="listitem"` / `aria-pressed` / `opacity-50` | 交互态 `<button role="listitem">` 覆盖按钮语义；切换态仅 `opacity-50`，双端均无 `aria-pressed` | C25-3 |
-| diff React/Vue ChartTooltip 定位段 | offset/翻转/`Math.max(8,…)` clamp 约 30 行逐行相同；core 仅共享 `getChartTooltipTransform`；无 `aria-live` | C25-4 |
-| grep 测试 `item-hover`/`item-leave`、`data-series-*`；grep slot `innerRect`、list `key` | Vue spec 缺 hover/leave 断言；ChartSeries 仅断言 data-series-*；Vue slot 传 `{innerRect}`、React children 不传；Vue Axis/Grid list 元素缺 key（React 有） | C25-5 |
-| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 4 文件 176 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C25 基线 |
+| 取证                                                                                    | 结果                                                                                                                                                               | 对应发现 |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| grep `extends.*ChartXxxProps` / 组件本地 props 接口                                     | Canvas/Axis/Grid/Series 双端 extends core 同名类型；Legend/Tooltip 双端各自定义本地接口，core 同名类型是高层图表配置 mixin（被 ~10 个 chart props extends）        | C25-1    |
+| 读 [shared/props/charts.md:12-28](../skills/tigercat/references/shared/props/charts.md) | ChartLegend 节列 `showLegend/legendPosition/legendMarkerSize`、ChartTooltip 节列 `showTooltip`——均为 core 配置而非组件实际 props；Canvas/Axis/Grid/Series 映射正确 | C25-1    |
+| grep `gap` / `gap-2` / `gap-3` / `marginRight`                                          | React 容器固定 `gap-2`/`gap-3` 不消费 `gap` prop、`gap` 仅作 label marginRight；Vue 容器用 `gap` 控 flex 间距并叠加 label marginRight                              | C25-2    |
+| grep `role="listitem"` / `aria-pressed` / `opacity-50`                                  | 交互态 `<button role="listitem">` 覆盖按钮语义；切换态仅 `opacity-50`，双端均无 `aria-pressed`                                                                     | C25-3    |
+| diff React/Vue ChartTooltip 定位段                                                      | offset/翻转/`Math.max(8,…)` clamp 约 30 行逐行相同；core 仅共享 `getChartTooltipTransform`；无 `aria-live`                                                         | C25-4    |
+| grep 测试 `item-hover`/`item-leave`、`data-series-*`；grep slot `innerRect`、list `key` | Vue spec 缺 hover/leave 断言；ChartSeries 仅断言 data-series-\*；Vue slot 传 `{innerRect}`、React children 不传；Vue Axis/Grid list 元素缺 key（React 有）         | C25-5    |
+| 目标 vitest、`api:validate`、`types:check`                                              | ✅ vitest 4 文件 176 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出                                                          | C25 基线 |
 
 > 本轮 C25 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮实跑 C25 目标 vitest（4 文件 176 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动源码。C24 虚拟列表组已在合并结果中记录。
 
@@ -4011,25 +4058,25 @@ corepack pnpm vitest run tests/react/BarChart.spec.tsx tests/vue/BarChart.spec.t
 
 #### C26 公共拆分/合并决策汇总（供任务 H 汇总）
 
-| 项 | 决策 | 优先级 |
-| --- | --- | --- |
-| Line/Area 单系列颜色 props 公开但未消费（C26-1） | 保留 API，双端在默认 series / palette fallback 中消费 `lineColor` / `areaColor` / `pointColor` | **P2** |
-| Line/Area 点级交互绕过 `hoverable` 且无键盘路径（C26-2） | 与 Bar/Scatter 收敛 hover/select 契约；为可交互点补 role/tabIndex/aria/key 激活 | **P2** |
-| 降采样无落点（C26-3） | 先抽 core downsample helper 与索引映射契约，再由 Line/Area/Scatter opt-in 消费 | P3 |
-| React BarChart bar a11y 不对称（C26-4） | React 对齐 Vue Bar / Scatter 的 role 和 aria-label | P3 |
+| 项                                                       | 决策                                                                                           | 优先级 |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------ |
+| Line/Area 单系列颜色 props 公开但未消费（C26-1）         | 保留 API，双端在默认 series / palette fallback 中消费 `lineColor` / `areaColor` / `pointColor` | **P2** |
+| Line/Area 点级交互绕过 `hoverable` 且无键盘路径（C26-2） | 与 Bar/Scatter 收敛 hover/select 契约；为可交互点补 role/tabIndex/aria/key 激活                | **P2** |
+| 降采样无落点（C26-3）                                    | 先抽 core downsample helper 与索引映射契约，再由 Line/Area/Scatter opt-in 消费                 | P3     |
+| React BarChart bar a11y 不对称（C26-4）                  | React 对齐 Vue Bar / Scatter 的 role 和 aria-label                                             | P3     |
 
 ---
 
 #### C26 取证摘要（静态实读 + 目标命令）
 
-| 取证 | 结果 | 对应发现 |
-| --- | --- | --- |
-| grep `lineColor` / `areaColor` / `pointColor` | core types 暴露；React Line/Area 解构为 `_lineColor` / `_areaColor` / `_pointColor`；Vue Line/Area 声明 props；双端实际只取 `series.color` / `series.pointColor` / palette | C26-1 |
-| 比对 Bar/Scatter 颜色 fallback | Bar 双端 `resolveChartPalette(colors, barColor)`；Scatter 双端 `resolveChartPalette(colors, pointColor)`；spec 覆盖自定义颜色 | C26-1 健康对照 |
-| grep Line/Area `handlePointMouseEnter` 与 tooltip visible | 点级 hover 无 `hoverable` guard；tooltip visible 只看 `hoveredPointInfo`；点 circle 无 tabIndex/role/keydown | C26-2 |
-| grep `downsample|sampling|decimat|large|progressive` | C26 props、helper、spec 零命中；组件按原始数据全量 map 渲染 | C26-3 |
-| 比对 React/Vue Bar rect attrs | React rect 有 tabIndex/handlers 但无 role/aria-label；Vue rect 有 role 与 aria-label；Scatter 双端有 role/aria-label | C26-4 |
-| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 11 文件 293 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出 | C26 基线 |
+| 取证                                                      | 结果                                                                                                                                                                       | 对应发现       |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| grep `lineColor` / `areaColor` / `pointColor`             | core types 暴露；React Line/Area 解构为 `_lineColor` / `_areaColor` / `_pointColor`；Vue Line/Area 声明 props；双端实际只取 `series.color` / `series.pointColor` / palette | C26-1          |
+| 比对 Bar/Scatter 颜色 fallback                            | Bar 双端 `resolveChartPalette(colors, barColor)`；Scatter 双端 `resolveChartPalette(colors, pointColor)`；spec 覆盖自定义颜色                                              | C26-1 健康对照 |
+| grep Line/Area `handlePointMouseEnter` 与 tooltip visible | 点级 hover 无 `hoverable` guard；tooltip visible 只看 `hoveredPointInfo`；点 circle 无 tabIndex/role/keydown                                                               | C26-2          |
+| grep `downsample\|sampling\|decimat\|large\|progressive`  | C26 props、helper、spec 零命中；组件按原始数据全量 map 渲染                                                                                                                | C26-3          |
+| 比对 React/Vue Bar rect attrs                             | React rect 有 tabIndex/handlers 但无 role/aria-label；Vue rect 有 role 与 aria-label；Scatter 双端有 role/aria-label                                                       | C26-4          |
+| 目标 vitest、`api:validate`、`types:check`                | ✅ vitest 11 文件 293 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出                                                                            | C26 基线       |
 
 > 本轮 C26 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用仓库声明的 `corepack pnpm` / pnpm 11.9.0 实跑 C26 目标 vitest（11 文件 293 测试通过）、`corepack pnpm api:validate`（一致性检查通过，0 问题）与 `corepack pnpm types:check`（全部 props 类型导出），均为只读校验、未改动源码。C24/C25 已在合并结果中记录；C26 本轮按 ROADMAP 可独立扫描。
 
@@ -4157,26 +4204,26 @@ corepack pnpm vitest run tests/core/chart-utils.spec.ts tests/react/PieChart.spe
 
 #### C27 公共拆分/合并决策汇总（供任务 H 汇总）
 
-| 项 | 决策 | 优先级 |
-| --- | --- | --- |
-| Gauge 继承 tooltip props 但无实现（C27-1） | 决定保留并补双端 tooltip，或从 core public API 移除 `ChartTooltipProps` 继承后更新 references | **P2** |
-| Vue Pie/Donut `legendFormatter` 缺口 + Donut `animated` no-op（C27-2） | 补 formatter runtime/转发；`animated` 实现或降级 API 承诺 | **P2** |
-| Gauge `min===max` / `tickCount=0` / 小半径大 arcWidth 极值（C27-3） | 抽 core normalization，替换当前 NaN 断言，双端继续复用 helper | **P2** |
-| Radar 点级键盘 tooltip + React Pie/Donut slice role/name（C27-4） | 与 C26 图表 a11y 批次合并，统一 SVG 图元 role/tabIndex/aria/key 规则 | P3 |
-| Pie/Donut 0/负值 mixed 数据空 path（C27-5） | 明确 0 值 slice 是否过滤；避免不可见 path 与 legend/label/交互语义漂移 | P3 |
+| 项                                                                     | 决策                                                                                          | 优先级 |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------ |
+| Gauge 继承 tooltip props 但无实现（C27-1）                             | 决定保留并补双端 tooltip，或从 core public API 移除 `ChartTooltipProps` 继承后更新 references | **P2** |
+| Vue Pie/Donut `legendFormatter` 缺口 + Donut `animated` no-op（C27-2） | 补 formatter runtime/转发；`animated` 实现或降级 API 承诺                                     | **P2** |
+| Gauge `min===max` / `tickCount=0` / 小半径大 arcWidth 极值（C27-3）    | 抽 core normalization，替换当前 NaN 断言，双端继续复用 helper                                 | **P2** |
+| Radar 点级键盘 tooltip + React Pie/Donut slice role/name（C27-4）      | 与 C26 图表 a11y 批次合并，统一 SVG 图元 role/tabIndex/aria/key 规则                          | P3     |
+| Pie/Donut 0/负值 mixed 数据空 path（C27-5）                            | 明确 0 值 slice 是否过滤；避免不可见 path 与 legend/label/交互语义漂移                        | P3     |
 
 ---
 
 #### C27 取证摘要（静态实读 + 目标命令）
 
-| 取证 | 结果 | 对应发现 |
-| --- | --- | --- |
-| grep `GaugeChartProps extends BaseChartProps, ChartTooltipProps` + 双端 Gauge `ChartTooltip/showTooltip/tooltipFormatter` | core 类型承诺 tooltip；React/Vue Gauge 不导入 `ChartTooltip`，React 不解构 tooltip props，Vue runtime props 无 tooltip 字段 | C27-1 |
-| grep `legendFormatter` / `animated` | React Pie 消费 `legendFormatter`；Vue Pie 未声明/消费；Donut 双端不转发 `legendFormatter`；React Donut `_animated` 未用、Vue Donut `animated` prop 未用 | C27-2 |
-| 读 `valueToGaugeAngle` / `computeGaugeTicks` 与 spec | `max-min` 为 0 时 NaN；`tickCount=0` 产生 NaN 坐标/label；spec 当前锁定 NaN 或只断言数量 | C27-3 |
-| 比对 Pie/Radar SVG 图元 attrs | Vue Pie slice 有 role/aria-label；React Pie slice 仅 selectable tabIndex/keydown；Radar point 双端仅鼠标事件，无 role/tabIndex/aria/key | C27-4 |
-| 读 `getPieArcs` + `createPieArcPath` + Pie 组件 map | mixed 0/负值数据保留 arc 并渲染 `d=""` path；全 0 返回 []，组件 spec 未覆盖 mixed 情况 | C27-5 |
-| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 12 文件 297 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出 | C27 基线 |
+| 取证                                                                                                                      | 结果                                                                                                                                                    | 对应发现 |
+| ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| grep `GaugeChartProps extends BaseChartProps, ChartTooltipProps` + 双端 Gauge `ChartTooltip/showTooltip/tooltipFormatter` | core 类型承诺 tooltip；React/Vue Gauge 不导入 `ChartTooltip`，React 不解构 tooltip props，Vue runtime props 无 tooltip 字段                             | C27-1    |
+| grep `legendFormatter` / `animated`                                                                                       | React Pie 消费 `legendFormatter`；Vue Pie 未声明/消费；Donut 双端不转发 `legendFormatter`；React Donut `_animated` 未用、Vue Donut `animated` prop 未用 | C27-2    |
+| 读 `valueToGaugeAngle` / `computeGaugeTicks` 与 spec                                                                      | `max-min` 为 0 时 NaN；`tickCount=0` 产生 NaN 坐标/label；spec 当前锁定 NaN 或只断言数量                                                                | C27-3    |
+| 比对 Pie/Radar SVG 图元 attrs                                                                                             | Vue Pie slice 有 role/aria-label；React Pie slice 仅 selectable tabIndex/keydown；Radar point 双端仅鼠标事件，无 role/tabIndex/aria/key                 | C27-4    |
+| 读 `getPieArcs` + `createPieArcPath` + Pie 组件 map                                                                       | mixed 0/负值数据保留 arc 并渲染 `d=""` path；全 0 返回 []，组件 spec 未覆盖 mixed 情况                                                                  | C27-5    |
+| 目标 vitest、`api:validate`、`types:check`                                                                                | ✅ vitest 12 文件 297 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出                                                         | C27 基线 |
 
 > 本轮 C27 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用仓库声明的 `corepack pnpm` / pnpm 11.9.0 实跑 C27 目标 vitest（12 文件 297 测试通过）、`corepack pnpm api:validate`（一致性检查通过，0 问题）与 `corepack pnpm types:check`（全部 props 类型导出），均为只读校验、未改动源码。C24 已在合并结果中记录；C27 本轮按 ROADMAP 可独立扫描。
 
@@ -4418,24 +4465,24 @@ corepack pnpm vitest run tests/react/ActivityFeed.spec.tsx tests/vue/ActivityFee
 
 #### C29 公共拆分/合并决策汇总（供任务 H 汇总）
 
-| 项 | 决策 | 优先级 |
-| --- | --- | --- |
-| ChatWindow `statusVariant` 公开 no-op（C29-1） | 保留并实现状态栏 variant，或从 public type/generated references 移除 | **P2** |
+| 项                                                          | 决策                                                                            | 优先级 |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------- | ------ |
+| ChatWindow `statusVariant` 公开 no-op（C29-1）              | 保留并实现状态栏 variant，或从 public type/generated references 移除            | **P2** |
 | CommentThread Vue `onExpandedChange` 类型/文档漂移（C29-2） | Vue 类型 Omit React 回调，docs 区分 React callback 与 Vue `update:expandedKeys` | **P2** |
-| ActivityFeed 长列表无虚拟/分页策略（C29-3） | 等 C24 后定 ActivityFeed 是否 opt-in VirtualList，或文档声明适用规模 | P3 |
-| custom render/slot/action callback 覆盖不足（C29-4） | 先补双端测试锁住现有契约，再处理 C29-1/C29-2 | P3 |
+| ActivityFeed 长列表无虚拟/分页策略（C29-3）                 | 等 C24 后定 ActivityFeed 是否 opt-in VirtualList，或文档声明适用规模            | P3     |
+| custom render/slot/action callback 覆盖不足（C29-4）        | 先补双端测试锁住现有契约，再处理 C29-1/C29-2                                    | P3     |
 
 ---
 
 #### C29 取证摘要（静态实读 + 目标命令）
 
-| 取证 | 结果 | 对应发现 |
-| --- | --- | --- |
-| grep `statusVariant` / `_statusVariant` | core 类型公开；React 解构为 `_statusVariant` 后不消费；Vue 声明 prop 后不消费；状态栏 class 固定 | C29-1 |
-| grep `onExpandedChange` / `update:expandedKeys` / `release.md` | React 调用 `onExpandedChange`；Vue 只 emit `update:expandedKeys`；Vue props 类型继承 core 回调；release note 已把 Vue `expand-change` 替换为 `update:expandedKeys` | C29-2 |
-| 读 ActivityFeed + Timeline 渲染链路 | ActivityFeed 双端把每组 items 转成 Timeline items；Timeline 双端全量 `processedItems.map`；没有 VirtualList/分页/阈值入口 | C29-3 |
-| 读 C29 双端 spec | ChatWindow virtual/空态/发送路径覆盖较稳；ActivityFeed action/custom slot 与 CommentThread like/more/action/controlled expandedKeys 缺少双端断言 | C29-4 |
-| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 8 文件 81 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出 | C29 基线 |
+| 取证                                                           | 结果                                                                                                                                                               | 对应发现 |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| grep `statusVariant` / `_statusVariant`                        | core 类型公开；React 解构为 `_statusVariant` 后不消费；Vue 声明 prop 后不消费；状态栏 class 固定                                                                   | C29-1    |
+| grep `onExpandedChange` / `update:expandedKeys` / `release.md` | React 调用 `onExpandedChange`；Vue 只 emit `update:expandedKeys`；Vue props 类型继承 core 回调；release note 已把 Vue `expand-change` 替换为 `update:expandedKeys` | C29-2    |
+| 读 ActivityFeed + Timeline 渲染链路                            | ActivityFeed 双端把每组 items 转成 Timeline items；Timeline 双端全量 `processedItems.map`；没有 VirtualList/分页/阈值入口                                          | C29-3    |
+| 读 C29 双端 spec                                               | ChatWindow virtual/空态/发送路径覆盖较稳；ActivityFeed action/custom slot 与 CommentThread like/more/action/controlled expandedKeys 缺少双端断言                   | C29-4    |
+| 目标 vitest、`api:validate`、`types:check`                     | ✅ vitest 8 文件 81 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出                                                                      | C29 基线 |
 
 > 本轮 C29 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用仓库声明的 `corepack pnpm` / pnpm 11.9.0 实跑 C29 目标 vitest（8 文件 81 测试通过）、`corepack pnpm api:validate`（一致性检查通过，0 问题）与 `corepack pnpm types:check`（全部 props 类型导出），均为只读校验、未改动源码。C24/C28 已在合并结果中记录；C29 本轮按 ROADMAP 可独立扫描。
 
@@ -4685,26 +4732,26 @@ corepack pnpm api:validate
 
 #### C31 公共拆分/合并决策汇总（供任务 H 汇总）
 
-| 项 | 决策 | 优先级 |
-| --- | --- | --- |
-| MarkdownEditor 空 preview placeholder HTML 注入（C31-1） | placeholder 按纯文本/escape 渲染，或复用同一 sanitize 边界 | **P1** |
-| CodeEditor `highlightActiveLine` 公开 no-op（C31-2） | 保留并实现 active-line helper，或从 shared type/docs 移除/降级说明 | **P2** |
-| RichTextEditor `mode` 公开 no-op（C31-3） | 明确 HTML-only，或把 markdown/plain 转换纳入 engine 契约 | **P2** |
-| RichTextEditor custom action 不触发 change（C31-4） | 统一走 engine action/notifyChange 路径，补双端断言 | **P2** |
-| engine/highlighter docs 发现性不足（C31-5） | generated references/examples 补 opt-in engine/highlighter 说明与组件 smoke tests | P3 |
+| 项                                                       | 决策                                                                              | 优先级 |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------- | ------ |
+| MarkdownEditor 空 preview placeholder HTML 注入（C31-1） | placeholder 按纯文本/escape 渲染，或复用同一 sanitize 边界                        | **P1** |
+| CodeEditor `highlightActiveLine` 公开 no-op（C31-2）     | 保留并实现 active-line helper，或从 shared type/docs 移除/降级说明                | **P2** |
+| RichTextEditor `mode` 公开 no-op（C31-3）                | 明确 HTML-only，或把 markdown/plain 转换纳入 engine 契约                          | **P2** |
+| RichTextEditor custom action 不触发 change（C31-4）      | 统一走 engine action/notifyChange 路径，补双端断言                                | **P2** |
+| engine/highlighter docs 发现性不足（C31-5）              | generated references/examples 补 opt-in engine/highlighter 说明与组件 smoke tests | P3     |
 
 ---
 
 #### C31 取证摘要（静态实读 + 目标命令）
 
-| 取证 | 结果 | 对应发现 |
-| --- | --- | --- |
-| grep `placeholder || ''` / `innerHTML: currentValue.value ? previewHtml.value : props.placeholder` | Markdown preview 的 markdown/custom renderer 路径会 sanitize；空值 placeholder 分支双端直接写入 HTML | C31-1 |
-| grep `highlightActiveLine` | core/Vue props 暴露；React 继承 core props；双端实现和 tests 无消费/断言 | C31-2 |
-| grep `mode: _mode` / RichText `mode` prop | React 解构 `_mode` 后未用；Vue 声明 prop 后未用；engine 契约只处理 HTML | C31-3 |
-| 读 RichText `execButtonAction` + engine `exec` | engine 的 custom action 会 notifyChange；双端组件先拦截 custom action，执行后不读取/同步内容 | C31-4 |
-| 读 generated advanced refs + component specs | highlighter/engine 已是双端运行时 API；shared props/examples 未展示，组件 spec 未覆盖 opt-in engine path | C31-5 |
-| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 11 文件 275 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出 | C31 基线 |
+| 取证                                                                                                 | 结果                                                                                                     | 对应发现 |
+| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------- |
+| grep `placeholder \|\| ''` / `innerHTML: currentValue.value ? previewHtml.value : props.placeholder` | Markdown preview 的 markdown/custom renderer 路径会 sanitize；空值 placeholder 分支双端直接写入 HTML     | C31-1    |
+| grep `highlightActiveLine`                                                                           | core/Vue props 暴露；React 继承 core props；双端实现和 tests 无消费/断言                                 | C31-2    |
+| grep `mode: _mode` / RichText `mode` prop                                                            | React 解构 `_mode` 后未用；Vue 声明 prop 后未用；engine 契约只处理 HTML                                  | C31-3    |
+| 读 RichText `execButtonAction` + engine `exec`                                                       | engine 的 custom action 会 notifyChange；双端组件先拦截 custom action，执行后不读取/同步内容             | C31-4    |
+| 读 generated advanced refs + component specs                                                         | highlighter/engine 已是双端运行时 API；shared props/examples 未展示，组件 spec 未覆盖 opt-in engine path | C31-5    |
+| 目标 vitest、`api:validate`、`types:check`                                                           | ✅ vitest 11 文件 275 测试通过；`api:validate` 一致性 0 问题；`types:check` 全部 props 类型导出          | C31 基线 |
 
 > 本轮 C31 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用仓库声明的 `corepack pnpm` / pnpm 11.9.0 实跑 C31 目标 vitest（11 文件 275 测试通过）、`corepack pnpm api:validate`（一致性检查通过，0 问题）与 `corepack pnpm types:check`（全部 props 类型导出），均为只读校验、未改动源码。C24/C28/C30 已在合并结果中记录；C31 本轮按 ROADMAP 可独立扫描。
 
