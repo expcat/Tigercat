@@ -172,7 +172,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Image、ImagePreview、ImageGroup、ImageViewer。
 - 重点：预览状态、受控量、手势、加载/错误态、图片组上下文。
 
-##### C20 图片编辑组
+##### C20 图片编辑组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C20 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：ImageCropper、ImageAnnotation、CropUpload。
 - 重点：裁剪/标注纯逻辑是否可沉到 core、上传接入、坐标计算、撤销/重置。

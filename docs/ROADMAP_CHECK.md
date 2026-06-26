@@ -2,7 +2,7 @@
 
 <!-- LLM-INDEX
 type: roadmap-scan
-scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）
+scope: ROADMAP「最新一轮全代码扫描」任务 A-B；任务 C 组件分组扫描 C01「基础动作与文本」（C01-1~C01-8）、C02「头像与状态展示」（C02-1~C02-5）、C03「布局骨架」（C03-1~C03-2）、C04「内容容器」（C04-1~C04-8）、C05「导航轻量组」（C05-1~C05-5）、C06「Steps/Tabs」（C06-1~C06-6）、C07「Menu 单组」（C07-1~C07-8）、C08「Overlay 触发器」（C08-1~C08-7）、C09「Feedback 容器」（C09-1~C09-7）、C10「消息通知」（C10-1~C10-7）、C11「Form 单组」（C11-1~C11-6）、C12「输入基础组」（C12-1~C12-6）、C13「选择/切换基础组」（C13-1~C13-4）、C14「Select 单组」（C14-1~C14-8）、C15「层级选择组」（C15-1~C15-5）、C16「日期组」（C16-1~C16-8）、C17「时间组」（C17-1~C17-3）、C18「Upload 单组」（C18-1~C18-8）、C20「图片编辑组」（C20-1~C20-6）
 verified-date: 2026-06-27
 source: 任务 A：实读 packages/{core,react,vue,cli}/src/index* 与 package.json；scripts/{validate-api,check-public-types,generate-api-docs,generate-api-baseline}.mjs；根 package.json scripts；api-reports/public-api-baseline.json（含 git show HEAD 对照）；skills/tigercat/references/component-index.md；.prettierignore/.prettierrc.json。实跑 pnpm api:validate / types:check（均通过）、pnpm api:baseline / docs:api（生成后 git diff 取证再 git checkout 还原）。Grep packages/*/src 的 @deprecated（0 命中）。任务 B：实读 packages/core/src/{types,utils,themes,theme-runtime,tokens}、tailwind entry/plugin、packages/core/tokens、packages/core/package.json、packages/core/tsup.config.ts、React/Vue DatePicker 与 ConfigProvider、相关 tests/core；复核时直接 pnpm 因本机 11.7.0 低于 engines.pnpm >=11.9.0 被拦截，改用 packageManager 指定的 corepack pnpm 11.9.0 实跑 types:check / api:validate / 目标 vitest（均通过）。任务 C/C01：实读 8 组件（Button/ButtonGroup/Link/Text/Code/Icon/Tag/Badge）的 core 类型 types/{button,link,tag,badge,icon,text,code}.ts、core 工具 utils/{button,badge,tag,text,link,icon,group}-utils.ts 与 class-names/compose-classes/coerce-class-value/svg-attrs/dev-warn/common-icons、theme-runtime/colors.ts，packages/{react,vue}/src/components 的 8 组件实现，tests/{react,vue} 对应 spec，component-index.md；静态实读取证（含 grep 取证 role/label/helper 用法），C01 为仅文档变更未跑门禁命令。任务 C/C02：实读 packages/{core,react,vue}/src/components/{Avatar,AvatarGroup,Empty,Result,Statistic,QRCode,Watermark}.{tsx,ts} 与对应 core/src/utils/{avatar,empty,result,statistic,qrcode,watermark}-utils.ts 及 core/src/types/*。任务 C/C03：实读 packages/core/src/types/{layout,container,grid,space,divider}.ts、packages/core/src/utils/{layout-utils,container-utils,grid,space,divider}.ts、React/Vue 对应布局组件实现、tests/{core,react,vue} 定向测试、examples/example/{react,vue3} 布局示例、skills/tigercat/references 相关 generated references。任务 C/C04：实读 packages/core/src/types/{card,list,descriptions,skeleton,collapse,timeline}.ts 与 locale.ts、packages/core/src/utils/{card,list,descriptions,skeleton,collapse,timeline}-utils.ts（对照 grid.ts/table-utils.ts/markdown-editor-utils.ts 安全 class 写法）、React/Vue 对应七组件实现、tests/{react,vue} 定向 spec、examples/example/{react,vue3} 内容容器示例、skills/tigercat/references；实跑 C04 定向 vitest（12 files/210 tests 通过）+ validate-api/check-public-types 通过，未改动任何源码。任务 C/C05：实读 packages/core/src/types/{affix,anchor,back-top,breadcrumb,float-button,scroll-spy}.ts、packages/core/src/utils/{affix-utils,anchor-utils,back-top-utils,breadcrumb-utils,float-button-utils,scroll-spy-utils}.ts、React/Vue 对应导航组件实现、tests/{core,react,vue} 定向测试、skills/tigercat/references/shared/props/navigation.md 与 examples/navigation.md；实跑本地 vitest/API/type 验证通过；未改动任何源码。任务 C/C06：实读 Steps/StepsItem/Tabs/TabPane 的 core 类型 types/{steps,tabs}.ts、core 工具 utils/{steps,tabs}-utils.ts、packages/{react,vue}/src/components/{Steps,StepsItem,Tabs,TabPane}、tests/{react,vue}/{Steps,Tabs}.spec 与 tests/core/tabs-utils.spec.ts、skills/tigercat/references/{component-index.md,shared/props/navigation.md,examples/navigation.md}；实跑 C06 目标 vitest、pnpm api:validate、pnpm types:check（均通过）。任务 C/C07：实读 Menu/MenuItem/MenuItemGroup/SubMenu 的 core 类型 types/menu.ts、core 工具 utils/menu-utils.ts（并对照 utils/focus-utils.ts）、packages/react/src/components/Menu.tsx 与 Menu/{context,state,types,menu-item,submenu,menu-item-group,icons}、packages/vue/src/components/Menu.ts 单文件与 {MenuItem,MenuItemGroup,SubMenu}.ts re-export、tests/{react,vue}/Menu.spec.ts* 与 tests/core/menu-utils.spec.ts、skills/tigercat/references/component-index.md；grep 取证 focus-utils 菜单函数消费者仅 Dropdown、React Menu 子组件无 displayName、Vue {class,style,...rest} 透传样板（7 处）；实跑 C07 目标 vitest（tests/react/Menu.spec.tsx + tests/vue/Menu.spec.ts + tests/core/menu-utils.spec.ts，3 文件 119 测试通过）、pnpm api:validate、pnpm types:check（均通过）。任务 C/C08：实读 Dropdown/DropdownMenu/DropdownItem/Popover/Popconfirm/Tooltip 的 core 类型、floating/overlay/focus 工具、React/Vue 实现、双端 usePopup/useFloatingPopup 与 overlay 封装、4 个 popup 双端 spec、core floating/focus/overlay spec、generated references；grep 取证 BaseFloatingPopupProps/PopoverTrigger/TooltipTrigger/defer/focus-utils 菜单消费者；实跑 C08 目标 vitest（12 文件 225 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C09：实读 Modal/Drawer/Loading/Progress/Tour 的 core 类型与工具、React/Vue 实现、overlay helper、feedback props/examples references、双端 spec 与 core overlay/tour-utils spec；grep 取证 open callback、mask=false、locale、portal/Teleport、focus/scroll/Escape/aria；实跑 C09 目标 vitest（13 文件 243 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C10：实读 Message/Notification/NotificationCenter 的 core 类型 types/{message,notification}.ts、core 工具 utils/{message-utils,notification-utils,notification-center-utils}.ts、React/Vue 三组件实现与 packages/{react,vue}/src/index 导出、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/feedback.md、shared/api-summary.md）；grep 取证 Message position 未被 addMessage 读取（双端单例恒 top）、NotificationCenter `_currentGroup` 双端死代码、imperative 共享 helper（normalizeStringOption/createInstanceCounter/ANIMATION_DURATION_MS/isBrowser）与 `Message`/`notification` 导出命名、core 回退不对称；实跑 C10 目标 vitest（8 文件 112 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C11：实读 Form/FormItem/useFormController 的 core 类型 types/form.ts、core 工具 utils/{form-validation,form-dependency-utils,form-item-styles,form-history-utils}.ts、React 实现 components/{Form,FormItem}.tsx 与 hooks/useFormController.ts、Vue 实现 components/{Form,FormItem}.ts 与 composables/useFormController.ts、tests/{core,react,vue} 8 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/api-summary.md、examples/form.md）；FormWizard（C30）排除；grep 取证 useFormContext 消费者与 context.model/updateValue 无人读、8 个 core 表单 helper 无生产消费者、addField/resetFields/undo 双端契约差异、getValueByPath 数组段限制；实跑 C11 目标 vitest（8 文件 248 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。任务 C/C12：实读 Input/Textarea/InputGroup/InputGroupAddon/InputNumber/NumberKeyboard/Mentions 的 core 类型 types/{input,textarea,input-group,input-number,number-keyboard,mentions}.ts、core 工具 utils/{input-styles,textarea-auto-resize,input-group-utils,input-number-utils,number-keyboard-utils,mentions-utils}.ts、React/Vue 对应组件实现、tests/{core,react,vue} 16 个定向 spec、generated references（component-index.md、shared/props/form.md、shared/patterns/common.md、examples/form.md）；grep 取证 InputGroup size 上下文消费者、React Input/Textarea reference onChange 示例、Vue InputNumber defaultValue/className props、Mentions filteredOptions 打开/渲染分支、InputNumber 重复 spec、NumberKeyboard delete/confirm locale；实跑 C12 目标 vitest（16 文件 473 测试通过）、corepack pnpm api:validate、corepack pnpm types:check（均通过）。
 source-c13: 实读 Checkbox/CheckboxGroup、Radio/RadioGroup、Switch、Slider、Stepper、Rate、Segmented 的 core 类型 types/{checkbox,radio,switch,slider,stepper,rate,segmented}.ts、core 工具 utils/{radio-utils,radio-group-utils,rate-utils,stepper-utils,segmented-utils}.ts 与 utils/helpers/slider-utils.ts，双端组件实现、双端定向 spec、tests/core/{segmented-utils,switch-theme}.spec.ts，以及 component-index、shared/props/{form,basic}.md、examples/form.md；grep 取证 ARIA/键盘事件、marks 布局、slider/stepper 数值 helper 消费者与测试覆盖。
@@ -11,6 +11,7 @@ source-c15: 实读 Tree/TreeSelect/Cascader/Transfer 全链路——core 类型 
 source-c16: 实读 DatePicker/Calendar 全链路——core 类型 types/{datepicker,calendar}.ts、core 工具 utils/{date-utils,calendar-utils,datepicker-i18n,datepicker-styles}.ts 与 utils/i18n/datepicker-locales/*、React 实现 components/DatePicker.tsx + DatePicker/{state,render-calendar,render-mobile,types}.ts(x)、components/Calendar.tsx、Vue 实现 components/{DatePicker,Calendar}.ts、tests/{core/date-utils,core/datepicker-i18n,react/DatePicker,vue/DatePicker,react/Calendar,vue/Calendar}.spec.*、examples DatePickerDemo/CalendarDemo、generated component-index/i18n；grep 取证 core CalendarProps 双端零消费、WEEKDAYS/MONTHS/getMonthDays 仅 Calendar 消费、getDatePickerLabels 仅 DatePicker 消费、getIntlOptionsFromDateFormat 五分支全等、datepicker-i18n 7 语言 inline map vs 13 preset 的 6 个 preset-only 语言回落英文；以本机 pnpm 11.9.0 实跑 C16 目标 vitest（6 文件 117 测试通过）、api:validate（一致性 0 问题）、types:check（全部 props 类型导出），均通过，未改动源码。
 source-c17: 实读 TimePicker/Countdown/CronEditor 全链路——core 类型 types/{timepicker,countdown,cron-editor}.ts、core 工具 utils/{time-utils,timepicker-utils,countdown-utils,cron-editor-utils}.ts、React 实现 components/TimePicker.tsx 与 TimePicker/{state,render-desktop,render-mobile,types,icons}、components/{Countdown,CronEditor}.tsx、Vue 实现 components/{TimePicker,Countdown,CronEditor}.ts、tests/{core,react,vue} 9 个定向 spec、examples TimePickerDemo/CountdownDemo/CronEditorDemo、generated component-index 与 shared/props/{form,data}.md；grep 取证 TimePicker 秒级范围判断、秒列禁用逻辑、CronEditor className 透传、Countdown now/tick 测试契约；实跑 C17 目标 vitest（9 文件 174 测试通过）、pnpm run api:validate、pnpm run types:check（均通过），未改动源码。
 source-c18: 实读 Upload/FileManager/Signature 全链路——core 类型 types/{upload,signature,file-manager}.ts、core 工具 utils/{upload-utils,upload-labels,signature-utils,file-manager-utils}.ts（对照 locale-utils 的 DEFAULT_UPLOAD_LABELS/ZH_CN_UPLOAD_LABELS、tailwind-entry）、React components/{Upload,FileManager,Signature}.tsx 与 index.tsx 导出、Vue components/{Upload,FileManager,Signature}.ts 与 index.ts 导出、tests/{core,react,vue} 9 个定向 spec、examples {Upload,FileManager,Signature}Demo、generated component-index；grep 取证 Tailwind v4（core/package.json tailwindcss ^4.0.0）下 Upload 4 处 bg-opacity-* 失效、applyFileDragReorder 零组件消费、FileManager draggable 半接线、React FileManager Loading 硬编码 vs Vue locale、core FileManagerProps/columns 漂移死字段、formatFileSize vs formatFileSizeLabel 双实现、getFileExtension 重名异义；以 packageManager pnpm 11.9.0 实跑 C18 目标 vitest（9 文件 238 测试通过）与 api:validate / types:check（均通过），未改动源码。CropUpload 属 C20 排除。
+source-c20: 实读 ImageCropper/ImageAnnotation/CropUpload 全链路——core 类型 types/{image,image-annotation}.ts、core 工具 utils/{image-utils,image-annotation-utils,crop-upload-utils}.ts、React components/{ImageCropper,ImageAnnotation,CropUpload}.tsx、Vue components/{ImageCropper,ImageAnnotation,CropUpload}.ts、tests/{core,react,vue} 9 个定向 spec、examples {ImageCropper,ImageAnnotation,CropUpload}Demo、generated component-index/shared props/api-summary；grep 取证 ImageCropper 静态 SVG mask id、CropUpload modalWidth 零消费、ImageAnnotation SVG role=button 键盘激活缺口、Vue selectedId/tool 无 update 事件、ImageAnnotationChangeMeta 未实现分支、硬编码编辑文案/aria；以 packageManager pnpm 11.9.0 实跑 C20 目标 vitest（9 文件 187 测试通过）与 api:validate / types:check（均通过），未改动源码。
 note: 本文仅记录可验证发现与修复建议；扫描阶段不改组件代码、不改公共 API、不运行会重写生成产物的命令。结论与建议供维护者取舍。
 -->
 
@@ -2928,3 +2929,169 @@ pnpm vitest run tests/core/countdown-utils.spec.ts tests/react/Countdown.spec.ts
 | 目标 vitest、`api:validate`、`types:check` | ✅ vitest 9 文件 238 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C18 基线 |
 
 > 本轮 C18 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0（本机无 corepack）实跑 C18 目标 vitest（9 文件 238 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动仓库。
+
+---
+
+### C20 图片编辑组
+
+**扫描范围**：ImageCropper、ImageAnnotation、CropUpload 的全链路——core 类型 [image.ts](../packages/core/src/types/image.ts)、[image-annotation.ts](../packages/core/src/types/image-annotation.ts)，core 工具 [image-utils.ts](../packages/core/src/utils/image-utils.ts)、[image-annotation-utils.ts](../packages/core/src/utils/image-annotation-utils.ts)、[crop-upload-utils.ts](../packages/core/src/utils/crop-upload-utils.ts)，React 实现 [ImageCropper.tsx](../packages/react/src/components/ImageCropper.tsx)、[ImageAnnotation.tsx](../packages/react/src/components/ImageAnnotation.tsx)、[CropUpload.tsx](../packages/react/src/components/CropUpload.tsx)，Vue 实现 [ImageCropper.ts](../packages/vue/src/components/ImageCropper.ts)、[ImageAnnotation.ts](../packages/vue/src/components/ImageAnnotation.ts)、[CropUpload.ts](../packages/vue/src/components/CropUpload.ts)，`tests/core/{image-utils,image-annotation-utils,crop-upload-utils}.spec.ts`、`tests/{react,vue}/{ImageCropper,ImageAnnotation,CropUpload}.spec.*`，examples `{ImageCropper,ImageAnnotation,CropUpload}Demo`，generated references（component-index、shared props、api-summary）。C19 的 Image/ImagePreview/ImageGroup/ImageViewer 不在本组范围。
+
+**结论速览**：裁剪几何、标注坐标、CropUpload 文件读取/校验等纯逻辑已沉到 core，双端实现总体对称，C20 目标 vitest/API/type 门禁均通过。**无 P1**。需处理项集中在公开契约与多实例/a11y/i18n：① ImageCropper 的 SVG mask 使用固定 `crop-mask` id，多实例同屏会冲突（P2）；② CropUpload 公开 `modalWidth` 但双端零消费（P2）；③ ImageAnnotation 的 SVG 标注形状声明 `role="button"` + 可聚焦，但缺 Enter/Space 键盘激活（P2）；④ Vue ImageAnnotation 的 `selectedId`/`tool` 受控 props 无 `update:*` 事件，双向受控口径不完整（P3）；⑤ `ImageAnnotationChangeMeta` 暴露 `update/select/clear` 但实现只发 `add/remove`（P3）；⑥ 编辑组件硬编码英文/中文文案与 aria label，未接 locale（P3）。
+
+---
+
+#### C20-1 ImageCropper SVG mask 固定 `crop-mask` id，多实例同屏会冲突 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜React [ImageCropper.tsx](../packages/react/src/components/ImageCropper.tsx) 与 Vue [ImageCropper.ts](../packages/vue/src/components/ImageCropper.ts) 都在每个实例内渲染 `<mask id="crop-mask">`，并通过 `mask="url(#crop-mask)"` 引用。HTML/SVG id 是文档级唯一；同屏多个裁剪器时，后续实例的 `url(#crop-mask)` 可能解析到第一个 mask，导致遮罩裁剪窗口串用第一实例的尺寸/位置。
+- 🟠 P2｜示例页实际同屏渲染多个 ImageCropper：React `ImageCropperDemo` 同页有基础、固定宽高比、隐藏辅助线、JPEG 输出四个实例；Vue demo 同理。现有测试只单实例渲染、拖拽、键盘、touch，未覆盖多实例 mask id。
+- ℹ️ 仓内已有同类做法可复用：React 多个图表和表单控件使用 `useId()`；Vue 图表使用 `useId()` + stable prefix 生成 SVG gradient id，说明现有模式支持实例级 SVG id。
+
+**公共内容决策**：不改公共 API。双端组件层生成实例级 mask id（React `useId`，Vue `useId` 或现有 stable id helper），并把 `mask` 引用同步改为 `url(#${maskId})`。纯 DOM/id 修复，无需沉 core。
+
+**建议修复顺序**：P2。优先修，因为示例页已具备多实例触发条件，且修复局部、低风险。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/ImageCropper.spec.tsx tests/vue/ImageCropper.spec.ts
+pnpm example:build
+```
+
+---
+
+#### C20-2 CropUpload `modalWidth` 是公开 prop 但双端零消费 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜core [CropUploadProps](../packages/core/src/types/image.ts) 暴露 `modalWidth?: number`，React/Vue 本地 props 也暴露同名字段；但 React [CropUpload.tsx](../packages/react/src/components/CropUpload.tsx) 只把它解构成 `_modalWidth = 520` 后完全不传给 Modal，Vue [CropUpload.ts](../packages/vue/src/components/CropUpload.ts) 定义 `modalWidth` prop 后也没有读取。
+- 🟠 P2｜Modal 双端实际支持 `width` prop，并有对应测试（React/Vue Modal spec 均覆盖 string/number width）。CropUpload 当前固定 `size="lg"` / `size: 'lg'`，`modalWidth` 对消费者完全无效。
+- ℹ️ 现有 CropUpload spec 覆盖默认 modalTitle 的“渲染不崩”、accept、disabled、maxSize、键盘触发与 a11y，但没有断言 `modalWidth`。
+
+**公共内容决策**：公开 prop 已存在，应实现而非废弃。双端把 `modalWidth` 传给 Modal 的 `width`，并补 React/Vue spec 断言自定义宽度进入 dialog style。若维护者决定只保留 Modal size，则需 deprecated `modalWidth` 并走 baseline/migration；不建议继续保留死 prop。
+
+**建议修复顺序**：P2。与 C20-1 同批修复，成本低且消除公开契约失效。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/CropUpload.spec.tsx tests/vue/CropUpload.spec.ts
+pnpm run api:validate
+pnpm run types:check
+```
+
+---
+
+#### C20-3 ImageAnnotation 标注形状可聚焦但缺键盘激活 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜React/Vue ImageAnnotation 渲染标注图形时给 SVG `rect`/`ellipse`/`path` 设置 `role="button"` 与 `tabIndex`/`tabindex`，但只绑定鼠标 `onClick`。SVG + `role="button"` 不是原生 button，Enter/Space 不会自动触发 click；键盘用户可以 Tab 到形状，却不能用键盘选中它。
+- 🟠 P2｜Delete/Backspace 删除路径依赖已有选中项。由于键盘无法选中 SVG 形状，键盘删除现有标注的路径不完整。现有 `handleKeyDown` 只处理 Escape、Enter、Delete/Backspace，不处理标注形状自身的 Enter/Space 激活。
+- ℹ️ 现有双端 ImageAnnotation spec 覆盖鼠标绘制、点击选择、点击 Delete、polygon Enter 提交、readonly/disabled 与 axe，但没有覆盖“Tab 到已有标注后 Enter/Space 选中/删除”。
+
+**公共内容决策**：框架层 a11y 修复。给可聚焦 SVG 标注增加键盘处理：Enter/Space 选择该 annotation；Delete/Backspace 可删除当前聚焦且可编辑的 annotation；必要时 stop propagation 避免误提交 polygon。纯交互修复，不改 core 类型。
+
+**建议修复顺序**：P2。跟随 C20-1/C20-2 后处理；补双端键盘 spec 防回归。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/ImageAnnotation.spec.tsx tests/vue/ImageAnnotation.spec.ts
+```
+
+---
+
+#### C20-4 Vue ImageAnnotation `selectedId` / `tool` 受控 props 无 `update:*` 事件 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜core [ImageAnnotationProps](../packages/core/src/types/image-annotation.ts) 暴露 `selectedId`、`defaultSelectedId`、`tool`、`defaultTool`；React 对应 `onSelect` / `onToolChange` 可让外部同步受控状态。Vue 也有 `selectedId` / `tool` props 和 `select` / `tool-change` 事件，但没有 `update:selectedId` / `update:tool`，因此不能用 Vue 常规 `v-model:selected-id` / `v-model:tool` 双向受控。
+- 🟢 P3｜Vue 对 annotations 已采用 `modelValue` + `update:modelValue`，同组件内部受控口径不一致：数据列表支持 v-model，选中项和工具只支持单向 prop + 自定义事件。
+- ℹ️ 示例目前只用 `@select` 保存选中对象、`v-model` 保存 annotations，未演示 `selectedId` / `tool` 受控；generated props 只列前 3 个 props，暂未放大到文档错误。
+
+**公共内容决策**：建议补 Vue `update:selectedId` / `update:tool` 事件，并保留现有 `select` / `tool-change` 事件作为语义回调。React 保持现有 callbacks。属 Vue framework parity，不涉及 core 类型变更。
+
+**建议修复顺序**：P3。可随 ImageAnnotation 下一次受控量整理处理。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/vue/ImageAnnotation.spec.ts
+pnpm run types:check
+```
+
+---
+
+#### C20-5 `ImageAnnotationChangeMeta` 暴露未实现分支，撤销/重置/清空能力缺口未成型 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜core [ImageAnnotationChangeMeta](../packages/core/src/types/image-annotation.ts) 的 `type` 包含 `'add' | 'update' | 'remove' | 'select' | 'clear'`，但 React/Vue 实现只通过 `onChange` / `change` 发出 `add` 和 `remove`；grep `update/select/clear` 在实现和测试中均无命中。
+- 🟢 P3｜组件有 Delete 删除选中项、Escape 取消 draft、Enter/双击提交 polygon，但没有公开 clear/reset/undo/redo 方法或 props。ROADMAP 对本组要求扫描“撤销/重置”，当前能力尚未形成公共契约；类型里的 `clear`/`update` 像预留状态而非实际行为。
+- ℹ️ 现有 tests 只断言 `add` 和 `remove` meta；示例也只演示绘制、选择和受控 annotations，不演示清空、更新、撤销或重置。
+
+**公共内容决策**：走任务 H/API 收敛。二选一：若要补能力，新增清空/更新/撤销/重做的明确 UI/API，并让 meta 分支真实可达；若短期不做，应收窄 `ImageAnnotationChangeMeta` 或标注未实现分支，避免 public type 暗示不存在的事件。
+
+**建议修复顺序**：P3。先定产品契约，再改类型/实现/测试；不要只在组件里临时塞一个清空按钮而不定义受控行为。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/core/image-annotation-utils.spec.ts tests/react/ImageAnnotation.spec.tsx tests/vue/ImageAnnotation.spec.ts
+pnpm run api:validate
+pnpm run types:check
+```
+
+---
+
+#### C20-6 图片编辑组件硬编码文案与 aria label，未接 locale — **P3**
+
+**发现问题**
+
+- 🟢 P3｜CropUpload 双端硬编码默认触发文案 `选择图片`、Modal title `裁剪图片`、footer `取消` / `确认裁剪`，aria-label 则硬编码英文 `Select image to crop and upload`。这些文案无法通过 ConfigProvider locale 统一替换，只能部分通过 `modalTitle` 或自定义 children 规避。
+- 🟢 P3｜ImageCropper 双端硬编码 `Loading image for cropping`、`Image cropper`、`Image to crop`、`Move crop area`、`Resize crop area {handle}` 等 aria label；ImageAnnotation 的 toolbar label、工具名 `Select/Rectangle/...`、`Delete`、loading/editor/canvas aria label 也硬编码在 core helper 或组件实现中。
+- ℹ️ 与 C09/C14/C18 多个 locale 发现同向：已有 `resolveLocaleText`/ConfigProvider locale 链路，但图片编辑组尚未接入。当前 tests 把这些硬编码文案作为断言锁定，修复时需同步改为 locale-aware 断言。
+
+**公共内容决策**：locale 能力应沉到 core 的 locale 类型/默认值，框架层消费。先给 CropUpload 的 visible 文案和 aria label 接 locale；再补 ImageCropper/ImageAnnotation 的 a11y 文案。短期保留现有字符串作为 fallback，避免破坏默认渲染。
+
+**建议修复顺序**：P3。可与全库 locale 清理批次合并；不阻断当前发布门禁。
+
+**目标验证命令**：
+
+```bash
+pnpm vitest run tests/react/ImageCropper.spec.tsx tests/vue/ImageCropper.spec.ts tests/react/ImageAnnotation.spec.tsx tests/vue/ImageAnnotation.spec.ts tests/react/CropUpload.spec.tsx tests/vue/CropUpload.spec.ts
+pnpm run api:validate
+pnpm run types:check
+```
+
+---
+
+#### C20 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项 | 决策 | 优先级 |
+| --- | --- | --- |
+| ImageCropper 固定 SVG mask id（C20-1） | 双端组件层生成实例级 id；不改 public API | **P2** |
+| CropUpload `modalWidth` 死 prop（C20-2） | 实现为 Modal `width`，并补双端 spec；不建议保留死字段 | **P2** |
+| ImageAnnotation SVG button 键盘激活缺口（C20-3） | 框架层补 Enter/Space 选择与删除键路径 | **P2** |
+| Vue ImageAnnotation selected/tool v-model 缺口（C20-4） | 补 `update:selectedId` / `update:tool`，保留语义事件 | P3 |
+| `ImageAnnotationChangeMeta` 未实现分支（C20-5） | 补真实 clear/update/undo/reset 契约，或收窄 public type | P3 |
+| 图片编辑文案/aria 未接 locale（C20-6） | locale 默认值沉 core，双端消费，保留现有 fallback | P3 |
+
+---
+
+#### C20 取证摘要（静态实读 + 目标命令）
+
+| 取证 | 结果 | 对应发现 |
+| --- | --- | --- |
+| grep `crop-mask` | React/Vue ImageCropper 均固定 `id="crop-mask"` + `url(#crop-mask)`；测试无多实例覆盖 | C20-1 |
+| grep `modalWidth` | core/React/Vue props 暴露；React 解构为 `_modalWidth`；Vue 定义后零读取；spec 无断言 | C20-2 |
+| 比对 Modal width 支持 | React/Vue Modal 已支持 `width` 并有 spec；CropUpload 未转发 | C20-2 |
+| grep ImageAnnotation SVG role/tabIndex | 标注形状 `role="button"` + tabIndex/tabindex，仅 click 选择，无键盘激活 | C20-3 |
+| grep `update:selectedId` / `update:tool` | Vue ImageAnnotation 无命中；仅 `select` / `tool-change` 语义事件 | C20-4 |
+| grep `ImageAnnotationChangeMeta` 分支 | public type 含 `update/select/clear`；实现和测试只触达 `add/remove` | C20-5 |
+| grep 硬编码文案/aria | CropUpload、ImageCropper、ImageAnnotation 多处中英文硬编码；tests 锁定当前字符串 | C20-6 |
+| 目标 vitest、`api:validate`、`types:check` | ✅ vitest 9 文件 187 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C20 基线 |
+
+> 本轮 C20 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮以 packageManager 指定的 pnpm 11.9.0 实跑 C20 目标 vitest（9 文件 187 测试通过）、`pnpm run api:validate`（一致性检查 0 问题）与 `pnpm run types:check`（全部 props 类型导出），均为只读校验、未改动源码。
