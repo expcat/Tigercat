@@ -248,7 +248,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：CodeEditor、RichTextEditor、MarkdownEditor。
 - 重点：引擎抽象、输入同步、内容转换、示例复杂度、无第三方运行时边界。
 
-##### C32 交互能力组
+##### C32 交互能力组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C32 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：Drag、Carousel、Resizable、Splitter。
 - 重点：pointer/keyboard/resize helper、拖拽状态、尺寸约束、动画/过渡公共逻辑。
