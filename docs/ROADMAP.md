@@ -212,7 +212,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：ChartCanvas、ChartAxis、ChartGrid、ChartSeries、ChartLegend、ChartTooltip。
 - 重点：chart shared/utils、坐标系、tooltip、legend、SVG 属性公共逻辑。
 
-##### C26 笛卡尔图表组
+##### C26 笛卡尔图表组 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C26 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 组件：LineChart、AreaChart、BarChart、ScatterChart。
 - 重点：scale、path、tooltip、降采样、点/线/柱复用边界。
