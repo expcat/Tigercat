@@ -151,6 +151,7 @@ export * from './virtual-table-utils'
 export * from './infinite-scroll-utils'
 
 // FileManager utilities (v0.8.0+)
+export * from './file-utils'
 export * from './file-manager-utils'
 
 // ImageAnnotation utilities (v1.6+)

@@ -4,6 +4,7 @@ import {
   selectGroupLabelClasses,
   selectEmptyStateClasses,
   isOptionGroup,
+  getPickerOptionAria,
   getCreateSelectOptionLabel,
   type SelectOption
 } from '@expcat/tigercat-core'
@@ -18,15 +19,17 @@ export function renderOption(
 ): React.ReactNode {
   const optionSelected = ctx.isSelected(option)
   const optionActive = index === ctx.activeIndex
+  const optionAria = getPickerOptionAria({
+    selected: optionSelected,
+    disabled: !!option.disabled
+  })
 
   return (
     <div
       key={option.value}
       id={ctx.getOptionId(index)}
       data-option-index={index}
-      role="option"
-      aria-selected={optionSelected}
-      aria-disabled={option.disabled ? true : undefined}
+      {...optionAria}
       tabIndex={optionActive ? 0 : -1}
       className={getSelectOptionClasses(optionSelected, !!option.disabled, ctx.size)}
       onMouseEnter={() => {

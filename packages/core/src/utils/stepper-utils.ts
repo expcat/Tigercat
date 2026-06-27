@@ -66,9 +66,14 @@ export function clampStepperValue(
   max: number,
   precision?: number
 ): number {
-  let v = Math.max(min, Math.min(max, value))
-  if (precision !== undefined) {
-    v = Number(v.toFixed(precision))
+  const safeMin = Number.isFinite(min) || min === Number.NEGATIVE_INFINITY ? min : 0
+  const safeMax = Number.isFinite(max) || max === Number.POSITIVE_INFINITY ? max : safeMin
+  const lower = Math.min(safeMin, safeMax)
+  const upper = Math.max(safeMin, safeMax)
+  const fallback = Number.isFinite(lower) ? lower : 0
+  let v = Math.max(lower, Math.min(upper, Number.isFinite(value) ? value : fallback))
+  if (precision !== undefined && Number.isFinite(precision) && precision >= 0) {
+    v = Number(v.toFixed(Math.floor(precision)))
   }
   return v
 }

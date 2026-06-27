@@ -66,6 +66,33 @@ describe('virtual-table-utils', () => {
       const r = calculateVirtualRange(0, 400, 1000, 40)
       expect(r.end).toBe(15)
     })
+
+    it('clamps negative and non-finite inputs to a stable empty or finite range', () => {
+      expect(calculateVirtualRange(Number.NaN, 400, 100, 40, 5)).toEqual({
+        start: 0,
+        end: 15,
+        offsetTop: 0,
+        totalHeight: 4000
+      })
+      expect(calculateVirtualRange(-40, 400, 100, 40, -5)).toEqual({
+        start: 0,
+        end: 10,
+        offsetTop: 0,
+        totalHeight: 4000
+      })
+      expect(calculateVirtualRange(0, Number.POSITIVE_INFINITY, 100, 40, 5)).toEqual({
+        start: 0,
+        end: 0,
+        offsetTop: 0,
+        totalHeight: 0
+      })
+      expect(calculateVirtualRange(0, 400, Number.POSITIVE_INFINITY, 40, 5)).toEqual({
+        start: 0,
+        end: 0,
+        offsetTop: 0,
+        totalHeight: 0
+      })
+    })
   })
 
   // ─── getRowKey ────────────────────────────────────────────

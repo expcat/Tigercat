@@ -4,6 +4,7 @@
 
 import type { UploadChunk, UploadFile, UploadFileStatus, UploadQueueItem } from '../types/upload'
 import { classNames } from './class-names'
+import { formatBytes, getFileExtensionName } from './file-utils'
 
 export type UploadStatusIconSize = 'sm' | 'lg'
 
@@ -220,8 +221,7 @@ export function generateFileId(): string {
  * @returns File extension with dot (e.g., '.png') or empty string
  */
 function getFileExtension(fileName: string): string {
-  if (!fileName.includes('.')) return ''
-  return `.${fileName.split('.').pop()?.toLowerCase() || ''}`
+  return getFileExtensionName(fileName, { includeDot: true })
 }
 
 /**
@@ -362,13 +362,7 @@ export function validateFileSize(file: File, maxSize?: number): boolean {
  * Format file size for display
  */
 export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B'
-
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  const k = 1024
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${units[i]}`
+  return formatBytes(bytes, { precision: 2 })
 }
 
 /**

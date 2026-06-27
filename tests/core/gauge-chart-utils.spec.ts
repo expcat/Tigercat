@@ -87,10 +87,8 @@ describe('valueToGaugeAngle', () => {
     expect(valueToGaugeAngle(200, 0, 100, -135, 135)).toBe(135)
   })
 
-  it('handles min === max (returns NaN due to division by zero)', () => {
-    // ratio = (v - min) / (max - min) → 0/0 → NaN
-    const result = valueToGaugeAngle(50, 50, 50, -135, 135)
-    expect(result).toBeNaN()
+  it('falls back to the start angle when min and max collapse', () => {
+    expect(valueToGaugeAngle(50, 50, 50, -135, 135)).toBe(-135)
   })
 })
 
@@ -123,9 +121,18 @@ describe('computeGaugeTicks', () => {
     }
   })
 
-  it('returns single tick when tickCount is 0', () => {
+  it('normalizes zero tickCount to one interval with finite ticks', () => {
     const ticks = computeGaugeTicks(100, 100, 80, 0, 100, -135, 135, 0)
-    expect(ticks).toHaveLength(1)
+    expect(ticks).toHaveLength(2)
+    expect(ticks.every((tick) => Number.isFinite(tick.x1) && Number.isFinite(tick.y1))).toBe(true)
+  })
+
+  it('clamps invalid geometry instead of emitting NaN path coordinates', () => {
+    const arc = createGaugeArcPath(100, 100, -80, 0, 180, 200)
+    const needle = createGaugeNeedlePath(100, 100, Number.NaN, 90)
+
+    expect(arc).not.toContain('NaN')
+    expect(needle).not.toContain('NaN')
   })
 })
 

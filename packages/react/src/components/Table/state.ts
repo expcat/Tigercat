@@ -11,6 +11,9 @@ import {
   freezeTableColumnWidths,
   filterHiddenColumns,
   orderTableFixedColumns,
+  getNextTableSelectAllKeys,
+  getTableSelectionState,
+  hasTableSelectionColumn,
   type SortState,
   type PaginationConfig,
   type TableColumn,
@@ -226,7 +229,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   const totalColumnCount = useMemo(() => {
     let count = displayColumns.length
-    if (rowSelection && rowSelection.showCheckbox !== false) count++
+    if (hasTableSelectionColumn(rowSelection)) count++
     if (expandable) count++
     return count
   }, [displayColumns.length, rowSelection, expandable])
@@ -426,30 +429,31 @@ export function useTableState(input: UseTableStateInput): TableContext {
     onSelectionChange?.(newKeys)
   }
 
+  const selectionState = useMemo(
+    () =>
+      getTableSelectionState({
+        records: paginatedData,
+        rowKeys: pageRowKeys,
+        selectedRowKeys,
+        getCheckboxProps: rowSelection?.getCheckboxProps
+      }),
+    [paginatedData, pageRowKeys, selectedRowKeys, rowSelection]
+  )
+
   function handleSelectAll(checked: boolean) {
-    if (checked) {
-      const newKeys = pageRowKeys
-      if (!isSelectionControlled) {
-        setUncontrolledSelectedRowKeys(newKeys)
-      }
-      onSelectionChange?.(newKeys)
-    } else {
-      if (!isSelectionControlled) {
-        setUncontrolledSelectedRowKeys([])
-      }
-      onSelectionChange?.([])
+    const newKeys = getNextTableSelectAllKeys(
+      selectedRowKeys,
+      selectionState.selectableRowKeys,
+      checked
+    )
+    if (!isSelectionControlled) {
+      setUncontrolledSelectedRowKeys(newKeys)
     }
+    onSelectionChange?.(newKeys)
   }
 
-  const allSelected = useMemo(() => {
-    if (pageRowKeys.length === 0) return false
-    return pageRowKeys.every((key) => selectedRowKeySet.has(key))
-  }, [pageRowKeys, selectedRowKeySet])
-
-  const someSelected = useMemo(
-    () => selectedRowKeys.length > 0 && !allSelected,
-    [selectedRowKeys.length, allSelected]
-  )
+  const allSelected = selectionState.allSelected
+  const someSelected = selectionState.someSelected
 
   // editable cell state
   const [editingCell, setEditingCell] = useState<{ rowIndex: number; columnKey: string } | null>(

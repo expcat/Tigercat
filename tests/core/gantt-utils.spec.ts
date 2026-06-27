@@ -108,4 +108,19 @@ describe('gantt-utils', () => {
     expect(getGanttTaskAriaLabel(tasks[0])).toBe('Design, 01-01 to 01-05, 50%')
     expect(formatGanttDate(new Date('2026-02-03'), 'day')).toBe('02-03')
   })
+
+  it('normalizes invalid ranges into finite layout and labels', () => {
+    const layout = computeGanttLayout(
+      [{ id: 'bad', label: 'Bad', start: 'bad-date', end: Number.POSITIVE_INFINITY, progress: 30 }],
+      { width: Number.NaN, taskLabelWidth: -100, minDate: 'bad-date', maxDate: 'also-bad' }
+    )
+
+    expect(layout.timelineWidth).toBe(0)
+    expect(layout.tasks[0].x).toBe(0)
+    expect(layout.tasks[0].width).toBe(6)
+    expect(getGanttTaskAriaLabel(layout.tasks[0].task)).toBe('Bad, unknown to unknown, 30%')
+
+    const ticks = createGanttTimelineTicks(Number.NaN, Number.POSITIVE_INFINITY, 100, 0, 'day')
+    expect(ticks.every((tick) => Number.isFinite(tick.x))).toBe(true)
+  })
 })

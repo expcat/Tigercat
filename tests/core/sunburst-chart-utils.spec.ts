@@ -106,11 +106,16 @@ describe('computeSunburstArcs', () => {
     }
   })
 
-  it('memoizes result for same inputs', () => {
+  it('recomputes same-reference data mutations instead of returning stale cached arcs', () => {
     const data = [{ label: 'A', value: 100 }]
     const r1 = computeSunburstArcs(data, baseOpts)
+    data[0].label = 'Changed'
+    data[0].value = 50
     const r2 = computeSunburstArcs(data, baseOpts)
-    expect(r1).toBe(r2) // same reference
+
+    expect(r1).not.toBe(r2)
+    expect(r2[0].label).toBe('Changed')
+    expect(r2[0].value).toBe(50)
   })
 
   it('recomputes when data changes', () => {
@@ -130,5 +135,19 @@ describe('computeSunburstArcs', () => {
     // totalValue = 0, layout should not crash
     const arcs = computeSunburstArcs(data, baseOpts)
     expect(Array.isArray(arcs)).toBe(true)
+  })
+
+  it('normalizes invalid radii and values without NaN paths', () => {
+    const arcs = computeSunburstArcs(
+      [
+        { label: 'Bad', value: Number.NaN },
+        { label: 'Negative', value: -5 },
+        { label: 'Good', value: 10 }
+      ],
+      { cx: 100, cy: 100, innerRadius: -30, outerRadius: Number.POSITIVE_INFINITY }
+    )
+
+    expect(arcs.map((arc) => arc.value)).toEqual([0, 0, 10])
+    expect(arcs.every((arc) => !arc.path.includes('NaN'))).toBe(true)
   })
 })

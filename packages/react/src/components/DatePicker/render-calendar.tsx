@@ -1,10 +1,7 @@
 import React from 'react'
 import {
-  formatDate,
   formatMonthYear,
-  isSameDay,
-  isToday as isTodayUtil,
-  normalizeDate,
+  getDatePickerCalendarCellState,
   datePickerCalendarClasses,
   datePickerCalendarHeaderClasses,
   datePickerNavButtonClasses,
@@ -61,12 +58,6 @@ export function renderDatePickerCalendar(ctx: DatePickerContext): React.ReactNod
 
       {/* Calendar grid */}
       {(() => {
-        // Pre-compute range values once instead of per-cell
-        const [rangeStart, rangeEnd] = ctx.selectedRange
-        const normStart = rangeStart ? normalizeDate(rangeStart) : null
-        const normEnd = rangeEnd ? normalizeDate(rangeEnd) : null
-        const isSelectingEnd = ctx.isRangeMode && Boolean(rangeStart) && !rangeEnd
-
         return (
           <div
             className={datePickerCalendarGridClasses}
@@ -76,54 +67,37 @@ export function renderDatePickerCalendar(ctx: DatePickerContext): React.ReactNod
             {ctx.calendarDays.map((date, index) => {
               if (!date) return null
 
-              const normDate = normalizeDate(date)
-
-              const isRangeStart =
-                ctx.isRangeMode && rangeStart ? isSameDay(date, rangeStart) : false
-              const isRangeEnd = ctx.isRangeMode && rangeEnd ? isSameDay(date, rangeEnd) : false
-              const isInRange =
-                ctx.isRangeMode &&
-                normStart &&
-                normEnd &&
-                normDate >= normStart &&
-                normDate <= normEnd
-
-              const isSelected = !ctx.isRangeMode
-                ? ctx.selectedDate
-                  ? isSameDay(date, ctx.selectedDate)
-                  : false
-                : isRangeStart || isRangeEnd
-
-              const isCurrentMonthDay = ctx.isCurrentMonth(date)
-              const isTodayDay = isTodayUtil(date)
-              const isBeforeRangeStart = isSelectingEnd && normStart && normDate < normStart
-
-              const isDisabled = ctx.isDateDisabled(date) || Boolean(isBeforeRangeStart)
-
-              const iso = formatDate(date, 'yyyy-MM-dd')
+              const cell = getDatePickerCalendarCellState({
+                date,
+                selectedDate: ctx.selectedDate,
+                selectedRange: ctx.selectedRange,
+                isRangeMode: ctx.isRangeMode,
+                isCurrentMonth: ctx.isCurrentMonth,
+                isDateDisabled: ctx.isDateDisabled
+              })
 
               return (
                 <button
                   key={index}
                   type="button"
                   className={getDatePickerDayCellClasses(
-                    isCurrentMonthDay,
-                    isSelected,
-                    isTodayDay,
-                    isDisabled,
-                    Boolean(isInRange),
-                    Boolean(isRangeStart),
-                    Boolean(isRangeEnd)
+                    cell.isCurrentMonthDay,
+                    cell.isSelected,
+                    cell.isTodayDay,
+                    cell.isDisabled,
+                    cell.isInRange,
+                    cell.isRangeStart,
+                    cell.isRangeEnd
                   )}
-                  disabled={isDisabled}
+                  disabled={cell.isDisabled}
                   onClick={() => ctx.selectDate(date)}
                   role="gridcell"
-                  data-date={iso}
-                  onFocus={() => ctx.setActiveDateIso(iso)}
-                  tabIndex={ctx.activeDateIso === iso && !isDisabled ? 0 : -1}
-                  aria-label={iso}
-                  aria-selected={isSelected}
-                  aria-current={isTodayDay ? 'date' : undefined}>
+                  data-date={cell.iso}
+                  onFocus={() => ctx.setActiveDateIso(cell.iso)}
+                  tabIndex={ctx.activeDateIso === cell.iso && !cell.isDisabled ? 0 : -1}
+                  aria-label={cell.iso}
+                  aria-selected={cell.isSelected}
+                  aria-current={cell.isTodayDay ? 'date' : undefined}>
                   {date.getDate()}
                 </button>
               )

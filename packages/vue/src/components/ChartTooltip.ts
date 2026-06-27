@@ -1,5 +1,9 @@
 import { defineComponent, h, computed, ref, watch, Teleport } from 'vue'
-import { classNames, getChartTooltipTransform } from '@expcat/tigercat-core'
+import {
+  classNames,
+  getChartTooltipTransform,
+  resolveChartTooltipPosition
+} from '@expcat/tigercat-core'
 
 export interface VueChartTooltipProps {
   content: string
@@ -42,37 +46,28 @@ export const ChartTooltip = defineComponent({
       (_value, _oldValue, onCleanup) => {
         if (!props.visible) return
 
-        // Add small offset from cursor
-        let x = props.x + 12
-        let y = props.y - 8
+        const initialPosition = resolveChartTooltipPosition({
+          x: props.x,
+          y: props.y,
+          rect: { width: 0, height: 0 },
+          viewport: { width: window.innerWidth, height: window.innerHeight }
+        })
 
         // Check bounds after render
         const frameHandle = requestAnimationFrame(() => {
           if (!tooltipRef.value) return
 
           const rect = tooltipRef.value.getBoundingClientRect()
-          const viewportWidth = window.innerWidth
-          const viewportHeight = window.innerHeight
-
-          // Adjust if overflowing right
-          if (x + rect.width > viewportWidth - 8) {
-            x = props.x - rect.width - 12
-          }
-
-          // Adjust if overflowing bottom
-          if (y + rect.height > viewportHeight - 8) {
-            y = props.y - rect.height - 8
-          }
-
-          // Keep within left/top bounds
-          x = Math.max(8, x)
-          y = Math.max(8, y)
-
-          adjustedPosition.value = { x, y }
+          adjustedPosition.value = resolveChartTooltipPosition({
+            x: props.x,
+            y: props.y,
+            rect,
+            viewport: { width: window.innerWidth, height: window.innerHeight }
+          })
         })
         onCleanup(() => cancelAnimationFrame(frameHandle))
 
-        adjustedPosition.value = { x, y }
+        adjustedPosition.value = initialPosition
       },
       { immediate: true }
     )

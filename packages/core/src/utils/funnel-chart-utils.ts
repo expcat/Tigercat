@@ -46,22 +46,29 @@ export function computeFunnelSegments(
   if (data.length === 0) return []
 
   const { width, height, gap = 2, pinch = false, colors } = opts
-  const palette = colors ?? DEFAULT_CHART_COLORS
-  const maxValue = Math.max(...data.map((d) => d.value))
-  if (maxValue === 0) return []
+  const safeWidth = Number.isFinite(width) ? Math.max(0, width) : 0
+  const safeHeight = Number.isFinite(height) ? Math.max(0, height) : 0
+  const safeGap = Number.isFinite(gap) ? Math.max(0, gap) : 0
+  if (safeWidth <= 0 || safeHeight <= 0) return []
 
-  const totalGap = gap * (data.length - 1)
-  const segH = (height - totalGap) / data.length
-  const halfW = width / 2
+  const palette = colors ?? DEFAULT_CHART_COLORS
+  const values = data.map((d) => (Number.isFinite(d.value) ? Math.max(0, d.value) : 0))
+  const maxValue = Math.max(...values)
+  if (maxValue <= 0) return []
+
+  const totalGap = Math.min(safeHeight, safeGap * (data.length - 1))
+  const segH = Math.max(0, (safeHeight - totalGap) / data.length)
+  const halfW = safeWidth / 2
 
   return data.map((d, i) => {
-    const topRatio = d.value / maxValue
-    const nextVal = i < data.length - 1 ? data[i + 1].value : pinch ? 0 : d.value
+    const value = values[i]
+    const topRatio = value / maxValue
+    const nextVal = i < data.length - 1 ? values[i + 1] : pinch ? 0 : value
     const bottomRatio = nextVal / maxValue
 
-    const tw = width * topRatio
-    const bw = width * bottomRatio
-    const y = i * (segH + gap)
+    const tw = safeWidth * topRatio
+    const bw = safeWidth * bottomRatio
+    const y = i * (segH + safeGap)
     const cx = halfW
     const cy = y + segH / 2
 
@@ -75,7 +82,7 @@ export function computeFunnelSegments(
     return {
       index: i,
       label: d.label ?? `Stage ${i + 1}`,
-      value: d.value,
+      value,
       color: d.color ?? palette[i % palette.length],
       path,
       cx,

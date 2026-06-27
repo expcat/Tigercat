@@ -4,6 +4,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
+  themeConfigToCssVars,
   ThemeManager,
   setCssVarsCached,
   removeCssVarsCached,
@@ -18,7 +19,12 @@ const ALL_VAR_NAMES = [
   '--tiger-text',
   '--tiger-border',
   '--tiger-success',
-  '--tiger-chart-1'
+  '--tiger-chart-1',
+  '--tiger-font-family',
+  '--tiger-radius-md',
+  '--tiger-shadow-md',
+  '--tiger-spacing-md',
+  '--tiger-transition-normal'
 ]
 
 function clearAllInlineVars(): void {
@@ -148,9 +154,13 @@ describe('themes/manager — ThemeManager', () => {
       ThemeManager.defineTheme({
         name: 'with-extra',
         label: 'With extra',
-        light: { colors: { primary: '#abcdef' } }
+        light: {
+          colors: { primary: '#abcdef' },
+          radius: { md: '12px' }
+        }
       })
       expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('#abcdef')
+      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe('12px')
       ThemeManager.defineTheme({
         name: 'without-primary',
         label: 'Without',
@@ -158,7 +168,26 @@ describe('themes/manager — ThemeManager', () => {
       })
       // Previous primary value must have been cleared.
       expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('')
+      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe('')
       expect(document.documentElement.style.getPropertyValue('--tiger-surface')).toBe('#111111')
+    })
+
+    it('maps non-color ThemeConfig sections to runtime CSS variables', () => {
+      expect(
+        themeConfigToCssVars({
+          typography: { fontFamily: 'Inter, sans-serif' },
+          radius: { md: '0.75rem' },
+          shadows: { md: '0 8px 16px rgb(0 0 0 / 0.2)' },
+          spacing: { md: '1rem' },
+          motion: { durationBase: '240ms' }
+        })
+      ).toEqual({
+        '--tiger-font-family': 'Inter, sans-serif',
+        '--tiger-radius-md': '0.75rem',
+        '--tiger-shadow-md': '0 8px 16px rgb(0 0 0 / 0.2)',
+        '--tiger-spacing-md': '1rem',
+        '--tiger-duration-base': '240ms'
+      })
     })
   })
 

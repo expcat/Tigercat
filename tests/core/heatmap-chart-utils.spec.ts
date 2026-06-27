@@ -40,4 +40,23 @@ describe('heatmap chart utils', () => {
     expect(getHeatmapCellIndexAtPoint(cells, 75, 75)).toBe(3)
     expect(getHeatmapCellIndexAtPoint(cells, 101, 101)).toBeNull()
   })
+
+  it('normalizes non-finite values and gaps into finite cells', () => {
+    const cells = computeHeatmapCells(
+      [{ x: 'Mon', y: 'AM', value: Number.POSITIVE_INFINITY }],
+      {
+        xLabels: ['Mon', 'Tue'],
+        yLabels: ['AM'],
+        width: 100,
+        height: 50,
+        cellGap: -4
+      }
+    )
+
+    expect(cells).toHaveLength(2)
+    expect(cells.every((cell) => Number.isFinite(cell.value) && Number.isFinite(cell.heat))).toBe(
+      true
+    )
+    expect(cells[0].value).toBe(0)
+  })
 })

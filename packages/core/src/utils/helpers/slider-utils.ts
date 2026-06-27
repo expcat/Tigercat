@@ -25,12 +25,18 @@ export function sliderNormalizeValue(
   max: number,
   step: number = 1
 ): number {
+  const safeMin = Number.isFinite(min) ? min : 0
+  const safeMax = Number.isFinite(max) ? max : safeMin
+  const lower = Math.min(safeMin, safeMax)
+  const upper = Math.max(safeMin, safeMax)
+  const safeStep = Number.isFinite(step) && step > 0 ? step : 1
+  const safeValue = Number.isFinite(value) ? value : lower
   // Clamp value to [min, max]
-  const clamped = Math.min(Math.max(value, min), max)
+  const clamped = Math.min(Math.max(safeValue, lower), upper)
   // Round to nearest step
-  const stepped = Math.round((clamped - min) / step) * step + min
+  const stepped = Math.round((clamped - lower) / safeStep) * safeStep + lower
   // Ensure final value doesn't exceed max due to floating point
-  return Math.min(stepped, max)
+  return Math.min(Math.max(stepped, lower), upper)
 }
 
 /**
@@ -46,8 +52,13 @@ export function sliderNormalizeValue(
  * sliderGetPercentage(25, 0, 200) // => 12.5
  */
 export function sliderGetPercentage(value: number, min: number, max: number): number {
-  if (max === min) return 0
-  return ((value - min) / (max - min)) * 100
+  const safeMin = Number.isFinite(min) ? min : 0
+  const safeMax = Number.isFinite(max) ? max : safeMin
+  const lower = Math.min(safeMin, safeMax)
+  const upper = Math.max(safeMin, safeMax)
+  if (upper === lower) return 0
+  const safeValue = Number.isFinite(value) ? value : lower
+  return ((Math.min(Math.max(safeValue, lower), upper) - lower) / (upper - lower)) * 100
 }
 
 /**
@@ -70,10 +81,15 @@ export function sliderGetValueFromPosition(
   max: number,
   step: number = 1
 ): number {
-  if (trackWidth === 0) return min
-  const ratio = position / trackWidth
-  const rawValue = ratio * (max - min) + min
-  return sliderNormalizeValue(rawValue, min, max, step)
+  const safeMin = Number.isFinite(min) ? min : 0
+  const safeMax = Number.isFinite(max) ? max : safeMin
+  const lower = Math.min(safeMin, safeMax)
+  const upper = Math.max(safeMin, safeMax)
+  if (!Number.isFinite(trackWidth) || trackWidth <= 0) return lower
+  const safePosition = Number.isFinite(position) ? Math.min(Math.max(position, 0), trackWidth) : 0
+  const ratio = safePosition / trackWidth
+  const rawValue = ratio * (upper - lower) + lower
+  return sliderNormalizeValue(rawValue, lower, upper, step)
 }
 
 /**
@@ -100,23 +116,25 @@ export function sliderGetKeyboardValue(
   step: number = 1,
   largeStep?: number
 ): number | null {
-  const bigStep = largeStep ?? step * 10
+  const safeStep = Number.isFinite(step) && step > 0 ? step : 1
+  const bigStep = Number.isFinite(largeStep) && largeStep! > 0 ? largeStep! : safeStep * 10
+  const safeCurrent = sliderNormalizeValue(currentValue, min, max, safeStep)
 
   switch (key) {
     case 'ArrowRight':
     case 'ArrowUp':
-      return sliderNormalizeValue(currentValue + step, min, max, step)
+      return sliderNormalizeValue(safeCurrent + safeStep, min, max, safeStep)
     case 'ArrowLeft':
     case 'ArrowDown':
-      return sliderNormalizeValue(currentValue - step, min, max, step)
+      return sliderNormalizeValue(safeCurrent - safeStep, min, max, safeStep)
     case 'PageUp':
-      return sliderNormalizeValue(currentValue + bigStep, min, max, step)
+      return sliderNormalizeValue(safeCurrent + bigStep, min, max, safeStep)
     case 'PageDown':
-      return sliderNormalizeValue(currentValue - bigStep, min, max, step)
+      return sliderNormalizeValue(safeCurrent - bigStep, min, max, safeStep)
     case 'Home':
-      return min
+      return sliderNormalizeValue(min, min, max, safeStep)
     case 'End':
-      return max
+      return sliderNormalizeValue(max, min, max, safeStep)
     default:
       return null
   }

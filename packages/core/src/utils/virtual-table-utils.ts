@@ -69,19 +69,25 @@ export function calculateVirtualRange(
   rowHeight: number,
   overscan: number = 5
 ): VirtualTableRange {
-  if (totalRows === 0 || rowHeight <= 0) {
+  const safeTotalRows = Number.isFinite(totalRows) ? Math.max(0, Math.floor(totalRows)) : 0
+  const safeRowHeight = Number.isFinite(rowHeight) ? rowHeight : 0
+  const safeViewportHeight = Number.isFinite(viewportHeight) ? Math.max(0, viewportHeight) : 0
+  const safeScrollTop = Number.isFinite(scrollTop) ? Math.max(0, scrollTop) : 0
+  const safeOverscan = Number.isFinite(overscan) ? Math.max(0, Math.floor(overscan)) : 0
+
+  if (safeTotalRows === 0 || safeRowHeight <= 0 || safeViewportHeight <= 0) {
     return { start: 0, end: 0, offsetTop: 0, totalHeight: 0 }
   }
 
-  const totalHeight = totalRows * rowHeight
+  const totalHeight = safeTotalRows * safeRowHeight
 
-  const startRaw = Math.floor(scrollTop / rowHeight)
-  const visibleCount = Math.ceil(viewportHeight / rowHeight)
+  const startRaw = Math.floor(safeScrollTop / safeRowHeight)
+  const visibleCount = Math.ceil(safeViewportHeight / safeRowHeight)
 
-  const start = Math.max(0, startRaw - overscan)
-  const end = Math.min(totalRows, startRaw + visibleCount + overscan)
+  const start = Math.max(0, Math.min(safeTotalRows, startRaw - safeOverscan))
+  const end = Math.max(start, Math.min(safeTotalRows, startRaw + visibleCount + safeOverscan))
 
-  const offsetTop = start * rowHeight
+  const offsetTop = start * safeRowHeight
 
   return { start, end, offsetTop, totalHeight }
 }

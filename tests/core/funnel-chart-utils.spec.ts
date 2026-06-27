@@ -114,4 +114,20 @@ describe('computeFunnelSegments', () => {
       expect(seg.index).toBe(i)
     })
   })
+
+  it('normalizes invalid values and dimensions without NaN geometry', () => {
+    expect(computeFunnelSegments(data, { width: -200, height: 300 })).toEqual([])
+
+    const result = computeFunnelSegments(
+      [
+        { label: 'Bad', value: Number.NaN },
+        { label: 'Negative', value: -10 },
+        { label: 'Good', value: 50 }
+      ],
+      { width: 200, height: 80, gap: 999 }
+    )
+
+    expect(result.map((segment) => segment.value)).toEqual([0, 0, 50])
+    expect(result.every((segment) => !segment.path.includes('NaN'))).toBe(true)
+  })
 })

@@ -28,7 +28,7 @@
  */
 
 // Re-export manager
-export { ThemeManager } from './manager'
+export { ThemeManager, THEME_CONFIG_CSS_VARS, themeConfigToCssVars } from './manager'
 export type { ThemeChangeEvent, ThemeChangeListener } from './manager'
 
 // Re-export preset themes

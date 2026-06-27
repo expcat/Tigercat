@@ -106,6 +106,87 @@ export function getChartTooltipTransform(position: { x: number; y: number }): st
   return `translate3d(${position.x}px, ${position.y}px, 0)`
 }
 
+export interface ChartTooltipPositionInput {
+  x: number
+  y: number
+  rect: { width: number; height: number }
+  viewport: { width: number; height: number }
+  offsetX?: number
+  offsetY?: number
+  padding?: number
+}
+
+export function resolveChartTooltipPosition(input: ChartTooltipPositionInput): {
+  x: number
+  y: number
+} {
+  const offsetX = input.offsetX ?? 12
+  const offsetY = input.offsetY ?? -8
+  const padding = input.padding ?? 8
+  const anchorX = Number.isFinite(input.x) ? input.x : 0
+  const anchorY = Number.isFinite(input.y) ? input.y : 0
+  const rectWidth = Number.isFinite(input.rect.width) ? Math.max(0, input.rect.width) : 0
+  const rectHeight = Number.isFinite(input.rect.height) ? Math.max(0, input.rect.height) : 0
+  const viewportWidth = Number.isFinite(input.viewport.width) ? Math.max(0, input.viewport.width) : 0
+  const viewportHeight = Number.isFinite(input.viewport.height) ? Math.max(0, input.viewport.height) : 0
+
+  let nextX = anchorX + offsetX
+  let nextY = anchorY + offsetY
+
+  if (nextX + rectWidth > viewportWidth - padding) {
+    nextX = anchorX - rectWidth - offsetX
+  }
+  if (nextY + rectHeight > viewportHeight - padding) {
+    nextY = anchorY - rectHeight - Math.abs(offsetY)
+  }
+
+  return {
+    x: Math.max(padding, nextX),
+    y: Math.max(padding, nextY)
+  }
+}
+
+export interface DownsampledPoint<T> {
+  item: T
+  index: number
+}
+
+export function downsampleSeriesData<T>(
+  data: readonly T[],
+  threshold: number,
+  getValue: (item: T, index: number) => number = (_item, index) => index
+): DownsampledPoint<T>[] {
+  const safeThreshold = Math.max(0, Math.floor(Number.isFinite(threshold) ? threshold : 0))
+  if (safeThreshold === 0 || data.length <= safeThreshold) {
+    return data.map((item, index) => ({ item, index }))
+  }
+  if (safeThreshold === 1) {
+    return [{ item: data[0], index: 0 }]
+  }
+
+  const result: DownsampledPoint<T>[] = [{ item: data[0], index: 0 }]
+  const bucketSize = (data.length - 2) / Math.max(1, safeThreshold - 2)
+
+  for (let bucket = 0; bucket < safeThreshold - 2; bucket++) {
+    const start = Math.floor(1 + bucket * bucketSize)
+    const end = Math.min(data.length - 1, Math.floor(1 + (bucket + 1) * bucketSize))
+    let selectedIndex = start
+    let selectedValue = Number.NEGATIVE_INFINITY
+    for (let index = start; index < end; index++) {
+      const rawValue = getValue(data[index], index)
+      const value = Math.abs(Number.isFinite(rawValue) ? rawValue : 0)
+      if (value > selectedValue) {
+        selectedValue = value
+        selectedIndex = index
+      }
+    }
+    result.push({ item: data[selectedIndex], index: selectedIndex })
+  }
+
+  result.push({ item: data[data.length - 1], index: data.length - 1 })
+  return result
+}
+
 /** Resolve tooltip content for multi-series charts (Line, Area, Radar). */
 export function resolveMultiSeriesTooltipContent<TDatum, TSeries extends { data: TDatum[] }>(
   hoveredPoint: { seriesIndex: number; pointIndex: number } | null,

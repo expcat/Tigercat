@@ -28,44 +28,18 @@ export interface SunburstArc {
   midAngle: number
 }
 
-/** WeakMap cache for sumValue — avoids O(n·d) redundant traversals */
-const sumCache = new WeakMap<SunburstChartDatum, number>()
-
 function sumValue(d: SunburstChartDatum): number {
-  const cached = sumCache.get(d)
-  if (cached !== undefined) return cached
   let v: number
   if (d.children && d.children.length > 0) {
     v = d.children.reduce((s, c) => s + sumValue(c), 0)
   } else {
     v = d.value
   }
-  sumCache.set(d, v)
-  return v
+  return Number.isFinite(v) ? Math.max(0, v) : 0
 }
-
-/** Pre-warm the sumValue cache for the entire tree in O(n) */
-function precomputeSums(items: readonly SunburstChartDatum[]): void {
-  for (const item of items) {
-    if (item.children && item.children.length > 0) {
-      precomputeSums(item.children)
-    }
-    sumValue(item)
-  }
-}
-
-/** Last-result memo cache for computeSunburstArcs */
-let _sbLastData: readonly SunburstChartDatum[] | null = null
-let _sbLastCx = 0
-let _sbLastCy = 0
-let _sbLastIR = 0
-let _sbLastOR = 0
-let _sbLastColors: readonly string[] | null = null
-let _sbLastResult: SunburstArc[] = []
 
 /**
  * Flatten hierarchical data into arc descriptors with depth levels.
- * Layout is memoized: identical inputs return the cached result.
  */
 export function computeSunburstArcs(
   data: SunburstChartDatum[],
@@ -77,23 +51,14 @@ export function computeSunburstArcs(
     colors?: string[]
   }
 ): SunburstArc[] {
-  const { cx, cy, innerRadius, outerRadius, colors } = opts
+  const { innerRadius, outerRadius, colors } = opts
+  const cx = Number.isFinite(opts.cx) ? opts.cx : 0
+  const cy = Number.isFinite(opts.cy) ? opts.cy : 0
+  const safeInnerRadius = Number.isFinite(innerRadius) ? Math.max(0, innerRadius) : 0
+  const safeOuterRadius = Number.isFinite(outerRadius)
+    ? Math.max(safeInnerRadius, outerRadius)
+    : safeInnerRadius
   const palette = colors ?? DEFAULT_CHART_COLORS
-
-  // Return cached result when inputs are unchanged
-  if (
-    data === _sbLastData &&
-    cx === _sbLastCx &&
-    cy === _sbLastCy &&
-    innerRadius === _sbLastIR &&
-    outerRadius === _sbLastOR &&
-    palette === _sbLastColors
-  ) {
-    return _sbLastResult
-  }
-
-  // Pre-warm sum cache for the entire tree (O(n) single pass)
-  precomputeSums(data)
 
   // Determine max depth
   function maxDepth(items: SunburstChartDatum[], d: number): number {
@@ -108,7 +73,9 @@ export function computeSunburstArcs(
 
   const depth = maxDepth(data, 0)
   const ringWidth =
-    depth > 0 ? (outerRadius - innerRadius) / (depth + 1) : outerRadius - innerRadius
+    depth > 0
+      ? (safeOuterRadius - safeInnerRadius) / (depth + 1)
+      : safeOuterRadius - safeInnerRadius
 
   const arcs: SunburstArc[] = []
   let flatIndex = 0
@@ -130,8 +97,8 @@ export function computeSunburstArcs(
       const sa = angle
       const ea = angle + sweep
 
-      const iR = innerRadius + level * ringWidth
-      const oR = iR + ringWidth - 1 // 1px gap between rings
+      const iR = safeInnerRadius + level * ringWidth
+      const oR = Math.max(iR, iR + ringWidth - 1) // 1px gap between rings
 
       const colorIdx = level === 0 ? i : parentColorIdx
       const color = item.color ?? palette[colorIdx % palette.length]
@@ -148,7 +115,7 @@ export function computeSunburstArcs(
       arcs.push({
         index: flatIndex++,
         label: item.label,
-        value: item.value,
+        value: val,
         depth: level,
         startAngle: sa,
         endAngle: ea,
@@ -167,12 +134,5 @@ export function computeSunburstArcs(
 
   layoutLevel(data, -Math.PI / 2, (3 * Math.PI) / 2, 0, 0)
 
-  _sbLastData = data
-  _sbLastCx = cx
-  _sbLastCy = cy
-  _sbLastIR = innerRadius
-  _sbLastOR = outerRadius
-  _sbLastColors = palette
-  _sbLastResult = arcs
   return arcs
 }

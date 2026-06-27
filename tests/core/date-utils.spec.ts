@@ -8,6 +8,7 @@ import {
   formatDateWithLocale,
   getCalendarDays,
   getCalendarMonthDaysCacheSize,
+  getDatePickerCalendarCellState,
   getDayNames,
   getDaysInMonth,
   getFirstDayOfMonth,
@@ -73,16 +74,12 @@ describe('date-utils calendar month cache', () => {
     expect(formatDate(new Date(2024, 0, 5), 'dd/MM/yyyy')).toBe('05/01/2024')
   })
 
-  it('formats dates through Intl when locale is provided', () => {
+  it('formats localized date parts while preserving the requested format order', () => {
     const date = new Date(2024, 0, 5)
 
-    expect(formatDate(date, 'yyyy-MM-dd', 'fr-FR')).toBe(
-      new Intl.DateTimeFormat('fr-FR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).format(date)
-    )
+    expect(formatDate(date, 'yyyy-MM-dd', 'fr-FR')).toBe('2024-01-05')
+    expect(formatDate(date, 'dd/MM/yyyy', 'fr-FR')).toBe('05/01/2024')
+    expect(formatDate(date, 'yyyy/MM/dd', 'ar-SA')).not.toBe('2024/01/05')
     expect(formatDateWithLocale(date, 'de-DE', { dateStyle: 'medium' })).toBe(
       new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium' }).format(date)
     )
@@ -167,6 +164,34 @@ describe('date-utils calendar month cache', () => {
     expect(isToday(new Date(2024, 3, 21))).toBe(false)
 
     vi.useRealTimers()
+  })
+
+  it('derives DatePicker calendar cell state without DOM dependencies', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2024, 0, 15, 12))
+
+    const state = getDatePickerCalendarCellState({
+      date: new Date(2024, 0, 10),
+      isCurrentMonth: (date) => date.getMonth() === 0,
+      isDateDisabled: (date) => date < new Date(2024, 0, 9) || date > new Date(2024, 0, 20),
+      selectedDate: new Date(2024, 0, 10, 12),
+      selectedRange: [new Date(2024, 0, 8), new Date(2024, 0, 12)],
+      isRangeMode: true
+    })
+
+    expect(state).toMatchObject({
+      isCurrentMonthDay: true,
+      isSelected: false,
+      isInRange: true,
+      isDisabled: false,
+      isRangeEnd: false
+    })
+
+    const disabled = getDatePickerCalendarCellState({
+      date: new Date(2024, 0, 8),
+      isDateDisabled: (date) => date < new Date(2024, 0, 9)
+    })
+    expect(disabled.isDisabled).toBe(true)
   })
 
   afterEach(() => {

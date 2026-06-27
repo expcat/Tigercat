@@ -7,6 +7,7 @@
 
 import type { FileItem, FileSortField, FileSortOrder, FileViewMode } from '../types/file-manager'
 import type { DragItem, DragDropEvent } from '../types/drag'
+import { formatBytes, getFileExtensionName } from './file-utils'
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
@@ -114,24 +115,14 @@ export function filterHiddenFiles(items: FileItem[], showHidden: boolean): FileI
  * Uses the same format as upload-utils but handles undefined.
  */
 export function formatFileSizeLabel(bytes?: number): string {
-  if (bytes === undefined || bytes === null) return ''
-  if (bytes === 0) return '0 B'
-
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  const k = 1024
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  const size = bytes / Math.pow(k, i)
-
-  return `${size % 1 === 0 ? size : size.toFixed(1)} ${units[i]}`
+  return formatBytes(bytes, { precision: 1, trimTrailingZeros: true })
 }
 
 /**
  * Get file extension from name.
  */
 export function getFileExtension(name: string): string {
-  const dot = name.lastIndexOf('.')
-  if (dot <= 0) return ''
-  return name.slice(dot + 1).toLowerCase()
+  return getFileExtensionName(name)
 }
 
 /**

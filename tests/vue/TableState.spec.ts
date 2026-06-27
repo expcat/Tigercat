@@ -143,6 +143,23 @@ describe('Vue useTableState', () => {
     scope.stop()
   })
 
+  it('selects only enabled current-page rows when toggling select all', () => {
+    const { context, emit, scope } = createState({
+      rowSelection: {
+        defaultSelectedRowKeys: [4],
+        getCheckboxProps: (record) => ({ disabled: record.id === 2 })
+      }
+    })
+
+    context.handleSelectAll(true)
+    expect(emit).toHaveBeenLastCalledWith('selection-change', [4, 1])
+    expect(context.allSelected.value).toBe(true)
+
+    context.handleSelectAll(false)
+    expect(emit).toHaveBeenLastCalledWith('selection-change', [4])
+    scope.stop()
+  })
+
   it('handles radio selection and editable cells', () => {
     const editableCells = new Map<string, Set<number>>([['name', new Set([0])]])
     const { context, emit, scope } = createState({

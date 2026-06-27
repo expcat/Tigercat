@@ -14,6 +14,7 @@ import {
   flattenSelectOptions,
   resolveCreatableSelectOption,
   resolveSelectFilteredOptions,
+  getPickerOptionAria,
   findFirstEnabledIndex as pickerFindFirstEnabledIndex,
   findLastEnabledIndex as pickerFindLastEnabledIndex,
   findNextEnabledIndex as pickerFindNextEnabledIndex,
@@ -740,6 +741,10 @@ export const Select = defineComponent({
                     ) => {
                       const selected = isSelected(option)
                       const active = idx === activeIndex.value
+                      const optionAria = getPickerOptionAria({
+                        selected,
+                        disabled: !!option.disabled
+                      })
 
                       return h(
                         'div',
@@ -747,9 +752,7 @@ export const Select = defineComponent({
                           key: option.value,
                           id: getOptionId(idx),
                           'data-option-index': idx,
-                          role: 'option',
-                          'aria-selected': selected,
-                          'aria-disabled': option.disabled ? true : undefined,
+                          ...optionAria,
                           tabindex: active ? 0 : -1,
                           class: getSelectOptionClasses(selected, !!option.disabled, props.size),
                           onMouseenter: () => {

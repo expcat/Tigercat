@@ -86,9 +86,14 @@ export function getHeatmapCellIndexAtPoint(
  * Linearly interpolate between two hex colours.
  */
 export function interpolateColor(minColor: string, maxColor: string, t: number): string {
+  const clamped = Number.isFinite(t) ? Math.max(0, Math.min(1, t)) : 0
   const [r1, g1, b1] = hexToRgb(minColor)
   const [r2, g2, b2] = hexToRgb(maxColor)
-  return rgbToHex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t)
+  return rgbToHex(
+    r1 + (r2 - r1) * clamped,
+    g1 + (g2 - g1) * clamped,
+    b1 + (b2 - b1) * clamped
+  )
 }
 
 /**
@@ -138,22 +143,28 @@ export function computeHeatmapCells(
 
   const cols = xLabels.length
   const rows = yLabels.length
-  if (cols === 0 || rows === 0) return []
+  const safeWidth = Number.isFinite(width) ? Math.max(0, width) : 0
+  const safeHeight = Number.isFinite(height) ? Math.max(0, height) : 0
+  const safeCellGap = Number.isFinite(cellGap) ? Math.max(0, cellGap) : 0
+  if (cols === 0 || rows === 0 || safeWidth <= 0 || safeHeight <= 0) return []
 
-  const cellW = (width - cellGap * (cols - 1)) / cols
-  const cellH = (height - cellGap * (rows - 1)) / rows
+  const totalGapX = Math.min(safeWidth, safeCellGap * (cols - 1))
+  const totalGapY = Math.min(safeHeight, safeCellGap * (rows - 1))
+  const cellW = Math.max(0, (safeWidth - totalGapX) / cols)
+  const cellH = Math.max(0, (safeHeight - totalGapY) / rows)
 
   // Build value lookup
   const valMap = new Map<string, number>()
   for (const d of data) {
-    valMap.set(`${d.x}|${d.y}`, d.value)
+    valMap.set(`${d.x}|${d.y}`, Number.isFinite(d.value) ? d.value : 0)
   }
 
-  let minVal = Infinity
-  let maxVal = -Infinity
-  for (const d of data) {
-    if (d.value < minVal) minVal = d.value
-    if (d.value > maxVal) maxVal = d.value
+  const finiteValues = Array.from(valMap.values())
+  let minVal = 0
+  let maxVal = 0
+  if (finiteValues.length > 0) {
+    minVal = Math.min(...finiteValues, 0)
+    maxVal = Math.max(...finiteValues, 0)
   }
   if (minVal === maxVal) maxVal = minVal + 1 // avoid division by zero
 
@@ -161,12 +172,12 @@ export function computeHeatmapCells(
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const val = valMap.get(`${xLabels[c]}|${yLabels[r]}`) ?? 0
-      const heat = (val - minVal) / (maxVal - minVal)
+      const heat = Math.max(0, Math.min(1, (val - minVal) / (maxVal - minVal)))
       cells.push({
         row: r,
         col: c,
-        x: c * (cellW + cellGap),
-        y: r * (cellH + cellGap),
+        x: c * (cellW + safeCellGap),
+        y: r * (cellH + safeCellGap),
         w: cellW,
         h: cellH,
         heat,

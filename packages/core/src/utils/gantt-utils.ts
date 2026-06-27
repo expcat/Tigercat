@@ -90,8 +90,10 @@ export function normalizeGanttDate(value: GanttDateValue): number {
 }
 
 export function getGanttTaskAriaLabel(task: GanttTask): string {
-  const start = formatGanttDate(new Date(normalizeGanttDate(task.start)), 'day')
-  const end = formatGanttDate(new Date(normalizeGanttDate(task.end)), 'day')
+  const startMs = normalizeGanttDate(task.start)
+  const endMs = normalizeGanttDate(task.end)
+  const start = Number.isFinite(startMs) ? formatGanttDate(new Date(startMs), 'day') : 'unknown'
+  const end = Number.isFinite(endMs) ? formatGanttDate(new Date(endMs), 'day') : 'unknown'
   const progress = typeof task.progress === 'number' ? `, ${clampProgress(task.progress)}%` : ''
   return `${task.label}, ${start} to ${end}${progress}`
 }
@@ -110,20 +112,29 @@ export function computeGanttLayout(
   options: GanttLayoutOptions = {}
 ): GanttLayoutResult {
   const {
-    width = 720,
-    rowHeight = 40,
-    barHeight = 18,
-    taskLabelWidth = 140,
-    timelineHeight = 36,
-    minBarWidth = 6,
+    width: rawWidth = 720,
+    rowHeight: rawRowHeight = 40,
+    barHeight: rawBarHeight = 18,
+    taskLabelWidth: rawTaskLabelWidth = 140,
+    timelineHeight: rawTimelineHeight = 36,
+    minBarWidth: rawMinBarWidth = 6,
     scale = 'week',
     colors = DEFAULT_CHART_COLORS,
     dateFormatter
   } = options
+  const width = Number.isFinite(rawWidth) ? Math.max(0, rawWidth) : 0
+  const rowHeight = Number.isFinite(rawRowHeight) ? Math.max(0, rawRowHeight) : 0
+  const barHeight = Number.isFinite(rawBarHeight) ? Math.max(0, rawBarHeight) : 0
+  const taskLabelWidth = Number.isFinite(rawTaskLabelWidth) ? Math.max(0, rawTaskLabelWidth) : 0
+  const timelineHeight = Number.isFinite(rawTimelineHeight) ? Math.max(0, rawTimelineHeight) : 0
+  const minBarWidth = Number.isFinite(rawMinBarWidth) ? Math.max(0, rawMinBarWidth) : 0
 
   if (data.length === 0) {
-    const minMs = normalizeGanttDate(options.minDate ?? Date.now())
-    const maxMs = normalizeGanttDate(options.maxDate ?? minMs + DAY_MS)
+    const fallbackMin = Date.now()
+    const rawMinMs = normalizeGanttDate(options.minDate ?? fallbackMin)
+    const minMs = Number.isFinite(rawMinMs) ? rawMinMs : fallbackMin
+    const rawMaxMs = normalizeGanttDate(options.maxDate ?? minMs + DAY_MS)
+    const maxMs = Number.isFinite(rawMaxMs) && rawMaxMs > minMs ? rawMaxMs : minMs + DAY_MS
     return {
       tasks: [],
       dependencies: [],
@@ -140,16 +151,20 @@ export function computeGanttLayout(
   const taskRanges = data.map((task) => {
     const rawStart = normalizeGanttDate(task.start)
     const rawEnd = normalizeGanttDate(task.end)
-    const startMs = Math.min(rawStart, rawEnd)
-    const endMs = Math.max(rawStart, rawEnd)
+    const startFallback = Number.isFinite(rawEnd) ? rawEnd : Date.now()
+    const endFallback = Number.isFinite(rawStart) ? rawStart : startFallback + DAY_MS
+    const safeStart = Number.isFinite(rawStart) ? rawStart : startFallback
+    const safeEnd = Number.isFinite(rawEnd) ? rawEnd : endFallback
+    const startMs = Math.min(safeStart, safeEnd)
+    const endMs = Math.max(safeStart, safeEnd)
     return { task, startMs, endMs: endMs === startMs ? endMs + DAY_MS : endMs }
   })
-  const minMs = normalizeGanttDate(
-    options.minDate ?? Math.min(...taskRanges.map((item) => item.startMs))
-  )
-  const maxMs = normalizeGanttDate(
-    options.maxDate ?? Math.max(...taskRanges.map((item) => item.endMs))
-  )
+  const inferredMinMs = Math.min(...taskRanges.map((item) => item.startMs))
+  const inferredMaxMs = Math.max(...taskRanges.map((item) => item.endMs))
+  const rawMinMs = normalizeGanttDate(options.minDate ?? inferredMinMs)
+  const rawMaxMs = normalizeGanttDate(options.maxDate ?? inferredMaxMs)
+  const minMs = Number.isFinite(rawMinMs) ? rawMinMs : inferredMinMs
+  const maxMs = Number.isFinite(rawMaxMs) ? rawMaxMs : inferredMaxMs
   const safeMaxMs = maxMs > minMs ? maxMs : minMs + DAY_MS
   const timelineWidth = Math.max(0, width - taskLabelWidth)
   const rangeMs = safeMaxMs - minMs
@@ -223,16 +238,20 @@ export function createGanttTimelineTicks(
   scale: GanttScale,
   formatter: (date: Date, scale: GanttScale) => string = formatGanttDate
 ): GanttTimelineTick[] {
+  const safeMinMs = Number.isFinite(minMs) ? minMs : Date.now()
+  const safeMaxMs = Number.isFinite(maxMs) && maxMs > safeMinMs ? maxMs : safeMinMs + DAY_MS
+  const safeTimelineWidth = Number.isFinite(timelineWidth) ? Math.max(0, timelineWidth) : 0
+  const safeTaskLabelWidth = Number.isFinite(taskLabelWidth) ? Math.max(0, taskLabelWidth) : 0
   const ticks: GanttTimelineTick[] = []
-  const rangeMs = Math.max(DAY_MS, maxMs - minMs)
-  let current = startOfTick(new Date(minMs), scale)
+  const rangeMs = Math.max(DAY_MS, safeMaxMs - safeMinMs)
+  let current = startOfTick(new Date(safeMinMs), scale)
 
-  while (current.getTime() <= maxMs) {
+  while (current.getTime() <= safeMaxMs) {
     const currentMs = current.getTime()
-    if (currentMs >= minMs) {
+    if (currentMs >= safeMinMs) {
       ticks.push({
         value: new Date(currentMs),
-        x: taskLabelWidth + ((currentMs - minMs) / rangeMs) * timelineWidth,
+        x: safeTaskLabelWidth + ((currentMs - safeMinMs) / rangeMs) * safeTimelineWidth,
         label: formatter(new Date(currentMs), scale)
       })
     }
@@ -241,8 +260,8 @@ export function createGanttTimelineTicks(
   }
 
   if (ticks.length === 0) {
-    const date = new Date(minMs)
-    ticks.push({ value: date, x: taskLabelWidth, label: formatter(date, scale) })
+    const date = new Date(safeMinMs)
+    ticks.push({ value: date, x: safeTaskLabelWidth, label: formatter(date, scale) })
   }
 
   return ticks

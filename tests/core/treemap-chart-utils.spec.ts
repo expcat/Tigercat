@@ -123,11 +123,16 @@ describe('computeTreeMapNodes', () => {
     expect(nodes[0].color).toBe('#abc')
   })
 
-  it('memoizes result for same inputs', () => {
+  it('recomputes same-reference data mutations instead of returning stale cached nodes', () => {
     const data = [{ label: 'A', value: 100 }]
     const r1 = computeTreeMapNodes(data, baseOpts)
+    data[0].label = 'Changed'
+    data[0].value = 50
     const r2 = computeTreeMapNodes(data, baseOpts)
-    expect(r1).toBe(r2) // same reference
+
+    expect(r1).not.toBe(r2)
+    expect(r2[0].label).toBe('Changed')
+    expect(r2[0].value).toBe(50)
   })
 
   it('recomputes when data reference changes', () => {
@@ -147,5 +152,21 @@ describe('computeTreeMapNodes', () => {
     const big = nodes.find((n) => n.label === 'Big')!
     const small = nodes.find((n) => n.label === 'Small')!
     expect(big.w * big.h).toBeGreaterThan(small.w * small.h)
+  })
+
+  it('normalizes invalid dimensions and leaf values', () => {
+    expect(computeTreeMapNodes([{ label: 'A', value: 1 }], { width: -1, height: 100 })).toEqual([])
+
+    const nodes = computeTreeMapNodes(
+      [
+        { label: 'Bad', value: Number.NaN },
+        { label: 'Negative', value: -5 },
+        { label: 'Good', value: 10 }
+      ],
+      { ...baseOpts, gap: -8 }
+    )
+
+    expect(nodes.map((node) => node.value)).toEqual([10])
+    expect(nodes.every((node) => Number.isFinite(node.x) && Number.isFinite(node.w))).toBe(true)
   })
 })

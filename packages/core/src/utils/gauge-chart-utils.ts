@@ -100,6 +100,10 @@ function degToRad(deg: number): number {
   return (deg * Math.PI) / 180
 }
 
+function safeNumber(value: number, fallback = 0): number {
+  return Number.isFinite(value) ? value : fallback
+}
+
 /**
  * Create an SVG arc path for a gauge segment.
  *
@@ -113,8 +117,9 @@ export function createGaugeArcPath(
   endDeg: number,
   arcWidth: number
 ): string {
-  const outerR = radius
-  const innerR = radius - arcWidth
+  const outerR = Math.max(0, safeNumber(radius))
+  const safeArcWidth = Math.max(0, safeNumber(arcWidth))
+  const innerR = Math.max(0, outerR - safeArcWidth)
 
   // Convert to standard math angles (0=3 o'clock, CCW positive)
   // We use clockwise from top (12 o'clock) so adjust:
@@ -160,8 +165,9 @@ export function createGaugeNeedlePath(
   needleWidth: number = 4
 ): string {
   const rad = degToRad(angleDeg - 90)
-  const tipX = cx + length * Math.cos(rad)
-  const tipY = cy + length * Math.sin(rad)
+  const safeLength = Math.max(0, safeNumber(length))
+  const tipX = cx + safeLength * Math.cos(rad)
+  const tipY = cy + safeLength * Math.sin(rad)
 
   // Perpendicular offset for base width
   const perpRad = rad + Math.PI / 2
@@ -184,8 +190,13 @@ export function valueToGaugeAngle(
   startAngle: number,
   endAngle: number
 ): number {
-  const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)))
-  return startAngle + ratio * (endAngle - startAngle)
+  const safeStart = safeNumber(startAngle)
+  const safeEnd = safeNumber(endAngle, safeStart)
+  const safeMin = safeNumber(min)
+  const safeMax = safeNumber(max, safeMin)
+  if (safeMax <= safeMin) return safeStart
+  const ratio = Math.max(0, Math.min(1, (safeNumber(value, safeMin) - safeMin) / (safeMax - safeMin)))
+  return safeStart + ratio * (safeEnd - safeStart)
 }
 
 /**
@@ -202,15 +213,22 @@ export function computeGaugeTicks(
   tickCount: number
 ): Array<{ x1: number; y1: number; x2: number; y2: number; value: number; label: string }> {
   const ticks = []
-  for (let i = 0; i <= tickCount; i++) {
-    const ratio = i / tickCount
-    const val = min + ratio * (max - min)
-    const angle = startAngle + ratio * (endAngle - startAngle)
+  const safeTickCount = Math.max(1, Math.floor(safeNumber(tickCount, 1)))
+  const safeRadius = Math.max(0, safeNumber(radius))
+  const safeMin = safeNumber(min)
+  const safeMax = safeNumber(max, safeMin)
+  const safeStart = safeNumber(startAngle)
+  const safeEnd = safeNumber(endAngle, safeStart)
+  for (let i = 0; i <= safeTickCount; i++) {
+    const ratio = i / safeTickCount
+    const val = safeMax <= safeMin ? safeMin : safeMin + ratio * (safeMax - safeMin)
+    const angle = safeStart + ratio * (safeEnd - safeStart)
     const rad = degToRad(angle - 90)
-    const outerX = cx + radius * Math.cos(rad)
-    const outerY = cy + radius * Math.sin(rad)
-    const innerX = cx + (radius - 8) * Math.cos(rad)
-    const innerY = cy + (radius - 8) * Math.sin(rad)
+    const innerRadius = Math.max(0, safeRadius - 8)
+    const outerX = cx + safeRadius * Math.cos(rad)
+    const outerY = cy + safeRadius * Math.sin(rad)
+    const innerX = cx + innerRadius * Math.cos(rad)
+    const innerY = cy + innerRadius * Math.sin(rad)
     ticks.push({
       x1: innerX,
       y1: innerY,

@@ -11,7 +11,7 @@
  * @since 0.7.0
  */
 
-import type { ThemePreset, ThemeSemanticColors, ColorScheme } from '../types/theme'
+import type { ThemeConfig, ThemePreset, ThemeSemanticColors, ColorScheme } from '../types/theme'
 import { THEME_CSS_VARS, removeCssVarsCached, setCssVarsCached } from '../theme-runtime'
 import { isBrowser } from '../utils/env'
 
@@ -19,19 +19,82 @@ import { isBrowser } from '../utils/env'
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-function applyColors(colors: Partial<ThemeSemanticColors>, target: HTMLElement): void {
+export const THEME_CONFIG_CSS_VARS = {
+  typography: {
+    fontFamily: '--tiger-font-family',
+    fontFamilyMono: '--tiger-font-family-mono',
+    fontSizeBase: '--tiger-font-size-base',
+    fontSizeSm: '--tiger-font-size-sm',
+    fontSizeLg: '--tiger-font-size-lg',
+    fontWeightNormal: '--tiger-font-weight-normal',
+    fontWeightMedium: '--tiger-font-weight-medium',
+    fontWeightSemibold: '--tiger-font-weight-semibold',
+    fontWeightBold: '--tiger-font-weight-bold',
+    lineHeightNormal: '--tiger-line-height-normal',
+    lineHeightTight: '--tiger-line-height-tight'
+  },
+  radius: {
+    none: '--tiger-radius-none',
+    sm: '--tiger-radius-sm',
+    md: '--tiger-radius-md',
+    lg: '--tiger-radius-lg',
+    xl: '--tiger-radius-xl',
+    full: '--tiger-radius-full'
+  },
+  shadows: {
+    xs: '--tiger-shadow-xs',
+    sm: '--tiger-shadow-sm',
+    md: '--tiger-shadow-md',
+    lg: '--tiger-shadow-lg',
+    xl: '--tiger-shadow-xl'
+  },
+  spacing: {
+    xs: '--tiger-spacing-xs',
+    sm: '--tiger-spacing-sm',
+    md: '--tiger-spacing-md',
+    lg: '--tiger-spacing-lg',
+    xl: '--tiger-spacing-xl'
+  },
+  motion: {
+    durationFast: '--tiger-duration-fast',
+    durationBase: '--tiger-duration-base',
+    durationSlow: '--tiger-duration-slow',
+    easing: '--tiger-easing'
+  }
+} as const
+
+export function themeConfigToCssVars(config: ThemeConfig): Record<string, string> {
   const vars: Record<string, string> = {}
-  for (const [key, value] of Object.entries(colors)) {
-    const varName = THEME_CSS_VARS[key as keyof ThemeSemanticColors]
-    if (varName && value) {
-      vars[varName] = value
+
+  if (config.colors) {
+    for (const [key, value] of Object.entries(config.colors)) {
+      const varName = THEME_CSS_VARS[key as keyof ThemeSemanticColors]
+      if (varName && value) vars[varName] = value
     }
   }
-  setCssVarsCached(target, vars)
+
+  for (const section of ['typography', 'radius', 'shadows', 'spacing', 'motion'] as const) {
+    const values = config[section]
+    if (!values) continue
+    const varNames = THEME_CONFIG_CSS_VARS[section]
+    for (const [key, value] of Object.entries(values)) {
+      const varName = varNames[key as keyof typeof varNames]
+      if (varName && value) vars[varName] = value
+    }
+  }
+
+  return vars
 }
 
-function clearColors(target: HTMLElement): void {
-  removeCssVarsCached(target, Object.values(THEME_CSS_VARS))
+function clearThemeConfig(target: HTMLElement): void {
+  removeCssVarsCached(target, [
+    ...Object.values(THEME_CSS_VARS),
+    ...Object.values(THEME_CONFIG_CSS_VARS.typography),
+    ...Object.values(THEME_CONFIG_CSS_VARS.radius),
+    ...Object.values(THEME_CONFIG_CSS_VARS.shadows),
+    ...Object.values(THEME_CONFIG_CSS_VARS.spacing),
+    ...Object.values(THEME_CONFIG_CSS_VARS.motion)
+  ])
 }
 
 function resolveSystemDark(): boolean {
@@ -165,13 +228,11 @@ class ThemeManagerImpl {
     const preset = this.presets.get(this.currentThemeName)
 
     // Clear previous inline variables so preset defaults flow through
-    clearColors(root)
+    clearThemeConfig(root)
 
     if (preset) {
       const config = this.resolvedDark ? preset.dark : preset.light
-      if (config.colors) {
-        applyColors(config.colors, root)
-      }
+      setCssVarsCached(root, themeConfigToCssVars(config))
     }
 
     // Toggle `.dark` class on <html>

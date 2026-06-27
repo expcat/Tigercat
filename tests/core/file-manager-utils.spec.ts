@@ -3,8 +3,10 @@ import {
   sortFileItems,
   filterFileItems,
   filterHiddenFiles,
+  formatBytes,
   formatFileSizeLabel,
   getFileExtension,
+  getFileExtensionName,
   navigateToFolder,
   getFileManagerContainerClasses,
   getFileItemClasses,
@@ -139,6 +141,12 @@ describe('file-manager-utils', () => {
     it('formats megabytes', () => {
       expect(formatFileSizeLabel(1024 * 1024 * 2.5)).toBe('2.5 MB')
     })
+
+    it('shares core byte formatting while preserving FileManager precision', () => {
+      expect(formatBytes(1024, { precision: 2 })).toBe('1.00 KB')
+      expect(formatBytes(1024, { precision: 2, trimTrailingZeros: true })).toBe('1 KB')
+      expect(formatFileSizeLabel(Number.NaN)).toBe('0 B')
+    })
   })
 
   // ─── getFileExtension ─────────────────────────────────────
@@ -162,6 +170,12 @@ describe('file-manager-utils', () => {
 
     it('returns empty for dotfile', () => {
       expect(getFileExtension('.gitignore')).toBe('')
+    })
+
+    it('shares core extension parsing with optional dotted aliases', () => {
+      expect(getFileExtensionName('Archive.TAR.GZ')).toBe('gz')
+      expect(getFileExtensionName('Archive.TAR.GZ', { includeDot: true })).toBe('.gz')
+      expect(getFileExtensionName('folder.')).toBe('')
     })
   })
 

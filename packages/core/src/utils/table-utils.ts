@@ -295,6 +295,61 @@ export function getTableColgroup<T = Record<string, unknown>>(
   return entries
 }
 
+export function hasTableSelectionColumn(
+  rowSelection?: { showCheckbox?: boolean } | null
+): boolean {
+  return !!rowSelection && rowSelection.showCheckbox !== false
+}
+
+export interface TableSelectionStateInput<T = Record<string, unknown>> {
+  records: T[]
+  rowKeys: (string | number)[]
+  selectedRowKeys: (string | number)[]
+  getCheckboxProps?: (record: T) => { disabled?: boolean } | undefined
+}
+
+export interface TableSelectionState {
+  selectableRowKeys: (string | number)[]
+  allSelected: boolean
+  someSelected: boolean
+}
+
+export function getTableSelectionState<T = Record<string, unknown>>(
+  input: TableSelectionStateInput<T>
+): TableSelectionState {
+  const selectedSet = new Set(input.selectedRowKeys)
+  const selectableRowKeys = input.rowKeys.filter((key, index) => {
+    const record = input.records[index]
+    return !input.getCheckboxProps?.(record)?.disabled
+  })
+  const allSelected =
+    selectableRowKeys.length > 0 && selectableRowKeys.every((key) => selectedSet.has(key))
+  const someSelected = selectableRowKeys.some((key) => selectedSet.has(key)) && !allSelected
+
+  return { selectableRowKeys, allSelected, someSelected }
+}
+
+export function getNextTableSelectAllKeys(
+  selectedRowKeys: (string | number)[],
+  selectableRowKeys: (string | number)[],
+  checked: boolean
+): (string | number)[] {
+  const selectableSet = new Set(selectableRowKeys)
+  if (!checked) {
+    return selectedRowKeys.filter((key) => !selectableSet.has(key))
+  }
+
+  const next = [...selectedRowKeys]
+  const nextSet = new Set(next)
+  for (const key of selectableRowKeys) {
+    if (!nextSet.has(key)) {
+      next.push(key)
+      nextSet.add(key)
+    }
+  }
+  return next
+}
+
 /**
  * Freeze the first measured width of each auto-sized column.
  *

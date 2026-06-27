@@ -5,8 +5,10 @@ import {
   buildChartSeriesKeys,
   resolveChartTooltipContent,
   getChartTooltipTransform,
+  resolveChartTooltipPosition,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
+  downsampleSeriesData,
   defaultXYTooltipFormatter,
   defaultSeriesXYTooltipFormatter,
   defaultRadarTooltipFormatter,
@@ -156,6 +158,33 @@ describe('getChartTooltipTransform', () => {
   })
 })
 
+describe('resolveChartTooltipPosition', () => {
+  it('keeps tooltip inside the viewport when it would overflow', () => {
+    expect(
+      resolveChartTooltipPosition({
+        x: 190,
+        y: 90,
+        rect: { width: 80, height: 40 },
+        viewport: { width: 220, height: 120 },
+        offsetX: 10,
+        offsetY: 10,
+        padding: 8
+      })
+    ).toEqual({ x: 100, y: 40 })
+  })
+
+  it('normalizes non-finite coordinates and dimensions', () => {
+    expect(
+      resolveChartTooltipPosition({
+        x: Number.NaN,
+        y: Number.POSITIVE_INFINITY,
+        rect: { width: Number.NaN, height: -40 },
+        viewport: { width: 0, height: Number.NaN }
+      })
+    ).toEqual({ x: 8, y: 8 })
+  })
+})
+
 // ============================================================================
 // resolveMultiSeriesTooltipContent
 // ============================================================================
@@ -201,6 +230,29 @@ describe('resolveSeriesData', () => {
   it('returns empty array when both are empty/undefined', () => {
     expect(resolveSeriesData(undefined, undefined)).toEqual([])
     expect(resolveSeriesData([], [])).toEqual([])
+  })
+})
+
+describe('downsampleSeriesData', () => {
+  it('preserves endpoints and selects bucket representatives by value magnitude', () => {
+    const result = downsampleSeriesData([1, 2, 10, 4, 5], 3, (value) => value)
+
+    expect(result).toEqual([
+      { item: 1, index: 0 },
+      { item: 10, index: 2 },
+      { item: 5, index: 4 }
+    ])
+  })
+
+  it('returns indexed copies for disabled or unnecessary downsampling', () => {
+    expect(downsampleSeriesData(['a', 'b'], 0)).toEqual([
+      { item: 'a', index: 0 },
+      { item: 'b', index: 1 }
+    ])
+    expect(downsampleSeriesData(['a', 'b'], 5)).toEqual([
+      { item: 'a', index: 0 },
+      { item: 'b', index: 1 }
+    ])
   })
 })
 

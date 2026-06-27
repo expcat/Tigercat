@@ -166,6 +166,28 @@ describe('useTableState', () => {
     expect(onExpandChange).toHaveBeenLastCalledWith([], rows[0], false)
   })
 
+  it('selects only enabled current-page rows when toggling select all', () => {
+    const onSelectionChange = vi.fn()
+    const { result } = renderHook(() =>
+      useTableState(
+        makeInput({
+          rowSelection: {
+            defaultSelectedRowKeys: [4],
+            getCheckboxProps: (record) => ({ disabled: record.id === 2 })
+          },
+          onSelectionChange
+        })
+      )
+    )
+
+    act(() => result.current.handleSelectAll(true))
+    expect(onSelectionChange).toHaveBeenLastCalledWith([4, 1])
+    expect(result.current.allSelected).toBe(true)
+
+    act(() => result.current.handleSelectAll(false))
+    expect(onSelectionChange).toHaveBeenLastCalledWith([4])
+  })
+
   it('handles radio row selection', () => {
     const onSelectionChange = vi.fn()
     const { result } = renderHook(() =>

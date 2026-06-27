@@ -1385,6 +1385,23 @@ describe('Table', () => {
       expect(expandedTd?.getAttribute('colspan')).toBe('5')
     })
 
+    it('should not count hidden rowSelection checkbox column in expanded colspan', async () => {
+      const { getAllByRole, container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        expandable: expandableConfig,
+        rowSelection: { type: 'checkbox', showCheckbox: false }
+      })
+
+      const expandButtons = getAllByRole('button', { name: /expand row/i })
+      await fireEvent.click(expandButtons[0])
+      await nextTick()
+
+      // columns (3) + expand icon column (1) = 4
+      const expandedTd = container.querySelector('.expanded-content')?.closest('td')
+      expect(expandedTd?.getAttribute('colspan')).toBe('4')
+    })
+
     it('should support expanded-row slot', async () => {
       const { getAllByRole, getByText } = render(Table, {
         props: {

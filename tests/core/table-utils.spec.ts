@@ -8,6 +8,8 @@ import {
   getFixedColumnOffsets,
   getFixedColumnPosition,
   getFixedColumnStyle,
+  getNextTableSelectAllKeys,
+  getTableSelectionState,
   getTableColgroup,
   orderTableFixedColumns,
   resolveTableColumnWidth,
@@ -18,6 +20,7 @@ import {
   getTableVirtualRecommendation,
   getTableRowClasses,
   getTableHeaderClasses,
+  hasTableSelectionColumn,
   getExpandedRowClasses,
   getRowKey,
   tableBaseClasses,
@@ -238,6 +241,40 @@ describe('table-utils', () => {
       })
 
       expect(entries[0]).toEqual({ key: 'name', width: undefined })
+    })
+  })
+
+  describe('selection helpers', () => {
+    const records = [
+      { id: 1, disabled: false },
+      { id: 2, disabled: true },
+      { id: 3, disabled: false }
+    ]
+    const rowKeys = records.map((record) => record.id)
+
+    it('derives select-all state from selectable rows only', () => {
+      expect(hasTableSelectionColumn(undefined)).toBe(false)
+      expect(hasTableSelectionColumn({ showCheckbox: false })).toBe(false)
+      expect(hasTableSelectionColumn({ showCheckbox: true })).toBe(true)
+      expect(hasTableSelectionColumn({})).toBe(true)
+
+      const state = getTableSelectionState({
+        records,
+        rowKeys,
+        selectedRowKeys: [1, 2],
+        getCheckboxProps: (record) => ({ disabled: record.disabled })
+      })
+
+      expect(state).toEqual({
+        selectableRowKeys: [1, 3],
+        allSelected: false,
+        someSelected: true
+      })
+    })
+
+    it('adds and removes only selectable current-page row keys', () => {
+      expect(getNextTableSelectAllKeys([2, 99], [1, 3], true)).toEqual([2, 99, 1, 3])
+      expect(getNextTableSelectAllKeys([1, 2, 3, 99], [1, 3], false)).toEqual([2, 99])
     })
   })
 

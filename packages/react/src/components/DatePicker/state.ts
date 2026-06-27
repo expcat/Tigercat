@@ -19,6 +19,7 @@ import {
   type DatePickerRangeValue,
   type DatePickerRangeModelValue,
   type DatePickerLocaleInput,
+  type DatePickerLocalePreset,
   type TigerLocale,
   type DatePickerShortcut
 } from '@expcat/tigercat-core'
@@ -36,7 +37,17 @@ function normalizeDatePickerLocale(locale?: DatePickerLocaleInput): Partial<Tige
   if (!locale) return undefined
   if (typeof locale === 'string') return { locale }
   if ('datePicker' in locale) return locale as Partial<TigerLocale>
-  return { locale: locale.locale, datePicker: locale }
+  const preset = locale as Partial<DatePickerLocalePreset>
+  return {
+    locale: hasDatePickerLocaleCode(preset) ? preset.locale : undefined,
+    datePicker: preset
+  }
+}
+
+function hasDatePickerLocaleCode(
+  locale: Partial<DatePickerLocalePreset>
+): locale is Partial<DatePickerLocalePreset> & { locale: string } {
+  return typeof locale.locale === 'string'
 }
 
 export function useDatePickerState(props: DatePickerProps): DatePickerContext {

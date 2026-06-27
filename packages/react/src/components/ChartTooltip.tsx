@@ -1,6 +1,11 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { classNames, getChartTooltipTransform, isBrowser } from '@expcat/tigercat-core'
+import {
+  classNames,
+  getChartTooltipTransform,
+  isBrowser,
+  resolveChartTooltipPosition
+} from '@expcat/tigercat-core'
 
 export interface ChartTooltipProps {
   content: string
@@ -24,36 +29,32 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   useEffect(() => {
     if (!visible) return
 
-    // Add small offset from cursor
-    let newX = x + 12
-    let newY = y - 8
+    const initialPosition = resolveChartTooltipPosition({
+      x,
+      y,
+      rect: { width: 0, height: 0 },
+      viewport: {
+        width: typeof window === 'undefined' ? 0 : window.innerWidth,
+        height: typeof window === 'undefined' ? 0 : window.innerHeight
+      }
+    })
 
     // Check bounds after render
     const frameHandle = requestAnimationFrame(() => {
       if (!tooltipRef.current) return
 
       const rect = tooltipRef.current.getBoundingClientRect()
-      const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-
-      // Adjust if overflowing right
-      if (newX + rect.width > viewportWidth - 8) {
-        newX = x - rect.width - 12
-      }
-
-      // Adjust if overflowing bottom
-      if (newY + rect.height > viewportHeight - 8) {
-        newY = y - rect.height - 8
-      }
-
-      // Keep within left/top bounds
-      newX = Math.max(8, newX)
-      newY = Math.max(8, newY)
-
-      setAdjustedPosition({ x: newX, y: newY })
+      setAdjustedPosition(
+        resolveChartTooltipPosition({
+          x,
+          y,
+          rect,
+          viewport: { width: window.innerWidth, height: window.innerHeight }
+        })
+      )
     })
 
-    setAdjustedPosition({ x: newX, y: newY })
+    setAdjustedPosition(initialPosition)
     return () => cancelAnimationFrame(frameHandle)
   }, [x, y, visible])
 

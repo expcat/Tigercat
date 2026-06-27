@@ -3,6 +3,7 @@ import {
   getUploadDataTransferFiles,
   createUploadChunks,
   createUploadQueueItem,
+  formatFileSize,
   getUploadResumeKey,
   handleUploadDragLeave,
   handleUploadDragOver,
@@ -100,5 +101,12 @@ describe('upload-utils chunk and queue helpers', () => {
     expect(result.map((item) => item.status)).toEqual(['success', 'success'])
     expect(result.map((item) => item.progress)).toEqual([100, 100])
     expect(onChange).toHaveBeenCalled()
+  })
+
+  it('keeps legacy upload file-size formatting through shared core logic', () => {
+    expect(formatFileSize(0)).toBe('0 B')
+    expect(formatFileSize(1024)).toBe('1.00 KB')
+    expect(formatFileSize(1024 * 1024 * 2.5)).toBe('2.50 MB')
+    expect(formatFileSize(Number.NaN)).toBe('0 B')
   })
 })

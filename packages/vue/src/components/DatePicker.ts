@@ -12,7 +12,7 @@ import {
   isDateInRange,
   getCalendarDays,
   getShortDayNames,
-  isToday as isTodayUtil,
+  getDatePickerCalendarCellState,
   normalizeDate,
   datePickerBaseClasses,
   datePickerInputWrapperClasses,
@@ -44,6 +44,7 @@ import {
   type DatePickerModelValue,
   type DatePickerRangeModelValue,
   type DatePickerLocaleInput,
+  type DatePickerLocalePreset,
   type DatePickerLabels,
   type TigerLocale,
   type DatePickerShortcut
@@ -62,7 +63,17 @@ function normalizeDatePickerLocale(locale?: DatePickerLocaleInput): Partial<Tige
   if (!locale) return undefined
   if (typeof locale === 'string') return { locale }
   if ('datePicker' in locale) return locale as Partial<TigerLocale>
-  return { locale: locale.locale, datePicker: locale }
+  const preset = locale as Partial<DatePickerLocalePreset>
+  return {
+    locale: hasDatePickerLocaleCode(preset) ? preset.locale : undefined,
+    datePicker: preset
+  }
+}
+
+function hasDatePickerLocaleCode(
+  locale: Partial<DatePickerLocalePreset>
+): locale is Partial<DatePickerLocalePreset> & { locale: string } {
+  return typeof locale.locale === 'string'
 }
 
 export type VueDatePickerModelValue = DatePickerModelValue
@@ -890,12 +901,6 @@ export const DatePicker = defineComponent({
                 ]),
                 // Calendar grid
                 (() => {
-                  // Pre-compute range values once instead of per-cell
-                  const [rangeStart, rangeEnd] = selectedRange.value
-                  const normStart = rangeStart ? normalizeDate(rangeStart) : null
-                  const normEnd = rangeEnd ? normalizeDate(rangeEnd) : null
-                  const isSelectingEnd = isRangeMode.value && Boolean(rangeStart) && !rangeEnd
-
                   return h(
                     'div',
                     {
@@ -908,33 +913,14 @@ export const DatePicker = defineComponent({
                       ...calendarDays.value.map((date, index) => {
                         if (!date) return null
 
-                        const normDate = normalizeDate(date)
-
-                        const isRangeStart =
-                          isRangeMode.value && rangeStart ? isSameDay(date, rangeStart) : false
-                        const isRangeEnd =
-                          isRangeMode.value && rangeEnd ? isSameDay(date, rangeEnd) : false
-                        const isInRange =
-                          isRangeMode.value &&
-                          normStart &&
-                          normEnd &&
-                          normDate >= normStart &&
-                          normDate <= normEnd
-
-                        const isSelected = !isRangeMode.value
-                          ? selectedDate.value
-                            ? isSameDay(date, selectedDate.value)
-                            : false
-                          : isRangeStart || isRangeEnd
-                        const isCurrentMonthDay = isCurrentMonth(date)
-                        const isTodayDay = isTodayUtil(date)
-
-                        const isBeforeRangeStart =
-                          isSelectingEnd && normStart && normDate < normStart
-
-                        const isDisabled = isDateDisabled(date) || Boolean(isBeforeRangeStart)
-
-                        const iso = formatDate(date, 'yyyy-MM-dd')
+                        const cell = getDatePickerCalendarCellState({
+                          date,
+                          selectedDate: selectedDate.value,
+                          selectedRange: selectedRange.value,
+                          isRangeMode: isRangeMode.value,
+                          isCurrentMonth,
+                          isDateDisabled
+                        })
 
                         return h(
                           'button',
@@ -942,25 +928,26 @@ export const DatePicker = defineComponent({
                             key: index,
                             type: 'button',
                             class: getDatePickerDayCellClasses(
-                              isCurrentMonthDay,
-                              isSelected,
-                              isTodayDay,
-                              isDisabled,
-                              Boolean(isInRange),
-                              Boolean(isRangeStart),
-                              Boolean(isRangeEnd)
+                              cell.isCurrentMonthDay,
+                              cell.isSelected,
+                              cell.isTodayDay,
+                              cell.isDisabled,
+                              cell.isInRange,
+                              cell.isRangeStart,
+                              cell.isRangeEnd
                             ),
-                            disabled: isDisabled,
+                            disabled: cell.isDisabled,
                             onClick: () => selectDate(date),
                             role: 'gridcell',
-                            'data-date': iso,
+                            'data-date': cell.iso,
                             onFocus: () => {
-                              activeDateIso.value = iso
+                              activeDateIso.value = cell.iso
                             },
-                            tabindex: activeDateIso.value === iso && !isDisabled ? 0 : -1,
-                            'aria-label': iso,
-                            'aria-selected': isSelected,
-                            'aria-current': isTodayDay ? 'date' : undefined
+                            tabindex:
+                              activeDateIso.value === cell.iso && !cell.isDisabled ? 0 : -1,
+                            'aria-label': cell.iso,
+                            'aria-selected': cell.isSelected,
+                            'aria-current': cell.isTodayDay ? 'date' : undefined
                           },
                           date.getDate()
                         )

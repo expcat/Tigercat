@@ -11,6 +11,9 @@ import {
   filterHiddenColumns,
   freezeTableColumnWidths,
   orderTableFixedColumns,
+  getNextTableSelectAllKeys,
+  getTableSelectionState,
+  hasTableSelectionColumn,
   type TableColumn,
   type SortState,
   type SortDirection,
@@ -243,7 +246,7 @@ export function useTableState(
 
   const totalColumnCount = computed(() => {
     let count = displayColumns.value.length
-    if (props.rowSelection) count += 1
+    if (hasTableSelectionColumn(props.rowSelection)) count += 1
     if (props.expandable) count += 1
     return count
   })
@@ -399,31 +402,30 @@ export function useTableState(
     emit('selection-change', newKeys)
   }
 
+  const selectionState = computed(() =>
+    getTableSelectionState({
+      records: paginatedData.value,
+      rowKeys: paginatedRowKeys.value,
+      selectedRowKeys: selectedRowKeys.value,
+      getCheckboxProps: props.rowSelection?.getCheckboxProps
+    })
+  )
+
   function handleSelectAll(checked: boolean) {
-    if (checked) {
-      const nextKeys = paginatedRowKeys.value
-      if (!isSelectionControlled.value) {
-        uncontrolledSelectedRowKeys.value = nextKeys
-      }
-      emit('selection-change', nextKeys)
-    } else {
-      if (!isSelectionControlled.value) {
-        uncontrolledSelectedRowKeys.value = []
-      }
-      emit('selection-change', [])
+    const nextKeys = getNextTableSelectAllKeys(
+      selectedRowKeys.value,
+      selectionState.value.selectableRowKeys,
+      checked
+    )
+    if (!isSelectionControlled.value) {
+      uncontrolledSelectedRowKeys.value = nextKeys
     }
+    emit('selection-change', nextKeys)
   }
 
-  const allSelected = computed(() => {
-    if (paginatedRowKeys.value.length === 0) {
-      return false
-    }
-    return paginatedRowKeys.value.every((key) => selectedRowKeySet.value.has(key))
-  })
+  const allSelected = computed(() => selectionState.value.allSelected)
 
-  const someSelected = computed(() => {
-    return selectedRowKeys.value.length > 0 && !allSelected.value
-  })
+  const someSelected = computed(() => selectionState.value.someSelected)
 
   // --- v0.6.0: editable cell state ---
   const editingCell = ref<{ rowIndex: number; columnKey: string } | null>(null)

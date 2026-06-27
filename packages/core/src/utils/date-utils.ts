@@ -18,17 +18,23 @@ export function parseDate(value: Date | string | null | undefined): Date | null 
   return isNaN(parsed.getTime()) ? null : parsed
 }
 
-function getIntlOptionsFromDateFormat(format: DateFormat): Intl.DateTimeFormatOptions {
+const defaultDateFormatOptions: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+}
+
+function getDateFormatParts(format: DateFormat): Array<'year' | 'month' | 'day' | '-' | '/'> {
   switch (format) {
-    case 'yyyy-MM-dd':
-    case 'yyyy/MM/dd':
-      return { year: 'numeric', month: '2-digit', day: '2-digit' }
     case 'MM/dd/yyyy':
-      return { year: 'numeric', month: '2-digit', day: '2-digit' }
+      return ['month', '/', 'day', '/', 'year']
     case 'dd/MM/yyyy':
-      return { year: 'numeric', month: '2-digit', day: '2-digit' }
+      return ['day', '/', 'month', '/', 'year']
+    case 'yyyy/MM/dd':
+      return ['year', '/', 'month', '/', 'day']
+    case 'yyyy-MM-dd':
     default:
-      return { year: 'numeric', month: '2-digit', day: '2-digit' }
+      return ['year', '-', 'month', '-', 'day']
   }
 }
 
@@ -49,7 +55,7 @@ export function formatDate(
   if (!date || isNaN(date.getTime())) return ''
 
   if (locale) {
-    const localized = safeIntlFormat(locale, getIntlOptionsFromDateFormat(format), date)
+    const localized = safeIntlFormatDateParts(locale, format, date)
     if (localized) return localized
   }
 
@@ -75,7 +81,7 @@ export function formatDate(
 export function formatDateWithLocale(
   date: Date | null,
   locale?: string,
-  options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' }
+  options: Intl.DateTimeFormatOptions = defaultDateFormatOptions
 ): string {
   if (!date || isNaN(date.getTime())) return ''
   if (!locale) return formatDate(date)
@@ -284,6 +290,33 @@ function safeIntlFormat(
   }
 }
 
+function safeIntlFormatDateParts(locale: string, format: DateFormat, date: Date): string {
+  try {
+    const key = `${locale}_${JSON.stringify(defaultDateFormatOptions)}_parts`
+    let fmt = intlCache.get(key)
+    if (!fmt) {
+      fmt = new Intl.DateTimeFormat(locale, defaultDateFormatOptions)
+      intlCache.set(key, fmt)
+    }
+    const parts = fmt.formatToParts(date)
+    const partMap = new Map(parts.map((part) => [part.type, part.value]))
+    const year = partMap.get('year')
+    const month = partMap.get('month')
+    const day = partMap.get('day')
+    if (!year || !month || !day) return ''
+    return getDateFormatParts(format)
+      .map((part) => {
+        if (part === 'year') return year
+        if (part === 'month') return month
+        if (part === 'day') return day
+        return part
+      })
+      .join('')
+  } catch {
+    return ''
+  }
+}
+
 /**
  * Format the calendar header (month + year) using Intl for a given locale.
  * Falls back to English month names when Intl is unavailable.
@@ -406,4 +439,59 @@ export function getShortDayNames(locale?: string): string[] {
 export function isToday(date: Date): boolean {
   const today = new Date()
   return isSameDay(date, today)
+}
+
+export interface DatePickerCalendarCellStateInput {
+  date: Date
+  selectedDate?: Date | null
+  selectedRange?: [Date | null, Date | null]
+  isRangeMode?: boolean
+  isCurrentMonth?: (date: Date) => boolean
+  isDateDisabled?: (date: Date) => boolean
+}
+
+export interface DatePickerCalendarCellState {
+  iso: string
+  isCurrentMonthDay: boolean
+  isSelected: boolean
+  isTodayDay: boolean
+  isDisabled: boolean
+  isInRange: boolean
+  isRangeStart: boolean
+  isRangeEnd: boolean
+}
+
+export function getDatePickerCalendarCellState(
+  input: DatePickerCalendarCellStateInput
+): DatePickerCalendarCellState {
+  const { date, selectedDate = null, selectedRange = [null, null], isRangeMode = false } = input
+  const [rangeStart, rangeEnd] = selectedRange
+  const normDate = normalizeDate(date)
+  const normStart = rangeStart ? normalizeDate(rangeStart) : null
+  const normEnd = rangeEnd ? normalizeDate(rangeEnd) : null
+  const isSelectingEnd = isRangeMode && Boolean(rangeStart) && !rangeEnd
+
+  const isRangeStart = isRangeMode && rangeStart ? isSameDay(date, rangeStart) : false
+  const isRangeEnd = isRangeMode && rangeEnd ? isSameDay(date, rangeEnd) : false
+  const isInRange = Boolean(
+    isRangeMode && normStart && normEnd && normDate >= normStart && normDate <= normEnd
+  )
+  const isSelected = !isRangeMode
+    ? selectedDate
+      ? isSameDay(date, selectedDate)
+      : false
+    : isRangeStart || isRangeEnd
+  const isBeforeRangeStart = Boolean(isSelectingEnd && normStart && normDate < normStart)
+  const isDisabled = Boolean(input.isDateDisabled?.(date)) || isBeforeRangeStart
+
+  return {
+    iso: formatDate(date, 'yyyy-MM-dd'),
+    isCurrentMonthDay: input.isCurrentMonth?.(date) ?? true,
+    isSelected,
+    isTodayDay: isToday(date),
+    isDisabled,
+    isInRange,
+    isRangeStart,
+    isRangeEnd
+  }
 }
