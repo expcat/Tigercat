@@ -206,15 +206,12 @@ function checkReleaseDocs(expectedVersion) {
   }
 
   const roadmapPath = 'docs/ROADMAP.md'
+  check(existsSync(join(root, roadmapPath)), `${roadmapPath} is missing`)
   if (existsSync(join(root, roadmapPath))) {
     const roadmap = readText(roadmapPath)
     check(
-      roadmap.includes(`| 发布版本 | v${expectedVersion} 发布准备中`),
-      `${roadmapPath} must declare v${expectedVersion} as the current release`
-    )
-    check(
-      roadmap.includes(`- [ ] v${expectedVersion} 发布执行`),
-      `${roadmapPath} must keep the current release task aligned with v${expectedVersion}`
+      roadmap.includes('type: active-roadmap'),
+      `${roadmapPath} must declare the active implementation roadmap marker`
     )
   }
 

@@ -25,6 +25,7 @@
 import { readFileSync, readdirSync, writeFileSync, existsSync, statSync, mkdirSync } from 'fs'
 import { join, relative } from 'path'
 import { fileURLToPath } from 'url'
+import prettier from 'prettier'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -215,8 +216,14 @@ const snapshot = sortKeys({
   }
 })
 
+const prettierConfig = (await prettier.resolveConfig(OUT_FILE)) ?? {}
+const formattedSnapshot = await prettier.format(JSON.stringify(snapshot, null, 2), {
+  ...prettierConfig,
+  parser: 'json'
+})
+
 if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true })
-writeFileSync(OUT_FILE, JSON.stringify(snapshot, null, 2) + '\n')
+writeFileSync(OUT_FILE, formattedSnapshot)
 
 console.log(
   `Public API baseline written to ${relative(ROOT, OUT_FILE)} — ` +
