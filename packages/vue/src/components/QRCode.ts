@@ -59,6 +59,17 @@ export const QRCode = defineComponent({
       )
       const mSize = moduleSize.value
       const modules = matrix.value
+      const ariaLabel = resolveLocaleText('QR Code', mergedLocale.value?.qrcode?.ariaLabel)
+      const expiredText = resolveLocaleText(
+        'QR code expired',
+        mergedLocale.value?.qrcode?.expiredText
+      )
+      const refreshText = resolveLocaleText('Refresh', mergedLocale.value?.qrcode?.refreshText)
+      const loadingText = resolveLocaleText(
+        'Loading...',
+        mergedLocale.value?.qrcode?.loadingText,
+        mergedLocale.value?.common?.loadingText
+      )
 
       const rects = modules.flatMap((row, r) =>
         row
@@ -85,7 +96,7 @@ export const QRCode = defineComponent({
           viewBox: `0 0 ${props.size} ${props.size}`,
           xmlns: 'http://www.w3.org/2000/svg',
           role: 'img',
-          'aria-label': 'QR Code'
+          'aria-label': ariaLabel
         },
         [h('rect', { width: props.size, height: props.size, fill: props.bgColor }), ...rects]
       )
@@ -95,14 +106,14 @@ export const QRCode = defineComponent({
       if (props.status === 'expired') {
         children.push(
           h('div', { class: qrcodeOverlayClasses }, [
-            h('span', { class: qrcodeExpiredTextClasses }, 'QR code expired'),
+            h('span', { class: qrcodeExpiredTextClasses }, expiredText),
             h(
               'span',
               {
                 class: qrcodeRefreshClasses,
                 onClick: () => emit('refresh')
               },
-              'Refresh'
+              refreshText
             )
           ])
         )
@@ -111,11 +122,7 @@ export const QRCode = defineComponent({
       if (props.status === 'loading') {
         children.push(
           h('div', { class: qrcodeOverlayClasses }, [
-            h(
-              'span',
-              { class: 'text-sm text-gray-500' },
-              resolveLocaleText('Loading...', mergedLocale.value?.common?.loadingText)
-            )
+            h('span', { class: 'text-sm text-gray-500' }, loadingText)
           ])
         )
       }

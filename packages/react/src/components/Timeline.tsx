@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react'
 import {
   classNames,
+  mergeTigerLocale,
+  resolveLocaleText,
   getTimelineContainerClasses,
   getTimelineItemClasses,
   getTimelineTailClasses,
@@ -13,8 +15,10 @@ import {
   timelineDescriptionClasses,
   type TimelineMode,
   type TimelineItem,
-  type TimelineItemPosition
+  type TimelineItemPosition,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface TimelineProps extends Omit<React.HTMLAttributes<HTMLUListElement>, 'children'> {
   /**
@@ -56,6 +60,10 @@ export interface TimelineProps extends Omit<React.HTMLAttributes<HTMLUListElemen
    * Additional CSS classes
    */
   className?: string
+  /**
+   * Locale override; falls back to ConfigProvider locale
+   */
+  locale?: Partial<TigerLocale>
 }
 
 export const Timeline: React.FC<TimelineProps> = ({
@@ -68,8 +76,14 @@ export const Timeline: React.FC<TimelineProps> = ({
   renderItem,
   renderDot: customRenderDot,
   className,
+  locale,
   ...ulProps
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
   const processedItems = useMemo(() => {
     let result = reverse ? [...items].reverse() : [...items]
     if (mode === 'alternate') {
@@ -160,12 +174,17 @@ export const Timeline: React.FC<TimelineProps> = ({
     const itemClasses = getTimelineItemClasses(mode, position, true)
     const headClasses = getTimelineHeadClasses(mode)
     const contentClasses = getTimelineContentClasses(mode, position)
+    const pendingText = resolveLocaleText(
+      'Loading...',
+      mergedLocale?.timeline?.pendingText,
+      mergedLocale?.common?.loadingText
+    )
 
     return (
       <li key="pending" className={itemClasses}>
         <div className={headClasses}>{renderDotElement({}, true)}</div>
         <div className={contentClasses}>
-          {pendingContent || <div className={timelineDescriptionClasses}>Loading...</div>}
+          {pendingContent || <div className={timelineDescriptionClasses}>{pendingText}</div>}
         </div>
       </li>
     )

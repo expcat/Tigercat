@@ -23,6 +23,15 @@ export const zhTW: TigerLocale = {
   drawer: {
     closeAriaLabel: '關閉'
   },
+  qrcode: {
+    ariaLabel: 'QR Code',
+    expiredText: 'QR Code 已過期',
+    refreshText: '重新整理',
+    loadingText: '載入中...'
+  },
+  timeline: {
+    pendingText: '載入中...'
+  },
   pagination: {
     totalText: '共 {total} 筆',
     itemsPerPageText: '筆/頁',

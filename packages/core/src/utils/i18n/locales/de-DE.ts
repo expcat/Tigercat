@@ -24,6 +24,15 @@ export const deDE: TigerLocale = defineLocale({
   drawer: {
     closeAriaLabel: 'Schließen'
   },
+  qrcode: {
+    ariaLabel: 'QR-Code',
+    expiredText: 'QR-Code abgelaufen',
+    refreshText: 'Aktualisieren',
+    loadingText: 'Wird geladen...'
+  },
+  timeline: {
+    pendingText: 'Wird geladen...'
+  },
   upload: {
     dragAreaAriaLabel: 'Datei per Klick oder Drag-and-drop hochladen',
     buttonAriaLabel: 'Datei hochladen',

@@ -23,6 +23,15 @@ export const thTH: TigerLocale = {
   drawer: {
     closeAriaLabel: 'ปิด'
   },
+  qrcode: {
+    ariaLabel: 'QR Code',
+    expiredText: 'QR Code หมดอายุแล้ว',
+    refreshText: 'รีเฟรช',
+    loadingText: 'กำลังโหลด...'
+  },
+  timeline: {
+    pendingText: 'กำลังโหลด...'
+  },
   pagination: {
     totalText: 'ทั้งหมด {total} รายการ',
     itemsPerPageText: '/หน้า',

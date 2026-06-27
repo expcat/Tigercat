@@ -26,6 +26,15 @@ export const zhCN: TigerLocale = {
   drawer: {
     closeAriaLabel: '关闭'
   },
+  qrcode: {
+    ariaLabel: '二维码',
+    expiredText: '二维码已过期',
+    refreshText: '刷新',
+    loadingText: '加载中...'
+  },
+  timeline: {
+    pendingText: '加载中...'
+  },
   upload: ZH_CN_UPLOAD_LABELS,
   pagination: {
     totalText: '共 {total} 条',

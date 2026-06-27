@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
-import { Timeline } from '../../packages/vue/src/components/Timeline'
+import { ConfigProvider, Timeline } from '@expcat/tigercat-vue'
 import type { TimelineItem } from '../../packages/core/src/types/timeline'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -68,6 +68,43 @@ describe('Timeline (Vue)', () => {
     expect(ul?.getAttribute('aria-busy')).toBe('true')
     expect(screen.getByText('Pending Dot')).toBeTruthy()
     expect(screen.getByText('Pending Content')).toBeTruthy()
+  })
+
+  it('keeps default pending text outside ConfigProvider', () => {
+    render(Timeline, { props: { pending: true } })
+    expect(screen.getByText('Loading...')).toBeInTheDocument()
+  })
+
+  it('uses ConfigProvider timeline locale for default pending content', () => {
+    render({
+      render: () =>
+        h(ConfigProvider, { locale: { timeline: { pendingText: '全局加载中' } } }, () =>
+          h(Timeline, { pending: true })
+        )
+    })
+    expect(screen.getByText('全局加载中')).toBeInTheDocument()
+  })
+
+  it('lets the timeline locale prop override ConfigProvider pending text', () => {
+    render({
+      render: () =>
+        h(ConfigProvider, { locale: { timeline: { pendingText: '全局加载中' } } }, () =>
+          h(Timeline, { pending: true, locale: { timeline: { pendingText: '局部加载中' } } })
+        )
+    })
+    expect(screen.getByText('局部加载中')).toBeInTheDocument()
+    expect(screen.queryByText('全局加载中')).toBeNull()
+  })
+
+  it('keeps pending slot ahead of timeline locale text', () => {
+    render({
+      render: () =>
+        h(ConfigProvider, { locale: { timeline: { pendingText: '全局加载中' } } }, () =>
+          h(Timeline, { pending: true }, { pending: () => h('div', {}, 'Custom pending') })
+        )
+    })
+    expect(screen.getByText('Custom pending')).toBeInTheDocument()
+    expect(screen.queryByText('全局加载中')).toBeNull()
   })
 
   it('supports reverse order', () => {

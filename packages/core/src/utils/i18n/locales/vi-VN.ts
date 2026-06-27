@@ -23,6 +23,15 @@ export const viVN: TigerLocale = {
   drawer: {
     closeAriaLabel: 'Đóng'
   },
+  qrcode: {
+    ariaLabel: 'Mã QR',
+    expiredText: 'Mã QR đã hết hạn',
+    refreshText: 'Làm mới',
+    loadingText: 'Đang tải...'
+  },
+  timeline: {
+    pendingText: 'Đang tải...'
+  },
   pagination: {
     totalText: 'Tổng {total} mục',
     itemsPerPageText: '/trang',

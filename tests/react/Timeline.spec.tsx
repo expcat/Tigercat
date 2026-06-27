@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
-import { Timeline } from '../../packages/react/src/components/Timeline'
+import { ConfigProvider, Timeline } from '@expcat/tigercat-react'
 import type { TimelineItem } from '../../packages/core/src/types/timeline'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -57,6 +57,40 @@ describe('Timeline (React)', () => {
     expect(container.querySelector('ul')?.getAttribute('aria-busy')).toBe('true')
     expect(screen.getByText('Pending Dot')).toBeTruthy()
     expect(screen.getByText('Pending Content')).toBeTruthy()
+  })
+
+  it('keeps default pending text outside ConfigProvider', () => {
+    render(<Timeline pending />)
+    expect(screen.getByText('Loading...')).toBeInTheDocument()
+  })
+
+  it('uses ConfigProvider timeline locale for default pending content', () => {
+    render(
+      <ConfigProvider locale={{ timeline: { pendingText: '全局加载中' } }}>
+        <Timeline pending />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('全局加载中')).toBeInTheDocument()
+  })
+
+  it('lets the timeline locale prop override ConfigProvider pending text', () => {
+    render(
+      <ConfigProvider locale={{ timeline: { pendingText: '全局加载中' } }}>
+        <Timeline pending locale={{ timeline: { pendingText: '局部加载中' } }} />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('局部加载中')).toBeInTheDocument()
+    expect(screen.queryByText('全局加载中')).toBeNull()
+  })
+
+  it('keeps custom pendingContent ahead of timeline locale text', () => {
+    render(
+      <ConfigProvider locale={{ timeline: { pendingText: '全局加载中' } }}>
+        <Timeline pending pendingContent={<div>Custom pending</div>} />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('Custom pending')).toBeInTheDocument()
+    expect(screen.queryByText('全局加载中')).toBeNull()
   })
 
   it('supports reverse order', () => {

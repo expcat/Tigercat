@@ -24,6 +24,15 @@ export const arSA: TigerLocale = defineLocale({
   drawer: {
     closeAriaLabel: 'إغلاق'
   },
+  qrcode: {
+    ariaLabel: 'رمز QR',
+    expiredText: 'انتهت صلاحية رمز QR',
+    refreshText: 'تحديث',
+    loadingText: 'جار التحميل...'
+  },
+  timeline: {
+    pendingText: 'جار التحميل...'
+  },
   upload: {
     dragAreaAriaLabel: 'رفع ملف بالنقر أو السحب',
     buttonAriaLabel: 'رفع ملف',

@@ -24,6 +24,15 @@ export const ptBR: TigerLocale = defineLocale({
   drawer: {
     closeAriaLabel: 'Fechar'
   },
+  qrcode: {
+    ariaLabel: 'Código QR',
+    expiredText: 'Código QR expirado',
+    refreshText: 'Atualizar',
+    loadingText: 'Carregando...'
+  },
+  timeline: {
+    pendingText: 'Carregando...'
+  },
   upload: {
     dragAreaAriaLabel: 'Enviar arquivo clicando ou arrastando',
     buttonAriaLabel: 'Enviar arquivo',

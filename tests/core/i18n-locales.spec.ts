@@ -12,7 +12,7 @@ import { frFR } from '@expcat/tigercat-core/locales/fr-FR'
 import { deDE } from '@expcat/tigercat-core/locales/de-DE'
 import { ptBR } from '@expcat/tigercat-core/locales/pt-BR'
 import { arSA } from '@expcat/tigercat-core/locales/ar-SA'
-import { getLocaleDirection, isRtlLocale } from '@expcat/tigercat-core'
+import { getLocaleDirection, isRtlLocale, mergeTigerLocale } from '@expcat/tigercat-core'
 
 const locales = { enUS, zhCN, zhTW, jaJP, koKR, thTH, viVN, idID, esES, frFR, deDE, ptBR, arSA }
 
@@ -21,6 +21,8 @@ describe('i18n locale presets', () => {
     'common',
     'modal',
     'drawer',
+    'qrcode',
+    'timeline',
     'pagination',
     'table',
     'formWizard',
@@ -82,6 +84,46 @@ describe('i18n locale presets', () => {
     for (const [, locale] of Object.entries(locales)) {
       expect(locale.common.noMoreText).toBeDefined()
     }
+  })
+
+  it('all locales have qrcode and timeline text', () => {
+    for (const [, locale] of Object.entries(locales)) {
+      expect(locale.qrcode?.ariaLabel).toBeDefined()
+      expect(locale.qrcode?.expiredText).toBeDefined()
+      expect(locale.qrcode?.refreshText).toBeDefined()
+      expect(locale.qrcode?.loadingText).toBeDefined()
+      expect(locale.timeline?.pendingText).toBeDefined()
+    }
+  })
+
+  it('mergeTigerLocale preserves and overrides qrcode and timeline text', () => {
+    const merged = mergeTigerLocale(
+      {
+        qrcode: {
+          ariaLabel: 'Base QR',
+          expiredText: 'Base expired',
+          refreshText: 'Base refresh',
+          loadingText: 'Base loading'
+        },
+        timeline: {
+          pendingText: 'Base pending'
+        }
+      },
+      {
+        qrcode: {
+          refreshText: 'Override refresh'
+        },
+        timeline: {
+          pendingText: 'Override pending'
+        }
+      }
+    )
+
+    expect(merged?.qrcode?.ariaLabel).toBe('Base QR')
+    expect(merged?.qrcode?.expiredText).toBe('Base expired')
+    expect(merged?.qrcode?.refreshText).toBe('Override refresh')
+    expect(merged?.qrcode?.loadingText).toBe('Base loading')
+    expect(merged?.timeline?.pendingText).toBe('Override pending')
   })
 
   it('enUS and zhCN expose built-in Upload and TimePicker labels', () => {

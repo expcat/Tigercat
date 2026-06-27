@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { QRCode } from '@expcat/tigercat-react'
+import { ConfigProvider, QRCode } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('QRCode', () => {
@@ -31,6 +31,13 @@ describe('QRCode', () => {
     const { container } = render(<QRCode value="test" />)
     const svg = container.querySelector('svg')
     expect(svg).toHaveAttribute('aria-label', 'QR Code')
+  })
+
+  it('keeps default English status text outside ConfigProvider', () => {
+    render(<QRCode value="test" status="expired" />)
+    expect(screen.getByLabelText('QR Code')).toBeInTheDocument()
+    expect(screen.getByText('QR code expired')).toBeInTheDocument()
+    expect(screen.getByText('Refresh')).toBeInTheDocument()
   })
 
   it('applies className', () => {
@@ -81,6 +88,63 @@ describe('QRCode', () => {
   it('shows loading overlay', () => {
     render(<QRCode value="test" status="loading" />)
     expect(screen.getByText('Loading...')).toBeInTheDocument()
+  })
+
+  it('uses ConfigProvider qrcode locale for aria and status text', () => {
+    const { rerender } = render(
+      <ConfigProvider
+        locale={{
+          qrcode: {
+            ariaLabel: '全局二维码',
+            expiredText: '全局已过期',
+            refreshText: '全局刷新',
+            loadingText: '全局加载中'
+          }
+        }}>
+        <QRCode value="test" status="expired" />
+      </ConfigProvider>
+    )
+
+    expect(screen.getByLabelText('全局二维码')).toBeInTheDocument()
+    expect(screen.getByText('全局已过期')).toBeInTheDocument()
+    expect(screen.getByText('全局刷新')).toBeInTheDocument()
+
+    rerender(
+      <ConfigProvider locale={{ qrcode: { loadingText: '全局加载中' } }}>
+        <QRCode value="test" status="loading" />
+      </ConfigProvider>
+    )
+    expect(screen.getByText('全局加载中')).toBeInTheDocument()
+  })
+
+  it('lets the qrcode locale prop override ConfigProvider text', () => {
+    render(
+      <ConfigProvider
+        locale={{
+          qrcode: {
+            ariaLabel: '全局二维码',
+            expiredText: '全局已过期',
+            refreshText: '全局刷新'
+          }
+        }}>
+        <QRCode
+          value="test"
+          status="expired"
+          locale={{
+            qrcode: {
+              ariaLabel: '局部二维码',
+              expiredText: '局部已过期',
+              refreshText: '局部刷新'
+            }
+          }}
+        />
+      </ConfigProvider>
+    )
+
+    expect(screen.getByLabelText('局部二维码')).toBeInTheDocument()
+    expect(screen.getByText('局部已过期')).toBeInTheDocument()
+    expect(screen.getByText('局部刷新')).toBeInTheDocument()
+    expect(screen.queryByText('全局已过期')).toBeNull()
   })
 
   it('does not show overlay when active', () => {

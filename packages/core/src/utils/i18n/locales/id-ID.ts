@@ -23,6 +23,15 @@ export const idID: TigerLocale = {
   drawer: {
     closeAriaLabel: 'Tutup'
   },
+  qrcode: {
+    ariaLabel: 'Kode QR',
+    expiredText: 'Kode QR kedaluwarsa',
+    refreshText: 'Muat ulang',
+    loadingText: 'Memuat...'
+  },
+  timeline: {
+    pendingText: 'Memuat...'
+  },
   pagination: {
     totalText: 'Total {total} item',
     itemsPerPageText: '/halaman',

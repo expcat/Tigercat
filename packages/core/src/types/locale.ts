@@ -27,6 +27,17 @@ export interface TigerLocaleDrawer {
   closeAriaLabel?: string
 }
 
+export interface TigerLocaleQRCode {
+  ariaLabel?: string
+  expiredText?: string
+  refreshText?: string
+  loadingText?: string
+}
+
+export interface TigerLocaleTimeline {
+  pendingText?: string
+}
+
 export interface TigerLocaleUpload {
   /** Drag area aria-label */
   dragAreaAriaLabel?: string
@@ -175,6 +186,8 @@ export interface TigerLocale {
   common?: TigerLocaleCommon
   modal?: TigerLocaleModal
   drawer?: TigerLocaleDrawer
+  qrcode?: TigerLocaleQRCode
+  timeline?: TigerLocaleTimeline
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination
   table?: TigerLocaleTable

@@ -24,6 +24,15 @@ export const esES: TigerLocale = defineLocale({
   drawer: {
     closeAriaLabel: 'Cerrar'
   },
+  qrcode: {
+    ariaLabel: 'Código QR',
+    expiredText: 'El código QR ha caducado',
+    refreshText: 'Actualizar',
+    loadingText: 'Cargando...'
+  },
+  timeline: {
+    pendingText: 'Cargando...'
+  },
   upload: {
     dragAreaAriaLabel: 'Subir archivo haciendo clic o arrastrando',
     buttonAriaLabel: 'Subir archivo',

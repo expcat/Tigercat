@@ -225,7 +225,11 @@ export const Timeline = defineComponent({
           h(
             'div',
             { class: timelineDescriptionClasses },
-            resolveLocaleText('Loading...', mergedLocale.value?.common?.loadingText)
+            resolveLocaleText(
+              'Loading...',
+              mergedLocale.value?.timeline?.pendingText,
+              mergedLocale.value?.common?.loadingText
+            )
           )
         ])
       ])

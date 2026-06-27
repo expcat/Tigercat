@@ -26,6 +26,15 @@ export const enUS: TigerLocale = {
   drawer: {
     closeAriaLabel: 'Close'
   },
+  qrcode: {
+    ariaLabel: 'QR Code',
+    expiredText: 'QR code expired',
+    refreshText: 'Refresh',
+    loadingText: 'Loading...'
+  },
+  timeline: {
+    pendingText: 'Loading...'
+  },
   upload: DEFAULT_UPLOAD_LABELS,
   pagination: {
     totalText: 'Total {total} items',

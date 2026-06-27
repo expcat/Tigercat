@@ -24,6 +24,15 @@ export const frFR: TigerLocale = defineLocale({
   drawer: {
     closeAriaLabel: 'Fermer'
   },
+  qrcode: {
+    ariaLabel: 'Code QR',
+    expiredText: 'Le code QR a expiré',
+    refreshText: 'Actualiser',
+    loadingText: 'Chargement...'
+  },
+  timeline: {
+    pendingText: 'Chargement...'
+  },
   upload: {
     dragAreaAriaLabel: 'Téléverser un fichier en cliquant ou en le déposant',
     buttonAriaLabel: 'Téléverser un fichier',

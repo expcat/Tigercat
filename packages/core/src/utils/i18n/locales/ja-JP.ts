@@ -23,6 +23,15 @@ export const jaJP: TigerLocale = {
   drawer: {
     closeAriaLabel: '閉じる'
   },
+  qrcode: {
+    ariaLabel: 'QRコード',
+    expiredText: 'QRコードの有効期限が切れました',
+    refreshText: '更新',
+    loadingText: '読み込み中...'
+  },
+  timeline: {
+    pendingText: '読み込み中...'
+  },
   pagination: {
     totalText: '全 {total} 件',
     itemsPerPageText: '件/ページ',

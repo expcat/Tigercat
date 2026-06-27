@@ -23,6 +23,15 @@ export const koKR: TigerLocale = {
   drawer: {
     closeAriaLabel: '닫기'
   },
+  qrcode: {
+    ariaLabel: 'QR 코드',
+    expiredText: 'QR 코드가 만료되었습니다',
+    refreshText: '새로 고침',
+    loadingText: '로딩 중...'
+  },
+  timeline: {
+    pendingText: '로딩 중...'
+  },
   pagination: {
     totalText: '총 {total}개',
     itemsPerPageText: '개/페이지',
