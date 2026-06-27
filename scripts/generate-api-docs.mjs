@@ -16,6 +16,14 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import prettier from 'prettier'
 import ts from 'typescript'
+import {
+  CATEGORIES,
+  CATEGORY_SLUGS,
+  buildPublicComponentEntries,
+  formatComponentIndexType,
+  loadPublicComponentExports,
+  propsToPublicComponents
+} from './lib/public-components.mjs'
 
 const ROOT_DIR = join(import.meta.dirname, '..')
 const TYPES_DIR = join(ROOT_DIR, 'packages', 'core', 'src', 'types')
@@ -25,117 +33,6 @@ const PROPS_DIR = join(SHARED_DIR, 'props')
 const EXAMPLES_DIR = join(SKILL_REFERENCES_DIR, 'examples')
 const LLM_API_SUMMARY = join(SHARED_DIR, 'api-summary.md')
 const COMPONENT_INDEX = join(SKILL_REFERENCES_DIR, 'component-index.md')
-
-const CATEGORIES = {
-  Basic: [
-    'alert',
-    'avatar',
-    'badge',
-    'button',
-    'code',
-    'divider',
-    'empty',
-    'icon',
-    'image',
-    'link',
-    'qrcode',
-    'rate',
-    'result',
-    'segmented',
-    'statistic',
-    'tag',
-    'text',
-    'watermark'
-  ],
-  Form: [
-    'auto-complete',
-    'cascader',
-    'checkbox',
-    'color-picker',
-    'color-swatch',
-    'cron-editor',
-    'datepicker',
-    'form',
-    'input',
-    'input-group',
-    'input-number',
-    'mentions',
-    'number-keyboard',
-    'radio',
-    'select',
-    'signature',
-    'slider',
-    'stepper',
-    'switch',
-    'textarea',
-    'timepicker',
-    'transfer',
-    'tree-select',
-    'upload'
-  ],
-  Feedback: [
-    'drawer',
-    'loading',
-    'message',
-    'modal',
-    'notification',
-    'popconfirm',
-    'popover',
-    'progress',
-    'tooltip',
-    'tour'
-  ],
-  Layout: [
-    'card',
-    'carousel',
-    'container',
-    'descriptions',
-    'grid',
-    'layout',
-    'list',
-    'resizable',
-    'skeleton',
-    'space',
-    'splitter'
-  ],
-  Navigation: [
-    'affix',
-    'anchor',
-    'back-top',
-    'breadcrumb',
-    'dropdown',
-    'float-button',
-    'menu',
-    'pagination',
-    'scroll-spy',
-    'spotlight',
-    'steps',
-    'tabs',
-    'tree'
-  ],
-  Data: ['calendar', 'collapse', 'countdown', 'table', 'timeline'],
-  Charts: ['chart', 'gantt', 'org-chart'],
-  Advanced: [
-    'code-editor',
-    'drag',
-    'file-manager',
-    'image-annotation',
-    'image-viewer',
-    'infinite-scroll',
-    'kanban',
-    'markdown-editor',
-    'print-layout',
-    'rich-text-editor',
-    'virtual-list',
-    'virtual-table'
-  ],
-  Composite: ['composite'],
-  Core: ['base', 'events', 'floating-popup', 'generics', 'locale', 'slots', 'theme']
-}
-
-const CATEGORY_SLUGS = Object.fromEntries(
-  Object.keys(CATEGORIES).map((category) => [category, category.toLowerCase()])
-)
 
 const CATEGORY_DESCRIPTIONS = {
   Basic: '基础展示与低级交互组件。',
@@ -433,51 +330,6 @@ const COMPONENT_SNIPPETS = {
 const MAX_PROPS_PER_COMPONENT = 3
 const MAX_EVENTS_PER_COMPONENT = 6
 
-const VIRTUAL_COMPONENTS = [
-  {
-    component: 'ConfigProvider',
-    category: 'Basic',
-    props: 'shared/props/basic.md#config-provider',
-    examples: 'examples/basic.md#config-provider',
-    typeSource:
-      'packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts',
-    propsRows: [
-      {
-        name: 'locale?',
-        type: 'TigerLocale',
-        defaultValue: '-',
-        description: 'Locale configuration'
-      },
-      { name: 'theme?', type: 'TigerTheme', defaultValue: '-', description: 'Theme configuration' },
-      { name: 'prefixCls?', type: 'string', defaultValue: 'tiger', description: 'CSS class prefix' }
-    ]
-  }
-]
-
-const COMPONENT_ALIASES = {
-  AutoComplete: 'AutoComplete',
-  QRCode: 'QRCode',
-  DataTableWithToolbar: 'DataTableWithToolbar',
-  ChartCanvas: 'ChartCanvas',
-  ChartAxis: 'ChartAxis',
-  ChartGrid: 'ChartGrid',
-  ChartSeries: 'ChartSeries',
-  ChartLegend: 'ChartLegend',
-  ChartTooltip: 'ChartTooltip'
-}
-
-const EXCLUDED_COMPONENTS = new Set([
-  'BaseChart',
-  'ChartInteraction',
-  'ChartWithAxes',
-  'FormCondition',
-  'FormRule',
-  'FormError',
-  'GenericComponent',
-  'GenericProps',
-  'TigerLocale'
-])
-
 let prettierConfigPromise
 async function formatMarkdown(content) {
   prettierConfigPromise ??= prettier.resolveConfig(SKILL_REFERENCES_DIR)
@@ -491,39 +343,6 @@ function hasExportModifier(node) {
 
 function getDeclarationName(node) {
   return node.name && ts.isIdentifier(node.name) ? node.name.text : null
-}
-
-function kebabToPascal(value) {
-  return value
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('')
-}
-
-function pascalToKebab(value) {
-  return value
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
-    .toLowerCase()
-}
-
-function normalizeComponentName(name) {
-  return COMPONENT_ALIASES[name] || name
-}
-
-function propsToComponents(propsInterfaces) {
-  return propsInterfaces
-    .map((propsInterface) =>
-      propsInterface
-        .replace(/^Vue/, '')
-        .replace(/^React/, '')
-        .replace(/Props$/, '')
-        .replace(/ConfigProvider$/, 'ConfigProvider')
-    )
-    .map(normalizeComponentName)
-    .filter((name) => /^[A-Z]/.test(name))
-    .filter((name) => !EXCLUDED_COMPONENTS.has(name))
-    .filter((name) => !/^(Base|Generic|Use|Tiger|React|Vue)$/.test(name))
 }
 
 function getJsDocText(node) {
@@ -639,7 +458,7 @@ function extractFileInfo(fileName, content) {
   visit(sourceFile)
   return {
     fileName,
-    typeName: basename(fileName, '.ts'),
+    typeName: basename(fileName).replace(/\.(tsx?|mts|cts)$/, ''),
     exports,
     propsInterfaces,
     interfaceDetails
@@ -670,38 +489,7 @@ function countExportedTypes(categorizedFiles) {
   )
 }
 
-function getComponentRows(categorizedFiles) {
-  const rows = []
-  const seen = new Set()
-
-  for (const { category, files } of categorizedFiles) {
-    if (category === 'Core' || category === 'Other') continue
-
-    for (const fileInfo of files) {
-      const components = propsToComponents(fileInfo.propsInterfaces)
-      for (const component of components.length > 0
-        ? components
-        : [kebabToPascal(fileInfo.typeName)]) {
-        if (seen.has(component)) continue
-        seen.add(component)
-        const slug = CATEGORY_SLUGS[category]
-        rows.push({
-          component,
-          category,
-          props: `shared/props/${slug}.md#${pascalToKebab(component)}`,
-          examples: `examples/${slug}.md#${pascalToKebab(component)}`,
-          typeSource: `packages/core/src/types/${fileInfo.fileName}`
-        })
-      }
-    }
-  }
-
-  return rows.sort(
-    (a, b) => a.category.localeCompare(b.category) || a.component.localeCompare(b.component)
-  )
-}
-
-function generateLlmApiSummary(categorizedFiles, totalTypes) {
+function generateLlmApiSummary(categorizedFiles, totalTypes, publicComponentNames) {
   let markdownText = '---\n'
   markdownText += 'name: tigercat-api-summary\n'
   markdownText += 'description: Compact generated API summary for Tigercat core types\n'
@@ -715,7 +503,7 @@ function generateLlmApiSummary(categorizedFiles, totalTypes) {
     markdownText += '| Type File | Props Interfaces | Components | Exports |\n'
     markdownText += '| --------- | ---------------- | ---------- | ------- |\n'
     for (const fileInfo of files) {
-      const components = propsToComponents(fileInfo.propsInterfaces)
+      const components = propsToPublicComponents(fileInfo.propsInterfaces, publicComponentNames)
       markdownText += `| ${fileInfo.fileName} | ${fileInfo.propsInterfaces.join(', ') || '-'} | ${components.join(', ') || '-'} | ${fileInfo.exports.length} |\n`
     }
     markdownText += '\n'
@@ -743,10 +531,7 @@ function generateComponentIndex(componentRows) {
   markdownText += '| --------- | -------- | ---- |\n'
 
   for (const row of componentRows) {
-    const typeFile = row.typeSource
-      .replace(/^packages\/core\/src\/types\//, '')
-      .replace(/packages\/[^/]+\/src\/components\//g, '')
-      .replace(/ and /g, ', ')
+    const typeFile = formatComponentIndexType(row.typeSource)
     markdownText += `| ${row.component} | ${row.category} | ${typeFile} |\n`
   }
 
@@ -785,85 +570,97 @@ function generateComponentNotesTable(components) {
   return markdownText
 }
 
-function generatePropsReference(category, files) {
+function collectInterfaceDetails(fileInfos) {
+  const details = new Map()
+  for (const fileInfo of fileInfos) {
+    for (const detail of fileInfo.interfaceDetails) {
+      if (!details.has(detail.name)) details.set(detail.name, detail)
+    }
+  }
+  return details
+}
+
+function getComponentDetails(entry, interfaceDetails) {
+  return (entry.propsInterfaces || []).map((name) => interfaceDetails.get(name)).filter(Boolean)
+}
+
+function mergeMembers(details, kind) {
+  const members = []
+  const seen = new Set()
+
+  for (const detail of details) {
+    for (const member of detail.members.filter((item) => item.kind === kind)) {
+      if (seen.has(member.name)) continue
+      seen.add(member.name)
+      members.push(member)
+    }
+  }
+
+  return members
+}
+
+function getPropsExtra(component) {
+  const extras = [COMPONENT_PROPS_EXTRA[component]]
+  if (component === 'DataTableWithToolbar') extras.push(COMPONENT_PROPS_EXTRA.TableToolbar)
+  return extras.filter(Boolean).join('\n\n')
+}
+
+function generatePublicPropsReference(category, componentEntries, interfaceDetails) {
   const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
-  const componentCount = files.reduce(
-    (count, fileInfo) => count + propsToComponents(fileInfo.propsInterfaces).length,
-    0
-  )
   let markdownText = '---\n'
   markdownText += `name: tigercat-props-${slug}\n`
   markdownText += `description: Compact generated Tigercat ${category} props reference\n`
   markdownText += '---\n\n'
   markdownText += '<!-- generated by pnpm docs:api -->\n\n'
   markdownText += `# ${category} Props\n\n`
-  markdownText += `${CATEGORY_DESCRIPTIONS[category] || 'Tigercat component props.'} 共 ${componentCount} 个组件。字段细节以 \`packages/core/src/types/*.ts\` 为准。\n\n`
+  markdownText += `${CATEGORY_DESCRIPTIONS[category] || 'Tigercat component props.'} 共 ${componentEntries.length} 个组件。字段细节以 \`packages/core/src/types/*.ts\` 为准；跨包组件以本段列出的源码为准。\n\n`
 
-  for (const fileInfo of files) {
-    const components = propsToComponents(fileInfo.propsInterfaces)
-    if (components.length === 0) continue
+  for (const entry of componentEntries) {
+    const component = entry.component
+    const details = getComponentDetails(entry, interfaceDetails)
+    const propRows = entry.propsRows || mergeMembers(details, 'prop')
+    const eventRows = mergeMembers(details, 'event')
+    const methodRows = mergeMembers(details, 'method')
+    const shownCount = Math.min(propRows.length, MAX_PROPS_PER_COMPONENT)
+    const propsMeta =
+      propRows.length > shownCount ? ` · ${shownCount}/${propRows.length} props` : ''
+    const interfaceNames =
+      details.map((detail) => detail.name).join(' / ') || entry.propsInterfaces?.join(' / ') || '-'
 
-    for (const detail of fileInfo.interfaceDetails) {
-      const component = normalizeComponentName(
-        detail.name
-          .replace(/^Vue/, '')
-          .replace(/^React/, '')
-          .replace(/Props$/, '')
-      )
-      if (!components.includes(component)) continue
+    markdownText += `## ${component}\n\n`
+    markdownText += `\`${entry.typeSource}\` · \`${interfaceNames}\`${propsMeta}\n\n`
+    markdownText += getComponentUsageText(component)
 
-      const propRows = detail.members.filter((member) => member.kind === 'prop')
-      const eventRows = detail.members.filter((member) => member.kind === 'event')
-      const methodRows = detail.members.filter((member) => member.kind === 'method')
-      const shownCount = Math.min(propRows.length, MAX_PROPS_PER_COMPONENT)
-      const propsMeta = propRows.length > shownCount ? ` · ${shownCount}/${propRows.length} props` : ''
-
-      markdownText += `## ${component}\n\n`
-      markdownText += `\`${fileInfo.fileName}\` · \`${detail.name}\`${propsMeta}\n\n`
-      markdownText += getComponentUsageText(component)
-
-      if (propRows.length > 0) {
-        const visiblePropRows = propRows.slice(0, MAX_PROPS_PER_COMPONENT)
-        markdownText += '| Prop | Type | Default | Notes |\n'
-        markdownText += '| ---- | ---- | ------- | ----- |\n'
-        for (const member of visiblePropRows) {
-          markdownText += `| \`${codeText(member.name)}\` | \`${codeText(member.type)}\` | \`${codeText(member.defaultValue)}\` | ${tableText(member.description)} |\n`
-        }
-        markdownText += '\n'
+    if (propRows.length > 0) {
+      const visiblePropRows = propRows.slice(0, MAX_PROPS_PER_COMPONENT)
+      markdownText += '| Prop | Type | Default | Notes |\n'
+      markdownText += '| ---- | ---- | ------- | ----- |\n'
+      for (const member of visiblePropRows) {
+        markdownText += `| \`${codeText(member.name)}\` | \`${codeText(member.type)}\` | \`${codeText(member.defaultValue)}\` | ${tableText(member.description)} |\n`
       }
-
-      if (eventRows.length > 0) {
-        markdownText += 'Events/callback props: '
-        markdownText += eventRows
-          .slice(0, MAX_EVENTS_PER_COMPONENT)
-          .map((member) => `\`${member.name}\``)
-          .join(', ')
-        if (eventRows.length > MAX_EVENTS_PER_COMPONENT) markdownText += ', ...'
-        markdownText += '.\n\n'
-      }
-
-      if (methodRows.length > 0) {
-        markdownText += 'Method signatures: '
-        markdownText += methodRows.map((member) => `\`${member.name}\``).join(', ')
-        markdownText += '.\n\n'
-      }
-
-      if (COMPONENT_PROPS_EXTRA[component]) {
-        markdownText += `${COMPONENT_PROPS_EXTRA[component].trim()}\n\n`
-      }
+      markdownText += '\n'
     }
-  }
 
-  for (const virtualComponent of VIRTUAL_COMPONENTS.filter((item) => item.category === category)) {
-    markdownText += `## ${virtualComponent.component}\n\n`
-    markdownText += `\`${virtualComponent.typeSource}\`\n\n`
-    markdownText += getComponentUsageText(virtualComponent.component)
-    markdownText += '| Prop | Type | Default | Notes |\n'
-    markdownText += '| ---- | ---- | ------- | ----- |\n'
-    for (const member of virtualComponent.propsRows) {
-      markdownText += `| \`${codeText(member.name)}\` | \`${codeText(member.type)}\` | \`${codeText(member.defaultValue)}\` | ${tableText(member.description)} |\n`
+    if (entry.passThroughNote) markdownText += `${entry.passThroughNote}\n\n`
+
+    if (eventRows.length > 0) {
+      markdownText += 'Events/callback props: '
+      markdownText += eventRows
+        .slice(0, MAX_EVENTS_PER_COMPONENT)
+        .map((member) => `\`${member.name}\``)
+        .join(', ')
+      if (eventRows.length > MAX_EVENTS_PER_COMPONENT) markdownText += ', ...'
+      markdownText += '.\n\n'
     }
-    markdownText += '\n'
+
+    if (methodRows.length > 0) {
+      markdownText += 'Method signatures: '
+      markdownText += methodRows.map((member) => `\`${member.name}\``).join(', ')
+      markdownText += '.\n\n'
+    }
+
+    const propsExtra = getPropsExtra(component)
+    if (propsExtra) markdownText += `${propsExtra.trim()}\n\n`
   }
 
   return markdownText
@@ -900,12 +697,9 @@ function getReactSnippet(component, category) {
   return `<${component} />`
 }
 
-function generateExamples(category, files) {
+function generateExamples(category, componentEntries) {
   const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
-  const components = [
-    ...files.flatMap((fileInfo) => propsToComponents(fileInfo.propsInterfaces)),
-    ...VIRTUAL_COMPONENTS.filter((item) => item.category === category).map((item) => item.component)
-  ]
+  const components = componentEntries.map((entry) => entry.component)
   let markdownText = '---\n'
   markdownText += `name: tigercat-examples-${slug}\n`
   markdownText += `description: Compact Tigercat ${category} Vue and React usage routes\n`
@@ -975,26 +769,33 @@ async function main() {
   for (const fileName of typeFiles) {
     const content = await readFile(join(TYPES_DIR, fileName), 'utf8')
     const fileInfo = extractFileInfo(fileName, content)
-    fileInfoByName.set(basename(fileName, '.ts'), fileInfo)
+    fileInfoByName.set(fileInfo.typeName, fileInfo)
   }
 
   const categorizedFiles = getCategorizedFiles(fileInfoByName)
   const totalTypes = countExportedTypes(categorizedFiles)
-  const componentRows = getComponentRows(categorizedFiles)
-  for (const virtualComponent of VIRTUAL_COMPONENTS) {
-    if (!componentRows.some((row) => row.component === virtualComponent.component)) {
-      componentRows.push({
-        component: virtualComponent.component,
-        category: virtualComponent.category,
-        props: virtualComponent.props,
-        examples: virtualComponent.examples,
-        typeSource: virtualComponent.typeSource
-      })
-    }
+  const publicExports = loadPublicComponentExports(ROOT_DIR)
+  const publicComponentNames = new Set(publicExports.all)
+  const componentRows = buildPublicComponentEntries(ROOT_DIR, fileInfoByName, publicExports)
+  const frameworkSourceFiles = [
+    ...new Set(componentRows.flatMap((entry) => entry.sourceFiles || []))
+  ].filter((fileName) => !fileName.startsWith('packages/core/src/types/'))
+  const frameworkFileInfos = []
+  for (const fileName of frameworkSourceFiles) {
+    const content = await readFile(join(ROOT_DIR, fileName), 'utf8')
+    frameworkFileInfos.push(extractFileInfo(fileName, content))
   }
-  componentRows.sort(
-    (a, b) => a.category.localeCompare(b.category) || a.component.localeCompare(b.component)
-  )
+  const interfaceDetails = collectInterfaceDetails([
+    ...[...fileInfoByName.values()],
+    ...frameworkFileInfos
+  ])
+  const entriesByCategory = new Map()
+  for (const entry of componentRows) {
+    if (!entriesByCategory.has(entry.category)) {
+      entriesByCategory.set(entry.category, [])
+    }
+    entriesByCategory.get(entry.category).push(entry)
+  }
 
   await mkdir(SHARED_DIR, { recursive: true })
   await mkdir(PROPS_DIR, { recursive: true })
@@ -1006,7 +807,7 @@ async function main() {
 
   await writeFile(
     LLM_API_SUMMARY,
-    await formatMarkdown(generateLlmApiSummary(categorizedFiles, totalTypes)),
+    await formatMarkdown(generateLlmApiSummary(categorizedFiles, totalTypes, publicComponentNames)),
     'utf8'
   )
   await writeFile(
@@ -1015,17 +816,19 @@ async function main() {
     'utf8'
   )
 
-  for (const { category, files } of categorizedFiles) {
-    if (category === 'Core' || category === 'Other') continue
+  for (const category of Object.keys(CATEGORIES)) {
+    if (category === 'Core') continue
+    const entries = entriesByCategory.get(category) || []
+    if (entries.length === 0) continue
     const slug = CATEGORY_SLUGS[category]
     await writeFile(
       join(PROPS_DIR, `${slug}.md`),
-      await formatMarkdown(generatePropsReference(category, files)),
+      await formatMarkdown(generatePublicPropsReference(category, entries, interfaceDetails)),
       'utf8'
     )
     await writeFile(
       join(EXAMPLES_DIR, `${slug}.md`),
-      await formatMarkdown(generateExamples(category, files)),
+      await formatMarkdown(generateExamples(category, entries)),
       'utf8'
     )
   }

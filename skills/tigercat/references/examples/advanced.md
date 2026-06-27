@@ -23,6 +23,6 @@ description: Compact Tigercat Advanced Vue and React usage routes
 | Kanban       | `<Kanban :columns="columns" />`                                                        | `<Kanban columns={columns} />`                                                    |
 | VirtualTable | `<VirtualTable :data="rows" :columns="fixedColumns" :row-height="40" :height="320" />` | `<VirtualTable data={rows} columns={fixedColumns} rowHeight={40} height={320} />` |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：CodeEditor, FileManager, ImageAnnotation, ImageViewer, InfiniteScroll, MarkdownEditor, PrintLayout, RichTextEditor, VirtualList.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：CodeEditor, FileManager, ImageAnnotation, ImageViewer, InfiniteScroll, MarkdownEditor, PrintLayout, PrintPageBreak, RichTextEditor, VirtualList.
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.

@@ -7,11 +7,11 @@ description: Compact generated Tigercat Data props reference
 
 # Data Props
 
-数据展示、表格、时间线、日历和折叠面板组件。 共 6 个组件。字段细节以 `packages/core/src/types/*.ts` 为准。
+数据展示、表格、时间线、日历和折叠面板组件。 共 6 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Calendar
 
-`calendar.ts` · `CalendarProps` · 3/4 props
+`packages/core/src/types/calendar.ts` · `CalendarProps` · 3/4 props
 
 | Prop            | Type                      | Default | Notes                                             |
 | --------------- | ------------------------- | ------- | ------------------------------------------------- |
@@ -21,7 +21,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Collapse
 
-`collapse.ts` · `CollapseProps` · 3/8 props
+`packages/core/src/types/collapse.ts` · `CollapseProps` · 3/8 props
 
 | Prop                | Type                                       | Default | Notes                                                     |
 | ------------------- | ------------------------------------------ | ------- | --------------------------------------------------------- |
@@ -31,7 +31,7 @@ description: Compact generated Tigercat Data props reference
 
 ## CollapsePanel
 
-`collapse.ts` · `CollapsePanelProps` · 3/6 props
+`packages/core/src/types/collapse.ts` · `CollapsePanelProps` · 3/6 props
 
 | Prop        | Type               | Default | Notes                               |
 | ----------- | ------------------ | ------- | ----------------------------------- |
@@ -41,7 +41,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Countdown
 
-`countdown.ts` · `CountdownProps` · 3/10 props
+`packages/core/src/types/countdown.ts` · `CountdownProps` · 3/10 props
 
 | Prop      | Type             | Default | Notes |
 | --------- | ---------------- | ------- | ----- |
@@ -51,7 +51,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Table
 
-`table.ts` · `TableProps` · 3/50 props
+`packages/core/src/types/table.ts` · `TableProps` · 3/50 props
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 
@@ -65,7 +65,7 @@ Note: 固定列通过 `column.fixed`（`left` / `right`）开启；开启 `colum
 
 ## Timeline
 
-`timeline.ts` · `TimelineProps` · 3/5 props
+`packages/core/src/types/timeline.ts` · `TimelineProps` · 3/5 props
 
 | Prop          | Type           | Default  | Notes                                               |
 | ------------- | -------------- | -------- | --------------------------------------------------- |

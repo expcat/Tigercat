@@ -112,6 +112,15 @@ Breadcrumb、DatePicker、Dropdown 目标 spec 已在本轮验证通过。
 
 #### T05 generator and generated refs
 
+**状态**：已完成（2026-06-27）。本轮新增 `scripts/lib/public-components.mjs`
+统一公开组件枚举，并让 `docs:api`、`api:validate`、`types:check` 与 API baseline
+生成复用同一事实源；generated references 已重生成，component-index 修正为 148 个公开组件
+（补 `MessageContainer`、`NotificationContainer`、`PrintPageBreak`、`StepsItem`，移除
+`Drag`、`Notification`、`TableToolbar` 组件路由）。验证已运行 `npx -y pnpm@11.9.0
+docs:api`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`
+与 `npx -y pnpm@11.9.0 api:baseline:check`；`docs:api:check` 的生成阶段通过，
+diff gate 显示本任务的 generated references 预期变更。
+
 **目标**：统一公开组件枚举与 generated references 事实源，修复 component-index 误列/漏列、props 类型映射与高级能力覆盖不足。
 
 **来源**：A-5、A-6、A-7、C03-1、C06-4、C22-4、C24-4、C25-1、C28-5、C30-3、C31-5、C32-4、C12-2。

@@ -7,119 +7,11 @@ description: Compact generated Tigercat Charts props reference
 
 # Charts Props
 
-图表画布、图例、工具提示和可视化组件。 共 20 个组件。字段细节以 `packages/core/src/types/*.ts` 为准。
-
-## ChartLegend
-
-`chart.ts` · `ChartLegendProps` · 3/4 props
-
-| Prop                | Type                  | Default    | Notes                    |
-| ------------------- | --------------------- | ---------- | ------------------------ |
-| `showLegend?`       | `boolean`             | `false`    | Whether to show legend   |
-| `legendPosition?`   | `ChartLegendPosition` | `'bottom'` | Legend position          |
-| `legendMarkerSize?` | `number`              | `10`       | Legend marker size in px |
-
-## ChartTooltip
-
-`chart.ts` · `ChartTooltipProps`
-
-| Prop           | Type      | Default | Notes                   |
-| -------------- | --------- | ------- | ----------------------- |
-| `showTooltip?` | `boolean` | `true`  | Whether to show tooltip |
-
-## ChartCanvas
-
-`chart.ts` · `ChartCanvasProps` · 3/7 props
-
-| Prop          | Type      | Default | Notes                                                       |
-| ------------- | --------- | ------- | ----------------------------------------------------------- |
-| `width?`      | `number`  | `320`   | SVG width                                                   |
-| `height?`     | `number`  | `200`   | SVG height                                                  |
-| `responsive?` | `boolean` | `false` | Resize the SVG to its parent container using ResizeObserver |
-
-## ChartAxis
-
-`chart.ts` · `ChartAxisProps` · 3/12 props
-
-| Prop           | Type                   | Default    | Notes                                   |
-| -------------- | ---------------------- | ---------- | --------------------------------------- |
-| `orientation?` | `ChartAxisOrientation` | `'bottom'` | Axis orientation                        |
-| `scale`        | `ChartScale`           | `-`        | Axis scale                              |
-| `ticks?`       | `number`               | `5`        | Number of ticks (only for linear scale) |
-
-## ChartGrid
-
-`chart.ts` · `ChartGridProps` · 3/12 props
-
-| Prop      | Type            | Default  | Notes           |
-| --------- | --------------- | -------- | --------------- |
-| `xScale?` | `ChartScale`    | `-`      | X axis scale    |
-| `yScale?` | `ChartScale`    | `-`      | Y axis scale    |
-| `show?`   | `ChartGridLine` | `'both'` | Show grid lines |
-
-## ChartSeries
-
-`chart.ts` · `ChartSeriesProps` · 3/6 props
-
-| Prop     | Type     | Default | Notes        |
-| -------- | -------- | ------- | ------------ |
-| `data`   | `T[]`    | `-`     | Series data  |
-| `name?`  | `string` | `-`     | Series name  |
-| `color?` | `string` | `-`     | Series color |
-
-## BarChart
-
-`chart.ts` · `BarChartProps` · 3/31 props
-
-| Prop      | Type              | Default | Notes          |
-| --------- | ----------------- | ------- | -------------- |
-| `data`    | `BarChartDatum[]` | `-`     | Chart data     |
-| `xScale?` | `ChartScale`      | `-`     | Custom x scale |
-| `yScale?` | `ChartScale`      | `-`     | Custom y scale |
-
-## ScatterChart
-
-`chart.ts` · `ScatterChartProps` · 3/13 props
-
-| Prop          | Type                  | Default | Notes               |
-| ------------- | --------------------- | ------- | ------------------- |
-| `data`        | `ScatterChartDatum[]` | `-`     | Chart data          |
-| `pointSize?`  | `number`              | `6`     | Point size (radius) |
-| `pointColor?` | `string`              | `-`     | Point color         |
-
-## PieChart
-
-`chart.ts` · `PieChartProps` · 3/17 props
-
-| Prop           | Type              | Default | Notes                  |
-| -------------- | ----------------- | ------- | ---------------------- |
-| `data`         | `PieChartDatum[]` | `-`     | Chart data             |
-| `innerRadius?` | `number`          | `0`     | Inner radius for donut |
-| `outerRadius?` | `number`          | `-`     | Outer radius           |
-
-## DonutChart
-
-`chart.ts` · `DonutChartProps` · 3/4 props
-
-| Prop                | Type               | Default | Notes                                                         |
-| ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
-| `innerRadiusRatio?` | `number`           | `0.6`   | Inner radius ratio based on outer radius                      |
-| `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the donut center              |
-| `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue in the donut center |
-
-## LineChart
-
-`chart.ts` · `LineChartProps` · 3/34 props
-
-| Prop      | Type                | Default | Notes                      |
-| --------- | ------------------- | ------- | -------------------------- |
-| `data?`   | `LineChartDatum[]`  | `-`     | Chart data (single series) |
-| `series?` | `LineChartSeries[]` | `-`     | Multiple series            |
-| `xScale?` | `ChartScale`        | `-`     | Custom x scale             |
+图表画布、图例、工具提示和可视化组件。 共 20 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## AreaChart
 
-`chart.ts` · `AreaChartProps` · 3/35 props
+`packages/core/src/types/chart.ts` · `AreaChartProps` · 3/35 props
 
 | Prop      | Type                | Default | Notes                      |
 | --------- | ------------------- | ------- | -------------------------- |
@@ -127,19 +19,87 @@ description: Compact generated Tigercat Charts props reference
 | `series?` | `AreaChartSeries[]` | `-`     | Multiple series            |
 | `xScale?` | `ChartScale`        | `-`     | Custom x scale             |
 
-## RadarChart
+## BarChart
 
-`chart.ts` · `RadarChartProps` · 3/41 props
+`packages/core/src/types/chart.ts` · `BarChartProps` · 3/31 props
 
-| Prop        | Type                 | Default | Notes                        |
-| ----------- | -------------------- | ------- | ---------------------------- |
-| `data?`     | `RadarChartDatum[]`  | `-`     | Chart data (single series)   |
-| `series?`   | `RadarChartSeries[]` | `-`     | Multiple series              |
-| `maxValue?` | `number`             | `-`     | Max value for radius scaling |
+| Prop      | Type              | Default | Notes          |
+| --------- | ----------------- | ------- | -------------- |
+| `data`    | `BarChartDatum[]` | `-`     | Chart data     |
+| `xScale?` | `ChartScale`      | `-`     | Custom x scale |
+| `yScale?` | `ChartScale`      | `-`     | Custom y scale |
+
+## ChartAxis
+
+`packages/core/src/types/chart.ts` · `ChartAxisProps` · 3/12 props
+
+| Prop           | Type                   | Default    | Notes                                   |
+| -------------- | ---------------------- | ---------- | --------------------------------------- |
+| `orientation?` | `ChartAxisOrientation` | `'bottom'` | Axis orientation                        |
+| `scale`        | `ChartScale`           | `-`        | Axis scale                              |
+| `ticks?`       | `number`               | `5`        | Number of ticks (only for linear scale) |
+
+## ChartCanvas
+
+`packages/core/src/types/chart.ts` · `ChartCanvasProps` · 3/7 props
+
+| Prop          | Type      | Default | Notes                                                       |
+| ------------- | --------- | ------- | ----------------------------------------------------------- |
+| `width?`      | `number`  | `320`   | SVG width                                                   |
+| `height?`     | `number`  | `200`   | SVG height                                                  |
+| `responsive?` | `boolean` | `false` | Resize the SVG to its parent container using ResizeObserver |
+
+## ChartGrid
+
+`packages/core/src/types/chart.ts` · `ChartGridProps` · 3/12 props
+
+| Prop      | Type            | Default  | Notes           |
+| --------- | --------------- | -------- | --------------- |
+| `xScale?` | `ChartScale`    | `-`      | X axis scale    |
+| `yScale?` | `ChartScale`    | `-`      | Y axis scale    |
+| `show?`   | `ChartGridLine` | `'both'` | Show grid lines |
+
+## ChartLegend
+
+`packages/core/src/types/chart.ts` · `ChartLegendProps` · 3/4 props
+
+| Prop                | Type                  | Default    | Notes                    |
+| ------------------- | --------------------- | ---------- | ------------------------ |
+| `showLegend?`       | `boolean`             | `false`    | Whether to show legend   |
+| `legendPosition?`   | `ChartLegendPosition` | `'bottom'` | Legend position          |
+| `legendMarkerSize?` | `number`              | `10`       | Legend marker size in px |
+
+## ChartSeries
+
+`packages/core/src/types/chart.ts` · `ChartSeriesProps` · 3/6 props
+
+| Prop     | Type     | Default | Notes        |
+| -------- | -------- | ------- | ------------ |
+| `data`   | `T[]`    | `-`     | Series data  |
+| `name?`  | `string` | `-`     | Series name  |
+| `color?` | `string` | `-`     | Series color |
+
+## ChartTooltip
+
+`packages/core/src/types/chart.ts` · `ChartTooltipProps`
+
+| Prop           | Type      | Default | Notes                   |
+| -------------- | --------- | ------- | ----------------------- |
+| `showTooltip?` | `boolean` | `true`  | Whether to show tooltip |
+
+## DonutChart
+
+`packages/core/src/types/chart.ts` · `DonutChartProps` · 3/4 props
+
+| Prop                | Type               | Default | Notes                                                         |
+| ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
+| `innerRadiusRatio?` | `number`           | `0.6`   | Inner radius ratio based on outer radius                      |
+| `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the donut center              |
+| `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue in the donut center |
 
 ## FunnelChart
 
-`chart.ts` · `FunnelChartProps` · 3/6 props
+`packages/core/src/types/chart.ts` · `FunnelChartProps` · 3/6 props
 
 | Prop         | Type                         | Default      | Notes                                         |
 | ------------ | ---------------------------- | ------------ | --------------------------------------------- |
@@ -147,9 +107,19 @@ description: Compact generated Tigercat Charts props reference
 | `direction?` | `'vertical' \| 'horizontal'` | `'vertical'` | Vertical or horizontal layout                 |
 | `gap?`       | `number`                     | `2`          | Gap between funnel segments in px             |
 
+## Gantt
+
+`packages/core/src/types/gantt.ts` · `GanttProps` · 3/16 props
+
+| Prop         | Type          | Default | Notes |
+| ------------ | ------------- | ------- | ----- |
+| `data`       | `GanttTask[]` | `-`     | -     |
+| `scale?`     | `GanttScale`  | `-`     | -     |
+| `rowHeight?` | `number`      | `-`     | -     |
+
 ## GaugeChart
 
-`chart.ts` · `GaugeChartProps` · 3/15 props
+`packages/core/src/types/chart.ts` · `GaugeChartProps` · 3/15 props
 
 | Prop    | Type     | Default | Notes                      |
 | ------- | -------- | ------- | -------------------------- |
@@ -159,7 +129,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## HeatmapChart
 
-`chart.ts` · `HeatmapChartProps` · 3/13 props
+`packages/core/src/types/chart.ts` · `HeatmapChartProps` · 3/13 props
 
 | Prop      | Type                  | Default | Notes         |
 | --------- | --------------------- | ------- | ------------- |
@@ -167,19 +137,59 @@ description: Compact generated Tigercat Charts props reference
 | `xLabels` | `string[]`            | `-`     | X-axis labels |
 | `yLabels` | `string[]`            | `-`     | Y-axis labels |
 
-## TreeMapChart
+## LineChart
 
-`chart.ts` · `TreeMapChartProps` · 3/6 props
+`packages/core/src/types/chart.ts` · `LineChartProps` · 3/34 props
 
-| Prop          | Type                  | Default | Notes                               |
-| ------------- | --------------------- | ------- | ----------------------------------- |
-| `data`        | `TreeMapChartDatum[]` | `-`     | Hierarchical data                   |
-| `gap?`        | `number`              | `2`     | Gap between nodes in px             |
-| `showLabels?` | `boolean`             | `true`  | Whether to show labels inside nodes |
+| Prop      | Type                | Default | Notes                      |
+| --------- | ------------------- | ------- | -------------------------- |
+| `data?`   | `LineChartDatum[]`  | `-`     | Chart data (single series) |
+| `series?` | `LineChartSeries[]` | `-`     | Multiple series            |
+| `xScale?` | `ChartScale`        | `-`     | Custom x scale             |
+
+## OrgChart
+
+`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 3/11 props
+
+| Prop          | Type                             | Default | Notes |
+| ------------- | -------------------------------- | ------- | ----- |
+| `data`        | `OrgChartNode \| OrgChartNode[]` | `-`     | -     |
+| `nodeWidth?`  | `number`                         | `-`     | -     |
+| `nodeHeight?` | `number`                         | `-`     | -     |
+
+## PieChart
+
+`packages/core/src/types/chart.ts` · `PieChartProps` · 3/17 props
+
+| Prop           | Type              | Default | Notes                  |
+| -------------- | ----------------- | ------- | ---------------------- |
+| `data`         | `PieChartDatum[]` | `-`     | Chart data             |
+| `innerRadius?` | `number`          | `0`     | Inner radius for donut |
+| `outerRadius?` | `number`          | `-`     | Outer radius           |
+
+## RadarChart
+
+`packages/core/src/types/chart.ts` · `RadarChartProps` · 3/41 props
+
+| Prop        | Type                 | Default | Notes                        |
+| ----------- | -------------------- | ------- | ---------------------------- |
+| `data?`     | `RadarChartDatum[]`  | `-`     | Chart data (single series)   |
+| `series?`   | `RadarChartSeries[]` | `-`     | Multiple series              |
+| `maxValue?` | `number`             | `-`     | Max value for radius scaling |
+
+## ScatterChart
+
+`packages/core/src/types/chart.ts` · `ScatterChartProps` · 3/13 props
+
+| Prop          | Type                  | Default | Notes               |
+| ------------- | --------------------- | ------- | ------------------- |
+| `data`        | `ScatterChartDatum[]` | `-`     | Chart data          |
+| `pointSize?`  | `number`              | `6`     | Point size (radius) |
+| `pointColor?` | `string`              | `-`     | Point color         |
 
 ## SunburstChart
 
-`chart.ts` · `SunburstChartProps` · 3/5 props
+`packages/core/src/types/chart.ts` · `SunburstChartProps` · 3/5 props
 
 | Prop                | Type                   | Default | Notes                                              |
 | ------------------- | ---------------------- | ------- | -------------------------------------------------- |
@@ -187,22 +197,12 @@ description: Compact generated Tigercat Charts props reference
 | `innerRadiusRatio?` | `number`               | `0`     | Inner radius ratio (0 = no hole, 0.3 = donut-like) |
 | `showLabels?`       | `boolean`              | `true`  | Whether to show labels on arcs                     |
 
-## Gantt
+## TreeMapChart
 
-`gantt.ts` · `GanttProps` · 3/16 props
+`packages/core/src/types/chart.ts` · `TreeMapChartProps` · 3/6 props
 
-| Prop         | Type          | Default | Notes |
-| ------------ | ------------- | ------- | ----- |
-| `data`       | `GanttTask[]` | `-`     | -     |
-| `scale?`     | `GanttScale`  | `-`     | -     |
-| `rowHeight?` | `number`      | `-`     | -     |
-
-## OrgChart
-
-`org-chart.ts` · `OrgChartProps` · 3/11 props
-
-| Prop          | Type                             | Default | Notes |
-| ------------- | -------------------------------- | ------- | ----- |
-| `data`        | `OrgChartNode \| OrgChartNode[]` | `-`     | -     |
-| `nodeWidth?`  | `number`                         | `-`     | -     |
-| `nodeHeight?` | `number`                         | `-`     | -     |
+| Prop          | Type                  | Default | Notes                               |
+| ------------- | --------------------- | ------- | ----------------------------------- |
+| `data`        | `TreeMapChartDatum[]` | `-`     | Hierarchical data                   |
+| `gap?`        | `number`              | `2`     | Gap between nodes in px             |
+| `showLabels?` | `boolean`             | `true`  | Whether to show labels inside nodes |

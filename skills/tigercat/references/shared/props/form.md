@@ -7,11 +7,11 @@ description: Compact generated Tigercat Form props reference
 
 # Form Props
 
-表单输入、选择、校验和上传相关组件。 共 28 个组件。字段细节以 `packages/core/src/types/*.ts` 为准。
+表单输入、选择、校验和上传相关组件。 共 28 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## AutoComplete
 
-`auto-complete.ts` · `AutoCompleteProps` · 3/10 props
+`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 3/10 props
 
 | Prop           | Type                   | Default | Notes            |
 | -------------- | ---------------------- | ------- | ---------------- |
@@ -21,7 +21,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Cascader
 
-`cascader.ts` · `CascaderProps` · 3/11 props
+`packages/core/src/types/cascader.ts` · `CascaderProps` · 3/11 props
 
 | Prop           | Type               | Default           | Notes                 |
 | -------------- | ------------------ | ----------------- | --------------------- |
@@ -31,7 +31,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Checkbox
 
-`checkbox.ts` · `CheckboxProps` · 3/4 props
+`packages/core/src/types/checkbox.ts` · `CheckboxProps` · 3/4 props
 
 | Prop        | Type            | Default | Notes                                       |
 | ----------- | --------------- | ------- | ------------------------------------------- |
@@ -41,7 +41,7 @@ description: Compact generated Tigercat Form props reference
 
 ## CheckboxGroup
 
-`checkbox.ts` · `CheckboxGroupProps`
+`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps`
 
 | Prop        | Type           | Default | Notes                                         |
 | ----------- | -------------- | ------- | --------------------------------------------- |
@@ -50,7 +50,7 @@ description: Compact generated Tigercat Form props reference
 
 ## ColorPicker
 
-`color-picker.ts` · `ColorPickerProps` · 3/6 props
+`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 3/6 props
 
 | Prop         | Type              | Default | Notes                          |
 | ------------ | ----------------- | ------- | ------------------------------ |
@@ -60,7 +60,7 @@ description: Compact generated Tigercat Form props reference
 
 ## ColorSwatch
 
-`color-swatch.ts` · `ColorSwatchProps` · 3/7 props
+`packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 3/7 props
 
 | Prop        | Type                       | Default | Notes |
 | ----------- | -------------------------- | ------- | ----- |
@@ -70,7 +70,7 @@ description: Compact generated Tigercat Form props reference
 
 ## CronEditor
 
-`cron-editor.ts` · `CronEditorProps` · 3/6 props
+`packages/core/src/types/cron-editor.ts` · `CronEditorProps` · 3/6 props
 
 | Prop        | Type             | Default | Notes |
 | ----------- | ---------------- | ------- | ----- |
@@ -80,7 +80,7 @@ description: Compact generated Tigercat Form props reference
 
 ## DatePicker
 
-`datepicker.ts` · `DatePickerProps` · 3/17 props
+`packages/core/src/types/datepicker.ts` · `DatePickerProps` · 3/17 props
 
 | Prop      | Type                        | Default | Notes                                                                         |
 | --------- | --------------------------- | ------- | ----------------------------------------------------------------------------- |
@@ -90,7 +90,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Form
 
-`form.ts` · `FormProps` · 3/17 props
+`packages/core/src/types/form.ts` · `FormProps` · 3/17 props
 
 | Prop          | Type               | Default | Notes                                                         |
 | ------------- | ------------------ | ------- | ------------------------------------------------------------- |
@@ -100,7 +100,7 @@ description: Compact generated Tigercat Form props reference
 
 ## FormItem
 
-`form.ts` · `FormItemProps` · 3/10 props
+`packages/core/src/types/form.ts` · `FormItemProps` · 3/10 props
 
 | Prop          | Type               | Default | Notes                                     |
 | ------------- | ------------------ | ------- | ----------------------------------------- |
@@ -110,7 +110,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Input
 
-`input.ts` · `InputProps` · 3/19 props
+`packages/core/src/types/input.ts` · `InputProps` · 3/19 props
 
 | Prop            | Type          | Default     | Notes                    |
 | --------------- | ------------- | ----------- | ------------------------ |
@@ -120,7 +120,7 @@ description: Compact generated Tigercat Form props reference
 
 ## InputGroup
 
-`input-group.ts` · `InputGroupProps`
+`packages/core/src/types/input-group.ts` · `InputGroupProps`
 
 | Prop         | Type             | Default | Notes                                        |
 | ------------ | ---------------- | ------- | -------------------------------------------- |
@@ -130,7 +130,7 @@ description: Compact generated Tigercat Form props reference
 
 ## InputGroupAddon
 
-`input-group.ts` · `InputGroupAddonProps`
+`packages/core/src/types/input-group.ts` · `InputGroupAddonProps`
 
 | Prop         | Type               | Default  | Notes                  |
 | ------------ | ------------------ | -------- | ---------------------- |
@@ -139,7 +139,7 @@ description: Compact generated Tigercat Form props reference
 
 ## InputNumber
 
-`input-number.ts` · `InputNumberProps` · 3/19 props
+`packages/core/src/types/input-number.ts` · `InputNumberProps` · 3/19 props
 
 | Prop      | Type             | Default     | Notes                           |
 | --------- | ---------------- | ----------- | ------------------------------- |
@@ -149,7 +149,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Mentions
 
-`mentions.ts` · `MentionsProps` · 3/7 props
+`packages/core/src/types/mentions.ts` · `MentionsProps` · 3/7 props
 
 | Prop           | Type              | Default | Notes                     |
 | -------------- | ----------------- | ------- | ------------------------- |
@@ -159,7 +159,7 @@ description: Compact generated Tigercat Form props reference
 
 ## NumberKeyboard
 
-`number-keyboard.ts` · `NumberKeyboardProps` · 3/15 props
+`packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 3/15 props
 
 | Prop            | Type     | Default | Notes |
 | --------------- | -------- | ------- | ----- |
@@ -169,7 +169,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Radio
 
-`radio.ts` · `RadioProps` · 3/6 props
+`packages/core/src/types/radio.ts` · `RadioProps` · 3/6 props
 
 | Prop        | Type               | Default | Notes                         |
 | ----------- | ------------------ | ------- | ----------------------------- |
@@ -179,7 +179,7 @@ description: Compact generated Tigercat Form props reference
 
 ## RadioGroup
 
-`radio.ts` · `RadioGroupProps` · 3/5 props
+`packages/core/src/types/radio.ts` · `RadioGroupProps` · 3/5 props
 
 | Prop            | Type               | Default | Notes                                        |
 | --------------- | ------------------ | ------- | -------------------------------------------- |
@@ -189,7 +189,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Select
 
-`select.ts` · `SelectProps` · 3/16 props
+`packages/core/src/types/select.ts` · `SelectProps` · 3/16 props
 
 | Prop           | Type         | Default | Notes                                       |
 | -------------- | ------------ | ------- | ------------------------------------------- |
@@ -199,7 +199,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Signature
 
-`signature.ts` · `SignatureProps` · 3/14 props
+`packages/core/src/types/signature.ts` · `SignatureProps` · 3/14 props
 
 | Prop        | Type     | Default | Notes |
 | ----------- | -------- | ------- | ----- |
@@ -209,7 +209,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Slider
 
-`slider.ts` · `SliderProps` · 3/10 props
+`packages/core/src/types/slider.ts` · `SliderProps` · 3/10 props
 
 | Prop            | Type                         | Default | Notes                                                                                     |
 | --------------- | ---------------------------- | ------- | ----------------------------------------------------------------------------------------- |
@@ -219,7 +219,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Stepper
 
-`stepper.ts` · `StepperProps` · 3/7 props
+`packages/core/src/types/stepper.ts` · `StepperProps` · 3/7 props
 
 | Prop    | Type     | Default | Notes          |
 | ------- | -------- | ------- | -------------- |
@@ -229,7 +229,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Switch
 
-`switch.ts` · `SwitchProps`
+`packages/core/src/types/switch.ts` · `SwitchProps`
 
 | Prop        | Type         | Default | Notes                          |
 | ----------- | ------------ | ------- | ------------------------------ |
@@ -239,7 +239,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Textarea
 
-`textarea.ts` · `TextareaProps` · 3/18 props
+`packages/core/src/types/textarea.ts` · `TextareaProps` · 3/18 props
 
 | Prop            | Type           | Default | Notes                                 |
 | --------------- | -------------- | ------- | ------------------------------------- |
@@ -249,7 +249,7 @@ description: Compact generated Tigercat Form props reference
 
 ## TimePicker
 
-`timepicker.ts` · `TimePickerProps` · 3/20 props
+`packages/core/src/types/timepicker.ts` · `TimePickerProps` · 3/20 props
 
 | Prop      | Type                             | Default | Notes                                                                                      |
 | --------- | -------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -259,7 +259,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Transfer
 
-`transfer.ts` · `TransferProps` · 3/10 props
+`packages/core/src/types/transfer.ts` · `TransferProps` · 3/10 props
 
 | Prop          | Type                   | Default | Notes                                    |
 | ------------- | ---------------------- | ------- | ---------------------------------------- |
@@ -269,7 +269,7 @@ description: Compact generated Tigercat Form props reference
 
 ## TreeSelect
 
-`tree-select.ts` · `TreeSelectProps` · 3/10 props
+`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 3/10 props
 
 | Prop           | Type             | Default | Notes            |
 | -------------- | ---------------- | ------- | ---------------- |
@@ -279,7 +279,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Upload
 
-`upload.ts` · `UploadProps` · 3/18 props
+`packages/core/src/types/upload.ts` · `UploadProps` · 3/18 props
 
 | Prop        | Type      | Default | Notes                                               |
 | ----------- | --------- | ------- | --------------------------------------------------- |

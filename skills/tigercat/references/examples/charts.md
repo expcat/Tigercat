@@ -13,25 +13,25 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 | Component     | Vue                              | React                           |
 | ------------- | -------------------------------- | ------------------------------- |
-| ChartLegend   | `<ChartLegend :data="data" />`   | `<ChartLegend data={data} />`   |
-| ChartTooltip  | `<ChartTooltip :data="data" />`  | `<ChartTooltip data={data} />`  |
-| ChartCanvas   | `<ChartCanvas :data="data" />`   | `<ChartCanvas data={data} />`   |
-| ChartAxis     | `<ChartAxis :data="data" />`     | `<ChartAxis data={data} />`     |
-| ChartGrid     | `<ChartGrid :data="data" />`     | `<ChartGrid data={data} />`     |
-| ChartSeries   | `<ChartSeries :data="data" />`   | `<ChartSeries data={data} />`   |
-| BarChart      | `<BarChart :data="data" />`      | `<BarChart data={data} />`      |
-| ScatterChart  | `<ScatterChart :data="data" />`  | `<ScatterChart data={data} />`  |
-| PieChart      | `<PieChart :data="data" />`      | `<PieChart data={data} />`      |
-| DonutChart    | `<DonutChart :data="data" />`    | `<DonutChart data={data} />`    |
-| LineChart     | `<LineChart :data="data" />`     | `<LineChart data={data} />`     |
 | AreaChart     | `<AreaChart :data="data" />`     | `<AreaChart data={data} />`     |
-| RadarChart    | `<RadarChart :data="data" />`    | `<RadarChart data={data} />`    |
+| BarChart      | `<BarChart :data="data" />`      | `<BarChart data={data} />`      |
+| ChartAxis     | `<ChartAxis :data="data" />`     | `<ChartAxis data={data} />`     |
+| ChartCanvas   | `<ChartCanvas :data="data" />`   | `<ChartCanvas data={data} />`   |
+| ChartGrid     | `<ChartGrid :data="data" />`     | `<ChartGrid data={data} />`     |
+| ChartLegend   | `<ChartLegend :data="data" />`   | `<ChartLegend data={data} />`   |
+| ChartSeries   | `<ChartSeries :data="data" />`   | `<ChartSeries data={data} />`   |
+| ChartTooltip  | `<ChartTooltip :data="data" />`  | `<ChartTooltip data={data} />`  |
+| DonutChart    | `<DonutChart :data="data" />`    | `<DonutChart data={data} />`    |
 | FunnelChart   | `<FunnelChart :data="data" />`   | `<FunnelChart data={data} />`   |
+| Gantt         | `<Gantt :data="data" />`         | `<Gantt data={data} />`         |
 | GaugeChart    | `<GaugeChart :data="data" />`    | `<GaugeChart data={data} />`    |
 | HeatmapChart  | `<HeatmapChart :data="data" />`  | `<HeatmapChart data={data} />`  |
-| TreeMapChart  | `<TreeMapChart :data="data" />`  | `<TreeMapChart data={data} />`  |
-| SunburstChart | `<SunburstChart :data="data" />` | `<SunburstChart data={data} />` |
-| Gantt         | `<Gantt :data="data" />`         | `<Gantt data={data} />`         |
+| LineChart     | `<LineChart :data="data" />`     | `<LineChart data={data} />`     |
 | OrgChart      | `<OrgChart :data="data" />`      | `<OrgChart data={data} />`      |
+| PieChart      | `<PieChart :data="data" />`      | `<PieChart data={data} />`      |
+| RadarChart    | `<RadarChart :data="data" />`    | `<RadarChart data={data} />`    |
+| ScatterChart  | `<ScatterChart :data="data" />`  | `<ScatterChart data={data} />`  |
+| SunburstChart | `<SunburstChart :data="data" />` | `<SunburstChart data={data} />` |
+| TreeMapChart  | `<TreeMapChart :data="data" />`  | `<TreeMapChart data={data} />`  |
 
 Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.

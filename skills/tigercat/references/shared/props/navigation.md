@@ -7,11 +7,11 @@ description: Compact generated Tigercat Navigation props reference
 
 # Navigation Props
 
-导航、菜单、分页、步骤、锚点和树形导航组件。 共 22 个组件。字段细节以 `packages/core/src/types/*.ts` 为准。
+导航、菜单、分页、步骤、锚点和树形导航组件。 共 23 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Affix
 
-`affix.ts` · `AffixProps` · 3/5 props
+`packages/core/src/types/affix.ts` · `AffixProps` · 3/5 props
 
 | Prop            | Type     | Default | Notes                                                                                      |
 | --------------- | -------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -21,7 +21,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Anchor
 
-`anchor.ts` · `AnchorProps` · 3/10 props
+`packages/core/src/types/anchor.ts` · `AnchorProps` · 3/10 props
 
 | Prop         | Type      | Default | Notes                                     |
 | ------------ | --------- | ------- | ----------------------------------------- |
@@ -31,7 +31,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## AnchorLink
 
-`anchor.ts` · `AnchorLinkProps` · 3/4 props
+`packages/core/src/types/anchor.ts` · `AnchorLinkProps` · 3/4 props
 
 | Prop      | Type     | Default | Notes                     |
 | --------- | -------- | ------- | ------------------------- |
@@ -41,7 +41,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## BackTop
 
-`back-top.ts` · `BackTopProps`
+`packages/core/src/types/back-top.ts` · `BackTopProps`
 
 | Prop                | Type     | Default | Notes                                                                           |
 | ------------------- | -------- | ------- | ------------------------------------------------------------------------------- |
@@ -50,7 +50,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Breadcrumb
 
-`breadcrumb.ts` · `BreadcrumbProps` · 3/5 props
+`packages/core/src/types/breadcrumb.ts` · `BreadcrumbProps` · 3/5 props
 
 | Prop         | Type                  | Default | Notes                                                                                      |
 | ------------ | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -60,7 +60,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## BreadcrumbItem
 
-`breadcrumb.ts` · `BreadcrumbItemProps` · 3/6 props
+`packages/core/src/types/breadcrumb.ts` · `BreadcrumbItemProps` · 3/6 props
 
 | Prop       | Type                                         | Default | Notes                                 |
 | ---------- | -------------------------------------------- | ------- | ------------------------------------- |
@@ -70,7 +70,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Dropdown
 
-`dropdown.ts` · `DropdownProps` · 3/9 props
+`packages/core/src/types/dropdown.ts` · `DropdownProps` · 3/9 props
 
 Uses: `DropdownMenu`, `DropdownItem`.
 
@@ -82,18 +82,9 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 | `disabled?` | `boolean`         | `false`   | Whether the dropdown is disabled               |
 | `open?`     | `boolean`         | `-`       | Whether the dropdown is open (controlled mode) |
 
-## DropdownMenu
-
-`dropdown.ts` · `DropdownMenuProps`
-
-| Prop         | Type                      | Default | Notes                  |
-| ------------ | ------------------------- | ------- | ---------------------- |
-| `className?` | `string`                  | `-`     | Additional CSS classes |
-| `style?`     | `Record<string, unknown>` | `-`     | Custom styles          |
-
 ## DropdownItem
 
-`dropdown.ts` · `DropdownItemProps` · 3/5 props
+`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 3/5 props
 
 | Prop        | Type               | Default | Notes                                          |
 | ----------- | ------------------ | ------- | ---------------------------------------------- |
@@ -101,9 +92,18 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 | `disabled?` | `boolean`          | `false` | Whether the item is disabled                   |
 | `divided?`  | `boolean`          | `false` | Whether the item is divided from previous item |
 
+## DropdownMenu
+
+`packages/core/src/types/dropdown.ts` · `DropdownMenuProps`
+
+| Prop         | Type                      | Default | Notes                  |
+| ------------ | ------------------------- | ------- | ---------------------- |
+| `className?` | `string`                  | `-`     | Additional CSS classes |
+| `style?`     | `Record<string, unknown>` | `-`     | Custom styles          |
+
 ## FloatButton
 
-`float-button.ts` · `FloatButtonProps` · 3/7 props
+`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 3/7 props
 
 | Prop       | Type               | Default    | Notes                       |
 | ---------- | ------------------ | ---------- | --------------------------- |
@@ -113,7 +113,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## FloatButtonGroup
 
-`float-button.ts` · `FloatButtonGroupProps` · 3/4 props
+`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 3/4 props
 
 | Prop       | Type                 | Default    | Notes                                  |
 | ---------- | -------------------- | ---------- | -------------------------------------- |
@@ -123,7 +123,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## Menu
 
-`menu.ts` · `MenuProps` · 3/18 props
+`packages/core/src/types/menu.ts` · `MenuProps` · 3/18 props
 
 | Prop     | Type         | Default      | Notes                                                                 |
 | -------- | ------------ | ------------ | --------------------------------------------------------------------- |
@@ -143,7 +143,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## MenuItem
 
-`menu.ts` · `MenuItemProps` · 3/4 props
+`packages/core/src/types/menu.ts` · `MenuItemProps` · 3/4 props
 
 | Prop        | Type      | Default | Notes                             |
 | ----------- | --------- | ------- | --------------------------------- |
@@ -151,19 +151,9 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 | `disabled?` | `boolean` | `-`     | Whether the menu item is disabled |
 | `icon?`     | `unknown` | `-`     | Icon for the menu item            |
 
-## SubMenu
-
-`menu.ts` · `SubMenuProps` · 3/5 props
-
-| Prop      | Type      | Default | Notes                      |
-| --------- | --------- | ------- | -------------------------- |
-| `itemKey` | `MenuKey` | `-`     | Unique key for the submenu |
-| `title?`  | `string`  | `-`     | Submenu title              |
-| `icon?`   | `unknown` | `-`     | Icon for the submenu       |
-
 ## MenuItemGroup
 
-`menu.ts` · `MenuItemGroupProps`
+`packages/core/src/types/menu.ts` · `MenuItemGroupProps`
 
 | Prop         | Type     | Default | Notes                  |
 | ------------ | -------- | ------- | ---------------------- |
@@ -172,7 +162,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## Pagination
 
-`pagination.ts` · `PaginationProps` · 3/21 props
+`packages/core/src/types/pagination.ts` · `PaginationProps` · 3/21 props
 
 | Prop              | Type     | Default | Notes                                        |
 | ----------------- | -------- | ------- | -------------------------------------------- |
@@ -182,7 +172,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## ScrollSpy
 
-`scroll-spy.ts` · `ScrollSpyProps` · 3/11 props
+`packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 3/11 props
 
 | Prop                | Type              | Default | Notes |
 | ------------------- | ----------------- | ------- | ----- |
@@ -192,7 +182,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## Spotlight
 
-`spotlight.ts` · `SpotlightProps` · 3/19 props
+`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 3/19 props
 
 | Prop           | Type      | Default | Notes |
 | -------------- | --------- | ------- | ----- |
@@ -202,7 +192,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## Steps
 
-`steps.ts` · `StepsProps` · 3/8 props
+`packages/core/src/types/steps.ts` · `StepsProps` · 3/8 props
 
 | Prop         | Type             | Default        | Notes                          |
 | ------------ | ---------------- | -------------- | ------------------------------ |
@@ -210,19 +200,29 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 | `status?`    | `StepStatus`     | `'process'`    | Step status (for current step) |
 | `direction?` | `StepsDirection` | `'horizontal'` | Steps direction/orientation    |
 
-## Tabs
+## StepsItem
 
-`tabs.ts` · `TabsProps` · 3/12 props
+`packages/react/src/components/Steps.tsx and packages/vue/src/components/Steps.ts` · `StepsItemProps / VueStepsItemProps` · 3/9 props
 
-| Prop                | Type               | Default  | Notes                                          |
-| ------------------- | ------------------ | -------- | ---------------------------------------------- |
-| `activeKey?`        | `string \| number` | `-`      | Currently active tab key                       |
-| `defaultActiveKey?` | `string \| number` | `-`      | Default active tab key (for uncontrolled mode) |
-| `type?`             | `TabType`          | `'line'` | Tab type - line, card, or editable-card        |
+| Prop           | Type              | Default | Notes                           |
+| -------------- | ----------------- | ------- | ------------------------------- |
+| `title`        | `string`          | `-`     | Step title                      |
+| `description?` | `string`          | `-`     | Step description                |
+| `icon?`        | `React.ReactNode` | `-`     | Step icon (custom icon element) |
+
+## SubMenu
+
+`packages/core/src/types/menu.ts` · `SubMenuProps` · 3/5 props
+
+| Prop      | Type      | Default | Notes                      |
+| --------- | --------- | ------- | -------------------------- |
+| `itemKey` | `MenuKey` | `-`     | Unique key for the submenu |
+| `title?`  | `string`  | `-`     | Submenu title              |
+| `icon?`   | `unknown` | `-`     | Icon for the submenu       |
 
 ## TabPane
 
-`tabs.ts` · `TabPaneProps` · 3/7 props
+`packages/core/src/types/tabs.ts` · `TabPaneProps` · 3/7 props
 
 | Prop        | Type               | Default | Notes                                  |
 | ----------- | ------------------ | ------- | -------------------------------------- |
@@ -230,9 +230,19 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 | `label`     | `string`           | `-`     | Tab label/title                        |
 | `disabled?` | `boolean`          | `false` | Whether the tab is disabled            |
 
+## Tabs
+
+`packages/core/src/types/tabs.ts` · `TabsProps` · 3/12 props
+
+| Prop                | Type               | Default  | Notes                                          |
+| ------------------- | ------------------ | -------- | ---------------------------------------------- |
+| `activeKey?`        | `string \| number` | `-`      | Currently active tab key                       |
+| `defaultActiveKey?` | `string \| number` | `-`      | Default active tab key (for uncontrolled mode) |
+| `type?`             | `TabType`          | `'line'` | Tab type - line, card, or editable-card        |
+
 ## Tree
 
-`tree.ts` · `TreeProps` · 3/28 props
+`packages/core/src/types/tree.ts` · `TreeProps` · 3/28 props
 
 | Prop             | Type                | Default  | Notes                      |
 | ---------------- | ------------------- | -------- | -------------------------- |

@@ -7,11 +7,11 @@ description: Compact generated Tigercat Advanced props reference
 
 # Advanced Props
 
-编辑器、虚拟化、文件、拖拽、看板和高级工具组件。 共 11 个组件。字段细节以 `packages/core/src/types/*.ts` 为准。
+编辑器、虚拟化、文件、拖拽、看板和高级工具组件。 共 12 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## CodeEditor
 
-`code-editor.ts` · `CodeEditorProps` · 3/15 props
+`packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 3/15 props
 
 | Prop            | Type           | Default   | Notes                                        |
 | --------------- | -------------- | --------- | -------------------------------------------- |
@@ -21,7 +21,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## FileManager
 
-`file-manager.ts` · `FileManagerProps` · 3/15 props
+`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 3/15 props
 
 | Prop            | Type                   | Default | Notes                        |
 | --------------- | ---------------------- | ------- | ---------------------------- |
@@ -31,7 +31,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## ImageAnnotation
 
-`image-annotation.ts` · `ImageAnnotationProps` · 3/15 props
+`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 3/15 props
 
 | Prop     | Type                | Default | Notes |
 | -------- | ------------------- | ------- | ----- |
@@ -41,7 +41,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## ImageViewer
 
-`image-viewer.ts` · `ImageViewerProps` · 3/11 props
+`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 3/11 props
 
 | Prop            | Type       | Default | Notes                          |
 | --------------- | ---------- | ------- | ------------------------------ |
@@ -51,7 +51,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## InfiniteScroll
 
-`infinite-scroll.ts` · `InfiniteScrollProps` · 3/9 props
+`packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 3/9 props
 
 | Prop         | Type      | Default | Notes                                     |
 | ------------ | --------- | ------- | ----------------------------------------- |
@@ -61,7 +61,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## Kanban
 
-`kanban.ts` · `KanbanProps`
+`packages/core/src/types/kanban.ts` · `KanbanProps`
 
 Uses: `TaskBoard`.
 
@@ -74,7 +74,7 @@ Note: Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `al
 
 ## MarkdownEditor
 
-`markdown-editor.ts` · `MarkdownEditorProps` · 3/13 props
+`packages/core/src/types/markdown-editor.ts` · `MarkdownEditorProps` · 3/13 props
 
 | Prop            | Type     | Default | Notes                                   |
 | --------------- | -------- | ------- | --------------------------------------- |
@@ -84,7 +84,7 @@ Note: Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `al
 
 ## PrintLayout
 
-`print-layout.ts` · `PrintLayoutProps` · 3/8 props
+`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 3/8 props
 
 | Prop           | Type               | Default      | Notes                             |
 | -------------- | ------------------ | ------------ | --------------------------------- |
@@ -92,9 +92,15 @@ Note: Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `al
 | `orientation?` | `PrintOrientation` | `'portrait'` | Page orientation                  |
 | `showHeader?`  | `boolean`          | `false`      | Whether to show print-only header |
 
+## PrintPageBreak
+
+`packages/react/src/components/PrintLayout.tsx and packages/vue/src/components/PrintLayout.ts` · `PrintPageBreakProps`
+
+Vue PrintPageBreak accepts attrs/pass-through only; React PrintPageBreakProps extends div attributes.
+
 ## RichTextEditor
 
-`rich-text-editor.ts` · `RichTextEditorProps` · 3/9 props
+`packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 3/9 props
 
 | Prop            | Type     | Default | Notes                             |
 | --------------- | -------- | ------- | --------------------------------- |
@@ -104,7 +110,7 @@ Note: Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `al
 
 ## VirtualList
 
-`virtual-list.ts` · `VirtualListProps` · 3/8 props
+`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 3/8 props
 
 | Prop                   | Type     | Default | Notes                                                  |
 | ---------------------- | -------- | ------- | ------------------------------------------------------ |
@@ -114,7 +120,7 @@ Note: Kanban 是 `TaskBoard` 的薄封装，默认启用 `showCardCount` 和 `al
 
 ## VirtualTable
 
-`virtual-table.ts` · `VirtualTableProps` · 3/17 props
+`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 3/17 props
 
 Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
 

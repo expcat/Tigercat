@@ -26,6 +26,7 @@ import { readFileSync, readdirSync, writeFileSync, existsSync, statSync, mkdirSy
 import { join, relative } from 'path'
 import { fileURLToPath } from 'url'
 import prettier from 'prettier'
+import { loadPublicComponentExports } from './lib/public-components.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -171,23 +172,6 @@ function extractPropsInterfaces(content) {
   return result
 }
 
-// Public component value exports (`export { X } from './components/...'`), PascalCase, skip *Context.
-function componentExports(indexContent) {
-  const set = new Set()
-  const re = /export\s+\{([^}]+)\}\s+from\s+['"]\.\/components\//g
-  let m
-  while ((m = re.exec(indexContent)) !== null) {
-    for (const spec of m[1].split(',')) {
-      const name = spec
-        .trim()
-        .split(/\s+as\s+/)[0]
-        .trim()
-      if (/^[A-Z]/.test(name) && !/Context$/.test(name)) set.add(name)
-    }
-  }
-  return uniqSorted([...set])
-}
-
 function sortKeys(value) {
   if (Array.isArray(value)) return value
   if (value && typeof value === 'object') {
@@ -216,6 +200,7 @@ for (const target of CORE_EXPORT_TARGETS) {
 
 const vueIndex = readFileSync(join(ROOT, 'packages', 'vue', 'src', 'index.ts'), 'utf-8')
 const reactIndex = readFileSync(join(ROOT, 'packages', 'react', 'src', 'index.tsx'), 'utf-8')
+const publicComponentExports = loadPublicComponentExports(ROOT)
 
 const snapshot = sortKeys({
   _comment:
@@ -223,11 +208,11 @@ const snapshot = sortKeys({
   propsInterfaces,
   core: { exports: uniqSorted(coreExportNames) },
   vue: {
-    components: componentExports(vueIndex),
+    components: publicComponentExports.vue,
     exports: uniqSorted(extractExportNames(vueIndex))
   },
   react: {
-    components: componentExports(reactIndex),
+    components: publicComponentExports.react,
     exports: uniqSorted(extractExportNames(reactIndex))
   }
 })

@@ -12,6 +12,12 @@
 import { readFileSync, readdirSync, writeFileSync, existsSync, statSync } from 'fs'
 import { join, basename, relative } from 'path'
 import { fileURLToPath } from 'url'
+import {
+  buildPublicComponentEntries,
+  formatComponentIndexType,
+  getDocTarget,
+  loadPublicComponentExports
+} from './lib/public-components.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -55,11 +61,19 @@ function addIssue(file, line, rule, message) {
 // ----- Scanning -----
 
 const typeFiles = readdirSync(TYPES_DIR).filter((f) => f.endsWith('.ts') && f !== 'index.ts')
+const coreFileInfoByName = new Map()
 
 for (const filename of typeFiles) {
   const filepath = join(TYPES_DIR, filename)
   const content = readFileSync(filepath, 'utf-8')
   const lines = content.split('\n')
+  coreFileInfoByName.set(basename(filename, '.ts'), {
+    fileName: filename,
+    typeName: basename(filename, '.ts'),
+    propsInterfaces: [...content.matchAll(/\bexport\s+interface\s+([A-Za-z_$][\w$]*Props)\b/g)].map(
+      (match) => match[1]
+    )
+  })
 
   lines.forEach((line, idx) => {
     const lineNum = idx + 1
@@ -494,29 +508,6 @@ if (deprecatedAPIs.length > 0) {
 
 // ----- LLM docs coverage check -----
 
-const DOC_SECTION_ALIASES = new Map([
-  ['Header', 'Layout'],
-  ['Sidebar', 'Layout'],
-  ['Content', 'Layout'],
-  ['Footer', 'Layout'],
-  ['Row', 'Grid'],
-  ['Col', 'Grid'],
-  ['CollapsePanel', 'Collapse'],
-  ['MenuItem', 'Menu'],
-  ['SubMenu', 'Menu'],
-  ['MenuItemGroup', 'Menu'],
-  ['TabPane', 'Tabs'],
-  ['BreadcrumbItem', 'Breadcrumb'],
-  ['StepsItem', 'Steps'],
-  ['DropdownMenu', 'Dropdown'],
-  ['DropdownItem', 'Dropdown'],
-  ['FloatButtonGroup', 'FloatButton'],
-  ['InputGroupAddon', 'InputGroup'],
-  ['PrintPageBreak', 'PrintLayout'],
-  ['MessageContainer', 'Message'],
-  ['NotificationContainer', 'Notification']
-])
-
 function collectMarkdownContent(dir, options = {}) {
   const markdownFiles = collectFiles(dir, ['.md']).filter((file) => {
     if (options.excludeIndex && basename(file) === 'index.md') return false
@@ -527,29 +518,6 @@ function collectMarkdownContent(dir, options = {}) {
   return markdownFiles.map((file) => readFileSync(file, 'utf-8')).join('\n')
 }
 
-function collectPublicComponentExports(indexFile) {
-  const content = readFileSync(indexFile, 'utf-8')
-  const componentExports = new Set()
-  const exportRegex = /export\s+\{([^}]+)\}\s+from\s+['"]\.\/components\//g
-  let match
-
-  while ((match = exportRegex.exec(content)) !== null) {
-    const specifiers = match[1].split(',').map((specifier) => specifier.trim())
-    for (const specifier of specifiers) {
-      const name = specifier.split(/\s+as\s+/)[0].trim()
-      if (!/^[A-Z]/.test(name)) continue
-      if (/Context$/.test(name)) continue
-      componentExports.add(name)
-    }
-  }
-
-  return componentExports
-}
-
-function getDocTarget(componentName) {
-  return DOC_SECTION_ALIASES.get(componentName) || componentName
-}
-
 function hasHeadingOrMention(content, target) {
   const escaped = escapeRegExp(target)
   return (
@@ -558,13 +526,10 @@ function hasHeadingOrMention(content, target) {
   )
 }
 
-const vuePublicComponents = collectPublicComponentExports(
-  join(ROOT, 'packages', 'vue', 'src', 'index.ts')
-)
-const reactPublicComponents = collectPublicComponentExports(
-  join(ROOT, 'packages', 'react', 'src', 'index.tsx')
-)
-const allPublicComponents = new Set([...vuePublicComponents, ...reactPublicComponents])
+const publicExports = loadPublicComponentExports(ROOT)
+const vuePublicComponents = new Set(publicExports.vue)
+const reactPublicComponents = new Set(publicExports.react)
+const allPublicComponents = new Set(publicExports.all)
 
 const sharedPropsDocs = collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'shared', 'props'))
 const generatedExampleDocs = collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'examples'))
@@ -607,6 +572,68 @@ for (const componentName of [...allPublicComponents].sort()) {
       `React 公开组件 "${componentName}" 缺少示例文档（期望匹配：${docTarget}）`
     )
   }
+}
+
+function collectComponentIndexRows() {
+  const indexFile = join(SKILL_REFERENCES_DIR, 'component-index.md')
+  const rows = new Map()
+  const lines = readFileSync(indexFile, 'utf-8').split(/\r?\n/)
+
+  for (const line of lines) {
+    const match = line.match(/^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|$/)
+    if (!match) continue
+    const component = match[1].trim()
+    if (component === 'Component' || component.startsWith('-')) continue
+    rows.set(component, {
+      category: match[2].trim(),
+      type: match[3].trim()
+    })
+  }
+
+  return rows
+}
+
+const expectedComponentRows = new Map(
+  buildPublicComponentEntries(ROOT, coreFileInfoByName, publicExports).map((entry) => [
+    entry.component,
+    {
+      category: entry.category,
+      type: formatComponentIndexType(entry.typeSource)
+    }
+  ])
+)
+const actualComponentRows = collectComponentIndexRows()
+
+for (const [componentName, expected] of expectedComponentRows) {
+  const actual = actualComponentRows.get(componentName)
+  if (!actual) {
+    addIssue(
+      'skills/tigercat/references/component-index.md',
+      0,
+      'docs-api',
+      `component-index 缺少公开组件 "${componentName}"`
+    )
+    continue
+  }
+
+  if (actual.category !== expected.category || actual.type !== expected.type) {
+    addIssue(
+      'skills/tigercat/references/component-index.md',
+      0,
+      'docs-api',
+      `component-index 组件 "${componentName}" 应为 ${expected.category} / ${expected.type}，实际为 ${actual.category} / ${actual.type}`
+    )
+  }
+}
+
+for (const componentName of actualComponentRows.keys()) {
+  if (expectedComponentRows.has(componentName)) continue
+  addIssue(
+    'skills/tigercat/references/component-index.md',
+    0,
+    'docs-api',
+    `component-index 误列非公开组件 "${componentName}"`
+  )
 }
 
 // ----- Skill docs quality budget -----

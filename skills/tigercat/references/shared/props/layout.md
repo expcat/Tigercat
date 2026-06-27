@@ -7,11 +7,11 @@ description: Compact generated Tigercat Layout props reference
 
 # Layout Props
 
-布局容器、栅格、列表、分割和尺寸控制组件。 共 16 个组件。字段细节以 `packages/core/src/types/*.ts` 为准。
+布局容器、栅格、列表、分割和尺寸控制组件。 共 16 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Card
 
-`card.ts` · `CardProps` · 3/6 props
+`packages/core/src/types/card.ts` · `CardProps` · 3/6 props
 
 Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。
 
@@ -23,7 +23,7 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 ## Carousel
 
-`carousel.ts` · `CarouselProps` · 3/13 props
+`packages/core/src/types/carousel.ts` · `CarouselProps` · 3/13 props
 
 | Prop             | Type      | Default | Notes                                       |
 | ---------------- | --------- | ------- | ------------------------------------------- |
@@ -31,39 +31,9 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 | `autoplaySpeed?` | `number`  | `3000`  | Time interval for auto-play in milliseconds |
 | `dots?`          | `boolean` | `true`  | Whether to show navigation dots             |
 
-## Container
-
-`container.ts` · `ContainerProps`
-
-| Prop        | Type                | Default | Notes                                                                                      |
-| ----------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `maxWidth?` | `ContainerMaxWidth` | `false` | Maximum width constraint for the container - 'sm': max-w-screen-sm (640px) - 'md': max-... |
-| `center?`   | `boolean`           | `true`  | Whether to center the container horizontally                                               |
-| `padding?`  | `boolean`           | `true`  | Whether to add horizontal padding                                                          |
-
-## Descriptions
-
-`descriptions.ts` · `DescriptionsProps` · 3/10 props
-
-| Prop        | Type      | Default | Notes                                |
-| ----------- | --------- | ------- | ------------------------------------ |
-| `title?`    | `string`  | `-`     | Descriptions title                   |
-| `extra?`    | `unknown` | `-`     | Extra content (actions, links, etc.) |
-| `bordered?` | `boolean` | `false` | Whether to show border               |
-
-## Row
-
-`grid.ts` · `RowProps` · 3/4 props
-
-| Prop       | Type         | Default   | Notes                                                      |
-| ---------- | ------------ | --------- | ---------------------------------------------------------- |
-| `gutter?`  | `GutterSize` | `0`       | Grid gutter, could be horizontal or [horizontal, vertical] |
-| `align?`   | `Align`      | `'top'`   | Vertical alignment of flex layout                          |
-| `justify?` | `Justify`    | `'start'` | Horizontal arrangement of flex layout                      |
-
 ## Col
 
-`grid.ts` · `ColProps` · 3/4 props
+`packages/core/src/types/grid.ts` · `ColProps` · 3/4 props
 
 | Prop      | Type                                            | Default | Notes                                         |
 | --------- | ----------------------------------------------- | ------- | --------------------------------------------- |
@@ -71,17 +41,47 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 | `offset?` | `number \| Partial<Record<Breakpoint, number>>` | `0`     | Number of cells to offset                     |
 | `order?`  | `number \| Partial<Record<Breakpoint, number>>` | `-`     | Number of cells to order                      |
 
-## Layout
+## Container
 
-`layout.ts` · `LayoutProps`
+`packages/core/src/types/container.ts` · `ContainerProps`
 
-| Prop         | Type     | Default | Notes                  |
-| ------------ | -------- | ------- | ---------------------- |
-| `className?` | `string` | `-`     | Additional CSS classes |
+| Prop        | Type                | Default | Notes                                                                                      |
+| ----------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `maxWidth?` | `ContainerMaxWidth` | `false` | Maximum width constraint for the container - 'sm': max-w-screen-sm (640px) - 'md': max-... |
+| `center?`   | `boolean`           | `true`  | Whether to center the container horizontally                                               |
+| `padding?`  | `boolean`           | `true`  | Whether to add horizontal padding                                                          |
+
+## Content
+
+`packages/core/src/types/layout.ts` · `ContentProps`
+
+| Prop         | Type                | Default | Notes                                                                                      |
+| ------------ | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `className?` | `string`            | `-`     | Additional CSS classes                                                                     |
+| `padding?`   | `boolean \| string` | `true`  | Built-in content padding. true keeps the default p-6, false removes it, and a string is... |
+
+## Descriptions
+
+`packages/core/src/types/descriptions.ts` · `DescriptionsProps` · 3/10 props
+
+| Prop        | Type      | Default | Notes                                |
+| ----------- | --------- | ------- | ------------------------------------ |
+| `title?`    | `string`  | `-`     | Descriptions title                   |
+| `extra?`    | `unknown` | `-`     | Extra content (actions, links, etc.) |
+| `bordered?` | `boolean` | `false` | Whether to show border               |
+
+## Footer
+
+`packages/core/src/types/layout.ts` · `FooterProps`
+
+| Prop         | Type     | Default  | Notes                  |
+| ------------ | -------- | -------- | ---------------------- |
+| `className?` | `string` | `-`      | Additional CSS classes |
+| `height?`    | `string` | `'auto'` | Footer height          |
 
 ## Header
 
-`layout.ts` · `HeaderProps`
+`packages/core/src/types/layout.ts` · `HeaderProps`
 
 | Prop         | Type            | Default     | Notes                  |
 | ------------ | --------------- | ----------- | ---------------------- |
@@ -89,37 +89,17 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 | `variant?`   | `HeaderVariant` | `'default'` | Header visual style.   |
 | `height?`    | `string`        | `'64px'`    | Header height          |
 
-## Sidebar
+## Layout
 
-`layout.ts` · `SidebarProps` · 3/4 props
+`packages/core/src/types/layout.ts` · `LayoutProps`
 
-| Prop              | Type     | Default   | Notes                                                                                    |
-| ----------------- | -------- | --------- | ---------------------------------------------------------------------------------------- |
-| `className?`      | `string` | `-`       | Additional CSS classes                                                                   |
-| `width?`          | `string` | `'256px'` | Sidebar width                                                                            |
-| `collapsedWidth?` | `string` | `'64px'`  | Width when collapsed (mini mode). Set to '0px' to fully hide the sidebar when collapsed. |
-
-## Content
-
-`layout.ts` · `ContentProps`
-
-| Prop         | Type                | Default | Notes                                                                                      |
-| ------------ | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `className?` | `string`            | `-`     | Additional CSS classes                                                                     |
-| `padding?`   | `boolean \| string` | `true`  | Built-in content padding. true keeps the default p-6, false removes it, and a string is... |
-
-## Footer
-
-`layout.ts` · `FooterProps`
-
-| Prop         | Type     | Default  | Notes                  |
-| ------------ | -------- | -------- | ---------------------- |
-| `className?` | `string` | `-`      | Additional CSS classes |
-| `height?`    | `string` | `'auto'` | Footer height          |
+| Prop         | Type     | Default | Notes                  |
+| ------------ | -------- | ------- | ---------------------- |
+| `className?` | `string` | `-`     | Additional CSS classes |
 
 ## List
 
-`list.ts` · `ListProps` · 3/16 props
+`packages/core/src/types/list.ts` · `ListProps` · 3/16 props
 
 | Prop        | Type              | Default     | Notes             |
 | ----------- | ----------------- | ----------- | ----------------- |
@@ -129,7 +109,7 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 ## Resizable
 
-`resizable.ts` · `ResizableProps` · 3/12 props
+`packages/core/src/types/resizable.ts` · `ResizableProps` · 3/12 props
 
 | Prop             | Type     | Default | Notes                    |
 | ---------------- | -------- | ------- | ------------------------ |
@@ -137,9 +117,29 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 | `defaultHeight?` | `number` | `-`     | Default height in pixels |
 | `minWidth?`      | `number` | `0`     | Minimum width in pixels  |
 
+## Row
+
+`packages/core/src/types/grid.ts` · `RowProps` · 3/4 props
+
+| Prop       | Type         | Default   | Notes                                                      |
+| ---------- | ------------ | --------- | ---------------------------------------------------------- |
+| `gutter?`  | `GutterSize` | `0`       | Grid gutter, could be horizontal or [horizontal, vertical] |
+| `align?`   | `Align`      | `'top'`   | Vertical alignment of flex layout                          |
+| `justify?` | `Justify`    | `'start'` | Horizontal arrangement of flex layout                      |
+
+## Sidebar
+
+`packages/core/src/types/layout.ts` · `SidebarProps` · 3/4 props
+
+| Prop              | Type     | Default   | Notes                                                                                    |
+| ----------------- | -------- | --------- | ---------------------------------------------------------------------------------------- |
+| `className?`      | `string` | `-`       | Additional CSS classes                                                                   |
+| `width?`          | `string` | `'256px'` | Sidebar width                                                                            |
+| `collapsedWidth?` | `string` | `'64px'`  | Width when collapsed (mini mode). Set to '0px' to fully hide the sidebar when collapsed. |
+
 ## Skeleton
 
-`skeleton.ts` · `SkeletonProps` · 3/8 props
+`packages/core/src/types/skeleton.ts` · `SkeletonProps` · 3/8 props
 
 | Prop         | Type                | Default                             | Notes                                                                   |
 | ------------ | ------------------- | ----------------------------------- | ----------------------------------------------------------------------- |
@@ -149,7 +149,7 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 ## Space
 
-`space.ts` · `SpaceProps` · 3/4 props
+`packages/core/src/types/space.ts` · `SpaceProps` · 3/4 props
 
 | Prop         | Type             | Default        | Notes                                                  |
 | ------------ | ---------------- | -------------- | ------------------------------------------------------ | ------- | --------------------------- |
@@ -159,7 +159,7 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 ## Splitter
 
-`splitter.ts` · `SplitterProps` · 3/8 props
+`packages/core/src/types/splitter.ts` · `SplitterProps` · 3/8 props
 
 | Prop         | Type             | Default        | Notes                                                                       |
 | ------------ | ---------------- | -------------- | --------------------------------------------------------------------------- |

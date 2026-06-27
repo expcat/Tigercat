@@ -1,18 +1,13 @@
 #!/usr/bin/env node
 
-import { readdir, readFile } from 'node:fs/promises'
+import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import {
+  PUBLIC_PROPS_TYPE_EXCEPTIONS,
+  loadPublicComponentExports
+} from './lib/public-components.mjs'
 
 const root = join(import.meta.dirname, '..')
-
-async function listComponentNames(packageName, extension) {
-  const dir = join(root, 'packages', packageName, 'src', 'components')
-  const files = await readdir(dir)
-  return files
-    .filter((file) => file.endsWith(extension))
-    .map((file) => file.slice(0, -extension.length))
-    .sort()
-}
 
 function flattenExports(content) {
   return content.replace(/\s+/g, ' ')
@@ -24,15 +19,21 @@ function hasTypeExport(indexContent, typeName) {
   )
 }
 
-async function checkPackage(packageName, indexFile, prefix, extension) {
-  const components = await listComponentNames(packageName, extension)
+function getExpectedTypeName(packageName, componentName) {
+  return packageName === 'vue' ? `Vue${componentName}Props` : `${componentName}Props`
+}
+
+async function checkPackage(packageName, indexFile, componentNames) {
   const indexContent = flattenExports(
     await readFile(join(root, 'packages', packageName, 'src', indexFile), 'utf-8')
   )
   const missing = []
 
-  for (const componentName of components) {
-    const typeName = `${prefix}${componentName}Props`
+  for (const componentName of componentNames) {
+    const exceptionKey = `${packageName}:${componentName}`
+    if (PUBLIC_PROPS_TYPE_EXCEPTIONS.has(exceptionKey)) continue
+
+    const typeName = getExpectedTypeName(packageName, componentName)
     if (!hasTypeExport(indexContent, typeName)) {
       missing.push(`${componentName} (${typeName})`)
     }
@@ -41,8 +42,9 @@ async function checkPackage(packageName, indexFile, prefix, extension) {
   return missing
 }
 
-const vueMissing = await checkPackage('vue', 'index.ts', 'Vue', '.ts')
-const reactMissing = await checkPackage('react', 'index.tsx', '', '.tsx')
+const publicExports = loadPublicComponentExports(root)
+const vueMissing = await checkPackage('vue', 'index.ts', publicExports.vue)
+const reactMissing = await checkPackage('react', 'index.tsx', publicExports.react)
 
 if (vueMissing.length > 0 || reactMissing.length > 0) {
   if (vueMissing.length > 0) console.error(`Vue props types missing: ${vueMissing.join(', ')}`)

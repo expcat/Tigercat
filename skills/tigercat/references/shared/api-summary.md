@@ -63,18 +63,18 @@ description: Compact generated API summary for Tigercat core types
 
 ## Feedback
 
-| Type File       | Props Interfaces  | Components   | Exports |
-| --------------- | ----------------- | ------------ | ------- |
-| drawer.ts       | DrawerProps       | Drawer       | 3       |
-| loading.ts      | LoadingProps      | Loading      | 4       |
-| message.ts      | MessageProps      | Message      | 6       |
-| modal.ts        | ModalProps        | Modal        | 2       |
-| notification.ts | NotificationProps | Notification | 6       |
-| popconfirm.ts   | PopconfirmProps   | Popconfirm   | 2       |
-| popover.ts      | PopoverProps      | Popover      | 2       |
-| progress.ts     | ProgressProps     | Progress     | 5       |
-| tooltip.ts      | TooltipProps      | Tooltip      | 2       |
-| tour.ts         | TourProps         | Tour         | 5       |
+| Type File       | Props Interfaces  | Components | Exports |
+| --------------- | ----------------- | ---------- | ------- |
+| drawer.ts       | DrawerProps       | Drawer     | 3       |
+| loading.ts      | LoadingProps      | Loading    | 4       |
+| message.ts      | MessageProps      | Message    | 6       |
+| modal.ts        | ModalProps        | Modal      | 2       |
+| notification.ts | NotificationProps | -          | 6       |
+| popconfirm.ts   | PopconfirmProps   | Popconfirm | 2       |
+| popover.ts      | PopoverProps      | Popover    | 2       |
+| progress.ts     | ProgressProps     | Progress   | 5       |
+| tooltip.ts      | TooltipProps      | Tooltip    | 2       |
+| tour.ts         | TourProps         | Tour       | 5       |
 
 ## Layout
 
@@ -147,20 +147,20 @@ description: Compact generated API summary for Tigercat core types
 
 ## Composite
 
-| Type File    | Props Interfaces                                                                                                                                               | Components                                                                                                             | Exports |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------- |
-| composite.ts | ChatWindowProps, ActivityFeedProps, CommentThreadProps, NotificationCenterProps, TableToolbarProps, DataTableWithToolbarProps, FormWizardProps, TaskBoardProps | ChatWindow, ActivityFeed, CommentThread, NotificationCenter, TableToolbar, DataTableWithToolbar, FormWizard, TaskBoard | 40      |
+| Type File    | Props Interfaces                                                                                                                                               | Components                                                                                               | Exports |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------- |
+| composite.ts | ChatWindowProps, ActivityFeedProps, CommentThreadProps, NotificationCenterProps, TableToolbarProps, DataTableWithToolbarProps, FormWizardProps, TaskBoardProps | ChatWindow, ActivityFeed, CommentThread, NotificationCenter, DataTableWithToolbar, FormWizard, TaskBoard | 40      |
 
 ## Core
 
-| Type File         | Props Interfaces                                             | Components                                    | Exports |
-| ----------------- | ------------------------------------------------------------ | --------------------------------------------- | ------- |
-| base.ts           | BaseInteractiveProps, BaseFormControlProps, BaseLayoutProps  | BaseInteractive, BaseFormControl, BaseLayout  | 4       |
-| events.ts         | -                                                            | -                                             | 23      |
-| floating-popup.ts | BaseFloatingPopupProps                                       | BaseFloatingPopup                             | 2       |
-| generics.ts       | GenericTableProps, GenericSelectProps, GenericFormFieldProps | GenericTable, GenericSelect, GenericFormField | 9       |
-| locale.ts         | -                                                            | -                                             | 16      |
-| slots.ts          | -                                                            | -                                             | 10      |
-| theme.ts          | -                                                            | -                                             | 11      |
+| Type File         | Props Interfaces                                             | Components | Exports |
+| ----------------- | ------------------------------------------------------------ | ---------- | ------- |
+| base.ts           | BaseInteractiveProps, BaseFormControlProps, BaseLayoutProps  | -          | 4       |
+| events.ts         | -                                                            | -          | 23      |
+| floating-popup.ts | BaseFloatingPopupProps                                       | -          | 2       |
+| generics.ts       | GenericTableProps, GenericSelectProps, GenericFormFieldProps | -          | 9       |
+| locale.ts         | -                                                            | -          | 18      |
+| slots.ts          | -                                                            | -          | 10      |
+| theme.ts          | -                                                            | -          | 11      |
 
-Total exported types: 629.
+Total exported types: 631.

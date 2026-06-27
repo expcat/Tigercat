@@ -7,11 +7,11 @@ description: Compact generated Tigercat Basic props reference
 
 # Basic Props
 
-基础展示与低级交互组件。 共 24 个组件。字段细节以 `packages/core/src/types/*.ts` 为准。
+基础展示与低级交互组件。 共 25 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Alert
 
-`alert.ts` · `AlertProps` · 3/11 props
+`packages/core/src/types/alert.ts` · `AlertProps` · 3/11 props
 
 | Prop     | Type        | Default  | Notes                                      |
 | -------- | ----------- | -------- | ------------------------------------------ |
@@ -21,7 +21,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Avatar
 
-`avatar.ts` · `AvatarProps` · 3/8 props
+`packages/core/src/types/avatar.ts` · `AvatarProps` · 3/8 props
 
 | Prop     | Type          | Default    | Notes            |
 | -------- | ------------- | ---------- | ---------------- |
@@ -31,7 +31,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## AvatarGroup
 
-`avatar.ts` · `AvatarGroupProps`
+`packages/core/src/types/avatar.ts` · `AvatarGroupProps`
 
 | Prop         | Type         | Default | Notes                                                                                 |
 | ------------ | ------------ | ------- | ------------------------------------------------------------------------------------- |
@@ -41,7 +41,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Badge
 
-`badge.ts` · `BadgeProps` · 3/9 props
+`packages/core/src/types/badge.ts` · `BadgeProps` · 3/9 props
 
 | Prop       | Type           | Default    | Notes               |
 | ---------- | -------------- | ---------- | ------------------- |
@@ -51,7 +51,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Button
 
-`button.ts` · `ButtonProps` · 3/8 props
+`packages/core/src/types/button.ts` · `ButtonProps` · 3/8 props
 
 | Prop        | Type            | Default     | Notes                          |
 | ----------- | --------------- | ----------- | ------------------------------ |
@@ -61,7 +61,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## ButtonGroup
 
-`button.ts` · `ButtonGroupProps`
+`packages/core/src/types/button.ts` · `ButtonGroupProps`
 
 | Prop        | Type         | Default | Notes                                    |
 | ----------- | ------------ | ------- | ---------------------------------------- |
@@ -70,7 +70,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Code
 
-`code.ts` · `CodeProps` · 3/4 props
+`packages/core/src/types/code.ts` · `CodeProps` · 3/4 props
 
 | Prop         | Type      | Default | Notes |
 | ------------ | --------- | ------- | ----- |
@@ -78,9 +78,29 @@ description: Compact generated Tigercat Basic props reference
 | `copyable?`  | `boolean` | `-`     | -     |
 | `copyLabel?` | `string`  | `-`     | -     |
 
+## ConfigProvider
+
+`packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts` · `-`
+
+| Prop           | Type               | Default | Notes                |
+| -------------- | ------------------ | ------- | -------------------- |
+| `locale?`      | `TigerLocaleInput` | `-`     | Locale configuration |
+| `theme?`       | `string`           | `-`     | Theme name           |
+| `colorScheme?` | `ColorScheme`      | `-`     | Theme color scheme   |
+
+## CropUpload
+
+`packages/core/src/types/image.ts` · `CropUploadProps` · 3/7 props
+
+| Prop        | Type      | Default     | Notes                             |
+| ----------- | --------- | ----------- | --------------------------------- |
+| `accept?`   | `string`  | `'image/*'` | Accepted file types               |
+| `disabled?` | `boolean` | `false`     | Whether the component is disabled |
+| `maxSize?`  | `number`  | `-`         | Maximum file size in bytes        |
+
 ## Divider
 
-`divider.ts` · `DividerProps` · 3/5 props
+`packages/core/src/types/divider.ts` · `DividerProps` · 3/5 props
 
 | Prop           | Type                 | Default        | Notes                               |
 | -------------- | -------------------- | -------------- | ----------------------------------- |
@@ -90,7 +110,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Empty
 
-`empty.ts` · `EmptyProps` · 3/4 props
+`packages/core/src/types/empty.ts` · `EmptyProps` · 3/4 props
 
 | Prop           | Type          | Default     | Notes                                         |
 | -------------- | ------------- | ----------- | --------------------------------------------- |
@@ -100,7 +120,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Icon
 
-`icon.ts` · `IconProps` · 3/4 props
+`packages/core/src/types/icon.ts` · `IconProps` · 3/4 props
 
 Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。
 
@@ -140,7 +160,7 @@ import { iconRegistry, iconNames, getIconDefinition } from '@expcat/tigercat-cor
 
 ## Image
 
-`image.ts` · `ImageProps` · 3/10 props
+`packages/core/src/types/image.ts` · `ImageProps` · 3/10 props
 
 Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默认的 `click` 全屏预览；悬停预览仅对单张图片生效（在 `ImageGroup` 内部时禁用）。
 
@@ -150,27 +170,9 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `alt?`   | `string`           | `-`     | Alternative text for image |
 | `width?` | `number \| string` | `-`     | Image width (CSS value)    |
 
-## ImagePreview
-
-`image.ts` · `ImagePreviewProps` · 3/8 props
-
-| Prop            | Type       | Default | Notes                                         |
-| --------------- | ---------- | ------- | --------------------------------------------- |
-| `open?`         | `boolean`  | `-`     | Whether the preview is open                   |
-| `images`        | `string[]` | `-`     | Array of image URLs to preview                |
-| `currentIndex?` | `number`   | `0`     | Current image index (for multi-image preview) |
-
-## ImageGroup
-
-`image.ts` · `ImageGroupProps`
-
-| Prop       | Type      | Default | Notes                                          |
-| ---------- | --------- | ------- | ---------------------------------------------- |
-| `preview?` | `boolean` | `true`  | Whether to enable preview for all child images |
-
 ## ImageCropper
 
-`image.ts` · `ImageCropperProps` · 3/8 props
+`packages/core/src/types/image.ts` · `ImageCropperProps` · 3/8 props
 
 | Prop           | Type     | Default | Notes                                                                   |
 | -------------- | -------- | ------- | ----------------------------------------------------------------------- |
@@ -178,19 +180,27 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `aspectRatio?` | `number` | `-`     | Fixed aspect ratio (width / height). Leave undefined for free cropping. |
 | `minWidth?`    | `number` | `20`    | Minimum crop width in pixels                                            |
 
-## CropUpload
+## ImageGroup
 
-`image.ts` · `CropUploadProps` · 3/7 props
+`packages/core/src/types/image.ts` · `ImageGroupProps`
 
-| Prop        | Type      | Default     | Notes                             |
-| ----------- | --------- | ----------- | --------------------------------- |
-| `accept?`   | `string`  | `'image/*'` | Accepted file types               |
-| `disabled?` | `boolean` | `false`     | Whether the component is disabled |
-| `maxSize?`  | `number`  | `-`         | Maximum file size in bytes        |
+| Prop       | Type      | Default | Notes                                          |
+| ---------- | --------- | ------- | ---------------------------------------------- |
+| `preview?` | `boolean` | `true`  | Whether to enable preview for all child images |
+
+## ImagePreview
+
+`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/8 props
+
+| Prop            | Type       | Default | Notes                                         |
+| --------------- | ---------- | ------- | --------------------------------------------- |
+| `open?`         | `boolean`  | `-`     | Whether the preview is open                   |
+| `images`        | `string[]` | `-`     | Array of image URLs to preview                |
+| `currentIndex?` | `number`   | `0`     | Current image index (for multi-image preview) |
 
 ## Link
 
-`link.ts` · `LinkProps` · 3/7 props
+`packages/core/src/types/link.ts` · `LinkProps` · 3/7 props
 
 | Prop        | Type          | Default     | Notes                        |
 | ----------- | ------------- | ----------- | ---------------------------- |
@@ -200,7 +210,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## QRCode
 
-`qrcode.ts` · `QRCodeProps` · 3/7 props
+`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 3/7 props
 
 | Prop     | Type     | Default | Notes                |
 | -------- | -------- | ------- | -------------------- |
@@ -210,7 +220,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Rate
 
-`rate.ts` · `RateProps` · 3/7 props
+`packages/core/src/types/rate.ts` · `RateProps` · 3/7 props
 
 | Prop         | Type      | Default | Notes                                         |
 | ------------ | --------- | ------- | --------------------------------------------- |
@@ -220,7 +230,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Result
 
-`result.ts` · `ResultProps` · 3/4 props
+`packages/core/src/types/result.ts` · `ResultProps` · 3/4 props
 
 | Prop        | Type           | Default  | Notes                                                |
 | ----------- | -------------- | -------- | ---------------------------------------------------- |
@@ -230,7 +240,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Segmented
 
-`segmented.ts` · `SegmentedProps` · 3/5 props
+`packages/core/src/types/segmented.ts` · `SegmentedProps` · 3/5 props
 
 | Prop        | Type                | Default | Notes                                 |
 | ----------- | ------------------- | ------- | ------------------------------------- |
@@ -240,7 +250,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Statistic
 
-`statistic.ts` · `StatisticProps` · 3/10 props
+`packages/core/src/types/statistic.ts` · `StatisticProps` · 3/10 props
 
 | Prop         | Type               | Default | Notes                                         |
 | ------------ | ------------------ | ------- | --------------------------------------------- |
@@ -250,7 +260,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Tag
 
-`tag.ts` · `TagProps` · 3/4 props
+`packages/core/src/types/tag.ts` · `TagProps` · 3/4 props
 
 | Prop        | Type         | Default     | Notes                         |
 | ----------- | ------------ | ----------- | ----------------------------- |
@@ -260,7 +270,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Text
 
-`text.ts` · `TextProps` · 3/9 props
+`packages/core/src/types/text.ts` · `TextProps` · 3/9 props
 
 | Prop      | Type         | Default    | Notes              |
 | --------- | ------------ | ---------- | ------------------ |
@@ -270,20 +280,10 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Watermark
 
-`watermark.ts` · `WatermarkProps` · 3/12 props
+`packages/core/src/types/watermark.ts` · `WatermarkProps` · 3/12 props
 
 | Prop       | Type                 | Default | Notes                                                       |
 | ---------- | -------------------- | ------- | ----------------------------------------------------------- |
 | `content?` | `string \| string[]` | `-`     | Watermark text content. Array means multi-line.             |
 | `image?`   | `string`             | `-`     | Image URL to use as watermark (takes priority over content) |
 | `width?`   | `number`             | `120`   | Watermark width in px                                       |
-
-## ConfigProvider
-
-`packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts`
-
-| Prop         | Type          | Default | Notes                |
-| ------------ | ------------- | ------- | -------------------- |
-| `locale?`    | `TigerLocale` | `-`     | Locale configuration |
-| `theme?`     | `TigerTheme`  | `-`     | Theme configuration  |
-| `prefixCls?` | `string`      | `tiger` | CSS class prefix     |
