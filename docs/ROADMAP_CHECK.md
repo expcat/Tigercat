@@ -39,6 +39,8 @@ scope:
   - C31: 高级编辑器组（C31-1~C31-5）
   - C32: 交互能力组（C32-1~C32-5）
   - F: 测试、示例、E2E、benchmark（F-1~F-5）
+  - G: CLI、脚本、发布与维护自动化（G-1~G-5）
+  - H: 最终公共内容拆分/合并决策汇总（H-0~H-8）
 sources:
   - id: A
     read:
@@ -73,6 +75,15 @@ sources:
       - e2e、playwright.config.ts、.github/workflows/{ci,e2e,bench}.yml
       - benchmarks、vitest.config.ts、package.json scripts
     validation: test:validate、example:build、example:ssr:build、bench；静态路由/skip/门禁核对
+  - id: G
+    read:
+      - packages/cli/src（create/add/playground/generate/doctor、templates、fs/logger/validate）
+      - scripts/*.mjs（setup/check-env/release-readiness/publish-check/run-examples/api/test validate/utils）
+      - 根 package.json scripts、scripts/README.md、tests/core/cli.spec.ts
+    validation: release:check 实跑、CLI vitest；静态 scripts/README/package scripts 核对
+  - id: H
+    read: A、B、C01-C32、F、G 各节「供任务 H 汇总」决策（无新读源，纯汇总）
+    validation: prettier --check、git diff --check、来源编号回溯核对（文档类，不跑 quality:release）
 verification-defaults:
   - 使用仓库声明的 pnpm 11.9.0；本机 bare pnpm 可能因 engines.pnpm 拦截。
   - 扫描类任务优先跑目标 vitest、api:validate、types:check，再对文档改动跑 prettier 与 git diff --check。
@@ -5166,26 +5177,165 @@ corepack pnpm smoke:published
 
 #### G 公共拆分/合并决策汇总（供任务 H 汇总）
 
-| 项                                   | 决策                                                                 | 优先级 |
-| ------------------------------------ | -------------------------------------------------------------------- | ------ |
+| 项                                      | 决策                                                                 | 优先级 |
+| --------------------------------------- | -------------------------------------------------------------------- | ------ |
 | release-check ROADMAP 旧结构断言（G-1） | 删除/替换旧 Roadmap 发布表断言，以当前 release docs 和版本事实源为准 | **P2** |
-| CLI command runner（G-2）            | 在 CLI 局部抽 arg-array runner；不要复用 repo-only scripts helper     | **P2** |
+| CLI command runner（G-2）               | 在 CLI 局部抽 arg-array runner；不要复用 repo-only scripts helper    | **P2** |
 | scripts 文件/版本/catalog helper（G-3） | 合并到 `scripts/utils/*`，保持 CLI runtime 与维护脚本边界分离        | P3     |
-| CLI docs generator 命名边界（G-4）   | 文档化 starter docs vs official refs，不立即合并生成器               | P3     |
-| CLI/脚本健康基线（G-5）              | 保持现有 dry-run、doctor、publish smoke、API/docs drift gate          | 观察   |
+| CLI docs generator 命名边界（G-4）      | 文档化 starter docs vs official refs，不立即合并生成器               | P3     |
+| CLI/脚本健康基线（G-5）                 | 保持现有 dry-run、doctor、publish smoke、API/docs drift gate         | 观察   |
 
 ---
 
 #### G 取证摘要（静态实读 + 目标命令）
 
-| 取证                                            | 结果                                                                                                      | 对应发现 |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------- |
-| `corepack pnpm release:check`                   | ❌ 失败；`check-release-readiness.mjs` 仍要求 ROADMAP 包含 v1.4.0 发布准备/执行旧文本                      | G-1      |
-| `package.json` release scripts                  | `quality:release` 首步是 `release:check`，后续才是 quick/coverage/API/docs/size/test/example/SSR 门禁      | G-1      |
-| grep `execSync` / `spawnSync` / `shell:`         | scripts 有 `pnpm` helper；CLI playground/add 仍有字符串命令执行路径                                       | G-2      |
-| grep `collectFiles` / `walk` / `parseVersion`   | 文件遍历、版本解析、catalog 读取在多个脚本/CLI doctor 中重复                                               | G-3      |
-| 读 `generate.ts` + `generate-api-docs.mjs`       | CLI docs generator 是轻量用户项目输出；仓库 `docs:api` 是官方 skill references 生成链路                    | G-4      |
-| README/scripts 表核对                           | ✅ `scripts/README.md` 覆盖主要 setup/dev/check/release/publish/docs/example 入口                          | G-5      |
-| `corepack pnpm vitest run tests/core/cli.spec.ts` | ✅ 1 个文件、72 个 CLI 测试通过                                                                            | G-5      |
+| 取证                                              | 结果                                                                                                  | 对应发现 |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------- |
+| `corepack pnpm release:check`                     | ❌ 失败；`check-release-readiness.mjs` 仍要求 ROADMAP 包含 v1.4.0 发布准备/执行旧文本                 | G-1      |
+| `package.json` release scripts                    | `quality:release` 首步是 `release:check`，后续才是 quick/coverage/API/docs/size/test/example/SSR 门禁 | G-1      |
+| grep `execSync` / `spawnSync` / `shell:`          | scripts 有 `pnpm` helper；CLI playground/add 仍有字符串命令执行路径                                   | G-2      |
+| grep `collectFiles` / `walk` / `parseVersion`     | 文件遍历、版本解析、catalog 读取在多个脚本/CLI doctor 中重复                                          | G-3      |
+| 读 `generate.ts` + `generate-api-docs.mjs`        | CLI docs generator 是轻量用户项目输出；仓库 `docs:api` 是官方 skill references 生成链路               | G-4      |
+| README/scripts 表核对                             | ✅ `scripts/README.md` 覆盖主要 setup/dev/check/release/publish/docs/example 入口                     | G-5      |
+| `corepack pnpm vitest run tests/core/cli.spec.ts` | ✅ 1 个文件、72 个 CLI 测试通过                                                                       | G-5      |
 
 > 本轮 G 只记录扫描结论和修复建议；未改任何 CLI 源码、维护脚本、公共 API、生成器或 generated references（仅 `docs/ROADMAP.md` + `docs/ROADMAP_CHECK.md` 保留改动）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用 `corepack pnpm` 做 CLI 定向测试、release-check 实跑与静态脚本/README/package scripts 核对。`release:check` 当前失败是本轮记录的 P2 发现，故不运行完整 `quality:release` 或 `publish:check`。
+
+---
+
+## 任务 H — 最终公共内容拆分/合并决策汇总
+
+> 全轮收口节：汇总任务 A、B、C01–C32、F、G 各节「公共拆分/合并决策汇总（供任务 H 汇总）」表（约 35 张），按 ROADMAP 规定的五类动作（**合并到 core / 保持框架分离 / 拆出局部 helper / 删除或废弃 / 延后**）重新归类，并给出跨切面专项与执行批次。本节不复述发现细节，每行只回溯到源发现编号，细节见对应任务正文。
+
+**结论速览**：全轮 5 个 P1 + 一批 P2，集中在四条跨切面主线——**i18n/locale 接入、公开 API 漂移与 no-op props、a11y/键盘/ARIA、生成器与发布门禁**。多数「合并到 core」是把已重复的纯逻辑收口；「保持框架分离」是 DOM ref/生命周期/render/运行时 a11y 类；删除或废弃一律走 `deprecated → migration → changeset → api:baseline:check`，no-op/ghost 项优先「实现」而非「删」。A-4 与 G-1 两条门禁漂移都会阻断 `pnpm quality:release`，须最先修。
+
+### H-0 首批 P1（先于一切）
+
+| 项                                                          | 类型   | 来源  | 动作                                                                                                        |
+| ----------------------------------------------------------- | ------ | ----- | ----------------------------------------------------------------------------------------------------------- |
+| api baseline 门禁恒失败（生成多行 ↔ 提交单行 + 内容滞后）   | 门禁   | A-4   | 生成器输出前过 prettier 使「生成 == 提交」，再刷新 `TigerLocaleTimePicker`/`ZH_CN_UPLOAD_LABELS` 等滞后导出 |
+| MarkdownEditor 空 preview 把 `placeholder` 直写 `innerHTML` | 安全   | C31-1 | placeholder 按纯文本/escape 渲染，或复用同一 sanitize 边界                                                  |
+| Vue AvatarGroup `size` prop 不响应式                        | Bug    | C02-1 | Vue 组件层 reactive provide 修复                                                                            |
+| React QRCode 缺 locale，与 Vue 不对称                       | 不对称 | C02-2 | React 接 ConfigProvider locale + 补 core `TigerLocale` qrcode key                                           |
+| React Timeline 缺 locale，与 Vue 不对称                     | 不对称 | C04-1 | React 接 ConfigProvider locale（core key 已具备）                                                           |
+
+> G-1（`release:check` 绑定旧 ROADMAP 结构致失败）虽列 P2，但同样阻断 `quality:release`，随 H-6「发布/质量门禁修复专项」与上述 P1 一并最先处理。
+
+### H-1 合并到 core（跨框架纯逻辑 / 重复实现收口）
+
+| 合并项                                                                                                  | 来源                                   | 说明                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 两套菜单键盘导航实现并存                                                                                | C07-2                                  | core 收敛为单一键盘导航 helper，双端复用（C07/C08 跨组遗留，归此处定性）                                                                                               |
+| Message/Notification imperative 栈簿记四实现重复                                                        | C10-2                                  | 抽 core 框架无关 controller（scheduler/分组/class 常量已在 core）                                                                                                      |
+| DatePicker 键盘/聚焦/cell-state 双端重复                                                                | C16-1                                  | core 共享 helper（cell-state → key-action → focus 步进渐进）                                                                                                           |
+| ImagePreview/ImageViewer 两套全屏查看器 + 手势/图标重复                                                 | C19-1, C19-2                           | 中期合并查看器逻辑 + 单一手势/图标来源                                                                                                                                 |
+| ChartTooltip 视口溢出定位双端逐行重复                                                                   | C25-4                                  | 抽 core `resolveChartTooltipPosition`                                                                                                                                  |
+| Table select-all 未排除 disabled / 选择状态不按可选行                                                   | C21-3                                  | 抽 core selection helper（all/some/toggle-all 按可选行计算）                                                                                                           |
+| 数值/极值规范化（virtual range、Gauge 极值、Funnel/Heatmap domain、Gantt date、TreeMap/Sunburst cache） | C23-5, C27-3, C28-1, C28-2, C28-3      | core normalization helper，替换当前 NaN 断言，双端复用                                                                                                                 |
+| Select 绕开 picker-utils 高层 helper                                                                    | C14-4                                  | 合并→core 共享（`getPickerNavigationIndex`/`getPickerOptionAria` 等）                                                                                                  |
+| core 两套 file-size 格式化 + `getFileExtension` 重名异义                                                | C18-5                                  | 合并→core 单一实现，消除显示分歧                                                                                                                                       |
+| Transfer move 纯逻辑                                                                                    | C15-5                                  | 可沉 core（Vue 无消费者 computed 另见 H-4 清理）                                                                                                                       |
+| 降采样无 API/helper 落点                                                                                | C26-3                                  | 抽 core downsample helper 与索引映射契约，再由 Line/Area/Scatter opt-in                                                                                                |
+| List grid 列 class 动态拼接（Tailwind 不可扫描）                                                        | C04-2                                  | 改用 core `grid.ts` CSS 变量或 `table-utils` 静态映射                                                                                                                  |
+| ThemeConfig 非 colors 字段运行时未应用                                                                  | B-3                                    | 抽 `ThemeConfig → CSS vars` helper，ThemeManager 与 plugin 共用（替代方案=收窄类型，见 H-4）                                                                           |
+| 健康面：已正确下沉 core 的纯逻辑保持不动                                                                | C02/C03/C05/C09/C10/C11/C12/C13/C26 等 | watermark/qr/statistic、layout/grid/space、affix/anchor/scrollspy、modal/drawer/loading/progress、校验/DSL/依赖/历史、输入/数值/Mentions、scale/path/shared tooltip 等 |
+
+### H-2 保持框架分离（DOM ref / 生命周期 / render / 运行时 a11y）
+
+| 项                                                                                | 来源                                                          | 说明                                                                                          |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| 组件级 i18n 接入：框架层读 ConfigProvider merged locale（显式 prop 仍最高优先级） | B-1, C02-2, C04-1, C09-3, C14-3, C16-5, C18-3, C19-3, C23-4   | DOM/框架层注入；默认文案与 locale 命名空间沉 core（见 H-6 i18n 专项）                         |
+| Vue reactive/生命周期修复                                                         | C02-1, C05-2, C05-3, C08-1, C16-7                             | reactive provide / href watch / context 快照 / shortcut 归一化，不改公共类型形状              |
+| React Modal open callback observer 语义                                           | C09-1                                                         | React open API 语义修正，不沉 core                                                            |
+| 框架层 a11y（键盘/ARIA/focus）                                                    | C13-1, C16-2, C20-3, C23-3, C25-3, C26-2, C26-4, C27-4, C32-2 | DOM/focus 留框架层；候选索引/aria 规则可抽 core（见 H-6 a11y 专项）                           |
+| 水印 MutationObserver / BackTop SSR window guard                                  | C02, C05-4                                                    | 依赖 DOM ref 与 render/mount 时机，不可沉 core                                                |
+| React/Vue 惯用差异导出（Context/ref vs v-model）                                  | A-1                                                           | 保持分离，仅文档说明                                                                          |
+| CLI command runner                                                                | G-2                                                           | 在 CLI 局部抽 arg-array runner，**不**复用 repo-only scripts helper（脚本/CLI 层，不入 core） |
+
+### H-3 拆出局部 helper（组件局部 / 脚本层，明确不入 core 运行时包）
+
+| 项                                            | 来源     | 目标位置                                                                                |
+| --------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| 公开组件枚举逻辑三脚本各写一份、口径不一      | A-6, A-7 | `scripts/lib/public-components.mjs`（脚本层，三脚本共用；component-index 改以其为权威） |
+| scripts 文件遍历/版本/catalog helper 多处重复 | G-3      | `scripts/utils/{files,version,catalog}.mjs`（脚本层；CLI runtime 不依赖）               |
+| Tag 关闭按钮类未抽                            | C01-3    | core util `getTagCloseButtonClasses`                                                    |
+| Tag/Badge variant 联合类型逐字重复            | C01-6    | core 共享类型别名 `StatusVariant`（非破坏）                                             |
+| qrcode loading 文案常量裸 Tailwind            | C02-3    | `core/utils/qrcode-utils.ts` 常量（token 化，见 H-6 Tailwind 专项）                     |
+| Steps finish 图标常量重复                     | C06-5    | 图标数据沉 core（`stepFinishChar` 无消费者另见 H-4 分类）                               |
+
+### H-4 删除或废弃（默认走 deprecated → migration → changeset → `api:baseline:check`）
+
+> 默认策略：**不直接删除公开内容**；no-op/ghost 项优先「实现」，确需移除再走废弃流程。下表「处置」列给出「实现 or 废弃」取向。
+
+| 项                                                                 | 来源         | 处置                                                           |
+| ------------------------------------------------------------------ | ------------ | -------------------------------------------------------------- |
+| CodeEditor `highlightActiveLine` 公开 no-op                        | C31-2        | 实现 active-line helper，或从 shared type/docs 移除/降级       |
+| ChatWindow `statusVariant` 公开 no-op                              | C29-1        | 实现状态栏 variant，或从 public type/generated references 移除 |
+| Donut `animated` 公开 no-op                                        | C27-2        | 实现，或降级 API 承诺                                          |
+| Select `virtual`/`listHeight` 双端 no-op                           | C14-2        | 接入真实虚拟滚动（复用 VirtualList），或废弃 + 改注释          |
+| AutoComplete `allowFreeInput` 死 prop                              | C14-1        | 实现，或废弃（走 H 流程）                                      |
+| CropUpload `modalWidth` 死 prop                                    | C20-2        | 实现为 Modal `width` + 补双端 spec；不建议保留死字段           |
+| FileManager `draggable` 半接线 + `applyFileDragReorder` 死 helper  | C18-2        | 补全实现（消费 core helper），或废弃 prop+helper               |
+| FileManager `columns` 死字段                                       | C18-4        | 实现，或废弃；类型来源统一以 core 为源                         |
+| `CalendarProps` 幽灵共享类型                                       | C16-6        | 做成真源，或废弃                                               |
+| VirtualTable `virtualizeColumns`（及 `width`/`rowClassName` 漂移） | C23-1        | 先定契约；短期无法实现则降级 public 承诺                       |
+| Gauge 继承 `ChartTooltipProps` 但无实现                            | C27-1        | 补双端 tooltip，或移除继承后更新 references                    |
+| Splitter `sizes` 比例/像素语义不一致                               | C32-1        | 收敛为像素语义；如需比例输入应新增明确 API                     |
+| Transfer `targetKeys` core/双端受控名不一致                        | C15-1        | 实现 alias 或收敛/废弃共享 prop                                |
+| Cascader `showSearch.render` 零消费                                | C15-2        | 实现自定义结果渲染，或 deprecated + 修 reference               |
+| RichTextEditor `mode` 公开 no-op                                   | C31-3        | 明确 HTML-only，或把 markdown/plain 转换纳入 engine 契约       |
+| `DataTableWithToolbarProps` ghost 型                               | C22-2        | core 作单一事实源并补 toolbar 级回调（亦属类型对齐，见 H-6）   |
+| `getResultHttpLabel` 无实质作用                                    | C02-4        | 替换为 `isHttpResultStatus`，保留 core 走 deprecated           |
+| `getTouchDistance` 零消费公共导出                                  | C19-2        | 复用或废弃                                                     |
+| `getNextActiveKey` / `stepFinishChar` 无仓库消费者                 | C06-6, C06-5 | 保留并分类；删除需 deprecated/migration                        |
+| NotificationCenter `_currentGroup` 计算属性死代码                  | C10-5        | 纯死代码（非公开），双端直接删除                               |
+| Transfer Vue 无消费者 computed                                     | C15-5        | 纯死代码，直接清理                                             |
+
+> 注：Line/Area 单系列颜色 props（C26-1）属「**保留 API、改为消费**」（默认 series/palette fallback 中消费 `lineColor`/`areaColor`/`pointColor`），不在删除桶。
+
+### H-5 延后（先分类 / 补护栏，本轮不动）
+
+| 项                                              | 来源       | 说明                                                                          |
+| ----------------------------------------------- | ---------- | ----------------------------------------------------------------------------- |
+| core utils flat barrel 公开面分类               | B-5, C11-4 | 先区分公开 API / 框架共享 helper / 组件局部 helper，不直接删；删除走 baseline |
+| locale ↔ 导出映射同步校验                       | A-2        | 已归 G 脚本扫描；加同步护栏，当前无缺陷                                       |
+| ActivityFeed 长列表虚拟化策略                   | C29-3      | 待 C24 结论后定是否 opt-in VirtualList，或文档声明适用规模                    |
+| benchmark 基线与覆盖扩展                        | F-4        | 保持 advisory；先补 coverage map 再决定是否扩展                               |
+| Vue Menu monolith 拆分                          | C07-5      | 可选重构                                                                      |
+| token / Tailwind plugin / themes 默认值同步护栏 | B-4        | 共享 token mapping 或先补一致性测试护栏                                       |
+
+### H-6 跨切面专项（横跨多组，建议成批统一做；与 H-1~H-5 按主题重切，存在有意重叠）
+
+- **i18n / locale 接入专项**：B-1, B-2, C01-4, C02-2, C02-5, C04-1, C04-4, C09-3, C09-6, C14-3, C14-6, C16-3, C16-5, C18-3, C19-3, C20-6, C21-5, C23-4, C30-2，及 Calendar。统一口径：**组件接 ConfigProvider merged locale（显式 prop 最高优先级）+ 默认文案沉 core + 新增 locale 命名空间**（`qrcode`/`empty`/`tour`/`table` 等），preset 作 labels 单一来源。
+- **公开 API 漂移 / no-op props 专项**：H-4 一批 no-op/ghost + 类型对齐 C06-1、C12-3、C15-1/2、C22-1/2、C24-1/3。统一「实现 or 走 deprecated」，过 `api:baseline:check`。
+- **a11y / 键盘 / ARIA 专项**：C06-3, C07-8, C13-1, C14-5, C16-2, C18-6, C20-3, C21（行交互）, C23-3, C25-3, C26-2, C26-4, C27-4, C32-2。SVG 图元 / grid 行 / clear 控件 / resize handle 的 role/tabIndex/aria/key 激活统一规则。
+- **生成器 / generated references 专项**：A-5, A-6, A-7, C03-1, C06-4, C22-4, C24-4, C25-1, C28-5, C30-3, C31-5, C32-4。统一改 `generate-api-docs.mjs` 源（公开组件来源、props 类型映射、转义），**不手改 generated 文件**，再重生成。
+- **Tailwind v4 token 化 / `bg-opacity-*` 迁移专项**：C02-3, C04-3, C18-1, C18-7, B-4。裸 gray/white/`bg-opacity-*` → `var(--tiger-*)` / 斜杠透明度。
+- **发布 / 质量门禁修复专项**：A-4, G-1。两条门禁漂移都阻断 `pnpm quality:release`，最先修；修后补 fixture/字符串级测试覆盖当前 Roadmap 发布策略与基线格式。
+
+### H-7 公共 API 变更默认策略（重申）
+
+- **不直接删除公开内容**；删除/收窄公开 API → 标 `@deprecated` + 补 MIGRATION + 补 changeset + 过 `api:baseline:check`。
+- no-op / ghost 项**优先实现**承诺的能力，确无必要再废弃。
+- 纯死代码（非公开、无消费者，如 `_currentGroup`）可直接删，不走废弃流程。
+- 生成产物（`skills/tigercat/references/*`、`api-reports/*`）只能改生成器源后重生成，不手改。
+
+### H-8 建议执行顺序
+
+1. **门禁与安全先行**：H-0 五个 P1 + 发布门禁专项（A-4、G-1）+ C31-1 安全修复。
+2. **生成器共享 helper**（A-6/A-7 → `scripts/lib/public-components.mjs`）：是 A-5/component-index 与多项 generated 覆盖的前置。
+3. **i18n 接入专项**：含 core locale 命名空间新增（`qrcode`/`empty`/`tour`/`table`…）与双端接 ConfigProvider。
+4. **a11y 专项 + H-1 合并到 core 收口**（菜单导航、imperative 栈、datepicker helper、selection、数值规范化、查看器/手势等）。
+5. **公开 API 漂移逐项「实现 or 废弃」**，每项走 `api:baseline:check` 与 changeset。
+6. **H-5 延后项**分类与护栏（barrel 分级、token 同步、benchmark 覆盖）。
+
+### 任务 H 验证摘要（文档汇总，轻量）
+
+| 取证                                                                   | 结果    | 备注                                                                          |
+| ---------------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------- |
+| `corepack pnpm prettier --check docs/ROADMAP_CHECK.md docs/ROADMAP.md` | ✅ 通过 | 仅格式核对，未跑 `quality:release`                                            |
+| `git diff --check`                                                     | ✅ 通过 | 无行尾/空白冲突                                                               |
+| `git status --short`                                                   | ✅ 两处 | 仅 `docs/ROADMAP.md`、`docs/ROADMAP_CHECK.md` 两处；未触碰源码/脚本/生成产物  |
+| 来源编号回溯核对                                                       | ✅ 通过 | H 表各来源编号在对应任务节真实存在；5 个 P1 与 A-4/G-1 两门禁项均落入 H-0/H-6 |
+
+> 本轮任务 H 只做 A-G 决策汇总，未改组件代码、未改公共 API、未运行 `pnpm docs:api` 或任何生成器，未执行发布相关命令。

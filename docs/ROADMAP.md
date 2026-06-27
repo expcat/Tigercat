@@ -281,7 +281,9 @@ source: current repository state; v1.4.0 has been released
 - 目标：找跨平台问题、重复文件遍历、硬编码路径、错误输出不清晰、与 README/scripts 文档不一致的命令。
 - 公共拆合判断：通用终端输出、pnpm 执行、walk/collectFiles 等脚本 helper 合并；一次性发布规则保持在对应脚本内。
 
-#### 任务 H：最终公共内容拆分/合并决策汇总
+#### 任务 H：最终公共内容拆分/合并决策汇总 ✅ 已汇总（2026-06-27）
+
+> 汇总结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 H 节）；A-G 决策按五类动作（合并到 core / 保持框架分离 / 拆出局部 helper / 删除或废弃 / 延后）归类，本表仅留计划与状态。
 
 - 范围：汇总 A-G 发现。
 - 目标：形成“合并到 core / 保持框架分离 / 拆出局部 helper / 删除或废弃 / 延后”的决策表。
