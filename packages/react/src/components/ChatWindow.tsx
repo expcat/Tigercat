@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   getChatMessageStatusInfo,
+  getChatStatusBarClasses,
   formatChatTime,
   type ChatMessage,
   type ChatWindowProps as CoreChatWindowProps
@@ -36,7 +37,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   inputAriaLabel,
   sendAriaLabel,
   statusText,
-  statusVariant: _statusVariant = 'info',
+  statusVariant = 'info',
   showAvatar = true,
   showName = true,
   showTime = false,
@@ -221,11 +222,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           )}
         </div>
       )}
-      {statusText && (
-        <div className="px-5 py-2 border-t border-[var(--tiger-border,#e5e7eb)] text-xs italic text-[var(--tiger-text-muted,#6b7280)] bg-[var(--tiger-surface-muted,#f9fafb)]">
-          {statusText}
-        </div>
-      )}
+      {statusText && <div className={getChatStatusBarClasses(statusVariant)}>{statusText}</div>}
       <div className="flex items-end gap-3 px-5 py-4 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] rounded-b-lg">
         <div className="flex-1">
           {inputType === 'input' ? (

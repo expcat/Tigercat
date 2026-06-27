@@ -9,7 +9,8 @@ import {
   getSliderTooltipClasses,
   sliderGetPercentage,
   sliderGetValueFromPosition,
-  sliderGetKeyboardValue
+  sliderGetKeyboardValue,
+  sliderResolveMarks
 } from '@expcat/tigercat-core'
 
 export interface VueSliderProps {
@@ -355,7 +356,8 @@ export const Slider = defineComponent({
       const createMarks = () => {
         if (!props.marks) return null
 
-        const marks = typeof props.marks === 'boolean' ? {} : props.marks
+        const marks = sliderResolveMarks(props.marks, props.min, props.max)
+        if (Object.keys(marks).length === 0) return null
 
         return h(
           'div',

@@ -5,9 +5,22 @@
 import type { StepsDirection, StepStatus, StepSize } from '../types/steps'
 
 /**
- * Checkmark character used by StepsItem when status is "finish"
+ * Plain checkmark character for the "finish" step status.
+ *
+ * The default StepsItem UI renders the SVG checkmark below
+ * ({@link stepFinishIconPathD}); this constant is kept as a public, lightweight
+ * text fallback for consumers that render their own finish indicator.
  */
 export const stepFinishChar = '✓'
+
+/** SVG `viewBox` for the StepsItem "finish" checkmark icon */
+export const stepFinishIconViewBox = '0 0 24 24'
+
+/** SVG `stroke-width` for the StepsItem "finish" checkmark icon */
+export const stepFinishIconStrokeWidth = '3'
+
+/** SVG path `d` for the StepsItem "finish" checkmark icon */
+export const stepFinishIconPathD = 'M4.5 12.75l6 6 9-13.5'
 
 /**
  * Get Steps container classes

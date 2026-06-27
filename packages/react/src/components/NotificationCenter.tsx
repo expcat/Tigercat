@@ -90,15 +90,6 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     }
   }, [activeGroupKey, currentGroupKey, resolvedGroups])
 
-  const _currentGroup = useMemo(() => {
-    if (resolvedGroups.length === 0) return undefined
-    if (currentGroupKey === undefined) return resolvedGroups[0]
-    const index = resolvedGroups.findIndex(
-      (group, groupIndex) => getGroupKey(group, groupIndex) === currentGroupKey
-    )
-    return index >= 0 ? resolvedGroups[index] : resolvedGroups[0]
-  }, [currentGroupKey, resolvedGroups])
-
   // --- Internal read-state management ---
   const [readStateOverrides, setReadStateOverrides] = useState(
     () => new Map<string | number, boolean>()

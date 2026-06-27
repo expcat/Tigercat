@@ -10,6 +10,7 @@
 import React from 'react'
 import {
   type TaskBoardColumn,
+  type KanbanSwimlane,
   type TaskBoardCardMoveEvent,
   type TaskBoardColumnMoveEvent
 } from '@expcat/tigercat-core'
@@ -34,6 +35,10 @@ export interface KanbanProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   filterText?: string
   /** Column IDs to hide */
   hiddenColumns?: (string | number)[]
+  /** Swimlane definitions used to group cards inside each column */
+  swimlanes?: KanbanSwimlane[]
+  /** Card field used to assign a card to a swimlane */
+  swimlaneField?: string
   /** Show card count badges */
   showCardCount?: boolean
   /** Allow inline card add */

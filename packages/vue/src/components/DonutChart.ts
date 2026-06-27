@@ -1,8 +1,10 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, onMounted, ref, PropType } from 'vue'
 import {
   classNames,
   getChartInnerRect,
   normalizeChartPadding,
+  DONUT_ENTRANCE_KEYFRAMES,
+  DONUT_ENTRANCE_CLASS,
   type ChartPadding,
   type ChartLegendPosition,
   type DonutChartDatum,
@@ -127,6 +129,10 @@ export const DonutChart = defineComponent({
       type: Number,
       default: 8
     },
+    legendFormatter: {
+      type: Function as PropType<(datum: DonutChartDatum, index: number) => string>,
+      default: undefined
+    },
     // Tooltip props
     showTooltip: {
       type: Boolean,
@@ -187,6 +193,13 @@ export const DonutChart = defineComponent({
   setup(props, { emit }) {
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
     const pad = computed(() => normalizeChartPadding(props.padding))
+
+    // Entrance animation: enable the class after mount when `animated`.
+    // The keyframes collapse to no motion under `prefers-reduced-motion`.
+    const entered = ref(false)
+    onMounted(() => {
+      if (props.animated) entered.value = true
+    })
 
     const resolvedOuterRadius = computed(() => {
       if (typeof props.outerRadius === 'number') return Math.max(0, props.outerRadius)
@@ -267,6 +280,7 @@ export const DonutChart = defineComponent({
         legendPosition: props.legendPosition,
         legendMarkerSize: props.legendMarkerSize,
         legendGap: props.legendGap,
+        legendFormatter: props.legendFormatter,
         showTooltip: props.showTooltip,
         tooltipFormatter: donutTooltipFormatter.value,
         title: props.title,
@@ -324,7 +338,20 @@ export const DonutChart = defineComponent({
           )
         : null
 
-      return h('div', { class: 'inline-block relative', 'data-donut-chart': 'true' }, [pie, center])
+      const styleNode =
+        props.animated && entered.value ? h('style', null, DONUT_ENTRANCE_KEYFRAMES) : null
+
+      return h(
+        'div',
+        {
+          class: classNames(
+            'inline-block relative',
+            props.animated && entered.value && DONUT_ENTRANCE_CLASS
+          ),
+          'data-donut-chart': 'true'
+        },
+        [styleNode, pie, center]
+      )
     }
   }
 })

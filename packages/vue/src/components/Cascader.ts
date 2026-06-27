@@ -154,7 +154,7 @@ export const Cascader = defineComponent({
     // Flattened options for search
     const flattenedOptions = computed(() => {
       if (!props.showSearch) return []
-      return flattenCascaderOptions(props.options)
+      return flattenCascaderOptions(props.options, [], [], props.changeOnSelect)
     })
 
     // Filtered search results
@@ -417,7 +417,9 @@ export const Cascader = defineComponent({
                     }),
                     onClick: () => handleSearchResultClick(item.valuePath, item.disabled)
                   },
-                  item.label
+                  typeof props.showSearch === 'object' && props.showSearch.render
+                    ? props.showSearch.render(searchQuery.value, item.path)
+                    : item.label
                 )
               )
             )

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   sortData,
-  filterData,
+  filterTableData,
   paginateData,
   calculatePagination,
   createTableRowKeyCache,
@@ -283,7 +283,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     if (filterMode === 'advanced' && advancedFilterRules.length > 0) {
       data = filterDataAdvanced(data, advancedFilterRules)
     } else {
-      data = filterData(data, filterState)
+      data = filterTableData(data, columns, filterState)
     }
     if (sortState.key && sortState.direction) {
       const column = columnByKey[sortState.key]

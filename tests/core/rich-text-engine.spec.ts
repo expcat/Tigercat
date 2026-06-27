@@ -3,6 +3,8 @@ import {
   builtinRichTextEngine,
   createBuiltinRichTextEngine,
   defaultToolbar,
+  richTextHtmlToMode,
+  richTextModeToHtml,
   type RichTextEngineMountContext,
   type RichTextEngineInstance
 } from '../../packages/core/src'
@@ -105,6 +107,28 @@ describe('rich-text-engine', () => {
     instance = builtinRichTextEngine.create(ctx)
     expect(ctx.element.innerHTML).toContain('<p>Hello')
     expect(ctx.element.innerHTML).not.toContain('<script>')
+  })
+
+  it('converts markdown initial value into editable HTML', () => {
+    const { ctx } = makeContext({ mode: 'markdown', initialValue: '# Title\n\n- One' })
+    instance = builtinRichTextEngine.create(ctx)
+    expect(ctx.element.innerHTML).toContain('<h1>Title</h1>')
+    expect(ctx.element.innerHTML).toContain('<li>One</li>')
+  })
+
+  it('serializes changes in plain mode as text', () => {
+    const { ctx, changes } = makeContext({ mode: 'plain' })
+    instance = builtinRichTextEngine.create(ctx)
+    ctx.element.innerHTML = '<p>Hello <strong>world</strong></p>'
+    ctx.element.dispatchEvent(new Event('input', { bubbles: true }))
+    expect(changes).toContain('Hello world')
+  })
+
+  it('round-trips markdown helper boundaries', () => {
+    const html = richTextModeToHtml('## Heading\n\n**Bold** text', 'markdown')
+    expect(html).toContain('<h2>Heading</h2>')
+    expect(html).toContain('<strong>Bold</strong>')
+    expect(richTextHtmlToMode(html, 'markdown')).toContain('## Heading')
   })
 
   it('setValue replaces content', () => {

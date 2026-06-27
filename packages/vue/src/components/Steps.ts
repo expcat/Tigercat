@@ -22,6 +22,9 @@ import {
   getStepDescriptionClasses,
   getStepsContainerClasses,
   calculateStepStatus,
+  stepFinishIconViewBox,
+  stepFinishIconStrokeWidth,
+  stepFinishIconPathD,
   type StepsDirection,
   type StepStatus,
   type StepSize
@@ -214,14 +217,14 @@ export const StepsItem = defineComponent({
               class: 'w-4 h-4 shrink-0 transition-transform duration-300 animate-fade-in',
               fill: 'none',
               stroke: 'currentColor',
-              'stroke-width': '3',
-              viewBox: '0 0 24 24'
+              'stroke-width': stepFinishIconStrokeWidth,
+              viewBox: stepFinishIconViewBox
             },
             [
               h('path', {
                 'stroke-linecap': 'round',
                 'stroke-linejoin': 'round',
-                d: 'M4.5 12.75l6 6 9-13.5'
+                d: stepFinishIconPathD
               })
             ]
           )

@@ -8,7 +8,8 @@ import {
   resultExtraClasses,
   getResultColorScheme,
   getResultIconPath,
-  getResultHttpLabel
+  getResultHttpLabel,
+  isHttpResultStatus
 } from '@expcat/tigercat-core'
 import type { ResultStatus } from '@expcat/tigercat-core'
 
@@ -76,7 +77,22 @@ describe('result-utils', () => {
     })
   })
 
-  describe('getResultHttpLabel', () => {
+  describe('isHttpResultStatus', () => {
+    it('returns true for HTTP error statuses', () => {
+      expect(isHttpResultStatus('404')).toBe(true)
+      expect(isHttpResultStatus('403')).toBe(true)
+      expect(isHttpResultStatus('500')).toBe(true)
+    })
+
+    it('returns false for non-HTTP statuses', () => {
+      expect(isHttpResultStatus('success')).toBe(false)
+      expect(isHttpResultStatus('error')).toBe(false)
+      expect(isHttpResultStatus('info')).toBe(false)
+      expect(isHttpResultStatus('warning')).toBe(false)
+    })
+  })
+
+  describe('getResultHttpLabel (deprecated)', () => {
     it('returns label for HTTP error statuses', () => {
       expect(getResultHttpLabel('404')).toBe('404')
       expect(getResultHttpLabel('403')).toBe('403')

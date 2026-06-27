@@ -17,8 +17,13 @@ import {
   taskBoardWipExceededClasses,
   taskBoardAddCardClasses,
   kanbanCardCountClasses,
+  kanbanSwimlaneClasses,
+  kanbanSwimlaneHeaderClasses,
+  kanbanSwimlaneDotClasses,
+  kanbanSwimlaneCollapsedClasses,
   kanbanAddColumnClasses,
   filterColumns,
+  groupBySwimlane,
   getColumnCardCount,
   moveCard,
   reorderColumns,
@@ -28,6 +33,7 @@ import {
   type TaskBoardProps as CoreTaskBoardProps,
   type TaskBoardColumn,
   type TaskBoardCard,
+  type KanbanSwimlane,
   type TaskBoardDragSnapshot,
   type TaskBoardDragController
 } from '@expcat/tigercat-core'
@@ -123,6 +129,8 @@ interface ColumnItemProps {
   kbDragStateId: string | number | null
   showCardCount: boolean
   allowAddCard: boolean
+  swimlanes?: KanbanSwimlane[]
+  swimlaneField?: string
 }
 
 const ColumnItem = React.memo<ColumnItemProps>(
@@ -145,7 +153,9 @@ const ColumnItem = React.memo<ColumnItemProps>(
     dragStateId,
     kbDragStateId,
     showCardCount,
-    allowAddCard
+    allowAddCard,
+    swimlanes,
+    swimlaneField
   }) => {
     const wipOver = isWipExceeded(column)
     const cardCount = showCardCount ? getColumnCardCount(column) : null
@@ -156,30 +166,63 @@ const ColumnItem = React.memo<ColumnItemProps>(
       isColDragging && taskBoardColumnDraggingClasses
     )
 
+    const renderCardNode = (card: TaskBoardCard, originalIndex: number) => {
+      const nodes: React.ReactNode[] = []
+      if (isDropTarget && dropIdx === originalIndex) {
+        nodes.push(<div key={`drop-${originalIndex}`} className={taskBoardDropIndicatorClasses} />)
+      }
+      const isDragging = dragStateId === card.id
+      const isKbGrabbed = kbDragStateId === card.id
+      nodes.push(
+        <CardItem
+          key={String(card.id)}
+          card={card}
+          column={column}
+          isDragging={isDragging}
+          isKbGrabbed={isKbGrabbed}
+          draggable={draggable}
+          dragHintText={labels.dragHintText}
+          renderCard={renderCardProp}
+          dragCtrl={dragCtrl}
+        />
+      )
+      return nodes
+    }
+
     // Build cards list with drop indicators
     let cardsContent: React.ReactNode
     if (column.cards.length > 0) {
-      const nodes: React.ReactNode[] = []
-      column.cards.forEach((card, i) => {
-        if (isDropTarget && dropIdx === i) {
-          nodes.push(<div key={`drop-${i}`} className={taskBoardDropIndicatorClasses} />)
-        }
-        const isDragging = dragStateId === card.id
-        const isKbGrabbed = kbDragStateId === card.id
-        nodes.push(
-          <CardItem
-            key={String(card.id)}
-            card={card}
-            column={column}
-            isDragging={isDragging}
-            isKbGrabbed={isKbGrabbed}
-            draggable={draggable}
-            dragHintText={labels.dragHintText}
-            renderCard={renderCardProp}
-            dragCtrl={dragCtrl}
-          />
-        )
-      })
+      const nodes: React.ReactNode[] =
+        swimlanes && swimlaneField
+          ? groupBySwimlane(column.cards, swimlanes, swimlaneField).map((group) => (
+              <div
+                key={String(group.swimlane.id)}
+                className={kanbanSwimlaneClasses}
+                data-tiger-kanban-swimlane=""
+                data-tiger-kanban-swimlane-id={String(group.swimlane.id)}>
+                <div className={kanbanSwimlaneHeaderClasses}>
+                  {group.swimlane.color && (
+                    <span
+                      className={kanbanSwimlaneDotClasses}
+                      style={{ backgroundColor: group.swimlane.color }}
+                    />
+                  )}
+                  <span>{group.swimlane.label}</span>
+                  <span className="ml-auto text-xs text-[var(--tiger-text-muted,#6b7280)]">
+                    {group.cards.length}
+                  </span>
+                </div>
+                <div className={group.swimlane.collapsed ? kanbanSwimlaneCollapsedClasses : ''}>
+                  {group.cards.flatMap((card) =>
+                    renderCardNode(
+                      card,
+                      column.cards.findIndex((item) => item.id === card.id)
+                    )
+                  )}
+                </div>
+              </div>
+            ))
+          : column.cards.flatMap((card, i) => renderCardNode(card, i))
       if (isDropTarget && dropIdx >= column.cards.length) {
         nodes.push(<div key="drop-end" className={taskBoardDropIndicatorClasses} />)
       }
@@ -338,7 +381,9 @@ const ColumnItem = React.memo<ColumnItemProps>(
     prev.kbDragStateId === next.kbDragStateId &&
     prev.onCardAdd === next.onCardAdd &&
     prev.showCardCount === next.showCardCount &&
-    prev.allowAddCard === next.allowAddCard
+    prev.allowAddCard === next.allowAddCard &&
+    prev.swimlanes === next.swimlanes &&
+    prev.swimlaneField === next.swimlaneField
 )
 ColumnItem.displayName = 'TaskBoardColumnItem'
 
@@ -357,6 +402,8 @@ export interface TaskBoardProps
   renderColumnHeader?: (column: TaskBoardColumn) => React.ReactNode
   renderColumnFooter?: (column: TaskBoardColumn) => React.ReactNode
   renderEmptyColumn?: (column: TaskBoardColumn) => React.ReactNode
+  swimlanes?: KanbanSwimlane[]
+  swimlaneField?: string
   style?: React.CSSProperties
 }
 
@@ -382,6 +429,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   renderColumnHeader,
   renderColumnFooter,
   renderEmptyColumn,
+  swimlanes,
+  swimlaneField,
   locale,
   labels: labelsOverride,
   className,
@@ -561,6 +610,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
             kbDragStateId={kbDragStateId}
             showCardCount={showCardCount}
             allowAddCard={allowAddCard}
+            swimlanes={swimlanes}
+            swimlaneField={swimlaneField}
           />
         )
       })}

@@ -48,6 +48,23 @@ describe('Transfer', () => {
 
       expect(container.querySelector('.custom-transfer')).toBeInTheDocument()
     })
+
+    it('should split items by targetKeys alias when value is absent', () => {
+      const { getAllByRole } = render(<Transfer dataSource={dataSource} targetKeys={['1', '2']} />)
+
+      const panels = getAllByRole('listbox')
+      expect(panels[0].querySelectorAll('[role="option"]').length).toBe(3)
+      expect(panels[1].querySelectorAll('[role="option"]').length).toBe(2)
+    })
+
+    it('should prefer value over targetKeys', () => {
+      const { getAllByRole } = render(
+        <Transfer dataSource={dataSource} value={['1']} targetKeys={['1', '2', '3']} />
+      )
+
+      const panels = getAllByRole('listbox')
+      expect(panels[1].querySelectorAll('[role="option"]').length).toBe(1)
+    })
   })
 
   describe('Transfer operations', () => {

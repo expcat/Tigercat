@@ -10,6 +10,7 @@
 import { defineComponent, h, PropType } from 'vue'
 import {
   type TaskBoardColumn,
+  type KanbanSwimlane,
   type TaskBoardCardMoveEvent,
   type TaskBoardColumnMoveEvent,
   type TaskBoardMoveValidator,
@@ -28,6 +29,8 @@ export interface VueKanbanProps {
   onCardAdd?: (columnId: string | number) => void
   filterText?: string
   hiddenColumns?: (string | number)[]
+  swimlanes?: KanbanSwimlane[]
+  swimlaneField?: string
   showCardCount?: boolean
   allowAddCard?: boolean
   allowAddColumn?: boolean
@@ -68,6 +71,14 @@ export const Kanban = defineComponent({
       type: Array as PropType<(string | number)[]>,
       default: () => []
     },
+    swimlanes: {
+      type: Array as PropType<KanbanSwimlane[]>,
+      default: undefined
+    },
+    swimlaneField: {
+      type: String,
+      default: undefined
+    },
     showCardCount: { type: Boolean, default: true },
     allowAddCard: { type: Boolean, default: true },
     allowAddColumn: { type: Boolean, default: false },
@@ -106,6 +117,8 @@ export const Kanban = defineComponent({
           onCardAdd: props.allowAddCard || props.onCardAdd ? handleCardAdd : undefined,
           filterText: props.filterText,
           hiddenColumns: props.hiddenColumns,
+          swimlanes: props.swimlanes,
+          swimlaneField: props.swimlaneField,
           showCardCount: props.showCardCount,
           allowAddCard: props.allowAddCard,
           allowAddColumn: props.allowAddColumn,

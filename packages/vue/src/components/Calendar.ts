@@ -1,6 +1,10 @@
 import { defineComponent, h, ref, computed, nextTick, PropType } from 'vue'
 import { classNames, coerceClassValue } from '@expcat/tigercat-core'
-import type { CalendarMode, TigerLocale } from '@expcat/tigercat-core'
+import type {
+  CalendarMode,
+  TigerLocale,
+  CalendarProps as CoreCalendarProps
+} from '@expcat/tigercat-core'
 import {
   getCalendarContainerClasses,
   calendarHeaderClasses,
@@ -22,13 +26,16 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface VueCalendarProps {
+/**
+ * Vue Calendar props. Reuses the shared core props except `value`/callbacks —
+ * Vue binds the selected date with `v-model` (`modelValue`) and emits `change` /
+ * `panel-change` instead of `onChange` / `onPanelChange`.
+ */
+export interface VueCalendarProps extends Omit<
+  CoreCalendarProps,
+  'value' | 'onChange' | 'onPanelChange'
+> {
   modelValue?: Date
-  mode?: CalendarMode
-  fullscreen?: boolean
-  disabledDate?: (date: Date) => boolean
-  locale?: Partial<TigerLocale>
-  className?: string
 }
 
 export const Calendar = defineComponent({

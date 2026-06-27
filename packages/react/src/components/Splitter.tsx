@@ -68,16 +68,10 @@ export const Splitter: React.FC<SplitterProps> = ({
       direction === 'horizontal' ? el.clientWidth - totalGutter : el.clientHeight - totalGutter
 
     if (controlledSizes && controlledSizes.length > 0) {
-      if (total > 0) {
-        // Convert proportional sizes to pixels based on container dimensions
-        const sum = controlledSizes.reduce((a, b) => a + b, 0)
-        if (sum > 0) {
-          setPaneSizes(controlledSizes.map((s) => (s / sum) * total))
-        }
-      } else {
-        // No layout available (e.g. test env), use sizes as-is
-        setPaneSizes([...controlledSizes])
-      }
+      // `sizes` are pixel values (per the documented contract); use them as-is
+      // instead of proportionally re-normalizing to the container, so the
+      // semantics match Vue and the public docs.
+      setPaneSizes([...controlledSizes])
     } else {
       if (total > 0) {
         const eachSize = total / paneCount

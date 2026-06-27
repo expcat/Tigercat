@@ -15,6 +15,7 @@ import {
   editableCellInputClasses,
   tableGroupHeaderClasses,
   getGroupHeaderCellClasses,
+  type TableVirtualWindow,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
 import { ExpandIcon } from './icons'
@@ -22,7 +23,7 @@ import type { TableContext, TableInternalProps } from './types'
 
 export function renderTableBody(
   ctx: TableContext,
-  props: TableInternalProps & { interactiveRows?: boolean },
+  props: TableInternalProps & { interactiveRows?: boolean; virtualWindow?: TableVirtualWindow },
   slots: Slots,
   labels: Required<TigerLocaleTable>
 ): VNodeChild {
@@ -339,6 +340,38 @@ export function renderTableBody(
       })
     }
     return h('tbody', delegatedBodyHandlers, groupRows)
+  }
+
+  // Virtual row windowing: render only the visible slice with spacer rows.
+  const vw = props.virtualWindow
+  if (vw && vw.endIndex >= vw.startIndex) {
+    const windowed: VNodeChild[] = []
+    if (vw.topPad > 0) {
+      windowed.push(
+        h('tr', { key: 'virtual-top', 'aria-hidden': 'true' }, [
+          h('td', {
+            colspan: ctx.totalColumnCount.value,
+            style: { height: `${vw.topPad}px`, padding: 0 }
+          })
+        ])
+      )
+    }
+    for (let index = vw.startIndex; index <= vw.endIndex; index++) {
+      const result = renderDataRow(ctx.paginatedData.value[index], index)
+      if (Array.isArray(result)) windowed.push(...result)
+      else windowed.push(result)
+    }
+    if (vw.bottomPad > 0) {
+      windowed.push(
+        h('tr', { key: 'virtual-bottom', 'aria-hidden': 'true' }, [
+          h('td', {
+            colspan: ctx.totalColumnCount.value,
+            style: { height: `${vw.bottomPad}px`, padding: 0 }
+          })
+        ])
+      )
+    }
+    return h('tbody', delegatedBodyHandlers, windowed)
   }
 
   const rows = ctx.paginatedData.value.flatMap((record, index) => renderDataRow(record, index))

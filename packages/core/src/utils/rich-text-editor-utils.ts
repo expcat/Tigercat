@@ -5,7 +5,12 @@
  * for basic rich-text editing support.
  */
 
-import type { ToolbarButton, ToolbarItem, ToolbarSeparator } from '../types/rich-text-editor'
+import type {
+  RichTextEditorMode,
+  ToolbarButton,
+  ToolbarItem,
+  ToolbarSeparator
+} from '../types/rich-text-editor'
 
 // ─── Toolbar item helpers ─────────────────────────────────────────
 
@@ -213,6 +218,118 @@ export function isContentEmpty(html: string): boolean {
     .replace(/&nbsp;/gi, '')
     .trim()
   return stripped.length === 0
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&amp;/gi, '&')
+}
+
+function inlineMarkdownToHtml(value: string): string {
+  return escapeHtml(value)
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+}
+
+/** Convert external editor content into HTML for the built-in engine. */
+export function richTextModeToHtml(value: string, mode: RichTextEditorMode = 'html'): string {
+  if (mode === 'html') return sanitizeHtml(value)
+
+  if (mode === 'plain') {
+    return escapeHtml(value)
+      .split(/\r?\n/)
+      .map((line) => (line ? `<p>${line}</p>` : '<p><br></p>'))
+      .join('')
+  }
+
+  const lines = value.split(/\r?\n/)
+  const html: string[] = []
+  let listItems: string[] = []
+
+  const flushList = () => {
+    if (listItems.length === 0) return
+    html.push(
+      `<ul>${listItems.map((item) => `<li>${inlineMarkdownToHtml(item)}</li>`).join('')}</ul>`
+    )
+    listItems = []
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    const bullet = /^[-*]\s+(.+)$/.exec(trimmed)
+    if (bullet) {
+      listItems.push(bullet[1])
+      continue
+    }
+
+    flushList()
+    if (!trimmed) {
+      html.push('<p><br></p>')
+    } else if (trimmed.startsWith('### ')) {
+      html.push(`<h3>${inlineMarkdownToHtml(trimmed.slice(4))}</h3>`)
+    } else if (trimmed.startsWith('## ')) {
+      html.push(`<h2>${inlineMarkdownToHtml(trimmed.slice(3))}</h2>`)
+    } else if (trimmed.startsWith('# ')) {
+      html.push(`<h1>${inlineMarkdownToHtml(trimmed.slice(2))}</h1>`)
+    } else {
+      html.push(`<p>${inlineMarkdownToHtml(trimmed)}</p>`)
+    }
+  }
+  flushList()
+  return sanitizeHtml(html.join(''))
+}
+
+function htmlToText(value: string): string {
+  return decodeHtmlEntities(
+    sanitizeHtml(value)
+      .replace(/<\/(h[1-6]|p|div|li)>/gi, '\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/ul>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+  )
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+/** Convert built-in engine HTML back to the public value for the selected mode. */
+export function richTextHtmlToMode(html: string, mode: RichTextEditorMode = 'html'): string {
+  const sanitized = sanitizeHtml(html)
+  if (mode === 'html') return sanitized
+  if (mode === 'plain') return htmlToText(sanitized)
+
+  return decodeHtmlEntities(
+    sanitized
+      .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, '# $1\n\n')
+      .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, '## $1\n\n')
+      .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, '### $1\n\n')
+      .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1\n')
+      .replace(/<\/ul>/gi, '\n')
+      .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**')
+      .replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, '**$1**')
+      .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, '*$1*')
+      .replace(/<i[^>]*>([\s\S]*?)<\/i>/gi, '*$1*')
+      .replace(/<code[^>]*>([\s\S]*?)<\/code>/gi, '`$1`')
+      .replace(/<\/(p|div)>/gi, '\n\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+  )
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
 
 /** Parse height prop to CSS value */

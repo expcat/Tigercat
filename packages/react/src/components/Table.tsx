@@ -10,6 +10,7 @@ import {
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
+  getTableVirtualWindow,
   formatTableSelectRowAriaLabel,
   formatTableSortByText,
   getTableLabels,
@@ -92,7 +93,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   virtual = false,
   autoVirtual = true,
   virtualHeight = 400,
-  virtualItemHeight: _virtualItemHeight = 40,
+  virtualItemHeight = 40,
   autoVirtualThreshold = 10000,
   virtualThreshold = 1000,
   editable = false,
@@ -292,6 +293,21 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
   const effectiveVirtual = virtualRecommendation.enabled
 
+  // Row windowing: track the scroll position and compute the visible slice.
+  const [virtualScrollTop, setVirtualScrollTop] = useState(0)
+  const virtualWindow = useMemo(
+    () =>
+      effectiveVirtual
+        ? getTableVirtualWindow(
+            virtualScrollTop,
+            typeof virtualHeight === 'number' ? virtualHeight : 400,
+            virtualItemHeight,
+            ctx.paginatedData.length
+          )
+        : undefined,
+    [effectiveVirtual, virtualScrollTop, virtualHeight, virtualItemHeight, ctx.paginatedData.length]
+  )
+
   const wrapperStyle = useMemo(() => {
     if (effectiveVirtual) {
       return {
@@ -335,6 +351,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         maxHeight || (virtual ? virtualHeight : undefined)
       )}
       style={wrapperStyle}
+      onScroll={
+        effectiveVirtual
+          ? (e) => setVirtualScrollTop((e.target as HTMLDivElement).scrollTop)
+          : undefined
+      }
       data-tiger-virtual={virtualRecommendation.enabled ? 'enabled' : undefined}
       data-tiger-virtual-auto={virtualRecommendation.autoEnabled ? 'true' : undefined}
       data-tiger-virtual-recommended={virtualRecommendation.recommended ? 'true' : undefined}
@@ -419,7 +440,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           labels: tableLabels,
           rowClassName: internalRowClassName,
           rowDraggable,
-          interactiveRows: !!onRowClick || !!internalRowSelection
+          interactiveRows: !!onRowClick || !!internalRowSelection,
+          virtualWindow
         })}
         {renderSummaryRow(ctx, {
           size,

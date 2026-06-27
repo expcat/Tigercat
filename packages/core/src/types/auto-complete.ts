@@ -40,8 +40,12 @@ export interface AutoCompleteProps {
   filterOption?: boolean | ((inputValue: string, option: AutoCompleteOption) => boolean)
   /** Custom class name */
   className?: string
-  /** Whether to select the first match automatically when losing focus */
+  /** Whether to highlight the first matching option when the dropdown opens */
   defaultActiveFirstOption?: boolean
-  /** Whether to allow free-form text input (not limited to options) */
+  /**
+   * Whether to allow free-form text input not limited to the options.
+   * When `false`, the committed value is constrained to an existing option on
+   * blur/Enter — input that doesn't match any option is reverted (default: true).
+   */
   allowFreeInput?: boolean
 }

@@ -1103,6 +1103,26 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>> extends 
    * Page size change callback
    */
   onPageSizeChange?: (current: number, pageSize: number) => void
+  /**
+   * Search input change callback (toolbar-level).
+   */
+  onSearchChange?: (value: string) => void
+  /**
+   * Search submit callback (toolbar-level).
+   */
+  onSearch?: (value: string) => void
+  /**
+   * Filters change callback (toolbar-level).
+   */
+  onFiltersChange?: (filters: Record<string, TableToolbarFilterValue>) => void
+  /**
+   * Bulk action callback (toolbar-level).
+   */
+  onBulkAction?: (action: TableToolbarAction, selectedKeys: (string | number)[]) => void
+  /**
+   * Class applied to the inner table element.
+   */
+  tableClassName?: string
 }
 
 /**

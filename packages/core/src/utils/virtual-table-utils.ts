@@ -92,6 +92,68 @@ export function calculateVirtualRange(
   return { start, end, offsetTop, totalHeight }
 }
 
+/** Visible column window for horizontal (column) virtualization. */
+export interface VirtualColumnRange {
+  /** Start column index (inclusive) */
+  start: number
+  /** End column index (exclusive) */
+  end: number
+  /** Spacer width (px) before the rendered columns */
+  leftPad: number
+  /** Spacer width (px) after the rendered columns */
+  rightPad: number
+}
+
+/**
+ * Compute the visible column window for horizontal column virtualization.
+ *
+ * Columns without a numeric `width` fall back to `defaultColumnWidth`. Returns
+ * the column index range to render plus left/right spacer widths so the table
+ * keeps its full horizontal extent.
+ */
+export function calculateVirtualColumnRange(
+  scrollLeft: number,
+  viewportWidth: number,
+  columnWidths: number[],
+  overscan = 2
+): VirtualColumnRange {
+  const count = columnWidths.length
+  if (count === 0 || viewportWidth <= 0) {
+    return { start: 0, end: count, leftPad: 0, rightPad: 0 }
+  }
+  const safeScrollLeft = Math.max(0, Number.isFinite(scrollLeft) ? scrollLeft : 0)
+  const safeOverscan = Math.max(0, Math.floor(overscan))
+
+  let acc = 0
+  let rawStart = 0
+  for (let i = 0; i < count; i++) {
+    if (acc + columnWidths[i] > safeScrollLeft) {
+      rawStart = i
+      break
+    }
+    acc += columnWidths[i]
+    if (i === count - 1) rawStart = count - 1
+  }
+
+  const viewEnd = safeScrollLeft + viewportWidth
+  let endExclusive = rawStart
+  let endAcc = acc
+  while (endExclusive < count && endAcc < viewEnd) {
+    endAcc += columnWidths[endExclusive]
+    endExclusive++
+  }
+
+  const start = Math.max(0, rawStart - safeOverscan)
+  const end = Math.min(count, endExclusive + safeOverscan)
+
+  let leftPad = 0
+  for (let i = 0; i < start; i++) leftPad += columnWidths[i]
+  let rightPad = 0
+  for (let i = end; i < count; i++) rightPad += columnWidths[i]
+
+  return { start, end, leftPad, rightPad }
+}
+
 /**
  * Get the row key for a virtual table data item.
  */

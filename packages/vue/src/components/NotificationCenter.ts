@@ -167,17 +167,6 @@ export const NotificationCenter = defineComponent({
       { immediate: true }
     )
 
-    const _currentGroup = computed(() => {
-      const groups = resolvedGroups.value
-      if (groups.length === 0) return undefined
-      const activeKey = currentGroupKey.value
-      if (activeKey === undefined) return groups[0]
-      const matchedIndex = groups.findIndex(
-        (group, index) => getGroupKey(group, index) === activeKey
-      )
-      return matchedIndex >= 0 ? groups[matchedIndex] : groups[0]
-    })
-
     // --- Internal read-state management ---
     const readStateOverrides = ref(new Map<string | number, boolean>())
 

@@ -55,6 +55,16 @@ describe('Transfer', () => {
       // Target: 2 items (1, 2)
       expect(panels[1].querySelectorAll('[role="option"]').length).toBe(2)
     })
+
+    it('should split items by targetKeys alias when modelValue is absent', () => {
+      const { getAllByRole } = render(Transfer, {
+        props: { dataSource, targetKeys: ['1', '2'] }
+      })
+
+      const panels = getAllByRole('listbox')
+      expect(panels[0].querySelectorAll('[role="option"]').length).toBe(3)
+      expect(panels[1].querySelectorAll('[role="option"]').length).toBe(2)
+    })
   })
 
   describe('Transfer operations', () => {

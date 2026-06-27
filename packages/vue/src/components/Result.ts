@@ -11,7 +11,7 @@ import {
   resultExtraClasses,
   getResultColorScheme,
   getResultIconPath,
-  getResultHttpLabel,
+  isHttpResultStatus,
   type ResultStatus
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
@@ -52,7 +52,7 @@ export const Result = defineComponent({
   setup(props, { slots, attrs }) {
     const colors = computed(() => getResultColorScheme(props.status))
     const iconPath = computed(() => getResultIconPath(props.status))
-    const httpLabel = computed(() => getResultHttpLabel(props.status))
+    const httpLabel = computed(() => (isHttpResultStatus(props.status) ? props.status : undefined))
 
     const iconContainerClasses = computed(() =>
       classNames(resultIconContainerBaseClasses, colors.value.iconBg)

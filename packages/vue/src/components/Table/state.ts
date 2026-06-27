@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import {
   sortData,
-  filterData,
+  filterTableData,
   paginateData,
   calculatePagination,
   createTableRowKeyCache,
@@ -212,7 +212,7 @@ export function useTableState(
     if (props.filterMode === 'advanced' && (props.advancedFilterRules?.length ?? 0) > 0) {
       data = filterDataAdvanced(data, props.advancedFilterRules ?? [])
     } else {
-      data = filterData(data, filterState.value)
+      data = filterTableData(data, props.columns, filterState.value)
     }
 
     if (sortState.value.key && sortState.value.direction) {

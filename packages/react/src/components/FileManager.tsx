@@ -8,6 +8,7 @@ import {
   resolveFileOpen,
   sliceBreadcrumbPath,
   toFileDragItem,
+  applyFileDragReorder,
   formatFileSizeLabel,
   getFileManagerLabels,
   fileManagerToolbarClasses,
@@ -24,36 +25,14 @@ import {
   resolveLocaleText,
   mergeTigerLocale,
   type FileItem,
-  type FileViewMode,
   type FileSortField,
-  type FileSortOrder,
-  type TigerLocale
+  type FileManagerProps as CoreFileManagerProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface FileManagerProps {
-  files?: FileItem[]
-  viewMode?: FileViewMode
-  selectedKeys?: (string | number)[]
-  multiple?: boolean
-  sortField?: FileSortField
-  sortOrder?: FileSortOrder
-  currentPath?: string[]
-  showHidden?: boolean
-  draggable?: boolean
-  loading?: boolean
-  emptyText?: string
-  searchable?: boolean
-  searchText?: string
-  className?: string
-  onSelect?: (item: FileItem) => void
-  onOpen?: (item: FileItem) => void
-  onNavigate?: (path: string[]) => void
-  onSelectedKeysChange?: (keys: (string | number)[]) => void
-  onCurrentPathChange?: (path: string[]) => void
-  onSearchTextChange?: (text: string) => void
+export interface FileManagerProps extends CoreFileManagerProps {
+  /** Custom icon renderer */
   renderIcon?: (item: FileItem) => React.ReactNode
-  locale?: Partial<TigerLocale>
 }
 
 export const FileManager: React.FC<FileManagerProps> = ({
@@ -61,6 +40,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
   viewMode = 'list',
   selectedKeys = [],
   multiple = false,
+  columns,
   sortField = 'name',
   sortOrder = 'asc',
   currentPath = [],
@@ -77,6 +57,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
   onSelectedKeysChange,
   onCurrentPathChange,
   onSearchTextChange,
+  onReorder,
   renderIcon,
   locale
 }) => {
@@ -88,7 +69,14 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const [localSearch, setLocalSearch] = useState(searchText)
   const [focusedIndex, setFocusedIndex] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
+  const dragFromIndex = useRef<number | null>(null)
   const labels = useMemo(() => getFileManagerLabels(mergedLocale), [mergedLocale])
+
+  // Which meta columns the list view shows (name is always rendered).
+  const metaColumns = columns ?? ['size', 'modified']
+  const showSizeColumn = metaColumns.includes('size')
+  const showModifiedColumn = metaColumns.includes('modified')
+  const showTypeColumn = metaColumns.includes('type')
 
   const model = useMemo(
     () =>
@@ -243,6 +231,45 @@ export const FileManager: React.FC<FileManagerProps> = ({
     [firstEnabledIndex, focusItemAt, handleOpen, handleSelect, model.processedItems, moveFocus]
   )
 
+  const handleDragStart = useCallback(
+    (event: React.DragEvent<HTMLDivElement>, item: FileItem, index: number) => {
+      if (!draggable || item.disabled) return
+      dragFromIndex.current = index
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.setData('text/plain', String(toFileDragItem(item, index).id))
+    },
+    [draggable]
+  )
+
+  const handleDragOver = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      if (!draggable || dragFromIndex.current === null) return
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
+    },
+    [draggable]
+  )
+
+  const handleDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>, toIndex: number) => {
+      if (!draggable) return
+      const fromIndex = dragFromIndex.current
+      dragFromIndex.current = null
+      if (fromIndex === null || fromIndex === toIndex) return
+      event.preventDefault()
+      const items = model.processedItems
+      const reordered = applyFileDragReorder(items, {
+        item: toFileDragItem(items[fromIndex], fromIndex),
+        fromIndex,
+        toIndex,
+        fromContainerId: '',
+        toContainerId: ''
+      })
+      onReorder?.(reordered, fromIndex, toIndex)
+    },
+    [draggable, model.processedItems, onReorder]
+  )
+
   return (
     <div className={classNames(containerClasses)}>
       <div className={fileManagerToolbarClasses}>
@@ -291,7 +318,10 @@ export const FileManager: React.FC<FileManagerProps> = ({
                 onKeyDown={(event) => handleItemKeyDown(event, item, index)}
                 onClick={() => handleSelect(item)}
                 onDoubleClick={() => handleOpen(item)}
-                draggable={draggable && !item.disabled}>
+                draggable={draggable && !item.disabled}
+                onDragStart={(event) => handleDragStart(event, item, index)}
+                onDragOver={handleDragOver}
+                onDrop={(event) => handleDrop(event, index)}>
                 {renderIcon ? (
                   renderIcon(item)
                 ) : (
@@ -300,12 +330,15 @@ export const FileManager: React.FC<FileManagerProps> = ({
                   </span>
                 )}
                 <span className={fileManagerItemNameClasses}>{item.name}</span>
-                {viewMode === 'list' && item.size !== undefined && (
+                {viewMode === 'list' && showTypeColumn && (
+                  <span className={fileManagerItemMetaClasses}>{item.extension ?? item.type}</span>
+                )}
+                {viewMode === 'list' && showSizeColumn && item.size !== undefined && (
                   <span className={fileManagerItemMetaClasses}>
                     {formatFileSizeLabel(item.size)}
                   </span>
                 )}
-                {viewMode === 'list' && item.modified && (
+                {viewMode === 'list' && showModifiedColumn && item.modified && (
                   <span className={fileManagerItemMetaClasses}>{item.modified}</span>
                 )}
               </div>

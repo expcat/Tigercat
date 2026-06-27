@@ -145,6 +145,28 @@ export const AutoComplete = defineComponent({
       activeIndex.value = -1
     }
 
+    // When free input is disallowed, snap the committed value to an existing
+    // option on blur/Enter — reverting input that doesn't match any option.
+    function constrainToOption() {
+      if (props.allowFreeInput) return
+      const match = props.options.find((o) => !o.disabled && o.label === inputValue.value)
+      if (match) {
+        if (String(match.value) !== String(props.modelValue)) {
+          emit('update:modelValue', match.value)
+          emit('select', match.value, match)
+          emit('change', match.value)
+        }
+        return
+      }
+      const current = props.options.find((o) => String(o.value) === String(props.modelValue))
+      const revertLabel = current ? current.label : ''
+      if (revertLabel !== inputValue.value) {
+        inputValue.value = revertLabel
+        emit('update:modelValue', current ? current.value : '')
+        emit('change', current ? current.value : '')
+      }
+    }
+
     function handleInput(e: Event) {
       const val = (e.target as HTMLInputElement).value
       inputValue.value = val
@@ -196,6 +218,9 @@ export const AutoComplete = defineComponent({
           e.preventDefault()
           if (activeIndex.value >= 0 && activeIndex.value < options.length) {
             handleSelect(options[activeIndex.value])
+          } else {
+            constrainToOption()
+            closeDropdown()
           }
           break
         case 'Escape':
@@ -252,7 +277,8 @@ export const AutoComplete = defineComponent({
             autocomplete: 'off',
             onInput: handleInput,
             onFocus: openDropdown,
-            onKeydown: handleKeyDown
+            onKeydown: handleKeyDown,
+            onBlur: constrainToOption
           }),
 
           // Clear button
@@ -292,6 +318,7 @@ export const AutoComplete = defineComponent({
                         !!option.disabled,
                         props.size
                       ),
+                      onMousedown: (e: Event) => e.preventDefault(),
                       onClick: () => handleSelect(option),
                       onMouseenter: () => {
                         activeIndex.value = index

@@ -9,7 +9,7 @@ import {
   resultExtraClasses,
   getResultColorScheme,
   getResultIconPath,
-  getResultHttpLabel,
+  isHttpResultStatus,
   type ResultProps as CoreResultProps
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
@@ -36,7 +36,7 @@ export const Result: React.FC<ResultProps> = ({
 }) => {
   const colors = useMemo(() => getResultColorScheme(status), [status])
   const iconPath = useMemo(() => getResultIconPath(status), [status])
-  const httpLabel = useMemo(() => getResultHttpLabel(status), [status])
+  const httpLabel = useMemo(() => (isHttpResultStatus(status) ? status : undefined), [status])
 
   const wrapperClasses = useMemo(() => classNames(resultBaseClasses, className), [className])
 

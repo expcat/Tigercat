@@ -3,8 +3,10 @@ import {
   classNames,
   coerceClassValue,
   getChatMessageStatusInfo,
+  getChatStatusBarClasses,
   formatChatTime,
   mergeStyleValues,
+  type BadgeVariant,
   type ChatMessage,
   type ChatWindowProps as CoreChatWindowProps
 } from '@expcat/tigercat-core'
@@ -71,8 +73,8 @@ export const ChatWindow = defineComponent({
       type: String
     },
     statusVariant: {
-      type: String as PropType<string>,
-      default: 'info'
+      type: String as PropType<BadgeVariant>,
+      default: 'info' as BadgeVariant
     },
     showAvatar: {
       type: Boolean,
@@ -372,8 +374,7 @@ export const ChatWindow = defineComponent({
             ? h(
                 'div',
                 {
-                  class:
-                    'px-5 py-2 border-t border-[var(--tiger-border,#e5e7eb)] text-xs italic text-[var(--tiger-text-muted,#6b7280)] bg-[var(--tiger-surface-muted,#f9fafb)]'
+                  class: getChatStatusBarClasses(props.statusVariant)
                 },
                 props.statusText
               )

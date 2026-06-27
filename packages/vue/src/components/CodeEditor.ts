@@ -9,6 +9,8 @@ import {
   countLines,
   generateLineNumbers,
   handleTabKey,
+  getActiveLineIndex,
+  getCodeEditorActiveLineClasses,
   codeEditorTextareaClasses,
   codeEditorHighlightClasses,
   type CodeLanguage,
@@ -77,6 +79,13 @@ export const CodeEditor = defineComponent({
   setup(props, { emit, attrs }) {
     const internalValue = ref(props.defaultValue || '')
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
+    const activeLine = ref(0)
+
+    const updateActiveLine = () => {
+      const ta = textareaRef.value
+      if (!ta) return
+      activeLine.value = getActiveLineIndex(ta.value, ta.selectionStart)
+    }
 
     const code = computed(() => (props.value !== undefined ? props.value : internalValue.value))
 
@@ -111,10 +120,12 @@ export const CodeEditor = defineComponent({
     })
 
     const onInput = (e: Event) => {
-      const val = (e.target as HTMLTextAreaElement).value
+      const target = e.target as HTMLTextAreaElement
+      const val = target.value
       internalValue.value = val
       emit('update:value', val)
       emit('change', val)
+      activeLine.value = getActiveLineIndex(val, target.selectionStart)
     }
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -135,12 +146,19 @@ export const CodeEditor = defineComponent({
     }
 
     const renderHighlightedLine = (line: string, lineIndex: number) => {
+      const showActiveLine = props.highlightActiveLine && !props.disabled
+      const isActive = showActiveLine && lineIndex === activeLine.value
+      const lineClass = classNames(
+        'min-h-[1.625rem]',
+        isActive && getCodeEditorActiveLineClasses(props.theme)
+      )
       // Engine path: trusted HTML injected per-line.
       const engine = props.highlighter
       if (engine?.highlightLine) {
         return h('div', {
           key: lineIndex,
-          class: 'min-h-[1.625rem]',
+          class: lineClass,
+          'data-active-line': isActive ? '' : undefined,
           innerHTML:
             engine.highlightLine(line, props.language, props.theme) || (line === '' ? '\n' : '')
         })
@@ -151,10 +169,11 @@ export const CodeEditor = defineComponent({
         const cls = getTokenClasses(token.type, props.theme)
         return cls ? h('span', { class: cls, key: ti }, token.value) : token.value
       })
-      return h('div', { key: lineIndex, class: 'min-h-[1.625rem]' }, [
-        ...spans,
-        line === '' ? '\n' : null
-      ])
+      return h(
+        'div',
+        { key: lineIndex, class: lineClass, 'data-active-line': isActive ? '' : undefined },
+        [...spans, line === '' ? '\n' : null]
+      )
     }
 
     return () => {
@@ -197,6 +216,9 @@ export const CodeEditor = defineComponent({
         value: code.value,
         onInput,
         onKeydown: onKeyDown,
+        onSelect: updateActiveLine,
+        onClick: updateActiveLine,
+        onKeyup: updateActiveLine,
         readonly: props.readOnly || props.disabled,
         disabled: props.disabled,
         placeholder: props.placeholder,

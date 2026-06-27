@@ -5,6 +5,8 @@
  * additional metadata and operations.
  */
 
+import type { TigerLocale } from './locale'
+
 export type FileType = 'file' | 'folder'
 
 export type FileViewMode = 'list' | 'grid'
@@ -66,4 +68,23 @@ export interface FileManagerProps {
   searchText?: string
   /** Custom class */
   className?: string
+  /** Locale override merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+  /** Called when an item is selected */
+  onSelect?: (item: FileItem) => void
+  /** Called when an item is opened (file) */
+  onOpen?: (item: FileItem) => void
+  /** Called when navigating into a folder / breadcrumb */
+  onNavigate?: (path: string[]) => void
+  /** Called when the selected keys change */
+  onSelectedKeysChange?: (keys: (string | number)[]) => void
+  /** Called when the current path changes */
+  onCurrentPathChange?: (path: string[]) => void
+  /** Called when the search text changes */
+  onSearchTextChange?: (text: string) => void
+  /**
+   * Called when items are reordered via drag-and-drop (requires `draggable`).
+   * Receives the reordered list of currently displayed items.
+   */
+  onReorder?: (items: FileItem[], fromIndex: number, toIndex: number) => void
 }

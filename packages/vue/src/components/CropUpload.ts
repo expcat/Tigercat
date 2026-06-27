@@ -214,6 +214,7 @@ export const CropUpload = defineComponent({
         {
           open: modalVisible.value,
           size: 'lg',
+          width: props.modalWidth,
           title: props.modalTitle ?? labels.value.cropModalTitle,
           closable: true,
           maskClosable: false,

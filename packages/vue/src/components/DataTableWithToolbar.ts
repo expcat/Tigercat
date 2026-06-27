@@ -28,6 +28,10 @@ import {
   type RowSelectionConfig,
   type TableCardLayoutItem,
   type TableCardRenderContext,
+  type TableCardSelectionPosition,
+  type ExpandableConfig,
+  type FilterRule,
+  type TableExportFormat,
   type TigerLocale,
   type TigerLocaleInput,
   type TigerLocaleTable,
@@ -103,6 +107,27 @@ export interface VueDataTableWithToolbarProps {
   cardLayout?: TableCardLayoutItem[]
   cardClassName?: string | ((record: Record<string, unknown>, index: number) => string | undefined)
   renderCard?: (context: TableCardRenderContext<Record<string, unknown>>) => unknown
+  cardSelectionPosition?: TableCardSelectionPosition
+  cardPadding?: string | false
+  cardFieldGap?: string
+  expandable?: ExpandableConfig
+  virtual?: boolean
+  autoVirtual?: boolean
+  virtualHeight?: number
+  virtualItemHeight?: number
+  autoVirtualThreshold?: number
+  virtualThreshold?: number
+  editable?: boolean
+  editableCells?: Map<string, Set<number>>
+  filterMode?: 'basic' | 'advanced'
+  advancedFilterRules?: FilterRule[]
+  columnDraggable?: boolean
+  rowDraggable?: boolean
+  summaryRow?: { show: boolean; data: Record<string, unknown> }
+  groupBy?: string
+  exportable?: boolean
+  exportFormat?: TableExportFormat
+  exportFilename?: string
   toolbar?: VueTableToolbarProps
   pagination?: PaginationConfig | false
   tableLayout?: 'auto' | 'fixed'
@@ -228,6 +253,90 @@ export const DataTableWithToolbar = defineComponent({
       type: Function as PropType<
         (context: TableCardRenderContext<Record<string, unknown>>) => unknown
       >,
+      default: undefined
+    },
+    cardSelectionPosition: {
+      type: String as PropType<TableCardSelectionPosition>,
+      default: undefined
+    },
+    cardPadding: {
+      type: [String, Boolean] as PropType<string | false>,
+      default: undefined
+    },
+    cardFieldGap: {
+      type: String,
+      default: undefined
+    },
+    expandable: {
+      type: Object as PropType<ExpandableConfig>,
+      default: undefined
+    },
+    virtual: {
+      type: Boolean,
+      default: undefined
+    },
+    autoVirtual: {
+      type: Boolean,
+      default: undefined
+    },
+    virtualHeight: {
+      type: Number,
+      default: undefined
+    },
+    virtualItemHeight: {
+      type: Number,
+      default: undefined
+    },
+    autoVirtualThreshold: {
+      type: Number,
+      default: undefined
+    },
+    virtualThreshold: {
+      type: Number,
+      default: undefined
+    },
+    editable: {
+      type: Boolean,
+      default: undefined
+    },
+    editableCells: {
+      type: Object as PropType<Map<string, Set<number>>>,
+      default: undefined
+    },
+    filterMode: {
+      type: String as PropType<'basic' | 'advanced'>,
+      default: undefined
+    },
+    advancedFilterRules: {
+      type: Array as PropType<FilterRule[]>,
+      default: undefined
+    },
+    columnDraggable: {
+      type: Boolean,
+      default: undefined
+    },
+    rowDraggable: {
+      type: Boolean,
+      default: undefined
+    },
+    summaryRow: {
+      type: Object as PropType<{ show: boolean; data: Record<string, unknown> }>,
+      default: undefined
+    },
+    groupBy: {
+      type: String,
+      default: undefined
+    },
+    exportable: {
+      type: Boolean,
+      default: undefined
+    },
+    exportFormat: {
+      type: String as PropType<TableExportFormat>,
+      default: undefined
+    },
+    exportFilename: {
+      type: String,
       default: undefined
     },
     toolbar: {
@@ -831,6 +940,39 @@ export const DataTableWithToolbar = defineComponent({
         cardLayout: props.cardLayout,
         cardClassName: props.cardClassName,
         renderCard: props.renderCard,
+        // Forward advanced Table capabilities only when explicitly provided so
+        // Table's own defaults are preserved.
+        ...(props.cardSelectionPosition !== undefined
+          ? { cardSelectionPosition: props.cardSelectionPosition }
+          : {}),
+        ...(props.cardPadding !== undefined ? { cardPadding: props.cardPadding } : {}),
+        ...(props.cardFieldGap !== undefined ? { cardFieldGap: props.cardFieldGap } : {}),
+        ...(props.expandable !== undefined ? { expandable: props.expandable } : {}),
+        ...(props.virtual !== undefined ? { virtual: props.virtual } : {}),
+        ...(props.autoVirtual !== undefined ? { autoVirtual: props.autoVirtual } : {}),
+        ...(props.virtualHeight !== undefined ? { virtualHeight: props.virtualHeight } : {}),
+        ...(props.virtualItemHeight !== undefined
+          ? { virtualItemHeight: props.virtualItemHeight }
+          : {}),
+        ...(props.autoVirtualThreshold !== undefined
+          ? { autoVirtualThreshold: props.autoVirtualThreshold }
+          : {}),
+        ...(props.virtualThreshold !== undefined
+          ? { virtualThreshold: props.virtualThreshold }
+          : {}),
+        ...(props.editable !== undefined ? { editable: props.editable } : {}),
+        ...(props.editableCells !== undefined ? { editableCells: props.editableCells } : {}),
+        ...(props.filterMode !== undefined ? { filterMode: props.filterMode } : {}),
+        ...(props.advancedFilterRules !== undefined
+          ? { advancedFilterRules: props.advancedFilterRules }
+          : {}),
+        ...(props.columnDraggable !== undefined ? { columnDraggable: props.columnDraggable } : {}),
+        ...(props.rowDraggable !== undefined ? { rowDraggable: props.rowDraggable } : {}),
+        ...(props.summaryRow !== undefined ? { summaryRow: props.summaryRow } : {}),
+        ...(props.groupBy !== undefined ? { groupBy: props.groupBy } : {}),
+        ...(props.exportable !== undefined ? { exportable: props.exportable } : {}),
+        ...(props.exportFormat !== undefined ? { exportFormat: props.exportFormat } : {}),
+        ...(props.exportFilename !== undefined ? { exportFilename: props.exportFilename } : {}),
         class: props.bordered ? 'border-none rounded-none shadow-none' : undefined,
         onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys),
         onPageChange: handleTablePageChange

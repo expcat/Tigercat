@@ -32,6 +32,31 @@ export const codeEditorLineNumberLightClasses = 'bg-gray-50 border-gray-200 text
 
 export const codeEditorLineNumberDarkClasses = 'bg-gray-800 border-gray-700 text-gray-500'
 
+/** Active-line highlight background (light theme) */
+export const codeEditorActiveLineLightClasses = 'bg-gray-100'
+
+/** Active-line highlight background (dark theme) */
+export const codeEditorActiveLineDarkClasses = 'bg-gray-800/60'
+
+/**
+ * Background class for the active (caret) line, or '' when no highlight applies.
+ */
+export function getCodeEditorActiveLineClasses(theme: CodeEditorTheme): string {
+  return theme === 'dark' ? codeEditorActiveLineDarkClasses : codeEditorActiveLineLightClasses
+}
+
+/**
+ * Index (0-based) of the line containing the given caret position.
+ */
+export function getActiveLineIndex(value: string, caretPosition: number): number {
+  const clamped = Math.max(0, Math.min(caretPosition, value.length))
+  let line = 0
+  for (let i = 0; i < clamped; i++) {
+    if (value[i] === '\n') line++
+  }
+  return line
+}
+
 // ─── Token Types & Highlighting ─────────────────────────────────────
 
 export type TokenType = 'keyword' | 'string' | 'comment' | 'number' | 'punctuation' | 'plain'

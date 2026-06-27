@@ -64,13 +64,13 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   series,
   xScale: xScaleProp,
   yScale: yScaleProp,
-  areaColor: _areaColor = 'var(--tiger-primary,#2563eb)',
+  areaColor = 'var(--tiger-primary,#2563eb)',
   strokeWidth = 2,
   fillOpacity = 0.2,
   curve = 'linear',
   showPoints = false,
   pointSize = 4,
-  pointColor: _pointColor,
+  pointColor,
   stacked = false,
   showGrid = true,
   showAxis = true,
@@ -136,8 +136,14 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   )
 
   const resolvedSeries = useMemo<AreaChartSeries[]>(
-    () => resolveSeriesData<AreaChartDatum, AreaChartSeries>(series, data),
-    [series, data]
+    () =>
+      resolveSeriesData<AreaChartDatum, AreaChartSeries>(series, data, {
+        // Single-series colors (`areaColor`/`pointColor`) seed the synthesized
+        // series so they take effect when only `data` is provided.
+        color: areaColor,
+        pointColor
+      } as Partial<Omit<AreaChartSeries, 'data'>>),
+    [series, data, areaColor, pointColor]
   )
 
   // Use shared interaction hook for series-level interaction

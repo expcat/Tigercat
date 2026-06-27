@@ -445,10 +445,19 @@ export function cropCanvas(
   return { canvas, dataUrl }
 }
 
+/** Minimal touch-point shape for distance calculations. */
+export interface TouchPoint {
+  clientX: number
+  clientY: number
+}
+
 /**
- * Get touch distance for pinch-to-zoom
+ * Get the distance between two touch points for pinch-to-zoom.
+ *
+ * Accepts any object with `clientX`/`clientY` (native `Touch`, `PointerEvent`,
+ * synthetic points, etc.) so it can back every pinch implementation.
  */
-export function getTouchDistance(touch1: Touch, touch2: Touch): number {
+export function getTouchDistance(touch1: TouchPoint, touch2: TouchPoint): number {
   const dx = touch1.clientX - touch2.clientX
   const dy = touch1.clientY - touch2.clientY
   return Math.sqrt(dx * dx + dy * dy)

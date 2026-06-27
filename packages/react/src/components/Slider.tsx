@@ -9,7 +9,8 @@ import {
   getSliderTooltipClasses,
   sliderGetPercentage,
   sliderGetValueFromPosition,
-  sliderGetKeyboardValue
+  sliderGetKeyboardValue,
+  sliderResolveMarks
 } from '@expcat/tigercat-core'
 
 export interface SliderProps
@@ -280,7 +281,8 @@ export const Slider: React.FC<SliderProps> = ({
   const renderMarks = () => {
     if (!marks) return null
 
-    const marksObj = typeof marks === 'boolean' ? {} : marks
+    const marksObj = sliderResolveMarks(marks, min, max)
+    if (Object.keys(marksObj).length === 0) return null
 
     return (
       <div className="absolute w-full top-full mt-2">

@@ -11,13 +11,15 @@ description: Compact generated Tigercat Data props reference
 
 ## Calendar
 
-`packages/core/src/types/calendar.ts` · `CalendarProps` · 3/4 props
+`packages/core/src/types/calendar.ts` · `CalendarProps` · 3/6 props
 
-| Prop            | Type                      | Default | Notes                                             |
-| --------------- | ------------------------- | ------- | ------------------------------------------------- |
-| `mode?`         | `CalendarMode`            | `-`     | Calendar display mode                             |
-| `fullscreen?`   | `boolean`                 | `-`     | Whether the calendar is full-screen or card-style |
-| `disabledDate?` | `(date: Date) => boolean` | `-`     | Function that determines if a date is disabled    |
+| Prop      | Type                   | Default | Notes                                                  |
+| --------- | ---------------------- | ------- | ------------------------------------------------------ |
+| `locale?` | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale |
+| `value?`  | `Date`                 | `-`     | Currently selected date (controlled)                   |
+| `mode?`   | `CalendarMode`         | `-`     | Calendar display mode                                  |
+
+Events/callback props: `onChange?`, `onPanelChange?`.
 
 ## Collapse
 

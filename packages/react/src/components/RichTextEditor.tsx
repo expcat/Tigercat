@@ -57,7 +57,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   value,
   defaultValue = '',
   placeholder,
-  mode: _mode = 'html',
+  mode = 'html',
   toolbar,
   height = 300,
   readOnly = false,
@@ -82,6 +82,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     const instance = factory.create({
       element: editorRef.current,
       initialValue: isControlled ? value! : defaultValue,
+      mode,
       readOnly,
       disabled,
       placeholder,

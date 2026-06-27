@@ -66,6 +66,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
     notFoundText,
     filterOption = true,
     defaultActiveFirstOption = true,
+    allowFreeInput = true,
     locale,
     className,
     onChange,
@@ -124,6 +125,26 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
     setActiveIndex(-1)
   }
 
+  // When free input is disallowed, snap the committed value to an existing
+  // option on blur/Enter — reverting input that doesn't match any option.
+  function constrainToOption() {
+    if (allowFreeInput) return
+    const match = options.find((o) => !o.disabled && o.label === inputValue)
+    if (match) {
+      if (String(match.value) !== String(value)) {
+        onChange?.(match.value)
+        onSelect?.(match.value, match)
+      }
+      return
+    }
+    const current = options.find((o) => String(o.value) === String(value))
+    const revertLabel = current ? current.label : ''
+    if (revertLabel !== inputValue) {
+      setInputValue(revertLabel)
+      onChange?.(current ? current.value : '')
+    }
+  }
+
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value
     setInputValue(val)
@@ -174,6 +195,9 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
         e.preventDefault()
         if (activeIndex >= 0 && activeIndex < filteredOptions.length) {
           handleSelect(filteredOptions[activeIndex])
+        } else {
+          constrainToOption()
+          closeDropdown()
         }
         break
       case 'Escape':
@@ -211,6 +235,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
         onChange={handleInput}
         onFocus={openDropdown}
         onKeyDown={handleKeyDown}
+        onBlur={constrainToOption}
       />
 
       {showClearButton && (
@@ -244,6 +269,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
                 !!option.disabled,
                 size
               )}
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(option)}
               onMouseEnter={() => setActiveIndex(index)}>
               {option.label}

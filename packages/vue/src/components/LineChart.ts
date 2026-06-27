@@ -269,9 +269,13 @@ export const LineChart = defineComponent({
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
-    // Normalize series data
+    // Normalize series data. Single-series colors (`lineColor`/`pointColor`)
+    // seed the synthesized series so they apply when only `data` is provided.
     const resolvedSeries = computed<LineChartSeries[]>(() =>
-      resolveSeriesData(props.series, props.data)
+      resolveSeriesData(props.series, props.data, {
+        color: props.lineColor,
+        pointColor: props.pointColor
+      } as Partial<Omit<LineChartSeries, 'data'>>)
     )
 
     // Use shared interaction composable for series-level interaction

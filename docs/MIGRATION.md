@@ -4,6 +4,17 @@
 
 ## v1.4.0
 
+### `getResultHttpLabel` 标记为废弃
+
+`getResultHttpLabel(status)` 的返回值始终等于 HTTP status 本身；新代码请使用 `isHttpResultStatus(status)` 判断是否为 HTTP 结果状态，再按需直接使用原 status。
+
+```diff
+- const label = getResultHttpLabel(status)
++ const label = isHttpResultStatus(status) ? status : undefined
+```
+
+旧函数仍保留为兼容别名，本次不要求立即迁移。
+
 ### 跨端 API 对称：受控量 / 事件回调统一命名
 
 为消除受控量与事件回调的双端命名/对称不一致，以下三处做了破坏性改名。准则：受控 prop `X` → Vue `update:X`（可 `v-model:x`）/ React `on<X>Change`。

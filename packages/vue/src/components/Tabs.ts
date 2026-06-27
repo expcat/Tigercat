@@ -27,6 +27,7 @@ import {
   getGestureTouchPoint,
   resolveSwipeGesture,
   isKeyActive,
+  getNextActiveKey,
   tabAddButtonClasses,
   tabCloseButtonClasses,
   tabContentBaseClasses,
@@ -62,6 +63,8 @@ export interface VueTabsProps {
   closable?: boolean
   centered?: boolean
   destroyInactiveTabPane?: boolean
+  /** Whether inactive tab panes are mounted lazily (on first activation) */
+  lazy?: boolean
   swipeable?: boolean
   className?: string
   style?: Record<string, string | number>
@@ -465,6 +468,9 @@ export const Tabs = defineComponent({
     // Internal state for uncontrolled mode
     const internalActiveKey = ref<string | number | undefined>(props.defaultActiveKey)
     const swipeStart = ref<ReturnType<typeof getGestureTouchPoint> | null>(null)
+    // Snapshot of the rendered tab keys (updated each render); used by close
+    // handling to compute the next active key without re-walking slots.
+    let lastTabKeys: Array<string | number> = []
 
     // Computed active key (controlled or uncontrolled)
     const currentActiveKey = computed(() => {
@@ -489,6 +495,10 @@ export const Tabs = defineComponent({
     // Handle tab close
     const handleTabClose = (key: string | number, event: Event) => {
       event.stopPropagation()
+      // In uncontrolled mode, move the active key off a closed active tab.
+      if (props.activeKey === undefined && key === currentActiveKey.value) {
+        internalActiveKey.value = getNextActiveKey(key, currentActiveKey.value, lastTabKeys)
+      }
       emit('edit', { targetKey: key, action: 'remove' })
     }
 
@@ -634,6 +644,9 @@ export const Tabs = defineComponent({
       ) {
         internalActiveKey.value = firstTabKey
       }
+
+      // Snapshot keys for the close handler (next-active-key computation)
+      lastTabKeys = tabKeys
 
       // Compute resolvedActiveKey once for roving tabindex
       const resolvedActiveKey = currentActiveKey.value ?? firstTabKey

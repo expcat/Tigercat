@@ -119,7 +119,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## GaugeChart
 
-`packages/core/src/types/chart.ts` · `GaugeChartProps` · 3/15 props
+`packages/core/src/types/chart.ts` · `GaugeChartProps` · 3/16 props
 
 | Prop    | Type     | Default | Notes                      |
 | ------- | -------- | ------- | -------------------------- |

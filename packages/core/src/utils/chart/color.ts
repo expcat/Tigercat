@@ -120,3 +120,11 @@ export function getScatterHoverSize(baseSize: number): number {
  */
 export const SCATTER_ENTRANCE_KEYFRAMES = `@keyframes tiger-scatter-entrance{from{opacity:0;transform:scale(0)}60%{transform:scale(1.15)}to{opacity:1;transform:scale(1)}}@media (prefers-reduced-motion: reduce){.tiger-scatter-entrance{animation-duration:0ms;animation-delay:0ms}}`
 export const SCATTER_ENTRANCE_CLASS = 'tiger-scatter-entrance'
+
+/**
+ * CSS animation keyframes and class for the donut entrance animation.
+ * The animation scales/fades the chart in; reduced-motion users get no motion.
+ * Inject once via a <style> tag when `animated` is enabled.
+ */
+export const DONUT_ENTRANCE_KEYFRAMES = `@keyframes tiger-donut-entrance{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}.tiger-donut-entrance{transform-origin:center;animation:tiger-donut-entrance var(--tiger-motion-duration-slow,500ms) var(--tiger-motion-ease-spring,cubic-bezier(.34,1.56,.64,1)) both}@media (prefers-reduced-motion: reduce){.tiger-donut-entrance{animation-duration:0ms}}`
+export const DONUT_ENTRANCE_CLASS = 'tiger-donut-entrance'

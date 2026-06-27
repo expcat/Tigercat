@@ -3,6 +3,16 @@
  * @since 0.9.0
  */
 
+import {
+  clampScale,
+  getTouchDistance,
+  zoomInIconPath,
+  zoomOutIconPath,
+  prevIconPath,
+  nextIconPath,
+  previewCloseIconPath
+} from './image-utils'
+
 /**
  * ImageViewer backdrop classes
  */
@@ -46,23 +56,26 @@ export const imageViewerCounterClasses =
   'fixed top-4 left-1/2 -translate-x-1/2 z-50 text-white text-sm bg-[var(--tiger-surface,rgba(0,0,0,0.4))] rounded-full px-3 py-1'
 
 /**
- * SVG icon paths for ImageViewer
+ * SVG icon paths for ImageViewer.
+ *
+ * The shared paths (zoom/prev/next/close) reuse the single-source constants from
+ * `image-utils`; only the rotate icons are unique to the viewer.
  */
 export const imageViewerIcons = {
-  zoomIn: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7',
-  zoomOut: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7',
+  zoomIn: zoomInIconPath,
+  zoomOut: zoomOutIconPath,
   rotateLeft: 'M3 10h7V3M21 14h-7v7M16.7 7.3A8 8 0 004.1 9.9M7.3 16.7A8 8 0 0019.9 14.1',
   rotateRight: 'M14 10h7V3M10 14H3v7M7.3 7.3A8 8 0 0119.9 9.9M16.7 16.7A8 8 0 014.1 14.1',
-  close: 'M6 18L18 6M6 6l12 12',
-  prev: 'M15 19l-7-7 7-7',
-  next: 'M9 5l7 7-7 7'
+  close: previewCloseIconPath,
+  prev: prevIconPath,
+  next: nextIconPath
 }
 
 /**
- * Clamp zoom level within bounds
+ * Clamp zoom level within bounds (alias of the shared {@link clampScale}).
  */
 export function clampZoom(zoom: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, zoom))
+  return clampScale(zoom, min, max)
 }
 
 /**
@@ -169,18 +182,7 @@ export function movePan(pan: PanState, clientX: number, clientY: number): PanRes
 
 // ─── Pinch zoom (two-finger touch) ───────────────────────────────
 
-// Note: image-utils.ts exports getTouchDistance(Touch, Touch).
-// We use the same formula here but with a broader signature accepting
-// any object with clientX/clientY (works for Touch, PointerEvent, etc.)
-
-function touchDistance(
-  t1: { clientX: number; clientY: number },
-  t2: { clientX: number; clientY: number }
-): number {
-  const dx = t1.clientX - t2.clientX
-  const dy = t1.clientY - t2.clientY
-  return Math.sqrt(dx * dx + dy * dy)
-}
+// Pinch distance reuses the shared getTouchDistance from image-utils (single source).
 
 export interface PinchState {
   isPinching: boolean
@@ -205,7 +207,7 @@ export function startPinch(
 ): PinchState {
   return {
     isPinching: true,
-    initialDistance: touchDistance(t1, t2),
+    initialDistance: getTouchDistance(t1, t2),
     initialScale: currentScale
   }
 }
@@ -221,7 +223,7 @@ export function movePinch(
   maxZoom: number
 ): number {
   if (pinch.initialDistance === 0) return pinch.initialScale
-  const currentDistance = touchDistance(t1, t2)
+  const currentDistance = getTouchDistance(t1, t2)
   const ratio = currentDistance / pinch.initialDistance
   return clampZoom(pinch.initialScale * ratio, minZoom, maxZoom)
 }

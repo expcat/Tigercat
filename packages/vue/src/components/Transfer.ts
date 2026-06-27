@@ -13,6 +13,7 @@ import {
   getTransferButtonClasses,
   splitTransferData,
   filterTransferItems,
+  moveTransferItems,
   getPickerListboxAria,
   getPickerOptionAria,
   coerceClassValue,
@@ -52,7 +53,15 @@ export const Transfer = defineComponent({
   props: {
     modelValue: {
       type: Array as PropType<(string | number)[]>,
-      default: () => []
+      default: undefined
+    },
+    /**
+     * Target keys alias (core/shared name). Used when `modelValue` /
+     * `v-model` is not bound; `modelValue` takes priority.
+     */
+    targetKeys: {
+      type: Array as PropType<(string | number)[]>,
+      default: undefined
     },
     dataSource: {
       type: Array as PropType<TransferItem[]>,
@@ -103,11 +112,12 @@ export const Transfer = defineComponent({
     const sourceSearch = ref('')
     const targetSearch = ref('')
 
-    const { sourceItems: _sourceItems, targetItems: _targetItems } = computed(() =>
-      splitTransferData(props.dataSource, props.modelValue)
-    ).value
+    // `modelValue` (v-model) takes priority; `targetKeys` is the shared alias.
+    const resolvedTargetKeys = computed(() => props.modelValue ?? props.targetKeys ?? [])
 
-    const computedData = computed(() => splitTransferData(props.dataSource, props.modelValue))
+    const computedData = computed(() =>
+      splitTransferData(props.dataSource, resolvedTargetKeys.value)
+    )
 
     const filteredSourceItems = computed(() =>
       filterTransferItems(computedData.value.sourceItems, sourceSearch.value, props.filterOption)
@@ -157,28 +167,28 @@ export const Transfer = defineComponent({
 
     function moveRight() {
       if (!canMoveRight.value) return
-      const keysToMove = [...sourceSelectedKeys.value].filter((key) => {
-        const item = props.dataSource.find((d) => d.key === key)
-        return item && !item.disabled
-      })
-      const newTargetKeys = [...props.modelValue, ...keysToMove]
+      const { targetKeys: newTargetKeys, movedKeys } = moveTransferItems(
+        'right',
+        resolvedTargetKeys.value,
+        sourceSelectedKeys.value,
+        props.dataSource
+      )
       sourceSelectedKeys.value = new Set()
       emit('update:modelValue', newTargetKeys)
-      emit('change', newTargetKeys, 'right', keysToMove)
+      emit('change', newTargetKeys, 'right', movedKeys)
     }
 
     function moveLeft() {
       if (!canMoveLeft.value) return
-      const keysToRemove = new Set(
-        [...targetSelectedKeys.value].filter((key) => {
-          const item = props.dataSource.find((d) => d.key === key)
-          return item && !item.disabled
-        })
+      const { targetKeys: newTargetKeys, movedKeys } = moveTransferItems(
+        'left',
+        resolvedTargetKeys.value,
+        targetSelectedKeys.value,
+        props.dataSource
       )
-      const newTargetKeys = props.modelValue.filter((k) => !keysToRemove.has(k))
       targetSelectedKeys.value = new Set()
       emit('update:modelValue', newTargetKeys)
-      emit('change', newTargetKeys, 'left', [...keysToRemove])
+      emit('change', newTargetKeys, 'left', movedKeys)
     }
 
     function renderPanel(

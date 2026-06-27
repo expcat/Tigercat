@@ -1,4 +1,4 @@
-import type { TransferItem, TransferSize } from '../types/transfer'
+import type { TransferItem, TransferSize, TransferDirection } from '../types/transfer'
 import { classNames } from './class-names'
 
 // ============================================================================
@@ -117,6 +117,44 @@ export function splitTransferData(
   }
 
   return { sourceItems, targetItems }
+}
+
+/**
+ * Result of a transfer move operation.
+ */
+export interface TransferMoveResult {
+  /** The next set of target keys after the move */
+  targetKeys: (string | number)[]
+  /** The keys that were actually moved (disabled items are skipped) */
+  movedKeys: (string | number)[]
+}
+
+/**
+ * Compute the next target keys and moved keys for a transfer move.
+ *
+ * Disabled items in `dataSource` are never moved. Moving `'right'` appends the
+ * (enabled) selected keys to `targetKeys`; moving `'left'` removes them.
+ */
+export function moveTransferItems(
+  direction: TransferDirection,
+  targetKeys: (string | number)[],
+  selectedKeys: Iterable<string | number>,
+  dataSource: TransferItem[]
+): TransferMoveResult {
+  const disabledKeys = new Set<string | number>()
+  for (const item of dataSource) {
+    if (item.disabled) disabledKeys.add(item.key)
+  }
+  const dataKeys = new Set<string | number>(dataSource.map((item) => item.key))
+
+  const movedKeys = [...selectedKeys].filter((key) => dataKeys.has(key) && !disabledKeys.has(key))
+
+  if (direction === 'right') {
+    return { targetKeys: [...targetKeys, ...movedKeys], movedKeys }
+  }
+
+  const movedSet = new Set(movedKeys)
+  return { targetKeys: targetKeys.filter((key) => !movedSet.has(key)), movedKeys }
 }
 
 /**

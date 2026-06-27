@@ -40,6 +40,33 @@ export function sliderNormalizeValue(
 }
 
 /**
+ * Resolve the `marks` prop into a concrete `{ value: label }` map.
+ *
+ * - An object is returned as-is.
+ * - `true` derives default marks at `min` and `max` (labelled with their values).
+ * - `false`/undefined yields an empty map (no marks).
+ *
+ * @example
+ * sliderResolveMarks(true, 0, 100) // => { 0: '0', 100: '100' }
+ * sliderResolveMarks({ 50: 'mid' }, 0, 100) // => { 50: 'mid' }
+ * sliderResolveMarks(false, 0, 100) // => {}
+ */
+export function sliderResolveMarks(
+  marks: boolean | Record<number, string> | undefined,
+  min: number,
+  max: number
+): Record<number, string> {
+  if (!marks) return {}
+  if (typeof marks === 'object') return marks
+  const safeMin = Number.isFinite(min) ? min : 0
+  const safeMax = Number.isFinite(max) ? max : safeMin
+  const lower = Math.min(safeMin, safeMax)
+  const upper = Math.max(safeMin, safeMax)
+  if (lower === upper) return { [lower]: String(lower) }
+  return { [lower]: String(lower), [upper]: String(upper) }
+}
+
+/**
  * Convert a value to percentage based on min/max range
  *
  * @param value - Current value

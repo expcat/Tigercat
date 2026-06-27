@@ -1871,6 +1871,12 @@ export interface GaugeChartProps extends BaseChartProps, ChartTooltipProps {
   valueFormatter?: (value: number) => string
 
   /**
+   * Tooltip content formatter. Receives the current value; defaults to the
+   * formatted value (prefixed with `label` when present).
+   */
+  tooltipFormatter?: (value: number) => string
+
+  /**
    * Label shown below the value
    */
   label?: string

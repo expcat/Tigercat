@@ -159,6 +159,21 @@ describe('RichTextEditor', () => {
       fireEvent.input(editor)
       expect(onChange).toHaveBeenCalled()
     })
+
+    it('should render markdown mode content through the engine', () => {
+      const { container } = renderEditor({ value: '# Title', mode: 'markdown' })
+      const editor = container.querySelector('[role="textbox"]') as HTMLElement
+      expect(editor.innerHTML).toContain('<h1>Title</h1>')
+    })
+
+    it('should emit plain mode content as text', () => {
+      const onChange = vi.fn()
+      const { container } = renderEditor({ value: 'Hello', mode: 'plain', onChange })
+      const editor = container.querySelector('[role="textbox"]') as HTMLElement
+      editor.innerHTML = '<p>Hello <strong>world</strong></p>'
+      fireEvent.input(editor)
+      expect(onChange).toHaveBeenCalledWith('Hello world')
+    })
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {

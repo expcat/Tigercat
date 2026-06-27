@@ -14,6 +14,8 @@ import {
   flattenSelectOptions,
   resolveCreatableSelectOption,
   resolveSelectFilteredOptions,
+  getSelectVirtualItemHeight,
+  fixedSizeStrategy,
   getPickerOptionAria,
   findFirstEnabledIndex as pickerFindFirstEnabledIndex,
   findLastEnabledIndex as pickerFindLastEnabledIndex,
@@ -250,6 +252,20 @@ export const Select = defineComponent({
     const dropdownRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const searchInputRef = ref<HTMLInputElement | null>(null)
+    // Virtual scrolling (flat options only)
+    const virtualScrollTop = ref(0)
+    const virtualScrollRef = ref<HTMLElement | null>(null)
+    // Keep the active option within the virtual scroll window during keyboard nav.
+    watch(activeIndex, (idx) => {
+      if (!props.virtual || idx < 0) return
+      const el = virtualScrollRef.value
+      if (!el) return
+      const itemH = getSelectVirtualItemHeight(props.size)
+      const top = idx * itemH
+      if (top < el.scrollTop) el.scrollTop = top
+      else if (top + itemH > el.scrollTop + props.listHeight)
+        el.scrollTop = top + itemH - props.listHeight
+    })
     let searchDebouncer: SelectSearchDebouncer = createSelectSearchDebouncer({
       delay: props.searchDebounce,
       onSearch: (query) => emit('search', query)
@@ -767,6 +783,57 @@ export const Select = defineComponent({
                             h('span', displayLabel),
                             selected && h('span', CheckIcon)
                           ])
+                        ]
+                      )
+                    }
+
+                    const hasGroups = filteredOptions.value.some(isOptionGroup)
+
+                    // Virtual mode: only for flat option lists (no groups).
+                    if (props.virtual && !hasGroups) {
+                      const flat = filteredOptions.value.filter(
+                        (o): o is SelectOption => !isOptionGroup(o)
+                      )
+                      const all = creatableOption.value ? [...flat, creatableOption.value] : flat
+                      const itemH = getSelectVirtualItemHeight(props.size)
+                      const { startIndex, endIndex, totalHeight } = fixedSizeStrategy(
+                        itemH
+                      ).getRange(virtualScrollTop.value, props.listHeight, all.length, 5)
+                      const visible = []
+                      for (let i = startIndex; i <= endIndex; i++) {
+                        const isCreate = creatableOption.value && i === all.length - 1
+                        visible.push(
+                          renderOptionItem(
+                            all[i],
+                            i,
+                            isCreate
+                              ? getCreateSelectOptionLabel(all[i], props.createOptionText)
+                              : all[i].label
+                          )
+                        )
+                      }
+                      return h(
+                        'div',
+                        {
+                          ref: virtualScrollRef,
+                          'data-tiger-select-virtual': '',
+                          style: { maxHeight: `${props.listHeight}px`, overflowY: 'auto' },
+                          onScroll: (e: Event) => {
+                            virtualScrollTop.value = (e.target as HTMLElement).scrollTop
+                          }
+                        },
+                        [
+                          h(
+                            'div',
+                            { style: { height: `${totalHeight}px`, position: 'relative' } },
+                            [
+                              h(
+                                'div',
+                                { style: { transform: `translateY(${startIndex * itemH}px)` } },
+                                visible
+                              )
+                            ]
+                          )
                         ]
                       )
                     }

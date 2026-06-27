@@ -19,6 +19,7 @@ import {
   getTransferButtonClasses,
   splitTransferData,
   filterTransferItems,
+  moveTransferItems,
   getPickerListboxAria,
   getPickerOptionAria,
   classNames,
@@ -44,6 +45,7 @@ export interface TransferProps
 
 const TRANSFER_KEYS = new Set<string>([
   'value',
+  'targetKeys',
   'dataSource',
   'size',
   'disabled',
@@ -57,7 +59,8 @@ const TRANSFER_KEYS = new Set<string>([
 
 export const Transfer: React.FC<TransferProps> = (props) => {
   const {
-    value = [],
+    value,
+    targetKeys,
     dataSource = [],
     size = 'md',
     disabled = false,
@@ -71,6 +74,10 @@ export const Transfer: React.FC<TransferProps> = (props) => {
     locale,
     ...rest
   } = props
+
+  // `value` is the primary controlled prop; `targetKeys` (core/shared name) is
+  // accepted as an alias with lower priority.
+  const resolvedValue = value ?? targetKeys ?? []
 
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -91,8 +98,8 @@ export const Transfer: React.FC<TransferProps> = (props) => {
   const [targetSearch, setTargetSearch] = useState('')
 
   const { sourceItems, targetItems } = useMemo(
-    () => splitTransferData(dataSource, value),
-    [dataSource, value]
+    () => splitTransferData(dataSource, resolvedValue),
+    [dataSource, resolvedValue]
   )
 
   const filteredSourceItems = useMemo(
@@ -139,26 +146,26 @@ export const Transfer: React.FC<TransferProps> = (props) => {
 
   function moveRight() {
     if (!canMoveRight) return
-    const keysToMove = [...sourceSelectedKeys].filter((key) => {
-      const item = dataSource.find((d) => d.key === key)
-      return item && !item.disabled
-    })
-    const newTargetKeys = [...value, ...keysToMove]
+    const { targetKeys: newTargetKeys, movedKeys } = moveTransferItems(
+      'right',
+      resolvedValue,
+      sourceSelectedKeys,
+      dataSource
+    )
     setSourceSelectedKeys(new Set())
-    onChange?.(newTargetKeys, 'right', keysToMove)
+    onChange?.(newTargetKeys, 'right', movedKeys)
   }
 
   function moveLeft() {
     if (!canMoveLeft) return
-    const keysToRemove = new Set(
-      [...targetSelectedKeys].filter((key) => {
-        const item = dataSource.find((d) => d.key === key)
-        return item && !item.disabled
-      })
+    const { targetKeys: newTargetKeys, movedKeys } = moveTransferItems(
+      'left',
+      resolvedValue,
+      targetSelectedKeys,
+      dataSource
     )
-    const newTargetKeys = value.filter((k) => !keysToRemove.has(k))
     setTargetSelectedKeys(new Set())
-    onChange?.(newTargetKeys, 'left', [...keysToRemove])
+    onChange?.(newTargetKeys, 'left', movedKeys)
   }
 
   function renderPanel(

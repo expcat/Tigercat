@@ -112,8 +112,8 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
 
   const flattenedOptions = useMemo(() => {
     if (!showSearch) return []
-    return flattenCascaderOptions(options)
-  }, [showSearch, options])
+    return flattenCascaderOptions(options, [], [], changeOnSelect)
+  }, [showSearch, options, changeOnSelect])
 
   const searchResults = useMemo(() => {
     if (!isSearchMode) return []
@@ -314,7 +314,9 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                       disabled: item.disabled
                     })}
                     onClick={() => handleSearchResultClick(item.valuePath, item.disabled)}>
-                    {item.label}
+                    {typeof showSearch === 'object' && showSearch.render
+                      ? showSearch.render(searchQuery, item.path)
+                      : item.label}
                   </div>
                 ))}
               </div>

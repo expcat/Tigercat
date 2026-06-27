@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, PropType } from 'vue'
+import { defineComponent, h, ref, computed, onMounted, onUpdated, PropType } from 'vue'
 import {
   virtualListContainerClasses,
   virtualListInnerClasses,
@@ -27,12 +27,21 @@ export const VirtualList = defineComponent({
       default: undefined
     },
     height: { type: Number, default: 400 },
-    overscan: { type: Number, default: 5 }
+    overscan: { type: Number, default: 5 },
+    /** Custom class name (merged with the `class` attribute) */
+    className: { type: String, default: undefined }
   },
   emits: ['scroll'],
   setup(props, { emit, attrs, slots }) {
     const scrollTop = ref(0)
+    // Bumped after DOM measurement so the range/offsets recompute (dynamic mode).
+    const measureVersion = ref(0)
     const containerRef = ref<HTMLElement | null>(null)
+    const itemEls = new Map<number, HTMLElement>()
+
+    const isDynamic = computed(
+      () => !props.sizeStrategy && !props.getItemHeight && props.estimatedItemHeight !== undefined
+    )
 
     const strategy = computed<VirtualListSizeStrategy>(() => {
       if (props.sizeStrategy) return props.sizeStrategy
@@ -45,9 +54,29 @@ export const VirtualList = defineComponent({
       return fixedSizeStrategy(props.itemHeight)
     })
 
-    const range = computed(() =>
-      strategy.value.getRange(scrollTop.value, props.height, props.itemCount, props.overscan)
-    )
+    const range = computed(() => {
+      // Touch measureVersion so re-measured heights recompute the window.
+      void measureVersion.value
+      return strategy.value.getRange(scrollTop.value, props.height, props.itemCount, props.overscan)
+    })
+
+    function measureDynamic() {
+      if (!isDynamic.value) return
+      const strat = strategy.value
+      if (!strat.updateItemHeight) return
+      let changed = false
+      itemEls.forEach((el, i) => {
+        const measured = el.offsetHeight
+        if (measured > 0 && measured !== strat.getItemHeight(i)) {
+          strat.updateItemHeight!(i, measured)
+          changed = true
+        }
+      })
+      if (changed) measureVersion.value += 1
+    }
+
+    onMounted(measureDynamic)
+    onUpdated(measureDynamic)
 
     function handleScroll() {
       if (containerRef.value) {
@@ -61,18 +90,26 @@ export const VirtualList = defineComponent({
       const currentStrategy = strategy.value
       const items: ReturnType<typeof h>[] = []
 
+      const dynamic = isDynamic.value
+      if (dynamic) itemEls.clear()
       for (let i = startIndex; i <= endIndex; i++) {
         const itemH = currentStrategy.getItemHeight(i)
         const slotContent = slots.default?.({ index: i })
+        const index = i
         items.push(
           h(
             'div',
             {
-              key: i,
-              style: {
-                height: `${itemH}px`,
-                width: '100%'
-              }
+              key: index,
+              // Auto height in dynamic mode so real content height is measurable.
+              style: dynamic ? { width: '100%' } : { height: `${itemH}px`, width: '100%' },
+              ref: dynamic
+                ? (el: unknown) => {
+                    if (el)
+                      itemEls.set(index, (el as { $el?: HTMLElement }).$el ?? (el as HTMLElement))
+                    else itemEls.delete(index)
+                  }
+                : undefined
             },
             slotContent
           )
@@ -85,7 +122,11 @@ export const VirtualList = defineComponent({
         'div',
         {
           ref: containerRef,
-          class: classNames(virtualListContainerClasses, coerceClassValue(attrs.class)),
+          class: classNames(
+            virtualListContainerClasses,
+            props.className,
+            coerceClassValue(attrs.class)
+          ),
           style: { height: `${props.height}px` },
           onScroll: handleScroll
         },

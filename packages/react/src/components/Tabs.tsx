@@ -23,6 +23,7 @@ import {
   getGestureTouchPoint,
   resolveSwipeGesture,
   isKeyActive,
+  getNextActiveKey,
   tabAddButtonClasses,
   tabCloseButtonClasses,
   tabContentBaseClasses,
@@ -507,9 +508,15 @@ export const Tabs: React.FC<TabsProps> = ({
     (key: string | number, event: React.SyntheticEvent) => {
       event.stopPropagation()
 
+      // In uncontrolled mode, move the active key off a closed active tab so the
+      // tablist keeps a valid selection after removal.
+      if (controlledActiveKey === undefined && key === activeKey) {
+        setInternalActiveKey(getNextActiveKey(key, activeKey, tabKeys))
+      }
+
       onEdit?.({ targetKey: key, action: 'remove' })
     },
-    [onEdit]
+    [onEdit, controlledActiveKey, activeKey, tabKeys]
   )
 
   const handleTabAdd = useCallback(() => {

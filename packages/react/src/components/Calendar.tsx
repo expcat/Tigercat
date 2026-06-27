@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { classNames } from '@expcat/tigercat-core'
-import type { CalendarMode, TigerLocale } from '@expcat/tigercat-core'
+import type { CalendarProps as CoreCalendarProps } from '@expcat/tigercat-core'
 import {
   getCalendarContainerClasses,
   calendarHeaderClasses,
@@ -22,16 +22,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface CalendarProps {
-  value?: Date
-  mode?: CalendarMode
-  fullscreen?: boolean
-  disabledDate?: (date: Date) => boolean
-  locale?: Partial<TigerLocale>
-  onChange?: (date: Date) => void
-  onPanelChange?: (date: Date, mode: CalendarMode) => void
-  className?: string
-}
+export type CalendarProps = CoreCalendarProps
 
 export const Calendar: React.FC<CalendarProps> = ({
   value,

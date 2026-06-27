@@ -68,6 +68,8 @@ export interface SelectContext {
   // resolved view props
   isMultiple: boolean
   size: SelectSize
+  virtual: boolean
+  listHeight: number
   disabled: boolean
   placeholder: string
   searchable: boolean

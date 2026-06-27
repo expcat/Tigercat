@@ -41,13 +41,13 @@ description: Compact generated Tigercat Basic props reference
 
 ## Badge
 
-`packages/core/src/types/badge.ts` · `BadgeProps` · 3/9 props
+`packages/core/src/types/badge.ts` · `BadgeProps` · 3/10 props
 
-| Prop       | Type           | Default    | Notes               |
-| ---------- | -------------- | ---------- | ------------------- |
-| `variant?` | `BadgeVariant` | `'danger'` | Badge variant style |
-| `size?`    | `BadgeSize`    | `'md'`     | Badge size          |
-| `type?`    | `BadgeType`    | `'number'` | Badge display type  |
+| Prop       | Type                   | Default    | Notes                                                   |
+| ---------- | ---------------------- | ---------- | ------------------------------------------------------- |
+| `locale?`  | `Partial<TigerLocale>` | `-`        | Locale override merged on top of ConfigProvider locale. |
+| `variant?` | `BadgeVariant`         | `'danger'` | Badge variant style                                     |
+| `size?`    | `BadgeSize`            | `'md'`     | Badge size                                              |
 
 ## Button
 
@@ -90,13 +90,13 @@ description: Compact generated Tigercat Basic props reference
 
 ## CropUpload
 
-`packages/core/src/types/image.ts` · `CropUploadProps` · 3/7 props
+`packages/core/src/types/image.ts` · `CropUploadProps` · 3/8 props
 
-| Prop        | Type      | Default     | Notes                             |
-| ----------- | --------- | ----------- | --------------------------------- |
-| `accept?`   | `string`  | `'image/*'` | Accepted file types               |
-| `disabled?` | `boolean` | `false`     | Whether the component is disabled |
-| `maxSize?`  | `number`  | `-`         | Maximum file size in bytes        |
+| Prop        | Type                   | Default     | Notes                                                   |
+| ----------- | ---------------------- | ----------- | ------------------------------------------------------- |
+| `locale?`   | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
+| `accept?`   | `string`               | `'image/*'` | Accepted file types                                     |
+| `disabled?` | `boolean`              | `false`     | Whether the component is disabled                       |
 
 ## Divider
 
@@ -110,13 +110,13 @@ description: Compact generated Tigercat Basic props reference
 
 ## Empty
 
-`packages/core/src/types/empty.ts` · `EmptyProps` · 3/4 props
+`packages/core/src/types/empty.ts` · `EmptyProps` · 3/5 props
 
-| Prop           | Type          | Default     | Notes                                         |
-| -------------- | ------------- | ----------- | --------------------------------------------- |
-| `preset?`      | `EmptyPreset` | `'default'` | Preset empty state style                      |
-| `description?` | `string`      | `-`         | Description text below the illustration       |
-| `showImage?`   | `boolean`     | `true`      | Whether to show the built-in SVG illustration |
+| Prop           | Type                   | Default     | Notes                                                   |
+| -------------- | ---------------------- | ----------- | ------------------------------------------------------- |
+| `locale?`      | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
+| `preset?`      | `EmptyPreset`          | `'default'` | Preset empty state style                                |
+| `description?` | `string`               | `-`         | Description text below the illustration                 |
 
 ## Icon
 
@@ -172,13 +172,13 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## ImageCropper
 
-`packages/core/src/types/image.ts` · `ImageCropperProps` · 3/8 props
+`packages/core/src/types/image.ts` · `ImageCropperProps` · 3/9 props
 
-| Prop           | Type     | Default | Notes                                                                   |
-| -------------- | -------- | ------- | ----------------------------------------------------------------------- |
-| `src`          | `string` | `-`     | Image source URL to crop                                                |
-| `aspectRatio?` | `number` | `-`     | Fixed aspect ratio (width / height). Leave undefined for free cropping. |
-| `minWidth?`    | `number` | `20`    | Minimum crop width in pixels                                            |
+| Prop           | Type                   | Default | Notes                                                                   |
+| -------------- | ---------------------- | ------- | ----------------------------------------------------------------------- |
+| `locale?`      | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale.                 |
+| `src`          | `string`               | `-`     | Image source URL to crop                                                |
+| `aspectRatio?` | `number`               | `-`     | Fixed aspect ratio (width / height). Leave undefined for free cropping. |
 
 ## ImageGroup
 
@@ -190,13 +190,13 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## ImagePreview
 
-`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/8 props
+`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/9 props
 
-| Prop            | Type       | Default | Notes                                         |
-| --------------- | ---------- | ------- | --------------------------------------------- |
-| `open?`         | `boolean`  | `-`     | Whether the preview is open                   |
-| `images`        | `string[]` | `-`     | Array of image URLs to preview                |
-| `currentIndex?` | `number`   | `0`     | Current image index (for multi-image preview) |
+| Prop      | Type                   | Default | Notes                                                   |
+| --------- | ---------------------- | ------- | ------------------------------------------------------- |
+| `locale?` | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale. |
+| `open?`   | `boolean`              | `-`     | Whether the preview is open                             |
+| `images`  | `string[]`             | `-`     | Array of image URLs to preview                          |
 
 ## Link
 
@@ -260,13 +260,13 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## Tag
 
-`packages/core/src/types/tag.ts` · `TagProps` · 3/4 props
+`packages/core/src/types/tag.ts` · `TagProps` · 3/5 props
 
-| Prop        | Type         | Default     | Notes                         |
-| ----------- | ------------ | ----------- | ----------------------------- |
-| `variant?`  | `TagVariant` | `'default'` | Tag variant style             |
-| `size?`     | `TagSize`    | `'md'`      | Tag size                      |
-| `closable?` | `boolean`    | `false`     | Whether the tag can be closed |
+| Prop       | Type                   | Default     | Notes                                                   |
+| ---------- | ---------------------- | ----------- | ------------------------------------------------------- |
+| `locale?`  | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
+| `variant?` | `TagVariant`           | `'default'` | Tag variant style                                       |
+| `size?`    | `TagSize`              | `'md'`      | Tag size                                                |
 
 ## Text
 

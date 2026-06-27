@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { createContext, useContext, useState, useMemo, useCallback } from 'react'
 import ReactDOM from 'react-dom'
 import {
   classNames,
@@ -9,9 +9,14 @@ import {
   floatButtonTypeClasses,
   floatButtonDisabledClasses,
   floatButtonGroupClasses,
+  type FloatButtonShape,
   type FloatButtonProps as CoreFloatButtonProps,
   type FloatButtonGroupProps as CoreFloatButtonGroupProps
 } from '@expcat/tigercat-core'
+
+// Group context — lets FloatButtonGroup share its `shape` with child buttons
+// that don't set their own.
+const FloatButtonGroupContext = createContext<{ shape?: FloatButtonShape } | null>(null)
 
 // ---------------------------------------------------------------------------
 // FloatButton
@@ -26,7 +31,7 @@ export interface FloatButtonProps
 }
 
 export const FloatButton: React.FC<FloatButtonProps> = ({
-  shape = 'circle',
+  shape,
   size = 'md',
   type = 'primary',
   tooltip,
@@ -37,17 +42,20 @@ export const FloatButton: React.FC<FloatButtonProps> = ({
   onClick,
   ...props
 }) => {
+  const group = useContext(FloatButtonGroupContext)
+  // Explicit shape wins; otherwise inherit the group shape, else default.
+  const resolvedShape: FloatButtonShape = shape ?? group?.shape ?? 'circle'
   const classes = useMemo(
     () =>
       classNames(
         floatButtonBaseClasses,
-        floatButtonShapeClasses[shape],
+        floatButtonShapeClasses[resolvedShape],
         floatButtonSizeClasses[size],
         floatButtonTypeClasses[type],
         disabled && floatButtonDisabledClasses,
         className
       ),
-    [shape, size, type, disabled, className]
+    [resolvedShape, size, type, disabled, className]
   )
 
   return (
@@ -79,7 +87,7 @@ export interface FloatButtonGroupProps
 }
 
 export const FloatButtonGroup: React.FC<FloatButtonGroupProps> = ({
-  shape: _shape = 'circle',
+  shape: groupShape,
   trigger = 'click',
   open: controlledOpen,
   triggerNode,
@@ -88,6 +96,7 @@ export const FloatButtonGroup: React.FC<FloatButtonGroupProps> = ({
   onOpenChange,
   ...props
 }) => {
+  const groupContextValue = useMemo(() => ({ shape: groupShape }), [groupShape])
   const [internalOpen, setInternalOpen] = useState(false)
   const isOpen = controlledOpen ?? internalOpen
 
@@ -112,14 +121,16 @@ export const FloatButtonGroup: React.FC<FloatButtonGroupProps> = ({
   if (!isBrowser()) return null
 
   const content = (
-    <div
-      className={groupClasses}
-      onMouseEnter={trigger === 'hover' ? handleMouseEnter : undefined}
-      onMouseLeave={trigger === 'hover' ? handleMouseLeave : undefined}
-      {...props}>
-      {triggerNode && <div onClick={trigger === 'click' ? toggle : undefined}>{triggerNode}</div>}
-      {isOpen && children}
-    </div>
+    <FloatButtonGroupContext.Provider value={groupContextValue}>
+      <div
+        className={groupClasses}
+        onMouseEnter={trigger === 'hover' ? handleMouseEnter : undefined}
+        onMouseLeave={trigger === 'hover' ? handleMouseLeave : undefined}
+        {...props}>
+        {triggerNode && <div onClick={trigger === 'click' ? toggle : undefined}>{triggerNode}</div>}
+        {isOpen && children}
+      </div>
+    </FloatButtonGroupContext.Provider>
   )
 
   return ReactDOM.createPortal(content, document.body)

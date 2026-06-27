@@ -16,7 +16,11 @@ import { Button } from './Button'
 import { Textarea } from './Textarea'
 import { Text } from './Text'
 
-export interface VueCommentThreadProps extends CoreCommentThreadProps {
+/**
+ * Vue CommentThread props. The React-only `onExpandedChange` callback is
+ * omitted — Vue emits `update:expandedKeys` (`v-model:expanded-keys`) instead.
+ */
+export interface VueCommentThreadProps extends Omit<CoreCommentThreadProps, 'onExpandedChange'> {
   className?: string
   style?: Record<string, string | number>
 }

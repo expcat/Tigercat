@@ -28,6 +28,8 @@ import {
 
 export interface VueInputNumberProps {
   modelValue?: number | null
+  /** Initial value for uncontrolled usage (when `modelValue` is not bound) */
+  defaultValue?: number | null
   size?: InputSize
   status?: InputStatus
   min?: number
@@ -54,6 +56,10 @@ export const InputNumber = defineComponent({
   props: {
     modelValue: {
       type: [Number, null] as PropType<number | null>
+    },
+    defaultValue: {
+      type: [Number, null] as PropType<number | null>,
+      default: undefined
     },
     size: {
       type: String as PropType<InputSize>,
@@ -111,6 +117,10 @@ export const InputNumber = defineComponent({
     autoFocus: {
       type: Boolean,
       default: false
+    },
+    className: {
+      type: String,
+      default: undefined
     }
   },
   emits: ['update:modelValue', 'change', 'focus', 'blur'],
@@ -149,11 +159,17 @@ export const InputNumber = defineComponent({
 
     const isControlled = computed(() => props.modelValue !== undefined)
 
-    const internalValue = ref<number | null>(props.modelValue ?? null)
+    const internalValue = ref<number | null>(props.modelValue ?? props.defaultValue ?? null)
 
     const currentValue = computed(() =>
       isControlled.value ? (props.modelValue ?? null) : internalValue.value
     )
+
+    // Reflect the uncontrolled initial (defaultValue) in the display value;
+    // the immediate modelValue watch above only handles the controlled case.
+    if (!isControlled.value && internalValue.value !== null) {
+      displayValue.value = toDisplayValue(internalValue.value)
+    }
 
     function commitValue(val: number | null) {
       let finalVal = val
@@ -267,6 +283,7 @@ export const InputNumber = defineComponent({
         getInputNumberStatusClasses(props.status),
         getInputNumberSizeClasses(props.size),
         focused.value && `ring-2 ${getInputNumberFocusRingColor(props.status)}`,
+        props.className,
         coerceClassValue(attrs.class)
       )
     )

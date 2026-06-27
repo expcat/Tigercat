@@ -105,6 +105,7 @@ export const RichTextEditor = defineComponent({
       engineInstance = engine.create({
         element: editorRef.value,
         initialValue: currentContent.value,
+        mode: props.mode,
         readOnly: props.readOnly,
         disabled: props.disabled,
         placeholder: props.placeholder,

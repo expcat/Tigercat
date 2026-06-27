@@ -9,6 +9,7 @@ import {
   resolveFileOpen,
   sliceBreadcrumbPath,
   toFileDragItem,
+  applyFileDragReorder,
   formatFileSizeLabel,
   getFileManagerLabels,
   fileManagerToolbarClasses,
@@ -28,27 +29,26 @@ import {
   type FileViewMode,
   type FileSortField,
   type FileSortOrder,
-  type TigerLocale
+  type TigerLocale,
+  type FileManagerProps as CoreFileManagerProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface VueFileManagerProps {
-  files?: FileItem[]
-  viewMode?: FileViewMode
-  selectedKeys?: (string | number)[]
-  multiple?: boolean
-  sortField?: FileSortField
-  sortOrder?: FileSortOrder
-  currentPath?: string[]
-  showHidden?: boolean
-  draggable?: boolean
-  loading?: boolean
-  emptyText?: string
-  searchable?: boolean
-  searchText?: string
-  className?: string
-  locale?: Partial<TigerLocale>
-}
+/**
+ * Vue FileManager props. Reuses the shared core props except the React-style
+ * callbacks — Vue uses emits / `v-model` (`update:selectedKeys`,
+ * `update:currentPath`, `update:searchText`, `update:files`, `reorder`).
+ */
+export type VueFileManagerProps = Omit<
+  CoreFileManagerProps,
+  | 'onSelect'
+  | 'onOpen'
+  | 'onNavigate'
+  | 'onSelectedKeysChange'
+  | 'onCurrentPathChange'
+  | 'onSearchTextChange'
+  | 'onReorder'
+>
 
 export const FileManager = defineComponent({
   name: 'TigerFileManager',
@@ -64,6 +64,10 @@ export const FileManager = defineComponent({
       default: () => []
     },
     multiple: { type: Boolean, default: false },
+    columns: {
+      type: Array as PropType<FileSortField[]>,
+      default: undefined
+    },
     sortField: {
       type: String as PropType<FileSortField>,
       default: 'name'
@@ -91,7 +95,9 @@ export const FileManager = defineComponent({
     'navigate',
     'update:currentPath',
     'update:searchText',
-    'update:selectedKeys'
+    'update:selectedKeys',
+    'update:files',
+    'reorder'
   ],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
@@ -100,6 +106,40 @@ export const FileManager = defineComponent({
     const localSearch = ref(props.searchText)
     const focusedIndex = ref(0)
     const contentRef = ref<HTMLElement | null>(null)
+    let dragFromIndex: number | null = null
+
+    function handleDragStart(event: DragEvent, item: FileItem, index: number) {
+      if (!props.draggable || item.disabled) return
+      dragFromIndex = index
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'move'
+        event.dataTransfer.setData('text/plain', String(toFileDragItem(item, index).id))
+      }
+    }
+
+    function handleDragOver(event: DragEvent) {
+      if (!props.draggable || dragFromIndex === null) return
+      event.preventDefault()
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
+    }
+
+    function handleDrop(event: DragEvent, toIndex: number) {
+      if (!props.draggable) return
+      const fromIndex = dragFromIndex
+      dragFromIndex = null
+      if (fromIndex === null || fromIndex === toIndex) return
+      event.preventDefault()
+      const items = model.value.processedItems
+      const reordered = applyFileDragReorder(items, {
+        item: toFileDragItem(items[fromIndex], fromIndex),
+        fromIndex,
+        toIndex,
+        fromContainerId: '',
+        toContainerId: ''
+      })
+      emit('reorder', reordered, fromIndex, toIndex)
+      emit('update:files', reordered)
+    }
 
     const model = computed(() =>
       deriveFileManagerModel({
@@ -294,13 +334,17 @@ export const FileManager = defineComponent({
 
         const nameEl = h('span', { class: fileManagerItemNameClasses }, item.name)
 
+        const metaColumns = props.columns ?? ['size', 'modified']
         const metaEls =
           props.viewMode === 'list'
             ? [
-                item.size !== undefined
+                metaColumns.includes('type')
+                  ? h('span', { class: fileManagerItemMetaClasses }, item.extension ?? item.type)
+                  : null,
+                metaColumns.includes('size') && item.size !== undefined
                   ? h('span', { class: fileManagerItemMetaClasses }, formatFileSizeLabel(item.size))
                   : null,
-                item.modified
+                metaColumns.includes('modified') && item.modified
                   ? h('span', { class: fileManagerItemMetaClasses }, item.modified)
                   : null
               ]
@@ -325,7 +369,10 @@ export const FileManager = defineComponent({
             onClick: () => handleSelect(item),
             onDblclick: () => handleOpen(item),
             draggable: props.draggable && !item.disabled,
-            'data-drag-id': dragItem?.id
+            'data-drag-id': dragItem?.id,
+            onDragstart: (event: DragEvent) => handleDragStart(event, item, index),
+            onDragover: handleDragOver,
+            onDrop: (event: DragEvent) => handleDrop(event, index)
           },
           [fileIcon(item), nameEl, ...metaEls]
         )

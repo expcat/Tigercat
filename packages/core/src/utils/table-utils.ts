@@ -295,9 +295,7 @@ export function getTableColgroup<T = Record<string, unknown>>(
   return entries
 }
 
-export function hasTableSelectionColumn(
-  rowSelection?: { showCheckbox?: boolean } | null
-): boolean {
+export function hasTableSelectionColumn(rowSelection?: { showCheckbox?: boolean } | null): boolean {
   return !!rowSelection && rowSelection.showCheckbox !== false
 }
 
@@ -830,6 +828,91 @@ export function filterData<T>(data: T[], filters: Record<string, unknown>): T[] 
       return cellValue === filterValue
     })
   })
+}
+
+/**
+ * Filter data using per-column configuration.
+ *
+ * Like {@link filterData}, but a column's `filter.filterFn(cellValue, filterValue)`
+ * (when provided) overrides the default substring/equality matching for that key.
+ * Columns without a custom `filterFn` fall back to the default behavior.
+ */
+export function filterTableData<T>(
+  data: T[],
+  columns: TableColumn<T>[],
+  filters: Record<string, unknown>
+): T[] {
+  if (!filters || Object.keys(filters).length === 0) {
+    return data
+  }
+
+  const filterFnByKey = new Map<string, (value: unknown, filterValue: unknown) => boolean>()
+  for (const column of columns) {
+    if (column.filter?.filterFn) {
+      filterFnByKey.set(column.key, column.filter.filterFn)
+    }
+  }
+
+  return data.filter((record) => {
+    return Object.entries(filters).every(([key, filterValue]) => {
+      if (filterValue === '' || filterValue === null || filterValue === undefined) {
+        return true
+      }
+
+      const cellValue = (record as Record<string, unknown>)[key]
+
+      const customFn = filterFnByKey.get(key)
+      if (customFn) {
+        return customFn(cellValue, filterValue)
+      }
+
+      if (typeof filterValue === 'string') {
+        return String(cellValue).toLowerCase().includes(filterValue.toLowerCase())
+      }
+
+      return cellValue === filterValue
+    })
+  })
+}
+
+/**
+ * Visible row window for Table virtual scrolling.
+ */
+export interface TableVirtualWindow {
+  startIndex: number
+  endIndex: number
+  /** Spacer height (px) above the rendered rows */
+  topPad: number
+  /** Spacer height (px) below the rendered rows */
+  bottomPad: number
+}
+
+/**
+ * Compute the visible row window for fixed-height table virtual scrolling.
+ *
+ * Returns the index range to render plus top/bottom spacer heights so the
+ * scrollable area keeps its full height.
+ */
+export function getTableVirtualWindow(
+  scrollTop: number,
+  viewportHeight: number,
+  itemHeight: number,
+  rowCount: number,
+  overscan = 5
+): TableVirtualWindow {
+  if (rowCount <= 0 || itemHeight <= 0) {
+    return { startIndex: 0, endIndex: -1, topPad: 0, bottomPad: 0 }
+  }
+  const safeScrollTop = Math.max(0, Number.isFinite(scrollTop) ? scrollTop : 0)
+  const startIndex = Math.max(0, Math.floor(safeScrollTop / itemHeight) - overscan)
+  const visibleCount = Math.ceil(Math.max(0, viewportHeight) / itemHeight) + overscan * 2
+  const endIndex = Math.min(rowCount - 1, startIndex + visibleCount)
+  return {
+    startIndex,
+    endIndex,
+    topPad: startIndex * itemHeight,
+    bottomPad: Math.max(0, (rowCount - 1 - endIndex) * itemHeight)
+  }
 }
 
 /**

@@ -18,6 +18,7 @@ import {
   type RowSelectionConfig,
   type ExpandableConfig,
   type TableSize,
+  type TableVirtualWindow,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
 import { ExpandIcon } from './icons'
@@ -36,6 +37,8 @@ export interface RenderBodyViewProps {
   rowDraggable?: boolean
   /** Whether rows respond to click/keyboard activation (onRowClick or rowSelection). */
   interactiveRows?: boolean
+  /** When set, only the windowed row slice is rendered (virtual scrolling). */
+  virtualWindow?: TableVirtualWindow
 }
 
 export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): React.ReactNode {
@@ -50,7 +53,8 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     labels,
     rowClassName,
     rowDraggable,
-    interactiveRows
+    interactiveRows,
+    virtualWindow
   } = view
 
   if (loading) {
@@ -296,6 +300,38 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
             })}
           </React.Fragment>
         ))}
+      </tbody>
+    )
+  }
+
+  // Virtual row windowing: render only the visible slice with spacer rows.
+  if (virtualWindow && virtualWindow.endIndex >= virtualWindow.startIndex) {
+    const { startIndex, endIndex, topPad, bottomPad } = virtualWindow
+    const windowed: React.ReactNode[] = []
+    if (topPad > 0) {
+      windowed.push(
+        <tr key="virtual-top" aria-hidden="true">
+          <td colSpan={ctx.totalColumnCount} style={{ height: `${topPad}px`, padding: 0 }} />
+        </tr>
+      )
+    }
+    for (let index = startIndex; index <= endIndex; index++) {
+      windowed.push(renderDataRow(ctx.paginatedData[index], index))
+    }
+    if (bottomPad > 0) {
+      windowed.push(
+        <tr key="virtual-bottom" aria-hidden="true">
+          <td colSpan={ctx.totalColumnCount} style={{ height: `${bottomPad}px`, padding: 0 }} />
+        </tr>
+      )
+    }
+    return (
+      <tbody
+        onClick={handleBodyClick}
+        onDragStart={rowDraggable ? handleBodyDragStart : undefined}
+        onDragOver={rowDraggable ? handleBodyDragOver : undefined}
+        onDrop={rowDraggable ? handleBodyDrop : undefined}>
+        {windowed}
       </tbody>
     )
   }

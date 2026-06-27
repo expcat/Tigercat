@@ -78,7 +78,7 @@ export const CropUpload: React.FC<CropUploadProps> = ({
   maxSize,
   cropperProps,
   modalTitle,
-  modalWidth: _modalWidth = 520,
+  modalWidth = 520,
   className,
   children,
   onCropComplete,
@@ -202,6 +202,7 @@ export const CropUpload: React.FC<CropUploadProps> = ({
       <Modal
         open={modalVisible}
         size="lg"
+        width={modalWidth}
         title={modalTitle ?? labels.cropModalTitle}
         className="tiger-crop-upload-modal"
         closable

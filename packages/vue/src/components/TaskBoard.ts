@@ -19,8 +19,13 @@ import {
   taskBoardWipExceededClasses,
   taskBoardAddCardClasses,
   kanbanCardCountClasses,
+  kanbanSwimlaneClasses,
+  kanbanSwimlaneHeaderClasses,
+  kanbanSwimlaneDotClasses,
+  kanbanSwimlaneCollapsedClasses,
   kanbanAddColumnClasses,
   filterColumns,
+  groupBySwimlane,
   getColumnCardCount,
   moveCard,
   reorderColumns,
@@ -29,6 +34,7 @@ import {
   createDefaultDragSnapshot,
   type TaskBoardColumn,
   type TaskBoardCard,
+  type KanbanSwimlane,
   type TaskBoardCardMoveEvent,
   type TaskBoardColumnMoveEvent,
   type TaskBoardMoveValidator,
@@ -52,6 +58,8 @@ export interface VueTaskBoardProps {
   showCardCount?: boolean
   allowAddCard?: boolean
   allowAddColumn?: boolean
+  swimlanes?: KanbanSwimlane[]
+  swimlaneField?: string
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleTaskBoard>
   className?: string
@@ -102,6 +110,14 @@ export const TaskBoard = defineComponent({
     showCardCount: { type: Boolean, default: false },
     allowAddCard: { type: Boolean, default: false },
     allowAddColumn: { type: Boolean, default: false },
+    swimlanes: {
+      type: Array as PropType<KanbanSwimlane[]>,
+      default: undefined
+    },
+    swimlaneField: {
+      type: String,
+      default: undefined
+    },
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
@@ -388,23 +404,68 @@ export const TaskBoard = defineComponent({
         headerContent
       )
 
+      const renderCardNode = (card: TaskBoardCard, originalIndex: number) => {
+        const nodes = []
+        if (isDropTarget && dragSnap.value.dropIndex === originalIndex) {
+          nodes.push(
+            h('div', { key: `drop-${originalIndex}`, class: taskBoardDropIndicatorClasses })
+          )
+        }
+        nodes.push(renderCard(card, column))
+        return nodes
+      }
+
       // Cards or empty state
       const cards =
         column.cards.length > 0
-          ? column.cards
-              .flatMap((card, i) => {
-                const nodes = []
-                if (isDropTarget && dragSnap.value.dropIndex === i) {
-                  nodes.push(h('div', { key: `drop-${i}`, class: taskBoardDropIndicatorClasses }))
-                }
-                nodes.push(renderCard(card, column))
-                return nodes
-              })
-              .concat(
-                isDropTarget && dragSnap.value.dropIndex >= column.cards.length
-                  ? [h('div', { key: 'drop-end', class: taskBoardDropIndicatorClasses })]
-                  : []
-              )
+          ? (props.swimlanes && props.swimlaneField
+              ? groupBySwimlane(column.cards, props.swimlanes, props.swimlaneField).map((group) =>
+                  h(
+                    'div',
+                    {
+                      key: String(group.swimlane.id),
+                      class: kanbanSwimlaneClasses,
+                      'data-tiger-kanban-swimlane': '',
+                      'data-tiger-kanban-swimlane-id': String(group.swimlane.id)
+                    },
+                    [
+                      h('div', { class: kanbanSwimlaneHeaderClasses }, [
+                        group.swimlane.color
+                          ? h('span', {
+                              class: kanbanSwimlaneDotClasses,
+                              style: { backgroundColor: group.swimlane.color }
+                            })
+                          : null,
+                        h('span', null, group.swimlane.label),
+                        h(
+                          'span',
+                          {
+                            class: 'ml-auto text-xs text-[var(--tiger-text-muted,#6b7280)]'
+                          },
+                          String(group.cards.length)
+                        )
+                      ]),
+                      h(
+                        'div',
+                        {
+                          class: group.swimlane.collapsed ? kanbanSwimlaneCollapsedClasses : ''
+                        },
+                        group.cards.flatMap((card) =>
+                          renderCardNode(
+                            card,
+                            column.cards.findIndex((item) => item.id === card.id)
+                          )
+                        )
+                      )
+                    ]
+                  )
+                )
+              : column.cards.flatMap((card, i) => renderCardNode(card, i))
+            ).concat(
+              isDropTarget && dragSnap.value.dropIndex >= column.cards.length
+                ? [h('div', { key: 'drop-end', class: taskBoardDropIndicatorClasses })]
+                : []
+            )
           : [
               isDropTarget
                 ? h('div', { key: 'drop-empty', class: taskBoardDropIndicatorClasses })

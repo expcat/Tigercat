@@ -21,7 +21,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## FileManager
 
-`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 3/15 props
+`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 3/16 props
 
 | Prop            | Type                   | Default | Notes                        |
 | --------------- | ---------------------- | ------- | ---------------------------- |
@@ -29,25 +29,27 @@ description: Compact generated Tigercat Advanced props reference
 | `viewMode?`     | `FileViewMode`         | `-`     | View mode                    |
 | `selectedKeys?` | `(string \| number)[]` | `-`     | Currently selected file keys |
 
+Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysChange?`, `onCurrentPathChange?`, `onSearchTextChange?`, ....
+
 ## ImageAnnotation
 
-`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 3/15 props
+`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 3/16 props
 
-| Prop     | Type                | Default | Notes |
-| -------- | ------------------- | ------- | ----- |
-| `src`    | `string`            | `-`     | -     |
-| `alt?`   | `string`            | `-`     | -     |
-| `value?` | `ImageAnnotation[]` | `-`     | -     |
+| Prop      | Type                   | Default | Notes |
+| --------- | ---------------------- | ------- | ----- |
+| `locale?` | `Partial<TigerLocale>` | `-`     | -     |
+| `src`     | `string`               | `-`     | -     |
+| `alt?`    | `string`               | `-`     | -     |
 
 ## ImageViewer
 
-`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 3/11 props
+`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 3/12 props
 
-| Prop            | Type       | Default | Notes                          |
-| --------------- | ---------- | ------- | ------------------------------ |
-| `images`        | `string[]` | `-`     | Array of image URLs to display |
-| `open?`         | `boolean`  | `false` | Whether the viewer is visible  |
-| `currentIndex?` | `number`   | `0`     | Current image index            |
+| Prop      | Type                   | Default | Notes                                                   |
+| --------- | ---------------------- | ------- | ------------------------------------------------------- |
+| `locale?` | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale. |
+| `images`  | `string[]`             | `-`     | Array of image URLs to display                          |
+| `open?`   | `boolean`              | `false` | Whether the viewer is visible                           |
 
 ## InfiniteScroll
 

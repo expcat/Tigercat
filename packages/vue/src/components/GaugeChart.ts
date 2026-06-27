@@ -14,6 +14,7 @@ import {
   type GaugeChartProps as CoreGaugeChartProps
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
+import { ChartTooltip } from './ChartTooltip'
 
 export interface VueGaugeChartProps extends CoreGaugeChartProps {
   padding?: ChartPadding
@@ -34,6 +35,8 @@ export const GaugeChart = defineComponent({
     showTicks: { type: Boolean, default: true },
     tickCount: { type: Number, default: 5 },
     valueFormatter: { type: Function as PropType<(value: number) => string> },
+    tooltipFormatter: { type: Function as PropType<(value: number) => string> },
+    showTooltip: { type: Boolean, default: true },
     label: { type: String },
     segments: {
       type: Array as PropType<Array<{ range: [number, number]; color: string }>>
@@ -80,6 +83,28 @@ export const GaugeChart = defineComponent({
     onBeforeUnmount(() => {
       animCtrl?.stop()
     })
+
+    // Tooltip (hover / focus over the gauge)
+    const wrapperRef = ref<HTMLElement | null>(null)
+    const tooltipState = ref({ visible: false, x: 0, y: 0 })
+    const handleTooltipMove = (e: MouseEvent) => {
+      if (!props.showTooltip) return
+      tooltipState.value = { visible: true, x: e.clientX, y: e.clientY }
+    }
+    const handleTooltipLeave = () => {
+      tooltipState.value = { ...tooltipState.value, visible: false }
+    }
+    const handleTooltipFocus = () => {
+      if (!props.showTooltip) return
+      const rect = wrapperRef.value?.getBoundingClientRect()
+      if (rect) {
+        tooltipState.value = {
+          visible: true,
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        }
+      }
+    }
 
     const ticks = computed(() =>
       props.showTicks
@@ -143,7 +168,13 @@ export const GaugeChart = defineComponent({
         ? props.valueFormatter(props.value)
         : `${props.value}`
 
-      return h(
+      const tooltipContent = props.tooltipFormatter
+        ? props.tooltipFormatter(props.value)
+        : props.label
+          ? `${props.label}: ${formattedValue}`
+          : formattedValue
+
+      const canvas = h(
         ChartCanvas,
         {
           width: props.width,
@@ -261,6 +292,32 @@ export const GaugeChart = defineComponent({
               : [])
           ]
         }
+      )
+
+      return h(
+        'div',
+        {
+          ref: wrapperRef,
+          class: 'inline-block relative',
+          tabindex: props.showTooltip ? 0 : undefined,
+          role: 'img',
+          'aria-label': props.label ? `${props.label}: ${formattedValue}` : formattedValue,
+          onMousemove: handleTooltipMove,
+          onMouseleave: handleTooltipLeave,
+          onFocus: handleTooltipFocus,
+          onBlur: handleTooltipLeave
+        },
+        [
+          canvas,
+          props.showTooltip
+            ? h(ChartTooltip, {
+                content: tooltipContent,
+                visible: tooltipState.value.visible && tooltipContent !== '',
+                x: tooltipState.value.x,
+                y: tooltipState.value.y
+              })
+            : null
+        ]
       )
     }
   }

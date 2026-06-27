@@ -5,6 +5,7 @@ import {
   resolveLocaleText,
   mergeTigerLocale,
   calculateVirtualRange,
+  calculateVirtualColumnRange,
   getVirtualTableContainerClasses,
   getVirtualTableRowClasses,
   getVirtualRowKey,
@@ -28,9 +29,15 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   columns?: TableColumn<T>[]
   rowHeight?: number
   height?: number
+  /** Viewport width in px or 'auto' */
+  width?: number | 'auto'
   overscan?: number
   stickyHeader?: boolean
+  /** Enable horizontal column virtualization (when no fixed columns) */
+  virtualizeColumns?: boolean
   rowKey?: keyof T | ((row: T, index: number) => string | number)
+  /** Row class name (static or per-row resolver) */
+  rowClassName?: string | ((row: T, index: number) => string)
   loading?: boolean
   emptyText?: string
   locale?: Partial<TigerLocale>
@@ -44,14 +51,20 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   renderCell?: (value: unknown, row: T, column: TableColumn<T>) => React.ReactNode
 }
 
+/** Fallback column width (px) when a column has no numeric `width`. */
+const DEFAULT_VIRTUAL_COLUMN_WIDTH = 150
+
 export const VirtualTable = <T extends Record<string, unknown> = Record<string, unknown>>({
   data = [] as unknown as T[],
   columns = [] as unknown as TableColumn<T>[],
   rowHeight = 48,
   height = 400,
+  width = 'auto',
   overscan = 5,
   stickyHeader = true,
+  virtualizeColumns = false,
   rowKey,
+  rowClassName,
   loading = false,
   emptyText,
   locale,
@@ -72,6 +85,7 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   )
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollTop, setScrollTop] = useState(0)
+  const [scrollLeft, setScrollLeft] = useState(0)
 
   const range = useMemo(
     () => calculateVirtualRange(scrollTop, height, data.length, rowHeight, overscan),
@@ -88,6 +102,7 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   const onScroll = useCallback(() => {
     if (containerRef.current) {
       setScrollTop(containerRef.current.scrollTop)
+      setScrollLeft(containerRef.current.scrollLeft)
     }
   }, [])
 
@@ -98,6 +113,27 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
 
   const fixedInfo = useMemo(() => getVirtualTableFixedInfo(columns), [columns])
 
+  // Column virtualization only when explicitly enabled and there are no fixed
+  // columns (sticky offsets are incompatible with spacer cells).
+  const columnWidths = useMemo(
+    () =>
+      columns.map((c) => (typeof c.width === 'number' ? c.width : DEFAULT_VIRTUAL_COLUMN_WIDTH)),
+    [columns]
+  )
+  const colVirtualActive = virtualizeColumns && !fixedInfo.hasFixedColumns && width !== 'auto'
+  const colRange = useMemo(
+    () =>
+      colVirtualActive
+        ? calculateVirtualColumnRange(scrollLeft, width as number, columnWidths)
+        : undefined,
+    [colVirtualActive, scrollLeft, width, columnWidths]
+  )
+  const visibleColumns = colRange ? columns.slice(colRange.start, colRange.end) : columns
+  const colIndexOffset = colRange ? colRange.start : 0
+
+  const resolveRowClassName = (row: T, index: number): string | undefined =>
+    typeof rowClassName === 'function' ? rowClassName(row, index) : rowClassName
+
   const bottomHeight = Math.max(0, range.totalHeight - range.end * rowHeight)
 
   return (
@@ -107,14 +143,20 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
         containerClasses,
         (rest as Record<string, unknown>).className as string
       )}
-      style={{ height: `${height}px` }}
+      style={{
+        height: `${height}px`,
+        ...(width !== 'auto' ? { width: `${width}px` } : {})
+      }}
       onScroll={onScroll}
       role="grid"
       aria-rowcount={data.length}>
       <table className="w-full table-fixed">
         <thead className={stickyHeader ? virtualTableHeaderClasses : undefined}>
           <tr>
-            {columns.map((col) => {
+            {colRange && colRange.leftPad > 0 && (
+              <th aria-hidden style={{ width: `${colRange.leftPad}px`, padding: 0 }} />
+            )}
+            {visibleColumns.map((col) => {
               const widthStyle = col.width
                 ? { width: typeof col.width === 'number' ? `${col.width}px` : col.width }
                 : {}
@@ -136,6 +178,9 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                 </th>
               )
             })}
+            {colRange && colRange.rightPad > 0 && (
+              <th aria-hidden style={{ width: `${colRange.rightPad}px`, padding: 0 }} />
+            )}
           </tr>
         </thead>
         <tbody>
@@ -153,7 +198,10 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
             return (
               <tr
                 key={key}
-                className={getVirtualTableRowClasses(globalIdx, striped, isSelected)}
+                className={classNames(
+                  getVirtualTableRowClasses(globalIdx, striped, isSelected),
+                  resolveRowClassName(row, globalIdx)
+                )}
                 // header occupies aria-rowindex 1
                 aria-rowindex={globalIdx + 2}
                 aria-selected={selectable ? isSelected : undefined}
@@ -169,10 +217,13 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                       }
                     : undefined
                 }>
-                {columns.map((col, colIdx) => (
+                {colRange && colRange.leftPad > 0 && (
+                  <td aria-hidden style={{ width: `${colRange.leftPad}px`, padding: 0 }} />
+                )}
+                {visibleColumns.map((col, colIdx) => (
                   <td
                     key={col.key as string}
-                    aria-colindex={colIdx + 1}
+                    aria-colindex={colIndexOffset + colIdx + 1}
                     className={classNames(
                       virtualTableCellClasses,
                       getTableFixedCellClasses({
@@ -194,6 +245,9 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                       : String(row[col.key as keyof T] ?? '')}
                   </td>
                 ))}
+                {colRange && colRange.rightPad > 0 && (
+                  <td aria-hidden style={{ width: `${colRange.rightPad}px`, padding: 0 }} />
+                )}
               </tr>
             )
           })}

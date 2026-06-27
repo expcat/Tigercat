@@ -24,6 +24,7 @@ import {
   getTableResponsiveCardListClasses,
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
+  getTableVirtualWindow,
   isLazyTigerLocale,
   mergeTigerLocale,
   resolveTigerLocale,
@@ -214,14 +215,24 @@ export const Table = defineComponent({
           }
         : undefined
 
+      const virtualWindow = effectiveVirtual
+        ? getTableVirtualWindow(
+            ctx.virtualScrollTop.value,
+            typeof resolvedProps.virtualHeight === 'number' ? resolvedProps.virtualHeight : 400,
+            resolvedProps.virtualItemHeight,
+            ctx.paginatedData.value.length
+          )
+        : undefined
+
       const renderProps = {
         ...resolvedProps,
         emptyText: tableLabels.value.emptyText,
         // Rows become keyboard-activable when a row-click listener is bound or
         // row selection is enabled (mirrors React's onRowClick/rowSelection).
         interactiveRows:
-          !!resolvedProps.rowSelection || typeof instance?.vnode.props?.onRowClick === 'function'
-      } as TableInternalProps
+          !!resolvedProps.rowSelection || typeof instance?.vnode.props?.onRowClick === 'function',
+        virtualWindow
+      } as TableInternalProps & { virtualWindow?: ReturnType<typeof getTableVirtualWindow> }
 
       const shouldPinColumns =
         resolvedProps.columnLockable || ctx.fixedColumnsInfo.value.hasFixedColumns

@@ -58,12 +58,12 @@ export const LineChart: React.FC<LineChartProps> = ({
   series,
   xScale: xScaleProp,
   yScale: yScaleProp,
-  lineColor: _lineColor = 'var(--tiger-primary,#2563eb)',
+  lineColor = 'var(--tiger-primary,#2563eb)',
   strokeWidth = 2,
   curve = 'linear',
   showPoints = true,
   pointSize = 4,
-  pointColor: _pointColor,
+  pointColor,
   showGrid = true,
   showAxis = true,
   showXAxis = true,
@@ -129,8 +129,14 @@ export const LineChart: React.FC<LineChartProps> = ({
   )
 
   const resolvedSeries = useMemo<LineChartSeries[]>(
-    () => resolveSeriesData<LineChartDatum, LineChartSeries>(series, data),
-    [series, data]
+    () =>
+      resolveSeriesData<LineChartDatum, LineChartSeries>(series, data, {
+        // Single-series colors (`lineColor`/`pointColor`) seed the synthesized
+        // series so they take effect when only `data` is provided.
+        color: lineColor,
+        pointColor
+      } as Partial<Omit<LineChartSeries, 'data'>>),
+    [series, data, lineColor, pointColor]
   )
 
   // Use shared interaction hook for series-level interaction

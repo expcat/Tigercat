@@ -1,4 +1,15 @@
-import { defineComponent, computed, h, ref, PropType, Teleport, type VNode } from 'vue'
+import {
+  defineComponent,
+  computed,
+  h,
+  ref,
+  provide,
+  inject,
+  PropType,
+  Teleport,
+  type ComputedRef,
+  type VNode
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -12,6 +23,9 @@ import {
   type FloatButtonShape,
   type FloatButtonSize
 } from '@expcat/tigercat-core'
+
+// Group → child shape inheritance (child's own shape still wins)
+const FloatButtonGroupShapeKey = Symbol('FloatButtonGroupShape')
 
 export interface VueFloatButtonProps {
   shape?: FloatButtonShape
@@ -30,7 +44,7 @@ export const FloatButton = defineComponent({
   props: {
     shape: {
       type: String as PropType<FloatButtonShape>,
-      default: 'circle' as FloatButtonShape
+      default: undefined
     },
     size: {
       type: String as PropType<FloatButtonSize>,
@@ -63,10 +77,18 @@ export const FloatButton = defineComponent({
   },
   emits: ['click'],
   setup(props, { slots, emit, attrs }) {
+    const groupShape = inject<ComputedRef<FloatButtonShape | undefined> | undefined>(
+      FloatButtonGroupShapeKey,
+      undefined
+    )
+    // Explicit shape wins; otherwise inherit the group shape, else default.
+    const resolvedShape = computed<FloatButtonShape>(
+      () => props.shape ?? groupShape?.value ?? 'circle'
+    )
     const classes = computed(() =>
       classNames(
         floatButtonBaseClasses,
-        floatButtonShapeClasses[props.shape],
+        floatButtonShapeClasses[resolvedShape.value],
         floatButtonSizeClasses[props.size],
         floatButtonTypeClasses[props.type],
         props.disabled && floatButtonDisabledClasses,
@@ -140,6 +162,12 @@ export const FloatButtonGroup = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const internalOpen = ref(false)
     const isOpen = computed(() => props.open ?? internalOpen.value)
+
+    // Share the group shape with child FloatButtons that don't set their own.
+    provide(
+      FloatButtonGroupShapeKey,
+      computed(() => props.shape)
+    )
 
     const toggle = () => {
       const next = !isOpen.value

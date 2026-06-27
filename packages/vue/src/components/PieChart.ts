@@ -122,6 +122,10 @@ export const PieChart = defineComponent({
       type: Number,
       default: 8
     },
+    legendFormatter: {
+      type: Function as PropType<(datum: PieChartDatum, index: number) => string>,
+      default: undefined
+    },
     // Tooltip props
     showTooltip: {
       type: Boolean,
@@ -224,7 +228,8 @@ export const PieChart = defineComponent({
         data: props.data,
         palette: palette.value,
         activeIndex: activeIndex.value,
-        getLabel: (d) => d.label ?? `${d.value}`,
+        getLabel: (d, i) =>
+          props.legendFormatter ? props.legendFormatter(d, i) : (d.label ?? `${d.value}`),
         getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
       })
     )

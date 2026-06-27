@@ -269,9 +269,13 @@ export const AreaChart = defineComponent({
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
-    // Normalize series data
+    // Normalize series data. Single-series colors (`areaColor`/`pointColor`)
+    // seed the synthesized series so they apply when only `data` is provided.
     const resolvedSeries = computed<AreaChartSeries[]>(() =>
-      resolveSeriesData(props.series, props.data)
+      resolveSeriesData(props.series, props.data, {
+        color: props.areaColor,
+        pointColor: props.pointColor
+      } as Partial<Omit<AreaChartSeries, 'data'>>)
     )
 
     // Use shared interaction composable for series-level interaction

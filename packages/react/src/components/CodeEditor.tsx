@@ -8,6 +8,8 @@ import {
   countLines,
   generateLineNumbers,
   handleTabKey,
+  getActiveLineIndex,
+  getCodeEditorActiveLineClasses,
   codeEditorTextareaClasses,
   codeEditorHighlightClasses,
   type CodeEditorProps as CoreCodeEditorProps,
@@ -40,6 +42,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   wordWrap = false,
   minLines = 3,
   maxLines = 0,
+  highlightActiveLine = true,
   disabled = false,
   className,
   style,
@@ -47,6 +50,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   highlighter
 }) => {
   const [internalValue, setInternalValue] = useState(defaultValue)
+  const [activeLine, setActiveLine] = useState(0)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const code = controlledValue !== undefined ? controlledValue : internalValue
@@ -68,11 +72,18 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     return s
   }, [minLines, maxLines, style])
 
+  const updateActiveLine = useCallback(() => {
+    const ta = textareaRef.current
+    if (!ta) return
+    setActiveLine(getActiveLineIndex(ta.value, ta.selectionStart))
+  }, [])
+
   const handleInput = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const val = e.target.value
       setInternalValue(val)
       onChange?.(val)
+      setActiveLine(getActiveLineIndex(val, e.target.selectionStart))
     },
     [onChange]
   )
@@ -96,6 +107,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   )
 
   const wrapClass = wordWrap ? 'whitespace-pre-wrap break-all' : ''
+  const showActiveLine = highlightActiveLine && !disabled
+  const activeLineClass = getCodeEditorActiveLineClasses(theme)
 
   const renderToken = (token: Token, idx: number) => {
     const cls = getTokenClasses(token.type, theme)
@@ -109,19 +122,27 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   }
 
   const renderLine = (line: string, lineIndex: number) => {
+    const lineClass = classNames(
+      'min-h-[1.625rem]',
+      showActiveLine && lineIndex === activeLine && activeLineClass
+    )
     if (highlighter?.highlightLine) {
       const html = highlighter.highlightLine(line, language, theme) || (line === '' ? '\n' : '')
       return (
         <div
           key={lineIndex}
-          className="min-h-[1.625rem]"
+          className={lineClass}
+          data-active-line={showActiveLine && lineIndex === activeLine ? '' : undefined}
           dangerouslySetInnerHTML={{ __html: html }}
         />
       )
     }
     const tokens = tokenizeLine(line, language)
     return (
-      <div key={lineIndex} className="min-h-[1.625rem]">
+      <div
+        key={lineIndex}
+        className={lineClass}
+        data-active-line={showActiveLine && lineIndex === activeLine ? '' : undefined}>
         {tokens.map(renderToken)}
         {line === '' ? '\n' : null}
       </div>
@@ -167,6 +188,9 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             value={code}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
+            onSelect={updateActiveLine}
+            onClick={updateActiveLine}
+            onKeyUp={updateActiveLine}
             readOnly={readOnly || disabled}
             disabled={disabled}
             placeholder={placeholder}

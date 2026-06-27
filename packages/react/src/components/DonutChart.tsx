@@ -1,8 +1,10 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   classNames,
   getChartInnerRect,
   normalizeChartPadding,
+  DONUT_ENTRANCE_KEYFRAMES,
+  DONUT_ENTRANCE_CLASS,
   type ChartPadding,
   type DonutChartDatum,
   type DonutChartProps as CoreDonutChartProps
@@ -75,6 +77,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   legendPosition = 'bottom',
   legendMarkerSize = 10,
   legendGap = 8,
+  legendFormatter,
   // Tooltip props
   showTooltip = true,
   tooltipFormatter,
@@ -85,7 +88,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   // DonutChart-specific
   centerValue,
   centerLabel,
-  animated: _animated = false,
+  animated = false,
   // Visual modes (forwarded to PieChart, opt-in per PR-19k(b6/b7))
   gradient = false,
   // Callbacks
@@ -133,8 +136,18 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   const centerX = pad.left + innerRect.width / 2
   const centerY = pad.top + innerRect.height / 2
 
+  // Entrance animation: enable the class on mount when `animated`. The keyframes
+  // collapse to no motion under `prefers-reduced-motion`.
+  const [entered, setEntered] = useState(false)
+  useEffect(() => {
+    if (animated) setEntered(true)
+  }, [animated])
+
   return (
-    <div className="inline-block relative" data-donut-chart="true">
+    <div
+      className={classNames('inline-block relative', animated && entered && DONUT_ENTRANCE_CLASS)}
+      data-donut-chart="true">
+      {animated && entered && <style>{DONUT_ENTRANCE_KEYFRAMES}</style>}
       <PieChart
         width={width}
         height={height}
@@ -164,6 +177,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
         legendPosition={legendPosition}
         legendMarkerSize={legendMarkerSize}
         legendGap={legendGap}
+        legendFormatter={legendFormatter}
         showTooltip={showTooltip}
         tooltipFormatter={donutTooltipFormatter}
         title={title}

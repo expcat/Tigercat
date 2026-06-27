@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react'
+import React, { useState, useMemo, useRef, useCallback, useLayoutEffect } from 'react'
 import type { VirtualListProps as CoreVirtualListProps } from '@expcat/tigercat-core'
 import {
   virtualListContainerClasses,
@@ -29,7 +29,13 @@ export const VirtualList: React.FC<VirtualListProps> = ({
   onScroll
 }) => {
   const [scrollTop, setScrollTop] = useState(0)
+  // Bumped after DOM measurement so the range/offsets recompute (dynamic mode).
+  const [measureVersion, setMeasureVersion] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef(new Map<number, HTMLDivElement>())
+
+  // Dynamic mode measures real DOM heights and writes them back to the strategy.
+  const isDynamic = !customStrategy && !getItemHeight && estimatedItemHeight !== undefined
 
   const strategy = useMemo(() => {
     if (customStrategy) return customStrategy
@@ -41,8 +47,24 @@ export const VirtualList: React.FC<VirtualListProps> = ({
 
   const range = useMemo(
     () => strategy.getRange(scrollTop, height, itemCount, overscan),
-    [scrollTop, height, itemCount, overscan, strategy]
+    // measureVersion participates so re-measured heights recompute the window.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [scrollTop, height, itemCount, overscan, strategy, measureVersion]
   )
+
+  useLayoutEffect(() => {
+    if (!isDynamic || !strategy.updateItemHeight) return
+    let changed = false
+    itemRefs.current.forEach((el, i) => {
+      if (!el) return
+      const measured = el.offsetHeight
+      if (measured > 0 && measured !== strategy.getItemHeight(i)) {
+        strategy.updateItemHeight!(i, measured)
+        changed = true
+      }
+    })
+    if (changed) setMeasureVersion((v) => v + 1)
+  })
 
   const handleScroll = useCallback(() => {
     if (containerRef.current) {
@@ -57,11 +79,27 @@ export const VirtualList: React.FC<VirtualListProps> = ({
   const items: React.ReactNode[] = []
   for (let i = startIndex; i <= endIndex; i++) {
     const itemH = strategy.getItemHeight(i)
-    items.push(
-      <div key={i} style={{ height: `${itemH}px`, width: '100%' }}>
-        {renderItem({ index: i })}
-      </div>
-    )
+    if (isDynamic) {
+      // Auto height so the content's real height can be measured back.
+      const index = i
+      items.push(
+        <div
+          key={index}
+          ref={(el) => {
+            if (el) itemRefs.current.set(index, el)
+            else itemRefs.current.delete(index)
+          }}
+          style={{ width: '100%' }}>
+          {renderItem({ index })}
+        </div>
+      )
+    } else {
+      items.push(
+        <div key={i} style={{ height: `${itemH}px`, width: '100%' }}>
+          {renderItem({ index: i })}
+        </div>
+      )
+    }
   }
 
   const offsetTop = startIndex >= 0 ? strategy.getItemOffset(startIndex) : 0

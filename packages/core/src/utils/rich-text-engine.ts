@@ -24,18 +24,21 @@
 import {
   defaultToolbar,
   mapToolbarAction,
-  sanitizeHtml,
   isValidUrl,
-  getToolbarButtons
+  getToolbarButtons,
+  richTextModeToHtml,
+  richTextHtmlToMode
 } from './rich-text-editor-utils'
 import { isBrowser } from './env'
-import type { ToolbarItem } from '../types/rich-text-editor'
+import type { RichTextEditorMode, ToolbarItem } from '../types/rich-text-editor'
 
 export interface RichTextEngineMountContext {
   /** Host element the engine should mount into. */
   element: HTMLElement
   /** Initial HTML content (already sanitised by the component). */
   initialValue: string
+  /** Public value mode used by this editor instance. */
+  mode?: RichTextEditorMode
   /** Whether the editor is read-only at mount time. */
   readOnly: boolean
   /** Whether the editor is disabled at mount time. */
@@ -82,17 +85,17 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
     name: 'builtin',
     create(ctx) {
       const { element } = ctx
+      const mode = ctx.mode ?? 'html'
       let readOnly = ctx.readOnly
       let disabled = ctx.disabled
       element.contentEditable = String(!(readOnly || disabled))
 
-      const initial = sanitizeHtml(ctx.initialValue)
+      const initial = richTextModeToHtml(ctx.initialValue, mode)
       if (initial) element.innerHTML = initial
 
       const handleInput = () => {
         const html = element.innerHTML
-        const sanitized = sanitizeHtml(html)
-        ctx.notifyChange(sanitized)
+        ctx.notifyChange(richTextHtmlToMode(html, mode))
       }
 
       const refreshActiveFormats = () => {
@@ -165,11 +168,11 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
 
       return {
         setValue(html) {
-          const sanitized = sanitizeHtml(html)
+          const sanitized = richTextModeToHtml(html, mode)
           if (element.innerHTML !== sanitized) element.innerHTML = sanitized
         },
         getValue() {
-          return sanitizeHtml(element.innerHTML)
+          return richTextHtmlToMode(element.innerHTML, mode)
         },
         exec,
         refreshActiveFormats,

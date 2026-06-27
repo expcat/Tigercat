@@ -217,7 +217,8 @@ export function isCascaderOptionExpandable(option: CascaderOption): boolean {
 export function flattenCascaderOptions(
   options: CascaderOption[],
   parentPath: CascaderOption[] = [],
-  parentValuePath: CascaderValue = []
+  parentValuePath: CascaderValue = [],
+  changeOnSelect = false
 ): CascaderFlattenedOption[] {
   const result: CascaderFlattenedOption[] = []
 
@@ -225,9 +226,11 @@ export function flattenCascaderOptions(
     const currentPath = [...parentPath, option]
     const currentValuePath = [...parentValuePath, option.value]
     const isDisabled = currentPath.some((o) => o.disabled)
+    const isLeaf = !option.children || option.children.length === 0 || !!option.isLeaf
 
-    // Add leaf options or all if changeOnSelect
-    if (!option.children || option.children.length === 0 || option.isLeaf) {
+    // Add leaf options; with `changeOnSelect`, intermediate nodes are also
+    // selectable search results.
+    if (isLeaf || changeOnSelect) {
       result.push({
         path: currentPath,
         valuePath: currentValuePath,
@@ -238,7 +241,9 @@ export function flattenCascaderOptions(
 
     // Recurse into children
     if (option.children && option.children.length > 0) {
-      result.push(...flattenCascaderOptions(option.children, currentPath, currentValuePath))
+      result.push(
+        ...flattenCascaderOptions(option.children, currentPath, currentValuePath, changeOnSelect)
+      )
     }
   }
 

@@ -236,6 +236,8 @@ api:baseline:check` 已运行并生成预期 `api-reports/public-api-baseline.js
 
 **目标**：逐项处理公开 no-op、ghost 类型、受控名漂移与死公共 helper；默认实现能力，确需移除时走废弃流程。
 
+**状态**：已完成（2026-06-27）。本轮按“全量实现优先”处理 T09 全部 34 个子项：Select/Table/VirtualTable/VirtualList/Kanban/RichTextEditor 等大型 no-op 能力已接入真实运行路径；Transfer/FileManager/DataTableWithToolbar/Calendar/InputNumber/CommentThread/VirtualList 等 ghost 类型与双端声明已对齐；`getResultHttpLabel` 标记废弃并新增 `isHttpResultStatus`；NotificationCenter、Transfer 等纯死代码已删除或合并到 core helper。已补目标 core/React/Vue specs，运行 `npx -y pnpm@11.9.0 run types:check`、`npx -y pnpm@11.9.0 run api:validate`；generated references/API baseline 在本任务收尾通过生成器刷新。
+
 **来源**：C31-2、C29-1、C27-2、C14-2、C14-1、C20-2、C18-2、C18-4、C16-6、C23-1、C27-1、C32-1、C15-1、C15-2、C31-3、C22-2、C02-4、C19-2、C06-6、C06-5、C10-5、C15-5、C05-1、C13-2、C21-1、C21-2、C26-1、C29-2、C30-1；另含 C06-1、C12-3、C22-1、C24-1、C24-3 的类型对齐项。
 
 **允许修改**：对应组件 core 类型、React/Vue 实现、tests、MIGRATION、changeset、API baseline、必要的 generated references（通过 T05 的生成器）。

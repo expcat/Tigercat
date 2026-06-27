@@ -11,13 +11,13 @@ description: Compact generated Tigercat Form props reference
 
 ## AutoComplete
 
-`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 3/10 props
+`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 3/11 props
 
-| Prop           | Type                   | Default | Notes            |
-| -------------- | ---------------------- | ------- | ---------------- |
-| `options?`     | `AutoCompleteOption[]` | `-`     | Options list     |
-| `placeholder?` | `string`               | `-`     | Placeholder text |
-| `size?`        | `AutoCompleteSize`     | `-`     | Component size   |
+| Prop           | Type                   | Default | Notes                                                  |
+| -------------- | ---------------------- | ------- | ------------------------------------------------------ |
+| `locale?`      | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale |
+| `options?`     | `AutoCompleteOption[]` | `-`     | Options list                                           |
+| `placeholder?` | `string`               | `-`     | Placeholder text                                       |
 
 ## Cascader
 

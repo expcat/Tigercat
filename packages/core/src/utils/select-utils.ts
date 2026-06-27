@@ -117,6 +117,21 @@ const SELECT_SIZE_CLASSES: Record<SelectSize, string> = {
 }
 
 /**
+ * Approximate rendered option height (px) per size, used for virtual scrolling
+ * window math. Kept in core so React/Vue use identical values.
+ */
+const SELECT_VIRTUAL_ITEM_HEIGHT: Record<SelectSize, number> = {
+  sm: 32,
+  md: 40,
+  lg: 48
+}
+
+/** Get the virtual-scroll item height (px) for a select size. */
+export function getSelectVirtualItemHeight(size: SelectSize = 'md'): number {
+  return SELECT_VIRTUAL_ITEM_HEIGHT[size] ?? SELECT_VIRTUAL_ITEM_HEIGHT.md
+}
+
+/**
  * Get select size classes
  * @param size - Select size variant
  * @returns Size-specific class string
