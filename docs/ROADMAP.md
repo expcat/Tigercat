@@ -2,306 +2,284 @@
 
 <!-- LLM-INDEX
 type: active-roadmap
-scope: future planned tasks only
+scope: next-phase implementation plan based on the 2026-06-27 full-repo scan
 verified-date: 2026-06-27
-source: current repository state; v1.4.0 has been released
+source: current repository state; v1.4.0 has been released; all 202 A-G scan findings registered into T01-T14 (P3/observations under T13)
 -->
 
-本文只记录之后计划要完成的任务。已完成内容、发布记录、长期规则和命令说明不写入本文件。
+本文只记录下一阶段要实施的任务。已完成扫描的详细取证不再单独保留；后续执行入口以本文件的 T01-T14 为准。
 
 ## 后续计划
 
-### 最新一轮全代码扫描与公共内容整理
+### 下一阶段实施任务队列
 
-本轮扫描覆盖版本库跟踪的源码、测试、示例、脚本、文档与 skill references；不扫描 `node_modules`、`dist`、coverage、Playwright 报告等生成或依赖产物。当前扫描口径约 1429 个被跟踪代码/文档文件，重点覆盖 `packages/core`、`packages/react`、`packages/vue`、`packages/cli`、`tests`、`examples`、`scripts`、`benchmarks`、`e2e`、`docs`、`skills/tigercat`。
+本计划来自 2026-06-27 全代码扫描结果。扫描覆盖版本库跟踪的源码、测试、示例、脚本、文档与 skill references；不包括 `node_modules`、`dist`、coverage、Playwright 报告等生成或依赖产物。扫描中的 A、B、C01-C32、F、G 只作为来源编号引用，不作为实施清单直接分配。
 
-扫描目标是分批发现并记录 Bug、冗余、重复实现、无用代码、低效路径、过度设计、复杂逻辑，以及公共内容该拆未拆或该合未合的问题。每个扫描任务只产出可验证的发现和修复建议，不在扫描阶段直接重构公共 API。
+#### 执行原则
 
-#### 任务 A：公共 API、导出面与文档生成链路扫描 ✅ 已扫描（2026-06-24）
+- 实施入口以 T01-T14 为准；每个任务都必须遵守本节的允许修改、不得修改、依赖和验证边界。
+- 公开 API 删除、收窄或降级必须走 `@deprecated`、MIGRATION、changeset、`api:baseline:check`；no-op/ghost 项默认优先实现承诺能力。
+- 生成产物只能通过修改生成器或源码事实源后重生成；不得手改 `skills/tigercat/references/*` 或 `api-reports/*` 来掩盖漂移。
+- 有依赖或文件边界重叠的任务串行实施；无依赖且文件族不重叠的任务可以并行。
+- 文档整理任务不启动组件源码修复；执行 T01-T14 时再按各任务的验证命令运行目标门禁。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 A 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+#### 批次与依赖
 
-- 范围：`packages/*/src/index*`、`packages/*/package.json`、`api-reports`、`scripts/check-public-types.mjs`、`scripts/validate-api.mjs`、`scripts/generate-api-docs.mjs`、`skills/tigercat/references`。
-- 目标：找缺失/多余导出、React/Vue 公共组件不对称、废弃 API 残留、generated references 与生成器规则漂移。
-- 公共拆合判断：公开类型、Props、事件命名、受控量 parity 优先沉到 `core` 类型/工具；框架生命周期与渲染细节保留在 React/Vue 包内。
+| 批次 | 任务                    | 并行规则                                                                    |
+| ---- | ----------------------- | --------------------------------------------------------------------------- |
+| 1    | T01、T02、T03、T04      | 最高优先级；T01 与其他三项可并行，T03 与 T06 不能同时改同一 locale 类型     |
+| 2    | T05                     | 先统一生成器事实源；完成后其他 generated refs 相关任务不得另起生成器改动    |
+| 3    | T06、T07、T08、T10、T11 | 可并行，但各自只改本任务声明的文件族                                        |
+| 4    | T09、T12、T13、T14      | T09/T14 逐项实施；T12/T13 与源码组件任务隔离；T14 与 T07/T08/T09 同组件串行 |
 
-#### 任务 B：Core 工具、类型、主题、i18n、token 扫描 ✅ 已扫描（2026-06-26）
+#### T01 release/api baseline gate
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 B 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**目标**：修复 A-4 与 G-1 两条会阻断 `quality:release` 的门禁漂移：API baseline 生成格式必须与提交格式一致，release check 不再依赖旧版 ROADMAP 发布结构。
 
-- 范围：`packages/core/src/types`、`utils`、`themes`、`theme-runtime`、`tokens`、Tailwind entry。
-- 目标：找重复 helper、过宽工具模块、历史兼容别名、无消费者工具、低效遍历/缓存、locale 与 datepicker locale 重复。
-- 公共拆合判断：两个框架共同依赖且无框架运行时依赖的逻辑合入 core；只服务单组件且无复用价值的工具回收到组件局部。
+**来源**：A-4、G-1。
 
-#### 任务 C：组件分组扫描
+**允许修改**：`scripts/generate-api-baseline.mjs`、`scripts/check-release-readiness.mjs`、相关脚本测试或 fixture、`api-reports/public-api-baseline.json`、必要的 release 文档断言事实源。
 
-- 范围：以 `skills/tigercat/references/component-index.md` 为组件清单来源，按相近用途、共享 core helper、共享测试/示例/文档入口分组扫描。
-- 执行单位：一个组件组一次扫描；Table、DataTableWithToolbar、VirtualTable、Menu、Form、Select、DatePicker、TimePicker、Upload 等体量较大的组件单独成组或只带强关联子组件。
-- 统一检查：每组只打开本组相关的 core 类型/工具、React 实现、Vue 实现、React/Vue 测试、示例页面、generated references，并检查是否应提取、合并或拆分公共方法。
-- 固定结论格式：每组扫描结果统一记录 `发现问题`、`公共内容决策`、`建议修复顺序`、`目标验证命令`，方便后续对比和执行。
-- 公共拆合判断：纯逻辑和跨框架一致性优先沉到 core；框架生命周期、DOM ref、render/template 细节留在框架层。
+**不得修改**：组件源码、React/Vue 公共类型、旧发布表结构、`skills/tigercat/references/*`。
 
-##### C01 基础动作与文本 ✅ 已扫描（2026-06-26）
+**依赖/阻塞**：无；优先于所有需要 `quality:release` 或 `api:baseline:check` 的任务。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C01 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**完成验证**：`pnpm api:baseline`、`pnpm api:baseline:check`、`pnpm release:check`；若时间允许再跑 `pnpm quality:release`。
 
-- 组件：Button、ButtonGroup、Link、Text、Code、Icon、Tag、Badge。
-- 重点：尺寸/variant/color 命名、class 生成、aria 属性、图标渲染、轻量组件是否有重复样板。
+**冲突规避**：T01 是唯一允许改 `api-reports/public-api-baseline.json` 与 release-readiness 逻辑的任务；其他任务如需 baseline 变化，必须基于 T01 完成后的结果追加。
 
-##### C02 头像与状态展示 ✅ 已扫描（2026-06-26）
+#### T02 MarkdownEditor security
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C02 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**目标**：修复 C31-1 的安全问题，确保 MarkdownEditor 空 preview 不把 `placeholder` 直写进 `innerHTML`。
 
-- 组件：Avatar、AvatarGroup、Empty、Result、Statistic、QRCode、Watermark。
-- 重点：占位/回退内容、状态语义、重复布局 class、SVG/Canvas/水印计算逻辑是否应沉到 core。
+**来源**：C31-1。
 
-##### C03 布局骨架 ✅ 已扫描（2026-06-26）
+**允许修改**：MarkdownEditor 的 React/Vue 实现、共享 Markdown/RichText 安全 helper、对应 React/Vue 测试。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C03 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**不得修改**：其他编辑器公开 API、generated references、全局 sanitizer 契约以外的文档生成链路。
 
-- 组件：Layout、Header、Sidebar、Content、Footer、Container、Row、Col、Space、Divider。
-- 重点：布局 class 组合、响应式约束、Grid/Space 公共计算、框架实现是否保持对称。
+**依赖/阻塞**：无；可与 T01/T03/T04 并行。
 
-##### C04 内容容器 ✅ 已扫描（2026-06-26）
+**完成验证**：目标 MarkdownEditor React/Vue spec、`pnpm api:validate`、`pnpm types:check`。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C04 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**冲突规避**：只处理 placeholder 安全渲染；C31-2/C31-3/C31-5 分别归 T09/T05，不在本任务中扩展。
 
-- 组件：Card、List、Descriptions、Skeleton、Collapse、CollapsePanel、Timeline。
-- 重点：容器 variant、列表/描述项结构、折叠状态、Skeleton 重复渲染逻辑、Timeline item 内容类型。
+#### T03 critical i18n parity
 
-##### C05 导航轻量组 ✅ 已扫描（2026-06-26）
+**目标**：修复 P1 级 i18n 不对称：React QRCode 接入 ConfigProvider locale 并补 `qrcode` locale key；React Timeline 接入已有 Timeline locale。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C05 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**来源**：C02-2、C04-1。
 
-- 组件：Affix、Anchor、AnchorLink、BackTop、Breadcrumb、BreadcrumbItem、ScrollSpy、FloatButton、FloatButtonGroup。
-- 重点：滚动监听、active 计算、固定定位、键盘/aria、导航 item 公共结构。
+**允许修改**：`TigerLocale` 中 QRCode/Timeline 所需字段、core locale presets、React QRCode/Timeline 实现、对应 React/core 测试。
 
-##### C06 Steps/Tabs ✅ 已扫描（2026-06-26）
+**不得修改**：DatePicker/Select/Upload/Table 等其他 locale 命名空间；不得展开到 T06 的全量 locale rollout。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C06 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**依赖/阻塞**：无；但与 T06 不能同时改同一 locale 类型或 preset 文件。若 T06 已开始，T03 作为 T06 的首批子任务合并执行。
 
-- 组件：Steps、StepsItem、Tabs、TabPane。
-- 重点：上下文、受控状态、键盘导航、禁用态、面板挂载策略是否可共享。
+**完成验证**：QRCode/Timeline 目标 spec、`pnpm api:validate`、`pnpm types:check`、必要时 `pnpm api:baseline:check`。
 
-##### C07 Menu 单组 ✅ 已扫描（2026-06-26）
+**冲突规避**：T03 只处理 P1 parity；C02-5/C04-4 等非 P1 locale 文案留给 T06。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C07 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+#### T04 Vue reactive lifecycle fixes
 
-- 组件：Menu、MenuItem、MenuItemGroup、SubMenu。
-- 重点：体量较大，单独检查层级状态、展开/选中、键盘导航、首字母回退、上下文拆分。
+**目标**：修复 Vue 侧 reactive/lifecycle 类缺陷，不改变公共类型形状。
 
-##### C08 Overlay 触发器 ✅ 已扫描（2026-06-26）
+**来源**：C02-1、C05-2、C05-3、C08-1、C16-7。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C08 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**允许修改**：Vue AvatarGroup、Anchor/AnchorLink/ScrollSpy、Overlay 触发器、DatePicker shortcut/生命周期相关实现与 Vue 测试。
 
-- 组件：Dropdown、DropdownMenu、DropdownItem、Popover、Popconfirm、Tooltip。
-- 重点：floating/overlay/focus 公共逻辑、触发方式、关闭时机、定位更新、事件穿透。
+**不得修改**：React 对应实现、core 公共类型、locale rollout、生成器。
 
-##### C09 Feedback 容器 ✅ 已扫描（2026-06-26）
+**依赖/阻塞**：无；可与 T01/T02/T03 并行。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C09 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**完成验证**：相关 Vue spec、`pnpm api:validate`、`pnpm types:check`。
 
-- 组件：Modal、Drawer、Loading、Progress、Tour。
-- 重点：open API、portal、scroll lock、focus restore、遮罩/层级、进度状态。
+**冲突规避**：本任务只做 Vue reactive/lifecycle 修复；同一组件的 a11y、locale、公共 API no-op 分别归 T07/T06/T09。
 
-##### C10 消息通知 ✅ 已扫描（2026-06-26）
+#### T05 generator and generated refs
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C10 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**目标**：统一公开组件枚举与 generated references 事实源，修复 component-index 误列/漏列、props 类型映射与高级能力覆盖不足。
 
-- 组件：Message、Notification、NotificationCenter。
-- 重点：全局容器、重复节点、队列清理、定时器、严格模式重复渲染。
+**来源**：A-5、A-6、A-7、C03-1、C06-4、C22-4、C24-4、C25-1、C28-5、C30-3、C31-5、C32-4、C12-2。
 
-##### C11 Form 单组 ✅ 已扫描（2026-06-26）
+**允许修改**：`scripts/generate-api-docs.mjs`、新增脚本层 helper（如 `scripts/lib/public-components.mjs`）、消费同一 helper 的 `validate-api`/baseline 脚本、生成后的 `skills/tigercat/references/*`。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C11 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**不得修改**：组件运行时实现、core runtime helper、公共 API 语义；不得手写 generated references 内容。
 
-- 组件：Form、FormItem、useFormController。
-- 重点：体量较大，单独检查表单上下文、校验、依赖字段、受控/非受控、错误状态公共逻辑。
+**依赖/阻塞**：建议在 T01 后执行，避免 baseline/generator 事实源同时漂移。
 
-##### C12 输入基础组 ✅ 已扫描（2026-06-26）
+**完成验证**：`pnpm docs:api`、`pnpm docs:api:check`、`pnpm api:validate`、`pnpm types:check`。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C12 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**冲突规避**：T05 是唯一允许修改 generated references 生成链路的任务；T09 若需要更新 docs，必须等 T05 合并后再通过同一生成器重跑。
 
-- 组件：Input、Textarea、InputGroup、InputGroupAddon、InputNumber、NumberKeyboard、Mentions。
-- 重点：输入展示/解析、自动尺寸、组合输入结构、数字边界、Mentions 导航和过滤公共逻辑。
+#### T06 locale namespace rollout
 
-##### C13 选择/切换基础组 ✅ 已扫描（2026-06-26）
+**目标**：按统一规则完成非 P1 的 locale/i18n 扩展：组件接 ConfigProvider merged locale，显式 prop 最高优先级，默认文案沉 core，preset 作为 labels 单一来源。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C13 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**来源**：B-1、B-2、C01-4、C02-5、C04-4、C09-3、C09-6、C14-3、C14-6、C16-3、C16-5、C18-3、C19-3、C20-6、C21-5、C23-4、C30-2，及 Calendar locale。
 
-- 组件：Checkbox、CheckboxGroup、Radio、RadioGroup、Switch、Slider、Stepper、Rate、Segmented。
-- 重点：受控状态、键盘交互、禁用态、组选项、滑动/步进公共计算。
+**允许修改**：core locale 类型与 presets、React/Vue 组件 locale 接入、locale utils、i18n 测试、组件目标测试、必要的 API baseline/changeset。
 
-##### C14 Select 单组 ✅ 已扫描（2026-06-26）
+**不得修改**：a11y 键盘行为、no-op props 实现、generated references 生成器、发布门禁脚本。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C14 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**依赖/阻塞**：若 T03 未完成，先把 T03 内容纳入本任务首批；否则基于 T03 的 locale key 继续扩展。
 
-- 组件：Select、AutoComplete。
-- 重点：option state、过滤、键盘导航、popup、受控量 parity、与 TreeSelect/Cascader 的可共享边界。
+**完成验证**：core i18n/date picker locale spec、相关组件 React/Vue spec、`pnpm api:validate`、`pnpm types:check`、涉及公共类型时跑 `pnpm api:baseline:check`。
 
-##### C15 层级选择组 ✅ 已扫描（2026-06-27）
+**冲突规避**：T06 独占 locale 类型和 preset 文件；T03/T07/T09 不得同时修改同一 locale 字段。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C15 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+#### T07 a11y keyboard aria
 
-- 组件：Tree、TreeSelect、Cascader、Transfer。
-- 重点：tree-utils、展开/选中/过滤、层级数据扁平化、移动项状态、虚拟化接入点。
+**目标**：统一修复可访问性、键盘交互、ARIA 与 focus 行为，DOM/focus 保持框架层，纯索引/规则 helper 可沉 core。
 
-##### C16 日期组 ✅ 已扫描（2026-06-27）
+**来源**：C06-3、C07-8、C13-1、C14-5、C16-2、C18-6、C20-3、C21 行交互、C23-3、C25-3、C26-2、C26-4、C27-4、C32-2、C06-2、C09-4。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C16 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**允许修改**：相关 React/Vue 组件的 ARIA/focus/key handling、必要的 core 纯规则 helper、a11y/keyboard 测试。
 
-- 组件：DatePicker、Calendar。
-- 重点：DatePicker 体量较大，检查 date-utils、datepicker locale、键盘导航、范围/面板状态。
+**不得修改**：locale 文案、公开 no-op props 契约、generated references、发布脚本。
 
-##### C17 时间组 ✅ 已扫描（2026-06-27）
+**依赖/阻塞**：可与 T06/T08 并行，但同一组件同一文件需串行合并；菜单键盘底层 helper 若与 T08 重叠，以 T08 先抽 helper、T07 再接入行为测试。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C17 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**完成验证**：相关组件 React/Vue spec、a11y 断言、`pnpm api:validate`、`pnpm types:check`。
 
-- 组件：TimePicker、Countdown、CronEditor。
-- 重点：TimePicker 体量较大，检查 timepicker-utils、格式/解析、步进、倒计时和 cron 纯逻辑。
+**冲突规避**：T07 只处理交互/a11y；同组件 locale 和 API no-op 分别归 T06/T09。
 
-##### C18 Upload 单组 ✅ 已扫描（2026-06-27）
+#### T08 core pure-logic consolidation
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C18 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**目标**：把双端重复且框架无关的纯逻辑收口到 core，降低 React/Vue 漂移风险。
 
-- 组件：Upload、FileManager、Signature。
-- 重点：Upload 体量较大，检查文件状态、校验、拖放、可访问性、文件管理和签名输入的复用边界。
+**来源**：C07-2、C10-2、C16-1、C19-1、C19-2、C25-4、C21-3、C23-5、C27-3、C28-1、C28-2、C28-3、C14-4、C18-5、C15-5、C26-3、C04-2、B-3、C13-3、C16-4、C21-4。
 
-##### C19 图片展示组 ✅ 已扫描（2026-06-27）
+**允许修改**：`packages/core/src/utils`、相关 core 类型、React/Vue 调用点、目标组件测试、必要的 API baseline/changeset。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C19 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**不得修改**：locale preset、a11y DOM 行为、generated references 生成器、CLI/scripts。
 
-- 组件：Image、ImagePreview、ImageGroup、ImageViewer。
-- 重点：预览状态、受控量、手势、加载/错误态、图片组上下文。
+**依赖/阻塞**：ThemeConfig helper 与 T10 token 工作可能接触相邻文件，需先约定边界：T08 管运行时 `ThemeConfig → CSS vars`，T10 管 token/Tailwind 默认值和 `bg-opacity-*` 迁移。
 
-##### C20 图片编辑组 ✅ 已扫描（2026-06-27）
+**完成验证**：目标 core tests、相关 React/Vue spec、`pnpm api:validate`、`pnpm types:check`、涉及公开导出时跑 `pnpm api:baseline:check`。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C20 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**冲突规避**：每个 helper 子项独立 PR/提交更稳；不得在同一次修改中顺手处理 T09 no-op props 或 T07 a11y。
 
-- 组件：ImageCropper、ImageAnnotation、CropUpload。
-- 重点：裁剪/标注纯逻辑是否可沉到 core、上传接入、坐标计算、撤销/重置。
+#### T09 public API no-op and ghost props
 
-##### C21 Table 单组 ✅ 已扫描（2026-06-27）
+**目标**：逐项处理公开 no-op、ghost 类型、受控名漂移与死公共 helper；默认实现能力，确需移除时走废弃流程。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C21 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**来源**：C31-2、C29-1、C27-2、C14-2、C14-1、C20-2、C18-2、C18-4、C16-6、C23-1、C27-1、C32-1、C15-1、C15-2、C31-3、C22-2、C02-4、C19-2、C06-6、C06-5、C10-5、C15-5、C05-1、C13-2、C21-1、C21-2、C26-1、C29-2、C30-1；另含 C06-1、C12-3、C22-1、C24-1、C24-3 的类型对齐项。
 
-- 组件：Table。
-- 重点：体量最大，单独扫描 fixed columns、pagination、selection、resize、export、i18n、card/virtual 推荐边界。
+**允许修改**：对应组件 core 类型、React/Vue 实现、tests、MIGRATION、changeset、API baseline、必要的 generated references（通过 T05 的生成器）。
 
-##### C22 DataTableWithToolbar 单组 ✅ 已扫描（2026-06-27）
+**不得修改**：与目标子项无关的组件、release scripts、locale rollout、Tailwind token 迁移。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C22 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**依赖/阻塞**：建议在 T01 后执行；涉及 generated references 的子项应等 T05 完成。每个 no-op/ghost 子项应独立拆分，避免一个 Agent 同时跨越多个组件域。
 
-- 组件：DataTableWithToolbar、TableToolbar。
-- 重点：toolbar/filter/card mode、列隐藏/锁定、Table 共享边界、过滤值更新是否双端一致。
+**完成验证**：目标组件 spec、`pnpm api:validate`、`pnpm types:check`、`pnpm api:baseline:check`；涉及文档时追加 `pnpm docs:api:check`。
 
-##### C23 VirtualTable 单组 ✅ 已扫描（2026-06-27）
+**冲突规避**：T09 是公开 API 契约任务；T06/T07/T08 不得借机删除或降级公开 prop。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C23 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+#### T10 Tailwind/token cleanup
 
-- 组件：VirtualTable。
-- 重点：虚拟滚动、固定列、可访问性、Table 复用关系、滚动性能。
+**目标**：收敛 Tailwind v4 token 化与透明度写法，降低 token、plugin、theme preset 多源维护风险。
 
-##### C24 虚拟列表组 ✅ 已扫描（2026-06-27）
+**来源**：B-4、C02-3、C04-3、C18-1、C18-7。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C24 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**允许修改**：token 生成链路、Tailwind plugin 默认变量、theme preset 默认值同步护栏、相关组件 class/token 引用、token/Tailwind 测试。
 
-- 组件：VirtualList、InfiniteScroll。
-- 重点：viewport、observer、scroll 性能、占位测量、加载触发条件。
+**不得修改**：ThemeManager 运行时非 colors 应用（归 T08）、locale、a11y、generated references。
 
-##### C25 图表基础组 ✅ 已扫描（2026-06-27）
+**依赖/阻塞**：与 T08 的 ThemeConfig 子项可能接触主题文件；先完成 T08 的运行时边界或在同一分支协调。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C25 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**完成验证**：token 生成/校验命令、相关 core tests、`pnpm api:validate`、`pnpm types:check`、必要时 `pnpm size`。
 
-- 组件：ChartCanvas、ChartAxis、ChartGrid、ChartSeries、ChartLegend、ChartTooltip。
-- 重点：chart shared/utils、坐标系、tooltip、legend、SVG 属性公共逻辑。
+**冲突规避**：T10 只处理 token/Tailwind 默认值和 class 迁移；不得改组件行为契约。
 
-##### C26 笛卡尔图表组 ✅ 已扫描（2026-06-27）
+#### T11 test/e2e/benchmark maintenance
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C26 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**目标**：增强测试质量门禁、E2E 入口、SSR 示例生成副作用检查与 benchmark 覆盖说明。
 
-- 组件：LineChart、AreaChart、BarChart、ScatterChart。
-- 重点：scale、path、tooltip、降采样、点/线/柱复用边界。
+**来源**：F-1、F-2、F-3、F-4。
 
-##### C27 径向图表组 ✅ 已扫描（2026-06-27）
+**允许修改**：`scripts/validate-tests.mjs`、根 `package.json` scripts、CI/E2E workflow、PR 模板、`examples/nextjs/next-env.d.ts` 或 SSR build 流程、benchmark coverage map。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C27 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**不得修改**：组件源码行为、公共 API、locale、generated references。
 
-- 组件：PieChart、DonutChart、RadarChart、GaugeChart。
-- 重点：角度计算、label 布局、重复 SVG 逻辑、空值和极值。
+**依赖/阻塞**：无；可与组件源码任务并行。
 
-##### C28 专用图表组 ✅ 已扫描（2026-06-27）
+**完成验证**：`pnpm test:validate`、`pnpm example:ssr:build` 后目标 diff 检查、E2E script dry run 或 Playwright smoke、`pnpm bench`（如改 benchmark）。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C28 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**冲突规避**：T11 只改测试/示例/CI 维护层；不得把组件修复混入门禁增强。
 
-- 组件：FunnelChart、HeatmapChart、TreeMapChart、SunburstChart、OrgChart、Gantt。
-- 重点：专用布局算法、层级/时间轴计算、颜色映射、复杂数据边界。
+#### T12 CLI/scripts maintenance
 
-##### C29 复合内容组 ✅ 已扫描（2026-06-27）
+**目标**：收敛 CLI 命令执行、维护脚本 helper 与文档发现性，保持 CLI runtime 与 repo-only scripts 边界清晰。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C29 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**来源**：G-2、G-3、G-4。
 
-- 组件：ActivityFeed、ChatWindow、CommentThread。
-- 重点：Avatar/Input/Textarea/Button/VirtualList 等依赖复用、列表性能、空态、交互回调。
+**允许修改**：`packages/cli/src` 局部 command runner、CLI tests、`scripts/utils/*`、维护脚本 helper、CLI README、scripts README。
 
-##### C30 工作流复合组 ✅ 已扫描（2026-06-27）
+**不得修改**：组件 runtime、generated references 官方生成器行为、release-readiness 旧 ROADMAP 断言（已归 T01）。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C30 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**依赖/阻塞**：T01 先恢复 release gate；T12 再做脚本 helper 机械合并。
 
-- 组件：FormWizard、TaskBoard、Kanban。
-- 重点：Steps、ConfigProvider、drag/task-board utilities、Kanban 与 TaskBoard 的薄封装边界。
+**完成验证**：CLI 目标 vitest、受影响脚本目标命令、`pnpm api:validate`、`pnpm types:check`。
 
-##### C31 高级编辑器组 ✅ 已扫描（2026-06-27）
+**冲突规避**：CLI command runner 不得直接导入 `scripts/utils/*`；repo-only scripts helper 不进入发布包。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C31 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+#### T13 deferred classification
 
-- 组件：CodeEditor、RichTextEditor、MarkdownEditor。
-- 重点：引擎抽象、输入同步、内容转换、示例复杂度、无第三方运行时边界。
+**目标**：对暂缓项补分类、护栏或文档说明，不抢占前置任务的源码范围。
 
-##### C32 交互能力组 ✅ 已扫描（2026-06-27）
+**分组入口**：
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 C / C32 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+| 分组              | 来源                                                                                                                                                                                                                                 | 处理目标                                                                                  | 允许动作                                                                                 | 禁止动作                                                                                  | 升级条件                                                                                                    | 最小验证                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 分类/文档护栏     | B-5、A-2、C29-3、F-4、C07-5、C01-5                                                                                                                                                                                                   | 补充分类说明、coverage map 或后续 backlog，避免低优先观察在后续任务中被误当成立即修复项。 | 分类文档、只读审计记录、低风险 guard test、benchmark coverage map、命名/语义说明。       | 不删除公开 API；不改组件运行时；不改 generated references、release gate、locale rollout。 | 审计发现真实功能缺陷、用户可见回归、公共契约不一致，或需要改源码才能建立护栏时，拆成新的 Txx 子任务。       | `corepack pnpm prettier --check docs/ROADMAP.md`、`git diff --check -- docs/ROADMAP.md`。                       |
+| 低风险清理候选    | A-3、B-6、C01-1/2/3/6/7、C03-2、C04-5/6/7/8、C05-5、C07-1/3/4/6、C08-2/3/4/5/6/7、C09-2/5/7、C10-3/4/6/7、C11-4/5、C12-4/5/6、C13-4、C14-7、C15-3/4、C17-2、C19-4/5、C20-4/5、C21-6、C22-3、C25-5、C27-5、C28-4、C29-4、C30-4、C32-3 | 分批处理不急迫的重复实现、helper 归属、轻微 parity、文档发现性或低概率边界问题。          | 小范围 helper 合并、局部测试补强、JSDoc/说明修正、低风险行为对齐；每次只认领一个组件族。 | 不跨组件大重构；不把 P2/P1 行为修复混入；不借机收窄公开 prop。                            | 子项需要公共类型变更、破坏兼容、涉及安全/SSR/a11y 主路径，或与 T06/T07/T08/T09/T14 重叠时，升级并重新归类。 | 目标组件/core spec；`corepack pnpm api:validate`、`corepack pnpm types:check`；文档项追加 prettier/diff check。 |
+| 观察/健康，无动作 | A-1、C01-8、C07-7、C11-6、C14-8、C16-8、C17-3、C18-8、C19-6、C24-5、C32-5、F-5、G-5                                                                                                                                                  | 保留为后续回归背景，不作为实施任务；执行相邻组件修复时用来确认健康路径不被误改。          | 只读复核、回归说明、测试备注；必要时把健康路径加入受影响任务的验收清单。                 | 不主动改源码；不把“健康面”改写成待修复缺陷。                                              | 后续取证证明观察项已变成真实缺陷，或产品策略决定改变既有行为时，单独建任务。                                | 文档检查；若相邻源码任务引用该健康面，则跑该任务自己的目标 spec。                                               |
 
-- 组件：Drag、Carousel、Resizable、Splitter。
-- 重点：pointer/keyboard/resize helper、拖拽状态、尺寸约束、动画/过渡公共逻辑。
+**允许修改**：分类文档、低风险 guard test、coverage map、后续 backlog 条目；必要时只做只读审计报告。
 
-#### 任务 F：测试、示例、E2E、benchmark 扫描 ✅ 已扫描（2026-06-27）
+**不得修改**：公开 API 删除、组件大重构、generated references、release gate、locale rollout。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 F 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+**依赖/阻塞**：排在 T01-T12 后；只有当前置任务完成或明确不覆盖该区域时才实施。
 
-- 范围：`tests/core`、`tests/react`、`tests/vue`、`tests/utils`、`examples/example/*`、`examples/nextjs`、`examples/nuxt`、`e2e`、`benchmarks`。
-- 目标：找失效测试、弱断言、重复测试样板、示例使用废弃 API、示例与公开 API 不一致、benchmark 覆盖缺口。
-- 公共拆合判断：跨框架测试 fixture/helper 合并到 `tests/utils`；框架特有 render helper 保留独立。
+**完成验证**：文档/护栏对应的最小命令，至少 `pnpm prettier --check` 与 `git diff --check`。
 
-#### 任务 G：CLI、脚本、发布与维护自动化扫描 ✅ 已扫描（2026-06-27）
+**冲突规避**：T13 不做功能修复；若发现必须改源码，应拆成新的后续任务，不在 T13 中直接实施。
 
-> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 G 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
+#### T14 残留 P2 组件行为/契约修复
 
-- 范围：`packages/cli/src`、`scripts/*.mjs`、根 `package.json` scripts、release/check/publish/setup 工具。
-- 目标：找跨平台问题、重复文件遍历、硬编码路径、错误输出不清晰、与 README/scripts 文档不一致的命令。
-- 公共拆合判断：通用终端输出、pnpm 执行、walk/collectFiles 等脚本 helper 合并；一次性发布规则保持在对应脚本内。
+**目标**：逐项修复随取证删除而失去归属的 P2 行为/契约类缺陷，默认实现承诺能力；需改公共契约时走废弃流程。
 
-#### 任务 H：最终公共内容拆分/合并决策汇总 ✅ 已汇总（2026-06-27）
+**子项入口**：
 
-> 汇总结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 H 节）；A-G 决策按五类动作（合并到 core / 保持框架分离 / 拆出局部 helper / 删除或废弃 / 延后）归类，本表仅留计划与状态。
+| 来源  | 组件/区域      | 问题                                                                              | 建议修复方向                                                                                                              | 主要修改边界                                                                                         | 目标验证命令                                                                                                                                                                                                                                                                                      |
+| ----- | -------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C05-4 | BackTop        | render 阶段访问默认 `window`，存在 SSR 风险。                                     | 在框架层延迟读取 `window`，SSR 下保持可渲染；core 的 visibility controller、scroll helper 与 class 常量继续复用。         | React/Vue BackTop 实现和目标测试；不改 core public API。                                             | `corepack pnpm vitest run tests/react/BackTop.spec.tsx tests/vue/BackTop.spec.ts tests/core/back-top-utils.spec.ts tests/core/ssr-frameworks.spec.ts`、`corepack pnpm quality:ssr`、`corepack pnpm api:validate`。                                                                                |
+| C09-1 | React Modal    | `onOpenChange`/`onClose` 被当作 prop observer，初始挂载或父级 prop 变化也会触发。 | 推荐改为 action-only 语义：只在内部关闭/确认动作或有效 open-to-closed 过渡触发；若保留 observer，必须文档化。             | React Modal 与测试；Vue 仅作对照，不主动改。涉及兼容语义时补 migration/changeset。                   | `corepack pnpm vitest run tests/react/Modal.spec.tsx tests/vue/Modal.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`。                                                                                                                                                        |
+| C10-1 | Message        | imperative API 接收 `position` 但双端静默忽略，和 Notification 不对称。           | 二选一：真正按 position 分容器渲染；或将 `position` 标为 deprecated 并同步类型/文档。默认优先实现承诺能力。               | React/Vue Message 实现、测试、必要的 core 类型；public type 变更必须跑 baseline。                    | `corepack pnpm vitest run tests/react/Message.spec.tsx tests/vue/Message.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`，涉及类型追加 `corepack pnpm api:baseline:check`。                                                                                                   |
+| C11-1 | Form           | React 维护无人读取的 `formValues` 影子状态与 `updateValue`，Vue 没有同等契约。    | 先统一 Form 数据所有权：推荐以外部 `model` 为单一数据源，移除或正式文档化写入口；双端契约必须一致。                       | Form React/Vue、FormContext 类型、useFormContext 消费端、测试；涉及公开类型需 changeset/baseline。   | `corepack pnpm vitest run tests/react/Form.spec.tsx tests/vue/Form.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`，涉及类型追加 `corepack pnpm api:baseline:check`。                                                                                                         |
+| C11-2 | Form           | `resetFields` 只清校验错误，不重置字段值，且双端实现不一致。                      | 二选一：明确仅清校验并文档化；或存初始快照并真正重置字段值。与 C11-1 的数据所有权决策一起落地。                           | Form 实现、useFormController 对照测试、文档/类型说明；不混入无关 FormItem 样式调整。                 | `corepack pnpm vitest run tests/react/Form.spec.tsx tests/vue/Form.spec.ts`、`corepack pnpm types:check`。                                                                                                                                                                                        |
+| C11-3 | Form           | `addField`/`removeField`/`undo`/`redo` 受控数据流双端契约不一致。                 | 与 C11-1 合并决策：统一为单一数据源 + 一致变更事件，确保命令后值、校验与历史栈一致。                                      | Form 命令方法、core form history helper 调用点、双端测试；不重写表单校验系统。                       | `corepack pnpm vitest run tests/react/Form.spec.tsx tests/vue/Form.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`。                                                                                                                                                          |
+| C12-1 | InputGroup     | `size` 说明为应用到全部子控件，但当前只影响 Addon。                               | 二选一：收窄说明为只影响 Addon；或让 Input/Textarea/InputNumber 在未显式传 size 时继承 group size。默认优先实现承诺能力。 | InputGroup context、Input/Textarea/InputNumber 双端实现和测试；不改输入解析/格式化逻辑。             | `corepack pnpm vitest run tests/react/InputGroup.spec.tsx tests/react/Input.spec.tsx tests/react/Textarea.spec.tsx tests/react/InputNumber.spec.tsx tests/vue/InputGroup.spec.ts tests/vue/Input.spec.ts tests/vue/Textarea.spec.ts tests/vue/InputNumber.spec.ts`、`corepack pnpm types:check`。 |
+| C17-1 | TimePicker     | `minTime`/`maxTime` 只按分钟比较，`showSeconds` 秒级边界无效。                    | 将 core range helper 收敛为总秒比较，并让秒列/移动端 option 复用同一禁用规则；若不支持秒级需收窄文档。                    | core time utils、React/Vue TimePicker 渲染与测试、props 文档；不改 locale rollout。                  | `corepack pnpm vitest run tests/core/time-utils.spec.ts tests/react/TimePicker.spec.tsx tests/vue/TimePicker.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`。                                                                                                                |
+| C20-1 | ImageCropper   | SVG mask 固定 `crop-mask` id，多实例同屏会冲突。                                  | 双端生成实例级 mask id 并同步 `url(#id)` 引用；不改 public API。                                                          | React/Vue ImageCropper 实现和多实例测试；不改裁剪算法。                                              | `corepack pnpm vitest run tests/react/ImageCropper.spec.tsx tests/vue/ImageCropper.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`。                                                                                                                                          |
+| C23-2 | VirtualTable   | 固定列未复用 Table 的 `border-separate` 与 colgroup 钉宽策略。                    | 提取/复用 table base class、colgroup descriptor 或固定列宽度策略，保持 VirtualTable 虚拟窗口逻辑独立。                    | VirtualTable、必要的 Table shared helper、固定列测试；不得重写 Table 状态机。                        | `corepack pnpm vitest run tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts tests/react/Table.spec.tsx tests/vue/Table.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`。                                                                                       |
+| C24-2 | InfiniteScroll | observer 路径未感知 `inverse`，与 scroll fallback 触发边界不一致。                | 扩展 core observer helper 支持 `inverse`，生成 top/left rootMargin；React/Vue 同步传入。                                  | core infinite-scroll utils、React/Vue InfiniteScroll 传参和测试；不改 public prop。                  | `corepack pnpm vitest run tests/core/infinite-scroll-utils.spec.ts tests/react/InfiniteScroll.spec.tsx tests/vue/InfiniteScroll.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`。                                                                                             |
+| C25-2 | ChartLegend    | `gap` prop 双端行为分歧，label 上还有冗余 `marginRight`。                         | 统一 `gap` 为容器 flex 行间距，移除 label 冗余尾边距；可抽小型 layout style helper 防漂移。                               | React/Vue ChartLegend、必要 core chart helper、双端断言；不改 chart scale/path 逻辑。                | `corepack pnpm vitest run tests/react/ChartSubComponents.spec.tsx tests/vue/ChartSubComponents.spec.ts tests/core/chart-utils.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`。                                                                                               |
+| C31-4 | RichTextEditor | 自定义 toolbar action 绕过 engine change 同步。                                   | 让自定义 action 统一走 engine 执行，或组件执行后显式走同一 notifyChange/sanitize/active-format 路径。                     | React/Vue RichTextEditor、rich-text engine、custom toolbar action 测试；不改 MarkdownEditor 安全项。 | `corepack pnpm vitest run tests/react/RichTextEditor.spec.tsx tests/vue/RichTextEditor.spec.ts tests/core/rich-text-engine.spec.ts`、`corepack pnpm api:validate`、`corepack pnpm types:check`。                                                                                                  |
 
-- 范围：汇总 A-G 发现。
-- 目标：形成“合并到 core / 保持框架分离 / 拆出局部 helper / 删除或废弃 / 延后”的决策表。
-- 公共 API 变更默认策略：不直接删除公开内容；需要删除时先标记 deprecated、补 migration、补 changeset，并通过 API baseline 检查。
+**允许修改**：上列组件的 React/Vue 运行时实现、目标组件测试、必要的 core 纯 helper/类型、涉及公共类型时的 changeset/API baseline。
 
-#### 验证计划
+**不得修改**：locale rollout（T06）、generated references 生成器（T05）、release gate（T01）、Tailwind/token（T10）；不借机删除/降级公开 prop（T09）。
 
-- 每个扫描任务完成后至少运行对应轻量门禁：`pnpm api:validate`、`pnpm types:check`、相关 `vitest` 目标、必要时 `pnpm docs:api:check`。
-- 涉及示例、SSR、发布或公共导出时追加：`pnpm example:build`、`pnpm quality:ssr`、`pnpm api:baseline:check`。
-- 整轮 Roadmap 收尾门禁：`pnpm quality:quick`、`pnpm test:validate`、`pnpm docs:api:check`、`pnpm api:baseline:check`、`git diff --check`。
-- 若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`。
-- 后续执行组件组扫描时，按组选择目标验证：相关 `vitest` 文件、`pnpm api:validate`、`pnpm types:check`；涉及示例或 public surface 时追加 `pnpm example:build`、`pnpm docs:api:check` 或 `pnpm api:baseline:check`。
+**依赖/阻塞**：排在 T01 之后；每子项独立 PR；与 T07/T08/T09 触及同组件文件时串行（Table 类：C23-2 与 T08 的 C21-4、T09 的 C21-1/C21-2 不得并发改同文件）。
 
-#### 执行假设
+**完成验证**：目标组件 React/Vue spec、`pnpm api:validate`、`pnpm types:check`；涉及公共类型时 `pnpm api:baseline:check`。
 
-- 本轮先规划并记录扫描任务，不直接实施重构或修复。
-- `docs/ROADMAP.md` 继续只记录未来计划；已完成扫描结果和发布记录不写入本文件。
-- `skills/tigercat/references/*` 视为生成结果；若发现文档问题，先改 `scripts/generate-api-docs.mjs` 或源码注释/类型来源，再生成。
-- “全代码”指版本库跟踪的源码、测试、示例、脚本和文档，不包括依赖、构建产物、coverage 和报告目录。
-- 组件分组以当前 `component-index.md` 和源码体量为准；后续新增组件时追加到最相近组，过大则单独成组。
-- 每个组件组的扫描结果必须能独立阅读和验证，避免一次加载全库造成 token 消耗过大。
+**冲突规避**：T14 只做行为/契约修复；同组件 no-op/ghost、a11y、纯逻辑、locale 分别归 T09/T07/T08/T06。
+
+#### 路线图维护验证
+
+- 文档整理后运行 `corepack pnpm prettier --write docs/ROADMAP.md` 与 `corepack pnpm prettier --check docs/ROADMAP.md`。
+- 删除旧扫描记录后确认文件不存在，并确认仓库内没有旧扫描记录引用或行首冲突标记。
+- 文档类改动至少运行 `git diff --check -- docs/ROADMAP.md`。
