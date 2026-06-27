@@ -151,8 +151,9 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       )}
       role="region"
       aria-label="Markdown preview"
-      dangerouslySetInnerHTML={{ __html: currentValue ? previewHtml : placeholder || '' }}
-    />
+      {...(currentValue ? { dangerouslySetInnerHTML: { __html: previewHtml } } : {})}>
+      {currentValue ? null : placeholder}
+    </div>
   )
 
   return (

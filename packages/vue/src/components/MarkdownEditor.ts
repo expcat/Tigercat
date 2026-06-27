@@ -252,16 +252,20 @@ export const MarkdownEditor = defineComponent({
         : null
 
       const previewNode = showPreview.value
-        ? h('div', {
-            class: classNames(
-              markdownEditorPreviewClasses,
-              currentMode.value === 'split' ? markdownEditorSplitDividerClasses : undefined,
-              !currentValue.value ? markdownEditorEmptyPreviewClasses : undefined
-            ),
-            role: 'region',
-            'aria-label': 'Markdown preview',
-            innerHTML: currentValue.value ? previewHtml.value : props.placeholder || ''
-          })
+        ? h(
+            'div',
+            {
+              class: classNames(
+                markdownEditorPreviewClasses,
+                currentMode.value === 'split' ? markdownEditorSplitDividerClasses : undefined,
+                !currentValue.value ? markdownEditorEmptyPreviewClasses : undefined
+              ),
+              role: 'region',
+              'aria-label': 'Markdown preview',
+              ...(currentValue.value ? { innerHTML: previewHtml.value } : {})
+            },
+            currentValue.value ? undefined : props.placeholder
+          )
         : null
 
       return h(

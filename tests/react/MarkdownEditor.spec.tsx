@@ -87,6 +87,15 @@ describe('MarkdownEditor', () => {
         'Write markdown...'
       )
     })
+
+    it('escapes html in empty-preview placeholder', () => {
+      const payload = '<img src=x onerror="alert(1)">'
+      const { container } = renderEditor({ value: '', placeholder: payload })
+      const preview = container.querySelector('[aria-label="Markdown preview"]') as HTMLElement
+      expect(preview.querySelector('img')).toBeNull()
+      expect(preview.innerHTML).not.toContain('<img')
+      expect(preview.textContent).toBe(payload)
+    })
   })
 
   describe('Events', () => {
