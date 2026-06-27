@@ -4,6 +4,8 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { readJson, writeJson } from './utils/files.mjs'
+
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const requestedVersion = process.argv[2]
 const rootPackagePath = path.join(rootDir, 'package.json')
@@ -66,15 +68,11 @@ replaceInFile(path.join(rootDir, 'docs', 'ROADMAP.md'), [
 
 console.log(`Synchronized Tigercat version to ${version}`)
 
-function readJson(filePath) {
-  return JSON.parse(readFileSync(filePath, 'utf-8'))
-}
-
 function updateJsonVersion(filePath, version) {
   const json = readJson(filePath)
   if (json.version === version) return
   json.version = version
-  writeFileSync(filePath, `${JSON.stringify(json, null, 2)}\n`)
+  writeJson(filePath, json)
 }
 
 function replaceInFile(filePath, replacements) {

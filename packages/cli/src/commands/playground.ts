@@ -1,10 +1,10 @@
 import { Command } from 'commander'
 import { resolve, join } from 'node:path'
-import { execSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { type TemplateName } from '../constants'
-import { logSuccess, logError, logInfo, logStep } from '../utils/logger'
+import { logSuccess, logInfo, logStep } from '../utils/logger'
 import { ensureDir, writeFileSafe } from '../utils/fs'
+import { runCommand } from '../utils/exec'
 import { resolveTemplateOption } from '../utils/validate'
 import { getVue3Template } from '../templates/vue3'
 import { getReactTemplate } from '../templates/react'
@@ -66,21 +66,16 @@ export async function runPlayground(
     }
 
     logInfo('Installing dependencies...')
-    try {
-      execSync('pnpm install', { cwd: projectDir, stdio: 'inherit' })
-    } catch {
-      logError('Failed to install dependencies. Make sure pnpm is available.')
-      process.exit(1)
-    }
+    runCommand('pnpm install', {
+      cwd: projectDir,
+      failureMessage: 'Failed to install dependencies. Make sure pnpm is available.'
+    })
   }
 
   logSuccess(`Starting playground on port ${port}...\n`)
 
-  try {
-    const safePort = /^\d+$/.test(port) ? port : '3456'
-    const openFlag = open ? ' --open' : ''
-    execSync(`npx vite --port ${safePort}${openFlag}`, { cwd: projectDir, stdio: 'inherit' })
-  } catch {
-    // user terminated with Ctrl+C
-  }
+  const safePort = /^\d+$/.test(port) ? port : '3456'
+  const openFlag = open ? ' --open' : ''
+  // allowFailure: the dev server exits non-zero when the user stops it (Ctrl+C).
+  runCommand(`npx vite --port ${safePort}${openFlag}`, { cwd: projectDir, allowFailure: true })
 }

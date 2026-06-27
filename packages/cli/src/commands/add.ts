@@ -1,11 +1,11 @@
 import { Command } from 'commander'
-import { execSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 import prompts from 'prompts'
 import { ALL_COMPONENTS } from '../constants'
 import { logSuccess, logError, logInfo, logWarn } from '../utils/logger'
 import { readFileSafe, writeFileSafe } from '../utils/fs'
+import { runCommand } from '../utils/exec'
 import { isFramework, type Framework } from '../utils/validate'
 
 interface AddOptions {
@@ -148,7 +148,7 @@ export async function runAdd(components: string[], options: AddOptions = {}) {
 
     if (options.install && !dryRun) {
       logInfo(`Installing missing dependencies: ${missingDeps.join(', ')}`)
-      execSync(installCommand, { cwd, stdio: 'inherit' })
+      runCommand(installCommand, { cwd })
     } else {
       logInfo(`Missing dependencies detected. Run: ${installCommand}`)
     }

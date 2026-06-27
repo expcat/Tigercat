@@ -15,6 +15,8 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
+import { readJson, readJsonc, writeJson } from './utils/files.mjs'
+
 const rootDir = process.cwd()
 const argv = process.argv.slice(2)
 const publishedOnly = argv.includes('--published')
@@ -500,18 +502,6 @@ async function verifyInstalledPackages(tempDir, version) {
   }
 }
 
-function readJson(filePath) {
-  return JSON.parse(readFileSync(filePath, 'utf-8'))
-}
-
-function readJsonc(filePath) {
-  return JSON.parse(stripJsonComments(readFileSync(filePath, 'utf-8')))
-}
-
-function writeJson(filePath, value) {
-  writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`)
-}
-
 function toPortablePath(filePath) {
   return filePath.split(path.sep).join('/')
 }
@@ -563,54 +553,4 @@ function appendNodeOption(existingValue, option) {
   }
 
   return `${existingValue} ${option}`
-}
-
-function stripJsonComments(source) {
-  let result = ''
-  let inString = false
-  let escaped = false
-
-  for (let index = 0; index < source.length; index++) {
-    const char = source[index]
-    const next = source[index + 1]
-
-    if (inString) {
-      result += char
-      if (escaped) {
-        escaped = false
-      } else if (char === '\\') {
-        escaped = true
-      } else if (char === '"') {
-        inString = false
-      }
-      continue
-    }
-
-    if (char === '"') {
-      inString = true
-      result += char
-      continue
-    }
-
-    if (char === '/' && next === '/') {
-      while (index < source.length && source[index] !== '\n') {
-        index++
-      }
-      result += source[index] ?? ''
-      continue
-    }
-
-    if (char === '/' && next === '*') {
-      index += 2
-      while (index < source.length && !(source[index] === '*' && source[index + 1] === '/')) {
-        index++
-      }
-      index++
-      continue
-    }
-
-    result += char
-  }
-
-  return result
 }

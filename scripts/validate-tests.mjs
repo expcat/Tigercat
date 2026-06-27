@@ -1,23 +1,10 @@
 #!/usr/bin/env node
 
 import { readFileSync } from 'node:fs'
-import { readdir } from 'node:fs/promises'
 import path from 'node:path'
 
+import { walkFiles } from './utils/files.mjs'
 import { c } from './utils/term.mjs'
-
-async function* walk(dir) {
-  const entries = await readdir(dir, { withFileTypes: true })
-  for (const entry of entries) {
-    if (entry.name === 'node_modules' || entry.name === 'dist') continue
-    const fullPath = path.join(dir, entry.name)
-    if (entry.isDirectory()) {
-      yield* walk(fullPath)
-    } else if (entry.isFile()) {
-      yield fullPath
-    }
-  }
-}
 
 function countArrayItems(source) {
   const body = source.trim().replace(/^\[/, '').replace(/\]$/, '').trim()
@@ -281,7 +268,7 @@ async function main() {
   const testFiles = []
   for (const dir of testDirs) {
     try {
-      for await (const filePath of walk(dir)) {
+      for await (const filePath of walkFiles(dir)) {
         if (filePath.endsWith('.spec.ts') || filePath.endsWith('.spec.tsx'))
           testFiles.push(filePath)
       }

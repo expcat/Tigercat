@@ -2,11 +2,12 @@
 
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, rmSync } from 'node:fs'
-import { readdir, stat } from 'node:fs/promises'
+import { stat } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 
+import { walkFiles } from './utils/files.mjs'
 import { isWindows, isPnpmAvailable, runPnpm, PNPM_CMD, PNPM_SHELL } from './utils/pnpm.mjs'
 
 const require = createRequire(import.meta.url)
@@ -17,19 +18,6 @@ const smoke = argv.includes('--smoke')
 const smokeArg = argv.find((a) => a.startsWith('--smoke-ms='))
 const smokeMs = Number.parseInt(smokeArg?.slice('--smoke-ms='.length) ?? '', 10)
 const effectiveSmokeMs = Number.isFinite(smokeMs) && smokeMs > 0 ? smokeMs : 3000
-
-async function* walkFiles(dir) {
-  const entries = await readdir(dir, { withFileTypes: true })
-  for (const entry of entries) {
-    if (entry.name === 'node_modules' || entry.name === 'dist') continue
-    const fullPath = path.join(dir, entry.name)
-    if (entry.isDirectory()) {
-      yield* walkFiles(fullPath)
-    } else if (entry.isFile()) {
-      yield fullPath
-    }
-  }
-}
 
 async function needsBuildForPackage(srcDir, distEntry) {
   if (!existsSync(distEntry)) return true

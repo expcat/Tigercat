@@ -19,6 +19,7 @@ import {
 
 // Test utils
 import { ensureDir, writeFileSafe, isDirEmpty, readFileSafe } from '@expcat/tigercat-cli/utils/fs'
+import { runCommand } from '@expcat/tigercat-cli/utils/exec'
 import { validateProjectName, suggestProjectName } from '@expcat/tigercat-cli/utils/validate'
 import { runCreate } from '@expcat/tigercat-cli/commands/create'
 import { runAdd } from '@expcat/tigercat-cli/commands/add'
@@ -1026,5 +1027,38 @@ describe('CLI Cross-Platform Paths', () => {
     )
     expect(packageJson.bin.tigercat).toBe('./dist/index.js')
     expect(packageJson.bin.tigercat).not.toContain('\\')
+  })
+})
+
+describe('CLI runCommand', () => {
+  let exitSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      throw new Error(`process.exit:${code}`)
+    }) as never)
+  })
+
+  afterEach(() => {
+    exitSpy.mockRestore()
+  })
+
+  it('runs a successful command without throwing', () => {
+    expect(() => runCommand('node -e ""')).not.toThrow()
+  })
+
+  it('rethrows by default when the command exits non-zero', () => {
+    expect(() => runCommand('node -e "process.exit(1)"')).toThrow()
+  })
+
+  it('swallows a non-zero exit when allowFailure is set', () => {
+    expect(() => runCommand('node -e "process.exit(1)"', { allowFailure: true })).not.toThrow()
+  })
+
+  it('logs the failure message and exits when failureMessage is set', () => {
+    expect(() => runCommand('node -e "process.exit(1)"', { failureMessage: 'boom' })).toThrow(
+      'process.exit:1'
+    )
+    expect(exitSpy).toHaveBeenCalledWith(1)
   })
 })

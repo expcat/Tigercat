@@ -18,6 +18,8 @@ import {
   getDocTarget,
   loadPublicComponentExports
 } from './lib/public-components.mjs'
+import { collectFiles as collectFilesIn } from './utils/files.mjs'
+import { escapeRegExp } from './utils/strings.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -396,26 +398,10 @@ function collectDeprecatedAPIs() {
 
 /**
  * Recursively collect all source files under a directory.
+ * Skips node_modules/dist/.nuxt to match the previous in-script behavior.
  */
 function collectFiles(dir, extensions) {
-  const results = []
-  if (!existsSync(dir)) return results
-  for (const entry of readdirSync(dir)) {
-    const full = join(dir, entry)
-    const stat = statSync(full)
-    if (stat.isDirectory()) {
-      if (entry !== 'node_modules' && entry !== 'dist' && entry !== '.nuxt') {
-        results.push(...collectFiles(full, extensions))
-      }
-    } else if (extensions.some((ext) => entry.endsWith(ext))) {
-      results.push(full)
-    }
-  }
-  return results
-}
-
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return collectFilesIn(dir, extensions, { skip: ['node_modules', 'dist', '.nuxt'] })
 }
 
 function getDeprecatedUsageRegexes(name, kinds) {

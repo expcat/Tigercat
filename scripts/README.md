@@ -37,6 +37,18 @@ pnpm example:all -- --smoke --smoke-ms=2000
 - Vue3: http://localhost:5173
 - React: http://localhost:5174
 
+## 内部 helper（仅限仓库脚本）
+
+上面的脚本共享以下 helper 模块。它们**只服务于仓库脚本**：不得被发布包（`packages/*/src`）导入；CLI runtime 有自己的 `packages/cli/src/utils/*`，同样不得反向导入 `scripts/utils/*`。
+
+| 模块                                | 说明                                                                                                      |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `scripts/utils/term.mjs`            | TTY 感知的彩色终端输出（`c()`）                                                                           |
+| `scripts/utils/pnpm.mjs`            | 跨平台 pnpm 调用（`runPnpm`、`getPnpmVersion`、`isPnpmAvailable` 等）                                     |
+| `scripts/utils/files.mjs`           | 文件/JSON 读写与目录遍历（`readText`、`readJson`、`writeJson`、`readJsonc`、`walkFiles`、`collectFiles`） |
+| `scripts/utils/strings.mjs`         | 字符串工具（`escapeRegExp`）                                                                              |
+| `scripts/lib/public-components.mjs` | 公开组件枚举与类型映射的唯一事实源（生成/校验脚本共用）                                                   |
+
 ## 维护规则
 
 新增脚本时同时完成三件事：
@@ -44,3 +56,5 @@ pnpm example:all -- --smoke --smoke-ms=2000
 1. 使用 `.mjs` 并保持跨平台。
 2. 在根 [package.json](../package.json) 中添加需要的 pnpm 入口。
 3. 更新本文件的命令表。
+
+需要文件/JSON 读写、目录遍历或正则转义等通用逻辑时，优先复用 `scripts/utils/*` 中的共享 helper，不要在脚本里重复实现。

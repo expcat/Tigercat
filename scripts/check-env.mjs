@@ -3,7 +3,9 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 
+import { readJson } from './utils/files.mjs'
 import { getPnpmVersion } from './utils/pnpm.mjs'
+import { escapeRegExp } from './utils/strings.mjs'
 import { c } from './utils/term.mjs'
 
 function extractMajor(versionRange) {
@@ -54,15 +56,11 @@ function checkVersion(name, current, required) {
   return false
 }
 
-function escapeRegex(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
 function readCatalogRange(packageName) {
   if (!existsSync('pnpm-workspace.yaml')) return ''
 
   const content = readFileSync('pnpm-workspace.yaml', 'utf8')
-  const escapedName = escapeRegex(packageName)
+  const escapedName = escapeRegExp(packageName)
   const pattern = new RegExp(
     `^[ \\t]*(?:'${escapedName}'|"${escapedName}"|${escapedName}):\\s*([^\\n#]+)`,
     'm'
@@ -77,10 +75,6 @@ function resolveCatalogRange(packageName, value) {
   return readCatalogRange(packageName)
 }
 
-function safeReadJson(path) {
-  return JSON.parse(readFileSync(path, 'utf8'))
-}
-
 function main() {
   console.log('🐯 Tigercat Development Environment Check')
   console.log('==========================================')
@@ -90,7 +84,7 @@ function main() {
 
   console.log('Checking Node.js...')
   const nodeVersion = process.versions.node
-  const pkg = safeReadJson('package.json')
+  const pkg = readJson('package.json')
   const requiredNode = String(pkg?.engines?.node ?? '>=22.13.0').replace(/^>=\s*/, '')
   if (!checkVersion('Node.js', nodeVersion, requiredNode)) hasErrors = true
   console.log('')

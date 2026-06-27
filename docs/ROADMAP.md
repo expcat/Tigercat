@@ -307,6 +307,22 @@ benchmark coverage map，并将 Next.js `next-env.d.ts` 固定为构建后稳定
 
 #### T12 CLI/scripts maintenance
 
+**状态**：已完成（2026-06-28）。按三条来源收敛 CLI/scripts：G-2 新增
+`packages/cli/src/utils/exec.ts` 的 `runCommand`，统一 `add`/`playground` 的子进程
+执行与错误处理（playground 仍保持 `pnpm install`，仅集中化），CLI 仍不导入
+`scripts/*`；G-3 新增 `scripts/utils/files.mjs`（readText/writeText/readJson/writeJson/
+readJsonc/walkFiles/collectFiles）与 `scripts/utils/strings.mjs`（escapeRegExp），并让
+check-env、check-release-readiness、validate-tests、validate-api、sync-version、
+publish-check、run-examples 复用，生成器 generate-api-docs/generate-api-baseline
+不动（归 T05/T01）；G-4 在 `scripts/README.md` 增补「内部 helper（仅限仓库脚本）」
+小节与 repo-only ↔ CLI runtime 边界说明。验证已运行 `npx -y pnpm@11.9.0 vitest run
+tests/core/cli.spec.ts`、`npx -y pnpm@11.9.0 --filter @expcat/tigercat-cli build`、
+`tsc --noEmit -p packages/cli/tsconfig.json`、`npx -y pnpm@11.9.0 dev:check`、
+`release:check`、`test:validate`、`api:validate`、`types:check`，对
+sync-version/publish-check/run-examples 跑 `node --check`，并确认边界 grep
+（`packages/*/src` 无 `scripts/utils`、`packages/cli/src` 无 `scripts/`）与
+`prettier --check` / `git diff --check -- scripts/README.md` 通过。
+
 **目标**：收敛 CLI 命令执行、维护脚本 helper 与文档发现性，保持 CLI runtime 与 repo-only scripts 边界清晰。
 
 **来源**：G-2、G-3、G-4。

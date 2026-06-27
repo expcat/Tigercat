@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+
+import { readText as readFileText } from './utils/files.mjs'
 
 const root = join(import.meta.dirname, '..')
 
@@ -23,7 +25,7 @@ const expectedRepositoryUrl = 'https://github.com/expcat/Tigercat'
 const errors = []
 
 function readText(path) {
-  return readFileSync(join(root, path), 'utf8')
+  return readFileText(join(root, path))
 }
 
 function readJson(path) {
