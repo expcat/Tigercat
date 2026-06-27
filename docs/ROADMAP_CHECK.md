@@ -38,6 +38,7 @@ scope:
   - C30: 工作流复合组（C30-1~C30-4）
   - C31: 高级编辑器组（C31-1~C31-5）
   - C32: 交互能力组（C32-1~C32-5）
+  - F: 测试、示例、E2E、benchmark（F-1~F-5）
 sources:
   - id: A
     read:
@@ -65,6 +66,13 @@ sources:
   - id: C29-C32
     read: 复合内容、工作流复合、高级编辑器、交互能力相关链路
     validation: 各组通过目标 vitest、api:validate、types:check
+  - id: F
+    read:
+      - tests/{core,react,vue,utils}、测试指南、validate-tests.mjs
+      - examples/example/{react,vue3,shared}、examples/{nextjs,nuxt}
+      - e2e、playwright.config.ts、.github/workflows/{ci,e2e,bench}.yml
+      - benchmarks、vitest.config.ts、package.json scripts
+    validation: test:validate、example:build、example:ssr:build、bench；静态路由/skip/门禁核对
 verification-defaults:
   - 使用仓库声明的 pnpm 11.9.0；本机 bare pnpm 可能因 engines.pnpm 拦截。
   - 扫描类任务优先跑目标 vitest、api:validate、types:check，再对文档改动跑 prettier 与 git diff --check。
@@ -4893,3 +4901,152 @@ pnpm vitest run tests/core/drag.spec.ts tests/react/useDrag.spec.tsx tests/vue/u
 | 目标 vitest、`api:validate`、`types:check`                                                           | ✅ `npx -y pnpm@11.9.0` vitest 14 文件 374 测试通过；`api:validate` 一致性检查通过（0 问题）；`types:check` 全部 props 类型导出 | C32 基线 |
 
 > 本轮 C32 只记录扫描结论和修复建议；未改任何组件源码、core 工具、公共 API、生成器或 generated references（仅本文件 + `docs/ROADMAP.md` 状态标记）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮用 `npx -y pnpm@11.9.0` 实跑 C32 目标 vitest（14 文件 374 测试通过）、`api:validate` 与 `types:check`，均为只读校验、未改动源码。
+
+### 任务 F：测试、示例、E2E、benchmark 扫描结果（2026-06-27）
+
+**扫描范围**：`tests/core`、`tests/react`、`tests/vue`、`tests/utils`、测试指南与 [validate-tests.mjs](../scripts/validate-tests.mjs)，Vite 示例 `examples/example/{react,vue3,shared}`、SSR 示例 `examples/{nextjs,nuxt}`，E2E specs 与 [playwright.config.ts](../playwright.config.ts)，benchmarks 与 [vitest.config.ts](../vitest.config.ts)、根 [package.json](../package.json) scripts、`.github/workflows/{ci,e2e,bench}.yml`。
+
+**结论速览**：任务 F 的主路径健康：React/Vue 示例路由与 `app-config` 116 个 demo path 对齐，`example:build`、`example:ssr:build`、`test:validate`、`bench` 均通过；未发现 `.only`。需要处理项集中在门禁覆盖与可维护性：① `test:validate` 默认只扫 React/Vue 组件 spec，core/utils/E2E/benchmark 不受测试质量脚本约束（P2）；② E2E 没有根 package script，CI/E2E workflow 均为手动触发，且 Popover 视觉回归被长期 skip（P2/P3）；③ Next SSR build 会改写已跟踪的 `next-env.d.ts`，造成验证后工作树变脏（P2）；④ benchmark 已可运行但仍无自动基线差异判断，覆盖集中在图表/表格/虚拟滚动/表单等热点（P3）。无 P1。
+
+---
+
+#### F-1 `test:validate` 默认覆盖面窄，core/utils/E2E/benchmark 不受质量脚本约束 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜[scripts/validate-tests.mjs](../scripts/validate-tests.mjs) 默认 `testDirs = ['tests/vue', 'tests/react']`，只扫描双端组件 spec；本轮文件统计为 `tests/core` 117 个 TS/spec 文件、`tests/react` 129 个、`tests/vue` 126 个、`tests/utils` 9 个，其中 core/utils 不在默认质量校验内。
+- 🟠 P2｜`test:validate` 实跑通过：255 个 React/Vue spec 全部 pass、0 hard failure；但软警告 178 条，集中在低于推荐测试数、缺 Edge Cases/Boundary 分组、少量 a11y 检查缺失和 `Text.spec` 命名比例偏低。当前脚本把这些都当 warning，不会阻塞。
+- 🟢 P3｜`validate-tests.mjs` 的 hard check 只有每文件至少 3 个测试和非注释 `: any`；弱断言（如大量 `toBeTruthy` / `querySelector`）只靠人工审查，脚本没有语义级护栏。
+
+**公共内容决策**：测试质量规则属于脚本/测试公共约定。建议把 core spec 纳入默认 `test:validate` 或新增 `test:validate:all`，并将 `tests/utils` 的共享 helper 以 lint/typecheck 覆盖；React/Vue render helper 保持框架分离，跨框架 fixture/mock observer/frame scheduler 继续沉在 `tests/utils`。
+
+**建议修复顺序**：P2。先让 `validate-tests.mjs` 支持并在 CI 中明确覆盖 core，再分批把高价值组件的软警告转为实际测试补强；弱断言规则可从低误报的 `expect(...).toBeTruthy()` + DOM 查询组合开始做 warning。
+
+**目标验证命令**：
+
+```bash
+pnpm test:validate
+TEST_DIRS="tests/core tests/vue tests/react" pnpm test:validate
+pnpm test:coverage
+```
+
+---
+
+#### F-2 E2E 入口与触发不够一等，Popover 视觉回归长期 skip — **P2 / P3**
+
+**发现问题**
+
+- 🟠 P2｜根 [package.json](../package.json) 没有 `test:e2e` / `e2e` script；PR 模板提示 `npx playwright test`，`.github/workflows/e2e.yml` 也直接运行 `npx playwright test`。本地和 CI 没有统一脚本入口，不利于后续把 Playwright 参数、项目过滤、报告路径集中维护。
+- 🟠 P2｜当前 [ci.yml](../.github/workflows/ci.yml) 和 [e2e.yml](../.github/workflows/e2e.yml) 都只有 `workflow_dispatch` 触发；E2E 不进入 PR/发布常规门禁。E2E workflow 使用 Playwright 官方容器、先 build packages、再跑全量 `npx playwright test`，配置本身清晰，但需要人工触发。
+- 🟢 P3｜[e2e/overlay-visual.spec.ts](../e2e/overlay-visual.spec.ts) 的 Popover 视觉快照被 `test.skip`，注释说明跨平台 200px vs 201px 尺寸差导致持久失败。Modal/Drawer 有视觉快照，Popover 当前没有等价视觉回归保护。
+- ℹ️ [e2e/mobile-touch.spec.ts](../e2e/mobile-touch.spec.ts) 内的 `test.skip(project !== 'mobile-chromium')` 属项目内防御；`playwright.config.ts` 已用 `testMatch` / `testIgnore` 把 mobile touch 只路由到 `mobile-chromium`，不是未完成覆盖。
+
+**公共内容决策**：E2E 运行入口应合并到根 scripts（例如 `test:e2e`），workflow 和 PR 模板复用该入口；视觉稳定化策略属于 E2E 层，不进入组件 runtime。Popover 快照可通过稳定尺寸/clip/locator 约束修复，或拆成非截图交互断言 + 单浏览器视觉基线。
+
+**建议修复顺序**：P2 先补根 `test:e2e` 并让 workflow/PR 模板复用；P3 再处理 Popover skip，目标是移除长期 `test.skip` 或把它替换成有明确 owner 的非视觉断言。
+
+**目标验证命令**：
+
+```bash
+pnpm test:e2e
+npx playwright test e2e/overlay-visual.spec.ts --project=chromium
+npx playwright test e2e/mobile-touch.spec.ts --project=mobile-chromium
+```
+
+---
+
+#### F-3 Next SSR build 会改写 tracked `next-env.d.ts`，验证后工作树变脏 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜`npx -y pnpm@11.9.0 example:ssr:build` 实跑通过 Nuxt 与 Next 构建，但 Next 16 build 自动把 [examples/nextjs/next-env.d.ts](../examples/nextjs/next-env.d.ts) 的 `import './.next/types/routes.d.ts'` 改为 `import "./.next/types/routes.d.ts";`，导致 docs-only 验证后出现 tracked diff。本轮已将该生成副作用还原，最终不保留示例文件改动。
+- 🟠 P2｜该文件头部写着 “should not be edited”，但它又被提交跟踪；当生成器输出格式与仓库提交格式不一致时，`example:ssr:build` 会制造噪声。`quality:release` 虽运行 `example:ssr:build`，但后面没有针对示例生成副作用的 `git diff --exit-code`，因此 CI 不会暴露这类 dirty tree。
+- ✅ Nuxt/Next SSR 构建本身通过；Nuxt build 仅出现上游依赖 `@vue/shared` trailing slash export pattern 的 Node deprecation warning，不影响构建结果。
+
+**公共内容决策**：这是 SSR 示例维护问题，不改 runtime。候选方向：让 tracked `next-env.d.ts` 与 Next 生成格式一致；或将该文件从源码事实源中移出/忽略并在 build 前生成；或在 `quality:ssr` 后追加目标文件 diff 检查，使生成副作用可见。
+
+**建议修复顺序**：P2。优先采用最小修复：提交 Next 当前生成格式或调整示例 build 流程，确保 `pnpm example:ssr:build && git diff --exit-code examples/nextjs/next-env.d.ts` 绿色。
+
+**目标验证命令**：
+
+```bash
+pnpm example:ssr:build
+git diff --exit-code examples/nextjs/next-env.d.ts
+```
+
+---
+
+#### F-4 Benchmark 可运行但仍是人工对比，覆盖集中在少数性能热点 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜[benchmarks](../benchmarks) 现有 8 个 `.bench.ts` 文件，静态计数约 107 个 bench case；本轮 `npx -y pnpm@11.9.0 bench` 实跑通过。覆盖集中在 chart path/scale/interaction、Table/VirtualTable 大数据、VirtualList/Tree virtualization、Descriptions row grouping、Form validation。
+- 🟢 P3｜[bench.yml](../.github/workflows/bench.yml) 明确为 advisory：每周和手动触发，运行 `pnpm bench --run --outputJson=bench-results.json` 并上传 artifact；注释说明不作为 PR gate，自动 baseline diff 阈值延后。这个设计合理但意味着性能回归仍靠人工对比。
+- 🟢 P3｜benchmark 覆盖与前面组件扫描发现并不完全对齐：Overlay/floating、Upload/FileManager、Image editing/viewer、Drag/Resizable/Splitter、RichText/Markdown 等复杂交互没有专门 bench。它们可能不需要微基准，但目前没有记录“为什么不测 / 用什么替代”。
+
+**公共内容决策**：保持 benchmark workflow advisory，不建议把微基准硬接 PR 门禁。需要公共约定的是覆盖边界：性能热点用 bench，交互/DOM 稳定性用 E2E 或组件测试，避免用 noisy micro-benchmark 错测 UI 行为。
+
+**建议修复顺序**：P3。先补一张 benchmark coverage map（热点、对应组件扫描发现、是否需要 bench/用 E2E 替代），再决定是否给 Drag/Resizable/Splitter、overlay/floating、upload/file list 增加最小 bench。
+
+**目标验证命令**：
+
+```bash
+pnpm bench
+pnpm bench --run --outputJson=bench-results.json
+```
+
+---
+
+#### F-5 示例与测试主路径健康面 — **观察**
+
+**发现问题**
+
+- ✅ Vite 示例路由健康：`examples/example/shared/app-config.ts` 中 116 个 demo path 与 React/Vue router 完全对齐；React 116 条 demo route，Vue 116 条 demo route，Vue 额外 `/` 为空首页路由。
+- ✅ 示例构建健康：`npx -y pnpm@11.9.0 example:build` 通过 React 与 Vue Vite 示例；`example:ssr:build` 通过 Nuxt 与 Next SSR 示例（见 F-3 的 dirty tree 副作用）。
+- ✅ 静态搜索未发现 `.only`；仅 3 处 `test.skip`，其中 2 处 mobile project guard 可接受，1 处 Popover 视觉快照为真实覆盖缺口（F-2）。
+- ✅ 现有质量门禁覆盖主路径：CI workflow 已运行 `test:coverage`、`test:validate`、generated refs diff、API baseline diff、`api:validate`、`test:a11y`、`size`；release quality script 还包含 `example:build` 与 `example:ssr:build`。
+
+**公共内容决策**：健康面保持现状。后续补强时避免把示例路由、SSR smoke、coverage、a11y、size 这些已有门禁降级；新增示例页面时同步 `app-config` + 双端 router + `example:build`。
+
+**建议修复顺序**：观察项。作为后续 F-1~F-4 修复的回归基线。
+
+**目标验证命令**：
+
+```bash
+pnpm test:coverage
+pnpm test:validate
+pnpm example:build
+pnpm example:ssr:build
+pnpm size
+```
+
+---
+
+#### F 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项                            | 决策                                                          | 优先级 |
+| ----------------------------- | ------------------------------------------------------------- | ------ |
+| 测试质量校验默认范围（F-1）   | 扩展脚本/CI 覆盖 core；共享 fixture/mock 继续放 `tests/utils` | **P2** |
+| E2E 根脚本入口（F-2）         | 合并为根 `test:e2e`，workflow/PR 模板复用                     | **P2** |
+| Popover 视觉 skip（F-2）      | 稳定快照或改为非截图断言，移除长期 skip                       | P3     |
+| Next SSR 生成副作用（F-3）    | 让 tracked 文件与生成器一致，或 build 后加目标 diff 检查      | **P2** |
+| benchmark 基线与覆盖（F-4）   | 保持 advisory；补 coverage map，再决定是否扩展复杂交互 bench  | P3     |
+| 示例路由与主门禁健康面（F-5） | 保持现状，作为新增示例/SSR/测试门禁的回归基线                 | 观察   |
+
+---
+
+#### F 取证摘要（静态实读 + 目标命令）
+
+| 取证                                   | 结果                                                                                             | 对应发现 |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------ | -------- |
+| `npx -y pnpm@11.9.0 test:validate`     | ✅ 255 个 React/Vue spec 通过，0 hard failure，178 warnings；默认未扫 `tests/core`/`tests/utils` | F-1      |
+| 文件统计                               | `tests/core` 117、`tests/react` 129、`tests/vue` 126、`tests/utils` 9 个 TS/TSX 文件             | F-1      |
+| grep `.only` / `test.skip`             | `.only` 0；skip 3 处，其中 Popover visual 为真实长期 skip                                        | F-2      |
+| E2E/CI workflow + package scripts      | `e2e.yml` 直接跑 `npx playwright test` 且仅手动触发；根 package 无 `test:e2e`                    | F-2      |
+| `npx -y pnpm@11.9.0 example:build`     | ✅ React/Vue Vite 示例构建通过                                                                   | F-5      |
+| 示例路由核对                           | ✅ 116 个 app-config path 与 React/Vue demo routes 对齐；Vue 额外 `/` 为首页                     | F-5      |
+| `npx -y pnpm@11.9.0 example:ssr:build` | ✅ Nuxt/Next SSR build 通过；Next 会改写 tracked `next-env.d.ts`，本轮已还原                     | F-3      |
+| `npx -y pnpm@11.9.0 bench`             | ✅ 8 个 bench 文件实跑通过；静态约 107 个 bench case                                             | F-4      |
+| `bench.yml`                            | benchmarks 每周/手动运行并上传 JSON artifact；无自动 baseline diff                               | F-4      |
+
+> 本轮 F 只记录扫描结论和修复建议；未改任何测试、示例、E2E、benchmark、组件源码、公共 API、生成器或 generated references（最终仅 `docs/ROADMAP.md` + `docs/ROADMAP_CHECK.md` 保留改动）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用 `npx -y pnpm@11.9.0` 跑 `test:validate`、`example:build`、`example:ssr:build`、`bench`，并做静态路由/skip/workflow/script 核对。

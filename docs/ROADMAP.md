@@ -265,7 +265,9 @@ source: current repository state; v1.4.0 has been released
 - 组件：Drag、Carousel、Resizable、Splitter。
 - 重点：pointer/keyboard/resize helper、拖拽状态、尺寸约束、动画/过渡公共逻辑。
 
-#### 任务 F：测试、示例、E2E、benchmark 扫描
+#### 任务 F：测试、示例、E2E、benchmark 扫描 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 F 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 范围：`tests/core`、`tests/react`、`tests/vue`、`tests/utils`、`examples/example/*`、`examples/nextjs`、`examples/nuxt`、`e2e`、`benchmarks`。
 - 目标：找失效测试、弱断言、重复测试样板、示例使用废弃 API、示例与公开 API 不一致、benchmark 覆盖缺口。
