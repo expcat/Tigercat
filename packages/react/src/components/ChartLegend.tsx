@@ -28,7 +28,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
     () =>
       classNames(
         'flex flex-wrap',
-        position === 'right' || position === 'left' ? 'flex-col gap-2' : 'flex-row gap-3',
+        position === 'right' || position === 'left' ? 'flex-col' : 'flex-row',
         className
       ),
     [position, className]
@@ -62,6 +62,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
       // the static (non-interactive) legend.
       role={interactive ? 'group' : 'list'}
       aria-label="Chart legend"
+      style={{ gap: `${gap}px` }}
       data-chart-legend="true">
       {items.map((item) => {
         const ItemComponent = interactive ? 'button' : 'div'
@@ -98,7 +99,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
               aria-hidden="true"
               data-legend-marker="true"
             />
-            <span style={{ marginRight: `${gap}px` }}>{item.label}</span>
+            <span>{item.label}</span>
           </ItemComponent>
         )
       })}

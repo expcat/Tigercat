@@ -1,4 +1,15 @@
-import { defineComponent, computed, ref, watch, onMounted, nextTick, h, PropType } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  watch,
+  onMounted,
+  nextTick,
+  h,
+  inject,
+  getCurrentInstance,
+  PropType
+} from 'vue'
 import {
   autoResizeTextarea,
   classNames,
@@ -7,6 +18,7 @@ import {
   mergeStyleValues,
   type TextareaSize
 } from '@expcat/tigercat-core'
+import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 
 export interface VueTextareaProps {
   modelValue?: string
@@ -178,6 +190,12 @@ export const Textarea = defineComponent({
     blur: null
   },
   setup(props, { emit, attrs }) {
+    const instance = getCurrentInstance()
+    const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const effectiveSize = computed(() => {
+      const hasOwnSize = Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'size')
+      return hasOwnSize ? props.size : (inputGroup?.size ?? props.size)
+    })
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
     const localValue = ref<string>(props.modelValue ?? '')
@@ -195,7 +213,7 @@ export const Textarea = defineComponent({
     const textareaClasses = computed(() =>
       classNames(
         'block',
-        getInputClasses({ size: props.size }),
+        getInputClasses({ size: effectiveSize.value }),
         props.autoResize ? 'resize-none' : 'resize-y',
         props.className,
         coerceClassValue(attrs.class)

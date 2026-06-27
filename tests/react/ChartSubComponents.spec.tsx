@@ -291,6 +291,15 @@ describe('ChartLegend', () => {
     expect(items[0]).not.toHaveAttribute('aria-pressed')
   })
 
+  it('applies gap on the legend container without label margin', () => {
+    const { container } = renderWithProps(ChartLegend, { items: legendItems, gap: 12 })
+    expect(container.querySelector('[data-chart-legend]')).toHaveStyle({ gap: '12px' })
+    expect(
+      (container.querySelector('[data-legend-item] span:last-child') as HTMLElement).style
+        .marginRight
+    ).toBe('')
+  })
+
   it('calls hover callbacks when interactive', () => {
     const onItemHover = vi.fn()
     const onItemLeave = vi.fn()

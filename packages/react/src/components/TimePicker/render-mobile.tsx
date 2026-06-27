@@ -39,7 +39,7 @@ export function renderTimePickerMobile(ctx: TimePickerContext): React.ReactNode 
           aria-label={ctx.labels.second}
           onChange={(event) => ctx.selectSecond(Number(event.target.value))}>
           {ctx.secondsList.map((second) => (
-            <option key={second} value={second}>
+            <option key={second} value={second} disabled={ctx.isSecondDisabled(second)}>
               {padTwo(second)}
             </option>
           ))}

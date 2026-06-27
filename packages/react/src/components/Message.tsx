@@ -30,11 +30,21 @@ import { StatusIconWithLoading, StatusIcon } from './shared/icons'
  */
 const MESSAGE_CONTAINER_ID = 'tiger-message-container'
 const MESSAGE_CLOSE_ARIA_LABEL = 'Close message'
+const MESSAGE_POSITIONS: MessagePosition[] = [
+  'top',
+  'top-left',
+  'top-right',
+  'bottom',
+  'bottom-left',
+  'bottom-right'
+]
+
+type InternalMessageInstance = MessageInstance & { position: MessagePosition }
 
 /**
  * Message instance storage
  */
-let messageInstances: MessageInstance[] = []
+let messageInstances: InternalMessageInstance[] = []
 let containerRoot: Root | null = null
 let updateCallback: (() => void) | null = null
 
@@ -47,7 +57,7 @@ const getNextInstanceId = createInstanceCounter()
  * Single message item component
  */
 interface MessageItemProps {
-  message: MessageInstance
+  message: InternalMessageInstance
   onClose: (id: string | number) => void
 }
 
@@ -117,6 +127,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
  */
 export interface MessageContainerProps {
   position?: MessagePosition
+  messages?: InternalMessageInstance[]
 }
 
 /** Options accepted by the React global Message API. */
@@ -125,11 +136,37 @@ export type MessageProps = MessageOptions
 /**
  * Message container component
  */
-export const MessageContainer: React.FC<MessageContainerProps> = ({ position = 'top' }) => {
-  const [messages, setMessages] = useState<MessageInstance[]>(() => [...messageInstances])
+export const MessageContainer: React.FC<MessageContainerProps> = ({
+  position = 'top',
+  messages = messageInstances.filter((message) => message.position === position)
+}) => {
+  const containerClasses = classNames(messageContainerBaseClasses, messagePositionClasses[position])
+  const containerId =
+    position === 'top' ? MESSAGE_CONTAINER_ID : `${MESSAGE_CONTAINER_ID}-${position}`
+
+  const handleRemove = useCallback((id: string | number) => {
+    removeMessage(id)
+  }, [])
+
+  return (
+    <div
+      className={containerClasses}
+      id={containerId}
+      aria-live="polite"
+      aria-relevant="additions"
+      data-tiger-message-position={position}
+      data-tiger-message-container>
+      {messages.map((message) => (
+        <MessageItem key={message.id} message={message} onClose={handleRemove} />
+      ))}
+    </div>
+  )
+}
+
+const MessageHost: React.FC = () => {
+  const [messages, setMessages] = useState<InternalMessageInstance[]>(() => [...messageInstances])
 
   useEffect(() => {
-    // Register update callback
     updateCallback = () => {
       setMessages([...messageInstances])
     }
@@ -139,23 +176,14 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ position = '
     }
   }, [])
 
-  const containerClasses = classNames(messageContainerBaseClasses, messagePositionClasses[position])
-
-  const handleRemove = useCallback((id: string | number) => {
-    removeMessage(id)
-  }, [])
-
   return (
-    <div
-      className={containerClasses}
-      id={MESSAGE_CONTAINER_ID}
-      aria-live="polite"
-      aria-relevant="additions"
-      data-tiger-message-container>
-      {messages.map((message) => (
-        <MessageItem key={message.id} message={message} onClose={handleRemove} />
-      ))}
-    </div>
+    <>
+      {MESSAGE_POSITIONS.map((position) => {
+        const positionedMessages = messages.filter((message) => message.position === position)
+        if (positionedMessages.length === 0) return null
+        return <MessageContainer key={position} position={position} messages={positionedMessages} />
+      })}
+    </>
   )
 }
 
@@ -189,7 +217,7 @@ function ensureContainer() {
 
   containerRoot = createRoot(rootEl)
   flushSync(() => {
-    containerRoot?.render(<MessageContainer />)
+    containerRoot?.render(<MessageHost />)
   })
 }
 
@@ -207,7 +235,8 @@ function addMessage(config: MessageConfig): () => void {
     closable: config.closable || false,
     onClose: config.onClose,
     icon: config.icon,
-    className: config.className
+    className: config.className,
+    position: config.position ?? 'top'
   }
 
   messageInstances.push(instance)

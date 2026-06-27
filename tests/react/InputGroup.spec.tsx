@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { InputGroup, InputGroupAddon } from '@expcat/tigercat-react'
+import { InputGroup, InputGroupAddon, Input, Textarea, InputNumber } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('InputGroup', () => {
@@ -66,6 +66,20 @@ describe('InputGroup', () => {
       expect(screen.getByRole('group')).toBeInTheDocument()
       unmount()
     }
+  })
+
+  it('passes size to child inputs that do not set their own size', () => {
+    render(
+      <InputGroup size="lg">
+        <Input aria-label="plain input" />
+        <Textarea aria-label="plain textarea" />
+        <InputNumber aria-label="plain number" />
+      </InputGroup>
+    )
+
+    expect(screen.getByLabelText('plain input').className).toContain('py-3')
+    expect(screen.getByLabelText('plain textarea').className).toContain('py-3')
+    expect(screen.getByRole('spinbutton').className).toContain('text-lg')
   })
 })
 

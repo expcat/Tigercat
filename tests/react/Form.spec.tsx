@@ -1005,6 +1005,37 @@ describe('Form', () => {
       })
     })
 
+    it('resetFields restores the initial model snapshot', async () => {
+      const formRef = React.createRef<FormHandle>()
+
+      const Demo = () => {
+        const [model, setModel] = React.useState({ username: 'initial' })
+        return (
+          <Form ref={formRef} model={model} onChange={setModel}>
+            <FormItem name="username" label="Username">
+              <input
+                aria-label="username"
+                value={model.username}
+                onChange={(event) => setModel({ username: event.target.value })}
+              />
+            </FormItem>
+          </Form>
+        )
+      }
+
+      render(<Demo />)
+      const input = screen.getByLabelText('username') as HTMLInputElement
+
+      fireEvent.change(input, { target: { value: 'changed' } })
+      expect(input.value).toBe('changed')
+
+      await act(async () => {
+        formRef.current?.resetFields()
+      })
+
+      expect(input.value).toBe('initial')
+    })
+
     it('calls onValidate when field is validated', async () => {
       const onValidate = vi.fn()
       const formRef = React.createRef<FormHandle>()

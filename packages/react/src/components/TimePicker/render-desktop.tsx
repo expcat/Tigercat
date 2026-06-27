@@ -83,12 +83,14 @@ export function renderTimePickerDesktop(ctx: TimePickerContext): React.ReactNode
           <div className={timePickerColumnListClasses}>
             {ctx.secondsList.map((second) => {
               const isSelected = ctx.selectedSeconds === second
+              const isDisabled = ctx.isSecondDisabled(second)
 
               return (
                 <button
                   key={second}
                   type="button"
-                  className={getTimePickerItemClasses(isSelected, false)}
+                  className={getTimePickerItemClasses(isSelected, isDisabled)}
+                  disabled={isDisabled}
                   onClick={() => ctx.selectSecond(second)}
                   data-tiger-timepicker-unit="second"
                   aria-label={getTimePickerOptionAriaLabel(

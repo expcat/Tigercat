@@ -176,6 +176,23 @@ describe('RichTextEditor', () => {
       expect(events).toBeTruthy()
     })
 
+    it('syncs custom toolbar action changes through the engine', async () => {
+      const toolbar = [
+        {
+          name: 'insertCustom',
+          label: 'Custom',
+          action: (element: HTMLElement) => {
+            element.innerHTML = '<p>Custom value</p>'
+          }
+        }
+      ]
+      const { getByRole, emitted } = renderEditor({ toolbar })
+
+      await fireEvent.click(getByRole('button', { name: 'Custom' }))
+
+      expect(emitted()['update:value'].at(-1)?.[0]).toBe('<p>Custom value</p>')
+    })
+
     it('should render markdown mode content through the engine', () => {
       const { container } = renderEditor({ value: '# Title', mode: 'markdown' })
       const editor = container.querySelector('[role="textbox"]') as HTMLElement

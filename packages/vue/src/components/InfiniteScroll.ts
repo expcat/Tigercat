@@ -90,6 +90,7 @@ export const InfiniteScroll = defineComponent({
         threshold: props.threshold,
         direction: props.direction,
         root: containerRef.value,
+        inverse: props.inverse,
         onLoadMore: handleLoadMore
       })
 

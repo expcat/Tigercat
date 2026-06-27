@@ -488,7 +488,13 @@ export const TimePicker = defineComponent({
 
     function updateTime() {
       if (
-        !isTimeInRange(selectedHours.value, selectedMinutes.value, props.minTime, props.maxTime)
+        !isTimeInRange(
+          selectedHours.value,
+          selectedMinutes.value,
+          props.minTime,
+          props.maxTime,
+          selectedSeconds.value
+        )
       ) {
         return
       }
@@ -589,11 +595,33 @@ export const TimePicker = defineComponent({
 
     function isHourDisabled(hour: number): boolean {
       const hours24 = props.format === '12' ? to24HourFormat(hour, selectedPeriod.value) : hour
-      return !isTimeInRange(hours24, selectedMinutes.value, props.minTime, props.maxTime)
+      return !isTimeInRange(
+        hours24,
+        selectedMinutes.value,
+        props.minTime,
+        props.maxTime,
+        selectedSeconds.value
+      )
     }
 
     function isMinuteDisabled(minute: number): boolean {
-      return !isTimeInRange(selectedHours.value, minute, props.minTime, props.maxTime)
+      return !isTimeInRange(
+        selectedHours.value,
+        minute,
+        props.minTime,
+        props.maxTime,
+        selectedSeconds.value
+      )
+    }
+
+    function isSecondDisabled(second: number): boolean {
+      return !isTimeInRange(
+        selectedHours.value,
+        selectedMinutes.value,
+        props.minTime,
+        props.maxTime,
+        second
+      )
     }
 
     function handleClickOutside(event: Event) {
@@ -787,7 +815,11 @@ export const TimePicker = defineComponent({
                         selectSecond(Number((event.target as HTMLSelectElement).value))
                     },
                     secondsList.value.map((second) =>
-                      h('option', { value: second }, padTwo(second))
+                      h(
+                        'option',
+                        { value: second, disabled: isSecondDisabled(second) },
+                        padTwo(second)
+                      )
                     )
                   ),
                 props.format === '12' &&
@@ -883,13 +915,15 @@ export const TimePicker = defineComponent({
                       { class: timePickerColumnListClasses },
                       secondsList.value.map((second) => {
                         const isSelected = selectedSeconds.value === second
+                        const isDisabled = isSecondDisabled(second)
 
                         return h(
                           'button',
                           {
                             key: second,
                             type: 'button',
-                            class: getTimePickerItemClasses(isSelected, false),
+                            class: getTimePickerItemClasses(isSelected, isDisabled),
+                            disabled: isDisabled,
                             onClick: () => selectSecond(second),
                             'data-tiger-timepicker-unit': 'second',
                             'aria-label': getTimePickerOptionAriaLabel(

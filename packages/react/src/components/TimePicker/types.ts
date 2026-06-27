@@ -98,4 +98,5 @@ export interface TimePickerContext {
   selectPeriod: (period: 'AM' | 'PM') => void
   isHourDisabled: (hour: number) => boolean
   isMinuteDisabled: (minute: number) => boolean
+  isSecondDisabled: (second: number) => boolean
 }

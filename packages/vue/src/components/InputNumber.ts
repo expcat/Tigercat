@@ -1,4 +1,15 @@
-import { defineComponent, computed, ref, watch, h, onMounted, onBeforeUnmount, PropType } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  watch,
+  h,
+  onMounted,
+  onBeforeUnmount,
+  inject,
+  getCurrentInstance,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -25,6 +36,7 @@ import {
   type InputSize,
   type InputStatus
 } from '@expcat/tigercat-core'
+import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 
 export interface VueInputNumberProps {
   modelValue?: number | null
@@ -126,6 +138,12 @@ export const InputNumber = defineComponent({
   emits: ['update:modelValue', 'change', 'focus', 'blur'],
 
   setup(props, { emit, attrs }) {
+    const instance = getCurrentInstance()
+    const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const effectiveSize = computed(() => {
+      const hasOwnSize = Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'size')
+      return hasOwnSize ? props.size : (inputGroup?.size ?? props.size)
+    })
     const inputRef = ref<HTMLInputElement | null>(null)
     const focused = ref(false)
     const repeatController = createRafRepeatActionController()
@@ -281,7 +299,7 @@ export const InputNumber = defineComponent({
       classNames(
         getInputNumberWrapperClasses(props.disabled),
         getInputNumberStatusClasses(props.status),
-        getInputNumberSizeClasses(props.size),
+        getInputNumberSizeClasses(effectiveSize.value),
         focused.value && `ring-2 ${getInputNumberFocusRingColor(props.status)}`,
         props.className,
         coerceClassValue(attrs.class)
@@ -290,7 +308,7 @@ export const InputNumber = defineComponent({
 
     const inputClasses = computed(() =>
       getInputNumberInputClasses(
-        props.size,
+        effectiveSize.value,
         props.controls && props.controlsPosition === 'right',
         props.controls && props.controlsPosition === 'both'
       )

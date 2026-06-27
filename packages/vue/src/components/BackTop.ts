@@ -19,6 +19,7 @@ import {
   backTopHiddenClasses,
   backTopVisibleClasses,
   backTopIconPath,
+  isBrowser,
   type BackTopProps,
   type BackTopVisibilityController
 } from '@expcat/tigercat-core'
@@ -61,7 +62,7 @@ export const BackTop = defineComponent({
      */
     target: {
       type: Function as PropType<() => HTMLElement | Window | null>,
-      default: () => window
+      default: () => (isBrowser() ? window : null)
     },
     /**
      * Use immediate scroll when set to 0; positive values use native smooth scrolling
@@ -93,7 +94,8 @@ export const BackTop = defineComponent({
     }
 
     onMounted(() => {
-      targetElement.value = props.target() ?? window
+      targetElement.value = props.target() ?? (isBrowser() ? window : null)
+      if (!targetElement.value) return
       visibilityController = createBackTopVisibilityController({
         target: targetElement.value,
         getVisibilityHeight: () => props.visibilityHeight,
@@ -115,7 +117,7 @@ export const BackTop = defineComponent({
     })
 
     const buttonClasses = computed(() => {
-      const target = targetElement.value ?? props.target()
+      const target = targetElement.value ?? (isBrowser() ? props.target() : null)
       const isWindowTarget = !target || target === window
       const positionClasses = isWindowTarget ? backTopButtonClasses : backTopContainerClasses
       return classNames(

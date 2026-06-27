@@ -132,6 +132,8 @@ export const Modal: React.FC<ModalProps> = ({
   )
   const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 })
+  const prevOpenRef = useRef(open)
+  const suppressNextCloseRef = useRef(false)
 
   useEffect(() => {
     if (open) {
@@ -163,25 +165,32 @@ export const Modal: React.FC<ModalProps> = ({
     [isDraggable, dragOffset]
   )
 
-  // Notify parent of visibility changes
   useEffect(() => {
-    onOpenChange?.(open)
-    if (!open && onClose) {
-      onClose()
+    if (prevOpenRef.current && !open) {
+      if (suppressNextCloseRef.current) {
+        suppressNextCloseRef.current = false
+      } else {
+        onClose?.()
+      }
     }
-  }, [open, onOpenChange, onClose])
+    prevOpenRef.current = open
+  }, [open, onClose])
 
   const shouldRender = destroyOnClose ? open : hasBeenOpened
 
   const handleClose = useCallback(() => {
     onCancel?.()
     onOpenChange?.(false)
-  }, [onCancel, onOpenChange])
+    suppressNextCloseRef.current = true
+    onClose?.()
+  }, [onCancel, onOpenChange, onClose])
 
   const handleOk = useCallback(() => {
     onOk?.()
     onOpenChange?.(false)
-  }, [onOk, onOpenChange])
+    suppressNextCloseRef.current = true
+    onClose?.()
+  }, [onOk, onOpenChange, onClose])
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {

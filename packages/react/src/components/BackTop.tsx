@@ -8,6 +8,7 @@ import {
   backTopHiddenClasses,
   backTopVisibleClasses,
   backTopIconPath,
+  isBrowser,
   type BackTopProps as CoreBackTopProps
 } from '@expcat/tigercat-core'
 
@@ -41,7 +42,7 @@ const DefaultIcon: React.FC = () => (
   </svg>
 )
 
-const getDefaultTarget = () => window
+const getDefaultTarget = () => (isBrowser() ? window : null)
 
 export const BackTop: React.FC<BackTopProps> = ({
   visibilityHeight = 400,
@@ -54,9 +55,11 @@ export const BackTop: React.FC<BackTopProps> = ({
   ...props
 }) => {
   const [visible, setVisible] = useState(false)
+  const [targetElement, setTargetElement] = useState<HTMLElement | Window | null>(null)
 
   useEffect(() => {
     const el = target()
+    setTargetElement(el)
     if (!el) return
 
     const visibilityController = createBackTopVisibilityController({
@@ -71,6 +74,7 @@ export const BackTop: React.FC<BackTopProps> = ({
     return () => {
       el.removeEventListener('scroll', visibilityController.schedule)
       visibilityController.cancel()
+      setTargetElement(null)
     }
   }, [target, visibilityHeight])
 
@@ -84,14 +88,14 @@ export const BackTop: React.FC<BackTopProps> = ({
   )
 
   const buttonClasses = useMemo(() => {
-    const el = target()
-    const positionClasses = !el || el === window ? backTopButtonClasses : backTopContainerClasses
+    const positionClasses =
+      !targetElement || targetElement === window ? backTopButtonClasses : backTopContainerClasses
     return classNames(
       positionClasses,
       visible ? backTopVisibleClasses : backTopHiddenClasses,
       className
     )
-  }, [target, visible, className])
+  }, [targetElement, visible, className])
 
   return (
     <button

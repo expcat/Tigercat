@@ -292,7 +292,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
   }
 
   const updateTime = (hours: number, minutes: number, seconds: number) => {
-    if (!isTimeInRange(hours, minutes, minTime, maxTime)) {
+    if (!isTimeInRange(hours, minutes, minTime, maxTime, seconds)) {
       return
     }
 
@@ -380,11 +380,15 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
 
   const isHourDisabled = (hour: number): boolean => {
     const hours24 = format === '12' ? to24HourFormat(hour, selectedPeriod) : hour
-    return !isTimeInRange(hours24, selectedMinutes, minTime, maxTime)
+    return !isTimeInRange(hours24, selectedMinutes, minTime, maxTime, selectedSeconds)
   }
 
   const isMinuteDisabled = (minute: number): boolean => {
-    return !isTimeInRange(selectedHours, minute, minTime, maxTime)
+    return !isTimeInRange(selectedHours, minute, minTime, maxTime, selectedSeconds)
+  }
+
+  const isSecondDisabled = (second: number): boolean => {
+    return !isTimeInRange(selectedHours, selectedMinutes, minTime, maxTime, second)
   }
 
   const handleInputClick = () => {
@@ -481,6 +485,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
     selectSecond,
     selectPeriod,
     isHourDisabled,
-    isMinuteDisabled
+    isMinuteDisabled,
+    isSecondDisabled
   }
 }

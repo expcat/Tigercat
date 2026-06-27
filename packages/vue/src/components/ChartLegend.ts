@@ -113,7 +113,7 @@ export const ChartLegend = defineComponent({
                 'aria-hidden': 'true',
                 'data-legend-marker': 'true'
               }),
-              h('span', { style: { marginRight: `${props.gap}px` } }, item.label)
+              h('span', null, item.label)
             ]
           )
         )

@@ -13,6 +13,8 @@ import {
   getVirtualTableFixedCellStyle,
   getTableFixedCellClasses,
   getTableFixedHeaderCellClasses,
+  getTableColgroup,
+  tableBaseClasses,
   virtualTableHeaderClasses,
   virtualTableHeaderCellClasses,
   virtualTableCellClasses,
@@ -130,6 +132,18 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   )
   const visibleColumns = colRange ? columns.slice(colRange.start, colRange.end) : columns
   const colIndexOffset = colRange ? colRange.start : 0
+  const colgroupEntries = useMemo(
+    () =>
+      fixedInfo.hasFixedColumns
+        ? getTableColgroup({
+            columns: visibleColumns,
+            size: 'md',
+            hasSelectionColumn: false,
+            expand: false
+          })
+        : [],
+    [fixedInfo.hasFixedColumns, visibleColumns]
+  )
 
   const resolveRowClassName = (row: T, index: number): string | undefined =>
     typeof rowClassName === 'function' ? rowClassName(row, index) : rowClassName
@@ -150,7 +164,18 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
       onScroll={onScroll}
       role="grid"
       aria-rowcount={data.length}>
-      <table className="w-full table-fixed">
+      <table className={classNames(tableBaseClasses, 'table-fixed')}>
+        {colgroupEntries.length > 0 && (
+          <colgroup>
+            {colgroupEntries.map((entry) => (
+              <col
+                key={entry.key}
+                data-tiger-table-col={entry.key}
+                style={entry.width ? { width: entry.width } : undefined}
+              />
+            ))}
+          </colgroup>
+        )}
         <thead className={stickyHeader ? virtualTableHeaderClasses : undefined}>
           <tr>
             {colRange && colRange.leftPad > 0 && (

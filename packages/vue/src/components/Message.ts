@@ -42,11 +42,21 @@ const MESSAGE_CLOSE_ARIA_LABEL = 'Close message'
  * Global message container root id
  */
 const MESSAGE_CONTAINER_ROOT_ID = `${MESSAGE_CONTAINER_ID}-root`
+const MESSAGE_POSITIONS: MessagePosition[] = [
+  'top',
+  'top-left',
+  'top-right',
+  'bottom',
+  'bottom-left',
+  'bottom-right'
+]
+
+type InternalMessageInstance = MessageInstance & { position: MessagePosition }
 
 /**
  * Message instance storage (reactive)
  */
-const messageInstances = ref<MessageInstance[]>([])
+const messageInstances = ref<InternalMessageInstance[]>([])
 
 const IS_TEST_ENV = (() => {
   const proc = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process
@@ -62,6 +72,7 @@ const getNextInstanceId = createInstanceCounter()
 
 export interface VueMessageContainerProps {
   position?: MessagePosition
+  messages?: InternalMessageInstance[]
 }
 
 /** Options accepted by the Vue global Message API. */
@@ -76,6 +87,10 @@ export const MessageContainer = defineComponent({
     position: {
       type: String as PropType<MessagePosition>,
       default: 'top' as MessagePosition
+    },
+    messages: {
+      type: Array as PropType<InternalMessageInstance[]>,
+      default: () => []
     }
   },
   setup(props) {
@@ -150,18 +165,38 @@ export const MessageContainer = defineComponent({
           'div',
           {
             class: containerClasses.value,
-            id: MESSAGE_CONTAINER_ID,
+            id:
+              props.position === 'top'
+                ? MESSAGE_CONTAINER_ID
+                : `${MESSAGE_CONTAINER_ID}-${props.position}`,
             'aria-live': 'polite',
             'aria-relevant': 'additions',
+            'data-tiger-message-position': props.position,
             'data-tiger-message-container': ''
           },
           IS_TEST_ENV
-            ? messageInstances.value.map(renderMessageItem)
-            : h(TransitionGroup, { name: 'message' }, () =>
-                messageInstances.value.map(renderMessageItem)
-              )
+            ? props.messages.map(renderMessageItem)
+            : h(TransitionGroup, { name: 'message' }, () => props.messages.map(renderMessageItem))
         )
       )
+  }
+})
+
+const MessageHost = defineComponent({
+  name: 'TigerMessageHost',
+  setup() {
+    return () =>
+      MESSAGE_POSITIONS.map((position) => {
+        const positionedMessages = messageInstances.value.filter(
+          (message) => message.position === position
+        )
+        if (positionedMessages.length === 0) return null
+        return h(MessageContainer, {
+          key: position,
+          position,
+          messages: positionedMessages
+        })
+      })
   }
 })
 
@@ -191,7 +226,7 @@ function ensureContainer() {
     document.body.appendChild(rootEl)
   }
 
-  containerApp = createApp(MessageContainer)
+  containerApp = createApp(MessageHost)
   containerApp.mount(rootEl)
 }
 
@@ -209,7 +244,8 @@ function addMessage(config: MessageConfig): () => void {
     closable: config.closable || false,
     onClose: config.onClose,
     icon: config.icon,
-    className: config.className
+    className: config.className,
+    position: config.position ?? 'top'
   }
 
   messageInstances.value.push(instance)

@@ -3,8 +3,9 @@
  */
 
 import { describe, it, expect } from 'vitest'
+import { h } from 'vue'
 import { render, screen } from '@testing-library/vue'
-import { InputGroup, InputGroupAddon, Input } from '@expcat/tigercat-vue'
+import { InputGroup, InputGroupAddon, Input, Textarea, InputNumber } from '@expcat/tigercat-vue'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('InputGroup', () => {
@@ -86,6 +87,23 @@ describe('InputGroup', () => {
       expect(screen.getByRole('group')).toBeInTheDocument()
       unmount()
     }
+  })
+
+  it('passes size to child inputs that do not set their own size', () => {
+    const { getByLabelText } = render(InputGroup, {
+      props: { size: 'lg' },
+      slots: {
+        default: () => [
+          h(Input, { 'aria-label': 'plain input' }),
+          h(Textarea, { 'aria-label': 'plain textarea' }),
+          h(InputNumber, { 'aria-label': 'plain number' })
+        ]
+      }
+    })
+
+    expect(getByLabelText('plain input').className).toContain('py-3')
+    expect(getByLabelText('plain textarea').className).toContain('py-3')
+    expect(screen.getByRole('spinbutton').className).toContain('text-lg')
   })
 })
 

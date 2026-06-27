@@ -6,6 +6,7 @@ import {
   getInputClasses,
   type TextareaProps as CoreTextareaProps
 } from '@expcat/tigercat-core'
+import { useInputGroupContext } from './InputGroup'
 
 export interface TextareaProps
   extends
@@ -24,7 +25,7 @@ export interface TextareaProps
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     {
-      size = 'md',
+      size,
       disabled = false,
       readonly = false,
       required = false,
@@ -47,6 +48,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     },
     ref
   ) => {
+    const inputGroup = useInputGroupContext()
+    const effectiveSize = size ?? inputGroup?.size ?? 'md'
     const textareaRef = useRef<HTMLTextAreaElement | null>(null)
     const [currentValue, setValue] = useControlledState(value, defaultValue || '')
 
@@ -65,11 +68,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       () =>
         classNames(
           'block',
-          getInputClasses({ size }),
+          getInputClasses({ size: effectiveSize }),
           autoResize ? 'resize-none' : 'resize-y',
           className
         ),
-      [size, autoResize, className]
+      [effectiveSize, autoResize, className]
     )
 
     const handleInput = (event: React.FormEvent<HTMLTextAreaElement>) => {

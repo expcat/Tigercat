@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
+  useId,
   useImperativeHandle,
   forwardRef
 } from 'react'
@@ -65,6 +66,8 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
     },
     ref
   ) => {
+    const reactId = useId()
+    const maskId = `tiger-crop-mask-${reactId.replace(/:/g, '')}`
     const config = useTigerConfig()
     const mergedLocale = useMemo(
       () => mergeTigerLocale(config.locale, locale),
@@ -362,7 +365,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           height={displayHeight}
           xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <mask id="crop-mask">
+            <mask id={maskId}>
               <rect width={displayWidth} height={displayHeight} fill="white" />
               <rect x={cr.x} y={cr.y} width={cr.width} height={cr.height} fill="black" />
             </mask>
@@ -371,7 +374,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             width={displayWidth}
             height={displayHeight}
             fill="var(--tiger-image-cropper-mask, rgba(0,0,0,0.55))"
-            mask="url(#crop-mask)"
+            mask={`url(#${maskId})`}
           />
         </svg>
 

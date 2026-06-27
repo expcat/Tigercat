@@ -1488,6 +1488,56 @@ describe('Form', () => {
       })
     })
 
+    it('resetFields restores the initial model snapshot', async () => {
+      let formApi:
+        | {
+            resetFields: () => void
+          }
+        | undefined
+      const model = reactive({ username: 'initial' })
+
+      const Demo = defineComponent({
+        setup() {
+          return () =>
+            h(
+              Form,
+              {
+                model,
+                ref: (el) => {
+                  formApi = (el as typeof formApi) ?? undefined
+                }
+              },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'username',
+                          value: model.username,
+                          onInput: (event: Event) => {
+                            model.username = (event.target as HTMLInputElement).value
+                          }
+                        })
+                    }
+                  )
+              }
+            )
+        }
+      })
+
+      render(Demo)
+      await fireEvent.update(screen.getByLabelText('username'), 'changed')
+      expect(model.username).toBe('changed')
+
+      formApi?.resetFields()
+      await nextTick()
+
+      expect(model.username).toBe('initial')
+    })
+
     it('emits validate event when field is validated', async () => {
       const onValidate = vi.fn()
       const Demo = defineComponent({

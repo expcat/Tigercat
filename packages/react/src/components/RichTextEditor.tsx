@@ -118,10 +118,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const execButtonAction = useCallback(
     (btn: ToolbarButton) => {
       if (readOnly || disabled) return
-      if (btn.action && editorRef.current) {
-        btn.action(editorRef.current)
-        return
-      }
       engineRef.current?.exec(btn.name)
     },
     [readOnly, disabled]

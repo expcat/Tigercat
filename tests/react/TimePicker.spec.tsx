@@ -184,6 +184,25 @@ describe('TimePicker', () => {
     expect(onChange).toHaveBeenLastCalledWith('10:15:05')
   })
 
+  it('disables seconds outside minTime and maxTime', async () => {
+    const user = userEvent.setup()
+    render(<TimePicker showSeconds defaultValue="10:15:20" minTime="10:15:10" maxTime="10:15:30" />)
+
+    await user.click(screen.getByRole('textbox'))
+    const dialog = await screen.findByRole('dialog')
+
+    expect(
+      dialog.querySelector<HTMLButtonElement>(
+        'button[data-tiger-timepicker-unit="second"][aria-label="5 seconds"]'
+      )
+    ).toBeDisabled()
+    expect(
+      dialog.querySelector<HTMLButtonElement>(
+        'button[data-tiger-timepicker-unit="second"][aria-label="15 seconds"]'
+      )
+    ).not.toBeDisabled()
+  })
+
   it('supports 12-hour period selection and Home/End keyboard movement', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()

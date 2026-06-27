@@ -209,23 +209,24 @@ export function isTimeInRange(
   hours: number,
   minutes: number,
   minTime: string | null | undefined,
-  maxTime: string | null | undefined
+  maxTime: string | null | undefined,
+  seconds: number = 0
 ): boolean {
-  const currentMinutes = hours * 60 + minutes
+  const currentSeconds = hours * 3600 + minutes * 60 + seconds
 
   if (minTime) {
     const min = parseTime(minTime)
     if (min) {
-      const minMinutes = min.hours * 60 + min.minutes
-      if (currentMinutes < minMinutes) return false
+      const minSeconds = min.hours * 3600 + min.minutes * 60 + min.seconds
+      if (currentSeconds < minSeconds) return false
     }
   }
 
   if (maxTime) {
     const max = parseTime(maxTime)
     if (max) {
-      const maxMinutes = max.hours * 60 + max.minutes
-      if (currentMinutes > maxMinutes) return false
+      const maxSeconds = max.hours * 3600 + max.minutes * 60 + max.seconds
+      if (currentSeconds > maxSeconds) return false
     }
   }
 

@@ -207,6 +207,24 @@ describe('infinite-scroll-utils', () => {
       expect(lastOptions?.rootMargin).toBe('0px 150px 0px 0px')
     })
 
+    it('uses start-edge rootMargin for inverse observers', () => {
+      const sentinel = document.createElement('div')
+      createInfiniteScrollObserver(sentinel, {
+        onLoadMore: vi.fn(),
+        threshold: 80,
+        inverse: true
+      })
+      expect(lastOptions?.rootMargin).toBe('80px 0px 0px 0px')
+
+      createInfiniteScrollObserver(sentinel, {
+        onLoadMore: vi.fn(),
+        threshold: 60,
+        direction: 'horizontal',
+        inverse: true
+      })
+      expect(lastOptions?.rootMargin).toBe('0px 0px 0px 60px')
+    })
+
     it('passes root to observer options', () => {
       const sentinel = document.createElement('div')
       const root = document.createElement('div')

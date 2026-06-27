@@ -131,10 +131,6 @@ export const RichTextEditor = defineComponent({
     /** Execute action for a specific button (supports custom action) */
     function execButtonAction(btn: ToolbarButton) {
       if (props.readOnly || props.disabled) return
-      if (btn.action && editorRef.value) {
-        btn.action(editorRef.value)
-        return
-      }
       engineInstance?.exec(btn.name)
     }
 

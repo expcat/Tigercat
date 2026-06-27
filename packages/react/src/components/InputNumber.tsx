@@ -24,6 +24,7 @@ import {
   type InputNumberProps as CoreInputNumberProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
+import { useInputGroupContext } from './InputGroup'
 
 export interface InputNumberProps extends CoreInputNumberProps {
   /**
@@ -50,7 +51,7 @@ export interface InputNumberProps extends CoreInputNumberProps {
 export const InputNumber: React.FC<InputNumberProps> = ({
   value: controlledValue,
   defaultValue,
-  size = 'md',
+  size,
   status = 'default',
   min = -Infinity,
   max = Infinity,
@@ -72,6 +73,8 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   onBlur,
   className
 }) => {
+  const inputGroup = useInputGroupContext()
+  const effectiveSize = size ?? inputGroup?.size ?? 'md'
   const inputRef = useRef<HTMLInputElement>(null)
   const repeatControllerRef = useRef(createRafRepeatActionController())
   const repeatValueRef = useRef<number | null>(null)
@@ -205,21 +208,21 @@ export const InputNumber: React.FC<InputNumberProps> = ({
       classNames(
         getInputNumberWrapperClasses(disabled),
         getInputNumberStatusClasses(status),
-        getInputNumberSizeClasses(size),
+        getInputNumberSizeClasses(effectiveSize),
         focused && `ring-2 ${getInputNumberFocusRingColor(status)}`,
         className
       ),
-    [disabled, status, size, focused, className]
+    [disabled, status, effectiveSize, focused, className]
   )
 
   const inputClasses = useMemo(
     () =>
       getInputNumberInputClasses(
-        size,
+        effectiveSize,
         controls && controlsPosition === 'right',
         controls && controlsPosition === 'both'
       ),
-    [size, controls, controlsPosition]
+    [effectiveSize, controls, controlsPosition]
   )
 
   return (

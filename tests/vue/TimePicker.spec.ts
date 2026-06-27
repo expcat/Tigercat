@@ -198,6 +198,30 @@ describe('TimePicker', () => {
     expect(updates.at(-1)?.[0]).toBe('10:15:05')
   })
 
+  it('disables seconds outside minTime and maxTime', async () => {
+    const { container } = renderWithProps(TimePicker, {
+      showSeconds: true,
+      modelValue: '10:15:20',
+      minTime: '10:15:10',
+      maxTime: '10:15:30'
+    })
+
+    await fireEvent.click(container.querySelector('input') as HTMLInputElement)
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+
+    expect(
+      dialog.querySelector<HTMLButtonElement>(
+        'button[data-tiger-timepicker-unit="second"][aria-label="5 seconds"]'
+      )
+    ).toBeDisabled()
+    expect(
+      dialog.querySelector<HTMLButtonElement>(
+        'button[data-tiger-timepicker-unit="second"][aria-label="15 seconds"]'
+      )
+    ).not.toBeDisabled()
+  })
+
   it('supports 12-hour period selection and Home/End keyboard movement', async () => {
     const { container, emitted } = renderWithProps(TimePicker, {
       format: '12',

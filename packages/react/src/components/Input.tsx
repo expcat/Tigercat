@@ -14,6 +14,7 @@ import {
   type InputProps as CoreInputProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
+import { useInputGroupContext } from './InputGroup'
 
 export interface InputProps
   extends
@@ -81,7 +82,7 @@ export interface InputProps
 }
 
 export const Input: React.FC<InputProps> = ({
-  size = 'md',
+  size,
   type = 'text',
   status = 'default',
   errorMessage,
@@ -113,6 +114,8 @@ export const Input: React.FC<InputProps> = ({
   ...props
 }) => {
   injectShakeStyle()
+  const inputGroup = useInputGroupContext()
+  const effectiveSize = size ?? inputGroup?.size ?? 'md'
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -167,7 +170,7 @@ export const Input: React.FC<InputProps> = ({
     showPassword && type === 'password' ? (passwordVisible ? 'text' : 'password') : type
 
   const inputClasses = getInputClasses({
-    size,
+    size: effectiveSize,
     status,
     hasPrefix,
     hasSuffix
@@ -176,7 +179,7 @@ export const Input: React.FC<InputProps> = ({
   const renderSuffix = () => {
     if (activeError) {
       return (
-        <div id={errorMsgId} className={getInputErrorClasses(size)}>
+        <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)}>
           {errorMessage}
         </div>
       )
@@ -185,7 +188,7 @@ export const Input: React.FC<InputProps> = ({
       return (
         <button
           type="button"
-          className={getInputClearButtonClasses(size)}
+          className={getInputClearButtonClasses(effectiveSize)}
           onClick={handleClear}
           aria-label="Clear input"
           tabIndex={-1}>
@@ -197,7 +200,7 @@ export const Input: React.FC<InputProps> = ({
       return (
         <button
           type="button"
-          className={getInputPasswordToggleClasses(size)}
+          className={getInputPasswordToggleClasses(effectiveSize)}
           onClick={togglePasswordVisibility}
           aria-label={passwordVisible ? 'Hide password' : 'Show password'}
           tabIndex={-1}>
@@ -206,7 +209,7 @@ export const Input: React.FC<InputProps> = ({
       )
     }
     if (suffix) {
-      return <div className={getInputAffixClasses('suffix', size)}>{suffix}</div>
+      return <div className={getInputAffixClasses('suffix', effectiveSize)}>{suffix}</div>
     }
     return null
   }
@@ -217,7 +220,7 @@ export const Input: React.FC<InputProps> = ({
       className={classNames(getInputWrapperClasses(), className)}
       style={style}
       onAnimationEnd={handleAnimationEnd}>
-      {hasPrefix && <div className={getInputAffixClasses('prefix', size)}>{prefix}</div>}
+      {hasPrefix && <div className={getInputAffixClasses('prefix', effectiveSize)}>{prefix}</div>}
       <input
         {...props}
         ref={inputRef}

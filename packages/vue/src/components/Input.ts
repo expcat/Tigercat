@@ -1,4 +1,4 @@
-import { defineComponent, computed, ref, watch, h, PropType } from 'vue'
+import { defineComponent, computed, ref, watch, h, inject, getCurrentInstance, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -16,6 +16,7 @@ import {
   type InputType,
   type InputStatus
 } from '@expcat/tigercat-core'
+import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 
 let inputIdCounter = 0
 
@@ -168,6 +169,12 @@ export const Input = defineComponent({
   },
   setup(props, { emit, attrs, slots }) {
     injectShakeStyle()
+    const instance = getCurrentInstance()
+    const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const effectiveSize = computed(() => {
+      const hasOwnSize = Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'size')
+      return hasOwnSize ? props.size : (inputGroup?.size ?? props.size)
+    })
     const inputRef = ref<HTMLInputElement | null>(null)
     const wrapperRef = ref<HTMLDivElement | null>(null)
     const localValue = ref<string | number>(props.modelValue ?? '')
@@ -208,7 +215,7 @@ export const Input = defineComponent({
 
     const inputClasses = computed(() =>
       getInputClasses({
-        size: props.size,
+        size: effectiveSize.value,
         status: props.status,
         hasPrefix: hasPrefix.value,
         hasSuffix: hasSuffix.value
@@ -256,7 +263,11 @@ export const Input = defineComponent({
 
       if (activeError.value) {
         suffixNodes.push(
-          h('div', { id: errorMsgId, class: getInputErrorClasses(props.size) }, props.errorMessage)
+          h(
+            'div',
+            { id: errorMsgId, class: getInputErrorClasses(effectiveSize.value) },
+            props.errorMessage
+          )
         )
       } else {
         if (showClear) {
@@ -265,7 +276,7 @@ export const Input = defineComponent({
               'button',
               {
                 type: 'button',
-                class: getInputClearButtonClasses(props.size),
+                class: getInputClearButtonClasses(effectiveSize.value),
                 onClick: handleClear,
                 'aria-label': 'Clear input',
                 tabindex: -1
@@ -280,7 +291,7 @@ export const Input = defineComponent({
               'button',
               {
                 type: 'button',
-                class: getInputPasswordToggleClasses(props.size),
+                class: getInputPasswordToggleClasses(effectiveSize.value),
                 onClick: togglePasswordVisibility,
                 'aria-label': passwordVisible.value ? 'Hide password' : 'Show password',
                 tabindex: -1
@@ -293,7 +304,7 @@ export const Input = defineComponent({
           suffixNodes.push(
             h(
               'div',
-              { class: getInputAffixClasses('suffix', props.size) },
+              { class: getInputAffixClasses('suffix', effectiveSize.value) },
               slots.suffix ? slots.suffix() : props.suffix
             )
           )
@@ -304,7 +315,7 @@ export const Input = defineComponent({
         hasPrefix.value &&
           h(
             'div',
-            { class: getInputAffixClasses('prefix', props.size) },
+            { class: getInputAffixClasses('prefix', effectiveSize.value) },
             slots.prefix ? slots.prefix() : props.prefix
           ),
         h('input', {

@@ -1,4 +1,13 @@
-import { defineComponent, h, ref, computed, watch, onMounted, PropType } from 'vue'
+import {
+  defineComponent,
+  h,
+  ref,
+  computed,
+  watch,
+  onMounted,
+  getCurrentInstance,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -63,6 +72,8 @@ export const ImageCropper = defineComponent({
   },
   emits: ['crop-change', 'ready'],
   setup(props, { emit, attrs, expose }) {
+    const instance = getCurrentInstance()
+    const maskId = `tiger-crop-mask-${instance?.uid ?? '0'}`
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getImageEditorLabels(mergedLocale.value))
@@ -368,7 +379,7 @@ export const ImageCropper = defineComponent({
         },
         [
           h('defs', null, [
-            h('mask', { id: 'crop-mask' }, [
+            h('mask', { id: maskId }, [
               h('rect', {
                 width: displayWidth.value,
                 height: displayHeight.value,
@@ -387,7 +398,7 @@ export const ImageCropper = defineComponent({
             width: displayWidth.value,
             height: displayHeight.value,
             fill: 'var(--tiger-image-cropper-mask, rgba(0,0,0,0.55))',
-            mask: 'url(#crop-mask)'
+            mask: `url(#${maskId})`
           })
         ]
       )

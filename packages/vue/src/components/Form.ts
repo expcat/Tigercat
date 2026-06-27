@@ -216,6 +216,7 @@ export const Form = defineComponent({
       typeof fieldName === 'string' && typeof isValid === 'boolean'
   },
   setup(props, { slots, emit, expose }) {
+    const initialValues = { ...(props.model ?? {}) }
     const errors = reactive<FormError[]>([])
     const fieldRules = reactive<Record<string, FormRule | FormRule[]>>({})
     const fieldConditions = reactive<FormConditions>({})
@@ -481,6 +482,13 @@ export const Form = defineComponent({
     const resetFields = (): void => {
       validationDebouncer.cancel()
       clearValidate()
+      if (props.model) {
+        Object.keys(props.model).forEach((key) => delete props.model![key])
+        Object.assign(props.model, { ...initialValues })
+      }
+      if (props.undoable) {
+        history.value = createFormHistory({ ...initialValues }, props.maxHistorySize)
+      }
     }
 
     const addField = (fieldName: string, defaultValue?: unknown): void => {

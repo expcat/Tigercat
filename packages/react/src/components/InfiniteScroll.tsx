@@ -84,6 +84,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
       threshold,
       direction,
       root: containerRef.current,
+      inverse,
       onLoadMore: () => {
         if (!disabled && !loading && hasMore) {
           onLoadMoreRef.current?.()

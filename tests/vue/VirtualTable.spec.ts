@@ -246,6 +246,17 @@ describe('VirtualTable (Vue)', () => {
       expect(th).toHaveClass(tableHeaderBgClass)
     })
 
+    it('pins fixed-column widths with a colgroup', () => {
+      const { container } = render(VirtualTable, {
+        props: { data: makeFixedData(5), columns: fixedColumns }
+      })
+      const widths = Array.from(container.querySelectorAll('table > colgroup col')).map(
+        (col) => (col as HTMLElement).style.width
+      )
+      expect(widths).toEqual(['80px', '150px', '100px'])
+      expect(container.querySelector('table')?.className).toContain('border-separate')
+    })
+
     it('applies sticky right style to fixed-right header cell', () => {
       const { getByText } = render(VirtualTable, {
         props: { data: makeFixedData(5), columns: fixedColumns }

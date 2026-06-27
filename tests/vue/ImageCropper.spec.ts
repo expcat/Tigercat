@@ -225,6 +225,21 @@ describe('ImageCropper', () => {
     expect(container.firstElementChild).toBeInTheDocument()
   })
 
+  it('uses unique SVG mask ids for multiple instances', async () => {
+    const { container } = await renderLoadedCropper({
+      props: { src: '/a.jpg' }
+    })
+    const second = render(ImageCropper, { props: { src: '/b.jpg' } })
+    await waitFor(() => expect(second.container.querySelector('mask')).toBeTruthy())
+
+    const masks = [
+      ...(Array.from(container.querySelectorAll('mask')) as SVGMaskElement[]),
+      ...(Array.from(second.container.querySelectorAll('mask')) as SVGMaskElement[])
+    ].map((mask) => mask.id)
+    expect(masks).toHaveLength(2)
+    expect(new Set(masks).size).toBe(2)
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       const { container } = render(ImageCropper)

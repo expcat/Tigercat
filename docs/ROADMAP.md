@@ -378,6 +378,16 @@ references、API baseline 或 changeset 变更。
 
 #### T14 残留 P2 组件行为/契约修复
 
+**状态**：已完成（2026-06-28）。本轮一次性收口 T14 全部 P2
+行为/契约项：BackTop SSR 默认 target、React Modal 回调语义、Message
+position 分容器、Form 单一 model 数据源与 reset/命令一致性、InputGroup
+size 继承、TimePicker 秒级范围、ImageCropper 多实例 mask id、VirtualTable
+固定列 colgroup/`border-separate`、InfiniteScroll inverse observer、ChartLegend
+gap 语义、RichTextEditor 自定义 action engine 同步均已补齐。目标组件
+React/Vue/core spec、`api:validate`、`types:check` 与 SSR 示例门禁已验证通过；
+`corepack pnpm quality:ssr` 在本机因嵌套裸 `pnpm` 解析到 10.28.2 失败，已用
+`npx -y pnpm@11.9.0 quality:ssr` 跑通同一门禁。
+
 **目标**：逐项修复随取证删除而失去归属的 P2 行为/契约类缺陷，默认实现承诺能力；需改公共契约时走废弃流程。
 
 **子项入口**：

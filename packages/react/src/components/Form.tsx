@@ -199,10 +199,10 @@ export const Form = forwardRef<FormHandle, FormProps>(
       [config.locale, locale]
     )
     const [errors, setErrors] = useState<FormError[]>([])
-    const [formValues, setFormValues] = useState<FormValues>(model)
     const fieldRulesRef = React.useRef<FormRules>({})
     const fieldConditionsRef = React.useRef<FormConditions>({})
     const formValuesRef = React.useRef<FormValues>(model)
+    const initialValuesRef = React.useRef<FormValues>({ ...model })
     const validationDebouncerRef = React.useRef<FormValidationDebouncer>(
       createFormValidationDebouncer({ delay: validateDebounce })
     )
@@ -210,11 +210,6 @@ export const Form = forwardRef<FormHandle, FormProps>(
 
     // v0.6.0: undo/redo history
     const [historyState, setHistoryState] = useState(() => createFormHistory(model, maxHistorySize))
-
-    // Update form values when model changes
-    React.useEffect(() => {
-      setFormValues(model)
-    }, [model])
 
     React.useEffect(() => {
       validationDebouncerRef.current.cancel()
@@ -485,17 +480,20 @@ export const Form = forwardRef<FormHandle, FormProps>(
 
     const resetFields = useCallback((): void => {
       clearValidate()
-      setFormValues(model)
-    }, [model, clearValidate])
+      const next = { ...initialValuesRef.current }
+      formValuesRef.current = next
+      onChange?.(next)
+      if (undoable) {
+        setHistoryState(createFormHistory(next, maxHistorySize))
+      }
+    }, [clearValidate, onChange, undoable, maxHistorySize])
 
     const addField = useCallback(
       (fieldName: string, defaultValue?: unknown): void => {
         if (!fieldName) return
-        setFormValues((prev) => {
-          const next = { ...prev, [fieldName]: defaultValue ?? null }
-          onChange?.(next)
-          return next
-        })
+        const next = { ...formValuesRef.current, [fieldName]: defaultValue ?? null }
+        formValuesRef.current = next
+        onChange?.(next)
       },
       [onChange]
     )
@@ -503,11 +501,9 @@ export const Form = forwardRef<FormHandle, FormProps>(
     const removeField = useCallback(
       (fieldName: string): void => {
         if (!fieldName) return
-        setFormValues((prev) => {
-          const { [fieldName]: _, ...next } = prev
-          onChange?.(next)
-          return next
-        })
+        const { [fieldName]: _, ...next } = formValuesRef.current
+        formValuesRef.current = next
+        onChange?.(next)
         clearValidate(fieldName)
       },
       [onChange, clearValidate]
@@ -554,11 +550,9 @@ export const Form = forwardRef<FormHandle, FormProps>(
           return clone
         }
 
-        setFormValues((prevValues) => {
-          const newValues = setValueByPath(prevValues, fieldName, value)
-          onChange?.(newValues)
-          return newValues
-        })
+        const newValues = setValueByPath(formValuesRef.current, fieldName, value)
+        formValuesRef.current = newValues
+        onChange?.(newValues)
       },
       [onChange]
     )
@@ -574,7 +568,6 @@ export const Form = forwardRef<FormHandle, FormProps>(
       setHistoryState((prev) => {
         const result = undoFormHistory(prev)
         if (result) {
-          setFormValues(result.present)
           formValuesRef.current = result.present
           onChange?.(result.present)
           return result
@@ -588,7 +581,6 @@ export const Form = forwardRef<FormHandle, FormProps>(
       setHistoryState((prev) => {
         const result = redoFormHistory(prev)
         if (result) {
-          setFormValues(result.present)
           formValuesRef.current = result.present
           onChange?.(result.present)
           return result
@@ -641,7 +633,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
 
     const contextValue: FormContextValue = useMemo(
       () => ({
-        model: formValues,
+        model,
         rules,
         labelWidth,
         labelPosition,
@@ -661,7 +653,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
         updateValue
       }),
       [
-        formValues,
+        model,
         rules,
         labelWidth,
         labelPosition,

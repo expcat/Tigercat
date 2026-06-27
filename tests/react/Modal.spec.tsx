@@ -301,20 +301,18 @@ describe('Modal', () => {
       })
     })
 
-    it('should call onOpenChange when open state changes', async () => {
+    it('should not call onOpenChange for external open prop changes', async () => {
       const onOpenChange = vi.fn()
 
       const { rerender } = render(
         <Modal open={true} title="Test Modal" onOpenChange={onOpenChange} />
       )
 
-      expect(onOpenChange).toHaveBeenCalledWith(true)
+      expect(onOpenChange).not.toHaveBeenCalled()
 
       rerender(<Modal open={false} title="Test Modal" onOpenChange={onOpenChange} />)
 
-      await waitFor(() => {
-        expect(onOpenChange).toHaveBeenCalledWith(false)
-      })
+      expect(onOpenChange).not.toHaveBeenCalled()
     })
   })
 

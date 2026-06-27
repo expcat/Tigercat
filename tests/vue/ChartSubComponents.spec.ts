@@ -274,6 +274,10 @@ describe('ChartLegend', () => {
       height: '16px'
     })
     expect(container.querySelector('[data-chart-legend]')).toHaveStyle({ gap: '12px' })
+    expect(
+      (container.querySelector('[data-legend-item] span:last-child') as HTMLElement).style
+        .marginRight
+    ).toBe('')
   })
 })
 

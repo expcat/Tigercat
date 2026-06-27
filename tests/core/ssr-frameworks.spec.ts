@@ -5,11 +5,13 @@ import { createSSRApp, h } from 'vue'
 import { renderToString as renderVueToString } from '@vue/server-renderer'
 import {
   BarChart as ReactBarChart,
+  BackTop as ReactBackTop,
   ConfigProvider as ReactConfigProvider,
   DatePicker as ReactDatePicker
 } from '@expcat/tigercat-react'
 import {
   BarChart as VueBarChart,
+  BackTop as VueBackTop,
   ConfigProvider as VueConfigProvider,
   DatePicker as VueDatePicker
 } from '@expcat/tigercat-vue'
@@ -32,6 +34,7 @@ function renderReactSsrTree(): string {
           value: selectedDate,
           locale: 'zh-CN'
         }),
+        createElement(ReactBackTop, { key: 'backtop' }),
         createElement(ReactBarChart, {
           key: 'chart',
           data: chartData,
@@ -53,6 +56,7 @@ async function renderVueSsrTree(): Promise<string> {
           modelValue: selectedDate,
           locale: 'zh-CN'
         }),
+        h(VueBackTop),
         h(VueBarChart, {
           data: chartData,
           width: 320,
@@ -75,7 +79,7 @@ describe('SSR framework smoke coverage', () => {
     expect(first).toBe(second)
     expect(first).toContain('tiger-bar-grad-')
     expect(first).toContain('React SSR chart')
-    expect(first).toContain('2024/01/15')
+    expect(first).toContain('2024-01-15')
   })
 
   it('renders Vue components to stable HTML for Nuxt SSR', async () => {
@@ -85,6 +89,6 @@ describe('SSR framework smoke coverage', () => {
     expect(first).toBe(second)
     expect(first).toContain('tiger-bar-grad-')
     expect(first).toContain('Vue SSR chart')
-    expect(first).toContain('2024/01/15')
+    expect(first).toContain('2024-01-15')
   })
 })

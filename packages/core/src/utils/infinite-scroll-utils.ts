@@ -65,6 +65,8 @@ export interface InfiniteScrollObserverOptions {
   direction?: 'vertical' | 'horizontal'
   /** Scroll root element. `null` = the sentinel's nearest scrollable ancestor is determined by IO */
   root?: Element | null
+  /** Whether the sentinel is placed at the start edge instead of the end edge */
+  inverse?: boolean
   /** Called when the sentinel becomes visible (should load more) */
   onLoadMore: () => void
 }
@@ -87,10 +89,22 @@ export function createInfiniteScrollObserver(
 ): (() => void) | null {
   if (typeof IntersectionObserver === 'undefined') return null
 
-  const { threshold = 100, direction = 'vertical', root = null, onLoadMore } = options
+  const {
+    threshold = 100,
+    direction = 'vertical',
+    root = null,
+    inverse = false,
+    onLoadMore
+  } = options
 
   const rootMargin =
-    direction === 'horizontal' ? `0px ${threshold}px 0px 0px` : `0px 0px ${threshold}px 0px`
+    direction === 'horizontal'
+      ? inverse
+        ? `0px 0px 0px ${threshold}px`
+        : `0px ${threshold}px 0px 0px`
+      : inverse
+        ? `${threshold}px 0px 0px 0px`
+        : `0px 0px ${threshold}px 0px`
 
   const observer = new IntersectionObserver(
     (entries) => {

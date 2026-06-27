@@ -56,6 +56,22 @@ describe('Message (Vue)', () => {
       const messageElement = getMessageByType('warning')
       expect(messageElement?.textContent).toContain('Warning message')
     })
+
+    it('renders messages into the requested position container', async () => {
+      Message.info({
+        content: 'Bottom right message',
+        position: 'bottom-right',
+        duration: 0
+      })
+      await flushDomUpdates()
+
+      const container = document.querySelector(
+        '[data-tiger-message-container][data-tiger-message-position="bottom-right"]'
+      )
+      expect(container).toBeTruthy()
+      expect(container?.className).toContain('bottom-6')
+      expect(container?.textContent).toContain('Bottom right message')
+    })
   })
 
   describe('Types', () => {

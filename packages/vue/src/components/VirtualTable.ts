@@ -12,6 +12,8 @@ import {
   getVirtualTableFixedCellStyle,
   getTableFixedCellClasses,
   getTableFixedHeaderCellClasses,
+  getTableColgroup,
+  tableBaseClasses,
   virtualTableHeaderClasses,
   virtualTableHeaderCellClasses,
   virtualTableCellClasses,
@@ -147,6 +149,14 @@ export const VirtualTable = defineComponent({
         ? props.columns.slice(colRange.start, colRange.end)
         : props.columns
       const colIndexOffset = colRange ? colRange.start : 0
+      const colgroupEntries = fi.hasFixedColumns
+        ? getTableColgroup({
+            columns: visibleColumns,
+            size: 'md',
+            hasSelectionColumn: false,
+            expand: false
+          })
+        : []
 
       const headerCells = visibleColumns.map((col) => {
         const widthStyle = col.width
@@ -303,7 +313,26 @@ export const VirtualTable = defineComponent({
 
       const tbody = h('tbody', {}, [topSpacer, ...rows, bottomSpacer])
 
-      const table = h('table', { class: 'w-full table-fixed' }, [thead, tbody])
+      const colgroup =
+        colgroupEntries.length > 0
+          ? h(
+              'colgroup',
+              {},
+              colgroupEntries.map((entry) =>
+                h('col', {
+                  key: entry.key,
+                  'data-tiger-table-col': entry.key,
+                  style: entry.width ? { width: entry.width } : undefined
+                })
+              )
+            )
+          : null
+
+      const table = h('table', { class: classNames(tableBaseClasses, 'table-fixed') }, [
+        colgroup,
+        thead,
+        tbody
+      ])
 
       // Empty state
       const emptyEl =
