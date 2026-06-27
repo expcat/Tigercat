@@ -2617,8 +2617,10 @@
       "TigerLocaleLoader",
       "TigerLocaleModal",
       "TigerLocalePagination",
+      "TigerLocaleQRCode",
       "TigerLocaleTable",
       "TigerLocaleTaskBoard",
+      "TigerLocaleTimeline",
       "TigerLocaleTimePicker",
       "TigerLocaleUpload",
       "TigerText",
@@ -3383,7 +3385,7 @@
       ]
     },
     "DataTableWithToolbarProps": {
-      "extends": ["'pagination'\n>", "Omit"],
+      "extends": ["Omit"],
       "props": ["onPageChange", "onPageSizeChange", "pageSize", "pagination", "toolbar"]
     },
     "DatePickerProps": {
@@ -3588,7 +3590,7 @@
       "props": ["colors", "data", "direction", "gap", "gradient", "pinch"]
     },
     "GanttProps": {
-      "extends": ["'selectedIndex'>", "BaseChartProps", "Omit<ChartInteractionProps"],
+      "extends": ["BaseChartProps", "Omit"],
       "props": [
         "ariaLabel",
         "barHeight",
@@ -4102,7 +4104,7 @@
       ]
     },
     "OrgChartProps": {
-      "extends": ["'selectedIndex'>", "BaseChartProps", "Omit<ChartInteractionProps"],
+      "extends": ["BaseChartProps", "Omit"],
       "props": [
         "ariaLabel",
         "colors",

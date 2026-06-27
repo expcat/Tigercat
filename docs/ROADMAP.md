@@ -34,6 +34,10 @@ source: current repository state; v1.4.0 has been released; all 202 A-G scan fin
 
 #### T01 release/api baseline gate
 
+**状态**：已完成（2026-06-27）。依据提交 `df9a76a4`，并在本轮补齐 API baseline
+heritage 解析与 `api-reports/public-api-baseline.json` 快照更新；验证已运行
+`npx -y pnpm@11.9.0 release:check` 与 `npx -y pnpm@11.9.0 api:baseline`。
+
 **目标**：修复 A-4 与 G-1 两条会阻断 `quality:release` 的门禁漂移：API baseline 生成格式必须与提交格式一致，release check 不再依赖旧版 ROADMAP 发布结构。
 
 **来源**：A-4、G-1。
@@ -49,6 +53,9 @@ source: current repository state; v1.4.0 has been released; all 202 A-G scan fin
 **冲突规避**：T01 是唯一允许改 `api-reports/public-api-baseline.json` 与 release-readiness 逻辑的任务；其他任务如需 baseline 变化，必须基于 T01 完成后的结果追加。
 
 #### T02 MarkdownEditor security
+
+**状态**：已完成（2026-06-27）。依据提交 `94e079cf`；目标 React/Vue
+MarkdownEditor spec 已在本轮验证通过。
 
 **目标**：修复 C31-1 的安全问题，确保 MarkdownEditor 空 preview 不把 `placeholder` 直写进 `innerHTML`。
 
@@ -66,6 +73,10 @@ source: current repository state; v1.4.0 has been released; all 202 A-G scan fin
 
 #### T03 critical i18n parity
 
+**状态**：已完成（2026-06-27）。依据提交 `a08340c0`，并在本轮补齐新增
+`TigerLocaleQRCode`/`TigerLocaleTimeline` 的 API baseline 快照；QRCode/Timeline
+目标 spec、`api:validate` 与 `types:check` 已验证通过。
+
 **目标**：修复 P1 级 i18n 不对称：React QRCode 接入 ConfigProvider locale 并补 `qrcode` locale key；React Timeline 接入已有 Timeline locale。
 
 **来源**：C02-2、C04-1。
@@ -81,6 +92,9 @@ source: current repository state; v1.4.0 has been released; all 202 A-G scan fin
 **冲突规避**：T03 只处理 P1 parity；C02-5/C04-4 等非 P1 locale 文案留给 T06。
 
 #### T04 Vue reactive lifecycle fixes
+
+**状态**：已完成（2026-06-27）。依据提交 `bfb96d7c`；Vue Anchor、Avatar、
+Breadcrumb、DatePicker、Dropdown 目标 spec 已在本轮验证通过。
 
 **目标**：修复 Vue 侧 reactive/lifecycle 类缺陷，不改变公共类型形状。
 
