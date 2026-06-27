@@ -5050,3 +5050,142 @@ pnpm size
 | `bench.yml`                            | benchmarks 每周/手动运行并上传 JSON artifact；无自动 baseline diff                               | F-4      |
 
 > 本轮 F 只记录扫描结论和修复建议；未改任何测试、示例、E2E、benchmark、组件源码、公共 API、生成器或 generated references（最终仅 `docs/ROADMAP.md` + `docs/ROADMAP_CHECK.md` 保留改动）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用 `npx -y pnpm@11.9.0` 跑 `test:validate`、`example:build`、`example:ssr:build`、`bench`，并做静态路由/skip/workflow/script 核对。
+
+### 任务 G：CLI、脚本、发布与维护自动化扫描结果（2026-06-27）
+
+**扫描范围**：CLI 全链路 [packages/cli/src](../packages/cli/src)（create/add/playground/generate/doctor、templates、fs/logger/validate helper、CLI README）、维护脚本 [scripts](../scripts)（setup/check-env/release-readiness/publish-check/run-examples/api docs/API validate/baseline/test validate/utils）、根 [package.json](../package.json) scripts、[scripts/README.md](../scripts/README.md) 命令表，以及 [tests/core/cli.spec.ts](../tests/core/cli.spec.ts) 的 CLI 覆盖。
+
+#### G-1 `release:check` 仍绑定旧版 ROADMAP 发布结构，当前发布门禁失败 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜[check-release-readiness.mjs](../scripts/check-release-readiness.mjs) 的 `checkReleaseDocs()` 仍要求 [docs/ROADMAP.md](ROADMAP.md) 包含 `| 发布版本 | v1.4.0 发布准备中` 与 `- [ ] v1.4.0 发布执行` 两段旧发布计划文本。
+- 🟠 P2｜当前 ROADMAP 头部已声明“只记录之后计划要完成的任务”，v1.4.0 已发布；实跑 `corepack pnpm release:check` 失败，报错正是 `docs/ROADMAP.md must declare v1.4.0 as the current release` 与 `must keep the current release task aligned with v1.4.0`。
+- 🟠 P2｜根 `quality:release` 仍把 `release:check` 放在第一步，因此该漂移会阻断后续快速门禁、coverage、API baseline、docs refs、size、示例与 SSR 检查。
+
+**公共内容决策**：发布元数据检查应改成验证当前事实源（package versions、CHANGELOG/MIGRATION、release reference、example header/footer、CLI constants），不要依赖 ROADMAP 的旧发布任务表。若仍需要发布执行清单，应迁到 release reference 或单独 release checklist，而不是恢复 ROADMAP 旧结构。
+
+**建议修复顺序**：P2。优先移除或替换 `checkReleaseDocs()` 中对 ROADMAP 发布表/checkbox 的断言，再补一个 release-check fixture 或字符串级测试覆盖当前 Roadmap 策略。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm release:check
+corepack pnpm quality:quick
+```
+
+---
+
+#### G-2 CLI 子命令仍绕过脚本侧 pnpm/spawn helper，跨平台行为存在双轨 — **P2**
+
+**发现问题**
+
+- 🟠 P2｜维护脚本已有 [scripts/utils/pnpm.mjs](../scripts/utils/pnpm.mjs)，集中处理 Windows 下 `pnpm` / Corepack shim 的 `shell` 规则；CLI README 也提示 Windows/Corepack programmatic spawn 要带 `shell: true`。
+- 🟠 P2｜[playground.ts](../packages/cli/src/commands/playground.ts) 仍直接 `execSync('pnpm install')`，并用字符串 `execSync(\`npx vite --port ${safePort}${openFlag}\`)` 启动 dev server。port 已做数字兜底，注入风险低，但命令查找、Corepack shim、错误输出和未来参数扩展没有复用统一 helper。
+- 🟢 P3｜[add.ts](../packages/cli/src/commands/add.ts) 根据 lockfile 拼出 `yarn add` / `npm install` / `pnpm add` 字符串后直接 `execSync(installCommand)`；依赖名来自常量，安全风险低，但和脚本侧 arg-array spawn 风格不一致。
+
+**公共内容决策**：通用命令执行 helper 可拆到 CLI 局部 utils（不要从发布脚本直接导入）。CLI 侧应优先用 `spawnSync(command, args, { shell: isWindows })`/arg-array，安装命令、playground 启动、dry-run 输出共享同一格式化逻辑。
+
+**建议修复顺序**：P2。先收敛 playground 的 install/start 命令，再处理 add `--install` 的命令构造；补 Windows/Corepack 命令格式单测或通过 injectable runner 做 smoke。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm vitest run tests/core/cli.spec.ts
+node packages/cli/dist/index.js playground --template react --port 3457 --dry-run
+```
+
+---
+
+#### G-3 walk/collectFiles、版本解析、catalog 读取等脚本 helper 重复，维护边界已到可合并点 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜递归文件遍历至少有 4 套：`generate-api-baseline.mjs` 的 `collectFiles()`、`validate-api.mjs` 的 `collectFiles()`、`validate-tests.mjs` 的 async `walk()`、`run-examples.mjs` 的 async `walkFiles()`；排除目录集合也略有差异（如 `.nuxt`、`.next`、`dist`）。
+- 🟢 P3｜版本解析/比较同时存在于 `check-env.mjs` 和 CLI `doctor.ts`；workspace catalog 读取同时存在于 `check-env.mjs` 和 `publish-check.mjs`。
+- 🟢 P3｜已有 `scripts/utils/pnpm.mjs` 与 `scripts/utils/term.mjs`，说明脚本层已经接受 utils 目录；继续复制 helper 会让后续新增 `.next`、coverage、Playwright 报告等排除规则时容易漏一处。
+
+**公共内容决策**：脚本层可新增 `scripts/utils/files.mjs`、`scripts/utils/version.mjs`、`scripts/utils/catalog.mjs`，只服务仓库维护脚本。CLI runtime 不直接依赖这些脚本 helper，避免发布包把 repo-only 维护逻辑带入用户项目。
+
+**建议修复顺序**：P3。等 G-1 发布门禁恢复后再做机械合并；每合并一类 helper，先跑对应脚本的目标命令，避免一次性横扫造成行为漂移。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm api:validate
+corepack pnpm api:baseline
+corepack pnpm test:validate
+corepack pnpm example:all -- --check
+```
+
+---
+
+#### G-4 CLI `generate docs` 与仓库 `docs:api` 是两条不同生成链路，文档发现性容易混淆 — **P3**
+
+**发现问题**
+
+- 🟢 P3｜CLI [generate.ts](../packages/cli/src/commands/generate.ts) 的 `runGenerateDocs()` 是轻量 regex/字符串解析器，输出到用户指定 `docs/api`；仓库正式 references 由 [generate-api-docs.mjs](../scripts/generate-api-docs.mjs) 使用 TypeScript AST、分类表、组件 notes 和 Prettier 生成 `skills/tigercat/references/*`。
+- 🟢 P3｜[packages/cli/README.md](../packages/cli/README.md) 将 `tigercat generate docs` 描述为 “Generate API docs from type definitions”，而 [scripts/README.md](../scripts/README.md) 将 `pnpm docs:api` 描述为生成 skills API 摘要。二者用途不同但名称接近，后续维护者容易误以为 CLI 命令能更新官方 generated references。
+- 🟢 P3｜`tests/core/cli.spec.ts` 覆盖了 `runGenerateDocs()` dry-run 和实际写文件路径，能证明 CLI 生成器可运行，但没有把它和 `docs:api:check` 的官方输出边界区分开。
+
+**公共内容决策**：保持两条链路分离：CLI `generate docs` 面向用户项目 starter docs；仓库 `docs:api` 面向 Tigercat skill references。建议在 CLI README 和命令描述中明确“starter/local docs”，并在 scripts README 强调官方 references 只能通过 `pnpm docs:api` / 生成器维护。
+
+**建议修复顺序**：P3。先改说明文字和命令 help，不改生成器行为；如后续要统一 parser，应从 `generate-api-docs.mjs` 抽内部库前先确认是否适合随 CLI 发布。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm vitest run tests/core/cli.spec.ts
+corepack pnpm docs:api:check
+```
+
+---
+
+#### G-5 CLI/脚本主路径健康面 — **观察**
+
+**发现问题**
+
+- ✅ CLI 核心 spec 当前覆盖常量、模板、dry-run、doctor、add/generate/playground 等路径；本轮 `corepack pnpm vitest run tests/core/cli.spec.ts` 实跑 72 个测试通过。
+- ✅ `scripts/README.md` 中常用维护入口与根 package scripts 的主要 release/check/docs/example 入口对齐；未发现命令表缺失 `setup`、`dev:check`、`example:all`、`release:check`、`publish:check`、`smoke:published`、`docs:api`、`docs:api:check` 等条目。
+- ✅ `publish-check.mjs` 使用临时目录、本地 tarball smoke、published smoke、npm env 清洗、示例 fixture 拷贝与 finally 清理；本轮未默认运行 `publish:check`，因为它会 build/pack/install 示例，超出文档扫描的轻量验证边界。
+- ✅ `scripts/utils/pnpm.mjs` 已集中 `pnpm` 可用性、版本读取和 Windows shell 规则；`scripts/utils/term.mjs` 已集中脚本输出颜色。
+
+**公共内容决策**：健康面保持现状。后续修复 G-1~G-4 时不要降低 CLI dry-run、doctor compatibility matrix、publish smoke、docs/API drift gate 这些已有保护。
+
+**建议修复顺序**：观察项。作为后续 CLI/脚本维护重构的回归基线。
+
+**目标验证命令**：
+
+```bash
+corepack pnpm vitest run tests/core/cli.spec.ts
+corepack pnpm publish:check
+corepack pnpm smoke:published
+```
+
+---
+
+#### G 公共拆分/合并决策汇总（供任务 H 汇总）
+
+| 项                                   | 决策                                                                 | 优先级 |
+| ------------------------------------ | -------------------------------------------------------------------- | ------ |
+| release-check ROADMAP 旧结构断言（G-1） | 删除/替换旧 Roadmap 发布表断言，以当前 release docs 和版本事实源为准 | **P2** |
+| CLI command runner（G-2）            | 在 CLI 局部抽 arg-array runner；不要复用 repo-only scripts helper     | **P2** |
+| scripts 文件/版本/catalog helper（G-3） | 合并到 `scripts/utils/*`，保持 CLI runtime 与维护脚本边界分离        | P3     |
+| CLI docs generator 命名边界（G-4）   | 文档化 starter docs vs official refs，不立即合并生成器               | P3     |
+| CLI/脚本健康基线（G-5）              | 保持现有 dry-run、doctor、publish smoke、API/docs drift gate          | 观察   |
+
+---
+
+#### G 取证摘要（静态实读 + 目标命令）
+
+| 取证                                            | 结果                                                                                                      | 对应发现 |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------- |
+| `corepack pnpm release:check`                   | ❌ 失败；`check-release-readiness.mjs` 仍要求 ROADMAP 包含 v1.4.0 发布准备/执行旧文本                      | G-1      |
+| `package.json` release scripts                  | `quality:release` 首步是 `release:check`，后续才是 quick/coverage/API/docs/size/test/example/SSR 门禁      | G-1      |
+| grep `execSync` / `spawnSync` / `shell:`         | scripts 有 `pnpm` helper；CLI playground/add 仍有字符串命令执行路径                                       | G-2      |
+| grep `collectFiles` / `walk` / `parseVersion`   | 文件遍历、版本解析、catalog 读取在多个脚本/CLI doctor 中重复                                               | G-3      |
+| 读 `generate.ts` + `generate-api-docs.mjs`       | CLI docs generator 是轻量用户项目输出；仓库 `docs:api` 是官方 skill references 生成链路                    | G-4      |
+| README/scripts 表核对                           | ✅ `scripts/README.md` 覆盖主要 setup/dev/check/release/publish/docs/example 入口                          | G-5      |
+| `corepack pnpm vitest run tests/core/cli.spec.ts` | ✅ 1 个文件、72 个 CLI 测试通过                                                                            | G-5      |
+
+> 本轮 G 只记录扫描结论和修复建议；未改任何 CLI 源码、维护脚本、公共 API、生成器或 generated references（仅 `docs/ROADMAP.md` + `docs/ROADMAP_CHECK.md` 保留改动）。按 ROADMAP「若扫描只更新 Roadmap 文档，不要求跑完整 `pnpm quality:release`，也不运行 `pnpm docs:api`」，本轮使用 `corepack pnpm` 做 CLI 定向测试、release-check 实跑与静态脚本/README/package scripts 核对。`release:check` 当前失败是本轮记录的 P2 发现，故不运行完整 `quality:release` 或 `publish:check`。

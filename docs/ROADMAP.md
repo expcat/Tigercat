@@ -273,7 +273,9 @@ source: current repository state; v1.4.0 has been released
 - 目标：找失效测试、弱断言、重复测试样板、示例使用废弃 API、示例与公开 API 不一致、benchmark 覆盖缺口。
 - 公共拆合判断：跨框架测试 fixture/helper 合并到 `tests/utils`；框架特有 render helper 保留独立。
 
-#### 任务 G：CLI、脚本、发布与维护自动化扫描
+#### 任务 G：CLI、脚本、发布与维护自动化扫描 ✅ 已扫描（2026-06-27）
+
+> 扫描结果见 [ROADMAP_CHECK.md](ROADMAP_CHECK.md)（任务 G 节）；发现与修复建议记录在该文件，本表仅留计划与状态。
 
 - 范围：`packages/cli/src`、`scripts/*.mjs`、根 `package.json` scripts、release/check/publish/setup 工具。
 - 目标：找跨平台问题、重复文件遍历、硬编码路径、错误输出不清晰、与 README/scripts 文档不一致的命令。
