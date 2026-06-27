@@ -2,6 +2,7 @@ import { defineComponent, h, ref, computed, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  isActivationKey,
   calculateVirtualRange,
   getVirtualTableContainerClasses,
   getVirtualTableRowClasses,
@@ -153,12 +154,18 @@ export const VirtualTable = defineComponent({
           props.rowKey as keyof typeof row | ((r: typeof row, i: number) => string | number)
         )
         const isSelected = selectedSet.value.has(key)
+        const isInteractive = props.selectable || typeof attrs.onRowClick === 'function'
+        const activate = () => {
+          emit('row-click', row, globalIdx)
+          if (props.selectable) emit('select', key, row, globalIdx)
+        }
 
-        const cells = props.columns.map((col) =>
+        const cells = props.columns.map((col, colIdx) =>
           h(
             'td',
             {
               key: col.key as string,
+              'aria-colindex': colIdx + 1,
               class: classNames(
                 virtualTableCellClasses,
                 getTableFixedCellClasses({
@@ -185,10 +192,21 @@ export const VirtualTable = defineComponent({
           {
             key,
             class: getVirtualTableRowClasses(globalIdx, props.striped, isSelected),
-            onClick: () => {
-              emit('row-click', row, globalIdx)
-              if (props.selectable) emit('select', key, row, globalIdx)
-            }
+            // header occupies aria-rowindex 1
+            'aria-rowindex': globalIdx + 2,
+            'aria-selected': props.selectable ? isSelected : undefined,
+            tabindex: isInteractive ? 0 : undefined,
+            // onClick stays attached so `row-click` always fires for consumers
+            // that listen for it; keyboard activation is added when interactive.
+            onClick: activate,
+            onKeydown: isInteractive
+              ? (e: KeyboardEvent) => {
+                  if (isActivationKey(e)) {
+                    e.preventDefault()
+                    activate()
+                  }
+                }
+              : undefined
           },
           cells
         )

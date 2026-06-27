@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  isActivationKey,
   createImageAnnotationBox,
   createImageAnnotationPath,
   defaultImageAnnotationTools,
@@ -251,13 +252,21 @@ export function ImageAnnotation({
     [activeTool, canEdit, getPointFromEvent]
   )
 
+  const removeAnnotation = useCallback(
+    (annotation: CoreImageAnnotation) => {
+      if (!canEdit) return
+      const next = annotations.filter((item) => item.id !== annotation.id)
+      commitAnnotations(next, { type: 'remove', annotation })
+      selectAnnotation(null)
+    },
+    [annotations, canEdit, commitAnnotations, selectAnnotation]
+  )
+
   const removeSelectedAnnotation = useCallback(() => {
     if (!canEdit || !activeSelectedId) return
     const removed = annotations.find((annotation) => annotation.id === activeSelectedId)
-    const next = annotations.filter((annotation) => annotation.id !== activeSelectedId)
-    commitAnnotations(next, { type: 'remove', annotation: removed })
-    selectAnnotation(null)
-  }, [activeSelectedId, annotations, canEdit, commitAnnotations, selectAnnotation])
+    if (removed) removeAnnotation(removed)
+  }, [activeSelectedId, annotations, canEdit, removeAnnotation])
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -284,6 +293,22 @@ export function ImageAnnotation({
     (annotation: CoreImageAnnotation, isDraft = false) => {
       const selected = !isDraft && annotation.id === activeSelectedId
       const stroke = getImageAnnotationStrokeColor(annotation)
+      // SVG `role="button"` elements do not fire click on Enter/Space natively,
+      // so wire keyboard activation (select) and Delete/Backspace (remove) here.
+      const onKeyDown = (event: React.KeyboardEvent<SVGElement>) => {
+        if (isDraft) return
+        if (isActivationKey(event)) {
+          event.preventDefault()
+          event.stopPropagation()
+          selectAnnotation(annotation)
+          return
+        }
+        if (event.key === 'Delete' || event.key === 'Backspace') {
+          event.preventDefault()
+          event.stopPropagation()
+          removeAnnotation(annotation)
+        }
+      }
       const commonProps = {
         stroke,
         strokeWidth: selected ? strokeWidth + 1 : strokeWidth,
@@ -292,7 +317,8 @@ export function ImageAnnotation({
         role: 'button',
         tabIndex: isDraft ? -1 : 0,
         'aria-label': getImageAnnotationShapeAriaLabel(annotation),
-        className: classNames(!isDraft && 'cursor-pointer focus:outline-none')
+        className: classNames(!isDraft && 'cursor-pointer focus:outline-none'),
+        onKeyDown: isDraft ? undefined : onKeyDown
       }
       const onClick = (event: React.MouseEvent<SVGElement>) => {
         if (isDraft) return

@@ -418,7 +418,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           expandable: internalExpandable,
           labels: tableLabels,
           rowClassName: internalRowClassName,
-          rowDraggable
+          rowDraggable,
+          interactiveRows: !!onRowClick || !!internalRowSelection
         })}
         {renderSummaryRow(ctx, {
           size,

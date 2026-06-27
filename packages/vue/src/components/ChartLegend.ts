@@ -72,7 +72,9 @@ export const ChartLegend = defineComponent({
         {
           class: containerClasses.value,
           style: containerStyle.value,
-          role: 'list',
+          // A group of toggle buttons is not a "list"; only use list semantics
+          // for the static (non-interactive) legend.
+          role: props.interactive ? 'group' : 'list',
           'aria-label': 'Chart legend',
           'data-chart-legend': 'true'
         },
@@ -90,7 +92,10 @@ export const ChartLegend = defineComponent({
                   : 'cursor-default',
                 item.active === false ? 'opacity-50' : undefined
               ),
-              role: 'listitem',
+              // Interactive items are real buttons; `role="listitem"` would
+              // override the button role, so it is only set for the static legend.
+              role: props.interactive ? undefined : 'listitem',
+              'aria-pressed': props.interactive ? item.active !== false : undefined,
               'data-legend-item': 'true',
               onClick: props.interactive ? () => handleClick(item) : undefined,
               onMouseenter: props.interactive ? () => handleHover(item) : undefined,

@@ -39,6 +39,26 @@ describe('RadarChart', () => {
     await expectNoA11yViolationsIsolated(container)
   })
 
+  it('labels points and makes them keyboard-focusable when interactive (C27-4)', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      hoverable: true,
+      showTooltip: true
+    })
+    const points = container.querySelectorAll('circle[data-radar-point]')
+    expect(points[0].getAttribute('role')).toBe('button')
+    expect(points[0].getAttribute('aria-label')).toBe('A')
+    expect(points[0].getAttribute('tabindex')).toBe('0')
+  })
+
+  it('labels points as images (non-focusable) when not interactive (C27-4)', () => {
+    const { container } = renderWithProps(RadarChart, { data: singleSeriesData })
+    const point = container.querySelector('circle[data-radar-point]')!
+    expect(point.getAttribute('role')).toBe('img')
+    expect(point.getAttribute('aria-label')).toBe('A')
+    expect(point.getAttribute('tabindex')).toBeNull()
+  })
+
   it('renders multiple series', () => {
     const { container } = renderWithProps(RadarChart, { series: multiSeriesData })
     expect(container.querySelectorAll('path[data-radar-area]')).toHaveLength(2)

@@ -23,6 +23,28 @@ describe('PieChart', () => {
     await expectNoA11yViolationsIsolated(container)
   })
 
+  it('labels slices with role/aria-label, and uses button role when selectable (C27-4)', () => {
+    const staticPie = renderWithProps(PieChart, {
+      data: [
+        { value: 40, label: 'Apples' },
+        { value: 30, label: 'Pears' }
+      ],
+      ...defaultSize
+    })
+    const staticSlice = staticPie.container.querySelector('path[data-pie-slice]')!
+    expect(staticSlice).toHaveAttribute('role', 'img')
+    expect(staticSlice).toHaveAttribute('aria-label', 'Apples')
+
+    const selectablePie = renderWithProps(PieChart, {
+      data: [{ value: 40, label: 'Apples' }],
+      selectable: true,
+      ...defaultSize
+    })
+    const slice = selectablePie.container.querySelector('path[data-pie-slice]')!
+    expect(slice).toHaveAttribute('role', 'button')
+    expect(slice).toHaveAttribute('tabindex', '0')
+  })
+
   it('renders empty state with no data', () => {
     const { container } = renderWithProps(PieChart, {
       data: [],

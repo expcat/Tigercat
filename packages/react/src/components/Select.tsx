@@ -24,7 +24,7 @@ export const Select: React.FC<SelectProps> = (props) => {
       <button
         ref={ctx.triggerRef}
         type="button"
-        className={ctx.triggerClasses}
+        className={classNames(ctx.triggerClasses, 'pr-16')}
         disabled={ctx.disabled}
         onClick={ctx.toggleDropdown}
         onKeyDown={ctx.handleTriggerKeyDown}
@@ -43,21 +43,22 @@ export const Select: React.FC<SelectProps> = (props) => {
           )}>
           {ctx.displayText}
         </span>
-        <span className="flex items-center gap-1">
-          {ctx.showClearButton && (
-            <span
-              className="inline-flex"
-              data-tiger-select-clear
-              aria-label={ctx.clearAriaLabel}
-              onClick={ctx.clearSelection}>
-              <SelectClearIcon />
-            </span>
-          )}
-          <span className={classNames('inline-flex', ctx.isOpen && 'rotate-180')}>
-            <SelectChevronIcon />
-          </span>
-        </span>
       </button>
+      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center gap-1">
+        {ctx.showClearButton && (
+          <button
+            type="button"
+            className="pointer-events-auto inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-select-ring,var(--tiger-primary,#2563eb))]"
+            data-tiger-select-clear
+            aria-label={ctx.clearAriaLabel}
+            onClick={ctx.clearSelection}>
+            <SelectClearIcon />
+          </button>
+        )}
+        <span className={classNames('inline-flex', ctx.isOpen && 'rotate-180')} aria-hidden="true">
+          <SelectChevronIcon />
+        </span>
+      </span>
 
       {ctx.isOpen && (
         <div

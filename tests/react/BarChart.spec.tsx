@@ -26,6 +26,32 @@ describe('BarChart', () => {
     await expectNoA11yViolationsIsolated(container)
   })
 
+  it('labels bars with role/aria-label, matching Vue/Scatter (C26-4)', () => {
+    const { container } = renderWithProps(BarChart, {
+      data: [
+        { x: 'A', y: 10, label: 'Alpha' },
+        { x: 'B', y: 20 }
+      ],
+      ...defaultSize
+    })
+    const bars = container.querySelectorAll('rect[data-bar-index]')
+    expect(bars).toHaveLength(2)
+    expect(bars[0]).toHaveAttribute('role', 'img')
+    expect(bars[0]).toHaveAttribute('aria-label', 'Alpha')
+    expect(bars[1]).toHaveAttribute('aria-label', 'B')
+  })
+
+  it('uses button role on bars when selectable (C26-4)', () => {
+    const { container } = renderWithProps(BarChart, {
+      data: [{ x: 'A', y: 10 }],
+      selectable: true,
+      ...defaultSize
+    })
+    const bar = container.querySelector('rect[data-bar-index]')!
+    expect(bar).toHaveAttribute('role', 'button')
+    expect(bar).toHaveAttribute('tabindex', '0')
+  })
+
   it('renders empty state with no data', () => {
     const { container } = renderWithProps(BarChart, {
       data: [],

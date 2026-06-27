@@ -646,7 +646,7 @@ export const Select = defineComponent({
           {
             ref: triggerRef,
             type: 'button',
-            class: triggerClasses,
+            class: classNames(triggerClasses, 'pr-16'),
             disabled: props.disabled,
             onClick: toggleDropdown,
             onKeydown: handleTriggerKeyDown,
@@ -668,30 +668,37 @@ export const Select = defineComponent({
                 )
               },
               displayText.value
-            ),
-            h('span', { class: 'flex items-center gap-1' }, [
-              showClearButton.value &&
-                h(
-                  'span',
-                  {
-                    class: 'inline-flex',
-                    'data-tiger-select-clear': '',
-                    'aria-label': resolveLocaleText(
-                      'Clear selection',
-                      mergedLocale.value?.common?.clearText
-                    ),
-                    onClick: clearSelection
-                  },
-                  CloseIcon
-                ),
+            )
+          ]
+        ),
+        h(
+          'span',
+          { class: 'pointer-events-none absolute inset-y-0 right-3 flex items-center gap-1' },
+          [
+            showClearButton.value &&
               h(
-                'span',
+                'button',
                 {
-                  class: classNames('inline-flex', isOpen.value && 'rotate-180')
+                  type: 'button',
+                  class:
+                    'pointer-events-auto inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-select-ring,var(--tiger-primary,#2563eb))]',
+                  'data-tiger-select-clear': '',
+                  'aria-label': resolveLocaleText(
+                    'Clear selection',
+                    mergedLocale.value?.common?.clearText
+                  ),
+                  onClick: clearSelection
                 },
-                ChevronDownIcon
-              )
-            ])
+                CloseIcon
+              ),
+            h(
+              'span',
+              {
+                class: classNames('inline-flex', isOpen.value && 'rotate-180'),
+                'aria-hidden': 'true'
+              },
+              ChevronDownIcon
+            )
           ]
         ),
         // Dropdown

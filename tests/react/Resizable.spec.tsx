@@ -212,6 +212,62 @@ describe('Resizable', () => {
       // onResize should have been called via createDocumentDragSession
     })
   })
+  // --- Keyboard resize (C32-2) ---
+  describe('Keyboard resize', () => {
+    it('exposes handles as focusable separators with ARIA', () => {
+      const { container } = renderResizable()
+      const handle = container.querySelector('[data-handle="right"]')!
+      expect(handle).toHaveAttribute('role', 'separator')
+      expect(handle).toHaveAttribute('tabindex', '0')
+      expect(handle).toHaveAttribute('aria-orientation', 'vertical')
+      expect(handle).toHaveAttribute('aria-valuenow', '300')
+    })
+
+    it('grows width with ArrowRight on the right handle', () => {
+      const onResize = vi.fn()
+      const { container } = renderResizable({ onResize })
+      const handle = container.querySelector('[data-handle="right"]')!
+      fireEvent.keyDown(handle, { key: 'ArrowRight' })
+      expect(onResize).toHaveBeenCalled()
+      const evt = onResize.mock.calls[0][0]
+      expect(evt.width).toBe(310)
+      expect(evt.handle).toBe('right')
+    })
+
+    it('shrinks width with ArrowLeft on the right handle', () => {
+      const onResize = vi.fn()
+      const { container } = renderResizable({ onResize })
+      const handle = container.querySelector('[data-handle="right"]')!
+      fireEvent.keyDown(handle, { key: 'ArrowLeft' })
+      expect(onResize.mock.calls[0][0].width).toBe(290)
+    })
+
+    it('resizes height with ArrowDown on the bottom handle', () => {
+      const onResize = vi.fn()
+      const { container } = renderResizable({ onResize })
+      const handle = container.querySelector('[data-handle="bottom"]')!
+      fireEvent.keyDown(handle, { key: 'ArrowDown' })
+      expect(onResize.mock.calls[0][0].height).toBe(210)
+    })
+
+    it('respects min/max bounds on keyboard resize', () => {
+      const onResize = vi.fn()
+      const { container } = renderResizable({ onResize, maxWidth: 305 })
+      const handle = container.querySelector('[data-handle="right"]')!
+      fireEvent.keyDown(handle, { key: 'ArrowRight' })
+      expect(onResize.mock.calls[0][0].width).toBe(305)
+    })
+
+    it('does not resize via keyboard when disabled', () => {
+      const onResize = vi.fn()
+      const { container } = renderResizable({ disabled: true, onResize })
+      const handle = container.querySelector('[data-handle="right"]')!
+      expect(handle).toHaveAttribute('tabindex', '-1')
+      fireEvent.keyDown(handle, { key: 'ArrowRight' })
+      expect(onResize).not.toHaveBeenCalled()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<Resizable />)

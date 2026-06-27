@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   getFileManagerContainerClasses,
@@ -86,6 +86,8 @@ export const FileManager: React.FC<FileManagerProps> = ({
     [config.locale, locale]
   )
   const [localSearch, setLocalSearch] = useState(searchText)
+  const [focusedIndex, setFocusedIndex] = useState(0)
+  const contentRef = useRef<HTMLDivElement>(null)
   const labels = useMemo(() => getFileManagerLabels(mergedLocale), [mergedLocale])
 
   const model = useMemo(
@@ -162,6 +164,85 @@ export const FileManager: React.FC<FileManagerProps> = ({
       ? `${fileManagerContentClasses} grid grid-cols-4 gap-2`
       : fileManagerContentClasses
 
+  const firstEnabledIndex = model.processedItems.findIndex((item) => !item.disabled)
+  const focusedItem =
+    focusedIndex >= 0 && !model.processedItems[focusedIndex]?.disabled
+      ? focusedIndex
+      : firstEnabledIndex
+
+  const focusItemAt = useCallback((index: number) => {
+    requestAnimationFrame(() => {
+      contentRef.current?.querySelector<HTMLElement>(`[data-option-index="${index}"]`)?.focus()
+    })
+  }, [])
+
+  const moveFocus = useCallback(
+    (current: number, direction: 1 | -1) => {
+      if (model.processedItems.length === 0) return
+      let next = current
+      for (let i = 0; i < model.processedItems.length; i += 1) {
+        next = (next + direction + model.processedItems.length) % model.processedItems.length
+        if (!model.processedItems[next]?.disabled) {
+          setFocusedIndex(next)
+          focusItemAt(next)
+          return
+        }
+      }
+    },
+    [focusItemAt, model.processedItems]
+  )
+
+  const handleItemKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>, item: FileItem, index: number) => {
+      switch (event.key) {
+        case 'ArrowDown':
+        case 'ArrowRight':
+          event.preventDefault()
+          moveFocus(index, 1)
+          return
+        case 'ArrowUp':
+        case 'ArrowLeft':
+          event.preventDefault()
+          moveFocus(index, -1)
+          return
+        case 'Home':
+          event.preventDefault()
+          if (firstEnabledIndex >= 0) {
+            setFocusedIndex(firstEnabledIndex)
+            focusItemAt(firstEnabledIndex)
+          }
+          return
+        case 'End': {
+          event.preventDefault()
+          let lastEnabledIndex = -1
+          for (let next = model.processedItems.length - 1; next >= 0; next -= 1) {
+            if (!model.processedItems[next]?.disabled) {
+              lastEnabledIndex = next
+              break
+            }
+          }
+          if (lastEnabledIndex >= 0) {
+            setFocusedIndex(lastEnabledIndex)
+            focusItemAt(lastEnabledIndex)
+          }
+          return
+        }
+        case ' ':
+          event.preventDefault()
+          handleSelect(item)
+          return
+        case 'Enter':
+          event.preventDefault()
+          handleSelect(item)
+          handleOpen(item)
+          return
+        default:
+          return
+      }
+    },
+    [firstEnabledIndex, focusItemAt, handleOpen, handleSelect, model.processedItems, moveFocus]
+  )
+
   return (
     <div className={classNames(containerClasses)}>
       <div className={fileManagerToolbarClasses}>
@@ -184,7 +265,11 @@ export const FileManager: React.FC<FileManagerProps> = ({
       </div>
 
       {model.processedItems.length > 0 ? (
-        <div className={contentClass} role="listbox" aria-multiselectable={multiple}>
+        <div
+          ref={contentRef}
+          className={contentClass}
+          role="listbox"
+          aria-multiselectable={multiple}>
           {model.processedItems.map((item, index) => {
             const isSelected = model.selectedSet.has(item.key)
             const itemClass = getFileItemClasses(viewMode, isSelected)
@@ -196,8 +281,14 @@ export const FileManager: React.FC<FileManagerProps> = ({
                 className={itemClass}
                 role="option"
                 aria-selected={isSelected}
+                tabIndex={!item.disabled && index === focusedItem ? 0 : -1}
+                data-option-index={index}
                 data-disabled={item.disabled || undefined}
                 data-drag-id={dragItem?.id}
+                onFocus={() => {
+                  if (!item.disabled) setFocusedIndex(index)
+                }}
+                onKeyDown={(event) => handleItemKeyDown(event, item, index)}
                 onClick={() => handleSelect(item)}
                 onDoubleClick={() => handleOpen(item)}
                 draggable={draggable && !item.disabled}>

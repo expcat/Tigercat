@@ -145,12 +145,14 @@ describe('Select', () => {
     it('should clear selection without opening dropdown (single)', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
-      const { container, queryByRole } = render(
+      const { container, getByRole, queryByRole } = render(
         <Select options={testOptions} value="1" onChange={handleChange} />
       )
 
-      const clear = container.querySelector('[data-tiger-select-clear]') as HTMLElement
+      const trigger = container.querySelector('button')!
+      const clear = getByRole('button', { name: 'Clear selection' })
       expect(clear).toBeInTheDocument()
+      expect(trigger.contains(clear)).toBe(false)
 
       await user.click(clear)
 
@@ -684,7 +686,7 @@ describe('Select', () => {
         <Select options={testOptions} multiple value={['1']} onChange={handleChange} />
       )
 
-      const trigger = getByRole('button')
+      const trigger = getByRole('button', { expanded: false })
       await user.click(trigger)
 
       const option1 = getByRole('option', { name: 'Option 1' })

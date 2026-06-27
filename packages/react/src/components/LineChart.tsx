@@ -297,6 +297,19 @@ export const LineChart: React.FC<LineChartProps> = ({
     onPointHover?.(null, null, null)
   }, [onPointHover])
 
+  // Keyboard/focus tooltip: synthesize a pointer position from the point's
+  // on-screen rect so focused points show the same tooltip as hovered ones.
+  const showPointTooltipFromElement = useCallback(
+    (el: SVGGraphicsElement, seriesIndex: number, pointIndex: number) => {
+      if (!hoverable) return
+      const rect = el.getBoundingClientRect()
+      setHoveredPointInfo({ seriesIndex, pointIndex })
+      setTooltipPosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
+      onPointHover?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
+    },
+    [hoverable, onPointHover, resolvedSeries]
+  )
+
   const handlePointClick = useCallback(
     (seriesIndex: number, pointIndex: number) => {
       onPointClick?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
@@ -314,6 +327,10 @@ export const LineChart: React.FC<LineChartProps> = ({
     },
     [selectable, handleSeriesSelect]
   )
+
+  // Point-level interaction is gated: hover/tooltip on `hoverable`, click on
+  // `selectable` or an explicit point-click callback (C26-2).
+  const pointClickable = selectable || !!onPointClick
 
   const chart = (
     <ChartCanvas
@@ -468,6 +485,8 @@ export const LineChart: React.FC<LineChartProps> = ({
                 hoveredPointInfo?.seriesIndex === sd.seriesIndex &&
                 hoveredPointInfo?.pointIndex === point.pointIndex
               const hoverSize = sd.pointSize + 2
+              const datum = resolvedSeries[sd.seriesIndex]?.data?.[point.pointIndex]
+              const pointInteractive = hoverable || pointClickable
               return (
                 <circle
                   key={`point-${sd.seriesKey}-${point.pointIndex}`}
@@ -483,17 +502,63 @@ export const LineChart: React.FC<LineChartProps> = ({
                   }
                   stroke={sd.pointHollow ? sd.pointColor : 'none'}
                   strokeWidth={sd.pointHollow ? 2 : 0}
-                  className={linePointTransitionClasses}
+                  className={classNames(
+                    linePointTransitionClasses,
+                    pointInteractive && 'cursor-pointer'
+                  )}
                   style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
+                  role={pointInteractive ? 'button' : 'img'}
+                  aria-label={datum?.label ?? String(datum?.y ?? '')}
+                  tabIndex={pointInteractive ? 0 : undefined}
                   data-point-index={point.pointIndex}
                   data-series-key={sd.seriesKey}
-                  onMouseEnter={(e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)}
-                  onMouseMove={handlePointMouseMove}
-                  onMouseLeave={handlePointMouseLeave}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handlePointClick(sd.seriesIndex, point.pointIndex)
-                  }}
+                  onMouseEnter={
+                    hoverable
+                      ? (e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
+                      : undefined
+                  }
+                  onMouseMove={hoverable ? handlePointMouseMove : undefined}
+                  onMouseLeave={hoverable ? handlePointMouseLeave : undefined}
+                  onClick={
+                    pointClickable
+                      ? (e) => {
+                          e.stopPropagation()
+                          handlePointClick(sd.seriesIndex, point.pointIndex)
+                        }
+                      : undefined
+                  }
+                  onFocus={
+                    hoverable
+                      ? (e) =>
+                          showPointTooltipFromElement(
+                            e.currentTarget,
+                            sd.seriesIndex,
+                            point.pointIndex
+                          )
+                      : undefined
+                  }
+                  onBlur={hoverable ? handlePointMouseLeave : undefined}
+                  onKeyDown={
+                    pointInteractive
+                      ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            if (pointClickable) {
+                              handlePointClick(sd.seriesIndex, point.pointIndex)
+                            } else {
+                              showPointTooltipFromElement(
+                                e.currentTarget,
+                                sd.seriesIndex,
+                                point.pointIndex
+                              )
+                            }
+                          } else if (e.key === 'Escape' && hoverable) {
+                            handlePointMouseLeave()
+                          }
+                        }
+                      : undefined
+                  }
                 />
               )
             })}

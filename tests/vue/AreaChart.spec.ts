@@ -227,4 +227,27 @@ describe('AreaChart', () => {
     expect(container.querySelector('radialGradient')).toBeInTheDocument()
     expect(container.querySelector('linearGradient[id*="stroke"]')).toBeInTheDocument()
   })
+
+  it('gates point interaction and keyboard focus behind hoverable or point click handlers', async () => {
+    const passive = renderWithProps(AreaChart, {
+      data: basicData,
+      showPoints: true,
+      ...defaultSize
+    })
+    const passivePoint = passive.container.querySelector('circle[data-point-index="0"]')!
+    expect(passivePoint).toHaveAttribute('role', 'img')
+    expect(passivePoint).not.toHaveAttribute('tabindex')
+
+    const clickable = renderWithProps(AreaChart, {
+      data: basicData,
+      showPoints: true,
+      onPointClick: () => {},
+      ...defaultSize
+    })
+    const clickablePoint = clickable.container.querySelector('circle[data-point-index="0"]')!
+    expect(clickablePoint).toHaveAttribute('role', 'button')
+    expect(clickablePoint).toHaveAttribute('tabindex', '0')
+    await fireEvent.keyDown(clickablePoint, { key: ' ' })
+    expect(clickable.emitted()['point-click']).toBeTruthy()
+  })
 })

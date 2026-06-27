@@ -1,6 +1,7 @@
 import { computed, defineComponent, h, onMounted, PropType, ref, watch } from 'vue'
 import {
   classNames,
+  isActivationKey,
   coerceClassValue,
   createImageAnnotationBox,
   createImageAnnotationPath,
@@ -261,16 +262,19 @@ export const ImageAnnotation = defineComponent({
       draft.value = createImageAnnotationPath('polygon', 'draft', points)
     }
 
+    const removeAnnotation = (annotation: CoreImageAnnotation) => {
+      if (!canEdit.value) return
+      const next = annotations.value.filter((item) => item.id !== annotation.id)
+      commitAnnotations(next, { type: 'remove', annotation })
+      selectAnnotation(null)
+    }
+
     const removeSelectedAnnotation = () => {
       if (!canEdit.value || !activeSelectedId.value) return
       const removed = annotations.value.find(
         (annotation) => annotation.id === activeSelectedId.value
       )
-      const next = annotations.value.filter(
-        (annotation) => annotation.id !== activeSelectedId.value
-      )
-      commitAnnotations(next, { type: 'remove', annotation: removed })
-      selectAnnotation(null)
+      if (removed) removeAnnotation(removed)
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -308,7 +312,24 @@ export const ImageAnnotation = defineComponent({
           if (isDraft) return
           event.stopPropagation()
           selectAnnotation(annotation)
-        }
+        },
+        // SVG `role="button"` does not fire click on Enter/Space natively, so
+        // wire keyboard activation (select) and Delete/Backspace (remove) here.
+        onKeydown: isDraft
+          ? undefined
+          : (event: KeyboardEvent) => {
+              if (isActivationKey(event)) {
+                event.preventDefault()
+                event.stopPropagation()
+                selectAnnotation(annotation)
+                return
+              }
+              if (event.key === 'Delete' || event.key === 'Backspace') {
+                event.preventDefault()
+                event.stopPropagation()
+                removeAnnotation(annotation)
+              }
+            }
       }
 
       if (annotation.type === 'rectangle') {

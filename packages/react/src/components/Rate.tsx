@@ -75,6 +75,36 @@ export const Rate: React.FC<RateProps> = ({
     onHoverChange?.(0)
   }, [disabled, onHoverChange])
 
+  const step = allowHalf ? 0.5 : 1
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (disabled) return
+      let next = value
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowUp':
+          next = Math.min(count, value + step)
+          break
+        case 'ArrowLeft':
+        case 'ArrowDown':
+          next = Math.max(0, value - step)
+          break
+        case 'Home':
+          next = 0
+          break
+        case 'End':
+          next = count
+          break
+        default:
+          return
+      }
+      e.preventDefault()
+      if (next !== value) onChange?.(next)
+    },
+    [disabled, value, count, step, onChange]
+  )
+
   const starIcon = useMemo(
     () => (
       <svg viewBox={starViewBox} fill="currentColor" className="w-full h-full">
@@ -116,9 +146,7 @@ export const Rate: React.FC<RateProps> = ({
         <span
           key={i}
           className={getRateStarClasses(size, isChar, disabled)}
-          role="radio"
-          aria-checked={full || half}
-          aria-label={`${i + 1} star${i + 1 > 1 ? 's' : ''}`}
+          aria-hidden="true"
           onClick={(e) => handleClick(i, e)}
           onMouseMove={(e) => handleMouseMove(i, e)}
           onMouseLeave={handleMouseLeave}>
@@ -142,8 +170,21 @@ export const Rate: React.FC<RateProps> = ({
     handleMouseLeave
   ])
 
+  const valueText = `${value} star${value === 1 ? '' : 's'}`
+
   return (
-    <div className={classNames(rateBaseClasses, className)} role="radiogroup" aria-label="Rating">
+    <div
+      className={classNames(rateBaseClasses, className)}
+      role="slider"
+      aria-label="Rating"
+      aria-valuemin={0}
+      aria-valuemax={count}
+      aria-valuenow={value}
+      aria-valuetext={valueText}
+      aria-disabled={disabled || undefined}
+      aria-orientation="horizontal"
+      tabIndex={disabled ? -1 : 0}
+      onKeyDown={handleKeyDown}>
       {stars}
     </div>
   )

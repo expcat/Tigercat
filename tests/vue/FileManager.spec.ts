@@ -172,6 +172,29 @@ describe('FileManager (Vue)', () => {
     expect(firstEmit).toContain('readme')
   })
 
+  it('supports roving keyboard selection and folder open', async () => {
+    const wrapper = render(FileManager, {
+      props: { files, showHidden: true, multiple: true }
+    })
+
+    let options = wrapper.getAllByRole('option')
+    expect(options[0]).toHaveAttribute('tabindex', '0')
+    expect(options[1]).toHaveAttribute('tabindex', '-1')
+
+    await fireEvent.keyDown(options[0], { key: 'ArrowDown' })
+    options = wrapper.getAllByRole('option')
+    expect(options[0]).toHaveAttribute('tabindex', '-1')
+    expect(options[1]).toHaveAttribute('tabindex', '0')
+
+    await fireEvent.keyDown(options[1], { key: ' ' })
+    expect(wrapper.emitted('update:selectedKeys')?.[0]?.[0]).toEqual(['env'])
+
+    const folderOption = wrapper.getByText('src').closest('[role="option"]') as HTMLElement
+    await fireEvent.keyDown(folderOption, { key: 'Enter' })
+    expect(wrapper.emitted('select')?.[1]?.[0]).toEqual(files[0])
+    expect(wrapper.emitted('update:currentPath')?.[0]).toEqual([['src']])
+  })
+
   it('deep nested path navigation', () => {
     const deepFiles: FileItem[] = [
       {

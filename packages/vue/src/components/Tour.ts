@@ -4,10 +4,10 @@ import {
   h,
   ref,
   watch,
+  nextTick,
   onMounted,
   onBeforeUnmount,
-  PropType,
-  Teleport
+  PropType
 } from 'vue'
 import {
   classNames,
@@ -26,6 +26,9 @@ import {
   getTourLabels,
   closeIconPathD,
   mergeTigerLocale,
+  captureActiveElement,
+  focusFirst,
+  restoreFocus,
   type TourStep,
   type TourStepLoader,
   type TourPlacement,
@@ -33,6 +36,12 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
+import {
+  renderVueBodyTeleport,
+  useVueBodyScrollLock,
+  useVueEscapeKey,
+  useVueFocusTrap
+} from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueTourProps {
@@ -101,6 +110,9 @@ export const Tour = defineComponent({
     const step = computed(() => activeStepInfo.value?.step)
     const targetRect = ref<TourRect | undefined>()
     const popoverRef = ref<HTMLElement | null>(null)
+    const closeButtonRef = ref<HTMLButtonElement | null>(null)
+    const openRef = computed(() => props.open)
+    let previousActiveElement: HTMLElement | null = null
 
     const updateRect = () => {
       if (step.value?.target) {
@@ -189,6 +201,28 @@ export const Tour = defineComponent({
       emit('update:open', false)
     }
 
+    // Overlay lifecycle: trap focus, lock scroll, close on Escape, and move
+    // focus into the popover on open / restore it on close (mirrors Modal).
+    const detachEscape = useVueEscapeKey({ enabled: openRef, onEscape: close })
+    onBeforeUnmount(detachEscape)
+    useVueBodyScrollLock(openRef)
+    useVueFocusTrap({ enabled: openRef, containerRef: popoverRef })
+
+    watch(
+      openRef,
+      (open) => {
+        if (open) {
+          previousActiveElement = captureActiveElement()
+          nextTick(() => {
+            focusFirst([closeButtonRef.value, popoverRef.value])
+          })
+        } else {
+          restoreFocus(previousActiveElement)
+        }
+      },
+      { immediate: true }
+    )
+
     return () => {
       if (!props.open || !step.value) return null
 
@@ -244,6 +278,7 @@ export const Tour = defineComponent({
           h(
             'button',
             {
+              ref: closeButtonRef,
               class: tourCloseButtonClasses,
               type: 'button',
               'aria-label': labels.value.closeAriaLabel,
@@ -318,7 +353,7 @@ export const Tour = defineComponent({
         )
       )
 
-      return h(Teleport, { to: 'body' }, children)
+      return renderVueBodyTeleport(children)
     }
   }
 })

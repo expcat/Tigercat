@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   classNames,
+  isActivationKey,
   getTableRowClasses,
   getTableCellClasses,
   getTableFixedCellClasses,
@@ -33,6 +34,8 @@ export interface RenderBodyViewProps {
   labels: Required<TigerLocaleTable>
   rowClassName?: string | ((record: Record<string, unknown>, index: number) => string) | undefined
   rowDraggable?: boolean
+  /** Whether rows respond to click/keyboard activation (onRowClick or rowSelection). */
+  interactiveRows?: boolean
 }
 
 export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): React.ReactNode {
@@ -46,7 +49,8 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     expandable,
     labels,
     rowClassName,
-    rowDraggable
+    rowDraggable,
+    interactiveRows
   } = view
 
   if (loading) {
@@ -151,6 +155,20 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           getTableRowClasses(hoverable, striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.hasFixedColumns && 'group'
         )}
+        aria-selected={rowSelection ? isSelected : undefined}
+        tabIndex={interactiveRows ? 0 : undefined}
+        onKeyDown={
+          interactiveRows
+            ? (e) => {
+                // Ignore activation bubbling up from interactive cell content.
+                if (e.target !== e.currentTarget) return
+                if (isActivationKey(e)) {
+                  e.preventDefault()
+                  ctx.handleRowClick(record, index, key)
+                }
+              }
+            : undefined
+        }
         draggable={rowDraggable ? true : undefined}>
         {expandAtStart && expandToggleCell}
 

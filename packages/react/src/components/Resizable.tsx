@@ -8,6 +8,8 @@ import {
   applyAspectRatio,
   defaultResizeHandles,
   createDocumentDragSession,
+  getResizeKeyboardDelta,
+  getResizeHandleOrientation,
   type DocumentDragSession,
   type ResizableProps as CoreResizableProps,
   type ResizeHandlePosition,
@@ -143,6 +145,55 @@ export const Resizable: React.FC<ResizableProps> = ({
     ]
   )
 
+  const handleKeyDown = useCallback(
+    (handle: ResizeHandlePosition, e: React.KeyboardEvent) => {
+      if (disabled) return
+      const delta = getResizeKeyboardDelta(e.key)
+      if (!delta) return
+      e.preventDefault()
+      const startW = width ?? 0
+      const startH = height ?? 0
+      const { deltaWidth, deltaHeight } = calculateResizeDelta(
+        handle,
+        delta.deltaX,
+        delta.deltaY,
+        axis
+      )
+      let newW = startW + deltaWidth
+      let newH = startH + deltaHeight
+      if (lockAspectRatio) {
+        const ar = applyAspectRatio(newW, newH, startW, startH)
+        newW = ar.width
+        newH = ar.height
+      }
+      const clamped = clampDimensions(newW, newH, minWidth, minHeight, maxWidth, maxHeight)
+      setWidth(clamped.width)
+      setHeight(clamped.height)
+      const evt: ResizeEvent = {
+        width: clamped.width,
+        height: clamped.height,
+        handle,
+        deltaX: clamped.width - startW,
+        deltaY: clamped.height - startH
+      }
+      onResize?.(evt)
+      onResizeEnd?.(evt)
+    },
+    [
+      disabled,
+      width,
+      height,
+      axis,
+      lockAspectRatio,
+      minWidth,
+      minHeight,
+      maxWidth,
+      maxHeight,
+      onResize,
+      onResizeEnd
+    ]
+  )
+
   const containerClasses = useMemo(
     () => classNames(resizableBaseClasses, 'group/resizable', className),
     [className]
@@ -158,14 +209,28 @@ export const Resizable: React.FC<ResizableProps> = ({
   return (
     <div className={containerClasses} style={containerStyle} data-resizable="">
       {children}
-      {handles.map((pos) => (
-        <div
-          key={pos}
-          className={getResizableHandleClasses(pos, draggingHandle === pos, disabled)}
-          data-handle={pos}
-          onMouseDown={(e) => handleMouseDown(pos, e)}
-        />
-      ))}
+      {handles.map((pos) => {
+        const usesHeight = pos === 'top' || pos === 'bottom'
+        const valueNow = Math.round((usesHeight ? height : width) ?? 0)
+        const valueMin = usesHeight ? minHeight : minWidth
+        const valueMax = usesHeight ? maxHeight : maxWidth
+        return (
+          <div
+            key={pos}
+            className={getResizableHandleClasses(pos, draggingHandle === pos, disabled)}
+            data-handle={pos}
+            role="separator"
+            aria-label={`Resize ${pos}`}
+            aria-orientation={getResizeHandleOrientation(pos)}
+            aria-valuenow={valueNow}
+            aria-valuemin={valueMin}
+            aria-valuemax={valueMax}
+            tabIndex={disabled ? -1 : 0}
+            onMouseDown={(e) => handleMouseDown(pos, e)}
+            onKeyDown={(e) => handleKeyDown(pos, e)}
+          />
+        )
+      })}
     </div>
   )
 }

@@ -241,6 +241,27 @@ describe('ChartLegend', () => {
     expect(onItemClick).toHaveBeenCalledWith(0, legendItems[0])
   })
 
+  it('uses button toggle semantics (not listitem) when interactive (C25-3)', () => {
+    const { container } = renderWithProps(ChartLegend, {
+      items: legendItems,
+      interactive: true
+    })
+    expect(container.querySelector('[data-chart-legend]')?.getAttribute('role')).toBe('group')
+    const items = container.querySelectorAll('[data-legend-item]')
+    expect(items[0].tagName).toBe('BUTTON')
+    expect(items[0].getAttribute('role')).toBeNull()
+    expect(items[0].getAttribute('aria-pressed')).toBe('true')
+    expect(items[2].getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('keeps list semantics for the static legend', () => {
+    const { container } = renderWithProps(ChartLegend, { items: legendItems })
+    expect(container.querySelector('[data-chart-legend]')?.getAttribute('role')).toBe('list')
+    const items = container.querySelectorAll('[data-legend-item]')
+    expect(items[0].getAttribute('role')).toBe('listitem')
+    expect(items[0].getAttribute('aria-pressed')).toBeNull()
+  })
+
   it('applies custom marker size and gap', () => {
     const { container } = renderWithProps(ChartLegend, {
       items: legendItems,

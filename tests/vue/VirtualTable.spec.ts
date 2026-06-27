@@ -97,6 +97,41 @@ describe('VirtualTable (Vue)', () => {
     }
   })
 
+  it('makes interactive rows keyboard-activable with aria (C23-3)', async () => {
+    const wrapper = render(VirtualTable, {
+      props: {
+        data: makeData(3),
+        columns,
+        rowHeight: 40,
+        height: 400,
+        selectable: true,
+        selectedKeys: [1],
+        rowKey: 'id'
+      }
+    })
+    const dataRows = wrapper.getAllByRole('row').filter((r) => r.querySelector('td'))
+    const first = dataRows[0]
+    expect(first.getAttribute('tabindex')).toBe('0')
+    expect(first.getAttribute('aria-rowindex')).toBe('2')
+    expect(first.getAttribute('aria-selected')).toBe('true')
+    expect(dataRows[1].getAttribute('aria-selected')).toBe('false')
+    expect(first.querySelectorAll('td')[0].getAttribute('aria-colindex')).toBe('1')
+    expect(first.querySelectorAll('td')[1].getAttribute('aria-colindex')).toBe('2')
+
+    await fireEvent.keyDown(first, { key: 'Enter' })
+    expect(wrapper.emitted('row-click')?.length).toBe(1)
+    expect(wrapper.emitted('select')?.length).toBe(1)
+  })
+
+  it('does not make rows focusable when non-interactive', () => {
+    const wrapper = render(VirtualTable, {
+      props: { data: makeData(3), columns, rowHeight: 40, height: 400 }
+    })
+    const dataRows = wrapper.getAllByRole('row').filter((r) => r.querySelector('td'))
+    expect(dataRows[0].getAttribute('tabindex')).toBeNull()
+    expect(dataRows[0].getAttribute('aria-selected')).toBeNull()
+  })
+
   it('emits select when selectable', async () => {
     const wrapper = render(VirtualTable, {
       props: { data: makeData(3), columns, rowHeight: 40, height: 400, selectable: true }

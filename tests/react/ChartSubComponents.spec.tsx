@@ -267,6 +267,30 @@ describe('ChartLegend', () => {
     expect(onItemClick).toHaveBeenCalledWith(0, legendItems[0])
   })
 
+  it('uses button toggle semantics (not listitem) when interactive (C25-3)', () => {
+    const { container } = renderWithProps(ChartLegend, {
+      items: legendItems,
+      interactive: true
+    })
+    const group = container.querySelector('[data-chart-legend]')!
+    expect(group).toHaveAttribute('role', 'group')
+
+    const items = container.querySelectorAll('[data-legend-item]')
+    expect(items[0].tagName).toBe('BUTTON')
+    expect(items[0]).not.toHaveAttribute('role', 'listitem')
+    // active series → pressed; inactive series → not pressed
+    expect(items[0]).toHaveAttribute('aria-pressed', 'true')
+    expect(items[2]).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('keeps list semantics for the static legend', () => {
+    const { container } = renderWithProps(ChartLegend, { items: legendItems })
+    expect(container.querySelector('[data-chart-legend]')).toHaveAttribute('role', 'list')
+    const items = container.querySelectorAll('[data-legend-item]')
+    expect(items[0]).toHaveAttribute('role', 'listitem')
+    expect(items[0]).not.toHaveAttribute('aria-pressed')
+  })
+
   it('calls hover callbacks when interactive', () => {
     const onItemHover = vi.fn()
     const onItemLeave = vi.fn()

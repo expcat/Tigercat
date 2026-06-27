@@ -121,6 +121,48 @@ describe('VirtualTable (React)', () => {
     }
   })
 
+  it('makes interactive rows keyboard-activable with aria (C23-3)', () => {
+    const onRowClick = vi.fn()
+    const onSelect = vi.fn()
+    const { getAllByRole } = render(
+      <VirtualTable
+        data={makeData(3)}
+        columns={columns}
+        rowHeight={40}
+        height={400}
+        selectable
+        selectedKeys={[1]}
+        rowKey="id"
+        onRowClick={onRowClick}
+        onSelect={onSelect}
+      />
+    )
+    const dataRows = getAllByRole('row').filter((r) => r.querySelector('td'))
+    const first = dataRows[0]
+    expect(first).toHaveAttribute('tabindex', '0')
+    expect(first).toHaveAttribute('aria-rowindex', '2')
+    expect(first).toHaveAttribute('aria-selected', 'true')
+    expect(dataRows[1]).toHaveAttribute('aria-selected', 'false')
+    // cells carry aria-colindex
+    expect(first.querySelectorAll('td')[0]).toHaveAttribute('aria-colindex', '1')
+    expect(first.querySelectorAll('td')[1]).toHaveAttribute('aria-colindex', '2')
+
+    fireEvent.keyDown(first, { key: 'Enter' })
+    expect(onRowClick).toHaveBeenCalledOnce()
+    expect(onSelect).toHaveBeenCalledOnce()
+    fireEvent.keyDown(first, { key: ' ' })
+    expect(onRowClick).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not make rows focusable when non-interactive', () => {
+    const { getAllByRole } = render(
+      <VirtualTable data={makeData(3)} columns={columns} rowHeight={40} height={400} />
+    )
+    const dataRows = getAllByRole('row').filter((r) => r.querySelector('td'))
+    expect(dataRows[0]).not.toHaveAttribute('tabindex')
+    expect(dataRows[0]).not.toHaveAttribute('aria-selected')
+  })
+
   it('sets aria-rowcount', () => {
     const data = makeData(200)
     const { getByRole } = render(

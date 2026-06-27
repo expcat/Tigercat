@@ -1,6 +1,7 @@
 import { h, type Slots, type VNodeChild } from 'vue'
 import {
   classNames,
+  isActivationKey,
   getTableRowClasses,
   getTableCellClasses,
   getTableFixedCellClasses,
@@ -21,7 +22,7 @@ import type { TableContext, TableInternalProps } from './types'
 
 export function renderTableBody(
   ctx: TableContext,
-  props: TableInternalProps,
+  props: TableInternalProps & { interactiveRows?: boolean },
   slots: Slots,
   labels: Required<TigerLocaleTable>
 ): VNodeChild {
@@ -264,6 +265,18 @@ export function renderTableBody(
           getTableRowClasses(props.hoverable, props.striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.value.hasFixedColumns && 'group'
         ),
+        'aria-selected': props.rowSelection ? isSelected : undefined,
+        tabindex: props.interactiveRows ? 0 : undefined,
+        // Delegated mouse click stays on tbody; add per-row keyboard activation.
+        onKeydown: props.interactiveRows
+          ? (e: KeyboardEvent) => {
+              if (e.target !== e.currentTarget) return
+              if (isActivationKey(e)) {
+                e.preventDefault()
+                ctx.handleRowClick(record, index, key)
+              }
+            }
+          : undefined,
         draggable: props.rowDraggable ? 'true' : undefined
       },
       cells

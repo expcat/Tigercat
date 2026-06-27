@@ -113,6 +113,47 @@ export function calculateResizeDelta(
 }
 
 /**
+ * Default step (in px) applied per arrow-key press during keyboard resize.
+ */
+export const RESIZE_KEYBOARD_STEP = 10
+
+/**
+ * Map an arrow key to an equivalent pointer delta for keyboard resizing.
+ * The result is fed through `calculateResizeDelta` so keyboard and pointer
+ * resizing share the same handle-direction semantics. Returns `null` for keys
+ * that are not arrow keys.
+ */
+export function getResizeKeyboardDelta(
+  key: string,
+  step: number = RESIZE_KEYBOARD_STEP
+): { deltaX: number; deltaY: number } | null {
+  switch (key) {
+    case 'ArrowRight':
+      return { deltaX: step, deltaY: 0 }
+    case 'ArrowLeft':
+      return { deltaX: -step, deltaY: 0 }
+    case 'ArrowDown':
+      return { deltaX: 0, deltaY: step }
+    case 'ArrowUp':
+      return { deltaX: 0, deltaY: -step }
+    default:
+      return null
+  }
+}
+
+/**
+ * ARIA orientation for a resize handle acting as a `role="separator"`.
+ * Edge handles map to a single orientation; corner handles have none.
+ */
+export function getResizeHandleOrientation(
+  handle: ResizeHandlePosition
+): 'horizontal' | 'vertical' | undefined {
+  if (handle === 'left' || handle === 'right') return 'vertical'
+  if (handle === 'top' || handle === 'bottom') return 'horizontal'
+  return undefined
+}
+
+/**
  * Clamp new dimensions within min/max bounds.
  * Returns the clamped { width, height }.
  */

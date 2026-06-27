@@ -189,6 +189,21 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     handleHoverLeave()
   }, [handleHoverLeave])
 
+  // Keyboard/focus tooltip: synthesize a pointer position from the point's
+  // on-screen rect so focused points show the same tooltip as hovered ones.
+  const showPointTooltipFromElement = useCallback(
+    (el: SVGGraphicsElement, seriesIndex: number, pointIndex: number) => {
+      if (!hoverable) return
+      const rect = el.getBoundingClientRect()
+      setHoveredPoint({ seriesIndex, pointIndex })
+      handleHoverEnter(seriesIndex, {
+        clientX: rect.left + rect.width / 2,
+        clientY: rect.top + rect.height / 2
+      } as React.MouseEvent)
+    },
+    [hoverable, handleHoverEnter]
+  )
+
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
     [width, height, padding]
@@ -627,6 +642,9 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                         showTooltip && hoverable ? 'cursor-pointer' : undefined,
                         'transition-[r] duration-150 ease-out'
                       )}
+                      role={showTooltip && hoverable ? 'button' : 'img'}
+                      aria-label={point.data.label ?? String(point.data.value)}
+                      tabIndex={showTooltip && hoverable ? 0 : undefined}
                       data-radar-point="true"
                       data-series-index={seriesIndex}
                       data-series-key={item.seriesKey}
@@ -638,6 +656,29 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                       }
                       onMouseMove={showTooltip && hoverable ? handlePointMove : undefined}
                       onMouseLeave={showTooltip && hoverable ? handlePointLeave : undefined}
+                      onFocus={
+                        showTooltip && hoverable
+                          ? (e: React.FocusEvent<SVGCircleElement>) =>
+                              showPointTooltipFromElement(e.currentTarget, seriesIndex, point.index)
+                          : undefined
+                      }
+                      onBlur={showTooltip && hoverable ? handlePointLeave : undefined}
+                      onKeyDown={
+                        showTooltip && hoverable
+                          ? (e: React.KeyboardEvent<SVGCircleElement>) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault()
+                                showPointTooltipFromElement(
+                                  e.currentTarget,
+                                  seriesIndex,
+                                  point.index
+                                )
+                              } else if (e.key === 'Escape') {
+                                handlePointLeave()
+                              }
+                            }
+                          : undefined
+                      }
                     />
                   )
                 })

@@ -6,7 +6,10 @@ import {
   applyAspectRatio,
   defaultResizeHandles,
   resizableBaseClasses,
-  resizableHandlePositionStyles
+  resizableHandlePositionStyles,
+  getResizeKeyboardDelta,
+  getResizeHandleOrientation,
+  RESIZE_KEYBOARD_STEP
 } from '@expcat/tigercat-core'
 
 describe('resizable-utils', () => {
@@ -148,6 +151,61 @@ describe('resizable-utils', () => {
       const { width, height } = applyAspectRatio(300, 200, 0, 0)
       expect(width).toBe(300)
       expect(height).toBe(200)
+    })
+  })
+
+  describe('getResizeKeyboardDelta', () => {
+    it('maps arrow keys to pointer deltas using the default step', () => {
+      expect(getResizeKeyboardDelta('ArrowRight')).toEqual({
+        deltaX: RESIZE_KEYBOARD_STEP,
+        deltaY: 0
+      })
+      expect(getResizeKeyboardDelta('ArrowLeft')).toEqual({
+        deltaX: -RESIZE_KEYBOARD_STEP,
+        deltaY: 0
+      })
+      expect(getResizeKeyboardDelta('ArrowDown')).toEqual({
+        deltaX: 0,
+        deltaY: RESIZE_KEYBOARD_STEP
+      })
+      expect(getResizeKeyboardDelta('ArrowUp')).toEqual({
+        deltaX: 0,
+        deltaY: -RESIZE_KEYBOARD_STEP
+      })
+    })
+
+    it('honours a custom step', () => {
+      expect(getResizeKeyboardDelta('ArrowRight', 4)).toEqual({ deltaX: 4, deltaY: 0 })
+    })
+
+    it('returns null for non-arrow keys', () => {
+      expect(getResizeKeyboardDelta('Enter')).toBeNull()
+      expect(getResizeKeyboardDelta(' ')).toBeNull()
+    })
+
+    it('combines with calculateResizeDelta for the right handle', () => {
+      const d = getResizeKeyboardDelta('ArrowRight')!
+      expect(calculateResizeDelta('right', d.deltaX, d.deltaY, 'both')).toEqual({
+        deltaWidth: RESIZE_KEYBOARD_STEP,
+        deltaHeight: 0
+      })
+    })
+  })
+
+  describe('getResizeHandleOrientation', () => {
+    it('returns vertical for left/right edges', () => {
+      expect(getResizeHandleOrientation('left')).toBe('vertical')
+      expect(getResizeHandleOrientation('right')).toBe('vertical')
+    })
+
+    it('returns horizontal for top/bottom edges', () => {
+      expect(getResizeHandleOrientation('top')).toBe('horizontal')
+      expect(getResizeHandleOrientation('bottom')).toBe('horizontal')
+    })
+
+    it('returns undefined for corner handles', () => {
+      expect(getResizeHandleOrientation('top-left')).toBeUndefined()
+      expect(getResizeHandleOrientation('bottom-right')).toBeUndefined()
     })
   })
 })

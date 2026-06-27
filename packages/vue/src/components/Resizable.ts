@@ -9,6 +9,8 @@ import {
   applyAspectRatio,
   defaultResizeHandles,
   createDocumentDragSession,
+  getResizeKeyboardDelta,
+  getResizeHandleOrientation,
   type DocumentDragSession,
   type ResizeHandlePosition,
   type ResizeAxis
@@ -167,18 +169,69 @@ export const Resizable = defineComponent({
       })
     }
 
+    const onKeyDown = (handle: ResizeHandlePosition, e: KeyboardEvent) => {
+      if (props.disabled) return
+      const delta = getResizeKeyboardDelta(e.key)
+      if (!delta) return
+      e.preventDefault()
+      const startW = width.value ?? 0
+      const startH = height.value ?? 0
+      const { deltaWidth, deltaHeight } = calculateResizeDelta(
+        handle,
+        delta.deltaX,
+        delta.deltaY,
+        props.axis
+      )
+      let newW = startW + deltaWidth
+      let newH = startH + deltaHeight
+      if (props.lockAspectRatio) {
+        const ar = applyAspectRatio(newW, newH, startW, startH)
+        newW = ar.width
+        newH = ar.height
+      }
+      const clamped = clampDimensions(
+        newW,
+        newH,
+        props.minWidth,
+        props.minHeight,
+        props.maxWidth,
+        props.maxHeight
+      )
+      width.value = clamped.width
+      height.value = clamped.height
+      const evt = {
+        width: clamped.width,
+        height: clamped.height,
+        handle,
+        deltaX: clamped.width - startW,
+        deltaY: clamped.height - startH
+      }
+      emit('resize', evt)
+      emit('resize-end', evt)
+    }
+
     onBeforeUnmount(() => {
       cleanupDragSession()
     })
 
     return () => {
-      const handleNodes = props.handles.map((pos) =>
-        h('div', {
+      const handleNodes = props.handles.map((pos) => {
+        const usesHeight = pos === 'top' || pos === 'bottom'
+        const valueNow = Math.round((usesHeight ? height.value : width.value) ?? 0)
+        return h('div', {
           class: getResizableHandleClasses(pos, draggingHandle.value === pos, props.disabled),
           'data-handle': pos,
-          onMousedown: (e: MouseEvent) => onMouseDown(pos, e)
+          role: 'separator',
+          'aria-label': `Resize ${pos}`,
+          'aria-orientation': getResizeHandleOrientation(pos),
+          'aria-valuenow': valueNow,
+          'aria-valuemin': usesHeight ? props.minHeight : props.minWidth,
+          'aria-valuemax': usesHeight ? props.maxHeight : props.maxWidth,
+          tabindex: props.disabled ? -1 : 0,
+          onMousedown: (e: MouseEvent) => onMouseDown(pos, e),
+          onKeydown: (e: KeyboardEvent) => onKeyDown(pos, e)
         })
-      )
+      })
 
       return h(
         'div',

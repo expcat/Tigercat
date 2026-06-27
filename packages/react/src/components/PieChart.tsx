@@ -242,6 +242,8 @@ export const PieChart: React.FC<PieChartProps> = ({
                 filter: shadow ? (isEmphasized ? PIE_EMPHASIS_SHADOW : PIE_BASE_SHADOW) : undefined
               }}
               tabIndex={selectable ? 0 : undefined}
+              role={selectable ? 'button' : 'img'}
+              aria-label={arc.data.label ?? String(arc.value)}
               data-pie-slice="true"
               data-index={arc.index}
               onMouseEnter={(e) => handleMouseEnter(arc.index, e)}

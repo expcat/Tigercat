@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import ReactDOM from 'react-dom'
 import {
   classNames,
   isBrowser,
   mergeTigerLocale,
+  captureActiveElement,
+  focusFirst,
+  restoreFocus,
   tourPopoverClasses,
   tourTitleClasses,
   tourDescriptionClasses,
@@ -23,6 +25,7 @@ import {
   type TourRect
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
+import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface TourProps extends CoreTourProps {
@@ -74,6 +77,8 @@ export const Tour: React.FC<TourProps> = ({
   const step = activeStepInfo?.step
   const [targetRect, setTargetRect] = useState<TourRect | undefined>()
   const popoverRef = useRef<HTMLDivElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const previousActiveElementRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!loadSteps) {
@@ -146,6 +151,23 @@ export const Tour: React.FC<TourProps> = ({
     onClose?.()
   }, [onOpenChange, onClose])
 
+  // Overlay lifecycle: trap focus, lock scroll, close on Escape, and move focus
+  // into the popover on open / restore it on close (mirrors Modal/Drawer).
+  useEffect(() => {
+    if (open) {
+      previousActiveElementRef.current = captureActiveElement()
+      const timer = setTimeout(() => {
+        focusFirst([closeButtonRef.current, popoverRef.current])
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+    restoreFocus(previousActiveElementRef.current)
+  }, [open])
+
+  useEscapeKey({ enabled: open, onEscape: close })
+  useBodyScrollLock({ enabled: open })
+  useFocusTrap({ enabled: open, containerRef: popoverRef })
+
   if (!open || !step) return null
   if (!isBrowser()) return null
 
@@ -186,6 +208,7 @@ export const Tour: React.FC<TourProps> = ({
         aria-modal="true">
         {closable && (
           <button
+            ref={closeButtonRef}
             className={tourCloseButtonClasses}
             type="button"
             aria-label={labels.closeAriaLabel}
@@ -224,5 +247,5 @@ export const Tour: React.FC<TourProps> = ({
     </>
   )
 
-  return ReactDOM.createPortal(content, document.body)
+  return renderBodyPortal(content)
 }

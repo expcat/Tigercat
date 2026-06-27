@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, ref, useId } from 'vue'
+import { defineComponent, computed, getCurrentInstance, h, PropType, ref, useId } from 'vue'
 import {
   classNames,
   createAreaPath,
@@ -259,6 +259,7 @@ export const LineChart = defineComponent({
     'point-hover'
   ],
   setup(props, { emit }) {
+    const instance = getCurrentInstance()
     // Point-level hover state (not managed by composable)
     const hoveredPointInfo = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
     const tooltipPosition = ref({ x: 0, y: 0 })
@@ -416,6 +417,25 @@ export const LineChart = defineComponent({
       emit('point-hover', null, null, null)
     }
 
+    // Keyboard/focus tooltip: synthesize a pointer position from the point's
+    // on-screen rect so focused points show the same tooltip as hovered ones.
+    const showPointTooltipFromElement = (
+      el: SVGGraphicsElement,
+      seriesIndex: number,
+      pointIndex: number
+    ) => {
+      if (!props.hoverable) return
+      const rect = el.getBoundingClientRect()
+      hoveredPointInfo.value = { seriesIndex, pointIndex }
+      tooltipPosition.value = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+      emit(
+        'point-hover',
+        seriesIndex,
+        pointIndex,
+        resolvedSeries.value[seriesIndex]?.data[pointIndex]
+      )
+    }
+
     const handlePointClick = (seriesIndex: number, pointIndex: number) => {
       emit(
         'point-click',
@@ -434,6 +454,10 @@ export const LineChart = defineComponent({
     }
 
     return () => {
+      // Point-level interaction is gated: hover/tooltip on `hoverable`, click on
+      // `selectable` or an explicit point-click listener (C26-2).
+      const pointClickable =
+        props.selectable || typeof instance?.vnode.props?.onPointClick === 'function'
       const chart = h(
         ChartCanvas,
         {
@@ -658,6 +682,9 @@ export const LineChart = defineComponent({
                               hoveredPointInfo.value?.seriesIndex === sd.seriesIndex &&
                               hoveredPointInfo.value?.pointIndex === point.pointIndex
                             const hoverSize = sd.pointSize + 2
+                            const datum =
+                              resolvedSeries.value[sd.seriesIndex]?.data?.[point.pointIndex]
+                            const pointInteractive = props.hoverable || pointClickable
                             return h('circle', {
                               key: `point-${sd.seriesKey}-${point.pointIndex}`,
                               cx: point.x,
@@ -670,20 +697,58 @@ export const LineChart = defineComponent({
                                   : sd.pointColor,
                               stroke: sd.pointHollow ? sd.pointColor : 'none',
                               'stroke-width': sd.pointHollow ? 2 : 0,
-                              class: linePointTransitionClasses,
+                              class: classNames(
+                                linePointTransitionClasses,
+                                pointInteractive && 'cursor-pointer'
+                              ),
                               style: isHovered
                                 ? `filter: drop-shadow(0 0 4px ${sd.color})`
                                 : undefined,
+                              role: pointInteractive ? 'button' : 'img',
+                              'aria-label': datum?.label ?? String(datum?.y ?? ''),
+                              tabindex: pointInteractive ? 0 : undefined,
                               'data-point-index': point.pointIndex,
                               'data-series-key': sd.seriesKey,
-                              onMouseenter: (e: MouseEvent) =>
-                                handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e),
-                              onMousemove: handlePointMouseMove,
-                              onMouseleave: handlePointMouseLeave,
-                              onClick: (e: MouseEvent) => {
-                                e.stopPropagation()
-                                handlePointClick(sd.seriesIndex, point.pointIndex)
-                              }
+                              onMouseenter: props.hoverable
+                                ? (e: MouseEvent) =>
+                                    handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
+                                : undefined,
+                              onMousemove: props.hoverable ? handlePointMouseMove : undefined,
+                              onMouseleave: props.hoverable ? handlePointMouseLeave : undefined,
+                              onClick: pointClickable
+                                ? (e: MouseEvent) => {
+                                    e.stopPropagation()
+                                    handlePointClick(sd.seriesIndex, point.pointIndex)
+                                  }
+                                : undefined,
+                              onFocus: props.hoverable
+                                ? (e: FocusEvent) =>
+                                    showPointTooltipFromElement(
+                                      e.currentTarget as unknown as SVGGraphicsElement,
+                                      sd.seriesIndex,
+                                      point.pointIndex
+                                    )
+                                : undefined,
+                              onBlur: props.hoverable ? handlePointMouseLeave : undefined,
+                              onKeydown: pointInteractive
+                                ? (e: KeyboardEvent) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault()
+                                      e.stopPropagation()
+                                      if (pointClickable) {
+                                        handlePointClick(sd.seriesIndex, point.pointIndex)
+                                      } else {
+                                        showPointTooltipFromElement(
+                                          e.currentTarget as unknown as SVGGraphicsElement,
+                                          sd.seriesIndex,
+                                          point.pointIndex
+                                        )
+                                      }
+                                    } else if (e.key === 'Escape' && props.hoverable) {
+                                      handlePointMouseLeave()
+                                    }
+                                  }
+                                : undefined
                             })
                           })
                         : null

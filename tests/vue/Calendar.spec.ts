@@ -119,6 +119,71 @@ describe('Calendar', () => {
     await fireEvent.click(nextBtn)
     expect(screen.getByText('2025')).toBeInTheDocument()
   })
+
+  // --- Keyboard navigation (C16-2) ---
+  describe('Keyboard navigation', () => {
+    it('renders day cells as gridcell buttons with a single roving tab-stop', () => {
+      renderWithProps(Calendar, { modelValue: testDate })
+      const selected = screen.getByRole('gridcell', { name: '2024-06-15' })
+      expect(selected.tagName).toBe('BUTTON')
+      expect(selected).toHaveAttribute('tabindex', '0')
+      expect(screen.getByRole('gridcell', { name: '2024-06-16' })).toHaveAttribute('tabindex', '-1')
+    })
+
+    it('moves focus with arrow keys', async () => {
+      renderWithProps(Calendar, { modelValue: testDate })
+      const start = screen.getByRole('gridcell', { name: '2024-06-15' })
+      start.focus()
+      await fireEvent.keyDown(start, { key: 'ArrowRight' })
+      expect(screen.getByRole('gridcell', { name: '2024-06-16' })).toHaveFocus()
+      await fireEvent.keyDown(document.activeElement!, { key: 'ArrowDown' })
+      expect(screen.getByRole('gridcell', { name: '2024-06-23' })).toHaveFocus()
+    })
+
+    it('selects the focused day with Enter', async () => {
+      const onChange = vi.fn()
+      render(Calendar, { props: { modelValue: testDate, 'onUpdate:modelValue': onChange } })
+      const cell = screen.getByRole('gridcell', { name: '2024-06-20' })
+      cell.focus()
+      await fireEvent.keyDown(cell, { key: 'Enter' })
+      expect(onChange).toHaveBeenCalled()
+      expect((onChange.mock.calls[0][0] as Date).getDate()).toBe(20)
+    })
+
+    it('Home/End focus the first/last day of the month', async () => {
+      renderWithProps(Calendar, { modelValue: testDate })
+      const cell = screen.getByRole('gridcell', { name: '2024-06-15' })
+      cell.focus()
+      await fireEvent.keyDown(cell, { key: 'Home' })
+      expect(screen.getByRole('gridcell', { name: '2024-06-01' })).toHaveFocus()
+      await fireEvent.keyDown(document.activeElement!, { key: 'End' })
+      expect(screen.getByRole('gridcell', { name: '2024-06-30' })).toHaveFocus()
+    })
+
+    it('arrows across the month boundary and navigates the view', async () => {
+      renderWithProps(Calendar, { modelValue: new Date(2024, 5, 30) })
+      const cell = screen.getByRole('gridcell', { name: '2024-06-30' })
+      cell.focus()
+      await fireEvent.keyDown(cell, { key: 'ArrowDown' })
+      expect(screen.getByText('July 2024')).toBeInTheDocument()
+      expect(screen.getByRole('gridcell', { name: '2024-07-07' })).toHaveFocus()
+    })
+
+    it('year mode: months are keyboard-navigable gridcell buttons', async () => {
+      const onPanelChange = vi.fn()
+      render(Calendar, {
+        props: { mode: 'year', modelValue: testDate, 'onPanel-change': onPanelChange }
+      })
+      const jun = screen.getByRole('gridcell', { name: 'Jun' })
+      expect(jun).toHaveAttribute('tabindex', '0')
+      jun.focus()
+      await fireEvent.keyDown(jun, { key: 'ArrowRight' })
+      expect(screen.getByRole('gridcell', { name: 'Jul' })).toHaveFocus()
+      await fireEvent.keyDown(document.activeElement!, { key: 'Enter' })
+      expect(onPanelChange).toHaveBeenCalled()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Calendar)

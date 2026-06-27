@@ -58,7 +58,9 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
   return (
     <div
       className={containerClasses}
-      role="list"
+      // A group of toggle buttons is not a "list"; only use list semantics for
+      // the static (non-interactive) legend.
+      role={interactive ? 'group' : 'list'}
       aria-label="Chart legend"
       data-chart-legend="true">
       {items.map((item) => {
@@ -75,7 +77,10 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
                 : 'cursor-default',
               item.active === false ? 'opacity-50' : undefined
             )}
-            role="listitem"
+            // Interactive items are real buttons; `role="listitem"` would
+            // override the button role, so it is only set for the static legend.
+            role={interactive ? undefined : 'listitem'}
+            aria-pressed={interactive ? item.active !== false : undefined}
             data-legend-item="true"
             onClick={interactive ? () => handleClick(item) : undefined}
             onMouseEnter={interactive ? () => handleHover(item) : undefined}

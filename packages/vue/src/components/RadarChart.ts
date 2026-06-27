@@ -314,6 +314,22 @@ export const RadarChart = defineComponent({
       handleHoverLeave()
     }
 
+    // Keyboard/focus tooltip: synthesize a pointer position from the point's
+    // on-screen rect so focused points show the same tooltip as hovered ones.
+    const showPointTooltipFromElement = (
+      el: SVGGraphicsElement,
+      seriesIndex: number,
+      pointIndex: number
+    ) => {
+      if (!props.hoverable) return
+      const rect = el.getBoundingClientRect()
+      hoveredPoint.value = { seriesIndex, pointIndex }
+      handleHoverEnter(seriesIndex, {
+        clientX: rect.left + rect.width / 2,
+        clientY: rect.top + rect.height / 2
+      } as MouseEvent)
+    }
+
     const axisData = computed(() => {
       if (props.series && props.series.length > 0) return props.series[0]?.data ?? []
       return props.data ?? []
@@ -790,6 +806,9 @@ export const RadarChart = defineComponent({
                                 props.showTooltip && props.hoverable ? 'cursor-pointer' : null,
                                 'transition-[r] duration-150 ease-out'
                               ),
+                              role: props.showTooltip && props.hoverable ? 'button' : 'img',
+                              'aria-label': point.data.label ?? String(point.data.value),
+                              tabindex: props.showTooltip && props.hoverable ? 0 : undefined,
                               'data-radar-point': 'true',
                               'data-series-index': seriesIndex,
                               'data-series-key': item.seriesKey,
@@ -801,7 +820,33 @@ export const RadarChart = defineComponent({
                               onMousemove:
                                 props.showTooltip && props.hoverable ? handlePointMove : undefined,
                               onMouseleave:
-                                props.showTooltip && props.hoverable ? handlePointLeave : undefined
+                                props.showTooltip && props.hoverable ? handlePointLeave : undefined,
+                              onFocus:
+                                props.showTooltip && props.hoverable
+                                  ? (e: FocusEvent) =>
+                                      showPointTooltipFromElement(
+                                        e.currentTarget as unknown as SVGGraphicsElement,
+                                        seriesIndex,
+                                        point.index
+                                      )
+                                  : undefined,
+                              onBlur:
+                                props.showTooltip && props.hoverable ? handlePointLeave : undefined,
+                              onKeydown:
+                                props.showTooltip && props.hoverable
+                                  ? (e: KeyboardEvent) => {
+                                      if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault()
+                                        showPointTooltipFromElement(
+                                          e.currentTarget as unknown as SVGGraphicsElement,
+                                          seriesIndex,
+                                          point.index
+                                        )
+                                      } else if (e.key === 'Escape') {
+                                        handlePointLeave()
+                                      }
+                                    }
+                                  : undefined
                             })
                           })
                         : null

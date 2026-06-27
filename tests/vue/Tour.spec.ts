@@ -288,6 +288,51 @@ describe('Tour', () => {
     render(Tour, { props: { steps: baseSteps, open: true, current: 99 } })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
+
+  // --- Overlay lifecycle (C09-4) ---
+  describe('Overlay lifecycle', () => {
+    it('moves focus to the close button when opened', async () => {
+      render(Tour, { props: { steps: baseSteps, open: true } })
+      const closeButton = await screen.findByLabelText('Close tour')
+      await waitFor(() => expect(closeButton).toHaveFocus())
+    })
+
+    it('closes on Escape', async () => {
+      const onClose = vi.fn()
+      const onUpdateOpen = vi.fn()
+      render(Tour, {
+        props: { steps: baseSteps, open: true, onClose, 'onUpdate:open': onUpdateOpen }
+      })
+      await screen.findByRole('dialog')
+      await fireEvent.keyDown(document, { key: 'Escape' })
+      expect(onClose).toHaveBeenCalled()
+      expect(onUpdateOpen).toHaveBeenCalledWith(false)
+    })
+
+    it('locks body scroll while open and restores it on close', async () => {
+      const { rerender } = render(Tour, { props: { steps: baseSteps, open: true } })
+      await screen.findByRole('dialog')
+      expect(document.body.style.overflow).toBe('hidden')
+      await rerender({ steps: baseSteps, open: false })
+      await waitFor(() => expect(document.body.style.overflow).not.toBe('hidden'))
+    })
+
+    it('restores focus to the previously focused element on close', async () => {
+      const trigger = document.createElement('button')
+      trigger.textContent = 'Open tour'
+      document.body.appendChild(trigger)
+      trigger.focus()
+      expect(trigger).toHaveFocus()
+
+      const { rerender } = render(Tour, { props: { steps: baseSteps, open: true } })
+      await screen.findByRole('dialog')
+
+      await rerender({ steps: baseSteps, open: false })
+      await waitFor(() => expect(trigger).toHaveFocus())
+      trigger.remove()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Tour, {

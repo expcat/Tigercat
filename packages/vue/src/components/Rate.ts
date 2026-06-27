@@ -66,6 +66,35 @@ export const Rate = defineComponent({
       emit('hover-change', 0)
     }
 
+    function handleKeydown(e: KeyboardEvent) {
+      if (props.disabled) return
+      const step = props.allowHalf ? 0.5 : 1
+      let next = props.modelValue
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowUp':
+          next = Math.min(props.count, props.modelValue + step)
+          break
+        case 'ArrowLeft':
+        case 'ArrowDown':
+          next = Math.max(0, props.modelValue - step)
+          break
+        case 'Home':
+          next = 0
+          break
+        case 'End':
+          next = props.count
+          break
+        default:
+          return
+      }
+      e.preventDefault()
+      if (next !== props.modelValue) {
+        emit('update:modelValue', next)
+        emit('change', next)
+      }
+    }
+
     return () => {
       const isChar = !!props.character
       const stars: ReturnType<typeof h>[] = []
@@ -140,9 +169,7 @@ export const Rate = defineComponent({
             {
               key: i,
               class: getRateStarClasses(props.size, isChar, props.disabled),
-              role: 'radio',
-              'aria-checked': full || half,
-              'aria-label': `${i + 1} star${i + 1 > 1 ? 's' : ''}`,
+              'aria-hidden': 'true',
               onClick: (e: MouseEvent) => handleClick(i, e),
               onMousemove: (e: MouseEvent) => handleMouseMove(i, e),
               onMouseleave: handleMouseLeave
@@ -152,12 +179,22 @@ export const Rate = defineComponent({
         )
       }
 
+      const valueText = `${props.modelValue} star${props.modelValue === 1 ? '' : 's'}`
+
       return h(
         'div',
         {
           class: classNames(rateBaseClasses, coerceClassValue(attrs.class)),
-          role: 'radiogroup',
-          'aria-label': 'Rating'
+          role: 'slider',
+          'aria-label': 'Rating',
+          'aria-valuemin': 0,
+          'aria-valuemax': props.count,
+          'aria-valuenow': props.modelValue,
+          'aria-valuetext': valueText,
+          'aria-disabled': props.disabled || undefined,
+          'aria-orientation': 'horizontal',
+          tabindex: props.disabled ? -1 : 0,
+          onKeydown: handleKeydown
         },
         stars
       )

@@ -91,6 +91,90 @@ describe('Segmented', () => {
     expect(radios[2].getAttribute('aria-disabled')).toBe('false')
   })
 
+  // --- Keyboard / roving tabindex (C13-1) ---
+  it('exposes a single roving tab-stop on the selected option', () => {
+    const { container } = render(<Segmented options={defaultOptions} value="b" />)
+    const radios = container.querySelectorAll('[role="radio"]')
+    expect(radios[0].getAttribute('tabindex')).toBe('-1')
+    expect(radios[1].getAttribute('tabindex')).toBe('0')
+    expect(radios[2].getAttribute('tabindex')).toBe('-1')
+  })
+
+  it('puts the tab-stop on the first enabled option when nothing is selected', () => {
+    const { container } = render(<Segmented options={defaultOptions} />)
+    const radios = container.querySelectorAll('[role="radio"]')
+    expect(radios[0].getAttribute('tabindex')).toBe('0')
+    expect(radios[1].getAttribute('tabindex')).toBe('-1')
+  })
+
+  it('moves selection with arrow keys', () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <Segmented options={defaultOptions} value="a" onChange={onChange} />
+    )
+    const radios = container.querySelectorAll('[role="radio"]')
+    fireEvent.keyDown(radios[0], { key: 'ArrowRight' })
+    expect(onChange).toHaveBeenCalledWith('b')
+
+    onChange.mockClear()
+    fireEvent.keyDown(radios[0], { key: 'ArrowLeft' })
+    // wraps to the last option
+    expect(onChange).toHaveBeenCalledWith('c')
+  })
+
+  it('Home/End jump to the first/last option', () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <Segmented options={defaultOptions} value="b" onChange={onChange} />
+    )
+    const radios = container.querySelectorAll('[role="radio"]')
+    fireEvent.keyDown(radios[1], { key: 'End' })
+    expect(onChange).toHaveBeenCalledWith('c')
+    fireEvent.keyDown(radios[1], { key: 'Home' })
+    expect(onChange).toHaveBeenCalledWith('a')
+  })
+
+  it('Enter/Space selects the focused option', () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <Segmented options={defaultOptions} value="a" onChange={onChange} />
+    )
+    const radios = container.querySelectorAll('[role="radio"]')
+    fireEvent.keyDown(radios[2], { key: 'Enter' })
+    expect(onChange).toHaveBeenCalledWith('c')
+  })
+
+  it('skips disabled options during arrow navigation', () => {
+    const opts = [
+      { value: 'a', label: 'A' },
+      { value: 'b', label: 'B', disabled: true },
+      { value: 'c', label: 'C' }
+    ]
+    const onChange = vi.fn()
+    const { container } = render(<Segmented options={opts} value="a" onChange={onChange} />)
+    const radios = container.querySelectorAll('[role="radio"]')
+    fireEvent.keyDown(radios[0], { key: 'ArrowRight' })
+    expect(onChange).toHaveBeenCalledWith('c')
+  })
+
+  it('does not move on keyboard when the whole group is disabled', () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <Segmented options={defaultOptions} value="a" disabled onChange={onChange} />
+    )
+    const radios = container.querySelectorAll('[role="radio"]')
+    fireEvent.keyDown(radios[0], { key: 'ArrowRight' })
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('forwards aria-label to the radiogroup root', () => {
+    const { container } = render(<Segmented options={defaultOptions} aria-label="View mode" />)
+    expect(container.querySelector('[role="radiogroup"]')).toHaveAttribute(
+      'aria-label',
+      'View mode'
+    )
+  })
+
   // --- Block mode ---
   it('applies block class', () => {
     const { container } = render(<Segmented options={defaultOptions} block />)

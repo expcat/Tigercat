@@ -325,6 +325,9 @@ export const BarChart: React.FC<BarChartProps> = ({
               } as React.CSSProperties
             }
             tabIndex={selectable ? 0 : undefined}
+            role={selectable ? 'button' : 'img'}
+            aria-label={bar.datum.label ?? String(bar.datum.x)}
+            data-bar-index={bar.index}
             onMouseEnter={(e) => handleMouseEnter(bar.index, e)}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}

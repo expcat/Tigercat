@@ -162,6 +162,17 @@ TaskBoard/Kanban 等目标组件已接入 ConfigProvider merged locale，显式 
 
 #### T07 a11y keyboard aria
 
+**状态**：已完成（2026-06-27）。本轮补齐 T07 全部 16 项来源覆盖：
+C06-2/C06-3 Tabs、C07-8 菜单底层测试、C09-4 Tour overlay 生命周期、C13-1
+Rate/Segmented、C14-5 Select clear、C16-2 Calendar、C18-6 FileManager、C20-3
+ImageAnnotation、C21 Table 行交互、C23-3 VirtualTable、C25-3 ChartLegend、C26-2
+Line/Area 点交互门控、C26-4 BarChart、C27-4 径向图表、C32-2 Resizable。关键决策：
+Rate 统一改为单个可聚焦 `role="slider"`；Resizable 键盘 helper 进入 core 公共导出并已更新
+`api-reports/public-api-baseline.json`。验证已运行 `corepack pnpm vitest run $(git diff
+--name-only | rg '^tests/.*\\.(spec|test)\\.')`、`corepack pnpm test:a11y`、
+`corepack pnpm api:validate`、`corepack pnpm types:check`、`corepack pnpm api:baseline`，并审阅
+`api-reports/public-api-baseline.json` diff 确认仅新增 Resizable helper 导出。
+
 **目标**：统一修复可访问性、键盘交互、ARIA 与 focus 行为，DOM/focus 保持框架层，纯索引/规则 helper 可沉 core。
 
 **来源**：C06-3、C07-8、C13-1、C14-5、C16-2、C18-6、C20-3、C21 行交互、C23-3、C25-3、C26-2、C26-4、C27-4、C32-2、C06-2、C09-4。

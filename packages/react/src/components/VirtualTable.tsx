@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  isActivationKey,
   resolveLocaleText,
   mergeTigerLocale,
   calculateVirtualRange,
@@ -143,18 +144,35 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
             const globalIdx = range.start + localIdx
             const key = getVirtualRowKey(row, globalIdx, rowKey)
             const isSelected = selectedSet.has(key)
+            const isInteractive = !!onRowClick || selectable
+            const activate = () => {
+              onRowClick?.(row, globalIdx)
+              if (selectable) onSelect?.(key, row, globalIdx)
+            }
 
             return (
               <tr
                 key={key}
                 className={getVirtualTableRowClasses(globalIdx, striped, isSelected)}
-                onClick={() => {
-                  onRowClick?.(row, globalIdx)
-                  if (selectable) onSelect?.(key, row, globalIdx)
-                }}>
-                {columns.map((col) => (
+                // header occupies aria-rowindex 1
+                aria-rowindex={globalIdx + 2}
+                aria-selected={selectable ? isSelected : undefined}
+                tabIndex={isInteractive ? 0 : undefined}
+                onClick={isInteractive ? activate : undefined}
+                onKeyDown={
+                  isInteractive
+                    ? (e) => {
+                        if (isActivationKey(e)) {
+                          e.preventDefault()
+                          activate()
+                        }
+                      }
+                    : undefined
+                }>
+                {columns.map((col, colIdx) => (
                   <td
                     key={col.key as string}
+                    aria-colindex={colIdx + 1}
                     className={classNames(
                       virtualTableCellClasses,
                       getTableFixedCellClasses({

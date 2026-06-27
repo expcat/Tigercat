@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/vue'
+import { render, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
 import { Resizable } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -192,6 +192,50 @@ describe('Resizable', () => {
       expect(root.style.border).toBe('1px solid red')
     })
   })
+  // --- Keyboard resize (C32-2) ---
+  describe('Keyboard resize', () => {
+    it('exposes handles as focusable separators with ARIA', () => {
+      const { container } = renderResizable()
+      const handle = container.querySelector('[data-handle="right"]')!
+      expect(handle.getAttribute('role')).toBe('separator')
+      expect(handle.getAttribute('tabindex')).toBe('0')
+      expect(handle.getAttribute('aria-orientation')).toBe('vertical')
+      expect(handle.getAttribute('aria-valuenow')).toBe('300')
+    })
+
+    it('grows width with ArrowRight on the right handle', async () => {
+      const { container, emitted } = renderResizable()
+      const handle = container.querySelector('[data-handle="right"]')!
+      await fireEvent.keyDown(handle, { key: 'ArrowRight' })
+      const events = emitted().resize as unknown[][]
+      expect(events).toBeTruthy()
+      expect((events[0][0] as { width: number }).width).toBe(310)
+    })
+
+    it('resizes height with ArrowDown on the bottom handle', async () => {
+      const { container, emitted } = renderResizable()
+      const handle = container.querySelector('[data-handle="bottom"]')!
+      await fireEvent.keyDown(handle, { key: 'ArrowDown' })
+      const events = emitted().resize as unknown[][]
+      expect((events[0][0] as { height: number }).height).toBe(210)
+    })
+
+    it('respects the max bound on keyboard resize', async () => {
+      const { container, emitted } = renderResizable({ maxWidth: 305 })
+      const handle = container.querySelector('[data-handle="right"]')!
+      await fireEvent.keyDown(handle, { key: 'ArrowRight' })
+      expect((emitted().resize as unknown[][])[0][0]).toMatchObject({ width: 305 })
+    })
+
+    it('does not resize via keyboard when disabled', async () => {
+      const { container, emitted } = renderResizable({ disabled: true })
+      const handle = container.querySelector('[data-handle="right"]')!
+      expect(handle.getAttribute('tabindex')).toBe('-1')
+      await fireEvent.keyDown(handle, { key: 'ArrowRight' })
+      expect(emitted().resize).toBeUndefined()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Resizable)

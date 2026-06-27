@@ -1111,6 +1111,40 @@ describe('Table', () => {
       expect(onRowClick).toHaveBeenCalledWith(dataSource[0], 0)
     })
 
+    it('makes rows keyboard-activable when a row-click listener is bound (C21)', async () => {
+      const onRowClick = vi.fn()
+      const { container } = render(Table, {
+        props: { columns, dataSource },
+        attrs: { onRowClick }
+      })
+      const firstRow = container.querySelector('tbody tr')! as HTMLElement
+      expect(firstRow.getAttribute('tabindex')).toBe('0')
+      await fireEvent.keyDown(firstRow, { key: 'Enter' })
+      expect(onRowClick).toHaveBeenCalledWith(dataSource[0], 0)
+      await fireEvent.keyDown(firstRow, { key: ' ' })
+      expect(onRowClick).toHaveBeenCalledTimes(2)
+    })
+
+    it('exposes aria-selected on rows and leaves plain rows unfocusable (C21)', () => {
+      const selected = render(Table, {
+        props: {
+          columns,
+          dataSource,
+          rowKey: 'id',
+          rowSelection: { type: 'checkbox', selectedRowKeys: [1] }
+        }
+      })
+      const rows = selected.container.querySelectorAll('tbody tr')
+      expect(rows[0].getAttribute('aria-selected')).toBe('true')
+      expect(rows[1].getAttribute('aria-selected')).toBe('false')
+      expect(rows[0].getAttribute('tabindex')).toBe('0')
+
+      const plain = render(Table, { props: { columns, dataSource } })
+      const plainRow = plain.container.querySelector('tbody tr')!
+      expect(plainRow.getAttribute('tabindex')).toBeNull()
+      expect(plainRow.getAttribute('aria-selected')).toBeNull()
+    })
+
     it('should emit change event with combined state', async () => {
       const onChange = vi.fn()
 

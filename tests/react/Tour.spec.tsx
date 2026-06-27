@@ -254,6 +254,49 @@ describe('Tour', () => {
     render(<Tour steps={baseSteps} open={true} current={99} />)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
+
+  // --- Overlay lifecycle (C09-4) ---
+  describe('Overlay lifecycle', () => {
+    it('moves focus to the close button when opened', async () => {
+      render(<Tour steps={baseSteps} open={true} />)
+      const closeButton = await screen.findByLabelText('Close tour')
+      await waitFor(() => expect(closeButton).toHaveFocus())
+    })
+
+    it('closes on Escape', async () => {
+      const onOpenChange = vi.fn()
+      const onClose = vi.fn()
+      render(<Tour steps={baseSteps} open={true} onOpenChange={onOpenChange} onClose={onClose} />)
+      await screen.findByRole('dialog')
+      await userEvent.keyboard('{Escape}')
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+      expect(onClose).toHaveBeenCalled()
+    })
+
+    it('locks body scroll while open and restores it on close', async () => {
+      const { rerender } = render(<Tour steps={baseSteps} open={true} />)
+      await screen.findByRole('dialog')
+      expect(document.body.style.overflow).toBe('hidden')
+      rerender(<Tour steps={baseSteps} open={false} />)
+      await waitFor(() => expect(document.body.style.overflow).not.toBe('hidden'))
+    })
+
+    it('restores focus to the previously focused element on close', async () => {
+      const trigger = document.createElement('button')
+      trigger.textContent = 'Open tour'
+      document.body.appendChild(trigger)
+      trigger.focus()
+      expect(trigger).toHaveFocus()
+
+      const { rerender } = render(<Tour steps={baseSteps} open={true} />)
+      await screen.findByRole('dialog')
+
+      rerender(<Tour steps={baseSteps} open={false} />)
+      await waitFor(() => expect(trigger).toHaveFocus())
+      trigger.remove()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<Tour steps={baseSteps} open={false} />)

@@ -173,6 +173,39 @@ describe('FileManager (React)', () => {
     expect(keys).toContain('readme')
   })
 
+  it('supports roving keyboard selection and folder open', () => {
+    const onSelect = vi.fn()
+    const onCurrentPathChange = vi.fn()
+    const onSelectedKeysChange = vi.fn()
+    const { getAllByRole, getByText } = render(
+      <FileManager
+        files={files}
+        showHidden
+        multiple
+        onSelect={onSelect}
+        onCurrentPathChange={onCurrentPathChange}
+        onSelectedKeysChange={onSelectedKeysChange}
+      />
+    )
+
+    let options = getAllByRole('option')
+    expect(options[0]).toHaveAttribute('tabindex', '0')
+    expect(options[1]).toHaveAttribute('tabindex', '-1')
+
+    fireEvent.keyDown(options[0], { key: 'ArrowDown' })
+    options = getAllByRole('option')
+    expect(options[0]).toHaveAttribute('tabindex', '-1')
+    expect(options[1]).toHaveAttribute('tabindex', '0')
+
+    fireEvent.keyDown(options[1], { key: ' ' })
+    expect(onSelectedKeysChange).toHaveBeenCalledWith(['env'])
+
+    const folderOption = getByText('src').closest('[role="option"]') as HTMLElement
+    fireEvent.keyDown(folderOption, { key: 'Enter' })
+    expect(onSelect).toHaveBeenCalledWith(files[0])
+    expect(onCurrentPathChange).toHaveBeenCalledWith(['src'])
+  })
+
   it('deep nested path navigation', () => {
     const deepFiles: FileItem[] = [
       {

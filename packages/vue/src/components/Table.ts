@@ -1,6 +1,7 @@
 import {
   computed,
   defineComponent,
+  getCurrentInstance,
   h,
   onBeforeUnmount,
   onMounted,
@@ -61,6 +62,7 @@ export const Table = defineComponent({
   emits: tableEmits as unknown as string[],
   setup(props, { emit, slots }) {
     const config = useTigerConfig()
+    const instance = getCurrentInstance()
     const wrapperRef = ref<HTMLElement | null>(null)
     const tableRef = ref<HTMLTableElement | null>(null)
     const measuredColumnWidths = ref<Record<string, number>>({})
@@ -214,7 +216,11 @@ export const Table = defineComponent({
 
       const renderProps = {
         ...resolvedProps,
-        emptyText: tableLabels.value.emptyText
+        emptyText: tableLabels.value.emptyText,
+        // Rows become keyboard-activable when a row-click listener is bound or
+        // row selection is enabled (mirrors React's onRowClick/rowSelection).
+        interactiveRows:
+          !!resolvedProps.rowSelection || typeof instance?.vnode.props?.onRowClick === 'function'
       } as TableInternalProps
 
       const shouldPinColumns =

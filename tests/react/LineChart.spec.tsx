@@ -2,8 +2,9 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { LineChart } from '@expcat/tigercat-react'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 
@@ -223,5 +224,30 @@ describe('LineChart', () => {
 
     expect(movedAlphaArea?.getAttribute('fill')).toBe(alphaAreaFill)
     expect(movedAlphaLine?.getAttribute('stroke')).toBe(alphaLineStroke)
+  })
+
+  it('gates point interaction and keyboard focus behind hoverable or point click handlers', () => {
+    const onPointClick = vi.fn()
+
+    const passive = renderWithProps(LineChart, {
+      data: basicData,
+      showPoints: true,
+      ...defaultSize
+    })
+    const passivePoint = passive.container.querySelector('circle[data-point-index="0"]')!
+    expect(passivePoint).toHaveAttribute('role', 'img')
+    expect(passivePoint).not.toHaveAttribute('tabindex')
+
+    const clickable = renderWithProps(LineChart, {
+      data: basicData,
+      showPoints: true,
+      onPointClick,
+      ...defaultSize
+    })
+    const clickablePoint = clickable.container.querySelector('circle[data-point-index="0"]')!
+    expect(clickablePoint).toHaveAttribute('role', 'button')
+    expect(clickablePoint).toHaveAttribute('tabindex', '0')
+    fireEvent.keyDown(clickablePoint, { key: 'Enter' })
+    expect(onPointClick).toHaveBeenCalledWith(0, 0, expect.any(Object))
   })
 })

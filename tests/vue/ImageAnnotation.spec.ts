@@ -117,6 +117,45 @@ describe('ImageAnnotation', () => {
     ])
   })
 
+  it('selects an annotation with Enter/Space on its shape (C20-3)', async () => {
+    const annotations: CoreImageAnnotation[] = [
+      { id: 'face', type: 'rectangle', x: 0.1, y: 0.1, width: 0.2, height: 0.2, label: 'Face' }
+    ]
+    const { getByRole, emitted } = await renderLoadedAnnotation({
+      props: { src: '/scene.jpg', modelValue: annotations }
+    })
+    const shape = getByRole('button', { name: 'Face, rectangle annotation' })
+    await fireEvent.keyDown(shape, { key: 'Enter' })
+    expect(emitted().select?.at(-1)).toEqual([annotations[0]])
+
+    await fireEvent.keyDown(shape, { key: ' ' })
+    expect(emitted().select?.at(-1)).toEqual([annotations[0]])
+  })
+
+  it('removes the focused editable annotation with Delete (C20-3)', async () => {
+    const annotations: CoreImageAnnotation[] = [
+      { id: 'face', type: 'rectangle', x: 0.1, y: 0.1, width: 0.2, height: 0.2 }
+    ]
+    const { getByRole, emitted } = await renderLoadedAnnotation({
+      props: { src: '/scene.jpg', defaultValue: annotations }
+    })
+    const shape = getByRole('button', { name: 'rectangle annotation' })
+    await fireEvent.keyDown(shape, { key: 'Delete' })
+    expect(emitted().change.at(-1)).toEqual([[], { type: 'remove', annotation: annotations[0] }])
+  })
+
+  it('does not remove via keyboard when readonly (C20-3)', async () => {
+    const annotations: CoreImageAnnotation[] = [
+      { id: 'face', type: 'rectangle', x: 0.1, y: 0.1, width: 0.2, height: 0.2 }
+    ]
+    const { getByRole, emitted } = await renderLoadedAnnotation({
+      props: { src: '/scene.jpg', modelValue: annotations, readonly: true }
+    })
+    const shape = getByRole('button', { name: 'rectangle annotation' })
+    await fireEvent.keyDown(shape, { key: 'Delete' })
+    expect(emitted().change).toBeUndefined()
+  })
+
   it('renders polygon and freehand annotations', async () => {
     const annotations: CoreImageAnnotation[] = [
       {

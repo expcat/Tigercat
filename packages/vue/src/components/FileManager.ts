@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, PropType } from 'vue'
+import { defineComponent, h, ref, computed, nextTick, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -98,6 +98,8 @@ export const FileManager = defineComponent({
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getFileManagerLabels(mergedLocale.value))
     const localSearch = ref(props.searchText)
+    const focusedIndex = ref(0)
+    const contentRef = ref<HTMLElement | null>(null)
 
     const model = computed(() =>
       deriveFileManagerModel({
@@ -137,6 +139,89 @@ export const FileManager = defineComponent({
       const newPath = sliceBreadcrumbPath(props.currentPath, index)
       emit('update:currentPath', newPath)
       emit('navigate', newPath)
+    }
+
+    function getFirstEnabledIndex() {
+      return model.value.processedItems.findIndex((item) => !item.disabled)
+    }
+
+    function getLastEnabledIndex() {
+      for (let index = model.value.processedItems.length - 1; index >= 0; index -= 1) {
+        if (!model.value.processedItems[index]?.disabled) {
+          return index
+        }
+      }
+      return -1
+    }
+
+    function getFocusedItemIndex() {
+      return focusedIndex.value >= 0 && !model.value.processedItems[focusedIndex.value]?.disabled
+        ? focusedIndex.value
+        : getFirstEnabledIndex()
+    }
+
+    function focusItemAt(index: number) {
+      nextTick(() => {
+        contentRef.value?.querySelector<HTMLElement>(`[data-option-index="${index}"]`)?.focus()
+      })
+    }
+
+    function moveFocus(current: number, direction: 1 | -1) {
+      if (model.value.processedItems.length === 0) return
+      let next = current
+      for (let i = 0; i < model.value.processedItems.length; i += 1) {
+        next =
+          (next + direction + model.value.processedItems.length) % model.value.processedItems.length
+        if (!model.value.processedItems[next]?.disabled) {
+          focusedIndex.value = next
+          focusItemAt(next)
+          return
+        }
+      }
+    }
+
+    function handleItemKeydown(event: KeyboardEvent, item: FileItem, index: number) {
+      switch (event.key) {
+        case 'ArrowDown':
+        case 'ArrowRight':
+          event.preventDefault()
+          moveFocus(index, 1)
+          return
+        case 'ArrowUp':
+        case 'ArrowLeft':
+          event.preventDefault()
+          moveFocus(index, -1)
+          return
+        case 'Home': {
+          event.preventDefault()
+          const first = getFirstEnabledIndex()
+          if (first >= 0) {
+            focusedIndex.value = first
+            focusItemAt(first)
+          }
+          return
+        }
+        case 'End': {
+          event.preventDefault()
+          const last = getLastEnabledIndex()
+          if (last >= 0) {
+            focusedIndex.value = last
+            focusItemAt(last)
+          }
+          return
+        }
+        case ' ':
+          event.preventDefault()
+          handleSelect(item)
+          return
+        case 'Enter':
+          event.preventDefault()
+          handleSelect(item)
+          handleOpen(item)
+          return
+        default:
+          return
+      }
     }
 
     return () => {
@@ -205,6 +290,7 @@ export const FileManager = defineComponent({
       const renderItem = (item: FileItem, index: number) => {
         const isSelected = model.value.selectedSet.has(item.key)
         const itemClass = getFileItemClasses(props.viewMode, isSelected)
+        const focusedItem = getFocusedItemIndex()
 
         const nameEl = h('span', { class: fileManagerItemNameClasses }, item.name)
 
@@ -229,7 +315,13 @@ export const FileManager = defineComponent({
             class: itemClass,
             role: 'option',
             'aria-selected': isSelected,
+            tabindex: !item.disabled && index === focusedItem ? 0 : -1,
+            'data-option-index': index,
             'data-disabled': item.disabled || undefined,
+            onFocus: () => {
+              if (!item.disabled) focusedIndex.value = index
+            },
+            onKeydown: (event: KeyboardEvent) => handleItemKeydown(event, item, index),
             onClick: () => handleSelect(item),
             onDblclick: () => handleOpen(item),
             draggable: props.draggable && !item.disabled,
@@ -248,7 +340,12 @@ export const FileManager = defineComponent({
         model.value.processedItems.length > 0
           ? h(
               'div',
-              { class: contentClass, role: 'listbox', 'aria-multiselectable': props.multiple },
+              {
+                ref: contentRef,
+                class: contentClass,
+                role: 'listbox',
+                'aria-multiselectable': props.multiple
+              },
               model.value.processedItems.map(renderItem)
             )
           : h(
