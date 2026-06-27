@@ -281,6 +281,16 @@ DatePicker/Tree/TimePicker 与 core zh-CN locale size budget 超限。
 
 #### T11 test/e2e/benchmark maintenance
 
+**状态**：已完成（2026-06-28）。本轮将 `test:validate` 默认覆盖扩展到
+core/react/vue 三组测试，并新增 focused test 硬失败、测试命名统计修正、core
+utility 与组件 spec 的质量提示边界；新增 `e2e`/`e2e:smoke`/`example:ssr:check`
+根脚本，CI/E2E workflow 改为 PR smoke 与手动/定时全量 E2E 分层；补充
+benchmark coverage map，并将 Next.js `next-env.d.ts` 固定为构建后稳定格式。验证已运行
+`npx -y pnpm@11.9.0 test:validate`、`npx -y pnpm@11.9.0 example:ssr:check`、
+`npx -y pnpm@11.9.0 e2e:smoke`、`npx -y pnpm@11.9.0 bench --run`、
+`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md benchmarks/README.md .github/pull_request_template.md`
+与 `git diff --check`。
+
 **目标**：增强测试质量门禁、E2E 入口、SSR 示例生成副作用检查与 benchmark 覆盖说明。
 
 **来源**：F-1、F-2、F-3、F-4。
@@ -291,7 +301,7 @@ DatePicker/Tree/TimePicker 与 core zh-CN locale size budget 超限。
 
 **依赖/阻塞**：无；可与组件源码任务并行。
 
-**完成验证**：`pnpm test:validate`、`pnpm example:ssr:build` 后目标 diff 检查、E2E script dry run 或 Playwright smoke、`pnpm bench`（如改 benchmark）。
+**完成验证**：`pnpm test:validate`、`pnpm example:ssr:check`、E2E script dry run 或 Playwright smoke、`pnpm bench`（如改 benchmark）。
 
 **冲突规避**：T11 只改测试/示例/CI 维护层；不得把组件修复混入门禁增强。
 

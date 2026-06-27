@@ -23,7 +23,9 @@
 - [ ] `pnpm api:validate`
 - [ ] `pnpm size`
 - [ ] `pnpm example:build`
-- [ ] `npx playwright test`
+- [ ] `pnpm example:ssr:check`
+- [ ] `pnpm e2e:smoke`
+- [ ] `pnpm bench --run`
 - [ ] Not run; reason:
 
 ## Checklist

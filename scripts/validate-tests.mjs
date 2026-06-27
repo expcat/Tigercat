@@ -82,6 +82,11 @@ function countTests(content) {
   return total
 }
 
+function hasFocusedTests(content) {
+  const stripped = stripCommentLines(content)
+  return /\b(?:describe|it|test)\.only\s*\(/.test(stripped)
+}
+
 function stripCommentLines(content) {
   return content
     .split(/\r?\n/g)
@@ -107,78 +112,93 @@ function checkTestStructure(filePath, content, counters) {
   return true
 }
 
-function checkTestNaming(filePath, content, counters) {
-  const lines = content.split(/\r?\n/g)
-  let total = 0
-  let descriptive = 0
+const descriptiveNameWords = [
+  'should',
+  'snapshot',
+  'render',
+  'display',
+  'emit',
+  'trigger',
+  'accept',
+  'reject',
+  'throw',
+  'return',
+  'call',
+  'when',
+  'with',
+  'without',
+  'not ',
+  'handle',
+  'support',
+  'allow',
+  'prevent',
+  'disable',
+  'enable',
+  'show',
+  'hide',
+  'open',
+  'close',
+  'toggle',
+  'update',
+  'set',
+  'clear',
+  'reset',
+  'apply',
+  'remove',
+  'add',
+  'create',
+  'delete',
+  'select',
+  'validate',
+  'format',
+  'parse',
+  'convert',
+  'calculate',
+  'compute',
+  'respond',
+  'fire',
+  'navigate',
+  'focus',
+  'blur',
+  'scroll',
+  'resize',
+  'change',
+  'submit',
+  'cancel',
+  'confirm',
+  'dismiss',
+  'load',
+  'fetch',
+  'default'
+]
 
-  for (const line of lines) {
-    const match = line.match(/\bit\s*\(\s*(['"`])([^\1]+?)\1/) // naive
-    if (!match) continue
-    total++
-    const lower = match[2].toLowerCase()
-    if (
-      lower.includes('should') ||
-      lower.includes('snapshot') ||
-      lower.includes('render') ||
-      lower.includes('display') ||
-      lower.includes('emit') ||
-      lower.includes('trigger') ||
-      lower.includes('accept') ||
-      lower.includes('reject') ||
-      lower.includes('throw') ||
-      lower.includes('return') ||
-      lower.includes('call') ||
-      lower.includes('when') ||
-      lower.includes('with') ||
-      lower.includes('without') ||
-      lower.includes('not ') ||
-      lower.includes('handle') ||
-      lower.includes('support') ||
-      lower.includes('allow') ||
-      lower.includes('prevent') ||
-      lower.includes('disable') ||
-      lower.includes('enable') ||
-      lower.includes('show') ||
-      lower.includes('hide') ||
-      lower.includes('open') ||
-      lower.includes('close') ||
-      lower.includes('toggle') ||
-      lower.includes('update') ||
-      lower.includes('set') ||
-      lower.includes('clear') ||
-      lower.includes('reset') ||
-      lower.includes('apply') ||
-      lower.includes('remove') ||
-      lower.includes('add') ||
-      lower.includes('create') ||
-      lower.includes('delete') ||
-      lower.includes('select') ||
-      lower.includes('validate') ||
-      lower.includes('format') ||
-      lower.includes('parse') ||
-      lower.includes('convert') ||
-      lower.includes('calculate') ||
-      lower.includes('compute') ||
-      lower.includes('respond') ||
-      lower.includes('fire') ||
-      lower.includes('navigate') ||
-      lower.includes('focus') ||
-      lower.includes('blur') ||
-      lower.includes('scroll') ||
-      lower.includes('resize') ||
-      lower.includes('change') ||
-      lower.includes('submit') ||
-      lower.includes('cancel') ||
-      lower.includes('confirm') ||
-      lower.includes('dismiss') ||
-      lower.includes('load') ||
-      lower.includes('fetch') ||
-      lower.includes('default')
-    ) {
-      descriptive++
-    }
+function getTestNames(content) {
+  const names = []
+  const directRegex =
+    /\b(?:it|test)(?:\.(?:skip|todo|concurrent|fails))?\s*\(\s*(['"`])([\s\S]*?)\1/g
+  const eachRegex = /\b(?:it|test)\.each\s*\([\s\S]*?\)\s*\(\s*(['"`])([\s\S]*?)\1/g
+  let match
+
+  while ((match = directRegex.exec(content))) {
+    names.push(match[2])
   }
+
+  while ((match = eachRegex.exec(content))) {
+    names.push(match[2])
+  }
+
+  return names
+}
+
+function isDescriptiveTestName(name) {
+  const lower = name.toLowerCase()
+  return descriptiveNameWords.some((word) => lower.includes(word))
+}
+
+function checkTestNaming(filePath, content, counters) {
+  const names = getTestNames(content)
+  const total = names.length
+  const descriptive = names.filter(isDescriptiveTestName).length
 
   if (total > 0 && descriptive / total < 0.5) {
     console.log(c('yellow', `  ⚠ Low descriptive naming ratio (${descriptive}/${total})`))
@@ -215,7 +235,7 @@ function checkTypeSafety(content, counters) {
   return true
 }
 
-// Hard minimum: file must have at least this many tests to pass
+// Component specs must have at least this many tests to pass.
 function hardMinTests() {
   return 3
 }
@@ -229,6 +249,13 @@ function softMinTestsForFile(filename) {
   )
     return 30
   return 15
+}
+
+function isComponentSpec(filePath) {
+  return (
+    filePath.startsWith(`tests${path.sep}react${path.sep}`) ||
+    filePath.startsWith(`tests${path.sep}vue${path.sep}`)
+  )
 }
 
 async function main() {
@@ -247,9 +274,9 @@ async function main() {
   console.log('')
 
   const testDirsEnv = process.env.TEST_DIRS
-  const testDirs = (testDirsEnv ? testDirsEnv.split(/\s+/g) : ['tests/vue', 'tests/react']).filter(
-    Boolean
-  )
+  const testDirs = (
+    testDirsEnv ? testDirsEnv.split(/\s+/g) : ['tests/core', 'tests/react', 'tests/vue']
+  ).filter(Boolean)
 
   const testFiles = []
   for (const dir of testDirs) {
@@ -278,6 +305,7 @@ async function main() {
     const content = readFileSync(filePath, 'utf8')
 
     const testCount = countTests(content)
+    const componentSpec = isComponentSpec(filePath)
     const hardMin = hardMinTests()
     const softMin = softMinTestsForFile(filename)
 
@@ -287,21 +315,25 @@ async function main() {
     let softIssues = 0 // warnings only
 
     // --- Hard checks (cause file to fail) ---
-    if (testCount < hardMin) {
+    if (componentSpec && testCount < hardMin) {
       console.log(c('red', `  ✗ Below hard minimum (${hardMin})`))
+      errors++
+    }
+    if (hasFocusedTests(content)) {
+      console.log(c('red', '  ✗ Focused test detected (.only)'))
       errors++
     }
     if (!checkTypeSafety(content, counters)) errors++
 
     // --- Soft checks (warnings, don't cause failure) ---
-    if (testCount < softMin && testCount >= hardMin) {
+    if (testCount < softMin && (!componentSpec || testCount >= hardMin)) {
       console.log(c('yellow', `  ⚠ Below recommended minimum (${softMin})`))
       counters.warnings++
     }
     if (!checkTestStructure(filePath, content, counters)) softIssues++
     if (!checkTestNaming(filePath, content, counters)) softIssues++
     if (!checkEdgeCases(content, counters)) softIssues++
-    if (!checkAccessibility(filePath, content, counters)) softIssues++
+    if (componentSpec && !checkAccessibility(filePath, content, counters)) softIssues++
 
     if (errors === 0) {
       if (softIssues === 0) {

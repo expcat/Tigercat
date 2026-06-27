@@ -19,6 +19,7 @@
 | `pnpm smoke:published`    | `scripts/publish-check.mjs --published` | 使用同一发布检查脚本校验 npm 上已发布版本                                                                  |
 | `pnpm test:core`          | 根 package scripts                      | 运行 core 测试集合                                                                                         |
 | `pnpm test:validate`      | `scripts/validate-tests.mjs`            | 按 [测试质量指南](../tests/TEST_QUALITY_GUIDELINES.md) 检查测试文件                                        |
+| `pnpm example:ssr:check`  | `scripts/check-ssr-examples.mjs`        | 构建 Nuxt/Next.js SSR 示例，并检查 `examples/nextjs/next-env.d.ts` 没有被构建过程改写                      |
 | `pnpm docs:api`           | `scripts/generate-api-docs.mjs`         | 生成 skills API 摘要                                                                                       |
 | `pnpm api:baseline:check` | 根 package scripts                      | 公共 API 基线漂移闸：生成基线并校验 `api-reports` 无差异                                                   |
 | `pnpm docs:api:check`     | 根 package scripts                      | references 漂移闸：生成 LLM API 文档并校验 `skills/tigercat/references` 无差异                             |
