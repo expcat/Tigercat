@@ -3,8 +3,9 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
+import { defineLocale } from '../define-locale'
 
-export const jaJP: TigerLocale = {
+export const jaJP: TigerLocale = defineLocale({
   locale: 'ja-JP',
   direction: 'ltr',
   common: {
@@ -73,4 +74,4 @@ export const jaJP: TigerLocale = {
     dragHintText: 'ドラッグして移動',
     boardAriaLabel: 'タスクボード'
   }
-}
+})

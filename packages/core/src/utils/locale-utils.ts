@@ -19,6 +19,12 @@ import type {
   TigerLocalePagination,
   TigerLocaleTable,
   TigerLocaleFormWizard,
+  TigerLocaleTour,
+  TigerLocaleCalendar,
+  TigerLocaleFileManager,
+  TigerLocaleImageViewer,
+  TigerLocaleImageEditor,
+  TigerLocaleStatus,
   TigerLocaleTaskBoard,
   TigerLocaleFormValidation,
   TigerLocaleDirection
@@ -30,6 +36,7 @@ const TIGER_LOCALE_KEYS = [
   'locale',
   'direction',
   'common',
+  'empty',
   'modal',
   'drawer',
   'qrcode',
@@ -40,6 +47,12 @@ const TIGER_LOCALE_KEYS = [
   'datePicker',
   'timePicker',
   'formWizard',
+  'tour',
+  'calendar',
+  'fileManager',
+  'imageViewer',
+  'imageEditor',
+  'status',
   'taskBoard',
   'formValidation'
 ]
@@ -104,6 +117,7 @@ export function mergeTigerLocale(
     locale: override?.locale ?? base?.locale,
     direction: override?.direction ?? base?.direction,
     common: { ...base?.common, ...override?.common },
+    empty: { ...base?.empty, ...override?.empty },
     modal: { ...base?.modal, ...override?.modal },
     drawer: { ...base?.drawer, ...override?.drawer },
     qrcode: { ...base?.qrcode, ...override?.qrcode },
@@ -114,6 +128,12 @@ export function mergeTigerLocale(
     datePicker: { ...base?.datePicker, ...override?.datePicker },
     timePicker: { ...base?.timePicker, ...override?.timePicker },
     formWizard: { ...base?.formWizard, ...override?.formWizard },
+    tour: { ...base?.tour, ...override?.tour },
+    calendar: { ...base?.calendar, ...override?.calendar },
+    fileManager: { ...base?.fileManager, ...override?.fileManager },
+    imageViewer: { ...base?.imageViewer, ...override?.imageViewer },
+    imageEditor: { ...base?.imageEditor, ...override?.imageEditor },
+    status: { ...base?.status, ...override?.status },
     taskBoard: { ...base?.taskBoard, ...override?.taskBoard },
     formValidation: { ...base?.formValidation, ...override?.formValidation }
   }
@@ -199,6 +219,85 @@ export const ZH_CN_FORM_WIZARD_LABELS: Required<TigerLocaleFormWizard> = {
   prevText: '上一步',
   nextText: '下一步',
   finishText: '完成'
+}
+
+export const DEFAULT_TOUR_LABELS: Required<TigerLocaleTour> = {
+  prevText: 'Previous',
+  nextText: 'Next',
+  finishText: 'Finish',
+  closeAriaLabel: 'Close tour'
+}
+
+export const ZH_CN_TOUR_LABELS: Required<TigerLocaleTour> = {
+  prevText: '上一步',
+  nextText: '下一步',
+  finishText: '完成',
+  closeAriaLabel: '关闭导览'
+}
+
+export function getTourLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleTour>
+): Required<TigerLocaleTour> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_TOUR_LABELS : DEFAULT_TOUR_LABELS
+  return {
+    prevText:
+      overrides?.prevText ??
+      locale?.tour?.prevText ??
+      locale?.formWizard?.prevText ??
+      defaultLabels.prevText,
+    nextText:
+      overrides?.nextText ??
+      locale?.tour?.nextText ??
+      locale?.formWizard?.nextText ??
+      defaultLabels.nextText,
+    finishText:
+      overrides?.finishText ??
+      locale?.tour?.finishText ??
+      locale?.formWizard?.finishText ??
+      defaultLabels.finishText,
+    closeAriaLabel:
+      overrides?.closeAriaLabel ??
+      locale?.tour?.closeAriaLabel ??
+      locale?.common?.closeText ??
+      defaultLabels.closeAriaLabel
+  }
+}
+
+export const DEFAULT_CALENDAR_LABELS: Required<TigerLocaleCalendar> = {
+  previousMonth: 'Previous month',
+  nextMonth: 'Next month',
+  previousYear: 'Previous year',
+  nextYear: 'Next year',
+  yearSelectAriaLabel: 'Year',
+  monthSelectAriaLabel: 'Month',
+  daySelectAriaLabel: 'Day'
+}
+
+export const ZH_CN_CALENDAR_LABELS: Required<TigerLocaleCalendar> = {
+  previousMonth: '上个月',
+  nextMonth: '下个月',
+  previousYear: '上一年',
+  nextYear: '下一年',
+  yearSelectAriaLabel: '年份',
+  monthSelectAriaLabel: '月份',
+  daySelectAriaLabel: '日期'
+}
+
+export function getCalendarLabels(locale?: Partial<TigerLocale>): Required<TigerLocaleCalendar> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_CALENDAR_LABELS : DEFAULT_CALENDAR_LABELS
+  return {
+    previousMonth: locale?.calendar?.previousMonth ?? defaultLabels.previousMonth,
+    nextMonth: locale?.calendar?.nextMonth ?? defaultLabels.nextMonth,
+    previousYear: locale?.calendar?.previousYear ?? defaultLabels.previousYear,
+    nextYear: locale?.calendar?.nextYear ?? defaultLabels.nextYear,
+    yearSelectAriaLabel: locale?.calendar?.yearSelectAriaLabel ?? defaultLabels.yearSelectAriaLabel,
+    monthSelectAriaLabel:
+      locale?.calendar?.monthSelectAriaLabel ?? defaultLabels.monthSelectAriaLabel,
+    daySelectAriaLabel: locale?.calendar?.daySelectAriaLabel ?? defaultLabels.daySelectAriaLabel
+  }
 }
 
 export function getFormWizardLabels(
@@ -320,7 +419,15 @@ export const DEFAULT_TABLE_LABELS: Required<TigerLocaleTable> = {
   columnSettingsText: 'Column settings',
   columnSettingsAriaLabel: 'Column settings',
   lockColumnAriaLabel: 'Lock column {column}',
-  unlockColumnAriaLabel: 'Unlock column {column}'
+  unlockColumnAriaLabel: 'Unlock column {column}',
+  allText: 'All',
+  filterPlaceholder: 'Filter...',
+  exportCsvText: 'Export CSV',
+  exportExcelText: 'Export Excel',
+  exportCsvAriaLabel: 'Export to CSV',
+  exportExcelAriaLabel: 'Export to Excel',
+  expandRowAriaLabel: 'Expand row',
+  collapseRowAriaLabel: 'Collapse row'
 }
 
 export const ZH_CN_TABLE_LABELS: Required<TigerLocaleTable> = {
@@ -340,7 +447,15 @@ export const ZH_CN_TABLE_LABELS: Required<TigerLocaleTable> = {
   columnSettingsText: '列设置',
   columnSettingsAriaLabel: '列设置',
   lockColumnAriaLabel: '锁定{column}列',
-  unlockColumnAriaLabel: '取消锁定{column}列'
+  unlockColumnAriaLabel: '取消锁定{column}列',
+  allText: '全部',
+  filterPlaceholder: '筛选...',
+  exportCsvText: '导出 CSV',
+  exportExcelText: '导出 Excel',
+  exportCsvAriaLabel: '导出为 CSV',
+  exportExcelAriaLabel: '导出为 Excel',
+  expandRowAriaLabel: '展开行',
+  collapseRowAriaLabel: '收起行'
 }
 
 export function getTableLabels(
@@ -401,7 +516,32 @@ export function getTableLabels(
     unlockColumnAriaLabel:
       overrides?.unlockColumnAriaLabel ??
       locale?.table?.unlockColumnAriaLabel ??
-      defaultLabels.unlockColumnAriaLabel
+      defaultLabels.unlockColumnAriaLabel,
+    allText: overrides?.allText ?? locale?.table?.allText ?? defaultLabels.allText,
+    filterPlaceholder:
+      overrides?.filterPlaceholder ??
+      locale?.table?.filterPlaceholder ??
+      defaultLabels.filterPlaceholder,
+    exportCsvText:
+      overrides?.exportCsvText ?? locale?.table?.exportCsvText ?? defaultLabels.exportCsvText,
+    exportExcelText:
+      overrides?.exportExcelText ?? locale?.table?.exportExcelText ?? defaultLabels.exportExcelText,
+    exportCsvAriaLabel:
+      overrides?.exportCsvAriaLabel ??
+      locale?.table?.exportCsvAriaLabel ??
+      defaultLabels.exportCsvAriaLabel,
+    exportExcelAriaLabel:
+      overrides?.exportExcelAriaLabel ??
+      locale?.table?.exportExcelAriaLabel ??
+      defaultLabels.exportExcelAriaLabel,
+    expandRowAriaLabel:
+      overrides?.expandRowAriaLabel ??
+      locale?.table?.expandRowAriaLabel ??
+      defaultLabels.expandRowAriaLabel,
+    collapseRowAriaLabel:
+      overrides?.collapseRowAriaLabel ??
+      locale?.table?.collapseRowAriaLabel ??
+      defaultLabels.collapseRowAriaLabel
   }
 }
 
@@ -424,6 +564,7 @@ export function formatTableSortByText(template: string, column: string): string 
 export const DEFAULT_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
   emptyColumnText: 'No tasks',
   addCardText: 'Add task',
+  addColumnText: 'Add column',
   wipLimitText: 'WIP limit: {limit}',
   dragHintText: 'Drag to move',
   boardAriaLabel: 'Task Board'
@@ -432,6 +573,7 @@ export const DEFAULT_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
 export const ZH_CN_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
   emptyColumnText: '暂无任务',
   addCardText: '添加任务',
+  addColumnText: '添加列',
   wipLimitText: 'WIP 限制: {limit}',
   dragHintText: '拖拽以移动',
   boardAriaLabel: '任务看板'
@@ -450,12 +592,206 @@ export function getTaskBoardLabels(
       defaultLabels.emptyColumnText,
     addCardText:
       overrides?.addCardText ?? locale?.taskBoard?.addCardText ?? defaultLabels.addCardText,
+    addColumnText:
+      overrides?.addColumnText ?? locale?.taskBoard?.addColumnText ?? defaultLabels.addColumnText,
     wipLimitText:
       overrides?.wipLimitText ?? locale?.taskBoard?.wipLimitText ?? defaultLabels.wipLimitText,
     dragHintText:
       overrides?.dragHintText ?? locale?.taskBoard?.dragHintText ?? defaultLabels.dragHintText,
     boardAriaLabel:
       overrides?.boardAriaLabel ?? locale?.taskBoard?.boardAriaLabel ?? defaultLabels.boardAriaLabel
+  }
+}
+
+export const DEFAULT_FILE_MANAGER_LABELS: Required<TigerLocaleFileManager> = {
+  rootText: 'Root'
+}
+
+export const ZH_CN_FILE_MANAGER_LABELS: Required<TigerLocaleFileManager> = {
+  rootText: '根目录'
+}
+
+export function getFileManagerLabels(
+  locale?: Partial<TigerLocale>
+): Required<TigerLocaleFileManager> {
+  const defaultLabels = locale?.locale?.startsWith('zh')
+    ? ZH_CN_FILE_MANAGER_LABELS
+    : DEFAULT_FILE_MANAGER_LABELS
+  return {
+    rootText: locale?.fileManager?.rootText ?? defaultLabels.rootText
+  }
+}
+
+export const DEFAULT_IMAGE_VIEWER_LABELS: Required<TigerLocaleImageViewer> = {
+  dialogAriaLabel: 'Image viewer',
+  previewDialogAriaLabel: 'Image preview',
+  closeAriaLabel: 'Close',
+  closePreviewAriaLabel: 'Close preview',
+  previousImageAriaLabel: 'Previous image',
+  nextImageAriaLabel: 'Next image',
+  zoomOutAriaLabel: 'Zoom out',
+  resetAriaLabel: 'Reset',
+  zoomInAriaLabel: 'Zoom in',
+  rotateLeftAriaLabel: 'Rotate left',
+  rotateRightAriaLabel: 'Rotate right'
+}
+
+export const ZH_CN_IMAGE_VIEWER_LABELS: Required<TigerLocaleImageViewer> = {
+  dialogAriaLabel: '图片查看器',
+  previewDialogAriaLabel: '图片预览',
+  closeAriaLabel: '关闭',
+  closePreviewAriaLabel: '关闭预览',
+  previousImageAriaLabel: '上一张图片',
+  nextImageAriaLabel: '下一张图片',
+  zoomOutAriaLabel: '缩小',
+  resetAriaLabel: '重置',
+  zoomInAriaLabel: '放大',
+  rotateLeftAriaLabel: '向左旋转',
+  rotateRightAriaLabel: '向右旋转'
+}
+
+export function getImageViewerLabels(
+  locale?: Partial<TigerLocale>
+): Required<TigerLocaleImageViewer> {
+  const defaultLabels = locale?.locale?.startsWith('zh')
+    ? ZH_CN_IMAGE_VIEWER_LABELS
+    : DEFAULT_IMAGE_VIEWER_LABELS
+  return {
+    dialogAriaLabel: locale?.imageViewer?.dialogAriaLabel ?? defaultLabels.dialogAriaLabel,
+    previewDialogAriaLabel:
+      locale?.imageViewer?.previewDialogAriaLabel ?? defaultLabels.previewDialogAriaLabel,
+    closeAriaLabel:
+      locale?.imageViewer?.closeAriaLabel ??
+      locale?.common?.closeText ??
+      defaultLabels.closeAriaLabel,
+    closePreviewAriaLabel:
+      locale?.imageViewer?.closePreviewAriaLabel ?? defaultLabels.closePreviewAriaLabel,
+    previousImageAriaLabel:
+      locale?.imageViewer?.previousImageAriaLabel ?? defaultLabels.previousImageAriaLabel,
+    nextImageAriaLabel: locale?.imageViewer?.nextImageAriaLabel ?? defaultLabels.nextImageAriaLabel,
+    zoomOutAriaLabel: locale?.imageViewer?.zoomOutAriaLabel ?? defaultLabels.zoomOutAriaLabel,
+    resetAriaLabel: locale?.imageViewer?.resetAriaLabel ?? defaultLabels.resetAriaLabel,
+    zoomInAriaLabel: locale?.imageViewer?.zoomInAriaLabel ?? defaultLabels.zoomInAriaLabel,
+    rotateLeftAriaLabel:
+      locale?.imageViewer?.rotateLeftAriaLabel ?? defaultLabels.rotateLeftAriaLabel,
+    rotateRightAriaLabel:
+      locale?.imageViewer?.rotateRightAriaLabel ?? defaultLabels.rotateRightAriaLabel
+  }
+}
+
+export const DEFAULT_IMAGE_EDITOR_LABELS: Required<TigerLocaleImageEditor> = {
+  selectImageText: 'Select image',
+  selectImageAriaLabel: 'Select image to crop and upload',
+  cropModalTitle: 'Crop image',
+  cropCancelText: 'Cancel',
+  cropConfirmText: 'Confirm crop',
+  cropperDialogAriaLabel: 'Image cropper',
+  imageToCropAriaLabel: 'Image to crop',
+  moveCropAreaAriaLabel: 'Move crop area',
+  resizeCropAreaAriaLabel: 'Resize crop area {handle}',
+  loadingCropImageAriaLabel: 'Loading image for cropping',
+  annotationToolbarAriaLabel: 'Annotation tools',
+  annotationEditorAriaLabel: 'Image annotation editor',
+  annotationCanvasAriaLabel: 'Image annotation canvas',
+  loadingAnnotationImageAriaLabel: 'Loading image for annotation',
+  selectToolText: 'Select',
+  rectangleToolText: 'Rectangle',
+  ellipseToolText: 'Ellipse',
+  polygonToolText: 'Polygon',
+  freehandToolText: 'Freehand',
+  deleteText: 'Delete'
+}
+
+export const ZH_CN_IMAGE_EDITOR_LABELS: Required<TigerLocaleImageEditor> = {
+  selectImageText: '选择图片',
+  selectImageAriaLabel: '选择图片进行裁剪并上传',
+  cropModalTitle: '裁剪图片',
+  cropCancelText: '取消',
+  cropConfirmText: '确认裁剪',
+  cropperDialogAriaLabel: '图片裁剪器',
+  imageToCropAriaLabel: '待裁剪图片',
+  moveCropAreaAriaLabel: '移动裁剪区域',
+  resizeCropAreaAriaLabel: '调整裁剪区域 {handle}',
+  loadingCropImageAriaLabel: '正在加载待裁剪图片',
+  annotationToolbarAriaLabel: '标注工具',
+  annotationEditorAriaLabel: '图片标注编辑器',
+  annotationCanvasAriaLabel: '图片标注画布',
+  loadingAnnotationImageAriaLabel: '正在加载待标注图片',
+  selectToolText: '选择',
+  rectangleToolText: '矩形',
+  ellipseToolText: '椭圆',
+  polygonToolText: '多边形',
+  freehandToolText: '自由绘制',
+  deleteText: '删除'
+}
+
+export function getImageEditorLabels(
+  locale?: Partial<TigerLocale>
+): Required<TigerLocaleImageEditor> {
+  const defaultLabels = locale?.locale?.startsWith('zh')
+    ? ZH_CN_IMAGE_EDITOR_LABELS
+    : DEFAULT_IMAGE_EDITOR_LABELS
+  return {
+    selectImageText: locale?.imageEditor?.selectImageText ?? defaultLabels.selectImageText,
+    selectImageAriaLabel:
+      locale?.imageEditor?.selectImageAriaLabel ?? defaultLabels.selectImageAriaLabel,
+    cropModalTitle: locale?.imageEditor?.cropModalTitle ?? defaultLabels.cropModalTitle,
+    cropCancelText:
+      locale?.imageEditor?.cropCancelText ??
+      locale?.common?.cancelText ??
+      defaultLabels.cropCancelText,
+    cropConfirmText:
+      locale?.imageEditor?.cropConfirmText ??
+      locale?.common?.okText ??
+      defaultLabels.cropConfirmText,
+    cropperDialogAriaLabel:
+      locale?.imageEditor?.cropperDialogAriaLabel ?? defaultLabels.cropperDialogAriaLabel,
+    imageToCropAriaLabel:
+      locale?.imageEditor?.imageToCropAriaLabel ?? defaultLabels.imageToCropAriaLabel,
+    moveCropAreaAriaLabel:
+      locale?.imageEditor?.moveCropAreaAriaLabel ?? defaultLabels.moveCropAreaAriaLabel,
+    resizeCropAreaAriaLabel:
+      locale?.imageEditor?.resizeCropAreaAriaLabel ?? defaultLabels.resizeCropAreaAriaLabel,
+    loadingCropImageAriaLabel:
+      locale?.imageEditor?.loadingCropImageAriaLabel ?? defaultLabels.loadingCropImageAriaLabel,
+    annotationToolbarAriaLabel:
+      locale?.imageEditor?.annotationToolbarAriaLabel ?? defaultLabels.annotationToolbarAriaLabel,
+    annotationEditorAriaLabel:
+      locale?.imageEditor?.annotationEditorAriaLabel ?? defaultLabels.annotationEditorAriaLabel,
+    annotationCanvasAriaLabel:
+      locale?.imageEditor?.annotationCanvasAriaLabel ?? defaultLabels.annotationCanvasAriaLabel,
+    loadingAnnotationImageAriaLabel:
+      locale?.imageEditor?.loadingAnnotationImageAriaLabel ??
+      defaultLabels.loadingAnnotationImageAriaLabel,
+    selectToolText: locale?.imageEditor?.selectToolText ?? defaultLabels.selectToolText,
+    rectangleToolText: locale?.imageEditor?.rectangleToolText ?? defaultLabels.rectangleToolText,
+    ellipseToolText: locale?.imageEditor?.ellipseToolText ?? defaultLabels.ellipseToolText,
+    polygonToolText: locale?.imageEditor?.polygonToolText ?? defaultLabels.polygonToolText,
+    freehandToolText: locale?.imageEditor?.freehandToolText ?? defaultLabels.freehandToolText,
+    deleteText: locale?.imageEditor?.deleteText ?? defaultLabels.deleteText
+  }
+}
+
+export const DEFAULT_STATUS_LABELS: Required<TigerLocaleStatus> = {
+  tagCloseAriaLabel: 'Close tag',
+  badgeLabel: 'notification',
+  badgeCountLabel: '{count} notifications'
+}
+
+export const ZH_CN_STATUS_LABELS: Required<TigerLocaleStatus> = {
+  tagCloseAriaLabel: '关闭标签',
+  badgeLabel: '通知',
+  badgeCountLabel: '{count} 条通知'
+}
+
+export function getStatusLabels(locale?: Partial<TigerLocale>): Required<TigerLocaleStatus> {
+  const defaultLabels = locale?.locale?.startsWith('zh')
+    ? ZH_CN_STATUS_LABELS
+    : DEFAULT_STATUS_LABELS
+  return {
+    tagCloseAriaLabel: locale?.status?.tagCloseAriaLabel ?? defaultLabels.tagCloseAriaLabel,
+    badgeLabel: locale?.status?.badgeLabel ?? defaultLabels.badgeLabel,
+    badgeCountLabel: locale?.status?.badgeCountLabel ?? defaultLabels.badgeCountLabel
   }
 }
 

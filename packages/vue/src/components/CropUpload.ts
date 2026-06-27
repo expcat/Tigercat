@@ -11,14 +11,19 @@ import {
   readFileAsDataUrl,
   getCropperResult,
   isActivationKey,
+  getImageEditorLabels,
+  mergeTigerLocale,
   type ImageCropperProps as CoreImageCropperProps,
-  type CropResult
+  type CropResult,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { Modal } from './Modal'
 import { ImageCropper } from './ImageCropper'
 import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueCropUploadProps {
+  locale?: Partial<TigerLocale>
   accept?: string
   disabled?: boolean
   maxSize?: number
@@ -33,6 +38,10 @@ export const CropUpload = defineComponent({
   name: 'TigerCropUpload',
   inheritAttrs: false,
   props: {
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
     accept: { type: String, default: 'image/*' },
     disabled: { type: Boolean, default: false },
     maxSize: { type: Number, default: undefined },
@@ -40,7 +49,7 @@ export const CropUpload = defineComponent({
       type: Object as PropType<Partial<Omit<CoreImageCropperProps, 'src'>>>,
       default: undefined
     },
-    modalTitle: { type: String, default: '裁剪图片' },
+    modalTitle: { type: String, default: undefined },
     modalWidth: { type: Number, default: 520 },
     className: { type: String, default: undefined },
     style: {
@@ -50,6 +59,9 @@ export const CropUpload = defineComponent({
   },
   emits: ['crop-complete', 'error'],
   setup(props, { slots, emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getImageEditorLabels(mergedLocale.value))
     const fileInputRef = ref<HTMLInputElement | null>(null)
     const modalVisible = ref(false)
     const imageSrc = ref('')
@@ -144,7 +156,7 @@ export const CropUpload = defineComponent({
               onClick: handleTriggerClick,
               role: 'button',
               tabindex: props.disabled ? -1 : 0,
-              'aria-label': 'Select image to crop and upload',
+              'aria-label': labels.value.selectImageAriaLabel,
               'aria-disabled': props.disabled ? 'true' : undefined,
               onKeydown: (e: KeyboardEvent) => {
                 if (isActivationKey(e)) {
@@ -164,7 +176,7 @@ export const CropUpload = defineComponent({
               onClick: handleTriggerClick,
               role: 'button',
               tabindex: props.disabled ? -1 : 0,
-              'aria-label': 'Select image to crop and upload',
+              'aria-label': labels.value.selectImageAriaLabel,
               'aria-disabled': props.disabled ? 'true' : undefined,
               onKeydown: (e: KeyboardEvent) => {
                 if (isActivationKey(e)) {
@@ -192,7 +204,7 @@ export const CropUpload = defineComponent({
                   })
                 ]
               ),
-              h('span', null, '选择图片')
+              h('span', null, labels.value.selectImageText)
             ]
           )
 
@@ -202,7 +214,7 @@ export const CropUpload = defineComponent({
         {
           open: modalVisible.value,
           size: 'lg',
-          title: props.modalTitle,
+          title: props.modalTitle ?? labels.value.cropModalTitle,
           closable: true,
           maskClosable: false,
           showDefaultFooter: false,
@@ -217,16 +229,21 @@ export const CropUpload = defineComponent({
               ? h(ImageCropper, {
                   ref: cropperRef,
                   src: imageSrc.value,
+                  locale: props.locale,
                   ...props.cropperProps
                 })
               : null,
           footer: ({ cancel: _cancel }: { cancel: () => void }) =>
             h('div', { class: modalFooterClasses }, [
-              h(Button, { variant: 'secondary', onClick: handleCancel }, { default: () => '取消' }),
+              h(
+                Button,
+                { variant: 'secondary', onClick: handleCancel },
+                { default: () => labels.value.cropCancelText }
+              ),
               h(
                 Button,
                 { onClick: handleConfirm, loading: cropping.value },
-                { default: () => '确认裁剪' }
+                { default: () => labels.value.cropConfirmText }
               )
             ])
         }

@@ -26,9 +26,12 @@ import {
   createPinchState,
   startPinch,
   movePinch,
+  getImageViewerLabels,
+  mergeTigerLocale,
   type ImagePreviewProps as CoreImagePreviewProps
 } from '@expcat/tigercat-core'
 import { useEscapeKey, renderBodyPortal } from '../utils/overlay'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ImagePreviewProps extends CoreImagePreviewProps {
   /**
@@ -67,11 +70,18 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   scaleStep = 0.5,
   minScale = 0.25,
   maxScale = 5,
+  locale,
   onOpenChange,
 
   onCurrentIndexChange,
   onScaleChange
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(() => getImageViewerLabels(mergedLocale), [mergedLocale])
   const isOpen = open ?? false
 
   const [scale, setScale] = useState(1)
@@ -273,7 +283,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       style={{ zIndex }}
       role="dialog"
       aria-modal="true"
-      aria-label="Image preview"
+      aria-label={labels.previewDialogAriaLabel}
       onClick={handleMaskClick}
       onWheel={handleWheel}>
       <div className={imagePreviewMaskClasses} aria-hidden="true" />
@@ -295,7 +305,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       <button
         className={imagePreviewCloseBtnClasses}
         onClick={handleClose}
-        aria-label="Close preview"
+        aria-label={labels.closePreviewAriaLabel}
         type="button">
         <SvgIcon d={previewCloseIconPath} />
       </button>
@@ -304,7 +314,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           className={classNames(imagePreviewNavBtnClasses, 'left-4')}
           onClick={handlePrev}
           disabled={!navState.hasPrev}
-          aria-label="Previous image"
+          aria-label={labels.previousImageAriaLabel}
           type="button">
           <SvgIcon d={prevIconPath} />
         </button>
@@ -314,7 +324,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           className={classNames(imagePreviewNavBtnClasses, 'right-4')}
           onClick={handleNext}
           disabled={!navState.hasNext}
-          aria-label="Next image"
+          aria-label={labels.nextImageAriaLabel}
           type="button">
           <SvgIcon d={nextIconPath} />
         </button>
@@ -323,35 +333,35 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         <button
           className={imagePreviewToolbarBtnClasses}
           onClick={handleZoomOut}
-          aria-label="Zoom out"
+          aria-label={labels.zoomOutAriaLabel}
           type="button">
           <SvgIcon d={zoomOutIconPath} />
         </button>
         <button
           className={imagePreviewToolbarBtnClasses}
           onClick={handleReset}
-          aria-label="Reset"
+          aria-label={labels.resetAriaLabel}
           type="button">
           <SvgIcon d={resetIconPath} />
         </button>
         <button
           className={imagePreviewToolbarBtnClasses}
           onClick={handleZoomIn}
-          aria-label="Zoom in"
+          aria-label={labels.zoomInAriaLabel}
           type="button">
           <SvgIcon d={zoomInIconPath} />
         </button>
         <button
           className={imagePreviewToolbarBtnClasses}
           onClick={handleRotateLeft}
-          aria-label="Rotate left"
+          aria-label={labels.rotateLeftAriaLabel}
           type="button">
           <SvgIcon d={imageViewerIcons.rotateLeft} />
         </button>
         <button
           className={imagePreviewToolbarBtnClasses}
           onClick={handleRotateRight}
-          aria-label="Rotate right"
+          aria-label={labels.rotateRightAriaLabel}
           type="button">
           <SvgIcon d={imageViewerIcons.rotateRight} />
         </button>

@@ -3,10 +3,17 @@
  * @since 0.9.0
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Base ImageViewer props interface
  */
 export interface ImageViewerProps {
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
   /**
    * Array of image URLs to display
    */

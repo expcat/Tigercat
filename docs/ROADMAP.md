@@ -137,6 +137,15 @@ diff gate 显示本任务的 generated references 预期变更。
 
 #### T06 locale namespace rollout
 
+**状态**：已完成（2026-06-27）。本轮扩展 `TigerLocale` 的 empty、tour、
+calendar、fileManager、imageViewer、imageEditor、table、taskBoard、status 等命名空间，
+并将 DatePicker locale labels 收敛到 `datepicker-locales/*` preset；React/Vue
+DatePicker、Calendar、Empty、List、Loading、Tour、AutoComplete、Select、FileManager、
+ImageViewer/ImagePreview/CropUpload/ImageCropper/ImageAnnotation、Table/VirtualTable、
+TaskBoard/Kanban 等目标组件已接入 ConfigProvider merged locale，显式 prop/labels
+仍保持最高优先级。验证已运行目标 core 与 React/Vue 组件 spec、`corepack pnpm api:validate`、
+`corepack pnpm types:check`、`corepack pnpm api:baseline` 与 API baseline diff 检查。
+
 **目标**：按统一规则完成非 P1 的 locale/i18n 扩展：组件接 ConfigProvider merged locale，显式 prop 最高优先级，默认文案沉 core，preset 作为 labels 单一来源。
 
 **来源**：B-1、B-2、C01-4、C02-5、C04-4、C09-3、C09-6、C14-3、C14-6、C16-3、C16-5、C18-3、C19-3、C20-6、C21-5、C23-4、C30-2，及 Calendar locale。

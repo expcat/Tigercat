@@ -2,6 +2,8 @@
  * Tag component types and interfaces
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Tag variant types
  */
@@ -16,6 +18,11 @@ export type TagSize = 'sm' | 'md' | 'lg'
  * Base tag props interface
  */
 export interface TagProps {
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
   /**
    * Tag variant style
    * @default 'default'

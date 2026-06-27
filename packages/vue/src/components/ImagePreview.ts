@@ -35,8 +35,12 @@ import {
   movePan,
   createPinchState,
   startPinch,
-  movePinch
+  movePinch,
+  getImageViewerLabels,
+  mergeTigerLocale,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueImagePreviewProps {
   open?: boolean
@@ -47,6 +51,7 @@ export interface VueImagePreviewProps {
   scaleStep?: number
   minScale?: number
   maxScale?: number
+  locale?: Partial<TigerLocale>
 }
 
 const svgIcon = (d: string, cls = 'w-5 h-5') =>
@@ -80,10 +85,17 @@ export const ImagePreview = defineComponent({
     maskClosable: { type: Boolean, default: true },
     scaleStep: { type: Number, default: 0.5 },
     minScale: { type: Number, default: 0.25 },
-    maxScale: { type: Number, default: 5 }
+    maxScale: { type: Number, default: 5 },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    }
   },
   emits: ['update:open', 'update:currentIndex', 'scale-change'],
   setup(props, { emit }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getImageViewerLabels(mergedLocale.value))
     const scale = ref(1)
     const rotation = ref(0)
     const offsetX = ref(0)
@@ -309,7 +321,7 @@ export const ImagePreview = defineComponent({
         {
           class: imagePreviewCloseBtnClasses,
           onClick: handleClose,
-          'aria-label': 'Close preview',
+          'aria-label': labels.value.closePreviewAriaLabel,
           type: 'button'
         },
         [svgIcon(previewCloseIconPath)]
@@ -321,7 +333,7 @@ export const ImagePreview = defineComponent({
           {
             class: imagePreviewToolbarBtnClasses,
             onClick: handleZoomOut,
-            'aria-label': 'Zoom out',
+            'aria-label': labels.value.zoomOutAriaLabel,
             type: 'button'
           },
           [svgIcon(zoomOutIconPath)]
@@ -331,7 +343,7 @@ export const ImagePreview = defineComponent({
           {
             class: imagePreviewToolbarBtnClasses,
             onClick: handleReset,
-            'aria-label': 'Reset',
+            'aria-label': labels.value.resetAriaLabel,
             type: 'button'
           },
           [svgIcon(resetIconPath)]
@@ -341,7 +353,7 @@ export const ImagePreview = defineComponent({
           {
             class: imagePreviewToolbarBtnClasses,
             onClick: handleZoomIn,
-            'aria-label': 'Zoom in',
+            'aria-label': labels.value.zoomInAriaLabel,
             type: 'button'
           },
           [svgIcon(zoomInIconPath)]
@@ -351,7 +363,7 @@ export const ImagePreview = defineComponent({
           {
             class: imagePreviewToolbarBtnClasses,
             onClick: handleRotateLeft,
-            'aria-label': 'Rotate left',
+            'aria-label': labels.value.rotateLeftAriaLabel,
             type: 'button'
           },
           [svgIcon(imageViewerIcons.rotateLeft)]
@@ -361,7 +373,7 @@ export const ImagePreview = defineComponent({
           {
             class: imagePreviewToolbarBtnClasses,
             onClick: handleRotateRight,
-            'aria-label': 'Rotate right',
+            'aria-label': labels.value.rotateRightAriaLabel,
             type: 'button'
           },
           [svgIcon(imageViewerIcons.rotateRight)]
@@ -379,7 +391,7 @@ export const ImagePreview = defineComponent({
                 class: classNames(imagePreviewNavBtnClasses, 'left-4'),
                 onClick: handlePrev,
                 disabled: !navState.value.hasPrev,
-                'aria-label': 'Previous image',
+                'aria-label': labels.value.previousImageAriaLabel,
                 type: 'button'
               },
               [svgIcon(prevIconPath)]
@@ -394,7 +406,7 @@ export const ImagePreview = defineComponent({
                 class: classNames(imagePreviewNavBtnClasses, 'right-4'),
                 onClick: handleNext,
                 disabled: !navState.value.hasNext,
-                'aria-label': 'Next image',
+                'aria-label': labels.value.nextImageAriaLabel,
                 type: 'button'
               },
               [svgIcon(nextIconPath)]
@@ -408,7 +420,7 @@ export const ImagePreview = defineComponent({
           style: { zIndex: props.zIndex },
           role: 'dialog',
           'aria-modal': 'true',
-          'aria-label': 'Image preview',
+          'aria-label': labels.value.previewDialogAriaLabel,
           onClick: handleMaskClick,
           onWheel: handleWheel
         },

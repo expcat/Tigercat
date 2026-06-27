@@ -3,8 +3,9 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
+import { defineLocale } from '../define-locale'
 
-export const idID: TigerLocale = {
+export const idID: TigerLocale = defineLocale({
   locale: 'id-ID',
   direction: 'ltr',
   common: {
@@ -73,4 +74,4 @@ export const idID: TigerLocale = {
     dragHintText: 'Seret untuk memindahkan',
     boardAriaLabel: 'Papan Tugas'
   }
-}
+})

@@ -187,7 +187,11 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
           {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
         </div>
       )}
-      {loading && <div className={virtualTableLoadingClasses}>Loading...</div>}
+      {loading && (
+        <div className={virtualTableLoadingClasses}>
+          {resolveLocaleText('Loading...', mergedLocale?.common?.loadingText)}
+        </div>
+      )}
     </div>
   )
 }

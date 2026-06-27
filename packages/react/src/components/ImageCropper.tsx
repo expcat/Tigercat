@@ -21,11 +21,14 @@ import {
   resizeCropRect,
   moveCropRect,
   cropCanvas,
+  getImageEditorLabels,
+  mergeTigerLocale,
   type CropRect,
   type CropResult,
   type CropHandle,
   type ImageCropperProps as CoreImageCropperProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ImageCropperProps extends Omit<CoreImageCropperProps, 'className'> {
   className?: string
@@ -54,6 +57,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
       outputType = 'image/png',
       quality = 0.92,
       guides = true,
+      locale,
       className,
       style,
       onCropChange,
@@ -61,6 +65,12 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
     },
     ref
   ) => {
+    const config = useTigerConfig()
+    const mergedLocale = useMemo(
+      () => mergeTigerLocale(config.locale, locale),
+      [config.locale, locale]
+    )
+    const labels = useMemo(() => getImageEditorLabels(mergedLocale), [mergedLocale])
     const containerRef = useRef<HTMLDivElement>(null)
     const imageRef = useRef<HTMLImageElement | null>(null)
     const [imageLoaded, setImageLoaded] = useState(false)
@@ -318,7 +328,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           className={classNames(containerClasses, 'flex items-center justify-center')}
           style={{ ...style, minHeight: '200px' }}
           role="img"
-          aria-label="Loading image for cropping">
+          aria-label={labels.loadingCropImageAriaLabel}>
           <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         </div>
       )
@@ -334,7 +344,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           height: `${displayHeight}px`
         }}
         role="application"
-        aria-label="Image cropper"
+        aria-label={labels.cropperDialogAriaLabel}
         aria-roledescription="image cropper">
         {/* Source image */}
         <img
@@ -342,7 +352,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           className={imageCropperImgClasses}
           style={{ width: `${displayWidth}px`, height: `${displayHeight}px` }}
           draggable={false}
-          alt="Image to crop"
+          alt={labels.imageToCropAriaLabel}
         />
 
         {/* SVG mask with cutout */}
@@ -387,7 +397,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           }}
           role="button"
           tabIndex={0}
-          aria-label="Move crop area"
+          aria-label={labels.moveCropAreaAriaLabel}
           onMouseDown={(e) => handleMouseDown(e, 'move')}
           onTouchStart={(e) => handleTouchStart(e, 'move')}
           onKeyDown={handleMoveKeyDown}
@@ -464,7 +474,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               style={pos}
               role="button"
               tabIndex={0}
-              aria-label={`Resize crop area ${handle}`}
+              aria-label={labels.resizeCropAreaAriaLabel.replace('{handle}', handle)}
               onMouseDown={(e) => handleMouseDown(e, 'resize', handle)}
               onTouchStart={(e) => handleTouchStart(e, 'resize', handle)}
               onKeyDown={(e) => handleResizeKeyDown(e, handle)}

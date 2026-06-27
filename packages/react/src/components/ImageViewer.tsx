@@ -20,10 +20,15 @@ import {
   createPinchState,
   startPinch,
   movePinch,
-  type GestureTransform
+  getImageViewerLabels,
+  mergeTigerLocale,
+  type GestureTransform,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ImageViewerProps {
+  locale?: Partial<TigerLocale>
   images: string[]
   open?: boolean
   currentIndex?: number
@@ -57,6 +62,7 @@ function SvgIcon({ pathD, label }: { pathD: string; label: string }) {
 }
 
 export const ImageViewer: React.FC<ImageViewerProps> = ({
+  locale,
   images,
   open = false,
   currentIndex = 0,
@@ -72,6 +78,12 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   onClose,
   onCurrentIndexChange
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(() => getImageViewerLabels(mergedLocale), [mergedLocale])
   const [index, setIndex] = useState(currentIndex)
   const [transform, setTransform] = useState<GestureTransform>(createDefaultTransform)
   const panRef = useRef(createPanState())
@@ -137,7 +149,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
       className={backdropClasses}
       role="dialog"
       aria-modal="true"
-      aria-label="Image viewer"
+      aria-label={labels.dialogAriaLabel}
       onClick={(e) => {
         if (maskClosable && e.target === e.currentTarget) handleClose()
       }}>
@@ -150,9 +162,9 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
       <button
         className={imageViewerCloseBtnClasses}
         onClick={handleClose}
-        aria-label="Close"
+        aria-label={labels.closeAriaLabel}
         type="button">
-        <SvgIcon pathD={imageViewerIcons.close} label="Close" />
+        <SvgIcon pathD={imageViewerIcons.close} label={labels.closeAriaLabel} />
       </button>
 
       {showNav && images.length > 1 && (
@@ -160,16 +172,16 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
           <button
             className={classNames(imageViewerNavBtnClasses, 'left-4')}
             onClick={handlePrev}
-            aria-label="Previous image"
+            aria-label={labels.previousImageAriaLabel}
             type="button">
-            <SvgIcon pathD={imageViewerIcons.prev} label="Previous" />
+            <SvgIcon pathD={imageViewerIcons.prev} label={labels.previousImageAriaLabel} />
           </button>
           <button
             className={classNames(imageViewerNavBtnClasses, 'right-4')}
             onClick={handleNext}
-            aria-label="Next image"
+            aria-label={labels.nextImageAriaLabel}
             type="button">
-            <SvgIcon pathD={imageViewerIcons.next} label="Next" />
+            <SvgIcon pathD={imageViewerIcons.next} label={labels.nextImageAriaLabel} />
           </button>
         </>
       )}
@@ -258,9 +270,9 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                     scale: clampZoom(t.scale - 0.25, minZoom, maxZoom)
                   }))
                 }
-                aria-label="Zoom out"
+                aria-label={labels.zoomOutAriaLabel}
                 type="button">
-                <SvgIcon pathD={imageViewerIcons.zoomOut} label="Zoom out" />
+                <SvgIcon pathD={imageViewerIcons.zoomOut} label={labels.zoomOutAriaLabel} />
               </button>
               <button
                 className={imageViewerToolbarBtnClasses}
@@ -270,9 +282,9 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                     scale: clampZoom(t.scale + 0.25, minZoom, maxZoom)
                   }))
                 }
-                aria-label="Zoom in"
+                aria-label={labels.zoomInAriaLabel}
                 type="button">
-                <SvgIcon pathD={imageViewerIcons.zoomIn} label="Zoom in" />
+                <SvgIcon pathD={imageViewerIcons.zoomIn} label={labels.zoomInAriaLabel} />
               </button>
             </>
           )}
@@ -283,18 +295,18 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                 onClick={() =>
                   setTransform((t) => ({ ...t, rotation: normalizeRotation(t.rotation - 90) }))
                 }
-                aria-label="Rotate left"
+                aria-label={labels.rotateLeftAriaLabel}
                 type="button">
-                <SvgIcon pathD={imageViewerIcons.rotateLeft} label="Rotate left" />
+                <SvgIcon pathD={imageViewerIcons.rotateLeft} label={labels.rotateLeftAriaLabel} />
               </button>
               <button
                 className={imageViewerToolbarBtnClasses}
                 onClick={() =>
                   setTransform((t) => ({ ...t, rotation: normalizeRotation(t.rotation + 90) }))
                 }
-                aria-label="Rotate right"
+                aria-label={labels.rotateRightAriaLabel}
                 type="button">
-                <SvgIcon pathD={imageViewerIcons.rotateRight} label="Rotate right" />
+                <SvgIcon pathD={imageViewerIcons.rotateRight} label={labels.rotateRightAriaLabel} />
               </button>
             </>
           )}

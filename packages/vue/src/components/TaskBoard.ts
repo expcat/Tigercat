@@ -513,7 +513,7 @@ export const TaskBoard = defineComponent({
                 }
               }
             },
-            '+ ' + resolveLocaleText(labels.value.addCardText)
+            '+ ' + resolveLocaleText(labels.value.addColumnText)
           )
         )
       }

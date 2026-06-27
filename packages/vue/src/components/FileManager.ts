@@ -10,6 +10,7 @@ import {
   sliceBreadcrumbPath,
   toFileDragItem,
   formatFileSizeLabel,
+  getFileManagerLabels,
   fileManagerToolbarClasses,
   fileManagerBreadcrumbClasses,
   fileManagerBreadcrumbItemClasses,
@@ -95,6 +96,7 @@ export const FileManager = defineComponent({
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getFileManagerLabels(mergedLocale.value))
     const localSearch = ref(props.searchText)
 
     const model = computed(() =>
@@ -146,7 +148,7 @@ export const FileManager = defineComponent({
             class: fileManagerBreadcrumbItemClasses,
             onClick: () => navigateToBreadcrumb(0)
           },
-          'Root'
+          labels.value.rootText
         ),
         ...props.currentPath.flatMap((seg, i) => [
           h('span', { class: fileManagerBreadcrumbSeparatorClasses }, '/'),

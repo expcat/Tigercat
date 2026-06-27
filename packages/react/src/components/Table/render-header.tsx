@@ -10,7 +10,8 @@ import {
   formatTableSortByText,
   type RowSelectionConfig,
   type ExpandableConfig,
-  type TableSize
+  type TableSize,
+  type TigerLocaleTable
 } from '@expcat/tigercat-core'
 import { LockIcon, SortIcon } from './icons'
 import type { TableContext } from './types'
@@ -24,6 +25,7 @@ export interface RenderHeaderViewProps {
   columnDraggable: boolean
   lockColumnAriaLabel: string
   unlockColumnAriaLabel: string
+  labels: Required<TigerLocaleTable>
 }
 
 export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps): React.ReactNode {
@@ -35,10 +37,11 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
     columnLockable,
     columnDraggable,
     lockColumnAriaLabel,
-    unlockColumnAriaLabel
+    unlockColumnAriaLabel,
+    labels
   } = view
   const expandHeaderTh = expandable ? (
-    <th className={getExpandIconCellClasses(size)} aria-label="Expand" />
+    <th className={getExpandIconCellClasses(size)} aria-label={labels.expandText} />
   ) : null
   const expandAtStart = expandable?.expandIconPosition !== 'end'
 
@@ -144,7 +147,7 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
                       onChange={(e) => ctx.handleFilter(column.key, e.target.value)}
                       onClick={(e) => e.stopPropagation()}>
-                      <option value="">All</option>
+                      <option value="">{labels.allText}</option>
                       {column.filter.options.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
@@ -155,7 +158,7 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                     <input
                       type="text"
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                      placeholder={column.filter.placeholder || 'Filter...'}
+                      placeholder={column.filter.placeholder || labels.filterPlaceholder}
                       onInput={(e) =>
                         ctx.handleFilter(column.key, (e.target as HTMLInputElement).value)
                       }

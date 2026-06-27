@@ -15,12 +15,17 @@ import {
   resizeCropRect,
   moveCropRect,
   cropCanvas,
+  getImageEditorLabels,
+  mergeTigerLocale,
   type CropRect,
   type CropResult,
-  type CropHandle
+  type CropHandle,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueImageCropperProps {
+  locale?: Partial<TigerLocale>
   src: string
   aspectRatio?: number
   minWidth?: number
@@ -36,6 +41,10 @@ export const ImageCropper = defineComponent({
   name: 'TigerImageCropper',
   inheritAttrs: false,
   props: {
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
     src: { type: String, required: true },
     aspectRatio: { type: Number, default: undefined },
     minWidth: { type: Number, default: 20 },
@@ -54,6 +63,9 @@ export const ImageCropper = defineComponent({
   },
   emits: ['crop-change', 'ready'],
   setup(props, { emit, attrs, expose }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getImageEditorLabels(mergedLocale.value))
     const containerRef = ref<HTMLElement | null>(null)
     const imageRef = ref<HTMLImageElement | null>(null)
     const imageLoaded = ref(false)
@@ -321,7 +333,7 @@ export const ImageCropper = defineComponent({
               minHeight: '200px'
             }),
             role: 'img',
-            'aria-label': 'Loading image for cropping'
+            'aria-label': labels.value.loadingCropImageAriaLabel
           },
           [
             h('div', {
@@ -342,7 +354,7 @@ export const ImageCropper = defineComponent({
           height: `${displayHeight.value}px`
         },
         draggable: false,
-        alt: 'Image to crop'
+        alt: labels.value.imageToCropAriaLabel
       })
 
       // Semi-transparent mask with SVG cutout
@@ -402,7 +414,7 @@ export const ImageCropper = defineComponent({
         },
         role: 'button',
         tabindex: 0,
-        'aria-label': 'Move crop area',
+        'aria-label': labels.value.moveCropAreaAriaLabel,
         onMousedown: (e: MouseEvent) => handleMouseDown(e, 'move'),
         onTouchstart: (e: TouchEvent) => handleTouchStart(e, 'move'),
         onKeydown: handleMoveKeyDown
@@ -481,7 +493,7 @@ export const ImageCropper = defineComponent({
           style: pos,
           role: 'button',
           tabindex: 0,
-          'aria-label': `Resize crop area ${handle}`,
+          'aria-label': labels.value.resizeCropAreaAriaLabel.replace('{handle}', handle),
           onMousedown: (e: MouseEvent) => handleMouseDown(e, 'resize', handle),
           onTouchstart: (e: TouchEvent) => handleTouchStart(e, 'resize', handle),
           onKeydown: (e: KeyboardEvent) => handleResizeKeyDown(e, handle)
@@ -499,7 +511,7 @@ export const ImageCropper = defineComponent({
             height: `${displayHeight.value}px`
           }),
           role: 'application',
-          'aria-label': 'Image cropper',
+          'aria-label': labels.value.cropperDialogAriaLabel,
           'aria-roledescription': 'image cropper'
         },
         [img, mask, selection, dragArea, ...guideLines, ...handles]

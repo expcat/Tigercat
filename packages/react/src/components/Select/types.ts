@@ -78,6 +78,7 @@ export interface SelectContext {
   className?: string
   divProps: Record<string, unknown>
   searchPlaceholder: string
+  clearAriaLabel: string
 
   // derived data
   filteredOptions: SelectOptions

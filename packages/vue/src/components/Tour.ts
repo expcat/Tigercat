@@ -23,9 +23,9 @@ import {
   getActiveTourSteps,
   getCurrentActiveTourStep,
   getActiveTourStepPosition,
+  getTourLabels,
   closeIconPathD,
   mergeTigerLocale,
-  resolveLocaleText,
   type TourStep,
   type TourStepLoader,
   type TourPlacement,
@@ -81,14 +81,12 @@ export const Tour = defineComponent({
   setup(props, { emit }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const nextLabel = computed(() =>
-      resolveLocaleText('Next', props.nextText, mergedLocale.value?.formWizard?.nextText)
-    )
-    const prevLabel = computed(() =>
-      resolveLocaleText('Previous', props.prevText, mergedLocale.value?.formWizard?.prevText)
-    )
-    const finishLabel = computed(() =>
-      resolveLocaleText('Finish', props.finishText, mergedLocale.value?.formWizard?.finishText)
+    const labels = computed(() =>
+      getTourLabels(mergedLocale.value, {
+        nextText: props.nextText,
+        prevText: props.prevText,
+        finishText: props.finishText
+      })
     )
     const internalStep = ref(0)
     const resolvedSteps = ref<TourStep[]>(props.steps)
@@ -248,7 +246,7 @@ export const Tour = defineComponent({
             {
               class: tourCloseButtonClasses,
               type: 'button',
-              'aria-label': 'Close tour',
+              'aria-label': labels.value.closeAriaLabel,
               onClick: close
             },
             createStatusIcon(closeIconPathD, 'h-4 w-4')
@@ -286,7 +284,7 @@ export const Tour = defineComponent({
                 'px-3 py-1.5 text-sm rounded-md border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors mr-2',
               onClick: prev
             },
-            prevLabel.value
+            labels.value.prevText
           )
         )
       }
@@ -299,7 +297,7 @@ export const Tour = defineComponent({
               'px-3 py-1.5 text-sm rounded-md bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] transition-colors',
             onClick: next
           },
-          isLast ? finishLabel.value : nextLabel.value
+          isLast ? labels.value.finishText : labels.value.nextText
         )
       )
 

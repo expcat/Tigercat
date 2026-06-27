@@ -17,6 +17,13 @@ export interface TigerLocaleCommon {
   clearText?: string
 }
 
+export interface TigerLocaleEmpty {
+  noData?: string
+  noDataAvailable?: string
+  noResults?: string
+  error?: string
+}
+
 export interface TigerLocaleModal {
   closeAriaLabel?: string
   okText?: string
@@ -113,12 +120,84 @@ export interface TigerLocaleTable {
   lockColumnAriaLabel?: string
   /** Unlock-column button aria-label. Template: supports {column} */
   unlockColumnAriaLabel?: string
+  allText?: string
+  filterPlaceholder?: string
+  exportCsvText?: string
+  exportExcelText?: string
+  exportCsvAriaLabel?: string
+  exportExcelAriaLabel?: string
+  expandRowAriaLabel?: string
+  collapseRowAriaLabel?: string
 }
 
 export interface TigerLocaleFormWizard {
   prevText?: string
   nextText?: string
   finishText?: string
+}
+
+export interface TigerLocaleTour {
+  prevText?: string
+  nextText?: string
+  finishText?: string
+  closeAriaLabel?: string
+}
+
+export interface TigerLocaleCalendar {
+  previousMonth?: string
+  nextMonth?: string
+  previousYear?: string
+  nextYear?: string
+  yearSelectAriaLabel?: string
+  monthSelectAriaLabel?: string
+  daySelectAriaLabel?: string
+}
+
+export interface TigerLocaleFileManager {
+  rootText?: string
+}
+
+export interface TigerLocaleImageViewer {
+  dialogAriaLabel?: string
+  previewDialogAriaLabel?: string
+  closeAriaLabel?: string
+  closePreviewAriaLabel?: string
+  previousImageAriaLabel?: string
+  nextImageAriaLabel?: string
+  zoomOutAriaLabel?: string
+  resetAriaLabel?: string
+  zoomInAriaLabel?: string
+  rotateLeftAriaLabel?: string
+  rotateRightAriaLabel?: string
+}
+
+export interface TigerLocaleImageEditor {
+  selectImageText?: string
+  selectImageAriaLabel?: string
+  cropModalTitle?: string
+  cropCancelText?: string
+  cropConfirmText?: string
+  cropperDialogAriaLabel?: string
+  imageToCropAriaLabel?: string
+  moveCropAreaAriaLabel?: string
+  resizeCropAreaAriaLabel?: string
+  loadingCropImageAriaLabel?: string
+  annotationToolbarAriaLabel?: string
+  annotationEditorAriaLabel?: string
+  annotationCanvasAriaLabel?: string
+  loadingAnnotationImageAriaLabel?: string
+  selectToolText?: string
+  rectangleToolText?: string
+  ellipseToolText?: string
+  polygonToolText?: string
+  freehandToolText?: string
+  deleteText?: string
+}
+
+export interface TigerLocaleStatus {
+  tagCloseAriaLabel?: string
+  badgeLabel?: string
+  badgeCountLabel?: string
 }
 
 export type TigerLocaleTimePicker = Partial<TimePickerLabels>
@@ -128,6 +207,8 @@ export interface TigerLocaleTaskBoard {
   emptyColumnText?: string
   /** Label for the add-card button */
   addCardText?: string
+  /** Label for the add-column button */
+  addColumnText?: string
   /** Template: supports {limit} */
   wipLimitText?: string
   /** Aria hint for draggable items */
@@ -184,6 +265,7 @@ export interface TigerLocale {
   /** Text/layout direction. RTL locales should set this to `rtl`. */
   direction?: TigerLocaleDirection
   common?: TigerLocaleCommon
+  empty?: TigerLocaleEmpty
   modal?: TigerLocaleModal
   drawer?: TigerLocaleDrawer
   qrcode?: TigerLocaleQRCode
@@ -194,6 +276,12 @@ export interface TigerLocale {
   datePicker?: Partial<DatePickerLocalePreset>
   timePicker?: TigerLocaleTimePicker
   formWizard?: TigerLocaleFormWizard
+  tour?: TigerLocaleTour
+  calendar?: TigerLocaleCalendar
+  fileManager?: TigerLocaleFileManager
+  imageViewer?: TigerLocaleImageViewer
+  imageEditor?: TigerLocaleImageEditor
+  status?: TigerLocaleStatus
   taskBoard?: TigerLocaleTaskBoard
   formValidation?: TigerLocaleFormValidation
 }

@@ -21,7 +21,7 @@ import {
   createPinchState,
   startPinch,
   movePinch,
-  resolveLocaleText,
+  getImageViewerLabels,
   mergeTigerLocale,
   type GestureTransform,
   type TigerLocale
@@ -40,6 +40,7 @@ export interface VueImageViewerProps {
   minZoom?: number
   maxZoom?: number
   className?: string
+  locale?: Partial<TigerLocale>
 }
 
 function createSvgIcon(pathD: string, label: string) {
@@ -116,9 +117,7 @@ export const ImageViewer = defineComponent({
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const closeText = computed(() =>
-      resolveLocaleText('Close', mergedLocale.value?.common?.closeText)
-    )
+    const labels = computed(() => getImageViewerLabels(mergedLocale.value))
     const index = ref(props.currentIndex)
     const transform = ref<GestureTransform>(createDefaultTransform())
     let panState = createPanState()
@@ -298,10 +297,10 @@ export const ImageViewer = defineComponent({
           {
             class: imageViewerCloseBtnClasses,
             onClick: handleClose,
-            'aria-label': closeText.value,
+            'aria-label': labels.value.closeAriaLabel,
             type: 'button'
           },
-          createSvgIcon(imageViewerIcons.close, closeText.value)
+          createSvgIcon(imageViewerIcons.close, labels.value.closeAriaLabel)
         )
       )
 
@@ -313,20 +312,20 @@ export const ImageViewer = defineComponent({
             {
               class: classNames(imageViewerNavBtnClasses, 'left-4'),
               onClick: handlePrev,
-              'aria-label': 'Previous image',
+              'aria-label': labels.value.previousImageAriaLabel,
               type: 'button'
             },
-            createSvgIcon(imageViewerIcons.prev, 'Previous')
+            createSvgIcon(imageViewerIcons.prev, labels.value.previousImageAriaLabel)
           ),
           h(
             'button',
             {
               class: classNames(imageViewerNavBtnClasses, 'right-4'),
               onClick: handleNext,
-              'aria-label': 'Next image',
+              'aria-label': labels.value.nextImageAriaLabel,
               type: 'button'
             },
-            createSvgIcon(imageViewerIcons.next, 'Next')
+            createSvgIcon(imageViewerIcons.next, labels.value.nextImageAriaLabel)
           )
         )
       }
@@ -362,20 +361,20 @@ export const ImageViewer = defineComponent({
             {
               class: imageViewerToolbarBtnClasses,
               onClick: handleZoomOut,
-              'aria-label': 'Zoom out',
+              'aria-label': labels.value.zoomOutAriaLabel,
               type: 'button'
             },
-            createSvgIcon(imageViewerIcons.zoomOut, 'Zoom out')
+            createSvgIcon(imageViewerIcons.zoomOut, labels.value.zoomOutAriaLabel)
           ),
           h(
             'button',
             {
               class: imageViewerToolbarBtnClasses,
               onClick: handleZoomIn,
-              'aria-label': 'Zoom in',
+              'aria-label': labels.value.zoomInAriaLabel,
               type: 'button'
             },
-            createSvgIcon(imageViewerIcons.zoomIn, 'Zoom in')
+            createSvgIcon(imageViewerIcons.zoomIn, labels.value.zoomInAriaLabel)
           )
         )
       }
@@ -386,20 +385,20 @@ export const ImageViewer = defineComponent({
             {
               class: imageViewerToolbarBtnClasses,
               onClick: handleRotateLeft,
-              'aria-label': 'Rotate left',
+              'aria-label': labels.value.rotateLeftAriaLabel,
               type: 'button'
             },
-            createSvgIcon(imageViewerIcons.rotateLeft, 'Rotate left')
+            createSvgIcon(imageViewerIcons.rotateLeft, labels.value.rotateLeftAriaLabel)
           ),
           h(
             'button',
             {
               class: imageViewerToolbarBtnClasses,
               onClick: handleRotateRight,
-              'aria-label': 'Rotate right',
+              'aria-label': labels.value.rotateRightAriaLabel,
               type: 'button'
             },
-            createSvgIcon(imageViewerIcons.rotateRight, 'Rotate right')
+            createSvgIcon(imageViewerIcons.rotateRight, labels.value.rotateRightAriaLabel)
           )
         )
       }
@@ -418,7 +417,7 @@ export const ImageViewer = defineComponent({
           ),
           role: 'dialog',
           'aria-modal': 'true',
-          'aria-label': 'Image viewer',
+          'aria-label': labels.value.dialogAriaLabel,
           onClick: (e: MouseEvent) => {
             if (props.maskClosable && e.target === e.currentTarget) {
               handleClose()

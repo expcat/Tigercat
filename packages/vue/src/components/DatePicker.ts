@@ -38,22 +38,32 @@ import {
   getDatePickerLocaleCode,
   getDatePickerLabels,
   getLocaleDirection,
+  mergeTigerLocale,
   type DatePickerSize,
   type DateFormat,
   type DatePickerModelValue,
   type DatePickerRangeModelValue,
   type DatePickerLocaleInput,
   type DatePickerLabels,
+  type TigerLocale,
   type DatePickerShortcut
 } from '@expcat/tigercat-core'
 
 import { createFilledIcon } from '../utils/icon-helpers'
+import { useTigerConfig } from './ConfigProvider'
 
 // Icons
 const CalendarIcon = createFilledIcon(CalendarIconPath, 'w-5 h-5')
 const CloseIcon = createFilledIcon(CloseIconPath, 'w-4 h-4')
 const ChevronLeftIcon = createFilledIcon(ChevronLeftIconPath, 'w-5 h-5')
 const ChevronRightIcon = createFilledIcon(ChevronRightIconPath, 'w-5 h-5')
+
+function normalizeDatePickerLocale(locale?: DatePickerLocaleInput): Partial<TigerLocale> | undefined {
+  if (!locale) return undefined
+  if (typeof locale === 'string') return { locale }
+  if ('datePicker' in locale) return locale as Partial<TigerLocale>
+  return { locale: locale.locale, datePicker: locale }
+}
 
 export type VueDatePickerModelValue = DatePickerModelValue
 
@@ -253,6 +263,7 @@ export const DatePicker = defineComponent({
     clear: () => true
   },
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
     const isOpen = ref(false)
     const calendarRef = ref<HTMLElement | null>(null)
     const mobileCalendarRef = ref<HTMLElement | null>(null)
@@ -279,7 +290,10 @@ export const DatePicker = defineComponent({
     })
     const minDateParsed = computed(() => parseDate(props.minDate))
     const maxDateParsed = computed(() => parseDate(props.maxDate))
-    const localeCode = computed(() => getDatePickerLocaleCode(props.locale))
+    const mergedLocale = computed(() =>
+      mergeTigerLocale(config.value.locale, normalizeDatePickerLocale(props.locale))
+    )
+    const localeCode = computed(() => getDatePickerLocaleCode(mergedLocale.value))
 
     // Current viewing month/year in calendar
     const viewingMonth = ref(
@@ -325,7 +339,7 @@ export const DatePicker = defineComponent({
     const previousMonthIcon = computed(() => (isRtl.value ? ChevronRightIcon : ChevronLeftIcon))
     const nextMonthIcon = computed(() => (isRtl.value ? ChevronLeftIcon : ChevronRightIcon))
 
-    const labels = computed(() => getDatePickerLabels(props.locale, props.labels))
+    const labels = computed(() => getDatePickerLabels(mergedLocale.value, props.labels))
 
     const mobileDate = computed(() => {
       if (!isRangeMode.value) return selectedDate.value ?? normalizeDate(new Date())

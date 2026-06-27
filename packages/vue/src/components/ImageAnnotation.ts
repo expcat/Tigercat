@@ -11,7 +11,7 @@ import {
   getImageAnnotationShapeAriaLabel,
   getImageAnnotationStrokeColor,
   getImageAnnotationToolButtonClasses,
-  getImageAnnotationToolLabel,
+  getImageEditorLabels,
   imageAnnotationContainerClasses,
   imageAnnotationDeleteButtonClasses,
   imageAnnotationImageClasses,
@@ -21,15 +21,19 @@ import {
   imageAnnotationStageClasses,
   imageAnnotationToolbarClasses,
   isBrowser,
+  mergeTigerLocale,
   mergeStyleValues,
   shouldCommitImageAnnotationBox,
   type ImageAnnotation as CoreImageAnnotation,
   type ImageAnnotationChangeMeta,
   type ImageAnnotationPoint,
-  type ImageAnnotationTool
+  type ImageAnnotationTool,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueImageAnnotationProps {
+  locale?: Partial<TigerLocale>
   src: string
   alt?: string
   modelValue?: CoreImageAnnotation[]
@@ -58,6 +62,10 @@ export const ImageAnnotation = defineComponent({
   name: 'TigerImageAnnotation',
   inheritAttrs: false,
   props: {
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
     src: { type: String, required: true },
     alt: { type: String, default: 'Image to annotate' },
     modelValue: { type: Array as PropType<CoreImageAnnotation[]>, default: undefined },
@@ -86,6 +94,16 @@ export const ImageAnnotation = defineComponent({
   },
   emits: ['update:modelValue', 'change', 'select', 'tool-change', 'ready'],
   setup(props, { attrs, emit }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getImageEditorLabels(mergedLocale.value))
+    const toolLabels = computed<Record<ImageAnnotationTool, string>>(() => ({
+      select: labels.value.selectToolText,
+      rectangle: labels.value.rectangleToolText,
+      ellipse: labels.value.ellipseToolText,
+      polygon: labels.value.polygonToolText,
+      freehand: labels.value.freehandToolText
+    }))
     const containerRef = ref<HTMLElement | null>(null)
     const overlayRef = ref<SVGSVGElement | null>(null)
     const idSeed = ref(0)
@@ -347,7 +365,10 @@ export const ImageAnnotation = defineComponent({
 
       const toolbar = h(
         'div',
-        { class: imageAnnotationToolbarClasses, 'aria-label': 'Annotation tools' },
+        {
+          class: imageAnnotationToolbarClasses,
+          'aria-label': labels.value.annotationToolbarAriaLabel
+        },
         [
           ...props.tools.map((item) =>
             h(
@@ -360,7 +381,7 @@ export const ImageAnnotation = defineComponent({
                 'aria-pressed': activeTool.value === item,
                 onClick: () => setActiveTool(item)
               },
-              getImageAnnotationToolLabel(item)
+              toolLabels.value[item]
             )
           ),
           h(
@@ -371,7 +392,7 @@ export const ImageAnnotation = defineComponent({
               disabled: !canEdit.value || !activeSelectedId.value,
               onClick: removeSelectedAnnotation
             },
-            'Delete'
+            labels.value.deleteText
           )
         ]
       )
@@ -405,7 +426,7 @@ export const ImageAnnotation = defineComponent({
                 width: displayWidth.value,
                 height: displayHeight.value,
                 viewBox: `0 0 ${displayWidth.value} ${displayHeight.value}`,
-                'aria-label': 'Image annotation canvas',
+                'aria-label': labels.value.annotationCanvasAriaLabel,
                 onMousedown: handleStageMouseDown,
                 onClick: handleStageClick,
                 onDblclick: commitPolygon
@@ -458,8 +479,8 @@ export const ImageAnnotation = defineComponent({
               style: imageLoaded.value ? { width: `${displayWidth.value}px` } : undefined,
               role: imageLoaded.value ? 'application' : 'img',
               'aria-label': imageLoaded.value
-                ? 'Image annotation editor'
-                : 'Loading image for annotation'
+                ? labels.value.annotationEditorAriaLabel
+                : labels.value.loadingAnnotationImageAriaLabel
             },
             stageChildren
           )

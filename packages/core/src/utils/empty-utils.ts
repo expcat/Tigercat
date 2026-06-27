@@ -4,6 +4,7 @@
  */
 
 import type { EmptyPreset } from '../types/empty'
+import type { TigerLocale } from '../types/locale'
 
 // ---------------------------------------------------------------------------
 // Layout classes
@@ -33,8 +34,19 @@ const presetDescriptions: Record<EmptyPreset, string> = {
   error: 'Something went wrong'
 }
 
-export function getEmptyDescription(preset: EmptyPreset): string {
-  return presetDescriptions[preset]
+export function getEmptyDescription(preset: EmptyPreset, locale?: Partial<TigerLocale>): string {
+  switch (preset) {
+    case 'no-data':
+      return locale?.empty?.noDataAvailable ?? presetDescriptions[preset]
+    case 'no-results':
+      return locale?.empty?.noResults ?? presetDescriptions[preset]
+    case 'error':
+      return locale?.empty?.error ?? presetDescriptions[preset]
+    case 'default':
+    case 'simple':
+    default:
+      return locale?.empty?.noData ?? locale?.common?.emptyText ?? presetDescriptions[preset]
+  }
 }
 
 // ---------------------------------------------------------------------------

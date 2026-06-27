@@ -10,7 +10,7 @@ import {
   getImageAnnotationShapeAriaLabel,
   getImageAnnotationStrokeColor,
   getImageAnnotationToolButtonClasses,
-  getImageAnnotationToolLabel,
+  getImageEditorLabels,
   imageAnnotationContainerClasses,
   imageAnnotationDeleteButtonClasses,
   imageAnnotationImageClasses,
@@ -20,12 +20,14 @@ import {
   imageAnnotationStageClasses,
   imageAnnotationToolbarClasses,
   shouldCommitImageAnnotationBox,
+  mergeTigerLocale,
   type ImageAnnotation as CoreImageAnnotation,
   type ImageAnnotationChangeMeta,
   type ImageAnnotationPoint,
   type ImageAnnotationProps as CoreImageAnnotationProps,
   type ImageAnnotationTool
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ImageAnnotationProps extends Omit<
   CoreImageAnnotationProps,
@@ -48,6 +50,7 @@ interface DrawingState {
 }
 
 export function ImageAnnotation({
+  locale,
   src,
   alt = 'Image to annotate',
   value,
@@ -69,6 +72,22 @@ export function ImageAnnotation({
   onToolChange,
   onReady
 }: ImageAnnotationProps): React.ReactElement {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(() => getImageEditorLabels(mergedLocale), [mergedLocale])
+  const toolLabels = useMemo<Record<ImageAnnotationTool, string>>(
+    () => ({
+      select: labels.selectToolText,
+      rectangle: labels.rectangleToolText,
+      ellipse: labels.ellipseToolText,
+      polygon: labels.polygonToolText,
+      freehand: labels.freehandToolText
+    }),
+    [labels]
+  )
   const containerRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<SVGSVGElement>(null)
   const idSeedRef = useRef(0)
@@ -355,7 +374,7 @@ export function ImageAnnotation({
 
   return (
     <div className={containerClasses} style={style} onKeyDown={handleKeyDown}>
-      <div className={imageAnnotationToolbarClasses} aria-label="Annotation tools">
+      <div className={imageAnnotationToolbarClasses} aria-label={labels.annotationToolbarAriaLabel}>
         {tools.map((item) => (
           <button
             key={item}
@@ -364,7 +383,7 @@ export function ImageAnnotation({
             disabled={disabled || readonly}
             aria-pressed={activeTool === item}
             onClick={() => setActiveTool(item)}>
-            {getImageAnnotationToolLabel(item)}
+            {toolLabels[item]}
           </button>
         ))}
         <button
@@ -372,7 +391,7 @@ export function ImageAnnotation({
           className={imageAnnotationDeleteButtonClasses}
           disabled={!canEdit || !activeSelectedId}
           onClick={removeSelectedAnnotation}>
-          Delete
+          {labels.deleteText}
         </button>
       </div>
 
@@ -381,7 +400,9 @@ export function ImageAnnotation({
         className={imageAnnotationStageClasses}
         style={{ width: imageLoaded ? `${displayWidth}px` : undefined }}
         role={imageLoaded ? 'application' : 'img'}
-        aria-label={imageLoaded ? 'Image annotation editor' : 'Loading image for annotation'}>
+        aria-label={
+          imageLoaded ? labels.annotationEditorAriaLabel : labels.loadingAnnotationImageAriaLabel
+        }>
         {!imageLoaded ? (
           <div className="flex min-h-[200px] min-w-[240px] items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--tiger-border,#d1d5db)] border-t-[var(--tiger-primary,#2563eb)]" />
@@ -404,7 +425,7 @@ export function ImageAnnotation({
               width={displayWidth}
               height={displayHeight}
               viewBox={`0 0 ${displayWidth} ${displayHeight}`}
-              aria-label="Image annotation canvas"
+              aria-label={labels.annotationCanvasAriaLabel}
               onMouseDown={handleStageMouseDown}
               onClick={handleStageClick}
               onDoubleClick={commitPolygon}>

@@ -8,14 +8,23 @@ import {
   readFileAsDataUrl,
   getCropperResult,
   isActivationKey,
+  getImageEditorLabels,
+  mergeTigerLocale,
   type ImageCropperProps as CoreImageCropperProps,
-  type CropResult
+  type CropResult,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { Modal } from './Modal'
 import { ImageCropper, type ImageCropperRef } from './ImageCropper'
 import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface CropUploadProps {
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
   /**
    * Accepted file types
    * @default 'image/*'
@@ -36,7 +45,7 @@ export interface CropUploadProps {
   cropperProps?: Partial<Omit<CoreImageCropperProps, 'src'>>
   /**
    * Title for the crop modal
-   * @default '裁剪图片'
+   * @default locale.imageEditor.cropModalTitle
    */
   modalTitle?: string
   /**
@@ -63,17 +72,24 @@ export interface CropUploadProps {
 }
 
 export const CropUpload: React.FC<CropUploadProps> = ({
+  locale,
   accept = 'image/*',
   disabled = false,
   maxSize,
   cropperProps,
-  modalTitle = '裁剪图片',
+  modalTitle,
   modalWidth: _modalWidth = 520,
   className,
   children,
   onCropComplete,
   onError
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(() => getImageEditorLabels(mergedLocale), [mergedLocale])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cropperRef = useRef<ImageCropperRef>(null)
   const [modalVisible, setModalVisible] = useState(false)
@@ -161,7 +177,7 @@ export const CropUpload: React.FC<CropUploadProps> = ({
         onClick={handleTriggerClick}
         role="button"
         tabIndex={disabled ? -1 : 0}
-        aria-label="Select image to crop and upload"
+        aria-label={labels.selectImageAriaLabel}
         aria-disabled={disabled ? 'true' : undefined}
         onKeyDown={handleKeyDown}>
         {children || (
@@ -179,14 +195,14 @@ export const CropUpload: React.FC<CropUploadProps> = ({
                 d={uploadPlusIconPath}
               />
             </svg>
-            <span>选择图片</span>
+            <span>{labels.selectImageText}</span>
           </>
         )}
       </div>
       <Modal
         open={modalVisible}
         size="lg"
-        title={modalTitle}
+        title={modalTitle ?? labels.cropModalTitle}
         className="tiger-crop-upload-modal"
         closable
         maskClosable={false}
@@ -194,14 +210,16 @@ export const CropUpload: React.FC<CropUploadProps> = ({
         footer={
           <div className="flex items-center justify-end gap-3">
             <Button variant="secondary" onClick={handleCancel}>
-              取消
+              {labels.cropCancelText}
             </Button>
             <Button onClick={handleConfirm} loading={cropping}>
-              确认裁剪
+              {labels.cropConfirmText}
             </Button>
           </div>
         }>
-        {imageSrc && <ImageCropper ref={cropperRef} src={imageSrc} {...cropperProps} />}
+        {imageSrc && (
+          <ImageCropper ref={cropperRef} src={imageSrc} locale={locale} {...cropperProps} />
+        )}
       </Modal>
     </div>
   )

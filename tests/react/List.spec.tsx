@@ -62,7 +62,7 @@ describe('List', () => {
       />
     )
 
-    await fireEvent.click(screen.getByText('Next'))
+    await fireEvent.click(screen.getByText('Next page'))
     expect(onPageChange).toHaveBeenCalledWith({ current: 2, pageSize: 10 })
   })
 

@@ -2,6 +2,8 @@
  * Image component types and interfaces
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Image object-fit types
  */
@@ -135,6 +137,11 @@ export interface ImageProps {
  */
 export interface ImagePreviewProps {
   /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
+  /**
    * Whether the preview is open
    * @since 0.9.0
    */
@@ -198,6 +205,11 @@ export interface ImageGroupProps {
  */
 export interface ImageCropperProps {
   /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
+  /**
    * Image source URL to crop
    */
   src: string
@@ -248,6 +260,11 @@ export interface ImageCropperProps {
  * CropUpload component props
  */
 export interface CropUploadProps {
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
   /**
    * Accepted file types
    * @default 'image/*'

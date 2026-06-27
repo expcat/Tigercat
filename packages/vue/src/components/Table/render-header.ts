@@ -25,7 +25,7 @@ export function renderTableHeader(
   const expandHeaderTh = props.expandable
     ? h('th', {
         class: getExpandIconCellClasses(props.size),
-        'aria-label': 'Expand'
+        'aria-label': labels.expandText
       })
     : null
 
@@ -166,7 +166,7 @@ export function renderTableHeader(
                           onClick: (e: Event) => e.stopPropagation()
                         },
                         [
-                          h('option', { value: '' }, 'All'),
+                          h('option', { value: '' }, labels.allText),
                           ...column.filter.options.map((opt) =>
                             h('option', { value: opt.value }, opt.label)
                           )
@@ -175,7 +175,7 @@ export function renderTableHeader(
                     : h('input', {
                         type: 'text',
                         class: 'w-full px-2 py-1 text-sm border border-gray-300 rounded',
-                        placeholder: column.filter.placeholder || 'Filter...',
+                        placeholder: column.filter.placeholder || labels.filterPlaceholder,
                         onInput: (e: Event) =>
                           ctx.handleFilter(column.key, (e.target as HTMLInputElement).value),
                         onClick: (e: Event) => e.stopPropagation()

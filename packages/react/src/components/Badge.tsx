@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   classNames,
   getBadgeVariantClasses,
@@ -10,8 +10,11 @@ import {
   badgePositionClasses,
   formatBadgeContent,
   shouldHideBadge,
+  getStatusLabels,
+  mergeTigerLocale,
   type BadgeProps as CoreBadgeProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export type BadgeProps = CoreBadgeProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, 'children' | 'content'> & {
@@ -20,6 +23,7 @@ export type BadgeProps = CoreBadgeProps &
 
 export const Badge: React.FC<BadgeProps> = React.memo(
   ({
+    locale,
     variant = 'danger',
     size = 'md',
     type = 'number',
@@ -33,6 +37,11 @@ export const Badge: React.FC<BadgeProps> = React.memo(
     ['aria-label']: ariaLabelProp,
     ...props
   }) => {
+    const config = useTigerConfig()
+    const labels = useMemo(
+      () => getStatusLabels(mergeTigerLocale(config.locale, locale)),
+      [config.locale, locale]
+    )
     const isDot = type === 'dot'
     const isHidden = shouldHideBadge(content, type, showZero)
     const displayContent = formatBadgeContent(content, max, showZero)
@@ -49,9 +58,9 @@ export const Badge: React.FC<BadgeProps> = React.memo(
     const computedAriaLabel =
       ariaLabelProp ??
       (isDot
-        ? 'notification'
+        ? labels.badgeLabel
         : type === 'number'
-          ? `${displayContent} notifications`
+          ? labels.badgeCountLabel.replace('{count}', String(displayContent))
           : `${displayContent ?? ''}`)
 
     if (isHidden) {

@@ -42,6 +42,9 @@ import {
   getSimplePaginationButtonClasses,
   getSimplePaginationPageIndicatorClasses,
   getSimplePaginationButtonsWrapperClasses,
+  getPaginationLabels,
+  formatPaginationTotal,
+  formatPaginationPageIndicator,
   type ListSize,
   type ListBorderStyle,
   type ListItemLayout,
@@ -516,6 +519,8 @@ export const List = defineComponent({
       const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo.value
       const total = props.dataSource.length
       const paginationConfig = props.pagination as ListPaginationConfig
+      const paginationLabels = getPaginationLabels(mergedLocale.value)
+      const localeCode = mergedLocale.value?.locale
 
       return h('div', { class: getSimplePaginationContainerClasses() }, [
         // Total info
@@ -525,7 +530,12 @@ export const List = defineComponent({
             { class: getSimplePaginationTotalClasses() },
             paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
-              : `Showing ${startIndex} to ${endIndex} of ${total} items`
+              : formatPaginationTotal(
+                  paginationLabels.totalText,
+                  total,
+                  [startIndex, endIndex],
+                  localeCode
+                )
           ),
 
         // Pagination controls
@@ -541,7 +551,7 @@ export const List = defineComponent({
                   handlePageSizeChange(Number((e.target as HTMLSelectElement).value))
               },
               (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) =>
-                h('option', { value: size }, `${size} / page`)
+                h('option', { value: size }, `${size} ${paginationLabels.itemsPerPageText}`)
               )
             ),
 
@@ -555,14 +565,19 @@ export const List = defineComponent({
                 disabled: !hasPrev,
                 onClick: () => handlePageChange(currentPage.value - 1)
               },
-              'Previous'
+              paginationLabels.prevPageAriaLabel
             ),
 
             // Current page indicator
             h(
               'span',
               { class: getSimplePaginationPageIndicatorClasses() },
-              `Page ${currentPage.value} of ${totalPages}`
+              formatPaginationPageIndicator(
+                paginationLabels.pageIndicatorText,
+                currentPage.value,
+                totalPages,
+                localeCode
+              )
             ),
 
             // Next button
@@ -573,7 +588,7 @@ export const List = defineComponent({
                 disabled: !hasNext,
                 onClick: () => handlePageChange(currentPage.value + 1)
               },
-              'Next'
+              paginationLabels.nextPageAriaLabel
             )
           ])
         ])

@@ -15,11 +15,15 @@ import {
   getDatePickerLocaleCode,
   getDatePickerLabels,
   getLocaleDirection,
+  mergeTigerLocale,
   type DatePickerRangeValue,
   type DatePickerRangeModelValue,
+  type DatePickerLocaleInput,
+  type TigerLocale,
   type DatePickerShortcut
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../../hooks/useControlledState'
+import { useTigerConfig } from '../ConfigProvider'
 import {
   isRangeDatePicker,
   type DatePickerContext,
@@ -28,7 +32,15 @@ import {
   type DatePickerRangeProps
 } from './types'
 
+function normalizeDatePickerLocale(locale?: DatePickerLocaleInput): Partial<TigerLocale> | undefined {
+  if (!locale) return undefined
+  if (typeof locale === 'string') return { locale }
+  if ('datePicker' in locale) return locale as Partial<TigerLocale>
+  return { locale: locale.locale, datePicker: locale }
+}
+
 export function useDatePickerState(props: DatePickerProps): DatePickerContext {
+  const config = useTigerConfig()
   const {
     size = 'md',
     disabled = false,
@@ -113,7 +125,11 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
 
   const minDateParsed = useMemo(() => parseDate(props.minDate ?? null), [props.minDate])
   const maxDateParsed = useMemo(() => parseDate(props.maxDate ?? null), [props.maxDate])
-  const localeCode = useMemo(() => getDatePickerLocaleCode(props.locale), [props.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, normalizeDatePickerLocale(props.locale)),
+    [config.locale, props.locale]
+  )
+  const localeCode = useMemo(() => getDatePickerLocaleCode(mergedLocale), [mergedLocale])
 
   // Current viewing month/year in calendar
   const [viewingMonth, setViewingMonth] = useState(
@@ -163,8 +179,8 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
   const isRtl = getLocaleDirection(localeCode) === 'rtl'
 
   const labels = useMemo(
-    () => getDatePickerLabels(props.locale, props.labels),
-    [props.locale, props.labels]
+    () => getDatePickerLabels(mergedLocale, props.labels),
+    [mergedLocale, props.labels]
   )
 
   const mobileDate = useMemo(() => {

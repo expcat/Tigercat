@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react'
 import {
   classNames,
   resolveLocaleText,
+  mergeTigerLocale,
   getLoadingBarClasses,
   getLoadingBarsWrapperClasses,
   getLoadingClasses,
@@ -33,9 +34,14 @@ export const Loading: React.FC<LoadingProps> = ({
   lockScroll = true,
   className,
   style,
+  locale,
   ...props
 }) => {
   const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
   const [visible, setVisible] = useState(delay <= 0)
 
   useEffect(() => {
@@ -143,7 +149,7 @@ export const Loading: React.FC<LoadingProps> = ({
       className={containerClasses}
       style={mergedStyle}
       role="status"
-      aria-label={text || resolveLocaleText('Loading', config.locale?.common?.loadingText)}
+      aria-label={text || resolveLocaleText('Loading', mergedLocale?.common?.loadingText)}
       aria-live="polite"
       aria-busy={true}
       {...props}>

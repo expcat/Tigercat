@@ -3,8 +3,9 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
+import { defineLocale } from '../define-locale'
 
-export const zhTW: TigerLocale = {
+export const zhTW: TigerLocale = defineLocale({
   locale: 'zh-TW',
   direction: 'ltr',
   common: {
@@ -73,4 +74,4 @@ export const zhTW: TigerLocale = {
     dragHintText: '拖曳以移動',
     boardAriaLabel: '任務看板'
   }
-}
+})

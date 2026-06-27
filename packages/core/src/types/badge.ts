@@ -2,6 +2,8 @@
  * Badge component types
  */
 
+import type { TigerLocale } from './locale'
+
 /** Badge variant types */
 export type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
 
@@ -16,6 +18,8 @@ export type BadgePosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-
 
 /** Base badge props interface */
 export interface BadgeProps {
+  /** Locale override merged on top of ConfigProvider locale. */
+  locale?: Partial<TigerLocale>
   /** Badge variant style @default 'danger' */
   variant?: BadgeVariant
   /** Badge size @default 'md' */

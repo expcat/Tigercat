@@ -59,8 +59,14 @@ describe('CropUpload', () => {
 
     it('displays default text and icon', () => {
       const { container } = render(<CropUpload />)
-      expect(screen.getByText('选择图片')).toBeInTheDocument()
+      expect(screen.getByText('Select image')).toBeInTheDocument()
       expect(container.querySelector('svg')).toBeInTheDocument()
+    })
+
+    it('uses component locale for default trigger text', () => {
+      render(<CropUpload locale={{ locale: 'zh-CN' }} />)
+      expect(screen.getByText('选择图片')).toBeInTheDocument()
+      expect(screen.getByRole('button')).toHaveAttribute('aria-label', '选择图片进行裁剪并上传')
     })
 
     it('supports custom children', () => {

@@ -12,12 +12,16 @@ import {
   badgePositionClasses,
   formatBadgeContent,
   shouldHideBadge,
+  getStatusLabels,
+  mergeTigerLocale,
   type BadgeProps,
   type BadgeVariant,
   type BadgeSize,
   type BadgeType,
-  type BadgePosition
+  type BadgePosition,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueBadgeProps extends BadgeProps {
   style?: Record<string, string | number>
@@ -27,6 +31,10 @@ export const Badge = defineComponent({
   name: 'TigerBadge',
   inheritAttrs: false,
   props: {
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
     variant: {
       type: String as PropType<BadgeVariant>,
       default: 'danger'
@@ -69,6 +77,10 @@ export const Badge = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
+    const config = useTigerConfig()
+    const labels = computed(() =>
+      getStatusLabels(mergeTigerLocale(config.value.locale, props.locale))
+    )
     const isDot = computed(() => props.type === 'dot')
     const isHidden = computed(() => shouldHideBadge(props.content, props.type, props.showZero))
     const displayContent = computed(() =>
@@ -94,9 +106,9 @@ export const Badge = defineComponent({
       const ariaLabel =
         (attrsRecord['aria-label'] as string | undefined) ??
         (isDot.value
-          ? 'notification'
+          ? labels.value.badgeLabel
           : props.type === 'number'
-            ? `${displayContent.value} notifications`
+            ? labels.value.badgeCountLabel.replace('{count}', String(displayContent.value))
             : `${displayContent.value ?? ''}`)
 
       const badgeElement = h(

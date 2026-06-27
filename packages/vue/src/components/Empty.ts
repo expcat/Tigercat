@@ -10,13 +10,17 @@ import {
   emptyIllustrationViewBox,
   emptyIllustrationPaths,
   getEmptyDescription,
+  mergeTigerLocale,
+  type TigerLocale,
   type EmptyPreset
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueEmptyProps {
   preset?: EmptyPreset
   description?: string
   showImage?: boolean
+  locale?: Partial<TigerLocale>
   className?: string
   style?: Record<string, string | number>
 }
@@ -44,10 +48,18 @@ export const Empty = defineComponent({
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   setup(props, { slots, attrs }) {
-    const descText = computed(() => props.description ?? getEmptyDescription(props.preset))
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const descText = computed(
+      () => props.description ?? getEmptyDescription(props.preset, mergedLocale.value)
+    )
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>

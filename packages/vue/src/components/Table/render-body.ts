@@ -13,7 +13,8 @@ import {
   getEditableCellClasses,
   editableCellInputClasses,
   tableGroupHeaderClasses,
-  getGroupHeaderCellClasses
+  getGroupHeaderCellClasses,
+  type TigerLocaleTable
 } from '@expcat/tigercat-core'
 import { ExpandIcon } from './icons'
 import type { TableContext, TableInternalProps } from './types'
@@ -21,7 +22,8 @@ import type { TableContext, TableInternalProps } from './types'
 export function renderTableBody(
   ctx: TableContext,
   props: TableInternalProps,
-  slots: Slots
+  slots: Slots,
+  labels: Required<TigerLocaleTable>
 ): VNodeChild {
   if (props.loading) {
     return null
@@ -133,7 +135,9 @@ export function renderTableBody(
                   {
                     type: 'button',
                     class: 'inline-flex items-center justify-center',
-                    'aria-label': isExpanded ? 'Collapse row' : 'Expand row',
+                    'aria-label': isExpanded
+                      ? labels.collapseRowAriaLabel
+                      : labels.expandRowAriaLabel,
                     'aria-expanded': isExpanded,
                     onClick: (e: Event) => {
                       e.stopPropagation()

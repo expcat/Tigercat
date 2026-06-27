@@ -576,7 +576,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
               onColumnAdd?.()
             }
           }}>
-          + Add column
+          + {resolveLocaleText(labels.addColumnText)}
         </div>
       )}
     </div>

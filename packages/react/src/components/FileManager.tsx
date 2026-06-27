@@ -9,6 +9,7 @@ import {
   sliceBreadcrumbPath,
   toFileDragItem,
   formatFileSizeLabel,
+  getFileManagerLabels,
   fileManagerToolbarClasses,
   fileManagerBreadcrumbClasses,
   fileManagerBreadcrumbItemClasses,
@@ -85,6 +86,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
     [config.locale, locale]
   )
   const [localSearch, setLocalSearch] = useState(searchText)
+  const labels = useMemo(() => getFileManagerLabels(mergedLocale), [mergedLocale])
 
   const model = useMemo(
     () =>
@@ -140,7 +142,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
       key="root"
       className={fileManagerBreadcrumbItemClasses}
       onClick={() => navigateToBreadcrumb(0)}>
-      Root
+      {labels.rootText}
     </span>,
     ...currentPath.flatMap((seg, i) => [
       <span key={`sep-${i}`} className={fileManagerBreadcrumbSeparatorClasses}>
@@ -225,7 +227,11 @@ export const FileManager: React.FC<FileManagerProps> = ({
         </div>
       )}
 
-      {loading && <div className={fileManagerLoadingClasses}>Loading...</div>}
+      {loading && (
+        <div className={fileManagerLoadingClasses}>
+          {resolveLocaleText('Loading...', mergedLocale?.common?.loadingText)}
+        </div>
+      )}
     </div>
   )
 }

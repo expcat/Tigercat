@@ -345,8 +345,16 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       aria-busy={loading}>
       {exportable && (
         <div className="mb-2 flex justify-end">
-          <button type="button" className={tableExportButtonClasses} onClick={ctx.handleExport}>
-            {exportFormat === 'excel' ? 'Export Excel' : 'Export CSV'}
+          <button
+            type="button"
+            className={tableExportButtonClasses}
+            aria-label={
+              exportFormat === 'excel'
+                ? tableLabels.exportExcelAriaLabel
+                : tableLabels.exportCsvAriaLabel
+            }
+            onClick={ctx.handleExport}>
+            {exportFormat === 'excel' ? tableLabels.exportExcelText : tableLabels.exportCsvText}
           </button>
         </div>
       )}
@@ -397,7 +405,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           columnLockable,
           columnDraggable,
           lockColumnAriaLabel: tableLabels.lockColumnAriaLabel,
-          unlockColumnAriaLabel: tableLabels.unlockColumnAriaLabel
+          unlockColumnAriaLabel: tableLabels.unlockColumnAriaLabel,
+          labels: tableLabels
         })}
         {renderTableBody(ctx, {
           size,
@@ -407,6 +416,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           emptyText: tableLabels.emptyText,
           rowSelection: internalRowSelection,
           expandable: internalExpandable,
+          labels: tableLabels,
           rowClassName: internalRowClassName,
           rowDraggable
         })}

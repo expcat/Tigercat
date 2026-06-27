@@ -81,7 +81,7 @@ export const AutoComplete = defineComponent({
     },
     notFoundText: {
       type: String,
-      default: 'No matches found'
+      default: undefined
     },
     filterOption: {
       type: [Boolean, Function] as PropType<
@@ -307,7 +307,11 @@ export const AutoComplete = defineComponent({
                   {
                     class: classNames(autoCompleteDropdownClasses, autoCompleteEmptyStateClasses)
                   },
-                  props.notFoundText
+                  resolveLocaleText(
+                    'No matches found',
+                    props.notFoundText,
+                    mergedLocale.value?.common?.emptyText
+                  )
                 )
               : null
         ]

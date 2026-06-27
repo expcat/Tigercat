@@ -48,7 +48,7 @@ export const Select: React.FC<SelectProps> = (props) => {
             <span
               className="inline-flex"
               data-tiger-select-clear
-              aria-label="Clear selection"
+              aria-label={ctx.clearAriaLabel}
               onClick={ctx.clearSelection}>
               <SelectClearIcon />
             </span>

@@ -14,11 +14,16 @@ import {
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
   warnUnsupportedColorProp,
+  getStatusLabels,
+  mergeTigerLocale,
   type TagVariant,
-  type TagSize
+  type TagSize,
+  type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueTagProps {
+  locale?: Partial<TigerLocale>
   variant?: TagVariant
   size?: TagSize
   closable?: boolean
@@ -53,6 +58,10 @@ export const Tag = defineComponent({
   name: 'TigerTag',
   inheritAttrs: false,
   props: {
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
     /**
      * Tag variant style
      * @default 'default'
@@ -84,7 +93,7 @@ export const Tag = defineComponent({
      */
     closeAriaLabel: {
       type: String,
-      default: 'Close tag'
+      default: undefined
     },
 
     /**
@@ -105,6 +114,10 @@ export const Tag = defineComponent({
   },
   emits: ['close'],
   setup(props, { slots, emit, attrs }) {
+    const config = useTigerConfig()
+    const labels = computed(() =>
+      getStatusLabels(mergeTigerLocale(config.value.locale, props.locale))
+    )
     const isVisible = ref(true)
 
     const tagClasses = computed(() =>
@@ -156,7 +169,7 @@ export const Tag = defineComponent({
                 {
                   class: closeButtonClasses.value,
                   onClick: handleClose,
-                  'aria-label': props.closeAriaLabel,
+                  'aria-label': props.closeAriaLabel ?? labels.value.tagCloseAriaLabel,
                   type: 'button'
                 },
                 CloseIcon()

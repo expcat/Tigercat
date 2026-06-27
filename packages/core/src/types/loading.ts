@@ -2,6 +2,8 @@
  * Loading/Spinner component types and interfaces
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Loading spinner variant types - different animation styles
  */
@@ -28,6 +30,11 @@ export type LoadingColor =
  * Base loading props interface
  */
 export interface LoadingProps {
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
   /**
    * Loading spinner variant - determines animation style
    * @default 'spinner'

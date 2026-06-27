@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { classNames } from '@expcat/tigercat-core'
-import type { CalendarMode } from '@expcat/tigercat-core'
+import type { CalendarMode, TigerLocale } from '@expcat/tigercat-core'
 import {
   getCalendarContainerClasses,
   calendarHeaderClasses,
@@ -9,17 +9,22 @@ import {
   calendarWeekdayClasses,
   getCalendarDayClasses,
   getCalendarMonthClasses,
-  WEEKDAYS,
-  MONTHS,
   isSameDay,
-  getMonthDays
+  getMonthDays,
+  getShortDayNames,
+  getShortMonthNames,
+  formatMonthYear,
+  getCalendarLabels,
+  mergeTigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface CalendarProps {
   value?: Date
   mode?: CalendarMode
   fullscreen?: boolean
   disabledDate?: (date: Date) => boolean
+  locale?: Partial<TigerLocale>
   onChange?: (date: Date) => void
   onPanelChange?: (date: Date, mode: CalendarMode) => void
   className?: string
@@ -30,10 +35,20 @@ export const Calendar: React.FC<CalendarProps> = ({
   mode = 'month',
   fullscreen = false,
   disabledDate,
+  locale,
   onChange,
   onPanelChange,
   className
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const localeCode = mergedLocale?.locale
+  const labels = useMemo(() => getCalendarLabels(mergedLocale), [mergedLocale])
+  const weekdayNames = useMemo(() => getShortDayNames(localeCode), [localeCode])
+  const monthNames = useMemo(() => getShortMonthNames(localeCode), [localeCode])
   const today = new Date()
   const [viewYear, setViewYear] = useState(value?.getFullYear() ?? today.getFullYear())
   const [viewMonth, setViewMonth] = useState(value?.getMonth() ?? today.getMonth())
@@ -92,17 +107,17 @@ export const Calendar: React.FC<CalendarProps> = ({
         <button
           type="button"
           className={calendarNavButtonClasses}
-          aria-label={mode === 'month' ? 'Previous month' : 'Previous year'}
+          aria-label={mode === 'month' ? labels.previousMonth : labels.previousYear}
           onClick={mode === 'month' ? prevMonth : prevYear}>
           {'\u2039'}
         </button>
         <span className={calendarTitleClasses}>
-          {mode === 'month' ? `${MONTHS[viewMonth]} ${viewYear}` : `${viewYear}`}
+          {mode === 'month' ? formatMonthYear(viewYear, viewMonth, localeCode) : `${viewYear}`}
         </span>
         <button
           type="button"
           className={calendarNavButtonClasses}
-          aria-label={mode === 'month' ? 'Next month' : 'Next year'}
+          aria-label={mode === 'month' ? labels.nextMonth : labels.nextYear}
           onClick={mode === 'month' ? nextMonth : nextYear}>
           {'\u203A'}
         </button>
@@ -110,7 +125,7 @@ export const Calendar: React.FC<CalendarProps> = ({
 
       {mode === 'year' ? (
         <div className="grid grid-cols-3 gap-2">
-          {MONTHS.map((m, i) => (
+          {monthNames.map((m, i) => (
             <div
               key={i}
               className={getCalendarMonthClasses(viewMonth === i)}
@@ -122,7 +137,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       ) : (
         <div>
           <div className="grid grid-cols-7">
-            {WEEKDAYS.map((wd) => (
+            {weekdayNames.map((wd) => (
               <div key={wd} className={calendarWeekdayClasses}>
                 {wd}
               </div>

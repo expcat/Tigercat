@@ -29,6 +29,9 @@ import {
   getSimplePaginationButtonClasses,
   getSimplePaginationPageIndicatorClasses,
   getSimplePaginationButtonsWrapperClasses,
+  getPaginationLabels,
+  formatPaginationTotal,
+  formatPaginationPageIndicator,
   type ListSize,
   type ListBorderStyle,
   type ListItemLayout,
@@ -470,6 +473,8 @@ export const List = <T extends ListItem = ListItem>({
     const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo
     const total = dataSource.length
     const paginationConfig = pagination as ListPaginationConfig
+    const paginationLabels = getPaginationLabels(mergedLocale)
+    const localeCode = mergedLocale?.locale
 
     return (
       <div className={getSimplePaginationContainerClasses()}>
@@ -478,7 +483,12 @@ export const List = <T extends ListItem = ListItem>({
           <div className={getSimplePaginationTotalClasses()}>
             {paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
-              : `Showing ${startIndex} to ${endIndex} of ${total} items`}
+              : formatPaginationTotal(
+                  paginationLabels.totalText,
+                  total,
+                  [startIndex, endIndex],
+                  localeCode
+                )}
           </div>
         )}
 
@@ -492,7 +502,7 @@ export const List = <T extends ListItem = ListItem>({
               onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
               {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) => (
                 <option key={size} value={size}>
-                  {size} / page
+                  {size} {paginationLabels.itemsPerPageText}
                 </option>
               ))}
             </select>
@@ -504,18 +514,23 @@ export const List = <T extends ListItem = ListItem>({
               className={getSimplePaginationButtonClasses(!hasPrev)}
               disabled={!hasPrev}
               onClick={() => handlePageChange(currentPage - 1)}>
-              Previous
+              {paginationLabels.prevPageAriaLabel}
             </button>
 
             <span className={getSimplePaginationPageIndicatorClasses()}>
-              Page {currentPage} of {totalPages}
+              {formatPaginationPageIndicator(
+                paginationLabels.pageIndicatorText,
+                currentPage,
+                totalPages,
+                localeCode
+              )}
             </span>
 
             <button
               className={getSimplePaginationButtonClasses(!hasNext)}
               disabled={!hasNext}
               onClick={() => handlePageChange(currentPage + 1)}>
-              Next
+              {paginationLabels.nextPageAriaLabel}
             </button>
           </div>
         </div>

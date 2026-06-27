@@ -2,6 +2,8 @@
  * Empty component types and interfaces
  */
 
+import type { TigerLocale } from './locale'
+
 /**
  * Built-in empty state presets
  */
@@ -11,6 +13,11 @@ export type EmptyPreset = 'default' | 'simple' | 'no-data' | 'no-results' | 'err
  * Base empty state props interface (framework-agnostic)
  */
 export interface EmptyProps {
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
   /**
    * Preset empty state style
    * @default 'default'

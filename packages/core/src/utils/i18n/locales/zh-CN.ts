@@ -4,6 +4,7 @@
 
 import type { TigerLocale } from '../../../types/locale'
 import { ZH_CN_TIME_PICKER_LABELS, ZH_CN_UPLOAD_LABELS } from '../../locale-utils'
+import { ZH_CN_DATEPICKER_LOCALE } from '../datepicker-locales/zh-CN'
 
 export const zhCN: TigerLocale = {
   locale: 'zh-CN',
@@ -17,6 +18,12 @@ export const zhCN: TigerLocale = {
     noMoreText: '没有更多了',
     searchPlaceholder: '搜索',
     clearText: '清除'
+  },
+  empty: {
+    noData: '暂无数据',
+    noDataAvailable: '暂无可用数据',
+    noResults: '暂无结果',
+    error: '出现错误'
   },
   modal: {
     closeAriaLabel: '关闭',
@@ -63,17 +70,85 @@ export const zhCN: TigerLocale = {
     columnSettingsText: '列设置',
     columnSettingsAriaLabel: '列设置',
     lockColumnAriaLabel: '锁定{column}列',
-    unlockColumnAriaLabel: '取消锁定{column}列'
+    unlockColumnAriaLabel: '取消锁定{column}列',
+    allText: '全部',
+    filterPlaceholder: '筛选...',
+    exportCsvText: '导出 CSV',
+    exportExcelText: '导出 Excel',
+    exportCsvAriaLabel: '导出为 CSV',
+    exportExcelAriaLabel: '导出为 Excel',
+    expandRowAriaLabel: '展开行',
+    collapseRowAriaLabel: '收起行'
   },
+  datePicker: ZH_CN_DATEPICKER_LOCALE,
   timePicker: ZH_CN_TIME_PICKER_LABELS,
   formWizard: {
     prevText: '上一步',
     nextText: '下一步',
     finishText: '完成'
   },
+  tour: {
+    prevText: '上一步',
+    nextText: '下一步',
+    finishText: '完成',
+    closeAriaLabel: '关闭导览'
+  },
+  calendar: {
+    previousMonth: '上个月',
+    nextMonth: '下个月',
+    previousYear: '上一年',
+    nextYear: '下一年',
+    yearSelectAriaLabel: '年份',
+    monthSelectAriaLabel: '月份',
+    daySelectAriaLabel: '日期'
+  },
+  fileManager: {
+    rootText: '根目录'
+  },
+  imageViewer: {
+    dialogAriaLabel: '图片查看器',
+    previewDialogAriaLabel: '图片预览',
+    closeAriaLabel: '关闭',
+    closePreviewAriaLabel: '关闭预览',
+    previousImageAriaLabel: '上一张图片',
+    nextImageAriaLabel: '下一张图片',
+    zoomOutAriaLabel: '缩小',
+    resetAriaLabel: '重置',
+    zoomInAriaLabel: '放大',
+    rotateLeftAriaLabel: '向左旋转',
+    rotateRightAriaLabel: '向右旋转'
+  },
+  imageEditor: {
+    selectImageText: '选择图片',
+    selectImageAriaLabel: '选择图片进行裁剪并上传',
+    cropModalTitle: '裁剪图片',
+    cropCancelText: '取消',
+    cropConfirmText: '确认裁剪',
+    cropperDialogAriaLabel: '图片裁剪器',
+    imageToCropAriaLabel: '待裁剪图片',
+    moveCropAreaAriaLabel: '移动裁剪区域',
+    resizeCropAreaAriaLabel: '调整裁剪区域 {handle}',
+    loadingCropImageAriaLabel: '正在加载待裁剪图片',
+    annotationToolbarAriaLabel: '标注工具',
+    annotationEditorAriaLabel: '图片标注编辑器',
+    annotationCanvasAriaLabel: '图片标注画布',
+    loadingAnnotationImageAriaLabel: '正在加载待标注图片',
+    selectToolText: '选择',
+    rectangleToolText: '矩形',
+    ellipseToolText: '椭圆',
+    polygonToolText: '多边形',
+    freehandToolText: '自由绘制',
+    deleteText: '删除'
+  },
+  status: {
+    tagCloseAriaLabel: '关闭标签',
+    badgeLabel: '通知',
+    badgeCountLabel: '{count} 条通知'
+  },
   taskBoard: {
     emptyColumnText: '暂无任务',
     addCardText: '添加任务',
+    addColumnText: '添加列',
     wipLimitText: 'WIP 限制: {limit}',
     dragHintText: '拖拽以移动',
     boardAriaLabel: '任务看板'

@@ -12,8 +12,11 @@ import {
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
   warnUnsupportedColorProp,
+  getStatusLabels,
+  mergeTigerLocale,
   type TagProps as CoreTagProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export type TagProps = CoreTagProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, keyof CoreTagProps | 'onClose'> & {
@@ -47,15 +50,21 @@ const CloseIcon: React.FC = () => (
 )
 
 export const Tag: React.FC<TagProps> = ({
+  locale,
   variant = 'default',
   size = 'md',
   closable = false,
-  closeAriaLabel = 'Close tag',
+  closeAriaLabel,
   onClose,
   children,
   className,
   ...props
 }) => {
+  const config = useTigerConfig()
+  const labels = useMemo(
+    () => getStatusLabels(mergeTigerLocale(config.locale, locale)),
+    [config.locale, locale]
+  )
   warnUnsupportedColorProp('Tag', props as Record<string, unknown>)
   const [isVisible, setIsVisible] = useState(true)
 
@@ -90,7 +99,7 @@ export const Tag: React.FC<TagProps> = ({
         <button
           className={closeButtonClasses}
           onClick={handleClose}
-          aria-label={closeAriaLabel}
+          aria-label={closeAriaLabel ?? labels.tagCloseAriaLabel}
           type="button">
           <CloseIcon />
         </button>

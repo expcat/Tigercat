@@ -16,7 +16,8 @@ import {
   getGroupHeaderCellClasses,
   type RowSelectionConfig,
   type ExpandableConfig,
-  type TableSize
+  type TableSize,
+  type TigerLocaleTable
 } from '@expcat/tigercat-core'
 import { ExpandIcon } from './icons'
 import type { TableContext } from './types'
@@ -29,6 +30,7 @@ export interface RenderBodyViewProps {
   emptyText: string
   rowSelection?: RowSelectionConfig
   expandable?: ExpandableConfig
+  labels: Required<TigerLocaleTable>
   rowClassName?: string | ((record: Record<string, unknown>, index: number) => string) | undefined
   rowDraggable?: boolean
 }
@@ -42,6 +44,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     emptyText,
     rowSelection,
     expandable,
+    labels,
     rowClassName,
     rowDraggable
   } = view
@@ -126,7 +129,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           <button
             type="button"
             className="inline-flex items-center justify-center"
-            aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
+            aria-label={isExpanded ? labels.collapseRowAriaLabel : labels.expandRowAriaLabel}
             aria-expanded={isExpanded}
             onClick={(e) => {
               e.stopPropagation()

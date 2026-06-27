@@ -17,9 +17,12 @@ import {
   getPickerOptionAria,
   getPickerOptionId,
   classNames,
+  resolveLocaleText,
+  mergeTigerLocale,
   icon20ViewBox,
   closeSolidIcon20PathD
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface AutoCompleteProps
   extends
@@ -46,6 +49,7 @@ const AUTOCOMPLETE_KEYS = new Set<string>([
   'filterOption',
   'defaultActiveFirstOption',
   'allowFreeInput',
+  'locale',
   'onChange',
   'onSelect',
   'onSearch'
@@ -59,15 +63,26 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
     size = 'md',
     disabled = false,
     clearable = false,
-    notFoundText = 'No matches found',
+    notFoundText,
     filterOption = true,
     defaultActiveFirstOption = true,
+    locale,
     className,
     onChange,
     onSelect,
     onSearch,
     ...rest
   } = props
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const resolvedNotFoundText = resolveLocaleText(
+    'No matches found',
+    notFoundText,
+    mergedLocale?.common?.emptyText
+  )
 
   // Filter out component-specific props from div props
   const divProps: Record<string, unknown> = {}
@@ -202,7 +217,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
         <button
           type="button"
           className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--tiger-autocomplete-clear,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-autocomplete-clear-hover,var(--tiger-text,#111827))] transition-colors"
-          aria-label="Clear"
+          aria-label={resolveLocaleText('Clear', mergedLocale?.common?.clearText)}
           onClick={handleClear}>
           <svg
             className="w-4 h-4"
@@ -239,7 +254,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
 
       {isOpen && inputValue && filteredOptions.length === 0 && (
         <div className={classNames(autoCompleteDropdownClasses, autoCompleteEmptyStateClasses)}>
-          {notFoundText}
+          {resolvedNotFoundText}
         </div>
       )}
     </div>

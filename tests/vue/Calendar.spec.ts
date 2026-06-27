@@ -18,14 +18,21 @@ describe('Calendar', () => {
 
   it('renders weekday headers in month mode', () => {
     renderWithProps(Calendar, { mode: 'month' })
-    expect(screen.getByText('Su')).toBeInTheDocument()
-    expect(screen.getByText('Mo')).toBeInTheDocument()
-    expect(screen.getByText('Sa')).toBeInTheDocument()
+    expect(screen.getByText('Sun')).toBeInTheDocument()
+    expect(screen.getByText('Mon')).toBeInTheDocument()
+    expect(screen.getByText('Sat')).toBeInTheDocument()
   })
 
   it('displays current month and year', () => {
     renderWithProps(Calendar, { modelValue: testDate })
-    expect(screen.getByText('Jun 2024')).toBeInTheDocument()
+    expect(screen.getByText('June 2024')).toBeInTheDocument()
+  })
+
+  it('uses component locale for calendar labels and date text', () => {
+    renderWithProps(Calendar, { modelValue: testDate, locale: { locale: 'zh-CN' } })
+    expect(screen.getByText('2024年6月')).toBeInTheDocument()
+    expect(screen.getByText('周日')).toBeInTheDocument()
+    expect(screen.getByLabelText('下个月')).toBeInTheDocument()
   })
 
   it('renders day numbers', () => {
@@ -52,15 +59,15 @@ describe('Calendar', () => {
     renderWithProps(Calendar, { modelValue: testDate })
     const nextBtn = screen.getByLabelText('Next month')
     await fireEvent.click(nextBtn)
-    expect(screen.getByText('Jul 2024')).toBeInTheDocument()
+    expect(screen.getByText('July 2024')).toBeInTheDocument()
   })
 
   it('wraps year on December→January', async () => {
     renderWithProps(Calendar, { modelValue: new Date(2024, 11, 1) })
-    expect(screen.getByText('Dec 2024')).toBeInTheDocument()
+    expect(screen.getByText('December 2024')).toBeInTheDocument()
     const nextBtn = screen.getByLabelText('Next month')
     await fireEvent.click(nextBtn)
-    expect(screen.getByText('Jan 2025')).toBeInTheDocument()
+    expect(screen.getByText('January 2025')).toBeInTheDocument()
   })
 
   // --- Selection ---

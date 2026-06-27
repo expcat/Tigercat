@@ -1,3 +1,5 @@
+import type { TigerLocale } from './locale'
+
 export type ImageAnnotationTool = 'select' | 'rectangle' | 'ellipse' | 'polygon' | 'freehand'
 
 export type ImageAnnotationShape = Exclude<ImageAnnotationTool, 'select'>
@@ -36,6 +38,7 @@ export interface ImageAnnotationChangeMeta {
 }
 
 export interface ImageAnnotationProps {
+  locale?: Partial<TigerLocale>
   src: string
   alt?: string
   value?: ImageAnnotation[]

@@ -1,6 +1,6 @@
 import { defineComponent, h, ref, computed, PropType } from 'vue'
 import { classNames, coerceClassValue } from '@expcat/tigercat-core'
-import type { CalendarMode } from '@expcat/tigercat-core'
+import type { CalendarMode, TigerLocale } from '@expcat/tigercat-core'
 import {
   getCalendarContainerClasses,
   calendarHeaderClasses,
@@ -9,17 +9,22 @@ import {
   calendarWeekdayClasses,
   getCalendarDayClasses,
   getCalendarMonthClasses,
-  WEEKDAYS,
-  MONTHS,
   isSameDay,
-  getMonthDays
+  getMonthDays,
+  getShortDayNames,
+  getShortMonthNames,
+  formatMonthYear,
+  getCalendarLabels,
+  mergeTigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueCalendarProps {
   modelValue?: Date
   mode?: CalendarMode
   fullscreen?: boolean
   disabledDate?: (date: Date) => boolean
+  locale?: Partial<TigerLocale>
   className?: string
 }
 
@@ -31,10 +36,17 @@ export const Calendar = defineComponent({
     mode: { type: String as PropType<CalendarMode>, default: 'month' },
     fullscreen: { type: Boolean, default: false },
     disabledDate: { type: Function as PropType<(date: Date) => boolean>, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     className: { type: String, default: undefined }
   },
   emits: ['update:modelValue', 'change', 'panel-change'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const localeCode = computed(() => mergedLocale.value?.locale)
+    const labels = computed(() => getCalendarLabels(mergedLocale.value))
+    const weekdayNames = computed(() => getShortDayNames(localeCode.value))
+    const monthNames = computed(() => getShortMonthNames(localeCode.value))
     const today = new Date()
     const viewYear = ref(props.modelValue?.getFullYear() ?? today.getFullYear())
     const viewMonth = ref(props.modelValue?.getMonth() ?? today.getMonth())
@@ -95,7 +107,8 @@ export const Calendar = defineComponent({
           {
             type: 'button',
             class: calendarNavButtonClasses,
-            'aria-label': props.mode === 'month' ? 'Previous month' : 'Previous year',
+            'aria-label':
+              props.mode === 'month' ? labels.value.previousMonth : labels.value.previousYear,
             onClick: props.mode === 'month' ? prevMonth : prevYear
           },
           '\u2039'
@@ -104,7 +117,7 @@ export const Calendar = defineComponent({
           'span',
           { class: calendarTitleClasses },
           props.mode === 'month'
-            ? `${MONTHS[viewMonth.value]} ${viewYear.value}`
+            ? formatMonthYear(viewYear.value, viewMonth.value, localeCode.value)
             : `${viewYear.value}`
         ),
         h(
@@ -112,7 +125,7 @@ export const Calendar = defineComponent({
           {
             type: 'button',
             class: calendarNavButtonClasses,
-            'aria-label': props.mode === 'month' ? 'Next month' : 'Next year',
+            'aria-label': props.mode === 'month' ? labels.value.nextMonth : labels.value.nextYear,
             onClick: props.mode === 'month' ? nextMonth : nextYear
           },
           '\u203A'
@@ -124,7 +137,7 @@ export const Calendar = defineComponent({
         body = h(
           'div',
           { class: 'grid grid-cols-3 gap-2' },
-          MONTHS.map((m, i) =>
+          monthNames.value.map((m, i) =>
             h(
               'div',
               {
@@ -140,7 +153,7 @@ export const Calendar = defineComponent({
         const weekdayRow = h(
           'div',
           { class: 'grid grid-cols-7' },
-          WEEKDAYS.map((wd) => h('div', { key: wd, class: calendarWeekdayClasses }, wd))
+          weekdayNames.value.map((wd) => h('div', { key: wd, class: calendarWeekdayClasses }, wd))
         )
         const dayGrid = h(
           'div',

@@ -3,8 +3,9 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
+import { defineLocale } from '../define-locale'
 
-export const thTH: TigerLocale = {
+export const thTH: TigerLocale = defineLocale({
   locale: 'th-TH',
   direction: 'ltr',
   common: {
@@ -73,4 +74,4 @@ export const thTH: TigerLocale = {
     dragHintText: 'ลากเพื่อย้าย',
     boardAriaLabel: 'บอร์ดงาน'
   }
-}
+})

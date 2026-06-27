@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import {
   classNames,
   isBrowser,
-  resolveLocaleText,
   mergeTigerLocale,
   tourPopoverClasses,
   tourTitleClasses,
@@ -17,6 +16,7 @@ import {
   getActiveTourSteps,
   getCurrentActiveTourStep,
   getActiveTourStepPosition,
+  getTourLabels,
   closeIconPathD,
   type TourProps as CoreTourProps,
   type TourPlacement,
@@ -58,9 +58,10 @@ export const Tour: React.FC<TourProps> = ({
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const nextLabel = resolveLocaleText('Next', nextText, mergedLocale?.formWizard?.nextText)
-  const prevLabel = resolveLocaleText('Previous', prevText, mergedLocale?.formWizard?.prevText)
-  const finishLabel = resolveLocaleText('Finish', finishText, mergedLocale?.formWizard?.finishText)
+  const labels = useMemo(
+    () => getTourLabels(mergedLocale, { nextText, prevText, finishText }),
+    [finishText, mergedLocale, nextText, prevText]
+  )
   const [internalStep, setInternalStep] = useState(0)
   const [resolvedSteps, setResolvedSteps] = useState(steps)
   const currentStep = controlledCurrent ?? internalStep
@@ -187,7 +188,7 @@ export const Tour: React.FC<TourProps> = ({
           <button
             className={tourCloseButtonClasses}
             type="button"
-            aria-label="Close tour"
+            aria-label={labels.closeAriaLabel}
             onClick={close}>
             <StatusIcon path={closeIconPathD} className="h-4 w-4" />
           </button>
@@ -208,14 +209,14 @@ export const Tour: React.FC<TourProps> = ({
                 type="button"
                 className="px-3 py-1.5 text-sm rounded-md border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors mr-2"
                 onClick={prev}>
-                {prevLabel}
+                {labels.prevText}
               </button>
             )}
             <button
               type="button"
               className="px-3 py-1.5 text-sm rounded-md bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] transition-colors"
               onClick={next}>
-              {isLast ? finishLabel : nextLabel}
+              {isLast ? labels.finishText : labels.nextText}
             </button>
           </div>
         </div>

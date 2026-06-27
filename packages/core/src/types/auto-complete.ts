@@ -1,6 +1,8 @@
 /**
  * AutoComplete option
  */
+
+import type { TigerLocale } from './locale'
 export interface AutoCompleteOption {
   /** Display text */
   label: string
@@ -19,6 +21,9 @@ export type AutoCompleteSize = 'sm' | 'md' | 'lg'
  * Shared AutoComplete props (framework-agnostic)
  */
 export interface AutoCompleteProps {
+  /** Locale override merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+
   /** Options list */
   options?: AutoCompleteOption[]
   /** Placeholder text */

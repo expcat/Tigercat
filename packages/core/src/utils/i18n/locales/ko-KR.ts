@@ -3,8 +3,9 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
+import { defineLocale } from '../define-locale'
 
-export const koKR: TigerLocale = {
+export const koKR: TigerLocale = defineLocale({
   locale: 'ko-KR',
   direction: 'ltr',
   common: {
@@ -73,4 +74,4 @@ export const koKR: TigerLocale = {
     dragHintText: '드래그하여 이동',
     boardAriaLabel: '작업 보드'
   }
-}
+})

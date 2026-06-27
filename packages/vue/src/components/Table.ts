@@ -245,7 +245,7 @@ export const Table = defineComponent({
       const tableChildren = [
         colgroup,
         renderTableHeader(ctx, renderProps, slots, tableLabels.value),
-        renderTableBody(ctx, renderProps, slots),
+        renderTableBody(ctx, renderProps, slots, tableLabels.value),
         renderSummaryRow(ctx, renderProps)
       ]
 
@@ -670,9 +670,13 @@ export const Table = defineComponent({
                   class: tableExportButtonClasses,
                   onClick: ctx.handleExport,
                   'aria-label':
-                    resolvedProps.exportFormat === 'excel' ? 'Export to Excel' : 'Export to CSV'
+                    resolvedProps.exportFormat === 'excel'
+                      ? tableLabels.value.exportExcelAriaLabel
+                      : tableLabels.value.exportCsvAriaLabel
                 },
-                resolvedProps.exportFormat === 'excel' ? 'Export Excel' : 'Export CSV'
+                resolvedProps.exportFormat === 'excel'
+                  ? tableLabels.value.exportExcelText
+                  : tableLabels.value.exportCsvText
               )
             ]),
 

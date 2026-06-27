@@ -676,7 +676,10 @@ export const Select = defineComponent({
                   {
                     class: 'inline-flex',
                     'data-tiger-select-clear': '',
-                    'aria-label': 'Clear selection',
+                    'aria-label': resolveLocaleText(
+                      'Clear selection',
+                      mergedLocale.value?.common?.clearText
+                    ),
                     onClick: clearSelection
                   },
                   CloseIcon

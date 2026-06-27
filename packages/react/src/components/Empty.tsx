@@ -8,8 +8,10 @@ import {
   emptyIllustrationViewBox,
   emptyIllustrationPaths,
   getEmptyDescription,
+  mergeTigerLocale,
   type EmptyProps as CoreEmptyProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface EmptyProps extends React.HTMLAttributes<HTMLDivElement>, CoreEmptyProps {
   /** Custom image / illustration node */
@@ -28,9 +30,18 @@ export const Empty: React.FC<EmptyProps> = ({
   extra,
   className,
   children,
+  locale,
   ...props
 }) => {
-  const descText = useMemo(() => description ?? getEmptyDescription(preset), [description, preset])
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const descText = useMemo(
+    () => description ?? getEmptyDescription(preset, mergedLocale),
+    [description, preset, mergedLocale]
+  )
 
   const wrapperClasses = useMemo(() => classNames(emptyBaseClasses, className), [className])
 

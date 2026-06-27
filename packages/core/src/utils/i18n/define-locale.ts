@@ -21,8 +21,41 @@
 
 import type { TigerLocale, TigerText } from '../../types/locale'
 import { enUS } from './locales/en-US'
+import { AR_SA_DATEPICKER_LOCALE } from './datepicker-locales/ar-SA'
+import { DE_DE_DATEPICKER_LOCALE } from './datepicker-locales/de-DE'
+import { EN_US_DATEPICKER_LOCALE } from './datepicker-locales/en-US'
+import { ES_ES_DATEPICKER_LOCALE } from './datepicker-locales/es-ES'
+import { FR_FR_DATEPICKER_LOCALE } from './datepicker-locales/fr-FR'
+import { ID_ID_DATEPICKER_LOCALE } from './datepicker-locales/id-ID'
+import { JA_JP_DATEPICKER_LOCALE } from './datepicker-locales/ja-JP'
+import { KO_KR_DATEPICKER_LOCALE } from './datepicker-locales/ko-KR'
+import { PT_BR_DATEPICKER_LOCALE } from './datepicker-locales/pt-BR'
+import { TH_TH_DATEPICKER_LOCALE } from './datepicker-locales/th-TH'
+import { VI_VN_DATEPICKER_LOCALE } from './datepicker-locales/vi-VN'
+import { ZH_CN_DATEPICKER_LOCALE } from './datepicker-locales/zh-CN'
+import { ZH_TW_DATEPICKER_LOCALE } from './datepicker-locales/zh-TW'
 
 type PlainObject = Record<string, unknown>
+
+const DATEPICKER_LOCALES = [
+  EN_US_DATEPICKER_LOCALE,
+  ZH_CN_DATEPICKER_LOCALE,
+  ZH_TW_DATEPICKER_LOCALE,
+  JA_JP_DATEPICKER_LOCALE,
+  KO_KR_DATEPICKER_LOCALE,
+  TH_TH_DATEPICKER_LOCALE,
+  VI_VN_DATEPICKER_LOCALE,
+  ID_ID_DATEPICKER_LOCALE,
+  ES_ES_DATEPICKER_LOCALE,
+  FR_FR_DATEPICKER_LOCALE,
+  DE_DE_DATEPICKER_LOCALE,
+  PT_BR_DATEPICKER_LOCALE,
+  AR_SA_DATEPICKER_LOCALE
+]
+
+const DATEPICKER_LOCALE_BY_ID = new Map(
+  DATEPICKER_LOCALES.map((locale) => [locale.locale, locale] as const)
+)
 
 function isPlainObject(value: unknown): value is PlainObject {
   if (value === null || typeof value !== 'object') return false
@@ -62,7 +95,10 @@ function deepMerge(base: PlainObject, override: PlainObject | undefined): PlainO
  * @returns A fully populated `TigerLocale`.
  */
 export function defineLocale(overrides: Partial<TigerLocale> = {}): TigerLocale {
-  return deepMerge(enUS as unknown as PlainObject, overrides as PlainObject) as TigerLocale
+  const locale = overrides.locale ? DATEPICKER_LOCALE_BY_ID.get(overrides.locale) : undefined
+  const normalizedOverrides =
+    locale && !overrides.datePicker ? { ...overrides, datePicker: locale } : overrides
+  return deepMerge(enUS as unknown as PlainObject, normalizedOverrides as PlainObject) as TigerLocale
 }
 
 /**

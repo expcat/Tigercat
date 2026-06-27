@@ -3,8 +3,9 @@
  */
 
 import type { TigerLocale } from '../../../types/locale'
+import { defineLocale } from '../define-locale'
 
-export const viVN: TigerLocale = {
+export const viVN: TigerLocale = defineLocale({
   locale: 'vi-VN',
   direction: 'ltr',
   common: {
@@ -73,4 +74,4 @@ export const viVN: TigerLocale = {
     dragHintText: 'Kéo để di chuyển',
     boardAriaLabel: 'Bảng nhiệm vụ'
   }
-}
+})
