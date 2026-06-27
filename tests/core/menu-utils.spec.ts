@@ -1,13 +1,18 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import {
   createSubmenuHeightTransitionController,
   filterMenuItems,
+  focusFirstChildItem,
+  focusMenuEdge,
+  getMenuButtons,
   getMenuClasses,
   getMenuNavigationKeys,
   getInitialSubmenuHeightTransitionStyle,
+  initRovingTabIndex,
   matchesMenuSearch,
   menuCollapsedIconClasses,
   menuItemIconClasses,
+  moveFocusInMenu,
   normalizeMenuSearchQuery,
   submenuHeightTransitionClasses,
   type MenuItem,
@@ -219,5 +224,124 @@ describe('getMenuNavigationKeys', () => {
       nextKey: 'ArrowDown',
       prevKey: 'ArrowUp'
     })
+  })
+})
+
+describe('menu-utils roving tabindex helpers', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  /**
+   * Build:
+   *   <ul role="menu" id="root">
+   *     <li><button data-tiger-menuitem>0</button></li>
+   *     <li><button data-tiger-menuitem disabled>1</button></li>   (disabled → filtered)
+   *     <li data-tiger-menu-hidden="true"><button data-tiger-menuitem>2</button></li> (hidden → filtered)
+   *     <li class="title"><button data-tiger-menuitem data-tiger-selected="true">3</button>
+   *       <ul role="menu"><li><button data-tiger-menuitem>3a</button></li></ul>  (nested → not in root)
+   *     </li>
+   *     <li><button data-tiger-menuitem>4</button></li>
+   *   </ul>
+   */
+  function buildMenu(): HTMLElement {
+    // Buttons render with an explicit tabindex="-1" (the roving baseline the
+    // Menu component sets), since native <button> reports tabIndex 0 by default.
+    document.body.innerHTML = `
+      <ul role="menu" id="root">
+        <li><button data-tiger-menuitem="true" id="b0" tabindex="-1">0</button></li>
+        <li><button data-tiger-menuitem="true" id="b1" tabindex="-1" disabled>1</button></li>
+        <li data-tiger-menu-hidden="true"><button data-tiger-menuitem="true" id="b2" tabindex="-1">2</button></li>
+        <li class="title">
+          <button data-tiger-menuitem="true" id="b3" tabindex="-1" data-tiger-selected="true">3</button>
+          <ul role="menu" id="sub"><li><button data-tiger-menuitem="true" id="b3a" tabindex="-1">3a</button></li></ul>
+        </li>
+        <li><button data-tiger-menuitem="true" id="b4" tabindex="-1">4</button></li>
+      </ul>
+    `
+    return document.getElementById('root') as HTMLElement
+  }
+
+  it('getMenuButtons returns only enabled, visible, direct items of the container', () => {
+    const root = buildMenu()
+    const ids = getMenuButtons(root).map((b) => b.id)
+    expect(ids).toEqual(['b0', 'b3', 'b4'])
+  })
+
+  it('moveFocusInMenu moves roving focus forward and wraps, updating tabIndex', () => {
+    const root = buildMenu()
+    const items = getMenuButtons(root)
+    moveFocusInMenu(items[0], 1)
+    expect(document.activeElement).toBe(items[1])
+    expect(items[1].tabIndex).toBe(0)
+    expect(items[0].tabIndex).toBe(-1)
+    expect(items[2].tabIndex).toBe(-1)
+
+    // wrap from last back to first
+    moveFocusInMenu(items[2], 1)
+    expect(document.activeElement).toBe(items[0])
+    expect(items[0].tabIndex).toBe(0)
+  })
+
+  it('moveFocusInMenu moves backward and wraps from first to last', () => {
+    const root = buildMenu()
+    const items = getMenuButtons(root)
+    moveFocusInMenu(items[0], -1)
+    expect(document.activeElement).toBe(items[items.length - 1])
+    expect(items[items.length - 1].tabIndex).toBe(0)
+  })
+
+  it('focusMenuEdge focuses the first or last item', () => {
+    const root = buildMenu()
+    const items = getMenuButtons(root)
+    focusMenuEdge(items[1], 'start')
+    expect(document.activeElement).toBe(items[0])
+    expect(items[0].tabIndex).toBe(0)
+
+    focusMenuEdge(items[0], 'end')
+    expect(document.activeElement).toBe(items[items.length - 1])
+    expect(items[items.length - 1].tabIndex).toBe(0)
+  })
+
+  it('initRovingTabIndex sets tabindex 0 on the selected item, -1 on the rest', () => {
+    const root = buildMenu()
+    initRovingTabIndex(root)
+    const items = getMenuButtons(root)
+    // b3 is data-tiger-selected
+    expect(items.find((b) => b.id === 'b3')?.tabIndex).toBe(0)
+    expect(items.filter((b) => b.id !== 'b3').every((b) => b.tabIndex === -1)).toBe(true)
+  })
+
+  it('initRovingTabIndex falls back to the first item when none selected', () => {
+    document.body.innerHTML = `
+      <ul role="menu" id="root">
+        <li><button data-tiger-menuitem="true" id="a" tabindex="-1">a</button></li>
+        <li><button data-tiger-menuitem="true" id="b" tabindex="-1">b</button></li>
+      </ul>
+    `
+    const root = document.getElementById('root') as HTMLElement
+    initRovingTabIndex(root)
+    const items = getMenuButtons(root)
+    expect(items[0].tabIndex).toBe(0)
+    expect(items[1].tabIndex).toBe(-1)
+  })
+
+  it('initRovingTabIndex is a no-op when an item already has tabindex 0', () => {
+    const root = buildMenu()
+    const items = getMenuButtons(root)
+    items[2].tabIndex = 0
+    initRovingTabIndex(root)
+    // unchanged: b3 not forced to 0
+    expect(items[2].tabIndex).toBe(0)
+    expect(items.find((b) => b.id === 'b3')?.tabIndex).not.toBe(0)
+  })
+
+  it('focusFirstChildItem focuses the first item of the submenu under the title', () => {
+    const root = buildMenu()
+    const title = document.getElementById('b3') as HTMLElement
+    focusFirstChildItem(title)
+    const first = document.getElementById('b3a') as HTMLButtonElement
+    expect(document.activeElement).toBe(first)
+    expect(first.tabIndex).toBe(0)
   })
 })

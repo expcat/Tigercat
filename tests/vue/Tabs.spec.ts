@@ -365,6 +365,40 @@ describe('Tabs', () => {
       expect(onEdit).toHaveBeenCalledWith({ targetKey: '1', action: 'remove' })
     })
 
+    it('renders the close control as a real button nested in a non-button tab (C06-3)', () => {
+      render(Tabs, {
+        props: { type: 'editable-card', closable: true },
+        slots: {
+          default: () => [h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1')]
+        }
+      })
+
+      const closeButton = screen.getByRole('button', { name: 'Close Tab 1' })
+      expect(closeButton.tagName).toBe('BUTTON')
+      const tab = screen.getByRole('tab', { name: 'Tab 1' })
+      expect(tab.tagName).not.toBe('BUTTON')
+      expect(tab.contains(closeButton)).toBe(true)
+    })
+
+    it('does not select the tab when its close control is clicked (C06-3)', async () => {
+      const onChange = vi.fn()
+
+      render(Tabs, {
+        props: { type: 'editable-card', closable: true, defaultActiveKey: '1', onChange },
+        slots: {
+          default: () => [
+            h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1'),
+            h(TabPane, { tabKey: '2', label: 'Tab 2' }, () => 'Content 2')
+          ]
+        }
+      })
+
+      const closeTab2 = screen.getByRole('button', { name: 'Close Tab 2' })
+      await fireEvent.click(closeTab2)
+
+      expect(onChange).not.toHaveBeenCalledWith('2')
+    })
+
     it('should emit edit remove when Delete/Backspace is pressed on a closable tab', async () => {
       const onEdit = vi.fn()
 

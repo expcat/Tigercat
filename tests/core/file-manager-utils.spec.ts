@@ -202,6 +202,10 @@ describe('file-manager-utils', () => {
       expect(getFileManagerContainerClasses()).toBe(fileManagerContainerClasses)
     })
 
+    it('is a positioned ancestor so the absolute loading overlay anchors to it', () => {
+      expect(fileManagerContainerClasses).toContain('relative')
+    })
+
     it('appends className', () => {
       const cls = getFileManagerContainerClasses('custom')
       expect(cls).toContain('custom')

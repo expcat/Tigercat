@@ -334,6 +334,44 @@ describe('Tabs', () => {
       })
     })
 
+    it('renders the close control as a real button, not a nested interactive span (C06-3)', () => {
+      render(
+        <Tabs type="editable-card" closable>
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+        </Tabs>
+      )
+
+      const closeButton = screen.getByRole('button', { name: 'Close Tab 1' })
+      expect(closeButton.tagName).toBe('BUTTON')
+      // The tab itself is no longer a native button (so it can host the close button).
+      const tab = screen.getByRole('tab', { name: 'Tab 1' })
+      expect(tab.tagName).not.toBe('BUTTON')
+      expect(tab).toContainElement(closeButton)
+    })
+
+    it('does not activate the tab when its close control is clicked (C06-3)', async () => {
+      const onChange = vi.fn()
+
+      render(
+        <Tabs type="editable-card" closable defaultActiveKey="1" onChange={onChange}>
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2">
+            Content 2
+          </TabPane>
+        </Tabs>
+      )
+
+      const closeTab2 = screen.getByRole('button', { name: 'Close Tab 2' })
+      await fireEvent.click(closeTab2)
+
+      // Closing tab 2 must not select it.
+      expect(onChange).not.toHaveBeenCalledWith('2')
+    })
+
     it('should call onEdit when Delete/Backspace is pressed on a closable tab', async () => {
       const onEdit = vi.fn()
 
@@ -752,6 +790,31 @@ describe('Tabs', () => {
 
       // Content should switch automatically
       expect(screen.getByText('Content 2')).toBeVisible()
+    })
+
+    it('should update roving tabIndex after an uncontrolled click (C06-2)', async () => {
+      render(
+        <Tabs defaultActiveKey="1">
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2">
+            Content 2
+          </TabPane>
+        </Tabs>
+      )
+
+      const tab1 = screen.getByRole('tab', { name: 'Tab 1' })
+      const tab2 = screen.getByRole('tab', { name: 'Tab 2' })
+
+      expect(tab1).toHaveAttribute('tabindex', '0')
+      expect(tab2).toHaveAttribute('tabindex', '-1')
+
+      await fireEvent.click(tab2)
+
+      // The newly active tab becomes the single tab-stop; the old one leaves it.
+      expect(tab2).toHaveAttribute('tabindex', '0')
+      expect(tab1).toHaveAttribute('tabindex', '-1')
     })
   })
 

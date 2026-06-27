@@ -11,7 +11,7 @@ import type { DragItem, DragDropEvent } from '../types/drag'
 // ─── Tailwind class constants ─────────────────────────────────────
 
 export const fileManagerContainerClasses =
-  'tiger-file-manager flex flex-col border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-bg,#ffffff)] overflow-hidden'
+  'tiger-file-manager relative flex flex-col border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-bg,#ffffff)] overflow-hidden'
 
 export const fileManagerToolbarClasses =
   'flex items-center gap-2 px-3 py-2 border-b border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-bg-secondary,#f9fafb)]'

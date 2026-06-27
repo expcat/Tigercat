@@ -190,6 +190,9 @@ export const TabPane = defineComponent({
     }
 
     const handleClose = (event: Event) => {
+      // The close control is nested inside the tab; prevent the click from
+      // bubbling up and activating the tab it is closing.
+      event.stopPropagation()
       if (!props.disabled) {
         tabsContext.handleTabClose(props.tabKey, event)
       }
@@ -230,11 +233,9 @@ export const TabPane = defineComponent({
 
       const tabList = (event.currentTarget as HTMLElement | null)?.closest('[role="tablist"]')
 
-      const tabButtons = Array.from(
-        tabList?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? []
-      )
+      const tabButtons = Array.from(tabList?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])
 
-      const enabled = tabButtons.filter((button) => !button.disabled)
+      const enabled = tabButtons.filter((button) => button.getAttribute('aria-disabled') !== 'true')
       const currentIndex = enabled.findIndex((button) => button.id === props.tabId)
       if (currentIndex === -1) {
         return
@@ -278,18 +279,25 @@ export const TabPane = defineComponent({
 
     return () => {
       if (props.renderMode === 'tab') {
+        // The tab is a `div[role="tab"]` (not a native button) so the closable
+        // variant can nest a real `<button>` close control without nesting an
+        // interactive button inside another button (C06-3).
         return h(
-          'button',
+          'div',
           {
-            type: 'button',
             class: tabItemClasses.value,
             role: 'tab',
             id: props.tabId,
             'aria-controls': props.panelId,
             'aria-selected': isActive.value,
             'aria-disabled': props.disabled,
-            disabled: props.disabled,
-            tabindex: typeof props.tabIndex === 'number' ? props.tabIndex : isActive.value ? 0 : -1,
+            tabindex: props.disabled
+              ? -1
+              : typeof props.tabIndex === 'number'
+                ? props.tabIndex
+                : isActive.value
+                  ? 0
+                  : -1,
             'data-tiger-tabs-id': tabsContext.idBase,
             'data-tiger-tab-key':
               typeof props.tabKey === 'number' ? `n:${props.tabKey}` : `s:${props.tabKey}`,
@@ -301,9 +309,9 @@ export const TabPane = defineComponent({
             h('span', props.label),
             isClosable.value &&
               h(
-                'span',
+                'button',
                 {
-                  role: 'button',
+                  type: 'button',
                   class: tabCloseButtonClasses,
                   'aria-label': `Close ${String(props.label)}`,
                   tabindex: -1,

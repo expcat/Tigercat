@@ -111,11 +111,6 @@ export interface TabPaneProps {
    * @internal
    */
   panelId?: string
-
-  /**
-   * @internal
-   */
-  tabIndex?: number
 }
 
 export const TabPane: React.FC<TabPaneProps> = ({
@@ -129,8 +124,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
   children,
   renderMode = 'pane',
   tabId,
-  panelId,
-  tabIndex
+  panelId
 }) => {
   const tabsContext = useTabsContext()
 
@@ -200,11 +194,9 @@ export const TabPane: React.FC<TabPaneProps> = ({
 
     const tabList = (event.currentTarget as HTMLElement | null)?.closest('[role="tablist"]')
 
-    const tabButtons = Array.from(
-      tabList?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? []
-    )
+    const tabButtons = Array.from(tabList?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])
 
-    const enabled = tabButtons.filter((button) => !button.disabled)
+    const enabled = tabButtons.filter((button) => button.getAttribute('aria-disabled') !== 'true')
     const currentIndex = enabled.findIndex((button) => button.id === tabId)
     if (currentIndex === -1) {
       return
@@ -246,23 +238,28 @@ export const TabPane: React.FC<TabPaneProps> = ({
   }
 
   const handleClose = (event: React.MouseEvent) => {
+    // The close control is nested inside the tab; prevent the click from
+    // bubbling up and activating the tab it is closing.
+    event.stopPropagation()
     if (!disabled) {
       tabsContext.handleTabClose(tabKey, event)
     }
   }
 
   if (renderMode === 'tab') {
+    // The tab is a `div[role="tab"]` (not a native button) so the closable
+    // variant can nest a real `<button>` close control without nesting an
+    // interactive button inside another button (C06-3). Keyboard close stays
+    // on the tab itself via Delete/Backspace.
     return (
-      <button
-        type="button"
+      <div
         className={tabItemClasses}
         role="tab"
         id={tabId}
         aria-controls={panelId}
         aria-selected={isActive}
         aria-disabled={disabled}
-        disabled={disabled}
-        tabIndex={typeof tabIndex === 'number' ? tabIndex : isActive ? 0 : -1}
+        tabIndex={disabled ? -1 : isActive ? 0 : -1}
         data-tiger-tabs-id={tabsContext.idBase}
         data-tiger-tab-key={typeof tabKey === 'number' ? `n:${tabKey}` : `s:${tabKey}`}
         onClick={handleClick}
@@ -270,8 +267,8 @@ export const TabPane: React.FC<TabPaneProps> = ({
         {icon && <span className="flex items-center">{icon}</span>}
         <span>{label}</span>
         {isClosable && (
-          <span
-            role="button"
+          <button
+            type="button"
             className={tabCloseButtonClasses}
             aria-label={`Close ${String(label)}`}
             tabIndex={-1}
@@ -284,9 +281,9 @@ export const TabPane: React.FC<TabPaneProps> = ({
                 d={closeIconPathD}
               />
             </svg>
-          </span>
+          </button>
         )}
-      </button>
+      </div>
     )
   }
 
@@ -444,17 +441,17 @@ export const Tabs: React.FC<TabsProps> = ({
       keys.push(key)
       if (!child.props.disabled) enabledKeys.push(key)
 
-      const resolvedActiveKey = controlledActiveKey ?? defaultActiveKey ?? firstKey
       const tabId = `${idBase}-tab-${String(key)}`
       const panelId = `${idBase}-panel-${String(key)}`
 
+      // Roving tabindex is derived from the live active state inside TabPane
+      // (via `isActive`), so it stays correct after uncontrolled clicks.
       items.push(
         React.cloneElement(child, {
           key: `tab-${String(key)}`,
           renderMode: 'tab',
           tabId,
-          panelId,
-          tabIndex: key === resolvedActiveKey ? 0 : -1
+          panelId
         })
       )
       panes.push(
@@ -474,7 +471,7 @@ export const Tabs: React.FC<TabsProps> = ({
       tabKeys: keys,
       enabledTabKeys: enabledKeys
     }
-  }, [children, controlledActiveKey, defaultActiveKey, idBase])
+  }, [children, idBase])
 
   // Use controlled or uncontrolled state, defaulting to the first tab if none is specified
   const activeKey =
