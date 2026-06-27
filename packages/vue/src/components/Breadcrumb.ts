@@ -3,7 +3,9 @@ import {
   computed,
   inject,
   provide,
+  reactive,
   ref,
+  watch,
   Fragment,
   PropType,
   h,
@@ -252,10 +254,17 @@ export const Breadcrumb = defineComponent({
       return classNames(breadcrumbContainerClasses, extraContent.value && 'w-full', props.className)
     })
 
-    // Provide breadcrumb context to child components
-    provide<BreadcrumbContext>(BreadcrumbContextKey, {
+    // Provide a reactive context so child items follow dynamic `separator` changes
+    const breadcrumbContext = reactive<BreadcrumbContext>({
       separator: props.separator
     })
+    watch(
+      () => props.separator,
+      (separator) => {
+        breadcrumbContext.separator = separator
+      }
+    )
+    provide(BreadcrumbContextKey, breadcrumbContext)
 
     const renderItems = (): VNodeChild[] => {
       const rawChildren = (slots.default?.() || []) as VNode[]

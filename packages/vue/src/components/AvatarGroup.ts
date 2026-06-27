@@ -1,4 +1,4 @@
-import { defineComponent, h, provide, PropType } from 'vue'
+import { defineComponent, h, provide, reactive, watch, PropType } from 'vue'
 import {
   coerceClassValue,
   getAvatarGroupClasses,
@@ -41,10 +41,18 @@ export const AvatarGroup = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    provide<AvatarGroupContext>(AVATAR_GROUP_INJECTION_KEY, {
+    // Provide a reactive context so child Avatars follow dynamic `size` changes
+    const groupContext = reactive<AvatarGroupContext>({
       size: props.size,
       itemClass: getAvatarGroupItemClasses()
     })
+    watch(
+      () => props.size,
+      (size) => {
+        groupContext.size = size
+      }
+    )
+    provide(AVATAR_GROUP_INJECTION_KEY, groupContext)
 
     return () => {
       const children = slots.default?.() ?? []

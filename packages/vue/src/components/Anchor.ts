@@ -96,6 +96,15 @@ export const AnchorLink = defineComponent({
       anchorContext?.registerLink(props.href)
     })
 
+    // Keep the parent registry in sync when href changes dynamically
+    watch(
+      () => props.href,
+      (next, prev) => {
+        anchorContext?.unregisterLink(prev)
+        anchorContext?.registerLink(next)
+      }
+    )
+
     onBeforeUnmount(() => {
       anchorContext?.unregisterLink(props.href)
     })

@@ -41,6 +41,7 @@ import {
   type DatePickerSize,
   type DateFormat,
   type DatePickerModelValue,
+  type DatePickerRangeModelValue,
   type DatePickerLocaleInput,
   type DatePickerLabels,
   type DatePickerShortcut
@@ -72,6 +73,7 @@ export interface VueDatePickerProps {
   clearable?: boolean
   name?: string
   id?: string
+  shortcuts?: DatePickerShortcut[]
   className?: string
   style?: Record<string, unknown>
 }
@@ -236,7 +238,11 @@ export const DatePicker = defineComponent({
       return isModelValue(value)
     },
     /**
-     * Emitted when date changes
+     * Convenience event emitted alongside `update:modelValue` on every value
+     * change. This is an intentional, non-v-model event (the idiomatic Vue
+     * pattern); it always carries the same normalized value as
+     * `update:modelValue`. Prefer `v-model` for two-way binding and use
+     * `@change` only for side effects.
      */
     change: (value: unknown) => {
       return isModelValue(value)
@@ -501,7 +507,31 @@ export const DatePicker = defineComponent({
 
     function handleShortcut(shortcut: DatePickerShortcut) {
       const val = typeof shortcut.value === 'function' ? shortcut.value() : shortcut.value
-      emitValue(val)
+
+      // Normalize shortcut values the same way React does (parse strings, zero
+      // the time component) so v-model receives canonical `Date` instances.
+      if (!isRangeMode.value) {
+        const date =
+          val instanceof Date
+            ? normalizeDate(val)
+            : val
+              ? normalizeDate(parseDate(val as string)!)
+              : null
+        emitValue(date)
+      } else {
+        const range = val as DatePickerRangeModelValue | null
+        if (range && Array.isArray(range)) {
+          emitValue([
+            range[0]
+              ? normalizeDate(range[0] instanceof Date ? range[0] : parseDate(range[0])!)
+              : null,
+            range[1]
+              ? normalizeDate(range[1] instanceof Date ? range[1] : parseDate(range[1])!)
+              : null
+          ])
+        }
+      }
+
       closeCalendar()
     }
 

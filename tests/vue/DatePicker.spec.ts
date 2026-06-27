@@ -528,6 +528,59 @@ describe('DatePicker', () => {
         expect(emitted()['change']).toBeTruthy()
       })
     })
+
+    it('normalizes a Date shortcut value to midnight before emitting', async () => {
+      const withTime = new Date('2024-06-15T13:45:30')
+      const { container, emitted } = renderWithProps(DatePicker, {
+        shortcuts: [{ label: 'Afternoon', value: withTime }]
+      })
+
+      const input = container.querySelector('input') as HTMLInputElement
+      await fireEvent.click(input)
+
+      await waitFor(() => {
+        expect(screen.getByText('Afternoon')).toBeInTheDocument()
+      })
+
+      await fireEvent.click(screen.getByText('Afternoon'))
+
+      await waitFor(() => {
+        expect(emitted()['change']).toBeTruthy()
+      })
+
+      const emittedValue = emitted()['change'][0][0] as Date
+      expect(emittedValue).toBeInstanceOf(Date)
+      expect(emittedValue.getHours()).toBe(0)
+      expect(emittedValue.getMinutes()).toBe(0)
+      expect(emittedValue.getSeconds()).toBe(0)
+      expect(emittedValue.getFullYear()).toBe(2024)
+      expect(emittedValue.getMonth()).toBe(5)
+      expect(emittedValue.getDate()).toBe(15)
+    })
+
+    it('parses a string shortcut value into a normalized Date before emitting', async () => {
+      const { container, emitted } = renderWithProps(DatePicker, {
+        shortcuts: [{ label: 'NewYear', value: '2024-01-01' }]
+      })
+
+      const input = container.querySelector('input') as HTMLInputElement
+      await fireEvent.click(input)
+
+      await waitFor(() => {
+        expect(screen.getByText('NewYear')).toBeInTheDocument()
+      })
+
+      await fireEvent.click(screen.getByText('NewYear'))
+
+      await waitFor(() => {
+        expect(emitted()['change']).toBeTruthy()
+      })
+
+      const emittedValue = emitted()['change'][0][0] as Date
+      // Before normalization the raw string would be emitted as-is
+      expect(emittedValue).toBeInstanceOf(Date)
+      expect(emittedValue.getHours()).toBe(0)
+    })
   })
 
   describe('Accessibility', () => {

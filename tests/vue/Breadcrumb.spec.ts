@@ -172,6 +172,43 @@ describe('Breadcrumb', () => {
       const separator = container.querySelector('[aria-hidden="true"]')
       expect(separator).toHaveTextContent('→')
     })
+
+    it('should update child separators when the parent separator prop changes', async () => {
+      const { container, rerender } = render(Breadcrumb, {
+        props: { separator: '/' },
+        slots: {
+          default: () => [
+            h(BreadcrumbItem, { href: '/' }, () => 'Home'),
+            h(BreadcrumbItem, { current: true }, () => 'Current')
+          ]
+        }
+      })
+
+      expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('/')
+
+      await rerender({ separator: 'arrow' })
+
+      expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('→')
+    })
+
+    it('should keep item-level separator override when the parent separator prop changes', async () => {
+      const { container, rerender } = render(Breadcrumb, {
+        props: { separator: '/' },
+        slots: {
+          default: () => [
+            h(BreadcrumbItem, { href: '/', separator: 'chevron' }, () => 'Home'),
+            h(BreadcrumbItem, { current: true }, () => 'Current')
+          ]
+        }
+      })
+
+      expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('›')
+
+      await rerender({ separator: 'arrow' })
+
+      // The item-level override still wins over the (now changed) parent separator
+      expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('›')
+    })
   })
 
   describe('BreadcrumbItem', () => {

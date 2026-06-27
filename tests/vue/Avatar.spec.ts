@@ -224,6 +224,28 @@ describe('AvatarGroup', () => {
     })
   })
 
+  it('updates child avatar sizes when the group size prop changes', async () => {
+    const { container, rerender } = render(AvatarGroup, {
+      props: { size: 'sm' },
+      slots: {
+        default: () => [h(Avatar, { text: 'AB' }), h(Avatar, { text: 'CD' })]
+      }
+    })
+
+    container.querySelectorAll('[role="img"]').forEach((avatar) => {
+      expect(avatar.className).toContain('w-8 h-8 text-xs')
+    })
+
+    await rerender({ size: 'lg' })
+
+    const avatars = container.querySelectorAll('[role="img"]')
+    expect(avatars.length).toBe(2)
+    avatars.forEach((avatar) => {
+      expect(avatar.className).toContain('w-12 h-12 text-base')
+      expect(avatar.className).not.toContain('w-8 h-8 text-xs')
+    })
+  })
+
   it('lets an explicit avatar size override the group size', () => {
     const { container } = render(AvatarGroup, {
       props: { size: 'sm' },

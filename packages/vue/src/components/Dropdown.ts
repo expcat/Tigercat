@@ -3,6 +3,7 @@ import {
   computed,
   ref,
   provide,
+  reactive,
   PropType,
   h,
   onBeforeUnmount,
@@ -377,11 +378,18 @@ export const Dropdown = defineComponent({
       transformOrigin: getTransformOrigin(currentPlacement.value)
     }))
 
-    // Provide dropdown context
-    provide<DropdownContext>(DropdownContextKey, {
+    // Provide a reactive context so items see dynamic `closeOnClick` changes
+    const dropdownContext = reactive<DropdownContext>({
       closeOnClick: props.closeOnClick,
       handleItemClick
     })
+    watch(
+      () => props.closeOnClick,
+      (closeOnClick) => {
+        dropdownContext.closeOnClick = closeOnClick
+      }
+    )
+    provide(DropdownContextKey, dropdownContext)
 
     // DropdownItem tabIndex: menuitem should be -1 (focused programmatically)
     const _menuItemTabIndex = -1

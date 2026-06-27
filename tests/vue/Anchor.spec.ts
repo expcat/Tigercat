@@ -4,9 +4,10 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { h } from 'vue'
+import { defineComponent, h } from 'vue'
 import { Anchor, AnchorLink } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
+import { MockIntersectionObserver } from '../utils/mock-observers'
 
 describe('Anchor', () => {
   let scrollContainer: HTMLDivElement
@@ -353,6 +354,51 @@ describe('Anchor', () => {
     it('should handle empty or minimal props without errors', () => {
       const { container } = render(Anchor)
       expect(container.firstChild).toBeTruthy()
+    })
+  })
+
+  describe('AnchorLink href lifecycle', () => {
+    beforeEach(() => {
+      MockIntersectionObserver.reset()
+      vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    // Wrapper exposes a reactive href so rerender() can mutate the child AnchorLink
+    const HrefWrapper = defineComponent({
+      props: { linkHref: { type: String, required: true } },
+      setup(props) {
+        return () =>
+          h(
+            Anchor,
+            { getContainer: () => scrollContainer, affix: false },
+            { default: () => [h(AnchorLink, { href: props.linkHref, title: 'Dynamic' })] }
+          )
+      }
+    })
+
+    const latestObservedIds = () => {
+      const latest = MockIntersectionObserver.instances.at(-1)
+      return latest ? latest.observe.mock.calls.map((call) => (call[0] as Element).id) : []
+    }
+
+    it('swaps the registered href in the observer when href changes dynamically', async () => {
+      const { rerender } = render(HrefWrapper, { props: { linkHref: '#section1' } })
+
+      await waitFor(() => {
+        expect(latestObservedIds()).toContain('section1')
+      })
+
+      await rerender({ linkHref: '#section2' })
+
+      // After the change the observer tracks the new target, not the stale one
+      await waitFor(() => {
+        expect(latestObservedIds()).toContain('section2')
+      })
+      expect(latestObservedIds()).not.toContain('section1')
     })
   })
 })

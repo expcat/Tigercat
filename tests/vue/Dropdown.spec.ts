@@ -362,6 +362,28 @@ describe('Dropdown', () => {
       expect(wrapper).not.toHaveAttribute('hidden')
     })
 
+    it('closes on item click after closeOnClick is toggled from false to true', async () => {
+      const { rerender } = render(Dropdown, {
+        props: { trigger: 'click', closeOnClick: false },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      await fireEvent.click(screen.getByText('Trigger'))
+      await fireEvent.click(screen.getByText('Item 1'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      // Reactively flip closeOnClick to true; the item must see the live value
+      await rerender({ trigger: 'click', closeOnClick: true })
+      await fireEvent.click(screen.getByText('Item 1'))
+      expect(wrapper).toHaveAttribute('hidden')
+    })
+
     it('emits open-change event', async () => {
       const { emitted } = render(Dropdown, {
         props: { trigger: 'click' },
