@@ -453,6 +453,12 @@ describe('Upload', () => {
       const img = container.querySelector('img')
       expect(img).toBeInTheDocument()
       expect(img).toHaveAttribute('src', 'https://example.com/test.jpg')
+      const renderedClasses = Array.from(container.querySelectorAll('[class]'))
+        .map((node) => node.getAttribute('class') ?? '')
+        .join(' ')
+      expect(renderedClasses).toContain('bg-black/0')
+      expect(renderedClasses).toContain('hover:bg-black/50')
+      expect(renderedClasses).not.toContain('bg-opacity-')
     })
   })
 
@@ -520,6 +526,26 @@ describe('Upload', () => {
 
       const uploadingIcon = container.querySelector('[aria-label="Uploading"]')
       expect(uploadingIcon).toBeInTheDocument()
+    })
+
+    it('should render uploading picture card overlay with Tailwind v4 opacity classes', () => {
+      const { container } = renderWithProps(Upload, {
+        fileList: [
+          {
+            uid: 'file-1',
+            name: 'test.jpg',
+            status: 'uploading',
+            url: 'https://example.com/test.jpg'
+          }
+        ],
+        listType: 'picture-card'
+      })
+
+      const renderedClasses = Array.from(container.querySelectorAll('[class]'))
+        .map((node) => node.getAttribute('class') ?? '')
+        .join(' ')
+      expect(renderedClasses).toContain('bg-white/75')
+      expect(renderedClasses).not.toContain('bg-opacity-')
     })
   })
 

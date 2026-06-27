@@ -213,7 +213,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "node ../../scripts/rimraf.mjs dist",
-    "tokens": "node ./scripts/generate-tokens.mjs"
+    "tokens": "node ./scripts/generate-tokens.mjs",
+    "tokens:check": "node ./scripts/generate-tokens.mjs --check"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6"

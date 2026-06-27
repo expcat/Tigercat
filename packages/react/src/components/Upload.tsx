@@ -473,7 +473,7 @@ export const Upload: React.FC<UploadProps> = ({
         {/* Image preview */}
         {imageUrl && <img src={imageUrl} alt={file.name} className="w-full h-full object-cover" />}
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100">
+        <div className="absolute inset-0 bg-black/0 hover:bg-black/50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100">
           {/* Preview button */}
           <button
             type="button"
@@ -521,7 +521,7 @@ export const Upload: React.FC<UploadProps> = ({
         </div>
         {/* Status indicator */}
         {file.status === 'uploading' && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
+          <div className="absolute inset-0 bg-white/75 flex items-center justify-center">
             <svg
               className={getUploadStatusIconClasses('uploading', 'lg', {
                 spinning: true

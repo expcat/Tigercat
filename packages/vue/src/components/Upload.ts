@@ -716,7 +716,7 @@ export const Upload = defineComponent({
             'div',
             {
               class:
-                'absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100'
+                'absolute inset-0 bg-black/0 hover:bg-black/50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100'
             },
             [
               // Preview button
@@ -794,7 +794,7 @@ export const Upload = defineComponent({
             h(
               'div',
               {
-                class: 'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center'
+                class: 'absolute inset-0 bg-white/75 flex items-center justify-center'
               },
               [
                 h(

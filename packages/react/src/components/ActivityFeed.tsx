@@ -133,7 +133,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                   <Tag
                     variant={item.status.variant ?? 'default'}
                     size="sm"
-                    className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-opacity-10 shadow-sm">
+                    className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-current/10 shadow-sm">
                     {item.status.label}
                   </Tag>
                 ) : null}

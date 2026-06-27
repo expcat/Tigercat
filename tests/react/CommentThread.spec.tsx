@@ -145,6 +145,26 @@ describe('CommentThread (React)', () => {
     expect(screen.getByText('10:30')).toBeInTheDocument()
   })
 
+  it('renders status tags with Tailwind v4 opacity classes', () => {
+    const nodes: CommentNode[] = [
+      {
+        id: 1,
+        content: 'Tagged',
+        user: { name: 'A' },
+        tag: { label: 'Owner', variant: 'primary' },
+        tags: [{ label: 'Pinned', variant: 'success' }]
+      }
+    ]
+
+    render(<CommentThread nodes={nodes} />)
+
+    for (const label of ['Owner', 'Pinned']) {
+      const tag = screen.getByText(label).closest('[role="status"]')
+      expect(tag?.className).toContain('bg-current/10')
+      expect(tag?.className).not.toContain('bg-opacity-')
+    }
+  })
+
   it('hides avatar when showAvatar is false', () => {
     const nodes: CommentNode[] = [
       { id: 1, content: 'Hello', user: { name: 'A', avatar: '/avatar.png' } }

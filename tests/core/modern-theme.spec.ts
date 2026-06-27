@@ -7,7 +7,10 @@ import {
   MODERN_OVERRIDE_TOKENS_DARK,
   MODERN_REDUCED_MOTION_TOKENS,
   createTigercatPlugin,
-  tigercatPlugin
+  tigercatPlugin,
+  tigercatTheme,
+  tigercatDarkTheme,
+  defaultTheme
 } from '@expcat/tigercat-core'
 
 describe('Modern theme tokens', () => {
@@ -85,6 +88,15 @@ describe('Modern theme tokens', () => {
     expect(modernTheme.light.shadows?.lg).toContain('rgb(0 0 0 / 0.08)')
     expect(modernTheme.light.motion?.easing).toBe('cubic-bezier(0.2, 0, 0, 1)')
     expect(modernTheme.dark.colors?.surface).toBe('#0f172a')
+  })
+
+  it('keeps Tailwind plugin defaults derived from the default preset colors', () => {
+    expect(tigercatTheme['--tiger-primary']).toBe(defaultTheme.light.colors?.primary)
+    expect(tigercatTheme['--tiger-surface']).toBe(defaultTheme.light.colors?.surface)
+    expect(tigercatTheme['--tiger-chart-6']).toBe(defaultTheme.light.colors?.chart6)
+    expect(tigercatDarkTheme['--tiger-primary']).toBe(defaultTheme.dark.colors?.primary)
+    expect(tigercatDarkTheme['--tiger-surface']).toBe(defaultTheme.dark.colors?.surface)
+    expect(tigercatDarkTheme['--tiger-chart-6']).toBe(defaultTheme.dark.colors?.chart6)
   })
 })
 

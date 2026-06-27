@@ -256,6 +256,19 @@ api:baseline:check` 已运行并生成预期 `api-reports/public-api-baseline.js
 
 **来源**：B-4、C02-3、C04-3、C18-1、C18-7。
 
+**状态**：已完成（2026-06-27）。本轮为 token 生成器新增非写入 `--check`
+模式与 `tokens:check` 脚本；Tailwind plugin 默认 `tigercatTheme` /
+`tigercatDarkTheme` 改为经 `THEME_CSS_VARS` 从 default theme colors 派生；
+ActivityFeed、CommentThread、Upload 的残留 `bg-opacity-*` class 已迁移为
+Tailwind v4 透明度写法，并补齐双端断言。完成验证已运行
+`npx -y pnpm@11.9.0 tokens:build`、`npx -y pnpm@11.9.0 tokens:check`、
+`npx -y pnpm@11.9.0 vitest run tests/core/design-tokens.spec.ts tests/core/modern-theme.spec.ts`、
+`npx -y pnpm@11.9.0 vitest run tests/react/ActivityFeed.spec.tsx tests/vue/ActivityFeed.spec.ts tests/react/CommentThread.spec.tsx tests/vue/CommentThread.spec.ts tests/react/Upload.spec.tsx tests/vue/Upload.spec.ts`、
+`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:validate`、
+`npx -y pnpm@11.9.0 build`、`npx -y pnpm@11.9.0 size`。其中 T10 相关
+`Core tailwind/modern subpath` size 通过；当前仓库仍有未触碰的 React
+DatePicker/Tree/TimePicker 与 core zh-CN locale size budget 超限。
+
 **允许修改**：token 生成链路、Tailwind plugin 默认变量、theme preset 默认值同步护栏、相关组件 class/token 引用、token/Tailwind 测试。
 
 **不得修改**：ThemeManager 运行时非 colors 应用（归 T08）、locale、a11y、generated references。

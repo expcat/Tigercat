@@ -416,7 +416,7 @@ export const CommentThread = defineComponent({
                         size: 'sm',
                         variant: node.tag.variant ?? 'default',
                         className:
-                          'rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-opacity-10'
+                          'rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-current/10'
                       },
                       { default: () => node.tag?.label }
                     )
@@ -429,7 +429,7 @@ export const CommentThread = defineComponent({
                       size: 'sm',
                       variant: tag.variant ?? 'default',
                       className:
-                        'rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-opacity-10'
+                        'rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase border border-current bg-current/10'
                     },
                     { default: () => tag.label }
                   )

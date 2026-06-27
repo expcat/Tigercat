@@ -57,6 +57,7 @@
     "docs:api": "node ./scripts/generate-api-docs.mjs",
     "docs:api:check": "pnpm docs:api && git diff --exit-code skills/tigercat/references",
     "tokens:build": "node ./packages/core/scripts/generate-tokens.mjs",
+    "tokens:check": "node ./packages/core/scripts/generate-tokens.mjs --check",
     "types:check": "node ./scripts/check-public-types.mjs",
     "example:vue": "pnpm --filter @expcat/tigercat-example-vue3 dev",
     "example:react": "pnpm --filter @expcat/tigercat-example-react dev",

@@ -11,13 +11,14 @@
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { format } from 'prettier'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const TOKENS_DIR = join(__dirname, '..', 'tokens')
 const SRC_TOKENS_DIR = join(__dirname, '..', 'src', 'tokens')
+const CHECK_MODE = process.argv.includes('--check')
 const rawTokens = JSON.parse(readFileSync(join(TOKENS_DIR, 'tokens.json'), 'utf-8'))
 const primitiveTokens = rawTokens.primitive ?? rawTokens.global
 const semanticTokens = rawTokens.semantic ?? rawTokens.alias
@@ -600,17 +601,59 @@ function generateFigmaVariables() {
 // Main
 // ---------------------------------------------------------------------------
 
-const css = await formatGenerated(generateCSS(), 'css')
-const ts = await formatGenerated(generateTS(), 'typescript')
-const tw = await formatGenerated(generateTailwind(), 'babel')
-const figma = await formatGenerated(generateFigmaVariables(), 'json')
+const generatedOutputs = [
+  {
+    label: 'tokens.css',
+    path: join(TOKENS_DIR, 'tokens.css'),
+    content: await formatGenerated(generateCSS(), 'css')
+  },
+  {
+    label: 'tokens.ts',
+    path: join(SRC_TOKENS_DIR, 'tokens.ts'),
+    content: await formatGenerated(generateTS(), 'typescript')
+  },
+  {
+    label: 'tailwind-tokens.js',
+    path: join(TOKENS_DIR, 'tailwind-tokens.js'),
+    content: await formatGenerated(generateTailwind(), 'babel')
+  },
+  {
+    label: 'figma-variables.json',
+    path: join(TOKENS_DIR, 'figma-variables.json'),
+    content: await formatGenerated(generateFigmaVariables(), 'json')
+  }
+]
 
-writeFileSync(join(TOKENS_DIR, 'tokens.css'), css, 'utf-8')
-writeFileSync(join(SRC_TOKENS_DIR, 'tokens.ts'), ts, 'utf-8')
-writeFileSync(join(TOKENS_DIR, 'tailwind-tokens.js'), tw, 'utf-8')
-writeFileSync(join(TOKENS_DIR, 'figma-variables.json'), figma, 'utf-8')
+if (CHECK_MODE) {
+  const staleOutputs = []
 
-console.log('✓ tokens.css generated')
-console.log('✓ tokens.ts generated')
-console.log('✓ tailwind-tokens.js generated')
-console.log('✓ figma-variables.json generated')
+  for (const output of generatedOutputs) {
+    let actual
+    try {
+      actual = readFileSync(output.path, 'utf-8')
+    } catch {
+      staleOutputs.push(`${relative(process.cwd(), output.path)} (missing)`)
+      continue
+    }
+
+    if (actual !== output.content) {
+      staleOutputs.push(relative(process.cwd(), output.path))
+    }
+  }
+
+  if (staleOutputs.length > 0) {
+    console.error('Token outputs are out of date:')
+    for (const outputPath of staleOutputs) {
+      console.error(`- ${outputPath}`)
+    }
+    console.error('Run pnpm tokens:build to regenerate them.')
+    process.exitCode = 1
+  } else {
+    console.log('✓ token outputs are up to date')
+  }
+} else {
+  for (const output of generatedOutputs) {
+    writeFileSync(output.path, output.content, 'utf-8')
+    console.log(`✓ ${output.label} generated`)
+  }
+}
