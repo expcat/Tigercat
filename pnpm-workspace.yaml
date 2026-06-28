@@ -59,6 +59,7 @@ overrides:
   'js-yaml@<=4.1.1': 4.2.0
   'launch-editor@<=2.14.0': 2.14.1
   'minimatch@>=9.0.0 <9.0.7': 9.0.7
+  '@manypkg/get-packages>read-yaml-file': 2.1.0
   'next>postcss': 8.5.10
   'fix-dts-default-cjs-exports>rollup': 4.59.0
   'tsup>rollup': 4.59.0
