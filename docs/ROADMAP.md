@@ -18,8 +18,8 @@ source: current repository state after v1.5.0 roadmap closure
 ## 阶段进度
 
 - 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）与阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects），已完成于 2026-06-28。
-- 当前阶段：阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup），状态为 `未开始`。
-- 当前可执行任务：R06。R05 已完成 React/Vue sideEffects 收敛和 Message/notification 命令式入口拆分，R06 可继续删除兼容 API。
+- 当前阶段：阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup），状态为 `进行中`。
+- 当前可执行任务：R07。R06 已删除首批 deprecated / compat API 并加固 public deprecated API 校验，R07 可继续清理 legacy token 与旧资源导出。
 - 阶段 4 暂未开始；必须等各自前置阶段满足依赖后再认领。
 
 ## 执行原则
@@ -47,7 +47,7 @@ source: current repository state after v1.5.0 roadmap closure
 | 0    | 已完成（2026-06-28） | R01     | 只做路线图清理；为后续 v2 任务建立边界                                |
 | 1    | 已完成（2026-06-28） | R02-R03 | 先稳定版本与 release metadata，再切换 ESM-only 发布面                 |
 | 2    | 已完成（2026-06-28） | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
-| 3    | 未开始               | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
+| 3    | 进行中               | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
 | 4    | 未开始               | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
 
 阶段状态规则：
@@ -227,7 +227,7 @@ source: current repository state after v1.5.0 roadmap closure
 
 ### R06 remove deprecated and compatibility APIs
 
-**状态**：未开始。
+**状态**：已完成（2026-06-28）。
 
 **目标**：删除当前公开 `@deprecated`、兼容别名、旧事件/prop 和兼容 barrel，并让校验脚本阻止新增 public deprecated API。
 
@@ -244,6 +244,20 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm api:baseline`
 - `corepack pnpm api:baseline:check`
 - 受影响组件目标 spec
+
+**执行摘要**：已删除 core 公开废弃函数 `getResultHttpLabel(status)`，保留 `isHttpResultStatus(status)` 作为唯一结果状态判断入口；React `ImageGroup` 已删除旧回调 `onPreviewVisibleChange` 并统一为 `onPreviewOpenChange(open)`；Vue `ImageGroup` 已删除旧事件 `preview-visible-change` 并统一为 `preview-open-change`；`api:validate` 已升级为直接阻止 core / React / Vue 公开源码重新引入 `@deprecated`。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 vitest run tests/core/result-utils.spec.ts tests/react/ImageGroup.spec.tsx tests/vue/ImageGroup.spec.ts`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`（未提交工作树下按预期报告 `api-reports/public-api-baseline.json` 删除 `getResultHttpLabel` 的 intentional diff；已用 `npx -y pnpm@11.9.0 api:baseline` 写回）
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md CHANGELOG.md docs/MIGRATION.md`
+- `git diff --check`
 
 **状态更新要求**：完成后写回状态、日期、删除的兼容面摘要和关键验证命令；同步更新阶段 3 状态。
 

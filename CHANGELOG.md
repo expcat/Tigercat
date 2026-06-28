@@ -4,7 +4,13 @@
 
 ## v2.0.0
 
-本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports 与 React / Vue tree-shaking 副作用收敛；compat API 删除和 size gate 将按 `docs/ROADMAP.md` 的 R06-R09 继续拆批实施。
+本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛与首批 compat API 删除；legacy token cleanup 和 size gate 将按 `docs/ROADMAP.md` 的 R07-R09 继续拆批实施。
+
+### Breaking Changes
+
+- **core**：移除已废弃的 `getResultHttpLabel(status)`。请改用 `isHttpResultStatus(status) ? status : undefined`。
+- **React ImageGroup**：移除旧回调 `onPreviewVisibleChange`，统一为 `onPreviewOpenChange(open)`。
+- **Vue ImageGroup**：移除旧事件 `preview-visible-change`，统一为 `preview-open-change`。
 
 ### Infrastructure
 
@@ -14,6 +20,7 @@
 - core / React / Vue 构建统一为 ESM-only，不再生成 CJS 产物；core package exports 移除 `require` 条件和 `.cjs` 目标。
 - React / Vue package exports 移除 `./*` 通配入口，改为由 `scripts/lib/public-components.mjs` 事实源生成的 148 个 PascalCase 显式组件子路径；`exports:check` 与 `release:check` 会阻止清单漂移。
 - React / Vue package `sideEffects` 收敛为 `false`，不再用 `dist/chunk-*` 或 `dist/components/*` 全量副作用兜底；`MessageContainer` 与 `NotificationContainer` 拆为独立纯容器入口，命令式 `Message` / `notification` 单例挂载逻辑保留在对应 imperative 入口中。
+- `api:validate` 会直接阻止 core / React / Vue 公开源码重新引入 `@deprecated`，v2 不再新增过渡废弃层。
 - `release:check` 和 `publish:check` 增加 ESM-only 断言，发布 smoke 使用临时安装目录中的 bare ESM import 验证包入口，并阻止 `.cjs` 文件混入 tarball 或安装产物。
 - `release:check` 会阻止 React / Vue 恢复宽泛 sideEffects 声明；`publish:check` 会对安装后的 React / Vue root Button named import 和 Button 子路径 import 做 bundler smoke，确保普通 Button bundle 不拉入 Message / notification 命令式挂载代码。
 

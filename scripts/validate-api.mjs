@@ -340,10 +340,10 @@ for (const entry of CONTROLLED_PARITY) {
   }
 }
 
-// ----- Deprecated API usage in Examples -----
+// ----- Deprecated public API guard -----
 
 /**
- * Scan source directories for @deprecated JSDoc annotations and extract
+ * Scan public source directories for @deprecated JSDoc annotations and extract
  * the deprecated symbol name from the following code line.
  */
 function collectDeprecatedAPIs() {
@@ -357,9 +357,8 @@ function collectDeprecatedAPIs() {
 
   for (const dir of srcDirs) {
     if (!existsSync(dir)) continue
-    const files = readdirSync(dir).filter((f) => /\.(ts|tsx)$/.test(f))
-    for (const filename of files) {
-      const filepath = join(dir, filename)
+    const files = collectFiles(dir, ['.ts', '.tsx'])
+    for (const filepath of files) {
       const content = readFileSync(filepath, 'utf-8')
       const lines = content.split('\n')
 
@@ -410,92 +409,10 @@ function collectFiles(dir, extensions) {
   return collectFilesIn(dir, extensions, { skip: ['node_modules', 'dist', '.nuxt'] })
 }
 
-function getDeprecatedUsageRegexes(name, kinds) {
-  const escaped = escapeRegExp(name)
-  const regexes = []
-
-  if (kinds.has('prop')) {
-    regexes.push(new RegExp(`(?:^|[\\s<{(])(?:v-model:|v-bind:|:)?${escaped}\\s*=`))
-  }
-
-  if (kinds.has('event')) {
-    regexes.push(new RegExp(`(?:@|v-on:)${escaped}(?:\\s*=|\\b)`))
-  }
-
-  if (kinds.has('symbol')) {
-    regexes.push(new RegExp(`\\b${escaped}\\b`))
-  }
-
-  return regexes
-}
-
 const deprecatedAPIs = collectDeprecatedAPIs()
 
-if (deprecatedAPIs.length > 0) {
-  // Deduplicate: group by name and derive owning component(s) from source filenames.
-  // This avoids reporting `visible` in DropdownDemo when only ImagePreview deprecated it.
-  const deduped = new Map()
-  for (const api of deprecatedAPIs) {
-    if (!deduped.has(api.name)) {
-      deduped.set(api.name, { name: api.name, kinds: new Set(), sources: [] })
-    }
-    deduped.get(api.name).kinds.add(api.kind)
-    deduped.get(api.name).sources.push({ file: api.file, line: api.line })
-  }
-
-  // Derive PascalCase component names from source filenames
-  for (const [, entry] of deduped) {
-    entry.components = new Set()
-    for (const src of entry.sources) {
-      const fname = basename(src.file).replace(/\.(ts|tsx)$/, '')
-      // Remove -utils suffix for utility files → `kanban-utils` → `kanban`
-      const cleaned = fname.replace(/-utils$/, '')
-      // kebab-case / lowercase → PascalCase
-      const pascal = cleaned
-        .split('-')
-        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-        .join('')
-      entry.components.add(pascal)
-    }
-  }
-
-  const exampleDirs = [
-    join(ROOT, 'examples', 'example', 'vue3', 'src'),
-    join(ROOT, 'examples', 'example', 'react', 'src')
-  ]
-
-  for (const exDir of exampleDirs) {
-    const exFiles = collectFiles(exDir, ['.vue', '.ts', '.tsx', '.jsx', '.js'])
-    for (const exFile of exFiles) {
-      const content = readFileSync(exFile, 'utf-8')
-      const lines = content.split('\n')
-
-      for (const [name, entry] of deduped) {
-        // Scope check: only report if the example file uses (imports/renders)
-        // one of the owning components. This prevents false positives for
-        // generic names like "visible" appearing in unrelated components.
-        const usesComponent = [...entry.components].some((comp) => {
-          const importRe = new RegExp(`import\\b[^;]*\\b${comp}\\b|<${comp}[\\s/>]`)
-          return importRe.test(content)
-        })
-        if (!usesComponent) continue
-
-        const regexes = getDeprecatedUsageRegexes(name, entry.kinds)
-        lines.forEach((line, idx) => {
-          if (regexes.some((regex) => regex.test(line))) {
-            const relPath = relative(ROOT, exFile)
-            const srcLabel = entry.sources.map((s) => `${basename(s.file)}:${s.line}`).join(', ')
-            addIssue(
-              relPath,
-              idx + 1,
-              'deprecated-in-example',
-              `Example 使用了废弃 API "${name}"（来源：${srcLabel}）`
-            )
-          }
-        })
-      }
-    }
-  }
+for (const api of deprecatedAPIs) {
+  addIssue(api.file, api.line, 'public-deprecated', `公开 API "${api.name}" 不得标记 @deprecated`)
 }
 
 // ----- LLM docs coverage check -----
@@ -775,6 +692,7 @@ if (jsonMode) {
       'missing-vue': '缺失 Vue 实现',
       'overlay-api': '弹出层 API 一致性',
       'controlled-parity': '受控量双端对称',
+      'public-deprecated': '公开 API 禁止 @deprecated',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',
       'docs-api': 'LLM 文档与公开 API 覆盖'
     }

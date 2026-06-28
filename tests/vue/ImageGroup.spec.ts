@@ -2,8 +2,8 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/vue'
+import { describe, it, expect, vi } from 'vitest'
+import { fireEvent, render } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
 import { ImageGroup, Image } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -53,6 +53,28 @@ describe('ImageGroup', () => {
     const images = container.querySelectorAll('img')
     expect(images.length).toBe(2)
   })
+
+  it('emits preview-open-change when group preview opens', async () => {
+    const onPreviewOpenChange = vi.fn()
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(
+            ImageGroup,
+            { onPreviewOpenChange },
+            {
+              default: () => [h(Image, { src: '/img1.jpg', alt: 'Image 1', preview: true })]
+            }
+          )
+      }
+    })
+
+    const { container } = render(Wrapper)
+    await fireEvent.click(container.querySelector('[role="button"]') as HTMLElement)
+
+    expect(onPreviewOpenChange).toHaveBeenCalledWith(true)
+  })
+
   it('renders with preview disabled', () => {
     const { container } = render(ImageGroup, {
       props: { preview: false },

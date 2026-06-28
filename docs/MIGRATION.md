@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，将 React / Vue component 子路径收敛为 PascalCase 显式 exports，并收紧 React / Vue tree-shaking 副作用声明。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。legacy token、compat API 删除和按需加载迁移项会随后续 R06-R09 任务落地后追加到本节。
+v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，将 React / Vue component 子路径收敛为 PascalCase 显式 exports，收紧 React / Vue tree-shaking 副作用声明，并删除首批 deprecated / compat API。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。legacy token 和按需加载迁移项会随后续 R07-R09 任务落地后追加到本节。
 
 ### React / Vue component 子路径改为显式 PascalCase
 
@@ -38,18 +38,36 @@ import { MessageContainer } from '@expcat/tigercat-react/MessageContainer'
 import { NotificationContainer } from '@expcat/tigercat-react/NotificationContainer'
 ```
 
-## v1.5.0
+### 移除 `getResultHttpLabel`
 
-### `getResultHttpLabel` 标记为废弃
-
-`getResultHttpLabel(status)` 的返回值始终等于 HTTP status 本身；新代码请使用 `isHttpResultStatus(status)` 判断是否为 HTTP 结果状态，再按需直接使用原 status。
+core 已删除 v1.5.0 标记为废弃的 `getResultHttpLabel(status)`。该函数的返回值始终等于 HTTP status 本身；请使用 `isHttpResultStatus(status)` 判断后直接使用原 status。
 
 ```diff
 - const label = getResultHttpLabel(status)
 + const label = isHttpResultStatus(status) ? status : undefined
 ```
 
-旧函数仍保留为兼容别名，本次不要求立即迁移。
+### ImageGroup 预览回调统一为 open 命名
+
+React `ImageGroup` 删除旧回调 `onPreviewVisibleChange`：
+
+```diff
+- <ImageGroup onPreviewVisibleChange={handlePreviewChange}>
++ <ImageGroup onPreviewOpenChange={handlePreviewChange}>
+    <Image src="/photo.jpg" />
+  </ImageGroup>
+```
+
+Vue `ImageGroup` 删除旧事件 `preview-visible-change`：
+
+```diff
+- <ImageGroup @preview-visible-change="handlePreviewChange">
++ <ImageGroup @preview-open-change="handlePreviewChange">
+    <Image src="/photo.jpg" />
+  </ImageGroup>
+```
+
+## v1.5.0
 
 ### 跨端 API 对称：受控量 / 事件回调统一命名
 

@@ -8,7 +8,6 @@ import {
   resultExtraClasses,
   getResultColorScheme,
   getResultIconPath,
-  getResultHttpLabel,
   isHttpResultStatus
 } from '@expcat/tigercat-core'
 import type { ResultStatus } from '@expcat/tigercat-core'
@@ -89,21 +88,6 @@ describe('result-utils', () => {
       expect(isHttpResultStatus('error')).toBe(false)
       expect(isHttpResultStatus('info')).toBe(false)
       expect(isHttpResultStatus('warning')).toBe(false)
-    })
-  })
-
-  describe('getResultHttpLabel (deprecated)', () => {
-    it('returns label for HTTP error statuses', () => {
-      expect(getResultHttpLabel('404')).toBe('404')
-      expect(getResultHttpLabel('403')).toBe('403')
-      expect(getResultHttpLabel('500')).toBe('500')
-    })
-
-    it('returns undefined for non-HTTP statuses', () => {
-      expect(getResultHttpLabel('success')).toBeUndefined()
-      expect(getResultHttpLabel('error')).toBeUndefined()
-      expect(getResultHttpLabel('info')).toBeUndefined()
-      expect(getResultHttpLabel('warning')).toBeUndefined()
     })
   })
 })

@@ -23,7 +23,7 @@ export const ImageGroup = defineComponent({
   props: {
     preview: { type: Boolean, default: true }
   },
-  emits: ['preview-visible-change'],
+  emits: ['preview-open-change'],
   setup(props, { slots, emit }) {
     const images = ref<string[]>([])
     const previewVisible = ref(false)
@@ -42,7 +42,7 @@ export const ImageGroup = defineComponent({
         if (!props.preview) return
         previewIndex.value = index
         previewVisible.value = true
-        emit('preview-visible-change', true)
+        emit('preview-open-change', true)
       }
     }
 
@@ -62,7 +62,7 @@ export const ImageGroup = defineComponent({
             currentIndex: previewIndex.value,
             'onUpdate:open': (val: boolean) => {
               previewVisible.value = val
-              if (!val) emit('preview-visible-change', false)
+              if (!val) emit('preview-open-change', false)
             },
             'onUpdate:currentIndex': (val: number) => {
               previewIndex.value = val

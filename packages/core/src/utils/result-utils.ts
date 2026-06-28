@@ -132,14 +132,3 @@ const HTTP_RESULT_STATUSES = new Set<ResultStatus>(['404', '403', '500'])
 export function isHttpResultStatus(status: ResultStatus): boolean {
   return HTTP_RESULT_STATUSES.has(status)
 }
-
-/**
- * If the status is an HTTP error code return its label, otherwise `undefined`.
- *
- * @deprecated Use {@link isHttpResultStatus} instead — the label always equals
- * the status string, so prefer `isHttpResultStatus(status) ? status : undefined`.
- * This function will be removed in a future major release.
- */
-export function getResultHttpLabel(status: ResultStatus): string | undefined {
-  return isHttpResultStatus(status) ? status : undefined
-}

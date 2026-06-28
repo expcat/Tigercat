@@ -21,9 +21,9 @@ export interface ImageGroupProps {
    */
   preview?: boolean
   /**
-   * Callback when preview visibility changes
+   * Callback when preview open state changes
    */
-  onPreviewVisibleChange?: (visible: boolean) => void
+  onPreviewOpenChange?: (open: boolean) => void
   /**
    * Children
    */
@@ -36,7 +36,7 @@ export interface ImageGroupProps {
 
 export const ImageGroup: React.FC<ImageGroupProps> = ({
   preview = true,
-  onPreviewVisibleChange,
+  onPreviewOpenChange,
   children,
   className
 }) => {
@@ -59,9 +59,9 @@ export const ImageGroup: React.FC<ImageGroupProps> = ({
       if (!preview) return
       setPreviewIndex(index)
       setPreviewVisible(true)
-      onPreviewVisibleChange?.(true)
+      onPreviewOpenChange?.(true)
     },
-    [preview, onPreviewVisibleChange]
+    [preview, onPreviewOpenChange]
   )
 
   const contextValue = useMemo(
@@ -80,7 +80,7 @@ export const ImageGroup: React.FC<ImageGroupProps> = ({
             currentIndex={previewIndex}
             onOpenChange={(val: boolean) => {
               setPreviewVisible(val)
-              if (!val) onPreviewVisibleChange?.(false)
+              if (!val) onPreviewOpenChange?.(false)
             }}
             onCurrentIndexChange={setPreviewIndex}
           />

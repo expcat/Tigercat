@@ -2,8 +2,8 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { fireEvent, render } from '@testing-library/react'
 import React from 'react'
 import { ImageGroup, Image } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
@@ -42,6 +42,19 @@ describe('ImageGroup', () => {
 
     const images = container.querySelectorAll('img')
     expect(images.length).toBe(2)
+  })
+
+  it('calls onPreviewOpenChange when group preview opens', () => {
+    const onPreviewOpenChange = vi.fn()
+    const { container } = render(
+      <ImageGroup onPreviewOpenChange={onPreviewOpenChange}>
+        <Image src="/img1.jpg" alt="Image 1" preview />
+      </ImageGroup>
+    )
+
+    fireEvent.click(container.querySelector('[role="button"]') as HTMLElement)
+
+    expect(onPreviewOpenChange).toHaveBeenCalledWith(true)
   })
 
   it('applies custom className', () => {
