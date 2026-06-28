@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-example-nuxt",
-  "version": "0.0.1",
+  "version": "1.5.0",
   "private": true,
   "type": "module",
   "description": "Nuxt 4 SSR example for Tigercat Vue components",

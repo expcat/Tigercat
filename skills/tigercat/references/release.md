@@ -35,7 +35,7 @@ pnpm build
 
 Breaking changes must be centralized in [docs/MIGRATION.md](../../../docs/MIGRATION.md) and [CHANGELOG.md](../../../CHANGELOG.md). Each entry should include affected package or component, removed API, replacement API, and a minimal diff when possible.
 
-Current v1.4.0 breaking changes are:
+Current v1.5.0 breaking changes are:
 
 | Area                       | Removed or changed                 | Replacement or action                                                 |
 | -------------------------- | ---------------------------------- | --------------------------------------------------------------------- |

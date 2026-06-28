@@ -2,7 +2,7 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
-## v1.4.0
+## v1.5.0
 
 ### `getResultHttpLabel` 标记为废弃
 
