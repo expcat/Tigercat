@@ -1,5 +1,6 @@
+import { Space } from '@expcat/tigercat-react/Space'
 import { useState } from 'react'
-import { Mentions, Space } from '@expcat/tigercat-react'
+import { Mentions } from '@expcat/tigercat-react/Mentions'
 import DemoBlock from '../components/DemoBlock'
 
 const users = [

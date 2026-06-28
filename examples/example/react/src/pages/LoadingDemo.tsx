@@ -1,5 +1,7 @@
+import { Button } from '@expcat/tigercat-react/Button'
+import { Card } from '@expcat/tigercat-react/Card'
 import { useState } from 'react'
-import { Loading, Button, Card } from '@expcat/tigercat-react'
+import { Loading } from '@expcat/tigercat-react/Loading'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Loading />

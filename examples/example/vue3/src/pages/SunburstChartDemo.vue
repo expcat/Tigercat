@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { SunburstChart } from '@expcat/tigercat-vue'
+import { SunburstChart } from '@expcat/tigercat-vue/SunburstChart'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const sunburstData = [

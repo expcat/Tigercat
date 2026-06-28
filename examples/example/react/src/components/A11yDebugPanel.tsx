@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button } from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
 import type { DemoLang } from '@demo-shared/app-config'
 
 interface AxeNode {

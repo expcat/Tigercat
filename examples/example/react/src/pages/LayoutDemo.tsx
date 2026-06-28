@@ -1,15 +1,13 @@
 import React, { useState } from 'react'
-import {
-  Container,
-  Layout,
-  Header,
-  Sidebar,
-  Content,
-  Footer,
-  Menu,
-  MenuItem,
-  SubMenu
-} from '@expcat/tigercat-react'
+import { Container } from '@expcat/tigercat-react/Container'
+import { Layout } from '@expcat/tigercat-react/Layout'
+import { Header } from '@expcat/tigercat-react/Header'
+import { Sidebar } from '@expcat/tigercat-react/Sidebar'
+import { Content } from '@expcat/tigercat-react/Content'
+import { Footer } from '@expcat/tigercat-react/Footer'
+import { Menu } from '@expcat/tigercat-react/Menu'
+import { MenuItem } from '@expcat/tigercat-react/MenuItem'
+import { SubMenu } from '@expcat/tigercat-react/SubMenu'
 import DemoBlock from '../components/DemoBlock'
 
 const containerSnippet = `<Container maxWidth="lg">

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Empty, Button, Space } from '@expcat/tigercat-vue'
+import { Empty } from '@expcat/tigercat-vue/Empty'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const presetSnippet = `<Space direction="vertical" :size="24" class="w-full">

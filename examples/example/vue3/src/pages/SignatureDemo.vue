@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Signature } from '@expcat/tigercat-vue/Signature'
 import { ref } from 'vue'
-import { Button, Signature } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import type { SignatureChangePayload, SignatureExportType } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

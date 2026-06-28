@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { RadioGroup } from '@expcat/tigercat-vue/RadioGroup'
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Radio, RadioGroup, Space } from '@expcat/tigercat-vue'
+import { Radio } from '@expcat/tigercat-vue/Radio'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicValue = ref<string | number>('male')

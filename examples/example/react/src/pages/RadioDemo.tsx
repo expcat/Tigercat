@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { Radio, RadioGroup, Space } from '@expcat/tigercat-react'
+import { Radio } from '@expcat/tigercat-react/Radio'
+import { RadioGroup } from '@expcat/tigercat-react/RadioGroup'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space direction="vertical">

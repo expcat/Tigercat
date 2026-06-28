@@ -1,4 +1,6 @@
-import { Empty, Button, Space } from '@expcat/tigercat-react'
+import { Empty } from '@expcat/tigercat-react/Empty'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const presetSnippet = `<Space direction="vertical" size={24} className="w-full">

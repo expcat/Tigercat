@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ActivityFeed } from '@expcat/tigercat-vue'
+import { ActivityFeed } from '@expcat/tigercat-vue/ActivityFeed'
 import type { ActivityGroup } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

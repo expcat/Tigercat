@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ImageAnnotation } from '@expcat/tigercat-react'
+import { ImageAnnotation } from '@expcat/tigercat-react/ImageAnnotation'
 import type { ImageAnnotation as ImageAnnotationItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

@@ -1,4 +1,6 @@
-import { Card, Space, Button } from '@expcat/tigercat-react'
+import { Card } from '@expcat/tigercat-react/Card'
+import { Space } from '@expcat/tigercat-react/Space'
+import { Button } from '@expcat/tigercat-react/Button'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Card>...</Card>`

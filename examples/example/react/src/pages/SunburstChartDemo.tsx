@@ -1,4 +1,4 @@
-import { SunburstChart } from '@expcat/tigercat-react'
+import { SunburstChart } from '@expcat/tigercat-react/SunburstChart'
 import DemoBlock from '../components/DemoBlock'
 
 const sunburstData = [

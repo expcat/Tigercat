@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { VirtualList } from '@expcat/tigercat-vue'
+import { VirtualList } from '@expcat/tigercat-vue/VirtualList'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<VirtualList :item-count="10000" :item-height="40" :height="300">

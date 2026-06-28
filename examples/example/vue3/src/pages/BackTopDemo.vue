@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
 import { ref, onMounted } from 'vue'
-import { BackTop, Button } from '@expcat/tigercat-vue'
+import { BackTop } from '@expcat/tigercat-vue/BackTop'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<BackTop />

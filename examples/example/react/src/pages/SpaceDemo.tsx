@@ -1,5 +1,5 @@
 import React from 'react'
-import { Space } from '@expcat/tigercat-react'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const horizontalSnippet = `<Space>

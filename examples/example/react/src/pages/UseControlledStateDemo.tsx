@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
-import { useControlledState, Button, Space, Card } from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
+import { Card } from '@expcat/tigercat-react/Card'
+import { useControlledState } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 interface CounterProps {

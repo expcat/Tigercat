@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Text, Space } from '@expcat/tigercat-vue'
+import { Text } from '@expcat/tigercat-vue/Text'
+import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Space direction="vertical" class="w-full">

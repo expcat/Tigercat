@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { CollapsePanel } from '@expcat/tigercat-vue/CollapsePanel'
 import { ref } from 'vue'
-import { Collapse, CollapsePanel } from '@expcat/tigercat-vue'
+import { Collapse } from '@expcat/tigercat-vue/Collapse'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Collapse v-model:activeKey="activeKey">

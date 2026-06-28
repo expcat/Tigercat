@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
+import { List } from '@expcat/tigercat-vue/List'
 import { ref } from 'vue'
-import { Popover, Button, Space, List } from '@expcat/tigercat-vue'
+import { Popover } from '@expcat/tigercat-vue/Popover'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Popover content="这是一个气泡卡片的内容">

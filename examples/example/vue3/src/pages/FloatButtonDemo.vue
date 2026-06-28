@@ -48,7 +48,8 @@
 </template>
 
 <script setup lang="ts">
-import { FloatButton, FloatButtonGroup } from '@expcat/tigercat-vue'
+import { FloatButton } from '@expcat/tigercat-vue/FloatButton'
+import { FloatButtonGroup } from '@expcat/tigercat-vue/FloatButtonGroup'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const onClick = () => {

@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
 import { defineComponent, h, ref } from 'vue'
-import { Drawer, Button, Space } from '@expcat/tigercat-vue'
+import { Drawer } from '@expcat/tigercat-vue/Drawer'
 import type { DrawerPlacement, DrawerSize } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 

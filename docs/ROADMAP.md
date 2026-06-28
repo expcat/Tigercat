@@ -18,9 +18,9 @@ source: current repository state after v1.5.0 roadmap closure
 ## 阶段进度
 
 - 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）与阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup），已完成于 2026-06-28。
-- 当前阶段：阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），状态为 `未开始`。
-- 当前可执行任务：R08。R07 已删除 legacy token CSS 变量、token alias API、DatePicker / TimePicker icon path 兼容别名和 `common-icons` 兼容 barrel；R08 可继续迁移按需使用文档与示例。
-- 阶段 4 中 R09 依赖 R04/R05，建议在 R08 完成或接近完成后校准最终 size budget。
+- 当前阶段：阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），状态为 `进行中`；R08 已完成于 2026-06-28。
+- 当前可执行任务：R09。R08 已将示例、SSR smoke、skills references 与性能/迁移文档迁移为组件 PascalCase 子路径和 lazy import 优先；R09 可继续校准 size 与 publish artifact gate。
+- 阶段 4 中 R09 依赖 R04/R05/R08，应基于已迁移的按需使用面校准最终 size budget。
 
 ## 执行原则
 
@@ -48,7 +48,7 @@ source: current repository state after v1.5.0 roadmap closure
 | 1    | 已完成（2026-06-28） | R02-R03 | 先稳定版本与 release metadata，再切换 ESM-only 发布面                 |
 | 2    | 已完成（2026-06-28） | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
 | 3    | 已完成（2026-06-28） | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
-| 4    | 未开始               | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
+| 4    | 进行中               | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
 
 阶段状态规则：
 
@@ -302,7 +302,7 @@ source: current repository state after v1.5.0 roadmap closure
 
 ### R08 on-demand usage docs and examples
 
-**状态**：未开始。
+**状态**：已完成（2026-06-28）。
 
 **目标**：将示例、skills references 与性能文档更新为组件子路径和 lazy import 优先，保留根入口 named exports 作为便利入口说明。
 
@@ -319,6 +319,20 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm example:build`
 - `corepack pnpm example:ssr:check`
 - `corepack pnpm prettier --check docs skills examples`
+
+**执行摘要**：已将 React/Vue 示例应用和 Nuxt/Next SSR smoke 的公开组件 value imports 迁移到 PascalCase 组件子路径；hooks/composables、`Message` / `notification` 命令式 API、共享类型和 core 工具继续使用根入口或 core 入口。`scripts/generate-api-docs.mjs` 已更新 generated references 文案，`skills/tigercat/references/*` 已通过 `docs:api` 刷新；`docs/MIGRATION.md`、`examples/README.md`、getting-started、performance 与 building-apps references 已同步 subpath-first / lazy-first 说明。示例 Vite alias 已按 package exports 的 root、component subpath 和 target alias 拆分，确保源码示例也能按子路径构建。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 vitest run tests/core/examples-lazy-routes.spec.ts`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 example:build`
+- `npx -y pnpm@11.9.0 example:ssr:check`
+- `git diff --name-only --diff-filter=ACM | tr '\n' '\0' | xargs -0 npx -y pnpm@11.9.0 prettier --check`
+- `npx -y pnpm@11.9.0 docs:api:check`（未提交工作树下按预期报告 `skills/tigercat/references` 生成物 diff；已用 `npx -y pnpm@11.9.0 docs:api` 写回，提交后需复跑确认 clean）
+- `npx -y pnpm@11.9.0 prettier --check docs skills examples scripts tests`（发现既有未改文件 `skills/tigercat/SKILL.md`、`examples/nextjs/next-env.d.ts`、`tests/core/heatmap-chart-utils.spec.ts`、`tests/core/list-utils.spec.ts` 格式不符合 Prettier；本次变更文件已通过 changed-file Prettier check）
 
 **状态更新要求**：完成后写回状态、日期、迁移后的使用面范围和关键验证命令；同步更新阶段 4 状态。
 

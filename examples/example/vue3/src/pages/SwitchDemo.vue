@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Switch, Space } from '@expcat/tigercat-vue'
+import { Switch } from '@expcat/tigercat-vue/Switch'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicEnabled = ref(true)

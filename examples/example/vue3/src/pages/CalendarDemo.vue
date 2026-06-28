@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Calendar } from '@expcat/tigercat-vue'
+import { Calendar } from '@expcat/tigercat-vue/Calendar'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const selectedDate = ref<Date | undefined>(new Date())

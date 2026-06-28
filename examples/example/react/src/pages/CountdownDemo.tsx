@@ -1,5 +1,7 @@
+import { Countdown } from '@expcat/tigercat-react/Countdown'
+import { Space } from '@expcat/tigercat-react/Space'
 import { useMemo, useState } from 'react'
-import { Card, Countdown, Space } from '@expcat/tigercat-react'
+import { Card } from '@expcat/tigercat-react/Card'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space size={32}>

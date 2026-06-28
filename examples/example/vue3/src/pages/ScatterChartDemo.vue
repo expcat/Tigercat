@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ScatterChart, type ScatterChartDatum } from '@expcat/tigercat-vue'
+import { ScatterChart } from '@expcat/tigercat-vue/ScatterChart'
+import { type ScatterChartDatum } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicData: ScatterChartDatum[] = [

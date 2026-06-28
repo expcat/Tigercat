@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Code } from '@expcat/tigercat-vue'
+import { Code } from '@expcat/tigercat-vue/Code'
 
 const installSnippet = 'pnpm add @expcat/tigercat-vue @expcat/tigercat-core'
 const scriptClose = '</scr' + 'ipt>'
@@ -23,7 +23,8 @@ const cssSnippet = `@import 'tailwindcss';
 
 const usageSnippet = [
   '<script setup lang="ts">',
-  "import { Button, ConfigProvider } from '@expcat/tigercat-vue'",
+  "import { Button } from '@expcat/tigercat-vue/Button'",
+  "import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'",
   scriptClose,
   '',
   '<template>',

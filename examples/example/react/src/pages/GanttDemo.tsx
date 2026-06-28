@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Gantt } from '@expcat/tigercat-react'
+import { Gantt } from '@expcat/tigercat-react/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

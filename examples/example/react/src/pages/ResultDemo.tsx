@@ -1,4 +1,6 @@
-import { Result, Button, Space } from '@expcat/tigercat-react'
+import { Result } from '@expcat/tigercat-react/Result'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const statusSnippet = `<Result status="success" title="操作成功" subTitle="订单已提交，预计2小时内送达" />

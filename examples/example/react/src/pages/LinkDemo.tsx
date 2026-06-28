@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Link, Space } from '@expcat/tigercat-react'
+import { Link } from '@expcat/tigercat-react/Link'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const variantSnippet = `<Space>

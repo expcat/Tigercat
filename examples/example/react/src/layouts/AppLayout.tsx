@@ -1,14 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { AnchorLink } from '@expcat/tigercat-react/AnchorLink'
+import { Breadcrumb } from '@expcat/tigercat-react/Breadcrumb'
+import { BreadcrumbItem } from '@expcat/tigercat-react/BreadcrumbItem'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Outlet, useLocation } from 'react-router-dom'
 import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
-import {
-  Anchor,
-  AnchorLink,
-  Breadcrumb,
-  BreadcrumbItem,
-  ConfigProvider
-} from '@expcat/tigercat-react'
+import { Anchor } from '@expcat/tigercat-react/Anchor'
 import {
   getStoredLang,
   getStoredSiderCollapsed,

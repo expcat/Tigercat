@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Tag, Space } from '@expcat/tigercat-react'
+import { Tag } from '@expcat/tigercat-react/Tag'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space>

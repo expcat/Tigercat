@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Card } from '@expcat/tigercat-vue/Card'
 import { ref } from 'vue'
-import { Loading, Button, Card } from '@expcat/tigercat-vue'
+import { Loading } from '@expcat/tigercat-vue/Loading'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Loading />

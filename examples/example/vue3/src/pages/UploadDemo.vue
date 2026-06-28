@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Upload, type UploadFile } from '@expcat/tigercat-vue'
+import { Upload } from '@expcat/tigercat-vue/Upload'
+import { type UploadFile } from '@expcat/tigercat-vue'
 import type { UploadRequestOptions } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

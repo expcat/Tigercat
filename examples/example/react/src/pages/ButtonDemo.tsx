@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Button, Space } from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const typeSnippet = `<Space wrap>

@@ -1,6 +1,7 @@
+import { Space } from '@expcat/tigercat-react/Space'
 import { useState } from 'react'
 import type { TreeSelectValue } from '@expcat/tigercat-core'
-import { TreeSelect, Space } from '@expcat/tigercat-react'
+import { TreeSelect } from '@expcat/tigercat-react/TreeSelect'
 import DemoBlock from '../components/DemoBlock'
 
 const treeData = [

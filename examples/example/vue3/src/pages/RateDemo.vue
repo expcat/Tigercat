@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
-import { Rate, Space, Text } from '@expcat/tigercat-vue'
+import { Rate } from '@expcat/tigercat-vue/Rate'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const val1 = ref(3)

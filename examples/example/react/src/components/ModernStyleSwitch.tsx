@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Switch } from '@expcat/tigercat-react'
+import { Switch } from '@expcat/tigercat-react/Switch'
 import { applyModernStyle, getStoredModernStyle, setStoredModernStyle } from '@demo-shared/prefs'
 import type { DemoLang } from '@demo-shared/app-config'
 

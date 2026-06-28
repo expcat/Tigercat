@@ -1,5 +1,10 @@
+import { Card } from '@expcat/tigercat-react/Card'
+import { Space } from '@expcat/tigercat-react/Space'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Pagination } from '@expcat/tigercat-react/Pagination'
 import { useState } from 'react'
-import { List, Card, Space, Button, Pagination, type ListProps } from '@expcat/tigercat-react'
+import { List } from '@expcat/tigercat-react/List'
+import { type ListProps } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 type DemoItem = NonNullable<ListProps['dataSource']>[number]

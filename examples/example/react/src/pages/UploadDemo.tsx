@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Upload, type UploadFile } from '@expcat/tigercat-react'
+import { Upload } from '@expcat/tigercat-react/Upload'
+import { type UploadFile } from '@expcat/tigercat-react'
 import type { UploadRequestOptions } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

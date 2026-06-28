@@ -1,5 +1,6 @@
 import React from 'react'
-import { RadarChart, type RadarChartDatum, type RadarChartSeries } from '@expcat/tigercat-react'
+import { RadarChart } from '@expcat/tigercat-react/RadarChart'
+import { type RadarChartDatum, type RadarChartSeries } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicData: RadarChartDatum[] = [

@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
-import { ColorPicker, Space, Text } from '@expcat/tigercat-vue'
+import { ColorPicker } from '@expcat/tigercat-vue/ColorPicker'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const color = ref('#2563eb')

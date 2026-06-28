@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { BreadcrumbItem } from '@expcat/tigercat-vue/BreadcrumbItem'
 import { h } from 'vue'
-import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
+import { Breadcrumb } from '@expcat/tigercat-vue/Breadcrumb'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Breadcrumb>

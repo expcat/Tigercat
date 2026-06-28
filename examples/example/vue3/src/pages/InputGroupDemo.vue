@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { InputGroup, Input, Select, Button } from '@expcat/tigercat-vue'
+import { InputGroup } from '@expcat/tigercat-vue/InputGroup'
+import { Input } from '@expcat/tigercat-vue/Input'
+import { Select } from '@expcat/tigercat-vue/Select'
+import { Button } from '@expcat/tigercat-vue/Button'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<InputGroup>

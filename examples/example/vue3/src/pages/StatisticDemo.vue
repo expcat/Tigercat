@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Statistic, Space, Card } from '@expcat/tigercat-vue'
+import { Statistic } from '@expcat/tigercat-vue/Statistic'
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Card } from '@expcat/tigercat-vue/Card'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Space :size="32">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TimePicker } from '@expcat/tigercat-react'
+import { TimePicker } from '@expcat/tigercat-react/TimePicker'
 import { useLang } from '../context/lang'
 import DemoBlock from '../components/DemoBlock'
 

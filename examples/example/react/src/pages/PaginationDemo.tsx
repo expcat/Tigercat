@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Pagination } from '@expcat/tigercat-react'
+import { Pagination } from '@expcat/tigercat-react/Pagination'
 import { type TigerLocalePagination } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

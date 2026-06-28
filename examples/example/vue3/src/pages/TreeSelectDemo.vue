@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { TreeSelect, Space } from '@expcat/tigercat-vue'
+import { TreeSelect } from '@expcat/tigercat-vue/TreeSelect'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const val = ref<string | number | undefined>(undefined)

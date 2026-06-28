@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TaskBoard } from '@expcat/tigercat-vue'
+import { TaskBoard } from '@expcat/tigercat-vue/TaskBoard'
 import type {
   TaskBoardColumn,
   TaskBoardCardMoveEvent,

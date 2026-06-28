@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RichTextEditor } from '@expcat/tigercat-react'
+import { RichTextEditor } from '@expcat/tigercat-react/RichTextEditor'
 import DemoBlock from '../components/DemoBlock'
 
 const sampleHtml = '<p>这是一段<em>只读</em>的富文本内容。</p>'

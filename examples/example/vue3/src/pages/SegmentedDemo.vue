@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
-import { Segmented, Space, Text } from '@expcat/tigercat-vue'
+import { Segmented } from '@expcat/tigercat-vue/Segmented'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const selected = ref<string | number>('daily')

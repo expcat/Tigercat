@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Card } from '@expcat/tigercat-vue/Card'
+import { Avatar } from '@expcat/tigercat-vue/Avatar'
 import { ref, onMounted } from 'vue'
-import { Skeleton, Space, Card, Avatar } from '@expcat/tigercat-vue'
+import { Skeleton } from '@expcat/tigercat-vue/Skeleton'
 import DemoBlock from '../components/DemoBlock.vue'
 
 // Loading state simulation

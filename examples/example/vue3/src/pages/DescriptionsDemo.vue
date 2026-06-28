@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Button, Descriptions } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Descriptions } from '@expcat/tigercat-vue/Descriptions'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Descriptions title="用户信息" :items="userInfo" />`

@@ -19,17 +19,22 @@ pnpm add @expcat/tigercat-core @expcat/tigercat-vue
 pnpm add @expcat/tigercat-core @expcat/tigercat-react
 ```
 
-Vue imports use `@expcat/tigercat-vue`.
+Vue component imports should prefer PascalCase subpaths for on-demand bundles.
 
 ```ts
-import { Button, Input } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Input } from '@expcat/tigercat-vue/Input'
 ```
 
-React imports use `@expcat/tigercat-react`.
+React component imports should prefer PascalCase subpaths for on-demand bundles.
 
 ```tsx
-import { Button, Input } from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Input } from '@expcat/tigercat-react/Input'
 ```
+
+Root named exports remain available for small apps, hooks/composables, command APIs, and shared
+types, but larger apps should use component subpaths at route or interaction boundaries.
 
 Tailwind integration must use Tailwind CSS v4 and `@tailwindcss/vite`.
 

@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { VirtualList } from '@expcat/tigercat-react'
+import { VirtualList } from '@expcat/tigercat-react/VirtualList'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<VirtualList itemCount={10000} itemHeight={40} height={300}

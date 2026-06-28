@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon } from '@expcat/tigercat-react'
+import { Icon } from '@expcat/tigercat-react/Icon'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<div className="flex items-center gap-6 flex-wrap">

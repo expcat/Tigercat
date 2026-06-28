@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Kanban } from '@expcat/tigercat-react'
+import { Kanban } from '@expcat/tigercat-react/Kanban'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

@@ -1,4 +1,4 @@
-import { TreeMapChart } from '@expcat/tigercat-react'
+import { TreeMapChart } from '@expcat/tigercat-react/TreeMapChart'
 import DemoBlock from '../components/DemoBlock'
 
 const flatData = [

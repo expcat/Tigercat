@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Popconfirm, Button, Space } from '@expcat/tigercat-vue'
+import { Popconfirm } from '@expcat/tigercat-vue/Popconfirm'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Popconfirm title="确定要删除这条记录吗？">

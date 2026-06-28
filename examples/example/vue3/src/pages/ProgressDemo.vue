@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
-import { Progress, Space, Button } from '@expcat/tigercat-vue'
+import { Progress } from '@expcat/tigercat-vue/Progress'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const uploadProgress = ref(0)

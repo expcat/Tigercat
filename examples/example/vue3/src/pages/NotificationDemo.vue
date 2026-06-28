@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { notification, Button } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { notification } from '@expcat/tigercat-vue'
 import { ref } from 'vue'
 import DemoBlock from '../components/DemoBlock.vue'
 

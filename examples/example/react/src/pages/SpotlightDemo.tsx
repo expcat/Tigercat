@@ -1,5 +1,7 @@
+import { Spotlight } from '@expcat/tigercat-react/Spotlight'
 import { useState } from 'react'
-import { Button, Spotlight, type SpotlightItem } from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
+import { type SpotlightItem } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const commands: SpotlightItem[] = [

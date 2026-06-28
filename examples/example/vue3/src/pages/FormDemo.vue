@@ -1,17 +1,15 @@
 <script setup lang="ts">
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { Input } from '@expcat/tigercat-vue/Input'
+import { Textarea } from '@expcat/tigercat-vue/Textarea'
+import { Select } from '@expcat/tigercat-vue/Select'
+import { Checkbox } from '@expcat/tigercat-vue/Checkbox'
+import { Radio } from '@expcat/tigercat-vue/Radio'
+import { RadioGroup } from '@expcat/tigercat-vue/RadioGroup'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
 import { reactive, ref } from 'vue'
-import {
-  Form,
-  FormItem,
-  Input,
-  Textarea,
-  Select,
-  Checkbox,
-  Radio,
-  RadioGroup,
-  Button,
-  Space
-} from '@expcat/tigercat-vue'
+import { Form } from '@expcat/tigercat-vue/Form'
 import { countries } from '@demo-shared/constants'
 import DemoBlock from '../components/DemoBlock.vue'
 

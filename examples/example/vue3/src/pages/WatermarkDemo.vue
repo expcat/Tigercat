@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Watermark } from '@expcat/tigercat-vue'
+import { Watermark } from '@expcat/tigercat-vue/Watermark'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const textSnippet = `<Watermark content="Tigercat">

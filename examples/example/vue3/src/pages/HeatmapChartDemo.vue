@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { HeatmapChart } from '@expcat/tigercat-vue'
+import { HeatmapChart } from '@expcat/tigercat-vue/HeatmapChart'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']

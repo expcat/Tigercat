@@ -1,5 +1,8 @@
+import { Space } from '@expcat/tigercat-react/Space'
+import { Card } from '@expcat/tigercat-react/Card'
+import { Avatar } from '@expcat/tigercat-react/Avatar'
 import { useState, useEffect } from 'react'
-import { Skeleton, Space, Card, Avatar } from '@expcat/tigercat-react'
+import { Skeleton } from '@expcat/tigercat-react/Skeleton'
 import DemoBlock from '../components/DemoBlock'
 
 const basicScriptSnippet = `const [loading, setLoading] = useState(true)`

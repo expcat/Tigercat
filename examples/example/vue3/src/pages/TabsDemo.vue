@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { TabPane } from '@expcat/tigercat-vue/TabPane'
 import { ref } from 'vue'
-import { Tabs, TabPane } from '@expcat/tigercat-vue'
+import { Tabs } from '@expcat/tigercat-vue/Tabs'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Tabs v-model:activeKey="activeKey1">

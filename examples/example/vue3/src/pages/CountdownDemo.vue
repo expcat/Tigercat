@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Countdown } from '@expcat/tigercat-vue/Countdown'
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Card, Countdown, Space } from '@expcat/tigercat-vue'
+import { Card } from '@expcat/tigercat-vue/Card'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const now = Date.now()

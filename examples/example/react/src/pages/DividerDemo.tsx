@@ -1,5 +1,5 @@
 import React from 'react'
-import { Divider } from '@expcat/tigercat-react'
+import { Divider } from '@expcat/tigercat-react/Divider'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<div className="text-gray-700 dark:text-gray-300">上方内容</div>

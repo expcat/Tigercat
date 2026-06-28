@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { OrgChart } from '@expcat/tigercat-react'
+import { OrgChart } from '@expcat/tigercat-react/OrgChart'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

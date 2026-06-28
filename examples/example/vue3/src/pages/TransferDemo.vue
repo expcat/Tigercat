@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Transfer } from '@expcat/tigercat-vue'
+import { Transfer } from '@expcat/tigercat-vue/Transfer'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const targetKeys1 = ref<(string | number)[]>(['3', '4'])

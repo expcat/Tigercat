@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ImageAnnotation } from '@expcat/tigercat-vue'
+import { ImageAnnotation } from '@expcat/tigercat-vue/ImageAnnotation'
 import type { ImageAnnotation as ImageAnnotationItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

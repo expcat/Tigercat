@@ -1,4 +1,5 @@
-import { QRCode, Space } from '@expcat/tigercat-react'
+import { QRCode } from '@expcat/tigercat-react/QRCode'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space wrap>

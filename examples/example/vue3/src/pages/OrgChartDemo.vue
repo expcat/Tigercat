@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { OrgChart } from '@expcat/tigercat-vue'
+import { OrgChart } from '@expcat/tigercat-vue/OrgChart'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { CommentThread } from '@expcat/tigercat-react'
+import { CommentThread } from '@expcat/tigercat-react/CommentThread'
 import type { CommentNode } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

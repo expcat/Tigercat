@@ -1,10 +1,7 @@
+import { Signature } from '@expcat/tigercat-react/Signature'
 import { useRef, useState } from 'react'
-import {
-  Button,
-  Signature,
-  type SignatureRef,
-  type SignatureChangePayload
-} from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
+import { type SignatureRef, type SignatureChangePayload } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Signature

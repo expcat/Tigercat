@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Tour } from '@expcat/tigercat-react'
+import { Tour } from '@expcat/tigercat-react/Tour'
 import DemoBlock from '../components/DemoBlock'
 
 const steps = [

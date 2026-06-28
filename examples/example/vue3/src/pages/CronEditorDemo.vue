@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
-import { CronEditor, Space, Text } from '@expcat/tigercat-vue'
+import { CronEditor } from '@expcat/tigercat-vue/CronEditor'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const cron = ref('0 9 * * 1-5')

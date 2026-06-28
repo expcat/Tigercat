@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Select, Space } from '@expcat/tigercat-vue'
+import { Select } from '@expcat/tigercat-vue/Select'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicValue = ref<string | number>('')

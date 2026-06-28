@@ -3,6 +3,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
+const workspaceRoot = path.resolve(__dirname, '../../..')
+
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
   base: command === 'serve' ? '/' : '/Tigercat/vue/',
@@ -11,26 +13,38 @@ export default defineConfig(({ command }) => ({
     chunkSizeWarningLimit: 650
   },
   resolve: {
-    alias: {
-      '@demo-shared': path.resolve(__dirname, '../shared'),
-      '@expcat/tigercat-vue': path.resolve(
-        path.resolve(__dirname, '../../..'),
-        'packages/vue/src/index.ts'
-      ),
-      '@expcat/tigercat-vue/': `${path.resolve(
-        path.resolve(__dirname, '../../..'),
-        'packages/vue/src/components'
-      )}/`,
-      '@expcat/tigercat-core': path.resolve(
-        path.resolve(__dirname, '../../..'),
-        'packages/core/src/index.ts'
-      )
-    }
+    alias: [
+      { find: '@demo-shared', replacement: path.resolve(__dirname, '../shared') },
+      {
+        find: '@expcat/tigercat-vue/FloatButtonGroup',
+        replacement: path.resolve(workspaceRoot, 'packages/vue/src/components/FloatButton')
+      },
+      {
+        find: '@expcat/tigercat-vue/InputGroupAddon',
+        replacement: path.resolve(workspaceRoot, 'packages/vue/src/components/InputGroup')
+      },
+      {
+        find: '@expcat/tigercat-vue/PrintPageBreak',
+        replacement: path.resolve(workspaceRoot, 'packages/vue/src/components/PrintLayout')
+      },
+      {
+        find: /^@expcat\/tigercat-vue\/(.+)$/,
+        replacement: `${path.resolve(workspaceRoot, 'packages/vue/src/components')}/$1`
+      },
+      {
+        find: '@expcat/tigercat-vue',
+        replacement: path.resolve(workspaceRoot, 'packages/vue/src/index.ts')
+      },
+      {
+        find: '@expcat/tigercat-core',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/index.ts')
+      }
+    ]
   },
   server: {
     port: 5173,
     fs: {
-      allow: [path.resolve(__dirname, '..'), path.resolve(__dirname, '../../..')]
+      allow: [path.resolve(__dirname, '..'), workspaceRoot]
     }
   }
 }))

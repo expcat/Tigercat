@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { Slider, Space, Text } from '@expcat/tigercat-react'
+import { Slider } from '@expcat/tigercat-react/Slider'
+import { Space } from '@expcat/tigercat-react/Space'
+import { Text } from '@expcat/tigercat-react/Text'
 import DemoBlock from '../components/DemoBlock'
 
 const SliderDemo: React.FC = () => {

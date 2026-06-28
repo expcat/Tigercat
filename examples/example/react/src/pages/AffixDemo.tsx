@@ -1,4 +1,4 @@
-import { Affix } from '@expcat/tigercat-react'
+import { Affix } from '@expcat/tigercat-react/Affix'
 import DemoBlock from '../components/DemoBlock'
 
 const topSnippet = `<Affix offsetTop={0} onChange={(affixed) => console.log(affixed)}>

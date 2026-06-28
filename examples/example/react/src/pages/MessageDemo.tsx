@@ -1,5 +1,7 @@
+import { Button } from '@expcat/tigercat-react/Button'
+import { List } from '@expcat/tigercat-react/List'
 import { useRef, useState } from 'react'
-import { Message, Button, List } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react/Message'
 import DemoBlock from '../components/DemoBlock'
 
 export default function MessageDemo() {

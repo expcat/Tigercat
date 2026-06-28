@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { AreaChart, type AreaChartDatum, type AreaChartSeries } from '@expcat/tigercat-react'
+import { AreaChart } from '@expcat/tigercat-react/AreaChart'
+import { type AreaChartDatum, type AreaChartSeries } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicData: AreaChartDatum[] = [

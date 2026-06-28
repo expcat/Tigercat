@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { ref } from 'vue'
-import { Textarea, Space, FormItem } from '@expcat/tigercat-vue'
+import { Textarea } from '@expcat/tigercat-vue/Textarea'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const text = ref('')

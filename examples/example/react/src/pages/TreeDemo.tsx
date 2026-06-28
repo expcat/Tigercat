@@ -1,5 +1,6 @@
+import { Input } from '@expcat/tigercat-react/Input'
 import { useState } from 'react'
-import { Tree, Input } from '@expcat/tigercat-react'
+import { Tree } from '@expcat/tigercat-react/Tree'
 import type { TreeNode } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 

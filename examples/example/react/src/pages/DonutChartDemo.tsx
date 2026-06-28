@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
-import { DonutChart, type DonutChartDatum } from '@expcat/tigercat-react'
+import { DonutChart } from '@expcat/tigercat-react/DonutChart'
+import { type DonutChartDatum } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicData: DonutChartDatum[] = [

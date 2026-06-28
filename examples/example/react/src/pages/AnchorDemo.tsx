@@ -1,5 +1,6 @@
+import { AnchorLink } from '@expcat/tigercat-react/AnchorLink'
 import { useRef, useState } from 'react'
-import { Anchor, AnchorLink } from '@expcat/tigercat-react'
+import { Anchor } from '@expcat/tigercat-react/Anchor'
 import DemoBlock from '../components/DemoBlock'
 
 // Get the main scroll container from the layout

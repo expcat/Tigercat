@@ -1,5 +1,7 @@
+import { Space } from '@expcat/tigercat-react/Space'
+import { Button } from '@expcat/tigercat-react/Button'
 import { useState } from 'react'
-import { Progress, Space, Button } from '@expcat/tigercat-react'
+import { Progress } from '@expcat/tigercat-react/Progress'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space direction="vertical" className="w-full">

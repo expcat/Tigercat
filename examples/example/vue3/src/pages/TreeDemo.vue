@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Input } from '@expcat/tigercat-vue/Input'
 import { ref } from 'vue'
-import { Tree, Input } from '@expcat/tigercat-vue'
+import { Tree } from '@expcat/tigercat-vue/Tree'
 import type { TreeNode } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 

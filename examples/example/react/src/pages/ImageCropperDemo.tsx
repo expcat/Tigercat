@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { ImageCropper } from '@expcat/tigercat-react'
+import { ImageCropper } from '@expcat/tigercat-react/ImageCropper'
 import type { ImageCropperRef } from '@expcat/tigercat-react'
 import type { CropRect, CropResult } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'

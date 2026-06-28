@@ -1,4 +1,4 @@
-import { GaugeChart } from '@expcat/tigercat-react'
+import { GaugeChart } from '@expcat/tigercat-react/GaugeChart'
 import DemoBlock from '../components/DemoBlock'
 
 const segments = [

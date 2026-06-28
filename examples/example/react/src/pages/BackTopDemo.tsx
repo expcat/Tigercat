@@ -1,5 +1,6 @@
+import { Button } from '@expcat/tigercat-react/Button'
 import { useState, useEffect, useRef } from 'react'
-import { BackTop, Button } from '@expcat/tigercat-react'
+import { BackTop } from '@expcat/tigercat-react/BackTop'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<BackTop />

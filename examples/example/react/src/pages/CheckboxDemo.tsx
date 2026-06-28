@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { Checkbox, CheckboxGroup, Space } from '@expcat/tigercat-react'
+import { Checkbox } from '@expcat/tigercat-react/Checkbox'
+import { CheckboxGroup } from '@expcat/tigercat-react/CheckboxGroup'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space direction="vertical">

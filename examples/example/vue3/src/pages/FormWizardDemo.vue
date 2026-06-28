@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { Input } from '@expcat/tigercat-vue/Input'
+import { Alert } from '@expcat/tigercat-vue/Alert'
 import { reactive, ref } from 'vue'
-import { FormWizard, Form, FormItem, Input, Alert } from '@expcat/tigercat-vue'
+import { FormWizard } from '@expcat/tigercat-vue/FormWizard'
 import type { WizardStep } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

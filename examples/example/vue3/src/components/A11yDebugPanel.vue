@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, shallowRef } from 'vue'
-import { Button } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import type { DemoLang } from '@demo-shared/app-config'
 
 interface AxeNode {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, inject, computed, type Ref } from 'vue'
-import { Pagination, type TigerLocalePagination } from '@expcat/tigercat-vue'
+import { Pagination } from '@expcat/tigercat-vue/Pagination'
+import { type TigerLocalePagination } from '@expcat/tigercat-vue'
 import type { DemoLang } from '@demo-shared/app-config'
 import DemoBlock from '../components/DemoBlock.vue'
 

@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
-import { Badge, Space, Button } from '@expcat/tigercat-vue'
+import { Badge } from '@expcat/tigercat-vue/Badge'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const notificationCount = ref(5)

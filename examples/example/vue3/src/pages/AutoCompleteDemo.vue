@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { AutoComplete } from '@expcat/tigercat-vue'
+import { AutoComplete } from '@expcat/tigercat-vue/AutoComplete'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const val = ref('')

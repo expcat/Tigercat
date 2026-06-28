@@ -1,5 +1,5 @@
 import React from 'react'
-import { Code } from '@expcat/tigercat-react'
+import { Code } from '@expcat/tigercat-react/Code'
 
 const Home: React.FC = () => {
   return (
@@ -75,7 +75,8 @@ export default {
 
           <Code
             className="mt-3"
-            code={`import { Button, ConfigProvider } from '@expcat/tigercat-react'
+            code={`import { Button } from '@expcat/tigercat-react/Button'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 
 function App() {
   return (

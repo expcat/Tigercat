@@ -1,5 +1,6 @@
+import { Button } from '@expcat/tigercat-react/Button'
 import { useState } from 'react'
-import { ImageViewer, Button } from '@expcat/tigercat-react'
+import { ImageViewer } from '@expcat/tigercat-react/ImageViewer'
 import DemoBlock from '../components/DemoBlock'
 
 const images = [

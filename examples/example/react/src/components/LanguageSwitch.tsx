@@ -1,5 +1,5 @@
 import React from 'react'
-import { Select } from '@expcat/tigercat-react'
+import { Select } from '@expcat/tigercat-react/Select'
 import { DEMO_LANG_OPTIONS, type DemoLang } from '@demo-shared/app-config'
 
 const languageOptions = DEMO_LANG_OPTIONS.map((o) => ({ label: o.label, value: o.value }))

@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，将 React / Vue component 子路径收敛为 PascalCase 显式 exports，收紧 React / Vue tree-shaking 副作用声明，并删除首批 deprecated / compat API 与 legacy token / icon path 兼容层。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。按需加载迁移项会随后续 R08-R09 任务落地后追加到本节。
+v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，将 React / Vue component 子路径收敛为 PascalCase 显式 exports，收紧 React / Vue tree-shaking 副作用声明，删除首批 deprecated / compat API 与 legacy token / icon path 兼容层，并将示例与 references 迁移为组件子路径和 lazy import 优先。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。
 
 ### React / Vue component 子路径改为显式 PascalCase
 
@@ -13,6 +13,22 @@ React / Vue 根入口 named exports 保持可用：
 ```ts
 import { Button } from '@expcat/tigercat-react'
 ```
+
+但生产应用中推荐组件 value imports 使用 PascalCase 子路径，让 bundler 更容易在路由或交互边界拆包：
+
+```diff
+- import { Button, DatePicker } from '@expcat/tigercat-react'
++ import { Button } from '@expcat/tigercat-react/Button'
++ import { DatePicker } from '@expcat/tigercat-react/DatePicker'
+```
+
+```diff
+- import { Button, DatePicker } from '@expcat/tigercat-vue'
++ import { Button } from '@expcat/tigercat-vue/Button'
++ import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
+```
+
+hooks/composables、`Message` / `notification` 命令式 API、共享类型和 core 工具仍可从根入口或 `@expcat/tigercat-core` 导入。
 
 组件子路径现在只声明 PascalCase 入口；如果项目曾借助旧通配 exports 导入非 PascalCase 路径，请改为组件名路径：
 

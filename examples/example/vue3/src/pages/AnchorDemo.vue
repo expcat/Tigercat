@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { AnchorLink } from '@expcat/tigercat-vue/AnchorLink'
 import { ref } from 'vue'
-import { Anchor, AnchorLink } from '@expcat/tigercat-vue'
+import { Anchor } from '@expcat/tigercat-vue/Anchor'
 import DemoBlock from '../components/DemoBlock.vue'
 
 // Get the main scroll container from the layout

@@ -1,5 +1,8 @@
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
 import { useState, useRef } from 'react'
-import { Carousel, Button, Space, type CarouselRef } from '@expcat/tigercat-react'
+import { Carousel } from '@expcat/tigercat-react/Carousel'
+import { type CarouselRef } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Carousel>

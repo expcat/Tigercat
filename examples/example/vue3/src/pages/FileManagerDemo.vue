@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { FileManager } from '@expcat/tigercat-vue'
+import { FileManager } from '@expcat/tigercat-vue/FileManager'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const files = [

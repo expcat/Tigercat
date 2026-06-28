@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Button, Space } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const clickCount = ref(0)

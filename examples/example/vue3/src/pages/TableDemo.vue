@@ -1,15 +1,13 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Pagination } from '@expcat/tigercat-vue/Pagination'
+import { Dropdown } from '@expcat/tigercat-vue/Dropdown'
+import { DropdownMenu } from '@expcat/tigercat-vue/DropdownMenu'
+import { DropdownItem } from '@expcat/tigercat-vue/DropdownItem'
 import { computed, ref, h } from 'vue'
-import {
-  Table,
-  Button,
-  Space,
-  Pagination,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
-  type TableColumn
-} from '@expcat/tigercat-vue'
+import { Table } from '@expcat/tigercat-vue/Table'
+import { type TableColumn } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 // Basic data

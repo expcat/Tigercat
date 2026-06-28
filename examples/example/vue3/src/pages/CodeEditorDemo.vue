@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CodeEditor } from '@expcat/tigercat-vue'
+import { CodeEditor } from '@expcat/tigercat-vue/CodeEditor'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const jsCode = ref(`function greet(name) {

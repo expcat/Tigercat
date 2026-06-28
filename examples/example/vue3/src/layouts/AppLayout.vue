@@ -1,15 +1,13 @@
 <script setup lang="ts">
+import { AnchorLink } from '@expcat/tigercat-vue/AnchorLink'
+import { Breadcrumb } from '@expcat/tigercat-vue/Breadcrumb'
+import { BreadcrumbItem } from '@expcat/tigercat-vue/BreadcrumbItem'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
-import {
-  Anchor,
-  AnchorLink,
-  Breadcrumb,
-  BreadcrumbItem,
-  ConfigProvider
-} from '@expcat/tigercat-vue'
+import { Anchor } from '@expcat/tigercat-vue/Anchor'
 import {
   getStoredLang,
   getStoredSiderCollapsed,

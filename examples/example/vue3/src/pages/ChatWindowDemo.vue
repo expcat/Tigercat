@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatWindow } from '@expcat/tigercat-vue'
+import { ChatWindow } from '@expcat/tigercat-vue/ChatWindow'
 import type { ChatMessage } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

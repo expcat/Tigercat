@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Card, Space, Button } from '@expcat/tigercat-vue'
+import { Card } from '@expcat/tigercat-vue/Card'
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Button } from '@expcat/tigercat-vue/Button'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Card>...</Card>`

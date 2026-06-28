@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Carousel, Button, Space } from '@expcat/tigercat-vue'
+import { Carousel } from '@expcat/tigercat-vue/Carousel'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Carousel>

@@ -1,4 +1,6 @@
-import { Avatar, Space, Badge } from '@expcat/tigercat-react'
+import { Avatar } from '@expcat/tigercat-react/Avatar'
+import { Space } from '@expcat/tigercat-react/Space'
+import { Badge } from '@expcat/tigercat-react/Badge'
 import DemoBlock from '../components/DemoBlock'
 
 const imageSnippet = `<Space>

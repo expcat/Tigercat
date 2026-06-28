@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { Card } from '@expcat/tigercat-vue/Card'
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Pagination } from '@expcat/tigercat-vue/Pagination'
 import { computed, ref, h } from 'vue'
-import { List, Card, Space, Button, Pagination } from '@expcat/tigercat-vue'
+import { List } from '@expcat/tigercat-vue/List'
 import type { ListItem } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 

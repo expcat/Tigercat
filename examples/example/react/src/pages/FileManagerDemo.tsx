@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { FileManager } from '@expcat/tigercat-react'
+import { FileManager } from '@expcat/tigercat-react/FileManager'
 import DemoBlock from '../components/DemoBlock'
 
 const files = [

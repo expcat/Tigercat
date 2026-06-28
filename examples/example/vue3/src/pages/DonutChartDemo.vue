@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { DonutChart, type DonutChartDatum } from '@expcat/tigercat-vue'
+import { DonutChart } from '@expcat/tigercat-vue/DonutChart'
+import { type DonutChartDatum } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicData: DonutChartDatum[] = [

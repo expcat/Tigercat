@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RichTextEditor } from '@expcat/tigercat-vue'
+import { RichTextEditor } from '@expcat/tigercat-vue/RichTextEditor'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const content = ref('<p>Hello <strong>Tigercat</strong>!</p>')

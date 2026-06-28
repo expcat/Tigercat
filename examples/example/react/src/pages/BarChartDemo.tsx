@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { BarChart, type BarChartDatum } from '@expcat/tigercat-react'
+import { BarChart } from '@expcat/tigercat-react/BarChart'
+import { type BarChartDatum } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicData: BarChartDatum[] = [

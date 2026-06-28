@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Tag, Space } from '@expcat/tigercat-vue'
+import { Tag } from '@expcat/tigercat-vue/Tag'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const tags = ref(['标签一', '标签二', '标签三'])

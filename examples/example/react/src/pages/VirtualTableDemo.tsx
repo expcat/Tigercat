@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { VirtualTable, type TableColumn } from '@expcat/tigercat-react'
+import { VirtualTable } from '@expcat/tigercat-react/VirtualTable'
+import { type TableColumn } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicColumns: TableColumn[] = [

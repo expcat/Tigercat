@@ -1,5 +1,7 @@
+import { Space } from '@expcat/tigercat-react/Space'
+import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
-import { CronEditor, Space, Text } from '@expcat/tigercat-react'
+import { CronEditor } from '@expcat/tigercat-react/CronEditor'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<CronEditor value={cron} onChange={setCron} />

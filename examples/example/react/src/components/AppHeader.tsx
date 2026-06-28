@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Button } from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import ThemeSwitch from './ThemeSwitch'
 import DarkModeSwitch from './DarkModeSwitch'

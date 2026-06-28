@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { FunnelChart } from '@expcat/tigercat-vue'
+import { FunnelChart } from '@expcat/tigercat-vue/FunnelChart'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const funnelData = [

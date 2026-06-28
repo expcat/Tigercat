@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@expcat/tigercat-vue'
+import { Icon } from '@expcat/tigercat-vue/Icon'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<div class="flex items-center gap-6 flex-wrap">

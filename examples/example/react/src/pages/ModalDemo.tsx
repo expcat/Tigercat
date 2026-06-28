@@ -1,5 +1,8 @@
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
+import { Input } from '@expcat/tigercat-react/Input'
 import { useState } from 'react'
-import { Modal, Button, Space, Input } from '@expcat/tigercat-react'
+import { Modal } from '@expcat/tigercat-react/Modal'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Button>打开对话框</Button>

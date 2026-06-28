@@ -40,7 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { VirtualTable, type TableColumn } from '@expcat/tigercat-vue'
+import { VirtualTable } from '@expcat/tigercat-vue/VirtualTable'
+import { type TableColumn } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicColumns: TableColumn[] = [

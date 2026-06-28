@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
-import { ScrollSpy, type ScrollSpyItem } from '@expcat/tigercat-react'
+import { ScrollSpy } from '@expcat/tigercat-react/ScrollSpy'
+import { type ScrollSpyItem } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const getMainContainer = () => {

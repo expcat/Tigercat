@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
+import { List } from '@expcat/tigercat-vue/List'
 import { ref } from 'vue'
-import { Alert, Button, List } from '@expcat/tigercat-vue'
+import { Alert } from '@expcat/tigercat-vue/Alert'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Alert title="这是一条提示信息" />

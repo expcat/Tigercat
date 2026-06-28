@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
-import {
-  Drawer,
-  Button,
-  Space,
-  type DrawerPlacement,
-  type DrawerSize
-} from '@expcat/tigercat-react'
+import { Drawer } from '@expcat/tigercat-react/Drawer'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
+import { type DrawerPlacement, type DrawerSize } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Button onClick={openBasic}>打开抽屉</Button>

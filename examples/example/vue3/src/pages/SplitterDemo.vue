@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Splitter } from '@expcat/tigercat-vue'
+import { Splitter } from '@expcat/tigercat-vue/Splitter'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const horizontalSnippet = `<Splitter direction="horizontal" :sizes="[30, 70]" style="height: 200px; border: 1px solid #e5e7eb; border-radius: 8px;">

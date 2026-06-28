@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Space } from '@expcat/tigercat-vue'
+import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const horizontalSnippet = `<Space>

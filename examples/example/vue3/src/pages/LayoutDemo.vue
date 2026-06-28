@@ -1,16 +1,14 @@
 <script setup lang="ts">
+import { Layout } from '@expcat/tigercat-vue/Layout'
+import { Header } from '@expcat/tigercat-vue/Header'
+import { Sidebar } from '@expcat/tigercat-vue/Sidebar'
+import { Content } from '@expcat/tigercat-vue/Content'
+import { Footer } from '@expcat/tigercat-vue/Footer'
+import { Menu } from '@expcat/tigercat-vue/Menu'
+import { MenuItem } from '@expcat/tigercat-vue/MenuItem'
+import { SubMenu } from '@expcat/tigercat-vue/SubMenu'
 import { ref } from 'vue'
-import {
-  Container,
-  Layout,
-  Header,
-  Sidebar,
-  Content,
-  Footer,
-  Menu,
-  MenuItem,
-  SubMenu
-} from '@expcat/tigercat-vue'
+import { Container } from '@expcat/tigercat-vue/Container'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const collapsed = ref(false)

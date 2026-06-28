@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Alert, Card } from '@expcat/tigercat-vue'
+import { Alert } from '@expcat/tigercat-vue/Alert'
+import { Card } from '@expcat/tigercat-vue/Card'
 </script>
 
 <template>

@@ -1,5 +1,9 @@
 import React, { useState } from 'react'
-import { Menu, MenuItem, SubMenu, MenuItemGroup, Button } from '@expcat/tigercat-react'
+import { Menu } from '@expcat/tigercat-react/Menu'
+import { MenuItem } from '@expcat/tigercat-react/MenuItem'
+import { SubMenu } from '@expcat/tigercat-react/SubMenu'
+import { MenuItemGroup } from '@expcat/tigercat-react/MenuItemGroup'
+import { Button } from '@expcat/tigercat-react/Button'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Menu selectedKeys={selectedKeys1} onSelect={(key) => setSelectedKeys1([key])}>

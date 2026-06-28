@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
+import { Row } from '@expcat/tigercat-vue/Row'
+import { Col } from '@expcat/tigercat-vue/Col'
+import { Container } from '@expcat/tigercat-vue/Container'
+import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const justifyValues = [

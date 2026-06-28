@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import { CollapsePanel } from '@expcat/tigercat-react/CollapsePanel'
+import { Button } from '@expcat/tigercat-react/Button'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
-import { Collapse, CollapsePanel, Button } from '@expcat/tigercat-react'
+import { Collapse } from '@expcat/tigercat-react/Collapse'
 import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { getStoredCollapsedNavGroups, setStoredCollapsedNavGroups } from '@demo-shared/prefs'
 

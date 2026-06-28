@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Result, Button, Space } from '@expcat/tigercat-vue'
+import { Result } from '@expcat/tigercat-vue/Result'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const statusSnippet = `<Space direction="vertical" :size="24" class="w-full">

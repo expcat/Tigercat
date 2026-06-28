@@ -33,7 +33,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 | NotificationCenter   | `<NotificationCenter :items="items" />`                                                                                                                        | `<NotificationCenter items={items} />`                                                                                                                 |
 | TaskBoard            | `<TaskBoard :columns="columns" />`                                                                                                                             | `<TaskBoard columns={columns} />`                                                                                                                      |
 
-Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.
+Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
 
 ## DataTableWithToolbar Custom Filters
 

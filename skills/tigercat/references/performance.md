@@ -5,7 +5,7 @@ description: Tigercat import strategy, lazy loading, chart entries, and performa
 
 # Performance
 
-Prefer package-level imports for ordinary usage and component subpath imports for large applications that need stricter bundle control.
+Prefer PascalCase component subpath imports for on-demand bundles. Root named exports remain available for small apps and non-component APIs, but large applications should put heavy components behind route or interaction boundaries.
 
 ## Subpath Imports
 
@@ -50,6 +50,8 @@ import { BarChart } from '@expcat/tigercat-vue/BarChart'
 import { LineChart } from '@expcat/tigercat-react/LineChart'
 import { BarChart } from '@expcat/tigercat-react/BarChart'
 ```
+
+Use root named exports for hooks/composables, command APIs such as `Message` / `notification`, and shared framework/core types when no component subpath owns the symbol.
 
 Run `pnpm build` and `pnpm size` after changing shared utils, chart code, exports, or component dependencies.
 

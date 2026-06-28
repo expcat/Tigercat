@@ -1,9 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import {
-  DataTableWithToolbar,
-  type TableColumn,
-  type TableToolbarFilterValue
-} from '@expcat/tigercat-react'
+import { DataTableWithToolbar } from '@expcat/tigercat-react/DataTableWithToolbar'
+import { type TableColumn, type TableToolbarFilterValue } from '@expcat/tigercat-react'
 import type { TableCardLayoutItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

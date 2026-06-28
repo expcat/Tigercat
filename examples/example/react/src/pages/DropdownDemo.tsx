@@ -1,5 +1,8 @@
+import { DropdownMenu } from '@expcat/tigercat-react/DropdownMenu'
+import { DropdownItem } from '@expcat/tigercat-react/DropdownItem'
+import { Button } from '@expcat/tigercat-react/Button'
 import { useState } from 'react'
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
+import { Dropdown } from '@expcat/tigercat-react/Dropdown'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Dropdown>

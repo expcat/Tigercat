@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { NotificationCenter } from '@expcat/tigercat-vue'
+import { NotificationCenter } from '@expcat/tigercat-vue/NotificationCenter'
 import type { NotificationItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

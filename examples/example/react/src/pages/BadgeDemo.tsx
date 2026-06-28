@@ -1,5 +1,7 @@
+import { Space } from '@expcat/tigercat-react/Space'
+import { Button } from '@expcat/tigercat-react/Button'
 import { useState } from 'react'
-import { Badge, Space, Button } from '@expcat/tigercat-react'
+import { Badge } from '@expcat/tigercat-react/Badge'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space>

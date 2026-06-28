@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Spotlight } from '@expcat/tigercat-vue/Spotlight'
 import { ref } from 'vue'
-import { Button, Spotlight, type SpotlightItem } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { type SpotlightItem } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const commands: SpotlightItem[] = [

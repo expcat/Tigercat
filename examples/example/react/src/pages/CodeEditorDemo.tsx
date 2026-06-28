@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CodeEditor } from '@expcat/tigercat-react'
+import { CodeEditor } from '@expcat/tigercat-react/CodeEditor'
 import DemoBlock from '../components/DemoBlock'
 
 const defaultJs = `function greet(name) {

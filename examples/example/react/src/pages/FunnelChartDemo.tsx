@@ -1,4 +1,4 @@
-import { FunnelChart } from '@expcat/tigercat-react'
+import { FunnelChart } from '@expcat/tigercat-react/FunnelChart'
 import DemoBlock from '../components/DemoBlock'
 
 const funnelData = [

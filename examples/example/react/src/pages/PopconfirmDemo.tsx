@@ -1,5 +1,7 @@
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
 import { useState } from 'react'
-import { Popconfirm, Button, Space } from '@expcat/tigercat-react'
+import { Popconfirm } from '@expcat/tigercat-react/Popconfirm'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Popconfirm title="确定要删除这条记录吗？">

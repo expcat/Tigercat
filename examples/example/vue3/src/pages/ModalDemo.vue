@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Input } from '@expcat/tigercat-vue/Input'
 import { ref } from 'vue'
-import { Modal, Button, Space, Input } from '@expcat/tigercat-vue'
+import { Modal } from '@expcat/tigercat-vue/Modal'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Button>打开对话框</Button>

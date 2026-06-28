@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { Switch } from '@expcat/tigercat-vue'
+import { Switch } from '@expcat/tigercat-vue/Switch'
 import { applyDarkMode, getStoredDarkMode, setStoredDarkMode } from '@demo-shared/prefs'
 import type { DemoLang } from '@demo-shared/app-config'
 

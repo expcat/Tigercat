@@ -1,4 +1,5 @@
-import { Tag, Timeline } from '@expcat/tigercat-react'
+import { Tag } from '@expcat/tigercat-react/Tag'
+import { Timeline } from '@expcat/tigercat-react/Timeline'
 import DemoBlock from '../components/DemoBlock'
 
 type ProjectStatus = 'completed' | 'in-progress' | 'pending'

@@ -1,4 +1,5 @@
-import { FloatButton, FloatButtonGroup } from '@expcat/tigercat-react'
+import { FloatButton } from '@expcat/tigercat-react/FloatButton'
+import { FloatButtonGroup } from '@expcat/tigercat-react/FloatButtonGroup'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<FloatButton tooltip="默认" onClick={() => console.log('clicked')} />

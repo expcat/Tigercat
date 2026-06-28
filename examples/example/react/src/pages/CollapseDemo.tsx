@@ -1,5 +1,6 @@
+import { CollapsePanel } from '@expcat/tigercat-react/CollapsePanel'
 import { useState } from 'react'
-import { Collapse, CollapsePanel } from '@expcat/tigercat-react'
+import { Collapse } from '@expcat/tigercat-react/Collapse'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Collapse activeKey={activeKey} onChange={setActiveKey}>

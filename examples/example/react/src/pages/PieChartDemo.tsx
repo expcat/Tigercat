@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { PieChart, type PieChartDatum } from '@expcat/tigercat-react'
+import { PieChart } from '@expcat/tigercat-react/PieChart'
+import { type PieChartDatum } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const salesData: PieChartDatum[] = [

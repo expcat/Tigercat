@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { Switch } from '@expcat/tigercat-vue'
+import { Switch } from '@expcat/tigercat-vue/Switch'
 import { applyModernStyle, getStoredModernStyle, setStoredModernStyle } from '@demo-shared/prefs'
 import type { DemoLang } from '@demo-shared/app-config'
 

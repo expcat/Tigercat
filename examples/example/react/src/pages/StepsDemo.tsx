@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { Steps, StepsItem, Button } from '@expcat/tigercat-react'
+import { Steps } from '@expcat/tigercat-react/Steps'
+import { StepsItem } from '@expcat/tigercat-react/StepsItem'
+import { Button } from '@expcat/tigercat-react/Button'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Steps current={current1}>

@@ -1,13 +1,10 @@
 import React, { useMemo, useRef, useState } from 'react'
-import {
-  FormWizard,
-  Form,
-  FormItem,
-  Input,
-  Alert,
-  type FormHandle,
-  type WizardStep
-} from '@expcat/tigercat-react'
+import { FormWizard } from '@expcat/tigercat-react/FormWizard'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { Input } from '@expcat/tigercat-react/Input'
+import { Alert } from '@expcat/tigercat-react/Alert'
+import { type FormHandle, type WizardStep } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<FormWizard

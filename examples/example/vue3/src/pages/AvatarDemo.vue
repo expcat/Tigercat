@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Avatar, Space, Badge } from '@expcat/tigercat-vue'
+import { Avatar } from '@expcat/tigercat-vue/Avatar'
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Badge } from '@expcat/tigercat-vue/Badge'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const imageSnippet = `<Space>

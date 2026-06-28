@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Code } from '@expcat/tigercat-vue'
+import { Code } from '@expcat/tigercat-vue/Code'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const installSnippet = 'pnpm add @expcat/tigercat-vue'
 const usageSnippet = [
-  "import { Code } from '@expcat/tigercat-vue'",
+  "import { Code } from '@expcat/tigercat-vue/Code'",
   '',
   '<Code :code="const a = 1" />'
 ].join('\n')

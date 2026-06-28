@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
-import {
-  Table,
-  Button,
-  Space,
-  Pagination,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
-  type TableColumn
-} from '@expcat/tigercat-react'
+import { Table } from '@expcat/tigercat-react/Table'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
+import { Pagination } from '@expcat/tigercat-react/Pagination'
+import { Dropdown } from '@expcat/tigercat-react/Dropdown'
+import { DropdownMenu } from '@expcat/tigercat-react/DropdownMenu'
+import { DropdownItem } from '@expcat/tigercat-react/DropdownItem'
+import { type TableColumn } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 interface UserData extends Record<string, unknown> {

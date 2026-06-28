@@ -1,32 +1,30 @@
 import React, { useState } from 'react'
-import {
-  Button,
-  Input,
-  Textarea,
-  Checkbox,
-  CheckboxGroup,
-  Radio,
-  RadioGroup,
-  Switch,
-  Slider,
-  Select,
-  Form,
-  FormItem,
-  Space,
-  Divider,
-  List,
-  Layout,
-  Header,
-  Sidebar,
-  Content,
-  Footer,
-  Row,
-  Col,
-  Container,
-  Link,
-  Text,
-  Icon
-} from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Input } from '@expcat/tigercat-react/Input'
+import { Textarea } from '@expcat/tigercat-react/Textarea'
+import { Checkbox } from '@expcat/tigercat-react/Checkbox'
+import { CheckboxGroup } from '@expcat/tigercat-react/CheckboxGroup'
+import { Radio } from '@expcat/tigercat-react/Radio'
+import { RadioGroup } from '@expcat/tigercat-react/RadioGroup'
+import { Switch } from '@expcat/tigercat-react/Switch'
+import { Slider } from '@expcat/tigercat-react/Slider'
+import { Select } from '@expcat/tigercat-react/Select'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { Space } from '@expcat/tigercat-react/Space'
+import { Divider } from '@expcat/tigercat-react/Divider'
+import { List } from '@expcat/tigercat-react/List'
+import { Layout } from '@expcat/tigercat-react/Layout'
+import { Header } from '@expcat/tigercat-react/Header'
+import { Sidebar } from '@expcat/tigercat-react/Sidebar'
+import { Content } from '@expcat/tigercat-react/Content'
+import { Footer } from '@expcat/tigercat-react/Footer'
+import { Row } from '@expcat/tigercat-react/Row'
+import { Col } from '@expcat/tigercat-react/Col'
+import { Container } from '@expcat/tigercat-react/Container'
+import { Link } from '@expcat/tigercat-react/Link'
+import { Text } from '@expcat/tigercat-react/Text'
+import { Icon } from '@expcat/tigercat-react/Icon'
 
 const App: React.FC = () => {
   // Form state

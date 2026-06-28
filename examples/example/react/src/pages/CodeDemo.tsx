@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Code } from '@expcat/tigercat-react'
+import { Code } from '@expcat/tigercat-react/Code'
 import DemoBlock from '../components/DemoBlock'
 
 const installSnippet = 'pnpm add @expcat/tigercat-react'
 const usageSnippet = [
-  "import { Code } from '@expcat/tigercat-react'",
+  "import { Code } from '@expcat/tigercat-react/Code'",
   '',
   '<Code code="const a = 1" />'
 ].join('\n')

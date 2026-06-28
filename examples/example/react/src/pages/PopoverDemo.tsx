@@ -1,5 +1,8 @@
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
+import { List } from '@expcat/tigercat-react/List'
 import { useState } from 'react'
-import { Popover, Button, Space, List } from '@expcat/tigercat-react'
+import { Popover } from '@expcat/tigercat-react/Popover'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Popover content="这是一个气泡卡片的内容">

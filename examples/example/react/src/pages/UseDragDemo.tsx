@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { useDrag, Card, Tag } from '@expcat/tigercat-react'
+import { Card } from '@expcat/tigercat-react/Card'
+import { Tag } from '@expcat/tigercat-react/Tag'
+import { useDrag } from '@expcat/tigercat-react'
 import type { DragItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

@@ -1,5 +1,6 @@
 import React from 'react'
-import { Text, Space } from '@expcat/tigercat-react'
+import { Text } from '@expcat/tigercat-react/Text'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space direction="vertical" className="w-full">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { LineChart, type LineChartDatum, type LineChartSeries } from '@expcat/tigercat-react'
+import { LineChart } from '@expcat/tigercat-react/LineChart'
+import { type LineChartDatum, type LineChartSeries } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicData: LineChartDatum[] = [

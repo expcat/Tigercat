@@ -1,5 +1,9 @@
 import React, { useState } from 'react'
-import { Input, InputNumber, Space, FormItem, Button } from '@expcat/tigercat-react'
+import { Input } from '@expcat/tigercat-react/Input'
+import { InputNumber } from '@expcat/tigercat-react/InputNumber'
+import { Space } from '@expcat/tigercat-react/Space'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { Button } from '@expcat/tigercat-react/Button'
 import DemoBlock from '../components/DemoBlock'
 import type { InputStatus } from '@expcat/tigercat-core'
 

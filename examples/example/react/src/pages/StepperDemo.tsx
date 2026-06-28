@@ -1,5 +1,7 @@
+import { Space } from '@expcat/tigercat-react/Space'
+import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
-import { Stepper, Space, Text } from '@expcat/tigercat-react'
+import { Stepper } from '@expcat/tigercat-react/Stepper'
 import DemoBlock from '../components/DemoBlock'
 
 const basicScriptSnippet = `import { useState } from 'react'

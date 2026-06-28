@@ -17,4 +17,4 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Affix, Anchor, AnchorLink, BackTop, Breadcrumb, BreadcrumbItem, Dropdown, DropdownItem, DropdownMenu, FloatButton, FloatButtonGroup, Menu, MenuItem, MenuItemGroup, Pagination, ScrollSpy, Spotlight, Steps, StepsItem, SubMenu, TabPane, Tabs, Tree.
 
-Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.
+Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

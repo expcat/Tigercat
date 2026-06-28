@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { Collapse } from '@expcat/tigercat-vue/Collapse'
+import { CollapsePanel } from '@expcat/tigercat-vue/CollapsePanel'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
-import { Button, Collapse, CollapsePanel } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { getStoredCollapsedNavGroups, setStoredCollapsedNavGroups } from '@demo-shared/prefs'
 
 const props = defineProps<{ lang: DemoLang; isSiderCollapsed: boolean; isMobile: boolean }>()

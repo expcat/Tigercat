@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TaskBoard } from '@expcat/tigercat-react'
+import { TaskBoard } from '@expcat/tigercat-react/TaskBoard'
 import type {
   TaskBoardColumn,
   TaskBoardCardMoveEvent,

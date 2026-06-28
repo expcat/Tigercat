@@ -39,7 +39,8 @@
 </template>
 
 <script setup lang="ts">
-import { PrintLayout, PrintPageBreak } from '@expcat/tigercat-vue'
+import { PrintLayout } from '@expcat/tigercat-vue/PrintLayout'
+import { PrintPageBreak } from '@expcat/tigercat-vue/PrintPageBreak'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<PrintLayout>

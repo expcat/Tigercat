@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { TreeMapChart } from '@expcat/tigercat-vue'
+import { TreeMapChart } from '@expcat/tigercat-vue/TreeMapChart'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const flatData = [

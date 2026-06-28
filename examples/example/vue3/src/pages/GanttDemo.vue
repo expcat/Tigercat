@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Gantt } from '@expcat/tigercat-vue'
+import { Gantt } from '@expcat/tigercat-vue/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

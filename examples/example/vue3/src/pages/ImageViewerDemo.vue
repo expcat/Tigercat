@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
-import { ImageViewer, Button } from '@expcat/tigercat-vue'
+import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const open1 = ref(false)

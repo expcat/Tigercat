@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { MenuItem } from '@expcat/tigercat-vue/MenuItem'
+import { SubMenu } from '@expcat/tigercat-vue/SubMenu'
+import { MenuItemGroup } from '@expcat/tigercat-vue/MenuItemGroup'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu, MenuItemGroup, Button } from '@expcat/tigercat-vue'
+import { Menu } from '@expcat/tigercat-vue/Menu'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const selectedKeys1 = ref(['1'])

@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { TabPane } from '@expcat/tigercat-vue/TabPane'
+import { Code } from '@expcat/tigercat-vue/Code'
 import { onBeforeUnmount, ref } from 'vue'
-import { Tabs, TabPane, Code } from '@expcat/tigercat-vue'
+import { Tabs } from '@expcat/tigercat-vue/Tabs'
 import { copyTextToClipboard } from '@expcat/tigercat-core'
 
 const props = defineProps<{

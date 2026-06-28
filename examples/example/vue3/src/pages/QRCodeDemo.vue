@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { QRCode, Space } from '@expcat/tigercat-vue'
+import { QRCode } from '@expcat/tigercat-vue/QRCode'
+import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Space wrap>

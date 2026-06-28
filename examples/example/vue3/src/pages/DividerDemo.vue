@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Divider } from '@expcat/tigercat-vue'
+import { Divider } from '@expcat/tigercat-vue/Divider'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<div class="text-gray-700 dark:text-gray-300">上方内容</div>

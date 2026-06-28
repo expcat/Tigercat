@@ -1,5 +1,7 @@
+import { ImageGroup } from '@expcat/tigercat-react/ImageGroup'
+import { ImagePreview } from '@expcat/tigercat-react/ImagePreview'
 import { useState } from 'react'
-import { Image, ImageGroup, ImagePreview } from '@expcat/tigercat-react'
+import { Image } from '@expcat/tigercat-react/Image'
 import DemoBlock from '../components/DemoBlock'
 
 const PHOTOS = [

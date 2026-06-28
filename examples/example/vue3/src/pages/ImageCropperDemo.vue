@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ImageCropper } from '@expcat/tigercat-vue'
+import { ImageCropper } from '@expcat/tigercat-vue/ImageCropper'
 import type { CropRect, CropResult } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { AreaChart, type AreaChartDatum, type AreaChartSeries } from '@expcat/tigercat-vue'
+import { AreaChart } from '@expcat/tigercat-vue/AreaChart'
+import { type AreaChartDatum, type AreaChartSeries } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicData: AreaChartDatum[] = [

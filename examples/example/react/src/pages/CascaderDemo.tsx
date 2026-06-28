@@ -1,5 +1,6 @@
+import { Space } from '@expcat/tigercat-react/Space'
 import { useState } from 'react'
-import { Cascader, Space } from '@expcat/tigercat-react'
+import { Cascader } from '@expcat/tigercat-react/Cascader'
 import DemoBlock from '../components/DemoBlock'
 
 const options = [

@@ -1,4 +1,7 @@
-import { InputGroup, Input, Select, Button } from '@expcat/tigercat-react'
+import { InputGroup } from '@expcat/tigercat-react/InputGroup'
+import { Input } from '@expcat/tigercat-react/Input'
+import { Select } from '@expcat/tigercat-react/Select'
+import { Button } from '@expcat/tigercat-react/Button'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<InputGroup>

@@ -529,7 +529,7 @@ function generateComponentIndex(componentRows) {
   markdownText +=
     '- 类型源码：`packages/core/src/types/` + Type 列；个别跨包组件（如 ConfigProvider）以各框架包内同名文件为准，详见其 props 段。\n\n'
   markdownText +=
-    '- Package subpath：React/Vue 均使用 PascalCase 显式入口，例如 `@expcat/tigercat-react/Button` 或 `@expcat/tigercat-vue/Button`。\n\n'
+    '- Package subpath：React/Vue 组件按需使用均优先走 PascalCase 显式入口，例如 `@expcat/tigercat-react/Button` 或 `@expcat/tigercat-vue/Button`；根入口 named exports 仅作为小应用便利入口与非组件 API 入口。\n\n'
   markdownText += '| Component | Category | Type | Package Subpath |\n'
   markdownText += '| --------- | -------- | ---- | --------------- |\n'
 
@@ -738,7 +738,7 @@ function generateExamples(category, componentEntries) {
   }
 
   markdownText +=
-    'Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.\n'
+    'Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.\n'
   if (COMPONENT_EXAMPLE_EXTRA[category]) {
     markdownText += `\n${COMPONENT_EXAMPLE_EXTRA[category].trim()}\n`
   }
@@ -757,9 +757,9 @@ function generateFrameworkIndex(framework) {
   markdownText += `description: Tigercat ${framework === 'vue' ? 'Vue 3' : 'React'} routing page for generated examples\n`
   markdownText += '---\n\n'
   markdownText += `# Tigercat ${framework === 'vue' ? 'Vue 3' : 'React'}\n\n`
-  markdownText += `${bindingNote} Install from \`${packageName}\`.\n\n`
+  markdownText += `${bindingNote} Install from \`${packageName}\`; import components from PascalCase subpaths for on-demand usage.\n\n`
   markdownText +=
-    '查组件用法：先开 [component-index.md](../component-index.md) 定位组件与 Category，再按其规则打开 `shared/props/{cat}.md` 与 `examples/{cat}.md`。跨框架绑定差异见 [shared/patterns/common.md](../shared/patterns/common.md) 与 [shared/glossary.md](../shared/glossary.md)。\n'
+    '查组件用法：先开 [component-index.md](../component-index.md) 定位组件、Category 与 PascalCase Package Subpath，再按其规则打开 `shared/props/{cat}.md` 与 `examples/{cat}.md`。跨框架绑定差异见 [shared/patterns/common.md](../shared/patterns/common.md) 与 [shared/glossary.md](../shared/glossary.md)。\n'
   return markdownText
 }
 

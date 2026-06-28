@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { MarkdownEditor } from '@expcat/tigercat-vue'
+import { MarkdownEditor } from '@expcat/tigercat-vue/MarkdownEditor'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const initialMarkdown = `# Release notes

@@ -1,4 +1,4 @@
-import { Splitter } from '@expcat/tigercat-react'
+import { Splitter } from '@expcat/tigercat-react/Splitter'
 import DemoBlock from '../components/DemoBlock'
 
 const horizontalSnippet = `<Splitter direction="horizontal" sizes={[30, 70]} style={{ height: 200, border: '1px solid #e5e7eb', borderRadius: 8 }}>

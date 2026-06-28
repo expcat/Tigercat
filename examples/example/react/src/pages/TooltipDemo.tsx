@@ -1,5 +1,7 @@
+import { Button } from '@expcat/tigercat-react/Button'
+import { Space } from '@expcat/tigercat-react/Space'
 import { useState } from 'react'
-import { Tooltip, Button, Space } from '@expcat/tigercat-react'
+import { Tooltip } from '@expcat/tigercat-react/Tooltip'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Tooltip content="这是一个气泡提示">

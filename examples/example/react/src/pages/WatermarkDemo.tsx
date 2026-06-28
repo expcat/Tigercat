@@ -1,4 +1,4 @@
-import { Watermark } from '@expcat/tigercat-react'
+import { Watermark } from '@expcat/tigercat-react/Watermark'
 import DemoBlock from '../components/DemoBlock'
 
 const textSnippet = `<Watermark content="Tigercat">

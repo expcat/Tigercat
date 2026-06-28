@@ -1,5 +1,8 @@
 import React from 'react'
-import { Row, Col, Container, Space } from '@expcat/tigercat-react'
+import { Row } from '@expcat/tigercat-react/Row'
+import { Col } from '@expcat/tigercat-react/Col'
+import { Container } from '@expcat/tigercat-react/Container'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Row>

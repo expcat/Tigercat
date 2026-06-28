@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { DropdownMenu } from '@expcat/tigercat-vue/DropdownMenu'
+import { DropdownItem } from '@expcat/tigercat-vue/DropdownItem'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-vue'
+import { Dropdown } from '@expcat/tigercat-vue/Dropdown'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const visible1 = ref(false)

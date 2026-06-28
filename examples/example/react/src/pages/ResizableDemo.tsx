@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Resizable } from '@expcat/tigercat-react'
+import { Resizable } from '@expcat/tigercat-react/Resizable'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Resizable defaultWidth={300} defaultHeight={150} minWidth={100} minHeight={60} onResize={onResize}>

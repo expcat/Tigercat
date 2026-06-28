@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { ImageGroup } from '@expcat/tigercat-vue/ImageGroup'
+import { ImagePreview } from '@expcat/tigercat-vue/ImagePreview'
 import { ref } from 'vue'
-import { Image, ImageGroup, ImagePreview } from '@expcat/tigercat-vue'
+import { Image } from '@expcat/tigercat-vue/Image'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const PHOTOS = [

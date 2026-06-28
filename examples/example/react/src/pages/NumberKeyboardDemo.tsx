@@ -1,5 +1,6 @@
+import { NumberKeyboard } from '@expcat/tigercat-react/NumberKeyboard'
 import { useState } from 'react'
-import { Input, NumberKeyboard } from '@expcat/tigercat-react'
+import { Input } from '@expcat/tigercat-react/Input'
 import DemoBlock from '../components/DemoBlock'
 
 const amountSnippet = `const [amount, setAmount] = useState('')

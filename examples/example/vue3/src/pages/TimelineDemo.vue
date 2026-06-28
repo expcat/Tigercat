@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Tag } from '@expcat/tigercat-vue/Tag'
 import { h } from 'vue'
-import { Timeline, Tag } from '@expcat/tigercat-vue'
+import { Timeline } from '@expcat/tigercat-vue/Timeline'
 import DemoBlock from '../components/DemoBlock.vue'
 
 // Basic timeline data

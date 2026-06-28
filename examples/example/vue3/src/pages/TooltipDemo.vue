@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Button } from '@expcat/tigercat-vue/Button'
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Tooltip, Button, Space } from '@expcat/tigercat-vue'
+import { Tooltip } from '@expcat/tigercat-vue/Tooltip'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const visible1 = ref(false)

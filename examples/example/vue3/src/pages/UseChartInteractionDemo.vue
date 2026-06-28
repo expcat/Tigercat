@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Card } from '@expcat/tigercat-vue/Card'
 import { computed } from 'vue'
-import { useChartInteraction, Card } from '@expcat/tigercat-vue'
+import { useChartInteraction } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 interface BarDatum {

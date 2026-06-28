@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { Resizable } from '@expcat/tigercat-vue'
+import { Resizable } from '@expcat/tigercat-vue/Resizable'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const size = reactive({ width: 300, height: 150 })

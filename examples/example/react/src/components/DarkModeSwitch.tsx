@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Switch } from '@expcat/tigercat-react'
+import { Switch } from '@expcat/tigercat-react/Switch'
 import { applyDarkMode, getStoredDarkMode, setStoredDarkMode } from '@demo-shared/prefs'
 import type { DemoLang } from '@demo-shared/app-config'
 

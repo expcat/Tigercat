@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Kanban } from '@expcat/tigercat-vue'
+import { Kanban } from '@expcat/tigercat-vue/Kanban'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const columns = ref([

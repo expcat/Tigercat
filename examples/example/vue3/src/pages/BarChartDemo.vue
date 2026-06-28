@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { BarChart, type BarChartDatum } from '@expcat/tigercat-vue'
+import { BarChart } from '@expcat/tigercat-vue/BarChart'
+import { type BarChartDatum } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicData: BarChartDatum[] = [

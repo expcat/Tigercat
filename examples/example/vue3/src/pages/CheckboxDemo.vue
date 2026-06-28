@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { CheckboxGroup } from '@expcat/tigercat-vue/CheckboxGroup'
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref, computed } from 'vue'
-import { Checkbox, CheckboxGroup, Space } from '@expcat/tigercat-vue'
+import { Checkbox } from '@expcat/tigercat-vue/Checkbox'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const checked = ref(false)

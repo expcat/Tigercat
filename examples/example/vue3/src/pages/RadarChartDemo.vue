@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { RadarChart, type RadarChartDatum, type RadarChartSeries } from '@expcat/tigercat-vue'
+import { RadarChart } from '@expcat/tigercat-vue/RadarChart'
+import { type RadarChartDatum, type RadarChartSeries } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicData: RadarChartDatum[] = [

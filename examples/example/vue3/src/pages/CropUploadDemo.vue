@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CropUpload } from '@expcat/tigercat-vue'
+import { CropUpload } from '@expcat/tigercat-vue/CropUpload'
 import type { CropResult } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Select, Space } from '@expcat/tigercat-react'
+import { Select } from '@expcat/tigercat-react/Select'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space direction="vertical" className="w-full max-w-md">

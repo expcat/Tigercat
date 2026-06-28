@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Tour } from '@expcat/tigercat-vue'
+import { Tour } from '@expcat/tigercat-vue/Tour'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const open = ref(false)

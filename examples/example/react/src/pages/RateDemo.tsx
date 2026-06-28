@@ -1,5 +1,7 @@
+import { Space } from '@expcat/tigercat-react/Space'
+import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
-import { Rate, Space, Text } from '@expcat/tigercat-react'
+import { Rate } from '@expcat/tigercat-react/Rate'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Rate value={val} onChange={setVal} />

@@ -1,6 +1,9 @@
 'use client'
 
-import { BarChart, Button, ConfigProvider, DatePicker } from '@expcat/tigercat-react'
+import { BarChart } from '@expcat/tigercat-react/BarChart'
+import { Button } from '@expcat/tigercat-react/Button'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { DatePicker } from '@expcat/tigercat-react/DatePicker'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 const selectedDate = new Date(2024, 0, 15)

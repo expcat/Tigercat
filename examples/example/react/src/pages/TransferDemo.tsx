@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Transfer } from '@expcat/tigercat-react'
+import { Transfer } from '@expcat/tigercat-react/Transfer'
 import DemoBlock from '../components/DemoBlock'
 
 const dataSource = Array.from({ length: 10 }, (_, i) => ({

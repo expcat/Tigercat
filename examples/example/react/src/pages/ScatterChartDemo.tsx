@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { ScatterChart, type ScatterChartDatum } from '@expcat/tigercat-react'
+import { ScatterChart } from '@expcat/tigercat-react/ScatterChart'
+import { type ScatterChartDatum } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicData: ScatterChartDatum[] = [

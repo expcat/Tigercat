@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { Affix } from '@expcat/tigercat-vue'
+import { Affix } from '@expcat/tigercat-vue/Affix'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const onAffixChange = (affixed: boolean) => {

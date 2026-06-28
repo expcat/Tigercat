@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AutoComplete } from '@expcat/tigercat-react'
+import { AutoComplete } from '@expcat/tigercat-react/AutoComplete'
 import DemoBlock from '../components/DemoBlock'
 
 const allOptions = ['React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Preact', 'Next.js', 'Nuxt'].map(

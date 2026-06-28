@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
-import { Button } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import ThemeSwitch from './ThemeSwitch.vue'
 import DarkModeSwitch from './DarkModeSwitch.vue'
 import ModernStyleSwitch from './ModernStyleSwitch.vue'

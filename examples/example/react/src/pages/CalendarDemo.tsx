@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Calendar } from '@expcat/tigercat-react'
+import { Calendar } from '@expcat/tigercat-react/Calendar'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `const [date, setDate] = useState(new Date())

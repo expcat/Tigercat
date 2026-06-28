@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
-import { Slider, Space, Text } from '@expcat/tigercat-vue'
+import { Slider } from '@expcat/tigercat-vue/Slider'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicValue = ref(50)

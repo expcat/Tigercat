@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { InputNumber } from '@expcat/tigercat-vue/InputNumber'
+import { Space } from '@expcat/tigercat-vue/Space'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
-import { Input, InputNumber, Space, FormItem, Button } from '@expcat/tigercat-vue'
+import { Input } from '@expcat/tigercat-vue/Input'
 import DemoBlock from '../components/DemoBlock.vue'
 import type { InputStatus } from '@expcat/tigercat-core'
 

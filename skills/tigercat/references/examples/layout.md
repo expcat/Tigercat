@@ -17,4 +17,4 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Card, Carousel, Col, Container, Content, Descriptions, Footer, Header, Layout, List, Resizable, Row, Sidebar, Skeleton, Space, Splitter.
 
-Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.
+Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

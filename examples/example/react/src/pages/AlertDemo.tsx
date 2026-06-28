@@ -1,5 +1,7 @@
+import { Button } from '@expcat/tigercat-react/Button'
+import { List } from '@expcat/tigercat-react/List'
 import { useState } from 'react'
-import { Alert, Button, List } from '@expcat/tigercat-react'
+import { Alert } from '@expcat/tigercat-react/Alert'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Alert title="这是一条提示信息" />

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { MarkdownEditor } from '@expcat/tigercat-react'
+import { MarkdownEditor } from '@expcat/tigercat-react/MarkdownEditor'
 import DemoBlock from '../components/DemoBlock'
 
 const initialMarkdown = `# Release notes

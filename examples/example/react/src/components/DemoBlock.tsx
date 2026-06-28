@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Tabs, TabPane, Code } from '@expcat/tigercat-react'
+import { Tabs } from '@expcat/tigercat-react/Tabs'
+import { TabPane } from '@expcat/tigercat-react/TabPane'
+import { Code } from '@expcat/tigercat-react/Code'
 import { copyTextToClipboard } from '@expcat/tigercat-core'
 
 interface DemoBlockProps {

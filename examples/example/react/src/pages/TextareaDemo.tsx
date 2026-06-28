@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { Textarea, Space, FormItem } from '@expcat/tigercat-react'
+import { Textarea } from '@expcat/tigercat-react/Textarea'
+import { Space } from '@expcat/tigercat-react/Space'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space direction="vertical" className="w-full max-w-md">

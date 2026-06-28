@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { InfiniteScroll } from '@expcat/tigercat-react'
+import { InfiniteScroll } from '@expcat/tigercat-react/InfiniteScroll'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<InfiniteScroll hasMore={hasMore} loading={loading} onLoadMore={loadMore}

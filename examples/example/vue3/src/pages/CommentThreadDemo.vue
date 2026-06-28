@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CommentThread } from '@expcat/tigercat-vue'
+import { CommentThread } from '@expcat/tigercat-vue/CommentThread'
 import type { CommentNode } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

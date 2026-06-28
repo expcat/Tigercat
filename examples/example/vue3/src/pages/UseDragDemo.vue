@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Card } from '@expcat/tigercat-vue/Card'
+import { Tag } from '@expcat/tigercat-vue/Tag'
 import { ref, computed } from 'vue'
-import { useDrag, Card, Tag } from '@expcat/tigercat-vue'
+import { useDrag } from '@expcat/tigercat-vue'
 import type { DragItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

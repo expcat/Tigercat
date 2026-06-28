@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { BarChart, Button, ConfigProvider, DatePicker } from '@expcat/tigercat-vue'
+import { BarChart } from '@expcat/tigercat-vue/BarChart'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 const selectedDate = new Date(2024, 0, 15)

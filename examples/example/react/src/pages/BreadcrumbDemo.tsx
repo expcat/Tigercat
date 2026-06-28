@@ -1,5 +1,6 @@
 import React from 'react'
-import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
+import { Breadcrumb } from '@expcat/tigercat-react/Breadcrumb'
+import { BreadcrumbItem } from '@expcat/tigercat-react/BreadcrumbItem'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Breadcrumb>

@@ -1,5 +1,6 @@
 import React from 'react'
-import { useChartInteraction, Card } from '@expcat/tigercat-react'
+import { Card } from '@expcat/tigercat-react/Card'
+import { useChartInteraction } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 interface BarDatum {

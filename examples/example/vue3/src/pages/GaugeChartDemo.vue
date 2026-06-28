@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { GaugeChart } from '@expcat/tigercat-vue'
+import { GaugeChart } from '@expcat/tigercat-vue/GaugeChart'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const segments = [

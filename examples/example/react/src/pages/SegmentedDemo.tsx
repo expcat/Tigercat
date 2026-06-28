@@ -1,5 +1,7 @@
+import { Space } from '@expcat/tigercat-react/Space'
+import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
-import { Segmented, Space, Text } from '@expcat/tigercat-react'
+import { Segmented } from '@expcat/tigercat-react/Segmented'
 import DemoBlock from '../components/DemoBlock'
 
 const simpleOpts = [

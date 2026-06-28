@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { NumberKeyboard } from '@expcat/tigercat-vue/NumberKeyboard'
 import { ref } from 'vue'
-import { Input, NumberKeyboard } from '@expcat/tigercat-vue'
+import { Input } from '@expcat/tigercat-vue/Input'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const amount = ref('')

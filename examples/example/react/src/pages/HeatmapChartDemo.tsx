@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { HeatmapChart } from '@expcat/tigercat-react'
+import { HeatmapChart } from '@expcat/tigercat-react/HeatmapChart'
 import DemoBlock from '../components/DemoBlock'
 
 const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']

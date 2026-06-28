@@ -1,4 +1,5 @@
-import { Button, Descriptions } from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
+import { Descriptions } from '@expcat/tigercat-react/Descriptions'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Descriptions title="用户信息" items={userInfo} />`

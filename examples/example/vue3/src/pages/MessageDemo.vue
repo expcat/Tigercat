@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Message, Button, List } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue/Message'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { List } from '@expcat/tigercat-vue/List'
 import { ref } from 'vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
@@ -167,7 +169,7 @@ const durationSnippet = `<div class="flex flex-wrap gap-2">
 </div>`
 
 const manualScriptSnippet = `import { ref } from 'vue'
-import { Message } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue/Message'
 
 const manualLoadingCloseFns = ref<Array<() => void>>([])`
 

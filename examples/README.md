@@ -1,6 +1,8 @@
 # Tigercat Examples
 
 本目录保留 Vite 示例应用与 SSR 示例应用，用来验证 Tigercat Vue 与 React 组件的真实使用路径。
+示例源码优先使用 PascalCase 组件子路径导入，保留根入口 named exports 覆盖 hooks/composables、
+命令式 API 和共享类型等非组件使用面。
 
 ## 结构
 
@@ -74,7 +76,8 @@ export default {
 新增或修改组件 API 时，同步检查：
 
 1. `examples/example/shared/app-config.ts` 中的分类、描述和路径。
-2. `examples/example/vue3/src` 与 `examples/example/react/src` 中的用法是否仍可复制运行，尤其是 `Table` / `VirtualTable` 的固定列与锁列示例。
-3. `pnpm example:build` 是否通过。
+2. `examples/example/vue3/src` 与 `examples/example/react/src` 中的组件 value imports 是否继续使用 PascalCase 子路径；hooks/composables、`notification`、共享类型可继续走根入口或 core。
+3. 路由页是否继续通过 `React.lazy` / `defineAsyncComponent` 懒加载。
+4. `pnpm example:build` 是否通过。
 
 组件 API 文档入口见 [skills/tigercat/SKILL.md](../skills/tigercat/SKILL.md)，测试入口见 [tests/README.md](../tests/README.md)。

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CropUpload } from '@expcat/tigercat-react'
+import { CropUpload } from '@expcat/tigercat-react/CropUpload'
 import type { CropResult } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

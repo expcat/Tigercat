@@ -1,4 +1,4 @@
-import { NotificationCenter } from '@expcat/tigercat-react'
+import { NotificationCenter } from '@expcat/tigercat-react/NotificationCenter'
 import type { NotificationItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 

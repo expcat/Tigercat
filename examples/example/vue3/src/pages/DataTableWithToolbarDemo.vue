@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import {
-  DataTableWithToolbar,
-  type TableColumn,
-  type TableToolbarFilterValue
-} from '@expcat/tigercat-vue'
+import { DataTableWithToolbar } from '@expcat/tigercat-vue/DataTableWithToolbar'
+import { type TableColumn, type TableToolbarFilterValue } from '@expcat/tigercat-vue'
 import type { TableToolbarAction, TableCardLayoutItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, ref, type Ref } from 'vue'
-import { TimePicker } from '@expcat/tigercat-vue'
+import { TimePicker } from '@expcat/tigercat-vue/TimePicker'
 import type { DemoLang } from '@demo-shared/app-config'
 import DemoBlock from '../components/DemoBlock.vue'
 

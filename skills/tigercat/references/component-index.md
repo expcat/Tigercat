@@ -13,7 +13,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 - Examples：在 `examples/{cat}.md` 内找 `## {Component}` 段或同名片段。
 - 类型源码：`packages/core/src/types/` + Type 列；个别跨包组件（如 ConfigProvider）以各框架包内同名文件为准，详见其 props 段。
 
-- Package subpath：React/Vue 均使用 PascalCase 显式入口，例如 `@expcat/tigercat-react/Button` 或 `@expcat/tigercat-vue/Button`。
+- Package subpath：React/Vue 组件按需使用均优先走 PascalCase 显式入口，例如 `@expcat/tigercat-react/Button` 或 `@expcat/tigercat-vue/Button`；根入口 named exports 仅作为小应用便利入口与非组件 API 入口。
 
 | Component             | Category   | Type                                                | Package Subpath         |
 | --------------------- | ---------- | --------------------------------------------------- | ----------------------- |

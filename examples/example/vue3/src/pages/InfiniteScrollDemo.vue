@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { InfiniteScroll } from '@expcat/tigercat-vue'
+import { InfiniteScroll } from '@expcat/tigercat-vue/InfiniteScroll'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const items = ref(Array.from({ length: 20 }, (_, i) => i + 1))

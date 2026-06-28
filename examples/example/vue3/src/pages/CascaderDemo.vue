@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
-import { Cascader, Space } from '@expcat/tigercat-vue'
+import { Cascader } from '@expcat/tigercat-vue/Cascader'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const val = ref<(string | number)[]>([])

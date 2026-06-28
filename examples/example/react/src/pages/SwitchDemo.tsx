@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Switch, Space } from '@expcat/tigercat-react'
+import { Switch } from '@expcat/tigercat-react/Switch'
+import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Space direction="vertical">

@@ -1,4 +1,5 @@
-import { PrintLayout, PrintPageBreak } from '@expcat/tigercat-react'
+import { PrintLayout } from '@expcat/tigercat-react/PrintLayout'
+import { PrintPageBreak } from '@expcat/tigercat-react/PrintPageBreak'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<PrintLayout>

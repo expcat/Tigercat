@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { DatePicker } from '@expcat/tigercat-react'
+import { DatePicker } from '@expcat/tigercat-react/DatePicker'
 import DemoBlock from '../components/DemoBlock'
 import { useLang } from '../context/lang'
 

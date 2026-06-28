@@ -34,4 +34,4 @@ description: Compact Tigercat Charts Vue and React usage routes
 | SunburstChart | `<SunburstChart :data="data" />` | `<SunburstChart data={data} />` |
 | TreeMapChart  | `<TreeMapChart :data="data" />`  | `<TreeMapChart data={data} />`  |
 
-Imports: use `@expcat/tigercat-vue` for Vue and `@expcat/tigercat-react` for React.
+Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

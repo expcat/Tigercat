@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { ref, computed, inject, type Ref } from 'vue'
-import { DatePicker, Space, FormItem } from '@expcat/tigercat-vue'
+import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
 import type { DemoLang } from '@demo-shared/app-config'
 import DemoBlock from '../components/DemoBlock.vue'
 

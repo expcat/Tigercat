@@ -1,5 +1,6 @@
+import { TabPane } from '@expcat/tigercat-react/TabPane'
 import { useRef, useState } from 'react'
-import { Tabs, TabPane } from '@expcat/tigercat-react'
+import { Tabs } from '@expcat/tigercat-react/Tabs'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Tabs activeKey={activeKey1} onChange={...}>

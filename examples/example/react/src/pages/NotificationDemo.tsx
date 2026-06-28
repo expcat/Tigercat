@@ -1,5 +1,6 @@
+import { Button } from '@expcat/tigercat-react/Button'
 import { useRef } from 'react'
-import { notification, Button } from '@expcat/tigercat-react'
+import { notification } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Button onClick={showInfo}>信息</Button>

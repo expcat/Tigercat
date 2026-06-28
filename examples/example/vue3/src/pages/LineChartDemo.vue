@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { LineChart, type LineChartDatum, type LineChartSeries } from '@expcat/tigercat-vue'
+import { LineChart } from '@expcat/tigercat-vue/LineChart'
+import { type LineChartDatum, type LineChartSeries } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicData: LineChartDatum[] = [

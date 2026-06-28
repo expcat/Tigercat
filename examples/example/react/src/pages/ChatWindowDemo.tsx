@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { ChatWindow } from '@expcat/tigercat-react'
+import { ChatWindow } from '@expcat/tigercat-react/ChatWindow'
 import type { ChatMessage } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 
