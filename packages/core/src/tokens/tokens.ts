@@ -87,7 +87,6 @@ export const primitiveColors = {
     '950': '#0a0a0a'
   }
 } as const
-export const globalColors = primitiveColors
 
 /** Primitive spacing scale */
 export const primitiveSpace = {
@@ -100,7 +99,6 @@ export const primitiveSpace = {
   '3xl': '48px',
   '4xl': '64px'
 } as const
-export const globalSpace = primitiveSpace
 
 /** Primitive border radius scale */
 export const primitiveRadius = {
@@ -111,7 +109,6 @@ export const primitiveRadius = {
   xl: '12px',
   full: '9999px'
 } as const
-export const globalRadius = primitiveRadius
 
 /** Primitive box shadow scale */
 export const primitiveShadow = {
@@ -121,7 +118,6 @@ export const primitiveShadow = {
   lg: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
   xl: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)'
 } as const
-export const globalShadow = primitiveShadow
 
 /** Primitive typography tokens */
 export const primitiveFont = {
@@ -152,7 +148,6 @@ export const primitiveFont = {
     loose: '2'
   }
 } as const
-export const globalFont = primitiveFont
 
 /** Primitive animation duration tokens */
 export const primitiveDuration = {
@@ -161,7 +156,6 @@ export const primitiveDuration = {
   slow: '300ms',
   slower: '500ms'
 } as const
-export const globalDuration = primitiveDuration
 
 /** Primitive animation easing tokens */
 export const primitiveEasing = {
@@ -171,7 +165,6 @@ export const primitiveEasing = {
   spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
   smooth: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
 } as const
-export const globalEasing = primitiveEasing
 
 /** Semantic tokens */
 export const semanticTokens = {
@@ -223,7 +216,6 @@ export const semanticTokens = {
     pill: '9999px'
   }
 } as const
-export const aliasTokens = semanticTokens
 
 /** Component-level tokens */
 export const componentTokens = {
@@ -444,10 +436,3 @@ export type PrimitiveDurationKey = keyof typeof primitiveDuration
 export type PrimitiveEasingKey = keyof typeof primitiveEasing
 export type SemanticTokenCategory = keyof typeof semanticTokens
 export type ComponentTokenName = keyof typeof componentTokens
-export type GlobalColorHue = PrimitiveColorHue
-export type GlobalColorLevel = PrimitiveColorLevel
-export type GlobalSpaceKey = PrimitiveSpaceKey
-export type GlobalRadiusKey = PrimitiveRadiusKey
-export type GlobalShadowKey = PrimitiveShadowKey
-export type GlobalDurationKey = PrimitiveDurationKey
-export type GlobalEasingKey = PrimitiveEasingKey

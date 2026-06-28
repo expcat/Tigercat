@@ -26,9 +26,7 @@ const componentTokens = rawTokens.component
 const tokens = {
   primitive: primitiveTokens,
   semantic: semanticTokens,
-  component: componentTokens,
-  global: primitiveTokens,
-  alias: semanticTokens
+  component: componentTokens
 }
 
 // ---------------------------------------------------------------------------
@@ -70,10 +68,6 @@ function resolve(ref, root = tokens) {
       cur.startsWith('alias.'))
     ? resolve(cur, root)
     : cur
-}
-
-function cssVarName(category, ...parts) {
-  return `--tiger-${category}-${parts.join('-')}`
 }
 
 function canonicalCssVarName(layer, category, ...parts) {
@@ -160,90 +154,6 @@ function generateCSS() {
     }
   }
 
-  lines.push('')
-  lines.push('  /* Compatibility variables */')
-
-  // Global tokens
-  const global = tokens.primitive
-
-  // Colors
-  for (const [hue, shades] of Object.entries(global.color)) {
-    for (const [level, value] of Object.entries(shades)) {
-      lines.push(`  ${cssVarName('color', hue, level)}: ${value};`)
-    }
-  }
-
-  // Spacing
-  for (const [key, value] of Object.entries(global.space)) {
-    lines.push(`  ${cssVarName('space', key)}: ${value};`)
-  }
-
-  // Border radius
-  for (const [key, value] of Object.entries(global.radius)) {
-    lines.push(`  ${cssVarName('radius', key)}: ${value};`)
-  }
-
-  // Box shadow
-  for (const [key, value] of Object.entries(global.shadow)) {
-    lines.push(`  ${cssVarName('shadow', key)}: ${value};`)
-  }
-
-  // Typography
-  for (const [key, value] of Object.entries(global.font.family)) {
-    lines.push(`  ${cssVarName('font', 'family', key)}: ${value};`)
-  }
-  for (const [key, value] of Object.entries(global.font.size)) {
-    lines.push(`  ${cssVarName('font', 'size', key)}: ${value};`)
-  }
-  for (const [key, value] of Object.entries(global.font.weight)) {
-    lines.push(`  ${cssVarName('font', 'weight', key)}: ${value};`)
-  }
-  for (const [key, value] of Object.entries(global.font.lineHeight)) {
-    lines.push(`  ${cssVarName('font', 'lh', key)}: ${value};`)
-  }
-
-  // Duration
-  for (const [key, value] of Object.entries(global.duration)) {
-    lines.push(`  ${cssVarName('duration', key)}: ${value};`)
-  }
-
-  // Easing
-  for (const [key, value] of Object.entries(global.easing)) {
-    lines.push(`  ${cssVarName('easing', key)}: ${value};`)
-  }
-
-  // Alias tokens
-  for (const [category, entries] of Object.entries(tokens.semantic)) {
-    for (const [key, ref] of Object.entries(entries)) {
-      const resolved = resolve(ref)
-      lines.push(`  ${cssVarName(category, key)}: ${resolved};`)
-    }
-  }
-
-  // Component tokens
-  for (const [comp, entries] of Object.entries(tokens.component)) {
-    for (const [key, ref] of Object.entries(entries)) {
-      const resolved = resolve(ref)
-      lines.push(`  --tiger-${comp}-${key}: ${resolved};`)
-    }
-  }
-
-  // Backward-compat: legacy variables mapped to new tokens
-  lines.push('')
-  lines.push('  /* Legacy variables (backward-compat with pre-0.5.0) */')
-  lines.push(`  --tiger-primary: var(${cssVarName('color', 'primary', '600')});`)
-  lines.push(`  --tiger-primary-hover: var(${cssVarName('color', 'primary', '700')});`)
-  lines.push(`  --tiger-primary-active: var(${cssVarName('color', 'primary', '800')});`)
-  lines.push(`  --tiger-primary-disabled: var(${cssVarName('color', 'primary', '300')});`)
-  lines.push(`  --tiger-secondary: var(${cssVarName('color', 'secondary', '600')});`)
-  lines.push(`  --tiger-secondary-hover: var(${cssVarName('color', 'secondary', '700')});`)
-  lines.push(`  --tiger-secondary-active: var(${cssVarName('color', 'secondary', '800')});`)
-  lines.push(`  --tiger-secondary-disabled: var(${cssVarName('color', 'secondary', '300')});`)
-  lines.push(`  --tiger-focus-ring: var(${cssVarName('color', 'focus-ring')});`)
-  lines.push(`  --tiger-surface: var(${cssVarName('color', 'bg-surface')});`)
-  lines.push(`  --tiger-outline-bg-hover: var(${cssVarName('color', 'primary', '50')});`)
-  lines.push(`  --tiger-ghost-bg-hover: var(${cssVarName('color', 'primary', '50')});`)
-
   lines.push('}')
   lines.push('')
   lines.push('.dark {')
@@ -270,7 +180,6 @@ function generateTS() {
     lines.push('  },')
   }
   lines.push('} as const')
-  lines.push('export const globalColors = primitiveColors')
   lines.push('')
 
   // Space
@@ -280,7 +189,6 @@ function generateTS() {
     lines.push(`  '${key}': '${value}',`)
   }
   lines.push('} as const')
-  lines.push('export const globalSpace = primitiveSpace')
   lines.push('')
 
   // Radius
@@ -290,7 +198,6 @@ function generateTS() {
     lines.push(`  ${key}: '${value}',`)
   }
   lines.push('} as const')
-  lines.push('export const globalRadius = primitiveRadius')
   lines.push('')
 
   // Shadow
@@ -300,7 +207,6 @@ function generateTS() {
     lines.push(`  ${key}: '${value}',`)
   }
   lines.push('} as const')
-  lines.push('export const globalShadow = primitiveShadow')
   lines.push('')
 
   // Font
@@ -327,7 +233,6 @@ function generateTS() {
   }
   lines.push('  },')
   lines.push('} as const')
-  lines.push('export const globalFont = primitiveFont')
   lines.push('')
 
   // Duration + easing
@@ -337,7 +242,6 @@ function generateTS() {
     lines.push(`  ${key}: '${value}',`)
   }
   lines.push('} as const')
-  lines.push('export const globalDuration = primitiveDuration')
   lines.push('')
   lines.push('/** Primitive animation easing tokens */')
   lines.push('export const primitiveEasing = {')
@@ -345,7 +249,6 @@ function generateTS() {
     lines.push(`  '${key}': '${value}',`)
   }
   lines.push('} as const')
-  lines.push('export const globalEasing = primitiveEasing')
   lines.push('')
 
   // Semantic
@@ -360,7 +263,6 @@ function generateTS() {
     lines.push('  },')
   }
   lines.push('} as const')
-  lines.push('export const aliasTokens = semanticTokens')
   lines.push('')
 
   // Component
@@ -403,13 +305,6 @@ function generateTS() {
   lines.push('export type PrimitiveEasingKey = keyof typeof primitiveEasing')
   lines.push('export type SemanticTokenCategory = keyof typeof semanticTokens')
   lines.push('export type ComponentTokenName = keyof typeof componentTokens')
-  lines.push('export type GlobalColorHue = PrimitiveColorHue')
-  lines.push('export type GlobalColorLevel = PrimitiveColorLevel')
-  lines.push('export type GlobalSpaceKey = PrimitiveSpaceKey')
-  lines.push('export type GlobalRadiusKey = PrimitiveRadiusKey')
-  lines.push('export type GlobalShadowKey = PrimitiveShadowKey')
-  lines.push('export type GlobalDurationKey = PrimitiveDurationKey')
-  lines.push('export type GlobalEasingKey = PrimitiveEasingKey')
 
   return lines.join('\n')
 }

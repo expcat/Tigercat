@@ -2,8 +2,8 @@ import React from 'react'
 import {
   datePickerInputWrapperClasses,
   datePickerClearButtonClasses,
-  CalendarIconPath,
-  CloseIconPath
+  calendarSolidIcon20PathD,
+  closeSolidIcon20PathD
 } from '@expcat/tigercat-core'
 import { useDatePickerState } from './DatePicker/state'
 import { renderDatePickerMobile } from './DatePicker/render-mobile'
@@ -48,7 +48,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
             className={datePickerClearButtonClasses}
             onClick={ctx.clearDate}
             aria-label={ctx.labels.clearDate}>
-            <Icon path={CloseIconPath} className="w-4 h-4" />
+            <Icon path={closeSolidIcon20PathD} className="w-4 h-4" />
           </button>
         )}
 
@@ -59,7 +59,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
           disabled={ctx.disabled || ctx.readonly}
           onClick={ctx.toggleCalendar}
           aria-label={ctx.labels.toggleCalendar}>
-          <Icon path={CalendarIconPath} className="w-5 h-5" />
+          <Icon path={calendarSolidIcon20PathD} className="w-5 h-5" />
         </button>
       </div>
 

@@ -7,8 +7,8 @@ import {
   getTimePickerRangeTabButtonClasses,
   timePickerFooterClasses,
   timePickerFooterButtonClasses,
-  ClockIconPath,
-  TimePickerCloseIconPath
+  clockSolidIcon20PathD,
+  closeSolidIcon20PathD
 } from '@expcat/tigercat-core'
 import { useTimePickerState } from './TimePicker/state'
 import { renderTimePickerMobile } from './TimePicker/render-mobile'
@@ -48,7 +48,7 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
             className={timePickerClearButtonClasses}
             onClick={ctx.clearTime}
             aria-label={ctx.labels.clear}>
-            <Icon path={TimePickerCloseIconPath} className="w-4 h-4" />
+            <Icon path={closeSolidIcon20PathD} className="w-4 h-4" />
           </button>
         )}
 
@@ -59,7 +59,7 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
           disabled={ctx.disabled || ctx.readonly}
           onClick={ctx.togglePanel}
           aria-label={ctx.labels.toggle}>
-          <Icon path={ClockIconPath} className="w-5 h-5" />
+          <Icon path={clockSolidIcon20PathD} className="w-5 h-5" />
         </button>
       </div>
 

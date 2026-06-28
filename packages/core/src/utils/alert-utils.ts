@@ -3,13 +3,13 @@
  * Shared styles and helpers for Alert components
  */
 
+import { closeIconPathD } from './icons/common'
 import {
-  closeIconPathD,
   statusErrorIconPath,
   statusInfoIconPath,
   statusSuccessIconPath,
   statusWarningIconPath
-} from './common-icons'
+} from './icons/status'
 
 import type { AlertSize, AlertType } from '../types/alert'
 

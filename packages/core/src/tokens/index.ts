@@ -18,14 +18,6 @@ export {
   primitiveEasing,
   semanticTokens,
   designTokens,
-  globalColors,
-  globalSpace,
-  globalRadius,
-  globalShadow,
-  globalFont,
-  globalDuration,
-  globalEasing,
-  aliasTokens,
   componentTokens
 } from './tokens'
 
@@ -38,12 +30,5 @@ export type {
   PrimitiveDurationKey,
   PrimitiveEasingKey,
   SemanticTokenCategory,
-  ComponentTokenName,
-  GlobalColorHue,
-  GlobalColorLevel,
-  GlobalSpaceKey,
-  GlobalRadiusKey,
-  GlobalShadowKey,
-  GlobalDurationKey,
-  GlobalEasingKey
+  ComponentTokenName
 } from './tokens'

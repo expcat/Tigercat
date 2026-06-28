@@ -8,7 +8,7 @@ import {
   statusWarningIconPath,
   statusErrorIconPath,
   statusInfoIconPath
-} from './common-icons'
+} from './icons/status'
 
 import type { ResultStatus } from '../types/result'
 

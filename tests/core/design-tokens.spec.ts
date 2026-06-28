@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
-  aliasTokens,
   componentTokens,
   designTokens,
-  globalColors,
   primitiveColors,
   semanticTokens
 } from '@expcat/tigercat-core'
@@ -16,9 +14,9 @@ describe('design tokens', () => {
     expect(designTokens.component.button['border-radius']).toBe('8px')
   })
 
-  it('keeps legacy token exports as compatibility aliases', () => {
-    expect(globalColors).toBe(primitiveColors)
-    expect(aliasTokens).toBe(semanticTokens)
+  it('exposes canonical token registries without compatibility aliases', () => {
+    expect(primitiveColors.primary['600']).toBe('#0284c7')
+    expect(semanticTokens.color['focus-ring']).toBe('#0ea5e9')
     expect(componentTokens.tag['border-radius']).toBe('6px')
     expect(componentTokens.table.bg).toBe('#fafafa')
   })

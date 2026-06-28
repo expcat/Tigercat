@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，将 React / Vue component 子路径收敛为 PascalCase 显式 exports，收紧 React / Vue tree-shaking 副作用声明，并删除首批 deprecated / compat API。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。legacy token 和按需加载迁移项会随后续 R07-R09 任务落地后追加到本节。
+v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，将 React / Vue component 子路径收敛为 PascalCase 显式 exports，收紧 React / Vue tree-shaking 副作用声明，并删除首批 deprecated / compat API 与 legacy token / icon path 兼容层。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。按需加载迁移项会随后续 R08-R09 任务落地后追加到本节。
 
 ### React / Vue component 子路径改为显式 PascalCase
 
@@ -36,6 +36,54 @@ import { Message, notification } from '@expcat/tigercat-react'
 ```ts
 import { MessageContainer } from '@expcat/tigercat-react/MessageContainer'
 import { NotificationContainer } from '@expcat/tigercat-react/NotificationContainer'
+```
+
+### Legacy token CSS 变量改为 canonical 三层 token
+
+`@expcat/tigercat-core/tokens.css` 现在只生成三层 canonical token：
+
+- `--tiger-primitive-*`
+- `--tiger-semantic-*`
+- `--tiger-component-*`
+
+如果应用 CSS 直接覆盖旧兼容变量，请迁移到对应 canonical token：
+
+```diff
+- --tiger-color-primary-600: #2563eb;
+- --tiger-primary: #2563eb;
++ --tiger-primitive-color-primary-600: #2563eb;
++ --tiger-semantic-color-interactive-primary: #2563eb;
+```
+
+组件运行时主题仍可能使用 `--tiger-primary`、`--tiger-surface` 等主题变量；本次删除的是 token 生成物中的旧兼容变量输出，不要求业务组件样式整体重写。
+
+### Token JS API 移除 global / alias 兼容命名
+
+core 不再导出 `globalColors` / `globalSpace` / `globalRadius` / `globalShadow` / `globalFont` / `globalDuration` / `globalEasing`、`aliasTokens` 及对应 `Global*` 类型别名：
+
+```diff
+- import { globalColors, aliasTokens } from '@expcat/tigercat-core'
++ import { primitiveColors, semanticTokens } from '@expcat/tigercat-core'
+```
+
+### Icon path 兼容别名改为分组命名
+
+DatePicker / TimePicker 旧 icon path 别名已删除。请改用 picker icon 的 canonical 名称：
+
+```diff
+- import { CalendarIconPath, CloseIconPath, ClockIconPath } from '@expcat/tigercat-core'
++ import {
++   calendarSolidIcon20PathD,
++   closeSolidIcon20PathD,
++   clockSolidIcon20PathD
++ } from '@expcat/tigercat-core'
+```
+
+如果项目曾经导入内部 `common-icons` 兼容 barrel，请改为分组 icon 子路径：
+
+```diff
+- import { closeIconPathD } from '@expcat/tigercat-core/dist/utils/common-icons'
++ import { closeIconPathD } from '@expcat/tigercat-core/icons/common'
 ```
 
 ### 移除 `getResultHttpLabel`

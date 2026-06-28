@@ -17,10 +17,10 @@ source: current repository state after v1.5.0 roadmap closure
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）与阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects），已完成于 2026-06-28。
-- 当前阶段：阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup），状态为 `进行中`。
-- 当前可执行任务：R07。R06 已删除首批 deprecated / compat API 并加固 public deprecated API 校验，R07 可继续清理 legacy token 与旧资源导出。
-- 阶段 4 暂未开始；必须等各自前置阶段满足依赖后再认领。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）与阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup），已完成于 2026-06-28。
+- 当前阶段：阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），状态为 `未开始`。
+- 当前可执行任务：R08。R07 已删除 legacy token CSS 变量、token alias API、DatePicker / TimePicker icon path 兼容别名和 `common-icons` 兼容 barrel；R08 可继续迁移按需使用文档与示例。
+- 阶段 4 中 R09 依赖 R04/R05，建议在 R08 完成或接近完成后校准最终 size budget。
 
 ## 执行原则
 
@@ -47,7 +47,7 @@ source: current repository state after v1.5.0 roadmap closure
 | 0    | 已完成（2026-06-28） | R01     | 只做路线图清理；为后续 v2 任务建立边界                                |
 | 1    | 已完成（2026-06-28） | R02-R03 | 先稳定版本与 release metadata，再切换 ESM-only 发布面                 |
 | 2    | 已完成（2026-06-28） | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
-| 3    | 进行中               | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
+| 3    | 已完成（2026-06-28） | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
 | 4    | 未开始               | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
 
 阶段状态规则：
@@ -263,7 +263,7 @@ source: current repository state after v1.5.0 roadmap closure
 
 ### R07 token and legacy asset cleanup
 
-**状态**：未开始。
+**状态**：已完成（2026-06-28）。
 
 **目标**：删除 legacy token CSS 变量、兼容 icon/path 名称和不再需要的旧资源导出，降低发布产物和运行时维护面。
 
@@ -280,6 +280,23 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm test:core`
 - `corepack pnpm api:validate`
 - `corepack pnpm size`
+
+**执行摘要**：已移除 token 生成器输出的 `Compatibility variables`、pre-0.5.0 legacy CSS 变量、`global*` / `aliasTokens` TS 兼容导出与对应 `Global*` 类型别名；已删除 DatePicker / TimePicker 旧 icon path 别名 `CalendarIconPath`、`CloseIconPath`、`ChevronLeftIconPath`、`ChevronRightIconPath`、`ClockIconPath`、`TimePickerCloseIconPath`，并移除 `common-icons` 兼容 barrel；React/Vue DatePicker 与 TimePicker 已改用 canonical `*SolidIcon20PathD` 常量；`CHANGELOG.md` 与 `docs/MIGRATION.md` 已记录迁移路径，API baseline 已刷新。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 tokens:build`
+- `npx -y pnpm@11.9.0 tokens:check`
+- `npx -y pnpm@11.9.0 vitest run tests/core/design-tokens.spec.ts tests/core/icon-registry.spec.ts tests/core/package-exports.spec.ts`
+- `npx -y pnpm@11.9.0 test:core`（第一次全量运行中 `tests/core/imperative-side-effects.spec.ts` 的 React root mount case 发生并行时序失败；单测复跑通过，第二次 `test:core` 全量 122 files / 1991 tests 通过）
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 build`
+- `npx -y pnpm@11.9.0 size`
+- `npx -y pnpm@11.9.0 release:check`
 
 **状态更新要求**：完成后写回状态、日期、删除的 legacy 资源类型和关键验证命令；同步更新阶段 3 状态。
 

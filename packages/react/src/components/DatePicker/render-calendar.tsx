@@ -11,8 +11,8 @@ import {
   getDatePickerDayCellClasses,
   datePickerFooterClasses,
   datePickerFooterButtonClasses,
-  ChevronLeftIconPath,
-  ChevronRightIconPath
+  chevronLeftSolidIcon20PathD,
+  chevronRightSolidIcon20PathD
 } from '@expcat/tigercat-core'
 import { Icon } from './icons'
 import type { DatePickerContext } from './types'
@@ -33,7 +33,10 @@ export function renderDatePickerCalendar(ctx: DatePickerContext): React.ReactNod
           className={datePickerNavButtonClasses}
           onClick={ctx.previousMonth}
           aria-label={ctx.labels.previousMonth}>
-          <Icon path={ctx.isRtl ? ChevronRightIconPath : ChevronLeftIconPath} className="w-5 h-5" />
+          <Icon
+            path={ctx.isRtl ? chevronRightSolidIcon20PathD : chevronLeftSolidIcon20PathD}
+            className="w-5 h-5"
+          />
         </button>
         <div className={datePickerMonthYearClasses}>
           {formatMonthYear(ctx.viewingYear, ctx.viewingMonth, ctx.localeCode)}
@@ -43,7 +46,10 @@ export function renderDatePickerCalendar(ctx: DatePickerContext): React.ReactNod
           className={datePickerNavButtonClasses}
           onClick={ctx.nextMonth}
           aria-label={ctx.labels.nextMonth}>
-          <Icon path={ctx.isRtl ? ChevronLeftIconPath : ChevronRightIconPath} className="w-5 h-5" />
+          <Icon
+            path={ctx.isRtl ? chevronLeftSolidIcon20PathD : chevronRightSolidIcon20PathD}
+            className="w-5 h-5"
+          />
         </button>
       </div>
 

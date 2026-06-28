@@ -4,13 +4,13 @@
 
 import type { NotificationType, NotificationPosition } from '../types/notification'
 
+import { closeIconPathD } from './icons/common'
 import {
-  closeIconPathD,
   statusErrorIconPath,
   statusInfoIconPath,
   statusSuccessIconPath,
   statusWarningIconPath
-} from './common-icons'
+} from './icons/status'
 
 /**
  * Base notification container classes

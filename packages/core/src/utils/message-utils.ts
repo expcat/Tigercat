@@ -4,13 +4,13 @@
 
 import type { MessageType, MessagePosition } from '../types/message'
 
+import { closeIconPathD } from './icons/common'
 import {
-  closeIconPathD,
   statusErrorIconPath,
   statusInfoIconPath,
   statusSuccessIconPath,
   statusWarningIconPath
-} from './common-icons'
+} from './icons/status'
 
 /**
  * Base message container classes

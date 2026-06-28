@@ -30,10 +30,10 @@ import {
   datePickerClearButtonClasses,
   datePickerFooterClasses,
   datePickerFooterButtonClasses,
-  CalendarIconPath,
-  CloseIconPath,
-  ChevronLeftIconPath,
-  ChevronRightIconPath,
+  calendarSolidIcon20PathD,
+  closeSolidIcon20PathD,
+  chevronLeftSolidIcon20PathD,
+  chevronRightSolidIcon20PathD,
   getDatePickerLocaleCode,
   getDatePickerLabels,
   getLocaleDirection,
@@ -53,12 +53,14 @@ import { createFilledIcon } from '../utils/icon-helpers'
 import { useTigerConfig } from './ConfigProvider'
 
 // Icons
-const CalendarIcon = createFilledIcon(CalendarIconPath, 'w-5 h-5')
-const CloseIcon = createFilledIcon(CloseIconPath, 'w-4 h-4')
-const ChevronLeftIcon = createFilledIcon(ChevronLeftIconPath, 'w-5 h-5')
-const ChevronRightIcon = createFilledIcon(ChevronRightIconPath, 'w-5 h-5')
+const CalendarIcon = createFilledIcon(calendarSolidIcon20PathD, 'w-5 h-5')
+const CloseIcon = createFilledIcon(closeSolidIcon20PathD, 'w-4 h-4')
+const ChevronLeftIcon = createFilledIcon(chevronLeftSolidIcon20PathD, 'w-5 h-5')
+const ChevronRightIcon = createFilledIcon(chevronRightSolidIcon20PathD, 'w-5 h-5')
 
-function normalizeDatePickerLocale(locale?: DatePickerLocaleInput): Partial<TigerLocale> | undefined {
+function normalizeDatePickerLocale(
+  locale?: DatePickerLocaleInput
+): Partial<TigerLocale> | undefined {
   if (!locale) return undefined
   if (typeof locale === 'string') return { locale }
   if ('datePicker' in locale) return locale as Partial<TigerLocale>
@@ -942,8 +944,7 @@ export const DatePicker = defineComponent({
                             onFocus: () => {
                               activeDateIso.value = cell.iso
                             },
-                            tabindex:
-                              activeDateIso.value === cell.iso && !cell.isDisabled ? 0 : -1,
+                            tabindex: activeDateIso.value === cell.iso && !cell.isDisabled ? 0 : -1,
                             'aria-label': cell.iso,
                             'aria-selected': cell.isSelected,
                             'aria-current': cell.isTodayDay ? 'date' : undefined

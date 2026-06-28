@@ -47,8 +47,8 @@ import {
   timePickerFooterClasses,
   timePickerFooterButtonClasses,
   focusTimePickerOption,
-  ClockIconPath,
-  TimePickerCloseIconPath,
+  clockSolidIcon20PathD,
+  closeSolidIcon20PathD,
   type TimePickerModelValue,
   type TimePickerLabels,
   type TimePickerRangeValue,
@@ -61,8 +61,8 @@ import { createFilledIcon } from '../utils/icon-helpers'
 import { useTigerConfig } from './ConfigProvider'
 
 // Icons
-const ClockIcon = createFilledIcon(ClockIconPath, 'w-5 h-5')
-const CloseIcon = createFilledIcon(TimePickerCloseIconPath, 'w-4 h-4')
+const ClockIcon = createFilledIcon(clockSolidIcon20PathD, 'w-5 h-5')
+const CloseIcon = createFilledIcon(closeSolidIcon20PathD, 'w-4 h-4')
 
 export type VueTimePickerModelValue = TimePickerModelValue
 

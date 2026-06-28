@@ -2,14 +2,12 @@
  * TimePicker component utilities
  *
  * Consolidated file including:
- * - Icon exports (from common-icons)
  * - Labels / i18n
  * - Style class generators
  */
 
 import type { TimePickerLabels } from '../types/timepicker'
 import type { TigerLocale } from '../types/locale'
-import { clockSolidIcon20PathD, closeSolidIcon20PathD } from './common-icons'
 import {
   formatIntlNumber,
   getIntlPluralCategory,
@@ -17,20 +15,6 @@ import {
   ZH_CN_TIME_PICKER_LABELS
 } from './locale-utils'
 import { findFirstEnabledIndex, findLastEnabledIndex, findNextEnabledIndex } from './picker-utils'
-
-// ============================================================================
-// Icons (re-exports for backward compatibility)
-// ============================================================================
-
-/**
- * Clock icon path
- */
-export const ClockIconPath = clockSolidIcon20PathD
-
-/**
- * Close/Clear icon path
- */
-export const TimePickerCloseIconPath = closeSolidIcon20PathD
 
 // ============================================================================
 // Labels / i18n

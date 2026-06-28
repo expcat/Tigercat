@@ -3,7 +3,7 @@
  * Shared styles and helpers for Tag components
  */
 
-import { closeIconPathD } from './common-icons'
+import { closeIconPathD } from './icons/common'
 
 /**
  * Base classes for all tag variants
