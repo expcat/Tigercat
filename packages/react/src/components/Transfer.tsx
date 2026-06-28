@@ -57,6 +57,8 @@ const TRANSFER_KEYS = new Set<string>([
   'onChange'
 ])
 
+const EMPTY_TRANSFER_VALUE: (string | number)[] = []
+
 export const Transfer: React.FC<TransferProps> = (props) => {
   const {
     value,
@@ -77,7 +79,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
 
   // `value` is the primary controlled prop; `targetKeys` (core/shared name) is
   // accepted as an alias with lower priority.
-  const resolvedValue = value ?? targetKeys ?? []
+  const resolvedValue = value ?? targetKeys ?? EMPTY_TRANSFER_VALUE
 
   const config = useTigerConfig()
   const mergedLocale = useMemo(

@@ -3,11 +3,16 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: next-phase implementation plan based on the 2026-06-27 full-repo scan
-verified-date: 2026-06-27
+verified-date: 2026-06-28
 source: current repository state; v1.4.0 has been released; all 202 A-G scan findings registered into T01-T14 (P3/observations under T13)
 -->
 
 本文只记录下一阶段要实施的任务。已完成扫描的详细取证不再单独保留；后续执行入口以本文件的 T01-T14 为准。
+
+## 最终收口状态
+
+截至 2026-06-28，T01-T14 均已完成；本轮清理最后两个 unused import lint
+阻塞后，使用固定版本 `npx -y pnpm@11.9.0 quality:quick` 完成路线图收口验证。
 
 ## 后续计划
 

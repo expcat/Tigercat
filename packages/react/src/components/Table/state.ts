@@ -290,7 +290,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
       data = sortData(data, sortState.key, sortState.direction, column?.sortFn)
     }
     return data
-  }, [dataSource, filterState, sortState, columnByKey, filterMode, advancedFilterRules])
+  }, [dataSource, columns, filterState, sortState, columnByKey, filterMode, advancedFilterRules])
 
   const paginatedData = useMemo(() => {
     if (pagination === false) {

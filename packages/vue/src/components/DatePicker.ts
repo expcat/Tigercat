@@ -8,7 +8,6 @@ import {
   formatMonthYear,
   addDays,
   addMonths,
-  isSameDay,
   isDateInRange,
   getCalendarDays,
   getShortDayNames,

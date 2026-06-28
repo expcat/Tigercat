@@ -25,7 +25,6 @@ import {
   resolveLocaleText,
   mergeTigerLocale,
   type FileItem,
-  type FileSortField,
   type FileManagerProps as CoreFileManagerProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'

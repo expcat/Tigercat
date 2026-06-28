@@ -369,7 +369,7 @@ export function ImageAnnotation({
         />
       )
     },
-    [activeSelectedId, displayHeight, displayWidth, selectAnnotation, strokeWidth]
+    [activeSelectedId, displayHeight, displayWidth, removeAnnotation, selectAnnotation, strokeWidth]
   )
 
   const renderedAnnotations = useMemo(

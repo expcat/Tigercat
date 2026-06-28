@@ -64,7 +64,7 @@ export const VirtualList: React.FC<VirtualListProps> = ({
       }
     })
     if (changed) setMeasureVersion((v) => v + 1)
-  })
+  }, [isDynamic, strategy])
 
   const handleScroll = useCallback(() => {
     if (containerRef.current) {
