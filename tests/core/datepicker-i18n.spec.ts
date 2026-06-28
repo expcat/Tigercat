@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { getDatePickerLabels, getDatePickerLocaleCode } from '@expcat/tigercat-core'
+import {
+  getDatePickerLabelsFromLocale,
+  getDatePickerLocalePreset
+} from '@expcat/tigercat-core/datepicker-locales/registry'
 import { ZH_CN_DATEPICKER_LOCALE } from '../../packages/core/src/utils/i18n/datepicker-locales/zh-CN'
 import { FR_FR_DATEPICKER_LOCALE } from '../../packages/core/src/utils/i18n/datepicker-locales/fr-FR'
 
@@ -25,12 +29,9 @@ describe('datepicker-i18n', () => {
     expect(labels.nextMonth).toBe('下个月')
   })
 
-  it('resolves new locale labels from locale codes', () => {
-    expect(getDatePickerLabels('es-ES').today).toBe('Hoy')
-    expect(getDatePickerLabels('fr-FR').today).toBe("Aujourd'hui")
-    expect(getDatePickerLabels('de-DE').clearDate).toBe('Datum löschen')
-    expect(getDatePickerLabels('pt-BR').calendar).toBe('Calendário')
-    expect(getDatePickerLabels('ar-SA').previousMonth).toBe('الشهر السابق')
+  it('keeps string locale lookup lightweight without the registry', () => {
+    expect(getDatePickerLocaleCode('fr-FR')).toBe('fr-FR')
+    expect(getDatePickerLabels('fr-FR').today).toBe('Today')
   })
 
   it('keeps explicit new DatePicker presets mergeable', () => {
@@ -38,5 +39,14 @@ describe('datepicker-i18n', () => {
 
     expect(labels.today).toBe("Aujourd'hui")
     expect(labels.ok).toBe('Valider')
+  })
+
+  it('resolves built-in labels from locale codes through the opt-in registry', () => {
+    expect(getDatePickerLabelsFromLocale('es-ES').today).toBe('Hoy')
+    expect(getDatePickerLabelsFromLocale('fr-FR').today).toBe("Aujourd'hui")
+    expect(getDatePickerLabelsFromLocale('de-DE').clearDate).toBe('Datum löschen')
+    expect(getDatePickerLabelsFromLocale('pt-BR').calendar).toBe('Calendário')
+    expect(getDatePickerLabelsFromLocale('ar-SA').previousMonth).toBe('الشهر السابق')
+    expect(getDatePickerLocalePreset('fr-CA')?.locale).toBe('fr-FR')
   })
 })

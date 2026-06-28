@@ -22,7 +22,7 @@ pnpm quality:release
 pnpm build
 ```
 
-`pnpm quality:release` includes quick API/type checks, size-limit, local publish artifact smoke, test checklist validation, Vue/React example builds, and the Nuxt/Next SSR build matrix. The publish smoke checks installed package ESM entrypoints and keeps Button component subpaths below their release budgets without pulling imperative APIs, charts, editors, or full locale bundles.
+`pnpm quality:release` includes quick API/type checks, size-limit, local publish artifact smoke, test checklist validation, Vue/React example builds, and the Nuxt/Next SSR build matrix. The publish smoke checks installed package ESM entrypoints and keeps Button component subpaths below their release budgets without pulling imperative APIs, charts, editors, or full locale bundles. It also verifies that `defineText` and DatePicker component subpaths do not pull unused DatePicker locale presets, while explicit DatePicker locale imports still include the requested preset.
 
 ## API Freeze Checklist
 

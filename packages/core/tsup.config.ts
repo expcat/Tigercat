@@ -23,6 +23,8 @@ const localeEntries = Object.fromEntries(
 const datePickerLocaleEntries = Object.fromEntries(
   localeIds.map((id) => [`datepicker-locales/${id}`, `src/utils/i18n/datepicker-locales/${id}.ts`])
 )
+datePickerLocaleEntries['datepicker-locales/registry'] =
+  'src/utils/i18n/datepicker-locales/registry.ts'
 
 const iconGroups = ['common', 'picker', 'status', 'table', 'registry']
 

@@ -12,7 +12,14 @@ import { frFR } from '@expcat/tigercat-core/locales/fr-FR'
 import { deDE } from '@expcat/tigercat-core/locales/de-DE'
 import { ptBR } from '@expcat/tigercat-core/locales/pt-BR'
 import { arSA } from '@expcat/tigercat-core/locales/ar-SA'
-import { getLocaleDirection, isRtlLocale, mergeTigerLocale } from '@expcat/tigercat-core'
+import {
+  defineLocale,
+  defineText,
+  getLocaleDirection,
+  isRtlLocale,
+  mergeTigerLocale
+} from '@expcat/tigercat-core'
+import { FR_FR_DATEPICKER_LOCALE } from '@expcat/tigercat-core/datepicker-locales/fr-FR'
 
 const locales = { enUS, zhCN, zhTW, jaJP, koKR, thTH, viVN, idID, esES, frFR, deDE, ptBR, arSA }
 
@@ -96,6 +103,13 @@ describe('i18n locale presets', () => {
     }
   })
 
+  it('all locales carry their own DatePicker preset', () => {
+    for (const [, locale] of Object.entries(locales)) {
+      expect(locale.datePicker?.locale).toBe(locale.locale)
+      expect(locale.datePicker?.labels?.today).toBeDefined()
+    }
+  })
+
   it('mergeTigerLocale preserves and overrides qrcode and timeline text', () => {
     const merged = mergeTigerLocale(
       {
@@ -131,5 +145,30 @@ describe('i18n locale presets', () => {
     expect(enUS.timePicker?.selectTime).toBe('Select time')
     expect(zhCN.upload?.selectFileText).toBe('选择文件')
     expect(zhCN.timePicker?.selectTime).toBe('请选择时间')
+  })
+
+  it('defineText returns only the custom text overlay', () => {
+    const source = {
+      modal: { okText: 'Confirm', cancelText: 'Dismiss' },
+      pagination: { totalText: '{total} results' }
+    }
+    const text = defineText(source)
+
+    expect(text).toEqual(source)
+    expect(text).not.toHaveProperty('locale')
+    expect(text).not.toHaveProperty('direction')
+    expect(text).not.toHaveProperty('datePicker')
+  })
+
+  it('defineLocale accepts an explicit DatePicker preset without registry lookup', () => {
+    const locale = defineLocale({
+      locale: 'fr-FR',
+      datePicker: FR_FR_DATEPICKER_LOCALE,
+      common: { okText: 'Valider' }
+    })
+
+    expect(locale.locale).toBe('fr-FR')
+    expect(locale.common?.okText).toBe('Valider')
+    expect(locale.datePicker?.labels?.today).toBe("Aujourd'hui")
   })
 })

@@ -142,6 +142,10 @@
       "types": "./dist/datepicker-locales/ar-SA.d.ts",
       "import": "./dist/datepicker-locales/ar-SA.js"
     },
+    "./datepicker-locales/registry": {
+      "types": "./dist/datepicker-locales/registry.d.ts",
+      "import": "./dist/datepicker-locales/registry.js"
+    },
     "./icons/common": {
       "types": "./dist/icons/common.d.ts",
       "import": "./dist/icons/common.js"

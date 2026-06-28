@@ -10,7 +10,6 @@ import {
   DEFAULT_FORM_WIZARD_LABELS,
   DEFAULT_TASK_BOARD_LABELS
 } from '@expcat/tigercat-core'
-import { enUS } from '@expcat/tigercat-core/locales/en-US'
 
 describe('custom-text overrides on label resolvers', () => {
   describe('getPaginationLabels', () => {
@@ -84,7 +83,7 @@ describe('custom-text overrides on label resolvers', () => {
 })
 
 describe('defineText()', () => {
-  it('produces a fully-populated locale from a flat text overlay', () => {
+  it('returns only the flat text overlay', () => {
     const text = defineText({
       modal: { okText: 'Confirm' },
       table: { searchButtonText: 'Find' },
@@ -93,12 +92,11 @@ describe('defineText()', () => {
     expect(text.modal?.okText).toBe('Confirm')
     expect(text.pagination?.totalText).toBe('{total} items found')
     expect(text.table?.searchButtonText).toBe('Find')
-    // Untouched fields inherit the enUS baseline
-    expect(text.modal?.cancelText).toBe(enUS.modal?.cancelText)
-    expect(text.formWizard?.finishText).toBe(enUS.formWizard?.finishText)
+    expect(text.modal?.cancelText).toBeUndefined()
+    expect(text.formWizard).toBeUndefined()
   })
 
-  it('returns the enUS baseline when called without arguments', () => {
-    expect(defineText()).toEqual(enUS)
+  it('returns an empty overlay when called without arguments', () => {
+    expect(defineText()).toEqual({})
   })
 })

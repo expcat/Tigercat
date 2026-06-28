@@ -14,6 +14,8 @@
 - **design tokens**：`@expcat/tigercat-core/tokens.css` 不再生成旧 `--tiger-color-*`、`--tiger-space-*`、`--tiger-button-*` 和 pre-0.5.0 `--tiger-primary` 等兼容变量；请改用 `--tiger-primitive-*`、`--tiger-semantic-*` 或 `--tiger-component-*` 三层 token。
 - **core token exports**：移除 `globalColors` / `globalSpace` / `globalRadius` / `globalShadow` / `globalFont` / `globalDuration` / `globalEasing`、`aliasTokens` 及对应 `Global*` 类型别名；请改用 `primitive*` 和 `semanticTokens`。
 - **core icon path aliases**：移除 DatePicker / TimePicker 旧 icon path 别名 `CalendarIconPath`、`CloseIconPath`、`ChevronLeftIconPath`、`ChevronRightIconPath`、`ClockIconPath`、`TimePickerCloseIconPath`，并删除 `common-icons` 兼容 barrel；请改用 `calendarSolidIcon20PathD`、`closeSolidIcon20PathD`、`chevron*SolidIcon20PathD`、`clockSolidIcon20PathD` 或分组 icon 子路径。
+- **core DatePicker i18n helper**：`getDatePickerLabels(string)` 不再默认查找 13 个内置 DatePicker locale，以避免默认 bundle 拉入全量语言表；按运行时字符串解析内置 DatePicker 文案请改用 `@expcat/tigercat-core/datepicker-locales/registry` 的 `getDatePickerLabelsFromLocale(locale)`。
+- **core `defineText`**：`defineText(...)` 不再作为 `defineLocale(...)` 的别名补齐 en-US 基线，而是返回纯自定义文本 overlay；需要完整 en-US 基线时请改用 `defineLocale(...)`，需要 DatePicker 翻译时请显式传入对应 DatePicker preset。
 
 ### Infrastructure
 
@@ -28,6 +30,7 @@
 - `release:check` 和 `publish:check` 增加 ESM-only 断言，发布 smoke 使用临时安装目录中的 bare ESM import 验证包入口，并阻止 `.cjs` 文件混入 tarball 或安装产物。
 - `release:check` 会阻止 React / Vue 恢复宽泛 sideEffects 声明；`publish:check` 会对安装后的 React / Vue root Button named import 和 Button 子路径 import 做 bundler smoke，确保普通 Button bundle 不拉入 Message / notification 命令式挂载代码。
 - `publish:check` 的 Button 子路径 smoke 增加 charts、editors 和全量 locale barrel 隔离断言，并将 React / Vue Button 子路径 bundle 上限固定为 6 kB / 8 kB；`quality:release` 现在包含 `publish:check`，发布 workflow 在现有触发面内改为执行完整 release gate。
+- i18n 默认路径更利于裁剪：`defineText` 不再导入内置 locale，DatePicker 默认 helper 不再导入全量 DatePicker locale；新增 `@expcat/tigercat-core/datepicker-locales/registry` 作为显式 opt-in 的运行时字符串查表入口，`publish:check` 会防止默认 DatePicker 子路径和 `defineText` bundle 回退到全量 locale。
 
 ## v1.5.0
 

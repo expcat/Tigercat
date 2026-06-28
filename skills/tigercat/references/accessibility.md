@@ -7,6 +7,11 @@ description: Tigercat accessibility keyboard, screen reader, and PR validation c
 
 Use automated tests for regressions and manual assistive-technology checks for complex interaction changes.
 
+Accessibility behavior is not exposed as a feature flag. Components that use
+focus management, keyboard handling, live regions, or ARIA attributes keep those
+semantics when imported; unused components and overlay/focus helpers remain
+tree-shakeable through normal subpath imports.
+
 ## Keyboard Baseline
 
 - `Tab` / `Shift+Tab`: move between focusable controls.

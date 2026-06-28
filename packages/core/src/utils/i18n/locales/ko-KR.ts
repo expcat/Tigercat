@@ -4,10 +4,12 @@
 
 import type { TigerLocale } from '../../../types/locale'
 import { defineLocale } from '../define-locale'
+import { KO_KR_DATEPICKER_LOCALE } from '../datepicker-locales/ko-KR'
 
 export const koKR: TigerLocale = defineLocale({
   locale: 'ko-KR',
   direction: 'ltr',
+  datePicker: KO_KR_DATEPICKER_LOCALE,
   common: {
     okText: '확인',
     cancelText: '취소',

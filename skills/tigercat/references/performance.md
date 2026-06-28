@@ -53,6 +53,19 @@ import { BarChart } from '@expcat/tigercat-react/BarChart'
 
 Use root named exports for hooks/composables, command APIs such as `Message` / `notification`, and shared framework/core types when no component subpath owns the symbol.
 
+## Locale Imports
+
+Single-language apps should import exactly the locale they need:
+
+```ts
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+```
+
+Apps that only need custom wording can use `defineText(...)`; it does not import
+Tigercat locale packs. Runtime DatePicker string lookup lives behind
+`@expcat/tigercat-core/datepicker-locales/registry` and should be imported only
+when all built-in DatePicker presets are intentionally needed.
+
 Run `pnpm build` and `pnpm size` after changing shared utils, chart code, exports, or component dependencies.
 
 ## Benchmarks

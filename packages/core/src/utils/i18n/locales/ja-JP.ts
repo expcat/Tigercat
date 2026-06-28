@@ -4,10 +4,12 @@
 
 import type { TigerLocale } from '../../../types/locale'
 import { defineLocale } from '../define-locale'
+import { JA_JP_DATEPICKER_LOCALE } from '../datepicker-locales/ja-JP'
 
 export const jaJP: TigerLocale = defineLocale({
   locale: 'ja-JP',
   direction: 'ltr',
+  datePicker: JA_JP_DATEPICKER_LOCALE,
   common: {
     okText: 'OK',
     cancelText: 'キャンセル',

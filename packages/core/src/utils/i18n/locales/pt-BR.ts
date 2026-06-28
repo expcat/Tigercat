@@ -4,10 +4,12 @@
 
 import type { TigerLocale } from '../../../types/locale'
 import { defineLocale } from '../define-locale'
+import { PT_BR_DATEPICKER_LOCALE } from '../datepicker-locales/pt-BR'
 
 export const ptBR: TigerLocale = defineLocale({
   locale: 'pt-BR',
   direction: 'ltr',
+  datePicker: PT_BR_DATEPICKER_LOCALE,
   common: {
     okText: 'OK',
     cancelText: 'Cancelar',

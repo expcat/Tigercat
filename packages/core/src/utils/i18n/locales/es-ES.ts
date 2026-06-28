@@ -4,10 +4,12 @@
 
 import type { TigerLocale } from '../../../types/locale'
 import { defineLocale } from '../define-locale'
+import { ES_ES_DATEPICKER_LOCALE } from '../datepicker-locales/es-ES'
 
 export const esES: TigerLocale = defineLocale({
   locale: 'es-ES',
   direction: 'ltr',
+  datePicker: ES_ES_DATEPICKER_LOCALE,
   common: {
     okText: 'Aceptar',
     cancelText: 'Cancelar',

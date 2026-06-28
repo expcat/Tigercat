@@ -4,10 +4,12 @@
 
 import type { TigerLocale } from '../../../types/locale'
 import { defineLocale } from '../define-locale'
+import { AR_SA_DATEPICKER_LOCALE } from '../datepicker-locales/ar-SA'
 
 export const arSA: TigerLocale = defineLocale({
   locale: 'ar-SA',
   direction: 'rtl',
+  datePicker: AR_SA_DATEPICKER_LOCALE,
   common: {
     okText: 'موافق',
     cancelText: 'إلغاء',

@@ -4,10 +4,12 @@
 
 import type { TigerLocale } from '../../../types/locale'
 import { defineLocale } from '../define-locale'
+import { TH_TH_DATEPICKER_LOCALE } from '../datepicker-locales/th-TH'
 
 export const thTH: TigerLocale = defineLocale({
   locale: 'th-TH',
   direction: 'ltr',
+  datePicker: TH_TH_DATEPICKER_LOCALE,
   common: {
     okText: 'ตกลง',
     cancelText: 'ยกเลิก',

@@ -4,10 +4,12 @@
 
 import type { TigerLocale } from '../../../types/locale'
 import { defineLocale } from '../define-locale'
+import { VI_VN_DATEPICKER_LOCALE } from '../datepicker-locales/vi-VN'
 
 export const viVN: TigerLocale = defineLocale({
   locale: 'vi-VN',
   direction: 'ltr',
+  datePicker: VI_VN_DATEPICKER_LOCALE,
   common: {
     okText: 'Đồng ý',
     cancelText: 'Hủy',

@@ -578,6 +578,7 @@ async function verifyInstalledPackages(tempDir, version) {
   }
 
   await verifyFrameworkButtonTreeShaking(tempDir)
+  await verifyI18nTreeShaking(tempDir)
 
   const cliEntry = path.join(tempDir, 'node_modules', '@expcat', 'tigercat-cli', 'dist', 'index.js')
   const cliResult = spawnSync(process.execPath, [cliEntry, '--version'], {
@@ -782,6 +783,119 @@ function assertButtonSubpathBundleIsIsolated(name, bundle) {
   if (includedMarkers.length > 0) {
     throw new Error(
       `${name} should not pull charts, editors, or full locale bundles, but included: ${includedMarkers.join(', ')}`
+    )
+  }
+}
+
+async function verifyI18nTreeShaking(tempDir) {
+  const cases = [
+    {
+      name: 'defineText root import',
+      source: `
+        import { defineText } from '@expcat/tigercat-core';
+        export default defineText({ modal: { okText: 'Confirm' } });
+      `,
+      forbiddenMarkers: getFullLocaleBundleMarkers()
+    },
+    {
+      name: 'React DatePicker subpath import',
+      source: `
+        import { DatePicker } from '@expcat/tigercat-react/DatePicker';
+        export default DatePicker;
+      `,
+      externals: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
+      forbiddenMarkers: getFullLocaleBundleMarkers()
+    },
+    {
+      name: 'Vue DatePicker subpath import',
+      source: `
+        import { DatePicker } from '@expcat/tigercat-vue/DatePicker';
+        export default DatePicker;
+      `,
+      externals: ['vue'],
+      forbiddenMarkers: getFullLocaleBundleMarkers()
+    },
+    {
+      name: 'React DatePicker with zh-CN preset',
+      source: `
+        import { DatePicker } from '@expcat/tigercat-react/DatePicker';
+        import { ZH_CN_DATEPICKER_LOCALE } from '@expcat/tigercat-core/datepicker-locales/zh-CN';
+        export default { DatePicker, locale: ZH_CN_DATEPICKER_LOCALE };
+      `,
+      externals: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
+      requiredMarkers: ['ZH_CN_DATEPICKER_LOCALE', '\\u4ECA\\u5929'],
+      forbiddenMarkers: getFullLocaleBundleMarkers({ allowZhCN: true })
+    },
+    {
+      name: 'Vue DatePicker with zh-CN preset',
+      source: `
+        import { DatePicker } from '@expcat/tigercat-vue/DatePicker';
+        import { ZH_CN_DATEPICKER_LOCALE } from '@expcat/tigercat-core/datepicker-locales/zh-CN';
+        export default { DatePicker, locale: ZH_CN_DATEPICKER_LOCALE };
+      `,
+      externals: ['vue'],
+      requiredMarkers: ['ZH_CN_DATEPICKER_LOCALE', '\\u4ECA\\u5929'],
+      forbiddenMarkers: getFullLocaleBundleMarkers({ allowZhCN: true })
+    }
+  ]
+
+  for (const bundleCase of cases) {
+    const bundle = await bundleInstalledSource(tempDir, bundleCase)
+    assertBundleIncludesMarkers(bundleCase.name, bundle, bundleCase.requiredMarkers ?? [])
+    assertBundleExcludesMarkers(bundleCase.name, bundle, bundleCase.forbiddenMarkers)
+  }
+}
+
+async function bundleInstalledSource(tempDir, { name, source, externals = [] }) {
+  const entryPath = path.join(tempDir, `.tigercat-bundle-${esmImportCounter++}.mjs`)
+  writeFileSync(entryPath, source)
+
+  const result = await esbuild({
+    entryPoints: [entryPath],
+    absWorkingDir: tempDir,
+    bundle: true,
+    format: 'esm',
+    platform: 'browser',
+    write: false,
+    logLevel: 'silent',
+    external: externals
+  })
+
+  const output = result.outputFiles?.[0]?.text
+  if (!output) {
+    throw new Error(`${name} did not produce a bundle`)
+  }
+
+  return output
+}
+
+function getFullLocaleBundleMarkers({ allowZhCN = false } = {}) {
+  return [
+    'DATEPICKER_LOCALES',
+    'getDatePickerLabelsFromLocale',
+    'getDatePickerLocalePreset',
+    'FR_FR_DATEPICKER_LOCALE',
+    'AR_SA_DATEPICKER_LOCALE',
+    "Aujourd'hui",
+    'الشهر السابق',
+    'fr-FR',
+    'ar-SA',
+    ...(allowZhCN ? [] : ['ZH_CN_DATEPICKER_LOCALE', '\\u4ECA\\u5929'])
+  ]
+}
+
+function assertBundleIncludesMarkers(name, bundle, markers) {
+  const missingMarkers = markers.filter((marker) => !bundle.includes(marker))
+  if (missingMarkers.length > 0) {
+    throw new Error(`${name} should include markers: ${missingMarkers.join(', ')}`)
+  }
+}
+
+function assertBundleExcludesMarkers(name, bundle, markers) {
+  const includedMarkers = markers.filter((marker) => bundle.includes(marker))
+  if (includedMarkers.length > 0) {
+    throw new Error(
+      `${name} should tree-shake unused i18n data, but included: ${includedMarkers.join(', ')}`
     )
   }
 }

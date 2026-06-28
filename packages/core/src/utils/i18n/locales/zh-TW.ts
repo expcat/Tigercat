@@ -4,10 +4,12 @@
 
 import type { TigerLocale } from '../../../types/locale'
 import { defineLocale } from '../define-locale'
+import { ZH_TW_DATEPICKER_LOCALE } from '../datepicker-locales/zh-TW'
 
 export const zhTW: TigerLocale = defineLocale({
   locale: 'zh-TW',
   direction: 'ltr',
+  datePicker: ZH_TW_DATEPICKER_LOCALE,
   common: {
     okText: '確定',
     cancelText: '取消',
