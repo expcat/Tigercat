@@ -11,16 +11,16 @@ source: current repository state after v1.5.0 roadmap closure
 
 ## 当前状态
 
-截至 2026-06-28，上一轮 T01-T14 已完成，路线图进入 v2.0.0 破坏性升级规划阶段。本阶段目标是先完成包体积、按需加载、发布产物和兼容层清理的基础改造，再继续追加 v2 新功能。
+截至 2026-06-28，上一轮 T01-T14 已完成，路线图进入 v2.0.0 破坏性升级规划阶段。本阶段已完成包体积、按需加载、发布产物和兼容层清理的基础改造，后续可继续追加 v2 新功能。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）与阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup），已完成于 2026-06-28。
-- 当前阶段：阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），状态为 `进行中`；R08 已完成于 2026-06-28。
-- 当前可执行任务：R09。R08 已将示例、SSR smoke、skills references 与性能/迁移文档迁移为组件 PascalCase 子路径和 lazy import 优先；R09 可继续校准 size 与 publish artifact gate。
-- 阶段 4 中 R09 依赖 R04/R05/R08，应基于已迁移的按需使用面校准最终 size budget。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28。
+- 当前阶段：暂无进行中阶段。
+- 当前可执行任务：暂无；后续 v2 新功能从 R10 起追加。
+- 阶段 4 已基于按需使用面完成 size budget、publish artifact gate 与发布 workflow 门禁校准。
 
 ## 执行原则
 
@@ -48,7 +48,7 @@ source: current repository state after v1.5.0 roadmap closure
 | 1    | 已完成（2026-06-28） | R02-R03 | 先稳定版本与 release metadata，再切换 ESM-only 发布面                 |
 | 2    | 已完成（2026-06-28） | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
 | 3    | 已完成（2026-06-28） | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
-| 4    | 进行中               | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
+| 4    | 已完成（2026-06-28） | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
 
 阶段状态规则：
 
@@ -338,7 +338,7 @@ source: current repository state after v1.5.0 roadmap closure
 
 ### R09 size and publish artifact gates
 
-**状态**：未开始。
+**状态**：已完成（2026-06-28）。
 
 **目标**：增加 size-limit、publish-check、bundler fixture 和 smoke 覆盖，验证 `Button` 子路径不会拉入命令式 API、charts、editors 或 locale 全量包。
 
@@ -355,6 +355,22 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm publish:check`
 - `corepack pnpm quality:release`
 - `corepack pnpm smoke:published`（发布后执行）
+
+**执行摘要**：已扩展 `publish:check` 的 Button bundler smoke：React / Vue root Button named import 继续验证不拉入 `Message` / `notification` 命令式挂载逻辑，React / Vue Button 子路径 import 额外验证不拉入 charts、editors 或全量 locale barrel，并将 Button 子路径 bundle 上限固定为 React 6 kB、Vue 8 kB。`release:check` 已新增 `.size-limit.json` 预算结构、`quality:release` 必含 `publish:check`、发布 workflow 门禁命令和触发面约束校验；`quality:release` 已纳入 `publish:check`。`.github/workflows/publish.yml` 和 `.github/workflows/publish-on-tag.yml` 仅将发布前命令提升为 `pnpm quality:release`，未新增 workflow，也未新增 `push`、`pull_request`、`schedule` 或 `workflow_run` 触发。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 build`
+- `npx -y pnpm@11.9.0 size`
+- `npx -y pnpm@11.9.0 publish:check`
+- `npx -y pnpm@11.9.0 release:check`
+- `npx -y pnpm@11.9.0 quality:release`
+- `npx -y pnpm@11.9.0 vitest run tests/core/imperative-side-effects.spec.ts tests/core/package-exports.spec.ts`
+- `npx -y pnpm@11.9.0 prettier --check .github/workflows/publish.yml .github/workflows/publish-on-tag.yml .size-limit.json CHANGELOG.md docs/ROADMAP.md package.json scripts/check-release-readiness.mjs scripts/publish-check.mjs skills/tigercat/references/release.md`
+- `git diff --check`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md CHANGELOG.md skills/tigercat/references/release.md .github/workflows scripts tests package.json .size-limit.json`
+
+**发布后验证**：`npx -y pnpm@11.9.0 smoke:published` 尚需在 v2.0.0 发布到 npm 后执行。
 
 **状态更新要求**：完成后写回状态、日期、关键 size/publish 阈值和验证命令；若 `smoke:published` 尚未发布后执行，应明确标记为发布后待跑；同步更新阶段 4 状态。
 

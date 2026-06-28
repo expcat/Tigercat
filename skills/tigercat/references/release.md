@@ -22,7 +22,7 @@ pnpm quality:release
 pnpm build
 ```
 
-`pnpm quality:release` includes quick API/type checks, size-limit, test checklist validation, Vue/React example builds, and the Nuxt/Next SSR build matrix.
+`pnpm quality:release` includes quick API/type checks, size-limit, local publish artifact smoke, test checklist validation, Vue/React example builds, and the Nuxt/Next SSR build matrix. The publish smoke checks installed package ESM entrypoints and keeps Button component subpaths below their release budgets without pulling imperative APIs, charts, editors, or full locale bundles.
 
 ## API Freeze Checklist
 
@@ -95,7 +95,7 @@ pnpm release:next
 pnpm release:canary
 ```
 
-Before publishing, run the validation set appropriate to the release scope. For package releases, prefer at least `pnpm lint`, `pnpm build`, `pnpm test`, `pnpm test:validate`, `pnpm api:validate`, and `pnpm size`.
+Before publishing, run the validation set appropriate to the release scope. For package releases, prefer `pnpm quality:release` so size-limit, local publish smoke, generated-reference drift, API baseline drift, examples, and SSR checks stay aligned.
 
 After publishing, run the published package smoke test when validating npm artifacts.
 

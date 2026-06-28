@@ -26,6 +26,26 @@ const sourceVersionFiles = {
 }
 
 const expectedRepositoryUrl = 'https://github.com/expcat/Tigercat'
+const expectedSizeLimitEntries = [
+  ['Core (full)', 'packages/core/dist/index.js', '118 kB'],
+  ['Vue (full)', 'packages/vue/dist/index.mjs', '284 kB'],
+  ['React (full)', 'packages/react/dist/index.mjs', '320 kB'],
+  ['Vue Button subpath', 'packages/vue/dist/components/Button.mjs', '22 kB'],
+  ['React Button subpath', 'packages/react/dist/components/Button.mjs', '20 kB'],
+  ['Vue Menu subpath', 'packages/vue/dist/components/Menu.mjs', '41 kB'],
+  ['React Menu subpath', 'packages/react/dist/components/Menu.mjs', '33 kB'],
+  ['Vue DatePicker subpath', 'packages/vue/dist/components/DatePicker.mjs', '31 kB'],
+  ['React DatePicker subpath', 'packages/react/dist/components/DatePicker.mjs', '25 kB'],
+  ['Vue Table subpath', 'packages/vue/dist/components/Table.mjs', '48 kB'],
+  ['React Table subpath', 'packages/react/dist/components/Table.mjs', '40 kB'],
+  ['Vue Tree subpath', 'packages/vue/dist/components/Tree.mjs', '32 kB'],
+  ['React Tree subpath', 'packages/react/dist/components/Tree.mjs', '25 kB'],
+  ['Vue TimePicker subpath', 'packages/vue/dist/components/TimePicker.mjs', '31 kB'],
+  ['React TimePicker subpath', 'packages/react/dist/components/TimePicker.mjs', '25 kB'],
+  ['Core tailwind/modern subpath', 'packages/core/dist/tailwind/modern.js', '3 kB'],
+  ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js', '3 kB'],
+  ['Core icons (common) subpath', 'packages/core/dist/icons/common.js', '1 kB']
+]
 
 const errors = []
 
@@ -206,6 +226,7 @@ function checkRootScripts() {
     'exports:check',
     'docs:api:check',
     'quality:size',
+    'publish:check',
     'test:validate',
     'quality:examples',
     'quality:ssr'
@@ -214,6 +235,47 @@ function checkRootScripts() {
   for (const step of requiredReleaseSteps) {
     check(releaseGate.includes(step), `quality:release must include ${step}`)
   }
+}
+
+function checkSizeLimitConfig() {
+  const entries = readJson('.size-limit.json')
+
+  check(Array.isArray(entries), '.size-limit.json must be an array')
+  if (!Array.isArray(entries)) return
+
+  const entriesByName = new Map(entries.map((entry) => [entry.name, entry]))
+  for (const [name, expectedPath, expectedLimit] of expectedSizeLimitEntries) {
+    const entry = entriesByName.get(name)
+
+    check(entry, `.size-limit.json missing ${name}`)
+    if (!entry) continue
+
+    check(entry.path === expectedPath, `.size-limit.json ${name} path must be ${expectedPath}`)
+    check(entry.limit === expectedLimit, `.size-limit.json ${name} limit must be ${expectedLimit}`)
+    check(entry.gzip === true, `.size-limit.json ${name} must use gzip sizing`)
+  }
+}
+
+function checkPublishWorkflows() {
+  const manualPublishWorkflow = readText('.github/workflows/publish.yml')
+  const tagPublishWorkflow = readText('.github/workflows/publish-on-tag.yml')
+
+  check(
+    manualPublishWorkflow.includes('run: pnpm quality:release'),
+    '.github/workflows/publish.yml must run pnpm quality:release before publishing'
+  )
+  check(
+    !/(^|\n)\s+(push|pull_request|schedule|workflow_run):/.test(manualPublishWorkflow),
+    '.github/workflows/publish.yml must stay workflow_dispatch-only'
+  )
+  check(
+    tagPublishWorkflow.includes('run: pnpm quality:release'),
+    '.github/workflows/publish-on-tag.yml must run pnpm quality:release before publishing'
+  )
+  check(
+    !/(^|\n)\s+(pull_request|schedule):/.test(tagPublishWorkflow),
+    '.github/workflows/publish-on-tag.yml must not add pull_request or schedule triggers'
+  )
 }
 
 function checkRootVersion(expectedVersion) {
@@ -329,6 +391,8 @@ checkFrameworkSideEffects(packages)
 checkEsmOnlyPackageSurface(packages)
 checkPackageRepositoryMetadata(packages)
 checkRootScripts()
+checkSizeLimitConfig()
+checkPublishWorkflows()
 checkRootVersion(expectedVersion)
 checkChangesetConfig(packages)
 checkReleaseDocs(expectedVersion)

@@ -8,8 +8,10 @@ const root = join(import.meta.dirname, '..')
 const nextEnvPath = join(root, 'examples/nextjs/next-env.d.ts')
 
 const before = readFileSync(nextEnvPath, 'utf8')
-const pnpmCommand = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
-const result = spawnSync(pnpmCommand, ['example:ssr:build'], {
+const pnpmExecPath = process.env.npm_execpath
+const command = pnpmExecPath ? process.execPath : process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
+const args = pnpmExecPath ? [pnpmExecPath, 'example:ssr:build'] : ['example:ssr:build']
+const result = spawnSync(command, args, {
   cwd: root,
   stdio: 'inherit'
 })

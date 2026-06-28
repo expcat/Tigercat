@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import {
   cpSync,
   existsSync,
@@ -70,6 +70,14 @@ const exampleProjects = [
   }
 ]
 
+const buttonSubpathBundleLimits = {
+  react: 6000,
+  vue: 8000
+}
+const npmInstallTimeoutMs = Number(
+  process.env.TIGERCAT_PUBLISH_CHECK_NPM_TIMEOUT_MS ?? 10 * 60 * 1000
+)
+
 main().catch((error) => {
   console.error(error instanceof Error ? error.message : String(error))
   process.exitCode = 1
@@ -122,12 +130,12 @@ async function main() {
 
     console.log('')
     console.log('4/4 Verifying examples against local tarballs...')
-    smokeExamples(tarballs)
+    await smokeExamples(tarballs)
 
     console.log('')
     console.log('Local publish check passed.')
   } finally {
-    rmSync(tempDir, { recursive: true, force: true })
+    removeDirWithRetry(tempDir)
   }
 }
 
@@ -186,13 +194,16 @@ function assertTarballHasNoCjsArtifacts(tarballPath) {
   }
 }
 
-function smokeExamples(tarballs) {
+async function smokeExamples(tarballs) {
   copyExampleFixtures()
 
   for (const example of exampleProjects) {
     console.log(`Building ${example.name}...`)
     example.prepare(example.dir, tarballs)
-    installWithRetry(['install', '--no-audit', '--fund=false'], example.dir)
+    await installWithRetry(
+      ['install', '--no-audit', '--fund=false', '--prefer-offline'],
+      example.dir
+    )
     runOrThrow('npm', example.buildArgs, { cwd: example.dir })
   }
 }
@@ -301,10 +312,10 @@ function prepareStandardExample(exampleDir, tarballs) {
 
 function rewriteViteExampleConfig(filePath) {
   const source = readFileSync(filePath, 'utf-8')
-  const withAlias = source.replace(
-    /resolve:\s*\{\s*alias:\s*\{[\s\S]*?\}\s*\},/m,
-    `resolve: {\n    alias: {\n      '@demo-shared': path.resolve(__dirname, './.publish-shared')\n    }\n  },`
-  )
+  const aliasReplacement = `resolve: {\n    alias: {\n      '@demo-shared': path.resolve(__dirname, './.publish-shared')\n    }\n  },`
+  const withAlias = source
+    .replace(/resolve:\s*\{\s*alias:\s*\{[\s\S]*?\}\s*\},/m, aliasReplacement)
+    .replace(/resolve:\s*\{\s*alias:\s*\[[\s\S]*?\r?\n    \]\r?\n  \},/m, aliasReplacement)
 
   const next = withAlias.replace(/chunkSizeWarningLimit:\s*\d+/, 'chunkSizeWarningLimit: 1024')
 
@@ -416,30 +427,68 @@ function readWorkspaceCatalogValue(rootDir, packageName) {
   return match[1].replace(/^['\"]|['\"]$/g, '')
 }
 
-function installWithRetry(args, cwd, waitMs = 3000) {
+async function installWithRetry(args, cwd, waitMs = 3000) {
   const attempts = 3
   const effectiveArgs = args.some((arg) => arg.startsWith('--loglevel='))
     ? args
     : [...args, '--loglevel=error']
 
   for (let attempt = 1; attempt <= attempts; attempt++) {
-    const result = spawnSync('npm', effectiveArgs, {
-      cwd,
-      stdio: 'inherit',
-      shell: process.platform === 'win32',
-      env: createCommandEnv('npm')
-    })
+    const result = await runNpmInstall(effectiveArgs, cwd)
 
     if (result.status === 0) {
       return
     }
 
     if (attempt === attempts) {
-      throw new Error(`npm ${args[0]} failed in ${cwd}`)
+      const reason = result.timedOut ? ' timed out' : ''
+      throw new Error(`npm ${args[0]}${reason} in ${cwd}`)
     }
 
     console.log(`npm ${args[0]} failed; retrying (${attempt + 1}/${attempts})...`)
     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs)
+  }
+}
+
+function runNpmInstall(args, cwd) {
+  return new Promise((resolve) => {
+    let finished = false
+    let timedOut = false
+    const child = spawn('npm', args, {
+      cwd,
+      stdio: 'inherit',
+      shell: process.platform === 'win32',
+      env: createCommandEnv('npm')
+    })
+    const timeout = setTimeout(() => {
+      timedOut = true
+      terminateProcessTree(child.pid)
+    }, npmInstallTimeoutMs)
+
+    const finish = (result) => {
+      if (finished) return
+      finished = true
+      clearTimeout(timeout)
+      resolve({ timedOut, ...result })
+    }
+
+    child.on('error', (error) => finish({ status: 1, error }))
+    child.on('close', (code, signal) => finish({ status: code ?? 1, signal }))
+  })
+}
+
+function terminateProcessTree(pid) {
+  if (!pid) return
+
+  if (process.platform === 'win32') {
+    spawnSync('taskkill', ['/PID', String(pid), '/T', '/F'], { stdio: 'ignore' })
+    return
+  }
+
+  try {
+    process.kill(pid, 'SIGTERM')
+  } catch {
+    // Process may have exited between timeout and termination.
   }
 }
 
@@ -459,7 +508,7 @@ async function runPublishedPackageSmoke({
       JSON.stringify({ private: true, type: 'module' }, null, 2)
     )
 
-    installWithRetry(
+    await installWithRetry(
       [
         'install',
         '--no-audit',
@@ -469,7 +518,8 @@ async function runPublishedPackageSmoke({
         `@vue/server-renderer@${readWorkspaceCatalogValue(rootDir, '@vue/server-renderer')}`,
         `react@${readWorkspaceCatalogValue(rootDir, 'react')}`,
         `react-dom@${readWorkspaceCatalogValue(rootDir, 'react-dom')}`,
-        `tailwindcss@${readWorkspaceCatalogValue(rootDir, 'tailwindcss')}`
+        `tailwindcss@${readWorkspaceCatalogValue(rootDir, 'tailwindcss')}`,
+        '--prefer-offline'
       ],
       tempDir,
       5000
@@ -478,7 +528,21 @@ async function runPublishedPackageSmoke({
     await verifyInstalledPackages(tempDir, effectiveVersion)
     console.log('Published package smoke test passed.')
   } finally {
-    rmSync(tempDir, { recursive: true, force: true })
+    removeDirWithRetry(tempDir)
+  }
+}
+
+function removeDirWithRetry(dir, attempts = 5, waitMs = 1000) {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      rmSync(dir, { recursive: true, force: true })
+      return
+    } catch (error) {
+      if (attempt === attempts) {
+        throw error
+      }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs)
+    }
   }
 }
 
@@ -587,6 +651,8 @@ async function verifyFrameworkButtonTreeShaking(tempDir) {
       name: 'React root Button import',
       specifier: '@expcat/tigercat-react',
       importName: 'Button',
+      framework: 'react',
+      mode: 'root',
       externals: [
         '@expcat/tigercat-core',
         'react',
@@ -600,6 +666,8 @@ async function verifyFrameworkButtonTreeShaking(tempDir) {
       name: 'React Button subpath import',
       specifier: '@expcat/tigercat-react/Button',
       importName: 'Button',
+      framework: 'react',
+      mode: 'button-subpath',
       externals: [
         '@expcat/tigercat-core',
         'react',
@@ -613,12 +681,16 @@ async function verifyFrameworkButtonTreeShaking(tempDir) {
       name: 'Vue root Button import',
       specifier: '@expcat/tigercat-vue',
       importName: 'Button',
+      framework: 'vue',
+      mode: 'root',
       externals: ['@expcat/tigercat-core', 'vue']
     },
     {
       name: 'Vue Button subpath import',
       specifier: '@expcat/tigercat-vue/Button',
       importName: 'Button',
+      framework: 'vue',
+      mode: 'button-subpath',
       externals: ['@expcat/tigercat-core', 'vue']
     }
   ]
@@ -626,6 +698,10 @@ async function verifyFrameworkButtonTreeShaking(tempDir) {
   for (const bundleCase of cases) {
     const bundle = await bundleInstalledImport(tempDir, bundleCase)
     assertBundleExcludesImperativeApis(bundleCase.name, bundle)
+    if (bundleCase.mode === 'button-subpath') {
+      assertButtonSubpathBundleBudget(bundleCase, bundle)
+      assertButtonSubpathBundleIsIsolated(bundleCase.name, bundle)
+    }
   }
 }
 
@@ -670,6 +746,42 @@ function assertBundleExcludesImperativeApis(name, bundle) {
   if (includedMarkers.length > 0) {
     throw new Error(
       `${name} should tree-shake imperative Message/notification APIs, but included: ${includedMarkers.join(', ')}`
+    )
+  }
+}
+
+function assertButtonSubpathBundleBudget({ name, framework }, bundle) {
+  const limit = buttonSubpathBundleLimits[framework]
+  const size = Buffer.byteLength(bundle, 'utf8')
+
+  if (size > limit) {
+    throw new Error(
+      `${name} bundle is ${size} bytes, exceeding the ${limit} byte Button subpath budget`
+    )
+  }
+}
+
+function assertButtonSubpathBundleIsIsolated(name, bundle) {
+  const forbiddenMarkers = [
+    'ChartCanvas',
+    'chart-tooltip',
+    'chart-legend',
+    'tiger-chart',
+    'CodeEditor',
+    'RichTextEditor',
+    'MarkdownEditor',
+    'defineLocale',
+    'DATEPICKER_LOCALES',
+    'zhCN',
+    'jaJP',
+    'koKR',
+    'arSA'
+  ]
+
+  const includedMarkers = forbiddenMarkers.filter((marker) => bundle.includes(marker))
+  if (includedMarkers.length > 0) {
+    throw new Error(
+      `${name} should not pull charts, editors, or full locale bundles, but included: ${includedMarkers.join(', ')}`
     )
   }
 }

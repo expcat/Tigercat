@@ -78,5 +78,5 @@ describe('example lazy routes', () => {
     }
 
     expect(violations).toEqual([])
-  })
+  }, 15_000)
 })

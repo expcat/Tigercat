@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除，以及 legacy token / icon path 兼容层清理；按需加载文档迁移和 size gate 将按 `docs/ROADMAP.md` 的 R08-R09 继续拆批实施。
+本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移，以及 size / publish artifact gate 收口。
 
 ### Breaking Changes
 
@@ -27,6 +27,7 @@
 - `tokens:build` / `tokens:check` 的生成面收敛为 canonical token 输出，移除 legacy CSS 变量和 token alias API 生成。
 - `release:check` 和 `publish:check` 增加 ESM-only 断言，发布 smoke 使用临时安装目录中的 bare ESM import 验证包入口，并阻止 `.cjs` 文件混入 tarball 或安装产物。
 - `release:check` 会阻止 React / Vue 恢复宽泛 sideEffects 声明；`publish:check` 会对安装后的 React / Vue root Button named import 和 Button 子路径 import 做 bundler smoke，确保普通 Button bundle 不拉入 Message / notification 命令式挂载代码。
+- `publish:check` 的 Button 子路径 smoke 增加 charts、editors 和全量 locale barrel 隔离断言，并将 React / Vue Button 子路径 bundle 上限固定为 6 kB / 8 kB；`quality:release` 现在包含 `publish:check`，发布 workflow 在现有触发面内改为执行完整 release gate。
 
 ## v1.5.0
 
