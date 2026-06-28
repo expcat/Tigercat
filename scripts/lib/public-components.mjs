@@ -166,20 +166,20 @@ export const FRAMEWORK_COMPONENTS = {
   MessageContainer: {
     category: 'Feedback',
     typeSource:
-      'packages/react/src/components/Message.tsx and packages/vue/src/components/Message.ts',
+      'packages/react/src/components/MessageContainer.tsx and packages/vue/src/components/MessageContainer.ts',
     sourceFiles: [
-      'packages/react/src/components/Message.tsx',
-      'packages/vue/src/components/Message.ts'
+      'packages/react/src/components/MessageContainer.tsx',
+      'packages/vue/src/components/MessageContainer.ts'
     ],
     propsInterfaces: ['MessageContainerProps', 'VueMessageContainerProps']
   },
   NotificationContainer: {
     category: 'Feedback',
     typeSource:
-      'packages/react/src/components/Notification.tsx and packages/vue/src/components/Notification.ts',
+      'packages/react/src/components/NotificationContainer.tsx and packages/vue/src/components/NotificationContainer.ts',
     sourceFiles: [
-      'packages/react/src/components/Notification.tsx',
-      'packages/vue/src/components/Notification.ts'
+      'packages/react/src/components/NotificationContainer.tsx',
+      'packages/vue/src/components/NotificationContainer.ts'
     ],
     propsInterfaces: ['NotificationContainerProps', 'VueNotificationContainerProps']
   },
@@ -234,8 +234,6 @@ const DOC_SECTION_ALIASES = new Map([
 const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['FloatButtonGroup', 'FloatButton'],
   ['InputGroupAddon', 'InputGroup'],
-  ['MessageContainer', 'Message'],
-  ['NotificationContainer', 'Notification'],
   ['PrintPageBreak', 'PrintLayout']
 ])
 

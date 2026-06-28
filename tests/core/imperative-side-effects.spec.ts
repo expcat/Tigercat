@@ -10,8 +10,12 @@ import { nextTick } from 'vue'
 import { Message as ReactMessage, notification as reactNotification } from '@expcat/tigercat-react'
 import { Message as VueMessage, notification as vueNotification } from '@expcat/tigercat-vue'
 
+function readText(path: string) {
+  return readFileSync(resolve(process.cwd(), path), 'utf-8')
+}
+
 function readPackageJson(path: string) {
-  return JSON.parse(readFileSync(resolve(process.cwd(), path), 'utf-8')) as {
+  return JSON.parse(readText(path)) as {
     sideEffects?: boolean | string[]
   }
 }
@@ -54,20 +58,106 @@ describe('imperative API sideEffects regression', () => {
     vi.useRealTimers()
   })
 
-  it('keeps React and Vue component chunks marked as side-effectful', () => {
+  it('marks React and Vue framework packages as side-effect free', () => {
     for (const packagePath of ['packages/react/package.json', 'packages/vue/package.json']) {
       const packageJson = readPackageJson(packagePath)
 
-      expect(packageJson.sideEffects).toEqual(
-        expect.arrayContaining([
-          './dist/chunk-*.mjs',
-          './dist/chunk-*.js',
-          './dist/components/*.mjs',
-          './dist/components/*.js'
-        ])
-      )
+      expect(packageJson.sideEffects).toBe(false)
+      expect(JSON.stringify(packageJson.sideEffects)).not.toContain('dist/chunk-*')
+      expect(JSON.stringify(packageJson.sideEffects)).not.toContain('dist/components/*')
     }
   })
+
+  it.each([
+    'packages/react/src/components/MessageContainer.tsx',
+    'packages/react/src/components/NotificationContainer.tsx',
+    'packages/vue/src/components/MessageContainer.ts',
+    'packages/vue/src/components/NotificationContainer.ts'
+  ])('%s stays free of singleton mounting logic', (sourcePath) => {
+    const source = readText(sourcePath)
+
+    expect(source).not.toContain('createRoot')
+    expect(source).not.toContain('react-dom')
+    expect(source).not.toContain('createApp')
+    expect(source).not.toContain('isBrowser')
+    expect(source).not.toContain('normalizeStringOption')
+    expect(source).not.toContain('createInstanceCounter')
+    expect(source).not.toContain('createNotificationStackUpdateScheduler')
+  })
+
+  it.each([
+    ['React Message', 'packages/react/src/components/Message.tsx', './MessageContainer'],
+    [
+      'React notification',
+      'packages/react/src/components/Notification.tsx',
+      './NotificationContainer'
+    ],
+    ['Vue Message', 'packages/vue/src/components/Message.ts', './MessageContainer'],
+    ['Vue notification', 'packages/vue/src/components/Notification.ts', './NotificationContainer']
+  ])('%s singleton imports its pure container module', (_label, sourcePath, importPath) => {
+    expect(readText(sourcePath)).toContain(importPath)
+  })
+
+  it.each([
+    [
+      'React',
+      'packages/react/src/index.tsx',
+      'MessageContainer',
+      'Message',
+      './components/MessageContainer',
+      './components/MessageRoot',
+      './components/Message'
+    ],
+    [
+      'React',
+      'packages/react/src/index.tsx',
+      'NotificationContainer',
+      'notification',
+      './components/NotificationContainer',
+      './components/NotificationRoot',
+      './components/Notification'
+    ],
+    [
+      'Vue',
+      'packages/vue/src/index.ts',
+      'MessageContainer',
+      'Message',
+      './components/MessageContainer',
+      './components/MessageRoot',
+      './components/Message'
+    ],
+    [
+      'Vue',
+      'packages/vue/src/index.ts',
+      'NotificationContainer',
+      'notification',
+      './components/NotificationContainer',
+      './components/NotificationRoot',
+      './components/Notification'
+    ]
+  ])(
+    '%s root entry keeps %s export separate from %s imperative module',
+    (
+      _framework,
+      sourcePath,
+      containerExport,
+      imperativeExport,
+      containerPath,
+      rootPath,
+      imperativePath
+    ) => {
+      const source = readText(sourcePath)
+
+      expect(source).toContain(`export { ${containerExport} } from '${containerPath}'`)
+      expect(source).toContain(`export { ${imperativeExport} } from '${rootPath}'`)
+      expect(source).not.toContain(
+        `export { ${containerExport}, ${imperativeExport} } from '${imperativePath}'`
+      )
+      expect(source).not.toContain(
+        `export { ${imperativeExport}, ${containerExport} } from '${imperativePath}'`
+      )
+    }
+  )
 
   it('mounts React Message and Notification from the package root entry', async () => {
     await actImperativeReact(() => {

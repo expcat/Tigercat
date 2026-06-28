@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面与显式 component exports；tree-shaking、compat API 删除和 size gate 将按 `docs/ROADMAP.md` 的 R05-R09 继续拆批实施。
+本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports 与 React / Vue tree-shaking 副作用收敛；compat API 删除和 size gate 将按 `docs/ROADMAP.md` 的 R06-R09 继续拆批实施。
 
 ### Infrastructure
 
@@ -13,7 +13,9 @@
 - `scripts/sync-version.mjs` 不再写入旧版 Roadmap 发布表格字段，避免当前 Rxx 路线图结构下的版本同步脚本在最后一步失败。
 - core / React / Vue 构建统一为 ESM-only，不再生成 CJS 产物；core package exports 移除 `require` 条件和 `.cjs` 目标。
 - React / Vue package exports 移除 `./*` 通配入口，改为由 `scripts/lib/public-components.mjs` 事实源生成的 148 个 PascalCase 显式组件子路径；`exports:check` 与 `release:check` 会阻止清单漂移。
+- React / Vue package `sideEffects` 收敛为 `false`，不再用 `dist/chunk-*` 或 `dist/components/*` 全量副作用兜底；`MessageContainer` 与 `NotificationContainer` 拆为独立纯容器入口，命令式 `Message` / `notification` 单例挂载逻辑保留在对应 imperative 入口中。
 - `release:check` 和 `publish:check` 增加 ESM-only 断言，发布 smoke 使用临时安装目录中的 bare ESM import 验证包入口，并阻止 `.cjs` 文件混入 tarball 或安装产物。
+- `release:check` 会阻止 React / Vue 恢复宽泛 sideEffects 声明；`publish:check` 会对安装后的 React / Vue root Button named import 和 Button 子路径 import 做 bundler smoke，确保普通 Button bundle 不拉入 Message / notification 命令式挂载代码。
 
 ## v1.5.0
 

@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，并将 React / Vue component 子路径收敛为 PascalCase 显式 exports。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。legacy token、tree-shaking 和按需加载迁移项会随后续 R05-R09 任务落地后追加到本节。
+v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，将 React / Vue component 子路径收敛为 PascalCase 显式 exports，并收紧 React / Vue tree-shaking 副作用声明。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。legacy token、compat API 删除和按需加载迁移项会随后续 R06-R09 任务落地后追加到本节。
 
 ### React / Vue component 子路径改为显式 PascalCase
 
@@ -19,6 +19,23 @@ import { Button } from '@expcat/tigercat-react'
 ```diff
 - import { Button } from '@expcat/tigercat-react/button'
 + import { Button } from '@expcat/tigercat-react/Button'
+```
+
+### Message / notification 命令式 API 与容器入口拆分
+
+React / Vue package 现在声明 `sideEffects: false`，普通 root named import 或组件子路径 import 可以被 bundler 摇掉未使用的命令式 Message / notification 挂载代码。
+
+命令式 API 继续从根入口使用：
+
+```ts
+import { Message, notification } from '@expcat/tigercat-react'
+```
+
+如果只需要可渲染容器组件，请使用独立容器入口：
+
+```ts
+import { MessageContainer } from '@expcat/tigercat-react/MessageContainer'
+import { NotificationContainer } from '@expcat/tigercat-react/NotificationContainer'
 ```
 
 ## v1.5.0

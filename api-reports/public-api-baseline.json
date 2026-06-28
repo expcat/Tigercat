@@ -5649,7 +5649,7 @@
       {
         "component": "MessageContainer",
         "subpath": "./MessageContainer",
-        "target": "Message"
+        "target": "MessageContainer"
       },
       {
         "component": "Modal",
@@ -5664,7 +5664,7 @@
       {
         "component": "NotificationContainer",
         "subpath": "./NotificationContainer",
-        "target": "Notification"
+        "target": "NotificationContainer"
       },
       {
         "component": "NumberKeyboard",
@@ -6881,7 +6881,7 @@
       {
         "component": "MessageContainer",
         "subpath": "./MessageContainer",
-        "target": "Message"
+        "target": "MessageContainer"
       },
       {
         "component": "Modal",
@@ -6896,7 +6896,7 @@
       {
         "component": "NotificationContainer",
         "subpath": "./NotificationContainer",
-        "target": "Notification"
+        "target": "NotificationContainer"
       },
       {
         "component": "NumberKeyboard",

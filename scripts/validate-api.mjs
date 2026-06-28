@@ -124,7 +124,10 @@ for (const filename of typeFiles) {
 // ----- Vue component scan (check events/emits naming) -----
 
 const VUE_COMPONENTS_DIR = join(ROOT, 'packages', 'vue', 'src', 'components')
-const vueFiles = readdirSync(VUE_COMPONENTS_DIR).filter((f) => f.endsWith('.ts'))
+const INTERNAL_COMPONENT_MODULES = new Set(['MessageRoot', 'NotificationRoot'])
+const vueFiles = readdirSync(VUE_COMPONENTS_DIR).filter(
+  (f) => f.endsWith('.ts') && !INTERNAL_COMPONENT_MODULES.has(f.replace('.ts', ''))
+)
 
 for (const filename of vueFiles) {
   const filepath = join(VUE_COMPONENTS_DIR, filename)
@@ -147,7 +150,9 @@ for (const filename of vueFiles) {
 // ----- React component scan (check event handlers are camelCase) -----
 
 const REACT_COMPONENTS_DIR = join(ROOT, 'packages', 'react', 'src', 'components')
-const reactFiles = readdirSync(REACT_COMPONENTS_DIR).filter((f) => f.endsWith('.tsx'))
+const reactFiles = readdirSync(REACT_COMPONENTS_DIR).filter(
+  (f) => f.endsWith('.tsx') && !INTERNAL_COMPONENT_MODULES.has(f.replace('.tsx', ''))
+)
 
 for (const filename of reactFiles) {
   const filepath = join(REACT_COMPONENTS_DIR, filename)

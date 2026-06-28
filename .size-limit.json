@@ -86,7 +86,7 @@
   {
     "name": "React TimePicker subpath",
     "path": "packages/react/dist/components/TimePicker.mjs",
-    "limit": "24 kB",
+    "limit": "25 kB",
     "gzip": true
   },
   {

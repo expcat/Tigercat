@@ -15,6 +15,7 @@ import {
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { build as esbuild } from 'esbuild'
 
 import { readJson, readJsonc, writeJson } from './utils/files.mjs'
 
@@ -512,6 +513,8 @@ async function verifyInstalledPackages(tempDir, version) {
     throw new Error('React SSR smoke render failed')
   }
 
+  await verifyFrameworkButtonTreeShaking(tempDir)
+
   const cliEntry = path.join(tempDir, 'node_modules', '@expcat', 'tigercat-cli', 'dist', 'index.js')
   const cliResult = spawnSync(process.execPath, [cliEntry, '--version'], {
     cwd: tempDir,
@@ -576,6 +579,99 @@ async function importFromTemp(tempDir, specifier) {
   )
   const imported = await import(pathToFileURL(modulePath).href)
   return imported.default
+}
+
+async function verifyFrameworkButtonTreeShaking(tempDir) {
+  const cases = [
+    {
+      name: 'React root Button import',
+      specifier: '@expcat/tigercat-react',
+      importName: 'Button',
+      externals: [
+        '@expcat/tigercat-core',
+        'react',
+        'react-dom',
+        'react-dom/client',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime'
+      ]
+    },
+    {
+      name: 'React Button subpath import',
+      specifier: '@expcat/tigercat-react/Button',
+      importName: 'Button',
+      externals: [
+        '@expcat/tigercat-core',
+        'react',
+        'react-dom',
+        'react-dom/client',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime'
+      ]
+    },
+    {
+      name: 'Vue root Button import',
+      specifier: '@expcat/tigercat-vue',
+      importName: 'Button',
+      externals: ['@expcat/tigercat-core', 'vue']
+    },
+    {
+      name: 'Vue Button subpath import',
+      specifier: '@expcat/tigercat-vue/Button',
+      importName: 'Button',
+      externals: ['@expcat/tigercat-core', 'vue']
+    }
+  ]
+
+  for (const bundleCase of cases) {
+    const bundle = await bundleInstalledImport(tempDir, bundleCase)
+    assertBundleExcludesImperativeApis(bundleCase.name, bundle)
+  }
+}
+
+async function bundleInstalledImport(tempDir, { name, specifier, importName, externals }) {
+  const entryPath = path.join(tempDir, `.tigercat-bundle-${esmImportCounter++}.mjs`)
+  writeFileSync(
+    entryPath,
+    `import { ${importName} } from ${JSON.stringify(specifier)};\nexport default ${importName};\n`
+  )
+
+  const result = await esbuild({
+    entryPoints: [entryPath],
+    absWorkingDir: tempDir,
+    bundle: true,
+    format: 'esm',
+    platform: 'browser',
+    write: false,
+    logLevel: 'silent',
+    external: externals
+  })
+
+  const output = result.outputFiles?.[0]?.text
+  if (!output) {
+    throw new Error(`${name} did not produce a bundle`)
+  }
+
+  return output
+}
+
+function assertBundleExcludesImperativeApis(name, bundle) {
+  const forbiddenMarkers = [
+    'tiger-message-container',
+    'tiger-notification-container',
+    'MessageHost',
+    'NotificationHost',
+    'react-dom/client',
+    'createRoot',
+    'createApp'
+  ]
+
+  const includedMarkers = forbiddenMarkers.filter((marker) => bundle.includes(marker))
+  if (includedMarkers.length > 0) {
+    throw new Error(
+      `${name} should tree-shake imperative Message/notification APIs, but included: ${includedMarkers.join(', ')}`
+    )
+  }
 }
 
 function createCommandEnv(command, extraEnv = {}) {

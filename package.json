@@ -97,6 +97,7 @@
     "eslint": "^10.5.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
+    "esbuild": "0.28.1",
     "happy-dom": "^20.10.6",
     "jest-axe": "^10.0.0",
     "jiti": "^2.7.0",

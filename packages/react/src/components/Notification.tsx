@@ -1,39 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import { createRoot, Root } from 'react-dom/client'
+import { createRoot, type Root } from 'react-dom/client'
 import {
-  classNames,
-  getNotificationTypeClasses,
-  notificationContainerBaseClasses,
-  notificationPositionClasses,
-  notificationBaseClasses,
-  notificationIconClasses,
-  notificationContentClasses,
-  notificationTitleClasses,
-  notificationDescriptionClasses,
-  notificationCloseButtonClasses,
-  notificationCloseIconClasses,
-  getNotificationIconPath,
-  notificationCloseIconPath,
+  createInstanceCounter,
   createNotificationStackUpdateScheduler,
   isBrowser,
-  ANIMATION_DURATION_MS,
   normalizeStringOption,
-  createInstanceCounter,
-  type NotificationPosition,
+  type NotificationConfig,
   type NotificationInstance,
   type NotificationOptions,
-  type NotificationConfig
+  type NotificationPosition
 } from '@expcat/tigercat-core'
-import { StatusIcon } from './shared/icons'
+import { NotificationContainer } from './NotificationContainer'
 
-/**
- * Global notification container id prefix
- */
+export { NotificationContainer } from './NotificationContainer'
+export type { NotificationContainerProps } from './NotificationContainer'
+
 const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container'
 
-/**
- * Notification instance storage per position
- */
 const notificationInstancesByPosition: Record<NotificationPosition, NotificationInstance[]> = {
   'top-left': [],
   'top-right': [],
@@ -53,184 +36,73 @@ const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
   'bottom-left': null,
   'bottom-right': null
 }
-const stackUpdateScheduler = createNotificationStackUpdateScheduler()
+let stackUpdateScheduler: ReturnType<typeof createNotificationStackUpdateScheduler> | null = null
+let getNextInstanceId: ReturnType<typeof createInstanceCounter> | null = null
+
+export type NotificationProps = NotificationOptions
+
+function getNotificationStackUpdateScheduler(): ReturnType<
+  typeof createNotificationStackUpdateScheduler
+> {
+  stackUpdateScheduler ??= createNotificationStackUpdateScheduler()
+  return stackUpdateScheduler
+}
+
+function getNotificationInstanceId(): string | number {
+  getNextInstanceId ??= createInstanceCounter()
+  return getNextInstanceId()
+}
 
 function scheduleNotificationStackUpdate(position: NotificationPosition): void {
   const callback = updateCallbacks[position]
   if (!callback) return
 
-  stackUpdateScheduler.schedule(position, callback)
+  getNotificationStackUpdateScheduler().schedule(position, callback)
 }
 
-/**
- * Get next instance id
- */
-const getNextInstanceId = createInstanceCounter()
-
-/**
- * Single notification item component
- */
-interface NotificationItemProps {
-  notification: NotificationInstance
-  onClose: (id: string | number) => void
+interface NotificationHostProps {
+  position: NotificationPosition
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClose }) => {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    // Trigger enter animation
-    const timer = setTimeout(() => setIsVisible(true), 10)
-    return () => clearTimeout(timer)
-  }, [])
-
-  const colorScheme = getNotificationTypeClasses(notification.type)
-
-  const notificationClasses = classNames(
-    notificationBaseClasses,
-    colorScheme.bg,
-    colorScheme.border,
-    notification.className,
-    isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
-  )
-
-  const iconPath = notification.icon || getNotificationIconPath(notification.type)
-  const iconClass = classNames(notificationIconClasses, colorScheme.icon)
-
-  const handleClose = () => {
-    setIsVisible(false)
-    setTimeout(() => onClose(notification.id), ANIMATION_DURATION_MS)
-  }
-
-  const a11yRole = notification.type === 'error' ? 'alert' : 'status'
-  const ariaLive = notification.type === 'error' ? 'assertive' : 'polite'
-
-  return (
-    <div
-      className={notificationClasses}
-      role={a11yRole}
-      aria-live={ariaLive}
-      aria-atomic="true"
-      onClick={notification.onClick}
-      onKeyDown={(e) => {
-        if (!notification.onClick) return
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          notification.onClick()
-        }
-      }}
-      tabIndex={notification.onClick ? 0 : undefined}
-      style={notification.onClick ? { cursor: 'pointer' } : undefined}
-      data-tiger-notification=""
-      data-tiger-notification-type={notification.type}
-      data-tiger-notification-id={String(notification.id)}>
-      <StatusIcon path={iconPath} className={iconClass} aria-hidden="true" focusable="false" />
-      <div className={notificationContentClasses}>
-        <div className={classNames(notificationTitleClasses, colorScheme.titleText)}>
-          {notification.title}
-        </div>
-        {notification.description && (
-          <div className={classNames(notificationDescriptionClasses, colorScheme.descriptionText)}>
-            {notification.description}
-          </div>
-        )}
-      </div>
-      {notification.closable && (
-        <button
-          className={notificationCloseButtonClasses}
-          onClick={(e) => {
-            e.stopPropagation()
-            handleClose()
-          }}
-          aria-label="Close notification"
-          type="button">
-          <StatusIcon path={notificationCloseIconPath} className={notificationCloseIconClasses} />
-        </button>
-      )}
-    </div>
-  )
-}
-
-/**
- * Notification container props
- */
-export interface NotificationContainerProps {
-  position?: NotificationPosition
-}
-
-/** Options accepted by the React global notification API. */
-export type NotificationProps = NotificationOptions
-
-/**
- * Notification container component
- */
-export const NotificationContainer: React.FC<NotificationContainerProps> = ({
-  position = 'top-right'
-}) => {
+const NotificationHost: React.FC<NotificationHostProps> = ({ position }) => {
   const [notifications, setNotifications] = useState<NotificationInstance[]>([])
 
   useEffect(() => {
-    // Register update callback
     updateCallbacks[position] = () => {
       setNotifications([...notificationInstancesByPosition[position]])
     }
 
-    // Initial sync
-    updateCallbacks[position]!()
+    updateCallbacks[position]?.()
 
     return () => {
-      stackUpdateScheduler.cancel(position)
+      getNotificationStackUpdateScheduler().cancel(position)
       updateCallbacks[position] = null
     }
   }, [position])
 
-  const containerClasses = classNames(
-    notificationContainerBaseClasses,
-    notificationPositionClasses[position]
-  )
-
-  const handleRemove = (id: string | number) => {
-    removeNotification(id, position)
-  }
-
   return (
-    <div
-      className={containerClasses}
-      id={`${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}`}
-      aria-live="polite"
-      aria-relevant="additions"
-      data-tiger-notification-container=""
-      data-tiger-notification-position={position}>
-      {notifications.map((notification) => (
-        <NotificationItem
-          key={notification.id}
-          notification={notification}
-          onClose={handleRemove}
-        />
-      ))}
-    </div>
+    <NotificationContainer
+      position={position}
+      notifications={notifications}
+      onClose={(id) => removeNotification(id, position)}
+    />
   )
 }
 
-/**
- * Ensure notification container exists for a position
- */
 function ensureContainer(position: NotificationPosition) {
   if (!isBrowser()) {
     return
   }
 
   const rootId = `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`
-
-  // If we already created a root but the DOM was externally cleared (e.g. tests), reset.
   const existingRootEl = document.getElementById(rootId)
+
   if (containerRoots[position] && !existingRootEl) {
     containerRoots[position] = null
     updateCallbacks[position] = null
-    stackUpdateScheduler.cancel(position)
+    getNotificationStackUpdateScheduler().cancel(position)
   }
 
-  // If a root already exists for this position, don't recreate it.
   if (containerRoots[position]) {
     return
   }
@@ -243,12 +115,9 @@ function ensureContainer(position: NotificationPosition) {
   }
 
   containerRoots[position] = createRoot(rootEl)
-  containerRoots[position]!.render(<NotificationContainer position={position} />)
+  containerRoots[position]!.render(<NotificationHost position={position} />)
 }
 
-/**
- * Destroy notification container for a position
- */
 function destroyContainer(position: NotificationPosition) {
   const rootId = `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`
 
@@ -258,21 +127,18 @@ function destroyContainer(position: NotificationPosition) {
   }
 
   updateCallbacks[position] = null
-  stackUpdateScheduler.cancel(position)
+  getNotificationStackUpdateScheduler().cancel(position)
 
   if (isBrowser()) {
     document.getElementById(rootId)?.remove()
   }
 }
 
-/**
- * Add a notification to the queue
- */
 function addNotification(config: NotificationConfig): () => void {
   const position = config.position || 'top-right'
   ensureContainer(position)
 
-  const id = getNextInstanceId()
+  const id = getNotificationInstanceId()
 
   const instance: NotificationInstance = {
     id,
@@ -291,20 +157,15 @@ function addNotification(config: NotificationConfig): () => void {
   notificationInstancesByPosition[position].push(instance)
   scheduleNotificationStackUpdate(position)
 
-  // Auto close after duration
   if (instance.duration > 0) {
     setTimeout(() => {
       removeNotification(id, position)
     }, instance.duration)
   }
 
-  // Return close function
   return () => removeNotification(id, position)
 }
 
-/**
- * Remove a notification from the queue
- */
 function removeNotification(id: string | number, position: NotificationPosition) {
   const instances = notificationInstancesByPosition[position]
   const index = instances.findIndex((notif) => notif.id === id)
@@ -323,9 +184,6 @@ function removeNotification(id: string | number, position: NotificationPosition)
   }
 }
 
-/**
- * Clear all notifications for a position or all positions
- */
 function clearAll(position?: NotificationPosition) {
   if (position) {
     notificationInstancesByPosition[position].forEach((instance) => {
@@ -345,16 +203,10 @@ function clearAll(position?: NotificationPosition) {
   }
 }
 
-/**
- * Normalize notification options
- */
 function normalizeOptions(options: NotificationOptions): NotificationConfig {
   return normalizeStringOption<NotificationConfig>(options, 'title')
 }
 
-/**
- * Notification API
- */
 export const notification = {
   info(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)

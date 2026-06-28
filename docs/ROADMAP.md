@@ -17,10 +17,10 @@ source: current repository state after v1.5.0 roadmap closure
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）与阶段 1（R02 version and release metadata、R03 ESM-only build surface），已完成于 2026-06-28。
-- 当前阶段：阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects），状态为 `进行中`；R04 已完成于 2026-06-28。
-- 当前可执行任务：R05。R04 已建立显式 exports 与公开组件事实源，R05 可继续调整 tree-shaking/sideEffects。
-- 阶段 3-4 暂未开始；必须等各自前置阶段满足依赖后再认领。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）与阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects），已完成于 2026-06-28。
+- 当前阶段：阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup），状态为 `未开始`。
+- 当前可执行任务：R06。R05 已完成 React/Vue sideEffects 收敛和 Message/notification 命令式入口拆分，R06 可继续删除兼容 API。
+- 阶段 4 暂未开始；必须等各自前置阶段满足依赖后再认领。
 
 ## 执行原则
 
@@ -46,7 +46,7 @@ source: current repository state after v1.5.0 roadmap closure
 | ---- | -------------------- | ------- | --------------------------------------------------------------------- |
 | 0    | 已完成（2026-06-28） | R01     | 只做路线图清理；为后续 v2 任务建立边界                                |
 | 1    | 已完成（2026-06-28） | R02-R03 | 先稳定版本与 release metadata，再切换 ESM-only 发布面                 |
-| 2    | 进行中               | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
+| 2    | 已完成（2026-06-28） | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
 | 3    | 未开始               | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
 | 4    | 未开始               | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
 
@@ -185,7 +185,7 @@ source: current repository state after v1.5.0 roadmap closure
 
 ### R05 tree-shaking and sideEffects
 
-**状态**：未开始。
+**状态**：已完成（2026-06-28）。
 
 **目标**：让普通组件和 shared chunks 可被 tree-shaking，拆分或最小化 `Message`/`notification` 命令式 API 的副作用声明。
 
@@ -202,6 +202,26 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm size`
 - `corepack pnpm publish:check`
 - `corepack pnpm api:validate`
+
+**执行摘要**：React/Vue package `sideEffects` 已收敛为 `false`，不再用 `dist/chunk-*` 或 `dist/components/*` 全量副作用兜底；React/Vue `MessageContainer` 与 `NotificationContainer` 已拆为独立纯容器入口，命令式 `Message` / `notification` 单例挂载逻辑保留在对应 imperative 入口；root `Message` / `notification` facade 保持同步返回 close handle，并通过动态导入延迟加载命令式挂载模块；`release:check` 会阻止宽泛 sideEffects 回退，`publish:check` 会对安装后的 React/Vue root Button named import 和 Button 子路径 import 做 bundler smoke，确认普通 Button bundle 不包含 Message/notification 命令式挂载标记。Next.js SSR 示例构建脚本改为 `next build --webpack`，避开本机 Next 16/Turbopack 原生绑定不可用时的发布检查失败。
+
+**实际验证**：
+
+- `node ./scripts/sync-package-exports.mjs`
+- `node ./scripts/generate-api-docs.mjs`
+- `node ./scripts/generate-api-baseline.mjs`
+- `npx -y pnpm@11.9.0 vitest run tests/core/imperative-side-effects.spec.ts`
+- `npx -y pnpm@11.9.0 build`
+- `npx -y pnpm@11.9.0 size`
+- `npx -y pnpm@11.9.0 publish:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 release:check`
+- `npx -y pnpm@11.9.0 exports:check`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 docs:api:check`（未提交工作树下按预期报告 `skills/tigercat/references` 生成物 diff；已用 `npx -y pnpm@11.9.0 docs:api` 写回）
+- `npx -y pnpm@11.9.0 api:baseline:check`（未提交工作树下按预期报告 `api-reports/public-api-baseline.json` 生成物 diff；已用 `npx -y pnpm@11.9.0 api:baseline` 写回）
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md CHANGELOG.md docs/MIGRATION.md package.json packages/react/package.json packages/vue/package.json packages/react/src/components/Message.tsx packages/react/src/components/MessageContainer.tsx packages/react/src/components/Notification.tsx packages/react/src/components/NotificationContainer.tsx packages/vue/src/components/Message.ts packages/vue/src/components/MessageContainer.ts packages/vue/src/components/Notification.ts packages/vue/src/components/NotificationContainer.ts scripts/check-release-readiness.mjs scripts/lib/public-components.mjs scripts/publish-check.mjs tests/core/imperative-side-effects.spec.ts api-reports/public-api-baseline.json skills/tigercat/references/component-index.md skills/tigercat/references/shared/props/feedback.md`
+- `git diff --check`
 
 **状态更新要求**：完成后写回状态、日期、副作用 allowlist 策略和关键验证命令；同步更新阶段 2 状态。
 

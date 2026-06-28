@@ -45,12 +45,14 @@ Events/callback props: `onClose?`.
 
 ## MessageContainer
 
-`packages/react/src/components/Message.tsx and packages/vue/src/components/Message.ts` · `MessageContainerProps / VueMessageContainerProps`
+`packages/react/src/components/MessageContainer.tsx and packages/vue/src/components/MessageContainer.ts` · `MessageContainerProps / VueMessageContainerProps`
 
 | Prop        | Type                | Default | Notes |
 | ----------- | ------------------- | ------- | ----- |
 | `position?` | `MessagePosition`   | `-`     | -     |
 | `messages?` | `MessageInstance[]` | `-`     | -     |
+
+Events/callback props: `onClose?`.
 
 ## Modal
 
@@ -64,11 +66,14 @@ Events/callback props: `onClose?`.
 
 ## NotificationContainer
 
-`packages/react/src/components/Notification.tsx and packages/vue/src/components/Notification.ts` · `NotificationContainerProps / VueNotificationContainerProps`
+`packages/react/src/components/NotificationContainer.tsx and packages/vue/src/components/NotificationContainer.ts` · `NotificationContainerProps / VueNotificationContainerProps`
 
-| Prop        | Type                   | Default | Notes |
-| ----------- | ---------------------- | ------- | ----- |
-| `position?` | `NotificationPosition` | `-`     | -     |
+| Prop             | Type                     | Default | Notes |
+| ---------------- | ------------------------ | ------- | ----- |
+| `position?`      | `NotificationPosition`   | `-`     | -     |
+| `notifications?` | `NotificationInstance[]` | `-`     | -     |
+
+Events/callback props: `onClose?`.
 
 ## Popconfirm
 

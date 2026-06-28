@@ -7,11 +7,19 @@ const componentEntries = readdirSync(componentsDir, { withFileTypes: true })
   .filter((entry) => entry.isFile() && entry.name.endsWith('.ts'))
   .map((entry) => `src/components/${entry.name}`)
 
+const composableEntries = [
+  'src/composables/useChartInteraction.ts',
+  'src/composables/useDrag.ts',
+  'src/composables/useFormController.ts'
+]
+
+const external = ['vue']
+
 export default defineConfig({
-  entry: ['src/index.ts', ...componentEntries],
+  entry: ['src/index.ts', ...componentEntries, ...composableEntries],
   format: ['esm'],
   dts: true,
   clean: true,
   splitting: true,
-  external: ['vue']
+  external
 })

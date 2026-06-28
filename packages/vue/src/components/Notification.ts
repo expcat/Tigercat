@@ -1,56 +1,21 @@
+import { createApp, defineComponent, h, ref, type App, type PropType } from 'vue'
 import {
-  createApp,
-  type App,
-  computed,
-  defineComponent,
-  h,
-  ref,
-  Teleport,
-  TransitionGroup,
-  type PropType
-} from 'vue'
-import {
-  classNames,
-  coerceClassValue,
-  getNotificationIconPath,
-  getNotificationTypeClasses,
-  notificationBaseClasses,
-  notificationCloseButtonClasses,
-  notificationCloseIconClasses,
-  notificationCloseIconPath,
-  notificationContainerBaseClasses,
-  notificationContentClasses,
-  notificationDescriptionClasses,
-  notificationIconClasses,
-  notificationPositionClasses,
-  notificationTitleClasses,
-  createNotificationStackUpdateScheduler,
-  normalizeStringOption,
   createInstanceCounter,
+  createNotificationStackUpdateScheduler,
+  isBrowser,
+  normalizeStringOption,
   type NotificationConfig,
   type NotificationInstance,
   type NotificationOptions,
-  type NotificationPosition,
-  isBrowser
+  type NotificationPosition
 } from '@expcat/tigercat-core'
-import { createStatusIcon } from '../utils/icon-helpers'
+import { NotificationContainer } from './NotificationContainer'
 
-type HArrayChildren = Extract<NonNullable<Parameters<typeof h>[2]>, unknown[]>
+export { NotificationContainer } from './NotificationContainer'
+export type { VueNotificationContainerProps } from './NotificationContainer'
 
-/**
- * Global notification container id prefix
- */
 const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container'
-const NOTIFICATION_CLOSE_ARIA_LABEL = 'Close notification'
 
-const IS_TEST_ENV = (() => {
-  const proc = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process
-  return typeof proc !== 'undefined' && proc.env?.NODE_ENV === 'test'
-})()
-
-/**
- * Notification instance storage per position
- */
 const notificationInstancesByPosition: Record<NotificationPosition, NotificationInstance[]> = {
   'top-left': [],
   'top-right': [],
@@ -71,180 +36,56 @@ const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
   'bottom-left': null,
   'bottom-right': null
 }
-const stackUpdateScheduler = createNotificationStackUpdateScheduler()
+let stackUpdateScheduler: ReturnType<typeof createNotificationStackUpdateScheduler> | null = null
+let getNextInstanceId: ReturnType<typeof createInstanceCounter> | null = null
+
+export type VueNotificationProps = NotificationOptions
+
+function getNotificationStackUpdateScheduler(): ReturnType<
+  typeof createNotificationStackUpdateScheduler
+> {
+  stackUpdateScheduler ??= createNotificationStackUpdateScheduler()
+  return stackUpdateScheduler
+}
+
+function getNotificationInstanceId(): string | number {
+  getNextInstanceId ??= createInstanceCounter()
+  return getNextInstanceId()
+}
 
 function scheduleNotificationStackUpdate(position: NotificationPosition): void {
   const callback = updateCallbacks[position]
   if (!callback) return
 
-  stackUpdateScheduler.schedule(position, callback)
+  getNotificationStackUpdateScheduler().schedule(position, callback)
 }
-
-/**
- * Get next instance id
- */
-const getNextInstanceId = createInstanceCounter()
 
 function getContainerRootId(position: NotificationPosition) {
   return `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`
 }
 
-export interface VueNotificationContainerProps {
-  position?: NotificationPosition
-}
-
-/** Options accepted by the Vue global notification API. */
-export type VueNotificationProps = NotificationOptions
-
-/**
- * Notification container component for a specific position
- */
-export const NotificationContainer = defineComponent({
-  name: 'TigerNotificationContainer',
-  inheritAttrs: false,
+const NotificationHost = /* @__PURE__ */ defineComponent({
+  name: 'TigerNotificationHost',
   props: {
     position: {
       type: String as PropType<NotificationPosition>,
-      default: 'top-right' as NotificationPosition
+      required: true
     }
   },
-  setup(props, { attrs }) {
+  setup(props) {
     const notifications = ref<NotificationInstance[]>([])
 
-    const syncNotifications = () => {
+    updateCallbacks[props.position] = () => {
       notifications.value = [...notificationInstancesByPosition[props.position]]
     }
-
-    updateCallbacks[props.position] = syncNotifications
-    syncNotifications()
-
-    const containerClasses = computed(() =>
-      classNames(
-        notificationContainerBaseClasses,
-        notificationPositionClasses[props.position],
-        coerceClassValue(attrs.class)
-      )
-    )
-
-    const renderNotificationItem = (notification: NotificationInstance) => {
-      const colorScheme = getNotificationTypeClasses(notification.type)
-
-      const notificationClasses = classNames(
-        notificationBaseClasses,
-        colorScheme.bg,
-        colorScheme.border,
-        notification.className
-      )
-
-      const iconPath = notification.icon || getNotificationIconPath(notification.type)
-      const iconClass = classNames(notificationIconClasses, colorScheme.icon)
-
-      const a11yRole = notification.type === 'error' ? 'alert' : 'status'
-      const ariaLive = notification.type === 'error' ? 'assertive' : 'polite'
-
-      const contentChildren = [
-        h(
-          'div',
-          {
-            class: classNames(notificationTitleClasses, colorScheme.titleText)
-          },
-          notification.title
-        )
-      ]
-
-      if (notification.description) {
-        contentChildren.push(
-          h(
-            'div',
-            {
-              class: classNames(notificationDescriptionClasses, colorScheme.descriptionText)
-            },
-            notification.description
-          )
-        )
-      }
-
-      const children: HArrayChildren = [
-        createStatusIcon(iconPath, iconClass, { 'aria-hidden': 'true', focusable: 'false' }),
-        h('div', { class: notificationContentClasses }, contentChildren)
-      ]
-
-      if (notification.closable) {
-        children.push(
-          h(
-            'button',
-            {
-              class: notificationCloseButtonClasses,
-              onClick: (e: MouseEvent) => {
-                e.stopPropagation()
-                removeNotification(notification.id, props.position)
-              },
-              'aria-label': NOTIFICATION_CLOSE_ARIA_LABEL,
-              type: 'button'
-            },
-            createStatusIcon(notificationCloseIconPath, notificationCloseIconClasses, {
-              'aria-hidden': 'true',
-              focusable: 'false'
-            })
-          )
-        )
-      }
-
-      return h(
-        'div',
-        {
-          key: notification.id,
-          class: notificationClasses,
-          role: a11yRole,
-          'aria-live': ariaLive,
-          'aria-atomic': 'true',
-          onClick: notification.onClick,
-          onKeydown: (e: KeyboardEvent) => {
-            if (!notification.onClick) return
-            const key = e.key
-            if (key === 'Enter' || key === ' ') {
-              e.preventDefault()
-              notification.onClick()
-            }
-          },
-          tabindex: notification.onClick ? 0 : undefined,
-          style: notification.onClick ? 'cursor: pointer;' : undefined,
-          'data-tiger-notification': '',
-          'data-tiger-notification-type': notification.type,
-          'data-tiger-notification-id': String(notification.id)
-        },
-        children
-      )
-    }
+    updateCallbacks[props.position]?.()
 
     return () =>
-      h(
-        Teleport,
-        { to: 'body' },
-        h(
-          'div',
-          {
-            ...attrs,
-            class: containerClasses.value,
-            id: `${NOTIFICATION_CONTAINER_ID_PREFIX}-${props.position}`,
-            'aria-live': 'polite',
-            'aria-relevant': 'additions',
-            'data-tiger-notification-container': '',
-            'data-tiger-notification-position': props.position
-          },
-          IS_TEST_ENV
-            ? notifications.value.map(renderNotificationItem)
-            : h(
-                TransitionGroup,
-                {
-                  name: 'notification',
-                  tag: 'div',
-                  class: 'flex flex-col gap-3'
-                },
-                () => notifications.value.map(renderNotificationItem)
-              )
-        )
-      )
+      h(NotificationContainer, {
+        position: props.position,
+        notifications: notifications.value,
+        onClose: (id: string | number) => removeNotification(id, props.position)
+      })
   }
 })
 
@@ -256,11 +97,10 @@ function ensureContainer(position: NotificationPosition) {
   const rootId = getContainerRootId(position)
   const existingRootEl = document.getElementById(rootId)
 
-  // If we already created an app but the DOM was externally cleared (e.g. tests), reset.
   if (containerApps[position] && !existingRootEl) {
     containerApps[position] = null
     updateCallbacks[position] = null
-    stackUpdateScheduler.cancel(position)
+    getNotificationStackUpdateScheduler().cancel(position)
   }
 
   if (containerApps[position]) {
@@ -274,7 +114,7 @@ function ensureContainer(position: NotificationPosition) {
     document.body.appendChild(rootEl)
   }
 
-  containerApps[position] = createApp(NotificationContainer, { position })
+  containerApps[position] = createApp(NotificationHost, { position })
   containerApps[position]!.mount(rootEl)
 }
 
@@ -287,18 +127,15 @@ function destroyContainer(position: NotificationPosition) {
   }
 
   updateCallbacks[position] = null
-  stackUpdateScheduler.cancel(position)
+  getNotificationStackUpdateScheduler().cancel(position)
 
   if (isBrowser()) {
     document.getElementById(rootId)?.remove()
   }
 }
 
-/**
- * Add a notification to the queue
- */
 function addNotification(config: NotificationConfig): () => void {
-  const id = getNextInstanceId()
+  const id = getNotificationInstanceId()
   const position = config.position || 'top-right'
 
   ensureContainer(position)
@@ -318,23 +155,17 @@ function addNotification(config: NotificationConfig): () => void {
   }
 
   notificationInstancesByPosition[position].push(instance)
-
   scheduleNotificationStackUpdate(position)
 
-  // Auto close after duration
   if (instance.duration > 0) {
     setTimeout(() => {
       removeNotification(id, position)
     }, instance.duration)
   }
 
-  // Return close function
   return () => removeNotification(id, position)
 }
 
-/**
- * Remove a notification from the queue
- */
 function removeNotification(id: string | number, position: NotificationPosition) {
   const instances = notificationInstancesByPosition[position]
   const index = instances.findIndex((notif) => notif.id === id)
@@ -353,9 +184,6 @@ function removeNotification(id: string | number, position: NotificationPosition)
   }
 }
 
-/**
- * Clear all notifications for a position or all positions
- */
 function clearAll(position?: NotificationPosition) {
   if (position) {
     notificationInstancesByPosition[position].forEach((instance) => {
@@ -364,7 +192,6 @@ function clearAll(position?: NotificationPosition) {
     notificationInstancesByPosition[position] = []
     destroyContainer(position)
   } else {
-    // Clear all positions
     Object.keys(notificationInstancesByPosition).forEach((pos) => {
       const p = pos as NotificationPosition
       notificationInstancesByPosition[p].forEach((instance) => {
@@ -376,16 +203,10 @@ function clearAll(position?: NotificationPosition) {
   }
 }
 
-/**
- * Normalize notification options
- */
 function normalizeOptions(options: NotificationOptions): NotificationConfig {
   return normalizeStringOption<NotificationConfig>(options, 'title')
 }
 
-/**
- * Notification API
- */
 export const notification = {
   info(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)

@@ -110,6 +110,24 @@ function checkPackageExports(packages) {
   }
 }
 
+function checkFrameworkSideEffects(packages) {
+  for (const packageName of ['vue', 'react']) {
+    const sideEffects = packages[packageName].sideEffects
+    check(
+      sideEffects === false,
+      `@expcat/tigercat-${packageName} sideEffects must be false for tree-shaking`
+    )
+
+    const sideEffectEntries = Array.isArray(sideEffects) ? sideEffects : []
+    for (const entry of sideEffectEntries) {
+      check(
+        !entry.includes('dist/chunk-*') && !entry.includes('dist/components/*'),
+        `@expcat/tigercat-${packageName} must not use broad sideEffects entry ${entry}`
+      )
+    }
+  }
+}
+
 function checkEsmOnlyPackageSurface(packages) {
   for (const [packageName, packageInfo] of Object.entries(packages)) {
     const surface = {
@@ -307,6 +325,7 @@ const expectedVersion = checkPackageVersions(packages)
 
 checkSourceVersions(expectedVersion)
 checkPackageExports(packages)
+checkFrameworkSideEffects(packages)
 checkEsmOnlyPackageSurface(packages)
 checkPackageRepositoryMetadata(packages)
 checkRootScripts()

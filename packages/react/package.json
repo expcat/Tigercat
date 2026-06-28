@@ -22,12 +22,7 @@
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "sideEffects": [
-    "./dist/chunk-*.mjs",
-    "./dist/chunk-*.js",
-    "./dist/components/*.mjs",
-    "./dist/components/*.js"
-  ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
@@ -480,9 +475,9 @@
       "default": "./dist/components/Message.mjs"
     },
     "./MessageContainer": {
-      "types": "./dist/components/Message.d.mts",
-      "import": "./dist/components/Message.mjs",
-      "default": "./dist/components/Message.mjs"
+      "types": "./dist/components/MessageContainer.d.mts",
+      "import": "./dist/components/MessageContainer.mjs",
+      "default": "./dist/components/MessageContainer.mjs"
     },
     "./Modal": {
       "types": "./dist/components/Modal.d.mts",
@@ -495,9 +490,9 @@
       "default": "./dist/components/NotificationCenter.mjs"
     },
     "./NotificationContainer": {
-      "types": "./dist/components/Notification.d.mts",
-      "import": "./dist/components/Notification.mjs",
-      "default": "./dist/components/Notification.mjs"
+      "types": "./dist/components/NotificationContainer.d.mts",
+      "import": "./dist/components/NotificationContainer.mjs",
+      "default": "./dist/components/NotificationContainer.mjs"
     },
     "./NumberKeyboard": {
       "types": "./dist/components/NumberKeyboard.d.mts",
@@ -782,7 +777,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup --config tsup.config.ts",
+    "build": "tsup --config tsup.config.ts && node ../../scripts/rewrite-framework-root-index.mjs react",
     "dev": "tsup --config tsup.config.ts --watch",
     "clean": "node ../../scripts/rimraf.mjs dist"
   },
