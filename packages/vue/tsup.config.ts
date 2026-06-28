@@ -9,7 +9,7 @@ const componentEntries = readdirSync(componentsDir, { withFileTypes: true })
 
 export default defineConfig({
   entry: ['src/index.ts', ...componentEntries],
-  format: ['cjs', 'esm'],
+  format: ['esm'],
   dts: true,
   clean: true,
   splitting: true,

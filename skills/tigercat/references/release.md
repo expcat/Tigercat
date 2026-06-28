@@ -35,7 +35,7 @@ pnpm build
 
 Breaking changes must be centralized in [docs/MIGRATION.md](../../../docs/MIGRATION.md) and [CHANGELOG.md](../../../CHANGELOG.md). Each entry should include affected package or component, removed API, replacement API, and a minimal diff when possible.
 
-Current v1.5.0 breaking changes are:
+Current v2.0.0 starts with release metadata alignment and an ESM-only build surface for core, React and Vue packages. Concrete API removals will be appended as the R04-R09 roadmap tasks land. The most recent completed breaking-change set remains v1.5.0:
 
 | Area                       | Removed or changed                 | Replacement or action                                                 |
 | -------------------------- | ---------------------------------- | --------------------------------------------------------------------- |

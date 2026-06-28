@@ -55,17 +55,6 @@ replaceInFile(path.join(rootDir, 'examples', 'index.html'), [
   }
 ])
 
-replaceInFile(path.join(rootDir, 'docs', 'ROADMAP.md'), [
-  {
-    pattern: /(\| 发布版本 \| )v[^ ]+( 发布准备中\s*\|)/,
-    next: `$1v${version}$2`
-  },
-  {
-    pattern: /(- \[ \] )v[^ ]+( 发布执行：)/,
-    next: `$1v${version}$2`
-  }
-])
-
 console.log(`Synchronized Tigercat version to ${version}`)
 
 function updateJsonVersion(filePath, version) {

@@ -15,6 +15,7 @@ import { fileURLToPath } from 'url'
 import {
   buildPublicComponentEntries,
   formatComponentIndexType,
+  getComponentPackageSubpath,
   getDocTarget,
   loadPublicComponentExports
 } from './lib/public-components.mjs'
@@ -566,13 +567,18 @@ function collectComponentIndexRows() {
   const lines = readFileSync(indexFile, 'utf-8').split(/\r?\n/)
 
   for (const line of lines) {
-    const match = line.match(/^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|$/)
-    if (!match) continue
-    const component = match[1].trim()
+    if (!line.startsWith('|')) continue
+    const columns = line
+      .split('|')
+      .slice(1, -1)
+      .map((column) => column.trim())
+    if (columns.length < 3) continue
+    const component = columns[0]
     if (component === 'Component' || component.startsWith('-')) continue
     rows.set(component, {
-      category: match[2].trim(),
-      type: match[3].trim()
+      category: columns[1],
+      type: columns[2],
+      packageSubpath: columns[3] ?? ''
     })
   }
 
@@ -584,7 +590,8 @@ const expectedComponentRows = new Map(
     entry.component,
     {
       category: entry.category,
-      type: formatComponentIndexType(entry.typeSource)
+      type: formatComponentIndexType(entry.typeSource),
+      packageSubpath: getComponentPackageSubpath(entry.component)
     }
   ])
 )
@@ -602,12 +609,16 @@ for (const [componentName, expected] of expectedComponentRows) {
     continue
   }
 
-  if (actual.category !== expected.category || actual.type !== expected.type) {
+  if (
+    actual.category !== expected.category ||
+    actual.type !== expected.type ||
+    actual.packageSubpath !== expected.packageSubpath
+  ) {
     addIssue(
       'skills/tigercat/references/component-index.md',
       0,
       'docs-api',
-      `component-index 组件 "${componentName}" 应为 ${expected.category} / ${expected.type}，实际为 ${actual.category} / ${actual.type}`
+      `component-index 组件 "${componentName}" 应为 ${expected.category} / ${expected.type} / ${expected.packageSubpath}，实际为 ${actual.category} / ${actual.type} / ${actual.packageSubpath}`
     )
   }
 }

@@ -231,6 +231,28 @@ const DOC_SECTION_ALIASES = new Map([
   ['PrintPageBreak', 'PrintLayout']
 ])
 
+const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
+  ['FloatButtonGroup', 'FloatButton'],
+  ['InputGroupAddon', 'InputGroup'],
+  ['MessageContainer', 'Message'],
+  ['NotificationContainer', 'Notification'],
+  ['PrintPageBreak', 'PrintLayout']
+])
+
+export const REQUIRED_CORE_PACKAGE_EXPORTS = [
+  '.',
+  './tailwind',
+  './tailwind/modern',
+  './tokens.css',
+  './figma-variables.json'
+]
+
+export const FRAMEWORK_ROOT_PACKAGE_EXPORT = {
+  types: './dist/index.d.mts',
+  import: './dist/index.mjs',
+  default: './dist/index.mjs'
+}
+
 export function kebabToPascal(value) {
   return value
     .split('-')
@@ -291,6 +313,46 @@ export function collectPublicComponentExports(indexContent) {
   return [...componentExports].sort((a, b) => a.localeCompare(b))
 }
 
+export function getComponentPackageSubpath(component) {
+  return `./${component}`
+}
+
+export function getComponentPackageTarget(component) {
+  return PACKAGE_EXPORT_TARGET_ALIASES.get(component) || component
+}
+
+export function getComponentPackageExport(component) {
+  const target = getComponentPackageTarget(component)
+
+  return {
+    types: `./dist/components/${target}.d.mts`,
+    import: `./dist/components/${target}.mjs`,
+    default: `./dist/components/${target}.mjs`
+  }
+}
+
+export function buildFrameworkPackageExports(components) {
+  const exports = {
+    '.': FRAMEWORK_ROOT_PACKAGE_EXPORT
+  }
+
+  for (const component of [...components].sort((a, b) => a.localeCompare(b))) {
+    exports[getComponentPackageSubpath(component)] = getComponentPackageExport(component)
+  }
+
+  return exports
+}
+
+export function buildFrameworkPackageSubpathFacts(components) {
+  return [...components]
+    .sort((a, b) => a.localeCompare(b))
+    .map((component) => ({
+      component,
+      subpath: getComponentPackageSubpath(component),
+      target: getComponentPackageTarget(component)
+    }))
+}
+
 export function loadPublicComponentExports(root) {
   const vue = collectPublicComponentExports(
     readFileSync(join(root, 'packages', 'vue', 'src', 'index.ts'), 'utf-8')
@@ -323,6 +385,8 @@ export function buildPublicComponentEntries(root, fileInfoByName, publicExports)
       entriesByComponent.set(component, {
         component,
         category,
+        packageSubpath: getComponentPackageSubpath(component),
+        packageTarget: getComponentPackageTarget(component),
         props: `shared/props/${CATEGORY_SLUGS[category]}.md#${pascalToKebab(component)}`,
         examples: `examples/${CATEGORY_SLUGS[category]}.md#${pascalToKebab(component)}`,
         typeSource: `packages/core/src/types/${fileInfo.fileName}`,
@@ -340,6 +404,8 @@ export function buildPublicComponentEntries(root, fileInfoByName, publicExports)
     entriesByComponent.set(component, {
       component,
       category,
+      packageSubpath: getComponentPackageSubpath(component),
+      packageTarget: getComponentPackageTarget(component),
       props: `shared/props/${CATEGORY_SLUGS[category]}.md#${pascalToKebab(component)}`,
       examples: `examples/${CATEGORY_SLUGS[category]}.md#${pascalToKebab(component)}`,
       ...frameworkInfo
@@ -352,6 +418,8 @@ export function buildPublicComponentEntries(root, fileInfoByName, publicExports)
     entriesByComponent.set(component, {
       component,
       category: 'Other',
+      packageSubpath: getComponentPackageSubpath(component),
+      packageTarget: getComponentPackageTarget(component),
       props: `shared/props/other.md#${pascalToKebab(component)}`,
       examples: `examples/other.md#${pascalToKebab(component)}`,
       typeSource: 'unknown',

@@ -2,6 +2,25 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+## v2.0.0
+
+v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，并将 React / Vue component 子路径收敛为 PascalCase 显式 exports。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。legacy token、tree-shaking 和按需加载迁移项会随后续 R05-R09 任务落地后追加到本节。
+
+### React / Vue component 子路径改为显式 PascalCase
+
+React / Vue 根入口 named exports 保持可用：
+
+```ts
+import { Button } from '@expcat/tigercat-react'
+```
+
+组件子路径现在只声明 PascalCase 入口；如果项目曾借助旧通配 exports 导入非 PascalCase 路径，请改为组件名路径：
+
+```diff
+- import { Button } from '@expcat/tigercat-react/button'
++ import { Button } from '@expcat/tigercat-react/Button'
+```
+
 ## v1.5.0
 
 ### `getResultHttpLabel` 标记为废弃

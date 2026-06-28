@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-core",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "type": "module",
   "description": "Core utilities for Tigercat UI library",
   "license": "MIT",
@@ -26,180 +26,145 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     },
     "./tailwind": {
       "types": "./dist/tailwind.d.ts",
-      "import": "./dist/tailwind.js",
-      "require": "./dist/tailwind.cjs"
+      "import": "./dist/tailwind.js"
     },
     "./tailwind/modern": {
       "types": "./dist/tailwind/modern.d.ts",
-      "import": "./dist/tailwind/modern.js",
-      "require": "./dist/tailwind/modern.cjs"
+      "import": "./dist/tailwind/modern.js"
     },
     "./tokens.css": "./tokens/tokens.css",
     "./figma-variables.json": "./tokens/figma-variables.json",
     "./locales/en-US": {
       "types": "./dist/locales/en-US.d.ts",
-      "import": "./dist/locales/en-US.js",
-      "require": "./dist/locales/en-US.cjs"
+      "import": "./dist/locales/en-US.js"
     },
     "./locales/zh-CN": {
       "types": "./dist/locales/zh-CN.d.ts",
-      "import": "./dist/locales/zh-CN.js",
-      "require": "./dist/locales/zh-CN.cjs"
+      "import": "./dist/locales/zh-CN.js"
     },
     "./locales/zh-TW": {
       "types": "./dist/locales/zh-TW.d.ts",
-      "import": "./dist/locales/zh-TW.js",
-      "require": "./dist/locales/zh-TW.cjs"
+      "import": "./dist/locales/zh-TW.js"
     },
     "./locales/ja-JP": {
       "types": "./dist/locales/ja-JP.d.ts",
-      "import": "./dist/locales/ja-JP.js",
-      "require": "./dist/locales/ja-JP.cjs"
+      "import": "./dist/locales/ja-JP.js"
     },
     "./locales/ko-KR": {
       "types": "./dist/locales/ko-KR.d.ts",
-      "import": "./dist/locales/ko-KR.js",
-      "require": "./dist/locales/ko-KR.cjs"
+      "import": "./dist/locales/ko-KR.js"
     },
     "./locales/th-TH": {
       "types": "./dist/locales/th-TH.d.ts",
-      "import": "./dist/locales/th-TH.js",
-      "require": "./dist/locales/th-TH.cjs"
+      "import": "./dist/locales/th-TH.js"
     },
     "./locales/vi-VN": {
       "types": "./dist/locales/vi-VN.d.ts",
-      "import": "./dist/locales/vi-VN.js",
-      "require": "./dist/locales/vi-VN.cjs"
+      "import": "./dist/locales/vi-VN.js"
     },
     "./locales/id-ID": {
       "types": "./dist/locales/id-ID.d.ts",
-      "import": "./dist/locales/id-ID.js",
-      "require": "./dist/locales/id-ID.cjs"
+      "import": "./dist/locales/id-ID.js"
     },
     "./locales/es-ES": {
       "types": "./dist/locales/es-ES.d.ts",
-      "import": "./dist/locales/es-ES.js",
-      "require": "./dist/locales/es-ES.cjs"
+      "import": "./dist/locales/es-ES.js"
     },
     "./locales/fr-FR": {
       "types": "./dist/locales/fr-FR.d.ts",
-      "import": "./dist/locales/fr-FR.js",
-      "require": "./dist/locales/fr-FR.cjs"
+      "import": "./dist/locales/fr-FR.js"
     },
     "./locales/de-DE": {
       "types": "./dist/locales/de-DE.d.ts",
-      "import": "./dist/locales/de-DE.js",
-      "require": "./dist/locales/de-DE.cjs"
+      "import": "./dist/locales/de-DE.js"
     },
     "./locales/pt-BR": {
       "types": "./dist/locales/pt-BR.d.ts",
-      "import": "./dist/locales/pt-BR.js",
-      "require": "./dist/locales/pt-BR.cjs"
+      "import": "./dist/locales/pt-BR.js"
     },
     "./locales/ar-SA": {
       "types": "./dist/locales/ar-SA.d.ts",
-      "import": "./dist/locales/ar-SA.js",
-      "require": "./dist/locales/ar-SA.cjs"
+      "import": "./dist/locales/ar-SA.js"
     },
     "./datepicker-locales/en-US": {
       "types": "./dist/datepicker-locales/en-US.d.ts",
-      "import": "./dist/datepicker-locales/en-US.js",
-      "require": "./dist/datepicker-locales/en-US.cjs"
+      "import": "./dist/datepicker-locales/en-US.js"
     },
     "./datepicker-locales/zh-CN": {
       "types": "./dist/datepicker-locales/zh-CN.d.ts",
-      "import": "./dist/datepicker-locales/zh-CN.js",
-      "require": "./dist/datepicker-locales/zh-CN.cjs"
+      "import": "./dist/datepicker-locales/zh-CN.js"
     },
     "./datepicker-locales/zh-TW": {
       "types": "./dist/datepicker-locales/zh-TW.d.ts",
-      "import": "./dist/datepicker-locales/zh-TW.js",
-      "require": "./dist/datepicker-locales/zh-TW.cjs"
+      "import": "./dist/datepicker-locales/zh-TW.js"
     },
     "./datepicker-locales/ja-JP": {
       "types": "./dist/datepicker-locales/ja-JP.d.ts",
-      "import": "./dist/datepicker-locales/ja-JP.js",
-      "require": "./dist/datepicker-locales/ja-JP.cjs"
+      "import": "./dist/datepicker-locales/ja-JP.js"
     },
     "./datepicker-locales/ko-KR": {
       "types": "./dist/datepicker-locales/ko-KR.d.ts",
-      "import": "./dist/datepicker-locales/ko-KR.js",
-      "require": "./dist/datepicker-locales/ko-KR.cjs"
+      "import": "./dist/datepicker-locales/ko-KR.js"
     },
     "./datepicker-locales/th-TH": {
       "types": "./dist/datepicker-locales/th-TH.d.ts",
-      "import": "./dist/datepicker-locales/th-TH.js",
-      "require": "./dist/datepicker-locales/th-TH.cjs"
+      "import": "./dist/datepicker-locales/th-TH.js"
     },
     "./datepicker-locales/vi-VN": {
       "types": "./dist/datepicker-locales/vi-VN.d.ts",
-      "import": "./dist/datepicker-locales/vi-VN.js",
-      "require": "./dist/datepicker-locales/vi-VN.cjs"
+      "import": "./dist/datepicker-locales/vi-VN.js"
     },
     "./datepicker-locales/id-ID": {
       "types": "./dist/datepicker-locales/id-ID.d.ts",
-      "import": "./dist/datepicker-locales/id-ID.js",
-      "require": "./dist/datepicker-locales/id-ID.cjs"
+      "import": "./dist/datepicker-locales/id-ID.js"
     },
     "./datepicker-locales/es-ES": {
       "types": "./dist/datepicker-locales/es-ES.d.ts",
-      "import": "./dist/datepicker-locales/es-ES.js",
-      "require": "./dist/datepicker-locales/es-ES.cjs"
+      "import": "./dist/datepicker-locales/es-ES.js"
     },
     "./datepicker-locales/fr-FR": {
       "types": "./dist/datepicker-locales/fr-FR.d.ts",
-      "import": "./dist/datepicker-locales/fr-FR.js",
-      "require": "./dist/datepicker-locales/fr-FR.cjs"
+      "import": "./dist/datepicker-locales/fr-FR.js"
     },
     "./datepicker-locales/de-DE": {
       "types": "./dist/datepicker-locales/de-DE.d.ts",
-      "import": "./dist/datepicker-locales/de-DE.js",
-      "require": "./dist/datepicker-locales/de-DE.cjs"
+      "import": "./dist/datepicker-locales/de-DE.js"
     },
     "./datepicker-locales/pt-BR": {
       "types": "./dist/datepicker-locales/pt-BR.d.ts",
-      "import": "./dist/datepicker-locales/pt-BR.js",
-      "require": "./dist/datepicker-locales/pt-BR.cjs"
+      "import": "./dist/datepicker-locales/pt-BR.js"
     },
     "./datepicker-locales/ar-SA": {
       "types": "./dist/datepicker-locales/ar-SA.d.ts",
-      "import": "./dist/datepicker-locales/ar-SA.js",
-      "require": "./dist/datepicker-locales/ar-SA.cjs"
+      "import": "./dist/datepicker-locales/ar-SA.js"
     },
     "./icons/common": {
       "types": "./dist/icons/common.d.ts",
-      "import": "./dist/icons/common.js",
-      "require": "./dist/icons/common.cjs"
+      "import": "./dist/icons/common.js"
     },
     "./icons/picker": {
       "types": "./dist/icons/picker.d.ts",
-      "import": "./dist/icons/picker.js",
-      "require": "./dist/icons/picker.cjs"
+      "import": "./dist/icons/picker.js"
     },
     "./icons/status": {
       "types": "./dist/icons/status.d.ts",
-      "import": "./dist/icons/status.js",
-      "require": "./dist/icons/status.cjs"
+      "import": "./dist/icons/status.js"
     },
     "./icons/table": {
       "types": "./dist/icons/table.d.ts",
-      "import": "./dist/icons/table.js",
-      "require": "./dist/icons/table.cjs"
+      "import": "./dist/icons/table.js"
     },
     "./icons/registry": {
       "types": "./dist/icons/registry.d.ts",
-      "import": "./dist/icons/registry.js",
-      "require": "./dist/icons/registry.cjs"
+      "import": "./dist/icons/registry.js"
     },
     "./utils/table-export": {
       "types": "./dist/utils/table-export.d.ts",
-      "import": "./dist/utils/table-export.js",
-      "require": "./dist/utils/table-export.cjs"
+      "import": "./dist/utils/table-export.js"
     }
   },
   "files": [

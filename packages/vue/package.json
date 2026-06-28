@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-vue",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "Vue 3 components for Tigercat UI library",
   "license": "MIT",
   "author": "Yizhe Wang",
@@ -35,10 +35,745 @@
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
     },
-    "./*": {
-      "types": "./dist/components/*.d.mts",
-      "import": "./dist/components/*.mjs",
-      "default": "./dist/components/*.mjs"
+    "./ActivityFeed": {
+      "types": "./dist/components/ActivityFeed.d.mts",
+      "import": "./dist/components/ActivityFeed.mjs",
+      "default": "./dist/components/ActivityFeed.mjs"
+    },
+    "./Affix": {
+      "types": "./dist/components/Affix.d.mts",
+      "import": "./dist/components/Affix.mjs",
+      "default": "./dist/components/Affix.mjs"
+    },
+    "./Alert": {
+      "types": "./dist/components/Alert.d.mts",
+      "import": "./dist/components/Alert.mjs",
+      "default": "./dist/components/Alert.mjs"
+    },
+    "./Anchor": {
+      "types": "./dist/components/Anchor.d.mts",
+      "import": "./dist/components/Anchor.mjs",
+      "default": "./dist/components/Anchor.mjs"
+    },
+    "./AnchorLink": {
+      "types": "./dist/components/AnchorLink.d.mts",
+      "import": "./dist/components/AnchorLink.mjs",
+      "default": "./dist/components/AnchorLink.mjs"
+    },
+    "./AreaChart": {
+      "types": "./dist/components/AreaChart.d.mts",
+      "import": "./dist/components/AreaChart.mjs",
+      "default": "./dist/components/AreaChart.mjs"
+    },
+    "./AutoComplete": {
+      "types": "./dist/components/AutoComplete.d.mts",
+      "import": "./dist/components/AutoComplete.mjs",
+      "default": "./dist/components/AutoComplete.mjs"
+    },
+    "./Avatar": {
+      "types": "./dist/components/Avatar.d.mts",
+      "import": "./dist/components/Avatar.mjs",
+      "default": "./dist/components/Avatar.mjs"
+    },
+    "./AvatarGroup": {
+      "types": "./dist/components/AvatarGroup.d.mts",
+      "import": "./dist/components/AvatarGroup.mjs",
+      "default": "./dist/components/AvatarGroup.mjs"
+    },
+    "./BackTop": {
+      "types": "./dist/components/BackTop.d.mts",
+      "import": "./dist/components/BackTop.mjs",
+      "default": "./dist/components/BackTop.mjs"
+    },
+    "./Badge": {
+      "types": "./dist/components/Badge.d.mts",
+      "import": "./dist/components/Badge.mjs",
+      "default": "./dist/components/Badge.mjs"
+    },
+    "./BarChart": {
+      "types": "./dist/components/BarChart.d.mts",
+      "import": "./dist/components/BarChart.mjs",
+      "default": "./dist/components/BarChart.mjs"
+    },
+    "./Breadcrumb": {
+      "types": "./dist/components/Breadcrumb.d.mts",
+      "import": "./dist/components/Breadcrumb.mjs",
+      "default": "./dist/components/Breadcrumb.mjs"
+    },
+    "./BreadcrumbItem": {
+      "types": "./dist/components/BreadcrumbItem.d.mts",
+      "import": "./dist/components/BreadcrumbItem.mjs",
+      "default": "./dist/components/BreadcrumbItem.mjs"
+    },
+    "./Button": {
+      "types": "./dist/components/Button.d.mts",
+      "import": "./dist/components/Button.mjs",
+      "default": "./dist/components/Button.mjs"
+    },
+    "./ButtonGroup": {
+      "types": "./dist/components/ButtonGroup.d.mts",
+      "import": "./dist/components/ButtonGroup.mjs",
+      "default": "./dist/components/ButtonGroup.mjs"
+    },
+    "./Calendar": {
+      "types": "./dist/components/Calendar.d.mts",
+      "import": "./dist/components/Calendar.mjs",
+      "default": "./dist/components/Calendar.mjs"
+    },
+    "./Card": {
+      "types": "./dist/components/Card.d.mts",
+      "import": "./dist/components/Card.mjs",
+      "default": "./dist/components/Card.mjs"
+    },
+    "./Carousel": {
+      "types": "./dist/components/Carousel.d.mts",
+      "import": "./dist/components/Carousel.mjs",
+      "default": "./dist/components/Carousel.mjs"
+    },
+    "./Cascader": {
+      "types": "./dist/components/Cascader.d.mts",
+      "import": "./dist/components/Cascader.mjs",
+      "default": "./dist/components/Cascader.mjs"
+    },
+    "./ChartAxis": {
+      "types": "./dist/components/ChartAxis.d.mts",
+      "import": "./dist/components/ChartAxis.mjs",
+      "default": "./dist/components/ChartAxis.mjs"
+    },
+    "./ChartCanvas": {
+      "types": "./dist/components/ChartCanvas.d.mts",
+      "import": "./dist/components/ChartCanvas.mjs",
+      "default": "./dist/components/ChartCanvas.mjs"
+    },
+    "./ChartGrid": {
+      "types": "./dist/components/ChartGrid.d.mts",
+      "import": "./dist/components/ChartGrid.mjs",
+      "default": "./dist/components/ChartGrid.mjs"
+    },
+    "./ChartLegend": {
+      "types": "./dist/components/ChartLegend.d.mts",
+      "import": "./dist/components/ChartLegend.mjs",
+      "default": "./dist/components/ChartLegend.mjs"
+    },
+    "./ChartSeries": {
+      "types": "./dist/components/ChartSeries.d.mts",
+      "import": "./dist/components/ChartSeries.mjs",
+      "default": "./dist/components/ChartSeries.mjs"
+    },
+    "./ChartTooltip": {
+      "types": "./dist/components/ChartTooltip.d.mts",
+      "import": "./dist/components/ChartTooltip.mjs",
+      "default": "./dist/components/ChartTooltip.mjs"
+    },
+    "./ChatWindow": {
+      "types": "./dist/components/ChatWindow.d.mts",
+      "import": "./dist/components/ChatWindow.mjs",
+      "default": "./dist/components/ChatWindow.mjs"
+    },
+    "./Checkbox": {
+      "types": "./dist/components/Checkbox.d.mts",
+      "import": "./dist/components/Checkbox.mjs",
+      "default": "./dist/components/Checkbox.mjs"
+    },
+    "./CheckboxGroup": {
+      "types": "./dist/components/CheckboxGroup.d.mts",
+      "import": "./dist/components/CheckboxGroup.mjs",
+      "default": "./dist/components/CheckboxGroup.mjs"
+    },
+    "./Code": {
+      "types": "./dist/components/Code.d.mts",
+      "import": "./dist/components/Code.mjs",
+      "default": "./dist/components/Code.mjs"
+    },
+    "./CodeEditor": {
+      "types": "./dist/components/CodeEditor.d.mts",
+      "import": "./dist/components/CodeEditor.mjs",
+      "default": "./dist/components/CodeEditor.mjs"
+    },
+    "./Col": {
+      "types": "./dist/components/Col.d.mts",
+      "import": "./dist/components/Col.mjs",
+      "default": "./dist/components/Col.mjs"
+    },
+    "./Collapse": {
+      "types": "./dist/components/Collapse.d.mts",
+      "import": "./dist/components/Collapse.mjs",
+      "default": "./dist/components/Collapse.mjs"
+    },
+    "./CollapsePanel": {
+      "types": "./dist/components/CollapsePanel.d.mts",
+      "import": "./dist/components/CollapsePanel.mjs",
+      "default": "./dist/components/CollapsePanel.mjs"
+    },
+    "./ColorPicker": {
+      "types": "./dist/components/ColorPicker.d.mts",
+      "import": "./dist/components/ColorPicker.mjs",
+      "default": "./dist/components/ColorPicker.mjs"
+    },
+    "./ColorSwatch": {
+      "types": "./dist/components/ColorSwatch.d.mts",
+      "import": "./dist/components/ColorSwatch.mjs",
+      "default": "./dist/components/ColorSwatch.mjs"
+    },
+    "./CommentThread": {
+      "types": "./dist/components/CommentThread.d.mts",
+      "import": "./dist/components/CommentThread.mjs",
+      "default": "./dist/components/CommentThread.mjs"
+    },
+    "./ConfigProvider": {
+      "types": "./dist/components/ConfigProvider.d.mts",
+      "import": "./dist/components/ConfigProvider.mjs",
+      "default": "./dist/components/ConfigProvider.mjs"
+    },
+    "./Container": {
+      "types": "./dist/components/Container.d.mts",
+      "import": "./dist/components/Container.mjs",
+      "default": "./dist/components/Container.mjs"
+    },
+    "./Content": {
+      "types": "./dist/components/Content.d.mts",
+      "import": "./dist/components/Content.mjs",
+      "default": "./dist/components/Content.mjs"
+    },
+    "./Countdown": {
+      "types": "./dist/components/Countdown.d.mts",
+      "import": "./dist/components/Countdown.mjs",
+      "default": "./dist/components/Countdown.mjs"
+    },
+    "./CronEditor": {
+      "types": "./dist/components/CronEditor.d.mts",
+      "import": "./dist/components/CronEditor.mjs",
+      "default": "./dist/components/CronEditor.mjs"
+    },
+    "./CropUpload": {
+      "types": "./dist/components/CropUpload.d.mts",
+      "import": "./dist/components/CropUpload.mjs",
+      "default": "./dist/components/CropUpload.mjs"
+    },
+    "./DataTableWithToolbar": {
+      "types": "./dist/components/DataTableWithToolbar.d.mts",
+      "import": "./dist/components/DataTableWithToolbar.mjs",
+      "default": "./dist/components/DataTableWithToolbar.mjs"
+    },
+    "./DatePicker": {
+      "types": "./dist/components/DatePicker.d.mts",
+      "import": "./dist/components/DatePicker.mjs",
+      "default": "./dist/components/DatePicker.mjs"
+    },
+    "./Descriptions": {
+      "types": "./dist/components/Descriptions.d.mts",
+      "import": "./dist/components/Descriptions.mjs",
+      "default": "./dist/components/Descriptions.mjs"
+    },
+    "./Divider": {
+      "types": "./dist/components/Divider.d.mts",
+      "import": "./dist/components/Divider.mjs",
+      "default": "./dist/components/Divider.mjs"
+    },
+    "./DonutChart": {
+      "types": "./dist/components/DonutChart.d.mts",
+      "import": "./dist/components/DonutChart.mjs",
+      "default": "./dist/components/DonutChart.mjs"
+    },
+    "./Drawer": {
+      "types": "./dist/components/Drawer.d.mts",
+      "import": "./dist/components/Drawer.mjs",
+      "default": "./dist/components/Drawer.mjs"
+    },
+    "./Dropdown": {
+      "types": "./dist/components/Dropdown.d.mts",
+      "import": "./dist/components/Dropdown.mjs",
+      "default": "./dist/components/Dropdown.mjs"
+    },
+    "./DropdownItem": {
+      "types": "./dist/components/DropdownItem.d.mts",
+      "import": "./dist/components/DropdownItem.mjs",
+      "default": "./dist/components/DropdownItem.mjs"
+    },
+    "./DropdownMenu": {
+      "types": "./dist/components/DropdownMenu.d.mts",
+      "import": "./dist/components/DropdownMenu.mjs",
+      "default": "./dist/components/DropdownMenu.mjs"
+    },
+    "./Empty": {
+      "types": "./dist/components/Empty.d.mts",
+      "import": "./dist/components/Empty.mjs",
+      "default": "./dist/components/Empty.mjs"
+    },
+    "./FileManager": {
+      "types": "./dist/components/FileManager.d.mts",
+      "import": "./dist/components/FileManager.mjs",
+      "default": "./dist/components/FileManager.mjs"
+    },
+    "./FloatButton": {
+      "types": "./dist/components/FloatButton.d.mts",
+      "import": "./dist/components/FloatButton.mjs",
+      "default": "./dist/components/FloatButton.mjs"
+    },
+    "./FloatButtonGroup": {
+      "types": "./dist/components/FloatButton.d.mts",
+      "import": "./dist/components/FloatButton.mjs",
+      "default": "./dist/components/FloatButton.mjs"
+    },
+    "./Footer": {
+      "types": "./dist/components/Footer.d.mts",
+      "import": "./dist/components/Footer.mjs",
+      "default": "./dist/components/Footer.mjs"
+    },
+    "./Form": {
+      "types": "./dist/components/Form.d.mts",
+      "import": "./dist/components/Form.mjs",
+      "default": "./dist/components/Form.mjs"
+    },
+    "./FormItem": {
+      "types": "./dist/components/FormItem.d.mts",
+      "import": "./dist/components/FormItem.mjs",
+      "default": "./dist/components/FormItem.mjs"
+    },
+    "./FormWizard": {
+      "types": "./dist/components/FormWizard.d.mts",
+      "import": "./dist/components/FormWizard.mjs",
+      "default": "./dist/components/FormWizard.mjs"
+    },
+    "./FunnelChart": {
+      "types": "./dist/components/FunnelChart.d.mts",
+      "import": "./dist/components/FunnelChart.mjs",
+      "default": "./dist/components/FunnelChart.mjs"
+    },
+    "./Gantt": {
+      "types": "./dist/components/Gantt.d.mts",
+      "import": "./dist/components/Gantt.mjs",
+      "default": "./dist/components/Gantt.mjs"
+    },
+    "./GaugeChart": {
+      "types": "./dist/components/GaugeChart.d.mts",
+      "import": "./dist/components/GaugeChart.mjs",
+      "default": "./dist/components/GaugeChart.mjs"
+    },
+    "./Header": {
+      "types": "./dist/components/Header.d.mts",
+      "import": "./dist/components/Header.mjs",
+      "default": "./dist/components/Header.mjs"
+    },
+    "./HeatmapChart": {
+      "types": "./dist/components/HeatmapChart.d.mts",
+      "import": "./dist/components/HeatmapChart.mjs",
+      "default": "./dist/components/HeatmapChart.mjs"
+    },
+    "./Icon": {
+      "types": "./dist/components/Icon.d.mts",
+      "import": "./dist/components/Icon.mjs",
+      "default": "./dist/components/Icon.mjs"
+    },
+    "./Image": {
+      "types": "./dist/components/Image.d.mts",
+      "import": "./dist/components/Image.mjs",
+      "default": "./dist/components/Image.mjs"
+    },
+    "./ImageAnnotation": {
+      "types": "./dist/components/ImageAnnotation.d.mts",
+      "import": "./dist/components/ImageAnnotation.mjs",
+      "default": "./dist/components/ImageAnnotation.mjs"
+    },
+    "./ImageCropper": {
+      "types": "./dist/components/ImageCropper.d.mts",
+      "import": "./dist/components/ImageCropper.mjs",
+      "default": "./dist/components/ImageCropper.mjs"
+    },
+    "./ImageGroup": {
+      "types": "./dist/components/ImageGroup.d.mts",
+      "import": "./dist/components/ImageGroup.mjs",
+      "default": "./dist/components/ImageGroup.mjs"
+    },
+    "./ImagePreview": {
+      "types": "./dist/components/ImagePreview.d.mts",
+      "import": "./dist/components/ImagePreview.mjs",
+      "default": "./dist/components/ImagePreview.mjs"
+    },
+    "./ImageViewer": {
+      "types": "./dist/components/ImageViewer.d.mts",
+      "import": "./dist/components/ImageViewer.mjs",
+      "default": "./dist/components/ImageViewer.mjs"
+    },
+    "./InfiniteScroll": {
+      "types": "./dist/components/InfiniteScroll.d.mts",
+      "import": "./dist/components/InfiniteScroll.mjs",
+      "default": "./dist/components/InfiniteScroll.mjs"
+    },
+    "./Input": {
+      "types": "./dist/components/Input.d.mts",
+      "import": "./dist/components/Input.mjs",
+      "default": "./dist/components/Input.mjs"
+    },
+    "./InputGroup": {
+      "types": "./dist/components/InputGroup.d.mts",
+      "import": "./dist/components/InputGroup.mjs",
+      "default": "./dist/components/InputGroup.mjs"
+    },
+    "./InputGroupAddon": {
+      "types": "./dist/components/InputGroup.d.mts",
+      "import": "./dist/components/InputGroup.mjs",
+      "default": "./dist/components/InputGroup.mjs"
+    },
+    "./InputNumber": {
+      "types": "./dist/components/InputNumber.d.mts",
+      "import": "./dist/components/InputNumber.mjs",
+      "default": "./dist/components/InputNumber.mjs"
+    },
+    "./Kanban": {
+      "types": "./dist/components/Kanban.d.mts",
+      "import": "./dist/components/Kanban.mjs",
+      "default": "./dist/components/Kanban.mjs"
+    },
+    "./Layout": {
+      "types": "./dist/components/Layout.d.mts",
+      "import": "./dist/components/Layout.mjs",
+      "default": "./dist/components/Layout.mjs"
+    },
+    "./LineChart": {
+      "types": "./dist/components/LineChart.d.mts",
+      "import": "./dist/components/LineChart.mjs",
+      "default": "./dist/components/LineChart.mjs"
+    },
+    "./Link": {
+      "types": "./dist/components/Link.d.mts",
+      "import": "./dist/components/Link.mjs",
+      "default": "./dist/components/Link.mjs"
+    },
+    "./List": {
+      "types": "./dist/components/List.d.mts",
+      "import": "./dist/components/List.mjs",
+      "default": "./dist/components/List.mjs"
+    },
+    "./Loading": {
+      "types": "./dist/components/Loading.d.mts",
+      "import": "./dist/components/Loading.mjs",
+      "default": "./dist/components/Loading.mjs"
+    },
+    "./MarkdownEditor": {
+      "types": "./dist/components/MarkdownEditor.d.mts",
+      "import": "./dist/components/MarkdownEditor.mjs",
+      "default": "./dist/components/MarkdownEditor.mjs"
+    },
+    "./Mentions": {
+      "types": "./dist/components/Mentions.d.mts",
+      "import": "./dist/components/Mentions.mjs",
+      "default": "./dist/components/Mentions.mjs"
+    },
+    "./Menu": {
+      "types": "./dist/components/Menu.d.mts",
+      "import": "./dist/components/Menu.mjs",
+      "default": "./dist/components/Menu.mjs"
+    },
+    "./MenuItem": {
+      "types": "./dist/components/MenuItem.d.mts",
+      "import": "./dist/components/MenuItem.mjs",
+      "default": "./dist/components/MenuItem.mjs"
+    },
+    "./MenuItemGroup": {
+      "types": "./dist/components/MenuItemGroup.d.mts",
+      "import": "./dist/components/MenuItemGroup.mjs",
+      "default": "./dist/components/MenuItemGroup.mjs"
+    },
+    "./Message": {
+      "types": "./dist/components/Message.d.mts",
+      "import": "./dist/components/Message.mjs",
+      "default": "./dist/components/Message.mjs"
+    },
+    "./MessageContainer": {
+      "types": "./dist/components/Message.d.mts",
+      "import": "./dist/components/Message.mjs",
+      "default": "./dist/components/Message.mjs"
+    },
+    "./Modal": {
+      "types": "./dist/components/Modal.d.mts",
+      "import": "./dist/components/Modal.mjs",
+      "default": "./dist/components/Modal.mjs"
+    },
+    "./NotificationCenter": {
+      "types": "./dist/components/NotificationCenter.d.mts",
+      "import": "./dist/components/NotificationCenter.mjs",
+      "default": "./dist/components/NotificationCenter.mjs"
+    },
+    "./NotificationContainer": {
+      "types": "./dist/components/Notification.d.mts",
+      "import": "./dist/components/Notification.mjs",
+      "default": "./dist/components/Notification.mjs"
+    },
+    "./NumberKeyboard": {
+      "types": "./dist/components/NumberKeyboard.d.mts",
+      "import": "./dist/components/NumberKeyboard.mjs",
+      "default": "./dist/components/NumberKeyboard.mjs"
+    },
+    "./OrgChart": {
+      "types": "./dist/components/OrgChart.d.mts",
+      "import": "./dist/components/OrgChart.mjs",
+      "default": "./dist/components/OrgChart.mjs"
+    },
+    "./Pagination": {
+      "types": "./dist/components/Pagination.d.mts",
+      "import": "./dist/components/Pagination.mjs",
+      "default": "./dist/components/Pagination.mjs"
+    },
+    "./PieChart": {
+      "types": "./dist/components/PieChart.d.mts",
+      "import": "./dist/components/PieChart.mjs",
+      "default": "./dist/components/PieChart.mjs"
+    },
+    "./Popconfirm": {
+      "types": "./dist/components/Popconfirm.d.mts",
+      "import": "./dist/components/Popconfirm.mjs",
+      "default": "./dist/components/Popconfirm.mjs"
+    },
+    "./Popover": {
+      "types": "./dist/components/Popover.d.mts",
+      "import": "./dist/components/Popover.mjs",
+      "default": "./dist/components/Popover.mjs"
+    },
+    "./PrintLayout": {
+      "types": "./dist/components/PrintLayout.d.mts",
+      "import": "./dist/components/PrintLayout.mjs",
+      "default": "./dist/components/PrintLayout.mjs"
+    },
+    "./PrintPageBreak": {
+      "types": "./dist/components/PrintLayout.d.mts",
+      "import": "./dist/components/PrintLayout.mjs",
+      "default": "./dist/components/PrintLayout.mjs"
+    },
+    "./Progress": {
+      "types": "./dist/components/Progress.d.mts",
+      "import": "./dist/components/Progress.mjs",
+      "default": "./dist/components/Progress.mjs"
+    },
+    "./QRCode": {
+      "types": "./dist/components/QRCode.d.mts",
+      "import": "./dist/components/QRCode.mjs",
+      "default": "./dist/components/QRCode.mjs"
+    },
+    "./RadarChart": {
+      "types": "./dist/components/RadarChart.d.mts",
+      "import": "./dist/components/RadarChart.mjs",
+      "default": "./dist/components/RadarChart.mjs"
+    },
+    "./Radio": {
+      "types": "./dist/components/Radio.d.mts",
+      "import": "./dist/components/Radio.mjs",
+      "default": "./dist/components/Radio.mjs"
+    },
+    "./RadioGroup": {
+      "types": "./dist/components/RadioGroup.d.mts",
+      "import": "./dist/components/RadioGroup.mjs",
+      "default": "./dist/components/RadioGroup.mjs"
+    },
+    "./Rate": {
+      "types": "./dist/components/Rate.d.mts",
+      "import": "./dist/components/Rate.mjs",
+      "default": "./dist/components/Rate.mjs"
+    },
+    "./Resizable": {
+      "types": "./dist/components/Resizable.d.mts",
+      "import": "./dist/components/Resizable.mjs",
+      "default": "./dist/components/Resizable.mjs"
+    },
+    "./Result": {
+      "types": "./dist/components/Result.d.mts",
+      "import": "./dist/components/Result.mjs",
+      "default": "./dist/components/Result.mjs"
+    },
+    "./RichTextEditor": {
+      "types": "./dist/components/RichTextEditor.d.mts",
+      "import": "./dist/components/RichTextEditor.mjs",
+      "default": "./dist/components/RichTextEditor.mjs"
+    },
+    "./Row": {
+      "types": "./dist/components/Row.d.mts",
+      "import": "./dist/components/Row.mjs",
+      "default": "./dist/components/Row.mjs"
+    },
+    "./ScatterChart": {
+      "types": "./dist/components/ScatterChart.d.mts",
+      "import": "./dist/components/ScatterChart.mjs",
+      "default": "./dist/components/ScatterChart.mjs"
+    },
+    "./ScrollSpy": {
+      "types": "./dist/components/ScrollSpy.d.mts",
+      "import": "./dist/components/ScrollSpy.mjs",
+      "default": "./dist/components/ScrollSpy.mjs"
+    },
+    "./Segmented": {
+      "types": "./dist/components/Segmented.d.mts",
+      "import": "./dist/components/Segmented.mjs",
+      "default": "./dist/components/Segmented.mjs"
+    },
+    "./Select": {
+      "types": "./dist/components/Select.d.mts",
+      "import": "./dist/components/Select.mjs",
+      "default": "./dist/components/Select.mjs"
+    },
+    "./Sidebar": {
+      "types": "./dist/components/Sidebar.d.mts",
+      "import": "./dist/components/Sidebar.mjs",
+      "default": "./dist/components/Sidebar.mjs"
+    },
+    "./Signature": {
+      "types": "./dist/components/Signature.d.mts",
+      "import": "./dist/components/Signature.mjs",
+      "default": "./dist/components/Signature.mjs"
+    },
+    "./Skeleton": {
+      "types": "./dist/components/Skeleton.d.mts",
+      "import": "./dist/components/Skeleton.mjs",
+      "default": "./dist/components/Skeleton.mjs"
+    },
+    "./Slider": {
+      "types": "./dist/components/Slider.d.mts",
+      "import": "./dist/components/Slider.mjs",
+      "default": "./dist/components/Slider.mjs"
+    },
+    "./Space": {
+      "types": "./dist/components/Space.d.mts",
+      "import": "./dist/components/Space.mjs",
+      "default": "./dist/components/Space.mjs"
+    },
+    "./Splitter": {
+      "types": "./dist/components/Splitter.d.mts",
+      "import": "./dist/components/Splitter.mjs",
+      "default": "./dist/components/Splitter.mjs"
+    },
+    "./Spotlight": {
+      "types": "./dist/components/Spotlight.d.mts",
+      "import": "./dist/components/Spotlight.mjs",
+      "default": "./dist/components/Spotlight.mjs"
+    },
+    "./Statistic": {
+      "types": "./dist/components/Statistic.d.mts",
+      "import": "./dist/components/Statistic.mjs",
+      "default": "./dist/components/Statistic.mjs"
+    },
+    "./Stepper": {
+      "types": "./dist/components/Stepper.d.mts",
+      "import": "./dist/components/Stepper.mjs",
+      "default": "./dist/components/Stepper.mjs"
+    },
+    "./Steps": {
+      "types": "./dist/components/Steps.d.mts",
+      "import": "./dist/components/Steps.mjs",
+      "default": "./dist/components/Steps.mjs"
+    },
+    "./StepsItem": {
+      "types": "./dist/components/StepsItem.d.mts",
+      "import": "./dist/components/StepsItem.mjs",
+      "default": "./dist/components/StepsItem.mjs"
+    },
+    "./SubMenu": {
+      "types": "./dist/components/SubMenu.d.mts",
+      "import": "./dist/components/SubMenu.mjs",
+      "default": "./dist/components/SubMenu.mjs"
+    },
+    "./SunburstChart": {
+      "types": "./dist/components/SunburstChart.d.mts",
+      "import": "./dist/components/SunburstChart.mjs",
+      "default": "./dist/components/SunburstChart.mjs"
+    },
+    "./Switch": {
+      "types": "./dist/components/Switch.d.mts",
+      "import": "./dist/components/Switch.mjs",
+      "default": "./dist/components/Switch.mjs"
+    },
+    "./Table": {
+      "types": "./dist/components/Table.d.mts",
+      "import": "./dist/components/Table.mjs",
+      "default": "./dist/components/Table.mjs"
+    },
+    "./TabPane": {
+      "types": "./dist/components/TabPane.d.mts",
+      "import": "./dist/components/TabPane.mjs",
+      "default": "./dist/components/TabPane.mjs"
+    },
+    "./Tabs": {
+      "types": "./dist/components/Tabs.d.mts",
+      "import": "./dist/components/Tabs.mjs",
+      "default": "./dist/components/Tabs.mjs"
+    },
+    "./Tag": {
+      "types": "./dist/components/Tag.d.mts",
+      "import": "./dist/components/Tag.mjs",
+      "default": "./dist/components/Tag.mjs"
+    },
+    "./TaskBoard": {
+      "types": "./dist/components/TaskBoard.d.mts",
+      "import": "./dist/components/TaskBoard.mjs",
+      "default": "./dist/components/TaskBoard.mjs"
+    },
+    "./Text": {
+      "types": "./dist/components/Text.d.mts",
+      "import": "./dist/components/Text.mjs",
+      "default": "./dist/components/Text.mjs"
+    },
+    "./Textarea": {
+      "types": "./dist/components/Textarea.d.mts",
+      "import": "./dist/components/Textarea.mjs",
+      "default": "./dist/components/Textarea.mjs"
+    },
+    "./Timeline": {
+      "types": "./dist/components/Timeline.d.mts",
+      "import": "./dist/components/Timeline.mjs",
+      "default": "./dist/components/Timeline.mjs"
+    },
+    "./TimePicker": {
+      "types": "./dist/components/TimePicker.d.mts",
+      "import": "./dist/components/TimePicker.mjs",
+      "default": "./dist/components/TimePicker.mjs"
+    },
+    "./Tooltip": {
+      "types": "./dist/components/Tooltip.d.mts",
+      "import": "./dist/components/Tooltip.mjs",
+      "default": "./dist/components/Tooltip.mjs"
+    },
+    "./Tour": {
+      "types": "./dist/components/Tour.d.mts",
+      "import": "./dist/components/Tour.mjs",
+      "default": "./dist/components/Tour.mjs"
+    },
+    "./Transfer": {
+      "types": "./dist/components/Transfer.d.mts",
+      "import": "./dist/components/Transfer.mjs",
+      "default": "./dist/components/Transfer.mjs"
+    },
+    "./Tree": {
+      "types": "./dist/components/Tree.d.mts",
+      "import": "./dist/components/Tree.mjs",
+      "default": "./dist/components/Tree.mjs"
+    },
+    "./TreeMapChart": {
+      "types": "./dist/components/TreeMapChart.d.mts",
+      "import": "./dist/components/TreeMapChart.mjs",
+      "default": "./dist/components/TreeMapChart.mjs"
+    },
+    "./TreeSelect": {
+      "types": "./dist/components/TreeSelect.d.mts",
+      "import": "./dist/components/TreeSelect.mjs",
+      "default": "./dist/components/TreeSelect.mjs"
+    },
+    "./Upload": {
+      "types": "./dist/components/Upload.d.mts",
+      "import": "./dist/components/Upload.mjs",
+      "default": "./dist/components/Upload.mjs"
+    },
+    "./VirtualList": {
+      "types": "./dist/components/VirtualList.d.mts",
+      "import": "./dist/components/VirtualList.mjs",
+      "default": "./dist/components/VirtualList.mjs"
+    },
+    "./VirtualTable": {
+      "types": "./dist/components/VirtualTable.d.mts",
+      "import": "./dist/components/VirtualTable.mjs",
+      "default": "./dist/components/VirtualTable.mjs"
+    },
+    "./Watermark": {
+      "types": "./dist/components/Watermark.d.mts",
+      "import": "./dist/components/Watermark.mjs",
+      "default": "./dist/components/Watermark.mjs"
     }
   },
   "files": [

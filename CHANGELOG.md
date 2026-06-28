@@ -2,6 +2,19 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.0.0
+
+本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面与显式 component exports；tree-shaking、compat API 删除和 size gate 将按 `docs/ROADMAP.md` 的 R05-R09 继续拆批实施。
+
+### Infrastructure
+
+- root 与 `@expcat/tigercat-core`、`@expcat/tigercat-react`、`@expcat/tigercat-vue`、`@expcat/tigercat-cli` 统一规划为 `2.0.0`。
+- 同步 core / React / Vue 运行时 `version` 导出、CLI `CLI_VERSION`、CLI 模板中的 Tigercat 依赖范围，以及示例首页展示版本。
+- `scripts/sync-version.mjs` 不再写入旧版 Roadmap 发布表格字段，避免当前 Rxx 路线图结构下的版本同步脚本在最后一步失败。
+- core / React / Vue 构建统一为 ESM-only，不再生成 CJS 产物；core package exports 移除 `require` 条件和 `.cjs` 目标。
+- React / Vue package exports 移除 `./*` 通配入口，改为由 `scripts/lib/public-components.mjs` 事实源生成的 148 个 PascalCase 显式组件子路径；`exports:check` 与 `release:check` 会阻止清单漂移。
+- `release:check` 和 `publish:check` 增加 ESM-only 断言，发布 smoke 使用临时安装目录中的 bare ESM import 验证包入口，并阻止 `.cjs` 文件混入 tarball 或安装产物。
+
 ## v1.5.0
 
 本版本汇总 v1.4.0 记录之后截至 2026-06-28 的主分支变更，重点标出升级后使用者需要留意的属性、行为与迁移点。

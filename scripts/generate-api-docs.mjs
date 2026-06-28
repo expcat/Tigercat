@@ -21,6 +21,7 @@ import {
   CATEGORY_SLUGS,
   buildPublicComponentEntries,
   formatComponentIndexType,
+  getComponentPackageSubpath,
   loadPublicComponentExports,
   propsToPublicComponents
 } from './lib/public-components.mjs'
@@ -527,12 +528,14 @@ function generateComponentIndex(componentRows) {
   markdownText += '- Examples：在 `examples/{cat}.md` 内找 `## {Component}` 段或同名片段。\n'
   markdownText +=
     '- 类型源码：`packages/core/src/types/` + Type 列；个别跨包组件（如 ConfigProvider）以各框架包内同名文件为准，详见其 props 段。\n\n'
-  markdownText += '| Component | Category | Type |\n'
-  markdownText += '| --------- | -------- | ---- |\n'
+  markdownText +=
+    '- Package subpath：React/Vue 均使用 PascalCase 显式入口，例如 `@expcat/tigercat-react/Button` 或 `@expcat/tigercat-vue/Button`。\n\n'
+  markdownText += '| Component | Category | Type | Package Subpath |\n'
+  markdownText += '| --------- | -------- | ---- | --------------- |\n'
 
   for (const row of componentRows) {
     const typeFile = formatComponentIndexType(row.typeSource)
-    markdownText += `| ${row.component} | ${row.category} | ${typeFile} |\n`
+    markdownText += `| ${row.component} | ${row.category} | ${typeFile} | ${getComponentPackageSubpath(row.component)} |\n`
   }
 
   return markdownText

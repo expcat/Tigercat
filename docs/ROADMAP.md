@@ -15,23 +15,47 @@ source: current repository state after v1.5.0 roadmap closure
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
+## 阶段进度
+
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）与阶段 1（R02 version and release metadata、R03 ESM-only build surface），已完成于 2026-06-28。
+- 当前阶段：阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects），状态为 `进行中`；R04 已完成于 2026-06-28。
+- 当前可执行任务：R05。R04 已建立显式 exports 与公开组件事实源，R05 可继续调整 tree-shaking/sideEffects。
+- 阶段 3-4 暂未开始；必须等各自前置阶段满足依赖后再认领。
+
 ## 执行原则
 
 - 每个任务独立执行并单独更新状态；不要把未声明的源码修复或新功能混入相邻任务。
 - v2.0.0 是破坏性版本，不新增 `@deprecated` 过渡层，不保留向后兼容分支。
 - 生成产物只能通过修改事实源或生成器后重生成；不得手改 `skills/tigercat/references/*`、`api-reports/*` 或发布快照来掩盖漂移。
 - 涉及公共 API、package exports、版本、发布产物或 size budget 的任务必须同步更新迁移说明、变更记录、API baseline 和对应门禁。
+- 完成任一 Rxx 后，必须同步更新该任务状态、所属阶段状态、完成日期和关键验证命令；未更新状态视为任务未完成。
 - 后续 v2 新功能从 R10 起追加，不插入 R01-R09 中间，避免破坏已分配批次和依赖顺序。
+
+## 状态回写要求
+
+完成任一任务后，必须同时更新以下位置：
+
+- `阶段进度`：更新当前已完成阶段、下一阶段、当前可执行任务和后续阶段说明。
+- `阶段与依赖`：更新所属阶段的 `阶段状态`；若阶段内任务部分完成则标为 `进行中`，全部完成则标为 `已完成（日期）`。
+- 对应 `Rxx` 任务条目：更新 `状态`、完成日期、关键执行摘要；必要时补充实际验证命令和剩余发布后验证。
+- `路线图维护验证`：如新增或调整文档维护命令，必须同步更新本节。
 
 ## 阶段与依赖
 
-| 阶段 | 任务    | 执行规则                                                              |
-| ---- | ------- | --------------------------------------------------------------------- |
-| 0    | R01     | 只做路线图清理；为后续 v2 任务建立边界                                |
-| 1    | R02-R03 | 先稳定版本与 release metadata，再切换 ESM-only 发布面                 |
-| 2    | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
-| 3    | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
-| 4    | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
+| 阶段 | 阶段状态             | 任务    | 执行规则                                                              |
+| ---- | -------------------- | ------- | --------------------------------------------------------------------- |
+| 0    | 已完成（2026-06-28） | R01     | 只做路线图清理；为后续 v2 任务建立边界                                |
+| 1    | 已完成（2026-06-28） | R02-R03 | 先稳定版本与 release metadata，再切换 ESM-only 发布面                 |
+| 2    | 进行中               | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
+| 3    | 未开始               | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
+| 4    | 未开始               | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
+
+阶段状态规则：
+
+- 阶段内所有任务均为 `未开始` 时，阶段状态为 `未开始`。
+- 阶段内任一任务为 `进行中`，或已有部分任务完成但阶段未全完成时，阶段状态为 `进行中`。
+- 阶段内所有任务均为 `已完成（日期）`，且验证命令已记录时，阶段状态为 `已完成（日期）`。
+- 任务遇到无法继续的外部阻塞时，任务与阶段状态都必须标为 `阻塞`，并在对应任务的 `依赖/阻塞` 中写明阻塞原因。
 
 ## v2.0.0 任务队列
 
@@ -53,11 +77,11 @@ source: current repository state after v1.5.0 roadmap closure
 - `git diff --check -- docs/ROADMAP.md`
 - `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md`
 
-**状态更新要求**：保持本任务为已完成，并记录执行日期与通过的文档验证命令。
+**状态更新要求**：保持本任务为已完成，并记录执行日期与通过的文档验证命令；所属阶段 0 必须保持 `已完成（2026-06-28）`。
 
 ### R02 version and release metadata
 
-**状态**：未开始。
+**状态**：已完成（2026-06-28）。
 
 **目标**：将 root 与 `@expcat/tigercat-core`、`@expcat/tigercat-react`、`@expcat/tigercat-vue`、`@expcat/tigercat-cli` 规划为 `2.0.0`，同步运行时 `version`、release-readiness 断言和发布文档入口。
 
@@ -74,11 +98,22 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm api:validate`
 - `git diff --check`
 
-**状态更新要求**：完成后写回状态、日期、版本同步范围和关键验证命令。
+**执行摘要**：已将 root package、core/react/vue/cli package、core/react/vue 运行时 `version`、CLI `CLI_VERSION`、CLI 模板 Tigercat 依赖范围和示例首页展示版本同步到 `2.0.0`；`scripts/sync-version.mjs` 已移除旧 Roadmap 发布表格替换逻辑；`CHANGELOG.md`、`docs/MIGRATION.md` 与 release reference 已新增 v2.0.0 发布入口。
+
+**实际验证**：
+
+- `corepack pnpm release:check`
+- `corepack pnpm types:check`
+- `corepack pnpm api:validate`
+- `corepack pnpm prettier --check docs/ROADMAP.md CHANGELOG.md docs/MIGRATION.md skills/tigercat/references/release.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md CHANGELOG.md docs/MIGRATION.md skills/tigercat/references/release.md`
+- `git diff --check`
+
+**状态更新要求**：完成后写回状态、日期、版本同步范围和关键验证命令；同步更新阶段 1 状态。
 
 ### R03 ESM-only build surface
 
-**状态**：未开始。
+**状态**：已完成（2026-06-28）。
 
 **目标**：移除 CJS 产物和 `require` exports，统一为 ESM-only 发布面，减少构建与发布产物复杂度。
 
@@ -95,11 +130,24 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm release:check`
 - `corepack pnpm types:check`
 
-**状态更新要求**：完成后写回状态、日期、被删除的 CJS 表面和关键验证命令。
+**执行摘要**：已将 core/react/vue `tsup` 输出切换为 ESM-only，保留 CLI 既有 ESM-only 构建；已移除 core package exports 的 `require` 条件和 `.cjs` 目标，React/Vue root 与通配 exports、sideEffects 策略和组件清单保持不变；`release:check` 和 `publish:check` 已增加 ESM-only 断言，发布 smoke 改为从临时安装目录发起 bare ESM import，并检查 tarball 与安装产物不包含 `.cjs` 文件。
+
+**实际验证**：
+
+- `corepack pnpm build`
+- `corepack pnpm publish:check`
+- `corepack pnpm release:check`
+- `corepack pnpm types:check`
+- `corepack pnpm vitest run tests/core/cli.spec.ts`
+- `corepack pnpm prettier --check docs/ROADMAP.md CHANGELOG.md docs/MIGRATION.md skills/tigercat/references/release.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md CHANGELOG.md docs/MIGRATION.md skills/tigercat/references/release.md`
+- `git diff --check`
+
+**状态更新要求**：完成后写回状态、日期、被删除的 CJS 表面和关键验证命令；同步更新阶段 1 状态。
 
 ### R04 explicit exports and public component facts
 
-**状态**：未开始。
+**状态**：已完成（2026-06-28）。
 
 **目标**：将 React/Vue 的 `./*` 通配 exports 改为由公开组件事实源生成的显式子路径 exports，并补齐 core 必要子路径导出。
 
@@ -117,7 +165,23 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm api:baseline:check`
 - `corepack pnpm release:check`
 
-**状态更新要求**：完成后写回状态、日期、显式 exports 事实源位置和关键验证命令。
+**执行摘要**：已将 `scripts/lib/public-components.mjs` 扩展为公开组件事实源，生成 React/Vue 148 个 PascalCase 显式 component 子路径并移除 `./*` 通配 exports；新增 `scripts/sync-package-exports.mjs`、`exports:sync` 与 `exports:check`，release readiness 会校验 React/Vue 显式子路径、core 必要子路径和事实源漂移；API docs 与 public API baseline 已记录 component package subpath facts。
+
+**实际验证**：
+
+- `node ./scripts/sync-package-exports.mjs`
+- `node ./scripts/generate-api-docs.mjs`
+- `node ./scripts/generate-api-baseline.mjs`
+- `npx -y pnpm@11.9.0 vitest run tests/core/package-exports.spec.ts`
+- `node ./scripts/sync-package-exports.mjs --check`
+- `node ./scripts/validate-api.mjs`
+- `node ./scripts/check-public-types.mjs`
+- `node ./scripts/check-release-readiness.mjs`
+- `npx -y pnpm@11.9.0 build`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md CHANGELOG.md docs/MIGRATION.md package.json packages/react/package.json packages/vue/package.json scripts/check-release-readiness.mjs scripts/generate-api-baseline.mjs scripts/generate-api-docs.mjs scripts/lib/public-components.mjs scripts/sync-package-exports.mjs scripts/validate-api.mjs tests/core/package-exports.spec.ts api-reports/public-api-baseline.json skills/tigercat/references/component-index.md`
+- `git diff --check`
+
+**状态更新要求**：完成后写回状态、日期、显式 exports 事实源位置和关键验证命令；同步更新阶段 2 状态。
 
 ### R05 tree-shaking and sideEffects
 
@@ -139,7 +203,7 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm publish:check`
 - `corepack pnpm api:validate`
 
-**状态更新要求**：完成后写回状态、日期、副作用 allowlist 策略和关键验证命令。
+**状态更新要求**：完成后写回状态、日期、副作用 allowlist 策略和关键验证命令；同步更新阶段 2 状态。
 
 ### R06 remove deprecated and compatibility APIs
 
@@ -161,7 +225,7 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm api:baseline:check`
 - 受影响组件目标 spec
 
-**状态更新要求**：完成后写回状态、日期、删除的兼容面摘要和关键验证命令。
+**状态更新要求**：完成后写回状态、日期、删除的兼容面摘要和关键验证命令；同步更新阶段 3 状态。
 
 ### R07 token and legacy asset cleanup
 
@@ -183,7 +247,7 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm api:validate`
 - `corepack pnpm size`
 
-**状态更新要求**：完成后写回状态、日期、删除的 legacy 资源类型和关键验证命令。
+**状态更新要求**：完成后写回状态、日期、删除的 legacy 资源类型和关键验证命令；同步更新阶段 3 状态。
 
 ### R08 on-demand usage docs and examples
 
@@ -205,7 +269,7 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm example:ssr:check`
 - `corepack pnpm prettier --check docs skills examples`
 
-**状态更新要求**：完成后写回状态、日期、迁移后的使用面范围和关键验证命令。
+**状态更新要求**：完成后写回状态、日期、迁移后的使用面范围和关键验证命令；同步更新阶段 4 状态。
 
 ### R09 size and publish artifact gates
 
@@ -227,11 +291,11 @@ source: current repository state after v1.5.0 roadmap closure
 - `corepack pnpm quality:release`
 - `corepack pnpm smoke:published`（发布后执行）
 
-**状态更新要求**：完成后写回状态、日期、关键 size/publish 阈值和验证命令；若 `smoke:published` 尚未发布后执行，应明确标记为发布后待跑。
+**状态更新要求**：完成后写回状态、日期、关键 size/publish 阈值和验证命令；若 `smoke:published` 尚未发布后执行，应明确标记为发布后待跑；同步更新阶段 4 状态。
 
 ### 后续 v2 功能入口
 
-后续 v2 新功能从 R10 起追加。新增任务必须声明状态、目标、允许修改、不得修改、依赖/阻塞、完成验证和状态更新要求；不得插入 R01-R09 中间，也不得改变既有阶段依赖。
+后续 v2 新功能从 R10 起追加。新增任务必须声明状态、目标、允许修改、不得修改、依赖/阻塞、完成验证和状态更新要求，并在阶段表中新增或更新对应阶段状态；不得插入 R01-R09 中间，也不得改变既有阶段依赖。
 
 ## 路线图维护验证
 

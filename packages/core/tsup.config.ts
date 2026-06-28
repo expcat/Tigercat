@@ -40,7 +40,7 @@ export default defineConfig({
     ...datePickerLocaleEntries,
     ...iconEntries
   },
-  format: ['cjs', 'esm'],
+  format: ['esm'],
   dts: true,
   clean: true,
   sourcemap: false,

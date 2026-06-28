@@ -1,5 +1,5 @@
 export const CLI_NAME = 'tigercat'
-export const CLI_VERSION = '1.5.0'
+export const CLI_VERSION = '2.0.0'
 
 export const TEMPLATES = ['vue3', 'react'] as const
 export type TemplateName = (typeof TEMPLATES)[number]
@@ -12,7 +12,7 @@ export type TemplateName = (typeof TEMPLATES)[number]
  */
 export const TEMPLATE_VERSIONS = {
   // Tigercat packages (use caret on latest major)
-  tigercat: '^1.5.0',
+  tigercat: '^2.0.0',
 
   // Frameworks
   vue: '^3.5.38',

@@ -7,10 +7,11 @@ import {
   mkdtempSync,
   mkdirSync,
   readFileSync,
+  readdirSync,
   rmSync,
+  statSync,
   writeFileSync
 } from 'node:fs'
-import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -24,6 +25,7 @@ const version = getRootVersion(rootDir)
 const tempDir = mkdtempSync(path.join(tmpdir(), 'tigercat-publish-check-'))
 const tarballsDir = path.join(tempDir, 'tarballs')
 const examplesDir = path.join(tempDir, 'examples')
+let esmImportCounter = 0
 const npmEnvSuffixesToStrip = new Set([
   'catalog',
   'npm-globalconfig',
@@ -157,7 +159,30 @@ function packPackage(packageDir, destinationDir) {
     throw new Error(`Packed tarball missing: ${tarballPath}`)
   }
 
+  assertTarballHasNoCjsArtifacts(tarballPath)
   return tarballPath
+}
+
+function assertTarballHasNoCjsArtifacts(tarballPath) {
+  const result = spawnSync('tar', ['-tf', tarballPath], {
+    encoding: 'utf8',
+    shell: process.platform === 'win32'
+  })
+
+  if (result.status !== 0) {
+    throw new Error(result.stderr || `Could not inspect tarball ${tarballPath}`)
+  }
+
+  const cjsEntries = result.stdout
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.endsWith('.cjs'))
+
+  if (cjsEntries.length > 0) {
+    throw new Error(
+      `${path.basename(tarballPath)} must not include CJS artifacts: ${cjsEntries.join(', ')}`
+    )
+  }
 }
 
 function smokeExamples(tarballs) {
@@ -457,14 +482,15 @@ async function runPublishedPackageSmoke({
 }
 
 async function verifyInstalledPackages(tempDir, version) {
-  const requireFromTemp = createRequire(path.join(tempDir, 'package.json'))
-  const core = await importFromTemp(requireFromTemp, '@expcat/tigercat-core')
-  const vue = await importFromTemp(requireFromTemp, 'vue')
-  const vueServer = await importFromTemp(requireFromTemp, '@vue/server-renderer')
-  const vueLib = await importFromTemp(requireFromTemp, '@expcat/tigercat-vue')
-  const react = await importFromTemp(requireFromTemp, 'react')
-  const reactServer = await importFromTemp(requireFromTemp, 'react-dom/server')
-  const reactLib = await importFromTemp(requireFromTemp, '@expcat/tigercat-react')
+  assertInstalledPackagesHaveNoCjsArtifacts(tempDir)
+
+  const core = await importFromTemp(tempDir, '@expcat/tigercat-core')
+  const vue = await importFromTemp(tempDir, 'vue')
+  const vueServer = await importFromTemp(tempDir, '@vue/server-renderer')
+  const vueLib = await importFromTemp(tempDir, '@expcat/tigercat-vue')
+  const react = await importFromTemp(tempDir, 'react')
+  const reactServer = await importFromTemp(tempDir, 'react-dom/server')
+  const reactLib = await importFromTemp(tempDir, '@expcat/tigercat-react')
 
   if (typeof core.createTigercatPlugin !== 'function') {
     throw new Error('core export createTigercatPlugin is missing')
@@ -506,9 +532,50 @@ function toPortablePath(filePath) {
   return filePath.split(path.sep).join('/')
 }
 
-async function importFromTemp(requireFromTemp, specifier) {
-  const resolved = requireFromTemp.resolve(specifier)
-  return import(pathToFileURL(resolved).href)
+function assertInstalledPackagesHaveNoCjsArtifacts(tempDir) {
+  const packageRoot = path.join(tempDir, 'node_modules', '@expcat')
+  const cjsFiles = []
+
+  for (const packageName of ['tigercat-core', 'tigercat-vue', 'tigercat-react', 'tigercat-cli']) {
+    const packageDir = path.join(packageRoot, packageName)
+    if (!existsSync(packageDir)) continue
+
+    for (const filePath of walkFiles(packageDir)) {
+      if (filePath.endsWith('.cjs')) {
+        cjsFiles.push(path.relative(tempDir, filePath))
+      }
+    }
+  }
+
+  if (cjsFiles.length > 0) {
+    throw new Error(
+      `Installed Tigercat packages must not include CJS artifacts: ${cjsFiles.join(', ')}`
+    )
+  }
+}
+
+function walkFiles(dir) {
+  const files = []
+  for (const entry of readdirSync(dir)) {
+    const entryPath = path.join(dir, entry)
+    const stats = statSync(entryPath)
+    if (stats.isDirectory()) {
+      files.push(...walkFiles(entryPath))
+    } else if (stats.isFile()) {
+      files.push(entryPath)
+    }
+  }
+  return files
+}
+
+async function importFromTemp(tempDir, specifier) {
+  const modulePath = path.join(tempDir, `.tigercat-esm-import-${esmImportCounter++}.mjs`)
+  writeFileSync(
+    modulePath,
+    `import * as namespace from ${JSON.stringify(specifier)};\nexport default namespace;\n`
+  )
+  const imported = await import(pathToFileURL(modulePath).href)
+  return imported.default
 }
 
 function createCommandEnv(command, extraEnv = {}) {

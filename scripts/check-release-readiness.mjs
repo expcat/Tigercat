@@ -3,6 +3,11 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
+import {
+  REQUIRED_CORE_PACKAGE_EXPORTS,
+  buildFrameworkPackageExports,
+  loadPublicComponentExports
+} from './lib/public-components.mjs'
 import { readText as readFileText } from './utils/files.mjs'
 
 const root = join(import.meta.dirname, '..')
@@ -36,6 +41,10 @@ function check(condition, message) {
   if (!condition) errors.push(message)
 }
 
+function stringify(value) {
+  return JSON.stringify(value, null, 2)
+}
+
 function checkPackageVersions(packages) {
   const versions = new Set(Object.values(packages).map((pkg) => pkg.version))
   check(versions.size === 1, `package versions are not aligned: ${[...versions].join(', ')}`)
@@ -58,26 +67,83 @@ function checkSourceVersions(expectedVersion) {
 
 function checkPackageExports(packages) {
   const coreExports = packages.core.exports ?? {}
-  const requiredCoreExports = [
-    '.',
-    './tailwind',
-    './tailwind/modern',
-    './tokens.css',
-    './figma-variables.json'
-  ]
 
-  for (const exportName of requiredCoreExports) {
+  for (const exportName of REQUIRED_CORE_PACKAGE_EXPORTS) {
     check(exportName in coreExports, `@expcat/tigercat-core missing export ${exportName}`)
   }
+
+  const publicComponents = loadPublicComponentExports(root)
 
   for (const packageName of ['vue', 'react']) {
     const packageExports = packages[packageName].exports ?? {}
     check('.' in packageExports, `@expcat/tigercat-${packageName} missing root export`)
     check(
-      `./*` in packageExports,
-      `@expcat/tigercat-${packageName} missing component subpath export`
+      !('./*' in packageExports),
+      `@expcat/tigercat-${packageName} must use explicit component subpath exports`
     )
+
+    const expectedExports = buildFrameworkPackageExports(publicComponents[packageName])
+    const actualKeys = new Set(Object.keys(packageExports))
+    const expectedKeys = new Set(Object.keys(expectedExports))
+
+    for (const exportName of expectedKeys) {
+      check(
+        actualKeys.has(exportName),
+        `@expcat/tigercat-${packageName} missing export ${exportName}`
+      )
+    }
+
+    for (const exportName of actualKeys) {
+      check(
+        expectedKeys.has(exportName),
+        `@expcat/tigercat-${packageName} has unexpected export ${exportName}`
+      )
+    }
+
+    for (const exportName of expectedKeys) {
+      if (!actualKeys.has(exportName)) continue
+      check(
+        stringify(packageExports[exportName]) === stringify(expectedExports[exportName]),
+        `@expcat/tigercat-${packageName} export ${exportName} is not synced with public component facts`
+      )
+    }
   }
+}
+
+function checkEsmOnlyPackageSurface(packages) {
+  for (const [packageName, packageInfo] of Object.entries(packages)) {
+    const surface = {
+      main: packageInfo.main,
+      module: packageInfo.module,
+      exports: packageInfo.exports
+    }
+    const issues = collectNonEsmSurfaceIssues(surface)
+
+    for (const issue of issues) {
+      check(false, `@expcat/tigercat-${packageName} must be ESM-only: ${issue}`)
+    }
+  }
+}
+
+function collectNonEsmSurfaceIssues(value, path = 'package') {
+  if (typeof value === 'string') {
+    return value.endsWith('.cjs') ? [`${path} points to ${value}`] : []
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return []
+  }
+
+  const issues = []
+  for (const [key, nestedValue] of Object.entries(value)) {
+    const nextPath = `${path}.${key}`
+    if (key === 'require') {
+      issues.push(`${nextPath} is a require condition`)
+    }
+    issues.push(...collectNonEsmSurfaceIssues(nestedValue, nextPath))
+  }
+
+  return issues
 }
 
 function checkPackageRepositoryMetadata(packages) {
@@ -105,6 +171,7 @@ function checkRootScripts() {
     'quality:release',
     'example:ssr:build',
     'docs:api',
+    'exports:check',
     'smoke:published'
   ]
 
@@ -118,6 +185,7 @@ function checkRootScripts() {
     'quality:quick',
     'test:coverage',
     'api:baseline:check',
+    'exports:check',
     'docs:api:check',
     'quality:size',
     'test:validate',
@@ -239,6 +307,7 @@ const expectedVersion = checkPackageVersions(packages)
 
 checkSourceVersions(expectedVersion)
 checkPackageExports(packages)
+checkEsmOnlyPackageSurface(packages)
 checkPackageRepositoryMetadata(packages)
 checkRootScripts()
 checkRootVersion(expectedVersion)

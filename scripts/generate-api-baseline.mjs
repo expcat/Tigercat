@@ -26,7 +26,10 @@ import { readFileSync, readdirSync, writeFileSync, existsSync, statSync, mkdirSy
 import { join, relative } from 'path'
 import { fileURLToPath } from 'url'
 import prettier from 'prettier'
-import { loadPublicComponentExports } from './lib/public-components.mjs'
+import {
+  buildFrameworkPackageSubpathFacts,
+  loadPublicComponentExports
+} from './lib/public-components.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -209,10 +212,12 @@ const snapshot = sortKeys({
   core: { exports: uniqSorted(coreExportNames) },
   vue: {
     components: publicComponentExports.vue,
+    componentSubpaths: buildFrameworkPackageSubpathFacts(publicComponentExports.vue),
     exports: uniqSorted(extractExportNames(vueIndex))
   },
   react: {
     components: publicComponentExports.react,
+    componentSubpaths: buildFrameworkPackageSubpathFacts(publicComponentExports.react),
     exports: uniqSorted(extractExportNames(reactIndex))
   }
 })
