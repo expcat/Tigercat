@@ -72,7 +72,7 @@ const getNextInstanceId = createInstanceCounter()
 
 export interface VueMessageContainerProps {
   position?: MessagePosition
-  messages?: InternalMessageInstance[]
+  messages?: MessageInstance[]
 }
 
 /** Options accepted by the Vue global Message API. */
@@ -89,7 +89,7 @@ export const MessageContainer = defineComponent({
       default: 'top' as MessagePosition
     },
     messages: {
-      type: Array as PropType<InternalMessageInstance[]>,
+      type: Array as PropType<MessageInstance[]>,
       default: () => []
     }
   },
@@ -236,7 +236,7 @@ function ensureContainer() {
 function addMessage(config: MessageConfig): () => void {
   const id = getNextInstanceId()
 
-  const instance: MessageInstance = {
+  const instance: InternalMessageInstance = {
     id,
     type: config.type || 'info',
     content: config.content,

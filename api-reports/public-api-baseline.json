@@ -644,6 +644,8 @@
       "defaultTagThemeColors",
       "defaultTheme",
       "defaultThemeColors",
+      "defaultThemeDarkColors",
+      "defaultThemeLightColors",
       "defaultToolbar",
       "defaultTooltipFormatter",
       "defaultTotalText",

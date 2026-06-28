@@ -47,9 +47,10 @@ Events/callback props: `onClose?`.
 
 `packages/react/src/components/Message.tsx and packages/vue/src/components/Message.ts` · `MessageContainerProps / VueMessageContainerProps`
 
-| Prop        | Type              | Default | Notes |
-| ----------- | ----------------- | ------- | ----- |
-| `position?` | `MessagePosition` | `-`     | -     |
+| Prop        | Type                | Default | Notes |
+| ----------- | ------------------- | ------- | ----- |
+| `position?` | `MessagePosition`   | `-`     | -     |
+| `messages?` | `MessageInstance[]` | `-`     | -     |
 
 ## Modal
 

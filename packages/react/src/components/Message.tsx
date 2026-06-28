@@ -57,7 +57,7 @@ const getNextInstanceId = createInstanceCounter()
  * Single message item component
  */
 interface MessageItemProps {
-  message: InternalMessageInstance
+  message: MessageInstance
   onClose: (id: string | number) => void
 }
 
@@ -127,7 +127,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
  */
 export interface MessageContainerProps {
   position?: MessagePosition
-  messages?: InternalMessageInstance[]
+  messages?: MessageInstance[]
 }
 
 /** Options accepted by the React global Message API. */
@@ -227,7 +227,7 @@ function ensureContainer() {
 function addMessage(config: MessageConfig): () => void {
   const id = getNextInstanceId()
 
-  const instance: MessageInstance = {
+  const instance: InternalMessageInstance = {
     id,
     type: config.type || 'info',
     content: config.content,
