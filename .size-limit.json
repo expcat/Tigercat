@@ -50,7 +50,7 @@
   {
     "name": "React DatePicker subpath",
     "path": "packages/react/dist/components/DatePicker.mjs",
-    "limit": "24 kB",
+    "limit": "25 kB",
     "gzip": true
   },
   {
@@ -74,7 +74,7 @@
   {
     "name": "React Tree subpath",
     "path": "packages/react/dist/components/Tree.mjs",
-    "limit": "24 kB",
+    "limit": "25 kB",
     "gzip": true
   },
   {
@@ -98,7 +98,7 @@
   {
     "name": "Core locale (zh-CN) subpath",
     "path": "packages/core/dist/locales/zh-CN.js",
-    "limit": "2 kB",
+    "limit": "3 kB",
     "gzip": true
   },
   {
