@@ -2,6 +2,51 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## Unreleased
+
+本段汇总 v1.4.0 记录之后截至 2026-06-28 的主分支变更，重点标出升级后使用者需要留意的属性、行为与迁移点。
+
+### Upgrade Notes
+
+- **开发/发布环境要求提高**：根工程 `packageManager` 更新为 `pnpm@11.9.0`，`engines` 更新为 Node `>=22.13.0`、pnpm `>=11.9.0`。本地开发、示例构建和发布检查请先升级工具链。
+- **Result 工具函数迁移建议**：`getResultHttpLabel(status)` 标记为弃用；新代码请改用 `isHttpResultStatus(status)` 判断 HTTP 状态，再按需直接使用原始 `status`。旧函数仍保留，现有导入不会立即失效。
+- **Message 类型导出修正**：React `MessageProps` / Vue `VueMessageProps` 现在表示命令式 Message API 接受的 `MessageOptions`；容器组件 props 保持为单独的 `MessageContainerProps` / `VueMessageContainerProps`。如果业务侧曾把容器 props 当作全局 `message.*()` 配置类型使用，请改用新的容器 props 名称。
+
+### Added
+
+- **Locale 命名空间继续扩展**：`TigerLocale` 新增 `empty`、`tour`、`calendar`、`fileManager`、`imageViewer`、`imageEditor`、`status`、`qrcode`、`timeline` 等文案段，并补齐 en-US / zh-CN 及 13 个 locale preset 中的相关默认文案。新增 core helpers / 常量包括 `getTourLabels`、`getCalendarLabels`、`getFileManagerLabels`、`getImageViewerLabels`、`getImageEditorLabels`、`getStatusLabels`、`DEFAULT_*_LABELS` 与 `ZH_CN_*_LABELS`。
+- **更多组件支持 `locale` 覆盖**：`AutoComplete`、`Badge`、`Calendar`、`CropUpload` / `ImageCropper`、`Empty`、`FileManager`、`ImageAnnotation`、`ImagePreview`、`ImageViewer`、`Loading`、`Tag` 等双端组件新增可选 `locale` prop，解析顺序为显式 prop / 组件 locale / ConfigProvider locale / 英文 fallback。
+- **Calendar 受控能力补齐**：React `Calendar` 新增 `value`、`onChange`、`onPanelChange` 与 `locale`；Vue 侧对应行为通过既有 emits / `v-model` 对齐。
+- **DataTableWithToolbar 工具栏能力补齐**：新增/公开 `onSearchChange`、`onSearch`、`onFiltersChange`、`onBulkAction`、`selectedKeys`、`tableClassName` 等属性，并把 toolbar 回调、搜索、筛选、批量操作和表格 class 传递纳入公开契约。
+- **FileManager 受控与拖拽回调补齐**：新增 `onCurrentPathChange`、`onNavigate`、`onOpen`、`onSelect`、`onSelectedKeysChange`、`onSearchTextChange`、`onReorder` 等回调，支持选择、路径、搜索与重排状态外置。
+- **VirtualTable 横向虚拟化与行定制**：新增 `width`、`virtualizeColumns`、`rowClassName`，core 新增 `calculateVirtualColumnRange` / `TableVirtualWindow` 等工具，用于大列数表格的横向窗口化渲染。
+- **图表与编辑器能力补齐**：`GaugeChart` 新增 `tooltipFormatter`；`RichTextEditor` 的 `mode` 现在传入底层 engine；`CodeEditor` 新增 active-line 相关 core class/helper；图表 tooltip、downsample、Donut 入场动画等 core helper 纳入公开导出。
+- **主题与 token 检查能力**：core 新增 `defaultThemeLightColors` / `defaultThemeDarkColors`、`THEME_CONFIG_CSS_VARS`、`themeConfigToCssVars`，Tailwind 默认主题变量改由默认主题色派生；新增 `pnpm tokens:check` 检查生成产物是否过期。
+
+### Changed
+
+- **DatePicker 文案来源收敛**：DatePicker labels 统一以 `datepicker-locales/*` preset 作为来源，`getDatePickerLabels(string)` 支持内置 13 个 locale id，未知 locale 自动回退 `en-US`。
+- **公开但此前未完整生效的 props 落地**：Select、Table、VirtualTable、VirtualList、Kanban、RichTextEditor、图表、FileManager、Transfer、AutoComplete、Slider、Splitter、CodeEditor、ChatWindow、CropUpload、Cascader、FloatButton、Steps、Tabs、Calendar、InputNumber、CommentThread、DataTableWithToolbar 等组件完成“已声明/已透传但运行时未完全承接”的属性实现与双端对齐。
+- **可访问性与键盘交互收敛**：Table / VirtualTable 行选择、展开行、筛选/导出控件、Tabs 关闭按钮、Rate、Segmented、Resizable、ImageAnnotation、Calendar、ChartLegend 等补齐 ARIA、键盘激活或可访问名称；折叠/交互场景更接近真实控件语义。
+- **InputGroup 尺寸继承补齐**：React / Vue `InputNumber` 现在会继承 `InputGroup` size；Vue `InputNumber` 同时补齐 `defaultValue` 与 `className`。
+- **质量脚本收敛**：`quality:ssr` 改走 `scripts/check-ssr-examples.mjs`，新增 `e2e` / `e2e:smoke` 脚本；CLI / 发布 / 校验脚本复用 `scripts/utils/files.mjs`、`scripts/utils/strings.mjs` 与 CLI `utils/exec.ts`。
+
+### Fixed
+
+- 修复 **MarkdownEditor** 空预览态把 `placeholder` 直接写入 `innerHTML` 的 XSS 风险：空态占位文案现在作为文本节点渲染，非空预览仍经 `sanitizeHtml`。
+- 修复 **Message** 多位置渲染与类型契约：全局消息按 `top` / `top-left` / `top-right` / `bottom` / `bottom-left` / `bottom-right` 分组渲染，导出的 API options 类型不再与容器 props 混淆。
+- 修复 **BackTop** 默认 `target` 在 SSR / 非浏览器环境直接访问 `window` 的问题。
+- 修复 **Modal** 关闭回调顺序，避免受控关闭、确认、取消路径中 `onClose` / `onOpenChange` 语义混乱或重复触发。
+- 修复 **TimePicker** 在存在秒值与 `minTime` / `maxTime` 时的禁用判断，秒列现在参与范围校验。
+- 修复 **Form** 动态字段、reset、undo/redo 等路径中的内部值同步问题，减少受控 model 与内部 ref 脱节。
+- 修复 **Vue** Anchor / AvatarGroup / Breadcrumb / Dropdown / DatePicker 等组件在响应式上下文、快捷日期和事件透传上的边缘问题。
+
+### Infrastructure
+
+- 依赖与工具链更新：Playwright、ESLint、Vitest、happy-dom、jiti、Prettier 等开发依赖升级；workspace 从 pnpm 10 迁移到 pnpm 11。
+- API 基线生成与 release readiness 校验继续收敛，`api-reports/public-api-baseline.json` 纳入新增 locale/helper/props 契约，`skills/tigercat/references` 同步刷新到新的组件属性说明。
+- Roadmap 文档从扫描日志整理为执行队列，历史 `docs/ROADMAP_CHECK.md` 内容已合并进 `docs/ROADMAP.md` 后删除。
+
 ## v1.4.0
 
 本版本包含新增组件、表格列显隐、i18n 扩展、跨端逻辑收敛、发布门禁强化，以及需要迁移的 Breaking changes。迁移路径集中于 [迁移指南](docs/MIGRATION.md)。
