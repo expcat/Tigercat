@@ -67,8 +67,13 @@ function main() {
   }
 
   console.log(`Running ${files.length} ${group} test file(s)...`)
-  const result = spawnSync('corepack', ['pnpm', 'vitest', 'run', ...files], {
-    shell: PNPM_SHELL,
+  const pnpmExecPath = process.env.npm_execpath
+  const command = pnpmExecPath ? process.execPath : 'pnpm'
+  const pnpmArgs = pnpmExecPath
+    ? [pnpmExecPath, 'vitest', 'run', ...files]
+    : ['vitest', 'run', ...files]
+  const result = spawnSync(command, pnpmArgs, {
+    shell: pnpmExecPath ? false : PNPM_SHELL,
     stdio: 'inherit'
   })
   process.exit(result.status ?? 1)

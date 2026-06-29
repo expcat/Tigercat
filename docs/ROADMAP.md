@@ -4,23 +4,23 @@
 type: active-roadmap
 scope: v2.0.0 breaking component API simplification and grouped validation plan
 verified-date: 2026-06-29
-source: current repository state after R01-R10 v2.0.0 infrastructure completion
+source: current repository state after R01-R11 v2.0.0 API audit completion
 -->
 
 本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；需要历史证据时从 git 历史、变更日志或对应提交中查找。
 
 ## 当前状态
 
-截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R10 基础设施阶段：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy 资源清理和按组件组验证通道已经落地。v2.0.0 尚未完成发布前组件级破坏性升级；R11-R20 是 v2.0.0 发布前剩余任务。
+截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R11 基础设施与 API 审计阶段：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy 资源清理、按组件组验证通道和 core/shared contracts 删除合并清单已经落地。v2.0.0 尚未完成发布前组件级破坏性升级；R12-R20 是 v2.0.0 发布前剩余任务。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）已完成于 2026-06-29。
-- 当前阶段：阶段 6（R11 Core API and shared contracts audit），状态为 `未开始`。
-- 当前可执行任务：R11 Core API and shared contracts audit。
-- 后续阶段：R12-R20 必须在 R11 完成后按阶段依赖执行；v2.0.0 只有 R20 完成并通过发布门禁后才算路线图完成。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）和阶段 6（R11 Core API and shared contracts audit）已完成于 2026-06-29。
+- 当前阶段：阶段 7（R12 Basic + Layout lightweight components），状态为 `未开始`。
+- 当前可执行任务：R12 Basic + Layout lightweight components。
+- 后续阶段：R13-R20 必须按阶段依赖执行；v2.0.0 只有 R20 完成并通过发布门禁后才算路线图完成。
 
 ## 执行原则
 
@@ -52,7 +52,7 @@ source: current repository state after R01-R10 v2.0.0 infrastructure completion
 | 3    | 已完成（2026-06-28） | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
 | 4    | 已完成（2026-06-28） | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
 | 5    | 已完成（2026-06-29） | R10     | 先建立按组件组可执行的测试、文档和示例维护通道                        |
-| 6    | 未开始               | R11     | 审计 core API 与 shared contracts，形成组件批次删除/合并清单          |
+| 6    | 已完成（2026-06-29） | R11     | 审计 core API 与 shared contracts，形成组件批次删除/合并清单          |
 | 7    | 未开始               | R12     | 清理 Basic + Layout 轻量展示组件                                      |
 | 8    | 未开始               | R13     | 清理 Feedback 与 overlay 组件                                         |
 | 9    | 未开始               | R14-R15 | 分两批清理 Form primitives 与 composite selectors                     |
@@ -444,7 +444,7 @@ source: current repository state after R01-R10 v2.0.0 infrastructure completion
 
 ### R11 Core API and shared contracts audit
 
-**状态**：未开始。
+**状态**：已完成（2026-06-29）。
 
 **目标**：审计 core types、utils、shared contracts，形成 R12-R20 可执行的删除/合并清单，避免组件批次各自临时决定公共 API 规则。
 
@@ -467,6 +467,33 @@ source: current repository state after R01-R10 v2.0.0 infrastructure completion
 - `corepack pnpm types:check`
 - `corepack pnpm api:baseline:check`
 - `git diff --check`
+
+**执行摘要**：已新增 `docs/V2_API_AUDIT.md` 作为 R11 审计输出，固定 v2 API 清理共享规则、R12-R20 每个组件批次的计划删除/合并项、唯一替代 API、证据路径和批次内待确认点。审计基于当前 `api-reports/public-api-baseline.json`（156 个 `*Props` 接口、2905 个 core exports、148 个 React/Vue 公开组件）以及 `scripts/validate-api.mjs` 现有 public deprecated、overlay open、controlled parity、Skill references 护栏；R11 未删除运行时 API、未修改 package exports、sideEffects 或 size budget。为让 R10 分组测试 runner 在无 `corepack` 的 Windows 环境继续可执行，`scripts/run-component-group-tests.mjs` 已改为优先复用当前 pnpm `npm_execpath`，否则再回退 PATH 中的 `pnpm`。
+
+**审计输出位置**：
+
+- `docs/V2_API_AUDIT.md`
+
+**R12-R20 清单更新范围**：
+
+- R12 Basic + Layout：轻量组件尺寸/布局别名、Carousel 受控索引模型和 class/style 透传。
+- R13 Feedback + Overlay：React `usePopup` 旧 visible 合约、overlay close/destroy/portal 命名和 R05 imperative sideEffects 边界。
+- R14-R15 Form：primitive 受控模型、等同 `ComponentSize` 的别名、选择器 value/search/filter/locale 与 picker/upload heavy helper 拆分。
+- R16 Navigation：active/selected/open/expanded 命名、子组件 subpath/re-export 策略和 search props。
+- R17 Data + Table：Table/VirtualTable/DataTableWithToolbar 的 data、selection、virtual、filter/sort/pagination 与 `GenericTable*` 合并边界。
+- R18 Charts：`chart.ts` 拆分、datum/series alias、tooltip visible/showTooltip 命名和 charts 隔离。
+- R19 Advanced + Media：editor/file/image/number-keyboard value/open/currentIndex 命名和 heavy runtime 隔离。
+- R20 Composite + Business：`composite.ts` 拆分、Kanban/TaskBoard alias、DataTableWithToolbar toolbar alias 和最终发布收口。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 test:group:core`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md scripts/run-component-group-tests.mjs`
+- `git diff --check`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/V2_API_AUDIT.md scripts/run-component-group-tests.mjs`
 
 **状态更新要求**：完成后写回状态、日期、审计输出位置、R12-R20 清单更新范围和关键验证命令；同步更新阶段 6 状态，并将当前可执行任务推进到 R12。
 
@@ -726,8 +753,8 @@ source: current repository state after R01-R10 v2.0.0 infrastructure completion
 
 ## 路线图维护验证
 
-- 文档整理后运行 `corepack pnpm prettier --check docs/ROADMAP.md`。
+- 文档整理后运行 `corepack pnpm prettier --check docs/ROADMAP.md`；R11 审计文档改动运行 `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md`。
 - 确认路线图仍包含 `type: active-roadmap`，避免 `release:check` 失效。
-- 文档类改动至少运行 `git diff --check -- docs/ROADMAP.md`。
-- 合并或重写路线图后运行 `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md`，确认没有冲突标记。
+- 文档类改动至少运行 `git diff --check -- docs/ROADMAP.md`；涉及 R11 审计输出时同时覆盖 `docs/V2_API_AUDIT.md`。
+- 合并或重写路线图后运行 `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md`；涉及 R11 审计输出时同时检查 `docs/V2_API_AUDIT.md`，确认没有冲突标记。
 - 如 `corepack pnpm docs:api:check` 命中 ambient pnpm engine mismatch，可改用 `npx -y pnpm@11.9.0 docs:api:check` 复跑同一门禁。
