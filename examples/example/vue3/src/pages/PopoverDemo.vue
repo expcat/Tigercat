@@ -28,7 +28,7 @@ const triggerSnippet = `<Popover trigger="click" title="点击触发" content="�
 <Popover trigger="focus" title="聚焦触发" content="聚焦触发气泡卡片">...</Popover>
 <Popover trigger="manual" title="手动触发" content="手动控制显示隐藏">...</Popover>`
 
-const controlledSnippet = `<Popover v-model:visible="visible1" title="受控气泡卡片" content="通过外部状态控制显示">...</Popover>`
+const controlledSnippet = `<Popover v-model:open="visible1" title="受控气泡卡片" content="通过外部状态控制显示">...</Popover>`
 
 const controlledScriptSnippet = `import { ref } from 'vue'
 
@@ -162,7 +162,7 @@ const customContentItems = [
           </Popover>
 
           <Popover
-            v-model:visible="manualVisible"
+            v-model:open="manualVisible"
             title="手动触发"
             content="手动控制显示隐藏"
             trigger="manual">
@@ -174,12 +174,12 @@ const customContentItems = [
 
     <DemoBlock
       title="受控模式"
-      description="通过 v-model:visible 控制气泡卡片的显示状态。"
+      description="通过 v-model:open 控制气泡卡片的显示状态。"
       :code="controlledSnippet"
       :script="controlledScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
-          <Popover v-model:visible="visible1" title="受控气泡卡片" content="通过外部状态控制显示">
+          <Popover v-model:open="visible1" title="受控气泡卡片" content="通过外部状态控制显示">
             <Button>受控气泡卡片</Button>
           </Popover>
 

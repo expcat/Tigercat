@@ -466,3 +466,37 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `git diff --check`
 
 **状态更新要求**：完成后已写回状态、日期、删除的 API 摘要、Skill/examples 更新范围、分组测试命令和关键验证命令；阶段 7 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R13。
+
+### R13 Feedback and overlay components
+
+**状态**：已完成（2026-06-29）。
+
+**目标**：统一 Feedback 与 overlay 组件的 open/portal/focus/keyboard/after-close 合约，删除 visible 语义残留和旧 portal 兼容分支。
+
+**允许修改**：Feedback 相关 core types、React/Vue 组件、overlay 工具、目标 tests/e2e、Skill feedback props/examples、example 使用、迁移说明、变更记录、API baseline。
+
+**不得修改**：Form/Navigation/Data/Charts/Advanced/Composite 组件行为、无关 package exports、size budget 结构。
+
+**依赖/阻塞**：依赖 R11；Message/notification 命令式入口保持 R05 sideEffects 隔离目标。
+
+**执行摘要**：已删除 React `packages/react/src/hooks/usePopup.ts` 旧 source hook 及 hooks barrel re-export，旧 `visible` / `defaultVisible` / `onVisibleChange` hook 合约不再保留。React/Vue Tooltip、Popover、Popconfirm 示例切到 `open` / `defaultOpen` / `onOpenChange` / `update:open`，并在 `scripts/validate-api.mjs` 中加入窄范围 Feedback 示例和 React hook source 护栏。Drawer 将 `destroyOnCloseAfterLeave` 改为 `deferDestroyOnClose`，React `onAfterLeave` / Vue `after-leave` 改为 `onAfterClose` / `after-close`；Modal 新增 React `onAfterClose` 与 Vue `after-close`，外部 `open=false` 不再触发 close intent。Vue Modal/Drawer 删除测试逃生口 `disableTeleport` 并统一 body teleport；Popconfirm confirm/cancel 关闭后恢复触发器焦点；Message/notification imperative root 与 pure container 拆分未改动。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 vitest run tests/react/Modal.spec.tsx tests/vue/Modal.spec.ts tests/react/Drawer.spec.tsx tests/vue/Drawer.spec.ts tests/react/Popconfirm.spec.tsx tests/vue/Popconfirm.spec.ts`
+- `npx -y pnpm@11.9.0 vitest run tests/react/Tooltip.spec.tsx tests/vue/Tooltip.spec.ts tests/react/Popover.spec.tsx tests/vue/Popover.spec.ts`
+- `npx -y pnpm@11.9.0 vitest run tests/vue/DragEnhancements.spec.ts tests/vue/custom-text.spec.ts tests/core/a11y-interactive-regression.spec.tsx`
+- `npx -y pnpm@11.9.0 test:group:feedback`
+- `npx -y pnpm@11.9.0 vitest run tests/core/imperative-side-effects.spec.ts`
+- `npx -y pnpm@11.9.0 e2e:smoke`
+- `npx -y pnpm@11.9.0 example:ssr:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
+- `git diff --check`
+
+**状态更新要求**：完成后已写回状态、日期、删除的 overlay/feedback API 摘要、Skill/examples 更新范围和关键验证命令；阶段 8 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R14。

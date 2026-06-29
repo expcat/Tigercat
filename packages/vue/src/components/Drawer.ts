@@ -68,7 +68,7 @@ export interface VueDrawerProps {
   bodyClassName?: string
   bodyPadding?: boolean | string
   destroyOnClose?: boolean
-  destroyOnCloseAfterLeave?: boolean
+  deferDestroyOnClose?: boolean
   fullscreenOnMobile?: boolean
   panelClassName?: string
   panelStyle?: StyleValue
@@ -184,10 +184,10 @@ export const Drawer = defineComponent({
     },
 
     /**
-     * When destroyOnClose is true, wait for leave animation before unmounting.
+     * When destroyOnClose is true, wait for the close animation before unmounting.
      * @default false
      */
-    destroyOnCloseAfterLeave: {
+    deferDestroyOnClose: {
       type: Boolean,
       default: false
     },
@@ -248,19 +248,9 @@ export const Drawer = defineComponent({
     labels: {
       type: Object as PropType<Partial<TigerLocaleDrawer>>,
       default: undefined
-    },
-
-    /**
-     * Disable teleport (useful for testing)
-     * @default false
-     * @internal
-     */
-    disableTeleport: {
-      type: Boolean,
-      default: false
     }
   },
-  emits: ['update:open', 'close', 'after-enter', 'after-leave'],
+  emits: ['update:open', 'close', 'after-enter', 'after-close'],
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
@@ -284,7 +274,7 @@ export const Drawer = defineComponent({
       }
 
       if (props.destroyOnClose) {
-        return props.destroyOnCloseAfterLeave ? deferredRendered.value : false
+        return props.deferDestroyOnClose ? deferredRendered.value : false
       }
       return hasBeenOpened.value
     })
@@ -364,7 +354,7 @@ export const Drawer = defineComponent({
           return
         }
 
-        if (props.destroyOnClose && !props.destroyOnCloseAfterLeave) {
+        if (props.destroyOnClose && !props.deferDestroyOnClose) {
           deferredRendered.value = false
         }
         restoreFocus(previousActiveElement.value)
@@ -379,8 +369,8 @@ export const Drawer = defineComponent({
           return
 
         const timer = window.setTimeout(() => {
-          emit(nextVisible ? 'after-enter' : 'after-leave')
-          if (!nextVisible && props.destroyOnClose && props.destroyOnCloseAfterLeave) {
+          emit(nextVisible ? 'after-enter' : 'after-close')
+          if (!nextVisible && props.destroyOnClose && props.deferDestroyOnClose) {
             deferredRendered.value = false
           }
         }, ANIMATION_DURATION_MS)
@@ -529,14 +519,14 @@ export const Drawer = defineComponent({
         {
           class: containerClasses,
           style: { zIndex: props.zIndex },
-          hidden: !props.open && !(props.destroyOnClose && props.destroyOnCloseAfterLeave),
+          hidden: !props.open && !(props.destroyOnClose && props.deferDestroyOnClose),
           'aria-hidden': !props.open ? 'true' : undefined,
           'data-tiger-drawer-root': ''
         },
         [mask, panel]
       )
 
-      return renderVueBodyTeleport([root], props.disableTeleport)
+      return renderVueBodyTeleport([root])
     }
   }
 })

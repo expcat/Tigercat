@@ -35,7 +35,6 @@ describe('custom text (no i18n) — Vue', () => {
         props: {
           open: true,
           showDefaultFooter: true,
-          disableTeleport: true,
           labels: { okText: 'GO', cancelText: 'STOP' }
         }
       })
@@ -45,7 +44,7 @@ describe('custom text (no i18n) — Vue', () => {
 
     it('Drawer close button uses labels', () => {
       render(Drawer, {
-        props: { open: true, disableTeleport: true, labels: { closeAriaLabel: 'Dismiss panel' } }
+        props: { open: true, labels: { closeAriaLabel: 'Dismiss panel' } }
       })
       expect(screen.getByLabelText('Dismiss panel')).toBeInTheDocument()
     })
@@ -96,7 +95,7 @@ describe('custom text (no i18n) — Vue', () => {
           setup() {
             return () =>
               h(ConfigProvider, { locale: { modal: { okText: 'GlobalOK' } } }, () =>
-                h(Modal, { open: true, showDefaultFooter: true, disableTeleport: true })
+                h(Modal, { open: true, showDefaultFooter: true })
               )
           }
         })

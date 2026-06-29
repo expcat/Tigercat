@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移、size / publish artifact gate 收口，以及 Basic / Layout 轻量组件 API 清理。
+本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移、size / publish artifact gate 收口、Basic / Layout 轻量组件 API 清理，以及 Feedback / overlay open、portal、focus 与 close lifecycle 收敛。
 
 ### Breaking Changes
 
@@ -18,6 +18,10 @@
 - **core `defineText`**：`defineText(...)` 不再作为 `defineLocale(...)` 的别名补齐 en-US 基线，而是返回纯自定义文本 overlay；需要完整 en-US 基线时请改用 `defineLocale(...)`，需要 DatePicker 翻译时请显式传入对应 DatePicker preset。
 - **core Basic / Layout type aliases**：移除等同 shared contracts 的 `SpaceDirection`、`SpaceAlign`、`CardDirection`、`StatisticSize`、`DescriptionsSize`、`ListSize`；请分别改用 `BaseLayoutProps['direction']`、`BaseLayoutProps['align']` 或 `ComponentSize`。
 - **Carousel**：移除仅初始化语义的 `initialSlide`，统一为受控索引模型；React 使用 `currentIndex` / `defaultCurrentIndex` / `onCurrentIndexChange`，Vue 使用 `currentIndex` / `defaultCurrentIndex` / `update:currentIndex`。
+- **React hooks**：移除旧 source hook `usePopup` 及其 hooks barrel re-export；它只暴露 `visible` / `defaultVisible` / `onVisibleChange` 合约。Tooltip、Popover、Popconfirm 等 overlay 请直接使用组件级 `open` / `defaultOpen` / `onOpenChange`。
+- **Drawer close lifecycle**：`destroyOnCloseAfterLeave` 重命名为 `deferDestroyOnClose`；React `onAfterLeave` 重命名为 `onAfterClose`；Vue `after-leave` 重命名为 `after-close`。
+- **Modal close lifecycle**：React Modal 新增 `onAfterClose`，Vue Modal 新增 `after-close`；外部 `open=false` 不再触发 close intent（React `onClose` / Vue `close`），用户取消、确认、遮罩、关闭按钮和 Escape 仍触发对应 intent。
+- **Vue Modal / Drawer teleport**：移除测试逃生口 `disableTeleport`，Modal 和 Drawer 始终 teleport 到 `document.body`；测试或样式选择器应查询 body 中的 overlay DOM。
 
 ### Infrastructure
 
@@ -28,6 +32,7 @@
 - React / Vue package exports 移除 `./*` 通配入口，改为由 `scripts/lib/public-components.mjs` 事实源生成的 148 个 PascalCase 显式组件子路径；`exports:check` 与 `release:check` 会阻止清单漂移。
 - React / Vue package `sideEffects` 收敛为 `false`，不再用 `dist/chunk-*` 或 `dist/components/*` 全量副作用兜底；`MessageContainer` 与 `NotificationContainer` 拆为独立纯容器入口，命令式 `Message` / `notification` 单例挂载逻辑保留在对应 imperative 入口中。
 - `api:validate` 会直接阻止 core / React / Vue 公开源码重新引入 `@deprecated`，v2 不再新增过渡废弃层。
+- `api:validate` 会阻止 Feedback 示例与 React hook source 重新引入 overlay `visible` / `defaultVisible` / `onVisibleChange` 用法，Feedback 当前示例统一使用 `open` 命名。
 - `tokens:build` / `tokens:check` 的生成面收敛为 canonical token 输出，移除 legacy CSS 变量和 token alias API 生成。
 - `release:check` 和 `publish:check` 增加 ESM-only 断言，发布 smoke 使用临时安装目录中的 bare ESM import 验证包入口，并阻止 `.cjs` 文件混入 tarball 或安装产物。
 - `release:check` 会阻止 React / Vue 恢复宽泛 sideEffects 声明；`publish:check` 会对安装后的 React / Vue root Button named import 和 Button 子路径 import 做 bundler smoke，确保普通 Button bundle 不拉入 Message / notification 命令式挂载代码。

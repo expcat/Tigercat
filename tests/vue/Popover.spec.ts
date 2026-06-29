@@ -392,7 +392,7 @@ describe('Popover', () => {
       expect(queryByText('Disabled content')).toBeNull()
     })
 
-    it('should support defaultVisible', () => {
+    it('should support defaultOpen', () => {
       const { getByText } = renderWithProps(
         Popover,
         {

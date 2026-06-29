@@ -86,7 +86,7 @@ const contentSnippet = `<Tooltip>
 </Tooltip>`
 
 const controlledSnippet = `<Space :size="16">
-  <Tooltip v-model:visible="visible1" content="受控的气泡提示">
+  <Tooltip v-model:open="visible1" content="受控的气泡提示">
     <Button>受控提示</Button>
   </Tooltip>
 
@@ -236,11 +236,11 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     <!-- 受控模式 -->
     <DemoBlock
       title="受控模式"
-      description="可以通过 visible 属性控制气泡提示的显示和隐藏。"
+      description="可以通过 open 属性控制气泡提示的显示和隐藏。"
       :code="controlledSnippet"
       :script="controlledScriptSnippet">
       <Space :size="16">
-        <Tooltip v-model:visible="visible1" content="受控的气泡提示">
+        <Tooltip v-model:open="visible1" content="受控的气泡提示">
           <Button>受控提示</Button>
         </Tooltip>
 

@@ -289,16 +289,56 @@ describe('Modal', () => {
       expect(onCancel).not.toHaveBeenCalled()
     })
 
-    it('should call onClose when modal is closed', async () => {
+    it('should call onClose for user close actions', async () => {
+      const user = userEvent.setup()
+      const onClose = vi.fn()
+
+      render(<Modal open={true} title="Test Modal" onClose={onClose} />)
+
+      await user.click(document.querySelector('button[aria-label="Close"]')!)
+      expect(onClose).toHaveBeenCalled()
+    })
+
+    it('should not call onClose for external open prop changes', async () => {
       const onClose = vi.fn()
 
       const { rerender } = render(<Modal open={true} title="Test Modal" onClose={onClose} />)
 
       rerender(<Modal open={false} title="Test Modal" onClose={onClose} />)
 
+      expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('should call onAfterClose after external close lifecycle completes', async () => {
+      const onAfterClose = vi.fn()
+
+      const { rerender } = render(
+        <Modal open={true} title="Test Modal" onAfterClose={onAfterClose} />
+      )
+
+      rerender(<Modal open={false} title="Test Modal" onAfterClose={onAfterClose} />)
+
       await waitFor(() => {
-        expect(onClose).toHaveBeenCalled()
+        expect(onAfterClose).toHaveBeenCalled()
       })
+    })
+
+    it('should restore focus to trigger after close', async () => {
+      const trigger = document.createElement('button')
+      trigger.textContent = 'Open modal'
+      document.body.appendChild(trigger)
+      trigger.focus()
+
+      const { rerender } = render(<Modal open={true} title="Test Modal" />)
+
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+      })
+
+      rerender(<Modal open={false} title="Test Modal" />)
+
+      await waitFor(() => expect(trigger).toHaveFocus())
+      trigger.remove()
     })
 
     it('should not call onOpenChange for external open prop changes', async () => {

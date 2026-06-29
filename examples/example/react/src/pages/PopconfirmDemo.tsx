@@ -25,7 +25,7 @@ const dangerSnippet = `<Popconfirm okType="danger" icon="error" title="确定要
 
 const descriptionSnippet = `<Popconfirm title="确定要发布这篇文章吗？" description="发布后，文章将对所有用户可见。">...</Popconfirm>`
 
-const controlledSnippet = `<Popconfirm visible={visible1} onVisibleChange={setVisible1} title="确定要执行此操作吗？">...</Popconfirm>`
+const controlledSnippet = `<Popconfirm open={visible1} onOpenChange={setVisible1} title="确定要执行此操作吗？">...</Popconfirm>`
 
 const noIconSnippet = `<Popconfirm showIcon={false} title="确定要继续吗？">...</Popconfirm>`
 
@@ -172,7 +172,7 @@ export default function PopconfirmDemo() {
 
       <DemoBlock
         title="受控模式"
-        description="通过 visible 和 onVisibleChange 控制 Popconfirm 的显示状态。"
+        description="通过 open 和 onOpenChange 控制 Popconfirm 的显示状态。"
         code={controlledSnippet}
         script={basicScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">

@@ -133,7 +133,7 @@ describe('Tree - Drag Enhancements', () => {
 describe('Modal - Drag Enhancements', () => {
   it('does not add drag cursor when draggable is false', () => {
     render(Modal, {
-      props: { open: true, title: 'Test Modal', disableTeleport: true }
+      props: { open: true, title: 'Test Modal' }
     })
     const header = document.querySelector('[data-tiger-modal] > div:first-child')
     expect(header).toBeTruthy()
@@ -142,7 +142,7 @@ describe('Modal - Drag Enhancements', () => {
 
   it('adds grab cursor to header when draggable is true', () => {
     render(Modal, {
-      props: { open: true, title: 'Draggable Modal', draggable: true, disableTeleport: true }
+      props: { open: true, title: 'Draggable Modal', draggable: true }
     })
     const header = document.querySelector('[data-tiger-modal] > div:first-child')
     expect(header).toBeTruthy()
@@ -151,7 +151,7 @@ describe('Modal - Drag Enhancements', () => {
 
   it('applies transform on drag', async () => {
     render(Modal, {
-      props: { open: true, title: 'Draggable Modal', draggable: true, disableTeleport: true }
+      props: { open: true, title: 'Draggable Modal', draggable: true }
     })
     const header = document.querySelector('[data-tiger-modal] > div:first-child') as HTMLElement
     const dialog = document.querySelector('[data-tiger-modal]') as HTMLElement
@@ -165,7 +165,7 @@ describe('Modal - Drag Enhancements', () => {
 
   it('resets position when modal closes and reopens', async () => {
     const { rerender } = render(Modal, {
-      props: { open: true, title: 'Draggable Modal', draggable: true, disableTeleport: true }
+      props: { open: true, title: 'Draggable Modal', draggable: true }
     })
     const header = document.querySelector('[data-tiger-modal] > div:first-child') as HTMLElement
 
@@ -177,10 +177,9 @@ describe('Modal - Drag Enhancements', () => {
     await rerender({
       open: false,
       title: 'Draggable Modal',
-      draggable: true,
-      disableTeleport: true
+      draggable: true
     })
-    await rerender({ open: true, title: 'Draggable Modal', draggable: true, disableTeleport: true })
+    await rerender({ open: true, title: 'Draggable Modal', draggable: true })
 
     const dialog = document.querySelector('[data-tiger-modal]') as HTMLElement
     // Position should be reset
@@ -189,7 +188,7 @@ describe('Modal - Drag Enhancements', () => {
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Modal, {
-        props: { open: true, title: 'Test Modal', disableTeleport: true }
+        props: { open: true, title: 'Test Modal' }
       })
       await expectNoA11yViolationsIsolated(container)
     })

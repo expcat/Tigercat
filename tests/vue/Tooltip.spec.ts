@@ -240,7 +240,7 @@ describe('Tooltip', () => {
     await expectNoA11yViolationsIsolated(container)
   })
 
-  it('supports defaultVisible', async () => {
+  it('supports defaultOpen', async () => {
     const { getByText } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },

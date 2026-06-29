@@ -97,6 +97,7 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     containerRef,
     triggerRef,
     floatingRef,
+    closeAndRestoreFocus,
     actualPlacement,
     floatingStyles: baseFloatingStyles
   } = usePopup({
@@ -111,11 +112,11 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
 
   const handleConfirm = () => {
     onConfirm?.()
-    setVisible(false)
+    closeAndRestoreFocus()
   }
   const handleCancel = () => {
     onCancel?.()
-    setVisible(false)
+    closeAndRestoreFocus()
   }
   const handleTriggerClick = () => {
     if (disabled) return

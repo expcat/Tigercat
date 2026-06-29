@@ -40,12 +40,11 @@ describe('interactive a11y regression coverage', () => {
   })
 
   it('passes axe for an open Vue modal with focusable content and default footer', async () => {
-    const { container } = renderVue(VueModal, {
+    renderVue(VueModal, {
       props: {
         open: true,
         title: 'Vue accessible modal',
-        showDefaultFooter: true,
-        disableTeleport: true
+        showDefaultFooter: true
       },
       slots: {
         default: '<label for="vue-modal-field">Modal field</label><input id="vue-modal-field" />'
@@ -57,7 +56,7 @@ describe('interactive a11y regression coverage', () => {
       expect(vueScreen.getByRole('button', { name: '确定' })).toBeInTheDocument()
     })
 
-    await expectNoA11yViolations(container)
+    await expectNoA11yViolations(document.body)
   })
 
   it('passes axe for a React form after validation errors are announced', async () => {

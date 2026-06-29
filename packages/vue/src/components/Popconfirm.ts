@@ -97,6 +97,7 @@ export const Popconfirm = defineComponent({
       containerRef,
       triggerRef,
       floatingRef,
+      closeAndRestoreFocus,
       floatingStyles,
       actualPlacement
     } = useFloatingPopup({ props, emit, multiTrigger: false })
@@ -108,11 +109,11 @@ export const Popconfirm = defineComponent({
     // Handle confirm / cancel
     const handleConfirm = () => {
       emit('confirm')
-      setVisible(false)
+      closeAndRestoreFocus()
     }
     const handleCancel = () => {
       emit('cancel')
-      setVisible(false)
+      closeAndRestoreFocus()
     }
     const handleTriggerClick = () => {
       if (props.disabled) return

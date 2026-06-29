@@ -50,6 +50,7 @@ export interface UsePopupReturn {
   actualPlacement: FloatingPlacement
   floatingStyles: React.CSSProperties
   triggerHandlers: React.DOMAttributes<HTMLDivElement>
+  closeAndRestoreFocus: () => void
 }
 
 // ---------------------------------------------------------------------------
@@ -178,6 +179,7 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     y,
     actualPlacement,
     floatingStyles,
-    triggerHandlers
+    triggerHandlers,
+    closeAndRestoreFocus
   }
 }

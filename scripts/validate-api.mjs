@@ -416,6 +416,67 @@ for (const api of deprecatedAPIs) {
   addIssue(api.file, api.line, 'public-deprecated', `公开 API "${api.name}" 不得标记 @deprecated`)
 }
 
+// ----- R13 Feedback overlay visible API guard -----
+
+const R13_REACT_HOOK_FORBIDDEN = [
+  { label: 'visible', regex: /\bvisible\s*[?]?\s*:/ },
+  { label: 'defaultVisible', regex: /\bdefaultVisible\b/ },
+  { label: 'onVisibleChange', regex: /\bonVisibleChange\b/ }
+]
+
+const R13_FEEDBACK_EXAMPLE_FORBIDDEN = [
+  { label: 'visible prop', regex: /\bvisible=/ },
+  { label: 'onVisibleChange', regex: /\bonVisibleChange\b/ },
+  { label: 'v-model:visible', regex: /v-model:visible/ }
+]
+
+const reactHooksDir = join(ROOT, 'packages', 'react', 'src', 'hooks')
+if (existsSync(reactHooksDir)) {
+  for (const filepath of collectFiles(reactHooksDir, ['.ts', '.tsx'])) {
+    const content = readFileSync(filepath, 'utf-8')
+    const lines = content.split(/\r?\n/)
+    lines.forEach((line, index) => {
+      for (const rule of R13_REACT_HOOK_FORBIDDEN) {
+        if (rule.regex.test(line)) {
+          addIssue(
+            filepath,
+            index + 1,
+            'overlay-visible-api',
+            `React hook source must not expose legacy overlay ${rule.label}; use open/defaultOpen/onOpenChange`
+          )
+        }
+      }
+    })
+  }
+}
+
+const feedbackExampleFiles = [
+  'examples/example/react/src/pages/TooltipDemo.tsx',
+  'examples/example/react/src/pages/PopoverDemo.tsx',
+  'examples/example/react/src/pages/PopconfirmDemo.tsx',
+  'examples/example/vue3/src/pages/TooltipDemo.vue',
+  'examples/example/vue3/src/pages/PopoverDemo.vue',
+  'examples/example/vue3/src/pages/PopconfirmDemo.vue'
+]
+
+for (const relativePath of feedbackExampleFiles) {
+  const filepath = join(ROOT, relativePath)
+  if (!existsSync(filepath)) continue
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    for (const rule of R13_FEEDBACK_EXAMPLE_FORBIDDEN) {
+      if (rule.regex.test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'overlay-visible-api',
+          `Feedback example must use open/defaultOpen/onOpenChange/update:open instead of ${rule.label}`
+        )
+      }
+    }
+  })
+}
+
 // ----- LLM docs coverage check -----
 
 function collectMarkdownContent(dir, options = {}) {
@@ -695,6 +756,7 @@ if (jsonMode) {
       'missing-react': '缺失 React 实现',
       'missing-vue': '缺失 Vue 实现',
       'overlay-api': '弹出层 API 一致性',
+      'overlay-visible-api': '弹出层 visible 兼容 API 禁止回流',
       'controlled-parity': '受控量双端对称',
       'public-deprecated': '公开 API 禁止 @deprecated',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',

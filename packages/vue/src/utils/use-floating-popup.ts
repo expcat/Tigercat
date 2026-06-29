@@ -72,6 +72,8 @@ export interface UseFloatingPopupReturn {
    * Returns a plain object ready to spread onto the trigger element.
    */
   triggerHandlers: Ref<Record<string, unknown>>
+  /** Close the popup and restore focus to the trigger. */
+  closeAndRestoreFocus: () => void
 }
 
 // ---------------------------------------------------------------------------
@@ -219,6 +221,7 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
     y,
     actualPlacement,
     floatingStyles,
-    triggerHandlers
+    triggerHandlers,
+    closeAndRestoreFocus
   }
 }

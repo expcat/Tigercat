@@ -10,6 +10,7 @@ import {
   nextTick
 } from 'vue'
 import {
+  ANIMATION_DURATION_MS,
   classNames,
   coerceClassValue,
   mergeStyleValues,
@@ -229,15 +230,6 @@ export const Modal = defineComponent({
       default: false
     },
     /**
-     * Disable teleport (useful for testing)
-     * @default false
-     * @internal
-     */
-    disableTeleport: {
-      type: Boolean,
-      default: false
-    },
-    /**
      * Whether the modal is draggable by its header
      * @default false
      */
@@ -246,7 +238,7 @@ export const Modal = defineComponent({
       default: false
     }
   },
-  emits: ['update:open', 'close', 'cancel', 'ok'],
+  emits: ['update:open', 'close', 'cancel', 'ok', 'after-close'],
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
@@ -292,11 +284,13 @@ export const Modal = defineComponent({
     const handleClose = () => {
       emit('update:open', false)
       emit('cancel')
+      emit('close')
     }
 
     const handleOk = () => {
       emit('ok')
       emit('update:open', false)
+      emit('close')
     }
 
     const handleMaskClick = (event: MouseEvent) => {
@@ -356,7 +350,7 @@ export const Modal = defineComponent({
 
     watch(
       () => props.open,
-      async (nextVisible) => {
+      async (nextVisible, previousVisible, onCleanup) => {
         if (nextVisible) {
           hasBeenOpened.value = true
 
@@ -367,9 +361,12 @@ export const Modal = defineComponent({
           const el = closeButtonRef.value ?? dialogRef.value
           el?.focus?.()
         } else {
-          emit('close')
           previousActiveElement.value?.focus?.()
           dragOffset.value = { x: 0, y: 0 }
+          if (previousVisible) {
+            const timer = window.setTimeout(() => emit('after-close'), ANIMATION_DURATION_MS)
+            onCleanup(() => window.clearTimeout(timer))
+          }
         }
       }
     )
@@ -564,7 +561,7 @@ export const Modal = defineComponent({
         ]
       )
 
-      return renderVueBodyTeleport([renderedWrapper], props.disableTeleport)
+      return renderVueBodyTeleport([renderedWrapper])
     }
   }
 })

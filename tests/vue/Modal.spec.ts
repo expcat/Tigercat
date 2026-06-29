@@ -15,30 +15,27 @@ describe('Modal', () => {
     it('should not render when open is false', () => {
       const { container } = renderWithProps(Modal, {
         open: false,
-        title: 'Test Modal',
-        disableTeleport: true
+        title: 'Test Modal'
       })
 
-      expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+      expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
     })
 
     it('should render when open is true', async () => {
       const { container } = renderWithProps(Modal, {
         open: true,
-        title: 'Test Modal',
-        disableTeleport: true
+        title: 'Test Modal'
       })
 
       await waitFor(() => {
-        expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
       })
     })
 
     it('should render with title', async () => {
       renderWithProps(Modal, {
         open: true,
-        title: 'Modal Title',
-        disableTeleport: true
+        title: 'Modal Title'
       })
 
       await waitFor(() => {
@@ -53,8 +50,7 @@ describe('Modal', () => {
           default: 'Modal Content'
         },
         {
-          open: true,
-          disableTeleport: true
+          open: true
         }
       )
 
@@ -70,8 +66,7 @@ describe('Modal', () => {
           title: '<strong>Custom Title</strong>'
         },
         {
-          open: true,
-          disableTeleport: true
+          open: true
         }
       )
 
@@ -88,8 +83,7 @@ describe('Modal', () => {
           footer: '<button>Custom Footer</button>'
         },
         {
-          open: true,
-          disableTeleport: true
+          open: true
         }
       )
 
@@ -104,12 +98,11 @@ describe('Modal', () => {
       const { container } = renderWithProps(Modal, {
         open: true,
         size,
-        title: 'Test Modal',
-        disableTeleport: true
+        title: 'Test Modal'
       })
 
       await waitFor(() => {
-        const dialog = container.querySelector('[role="dialog"]')
+        const dialog = document.querySelector('[role="dialog"]')
         expect(dialog).toBeInTheDocument()
       })
     })
@@ -117,12 +110,11 @@ describe('Modal', () => {
     it('should show close button by default', async () => {
       const { container } = renderWithProps(Modal, {
         open: true,
-        title: 'Test Modal',
-        disableTeleport: true
+        title: 'Test Modal'
       })
 
       await waitFor(() => {
-        const closeButton = container.querySelector('button[aria-label="Close"]')
+        const closeButton = document.querySelector('button[aria-label="Close"]')
         expect(closeButton).toBeInTheDocument()
       })
     })
@@ -134,8 +126,7 @@ describe('Modal', () => {
         showDefaultFooter: true,
         locale: {
           common: { okText: 'OK (i18n)', cancelText: 'Cancel (i18n)' }
-        },
-        disableTeleport: true
+        }
       })
 
       await waitFor(() => {
@@ -148,12 +139,11 @@ describe('Modal', () => {
       const { container } = renderWithProps(Modal, {
         open: true,
         title: 'Test Modal',
-        closable: false,
-        disableTeleport: true
+        closable: false
       })
 
       await waitFor(() => {
-        const closeButton = container.querySelector('button[aria-label="Close"]')
+        const closeButton = document.querySelector('button[aria-label="Close"]')
         expect(closeButton).not.toBeInTheDocument()
       })
     })
@@ -161,12 +151,11 @@ describe('Modal', () => {
     it('should show mask by default', async () => {
       const { container } = renderWithProps(Modal, {
         open: true,
-        title: 'Test Modal',
-        disableTeleport: true
+        title: 'Test Modal'
       })
 
       await waitFor(() => {
-        const mask = container.querySelector('[data-tiger-modal-mask]')
+        const mask = document.querySelector('[data-tiger-modal-mask]')
         expect(mask).toBeInTheDocument()
       })
     })
@@ -175,12 +164,11 @@ describe('Modal', () => {
       const { container } = renderWithProps(Modal, {
         open: true,
         title: 'Test Modal',
-        mask: false,
-        disableTeleport: true
+        mask: false
       })
 
       await waitFor(() => {
-        const mask = container.querySelector('[data-tiger-modal-mask]')
+        const mask = document.querySelector('[data-tiger-modal-mask]')
         expect(mask).not.toBeInTheDocument()
       })
     })
@@ -189,12 +177,11 @@ describe('Modal', () => {
       const { container } = renderWithProps(Modal, {
         open: true,
         title: 'Test Modal',
-        className: 'custom-modal-class',
-        disableTeleport: true
+        className: 'custom-modal-class'
       })
 
       await waitFor(() => {
-        const dialog = container.querySelector('.custom-modal-class')
+        const dialog = document.querySelector('.custom-modal-class')
         expect(dialog).toBeInTheDocument()
       })
     })
@@ -203,12 +190,11 @@ describe('Modal', () => {
       const { container } = renderWithProps(Modal, {
         open: true,
         title: 'Test Modal',
-        zIndex: 2000,
-        disableTeleport: true
+        zIndex: 2000
       })
 
       await waitFor(() => {
-        const wrapper = container.querySelector('.fixed')
+        const wrapper = document.querySelector('.fixed')
         expect(wrapper).toHaveStyle({ zIndex: '2000' })
       })
     })
@@ -217,12 +203,11 @@ describe('Modal', () => {
       const { container } = renderWithProps(Modal, {
         open: true,
         title: 'Mobile Sheet',
-        mobileSheet: true,
-        disableTeleport: true
+        mobileSheet: true
       })
 
       await waitFor(() => {
-        const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+        const dialog = document.querySelector('[role="dialog"]') as HTMLElement
         expect(dialog.className).toContain('max-md:fixed')
         expect(dialog.className).toContain('max-md:bottom-0')
       })
@@ -230,31 +215,33 @@ describe('Modal', () => {
   })
 
   describe('Events', () => {
-    it('should emit update:open and cancel when close button is clicked', async () => {
+    it('should emit update:open, cancel, and close when close button is clicked', async () => {
       const user = userEvent.setup()
       const onUpdateOpen = vi.fn()
       const onCancel = vi.fn()
+      const onClose = vi.fn()
 
       const { container } = render(Modal, {
         props: {
           open: true,
           title: 'Test Modal',
-          disableTeleport: true,
           'onUpdate:open': onUpdateOpen,
-          onCancel
+          onCancel,
+          onClose
         }
       })
 
       await waitFor(() => {
-        const closeButton = container.querySelector('button[aria-label="Close"]')
+        const closeButton = document.querySelector('button[aria-label="Close"]')
         expect(closeButton).toBeInTheDocument()
       })
 
-      const closeButton = container.querySelector('button[aria-label="Close"]')!
+      const closeButton = document.querySelector('button[aria-label="Close"]')!
       await user.click(closeButton)
 
       expect(onUpdateOpen).toHaveBeenCalledWith(false)
       expect(onCancel).toHaveBeenCalled()
+      expect(onClose).toHaveBeenCalled()
     })
 
     it('should emit update:open and cancel when mobile sheet is swiped down', async () => {
@@ -266,13 +253,12 @@ describe('Modal', () => {
           open: true,
           title: 'Swipe Sheet',
           mobileSheet: true,
-          disableTeleport: true,
           'onUpdate:open': onUpdateOpen,
           onCancel
         }
       })
 
-      const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
       await fireEvent.touchStart(dialog, { touches: [{ clientX: 120, clientY: 160 }] })
       await fireEvent.touchMove(dialog, { touches: [{ clientX: 124, clientY: 240 }] })
       await fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 124, clientY: 240 }] })
@@ -291,18 +277,17 @@ describe('Modal', () => {
           open: true,
           title: 'Test Modal',
           maskClosable: true,
-          disableTeleport: true,
           'onUpdate:open': onUpdateOpen,
           onCancel
         }
       })
 
       await waitFor(() => {
-        const containerEl = container.querySelector('.flex.min-h-full')
+        const containerEl = document.querySelector('.flex.min-h-full')
         expect(containerEl).toBeInTheDocument()
       })
 
-      const containerEl = container.querySelector('.flex.min-h-full')!
+      const containerEl = document.querySelector('.flex.min-h-full')!
       await user.click(containerEl)
 
       expect(onUpdateOpen).toHaveBeenCalledWith(false)
@@ -319,39 +304,81 @@ describe('Modal', () => {
           open: true,
           title: 'Test Modal',
           maskClosable: false,
-          disableTeleport: true,
           'onUpdate:open': onUpdateOpen,
           onCancel
         }
       })
 
       await waitFor(() => {
-        const containerEl = container.querySelector('.flex.min-h-full')
+        const containerEl = document.querySelector('.flex.min-h-full')
         expect(containerEl).toBeInTheDocument()
       })
 
-      const containerEl = container.querySelector('.flex.min-h-full')!
+      const containerEl = document.querySelector('.flex.min-h-full')!
       await user.click(containerEl)
 
       expect(onUpdateOpen).not.toHaveBeenCalled()
       expect(onCancel).not.toHaveBeenCalled()
     })
 
-    it('should emit close event when open changes to false', async () => {
+    it('should not emit close event when open changes externally', async () => {
       const onClose = vi.fn()
 
       const { rerender } = render(Modal, {
         props: {
           open: true,
           title: 'Test Modal',
-          disableTeleport: true,
           onClose
         }
       })
 
-      await rerender({ open: false, disableTeleport: true })
+      await rerender({ open: false })
 
-      expect(onClose).toHaveBeenCalled()
+      expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('should emit after-close when external close lifecycle completes', async () => {
+      const onAfterClose = vi.fn()
+
+      const { rerender } = render(Modal, {
+        props: {
+          open: true,
+          title: 'Test Modal',
+          onAfterClose
+        }
+      })
+
+      await rerender({ open: false, onAfterClose })
+
+      await waitFor(
+        () => {
+          expect(onAfterClose).toHaveBeenCalled()
+        },
+        { timeout: 1000 }
+      )
+    })
+
+    it('should restore focus to trigger after close', async () => {
+      const trigger = document.createElement('button')
+      trigger.textContent = 'Open modal'
+      document.body.appendChild(trigger)
+      trigger.focus()
+
+      const { rerender } = render(Modal, {
+        props: {
+          open: true,
+          title: 'Test Modal'
+        }
+      })
+
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+      })
+
+      await rerender({ open: false })
+
+      await waitFor(() => expect(trigger).toHaveFocus())
+      trigger.remove()
     })
 
     it('should emit cancel when ESC is pressed', async () => {
@@ -361,13 +388,12 @@ describe('Modal', () => {
         props: {
           open: true,
           title: 'Test Modal',
-          disableTeleport: true,
           onCancel
         }
       })
 
       await waitFor(() => {
-        expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
       })
 
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
@@ -380,12 +406,11 @@ describe('Modal', () => {
       const { container } = renderWithProps(Modal, {
         open: true,
         title: 'Test Modal',
-        centered: true,
-        disableTeleport: true
+        centered: true
       })
 
       await waitFor(() => {
-        const containerEl = container.querySelector('.items-center')
+        const containerEl = document.querySelector('.items-center')
         expect(containerEl).toBeInTheDocument()
       })
     })
@@ -394,12 +419,11 @@ describe('Modal', () => {
       const { container } = renderWithProps(Modal, {
         open: true,
         title: 'Test Modal',
-        centered: false,
-        disableTeleport: true
+        centered: false
       })
 
       await waitFor(() => {
-        const containerEl = container.querySelector('.items-start')
+        const containerEl = document.querySelector('.items-start')
         expect(containerEl).toBeInTheDocument()
       })
     })
@@ -408,8 +432,7 @@ describe('Modal', () => {
       const { container, rerender } = render(Modal, {
         props: {
           open: true,
-          destroyOnClose: true,
-          disableTeleport: true
+          destroyOnClose: true
         },
         slots: {
           default: '<div data-testid="modal-content">Content</div>'
@@ -417,17 +440,16 @@ describe('Modal', () => {
       })
 
       await waitFor(() => {
-        expect(container.querySelector('[data-testid="modal-content"]')).toBeInTheDocument()
+        expect(document.querySelector('[data-testid="modal-content"]')).toBeInTheDocument()
       })
 
       await rerender({
         open: false,
-        destroyOnClose: true,
-        disableTeleport: true
+        destroyOnClose: true
       })
 
       await waitFor(() => {
-        expect(container.querySelector('[data-testid="modal-content"]')).not.toBeInTheDocument()
+        expect(document.querySelector('[data-testid="modal-content"]')).not.toBeInTheDocument()
       })
     })
 
@@ -435,8 +457,7 @@ describe('Modal', () => {
       const { container, rerender } = render(Modal, {
         props: {
           open: true,
-          destroyOnClose: false,
-          disableTeleport: true
+          destroyOnClose: false
         },
         slots: {
           default: '<div data-testid="modal-content">Content</div>'
@@ -444,19 +465,18 @@ describe('Modal', () => {
       })
 
       await waitFor(() => {
-        expect(container.querySelector('[data-testid="modal-content"]')).toBeInTheDocument()
+        expect(document.querySelector('[data-testid="modal-content"]')).toBeInTheDocument()
       })
 
       await rerender({
         open: false,
-        destroyOnClose: false,
-        disableTeleport: true
+        destroyOnClose: false
       })
 
       await waitFor(() => {
-        const root = container.querySelector('[data-tiger-modal-root]')
+        const root = document.querySelector('[data-tiger-modal-root]')
         expect(root).toHaveAttribute('hidden')
-        expect(container.querySelector('[data-testid="modal-content"]')).toBeInTheDocument()
+        expect(document.querySelector('[data-testid="modal-content"]')).toBeInTheDocument()
       })
     })
   })
@@ -465,30 +485,28 @@ describe('Modal', () => {
     it('should have proper ARIA attributes', async () => {
       const { container } = renderWithProps(Modal, {
         open: true,
-        title: 'Test Modal',
-        disableTeleport: true
+        title: 'Test Modal'
       })
 
       await waitFor(() => {
-        const dialog = container.querySelector('[role="dialog"]')
+        const dialog = document.querySelector('[role="dialog"]')
         expect(dialog).toBeInTheDocument()
         expect(dialog).toHaveAttribute('aria-modal', 'true')
 
         const labelledby = dialog?.getAttribute('aria-labelledby')
         expect(labelledby).toBeTruthy()
-        expect(container.querySelector(`#${labelledby}`)).toBeInTheDocument()
+        expect(document.querySelector(`#${labelledby}`)).toBeInTheDocument()
       })
     })
 
     it('should have close button with aria-label', async () => {
       const { container } = renderWithProps(Modal, {
         open: true,
-        title: 'Test Modal',
-        disableTeleport: true
+        title: 'Test Modal'
       })
 
       await waitFor(() => {
-        const closeButton = container.querySelector('button[aria-label="Close"]')
+        const closeButton = document.querySelector('button[aria-label="Close"]')
         expect(closeButton).toBeInTheDocument()
       })
     })
@@ -496,12 +514,11 @@ describe('Modal', () => {
     it('should have mask with aria-hidden', async () => {
       const { container } = renderWithProps(Modal, {
         open: true,
-        title: 'Test Modal',
-        disableTeleport: true
+        title: 'Test Modal'
       })
 
       await waitFor(() => {
-        const mask = container.querySelector('[data-tiger-modal-mask]')
+        const mask = document.querySelector('[data-tiger-modal-mask]')
         expect(mask).toBeInTheDocument()
         expect(mask).toHaveAttribute('aria-hidden', 'true')
       })
@@ -510,12 +527,11 @@ describe('Modal', () => {
     it('should pass basic accessibility checks', async () => {
       const { container } = renderWithProps(Modal, {
         open: true,
-        title: 'Accessible Modal',
-        disableTeleport: true
+        title: 'Accessible Modal'
       })
 
       await waitFor(() => {
-        expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
       })
 
       await expectNoA11yViolationsIsolated(container)
@@ -529,16 +545,15 @@ describe('Modal', () => {
         props: {
           open: true,
           title: 'Focus Trap Test',
-          showDefaultFooter: true,
-          disableTeleport: true
+          showDefaultFooter: true
         }
       })
 
       await waitFor(() => {
-        expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
       })
 
-      const dialog = container.querySelector('[role="dialog"]')!
+      const dialog = document.querySelector('[role="dialog"]')!
       const focusableElements = dialog.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       )
@@ -567,16 +582,15 @@ describe('Modal', () => {
         props: {
           open: true,
           title: 'Focus Trap Test',
-          showDefaultFooter: true,
-          disableTeleport: true
+          showDefaultFooter: true
         }
       })
 
       await waitFor(() => {
-        expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
       })
 
-      const dialog = container.querySelector('[role="dialog"]')!
+      const dialog = document.querySelector('[role="dialog"]')!
       const focusableElements = dialog.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       )
@@ -597,17 +611,17 @@ describe('Modal', () => {
   describe('width prop', () => {
     it('should apply custom width style when width is a string', () => {
       const { container } = render(Modal, {
-        props: { open: true, width: '600px', disableTeleport: true }
+        props: { open: true, width: '600px' }
       })
-      const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
       expect(dialog.style.width).toBe('600px')
     })
 
     it('should apply custom width as pixels when width is a number', () => {
       const { container } = render(Modal, {
-        props: { open: true, width: 800, disableTeleport: true }
+        props: { open: true, width: 800 }
       })
-      const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
       expect(dialog.style.width).toBe('800px')
     })
   })

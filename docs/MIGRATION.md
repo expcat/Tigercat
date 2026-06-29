@@ -83,6 +83,45 @@ Vue:
 <Carousel v-model:current-index="index" />
 ```
 
+### Feedback / overlay open 与 close lifecycle 收敛
+
+Tooltip、Popover、Popconfirm 等 overlay 组件统一使用 `open` 命名；旧 React source hook `usePopup` 已删除，不再提供 `visible` / `defaultVisible` / `onVisibleChange` 合约。
+
+React:
+
+```diff
+- <Tooltip visible={open} onVisibleChange={setOpen} />
++ <Tooltip open={open} onOpenChange={setOpen} />
+```
+
+Vue:
+
+```diff
+- <Tooltip v-model:visible="open" />
++ <Tooltip v-model:open="open" />
+```
+
+Drawer 的关闭后生命周期和延迟销毁命名已收敛：
+
+```diff
+- <Drawer destroyOnClose destroyOnCloseAfterLeave onAfterLeave={handleAfterClose} />
++ <Drawer destroyOnClose deferDestroyOnClose onAfterClose={handleAfterClose} />
+```
+
+```diff
+- <Drawer destroy-on-close destroy-on-close-after-leave @after-leave="handleAfterClose" />
++ <Drawer destroy-on-close defer-destroy-on-close @after-close="handleAfterClose" />
+```
+
+Modal 现在也提供关闭后生命周期：React 使用 `onAfterClose`，Vue 使用 `@after-close`。外部受控 `open=false` 只表示状态变化，不再触发 close intent；需要记录用户关闭意图时继续监听 React `onClose` / Vue `close`，需要观察动画关闭完成时使用 `onAfterClose` / `after-close`。
+
+```diff
+- <Modal open={open} onClose={handleAnyClose} />
++ <Modal open={open} onClose={handleUserClose} onAfterClose={handleClosed} />
+```
+
+Vue Modal / Drawer 始终 teleport 到 `document.body`，测试中不再传 `disableTeleport`，请从 `document.body` 查询 overlay 内容。
+
 ### Message / notification 命令式 API 与容器入口拆分
 
 React / Vue package 现在声明 `sideEffects: false`，普通 root named import 或组件子路径 import 可以被 bundler 摇掉未使用的命令式 Message / notification 挂载代码。

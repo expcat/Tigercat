@@ -232,14 +232,10 @@ describe('Drawer', () => {
     })
   })
 
-  it('should destroy content after leave animation when requested', async () => {
-    const onAfterLeave = vi.fn()
+  it('should destroy content after close animation when requested', async () => {
+    const onAfterClose = vi.fn()
     const { rerender } = render(
-      <Drawer
-        open={true}
-        destroyOnClose={true}
-        destroyOnCloseAfterLeave
-        onAfterLeave={onAfterLeave}>
+      <Drawer open={true} destroyOnClose={true} deferDestroyOnClose onAfterClose={onAfterClose}>
         <div data-testid="drawer-content">Content</div>
       </Drawer>
     )
@@ -249,11 +245,7 @@ describe('Drawer', () => {
     })
 
     rerender(
-      <Drawer
-        open={false}
-        destroyOnClose={true}
-        destroyOnCloseAfterLeave
-        onAfterLeave={onAfterLeave}>
+      <Drawer open={false} destroyOnClose={true} deferDestroyOnClose onAfterClose={onAfterClose}>
         <div data-testid="drawer-content">Content</div>
       </Drawer>
     )
@@ -263,23 +255,23 @@ describe('Drawer', () => {
 
     await waitFor(
       () => {
-        expect(onAfterLeave).toHaveBeenCalled()
+        expect(onAfterClose).toHaveBeenCalled()
         expect(screen.queryByTestId('drawer-content')).not.toBeInTheDocument()
       },
       { timeout: 1000 }
     )
   })
 
-  it('should fire onAfterEnter/onAfterLeave after animation', async () => {
+  it('should fire onAfterEnter/onAfterClose after animation', async () => {
     const onAfterEnter = vi.fn()
-    const onAfterLeave = vi.fn()
+    const onAfterClose = vi.fn()
 
     const { rerender } = render(
       <Drawer
         open={true}
         title="Test Drawer"
         onAfterEnter={onAfterEnter}
-        onAfterLeave={onAfterLeave}
+        onAfterClose={onAfterClose}
       />
     )
 
@@ -291,12 +283,12 @@ describe('Drawer', () => {
         open={false}
         title="Test Drawer"
         onAfterEnter={onAfterEnter}
-        onAfterLeave={onAfterLeave}
+        onAfterClose={onAfterClose}
       />
     )
 
     await new Promise((resolve) => setTimeout(resolve, 350))
-    expect(onAfterLeave).toHaveBeenCalled()
+    expect(onAfterClose).toHaveBeenCalled()
   })
 
   it('should pass basic accessibility checks', async () => {

@@ -37,7 +37,7 @@ export interface DrawerProps
   onOpenChange?: (open: boolean) => void
   onClose?: () => void
   onAfterEnter?: () => void
-  onAfterLeave?: () => void
+  onAfterClose?: () => void
   header?: React.ReactNode
   children?: React.ReactNode
   footer?: React.ReactNode
@@ -81,14 +81,14 @@ export const Drawer: React.FC<DrawerProps> = ({
   bodyClassName,
   bodyPadding,
   destroyOnClose = false,
-  destroyOnCloseAfterLeave = false,
+  deferDestroyOnClose = false,
   fullscreenOnMobile = true,
   panelClassName,
   panelStyle,
   onClose,
   onOpenChange,
   onAfterEnter,
-  onAfterLeave,
+  onAfterClose,
   closeAriaLabel,
   locale,
   labels,
@@ -112,13 +112,13 @@ export const Drawer: React.FC<DrawerProps> = ({
       return
     }
 
-    if (destroyOnClose && !destroyOnCloseAfterLeave) {
+    if (destroyOnClose && !deferDestroyOnClose) {
       setDeferredRendered(false)
     }
-  }, [destroyOnClose, destroyOnCloseAfterLeave, open])
+  }, [destroyOnClose, deferDestroyOnClose, open])
 
   const shouldRender = destroyOnClose
-    ? destroyOnCloseAfterLeave
+    ? deferDestroyOnClose
       ? deferredRendered
       : open
     : hasBeenOpened
@@ -149,15 +149,15 @@ export const Drawer: React.FC<DrawerProps> = ({
       if (open) {
         onAfterEnter?.()
       } else {
-        onAfterLeave?.()
-        if (destroyOnClose && destroyOnCloseAfterLeave) {
+        onAfterClose?.()
+        if (destroyOnClose && deferDestroyOnClose) {
           setDeferredRendered(false)
         }
       }
     }, ANIMATION_DURATION_MS)
 
     return () => window.clearTimeout(timer)
-  }, [destroyOnClose, destroyOnCloseAfterLeave, open, onAfterEnter, onAfterLeave])
+  }, [destroyOnClose, deferDestroyOnClose, open, onAfterEnter, onAfterClose])
 
   const reactId = useId()
   const drawerId = useMemo(() => `tiger-drawer-${reactId}`, [reactId])
@@ -278,13 +278,13 @@ export const Drawer: React.FC<DrawerProps> = ({
     return null
   }
 
-  const isLeavingBeforeDestroy = destroyOnClose && destroyOnCloseAfterLeave && !open
+  const isClosingBeforeDestroy = destroyOnClose && deferDestroyOnClose && !open
 
   const drawerContent = (
     <div
       className={containerClasses}
       style={{ zIndex }}
-      hidden={!open && !isLeavingBeforeDestroy}
+      hidden={!open && !isClosingBeforeDestroy}
       aria-hidden={!open ? 'true' : undefined}
       data-tiger-drawer-root="">
       {mask && (

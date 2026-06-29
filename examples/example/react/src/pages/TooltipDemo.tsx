@@ -83,7 +83,7 @@ const contentSnippet = `<Tooltip
 </Tooltip>`
 
 const controlledSnippet = `<Space size={16}>
-  <Tooltip visible={visible1} content="受控的气泡提示" onVisibleChange={setVisible1}>
+  <Tooltip open={visible1} content="受控的气泡提示" onOpenChange={setVisible1}>
     <Button>受控提示</Button>
   </Tooltip>
 
@@ -236,7 +236,7 @@ export default function TooltipDemo() {
       {/* 受控模式 */}
       <DemoBlock
         title="受控模式"
-        description="可以通过 visible 属性控制气泡提示的显示和隐藏。"
+        description="可以通过 open 属性控制气泡提示的显示和隐藏。"
         code={controlledSnippet}
         script={basicScriptSnippet}>
         <Space size={16}>

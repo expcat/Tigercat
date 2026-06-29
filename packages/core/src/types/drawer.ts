@@ -97,10 +97,10 @@ export interface DrawerProps {
 
   /**
    * When `destroyOnClose` is enabled, keep the drawer mounted until the
-   * leave animation finishes before destroying its content.
+   * close animation finishes before destroying its content.
    * @default false
    */
-  destroyOnCloseAfterLeave?: boolean
+  deferDestroyOnClose?: boolean
 
   /**
    * Whether the drawer panel should become fullscreen on mobile viewports.

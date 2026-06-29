@@ -292,14 +292,14 @@ describe('Drawer', () => {
     })
   })
 
-  it('should destroy content after leave animation when requested', async () => {
-    const onAfterLeave = vi.fn()
+  it('should destroy content after close animation when requested', async () => {
+    const onAfterClose = vi.fn()
     const { rerender } = render(Drawer, {
       props: {
         open: true,
         destroyOnClose: true,
-        destroyOnCloseAfterLeave: true,
-        onAfterLeave
+        deferDestroyOnClose: true,
+        onAfterClose
       },
       slots: {
         default: () => h('div', { 'data-testid': 'drawer-content' }, 'Content')
@@ -313,8 +313,8 @@ describe('Drawer', () => {
     await rerender({
       open: false,
       destroyOnClose: true,
-      destroyOnCloseAfterLeave: true,
-      onAfterLeave
+      deferDestroyOnClose: true,
+      onAfterClose
     })
 
     expect(screen.getByTestId('drawer-content')).toBeInTheDocument()
@@ -322,23 +322,23 @@ describe('Drawer', () => {
 
     await waitFor(
       () => {
-        expect(onAfterLeave).toHaveBeenCalled()
+        expect(onAfterClose).toHaveBeenCalled()
         expect(screen.queryByTestId('drawer-content')).not.toBeInTheDocument()
       },
       { timeout: 1000 }
     )
   })
 
-  it('should emit after-enter/after-leave after 300ms', async () => {
+  it('should emit after-enter/after-close after 300ms', async () => {
     const onAfterEnter = vi.fn()
-    const onAfterLeave = vi.fn()
+    const onAfterClose = vi.fn()
 
     const { rerender } = render(Drawer, {
       props: {
         open: true,
         title: 'Test Drawer',
         onAfterEnter,
-        onAfterLeave
+        onAfterClose
       }
     })
 
@@ -349,10 +349,10 @@ describe('Drawer', () => {
       open: false,
       title: 'Test Drawer',
       onAfterEnter,
-      onAfterLeave
+      onAfterClose
     })
     await new Promise((resolve) => setTimeout(resolve, 350))
-    expect(onAfterLeave).toHaveBeenCalled()
+    expect(onAfterClose).toHaveBeenCalled()
   })
 
   it('should pass basic accessibility checks', async () => {
