@@ -454,6 +454,21 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 
 **依赖/阻塞**：依赖 R11。
 
+**组件范围**：Button、Tag、Badge、Avatar、Card、Space、Skeleton、Divider、Text、Statistic、Descriptions、List、Carousel，以及同组内必要的子组件。
+
+**完成验证**：
+
+- `corepack pnpm test:group:basic`
+- `corepack pnpm test:group:layout`
+- `corepack pnpm api:validate`
+- `corepack pnpm types:check`
+- `corepack pnpm api:baseline`
+- `corepack pnpm api:baseline:check`
+- `corepack pnpm docs:api`
+- `corepack pnpm docs:api:check`
+- `corepack pnpm size`
+- `git diff --check`
+
 **执行摘要**：已删除等同 shared contracts 的 `SpaceDirection`、`SpaceAlign`、`CardDirection`、`StatisticSize`、`DescriptionsSize`、`ListSize` public type aliases；对应 props 改用 `BaseLayoutProps` 或 `ComponentSize`。保留 `ButtonSize`、`AvatarSize`、`TextSize` 和 `SkeletonShape`，因为它们扩展或偏离共享 size/layout 合约，或当前没有共享 shape contract。Carousel 已删除 `initialSlide`，新增 `currentIndex` / `defaultCurrentIndex`；React 新增 `onCurrentIndexChange`，Vue 新增 `update:currentIndex`，导航、dots、swipe、autoplay 和 imperative methods 均走同一索引提交路径。React/Vue Carousel tests、example demos、迁移说明、变更记录、API baseline 与 Skill references 已同步更新。
 
 **实际验证**：
@@ -483,6 +498,19 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **不得修改**：Form/Navigation/Data/Charts/Advanced/Composite 组件行为、无关 package exports、size budget 结构。
 
 **依赖/阻塞**：依赖 R11；Message/notification 命令式入口保持 R05 sideEffects 隔离目标。
+
+**组件范围**：Modal、Drawer、Tooltip、Popover、Popconfirm、Message、Notification、Loading、Tour、Progress。
+
+**完成验证**：
+
+- `corepack pnpm test:group:feedback`
+- `corepack pnpm vitest run tests/core/imperative-side-effects.spec.ts`
+- `corepack pnpm e2e:smoke` 或目标 overlay e2e
+- `corepack pnpm example:ssr:check`
+- `corepack pnpm api:validate`
+- `corepack pnpm types:check`
+- `corepack pnpm docs:api:check`
+- `git diff --check`
 
 **执行摘要**：已删除 React `packages/react/src/hooks/usePopup.ts` 旧 source hook 及 hooks barrel re-export，旧 `visible` / `defaultVisible` / `onVisibleChange` hook 合约不再保留。React/Vue Tooltip、Popover、Popconfirm 示例切到 `open` / `defaultOpen` / `onOpenChange` / `update:open`，并在 `scripts/validate-api.mjs` 中加入窄范围 Feedback 示例和 React hook source 护栏。Drawer 将 `destroyOnCloseAfterLeave` 改为 `deferDestroyOnClose`，React `onAfterLeave` / Vue `after-leave` 改为 `onAfterClose` / `after-close`；Modal 新增 React `onAfterClose` 与 Vue `after-close`，外部 `open=false` 不再触发 close intent。Vue Modal/Drawer 删除测试逃生口 `disableTeleport` 并统一 body teleport；Popconfirm confirm/cancel 关闭后恢复触发器焦点；Message/notification imperative root 与 pure container 拆分未改动。
 
@@ -517,6 +545,18 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **不得修改**：Form composite selectors、Feedback/Navigation/Data/Charts/Advanced/Composite 组件行为、测试分组基础设施。
 
 **依赖/阻塞**：依赖 R11；R13 已完成，overlay/focus 变更未与本批次交叉。
+
+**组件范围**：Input、Textarea、InputNumber、Checkbox、Radio、Switch、Slider、Stepper、Segmented、ColorSwatch。
+
+**完成验证**：
+
+- `corepack pnpm test:group:form -- --filter primitives`
+- `corepack pnpm vitest run tests/react/useControlledState.spec.tsx tests/vue/useFormController.spec.ts`
+- `corepack pnpm test:a11y`
+- `corepack pnpm api:validate`
+- `corepack pnpm types:check`
+- `corepack pnpm docs:api:check`
+- `git diff --check`
 
 **执行摘要**：已删除等同 `ComponentSize` 的 primitive 尺寸类型别名 `InputSize`、`TextareaSize`、`CheckboxSize`、`RadioSize`、`SwitchSize`、`SliderSize`、`SegmentedSize`、`StepperSize`、`ColorSwatchSize`；对应 core props、style utilities、theme runtime、React/Vue components 和 generated references 改用 `ComponentSize`。Vue Checkbox、Radio、Switch 从 `checked` / `defaultChecked` / `update:checked` 收敛为 `modelValue` / `defaultValue` / `update:modelValue` / `change`；Vue RadioGroup 从 `value` / `update:value` 收敛为 `modelValue` / `update:modelValue`。React Checkbox、Radio、Switch 保持 `checked` / `defaultChecked` / `onChange`，Checkbox/Radio 的 `value` 保留为 group option identity。Vue Checkbox/Radio/Switch/RadioGroup examples 与 tests 已迁移，`scripts/validate-api.mjs` 已新增 R14 回流护栏。
 
@@ -554,6 +594,20 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **不得修改**：Form primitives 已完成行为、Feedback/Navigation/Data/Charts/Advanced/Composite 组件行为、发布 workflow。
 
 **依赖/阻塞**：依赖 R14；DatePicker/TimePicker locale 与 custom text 路径保持 R08/R09 的 locale trimming 目标。
+
+**组件范围**：Select、TreeSelect、Cascader、AutoComplete、Transfer、DatePicker、TimePicker、ColorPicker、Upload、Form、FormItem、InputGroup。
+
+**完成验证**：
+
+- `corepack pnpm test:group:form`
+- `corepack pnpm vitest run tests/core/custom-text-labels.spec.ts tests/core/datepicker-i18n.spec.ts`
+- `corepack pnpm example:ssr:check`
+- `corepack pnpm size`
+- `corepack pnpm publish:check`
+- `corepack pnpm api:validate`
+- `corepack pnpm types:check`
+- `corepack pnpm docs:api:check`
+- `git diff --check`
 
 **执行摘要**：已删除等同 `ComponentSize` 的 composite 尺寸类型别名 `SelectSize`、`TreeSelectSize`、`CascaderSize`、`AutoCompleteSize`、`DatePickerSize`、`TimePickerSize`、`TransferSize`、`ColorPickerSize`、`InputGroupSize`、`FormSize`；对应 core props、style utilities、React/Vue components 和 generated references 改用 `ComponentSize`。DatePicker/TimePicker public model surface 收敛为 `DatePickerModelValue` 与 `TimePickerModelValue`，删除重复 single/range public aliases。Select、TreeSelect、Cascader、AutoComplete、Transfer 的搜索受控量统一为 `searchValue` / `defaultSearchValue`，React 使用 `onSearchChange`，Vue 使用 `update:searchValue` / `search-change`；TreeSelect、Cascader、Transfer 搜索开关统一为 `searchable`。空态文案统一为 `emptyText` 并继续走 locale/custom text fallback。Upload queue/chunk/resume helper 已拆出基础 `upload-utils`，避免普通 Upload helper 引入队列重逻辑；examples、tests、API baseline、Skill references、迁移说明、变更记录和 `api:validate` R15 回流护栏已同步更新。
 
@@ -604,6 +658,22 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 
 **依赖/阻塞**：依赖 R11；子组件 subpath 保留为 PascalCase package path，但 exports 目标改为父组件产物。
 
+**组件范围**：Tabs、Menu、Dropdown、Tree、Pagination、Anchor、Breadcrumb、Steps、Spotlight、FloatButton、BackTop、ScrollSpy、Affix。
+
+**完成验证**：
+
+- `corepack pnpm test:group:navigation`
+- `corepack pnpm vitest run tests/core/examples-lazy-routes.spec.ts`
+- `corepack pnpm test:a11y`
+- `corepack pnpm exports:check`
+- `corepack pnpm api:validate`
+- `corepack pnpm types:check`
+- `corepack pnpm api:baseline`
+- `corepack pnpm api:baseline:check`
+- `corepack pnpm docs:api`
+- `corepack pnpm docs:api:check`
+- `git diff --check`
+
 **执行摘要**：React Tabs / ScrollSpy 的 active key 受控回调从 `onChange` 收敛为 `onActiveKeyChange`；React Menu 搜索从 `onSearch` 收敛为 `onSearchChange`；React Menu / Tree 受控 keys 使用 `onSelectedKeysChange`、`onOpenKeysChange`、`onExpandedKeysChange`、`onCheckedKeysChange`，原 `onSelect` / `onOpenChange` / `onExpand` / `onCheck` 保留为交互上下文事件。`AnchorChangeInfo.currentActiveLink` 已改为 `activeLink`。React/Vue Navigation 子组件独立 shim 文件已删除，`AnchorLink`、`BreadcrumbItem`、`DropdownItem`、`DropdownMenu`、`MenuItem`、`MenuItemGroup`、`StepsItem`、`SubMenu`、`TabPane` 的 package subpath 继续存在并指向父组件产物；examples、tests、API baseline、Skill references、迁移说明、变更记录和 `api:validate` R16 回流护栏已同步更新。
 
 **实际删除 / 合并**：
@@ -653,6 +723,16 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **依赖/阻塞**：依赖 R11；`DataTableWithToolbar` 本轮只同步底层 Table props，toolbar 业务 alias 仍留给 R20 composite/business 收口。
 
 **组件范围**：Table、DataTableWithToolbar、VirtualTable、Calendar、Timeline、Collapse、Countdown。
+
+**完成验证**：
+
+- `corepack pnpm test:group:data`
+- `corepack pnpm vitest run tests/react/TableState.spec.tsx tests/vue/TableState.spec.ts`
+- `corepack pnpm e2e:smoke`
+- `corepack pnpm api:validate`
+- `corepack pnpm types:check`
+- `corepack pnpm docs:api:check`
+- `git diff --check`
 
 **执行摘要**：Table / VirtualTable / DataTableWithToolbar 的数据入口已统一为 `dataSource`；VirtualTable 删除 `data`、`rowHeight`、`height`、`selectable`、`selectedKeys`、`onSelect` 公共入口，改用 `virtualItemHeight`、`virtualHeight`、`rowSelection` 与 React `onSelectionChange` / Vue `selection-change`、`update:rowSelection`。Table 自动虚拟化与推荐态统一使用 `virtualThreshold`，删除 `autoVirtualThreshold` 与 `TABLE_AUTO_VIRTUAL_THRESHOLD` / `autoThreshold`。`GenericTableColumn`、`GenericRowSelection`、`GenericExpandable`、`GenericTableProps` 已删除，泛型用户改用 `TableColumn<T>`、`RowSelectionConfig<T>`、`ExpandableConfig<T>`、`TableProps<T>`。React/Vue VirtualTable 继续复用 shared fixed-column helpers，examples、Skill references、API baseline、迁移说明和变更记录已同步更新；`scripts/validate-api.mjs` 新增 R17 guard 防止旧 API 回流。
 

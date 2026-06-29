@@ -7,7 +7,7 @@ verified-date: 2026-06-29
 source: current repository state after R17 Data and table stack completion
 -->
 
-本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；R01-R11 已完成任务的详细执行记录归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，需要历史证据时从归档、git 历史、变更日志或对应提交中查找。
+本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；R01-R17 已完成任务的详细执行记录归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，需要历史证据时从归档、git 历史、变更日志或对应提交中查找。
 
 ## 当前状态
 
@@ -32,7 +32,7 @@ source: current repository state after R17 Data and table stack completion
 - 删除 public API 必须给出唯一替代 API；没有保留价值的 API 直接删除并在迁移说明中写明。
 - 完成任一 Rxx 后，必须同步更新该任务状态、所属阶段状态、完成日期和关键验证命令；未更新状态视为任务未完成。
 - 完成任务的详细执行摘要、实际验证命令和状态回写要求应移至 [V2_COMPLETED.md](V2_COMPLETED.md)；`ROADMAP.md` 只保留完成状态摘要和当前/后续任务执行要求，避免读取时消耗过多 token。
-- 完成 R12-R20 中任何涉及 public API、shared contract、props、events、methods、type aliases 或 helper exports 删除/合并的任务后，必须在 [V2_API_AUDIT.md](V2_API_AUDIT.md) 追加或更新对应批次记录，写明实际变更、唯一替代 API、证据、验证命令和剩余阻塞。
+- 完成 R18-R20 中任何涉及 public API、shared contract、props、events、methods、type aliases 或 helper exports 删除/合并的任务后，必须在 [V2_API_AUDIT.md](V2_API_AUDIT.md) 追加或更新对应批次记录，写明实际变更、唯一替代 API、证据、验证命令和剩余阻塞。
 - R10-R20 属于 v2.0.0 发布前计划，不插入 R01-R09 中间，也不得改变既有阶段依赖。
 
 ## 状态回写要求
@@ -74,288 +74,29 @@ source: current repository state after R17 Data and table stack completion
 
 ## v2.0.0 任务队列
 
-### R01-R11 completed infrastructure archive
-
-R01-R11 已完成，详细执行摘要、实际验证命令和状态回写记录已归档到 [V2_COMPLETED.md](V2_COMPLETED.md)。当前执行入口只保留完成状态摘要，避免后续 Agent 读取 R12-R20 时消耗过多 token。
-
-| 任务                                                      | 状态                 | 摘要                                                                               | 详情                                                                                         |
-| --------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| R01 Roadmap cleanup                                       | 已完成（2026-06-28） | 清理路线图为 v2.0.0 分批执行入口。                                                 | [归档](V2_COMPLETED.md#r01-roadmap-cleanup)                                                  |
-| R02 version and release metadata                          | 已完成（2026-06-28） | 同步 2.0.0 版本、运行时 version、CLI 模板和 release readiness 入口。               | [归档](V2_COMPLETED.md#r02-version-and-release-metadata)                                     |
-| R03 ESM-only build surface                                | 已完成（2026-06-28） | 将 core/react/vue 发布面切为 ESM-only，并更新 publish smoke。                      | [归档](V2_COMPLETED.md#r03-esm-only-build-surface)                                           |
-| R04 explicit exports and public component facts           | 已完成（2026-06-28） | 建立公开组件事实源和 React/Vue 显式 component subpath exports。                    | [归档](V2_COMPLETED.md#r04-explicit-exports-and-public-component-facts)                      |
-| R05 tree-shaking and sideEffects                          | 已完成（2026-06-28） | 收敛 sideEffects，隔离 Message/notification 命令式入口并加 tree-shaking gates。    | [归档](V2_COMPLETED.md#r05-tree-shaking-and-sideeffects)                                     |
-| R06 remove deprecated and compatibility APIs              | 已完成（2026-06-28） | 删除首批 deprecated/compat API，并让 api:validate 阻止新增 public deprecated API。 | [归档](V2_COMPLETED.md#r06-remove-deprecated-and-compatibility-apis)                         |
-| R07 token and legacy asset cleanup                        | 已完成（2026-06-28） | 删除 legacy token CSS/TS 兼容命名、旧 icon path aliases 和 common-icons barrel。   | [归档](V2_COMPLETED.md#r07-token-and-legacy-asset-cleanup)                                   |
-| R08 on-demand usage docs and examples                     | 已完成（2026-06-28） | 将 examples、SSR smoke 和 references 迁移到 subpath-first / lazy-first 用法。      | [归档](V2_COMPLETED.md#r08-on-demand-usage-docs-and-examples)                                |
-| R09 size and publish artifact gates                       | 已完成（2026-06-28） | 增加 size/publish artifact gates，验证发布 tarball、exports 和 bundle 隔离。       | [归档](V2_COMPLETED.md#r09-size-and-publish-artifact-gates)                                  |
-| R10 grouped validation, docs, and examples infrastructure | 已完成（2026-06-29） | 建立按组件组运行测试、文档和示例维护的基础设施。                                   | [归档](V2_COMPLETED.md#r10-grouped-validation-docs-and-examples-infrastructure)              |
-| R11 Core API and shared contracts audit                   | 已完成（2026-06-29） | 输出 v2 shared contracts 审计和 R12-R20 API 删除/合并清单。                        | [归档](V2_COMPLETED.md#r11-core-api-and-shared-contracts-audit)，[API 审计](V2_API_AUDIT.md) |
-
-### R12 Basic + Layout lightweight components
-
-**状态**：已完成（2026-06-29）。
-
-**目标**：清理 Basic 与 Layout 轻量展示组件，删除历史别名 props，统一 class/style 透传和子组件导出策略，并同步测试、Skill 文档与 examples。
-
-**允许修改**：Basic/Layout 相关 core types、React/Vue 组件、目标 tests、Skill `shared/props/basic.md`、`shared/props/layout.md`、`examples/basic.md`、`examples/layout.md`、example 使用、迁移说明、变更记录、API baseline。
-
-**不得修改**：Feedback/Form/Navigation/Data/Charts/Advanced/Composite 组件行为、测试分组基础设施、发布 workflow。
-
-**依赖/阻塞**：依赖 R11。
-
-**组件范围**：Button、Tag、Badge、Avatar、Card、Space、Skeleton、Divider、Text、Statistic、Descriptions、List、Carousel，以及同组内必要的子组件。
-
-**完成验证**：
-
-- `corepack pnpm test:group:basic`
-- `corepack pnpm test:group:layout`
-- `corepack pnpm api:validate`
-- `corepack pnpm types:check`
-- `corepack pnpm api:baseline`
-- `corepack pnpm api:baseline:check`
-- `corepack pnpm docs:api`
-- `corepack pnpm docs:api:check`
-- `corepack pnpm size`
-- `git diff --check`
-
-**执行摘要**：已删除等同 shared contracts 的 `SpaceDirection`、`SpaceAlign`、`CardDirection`、`StatisticSize`、`DescriptionsSize`、`ListSize` public type aliases；对应 props 改用 `BaseLayoutProps` 或 `ComponentSize`。`ButtonSize`、`AvatarSize`、`TextSize` 与 `SkeletonShape` 因具备组件专属语义或无共享替代而保留。Carousel 已从 `initialSlide` 切换为 `currentIndex` / `defaultCurrentIndex` 受控模型，React 新增 `onCurrentIndexChange`，Vue 新增 `update:currentIndex`，并同步 tests、examples、迁移说明、变更记录、API baseline 与 Skill references。
-
-**实际验证**：
-
-- `npx -y pnpm@11.9.0 vitest run tests/react/Carousel.spec.tsx tests/vue/Carousel.spec.ts`
-- `npx -y pnpm@11.9.0 test:group:basic`
-- `npx -y pnpm@11.9.0 test:group:layout`
-- `npx -y pnpm@11.9.0 api:validate`
-- `npx -y pnpm@11.9.0 types:check`
-- `npx -y pnpm@11.9.0 api:baseline`
-- `npx -y pnpm@11.9.0 api:baseline:check`
-- `npx -y pnpm@11.9.0 docs:api`
-- `npx -y pnpm@11.9.0 docs:api:check`
-- `npx -y pnpm@11.9.0 size`
-- `git diff --check`
-
-**状态更新要求**：已写回状态、日期、删除的 API 摘要、Skill/examples 更新范围、分组测试命令和关键验证命令；阶段 7 已同步为完成。
-
-### R13 Feedback and overlay components
-
-**状态**：已完成（2026-06-29）。
-
-**目标**：统一 Feedback 与 overlay 组件的 open/portal/focus/keyboard/after-close 合约，删除 visible 语义残留和旧 portal 兼容分支。
-
-**允许修改**：Feedback 相关 core types、React/Vue 组件、overlay 工具、目标 tests/e2e、Skill feedback props/examples、example 使用、迁移说明、变更记录、API baseline。
-
-**不得修改**：Form/Navigation/Data/Charts/Advanced/Composite 组件行为、无关 package exports、size budget 结构。
-
-**依赖/阻塞**：依赖 R11；若触及 Message/notification 命令式入口，必须保持 R05 的 sideEffects 隔离目标。
-
-**组件范围**：Modal、Drawer、Tooltip、Popover、Popconfirm、Message、Notification、Loading、Tour、Progress。
-
-**完成验证**：
-
-- `corepack pnpm test:group:feedback`
-- `corepack pnpm vitest run tests/core/imperative-side-effects.spec.ts`
-- `corepack pnpm e2e:smoke` 或目标 overlay e2e
-- `corepack pnpm example:ssr:check`
-- `corepack pnpm api:validate`
-- `corepack pnpm types:check`
-- `corepack pnpm docs:api:check`
-- `git diff --check`
-
-**执行摘要**：已删除 React `packages/react/src/hooks/usePopup.ts` 旧 source hook 及 hooks barrel re-export，避免继续暴露 `visible` / `defaultVisible` / `onVisibleChange` 合约。Tooltip、Popover、Popconfirm 示例与 `api:validate` 护栏收敛到 `open` / `defaultOpen` / `onOpenChange` / `update:open`；Drawer 将 `destroyOnCloseAfterLeave` 改为 `deferDestroyOnClose`，React `onAfterLeave` / Vue `after-leave` 改为 `onAfterClose` / `after-close`；Modal 新增 React `onAfterClose` 与 Vue `after-close`，外部 `open=false` 只触发生命周期而不触发 close intent。Vue Modal/Drawer 删除 `disableTeleport`，统一 teleport 到 `body`；Popconfirm confirm/cancel 与 Escape/outside close 路径保持焦点恢复；Message/notification imperative root 与 pure container 的 R05 sideEffects 边界保持不变。
-
-**实际验证**：
-
-- `npx -y pnpm@11.9.0 vitest run tests/react/Modal.spec.tsx tests/vue/Modal.spec.ts tests/react/Drawer.spec.tsx tests/vue/Drawer.spec.ts tests/react/Popconfirm.spec.tsx tests/vue/Popconfirm.spec.ts`
-- `npx -y pnpm@11.9.0 vitest run tests/react/Tooltip.spec.tsx tests/vue/Tooltip.spec.ts tests/react/Popover.spec.tsx tests/vue/Popover.spec.ts`
-- `npx -y pnpm@11.9.0 vitest run tests/vue/DragEnhancements.spec.ts tests/vue/custom-text.spec.ts tests/core/a11y-interactive-regression.spec.tsx`
-- `npx -y pnpm@11.9.0 test:group:feedback`
-- `npx -y pnpm@11.9.0 vitest run tests/core/imperative-side-effects.spec.ts`
-- `npx -y pnpm@11.9.0 e2e:smoke`
-- `npx -y pnpm@11.9.0 example:ssr:check`
-- `npx -y pnpm@11.9.0 api:validate`
-- `npx -y pnpm@11.9.0 types:check`
-- `npx -y pnpm@11.9.0 api:baseline`
-- `npx -y pnpm@11.9.0 api:baseline:check`
-- `npx -y pnpm@11.9.0 docs:api`
-- `npx -y pnpm@11.9.0 docs:api:check`
-- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
-- `git diff --check`
-
-**状态更新要求**：已写回状态、日期、删除的 overlay/feedback API 摘要、Skill/examples 更新范围和关键验证命令；阶段 8 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R14。
-
-### R14 Form primitives
-
-**状态**：已完成（2026-06-29）。
-
-**目标**：清理表单基础输入组件，统一 controlled/default/onChange 模型，删除重复 value alias，并将重复测试收缩为分组内参数化覆盖。
-
-**允许修改**：Form primitive 相关 core types、React/Vue 组件、目标 tests、受控状态 helper 使用、Skill form props/examples、example 使用、迁移说明、变更记录、API baseline。
-
-**不得修改**：Form composite selectors、Feedback/Navigation/Data/Charts/Advanced/Composite 组件行为、测试分组基础设施。
-
-**依赖/阻塞**：依赖 R11；可在 R13 完成后执行，避免 overlay/focus 变更交叉。
-
-**组件范围**：Input、Textarea、InputNumber、Checkbox、Radio、Switch、Slider、Stepper、Segmented、ColorSwatch。
-
-**完成验证**：
-
-- `corepack pnpm test:group:form -- --filter primitives` 或等效目标文件集合
-- `corepack pnpm vitest run tests/react/useControlledState.spec.tsx tests/vue/useFormController.spec.ts`
-- `corepack pnpm test:a11y`
-- `corepack pnpm api:validate`
-- `corepack pnpm types:check`
-- `corepack pnpm docs:api:check`
-- `git diff --check`
-
-**执行摘要**：已删除等同 `ComponentSize` 的 primitive 尺寸类型别名 `InputSize`、`TextareaSize`、`CheckboxSize`、`RadioSize`、`SwitchSize`、`SliderSize`、`SegmentedSize`、`StepperSize`、`ColorSwatchSize`；对应 props、core style utilities、theme runtime 和 React/Vue 组件实现改用 `ComponentSize`。Vue Checkbox、Radio、Switch 统一为 `modelValue` / `defaultValue` / `update:modelValue` / `change`，Vue RadioGroup 统一为 `modelValue` / `defaultValue` / `update:modelValue` / `change`；React checkable primitives 继续使用 `checked` / `defaultChecked` / `onChange`，Checkbox/Radio 的 `value` 保留为 group option identity。Vue examples、primitive tests、Skill references、API baseline、迁移说明、变更记录和 `api:validate` R14 护栏已同步更新。
-
-**实际验证**：
-
-- `npx -y pnpm@11.9.0 test:group:form -- --filter primitives`
-- `npx -y pnpm@11.9.0 vitest run tests/react/useControlledState.spec.tsx tests/vue/useFormController.spec.ts`
-- `npx -y pnpm@11.9.0 api:validate`
-- `npx -y pnpm@11.9.0 types:check`
-- `npx -y pnpm@11.9.0 api:baseline`
-- `npx -y pnpm@11.9.0 api:baseline:check`
-- `npx -y pnpm@11.9.0 docs:api`
-- `npx -y pnpm@11.9.0 docs:api:check`
-- `npx -y pnpm@11.9.0 test:a11y`
-- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
-- `git diff --check`
-
-**状态更新要求**：已写回状态、日期、删除的 primitive API 摘要、参数化测试收缩范围、Skill/examples 更新范围和关键验证命令；阶段 9 已同步为 `进行中`，当前可执行任务推进到 R15。
-
-### R15 Form composite selectors
-
-**状态**：已完成（2026-06-29）。
-
-**目标**：清理表单复合选择器和大体量表单组件的多分支 API，统一 search/filter/empty/loading/locale 入口，并拆分可 tree-shake 的 heavy helpers。
-
-**允许修改**：Form composite 相关 core types、React/Vue 组件、picker/select/upload/form helper、目标 tests、Skill form props/examples、example 使用、迁移说明、变更记录、API baseline、必要的 bundle smoke。
-
-**不得修改**：Form primitives 已完成行为、Feedback/Navigation/Data/Charts/Advanced/Composite 组件行为、发布 workflow。
-
-**依赖/阻塞**：依赖 R14；涉及 DatePicker/TimePicker locale 或 custom text 时必须保持 R08/R09 的按需加载与 locale trimming 目标。
-
-**组件范围**：Select、TreeSelect、Cascader、AutoComplete、Transfer、DatePicker、TimePicker、ColorPicker、Upload、Form、FormItem、InputGroup。
-
-**完成验证**：
-
-- `corepack pnpm test:group:form`
-- `corepack pnpm vitest run tests/core/custom-text-labels.spec.ts tests/core/datepicker-i18n.spec.ts`
-- `corepack pnpm example:ssr:check`
-- `corepack pnpm size`
-- `corepack pnpm publish:check`
-- `corepack pnpm api:validate`
-- `corepack pnpm types:check`
-- `corepack pnpm docs:api:check`
-- `git diff --check`
-
-**执行摘要**：已删除等同 `ComponentSize` 的 composite 尺寸类型别名 `SelectSize`、`TreeSelectSize`、`CascaderSize`、`AutoCompleteSize`、`DatePickerSize`、`TimePickerSize`、`TransferSize`、`ColorPickerSize`、`InputGroupSize`、`FormSize`；DatePicker/TimePicker public model surface 收敛为 `DatePickerModelValue` 与 `TimePickerModelValue`。Select、TreeSelect、Cascader、AutoComplete、Transfer 搜索入口统一为 `searchValue` / `defaultSearchValue`、React `onSearchChange`、Vue `update:searchValue` / `search-change`，TreeSelect/Cascader/Transfer 的搜索开关统一为 `searchable`；空态文案统一为 `emptyText` 并继续从 locale/custom text fallback。Upload queue/chunk/resume helper 已拆入独立内部模块，基础 Upload helper 不再承载队列重逻辑；API baseline、Skill references、examples、迁移说明、变更记录和 `api:validate` R15 护栏已同步更新。
-
-**实际验证**：
-
-- `npx -y pnpm@11.9.0 test:group:form -- --filter composite`
-- `npx -y pnpm@11.9.0 vitest run tests/core/custom-text-labels.spec.ts tests/core/datepicker-i18n.spec.ts`
-- `npx -y pnpm@11.9.0 test:group:form`
-- `npx -y pnpm@11.9.0 example:ssr:check`
-- `npx -y pnpm@11.9.0 size`
-- `npx -y pnpm@11.9.0 publish:check`
-- `npx -y pnpm@11.9.0 api:validate`
-- `npx -y pnpm@11.9.0 types:check`
-- `npx -y pnpm@11.9.0 api:baseline`
-- `npx -y pnpm@11.9.0 api:baseline:check`
-- `npx -y pnpm@11.9.0 docs:api`
-- `npx -y pnpm@11.9.0 docs:api:check`
-- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
-- `rg -n "^(<<<<<<<|=======|>>>>>>>)"`
-- `git diff --check`
-
-**状态更新要求**：已写回状态、日期、删除的 composite form API 摘要、heavy helper 拆分范围、Skill/examples 更新范围和关键验证命令；阶段 9 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R16。
-
-### R16 Navigation components
-
-**状态**：已完成（2026-06-29）。
-
-**目标**：清理 Navigation 组件，合并子项组件导出策略，删除深路径兼容 re-export，统一 active/open/selected/expanded 命名。
-
-**允许修改**：Navigation 相关 core types、React/Vue 组件、子组件 re-export 文件、公开组件事实源、package exports、目标 tests、Skill navigation props/examples、example 使用、迁移说明、变更记录、API baseline。
-
-**不得修改**：Form/Data/Charts/Advanced/Composite 组件行为、非 Navigation 子路径、size budget 结构。
-
-**依赖/阻塞**：依赖 R11；子组件 PascalCase package subpath 保留，源码层子组件 re-export 文件已删除并通过 exports 事实源映射到父组件产物。
-
-**组件范围**：Tabs、Menu、Dropdown、Tree、Pagination、Anchor、Breadcrumb、Steps、Spotlight、FloatButton、BackTop、ScrollSpy、Affix。
-
-**完成验证**：
-
-- `npx -y pnpm@11.9.0 test:group:navigation`
-- `npx -y pnpm@11.9.0 vitest run tests/core/examples-lazy-routes.spec.ts`
-- `npx -y pnpm@11.9.0 test:a11y`
-- `npx -y pnpm@11.9.0 exports:check`
-- `npx -y pnpm@11.9.0 api:validate`
-- `npx -y pnpm@11.9.0 types:check`
-- `npx -y pnpm@11.9.0 api:baseline`
-- `npx -y pnpm@11.9.0 api:baseline:check`
-- `npx -y pnpm@11.9.0 docs:api`
-- `npx -y pnpm@11.9.0 docs:api:check`
-- `git diff --check`
-
-**执行摘要**：React Tabs / ScrollSpy active key 回调已从 `onChange` 收敛为 `onActiveKeyChange`；React Menu 搜索回调已从 `onSearch` 收敛为 `onSearchChange`；React Menu / Tree 受控 key 更新改用 `onSelectedKeysChange`、`onOpenKeysChange`、`onExpandedKeysChange`、`onCheckedKeysChange`。`AnchorChangeInfo.currentActiveLink` 已改为 `activeLink`。Navigation 子组件源码 shim 文件已删除，`AnchorLink`、`BreadcrumbItem`、`DropdownItem`、`DropdownMenu`、`MenuItem`、`MenuItemGroup`、`StepsItem`、`SubMenu`、`TabPane` 的 package subpath 保持可用并指向父组件产物。examples、tests、API baseline、Skill references、迁移说明、变更记录和 `api:validate` R16 回流护栏已同步更新。
-
-**实际验证**：
-
-- `npx -y pnpm@11.9.0 test:group:navigation`
-- `npx -y pnpm@11.9.0 vitest run tests/core/examples-lazy-routes.spec.ts`
-- `npx -y pnpm@11.9.0 test:a11y`
-- `npx -y pnpm@11.9.0 exports:sync`
-- `npx -y pnpm@11.9.0 exports:check`
-- `npx -y pnpm@11.9.0 api:validate`
-- `npx -y pnpm@11.9.0 types:check`
-- `npx -y pnpm@11.9.0 api:baseline`
-- `npx -y pnpm@11.9.0 api:baseline:check`
-- `npx -y pnpm@11.9.0 docs:api`
-- `npx -y pnpm@11.9.0 docs:api:check`
-- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
-- `rg -n "^(<<<<<<<|=======|>>>>>>>)"`
-- `git diff --check`
-
-**状态更新要求**：已写回状态、日期、删除的 Navigation API/subpath 摘要、Skill/examples 更新范围和关键验证命令；阶段 10 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R17。
-
-### R17 Data and table stack
-
-**状态**：已完成（2026-06-29）。
-
-**目标**：清理 Data 与 table stack，统一 columns/filter/sort/pagination/virtual props，删除重叠阈值和 toolbar alias，收敛固定列与虚拟滚动逻辑。
-
-**允许修改**：Data/table 相关 core types、React/Vue 组件、table helper、目标 tests/e2e、Skill data/advanced props/examples、example 使用、迁移说明、变更记录、API baseline。
-
-**不得修改**：Form/Navigation/Charts/Advanced editors/Composite business 组件行为、无关 exports。
-
-**依赖/阻塞**：依赖 R11；涉及 `DataTableWithToolbar` 时必须与 R20 的 composite/business 收口保持同一替代 API。
-
-**组件范围**：Table、DataTableWithToolbar、VirtualTable、Calendar、Timeline、Collapse、Countdown。
-
-**执行摘要**：已将 Table/VirtualTable/DataTableWithToolbar 的数据入口统一到 `dataSource`，将选择模型统一到 `rowSelection.selectedRowKeys` 与 React `onSelectionChange` / Vue `selection-change`、`update:rowSelection`，删除 VirtualTable 的 `data` / `rowHeight` / `height` / `selectable` / `selectedKeys` / `onSelect` 公共入口；Table 自动虚拟化和推荐态统一使用 `virtualThreshold`，不再保留 `autoVirtualThreshold`。`GenericTableColumn`、`GenericRowSelection`、`GenericExpandable`、`GenericTableProps` 已删除，泛型用户改用 `TableColumn<T>`、`RowSelectionConfig<T>`、`ExpandableConfig<T>`、`TableProps<T>`。
-
-**完成验证**：
-
-- `npx -y pnpm@11.9.0 test:group:data`
-- `npx -y pnpm@11.9.0 vitest run tests/react/TableState.spec.tsx tests/vue/TableState.spec.ts`
-- `npx -y pnpm@11.9.0 vitest run tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts tests/core/virtual-table-utils.spec.ts tests/core/table-utils.spec.ts`
-- `npx -y pnpm@11.9.0 e2e:smoke`
-- `npx -y pnpm@11.9.0 api:validate`
-- `npx -y pnpm@11.9.0 types:check`
-- `npx -y pnpm@11.9.0 api:baseline`
-- `npx -y pnpm@11.9.0 api:baseline:check`
-- `npx -y pnpm@11.9.0 docs:api`
-- `npx -y pnpm@11.9.0 docs:api:check`
-- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
-- `rg -n "^(<<<<<<<|=======|>>>>>>>)"`
-- `git diff --check`
-
-**状态更新要求**：完成后已写回状态、日期、删除的 Data/table API 摘要、固定列/虚拟滚动验证范围、Skill/examples 更新范围和关键验证命令；阶段 11 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R18。
+### R01-R17 completed archive
+
+R01-R17 已完成，详细执行摘要、实际验证命令和状态回写记录已归档到 [V2_COMPLETED.md](V2_COMPLETED.md)。当前执行入口只保留完成状态摘要，避免后续 Agent 读取 R18-R20 时消耗过多 token。
+
+| 任务                                                      | 状态                 | 摘要                                                                                           | 详情                                                                                         |
+| --------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| R01 Roadmap cleanup                                       | 已完成（2026-06-28） | 清理路线图为 v2.0.0 分批执行入口。                                                             | [归档](V2_COMPLETED.md#r01-roadmap-cleanup)                                                  |
+| R02 version and release metadata                          | 已完成（2026-06-28） | 同步 2.0.0 版本、运行时 version、CLI 模板和 release readiness 入口。                           | [归档](V2_COMPLETED.md#r02-version-and-release-metadata)                                     |
+| R03 ESM-only build surface                                | 已完成（2026-06-28） | 将 core/react/vue 发布面切为 ESM-only，并更新 publish smoke。                                  | [归档](V2_COMPLETED.md#r03-esm-only-build-surface)                                           |
+| R04 explicit exports and public component facts           | 已完成（2026-06-28） | 建立公开组件事实源和 React/Vue 显式 component subpath exports。                                | [归档](V2_COMPLETED.md#r04-explicit-exports-and-public-component-facts)                      |
+| R05 tree-shaking and sideEffects                          | 已完成（2026-06-28） | 收敛 sideEffects，隔离 Message/notification 命令式入口并加 tree-shaking gates。                | [归档](V2_COMPLETED.md#r05-tree-shaking-and-sideeffects)                                     |
+| R06 remove deprecated and compatibility APIs              | 已完成（2026-06-28） | 删除首批 deprecated/compat API，并让 api:validate 阻止新增 public deprecated API。             | [归档](V2_COMPLETED.md#r06-remove-deprecated-and-compatibility-apis)                         |
+| R07 token and legacy asset cleanup                        | 已完成（2026-06-28） | 删除 legacy token CSS/TS 兼容命名、旧 icon path aliases 和 common-icons barrel。               | [归档](V2_COMPLETED.md#r07-token-and-legacy-asset-cleanup)                                   |
+| R08 on-demand usage docs and examples                     | 已完成（2026-06-28） | 将 examples、SSR smoke 和 references 迁移到 subpath-first / lazy-first 用法。                  | [归档](V2_COMPLETED.md#r08-on-demand-usage-docs-and-examples)                                |
+| R09 size and publish artifact gates                       | 已完成（2026-06-28） | 增加 size/publish artifact gates，验证发布 tarball、exports 和 bundle 隔离。                   | [归档](V2_COMPLETED.md#r09-size-and-publish-artifact-gates)                                  |
+| R10 grouped validation, docs, and examples infrastructure | 已完成（2026-06-29） | 建立按组件组运行测试、文档和示例维护的基础设施。                                               | [归档](V2_COMPLETED.md#r10-grouped-validation-docs-and-examples-infrastructure)              |
+| R11 Core API and shared contracts audit                   | 已完成（2026-06-29） | 输出 v2 shared contracts 审计和 R12-R20 API 删除/合并清单。                                    | [归档](V2_COMPLETED.md#r11-core-api-and-shared-contracts-audit)，[API 审计](V2_API_AUDIT.md) |
+| R12 Basic + Layout lightweight components                 | 已完成（2026-06-29） | 清理 Basic/Layout 轻量组件，删除尺寸/布局别名，Carousel 切换受控 currentIndex 模型。           | [归档](V2_COMPLETED.md#r12-basic--layout-lightweight-components)                             |
+| R13 Feedback and overlay components                       | 已完成（2026-06-29） | 统一 Feedback/overlay 的 open/after-close/portal/focus 合约，删除 visible 残留。               | [归档](V2_COMPLETED.md#r13-feedback-and-overlay-components)                                  |
+| R14 Form primitives                                       | 已完成（2026-06-29） | 统一 Form primitives 受控模型，删除等同 ComponentSize 的尺寸别名。                             | [归档](V2_COMPLETED.md#r14-form-primitives)                                                  |
+| R15 Form composite selectors                              | 已完成（2026-06-29） | 收敛 composite selectors 的 search/empty/model 别名，拆分 Upload heavy helper。                | [归档](V2_COMPLETED.md#r15-form-composite-selectors)                                         |
+| R16 Navigation components                                 | 已完成（2026-06-29） | 收敛 Navigation 受控回调命名，删除子组件源码 shim 并保留 subpath 产物。                        | [归档](V2_COMPLETED.md#r16-navigation-components)                                            |
+| R17 Data and table stack                                  | 已完成（2026-06-29） | 统一 Table/VirtualTable/DataTableWithToolbar 数据、选择与虚拟滚动入口，删除 Generic 泛型别名。 | [归档](V2_COMPLETED.md#r17-data-and-table-stack)                                             |
 
 ### R18 Charts and visualization stack
 
@@ -442,7 +183,7 @@ R01-R11 已完成，详细执行摘要、实际验证命令和状态回写记录
 
 ## Public API 与文档规则
 
-- 每个 R12-R20 批次必须列出计划移除的 props/events/methods/type aliases 和唯一替代 API。
+- 每个 R18-R20 批次必须列出计划移除的 props/events/methods/type aliases 和唯一替代 API。
 - React 与 Vue 同一组件必须收敛到同一语义；命名差异只允许来自框架惯例。
 - Skill 文档更新必须覆盖对应 `shared/props/{category}.md`、`examples/{category}.md` 和必要的 `component-index.md`。
 - Example 更新必须优先使用组件子路径 import，避免重新引入 root value imports 或 heavy dependency leakage。
