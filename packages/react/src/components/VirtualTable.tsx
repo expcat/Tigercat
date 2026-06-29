@@ -14,6 +14,7 @@ import {
   getTableFixedCellClasses,
   getTableFixedHeaderCellClasses,
   getTableColgroup,
+  getNextTableSelectAllKeys,
   tableBaseClasses,
   virtualTableHeaderClasses,
   virtualTableHeaderCellClasses,
@@ -21,16 +22,17 @@ import {
   virtualTableEmptyClasses,
   virtualTableLoadingClasses,
   virtualTableFixedCellSelectedClasses,
+  type RowSelectionConfig,
   type TableColumn,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VirtualTableProps<T = Record<string, unknown>> {
-  data?: T[]
+  dataSource?: T[]
   columns?: TableColumn<T>[]
-  rowHeight?: number
-  height?: number
+  virtualItemHeight?: number
+  virtualHeight?: number
   /** Viewport width in px or 'auto' */
   width?: number | 'auto'
   overscan?: number
@@ -43,13 +45,12 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   loading?: boolean
   emptyText?: string
   locale?: Partial<TigerLocale>
-  selectable?: boolean
-  selectedKeys?: (string | number)[]
+  rowSelection?: RowSelectionConfig<T>
   striped?: boolean
   bordered?: boolean
   className?: string
   onRowClick?: (row: T, index: number) => void
-  onSelect?: (key: string | number, row: T, index: number) => void
+  onSelectionChange?: (selectedKeys: (string | number)[]) => void
   renderCell?: (value: unknown, row: T, column: TableColumn<T>) => React.ReactNode
 }
 
@@ -57,10 +58,10 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
 const DEFAULT_VIRTUAL_COLUMN_WIDTH = 150
 
 export const VirtualTable = <T extends Record<string, unknown> = Record<string, unknown>>({
-  data = [] as unknown as T[],
+  dataSource = [] as unknown as T[],
   columns = [] as unknown as TableColumn<T>[],
-  rowHeight = 48,
-  height = 400,
+  virtualItemHeight = 48,
+  virtualHeight = 400,
   width = 'auto',
   overscan = 5,
   stickyHeader = true,
@@ -70,13 +71,12 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   loading = false,
   emptyText,
   locale,
-  selectable = false,
-  selectedKeys = [],
+  rowSelection,
   striped = false,
   bordered = false,
   className,
   onRowClick,
-  onSelect,
+  onSelectionChange,
   renderCell,
   ...rest
 }: VirtualTableProps<T>) => {
@@ -88,18 +88,55 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollTop, setScrollTop] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
+  const [uncontrolledSelectedKeys, setUncontrolledSelectedKeys] = useState<(string | number)[]>(
+    rowSelection?.defaultSelectedRowKeys ?? rowSelection?.selectedRowKeys ?? []
+  )
+  const isSelectionControlled = rowSelection?.selectedRowKeys !== undefined
+  const selectedKeys = isSelectionControlled
+    ? (rowSelection.selectedRowKeys ?? [])
+    : uncontrolledSelectedKeys
+  const hasSelection = !!rowSelection
 
   const range = useMemo(
-    () => calculateVirtualRange(scrollTop, height, data.length, rowHeight, overscan),
-    [scrollTop, height, data.length, rowHeight, overscan]
+    () =>
+      calculateVirtualRange(
+        scrollTop,
+        virtualHeight,
+        dataSource.length,
+        virtualItemHeight,
+        overscan
+      ),
+    [scrollTop, virtualHeight, dataSource.length, virtualItemHeight, overscan]
   )
 
   const visibleData = useMemo(
-    () => data.slice(range.start, range.end),
-    [data, range.start, range.end]
+    () => dataSource.slice(range.start, range.end),
+    [dataSource, range.start, range.end]
   )
 
   const selectedSet = useMemo(() => new Set(selectedKeys), [selectedKeys])
+
+  const commitSelection = useCallback(
+    (nextKeys: (string | number)[]) => {
+      if (!isSelectionControlled) {
+        setUncontrolledSelectedKeys(nextKeys)
+      }
+      onSelectionChange?.(nextKeys)
+    },
+    [isSelectionControlled, onSelectionChange]
+  )
+
+  const toggleRowSelection = useCallback(
+    (key: string | number, row: T) => {
+      if (!rowSelection || rowSelection.getCheckboxProps?.(row)?.disabled) return
+      if (rowSelection.type === 'radio') {
+        commitSelection([key])
+        return
+      }
+      commitSelection(getNextTableSelectAllKeys(selectedKeys, [key], !selectedSet.has(key)))
+    },
+    [commitSelection, rowSelection, selectedKeys, selectedSet]
+  )
 
   const onScroll = useCallback(() => {
     if (containerRef.current) {
@@ -148,7 +185,7 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
   const resolveRowClassName = (row: T, index: number): string | undefined =>
     typeof rowClassName === 'function' ? rowClassName(row, index) : rowClassName
 
-  const bottomHeight = Math.max(0, range.totalHeight - range.end * rowHeight)
+  const bottomHeight = Math.max(0, range.totalHeight - range.end * virtualItemHeight)
 
   return (
     <div
@@ -158,12 +195,12 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
         (rest as Record<string, unknown>).className as string
       )}
       style={{
-        height: `${height}px`,
+        height: `${virtualHeight}px`,
         ...(width !== 'auto' ? { width: `${width}px` } : {})
       }}
       onScroll={onScroll}
       role="grid"
-      aria-rowcount={data.length}>
+      aria-rowcount={dataSource.length}>
       <table className={classNames(tableBaseClasses, 'table-fixed')}>
         {colgroupEntries.length > 0 && (
           <colgroup>
@@ -212,12 +249,14 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
           <tr style={{ height: `${range.offsetTop}px` }} aria-hidden />
           {visibleData.map((row, localIdx) => {
             const globalIdx = range.start + localIdx
-            const key = getVirtualRowKey(row, globalIdx, rowKey)
+            const key = rowSelection?.getRowKey
+              ? rowSelection.getRowKey(row)
+              : getVirtualRowKey(row, globalIdx, rowKey)
             const isSelected = selectedSet.has(key)
-            const isInteractive = !!onRowClick || selectable
+            const isInteractive = !!onRowClick || hasSelection
             const activate = () => {
               onRowClick?.(row, globalIdx)
-              if (selectable) onSelect?.(key, row, globalIdx)
+              if (hasSelection) toggleRowSelection(key, row)
             }
 
             return (
@@ -229,7 +268,7 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                 )}
                 // header occupies aria-rowindex 1
                 aria-rowindex={globalIdx + 2}
-                aria-selected={selectable ? isSelected : undefined}
+                aria-selected={hasSelection ? isSelected : undefined}
                 tabIndex={isInteractive ? 0 : undefined}
                 onClick={isInteractive ? activate : undefined}
                 onKeyDown={
@@ -279,7 +318,7 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
           {bottomHeight > 0 && <tr style={{ height: `${bottomHeight}px` }} aria-hidden />}
         </tbody>
       </table>
-      {data.length === 0 && !loading && (
+      {dataSource.length === 0 && !loading && (
         <div className={virtualTableEmptyClasses}>
           {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
         </div>

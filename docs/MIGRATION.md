@@ -223,6 +223,61 @@ import { TabPane } from '@expcat/tigercat-vue/TabPane'
 
 源码级深路径（如 `packages/react/src/components/MenuItem`）不再保留；库内部或源码级集成应从父组件文件导入。
 
+### Data / Table 数据、选择与虚拟滚动入口收敛
+
+VirtualTable 与 Table 的数据入口统一为 `dataSource`。VirtualTable 不再保留旧的 `data` / `rowHeight` / `height` 命名：
+
+```diff
+- <VirtualTable data={rows} rowHeight={40} height={320} />
++ <VirtualTable dataSource={rows} virtualItemHeight={40} virtualHeight={320} />
+```
+
+Vue 对应使用 kebab-case：
+
+```diff
+- <VirtualTable :data="rows" :row-height="40" :height="320" />
++ <VirtualTable :data-source="rows" :virtual-item-height="40" :virtual-height="320" />
+```
+
+VirtualTable 选择状态统一复用 Table 的 `rowSelection.selectedRowKeys` 模型。React 使用 `onSelectionChange(selectedKeys)` 接收选择结果：
+
+```diff
+- <VirtualTable selectable selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])} />
++ <VirtualTable
++   rowSelection={{ selectedRowKeys }}
++   onSelectionChange={setSelectedKeys}
++ />
+```
+
+Vue 使用 `row-selection`，并可监听 `selection-change` 或使用 `v-model:row-selection`：
+
+```diff
+- <VirtualTable selectable :selected-keys="selectedKeys" @select="selectRow" />
++ <VirtualTable
++   :row-selection="{ selectedRowKeys }"
++   @selection-change="selectedKeys = $event"
++ />
+```
+
+Table 自动虚拟化和推荐态只保留一个阈值 `virtualThreshold`；`autoVirtualThreshold` 不再保留。`virtual=true` 仍强制启用虚拟滚动，`autoVirtual=false` 时达到阈值只暴露推荐状态：
+
+```diff
+- <Table :data-source="rows" :auto-virtual-threshold="10000" :virtual-threshold="1000" />
++ <Table :data-source="rows" :virtual-threshold="1000" />
+```
+
+core 不再导出与 Table 类型重复的泛型接口：
+
+- `GenericTableColumn<T>` → `TableColumn<T>`
+- `GenericRowSelection<T>` → `RowSelectionConfig<T>`
+- `GenericExpandable<T>` → `ExpandableConfig<T>`
+- `GenericTableProps<T>` → `TableProps<T>`
+
+```diff
+- import type { GenericTableProps, GenericTableColumn } from '@expcat/tigercat-core'
++ import type { TableProps, TableColumn } from '@expcat/tigercat-core'
+```
+
 ### Carousel 索引改为受控模型
 
 `Carousel` 移除 `initialSlide`，改为与其他非表单受控量一致的 `currentIndex` 模型。

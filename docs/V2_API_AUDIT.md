@@ -4,15 +4,15 @@
 type: v2-api-audit
 scope: R11 core API and shared contracts audit for R12-R20 execution
 verified-date: 2026-06-29
-source: current repository state after R15 Form composite selectors completion
+source: current repository state after R17 Data and table stack completion
 -->
 
 本文是 R11 的审计输出，只记录 v2.0.0 发布前 R12-R20 批次要执行的 API 删除、合并与命名收敛计划。R11 不删除运行时 API，也不新增兼容层。
 
 ## 审计基线
 
-- `api-reports/public-api-baseline.json` 当前覆盖 156 个 `*Props` 接口、2887 个 core exports、148 个 React 公开组件和 148 个 Vue 公开组件。
-- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、Vue checkable Form primitives 不回退到 `checked` / `defaultChecked` / `update:checked`、Form composite selectors 不回退到旧尺寸 aliases / DatePicker-TimePicker 旧模型 aliases / 旧 search 和 empty 命名、登记过的受控量 parity、Skill references 覆盖与文档预算。
+- `api-reports/public-api-baseline.json` 当前覆盖 155 个 `*Props` 接口、2882 个 core exports、148 个 React 公开组件和 148 个 Vue 公开组件。
+- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、Vue checkable Form primitives 不回退到 `checked` / `defaultChecked` / `update:checked`、Form composite selectors 不回退到旧尺寸 aliases / DatePicker-TimePicker 旧模型 aliases / 旧 search 和 empty 命名、Navigation 受控回调与子组件 subpath 不回流、Data/Table 旧数据入口与虚拟阈值 API 不回流、登记过的受控量 parity、Skill references 覆盖与文档预算。
 - `packages/core/src/types/base.ts`、`events.ts`、`generics.ts` 是公共合约收敛事实源；后续批次应优先复用这些 shared contracts，不能在 React/Vue 组件内各自临时发明命名。
 - `packages/core/src/types/index.ts` 与 `packages/core/src/utils/index.ts` 仍以宽 barrel 公开大量类型与工具；R12-R20 删除或合并 public exports 时必须同步更新 API baseline、迁移说明和对应分组测试。
 
@@ -98,7 +98,17 @@ source: current repository state after R15 Form composite selectors completion
 - 唯一替代 API：React active key 用 `onActiveKeyChange`；Menu 搜索用 `onSearchChange`；Menu / Tree controlled keys 用对应 `on*KeysChange`；交互上下文继续从 `onSelect` / `onOpenChange` / `onExpand` / `onCheck` 读取；子组件 subpath 仍按 PascalCase package path 导入。
 - 证据：Navigation core type files、React/Vue Navigation components、public component facts、React/Vue package exports、Navigation examples、Navigation group tests、`api-reports/public-api-baseline.json`、generated Skill references 和 `scripts/validate-api.mjs` R16 guard 已同步更新。
 - 实际验证：`npx -y pnpm@11.9.0 test:group:navigation`、`npx -y pnpm@11.9.0 vitest run tests/core/examples-lazy-routes.spec.ts`、`npx -y pnpm@11.9.0 test:a11y`、`npx -y pnpm@11.9.0 exports:sync`、`npx -y pnpm@11.9.0 exports:check`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline && npx -y pnpm@11.9.0 api:baseline:check`、`npx -y pnpm@11.9.0 docs:api && npx -y pnpm@11.9.0 docs:api:check`、`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`、`rg -n "^(<<<<<<<|=======|>>>>>>>)"`、`git diff --check`。
-- 剩余阻塞：无；下一批次为 R17 Data and table stack。
+- 剩余阻塞：无；下一批次为 R17 Data and table stack（已完成，见下节）。
+
+### R17 Data + Table（2026-06-29）
+
+- 实际删除 / 合并：删除 VirtualTable 的 `data`、`rowHeight`、`height`、`selectable`、`selectedKeys`、`onSelect` 公共入口；删除 Table / DataTableWithToolbar 的 `autoVirtualThreshold`；删除 `TABLE_AUTO_VIRTUAL_THRESHOLD`、`TableVirtualRecommendationOptions.autoThreshold`、`TableVirtualRecommendation.autoThreshold`；删除 `GenericTableColumn`、`GenericRowSelection`、`GenericExpandable`、`GenericTableProps` public interfaces。
+- Controlled model 变更：React VirtualTable 使用 `rowSelection.selectedRowKeys` / `rowSelection.defaultSelectedRowKeys` 与 `onSelectionChange(selectedKeys)`；Vue VirtualTable 使用 `rowSelection.selectedRowKeys` / `rowSelection.defaultSelectedRowKeys`、`selection-change` 和 `update:rowSelection`。行 key 优先读取 `rowSelection.getRowKey`，否则继续使用 `rowKey`。
+- Virtualization 变更：Table 自动启用虚拟滚动与推荐态都以 `virtualThreshold` 为唯一阈值；`virtual=true` 仍强制启用，`autoVirtual=false` 时达到阈值只暴露推荐状态。
+- 唯一替代 API：VirtualTable 数据使用 `dataSource`；行高和 viewport 使用 `virtualItemHeight` / `virtualHeight`；选择使用 `rowSelection` 与 React `onSelectionChange` 或 Vue `selection-change` / `update:rowSelection`；泛型表格类型使用 `TableColumn<T>`、`RowSelectionConfig<T>`、`ExpandableConfig<T>`、`TableProps<T>`；自动虚拟化阈值使用 `virtualThreshold`。
+- 证据：core table / virtual-table / generics types、table utils、React/Vue Table 与 VirtualTable components、Vue DataTableWithToolbar、React/Vue VirtualTable demos、React/Vue Table 与 VirtualTable tests、`api-reports/public-api-baseline.json`、generated Skill references 和 `scripts/validate-api.mjs` R17 guard 已同步更新。
+- 实际验证：`npx -y pnpm@11.9.0 test:group:data`、`npx -y pnpm@11.9.0 vitest run tests/react/TableState.spec.tsx tests/vue/TableState.spec.ts`、`npx -y pnpm@11.9.0 vitest run tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts tests/core/virtual-table-utils.spec.ts tests/core/table-utils.spec.ts`、`npx -y pnpm@11.9.0 e2e:smoke`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline && npx -y pnpm@11.9.0 api:baseline:check`、`npx -y pnpm@11.9.0 docs:api && npx -y pnpm@11.9.0 docs:api:check`、`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`、`rg -n "^(<<<<<<<|=======|>>>>>>>)"`、`git diff --check`。
+- 剩余阻塞：无；下一批次为 R18 Charts and visualization stack。
 
 完成任一涉及 public API 或 shared contract 清理的 R12-R20 任务后，必须在本节追加对应 `### Rxx ...（YYYY-MM-DD）` 记录，并包含：
 

@@ -13,6 +13,7 @@ import {
   getTableFixedCellClasses,
   getTableFixedHeaderCellClasses,
   getTableColgroup,
+  getNextTableSelectAllKeys,
   tableBaseClasses,
   virtualTableHeaderClasses,
   virtualTableHeaderCellClasses,
@@ -23,16 +24,17 @@ import {
   resolveLocaleText,
   mergeTigerLocale,
   type TableColumn,
+  type RowSelectionConfig,
   type VirtualTableRange,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueVirtualTableProps {
-  data?: unknown[]
+  dataSource?: Record<string, unknown>[]
   columns?: TableColumn[]
-  rowHeight?: number
-  height?: number
+  virtualItemHeight?: number
+  virtualHeight?: number
   width?: number | 'auto'
   overscan?: number
   stickyHeader?: boolean
@@ -41,8 +43,7 @@ export interface VueVirtualTableProps {
   rowClassName?: string | ((row: unknown, index: number) => string)
   loading?: boolean
   emptyText?: string
-  selectable?: boolean
-  selectedKeys?: (string | number)[]
+  rowSelection?: RowSelectionConfig
   striped?: boolean
   bordered?: boolean
   className?: string
@@ -55,7 +56,7 @@ export const VirtualTable = defineComponent({
   name: 'TigerVirtualTable',
   inheritAttrs: false,
   props: {
-    data: {
+    dataSource: {
       type: Array as PropType<Record<string, unknown>[]>,
       default: () => []
     },
@@ -63,8 +64,8 @@ export const VirtualTable = defineComponent({
       type: Array as PropType<TableColumn[]>,
       default: () => []
     },
-    rowHeight: { type: Number, default: 48 },
-    height: { type: Number, default: 400 },
+    virtualItemHeight: { type: Number, default: 48 },
+    virtualHeight: { type: Number, default: 400 },
     width: { type: [Number, String] as PropType<number | 'auto'>, default: 'auto' },
     overscan: { type: Number, default: 5 },
     stickyHeader: { type: Boolean, default: true },
@@ -81,35 +82,64 @@ export const VirtualTable = defineComponent({
     },
     loading: { type: Boolean, default: false },
     emptyText: { type: String, default: undefined },
-    selectable: { type: Boolean, default: false },
-    selectedKeys: {
-      type: Array as PropType<(string | number)[]>,
-      default: () => []
+    rowSelection: {
+      type: Object as PropType<RowSelectionConfig>,
+      default: undefined
     },
     striped: { type: Boolean, default: false },
     bordered: { type: Boolean, default: false },
     className: { type: String, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
-  emits: ['row-click', 'select'],
+  emits: ['row-click', 'selection-change', 'update:rowSelection'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const containerRef = ref<HTMLElement | null>(null)
     const scrollTop = ref(0)
     const scrollLeft = ref(0)
+    const resolvedData = computed(() => props.dataSource ?? [])
+    const uncontrolledSelectedKeys = ref<(string | number)[]>(
+      props.rowSelection?.defaultSelectedRowKeys ?? props.rowSelection?.selectedRowKeys ?? []
+    )
+    const isSelectionControlled = computed(() => props.rowSelection?.selectedRowKeys !== undefined)
+    const selectedKeys = computed(() =>
+      isSelectionControlled.value
+        ? (props.rowSelection?.selectedRowKeys ?? [])
+        : uncontrolledSelectedKeys.value
+    )
+    const hasSelection = computed(() => !!props.rowSelection)
+
+    function commitSelection(nextKeys: (string | number)[]) {
+      if (!isSelectionControlled.value) {
+        uncontrolledSelectedKeys.value = nextKeys
+      }
+      emit('selection-change', nextKeys)
+      emit('update:rowSelection', { ...props.rowSelection, selectedRowKeys: nextKeys })
+    }
+
+    function toggleRowSelection(key: string | number, row: Record<string, unknown>) {
+      if (!props.rowSelection || props.rowSelection.getCheckboxProps?.(row)?.disabled) return
+      if (props.rowSelection.type === 'radio') {
+        commitSelection([key])
+        return
+      }
+      commitSelection(
+        getNextTableSelectAllKeys(selectedKeys.value, [key], !selectedSet.value.has(key))
+      )
+    }
 
     const range = computed<VirtualTableRange>(() =>
       calculateVirtualRange(
         scrollTop.value,
-        props.height,
-        props.data.length,
-        props.rowHeight,
+        props.virtualHeight,
+        resolvedData.value.length,
+        props.virtualItemHeight,
         props.overscan
       )
     )
 
-    const visibleData = computed(() => props.data.slice(range.value.start, range.value.end))
+    const visibleData = computed(() => resolvedData.value.slice(range.value.start, range.value.end))
 
     function onScroll() {
       if (containerRef.value) {
@@ -133,7 +163,7 @@ export const VirtualTable = defineComponent({
       )
     )
 
-    const selectedSet = computed(() => new Set(props.selectedKeys))
+    const selectedSet = computed(() => new Set(selectedKeys.value))
 
     const fixedInfo = computed(() => getVirtualTableFixedInfo(props.columns))
 
@@ -209,16 +239,18 @@ export const VirtualTable = defineComponent({
       // Visible rows
       const rows = visibleData.value.map((row, localIdx) => {
         const globalIdx = range.value.start + localIdx
-        const key = getVirtualRowKey(
-          row,
-          globalIdx,
-          props.rowKey as keyof typeof row | ((r: typeof row, i: number) => string | number)
-        )
+        const key = props.rowSelection?.getRowKey
+          ? props.rowSelection.getRowKey(row)
+          : getVirtualRowKey(
+              row,
+              globalIdx,
+              props.rowKey as keyof typeof row | ((r: typeof row, i: number) => string | number)
+            )
         const isSelected = selectedSet.value.has(key)
-        const isInteractive = props.selectable || typeof attrs.onRowClick === 'function'
+        const isInteractive = hasSelection.value || typeof attrs.onRowClick === 'function'
         const activate = () => {
           emit('row-click', row, globalIdx)
-          if (props.selectable) emit('select', key, row, globalIdx)
+          if (hasSelection.value) toggleRowSelection(key, row)
         }
 
         const cells = visibleColumns.map((col, colIdx) =>
@@ -276,7 +308,7 @@ export const VirtualTable = defineComponent({
             ),
             // header occupies aria-rowindex 1
             'aria-rowindex': globalIdx + 2,
-            'aria-selected': props.selectable ? isSelected : undefined,
+            'aria-selected': hasSelection.value ? isSelected : undefined,
             tabindex: isInteractive ? 0 : undefined,
             // onClick stays attached so `row-click` always fires for consumers
             // that listen for it; keyboard activation is added when interactive.
@@ -301,7 +333,7 @@ export const VirtualTable = defineComponent({
         'aria-hidden': true
       })
 
-      const bottomHeight = range.value.totalHeight - range.value.end * props.rowHeight
+      const bottomHeight = range.value.totalHeight - range.value.end * props.virtualItemHeight
       const bottomSpacer =
         bottomHeight > 0
           ? h('tr', {
@@ -336,7 +368,7 @@ export const VirtualTable = defineComponent({
 
       // Empty state
       const emptyEl =
-        props.data.length === 0 && !props.loading
+        resolvedData.value.length === 0 && !props.loading
           ? h(
               'div',
               { class: virtualTableEmptyClasses },
@@ -359,12 +391,12 @@ export const VirtualTable = defineComponent({
           ref: containerRef,
           class: containerClasses.value,
           style: {
-            height: `${props.height}px`,
+            height: `${props.virtualHeight}px`,
             ...(props.width !== 'auto' ? { width: `${props.width}px` } : {})
           },
           onScroll,
           role: 'grid',
-          'aria-rowcount': props.data.length
+          'aria-rowcount': resolvedData.value.length
         },
         [table, emptyEl, loadingEl]
       )

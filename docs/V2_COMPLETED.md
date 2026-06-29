@@ -2,12 +2,12 @@
 
 <!-- LLM-INDEX
 type: completed-roadmap-archive
-scope: v2.0.0 completed R01-R11 roadmap execution details
+scope: v2.0.0 completed R01-R17 roadmap execution details
 verified-date: 2026-06-29
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
-本文归档 v2.0.0 Roadmap 已完成 R01-R16 的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
+本文归档 v2.0.0 Roadmap 已完成 R01-R17 的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
 
 ## 已完成任务详情
 
@@ -639,3 +639,37 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `git diff --check`
 
 **状态更新要求**：完成后已写回状态、日期、删除的 Navigation API/subpath 摘要、Skill/examples 更新范围和关键验证命令；阶段 10 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R17。
+
+### R17 Data and table stack
+
+**状态**：已完成（2026-06-29）。
+
+**目标**：清理 Data 与 table stack，统一 columns/filter/sort/pagination/virtual props，删除重叠阈值和 toolbar alias，收敛固定列与虚拟滚动逻辑。
+
+**允许修改**：Data/table 相关 core types、React/Vue 组件、table helper、目标 tests/e2e、Skill data/advanced props/examples、example 使用、迁移说明、变更记录、API baseline。
+
+**不得修改**：Form/Navigation/Charts/Advanced editors/Composite business 组件行为、无关 exports。
+
+**依赖/阻塞**：依赖 R11；`DataTableWithToolbar` 本轮只同步底层 Table props，toolbar 业务 alias 仍留给 R20 composite/business 收口。
+
+**组件范围**：Table、DataTableWithToolbar、VirtualTable、Calendar、Timeline、Collapse、Countdown。
+
+**执行摘要**：Table / VirtualTable / DataTableWithToolbar 的数据入口已统一为 `dataSource`；VirtualTable 删除 `data`、`rowHeight`、`height`、`selectable`、`selectedKeys`、`onSelect` 公共入口，改用 `virtualItemHeight`、`virtualHeight`、`rowSelection` 与 React `onSelectionChange` / Vue `selection-change`、`update:rowSelection`。Table 自动虚拟化与推荐态统一使用 `virtualThreshold`，删除 `autoVirtualThreshold` 与 `TABLE_AUTO_VIRTUAL_THRESHOLD` / `autoThreshold`。`GenericTableColumn`、`GenericRowSelection`、`GenericExpandable`、`GenericTableProps` 已删除，泛型用户改用 `TableColumn<T>`、`RowSelectionConfig<T>`、`ExpandableConfig<T>`、`TableProps<T>`。React/Vue VirtualTable 继续复用 shared fixed-column helpers，examples、Skill references、API baseline、迁移说明和变更记录已同步更新；`scripts/validate-api.mjs` 新增 R17 guard 防止旧 API 回流。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 test:group:data`
+- `npx -y pnpm@11.9.0 vitest run tests/react/TableState.spec.tsx tests/vue/TableState.spec.ts`
+- `npx -y pnpm@11.9.0 vitest run tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts tests/core/virtual-table-utils.spec.ts tests/core/table-utils.spec.ts`
+- `npx -y pnpm@11.9.0 e2e:smoke`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)"`
+- `git diff --check`
+
+**状态更新要求**：完成后已写回状态、日期、删除的 Data/table API 摘要、固定列/虚拟滚动验证范围、Skill/examples 更新范围和关键验证命令；阶段 11 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R18。

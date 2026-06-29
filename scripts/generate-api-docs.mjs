@@ -311,7 +311,7 @@ const COMPONENT_SNIPPETS = {
     TaskBoard: '<TaskBoard :columns="columns" />',
     Kanban: '<Kanban :columns="columns" />',
     VirtualTable:
-      '<VirtualTable :data="rows" :columns="fixedColumns" :row-height="40" :height="320" />'
+      '<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />'
   },
   React: {
     Icon: '<Icon name="search" />',
@@ -327,7 +327,8 @@ const COMPONENT_SNIPPETS = {
     FormWizard: '<FormWizard steps={steps} />',
     TaskBoard: '<TaskBoard columns={columns} />',
     Kanban: '<Kanban columns={columns} />',
-    VirtualTable: '<VirtualTable data={rows} columns={fixedColumns} rowHeight={40} height={320} />'
+    VirtualTable:
+      '<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />'
   }
 }
 
@@ -705,7 +706,7 @@ function getVueSnippet(component, category) {
     return '<Form :model=\"form\"><FormItem name=\"name\"><Input v-model=\"form.name\" /></FormItem></Form>'
   if (component === 'Table')
     return '<Table :columns=\"columns\" :data-source=\"rows\" row-key=\"id\" />'
-  if (category === 'Charts') return `<${component} :data=\"data\" />`
+  if (category === 'Charts') return `<${component} :data-source=\"data\" />`
   return `<${component} />`
 }
 

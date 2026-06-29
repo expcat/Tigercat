@@ -94,7 +94,6 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   autoVirtual = true,
   virtualHeight = 400,
   virtualItemHeight = 40,
-  autoVirtualThreshold = 10000,
   virtualThreshold = 1000,
   editable = false,
   editableCells,
@@ -285,10 +284,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         virtual,
         autoVirtual,
         dataLength: dataSource.length,
-        threshold: virtualThreshold,
-        autoThreshold: autoVirtualThreshold
+        threshold: virtualThreshold
       }),
-    [autoVirtual, autoVirtualThreshold, dataSource.length, virtual, virtualThreshold]
+    [autoVirtual, dataSource.length, virtual, virtualThreshold]
   )
 
   const effectiveVirtual = virtualRecommendation.enabled
@@ -357,7 +355,6 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           : undefined
       }
       data-tiger-virtual={virtualRecommendation.enabled ? 'enabled' : undefined}
-      data-tiger-virtual-auto={virtualRecommendation.autoEnabled ? 'true' : undefined}
       data-tiger-virtual-recommended={virtualRecommendation.recommended ? 'true' : undefined}
       data-tiger-virtual-threshold={
         virtualRecommendation.recommended ? virtualRecommendation.threshold : undefined

@@ -122,14 +122,14 @@ Vue PrintPageBreak accepts attrs/pass-through only; React PrintPageBreakProps ex
 
 ## VirtualTable
 
-`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 3/17 props
+`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 3/16 props
 
 Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
 
 Note: 复用 `TableColumn` 类型；固定列同样支持 `fixedClassName` / `fixedHeaderClassName`，用于跟随 striped、selected 和 hover 状态定制 sticky 单元格样式。
 
-| Prop         | Type               | Default | Notes                                                         |
-| ------------ | ------------------ | ------- | ------------------------------------------------------------- |
-| `data`       | `T[]`              | `-`     | Data rows                                                     |
-| `columns`    | `TableColumn<T>[]` | `-`     | Column definitions — reuses Table's TableColumn type          |
-| `rowHeight?` | `number`           | `-`     | Fixed row height in px (required for accurate virtualization) |
+| Prop                 | Type               | Default | Notes                                                         |
+| -------------------- | ------------------ | ------- | ------------------------------------------------------------- |
+| `dataSource?`        | `T[]`              | `-`     | Data rows                                                     |
+| `columns?`           | `TableColumn<T>[]` | `-`     | Column definitions — reuses Table's TableColumn type          |
+| `virtualItemHeight?` | `number`           | `-`     | Fixed row height in px (required for accurate virtualization) |

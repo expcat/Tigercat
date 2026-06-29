@@ -28,6 +28,26 @@
       "@demo-shared/*": ["../shared/*"],
       "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
       "@expcat/tigercat-react": ["../../../packages/react/src/index.tsx"],
+      "@expcat/tigercat-react/AnchorLink": ["../../../packages/react/src/components/Anchor"],
+      "@expcat/tigercat-react/BreadcrumbItem": [
+        "../../../packages/react/src/components/Breadcrumb"
+      ],
+      "@expcat/tigercat-react/DropdownItem": ["../../../packages/react/src/components/Dropdown"],
+      "@expcat/tigercat-react/DropdownMenu": ["../../../packages/react/src/components/Dropdown"],
+      "@expcat/tigercat-react/FloatButtonGroup": [
+        "../../../packages/react/src/components/FloatButton"
+      ],
+      "@expcat/tigercat-react/InputGroupAddon": [
+        "../../../packages/react/src/components/InputGroup"
+      ],
+      "@expcat/tigercat-react/MenuItem": ["../../../packages/react/src/components/Menu"],
+      "@expcat/tigercat-react/MenuItemGroup": ["../../../packages/react/src/components/Menu"],
+      "@expcat/tigercat-react/PrintPageBreak": [
+        "../../../packages/react/src/components/PrintLayout"
+      ],
+      "@expcat/tigercat-react/StepsItem": ["../../../packages/react/src/components/Steps"],
+      "@expcat/tigercat-react/SubMenu": ["../../../packages/react/src/components/Menu"],
+      "@expcat/tigercat-react/TabPane": ["../../../packages/react/src/components/Tabs"],
       "@expcat/tigercat-react/*": ["../../../packages/react/src/components/*"]
     }
   },

@@ -153,15 +153,15 @@ description: Compact generated API summary for Tigercat core types
 
 ## Core
 
-| Type File         | Props Interfaces                                             | Components | Exports |
-| ----------------- | ------------------------------------------------------------ | ---------- | ------- |
-| base.ts           | BaseInteractiveProps, BaseFormControlProps, BaseLayoutProps  | -          | 4       |
-| events.ts         | -                                                            | -          | 23      |
-| floating-popup.ts | BaseFloatingPopupProps                                       | -          | 2       |
-| generics.ts       | GenericTableProps, GenericSelectProps, GenericFormFieldProps | -          | 9       |
-| locale.ts         | -                                                            | -          | 25      |
-| slots.ts          | -                                                            | -          | 10      |
-| theme.ts          | -                                                            | -          | 11      |
+| Type File         | Props Interfaces                                            | Components | Exports |
+| ----------------- | ----------------------------------------------------------- | ---------- | ------- |
+| base.ts           | BaseInteractiveProps, BaseFormControlProps, BaseLayoutProps | -          | 4       |
+| events.ts         | -                                                           | -          | 23      |
+| floating-popup.ts | BaseFloatingPopupProps                                      | -          | 2       |
+| generics.ts       | GenericSelectProps, GenericFormFieldProps                   | -          | 5       |
+| locale.ts         | -                                                           | -          | 25      |
+| slots.ts          | -                                                           | -          | 10      |
+| theme.ts          | -                                                           | -          | 11      |
 
 ## Other
 
@@ -169,4 +169,4 @@ description: Compact generated API summary for Tigercat core types
 | ----------- | ---------------- | ---------- | ------- |
 | viewport.ts | -                | -          | 2       |
 
-Total exported types: 613.
+Total exported types: 609.

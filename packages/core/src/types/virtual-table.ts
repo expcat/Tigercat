@@ -6,17 +6,17 @@
  * with fixed headers, column virtualization, and overscan support.
  */
 
-import type { TableColumn } from './table'
+import type { RowSelectionConfig, TableColumn } from './table'
 
 export interface VirtualTableProps<T = Record<string, unknown>> {
   /** Data rows */
-  data: T[]
+  dataSource?: T[]
   /** Column definitions — reuses Table's TableColumn type */
-  columns: TableColumn<T>[]
+  columns?: TableColumn<T>[]
   /** Fixed row height in px (required for accurate virtualization) */
-  rowHeight?: number
+  virtualItemHeight?: number
   /** Viewport height in px */
-  height?: number
+  virtualHeight?: number
   /** Viewport width in px or auto */
   width?: number | 'auto'
   /** Number of extra rows rendered above/below viewport */
@@ -33,10 +33,8 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   loading?: boolean
   /** Empty state text */
   emptyText?: string
-  /** Enable row selection */
-  selectable?: boolean
-  /** Selected row keys (controlled) */
-  selectedKeys?: (string | number)[]
+  /** Row selection configuration — mirrors Table's selection model */
+  rowSelection?: RowSelectionConfig<T>
   /** Striped rows */
   striped?: boolean
   /** Bordered variant */

@@ -631,7 +631,14 @@ const R16_NAVIGATION_CHILD_TARGETS = new Map([
 for (const [childComponent, parentComponent] of R16_NAVIGATION_CHILD_TARGETS) {
   for (const framework of ['react', 'vue']) {
     const extension = framework === 'react' ? '.tsx' : '.ts'
-    const childFile = join(ROOT, 'packages', framework, 'src', 'components', `${childComponent}${extension}`)
+    const childFile = join(
+      ROOT,
+      'packages',
+      framework,
+      'src',
+      'components',
+      `${childComponent}${extension}`
+    )
 
     if (existsSync(childFile)) {
       addIssue(
@@ -709,13 +716,75 @@ for (const [relativePath, callbackName] of R16_REQUIRED_REACT_CALLBACKS) {
   if (!existsSync(filepath)) continue
   const content = readFileSync(filepath, 'utf-8')
   if (!new RegExp(`\\b${callbackName}\\b`).test(content)) {
-    addIssue(
-      filepath,
-      0,
-      'navigation-api',
-      `R16 Navigation React API is missing ${callbackName}`
-    )
+    addIssue(filepath, 0, 'navigation-api', `R16 Navigation React API is missing ${callbackName}`)
   }
+}
+
+// ----- R17 Data/table stack public API guard -----
+
+const R17_FORBIDDEN_TYPE_EXPORTS = [
+  'GenericTableColumn',
+  'GenericRowSelection',
+  'GenericExpandable',
+  'GenericTableProps'
+]
+
+for (const filename of typeFiles) {
+  const filepath = join(TYPES_DIR, filename)
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    for (const typeName of R17_FORBIDDEN_TYPE_EXPORTS) {
+      if (new RegExp(`\\bexport\\s+interface\\s+${typeName}\\b`).test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'data-table-api',
+          `R17 data/table stack must use TableColumn<T>, RowSelectionConfig<T>, ExpandableConfig<T>, and TableProps<T> instead of ${typeName}`
+        )
+      }
+    }
+    if (/\bautoVirtualThreshold\s*\??\s*:/.test(line)) {
+      addIssue(
+        filepath,
+        index + 1,
+        'data-table-api',
+        'R17 Table API must use virtualThreshold as the only virtual threshold prop'
+      )
+    }
+  })
+}
+
+const R17_VIRTUAL_TABLE_FILES = [
+  'packages/core/src/types/virtual-table.ts',
+  'packages/react/src/components/VirtualTable.tsx',
+  'packages/vue/src/components/VirtualTable.ts'
+]
+
+const R17_VIRTUAL_TABLE_FORBIDDEN = [
+  { label: 'data prop', regex: /^\s{2}data\s*\??\s*:/ },
+  { label: 'rowHeight prop', regex: /\browHeight\s*\??\s*:/ },
+  { label: 'height prop', regex: /^\s{2}height\s*\??\s*:/ },
+  { label: 'selectable prop', regex: /\bselectable\s*\??\s*:/ },
+  { label: 'selectedKeys prop', regex: /^\s{2}selectedKeys\s*\??\s*:/ },
+  { label: 'onSelect callback', regex: /^\s*onSelect\??\s*:/ }
+]
+
+for (const relativePath of R17_VIRTUAL_TABLE_FILES) {
+  const filepath = join(ROOT, relativePath)
+  if (!existsSync(filepath)) continue
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    for (const rule of R17_VIRTUAL_TABLE_FORBIDDEN) {
+      if (rule.regex.test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'data-table-api',
+          `R17 VirtualTable must use dataSource, virtualItemHeight, virtualHeight, rowSelection, and onSelectionChange instead of ${rule.label}`
+        )
+      }
+    }
+  })
 }
 
 // ----- LLM docs coverage check -----
@@ -1001,6 +1070,7 @@ if (jsonMode) {
       'form-primitive-model': '表单基础组件受控模型禁止旧 API 回流',
       'form-composite-api': '表单复合组件 R15 旧 API 禁止回流',
       'navigation-api': '导航组件 R16 旧 API 与子路径目标禁止回流',
+      'data-table-api': 'Data/Table R17 旧 API 禁止回流',
       'controlled-parity': '受控量双端对称',
       'public-deprecated': '公开 API 禁止 @deprecated',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',

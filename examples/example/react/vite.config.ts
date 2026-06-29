@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 const workspaceRoot = path.resolve(__dirname, '../../..')
+const reactComponentsDir = path.resolve(workspaceRoot, 'packages/react/src/components')
+const reactComponentAlias = (component: string) => path.resolve(reactComponentsDir, component)
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
@@ -16,20 +18,56 @@ export default defineConfig(({ command }) => ({
     alias: [
       { find: '@demo-shared', replacement: path.resolve(__dirname, '../shared') },
       {
+        find: '@expcat/tigercat-react/AnchorLink',
+        replacement: reactComponentAlias('Anchor')
+      },
+      {
+        find: '@expcat/tigercat-react/BreadcrumbItem',
+        replacement: reactComponentAlias('Breadcrumb')
+      },
+      {
+        find: '@expcat/tigercat-react/DropdownItem',
+        replacement: reactComponentAlias('Dropdown')
+      },
+      {
+        find: '@expcat/tigercat-react/DropdownMenu',
+        replacement: reactComponentAlias('Dropdown')
+      },
+      {
         find: '@expcat/tigercat-react/FloatButtonGroup',
-        replacement: path.resolve(workspaceRoot, 'packages/react/src/components/FloatButton')
+        replacement: reactComponentAlias('FloatButton')
       },
       {
         find: '@expcat/tigercat-react/InputGroupAddon',
-        replacement: path.resolve(workspaceRoot, 'packages/react/src/components/InputGroup')
+        replacement: reactComponentAlias('InputGroup')
+      },
+      {
+        find: '@expcat/tigercat-react/MenuItem',
+        replacement: reactComponentAlias('Menu')
+      },
+      {
+        find: '@expcat/tigercat-react/MenuItemGroup',
+        replacement: reactComponentAlias('Menu')
       },
       {
         find: '@expcat/tigercat-react/PrintPageBreak',
-        replacement: path.resolve(workspaceRoot, 'packages/react/src/components/PrintLayout')
+        replacement: reactComponentAlias('PrintLayout')
+      },
+      {
+        find: '@expcat/tigercat-react/StepsItem',
+        replacement: reactComponentAlias('Steps')
+      },
+      {
+        find: '@expcat/tigercat-react/SubMenu',
+        replacement: reactComponentAlias('Menu')
+      },
+      {
+        find: '@expcat/tigercat-react/TabPane',
+        replacement: reactComponentAlias('Tabs')
       },
       {
         find: /^@expcat\/tigercat-react\/(.+)$/,
-        replacement: `${path.resolve(workspaceRoot, 'packages/react/src/components')}/$1`
+        replacement: `${reactComponentsDir}/$1`
       },
       {
         find: '@expcat/tigercat-react',

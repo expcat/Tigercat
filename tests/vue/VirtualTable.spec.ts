@@ -25,7 +25,7 @@ function makeData(count: number) {
 describe('VirtualTable (Vue)', () => {
   it('renders with basic data', () => {
     const { getByRole, getByText } = render(VirtualTable, {
-      props: { data: makeData(10), columns, height: 400, rowHeight: 40 }
+      props: { dataSource: makeData(10), columns, virtualHeight: 400, virtualItemHeight: 40 }
     })
     expect(getByRole('grid')).toBeTruthy()
     expect(getByText('ID')).toBeTruthy()
@@ -34,7 +34,7 @@ describe('VirtualTable (Vue)', () => {
 
   it('renders header cells', () => {
     const { getAllByRole } = render(VirtualTable, {
-      props: { data: makeData(5), columns }
+      props: { dataSource: makeData(5), columns }
     })
     const ths = getAllByRole('columnheader')
     expect(ths.length).toBe(2)
@@ -44,35 +44,35 @@ describe('VirtualTable (Vue)', () => {
 
   it('shows empty text when no data', () => {
     const { getByText } = render(VirtualTable, {
-      props: { data: [], columns, emptyText: 'Nothing here' }
+      props: { dataSource: [], columns, emptyText: 'Nothing here' }
     })
     expect(getByText('Nothing here')).toBeTruthy()
   })
 
   it('shows default empty text', () => {
     const { getByText } = render(VirtualTable, {
-      props: { data: [], columns }
+      props: { dataSource: [], columns }
     })
     expect(getByText('No data')).toBeTruthy()
   })
 
   it('shows loading overlay', () => {
     const { getByText } = render(VirtualTable, {
-      props: { data: makeData(5), columns, loading: true }
+      props: { dataSource: makeData(5), columns, loading: true }
     })
     expect(getByText('Loading...')).toBeTruthy()
   })
 
   it('does not show loading when not loading', () => {
     const { queryByText } = render(VirtualTable, {
-      props: { data: makeData(5), columns, loading: false }
+      props: { dataSource: makeData(5), columns, loading: false }
     })
     expect(queryByText('Loading...')).toBeNull()
   })
 
   it('renders row data', () => {
     const { getByText } = render(VirtualTable, {
-      props: { data: makeData(3), columns, rowHeight: 40, height: 400 }
+      props: { dataSource: makeData(3), columns, virtualItemHeight: 40, virtualHeight: 400 }
     })
     expect(getByText('Row 1')).toBeTruthy()
     expect(getByText('Row 2')).toBeTruthy()
@@ -81,7 +81,7 @@ describe('VirtualTable (Vue)', () => {
 
   it('emits row-click event', async () => {
     const wrapper = render(VirtualTable, {
-      props: { data: makeData(3), columns, rowHeight: 40, height: 400 }
+      props: { dataSource: makeData(3), columns, virtualItemHeight: 40, virtualHeight: 400 }
     })
     const rows = wrapper.getAllByRole('row')
     // First row is header, second is spacer (aria-hidden), rows start from index 2
@@ -100,12 +100,11 @@ describe('VirtualTable (Vue)', () => {
   it('makes interactive rows keyboard-activable with aria (C23-3)', async () => {
     const wrapper = render(VirtualTable, {
       props: {
-        data: makeData(3),
+        dataSource: makeData(3),
         columns,
-        rowHeight: 40,
-        height: 400,
-        selectable: true,
-        selectedKeys: [1],
+        virtualItemHeight: 40,
+        virtualHeight: 400,
+        rowSelection: { selectedRowKeys: [1] },
         rowKey: 'id'
       }
     })
@@ -120,21 +119,27 @@ describe('VirtualTable (Vue)', () => {
 
     await fireEvent.keyDown(first, { key: 'Enter' })
     expect(wrapper.emitted('row-click')?.length).toBe(1)
-    expect(wrapper.emitted('select')?.length).toBe(1)
+    expect(wrapper.emitted('selection-change')?.[0]).toEqual([[]])
   })
 
   it('does not make rows focusable when non-interactive', () => {
     const wrapper = render(VirtualTable, {
-      props: { data: makeData(3), columns, rowHeight: 40, height: 400 }
+      props: { dataSource: makeData(3), columns, virtualItemHeight: 40, virtualHeight: 400 }
     })
     const dataRows = wrapper.getAllByRole('row').filter((r) => r.querySelector('td'))
     expect(dataRows[0].getAttribute('tabindex')).toBeNull()
     expect(dataRows[0].getAttribute('aria-selected')).toBeNull()
   })
 
-  it('emits select when selectable', async () => {
+  it('emits selection-change when rowSelection is enabled', async () => {
     const wrapper = render(VirtualTable, {
-      props: { data: makeData(3), columns, rowHeight: 40, height: 400, selectable: true }
+      props: {
+        dataSource: makeData(3),
+        columns,
+        virtualItemHeight: 40,
+        virtualHeight: 400,
+        rowSelection: { getRowKey: (row: Record<string, unknown>) => row.id as string | number }
+      }
     })
     const rows = wrapper.getAllByRole('row')
     const dataRows = rows.filter(
@@ -145,28 +150,28 @@ describe('VirtualTable (Vue)', () => {
     )
     if (dataRows.length > 0) {
       await fireEvent.click(dataRows[0])
-      expect(wrapper.emitted('select')?.[0]).toBeTruthy()
+      expect(wrapper.emitted('selection-change')?.[0]).toEqual([[1]])
     }
   })
 
   it('applies aria-rowcount', () => {
     const data = makeData(100)
     const { getByRole } = render(VirtualTable, {
-      props: { data, columns, rowHeight: 40, height: 200 }
+      props: { dataSource: data, columns, virtualItemHeight: 40, virtualHeight: 200 }
     })
     expect(getByRole('grid').getAttribute('aria-rowcount')).toBe('100')
   })
 
   it('applies bordered class', () => {
     const { getByRole } = render(VirtualTable, {
-      props: { data: makeData(3), columns, bordered: true }
+      props: { dataSource: makeData(3), columns, bordered: true }
     })
     expect(getByRole('grid').className).toContain('border')
   })
 
   it('applies custom className', () => {
     const { getByRole } = render(VirtualTable, {
-      props: { data: makeData(3), columns, className: 'custom-vt' }
+      props: { dataSource: makeData(3), columns, className: 'custom-vt' }
     })
     expect(getByRole('grid').className).toContain('custom-vt')
   })
@@ -174,7 +179,13 @@ describe('VirtualTable (Vue)', () => {
   it('renders only visible rows for large datasets', () => {
     // 1000 rows, 40px each, 200px viewport → visible ~5 + overscan 5 = ~15 rows
     const { getAllByRole } = render(VirtualTable, {
-      props: { data: makeData(1000), columns, rowHeight: 40, height: 200, overscan: 5 }
+      props: {
+        dataSource: makeData(1000),
+        columns,
+        virtualItemHeight: 40,
+        virtualHeight: 200,
+        overscan: 5
+      }
     })
     // Filter to data rows only (not header, not spacers)
     const allRows = getAllByRole('row')
@@ -195,15 +206,15 @@ describe('VirtualTable (Vue)', () => {
       { id: 'b', name: 'Beta' }
     ]
     const { getByText } = render(VirtualTable, {
-      props: { data, columns, rowKey: 'id' }
+      props: { dataSource: data, columns, rowKey: 'id' }
     })
     expect(getByText('Alpha')).toBeTruthy()
     expect(getByText('Beta')).toBeTruthy()
   })
 
-  it('sets height style on container', () => {
+  it('sets virtualHeight style on container', () => {
     const { getByRole } = render(VirtualTable, {
-      props: { data: makeData(5), columns, height: 500 }
+      props: { dataSource: makeData(5), columns, virtualHeight: 500 }
     })
     expect(getByRole('grid').style.height).toBe('500px')
   })
@@ -214,7 +225,7 @@ describe('VirtualTable (Vue)', () => {
       { key: 'name', title: 'Name', width: '200px' }
     ]
     const { getAllByRole } = render(VirtualTable, {
-      props: { data: makeData(3), columns: cols }
+      props: { dataSource: makeData(3), columns: cols }
     })
     const ths = getAllByRole('columnheader')
     expect(ths[0].style.width).toBe('100px')
@@ -238,7 +249,7 @@ describe('VirtualTable (Vue)', () => {
 
     it('applies sticky left style to fixed-left header cell', () => {
       const { getByText } = render(VirtualTable, {
-        props: { data: makeFixedData(5), columns: fixedColumns }
+        props: { dataSource: makeFixedData(5), columns: fixedColumns }
       })
       const th = getByText('ID').closest('th')!
       expect(th.style.position).toBe('sticky')
@@ -248,7 +259,7 @@ describe('VirtualTable (Vue)', () => {
 
     it('pins fixed-column widths with a colgroup', () => {
       const { container } = render(VirtualTable, {
-        props: { data: makeFixedData(5), columns: fixedColumns }
+        props: { dataSource: makeFixedData(5), columns: fixedColumns }
       })
       const widths = Array.from(container.querySelectorAll('table > colgroup col')).map(
         (col) => (col as HTMLElement).style.width
@@ -259,7 +270,7 @@ describe('VirtualTable (Vue)', () => {
 
     it('applies sticky right style to fixed-right header cell', () => {
       const { getByText } = render(VirtualTable, {
-        props: { data: makeFixedData(5), columns: fixedColumns }
+        props: { dataSource: makeFixedData(5), columns: fixedColumns }
       })
       const th = getByText('Action').closest('th')!
       expect(th.style.position).toBe('sticky')
@@ -269,7 +280,7 @@ describe('VirtualTable (Vue)', () => {
 
     it('does not apply sticky style to non-fixed header cell', () => {
       const { getByText } = render(VirtualTable, {
-        props: { data: makeFixedData(5), columns: fixedColumns }
+        props: { dataSource: makeFixedData(5), columns: fixedColumns }
       })
       const th = getByText('Name').closest('th')!
       expect(th.style.position).not.toBe('sticky')
@@ -277,7 +288,12 @@ describe('VirtualTable (Vue)', () => {
 
     it('applies sticky left style to fixed-left body cell', () => {
       const { getAllByRole } = render(VirtualTable, {
-        props: { data: makeFixedData(3), columns: fixedColumns, rowHeight: 40, height: 400 }
+        props: {
+          dataSource: makeFixedData(3),
+          columns: fixedColumns,
+          virtualItemHeight: 40,
+          virtualHeight: 400
+        }
       })
       const rows = getAllByRole('row')
       const dataRows = rows.filter(
@@ -295,7 +311,12 @@ describe('VirtualTable (Vue)', () => {
 
     it('applies sticky right style to fixed-right body cell', () => {
       const { getAllByRole } = render(VirtualTable, {
-        props: { data: makeFixedData(3), columns: fixedColumns, rowHeight: 40, height: 400 }
+        props: {
+          dataSource: makeFixedData(3),
+          columns: fixedColumns,
+          virtualItemHeight: 40,
+          virtualHeight: 400
+        }
       })
       const rows = getAllByRole('row')
       const dataRows = rows.filter(
@@ -314,11 +335,11 @@ describe('VirtualTable (Vue)', () => {
     it('keeps striped background on fixed body cells', () => {
       const { getAllByRole } = render(VirtualTable, {
         props: {
-          data: makeFixedData(3),
+          dataSource: makeFixedData(3),
           columns: fixedColumns,
           striped: true,
-          rowHeight: 40,
-          height: 400
+          virtualItemHeight: 40,
+          virtualHeight: 400
         }
       })
       const rows = getAllByRole('row')
@@ -357,11 +378,11 @@ describe('VirtualTable (Vue)', () => {
 
       const { getByText, getAllByRole } = render(VirtualTable, {
         props: {
-          data: makeFixedData(3),
+          dataSource: makeFixedData(3),
           columns: styledColumns,
-          rowHeight: 40,
-          height: 240,
-          selectedKeys: [0]
+          virtualItemHeight: 40,
+          virtualHeight: 240,
+          rowSelection: { selectedRowKeys: [0] }
         }
       })
 
@@ -374,7 +395,7 @@ describe('VirtualTable (Vue)', () => {
     it('supports sticky header + sticky columns simultaneously', () => {
       const { getByText } = render(VirtualTable, {
         props: {
-          data: makeFixedData(5),
+          dataSource: makeFixedData(5),
           columns: fixedColumns,
           stickyHeader: true
         }
@@ -392,7 +413,7 @@ describe('VirtualTable (Vue)', () => {
   describe('Edge cases', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(VirtualTable, {
-        props: { data: makeData(3), columns, height: 240, rowHeight: 40 }
+        props: { dataSource: makeData(3), columns, virtualHeight: 240, virtualItemHeight: 40 }
       })
 
       await expectNoA11yViolationsIsolated(container)
@@ -400,7 +421,7 @@ describe('VirtualTable (Vue)', () => {
 
     it('renders with empty data and columns', () => {
       const { getByRole, getByText } = render(VirtualTable, {
-        props: { data: [], columns: [] }
+        props: { dataSource: [], columns: [] }
       })
       expect(getByRole('grid')).toBeTruthy()
       expect(getByText('No data')).toBeTruthy()
@@ -409,14 +430,20 @@ describe('VirtualTable (Vue)', () => {
     it('renders with single column', () => {
       const singleCol = [{ key: 'id', title: 'ID' }]
       const { getAllByRole } = render(VirtualTable, {
-        props: { data: makeData(3), columns: singleCol }
+        props: { dataSource: makeData(3), columns: singleCol }
       })
       expect(getAllByRole('columnheader').length).toBe(1)
     })
 
     it('renders striped rows correctly', () => {
       const { getAllByRole } = render(VirtualTable, {
-        props: { data: makeData(5), columns, striped: true, rowHeight: 40, height: 400 }
+        props: {
+          dataSource: makeData(5),
+          columns,
+          striped: true,
+          virtualItemHeight: 40,
+          virtualHeight: 400
+        }
       })
       const rows = getAllByRole('row')
       const dataRows = rows.filter(
@@ -434,11 +461,11 @@ describe('VirtualTable (Vue)', () => {
     it('renders selected row with highlight', () => {
       const { getAllByRole } = render(VirtualTable, {
         props: {
-          data: makeData(3),
+          dataSource: makeData(3),
           columns,
-          rowHeight: 40,
-          height: 400,
-          selectedKeys: [0]
+          virtualItemHeight: 40,
+          virtualHeight: 400,
+          rowSelection: { selectedRowKeys: [0] }
         }
       })
       const rows = getAllByRole('row')
@@ -457,7 +484,7 @@ describe('VirtualTable (Vue)', () => {
       const data = makeData(3)
       const { getByText } = render(VirtualTable, {
         props: {
-          data,
+          dataSource: data,
           columns,
           rowKey: (row: Record<string, unknown>) => `key-${row.id}`
         }
@@ -467,7 +494,7 @@ describe('VirtualTable (Vue)', () => {
 
     it('renders with loading and empty data simultaneously', () => {
       const { getByText, queryByText } = render(VirtualTable, {
-        props: { data: [], columns, loading: true }
+        props: { dataSource: [], columns, loading: true }
       })
       expect(getByText('Loading...')).toBeTruthy()
       // Empty text should NOT show when loading
@@ -476,7 +503,13 @@ describe('VirtualTable (Vue)', () => {
 
     it('handles large overscan value', () => {
       const { getAllByRole } = render(VirtualTable, {
-        props: { data: makeData(10), columns, rowHeight: 40, height: 200, overscan: 100 }
+        props: {
+          dataSource: makeData(10),
+          columns,
+          virtualItemHeight: 40,
+          virtualHeight: 200,
+          overscan: 100
+        }
       })
       const rows = getAllByRole('row')
       const dataRows = rows.filter(

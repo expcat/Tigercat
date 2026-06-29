@@ -53,7 +53,7 @@ Events/callback props: `onChange?`, `onPanelChange?`.
 
 ## Table
 
-`packages/core/src/types/table.ts` · `TableProps` · 3/50 props
+`packages/core/src/types/table.ts` · `TableProps` · 3/49 props
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 

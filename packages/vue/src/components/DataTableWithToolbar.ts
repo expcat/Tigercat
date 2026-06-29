@@ -115,7 +115,6 @@ export interface VueDataTableWithToolbarProps {
   autoVirtual?: boolean
   virtualHeight?: number
   virtualItemHeight?: number
-  autoVirtualThreshold?: number
   virtualThreshold?: number
   editable?: boolean
   editableCells?: Map<string, Set<number>>
@@ -284,10 +283,6 @@ export const DataTableWithToolbar = defineComponent({
       default: undefined
     },
     virtualItemHeight: {
-      type: Number,
-      default: undefined
-    },
-    autoVirtualThreshold: {
       type: Number,
       default: undefined
     },
@@ -953,9 +948,6 @@ export const DataTableWithToolbar = defineComponent({
         ...(props.virtualHeight !== undefined ? { virtualHeight: props.virtualHeight } : {}),
         ...(props.virtualItemHeight !== undefined
           ? { virtualItemHeight: props.virtualItemHeight }
-          : {}),
-        ...(props.autoVirtualThreshold !== undefined
-          ? { autoVirtualThreshold: props.autoVirtualThreshold }
           : {}),
         ...(props.virtualThreshold !== undefined
           ? { virtualThreshold: props.virtualThreshold }

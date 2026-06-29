@@ -18,10 +18,10 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
 
-| Component    | Vue                                                                                    | React                                                                             |
-| ------------ | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Kanban       | `<Kanban :columns="columns" />`                                                        | `<Kanban columns={columns} />`                                                    |
-| VirtualTable | `<VirtualTable :data="rows" :columns="fixedColumns" :row-height="40" :height="320" />` | `<VirtualTable data={rows} columns={fixedColumns} rowHeight={40} height={320} />` |
+| Component    | Vue                                                                                                            | React                                                                                                  |
+| ------------ | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Kanban       | `<Kanban :columns="columns" />`                                                                                | `<Kanban columns={columns} />`                                                                         |
+| VirtualTable | `<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />` | `<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />` |
 
 标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：CodeEditor, FileManager, ImageAnnotation, ImageViewer, InfiniteScroll, MarkdownEditor, PrintLayout, PrintPageBreak, RichTextEditor, VirtualList.
 

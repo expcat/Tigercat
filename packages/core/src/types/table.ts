@@ -738,14 +738,7 @@ export interface TableProps<T = Record<string, unknown>> {
 
   /**
    * Row count at which Table enables virtual mode automatically when `autoVirtual` is true.
-   * @default 10000
-   */
-  autoVirtualThreshold?: number
-
-  /**
-   * Row count at which Table marks virtual rendering as recommended.
-   * Table does not enable virtualization automatically; use this signal to
-   * switch to `virtual` or the dedicated `VirtualTable` component.
+   * When `autoVirtual` is false, the same threshold only marks virtualization as recommended.
    * @default 1000
    */
   virtualThreshold?: number

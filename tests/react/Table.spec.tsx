@@ -408,7 +408,13 @@ describe('Table', () => {
       }))
 
       const { container } = render(
-        <Table columns={columns} dataSource={largeData} pagination={false} virtualThreshold={4} />
+        <Table
+          columns={columns}
+          dataSource={largeData}
+          pagination={false}
+          autoVirtual={false}
+          virtualThreshold={4}
+        />
       )
 
       expect(container.querySelector('[data-tiger-virtual-recommended="true"]')).toHaveAttribute(
@@ -417,7 +423,7 @@ describe('Table', () => {
       )
     })
 
-    it('auto-enables virtual mode at the autoVirtualThreshold', () => {
+    it('auto-enables virtual mode at the virtualThreshold', () => {
       const largeData = Array.from({ length: 4 }, (_, index) => ({
         id: index,
         name: `User ${index}`,
@@ -426,18 +432,10 @@ describe('Table', () => {
       }))
 
       const { container } = render(
-        <Table
-          columns={columns}
-          dataSource={largeData}
-          pagination={false}
-          autoVirtualThreshold={4}
-        />
+        <Table columns={columns} dataSource={largeData} pagination={false} virtualThreshold={4} />
       )
 
-      expect(container.querySelector('[data-tiger-virtual="enabled"]')).toHaveAttribute(
-        'data-tiger-virtual-auto',
-        'true'
-      )
+      expect(container.querySelector('[data-tiger-virtual="enabled"]')).toBeInTheDocument()
     })
   })
 

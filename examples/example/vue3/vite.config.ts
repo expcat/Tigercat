@@ -4,6 +4,8 @@ import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
 const workspaceRoot = path.resolve(__dirname, '../../..')
+const vueComponentsDir = path.resolve(workspaceRoot, 'packages/vue/src/components')
+const vueComponentAlias = (component: string) => path.resolve(vueComponentsDir, component)
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
@@ -16,20 +18,56 @@ export default defineConfig(({ command }) => ({
     alias: [
       { find: '@demo-shared', replacement: path.resolve(__dirname, '../shared') },
       {
+        find: '@expcat/tigercat-vue/AnchorLink',
+        replacement: vueComponentAlias('Anchor')
+      },
+      {
+        find: '@expcat/tigercat-vue/BreadcrumbItem',
+        replacement: vueComponentAlias('Breadcrumb')
+      },
+      {
+        find: '@expcat/tigercat-vue/DropdownItem',
+        replacement: vueComponentAlias('Dropdown')
+      },
+      {
+        find: '@expcat/tigercat-vue/DropdownMenu',
+        replacement: vueComponentAlias('Dropdown')
+      },
+      {
         find: '@expcat/tigercat-vue/FloatButtonGroup',
-        replacement: path.resolve(workspaceRoot, 'packages/vue/src/components/FloatButton')
+        replacement: vueComponentAlias('FloatButton')
       },
       {
         find: '@expcat/tigercat-vue/InputGroupAddon',
-        replacement: path.resolve(workspaceRoot, 'packages/vue/src/components/InputGroup')
+        replacement: vueComponentAlias('InputGroup')
+      },
+      {
+        find: '@expcat/tigercat-vue/MenuItem',
+        replacement: vueComponentAlias('Menu')
+      },
+      {
+        find: '@expcat/tigercat-vue/MenuItemGroup',
+        replacement: vueComponentAlias('Menu')
       },
       {
         find: '@expcat/tigercat-vue/PrintPageBreak',
-        replacement: path.resolve(workspaceRoot, 'packages/vue/src/components/PrintLayout')
+        replacement: vueComponentAlias('PrintLayout')
+      },
+      {
+        find: '@expcat/tigercat-vue/StepsItem',
+        replacement: vueComponentAlias('Steps')
+      },
+      {
+        find: '@expcat/tigercat-vue/SubMenu',
+        replacement: vueComponentAlias('Menu')
+      },
+      {
+        find: '@expcat/tigercat-vue/TabPane',
+        replacement: vueComponentAlias('Tabs')
       },
       {
         find: /^@expcat\/tigercat-vue\/(.+)$/,
-        replacement: `${path.resolve(workspaceRoot, 'packages/vue/src/components')}/$1`
+        replacement: `${vueComponentsDir}/$1`
       },
       {
         find: '@expcat/tigercat-vue',

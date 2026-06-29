@@ -579,14 +579,12 @@ export function getTableFixedHeaderCellClasses<T = Record<string, unknown>>(
 }
 
 export const TABLE_VIRTUAL_RECOMMENDATION_THRESHOLD = 1000
-export const TABLE_AUTO_VIRTUAL_THRESHOLD = 10000
 
 export interface TableVirtualRecommendationOptions {
   virtual?: boolean
   autoVirtual?: boolean
   dataLength: number
   threshold?: number
-  autoThreshold?: number
 }
 
 export interface TableVirtualRecommendation {
@@ -594,7 +592,6 @@ export interface TableVirtualRecommendation {
   autoEnabled: boolean
   recommended: boolean
   threshold: number
-  autoThreshold: number
   dataLength: number
 }
 
@@ -609,9 +606,8 @@ export function getTableVirtualRecommendation(
   options: TableVirtualRecommendationOptions
 ): TableVirtualRecommendation {
   const threshold = options.threshold ?? TABLE_VIRTUAL_RECOMMENDATION_THRESHOLD
-  const autoThreshold = options.autoThreshold ?? TABLE_AUTO_VIRTUAL_THRESHOLD
   const autoEnabled =
-    options.virtual !== true && options.autoVirtual !== false && options.dataLength >= autoThreshold
+    options.virtual !== true && options.autoVirtual !== false && options.dataLength >= threshold
   const enabled = options.virtual === true || autoEnabled
 
   return {
@@ -619,7 +615,6 @@ export function getTableVirtualRecommendation(
     autoEnabled,
     recommended: !enabled && options.dataLength >= threshold,
     threshold,
-    autoThreshold,
     dataLength: options.dataLength
   }
 }

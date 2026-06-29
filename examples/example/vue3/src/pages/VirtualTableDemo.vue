@@ -3,12 +3,24 @@
     <h1 class="text-3xl font-bold mb-2">VirtualTable 虚拟表格</h1>
     <p class="text-gray-500 mb-8">虚拟滚动表格，可高效渲染大量数据行。</p>
 
-    <DemoBlock title="基础用法" description="1000 行数据，rowHeight=48" :code="basicSnippet">
-      <VirtualTable :data="basicData" :columns="basicColumns" :height="400" :row-height="48" />
+    <DemoBlock
+      title="基础用法"
+      description="1000 行数据，virtualItemHeight=48"
+      :code="basicSnippet">
+      <VirtualTable
+        :data-source="basicData"
+        :columns="basicColumns"
+        :virtual-height="400"
+        :virtual-item-height="48" />
     </DemoBlock>
 
     <DemoBlock title="斑马纹 & 边框" description="striped + bordered" :code="styledSnippet">
-      <VirtualTable :data="basicData" :columns="basicColumns" :height="300" striped bordered />
+      <VirtualTable
+        :data-source="basicData"
+        :columns="basicColumns"
+        :virtual-height="300"
+        striped
+        bordered />
     </DemoBlock>
 
     <DemoBlock
@@ -16,23 +28,27 @@
       description="固定列支持 fixedClassName / fixedHeaderClassName，可根据 selected 状态自定义 sticky 单元格外观。"
       :code="fixedSnippet">
       <VirtualTable
-        :data="basicData.slice(0, 24)"
+        :data-source="basicData.slice(0, 24)"
         :columns="fixedColumns"
-        :height="280"
-        :row-height="48"
+        :virtual-height="280"
+        :virtual-item-height="48"
         striped
-        :selected-keys="[2, 4]" />
+        :row-selection="{ selectedRowKeys: [2, 4] }" />
     </DemoBlock>
 
     <DemoBlock title="加载 & 空状态" description="loading 和 emptyText" :code="stateSnippet">
       <div class="flex gap-4">
         <div class="flex-1">
           <p class="text-sm text-gray-500 mb-2">Loading</p>
-          <VirtualTable :data="[]" :columns="basicColumns" :height="200" loading />
+          <VirtualTable :data-source="[]" :columns="basicColumns" :virtual-height="200" loading />
         </div>
         <div class="flex-1">
           <p class="text-sm text-gray-500 mb-2">Empty</p>
-          <VirtualTable :data="[]" :columns="basicColumns" :height="200" empty-text="暂无数据" />
+          <VirtualTable
+            :data-source="[]"
+            :columns="basicColumns"
+            :virtual-height="200"
+            empty-text="暂无数据" />
         </div>
       </div>
     </DemoBlock>
@@ -97,18 +113,18 @@ const data = Array.from({ length: 1000 }, (_, i) => ({
   id: i + 1, name: \`用户 \${i + 1}\`, email: \`user\${i + 1}@example.com\`
 }))
 
-<VirtualTable :data="data" :columns="columns" :height="400" :row-height="48" />`
+<VirtualTable :data-source="data" :columns="columns" :virtual-height="400" :virtual-item-height="48" />`
 
-const styledSnippet = `<VirtualTable :data="data" :columns="columns" :height="300" striped bordered />`
+const styledSnippet = `<VirtualTable :data-source="data" :columns="columns" :virtual-height="300" striped bordered />`
 
 const fixedSnippet = `<VirtualTable
-  :data="data"
+  :data-source="data"
   :columns="fixedColumns"
-  :height="280"
-  :row-height="48"
+  :virtual-height="280"
+  :virtual-item-height="48"
   striped
-  :selected-keys="[2, 4]" />`
+  :row-selection="{ selectedRowKeys: [2, 4] }" />`
 
-const stateSnippet = `<VirtualTable :data="[]" :columns="columns" :height="200" loading />
-<VirtualTable :data="[]" :columns="columns" :height="200" empty-text="暂无数据" />`
+const stateSnippet = `<VirtualTable :data-source="[]" :columns="columns" :virtual-height="200" loading />
+<VirtualTable :data-source="[]" :columns="columns" :virtual-height="200" empty-text="暂无数据" />`
 </script>

@@ -20,6 +20,18 @@
       "@demo-shared/*": ["../shared/*"],
       "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
       "@expcat/tigercat-vue": ["../../../packages/vue/src/index.ts"],
+      "@expcat/tigercat-vue/AnchorLink": ["../../../packages/vue/src/components/Anchor"],
+      "@expcat/tigercat-vue/BreadcrumbItem": ["../../../packages/vue/src/components/Breadcrumb"],
+      "@expcat/tigercat-vue/DropdownItem": ["../../../packages/vue/src/components/Dropdown"],
+      "@expcat/tigercat-vue/DropdownMenu": ["../../../packages/vue/src/components/Dropdown"],
+      "@expcat/tigercat-vue/FloatButtonGroup": ["../../../packages/vue/src/components/FloatButton"],
+      "@expcat/tigercat-vue/InputGroupAddon": ["../../../packages/vue/src/components/InputGroup"],
+      "@expcat/tigercat-vue/MenuItem": ["../../../packages/vue/src/components/Menu"],
+      "@expcat/tigercat-vue/MenuItemGroup": ["../../../packages/vue/src/components/Menu"],
+      "@expcat/tigercat-vue/PrintPageBreak": ["../../../packages/vue/src/components/PrintLayout"],
+      "@expcat/tigercat-vue/StepsItem": ["../../../packages/vue/src/components/Steps"],
+      "@expcat/tigercat-vue/SubMenu": ["../../../packages/vue/src/components/Menu"],
+      "@expcat/tigercat-vue/TabPane": ["../../../packages/vue/src/components/Tabs"],
       "@expcat/tigercat-vue/*": ["../../../packages/vue/src/components/*"]
     }
   },
