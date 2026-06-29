@@ -27,7 +27,7 @@ description: Compact generated API summary for Tigercat core types
 | rate.ts      | RateProps                                                                          | Rate                                                      | 2       |
 | result.ts    | ResultProps                                                                        | Result                                                    | 2       |
 | segmented.ts | SegmentedProps                                                                     | Segmented                                                 | 3       |
-| statistic.ts | StatisticProps                                                                     | Statistic                                                 | 2       |
+| statistic.ts | StatisticProps                                                                     | Statistic                                                 | 1       |
 | tag.ts       | TagProps                                                                           | Tag                                                       | 3       |
 | text.ts      | TextProps                                                                          | Text                                                      | 6       |
 | watermark.ts | WatermarkProps                                                                     | Watermark                                                 | 2       |
@@ -80,16 +80,16 @@ description: Compact generated API summary for Tigercat core types
 
 | Type File       | Props Interfaces                                                  | Components                               | Exports |
 | --------------- | ----------------------------------------------------------------- | ---------------------------------------- | ------- |
-| card.ts         | CardProps                                                         | Card                                     | 4       |
+| card.ts         | CardProps                                                         | Card                                     | 3       |
 | carousel.ts     | CarouselProps                                                     | Carousel                                 | 6       |
 | container.ts    | ContainerProps                                                    | Container                                | 2       |
-| descriptions.ts | DescriptionsProps                                                 | Descriptions                             | 4       |
+| descriptions.ts | DescriptionsProps                                                 | Descriptions                             | 3       |
 | grid.ts         | RowProps, ColProps                                                | Row, Col                                 | 7       |
 | layout.ts       | LayoutProps, HeaderProps, SidebarProps, ContentProps, FooterProps | Layout, Header, Sidebar, Content, Footer | 6       |
-| list.ts         | ListProps                                                         | List                                     | 6       |
+| list.ts         | ListProps                                                         | List                                     | 5       |
 | resizable.ts    | ResizableProps                                                    | Resizable                                | 4       |
 | skeleton.ts     | SkeletonProps                                                     | Skeleton                                 | 4       |
-| space.ts        | SpaceProps                                                        | Space                                    | 4       |
+| space.ts        | SpaceProps                                                        | Space                                    | 2       |
 | splitter.ts     | SplitterProps                                                     | Splitter                                 | 3       |
 
 ## Navigation
@@ -163,4 +163,4 @@ description: Compact generated API summary for Tigercat core types
 | slots.ts          | -                                                            | -          | 10      |
 | theme.ts          | -                                                            | -          | 11      |
 
-Total exported types: 638.
+Total exported types: 632.

@@ -32,8 +32,21 @@ import {
   type CarouselProps as CoreCarouselProps,
   type CarouselMethods
 } from '@expcat/tigercat-core'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface CarouselProps extends Omit<CoreCarouselProps, 'style'> {
+  /**
+   * Controlled current slide index
+   */
+  currentIndex?: number
+  /**
+   * Initial current slide index for uncontrolled usage
+   */
+  defaultCurrentIndex?: number
+  /**
+   * Callback when the controlled current slide index should change
+   */
+  onCurrentIndexChange?: (currentIndex: number) => void
   /**
    * Callback when slide changes
    */
@@ -65,18 +78,34 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       arrows = false,
       infinite = true,
       speed = 500,
-      initialSlide = 0,
+      currentIndex: controlledCurrentIndex,
+      defaultCurrentIndex = 0,
       pauseOnHover = true,
       pauseOnFocus = true,
       className,
       style,
+      onCurrentIndexChange,
       onChange,
       onBeforeChange,
       children
     },
     ref
   ) => {
-    const [currentIndex, setCurrentIndex] = useState(initialSlide)
+    // Get slides from children
+    const slides = useMemo(() => {
+      return React.Children.toArray(children).filter((child) => React.isValidElement(child))
+    }, [children])
+
+    const slideCount = slides.length
+    const [currentIndexValue, setCurrentIndexValue] = useControlledState(
+      controlledCurrentIndex,
+      clampSlideIndex(defaultCurrentIndex, slideCount),
+      onCurrentIndexChange
+    )
+    const currentIndex = useMemo(
+      () => clampSlideIndex(currentIndexValue, slideCount),
+      [currentIndexValue, slideCount]
+    )
     const [isPaused, setIsPaused] = useState(false)
     const containerRef = useRef<HTMLDivElement | null>(null)
     const touchStartRef = useRef<CarouselTouchPoint | null>(null)
@@ -91,12 +120,18 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     const currentIndexRef = useRef(currentIndex)
     currentIndexRef.current = currentIndex
 
-    // Get slides from children
-    const slides = useMemo(() => {
-      return React.Children.toArray(children).filter((child) => React.isValidElement(child))
-    }, [children])
+    const navigateToIndex = useCallback(
+      (index: number) => {
+        const current = currentIndexRef.current
+        const clampedIndex = clampSlideIndex(index, slideCount)
+        if (clampedIndex === current) return
 
-    const slideCount = slides.length
+        onBeforeChangeRef.current?.(current, clampedIndex)
+        setCurrentIndexValue(clampedIndex)
+        onChangeRef.current?.(clampedIndex, current)
+      },
+      [slideCount, setCurrentIndexValue]
+    )
 
     const navigateByDirection = useCallback(
       (direction: CarouselSwipeDirection) => {
@@ -106,13 +141,9 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
             ? getNextSlideIndex(current, slideCount, infinite)
             : getPrevSlideIndex(current, slideCount, infinite)
 
-        if (targetIndex === current) return
-
-        onBeforeChangeRef.current?.(current, targetIndex)
-        setCurrentIndex(targetIndex)
-        onChangeRef.current?.(targetIndex, current)
+        navigateToIndex(targetIndex)
       },
-      [slideCount, infinite]
+      [slideCount, infinite, navigateToIndex]
     )
 
     // Container classes
@@ -162,15 +193,9 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     // Navigation methods
     const goTo = useCallback(
       (index: number) => {
-        const clampedIndex = clampSlideIndex(index, slideCount)
-        if (clampedIndex === currentIndex) return
-
-        onBeforeChange?.(currentIndex, clampedIndex)
-        const prevIndex = currentIndex
-        setCurrentIndex(clampedIndex)
-        onChange?.(clampedIndex, prevIndex)
+        navigateToIndex(index)
       },
-      [currentIndex, slideCount, onBeforeChange, onChange]
+      [navigateToIndex]
     )
 
     const next = useCallback(() => {
@@ -208,9 +233,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           const curr = currentIndexRef.current
           const nextIdx = getNextSlideIndex(curr, slideCount, infinite)
           if (nextIdx !== curr) {
-            onBeforeChangeRef.current?.(curr, nextIdx)
-            setCurrentIndex(nextIdx)
-            onChangeRef.current?.(nextIdx, curr)
+            navigateToIndex(nextIdx)
           }
         }
       })
@@ -218,7 +241,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       controller.start()
 
       return () => controller.stop()
-    }, [autoplay, autoplaySpeed, isPaused, slideCount, infinite])
+    }, [autoplay, autoplaySpeed, isPaused, slideCount, infinite, navigateToIndex])
 
     useEffect(() => {
       const container = containerRef.current

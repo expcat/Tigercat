@@ -1,6 +1,7 @@
 /**
  * Card component types and interfaces
  */
+import type { BaseLayoutProps } from './base'
 
 /**
  * Card variant types
@@ -11,11 +12,6 @@ export type CardVariant = 'default' | 'bordered' | 'shadow' | 'elevated' | 'tran
  * Card size types
  */
 export type CardSize = 'sm' | 'md' | 'lg'
-
-/**
- * Card layout direction
- */
-export type CardDirection = 'vertical' | 'horizontal'
 
 /**
  * Base card props interface
@@ -52,7 +48,7 @@ export interface CardProps {
    * Card layout direction
    * @default 'vertical'
    */
-  direction?: CardDirection
+  direction?: BaseLayoutProps['direction']
 
   /**
    * Additional CSS classes

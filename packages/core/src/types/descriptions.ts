@@ -1,11 +1,7 @@
 /**
  * Descriptions component types and interfaces
  */
-
-/**
- * Descriptions size types
- */
-export type DescriptionsSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Descriptions layout types
@@ -75,7 +71,7 @@ export interface DescriptionsProps {
    * Descriptions size
    * @default 'md'
    */
-  size?: DescriptionsSize
+  size?: ComponentSize
 
   /**
    * Descriptions layout

@@ -1,7 +1,4 @@
-/**
- * Statistic size variants
- */
-export type StatisticSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Shared Statistic props (framework-agnostic)
@@ -24,7 +21,7 @@ export interface StatisticProps {
   /** Numeric animation duration in milliseconds */
   animationDuration?: number
   /** Component size */
-  size?: StatisticSize
+  size?: ComponentSize
   /** Custom class name */
   className?: string
 }

@@ -1,4 +1,4 @@
-import type { CardSize, CardVariant, CardDirection } from '../types/card'
+import type { BaseLayoutProps, CardSize, CardVariant } from '../types'
 
 export const cardBaseClasses =
   'rounded-[var(--tiger-radius-lg,0.75rem)] bg-[var(--tiger-surface,#ffffff)] overflow-hidden transition-all duration-200 ease-out'
@@ -19,7 +19,7 @@ export const cardVariantClasses: Record<CardVariant, string> = {
 
 export const cardHoverClasses = 'cursor-pointer hover:shadow-lg hover:-translate-y-1'
 
-export const cardDirectionClasses: Record<CardDirection, string> = {
+export const cardDirectionClasses: Record<NonNullable<BaseLayoutProps['direction']>, string> = {
   vertical: 'flex flex-col',
   horizontal: 'flex flex-row'
 } as const

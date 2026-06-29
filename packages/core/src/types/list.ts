@@ -1,11 +1,7 @@
 /**
  * List component types and interfaces
  */
-
-/**
- * List size types
- */
-export type ListSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * List item layout types
@@ -89,7 +85,7 @@ export interface ListProps {
    * List size
    * @default 'md'
    */
-  size?: ListSize
+  size?: ComponentSize
   /**
    * List border style
    * @default 'divided'

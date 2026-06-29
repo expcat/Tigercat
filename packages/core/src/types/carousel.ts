@@ -57,10 +57,14 @@ export interface CarouselProps {
    */
   speed?: number
   /**
-   * Initial slide index (0-based)
+   * Controlled current slide index (0-based)
+   */
+  currentIndex?: number
+  /**
+   * Initial current slide index for uncontrolled usage
    * @default 0
    */
-  initialSlide?: number
+  defaultCurrentIndex?: number
   /**
    * Whether to pause autoplay on hover
    * @default true

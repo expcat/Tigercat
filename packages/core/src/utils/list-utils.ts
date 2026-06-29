@@ -3,7 +3,8 @@
  * Shared styles and helpers for List components
  */
 
-import type { ListSize, ListBorderStyle, ListItemLayout } from '../types/list'
+import type { ComponentSize } from '../types/base'
+import type { ListBorderStyle, ListItemLayout } from '../types/list'
 
 /**
  * Base classes for list container
@@ -19,7 +20,7 @@ export const listWrapperClasses = 'w-full'
 /**
  * Size classes for list padding and spacing
  */
-export const listSizeClasses: Record<ListSize, string> = {
+export const listSizeClasses: Record<ComponentSize, string> = {
   sm: 'text-sm',
   md: 'text-base',
   lg: 'text-lg'
@@ -28,7 +29,7 @@ export const listSizeClasses: Record<ListSize, string> = {
 /**
  * List item size classes
  */
-export const listItemSizeClasses: Record<ListSize, string> = {
+export const listItemSizeClasses: Record<ComponentSize, string> = {
   sm: 'px-3 py-2',
   md: 'px-4 py-3',
   lg: 'px-6 py-4'
@@ -238,7 +239,7 @@ export function getListClasses(bordered: ListBorderStyle): string {
  * @returns Combined class string for list item
  */
 export function getListItemClasses(
-  size: ListSize,
+  size: ComponentSize,
   layout: ListItemLayout,
   divided: boolean,
   hoverable = false
@@ -262,7 +263,7 @@ export function getListItemClasses(
  * @param isFooter - Whether it's a footer (instead of header)
  * @returns Combined class string for header/footer
  */
-export function getListHeaderFooterClasses(size: ListSize, isFooter = false): string {
+export function getListHeaderFooterClasses(size: ComponentSize, isFooter = false): string {
   const classes = [listHeaderFooterBaseClasses, listItemSizeClasses[size]]
 
   if (isFooter) {

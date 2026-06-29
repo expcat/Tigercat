@@ -97,9 +97,9 @@ describe('Carousel', () => {
   })
 
   describe('Props', () => {
-    it('should start at initialSlide', () => {
+    it('should start at defaultCurrentIndex', () => {
       const { container } = render(Carousel, {
-        props: { initialSlide: 1 },
+        props: { defaultCurrentIndex: 1 },
         slots: {
           default: () => [
             h('div', { key: '1' }, 'Slide 1'),
@@ -111,6 +111,41 @@ describe('Carousel', () => {
 
       const dots = container.querySelectorAll('[role="tablist"] button')
       expect(dots[1]).toHaveAttribute('aria-current', 'true')
+    })
+
+    it('should request currentIndex updates without mutating controlled state', async () => {
+      const onUpdateCurrentIndex = vi.fn()
+      const onChange = vi.fn()
+
+      const { container, rerender } = render(Carousel, {
+        props: {
+          arrows: true,
+          currentIndex: 1,
+          'onUpdate:currentIndex': onUpdateCurrentIndex,
+          onChange
+        },
+        slots: {
+          default: () => [
+            h('div', { key: '1' }, 'Slide 1'),
+            h('div', { key: '2' }, 'Slide 2'),
+            h('div', { key: '3' }, 'Slide 3')
+          ]
+        }
+      })
+
+      const nextButton = screen.getByRole('button', { name: 'Next slide' })
+      await fireEvent.click(nextButton)
+
+      expect(onUpdateCurrentIndex).toHaveBeenCalledWith(2)
+      expect(onChange).toHaveBeenCalledWith(2, 1)
+
+      let dots = container.querySelectorAll('[role="tablist"] button')
+      expect(dots[1]).toHaveAttribute('aria-current', 'true')
+
+      await rerender({ currentIndex: 2 })
+
+      dots = container.querySelectorAll('[role="tablist"] button')
+      expect(dots[2]).toHaveAttribute('aria-current', 'true')
     })
 
     it('should render dots in different positions', () => {
@@ -187,7 +222,7 @@ describe('Carousel', () => {
       const { container } = render(Carousel, {
         props: {
           arrows: true,
-          initialSlide: 1,
+          defaultCurrentIndex: 1,
           onChange
         },
         slots: {
@@ -235,7 +270,7 @@ describe('Carousel', () => {
       render(Carousel, {
         props: {
           arrows: true,
-          initialSlide: 2,
+          defaultCurrentIndex: 2,
           infinite: true,
           onChange
         },
@@ -260,7 +295,7 @@ describe('Carousel', () => {
       render(Carousel, {
         props: {
           arrows: true,
-          initialSlide: 2,
+          defaultCurrentIndex: 2,
           infinite: false,
           onChange
         },
@@ -584,7 +619,7 @@ describe('Carousel', () => {
               Carousel,
               {
                 ref: carouselRef,
-                initialSlide: 1,
+                defaultCurrentIndex: 1,
                 onChange
               },
               {

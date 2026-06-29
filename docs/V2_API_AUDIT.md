@@ -47,7 +47,16 @@ source: current repository state after R10 grouped validation infrastructure
 
 ## Completed Batch Records
 
-当前暂无 R12-R20 已完成批次记录。完成任一涉及 public API 或 shared contract 清理的 R12-R20 任务后，必须在本节追加对应 `### Rxx ...（YYYY-MM-DD）` 记录，并包含：
+### R12 Basic + Layout lightweight components（2026-06-29）
+
+- 实际删除 / 合并：移除 `SpaceDirection`、`SpaceAlign`、`CardDirection`、`StatisticSize`、`DescriptionsSize`、`ListSize` public type aliases；`SpaceProps` 复用 `BaseLayoutProps`，`CardProps.direction` 复用 `BaseLayoutProps['direction']`，`StatisticProps.size` / `DescriptionsProps.size` / `ListProps.size` 复用 `ComponentSize`。
+- 实际保留：`ButtonSize`、`AvatarSize`、`TextSize` 保留，因为它们扩展或偏离 `ComponentSize`；`SkeletonShape` 保留，因为当前没有共享 shape contract。
+- Carousel 变更：删除 `initialSlide`，新增 `currentIndex` / `defaultCurrentIndex`；React 新增 `onCurrentIndexChange`，Vue 新增 `update:currentIndex`，并保持 `onChange` / `change` 与 `onBeforeChange` / `before-change`。
+- 证据：core type files、React/Vue Carousel tests、example Carousel demos、generated API baseline 和 generated Skill references 均已更新。
+- 实际验证：`npx -y pnpm@11.9.0 vitest run tests/react/Carousel.spec.tsx tests/vue/Carousel.spec.ts`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、R12 分组与生成物门禁见 `docs/V2_COMPLETED.md#r12-basic--layout-lightweight-components`。
+- 剩余阻塞：无；下一批次为 R13 Feedback and overlay components。
+
+完成任一涉及 public API 或 shared contract 清理的 R12-R20 任务后，必须在本节追加对应 `### Rxx ...（YYYY-MM-DD）` 记录，并包含：
 
 - 实际删除、合并或保留的 props、events、methods、type aliases 与 helper exports。
 - 每个删除项的唯一替代 API；没有替代 API 的项必须说明为何直接删除。

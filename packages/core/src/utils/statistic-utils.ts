@@ -1,5 +1,5 @@
 import { classNames } from './class-names'
-import type { StatisticSize } from '../types/statistic'
+import type { ComponentSize } from '../types/base'
 
 export interface StatisticNumberAnimationOptions {
   from: number
@@ -21,26 +21,26 @@ export interface StatisticNumberAnimationController {
 
 export const statisticBaseClasses = 'inline-block'
 
-const titleSize: Record<StatisticSize, string> = {
+const titleSize: Record<ComponentSize, string> = {
   sm: 'text-xs',
   md: 'text-sm',
   lg: 'text-base'
 }
 
-const valueSize: Record<StatisticSize, string> = {
+const valueSize: Record<ComponentSize, string> = {
   sm: 'text-lg font-semibold',
   md: 'text-2xl font-semibold',
   lg: 'text-4xl font-bold'
 }
 
-export function getStatisticTitleClasses(size: StatisticSize): string {
+export function getStatisticTitleClasses(size: ComponentSize): string {
   return classNames(
     titleSize[size],
     'text-[var(--tiger-statistic-title,var(--tiger-text-muted,#6b7280))] mb-1'
   )
 }
 
-export function getStatisticValueClasses(size: StatisticSize): string {
+export function getStatisticValueClasses(size: ComponentSize): string {
   return classNames(
     valueSize[size],
     'text-[var(--tiger-statistic-value,var(--tiger-text,#111827))]'

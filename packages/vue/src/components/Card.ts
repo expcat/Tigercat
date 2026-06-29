@@ -14,13 +14,13 @@ import {
   cardHorizontalBodyClasses,
   type CardVariant,
   type CardSize,
-  type CardDirection
+  type CardProps as CoreCardProps
 } from '@expcat/tigercat-core'
 
 export interface VueCardProps {
   variant?: CardVariant
   size?: CardSize
-  direction?: CardDirection
+  direction?: CoreCardProps['direction']
   hoverable?: boolean
   cover?: string
   coverAlt?: string
@@ -71,8 +71,8 @@ export const Card = defineComponent({
      * @default 'vertical'
      */
     direction: {
-      type: String as PropType<CardDirection>,
-      default: 'vertical' as CardDirection
+      type: String as PropType<CoreCardProps['direction']>,
+      default: 'vertical'
     },
     /**
      * Cover image URL

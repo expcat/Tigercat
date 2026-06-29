@@ -1,11 +1,7 @@
 /**
  * Space component types and interfaces
  */
-
-/**
- * Space direction types
- */
-export type SpaceDirection = 'horizontal' | 'vertical'
+import type { BaseLayoutProps } from './base'
 
 /**
  * Space size types
@@ -14,19 +10,14 @@ export type SpaceDirection = 'horizontal' | 'vertical'
 export type SpaceSize = 'sm' | 'md' | 'lg' | number
 
 /**
- * Space align types
- */
-export type SpaceAlign = 'start' | 'end' | 'center' | 'baseline' | 'stretch'
-
-/**
  * Base space props interface
  */
-export interface SpaceProps {
+export interface SpaceProps extends Pick<BaseLayoutProps, 'direction' | 'align' | 'wrap'> {
   /**
    * Space direction
    * @default 'horizontal'
    */
-  direction?: SpaceDirection
+  direction?: BaseLayoutProps['direction']
 
   /**
    * Space size between items
@@ -39,11 +30,11 @@ export interface SpaceProps {
    * Align items in the space
    * @default 'start'
    */
-  align?: SpaceAlign
+  align?: BaseLayoutProps['align']
 
   /**
    * Whether to wrap items
    * @default false
    */
-  wrap?: boolean
+  wrap?: BaseLayoutProps['wrap']
 }

@@ -97,9 +97,9 @@ describe('Carousel', () => {
   })
 
   describe('Props', () => {
-    it('should start at initialSlide', () => {
+    it('should start at defaultCurrentIndex', () => {
       const { container } = render(
-        <Carousel initialSlide={1}>
+        <Carousel defaultCurrentIndex={1}>
           <div>Slide 1</div>
           <div>Slide 2</div>
           <div>Slide 3</div>
@@ -108,6 +108,47 @@ describe('Carousel', () => {
 
       const dots = container.querySelectorAll('[role="tablist"] button')
       expect(dots[1]).toHaveAttribute('aria-current', 'true')
+    })
+
+    it('should request currentIndex changes without mutating controlled state', async () => {
+      const onCurrentIndexChange = vi.fn()
+      const onChange = vi.fn()
+
+      const { container, rerender } = render(
+        <Carousel
+          arrows
+          currentIndex={1}
+          onCurrentIndexChange={onCurrentIndexChange}
+          onChange={onChange}>
+          <div>Slide 1</div>
+          <div>Slide 2</div>
+          <div>Slide 3</div>
+        </Carousel>
+      )
+
+      const nextButton = screen.getByRole('button', { name: 'Next slide' })
+      await fireEvent.click(nextButton)
+
+      expect(onCurrentIndexChange).toHaveBeenCalledWith(2)
+      expect(onChange).toHaveBeenCalledWith(2, 1)
+
+      let dots = container.querySelectorAll('[role="tablist"] button')
+      expect(dots[1]).toHaveAttribute('aria-current', 'true')
+
+      rerender(
+        <Carousel
+          arrows
+          currentIndex={2}
+          onCurrentIndexChange={onCurrentIndexChange}
+          onChange={onChange}>
+          <div>Slide 1</div>
+          <div>Slide 2</div>
+          <div>Slide 3</div>
+        </Carousel>
+      )
+
+      dots = container.querySelectorAll('[role="tablist"] button')
+      expect(dots[2]).toHaveAttribute('aria-current', 'true')
     })
 
     it('should render dots in different positions', () => {
@@ -177,7 +218,7 @@ describe('Carousel', () => {
       const onChange = vi.fn()
 
       const { container } = render(
-        <Carousel arrows initialSlide={1} onChange={onChange}>
+        <Carousel arrows defaultCurrentIndex={1} onChange={onChange}>
           <div>Slide 1</div>
           <div>Slide 2</div>
           <div>Slide 3</div>
@@ -215,7 +256,7 @@ describe('Carousel', () => {
       const onChange = vi.fn()
 
       render(
-        <Carousel arrows initialSlide={2} infinite onChange={onChange}>
+        <Carousel arrows defaultCurrentIndex={2} infinite onChange={onChange}>
           <div>Slide 1</div>
           <div>Slide 2</div>
           <div>Slide 3</div>
@@ -232,7 +273,7 @@ describe('Carousel', () => {
       const onChange = vi.fn()
 
       render(
-        <Carousel arrows initialSlide={2} infinite={false} onChange={onChange}>
+        <Carousel arrows defaultCurrentIndex={2} infinite={false} onChange={onChange}>
           <div>Slide 1</div>
           <div>Slide 2</div>
           <div>Slide 3</div>
@@ -432,7 +473,7 @@ describe('Carousel', () => {
       const onChange = vi.fn()
 
       render(
-        <Carousel ref={ref} initialSlide={1} onChange={onChange}>
+        <Carousel ref={ref} defaultCurrentIndex={1} onChange={onChange}>
           <div>Slide 1</div>
           <div>Slide 2</div>
           <div>Slide 3</div>

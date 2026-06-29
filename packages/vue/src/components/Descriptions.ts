@@ -16,7 +16,7 @@ import {
   descriptionsVerticalWrapperClasses,
   resolveResponsiveValue,
   isBrowser,
-  type DescriptionsSize,
+  type ComponentSize,
   type DescriptionsLayout,
   type DescriptionsItem,
   type ResponsiveBreakpoint
@@ -29,7 +29,7 @@ export interface VueDescriptionsProps {
   extra?: unknown
   bordered?: boolean
   column?: number | Partial<Record<ResponsiveBreakpoint, number>>
-  size?: DescriptionsSize
+  size?: ComponentSize
   layout?: DescriptionsLayout
   colon?: boolean
   labelStyle?: Record<string, string | number>
@@ -78,8 +78,8 @@ export const Descriptions = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<DescriptionsSize>,
-      default: 'md' as DescriptionsSize
+      type: String as PropType<ComponentSize>,
+      default: 'md'
     },
     /**
      * Descriptions layout

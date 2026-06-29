@@ -45,7 +45,7 @@ import {
   getPaginationLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
-  type ListSize,
+  type ComponentSize,
   type ListBorderStyle,
   type ListItemLayout,
   type ListItem,
@@ -88,8 +88,8 @@ export const List = defineComponent({
      * List size
      */
     size: {
-      type: String as PropType<ListSize>,
-      default: 'md' as ListSize
+      type: String as PropType<ComponentSize>,
+      default: 'md'
     },
     /**
      * Border style
@@ -636,7 +636,7 @@ export const List = defineComponent({
 
 export interface VueListProps {
   dataSource?: ListItem[]
-  size?: ListSize
+  size?: ComponentSize
   bordered?: ListBorderStyle
   loading?: boolean
   emptyText?: string

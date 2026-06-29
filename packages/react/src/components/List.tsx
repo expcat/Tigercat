@@ -32,7 +32,7 @@ import {
   getPaginationLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
-  type ListSize,
+  type ComponentSize,
   type ListBorderStyle,
   type ListItemLayout,
   type ListItem,
@@ -70,7 +70,7 @@ export interface ListProps<
    * List size
    * @default 'md'
    */
-  size?: ListSize
+  size?: ComponentSize
   /**
    * Border style
    * @default 'divided'

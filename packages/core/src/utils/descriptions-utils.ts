@@ -1,4 +1,5 @@
-import type { DescriptionsSize, DescriptionsLayout } from '../types/descriptions'
+import type { ComponentSize } from '../types/base'
+import type { DescriptionsLayout } from '../types/descriptions'
 
 export const descriptionsBaseClasses = 'w-full'
 
@@ -11,7 +12,7 @@ export const descriptionsTitleClasses = 'text-lg font-semibold text-[var(--tiger
 
 export const descriptionsExtraClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
 
-export const descriptionsSizeClasses: Record<DescriptionsSize, string> = {
+export const descriptionsSizeClasses: Record<ComponentSize, string> = {
   sm: 'text-sm',
   md: 'text-base',
   lg: 'text-lg'
@@ -24,7 +25,7 @@ export const descriptionsTableBorderedClasses = 'border border-[var(--tiger-bord
 /**
  * Size classes for descriptions cells
  */
-export const descriptionsCellSizeClasses: Record<DescriptionsSize, string> = {
+export const descriptionsCellSizeClasses: Record<ComponentSize, string> = {
   sm: 'px-3 py-2',
   md: 'px-4 py-3',
   lg: 'px-6 py-4'
@@ -66,7 +67,7 @@ export const descriptionsVerticalContentClasses = 'text-[var(--tiger-text,#11182
  * @param size - Descriptions size
  * @returns Combined class string
  */
-export function getDescriptionsClasses(size: DescriptionsSize): string {
+export function getDescriptionsClasses(size: ComponentSize): string {
   return `${descriptionsBaseClasses} ${descriptionsSizeClasses[size]}`
 }
 
@@ -92,7 +93,7 @@ export function getDescriptionsTableClasses(bordered: boolean): string {
  */
 export function getDescriptionsLabelClasses(
   bordered: boolean,
-  size: DescriptionsSize,
+  size: ComponentSize,
   layout: DescriptionsLayout
 ): string {
   if (layout === 'vertical') {
@@ -115,7 +116,7 @@ export function getDescriptionsLabelClasses(
  */
 export function getDescriptionsContentClasses(
   bordered: boolean,
-  size: DescriptionsSize,
+  size: ComponentSize,
   layout: DescriptionsLayout
 ): string {
   if (layout === 'vertical') {
@@ -134,7 +135,7 @@ export function getDescriptionsContentClasses(
  * @param size - Descriptions size
  * @returns Combined class string
  */
-export function getDescriptionsVerticalItemClasses(size: DescriptionsSize): string {
+export function getDescriptionsVerticalItemClasses(size: ComponentSize): string {
   return `${descriptionsCellSizeClasses[size]} ${descriptionsVerticalItemClasses}`
 }
 

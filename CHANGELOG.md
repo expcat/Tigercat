@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移，以及 size / publish artifact gate 收口。
+本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移、size / publish artifact gate 收口，以及 Basic / Layout 轻量组件 API 清理。
 
 ### Breaking Changes
 
@@ -16,6 +16,8 @@
 - **core icon path aliases**：移除 DatePicker / TimePicker 旧 icon path 别名 `CalendarIconPath`、`CloseIconPath`、`ChevronLeftIconPath`、`ChevronRightIconPath`、`ClockIconPath`、`TimePickerCloseIconPath`，并删除 `common-icons` 兼容 barrel；请改用 `calendarSolidIcon20PathD`、`closeSolidIcon20PathD`、`chevron*SolidIcon20PathD`、`clockSolidIcon20PathD` 或分组 icon 子路径。
 - **core DatePicker i18n helper**：`getDatePickerLabels(string)` 不再默认查找 13 个内置 DatePicker locale，以避免默认 bundle 拉入全量语言表；按运行时字符串解析内置 DatePicker 文案请改用 `@expcat/tigercat-core/datepicker-locales/registry` 的 `getDatePickerLabelsFromLocale(locale)`。
 - **core `defineText`**：`defineText(...)` 不再作为 `defineLocale(...)` 的别名补齐 en-US 基线，而是返回纯自定义文本 overlay；需要完整 en-US 基线时请改用 `defineLocale(...)`，需要 DatePicker 翻译时请显式传入对应 DatePicker preset。
+- **core Basic / Layout type aliases**：移除等同 shared contracts 的 `SpaceDirection`、`SpaceAlign`、`CardDirection`、`StatisticSize`、`DescriptionsSize`、`ListSize`；请分别改用 `BaseLayoutProps['direction']`、`BaseLayoutProps['align']` 或 `ComponentSize`。
+- **Carousel**：移除仅初始化语义的 `initialSlide`，统一为受控索引模型；React 使用 `currentIndex` / `defaultCurrentIndex` / `onCurrentIndexChange`，Vue 使用 `currentIndex` / `defaultCurrentIndex` / `update:currentIndex`。
 
 ### Infrastructure
 

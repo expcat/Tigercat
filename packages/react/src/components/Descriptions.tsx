@@ -13,7 +13,7 @@ import {
   descriptionsExtraClasses,
   descriptionsVerticalWrapperClasses,
   resolveResponsiveValue,
-  type DescriptionsSize,
+  type ComponentSize,
   type DescriptionsLayout,
   type DescriptionsItem,
   type ResponsiveBreakpoint
@@ -46,7 +46,7 @@ export interface DescriptionsProps extends Omit<React.HTMLAttributes<HTMLDivElem
    * Descriptions size
    * @default 'md'
    */
-  size?: DescriptionsSize
+  size?: ComponentSize
 
   /**
    * Descriptions layout

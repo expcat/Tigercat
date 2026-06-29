@@ -1,5 +1,5 @@
 import { defineComponent, h, ref, computed, watch, onBeforeUnmount, type PropType } from 'vue'
-import type { StatisticSize } from '@expcat/tigercat-core'
+import type { ComponentSize } from '@expcat/tigercat-core'
 import {
   statisticBaseClasses,
   getStatisticTitleClasses,
@@ -28,7 +28,7 @@ export const Statistic = defineComponent({
     groupSeparator: { type: Boolean, default: false },
     animated: { type: Boolean, default: false },
     animationDuration: { type: Number, default: undefined },
-    size: { type: String as PropType<StatisticSize>, default: 'md' },
+    size: { type: String as PropType<ComponentSize>, default: 'md' },
     className: { type: String, default: undefined }
   },
   setup(props, { attrs }) {

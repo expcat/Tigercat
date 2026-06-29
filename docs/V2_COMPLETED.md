@@ -436,3 +436,33 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/V2_API_AUDIT.md scripts/run-component-group-tests.mjs`
 
 **状态更新要求**：完成后写回状态、日期、审计输出位置、R12-R20 清单更新范围和关键验证命令；同步更新阶段 6 状态，并将当前可执行任务推进到 R12。
+
+### R12 Basic + Layout lightweight components
+
+**状态**：已完成（2026-06-29）。
+
+**目标**：清理 Basic 与 Layout 轻量展示组件，删除历史别名 props，统一 class/style 透传和子组件导出策略，并同步测试、Skill 文档与 examples。
+
+**允许修改**：Basic/Layout 相关 core types、React/Vue 组件、目标 tests、Skill `shared/props/basic.md`、`shared/props/layout.md`、`examples/basic.md`、`examples/layout.md`、example 使用、迁移说明、变更记录、API baseline。
+
+**不得修改**：Feedback/Form/Navigation/Data/Charts/Advanced/Composite 组件行为、测试分组基础设施、发布 workflow。
+
+**依赖/阻塞**：依赖 R11。
+
+**执行摘要**：已删除等同 shared contracts 的 `SpaceDirection`、`SpaceAlign`、`CardDirection`、`StatisticSize`、`DescriptionsSize`、`ListSize` public type aliases；对应 props 改用 `BaseLayoutProps` 或 `ComponentSize`。保留 `ButtonSize`、`AvatarSize`、`TextSize` 和 `SkeletonShape`，因为它们扩展或偏离共享 size/layout 合约，或当前没有共享 shape contract。Carousel 已删除 `initialSlide`，新增 `currentIndex` / `defaultCurrentIndex`；React 新增 `onCurrentIndexChange`，Vue 新增 `update:currentIndex`，导航、dots、swipe、autoplay 和 imperative methods 均走同一索引提交路径。React/Vue Carousel tests、example demos、迁移说明、变更记录、API baseline 与 Skill references 已同步更新。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 vitest run tests/react/Carousel.spec.tsx tests/vue/Carousel.spec.ts`
+- `npx -y pnpm@11.9.0 test:group:basic`
+- `npx -y pnpm@11.9.0 test:group:layout`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 size`
+- `git diff --check`
+
+**状态更新要求**：完成后已写回状态、日期、删除的 API 摘要、Skill/examples 更新范围、分组测试命令和关键验证命令；阶段 7 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R13。

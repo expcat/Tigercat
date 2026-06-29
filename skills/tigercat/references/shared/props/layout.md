@@ -23,7 +23,7 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 ## Carousel
 
-`packages/core/src/types/carousel.ts` · `CarouselProps` · 3/13 props
+`packages/core/src/types/carousel.ts` · `CarouselProps` · 3/14 props
 
 | Prop             | Type      | Default | Notes                                       |
 | ---------------- | --------- | ------- | ------------------------------------------- |
@@ -103,7 +103,7 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 | Prop        | Type              | Default     | Notes             |
 | ----------- | ----------------- | ----------- | ----------------- |
-| `size?`     | `ListSize`        | `'md'`      | List size         |
+| `size?`     | `ComponentSize`   | `'md'`      | List size         |
 | `bordered?` | `ListBorderStyle` | `'divided'` | List border style |
 | `loading?`  | `boolean`         | `false`     | Loading state     |
 
@@ -151,11 +151,11 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 `packages/core/src/types/space.ts` · `SpaceProps` · 3/4 props
 
-| Prop         | Type             | Default        | Notes                                                  |
-| ------------ | ---------------- | -------------- | ------------------------------------------------------ | ------- | --------------------------- |
-| `direction?` | `SpaceDirection` | `'horizontal'` | Space direction                                        |
-| `size?`      | `SpaceSize`      | `'md'`         | Space size between items Can be a preset size ('sm' \\ | 'md' \\ | 'lg') or a custom number... |
-| `align?`     | `SpaceAlign`     | `'start'`      | Align items in the space                               |
+| Prop         | Type                           | Default        | Notes                                                  |
+| ------------ | ------------------------------ | -------------- | ------------------------------------------------------ | ------- | --------------------------- |
+| `direction?` | `BaseLayoutProps['direction']` | `'horizontal'` | Space direction                                        |
+| `size?`      | `SpaceSize`                    | `'md'`         | Space size between items Can be a preset size ('sm' \\ | 'md' \\ | 'lg') or a custom number... |
+| `align?`     | `BaseLayoutProps['align']`     | `'start'`      | Align items in the space                               |
 
 ## Splitter
 

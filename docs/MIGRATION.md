@@ -37,6 +37,52 @@ hooks/composables、`Message` / `notification` 命令式 API、共享类型和 c
 + import { Button } from '@expcat/tigercat-react/Button'
 ```
 
+### Basic / Layout 轻量组件类型别名合并
+
+core 不再导出等同 shared contracts 的轻量组件类型别名：
+
+- `SpaceDirection` / `SpaceAlign` → `BaseLayoutProps['direction']` / `BaseLayoutProps['align']`
+- `CardDirection` → `BaseLayoutProps['direction']`
+- `StatisticSize` / `DescriptionsSize` / `ListSize` → `ComponentSize`
+
+```diff
+- import type { SpaceDirection, StatisticSize } from '@expcat/tigercat-core'
++ import type { BaseLayoutProps, ComponentSize } from '@expcat/tigercat-core'
+
+- const direction: SpaceDirection = 'horizontal'
+- const size: StatisticSize = 'md'
++ const direction: BaseLayoutProps['direction'] = 'horizontal'
++ const size: ComponentSize = 'md'
+```
+
+`ButtonSize`、`AvatarSize`、`TextSize` 和 `SkeletonShape` 仍保留，因为它们不是 `ComponentSize` / `BaseLayoutProps` 的简单重复。
+
+### Carousel 索引改为受控模型
+
+`Carousel` 移除 `initialSlide`，改为与其他非表单受控量一致的 `currentIndex` 模型。
+
+React:
+
+```diff
+- <Carousel initialSlide={1} />
++ <Carousel defaultCurrentIndex={1} />
+```
+
+```tsx
+<Carousel currentIndex={index} onCurrentIndexChange={setIndex} />
+```
+
+Vue:
+
+```diff
+- <Carousel :initialSlide="1" />
++ <Carousel :defaultCurrentIndex="1" />
+```
+
+```vue
+<Carousel v-model:current-index="index" />
+```
+
 ### Message / notification 命令式 API 与容器入口拆分
 
 React / Vue package 现在声明 `sideEffects: false`，普通 root named import 或组件子路径 import 可以被 bundler 摇掉未使用的命令式 Message / notification 挂载代码。

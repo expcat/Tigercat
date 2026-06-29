@@ -2,8 +2,10 @@
  * Space component utility functions
  */
 
-import type { SpaceSize, SpaceAlign, SpaceProps } from '../types/space'
+import type { SpaceSize, SpaceProps } from '../types/space'
 import { classNames } from './class-names'
+
+type SpaceAlignValue = NonNullable<SpaceProps['align']>
 
 const SIZE_CLASS: Record<string, string> = {
   sm: 'gap-2',
@@ -11,7 +13,7 @@ const SIZE_CLASS: Record<string, string> = {
   lg: 'gap-6'
 }
 
-const ALIGN_CLASS: Record<SpaceAlign, string> = {
+const ALIGN_CLASS: Record<SpaceAlignValue, string> = {
   start: 'items-start',
   end: 'items-end',
   center: 'items-center',

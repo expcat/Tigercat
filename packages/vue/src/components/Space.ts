@@ -3,9 +3,7 @@ import {
   getSpaceClasses,
   getSpaceStyle,
   type SpaceProps,
-  type SpaceDirection,
-  type SpaceSize,
-  type SpaceAlign
+  type SpaceSize
 } from '@expcat/tigercat-core'
 
 export type VueSpaceProps = SpaceProps
@@ -14,16 +12,16 @@ export const Space = defineComponent({
   name: 'TigerSpace',
   props: {
     direction: {
-      type: String as PropType<SpaceDirection>,
-      default: 'horizontal' as SpaceDirection
+      type: String as PropType<SpaceProps['direction']>,
+      default: 'horizontal'
     },
     size: {
       type: [String, Number] as PropType<SpaceSize>,
       default: 'md' as SpaceSize
     },
     align: {
-      type: String as PropType<SpaceAlign>,
-      default: 'start' as SpaceAlign
+      type: String as PropType<SpaceProps['align']>,
+      default: 'start'
     },
     wrap: {
       type: Boolean,

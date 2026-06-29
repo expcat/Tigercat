@@ -4,22 +4,22 @@
 type: active-roadmap
 scope: v2.0.0 breaking component API simplification and grouped validation plan
 verified-date: 2026-06-29
-source: current repository state after R01-R11 v2.0.0 API audit completion
+source: current repository state after R12 Basic/Layout cleanup completion
 -->
 
 本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；R01-R11 已完成任务的详细执行记录归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，需要历史证据时从归档、git 历史、变更日志或对应提交中查找。
 
 ## 当前状态
 
-截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R11 基础设施与 API 审计阶段：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy 资源清理、按组件组验证通道和 core/shared contracts 删除合并清单已经落地。v2.0.0 尚未完成发布前组件级破坏性升级；R12-R20 是 v2.0.0 发布前剩余任务。
+截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R12 基础设施、API 审计与首个组件批次清理：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy 资源清理、按组件组验证通道、core/shared contracts 删除合并清单，以及 Basic/Layout 轻量组件 API 清理已经落地。v2.0.0 尚未完成发布前剩余组件级破坏性升级；R13-R20 是 v2.0.0 发布前剩余任务。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）和阶段 6（R11 Core API and shared contracts audit）已完成于 2026-06-29。
-- 当前阶段：阶段 7（R12 Basic + Layout lightweight components），状态为 `未开始`。
-- 当前可执行任务：R12 Basic + Layout lightweight components。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）、阶段 6（R11 Core API and shared contracts audit）和阶段 7（R12 Basic + Layout lightweight components）已完成于 2026-06-29。
+- 当前阶段：阶段 8（R13 Feedback and overlay components），状态为 `未开始`。
+- 当前可执行任务：R13 Feedback and overlay components。
 - 后续阶段：R13-R20 必须按阶段依赖执行；v2.0.0 只有 R20 完成并通过发布门禁后才算路线图完成。
 
 ## 执行原则
@@ -56,7 +56,7 @@ source: current repository state after R01-R11 v2.0.0 API audit completion
 | 4    | 已完成（2026-06-28） | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
 | 5    | 已完成（2026-06-29） | R10     | 先建立按组件组可执行的测试、文档和示例维护通道                        |
 | 6    | 已完成（2026-06-29） | R11     | 审计 core API 与 shared contracts，形成组件批次删除/合并清单          |
-| 7    | 未开始               | R12     | 清理 Basic + Layout 轻量展示组件                                      |
+| 7    | 已完成（2026-06-29） | R12     | 清理 Basic + Layout 轻量展示组件                                      |
 | 8    | 未开始               | R13     | 清理 Feedback 与 overlay 组件                                         |
 | 9    | 未开始               | R14-R15 | 分两批清理 Form primitives 与 composite selectors                     |
 | 10   | 未开始               | R16     | 清理 Navigation 组件                                                  |
@@ -94,7 +94,7 @@ R01-R11 已完成，详细执行摘要、实际验证命令和状态回写记录
 
 ### R12 Basic + Layout lightweight components
 
-**状态**：未开始。
+**状态**：已完成（2026-06-29）。
 
 **目标**：清理 Basic 与 Layout 轻量展示组件，删除历史别名 props，统一 class/style 透传和子组件导出策略，并同步测试、Skill 文档与 examples。
 
@@ -119,7 +119,23 @@ R01-R11 已完成，详细执行摘要、实际验证命令和状态回写记录
 - `corepack pnpm size`
 - `git diff --check`
 
-**状态更新要求**：完成后写回状态、日期、删除的 API 摘要、Skill/examples 更新范围、分组测试命令和关键验证命令；同步更新阶段 7 状态。
+**执行摘要**：已删除等同 shared contracts 的 `SpaceDirection`、`SpaceAlign`、`CardDirection`、`StatisticSize`、`DescriptionsSize`、`ListSize` public type aliases；对应 props 改用 `BaseLayoutProps` 或 `ComponentSize`。`ButtonSize`、`AvatarSize`、`TextSize` 与 `SkeletonShape` 因具备组件专属语义或无共享替代而保留。Carousel 已从 `initialSlide` 切换为 `currentIndex` / `defaultCurrentIndex` 受控模型，React 新增 `onCurrentIndexChange`，Vue 新增 `update:currentIndex`，并同步 tests、examples、迁移说明、变更记录、API baseline 与 Skill references。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 vitest run tests/react/Carousel.spec.tsx tests/vue/Carousel.spec.ts`
+- `npx -y pnpm@11.9.0 test:group:basic`
+- `npx -y pnpm@11.9.0 test:group:layout`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 size`
+- `git diff --check`
+
+**状态更新要求**：已写回状态、日期、删除的 API 摘要、Skill/examples 更新范围、分组测试命令和关键验证命令；阶段 7 已同步为完成。
 
 ### R13 Feedback and overlay components
 

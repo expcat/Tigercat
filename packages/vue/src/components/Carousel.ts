@@ -47,7 +47,8 @@ export interface VueCarouselProps {
   arrows?: boolean
   infinite?: boolean
   speed?: number
-  initialSlide?: number
+  currentIndex?: number
+  defaultCurrentIndex?: number
   pauseOnHover?: boolean
   pauseOnFocus?: boolean
   className?: string
@@ -122,10 +123,17 @@ export const Carousel = defineComponent({
       default: 500
     },
     /**
-     * Initial slide index (0-based)
+     * Controlled current slide index (0-based)
+     */
+    currentIndex: {
+      type: Number,
+      default: undefined
+    },
+    /**
+     * Initial current slide index for uncontrolled usage
      * @default 0
      */
-    initialSlide: {
+    defaultCurrentIndex: {
       type: Number,
       default: 0
     },
@@ -160,15 +168,23 @@ export const Carousel = defineComponent({
       default: undefined
     }
   },
-  emits: ['change', 'before-change'],
+  emits: ['change', 'before-change', 'update:currentIndex'],
   setup(props, { slots, emit, attrs, expose }) {
-    const currentIndex = ref(props.initialSlide)
+    const internalCurrentIndex = ref(props.defaultCurrentIndex)
     const isPaused = ref(false)
     const slideCount = ref(0)
     const containerRef = ref<HTMLElement | null>(null)
     let autoplayController: CarouselAutoplayController | null = null
     let touchStartPoint: CarouselTouchPoint | null = null
     let touchCurrentPoint: CarouselTouchPoint | null = null
+
+    const isControlled = computed(() => props.currentIndex !== undefined)
+    const currentIndex = computed(() =>
+      clampSlideIndex(
+        isControlled.value ? (props.currentIndex as number) : internalCurrentIndex.value,
+        slideCount.value
+      )
+    )
 
     // Container classes
     const containerClasses = computed(() => {
@@ -242,7 +258,10 @@ export const Carousel = defineComponent({
 
       emit('before-change', currentIndex.value, clampedIndex)
       const prevIndex = currentIndex.value
-      currentIndex.value = clampedIndex
+      if (!isControlled.value) {
+        internalCurrentIndex.value = clampedIndex
+      }
+      emit('update:currentIndex', clampedIndex)
       emit('change', clampedIndex, prevIndex)
     }
 
