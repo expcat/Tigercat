@@ -78,6 +78,8 @@ export default {
 1. `examples/example/shared/app-config.ts` 中的分类、描述和路径。
 2. `examples/example/vue3/src` 与 `examples/example/react/src` 中的组件 value imports 是否继续使用 PascalCase 子路径；hooks/composables、`notification`、共享类型可继续走根入口或 core。
 3. 路由页是否继续通过 `React.lazy` / `defineAsyncComponent` 懒加载。
-4. `pnpm example:build` 是否通过。
+4. 对应组件分组测试是否通过，例如 `pnpm test:group:form` 或 `pnpm test:group -- --group feedback --framework react`。
+5. `pnpm example:build` 是否通过；SSR、懒加载或按需导入变更还需要 `pnpm example:ssr:check`。
+6. 本次变更文件是否通过 changed-file Prettier check。
 
 组件 API 文档入口见 [skills/tigercat/SKILL.md](../skills/tigercat/SKILL.md)，测试入口见 [tests/README.md](../tests/README.md)。

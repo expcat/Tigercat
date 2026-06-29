@@ -4,23 +4,23 @@
 type: active-roadmap
 scope: v2.0.0 breaking component API simplification and grouped validation plan
 verified-date: 2026-06-29
-source: current repository state after R01-R09 v2.0.0 infrastructure completion
+source: current repository state after R01-R10 v2.0.0 infrastructure completion
 -->
 
 本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；需要历史证据时从 git 历史、变更日志或对应提交中查找。
 
 ## 当前状态
 
-截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R09 基础设施阶段：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层和 legacy 资源清理已经落地。v2.0.0 尚未完成发布前组件级破坏性升级；R10-R20 是 v2.0.0 发布前剩余任务。
+截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R10 基础设施阶段：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy 资源清理和按组件组验证通道已经落地。v2.0.0 尚未完成发布前组件级破坏性升级；R11-R20 是 v2.0.0 发布前剩余任务。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28。
-- 当前阶段：阶段 5（R10 grouped validation, docs, and examples infrastructure），状态为 `未开始`。
-- 当前可执行任务：R10 grouped validation, docs, and examples infrastructure。
-- 后续阶段：R11-R20 必须在 R10 完成后按阶段依赖执行；v2.0.0 只有 R20 完成并通过发布门禁后才算路线图完成。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）已完成于 2026-06-29。
+- 当前阶段：阶段 6（R11 Core API and shared contracts audit），状态为 `未开始`。
+- 当前可执行任务：R11 Core API and shared contracts audit。
+- 后续阶段：R12-R20 必须在 R11 完成后按阶段依赖执行；v2.0.0 只有 R20 完成并通过发布门禁后才算路线图完成。
 
 ## 执行原则
 
@@ -51,7 +51,7 @@ source: current repository state after R01-R09 v2.0.0 infrastructure completion
 | 2    | 已完成（2026-06-28） | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
 | 3    | 已完成（2026-06-28） | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
 | 4    | 已完成（2026-06-28） | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
-| 5    | 未开始               | R10     | 先建立按组件组可执行的测试、文档和示例维护通道                        |
+| 5    | 已完成（2026-06-29） | R10     | 先建立按组件组可执行的测试、文档和示例维护通道                        |
 | 6    | 未开始               | R11     | 审计 core API 与 shared contracts，形成组件批次删除/合并清单          |
 | 7    | 未开始               | R12     | 清理 Basic + Layout 轻量展示组件                                      |
 | 8    | 未开始               | R13     | 清理 Feedback 与 overlay 组件                                         |
@@ -388,7 +388,7 @@ source: current repository state after R01-R09 v2.0.0 infrastructure completion
 
 ### R10 grouped validation, docs, and examples infrastructure
 
-**状态**：未开始。
+**状态**：已完成（2026-06-29）。
 
 **目标**：先建立按组件组可执行的测试、文档和示例维护通道，避免后续组件批次每次都依赖长时间全量测试。
 
@@ -416,6 +416,29 @@ source: current repository state after R01-R09 v2.0.0 infrastructure completion
 - `corepack pnpm docs:api:check`
 - `corepack pnpm api:validate`
 - `git diff --check`
+
+**执行摘要**：已新增 `scripts/lib/component-test-groups.mjs` 作为分组测试文件解析事实源，并新增 `scripts/run-component-group-tests.mjs` 作为 `test:group` runner；root `package.json` 已新增 `test:group` 与 10 个 `test:group:*` 入口。runner 基于 `scripts/lib/public-components.mjs` 的 Category 与公开组件导出收集 React/Vue exact component spec、同组 core utils spec 和显式 cross-cutting spec，支持 `--group`、`--framework`、`--list`、`--filter`；`form` 额外支持 `primitives` / `composite` filter alias。`scripts/validate-tests.mjs` 已支持 `TEST_GROUP=<group>`、`--group`、`--framework`、`--filter` 单组测试质量校验。`scripts/README.md`、`examples/README.md`、Skill release/performance/component-index references 已同步说明组件批次优先运行对应分组测试、相关 docs/examples 检查和 changed-file Prettier check。
+
+**实际分组覆盖规则**：
+
+- `basic`、`form`、`feedback`、`layout`、`navigation`、`data`、`charts`、`advanced`、`composite`：收集同组 React/Vue 公开组件 spec、同组 core utils spec 和 `component-test-groups.mjs` 中维护的 cross-cutting specs。
+- `core`：收集 `tests/core` 下全部 `.spec.ts` / `.spec.tsx`。
+- `--framework react|vue` 只限制框架组件 spec，仍保留同组 core specs；`--list` 只打印解析结果不运行 Vitest；`--filter <keyword>` 在已解析的同组文件内继续筛选。
+
+**实际验证**：
+
+- `corepack pnpm test:group -- --list --group form`
+- `for group in basic form feedback layout navigation data charts advanced composite core; do corepack pnpm "test:group:$group" -- --list; done`
+- `corepack pnpm test:group:core`（122 files / 1996 tests passed）
+- `corepack pnpm test:group:basic`（79 files / 1320 tests passed）
+- `TEST_GROUP=form corepack pnpm test:validate`（75 files passed；56 existing soft warnings）
+- `corepack pnpm docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `corepack pnpm api:validate`
+- `corepack pnpm release:check`
+- `npx -y pnpm@11.9.0 prettier --check package.json scripts/README.md scripts/generate-api-docs.mjs scripts/lib/component-test-groups.mjs scripts/run-component-group-tests.mjs scripts/validate-api.mjs scripts/validate-tests.mjs examples/README.md skills/tigercat/references/component-index.md skills/tigercat/references/performance.md skills/tigercat/references/release.md docs/ROADMAP.md`
+- `git diff --check`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md CHANGELOG.md skills scripts tests examples package.json`
 
 **状态更新要求**：完成后写回状态、日期、分组脚本入口、实际分组覆盖规则和关键验证命令；同步更新阶段 5 状态，并将当前可执行任务推进到 R11。
 

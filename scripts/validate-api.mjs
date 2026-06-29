@@ -14,6 +14,7 @@ import { join, basename, relative } from 'path'
 import { fileURLToPath } from 'url'
 import {
   buildPublicComponentEntries,
+  CATEGORY_SLUGS,
   formatComponentIndexType,
   getComponentPackageSubpath,
   getDocTarget,
@@ -499,8 +500,9 @@ function collectComponentIndexRows() {
     if (component === 'Component' || component.startsWith('-')) continue
     rows.set(component, {
       category: columns[1],
-      type: columns[2],
-      packageSubpath: columns[3] ?? ''
+      testGroup: columns[2]?.replace(/`/g, ''),
+      type: columns[3],
+      packageSubpath: columns[4] ?? ''
     })
   }
 
@@ -512,6 +514,7 @@ const expectedComponentRows = new Map(
     entry.component,
     {
       category: entry.category,
+      testGroup: CATEGORY_SLUGS[entry.category] || entry.category.toLowerCase(),
       type: formatComponentIndexType(entry.typeSource),
       packageSubpath: getComponentPackageSubpath(entry.component)
     }
@@ -533,6 +536,7 @@ for (const [componentName, expected] of expectedComponentRows) {
 
   if (
     actual.category !== expected.category ||
+    actual.testGroup !== expected.testGroup ||
     actual.type !== expected.type ||
     actual.packageSubpath !== expected.packageSubpath
   ) {
@@ -540,7 +544,7 @@ for (const [componentName, expected] of expectedComponentRows) {
       'skills/tigercat/references/component-index.md',
       0,
       'docs-api',
-      `component-index 组件 "${componentName}" 应为 ${expected.category} / ${expected.type} / ${expected.packageSubpath}，实际为 ${actual.category} / ${actual.type} / ${actual.packageSubpath}`
+      `component-index 组件 "${componentName}" 应为 ${expected.category} / ${expected.testGroup} / ${expected.type} / ${expected.packageSubpath}，实际为 ${actual.category} / ${actual.testGroup} / ${actual.type} / ${actual.packageSubpath}`
     )
   }
 }

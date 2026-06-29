@@ -13,155 +13,157 @@ description: Canonical Tigercat component route map for props, examples, and typ
 - Examples：在 `examples/{cat}.md` 内找 `## {Component}` 段或同名片段。
 - 类型源码：`packages/core/src/types/` + Type 列；个别跨包组件（如 ConfigProvider）以各框架包内同名文件为准，详见其 props 段。
 
+- Test group：组件批次优先运行 `pnpm test:group:{group}`；需要限定框架时使用 `pnpm test:group -- --group {group} --framework react|vue`。
+
 - Package subpath：React/Vue 组件按需使用均优先走 PascalCase 显式入口，例如 `@expcat/tigercat-react/Button` 或 `@expcat/tigercat-vue/Button`；根入口 named exports 仅作为小应用便利入口与非组件 API 入口。
 
-| Component             | Category   | Type                                                | Package Subpath         |
-| --------------------- | ---------- | --------------------------------------------------- | ----------------------- |
-| CodeEditor            | Advanced   | code-editor.ts                                      | ./CodeEditor            |
-| FileManager           | Advanced   | file-manager.ts                                     | ./FileManager           |
-| ImageAnnotation       | Advanced   | image-annotation.ts                                 | ./ImageAnnotation       |
-| ImageViewer           | Advanced   | image-viewer.ts                                     | ./ImageViewer           |
-| InfiniteScroll        | Advanced   | infinite-scroll.ts                                  | ./InfiniteScroll        |
-| Kanban                | Advanced   | kanban.ts                                           | ./Kanban                |
-| MarkdownEditor        | Advanced   | markdown-editor.ts                                  | ./MarkdownEditor        |
-| PrintLayout           | Advanced   | print-layout.ts                                     | ./PrintLayout           |
-| PrintPageBreak        | Advanced   | PrintLayout.tsx, PrintLayout.ts                     | ./PrintPageBreak        |
-| RichTextEditor        | Advanced   | rich-text-editor.ts                                 | ./RichTextEditor        |
-| VirtualList           | Advanced   | virtual-list.ts                                     | ./VirtualList           |
-| VirtualTable          | Advanced   | virtual-table.ts                                    | ./VirtualTable          |
-| Alert                 | Basic      | alert.ts                                            | ./Alert                 |
-| Avatar                | Basic      | avatar.ts                                           | ./Avatar                |
-| AvatarGroup           | Basic      | avatar.ts                                           | ./AvatarGroup           |
-| Badge                 | Basic      | badge.ts                                            | ./Badge                 |
-| Button                | Basic      | button.ts                                           | ./Button                |
-| ButtonGroup           | Basic      | button.ts                                           | ./ButtonGroup           |
-| Code                  | Basic      | code.ts                                             | ./Code                  |
-| ConfigProvider        | Basic      | ConfigProvider.tsx, ConfigProvider.ts               | ./ConfigProvider        |
-| CropUpload            | Basic      | image.ts                                            | ./CropUpload            |
-| Divider               | Basic      | divider.ts                                          | ./Divider               |
-| Empty                 | Basic      | empty.ts                                            | ./Empty                 |
-| Icon                  | Basic      | icon.ts                                             | ./Icon                  |
-| Image                 | Basic      | image.ts                                            | ./Image                 |
-| ImageCropper          | Basic      | image.ts                                            | ./ImageCropper          |
-| ImageGroup            | Basic      | image.ts                                            | ./ImageGroup            |
-| ImagePreview          | Basic      | image.ts                                            | ./ImagePreview          |
-| Link                  | Basic      | link.ts                                             | ./Link                  |
-| QRCode                | Basic      | qrcode.ts                                           | ./QRCode                |
-| Rate                  | Basic      | rate.ts                                             | ./Rate                  |
-| Result                | Basic      | result.ts                                           | ./Result                |
-| Segmented             | Basic      | segmented.ts                                        | ./Segmented             |
-| Statistic             | Basic      | statistic.ts                                        | ./Statistic             |
-| Tag                   | Basic      | tag.ts                                              | ./Tag                   |
-| Text                  | Basic      | text.ts                                             | ./Text                  |
-| Watermark             | Basic      | watermark.ts                                        | ./Watermark             |
-| AreaChart             | Charts     | chart.ts                                            | ./AreaChart             |
-| BarChart              | Charts     | chart.ts                                            | ./BarChart              |
-| ChartAxis             | Charts     | chart.ts                                            | ./ChartAxis             |
-| ChartCanvas           | Charts     | chart.ts                                            | ./ChartCanvas           |
-| ChartGrid             | Charts     | chart.ts                                            | ./ChartGrid             |
-| ChartLegend           | Charts     | chart.ts                                            | ./ChartLegend           |
-| ChartSeries           | Charts     | chart.ts                                            | ./ChartSeries           |
-| ChartTooltip          | Charts     | chart.ts                                            | ./ChartTooltip          |
-| DonutChart            | Charts     | chart.ts                                            | ./DonutChart            |
-| FunnelChart           | Charts     | chart.ts                                            | ./FunnelChart           |
-| Gantt                 | Charts     | gantt.ts                                            | ./Gantt                 |
-| GaugeChart            | Charts     | chart.ts                                            | ./GaugeChart            |
-| HeatmapChart          | Charts     | chart.ts                                            | ./HeatmapChart          |
-| LineChart             | Charts     | chart.ts                                            | ./LineChart             |
-| OrgChart              | Charts     | org-chart.ts                                        | ./OrgChart              |
-| PieChart              | Charts     | chart.ts                                            | ./PieChart              |
-| RadarChart            | Charts     | chart.ts                                            | ./RadarChart            |
-| ScatterChart          | Charts     | chart.ts                                            | ./ScatterChart          |
-| SunburstChart         | Charts     | chart.ts                                            | ./SunburstChart         |
-| TreeMapChart          | Charts     | chart.ts                                            | ./TreeMapChart          |
-| ActivityFeed          | Composite  | composite.ts                                        | ./ActivityFeed          |
-| ChatWindow            | Composite  | composite.ts                                        | ./ChatWindow            |
-| CommentThread         | Composite  | composite.ts                                        | ./CommentThread         |
-| DataTableWithToolbar  | Composite  | composite.ts                                        | ./DataTableWithToolbar  |
-| FormWizard            | Composite  | composite.ts                                        | ./FormWizard            |
-| NotificationCenter    | Composite  | composite.ts                                        | ./NotificationCenter    |
-| TaskBoard             | Composite  | composite.ts                                        | ./TaskBoard             |
-| Calendar              | Data       | calendar.ts                                         | ./Calendar              |
-| Collapse              | Data       | collapse.ts                                         | ./Collapse              |
-| CollapsePanel         | Data       | collapse.ts                                         | ./CollapsePanel         |
-| Countdown             | Data       | countdown.ts                                        | ./Countdown             |
-| Table                 | Data       | table.ts                                            | ./Table                 |
-| Timeline              | Data       | timeline.ts                                         | ./Timeline              |
-| Drawer                | Feedback   | drawer.ts                                           | ./Drawer                |
-| Loading               | Feedback   | loading.ts                                          | ./Loading               |
-| Message               | Feedback   | message.ts                                          | ./Message               |
-| MessageContainer      | Feedback   | MessageContainer.tsx, MessageContainer.ts           | ./MessageContainer      |
-| Modal                 | Feedback   | modal.ts                                            | ./Modal                 |
-| NotificationContainer | Feedback   | NotificationContainer.tsx, NotificationContainer.ts | ./NotificationContainer |
-| Popconfirm            | Feedback   | popconfirm.ts                                       | ./Popconfirm            |
-| Popover               | Feedback   | popover.ts                                          | ./Popover               |
-| Progress              | Feedback   | progress.ts                                         | ./Progress              |
-| Tooltip               | Feedback   | tooltip.ts                                          | ./Tooltip               |
-| Tour                  | Feedback   | tour.ts                                             | ./Tour                  |
-| AutoComplete          | Form       | auto-complete.ts                                    | ./AutoComplete          |
-| Cascader              | Form       | cascader.ts                                         | ./Cascader              |
-| Checkbox              | Form       | checkbox.ts                                         | ./Checkbox              |
-| CheckboxGroup         | Form       | checkbox.ts                                         | ./CheckboxGroup         |
-| ColorPicker           | Form       | color-picker.ts                                     | ./ColorPicker           |
-| ColorSwatch           | Form       | color-swatch.ts                                     | ./ColorSwatch           |
-| CronEditor            | Form       | cron-editor.ts                                      | ./CronEditor            |
-| DatePicker            | Form       | datepicker.ts                                       | ./DatePicker            |
-| Form                  | Form       | form.ts                                             | ./Form                  |
-| FormItem              | Form       | form.ts                                             | ./FormItem              |
-| Input                 | Form       | input.ts                                            | ./Input                 |
-| InputGroup            | Form       | input-group.ts                                      | ./InputGroup            |
-| InputGroupAddon       | Form       | input-group.ts                                      | ./InputGroupAddon       |
-| InputNumber           | Form       | input-number.ts                                     | ./InputNumber           |
-| Mentions              | Form       | mentions.ts                                         | ./Mentions              |
-| NumberKeyboard        | Form       | number-keyboard.ts                                  | ./NumberKeyboard        |
-| Radio                 | Form       | radio.ts                                            | ./Radio                 |
-| RadioGroup            | Form       | radio.ts                                            | ./RadioGroup            |
-| Select                | Form       | select.ts                                           | ./Select                |
-| Signature             | Form       | signature.ts                                        | ./Signature             |
-| Slider                | Form       | slider.ts                                           | ./Slider                |
-| Stepper               | Form       | stepper.ts                                          | ./Stepper               |
-| Switch                | Form       | switch.ts                                           | ./Switch                |
-| Textarea              | Form       | textarea.ts                                         | ./Textarea              |
-| TimePicker            | Form       | timepicker.ts                                       | ./TimePicker            |
-| Transfer              | Form       | transfer.ts                                         | ./Transfer              |
-| TreeSelect            | Form       | tree-select.ts                                      | ./TreeSelect            |
-| Upload                | Form       | upload.ts                                           | ./Upload                |
-| Card                  | Layout     | card.ts                                             | ./Card                  |
-| Carousel              | Layout     | carousel.ts                                         | ./Carousel              |
-| Col                   | Layout     | grid.ts                                             | ./Col                   |
-| Container             | Layout     | container.ts                                        | ./Container             |
-| Content               | Layout     | layout.ts                                           | ./Content               |
-| Descriptions          | Layout     | descriptions.ts                                     | ./Descriptions          |
-| Footer                | Layout     | layout.ts                                           | ./Footer                |
-| Header                | Layout     | layout.ts                                           | ./Header                |
-| Layout                | Layout     | layout.ts                                           | ./Layout                |
-| List                  | Layout     | list.ts                                             | ./List                  |
-| Resizable             | Layout     | resizable.ts                                        | ./Resizable             |
-| Row                   | Layout     | grid.ts                                             | ./Row                   |
-| Sidebar               | Layout     | layout.ts                                           | ./Sidebar               |
-| Skeleton              | Layout     | skeleton.ts                                         | ./Skeleton              |
-| Space                 | Layout     | space.ts                                            | ./Space                 |
-| Splitter              | Layout     | splitter.ts                                         | ./Splitter              |
-| Affix                 | Navigation | affix.ts                                            | ./Affix                 |
-| Anchor                | Navigation | anchor.ts                                           | ./Anchor                |
-| AnchorLink            | Navigation | anchor.ts                                           | ./AnchorLink            |
-| BackTop               | Navigation | back-top.ts                                         | ./BackTop               |
-| Breadcrumb            | Navigation | breadcrumb.ts                                       | ./Breadcrumb            |
-| BreadcrumbItem        | Navigation | breadcrumb.ts                                       | ./BreadcrumbItem        |
-| Dropdown              | Navigation | dropdown.ts                                         | ./Dropdown              |
-| DropdownItem          | Navigation | dropdown.ts                                         | ./DropdownItem          |
-| DropdownMenu          | Navigation | dropdown.ts                                         | ./DropdownMenu          |
-| FloatButton           | Navigation | float-button.ts                                     | ./FloatButton           |
-| FloatButtonGroup      | Navigation | float-button.ts                                     | ./FloatButtonGroup      |
-| Menu                  | Navigation | menu.ts                                             | ./Menu                  |
-| MenuItem              | Navigation | menu.ts                                             | ./MenuItem              |
-| MenuItemGroup         | Navigation | menu.ts                                             | ./MenuItemGroup         |
-| Pagination            | Navigation | pagination.ts                                       | ./Pagination            |
-| ScrollSpy             | Navigation | scroll-spy.ts                                       | ./ScrollSpy             |
-| Spotlight             | Navigation | spotlight.ts                                        | ./Spotlight             |
-| Steps                 | Navigation | steps.ts                                            | ./Steps                 |
-| StepsItem             | Navigation | Steps.tsx, Steps.ts                                 | ./StepsItem             |
-| SubMenu               | Navigation | menu.ts                                             | ./SubMenu               |
-| TabPane               | Navigation | tabs.ts                                             | ./TabPane               |
-| Tabs                  | Navigation | tabs.ts                                             | ./Tabs                  |
-| Tree                  | Navigation | tree.ts                                             | ./Tree                  |
+| Component             | Category   | Test Group   | Type                                                | Package Subpath         |
+| --------------------- | ---------- | ------------ | --------------------------------------------------- | ----------------------- |
+| CodeEditor            | Advanced   | `advanced`   | code-editor.ts                                      | ./CodeEditor            |
+| FileManager           | Advanced   | `advanced`   | file-manager.ts                                     | ./FileManager           |
+| ImageAnnotation       | Advanced   | `advanced`   | image-annotation.ts                                 | ./ImageAnnotation       |
+| ImageViewer           | Advanced   | `advanced`   | image-viewer.ts                                     | ./ImageViewer           |
+| InfiniteScroll        | Advanced   | `advanced`   | infinite-scroll.ts                                  | ./InfiniteScroll        |
+| Kanban                | Advanced   | `advanced`   | kanban.ts                                           | ./Kanban                |
+| MarkdownEditor        | Advanced   | `advanced`   | markdown-editor.ts                                  | ./MarkdownEditor        |
+| PrintLayout           | Advanced   | `advanced`   | print-layout.ts                                     | ./PrintLayout           |
+| PrintPageBreak        | Advanced   | `advanced`   | PrintLayout.tsx, PrintLayout.ts                     | ./PrintPageBreak        |
+| RichTextEditor        | Advanced   | `advanced`   | rich-text-editor.ts                                 | ./RichTextEditor        |
+| VirtualList           | Advanced   | `advanced`   | virtual-list.ts                                     | ./VirtualList           |
+| VirtualTable          | Advanced   | `advanced`   | virtual-table.ts                                    | ./VirtualTable          |
+| Alert                 | Basic      | `basic`      | alert.ts                                            | ./Alert                 |
+| Avatar                | Basic      | `basic`      | avatar.ts                                           | ./Avatar                |
+| AvatarGroup           | Basic      | `basic`      | avatar.ts                                           | ./AvatarGroup           |
+| Badge                 | Basic      | `basic`      | badge.ts                                            | ./Badge                 |
+| Button                | Basic      | `basic`      | button.ts                                           | ./Button                |
+| ButtonGroup           | Basic      | `basic`      | button.ts                                           | ./ButtonGroup           |
+| Code                  | Basic      | `basic`      | code.ts                                             | ./Code                  |
+| ConfigProvider        | Basic      | `basic`      | ConfigProvider.tsx, ConfigProvider.ts               | ./ConfigProvider        |
+| CropUpload            | Basic      | `basic`      | image.ts                                            | ./CropUpload            |
+| Divider               | Basic      | `basic`      | divider.ts                                          | ./Divider               |
+| Empty                 | Basic      | `basic`      | empty.ts                                            | ./Empty                 |
+| Icon                  | Basic      | `basic`      | icon.ts                                             | ./Icon                  |
+| Image                 | Basic      | `basic`      | image.ts                                            | ./Image                 |
+| ImageCropper          | Basic      | `basic`      | image.ts                                            | ./ImageCropper          |
+| ImageGroup            | Basic      | `basic`      | image.ts                                            | ./ImageGroup            |
+| ImagePreview          | Basic      | `basic`      | image.ts                                            | ./ImagePreview          |
+| Link                  | Basic      | `basic`      | link.ts                                             | ./Link                  |
+| QRCode                | Basic      | `basic`      | qrcode.ts                                           | ./QRCode                |
+| Rate                  | Basic      | `basic`      | rate.ts                                             | ./Rate                  |
+| Result                | Basic      | `basic`      | result.ts                                           | ./Result                |
+| Segmented             | Basic      | `basic`      | segmented.ts                                        | ./Segmented             |
+| Statistic             | Basic      | `basic`      | statistic.ts                                        | ./Statistic             |
+| Tag                   | Basic      | `basic`      | tag.ts                                              | ./Tag                   |
+| Text                  | Basic      | `basic`      | text.ts                                             | ./Text                  |
+| Watermark             | Basic      | `basic`      | watermark.ts                                        | ./Watermark             |
+| AreaChart             | Charts     | `charts`     | chart.ts                                            | ./AreaChart             |
+| BarChart              | Charts     | `charts`     | chart.ts                                            | ./BarChart              |
+| ChartAxis             | Charts     | `charts`     | chart.ts                                            | ./ChartAxis             |
+| ChartCanvas           | Charts     | `charts`     | chart.ts                                            | ./ChartCanvas           |
+| ChartGrid             | Charts     | `charts`     | chart.ts                                            | ./ChartGrid             |
+| ChartLegend           | Charts     | `charts`     | chart.ts                                            | ./ChartLegend           |
+| ChartSeries           | Charts     | `charts`     | chart.ts                                            | ./ChartSeries           |
+| ChartTooltip          | Charts     | `charts`     | chart.ts                                            | ./ChartTooltip          |
+| DonutChart            | Charts     | `charts`     | chart.ts                                            | ./DonutChart            |
+| FunnelChart           | Charts     | `charts`     | chart.ts                                            | ./FunnelChart           |
+| Gantt                 | Charts     | `charts`     | gantt.ts                                            | ./Gantt                 |
+| GaugeChart            | Charts     | `charts`     | chart.ts                                            | ./GaugeChart            |
+| HeatmapChart          | Charts     | `charts`     | chart.ts                                            | ./HeatmapChart          |
+| LineChart             | Charts     | `charts`     | chart.ts                                            | ./LineChart             |
+| OrgChart              | Charts     | `charts`     | org-chart.ts                                        | ./OrgChart              |
+| PieChart              | Charts     | `charts`     | chart.ts                                            | ./PieChart              |
+| RadarChart            | Charts     | `charts`     | chart.ts                                            | ./RadarChart            |
+| ScatterChart          | Charts     | `charts`     | chart.ts                                            | ./ScatterChart          |
+| SunburstChart         | Charts     | `charts`     | chart.ts                                            | ./SunburstChart         |
+| TreeMapChart          | Charts     | `charts`     | chart.ts                                            | ./TreeMapChart          |
+| ActivityFeed          | Composite  | `composite`  | composite.ts                                        | ./ActivityFeed          |
+| ChatWindow            | Composite  | `composite`  | composite.ts                                        | ./ChatWindow            |
+| CommentThread         | Composite  | `composite`  | composite.ts                                        | ./CommentThread         |
+| DataTableWithToolbar  | Composite  | `composite`  | composite.ts                                        | ./DataTableWithToolbar  |
+| FormWizard            | Composite  | `composite`  | composite.ts                                        | ./FormWizard            |
+| NotificationCenter    | Composite  | `composite`  | composite.ts                                        | ./NotificationCenter    |
+| TaskBoard             | Composite  | `composite`  | composite.ts                                        | ./TaskBoard             |
+| Calendar              | Data       | `data`       | calendar.ts                                         | ./Calendar              |
+| Collapse              | Data       | `data`       | collapse.ts                                         | ./Collapse              |
+| CollapsePanel         | Data       | `data`       | collapse.ts                                         | ./CollapsePanel         |
+| Countdown             | Data       | `data`       | countdown.ts                                        | ./Countdown             |
+| Table                 | Data       | `data`       | table.ts                                            | ./Table                 |
+| Timeline              | Data       | `data`       | timeline.ts                                         | ./Timeline              |
+| Drawer                | Feedback   | `feedback`   | drawer.ts                                           | ./Drawer                |
+| Loading               | Feedback   | `feedback`   | loading.ts                                          | ./Loading               |
+| Message               | Feedback   | `feedback`   | message.ts                                          | ./Message               |
+| MessageContainer      | Feedback   | `feedback`   | MessageContainer.tsx, MessageContainer.ts           | ./MessageContainer      |
+| Modal                 | Feedback   | `feedback`   | modal.ts                                            | ./Modal                 |
+| NotificationContainer | Feedback   | `feedback`   | NotificationContainer.tsx, NotificationContainer.ts | ./NotificationContainer |
+| Popconfirm            | Feedback   | `feedback`   | popconfirm.ts                                       | ./Popconfirm            |
+| Popover               | Feedback   | `feedback`   | popover.ts                                          | ./Popover               |
+| Progress              | Feedback   | `feedback`   | progress.ts                                         | ./Progress              |
+| Tooltip               | Feedback   | `feedback`   | tooltip.ts                                          | ./Tooltip               |
+| Tour                  | Feedback   | `feedback`   | tour.ts                                             | ./Tour                  |
+| AutoComplete          | Form       | `form`       | auto-complete.ts                                    | ./AutoComplete          |
+| Cascader              | Form       | `form`       | cascader.ts                                         | ./Cascader              |
+| Checkbox              | Form       | `form`       | checkbox.ts                                         | ./Checkbox              |
+| CheckboxGroup         | Form       | `form`       | checkbox.ts                                         | ./CheckboxGroup         |
+| ColorPicker           | Form       | `form`       | color-picker.ts                                     | ./ColorPicker           |
+| ColorSwatch           | Form       | `form`       | color-swatch.ts                                     | ./ColorSwatch           |
+| CronEditor            | Form       | `form`       | cron-editor.ts                                      | ./CronEditor            |
+| DatePicker            | Form       | `form`       | datepicker.ts                                       | ./DatePicker            |
+| Form                  | Form       | `form`       | form.ts                                             | ./Form                  |
+| FormItem              | Form       | `form`       | form.ts                                             | ./FormItem              |
+| Input                 | Form       | `form`       | input.ts                                            | ./Input                 |
+| InputGroup            | Form       | `form`       | input-group.ts                                      | ./InputGroup            |
+| InputGroupAddon       | Form       | `form`       | input-group.ts                                      | ./InputGroupAddon       |
+| InputNumber           | Form       | `form`       | input-number.ts                                     | ./InputNumber           |
+| Mentions              | Form       | `form`       | mentions.ts                                         | ./Mentions              |
+| NumberKeyboard        | Form       | `form`       | number-keyboard.ts                                  | ./NumberKeyboard        |
+| Radio                 | Form       | `form`       | radio.ts                                            | ./Radio                 |
+| RadioGroup            | Form       | `form`       | radio.ts                                            | ./RadioGroup            |
+| Select                | Form       | `form`       | select.ts                                           | ./Select                |
+| Signature             | Form       | `form`       | signature.ts                                        | ./Signature             |
+| Slider                | Form       | `form`       | slider.ts                                           | ./Slider                |
+| Stepper               | Form       | `form`       | stepper.ts                                          | ./Stepper               |
+| Switch                | Form       | `form`       | switch.ts                                           | ./Switch                |
+| Textarea              | Form       | `form`       | textarea.ts                                         | ./Textarea              |
+| TimePicker            | Form       | `form`       | timepicker.ts                                       | ./TimePicker            |
+| Transfer              | Form       | `form`       | transfer.ts                                         | ./Transfer              |
+| TreeSelect            | Form       | `form`       | tree-select.ts                                      | ./TreeSelect            |
+| Upload                | Form       | `form`       | upload.ts                                           | ./Upload                |
+| Card                  | Layout     | `layout`     | card.ts                                             | ./Card                  |
+| Carousel              | Layout     | `layout`     | carousel.ts                                         | ./Carousel              |
+| Col                   | Layout     | `layout`     | grid.ts                                             | ./Col                   |
+| Container             | Layout     | `layout`     | container.ts                                        | ./Container             |
+| Content               | Layout     | `layout`     | layout.ts                                           | ./Content               |
+| Descriptions          | Layout     | `layout`     | descriptions.ts                                     | ./Descriptions          |
+| Footer                | Layout     | `layout`     | layout.ts                                           | ./Footer                |
+| Header                | Layout     | `layout`     | layout.ts                                           | ./Header                |
+| Layout                | Layout     | `layout`     | layout.ts                                           | ./Layout                |
+| List                  | Layout     | `layout`     | list.ts                                             | ./List                  |
+| Resizable             | Layout     | `layout`     | resizable.ts                                        | ./Resizable             |
+| Row                   | Layout     | `layout`     | grid.ts                                             | ./Row                   |
+| Sidebar               | Layout     | `layout`     | layout.ts                                           | ./Sidebar               |
+| Skeleton              | Layout     | `layout`     | skeleton.ts                                         | ./Skeleton              |
+| Space                 | Layout     | `layout`     | space.ts                                            | ./Space                 |
+| Splitter              | Layout     | `layout`     | splitter.ts                                         | ./Splitter              |
+| Affix                 | Navigation | `navigation` | affix.ts                                            | ./Affix                 |
+| Anchor                | Navigation | `navigation` | anchor.ts                                           | ./Anchor                |
+| AnchorLink            | Navigation | `navigation` | anchor.ts                                           | ./AnchorLink            |
+| BackTop               | Navigation | `navigation` | back-top.ts                                         | ./BackTop               |
+| Breadcrumb            | Navigation | `navigation` | breadcrumb.ts                                       | ./Breadcrumb            |
+| BreadcrumbItem        | Navigation | `navigation` | breadcrumb.ts                                       | ./BreadcrumbItem        |
+| Dropdown              | Navigation | `navigation` | dropdown.ts                                         | ./Dropdown              |
+| DropdownItem          | Navigation | `navigation` | dropdown.ts                                         | ./DropdownItem          |
+| DropdownMenu          | Navigation | `navigation` | dropdown.ts                                         | ./DropdownMenu          |
+| FloatButton           | Navigation | `navigation` | float-button.ts                                     | ./FloatButton           |
+| FloatButtonGroup      | Navigation | `navigation` | float-button.ts                                     | ./FloatButtonGroup      |
+| Menu                  | Navigation | `navigation` | menu.ts                                             | ./Menu                  |
+| MenuItem              | Navigation | `navigation` | menu.ts                                             | ./MenuItem              |
+| MenuItemGroup         | Navigation | `navigation` | menu.ts                                             | ./MenuItemGroup         |
+| Pagination            | Navigation | `navigation` | pagination.ts                                       | ./Pagination            |
+| ScrollSpy             | Navigation | `navigation` | scroll-spy.ts                                       | ./ScrollSpy             |
+| Spotlight             | Navigation | `navigation` | spotlight.ts                                        | ./Spotlight             |
+| Steps                 | Navigation | `navigation` | steps.ts                                            | ./Steps                 |
+| StepsItem             | Navigation | `navigation` | Steps.tsx, Steps.ts                                 | ./StepsItem             |
+| SubMenu               | Navigation | `navigation` | menu.ts                                             | ./SubMenu               |
+| TabPane               | Navigation | `navigation` | tabs.ts                                             | ./TabPane               |
+| Tabs                  | Navigation | `navigation` | tabs.ts                                             | ./Tabs                  |
+| Tree                  | Navigation | `navigation` | tree.ts                                             | ./Tree                  |

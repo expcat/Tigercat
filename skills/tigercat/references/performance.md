@@ -68,6 +68,16 @@ when all built-in DatePicker presets are intentionally needed.
 
 Run `pnpm build` and `pnpm size` after changing shared utils, chart code, exports, or component dependencies.
 
+For component-batch performance work, run the matching grouped tests before the heavier gates:
+
+```bash
+pnpm test:group -- --group charts --list
+pnpm test:group:charts
+pnpm test:group -- --group advanced --framework vue
+```
+
+Then run `pnpm docs:api:check`, the relevant examples check, and changed-file Prettier check. Escalate to `pnpm size` and `pnpm publish:check` whenever shared dependencies, component subpaths, lazy imports, charts, editors, locale loading, or package side effects change.
+
 ## Benchmarks
 
 Run `pnpm bench` (Vitest benchmark mode) to execute the suites under `benchmarks/` (8 `.bench.ts` files; the `benchmark` section of `vitest.config.ts` controls discovery). Results are advisory and not a CI gate: the P3 review kept hard baseline thresholds deferred because shared runners make micro-benchmark timings noisy and prone to false red builds. `.github/workflows/bench.yml` runs them weekly and on manual dispatch (`pnpm bench --run --outputJson=bench-results.json`) and uploads the JSON artifact for manual comparison against previous artifacts.

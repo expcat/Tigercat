@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 
+import { getComponentTestGroupFiles } from './lib/component-test-groups.mjs'
 import { walkFiles } from './utils/files.mjs'
 import { c } from './utils/term.mjs'
 
@@ -239,26 +240,29 @@ function softMinTestsForFile(filename) {
 }
 
 function isComponentSpec(filePath) {
-  return (
-    filePath.startsWith(`tests${path.sep}react${path.sep}`) ||
-    filePath.startsWith(`tests${path.sep}vue${path.sep}`)
-  )
+  const normalizedPath = filePath.split(path.sep).join('/')
+  return normalizedPath.startsWith('tests/react/') || normalizedPath.startsWith('tests/vue/')
 }
 
-async function main() {
-  const counters = {
-    totalFiles: 0,
-    passedFiles: 0,
-    failedFiles: 0,
-    warnings: 0
+function readOption(args, name) {
+  const index = args.indexOf(name)
+  if (index === -1) return null
+  const value = args[index + 1]
+  if (!value || value.startsWith('--')) {
+    throw new Error(`${name} requires a value.`)
   }
+  return value
+}
 
-  console.log('🐯 Tigercat Test Quality Validation')
-  console.log('====================================')
-  console.log('')
+async function collectValidationFiles() {
+  const args = process.argv.slice(2)
+  const group = readOption(args, '--group') || process.env.TEST_GROUP
 
-  console.log('Scanning test files...')
-  console.log('')
+  if (group) {
+    const framework = readOption(args, '--framework') || process.env.TEST_FRAMEWORK || 'all'
+    const filter = readOption(args, '--filter') || process.env.TEST_FILTER
+    return getComponentTestGroupFiles({ group, framework, filter })
+  }
 
   const testDirsEnv = process.env.TEST_DIRS
   const testDirs = (
@@ -277,9 +281,29 @@ async function main() {
     }
   }
 
+  return testFiles
+}
+
+async function main() {
+  const counters = {
+    totalFiles: 0,
+    passedFiles: 0,
+    failedFiles: 0,
+    warnings: 0
+  }
+
+  console.log('🐯 Tigercat Test Quality Validation')
+  console.log('====================================')
+  console.log('')
+
+  console.log('Scanning test files...')
+  console.log('')
+
+  const testFiles = await collectValidationFiles()
+
   if (testFiles.length === 0) {
-    console.log(c('red', `No test files found in: ${testDirs.join(' ')}`))
-    console.log('Set TEST_DIRS to customize directories.')
+    console.log(c('red', 'No test files found.'))
+    console.log('Set TEST_DIRS, TEST_GROUP, or pass --group to customize the scan.')
     process.exit(1)
   }
 

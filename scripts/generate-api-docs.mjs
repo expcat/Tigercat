@@ -529,13 +529,16 @@ function generateComponentIndex(componentRows) {
   markdownText +=
     '- 类型源码：`packages/core/src/types/` + Type 列；个别跨包组件（如 ConfigProvider）以各框架包内同名文件为准，详见其 props 段。\n\n'
   markdownText +=
+    '- Test group：组件批次优先运行 `pnpm test:group:{group}`；需要限定框架时使用 `pnpm test:group -- --group {group} --framework react|vue`。\n\n'
+  markdownText +=
     '- Package subpath：React/Vue 组件按需使用均优先走 PascalCase 显式入口，例如 `@expcat/tigercat-react/Button` 或 `@expcat/tigercat-vue/Button`；根入口 named exports 仅作为小应用便利入口与非组件 API 入口。\n\n'
-  markdownText += '| Component | Category | Type | Package Subpath |\n'
-  markdownText += '| --------- | -------- | ---- | --------------- |\n'
+  markdownText += '| Component | Category | Test Group | Type | Package Subpath |\n'
+  markdownText += '| --------- | -------- | ---------- | ---- | --------------- |\n'
 
   for (const row of componentRows) {
     const typeFile = formatComponentIndexType(row.typeSource)
-    markdownText += `| ${row.component} | ${row.category} | ${typeFile} | ${getComponentPackageSubpath(row.component)} |\n`
+    const testGroup = CATEGORY_SLUGS[row.category] || row.category.toLowerCase()
+    markdownText += `| ${row.component} | ${row.category} | \`${testGroup}\` | ${typeFile} | ${getComponentPackageSubpath(row.component)} |\n`
   }
 
   return markdownText

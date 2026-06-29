@@ -24,6 +24,16 @@ pnpm build
 
 `pnpm quality:release` includes quick API/type checks, size-limit, local publish artifact smoke, test checklist validation, Vue/React example builds, and the Nuxt/Next SSR build matrix. The publish smoke checks installed package ESM entrypoints and keeps Button component subpaths below their release budgets without pulling imperative APIs, charts, editors, or full locale bundles. It also verifies that `defineText` and DatePicker component subpaths do not pull unused DatePicker locale presets, while explicit DatePicker locale imports still include the requested preset.
 
+For component-batch work, start with the matching group gate before escalating to the full release gate:
+
+```bash
+pnpm test:group:form
+pnpm test:group -- --group feedback --framework react
+TEST_GROUP=form pnpm test:validate
+```
+
+Available groups are `basic`, `form`, `feedback`, `layout`, `navigation`, `data`, `charts`, `advanced`, `composite`, and `core`. Pair the group run with `pnpm docs:api:check`, the relevant examples check, and changed-file Prettier check. Use `pnpm quality:release` when package exports, generated references, API baselines, size budgets, publish smoke behavior, or release workflows change.
+
 ## API Freeze Checklist
 
 - Run `pnpm release:check`, `pnpm types:check`, and `pnpm api:validate`.
