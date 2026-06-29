@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
 import { nextTick } from 'vue'
 import { Message } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -11,7 +11,15 @@ const messageTypes = ['success', 'warning', 'error', 'info', 'loading'] as const
 
 async function flushDomUpdates() {
   await nextTick()
-  await Promise.resolve()
+  for (let i = 0; i < 8; i += 1) {
+    await Promise.resolve()
+  }
+}
+
+async function flushLazyImport() {
+  await flushDomUpdates()
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  await flushDomUpdates()
 }
 
 function getMessages() {
@@ -23,9 +31,16 @@ function getMessageByType(type: (typeof messageTypes)[number]) {
 }
 
 describe('Message (Vue)', () => {
-  beforeEach(() => {
+  beforeAll(async () => {
+    Message.clear()
+    await flushLazyImport()
+    document.body.innerHTML = ''
+  })
+
+  beforeEach(async () => {
     // Clear all messages before each test
     Message.clear()
+    await flushLazyImport()
     // Clear any existing message containers
     document.body.innerHTML = ''
   })

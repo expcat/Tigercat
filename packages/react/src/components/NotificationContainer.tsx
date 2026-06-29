@@ -4,6 +4,9 @@ import {
   classNames,
   getNotificationIconPath,
   getNotificationTypeClasses,
+  notificationActionButtonClasses,
+  notificationActionButtonTypeClasses,
+  notificationActionsClasses,
   notificationBaseClasses,
   notificationCloseButtonClasses,
   notificationCloseIconClasses,
@@ -82,6 +85,32 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
         {notification.description && (
           <div className={classNames(notificationDescriptionClasses, colorScheme.descriptionText)}>
             {notification.description}
+          </div>
+        )}
+        {notification.actions && notification.actions.length > 0 && (
+          <div className={notificationActionsClasses}>
+            {notification.actions.map((action) => (
+              <button
+                key={action.key ?? action.label}
+                className={classNames(
+                  notificationActionButtonClasses,
+                  notificationActionButtonTypeClasses[action.type ?? 'default']
+                )}
+                type="button"
+                disabled={action.disabled}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  action.onClick?.({
+                    id: notification.id,
+                    close: handleClose
+                  })
+                  if (action.closeOnClick) {
+                    handleClose()
+                  }
+                }}>
+                {action.label}
+              </button>
+            ))}
           </div>
         )}
       </div>

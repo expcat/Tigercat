@@ -28,6 +28,15 @@ const manualSnippet = `<Button @click="showNotification">显示通知</Button>
 const callbackSnippet = `<Button @click="showClickableNotification">可点击通知</Button>
 <Button @click="showNotificationWithCallback">带回调通知</Button>`
 
+const actionsSnippet = `notification.info({
+  title: '新通知',
+  description: '支持在 toast 内渲染多个操作按钮。',
+  actions: [
+    { label: '查看', type: 'primary', onClick: () => openDetail() },
+    { label: '撤销', closeOnClick: true, onClick: () => undo() }
+  ]
+})`
+
 const clearSnippet = `<Button @click="showMultipleNotifications">显示多条通知</Button>
 <Button @click="clearAll">清空所有</Button>
 <Button @click="clearTopRight">清空右上角</Button>`
@@ -200,6 +209,31 @@ const showNotificationWithCallback = () => {
     onClose: () => {
       console.log('通知已关闭')
     }
+  })
+}
+
+const showActionNotification = () => {
+  notification.info({
+    title: '新通知',
+    description: '支持在 toast 内渲染多个操作按钮。',
+    duration: 0,
+    actions: [
+      {
+        label: '查看',
+        type: 'primary',
+        onClick: () => {
+          console.log('查看通知详情')
+          alert('打开通知详情')
+        }
+      },
+      {
+        label: '撤销',
+        closeOnClick: true,
+        onClick: () => {
+          console.log('撤销通知相关操作')
+        }
+      }
+    ]
   })
 }
 
@@ -400,6 +434,14 @@ const showCustomClass = () => {
           带回调通知
         </Button>
       </div>
+    </DemoBlock>
+
+    <DemoBlock title="内嵌操作" description="在通知内容下方渲染操作按钮。" :code="actionsSnippet">
+      <Button
+        @click="showActionNotification"
+        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        显示带操作通知
+      </Button>
     </DemoBlock>
 
     <DemoBlock title="清空通知" description="按位置或全部清空通知。" :code="clearSnippet">

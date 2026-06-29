@@ -8,21 +8,26 @@ export type VueNotificationProps = NotificationOptions
 
 type NotificationClose = () => void
 
+let notificationModulePromise: Promise<typeof import('./Notification')> | null = null
+
+function loadNotificationModule(): Promise<typeof import('./Notification')> {
+  notificationModulePromise ??= import('./Notification')
+  return notificationModulePromise
+}
+
 function forwardNotification(
   method: NotificationType,
   options: NotificationOptions
 ): NotificationClose {
   let closeNotification: NotificationClose | null = null
   let requestedClose = false
-  queueMicrotask(() => {
-    void import('./Notification').then(({ notification }) => {
-      const close = notification[method](options)
-      if (requestedClose) {
-        close()
-      } else {
-        closeNotification = close
-      }
-    })
+  void loadNotificationModule().then(({ notification }) => {
+    const close = notification[method](options)
+    if (requestedClose) {
+      close()
+    } else {
+      closeNotification = close
+    }
   })
 
   return () => {
@@ -52,10 +57,8 @@ export const notification: Record<
     return forwardNotification('info', options)
   },
   clear(position) {
-    queueMicrotask(() => {
-      void import('./Notification').then(({ notification }) => {
-        notification.clear(position)
-      })
+    void loadNotificationModule().then(({ notification }) => {
+      notification.clear(position)
     })
   }
 }

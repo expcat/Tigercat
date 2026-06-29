@@ -3,12 +3,16 @@ import {
   classNames,
   createBackTopVisibilityController,
   scrollToTop,
+  backTopBaseClasses,
   backTopButtonClasses,
   backTopContainerClasses,
   backTopHiddenClasses,
   backTopVisibleClasses,
   backTopIconPath,
+  getViewportOffsetStyle,
   isBrowser,
+  viewportFloatingBaseClasses,
+  viewportPlacementClasses,
   type BackTopProps as CoreBackTopProps
 } from '@expcat/tigercat-core'
 
@@ -48,9 +52,13 @@ export const BackTop: React.FC<BackTopProps> = ({
   visibilityHeight = 400,
   target = getDefaultTarget,
   duration = 450,
+  position = 'auto',
+  placement = 'bottom-right',
+  offset,
   onClick,
   children,
   className,
+  style,
   'aria-label': ariaLabel = 'Back to top',
   ...props
 }) => {
@@ -89,18 +97,35 @@ export const BackTop: React.FC<BackTopProps> = ({
 
   const buttonClasses = useMemo(() => {
     const positionClasses =
-      !targetElement || targetElement === window ? backTopButtonClasses : backTopContainerClasses
+      position === 'fixed'
+        ? classNames(
+            viewportFloatingBaseClasses,
+            viewportPlacementClasses[placement],
+            backTopBaseClasses
+          )
+        : position === 'sticky'
+          ? backTopContainerClasses
+          : !targetElement || targetElement === window
+            ? backTopButtonClasses
+            : backTopContainerClasses
     return classNames(
       positionClasses,
       visible ? backTopVisibleClasses : backTopHiddenClasses,
       className
     )
-  }, [targetElement, visible, className])
+  }, [position, placement, targetElement, visible, className])
+
+  const buttonStyle = useMemo(
+    () =>
+      position === 'fixed' ? { ...getViewportOffsetStyle(placement, offset), ...style } : style,
+    [position, placement, offset, style]
+  )
 
   return (
     <button
       type="button"
       className={buttonClasses}
+      style={buttonStyle}
       aria-label={ariaLabel}
       onClick={handleClick}
       {...props}>

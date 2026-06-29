@@ -2,6 +2,8 @@
  * FloatButton component types and interfaces
  */
 
+import type { ViewportOffset, ViewportPlacement } from './viewport'
+
 /**
  * FloatButton shape
  */
@@ -54,6 +56,24 @@ export interface FloatButtonProps {
    * Additional CSS class name
    */
   className?: string
+
+  /**
+   * Whether the standalone button should be fixed to the viewport.
+   * @default false
+   */
+  floating?: boolean
+
+  /**
+   * Fixed viewport corner used when floating is true.
+   * @default 'bottom-right'
+   */
+  placement?: ViewportPlacement
+
+  /**
+   * Fixed viewport offset used when floating is true.
+   * @default 24
+   */
+  offset?: ViewportOffset
 }
 
 /**

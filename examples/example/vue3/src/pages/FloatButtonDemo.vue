@@ -44,6 +44,18 @@
           style="position: absolute; right: 24px; bottom: 24px" />
       </div>
     </DemoBlock>
+
+    <DemoBlock
+      title="独立悬浮"
+      description="单个 FloatButton 可直接固定到视口角落。"
+      :code="floatingSnippet">
+      <FloatButton
+        floating
+        placement="bottom-right"
+        :offset="24"
+        tooltip="客服"
+        aria-label="客服入口" />
+    </DemoBlock>
   </div>
 </template>
 
@@ -69,4 +81,12 @@ const groupSnippet = `<FloatButtonGroup trigger="hover">
 </FloatButtonGroup>`
 
 const disabledSnippet = `<FloatButton disabled tooltip="不可用" />`
+
+const floatingSnippet = `<FloatButton
+  floating
+  placement="bottom-right"
+  :offset="24"
+  tooltip="客服"
+  aria-label="客服入口"
+/>`
 </script>

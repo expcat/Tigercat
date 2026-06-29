@@ -94,6 +94,37 @@ describe('BackTop', () => {
     expect(button).toHaveClass('fixed')
   })
 
+  it('supports fixed placement for a custom scroll target', async () => {
+    const user = userEvent.setup()
+    scrollContainer.scrollTop = 200
+    scrollContainer.scrollTo = vi.fn((options?: ScrollToOptions) => {
+      scrollContainer.scrollTop = Number(options?.top ?? 0)
+    })
+
+    const { container } = render(
+      <BackTop
+        visibilityHeight={0}
+        duration={0}
+        target={() => scrollContainer}
+        position="fixed"
+        placement="bottom-left"
+        offset={{ x: 24, y: '2rem' }}
+      />
+    )
+
+    const button = container.querySelector('button')
+    expect(button).toHaveClass('fixed')
+    expect(button).toHaveClass('bottom-0')
+    expect(button).toHaveClass('left-0')
+    expect(button).not.toHaveClass('sticky')
+    expect(button?.style.left).toBe('24px')
+    expect(button?.style.bottom).toBe('2rem')
+
+    await user.click(button!)
+    expect(scrollContainer.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'auto' })
+    expect(scrollContainer.scrollTop).toBe(0)
+  })
+
   it('forwards native attributes', () => {
     const { container } = render(
       <BackTop target={() => scrollContainer} data-testid="backtop-btn" aria-label="Custom label" />

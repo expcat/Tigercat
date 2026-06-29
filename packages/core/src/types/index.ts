@@ -12,6 +12,7 @@
 
 // Base shared interfaces (v1.0+)
 export * from './base'
+export * from './viewport'
 
 // Form components
 export * from './button'

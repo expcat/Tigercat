@@ -75,6 +75,8 @@ Events/callback props: `onClose?`.
 
 Events/callback props: `onClose?`.
 
+Imperative notification API supports inline toast actions via `notification.info({ title, actions: [{ label, type, closeOnClick, onClick }] })`. Action clicks do not trigger the whole-toast `onClick`; use `closeOnClick` or the callback context `close()` to dismiss that toast.
+
 ## Popconfirm
 
 `packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 3/13 props

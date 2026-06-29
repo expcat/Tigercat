@@ -69,7 +69,7 @@ description: Compact generated API summary for Tigercat core types
 | loading.ts      | LoadingProps      | Loading    | 4       |
 | message.ts      | MessageProps      | Message    | 6       |
 | modal.ts        | ModalProps        | Modal      | 2       |
-| notification.ts | NotificationProps | -          | 6       |
+| notification.ts | NotificationProps | -          | 8       |
 | popconfirm.ts   | PopconfirmProps   | Popconfirm | 2       |
 | popover.ts      | PopoverProps      | Popover    | 2       |
 | progress.ts     | ProgressProps     | Progress   | 5       |
@@ -98,7 +98,7 @@ description: Compact generated API summary for Tigercat core types
 | --------------- | ---------------------------------------------------------- | -------------------------------------- | ------- |
 | affix.ts        | AffixProps                                                 | Affix                                  | 1       |
 | anchor.ts       | AnchorProps, AnchorLinkProps                               | Anchor, AnchorLink                     | 5       |
-| back-top.ts     | BackTopProps                                               | BackTop                                | 1       |
+| back-top.ts     | BackTopProps                                               | BackTop                                | 2       |
 | breadcrumb.ts   | BreadcrumbProps, BreadcrumbItemProps                       | Breadcrumb, BreadcrumbItem             | 3       |
 | dropdown.ts     | DropdownProps, DropdownMenuProps, DropdownItemProps        | Dropdown, DropdownMenu, DropdownItem   | 4       |
 | float-button.ts | FloatButtonProps, FloatButtonGroupProps                    | FloatButton, FloatButtonGroup          | 4       |
@@ -163,4 +163,10 @@ description: Compact generated API summary for Tigercat core types
 | slots.ts          | -                                                            | -          | 10      |
 | theme.ts          | -                                                            | -          | 11      |
 
-Total exported types: 632.
+## Other
+
+| Type File   | Props Interfaces | Components | Exports |
+| ----------- | ---------------- | ---------- | ------- |
+| viewport.ts | -                | -          | 2       |
+
+Total exported types: 637.

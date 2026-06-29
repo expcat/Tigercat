@@ -147,6 +147,27 @@ export const notificationDescriptionClasses = 'text-sm mt-1'
  */
 export const notificationContentClasses = 'flex-1 min-w-0'
 
+/**
+ * Notification actions wrapper classes
+ */
+export const notificationActionsClasses = 'mt-3 flex flex-wrap items-center gap-2'
+
+/**
+ * Notification action button base classes
+ */
+export const notificationActionButtonClasses =
+  'rounded-[var(--tiger-radius-md,0.5rem)] px-2.5 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 disabled:cursor-not-allowed disabled:opacity-50'
+
+/**
+ * Notification action button type classes
+ */
+export const notificationActionButtonTypeClasses = {
+  primary:
+    'bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] disabled:hover:bg-[var(--tiger-primary,#2563eb)]',
+  default:
+    'border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-surface-muted,#f3f4f6)]'
+}
+
 export type NotificationStackFrameCallback = (timestamp: number) => void
 
 export type NotificationStackFrameRequest = (callback: NotificationStackFrameCallback) => number

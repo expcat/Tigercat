@@ -4,6 +4,9 @@ import {
   coerceClassValue,
   getNotificationIconPath,
   getNotificationTypeClasses,
+  notificationActionButtonClasses,
+  notificationActionButtonTypeClasses,
+  notificationActionsClasses,
   notificationBaseClasses,
   notificationCloseButtonClasses,
   notificationCloseIconClasses,
@@ -92,6 +95,40 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
               class: classNames(notificationDescriptionClasses, colorScheme.descriptionText)
             },
             notification.description
+          )
+        )
+      }
+
+      if (notification.actions?.length) {
+        contentChildren.push(
+          h(
+            'div',
+            { class: notificationActionsClasses },
+            notification.actions.map((action) =>
+              h(
+                'button',
+                {
+                  key: action.key ?? action.label,
+                  class: classNames(
+                    notificationActionButtonClasses,
+                    notificationActionButtonTypeClasses[action.type ?? 'default']
+                  ),
+                  type: 'button',
+                  disabled: action.disabled,
+                  onClick: (e: MouseEvent) => {
+                    e.stopPropagation()
+                    action.onClick?.({
+                      id: notification.id,
+                      close: () => props.onClose?.(notification.id)
+                    })
+                    if (action.closeOnClick) {
+                      props.onClose?.(notification.id)
+                    }
+                  }
+                },
+                action.label
+              )
+            )
           )
         )
       }

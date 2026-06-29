@@ -41,12 +41,13 @@ description: Compact generated Tigercat Navigation props reference
 
 ## BackTop
 
-`packages/core/src/types/back-top.ts` · `BackTopProps`
+`packages/core/src/types/back-top.ts` · `BackTopProps` · 3/5 props
 
-| Prop                | Type     | Default | Notes                                                                           |
-| ------------------- | -------- | ------- | ------------------------------------------------------------------------------- |
-| `visibilityHeight?` | `number` | `400`   | Scroll height to show the BackTop button                                        |
-| `duration?`         | `number` | `450`   | Use immediate scroll when set to 0; positive values use native smooth scrolling |
+| Prop         | Type                | Default          | Notes                                                                                      |
+| ------------ | ------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
+| `position?`  | `BackTopPosition`   | `'auto'`         | Positioning strategy. Auto preserves the historical window=fixed/container=sticky behav... |
+| `placement?` | `ViewportPlacement` | `'bottom-right'` | Fixed viewport corner used when position is fixed.                                         |
+| `offset?`    | `ViewportOffset`    | `24`             | Fixed viewport offset used when position is fixed.                                         |
 
 ## Breadcrumb
 
@@ -103,13 +104,13 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## FloatButton
 
-`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 3/7 props
+`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 3/10 props
 
-| Prop       | Type               | Default    | Notes                       |
-| ---------- | ------------------ | ---------- | --------------------------- |
-| `shape?`   | `FloatButtonShape` | `'circle'` | Shape of the button         |
-| `size?`    | `FloatButtonSize`  | `'md'`     | Button size                 |
-| `tooltip?` | `string`           | `-`        | Tooltip text shown on hover |
+| Prop         | Type                | Default          | Notes                                                          |
+| ------------ | ------------------- | ---------------- | -------------------------------------------------------------- |
+| `floating?`  | `boolean`           | `false`          | Whether the standalone button should be fixed to the viewport. |
+| `placement?` | `ViewportPlacement` | `'bottom-right'` | Fixed viewport corner used when floating is true.              |
+| `offset?`    | `ViewportOffset`    | `24`             | Fixed viewport offset used when floating is true.              |
 
 ## FloatButtonGroup
 

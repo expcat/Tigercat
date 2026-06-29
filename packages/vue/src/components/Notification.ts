@@ -149,6 +149,7 @@ function addNotification(config: NotificationConfig): () => void {
     closable: config.closable !== undefined ? config.closable : true,
     onClose: config.onClose,
     onClick: config.onClick,
+    actions: config.actions,
     icon: config.icon,
     className: config.className,
     position

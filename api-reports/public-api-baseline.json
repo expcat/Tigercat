@@ -104,6 +104,7 @@
       "avatarShapeClasses",
       "AvatarSize",
       "avatarSizeClasses",
+      "backTopBaseClasses",
       "backTopButtonClasses",
       "backTopContainerClasses",
       "BackTopFrameCallback",
@@ -111,6 +112,7 @@
       "BackTopFrameRequest",
       "backTopHiddenClasses",
       "backTopIconPath",
+      "BackTopPosition",
       "BackTopProps",
       "BackTopVisibilityController",
       "BackTopVisibilityControllerOptions",
@@ -1481,6 +1483,7 @@
       "getValidatedPaginationJumperValue",
       "getValidationOrder",
       "getValueByPath",
+      "getViewportOffsetStyle",
       "getViewportWidth",
       "getViewTransitionNameStyle",
       "getVirtualRowKey",
@@ -1914,6 +1917,11 @@
       "normalizeSpotlightText",
       "normalizeStringOption",
       "normalizeSvgAttrs",
+      "NotificationAction",
+      "notificationActionButtonClasses",
+      "notificationActionButtonTypeClasses",
+      "NotificationActionContext",
+      "notificationActionsClasses",
       "notificationBaseClasses",
       "NotificationCenterProps",
       "notificationCloseButtonClasses",
@@ -2833,6 +2841,10 @@
       "VI_VN_DATEPICKER_LOCALE",
       "vibrantTheme",
       "VIEW_TRANSITION_CSS",
+      "viewportFloatingBaseClasses",
+      "ViewportOffset",
+      "ViewportPlacement",
+      "viewportPlacementClasses",
       "ViewportQueryOptions",
       "ViewTransitionLike",
       "ViewTransitionOptions",
@@ -3037,7 +3049,7 @@
     },
     "BackTopProps": {
       "extends": [],
-      "props": ["duration", "visibilityHeight"]
+      "props": ["duration", "offset", "placement", "position", "visibilityHeight"]
     },
     "BadgeProps": {
       "extends": [],
@@ -3590,7 +3602,18 @@
     },
     "FloatButtonProps": {
       "extends": [],
-      "props": ["ariaLabel", "className", "disabled", "shape", "size", "tooltip", "type"]
+      "props": [
+        "ariaLabel",
+        "className",
+        "disabled",
+        "floating",
+        "offset",
+        "placement",
+        "shape",
+        "size",
+        "tooltip",
+        "type"
+      ]
     },
     "FooterProps": {
       "extends": [],
@@ -4158,6 +4181,7 @@
     "NotificationProps": {
       "extends": [],
       "props": [
+        "actions",
         "className",
         "closable",
         "description",

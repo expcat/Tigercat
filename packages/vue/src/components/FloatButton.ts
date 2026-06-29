@@ -20,8 +20,13 @@ import {
   floatButtonTypeClasses,
   floatButtonDisabledClasses,
   floatButtonGroupClasses,
+  getViewportOffsetStyle,
+  viewportFloatingBaseClasses,
+  viewportPlacementClasses,
   type FloatButtonShape,
-  type FloatButtonSize
+  type FloatButtonSize,
+  type ViewportOffset,
+  type ViewportPlacement
 } from '@expcat/tigercat-core'
 
 // Group → child shape inheritance (child's own shape still wins)
@@ -35,6 +40,9 @@ export interface VueFloatButtonProps {
   disabled?: boolean
   ariaLabel?: string
   className?: string
+  floating?: boolean
+  placement?: ViewportPlacement
+  offset?: ViewportOffset
   style?: Record<string, string | number>
 }
 
@@ -70,6 +78,18 @@ export const FloatButton = defineComponent({
       type: String,
       default: undefined
     },
+    floating: {
+      type: Boolean,
+      default: false
+    },
+    placement: {
+      type: String as PropType<ViewportPlacement>,
+      default: 'bottom-right' as ViewportPlacement
+    },
+    offset: {
+      type: [Number, String, Object] as PropType<ViewportOffset>,
+      default: undefined
+    },
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
@@ -92,6 +112,8 @@ export const FloatButton = defineComponent({
         floatButtonSizeClasses[props.size],
         floatButtonTypeClasses[props.type],
         props.disabled && floatButtonDisabledClasses,
+        props.floating && viewportFloatingBaseClasses,
+        props.floating && viewportPlacementClasses[props.placement],
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
@@ -110,7 +132,11 @@ export const FloatButton = defineComponent({
         {
           ...attrs,
           class: classes.value,
-          style: mergeStyleValues(attrsRecord.style, props.style),
+          style: mergeStyleValues(
+            props.floating ? getViewportOffsetStyle(props.placement, props.offset) : undefined,
+            attrsRecord.style,
+            props.style
+          ),
           type: 'button',
           disabled: props.disabled,
           'aria-label': props.ariaLabel ?? props.tooltip,

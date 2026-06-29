@@ -14,14 +14,21 @@ import {
   createBackTopVisibilityController,
   mergeStyleValues,
   scrollToTop,
+  backTopBaseClasses,
   backTopButtonClasses,
   backTopContainerClasses,
   backTopHiddenClasses,
   backTopVisibleClasses,
   backTopIconPath,
+  getViewportOffsetStyle,
   isBrowser,
+  viewportFloatingBaseClasses,
+  viewportPlacementClasses,
+  type BackTopPosition,
   type BackTopProps,
-  type BackTopVisibilityController
+  type BackTopVisibilityController,
+  type ViewportOffset,
+  type ViewportPlacement
 } from '@expcat/tigercat-core'
 
 export interface VueBackTopProps extends BackTopProps {
@@ -72,6 +79,18 @@ export const BackTop = defineComponent({
       type: Number,
       default: 450
     },
+    position: {
+      type: String as PropType<BackTopPosition>,
+      default: 'auto' as BackTopPosition
+    },
+    placement: {
+      type: String as PropType<ViewportPlacement>,
+      default: 'bottom-right' as ViewportPlacement
+    },
+    offset: {
+      type: [Number, String, Object] as PropType<ViewportOffset>,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -119,7 +138,18 @@ export const BackTop = defineComponent({
     const buttonClasses = computed(() => {
       const target = targetElement.value ?? (isBrowser() ? props.target() : null)
       const isWindowTarget = !target || target === window
-      const positionClasses = isWindowTarget ? backTopButtonClasses : backTopContainerClasses
+      const positionClasses =
+        props.position === 'fixed'
+          ? classNames(
+              viewportFloatingBaseClasses,
+              viewportPlacementClasses[props.placement],
+              backTopBaseClasses
+            )
+          : props.position === 'sticky'
+            ? backTopContainerClasses
+            : isWindowTarget
+              ? backTopButtonClasses
+              : backTopContainerClasses
       return classNames(
         positionClasses,
         visible.value ? backTopVisibleClasses : backTopHiddenClasses,
@@ -128,7 +158,15 @@ export const BackTop = defineComponent({
       )
     })
 
-    const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
+    const mergedStyle = computed(() =>
+      mergeStyleValues(
+        props.position === 'fixed'
+          ? getViewportOffsetStyle(props.placement, props.offset)
+          : undefined,
+        attrs.style,
+        props.style
+      )
+    )
 
     return () => {
       const content = slots.default ? slots.default() : DefaultIcon

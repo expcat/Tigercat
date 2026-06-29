@@ -13,6 +13,59 @@ export type NotificationType = 'success' | 'warning' | 'error' | 'info'
 export type NotificationPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 /**
+ * Context passed to notification action callbacks.
+ */
+export interface NotificationActionContext {
+  /**
+   * Notification instance id.
+   */
+  id: string | number
+
+  /**
+   * Close this notification.
+   */
+  close: () => void
+}
+
+/**
+ * Inline action rendered inside a notification toast.
+ */
+export interface NotificationAction {
+  /**
+   * Stable key for rendering. Falls back to the label.
+   */
+  key?: string
+
+  /**
+   * Visible action label.
+   */
+  label: string
+
+  /**
+   * Action button type.
+   * @default 'default'
+   */
+  type?: 'primary' | 'default'
+
+  /**
+   * Whether this action is disabled.
+   * @default false
+   */
+  disabled?: boolean
+
+  /**
+   * Whether to close the notification after clicking this action.
+   * @default false
+   */
+  closeOnClick?: boolean
+
+  /**
+   * Action click handler.
+   */
+  onClick?: (context: NotificationActionContext) => void
+}
+
+/**
  * Notification instance interface
  */
 export interface NotificationInstance {
@@ -55,6 +108,11 @@ export interface NotificationInstance {
    * Callback when notification is clicked
    */
   onClick?: () => void
+
+  /**
+   * Inline action buttons rendered inside the notification.
+   */
+  actions?: NotificationAction[]
 
   /**
    * Custom icon (overrides default type icon)
@@ -113,6 +171,11 @@ export interface NotificationProps {
    * Callback when notification is clicked
    */
   onClick?: () => void
+
+  /**
+   * Inline action buttons rendered inside the notification.
+   */
+  actions?: NotificationAction[]
 
   /**
    * Custom icon (overrides default type icon)

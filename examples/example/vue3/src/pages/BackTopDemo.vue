@@ -27,7 +27,11 @@ const customDurationSnippet = `<BackTop :duration="800" />
 
 const customTargetSnippet = `<div ref="scrollContainer" class="h-64 overflow-auto">
   <div class="h-[1000px] p-4">长内容...</div>
-  <BackTop :target="() => scrollContainer" />
+  <BackTop
+    :target="() => scrollContainer"
+    position="fixed"
+    placement="bottom-left"
+    :offset="24" />
 </div>`
 
 const clickSnippet = `<BackTop @click="handleClick" />`
@@ -112,7 +116,13 @@ const handleClick = () => {
           <p class="text-gray-600 mb-4">在此容器内向下滚动查看回到顶部按钮。</p>
           <p v-for="i in 20" :key="i" class="text-gray-400 py-2">滚动内容行 {{ i }}</p>
         </div>
-        <BackTop v-if="innerContainer" :target="() => innerContainer!" :visibility-height="100" />
+        <BackTop
+          v-if="innerContainer"
+          :target="() => innerContainer!"
+          :visibility-height="100"
+          position="fixed"
+          placement="bottom-left"
+          :offset="24" />
       </div>
     </DemoBlock>
 

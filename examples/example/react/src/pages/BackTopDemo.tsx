@@ -22,7 +22,14 @@ const customTargetSnippet = `const scrollRef = useRef<HTMLDivElement>(null)
 
 <div ref={scrollRef} className="h-64 overflow-auto">
   <div className="h-[1000px] p-4">长内容...</div>
-  {scrollRef.current && <BackTop target={() => scrollRef.current!} />}
+  {scrollRef.current && (
+    <BackTop
+      target={() => scrollRef.current!}
+      position="fixed"
+      placement="bottom-left"
+      offset={24}
+    />
+  )}
 </div>`
 
 const clickSnippet = `<BackTop onClick={() => console.log('clicked')} />`
@@ -119,7 +126,13 @@ export default function BackTopDemo() {
             ))}
           </div>
           {innerMounted && innerContainerRef.current && (
-            <BackTop target={() => innerContainerRef.current!} visibilityHeight={100} />
+            <BackTop
+              target={() => innerContainerRef.current!}
+              visibilityHeight={100}
+              position="fixed"
+              placement="bottom-left"
+              offset={24}
+            />
           )}
         </div>
       </DemoBlock>

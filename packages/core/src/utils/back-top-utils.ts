@@ -117,19 +117,19 @@ export function createBackTopVisibilityController(
 /**
  * Base CSS classes for the BackTop button (without positioning)
  */
-const baseClasses =
+export const backTopBaseClasses =
   'z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--tiger-primary,#2563eb)] text-white shadow-lg transition-all duration-300 hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2'
 
 /**
  * Default CSS classes for the BackTop button (fixed positioning for window target)
  */
-export const backTopButtonClasses = `fixed bottom-8 right-8 ${baseClasses}`
+export const backTopButtonClasses = `fixed bottom-8 right-8 ${backTopBaseClasses}`
 
 /**
  * CSS classes for the BackTop button when using a custom scroll container (sticky positioning)
  * Should be placed inside the scroll container content to stay visible while scrolling
  */
-export const backTopContainerClasses = `sticky bottom-4 ml-auto mr-4 ${baseClasses}`
+export const backTopContainerClasses = `sticky bottom-4 ml-auto mr-4 ${backTopBaseClasses}`
 
 /**
  * Default CSS classes for hidden state

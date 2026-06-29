@@ -9,9 +9,12 @@ import {
   floatButtonTypeClasses,
   floatButtonDisabledClasses,
   floatButtonGroupClasses,
+  getViewportOffsetStyle,
   type FloatButtonShape,
   type FloatButtonProps as CoreFloatButtonProps,
-  type FloatButtonGroupProps as CoreFloatButtonGroupProps
+  type FloatButtonGroupProps as CoreFloatButtonGroupProps,
+  viewportFloatingBaseClasses,
+  viewportPlacementClasses
 } from '@expcat/tigercat-core'
 
 // Group context — lets FloatButtonGroup share its `shape` with child buttons
@@ -38,6 +41,10 @@ export const FloatButton: React.FC<FloatButtonProps> = ({
   disabled = false,
   ariaLabel,
   className,
+  floating = false,
+  placement = 'bottom-right',
+  offset,
+  style,
   children,
   onClick,
   ...props
@@ -53,9 +60,16 @@ export const FloatButton: React.FC<FloatButtonProps> = ({
         floatButtonSizeClasses[size],
         floatButtonTypeClasses[type],
         disabled && floatButtonDisabledClasses,
+        floating && viewportFloatingBaseClasses,
+        floating && viewportPlacementClasses[placement],
         className
       ),
-    [resolvedShape, size, type, disabled, className]
+    [resolvedShape, size, type, disabled, floating, placement, className]
+  )
+
+  const buttonStyle = useMemo(
+    () => (floating ? { ...getViewportOffsetStyle(placement, offset), ...style } : style),
+    [floating, placement, offset, style]
   )
 
   return (
@@ -63,6 +77,7 @@ export const FloatButton: React.FC<FloatButtonProps> = ({
       className={classes}
       type="button"
       disabled={disabled}
+      style={buttonStyle}
       aria-label={ariaLabel ?? tooltip}
       title={tooltip}
       onClick={disabled ? undefined : onClick}

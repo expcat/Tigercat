@@ -92,6 +92,21 @@ describe('FloatButton (React)', () => {
       render(<FloatButton className="my-btn" />)
       expect(screen.getByRole('button')).toHaveClass('my-btn')
     })
+
+    it('does not apply fixed positioning by default', () => {
+      render(<FloatButton />)
+      expect(screen.getByRole('button')).not.toHaveClass('fixed')
+    })
+
+    it('supports standalone floating placement', () => {
+      render(<FloatButton floating placement="bottom-left" offset={{ x: 32, y: '3rem' }} />)
+      const button = screen.getByRole('button')
+      expect(button).toHaveClass('fixed')
+      expect(button).toHaveClass('bottom-0')
+      expect(button).toHaveClass('left-0')
+      expect(button.style.left).toBe('32px')
+      expect(button.style.bottom).toBe('3rem')
+    })
   })
 })
 

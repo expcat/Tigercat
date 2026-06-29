@@ -2,15 +2,17 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
+import { fireEvent, waitFor } from '@testing-library/vue'
 import { nextTick } from 'vue'
 import { notification } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 async function flushMicrotasks() {
   await nextTick()
-  await Promise.resolve()
-  await Promise.resolve()
+  for (let i = 0; i < 8; i += 1) {
+    await Promise.resolve()
+  }
 }
 
 async function flush() {
@@ -19,10 +21,23 @@ async function flush() {
   await flushMicrotasks()
 }
 
+async function flushLazyImport() {
+  await flushMicrotasks()
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  await flushMicrotasks()
+}
+
 describe('Notification (Vue)', () => {
-  beforeEach(() => {
+  beforeAll(async () => {
+    notification.clear()
+    await flushLazyImport()
+    document.body.innerHTML = ''
+  })
+
+  beforeEach(async () => {
     // Clear all notifications before each test
     notification.clear()
+    await flushLazyImport()
     // Clear any existing notification containers
     document.body.innerHTML = ''
   })
@@ -38,8 +53,11 @@ describe('Notification (Vue)', () => {
     notification.info('Test notification')
     await flush()
 
+    await waitFor(() => {
+      expect(document.querySelector('[data-tiger-notification]')).toBeTruthy()
+    })
+
     const el = document.querySelector('[data-tiger-notification]')
-    expect(el).toBeTruthy()
     expect(el?.textContent).toContain('Test notification')
   })
 
@@ -101,6 +119,55 @@ describe('Notification (Vue)', () => {
 
     const closeBtn = document.querySelector('[aria-label="Close notification"]')
     expect(closeBtn).toBeFalsy()
+  })
+
+  it('renders inline actions without triggering the toast click handler', async () => {
+    const handleToastClick = vi.fn()
+    const handleActionClick = vi.fn()
+
+    notification.info({
+      title: 'Actionable notification',
+      duration: 0,
+      onClick: handleToastClick,
+      actions: [{ label: 'View', type: 'primary', onClick: handleActionClick }]
+    })
+    await flush()
+
+    const action = Array.from(document.querySelectorAll('button')).find(
+      (button) => button.textContent === 'View'
+    )
+    expect(action).toBeTruthy()
+
+    await fireEvent.click(action!)
+    await flush()
+
+    expect(handleActionClick).toHaveBeenCalledWith(
+      expect.objectContaining({ id: expect.any(Number), close: expect.any(Function) })
+    )
+    expect(handleToastClick).not.toHaveBeenCalled()
+
+    const toast = document.querySelector('[data-tiger-notification]')
+    await fireEvent.click(toast!)
+    await flush()
+    expect(handleToastClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('closes when an inline action has closeOnClick', async () => {
+    notification.info({
+      title: 'Close from action',
+      duration: 0,
+      actions: [{ label: 'Undo', closeOnClick: true }]
+    })
+    await flush()
+
+    const action = Array.from(document.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Undo'
+    )
+    expect(action).toBeTruthy()
+
+    await fireEvent.click(action!)
+    await flush()
+    expect(document.querySelector('[data-tiger-notification]')).toBeFalsy()
   })
 
   it('clears notifications for a specific position', async () => {

@@ -4,18 +4,23 @@ export type VueMessageProps = MessageOptions
 
 type MessageClose = () => void
 
+let messageModulePromise: Promise<typeof import('./Message')> | null = null
+
+function loadMessageModule(): Promise<typeof import('./Message')> {
+  messageModulePromise ??= import('./Message')
+  return messageModulePromise
+}
+
 function forwardMessage(method: MessageType, options: MessageOptions): MessageClose {
   let closeMessage: MessageClose | null = null
   let requestedClose = false
-  queueMicrotask(() => {
-    void import('./Message').then(({ Message }) => {
-      const close = Message[method](options)
-      if (requestedClose) {
-        close()
-      } else {
-        closeMessage = close
-      }
-    })
+  void loadMessageModule().then(({ Message }) => {
+    const close = Message[method](options)
+    if (requestedClose) {
+      close()
+    } else {
+      closeMessage = close
+    }
   })
 
   return () => {
@@ -47,10 +52,8 @@ export const Message: Record<MessageType, (options: MessageOptions) => MessageCl
     return forwardMessage('loading', options)
   },
   clear() {
-    queueMicrotask(() => {
-      void import('./Message').then(({ Message }) => {
-        Message.clear()
-      })
+    void loadMessageModule().then(({ Message }) => {
+      Message.clear()
     })
   }
 }
