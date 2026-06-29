@@ -176,7 +176,7 @@ describe('Switch a11y regression', () => {
 
   it('Vue: has role=switch and aria-checked', () => {
     const { container } = renderVue(VueSwitch, {
-      props: { checked: false }
+      props: { modelValue: false }
     })
 
     const sw = container.querySelector('[role="switch"]')
@@ -186,7 +186,7 @@ describe('Switch a11y regression', () => {
 
   it('Vue: checked switch has aria-checked=true', () => {
     const { container } = renderVue(VueSwitch, {
-      props: { checked: true }
+      props: { modelValue: true }
     })
 
     const sw = container.querySelector('[role="switch"]')

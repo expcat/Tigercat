@@ -26,7 +26,7 @@ description: Compact generated API summary for Tigercat core types
 | qrcode.ts    | QRCodeProps                                                                        | QRCode                                                    | 3       |
 | rate.ts      | RateProps                                                                          | Rate                                                      | 2       |
 | result.ts    | ResultProps                                                                        | Result                                                    | 2       |
-| segmented.ts | SegmentedProps                                                                     | Segmented                                                 | 3       |
+| segmented.ts | SegmentedProps                                                                     | Segmented                                                 | 2       |
 | statistic.ts | StatisticProps                                                                     | Statistic                                                 | 1       |
 | tag.ts       | TagProps                                                                           | Tag                                                       | 3       |
 | text.ts      | TextProps                                                                          | Text                                                      | 6       |
@@ -38,24 +38,24 @@ description: Compact generated API summary for Tigercat core types
 | ------------------ | ------------------------------------- | --------------------------- | ------- |
 | auto-complete.ts   | AutoCompleteProps                     | AutoComplete                | 3       |
 | cascader.ts        | CascaderProps                         | Cascader                    | 8       |
-| checkbox.ts        | CheckboxProps, CheckboxGroupProps     | Checkbox, CheckboxGroup     | 5       |
+| checkbox.ts        | CheckboxProps, CheckboxGroupProps     | Checkbox, CheckboxGroup     | 4       |
 | color-picker.ts    | ColorPickerProps                      | ColorPicker                 | 3       |
-| color-swatch.ts    | ColorSwatchProps                      | ColorSwatch                 | 7       |
+| color-swatch.ts    | ColorSwatchProps                      | ColorSwatch                 | 6       |
 | cron-editor.ts     | CronEditorProps                       | CronEditor                  | 9       |
 | datepicker.ts      | DatePickerProps                       | DatePicker                  | 14      |
 | form.ts            | FormProps, FormItemProps              | Form, FormItem              | 22      |
-| input.ts           | InputProps                            | Input                       | 4       |
+| input.ts           | InputProps                            | Input                       | 3       |
 | input-group.ts     | InputGroupProps, InputGroupAddonProps | InputGroup, InputGroupAddon | 3       |
 | input-number.ts    | InputNumberProps                      | InputNumber                 | 1       |
 | mentions.ts        | MentionsProps                         | Mentions                    | 3       |
 | number-keyboard.ts | NumberKeyboardProps                   | NumberKeyboard              | 6       |
-| radio.ts           | RadioProps, RadioGroupProps           | Radio, RadioGroup           | 3       |
+| radio.ts           | RadioProps, RadioGroupProps           | Radio, RadioGroup           | 2       |
 | select.ts          | SelectProps                           | Select                      | 8       |
 | signature.ts       | SignatureProps                        | Signature                   | 5       |
-| slider.ts          | SliderProps                           | Slider                      | 2       |
-| stepper.ts         | StepperProps                          | Stepper                     | 2       |
-| switch.ts          | SwitchProps                           | Switch                      | 2       |
-| textarea.ts        | TextareaProps                         | Textarea                    | 2       |
+| slider.ts          | SliderProps                           | Slider                      | 1       |
+| stepper.ts         | StepperProps                          | Stepper                     | 1       |
+| switch.ts          | SwitchProps                           | Switch                      | 1       |
+| textarea.ts        | TextareaProps                         | Textarea                    | 1       |
 | timepicker.ts      | TimePickerProps                       | TimePicker                  | 7       |
 | transfer.ts        | TransferProps                         | Transfer                    | 4       |
 | tree-select.ts     | TreeSelectProps                       | TreeSelect                  | 3       |
@@ -169,4 +169,4 @@ description: Compact generated API summary for Tigercat core types
 | ----------- | ---------------- | ---------- | ------- |
 | viewport.ts | -                | -          | 2       |
 
-Total exported types: 637.
+Total exported types: 628.

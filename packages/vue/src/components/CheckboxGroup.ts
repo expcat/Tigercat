@@ -3,7 +3,7 @@ import {
   classNames,
   coerceClassValue,
   type CheckboxGroupValue,
-  type CheckboxSize
+  type ComponentSize
 } from '@expcat/tigercat-core'
 
 export const CheckboxGroupKey = Symbol('CheckboxGroup')
@@ -11,7 +11,7 @@ export const CheckboxGroupKey = Symbol('CheckboxGroup')
 export interface CheckboxGroupContext {
   value: CheckboxGroupValue
   disabled: boolean
-  size: CheckboxSize
+  size: ComponentSize
   updateValue: (val: CheckboxGroupValue[number], checked: boolean) => void
 }
 
@@ -19,7 +19,7 @@ export interface VueCheckboxGroupProps {
   modelValue?: CheckboxGroupValue
   defaultValue?: CheckboxGroupValue
   disabled?: boolean
-  size?: CheckboxSize
+  size?: ComponentSize
   className?: string
   style?: Record<string, string | number>
 }
@@ -55,8 +55,8 @@ export const CheckboxGroup = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<CheckboxSize>,
-      default: 'md' as CheckboxSize
+      type: String as PropType<ComponentSize>,
+      default: 'md' as ComponentSize
     },
 
     /**

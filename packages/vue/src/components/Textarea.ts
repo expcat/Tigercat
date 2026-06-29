@@ -16,13 +16,13 @@ import {
   coerceClassValue,
   getInputClasses,
   mergeStyleValues,
-  type TextareaSize
+  type ComponentSize
 } from '@expcat/tigercat-core'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 
 export interface VueTextareaProps {
   modelValue?: string
-  size?: TextareaSize
+  size?: ComponentSize
   placeholder?: string
   disabled?: boolean
   readonly?: boolean
@@ -57,8 +57,8 @@ export const Textarea = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<TextareaSize>,
-      default: 'md' as TextareaSize
+      type: String as PropType<ComponentSize>,
+      default: 'md' as ComponentSize
     },
     /**
      * Whether the textarea is disabled

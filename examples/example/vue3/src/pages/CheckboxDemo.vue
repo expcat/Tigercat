@@ -31,7 +31,7 @@ const basicSnippet = `<Space direction="vertical">
 </Space>`
 
 const uncontrolledSnippet = `<Space>
-  <Checkbox :default-checked="true">默认选中</Checkbox>
+  <Checkbox :default-value="true">默认选中</Checkbox>
   <Checkbox>默认未选中</Checkbox>
 </Space>`
 
@@ -112,10 +112,10 @@ const groupSizeSnippet = `<Space direction="vertical">
     <!-- 非受控模式 -->
     <DemoBlock
       title="非受控模式"
-      description="使用 defaultChecked 设置默认选中，组件内部管理状态。"
+      description="使用 defaultValue 设置默认选中，组件内部管理状态。"
       :code="uncontrolledSnippet">
       <Space>
-        <Checkbox :default-checked="true">默认选中</Checkbox>
+        <Checkbox :default-value="true">默认选中</Checkbox>
         <Checkbox>默认未选中</Checkbox>
       </Space>
     </DemoBlock>

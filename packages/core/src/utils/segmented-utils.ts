@@ -1,5 +1,5 @@
 import { classNames } from './class-names'
-import type { SegmentedSize } from '../types/segmented'
+import type { ComponentSize } from '../types/base'
 
 export interface SegmentedIndicatorStyle {
   left: string
@@ -16,8 +16,8 @@ export interface SegmentedContainerStyle {
 /*  Style constants                                                    */
 /* ------------------------------------------------------------------ */
 
-export function getSegmentedContainerClasses(size: SegmentedSize, block: boolean): string {
-  const sizeClasses: Record<SegmentedSize, string> = {
+export function getSegmentedContainerClasses(size: ComponentSize, block: boolean): string {
+  const sizeClasses: Record<ComponentSize, string> = {
     sm: 'p-0.5 text-xs',
     md: 'p-1 text-sm',
     lg: 'p-1 text-base'
@@ -37,8 +37,8 @@ export function getSegmentedContainerStyle(optionCount: number): SegmentedContai
   }
 }
 
-export function getSegmentedIndicatorClasses(size: SegmentedSize): string {
-  const insetClasses: Record<SegmentedSize, string> = {
+export function getSegmentedIndicatorClasses(size: ComponentSize): string {
+  const insetClasses: Record<ComponentSize, string> = {
     sm: 'top-0.5 bottom-0.5',
     md: 'top-1 bottom-1',
     lg: 'top-1 bottom-1'
@@ -55,9 +55,9 @@ export function getSegmentedIndicatorClasses(size: SegmentedSize): string {
 export function getSegmentedIndicatorStyle(
   selectedIndex: number,
   optionCount: number,
-  size: SegmentedSize
+  size: ComponentSize
 ): SegmentedIndicatorStyle {
-  const horizontalInset: Record<SegmentedSize, string> = {
+  const horizontalInset: Record<ComponentSize, string> = {
     sm: '0.125rem',
     md: '0.25rem',
     lg: '0.25rem'
@@ -75,11 +75,11 @@ export function getSegmentedIndicatorStyle(
 }
 
 export function getSegmentedOptionClasses(
-  size: SegmentedSize,
+  size: ComponentSize,
   isSelected: boolean,
   isDisabled: boolean
 ): string {
-  const sizePad: Record<SegmentedSize, string> = {
+  const sizePad: Record<ComponentSize, string> = {
     sm: 'px-2 py-0.5',
     md: 'px-3 py-1',
     lg: 'px-4 py-1.5'

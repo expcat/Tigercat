@@ -2,10 +2,7 @@
  * Slider component types and interfaces
  */
 
-/**
- * Slider size types
- */
-export type SliderSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Base slider props interface
@@ -63,7 +60,7 @@ export interface SliderProps {
    * Slider size
    * @default 'md'
    */
-  size?: SliderSize
+  size?: ComponentSize
 
   /**
    * Whether to enable range selection

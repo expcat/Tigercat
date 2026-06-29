@@ -2,10 +2,7 @@
  * Radio component types and interfaces
  */
 
-/**
- * Radio size types
- */
-export type RadioSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Base radio props interface
@@ -20,7 +17,7 @@ export interface RadioProps {
    * Radio size
    * @default 'md'
    */
-  size?: RadioSize
+  size?: ComponentSize
 
   /**
    * Whether the radio is disabled
@@ -74,5 +71,5 @@ export interface RadioGroupProps {
    * Radio size for all radios in the group
    * @default 'md'
    */
-  size?: RadioSize
+  size?: ComponentSize
 }

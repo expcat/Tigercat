@@ -2,7 +2,7 @@
  * Theme configuration for Slider component
  */
 
-import type { SliderSize } from '../types/slider'
+import type { ComponentSize } from '../types/base'
 
 /**
  * Base classes for Slider component
@@ -40,7 +40,7 @@ export const sliderTooltipClasses =
  * Slider size-specific classes
  */
 export const sliderSizeClasses: Record<
-  SliderSize,
+  ComponentSize,
   {
     track: string
     thumb: string
@@ -67,7 +67,10 @@ export const sliderSizeClasses: Record<
 /**
  * Get slider track classes based on size and state
  */
-export function getSliderTrackClasses(size: SliderSize = 'md', disabled: boolean = false): string {
+export function getSliderTrackClasses(
+  size: ComponentSize = 'md',
+  disabled: boolean = false
+): string {
   const sizeClass = sliderSizeClasses[size].track
   const disabledClass = disabled ? sliderDisabledClasses : ''
 
@@ -77,7 +80,10 @@ export function getSliderTrackClasses(size: SliderSize = 'md', disabled: boolean
 /**
  * Get slider thumb classes based on size and state
  */
-export function getSliderThumbClasses(size: SliderSize = 'md', disabled: boolean = false): string {
+export function getSliderThumbClasses(
+  size: ComponentSize = 'md',
+  disabled: boolean = false
+): string {
   const sizeClass = sliderSizeClasses[size].thumb
   const disabledClass = disabled ? sliderDisabledClasses : ''
 
@@ -87,7 +93,7 @@ export function getSliderThumbClasses(size: SliderSize = 'md', disabled: boolean
 /**
  * Get slider tooltip classes based on size
  */
-export function getSliderTooltipClasses(size: SliderSize = 'md'): string {
+export function getSliderTooltipClasses(size: ComponentSize = 'md'): string {
   const sizeClass = sliderSizeClasses[size].tooltip
 
   return [sliderTooltipClasses, sizeClass].filter(Boolean).join(' ')

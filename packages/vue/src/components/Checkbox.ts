@@ -13,17 +13,17 @@ import {
   coerceClassValue,
   getCheckboxClasses,
   getCheckboxLabelClasses,
-  type CheckboxSize
+  type ComponentSize
 } from '@expcat/tigercat-core'
 import { CheckboxGroupKey, type CheckboxGroupContext } from './CheckboxGroup'
 
 export interface VueCheckboxProps {
   modelValue?: boolean | null
   value?: string | number | boolean
-  size?: CheckboxSize
+  size?: ComponentSize
   disabled?: boolean
   indeterminate?: boolean
-  defaultChecked?: boolean
+  defaultValue?: boolean
   className?: string
   style?: Record<string, string | number>
 }
@@ -49,7 +49,7 @@ export const Checkbox = defineComponent({
      * Checkbox size
      */
     size: {
-      type: String as PropType<CheckboxSize>
+      type: String as PropType<ComponentSize>
     },
     /**
      * Whether the checkbox is disabled
@@ -69,7 +69,7 @@ export const Checkbox = defineComponent({
      * Default checked state (uncontrolled mode)
      * @default false
      */
-    defaultChecked: {
+    defaultValue: {
       type: Boolean,
       default: false
     },
@@ -105,7 +105,7 @@ export const Checkbox = defineComponent({
     const groupContext = computed(() => groupContextRef?.value)
 
     // Internal state for uncontrolled mode
-    const internalChecked = ref(props.defaultChecked)
+    const internalChecked = ref(props.defaultValue)
 
     // Determine if controlled or uncontrolled
     const isControlled = computed(() => props.modelValue !== null)

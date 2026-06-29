@@ -2,10 +2,7 @@
  * Input component types and interfaces
  */
 
-/**
- * Input size types
- */
-export type InputSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Input type attribute
@@ -25,7 +22,7 @@ export interface InputProps {
    * Input size
    * @default 'md'
    */
-  size?: InputSize
+  size?: ComponentSize
 
   /**
    * Validation status

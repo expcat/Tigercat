@@ -19,20 +19,20 @@ const basicEnabled = ref(true)`
 
 const basicSnippet = `<Space direction="vertical">
   <div class="flex items-center gap-3">
-    <Switch v-model:checked="basicEnabled" />
+    <Switch v-model="basicEnabled" />
     <span class="text-sm text-gray-600">{{ basicEnabled ? '开启' : '关闭' }}</span>
   </div>
 </Space>`
 
 const disabledSnippet = `<Space>
-  <Switch v-model:checked="disabledOn" disabled />
-  <Switch v-model:checked="disabledOff" disabled />
+  <Switch v-model="disabledOn" disabled />
+  <Switch v-model="disabledOff" disabled />
 </Space>`
 
 const sizeSnippet = `<Space align="center">
-  <Switch v-model:checked="sizeSm" size="sm" />
-  <Switch v-model:checked="sizeMd" size="md" />
-  <Switch v-model:checked="sizeLg" size="lg" />
+  <Switch v-model="sizeSm" size="sm" />
+  <Switch v-model="sizeMd" size="md" />
+  <Switch v-model="sizeLg" size="lg" />
 </Space>`
 </script>
 
@@ -53,7 +53,7 @@ const sizeSnippet = `<Space align="center">
       :script="basicScriptSnippet">
       <Space direction="vertical">
         <div class="flex items-center gap-3">
-          <Switch v-model:checked="basicEnabled" />
+          <Switch v-model="basicEnabled" />
           <span class="text-sm text-gray-600">{{ basicEnabled ? '开启' : '关闭' }}</span>
         </div>
       </Space>
@@ -65,17 +65,17 @@ const sizeSnippet = `<Space align="center">
       description="通过设置 disabled 属性来禁用开关。"
       :code="disabledSnippet">
       <Space>
-        <Switch v-model:checked="disabledOn" disabled />
-        <Switch v-model:checked="disabledOff" disabled />
+        <Switch v-model="disabledOn" disabled />
+        <Switch v-model="disabledOff" disabled />
       </Space>
     </DemoBlock>
 
     <!-- 不同尺寸 -->
     <DemoBlock title="不同尺寸" description="开关有三种尺寸。" :code="sizeSnippet">
       <Space align="center">
-        <Switch v-model:checked="sizeSm" size="sm" />
-        <Switch v-model:checked="sizeMd" size="md" />
-        <Switch v-model:checked="sizeLg" size="lg" />
+        <Switch v-model="sizeSm" size="sm" />
+        <Switch v-model="sizeMd" size="md" />
+        <Switch v-model="sizeLg" size="lg" />
       </Space>
     </DemoBlock>
   </div>

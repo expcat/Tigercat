@@ -27,7 +27,7 @@ const basicScriptSnippet = `import { ref } from 'vue'
 const basicValue = ref('male')`
 
 const basicSnippet = `<Space direction="vertical">
-  <RadioGroup v-model:value="basicValue" class="flex flex-wrap items-center gap-4">
+  <RadioGroup v-model="basicValue" class="flex flex-wrap items-center gap-4">
     <Radio value="male">男</Radio>
     <Radio value="female">女</Radio>
     <Radio value="other">其他</Radio>
@@ -36,8 +36,8 @@ const basicSnippet = `<Space direction="vertical">
 </Space>`
 
 const standaloneSnippet = `<Space direction="vertical">
-  <Radio value="agree" v-model:checked="agreed">同意用户协议</Radio>
-  <Radio value="standalone" :default-checked="true">默认选中的独立选项</Radio>
+  <Radio value="agree" v-model="agreed">同意用户协议</Radio>
+  <Radio value="standalone" :default-value="true">默认选中的独立选项</Radio>
 </Space>`
 
 const uncontrolledSnippet = `<Space direction="vertical">
@@ -52,7 +52,7 @@ const uncontrolledSnippet = `<Space direction="vertical">
 const disabledSnippet = `<Space direction="vertical">
   <div>
     <div class="text-sm text-gray-700 mb-2">部分禁用</div>
-    <RadioGroup v-model:value="disabledValue" class="flex flex-wrap items-center gap-4">
+    <RadioGroup v-model="disabledValue" class="flex flex-wrap items-center gap-4">
       <Radio value="small">小</Radio>
       <Radio value="medium">中</Radio>
       <Radio value="large" disabled>大（禁用）</Radio>
@@ -60,7 +60,7 @@ const disabledSnippet = `<Space direction="vertical">
   </div>
   <div>
     <div class="text-sm text-gray-700 mb-2">整组禁用</div>
-    <RadioGroup v-model:value="groupDisabledValue" disabled class="flex flex-wrap items-center gap-4">
+    <RadioGroup v-model="groupDisabledValue" disabled class="flex flex-wrap items-center gap-4">
       <Radio value="a">选项 A</Radio>
       <Radio value="b">选项 B</Radio>
       <Radio value="c">选项 C</Radio>
@@ -71,7 +71,7 @@ const disabledSnippet = `<Space direction="vertical">
 const sizeSnippet = `<Space direction="vertical">
   <div>
     <div class="text-sm text-gray-700 mb-2">小号（sm）</div>
-    <RadioGroup v-model:value="sizeSmValue" size="sm" class="flex flex-wrap items-center gap-4">
+    <RadioGroup v-model="sizeSmValue" size="sm" class="flex flex-wrap items-center gap-4">
       <Radio value="a">选项 A</Radio>
       <Radio value="b">选项 B</Radio>
       <Radio value="c">选项 C</Radio>
@@ -79,7 +79,7 @@ const sizeSnippet = `<Space direction="vertical">
   </div>
   <div>
     <div class="text-sm text-gray-700 mb-2">默认（md）</div>
-    <RadioGroup v-model:value="sizeMdValue" size="md" class="flex flex-wrap items-center gap-4">
+    <RadioGroup v-model="sizeMdValue" size="md" class="flex flex-wrap items-center gap-4">
       <Radio value="a">选项 A</Radio>
       <Radio value="b">选项 B</Radio>
       <Radio value="c">选项 C</Radio>
@@ -87,7 +87,7 @@ const sizeSnippet = `<Space direction="vertical">
   </div>
   <div>
     <div class="text-sm text-gray-700 mb-2">大号（lg）</div>
-    <RadioGroup v-model:value="sizeLgValue" size="lg" class="flex flex-wrap items-center gap-4">
+    <RadioGroup v-model="sizeLgValue" size="lg" class="flex flex-wrap items-center gap-4">
       <Radio value="a">选项 A</Radio>
       <Radio value="b">选项 B</Radio>
       <Radio value="c">选项 C</Radio>
@@ -96,7 +96,7 @@ const sizeSnippet = `<Space direction="vertical">
 </Space>`
 
 const numericSnippet = `<Space direction="vertical">
-  <RadioGroup v-model:value="numericValue" class="flex flex-wrap items-center gap-4">
+  <RadioGroup v-model="numericValue" class="flex flex-wrap items-center gap-4">
     <Radio :value="1">选项 1</Radio>
     <Radio :value="2">选项 2</Radio>
     <Radio :value="3">选项 3</Radio>
@@ -104,7 +104,7 @@ const numericSnippet = `<Space direction="vertical">
   <p class="text-sm text-gray-600">当前值：{{ String(numericValue) }}（类型：{{ typeof numericValue }}）</p>
 </Space>`
 
-const customSnippet = `<RadioGroup v-model:value="customValue"
+const customSnippet = `<RadioGroup v-model="customValue"
             class="flex flex-wrap items-center gap-6"
             name="custom-radio">
   <Radio value="a" class-name="bg-blue-50 px-3 py-1 rounded">选项 A</Radio>
@@ -126,7 +126,7 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
       :code="basicSnippet"
       :script="basicScriptSnippet">
       <Space direction="vertical">
-        <RadioGroup v-model:value="basicValue" class="flex flex-wrap items-center gap-4">
+        <RadioGroup v-model="basicValue" class="flex flex-wrap items-center gap-4">
           <Radio value="male">男</Radio>
           <Radio value="female">女</Radio>
           <Radio value="other">其他</Radio>
@@ -138,11 +138,11 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
     <!-- 单独使用 -->
     <DemoBlock
       title="单独使用"
-      description="Radio 可以脱离 RadioGroup 单独使用，支持 v-model:checked 和 defaultChecked。"
+      description="Radio 可以脱离 RadioGroup 单独使用，支持 v-model 和 defaultValue。"
       :code="standaloneSnippet">
       <Space direction="vertical">
-        <Radio value="agree" v-model:checked="agreed">同意用户协议</Radio>
-        <Radio value="standalone" :default-checked="true">默认选中的独立选项</Radio>
+        <Radio value="agree" v-model="agreed">同意用户协议</Radio>
+        <Radio value="standalone" :default-value="true">默认选中的独立选项</Radio>
       </Space>
     </DemoBlock>
 
@@ -169,7 +169,7 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
       <Space direction="vertical">
         <div>
           <div class="text-sm text-gray-700 mb-2">部分禁用</div>
-          <RadioGroup v-model:value="disabledValue" class="flex flex-wrap items-center gap-4">
+          <RadioGroup v-model="disabledValue" class="flex flex-wrap items-center gap-4">
             <Radio value="small">小</Radio>
             <Radio value="medium">中</Radio>
             <Radio value="large" disabled>大（禁用）</Radio>
@@ -179,7 +179,7 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
         <div>
           <div class="text-sm text-gray-700 mb-2">整组禁用</div>
           <RadioGroup
-            v-model:value="groupDisabledValue"
+            v-model="groupDisabledValue"
             disabled
             class="flex flex-wrap items-center gap-4">
             <Radio value="a">选项 A</Radio>
@@ -198,10 +198,7 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
       <Space direction="vertical">
         <div>
           <div class="text-sm text-gray-700 mb-2">小号（sm）</div>
-          <RadioGroup
-            v-model:value="sizeSmValue"
-            size="sm"
-            class="flex flex-wrap items-center gap-4">
+          <RadioGroup v-model="sizeSmValue" size="sm" class="flex flex-wrap items-center gap-4">
             <Radio value="a">选项 A</Radio>
             <Radio value="b">选项 B</Radio>
             <Radio value="c">选项 C</Radio>
@@ -210,10 +207,7 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
 
         <div>
           <div class="text-sm text-gray-700 mb-2">默认（md）</div>
-          <RadioGroup
-            v-model:value="sizeMdValue"
-            size="md"
-            class="flex flex-wrap items-center gap-4">
+          <RadioGroup v-model="sizeMdValue" size="md" class="flex flex-wrap items-center gap-4">
             <Radio value="a">选项 A</Radio>
             <Radio value="b">选项 B</Radio>
             <Radio value="c">选项 C</Radio>
@@ -222,10 +216,7 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
 
         <div>
           <div class="text-sm text-gray-700 mb-2">大号（lg）</div>
-          <RadioGroup
-            v-model:value="sizeLgValue"
-            size="lg"
-            class="flex flex-wrap items-center gap-4">
+          <RadioGroup v-model="sizeLgValue" size="lg" class="flex flex-wrap items-center gap-4">
             <Radio value="a">选项 A</Radio>
             <Radio value="b">选项 B</Radio>
             <Radio value="c">选项 C</Radio>
@@ -240,7 +231,7 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
       description="Radio 的 value 支持 number 类型。"
       :code="numericSnippet">
       <Space direction="vertical">
-        <RadioGroup v-model:value="numericValue" class="flex flex-wrap items-center gap-4">
+        <RadioGroup v-model="numericValue" class="flex flex-wrap items-center gap-4">
           <Radio :value="1">选项 1</Radio>
           <Radio :value="2">选项 2</Radio>
           <Radio :value="3">选项 3</Radio>
@@ -257,7 +248,7 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
       description="通过 className 和 name 自定义 Radio 和 RadioGroup 的外观与分组。"
       :code="customSnippet">
       <RadioGroup
-        v-model:value="customValue"
+        v-model="customValue"
         class="flex flex-wrap items-center gap-6"
         name="custom-radio">
         <Radio value="a" class-name="bg-blue-50 px-3 py-1 rounded">选项 A</Radio>

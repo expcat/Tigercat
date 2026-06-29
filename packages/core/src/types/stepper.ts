@@ -1,7 +1,4 @@
-/**
- * Stepper size variants
- */
-export type StepperSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Shared Stepper props (framework-agnostic)
@@ -16,7 +13,7 @@ export interface StepperProps {
   /** Whether the stepper is disabled */
   disabled?: boolean
   /** Component size */
-  size?: StepperSize
+  size?: ComponentSize
   /** Precision (decimal places) */
   precision?: number
   /** Custom class name */

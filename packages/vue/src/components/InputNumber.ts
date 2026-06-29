@@ -33,7 +33,7 @@ import {
   formatInputNumberDisplay,
   parseInputNumberValue,
   createRafRepeatActionController,
-  type InputSize,
+  type ComponentSize,
   type InputStatus
 } from '@expcat/tigercat-core'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
@@ -42,7 +42,7 @@ export interface VueInputNumberProps {
   modelValue?: number | null
   /** Initial value for uncontrolled usage (when `modelValue` is not bound) */
   defaultValue?: number | null
-  size?: InputSize
+  size?: ComponentSize
   status?: InputStatus
   min?: number
   max?: number
@@ -74,7 +74,7 @@ export const InputNumber = defineComponent({
       default: undefined
     },
     size: {
-      type: String as PropType<InputSize>,
+      type: String as PropType<ComponentSize>,
       default: 'md'
     },
     status: {

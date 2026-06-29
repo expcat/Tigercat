@@ -12,7 +12,7 @@ import {
   parseInputValue,
   injectShakeStyle,
   SHAKE_CLASS,
-  type InputSize,
+  type ComponentSize,
   type InputType,
   type InputStatus
 } from '@expcat/tigercat-core'
@@ -22,7 +22,7 @@ let inputIdCounter = 0
 
 export interface VueInputProps {
   modelValue?: string | number
-  size?: InputSize
+  size?: ComponentSize
   type?: InputType
   status?: InputStatus
   errorMessage?: string
@@ -60,7 +60,7 @@ export const Input = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<InputSize>,
+      type: String as PropType<ComponentSize>,
       default: 'md'
     },
     /**

@@ -2,12 +2,12 @@
  * Theme color configuration for Checkbox component
  */
 
-import type { CheckboxSize } from '../types/checkbox'
+import type { ComponentSize } from '../types/base'
 
 /**
  * Checkbox size classes
  */
-export const checkboxSizeClasses: Record<CheckboxSize, string> = {
+export const checkboxSizeClasses: Record<ComponentSize, string> = {
   sm: 'w-4 h-4',
   md: 'w-5 h-5',
   lg: 'w-6 h-6'
@@ -16,7 +16,7 @@ export const checkboxSizeClasses: Record<CheckboxSize, string> = {
 /**
  * Checkbox label size classes
  */
-export const checkboxLabelSizeClasses: Record<CheckboxSize, string> = {
+export const checkboxLabelSizeClasses: Record<ComponentSize, string> = {
   sm: 'text-sm',
   md: 'text-base',
   lg: 'text-lg'
@@ -26,7 +26,7 @@ export const checkboxLabelSizeClasses: Record<CheckboxSize, string> = {
  * Get checkbox classes based on size and state
  * @since 0.2.0 - Changed to focus-visible, added active:scale
  */
-export function getCheckboxClasses(size: CheckboxSize = 'md', disabled: boolean = false): string {
+export function getCheckboxClasses(size: ComponentSize = 'md', disabled: boolean = false): string {
   const baseClasses =
     'rounded border-2 transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] active:scale-95'
   const sizeClass = checkboxSizeClasses[size]
@@ -44,7 +44,7 @@ export function getCheckboxClasses(size: CheckboxSize = 'md', disabled: boolean 
  * Get checkbox label classes based on size and state
  */
 export function getCheckboxLabelClasses(
-  size: CheckboxSize = 'md',
+  size: ComponentSize = 'md',
   disabled: boolean = false
 ): string {
   const baseClasses = 'inline-flex items-center cursor-pointer select-none'

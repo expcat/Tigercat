@@ -2,14 +2,11 @@
  * Checkbox component types and interfaces
  */
 
+import type { ComponentSize } from './base'
+
 export type CheckboxValue = string | number | boolean
 
 export type CheckboxGroupValue = CheckboxValue[]
-
-/**
- * Checkbox size types
- */
-export type CheckboxSize = 'sm' | 'md' | 'lg'
 
 /**
  * Base checkbox props interface
@@ -19,7 +16,7 @@ export interface CheckboxProps {
    * Checkbox size
    * @default 'md'
    */
-  size?: CheckboxSize
+  size?: ComponentSize
 
   /**
    * Whether the checkbox is disabled
@@ -53,5 +50,5 @@ export interface CheckboxGroupProps {
    * Checkbox size for all checkboxes in the group
    * @default 'md'
    */
-  size?: CheckboxSize
+  size?: ComponentSize
 }

@@ -1,7 +1,4 @@
-/**
- * Segmented size variants
- */
-export type SegmentedSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Segmented option
@@ -26,7 +23,7 @@ export interface SegmentedProps {
   /** Whether the whole control is disabled */
   disabled?: boolean
   /** Component size */
-  size?: SegmentedSize
+  size?: ComponentSize
   /** Whether the control fills full width */
   block?: boolean
   /** Custom class name */

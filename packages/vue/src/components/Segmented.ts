@@ -1,5 +1,5 @@
 import { defineComponent, h, type PropType } from 'vue'
-import type { SegmentedSize, SegmentedOption } from '@expcat/tigercat-core'
+import type { ComponentSize, SegmentedOption } from '@expcat/tigercat-core'
 import {
   getSegmentedContainerClasses,
   getSegmentedContainerStyle,
@@ -26,7 +26,7 @@ export const Segmented = defineComponent({
       default: () => []
     },
     disabled: { type: Boolean, default: false },
-    size: { type: String as PropType<SegmentedSize>, default: 'md' },
+    size: { type: String as PropType<ComponentSize>, default: 'md' },
     block: { type: Boolean, default: false },
     className: { type: String, default: undefined }
   },

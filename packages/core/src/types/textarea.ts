@@ -2,10 +2,7 @@
  * Textarea component types and interfaces
  */
 
-/**
- * Textarea size types
- */
-export type TextareaSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Base textarea props interface
@@ -15,7 +12,7 @@ export interface TextareaProps {
    * Textarea size
    * @default 'md'
    */
-  size?: TextareaSize
+  size?: ComponentSize
 
   /**
    * Textarea value (for controlled mode)

@@ -12,7 +12,7 @@ import {
   classNames,
   coerceClassValue,
   getRadioGroupClasses,
-  type RadioSize
+  type ComponentSize
 } from '@expcat/tigercat-core'
 
 export const RadioGroupKey = Symbol('RadioGroup')
@@ -21,16 +21,16 @@ export interface RadioGroupContext {
   value: string | number | undefined
   name: string
   disabled: boolean
-  size: RadioSize
+  size: ComponentSize
   onChange: (value: string | number) => void
 }
 
 export interface VueRadioGroupProps {
-  value?: string | number
+  modelValue?: string | number
   defaultValue?: string | number
   name?: string
   disabled?: boolean
-  size?: RadioSize
+  size?: ComponentSize
   className?: string
   style?: Record<string, string | number>
 }
@@ -40,9 +40,9 @@ export const RadioGroup = defineComponent({
   inheritAttrs: false,
   props: {
     /**
-     * Selected value (for v-model:value)
+     * Selected value (for v-model)
      */
-    value: {
+    modelValue: {
       type: [String, Number] as PropType<string | number | undefined>
     },
     /**
@@ -70,8 +70,8 @@ export const RadioGroup = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<RadioSize>,
-      default: 'md' as RadioSize
+      type: String as PropType<ComponentSize>,
+      default: 'md' as ComponentSize
     },
 
     /**
@@ -90,9 +90,9 @@ export const RadioGroup = defineComponent({
   },
   emits: {
     /**
-     * Emitted when value changes (for v-model:value)
+     * Emitted when value changes (for v-model)
      */
-    'update:value': (value: string | number) =>
+    'update:modelValue': (value: string | number) =>
       typeof value === 'string' || typeof value === 'number',
     /**
      * Emitted when value changes
@@ -108,11 +108,13 @@ export const RadioGroup = defineComponent({
     // Determine if controlled or uncontrolled
     const isControlled = computed(() => {
       const rawProps = instance?.vnode.props as Record<string, unknown> | null | undefined
-      return !!rawProps && Object.prototype.hasOwnProperty.call(rawProps, 'value')
+      return !!rawProps && Object.prototype.hasOwnProperty.call(rawProps, 'modelValue')
     })
 
     // Current value - use prop value if controlled, otherwise use internal state
-    const currentValue = computed(() => (isControlled.value ? props.value : internalValue.value))
+    const currentValue = computed(() =>
+      isControlled.value ? props.modelValue : internalValue.value
+    )
 
     const handleChange = (value: string | number) => {
       if (props.disabled) return
@@ -123,7 +125,7 @@ export const RadioGroup = defineComponent({
       }
 
       // Emit events
-      emit('update:value', value)
+      emit('update:modelValue', value)
       emit('change', value)
     }
 

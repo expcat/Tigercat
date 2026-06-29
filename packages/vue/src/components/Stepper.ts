@@ -1,5 +1,5 @@
 import { defineComponent, h, onBeforeUnmount, type PropType } from 'vue'
-import type { StepperSize } from '@expcat/tigercat-core'
+import type { ComponentSize } from '@expcat/tigercat-core'
 import {
   stepperBaseClasses,
   getStepperInputClasses,
@@ -23,7 +23,7 @@ export const Stepper = defineComponent({
     max: { type: Number, default: Infinity },
     step: { type: Number, default: 1 },
     disabled: { type: Boolean, default: false },
-    size: { type: String as PropType<StepperSize>, default: 'md' },
+    size: { type: String as PropType<ComponentSize>, default: 'md' },
     precision: { type: Number, default: undefined }
   },
   emits: ['update:modelValue', 'change'],

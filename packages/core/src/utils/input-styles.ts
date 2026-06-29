@@ -2,7 +2,8 @@
  * Input component styling utilities
  */
 
-import type { InputSize, InputStatus } from '../types/input'
+import type { ComponentSize } from '../types/base'
+import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
 
 /**
@@ -33,14 +34,14 @@ const STATUS_CLASSES: Record<InputStatus, string> = {
     'border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-yellow-900 placeholder-yellow-300'
 }
 
-const INPUT_SIZE_CLASSES: Record<InputSize, string> = {
+const INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
   sm: 'py-1 text-sm',
   md: 'py-2 text-base',
   lg: 'py-3 text-lg'
 }
 
 const INPUT_PADDING: Record<
-  InputSize,
+  ComponentSize,
   { left: string; right: string; prefixLeft: string; suffixRight: string }
 > = {
   sm: { left: 'pl-2', right: 'pr-2', prefixLeft: 'pl-8', suffixRight: 'pr-8' },
@@ -49,7 +50,7 @@ const INPUT_PADDING: Record<
 }
 
 export interface GetInputClassesOptions {
-  size?: InputSize
+  size?: ComponentSize
   status?: InputStatus
   hasPrefix?: boolean
   hasSuffix?: boolean
@@ -77,7 +78,7 @@ export function getInputWrapperClasses(): string {
 
 export function getInputAffixClasses(
   position: 'prefix' | 'suffix',
-  size: InputSize = 'md'
+  size: ComponentSize = 'md'
 ): string {
   const base = 'absolute top-0 bottom-0 flex items-center justify-center text-gray-500'
   const posClass = position === 'prefix' ? 'left-0' : 'right-0'
@@ -90,7 +91,7 @@ export function getInputAffixClasses(
   return classNames(base, posClass, widthClass)
 }
 
-export function getInputErrorClasses(size: InputSize = 'md'): string {
+export function getInputErrorClasses(size: ComponentSize = 'md'): string {
   return classNames(
     'absolute inset-y-0 right-0 flex items-center pointer-events-none',
     INPUT_PADDING[size].right,
@@ -102,7 +103,7 @@ export function getInputErrorClasses(size: InputSize = 'md'): string {
  * Clear button classes — positioned inside the input on the right
  * @since 0.5.0
  */
-export function getInputClearButtonClasses(size: InputSize = 'md'): string {
+export function getInputClearButtonClasses(size: ComponentSize = 'md'): string {
   return classNames(
     'absolute inset-y-0 right-0 flex items-center cursor-pointer',
     'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
@@ -114,7 +115,7 @@ export function getInputClearButtonClasses(size: InputSize = 'md'): string {
  * Password toggle button classes
  * @since 0.5.0
  */
-export function getInputPasswordToggleClasses(size: InputSize = 'md'): string {
+export function getInputPasswordToggleClasses(size: ComponentSize = 'md'): string {
   return classNames(
     'absolute inset-y-0 right-0 flex items-center cursor-pointer',
     'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',

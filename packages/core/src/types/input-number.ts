@@ -2,7 +2,8 @@
  * InputNumber component types and interfaces
  */
 
-import type { InputSize, InputStatus } from './input'
+import type { ComponentSize } from './base'
+import type { InputStatus } from './input'
 
 /**
  * InputNumber props interface
@@ -12,7 +13,7 @@ export interface InputNumberProps {
    * Input size
    * @default 'md'
    */
-  size?: InputSize
+  size?: ComponentSize
 
   /**
    * Validation status

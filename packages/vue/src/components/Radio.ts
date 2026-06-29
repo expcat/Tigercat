@@ -16,18 +16,18 @@ import {
   getRadioVisualClasses,
   defaultRadioColors,
   radioRootBaseClasses,
-  type RadioSize
+  type ComponentSize
 } from '@expcat/tigercat-core'
 
 import { RadioGroupKey, type RadioGroupContext } from './RadioGroup'
 
 export interface VueRadioProps {
   value: string | number
-  size?: RadioSize
+  size?: ComponentSize
   disabled?: boolean
   name?: string
-  checked?: boolean
-  defaultChecked?: boolean
+  modelValue?: boolean
+  defaultValue?: boolean
   className?: string
   style?: Record<string, string | number>
 }
@@ -48,7 +48,7 @@ export const Radio = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<RadioSize>
+      type: String as PropType<ComponentSize>
     },
     /**
      * Whether the radio is disabled
@@ -66,7 +66,7 @@ export const Radio = defineComponent({
     /**
      * Whether the radio is checked (controlled mode)
      */
-    checked: {
+    modelValue: {
       type: Boolean
     },
 
@@ -74,7 +74,7 @@ export const Radio = defineComponent({
      * Default checked state (uncontrolled mode)
      * @default false
      */
-    defaultChecked: {
+    defaultValue: {
       type: Boolean,
       default: false
     },
@@ -99,9 +99,9 @@ export const Radio = defineComponent({
      */
     change: (value: string | number) => typeof value === 'string' || typeof value === 'number',
     /**
-     * Emitted when checked state changes (for v-model:checked)
+     * Emitted when checked state changes (for v-model)
      */
-    'update:checked': (value: boolean) => typeof value === 'boolean'
+    'update:modelValue': (value: boolean) => typeof value === 'boolean'
   },
   setup(props, { slots, emit, attrs }) {
     const instance = getCurrentInstance()
@@ -110,15 +110,15 @@ export const Radio = defineComponent({
 
     const groupContext = computed(() => groupContextRef?.value)
 
-    const internalChecked = ref(props.defaultChecked)
+    const internalChecked = ref(props.defaultValue)
 
     const isCheckedControlled = computed(() => {
       const rawProps = instance?.vnode.props as Record<string, unknown> | null | undefined
-      return !!rawProps && Object.prototype.hasOwnProperty.call(rawProps, 'checked')
+      return !!rawProps && Object.prototype.hasOwnProperty.call(rawProps, 'modelValue')
     })
     const isInGroup = computed(() => !!groupContext.value)
 
-    const actualSize = computed<RadioSize>(() => props.size || groupContext.value?.size || 'md')
+    const actualSize = computed<ComponentSize>(() => props.size || groupContext.value?.size || 'md')
     const actualDisabled = computed(() => {
       if (props.disabled !== undefined) return props.disabled
       return groupContext.value?.disabled || false
@@ -126,7 +126,7 @@ export const Radio = defineComponent({
     const actualName = computed(() => props.name || groupContext.value?.name)
 
     const isChecked = computed(() => {
-      if (isCheckedControlled.value) return props.checked
+      if (isCheckedControlled.value) return props.modelValue
       if (isInGroup.value) return groupContext.value?.value === props.value
       return internalChecked.value
     })
@@ -169,7 +169,7 @@ export const Radio = defineComponent({
         internalChecked.value = true
       }
 
-      emit('update:checked', newChecked)
+      emit('update:modelValue', newChecked)
       emit('change', props.value)
 
       // Notify group if part of a group

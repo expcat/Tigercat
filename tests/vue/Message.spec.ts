@@ -32,6 +32,8 @@ function getMessageByType(type: (typeof messageTypes)[number]) {
 
 describe('Message (Vue)', () => {
   beforeAll(async () => {
+    Message.info({ content: '__message_warmup__', duration: 0 })
+    await flushLazyImport()
     Message.clear()
     await flushLazyImport()
     document.body.innerHTML = ''

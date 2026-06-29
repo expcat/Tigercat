@@ -1,11 +1,11 @@
 import React, { createContext, useContext } from 'react'
 import { useControlledState } from '../hooks/useControlledState'
-import { type CheckboxGroupValue, type CheckboxSize } from '@expcat/tigercat-core'
+import { type CheckboxGroupValue, type ComponentSize } from '@expcat/tigercat-core'
 
 export interface CheckboxGroupContext {
   value: CheckboxGroupValue
   disabled: boolean
-  size: CheckboxSize
+  size: ComponentSize
   updateValue: (val: CheckboxGroupValue[number], checked: boolean) => void
 }
 
@@ -40,7 +40,7 @@ export interface CheckboxGroupProps extends Omit<
    * Checkbox size for all checkboxes
    * @default 'md'
    */
-  size?: CheckboxSize
+  size?: ComponentSize
 
   /**
    * Change event handler

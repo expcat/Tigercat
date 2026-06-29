@@ -1,10 +1,10 @@
 import { computed, defineComponent, h, nextTick, ref, type PropType } from 'vue'
 import type { ComponentPublicInstance, VNodeRef } from 'vue'
 import type {
+  ComponentSize,
   ColorSwatchGroup,
   ColorSwatchNormalizedOption,
-  ColorSwatchOptionInput,
-  ColorSwatchSize
+  ColorSwatchOptionInput
 } from '@expcat/tigercat-core'
 import {
   classNames,
@@ -30,7 +30,7 @@ export const ColorSwatch = defineComponent({
   props: {
     modelValue: { type: String, default: undefined },
     disabled: { type: Boolean, default: false },
-    size: { type: String as PropType<ColorSwatchSize>, default: 'md' },
+    size: { type: String as PropType<ComponentSize>, default: 'md' },
     colors: { type: Array as PropType<ColorSwatchOptionInput[]>, default: undefined },
     groups: { type: Array as PropType<ColorSwatchGroup[]>, default: undefined },
     columns: { type: Number, default: 6 },

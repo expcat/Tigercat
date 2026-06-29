@@ -4,15 +4,15 @@
 type: v2-api-audit
 scope: R11 core API and shared contracts audit for R12-R20 execution
 verified-date: 2026-06-29
-source: current repository state after R13 Feedback/overlay cleanup completion
+source: current repository state after R14 Form primitives completion
 -->
 
 本文是 R11 的审计输出，只记录 v2.0.0 发布前 R12-R20 批次要执行的 API 删除、合并与命名收敛计划。R11 不删除运行时 API，也不新增兼容层。
 
 ## 审计基线
 
-- `api-reports/public-api-baseline.json` 当前覆盖 156 个 `*Props` 接口、2911 个 core exports、148 个 React 公开组件和 148 个 Vue 公开组件。
-- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、登记过的受控量 parity、Skill references 覆盖与文档预算。
+- `api-reports/public-api-baseline.json` 当前覆盖 156 个 `*Props` 接口、2902 个 core exports、148 个 React 公开组件和 148 个 Vue 公开组件。
+- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、Vue checkable Form primitives 不回退到 `checked` / `defaultChecked` / `update:checked`、登记过的受控量 parity、Skill references 覆盖与文档预算。
 - `packages/core/src/types/base.ts`、`events.ts`、`generics.ts` 是公共合约收敛事实源；后续批次应优先复用这些 shared contracts，不能在 React/Vue 组件内各自临时发明命名。
 - `packages/core/src/types/index.ts` 与 `packages/core/src/utils/index.ts` 仍以宽 barrel 公开大量类型与工具；R12-R20 删除或合并 public exports 时必须同步更新 API baseline、迁移说明和对应分组测试。
 
@@ -66,6 +66,16 @@ source: current repository state after R13 Feedback/overlay cleanup completion
 - 证据：core Drawer types、React/Vue Modal/Drawer/Popconfirm components、React/Vue popup utilities、Feedback example demos、targeted Feedback tests、`api-reports/public-api-baseline.json`、generated Skill references 和 `scripts/validate-api.mjs` 已同步更新。
 - 实际验证：`npx -y pnpm@11.9.0 test:group:feedback`、`npx -y pnpm@11.9.0 vitest run tests/core/imperative-side-effects.spec.ts`、`npx -y pnpm@11.9.0 e2e:smoke`、`npx -y pnpm@11.9.0 example:ssr:check`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline && npx -y pnpm@11.9.0 api:baseline:check`、`npx -y pnpm@11.9.0 docs:api && npx -y pnpm@11.9.0 docs:api:check`、`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`、`git diff --check`。
 - 剩余阻塞：无；下一批次为 R14 Form primitives。
+
+### R14 Form primitives（2026-06-29）
+
+- 实际删除 / 合并：移除 `InputSize`、`TextareaSize`、`CheckboxSize`、`RadioSize`、`SwitchSize`、`SliderSize`、`SegmentedSize`、`StepperSize`、`ColorSwatchSize` public type aliases；对应 props、core style utilities、theme runtime 和 React/Vue 组件 size 类型改用 `ComponentSize`。
+- Controlled model 变更：Vue Checkbox、Radio、Switch 从单体 `checked` / `defaultChecked` / `update:checked` 收敛为 `modelValue` / `defaultValue` / `update:modelValue` / `change`；Vue RadioGroup 从 `value` / `update:value` 收敛为 `modelValue` / `update:modelValue`。React Checkbox、Radio、Switch 保持 `checked` / `defaultChecked` / `onChange`。
+- 实际保留：`CheckboxValue` / `CheckboxGroupValue` 保留，Checkbox/Radio 的 `value` 继续作为 group option identity；`InputStatus`、`InputType` 保留，因为它们不是 size alias。
+- 唯一替代 API：所有被删 size aliases 改用 `ComponentSize`；Vue checkable primitives 使用默认 `v-model` / `default-value` / `@update:modelValue`；Vue RadioGroup 使用默认 `v-model`。
+- 证据：core primitive type files、core primitive style utilities、React/Vue primitive components、Vue primitive examples、primitive group tests、`api-reports/public-api-baseline.json`、generated Skill references 和 `scripts/validate-api.mjs` R14 guard 已同步更新。
+- 实际验证：`npx -y pnpm@11.9.0 test:group:form -- --filter primitives`、`npx -y pnpm@11.9.0 vitest run tests/react/useControlledState.spec.tsx tests/vue/useFormController.spec.ts`、`npx -y pnpm@11.9.0 test:a11y`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline && npx -y pnpm@11.9.0 api:baseline:check`、`npx -y pnpm@11.9.0 docs:api && npx -y pnpm@11.9.0 docs:api:check`、`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`、`git diff --check`。
+- 剩余阻塞：无；下一批次为 R15 Form composite selectors。
 
 完成任一涉及 public API 或 shared contract 清理的 R12-R20 任务后，必须在本节追加对应 `### Rxx ...（YYYY-MM-DD）` 记录，并包含：
 

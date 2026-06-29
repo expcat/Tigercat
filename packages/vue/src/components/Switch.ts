@@ -1,15 +1,15 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
-  type SwitchSize,
+  type ComponentSize,
   getSwitchClasses,
   getSwitchThumbClasses,
   mergeStyleValues
 } from '@expcat/tigercat-core'
 
 export interface VueSwitchProps {
-  checked?: boolean
+  modelValue?: boolean
   disabled?: boolean
-  size?: SwitchSize
+  size?: ComponentSize
   className?: string
   style?: Record<string, string | number>
 }
@@ -22,7 +22,7 @@ export const Switch = defineComponent({
      * Whether the switch is checked
      * @default false
      */
-    checked: {
+    modelValue: {
       type: Boolean,
       default: false
     },
@@ -41,8 +41,8 @@ export const Switch = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<SwitchSize>,
-      default: 'md' as SwitchSize
+      type: String as PropType<ComponentSize>,
+      default: 'md' as ComponentSize
     },
 
     className: {
@@ -55,9 +55,9 @@ export const Switch = defineComponent({
   },
   emits: {
     /**
-     * Emitted when checked state changes (for v-model:checked)
+     * Emitted when checked state changes (for v-model)
      */
-    'update:checked': (value: boolean) => typeof value === 'boolean',
+    'update:modelValue': (value: boolean) => typeof value === 'boolean',
 
     /**
      * Emitted when checked state changes
@@ -66,15 +66,15 @@ export const Switch = defineComponent({
   },
   setup(props, { emit, attrs }) {
     const switchClasses = computed(() =>
-      getSwitchClasses(props.size, props.checked, props.disabled, props.className, attrs.class)
+      getSwitchClasses(props.size, props.modelValue, props.disabled, props.className, attrs.class)
     )
 
-    const thumbClasses = computed(() => getSwitchThumbClasses(props.size, props.checked))
+    const thumbClasses = computed(() => getSwitchThumbClasses(props.size, props.modelValue))
 
     const emitChange = () => {
       if (props.disabled) return
-      const newValue = !props.checked
-      emit('update:checked', newValue)
+      const newValue = !props.modelValue
+      emit('update:modelValue', newValue)
       emit('change', newValue)
     }
 
@@ -94,7 +94,7 @@ export const Switch = defineComponent({
           ...attrs,
           type: 'button',
           role: 'switch',
-          'aria-checked': props.checked,
+          'aria-checked': props.modelValue,
           'aria-disabled': props.disabled ? 'true' : undefined,
           class: switchClasses.value,
           style: mergeStyleValues(attrs.style, props.style),

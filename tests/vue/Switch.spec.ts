@@ -29,8 +29,8 @@ describe('Switch', () => {
       expect(switchButton).toHaveAttribute('aria-checked', 'false')
     })
 
-    it('should render in checked state when checked prop is true', () => {
-      const { container } = renderWithProps(Switch, { checked: true })
+    it('should render in checked state when modelValue prop is true', () => {
+      const { container } = renderWithProps(Switch, { modelValue: true })
 
       const switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toHaveAttribute('aria-checked', 'true')
@@ -39,7 +39,7 @@ describe('Switch', () => {
     it('should compose className prop and attrs class with state classes', () => {
       const { container } = render(Switch, {
         props: {
-          checked: true,
+          modelValue: true,
           disabled: true,
           className: 'prop-class'
         },
@@ -75,12 +75,12 @@ describe('Switch', () => {
   })
 
   describe('Events', () => {
-    it('should emit update:checked when clicked', async () => {
+    it('should emit update:modelValue when clicked', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Switch, {
         props: {
-          checked: false,
-          'onUpdate:checked': onUpdate
+          modelValue: false,
+          'onUpdate:modelValue': onUpdate
         }
       })
 
@@ -94,7 +94,7 @@ describe('Switch', () => {
       const onChange = vi.fn()
       const { container } = render(Switch, {
         props: {
-          checked: false,
+          modelValue: false,
           onChange: onChange
         }
       })
@@ -111,8 +111,8 @@ describe('Switch', () => {
       const { container } = render(Switch, {
         props: {
           disabled: true,
-          checked: false,
-          'onUpdate:checked': onUpdate,
+          modelValue: false,
+          'onUpdate:modelValue': onUpdate,
           onChange: onChange
         }
       })
@@ -128,8 +128,8 @@ describe('Switch', () => {
       const onUpdate = vi.fn()
       const { container } = render(Switch, {
         props: {
-          checked: true,
-          'onUpdate:checked': onUpdate
+          modelValue: true,
+          'onUpdate:modelValue': onUpdate
         }
       })
 
@@ -139,12 +139,12 @@ describe('Switch', () => {
       expect(onUpdate).toHaveBeenCalledWith(false)
     })
 
-    it('should emit update:checked when Space is pressed', async () => {
+    it('should emit update:modelValue when Space is pressed', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Switch, {
         props: {
-          checked: false,
-          'onUpdate:checked': onUpdate
+          modelValue: false,
+          'onUpdate:modelValue': onUpdate
         }
       })
 
@@ -159,13 +159,13 @@ describe('Switch', () => {
   describe('States', () => {
     it('should show checked state correctly', async () => {
       const { container, rerender } = renderWithProps(Switch, {
-        checked: false
+        modelValue: false
       })
 
       let switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toHaveAttribute('aria-checked', 'false')
 
-      await rerender({ checked: true })
+      await rerender({ modelValue: true })
       switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toHaveAttribute('aria-checked', 'true')
     })
@@ -181,7 +181,7 @@ describe('Switch', () => {
         '--tiger-primary': '#ff0000'
       })
 
-      const { container } = renderWithProps(Switch, { checked: true })
+      const { container } = renderWithProps(Switch, { modelValue: true })
 
       const switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toBeInTheDocument()
@@ -203,7 +203,7 @@ describe('Switch', () => {
     })
 
     it('should have proper role and aria attributes', () => {
-      const { container } = renderWithProps(Switch, { checked: false })
+      const { container } = renderWithProps(Switch, { modelValue: false })
 
       const switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toHaveAttribute('role', 'switch')
@@ -214,8 +214,8 @@ describe('Switch', () => {
       const onUpdate = vi.fn()
       const { container } = render(Switch, {
         props: {
-          checked: false,
-          'onUpdate:checked': onUpdate
+          modelValue: false,
+          'onUpdate:modelValue': onUpdate
         }
       })
 
@@ -248,8 +248,8 @@ describe('Switch', () => {
       const onUpdate = vi.fn()
       const { container } = render(Switch, {
         props: {
-          checked: false,
-          'onUpdate:checked': onUpdate
+          modelValue: false,
+          'onUpdate:modelValue': onUpdate
         }
       })
 
@@ -271,8 +271,8 @@ describe('Switch', () => {
       const onUpdate = vi.fn()
       const { container } = render(Switch, {
         props: {
-          checked: false,
-          'onUpdate:checked': onUpdate
+          modelValue: false,
+          'onUpdate:modelValue': onUpdate
         }
       })
 
@@ -288,7 +288,7 @@ describe('Switch', () => {
     it('should preserve custom className with other props', () => {
       const { container } = renderWithProps(Switch, {
         className: 'custom-class',
-        checked: true,
+        modelValue: true,
         disabled: false
       })
 

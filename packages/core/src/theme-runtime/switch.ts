@@ -4,7 +4,7 @@
 
 import { classNames } from '../utils/class-names'
 import { composeComponentClasses, type ComposableClassInput } from '../utils/compose-classes'
-import type { SwitchSize } from '../types/switch'
+import type { ComponentSize } from '../types/base'
 
 /**
  * Base classes for Switch component
@@ -16,7 +16,7 @@ export const switchBaseClasses =
 /**
  * Switch container size classes
  */
-export const switchSizeClasses: Record<SwitchSize, string> = {
+export const switchSizeClasses: Record<ComponentSize, string> = {
   sm: 'h-5 w-9',
   md: 'h-6 w-11',
   lg: 'h-7 w-14'
@@ -25,7 +25,7 @@ export const switchSizeClasses: Record<SwitchSize, string> = {
 /**
  * Switch thumb size classes
  */
-export const switchThumbSizeClasses: Record<SwitchSize, string> = {
+export const switchThumbSizeClasses: Record<ComponentSize, string> = {
   sm: 'h-4 w-4',
   md: 'h-5 w-5',
   lg: 'h-6 w-6'
@@ -34,7 +34,7 @@ export const switchThumbSizeClasses: Record<SwitchSize, string> = {
 /**
  * Switch thumb translate classes for checked state
  */
-export const switchThumbTranslateClasses: Record<SwitchSize, string> = {
+export const switchThumbTranslateClasses: Record<ComponentSize, string> = {
   sm: 'translate-x-4',
   md: 'translate-x-5',
   lg: 'translate-x-7'
@@ -44,7 +44,7 @@ export const switchThumbTranslateClasses: Record<SwitchSize, string> = {
  * Get switch container classes based on size and state
  */
 export function getSwitchClasses(
-  size: SwitchSize = 'md',
+  size: ComponentSize = 'md',
   checked: boolean = false,
   disabled: boolean = false,
   ...classes: ComposableClassInput[]
@@ -65,7 +65,10 @@ export function getSwitchClasses(
 /**
  * Get switch thumb classes based on size and checked state
  */
-export function getSwitchThumbClasses(size: SwitchSize = 'md', checked: boolean = false): string {
+export function getSwitchThumbClasses(
+  size: ComponentSize = 'md',
+  checked: boolean = false
+): string {
   const baseClasses =
     'inline-block rounded-full bg-[var(--tiger-surface,#ffffff)] shadow-lg transition-transform'
   const sizeClass = switchThumbSizeClasses[size]

@@ -477,6 +477,61 @@ for (const relativePath of feedbackExampleFiles) {
   })
 }
 
+// ----- R14 Form primitive controlled model guard -----
+
+const R14_VUE_CHECKABLE_FORBIDDEN = [
+  { label: 'checked prop type', regex: /^\s{2}checked\s*\??:/ },
+  { label: 'checked prop option', regex: /^\s{4}checked\s*:\s*\{/ },
+  { label: 'defaultChecked', regex: /\bdefaultChecked\b/ },
+  { label: 'update:checked', regex: /['"]update:checked['"]/ }
+]
+
+const R14_VUE_CHECKABLE_EXAMPLE_FORBIDDEN = [
+  { label: 'v-model:checked', regex: /v-model:checked/ },
+  { label: 'default-checked', regex: /default-checked/ },
+  { label: 'update:checked', regex: /update:checked/ }
+]
+
+for (const componentName of ['Checkbox', 'Radio', 'Switch']) {
+  const filepath = join(VUE_COMPONENTS_DIR, `${componentName}.ts`)
+  if (!existsSync(filepath)) continue
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    for (const rule of R14_VUE_CHECKABLE_FORBIDDEN) {
+      if (rule.regex.test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'form-primitive-model',
+          `Vue ${componentName} must use modelValue/defaultValue/update:modelValue instead of ${rule.label}`
+        )
+      }
+    }
+  })
+}
+
+for (const relativePath of [
+  'examples/example/vue3/src/pages/CheckboxDemo.vue',
+  'examples/example/vue3/src/pages/RadioDemo.vue',
+  'examples/example/vue3/src/pages/SwitchDemo.vue'
+]) {
+  const filepath = join(ROOT, relativePath)
+  if (!existsSync(filepath)) continue
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    for (const rule of R14_VUE_CHECKABLE_EXAMPLE_FORBIDDEN) {
+      if (rule.regex.test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'form-primitive-model',
+          `Vue checkable primitive examples must use modelValue/defaultValue/update:modelValue instead of ${rule.label}`
+        )
+      }
+    }
+  })
+}
+
 // ----- LLM docs coverage check -----
 
 function collectMarkdownContent(dir, options = {}) {
@@ -757,6 +812,7 @@ if (jsonMode) {
       'missing-vue': '缺失 Vue 实现',
       'overlay-api': '弹出层 API 一致性',
       'overlay-visible-api': '弹出层 visible 兼容 API 禁止回流',
+      'form-primitive-model': '表单基础组件受控模型禁止旧 API 回流',
       'controlled-parity': '受控量双端对称',
       'public-deprecated': '公开 API 禁止 @deprecated',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',

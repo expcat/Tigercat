@@ -3,7 +3,7 @@ import {
   classNames,
   getCheckboxClasses,
   getCheckboxLabelClasses,
-  type CheckboxSize
+  type ComponentSize
 } from '@expcat/tigercat-core'
 import { useCheckboxGroup } from './CheckboxGroup'
 import { useControlledState } from '../hooks/useControlledState'
@@ -32,7 +32,7 @@ export interface CheckboxProps extends Omit<
    * Checkbox size
    * @default 'md'
    */
-  size?: CheckboxSize
+  size?: ComponentSize
 
   /**
    * Whether the checkbox is disabled

@@ -35,7 +35,7 @@ description: Compact generated Tigercat Form props reference
 
 | Prop        | Type            | Default | Notes                                       |
 | ----------- | --------------- | ------- | ------------------------------------------- |
-| `size?`     | `CheckboxSize`  | `'md'`  | Checkbox size                               |
+| `size?`     | `ComponentSize` | `'md'`  | Checkbox size                               |
 | `disabled?` | `boolean`       | `false` | Whether the checkbox is disabled            |
 | `value?`    | `CheckboxValue` | `-`     | Checkbox value (for use in checkbox groups) |
 
@@ -43,10 +43,10 @@ description: Compact generated Tigercat Form props reference
 
 `packages/core/src/types/checkbox.ts` · `CheckboxGroupProps`
 
-| Prop        | Type           | Default | Notes                                         |
-| ----------- | -------------- | ------- | --------------------------------------------- |
-| `disabled?` | `boolean`      | `false` | Whether the checkbox group is disabled        |
-| `size?`     | `CheckboxSize` | `'md'`  | Checkbox size for all checkboxes in the group |
+| Prop        | Type            | Default | Notes                                         |
+| ----------- | --------------- | ------- | --------------------------------------------- |
+| `disabled?` | `boolean`       | `false` | Whether the checkbox group is disabled        |
+| `size?`     | `ComponentSize` | `'md'`  | Checkbox size for all checkboxes in the group |
 
 ## ColorPicker
 
@@ -65,7 +65,7 @@ description: Compact generated Tigercat Form props reference
 | Prop        | Type                       | Default | Notes |
 | ----------- | -------------------------- | ------- | ----- |
 | `disabled?` | `boolean`                  | `-`     | -     |
-| `size?`     | `ColorSwatchSize`          | `-`     | -     |
+| `size?`     | `ComponentSize`            | `-`     | -     |
 | `colors?`   | `ColorSwatchOptionInput[]` | `-`     | -     |
 
 ## CronEditor
@@ -112,11 +112,11 @@ description: Compact generated Tigercat Form props reference
 
 `packages/core/src/types/input.ts` · `InputProps` · 3/19 props
 
-| Prop            | Type          | Default     | Notes                    |
-| --------------- | ------------- | ----------- | ------------------------ |
-| `size?`         | `InputSize`   | `'md'`      | Input size               |
-| `status?`       | `InputStatus` | `'default'` | Validation status        |
-| `errorMessage?` | `string`      | `-`         | Error message to display |
+| Prop            | Type            | Default     | Notes                    |
+| --------------- | --------------- | ----------- | ------------------------ |
+| `size?`         | `ComponentSize` | `'md'`      | Input size               |
+| `status?`       | `InputStatus`   | `'default'` | Validation status        |
+| `errorMessage?` | `string`        | `-`         | Error message to display |
 
 ## InputGroup
 
@@ -143,7 +143,7 @@ description: Compact generated Tigercat Form props reference
 
 | Prop      | Type             | Default     | Notes                           |
 | --------- | ---------------- | ----------- | ------------------------------- |
-| `size?`   | `InputSize`      | `'md'`      | Input size                      |
+| `size?`   | `ComponentSize`  | `'md'`      | Input size                      |
 | `status?` | `InputStatus`    | `'default'` | Validation status               |
 | `value?`  | `number \| null` | `-`         | Current value (controlled mode) |
 
@@ -174,7 +174,7 @@ description: Compact generated Tigercat Form props reference
 | Prop        | Type               | Default | Notes                         |
 | ----------- | ------------------ | ------- | ----------------------------- |
 | `value`     | `string \| number` | `-`     | The value of the radio        |
-| `size?`     | `RadioSize`        | `'md'`  | Radio size                    |
+| `size?`     | `ComponentSize`    | `'md'`  | Radio size                    |
 | `disabled?` | `boolean`          | `false` | Whether the radio is disabled |
 
 ## RadioGroup
@@ -231,21 +231,21 @@ description: Compact generated Tigercat Form props reference
 
 `packages/core/src/types/switch.ts` · `SwitchProps`
 
-| Prop        | Type         | Default | Notes                          |
-| ----------- | ------------ | ------- | ------------------------------ |
-| `checked?`  | `boolean`    | `false` | Whether the switch is checked  |
-| `disabled?` | `boolean`    | `false` | Whether the switch is disabled |
-| `size?`     | `SwitchSize` | `'md'`  | Switch size                    |
+| Prop        | Type            | Default | Notes                          |
+| ----------- | --------------- | ------- | ------------------------------ |
+| `checked?`  | `boolean`       | `false` | Whether the switch is checked  |
+| `disabled?` | `boolean`       | `false` | Whether the switch is disabled |
+| `size?`     | `ComponentSize` | `'md'`  | Switch size                    |
 
 ## Textarea
 
 `packages/core/src/types/textarea.ts` · `TextareaProps` · 3/18 props
 
-| Prop            | Type           | Default | Notes                                 |
-| --------------- | -------------- | ------- | ------------------------------------- |
-| `size?`         | `TextareaSize` | `'md'`  | Textarea size                         |
-| `value?`        | `string`       | `-`     | Textarea value (for controlled mode)  |
-| `defaultValue?` | `string`       | `-`     | Default value (for uncontrolled mode) |
+| Prop            | Type            | Default | Notes                                 |
+| --------------- | --------------- | ------- | ------------------------------------- |
+| `size?`         | `ComponentSize` | `'md'`  | Textarea size                         |
+| `value?`        | `string`        | `-`     | Textarea value (for controlled mode)  |
+| `defaultValue?` | `string`        | `-`     | Default value (for uncontrolled mode) |
 
 ## TimePicker
 

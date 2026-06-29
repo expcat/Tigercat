@@ -1,7 +1,7 @@
 import { defineComponent, computed, ref, watch, watchEffect, h, PropType } from 'vue'
 import {
   classNames,
-  type SliderSize,
+  type ComponentSize,
   sliderBaseClasses,
   sliderRangeClasses,
   getSliderTrackClasses,
@@ -22,7 +22,7 @@ export interface VueSliderProps {
   disabled?: boolean
   marks?: boolean | Record<number, string>
   tooltip?: boolean
-  size?: SliderSize
+  size?: ComponentSize
   range?: boolean
   className?: string
   style?: Record<string, string | number>
@@ -96,8 +96,8 @@ export const Slider = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<SliderSize>,
-      default: 'md' as SliderSize
+      type: String as PropType<ComponentSize>,
+      default: 'md' as ComponentSize
     },
     /**
      * Enable range selection mode

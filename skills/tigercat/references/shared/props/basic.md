@@ -246,7 +246,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | ----------- | ------------------- | ------- | ------------------------------------- |
 | `options?`  | `SegmentedOption[]` | `-`     | Available options                     |
 | `disabled?` | `boolean`           | `-`     | Whether the whole control is disabled |
-| `size?`     | `SegmentedSize`     | `-`     | Component size                        |
+| `size?`     | `ComponentSize`     | `-`     | Component size                        |
 
 ## Statistic
 

@@ -1,4 +1,4 @@
-export type ColorSwatchSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 export interface ColorSwatchOption {
   value: string
@@ -25,7 +25,7 @@ export interface ColorSwatchNormalizedGroup {
 
 export interface ColorSwatchProps {
   disabled?: boolean
-  size?: ColorSwatchSize
+  size?: ComponentSize
   colors?: ColorSwatchOptionInput[]
   groups?: ColorSwatchGroup[]
   columns?: number

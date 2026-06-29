@@ -47,9 +47,9 @@ describe('Radio', () => {
       expect(radio.checked).toBe(false)
     })
 
-    it('should support defaultChecked (uncontrolled)', () => {
+    it('should support defaultValue (uncontrolled)', () => {
       const { container } = render(Radio, {
-        props: { value: 'option1', defaultChecked: true },
+        props: { value: 'option1', defaultValue: true },
         slots: { default: 'Option 1' }
       })
 
@@ -129,9 +129,9 @@ describe('Radio', () => {
       expect(radio).toBeDisabled()
     })
 
-    it('should be checked when checked prop is true', () => {
+    it('should be checked when modelValue prop is true', () => {
       const { container } = render(Radio, {
-        props: { value: 'option1', checked: true },
+        props: { value: 'option1', modelValue: true },
         slots: { default: 'Checked' }
       })
 
@@ -139,9 +139,9 @@ describe('Radio', () => {
       expect(radio.checked).toBe(true)
     })
 
-    it('should prioritize checked prop over defaultChecked', () => {
+    it('should prioritize modelValue prop over defaultValue', () => {
       const { container } = render(Radio, {
-        props: { value: 'option1', checked: false, defaultChecked: true },
+        props: { value: 'option1', modelValue: false, defaultValue: true },
         slots: { default: 'Controlled' }
       })
 
@@ -164,10 +164,10 @@ describe('Radio', () => {
       expect(onChange).toHaveBeenCalledWith('option1')
     })
 
-    it('should emit update:checked event', async () => {
+    it('should emit update:modelValue event', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Radio, {
-        props: { value: 'option1', 'onUpdate:checked': onUpdate },
+        props: { value: 'option1', 'onUpdate:modelValue': onUpdate },
         slots: { default: 'Option 1' }
       })
 
@@ -203,13 +203,13 @@ describe('Radio', () => {
       expect(onChange).toHaveBeenCalledWith(42)
     })
 
-    it('should emit both change and update:checked events in order', async () => {
+    it('should emit both change and update:modelValue events in order', async () => {
       const events: string[] = []
       const onChange = vi.fn(() => events.push('change'))
-      const onUpdate = vi.fn(() => events.push('update:checked'))
+      const onUpdate = vi.fn(() => events.push('update:modelValue'))
 
       const { container } = render(Radio, {
-        props: { value: 'option1', onChange, 'onUpdate:checked': onUpdate },
+        props: { value: 'option1', onChange, 'onUpdate:modelValue': onUpdate },
         slots: { default: 'Option' }
       })
 
@@ -222,7 +222,7 @@ describe('Radio', () => {
   })
 
   describe('v-model Binding', () => {
-    it('should work with v-model:checked', async () => {
+    it('should work with v-model', async () => {
       const Wrapper = defineComponent({
         setup() {
           const checked = ref(false)
@@ -231,8 +231,8 @@ describe('Radio', () => {
               Radio,
               {
                 value: 'option1',
-                checked: checked.value,
-                'onUpdate:checked': (v: boolean) => {
+                modelValue: checked.value,
+                'onUpdate:modelValue': (v: boolean) => {
                   checked.value = v
                 }
               },
@@ -295,7 +295,7 @@ describe('Radio', () => {
       })
 
       const { container } = render(Radio, {
-        props: { value: 'option1', checked: true },
+        props: { value: 'option1', modelValue: true },
         slots: { default: 'Themed' }
       })
 
@@ -452,7 +452,7 @@ describe('Radio', () => {
     })
 
     describe('Controlled Mode', () => {
-      it('should work with v-model:value', async () => {
+      it('should work with v-model', async () => {
         const Wrapper = defineComponent({
           setup() {
             const value = ref<string | undefined>('a')
@@ -460,8 +460,8 @@ describe('Radio', () => {
               h(
                 RadioGroup,
                 {
-                  value: value.value,
-                  'onUpdate:value': (v: string) => {
+                  modelValue: value.value,
+                  'onUpdate:modelValue': (v: string) => {
                     value.value = v
                   }
                 },
@@ -628,12 +628,12 @@ describe('Radio', () => {
         expect(onChange).toHaveBeenCalledWith('b')
       })
 
-      it('should emit update:value event', async () => {
+      it('should emit update:modelValue event', async () => {
         const onUpdate = vi.fn()
         const { container } = render({
           components: { RadioGroup, Radio },
           template: `
-            <RadioGroup @update:value="onUpdate">
+            <RadioGroup @update:modelValue="onUpdate">
               <Radio value="a">A</Radio>
               <Radio value="b">B</Radio>
             </RadioGroup>
@@ -866,14 +866,14 @@ describe('Radio', () => {
     it('should handle switching between controlled and uncontrolled', async () => {
       // Test that we can properly render a controlled radio
       const { container, rerender } = render(Radio, {
-        props: { value: 'option1', checked: true },
+        props: { value: 'option1', modelValue: true },
         slots: { default: 'Option' }
       })
 
       let radio = container.querySelector('input[type="radio"]') as HTMLInputElement
       expect(radio.checked).toBe(true)
 
-      await rerender({ value: 'option1', checked: false })
+      await rerender({ value: 'option1', modelValue: false })
       radio = container.querySelector('input[type="radio"]') as HTMLInputElement
       expect(radio.checked).toBe(false)
     })

@@ -244,7 +244,12 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `npx -y pnpm@11.9.0 api:validate`
 - `npx -y pnpm@11.9.0 types:check`
 - `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
 - `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 test:a11y`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
+- `git diff --check`
 - `npx -y pnpm@11.9.0 docs:api:check`
 - `npx -y pnpm@11.9.0 build`
 - `npx -y pnpm@11.9.0 size`
@@ -500,3 +505,40 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `git diff --check`
 
 **状态更新要求**：完成后已写回状态、日期、删除的 overlay/feedback API 摘要、Skill/examples 更新范围和关键验证命令；阶段 8 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R14。
+
+### R14 Form primitives
+
+**状态**：已完成（2026-06-29）。
+
+**目标**：清理表单基础输入组件，统一 controlled/default/onChange 模型，删除重复 value alias，并将重复测试收缩为分组内参数化覆盖。
+
+**允许修改**：Form primitive 相关 core types、React/Vue 组件、目标 tests、受控状态 helper 使用、Skill form props/examples、example 使用、迁移说明、变更记录、API baseline。
+
+**不得修改**：Form composite selectors、Feedback/Navigation/Data/Charts/Advanced/Composite 组件行为、测试分组基础设施。
+
+**依赖/阻塞**：依赖 R11；R13 已完成，overlay/focus 变更未与本批次交叉。
+
+**执行摘要**：已删除等同 `ComponentSize` 的 primitive 尺寸类型别名 `InputSize`、`TextareaSize`、`CheckboxSize`、`RadioSize`、`SwitchSize`、`SliderSize`、`SegmentedSize`、`StepperSize`、`ColorSwatchSize`；对应 core props、style utilities、theme runtime、React/Vue components 和 generated references 改用 `ComponentSize`。Vue Checkbox、Radio、Switch 从 `checked` / `defaultChecked` / `update:checked` 收敛为 `modelValue` / `defaultValue` / `update:modelValue` / `change`；Vue RadioGroup 从 `value` / `update:value` 收敛为 `modelValue` / `update:modelValue`。React Checkbox、Radio、Switch 保持 `checked` / `defaultChecked` / `onChange`，Checkbox/Radio 的 `value` 保留为 group option identity。Vue Checkbox/Radio/Switch/RadioGroup examples 与 tests 已迁移，`scripts/validate-api.mjs` 已新增 R14 回流护栏。
+
+**实际删除 / 合并**：
+
+- `InputSize`、`TextareaSize`、`CheckboxSize`、`RadioSize`、`SwitchSize`、`SliderSize`、`SegmentedSize`、`StepperSize`、`ColorSwatchSize` → `ComponentSize`。
+- Vue Checkbox / Radio / Switch 单体 `defaultChecked`、`update:checked`、`v-model:checked` → `defaultValue`、`update:modelValue`、默认 `v-model`。
+- Vue RadioGroup `value` / `update:value` / `v-model:value` → `modelValue` / `update:modelValue` / 默认 `v-model`。
+
+**实际保留**：
+
+- `CheckboxValue` / `CheckboxGroupValue` 保留，Checkbox `value` 仍用于 group option value。
+- Radio `value` 保留为 option identity；React Radio / Checkbox / Switch 的 `checked` / `defaultChecked` 保留为 React 惯用 API。
+- `InputStatus` 和 `InputType` 保留，因为它们不是尺寸 shared union 的重复别名。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 test:group:form -- --filter primitives`
+- `npx -y pnpm@11.9.0 vitest run tests/react/useControlledState.spec.tsx tests/vue/useFormController.spec.ts`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 docs:api`
+
+**状态更新要求**：完成后已写回状态、日期、删除的 primitive API 摘要、参数化测试收缩范围、Skill/examples 更新范围和关键验证命令；阶段 9 已同步为 `进行中`，当前可执行任务推进到 R15。

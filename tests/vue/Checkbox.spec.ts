@@ -123,7 +123,7 @@ describe('Checkbox', () => {
     it('cannot be toggled when disabled', async () => {
       const user = userEvent.setup()
       const { container } = render(Checkbox, {
-        props: { disabled: true, defaultChecked: true },
+        props: { disabled: true, defaultValue: true },
         slots: { default: 'Disabled' }
       })
 
@@ -204,10 +204,10 @@ describe('Checkbox', () => {
     })
   })
 
-  describe('Uncontrolled Mode (defaultChecked)', () => {
-    it('supports uncontrolled defaultChecked', () => {
+  describe('Uncontrolled Mode (defaultValue)', () => {
+    it('supports uncontrolled defaultValue', () => {
       const { container } = render(Checkbox, {
-        props: { defaultChecked: true },
+        props: { defaultValue: true },
         slots: { default: 'Default checked' }
       })
 
@@ -218,7 +218,7 @@ describe('Checkbox', () => {
 
     it('can be toggled in uncontrolled mode', async () => {
       const { container } = render(Checkbox, {
-        props: { defaultChecked: false },
+        props: { defaultValue: false },
         slots: { default: 'Uncontrolled' }
       })
 
@@ -819,7 +819,7 @@ describe('Checkbox', () => {
 
     it('handles switching between controlled and uncontrolled', async () => {
       const { container, rerender } = render(Checkbox, {
-        props: { defaultChecked: true },
+        props: { defaultValue: true },
         slots: { default: 'Checkbox' }
       })
 

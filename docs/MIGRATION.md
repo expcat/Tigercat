@@ -57,6 +57,47 @@ core 不再导出等同 shared contracts 的轻量组件类型别名：
 
 `ButtonSize`、`AvatarSize`、`TextSize` 和 `SkeletonShape` 仍保留，因为它们不是 `ComponentSize` / `BaseLayoutProps` 的简单重复。
 
+### Form primitives 受控模型与尺寸类型收敛
+
+core 不再导出等同 `ComponentSize` 的表单基础组件尺寸别名：
+
+- `InputSize` / `TextareaSize`
+- `CheckboxSize` / `RadioSize` / `SwitchSize`
+- `SliderSize` / `SegmentedSize` / `StepperSize` / `ColorSwatchSize`
+
+请直接使用 `ComponentSize`：
+
+```diff
+- import type { InputSize, SwitchSize } from '@expcat/tigercat-core'
++ import type { ComponentSize } from '@expcat/tigercat-core'
+
+- const size: InputSize = 'md'
++ const size: ComponentSize = 'md'
+```
+
+Vue Checkbox、Radio、Switch 的单体受控状态改为默认 `v-model`；`defaultChecked` / `update:checked` / `v-model:checked` 不再保留：
+
+```diff
+- <Switch v-model:checked="enabled" />
+- <Radio value="agree" v-model:checked="agreed" />
+- <Checkbox :default-checked="true" />
++ <Switch v-model="enabled" />
++ <Radio value="agree" v-model="agreed" />
++ <Checkbox :default-value="true" />
+```
+
+Vue RadioGroup 也从 `v-model:value` 收敛为默认 `v-model`。`Radio` 的 `value` 仍表示选项值，不表示单体 checked 状态：
+
+```diff
+- <RadioGroup v-model:value="choice">
++ <RadioGroup v-model="choice">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+```
+
+React Checkbox、Radio、Switch 保持 React 惯用的 `checked` / `defaultChecked` / `onChange`。
+
 ### Carousel 索引改为受控模型
 
 `Carousel` 移除 `initialSlide`，改为与其他非表单受控量一致的 `currentIndex` 模型。

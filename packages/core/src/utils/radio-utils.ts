@@ -1,5 +1,5 @@
 import { classNames } from './class-names'
-import { type RadioSize } from '../types/radio'
+import { type ComponentSize } from '../types/base'
 import { type RadioColorScheme } from '../theme-runtime/colors'
 
 export const radioRootBaseClasses = 'inline-flex items-center'
@@ -19,7 +19,7 @@ export const radioDisabledCursorClasses = 'cursor-not-allowed'
 export const radioHoverBorderClasses = 'hover:border-[var(--tiger-primary,#2563eb)]'
 
 export const radioSizeClasses: Record<
-  RadioSize,
+  ComponentSize,
   {
     radio: string
     dot: string
@@ -44,7 +44,7 @@ export const radioSizeClasses: Record<
 } as const
 
 export interface GetRadioVisualClassesOptions {
-  size: RadioSize
+  size: ComponentSize
   checked: boolean
   disabled: boolean
   colors: RadioColorScheme
@@ -68,7 +68,7 @@ export const getRadioVisualClasses = ({
   )
 
 export interface GetRadioDotClassesOptions {
-  size: RadioSize
+  size: ComponentSize
   checked: boolean
   colors: RadioColorScheme
 }
@@ -82,7 +82,7 @@ export const getRadioDotClasses = ({ size, checked, colors }: GetRadioDotClasses
   )
 
 export interface GetRadioLabelClassesOptions {
-  size: RadioSize
+  size: ComponentSize
   disabled: boolean
   colors: RadioColorScheme
 }

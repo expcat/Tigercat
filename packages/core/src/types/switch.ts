@@ -2,10 +2,7 @@
  * Switch component types and interfaces
  */
 
-/**
- * Switch size types
- */
-export type SwitchSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Base switch props interface
@@ -27,5 +24,5 @@ export interface SwitchProps {
    * Switch size
    * @default 'md'
    */
-  size?: SwitchSize
+  size?: ComponentSize
 }

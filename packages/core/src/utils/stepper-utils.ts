@@ -1,5 +1,5 @@
 import { classNames } from './class-names'
-import type { StepperSize } from '../types/stepper'
+import type { ComponentSize } from '../types/base'
 
 /* ------------------------------------------------------------------ */
 /*  Style constants                                                    */
@@ -7,19 +7,19 @@ import type { StepperSize } from '../types/stepper'
 
 export const stepperBaseClasses = 'inline-flex items-center'
 
-const sizePad: Record<StepperSize, string> = {
+const sizePad: Record<ComponentSize, string> = {
   sm: 'h-7 text-xs',
   md: 'h-9 text-sm',
   lg: 'h-11 text-base'
 }
 
-const btnSize: Record<StepperSize, string> = {
+const btnSize: Record<ComponentSize, string> = {
   sm: 'w-7 h-7',
   md: 'w-9 h-9',
   lg: 'w-11 h-11'
 }
 
-export function getStepperInputClasses(size: StepperSize): string {
+export function getStepperInputClasses(size: ComponentSize): string {
   return classNames(
     'text-center border-y outline-none font-mono',
     sizePad[size],
@@ -31,7 +31,7 @@ export function getStepperInputClasses(size: StepperSize): string {
 }
 
 export function getStepperButtonClasses(
-  size: StepperSize,
+  size: ComponentSize,
   disabled: boolean,
   position: 'left' | 'right'
 ): string {

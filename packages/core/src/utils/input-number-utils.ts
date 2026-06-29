@@ -2,7 +2,8 @@
  * InputNumber component styling utilities
  */
 
-import type { InputSize, InputStatus } from '../types/input'
+import type { ComponentSize } from '../types/base'
+import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
 
 /**
@@ -48,27 +49,27 @@ export function getInputNumberFocusRingColor(status: InputStatus = 'default'): s
 /**
  * Size-based wrapper height classes
  */
-const WRAPPER_SIZE_CLASSES: Record<InputSize, string> = {
+const WRAPPER_SIZE_CLASSES: Record<ComponentSize, string> = {
   sm: 'h-8',
   md: 'h-10',
   lg: 'h-12'
 }
 
-export function getInputNumberSizeClasses(size: InputSize = 'md'): string {
+export function getInputNumberSizeClasses(size: ComponentSize = 'md'): string {
   return WRAPPER_SIZE_CLASSES[size]
 }
 
 /**
  * Inner input element classes (no border, no outline)
  */
-const INPUT_SIZE_CLASSES: Record<InputSize, string> = {
+const INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
   sm: 'text-sm px-2',
   md: 'text-base px-3',
   lg: 'text-lg px-4'
 }
 
 export function getInputNumberInputClasses(
-  size: InputSize = 'md',
+  size: ComponentSize = 'md',
   hasControlsRight?: boolean,
   hasControlsBoth?: boolean
 ): string {

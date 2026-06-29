@@ -3,9 +3,9 @@ import type {
   ColorSwatchGroup,
   ColorSwatchNormalizedGroup,
   ColorSwatchNormalizedOption,
-  ColorSwatchOptionInput,
-  ColorSwatchSize
+  ColorSwatchOptionInput
 } from '../types/color-swatch'
+import type { ComponentSize } from '../types/base'
 
 export const defaultColorSwatchGroups: ColorSwatchGroup[] = [
   {
@@ -30,14 +30,14 @@ export const colorSwatchGroupLabelClasses =
 
 export const colorSwatchGridClasses = 'grid gap-2'
 
-const colorSwatchSizeClasses: Record<ColorSwatchSize, string> = {
+const colorSwatchSizeClasses: Record<ComponentSize, string> = {
   sm: 'h-6 w-6',
   md: 'h-8 w-8',
   lg: 'h-10 w-10'
 }
 
 export function getColorSwatchButtonClasses(
-  size: ColorSwatchSize,
+  size: ComponentSize,
   selected: boolean,
   disabled: boolean
 ): string {
@@ -53,7 +53,7 @@ export function getColorSwatchButtonClasses(
   )
 }
 
-export function getColorSwatchCheckClasses(size: ColorSwatchSize): string {
+export function getColorSwatchCheckClasses(size: ComponentSize): string {
   return classNames(
     'pointer-events-none rounded-full bg-white/90 text-[var(--tiger-primary,#2563eb)] shadow-sm',
     size === 'sm' ? 'h-3 w-3 text-[8px]' : size === 'md' ? 'h-4 w-4 text-[10px]' : 'h-5 w-5 text-xs'

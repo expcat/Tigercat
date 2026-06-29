@@ -1,7 +1,10 @@
 import React, { useCallback, useMemo, useRef } from 'react'
 import { useControlledState } from '../hooks/useControlledState'
 import { getRadioGroupClasses } from '@expcat/tigercat-core'
-import { type RadioGroupProps as CoreRadioGroupProps, type RadioSize } from '@expcat/tigercat-core'
+import {
+  type ComponentSize,
+  type RadioGroupProps as CoreRadioGroupProps
+} from '@expcat/tigercat-core'
 
 export interface RadioGroupProps
   extends
@@ -27,7 +30,7 @@ interface RadioGroupContextValue {
   value?: string | number
   name: string
   disabled: boolean
-  size: RadioSize
+  size: ComponentSize
   onChange?: (value: string | number) => void
 }
 
