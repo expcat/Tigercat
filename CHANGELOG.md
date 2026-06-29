@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移、size / publish artifact gate 收口、Basic / Layout 轻量组件 API 清理、Feedback / overlay open、portal、focus 与 close lifecycle 收敛，以及 Form primitives 和 composite selectors 的受控模型、搜索、空态和尺寸类型收敛。
+本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移、size / publish artifact gate 收口、Basic / Layout 轻量组件 API 清理、Feedback / overlay open、portal、focus 与 close lifecycle 收敛，Form primitives 和 composite selectors 的受控模型、搜索、空态和尺寸类型收敛，以及 Navigation 组件受控回调与子组件 subpath 产物收敛。
 
 ### Breaking Changes
 
@@ -29,6 +29,8 @@
 - **Form composite search API**：Select、TreeSelect、Cascader、AutoComplete、Transfer 的搜索受控量统一为 `searchValue` / `defaultSearchValue`；React 回调统一为 `onSearchChange`，Vue 统一为 `update:searchValue` / `search-change`。TreeSelect、Cascader、Transfer 的旧 `showSearch` 改为 `searchable`。
 - **Form composite empty text API**：Select、TreeSelect、Cascader、AutoComplete、Transfer 的组件级空态文案统一为 `emptyText`；旧 `notFoundText`、`noOptionsText`、`noDataText` 不再保留，未显式传入时继续从 locale / custom text 解析默认空态。
 - **Upload queue helper split**：上传队列、分片与断点续传 helper 拆入 `upload-queue-utils`，普通选择、拖拽与样式 helper 继续保留在 `upload-utils`；根入口仍导出对应工具，但直接导入时应选择更小的 helper 模块。
+- **React Navigation controlled callbacks**：Tabs / ScrollSpy 的受控 active key 回调从 `onChange` 改为 `onActiveKeyChange`；Menu 搜索回调从 `onSearch` 改为 `onSearchChange`；Menu / Tree 的受控 key 变化分别使用 `onSelectedKeysChange`、`onOpenKeysChange`、`onExpandedKeysChange`、`onCheckedKeysChange`。`onSelect` / `onOpenChange` / `onExpand` / `onCheck` 仍作为携带交互上下文的事件回调。
+- **Navigation 子组件 subpath 产物收敛**：`AnchorLink`、`BreadcrumbItem`、`DropdownItem`、`DropdownMenu`、`MenuItem`、`MenuItemGroup`、`StepsItem`、`SubMenu`、`TabPane` 的 PascalCase package subpath 保持可用，但发布 exports 现在指向父组件产物（如 `./MenuItem` → `Menu`），源码层不再保留独立子组件 shim 文件。
 
 ### Infrastructure
 
@@ -42,6 +44,7 @@
 - `api:validate` 会阻止 Feedback 示例与 React hook source 重新引入 overlay `visible` / `defaultVisible` / `onVisibleChange` 用法，Feedback 当前示例统一使用 `open` 命名。
 - `api:validate` 会阻止 Vue Checkbox / Radio / Switch 及对应 Vue examples 回退到旧 `checked` / `defaultChecked` / `update:checked` / `v-model:checked` 受控模型。
 - `api:validate` 会阻止 Form composite selectors 回退到已删除的尺寸别名、DatePicker / TimePicker 旧模型别名、旧搜索 props/events 或重复空态命名。
+- `api:validate` 会阻止 Navigation 子组件 subpath 重新指向独立 shim、React Tabs / ScrollSpy 回退到 `onChange`，或 React Menu 回退到旧 `onSearch`。
 - `tokens:build` / `tokens:check` 的生成面收敛为 canonical token 输出，移除 legacy CSS 变量和 token alias API 生成。
 - `release:check` 和 `publish:check` 增加 ESM-only 断言，发布 smoke 使用临时安装目录中的 bare ESM import 验证包入口，并阻止 `.cjs` 文件混入 tarball 或安装产物。
 - `release:check` 会阻止 React / Vue 恢复宽泛 sideEffects 声明；`publish:check` 会对安装后的 React / Vue root Button named import 和 Button 子路径 import 做 bundler smoke，确保普通 Button bundle 不拉入 Message / notification 命令式挂载代码。

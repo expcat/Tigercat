@@ -108,7 +108,7 @@ describe('ScrollSpy', () => {
     })
 
     it('does not change the rendered active item in controlled mode after click', () => {
-      renderScrollSpy({ activeKey: 'intro', onChange: vi.fn() })
+      renderScrollSpy({ activeKey: 'intro', onActiveKeyChange: vi.fn() })
       fireEvent.click(screen.getByText('Usage'))
       expect(screen.getByText('Intro')).toHaveAttribute('aria-current', 'location')
     })
@@ -125,11 +125,11 @@ describe('ScrollSpy', () => {
       )
     })
 
-    it('calls onChange with payload when active item changes by click', () => {
-      const onChange = vi.fn()
-      renderScrollSpy({ onChange })
+    it('calls onActiveKeyChange with payload when active item changes by click', () => {
+      const onActiveKeyChange = vi.fn()
+      renderScrollSpy({ onActiveKeyChange })
       fireEvent.click(screen.getByText('Usage'))
-      expect(onChange).toHaveBeenCalledWith(
+      expect(onActiveKeyChange).toHaveBeenCalledWith(
         'usage',
         expect.objectContaining({ href: '#usage' }),
         expect.objectContaining({ source: 'click' })
@@ -154,19 +154,19 @@ describe('ScrollSpy', () => {
     })
 
     it('does not emit events for disabled items', () => {
-      const onChange = vi.fn()
+      const onActiveKeyChange = vi.fn()
       const onClick = vi.fn()
-      renderScrollSpy({ onChange, onClick })
+      renderScrollSpy({ onActiveKeyChange, onClick })
       fireEvent.click(screen.getByText('Disabled'))
-      expect(onChange).not.toHaveBeenCalled()
+      expect(onActiveKeyChange).not.toHaveBeenCalled()
       expect(onClick).not.toHaveBeenCalled()
     })
 
     it('does not emit change when clicking the active item', () => {
-      const onChange = vi.fn()
-      renderScrollSpy({ onChange })
+      const onActiveKeyChange = vi.fn()
+      renderScrollSpy({ onActiveKeyChange })
       fireEvent.click(screen.getByText('Intro'))
-      expect(onChange).not.toHaveBeenCalled()
+      expect(onActiveKeyChange).not.toHaveBeenCalled()
     })
   })
 

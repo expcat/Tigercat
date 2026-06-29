@@ -7,7 +7,7 @@ verified-date: 2026-06-29
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
-本文归档 v2.0.0 Roadmap 已完成 R01-R15 的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
+本文归档 v2.0.0 Roadmap 已完成 R01-R16 的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
 
 ## 已完成任务详情
 
@@ -591,3 +591,51 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `git diff --check`
 
 **状态更新要求**：完成后已写回状态、日期、删除的 composite form API 摘要、heavy helper 拆分范围、Skill/examples 更新范围和关键验证命令；阶段 9 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R16。
+
+### R16 Navigation components
+
+**状态**：已完成（2026-06-29）。
+
+**目标**：清理 Navigation 组件，合并子项组件导出策略，删除深路径兼容 re-export，统一 active/open/selected/expanded 命名。
+
+**允许修改**：Navigation 相关 core types、React/Vue 组件、子组件 re-export 文件、公开组件事实源、package exports、目标 tests、Skill navigation props/examples、example 使用、迁移说明、变更记录、API baseline。
+
+**不得修改**：Form/Data/Charts/Advanced/Composite 组件行为、非 Navigation 子路径、size budget 结构。
+
+**依赖/阻塞**：依赖 R11；子组件 subpath 保留为 PascalCase package path，但 exports 目标改为父组件产物。
+
+**执行摘要**：React Tabs / ScrollSpy 的 active key 受控回调从 `onChange` 收敛为 `onActiveKeyChange`；React Menu 搜索从 `onSearch` 收敛为 `onSearchChange`；React Menu / Tree 受控 keys 使用 `onSelectedKeysChange`、`onOpenKeysChange`、`onExpandedKeysChange`、`onCheckedKeysChange`，原 `onSelect` / `onOpenChange` / `onExpand` / `onCheck` 保留为交互上下文事件。`AnchorChangeInfo.currentActiveLink` 已改为 `activeLink`。React/Vue Navigation 子组件独立 shim 文件已删除，`AnchorLink`、`BreadcrumbItem`、`DropdownItem`、`DropdownMenu`、`MenuItem`、`MenuItemGroup`、`StepsItem`、`SubMenu`、`TabPane` 的 package subpath 继续存在并指向父组件产物；examples、tests、API baseline、Skill references、迁移说明、变更记录和 `api:validate` R16 回流护栏已同步更新。
+
+**实际删除 / 合并**：
+
+- React Tabs / ScrollSpy `onChange` → `onActiveKeyChange`。
+- React Menu `onSearch` → `onSearchChange`。
+- React Menu controlled selection/open 更新 → `onSelectedKeysChange` / `onOpenKeysChange`。
+- React Tree controlled expand/select/check 更新 → `onExpandedKeysChange` / `onSelectedKeysChange` / `onCheckedKeysChange`。
+- `AnchorChangeInfo.currentActiveLink` → `AnchorChangeInfo.activeLink`。
+- Navigation 子组件源码 shim 文件删除；子组件 package exports 目标合并到父组件产物。
+
+**实际保留**：
+
+- 子组件 PascalCase package subpath 保留，例如 `@expcat/tigercat-react/MenuItem`、`@expcat/tigercat-vue/TabPane`。
+- Vue Navigation 继续使用 `update:*` / `v-model:*` 与 kebab-case 事件。
+- React `onSelect`、`onOpenChange`、`onExpand`、`onCheck` 保留为携带交互上下文的事件，不承担受控量唯一出口。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 test:group:navigation`
+- `npx -y pnpm@11.9.0 vitest run tests/core/examples-lazy-routes.spec.ts`
+- `npx -y pnpm@11.9.0 test:a11y`
+- `npx -y pnpm@11.9.0 exports:sync`
+- `npx -y pnpm@11.9.0 exports:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)"`
+- `git diff --check`
+
+**状态更新要求**：完成后已写回状态、日期、删除的 Navigation API/subpath 摘要、Skill/examples 更新范围和关键验证命令；阶段 10 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R17。

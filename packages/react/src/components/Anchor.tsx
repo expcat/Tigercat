@@ -144,7 +144,7 @@ export interface AnchorProps extends Omit<CoreAnchorProps, 'style'> {
   /**
    * Change event handler when active anchor changes
    */
-  onChange?: (currentActiveLink: string) => void
+  onChange?: (activeLink: string) => void
   /**
    * Children (AnchorLink components)
    */

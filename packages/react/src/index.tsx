@@ -182,11 +182,8 @@ export type { PaginationProps } from './components/Pagination'
 export { Dropdown } from './components/Dropdown'
 export type { DropdownProps, DropdownContextValue } from './components/Dropdown'
 
-export { DropdownMenu } from './components/Dropdown'
-export type { DropdownMenuProps } from './components/Dropdown'
-
-export { DropdownItem } from './components/DropdownItem'
-export type { DropdownItemProps } from './components/DropdownItem'
+export { DropdownMenu, DropdownItem } from './components/Dropdown'
+export type { DropdownMenuProps, DropdownItemProps } from './components/Dropdown'
 export { Spotlight } from './components/Spotlight'
 export type { SpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'

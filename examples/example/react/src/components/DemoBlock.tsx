@@ -77,7 +77,7 @@ const DemoBlock: React.FC<DemoBlockProps> = ({
       </div>
 
       <div className="rounded-lg">
-        <Tabs activeKey={activeKey} onChange={(key) => setActiveKey(String(key))} type="card">
+        <Tabs activeKey={activeKey} onActiveKeyChange={(key) => setActiveKey(String(key))} type="card">
           <TabPane tabKey="preview" label="示例" />
           <TabPane tabKey="code" label="代码" />
           {script ? <TabPane tabKey="script" label="脚本" /> : null}

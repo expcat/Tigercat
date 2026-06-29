@@ -319,7 +319,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     </div>
   ) : resolvedGroups.length > 0 ? (
     <div className="-mx-4 -mb-4">
-      <Tabs type="line" size="small" activeKey={currentGroupKey} onChange={handleGroupChange}>
+      <Tabs type="line" size="small" activeKey={currentGroupKey} onActiveKeyChange={handleGroupChange}>
         {groupTabData.map((tab) => (
           <TabPane key={String(tab.key)} tabKey={tab.key} label={tab.label}>
             <div className="max-h-[380px] overflow-y-auto">{renderList(tab.filteredItems)}</div>

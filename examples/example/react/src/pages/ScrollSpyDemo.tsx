@@ -30,7 +30,7 @@ const horizontalSnippet = `<ScrollSpy
   direction="horizontal"
   items={items}
   activeKey={activeKey}
-  onChange={setActiveKey}
+  onActiveKeyChange={setActiveKey}
 />
 `
 
@@ -106,7 +106,7 @@ export default function ScrollSpyDemo() {
                 className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">事件</h3>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  onChange 会返回 activeKey、item 和 source，业务侧可以记录用户点击或滚动来源。
+                  onActiveKeyChange 会返回 activeKey、item 和 source，业务侧可以记录用户点击或滚动来源。
                 </p>
               </section>
             </div>
@@ -122,7 +122,7 @@ export default function ScrollSpyDemo() {
                 items={pageItems}
                 activeKey={activeKey}
                 getContainer={getMainContainer}
-                onChange={(key) => setActiveKey(key)}
+                onActiveKeyChange={(key) => setActiveKey(key)}
               />
               <p className="text-sm text-gray-500">当前 activeKey：{String(activeKey)}</p>
             </div>
@@ -158,7 +158,7 @@ export default function ScrollSpyDemo() {
               <ScrollSpy
                 items={containerItems}
                 getContainer={() => containerRef.current || window}
-                onChange={(_key, item, payload) =>
+                onActiveKeyChange={(_key, item, payload) =>
                   setLastEvent(`${item.label} / ${payload.source}`)
                 }
               />

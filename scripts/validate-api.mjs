@@ -614,6 +614,110 @@ for (const relativePath of R15_FORM_COMPOSITE_FILES) {
   })
 }
 
+// ----- R16 Navigation controlled API and subpath target guard -----
+
+const R16_NAVIGATION_CHILD_TARGETS = new Map([
+  ['AnchorLink', 'Anchor'],
+  ['BreadcrumbItem', 'Breadcrumb'],
+  ['DropdownItem', 'Dropdown'],
+  ['DropdownMenu', 'Dropdown'],
+  ['MenuItem', 'Menu'],
+  ['MenuItemGroup', 'Menu'],
+  ['StepsItem', 'Steps'],
+  ['SubMenu', 'Menu'],
+  ['TabPane', 'Tabs']
+])
+
+for (const [childComponent, parentComponent] of R16_NAVIGATION_CHILD_TARGETS) {
+  for (const framework of ['react', 'vue']) {
+    const extension = framework === 'react' ? '.tsx' : '.ts'
+    const childFile = join(ROOT, 'packages', framework, 'src', 'components', `${childComponent}${extension}`)
+
+    if (existsSync(childFile)) {
+      addIssue(
+        childFile,
+        0,
+        'navigation-api',
+        `R16 Navigation child component "${childComponent}" must be exported from ${parentComponent}, not an independent component file`
+      )
+    }
+
+    const packageJsonPath = join(ROOT, 'packages', framework, 'package.json')
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'))
+    const subpath = `./${childComponent}`
+    const expectedTarget = `./dist/components/${parentComponent}.mjs`
+    const actualExport = packageJson.exports?.[subpath]
+
+    if (actualExport?.import !== expectedTarget || actualExport?.default !== expectedTarget) {
+      addIssue(
+        packageJsonPath,
+        0,
+        'navigation-api',
+        `R16 Navigation subpath ${framework}/${childComponent} must target ${parentComponent}`
+      )
+    }
+  }
+}
+
+const R16_REACT_FORBIDDEN_CALLBACKS = [
+  {
+    relativePath: 'packages/react/src/components/Tabs.tsx',
+    label: 'Tabs onChange',
+    regex: /^  onChange\??\s*:/
+  },
+  {
+    relativePath: 'packages/react/src/components/ScrollSpy.tsx',
+    label: 'ScrollSpy onChange',
+    regex: /^  onChange\??\s*:/
+  },
+  {
+    relativePath: 'packages/react/src/components/Menu/types.ts',
+    label: 'Menu onSearch',
+    regex: /^  onSearch\??\s*:/
+  }
+]
+
+for (const { relativePath, label, regex } of R16_REACT_FORBIDDEN_CALLBACKS) {
+  const filepath = join(ROOT, relativePath)
+  if (!existsSync(filepath)) continue
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    if (regex.test(line)) {
+      addIssue(
+        filepath,
+        index + 1,
+        'navigation-api',
+        `R16 Navigation React API must use onActiveKeyChange/onSearchChange or controlled keys callbacks instead of ${label}`
+      )
+    }
+  })
+}
+
+const R16_REQUIRED_REACT_CALLBACKS = [
+  ['packages/react/src/components/Tabs.tsx', 'onActiveKeyChange'],
+  ['packages/react/src/components/ScrollSpy.tsx', 'onActiveKeyChange'],
+  ['packages/react/src/components/Menu/types.ts', 'onSelectedKeysChange'],
+  ['packages/react/src/components/Menu/types.ts', 'onOpenKeysChange'],
+  ['packages/react/src/components/Menu/types.ts', 'onSearchChange'],
+  ['packages/react/src/components/Tree/types.ts', 'onExpandedKeysChange'],
+  ['packages/react/src/components/Tree/types.ts', 'onSelectedKeysChange'],
+  ['packages/react/src/components/Tree/types.ts', 'onCheckedKeysChange']
+]
+
+for (const [relativePath, callbackName] of R16_REQUIRED_REACT_CALLBACKS) {
+  const filepath = join(ROOT, relativePath)
+  if (!existsSync(filepath)) continue
+  const content = readFileSync(filepath, 'utf-8')
+  if (!new RegExp(`\\b${callbackName}\\b`).test(content)) {
+    addIssue(
+      filepath,
+      0,
+      'navigation-api',
+      `R16 Navigation React API is missing ${callbackName}`
+    )
+  }
+}
+
 // ----- LLM docs coverage check -----
 
 function collectMarkdownContent(dir, options = {}) {
@@ -896,6 +1000,7 @@ if (jsonMode) {
       'overlay-visible-api': '弹出层 visible 兼容 API 禁止回流',
       'form-primitive-model': '表单基础组件受控模型禁止旧 API 回流',
       'form-composite-api': '表单复合组件 R15 旧 API 禁止回流',
+      'navigation-api': '导航组件 R16 旧 API 与子路径目标禁止回流',
       'controlled-parity': '受控量双端对称',
       'public-deprecated': '公开 API 禁止 @deprecated',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',

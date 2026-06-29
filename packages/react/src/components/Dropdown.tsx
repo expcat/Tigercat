@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useContext,
   useState,
   useEffect,
   useRef,
@@ -13,6 +14,7 @@ import {
   getDropdownTriggerClasses,
   getDropdownChevronClasses,
   getDropdownMenuClasses,
+  getDropdownItemClasses,
   getTransformOrigin,
   injectDropdownStyles,
   FLOATING_OVERLAY_Z_INDEX,
@@ -24,6 +26,7 @@ import {
   restoreFocus,
   type DropdownProps as CoreDropdownProps,
   type DropdownMenuProps as CoreDropdownMenuProps,
+  type DropdownItemProps as CoreDropdownItemProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useClickOutside, useEscapeKey, useFloating } from '../utils/overlay'
@@ -64,6 +67,65 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
     <div className={menuClasses} style={style} role={role ?? 'menu'} {...divProps}>
       {children}
     </div>
+  )
+}
+
+// --- DropdownItem (child component) ---
+
+export interface DropdownItemProps
+  extends
+    Omit<CoreDropdownItemProps, 'className'>,
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'disabled'> {
+  className?: string
+
+  /**
+   * Click event handler
+   */
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
+
+  /**
+   * Item content
+   */
+  children?: React.ReactNode
+}
+
+export const DropdownItem: React.FC<DropdownItemProps> = ({
+  disabled = false,
+  divided = false,
+  className,
+  onClick,
+  children,
+  ...buttonProps
+}) => {
+  const context = useContext(DropdownContext)
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (disabled) {
+      event.preventDefault()
+      return
+    }
+
+    onClick?.(event)
+
+    if (context?.closeOnClick) {
+      context.handleItemClick()
+    }
+  }
+
+  const itemClasses = classNames(getDropdownItemClasses(disabled, divided), className)
+
+  return (
+    <button
+      type="button"
+      className={itemClasses}
+      role="menuitem"
+      tabIndex={-1}
+      aria-disabled={disabled}
+      disabled={disabled}
+      onClick={handleClick}
+      {...buttonProps}>
+      {children}
+    </button>
   )
 }
 

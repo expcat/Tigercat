@@ -27,7 +27,11 @@ export interface ScrollSpyProps
   getContainer?: () => HTMLElement | Window
   className?: string
   style?: React.CSSProperties
-  onChange?: (activeKey: ScrollSpyKey, item: ScrollSpyItem, payload: ScrollSpyChangePayload) => void
+  onActiveKeyChange?: (
+    activeKey: ScrollSpyKey,
+    item: ScrollSpyItem,
+    payload: ScrollSpyChangePayload
+  ) => void
   onClick?: (item: ScrollSpyItem, event: React.MouseEvent<HTMLAnchorElement>) => void
 }
 
@@ -44,7 +48,7 @@ export const ScrollSpy: React.FC<ScrollSpyProps> = ({
   getContainer = getWindowContainer,
   className,
   style,
-  onChange,
+  onActiveKeyChange,
   onClick,
   ...rest
 }) => {
@@ -59,8 +63,8 @@ export const ScrollSpy: React.FC<ScrollSpyProps> = ({
 
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer
-  const onChangeRef = useRef(onChange)
-  onChangeRef.current = onChange
+  const onActiveKeyChangeRef = useRef(onActiveKeyChange)
+  onActiveKeyChangeRef.current = onActiveKeyChange
 
   const emitActive = useCallback(
     (item: ScrollSpyItem, source: ScrollSpyChangePayload['source']) => {
@@ -69,7 +73,7 @@ export const ScrollSpy: React.FC<ScrollSpyProps> = ({
 
       const payload = createScrollSpyPayload(item, source)
       if (!isControlled) setInnerActiveKey(item.key)
-      onChangeRef.current?.(item.key, item, payload)
+      onActiveKeyChangeRef.current?.(item.key, item, payload)
     },
     [activeKeyString, isControlled]
   )

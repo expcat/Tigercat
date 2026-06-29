@@ -353,7 +353,7 @@ describe('custom text (no i18n) — Vue', () => {
     it('Select empty options outside a ConfigProvider keeps default English text', async () => {
       const { container, getByText } = render(Select, { props: { options: [] } })
       await fireEvent.click(container.querySelector('button')!)
-      expect(getByText('No options available')).toBeInTheDocument()
+      expect(getByText('No options found')).toBeInTheDocument()
     })
 
     it('InfiniteScroll end state outside a ConfigProvider keeps default English text', () => {

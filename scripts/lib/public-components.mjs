@@ -232,9 +232,18 @@ const DOC_SECTION_ALIASES = new Map([
 ])
 
 const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
+  ['AnchorLink', 'Anchor'],
+  ['BreadcrumbItem', 'Breadcrumb'],
+  ['DropdownItem', 'Dropdown'],
+  ['DropdownMenu', 'Dropdown'],
   ['FloatButtonGroup', 'FloatButton'],
   ['InputGroupAddon', 'InputGroup'],
-  ['PrintPageBreak', 'PrintLayout']
+  ['MenuItem', 'Menu'],
+  ['MenuItemGroup', 'Menu'],
+  ['PrintPageBreak', 'PrintLayout'],
+  ['StepsItem', 'Steps'],
+  ['SubMenu', 'Menu'],
+  ['TabPane', 'Tabs']
 ])
 
 export const REQUIRED_CORE_PACKAGE_EXPORTS = [

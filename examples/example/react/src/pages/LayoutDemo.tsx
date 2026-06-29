@@ -75,8 +75,8 @@ const [openKeys, setOpenKeys] = useState<(string | number)[]>(['system'])
         popupPortal
         selectedKeys={selectedKeys}
         openKeys={collapsed ? [] : openKeys}
-        onSelect={(key) => setSelectedKeys([key])}
-        onOpenChange={(_key, info) => setOpenKeys(info.openKeys)}>
+        onSelectedKeysChange={setSelectedKeys}
+        onOpenKeysChange={setOpenKeys}>
         <MenuItem itemKey="dashboard" icon={<span className="text-xs">⌂</span>}>Dashboard</MenuItem>
         <SubMenu itemKey="system" title="System" icon={<span className="text-xs">⚙</span>}>
           <MenuItem itemKey="users">Users</MenuItem>
@@ -239,8 +239,8 @@ const LayoutDemo: React.FC = () => {
                     popupPortal
                     selectedKeys={shellSelectedKeys}
                     openKeys={shellCollapsed ? [] : shellOpenKeys}
-                    onSelect={(key) => setShellSelectedKeys([key])}
-                    onOpenChange={(_key, info) => setShellOpenKeys(info.openKeys)}>
+                    onSelectedKeysChange={setShellSelectedKeys}
+                    onOpenKeysChange={setShellOpenKeys}>
                     <MenuItem
                       itemKey="dashboard"
                       icon={

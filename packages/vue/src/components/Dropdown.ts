@@ -3,6 +3,7 @@ import {
   computed,
   ref,
   provide,
+  inject,
   reactive,
   PropType,
   h,
@@ -21,6 +22,7 @@ import {
   getDropdownTriggerClasses,
   getDropdownChevronClasses,
   getDropdownMenuClasses,
+  getDropdownItemClasses,
   getTransformOrigin,
   injectDropdownStyles,
   FLOATING_OVERLAY_Z_INDEX,
@@ -36,7 +38,8 @@ import {
 
 import type {
   DropdownProps as CoreDropdownProps,
-  DropdownMenuProps as CoreDropdownMenuProps
+  DropdownMenuProps as CoreDropdownMenuProps,
+  DropdownItemProps as CoreDropdownItemProps
 } from '@expcat/tigercat-core'
 import {
   useVueFloating,
@@ -100,8 +103,6 @@ export const DropdownMenu = defineComponent({
   }
 })
 
-// --- Dropdown (parent component) ---
-
 // Counter for unique menu IDs
 let dropdownIdCounter = 0
 const createDropdownMenuId = () => `tiger-dropdown-menu-${++dropdownIdCounter}`
@@ -114,6 +115,104 @@ export interface DropdownContext {
   closeOnClick: boolean
   handleItemClick: () => void
 }
+
+// --- DropdownItem (child component) ---
+
+export type VueDropdownItemProps = CoreDropdownItemProps
+
+export const DropdownItem = defineComponent({
+  name: 'TigerDropdownItem',
+  inheritAttrs: false,
+  props: {
+    /**
+     * Whether the item is disabled
+     * @default false
+     */
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Whether the item is divided from previous item
+     * @default false
+     */
+    divided: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Additional CSS classes
+     */
+    className: {
+      type: String,
+      default: undefined
+    },
+    style: {
+      type: Object as PropType<Record<string, unknown>>,
+      default: undefined
+    }
+  },
+  emits: ['click'],
+  setup(props, { slots, emit, attrs }) {
+    const attrsRecord = attrs as Record<string, unknown>
+    const attrsClass = (attrsRecord as { class?: unknown }).class
+    const attrsStyle = (attrsRecord as { style?: unknown }).style
+
+    const context = inject<DropdownContext | null>(DropdownContextKey, null)
+
+    const handleClick = (event: MouseEvent) => {
+      if (props.disabled) {
+        event.preventDefault()
+        return
+      }
+
+      emit('click', event)
+
+      if (context?.closeOnClick) {
+        context.handleItemClick()
+      }
+    }
+
+    const itemClasses = computed(() => {
+      return classNames(
+        getDropdownItemClasses(props.disabled, props.divided),
+        props.className,
+        coerceClassValue(attrsClass)
+      )
+    })
+
+    const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
+
+    return () => {
+      const {
+        class: _class,
+        style: _style,
+        ...restAttrs
+      } = attrsRecord as {
+        class?: unknown
+        style?: unknown
+      } & Record<string, unknown>
+
+      return h(
+        'button',
+        {
+          ...restAttrs,
+          type: 'button',
+          class: itemClasses.value,
+          role: 'menuitem',
+          tabindex: -1,
+          'aria-disabled': props.disabled,
+          disabled: props.disabled,
+          onClick: handleClick,
+          style: mergedStyle.value
+        },
+        slots.default?.()
+      )
+    }
+  }
+})
+
+// --- Dropdown (parent component) ---
 
 export interface VueDropdownProps extends CoreDropdownProps {
   /**

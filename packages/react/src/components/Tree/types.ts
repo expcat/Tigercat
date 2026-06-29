@@ -118,6 +118,18 @@ export interface TreeProps {
    */
   ariaLabel?: string
   /**
+   * Controlled expanded keys change handler
+   */
+  onExpandedKeysChange?: (expandedKeys: (string | number)[]) => void
+  /**
+   * Controlled selected keys change handler
+   */
+  onSelectedKeysChange?: (selectedKeys: (string | number)[]) => void
+  /**
+   * Controlled checked keys change handler
+   */
+  onCheckedKeysChange?: (checkedKeys: (string | number)[]) => void
+  /**
    * Expand event handler
    */
   onExpand?: (

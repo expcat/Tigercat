@@ -154,14 +154,14 @@ function App() {
 
 ## 父子组合组件文件约定
 
-父子组合组件优先把父组件、子组件和共享 context 放在同一个父组件文件中导出，例如 `Steps` 与 `StepsItem`、`Breadcrumb` 与 `BreadcrumbItem`、`Tabs` 与 `TabPane`、`Anchor` 与 `AnchorLink`。旧的子组件文件只保留 re-export，用于兼容已有深路径导入。
+父子组合组件把父组件、子组件和共享 context 放在同一个父组件文件中导出，例如 `Steps` 与 `StepsItem`、`Breadcrumb` 与 `BreadcrumbItem`、`Tabs` 与 `TabPane`、`Anchor` 与 `AnchorLink`。包级 PascalCase 子组件 subpath 保持可用，但由 package exports 映射到父组件产物，不再保留源码层子组件 re-export 文件。
 
 | 层级       | 约定                                                                  |
 | ---------- | --------------------------------------------------------------------- |
 | 实现文件   | `components/Steps.ts(x)` 同时导出 `Steps`、`StepsItem`、相关 props    |
-| 兼容文件   | `components/StepsItem.ts(x)` 仅 re-export，不再放实现                 |
+| 子路径入口 | `@expcat/tigercat-*/StepsItem` 由 package exports 指向父组件产物      |
 | 包入口     | `packages/*/src/index.*` 从父组件文件导出父子组件与类型               |
-| 内部使用方 | 同包内部引用优先从父组件文件导入，避免 `Steps` ↔ `StepsItem` 循环依赖 |
+| 内部使用方 | 同包内部引用必须从父组件文件导入，避免 `Steps` ↔ `StepsItem` 循环依赖 |
 
 ---
 

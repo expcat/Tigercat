@@ -50,9 +50,9 @@
       "default": "./dist/components/Anchor.mjs"
     },
     "./AnchorLink": {
-      "types": "./dist/components/AnchorLink.d.mts",
-      "import": "./dist/components/AnchorLink.mjs",
-      "default": "./dist/components/AnchorLink.mjs"
+      "types": "./dist/components/Anchor.d.mts",
+      "import": "./dist/components/Anchor.mjs",
+      "default": "./dist/components/Anchor.mjs"
     },
     "./AreaChart": {
       "types": "./dist/components/AreaChart.d.mts",
@@ -95,9 +95,9 @@
       "default": "./dist/components/Breadcrumb.mjs"
     },
     "./BreadcrumbItem": {
-      "types": "./dist/components/BreadcrumbItem.d.mts",
-      "import": "./dist/components/BreadcrumbItem.mjs",
-      "default": "./dist/components/BreadcrumbItem.mjs"
+      "types": "./dist/components/Breadcrumb.d.mts",
+      "import": "./dist/components/Breadcrumb.mjs",
+      "default": "./dist/components/Breadcrumb.mjs"
     },
     "./Button": {
       "types": "./dist/components/Button.d.mts",
@@ -280,14 +280,14 @@
       "default": "./dist/components/Dropdown.mjs"
     },
     "./DropdownItem": {
-      "types": "./dist/components/DropdownItem.d.mts",
-      "import": "./dist/components/DropdownItem.mjs",
-      "default": "./dist/components/DropdownItem.mjs"
+      "types": "./dist/components/Dropdown.d.mts",
+      "import": "./dist/components/Dropdown.mjs",
+      "default": "./dist/components/Dropdown.mjs"
     },
     "./DropdownMenu": {
-      "types": "./dist/components/DropdownMenu.d.mts",
-      "import": "./dist/components/DropdownMenu.mjs",
-      "default": "./dist/components/DropdownMenu.mjs"
+      "types": "./dist/components/Dropdown.d.mts",
+      "import": "./dist/components/Dropdown.mjs",
+      "default": "./dist/components/Dropdown.mjs"
     },
     "./Empty": {
       "types": "./dist/components/Empty.d.mts",
@@ -460,14 +460,14 @@
       "default": "./dist/components/Menu.mjs"
     },
     "./MenuItem": {
-      "types": "./dist/components/MenuItem.d.mts",
-      "import": "./dist/components/MenuItem.mjs",
-      "default": "./dist/components/MenuItem.mjs"
+      "types": "./dist/components/Menu.d.mts",
+      "import": "./dist/components/Menu.mjs",
+      "default": "./dist/components/Menu.mjs"
     },
     "./MenuItemGroup": {
-      "types": "./dist/components/MenuItemGroup.d.mts",
-      "import": "./dist/components/MenuItemGroup.mjs",
-      "default": "./dist/components/MenuItemGroup.mjs"
+      "types": "./dist/components/Menu.d.mts",
+      "import": "./dist/components/Menu.mjs",
+      "default": "./dist/components/Menu.mjs"
     },
     "./Message": {
       "types": "./dist/components/Message.d.mts",
@@ -655,14 +655,14 @@
       "default": "./dist/components/Steps.mjs"
     },
     "./StepsItem": {
-      "types": "./dist/components/StepsItem.d.mts",
-      "import": "./dist/components/StepsItem.mjs",
-      "default": "./dist/components/StepsItem.mjs"
+      "types": "./dist/components/Steps.d.mts",
+      "import": "./dist/components/Steps.mjs",
+      "default": "./dist/components/Steps.mjs"
     },
     "./SubMenu": {
-      "types": "./dist/components/SubMenu.d.mts",
-      "import": "./dist/components/SubMenu.mjs",
-      "default": "./dist/components/SubMenu.mjs"
+      "types": "./dist/components/Menu.d.mts",
+      "import": "./dist/components/Menu.mjs",
+      "default": "./dist/components/Menu.mjs"
     },
     "./SunburstChart": {
       "types": "./dist/components/SunburstChart.d.mts",
@@ -680,9 +680,9 @@
       "default": "./dist/components/Table.mjs"
     },
     "./TabPane": {
-      "types": "./dist/components/TabPane.d.mts",
-      "import": "./dist/components/TabPane.mjs",
-      "default": "./dist/components/TabPane.mjs"
+      "types": "./dist/components/Tabs.d.mts",
+      "import": "./dist/components/Tabs.mjs",
+      "default": "./dist/components/Tabs.mjs"
     },
     "./Tabs": {
       "types": "./dist/components/Tabs.d.mts",

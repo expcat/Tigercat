@@ -100,7 +100,7 @@ export interface AnchorClickInfo {
  */
 export interface AnchorChangeInfo {
   /**
-   * The current active anchor href
+   * The active anchor href
    */
-  currentActiveLink: string
+  activeLink: string
 }

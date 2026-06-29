@@ -5208,7 +5208,7 @@
       {
         "component": "AnchorLink",
         "subpath": "./AnchorLink",
-        "target": "AnchorLink"
+        "target": "Anchor"
       },
       {
         "component": "AreaChart",
@@ -5253,7 +5253,7 @@
       {
         "component": "BreadcrumbItem",
         "subpath": "./BreadcrumbItem",
-        "target": "BreadcrumbItem"
+        "target": "Breadcrumb"
       },
       {
         "component": "Button",
@@ -5438,12 +5438,12 @@
       {
         "component": "DropdownItem",
         "subpath": "./DropdownItem",
-        "target": "DropdownItem"
+        "target": "Dropdown"
       },
       {
         "component": "DropdownMenu",
         "subpath": "./DropdownMenu",
-        "target": "DropdownMenu"
+        "target": "Dropdown"
       },
       {
         "component": "Empty",
@@ -5618,12 +5618,12 @@
       {
         "component": "MenuItem",
         "subpath": "./MenuItem",
-        "target": "MenuItem"
+        "target": "Menu"
       },
       {
         "component": "MenuItemGroup",
         "subpath": "./MenuItemGroup",
-        "target": "MenuItemGroup"
+        "target": "Menu"
       },
       {
         "component": "Message",
@@ -5813,12 +5813,12 @@
       {
         "component": "StepsItem",
         "subpath": "./StepsItem",
-        "target": "StepsItem"
+        "target": "Steps"
       },
       {
         "component": "SubMenu",
         "subpath": "./SubMenu",
-        "target": "SubMenu"
+        "target": "Menu"
       },
       {
         "component": "SunburstChart",
@@ -5838,7 +5838,7 @@
       {
         "component": "TabPane",
         "subpath": "./TabPane",
-        "target": "TabPane"
+        "target": "Tabs"
       },
       {
         "component": "Tabs",
@@ -6440,7 +6440,7 @@
       {
         "component": "AnchorLink",
         "subpath": "./AnchorLink",
-        "target": "AnchorLink"
+        "target": "Anchor"
       },
       {
         "component": "AreaChart",
@@ -6485,7 +6485,7 @@
       {
         "component": "BreadcrumbItem",
         "subpath": "./BreadcrumbItem",
-        "target": "BreadcrumbItem"
+        "target": "Breadcrumb"
       },
       {
         "component": "Button",
@@ -6670,12 +6670,12 @@
       {
         "component": "DropdownItem",
         "subpath": "./DropdownItem",
-        "target": "DropdownItem"
+        "target": "Dropdown"
       },
       {
         "component": "DropdownMenu",
         "subpath": "./DropdownMenu",
-        "target": "DropdownMenu"
+        "target": "Dropdown"
       },
       {
         "component": "Empty",
@@ -6850,12 +6850,12 @@
       {
         "component": "MenuItem",
         "subpath": "./MenuItem",
-        "target": "MenuItem"
+        "target": "Menu"
       },
       {
         "component": "MenuItemGroup",
         "subpath": "./MenuItemGroup",
-        "target": "MenuItemGroup"
+        "target": "Menu"
       },
       {
         "component": "Message",
@@ -7045,12 +7045,12 @@
       {
         "component": "StepsItem",
         "subpath": "./StepsItem",
-        "target": "StepsItem"
+        "target": "Steps"
       },
       {
         "component": "SubMenu",
         "subpath": "./SubMenu",
-        "target": "SubMenu"
+        "target": "Menu"
       },
       {
         "component": "SunburstChart",
@@ -7070,7 +7070,7 @@
       {
         "component": "TabPane",
         "subpath": "./TabPane",
-        "target": "TabPane"
+        "target": "Tabs"
       },
       {
         "component": "Tabs",

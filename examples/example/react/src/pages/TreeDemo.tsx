@@ -135,7 +135,7 @@ export default function TreeDemo() {
   checkable
   defaultExpandAll
   checkedKeys={checkedKeys}
-  onCheck={(keys) => setCheckedKeys(keys)}
+  onCheckedKeysChange={setCheckedKeys}
 />`
 
   const checkStrictlySnippet = `<p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeysStrictly.join(', ')}</p>
@@ -145,7 +145,7 @@ export default function TreeDemo() {
   checkStrictly
   defaultExpandAll
   checkedKeys={checkedKeysStrictly}
-  onCheck={(keys) => setCheckedKeysStrictly(keys)}
+  onCheckedKeysChange={setCheckedKeysStrictly}
 />`
 
   const disabledSnippet = `<Tree treeData={disabledTreeData} checkable defaultExpandAll />`
@@ -169,14 +169,14 @@ export default function TreeDemo() {
   selectionMode="multiple"
   defaultExpandAll
   selectedKeys={multiSelectedKeys}
-  onSelect={(keys) => setMultiSelectedKeys(keys)}
+  onSelectedKeysChange={setMultiSelectedKeys}
 />`
 
   const controlledExpandSnippet = `<p className="text-sm text-gray-600 mb-4">展开节点: {controlledExpandedKeys.join(', ')}</p>
 <Tree
   treeData={basicTreeData}
   expandedKeys={controlledExpandedKeys}
-  onExpand={(keys) => setControlledExpandedKeys(keys)}
+  onExpandedKeysChange={setControlledExpandedKeys}
 />`
 
   const emptySnippet = `<Tree treeData={[]} emptyText="暂无数据" />`
@@ -224,7 +224,7 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
           checkable
           defaultExpandAll
           checkedKeys={checkedKeys}
-          onCheck={(keys) => setCheckedKeys(keys)}
+          onCheckedKeysChange={setCheckedKeys}
         />
       </DemoBlock>
 
@@ -239,7 +239,7 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
           checkStrictly
           defaultExpandAll
           checkedKeys={checkedKeysStrictly}
-          onCheck={(keys) => setCheckedKeysStrictly(keys)}
+          onCheckedKeysChange={setCheckedKeysStrictly}
         />
       </DemoBlock>
 
@@ -276,7 +276,7 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
           selectionMode="multiple"
           defaultExpandAll
           selectedKeys={multiSelectedKeys}
-          onSelect={(keys) => setMultiSelectedKeys(keys)}
+          onSelectedKeysChange={setMultiSelectedKeys}
         />
       </DemoBlock>
 
@@ -288,7 +288,7 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
         <Tree
           treeData={basicTreeData}
           expandedKeys={controlledExpandedKeys}
-          onExpand={(keys) => setControlledExpandedKeys(keys)}
+          onExpandedKeysChange={setControlledExpandedKeys}
         />
       </DemoBlock>
 

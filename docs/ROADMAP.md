@@ -4,23 +4,23 @@
 type: active-roadmap
 scope: v2.0.0 breaking component API simplification and grouped validation plan
 verified-date: 2026-06-29
-source: current repository state after R15 Form composite selectors completion
+source: current repository state after R16 Navigation components completion
 -->
 
 本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；R01-R11 已完成任务的详细执行记录归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，需要历史证据时从归档、git 历史、变更日志或对应提交中查找。
 
 ## 当前状态
 
-截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R15 基础设施、API 审计与前四个组件批次清理：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy token/icon 资源清理、按组件组验证通道、core/shared contracts 删除合并清单、Basic/Layout 轻量组件 API 清理、Feedback/overlay open/portal/focus/close lifecycle 收敛、Form primitives 受控模型与尺寸别名清理，以及 Form composite selectors 搜索、空态、模型别名与 heavy helper 拆分已经落地。v2.0.0 尚未完成发布前剩余组件级破坏性升级；R16-R20 是 v2.0.0 发布前剩余任务。
+截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R16 基础设施、API 审计与前五个组件批次清理：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy token/icon 资源清理、按组件组验证通道、core/shared contracts 删除合并清单、Basic/Layout 轻量组件 API 清理、Feedback/overlay open/portal/focus/close lifecycle 收敛、Form primitives 受控模型与尺寸别名清理、Form composite selectors 搜索/空态/模型别名与 heavy helper 拆分，以及 Navigation 受控回调和子组件 subpath 产物收敛已经落地。v2.0.0 尚未完成发布前剩余组件级破坏性升级；R17-R20 是 v2.0.0 发布前剩余任务。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）、阶段 6（R11 Core API and shared contracts audit）、阶段 7（R12 Basic + Layout lightweight components）、阶段 8（R13 Feedback and overlay components）和阶段 9（R14-R15 Form primitives 与 composite selectors）已完成于 2026-06-29。
-- 当前阶段：阶段 10（R16 Navigation components），状态为 `未开始`。
-- 当前可执行任务：R16 Navigation components。
-- 后续阶段：R16-R20 必须按阶段依赖执行；v2.0.0 只有 R20 完成并通过发布门禁后才算路线图完成。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）、阶段 6（R11 Core API and shared contracts audit）、阶段 7（R12 Basic + Layout lightweight components）、阶段 8（R13 Feedback and overlay components）、阶段 9（R14-R15 Form primitives 与 composite selectors）和阶段 10（R16 Navigation components）已完成于 2026-06-29。
+- 当前阶段：阶段 11（R17 Data and table stack），状态为 `未开始`。
+- 当前可执行任务：R17 Data and table stack。
+- 后续阶段：R17-R20 必须按阶段依赖执行；v2.0.0 只有 R20 完成并通过发布门禁后才算路线图完成。
 
 ## 执行原则
 
@@ -59,7 +59,7 @@ source: current repository state after R15 Form composite selectors completion
 | 7    | 已完成（2026-06-29） | R12     | 清理 Basic + Layout 轻量展示组件                                      |
 | 8    | 已完成（2026-06-29） | R13     | 清理 Feedback 与 overlay 组件                                         |
 | 9    | 已完成（2026-06-29） | R14-R15 | 分两批清理 Form primitives 与 composite selectors                     |
-| 10   | 未开始               | R16     | 清理 Navigation 组件                                                  |
+| 10   | 已完成（2026-06-29） | R16     | 清理 Navigation 组件                                                  |
 | 11   | 未开始               | R17     | 清理 Data 与 table stack                                              |
 | 12   | 未开始               | R18     | 清理 Charts 与 visualization stack                                    |
 | 13   | 未开始               | R19     | 清理 Advanced editors 与 media-heavy components                       |
@@ -276,7 +276,7 @@ R01-R11 已完成，详细执行摘要、实际验证命令和状态回写记录
 
 ### R16 Navigation components
 
-**状态**：未开始。
+**状态**：已完成（2026-06-29）。
 
 **目标**：清理 Navigation 组件，合并子项组件导出策略，删除深路径兼容 re-export，统一 active/open/selected/expanded 命名。
 
@@ -284,22 +284,44 @@ R01-R11 已完成，详细执行摘要、实际验证命令和状态回写记录
 
 **不得修改**：Form/Data/Charts/Advanced/Composite 组件行为、非 Navigation 子路径、size budget 结构。
 
-**依赖/阻塞**：依赖 R11；若删除 component subpath 或子组件 re-export，必须同步更新 exports 事实源和迁移说明。
+**依赖/阻塞**：依赖 R11；子组件 PascalCase package subpath 保留，源码层子组件 re-export 文件已删除并通过 exports 事实源映射到父组件产物。
 
 **组件范围**：Tabs、Menu、Dropdown、Tree、Pagination、Anchor、Breadcrumb、Steps、Spotlight、FloatButton、BackTop、ScrollSpy、Affix。
 
 **完成验证**：
 
-- `corepack pnpm test:group:navigation`
-- `corepack pnpm vitest run tests/core/examples-lazy-routes.spec.ts`
-- `corepack pnpm test:a11y`
-- `corepack pnpm exports:check`
-- `corepack pnpm api:validate`
-- `corepack pnpm types:check`
-- `corepack pnpm docs:api:check`
+- `npx -y pnpm@11.9.0 test:group:navigation`
+- `npx -y pnpm@11.9.0 vitest run tests/core/examples-lazy-routes.spec.ts`
+- `npx -y pnpm@11.9.0 test:a11y`
+- `npx -y pnpm@11.9.0 exports:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
 - `git diff --check`
 
-**状态更新要求**：完成后写回状态、日期、删除的 Navigation API/subpath 摘要、Skill/examples 更新范围和关键验证命令；同步更新阶段 10 状态。
+**执行摘要**：React Tabs / ScrollSpy active key 回调已从 `onChange` 收敛为 `onActiveKeyChange`；React Menu 搜索回调已从 `onSearch` 收敛为 `onSearchChange`；React Menu / Tree 受控 key 更新改用 `onSelectedKeysChange`、`onOpenKeysChange`、`onExpandedKeysChange`、`onCheckedKeysChange`。`AnchorChangeInfo.currentActiveLink` 已改为 `activeLink`。Navigation 子组件源码 shim 文件已删除，`AnchorLink`、`BreadcrumbItem`、`DropdownItem`、`DropdownMenu`、`MenuItem`、`MenuItemGroup`、`StepsItem`、`SubMenu`、`TabPane` 的 package subpath 保持可用并指向父组件产物。examples、tests、API baseline、Skill references、迁移说明、变更记录和 `api:validate` R16 回流护栏已同步更新。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 test:group:navigation`
+- `npx -y pnpm@11.9.0 vitest run tests/core/examples-lazy-routes.spec.ts`
+- `npx -y pnpm@11.9.0 test:a11y`
+- `npx -y pnpm@11.9.0 exports:sync`
+- `npx -y pnpm@11.9.0 exports:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)"`
+- `git diff --check`
+
+**状态更新要求**：已写回状态、日期、删除的 Navigation API/subpath 摘要、Skill/examples 更新范围和关键验证命令；阶段 10 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R17。
 
 ### R17 Data and table stack
 

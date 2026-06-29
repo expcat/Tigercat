@@ -45,6 +45,9 @@ export function useTreeState(props: TreeProps): TreeContext {
     blockNode = false,
     emptyText,
     ariaLabel = 'Tree',
+    onExpandedKeysChange,
+    onSelectedKeysChange,
+    onCheckedKeysChange,
     onExpand,
     onSelect,
     onCheck,
@@ -241,7 +244,9 @@ export function useTreeState(props: TreeProps): TreeContext {
         setInternalExpandedKeys(newExpandedKeys)
       }
 
-      onExpand?.(Array.from(newExpandedKeys), {
+      const expandedKeysArray = Array.from(newExpandedKeys)
+      onExpandedKeysChange?.(expandedKeysArray)
+      onExpand?.(expandedKeysArray, {
         expanded: !isExpanded,
         node
       })
@@ -252,6 +257,7 @@ export function useTreeState(props: TreeProps): TreeContext {
       loadData,
       loadingNodes,
       controlledExpandedKeys,
+      onExpandedKeysChange,
       onExpand,
       onNodeExpand,
       onNodeCollapse
@@ -281,6 +287,7 @@ export function useTreeState(props: TreeProps): TreeContext {
       }
 
       const selectedKeysArray = Array.from(newSelectedKeys)
+      onSelectedKeysChange?.(selectedKeysArray)
       onSelect?.(selectedKeysArray, {
         selected: newSelectedKeys.has(nodeKey),
         selectedNodes: selectedKeysArray
@@ -296,6 +303,7 @@ export function useTreeState(props: TreeProps): TreeContext {
       effectiveSelectable,
       effectiveMultiple,
       controlledSelectedKeys,
+      onSelectedKeysChange,
       onSelect
     ]
   )
@@ -320,6 +328,7 @@ export function useTreeState(props: TreeProps): TreeContext {
 
       const returnKeys = getCheckedKeysByStrategy(newCheckedState, treeData, checkStrategy)
 
+      onCheckedKeysChange?.(returnKeys)
       onCheck?.(returnKeys, {
         checked,
         checkedNodes: newCheckedState.checked
@@ -329,7 +338,15 @@ export function useTreeState(props: TreeProps): TreeContext {
         checkedNodesPositions: newCheckedState
       })
     },
-    [treeData, computedCheckedState, checkStrictly, checkStrategy, controlledCheckedKeys, onCheck]
+    [
+      treeData,
+      computedCheckedState,
+      checkStrictly,
+      checkStrategy,
+      controlledCheckedKeys,
+      onCheckedKeysChange,
+      onCheck
+    ]
   )
 
   const handleKeyDown = useCallback(

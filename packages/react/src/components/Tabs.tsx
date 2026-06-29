@@ -363,9 +363,9 @@ export interface TabsProps {
    */
   className?: string
   /**
-   * Tab change event handler
+   * Controlled active tab key change handler
    */
-  onChange?: (key: string | number) => void
+  onActiveKeyChange?: (key: string | number) => void
   /**
    * Tab click event handler
    */
@@ -397,7 +397,7 @@ export const Tabs: React.FC<TabsProps> = ({
   swipeable = true,
   className,
   style,
-  onChange,
+  onActiveKeyChange,
   onTabClick,
   onEdit,
   children
@@ -498,9 +498,9 @@ export const Tabs: React.FC<TabsProps> = ({
         setInternalActiveKey(key)
       }
 
-      onChange?.(key)
+      onActiveKeyChange?.(key)
     },
-    [activeKey, controlledActiveKey, onChange, onTabClick]
+    [activeKey, controlledActiveKey, onActiveKeyChange, onTabClick]
   )
 
   // Handle tab close

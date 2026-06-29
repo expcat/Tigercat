@@ -25,9 +25,11 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     popupPortal = false,
     className,
     style,
+    onSelectedKeysChange,
+    onOpenKeysChange,
     onSelect,
     onOpenChange,
-    onSearch,
+    onSearchChange,
     searchable = false,
     searchValue: controlledSearchValue,
     defaultSearchValue = '',
@@ -62,10 +64,10 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
         setInternalSelectedKeys(newSelectedKeys)
       }
 
-      // Call event handler
+      onSelectedKeysChange?.(newSelectedKeys)
       onSelect?.(key, { selectedKeys: newSelectedKeys })
     },
-    [controlledSelectedKeys, selectedKeys, onSelect]
+    [controlledSelectedKeys, selectedKeys, onSelectedKeysChange, onSelect]
   )
 
   // Handle submenu open/close
@@ -79,10 +81,10 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
         setInternalOpenKeys(newOpenKeys)
       }
 
-      // Call event handler
+      onOpenKeysChange?.(newOpenKeys)
       onOpenChange?.(key, { openKeys: newOpenKeys })
     },
-    [openKeys, multiple, controlledOpenKeys, onOpenChange]
+    [openKeys, multiple, controlledOpenKeys, onOpenKeysChange, onOpenChange]
   )
 
   const handleSearchInput = useCallback(
@@ -93,9 +95,9 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
         setInternalSearchValue(value)
       }
 
-      onSearch?.(value)
+      onSearchChange?.(value)
     },
-    [controlledSearchValue, onSearch]
+    [controlledSearchValue, onSearchChange]
   )
 
   // Menu classes

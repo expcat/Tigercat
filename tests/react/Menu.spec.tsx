@@ -121,7 +121,7 @@ describe('Menu', () => {
       const user = userEvent.setup()
       const onSearch = vi.fn()
 
-      render(<Menu items={dataItems} searchable onSearch={onSearch} />)
+      render(<Menu items={dataItems} searchable onSearchChange={onSearch} />)
 
       await user.type(screen.getByRole('searchbox', { name: 'Search menu' }), 'settings')
 
@@ -324,9 +324,10 @@ describe('Menu', () => {
     it('controlled mode does not change internal state', async () => {
       const user = userEvent.setup()
       const onSelect = vi.fn()
+      const onSelectedKeysChange = vi.fn()
 
       render(
-        <Menu selectedKeys={['1']} onSelect={onSelect}>
+        <Menu selectedKeys={['1']} onSelectedKeysChange={onSelectedKeysChange} onSelect={onSelect}>
           <MenuItem itemKey="1">Item 1</MenuItem>
           <MenuItem itemKey="2">Item 2</MenuItem>
         </Menu>
@@ -338,6 +339,7 @@ describe('Menu', () => {
       await user.click(item2)
 
       // Should call onSelect
+      expect(onSelectedKeysChange).toHaveBeenCalledWith(['2'])
       expect(onSelect).toHaveBeenCalledWith('2', { selectedKeys: ['2'] })
 
       // But the selection shouldn't change visually because it's controlled
@@ -591,9 +593,14 @@ describe('Menu', () => {
     it('closes other submenus when multiple is false', async () => {
       const user = userEvent.setup()
       const onOpenChange = vi.fn()
+      const onOpenKeysChange = vi.fn()
 
       render(
-        <Menu multiple={false} defaultOpenKeys={['sub1']} onOpenChange={onOpenChange}>
+        <Menu
+          multiple={false}
+          defaultOpenKeys={['sub1']}
+          onOpenKeysChange={onOpenKeysChange}
+          onOpenChange={onOpenChange}>
           <SubMenu itemKey="sub1" title="Submenu 1">
             <MenuItem itemKey="1">Item 1</MenuItem>
           </SubMenu>
@@ -609,6 +616,7 @@ describe('Menu', () => {
       const trigger2 = screen.getByRole('menuitem', { name: 'Submenu 2' })
       await user.click(trigger2)
 
+      expect(onOpenKeysChange).toHaveBeenCalledWith(['sub2'])
       expect(onOpenChange).toHaveBeenCalledWith('sub2', { openKeys: ['sub2'] })
       expect(trigger1).toHaveAttribute('aria-expanded', 'false')
       expect(trigger2).toHaveAttribute('aria-expanded', 'true')

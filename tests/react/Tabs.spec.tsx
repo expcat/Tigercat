@@ -245,9 +245,9 @@ describe('Tabs', () => {
 
   describe('Events', () => {
     it('switches to the next enabled tab on left swipe', () => {
-      const onChange = vi.fn()
+      const onActiveKeyChange = vi.fn()
       render(
-        <Tabs defaultActiveKey="1" onChange={onChange}>
+        <Tabs defaultActiveKey="1" onActiveKeyChange={onActiveKeyChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>
@@ -267,15 +267,15 @@ describe('Tabs', () => {
         timeStamp: 100
       })
 
-      expect(onChange).toHaveBeenCalledWith('3')
+      expect(onActiveKeyChange).toHaveBeenCalledWith('3')
       expect(screen.getByRole('tab', { name: 'Tab 3' })).toHaveAttribute('aria-selected', 'true')
     })
 
-    it('should call onChange when tab is clicked', async () => {
-      const onChange = vi.fn()
+    it('should call onActiveKeyChange when tab is clicked', async () => {
+      const onActiveKeyChange = vi.fn()
 
       render(
-        <Tabs onChange={onChange}>
+        <Tabs onActiveKeyChange={onActiveKeyChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>
@@ -288,7 +288,7 @@ describe('Tabs', () => {
       const tab2 = screen.getByText('Tab 2')
       await fireEvent.click(tab2)
 
-      expect(onChange).toHaveBeenCalledWith('2')
+      expect(onActiveKeyChange).toHaveBeenCalledWith('2')
     })
 
     it('should call onTabClick when tab is clicked', async () => {
@@ -352,10 +352,10 @@ describe('Tabs', () => {
     })
 
     it('does not activate the tab when its close control is clicked (C06-3)', async () => {
-      const onChange = vi.fn()
+      const onActiveKeyChange = vi.fn()
 
       render(
-        <Tabs type="editable-card" closable defaultActiveKey="1" onChange={onChange}>
+        <Tabs type="editable-card" closable defaultActiveKey="1" onActiveKeyChange={onActiveKeyChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>
@@ -369,7 +369,7 @@ describe('Tabs', () => {
       await fireEvent.click(closeTab2)
 
       // Closing tab 2 must not select it.
-      expect(onChange).not.toHaveBeenCalledWith('2')
+      expect(onActiveKeyChange).not.toHaveBeenCalledWith('2')
     })
 
     it('should call onEdit when Delete/Backspace is pressed on a closable tab', async () => {
@@ -397,9 +397,9 @@ describe('Tabs', () => {
     })
 
     it('navigates vertical tabs and parses numeric tab keys from keyboard focus', async () => {
-      const onChange = vi.fn()
+      const onActiveKeyChange = vi.fn()
       render(
-        <Tabs tabPosition="left" defaultActiveKey="1" onChange={onChange}>
+        <Tabs tabPosition="left" defaultActiveKey="1" onActiveKeyChange={onActiveKeyChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>
@@ -418,7 +418,7 @@ describe('Tabs', () => {
 
       await fireEvent.keyDown(tab1, { key: 'ArrowDown' })
       expect(document.activeElement).toBe(tab2)
-      expect(onChange).toHaveBeenCalledWith(2)
+      expect(onActiveKeyChange).toHaveBeenCalledWith(2)
 
       await fireEvent.keyDown(tab2, { key: 'ArrowUp' })
       expect(document.activeElement).toBe(tab1)
@@ -430,11 +430,11 @@ describe('Tabs', () => {
       expect(document.activeElement).toBe(tab1)
     })
 
-    it('should not call onChange when clicking the active tab', async () => {
-      const onChange = vi.fn()
+    it('should not call onActiveKeyChange when clicking the active tab', async () => {
+      const onActiveKeyChange = vi.fn()
 
       render(
-        <Tabs defaultActiveKey="1" onChange={onChange}>
+        <Tabs defaultActiveKey="1" onActiveKeyChange={onActiveKeyChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>
@@ -446,7 +446,7 @@ describe('Tabs', () => {
 
       await fireEvent.click(screen.getByRole('tab', { name: 'Tab 1' }))
 
-      expect(onChange).not.toHaveBeenCalled()
+      expect(onActiveKeyChange).not.toHaveBeenCalled()
     })
 
     it('should support keyboard navigation and skip disabled tabs', async () => {
@@ -551,10 +551,10 @@ describe('Tabs', () => {
     })
 
     it('should not switch to disabled tab when clicked', async () => {
-      const onChange = vi.fn()
+      const onActiveKeyChange = vi.fn()
 
       render(
-        <Tabs activeKey="1" onChange={onChange}>
+        <Tabs activeKey="1" onActiveKeyChange={onActiveKeyChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>
@@ -567,7 +567,7 @@ describe('Tabs', () => {
       const tab2 = screen.getByRole('tab', { name: 'Tab 2' })
       await fireEvent.click(tab2)
 
-      expect(onChange).not.toHaveBeenCalled()
+      expect(onActiveKeyChange).not.toHaveBeenCalled()
     })
 
     it('should show close button when closable is true', () => {
@@ -735,9 +735,9 @@ describe('Tabs', () => {
 
   describe('Controlled vs Uncontrolled', () => {
     it('should work in controlled mode', async () => {
-      const onChange = vi.fn()
+      const onActiveKeyChange = vi.fn()
       const { rerender } = render(
-        <Tabs activeKey="1" onChange={onChange}>
+        <Tabs activeKey="1" onActiveKeyChange={onActiveKeyChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>
@@ -750,14 +750,14 @@ describe('Tabs', () => {
       const tab2 = screen.getByText('Tab 2')
       await fireEvent.click(tab2)
 
-      expect(onChange).toHaveBeenCalledWith('2')
+      expect(onActiveKeyChange).toHaveBeenCalledWith('2')
 
       // Content should still show tab 1 since we didn't update activeKey
       expect(screen.getByText('Content 1')).toBeVisible()
 
       // Update activeKey prop
       rerender(
-        <Tabs activeKey="2" onChange={onChange}>
+        <Tabs activeKey="2" onActiveKeyChange={onActiveKeyChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>

@@ -88,7 +88,17 @@ source: current repository state after R15 Form composite selectors completion
 - 唯一替代 API：所有被删 size aliases 改用 `ComponentSize`；Date/Time picker 模型类型改用 `DatePickerModelValue` / `TimePickerModelValue`；搜索改用 `searchValue` / `defaultSearchValue`、React `onSearchChange`、Vue `v-model:search-value` / `search-change`；空态文本改用 `emptyText`；搜索开关改用 `searchable`。
 - 证据：core composite type files、core select/tree/cascader/auto-complete/transfer/upload utilities、React/Vue composite components、React/Vue examples、composite group tests、`api-reports/public-api-baseline.json`、generated Skill references 和 `scripts/validate-api.mjs` R15 guard 已同步更新。
 - 实际验证：`npx -y pnpm@11.9.0 test:group:form -- --filter composite`、`npx -y pnpm@11.9.0 vitest run tests/core/custom-text-labels.spec.ts tests/core/datepicker-i18n.spec.ts`、`npx -y pnpm@11.9.0 test:group:form`、`npx -y pnpm@11.9.0 example:ssr:check`、`npx -y pnpm@11.9.0 size`、`npx -y pnpm@11.9.0 publish:check`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline && npx -y pnpm@11.9.0 api:baseline:check`、`npx -y pnpm@11.9.0 docs:api && npx -y pnpm@11.9.0 docs:api:check`、`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`、`rg -n "^(<<<<<<<|=======|>>>>>>>)"`、`git diff --check`。
-- 剩余阻塞：无；下一批次为 R16 Navigation components。
+- 剩余阻塞：无；下一批次为 R16 Navigation components（已完成，见下节）。
+
+### R16 Navigation components（2026-06-29）
+
+- 实际删除 / 合并：删除 React/Vue Navigation 子组件源码 shim 文件；`AnchorLink`、`BreadcrumbItem`、`DropdownItem`、`DropdownMenu`、`MenuItem`、`MenuItemGroup`、`StepsItem`、`SubMenu`、`TabPane` 的 PascalCase package subpath 保留，但 exports 目标改为父组件产物。
+- Controlled model 变更：React Tabs / ScrollSpy active key 回调从 `onChange` 收敛为 `onActiveKeyChange`；React Menu 搜索从 `onSearch` 收敛为 `onSearchChange`；React Menu / Tree 的受控 key 更新分别使用 `onSelectedKeysChange`、`onOpenKeysChange`、`onExpandedKeysChange`、`onCheckedKeysChange`。
+- Anchor 变更：`AnchorChangeInfo.currentActiveLink` 改为 `activeLink`，与上下文、工具函数和命名规则一致。
+- 唯一替代 API：React active key 用 `onActiveKeyChange`；Menu 搜索用 `onSearchChange`；Menu / Tree controlled keys 用对应 `on*KeysChange`；交互上下文继续从 `onSelect` / `onOpenChange` / `onExpand` / `onCheck` 读取；子组件 subpath 仍按 PascalCase package path 导入。
+- 证据：Navigation core type files、React/Vue Navigation components、public component facts、React/Vue package exports、Navigation examples、Navigation group tests、`api-reports/public-api-baseline.json`、generated Skill references 和 `scripts/validate-api.mjs` R16 guard 已同步更新。
+- 实际验证：`npx -y pnpm@11.9.0 test:group:navigation`、`npx -y pnpm@11.9.0 vitest run tests/core/examples-lazy-routes.spec.ts`、`npx -y pnpm@11.9.0 test:a11y`、`npx -y pnpm@11.9.0 exports:sync`、`npx -y pnpm@11.9.0 exports:check`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline && npx -y pnpm@11.9.0 api:baseline:check`、`npx -y pnpm@11.9.0 docs:api && npx -y pnpm@11.9.0 docs:api:check`、`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`、`rg -n "^(<<<<<<<|=======|>>>>>>>)"`、`git diff --check`。
+- 剩余阻塞：无；下一批次为 R17 Data and table stack。
 
 完成任一涉及 public API 或 shared contract 清理的 R12-R20 任务后，必须在本节追加对应 `### Rxx ...（YYYY-MM-DD）` 记录，并包含：
 

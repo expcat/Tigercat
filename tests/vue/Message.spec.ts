@@ -30,6 +30,20 @@ function getMessageByType(type: (typeof messageTypes)[number]) {
   return document.querySelector(`[data-tiger-message][data-tiger-message-type="${type}"]`)
 }
 
+async function waitForMessagesCount(count: number) {
+  await vi.waitFor(() => {
+    expect(getMessages().length).toBe(count)
+  })
+}
+
+async function waitForMessageByType(type: (typeof messageTypes)[number]) {
+  await vi.waitFor(() => {
+    expect(getMessageByType(type)).toBeTruthy()
+  })
+
+  return getMessageByType(type)!
+}
+
 describe('Message (Vue)', () => {
   beforeAll(async () => {
     Message.info({ content: '__message_warmup__', duration: 0 })
@@ -58,8 +72,7 @@ describe('Message (Vue)', () => {
       Message.info('Test message')
       await flushDomUpdates()
 
-      const messageElement = getMessageByType('info')
-      expect(messageElement).toBeTruthy()
+      const messageElement = await waitForMessageByType('info')
       expect(messageElement?.textContent).toContain('Test message')
     })
 
@@ -70,7 +83,7 @@ describe('Message (Vue)', () => {
       })
       await flushDomUpdates()
 
-      const messageElement = getMessageByType('warning')
+      const messageElement = await waitForMessageByType('warning')
       expect(messageElement?.textContent).toContain('Warning message')
     })
 
@@ -82,10 +95,16 @@ describe('Message (Vue)', () => {
       })
       await flushDomUpdates()
 
+      await vi.waitFor(() => {
+        expect(
+          document.querySelector(
+            '[data-tiger-message-container][data-tiger-message-position="bottom-right"]'
+          )
+        ).toBeTruthy()
+      })
       const container = document.querySelector(
         '[data-tiger-message-container][data-tiger-message-position="bottom-right"]'
       )
-      expect(container).toBeTruthy()
       expect(container?.className).toContain('bottom-6')
       expect(container?.textContent).toContain('Bottom right message')
     })
@@ -96,8 +115,7 @@ describe('Message (Vue)', () => {
       Message[type](`${type} message`)
       await flushDomUpdates()
 
-      const messageElement = getMessageByType(type)
-      expect(messageElement).toBeTruthy()
+      const messageElement = await waitForMessageByType(type)
       expect(messageElement?.textContent).toContain(`${type} message`)
     })
   })
@@ -110,7 +128,7 @@ describe('Message (Vue)', () => {
       await flushDomUpdates()
 
       // Message should be visible
-      expect(getMessages().length).toBe(1)
+      await waitForMessagesCount(1)
 
       // Fast-forward time
       vi.advanceTimersByTime(3000)
@@ -132,7 +150,7 @@ describe('Message (Vue)', () => {
       await flushDomUpdates()
 
       // Message should be visible
-      expect(getMessages().length).toBe(1)
+      await waitForMessagesCount(1)
 
       // Fast-forward time
       vi.advanceTimersByTime(1000)
@@ -154,14 +172,14 @@ describe('Message (Vue)', () => {
       await flushDomUpdates()
 
       // Message should be visible
-      expect(getMessages().length).toBe(1)
+      await waitForMessagesCount(1)
 
       // Fast-forward time significantly
       vi.advanceTimersByTime(10000)
       await flushDomUpdates()
 
       // Message should still be visible
-      expect(getMessages().length).toBe(1)
+      await waitForMessagesCount(1)
 
       vi.useRealTimers()
     })
@@ -173,7 +191,7 @@ describe('Message (Vue)', () => {
       await flushDomUpdates()
 
       // Message should be visible
-      expect(getMessages().length).toBe(1)
+      await waitForMessagesCount(1)
 
       // Fast-forward time
       vi.advanceTimersByTime(5000)
@@ -289,7 +307,7 @@ describe('Message (Vue)', () => {
 
       await flushDomUpdates()
 
-      expect(getMessages().length).toBe(3)
+      await waitForMessagesCount(3)
     })
 
     it('should clear all messages with clear()', async () => {
@@ -300,7 +318,7 @@ describe('Message (Vue)', () => {
       await flushDomUpdates()
 
       // Messages should be visible
-      expect(getMessages().length).toBe(3)
+      await waitForMessagesCount(3)
 
       // Clear all
       Message.clear()
@@ -351,7 +369,7 @@ describe('Message (Vue)', () => {
 
       await flushDomUpdates()
 
-      const messageElement = getMessageByType('success')
+      const messageElement = await waitForMessageByType('success')
       const svgPath = messageElement?.querySelector('svg path')
       expect(svgPath?.getAttribute('d')).toBe('M5 13l4 4L19 7')
     })
@@ -365,6 +383,7 @@ describe('Message (Vue)', () => {
       })
       await flushDomUpdates()
 
+      await waitForMessagesCount(1)
       await expectNoA11yViolationsIsolated(document.body)
     })
 
@@ -372,7 +391,7 @@ describe('Message (Vue)', () => {
       Message.info('Accessible message')
       await flushDomUpdates()
 
-      const el = getMessageByType('info')
+      const el = await waitForMessageByType('info')
       expect(el?.getAttribute('role')).toBe('status')
     })
 
@@ -380,7 +399,7 @@ describe('Message (Vue)', () => {
       Message.error('Error message')
       await flushDomUpdates()
 
-      const el = getMessageByType('error')
+      const el = await waitForMessageByType('error')
       expect(el?.getAttribute('role')).toBe('alert')
     })
 

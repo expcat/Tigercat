@@ -162,6 +162,67 @@ Upload 的上传队列、分片和断点续传 helper 已从内部 `upload-utils
 + import { runUploadQueue } from '@expcat/tigercat-core'
 ```
 
+### Navigation 受控回调与子组件子路径收敛
+
+React Navigation 组件的非表单受控量统一使用 `on<Prop>Change`。Tabs / ScrollSpy 不再使用通用 `onChange` 作为 active key 受控出口：
+
+```diff
+- <Tabs activeKey={tab} onChange={setTab}>
++ <Tabs activeKey={tab} onActiveKeyChange={setTab}>
+    <TabPane tabKey="overview" label="Overview">...</TabPane>
+  </Tabs>
+```
+
+```diff
+- <ScrollSpy activeKey={section} onChange={setSection} items={items} />
++ <ScrollSpy activeKey={section} onActiveKeyChange={setSection} items={items} />
+```
+
+Menu 搜索回调与 Form composite search API 一致，React 使用 `onSearchChange`：
+
+```diff
+- <Menu searchable searchValue={query} onSearch={setQuery} items={items} />
++ <Menu searchable searchValue={query} onSearchChange={setQuery} items={items} />
+```
+
+Menu / Tree 的受控 key 状态使用专门的 key-change 回调；原来的交互事件仍保留，用于读取节点、是否展开、选中原因等上下文：
+
+```diff
+  <Menu
+    selectedKeys={selectedKeys}
+    openKeys={openKeys}
+-   onSelect={(key) => setSelectedKeys([key])}
+-   onOpenChange={(_, info) => setOpenKeys(info.openKeys)}
++   onSelectedKeysChange={setSelectedKeys}
++   onOpenKeysChange={setOpenKeys}
+  />
+```
+
+```diff
+  <Tree
+    expandedKeys={expandedKeys}
+    selectedKeys={selectedKeys}
+    checkedKeys={checkedKeys}
+-   onExpand={setExpandedKeys}
+-   onSelect={setSelectedKeys}
+-   onCheck={setCheckedKeys}
++   onExpandedKeysChange={setExpandedKeys}
++   onSelectedKeysChange={setSelectedKeys}
++   onCheckedKeysChange={setCheckedKeys}
+  />
+```
+
+Vue 端继续使用框架惯用的 `update:*` / `v-model:*` 与 kebab-case 事件，例如 `v-model:active-key`、`v-model:selected-keys`、`v-model:open-keys`、`v-model:expanded-keys`。
+
+Navigation 子组件的 PascalCase package subpath 保持可用，但现在直接指向父组件产物，避免发布包为子组件 shim 生成额外入口：
+
+```ts
+import { MenuItem } from '@expcat/tigercat-react/MenuItem'
+import { TabPane } from '@expcat/tigercat-vue/TabPane'
+```
+
+源码级深路径（如 `packages/react/src/components/MenuItem`）不再保留；库内部或源码级集成应从父组件文件导入。
+
 ### Carousel 索引改为受控模型
 
 `Carousel` 移除 `initialSlide`，改为与其他非表单受控量一致的 `currentIndex` 模型。

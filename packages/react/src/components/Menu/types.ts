@@ -24,6 +24,16 @@ export interface MenuContextValue {
 
 export interface MenuProps extends CoreMenuProps {
   /**
+   * Controlled selected keys change handler
+   */
+  onSelectedKeysChange?: (selectedKeys: (string | number)[]) => void
+
+  /**
+   * Controlled open keys change handler
+   */
+  onOpenKeysChange?: (openKeys: (string | number)[]) => void
+
+  /**
    * Menu item click event handler
    */
   onSelect?: (key: string | number, info: { selectedKeys: (string | number)[] }) => void
@@ -36,7 +46,7 @@ export interface MenuProps extends CoreMenuProps {
   /**
    * Search value change handler
    */
-  onSearch?: (value: string) => void
+  onSearchChange?: (value: string) => void
 
   /**
    * Menu content

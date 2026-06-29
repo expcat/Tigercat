@@ -6,14 +6,14 @@ import { MenuItemGroup } from '@expcat/tigercat-react/MenuItemGroup'
 import { Button } from '@expcat/tigercat-react/Button'
 import DemoBlock from '../components/DemoBlock'
 
-const basicSnippet = `<Menu selectedKeys={selectedKeys1} onSelect={(key) => setSelectedKeys1([key])}>
+const basicSnippet = `<Menu selectedKeys={selectedKeys1} onSelectedKeysChange={setSelectedKeys1}>
   <MenuItem itemKey="1">菜单项 1</MenuItem>
   <MenuItem itemKey="2">菜单项 2</MenuItem>
   <MenuItem itemKey="3">菜单项 3</MenuItem>
   <MenuItem itemKey="4" disabled>禁用菜单项</MenuItem>
 </Menu>`
 
-const horizontalSnippet = `<Menu mode="horizontal" selectedKeys={selectedKeys2} onSelect={(key) => setSelectedKeys2([key])}>
+const horizontalSnippet = `<Menu mode="horizontal" selectedKeys={selectedKeys2} onSelectedKeysChange={setSelectedKeys2}>
   <MenuItem itemKey="home">首页</MenuItem>
   <SubMenu itemKey="products" title="产品">
     <MenuItem itemKey="product-a">产品 A</MenuItem>
@@ -29,8 +29,8 @@ const horizontalSnippet = `<Menu mode="horizontal" selectedKeys={selectedKeys2} 
 const subMenuSnippet = `<Menu
   selectedKeys={selectedKeys3}
   openKeys={openKeys3}
-  onSelect={(key) => setSelectedKeys3([key])}
-  onOpenChange={(_key, { openKeys }) => setOpenKeys3(openKeys)}>
+  onSelectedKeysChange={setSelectedKeys3}
+  onOpenKeysChange={setOpenKeys3}>
   <SubMenu itemKey="sub1" title="导航 1">
     <MenuItem itemKey="1">选项 1</MenuItem>
     <MenuItem itemKey="2">选项 2</MenuItem>
@@ -47,8 +47,8 @@ const inlineSnippet = `<Menu
   mode="inline"
   selectedKeys={selectedKeys4}
   openKeys={openKeys4}
-  onSelect={(key) => setSelectedKeys4([key])}
-  onOpenChange={(_key, { openKeys }) => setOpenKeys4(openKeys)}>
+  onSelectedKeysChange={setSelectedKeys4}
+  onOpenKeysChange={setOpenKeys4}>
   <SubMenu itemKey="sub1" title="导航 1">
     <MenuItem itemKey="1">选项 1</MenuItem>
     <MenuItem itemKey="2">选项 2</MenuItem>
@@ -68,7 +68,7 @@ const collapseSnippet = `<Button
   mode="vertical"
   collapsed={collapsed}
   selectedKeys={selectedKeys5}
-  onSelect={(key) => setSelectedKeys5([key])}>
+  onSelectedKeysChange={setSelectedKeys5}>
   <MenuItem itemKey="1">菜单项 1</MenuItem>
   <MenuItem itemKey="2">菜单项 2</MenuItem>
   <SubMenu itemKey="sub1" title="子菜单">
@@ -77,7 +77,7 @@ const collapseSnippet = `<Button
   </SubMenu>
 </Menu>`
 
-const darkSnippet = `<Menu theme="dark" selectedKeys={selectedKeys6} onSelect={(key) => setSelectedKeys6([key])}>
+const darkSnippet = `<Menu theme="dark" selectedKeys={selectedKeys6} onSelectedKeysChange={setSelectedKeys6}>
   <MenuItem itemKey="1">菜单项 1</MenuItem>
   <MenuItem itemKey="2">菜单项 2</MenuItem>
   <SubMenu itemKey="sub1" title="子菜单">
@@ -86,7 +86,7 @@ const darkSnippet = `<Menu theme="dark" selectedKeys={selectedKeys6} onSelect={(
   </SubMenu>
 </Menu>`
 
-const iconSnippet = `<Menu selectedKeys={selectedKeys7} onSelect={(key) => setSelectedKeys7([key])}>
+const iconSnippet = `<Menu selectedKeys={selectedKeys7} onSelectedKeysChange={setSelectedKeys7}>
   <MenuItem itemKey="1" icon={homeIcon}>首页</MenuItem>
   <MenuItem itemKey="2" icon={userIcon}>用户</MenuItem>
   <SubMenu itemKey="sub1" title="设置" icon={settingsIcon}>
@@ -110,8 +110,8 @@ const singleOpenSnippet = `<Menu
   multiple={false}
   selectedKeys={selectedKeys8}
   openKeys={openKeys8}
-  onSelect={(key) => setSelectedKeys8([key])}
-  onOpenChange={(_key, { openKeys }) => setOpenKeys8(openKeys)}>
+  onSelectedKeysChange={setSelectedKeys8}
+  onOpenKeysChange={setOpenKeys8}>
   <SubMenu itemKey="sub1" title="导航 1">
     <MenuItem itemKey="1">选项 1</MenuItem>
     <MenuItem itemKey="2">选项 2</MenuItem>
@@ -164,7 +164,7 @@ const MenuDemo: React.FC = () => {
         script={basicScriptSnippet}>
         <div className="bg-gray-50 p-6 rounded-lg">
           <div className="bg-white inline-block">
-            <Menu selectedKeys={selectedKeys1} onSelect={(key) => setSelectedKeys1([key])}>
+            <Menu selectedKeys={selectedKeys1} onSelectedKeysChange={setSelectedKeys1}>
               <MenuItem itemKey="1">菜单项 1</MenuItem>
               <MenuItem itemKey="2">菜单项 2</MenuItem>
               <MenuItem itemKey="3">菜单项 3</MenuItem>
@@ -186,7 +186,7 @@ const MenuDemo: React.FC = () => {
             <Menu
               mode="horizontal"
               selectedKeys={selectedKeys2}
-              onSelect={(key) => setSelectedKeys2([key])}>
+              onSelectedKeysChange={setSelectedKeys2}>
               <MenuItem itemKey="home">首页</MenuItem>
               <SubMenu itemKey="products" title="产品">
                 <MenuItem itemKey="product-a">产品 A</MenuItem>
@@ -209,8 +209,8 @@ const MenuDemo: React.FC = () => {
             <Menu
               selectedKeys={selectedKeys3}
               openKeys={openKeys3}
-              onSelect={(key) => setSelectedKeys3([key])}
-              onOpenChange={(_key, { openKeys }) => setOpenKeys3(openKeys)}>
+              onSelectedKeysChange={setSelectedKeys3}
+              onOpenKeysChange={setOpenKeys3}>
               <SubMenu itemKey="sub1" title="导航 1">
                 <MenuItem itemKey="1">选项 1</MenuItem>
                 <MenuItem itemKey="2">选项 2</MenuItem>
@@ -234,8 +234,8 @@ const MenuDemo: React.FC = () => {
               mode="inline"
               selectedKeys={selectedKeys4}
               openKeys={openKeys4}
-              onSelect={(key) => setSelectedKeys4([key])}
-              onOpenChange={(_key, { openKeys }) => setOpenKeys4(openKeys)}>
+              onSelectedKeysChange={setSelectedKeys4}
+              onOpenKeysChange={setOpenKeys4}>
               <SubMenu itemKey="sub1" title="导航 1">
                 <MenuItem itemKey="1">选项 1</MenuItem>
                 <MenuItem itemKey="2">选项 2</MenuItem>
@@ -264,7 +264,7 @@ const MenuDemo: React.FC = () => {
               mode="vertical"
               collapsed={collapsed}
               selectedKeys={selectedKeys5}
-              onSelect={(key) => setSelectedKeys5([key])}>
+              onSelectedKeysChange={setSelectedKeys5}>
               <MenuItem itemKey="1">菜单项 1</MenuItem>
               <MenuItem itemKey="2">菜单项 2</MenuItem>
               <SubMenu itemKey="sub1" title="子菜单">
@@ -283,7 +283,7 @@ const MenuDemo: React.FC = () => {
             <Menu
               theme="dark"
               selectedKeys={selectedKeys6}
-              onSelect={(key) => setSelectedKeys6([key])}>
+              onSelectedKeysChange={setSelectedKeys6}>
               <MenuItem itemKey="1">菜单项 1</MenuItem>
               <MenuItem itemKey="2">菜单项 2</MenuItem>
               <SubMenu itemKey="sub1" title="子菜单">
@@ -299,7 +299,7 @@ const MenuDemo: React.FC = () => {
       <DemoBlock title="带图标的菜单" description="菜单项可以添加图标。" code={iconSnippet}>
         <div className="bg-gray-50 p-6 rounded-lg">
           <div className="bg-white inline-block">
-            <Menu selectedKeys={selectedKeys7} onSelect={(key) => setSelectedKeys7([key])}>
+            <Menu selectedKeys={selectedKeys7} onSelectedKeysChange={setSelectedKeys7}>
               <MenuItem itemKey="1" icon={homeIcon}>
                 首页
               </MenuItem>
@@ -347,8 +347,8 @@ const MenuDemo: React.FC = () => {
               multiple={false}
               selectedKeys={selectedKeys8}
               openKeys={openKeys8}
-              onSelect={(key) => setSelectedKeys8([key])}
-              onOpenChange={(_key, { openKeys }) => setOpenKeys8(openKeys)}>
+              onSelectedKeysChange={setSelectedKeys8}
+              onOpenKeysChange={setOpenKeys8}>
               <SubMenu itemKey="sub1" title="导航 1">
                 <MenuItem itemKey="1">选项 1</MenuItem>
                 <MenuItem itemKey="2">选项 2</MenuItem>
