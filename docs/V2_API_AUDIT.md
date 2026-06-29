@@ -45,9 +45,20 @@ source: current repository state after R10 grouped validation infrastructure
 - 暂无外部阻塞项。
 - R12 的视觉尺寸别名、R18 的 chart datum 类型和 R19 的 ImagePreview/ImageViewer 双 surface 需要在各自批次用 examples 与 generated references 再确认后删除；这些不是 R11 阻塞，只是批次内必须完成的证据点。
 
+## Completed Batch Records
+
+当前暂无 R12-R20 已完成批次记录。完成任一涉及 public API 或 shared contract 清理的 R12-R20 任务后，必须在本节追加对应 `### Rxx ...（YYYY-MM-DD）` 记录，并包含：
+
+- 实际删除、合并或保留的 props、events、methods、type aliases 与 helper exports。
+- 每个删除项的唯一替代 API；没有替代 API 的项必须说明为何直接删除。
+- 证据来源，包括源码文件、generated references、examples、API baseline 或测试覆盖。
+- 实际运行的验证命令；若命令与 `docs/ROADMAP.md` 计划不同，必须说明原因。
+- 剩余阻塞或后续批次依赖；无剩余阻塞时写明 `无`。
+
 ## Execution Rules For Component Batches
 
 - 每个批次开始前先读取本文件对应行、`docs/ROADMAP.md` 对应 Rxx 条目、`api-reports/public-api-baseline.json` 和对应 `skills/tigercat/references/shared/props/*.md`。
 - 删除 public API 后必须更新 `docs/MIGRATION.md`、`CHANGELOG.md`、API baseline、generated Skill references、examples 和对应分组测试。
+- 完成批次后必须回写 `Completed Batch Records`；若该批次经审计没有实际 public API/shared contract 变更，也必须在对应任务归档中说明无需新增审计记录。
 - 若新增受控量或发现新的跨端 parity 规则，优先扩展 `scripts/validate-api.mjs` 的显式 parity 表；不要用宽泛正则制造大量误报。
 - 生成物只能通过事实源或生成脚本更新；不得手改 `skills/tigercat/references/*` 或 `api-reports/*` 掩盖漂移。
