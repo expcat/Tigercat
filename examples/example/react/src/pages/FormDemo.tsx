@@ -14,7 +14,7 @@ import {
   type FormSubmitEvent,
   type FormRules,
   type FormLabelPosition,
-  type FormSize
+  type ComponentSize
 } from '@expcat/tigercat-react'
 import { countries } from '@demo-shared/constants'
 import DemoBlock from '../components/DemoBlock'
@@ -247,7 +247,7 @@ const FormDemo: React.FC = () => {
   const [layoutPosition, setLayoutPosition] = useState<FormLabelPosition>('right')
   const [layoutModel, setLayoutModel] = useState({ name: '', email: '' })
 
-  const [sizeValue, setSizeValue] = useState<FormSize>('md')
+  const [sizeValue, setSizeValue] = useState<ComponentSize>('md')
   const [sizeModel, setSizeModel] = useState({ name: '' })
 
   const disabledModel = { name: '张三', email: 'zhangsan@example.com' }

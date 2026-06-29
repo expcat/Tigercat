@@ -59,7 +59,7 @@ const searchableSnippet = `<Space direction="vertical" className="w-full max-w-m
     options={countries}
     searchable
     placeholder="搜索国家"
-    onSearch={(q) => setLastSearchQuery(q)}
+    onSearchChange={(q) => setLastSearchQuery(q)}
   />
   <p className="text-sm text-gray-600">最近一次搜索：{lastSearchQuery || '（无）'}</p>
 </Space>`
@@ -80,7 +80,7 @@ const groupedSnippet = `<Space direction="vertical" className="w-full max-w-md">
 </Space>`
 
 const emptySnippet = `<Space direction="vertical" className="w-full max-w-md">
-  <Select value={emptyValue} onChange={(v) => setEmptyValue(v ?? '')} options={[]} noDataText="暂无数据" placeholder="无可用选项" />
+  <Select value={emptyValue} onChange={(v) => setEmptyValue(v ?? '')} options={[]} emptyText="暂无数据" placeholder="无可用选项" />
 </Space>`
 
 const SelectDemo: React.FC = () => {
@@ -280,7 +280,7 @@ const SelectDemo: React.FC = () => {
             options={countries}
             searchable
             placeholder="搜索国家"
-            onSearch={(q) => setLastSearchQuery(q)}
+            onSearchChange={(q) => setLastSearchQuery(q)}
           />
           <p className="text-sm text-gray-600">最近一次搜索：{lastSearchQuery || '（无）'}</p>
         </Space>
@@ -347,7 +347,7 @@ const SelectDemo: React.FC = () => {
             value={emptyValue}
             onChange={(v) => setEmptyValue(v ?? '')}
             options={[]}
-            noDataText="暂无数据"
+            emptyText="暂无数据"
             placeholder="无可用选项"
           />
         </Space>

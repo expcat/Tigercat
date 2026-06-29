@@ -2,6 +2,8 @@
  * Cascader component types and interfaces
  */
 
+import type { ComponentSize } from './base'
+
 /**
  * Cascader option data structure
  */
@@ -24,11 +26,6 @@ export interface CascaderOption {
 export type CascaderValue = (string | number)[]
 
 /**
- * Cascader size types
- */
-export type CascaderSize = 'sm' | 'md' | 'lg'
-
-/**
  * Expand trigger type
  */
 export type CascaderExpandTrigger = 'click' | 'hover'
@@ -39,9 +36,9 @@ export type CascaderExpandTrigger = 'click' | 'hover'
 export type CascaderFilterFn = (inputValue: string, path: CascaderOption[]) => boolean
 
 /**
- * Show search configuration
+ * Search configuration
  */
-export interface CascaderShowSearch {
+export interface CascaderSearchConfig {
   /** Custom filter function */
   filter?: CascaderFilterFn
   /** Whether to render matched options in search result */
@@ -83,7 +80,7 @@ export interface CascaderProps {
    * Component size
    * @default 'md'
    */
-  size?: CascaderSize
+  size?: ComponentSize
 
   /**
    * Whether the cascader is disabled
@@ -101,7 +98,17 @@ export interface CascaderProps {
    * Whether to allow search/filter
    * @default false
    */
-  showSearch?: boolean | CascaderShowSearch
+  searchable?: boolean | CascaderSearchConfig
+
+  /**
+   * Controlled search input value
+   */
+  searchValue?: string
+
+  /**
+   * Default search input value
+   */
+  defaultSearchValue?: string
 
   /**
    * Trigger type for expanding sub-options
@@ -125,7 +132,7 @@ export interface CascaderProps {
    * Text to display when no options match search
    * @default 'No results found'
    */
-  notFoundText?: string
+  emptyText?: string
 
   /**
    * Additional CSS classes

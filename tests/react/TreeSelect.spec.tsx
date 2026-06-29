@@ -223,9 +223,9 @@ describe('TreeSelect', () => {
   })
 
   describe('Search', () => {
-    it('should show search input when showSearch is true', async () => {
+    it('should show search input when searchable is true', async () => {
       const user = userEvent.setup()
-      const { container, getByLabelText } = render(<TreeSelect treeData={treeData} showSearch />)
+      const { container, getByLabelText } = render(<TreeSelect treeData={treeData} searchable />)
       const button = container.querySelector('button')!
       await user.click(button)
 
@@ -235,7 +235,7 @@ describe('TreeSelect', () => {
     it('should filter nodes by search query', async () => {
       const user = userEvent.setup()
       const { container, getByLabelText, queryByText, getByText } = render(
-        <TreeSelect treeData={treeData} showSearch />
+        <TreeSelect treeData={treeData} searchable />
       )
       const button = container.querySelector('button')!
       await user.click(button)
@@ -251,7 +251,7 @@ describe('TreeSelect', () => {
     it('should show empty state when search has no results', async () => {
       const user = userEvent.setup()
       const { container, getByLabelText, getByText } = render(
-        <TreeSelect treeData={treeData} showSearch />
+        <TreeSelect treeData={treeData} searchable />
       )
       const button = container.querySelector('button')!
       await user.click(button)

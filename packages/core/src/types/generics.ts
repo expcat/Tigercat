@@ -10,6 +10,7 @@
 
 import type { ColumnAlign, ColumnFilter, SortState, TableSize, PaginationConfig } from './table'
 import type { FormRuleTrigger, FormRuleType } from './form'
+import type { ComponentSize } from './base'
 
 // ---------------------------------------------------------------------------
 // Table<T> generics
@@ -188,7 +189,7 @@ export interface GenericSelectOptionGroup<T extends string | number = string | n
  */
 export interface GenericSelectProps<T extends string | number = string | number> {
   /** Select size @default 'md' */
-  size?: 'sm' | 'md' | 'lg'
+  size?: ComponentSize
   /** Whether disabled @default false */
   disabled?: boolean
   /** Placeholder text */
@@ -201,10 +202,8 @@ export interface GenericSelectProps<T extends string | number = string | number>
   clearable?: boolean
   /** Typed options list */
   options?: Array<GenericSelectOption<T> | GenericSelectOptionGroup<T>>
-  /** Text when no search match @default 'No options found' */
-  noOptionsText?: string
-  /** Text when list is empty @default 'No options available' */
-  noDataText?: string
+  /** Text when the options list is empty or no search result matches */
+  emptyText?: string
 }
 
 // ---------------------------------------------------------------------------

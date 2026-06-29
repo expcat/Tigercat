@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import type {
   TransferItem,
   TransferProps as CoreTransferProps,
+  TransferSearchValue,
   TigerLocale
 } from '@expcat/tigercat-core'
 import {
@@ -39,6 +40,8 @@ export interface TransferProps
     direction: 'left' | 'right',
     movedKeys: (string | number)[]
   ) => void
+  /** Called when either panel search input changes */
+  onSearchChange?: (value: TransferSearchValue) => void
   /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>
 }
@@ -49,12 +52,15 @@ const TRANSFER_KEYS = new Set<string>([
   'dataSource',
   'size',
   'disabled',
-  'showSearch',
+  'searchable',
+  'searchValue',
+  'defaultSearchValue',
   'sourceTitle',
   'targetTitle',
-  'notFoundText',
+  'emptyText',
   'filterOption',
-  'onChange'
+  'onChange',
+  'onSearchChange'
 ])
 
 const EMPTY_TRANSFER_VALUE: (string | number)[] = []
@@ -66,13 +72,16 @@ export const Transfer: React.FC<TransferProps> = (props) => {
     dataSource = [],
     size = 'md',
     disabled = false,
-    showSearch = false,
+    searchable = false,
+    searchValue,
+    defaultSearchValue,
     sourceTitle = 'Source',
     targetTitle = 'Target',
-    notFoundText,
+    emptyText,
     filterOption,
     className,
     onChange,
+    onSearchChange,
     locale,
     ...rest
   } = props
@@ -96,8 +105,20 @@ export const Transfer: React.FC<TransferProps> = (props) => {
 
   const [sourceSelectedKeys, setSourceSelectedKeys] = useState<Set<string | number>>(new Set())
   const [targetSelectedKeys, setTargetSelectedKeys] = useState<Set<string | number>>(new Set())
-  const [sourceSearch, setSourceSearch] = useState('')
-  const [targetSearch, setTargetSearch] = useState('')
+  const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState<TransferSearchValue>(
+    defaultSearchValue ?? {}
+  )
+  const resolvedSearchValue = searchValue ?? uncontrolledSearchValue
+  const sourceSearch = resolvedSearchValue.source ?? ''
+  const targetSearch = resolvedSearchValue.target ?? ''
+
+  function updateSearchValue(panel: keyof TransferSearchValue, value: string) {
+    const next = { ...resolvedSearchValue, [panel]: value }
+    if (searchValue === undefined) {
+      setUncontrolledSearchValue(next)
+    }
+    onSearchChange?.(next)
+  }
 
   const { sourceItems, targetItems } = useMemo(
     () => splitTransferData(dataSource, resolvedValue),
@@ -176,7 +197,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
     selectedKeys: Set<string | number>,
     toggleFn: (key: string | number) => void,
     searchValue: string,
-    onSearch: (val: string) => void
+    onSearchInput: (val: string) => void
   ) {
     return (
       <div className={transferPanelClasses} role="group" aria-label={title}>
@@ -186,14 +207,14 @@ export const Transfer: React.FC<TransferProps> = (props) => {
           </span>
         </div>
 
-        {showSearch && (
+        {searchable && (
           <input
             type="text"
             className={transferSearchClasses}
             placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
             value={searchValue}
             aria-label={`Search ${title}`}
-            onChange={(e) => onSearch(e.target.value)}
+            onChange={(e) => onSearchInput(e.target.value)}
           />
         )}
 
@@ -224,7 +245,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
             })
           ) : (
             <div className={transferEmptyClasses}>
-              {resolveLocaleText('No data', notFoundText, mergedLocale?.common?.emptyText)}
+              {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
             </div>
           )}
         </div>
@@ -240,7 +261,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
         sourceSelectedKeys,
         toggleSourceItem,
         sourceSearch,
-        setSourceSearch
+        (value) => updateSearchValue('source', value)
       )}
 
       <div className={transferOperationClasses}>
@@ -280,7 +301,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
         targetSelectedKeys,
         toggleTargetItem,
         targetSearch,
-        setTargetSearch
+        (value) => updateSearchValue('target', value)
       )}
     </div>
   )

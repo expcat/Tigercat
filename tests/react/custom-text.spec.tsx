@@ -98,7 +98,7 @@ describe('custom text (no i18n) — React', () => {
     it('Transfer search reads global config searchPlaceholder', () => {
       render(
         <ConfigProvider locale={{ common: { searchPlaceholder: '全局搜索' } }}>
-          <Transfer showSearch />
+          <Transfer searchable />
         </ConfigProvider>
       )
       expect(screen.getAllByPlaceholderText('全局搜索').length).toBeGreaterThan(0)
@@ -107,7 +107,7 @@ describe('custom text (no i18n) — React', () => {
     it('Transfer locale prop wins over global config', () => {
       render(
         <ConfigProvider locale={{ common: { searchPlaceholder: '全局搜索' } }}>
-          <Transfer showSearch locale={{ common: { searchPlaceholder: '局部搜索' } }} />
+          <Transfer searchable locale={{ common: { searchPlaceholder: '局部搜索' } }} />
         </ConfigProvider>
       )
       expect(screen.getAllByPlaceholderText('局部搜索').length).toBeGreaterThan(0)
@@ -140,7 +140,7 @@ describe('custom text (no i18n) — React', () => {
     it('Cascader search empty state reads global config emptyText', () => {
       const { container, getByText } = render(
         <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
-          <Cascader options={[{ label: 'Beijing', value: 'bj' }]} showSearch />
+          <Cascader options={[{ label: 'Beijing', value: 'bj' }]} searchable />
         </ConfigProvider>
       )
       fireEvent.click(container.querySelector('button')!)
@@ -150,14 +150,10 @@ describe('custom text (no i18n) — React', () => {
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
-    it('Cascader notFoundText prop wins over global config', () => {
+    it('Cascader emptyText prop wins over global config', () => {
       const { container, getByText, queryByText } = render(
         <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
-          <Cascader
-            options={[{ label: 'Beijing', value: 'bj' }]}
-            showSearch
-            notFoundText="查无此项"
-          />
+          <Cascader options={[{ label: 'Beijing', value: 'bj' }]} searchable emptyText="查无此项" />
         </ConfigProvider>
       )
       fireEvent.click(container.querySelector('button')!)
@@ -168,7 +164,7 @@ describe('custom text (no i18n) — React', () => {
       expect(queryByText('暂无数据')).toBeNull()
     })
 
-    it('Select noDataText (empty options) reads global config emptyText', () => {
+    it('Select emptyText (empty options) reads global config emptyText', () => {
       const { container, getByText } = render(
         <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
           <Select options={[]} />
@@ -178,7 +174,7 @@ describe('custom text (no i18n) — React', () => {
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
-    it('Select noOptionsText (no search results) reads global config emptyText', () => {
+    it('Select emptyText (no search results) reads global config emptyText', () => {
       const { container, getByText } = render(
         <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
           <Select options={[{ label: 'One', value: 1 }]} searchable />
@@ -189,10 +185,10 @@ describe('custom text (no i18n) — React', () => {
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
-    it('Select noDataText prop wins over global config', () => {
+    it('Select emptyText prop wins over global config', () => {
       const { container, getByText, queryByText } = render(
         <ConfigProvider locale={{ common: { emptyText: '暂无数据' } }}>
-          <Select options={[]} noDataText="没有可选项" />
+          <Select options={[]} emptyText="没有可选项" />
         </ConfigProvider>
       )
       fireEvent.click(container.querySelector('button')!)
@@ -257,7 +253,7 @@ describe('custom text (no i18n) — React', () => {
     })
 
     it('Transfer search outside a ConfigProvider keeps default English placeholder', () => {
-      render(<Transfer showSearch />)
+      render(<Transfer searchable />)
       expect(screen.getAllByPlaceholderText('Search...').length).toBeGreaterThan(0)
     })
 

@@ -4,15 +4,15 @@
 type: v2-api-audit
 scope: R11 core API and shared contracts audit for R12-R20 execution
 verified-date: 2026-06-29
-source: current repository state after R14 Form primitives completion
+source: current repository state after R15 Form composite selectors completion
 -->
 
 本文是 R11 的审计输出，只记录 v2.0.0 发布前 R12-R20 批次要执行的 API 删除、合并与命名收敛计划。R11 不删除运行时 API，也不新增兼容层。
 
 ## 审计基线
 
-- `api-reports/public-api-baseline.json` 当前覆盖 156 个 `*Props` 接口、2902 个 core exports、148 个 React 公开组件和 148 个 Vue 公开组件。
-- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、Vue checkable Form primitives 不回退到 `checked` / `defaultChecked` / `update:checked`、登记过的受控量 parity、Skill references 覆盖与文档预算。
+- `api-reports/public-api-baseline.json` 当前覆盖 156 个 `*Props` 接口、2887 个 core exports、148 个 React 公开组件和 148 个 Vue 公开组件。
+- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、Vue checkable Form primitives 不回退到 `checked` / `defaultChecked` / `update:checked`、Form composite selectors 不回退到旧尺寸 aliases / DatePicker-TimePicker 旧模型 aliases / 旧 search 和 empty 命名、登记过的受控量 parity、Skill references 覆盖与文档预算。
 - `packages/core/src/types/base.ts`、`events.ts`、`generics.ts` 是公共合约收敛事实源；后续批次应优先复用这些 shared contracts，不能在 React/Vue 组件内各自临时发明命名。
 - `packages/core/src/types/index.ts` 与 `packages/core/src/utils/index.ts` 仍以宽 barrel 公开大量类型与工具；R12-R20 删除或合并 public exports 时必须同步更新 API baseline、迁移说明和对应分组测试。
 
@@ -76,6 +76,19 @@ source: current repository state after R14 Form primitives completion
 - 证据：core primitive type files、core primitive style utilities、React/Vue primitive components、Vue primitive examples、primitive group tests、`api-reports/public-api-baseline.json`、generated Skill references 和 `scripts/validate-api.mjs` R14 guard 已同步更新。
 - 实际验证：`npx -y pnpm@11.9.0 test:group:form -- --filter primitives`、`npx -y pnpm@11.9.0 vitest run tests/react/useControlledState.spec.tsx tests/vue/useFormController.spec.ts`、`npx -y pnpm@11.9.0 test:a11y`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline && npx -y pnpm@11.9.0 api:baseline:check`、`npx -y pnpm@11.9.0 docs:api && npx -y pnpm@11.9.0 docs:api:check`、`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`、`git diff --check`。
 - 剩余阻塞：无；下一批次为 R15 Form composite selectors。
+
+### R15 Form composite selectors（2026-06-29）
+
+- 实际删除 / 合并：移除 `SelectSize`、`TreeSelectSize`、`CascaderSize`、`AutoCompleteSize`、`DatePickerSize`、`TimePickerSize`、`TransferSize`、`ColorPickerSize`、`InputGroupSize`、`FormSize` public type aliases；对应 core props、style utilities、React/Vue components 和 generated references 改用 `ComponentSize`。
+- Date/Time model 变更：删除 `DatePickerSingleModelValue`、`DatePickerRangeModelValue`、`DatePickerSingleValue`、`DatePickerRangeValue`、`TimePickerSingleValue`、`TimePickerRangeValue` public aliases；DatePicker 保留 `DatePickerModelValue`，TimePicker 保留 `TimePickerModelValue`。
+- Search/empty 变更：Select、TreeSelect、Cascader、AutoComplete、Transfer 搜索受控量统一为 `searchValue` / `defaultSearchValue`；React 使用 `onSearchChange`，Vue 使用 `update:searchValue` / `search-change`；TreeSelect、Cascader、Transfer 的旧 `showSearch` 收敛为 `searchable`；`notFoundText`、`noOptionsText`、`noDataText` 收敛为 `emptyText`，未显式传入时继续从 locale/custom text fallback。
+- Transfer 变更：新增 `TransferSearchValue` 作为双栏搜索值 shape（`{ source?: string; target?: string }`），避免用旧双参 `onSearch` 作为受控 surface。
+- Upload helper 变更：`DEFAULT_UPLOAD_CHUNK_SIZE`、`createUploadChunks`、`getUploadResumeKey`、`createUploadQueueItem`、`RunUploadQueueOptions`、`runUploadQueue` 从基础 `upload-utils` 拆入 `upload-queue-utils` 内部模块并经 utils barrel 公开，基础选择、拖拽、状态和样式 helper 保留在 `upload-utils`。
+- 实际保留：`SelectModelValue`、`TreeSelectValue`、`CascaderValue`、`AutoCompleteOption`、`UploadFileItem` 等具有组件领域语义的类型保留；DatePicker/TimePicker 的 range runtime 行为保留，只是不再导出重复 single/range aliases。
+- 唯一替代 API：所有被删 size aliases 改用 `ComponentSize`；Date/Time picker 模型类型改用 `DatePickerModelValue` / `TimePickerModelValue`；搜索改用 `searchValue` / `defaultSearchValue`、React `onSearchChange`、Vue `v-model:search-value` / `search-change`；空态文本改用 `emptyText`；搜索开关改用 `searchable`。
+- 证据：core composite type files、core select/tree/cascader/auto-complete/transfer/upload utilities、React/Vue composite components、React/Vue examples、composite group tests、`api-reports/public-api-baseline.json`、generated Skill references 和 `scripts/validate-api.mjs` R15 guard 已同步更新。
+- 实际验证：`npx -y pnpm@11.9.0 test:group:form -- --filter composite`、`npx -y pnpm@11.9.0 vitest run tests/core/custom-text-labels.spec.ts tests/core/datepicker-i18n.spec.ts`、`npx -y pnpm@11.9.0 test:group:form`、`npx -y pnpm@11.9.0 example:ssr:check`、`npx -y pnpm@11.9.0 size`、`npx -y pnpm@11.9.0 publish:check`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline && npx -y pnpm@11.9.0 api:baseline:check`、`npx -y pnpm@11.9.0 docs:api && npx -y pnpm@11.9.0 docs:api:check`、`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`、`rg -n "^(<<<<<<<|=======|>>>>>>>)"`、`git diff --check`。
+- 剩余阻塞：无；下一批次为 R16 Navigation components。
 
 完成任一涉及 public API 或 shared contract 清理的 R12-R20 任务后，必须在本节追加对应 `### Rxx ...（YYYY-MM-DD）` 记录，并包含：
 

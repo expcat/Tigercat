@@ -1,14 +1,13 @@
 import type React from 'react'
 import type {
-  TimePickerRangeValue as CoreTimePickerRangeValue,
-  TimePickerSingleValue,
   TimePickerLabels,
   TimePickerProps as CoreTimePickerProps,
   TigerLocale,
   getTimePeriodLabels
 } from '@expcat/tigercat-core'
 
-export type TimePickerRangeValue = CoreTimePickerRangeValue
+type TimePickerSingleInputValue = string | null
+type TimePickerRangeInputValue = [string | null, string | null]
 
 type NativeDivProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'>
 
@@ -20,21 +19,21 @@ type BaseTimePickerProps = Omit<CoreTimePickerProps, 'value' | 'defaultValue' | 
 export type TimePickerProps =
   | (BaseTimePickerProps & {
       range?: false
-      value?: TimePickerSingleValue
-      defaultValue?: TimePickerSingleValue
+      value?: TimePickerSingleInputValue
+      defaultValue?: TimePickerSingleInputValue
       /**
        * Change event handler
        */
-      onChange?: (time: TimePickerSingleValue) => void
+      onChange?: (time: TimePickerSingleInputValue) => void
     })
   | (BaseTimePickerProps & {
       range: true
-      value?: TimePickerRangeValue | null
-      defaultValue?: TimePickerRangeValue | null
+      value?: TimePickerRangeInputValue | null
+      defaultValue?: TimePickerRangeInputValue | null
       /**
        * Change event handler
        */
-      onChange?: (time: TimePickerRangeValue) => void
+      onChange?: (time: TimePickerRangeInputValue) => void
     })
 
 type TimePeriodLabels = ReturnType<typeof getTimePeriodLabels>

@@ -1,45 +1,46 @@
 import { classNames } from './class-names'
-import type { FormLabelAlign, FormLabelPosition, FormSize } from '../types/form'
+import type { ComponentSize } from '../types/base'
+import type { FormLabelAlign, FormLabelPosition } from '../types/form'
 
-const FORM_ITEM_SPACING: Record<FormSize, string> = {
+const FORM_ITEM_SPACING: Record<ComponentSize, string> = {
   sm: 'mb-3 last:mb-0',
   md: 'mb-4 last:mb-0',
   lg: 'mb-6 last:mb-0'
 }
 
-const LABEL_TEXT_SIZE: Record<FormSize, string> = {
+const LABEL_TEXT_SIZE: Record<ComponentSize, string> = {
   sm: 'text-xs',
   md: 'text-sm',
   lg: 'text-base'
 }
 
-const LABEL_PADDING_TOP: Record<FormSize, string> = {
+const LABEL_PADDING_TOP: Record<ComponentSize, string> = {
   sm: 'pt-1',
   md: 'pt-2',
   lg: 'pt-3'
 }
 
-const ERROR_TEXT_SIZE: Record<FormSize, string> = {
+const ERROR_TEXT_SIZE: Record<ComponentSize, string> = {
   sm: 'text-xs',
   md: 'text-xs',
   lg: 'text-sm'
 }
 
-const ERROR_MIN_HEIGHT: Record<FormSize, string> = {
+const ERROR_MIN_HEIGHT: Record<ComponentSize, string> = {
   sm: 'min-h-[1rem]',
   md: 'min-h-[1.25rem]',
   lg: 'min-h-[1.5rem]'
 }
 
 export interface FormItemClassOptions {
-  size?: FormSize
+  size?: ComponentSize
   labelPosition?: FormLabelPosition
   hasError?: boolean
   disabled?: boolean
 }
 
 export interface FormItemLabelClassOptions {
-  size?: FormSize
+  size?: ComponentSize
   labelPosition?: FormLabelPosition
   labelAlign?: FormLabelAlign
   isRequired?: boolean
@@ -103,7 +104,7 @@ export function getFormItemFieldClasses(): string {
   return classNames('tiger-form-item__field', 'w-full')
 }
 
-export function getFormItemErrorClasses(size: FormSize = 'md'): string {
+export function getFormItemErrorClasses(size: ComponentSize = 'md'): string {
   return classNames(
     'tiger-form-item__error',
     'mt-1',

@@ -201,8 +201,8 @@ describe('Cascader', () => {
   })
 
   describe('Search', () => {
-    it('should show search input when showSearch is true', async () => {
-      const { container } = render(<Cascader options={simpleOptions} showSearch />)
+    it('should show search input when searchable is true', async () => {
+      const { container } = render(<Cascader options={simpleOptions} searchable />)
 
       const trigger = container.querySelector('button')!
       fireEvent.click(trigger)
@@ -211,7 +211,7 @@ describe('Cascader', () => {
     })
 
     it('should filter options by search query', async () => {
-      const { container, getByText } = render(<Cascader options={simpleOptions} showSearch />)
+      const { container, getByText } = render(<Cascader options={simpleOptions} searchable />)
 
       const trigger = container.querySelector('button')!
       fireEvent.click(trigger)
@@ -224,7 +224,7 @@ describe('Cascader', () => {
 
     it('should show not found text when no results', async () => {
       const { container, getByText } = render(
-        <Cascader options={simpleOptions} showSearch notFoundText="Nothing found" />
+        <Cascader options={simpleOptions} searchable emptyText="Nothing found" />
       )
 
       const trigger = container.querySelector('button')!

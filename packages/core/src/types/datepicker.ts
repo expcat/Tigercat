@@ -2,17 +2,14 @@
  * DatePicker component types and interfaces
  */
 
+import type { ComponentSize } from './base'
+
 export type DatePickerInputDate = Date | string
 
-export type DatePickerSingleModelValue = DatePickerInputDate | null
-
-export type DatePickerRangeModelValue = [DatePickerInputDate | null, DatePickerInputDate | null]
-
-export type DatePickerModelValue = DatePickerSingleModelValue | DatePickerRangeModelValue
-
-export type DatePickerSingleValue = Date | null
-
-export type DatePickerRangeValue = [Date | null, Date | null]
+export type DatePickerModelValue =
+  | DatePickerInputDate
+  | null
+  | [DatePickerInputDate | null, DatePickerInputDate | null]
 
 export interface DatePickerLabels {
   today: string
@@ -39,11 +36,6 @@ export type DatePickerLocaleInput =
   | DatePickerLocaleConfig
 
 /**
- * DatePicker size types
- */
-export type DatePickerSize = 'sm' | 'md' | 'lg'
-
-/**
  * Date format types
  */
 export type DateFormat = 'yyyy-MM-dd' | 'MM/dd/yyyy' | 'dd/MM/yyyy' | 'yyyy/MM/dd'
@@ -68,7 +60,7 @@ export interface DatePickerProps {
    * DatePicker size
    * @default 'md'
    */
-  size?: DatePickerSize
+  size?: ComponentSize
 
   /**
    * Selected date value (for controlled mode)

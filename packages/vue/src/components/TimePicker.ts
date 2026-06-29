@@ -51,8 +51,7 @@ import {
   closeSolidIcon20PathD,
   type TimePickerModelValue,
   type TimePickerLabels,
-  type TimePickerRangeValue,
-  type TimePickerSize,
+  type ComponentSize,
   type TimeFormat,
   type TigerLocale
 } from '@expcat/tigercat-core'
@@ -65,13 +64,14 @@ const ClockIcon = createFilledIcon(clockSolidIcon20PathD, 'w-5 h-5')
 const CloseIcon = createFilledIcon(closeSolidIcon20PathD, 'w-4 h-4')
 
 export type VueTimePickerModelValue = TimePickerModelValue
+type TimePickerRangeInputValue = [string | null, string | null]
 
 export interface VueTimePickerProps {
   modelValue?: VueTimePickerModelValue
   locale?: string | Partial<TigerLocale>
   labels?: Partial<TimePickerLabels>
   range?: boolean
-  size?: TimePickerSize
+  size?: ComponentSize
   format?: TimeFormat
   showSeconds?: boolean
   hourStep?: number
@@ -131,8 +131,8 @@ export const TimePicker = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<TimePickerSize>,
-      default: 'md' as TimePickerSize
+      type: String as PropType<ComponentSize>,
+      default: 'md' as ComponentSize
     },
     /**
      * Time format (12-hour or 24-hour)
@@ -276,12 +276,12 @@ export const TimePicker = defineComponent({
     const isRangeMode = computed(() => props.range === true)
     const activePart = ref<'start' | 'end'>('start')
 
-    const normalizeRangeValue = (value: unknown): TimePickerRangeValue => {
+    const normalizeRangeValue = (value: unknown): TimePickerRangeInputValue => {
       if (Array.isArray(value)) return [value[0] ?? null, value[1] ?? null]
       return [null, null]
     }
 
-    const currentRangeValue = computed<TimePickerRangeValue>(() => {
+    const currentRangeValue = computed<TimePickerRangeInputValue>(() => {
       if (!isRangeMode.value) return [null, null]
       return normalizeRangeValue(props.modelValue)
     })

@@ -104,7 +104,7 @@ describe('AutoComplete', () => {
     it('should show not found text', async () => {
       const user = userEvent.setup()
       const { container, getByText } = render(
-        <AutoComplete options={options} notFoundText="Nothing found" />
+        <AutoComplete options={options} emptyText="Nothing found" />
       )
 
       const input = container.querySelector('input')!

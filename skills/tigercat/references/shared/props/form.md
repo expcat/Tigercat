@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## AutoComplete
 
-`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 3/11 props
+`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 3/13 props
 
 | Prop           | Type                   | Default | Notes                                                  |
 | -------------- | ---------------------- | ------- | ------------------------------------------------------ |
@@ -21,13 +21,13 @@ description: Compact generated Tigercat Form props reference
 
 ## Cascader
 
-`packages/core/src/types/cascader.ts` · `CascaderProps` · 3/11 props
+`packages/core/src/types/cascader.ts` · `CascaderProps` · 3/13 props
 
 | Prop           | Type               | Default           | Notes                 |
 | -------------- | ------------------ | ----------------- | --------------------- |
 | `options?`     | `CascaderOption[]` | `-`               | Cascader options data |
 | `placeholder?` | `string`           | `'Please select'` | Placeholder text      |
-| `size?`        | `CascaderSize`     | `'md'`            | Component size        |
+| `size?`        | `ComponentSize`    | `'md'`            | Component size        |
 
 ## Checkbox
 
@@ -52,11 +52,11 @@ description: Compact generated Tigercat Form props reference
 
 `packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 3/6 props
 
-| Prop         | Type              | Default | Notes                          |
-| ------------ | ----------------- | ------- | ------------------------------ |
-| `disabled?`  | `boolean`         | `-`     | Whether the picker is disabled |
-| `size?`      | `ColorPickerSize` | `-`     | Component size                 |
-| `showAlpha?` | `boolean`         | `-`     | Whether to show alpha channel  |
+| Prop         | Type            | Default | Notes                          |
+| ------------ | --------------- | ------- | ------------------------------ |
+| `disabled?`  | `boolean`       | `-`     | Whether the picker is disabled |
+| `size?`      | `ComponentSize` | `-`     | Component size                 |
+| `showAlpha?` | `boolean`       | `-`     | Whether to show alpha channel  |
 
 ## ColorSwatch
 
@@ -86,7 +86,7 @@ description: Compact generated Tigercat Form props reference
 | --------- | --------------------------- | ------- | ----------------------------------------------------------------------------- |
 | `locale?` | `DatePickerLocaleInput`     | `-`     | Locale used for month/day names in the calendar UI. Example: 'zh-CN', 'en-US' |
 | `labels?` | `Partial<DatePickerLabels>` | `-`     | UI labels for i18n. When provided, merges with locale-based defaults.         |
-| `size?`   | `DatePickerSize`            | `'md'`  | DatePicker size                                                               |
+| `size?`   | `ComponentSize`             | `'md'`  | DatePicker size                                                               |
 
 ## Form
 
@@ -122,11 +122,11 @@ description: Compact generated Tigercat Form props reference
 
 `packages/core/src/types/input-group.ts` · `InputGroupProps`
 
-| Prop         | Type             | Default | Notes                                        |
-| ------------ | ---------------- | ------- | -------------------------------------------- |
-| `size?`      | `InputGroupSize` | `'md'`  | Size applied to all children in the group    |
-| `compact?`   | `boolean`        | `false` | Whether to use compact mode (merged borders) |
-| `className?` | `string`         | `-`     | Additional CSS classes                       |
+| Prop         | Type            | Default | Notes                                        |
+| ------------ | --------------- | ------- | -------------------------------------------- |
+| `size?`      | `ComponentSize` | `'md'`  | Size applied to all children in the group    |
+| `compact?`   | `boolean`       | `false` | Whether to use compact mode (merged borders) |
+| `className?` | `string`        | `-`     | Additional CSS classes                       |
 
 ## InputGroupAddon
 
@@ -189,13 +189,13 @@ description: Compact generated Tigercat Form props reference
 
 ## Select
 
-`packages/core/src/types/select.ts` · `SelectProps` · 3/16 props
+`packages/core/src/types/select.ts` · `SelectProps` · 3/17 props
 
-| Prop           | Type         | Default | Notes                                       |
-| -------------- | ------------ | ------- | ------------------------------------------- |
-| `size?`        | `SelectSize` | `'md'`  | Select size                                 |
-| `disabled?`    | `boolean`    | `false` | Whether the select is disabled              |
-| `placeholder?` | `string`     | `-`     | Placeholder text when no option is selected |
+| Prop           | Type            | Default | Notes                                       |
+| -------------- | --------------- | ------- | ------------------------------------------- |
+| `size?`        | `ComponentSize` | `'md'`  | Select size                                 |
+| `disabled?`    | `boolean`       | `false` | Whether the select is disabled              |
+| `placeholder?` | `string`        | `-`     | Placeholder text when no option is selected |
 
 ## Signature
 
@@ -255,27 +255,27 @@ description: Compact generated Tigercat Form props reference
 | --------- | -------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `locale?` | `string \| Partial<TigerLocale>` | `-`     | Locale used for UI labels (e.g. AM/PM) and display formatting. Example: 'zh-CN', 'en-US... |
 | `labels?` | `Partial<TimePickerLabels>`      | `-`     | UI labels for i18n. When provided, merges with locale-based defaults.                      |
-| `size?`   | `TimePickerSize`                 | `'md'`  | TimePicker size                                                                            |
+| `size?`   | `ComponentSize`                  | `'md'`  | TimePicker size                                                                            |
 
 ## Transfer
 
-`packages/core/src/types/transfer.ts` · `TransferProps` · 3/10 props
+`packages/core/src/types/transfer.ts` · `TransferProps` · 3/12 props
 
 | Prop          | Type                   | Default | Notes                                    |
 | ------------- | ---------------------- | ------- | ---------------------------------------- |
 | `dataSource?` | `TransferItem[]`       | `-`     | All available data items                 |
 | `targetKeys?` | `(string \| number)[]` | `-`     | Keys of items in the right (target) list |
-| `size?`       | `TransferSize`         | `-`     | Component size                           |
+| `size?`       | `ComponentSize`        | `-`     | Component size                           |
 
 ## TreeSelect
 
-`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 3/10 props
+`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 3/12 props
 
-| Prop           | Type             | Default | Notes            |
-| -------------- | ---------------- | ------- | ---------------- |
-| `treeData?`    | `TreeNode[]`     | `-`     | Tree data        |
-| `placeholder?` | `string`         | `-`     | Placeholder text |
-| `size?`        | `TreeSelectSize` | `-`     | Component size   |
+| Prop           | Type            | Default | Notes            |
+| -------------- | --------------- | ------- | ---------------- |
+| `treeData?`    | `TreeNode[]`    | `-`     | Tree data        |
+| `placeholder?` | `string`        | `-`     | Placeholder text |
+| `size?`        | `ComponentSize` | `-`     | Component size   |
 
 ## Upload
 

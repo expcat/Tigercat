@@ -42,7 +42,7 @@ const basicScriptSnippet = `import { useState } from 'react'
 
 const [val, setVal] = useState([])`
 
-const searchSnippet = `<Cascader value={val} onChange={setVal} options={options} placeholder="搜索地区" showSearch />`
+const searchSnippet = `<Cascader value={val} onChange={setVal} options={options} placeholder="搜索地区" searchable />`
 const sizeSnippet = `<Cascader options={options} placeholder="小" size="sm" />
 <Cascader options={options} placeholder="中" size="md" />
 <Cascader options={options} placeholder="大" size="lg" />
@@ -65,13 +65,13 @@ const CascaderDemo: React.FC = () => {
         <Cascader value={val} onChange={setVal} options={options} placeholder="请选择地区" />
       </DemoBlock>
 
-      <DemoBlock title="可搜索" description="showSearch 开启搜索过滤" code={searchSnippet}>
+      <DemoBlock title="可搜索" description="searchable 开启搜索过滤" code={searchSnippet}>
         <Cascader
           value={val2}
           onChange={setVal2}
           options={options}
           placeholder="搜索地区"
-          showSearch
+          searchable
         />
       </DemoBlock>
 

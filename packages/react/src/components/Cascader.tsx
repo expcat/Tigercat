@@ -37,6 +37,8 @@ export interface CascaderProps extends Omit<CoreCascaderProps, 'className'>, Cas
   value?: CascaderValue
   /** Change handler */
   onChange?: (value: CascaderValue) => void
+  /** Called when search text changes */
+  onSearchChange?: (value: string) => void
   /** Additional class name */
   className?: string
   /** Locale overrides merged on top of ConfigProvider locale */
@@ -51,11 +53,14 @@ const CASCADER_KEYS = new Set([
   'size',
   'disabled',
   'clearable',
-  'showSearch',
+  'searchable',
+  'searchValue',
+  'defaultSearchValue',
+  'onSearchChange',
   'expandTrigger',
   'changeOnSelect',
   'separator',
-  'notFoundText',
+  'emptyText',
   'className',
   'locale'
 ])
@@ -71,11 +76,14 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
     size = 'md',
     disabled = false,
     clearable = true,
-    showSearch = false,
+    searchable = false,
+    searchValue,
+    defaultSearchValue = '',
+    onSearchChange,
     expandTrigger = 'click',
     changeOnSelect = false,
     separator = ' / ',
-    notFoundText,
+    emptyText,
     className,
     locale
   } = props
@@ -95,7 +103,8 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
   const listboxId = `tiger-cascader-listbox-${instanceId}`
 
   const [isOpen, setIsOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(defaultSearchValue)
+  const searchQuery = searchValue ?? uncontrolledSearchValue
   const [activePath, setActivePath] = useState<CascaderValue>([])
 
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -108,17 +117,17 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
 
   const columns = useMemo(() => getCascaderColumns(options, activePath), [options, activePath])
 
-  const isSearchMode = showSearch && searchQuery.length > 0
+  const isSearchMode = searchable && searchQuery.length > 0
 
   const flattenedOptions = useMemo(() => {
-    if (!showSearch) return []
+    if (!searchable) return []
     return flattenCascaderOptions(options, [], [], changeOnSelect)
-  }, [showSearch, options, changeOnSelect])
+  }, [searchable, options, changeOnSelect])
 
   const searchResults = useMemo(() => {
     if (!isSearchMode) return []
-    return filterCascaderOptions(flattenedOptions, searchQuery, showSearch)
-  }, [isSearchMode, flattenedOptions, searchQuery, showSearch])
+    return filterCascaderOptions(flattenedOptions, searchQuery, searchable)
+  }, [isSearchMode, flattenedOptions, searchQuery, searchable])
 
   const triggerClasses = useMemo(
     () => classNames(getCascaderTriggerClasses(size, disabled, isOpen), className),
@@ -129,9 +138,16 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
   useEffect(() => {
     if (isOpen) {
       setActivePath(value ? [...value] : [])
-      setSearchQuery('')
+      updateSearchValue('')
     }
   }, [isOpen, value])
+
+  function updateSearchValue(value: string) {
+    if (searchValue === undefined) {
+      setUncontrolledSearchValue(value)
+    }
+    onSearchChange?.(value)
+  }
 
   // Click outside to close
   useEffect(() => {
@@ -279,13 +295,13 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
           ref={dropdownRef}
           className={classNames(cascaderDropdownClasses, isSearchMode && 'flex-col')}>
           {/* Search input */}
-          {showSearch && (
+          {searchable && (
             <input
               type="text"
               className={cascaderSearchInputClasses}
               placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => updateSearchValue(e.target.value)}
               aria-label="Search options"
             />
           )}
@@ -294,11 +310,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
             // Search results
             searchResults.length === 0 ? (
               <div className={cascaderEmptyStateClasses}>
-                {resolveLocaleText(
-                  'No results found',
-                  notFoundText,
-                  mergedLocale?.common?.emptyText
-                )}
+                {resolveLocaleText('No results found', emptyText, mergedLocale?.common?.emptyText)}
               </div>
             ) : (
               <div className="max-h-64 overflow-auto" {...getPickerListboxAria({ id: listboxId })}>
@@ -314,8 +326,8 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                       disabled: item.disabled
                     })}
                     onClick={() => handleSearchResultClick(item.valuePath, item.disabled)}>
-                    {typeof showSearch === 'object' && showSearch.render
-                      ? showSearch.render(searchQuery, item.path)
+                    {typeof searchable === 'object' && searchable.render
+                      ? searchable.render(searchQuery, item.path)
                       : item.label}
                   </div>
                 ))}

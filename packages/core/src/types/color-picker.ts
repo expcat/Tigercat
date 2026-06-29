@@ -1,7 +1,7 @@
 /**
  * ColorPicker size variants
  */
-export type ColorPickerSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Color format
@@ -15,7 +15,7 @@ export interface ColorPickerProps {
   /** Whether the picker is disabled */
   disabled?: boolean
   /** Component size */
-  size?: ColorPickerSize
+  size?: ComponentSize
   /** Whether to show alpha channel */
   showAlpha?: boolean
   /** Default format for input display */

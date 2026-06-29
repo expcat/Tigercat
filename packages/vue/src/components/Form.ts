@@ -20,7 +20,7 @@ import {
   type FormConditionState,
   type FormLabelPosition,
   type FormLabelAlign,
-  type FormSize,
+  type ComponentSize,
   type FormRule,
   type FormRuleTrigger,
   validateForm,
@@ -56,7 +56,7 @@ export interface FormContext {
   labelWidth?: string | number
   labelPosition: FormLabelPosition
   labelAlign: FormLabelAlign
-  size: FormSize
+  size: ComponentSize
   inlineMessage: boolean
   showRequiredAsterisk: boolean
   disabled: boolean
@@ -83,7 +83,7 @@ export interface VueFormProps {
   labelWidth?: string | number
   labelPosition?: FormLabelPosition
   labelAlign?: FormLabelAlign
-  size?: FormSize
+  size?: ComponentSize
   inlineMessage?: boolean
   showRequiredAsterisk?: boolean
   disabled?: boolean
@@ -139,8 +139,8 @@ export const Form = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<FormSize>,
-      default: 'md' as FormSize
+      type: String as PropType<ComponentSize>,
+      default: 'md' as ComponentSize
     },
     /**
      * Show inline validation messages

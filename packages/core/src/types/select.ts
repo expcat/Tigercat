@@ -2,6 +2,8 @@
  * Select component types and interfaces
  */
 
+import type { ComponentSize } from './base'
+
 export type SelectValue = string | number
 
 export type SelectValues = SelectValue[]
@@ -47,11 +49,6 @@ export interface SelectOptionGroup {
 export type SelectOptions = Array<SelectOption | SelectOptionGroup>
 
 /**
- * Select size types
- */
-export type SelectSize = 'sm' | 'md' | 'lg'
-
-/**
  * Base select props interface
  */
 export interface SelectProps {
@@ -59,7 +56,7 @@ export interface SelectProps {
    * Select size
    * @default 'md'
    */
-  size?: SelectSize
+  size?: ComponentSize
 
   /**
    * Whether the select is disabled
@@ -79,6 +76,16 @@ export interface SelectProps {
   searchable?: boolean
 
   /**
+   * Controlled search input value.
+   */
+  searchValue?: string
+
+  /**
+   * Default search input value for uncontrolled search.
+   */
+  defaultSearchValue?: string
+
+  /**
    * Whether to allow multiple selection
    * @default false
    */
@@ -96,16 +103,10 @@ export interface SelectProps {
   options?: SelectOptions
 
   /**
-   * Text to display when no options match search
-   * @default 'No options found'
+   * Text to display when the options list is empty or no search result matches.
+   * Defaults to ConfigProvider locale `common.emptyText`.
    */
-  noOptionsText?: string
-
-  /**
-   * Text to display when options list is empty
-   * @default 'No options available'
-   */
-  noDataText?: string
+  emptyText?: string
 
   /**
    * Maximum number of tags to display in multi-select mode.

@@ -26,7 +26,7 @@ import {
   checkSolidIcon20PathD,
   type SelectOption,
   type SelectOptions,
-  type SelectSize,
+  type ComponentSize,
   type SelectModelValue,
   type SelectSearchDebouncer,
   resolveLocaleText,
@@ -96,14 +96,15 @@ const CheckIcon = h(
 export interface VueSelectProps {
   modelValue?: SelectModelValue
   options?: SelectOptions
-  size?: SelectSize
+  size?: ComponentSize
   disabled?: boolean
   placeholder?: string
   searchable?: boolean
+  searchValue?: string
+  defaultSearchValue?: string
   multiple?: boolean
   clearable?: boolean
-  noOptionsText?: string
-  noDataText?: string
+  emptyText?: string
   maxTagCount?: number
   virtual?: boolean
   remote?: boolean
@@ -136,8 +137,8 @@ export const Select = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<SelectSize>,
-      default: 'md' as SelectSize
+      type: String as PropType<ComponentSize>,
+      default: 'md' as ComponentSize
     },
     /**
      * Whether the select is disabled
@@ -155,6 +156,14 @@ export const Select = defineComponent({
      * Enable search functionality
      */
     searchable: Boolean,
+    searchValue: {
+      type: String,
+      default: undefined
+    },
+    defaultSearchValue: {
+      type: String,
+      default: ''
+    },
     /**
      * Allow multiple selection
      */
@@ -168,18 +177,9 @@ export const Select = defineComponent({
       default: true
     },
     /**
-     * Text shown when no search results
-     * @default 'No options found'
+     * Text shown when the options list is empty or no search result matches
      */
-    noOptionsText: {
-      type: String,
-      default: undefined
-    },
-    /**
-     * Text shown when no data available
-     * @default 'No options available'
-     */
-    noDataText: {
+    emptyText: {
       type: String,
       default: undefined
     },
@@ -237,7 +237,7 @@ export const Select = defineComponent({
       default: undefined
     }
   },
-  emits: ['update:modelValue', 'change', 'search', 'create'],
+  emits: ['update:modelValue', 'update:searchValue', 'change', 'search-change', 'create'],
   setup(props, { emit }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
@@ -246,7 +246,8 @@ export const Select = defineComponent({
     const getOptionId = (index: number) => `tiger-select-option-${instanceId}-${index}`
 
     const isOpen = ref(false)
-    const searchQuery = ref('')
+    const uncontrolledSearchValue = ref(props.defaultSearchValue)
+    const searchQuery = computed(() => props.searchValue ?? uncontrolledSearchValue.value)
     const activeIndex = ref(-1)
     const createdOptions = ref<SelectOption[]>([])
     const dropdownRef = ref<HTMLElement | null>(null)
@@ -268,8 +269,16 @@ export const Select = defineComponent({
     })
     let searchDebouncer: SelectSearchDebouncer = createSelectSearchDebouncer({
       delay: props.searchDebounce,
-      onSearch: (query) => emit('search', query)
+      onSearchChange: (query) => emit('search-change', query)
     })
+
+    function updateSearchValue(query: string) {
+      if (props.searchValue === undefined) {
+        uncontrolledSearchValue.value = query
+      }
+      emit('update:searchValue', query)
+      searchDebouncer.schedule(query)
+    }
 
     const filteredOptions = computed(() => {
       return resolveSelectFilteredOptions(props.options, searchQuery.value, {
@@ -376,7 +385,7 @@ export const Select = defineComponent({
 
     function closeDropdown() {
       isOpen.value = false
-      searchQuery.value = ''
+      updateSearchValue('')
       activeIndex.value = -1
     }
 
@@ -432,8 +441,7 @@ export const Select = defineComponent({
 
     function handleSearchInput(event: Event) {
       const target = event.target as HTMLInputElement
-      searchQuery.value = target.value
-      searchDebouncer.schedule(target.value)
+      updateSearchValue(target.value)
     }
 
     function getActiveOption(): SelectOption | undefined {
@@ -643,7 +651,7 @@ export const Select = defineComponent({
         searchDebouncer.cancel()
         searchDebouncer = createSelectSearchDebouncer({
           delay,
-          onSearch: (query) => emit('search', query)
+          onSearchChange: (query) => emit('search-change', query)
         })
       }
     )
@@ -899,17 +907,11 @@ export const Select = defineComponent({
                   : h(
                       'div',
                       { class: selectEmptyStateClasses },
-                      props.options.length === 0
-                        ? resolveLocaleText(
-                            'No options available',
-                            props.noDataText,
-                            mergedLocale.value?.common?.emptyText
-                          )
-                        : resolveLocaleText(
-                            'No options found',
-                            props.noOptionsText,
-                            mergedLocale.value?.common?.emptyText
-                          )
+                      resolveLocaleText(
+                        'No options found',
+                        props.emptyText,
+                        mergedLocale.value?.common?.emptyText
+                      )
                     )
             ]
           )

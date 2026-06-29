@@ -128,7 +128,7 @@ describe('custom text (no i18n) — Vue', () => {
           setup() {
             return () =>
               h(ConfigProvider, { locale: { common: { searchPlaceholder: '全局搜索' } } }, () =>
-                h(Transfer, { showSearch: true })
+                h(Transfer, { searchable: true })
               )
           }
         })
@@ -143,7 +143,7 @@ describe('custom text (no i18n) — Vue', () => {
             return () =>
               h(ConfigProvider, { locale: { common: { searchPlaceholder: '全局搜索' } } }, () =>
                 h(Transfer, {
-                  showSearch: true,
+                  searchable: true,
                   locale: { common: { searchPlaceholder: '局部搜索' } }
                 })
               )
@@ -207,7 +207,7 @@ describe('custom text (no i18n) — Vue', () => {
           setup() {
             return () =>
               h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
-                h(Cascader, { options: [{ label: 'Beijing', value: 'bj' }], showSearch: true })
+                h(Cascader, { options: [{ label: 'Beijing', value: 'bj' }], searchable: true })
               )
           }
         })
@@ -217,7 +217,7 @@ describe('custom text (no i18n) — Vue', () => {
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
-    it('Cascader notFoundText prop wins over global config', async () => {
+    it('Cascader emptyText prop wins over global config', async () => {
       const { container, getByText, queryByText } = render(
         defineComponent({
           setup() {
@@ -225,8 +225,8 @@ describe('custom text (no i18n) — Vue', () => {
               h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
                 h(Cascader, {
                   options: [{ label: 'Beijing', value: 'bj' }],
-                  showSearch: true,
-                  notFoundText: '查无此项'
+                  searchable: true,
+                  emptyText: '查无此项'
                 })
               )
           }
@@ -238,7 +238,7 @@ describe('custom text (no i18n) — Vue', () => {
       expect(queryByText('暂无数据')).toBeNull()
     })
 
-    it('Select noDataText (empty options) reads global config emptyText', async () => {
+    it('Select emptyText (empty options) reads global config emptyText', async () => {
       const { container, getByText } = render(
         defineComponent({
           setup() {
@@ -253,7 +253,7 @@ describe('custom text (no i18n) — Vue', () => {
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
-    it('Select noOptionsText (no search results) reads global config emptyText', async () => {
+    it('Select emptyText (no search results) reads global config emptyText', async () => {
       const { container, getByText } = render(
         defineComponent({
           setup() {
@@ -269,13 +269,13 @@ describe('custom text (no i18n) — Vue', () => {
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
-    it('Select noDataText prop wins over global config', async () => {
+    it('Select emptyText prop wins over global config', async () => {
       const { container, getByText, queryByText } = render(
         defineComponent({
           setup() {
             return () =>
               h(ConfigProvider, { locale: { common: { emptyText: '暂无数据' } } }, () =>
-                h(Select, { options: [], noDataText: '没有可选项' })
+                h(Select, { options: [], emptyText: '没有可选项' })
               )
           }
         })
@@ -362,7 +362,7 @@ describe('custom text (no i18n) — Vue', () => {
     })
 
     it('Transfer search outside a ConfigProvider keeps default English placeholder', () => {
-      render(Transfer, { props: { showSearch: true } })
+      render(Transfer, { props: { searchable: true } })
       expect(screen.getAllByPlaceholderText('Search...').length).toBeGreaterThan(0)
     })
 

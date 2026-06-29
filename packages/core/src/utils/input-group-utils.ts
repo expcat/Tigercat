@@ -4,7 +4,7 @@
  * @since 0.9.0
  */
 
-import type { InputGroupSize } from '../types/input-group'
+import type { ComponentSize } from '../types/base'
 
 /**
  * Base classes for InputGroup container
@@ -31,7 +31,7 @@ export const inputGroupAddonBaseClasses =
 /**
  * Addon size classes
  */
-export const inputGroupAddonSizeClasses: Record<InputGroupSize, string> = {
+export const inputGroupAddonSizeClasses: Record<ComponentSize, string> = {
   sm: 'px-2 py-1 text-sm',
   md: 'px-3 py-2 text-base',
   lg: 'px-4 py-3 text-lg'
@@ -53,7 +53,7 @@ export function getInputGroupClasses(compact: boolean, className?: string): stri
  * Get InputGroup addon classes
  */
 export function getInputGroupAddonClasses(
-  size: InputGroupSize,
+  size: ComponentSize,
   compact: boolean,
   className?: string
 ): string {

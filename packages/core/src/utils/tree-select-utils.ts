@@ -1,5 +1,5 @@
+import type { ComponentSize } from '../types/base'
 import type { TreeNode } from '../types/tree'
-import type { TreeSelectSize } from '../types/tree-select'
 import { classNames } from './class-names'
 
 // ============================================================================
@@ -24,13 +24,13 @@ export const treeSelectNodeBaseClasses =
 // SIZE HELPERS
 // ============================================================================
 
-const triggerSizeClasses: Record<TreeSelectSize, string> = {
+const triggerSizeClasses: Record<ComponentSize, string> = {
   sm: 'text-sm py-1.5 pl-2 pr-8',
   md: 'text-base py-2 pl-3 pr-10',
   lg: 'text-lg py-2.5 pl-4 pr-12'
 }
 
-const nodeSizeClasses: Record<TreeSelectSize, string> = {
+const nodeSizeClasses: Record<ComponentSize, string> = {
   sm: 'text-sm py-1',
   md: 'text-base py-1.5',
   lg: 'text-lg py-2'
@@ -41,7 +41,7 @@ const nodeSizeClasses: Record<TreeSelectSize, string> = {
 // ============================================================================
 
 export function getTreeSelectTriggerClasses(
-  size: TreeSelectSize = 'md',
+  size: ComponentSize = 'md',
   disabled: boolean = false,
   isOpen: boolean = false
 ): string {
@@ -60,7 +60,7 @@ export function getTreeSelectTriggerClasses(
 export function getTreeSelectNodeClasses(
   isSelected: boolean = false,
   isDisabled: boolean = false,
-  size: TreeSelectSize = 'md'
+  size: ComponentSize = 'md'
 ): string {
   const stateClass = isDisabled
     ? 'text-[var(--tiger-treeselect-node-text-disabled,var(--tiger-text-muted,#9ca3af))] cursor-not-allowed opacity-50'

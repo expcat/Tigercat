@@ -1,5 +1,5 @@
 import { defineComponent, h, ref, computed, type PropType } from 'vue'
-import type { TransferItem, TransferSize } from '@expcat/tigercat-core'
+import type { TransferItem, TransferSearchValue, ComponentSize } from '@expcat/tigercat-core'
 import {
   transferBaseClasses,
   transferPanelClasses,
@@ -68,16 +68,24 @@ export const Transfer = defineComponent({
       default: () => []
     },
     size: {
-      type: String as PropType<TransferSize>,
+      type: String as PropType<ComponentSize>,
       default: 'md'
     },
     disabled: {
       type: Boolean,
       default: false
     },
-    showSearch: {
+    searchable: {
       type: Boolean,
       default: false
+    },
+    searchValue: {
+      type: Object as PropType<TransferSearchValue>,
+      default: undefined
+    },
+    defaultSearchValue: {
+      type: Object as PropType<TransferSearchValue>,
+      default: () => ({})
     },
     sourceTitle: {
       type: String,
@@ -87,7 +95,7 @@ export const Transfer = defineComponent({
       type: String,
       default: 'Target'
     },
-    notFoundText: {
+    emptyText: {
       type: String,
       default: undefined
     },
@@ -103,14 +111,25 @@ export const Transfer = defineComponent({
       default: undefined
     }
   },
-  emits: ['update:modelValue', 'change'],
+  emits: ['update:modelValue', 'update:searchValue', 'change', 'search-change'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const sourceSelectedKeys = ref<Set<string | number>>(new Set())
     const targetSelectedKeys = ref<Set<string | number>>(new Set())
-    const sourceSearch = ref('')
-    const targetSearch = ref('')
+    const uncontrolledSearchValue = ref<TransferSearchValue>({ ...props.defaultSearchValue })
+    const resolvedSearchValue = computed(() => props.searchValue ?? uncontrolledSearchValue.value)
+    const sourceSearch = computed(() => resolvedSearchValue.value.source ?? '')
+    const targetSearch = computed(() => resolvedSearchValue.value.target ?? '')
+
+    function updateSearchValue(panel: keyof TransferSearchValue, value: string) {
+      const next = { ...resolvedSearchValue.value, [panel]: value }
+      if (props.searchValue === undefined) {
+        uncontrolledSearchValue.value = next
+      }
+      emit('update:searchValue', next)
+      emit('search-change', next)
+    }
 
     // `modelValue` (v-model) takes priority; `targetKeys` is the shared alias.
     const resolvedTargetKeys = computed(() => props.modelValue ?? props.targetKeys ?? [])
@@ -197,7 +216,7 @@ export const Transfer = defineComponent({
       selectedKeys: Set<string | number>,
       toggleFn: (key: string | number) => void,
       searchValue: string,
-      onSearch: (val: string) => void
+      onSearchInput: (val: string) => void
     ) {
       return h('div', { class: transferPanelClasses, role: 'group', 'aria-label': title }, [
         // Header
@@ -210,7 +229,7 @@ export const Transfer = defineComponent({
         ]),
 
         // Search
-        props.showSearch
+        props.searchable
           ? h('input', {
               type: 'text',
               class: transferSearchClasses,
@@ -220,7 +239,7 @@ export const Transfer = defineComponent({
               ),
               value: searchValue,
               'aria-label': `Search ${title}`,
-              onInput: (e: Event) => onSearch((e.target as HTMLInputElement).value)
+              onInput: (e: Event) => onSearchInput((e.target as HTMLInputElement).value)
             })
           : null,
 
@@ -262,7 +281,7 @@ export const Transfer = defineComponent({
                   { class: transferEmptyClasses },
                   resolveLocaleText(
                     'No data',
-                    props.notFoundText,
+                    props.emptyText,
                     mergedLocale.value?.common?.emptyText
                   )
                 )
@@ -282,9 +301,7 @@ export const Transfer = defineComponent({
           sourceSelectedKeys.value,
           toggleSourceItem,
           sourceSearch.value,
-          (val) => {
-            sourceSearch.value = val
-          }
+          (value) => updateSearchValue('source', value)
         ),
 
         // Operation buttons
@@ -320,9 +337,7 @@ export const Transfer = defineComponent({
           targetSelectedKeys.value,
           toggleTargetItem,
           targetSearch.value,
-          (val) => {
-            targetSearch.value = val
-          }
+          (value) => updateSearchValue('target', value)
         )
       ])
     }

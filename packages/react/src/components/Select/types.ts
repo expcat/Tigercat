@@ -4,7 +4,7 @@ import type {
   SelectOptions,
   SelectValue,
   SelectValues,
-  SelectSize,
+  ComponentSize,
   SelectProps as CoreSelectProps,
   TigerLocale
 } from '@expcat/tigercat-core'
@@ -18,7 +18,7 @@ export interface SelectBaseProps
   extends Omit<CoreSelectProps, 'multiple' | 'options'>, SelectDivProps {
   options?: SelectOptions
 
-  onSearch?: (query: string) => void
+  onSearchChange?: (query: string) => void
 
   onCreate?: (option: SelectOption) => void
 
@@ -67,15 +67,14 @@ export interface SelectContext {
 
   // resolved view props
   isMultiple: boolean
-  size: SelectSize
+  size: ComponentSize
   virtual: boolean
   listHeight: number
   disabled: boolean
   placeholder: string
   searchable: boolean
   clearable: boolean
-  noDataText: string
-  noOptionsText: string
+  emptyText: string
   createOptionText: string
   className?: string
   divProps: Record<string, unknown>

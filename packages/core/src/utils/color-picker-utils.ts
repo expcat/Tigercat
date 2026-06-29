@@ -1,5 +1,5 @@
 import { classNames } from './class-names'
-import type { ColorPickerSize } from '../types/color-picker'
+import type { ComponentSize } from '../types/base'
 
 /* ------------------------------------------------------------------ */
 /*  Style constants                                                    */
@@ -7,13 +7,13 @@ import type { ColorPickerSize } from '../types/color-picker'
 
 export const colorPickerBaseClasses = 'relative inline-block'
 
-const triggerSizes: Record<ColorPickerSize, string> = {
+const triggerSizes: Record<ComponentSize, string> = {
   sm: 'w-6 h-6',
   md: 'w-8 h-8',
   lg: 'w-10 h-10'
 }
 
-export function getColorPickerTriggerClasses(size: ColorPickerSize, disabled: boolean): string {
+export function getColorPickerTriggerClasses(size: ComponentSize, disabled: boolean): string {
   return classNames(
     'rounded-[var(--tiger-radius-md,0.5rem)] border transition-all overflow-hidden',
     'border-[var(--tiger-colorpicker-border,var(--tiger-border,#d1d5db))]',

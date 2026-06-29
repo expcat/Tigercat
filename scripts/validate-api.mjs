@@ -532,6 +532,88 @@ for (const relativePath of [
   })
 }
 
+// ----- R15 Form composite selector API guard -----
+
+const R15_FORBIDDEN_TYPE_EXPORTS = [
+  'SelectSize',
+  'TreeSelectSize',
+  'CascaderSize',
+  'AutoCompleteSize',
+  'DatePickerSize',
+  'TimePickerSize',
+  'TransferSize',
+  'ColorPickerSize',
+  'InputGroupSize',
+  'FormSize',
+  'DatePickerSingleModelValue',
+  'DatePickerRangeModelValue',
+  'DatePickerSingleValue',
+  'DatePickerRangeValue',
+  'TimePickerSingleValue',
+  'TimePickerRangeValue'
+]
+
+for (const filename of typeFiles) {
+  const filepath = join(TYPES_DIR, filename)
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    for (const typeName of R15_FORBIDDEN_TYPE_EXPORTS) {
+      if (new RegExp(`\\bexport\\s+type\\s+${typeName}\\b`).test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'form-composite-api',
+          `R15 public type alias "${typeName}" must use ComponentSize, DatePickerModelValue, or TimePickerModelValue instead`
+        )
+      }
+    }
+  })
+}
+
+const R15_FORM_COMPOSITE_FILES = [
+  'packages/core/src/types/select.ts',
+  'packages/core/src/types/tree-select.ts',
+  'packages/core/src/types/cascader.ts',
+  'packages/core/src/types/auto-complete.ts',
+  'packages/core/src/types/transfer.ts',
+  'packages/react/src/components/Select/types.ts',
+  'packages/react/src/components/TreeSelect.tsx',
+  'packages/react/src/components/Cascader.tsx',
+  'packages/react/src/components/AutoComplete.tsx',
+  'packages/react/src/components/Transfer.tsx',
+  'packages/vue/src/components/Select.ts',
+  'packages/vue/src/components/TreeSelect.ts',
+  'packages/vue/src/components/Cascader.ts',
+  'packages/vue/src/components/AutoComplete.ts',
+  'packages/vue/src/components/Transfer.ts'
+]
+
+const R15_FORBIDDEN_SEARCH_EMPTY_API = [
+  { label: 'showSearch', regex: /\bshowSearch\b/ },
+  { label: 'notFoundText', regex: /\bnotFoundText\b/ },
+  { label: 'noOptionsText', regex: /\bnoOptionsText\b/ },
+  { label: 'noDataText', regex: /\bnoDataText\b/ },
+  { label: 'onSearch prop', regex: /^\s*onSearch\??\s*:/ }
+]
+
+for (const relativePath of R15_FORM_COMPOSITE_FILES) {
+  const filepath = join(ROOT, relativePath)
+  if (!existsSync(filepath)) continue
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    for (const rule of R15_FORBIDDEN_SEARCH_EMPTY_API) {
+      if (rule.regex.test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'form-composite-api',
+          `R15 form composite selectors must use searchable/searchValue/defaultSearchValue/onSearchChange and emptyText instead of ${rule.label}`
+        )
+      }
+    }
+  })
+}
+
 // ----- LLM docs coverage check -----
 
 function collectMarkdownContent(dir, options = {}) {
@@ -813,6 +895,7 @@ if (jsonMode) {
       'overlay-api': '弹出层 API 一致性',
       'overlay-visible-api': '弹出层 visible 兼容 API 禁止回流',
       'form-primitive-model': '表单基础组件受控模型禁止旧 API 回流',
+      'form-composite-api': '表单复合组件 R15 旧 API 禁止回流',
       'controlled-parity': '受控量双端对称',
       'public-deprecated': '公开 API 禁止 @deprecated',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',

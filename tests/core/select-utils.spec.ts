@@ -50,7 +50,7 @@ describe('select-utils', () => {
     let nextHandle = 0
     const debouncer = createSelectSearchDebouncer({
       delay: 200,
-      onSearch,
+      onSearchChange: onSearch,
       setTimer: (callback) => {
         nextHandle += 1
         callbacks.set(nextHandle, callback)

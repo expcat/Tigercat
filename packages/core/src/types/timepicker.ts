@@ -1,15 +1,10 @@
 /** TimePicker shared types */
+import type { ComponentSize } from './base'
 import type { TigerLocale } from './locale'
-
-export type TimePickerSize = 'sm' | 'md' | 'lg'
 
 export type TimeFormat = '12' | '24'
 
-export type TimePickerSingleValue = string | null
-
-export type TimePickerRangeValue = [string | null, string | null]
-
-export type TimePickerModelValue = TimePickerSingleValue | TimePickerRangeValue
+export type TimePickerModelValue = string | null | [string | null, string | null]
 
 export interface TimePickerLabels {
   hour: string
@@ -43,7 +38,7 @@ export interface TimePickerProps {
    * TimePicker size
    * @default 'md'
    */
-  size?: TimePickerSize
+  size?: ComponentSize
 
   /** Controlled value. Format: 'HH:mm' or 'HH:mm:ss' */
   value?: TimePickerModelValue

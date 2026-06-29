@@ -1,6 +1,9 @@
 /**
  * Transfer item data
  */
+
+import type { ComponentSize } from './base'
+
 export interface TransferItem {
   /** Unique key */
   key: string | number
@@ -13,14 +16,14 @@ export interface TransferItem {
 }
 
 /**
- * Transfer size variants
- */
-export type TransferSize = 'sm' | 'md' | 'lg'
-
-/**
  * Transfer direction
  */
 export type TransferDirection = 'left' | 'right'
+
+export interface TransferSearchValue {
+  source?: string
+  target?: string
+}
 
 /**
  * Shared Transfer props (framework-agnostic)
@@ -31,17 +34,21 @@ export interface TransferProps {
   /** Keys of items in the right (target) list */
   targetKeys?: (string | number)[]
   /** Component size */
-  size?: TransferSize
+  size?: ComponentSize
   /** Whether the component is disabled */
   disabled?: boolean
   /** Whether to show search input in each panel */
-  showSearch?: boolean
+  searchable?: boolean
+  /** Controlled search input values for source and target panels */
+  searchValue?: TransferSearchValue
+  /** Default search input values for source and target panels */
+  defaultSearchValue?: TransferSearchValue
   /** Title for left panel */
   sourceTitle?: string
   /** Title for right panel */
   targetTitle?: string
   /** Text shown when a panel has no items */
-  notFoundText?: string
+  emptyText?: string
   /** Custom class name */
   className?: string
   /** Custom filter function */

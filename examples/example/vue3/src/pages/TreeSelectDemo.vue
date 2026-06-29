@@ -37,7 +37,7 @@ const basicScriptSnippet = `import { ref } from 'vue'
 const val = ref(undefined)`
 
 const basicSnippet = `<TreeSelect v-model="val" :tree-data="treeData" placeholder="请选择成员" />`
-const searchSnippet = `<TreeSelect v-model="val" :tree-data="treeData" placeholder="搜索成员" show-search />`
+const searchSnippet = `<TreeSelect v-model="val" :tree-data="treeData" placeholder="搜索成员" searchable />`
 const sizeSnippet = `<TreeSelect :tree-data="treeData" size="sm" placeholder="小" />
 <TreeSelect :tree-data="treeData" size="lg" placeholder="大" />
 <TreeSelect :tree-data="treeData" disabled placeholder="禁用" />`
@@ -52,8 +52,8 @@ const sizeSnippet = `<TreeSelect :tree-data="treeData" size="sm" placeholder="�
       <TreeSelect v-model="val" :tree-data="treeData" placeholder="请选择成员" />
     </DemoBlock>
 
-    <DemoBlock title="可搜索" description="show-search 开启搜索" :code="searchSnippet">
-      <TreeSelect v-model="val2" :tree-data="treeData" placeholder="搜索成员" show-search />
+    <DemoBlock title="可搜索" description="searchable 开启搜索" :code="searchSnippet">
+      <TreeSelect v-model="val2" :tree-data="treeData" placeholder="搜索成员" searchable />
     </DemoBlock>
 
     <DemoBlock title="尺寸与禁用" :code="sizeSnippet">

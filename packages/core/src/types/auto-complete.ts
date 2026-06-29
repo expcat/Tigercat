@@ -2,6 +2,7 @@
  * AutoComplete option
  */
 
+import type { ComponentSize } from './base'
 import type { TigerLocale } from './locale'
 export interface AutoCompleteOption {
   /** Display text */
@@ -11,11 +12,6 @@ export interface AutoCompleteOption {
   /** Whether the option is disabled */
   disabled?: boolean
 }
-
-/**
- * AutoComplete size variants
- */
-export type AutoCompleteSize = 'sm' | 'md' | 'lg'
 
 /**
  * Shared AutoComplete props (framework-agnostic)
@@ -28,14 +24,18 @@ export interface AutoCompleteProps {
   options?: AutoCompleteOption[]
   /** Placeholder text */
   placeholder?: string
+  /** Controlled search input value */
+  searchValue?: string
+  /** Default search input value */
+  defaultSearchValue?: string
   /** Component size */
-  size?: AutoCompleteSize
+  size?: ComponentSize
   /** Whether the component is disabled */
   disabled?: boolean
   /** Whether to show clear button */
   clearable?: boolean
   /** Text shown when no options match */
-  notFoundText?: string
+  emptyText?: string
   /** Whether to filter options locally based on input value (default: true) */
   filterOption?: boolean | ((inputValue: string, option: AutoCompleteOption) => boolean)
   /** Custom class name */

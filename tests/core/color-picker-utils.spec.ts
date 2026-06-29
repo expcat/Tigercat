@@ -13,7 +13,7 @@ import {
   formatColorString,
   isValidHex
 } from '@expcat/tigercat-core'
-import type { ColorPickerSize } from '@expcat/tigercat-core'
+import type { ComponentSize } from '@expcat/tigercat-core'
 
 describe('color-picker-utils — class generators', () => {
   it('colorPickerBaseClasses is the inline-block wrapper', () => {
@@ -21,7 +21,7 @@ describe('color-picker-utils — class generators', () => {
   })
 
   it('getColorPickerTriggerClasses includes radius/border token + size + enabled affordance', () => {
-    const sizes: Array<[ColorPickerSize, string]> = [
+    const sizes: Array<[ComponentSize, string]> = [
       ['sm', 'w-6 h-6'],
       ['md', 'w-8 h-8'],
       ['lg', 'w-10 h-10']

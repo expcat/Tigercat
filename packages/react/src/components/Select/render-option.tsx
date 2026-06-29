@@ -97,11 +97,7 @@ const VirtualSelectOptions: React.FC<{ ctx: SelectContext; options: SelectOption
 
 export function renderOptions(ctx: SelectContext): React.ReactNode {
   if (!ctx.hasOptions && !ctx.creatableOption) {
-    return (
-      <div className={selectEmptyStateClasses}>
-        {ctx.optionsLength === 0 ? ctx.noDataText : ctx.noOptionsText}
-      </div>
-    )
+    return <div className={selectEmptyStateClasses}>{ctx.emptyText}</div>
   }
 
   // Virtual mode: only for flat option lists (no groups). Groups fall back to

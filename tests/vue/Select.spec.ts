@@ -298,7 +298,7 @@ describe('Select', () => {
         props: {
           options: testOptions,
           searchable: true,
-          onSearch
+          onSearchChange: onSearch
         }
       })
 
@@ -337,7 +337,7 @@ describe('Select', () => {
           options: testOptions,
           searchable: true,
           searchDebounce: 200,
-          onSearch
+          onSearchChange: onSearch
         }
       })
 
@@ -540,11 +540,11 @@ describe('Select', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should display noDataText when options array is empty', async () => {
+    it('should display emptyText when options array is empty', async () => {
       const { container, getByText } = render(Select, {
         props: {
           options: [],
-          noDataText: 'No data available'
+          emptyText: 'No data available'
         }
       })
 
@@ -554,12 +554,12 @@ describe('Select', () => {
       expect(getByText('No data available')).toBeInTheDocument()
     })
 
-    it('should display noOptionsText when search returns no results', async () => {
+    it('should display emptyText when search returns no results', async () => {
       const { container, getByText } = render(Select, {
         props: {
           options: testOptions,
           searchable: true,
-          noOptionsText: 'No matches found'
+          emptyText: 'No matches found'
         }
       })
 

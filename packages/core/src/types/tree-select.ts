@@ -1,9 +1,5 @@
+import type { ComponentSize } from './base'
 import type { TreeNode } from './tree'
-
-/**
- * TreeSelect size variants
- */
-export type TreeSelectSize = 'sm' | 'md' | 'lg'
 
 /**
  * TreeSelect value type
@@ -19,7 +15,7 @@ export interface TreeSelectProps {
   /** Placeholder text */
   placeholder?: string
   /** Component size */
-  size?: TreeSelectSize
+  size?: ComponentSize
   /** Whether the component is disabled */
   disabled?: boolean
   /** Whether to show clear button */
@@ -27,9 +23,13 @@ export interface TreeSelectProps {
   /** Whether to allow multiple selection */
   multiple?: boolean
   /** Whether to show search input in dropdown */
-  showSearch?: boolean
+  searchable?: boolean
+  /** Controlled search input value */
+  searchValue?: string
+  /** Default search input value */
+  defaultSearchValue?: string
   /** Text shown when no results found */
-  notFoundText?: string
+  emptyText?: string
   /** Whether to expand all tree nodes by default */
   defaultExpandAll?: boolean
   /** Custom class name */

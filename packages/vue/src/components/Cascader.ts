@@ -24,9 +24,9 @@ import {
   coerceClassValue,
   type CascaderOption,
   type CascaderValue,
-  type CascaderSize,
+  type ComponentSize,
   type CascaderExpandTrigger,
-  type CascaderShowSearch,
+  type CascaderSearchConfig,
   resolveLocaleText,
   mergeTigerLocale,
   type TigerLocale
@@ -57,14 +57,16 @@ export interface VueCascaderProps {
   modelValue?: CascaderValue
   options?: CascaderOption[]
   placeholder?: string
-  size?: CascaderSize
+  size?: ComponentSize
   disabled?: boolean
   clearable?: boolean
-  showSearch?: boolean | CascaderShowSearch
+  searchable?: boolean | CascaderSearchConfig
+  searchValue?: string
+  defaultSearchValue?: string
   expandTrigger?: CascaderExpandTrigger
   changeOnSelect?: boolean
   separator?: string
-  notFoundText?: string
+  emptyText?: string
   locale?: Partial<TigerLocale>
 }
 
@@ -84,7 +86,7 @@ export const Cascader = defineComponent({
       default: 'Please select'
     },
     size: {
-      type: String as PropType<CascaderSize>,
+      type: String as PropType<ComponentSize>,
       default: 'md'
     },
     disabled: {
@@ -95,9 +97,17 @@ export const Cascader = defineComponent({
       type: Boolean,
       default: true
     },
-    showSearch: {
-      type: [Boolean, Object] as PropType<boolean | CascaderShowSearch>,
+    searchable: {
+      type: [Boolean, Object] as PropType<boolean | CascaderSearchConfig>,
       default: false
+    },
+    searchValue: {
+      type: String,
+      default: undefined
+    },
+    defaultSearchValue: {
+      type: String,
+      default: ''
     },
     expandTrigger: {
       type: String as PropType<CascaderExpandTrigger>,
@@ -111,7 +121,7 @@ export const Cascader = defineComponent({
       type: String,
       default: ' / '
     },
-    notFoundText: {
+    emptyText: {
       type: String,
       default: undefined
     },
@@ -123,13 +133,14 @@ export const Cascader = defineComponent({
       default: undefined
     }
   },
-  emits: ['update:modelValue', 'change'],
+  emits: ['update:modelValue', 'update:searchValue', 'change', 'search-change'],
   setup(props, { emit, attrs }) {
     const instanceId = ++cascaderInstanceId
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const isOpen = ref(false)
-    const searchQuery = ref('')
+    const uncontrolledSearchValue = ref(props.defaultSearchValue)
+    const searchQuery = computed(() => props.searchValue ?? uncontrolledSearchValue.value)
     const activePath = ref<CascaderValue>([])
     const triggerRef = ref<HTMLElement | null>(null)
     const dropdownRef = ref<HTMLElement | null>(null)
@@ -148,19 +159,19 @@ export const Cascader = defineComponent({
 
     // Search mode active
     const isSearchMode = computed(() => {
-      return props.showSearch && searchQuery.value.length > 0
+      return props.searchable && searchQuery.value.length > 0
     })
 
     // Flattened options for search
     const flattenedOptions = computed(() => {
-      if (!props.showSearch) return []
+      if (!props.searchable) return []
       return flattenCascaderOptions(props.options, [], [], props.changeOnSelect)
     })
 
     // Filtered search results
     const searchResults = computed(() => {
       if (!isSearchMode.value) return []
-      return filterCascaderOptions(flattenedOptions.value, searchQuery.value, props.showSearch)
+      return filterCascaderOptions(flattenedOptions.value, searchQuery.value, props.searchable)
     })
 
     // Trigger classes
@@ -175,9 +186,17 @@ export const Cascader = defineComponent({
     watch(isOpen, (open) => {
       if (open) {
         activePath.value = props.modelValue ? [...props.modelValue] : []
-        searchQuery.value = ''
+        updateSearchValue('')
       }
     })
+
+    function updateSearchValue(value: string) {
+      if (props.searchValue === undefined) {
+        uncontrolledSearchValue.value = value
+      }
+      emit('update:searchValue', value)
+      emit('search-change', value)
+    }
 
     function toggleOpen() {
       if (props.disabled) return
@@ -232,7 +251,7 @@ export const Cascader = defineComponent({
     }
 
     function handleSearchInput(e: Event) {
-      searchQuery.value = (e.target as HTMLInputElement).value
+      updateSearchValue((e.target as HTMLInputElement).value)
     }
 
     // Keyboard navigation
@@ -368,7 +387,7 @@ export const Cascader = defineComponent({
         const children: ReturnType<typeof h>[] = []
 
         // Search input
-        if (props.showSearch) {
+        if (props.searchable) {
           children.push(
             h('input', {
               ref: searchInputRef,
@@ -394,7 +413,7 @@ export const Cascader = defineComponent({
                 { class: cascaderEmptyStateClasses },
                 resolveLocaleText(
                   'No results found',
-                  props.notFoundText,
+                  props.emptyText,
                   mergedLocale.value?.common?.emptyText
                 )
               )
@@ -417,8 +436,8 @@ export const Cascader = defineComponent({
                     }),
                     onClick: () => handleSearchResultClick(item.valuePath, item.disabled)
                   },
-                  typeof props.showSearch === 'object' && props.showSearch.render
-                    ? props.showSearch.render(searchQuery.value, item.path)
+                  typeof props.searchable === 'object' && props.searchable.render
+                    ? props.searchable.render(searchQuery.value, item.path)
                     : item.label
                 )
               )

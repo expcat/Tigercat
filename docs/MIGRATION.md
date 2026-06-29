@@ -98,6 +98,70 @@ Vue RadioGroup 也从 `v-model:value` 收敛为默认 `v-model`。`Radio` 的 `v
 
 React Checkbox、Radio、Switch 保持 React 惯用的 `checked` / `defaultChecked` / `onChange`。
 
+### Form composite selectors 搜索、空态与尺寸类型收敛
+
+core 不再导出等同 `ComponentSize` 的表单复合组件尺寸别名：
+
+- `SelectSize` / `TreeSelectSize` / `CascaderSize` / `AutoCompleteSize`
+- `DatePickerSize` / `TimePickerSize` / `TransferSize` / `ColorPickerSize`
+- `InputGroupSize` / `FormSize`
+
+请直接使用 `ComponentSize`：
+
+```diff
+- import type { SelectSize, FormSize } from '@expcat/tigercat-core'
++ import type { ComponentSize } from '@expcat/tigercat-core'
+
+- const selectSize: SelectSize = 'md'
++ const selectSize: ComponentSize = 'md'
+```
+
+DatePicker / TimePicker 只保留一个 public model surface。此前区分 single / range 的 public aliases 已删除：
+
+```diff
+- import type { DatePickerSingleValue, TimePickerRangeValue } from '@expcat/tigercat-core'
++ import type { DatePickerModelValue, TimePickerModelValue } from '@expcat/tigercat-core'
+```
+
+Select、TreeSelect、Cascader、AutoComplete、Transfer 的搜索受控量统一为 `searchValue` / `defaultSearchValue`。React 回调统一为 `onSearchChange`：
+
+```diff
+- <Select showSearch onSearch={setSearch} noOptionsText="No matches" />
++ <Select searchable onSearchChange={setSearch} emptyText="No matches" />
+```
+
+```diff
+- <Transfer showSearch onSearch={(side, value) => setSearch(side, value)} notFoundText="No data" />
++ <Transfer
++   searchable
++   searchValue={{ source: sourceSearch, target: targetSearch }}
++   onSearchChange={(next) => setSearch(next)}
++   emptyText="No data"
++ />
+```
+
+Vue 对应使用 `v-model:search-value` / `search-change`，空态文案统一为 `empty-text`：
+
+```diff
+- <TreeSelect show-search @search="setSearch" not-found-text="No matches" />
++ <TreeSelect searchable @search-change="setSearch" empty-text="No matches" />
+```
+
+```diff
+- <AutoComplete v-model="value" @search="setSearch" not-found-text="No results" />
++ <AutoComplete v-model="value" v-model:search-value="search" empty-text="No results" />
+```
+
+未显式传入 `emptyText` / `empty-text` 时，空态文案继续按组件 locale、ConfigProvider locale 和英文默认值解析。旧 `notFoundText`、`noOptionsText`、`noDataText` 不再保留。
+
+Upload 的上传队列、分片和断点续传 helper 已从内部 `upload-utils` 拆入 `upload-queue-utils`。根入口 named exports 保持可用；仅需要选择、拖拽、文件状态或样式 helper 的场景不会再因为基础 Upload helper 拉入队列 / 分片逻辑：
+
+```diff
+- import { getUploadItemStatusClasses, runUploadQueue } from '@expcat/tigercat-core'
++ import { getUploadItemStatusClasses } from '@expcat/tigercat-core'
++ import { runUploadQueue } from '@expcat/tigercat-core'
+```
+
 ### Carousel 索引改为受控模型
 
 `Carousel` 移除 `initialSlide`，改为与其他非表单受控量一致的 `currentIndex` 模型。

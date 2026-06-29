@@ -1,12 +1,14 @@
 import type React from 'react'
 import type {
+  DatePickerInputDate,
   DatePickerProps as CoreDatePickerProps,
-  DatePickerSingleModelValue,
-  DatePickerRangeModelValue,
-  DatePickerRangeValue,
   DatePickerShortcut,
   DatePickerLabels
 } from '@expcat/tigercat-core'
+
+type DatePickerSingleInputValue = DatePickerInputDate | null
+type DatePickerRangeInputValue = [DatePickerInputDate | null, DatePickerInputDate | null]
+type DatePickerRangeResolvedValue = [Date | null, Date | null]
 
 type DatePickerDivProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
@@ -22,16 +24,16 @@ export interface DatePickerBaseProps
 
 export interface DatePickerSingleProps extends DatePickerBaseProps {
   range?: false
-  value?: DatePickerSingleModelValue
-  defaultValue?: DatePickerSingleModelValue
+  value?: DatePickerSingleInputValue
+  defaultValue?: DatePickerSingleInputValue
   onChange?: (date: Date | null) => void
 }
 
 export interface DatePickerRangeProps extends DatePickerBaseProps {
   range: true
-  value?: DatePickerRangeModelValue | null
-  defaultValue?: DatePickerRangeModelValue | null
-  onChange?: (range: DatePickerRangeValue) => void
+  value?: DatePickerRangeInputValue | null
+  defaultValue?: DatePickerRangeInputValue | null
+  onChange?: (range: DatePickerRangeResolvedValue) => void
 }
 
 export type DatePickerProps = DatePickerSingleProps | DatePickerRangeProps
@@ -81,7 +83,7 @@ export interface DatePickerContext {
   dayNames: string[]
   calendarDays: Array<Date | null>
   selectedDate: Date | null
-  selectedRange: DatePickerRangeValue
+  selectedRange: DatePickerRangeResolvedValue
   viewingMonth: number
   viewingYear: number
   mobileDate: Date

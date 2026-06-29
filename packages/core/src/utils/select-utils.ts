@@ -1,4 +1,5 @@
-import type { SelectOptions, SelectSize, SelectOption, SelectOptionGroup } from '../types/select'
+import type { ComponentSize } from '../types/base'
+import type { SelectOptions, SelectOption, SelectOptionGroup } from '../types/select'
 import { classNames } from './class-names'
 
 export interface ResolveSelectOptionsOptions {
@@ -12,7 +13,7 @@ export interface ResolveCreatableSelectOptionOptions {
 
 export interface SelectSearchDebouncerOptions {
   delay?: number
-  onSearch: (query: string) => void
+  onSearchChange: (query: string) => void
   setTimer?: (callback: () => void, delay: number) => number
   clearTimer?: (handle: number) => void
 }
@@ -110,7 +111,7 @@ export const selectEmptyStateClasses =
 /**
  * Select size classes map (constant for performance)
  */
-const SELECT_SIZE_CLASSES: Record<SelectSize, string> = {
+const SELECT_SIZE_CLASSES: Record<ComponentSize, string> = {
   sm: 'text-sm py-1.5',
   md: 'text-base py-2',
   lg: 'text-lg py-2.5'
@@ -120,14 +121,14 @@ const SELECT_SIZE_CLASSES: Record<SelectSize, string> = {
  * Approximate rendered option height (px) per size, used for virtual scrolling
  * window math. Kept in core so React/Vue use identical values.
  */
-const SELECT_VIRTUAL_ITEM_HEIGHT: Record<SelectSize, number> = {
+const SELECT_VIRTUAL_ITEM_HEIGHT: Record<ComponentSize, number> = {
   sm: 32,
   md: 40,
   lg: 48
 }
 
 /** Get the virtual-scroll item height (px) for a select size. */
-export function getSelectVirtualItemHeight(size: SelectSize = 'md'): number {
+export function getSelectVirtualItemHeight(size: ComponentSize = 'md'): number {
   return SELECT_VIRTUAL_ITEM_HEIGHT[size] ?? SELECT_VIRTUAL_ITEM_HEIGHT.md
 }
 
@@ -136,7 +137,7 @@ export function getSelectVirtualItemHeight(size: SelectSize = 'md'): number {
  * @param size - Select size variant
  * @returns Size-specific class string
  */
-export function getSelectSizeClasses(size: SelectSize): string {
+export function getSelectSizeClasses(size: ComponentSize): string {
   return SELECT_SIZE_CLASSES[size]
 }
 
@@ -148,7 +149,7 @@ export function getSelectSizeClasses(size: SelectSize): string {
  * @returns Complete trigger class string
  */
 export function getSelectTriggerClasses(
-  size: SelectSize,
+  size: ComponentSize,
   disabled: boolean,
   isOpen: boolean
 ): string {
@@ -171,7 +172,7 @@ export function getSelectTriggerClasses(
 export function getSelectOptionClasses(
   isSelected: boolean,
   isDisabled: boolean,
-  size: SelectSize
+  size: ComponentSize
 ): string {
   return classNames(
     selectOptionBaseClasses,
@@ -323,7 +324,7 @@ export function createSelectSearchDebouncer(
   const flush = (): void => {
     if (timerHandle !== undefined) {
       cancel()
-      options.onSearch(pendingQuery)
+      options.onSearchChange(pendingQuery)
     }
   }
 
@@ -332,14 +333,14 @@ export function createSelectSearchDebouncer(
 
     if (delay <= 0) {
       cancel()
-      options.onSearch(query)
+      options.onSearchChange(query)
       return
     }
 
     cancel()
     timerHandle = setTimer(() => {
       timerHandle = undefined
-      options.onSearch(pendingQuery)
+      options.onSearchChange(pendingQuery)
     }, delay)
   }
 

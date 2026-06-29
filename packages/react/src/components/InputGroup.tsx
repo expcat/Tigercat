@@ -3,11 +3,11 @@ import {
   classNames,
   getInputGroupClasses,
   getInputGroupAddonClasses,
-  type InputGroupSize
+  type ComponentSize
 } from '@expcat/tigercat-core'
 
 export interface InputGroupContextValue {
-  size?: InputGroupSize
+  size?: ComponentSize
   compact?: boolean
 }
 
@@ -18,7 +18,7 @@ export function useInputGroupContext(): InputGroupContextValue | null {
 }
 
 export interface InputGroupProps extends React.HTMLAttributes<HTMLDivElement> {
-  size?: InputGroupSize
+  size?: ComponentSize
   compact?: boolean
 }
 

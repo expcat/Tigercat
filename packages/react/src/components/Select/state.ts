@@ -26,9 +26,10 @@ const SELECT_KEYS = new Set([
   'disabled',
   'placeholder',
   'searchable',
+  'searchValue',
+  'defaultSearchValue',
   'clearable',
-  'noOptionsText',
-  'noDataText',
+  'emptyText',
   'maxTagCount',
   'virtual',
   'remote',
@@ -36,7 +37,7 @@ const SELECT_KEYS = new Set([
   'creatable',
   'createOptionText',
   'listHeight',
-  'onSearch',
+  'onSearchChange',
   'onCreate',
   'className',
   'value',
@@ -52,9 +53,10 @@ export function useSelectState(props: SelectProps): SelectContext {
     disabled = false,
     placeholder = 'Select an option',
     searchable = false,
+    searchValue,
+    defaultSearchValue = '',
     clearable = true,
-    noOptionsText,
-    noDataText,
+    emptyText,
     maxTagCount,
     remote = false,
     searchDebounce = 0,
@@ -62,7 +64,7 @@ export function useSelectState(props: SelectProps): SelectContext {
     createOptionText = 'Create',
     virtual = false,
     listHeight = 256,
-    onSearch,
+    onSearchChange,
     onCreate,
     className,
     value,
@@ -87,7 +89,8 @@ export function useSelectState(props: SelectProps): SelectContext {
   const listboxId = `tiger-select-listbox-${instanceId}`
 
   const [isOpen, setIsOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(defaultSearchValue)
+  const searchQuery = searchValue ?? uncontrolledSearchValue
   const [activeIndex, setActiveIndex] = useState(-1)
   const [createdOptions, setCreatedOptions] = useState<SelectOption[]>([])
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -189,7 +192,7 @@ export function useSelectState(props: SelectProps): SelectContext {
 
   const closeDropdown = () => {
     setIsOpen(false)
-    setSearchQuery('')
+    updateSearchValue('')
     setActiveIndex(-1)
   }
 
@@ -253,20 +256,28 @@ export function useSelectState(props: SelectProps): SelectContext {
   }
 
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value
-    setSearchQuery(query)
-    searchDebouncerRef.current?.schedule(query)
+    updateSearchValue(event.target.value)
   }
+
+  const updateSearchValue = useCallback(
+    (query: string) => {
+      if (searchValue === undefined) {
+        setUncontrolledSearchValue(query)
+      }
+      searchDebouncerRef.current?.schedule(query)
+    },
+    [searchValue]
+  )
 
   useEffect(() => {
     searchDebouncerRef.current?.cancel()
     searchDebouncerRef.current = createSelectSearchDebouncer({
       delay: searchDebounce,
-      onSearch: (query) => onSearch?.(query)
+      onSearchChange: (query) => onSearchChange?.(query)
     })
 
     return () => searchDebouncerRef.current?.cancel()
-  }, [onSearch, searchDebounce])
+  }, [onSearchChange, searchDebounce])
 
   const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (disabled) {
@@ -491,16 +502,7 @@ export function useSelectState(props: SelectProps): SelectContext {
     placeholder,
     searchable,
     clearable,
-    noDataText: resolveLocaleText(
-      'No options available',
-      noDataText,
-      mergedLocale?.common?.emptyText
-    ),
-    noOptionsText: resolveLocaleText(
-      'No options found',
-      noOptionsText,
-      mergedLocale?.common?.emptyText
-    ),
+    emptyText: resolveLocaleText('No options found', emptyText, mergedLocale?.common?.emptyText),
     createOptionText,
     className,
     divProps,

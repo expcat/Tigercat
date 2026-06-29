@@ -46,7 +46,7 @@ const val = ref([])`
 
 const basicSnippet = `<Cascader v-model="val" :options="options" placeholder="请选择地区" />`
 
-const searchSnippet = `<Cascader v-model="val" :options="options" placeholder="搜索地区" show-search />`
+const searchSnippet = `<Cascader v-model="val" :options="options" placeholder="搜索地区" searchable />`
 
 const sizeSnippet = `<Space direction="vertical" :size="12">
   <Cascader :options="options" placeholder="小" size="sm" />
@@ -69,8 +69,8 @@ const sizeSnippet = `<Space direction="vertical" :size="12">
       <Cascader v-model="val" :options="options" placeholder="请选择地区" />
     </DemoBlock>
 
-    <DemoBlock title="可搜索" description="show-search 开启搜索过滤" :code="searchSnippet">
-      <Cascader v-model="val2" :options="options" placeholder="搜索地区" show-search />
+    <DemoBlock title="可搜索" description="searchable 开启搜索过滤" :code="searchSnippet">
+      <Cascader v-model="val2" :options="options" placeholder="搜索地区" searchable />
     </DemoBlock>
 
     <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸" :code="sizeSnippet">

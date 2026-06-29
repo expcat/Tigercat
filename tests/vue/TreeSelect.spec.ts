@@ -248,9 +248,9 @@ describe('TreeSelect', () => {
   })
 
   describe('Search', () => {
-    it('should show search input when showSearch is true', async () => {
+    it('should show search input when searchable is true', async () => {
       const { container, getByLabelText } = render(TreeSelect, {
-        props: { treeData, showSearch: true }
+        props: { treeData, searchable: true }
       })
       const button = container.querySelector('button')!
       await fireEvent.click(button)
@@ -260,7 +260,7 @@ describe('TreeSelect', () => {
 
     it('should filter nodes by search query', async () => {
       const { container, getByLabelText, queryByText, getByText } = render(TreeSelect, {
-        props: { treeData, showSearch: true }
+        props: { treeData, searchable: true }
       })
       const button = container.querySelector('button')!
       await fireEvent.click(button)
@@ -275,7 +275,7 @@ describe('TreeSelect', () => {
 
     it('should show empty state when search has no results', async () => {
       const { container, getByLabelText, getByText } = render(TreeSelect, {
-        props: { treeData, showSearch: true }
+        props: { treeData, searchable: true }
       })
       const button = container.querySelector('button')!
       await fireEvent.click(button)

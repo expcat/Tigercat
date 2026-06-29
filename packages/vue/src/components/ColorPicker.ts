@@ -1,5 +1,5 @@
 import { defineComponent, h, ref, computed, watch, onBeforeUnmount, type PropType } from 'vue'
-import type { ColorPickerSize, ColorFormat } from '@expcat/tigercat-core'
+import type { ComponentSize, ColorFormat } from '@expcat/tigercat-core'
 import {
   colorPickerBaseClasses,
   getColorPickerTriggerClasses,
@@ -22,7 +22,7 @@ export const ColorPicker = defineComponent({
   props: {
     modelValue: { type: String, default: '#2563eb' },
     disabled: { type: Boolean, default: false },
-    size: { type: String as PropType<ColorPickerSize>, default: 'md' },
+    size: { type: String as PropType<ComponentSize>, default: 'md' },
     showAlpha: { type: Boolean, default: false },
     format: { type: String as PropType<ColorFormat>, default: 'hex' },
     presets: { type: Array as PropType<string[]>, default: undefined }

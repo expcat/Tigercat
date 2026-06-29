@@ -35,24 +35,26 @@ export interface AutoCompleteProps
   /** Called when an option is selected */
   onSelect?: (value: string | number, option: AutoCompleteOption) => void
   /** Called when search text changes */
-  onSearch?: (value: string) => void
+  onSearchChange?: (value: string) => void
 }
 
 const AUTOCOMPLETE_KEYS = new Set<string>([
   'value',
   'options',
   'placeholder',
+  'searchValue',
+  'defaultSearchValue',
   'size',
   'disabled',
   'clearable',
-  'notFoundText',
+  'emptyText',
   'filterOption',
   'defaultActiveFirstOption',
   'allowFreeInput',
   'locale',
   'onChange',
   'onSelect',
-  'onSearch'
+  'onSearchChange'
 ])
 
 export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
@@ -60,10 +62,12 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
     value = '',
     options = [],
     placeholder = '',
+    searchValue,
+    defaultSearchValue = '',
     size = 'md',
     disabled = false,
     clearable = false,
-    notFoundText,
+    emptyText,
     filterOption = true,
     defaultActiveFirstOption = true,
     allowFreeInput = true,
@@ -71,7 +75,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
     className,
     onChange,
     onSelect,
-    onSearch,
+    onSearchChange,
     ...rest
   } = props
   const config = useTigerConfig()
@@ -81,7 +85,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
   )
   const resolvedNotFoundText = resolveLocaleText(
     'No matches found',
-    notFoundText,
+    emptyText,
     mergedLocale?.common?.emptyText
   )
 
@@ -97,15 +101,21 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
   const listboxId = `tiger-autocomplete-listbox-${instanceId}`
 
   const [isOpen, setIsOpen] = useState(false)
-  const [inputValue, setInputValue] = useState(String(value ?? ''))
+  const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
+    String(searchValue ?? value ?? defaultSearchValue ?? '')
+  )
+  const inputValue = searchValue ?? uncontrolledSearchValue
   const [activeIndex, setActiveIndex] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Sync external value
   useEffect(() => {
-    setInputValue(String(value ?? ''))
-  }, [value])
+    if (searchValue !== undefined) {
+      return
+    }
+    setUncontrolledSearchValue(String(value ?? defaultSearchValue ?? ''))
+  }, [defaultSearchValue, searchValue, value])
 
   const filteredOptions = useMemo(
     () => filterAutoCompleteOptions(options, inputValue, filterOption),
@@ -140,16 +150,18 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
     const current = options.find((o) => String(o.value) === String(value))
     const revertLabel = current ? current.label : ''
     if (revertLabel !== inputValue) {
-      setInputValue(revertLabel)
+      setUncontrolledSearchValue(revertLabel)
       onChange?.(current ? current.value : '')
     }
   }
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value
-    setInputValue(val)
+    if (searchValue === undefined) {
+      setUncontrolledSearchValue(val)
+    }
     onChange?.(val)
-    onSearch?.(val)
+    onSearchChange?.(val)
     if (!isOpen) {
       setIsOpen(true)
     }
@@ -161,7 +173,10 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
 
   function handleSelect(option: AutoCompleteOption) {
     if (option.disabled) return
-    setInputValue(option.label)
+    if (searchValue === undefined) {
+      setUncontrolledSearchValue(option.label)
+    }
+    onSearchChange?.(option.label)
     onChange?.(option.value)
     onSelect?.(option.value, option)
     closeDropdown()
@@ -169,8 +184,11 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
 
   function handleClear(e: React.MouseEvent) {
     e.stopPropagation()
-    setInputValue('')
+    if (searchValue === undefined) {
+      setUncontrolledSearchValue('')
+    }
     onChange?.('')
+    onSearchChange?.('')
     requestAnimationFrame(() => inputRef.current?.focus())
   }
 

@@ -102,7 +102,7 @@ describe('AutoComplete', () => {
 
     it('should show not found text when no matches', async () => {
       const { container, getByText } = render(AutoComplete, {
-        props: { options, notFoundText: 'Nothing found' }
+        props: { options, emptyText: 'Nothing found' }
       })
 
       const input = container.querySelector('input')!

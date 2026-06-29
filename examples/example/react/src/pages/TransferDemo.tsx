@@ -20,7 +20,7 @@ const dataSource = Array.from({ length: 10 }, (_, i) => ({
 
 const [targetKeys, setTargetKeys] = useState(['3', '4'])`
 
-const searchSnippet = `<Transfer targetKeys={targetKeys} onChange={setTargetKeys} dataSource={dataSource} showSearch sourceTitle="可选" targetTitle="已选" />`
+const searchSnippet = `<Transfer targetKeys={targetKeys} onChange={setTargetKeys} dataSource={dataSource} searchable sourceTitle="可选" targetTitle="已选" />`
 
 const TransferDemo: React.FC = () => {
   const [targetKeys1, setTargetKeys1] = useState<(string | number)[]>(['3', '4'])
@@ -39,12 +39,12 @@ const TransferDemo: React.FC = () => {
         <Transfer targetKeys={targetKeys1} onChange={setTargetKeys1} dataSource={dataSource} />
       </DemoBlock>
 
-      <DemoBlock title="搜索与标题" description="showSearch 开启搜索" code={searchSnippet}>
+      <DemoBlock title="搜索与标题" description="searchable 开启搜索" code={searchSnippet}>
         <Transfer
           targetKeys={targetKeys2}
           onChange={setTargetKeys2}
           dataSource={dataSource}
-          showSearch
+          searchable
           sourceTitle="可选"
           targetTitle="已选"
         />

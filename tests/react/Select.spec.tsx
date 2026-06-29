@@ -223,7 +223,7 @@ describe('Select', () => {
       const user = userEvent.setup()
       const onSearch = vi.fn()
       const { container, getByText, queryByText } = render(
-        <Select options={testOptions} searchable onSearch={onSearch} />
+        <Select options={testOptions} searchable onSearchChange={onSearch} />
       )
 
       const trigger = container.querySelector('button')!
@@ -252,7 +252,7 @@ describe('Select', () => {
       vi.useFakeTimers()
       const onSearch = vi.fn()
       const { container } = render(
-        <Select options={testOptions} searchable searchDebounce={200} onSearch={onSearch} />
+        <Select options={testOptions} searchable searchDebounce={200} onSearchChange={onSearch} />
       )
 
       fireEvent.click(container.querySelector('button')!)
@@ -432,11 +432,9 @@ describe('Select', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should display noDataText when options array is empty', async () => {
+    it('should display emptyText when options array is empty', async () => {
       const user = userEvent.setup()
-      const { container, getByText } = render(
-        <Select options={[]} noDataText="No data available" />
-      )
+      const { container, getByText } = render(<Select options={[]} emptyText="No data available" />)
 
       const trigger = container.querySelector('button')!
       await user.click(trigger)
@@ -444,10 +442,10 @@ describe('Select', () => {
       expect(getByText('No data available')).toBeInTheDocument()
     })
 
-    it('should display noOptionsText when search returns no results', async () => {
+    it('should display emptyText when search returns no results', async () => {
       const user = userEvent.setup()
       const { container, getByText } = render(
-        <Select options={testOptions} searchable noOptionsText="No matches found" />
+        <Select options={testOptions} searchable emptyText="No matches found" />
       )
 
       const trigger = container.querySelector('button')!

@@ -17,12 +17,14 @@ import {
   timePickerBaseClasses,
   getTimePickerInputClasses,
   getTimePickerIconButtonClasses,
-  focusTimePickerOption,
-  type TimePickerSingleValue
+  focusTimePickerOption
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../../hooks/useControlledState'
 import { useTigerConfig } from '../ConfigProvider'
-import type { TimePickerContext, TimePickerProps, TimePickerRangeValue } from './types'
+import type { TimePickerContext, TimePickerProps } from './types'
+
+type TimePickerSingleInputValue = string | null
+type TimePickerRangeInputValue = [string | null, string | null]
 
 export function useTimePickerState(allProps: TimePickerProps): TimePickerContext {
   const config = useTigerConfig()
@@ -64,7 +66,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
   // `isControlled` branches.
   const normalizeRangeValue = (
     input: TimePickerProps['value'] | null | undefined
-  ): TimePickerRangeValue => {
+  ): TimePickerRangeInputValue => {
     if (Array.isArray(input)) return [input[0] ?? null, input[1] ?? null]
     return [null, null]
   }
@@ -83,13 +85,13 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
   const [singleValue, setSingleValue] = useControlledState<string | null>(
     singleControlled,
     singleDefault,
-    allProps.onChange as ((time: TimePickerSingleValue) => void) | undefined
+    allProps.onChange as ((time: TimePickerSingleInputValue) => void) | undefined
   )
 
-  const [rangeValue, setRangeValue] = useControlledState<TimePickerRangeValue>(
+  const [rangeValue, setRangeValue] = useControlledState<TimePickerRangeInputValue>(
     isRangeMode && value !== undefined ? normalizeRangeValue(value) : undefined,
     normalizeRangeValue(defaultValue),
-    allProps.onChange as ((time: TimePickerRangeValue) => void) | undefined
+    allProps.onChange as ((time: TimePickerRangeInputValue) => void) | undefined
   )
 
   const [activePart, setActivePart] = useState<'start' | 'end'>('start')
@@ -99,7 +101,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
   const inputRef = useRef<HTMLInputElement>(null)
 
   const currentSingleValue: string | null = isRangeMode ? null : singleValue
-  const currentRangeValue: TimePickerRangeValue = isRangeMode ? rangeValue : [null, null]
+  const currentRangeValue: TimePickerRangeInputValue = isRangeMode ? rangeValue : [null, null]
 
   const activeValue: string | null = isRangeMode
     ? currentRangeValue[activePart === 'start' ? 0 : 1]
@@ -334,7 +336,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
         }
       }
     }
-    const nextRange: TimePickerRangeValue = [currentRangeValue[0], currentRangeValue[1]]
+    const nextRange: TimePickerRangeInputValue = [currentRangeValue[0], currentRangeValue[1]]
     nextRange[index] = timeString
 
     if (activePart === 'start' && endSeconds !== null && candidateSeconds > endSeconds) {

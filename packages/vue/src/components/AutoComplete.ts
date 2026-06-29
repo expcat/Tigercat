@@ -8,7 +8,7 @@ import {
   nextTick,
   type PropType
 } from 'vue'
-import type { AutoCompleteOption, AutoCompleteSize, TigerLocale } from '@expcat/tigercat-core'
+import type { AutoCompleteOption, ComponentSize, TigerLocale } from '@expcat/tigercat-core'
 import {
   resolveLocaleText,
   mergeTigerLocale,
@@ -67,8 +67,16 @@ export const AutoComplete = defineComponent({
       type: String,
       default: ''
     },
+    searchValue: {
+      type: String,
+      default: undefined
+    },
+    defaultSearchValue: {
+      type: String,
+      default: ''
+    },
     size: {
-      type: String as PropType<AutoCompleteSize>,
+      type: String as PropType<ComponentSize>,
       default: 'md'
     },
     disabled: {
@@ -79,7 +87,7 @@ export const AutoComplete = defineComponent({
       type: Boolean,
       default: false
     },
-    notFoundText: {
+    emptyText: {
       type: String,
       default: undefined
     },
@@ -102,7 +110,7 @@ export const AutoComplete = defineComponent({
       default: undefined
     }
   },
-  emits: ['update:modelValue', 'select', 'search', 'change'],
+  emits: ['update:modelValue', 'update:searchValue', 'select', 'search-change', 'change'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
@@ -110,7 +118,10 @@ export const AutoComplete = defineComponent({
     const listboxId = `tiger-autocomplete-listbox-${instanceId}`
 
     const isOpen = ref(false)
-    const inputValue = ref(String(props.modelValue ?? ''))
+    const uncontrolledSearchValue = ref(
+      String(props.searchValue ?? props.modelValue ?? props.defaultSearchValue ?? '')
+    )
+    const inputValue = computed(() => props.searchValue ?? uncontrolledSearchValue.value)
     const activeIndex = ref(-1)
     const containerRef = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
@@ -127,7 +138,9 @@ export const AutoComplete = defineComponent({
     watch(
       () => props.modelValue,
       (val) => {
-        inputValue.value = String(val ?? '')
+        if (props.searchValue === undefined) {
+          uncontrolledSearchValue.value = String(val ?? props.defaultSearchValue ?? '')
+        }
       }
     )
 
@@ -161,7 +174,9 @@ export const AutoComplete = defineComponent({
       const current = props.options.find((o) => String(o.value) === String(props.modelValue))
       const revertLabel = current ? current.label : ''
       if (revertLabel !== inputValue.value) {
-        inputValue.value = revertLabel
+        uncontrolledSearchValue.value = revertLabel
+        emit('update:searchValue', revertLabel)
+        emit('search-change', revertLabel)
         emit('update:modelValue', current ? current.value : '')
         emit('change', current ? current.value : '')
       }
@@ -169,9 +184,12 @@ export const AutoComplete = defineComponent({
 
     function handleInput(e: Event) {
       const val = (e.target as HTMLInputElement).value
-      inputValue.value = val
+      if (props.searchValue === undefined) {
+        uncontrolledSearchValue.value = val
+      }
       emit('update:modelValue', val)
-      emit('search', val)
+      emit('update:searchValue', val)
+      emit('search-change', val)
       emit('change', val)
       if (!isOpen.value) openDropdown()
       if (props.defaultActiveFirstOption) {
@@ -181,17 +199,24 @@ export const AutoComplete = defineComponent({
 
     function handleSelect(option: AutoCompleteOption) {
       if (option.disabled) return
-      inputValue.value = option.label
+      if (props.searchValue === undefined) {
+        uncontrolledSearchValue.value = option.label
+      }
       emit('update:modelValue', option.value)
+      emit('update:searchValue', option.label)
       emit('select', option.value, option)
+      emit('search-change', option.label)
       emit('change', option.value)
       closeDropdown()
     }
 
     function handleClear(e: Event) {
       e.stopPropagation()
-      inputValue.value = ''
+      if (props.searchValue === undefined) {
+        uncontrolledSearchValue.value = ''
+      }
       emit('update:modelValue', '')
+      emit('update:searchValue', '')
       emit('change', '')
       nextTick(() => inputRef.value?.focus())
     }
@@ -336,7 +361,7 @@ export const AutoComplete = defineComponent({
                   },
                   resolveLocaleText(
                     'No matches found',
-                    props.notFoundText,
+                    props.emptyText,
                     mergedLocale.value?.common?.emptyText
                   )
                 )

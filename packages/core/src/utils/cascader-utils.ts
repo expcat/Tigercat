@@ -1,9 +1,9 @@
+import type { ComponentSize } from '../types/base'
 import type {
   CascaderOption,
   CascaderValue,
-  CascaderSize,
   CascaderFlattenedOption,
-  CascaderShowSearch
+  CascaderSearchConfig
 } from '../types/cascader'
 import { classNames } from './class-names'
 
@@ -96,7 +96,7 @@ export const cascaderSearchResultClasses =
 /**
  * Size classes map
  */
-const CASCADER_SIZE_CLASSES: Record<CascaderSize, string> = {
+const CASCADER_SIZE_CLASSES: Record<ComponentSize, string> = {
   sm: 'text-sm py-1.5',
   md: 'text-base py-2',
   lg: 'text-lg py-2.5'
@@ -106,7 +106,7 @@ const CASCADER_SIZE_CLASSES: Record<CascaderSize, string> = {
  * Get cascader trigger classes
  */
 export function getCascaderTriggerClasses(
-  size: CascaderSize,
+  size: ComponentSize,
   disabled: boolean,
   isOpen: boolean
 ): string {
@@ -125,7 +125,7 @@ export function getCascaderTriggerClasses(
 export function getCascaderOptionClasses(
   isSelected: boolean,
   isDisabled: boolean,
-  size: CascaderSize
+  size: ComponentSize
 ): string {
   return classNames(
     cascaderOptionBaseClasses,
@@ -264,14 +264,14 @@ export function defaultCascaderFilter(inputValue: string, path: CascaderOption[]
 export function filterCascaderOptions(
   flattenedOptions: CascaderFlattenedOption[],
   inputValue: string,
-  showSearch?: boolean | CascaderShowSearch
+  searchable?: boolean | CascaderSearchConfig
 ): CascaderFlattenedOption[] {
   if (!inputValue) return flattenedOptions
 
   const filterFn =
-    typeof showSearch === 'object' && showSearch.filter ? showSearch.filter : defaultCascaderFilter
+    typeof searchable === 'object' && searchable.filter ? searchable.filter : defaultCascaderFilter
 
-  const limit = typeof showSearch === 'object' && showSearch.limit ? showSearch.limit : 50
+  const limit = typeof searchable === 'object' && searchable.limit ? searchable.limit : 50
 
   const filtered = flattenedOptions.filter((item) => filterFn(inputValue, item.path))
 

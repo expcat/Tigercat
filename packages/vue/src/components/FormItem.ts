@@ -16,7 +16,7 @@ import {
   classNames,
   type FormRule,
   type FormFieldCondition,
-  type FormSize,
+  type ComponentSize,
   type FormErrorDisplayMode,
   getFormItemClasses,
   getFormItemLabelClasses,
@@ -52,7 +52,7 @@ export interface VueFormItemProps {
   rules?: FormRule | FormRule[]
   error?: string
   showMessage?: boolean
-  size?: FormSize
+  size?: ComponentSize
   errorDisplayMode?: FormErrorDisplayMode
   condition?: FormFieldCondition
 }
@@ -108,7 +108,7 @@ export const FormItem = defineComponent({
      * Field size (overrides form-level size)
      */
     size: {
-      type: String as PropType<FormSize>
+      type: String as PropType<ComponentSize>
     },
     /**
      * Error display mode

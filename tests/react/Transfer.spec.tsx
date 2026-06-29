@@ -97,8 +97,8 @@ describe('Transfer', () => {
   })
 
   describe('Search', () => {
-    it('should show search inputs when showSearch', () => {
-      const { container } = render(<Transfer dataSource={dataSource} showSearch />)
+    it('should show search inputs when searchable', () => {
+      const { container } = render(<Transfer dataSource={dataSource} searchable />)
 
       const searchInputs = container.querySelectorAll('input[type="text"]')
       expect(searchInputs.length).toBe(2)
@@ -106,7 +106,7 @@ describe('Transfer', () => {
 
     it('should filter items', async () => {
       const user = userEvent.setup()
-      const { container } = render(<Transfer dataSource={dataSource} showSearch />)
+      const { container } = render(<Transfer dataSource={dataSource} searchable />)
 
       const searchInput = container.querySelector('input[type="text"]')!
       await user.type(searchInput, 'Item 1')

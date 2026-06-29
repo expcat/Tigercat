@@ -36,7 +36,7 @@ const basicScriptSnippet = `import { useState } from 'react'
 
 const [val, setVal] = useState(undefined)`
 
-const searchSnippet = `<TreeSelect value={val} onChange={setVal} treeData={treeData} placeholder="搜索成员" showSearch />`
+const searchSnippet = `<TreeSelect value={val} onChange={setVal} treeData={treeData} placeholder="搜索成员" searchable />`
 const sizeSnippet = `<TreeSelect treeData={treeData} size="sm" placeholder="小" />
 <TreeSelect treeData={treeData} size="lg" placeholder="大" />
 <TreeSelect treeData={treeData} disabled placeholder="禁用" />`
@@ -54,13 +54,13 @@ const TreeSelectDemo: React.FC = () => {
         <TreeSelect value={val} onChange={setVal} treeData={treeData} placeholder="请选择成员" />
       </DemoBlock>
 
-      <DemoBlock title="可搜索" description="showSearch 开启搜索" code={searchSnippet}>
+      <DemoBlock title="可搜索" description="searchable 开启搜索" code={searchSnippet}>
         <TreeSelect
           value={val2}
           onChange={setVal2}
           treeData={treeData}
           placeholder="搜索成员"
-          showSearch
+          searchable
         />
       </DemoBlock>
 

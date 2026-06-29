@@ -4,18 +4,18 @@ import {
   coerceClassValue,
   getInputGroupClasses,
   getInputGroupAddonClasses,
-  type InputGroupSize
+  type ComponentSize
 } from '@expcat/tigercat-core'
 
 export const INPUT_GROUP_INJECTION_KEY = Symbol('TigerInputGroup')
 
 export interface InputGroupContext {
-  size?: InputGroupSize
+  size?: ComponentSize
   compact?: boolean
 }
 
 export interface VueInputGroupProps {
-  size?: InputGroupSize
+  size?: ComponentSize
   compact?: boolean
   className?: string
 }
@@ -30,7 +30,7 @@ export const InputGroup = defineComponent({
   inheritAttrs: false,
   props: {
     size: {
-      type: String as PropType<InputGroupSize>,
+      type: String as PropType<ComponentSize>,
       default: 'md'
     },
     compact: {

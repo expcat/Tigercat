@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useState, useCallback, useId, useRef } from 'react'
 import {
   classNames,
-  type FormSize,
+  type ComponentSize,
   type FormRule,
   type FormItemProps as CoreFormItemProps,
   getFormItemClasses,
@@ -88,7 +88,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   const errorId = `${baseId}-error`
 
   // Simple logical operations - no need to memoize
-  const actualSize: FormSize = size || formContext?.size || 'md'
+  const actualSize: ComponentSize = size || formContext?.size || 'md'
   const labelPosition = formContext?.labelPosition || 'right'
   const labelAlign = formContext?.labelAlign || 'right'
 

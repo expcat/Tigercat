@@ -16,7 +16,7 @@ import { renderTimePickerDesktop } from './TimePicker/render-desktop'
 import { Icon } from './TimePicker/icons'
 import type { TimePickerProps } from './TimePicker/types'
 
-export type { TimePickerProps, TimePickerRangeValue } from './TimePicker/types'
+export type { TimePickerProps } from './TimePicker/types'
 
 export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
   const ctx = useTimePickerState(allProps)

@@ -98,9 +98,9 @@ describe('Transfer', () => {
   })
 
   describe('Search', () => {
-    it('should show search inputs when showSearch is true', () => {
+    it('should show search inputs when searchable is true', () => {
       const { container } = render(Transfer, {
-        props: { dataSource, showSearch: true }
+        props: { dataSource, searchable: true }
       })
 
       const searchInputs = container.querySelectorAll('input[type="text"]')
@@ -109,7 +109,7 @@ describe('Transfer', () => {
 
     it('should filter items by search query', async () => {
       const { container, queryByText } = render(Transfer, {
-        props: { dataSource, showSearch: true }
+        props: { dataSource, searchable: true }
       })
 
       const searchInput = container.querySelector('input[type="text"]')!

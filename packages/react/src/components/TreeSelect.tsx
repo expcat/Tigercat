@@ -36,6 +36,8 @@ export interface TreeSelectProps
   value?: TreeSelectValue
   /** Called when value changes */
   onChange?: (value: TreeSelectValue) => void
+  /** Called when search text changes */
+  onSearchChange?: (value: string) => void
   /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>
 }
@@ -48,10 +50,13 @@ const TREESELECT_KEYS = new Set<string>([
   'disabled',
   'clearable',
   'multiple',
-  'showSearch',
-  'notFoundText',
+  'searchable',
+  'searchValue',
+  'defaultSearchValue',
+  'emptyText',
   'defaultExpandAll',
-  'onChange'
+  'onChange',
+  'onSearchChange'
 ])
 
 export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
@@ -63,11 +68,14 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     disabled = false,
     clearable = false,
     multiple = false,
-    showSearch = false,
-    notFoundText,
+    searchable = false,
+    searchValue,
+    defaultSearchValue = '',
+    emptyText,
     defaultExpandAll = false,
     className,
     onChange,
+    onSearchChange,
     locale,
     ...rest
   } = props
@@ -89,7 +97,8 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
   const listboxId = `tiger-treeselect-listbox-${instanceId}`
 
   const [isOpen, setIsOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(defaultSearchValue)
+  const searchQuery = searchValue ?? uncontrolledSearchValue
   const [expandedKeys, setExpandedKeys] = useState<Set<string | number>>(() =>
     defaultExpandAll ? new Set(getAllTreeSelectKeys(treeData)) : new Set()
   )
@@ -127,7 +136,14 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
 
   function closeDropdown() {
     setIsOpen(false)
-    setSearchQuery('')
+    updateSearchValue('')
+  }
+
+  function updateSearchValue(value: string) {
+    if (searchValue === undefined) {
+      setUncontrolledSearchValue(value)
+    }
+    onSearchChange?.(value)
   }
 
   function toggleDropdown() {
@@ -248,14 +264,14 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       {/* Dropdown */}
       {isOpen && (
         <div {...getPickerListboxAria({ id: listboxId })} className={treeSelectDropdownClasses}>
-          {showSearch && (
+          {searchable && (
             <input
               type="text"
               className={treeSelectSearchClasses}
               placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
               value={searchQuery}
               aria-label="Search tree"
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => updateSearchValue(e.target.value)}
             />
           )}
 
@@ -299,7 +315,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
             })
           ) : (
             <div className={treeSelectEmptyClasses}>
-              {resolveLocaleText('No data', notFoundText, mergedLocale?.common?.emptyText)}
+              {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
             </div>
           )}
         </div>

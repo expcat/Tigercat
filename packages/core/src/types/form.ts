@@ -2,6 +2,7 @@
  * Form component types and interfaces
  */
 
+import type { ComponentSize } from './base'
 import type { TigerLocale } from './locale'
 
 /**
@@ -211,11 +212,6 @@ export type FormLabelAlign = 'left' | 'right' | 'top'
 export type FormLabelPosition = 'left' | 'right' | 'top'
 
 /**
- * Form size - affects all form items within the form
- */
-export type FormSize = 'sm' | 'md' | 'lg'
-
-/**
  * Base form props interface
  */
 export interface FormProps {
@@ -250,7 +246,7 @@ export interface FormProps {
    * Form size
    * @default 'md'
    */
-  size?: FormSize
+  size?: ComponentSize
 
   /**
    * Whether to show validation messages inline
@@ -369,7 +365,7 @@ export interface FormItemProps {
   /**
    * Size (overrides form's size)
    */
-  size?: FormSize
+  size?: ComponentSize
 
   /**
    * Error display mode

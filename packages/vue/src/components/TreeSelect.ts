@@ -1,6 +1,6 @@
 import { defineComponent, h, ref, computed, watch, onBeforeUnmount, type PropType } from 'vue'
 import type { TreeNode } from '@expcat/tigercat-core'
-import type { TreeSelectSize, TreeSelectValue } from '@expcat/tigercat-core'
+import type { ComponentSize, TreeSelectValue } from '@expcat/tigercat-core'
 import {
   treeSelectBaseClasses,
   treeSelectDropdownClasses,
@@ -82,7 +82,7 @@ export const TreeSelect = defineComponent({
       default: 'Please select'
     },
     size: {
-      type: String as PropType<TreeSelectSize>,
+      type: String as PropType<ComponentSize>,
       default: 'md'
     },
     disabled: {
@@ -97,11 +97,19 @@ export const TreeSelect = defineComponent({
       type: Boolean,
       default: false
     },
-    showSearch: {
+    searchable: {
       type: Boolean,
       default: false
     },
-    notFoundText: {
+    searchValue: {
+      type: String,
+      default: undefined
+    },
+    defaultSearchValue: {
+      type: String,
+      default: ''
+    },
+    emptyText: {
       type: String,
       default: undefined
     },
@@ -117,7 +125,7 @@ export const TreeSelect = defineComponent({
       default: undefined
     }
   },
-  emits: ['update:modelValue', 'change'],
+  emits: ['update:modelValue', 'update:searchValue', 'change', 'search-change'],
   setup(props, { emit, attrs }) {
     const instanceId = ++treeSelectInstanceId
     const config = useTigerConfig()
@@ -125,7 +133,8 @@ export const TreeSelect = defineComponent({
     const listboxId = `tiger-treeselect-listbox-${instanceId}`
 
     const isOpen = ref(false)
-    const searchQuery = ref('')
+    const uncontrolledSearchValue = ref(props.defaultSearchValue)
+    const searchQuery = computed(() => props.searchValue ?? uncontrolledSearchValue.value)
     const containerRef = ref<HTMLElement | null>(null)
 
     const expandedKeys = ref<Set<string | number>>(
@@ -170,7 +179,15 @@ export const TreeSelect = defineComponent({
 
     function closeDropdown() {
       isOpen.value = false
-      searchQuery.value = ''
+      updateSearchValue('')
+    }
+
+    function updateSearchValue(value: string) {
+      if (props.searchValue === undefined) {
+        uncontrolledSearchValue.value = value
+      }
+      emit('update:searchValue', value)
+      emit('search-change', value)
     }
 
     function toggleDropdown() {
@@ -315,7 +332,7 @@ export const TreeSelect = defineComponent({
               },
               [
                 // Search
-                props.showSearch
+                props.searchable
                   ? h('input', {
                       type: 'text',
                       class: treeSelectSearchClasses,
@@ -325,9 +342,7 @@ export const TreeSelect = defineComponent({
                       ),
                       value: searchQuery.value,
                       'aria-label': 'Search tree',
-                      onInput: (e: Event) => {
-                        searchQuery.value = (e.target as HTMLInputElement).value
-                      }
+                      onInput: (e: Event) => updateSearchValue((e.target as HTMLInputElement).value)
                     })
                   : null,
 
@@ -395,7 +410,7 @@ export const TreeSelect = defineComponent({
                       { class: treeSelectEmptyClasses },
                       resolveLocaleText(
                         'No data',
-                        props.notFoundText,
+                        props.emptyText,
                         mergedLocale.value?.common?.emptyText
                       )
                     )

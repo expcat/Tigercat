@@ -1,4 +1,5 @@
-import type { TransferItem, TransferSize, TransferDirection } from '../types/transfer'
+import type { ComponentSize } from '../types/base'
+import type { TransferItem, TransferDirection } from '../types/transfer'
 import { classNames } from './class-names'
 
 // ============================================================================
@@ -27,19 +28,19 @@ export const transferOperationClasses = 'flex flex-col items-center justify-cent
 // SIZE HELPERS
 // ============================================================================
 
-const sizeClasses: Record<TransferSize, string> = {
+const sizeClasses: Record<ComponentSize, string> = {
   sm: 'text-sm',
   md: 'text-base',
   lg: 'text-lg'
 }
 
-const itemPaddingClasses: Record<TransferSize, string> = {
+const itemPaddingClasses: Record<ComponentSize, string> = {
   sm: 'px-2 py-1',
   md: 'px-3 py-2',
   lg: 'px-4 py-2.5'
 }
 
-const checkboxSizeClasses: Record<TransferSize, string> = {
+const checkboxSizeClasses: Record<ComponentSize, string> = {
   sm: 'w-3.5 h-3.5',
   md: 'w-4 h-4',
   lg: 'w-5 h-5'
@@ -52,7 +53,7 @@ const checkboxSizeClasses: Record<TransferSize, string> = {
 export function getTransferItemClasses(
   isSelected: boolean,
   isDisabled: boolean,
-  size: TransferSize = 'md'
+  size: ComponentSize = 'md'
 ): string {
   const base = 'flex items-center gap-2 cursor-pointer transition-colors'
 
@@ -65,7 +66,7 @@ export function getTransferItemClasses(
   return classNames(base, sizeClasses[size], itemPaddingClasses[size], stateClass)
 }
 
-export function getTransferCheckboxClasses(size: TransferSize = 'md'): string {
+export function getTransferCheckboxClasses(size: ComponentSize = 'md'): string {
   return classNames(
     checkboxSizeClasses[size],
     'rounded border border-[var(--tiger-transfer-checkbox-border,var(--tiger-border,#d1d5db))] accent-[var(--tiger-primary,#2563eb)]'

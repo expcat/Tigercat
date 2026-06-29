@@ -7,7 +7,7 @@ verified-date: 2026-06-29
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
-本文归档 v2.0.0 Roadmap 已完成 R01-R11 的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
+本文归档 v2.0.0 Roadmap 已完成 R01-R15 的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
 
 ## 已完成任务详情
 
@@ -542,3 +542,52 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `npx -y pnpm@11.9.0 docs:api`
 
 **状态更新要求**：完成后已写回状态、日期、删除的 primitive API 摘要、参数化测试收缩范围、Skill/examples 更新范围和关键验证命令；阶段 9 已同步为 `进行中`，当前可执行任务推进到 R15。
+
+### R15 Form composite selectors
+
+**状态**：已完成（2026-06-29）。
+
+**目标**：清理表单复合选择器和大体量表单组件的多分支 API，统一 search/filter/empty/loading/locale 入口，并拆分可 tree-shake 的 heavy helpers。
+
+**允许修改**：Form composite 相关 core types、React/Vue 组件、picker/select/upload/form helper、目标 tests、Skill form props/examples、example 使用、迁移说明、变更记录、API baseline、必要的 bundle smoke。
+
+**不得修改**：Form primitives 已完成行为、Feedback/Navigation/Data/Charts/Advanced/Composite 组件行为、发布 workflow。
+
+**依赖/阻塞**：依赖 R14；DatePicker/TimePicker locale 与 custom text 路径保持 R08/R09 的 locale trimming 目标。
+
+**执行摘要**：已删除等同 `ComponentSize` 的 composite 尺寸类型别名 `SelectSize`、`TreeSelectSize`、`CascaderSize`、`AutoCompleteSize`、`DatePickerSize`、`TimePickerSize`、`TransferSize`、`ColorPickerSize`、`InputGroupSize`、`FormSize`；对应 core props、style utilities、React/Vue components 和 generated references 改用 `ComponentSize`。DatePicker/TimePicker public model surface 收敛为 `DatePickerModelValue` 与 `TimePickerModelValue`，删除重复 single/range public aliases。Select、TreeSelect、Cascader、AutoComplete、Transfer 的搜索受控量统一为 `searchValue` / `defaultSearchValue`，React 使用 `onSearchChange`，Vue 使用 `update:searchValue` / `search-change`；TreeSelect、Cascader、Transfer 搜索开关统一为 `searchable`。空态文案统一为 `emptyText` 并继续走 locale/custom text fallback。Upload queue/chunk/resume helper 已拆出基础 `upload-utils`，避免普通 Upload helper 引入队列重逻辑；examples、tests、API baseline、Skill references、迁移说明、变更记录和 `api:validate` R15 回流护栏已同步更新。
+
+**实际删除 / 合并**：
+
+- `SelectSize`、`TreeSelectSize`、`CascaderSize`、`AutoCompleteSize`、`DatePickerSize`、`TimePickerSize`、`TransferSize`、`ColorPickerSize`、`InputGroupSize`、`FormSize` → `ComponentSize`。
+- `DatePickerSingleModelValue`、`DatePickerRangeModelValue`、`DatePickerSingleValue`、`DatePickerRangeValue` → `DatePickerModelValue`。
+- `TimePickerSingleValue`、`TimePickerRangeValue` → `TimePickerModelValue`。
+- React `onSearch` → `onSearchChange`；Vue `search` → `search-change` / `update:searchValue`。
+- `showSearch` → `searchable`；`notFoundText` / `noOptionsText` / `noDataText` → `emptyText`。
+- Upload queue/chunk/resume helper 从基础 `upload-utils` 拆入 `upload-queue-utils` 内部模块并经 utils barrel 公开。
+
+**实际保留**：
+
+- `SelectModelValue`、`TreeSelectValue`、`CascaderValue`、`AutoCompleteOption`、`UploadFileItem` 等具有组件领域语义的类型保留。
+- DatePicker / TimePicker 的 range 运行时行为保留；仅删除重复的 public single/range aliases。
+- Upload queue helper 仍从 `@expcat/tigercat-core` 根入口导出，保持 public helper 可用性。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 test:group:form -- --filter composite`
+- `npx -y pnpm@11.9.0 vitest run tests/core/custom-text-labels.spec.ts tests/core/datepicker-i18n.spec.ts`
+- `npx -y pnpm@11.9.0 test:group:form`
+- `npx -y pnpm@11.9.0 example:ssr:check`
+- `npx -y pnpm@11.9.0 size`
+- `npx -y pnpm@11.9.0 publish:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)"`
+- `git diff --check`
+
+**状态更新要求**：完成后已写回状态、日期、删除的 composite form API 摘要、heavy helper 拆分范围、Skill/examples 更新范围和关键验证命令；阶段 9 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R16。

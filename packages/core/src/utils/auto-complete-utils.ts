@@ -1,4 +1,5 @@
-import type { AutoCompleteOption, AutoCompleteSize } from '../types/auto-complete'
+import type { ComponentSize } from '../types/base'
+import type { AutoCompleteOption } from '../types/auto-complete'
 import { classNames } from './class-names'
 
 // ============================================================================
@@ -32,13 +33,13 @@ export const autoCompleteEmptyStateClasses =
 // SIZE HELPERS
 // ============================================================================
 
-const sizeClasses: Record<AutoCompleteSize, string> = {
+const sizeClasses: Record<ComponentSize, string> = {
   sm: 'text-sm py-1.5',
   md: 'text-base py-2',
   lg: 'text-lg py-2.5'
 }
 
-const inputPaddingClasses: Record<AutoCompleteSize, string> = {
+const inputPaddingClasses: Record<ComponentSize, string> = {
   sm: 'pl-2 pr-8',
   md: 'pl-3 pr-10',
   lg: 'pl-4 pr-12'
@@ -52,7 +53,7 @@ const inputPaddingClasses: Record<AutoCompleteSize, string> = {
  * Get input classes for the autocomplete text input
  */
 export function getAutoCompleteInputClasses(
-  size: AutoCompleteSize = 'md',
+  size: ComponentSize = 'md',
   disabled: boolean = false,
   isOpen: boolean = false
 ): string {
@@ -76,7 +77,7 @@ export function getAutoCompleteInputClasses(
 export function getAutoCompleteOptionClasses(
   isSelected: boolean = false,
   isDisabled: boolean = false,
-  size: AutoCompleteSize = 'md'
+  size: ComponentSize = 'md'
 ): string {
   const stateClass = isDisabled
     ? 'text-[var(--tiger-autocomplete-option-text-disabled,var(--tiger-text-muted,#9ca3af))] cursor-not-allowed'

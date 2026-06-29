@@ -3,10 +3,7 @@
  * @since 0.9.0
  */
 
-/**
- * InputGroup size types
- */
-export type InputGroupSize = 'sm' | 'md' | 'lg'
+import type { ComponentSize } from './base'
 
 /**
  * Base InputGroup props interface
@@ -16,7 +13,7 @@ export interface InputGroupProps {
    * Size applied to all children in the group
    * @default 'md'
    */
-  size?: InputGroupSize
+  size?: ComponentSize
 
   /**
    * Whether to use compact mode (merged borders)

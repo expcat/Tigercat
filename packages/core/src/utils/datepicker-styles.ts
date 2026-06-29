@@ -2,7 +2,7 @@
  * DatePicker styling utilities
  */
 
-import type { DatePickerSize } from '../types/datepicker'
+import type { ComponentSize } from '../types/base'
 import { classNames } from './class-names'
 
 /**
@@ -18,7 +18,7 @@ export const datePickerInputWrapperClasses = 'relative w-full'
 /**
  * Get input classes based on size
  */
-export function getDatePickerInputClasses(size: DatePickerSize = 'md', disabled = false): string {
+export function getDatePickerInputClasses(size: ComponentSize = 'md', disabled = false): string {
   const baseClasses = [
     'w-full',
     'rounded-[var(--tiger-radius-md,0.5rem)]',
@@ -51,7 +51,7 @@ export function getDatePickerInputClasses(size: DatePickerSize = 'md', disabled 
 /**
  * Icon button classes
  */
-export function getDatePickerIconButtonClasses(size: DatePickerSize = 'md'): string {
+export function getDatePickerIconButtonClasses(size: ComponentSize = 'md'): string {
   const baseClasses = [
     'absolute',
     'right-0',

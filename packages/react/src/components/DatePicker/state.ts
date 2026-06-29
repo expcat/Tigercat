@@ -16,8 +16,6 @@ import {
   getDatePickerLabels,
   getLocaleDirection,
   mergeTigerLocale,
-  type DatePickerRangeValue,
-  type DatePickerRangeModelValue,
   type DatePickerLocaleInput,
   type DatePickerLocalePreset,
   type TigerLocale,
@@ -33,7 +31,12 @@ import {
   type DatePickerRangeProps
 } from './types'
 
-function normalizeDatePickerLocale(locale?: DatePickerLocaleInput): Partial<TigerLocale> | undefined {
+type DatePickerRangeInputValue = [Date | string | null, Date | string | null]
+type DatePickerRangeResolvedValue = [Date | null, Date | null]
+
+function normalizeDatePickerLocale(
+  locale?: DatePickerLocaleInput
+): Partial<TigerLocale> | undefined {
   if (!locale) return undefined
   if (typeof locale === 'string') return { locale }
   if ('datePicker' in locale) return locale as Partial<TigerLocale>
@@ -101,8 +104,8 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
   const rangeProps = props as DatePickerRangeProps
 
   const parseRangeTuple = (
-    tuple: DatePickerRangeModelValue | null | undefined
-  ): DatePickerRangeValue => {
+    tuple: DatePickerRangeInputValue | null | undefined
+  ): DatePickerRangeResolvedValue => {
     if (!tuple || !Array.isArray(tuple)) return [null, null]
     return [parseDate(tuple[0]), parseDate(tuple[1])]
   }
@@ -115,7 +118,7 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
     singleProps.onChange
   )
 
-  const [rangeValue, setRangeValue] = useControlledState<DatePickerRangeValue>(
+  const [rangeValue, setRangeValue] = useControlledState<DatePickerRangeResolvedValue>(
     isRangeMode && rangeProps.value !== undefined ? parseRangeTuple(rangeProps.value) : undefined,
     parseRangeTuple(rangeProps.defaultValue),
     rangeProps.onChange
@@ -129,7 +132,7 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
   const restoreFocusRef = useRef<HTMLElement | null>(null)
 
   const selectedDate = isRangeMode ? null : singleValue
-  const selectedRange: DatePickerRangeValue = useMemo(
+  const selectedRange: DatePickerRangeResolvedValue = useMemo(
     () => (isRangeMode ? rangeValue : [null, null]),
     [isRangeMode, rangeValue]
   )
@@ -175,7 +178,7 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
     [viewingYear, viewingMonth]
   )
   const selectedDateRef = useRef<Date | null>(selectedDate)
-  const selectedRangeRef = useRef<DatePickerRangeValue>(selectedRange)
+  const selectedRangeRef = useRef<DatePickerRangeResolvedValue>(selectedRange)
   const minDateParsedRef = useRef<Date | null>(minDateParsed)
   const maxDateParsedRef = useRef<Date | null>(maxDateParsed)
   const calendarDaysRef = useRef<Array<Date | null>>(calendarDays)
@@ -402,7 +405,10 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
 
     const [start, end] = selectedRange
     if (activeRangePart === 'start') {
-      const next: DatePickerRangeValue = [normalized, end && end < normalized ? normalized : end]
+      const next: DatePickerRangeResolvedValue = [
+        normalized,
+        end && end < normalized ? normalized : end
+      ]
       setRangeValue(next)
       setActiveRangePart('end')
       return
@@ -430,9 +436,9 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
             : null
       setSingleValue(date)
     } else {
-      const range = val as DatePickerRangeModelValue | null
+      const range = val as DatePickerRangeInputValue | null
       if (range && Array.isArray(range)) {
-        const parsed: DatePickerRangeValue = [
+        const parsed: DatePickerRangeResolvedValue = [
           range[0]
             ? normalizeDate(range[0] instanceof Date ? range[0] : parseDate(range[0])!)
             : null,

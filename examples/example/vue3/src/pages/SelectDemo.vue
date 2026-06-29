@@ -129,7 +129,7 @@ const searchableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     :options="countries"
     searchable
     placeholder="搜索国家"
-    @search="(q) => (lastSearchQuery = q)" />
+    @search-change="(q) => (lastSearchQuery = q)" />
   <p class="text-sm text-gray-600">最近一次搜索：{{ lastSearchQuery || '（无）' }}</p>
 </Space>`
 
@@ -153,7 +153,7 @@ const groupedSnippet = `<Space direction="vertical" class="w-full max-w-md">
 </Space>`
 
 const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
-  <Select v-model="emptyValue" :options="[]" no-data-text="暂无数据" placeholder="无可用选项" />
+  <Select v-model="emptyValue" :options="[]" empty-text="暂无数据" placeholder="无可用选项" />
 </Space>`
 </script>
 
@@ -248,7 +248,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
           :options="countries"
           searchable
           placeholder="搜索国家"
-          @search="(q) => (lastSearchQuery = q)" />
+          @search-change="(q) => (lastSearchQuery = q)" />
         <p class="text-sm text-gray-600">最近一次搜索：{{ lastSearchQuery || '（无）' }}</p>
       </Space>
     </DemoBlock>
@@ -298,11 +298,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
       description="当 options 为空时，会显示空提示文案。"
       :code="emptySnippet">
       <Space direction="vertical" class="w-full max-w-md">
-        <Select
-          v-model="emptyValue"
-          :options="[]"
-          no-data-text="暂无数据"
-          placeholder="无可用选项" />
+        <Select v-model="emptyValue" :options="[]" empty-text="暂无数据" placeholder="无可用选项" />
       </Space>
     </DemoBlock>
   </div>

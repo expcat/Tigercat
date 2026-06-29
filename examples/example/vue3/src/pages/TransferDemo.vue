@@ -23,7 +23,7 @@ const basicSnippet = `<Transfer
 const searchSnippet = `<Transfer
   v-model="targetKeys"
   :data-source="dataSource"
-  show-search
+  searchable
   :titles="['可选', '已选']"
 />`
 </script>
@@ -43,12 +43,12 @@ const searchSnippet = `<Transfer
 
     <DemoBlock
       title="搜索与标题"
-      description="show-search 开启搜索，titles 自定义标题"
+      description="searchable 开启搜索，titles 自定义标题"
       :code="searchSnippet">
       <Transfer
         v-model="targetKeys2"
         :data-source="dataSource"
-        show-search
+        searchable
         :titles="['可选', '已选']" />
     </DemoBlock>
   </div>

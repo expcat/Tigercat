@@ -38,10 +38,9 @@ import {
   getDatePickerLabels,
   getLocaleDirection,
   mergeTigerLocale,
-  type DatePickerSize,
+  type ComponentSize,
   type DateFormat,
   type DatePickerModelValue,
-  type DatePickerRangeModelValue,
   type DatePickerLocaleInput,
   type DatePickerLocalePreset,
   type DatePickerLabels,
@@ -78,13 +77,14 @@ function hasDatePickerLocaleCode(
 }
 
 export type VueDatePickerModelValue = DatePickerModelValue
+type DatePickerRangeInputValue = [Date | string | null, Date | string | null]
 
 export interface VueDatePickerProps {
   range?: boolean
   locale?: DatePickerLocaleInput
   labels?: Partial<DatePickerLabels>
   modelValue?: VueDatePickerModelValue
-  size?: DatePickerSize
+  size?: ComponentSize
   format?: DateFormat
   placeholder?: string
   disabled?: boolean
@@ -152,8 +152,8 @@ export const DatePicker = defineComponent({
      * @default 'md'
      */
     size: {
-      type: String as PropType<DatePickerSize>,
-      default: 'md' as DatePickerSize
+      type: String as PropType<ComponentSize>,
+      default: 'md' as ComponentSize
     },
     /**
      * Date format string
@@ -545,7 +545,7 @@ export const DatePicker = defineComponent({
               : null
         emitValue(date)
       } else {
-        const range = val as DatePickerRangeModelValue | null
+        const range = val as DatePickerRangeInputValue | null
         if (range && Array.isArray(range)) {
           emitValue([
             range[0]

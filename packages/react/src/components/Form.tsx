@@ -18,7 +18,7 @@ import {
   type FormConditionState,
   type FormLabelPosition,
   type FormLabelAlign,
-  type FormSize,
+  type ComponentSize,
   type FormRule,
   type FormRuleTrigger,
   validateForm,
@@ -49,7 +49,7 @@ export interface FormContextValue {
   labelWidth?: string | number
   labelPosition: FormLabelPosition
   labelAlign: FormLabelAlign
-  size: FormSize
+  size: ComponentSize
   inlineMessage: boolean
   showRequiredAsterisk: boolean
   disabled: boolean
