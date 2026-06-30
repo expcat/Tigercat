@@ -38,20 +38,13 @@ import {
   movePinch,
   getImageViewerLabels,
   mergeTigerLocale,
+  type ImagePreviewProps as CoreImagePreviewProps,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface VueImagePreviewProps {
-  open?: boolean
+export interface VueImagePreviewProps extends Omit<CoreImagePreviewProps, 'images'> {
   images?: string[]
-  currentIndex?: number
-  zIndex?: number
-  maskClosable?: boolean
-  scaleStep?: number
-  minScale?: number
-  maxScale?: number
-  locale?: Partial<TigerLocale>
 }
 
 const svgIcon = (d: string, cls = 'w-5 h-5') =>

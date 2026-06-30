@@ -12,7 +12,7 @@ source: current repository state after R18 Charts completion and R20 composite/b
 ## 审计基线
 
 - `api-reports/public-api-baseline.json` 当前覆盖 156 个 `*Props` 接口、2877 个 core exports、148 个 React 公开组件和 148 个 Vue 公开组件。
-- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、Vue checkable Form primitives 不回退到 `checked` / `defaultChecked` / `update:checked`、Form composite selectors 不回退到旧尺寸 aliases / DatePicker-TimePicker 旧模型 aliases / 旧 search 和 empty 命名、Navigation 受控回调与子组件 subpath 不回流、Data/Table 旧数据入口与虚拟阈值 API 不回流、Charts 重复 datum aliases 与独立 `ChartTooltip visible` 不回流、Kanban 并行类型别名与 DataTableWithToolbar 顶层业务回调不回流、登记过的受控量 parity、Skill references 覆盖与文档预算。
+- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、Vue checkable Form primitives 不回退到 `checked` / `defaultChecked` / `update:checked`、Form composite selectors 不回退到旧尺寸 aliases / DatePicker-TimePicker 旧模型 aliases / 旧 search 和 empty 命名、Navigation 受控回调与子组件 subpath 不回流、Data/Table 旧数据入口与虚拟阈值 API 不回流、Charts 重复 datum aliases 与独立 `ChartTooltip visible` 不回流、Advanced/media 的 core `NumberKeyboardProps.modelValue` 与 viewer 旧索引/可见性命名不回流、Kanban 并行类型别名与 DataTableWithToolbar 顶层业务回调不回流、登记过的受控量 parity、Skill references 覆盖与文档预算。
 - `packages/core/src/types/base.ts`、`events.ts`、`generics.ts` 是公共合约收敛事实源；后续批次应优先复用这些 shared contracts，不能在 React/Vue 组件内各自临时发明命名。
 - `packages/core/src/types/index.ts` 与 `packages/core/src/utils/index.ts` 仍以宽 barrel 公开大量类型与工具；R12-R20 删除或合并 public exports 时必须同步更新 API baseline、迁移说明和对应分组测试。
 
@@ -119,6 +119,16 @@ source: current repository state after R18 Charts completion and R20 composite/b
 - 证据：split chart core type files、React/Vue AreaChart/DonutChart/ChartTooltip 和高阶 chart components、React/Vue chart demos、ChartSubComponents tests、generated Skill charts props/examples、`api-reports/public-api-baseline.json` 和 `scripts/validate-api.mjs` R18 guard 已同步更新。
 - 实际验证：`npx -y pnpm@11.9.0 test:group:charts`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline`、`npx -y pnpm@11.9.0 docs:api`；其余发布与格式门禁见 `docs/V2_COMPLETED.md#r18-charts-and-visualization-stack`。
 - 剩余阻塞：无；下一批次为 R19 Advanced editors and media-heavy components。
+
+### R19 Advanced editors + Media（2026-06-30）
+
+- 实际删除 / 合并：删除 core `NumberKeyboardProps.modelValue`；新增 `ImageViewerBaseProps` 并让 `ImagePreviewProps` 与 `ImageViewerProps` 复用 shared viewer contract；React `ImageViewerProps` 与 Vue `VueImagePreviewProps` / `VueImageViewerProps` 改为从 core props 派生。
+- Viewer surface：`ImagePreview` 与 `ImageViewer` 保持两个 public props 名称和运行时入口；共享 `locale` / `images` / `open` / `currentIndex` / `maskClosable` 语义，不恢复 `visible`、`defaultIndex`、`onIndexChange` 或 `update:index`。
+- Runtime guard：RichTextEditor 内置 engine 在非浏览器环境下对 `document.execCommand`、`queryCommandState` 与 `window.prompt` 做 no-op guard，避免 Node/SSR 下触发浏览器 API。
+- 唯一替代 API：core `NumberKeyboardProps.modelValue` 使用 `value`；Vue 组件本地仍使用 `modelValue` / `update:modelValue` 作为 Vue v-model；React ImageViewer 索引回调用 `onCurrentIndexChange`，Vue 用 `update:currentIndex`。
+- 证据：core number-keyboard/image/image-viewer/rich-text-engine、React/Vue ImagePreview/ImageViewer、browser-only guard test、generated API baseline、generated Skill references 和 `scripts/validate-api.mjs` R19 guard 已同步更新。
+- 实际验证：`corepack pnpm vitest run tests/core/browser-only-guards.spec.ts`、`corepack pnpm api:validate`；完整 R19 验证见 `docs/V2_COMPLETED.md#r19-advanced-editors-and-media-heavy-components`。
+- 剩余阻塞：无；R10-R20 组件级 API 清理已完成，v2.0.0 发布收口仍按维护决定单独执行。
 
 ### R20 Composite + Business（2026-06-30）
 

@@ -30,7 +30,6 @@ export interface NumberKeyboardChangePayload {
 export interface NumberKeyboardProps {
   value?: string
   defaultValue?: string
-  modelValue?: string
   mode?: NumberKeyboardMode
   maxLength?: number
   precision?: number

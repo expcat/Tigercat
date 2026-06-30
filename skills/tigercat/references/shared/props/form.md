@@ -159,13 +159,13 @@ description: Compact generated Tigercat Form props reference
 
 ## NumberKeyboard
 
-`packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 3/15 props
+`packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 3/14 props
 
-| Prop            | Type     | Default | Notes |
-| --------------- | -------- | ------- | ----- |
-| `value?`        | `string` | `-`     | -     |
-| `defaultValue?` | `string` | `-`     | -     |
-| `modelValue?`   | `string` | `-`     | -     |
+| Prop            | Type                 | Default | Notes |
+| --------------- | -------------------- | ------- | ----- |
+| `value?`        | `string`             | `-`     | -     |
+| `defaultValue?` | `string`             | `-`     | -     |
+| `mode?`         | `NumberKeyboardMode` | `-`     | -     |
 
 ## Radio
 

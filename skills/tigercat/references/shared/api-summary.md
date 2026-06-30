@@ -11,26 +11,26 @@ description: Compact generated API summary for Tigercat core types
 
 ## Basic
 
-| Type File    | Props Interfaces                                                                   | Components                                                | Exports |
-| ------------ | ---------------------------------------------------------------------------------- | --------------------------------------------------------- | ------- |
-| alert.ts     | AlertProps                                                                         | Alert                                                     | 3       |
-| avatar.ts    | AvatarProps, AvatarGroupProps                                                      | Avatar, AvatarGroup                                       | 4       |
-| badge.ts     | BadgeProps                                                                         | Badge                                                     | 5       |
-| button.ts    | ButtonProps, ButtonGroupProps                                                      | Button, ButtonGroup                                       | 6       |
-| code.ts      | CodeProps                                                                          | Code                                                      | 1       |
-| divider.ts   | DividerProps                                                                       | Divider                                                   | 4       |
-| empty.ts     | EmptyProps                                                                         | Empty                                                     | 2       |
-| icon.ts      | IconProps                                                                          | Icon                                                      | 2       |
-| image.ts     | ImageProps, ImagePreviewProps, ImageGroupProps, ImageCropperProps, CropUploadProps | Image, ImagePreview, ImageGroup, ImageCropper, CropUpload | 12      |
-| link.ts      | LinkProps                                                                          | Link                                                      | 3       |
-| qrcode.ts    | QRCodeProps                                                                        | QRCode                                                    | 3       |
-| rate.ts      | RateProps                                                                          | Rate                                                      | 2       |
-| result.ts    | ResultProps                                                                        | Result                                                    | 2       |
-| segmented.ts | SegmentedProps                                                                     | Segmented                                                 | 2       |
-| statistic.ts | StatisticProps                                                                     | Statistic                                                 | 1       |
-| tag.ts       | TagProps                                                                           | Tag                                                       | 3       |
-| text.ts      | TextProps                                                                          | Text                                                      | 6       |
-| watermark.ts | WatermarkProps                                                                     | Watermark                                                 | 2       |
+| Type File    | Props Interfaces                                                                                         | Components                                                | Exports |
+| ------------ | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ------- |
+| alert.ts     | AlertProps                                                                                               | Alert                                                     | 3       |
+| avatar.ts    | AvatarProps, AvatarGroupProps                                                                            | Avatar, AvatarGroup                                       | 4       |
+| badge.ts     | BadgeProps                                                                                               | Badge                                                     | 5       |
+| button.ts    | ButtonProps, ButtonGroupProps                                                                            | Button, ButtonGroup                                       | 6       |
+| code.ts      | CodeProps                                                                                                | Code                                                      | 1       |
+| divider.ts   | DividerProps                                                                                             | Divider                                                   | 4       |
+| empty.ts     | EmptyProps                                                                                               | Empty                                                     | 2       |
+| icon.ts      | IconProps                                                                                                | Icon                                                      | 2       |
+| image.ts     | ImageProps, ImageViewerBaseProps, ImagePreviewProps, ImageGroupProps, ImageCropperProps, CropUploadProps | Image, ImagePreview, ImageGroup, ImageCropper, CropUpload | 13      |
+| link.ts      | LinkProps                                                                                                | Link                                                      | 3       |
+| qrcode.ts    | QRCodeProps                                                                                              | QRCode                                                    | 3       |
+| rate.ts      | RateProps                                                                                                | Rate                                                      | 2       |
+| result.ts    | ResultProps                                                                                              | Result                                                    | 2       |
+| segmented.ts | SegmentedProps                                                                                           | Segmented                                                 | 2       |
+| statistic.ts | StatisticProps                                                                                           | Statistic                                                 | 1       |
+| tag.ts       | TagProps                                                                                                 | Tag                                                       | 3       |
+| text.ts      | TextProps                                                                                                | Text                                                      | 6       |
+| watermark.ts | WatermarkProps                                                                                           | Watermark                                                 | 2       |
 
 ## Form
 
@@ -180,4 +180,4 @@ description: Compact generated API summary for Tigercat core types
 | ----------- | ---------------- | ---------- | ------- |
 | viewport.ts | -                | -          | 2       |
 
-Total exported types: 604.
+Total exported types: 605.

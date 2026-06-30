@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 import {
   announceToScreenReader,
   captureActiveElement,
+  builtinRichTextEngine,
   createAnchorObserver,
   createFocusTrap,
   cropCanvas,
@@ -24,6 +25,21 @@ import {
   manageLiveRegion,
   scrollToAnchor
 } from '@expcat/tigercat-core'
+
+function createRichTextHost() {
+  const listeners = new Map<string, EventListener>()
+  return {
+    contentEditable: 'true',
+    innerHTML: '<p>Hello</p>',
+    addEventListener(type: string, listener: EventListener) {
+      listeners.set(type, listener)
+    },
+    removeEventListener(type: string) {
+      listeners.delete(type)
+    },
+    focus() {}
+  } as unknown as HTMLElement
+}
 
 describe('browser-only utility guards', () => {
   it('no-ops browser side effects when document/window are unavailable', async () => {
@@ -73,5 +89,24 @@ describe('browser-only utility guards', () => {
     await expect(exportChartPng({} as SVGSVGElement)).rejects.toThrow(
       'Chart PNG export is only available in the browser'
     )
+  })
+
+  it('no-ops rich text document commands outside the browser', () => {
+    const instance = builtinRichTextEngine.create({
+      element: createRichTextHost(),
+      initialValue: '<p>Hello</p>',
+      readOnly: false,
+      disabled: false,
+      toolbar: [{ name: 'bold', label: 'Bold' }],
+      notifyChange: () => {},
+      notifyActiveFormats: () => {}
+    })
+
+    expect(() => instance.refreshActiveFormats()).not.toThrow()
+    expect(() => instance.exec('bold')).not.toThrow()
+    expect(() => instance.exec('codeBlock')).not.toThrow()
+    expect(() => instance.exec('link')).not.toThrow()
+    expect(() => instance.exec('image')).not.toThrow()
+    expect(() => instance.destroy()).not.toThrow()
   })
 })

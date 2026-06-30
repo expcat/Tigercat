@@ -3,34 +3,12 @@
  * @since 0.9.0
  */
 
-import type { TigerLocale } from './locale'
+import type { ImageViewerBaseProps } from './image'
 
 /**
  * Base ImageViewer props interface
  */
-export interface ImageViewerProps {
-  /**
-   * Locale override merged on top of ConfigProvider locale.
-   */
-  locale?: Partial<TigerLocale>
-
-  /**
-   * Array of image URLs to display
-   */
-  images: string[]
-
-  /**
-   * Whether the viewer is visible
-   * @default false
-   */
-  open?: boolean
-
-  /**
-   * Current image index
-   * @default 0
-   */
-  currentIndex?: number
-
+export interface ImageViewerProps extends ImageViewerBaseProps {
   /**
    * Whether to enable zoom controls
    * @default true
@@ -54,12 +32,6 @@ export interface ImageViewerProps {
    * @default true
    */
   showCounter?: boolean
-
-  /**
-   * Whether to close on mask/backdrop click
-   * @default true
-   */
-  maskClosable?: boolean
 
   /**
    * Minimum zoom scale

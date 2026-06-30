@@ -830,3 +830,44 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `git diff --check`
 
 **状态更新要求**：完成后已写回状态、日期、删除的 chart API 摘要、bundle 隔离结果、Skill/examples 更新范围和关键验证命令；阶段 12 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R19。
+
+### R19 Advanced editors and media-heavy components
+
+**状态**：已完成（2026-06-30）。
+
+**目标**：清理 Advanced editors 与 media-heavy components，隔离 heavy runtime，统一 file/image/editor value 与 event 命名，删除旧浏览器兼容分支中的 public API。
+
+**允许修改**：Advanced 相关 core types、React/Vue 组件、editor/media helpers、目标 tests、SSR/browser guard tests、Skill advanced props/examples、example 使用、迁移说明、变更记录、API baseline、必要 bundle smoke。
+
+**不得修改**：Charts/Data/Composite business 组件行为、发布 workflow、无关 package exports。
+
+**组件范围**：CodeEditor、MarkdownEditor、RichTextEditor、FileManager、ImageViewer、ImageAnnotation、ImageCropper、PrintLayout、VirtualList、InfiniteScroll、Signature、NumberKeyboard。
+
+**执行摘要**：删除 core `NumberKeyboardProps.modelValue`，跨框架 shared contract 统一使用 `value` / `defaultValue`，Vue `NumberKeyboard` 组件本地仍保留 `modelValue` / `update:modelValue` 作为默认 `v-model`。新增 `ImageViewerBaseProps` 复用 `locale` / `images` / `open` / `currentIndex` / `maskClosable`，`ImagePreviewProps` 与 `ImageViewerProps` 继续作为两个 public surface 保留；React `ImageViewerProps` 与 Vue `VueImagePreviewProps` / `VueImageViewerProps` 从 core props 派生。RichTextEditor 内置 engine 对非浏览器环境的 `document.execCommand`、`queryCommandState` 与 `window.prompt` 做 no-op guard，避免 Node/SSR import 或命令执行路径抛错。`scripts/validate-api.mjs` 新增 R19 guard（`advanced-media-api`）阻止 core `NumberKeyboardProps.modelValue` 和 viewer `visible` / `defaultIndex` / `onIndexChange` / `update:index` 回流；API baseline、generated Skill references、迁移说明和变更记录已同步更新。
+
+**实际删除 / 合并**：
+
+- `NumberKeyboardProps.modelValue` → core `NumberKeyboardProps.value`；Vue 组件本地 `modelValue` 仅作为 Vue v-model surface。
+- `ImagePreviewProps` / `ImageViewerProps` 重复 viewer 字段 → `ImageViewerBaseProps`。
+- Viewer 旧命名回流 guard：`visible` / `defaultIndex` / `onIndexChange` / `update:index` → `open` / `currentIndex` / React `onCurrentIndexChange` / Vue `update:currentIndex`。
+- RichTextEditor 内置 engine 浏览器命令 → 非浏览器 no-op guard。
+
+**实际保留**：
+
+- `ImagePreview` 与 `ImageViewer` 保留为两个 public component/type surface，因为两者仍代表不同运行时入口与配置范围。
+- React editors 继续使用 `value` / `defaultValue` / `onChange`；Vue editors 继续使用框架惯例的 `modelValue` / `update:modelValue`。
+
+**实际验证**：
+
+- `corepack pnpm test:group:advanced`
+- `corepack pnpm vitest run tests/core/browser-only-guards.spec.ts`
+- `corepack pnpm api:validate`
+- `corepack pnpm types:check`
+- `corepack pnpm api:baseline`
+- `corepack pnpm docs:api`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 example:ssr:check`
+- `npx -y pnpm@11.9.0 publish:check`
+
+**状态更新要求**：完成后已写回状态、日期、删除的 Advanced/media API 摘要、SSR/browser guard 验证范围、Skill/examples 更新范围和关键验证命令；阶段 13 已同步为 `已完成（2026-06-30）`。R10-R20 组件级 API 清理已完成，v2.0.0 发布收口仍按维护决定单独执行。

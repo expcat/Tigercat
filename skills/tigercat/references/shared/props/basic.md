@@ -190,13 +190,13 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## ImagePreview
 
-`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/9 props
+`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/4 props
 
-| Prop      | Type                   | Default | Notes                                                   |
-| --------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `locale?` | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale. |
-| `open?`   | `boolean`              | `-`     | Whether the preview is open                             |
-| `images`  | `string[]`             | `-`     | Array of image URLs to preview                          |
+| Prop         | Type     | Default | Notes                                  |
+| ------------ | -------- | ------- | -------------------------------------- |
+| `zIndex?`    | `number` | `1050`  | Custom z-index for the preview overlay |
+| `scaleStep?` | `number` | `0.5`   | Scale step for zoom in/out             |
+| `minScale?`  | `number` | `0.25`  | Minimum scale factor                   |
 
 ## Link
 

@@ -565,6 +565,24 @@ Vue `ImageGroup` 删除旧事件 `preview-visible-change`：
   </ImageGroup>
 ```
 
+### Advanced / media 受控值与 viewer 合约收敛
+
+core `NumberKeyboardProps` 不再包含 Vue 专属的 `modelValue` 字段。跨框架 shared contract 使用 `value` / `defaultValue`；React 继续通过 `onChange(value, payload)` 接收变化，Vue 组件仍支持默认 `v-model`。
+
+```diff
+- import type { NumberKeyboardProps } from '@expcat/tigercat-core'
+- const props: NumberKeyboardProps = { modelValue: amount }
++ import type { NumberKeyboardProps } from '@expcat/tigercat-core'
++ const props: NumberKeyboardProps = { value: amount }
+```
+
+`ImagePreviewProps` 与 `ImageViewerProps` 继续作为两个 public surface 保留，但共享 `ImageViewerBaseProps` 的 `open` / `currentIndex` 合约。旧的 `visible` / `defaultIndex` / `onIndexChange` 不再作为 viewer API 使用。
+
+```diff
+- <ImageViewer images={images} currentIndex={i} onIndexChange={setI} />
++ <ImageViewer images={images} currentIndex={i} onCurrentIndexChange={setI} />
+```
+
 ## v1.5.0
 
 ### 跨端 API 对称：受控量 / 事件回调统一命名

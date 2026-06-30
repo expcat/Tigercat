@@ -890,6 +890,69 @@ for (const relativePath of R18_CHART_TOOLTIP_FILES) {
   })
 }
 
+// ----- R19 Advanced/media component public API guard -----
+
+const R19_NUMBER_KEYBOARD_FILE = join(TYPES_DIR, 'number-keyboard.ts')
+if (existsSync(R19_NUMBER_KEYBOARD_FILE)) {
+  const lines = readFileSync(R19_NUMBER_KEYBOARD_FILE, 'utf-8').split(/\r?\n/)
+  let inProps = false
+  let depth = 0
+  lines.forEach((line, index) => {
+    if (!inProps && /\bexport\s+interface\s+NumberKeyboardProps\b/.test(line)) {
+      inProps = true
+      depth = 0
+    }
+    if (!inProps) return
+    if (/^\s+modelValue\s*\??\s*:/.test(line)) {
+      addIssue(
+        R19_NUMBER_KEYBOARD_FILE,
+        index + 1,
+        'advanced-media-api',
+        'R19 core NumberKeyboardProps must use value/defaultValue; modelValue is only a Vue component v-model prop'
+      )
+    }
+    for (const ch of line) {
+      if (ch === '{') depth++
+      else if (ch === '}') depth--
+    }
+    if (depth <= 0 && line.includes('}')) inProps = false
+  })
+}
+
+const R19_VIEWER_FILES = [
+  'packages/core/src/types/image.ts',
+  'packages/core/src/types/image-viewer.ts',
+  'packages/react/src/components/ImagePreview.tsx',
+  'packages/react/src/components/ImageViewer.tsx',
+  'packages/vue/src/components/ImagePreview.ts',
+  'packages/vue/src/components/ImageViewer.ts'
+]
+
+const R19_VIEWER_FORBIDDEN = [
+  { label: 'visible prop', regex: /\bvisible\s*[?]?\s*:/ },
+  { label: 'defaultIndex prop', regex: /\bdefaultIndex\s*[?]?\s*:/ },
+  { label: 'onIndexChange callback', regex: /\bonIndexChange\s*[?]?\s*:/ },
+  { label: 'update:index event', regex: /['"]update:index['"]/ }
+]
+
+for (const relativePath of R19_VIEWER_FILES) {
+  const filepath = join(ROOT, relativePath)
+  if (!existsSync(filepath)) continue
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    for (const rule of R19_VIEWER_FORBIDDEN) {
+      if (rule.regex.test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'advanced-media-api',
+          `R19 image preview/viewer APIs must use open/currentIndex/onCurrentIndexChange/update:currentIndex instead of ${rule.label}`
+        )
+      }
+    }
+  })
+}
+
 // ----- LLM docs coverage check -----
 
 function collectMarkdownContent(dir, options = {}) {
@@ -1176,6 +1239,7 @@ if (jsonMode) {
       'data-table-api': 'Data/Table R17 旧 API 禁止回流',
       'composite-api': 'Composite/业务组件 R20 旧 API 禁止回流',
       'charts-api': 'Charts R18 旧 API 禁止回流',
+      'advanced-media-api': 'Advanced/Media R19 旧 API 禁止回流',
       'controlled-parity': '受控量双端对称',
       'public-deprecated': '公开 API 禁止 @deprecated',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',

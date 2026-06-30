@@ -24,23 +24,13 @@ import {
   getImageViewerLabels,
   mergeTigerLocale,
   type GestureTransform,
+  type ImageViewerProps as CoreImageViewerProps,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface VueImageViewerProps {
-  images: string[]
-  open?: boolean
-  currentIndex?: number
-  zoomable?: boolean
-  rotatable?: boolean
-  showNav?: boolean
-  showCounter?: boolean
-  maskClosable?: boolean
-  minZoom?: number
-  maxZoom?: number
-  className?: string
-  locale?: Partial<TigerLocale>
+export interface VueImageViewerProps extends Omit<CoreImageViewerProps, 'images'> {
+  images?: string[]
 }
 
 function createSvgIcon(pathD: string, label: string) {
@@ -66,7 +56,7 @@ export const ImageViewer = defineComponent({
   props: {
     images: {
       type: Array as PropType<string[]>,
-      required: true
+      default: () => []
     },
     open: {
       type: Boolean,

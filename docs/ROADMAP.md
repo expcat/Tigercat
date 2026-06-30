@@ -4,23 +4,23 @@
 type: active-roadmap
 scope: v2.0.0 breaking component API simplification and grouped validation plan
 verified-date: 2026-06-30
-source: current repository state after R18 Charts completion and R20 composite/business cleanup (v2.0 release hardening deferred)
+source: current repository state after R19 Advanced/media completion and R20 composite/business cleanup (v2.0 release hardening deferred)
 -->
 
-本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；R01-R18 已完成任务的详细执行记录归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，需要历史证据时从归档、git 历史、变更日志或对应提交中查找。
+本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；R01-R19 已完成任务的详细执行记录归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，需要历史证据时从归档、git 历史、变更日志或对应提交中查找。
 
 ## 当前状态
 
-截至 2026-06-30，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R18 基础设施、API 审计与前七个组件批次清理：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy token/icon 资源清理、按组件组验证通道、core/shared contracts 删除合并清单、Basic/Layout 轻量组件 API 清理、Feedback/overlay open/portal/focus/close lifecycle 收敛、Form primitives 受控模型与尺寸别名清理、Form composite selectors 搜索/空态/模型别名与 heavy helper 拆分、Navigation 受控回调和子组件 subpath 产物收敛、Data/table stack 数据、选择与虚拟滚动入口统一，以及 Charts/visualization 类型拆分和 tooltip 命名收敛已经落地。R20 Composite/business 组件 API 清理也已于 2026-06-30 提前完成（移除 Kanban 数据模型别名、收敛 DataTableWithToolbar 业务回调、拆分 composite 巨型类型文件），但 R20 不再作为 v2.0.0 的发布收口任务；发布前仍需完成 R19 与最终发布门禁，v2.0.0 后续仍会追加新的更新计划，本批次不准备发布版本。
+截至 2026-06-30，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R19 基础设施、API 审计与组件批次清理：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy token/icon 资源清理、按组件组验证通道、core/shared contracts 删除合并清单、Basic/Layout 轻量组件 API 清理、Feedback/overlay open/portal/focus/close lifecycle 收敛、Form primitives 受控模型与尺寸别名清理、Form composite selectors 搜索/空态/模型别名与 heavy helper 拆分、Navigation 受控回调和子组件 subpath 产物收敛、Data/table stack 数据、选择与虚拟滚动入口统一、Charts/visualization 类型拆分与 tooltip 命名收敛，以及 Advanced/media viewer contract 和 editor runtime guard 收敛已经落地。R20 Composite/business 组件 API 清理也已于 2026-06-30 提前完成（移除 Kanban 数据模型别名、收敛 DataTableWithToolbar 业务回调、拆分 composite 巨型类型文件），但 R20 不再作为 v2.0.0 的发布收口任务；最终发布门禁留待单独批次执行，v2.0.0 后续仍会追加新的更新计划，本批次不准备发布版本。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）、阶段 6（R11 Core API and shared contracts audit）、阶段 7（R12 Basic + Layout lightweight components）、阶段 8（R13 Feedback and overlay components）、阶段 9（R14-R15 Form primitives 与 composite selectors）、阶段 10（R16 Navigation components）和阶段 11（R17 Data and table stack）已完成于 2026-06-29；阶段 12（R18 Charts and visualization stack）已完成于 2026-06-30。阶段 14（R20 Composite/business components）的组件级 API 清理已于 2026-06-30 提前完成，但其 v2.0 发布收口部分按维护决定 deferred，本批次不发布版本。
-- 当前阶段：阶段 13（R19 Advanced editors and media-heavy components），状态为 `未开始`。
-- 当前可执行任务：R19 Advanced editors and media-heavy components。
-- 后续阶段：R19 仍需执行；R20 组件清理已提前落地，但 v2.0.0 发布收口不再绑定 R20，需在 R19 完成后单独完成最终发布门禁。v2.0.0 后续仍会追加新的更新计划，路线图不在 R20 处收口。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）、阶段 6（R11 Core API and shared contracts audit）、阶段 7（R12 Basic + Layout lightweight components）、阶段 8（R13 Feedback and overlay components）、阶段 9（R14-R15 Form primitives 与 composite selectors）、阶段 10（R16 Navigation components）和阶段 11（R17 Data and table stack）已完成于 2026-06-29；阶段 12（R18 Charts and visualization stack）与阶段 13（R19 Advanced editors and media-heavy components）已完成于 2026-06-30。阶段 14（R20 Composite/business components）的组件级 API 清理已于 2026-06-30 提前完成，但其 v2.0 发布收口部分按维护决定 deferred，本批次不发布版本。
+- 当前阶段：R10-R20 组件级 API 清理已完成；最终发布门禁需单独执行。
+- 当前可执行任务：最终发布门禁（单独批次，尚未发布，不运行发布后 `smoke:published`）。
+- 后续阶段：R20 组件清理已提前落地，但 v2.0.0 发布收口不再绑定 R20；发布前仍需单独完成 release hardening / `quality:release` / 发布后 smoke。v2.0.0 后续仍会追加新的更新计划，路线图不在 R20 处收口。
 
 ## 执行原则
 
@@ -62,7 +62,7 @@ source: current repository state after R18 Charts completion and R20 composite/b
 | 10   | 已完成（2026-06-29）                            | R16     | 清理 Navigation 组件                                                                      |
 | 11   | 已完成（2026-06-29）                            | R17     | 清理 Data 与 table stack                                                                  |
 | 12   | 已完成（2026-06-30）                            | R18     | 清理 Charts 与 visualization stack                                                        |
-| 13   | 未开始                                          | R19     | 清理 Advanced editors 与 media-heavy components                                           |
+| 13   | 已完成（2026-06-30）                            | R19     | 清理 Advanced editors 与 media-heavy components                                           |
 | 14   | 组件清理已完成（2026-06-30）；发布收口 deferred | R20     | 清理 Composite/business components；v2.0 release hardening 不再绑定本批次，发布前单独收口 |
 
 阶段状态规则：
@@ -74,9 +74,9 @@ source: current repository state after R18 Charts completion and R20 composite/b
 
 ## v2.0.0 任务队列
 
-### R01-R18 completed archive
+### R01-R19 completed archive
 
-R01-R18 已完成，详细执行摘要、实际验证命令和状态回写记录已归档到 [V2_COMPLETED.md](V2_COMPLETED.md)。当前执行入口只保留完成状态摘要，避免后续 Agent 读取 R19-R20 时消耗过多 token。
+R01-R19 已完成，详细执行摘要、实际验证命令和状态回写记录已归档到 [V2_COMPLETED.md](V2_COMPLETED.md)。当前执行入口只保留完成状态摘要，避免后续 Agent 读取发布收口任务时消耗过多 token。
 
 | 任务                                                      | 状态                 | 摘要                                                                                             | 详情                                                                                         |
 | --------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
@@ -98,10 +98,11 @@ R01-R18 已完成，详细执行摘要、实际验证命令和状态回写记录
 | R16 Navigation components                                 | 已完成（2026-06-29） | 收敛 Navigation 受控回调命名，删除子组件源码 shim 并保留 subpath 产物。                          | [归档](V2_COMPLETED.md#r16-navigation-components)                                            |
 | R17 Data and table stack                                  | 已完成（2026-06-29） | 统一 Table/VirtualTable/DataTableWithToolbar 数据、选择与虚拟滚动入口，删除 Generic 泛型别名。   | [归档](V2_COMPLETED.md#r17-data-and-table-stack)                                             |
 | R18 Charts and visualization stack                        | 已完成（2026-06-30） | 拆分 chart 类型文件，删除重复 datum aliases，统一独立 ChartTooltip open 命名并保留 charts 隔离。 | [归档](V2_COMPLETED.md#r18-charts-and-visualization-stack)                                   |
+| R19 Advanced editors and media-heavy components           | 已完成（2026-06-30） | 删除 core NumberKeyboard modelValue，合并 viewer shared contract，并补齐 editor browser guard。  | [归档](V2_COMPLETED.md#r19-advanced-editors-and-media-heavy-components)                      |
 
 ### R19 Advanced editors and media-heavy components
 
-**状态**：未开始。
+**状态**：已完成（2026-06-30）。
 
 **目标**：清理 Advanced editors 与 media-heavy components，隔离 heavy runtime，统一 file/image/editor value 与 event 命名，删除旧浏览器兼容分支中的 public API。
 
@@ -125,6 +126,8 @@ R01-R18 已完成，详细执行摘要、实际验证命令和状态回写记录
 - `git diff --check`
 
 **状态更新要求**：完成后写回状态、日期、删除的 Advanced/media API 摘要、SSR/browser guard 验证范围、Skill/examples 更新范围和关键验证命令；同步更新阶段 13 状态。
+
+**执行摘要（2026-06-30）**：删除 core `NumberKeyboardProps.modelValue`，Vue 组件本地仍保留默认 `v-model`；新增 `ImageViewerBaseProps` 并让 `ImagePreviewProps` / `ImageViewerProps` 复用 `open` / `currentIndex` / `maskClosable` viewer contract，两个 public surface 均保留；React/Vue viewer props 从 core props 派生；RichTextEditor 内置 engine 对 Node/SSR 下的 `document.execCommand` / `window.prompt` 做 no-op guard；新增 `api:validate` R19 guard。详细记录见 [V2_API_AUDIT.md](V2_API_AUDIT.md) 与 [V2_COMPLETED.md](V2_COMPLETED.md)。R19 不发布 v2.0.0，最终发布门禁仍单独执行。
 
 ### R20 Composite/business components and v2.0 release hardening
 

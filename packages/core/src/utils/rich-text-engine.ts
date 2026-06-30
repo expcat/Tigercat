@@ -32,6 +32,15 @@ import {
 import { isBrowser } from './env'
 import type { RichTextEditorMode, ToolbarItem } from '../types/rich-text-editor'
 
+function canUseExecCommand(): boolean {
+  return isBrowser() && typeof document.execCommand === 'function'
+}
+
+function promptForRichTextUrl(message: string): string | null {
+  if (!isBrowser() || typeof window.prompt !== 'function') return null
+  return window.prompt(message)
+}
+
 export interface RichTextEngineMountContext {
   /** Host element the engine should mount into. */
   element: HTMLElement
@@ -124,7 +133,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
 
       const exec = (actionName: string) => {
         if (readOnly || disabled) return
-        element.focus()
+        if (typeof element.focus === 'function') element.focus()
 
         // Check for custom action on the toolbar button first
         const buttons = getToolbarButtons(ctx.toolbar)
@@ -138,6 +147,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
 
         const mapping = mapToolbarAction(actionName)
         if (mapping) {
+          if (!canUseExecCommand()) return
           document.execCommand(mapping.command, false, mapping.argument)
           handleInput()
           refreshActiveFormats()
@@ -145,12 +155,14 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         }
 
         if (actionName === 'codeBlock') {
+          if (!canUseExecCommand()) return
           document.execCommand('formatBlock', false, 'PRE')
           handleInput()
           return
         }
         if (actionName === 'link') {
-          const url = isBrowser() ? window.prompt('Enter URL:') : null
+          if (!canUseExecCommand()) return
+          const url = promptForRichTextUrl('Enter URL:')
           if (url && isValidUrl(url)) {
             document.execCommand('createLink', false, url)
             handleInput()
@@ -158,7 +170,8 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
           return
         }
         if (actionName === 'image') {
-          const url = isBrowser() ? window.prompt('Enter image URL:') : null
+          if (!canUseExecCommand()) return
+          const url = promptForRichTextUrl('Enter image URL:')
           if (url && isValidUrl(url)) {
             document.execCommand('insertImage', false, url)
             handleInput()

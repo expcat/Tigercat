@@ -1578,6 +1578,7 @@
       "imagePreviewWrapperClasses",
       "ImageProps",
       "imageViewerBackdropClasses",
+      "ImageViewerBaseProps",
       "imageViewerCloseBtnClasses",
       "imageViewerCounterClasses",
       "imageViewerIcons",
@@ -3787,18 +3788,8 @@
       "props": ["preview"]
     },
     "ImagePreviewProps": {
-      "extends": [],
-      "props": [
-        "currentIndex",
-        "images",
-        "locale",
-        "maskClosable",
-        "maxScale",
-        "minScale",
-        "open",
-        "scaleStep",
-        "zIndex"
-      ]
+      "extends": ["ImageViewerBaseProps"],
+      "props": ["maxScale", "minScale", "scaleStep", "zIndex"]
     },
     "ImageProps": {
       "extends": [],
@@ -3815,17 +3806,16 @@
         "width"
       ]
     },
-    "ImageViewerProps": {
+    "ImageViewerBaseProps": {
       "extends": [],
+      "props": ["currentIndex", "images", "locale", "maskClosable", "open"]
+    },
+    "ImageViewerProps": {
+      "extends": ["ImageViewerBaseProps"],
       "props": [
         "className",
-        "currentIndex",
-        "images",
-        "locale",
-        "maskClosable",
         "maxZoom",
         "minZoom",
-        "open",
         "rotatable",
         "showCounter",
         "showNav",
@@ -4148,7 +4138,6 @@
         "locale",
         "maxLength",
         "mode",
-        "modelValue",
         "precision",
         "readonly",
         "showConfirm",

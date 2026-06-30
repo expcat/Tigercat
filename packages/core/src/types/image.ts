@@ -133,9 +133,9 @@ export interface ImageProps {
 }
 
 /**
- * ImagePreview component props
+ * Shared viewer contract used by image preview surfaces.
  */
-export interface ImagePreviewProps {
+export interface ImageViewerBaseProps {
   /**
    * Locale override merged on top of ConfigProvider locale.
    */
@@ -159,16 +159,21 @@ export interface ImagePreviewProps {
   currentIndex?: number
 
   /**
-   * Custom z-index for the preview overlay
-   * @default 1050
-   */
-  zIndex?: number
-
-  /**
    * Whether clicking the mask closes the preview
    * @default true
    */
   maskClosable?: boolean
+}
+
+/**
+ * ImagePreview component props
+ */
+export interface ImagePreviewProps extends ImageViewerBaseProps {
+  /**
+   * Custom z-index for the preview overlay
+   * @default 1050
+   */
+  zIndex?: number
 
   /**
    * Scale step for zoom in/out

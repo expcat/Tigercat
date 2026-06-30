@@ -43,13 +43,13 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 ## ImageViewer
 
-`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 3/12 props
+`packages/core/src/types/image-viewer.ts` · `ImageViewerProps` · 3/7 props
 
-| Prop      | Type                   | Default | Notes                                                   |
-| --------- | ---------------------- | ------- | ------------------------------------------------------- |
-| `locale?` | `Partial<TigerLocale>` | `-`     | Locale override merged on top of ConfigProvider locale. |
-| `images`  | `string[]`             | `-`     | Array of image URLs to display                          |
-| `open?`   | `boolean`              | `false` | Whether the viewer is visible                           |
+| Prop         | Type      | Default | Notes                               |
+| ------------ | --------- | ------- | ----------------------------------- |
+| `zoomable?`  | `boolean` | `true`  | Whether to enable zoom controls     |
+| `rotatable?` | `boolean` | `true`  | Whether to enable rotation controls |
+| `showNav?`   | `boolean` | `true`  | Whether to show navigation arrows   |
 
 ## InfiniteScroll
 

@@ -23,23 +23,11 @@ import {
   getImageViewerLabels,
   mergeTigerLocale,
   type GestureTransform,
-  type TigerLocale
+  type ImageViewerProps as CoreImageViewerProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
-export interface ImageViewerProps {
-  locale?: Partial<TigerLocale>
-  images: string[]
-  open?: boolean
-  currentIndex?: number
-  zoomable?: boolean
-  rotatable?: boolean
-  showNav?: boolean
-  showCounter?: boolean
-  maskClosable?: boolean
-  minZoom?: number
-  maxZoom?: number
-  className?: string
+export interface ImageViewerProps extends CoreImageViewerProps {
   onOpenChange?: (open: boolean) => void
   onClose?: () => void
   onCurrentIndexChange?: (index: number) => void
