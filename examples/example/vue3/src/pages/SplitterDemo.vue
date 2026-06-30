@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Splitter } from '@expcat/tigercat-vue/Splitter'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SplitterDemo.vue?raw'
 
 const horizontalSnippet = `<Splitter direction="horizontal" :sizes="[30, 70]" style="height: 200px; border: 1px solid #e5e7eb; border-radius: 8px;">
   <template #panel-0><div class="p-4">左侧面板 (30%)</div></template>
@@ -33,7 +34,7 @@ const collapsibleSnippet = `<Splitter direction="horizontal" :sizes="[30, 70]" :
     <h1 class="text-3xl font-bold mb-2">Splitter 分割面板</h1>
     <p class="text-gray-500 mb-8">可拖拽分割面板，支持水平/垂直、嵌套和折叠。</p>
 
-    <DemoBlock title="水平分割" description="拖拽分割条调整面板大小" :code="horizontalSnippet">
+    <DemoBlock title="水平分割" description="拖拽分割条调整面板大小" :code="fullPageSnippet">
       <Splitter
         direction="horizontal"
         :sizes="[30, 70]"
@@ -43,7 +44,7 @@ const collapsibleSnippet = `<Splitter direction="horizontal" :sizes="[30, 70]" :
       </Splitter>
     </DemoBlock>
 
-    <DemoBlock title="垂直分割" :code="verticalSnippet">
+    <DemoBlock title="垂直分割" :code="fullPageSnippet">
       <Splitter
         direction="vertical"
         :sizes="[40, 60]"
@@ -53,7 +54,7 @@ const collapsibleSnippet = `<Splitter direction="horizontal" :sizes="[30, 70]" :
       </Splitter>
     </DemoBlock>
 
-    <DemoBlock title="嵌套分割" description="水平套垂直，实现 IDE 布局" :code="nestedSnippet">
+    <DemoBlock title="嵌套分割" description="水平套垂直，实现 IDE 布局" :code="fullPageSnippet">
       <Splitter
         direction="horizontal"
         :sizes="[25, 75]"
@@ -68,7 +69,7 @@ const collapsibleSnippet = `<Splitter direction="horizontal" :sizes="[30, 70]" :
       </Splitter>
     </DemoBlock>
 
-    <DemoBlock title="可折叠" description="collapsible 允许折叠面板" :code="collapsibleSnippet">
+    <DemoBlock title="可折叠" description="collapsible 允许折叠面板" :code="fullPageSnippet">
       <Splitter
         direction="horizontal"
         :sizes="[30, 70]"

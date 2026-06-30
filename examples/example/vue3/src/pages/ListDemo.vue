@@ -7,6 +7,7 @@ import { computed, ref, h } from 'vue'
 import { List } from '@expcat/tigercat-vue/List'
 import type { ListItem } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ListDemo.vue?raw'
 
 const basicSnippet = `<List :dataSource="basicData" />`
 
@@ -167,13 +168,16 @@ function handlePageChange(current: number, pageSize: number) {
       <p class="text-gray-600 dark:text-gray-400">通用列表组件，用于展示一系列相似的数据项。</p>
     </div>
 
-    <DemoBlock title="基本用法" description="最简单的列表展示。" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="最简单的列表展示。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <List :dataSource="basicData" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="列表尺寸" description="列表支持三种尺寸：小、中、大。" :code="sizeSnippet">
+    <DemoBlock
+      title="列表尺寸"
+      description="列表支持三种尺寸：小、中、大。"
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical" :size="16" class="w-full">
           <div>
@@ -192,7 +196,7 @@ function handlePageChange(current: number, pageSize: number) {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="边框样式" description="列表支持多种边框样式。" :code="borderSnippet">
+    <DemoBlock title="边框样式" description="列表支持多种边框样式。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical" :size="16" class="w-full">
           <div>
@@ -214,7 +218,7 @@ function handlePageChange(current: number, pageSize: number) {
     <DemoBlock
       title="分割线（split）"
       description='当 bordered="divided" 时，可通过 split 控制是否显示分割线。'
-      :code="splitSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -229,7 +233,7 @@ function handlePageChange(current: number, pageSize: number) {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="带头像的列表" description="列表项可以包含头像。" :code="avatarSnippet">
+    <DemoBlock title="带头像的列表" description="列表项可以包含头像。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <List :dataSource="userData" />
       </div>
@@ -238,7 +242,7 @@ function handlePageChange(current: number, pageSize: number) {
     <DemoBlock
       title="带额外内容"
       description="通过数据项的 extra 在右侧添加操作区。"
-      :code="extraSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <List :dataSource="extraData" />
       </div>
@@ -247,7 +251,7 @@ function handlePageChange(current: number, pageSize: number) {
     <DemoBlock
       title="自定义列表项渲染"
       description="通过 renderItem 插槽自定义每一项的布局。"
-      :code="renderSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <List :dataSource="productData" hoverable>
           <template #renderItem="{ item }">
@@ -269,7 +273,7 @@ function handlePageChange(current: number, pageSize: number) {
     <DemoBlock
       title="头部和底部"
       description="列表可以添加头部和底部内容。"
-      :code="headerFooterSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <List :dataSource="basicData">
           <template #header>
@@ -288,8 +292,7 @@ function handlePageChange(current: number, pageSize: number) {
     <DemoBlock
       title="分页列表"
       description="当数据较多时，可以使用分页功能。"
-      :code="paginationSnippet"
-      :script="paginationScriptSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="space-y-3">
           <List :dataSource="pagedListData" />
@@ -311,7 +314,7 @@ function handlePageChange(current: number, pageSize: number) {
     <DemoBlock
       title="网格布局"
       description="列表项可以以网格形式展示，支持响应式布局。"
-      :code="gridSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <List
           :dataSource="gridData"
@@ -333,7 +336,7 @@ function handlePageChange(current: number, pageSize: number) {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="加载状态" description="列表支持加载状态。" :code="loadingSnippet">
+    <DemoBlock title="加载状态" description="列表支持加载状态。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical" :size="16" class="w-full">
           <Button @click="simulateLoading">{{ loading ? '加载中...' : '模拟加载' }}</Button>
@@ -342,7 +345,7 @@ function handlePageChange(current: number, pageSize: number) {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="空状态" description="当列表没有数据时显示空状态。" :code="emptySnippet">
+    <DemoBlock title="空状态" description="当列表没有数据时显示空状态。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <List :dataSource="[]" emptyText="暂无数据" />
       </div>
@@ -351,7 +354,7 @@ function handlePageChange(current: number, pageSize: number) {
     <DemoBlock
       title="可点击列表"
       description="列表项可以添加点击事件和悬停效果。"
-      :code="clickableSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <List :dataSource="basicData" hoverable @item-click="handleItemClick" />
       </div>
@@ -360,7 +363,7 @@ function handlePageChange(current: number, pageSize: number) {
     <DemoBlock
       title="竖直布局"
       description='通过 itemLayout="vertical" 将列表项内容竖直排列。'
-      :code="verticalSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <List :dataSource="userData" itemLayout="vertical" />
       </div>

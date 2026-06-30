@@ -2,6 +2,7 @@
 import { Button } from '@expcat/tigercat-vue/Button'
 import { Descriptions } from '@expcat/tigercat-vue/Descriptions'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './DescriptionsDemo.vue?raw'
 
 const basicSnippet = `<Descriptions title="用户信息" :items="userInfo" />`
 
@@ -94,13 +95,13 @@ const highlightItems = [
       <p class="text-gray-600 dark:text-gray-400">用于展示结构化数据、详情信息的描述列表组件。</p>
     </div>
 
-    <DemoBlock title="基本用法" description="最简单的描述列表展示。" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="最简单的描述列表展示。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Descriptions title="用户信息" :items="userInfo" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="带边框" description="使用 bordered 属性添加边框。" :code="borderedSnippet">
+    <DemoBlock title="带边框" description="使用 bordered 属性添加边框。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Descriptions title="用户信息" bordered :items="userInfo" />
       </div>
@@ -109,7 +110,7 @@ const highlightItems = [
     <DemoBlock
       title="不同尺寸"
       description="支持三种尺寸：small、medium、large。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">小尺寸</h3>
@@ -129,7 +130,7 @@ const highlightItems = [
     <DemoBlock
       title="垂直布局"
       description='使用 layout="vertical" 设置垂直布局。'
-      :code="verticalSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">垂直布局（无边框）</h3>
@@ -145,7 +146,7 @@ const highlightItems = [
     <DemoBlock
       title="自定义列数"
       description="通过 column 属性设置每行显示的列数。"
-      :code="columnSnippet">
+      :code="fullPageSnippet">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">2 列布局</h3>
@@ -161,7 +162,7 @@ const highlightItems = [
     <DemoBlock
       title="跨列显示"
       description="描述项可以通过 span 属性实现跨列显示。"
-      :code="spanSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Descriptions title="产品详情" bordered :column="3" :items="productDetails" />
       </div>
@@ -170,7 +171,7 @@ const highlightItems = [
     <DemoBlock
       title="带操作区域"
       description="可以通过 extra 插槽添加操作按钮。"
-      :code="extraSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Descriptions title="订单详情" bordered :column="3" :items="orderInfo">
           <template #extra>
@@ -183,7 +184,7 @@ const highlightItems = [
     <DemoBlock
       title="自定义样式"
       description="通过 labelStyle 和 contentStyle 自定义标签/内容样式。"
-      :code="styleSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Descriptions
           title="用户信息（自定义样式）"
@@ -198,7 +199,7 @@ const highlightItems = [
     <DemoBlock
       title="无冒号"
       description="通过设置 colon 为 false 隐藏标签后的冒号。"
-      :code="colonSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Descriptions title="服务器配置" :colon="false" bordered :items="serverConfig" />
       </div>
@@ -207,7 +208,7 @@ const highlightItems = [
     <DemoBlock
       title="Item 级自定义 class"
       description="通过 labelClassName / contentClassName 为单个描述项设置独立样式。"
-      :code="itemClassSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Descriptions bordered :column="2" :items="highlightItems" />
       </div>

@@ -3,6 +3,7 @@ import { Statistic } from '@expcat/tigercat-vue/Statistic'
 import { Space } from '@expcat/tigercat-vue/Space'
 import { Card } from '@expcat/tigercat-vue/Card'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './StatisticDemo.vue?raw'
 
 const basicSnippet = `<Space :size="32">
   <Statistic title="活跃用户" :value="112893" />
@@ -32,7 +33,7 @@ const cardSnippet = `<Space :size="16">
     <h1 class="text-3xl font-bold mb-2">Statistic 统计</h1>
     <p class="text-gray-500 mb-8">展示统计数值，支持精度、前缀后缀和千分位分隔。</p>
 
-    <DemoBlock title="基本用法" description="展示数值、精度和后缀" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="展示数值、精度和后缀" :code="fullPageSnippet">
       <Space :size="32">
         <Statistic title="活跃用户" :value="112893" />
         <Statistic title="收入 (CNY)" :value="89320.5" :precision="2" />
@@ -40,7 +41,10 @@ const cardSnippet = `<Space :size="16">
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="前后缀与尺寸" description="prefix/suffix 和 size 控制" :code="affixSnippet">
+    <DemoBlock
+      title="前后缀与尺寸"
+      description="prefix/suffix 和 size 控制"
+      :code="fullPageSnippet">
       <Space :size="32">
         <Statistic title="日活用户" :value="1128" prefix="↑" :group-separator="true" />
         <Statistic title="下单金额" :value="250000" prefix="¥" :group-separator="true" />
@@ -49,7 +53,7 @@ const cardSnippet = `<Space :size="16">
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="卡片中使用" description="与 Card 组件配合使用" :code="cardSnippet">
+    <DemoBlock title="卡片中使用" description="与 Card 组件配合使用" :code="fullPageSnippet">
       <Space :size="16">
         <Card style="width: 200px">
           <Statistic title="总销量" :value="8846" :group-separator="true" />

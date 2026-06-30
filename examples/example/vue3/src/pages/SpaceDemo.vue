@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SpaceDemo.vue?raw'
 
 const horizontalSnippet = `<Space>
   <div class="bg-blue-500 text-white p-4 rounded">Item 1</div>
@@ -40,7 +41,7 @@ const wrapSnippet = `<Space wrap size="sm" class="w-full">
       <p class="text-gray-600 dark:text-gray-400">设置组件之间的间距。</p>
     </div>
 
-    <DemoBlock title="水平间距" description="水平方向的间距。" :code="horizontalSnippet">
+    <DemoBlock title="水平间距" description="水平方向的间距。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <div class="bg-blue-500 text-white p-4 rounded">Item 1</div>
@@ -50,7 +51,7 @@ const wrapSnippet = `<Space wrap size="sm" class="w-full">
       </div>
     </DemoBlock>
 
-    <DemoBlock title="垂直间距" description="垂直方向的间距。" :code="verticalSnippet">
+    <DemoBlock title="垂直间距" description="垂直方向的间距。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical">
           <div class="bg-green-500 text-white p-4 rounded">Item 1</div>
@@ -63,7 +64,7 @@ const wrapSnippet = `<Space wrap size="sm" class="w-full">
     <DemoBlock
       title="不同尺寸"
       description="size 支持内置尺寸（sm/md/lg）与自定义数值（px）。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical" class="w-full">
           <div>
@@ -105,7 +106,7 @@ const wrapSnippet = `<Space wrap size="sm" class="w-full">
     <DemoBlock
       title="对齐方式"
       description="align 控制交叉轴对齐（start/center/end/baseline/stretch）。"
-      :code="alignSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical" class="w-full">
           <div>
@@ -148,7 +149,7 @@ const wrapSnippet = `<Space wrap size="sm" class="w-full">
     <DemoBlock
       title="自动换行"
       description="wrap=true 时，子项在空间不足时自动换行。"
-      :code="wrapSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md">
           <Space wrap size="sm" class="w-full">

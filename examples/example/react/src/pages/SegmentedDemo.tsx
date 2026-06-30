@@ -3,6 +3,7 @@ import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
 import { Segmented } from '@expcat/tigercat-react/Segmented'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './SegmentedDemo.tsx?raw'
 
 const simpleOpts = [
   { label: '选项 A', value: 'a' },
@@ -48,11 +49,7 @@ const SegmentedDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Segmented 分段控制器</h1>
       <p className="text-gray-500 mb-8">分段选择器，类似 iOS UISegmentedControl。</p>
 
-      <DemoBlock
-        title="基本用法"
-        description="value + onChange 受控"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="value + onChange 受控" code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
           <Segmented
             value={selected}
@@ -68,7 +65,10 @@ const SegmentedDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="尺寸与通栏" description="sm/md/lg 尺寸，block 撑满宽度" code={sizeSnippet}>
+      <DemoBlock
+        title="尺寸与通栏"
+        description="sm/md/lg 尺寸，block 撑满宽度"
+        code={fullPageSnippet}>
         <Space direction="vertical" size={12} className="w-full">
           <Segmented size="sm" options={simpleOpts} value="a" />
           <Segmented size="md" options={simpleOpts} value="a" />
@@ -77,7 +77,7 @@ const SegmentedDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="禁用" description="整体禁用 或 单个选项禁用" code={disabledSnippet}>
+      <DemoBlock title="禁用" description="整体禁用 或 单个选项禁用" code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
           <Segmented
             options={[

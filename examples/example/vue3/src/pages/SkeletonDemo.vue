@@ -5,6 +5,7 @@ import { Avatar } from '@expcat/tigercat-vue/Avatar'
 import { ref, onMounted } from 'vue'
 import { Skeleton } from '@expcat/tigercat-vue/Skeleton'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SkeletonDemo.vue?raw'
 
 // Loading state simulation
 const loading = ref(true)
@@ -187,7 +188,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="基本用法"
       description="最简单的使用方式，默认为文本占位符。"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <Skeleton />
     </DemoBlock>
 
@@ -195,7 +196,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="骨架屏变体"
       description="支持文本、头像、图片、按钮和自定义等多种变体。"
-      :code="variantsSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-6">
         <div>
           <h3 class="text-sm font-semibold text-gray-700 mb-2">文本 (Text)</h3>
@@ -224,7 +225,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="动画效果"
       description="支持脉冲、波浪和无动画三种效果。"
-      :code="animationSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="16" class="w-full">
         <div>
           <h3 class="text-sm font-semibold text-gray-700 mb-2">脉冲 (Pulse) - 默认</h3>
@@ -245,7 +246,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="多行文本"
       description="使用 rows 属性渲染多行文本骨架屏。"
-      :code="rowsSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="24" class="w-full">
         <div>
           <h3 class="text-sm font-semibold text-gray-700 mb-2">3 行</h3>
@@ -262,7 +263,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="段落模式"
       description="启用 paragraph 属性让多行文本具有不同的宽度。"
-      :code="paragraphSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="24" class="w-full">
         <div>
           <h3 class="text-sm font-semibold text-gray-700 mb-2">段落模式</h3>
@@ -279,7 +280,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="头像形状"
       description="头像变体支持圆形和方形两种形状。"
-      :code="avatarShapeSnippet">
+      :code="fullPageSnippet">
       <Space>
         <div class="text-center">
           <Skeleton variant="avatar" shape="circle" />
@@ -296,7 +297,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="自定义尺寸"
       description="通过 width 和 height 属性自定义骨架屏的尺寸。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="16" class="w-full">
         <div>
           <h3 class="text-sm font-semibold text-gray-700 mb-2">自定义宽度</h3>
@@ -317,7 +318,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="组合使用"
       description="组合多个 Skeleton 组件创建复杂的加载状态。"
-      :code="composeSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="24" class="w-full">
         <div class="bg-white p-4 rounded-lg">
           <h3 class="text-sm font-semibold text-gray-700 mb-4">文章预览</h3>
@@ -343,8 +344,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="加载状态控制"
       description="结合加载状态使用骨架屏（3秒后显示内容）。"
-      :code="loadingSnippet"
-      :script="loadingScriptSnippet">
+      :code="fullPageSnippet">
       <div class="bg-white p-6 rounded-lg">
         <div v-if="loading">
           <Skeleton variant="text" width="200px" class="mb-4" />
@@ -364,7 +364,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <DemoBlock
       title="真实场景示例"
       description="卡片列表加载效果（3.5秒后显示内容）。"
-      :code="realSnippet">
+      :code="fullPageSnippet">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <template v-if="cardLoading">
           <Card v-for="i in 4" :key="i">

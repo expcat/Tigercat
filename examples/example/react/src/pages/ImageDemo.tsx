@@ -3,6 +3,7 @@ import { ImagePreview } from '@expcat/tigercat-react/ImagePreview'
 import { useState } from 'react'
 import { Image } from '@expcat/tigercat-react/Image'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ImageDemo.tsx?raw'
 
 const PHOTOS = [
   'https://picsum.photos/seed/tiger1/600/400',
@@ -90,7 +91,7 @@ export default function ImageDemo() {
         图片展示组件，支持适配模式、懒加载、错误回退、点击预览、多图组预览。
       </p>
 
-      <DemoBlock title="基本用法" description="使用 src 和尺寸属性展示图片" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="使用 src 和尺寸属性展示图片" code={fullPageSnippet}>
         <div className="flex gap-4 flex-wrap">
           <Image src={PHOTOS[0]} alt="示例图片" width={200} height={150} preview={false} />
           <Image src={PHOTOS[1]} alt="示例图片 2" width={200} height={150} preview={false} />
@@ -100,7 +101,7 @@ export default function ImageDemo() {
       <DemoBlock
         title="适配模式"
         description="fit 属性控制图片在容器中的适配方式"
-        code={fitSnippet}>
+        code={fullPageSnippet}>
         <div className="flex gap-4 flex-wrap">
           {FIT_MODES.map((mode) => (
             <div key={mode} className="text-center">
@@ -122,7 +123,7 @@ export default function ImageDemo() {
       <DemoBlock
         title="加载失败回退"
         description="设置 fallbackSrc 或使用 errorRender 自定义错误状态"
-        code={fallbackSnippet}>
+        code={fullPageSnippet}>
         <div className="flex gap-4 items-start">
           <div className="text-center">
             <Image
@@ -156,7 +157,7 @@ export default function ImageDemo() {
       <DemoBlock
         title="懒加载"
         description="lazy 属性开启 IntersectionObserver 懒加载"
-        code={lazySnippet}>
+        code={fullPageSnippet}>
         <div className="flex gap-4">
           <Image
             src={PHOTOS[2]}
@@ -177,7 +178,7 @@ export default function ImageDemo() {
       <DemoBlock
         title="图片预览模式"
         description="支持点击图片进入全屏预览（默认），也可通过 previewTrigger='hover' 开启悬停放大预览。"
-        code={previewSnippet}>
+        code={fullPageSnippet}>
         <div className="flex flex-col gap-4">
           <div className="flex gap-4 flex-wrap">
             {PHOTOS.slice(0, 4).map((src, i) => (
@@ -194,14 +195,14 @@ export default function ImageDemo() {
       <DemoBlock
         title="关闭预览"
         description="设置 preview={false} 禁用点击预览"
-        code={noPreviewSnippet}>
+        code={fullPageSnippet}>
         <Image src={PHOTOS[0]} width={200} height={150} preview={false} alt="无预览" />
       </DemoBlock>
 
       <DemoBlock
         title="图片组 ImageGroup"
         description="用 ImageGroup 包裹多张 Image，点击任一图片进入多图预览"
-        code={groupSnippet}>
+        code={fullPageSnippet}>
         <ImageGroup>
           <div className="flex gap-4 flex-wrap">
             {PHOTOS.map((src, i) => (
@@ -214,8 +215,7 @@ export default function ImageDemo() {
       <DemoBlock
         title="独立 ImagePreview"
         description="直接使用 ImagePreview 组件，可编程控制预览"
-        code={standalonePreviewSnippet}
-        script={standalonePreviewScriptSnippet}>
+        code={fullPageSnippet}>
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
           onClick={() => setPreviewOpen(true)}>

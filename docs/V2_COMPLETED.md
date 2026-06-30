@@ -945,3 +945,36 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `git diff --check`
 
 **状态更新要求**：已写回 R22 状态、日期、压缩前后读取规模、删除/迁出的 Skill 内容、保留的按需链接结构和关键验证命令；阶段 16 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R23。R22 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R23 Example demo consolidation and reproducible code snippets
+
+**状态**：已完成（2026-06-30）。
+
+**目标**：执行 R23 的 Basic/Layout 子批次，让 React/Vue 示例页面的 Code 展示内容与当前 demo 页面保持同步，复制后可复现完整示例页面，并移除局部 Script 片段漂移风险。
+
+**允许修改**：`examples/example/react/src/pages/**`、`examples/example/vue3/src/pages/**`、示例共享说明、必要文档。
+
+**不得修改**：组件 public API、组件运行时行为、发布产物策略、R21 分组 runner 语义、未来实时运行/编辑演示代码组件。
+
+**执行摘要**：Basic/Layout 子批次覆盖 React 与 Vue 共 56 个页面：Button、Icon、Link、Text、Code、Image、ImageCropper、ImageViewer、Avatar、Badge、Tag、Empty、Result、QRCode、Statistic、Rate、Segmented、Watermark、Layout、Grid、Space、Divider、Card、Descriptions、List、Skeleton、Splitter、PrintLayout。所有目标页面新增同页 `?raw` 源码导入，并将 `DemoBlock` 的 `code` 指向该 raw source；原先分散的 `script` tab 已从目标页面移除，避免展示脚本与实际 preview 状态继续漂移。`examples/README.md` 已补充后续维护规则：DemoBlock 展示代码必须来自同页 `?raw` 源码或可验证 fixture。
+
+**代码展示来源策略**：
+
+- Basic/Layout 页面当前采用同页 `?raw` source 作为 Code 标签内容，复制内容会随页面事实源更新。
+- 后续如某些页面需要更小的可抽取片段，可改为渲染同一个 fixture 并以 fixture `?raw` 作为 Code 来源。
+- 本轮未引入实时运行或在线编辑器；该能力仍属后续计划。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 test:group:basic`
+- `npx -y pnpm@11.9.0 test:group:layout`
+- `npx -y pnpm@11.9.0 example:build`
+- `npx -y pnpm@11.9.0 example:ssr:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 prettier --check <changed files>`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/V2_COMPLETED.md examples skills/tigercat`
+- `git diff --check`
+
+**状态更新要求**：已写回 R23 状态、日期、Basic/Layout 覆盖范围、代码展示来源策略、可复制复现方式和关键验证命令；阶段 17 已同步为 `已完成（2026-06-30）`，当前可执行任务为 `待追加`。R23 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。

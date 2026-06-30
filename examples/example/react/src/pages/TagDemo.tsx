@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Tag } from '@expcat/tigercat-react/Tag'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TagDemo.tsx?raw'
 
 const basicSnippet = `<Space>
   <Tag>Default Tag</Tag>
@@ -109,7 +110,7 @@ const TagDemo: React.FC = () => {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock title="基本用法" description="基础的标签展示。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="基础的标签展示。" code={fullPageSnippet}>
         <Space>
           <Tag>Default Tag</Tag>
           <Tag>标签二</Tag>
@@ -121,7 +122,7 @@ const TagDemo: React.FC = () => {
       <DemoBlock
         title="标签类型"
         description="标签有六种类型：默认、主要、成功、警告、危险和信息。"
-        code={variantSnippet}>
+        code={fullPageSnippet}>
         <Space wrap>
           <Tag variant="default">默认标签</Tag>
           <Tag variant="primary">主要标签</Tag>
@@ -133,7 +134,7 @@ const TagDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 标签大小 */}
-      <DemoBlock title="标签大小" description="标签有三种尺寸：小、中、大。" code={sizeSnippet}>
+      <DemoBlock title="标签大小" description="标签有三种尺寸：小、中、大。" code={fullPageSnippet}>
         <Space align="center">
           <Tag size="sm" variant="primary">
             小标签
@@ -151,8 +152,7 @@ const TagDemo: React.FC = () => {
       <DemoBlock
         title="可关闭标签"
         description="设置 closable 属性可以定义一个标签是否可移除。"
-        code={closableSnippet}
-        script={closableScriptSnippet}>
+        code={fullPageSnippet}>
         <Space wrap>
           {tags.map((tag, index) => (
             <Tag key={tag} variant="primary" closable onClose={() => handleClose(index)}>
@@ -167,7 +167,7 @@ const TagDemo: React.FC = () => {
       <DemoBlock
         title="关闭按钮无障碍标签"
         description="使用 closeAriaLabel 自定义关闭按钮的 aria-label（便于无障碍与多语言）。"
-        code={closeAriaSnippet}>
+        code={fullPageSnippet}>
         <Space wrap>
           <Tag variant="info" closable closeAriaLabel="移除标签：JavaScript">
             JavaScript
@@ -182,7 +182,7 @@ const TagDemo: React.FC = () => {
       <DemoBlock
         title="阻止关闭"
         description="通过 preventDefault() 阻止标签自动关闭，适用于二次确认等场景。"
-        code={preventCloseSnippet}>
+        code={fullPageSnippet}>
         <Tag closable onClose={(e) => e.preventDefault()}>
           点击关闭按钮不会消失
         </Tag>
@@ -192,7 +192,7 @@ const TagDemo: React.FC = () => {
       <DemoBlock
         title="不同类型的可关闭标签"
         description="展示不同变体的可关闭标签。"
-        code={closableVariantSnippet}>
+        code={fullPageSnippet}>
         <Space wrap>
           <Tag variant="default" closable>
             默认标签
@@ -219,7 +219,7 @@ const TagDemo: React.FC = () => {
       <DemoBlock
         title="不同大小的可关闭标签"
         description="不同尺寸的可关闭标签组合。"
-        code={closableSizeSnippet}>
+        code={fullPageSnippet}>
         <Space align="center" wrap>
           <Tag size="sm" variant="success" closable>
             小标签
@@ -237,7 +237,7 @@ const TagDemo: React.FC = () => {
       <DemoBlock
         title="应用场景"
         description="标签在实际应用中的常见使用场景。"
-        code={usageSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <div>
             <h3 className="text-sm font-semibold mb-2 text-gray-700">状态标签</h3>

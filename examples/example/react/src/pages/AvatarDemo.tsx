@@ -2,6 +2,7 @@ import { Avatar } from '@expcat/tigercat-react/Avatar'
 import { Space } from '@expcat/tigercat-react/Space'
 import { Badge } from '@expcat/tigercat-react/Badge'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './AvatarDemo.tsx?raw'
 
 const imageSnippet = `<Space>
   <Avatar src="https://i.pravatar.cc/150?img=1" alt="User 1" />
@@ -176,7 +177,7 @@ export default function AvatarDemo() {
       </div>
 
       {/* 基本用法 - 图片头像 */}
-      <DemoBlock title="图片头像" description="使用 src 属性显示图片头像。" code={imageSnippet}>
+      <DemoBlock title="图片头像" description="使用 src 属性显示图片头像。" code={fullPageSnippet}>
         <Space>
           <Avatar src="https://i.pravatar.cc/150?img=1" alt="User 1" />
           <Avatar src="https://i.pravatar.cc/150?img=2" alt="User 2" />
@@ -188,7 +189,7 @@ export default function AvatarDemo() {
       <DemoBlock
         title="图片加载失败回退"
         description="当图片加载失败时，自动回退到 text 文字头像。"
-        code={fallbackSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Avatar src="/does-not-exist.jpg" text="回退" alt="加载失败回退" />
           <Avatar text="无图" />
@@ -199,7 +200,7 @@ export default function AvatarDemo() {
       <DemoBlock
         title="文字头像"
         description="使用 text 属性显示文字头像，组件会自动提取首字母或缩写。"
-        code={textSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Avatar text="Alice" />
           <Avatar text="Bob Smith" />
@@ -210,7 +211,7 @@ export default function AvatarDemo() {
       </DemoBlock>
 
       {/* 图标头像 */}
-      <DemoBlock title="图标头像" description="通过 children 传入图标内容。" code={iconSnippet}>
+      <DemoBlock title="图标头像" description="通过 children 传入图标内容。" code={fullPageSnippet}>
         <Space>
           <Avatar>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,7 +250,7 @@ export default function AvatarDemo() {
       <DemoBlock
         title="头像尺寸"
         description="头像有四种尺寸：小、中、大、超大。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <Space align="center">
           <Avatar size="sm" text="SM" />
           <Avatar size="md" text="MD" />
@@ -259,7 +260,7 @@ export default function AvatarDemo() {
       </DemoBlock>
 
       {/* 头像形状 */}
-      <DemoBlock title="头像形状" description="头像支持圆形和方形两种形状。" code={shapeSnippet}>
+      <DemoBlock title="头像形状" description="头像支持圆形和方形两种形状。" code={fullPageSnippet}>
         <Space>
           <div>
             <p className="text-sm text-gray-600 mb-2 text-center">圆形</p>
@@ -276,7 +277,7 @@ export default function AvatarDemo() {
       <DemoBlock
         title="自定义颜色"
         description="可以通过 bgColor 和 textColor 自定义文字/图标头像颜色，推荐使用主题 CSS 变量以便跟随主题。"
-        code={colorSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Avatar text="默认" />
           <Avatar text="主" bgColor="bg-[var(--tiger-primary,#2563eb)]" textColor="text-white" />
@@ -285,7 +286,7 @@ export default function AvatarDemo() {
       </DemoBlock>
 
       {/* 实际应用示例 */}
-      <DemoBlock title="实际应用示例" description="模拟真实的使用场景。" code={usageSnippet}>
+      <DemoBlock title="实际应用示例" description="模拟真实的使用场景。" code={fullPageSnippet}>
         <div>
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3">用户列表</h3>

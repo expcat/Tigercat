@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { List } from '@expcat/tigercat-react/List'
 import { type ListProps } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ListDemo.tsx?raw'
 
 type DemoItem = NonNullable<ListProps['dataSource']>[number]
 
@@ -151,17 +152,16 @@ export default function ListDemo() {
         </p>
       </div>
 
-      <DemoBlock
-        title="基本用法"
-        description="最简单的列表展示。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="最简单的列表展示。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={basicData} />
         </div>
       </DemoBlock>
 
-      <DemoBlock title="列表尺寸" description="列表支持三种尺寸：小、中、大。" code={sizeSnippet}>
+      <DemoBlock
+        title="列表尺寸"
+        description="列表支持三种尺寸：小、中、大。"
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" size={16} className="w-full">
             <div>
@@ -180,7 +180,7 @@ export default function ListDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="边框样式" description="列表支持多种边框样式。" code={borderSnippet}>
+      <DemoBlock title="边框样式" description="列表支持多种边框样式。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" size={16} className="w-full">
             <div>
@@ -202,7 +202,7 @@ export default function ListDemo() {
       <DemoBlock
         title="分割线（split）"
         description='当 bordered="divided" 时，可通过 split 控制是否显示分割线。'
-        code={splitSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -217,7 +217,7 @@ export default function ListDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="带头像的列表" description="列表项可以包含头像。" code={avatarSnippet}>
+      <DemoBlock title="带头像的列表" description="列表项可以包含头像。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={userData} />
         </div>
@@ -226,7 +226,7 @@ export default function ListDemo() {
       <DemoBlock
         title="带额外内容"
         description="通过数据项的 extra 在右侧添加操作区。"
-        code={extraSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={extraData} />
         </div>
@@ -235,7 +235,7 @@ export default function ListDemo() {
       <DemoBlock
         title="自定义列表项渲染"
         description="通过 renderItem 自定义每一项的布局。"
-        code={renderSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List
             dataSource={productData}
@@ -270,7 +270,7 @@ export default function ListDemo() {
       <DemoBlock
         title="头部和底部"
         description="列表可以添加头部和底部内容。"
-        code={headerFooterSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List
             dataSource={basicData}
@@ -288,7 +288,7 @@ export default function ListDemo() {
       <DemoBlock
         title="分页列表"
         description="当数据较多时，可以使用分页功能。"
-        code={paginationSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="space-y-3">
             <List dataSource={pagedListData} />
@@ -311,7 +311,7 @@ export default function ListDemo() {
       <DemoBlock
         title="网格布局"
         description="列表项可以以网格形式展示，支持响应式布局。"
-        code={gridSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List
             dataSource={gridData}
@@ -338,7 +338,7 @@ export default function ListDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="加载状态" description="列表支持加载状态。" code={loadingSnippet}>
+      <DemoBlock title="加载状态" description="列表支持加载状态。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" size={16} className="w-full">
             <Button onClick={simulateLoading}>{loading ? '加载中...' : '模拟加载'}</Button>
@@ -347,7 +347,7 @@ export default function ListDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="空状态" description="当列表没有数据时显示空状态。" code={emptySnippet}>
+      <DemoBlock title="空状态" description="当列表没有数据时显示空状态。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={[]} emptyText="暂无数据" />
         </div>
@@ -356,7 +356,7 @@ export default function ListDemo() {
       <DemoBlock
         title="可点击列表"
         description="列表项可以添加点击事件和悬停效果。"
-        code={clickableSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={basicData} hoverable onItemClick={handleItemClick} />
         </div>
@@ -365,7 +365,7 @@ export default function ListDemo() {
       <DemoBlock
         title="竖直布局"
         description='通过 itemLayout="vertical" 将列表项内容竖直排列。'
-        code={verticalSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={userData} itemLayout="vertical" />
         </div>

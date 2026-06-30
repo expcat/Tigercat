@@ -1,6 +1,7 @@
 import React from 'react'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './SpaceDemo.tsx?raw'
 
 const horizontalSnippet = `<Space>
   <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 1</div>
@@ -40,10 +41,7 @@ const SpaceDemo: React.FC = () => {
         <p className="text-gray-600 dark:text-gray-400">设置组件之间的间距。</p>
       </div>
 
-      <DemoBlock
-        title="水平间距"
-        description="默认水平方向（horizontal）。"
-        code={horizontalSnippet}>
+      <DemoBlock title="水平间距" description="默认水平方向（horizontal）。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 1</div>
@@ -56,7 +54,7 @@ const SpaceDemo: React.FC = () => {
       <DemoBlock
         title="垂直间距"
         description='direction="vertical" 让子项纵向排列并产生间距。'
-        code={verticalSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical">
             <div className="bg-green-500 text-white px-4 py-2 rounded">Item 1</div>
@@ -69,7 +67,7 @@ const SpaceDemo: React.FC = () => {
       <DemoBlock
         title="不同尺寸"
         description="size 支持内置尺寸（sm/md/lg）与自定义数值（px）。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
             <div>
@@ -114,7 +112,7 @@ const SpaceDemo: React.FC = () => {
       <DemoBlock
         title="对齐方式"
         description="align 控制交叉轴对齐（start/center/end/baseline/stretch）。"
-        code={alignSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
             <div>
@@ -178,7 +176,7 @@ const SpaceDemo: React.FC = () => {
       <DemoBlock
         title="自动换行"
         description="wrap=true 时，子项在空间不足时自动换行。"
-        code={wrapSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md">
             <Space wrap size="sm" className="w-full">

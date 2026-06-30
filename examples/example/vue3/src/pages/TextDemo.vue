@@ -2,6 +2,7 @@
 import { Text } from '@expcat/tigercat-vue/Text'
 import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './TextDemo.vue?raw'
 
 const basicSnippet = `<Space direction="vertical" class="w-full">
   <Text>这是一段默认段落文本。</Text>
@@ -70,7 +71,7 @@ const decorateSnippet = `<Space direction="vertical" class="w-full">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="基础的 Text 用法。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="基础的 Text 用法。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Text>这是一段默认段落文本。</Text>
         <Text tag="span" class="block">这是一段 span 文本（通过 class 设置为 block）。</Text>
@@ -79,7 +80,10 @@ const decorateSnippet = `<Space direction="vertical" class="w-full">
     </DemoBlock>
 
     <!-- 语义标签 -->
-    <DemoBlock title="语义标签" description="通过 tag 属性渲染不同语义标签。" :code="tagSnippet">
+    <DemoBlock
+      title="语义标签"
+      description="通过 tag 属性渲染不同语义标签。"
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Text tag="h3" size="lg" weight="semibold">Heading (h3)</Text>
         <Text tag="label" size="sm" color="muted">Label text</Text>
@@ -88,7 +92,7 @@ const decorateSnippet = `<Space direction="vertical" class="w-full">
     </DemoBlock>
 
     <!-- 文本颜色 -->
-    <DemoBlock title="文本颜色" description="由 color 属性定义文本颜色。" :code="colorSnippet">
+    <DemoBlock title="文本颜色" description="由 color 属性定义文本颜色。" :code="fullPageSnippet">
       <Space direction="vertical">
         <Text color="primary">主要文本 Primary</Text>
         <Text color="secondary">次要文本 Secondary</Text>
@@ -101,7 +105,7 @@ const decorateSnippet = `<Space direction="vertical" class="w-full">
     </DemoBlock>
 
     <!-- 文本大小 -->
-    <DemoBlock title="文本大小" description="由 size 属性定义文本大小。" :code="sizeSnippet">
+    <DemoBlock title="文本大小" description="由 size 属性定义文本大小。" :code="fullPageSnippet">
       <Space direction="vertical" align="start">
         <Text size="sm">小号文本</Text>
         <Text size="base">中号文本</Text>
@@ -110,7 +114,7 @@ const decorateSnippet = `<Space direction="vertical" class="w-full">
     </DemoBlock>
 
     <!-- 文本粗细 -->
-    <DemoBlock title="文本粗细" description="由 weight 属性定义字重。" :code="weightSnippet">
+    <DemoBlock title="文本粗细" description="由 weight 属性定义字重。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Text weight="normal">Normal</Text>
         <Text weight="semibold">Semibold</Text>
@@ -119,7 +123,7 @@ const decorateSnippet = `<Space direction="vertical" class="w-full">
     </DemoBlock>
 
     <!-- 文本对齐 -->
-    <DemoBlock title="文本对齐" description="由 align 属性定义对齐方式。" :code="alignSnippet">
+    <DemoBlock title="文本对齐" description="由 align 属性定义对齐方式。" :code="fullPageSnippet">
       <div class="grid grid-cols-1 gap-4">
         <div class="p-4 bg-white rounded">
           <Text align="left">Left aligned text</Text>
@@ -143,7 +147,7 @@ const decorateSnippet = `<Space direction="vertical" class="w-full">
     <DemoBlock
       title="文本修饰"
       description="truncate / italic / underline / lineThrough。"
-      :code="decorateSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <div class="w-64">
           <Text truncate> 这是一段很长很长的文本，会在容器宽度不足时显示省略号。 </Text>

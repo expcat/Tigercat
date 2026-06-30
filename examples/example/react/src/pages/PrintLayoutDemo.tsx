@@ -1,6 +1,7 @@
 import { PrintLayout } from '@expcat/tigercat-react/PrintLayout'
 import { PrintPageBreak } from '@expcat/tigercat-react/PrintPageBreak'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './PrintLayoutDemo.tsx?raw'
 
 const basicSnippet = `<PrintLayout>
   <h2>文档标题</h2>
@@ -25,17 +26,14 @@ const PrintLayoutDemo: React.FC = () => {
         用于预览和打印的页面布局组件，支持 A4/Letter 尺寸、页眉页脚和分页。
       </p>
 
-      <DemoBlock title="基础用法" description="默认 A4 纵向布局" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="默认 A4 纵向布局" code={fullPageSnippet}>
         <PrintLayout>
           <h2 style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 12 }}>文档标题</h2>
           <p>这是一段打印内容示例文本。PrintLayout 组件会按照纸张尺寸约束内容宽度。</p>
         </PrintLayout>
       </DemoBlock>
 
-      <DemoBlock
-        title="页眉页脚"
-        description="showHeader / showFooter 开启"
-        code={headerFooterSnippet}>
+      <DemoBlock title="页眉页脚" description="showHeader / showFooter 开启" code={fullPageSnippet}>
         <PrintLayout
           showHeader
           showFooter
@@ -48,7 +46,7 @@ const PrintLayoutDemo: React.FC = () => {
       <DemoBlock
         title="横向 & 分页"
         description="orientation='landscape'，插入 PrintPageBreak"
-        code={landscapeSnippet}>
+        code={fullPageSnippet}>
         <PrintLayout orientation="landscape" showHeader headerText="横向报告" showPageBreaks>
           <p>第一页内容 — 横向 A4。</p>
           <PrintPageBreak />

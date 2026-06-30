@@ -3,6 +3,7 @@ import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
 import { Rate } from '@expcat/tigercat-react/Rate'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './RateDemo.tsx?raw'
 
 const basicSnippet = `<Rate value={val} onChange={setVal} />
 <Rate value={halfVal} onChange={setHalfVal} allowHalf />
@@ -34,8 +35,7 @@ const RateDemo: React.FC = () => {
       <DemoBlock
         title="基本与半星"
         description="value + onChange 受控，allowHalf 半星"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" size={16}>
           <Rate value={val} onChange={setVal} />
           <Rate value={halfVal} onChange={setHalfVal} allowHalf />
@@ -43,7 +43,7 @@ const RateDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="尺寸" description="sm / md / lg 三种尺寸" code={sizeSnippet}>
+      <DemoBlock title="尺寸" description="sm / md / lg 三种尺寸" code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
           <Rate value={3} size="sm" disabled />
           <Rate value={3} size="md" disabled />
@@ -54,7 +54,7 @@ const RateDemo: React.FC = () => {
       <DemoBlock
         title="自定义字符与数量"
         description="character 自定义图标，count 控制星星数"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
           <Rate value={customVal} onChange={setCustomVal} character="♥" />
           <Rate value={4} count={10} disabled />

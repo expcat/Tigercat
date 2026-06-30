@@ -5,7 +5,7 @@
       用于预览和打印的页面布局组件，支持 A4/Letter 尺寸、页眉页脚和分页。
     </p>
 
-    <DemoBlock title="基础用法" description="默认 A4 纵向布局" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="默认 A4 纵向布局" :code="fullPageSnippet">
       <PrintLayout>
         <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 12px">文档标题</h2>
         <p>这是一段打印内容示例文本。PrintLayout 组件会按照纸张尺寸约束内容宽度。</p>
@@ -15,7 +15,7 @@
     <DemoBlock
       title="页眉页脚"
       description="showHeader / showFooter 开启，支持自定义文字"
-      :code="headerFooterSnippet">
+      :code="fullPageSnippet">
       <PrintLayout
         show-header
         show-footer
@@ -28,7 +28,7 @@
     <DemoBlock
       title="横向 & 分页"
       description="orientation='landscape'，插入 PrintPageBreak 分页"
-      :code="landscapeSnippet">
+      :code="fullPageSnippet">
       <PrintLayout orientation="landscape" show-header header-text="横向报告" show-page-breaks>
         <p>第一页内容 — 横向 A4。</p>
         <PrintPageBreak />
@@ -42,6 +42,7 @@
 import { PrintLayout } from '@expcat/tigercat-vue/PrintLayout'
 import { PrintPageBreak } from '@expcat/tigercat-vue/PrintPageBreak'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './PrintLayoutDemo.vue?raw'
 
 const basicSnippet = `<PrintLayout>
   <h2>文档标题</h2>

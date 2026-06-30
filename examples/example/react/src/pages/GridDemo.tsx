@@ -4,6 +4,7 @@ import { Col } from '@expcat/tigercat-react/Col'
 import { Container } from '@expcat/tigercat-react/Container'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './GridDemo.tsx?raw'
 
 const basicSnippet = `<Row>
   <Col span={24}>col-24</Col>
@@ -92,7 +93,7 @@ const GridDemo: React.FC = () => {
       <DemoBlock
         title="基础栅格"
         description="使用单一分栏创建基础的栅格布局。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">
@@ -142,7 +143,7 @@ const GridDemo: React.FC = () => {
       <DemoBlock
         title="分栏间隔"
         description="支持水平间距或 [水平, 垂直] 的间距数组。"
-        code={gutterSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">
@@ -194,7 +195,7 @@ const GridDemo: React.FC = () => {
       <DemoBlock
         title="响应式栅格"
         description="span / offset 支持按断点设置（xs, sm, md, lg, xl, 2xl）。"
-        code={responsiveSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">
@@ -237,7 +238,7 @@ const GridDemo: React.FC = () => {
       <DemoBlock
         title="Row 对齐与分布"
         description="justify 控制水平分布，align 控制垂直对齐。"
-        code={alignSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">
@@ -292,7 +293,7 @@ const GridDemo: React.FC = () => {
       <DemoBlock
         title="列偏移"
         description="使用 offset 在 24 栅格内做留白与对齐。"
-        code={offsetSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">
@@ -326,7 +327,7 @@ const GridDemo: React.FC = () => {
       <DemoBlock
         title="列排序"
         description="使用 order 改变列的显示顺序（不改变 DOM 顺序），支持响应式。"
-        code={orderSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">
@@ -375,7 +376,7 @@ const GridDemo: React.FC = () => {
       <DemoBlock
         title="不换行（wrap=false）"
         description="当总宽度超过 24 栅格时，不换行会导致横向溢出。"
-        code={nowrapSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <div className="overflow-x-auto overflow-y-hidden px-2">
@@ -404,7 +405,7 @@ const GridDemo: React.FC = () => {
       <DemoBlock
         title="Flex 自适应"
         description="使用 flex 进行比例分配（建议与 span=0 搭配）。"
-        code={flexSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Row gutter={16}>
@@ -427,7 +428,7 @@ const GridDemo: React.FC = () => {
       <DemoBlock
         title="混合布局"
         description="通过基础的 1/24 分栏任意扩展组合形成较为复杂的混合布局。"
-        code={mixedSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">

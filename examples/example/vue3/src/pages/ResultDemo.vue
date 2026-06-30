@@ -3,6 +3,7 @@ import { Result } from '@expcat/tigercat-vue/Result'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ResultDemo.vue?raw'
 
 const statusSnippet = `<Space direction="vertical" :size="24" class="w-full">
   <Result status="success" title="操作成功" sub-title="订单已提交，预计2小时内送达" />
@@ -35,7 +36,7 @@ const customSnippet = `<Result status="success" title="购买成功">
     <DemoBlock
       title="状态类型"
       description="success / error / warning / info 四种基础状态"
-      :code="statusSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="24" class="w-full">
         <div class="border rounded-lg p-6">
           <Result status="success" title="操作成功" sub-title="订单已提交，预计2小时内送达" />
@@ -52,7 +53,7 @@ const customSnippet = `<Result status="success" title="购买成功">
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="HTTP 状态码" description="403 / 404 / 500 页面" :code="httpSnippet">
+    <DemoBlock title="HTTP 状态码" description="403 / 404 / 500 页面" :code="fullPageSnippet">
       <Space direction="vertical" :size="24" class="w-full">
         <div class="border rounded-lg p-6">
           <Result status="403" title="403" sub-title="抱歉，您没有权限访问此页面" />
@@ -69,7 +70,7 @@ const customSnippet = `<Result status="success" title="购买成功">
     <DemoBlock
       title="自定义操作按钮"
       description="通过 extra 插槽添加操作按钮"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <div class="border rounded-lg p-6">
         <Result status="success" title="购买成功">
           <template #extra>

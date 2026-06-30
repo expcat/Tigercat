@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ButtonDemo.tsx?raw'
 
 const typeSnippet = `<Space wrap>
   <Button variant="primary">主要按钮</Button>
@@ -105,7 +106,7 @@ const ButtonDemo: React.FC = () => {
       <DemoBlock
         title="按钮类型"
         description="按钮有五种类型：主要按钮、次要按钮、轮廓按钮、幽灵按钮和链接按钮。"
-        code={typeSnippet}>
+        code={fullPageSnippet}>
         <Space wrap>
           <Button variant="primary">主要按钮</Button>
           <Button variant="secondary">次要按钮</Button>
@@ -116,7 +117,7 @@ const ButtonDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 按钮大小 */}
-      <DemoBlock title="按钮大小" description="按钮有三种尺寸：小、中、大。" code={sizeSnippet}>
+      <DemoBlock title="按钮大小" description="按钮有三种尺寸：小、中、大。" code={fullPageSnippet}>
         <Space align="center">
           <Button size="sm">小按钮</Button>
           <Button size="md">中按钮</Button>
@@ -128,7 +129,7 @@ const ButtonDemo: React.FC = () => {
       <DemoBlock
         title="按钮状态"
         description="按钮可以处于正常、禁用或加载状态。"
-        code={stateSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <div>
             <h3 className="text-sm font-semibold mb-2 text-gray-700">正常状态</h3>
@@ -173,7 +174,7 @@ const ButtonDemo: React.FC = () => {
       <DemoBlock
         title="自定义加载图标"
         description="通过 loadingIcon 属性自定义加载状态的图标。"
-        code={customLoadingSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Button
             variant="primary"
@@ -206,8 +207,7 @@ const ButtonDemo: React.FC = () => {
       <DemoBlock
         title="事件处理"
         description="通过 onClick 监听按钮点击事件。"
-        code={eventSnippet}
-        script={eventScriptSnippet}>
+        code={fullPageSnippet}>
         <Space align="center">
           <Button variant="primary" onClick={() => setClickCount((c) => c + 1)}>
             已点击 {clickCount} 次
@@ -222,7 +222,7 @@ const ButtonDemo: React.FC = () => {
       <DemoBlock
         title="原生类型"
         description="通过 htmlType 属性设置 HTML 原生 button 类型（submit / reset / button）。"
-        code={htmlTypeSnippet}>
+        code={fullPageSnippet}>
         <form onSubmit={(e) => e.preventDefault()}>
           <Space>
             <Button htmlType="submit" variant="primary">
@@ -242,7 +242,7 @@ const ButtonDemo: React.FC = () => {
       <DemoBlock
         title="块级按钮"
         description="block 属性将使按钮适合其父宽度。"
-        code={blockSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <Button variant="primary" block>
             主要按钮
@@ -260,7 +260,7 @@ const ButtonDemo: React.FC = () => {
       <DemoBlock
         title="自定义宽度按钮"
         description="使用 className 设置按钮为任意宽度，与 block 属性不同，可以灵活控制宽度比例。"
-        code={fullWidthSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <Button variant="primary" className="w-1/2">
             50% 宽度

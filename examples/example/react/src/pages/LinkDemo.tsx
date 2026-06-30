@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link } from '@expcat/tigercat-react/Link'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './LinkDemo.tsx?raw'
 
 const variantSnippet = `<Space>
   <Link href="#" variant="primary">Primary</Link>
@@ -62,7 +63,7 @@ const LinkDemo: React.FC = () => {
       <DemoBlock
         title="链接变体"
         description="展示 primary / secondary / default 三种变体。"
-        code={variantSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Link href="#" onClick={handlePreventNavigate} variant="primary">
             Primary
@@ -77,7 +78,7 @@ const LinkDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 链接尺寸 */}
-      <DemoBlock title="链接尺寸" description="展示 sm / md / lg 三种尺寸。" code={sizeSnippet}>
+      <DemoBlock title="链接尺寸" description="展示 sm / md / lg 三种尺寸。" code={fullPageSnippet}>
         <Space>
           <Link href="#" onClick={handlePreventNavigate} size="sm">
             Small
@@ -95,7 +96,7 @@ const LinkDemo: React.FC = () => {
       <DemoBlock
         title="禁用状态"
         description="禁用后不可点击，移除 href，并从 Tab 顺序移除。"
-        code={disabledSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Link href="#" disabled>
             Disabled Primary
@@ -113,7 +114,7 @@ const LinkDemo: React.FC = () => {
       <DemoBlock
         title="下划线"
         description="underline=true（默认）悬停显示下划线；underline=false 无下划线。"
-        code={underlineSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Link href="#" onClick={handlePreventNavigate}>
             有下划线（悬停）
@@ -128,7 +129,7 @@ const LinkDemo: React.FC = () => {
       <DemoBlock
         title="外部链接"
         description='target="_blank" 时自动添加 rel="noopener noreferrer"；也可传入自定义 rel。'
-        code={externalSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Link href="https://github.com" target="_blank">
             GitHub（自动添加 rel）
@@ -143,8 +144,7 @@ const LinkDemo: React.FC = () => {
       <DemoBlock
         title="点击事件"
         description="通过 onClick 回调处理交互逻辑。"
-        code={eventSnippet}
-        script={eventScriptSnippet}>
+        code={fullPageSnippet}>
         <Link
           href="#"
           onClick={(e) => {

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Divider } from '@expcat/tigercat-react/Divider'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './DividerDemo.tsx?raw'
 
 const basicSnippet = `<div className="text-gray-700 dark:text-gray-300">上方内容</div>
 <Divider />
@@ -36,7 +37,7 @@ const DividerDemo: React.FC = () => {
         <p className="text-gray-600 dark:text-gray-400">区隔内容的分割线。</p>
       </div>
 
-      <DemoBlock title="基础用法" description="默认水平分割线。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="默认水平分割线。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="text-gray-700 dark:text-gray-300">上方内容</div>
           <Divider />
@@ -47,7 +48,7 @@ const DividerDemo: React.FC = () => {
       <DemoBlock
         title="线条样式"
         description="lineStyle 支持 solid / dashed / dotted。"
-        code={lineStyleSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
           <div>
             <div className="text-gray-700 mb-2">solid</div>
@@ -67,7 +68,7 @@ const DividerDemo: React.FC = () => {
       <DemoBlock
         title="间距"
         description="spacing 控制分割线周围留白（none / xs / sm / md / lg / xl）。"
-        code={spacingSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="text-gray-700 dark:text-gray-300">none</div>
           <Divider spacing="none" />
@@ -87,7 +88,7 @@ const DividerDemo: React.FC = () => {
       <DemoBlock
         title="自定义颜色与粗细"
         description="通过 color / thickness 自定义边框颜色与宽度。"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="text-gray-700 dark:text-gray-300">color="#2563eb" thickness="2px"</div>
           <Divider color="#2563eb" thickness="2px" />
@@ -101,7 +102,7 @@ const DividerDemo: React.FC = () => {
       <DemoBlock
         title="垂直分割线"
         description='orientation="vertical" 用于行内内容分隔。'
-        code={verticalSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="flex items-center h-12">
             <span className="text-gray-700 dark:text-gray-300">Left</span>

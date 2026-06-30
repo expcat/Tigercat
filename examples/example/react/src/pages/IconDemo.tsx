@@ -1,6 +1,7 @@
 import React from 'react'
 import { Icon } from '@expcat/tigercat-react/Icon'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './IconDemo.tsx?raw'
 
 const basicSnippet = `<div className="flex items-center gap-6 flex-wrap">
   {/* 自定义 SVG 图标 */}
@@ -75,7 +76,7 @@ const IconDemo: React.FC = () => {
       <DemoBlock
         title="基础用法与内置图标"
         description="支持传入 SVG 子元素来自定义图标，或者直接使用 name 属性指定内置图标（如 search, plus, edit, trash 等）。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <div className="flex items-center gap-6 flex-wrap">
           <Icon>
             <svg>
@@ -95,7 +96,7 @@ const IconDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 图标尺寸 */}
-      <DemoBlock title="图标尺寸" description="支持 sm/md/lg/xl 四种尺寸。" code={sizeSnippet}>
+      <DemoBlock title="图标尺寸" description="支持 sm/md/lg/xl 四种尺寸。" code={fullPageSnippet}>
         <div className="flex items-center gap-6">
           <Icon size="sm">
             <svg>
@@ -124,7 +125,7 @@ const IconDemo: React.FC = () => {
       <DemoBlock
         title="颜色定制"
         description="默认继承文本颜色，也可以通过 color 属性指定。"
-        code={colorSnippet}>
+        code={fullPageSnippet}>
         <div className="flex items-center gap-8">
           <div className="text-blue-600">
             <Icon>
@@ -145,7 +146,7 @@ const IconDemo: React.FC = () => {
       <DemoBlock
         title="填充图标"
         description="通过 SVG 属性 fill='currentColor' stroke='none' 切换为填充风格。"
-        code={filledSnippet}>
+        code={fullPageSnippet}>
         <div className="flex items-center gap-6">
           <Icon size="lg">
             <svg viewBox="0 0 20 20" fill="currentColor" stroke="none">
@@ -164,7 +165,7 @@ const IconDemo: React.FC = () => {
       <DemoBlock
         title="无障碍"
         description="无 aria-label 时自动隐藏（装饰性）；提供 aria-label 后获得 role=img（语义化）。"
-        code={a11ySnippet}>
+        code={fullPageSnippet}>
         <div className="flex items-center gap-8">
           <Icon>
             <svg>

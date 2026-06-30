@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { ImageCropper } from '@expcat/tigercat-vue/ImageCropper'
 import type { CropRect, CropResult } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ImageCropperDemo.vue?raw'
 
 const PHOTO = 'https://picsum.photos/seed/cropper/800/600'
 
@@ -62,11 +63,7 @@ const jpegSnippet = `<!-- 输出 JPEG 格式，质量 0.8 -->
       交互式图片裁剪组件，支持自由裁剪、固定宽高比、辅助线、Canvas 输出。
     </p>
 
-    <DemoBlock
-      title="基本用法"
-      description="自由裁剪，拖拽和缩放裁剪区域"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基本用法" description="自由裁剪，拖拽和缩放裁剪区域" :code="fullPageSnippet">
       <div class="space-y-4">
         <ImageCropper
           ref="cropperRef"
@@ -93,7 +90,7 @@ const jpegSnippet = `<!-- 输出 JPEG 格式，质量 0.8 -->
     <DemoBlock
       title="固定宽高比"
       description="设置 aspectRatio 为 1 实现正方形裁剪"
-      :code="aspectRatioSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <ImageCropper ref="cropperSquareRef" :src="PHOTO" :aspect-ratio="1" />
         <button
@@ -111,14 +108,14 @@ const jpegSnippet = `<!-- 输出 JPEG 格式，质量 0.8 -->
       </div>
     </DemoBlock>
 
-    <DemoBlock title="隐藏辅助线" description="guides=false 隐藏三分线" :code="noGuidesSnippet">
+    <DemoBlock title="隐藏辅助线" description="guides=false 隐藏三分线" :code="fullPageSnippet">
       <ImageCropper :src="PHOTO" :guides="false" />
     </DemoBlock>
 
     <DemoBlock
       title="JPEG 输出"
       description="指定 outputType='image/jpeg' 和 quality"
-      :code="jpegSnippet">
+      :code="fullPageSnippet">
       <ImageCropper :src="PHOTO" output-type="image/jpeg" :quality="0.8" />
     </DemoBlock>
   </div>

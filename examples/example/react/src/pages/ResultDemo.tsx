@@ -2,6 +2,7 @@ import { Result } from '@expcat/tigercat-react/Result'
 import { Button } from '@expcat/tigercat-react/Button'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ResultDemo.tsx?raw'
 
 const statusSnippet = `<Result status="success" title="操作成功" subTitle="订单已提交，预计2小时内送达" />
 <Result status="error" title="提交失败" subTitle="请检查网络连接后重试" />
@@ -25,7 +26,7 @@ const ResultDemo: React.FC = () => {
       <DemoBlock
         title="状态类型"
         description="success / error / warning / info 四种基础状态"
-        code={statusSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" size={24} className="w-full">
           <div className="border rounded-lg p-6">
             <Result status="success" title="操作成功" subTitle="订单已提交，预计2小时内送达" />
@@ -42,7 +43,7 @@ const ResultDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="HTTP 状态码" description="403 / 404 / 500 页面" code={httpSnippet}>
+      <DemoBlock title="HTTP 状态码" description="403 / 404 / 500 页面" code={fullPageSnippet}>
         <Space direction="vertical" size={24} className="w-full">
           <div className="border rounded-lg p-6">
             <Result status="403" title="403" subTitle="抱歉，您没有权限访问此页面" />
@@ -56,7 +57,10 @@ const ResultDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="自定义操作按钮" description="通过 extra 添加操作按钮" code={customSnippet}>
+      <DemoBlock
+        title="自定义操作按钮"
+        description="通过 extra 添加操作按钮"
+        code={fullPageSnippet}>
         <div className="border rounded-lg p-6">
           <Result
             status="success"

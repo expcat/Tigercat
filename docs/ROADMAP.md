@@ -2,24 +2,24 @@
 
 <!-- LLM-INDEX
 type: active-roadmap
-scope: v2.0.0 follow-up planning after grouped validation and Skill reference compression
+scope: v2.0.0 follow-up planning after R23 example demo source consolidation
 verified-date: 2026-06-30
-source: current repository state after R22 Skill reference compression and routing
+source: current repository state after R23 Basic/Layout example raw-source code sync
 -->
 
-本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节、R01-R22 已完成批次细节与发布收口记录不再保留在路线图中；详细执行摘要、实际验证命令和状态回写记录统一归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，public API 删除/合并证据归档到 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
+本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节、R01-R23 已完成批次细节与发布收口记录不再保留在路线图中；详细执行摘要、实际验证命令和状态回写记录统一归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，public API 删除/合并证据归档到 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
 
 ## 当前状态
 
-截至 2026-06-30，T01-T14 与 v2.0.0 R01-R22 已完成；R20 的 v2.0 发布收口按维护决定 deferred，本批次不发布版本。当前路线图进入 R23 example demo consolidation，后续仍会追加功能计划。
+截至 2026-06-30，T01-T14 与 v2.0.0 R01-R23 已完成；R20 的 v2.0 发布收口按维护决定 deferred，本批次不发布版本。R23 已完成 Basic/Layout example demo code-source consolidation，后续任务待追加。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0-16 已完成 R01-R22；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
-- 当前阶段：阶段 17（R23 example demo consolidation），整合示例演示并让展示代码可复制复现。
-- 当前可执行任务：R23 example demo consolidation and reproducible code snippets。
+- 已完成阶段：阶段 0-17 已完成 R01-R23；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
+- 当前阶段：待追加。
+- 当前可执行任务：待追加。
 - 后续阶段：v2.0.0 仍会追加新的维护与功能计划，路线图不在 R23 处收口。
 
 ## 执行原则
@@ -52,7 +52,7 @@ source: current repository state after R22 Skill reference compression and routi
 | 0-14 | 已完成（2026-06-30） | R01-R20 | 已完成组件级 API 清理，细节归档到 `V2_COMPLETED.md` / `V2_API_AUDIT.md` |
 | 15   | 已完成（2026-06-30） | R21     | 已审计并收紧分组验证入口，确保后续维护不会误跑全量或漏跑目标组          |
 | 16   | 已完成（2026-06-30） | R22     | 已压缩 Skill 读取路径，删除普通路由中的维护者 backlog                   |
-| 17   | 未开始               | R23     | 整合示例演示并让展示代码成为可复制复现的完整代码                        |
+| 17   | 已完成（2026-06-30） | R23     | 已让 Basic/Layout 示例展示代码跟随同页源码，避免手写 code/script 漂移   |
 
 阶段状态规则：
 
@@ -63,7 +63,7 @@ source: current repository state after R22 Skill reference compression and routi
 
 ## 已完成归档
 
-R01-R22 已完成，主路线图不再展开逐项一行摘要；需要追溯执行细节、实际验证命令或完成状态，请读取 [V2_COMPLETED.md](V2_COMPLETED.md)；需要追溯 public API 删除/合并证据，请读取 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
+R01-R23 已完成，主路线图不再展开逐项一行摘要；需要追溯执行细节、实际验证命令或完成状态，请读取 [V2_COMPLETED.md](V2_COMPLETED.md)；需要追溯 public API 删除/合并证据，请读取 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
 
 ## v2.0 后续任务队列
 
@@ -85,38 +85,13 @@ R01-R22 已完成，主路线图不再展开逐项一行摘要；需要追溯执
 
 ### R23 Example demo consolidation and reproducible code snippets
 
-**状态**：未开始。
+**状态**：已完成（2026-06-30）。
 
-**目标**：整合 React/Vue example demos：展示一个组件功能时，将不冲突的多个演示效果合并到一个示例页面中；同时让页面展示的 Script 脚本和 Code 展示内容与当前演示完全匹配，复制到文件即可完整复现效果。后续会继续规划实时运行/编辑演示代码组件，本任务只为该能力准备一致、完整、可抽取的示例源码。
+**完成摘要**：已完成 Basic/Layout 子批次，覆盖 React/Vue 共 56 个页面；所有目标页面的 `DemoBlock` 代码标签改为读取同页 `?raw` 源码，局部 `script` 标签已移除，确保展示代码随实际页面同步并可复制复现当前 demo 页面。`examples/README.md` 已补充后续维护规则。详细执行记录见 [V2_COMPLETED.md](V2_COMPLETED.md#r23-example-demo-consolidation-and-reproducible-code-snippets)。
 
-**允许修改**：`examples/example/react/src/pages/**`、`examples/example/vue3/src/pages/**`、示例共享组件（如 `DemoBlock`）、示例路由/元数据、Skill examples references 的生成器、示例 README、必要 example smoke 或 snapshot。
+**完成验证**：`npx -y pnpm@11.9.0 example:build` 已通过；完整门禁记录见 [V2_COMPLETED.md](V2_COMPLETED.md#r23-example-demo-consolidation-and-reproducible-code-snippets)。
 
-**不得修改**：组件 public API、组件运行时行为、发布产物策略、R21 分组 runner 语义；不得把未来“实时运行代码编辑器”实现混入本任务。
-
-**依赖/阻塞**：建议在 R21 完成后执行；如示例代码展示依赖 generated Skill examples，应与 `scripts/generate-api-docs.mjs` 同步。
-
-**组件范围规划**：按组件组分批执行，优先选择 demos 数量多且互不冲突的组：Basic/Layout、Form、Feedback/Overlay、Navigation、Data/Table、Charts、Advanced/Media、Composite/Business。每个子批次只整合目标组，不顺手改全库。
-
-**计划检查项**：
-
-- 建立 demo 盘点表：每个组件当前 React/Vue 页面是否存在重复 demo、是否展示完整 code、是否能单文件复制复现。
-- 为 `DemoBlock` 或等价机制定义代码来源策略：展示代码必须来自同一页面的完整片段或可验证 fixture，避免手写展示代码与实际演示漂移。
-- 合并同组件不冲突的状态、尺寸、禁用、受控、空态、异步、a11y 示例；保留必须分开的 SSR/heavy runtime/交互边界示例。
-- 示例 import 优先使用组件子路径，避免 root value imports 或 heavy dependency leakage 回流。
-- 每完成一个组件组，运行对应 `test:group:{group}`、example build、docs/api 漂移检查和 changed-file Prettier。
-
-**完成验证**：
-
-- `corepack pnpm test:group:<group>`
-- `corepack pnpm example:build`
-- `corepack pnpm example:ssr:check`（涉及 SSR 或 browser guard 示例时）
-- `corepack pnpm docs:api`
-- `corepack pnpm docs:api:check`
-- `corepack pnpm api:validate`
-- `corepack pnpm prettier --check <changed example files> docs/ROADMAP.md docs/V2_COMPLETED.md`
-- `git diff --check`
-
-**状态更新要求**：完成后写回状态、日期、已整合的组件组、代码展示来源策略、可复制复现验证方式、未纳入的后续实时运行编辑器计划和关键验证命令；同步更新阶段 17 状态。
+**状态更新要求**：已写回状态、日期、已整合的组件组、代码展示来源策略、可复制复现验证方式、未纳入的后续实时运行编辑器计划和关键验证命令；阶段 17 已同步为 `已完成（2026-06-30）`。R23 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
 
 ## Public API 与文档规则
 

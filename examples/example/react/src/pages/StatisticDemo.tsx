@@ -2,6 +2,7 @@ import { Statistic } from '@expcat/tigercat-react/Statistic'
 import { Space } from '@expcat/tigercat-react/Space'
 import { Card } from '@expcat/tigercat-react/Card'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './StatisticDemo.tsx?raw'
 
 const basicSnippet = `<Space size={32}>
   <Statistic title="活跃用户" value={112893} />
@@ -31,7 +32,7 @@ const StatisticDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Statistic 统计</h1>
       <p className="text-gray-500 mb-8">展示统计数值，支持精度、前缀后缀和千分位分隔。</p>
 
-      <DemoBlock title="基本用法" description="展示数值、精度和后缀" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="展示数值、精度和后缀" code={fullPageSnippet}>
         <Space size={32}>
           <Statistic title="活跃用户" value={112893} />
           <Statistic title="收入 (CNY)" value={89320.5} precision={2} />
@@ -39,7 +40,10 @@ const StatisticDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="前后缀与尺寸" description="prefix/suffix 和 size 控制" code={affixSnippet}>
+      <DemoBlock
+        title="前后缀与尺寸"
+        description="prefix/suffix 和 size 控制"
+        code={fullPageSnippet}>
         <Space size={32}>
           <Statistic title="日活用户" value={1128} prefix="↑" groupSeparator />
           <Statistic title="下单金额" value={250000} prefix="¥" groupSeparator />
@@ -48,7 +52,7 @@ const StatisticDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="卡片中使用" description="与 Card 组件配合使用" code={cardSnippet}>
+      <DemoBlock title="卡片中使用" description="与 Card 组件配合使用" code={fullPageSnippet}>
         <Space size={16}>
           <Card style={{ width: 200 }}>
             <Statistic title="总销量" value={8846} groupSeparator />

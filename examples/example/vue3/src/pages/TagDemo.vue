@@ -3,6 +3,7 @@ import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Tag } from '@expcat/tigercat-vue/Tag'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './TagDemo.vue?raw'
 
 const tags = ref(['标签一', '标签二', '标签三'])
 
@@ -113,7 +114,7 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock title="基本用法" description="基础的标签展示。" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="基础的标签展示。" :code="fullPageSnippet">
       <Space>
         <Tag>Default Tag</Tag>
         <Tag>标签二</Tag>
@@ -125,7 +126,7 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     <DemoBlock
       title="标签类型"
       description="标签有六种类型：默认、主要、成功、警告、危险和信息。"
-      :code="variantSnippet">
+      :code="fullPageSnippet">
       <Space wrap>
         <Tag variant="default">默认标签</Tag>
         <Tag variant="primary">主要标签</Tag>
@@ -137,7 +138,7 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     </DemoBlock>
 
     <!-- 标签大小 -->
-    <DemoBlock title="标签大小" description="标签有三种尺寸：小、中、大。" :code="sizeSnippet">
+    <DemoBlock title="标签大小" description="标签有三种尺寸：小、中、大。" :code="fullPageSnippet">
       <Space align="center">
         <Tag size="sm" variant="primary">小标签</Tag>
         <Tag size="md" variant="primary">中标签</Tag>
@@ -149,8 +150,7 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     <DemoBlock
       title="可关闭标签"
       description="设置 closable 属性可以定义一个标签是否可移除。"
-      :code="closableSnippet"
-      :script="closableScriptSnippet">
+      :code="fullPageSnippet">
       <Space wrap>
         <Tag
           v-for="(tag, index) in tags"
@@ -168,7 +168,7 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     <DemoBlock
       title="关闭按钮无障碍标签"
       description="使用 closeAriaLabel 自定义关闭按钮的 aria-label（便于无障碍与多语言）。"
-      :code="closeAriaSnippet">
+      :code="fullPageSnippet">
       <Space wrap>
         <Tag variant="info" closable closeAriaLabel="移除标签：JavaScript">JavaScript</Tag>
         <Tag variant="success" closable closeAriaLabel="移除标签：已完成">已完成</Tag>
@@ -179,7 +179,7 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     <DemoBlock
       title="阻止关闭"
       description="通过 preventDefault() 阻止标签自动关闭，适用于二次确认等场景。"
-      :code="preventCloseSnippet">
+      :code="fullPageSnippet">
       <Tag closable @close="$event.preventDefault()">点击关闭按钮不会消失</Tag>
     </DemoBlock>
 
@@ -187,7 +187,7 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     <DemoBlock
       title="不同类型的可关闭标签"
       description="展示不同变体的可关闭标签。"
-      :code="closableVariantSnippet">
+      :code="fullPageSnippet">
       <Space wrap>
         <Tag variant="default" closable>默认标签</Tag>
         <Tag variant="primary" closable>主要标签</Tag>
@@ -202,7 +202,7 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     <DemoBlock
       title="不同大小的可关闭标签"
       description="不同尺寸的可关闭标签组合。"
-      :code="closableSizeSnippet">
+      :code="fullPageSnippet">
       <Space align="center" wrap>
         <Tag size="sm" variant="success" closable>小标签</Tag>
         <Tag size="md" variant="success" closable>中标签</Tag>
@@ -211,7 +211,10 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     </DemoBlock>
 
     <!-- 实际应用场景 -->
-    <DemoBlock title="应用场景" description="标签在实际应用中的常见使用场景。" :code="usageSnippet">
+    <DemoBlock
+      title="应用场景"
+      description="标签在实际应用中的常见使用场景。"
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <div>
           <h3 class="text-sm font-semibold mb-2 text-gray-700">状态标签</h3>

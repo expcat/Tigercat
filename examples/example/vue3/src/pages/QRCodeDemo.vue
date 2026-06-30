@@ -2,6 +2,7 @@
 import { QRCode } from '@expcat/tigercat-vue/QRCode'
 import { Space } from '@expcat/tigercat-vue/Space'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './QRCodeDemo.vue?raw'
 
 const basicSnippet = `<Space wrap>
   <QRCode value="https://github.com" />
@@ -28,7 +29,10 @@ const statusSnippet = `<Space wrap>
     <h1 class="text-3xl font-bold mb-2">QRCode 二维码</h1>
     <p class="text-gray-500 mb-8">将文本转换为二维码，支持自定义颜色、大小和纠错等级。</p>
 
-    <DemoBlock title="基本用法与尺寸" description="通过 size 控制二维码大小" :code="basicSnippet">
+    <DemoBlock
+      title="基本用法与尺寸"
+      description="通过 size 控制二维码大小"
+      :code="fullPageSnippet">
       <Space wrap>
         <QRCode value="https://github.com" />
         <QRCode value="https://github.com" :size="200" />
@@ -39,7 +43,7 @@ const statusSnippet = `<Space wrap>
     <DemoBlock
       title="颜色与纠错等级"
       description="自定义颜色，level 控制纠错等级 L/M/Q/H"
-      :code="styleSnippet">
+      :code="fullPageSnippet">
       <Space wrap>
         <QRCode value="https://github.com" color="#1677ff" />
         <QRCode value="https://github.com" color="#52c41a" bg-color="#f6ffed" />
@@ -51,7 +55,7 @@ const statusSnippet = `<Space wrap>
     <DemoBlock
       title="状态"
       description="active（正常）、expired（已过期）、loading（加载中）"
-      :code="statusSnippet">
+      :code="fullPageSnippet">
       <Space wrap>
         <QRCode value="https://github.com" status="active" />
         <QRCode value="https://github.com" status="expired" />

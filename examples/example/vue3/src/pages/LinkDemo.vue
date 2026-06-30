@@ -3,6 +3,7 @@ import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Link } from '@expcat/tigercat-vue/Link'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './LinkDemo.vue?raw'
 
 const clickCount = ref(0)
 
@@ -58,7 +59,7 @@ const clickCount = ref(0)`
     <DemoBlock
       title="链接变体"
       description="展示 primary / secondary / default 三种变体。"
-      :code="variantSnippet">
+      :code="fullPageSnippet">
       <Space>
         <Link href="#" variant="primary" @click="handlePreventNavigate">Primary</Link>
         <Link href="#" variant="secondary" @click="handlePreventNavigate">Secondary</Link>
@@ -67,7 +68,7 @@ const clickCount = ref(0)`
     </DemoBlock>
 
     <!-- 链接尺寸 -->
-    <DemoBlock title="链接尺寸" description="展示 sm / md / lg 三种尺寸。" :code="sizeSnippet">
+    <DemoBlock title="链接尺寸" description="展示 sm / md / lg 三种尺寸。" :code="fullPageSnippet">
       <Space>
         <Link href="#" size="sm" @click="handlePreventNavigate">Small</Link>
         <Link href="#" size="md" @click="handlePreventNavigate">Medium</Link>
@@ -79,7 +80,7 @@ const clickCount = ref(0)`
     <DemoBlock
       title="禁用状态"
       description="禁用后不可点击，移除 href，并从 Tab 顺序移除。"
-      :code="disabledSnippet">
+      :code="fullPageSnippet">
       <Space>
         <Link href="#" disabled>Disabled Primary</Link>
         <Link href="#" variant="secondary" disabled>Disabled Secondary</Link>
@@ -91,7 +92,7 @@ const clickCount = ref(0)`
     <DemoBlock
       title="下划线"
       description="underline=true（默认）悬停显示下划线；underline=false 无下划线。"
-      :code="underlineSnippet">
+      :code="fullPageSnippet">
       <Space>
         <Link href="#" @click="handlePreventNavigate">有下划线（悬停）</Link>
         <Link href="#" :underline="false" @click="handlePreventNavigate">无下划线</Link>
@@ -102,7 +103,7 @@ const clickCount = ref(0)`
     <DemoBlock
       title="外部链接"
       description='target="_blank" 时自动添加 rel="noopener noreferrer"；也可传入自定义 rel。'
-      :code="externalSnippet">
+      :code="fullPageSnippet">
       <Space>
         <Link href="https://github.com" target="_blank">GitHub（自动添加 rel）</Link>
         <Link href="https://example.com" target="_blank" rel="nofollow">自定义 rel</Link>
@@ -113,8 +114,7 @@ const clickCount = ref(0)`
     <DemoBlock
       title="点击事件"
       description="监听 @click 事件处理交互逻辑。"
-      :code="eventSnippet"
-      :script="eventScriptSnippet">
+      :code="fullPageSnippet">
       <Link
         href="#"
         @click="

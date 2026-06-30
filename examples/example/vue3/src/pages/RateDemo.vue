@@ -4,6 +4,7 @@ import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
 import { Rate } from '@expcat/tigercat-vue/Rate'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './RateDemo.vue?raw'
 
 const val1 = ref(3)
 const val2 = ref(2.5)
@@ -41,8 +42,7 @@ const customSnippet = `<Space direction="vertical" :size="12">
     <DemoBlock
       title="基本与半星"
       description="v-model 双向绑定，allow-half 半星"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="16">
         <Rate v-model="val1" />
         <Rate v-model="val2" allow-half />
@@ -50,7 +50,7 @@ const customSnippet = `<Space direction="vertical" :size="12">
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="尺寸" description="sm / md / lg 三种尺寸" :code="sizeSnippet">
+    <DemoBlock title="尺寸" description="sm / md / lg 三种尺寸" :code="fullPageSnippet">
       <Space direction="vertical" :size="12">
         <Rate :model-value="3" size="sm" disabled />
         <Rate :model-value="3" size="md" disabled />
@@ -61,7 +61,7 @@ const customSnippet = `<Space direction="vertical" :size="12">
     <DemoBlock
       title="自定义字符与数量"
       description="character 自定义图标，count 控制星星数"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="12">
         <Rate v-model="val3" character="♥" />
         <Rate :model-value="4" :count="10" disabled />

@@ -1,5 +1,6 @@
 import { Splitter } from '@expcat/tigercat-react/Splitter'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './SplitterDemo.tsx?raw'
 
 const horizontalSnippet = `<Splitter direction="horizontal" sizes={[30, 70]} style={{ height: 200, border: '1px solid #e5e7eb', borderRadius: 8 }}>
   <div className="p-4">左侧面板 (30%)</div>
@@ -30,7 +31,7 @@ const SplitterDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Splitter 分割面板</h1>
       <p className="text-gray-500 mb-8">可拖拽分割面板，支持水平/垂直、嵌套和折叠。</p>
 
-      <DemoBlock title="水平分割" description="拖拽分割条调整面板大小" code={horizontalSnippet}>
+      <DemoBlock title="水平分割" description="拖拽分割条调整面板大小" code={fullPageSnippet}>
         <Splitter
           direction="horizontal"
           sizes={[30, 70]}
@@ -40,7 +41,7 @@ const SplitterDemo: React.FC = () => {
         </Splitter>
       </DemoBlock>
 
-      <DemoBlock title="垂直分割" code={verticalSnippet}>
+      <DemoBlock title="垂直分割" code={fullPageSnippet}>
         <Splitter
           direction="vertical"
           sizes={[40, 60]}
@@ -50,7 +51,7 @@ const SplitterDemo: React.FC = () => {
         </Splitter>
       </DemoBlock>
 
-      <DemoBlock title="嵌套分割" description="水平套垂直，实现 IDE 布局" code={nestedSnippet}>
+      <DemoBlock title="嵌套分割" description="水平套垂直，实现 IDE 布局" code={fullPageSnippet}>
         <Splitter
           direction="horizontal"
           sizes={[25, 75]}
@@ -63,7 +64,7 @@ const SplitterDemo: React.FC = () => {
         </Splitter>
       </DemoBlock>
 
-      <DemoBlock title="最小尺寸" description="min 限制面板最小尺寸" code={minSnippet}>
+      <DemoBlock title="最小尺寸" description="min 限制面板最小尺寸" code={fullPageSnippet}>
         <Splitter
           direction="horizontal"
           sizes={[30, 70]}

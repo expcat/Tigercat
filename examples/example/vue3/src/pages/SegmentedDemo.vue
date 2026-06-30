@@ -4,6 +4,7 @@ import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
 import { Segmented } from '@expcat/tigercat-vue/Segmented'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SegmentedDemo.vue?raw'
 
 const selected = ref<string | number>('daily')
 
@@ -50,11 +51,7 @@ const simpleOpts = [
     <h1 class="text-3xl font-bold mb-2">Segmented 分段控制器</h1>
     <p class="text-gray-500 mb-8">分段选择器，类似 iOS UISegmentedControl。</p>
 
-    <DemoBlock
-      title="基本用法"
-      description="v-model 双向绑定选中值"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基本用法" description="v-model 双向绑定选中值" :code="fullPageSnippet">
       <Space direction="vertical" :size="12">
         <Segmented
           v-model="selected"
@@ -68,7 +65,10 @@ const simpleOpts = [
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="尺寸与通栏" description="sm/md/lg 尺寸，block 撑满宽度" :code="sizeSnippet">
+    <DemoBlock
+      title="尺寸与通栏"
+      description="sm/md/lg 尺寸，block 撑满宽度"
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="12" class="w-full">
         <Segmented size="sm" :options="simpleOpts" model-value="a" />
         <Segmented size="md" :options="simpleOpts" model-value="a" />
@@ -77,7 +77,7 @@ const simpleOpts = [
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="禁用" description="整体禁用 或 单个选项禁用" :code="disabledSnippet">
+    <DemoBlock title="禁用" description="整体禁用 或 单个选项禁用" :code="fullPageSnippet">
       <Space direction="vertical" :size="12">
         <Segmented
           :options="[

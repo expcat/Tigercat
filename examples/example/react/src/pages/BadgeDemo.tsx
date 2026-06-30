@@ -3,6 +3,7 @@ import { Button } from '@expcat/tigercat-react/Button'
 import { useState } from 'react'
 import { Badge } from '@expcat/tigercat-react/Badge'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './BadgeDemo.tsx?raw'
 
 const basicSnippet = `<Space>
   <Badge content={5} />
@@ -195,7 +196,7 @@ export default function BadgeDemo() {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock title="基本用法" description="独立使用徽章展示数字或文本。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="独立使用徽章展示数字或文本。" code={fullPageSnippet}>
         <Space>
           <Badge content={5} />
           <Badge content={99} />
@@ -208,7 +209,7 @@ export default function BadgeDemo() {
       <DemoBlock
         title="徽章类型"
         description="徽章有六种颜色类型：默认、主要、成功、警告、危险和信息。"
-        code={variantSnippet}>
+        code={fullPageSnippet}>
         <Space wrap>
           <Badge variant="default" content={1} />
           <Badge variant="primary" content={2} />
@@ -220,7 +221,7 @@ export default function BadgeDemo() {
       </DemoBlock>
 
       {/* 徽章大小 */}
-      <DemoBlock title="徽章大小" description="徽章有三种尺寸：小、中、大。" code={sizeSnippet}>
+      <DemoBlock title="徽章大小" description="徽章有三种尺寸：小、中、大。" code={fullPageSnippet}>
         <Space align="center">
           <Badge size="sm" content={5} />
           <Badge size="md" content={10} />
@@ -232,7 +233,7 @@ export default function BadgeDemo() {
       <DemoBlock
         title="点状徽章"
         description="用于简单的通知提示，不显示具体数字。"
-        code={dotSnippet}>
+        code={fullPageSnippet}>
         <Space wrap>
           <Badge type="dot" variant="default" />
           <Badge type="dot" variant="primary" />
@@ -244,7 +245,7 @@ export default function BadgeDemo() {
       </DemoBlock>
 
       {/* 文本徽章 */}
-      <DemoBlock title="文本徽章" description="显示文本内容的徽章。" code={textSnippet}>
+      <DemoBlock title="文本徽章" description="显示文本内容的徽章。" code={fullPageSnippet}>
         <Space wrap>
           <Badge type="text" content="NEW" variant="danger" />
           <Badge type="text" content="HOT" variant="warning" />
@@ -257,7 +258,7 @@ export default function BadgeDemo() {
       <DemoBlock
         title="最大值"
         description="设置 max 属性，当数字超过最大值时显示 {'{max}+'}。"
-        code={maxSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Badge content={99} />
           <Badge content={100} />
@@ -270,7 +271,7 @@ export default function BadgeDemo() {
       <DemoBlock
         title="包裹元素"
         description="徽章可以附加到其他元素上，通过设置 standalone 为 false 启用包裹模式。"
-        code={wrapSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Badge content={5} standalone={false}>
             <Button>通知</Button>
@@ -290,7 +291,7 @@ export default function BadgeDemo() {
       <DemoBlock
         title="徽章位置"
         description="在包裹模式下，可以设置徽章的位置。"
-        code={positionSnippet}>
+        code={fullPageSnippet}>
         <Space wrap>
           <Badge content={5} standalone={false} position="top-right">
             <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
@@ -322,7 +323,7 @@ export default function BadgeDemo() {
       <DemoBlock
         title="显示零值"
         description="默认情况下不显示零值，设置 showZero 可以显示。"
-        code={zeroSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <div>
             <p className="text-sm text-gray-600 mb-2">默认（不显示零）</p>
@@ -338,11 +339,7 @@ export default function BadgeDemo() {
       </DemoBlock>
 
       {/* 实际应用示例 */}
-      <DemoBlock
-        title="实际应用示例"
-        description="模拟真实的使用场景。"
-        code={usageSnippet}
-        script={usageScriptSnippet}>
+      <DemoBlock title="实际应用示例" description="模拟真实的使用场景。" code={fullPageSnippet}>
         <div>
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3">通知中心</h3>

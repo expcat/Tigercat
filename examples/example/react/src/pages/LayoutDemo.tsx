@@ -9,6 +9,7 @@ import { Menu } from '@expcat/tigercat-react/Menu'
 import { MenuItem } from '@expcat/tigercat-react/MenuItem'
 import { SubMenu } from '@expcat/tigercat-react/SubMenu'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './LayoutDemo.tsx?raw'
 
 const containerSnippet = `<Container maxWidth="lg">
   <div>这里是 Container 内容区域</div>
@@ -123,7 +124,7 @@ const LayoutDemo: React.FC = () => {
       <DemoBlock
         title="Container 容器"
         description="用于约束内容宽度并提供响应式内边距。"
-        code={containerSnippet}>
+        code={fullPageSnippet}>
         <div className="bg-gray-50 rounded-lg py-6">
           <Container maxWidth="lg">
             <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -136,7 +137,7 @@ const LayoutDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="基础布局" description="典型的页面布局。" code={basicSnippet}>
+      <DemoBlock title="基础布局" description="典型的页面布局。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
             <Header className="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -149,7 +150,7 @@ const LayoutDemo: React.FC = () => {
       <DemoBlock
         title="自定义高度"
         description="自定义 Header 和 Footer 的高度。"
-        code={heightSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
             <Header height="48px" className="!bg-blue-600 !text-white !p-4">
@@ -163,7 +164,7 @@ const LayoutDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="侧边栏布局" description="带有侧边栏的布局。" code={sidebarSnippet}>
+      <DemoBlock title="侧边栏布局" description="带有侧边栏的布局。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
             <Header className="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -181,8 +182,7 @@ const LayoutDemo: React.FC = () => {
       <DemoBlock
         title="Sidebar 折叠"
         description="可折叠的侧边栏，通过 collapsedWidth 设置折叠后的宽度（默认 64px）。"
-        code={collapsedSnippet}
-        script={collapsedScriptSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <button
             className="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
@@ -209,7 +209,7 @@ const LayoutDemo: React.FC = () => {
       <DemoBlock
         title="后台 Shell 侧栏"
         description="推荐使用 Sidebar 的 collapsedWidth 配合文案 max-width、opacity、transform transition；Menu 在 inline + collapsed + popupPortal 下会自动退化成折叠侧栏常见的 popup 子菜单，无需手动切成 vertical。"
-        code={shellSidebarSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[320px]">
             <Sidebar
@@ -292,7 +292,7 @@ const LayoutDemo: React.FC = () => {
       <DemoBlock
         title="Mini 模式侧边栏"
         description="collapsedWidth 设为更小的值（如 48px）实现 mini 模式，折叠时仅显示图标。"
-        code={miniSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <button
             className="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
@@ -324,7 +324,7 @@ const LayoutDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="复杂布局" description="更复杂的页面布局。" code={complexSnippet}>
+      <DemoBlock title="复杂布局" description="更复杂的页面布局。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[400px]">
             <Header className="!bg-blue-600 !text-white !p-4">Header</Header>

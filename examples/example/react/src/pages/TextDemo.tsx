@@ -2,6 +2,7 @@ import React from 'react'
 import { Text } from '@expcat/tigercat-react/Text'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TextDemo.tsx?raw'
 
 const basicSnippet = `<Space direction="vertical" className="w-full">
   <Text>这是一段默认段落文本。</Text>
@@ -70,7 +71,7 @@ const TextDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的 Text 用法。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="基础的 Text 用法。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <Text>这是一段默认段落文本。</Text>
           <Text tag="span" className="block">
@@ -81,7 +82,10 @@ const TextDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 语义标签 */}
-      <DemoBlock title="语义标签" description="通过 tag 属性渲染不同语义标签。" code={tagSnippet}>
+      <DemoBlock
+        title="语义标签"
+        description="通过 tag 属性渲染不同语义标签。"
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <Text tag="h3" size="lg" weight="semibold">
             Heading (h3)
@@ -94,7 +98,7 @@ const TextDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 文本颜色 */}
-      <DemoBlock title="文本颜色" description="由 color 属性定义文本颜色。" code={colorSnippet}>
+      <DemoBlock title="文本颜色" description="由 color 属性定义文本颜色。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <Text color="primary">主要文本 Primary</Text>
           <Text color="secondary">次要文本 Secondary</Text>
@@ -107,7 +111,7 @@ const TextDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 文本大小 */}
-      <DemoBlock title="文本大小" description="由 size 属性定义文本大小。" code={sizeSnippet}>
+      <DemoBlock title="文本大小" description="由 size 属性定义文本大小。" code={fullPageSnippet}>
         <Space direction="vertical" align="start" className="w-full">
           <Text size="sm">小号文本</Text>
           <Text size="base">中号文本</Text>
@@ -116,7 +120,7 @@ const TextDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 文本粗细 */}
-      <DemoBlock title="文本粗细" description="由 weight 属性定义字重。" code={weightSnippet}>
+      <DemoBlock title="文本粗细" description="由 weight 属性定义字重。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <Text weight="normal">Normal</Text>
           <Text weight="semibold">Semibold</Text>
@@ -125,7 +129,7 @@ const TextDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 文本对齐 */}
-      <DemoBlock title="文本对齐" description="由 align 属性定义对齐方式。" code={alignSnippet}>
+      <DemoBlock title="文本对齐" description="由 align 属性定义对齐方式。" code={fullPageSnippet}>
         <div className="grid grid-cols-1 gap-4">
           <div className="p-4 bg-white rounded">
             <Text align="left">Left aligned text</Text>
@@ -148,7 +152,7 @@ const TextDemo: React.FC = () => {
       <DemoBlock
         title="文本修饰"
         description="truncate / italic / underline / lineThrough。"
-        code={decorateSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <div className="w-64">
             <Text truncate>这是一段很长很长的文本，会在容器宽度不足时显示省略号。</Text>

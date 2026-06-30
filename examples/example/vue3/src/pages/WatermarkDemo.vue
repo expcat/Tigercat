@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Watermark } from '@expcat/tigercat-vue/Watermark'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './WatermarkDemo.vue?raw'
 
 const textSnippet = `<Watermark content="Tigercat">
   <div style="height: 300px" class="bg-gray-50 rounded-lg p-4">
@@ -26,7 +27,7 @@ const configSnippet = `<Watermark content="Custom" :rotate="-30" :gap-x="120" :g
     <h1 class="text-3xl font-bold mb-2">Watermark 水印</h1>
     <p class="text-gray-500 mb-8">在页面上添加水印，支持文字和图片，防止信息泄露。</p>
 
-    <DemoBlock title="文字水印" description="基本水印效果" :code="textSnippet">
+    <DemoBlock title="文字水印" description="基本水印效果" :code="fullPageSnippet">
       <Watermark content="Tigercat">
         <div style="height: 300px" class="bg-gray-50 rounded-lg p-4">
           <p>这里是被水印覆盖的内容区域。水印文字会以倾斜角度重复平铺。</p>
@@ -37,7 +38,7 @@ const configSnippet = `<Watermark content="Custom" :rotate="-30" :gap-x="120" :g
     <DemoBlock
       title="多行水印"
       description="content 传数组实现多行，自定义字体"
-      :code="multiSnippet">
+      :code="fullPageSnippet">
       <Watermark
         :content="['Tigercat', '2024-01-01']"
         :font="{ fontSize: 14, color: 'rgba(0,0,0,0.1)' }">
@@ -47,7 +48,7 @@ const configSnippet = `<Watermark content="Custom" :rotate="-30" :gap-x="120" :g
       </Watermark>
     </DemoBlock>
 
-    <DemoBlock title="自定义配置" description="调整旋转角度、间距和层级" :code="configSnippet">
+    <DemoBlock title="自定义配置" description="调整旋转角度、间距和层级" :code="fullPageSnippet">
       <Watermark content="Custom" :rotate="-30" :gap-x="120" :gap-y="80" :z-index="5">
         <div style="height: 300px" class="bg-blue-50 rounded-lg p-4">
           <p>自定义旋转角度、水印间距和层级。</p>

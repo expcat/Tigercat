@@ -4,6 +4,7 @@ import { ImagePreview } from '@expcat/tigercat-vue/ImagePreview'
 import { ref } from 'vue'
 import { Image } from '@expcat/tigercat-vue/Image'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ImageDemo.vue?raw'
 
 const PHOTOS = [
   'https://picsum.photos/seed/tiger1/600/400',
@@ -92,14 +93,17 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
       图片展示组件，支持适配模式、懒加载、错误回退、点击预览、多图组预览。
     </p>
 
-    <DemoBlock title="基本用法" description="使用 src 和尺寸属性展示图片" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="使用 src 和尺寸属性展示图片" :code="fullPageSnippet">
       <div class="flex gap-4 flex-wrap">
         <Image :src="PHOTOS[0]" alt="示例图片" :width="200" :height="150" :preview="false" />
         <Image :src="PHOTOS[1]" alt="示例图片 2" :width="200" :height="150" :preview="false" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="适配模式" description="fit 属性控制图片在容器中的适配方式" :code="fitSnippet">
+    <DemoBlock
+      title="适配模式"
+      description="fit 属性控制图片在容器中的适配方式"
+      :code="fullPageSnippet">
       <div class="flex gap-4 flex-wrap">
         <div
           v-for="mode in ['contain', 'cover', 'fill', 'none', 'scale-down'] as const"
@@ -121,7 +125,7 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
     <DemoBlock
       title="加载失败回退"
       description="设置 fallbackSrc 或使用 error 插槽自定义错误状态"
-      :code="fallbackSnippet">
+      :code="fullPageSnippet">
       <div class="flex gap-4 items-start">
         <div class="text-center">
           <Image
@@ -150,7 +154,7 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
     <DemoBlock
       title="懒加载"
       description="lazy 属性开启 IntersectionObserver 懒加载"
-      :code="lazySnippet">
+      :code="fullPageSnippet">
       <div class="flex gap-4">
         <Image :src="PHOTOS[2]" :width="200" :height="150" lazy alt="懒加载" :preview="false">
           <template #placeholder>
@@ -166,7 +170,7 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
     <DemoBlock
       title="图片预览模式"
       description="支持点击图片进入全屏预览（默认），也可通过 preview-trigger='hover' 开启悬停放大预览。"
-      :code="previewSnippet">
+      :code="fullPageSnippet">
       <div class="flex flex-col gap-4">
         <div class="flex gap-4 flex-wrap">
           <Image
@@ -192,14 +196,14 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
     <DemoBlock
       title="关闭预览"
       description='设置 :preview="false" 禁用点击预览'
-      :code="noPreviewSnippet">
+      :code="fullPageSnippet">
       <Image :src="PHOTOS[0]" :width="200" :height="150" :preview="false" alt="无预览" />
     </DemoBlock>
 
     <DemoBlock
       title="图片组 ImageGroup"
       description="用 ImageGroup 包裹多张 Image，点击任一图片进入多图预览"
-      :code="groupSnippet">
+      :code="fullPageSnippet">
       <ImageGroup>
         <div class="flex gap-4 flex-wrap">
           <Image
@@ -216,8 +220,7 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
     <DemoBlock
       title="独立 ImagePreview"
       description="直接使用 ImagePreview 组件，可编程控制预览"
-      :code="standalonePreviewSnippet"
-      :script="standalonePreviewScriptSnippet">
+      :code="fullPageSnippet">
       <button
         class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
         @click="previewOpen = true">

@@ -2,6 +2,7 @@ import { Empty } from '@expcat/tigercat-react/Empty'
 import { Button } from '@expcat/tigercat-react/Button'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './EmptyDemo.tsx?raw'
 
 const presetSnippet = `<Space direction="vertical" size={24} className="w-full">
   <Empty />
@@ -19,7 +20,10 @@ const EmptyDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Empty 空状态</h1>
       <p className="text-gray-500 mb-8">空状态时的占位提示，支持多种预设样式。</p>
 
-      <DemoBlock title="预设样式" description="通过 preset 切换不同空状态场景" code={presetSnippet}>
+      <DemoBlock
+        title="预设样式"
+        description="通过 preset 切换不同空状态场景"
+        code={fullPageSnippet}>
         <Space direction="vertical" size={24} className="w-full">
           <div className="border rounded-lg p-6">
             <Empty />
@@ -36,7 +40,7 @@ const EmptyDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="自定义内容" description="自定义描述文字和操作按钮" code={customSnippet}>
+      <DemoBlock title="自定义内容" description="自定义描述文字和操作按钮" code={fullPageSnippet}>
         <Space direction="vertical" size={24} className="w-full">
           <div className="border rounded-lg p-6">
             <Empty

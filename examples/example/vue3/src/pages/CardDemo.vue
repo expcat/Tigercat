@@ -3,6 +3,7 @@ import { Card } from '@expcat/tigercat-vue/Card'
 import { Space } from '@expcat/tigercat-vue/Space'
 import { Button } from '@expcat/tigercat-vue/Button'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './CardDemo.vue?raw'
 
 const basicSnippet = `<Card>...</Card>`
 
@@ -39,7 +40,7 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
       </p>
     </div>
 
-    <DemoBlock title="基本用法" description="最简单的卡片，包含基本内容。" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="最简单的卡片，包含基本内容。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Card>
           <p>这是一个基础的卡片组件，可以展示任何内容。</p>
@@ -50,7 +51,7 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
     <DemoBlock
       title="卡片变体"
       description="卡片有四种样式：默认、带边框、带阴影和浮起。"
-      :code="variantSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card variant="default">
@@ -76,7 +77,7 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
     <DemoBlock
       title="卡片尺寸与内边距"
       description="卡片有三种尺寸（主要影响内边距），同时支持 padding 属性完全定制（可为 false 以移除，或传入自定义 Tailwind 类如 p-8）。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical" :size="16" class="w-full">
           <Card size="sm">
@@ -104,7 +105,7 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
       </div>
     </DemoBlock>
 
-    <DemoBlock title="可悬停卡片" description="鼠标悬停时显示交互效果。" :code="hoverSnippet">
+    <DemoBlock title="可悬停卡片" description="鼠标悬停时显示交互效果。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card hoverable variant="shadow">
@@ -123,7 +124,7 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
       </div>
     </DemoBlock>
 
-    <DemoBlock title="带封面图片" description="卡片可以包含封面图片。" :code="coverSnippet">
+    <DemoBlock title="带封面图片" description="卡片可以包含封面图片。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card
@@ -151,7 +152,7 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
     <DemoBlock
       title="卡片结构"
       description="卡片支持头部、主体、底部和操作区域。"
-      :code="structureSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
@@ -180,7 +181,7 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
       </div>
     </DemoBlock>
 
-    <DemoBlock title="完整示例" description="结合所有功能的完整卡片示例。" :code="fullSnippet">
+    <DemoBlock title="完整示例" description="结合所有功能的完整卡片示例。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card
