@@ -28,7 +28,10 @@ const basicSnippet = `<DataTableWithToolbar
       { key: 'export', label: '导出' },
       { key: 'delete', label: '删除', variant: 'outline' }
     ],
-    selectedKeys: selectedRowKeys
+    selectedKeys: selectedRowKeys,
+    onSearchChange: setKeyword,
+    onFiltersChange: setFilters,
+    onBulkAction: handleBulkAction
   }}
   pagination={{
     current, pageSize,
@@ -36,9 +39,6 @@ const basicSnippet = `<DataTableWithToolbar
     showSizeChanger: true,
     showTotal: true
   }}
-  onSearchChange={setKeyword}
-  onFiltersChange={setFilters}
-  onBulkAction={handleBulkAction}
   onPageChange={handlePageChange}
   onSelectionChange={setSelectedRowKeys}
 />`
@@ -258,9 +258,9 @@ const ageRangeSnippet = `<DataTableWithToolbar
           />
         </div>
       )
-    }
+    },
+    onFiltersChange: setFilters
   }}
-  onFiltersChange={setFilters}
 />`
 
 const settingsColumns: TableColumn<UserRow>[] = [
@@ -398,12 +398,12 @@ const DataTableWithToolbarDemo: React.FC = () => {
                 variant: 'outline'
               }
             ],
-            selectedKeys: selectedRowKeys
+            selectedKeys: selectedRowKeys,
+            onSearchChange: setKeyword,
+            onSearch: setKeyword,
+            onFiltersChange: handleFiltersChange,
+            onBulkAction: handleBulkAction
           }}
-          onSearchChange={setKeyword}
-          onSearch={setKeyword}
-          onFiltersChange={handleFiltersChange}
-          onBulkAction={handleBulkAction}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,
@@ -464,11 +464,11 @@ const DataTableWithToolbarDemo: React.FC = () => {
                   />
                 </div>
               )
-            }
+            },
+            onSearchChange: setKeyword,
+            onSearch: setKeyword,
+            onFiltersChange: handleFiltersChange
           }}
-          onSearchChange={setKeyword}
-          onSearch={setKeyword}
-          onFiltersChange={handleFiltersChange}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,
@@ -536,11 +536,11 @@ const DataTableWithToolbarDemo: React.FC = () => {
             filters: [
               { key: 'status', label: '状态', options: statusOptions },
               { key: 'role', label: '角色', options: roleOptions }
-            ]
+            ],
+            onSearchChange: setKeyword,
+            onSearch: setKeyword,
+            onFiltersChange: handleFiltersChange
           }}
-          onSearchChange={setKeyword}
-          onSearch={setKeyword}
-          onFiltersChange={handleFiltersChange}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,
@@ -596,11 +596,11 @@ const DataTableWithToolbarDemo: React.FC = () => {
             ],
             searchClassName: 'w-full sm:w-auto sm:min-w-[300px]',
             className: 'bg-gray-50 dark:bg-gray-800/50',
-            style: { padding: '12px 16px' }
+            style: { padding: '12px 16px' },
+            onSearchChange: setKeyword,
+            onSearch: setKeyword,
+            onFiltersChange: handleFiltersChange
           }}
-          onSearchChange={setKeyword}
-          onSearch={setKeyword}
-          onFiltersChange={handleFiltersChange}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,
@@ -646,10 +646,10 @@ const DataTableWithToolbarDemo: React.FC = () => {
                 </div>
                 <span className="text-sm text-gray-500">状态: {String(f.status ?? '全部')}</span>
               </div>
-            )
+            ),
+            onSearchChange: setKeyword,
+            onFiltersChange: handleFiltersChange
           }}
-          onSearchChange={setKeyword}
-          onFiltersChange={handleFiltersChange}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,

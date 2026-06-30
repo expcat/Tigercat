@@ -138,7 +138,7 @@ description: Compact generated API summary for Tigercat core types
 | image-annotation.ts | ImageAnnotationProps | ImageAnnotation | 9       |
 | image-viewer.ts     | ImageViewerProps     | ImageViewer     | 1       |
 | infinite-scroll.ts  | InfiniteScrollProps  | InfiniteScroll  | 1       |
-| kanban.ts           | KanbanProps          | Kanban          | 6       |
+| kanban.ts           | KanbanProps          | Kanban          | 2       |
 | markdown-editor.ts  | MarkdownEditorProps  | MarkdownEditor  | 9       |
 | print-layout.ts     | PrintLayoutProps     | PrintLayout     | 3       |
 | rich-text-editor.ts | RichTextEditorProps  | RichTextEditor  | 6       |
@@ -147,9 +147,16 @@ description: Compact generated API summary for Tigercat core types
 
 ## Composite
 
-| Type File    | Props Interfaces                                                                                                                                               | Components                                                                                               | Exports |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------- |
-| composite.ts | ChatWindowProps, ActivityFeedProps, CommentThreadProps, NotificationCenterProps, TableToolbarProps, DataTableWithToolbarProps, FormWizardProps, TaskBoardProps | ChatWindow, ActivityFeed, CommentThread, NotificationCenter, DataTableWithToolbar, FormWizard, TaskBoard | 40      |
+| Type File              | Props Interfaces                             | Components           | Exports |
+| ---------------------- | -------------------------------------------- | -------------------- | ------- |
+| activity-feed.ts       | ActivityFeedProps                            | ActivityFeed         | 6       |
+| chat.ts                | ChatWindowProps                              | ChatWindow           | 5       |
+| comment-thread.ts      | CommentThreadProps                           | CommentThread        | 5       |
+| composite.ts           | -                                            | -                    | 0       |
+| form-wizard.ts         | FormWizardProps                              | FormWizard           | 4       |
+| notification-center.ts | NotificationCenterProps                      | NotificationCenter   | 4       |
+| table-toolbar.ts       | TableToolbarProps, DataTableWithToolbarProps | DataTableWithToolbar | 10      |
+| task-board.ts          | TaskBoardProps                               | TaskBoard            | 6       |
 
 ## Core
 
@@ -169,4 +176,4 @@ description: Compact generated API summary for Tigercat core types
 | ----------- | ---------------- | ---------- | ------- |
 | viewport.ts | -                | -          | 2       |
 
-Total exported types: 609.
+Total exported types: 605.

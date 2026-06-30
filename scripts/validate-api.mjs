@@ -787,6 +787,70 @@ for (const relativePath of R17_VIRTUAL_TABLE_FILES) {
   })
 }
 
+// ----- R20 Composite/business component public API guard -----
+
+// Kanban reuses the TaskBoard data model; it must not re-export parallel aliases.
+const R20_FORBIDDEN_TYPE_EXPORTS = [
+  'KanbanCard',
+  'KanbanColumn',
+  'KanbanCardMoveEvent',
+  'KanbanColumnMoveEvent'
+]
+
+for (const filename of typeFiles) {
+  const filepath = join(TYPES_DIR, filename)
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    for (const typeName of R20_FORBIDDEN_TYPE_EXPORTS) {
+      if (new RegExp(`\\bexport\\s+(?:type|interface)\\s+${typeName}\\b`).test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'composite-api',
+          `R20 Kanban must reuse TaskBoardCard/TaskBoardColumn/TaskBoardCardMoveEvent/TaskBoardColumnMoveEvent instead of re-exporting ${typeName}`
+        )
+      }
+    }
+  })
+}
+
+// DataTableWithToolbar business callbacks live on the toolbar config (React
+// `toolbar.on*`) or Vue events, never as top-level props on the component.
+const R20_DATA_TABLE_TOOLBAR_FILES = [
+  'packages/core/src/types/table-toolbar.ts',
+  'packages/react/src/components/DataTableWithToolbar.tsx'
+]
+
+const R20_TOOLBAR_CALLBACK_RE = /^\s+(?:onSearchChange|onSearch|onFiltersChange|onBulkAction)\s*\??\s*:/
+
+for (const relativePath of R20_DATA_TABLE_TOOLBAR_FILES) {
+  const filepath = join(ROOT, relativePath)
+  if (!existsSync(filepath)) continue
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  let inInterface = false
+  let depth = 0
+  lines.forEach((line, index) => {
+    if (!inInterface && /\b(?:interface|type)\s+DataTableWithToolbarProps\b/.test(line)) {
+      inInterface = true
+      depth = 0
+    }
+    if (!inInterface) return
+    if (depth > 0 && R20_TOOLBAR_CALLBACK_RE.test(line)) {
+      addIssue(
+        filepath,
+        index + 1,
+        'composite-api',
+        'R20 DataTableWithToolbar must route search/filters/bulk callbacks through the toolbar config (toolbar.onSearchChange/onSearch/onFiltersChange/onBulkAction) or Vue events, not top-level props'
+      )
+    }
+    for (const ch of line) {
+      if (ch === '{') depth++
+      else if (ch === '}') depth--
+    }
+    if (depth <= 0 && line.includes('}')) inInterface = false
+  })
+}
+
 // ----- LLM docs coverage check -----
 
 function collectMarkdownContent(dir, options = {}) {
@@ -1071,6 +1135,7 @@ if (jsonMode) {
       'form-composite-api': '表单复合组件 R15 旧 API 禁止回流',
       'navigation-api': '导航组件 R16 旧 API 与子路径目标禁止回流',
       'data-table-api': 'Data/Table R17 旧 API 禁止回流',
+      'composite-api': 'Composite/业务组件 R20 旧 API 禁止回流',
       'controlled-parity': '受控量双端对称',
       'public-deprecated': '公开 API 禁止 @deprecated',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',

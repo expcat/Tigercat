@@ -34,6 +34,8 @@
 - **VirtualTable 数据与选择 API**：VirtualTable 删除 `data`、`rowHeight`、`height`、`selectable`、`selectedKeys`、`onSelect` 公共入口；请改用 `dataSource`、`virtualItemHeight`、`virtualHeight`、`rowSelection`，React 使用 `onSelectionChange`，Vue 使用 `selection-change` / `update:rowSelection`。
 - **Table 虚拟化阈值 API**：Table / DataTableWithToolbar 删除 `autoVirtualThreshold`；自动虚拟化启用和推荐态统一由 `virtualThreshold` 控制，`virtual=true` 仍强制启用。
 - **core table 泛型类型**：移除重复的 `GenericTableColumn`、`GenericRowSelection`、`GenericExpandable`、`GenericTableProps`；请改用 `TableColumn<T>`、`RowSelectionConfig<T>`、`ExpandableConfig<T>`、`TableProps<T>`。
+- **Kanban 数据模型类型别名**：移除 `KanbanCard`、`KanbanColumn`、`KanbanCardMoveEvent`、`KanbanColumnMoveEvent` 公共别名；Kanban 复用 TaskBoard 数据模型，请直接使用 `TaskBoardCard`、`TaskBoardColumn`、`TaskBoardCardMoveEvent`、`TaskBoardColumnMoveEvent`。`KanbanProps` 与 `KanbanSwimlane` 保留。
+- **DataTableWithToolbar 业务回调收敛**：移除组件顶层 `onSearchChange`、`onSearch`、`onFiltersChange`、`onBulkAction`，业务回调统一从 `toolbar` 配置发出——React 使用 `toolbar.onSearchChange` / `toolbar.onSearch` / `toolbar.onFiltersChange` / `toolbar.onBulkAction`，Vue 继续使用 `@search-change` / `@search` / `@filters-change` / `@bulk-action` 事件。`onPageChange` / `onPageSizeChange` / `onSelectionChange` 等分页与表格回调仍为组件顶层 API。
 
 ### Infrastructure
 
@@ -49,6 +51,8 @@
 - `api:validate` 会阻止 Form composite selectors 回退到已删除的尺寸别名、DatePicker / TimePicker 旧模型别名、旧搜索 props/events 或重复空态命名。
 - `api:validate` 会阻止 Navigation 子组件 subpath 重新指向独立 shim、React Tabs / ScrollSpy 回退到 `onChange`，或 React Menu 回退到旧 `onSearch`。
 - `api:validate` 会阻止 Data/Table stack 回退到 VirtualTable 旧数据/选择 props、Table `autoVirtualThreshold` 或重复 `GenericTable*` public interfaces。
+- `api:validate` 会阻止 Kanban 重新导出 `KanbanCard` / `KanbanColumn` / `KanbanCardMoveEvent` / `KanbanColumnMoveEvent` 别名，以及 DataTableWithToolbar 重新引入顶层 `onSearchChange` / `onSearch` / `onFiltersChange` / `onBulkAction` 业务回调。
+- core composite 巨型类型文件 `composite.ts` 按组件拆分为 `chat.ts`、`activity-feed.ts`、`comment-thread.ts`、`notification-center.ts`、`table-toolbar.ts`、`form-wizard.ts`、`task-board.ts`，`composite.ts` 改为薄 barrel；公共类型导出经 `@expcat/tigercat-core` 根入口保持不变。
 - `tokens:build` / `tokens:check` 的生成面收敛为 canonical token 输出，移除 legacy CSS 变量和 token alias API 生成。
 - `release:check` 和 `publish:check` 增加 ESM-only 断言，发布 smoke 使用临时安装目录中的 bare ESM import 验证包入口，并阻止 `.cjs` 文件混入 tarball 或安装产物。
 - `release:check` 会阻止 React / Vue 恢复宽泛 sideEffects 声明；`publish:check` 会对安装后的 React / Vue root Button named import 和 Button 子路径 import 做 bundler smoke，确保普通 Button bundle 不拉入 Message / notification 命令式挂载代码。

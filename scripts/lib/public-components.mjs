@@ -104,7 +104,16 @@ export const CATEGORIES = {
     'virtual-list',
     'virtual-table'
   ],
-  Composite: ['composite'],
+  Composite: [
+    'activity-feed',
+    'chat',
+    'comment-thread',
+    'composite',
+    'form-wizard',
+    'notification-center',
+    'table-toolbar',
+    'task-board'
+  ],
   Core: ['base', 'events', 'floating-popup', 'generics', 'locale', 'slots', 'theme']
 }
 

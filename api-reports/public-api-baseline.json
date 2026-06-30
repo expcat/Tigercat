@@ -1675,11 +1675,7 @@
       "jaJPDatePickerLocale",
       "Justify",
       "kanbanAddColumnClasses",
-      "KanbanCard",
       "kanbanCardCountClasses",
-      "KanbanCardMoveEvent",
-      "KanbanColumn",
-      "KanbanColumnMoveEvent",
       "kanbanFilterHighlightClasses",
       "KanbanProps",
       "KanbanSwimlane",
@@ -3433,15 +3429,10 @@
     "DataTableWithToolbarProps": {
       "extends": ["Omit"],
       "props": [
-        "onBulkAction",
-        "onFiltersChange",
         "onPageChange",
         "onPageSizeChange",
-        "onSearch",
-        "onSearchChange",
         "pageSize",
         "pagination",
-        "selectedKeys",
         "tableClassName",
         "toolbar"
       ]

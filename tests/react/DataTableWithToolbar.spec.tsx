@@ -242,9 +242,9 @@ describe('DataTableWithToolbar (React)', () => {
         toolbar={{
           bulkActions: [{ key: 'export', label: 'Export' }],
           selectedKeys: [1],
-          defaultSearchValue: ''
+          defaultSearchValue: '',
+          onSearch: vi.fn()
         }}
-        onSearch={vi.fn()}
         pagination={false}
       />
     )
@@ -263,9 +263,9 @@ describe('DataTableWithToolbar (React)', () => {
           selectedKeys: [1],
           defaultSearchValue: '',
           searchButtonText: 'Go',
-          bulkActionsLabel: 'Picked'
+          bulkActionsLabel: 'Picked',
+          onSearch: vi.fn()
         }}
-        onSearch={vi.fn()}
         pagination={false}
       />
     )
@@ -301,8 +301,7 @@ describe('DataTableWithToolbar (React)', () => {
       <DataTableWithToolbar<RowData>
         columns={columns}
         dataSource={[]}
-        toolbar={{ searchPlaceholder: '搜索名称', showSearchButton: false }}
-        onSearch={onSearch}
+        toolbar={{ searchPlaceholder: '搜索名称', showSearchButton: false, onSearch }}
         pagination={false}
       />
     )
@@ -358,9 +357,9 @@ describe('DataTableWithToolbar (React)', () => {
           toolbar={{
             bulkActions: [{ key: 'export', label: '导出' }],
             selectedKeys: [1],
-            defaultSearchValue: ''
+            defaultSearchValue: '',
+            onSearch: vi.fn()
           }}
-          onSearch={vi.fn()}
           pagination={false}
         />
       </ConfigProvider>
@@ -742,11 +741,11 @@ describe('DataTableWithToolbar (React)', () => {
                 <button onClick={() => setFilter('status', 'active')}>筛选</button>
                 <button onClick={() => setHiddenColumnKeys(['name'])}>隐藏列</button>
               </div>
-            )
+            ),
+            onFiltersChange,
+            onSearchChange,
+            onSearch
           }}
-          onFiltersChange={onFiltersChange}
-          onSearchChange={onSearchChange}
-          onSearch={onSearch}
           onHiddenColumnKeysChange={onHiddenColumnKeysChange}
         />
       )

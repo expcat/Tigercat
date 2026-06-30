@@ -278,6 +278,60 @@ core 不再导出与 Table 类型重复的泛型接口：
 + import type { TableProps, TableColumn } from '@expcat/tigercat-core'
 ```
 
+### Composite / business 组件数据模型与回调收敛
+
+Kanban 复用 TaskBoard 的卡片、列与移动事件数据模型；不再导出并行的 `Kanban*` 类型别名：
+
+- `KanbanCard` → `TaskBoardCard`
+- `KanbanColumn` → `TaskBoardColumn`
+- `KanbanCardMoveEvent` → `TaskBoardCardMoveEvent`
+- `KanbanColumnMoveEvent` → `TaskBoardColumnMoveEvent`
+
+```diff
+- import type { KanbanCard, KanbanColumn } from '@expcat/tigercat-core'
++ import type { TaskBoardCard, TaskBoardColumn } from '@expcat/tigercat-core'
+```
+
+`KanbanProps` 与 `KanbanSwimlane` 保留，Kanban 仍是 TaskBoard 的薄封装。
+
+DataTableWithToolbar 的搜索 / 筛选 / 批量操作业务回调统一从 `toolbar` 配置发出，组件顶层不再保留 `onSearchChange` / `onSearch` / `onFiltersChange` / `onBulkAction`。React 把这些回调移入 `toolbar`：
+
+```diff
+  <DataTableWithToolbar
+    columns={columns}
+    dataSource={rows}
+-   toolbar={{ searchPlaceholder: '搜索' }}
+-   onSearchChange={setKeyword}
+-   onSearch={runSearch}
+-   onFiltersChange={setFilters}
+-   onBulkAction={handleBulk}
++   toolbar={{
++     searchPlaceholder: '搜索',
++     onSearchChange: setKeyword,
++     onSearch: runSearch,
++     onFiltersChange: setFilters,
++     onBulkAction: handleBulk
++   }}
+    onPageChange={handlePageChange}
+    onSelectionChange={setSelectedRowKeys}
+  />
+```
+
+Vue 继续使用组件事件（无需迁移）：
+
+```vue
+<DataTableWithToolbar
+  :columns="columns"
+  :data-source="rows"
+  :toolbar="{ searchPlaceholder: '搜索' }"
+  @search-change="keyword = $event"
+  @search="runSearch"
+  @filters-change="filters = $event"
+  @bulk-action="handleBulk" />
+```
+
+`onPageChange` / `onPageSizeChange` / `onSelectionChange`（Vue `@page-change` / `@page-size-change` / `@selection-change`）等分页与表格回调仍是组件顶层 API。core composite 类型文件已按组件拆分，但公共类型导出经 `@expcat/tigercat-core` 根入口保持不变，无需调整 import 路径。
+
 ### Carousel 索引改为受控模型
 
 `Carousel` 移除 `initialSlide`，改为与其他非表单受控量一致的 `currentIndex` 模型。

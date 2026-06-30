@@ -1,23 +1,12 @@
 /**
  * Kanban types — extends TaskBoard with kanban-specific features.
  *
- * Since v0.9.0, filter/card-count/add-button features have been merged into
- * TaskBoardProps.  KanbanProps now only adds swimlane-specific extensions.
+ * Card/column/move data models are shared with TaskBoard: use `TaskBoardCard`,
+ * `TaskBoardColumn`, `TaskBoardCardMoveEvent` and `TaskBoardColumnMoveEvent`
+ * directly. `KanbanProps` only adds swim-lane specific extensions.
  */
 
-import type {
-  TaskBoardCard,
-  TaskBoardColumn,
-  TaskBoardCardMoveEvent,
-  TaskBoardColumnMoveEvent,
-  TaskBoardProps
-} from './composite'
-
-// Re-export TaskBoard types as Kanban aliases for discoverability
-export type KanbanCard = TaskBoardCard
-export type KanbanColumn = TaskBoardColumn
-export type KanbanCardMoveEvent = TaskBoardCardMoveEvent
-export type KanbanColumnMoveEvent = TaskBoardColumnMoveEvent
+import type { TaskBoardProps } from './task-board'
 
 /** Kanban-specific swim-lane grouping */
 export interface KanbanSwimlane {

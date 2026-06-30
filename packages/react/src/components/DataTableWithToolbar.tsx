@@ -58,25 +58,11 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>>
     Omit<TableProps<T>, 'className' | 'onPageChange'>,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /**
-   * Toolbar configuration
+   * Toolbar configuration. Business callbacks (search/filters/bulk actions)
+   * are configured here via `toolbar.onSearchChange`, `toolbar.onSearch`,
+   * `toolbar.onFiltersChange` and `toolbar.onBulkAction`.
    */
   toolbar?: ReactTableToolbarProps
-  /**
-   * Search change handler
-   */
-  onSearchChange?: (value: string) => void
-  /**
-   * Search submit handler
-   */
-  onSearch?: (value: string) => void
-  /**
-   * Filters change handler
-   */
-  onFiltersChange?: (filters: Record<string, TableToolbarFilterValue>) => void
-  /**
-   * Bulk action handler
-   */
-  onBulkAction?: (action: TableToolbarAction, selectedKeys: (string | number)[]) => void
   /**
    * Page change handler
    */
@@ -99,10 +85,6 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   toolbar,
   locale,
   labels,
-  onSearchChange,
-  onSearch,
-  onFiltersChange,
-  onBulkAction,
   hiddenColumnKeys,
   defaultHiddenColumnKeys,
   onHiddenColumnKeysChange,
@@ -220,9 +202,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       toolbar.defaultSearchValue !== undefined ||
       toolbar.showSearchButton ||
       toolbar.onSearchChange ||
-      toolbar.onSearch ||
-      onSearchChange ||
-      onSearch)
+      toolbar.onSearch)
   )
   const hasFilters = Boolean(toolbar?.filters && toolbar.filters.length > 0)
   const hasFiltersExtra = Boolean(toolbar?.filtersExtra)
@@ -267,12 +247,10 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     if (toolbar?.searchValue === undefined) {
       setInternalSearch(value)
     }
-    onSearchChange?.(value)
     toolbar?.onSearchChange?.(value)
   }
 
   const handleSearchSubmit = () => {
-    onSearch?.(searchValue ?? '')
     toolbar?.onSearch?.(searchValue ?? '')
   }
 
@@ -293,7 +271,6 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       }))
     }
 
-    onFiltersChange?.(nextFilters)
     toolbar?.onFiltersChange?.(nextFilters)
   }
 
@@ -304,7 +281,6 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   const handleBulkAction = (action: TableToolbarAction) => {
     const keys = selectedKeys ?? []
     action.onClick?.(keys)
-    onBulkAction?.(action, keys)
     toolbar?.onBulkAction?.(action, keys)
   }
 
@@ -455,7 +431,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                   variant="primary"
                   className="whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md,0.5rem)] px-3"
                   onClick={handleSearchSubmit}
-                  disabled={!onSearch && !toolbar?.onSearch}>
+                  disabled={!toolbar?.onSearch}>
                   {toolbar?.searchButtonText ?? tableLabels.searchButtonText}
                 </Button>
               ) : null}

@@ -3,24 +3,24 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: v2.0.0 breaking component API simplification and grouped validation plan
-verified-date: 2026-06-29
-source: current repository state after R17 Data and table stack completion
+verified-date: 2026-06-30
+source: current repository state after R20 composite/business cleanup (v2.0 release hardening deferred)
 -->
 
 本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；R01-R17 已完成任务的详细执行记录归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，需要历史证据时从归档、git 历史、变更日志或对应提交中查找。
 
 ## 当前状态
 
-截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R17 基础设施、API 审计与前六个组件批次清理：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy token/icon 资源清理、按组件组验证通道、core/shared contracts 删除合并清单、Basic/Layout 轻量组件 API 清理、Feedback/overlay open/portal/focus/close lifecycle 收敛、Form primitives 受控模型与尺寸别名清理、Form composite selectors 搜索/空态/模型别名与 heavy helper 拆分、Navigation 受控回调和子组件 subpath 产物收敛，以及 Data/table stack 数据、选择与虚拟滚动入口统一已经落地。v2.0.0 尚未完成发布前剩余组件级破坏性升级；R18-R20 是 v2.0.0 发布前剩余任务。
+截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R17 基础设施、API 审计与前六个组件批次清理：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy token/icon 资源清理、按组件组验证通道、core/shared contracts 删除合并清单、Basic/Layout 轻量组件 API 清理、Feedback/overlay open/portal/focus/close lifecycle 收敛、Form primitives 受控模型与尺寸别名清理、Form composite selectors 搜索/空态/模型别名与 heavy helper 拆分、Navigation 受控回调和子组件 subpath 产物收敛，以及 Data/table stack 数据、选择与虚拟滚动入口统一已经落地。R20 Composite/business 组件 API 清理已于 2026-06-30 提前完成（移除 Kanban 数据模型别名、收敛 DataTableWithToolbar 业务回调、拆分 composite 巨型类型文件），但 R20 不再作为 v2.0.0 的发布收口任务：v2.0.0 后续仍会追加新的更新计划，发布前仍需完成 R18、R19 与最终发布收口，因此本批次不准备发布版本。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）、阶段 6（R11 Core API and shared contracts audit）、阶段 7（R12 Basic + Layout lightweight components）、阶段 8（R13 Feedback and overlay components）、阶段 9（R14-R15 Form primitives 与 composite selectors）、阶段 10（R16 Navigation components）和阶段 11（R17 Data and table stack）已完成于 2026-06-29。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）、阶段 6（R11 Core API and shared contracts audit）、阶段 7（R12 Basic + Layout lightweight components）、阶段 8（R13 Feedback and overlay components）、阶段 9（R14-R15 Form primitives 与 composite selectors）、阶段 10（R16 Navigation components）和阶段 11（R17 Data and table stack）已完成于 2026-06-29。阶段 14（R20 Composite/business components）的组件级 API 清理已于 2026-06-30 提前完成，但其 v2.0 发布收口部分按维护决定 deferred，本批次不发布版本。
 - 当前阶段：阶段 12（R18 Charts and visualization stack），状态为 `未开始`。
 - 当前可执行任务：R18 Charts and visualization stack。
-- 后续阶段：R18-R20 必须按阶段依赖执行；v2.0.0 只有 R20 完成并通过发布门禁后才算路线图完成。
+- 后续阶段：R18、R19 仍需执行；R20 组件清理已提前落地，但 v2.0.0 发布收口不再绑定 R20，需在 R18、R19 完成后单独完成最终发布门禁。v2.0.0 后续仍会追加新的更新计划，路线图不在 R20 处收口。
 
 ## 执行原则
 
@@ -47,23 +47,23 @@ source: current repository state after R17 Data and table stack completion
 
 ## 阶段与依赖
 
-| 阶段 | 阶段状态             | 任务    | 执行规则                                                              |
-| ---- | -------------------- | ------- | --------------------------------------------------------------------- |
-| 0    | 已完成（2026-06-28） | R01     | 只做路线图清理；为后续 v2 任务建立边界                                |
-| 1    | 已完成（2026-06-28） | R02-R03 | 先稳定版本与 release metadata，再切换 ESM-only 发布面                 |
-| 2    | 已完成（2026-06-28） | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects  |
-| 3    | 已完成（2026-06-28） | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次 |
-| 4    | 已完成（2026-06-28） | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                 |
-| 5    | 已完成（2026-06-29） | R10     | 先建立按组件组可执行的测试、文档和示例维护通道                        |
-| 6    | 已完成（2026-06-29） | R11     | 审计 core API 与 shared contracts，形成组件批次删除/合并清单          |
-| 7    | 已完成（2026-06-29） | R12     | 清理 Basic + Layout 轻量展示组件                                      |
-| 8    | 已完成（2026-06-29） | R13     | 清理 Feedback 与 overlay 组件                                         |
-| 9    | 已完成（2026-06-29） | R14-R15 | 分两批清理 Form primitives 与 composite selectors                     |
-| 10   | 已完成（2026-06-29） | R16     | 清理 Navigation 组件                                                  |
-| 11   | 已完成（2026-06-29） | R17     | 清理 Data 与 table stack                                              |
-| 12   | 未开始               | R18     | 清理 Charts 与 visualization stack                                    |
-| 13   | 未开始               | R19     | 清理 Advanced editors 与 media-heavy components                       |
-| 14   | 未开始               | R20     | 清理 Composite/business components 并完成 v2.0 release hardening      |
+| 阶段 | 阶段状态                                        | 任务    | 执行规则                                                                                  |
+| ---- | ----------------------------------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| 0    | 已完成（2026-06-28）                            | R01     | 只做路线图清理；为后续 v2 任务建立边界                                                    |
+| 1    | 已完成（2026-06-28）                            | R02-R03 | 先稳定版本与 release metadata，再切换 ESM-only 发布面                                     |
+| 2    | 已完成（2026-06-28）                            | R04-R05 | 先建立显式 exports 与公开组件事实源，再调整 tree-shaking/sideEffects                      |
+| 3    | 已完成（2026-06-28）                            | R06-R07 | 删除兼容 API、legacy token 与旧资源；按 API baseline 和目标测试拆批次                     |
+| 4    | 已完成（2026-06-28）                            | R08-R09 | 更新按需加载使用面，并增加 size/publish artifact 门禁                                     |
+| 5    | 已完成（2026-06-29）                            | R10     | 先建立按组件组可执行的测试、文档和示例维护通道                                            |
+| 6    | 已完成（2026-06-29）                            | R11     | 审计 core API 与 shared contracts，形成组件批次删除/合并清单                              |
+| 7    | 已完成（2026-06-29）                            | R12     | 清理 Basic + Layout 轻量展示组件                                                          |
+| 8    | 已完成（2026-06-29）                            | R13     | 清理 Feedback 与 overlay 组件                                                             |
+| 9    | 已完成（2026-06-29）                            | R14-R15 | 分两批清理 Form primitives 与 composite selectors                                         |
+| 10   | 已完成（2026-06-29）                            | R16     | 清理 Navigation 组件                                                                      |
+| 11   | 已完成（2026-06-29）                            | R17     | 清理 Data 与 table stack                                                                  |
+| 12   | 未开始                                          | R18     | 清理 Charts 与 visualization stack                                                        |
+| 13   | 未开始                                          | R19     | 清理 Advanced editors 与 media-heavy components                                           |
+| 14   | 组件清理已完成（2026-06-30）；发布收口 deferred | R20     | 清理 Composite/business components；v2.0 release hardening 不再绑定本批次，发布前单独收口 |
 
 阶段状态规则：
 
@@ -153,9 +153,11 @@ R01-R17 已完成，详细执行摘要、实际验证命令和状态回写记录
 
 ### R20 Composite/business components and v2.0 release hardening
 
-**状态**：未开始。
+**状态**：组件级 API 清理已完成（2026-06-30）；v2.0 发布收口 deferred、本批次不发布版本。
 
-**目标**：清理 Composite/business components，移除 legacy prop passthrough，统一业务对象字段和基础组件新 API 使用，并完成 v2.0.0 发布前迁移与门禁收口。
+**执行摘要（2026-06-30）**：移除 `KanbanCard` / `KanbanColumn` / `KanbanCardMoveEvent` / `KanbanColumnMoveEvent` 公共别名（统一复用 `TaskBoard*`，保留 `KanbanProps` / `KanbanSwimlane`）；删除 DataTableWithToolbar 顶层 `onSearchChange` / `onSearch` / `onFiltersChange` / `onBulkAction`，业务回调收敛到 React `toolbar.*` 配置与 Vue 组件事件；将 `composite.ts` 巨型类型文件按组件拆分为 `chat` / `activity-feed` / `comment-thread` / `notification-center` / `table-toolbar` / `form-wizard` / `task-board` 并改 `composite.ts` 为薄 barrel；新增 `api:validate` R20 guard。详细记录见 [V2_API_AUDIT.md](V2_API_AUDIT.md) 与 [V2_COMPLETED.md](V2_COMPLETED.md)。R20 不再承担 v2.0.0 发布收口：`quality:release` 全量发布门禁、`api:baseline` release 收口与发布后 `smoke:published` 留待 R18、R19 完成后的最终发布批次执行。
+
+**目标**：清理 Composite/business components，移除 legacy prop passthrough，统一业务对象字段和基础组件新 API 使用。注意：v2.0.0 发布收口已从 R20 解绑，留待 R18、R19 完成后单独执行。
 
 **允许修改**：Composite 相关 core types、React/Vue 组件、目标 tests、Skill composite props/examples、example 使用、迁移说明、变更记录、API baseline、size budget、release/publish 文档和必要发布门禁。
 

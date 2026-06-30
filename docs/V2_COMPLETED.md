@@ -2,8 +2,8 @@
 
 <!-- LLM-INDEX
 type: completed-roadmap-archive
-scope: v2.0.0 completed R01-R17 roadmap execution details
-verified-date: 2026-06-29
+scope: v2.0.0 completed R01-R17 plus R20 composite/business cleanup roadmap execution details
+verified-date: 2026-06-30
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
@@ -753,3 +753,33 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `git diff --check`
 
 **状态更新要求**：完成后已写回状态、日期、删除的 Data/table API 摘要、固定列/虚拟滚动验证范围、Skill/examples 更新范围和关键验证命令；阶段 11 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R18。
+
+### R20 Composite/business components（组件清理，发布收口 deferred）
+
+**状态**：组件级 API 清理已完成（2026-06-30）；v2.0 发布收口 deferred、本批次不发布版本。
+
+**执行顺序说明**：按维护决定，R20 组件级 API 清理提前于 R18、R19 执行；R20 不再作为 v2.0.0 发布收口任务，v2.0.0 后续仍会追加新的更新计划，路线图不在 R20 处收口。
+
+**目标**：清理 Composite/business components，移除并行数据模型别名，收敛 DataTableWithToolbar 业务回调入口，并拆分 composite 巨型类型文件。
+
+**允许修改**：Composite 相关 core types、React/Vue 组件、目标 tests、Skill composite props/examples、example 使用、迁移说明、变更记录、API baseline、`scripts/lib/public-components.mjs` 与 `scripts/validate-api.mjs` 的 composite 分类与 guard。
+
+**不得修改**：R10-R19 已完成 API 的兼容回退、已完成分组测试入口的语义、未说明的新增功能；本批次不发布版本。
+
+**组件范围**：ActivityFeed、ChatWindow、CommentThread、FormWizard、NotificationCenter、TaskBoard、Kanban、DataTableWithToolbar。
+
+**执行摘要**：移除 `KanbanCard` / `KanbanColumn` / `KanbanCardMoveEvent` / `KanbanColumnMoveEvent` 公共类型别名（统一复用 `TaskBoardCard` / `TaskBoardColumn` / `TaskBoardCardMoveEvent` / `TaskBoardColumnMoveEvent`，保留 `KanbanProps` / `KanbanSwimlane`）；删除 core 与 React `DataTableWithToolbarProps` 顶层 `onSearchChange` / `onSearch` / `onFiltersChange` / `onBulkAction`，业务回调统一从 React `toolbar.*` 配置与 Vue 组件事件 `@search-change` / `@search` / `@filters-change` / `@bulk-action` 发出（`onPageChange` / `onPageSizeChange` / `onSelectionChange` 等分页与表格回调保持组件顶层）；将 `packages/core/src/types/composite.ts` 巨型类型文件按组件拆分为 `chat.ts`、`activity-feed.ts`、`comment-thread.ts`、`notification-center.ts`、`table-toolbar.ts`、`form-wizard.ts`、`task-board.ts`，`composite.ts` 改为薄 barrel，`kanban.ts` 改为从 `task-board.ts` 导入，并在 `scripts/lib/public-components.mjs` 的 Composite 分类补齐新文件 basename。React DataTableWithToolbar 示例与测试已迁移到 `toolbar.*` 回调；`scripts/validate-api.mjs` 新增 R20 guard（`composite-api`）阻止 Kanban 别名与 DataTableWithToolbar 顶层业务回调回流；API baseline、generated Skill references、迁移说明与变更记录已同步更新。
+
+**实际验证**：
+
+- `corepack pnpm test:group:composite`（19 文件 / 350 用例通过）
+- `npx tsc --noEmit -p packages/core/tsconfig.json`、`packages/react/tsconfig.json`、`packages/vue/tsconfig.json`、`examples/example/react/tsconfig.json`
+- `corepack pnpm api:validate`
+- `corepack pnpm types:check`
+- `corepack pnpm api:baseline`（core exports 2882→2878）
+- `corepack pnpm docs:api`
+- `git diff --check`
+
+**发布收口 deferred**：`corepack pnpm quality:release` 全量发布门禁、`api:baseline:check`、发布后 `corepack pnpm smoke:published` 因本批次不发布而留待 R18、R19 完成后的最终发布批次执行。
+
+**状态更新要求**：已写回 R20 状态、日期、删除/拆分摘要、唯一替代 API 与关键验证命令；阶段 14 标为「组件清理已完成（2026-06-30）；发布收口 deferred」，并在 [V2_API_AUDIT.md](V2_API_AUDIT.md) 追加 R20 批次记录。v2.0.0 路线图不在 R20 处收口。
