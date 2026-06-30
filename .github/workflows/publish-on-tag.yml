@@ -90,6 +90,10 @@ jobs:
         if: steps.release_tag.outputs.found == 'true'
         run: pnpm install --frozen-lockfile
 
+      - name: Run release gate
+        if: steps.release_tag.outputs.found == 'true'
+        run: pnpm quality:release
+
       - name: Publish packages
         if: steps.release_tag.outputs.found == 'true'
         run: pnpm release

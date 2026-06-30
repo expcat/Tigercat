@@ -2,9 +2,9 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
-## v2.0.0-preview.1
+## v2.0.0-preview.2
 
-v2.0.0 preview 1 使用当前 v2.0.0 破坏性升级迁移路径。预览版本号已同步到四个发布包、运行时 `version` 导出、CLI 版本常量、CLI 模板 Tigercat 依赖范围和示例首页；迁移操作请按下方 v2.0.0 条目执行。
+v2.0.0 preview 2 使用当前 v2.0.0 破坏性升级迁移路径。预览版本号已同步到四个发布包、运行时 `version` 导出、CLI 版本常量、CLI 模板 Tigercat 依赖范围和示例首页；迁移操作请按下方 v2.0.0 条目执行。
 
 ## v2.0.0
 
