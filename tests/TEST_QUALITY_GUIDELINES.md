@@ -56,6 +56,17 @@ The validation script checks two severity levels:
 - No `describe('Edge Cases')` or `describe('Boundary')` section
 - No `expectNoA11yViolations` accessibility checks
 
+### Grouped Validation
+
+Use grouped validation for component-family work before broad release gates:
+
+- Component changes: run the matching `pnpm test:group:<group>`.
+- Cross-group helper changes: run each affected `pnpm test:group:<group>` and any focused `vitest run` checks.
+- Documentation or example changes: add the relevant docs/examples check and changed-file Prettier check.
+- Release-surface or gate-policy changes: upgrade to `pnpm quality:release`.
+
+`pnpm test:group` accepts `--group` / `TEST_GROUP`, `--framework` / `TEST_FRAMEWORK`, `--filter` / `TEST_FILTER`, and `--list`. `pnpm test:validate` accepts the same group, framework, and filter controls for scoped quality scans. `--framework react|vue` narrows React/Vue component specs but still includes shared core specs for that group. Current `form` aliases are `--filter primitives` and `--filter composite`.
+
 ### Qualitative Metrics
 
 - All prop combinations tested

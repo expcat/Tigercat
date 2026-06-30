@@ -871,3 +871,36 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `npx -y pnpm@11.9.0 publish:check`
 
 **状态更新要求**：完成后已写回状态、日期、删除的 Advanced/media API 摘要、SSR/browser guard 验证范围、Skill/examples 更新范围和关键验证命令；阶段 13 已同步为 `已完成（2026-06-30）`。R10-R20 组件级 API 清理已完成，v2.0.0 发布收口仍按维护决定单独执行。
+
+### R21 Grouped validation audit and script tightening
+
+**状态**：已完成（2026-06-30）。
+
+**目标**：审计当前分组测试入口是否能按组件组、框架和过滤器精准执行，补齐轻量自检与后续 Rxx 验证模板，避免后续维护误跑全量或漏跑目标组。
+
+**允许修改**：`scripts/lib/component-test-groups.mjs`、`scripts/run-component-group-tests.mjs`、`scripts/validate-tests.mjs`、`package.json` scripts、`scripts/README.md`、`tests/TEST_QUALITY_GUIDELINES.md`、必要的分组覆盖测试。
+
+**不得修改**：组件运行时行为、public API、Skill references 内容重写、examples 大规模示例改造、发布 workflow。
+
+**执行摘要**：已审计全部 10 个 group 的解析结果，当前文件数量为 `basic 79`、`form 75`、`feedback 29`、`layout 25`、`navigation 39`、`data 19`、`charts 42`、`advanced 38`、`composite 19`、`core 122`。`form/react/primitives` 解析 15 个文件，`form/vue/composite` 解析 20 个文件；`TEST_GROUP=form pnpm test:validate` 只扫描目标组 75 个文件并保留现有 56 个 soft warnings。新增 `tests/core/component-test-groups.spec.ts` 覆盖 group 列表、非空解析、排序去重、core-only 解析、framework narrowing、filter alias、未知参数错误、空 filter 失败和 root package scripts 入口。`scripts/README.md` 与 `tests/TEST_QUALITY_GUIDELINES.md` 已明确 `--framework` 只缩窄 React/Vue component specs 且保留 shared core specs，并记录后续 Rxx 验证模板。
+
+**脚本调整范围**：未修改 runner 语义或 package scripts；现有 `test:group`、`test:group:*` 与 `test:validate` 已满足 R21 目标，本轮只增加自检和文档约束。
+
+**后续验证模板**：
+
+- 组件源码改动运行对应 `pnpm test:group:<group>`，必要时用 `--framework` 或 `--filter` 缩小范围。
+- 跨组 helper 改动运行所有受影响 group，并补充 focused `vitest run`。
+- 文档或示例改动补充 `docs:api:check`、相关 examples 检查和 changed-file Prettier check。
+- 发布面或门禁策略变更升级到 `pnpm quality:release`。
+
+**实际验证**：
+
+- `corepack pnpm test:group -- --group form --list`
+- `corepack pnpm test:group:form -- --framework react --filter primitives --list`
+- `TEST_GROUP=form corepack pnpm test:validate`
+- `corepack pnpm vitest run tests/core/component-test-groups.spec.ts`
+- `corepack pnpm prettier --check scripts/README.md tests/TEST_QUALITY_GUIDELINES.md docs/ROADMAP.md docs/V2_COMPLETED.md tests/core/component-test-groups.spec.ts`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/V2_COMPLETED.md scripts/README.md tests/TEST_QUALITY_GUIDELINES.md tests/core/component-test-groups.spec.ts`
+- `git diff --check`
+
+**状态更新要求**：已写回 R21 状态、日期、分组审计结论、脚本调整范围、后续验证模板和关键验证命令；阶段 15 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R22。R21 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。

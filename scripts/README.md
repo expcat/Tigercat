@@ -40,7 +40,7 @@ pnpm example:all -- --smoke --smoke-ms=2000
 
 ## 组件分组测试
 
-R10 之后的组件批次优先运行对应分组测试，再按变更范围补充 API、docs、examples 或发布门禁。分组来自 `scripts/lib/public-components.mjs` 的组件 Category，runner 会同时收集 React/Vue 组件 spec、同组 core utils spec 和必要 cross-cutting spec。
+R10 之后的组件批次优先运行对应分组测试，再按变更范围补充 API、docs、examples 或发布门禁。分组来自 `scripts/lib/public-components.mjs` 的组件 Category，runner 会同时收集 React/Vue 组件 spec、同组 core utils spec 和必要 cross-cutting spec。`--framework react|vue` 只缩窄 React/Vue 组件 spec，仍会保留同组 shared core spec。
 
 ```bash
 pnpm test:group -- --group form --list
@@ -50,7 +50,14 @@ pnpm test:group:form -- --filter primitives
 TEST_GROUP=form pnpm test:validate
 ```
 
-可用分组：`basic`、`form`、`feedback`、`layout`、`navigation`、`data`、`charts`、`advanced`、`composite`、`core`。修改组件文档或示例时，同步运行 `pnpm docs:api:check`、相关 examples 检查和 changed-file Prettier check；发布面变更再升级到 `pnpm quality:release`。
+可用分组：`basic`、`form`、`feedback`、`layout`、`navigation`、`data`、`charts`、`advanced`、`composite`、`core`。`pnpm test:group` 支持 `--group` / `TEST_GROUP`、`--framework` / `TEST_FRAMEWORK`、`--filter` / `TEST_FILTER` 和 `--list`；`pnpm test:validate` 支持同一组参数用于只扫描目标组测试质量。当前 `form` 支持 `primitives` 与 `composite` filter alias。
+
+后续 Rxx 验证模板：
+
+- 组件源码改动：运行对应 `pnpm test:group:<group>`，必要时用 `--framework` 或 `--filter` 缩小范围。
+- 跨组 helper 改动：运行所有受影响 group 的 `pnpm test:group:<group>`，再补充相关 focused `vitest run`。
+- 文档或示例改动：同步运行 `pnpm docs:api:check`、相关 examples 检查和 changed-file Prettier check。
+- 发布面或门禁策略变更：升级到 `pnpm quality:release`。
 
 ## 内部 helper（仅限仓库脚本）
 

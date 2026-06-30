@@ -11,16 +11,16 @@ source: current repository state after R19 Advanced/media and R20 Composite/busi
 
 ## 当前状态
 
-截至 2026-06-30，T01-T14 与 v2.0.0 R01-R20 组件级 API 清理已完成；R20 的 v2.0 发布收口按维护决定 deferred，本批次不发布版本。当前路线图进入新的 v2.0 后续维护批次，只规划 R21-R23，后续仍会追加功能计划。
+截至 2026-06-30，T01-T14 与 v2.0.0 R01-R21 已完成；R20 的 v2.0 发布收口按维护决定 deferred，本批次不发布版本。当前路线图进入新的 v2.0 后续维护批次，只规划 R22-R23，后续仍会追加功能计划。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0-14 已完成 R01-R20 组件级 API 清理；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
-- 当前阶段：阶段 15（R21 grouped validation audit and script tightening），先确认测试脚本是否可按组/框架/过滤器执行，避免后续验证误跑无关任务。
-- 当前可执行任务：R21 grouped validation audit and script tightening。
-- 后续阶段：R22 Skill reference compression，R23 example demo consolidation。v2.0.0 仍会追加新的维护与功能计划，路线图不在 R23 处收口。
+- 已完成阶段：阶段 0-15 已完成 R01-R21；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
+- 当前阶段：阶段 16（R22 Skill reference compression and routing），压缩 Skill 读取路径并保留按需定位能力。
+- 当前可执行任务：R22 Skill reference compression and routing。
+- 后续阶段：R23 example demo consolidation。v2.0.0 仍会追加新的维护与功能计划，路线图不在 R23 处收口。
 
 ## 执行原则
 
@@ -50,7 +50,7 @@ source: current repository state after R19 Advanced/media and R20 Composite/busi
 | 阶段 | 阶段状态             | 任务    | 执行规则                                                                |
 | ---- | -------------------- | ------- | ----------------------------------------------------------------------- |
 | 0-14 | 已完成（2026-06-30） | R01-R20 | 已完成组件级 API 清理，细节归档到 `V2_COMPLETED.md` / `V2_API_AUDIT.md` |
-| 15   | 未开始               | R21     | 先审计并收紧分组验证入口，确保后续维护不会误跑全量或漏跑目标组          |
+| 15   | 已完成（2026-06-30） | R21     | 已审计并收紧分组验证入口，确保后续维护不会误跑全量或漏跑目标组          |
 | 16   | 未开始               | R22     | 压缩 Skill 读取路径，删除对 LLM 使用组件库无帮助的维护者内容            |
 | 17   | 未开始               | R23     | 整合示例演示并让展示代码成为可复制复现的完整代码                        |
 
@@ -69,7 +69,7 @@ R01-R20 已完成，主路线图不再展开逐项一行摘要；需要追溯执
 
 ### R21 Grouped validation audit and script tightening
 
-**状态**：未开始。
+**状态**：已完成（2026-06-30）。
 
 **目标**：检查当前测试脚本是否能按组件组、框架和过滤器精准执行，避免后续更新验证时运行过多无关任务或漏跑相关任务；必要时收紧脚本、文档和 package scripts。
 
@@ -80,6 +80,8 @@ R01-R20 已完成，主路线图不再展开逐项一行摘要；需要追溯执
 **依赖/阻塞**：基于 R10 已建立的 `test:group` / `test:validate -- --group` 能力；若发现组归属来自 `scripts/lib/public-components.mjs` 的事实源不完整，应先修事实源再调整 runner。
 
 **当前事实**：root scripts 已有 `test:group`、`test:group:{basic|form|feedback|layout|navigation|data|charts|advanced|composite|core}` 和 `test:validate`；runner 支持 `--group`、`--framework`、`--filter`、`--list`，`validate-tests.mjs` 支持 `TEST_GROUP` / `--group` / `--framework` / `--filter`。
+
+**完成摘要**：已审计全部 10 个 group 的 `--list` 输出并确认均非空；`form/react/primitives` 与 `form/vue/composite` 能精准缩窄框架与 filter alias，同时保留同组 shared core specs。新增 `tests/core/component-test-groups.spec.ts` 固定 group 列表、路径排序/去重、framework narrowing、filter alias、空结果失败和 root package scripts 入口；`scripts/README.md` 与 `tests/TEST_QUALITY_GUIDELINES.md` 已补充后续 Rxx 验证模板。
 
 **计划检查项**：
 
@@ -93,11 +95,11 @@ R01-R20 已完成，主路线图不再展开逐项一行摘要；需要追溯执
 - `corepack pnpm test:group -- --group form --list`
 - `corepack pnpm test:group:form -- --framework react --filter primitives --list`
 - `TEST_GROUP=form corepack pnpm test:validate`
-- `corepack pnpm vitest run <新增或受影响脚本测试>`
-- `corepack pnpm prettier --check docs/ROADMAP.md docs/V2_COMPLETED.md scripts/README.md tests/TEST_QUALITY_GUIDELINES.md`
+- `corepack pnpm vitest run tests/core/component-test-groups.spec.ts`
+- `corepack pnpm prettier --check scripts/README.md tests/TEST_QUALITY_GUIDELINES.md docs/ROADMAP.md docs/V2_COMPLETED.md tests/core/component-test-groups.spec.ts`
 - `git diff --check`
 
-**状态更新要求**：完成后写回状态、日期、分组审计结论、脚本调整范围、后续验证模板和关键验证命令；同步更新阶段 15 状态，并将当前可执行任务推进到 R22。
+**状态更新要求**：已写回状态、日期、分组审计结论、脚本调整范围、后续验证模板和关键验证命令；阶段 15 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R22。
 
 ### R22 Skill reference compression and routing
 
