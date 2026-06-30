@@ -2,12 +2,12 @@
 
 <!-- LLM-INDEX
 type: completed-roadmap-archive
-scope: v2.0.0 completed R01-R20 component cleanup roadmap execution details
+scope: v2.0.0 completed R01-R23 roadmap execution details
 verified-date: 2026-06-30
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
-本文归档 v2.0.0 Roadmap 已完成 R01-R20 组件级清理详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
+本文归档 v2.0.0 Roadmap 已完成 R01-R23 批次的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
 
 ## 已完成任务详情
 
@@ -413,7 +413,7 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `corepack pnpm api:baseline:check`
 - `git diff --check`
 
-**执行摘要**：已新增 `docs/V2_API_AUDIT.md` 作为 R11 审计输出，固定 v2 API 清理共享规则、R12-R20 每个组件批次的计划删除/合并项、唯一替代 API、证据路径和批次内待确认点。审计基于当前 `api-reports/public-api-baseline.json`（156 个 `*Props` 接口、2905 个 core exports、148 个 React/Vue 公开组件）以及 `scripts/validate-api.mjs` 现有 public deprecated、overlay open、controlled parity、Skill references 护栏；R11 未删除运行时 API、未修改 package exports、sideEffects 或 size budget。为让 R10 分组测试 runner 在无 `corepack` 的 Windows 环境继续可执行，`scripts/run-component-group-tests.mjs` 已改为优先复用当前 pnpm `npm_execpath`，否则再回退 PATH 中的 `pnpm`。
+**执行摘要**：已新增 `docs/V2_API_AUDIT.md` 作为 R11 审计输出，固定 v2 API 清理共享规则、R12-R20 每个组件批次的计划删除/合并项、唯一替代 API、证据路径和批次内待确认点。审计基于 R11 当时的 `api-reports/public-api-baseline.json`（156 个 `*Props` 接口、2905 个 core exports、148 个 React/Vue 公开组件）以及 `scripts/validate-api.mjs` 现有 public deprecated、overlay open、controlled parity、Skill references 护栏；R11 未删除运行时 API、未修改 package exports、sideEffects 或 size budget。为让 R10 分组测试 runner 在无 `corepack` 的 Windows 环境继续可执行，`scripts/run-component-group-tests.mjs` 已改为优先复用当前 pnpm `npm_execpath`，否则再回退 PATH 中的 `pnpm`。
 
 **审计输出位置**：
 
@@ -754,9 +754,9 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 
 **状态更新要求**：完成后已写回状态、日期、删除的 Data/table API 摘要、固定列/虚拟滚动验证范围、Skill/examples 更新范围和关键验证命令；阶段 11 已同步为 `已完成（2026-06-29）`，当前可执行任务推进到 R18。
 
-### R20 Composite/business components（组件清理，发布收口 deferred）
+### R20 Composite/business components
 
-**状态**：组件级 API 清理已完成（2026-06-30）；v2.0 发布收口 deferred、本批次不发布版本。
+**状态**：组件级 API 清理已完成（2026-06-30）；本批次不发布版本。
 
 **执行顺序说明**：按维护决定，R20 组件级 API 清理提前于 R19 执行；R20 不再作为 v2.0.0 发布收口任务，v2.0.0 后续仍会追加新的更新计划，路线图不在 R20 处收口。
 
@@ -780,9 +780,9 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `corepack pnpm docs:api`
 - `git diff --check`
 
-**发布收口 deferred**：`corepack pnpm quality:release` 全量发布门禁、`api:baseline:check`、发布后 `corepack pnpm smoke:published` 因本批次不发布而留待 R19 完成后的最终发布批次执行。
+**发布收口说明**：`corepack pnpm quality:release` 全量发布门禁与发布后 `corepack pnpm smoke:published` 因本批次不发布而不属于 R20 验证范围；2026-06-30 复核时 `api:baseline:check` 已通过。
 
-**状态更新要求**：已写回 R20 状态、日期、删除/拆分摘要、唯一替代 API 与关键验证命令；阶段 14 标为「组件清理已完成（2026-06-30）；发布收口 deferred」，并在 [V2_API_AUDIT.md](V2_API_AUDIT.md) 追加 R20 批次记录。v2.0.0 路线图不在 R20 处收口。
+**状态更新要求**：已写回 R20 状态、日期、删除/拆分摘要、唯一替代 API 与关键验证命令；阶段 14 标为「已完成（2026-06-30）」，并在 [V2_API_AUDIT.md](V2_API_AUDIT.md) 追加 R20 批次记录。v2.0.0 路线图不在 R20 处收口。
 
 ### R18 Charts and visualization stack
 

@@ -11,7 +11,7 @@ source: current repository state after R23 Basic/Layout example raw-source code 
 
 ## 当前状态
 
-截至 2026-06-30，T01-T14 与 v2.0.0 R01-R23 已完成；R20 的 v2.0 发布收口按维护决定 deferred，本批次不发布版本。R23 已完成 Basic/Layout example demo code-source consolidation，后续任务待追加。
+截至 2026-06-30，T01-T14 与 v2.0.0 R01-R23 已完成；R20 不作为 v2.0 发布收口批次，后续发布收口按维护决定单独追加。R23 已完成 Basic/Layout example demo code-source consolidation，后续任务待追加。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
