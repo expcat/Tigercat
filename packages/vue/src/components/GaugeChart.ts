@@ -86,20 +86,20 @@ export const GaugeChart = defineComponent({
 
     // Tooltip (hover / focus over the gauge)
     const wrapperRef = ref<HTMLElement | null>(null)
-    const tooltipState = ref({ visible: false, x: 0, y: 0 })
+    const tooltipState = ref({ open: false, x: 0, y: 0 })
     const handleTooltipMove = (e: MouseEvent) => {
       if (!props.showTooltip) return
-      tooltipState.value = { visible: true, x: e.clientX, y: e.clientY }
+      tooltipState.value = { open: true, x: e.clientX, y: e.clientY }
     }
     const handleTooltipLeave = () => {
-      tooltipState.value = { ...tooltipState.value, visible: false }
+      tooltipState.value = { ...tooltipState.value, open: false }
     }
     const handleTooltipFocus = () => {
       if (!props.showTooltip) return
       const rect = wrapperRef.value?.getBoundingClientRect()
       if (rect) {
         tooltipState.value = {
-          visible: true,
+          open: true,
           x: rect.left + rect.width / 2,
           y: rect.top + rect.height / 2
         }
@@ -312,7 +312,7 @@ export const GaugeChart = defineComponent({
           props.showTooltip
             ? h(ChartTooltip, {
                 content: tooltipContent,
-                visible: tooltipState.value.visible && tooltipContent !== '',
+                open: tooltipState.value.open && tooltipContent !== '',
                 x: tooltipState.value.x,
                 y: tooltipState.value.y
               })

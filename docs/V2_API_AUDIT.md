@@ -4,15 +4,15 @@
 type: v2-api-audit
 scope: R11 core API and shared contracts audit for R12-R20 execution
 verified-date: 2026-06-30
-source: current repository state after R20 composite/business cleanup (v2.0 release hardening deferred)
+source: current repository state after R18 Charts completion and R20 composite/business cleanup (v2.0 release hardening deferred)
 -->
 
 本文是 R11 的审计输出，只记录 v2.0.0 发布前 R12-R20 批次要执行的 API 删除、合并与命名收敛计划。R11 不删除运行时 API，也不新增兼容层。
 
 ## 审计基线
 
-- `api-reports/public-api-baseline.json` 当前覆盖 155 个 `*Props` 接口、2882 个 core exports、148 个 React 公开组件和 148 个 Vue 公开组件。
-- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、Vue checkable Form primitives 不回退到 `checked` / `defaultChecked` / `update:checked`、Form composite selectors 不回退到旧尺寸 aliases / DatePicker-TimePicker 旧模型 aliases / 旧 search 和 empty 命名、Navigation 受控回调与子组件 subpath 不回流、Data/Table 旧数据入口与虚拟阈值 API 不回流、登记过的受控量 parity、Skill references 覆盖与文档预算。
+- `api-reports/public-api-baseline.json` 当前覆盖 156 个 `*Props` 接口、2877 个 core exports、148 个 React 公开组件和 148 个 Vue 公开组件。
+- `scripts/validate-api.mjs` 当前已守护：公开 API 禁止 `@deprecated`、core type props 禁止 `visible`/`isVisible` 等旧命名、overlay `open` 双端对称、Feedback 示例与 React hook source 不回退到 `visible` / `defaultVisible` / `onVisibleChange`、Vue checkable Form primitives 不回退到 `checked` / `defaultChecked` / `update:checked`、Form composite selectors 不回退到旧尺寸 aliases / DatePicker-TimePicker 旧模型 aliases / 旧 search 和 empty 命名、Navigation 受控回调与子组件 subpath 不回流、Data/Table 旧数据入口与虚拟阈值 API 不回流、Charts 重复 datum aliases 与独立 `ChartTooltip visible` 不回流、Kanban 并行类型别名与 DataTableWithToolbar 顶层业务回调不回流、登记过的受控量 parity、Skill references 覆盖与文档预算。
 - `packages/core/src/types/base.ts`、`events.ts`、`generics.ts` 是公共合约收敛事实源；后续批次应优先复用这些 shared contracts，不能在 React/Vue 组件内各自临时发明命名。
 - `packages/core/src/types/index.ts` 与 `packages/core/src/utils/index.ts` 仍以宽 barrel 公开大量类型与工具；R12-R20 删除或合并 public exports 时必须同步更新 API baseline、迁移说明和对应分组测试。
 
@@ -108,11 +108,21 @@ source: current repository state after R20 composite/business cleanup (v2.0 rele
 - 唯一替代 API：VirtualTable 数据使用 `dataSource`；行高和 viewport 使用 `virtualItemHeight` / `virtualHeight`；选择使用 `rowSelection` 与 React `onSelectionChange` 或 Vue `selection-change` / `update:rowSelection`；泛型表格类型使用 `TableColumn<T>`、`RowSelectionConfig<T>`、`ExpandableConfig<T>`、`TableProps<T>`；自动虚拟化阈值使用 `virtualThreshold`。
 - 证据：core table / virtual-table / generics types、table utils、React/Vue Table 与 VirtualTable components、Vue DataTableWithToolbar、React/Vue VirtualTable demos、React/Vue Table 与 VirtualTable tests、`api-reports/public-api-baseline.json`、generated Skill references 和 `scripts/validate-api.mjs` R17 guard 已同步更新。
 - 实际验证：`npx -y pnpm@11.9.0 test:group:data`、`npx -y pnpm@11.9.0 vitest run tests/react/TableState.spec.tsx tests/vue/TableState.spec.ts`、`npx -y pnpm@11.9.0 vitest run tests/react/VirtualTable.spec.tsx tests/vue/VirtualTable.spec.ts tests/core/virtual-table-utils.spec.ts tests/core/table-utils.spec.ts`、`npx -y pnpm@11.9.0 e2e:smoke`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline && npx -y pnpm@11.9.0 api:baseline:check`、`npx -y pnpm@11.9.0 docs:api && npx -y pnpm@11.9.0 docs:api:check`、`npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`、`rg -n "^(<<<<<<<|=======|>>>>>>>)"`、`git diff --check`。
-- 剩余阻塞：无；下一批次为 R18 Charts and visualization stack。
+- 剩余阻塞：无；下一批次为 R18 Charts and visualization stack（已完成，见下节）。
+
+### R18 Charts + Visualization（2026-06-30）
+
+- 实际删除 / 合并：`chart.ts` 拆分为 `chart-core.ts`、`chart-cartesian.ts`、`chart-radial.ts`、`chart-visualization.ts`，原 `chart.ts` 保留为 public barrel；删除重复 public aliases `AreaChartDatum` 与 `DonutChartDatum`。
+- Tooltip 变更：core 新增 `ChartBuiltInTooltipProps` 承载高阶图表的 `showTooltip` 开关；`ChartTooltipProps` 改为独立 tooltip 的 `content` / `open` / `x` / `y` / `className`。React/Vue `ChartTooltip` 和所有高阶图表内部调用已从 `visible` 改为 `open`。
+- 实际保留：`BarChartDatum`、`ScatterChartDatum`、`PieChartDatum`、`RadarChartDatum`、`LineChartDatum`、`FunnelChartDatum`、`HeatmapChartDatum`、`TreeMapChartDatum`、`SunburstChartDatum` 等领域数据类型保留；`AreaChartSeries` 保留，因为它扩展 line series 的 area fill 语义。
+- 唯一替代 API：Area 单序列数据使用 `LineChartDatum`；Donut 数据使用 `PieChartDatum`；独立 `ChartTooltip` 使用 `open`；高阶图表继续使用 `showTooltip` 控制内置 tooltip。
+- 证据：split chart core type files、React/Vue AreaChart/DonutChart/ChartTooltip 和高阶 chart components、React/Vue chart demos、ChartSubComponents tests、generated Skill charts props/examples、`api-reports/public-api-baseline.json` 和 `scripts/validate-api.mjs` R18 guard 已同步更新。
+- 实际验证：`npx -y pnpm@11.9.0 test:group:charts`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:baseline`、`npx -y pnpm@11.9.0 docs:api`；其余发布与格式门禁见 `docs/V2_COMPLETED.md#r18-charts-and-visualization-stack`。
+- 剩余阻塞：无；下一批次为 R19 Advanced editors and media-heavy components。
 
 ### R20 Composite + Business（2026-06-30）
 
-- 执行顺序说明：R20 组件级 API 清理在 R18、R19 之前提前执行；R20 不再作为 v2.0.0 发布收口任务，本批次不发布版本，发布收口 deferred 到 R18、R19 完成后的最终发布批次。
+- 执行顺序说明：R20 组件级 API 清理提前于 R19 执行；R20 不再作为 v2.0.0 发布收口任务，本批次不发布版本，发布收口 deferred 到 R19 完成后的最终发布批次。
 - 实际删除 / 合并：移除 `KanbanCard`、`KanbanColumn`、`KanbanCardMoveEvent`、`KanbanColumnMoveEvent` 公共类型别名；删除 core 与 React `DataTableWithToolbarProps` 顶层 `onSearchChange`、`onSearch`、`onFiltersChange`、`onBulkAction` 业务回调。
 - 类型文件拆分：`packages/core/src/types/composite.ts` 巨型类型文件按组件拆分为 `chat.ts`、`activity-feed.ts`、`comment-thread.ts`、`notification-center.ts`、`table-toolbar.ts`、`form-wizard.ts`、`task-board.ts`，`composite.ts` 改为薄 barrel（仅 `export *`）；`kanban.ts` 改为从 `task-board.ts` 导入。`scripts/lib/public-components.mjs` 的 Composite 分类补齐新文件 basename，使拆分后组件仍归类为 Composite。
 - Controlled / 回调变更：DataTableWithToolbar 业务回调统一从 toolbar 上下文发出——React 使用 `toolbar.onSearchChange` / `toolbar.onSearch` / `toolbar.onFiltersChange` / `toolbar.onBulkAction`，Vue 继续使用组件事件 `@search-change` / `@search` / `@filters-change` / `@bulk-action`；`onPageChange` / `onPageSizeChange` / `onSelectionChange` 等分页与表格回调保持组件顶层。
@@ -120,7 +130,7 @@ source: current repository state after R20 composite/business cleanup (v2.0 rele
 - 唯一替代 API：Kanban 数据模型使用 `TaskBoardCard` / `TaskBoardColumn` / `TaskBoardCardMoveEvent` / `TaskBoardColumnMoveEvent`；DataTableWithToolbar 业务回调使用 React `toolbar.*` 配置或 Vue 组件事件。
 - 证据：core composite 拆分后的类型文件、`kanban.ts`、React/Vue DataTableWithToolbar 组件、React DataTableWithToolbar 示例与测试、`scripts/lib/public-components.mjs`、`api-reports/public-api-baseline.json`（core exports 2882→2878，仅移除 4 个 Kanban 别名；`DataTableWithToolbarProps` own props 移除 4 个回调）、generated Skill references 和 `scripts/validate-api.mjs` R20 guard（`composite-api`）已同步更新。
 - 实际验证：`corepack pnpm test:group:composite`、`npx tsc --noEmit -p`（core / react / vue / examples-react）、`corepack pnpm api:validate`、`corepack pnpm types:check`、`corepack pnpm api:baseline`、`corepack pnpm docs:api`、`git diff --check`。`quality:release` 全量发布门禁、`api:baseline:check`、发布后 `smoke:published` 因本批次不发布而 deferred。
-- 剩余阻塞：无；R18、R19 仍为 v2.0.0 发布前未完成批次，发布收口待其完成后单独执行。
+- 剩余阻塞：无；R19 仍为 v2.0.0 发布前未完成批次，发布收口待其完成后单独执行。
 
 完成任一涉及 public API 或 shared contract 清理的 R12-R20 任务后，必须在本节追加对应 `### Rxx ...（YYYY-MM-DD）` 记录，并包含：
 

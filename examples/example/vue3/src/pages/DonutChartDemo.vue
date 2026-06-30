@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { DonutChart } from '@expcat/tigercat-vue/DonutChart'
-import { type DonutChartDatum } from '@expcat/tigercat-vue'
+import { type PieChartDatum } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
-const basicData: DonutChartDatum[] = [
+const basicData: PieChartDatum[] = [
   { value: 40, label: '直接访问' },
   { value: 25, label: '邮件营销' },
   { value: 20, label: '联盟广告' },
   { value: 15, label: '搜索引擎' }
 ]
 
-const interactiveData: DonutChartDatum[] = [
+const interactiveData: PieChartDatum[] = [
   { value: 335, label: '直接访问' },
   { value: 310, label: '邮件营销' },
   { value: 234, label: '联盟广告' },

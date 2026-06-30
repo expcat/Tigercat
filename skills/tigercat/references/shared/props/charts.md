@@ -11,17 +11,17 @@ description: Compact generated Tigercat Charts props reference
 
 ## AreaChart
 
-`packages/core/src/types/chart.ts` · `AreaChartProps` · 3/35 props
+`packages/core/src/types/chart-cartesian.ts` · `AreaChartProps` · 3/35 props
 
 | Prop      | Type                | Default | Notes                      |
 | --------- | ------------------- | ------- | -------------------------- |
-| `data?`   | `AreaChartDatum[]`  | `-`     | Chart data (single series) |
+| `data?`   | `LineChartDatum[]`  | `-`     | Chart data (single series) |
 | `series?` | `AreaChartSeries[]` | `-`     | Multiple series            |
 | `xScale?` | `ChartScale`        | `-`     | Custom x scale             |
 
 ## BarChart
 
-`packages/core/src/types/chart.ts` · `BarChartProps` · 3/31 props
+`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 3/31 props
 
 | Prop      | Type              | Default | Notes          |
 | --------- | ----------------- | ------- | -------------- |
@@ -31,7 +31,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartAxis
 
-`packages/core/src/types/chart.ts` · `ChartAxisProps` · 3/12 props
+`packages/core/src/types/chart-core.ts` · `ChartAxisProps` · 3/12 props
 
 | Prop           | Type                   | Default    | Notes                                   |
 | -------------- | ---------------------- | ---------- | --------------------------------------- |
@@ -41,7 +41,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartCanvas
 
-`packages/core/src/types/chart.ts` · `ChartCanvasProps` · 3/7 props
+`packages/core/src/types/chart-core.ts` · `ChartCanvasProps` · 3/7 props
 
 | Prop          | Type      | Default | Notes                                                       |
 | ------------- | --------- | ------- | ----------------------------------------------------------- |
@@ -51,7 +51,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartGrid
 
-`packages/core/src/types/chart.ts` · `ChartGridProps` · 3/12 props
+`packages/core/src/types/chart-core.ts` · `ChartGridProps` · 3/12 props
 
 | Prop      | Type            | Default  | Notes           |
 | --------- | --------------- | -------- | --------------- |
@@ -61,7 +61,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartLegend
 
-`packages/core/src/types/chart.ts` · `ChartLegendProps` · 3/4 props
+`packages/core/src/types/chart-core.ts` · `ChartLegendProps` · 3/4 props
 
 | Prop                | Type                  | Default    | Notes                    |
 | ------------------- | --------------------- | ---------- | ------------------------ |
@@ -71,7 +71,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartSeries
 
-`packages/core/src/types/chart.ts` · `ChartSeriesProps` · 3/6 props
+`packages/core/src/types/chart-core.ts` · `ChartSeriesProps` · 3/6 props
 
 | Prop     | Type     | Default | Notes        |
 | -------- | -------- | ------- | ------------ |
@@ -81,15 +81,17 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartTooltip
 
-`packages/core/src/types/chart.ts` · `ChartTooltipProps`
+`packages/core/src/types/chart-core.ts` · `ChartTooltipProps` · 3/5 props
 
-| Prop           | Type      | Default | Notes                   |
-| -------------- | --------- | ------- | ----------------------- |
-| `showTooltip?` | `boolean` | `true`  | Whether to show tooltip |
+| Prop      | Type      | Default | Notes                       |
+| --------- | --------- | ------- | --------------------------- |
+| `content` | `string`  | `-`     | Tooltip content             |
+| `open?`   | `boolean` | `false` | Whether the tooltip is open |
+| `x?`      | `number`  | `0`     | Viewport X position         |
 
 ## DonutChart
 
-`packages/core/src/types/chart.ts` · `DonutChartProps` · 3/4 props
+`packages/core/src/types/chart-radial.ts` · `DonutChartProps` · 3/4 props
 
 | Prop                | Type               | Default | Notes                                                         |
 | ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
@@ -99,7 +101,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## FunnelChart
 
-`packages/core/src/types/chart.ts` · `FunnelChartProps` · 3/6 props
+`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 3/6 props
 
 | Prop         | Type                         | Default      | Notes                                         |
 | ------------ | ---------------------------- | ------------ | --------------------------------------------- |
@@ -119,7 +121,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## GaugeChart
 
-`packages/core/src/types/chart.ts` · `GaugeChartProps` · 3/16 props
+`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 3/16 props
 
 | Prop    | Type     | Default | Notes                      |
 | ------- | -------- | ------- | -------------------------- |
@@ -129,7 +131,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## HeatmapChart
 
-`packages/core/src/types/chart.ts` · `HeatmapChartProps` · 3/13 props
+`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 3/13 props
 
 | Prop      | Type                  | Default | Notes         |
 | --------- | --------------------- | ------- | ------------- |
@@ -139,7 +141,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## LineChart
 
-`packages/core/src/types/chart.ts` · `LineChartProps` · 3/34 props
+`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 3/34 props
 
 | Prop      | Type                | Default | Notes                      |
 | --------- | ------------------- | ------- | -------------------------- |
@@ -159,7 +161,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## PieChart
 
-`packages/core/src/types/chart.ts` · `PieChartProps` · 3/17 props
+`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 3/17 props
 
 | Prop           | Type              | Default | Notes                  |
 | -------------- | ----------------- | ------- | ---------------------- |
@@ -169,7 +171,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## RadarChart
 
-`packages/core/src/types/chart.ts` · `RadarChartProps` · 3/41 props
+`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 3/41 props
 
 | Prop        | Type                 | Default | Notes                        |
 | ----------- | -------------------- | ------- | ---------------------------- |
@@ -179,7 +181,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ScatterChart
 
-`packages/core/src/types/chart.ts` · `ScatterChartProps` · 3/13 props
+`packages/core/src/types/chart-cartesian.ts` · `ScatterChartProps` · 3/13 props
 
 | Prop          | Type                  | Default | Notes               |
 | ------------- | --------------------- | ------- | ------------------- |
@@ -189,7 +191,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## SunburstChart
 
-`packages/core/src/types/chart.ts` · `SunburstChartProps` · 3/5 props
+`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 3/5 props
 
 | Prop                | Type                   | Default | Notes                                              |
 | ------------------- | ---------------------- | ------- | -------------------------------------------------- |
@@ -199,7 +201,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## TreeMapChart
 
-`packages/core/src/types/chart.ts` · `TreeMapChartProps` · 3/6 props
+`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 3/6 props
 
 | Prop          | Type                  | Default | Notes                               |
 | ------------- | --------------------- | ------- | ----------------------------------- |

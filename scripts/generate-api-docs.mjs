@@ -311,7 +311,27 @@ const COMPONENT_SNIPPETS = {
     TaskBoard: '<TaskBoard :columns="columns" />',
     Kanban: '<Kanban :columns="columns" />',
     VirtualTable:
-      '<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />'
+      '<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />',
+    AreaChart: '<AreaChart :data="data" />',
+    BarChart: '<BarChart :data="data" />',
+    ChartAxis: '<ChartAxis :scale="xScale" />',
+    ChartCanvas: '<ChartCanvas :width="320" :height="200" />',
+    ChartGrid: '<ChartGrid :x-scale="xScale" :y-scale="yScale" />',
+    ChartLegend: '<ChartLegend :items="items" />',
+    ChartSeries: '<ChartSeries :data="data" />',
+    ChartTooltip: '<ChartTooltip content="Value: 42" open :x="120" :y="80" />',
+    DonutChart: '<DonutChart :data="data" />',
+    FunnelChart: '<FunnelChart :data="data" />',
+    Gantt: '<Gantt :data="tasks" />',
+    GaugeChart: '<GaugeChart :value="72" />',
+    HeatmapChart: '<HeatmapChart :data="data" :x-labels="xLabels" :y-labels="yLabels" />',
+    LineChart: '<LineChart :data="data" />',
+    OrgChart: '<OrgChart :data="nodes" />',
+    PieChart: '<PieChart :data="data" />',
+    RadarChart: '<RadarChart :data="data" />',
+    ScatterChart: '<ScatterChart :data="data" />',
+    SunburstChart: '<SunburstChart :data="data" />',
+    TreeMapChart: '<TreeMapChart :data="data" />'
   },
   React: {
     Icon: '<Icon name="search" />',
@@ -328,7 +348,27 @@ const COMPONENT_SNIPPETS = {
     TaskBoard: '<TaskBoard columns={columns} />',
     Kanban: '<Kanban columns={columns} />',
     VirtualTable:
-      '<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />'
+      '<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />',
+    AreaChart: '<AreaChart data={data} />',
+    BarChart: '<BarChart data={data} />',
+    ChartAxis: '<ChartAxis scale={xScale} />',
+    ChartCanvas: '<ChartCanvas width={320} height={200} />',
+    ChartGrid: '<ChartGrid xScale={xScale} yScale={yScale} />',
+    ChartLegend: '<ChartLegend items={items} />',
+    ChartSeries: '<ChartSeries data={data} />',
+    ChartTooltip: '<ChartTooltip content="Value: 42" open x={120} y={80} />',
+    DonutChart: '<DonutChart data={data} />',
+    FunnelChart: '<FunnelChart data={data} />',
+    Gantt: '<Gantt data={tasks} />',
+    GaugeChart: '<GaugeChart value={72} />',
+    HeatmapChart: '<HeatmapChart data={data} xLabels={xLabels} yLabels={yLabels} />',
+    LineChart: '<LineChart data={data} />',
+    OrgChart: '<OrgChart data={nodes} />',
+    PieChart: '<PieChart data={data} />',
+    RadarChart: '<RadarChart data={data} />',
+    ScatterChart: '<ScatterChart data={data} />',
+    SunburstChart: '<SunburstChart data={data} />',
+    TreeMapChart: '<TreeMapChart data={data} />'
   }
 }
 

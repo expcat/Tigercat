@@ -324,7 +324,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
     showTooltip && hoverable ? (
       <ChartTooltip
         content={tooltipContent}
-        visible={resolvedHoveredIndex !== null && tooltipContent !== ''}
+        open={resolvedHoveredIndex !== null && tooltipContent !== ''}
         x={tooltipPosition.x}
         y={tooltipPosition.y}
       />

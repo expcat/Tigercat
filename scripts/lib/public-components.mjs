@@ -89,7 +89,15 @@ export const CATEGORIES = {
     'tree'
   ],
   Data: ['calendar', 'collapse', 'countdown', 'table', 'timeline'],
-  Charts: ['chart', 'gantt', 'org-chart'],
+  Charts: [
+    'chart',
+    'chart-core',
+    'chart-cartesian',
+    'chart-radial',
+    'chart-visualization',
+    'gantt',
+    'org-chart'
+  ],
   Advanced: [
     'code-editor',
     'drag',

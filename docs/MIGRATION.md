@@ -332,6 +332,40 @@ Vue 继续使用组件事件（无需迁移）：
 
 `onPageChange` / `onPageSizeChange` / `onSelectionChange`（Vue `@page-change` / `@page-size-change` / `@selection-change`）等分页与表格回调仍是组件顶层 API。core composite 类型文件已按组件拆分，但公共类型导出经 `@expcat/tigercat-core` 根入口保持不变，无需调整 import 路径。
 
+### Charts 类型拆分、datum 别名与 ChartTooltip open 收敛
+
+Charts 类型已按职责拆分为 `chart-core`、`chart-cartesian`、`chart-radial`、`chart-visualization` 内部类型文件；公共导入路径保持不变，继续从 `@expcat/tigercat-core`、`@expcat/tigercat-react` 或 `@expcat/tigercat-vue` 导入。
+
+core 不再导出仅重复现有数据结构的 `AreaChartDatum` / `DonutChartDatum`：
+
+```diff
+- import type { AreaChartDatum, AreaChartSeries } from '@expcat/tigercat-core'
++ import type { LineChartDatum, AreaChartSeries } from '@expcat/tigercat-core'
+
+- const data: AreaChartDatum[] = []
++ const data: LineChartDatum[] = []
+```
+
+```diff
+- import type { DonutChartDatum } from '@expcat/tigercat-core'
++ import type { PieChartDatum } from '@expcat/tigercat-core'
+
+- const data: DonutChartDatum[] = []
++ const data: PieChartDatum[] = []
+```
+
+独立 `ChartTooltip` 使用 `open` 表示显示状态；高阶图表组件的内置 tooltip 开关仍是 `showTooltip`：
+
+```diff
+- <ChartTooltip content="Value: 42" visible={open} x={120} y={80} />
++ <ChartTooltip content="Value: 42" open={open} x={120} y={80} />
+```
+
+```diff
+- <ChartTooltip content="Value: 42" :visible="open" :x="120" :y="80" />
++ <ChartTooltip content="Value: 42" :open="open" :x="120" :y="80" />
+```
+
 ### Carousel 索引改为受控模型
 
 `Carousel` 移除 `initialSlide`，改为与其他非表单受控量一致的 `currentIndex` 模型。

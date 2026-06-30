@@ -2,12 +2,12 @@
 
 <!-- LLM-INDEX
 type: completed-roadmap-archive
-scope: v2.0.0 completed R01-R17 plus R20 composite/business cleanup roadmap execution details
+scope: v2.0.0 completed R01-R18 plus R20 composite/business cleanup roadmap execution details
 verified-date: 2026-06-30
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
-本文归档 v2.0.0 Roadmap 已完成 R01-R17 的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
+本文归档 v2.0.0 Roadmap 已完成 R01-R18 与提前完成的 R20 组件清理详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
 
 ## 已完成任务详情
 
@@ -758,7 +758,7 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 
 **状态**：组件级 API 清理已完成（2026-06-30）；v2.0 发布收口 deferred、本批次不发布版本。
 
-**执行顺序说明**：按维护决定，R20 组件级 API 清理提前于 R18、R19 执行；R20 不再作为 v2.0.0 发布收口任务，v2.0.0 后续仍会追加新的更新计划，路线图不在 R20 处收口。
+**执行顺序说明**：按维护决定，R20 组件级 API 清理提前于 R19 执行；R20 不再作为 v2.0.0 发布收口任务，v2.0.0 后续仍会追加新的更新计划，路线图不在 R20 处收口。
 
 **目标**：清理 Composite/business components，移除并行数据模型别名，收敛 DataTableWithToolbar 业务回调入口，并拆分 composite 巨型类型文件。
 
@@ -780,6 +780,53 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `corepack pnpm docs:api`
 - `git diff --check`
 
-**发布收口 deferred**：`corepack pnpm quality:release` 全量发布门禁、`api:baseline:check`、发布后 `corepack pnpm smoke:published` 因本批次不发布而留待 R18、R19 完成后的最终发布批次执行。
+**发布收口 deferred**：`corepack pnpm quality:release` 全量发布门禁、`api:baseline:check`、发布后 `corepack pnpm smoke:published` 因本批次不发布而留待 R19 完成后的最终发布批次执行。
 
 **状态更新要求**：已写回 R20 状态、日期、删除/拆分摘要、唯一替代 API 与关键验证命令；阶段 14 标为「组件清理已完成（2026-06-30）；发布收口 deferred」，并在 [V2_API_AUDIT.md](V2_API_AUDIT.md) 追加 R20 批次记录。v2.0.0 路线图不在 R20 处收口。
+
+### R18 Charts and visualization stack
+
+**状态**：已完成（2026-06-30）。
+
+**目标**：拆分巨型 chart type/API，统一 data/series/tooltip/legend/a11y 合约，并确保基础组件不会拉入 charts。
+
+**允许修改**：Charts 相关 core types、React/Vue chart components、chart hooks/helpers、目标 tests/bench smoke、Skill charts props/examples、example 使用、迁移说明、变更记录、API baseline、publish bundle smoke。
+
+**不得修改**：Basic/Form/Feedback/Navigation/Data/Advanced/Composite 非图表行为、无关 package exports。
+
+**依赖/阻塞**：依赖 R11；必须保持 R09 的 Button 子路径不拉入 charts 的隔离目标。
+
+**组件范围**：ChartCanvas、ChartAxis、ChartGrid、ChartLegend、ChartTooltip、AreaChart、BarChart、LineChart、PieChart、DonutChart、RadarChart、ScatterChart、HeatmapChart、SunburstChart、TreeMapChart、FunnelChart、GaugeChart、Gantt、OrgChart。
+
+**执行摘要**：`packages/core/src/types/chart.ts` 已拆为 core、cartesian、radial、visualization 四个分组类型文件，原 `chart.ts` 保留为 public barrel，根入口导出路径不变。删除重复 datum aliases `AreaChartDatum` 与 `DonutChartDatum`，Area 单序列数据统一使用 `LineChartDatum`，Donut 数据统一使用 `PieChartDatum`；保留 Bar、Scatter、Pie、Radar、Line、Funnel、Heatmap、TreeMap、Sunburst 等有领域字段的数据类型。独立 `ChartTooltip` 从 `visible` 改为 `open`，高阶图表继续使用 `showTooltip` 控制内置 tooltip，并通过 `ChartBuiltInTooltipProps` 与独立 `ChartTooltipProps` 分层。React/Vue 组件、tests、examples、API baseline、Skill references、迁移说明、变更记录和 `api:validate` R18 回流护栏已同步更新；R09 Button 子路径 charts 隔离 smoke 继续由 `publish:check` 覆盖。
+
+**实际删除 / 合并**：
+
+- `AreaChartDatum` → `LineChartDatum`。
+- `DonutChartDatum` → `PieChartDatum`。
+- 高阶图表内置 tooltip props → `ChartBuiltInTooltipProps`。
+- 独立 `ChartTooltip visible` → `open`。
+- `chart.ts` 巨型类型文件 → `chart-core.ts` / `chart-cartesian.ts` / `chart-radial.ts` / `chart-visualization.ts` + public barrel。
+
+**实际保留**：
+
+- `AreaChartSeries` 保留，因为它扩展 `LineChartSeries` 的 fill 语义。
+- `ChartSeriesPoint`、`ChartInteractionProps`、`ChartLegendProps`、`ChartTooltipProps` 保留为 chart shared contracts。
+- `showTooltip` 保留在高阶 chart components 上，用于启停内置 tooltip；它不再作为独立 `ChartTooltip` 可见性命名。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 test:group:charts`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 api:baseline:check`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 publish:check`
+- `npx -y pnpm@11.9.0 size`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md CHANGELOG.md docs/MIGRATION.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/V2_API_AUDIT.md docs/V2_COMPLETED.md docs/MIGRATION.md CHANGELOG.md`
+- `git diff --check`
+
+**状态更新要求**：完成后已写回状态、日期、删除的 chart API 摘要、bundle 隔离结果、Skill/examples 更新范围和关键验证命令；阶段 12 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R19。

@@ -17,7 +17,7 @@ import {
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultSeriesXYTooltipFormatter,
-  type AreaChartDatum,
+  type LineChartDatum,
   type AreaChartProps as CoreAreaChartProps,
   type AreaChartSeries,
   type ChartCurveType,
@@ -37,7 +37,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
 
 export interface VueAreaChartProps extends CoreAreaChartProps {
-  data?: AreaChartDatum[]
+  data?: LineChartDatum[]
   series?: AreaChartSeries[]
   padding?: ChartPadding
   xScale?: ChartScale
@@ -60,7 +60,7 @@ export const AreaChart = defineComponent({
       default: 24
     },
     data: {
-      type: Array as PropType<AreaChartDatum[]>
+      type: Array as PropType<LineChartDatum[]>
     },
     series: {
       type: Array as PropType<AreaChartSeries[]>
@@ -229,7 +229,7 @@ export const AreaChart = defineComponent({
     tooltipFormatter: {
       type: Function as PropType<
         (
-          datum: AreaChartDatum,
+          datum: LineChartDatum,
           seriesIndex: number,
           pointIndex: number,
           series?: AreaChartSeries
@@ -362,7 +362,7 @@ export const AreaChart = defineComponent({
         const fillColor = series.fillColor ?? color
         const seriesFillOpacity = series.fillOpacity ?? props.fillOpacity
 
-        let points: Array<{ x: number; y: number; datum: AreaChartDatum; pointIndex: number }>
+        let points: Array<{ x: number; y: number; datum: LineChartDatum; pointIndex: number }>
         let areaPath: string
         let linePath: string
 
@@ -820,7 +820,7 @@ export const AreaChart = defineComponent({
       const tooltip = props.showTooltip
         ? h(ChartTooltip, {
             content: tooltipContent.value,
-            visible: hoveredPointInfo.value !== null && tooltipContent.value !== '',
+            open: hoveredPointInfo.value !== null && tooltipContent.value !== '',
             x: tooltipPosition.value.x,
             y: tooltipPosition.value.y
           })

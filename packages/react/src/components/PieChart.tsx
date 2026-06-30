@@ -316,7 +316,7 @@ export const PieChart: React.FC<PieChartProps> = ({
   const tooltip = showTooltip && (
     <ChartTooltip
       content={tooltipContent}
-      visible={hoverable && resolvedHoveredIndex !== null && tooltipContent !== ''}
+      open={hoverable && resolvedHoveredIndex !== null && tooltipContent !== ''}
       x={tooltipPosition.x}
       y={tooltipPosition.y}
     />

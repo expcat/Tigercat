@@ -205,6 +205,7 @@ for (const name of reactComponentNames) {
 // This prevents introducing `visible` and ensures overlay API symmetry.
 
 const componentsWithOpen = new Set()
+const OPEN_PARITY_SKIP_COMPONENTS = new Set(['ChartTooltip'])
 
 for (const filename of typeFiles) {
   const filepath = join(TYPES_DIR, filename)
@@ -240,6 +241,8 @@ for (const filename of typeFiles) {
 }
 
 for (const compName of componentsWithOpen) {
+  if (OPEN_PARITY_SKIP_COMPONENTS.has(compName)) continue
+
   // Check Vue: must have 'update:open' in emits
   const vueFile = join(VUE_COMPONENTS_DIR, `${compName}.ts`)
   if (existsSync(vueFile)) {
@@ -797,6 +800,10 @@ const R20_FORBIDDEN_TYPE_EXPORTS = [
   'KanbanColumnMoveEvent'
 ]
 
+// ----- R18 Charts/visualization public API guard -----
+
+const R18_FORBIDDEN_CHART_TYPE_EXPORTS = ['AreaChartDatum', 'DonutChartDatum']
+
 for (const filename of typeFiles) {
   const filepath = join(TYPES_DIR, filename)
   const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
@@ -811,6 +818,16 @@ for (const filename of typeFiles) {
         )
       }
     }
+    for (const typeName of R18_FORBIDDEN_CHART_TYPE_EXPORTS) {
+      if (new RegExp(`\\bexport\\s+(?:interface|type)\\s+${typeName}\\b`).test(line)) {
+        addIssue(
+          filepath,
+          index + 1,
+          'charts-api',
+          `R18 Charts must use LineChartDatum or PieChartDatum instead of duplicate public alias "${typeName}"`
+        )
+      }
+    }
   })
 }
 
@@ -821,7 +838,8 @@ const R20_DATA_TABLE_TOOLBAR_FILES = [
   'packages/react/src/components/DataTableWithToolbar.tsx'
 ]
 
-const R20_TOOLBAR_CALLBACK_RE = /^\s+(?:onSearchChange|onSearch|onFiltersChange|onBulkAction)\s*\??\s*:/
+const R20_TOOLBAR_CALLBACK_RE =
+  /^\s+(?:onSearchChange|onSearch|onFiltersChange|onBulkAction)\s*\??\s*:/
 
 for (const relativePath of R20_DATA_TABLE_TOOLBAR_FILES) {
   const filepath = join(ROOT, relativePath)
@@ -848,6 +866,27 @@ for (const relativePath of R20_DATA_TABLE_TOOLBAR_FILES) {
       else if (ch === '}') depth--
     }
     if (depth <= 0 && line.includes('}')) inInterface = false
+  })
+}
+
+const R18_CHART_TOOLTIP_FILES = [
+  'packages/react/src/components/ChartTooltip.tsx',
+  'packages/vue/src/components/ChartTooltip.ts'
+]
+
+for (const relativePath of R18_CHART_TOOLTIP_FILES) {
+  const filepath = join(ROOT, relativePath)
+  if (!existsSync(filepath)) continue
+  const lines = readFileSync(filepath, 'utf-8').split(/\r?\n/)
+  lines.forEach((line, index) => {
+    if (/\bvisible\s*[?]?\s*:/.test(line) || /\bvisible\s*:/.test(line)) {
+      addIssue(
+        filepath,
+        index + 1,
+        'charts-api',
+        'R18 standalone ChartTooltip must use open instead of visible'
+      )
+    }
   })
 }
 
@@ -1136,6 +1175,7 @@ if (jsonMode) {
       'navigation-api': '导航组件 R16 旧 API 与子路径目标禁止回流',
       'data-table-api': 'Data/Table R17 旧 API 禁止回流',
       'composite-api': 'Composite/业务组件 R20 旧 API 禁止回流',
+      'charts-api': 'Charts R18 旧 API 禁止回流',
       'controlled-parity': '受控量双端对称',
       'public-deprecated': '公开 API 禁止 @deprecated',
       'deprecated-in-example': '废弃 API 仍在 Example 中使用',

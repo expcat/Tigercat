@@ -7,7 +7,7 @@ import {
 
 export interface VueChartTooltipProps {
   content: string
-  visible?: boolean
+  open?: boolean
   x?: number
   y?: number
   className?: string
@@ -20,7 +20,7 @@ export const ChartTooltip = defineComponent({
       type: String,
       required: true
     },
-    visible: {
+    open: {
       type: Boolean,
       default: false
     },
@@ -42,9 +42,9 @@ export const ChartTooltip = defineComponent({
 
     // Adjust position to keep tooltip within viewport
     watch(
-      () => [props.x, props.y, props.visible],
+      () => [props.x, props.y, props.open],
       (_value, _oldValue, onCleanup) => {
-        if (!props.visible) return
+        if (!props.open) return
 
         const initialPosition = resolveChartTooltipPosition({
           x: props.x,
@@ -80,7 +80,7 @@ export const ChartTooltip = defineComponent({
         'text-[color:var(--tiger-text-inverse,#f9fafb)]',
         'text-sm whitespace-nowrap',
         'transition-opacity duration-150',
-        props.visible ? 'opacity-100' : 'opacity-0',
+        props.open ? 'opacity-100' : 'opacity-0',
         props.className
       )
     )

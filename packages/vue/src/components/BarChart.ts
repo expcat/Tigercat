@@ -499,7 +499,7 @@ export const BarChart = defineComponent({
         props.showTooltip && props.hoverable
           ? h(ChartTooltip, {
               content: tooltipContent.value,
-              visible: resolvedHoveredIndex.value !== null && tooltipContent.value !== '',
+              open: resolvedHoveredIndex.value !== null && tooltipContent.value !== '',
               x: tooltipPosition.value.x,
               y: tooltipPosition.value.y
             })

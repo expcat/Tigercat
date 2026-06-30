@@ -6,13 +6,13 @@ import {
   DONUT_ENTRANCE_KEYFRAMES,
   DONUT_ENTRANCE_CLASS,
   type ChartPadding,
-  type DonutChartDatum,
+  type PieChartDatum,
   type DonutChartProps as CoreDonutChartProps
 } from '@expcat/tigercat-core'
 import { PieChart } from './PieChart'
 
 export interface DonutChartProps extends CoreDonutChartProps {
-  data: DonutChartDatum[]
+  data: PieChartDatum[]
   padding?: ChartPadding
   /** Text shown as the main value in the donut center */
   centerValue?: string | number
@@ -23,8 +23,8 @@ export interface DonutChartProps extends CoreDonutChartProps {
   // Interaction callbacks
   onHoveredIndexChange?: (index: number | null) => void
   onSelectedIndexChange?: (index: number | null) => void
-  onSliceClick?: (index: number, datum: DonutChartDatum) => void
-  onSliceHover?: (index: number | null, datum: DonutChartDatum | null) => void
+  onSliceClick?: (index: number, datum: PieChartDatum) => void
+  onSliceHover?: (index: number | null, datum: PieChartDatum | null) => void
 }
 
 /**
@@ -125,7 +125,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   const donutTooltipFormatter = useMemo(() => {
     if (tooltipFormatter) return tooltipFormatter
     const total = data.reduce((s, d) => s + d.value, 0)
-    return (datum: DonutChartDatum, index: number) => {
+    return (datum: PieChartDatum, index: number) => {
       const pct = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
       const label = datum.label ?? `#${index + 1}`
       return `${label}: ${datum.value} (${pct}%)`

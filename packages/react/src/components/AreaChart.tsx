@@ -17,7 +17,7 @@ import {
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultSeriesXYTooltipFormatter,
-  type AreaChartDatum,
+  type LineChartDatum,
   type AreaChartProps as CoreAreaChartProps,
   type AreaChartSeries,
   type ChartCurveType,
@@ -34,7 +34,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 
 export interface AreaChartProps extends CoreAreaChartProps {
-  data?: AreaChartDatum[]
+  data?: LineChartDatum[]
   series?: AreaChartSeries[]
   padding?: ChartPadding
   xScale?: ChartScale
@@ -43,11 +43,11 @@ export interface AreaChartProps extends CoreAreaChartProps {
   onSelectedIndexChange?: (index: number | null) => void
   onSeriesClick?: (seriesIndex: number, series: AreaChartSeries) => void
   onSeriesHover?: (seriesIndex: number | null, series: AreaChartSeries | null) => void
-  onPointClick?: (seriesIndex: number, pointIndex: number, datum: AreaChartDatum) => void
+  onPointClick?: (seriesIndex: number, pointIndex: number, datum: LineChartDatum) => void
   onPointHover?: (
     seriesIndex: number | null,
     pointIndex: number | null,
-    datum: AreaChartDatum | null
+    datum: LineChartDatum | null
   ) => void
   gradient?: boolean
   animated?: boolean
@@ -137,7 +137,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
 
   const resolvedSeries = useMemo<AreaChartSeries[]>(
     () =>
-      resolveSeriesData<AreaChartDatum, AreaChartSeries>(series, data, {
+      resolveSeriesData<LineChartDatum, AreaChartSeries>(series, data, {
         // Single-series colors (`areaColor`/`pointColor`) seed the synthesized
         // series so they take effect when only `data` is provided.
         color: areaColor,
@@ -227,7 +227,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       const seriesFillColor = s.fillColor ?? color
       const seriesFillOpacity = s.fillOpacity ?? fillOpacity
 
-      let points: Array<{ x: number; y: number; datum: AreaChartDatum; pointIndex: number }>
+      let points: Array<{ x: number; y: number; datum: LineChartDatum; pointIndex: number }>
       let areaPath: string
       let linePath: string
 
@@ -632,7 +632,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   const tooltip = showTooltip && (
     <ChartTooltip
       content={tooltipContent}
-      visible={hoveredPointInfo !== null && tooltipContent !== ''}
+      open={hoveredPointInfo !== null && tooltipContent !== ''}
       x={tooltipPosition.x}
       y={tooltipPosition.y}
     />

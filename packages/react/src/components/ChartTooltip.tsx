@@ -9,7 +9,7 @@ import {
 
 export interface ChartTooltipProps {
   content: string
-  visible?: boolean
+  open?: boolean
   x?: number
   y?: number
   className?: string
@@ -17,7 +17,7 @@ export interface ChartTooltipProps {
 
 export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   content,
-  visible = false,
+  open = false,
   x = 0,
   y = 0,
   className
@@ -27,7 +27,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
 
   // Adjust position to keep tooltip within viewport
   useEffect(() => {
-    if (!visible) return
+    if (!open) return
 
     const initialPosition = resolveChartTooltipPosition({
       x,
@@ -56,7 +56,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
 
     setAdjustedPosition(initialPosition)
     return () => cancelAnimationFrame(frameHandle)
-  }, [x, y, visible])
+  }, [x, y, open])
 
   const tooltipClasses = useMemo(
     () =>
@@ -67,10 +67,10 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
         'text-[color:var(--tiger-text-inverse,#f9fafb)]',
         'text-sm whitespace-nowrap',
         'transition-opacity duration-150',
-        visible ? 'opacity-100' : 'opacity-0',
+        open ? 'opacity-100' : 'opacity-0',
         className
       ),
-    [visible, className]
+    [open, className]
   )
 
   // Don't render if content is empty

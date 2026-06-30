@@ -316,8 +316,8 @@ describe('ChartTooltip', () => {
     document.body.innerHTML = ''
   })
 
-  it('renders content when visible', async () => {
-    renderWithProps(ChartTooltip, { content: 'Tooltip text', visible: true, x: 100, y: 100 })
+  it('renders content when open', async () => {
+    renderWithProps(ChartTooltip, { content: 'Tooltip text', open: true, x: 100, y: 100 })
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     const tooltip = document.querySelector('[data-chart-tooltip]')
@@ -325,8 +325,8 @@ describe('ChartTooltip', () => {
     expect(tooltip?.textContent).toContain('Tooltip text')
   })
 
-  it('hides when not visible or empty', async () => {
-    renderWithProps(ChartTooltip, { content: 'Tooltip text', visible: false, x: 100, y: 100 })
+  it('hides when not open or empty', async () => {
+    renderWithProps(ChartTooltip, { content: 'Tooltip text', open: false, x: 100, y: 100 })
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     const hiddenTooltip = document.querySelector('[data-chart-tooltip]')
@@ -335,7 +335,7 @@ describe('ChartTooltip', () => {
     }
 
     document.body.innerHTML = ''
-    renderWithProps(ChartTooltip, { content: '', visible: true, x: 100, y: 100 })
+    renderWithProps(ChartTooltip, { content: '', open: true, x: 100, y: 100 })
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(document.querySelector('[data-chart-tooltip]')).toBeFalsy()
@@ -344,7 +344,7 @@ describe('ChartTooltip', () => {
   it('applies custom className', async () => {
     renderWithProps(ChartTooltip, {
       content: 'Tooltip text',
-      visible: true,
+      open: true,
       x: 100,
       y: 100,
       className: 'custom-tooltip'
@@ -355,7 +355,7 @@ describe('ChartTooltip', () => {
   })
 
   it('positions with transform instead of dynamic left/top', async () => {
-    renderWithProps(ChartTooltip, { content: 'Tooltip text', visible: true, x: 100, y: 100 })
+    renderWithProps(ChartTooltip, { content: 'Tooltip text', open: true, x: 100, y: 100 })
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     const tooltip = document.querySelector('[data-chart-tooltip]') as HTMLElement

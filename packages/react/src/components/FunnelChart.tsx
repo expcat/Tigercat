@@ -211,7 +211,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     showTooltip && hoverable ? (
       <ChartTooltip
         content={tooltipContent}
-        visible={resolvedHoveredIndex !== null && tooltipContent !== ''}
+        open={resolvedHoveredIndex !== null && tooltipContent !== ''}
         x={tooltipPosition.x}
         y={tooltipPosition.y}
       />

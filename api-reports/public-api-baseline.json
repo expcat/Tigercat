@@ -75,7 +75,6 @@
       "applyNumberKeyboardInput",
       "applyWheelZoom",
       "AR_SA_DATEPICKER_LOCALE",
-      "AreaChartDatum",
       "AreaChartProps",
       "AreaChartSeries",
       "AriaLiveLevel",
@@ -273,6 +272,7 @@
       "chartAxisTickLineClasses",
       "chartAxisTickTextClasses",
       "ChartBrushRange",
+      "ChartBuiltInTooltipProps",
       "chartCanvasBaseClasses",
       "ChartCanvasProps",
       "ChartCanvasSize",
@@ -674,7 +674,6 @@
       "DONUT_EMPHASIS_SHADOW",
       "DONUT_ENTRANCE_CLASS",
       "DONUT_ENTRANCE_KEYFRAMES",
-      "DonutChartDatum",
       "DonutChartProps",
       "dotSizeClasses",
       "dotsVariantConfig",
@@ -2944,9 +2943,9 @@
     "AreaChartProps": {
       "extends": [
         "BaseChartProps",
+        "ChartBuiltInTooltipProps",
         "ChartInteractionProps",
-        "ChartLegendProps",
-        "ChartTooltipProps"
+        "ChartLegendProps"
       ],
       "props": [
         "animated",
@@ -3038,9 +3037,9 @@
     "BarChartProps": {
       "extends": [
         "BaseChartProps",
+        "ChartBuiltInTooltipProps",
         "ChartInteractionProps",
-        "ChartLegendProps",
-        "ChartTooltipProps"
+        "ChartLegendProps"
       ],
       "props": [
         "animated",
@@ -3193,6 +3192,10 @@
         "y"
       ]
     },
+    "ChartBuiltInTooltipProps": {
+      "extends": [],
+      "props": ["showTooltip"]
+    },
     "ChartCanvasProps": {
       "extends": [],
       "props": ["className", "desc", "height", "padding", "responsive", "title", "width"]
@@ -3235,7 +3238,7 @@
     },
     "ChartTooltipProps": {
       "extends": [],
-      "props": ["showTooltip"]
+      "props": ["className", "content", "open", "x", "y"]
     },
     "ChartWithAxesProps": {
       "extends": [],
@@ -3653,9 +3656,9 @@
     "FunnelChartProps": {
       "extends": [
         "BaseChartProps",
+        "ChartBuiltInTooltipProps",
         "ChartInteractionProps",
-        "ChartLegendProps",
-        "ChartTooltipProps"
+        "ChartLegendProps"
       ],
       "props": ["colors", "data", "direction", "gap", "gradient", "pinch"]
     },
@@ -3681,7 +3684,7 @@
       ]
     },
     "GaugeChartProps": {
-      "extends": ["BaseChartProps", "ChartTooltipProps"],
+      "extends": ["BaseChartProps", "ChartBuiltInTooltipProps"],
       "props": [
         "arcWidth",
         "color",
@@ -3723,7 +3726,7 @@
       "props": ["className", "height", "variant"]
     },
     "HeatmapChartProps": {
-      "extends": ["BaseChartProps", "ChartInteractionProps", "ChartTooltipProps"],
+      "extends": ["BaseChartProps", "ChartBuiltInTooltipProps", "ChartInteractionProps"],
       "props": [
         "canvasThreshold",
         "cellGap",
@@ -3910,9 +3913,9 @@
     "LineChartProps": {
       "extends": [
         "BaseChartProps",
+        "ChartBuiltInTooltipProps",
         "ChartInteractionProps",
-        "ChartLegendProps",
-        "ChartTooltipProps"
+        "ChartLegendProps"
       ],
       "props": [
         "animated",
@@ -4198,9 +4201,9 @@
     "PieChartProps": {
       "extends": [
         "BaseChartProps",
+        "ChartBuiltInTooltipProps",
         "ChartInteractionProps",
-        "ChartLegendProps",
-        "ChartTooltipProps"
+        "ChartLegendProps"
       ],
       "props": [
         "borderColor",
@@ -4295,7 +4298,7 @@
       "props": ["bgColor", "className", "color", "level", "size", "status", "value"]
     },
     "RadarChartProps": {
-      "extends": ["BaseChartProps", "ChartLegendProps", "ChartTooltipProps"],
+      "extends": ["BaseChartProps", "ChartBuiltInTooltipProps", "ChartLegendProps"],
       "props": [
         "activeOpacity",
         "colors",
@@ -4398,9 +4401,9 @@
     "ScatterChartProps": {
       "extends": [
         "BaseChartProps",
+        "ChartBuiltInTooltipProps",
         "ChartInteractionProps",
         "ChartLegendProps",
-        "ChartTooltipProps",
         "ChartWithAxesProps"
       ],
       "props": [
@@ -4584,9 +4587,9 @@
     "SunburstChartProps": {
       "extends": [
         "BaseChartProps",
+        "ChartBuiltInTooltipProps",
         "ChartInteractionProps",
-        "ChartLegendProps",
-        "ChartTooltipProps"
+        "ChartLegendProps"
       ],
       "props": ["colors", "data", "gradient", "innerRadiusRatio", "showLabels"]
     },
@@ -4847,9 +4850,9 @@
     "TreeMapChartProps": {
       "extends": [
         "BaseChartProps",
+        "ChartBuiltInTooltipProps",
         "ChartInteractionProps",
-        "ChartLegendProps",
-        "ChartTooltipProps"
+        "ChartLegendProps"
       ],
       "props": ["colors", "data", "gap", "gradient", "minLabelSize", "showLabels"]
     },

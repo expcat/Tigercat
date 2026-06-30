@@ -361,16 +361,16 @@ describe('ChartTooltip', () => {
     document.querySelectorAll('[data-chart-tooltip]').forEach((t) => t.remove())
   })
 
-  it('renders content when visible', () => {
-    renderWithProps(ChartTooltip, { content: 'Tooltip text', visible: true, x: 100, y: 100 })
+  it('renders content when open', () => {
+    renderWithProps(ChartTooltip, { content: 'Tooltip text', open: true, x: 100, y: 100 })
 
     const tooltip = document.querySelector('[data-chart-tooltip]')
     expect(tooltip).toBeTruthy()
     expect(tooltip?.textContent).toContain('Tooltip text')
   })
 
-  it('hides when not visible or empty', () => {
-    renderWithProps(ChartTooltip, { content: 'Tooltip text', visible: false, x: 100, y: 100 })
+  it('hides when not open or empty', () => {
+    renderWithProps(ChartTooltip, { content: 'Tooltip text', open: false, x: 100, y: 100 })
 
     const hiddenTooltip = document.querySelector('[data-chart-tooltip]')
     if (hiddenTooltip) {
@@ -378,14 +378,14 @@ describe('ChartTooltip', () => {
     }
 
     cleanup()
-    renderWithProps(ChartTooltip, { content: '', visible: true, x: 100, y: 100 })
+    renderWithProps(ChartTooltip, { content: '', open: true, x: 100, y: 100 })
     expect(document.querySelector('[data-chart-tooltip]')).toBeFalsy()
   })
 
   it('applies custom className', () => {
     renderWithProps(ChartTooltip, {
       content: 'Tooltip text',
-      visible: true,
+      open: true,
       x: 100,
       y: 100,
       className: 'custom-tooltip'
@@ -395,7 +395,7 @@ describe('ChartTooltip', () => {
   })
 
   it('positions with transform instead of dynamic left/top', () => {
-    renderWithProps(ChartTooltip, { content: 'Tooltip text', visible: true, x: 100, y: 100 })
+    renderWithProps(ChartTooltip, { content: 'Tooltip text', open: true, x: 100, y: 100 })
 
     const tooltip = document.querySelector('[data-chart-tooltip]') as HTMLElement
     expect(tooltip.style.transform).toBe('translate3d(112px, 92px, 0)')

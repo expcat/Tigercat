@@ -767,7 +767,7 @@ export const LineChart = defineComponent({
       const tooltip = props.showTooltip
         ? h(ChartTooltip, {
             content: tooltipContent.value,
-            visible: hoveredPointInfo.value !== null && tooltipContent.value !== '',
+            open: hoveredPointInfo.value !== null && tooltipContent.value !== '',
             x: tooltipPosition.value.x,
             y: tooltipPosition.value.y
           })

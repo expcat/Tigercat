@@ -7,13 +7,13 @@ import {
   DONUT_ENTRANCE_CLASS,
   type ChartPadding,
   type ChartLegendPosition,
-  type DonutChartDatum,
+  type PieChartDatum,
   type DonutChartProps as CoreDonutChartProps
 } from '@expcat/tigercat-core'
 import { PieChart } from './PieChart'
 
 export interface VueDonutChartProps extends CoreDonutChartProps {
-  data: DonutChartDatum[]
+  data: PieChartDatum[]
   padding?: ChartPadding
 }
 
@@ -52,7 +52,7 @@ export const DonutChart = defineComponent({
       default: 24
     },
     data: {
-      type: Array as PropType<DonutChartDatum[]>,
+      type: Array as PropType<PieChartDatum[]>,
       required: true
     },
     innerRadius: {
@@ -85,7 +85,7 @@ export const DonutChart = defineComponent({
       default: false
     },
     labelFormatter: {
-      type: Function as PropType<(value: number, datum: DonutChartDatum, index: number) => string>
+      type: Function as PropType<(value: number, datum: PieChartDatum, index: number) => string>
     },
     // Interaction props
     hoverable: {
@@ -130,7 +130,7 @@ export const DonutChart = defineComponent({
       default: 8
     },
     legendFormatter: {
-      type: Function as PropType<(datum: DonutChartDatum, index: number) => string>,
+      type: Function as PropType<(datum: PieChartDatum, index: number) => string>,
       default: undefined
     },
     // Tooltip props
@@ -139,7 +139,7 @@ export const DonutChart = defineComponent({
       default: true
     },
     tooltipFormatter: {
-      type: Function as PropType<(datum: DonutChartDatum, index: number) => string>
+      type: Function as PropType<(datum: PieChartDatum, index: number) => string>
     },
     // Accessibility
     title: {
@@ -230,7 +230,7 @@ export const DonutChart = defineComponent({
     const donutTooltipFormatter = computed(() => {
       if (props.tooltipFormatter) return props.tooltipFormatter
       const total = props.data.reduce((s, d) => s + d.value, 0)
-      return (datum: DonutChartDatum, index: number) => {
+      return (datum: PieChartDatum, index: number) => {
         const pct = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
         const label = datum.label ?? `#${index + 1}`
         return `${label}: ${datum.value} (${pct}%)`
@@ -243,10 +243,10 @@ export const DonutChart = defineComponent({
     const handleSelectedIndexUpdate = (index: number | null) => {
       emit('update:selectedIndex', index)
     }
-    const handleSliceClick = (datum: DonutChartDatum, index: number) => {
+    const handleSliceClick = (datum: PieChartDatum, index: number) => {
       emit('slice-click', datum, index)
     }
-    const handleSliceHover = (datum: DonutChartDatum | null, index: number | null) => {
+    const handleSliceHover = (datum: PieChartDatum | null, index: number | null) => {
       emit('slice-hover', datum, index)
     }
 

@@ -4,23 +4,23 @@
 type: active-roadmap
 scope: v2.0.0 breaking component API simplification and grouped validation plan
 verified-date: 2026-06-30
-source: current repository state after R20 composite/business cleanup (v2.0 release hardening deferred)
+source: current repository state after R18 Charts completion and R20 composite/business cleanup (v2.0 release hardening deferred)
 -->
 
-本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；R01-R17 已完成任务的详细执行记录归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，需要历史证据时从归档、git 历史、变更日志或对应提交中查找。
+本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节与发布收口记录不再保留在路线图中；R01-R18 已完成任务的详细执行记录归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，需要历史证据时从归档、git 历史、变更日志或对应提交中查找。
 
 ## 当前状态
 
-截至 2026-06-29，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R17 基础设施、API 审计与前六个组件批次清理：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy token/icon 资源清理、按组件组验证通道、core/shared contracts 删除合并清单、Basic/Layout 轻量组件 API 清理、Feedback/overlay open/portal/focus/close lifecycle 收敛、Form primitives 受控模型与尺寸别名清理、Form composite selectors 搜索/空态/模型别名与 heavy helper 拆分、Navigation 受控回调和子组件 subpath 产物收敛，以及 Data/table stack 数据、选择与虚拟滚动入口统一已经落地。R20 Composite/business 组件 API 清理已于 2026-06-30 提前完成（移除 Kanban 数据模型别名、收敛 DataTableWithToolbar 业务回调、拆分 composite 巨型类型文件），但 R20 不再作为 v2.0.0 的发布收口任务：v2.0.0 后续仍会追加新的更新计划，发布前仍需完成 R18、R19 与最终发布收口，因此本批次不准备发布版本。
+截至 2026-06-30，上一轮 T01-T14 已完成，v2.0.0 已完成 R01-R18 基础设施、API 审计与前七个组件批次清理：包体积、按需加载、发布产物、ESM-only、显式 exports、sideEffects、首批兼容层、legacy token/icon 资源清理、按组件组验证通道、core/shared contracts 删除合并清单、Basic/Layout 轻量组件 API 清理、Feedback/overlay open/portal/focus/close lifecycle 收敛、Form primitives 受控模型与尺寸别名清理、Form composite selectors 搜索/空态/模型别名与 heavy helper 拆分、Navigation 受控回调和子组件 subpath 产物收敛、Data/table stack 数据、选择与虚拟滚动入口统一，以及 Charts/visualization 类型拆分和 tooltip 命名收敛已经落地。R20 Composite/business 组件 API 清理也已于 2026-06-30 提前完成（移除 Kanban 数据模型别名、收敛 DataTableWithToolbar 业务回调、拆分 composite 巨型类型文件），但 R20 不再作为 v2.0.0 的发布收口任务；发布前仍需完成 R19 与最终发布门禁，v2.0.0 后续仍会追加新的更新计划，本批次不准备发布版本。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）、阶段 6（R11 Core API and shared contracts audit）、阶段 7（R12 Basic + Layout lightweight components）、阶段 8（R13 Feedback and overlay components）、阶段 9（R14-R15 Form primitives 与 composite selectors）、阶段 10（R16 Navigation components）和阶段 11（R17 Data and table stack）已完成于 2026-06-29。阶段 14（R20 Composite/business components）的组件级 API 清理已于 2026-06-30 提前完成，但其 v2.0 发布收口部分按维护决定 deferred，本批次不发布版本。
-- 当前阶段：阶段 12（R18 Charts and visualization stack），状态为 `未开始`。
-- 当前可执行任务：R18 Charts and visualization stack。
-- 后续阶段：R18、R19 仍需执行；R20 组件清理已提前落地，但 v2.0.0 发布收口不再绑定 R20，需在 R18、R19 完成后单独完成最终发布门禁。v2.0.0 后续仍会追加新的更新计划，路线图不在 R20 处收口。
+- 已完成阶段：阶段 0（R01 Roadmap cleanup）、阶段 1（R02 version and release metadata、R03 ESM-only build surface）、阶段 2（R04 explicit exports and public component facts、R05 tree-shaking and sideEffects）、阶段 3（R06 remove deprecated and compatibility APIs、R07 token and legacy asset cleanup）与阶段 4（R08 on-demand usage docs and examples、R09 size and publish artifact gates），已完成于 2026-06-28；阶段 5（R10 grouped validation, docs, and examples infrastructure）、阶段 6（R11 Core API and shared contracts audit）、阶段 7（R12 Basic + Layout lightweight components）、阶段 8（R13 Feedback and overlay components）、阶段 9（R14-R15 Form primitives 与 composite selectors）、阶段 10（R16 Navigation components）和阶段 11（R17 Data and table stack）已完成于 2026-06-29；阶段 12（R18 Charts and visualization stack）已完成于 2026-06-30。阶段 14（R20 Composite/business components）的组件级 API 清理已于 2026-06-30 提前完成，但其 v2.0 发布收口部分按维护决定 deferred，本批次不发布版本。
+- 当前阶段：阶段 13（R19 Advanced editors and media-heavy components），状态为 `未开始`。
+- 当前可执行任务：R19 Advanced editors and media-heavy components。
+- 后续阶段：R19 仍需执行；R20 组件清理已提前落地，但 v2.0.0 发布收口不再绑定 R20，需在 R19 完成后单独完成最终发布门禁。v2.0.0 后续仍会追加新的更新计划，路线图不在 R20 处收口。
 
 ## 执行原则
 
@@ -61,7 +61,7 @@ source: current repository state after R20 composite/business cleanup (v2.0 rele
 | 9    | 已完成（2026-06-29）                            | R14-R15 | 分两批清理 Form primitives 与 composite selectors                                         |
 | 10   | 已完成（2026-06-29）                            | R16     | 清理 Navigation 组件                                                                      |
 | 11   | 已完成（2026-06-29）                            | R17     | 清理 Data 与 table stack                                                                  |
-| 12   | 未开始                                          | R18     | 清理 Charts 与 visualization stack                                                        |
+| 12   | 已完成（2026-06-30）                            | R18     | 清理 Charts 与 visualization stack                                                        |
 | 13   | 未开始                                          | R19     | 清理 Advanced editors 与 media-heavy components                                           |
 | 14   | 组件清理已完成（2026-06-30）；发布收口 deferred | R20     | 清理 Composite/business components；v2.0 release hardening 不再绑定本批次，发布前单独收口 |
 
@@ -74,55 +74,30 @@ source: current repository state after R20 composite/business cleanup (v2.0 rele
 
 ## v2.0.0 任务队列
 
-### R01-R17 completed archive
+### R01-R18 completed archive
 
-R01-R17 已完成，详细执行摘要、实际验证命令和状态回写记录已归档到 [V2_COMPLETED.md](V2_COMPLETED.md)。当前执行入口只保留完成状态摘要，避免后续 Agent 读取 R18-R20 时消耗过多 token。
+R01-R18 已完成，详细执行摘要、实际验证命令和状态回写记录已归档到 [V2_COMPLETED.md](V2_COMPLETED.md)。当前执行入口只保留完成状态摘要，避免后续 Agent 读取 R19-R20 时消耗过多 token。
 
-| 任务                                                      | 状态                 | 摘要                                                                                           | 详情                                                                                         |
-| --------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| R01 Roadmap cleanup                                       | 已完成（2026-06-28） | 清理路线图为 v2.0.0 分批执行入口。                                                             | [归档](V2_COMPLETED.md#r01-roadmap-cleanup)                                                  |
-| R02 version and release metadata                          | 已完成（2026-06-28） | 同步 2.0.0 版本、运行时 version、CLI 模板和 release readiness 入口。                           | [归档](V2_COMPLETED.md#r02-version-and-release-metadata)                                     |
-| R03 ESM-only build surface                                | 已完成（2026-06-28） | 将 core/react/vue 发布面切为 ESM-only，并更新 publish smoke。                                  | [归档](V2_COMPLETED.md#r03-esm-only-build-surface)                                           |
-| R04 explicit exports and public component facts           | 已完成（2026-06-28） | 建立公开组件事实源和 React/Vue 显式 component subpath exports。                                | [归档](V2_COMPLETED.md#r04-explicit-exports-and-public-component-facts)                      |
-| R05 tree-shaking and sideEffects                          | 已完成（2026-06-28） | 收敛 sideEffects，隔离 Message/notification 命令式入口并加 tree-shaking gates。                | [归档](V2_COMPLETED.md#r05-tree-shaking-and-sideeffects)                                     |
-| R06 remove deprecated and compatibility APIs              | 已完成（2026-06-28） | 删除首批 deprecated/compat API，并让 api:validate 阻止新增 public deprecated API。             | [归档](V2_COMPLETED.md#r06-remove-deprecated-and-compatibility-apis)                         |
-| R07 token and legacy asset cleanup                        | 已完成（2026-06-28） | 删除 legacy token CSS/TS 兼容命名、旧 icon path aliases 和 common-icons barrel。               | [归档](V2_COMPLETED.md#r07-token-and-legacy-asset-cleanup)                                   |
-| R08 on-demand usage docs and examples                     | 已完成（2026-06-28） | 将 examples、SSR smoke 和 references 迁移到 subpath-first / lazy-first 用法。                  | [归档](V2_COMPLETED.md#r08-on-demand-usage-docs-and-examples)                                |
-| R09 size and publish artifact gates                       | 已完成（2026-06-28） | 增加 size/publish artifact gates，验证发布 tarball、exports 和 bundle 隔离。                   | [归档](V2_COMPLETED.md#r09-size-and-publish-artifact-gates)                                  |
-| R10 grouped validation, docs, and examples infrastructure | 已完成（2026-06-29） | 建立按组件组运行测试、文档和示例维护的基础设施。                                               | [归档](V2_COMPLETED.md#r10-grouped-validation-docs-and-examples-infrastructure)              |
-| R11 Core API and shared contracts audit                   | 已完成（2026-06-29） | 输出 v2 shared contracts 审计和 R12-R20 API 删除/合并清单。                                    | [归档](V2_COMPLETED.md#r11-core-api-and-shared-contracts-audit)，[API 审计](V2_API_AUDIT.md) |
-| R12 Basic + Layout lightweight components                 | 已完成（2026-06-29） | 清理 Basic/Layout 轻量组件，删除尺寸/布局别名，Carousel 切换受控 currentIndex 模型。           | [归档](V2_COMPLETED.md#r12-basic--layout-lightweight-components)                             |
-| R13 Feedback and overlay components                       | 已完成（2026-06-29） | 统一 Feedback/overlay 的 open/after-close/portal/focus 合约，删除 visible 残留。               | [归档](V2_COMPLETED.md#r13-feedback-and-overlay-components)                                  |
-| R14 Form primitives                                       | 已完成（2026-06-29） | 统一 Form primitives 受控模型，删除等同 ComponentSize 的尺寸别名。                             | [归档](V2_COMPLETED.md#r14-form-primitives)                                                  |
-| R15 Form composite selectors                              | 已完成（2026-06-29） | 收敛 composite selectors 的 search/empty/model 别名，拆分 Upload heavy helper。                | [归档](V2_COMPLETED.md#r15-form-composite-selectors)                                         |
-| R16 Navigation components                                 | 已完成（2026-06-29） | 收敛 Navigation 受控回调命名，删除子组件源码 shim 并保留 subpath 产物。                        | [归档](V2_COMPLETED.md#r16-navigation-components)                                            |
-| R17 Data and table stack                                  | 已完成（2026-06-29） | 统一 Table/VirtualTable/DataTableWithToolbar 数据、选择与虚拟滚动入口，删除 Generic 泛型别名。 | [归档](V2_COMPLETED.md#r17-data-and-table-stack)                                             |
-
-### R18 Charts and visualization stack
-
-**状态**：未开始。
-
-**目标**：拆分巨型 chart type/API，统一 data/series/tooltip/legend/a11y 合约，并确保基础组件不会拉入 charts。
-
-**允许修改**：Charts 相关 core types、React/Vue chart components、chart hooks/helpers、目标 tests/bench smoke、Skill charts props/examples、example 使用、迁移说明、变更记录、API baseline、publish bundle smoke。
-
-**不得修改**：Basic/Form/Feedback/Navigation/Data/Advanced/Composite 非图表行为、无关 package exports。
-
-**依赖/阻塞**：依赖 R11；必须保持 R09 的 Button 子路径不拉入 charts 的隔离目标。
-
-**组件范围**：ChartCanvas、ChartAxis、ChartGrid、ChartLegend、ChartTooltip、AreaChart、BarChart、LineChart、PieChart、DonutChart、RadarChart、ScatterChart、HeatmapChart、SunburstChart、TreeMapChart、FunnelChart、GaugeChart、Gantt、OrgChart。
-
-**完成验证**：
-
-- `corepack pnpm test:group:charts`
-- `corepack pnpm publish:check`
-- `corepack pnpm size`
-- `corepack pnpm api:validate`
-- `corepack pnpm types:check`
-- `corepack pnpm docs:api:check`
-- `git diff --check`
-
-**状态更新要求**：完成后写回状态、日期、删除的 chart API 摘要、bundle 隔离结果、Skill/examples 更新范围和关键验证命令；同步更新阶段 12 状态。
+| 任务                                                      | 状态                 | 摘要                                                                                             | 详情                                                                                         |
+| --------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| R01 Roadmap cleanup                                       | 已完成（2026-06-28） | 清理路线图为 v2.0.0 分批执行入口。                                                               | [归档](V2_COMPLETED.md#r01-roadmap-cleanup)                                                  |
+| R02 version and release metadata                          | 已完成（2026-06-28） | 同步 2.0.0 版本、运行时 version、CLI 模板和 release readiness 入口。                             | [归档](V2_COMPLETED.md#r02-version-and-release-metadata)                                     |
+| R03 ESM-only build surface                                | 已完成（2026-06-28） | 将 core/react/vue 发布面切为 ESM-only，并更新 publish smoke。                                    | [归档](V2_COMPLETED.md#r03-esm-only-build-surface)                                           |
+| R04 explicit exports and public component facts           | 已完成（2026-06-28） | 建立公开组件事实源和 React/Vue 显式 component subpath exports。                                  | [归档](V2_COMPLETED.md#r04-explicit-exports-and-public-component-facts)                      |
+| R05 tree-shaking and sideEffects                          | 已完成（2026-06-28） | 收敛 sideEffects，隔离 Message/notification 命令式入口并加 tree-shaking gates。                  | [归档](V2_COMPLETED.md#r05-tree-shaking-and-sideeffects)                                     |
+| R06 remove deprecated and compatibility APIs              | 已完成（2026-06-28） | 删除首批 deprecated/compat API，并让 api:validate 阻止新增 public deprecated API。               | [归档](V2_COMPLETED.md#r06-remove-deprecated-and-compatibility-apis)                         |
+| R07 token and legacy asset cleanup                        | 已完成（2026-06-28） | 删除 legacy token CSS/TS 兼容命名、旧 icon path aliases 和 common-icons barrel。                 | [归档](V2_COMPLETED.md#r07-token-and-legacy-asset-cleanup)                                   |
+| R08 on-demand usage docs and examples                     | 已完成（2026-06-28） | 将 examples、SSR smoke 和 references 迁移到 subpath-first / lazy-first 用法。                    | [归档](V2_COMPLETED.md#r08-on-demand-usage-docs-and-examples)                                |
+| R09 size and publish artifact gates                       | 已完成（2026-06-28） | 增加 size/publish artifact gates，验证发布 tarball、exports 和 bundle 隔离。                     | [归档](V2_COMPLETED.md#r09-size-and-publish-artifact-gates)                                  |
+| R10 grouped validation, docs, and examples infrastructure | 已完成（2026-06-29） | 建立按组件组运行测试、文档和示例维护的基础设施。                                                 | [归档](V2_COMPLETED.md#r10-grouped-validation-docs-and-examples-infrastructure)              |
+| R11 Core API and shared contracts audit                   | 已完成（2026-06-29） | 输出 v2 shared contracts 审计和 R12-R20 API 删除/合并清单。                                      | [归档](V2_COMPLETED.md#r11-core-api-and-shared-contracts-audit)，[API 审计](V2_API_AUDIT.md) |
+| R12 Basic + Layout lightweight components                 | 已完成（2026-06-29） | 清理 Basic/Layout 轻量组件，删除尺寸/布局别名，Carousel 切换受控 currentIndex 模型。             | [归档](V2_COMPLETED.md#r12-basic--layout-lightweight-components)                             |
+| R13 Feedback and overlay components                       | 已完成（2026-06-29） | 统一 Feedback/overlay 的 open/after-close/portal/focus 合约，删除 visible 残留。                 | [归档](V2_COMPLETED.md#r13-feedback-and-overlay-components)                                  |
+| R14 Form primitives                                       | 已完成（2026-06-29） | 统一 Form primitives 受控模型，删除等同 ComponentSize 的尺寸别名。                               | [归档](V2_COMPLETED.md#r14-form-primitives)                                                  |
+| R15 Form composite selectors                              | 已完成（2026-06-29） | 收敛 composite selectors 的 search/empty/model 别名，拆分 Upload heavy helper。                  | [归档](V2_COMPLETED.md#r15-form-composite-selectors)                                         |
+| R16 Navigation components                                 | 已完成（2026-06-29） | 收敛 Navigation 受控回调命名，删除子组件源码 shim 并保留 subpath 产物。                          | [归档](V2_COMPLETED.md#r16-navigation-components)                                            |
+| R17 Data and table stack                                  | 已完成（2026-06-29） | 统一 Table/VirtualTable/DataTableWithToolbar 数据、选择与虚拟滚动入口，删除 Generic 泛型别名。   | [归档](V2_COMPLETED.md#r17-data-and-table-stack)                                             |
+| R18 Charts and visualization stack                        | 已完成（2026-06-30） | 拆分 chart 类型文件，删除重复 datum aliases，统一独立 ChartTooltip open 命名并保留 charts 隔离。 | [归档](V2_COMPLETED.md#r18-charts-and-visualization-stack)                                   |
 
 ### R19 Advanced editors and media-heavy components
 
@@ -155,9 +130,9 @@ R01-R17 已完成，详细执行摘要、实际验证命令和状态回写记录
 
 **状态**：组件级 API 清理已完成（2026-06-30）；v2.0 发布收口 deferred、本批次不发布版本。
 
-**执行摘要（2026-06-30）**：移除 `KanbanCard` / `KanbanColumn` / `KanbanCardMoveEvent` / `KanbanColumnMoveEvent` 公共别名（统一复用 `TaskBoard*`，保留 `KanbanProps` / `KanbanSwimlane`）；删除 DataTableWithToolbar 顶层 `onSearchChange` / `onSearch` / `onFiltersChange` / `onBulkAction`，业务回调收敛到 React `toolbar.*` 配置与 Vue 组件事件；将 `composite.ts` 巨型类型文件按组件拆分为 `chat` / `activity-feed` / `comment-thread` / `notification-center` / `table-toolbar` / `form-wizard` / `task-board` 并改 `composite.ts` 为薄 barrel；新增 `api:validate` R20 guard。详细记录见 [V2_API_AUDIT.md](V2_API_AUDIT.md) 与 [V2_COMPLETED.md](V2_COMPLETED.md)。R20 不再承担 v2.0.0 发布收口：`quality:release` 全量发布门禁、`api:baseline` release 收口与发布后 `smoke:published` 留待 R18、R19 完成后的最终发布批次执行。
+**执行摘要（2026-06-30）**：移除 `KanbanCard` / `KanbanColumn` / `KanbanCardMoveEvent` / `KanbanColumnMoveEvent` 公共别名（统一复用 `TaskBoard*`，保留 `KanbanProps` / `KanbanSwimlane`）；删除 DataTableWithToolbar 顶层 `onSearchChange` / `onSearch` / `onFiltersChange` / `onBulkAction`，业务回调收敛到 React `toolbar.*` 配置与 Vue 组件事件；将 `composite.ts` 巨型类型文件按组件拆分为 `chat` / `activity-feed` / `comment-thread` / `notification-center` / `table-toolbar` / `form-wizard` / `task-board` 并改 `composite.ts` 为薄 barrel；新增 `api:validate` R20 guard。详细记录见 [V2_API_AUDIT.md](V2_API_AUDIT.md) 与 [V2_COMPLETED.md](V2_COMPLETED.md)。R20 不再承担 v2.0.0 发布收口：`quality:release` 全量发布门禁、`api:baseline` release 收口与发布后 `smoke:published` 留待 R19 完成后的最终发布批次执行。
 
-**目标**：清理 Composite/business components，移除 legacy prop passthrough，统一业务对象字段和基础组件新 API 使用。注意：v2.0.0 发布收口已从 R20 解绑，留待 R18、R19 完成后单独执行。
+**目标**：清理 Composite/business components，移除 legacy prop passthrough，统一业务对象字段和基础组件新 API 使用。注意：v2.0.0 发布收口已从 R20 解绑，留待 R19 完成后单独执行。
 
 **允许修改**：Composite 相关 core types、React/Vue 组件、目标 tests、Skill composite props/examples、example 使用、迁移说明、变更记录、API baseline、size budget、release/publish 文档和必要发布门禁。
 

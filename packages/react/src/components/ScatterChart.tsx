@@ -372,7 +372,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   const tooltip = showTooltip && hoverable && (
     <ChartTooltip
       content={tooltipContent}
-      visible={resolvedHoveredIndex !== null && tooltipContent !== ''}
+      open={resolvedHoveredIndex !== null && tooltipContent !== ''}
       x={tooltipPosition.x}
       y={tooltipPosition.y}
     />

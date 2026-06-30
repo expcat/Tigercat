@@ -576,7 +576,7 @@ export const LineChart: React.FC<LineChartProps> = ({
   const tooltip = showTooltip && (
     <ChartTooltip
       content={tooltipContent}
-      visible={hoveredPointInfo !== null && tooltipContent !== ''}
+      open={hoveredPointInfo !== null && tooltipContent !== ''}
       x={tooltipPosition.x}
       y={tooltipPosition.y}
     />

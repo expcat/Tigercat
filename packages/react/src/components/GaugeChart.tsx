@@ -94,8 +94,8 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   const formattedValue = valueFormatter ? valueFormatter(value) : `${value}`
 
   // Tooltip (hover / focus over the gauge)
-  const [tooltip, setTooltip] = useState<{ visible: boolean; x: number; y: number }>({
-    visible: false,
+  const [tooltip, setTooltip] = useState<{ open: boolean; x: number; y: number }>({
+    open: false,
     x: 0,
     y: 0
   })
@@ -106,9 +106,9 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       : formattedValue
   const handleTooltipMove = (e: React.MouseEvent) => {
     if (!showTooltip) return
-    setTooltip({ visible: true, x: e.clientX, y: e.clientY })
+    setTooltip({ open: true, x: e.clientX, y: e.clientY })
   }
-  const handleTooltipLeave = () => setTooltip((t) => ({ ...t, visible: false }))
+  const handleTooltipLeave = () => setTooltip((t) => ({ ...t, open: false }))
 
   // Per-instance gradient ID (only used when gradient prop is on)
   const gradientId = useId()
@@ -123,7 +123,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
     if (!showTooltip) return
     const rect = wrapperRef.current?.getBoundingClientRect()
     if (rect)
-      setTooltip({ visible: true, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
+      setTooltip({ open: true, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
   }
 
   return (
@@ -233,7 +233,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       {showTooltip && (
         <ChartTooltip
           content={tooltipContent}
-          visible={tooltip.visible && tooltipContent !== ''}
+          open={tooltip.open && tooltipContent !== ''}
           x={tooltip.x}
           y={tooltip.y}
         />

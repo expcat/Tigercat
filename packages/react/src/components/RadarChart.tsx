@@ -716,7 +716,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     showTooltip && hoverable ? (
       <ChartTooltip
         content={tooltipContent}
-        visible={hoveredPoint !== null && tooltipContent !== ''}
+        open={hoveredPoint !== null && tooltipContent !== ''}
         x={tooltipPosition.x}
         y={tooltipPosition.y}
       />

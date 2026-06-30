@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { AreaChart } from '@expcat/tigercat-vue/AreaChart'
-import { type AreaChartDatum, type AreaChartSeries } from '@expcat/tigercat-vue'
+import { type LineChartDatum, type AreaChartSeries } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
-const basicData: AreaChartDatum[] = [
+const basicData: LineChartDatum[] = [
   { x: 'Jan', y: 30 },
   { x: 'Feb', y: 40 },
   { x: 'Mar', y: 35 },

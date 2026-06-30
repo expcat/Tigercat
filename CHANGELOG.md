@@ -4,7 +4,7 @@
 
 ## v2.0.0
 
-本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移、size / publish artifact gate 收口、Basic / Layout 轻量组件 API 清理、Feedback / overlay open、portal、focus 与 close lifecycle 收敛，Form primitives 和 composite selectors 的受控模型、搜索、空态和尺寸类型收敛，Navigation 组件受控回调与子组件 subpath 产物收敛，以及 Data/table stack 数据、选择与虚拟滚动入口统一。
+本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移、size / publish artifact gate 收口、Basic / Layout 轻量组件 API 清理、Feedback / overlay open、portal、focus 与 close lifecycle 收敛，Form primitives 和 composite selectors 的受控模型、搜索、空态和尺寸类型收敛，Navigation 组件受控回调与子组件 subpath 产物收敛，Data/table stack 数据、选择与虚拟滚动入口统一，以及 Charts/visualization 类型拆分与 tooltip 命名收敛。
 
 ### Breaking Changes
 
@@ -36,6 +36,8 @@
 - **core table 泛型类型**：移除重复的 `GenericTableColumn`、`GenericRowSelection`、`GenericExpandable`、`GenericTableProps`；请改用 `TableColumn<T>`、`RowSelectionConfig<T>`、`ExpandableConfig<T>`、`TableProps<T>`。
 - **Kanban 数据模型类型别名**：移除 `KanbanCard`、`KanbanColumn`、`KanbanCardMoveEvent`、`KanbanColumnMoveEvent` 公共别名；Kanban 复用 TaskBoard 数据模型，请直接使用 `TaskBoardCard`、`TaskBoardColumn`、`TaskBoardCardMoveEvent`、`TaskBoardColumnMoveEvent`。`KanbanProps` 与 `KanbanSwimlane` 保留。
 - **DataTableWithToolbar 业务回调收敛**：移除组件顶层 `onSearchChange`、`onSearch`、`onFiltersChange`、`onBulkAction`，业务回调统一从 `toolbar` 配置发出——React 使用 `toolbar.onSearchChange` / `toolbar.onSearch` / `toolbar.onFiltersChange` / `toolbar.onBulkAction`，Vue 继续使用 `@search-change` / `@search` / `@filters-change` / `@bulk-action` 事件。`onPageChange` / `onPageSizeChange` / `onSelectionChange` 等分页与表格回调仍为组件顶层 API。
+- **Charts 类型拆分与重复别名删除**：`chart.ts` 拆分为 `chart-core`、`chart-cartesian`、`chart-radial`、`chart-visualization` 分组类型，根入口仍继续导出所有 chart 类型；删除重复的 `AreaChartDatum` 与 `DonutChartDatum`，请分别改用 `LineChartDatum` 与 `PieChartDatum`。
+- **ChartTooltip 可见性命名**：独立 `ChartTooltip` 的可见性 prop 从 `visible` 改为 `open`；高阶图表组件继续使用 `showTooltip` 控制内置 tooltip。
 
 ### Infrastructure
 
@@ -53,6 +55,7 @@
 - `api:validate` 会阻止 Data/Table stack 回退到 VirtualTable 旧数据/选择 props、Table `autoVirtualThreshold` 或重复 `GenericTable*` public interfaces。
 - `api:validate` 会阻止 Kanban 重新导出 `KanbanCard` / `KanbanColumn` / `KanbanCardMoveEvent` / `KanbanColumnMoveEvent` 别名，以及 DataTableWithToolbar 重新引入顶层 `onSearchChange` / `onSearch` / `onFiltersChange` / `onBulkAction` 业务回调。
 - core composite 巨型类型文件 `composite.ts` 按组件拆分为 `chat.ts`、`activity-feed.ts`、`comment-thread.ts`、`notification-center.ts`、`table-toolbar.ts`、`form-wizard.ts`、`task-board.ts`，`composite.ts` 改为薄 barrel；公共类型导出经 `@expcat/tigercat-core` 根入口保持不变。
+- `api:validate` 会阻止 Charts 回退到重复 datum aliases 或独立 `ChartTooltip visible` prop；generated chart references 由拆分后的类型文件重新生成。
 - `tokens:build` / `tokens:check` 的生成面收敛为 canonical token 输出，移除 legacy CSS 变量和 token alias API 生成。
 - `release:check` 和 `publish:check` 增加 ESM-only 断言，发布 smoke 使用临时安装目录中的 bare ESM import 验证包入口，并阻止 `.cjs` 文件混入 tarball 或安装产物。
 - `release:check` 会阻止 React / Vue 恢复宽泛 sideEffects 声明；`publish:check` 会对安装后的 React / Vue root Button named import 和 Button 子路径 import 做 bundler smoke，确保普通 Button bundle 不拉入 Message / notification 命令式挂载代码。

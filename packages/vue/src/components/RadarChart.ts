@@ -891,7 +891,7 @@ export const RadarChart = defineComponent({
         props.showTooltip && props.hoverable
           ? h(ChartTooltip, {
               content: tooltipContent.value,
-              visible: hoveredPoint.value !== null && tooltipContent.value !== '',
+              open: hoveredPoint.value !== null && tooltipContent.value !== '',
               x: tooltipPosition.value.x,
               y: tooltipPosition.value.y
             })
