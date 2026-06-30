@@ -66,59 +66,6 @@ const stackedSeries: AreaChartSeries[] = [
   }
 ]
 
-const basicSnippet = `<AreaChart
-  data={data}
-  width={420}
-  height={240}
-  fillOpacity={0.3}
-  xAxisLabel="Month"
-  yAxisLabel="Value"
-/>`
-
-const multiSeriesSnippet = `<AreaChart
-  series={multiSeries}
-  width={420}
-  height={240}
-  hoverable
-  showLegend
-/>`
-
-const stackedSnippet = `<AreaChart
-  series={stackedSeries}
-  width={420}
-  height={240}
-  stacked
-  hoverable
-  showLegend
-  legendPosition="right"
-/>`
-
-const interactiveSnippet = `<AreaChart
-  series={multiSeries}
-  width={420}
-  height={240}
-  hoverable
-  selectable
-  showPoints
-  showLegend
-  curve="monotone"
-  hoveredIndex={hoveredIndex}
-  onHoveredIndexChange={setHoveredIndex}
-/>`
-
-const gradientSnippet = `<AreaChart
-  data={data}
-  width={420}
-  height={240}
-  gradient
-  curve="monotone"
-  showPoints
-  pointHollow
-  animated
-/>`
-
-const basicScriptSnippet = `const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)`
-
 const AreaChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
@@ -131,72 +78,84 @@ const AreaChartDemo: React.FC = () => {
         </p>
       </div>
 
-      <DemoBlock title="基础用法" description="单系列面积图。" code={fullPageSnippet}>
-        <AreaChart
-          data={basicData}
-          width={420}
-          height={240}
-          fillOpacity={0.3}
-          xAxisLabel="Month"
-          yAxisLabel="Value"
-        />
-      </DemoBlock>
-
       <DemoBlock
-        title="渐变填充 + 动画"
-        description="渐变面积填充、曲线平滑、空心数据点与入场动画，对齐 ECharts 视觉效果。"
+        title="组合展示"
+        description="合并展示基础用法、渐变填充 + 动画、多系列、堆叠面积图、交互功能，减少重复示例块。"
         code={fullPageSnippet}>
-        <AreaChart
-          data={basicData}
-          width={420}
-          height={240}
-          gradient
-          curve="monotone"
-          showPoints
-          pointHollow
-          animated
-        />
-      </DemoBlock>
-
-      <DemoBlock title="多系列" description="多个系列对比。" code={fullPageSnippet}>
-        <AreaChart series={multiSeries} width={420} height={240} hoverable showLegend />
-      </DemoBlock>
-
-      <DemoBlock
-        title="堆叠面积图"
-        description="数据堆叠展示，适合展示部分与整体关系。"
-        code={fullPageSnippet}>
-        <AreaChart
-          series={stackedSeries}
-          width={420}
-          height={240}
-          stacked
-          hoverable
-          showLegend
-          legendPosition="right"
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="交互功能"
-        description="悬停高亮、点击选择、曲线平滑。"
-        code={fullPageSnippet}>
-        <div className="space-y-4">
-          <AreaChart
-            series={multiSeries}
-            width={420}
-            height={240}
-            hoverable
-            selectable
-            showPoints
-            showLegend
-            curve="monotone"
-            hoveredIndex={hoveredIndex}
-            onHoveredIndexChange={setHoveredIndex}
-          />
-          <p className="text-sm text-gray-500">
-            当前悬停: {hoveredIndex !== null ? multiSeries[hoveredIndex]?.name : '无'}
-          </p>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">单系列面积图。</p>
+            <AreaChart
+              data={basicData}
+              width={420}
+              height={240}
+              fillOpacity={0.3}
+              xAxisLabel="Month"
+              yAxisLabel="Value"
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              渐变填充 + 动画
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              渐变面积填充、曲线平滑、空心数据点与入场动画，对齐 ECharts 视觉效果。
+            </p>
+            <AreaChart
+              data={basicData}
+              width={420}
+              height={240}
+              gradient
+              curve="monotone"
+              showPoints
+              pointHollow
+              animated
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">多系列</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">多个系列对比。</p>
+            <AreaChart series={multiSeries} width={420} height={240} hoverable showLegend />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">堆叠面积图</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              数据堆叠展示，适合展示部分与整体关系。
+            </p>
+            <AreaChart
+              series={stackedSeries}
+              width={420}
+              height={240}
+              stacked
+              hoverable
+              showLegend
+              legendPosition="right"
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">交互功能</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              悬停高亮、点击选择、曲线平滑。
+            </p>
+            <div className="space-y-4">
+              <AreaChart
+                series={multiSeries}
+                width={420}
+                height={240}
+                hoverable
+                selectable
+                showPoints
+                showLegend
+                curve="monotone"
+                hoveredIndex={hoveredIndex}
+                onHoveredIndexChange={setHoveredIndex}
+              />
+              <p className="text-sm text-gray-500">
+                当前悬停: {hoveredIndex !== null ? multiSeries[hoveredIndex]?.name : '无'}
+              </p>
+            </div>
+          </section>
         </div>
       </DemoBlock>
     </div>

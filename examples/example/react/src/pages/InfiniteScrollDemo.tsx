@@ -3,20 +3,6 @@ import { InfiniteScroll } from '@expcat/tigercat-react/InfiniteScroll'
 import DemoBlock from '../components/DemoBlock'
 import fullPageSnippet from './InfiniteScrollDemo.tsx?raw'
 
-const basicSnippet = `<InfiniteScroll hasMore={hasMore} loading={loading} onLoadMore={loadMore}
-  className="h-[300px] border border-gray-200 rounded-lg">
-  {items.map(i => <div key={i} className="px-4 py-3 border-b">项目 {i}</div>)}
-</InfiniteScroll>`
-
-const customSnippet = `<InfiniteScroll hasMore={false} loadingText="拼命加载中..." endText="— 到底了 —"
-  className="h-[200px] border border-gray-200 rounded-lg">
-  {items.map(i => <div key={i}>项目 {i}</div>)}
-</InfiniteScroll>`
-
-const basicScriptSnippet = `const [items, setItems] = useState(() => Array.from({ length: 20 }, (_, i) => i + 1))
-const [loading, setLoading] = useState(false)
-const [hasMore, setHasMore] = useState(true)`
-
 const InfiniteScrollDemo: React.FC = () => {
   const [items, setItems] = useState(() => Array.from({ length: 20 }, (_, i) => i + 1))
   const [loading, setLoading] = useState(false)
@@ -40,32 +26,42 @@ const InfiniteScrollDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">InfiniteScroll 无限滚动</h1>
       <p className="text-gray-500 mb-8">滚动到底部自动加载更多内容。</p>
 
-      <DemoBlock title="基础用法" description="滚动到底部触发 onLoadMore" code={fullPageSnippet}>
-        <InfiniteScroll
-          hasMore={hasMore}
-          loading={loading}
-          onLoadMore={loadMore}
-          className="h-[300px] border border-gray-200 rounded-lg">
-          {items.map((i) => (
-            <div key={i} className="px-4 py-3 border-b">
-              项目 {i}
-            </div>
-          ))}
-        </InfiniteScroll>
-      </DemoBlock>
-
-      <DemoBlock title="自定义文案" description="loadingText / endText" code={fullPageSnippet}>
-        <InfiniteScroll
-          hasMore={false}
-          loadingText="拼命加载中..."
-          endText="— 到底了 —"
-          className="h-[200px] border border-gray-200 rounded-lg">
-          {Array.from({ length: 5 }, (_, i) => (
-            <div key={i} className="px-4 py-3 border-b">
-              项目 {i + 1}
-            </div>
-          ))}
-        </InfiniteScroll>
+      <DemoBlock
+        title="组合展示"
+        description="合并展示基础用法、自定义文案，减少重复示例块。"
+        code={fullPageSnippet}>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">滚动到底部触发 onLoadMore</p>
+            <InfiniteScroll
+              hasMore={hasMore}
+              loading={loading}
+              onLoadMore={loadMore}
+              className="h-[300px] border border-gray-200 rounded-lg">
+              {items.map((i) => (
+                <div key={i} className="px-4 py-3 border-b">
+                  项目 {i}
+                </div>
+              ))}
+            </InfiniteScroll>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义文案</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">loadingText / endText</p>
+            <InfiniteScroll
+              hasMore={false}
+              loadingText="拼命加载中..."
+              endText="— 到底了 —"
+              className="h-[200px] border border-gray-200 rounded-lg">
+              {Array.from({ length: 5 }, (_, i) => (
+                <div key={i} className="px-4 py-3 border-b">
+                  项目 {i + 1}
+                </div>
+              ))}
+            </InfiniteScroll>
+          </section>
+        </div>
       </DemoBlock>
     </div>
   )

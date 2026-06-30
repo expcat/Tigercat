@@ -38,99 +38,6 @@ const smallValuesData: BarChartDatum[] = [
 
 const currencyFormat = (value: number | string) => `$${value}`
 
-const basicSnippet = `<BarChart
-  data={data}
-  width={420}
-  height={240}
-  xAxisLabel="Weekday"
-  yAxisLabel="Sales"
-/>`
-
-const gradientSnippet = `<BarChart
-  data={data}
-  width={420}
-  height={240}
-  gradient
-  animated
-  barRadius={6}
-  gridLineStyle="dashed"
-  showValueLabels
-/>`
-
-const customSnippet = `<BarChart
-  data={coloredData}
-  width={420}
-  height={240}
-  barRadius={6}
-  gridLineStyle="dashed"
-  yTickFormat={(value) => \`$\${value}\`}
-  showXAxis={false}
-/>`
-
-const hoverableSnippet = `<BarChart
-  data={data}
-  width={420}
-  height={240}
-  hoverable
-  gradient
-  hoveredIndex={hoveredIndex}
-  onHoveredIndexChange={setHoveredIndex}
-/>`
-
-const selectableSnippet = `<BarChart
-  data={data}
-  width={420}
-  height={240}
-  hoverable
-  selectable
-  gradient
-  selectedIndex={selectedIndex}
-  onSelectedIndexChange={setSelectedIndex}
-  onBarClick={handleBarClick}
-/>`
-
-const legendSnippet = `<BarChart
-  data={data}
-  width={420}
-  height={240}
-  hoverable
-  showLegend
-  legendPosition="right"
-/>`
-
-const tooltipSnippet = `<BarChart
-  data={data}
-  width={420}
-  height={240}
-  hoverable
-  showTooltip
-  gradient
-/>`
-
-const valueLabelSnippet = `<BarChart
-  data={data}
-  width={420}
-  height={240}
-  showValueLabels
-  valueLabelPosition="top"
-  gradient
-  barRadius={6}
-/>`
-
-const constraintSnippet = `<BarChart
-  data={smallValuesData}
-  width={420}
-  height={240}
-  barMinHeight={3}
-  barMaxWidth={40}
-  gradient
-  showValueLabels
-/>`
-
-const basicScriptSnippet = `const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
-const [clickedBar, setClickedBar] = useState('')`
-
 const BarChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -149,139 +56,157 @@ const BarChartDemo: React.FC = () => {
         </p>
       </div>
 
-      <DemoBlock title="基础用法" description="自动生成坐标轴与网格。" code={fullPageSnippet}>
-        <BarChart
-          data={basicData}
-          width={420}
-          height={240}
-          xAxisLabel="Weekday"
-          yAxisLabel="Sales"
-        />
-      </DemoBlock>
-
       <DemoBlock
-        title="渐变填充 + 动画"
-        description="启用 gradient 渐变与 animated 平滑过渡，配合数值标签。"
+        title="组合展示"
+        description="合并展示基础用法、渐变填充 + 动画、自定义样式、数值标签、柱宽/柱高约束、悬停高亮、点击选中、显示图例、显示提示框，减少重复示例块。"
         code={fullPageSnippet}>
-        <BarChart
-          data={interactiveData}
-          width={420}
-          height={240}
-          gradient
-          animated
-          barRadius={6}
-          gridLineStyle="dashed"
-          showValueLabels
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="自定义样式"
-        description="自定义颜色、圆角与刻度格式。"
-        code={fullPageSnippet}>
-        <BarChart
-          data={coloredData}
-          width={420}
-          height={240}
-          barRadius={6}
-          gridLineStyle="dashed"
-          yTickFormat={currencyFormat}
-          showXAxis={false}
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="数值标签"
-        description="showValueLabels 在柱子上方或内部显示数值。"
-        code={fullPageSnippet}>
-        <BarChart
-          data={basicData}
-          width={420}
-          height={240}
-          showValueLabels
-          valueLabelPosition="top"
-          gradient
-          barRadius={6}
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="柱宽/柱高约束"
-        description="barMaxWidth 限制最大柱宽，barMinHeight 保证微小值可见。"
-        code={fullPageSnippet}>
-        <BarChart
-          data={smallValuesData}
-          width={420}
-          height={240}
-          barMinHeight={3}
-          barMaxWidth={40}
-          gradient
-          showValueLabels
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="悬停高亮"
-        description="启用 hoverable 后，鼠标悬停时高亮柱子，其余淡出。"
-        code={fullPageSnippet}>
-        <div className="space-y-4">
-          <BarChart
-            data={interactiveData}
-            width={420}
-            height={240}
-            hoverable
-            gradient
-            hoveredIndex={hoveredIndex}
-            onHoveredIndexChange={setHoveredIndex}
-          />
-          <p className="text-sm text-gray-500">
-            当前悬停: {hoveredIndex !== null ? interactiveData[hoveredIndex]?.x : '无'}
-          </p>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">自动生成坐标轴与网格。</p>
+            <BarChart
+              data={basicData}
+              width={420}
+              height={240}
+              xAxisLabel="Weekday"
+              yAxisLabel="Sales"
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              渐变填充 + 动画
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              启用 gradient 渐变与 animated 平滑过渡，配合数值标签。
+            </p>
+            <BarChart
+              data={interactiveData}
+              width={420}
+              height={240}
+              gradient
+              animated
+              barRadius={6}
+              gridLineStyle="dashed"
+              showValueLabels
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义样式</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">自定义颜色、圆角与刻度格式。</p>
+            <BarChart
+              data={coloredData}
+              width={420}
+              height={240}
+              barRadius={6}
+              gridLineStyle="dashed"
+              yTickFormat={currencyFormat}
+              showXAxis={false}
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">数值标签</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              showValueLabels 在柱子上方或内部显示数值。
+            </p>
+            <BarChart
+              data={basicData}
+              width={420}
+              height={240}
+              showValueLabels
+              valueLabelPosition="top"
+              gradient
+              barRadius={6}
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              柱宽/柱高约束
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              barMaxWidth 限制最大柱宽，barMinHeight 保证微小值可见。
+            </p>
+            <BarChart
+              data={smallValuesData}
+              width={420}
+              height={240}
+              barMinHeight={3}
+              barMaxWidth={40}
+              gradient
+              showValueLabels
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">悬停高亮</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              启用 hoverable 后，鼠标悬停时高亮柱子，其余淡出。
+            </p>
+            <div className="space-y-4">
+              <BarChart
+                data={interactiveData}
+                width={420}
+                height={240}
+                hoverable
+                gradient
+                hoveredIndex={hoveredIndex}
+                onHoveredIndexChange={setHoveredIndex}
+              />
+              <p className="text-sm text-gray-500">
+                当前悬停: {hoveredIndex !== null ? interactiveData[hoveredIndex]?.x : '无'}
+              </p>
+            </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">点击选中</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              启用 selectable 后，点击可选中柱子，支持事件回调。
+            </p>
+            <div className="space-y-4">
+              <BarChart
+                data={interactiveData}
+                width={420}
+                height={240}
+                hoverable
+                selectable
+                gradient
+                selectedIndex={selectedIndex}
+                onSelectedIndexChange={setSelectedIndex}
+                onBarClick={handleBarClick}
+              />
+              <p className="text-sm text-gray-500">
+                选中: {selectedIndex !== null ? interactiveData[selectedIndex]?.x : '无'}
+                {clickedBar && <span className="ml-4">{clickedBar}</span>}
+              </p>
+            </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">显示图例</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              通过 showLegend 显示图例，可设置位置。
+            </p>
+            <BarChart
+              data={coloredData}
+              width={420}
+              height={240}
+              hoverable
+              showLegend
+              legendPosition="right"
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">显示提示框</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              通过 showTooltip 在悬停时显示数据提示。
+            </p>
+            <BarChart
+              data={interactiveData}
+              width={420}
+              height={240}
+              hoverable
+              showTooltip
+              gradient
+            />
+          </section>
         </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="点击选中"
-        description="启用 selectable 后，点击可选中柱子，支持事件回调。"
-        code={fullPageSnippet}>
-        <div className="space-y-4">
-          <BarChart
-            data={interactiveData}
-            width={420}
-            height={240}
-            hoverable
-            selectable
-            gradient
-            selectedIndex={selectedIndex}
-            onSelectedIndexChange={setSelectedIndex}
-            onBarClick={handleBarClick}
-          />
-          <p className="text-sm text-gray-500">
-            选中: {selectedIndex !== null ? interactiveData[selectedIndex]?.x : '无'}
-            {clickedBar && <span className="ml-4">{clickedBar}</span>}
-          </p>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="显示图例"
-        description="通过 showLegend 显示图例，可设置位置。"
-        code={fullPageSnippet}>
-        <BarChart
-          data={coloredData}
-          width={420}
-          height={240}
-          hoverable
-          showLegend
-          legendPosition="right"
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="显示提示框"
-        description="通过 showTooltip 在悬停时显示数据提示。"
-        code={fullPageSnippet}>
-        <BarChart data={interactiveData} width={420} height={240} hoverable showTooltip gradient />
       </DemoBlock>
     </div>
   )

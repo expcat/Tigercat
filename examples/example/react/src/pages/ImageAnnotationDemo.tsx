@@ -29,19 +29,6 @@ const initialAnnotations: ImageAnnotationItem[] = [
   }
 ]
 
-const controlledSnippet = `const [annotations, setAnnotations] = useState<ImageAnnotation[]>(initialAnnotations)
-
-<ImageAnnotation
-  src={photo}
-  value={annotations}
-  defaultTool="rectangle"
-  onChange={setAnnotations} />`
-
-const shapeSnippet = `<ImageAnnotation
-  src={photo}
-  tools={['select', 'rectangle', 'ellipse', 'polygon', 'freehand']}
-  defaultValue={initialAnnotations} />`
-
 export default function ImageAnnotationDemo() {
   const [annotations, setAnnotations] = useState<ImageAnnotationItem[]>(initialAnnotations)
   const [selected, setSelected] = useState<ImageAnnotationItem | null>(null)
@@ -54,33 +41,41 @@ export default function ImageAnnotationDemo() {
       </p>
 
       <DemoBlock
-        title="受控标注"
-        description="通过 value / onChange 管理标注数据，切换工具后在图片上拖拽绘制。"
+        title="组合展示"
+        description="合并展示受控标注、多形状工具，减少重复示例块。"
         code={fullPageSnippet}>
-        <div className="space-y-4">
-          <ImageAnnotation
-            src={PHOTO}
-            value={annotations}
-            defaultTool="rectangle"
-            onChange={(next) => setAnnotations(next)}
-            onSelect={(annotation) => setSelected(annotation)}
-          />
-          <div className="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-            标注数量：{annotations.length}
-            {selected ? `，当前选择：${selected.label ?? selected.id}` : '，未选择标注'}
-          </div>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">受控标注</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              通过 value / onChange 管理标注数据，切换工具后在图片上拖拽绘制。
+            </p>
+            <div className="space-y-4">
+              <ImageAnnotation
+                src={PHOTO}
+                value={annotations}
+                defaultTool="rectangle"
+                onChange={(next) => setAnnotations(next)}
+                onSelect={(annotation) => setSelected(annotation)}
+              />
+              <div className="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                标注数量：{annotations.length}
+                {selected ? `，当前选择：${selected.label ?? selected.id}` : '，未选择标注'}
+              </div>
+            </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">多形状工具</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              内置 select、rectangle、ellipse、polygon、freehand 工具；多边形可用双击或 Enter 完成。
+            </p>
+            <ImageAnnotation
+              src={PHOTO}
+              tools={['select', 'rectangle', 'ellipse', 'polygon', 'freehand']}
+              defaultValue={initialAnnotations}
+            />
+          </section>
         </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="多形状工具"
-        description="内置 select、rectangle、ellipse、polygon、freehand 工具；多边形可用双击或 Enter 完成。"
-        code={fullPageSnippet}>
-        <ImageAnnotation
-          src={PHOTO}
-          tools={['select', 'rectangle', 'ellipse', 'polygon', 'freehand']}
-          defaultValue={initialAnnotations}
-        />
       </DemoBlock>
     </div>
   )

@@ -49,53 +49,6 @@ const tooltipFormatter = (
   _index: number,
   series?: RadarChartSeries
 ) => `${series?.name ?? 'Series'} · ${datum.label ?? ''}: ${datum.value}`
-
-const basicSnippet = `<RadarChart
-  :data="data"
-  :width="360"
-  :height="260"
-/>`
-
-const customSnippet = `<RadarChart
-  :data="customData"
-  :width="360"
-  :height="260"
-  :max-value="100"
-  :levels="6"
-  show-level-labels
-  :fill-opacity="0.15"
-  show-points
-/>`
-
-const circleSnippet = `<RadarChart
-  :data="customData"
-  :width="360"
-  :height="260"
-  :max-value="100"
-  grid-shape="circle"
-  show-split-area
-  :levels="5"
-  show-level-labels
-  :fill-opacity="0.25"
-  :stroke-width="2"
-  :point-border-width="2"
-  point-border-color="#fff"
-/>`
-
-const multiSnippet = `<RadarChart
-  :series="multiSeries"
-  :width="360"
-  :height="260"
-  :max-value="100"
-  :colors="['#2563eb', '#f97316']"
-  hoverable
-  selectable
-  show-legend
-  legend-position="right"
-  show-split-area
-  :fill-opacity="0.15"
-  :tooltip-formatter="tooltipFormatter"
-/>`
 </script>
 
 <template>
@@ -105,58 +58,68 @@ const multiSnippet = `<RadarChart
       <p class="text-gray-600 dark:text-gray-400">用于展示多维指标对比。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="默认雷达图样式。" :code="fullPageSnippet">
-      <RadarChart :data="basicData" :width="360" :height="260" />
-    </DemoBlock>
-
-    <DemoBlock title="固定最大值" description="统一尺度并增加网格层数。" :code="fullPageSnippet">
-      <RadarChart
-        :data="customData"
-        :width="360"
-        :height="260"
-        :max-value="100"
-        :levels="6"
-        show-level-labels
-        :fill-opacity="0.15"
-        show-points />
-    </DemoBlock>
-
     <DemoBlock
-      title="圆形网格 + 分割区域"
-      description="ECharts 风格的圆形网格与交替背景。"
+      title="组合展示"
+      description="合并展示基础用法、固定最大值、圆形网格 + 分割区域、多系列对比，减少重复示例块。"
       :code="fullPageSnippet">
-      <RadarChart
-        :data="customData"
-        :width="360"
-        :height="260"
-        :max-value="100"
-        grid-shape="circle"
-        show-split-area
-        :levels="5"
-        show-level-labels
-        :fill-opacity="0.25"
-        :stroke-width="2"
-        :point-border-width="2"
-        point-border-color="#fff" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="多系列对比"
-      description="多组数据叠加展示，支持交互与分割区域。"
-      :code="fullPageSnippet">
-      <RadarChart
-        :series="multiSeries"
-        :width="360"
-        :height="260"
-        :max-value="100"
-        :colors="['#2563eb', '#f97316']"
-        hoverable
-        selectable
-        show-legend
-        legend-position="right"
-        show-split-area
-        :fill-opacity="0.15"
-        :tooltip-formatter="tooltipFormatter" />
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">默认雷达图样式。</p>
+          <RadarChart :data="basicData" :width="360" :height="260" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">固定最大值</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">统一尺度并增加网格层数。</p>
+          <RadarChart
+            :data="customData"
+            :width="360"
+            :height="260"
+            :max-value="100"
+            :levels="6"
+            show-level-labels
+            :fill-opacity="0.15"
+            show-points />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            圆形网格 + 分割区域
+          </h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">ECharts 风格的圆形网格与交替背景。</p>
+          <RadarChart
+            :data="customData"
+            :width="360"
+            :height="260"
+            :max-value="100"
+            grid-shape="circle"
+            show-split-area
+            :levels="5"
+            show-level-labels
+            :fill-opacity="0.25"
+            :stroke-width="2"
+            :point-border-width="2"
+            point-border-color="#fff" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">多系列对比</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            多组数据叠加展示，支持交互与分割区域。
+          </p>
+          <RadarChart
+            :series="multiSeries"
+            :width="360"
+            :height="260"
+            :max-value="100"
+            :colors="['#2563eb', '#f97316']"
+            hoverable
+            selectable
+            show-legend
+            legend-position="right"
+            show-split-area
+            :fill-opacity="0.15"
+            :tooltip-formatter="tooltipFormatter" />
+        </section>
+      </div>
     </DemoBlock>
   </div>
 </template>

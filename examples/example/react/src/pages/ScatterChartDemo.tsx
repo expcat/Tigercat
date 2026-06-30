@@ -32,65 +32,6 @@ const interactiveData: ScatterChartDatum[] = [
   { x: 85, y: 55, label: 'Point F' }
 ]
 
-const basicSnippet = `<ScatterChart
-  data={data}
-  width={420}
-  height={260}
-  xAxisLabel="X"
-  yAxisLabel="Y"
-/>`
-
-const customSnippet = `<ScatterChart
-  data={customData}
-  width={420}
-  height={260}
-  includeZero
-  gridLineStyle="dotted"
-  hoverable
-/>`
-
-const animatedSnippet = `<ScatterChart
-  data={data}
-  width={420}
-  height={260}
-  animated
-  hoverable
-/>`
-
-const hoverableSnippet = `<ScatterChart
-  data={data}
-  width={420}
-  height={260}
-  hoverable
-  selectable
-  hoveredIndex={hoveredIndex}
-  onHoveredIndexChange={setHoveredIndex}
-  selectedIndex={selectedIndex}
-  onSelectedIndexChange={setSelectedIndex}
-/>`
-
-const diamondSnippet = `<ScatterChart
-  data={data}
-  width={420}
-  height={260}
-  pointStyle="diamond"
-  pointSize={8}
-  hoverable
-/>`
-
-const flatSnippet = `<ScatterChart
-  data={data}
-  width={420}
-  height={260}
-  gradient
-  pointBorderWidth={1.5}
-  hoverable
-  showTooltip
-/>`
-
-const basicScriptSnippet = `const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-const [selectedIndex, setSelectedIndex] = useState<number | null>(null)`
-
 const ScatterChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -104,82 +45,91 @@ const ScatterChartDemo: React.FC = () => {
         </p>
       </div>
 
-      <DemoBlock title="基础用法" description="默认扁平纯色填充，简洁朴素。" code={fullPageSnippet}>
-        <ScatterChart data={basicData} width={420} height={260} xAxisLabel="X" yAxisLabel="Y" />
-      </DemoBlock>
-
       <DemoBlock
-        title="自定义样式"
-        description="通过 datum.size / datum.color 控制每个点的样式。"
+        title="组合展示"
+        description="合并展示基础用法、自定义样式、入场动画、悬停 + 选中、菱形散点、渐变风格，减少重复示例块。"
         code={fullPageSnippet}>
-        <ScatterChart
-          data={customData}
-          width={420}
-          height={260}
-          includeZero
-          gridLineStyle="dotted"
-          hoverable
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="入场动画"
-        description="启用 animated 后数据点依次弹入。"
-        code={fullPageSnippet}>
-        <ScatterChart data={interactiveData} width={420} height={260} animated hoverable />
-      </DemoBlock>
-
-      <DemoBlock
-        title="悬停 + 选中"
-        description="悬停时数据点放大高亮，支持点击选中。"
-        code={fullPageSnippet}>
-        <div className="space-y-4">
-          <ScatterChart
-            data={interactiveData}
-            width={420}
-            height={260}
-            hoverable
-            selectable
-            hoveredIndex={hoveredIndex}
-            onHoveredIndexChange={setHoveredIndex}
-            selectedIndex={selectedIndex}
-            onSelectedIndexChange={setSelectedIndex}
-          />
-          <p className="text-sm text-gray-500">
-            悬停: {hoveredIndex !== null ? interactiveData[hoveredIndex]?.label : '无'}
-            {' · '}
-            选中: {selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无'}
-          </p>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">默认扁平纯色填充，简洁朴素。</p>
+            <ScatterChart data={basicData} width={420} height={260} xAxisLabel="X" yAxisLabel="Y" />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义样式</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              通过 datum.size / datum.color 控制每个点的样式。
+            </p>
+            <ScatterChart
+              data={customData}
+              width={420}
+              height={260}
+              includeZero
+              gridLineStyle="dotted"
+              hoverable
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">入场动画</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              启用 animated 后数据点依次弹入。
+            </p>
+            <ScatterChart data={interactiveData} width={420} height={260} animated hoverable />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">悬停 + 选中</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              悬停时数据点放大高亮，支持点击选中。
+            </p>
+            <div className="space-y-4">
+              <ScatterChart
+                data={interactiveData}
+                width={420}
+                height={260}
+                hoverable
+                selectable
+                hoveredIndex={hoveredIndex}
+                onHoveredIndexChange={setHoveredIndex}
+                selectedIndex={selectedIndex}
+                onSelectedIndexChange={setSelectedIndex}
+              />
+              <p className="text-sm text-gray-500">
+                悬停: {hoveredIndex !== null ? interactiveData[hoveredIndex]?.label : '无'}
+                {' · '}
+                选中: {selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无'}
+              </p>
+            </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">菱形散点</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              通过 pointStyle 切换形状，diamond / square / triangle 均可用。
+            </p>
+            <ScatterChart
+              data={interactiveData}
+              width={420}
+              height={260}
+              pointStyle="diamond"
+              pointSize={8}
+              hoverable
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">渐变风格</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              启用 gradient 与 pointBorderWidth 呈现立体效果。
+            </p>
+            <ScatterChart
+              data={basicData}
+              width={420}
+              height={260}
+              gradient
+              pointBorderWidth={1.5}
+              hoverable
+              showTooltip
+            />
+          </section>
         </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="菱形散点"
-        description="通过 pointStyle 切换形状，diamond / square / triangle 均可用。"
-        code={fullPageSnippet}>
-        <ScatterChart
-          data={interactiveData}
-          width={420}
-          height={260}
-          pointStyle="diamond"
-          pointSize={8}
-          hoverable
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="渐变风格"
-        description="启用 gradient 与 pointBorderWidth 呈现立体效果。"
-        code={fullPageSnippet}>
-        <ScatterChart
-          data={basicData}
-          width={420}
-          height={260}
-          gradient
-          pointBorderWidth={1.5}
-          hoverable
-          showTooltip
-        />
       </DemoBlock>
     </div>
   )

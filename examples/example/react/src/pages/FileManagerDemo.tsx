@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { FileManager } from '@expcat/tigercat-react/FileManager'
 import DemoBlock from '../components/DemoBlock'
-import fullPageSnippet from './FileManagerDemo.tsx?raw'
+import fullPageSnippet from './FileManagerDemo.fixture.tsx?raw'
 
 const files = [
   { key: '1', name: 'README.md', type: 'file' as const, size: 2048, modified: '2024-01-15' },
@@ -30,16 +30,6 @@ const nestedFiles = [
   { key: '3', name: 'README.md', type: 'file' as const, size: 2048 }
 ]
 
-const listSnippet = `<FileManager files={files} viewMode="list" searchable />`
-
-const gridSnippet = `<FileManager files={files} viewMode="grid" />`
-
-const multiSnippet = `<FileManager
-  files={files} viewMode="list" multiple searchable
-  currentPath={path} onNavigate={setPath} />`
-
-const basicScriptSnippet = `const [currentPath, setCurrentPath] = useState<string[]>([])`
-
 const FileManagerDemo: React.FC = () => {
   const [currentPath, setCurrentPath] = useState<string[]>([])
 
@@ -52,28 +42,41 @@ const FileManagerDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">FileManager 文件管理器</h1>
       <p className="text-gray-500 mb-8">文件浏览管理组件，支持列表/网格视图和搜索。</p>
 
-      <DemoBlock title="列表视图" description="默认列表模式，支持搜索" code={fullPageSnippet}>
-        <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
-          <FileManager files={files} viewMode="list" searchable />
-        </div>
-      </DemoBlock>
-
-      <DemoBlock title="网格视图" description="viewMode='grid'" code={fullPageSnippet}>
-        <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
-          <FileManager files={files} viewMode="grid" />
-        </div>
-      </DemoBlock>
-
-      <DemoBlock title="多选 & 面包屑导航" description="multiple 多选" code={fullPageSnippet}>
-        <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
-          <FileManager
-            files={nestedFiles}
-            viewMode="list"
-            multiple
-            searchable
-            currentPath={currentPath}
-            onNavigate={onNavigate}
-          />
+      <DemoBlock
+        title="组合展示"
+        description="合并展示列表视图、网格视图、多选 & 面包屑导航，减少重复示例块。"
+        code={fullPageSnippet}>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">列表视图</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">默认列表模式，支持搜索</p>
+            <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
+              <FileManager files={files} viewMode="list" searchable />
+            </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">网格视图</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">viewMode='grid'</p>
+            <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
+              <FileManager files={files} viewMode="grid" />
+            </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              多选 & 面包屑导航
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">multiple 多选</p>
+            <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
+              <FileManager
+                files={nestedFiles}
+                viewMode="list"
+                multiple
+                searchable
+                currentPath={currentPath}
+                onNavigate={onNavigate}
+              />
+            </div>
+          </section>
         </div>
       </DemoBlock>
     </div>

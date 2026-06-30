@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CodeEditor } from '@expcat/tigercat-react/CodeEditor'
 import DemoBlock from '../components/DemoBlock'
-import fullPageSnippet from './CodeEditorDemo.tsx?raw'
+import fullPageSnippet from './CodeEditorDemo.fixture.tsx?raw'
 
 const defaultJs = `function greet(name) {
   console.log('Hello, ' + name)
@@ -14,16 +14,6 @@ const htmlCode = `<div class="container">
   <p>This is read-only.</p>
 </div>`
 
-const basicSnippet = `<CodeEditor value={code} onChange={setCode} language="javascript" minLines={5} />`
-
-const themeSnippet = `<CodeEditor value={code} language="html" theme="dark" readOnly minLines={5} />`
-
-const configSnippet = `<CodeEditor
-  language="css" tabSize={4} wordWrap
-  placeholder="输入 CSS 代码..." minLines={4} maxLines={10} />`
-
-const basicScriptSnippet = `const [code, setCode] = useState(defaultJs)`
-
 const CodeEditorDemo: React.FC = () => {
   const [code, setCode] = useState(defaultJs)
 
@@ -32,23 +22,36 @@ const CodeEditorDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">CodeEditor 代码编辑器</h1>
       <p className="text-gray-500 mb-8">轻量级代码编辑器，支持语法高亮、行号和主题切换。</p>
 
-      <DemoBlock title="基础用法" description="language 设置语言" code={fullPageSnippet}>
-        <CodeEditor value={code} onChange={setCode} language="javascript" minLines={5} />
-      </DemoBlock>
-
-      <DemoBlock title="主题 & 只读" description="theme='dark'，readOnly" code={fullPageSnippet}>
-        <CodeEditor value={htmlCode} language="html" theme="dark" readOnly minLines={5} />
-      </DemoBlock>
-
-      <DemoBlock title="配置项" description="tabSize、wordWrap、placeholder" code={fullPageSnippet}>
-        <CodeEditor
-          language="css"
-          tabSize={4}
-          wordWrap
-          placeholder="输入 CSS 代码..."
-          minLines={4}
-          maxLines={10}
-        />
+      <DemoBlock
+        title="组合展示"
+        description="合并展示基础用法、主题 & 只读、配置项，减少重复示例块。"
+        code={fullPageSnippet}>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">language 设置语言</p>
+            <CodeEditor value={code} onChange={setCode} language="javascript" minLines={5} />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">主题 & 只读</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">theme='dark'，readOnly</p>
+            <CodeEditor value={htmlCode} language="html" theme="dark" readOnly minLines={5} />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">配置项</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              tabSize、wordWrap、placeholder
+            </p>
+            <CodeEditor
+              language="css"
+              tabSize={4}
+              wordWrap
+              placeholder="输入 CSS 代码..."
+              minLines={4}
+              maxLines={10}
+            />
+          </section>
+        </div>
       </DemoBlock>
     </div>
   )

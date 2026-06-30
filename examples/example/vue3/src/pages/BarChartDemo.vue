@@ -46,98 +46,6 @@ const handleBarClick = (_index: number, datum: BarChartDatum) => {
 }
 
 const currencyFormat = (value: number | string) => `$${value}`
-
-const basicSnippet = `<BarChart
-  :data="data"
-  :width="420"
-  :height="240"
-  x-axis-label="Weekday"
-  y-axis-label="Sales"
-/>`
-
-const gradientSnippet = `<BarChart
-  :data="data"
-  :width="420"
-  :height="240"
-  gradient
-  animated
-  :barRadius="6"
-  grid-line-style="dashed"
-  show-value-labels
-/>`
-
-const customSnippet = `<BarChart
-  :data="coloredData"
-  :width="420"
-  :height="240"
-  :barRadius="6"
-  grid-line-style="dashed"
-  :yTickFormat="(value) => \`$\${value}\`"
-  :show-x-axis="false"
-/>`
-
-const hoverableSnippet = `<BarChart
-  :data="data"
-  :width="420"
-  :height="240"
-  hoverable
-  gradient
-  v-model:hoveredIndex="hoveredIndex"
-/>`
-
-const hoverableScriptSnippet = `import { ref } from 'vue'
-
-const hoveredIndex = ref<number | null>(null)
-const selectedIndex = ref<number | null>(null)`
-
-const selectableSnippet = `<BarChart
-  :data="data"
-  :width="420"
-  :height="240"
-  hoverable
-  selectable
-  gradient
-  v-model:selectedIndex="selectedIndex"
-  @bar-click="handleBarClick"
-/>`
-
-const legendSnippet = `<BarChart
-  :data="data"
-  :width="420"
-  :height="240"
-  hoverable
-  show-legend
-  legend-position="right"
-/>`
-
-const tooltipSnippet = `<BarChart
-  :data="data"
-  :width="420"
-  :height="240"
-  hoverable
-  show-tooltip
-  gradient
-/>`
-
-const valueLabelSnippet = `<BarChart
-  :data="data"
-  :width="420"
-  :height="240"
-  show-value-labels
-  value-label-position="top"
-  gradient
-  :barRadius="6"
-/>`
-
-const constraintSnippet = `<BarChart
-  :data="smallValuesData"
-  :width="420"
-  :height="240"
-  :barMinHeight="3"
-  :barMaxWidth="40"
-  gradient
-  show-value-labels
-/>`
 </script>
 
 <template>
@@ -149,135 +57,142 @@ const constraintSnippet = `<BarChart
       </p>
     </div>
 
-    <DemoBlock title="基础用法" description="自动生成坐标轴与网格。" :code="fullPageSnippet">
-      <BarChart
-        :data="basicData"
-        :width="420"
-        :height="240"
-        x-axis-label="Weekday"
-        y-axis-label="Sales" />
-    </DemoBlock>
-
     <DemoBlock
-      title="渐变填充 + 动画"
-      description="启用 gradient 渐变与 animated 平滑过渡，配合数值标签。"
+      title="组合展示"
+      description="合并展示基础用法、渐变填充 + 动画、自定义样式、数值标签、柱宽/柱高约束、悬停高亮、点击选中、显示图例、显示提示框，减少重复示例块。"
       :code="fullPageSnippet">
-      <BarChart
-        :data="interactiveData"
-        :width="420"
-        :height="240"
-        gradient
-        animated
-        :barRadius="6"
-        grid-line-style="dashed"
-        show-value-labels />
-    </DemoBlock>
-
-    <DemoBlock
-      title="自定义样式"
-      description="自定义颜色、圆角与刻度格式。"
-      :code="fullPageSnippet">
-      <BarChart
-        :data="coloredData"
-        :width="420"
-        :height="240"
-        :barRadius="6"
-        grid-line-style="dashed"
-        :yTickFormat="currencyFormat"
-        :show-x-axis="false" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="数值标签"
-      description="show-value-labels 在柱子上方或内部显示数值。"
-      :code="fullPageSnippet">
-      <BarChart
-        :data="basicData"
-        :width="420"
-        :height="240"
-        show-value-labels
-        value-label-position="top"
-        gradient
-        :barRadius="6" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="柱宽/柱高约束"
-      description="barMaxWidth 限制最大柱宽，barMinHeight 保证微小值可见。"
-      :code="fullPageSnippet">
-      <BarChart
-        :data="smallValuesData"
-        :width="420"
-        :height="240"
-        :barMinHeight="3"
-        :barMaxWidth="40"
-        gradient
-        show-value-labels />
-    </DemoBlock>
-
-    <DemoBlock
-      title="悬停高亮"
-      description="启用 hoverable 后，鼠标悬停时高亮柱子，其余淡出。"
-      :code="fullPageSnippet">
-      <div class="space-y-4">
-        <BarChart
-          :data="interactiveData"
-          :width="420"
-          :height="240"
-          hoverable
-          gradient
-          v-model:hoveredIndex="hoveredIndex" />
-        <p class="text-sm text-gray-500">
-          当前悬停: {{ hoveredIndex !== null ? interactiveData[hoveredIndex]?.x : '无' }}
-        </p>
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">自动生成坐标轴与网格。</p>
+          <BarChart
+            :data="basicData"
+            :width="420"
+            :height="240"
+            x-axis-label="Weekday"
+            y-axis-label="Sales" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">渐变填充 + 动画</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            启用 gradient 渐变与 animated 平滑过渡，配合数值标签。
+          </p>
+          <BarChart
+            :data="interactiveData"
+            :width="420"
+            :height="240"
+            gradient
+            animated
+            :barRadius="6"
+            grid-line-style="dashed"
+            show-value-labels />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义样式</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">自定义颜色、圆角与刻度格式。</p>
+          <BarChart
+            :data="coloredData"
+            :width="420"
+            :height="240"
+            :barRadius="6"
+            grid-line-style="dashed"
+            :yTickFormat="currencyFormat"
+            :show-x-axis="false" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">数值标签</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            show-value-labels 在柱子上方或内部显示数值。
+          </p>
+          <BarChart
+            :data="basicData"
+            :width="420"
+            :height="240"
+            show-value-labels
+            value-label-position="top"
+            gradient
+            :barRadius="6" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">柱宽/柱高约束</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            barMaxWidth 限制最大柱宽，barMinHeight 保证微小值可见。
+          </p>
+          <BarChart
+            :data="smallValuesData"
+            :width="420"
+            :height="240"
+            :barMinHeight="3"
+            :barMaxWidth="40"
+            gradient
+            show-value-labels />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">悬停高亮</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            启用 hoverable 后，鼠标悬停时高亮柱子，其余淡出。
+          </p>
+          <div class="space-y-4">
+            <BarChart
+              :data="interactiveData"
+              :width="420"
+              :height="240"
+              hoverable
+              gradient
+              v-model:hoveredIndex="hoveredIndex" />
+            <p class="text-sm text-gray-500">
+              当前悬停: {{ hoveredIndex !== null ? interactiveData[hoveredIndex]?.x : '无' }}
+            </p>
+          </div>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">点击选中</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            启用 selectable 后，点击可选中柱子，支持事件回调。
+          </p>
+          <div class="space-y-4">
+            <BarChart
+              :data="interactiveData"
+              :width="420"
+              :height="240"
+              hoverable
+              selectable
+              gradient
+              v-model:selectedIndex="selectedIndex"
+              @bar-click="handleBarClick" />
+            <p class="text-sm text-gray-500">
+              选中: {{ selectedIndex !== null ? interactiveData[selectedIndex]?.x : '无' }}
+              <span v-if="clickedBar" class="ml-4">{{ clickedBar }}</span>
+            </p>
+          </div>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">显示图例</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            通过 show-legend 显示图例，可设置位置。
+          </p>
+          <BarChart
+            :data="coloredData"
+            :width="420"
+            :height="240"
+            hoverable
+            show-legend
+            legend-position="right" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">显示提示框</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            通过 show-tooltip 在悬停时显示数据提示。
+          </p>
+          <BarChart
+            :data="interactiveData"
+            :width="420"
+            :height="240"
+            hoverable
+            show-tooltip
+            gradient />
+        </section>
       </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="点击选中"
-      description="启用 selectable 后，点击可选中柱子，支持事件回调。"
-      :code="fullPageSnippet">
-      <div class="space-y-4">
-        <BarChart
-          :data="interactiveData"
-          :width="420"
-          :height="240"
-          hoverable
-          selectable
-          gradient
-          v-model:selectedIndex="selectedIndex"
-          @bar-click="handleBarClick" />
-        <p class="text-sm text-gray-500">
-          选中: {{ selectedIndex !== null ? interactiveData[selectedIndex]?.x : '无' }}
-          <span v-if="clickedBar" class="ml-4">{{ clickedBar }}</span>
-        </p>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="显示图例"
-      description="通过 show-legend 显示图例，可设置位置。"
-      :code="fullPageSnippet">
-      <BarChart
-        :data="coloredData"
-        :width="420"
-        :height="240"
-        hoverable
-        show-legend
-        legend-position="right" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="显示提示框"
-      description="通过 show-tooltip 在悬停时显示数据提示。"
-      :code="fullPageSnippet">
-      <BarChart
-        :data="interactiveData"
-        :width="420"
-        :height="240"
-        hoverable
-        show-tooltip
-        gradient />
     </DemoBlock>
   </div>
 </template>

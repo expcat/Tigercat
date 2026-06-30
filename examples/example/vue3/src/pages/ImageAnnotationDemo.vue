@@ -32,18 +32,6 @@ const initialAnnotations: ImageAnnotationItem[] = [
 
 const annotations = ref<ImageAnnotationItem[]>(initialAnnotations)
 const selected = ref<ImageAnnotationItem | null>(null)
-
-const controlledSnippet = `const annotations = ref<ImageAnnotation[]>(initialAnnotations)
-
-<ImageAnnotation
-  v-model="annotations"
-  :src="photo"
-  default-tool="rectangle" />`
-
-const shapeSnippet = `<ImageAnnotation
-  :src="photo"
-  :tools="['select', 'rectangle', 'ellipse', 'polygon', 'freehand']"
-  :default-value="initialAnnotations" />`
 </script>
 
 <template>
@@ -54,30 +42,38 @@ const shapeSnippet = `<ImageAnnotation
     </p>
 
     <DemoBlock
-      title="受控标注"
-      description="通过 v-model 管理标注数据，切换工具后在图片上拖拽绘制。"
+      title="组合展示"
+      description="合并展示受控标注、多形状工具，减少重复示例块。"
       :code="fullPageSnippet">
-      <div class="space-y-4">
-        <ImageAnnotation
-          v-model="annotations"
-          :src="PHOTO"
-          default-tool="rectangle"
-          @select="(annotation: ImageAnnotationItem | null) => (selected = annotation)" />
-        <div class="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-          标注数量：{{ annotations.length
-          }}{{ selected ? `，当前选择：${selected.label ?? selected.id}` : '，未选择标注' }}
-        </div>
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">受控标注</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            通过 v-model 管理标注数据，切换工具后在图片上拖拽绘制。
+          </p>
+          <div class="space-y-4">
+            <ImageAnnotation
+              v-model="annotations"
+              :src="PHOTO"
+              default-tool="rectangle"
+              @select="(annotation: ImageAnnotationItem | null) => (selected = annotation)" />
+            <div class="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+              标注数量：{{ annotations.length
+              }}{{ selected ? `，当前选择：${selected.label ?? selected.id}` : '，未选择标注' }}
+            </div>
+          </div>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">多形状工具</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            内置 select、rectangle、ellipse、polygon、freehand 工具；多边形可用双击或 Enter 完成。
+          </p>
+          <ImageAnnotation
+            :src="PHOTO"
+            :tools="['select', 'rectangle', 'ellipse', 'polygon', 'freehand']"
+            :default-value="initialAnnotations" />
+        </section>
       </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="多形状工具"
-      description="内置 select、rectangle、ellipse、polygon、freehand 工具；多边形可用双击或 Enter 完成。"
-      :code="fullPageSnippet">
-      <ImageAnnotation
-        :src="PHOTO"
-        :tools="['select', 'rectangle', 'ellipse', 'polygon', 'freehand']"
-        :default-value="initialAnnotations" />
     </DemoBlock>
   </div>
 </template>

@@ -6,31 +6,39 @@
     </p>
 
     <DemoBlock
-      title="基础用法"
-      description="树形组织数据，节点自动居中到子树范围。"
+      title="组合展示"
+      description="合并展示基础用法、横向布局，减少重复示例块。"
       :code="fullPageSnippet">
-      <div class="space-y-4">
-        <OrgChart
-          :data="orgData"
-          :width="760"
-          :height="460"
-          hoverable
-          selectable
-          :selected-id="selectedId"
-          title="Organization chart"
-          desc="Company reporting structure"
-          @update:selected-id="(id: string | number | null) => (selectedId = id)" />
-        <div class="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-          当前选择：{{ selectedId ?? '未选择' }}
-        </div>
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            树形组织数据，节点自动居中到子树范围。
+          </p>
+          <div class="space-y-4">
+            <OrgChart
+              :data="orgData"
+              :width="760"
+              :height="460"
+              hoverable
+              selectable
+              :selected-id="selectedId"
+              title="Organization chart"
+              desc="Company reporting structure"
+              @update:selected-id="(id: string | number | null) => (selectedId = id)" />
+            <div class="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+              当前选择：{{ selectedId ?? '未选择' }}
+            </div>
+          </div>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">横向布局</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            direction='horizontal' 将层级从左向右展开。
+          </p>
+          <OrgChart :data="orgData" direction="horizontal" :width="760" :height="460" hoverable />
+        </section>
       </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="横向布局"
-      description="direction='horizontal' 将层级从左向右展开。"
-      :code="fullPageSnippet">
-      <OrgChart :data="orgData" direction="horizontal" :width="760" :height="460" hoverable />
     </DemoBlock>
   </div>
 </template>
@@ -75,21 +83,4 @@ const orgData: OrgChartNode = {
     }
   ]
 }
-
-const basicSnippet = `const data = {
-  id: 'ceo',
-  label: 'Ada Chen',
-  title: 'Chief Executive Officer',
-  children: [{ id: 'product', label: 'Lin Wu', title: 'Product' }]
-}
-
-<OrgChart :data="data" :width="720" :height="420" hoverable selectable />`
-
-const horizontalSnippet = `<OrgChart
-  :data="data"
-  direction="horizontal"
-  :width="760"
-  :height="420"
-  :node-width="160"
-  :node-height="72" />`
 </script>

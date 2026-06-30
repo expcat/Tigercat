@@ -3,22 +3,32 @@
     <h1 class="text-3xl font-bold mb-2">MarkdownEditor Markdown 编辑器</h1>
     <p class="text-gray-500 mb-8">支持编辑、分屏预览、工具栏插入和自定义预览渲染。</p>
 
-    <DemoBlock title="基础用法" description="v-model:value 绑定 Markdown" :code="fullPageSnippet">
-      <MarkdownEditor v-model:value="content" :height="360" placeholder="Write markdown..." />
-    </DemoBlock>
-
-    <DemoBlock title="模式切换" description="edit / split / preview" :code="fullPageSnippet">
-      <div class="grid gap-4 md:grid-cols-2">
-        <MarkdownEditor :value="readOnlyMarkdown" mode="preview" :height="220" read-only />
-        <MarkdownEditor :default-value="readOnlyMarkdown" default-mode="edit" :height="220" />
-      </div>
-    </DemoBlock>
-
     <DemoBlock
-      title="扩展渲染器"
-      description="renderer 接管预览 HTML，组件仍会清理危险内容"
+      title="组合展示"
+      description="合并展示基础用法、模式切换、扩展渲染器，减少重复示例块。"
       :code="fullPageSnippet">
-      <MarkdownEditor :value="content" :renderer="renderer" mode="preview" :height="180" />
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">v-model:value 绑定 Markdown</p>
+          <MarkdownEditor v-model:value="content" :height="360" placeholder="Write markdown..." />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">模式切换</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">edit / split / preview</p>
+          <div class="grid gap-4 md:grid-cols-2">
+            <MarkdownEditor :value="readOnlyMarkdown" mode="preview" :height="220" read-only />
+            <MarkdownEditor :default-value="readOnlyMarkdown" default-mode="edit" :height="220" />
+          </div>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">扩展渲染器</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            renderer 接管预览 HTML，组件仍会清理危险内容
+          </p>
+          <MarkdownEditor :value="content" :renderer="renderer" mode="preview" :height="180" />
+        </section>
+      </div>
     </DemoBlock>
   </div>
 </template>
@@ -27,7 +37,7 @@
 import { ref } from 'vue'
 import { MarkdownEditor } from '@expcat/tigercat-vue/MarkdownEditor'
 import DemoBlock from '../components/DemoBlock.vue'
-import fullPageSnippet from './MarkdownEditorDemo.vue?raw'
+import fullPageSnippet from './MarkdownEditorDemo.fixture.vue?raw'
 
 const initialMarkdown = `# Release notes
 
@@ -55,15 +65,4 @@ const renderer = {
     return `<p><strong>Custom renderer:</strong> ${markdown.split('\n')[0]}</p>`
   }
 }
-
-const basicSnippet = `<MarkdownEditor v-model:value="content" :height="360" placeholder="Write markdown..." />`
-
-const scriptSnippet = `import { ref } from 'vue'
-
-const content = ref(initialMarkdown)`
-
-const modeSnippet = `<MarkdownEditor :value="markdown" mode="preview" :height="220" read-only />
-<MarkdownEditor :default-value="markdown" default-mode="edit" :height="220" />`
-
-const rendererSnippet = `<MarkdownEditor :value="content" :renderer="renderer" mode="preview" :height="180" />`
 </script>

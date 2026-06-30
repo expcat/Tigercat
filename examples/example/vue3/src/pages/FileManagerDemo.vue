@@ -3,33 +3,41 @@
     <h1 class="text-3xl font-bold mb-2">FileManager 文件管理器</h1>
     <p class="text-gray-500 mb-8">文件浏览管理组件，支持列表/网格视图和搜索。</p>
 
-    <DemoBlock title="列表视图" description="默认列表模式，支持排序和搜索" :code="fullPageSnippet">
-      <FileManager
-        :files="files"
-        view-mode="list"
-        searchable
-        style="height: 350px; border: 1px solid #e5e7eb; border-radius: 8px" />
-    </DemoBlock>
-
-    <DemoBlock title="网格视图" description="viewMode='grid'" :code="fullPageSnippet">
-      <FileManager
-        :files="files"
-        view-mode="grid"
-        style="height: 350px; border: 1px solid #e5e7eb; border-radius: 8px" />
-    </DemoBlock>
-
     <DemoBlock
-      title="多选 & 面包屑导航"
-      description="multiple 多选，currentPath 面包屑"
+      title="组合展示"
+      description="合并展示列表视图、网格视图、多选 & 面包屑导航，减少重复示例块。"
       :code="fullPageSnippet">
-      <FileManager
-        :files="nestedFiles"
-        view-mode="list"
-        multiple
-        searchable
-        :current-path="currentPath"
-        @navigate="onNavigate"
-        style="height: 350px; border: 1px solid #e5e7eb; border-radius: 8px" />
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">列表视图</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">默认列表模式，支持排序和搜索</p>
+          <FileManager
+            :files="files"
+            view-mode="list"
+            searchable
+            style="height: 350px; border: 1px solid #e5e7eb; border-radius: 8px" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">网格视图</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">viewMode='grid'</p>
+          <FileManager
+            :files="files"
+            view-mode="grid"
+            style="height: 350px; border: 1px solid #e5e7eb; border-radius: 8px" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">多选 & 面包屑导航</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">multiple 多选，currentPath 面包屑</p>
+          <FileManager
+            :files="nestedFiles"
+            view-mode="list"
+            multiple
+            searchable
+            :current-path="currentPath"
+            @navigate="onNavigate"
+            style="height: 350px; border: 1px solid #e5e7eb; border-radius: 8px" />
+        </section>
+      </div>
     </DemoBlock>
   </div>
 </template>
@@ -38,7 +46,7 @@
 import { ref } from 'vue'
 import { FileManager } from '@expcat/tigercat-vue/FileManager'
 import DemoBlock from '../components/DemoBlock.vue'
-import fullPageSnippet from './FileManagerDemo.vue?raw'
+import fullPageSnippet from './FileManagerDemo.fixture.vue?raw'
 
 const files = [
   { key: '1', name: 'README.md', type: 'file' as const, size: 2048, modified: '2024-01-15' },
@@ -72,20 +80,4 @@ const currentPath = ref<string[]>([])
 const onNavigate = (path: string[]) => {
   currentPath.value = path
 }
-
-const listSnippet = `<FileManager :files="files" view-mode="list" searchable />`
-
-const gridSnippet = `<FileManager :files="files" view-mode="grid" />`
-
-const multiSnippet = `<FileManager
-  :files="files" view-mode="list" multiple searchable
-  :current-path="currentPath" @navigate="onNavigate" />`
-
-const multiScriptSnippet = `import { ref } from 'vue'
-
-const currentPath = ref<string[]>([])
-
-const onNavigate = (path: string[]) => {
-  currentPath.value = path
-}`
 </script>

@@ -2,12 +2,12 @@
 
 <!-- LLM-INDEX
 type: completed-roadmap-archive
-scope: v2.0.0 completed R01-R25 roadmap execution details
+scope: v2.0.0 completed R01-R26 roadmap execution details
 verified-date: 2026-07-01
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
-本文归档 v2.0.0 Roadmap 已完成 R01-R25 批次的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
+本文归档 v2.0.0 Roadmap 已完成 R01-R26 批次的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
 
 ## 已完成任务详情
 
@@ -1028,3 +1028,33 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **剩余阻塞**：无。R26 继续处理 Charts/Advanced 示例合并。
 
 **状态更新要求**：已写回 R25 状态、日期、Navigation/Feedback 覆盖范围、DemoBlock 压缩策略和关键验证命令；阶段 19 已同步为 `已完成（2026-07-01）`，当前可执行任务推进到 R26。R25 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R26 Charts and advanced demo merging
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：合并 Charts 静态配置展示；Advanced 中编辑器、虚拟列表、文件管理等复杂页面优先抽取 page-local fixture source，避免代码 Tab 过长或不可复制。
+
+**允许修改**：React/Vue Charts 与 Advanced example pages、可编译 fixture source、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件 public API、组件运行时行为、package exports、测试分组基础设施、generated Skill references、API baseline、发布产物策略。
+
+**执行摘要**：已覆盖 React/Vue 共 48 个页面：Charts 的 AreaChart、BarChart、LineChart、PieChart、DonutChart、RadarChart、ScatterChart、HeatmapChart、SunburstChart、TreeMapChart、FunnelChart、GaugeChart、OrgChart、Gantt，以及 Advanced 的 CodeEditor、FileManager、ImageAnnotation、InfiniteScroll、Kanban、MarkdownEditor、PrintLayout、RichTextEditor、VirtualList、VirtualTable。所有目标页已移除旧 `*Snippet` 常量，并将同页可共存配置合并到单个 `DemoBlock` 内；每个原示例保留为块内 section 小标题，避免丢失场景边界。CodeEditor、MarkdownEditor、FileManager、VirtualTable 新增 React/Vue fixture source，并把 Code 展示来源切到 fixture `?raw`；其余页面继续使用同页 `?raw`，未重新引入 `script` Tab 或手写 code prop。
+
+**合并规模**：
+
+- React 目标页面 `DemoBlock` 总数从 85 个压缩到 24 个。
+- Vue 目标页面 `DemoBlock` 总数从 85 个压缩到 24 个。
+- 新增 8 个 Advanced fixture source 文件，覆盖 React/Vue 的 CodeEditor、MarkdownEditor、FileManager、VirtualTable。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 prettier --write <changed example files>`
+- `npx -y pnpm@11.9.0 example:sources:check`
+- `npx -y pnpm@11.9.0 test:group:charts`
+- `npx -y pnpm@11.9.0 test:group:advanced`
+- `npx -y pnpm@11.9.0 example:build`
+
+**剩余阻塞**：无。R27 继续处理 Composite/Hooks 展示合并与剩余 cleanup。
+
+**状态更新要求**：已写回 R26 状态、日期、Charts/Advanced 覆盖范围、DemoBlock 压缩规模、fixture source 策略和关键验证命令；阶段 20 已同步为 `已完成（2026-07-01）`，当前可执行任务推进到 R27。R26 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。

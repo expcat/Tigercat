@@ -36,23 +36,6 @@ const orgData: OrgChartNode = {
   ]
 }
 
-const basicSnippet = `const data = {
-  id: 'ceo',
-  label: 'Ada Chen',
-  title: 'Chief Executive Officer',
-  children: [{ id: 'product', label: 'Lin Wu', title: 'Product' }]
-}
-
-<OrgChart data={data} width={720} height={420} hoverable selectable />`
-
-const horizontalSnippet = `<OrgChart
-  data={data}
-  direction="horizontal"
-  width={760}
-  height={420}
-  nodeWidth={160}
-  nodeHeight={72} />`
-
 export default function OrgChartDemo() {
   const [selectedId, setSelectedId] = useState<string | number | null>(null)
 
@@ -64,32 +47,40 @@ export default function OrgChartDemo() {
       </p>
 
       <DemoBlock
-        title="基础用法"
-        description="树形组织数据，节点自动居中到子树范围。"
+        title="组合展示"
+        description="合并展示基础用法、横向布局，减少重复示例块。"
         code={fullPageSnippet}>
-        <div className="space-y-4">
-          <OrgChart
-            data={orgData}
-            width={760}
-            height={460}
-            hoverable
-            selectable
-            selectedId={selectedId}
-            onSelectedIdChange={setSelectedId}
-            title="Organization chart"
-            desc="Company reporting structure"
-          />
-          <div className="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-            当前选择：{selectedId ?? '未选择'}
-          </div>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              树形组织数据，节点自动居中到子树范围。
+            </p>
+            <div className="space-y-4">
+              <OrgChart
+                data={orgData}
+                width={760}
+                height={460}
+                hoverable
+                selectable
+                selectedId={selectedId}
+                onSelectedIdChange={setSelectedId}
+                title="Organization chart"
+                desc="Company reporting structure"
+              />
+              <div className="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                当前选择：{selectedId ?? '未选择'}
+              </div>
+            </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">横向布局</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              direction='horizontal' 将层级从左向右展开。
+            </p>
+            <OrgChart data={orgData} direction="horizontal" width={760} height={460} hoverable />
+          </section>
         </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="横向布局"
-        description="direction='horizontal' 将层级从左向右展开。"
-        code={fullPageSnippet}>
-        <OrgChart data={orgData} direction="horizontal" width={760} height={460} hoverable />
       </DemoBlock>
     </div>
   )

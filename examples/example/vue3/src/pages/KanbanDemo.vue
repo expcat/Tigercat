@@ -4,22 +4,30 @@
     <p class="text-gray-500 mb-8">可拖拽的看板面板，支持卡片和列拖拽排序。</p>
 
     <DemoBlock
-      title="基础用法"
-      description="columns 定义列和卡片，支持拖拽"
+      title="组合展示"
+      description="合并展示基础用法、禁用拖拽 & WIP 限制，减少重复示例块。"
       :code="fullPageSnippet">
-      <Kanban v-model:columns="columns" allow-add-card :style="{ height: '400px' }" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="禁用拖拽 & WIP 限制"
-      description="draggable=false 禁用，enforceWipLimit 限制列容量"
-      :code="fullPageSnippet">
-      <Kanban
-        :default-columns="wipColumns"
-        :draggable="false"
-        enforce-wip-limit
-        :show-card-count="true"
-        :style="{ height: '350px' }" />
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">columns 定义列和卡片，支持拖拽</p>
+          <Kanban v-model:columns="columns" allow-add-card :style="{ height: '400px' }" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            禁用拖拽 & WIP 限制
+          </h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            draggable=false 禁用，enforceWipLimit 限制列容量
+          </p>
+          <Kanban
+            :default-columns="wipColumns"
+            :draggable="false"
+            enforce-wip-limit
+            :show-card-count="true"
+            :style="{ height: '350px' }" />
+        </section>
+      </div>
     </DemoBlock>
   </div>
 </template>
@@ -77,22 +85,4 @@ const wipColumns = [
     cards: []
   }
 ]
-
-const basicSnippet = `const columns = ref([
-  { id: 'todo', title: '待办', cards: [{ id: '1', title: '设计 UI', description: '...' }] },
-  { id: 'doing', title: '进行中', cards: [...] },
-  { id: 'done', title: '已完成', cards: [...] }
-])
-
-<Kanban v-model:columns="columns" allow-add-card />`
-
-const basicScriptSnippet = `import { ref } from 'vue'
-
-const columns = ref([
-  { id: 'todo', title: '待办', cards: [...] },
-  { id: 'doing', title: '进行中', cards: [...] },
-  { id: 'done', title: '已完成', cards: [...] }
-])`
-
-const wipSnippet = `<Kanban :default-columns="columns" :draggable="false" enforce-wip-limit :show-card-count="true" />`
 </script>

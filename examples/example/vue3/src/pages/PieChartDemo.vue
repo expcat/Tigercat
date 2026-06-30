@@ -28,64 +28,6 @@ const clickedSlice = ref<string>('')
 const handleSliceClick = (datum: PieChartDatum, _index: number) => {
   clickedSlice.value = `点击了 ${datum.label}，值 ${datum.value}`
 }
-
-const basicSnippet = `<PieChart
-  :data="data"
-  :width="380"
-  :height="280"
-  :show-labels="true"
-/>`
-
-const hoverSnippet = `<PieChart
-  :data="data"
-  :width="380"
-  :height="280"
-  hoverable
-  shadow
-  v-model:hoveredIndex="hoveredIndex"
-/>`
-
-const outsideSnippet = `<PieChart
-  :data="data"
-  :width="440"
-  :height="320"
-  :show-labels="true"
-  label-position="outside"
-  hoverable
-  shadow
-/>`
-
-const selectableSnippet = `<PieChart
-  :data="data"
-  :width="380"
-  :height="280"
-  hoverable
-  selectable
-  shadow
-  show-legend
-  legend-position="right"
-  v-model:selectedIndex="selectedIndex"
-  @slice-click="handleSliceClick"
-/>`
-
-const selectableScriptSnippet = `import { ref } from 'vue'
-
-const hoveredIndex = ref<number | null>(null)
-const selectedIndex = ref<number | null>(null)
-const clickedSlice = ref<string>('')`
-
-const fullSnippet = `<PieChart
-  :data="data"
-  :width="480"
-  :height="340"
-  hoverable
-  shadow
-  :show-labels="true"
-  label-position="outside"
-  show-legend
-  legend-position="right"
-  show-tooltip
-/>`
 </script>
 
 <template>
@@ -98,82 +40,90 @@ const fullSnippet = `<PieChart
     </div>
 
     <DemoBlock
-      title="基础饼图"
-      description="自带 2px 白色边框分隔扇区，视觉更清晰。"
+      title="组合展示"
+      description="合并展示基础饼图、悬停偏移 + 阴影、外部标签 + 引导线、点击选中 + 图例、完整效果，减少重复示例块。"
       :code="fullPageSnippet">
-      <PieChart :data="salesData" :width="380" :height="280" :show-labels="true" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="悬停偏移 + 阴影"
-      description="hoverable + shadow 模拟 ECharts emphasis 效果：悬停时扇区向外偏移并附带阴影。"
-      :code="fullPageSnippet">
-      <div class="space-y-4">
-        <PieChart
-          :data="colorfulData"
-          :width="380"
-          :height="280"
-          hoverable
-          shadow
-          v-model:hoveredIndex="hoveredIndex" />
-        <p class="text-sm text-gray-500">
-          当前悬停: {{ hoveredIndex !== null ? colorfulData[hoveredIndex]?.label : '无' }}
-        </p>
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础饼图</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            自带 2px 白色边框分隔扇区，视觉更清晰。
+          </p>
+          <PieChart :data="salesData" :width="380" :height="280" :show-labels="true" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">悬停偏移 + 阴影</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            hoverable + shadow 模拟 ECharts emphasis 效果：悬停时扇区向外偏移并附带阴影。
+          </p>
+          <div class="space-y-4">
+            <PieChart
+              :data="colorfulData"
+              :width="380"
+              :height="280"
+              hoverable
+              shadow
+              v-model:hoveredIndex="hoveredIndex" />
+            <p class="text-sm text-gray-500">
+              当前悬停: {{ hoveredIndex !== null ? colorfulData[hoveredIndex]?.label : '无' }}
+            </p>
+          </div>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">外部标签 + 引导线</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            labelPosition='outside' 时标签在扇区外侧，带引导线显示名称与百分比。
+          </p>
+          <PieChart
+            :data="salesData"
+            :width="440"
+            :height="320"
+            :show-labels="true"
+            label-position="outside"
+            hoverable
+            shadow />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">点击选中 + 图例</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            selectable 支持点击选中；配合图例实现完整交互。
+          </p>
+          <div class="space-y-4">
+            <PieChart
+              :data="colorfulData"
+              :width="380"
+              :height="280"
+              hoverable
+              selectable
+              shadow
+              show-legend
+              legend-position="right"
+              v-model:selectedIndex="selectedIndex"
+              @slice-click="handleSliceClick" />
+            <p class="text-sm text-gray-500">
+              选中: {{ selectedIndex !== null ? colorfulData[selectedIndex]?.label : '无' }}
+              <span v-if="clickedSlice" class="ml-4">{{ clickedSlice }}</span>
+            </p>
+          </div>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">完整效果</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            悬停偏移 + 阴影 + 外部标签 + 图例 + 提示框的完整示例。
+          </p>
+          <PieChart
+            :data="salesData"
+            :width="480"
+            :height="340"
+            hoverable
+            shadow
+            :show-labels="true"
+            label-position="outside"
+            show-legend
+            legend-position="right"
+            show-tooltip />
+        </section>
       </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="外部标签 + 引导线"
-      description="labelPosition='outside' 时标签在扇区外侧，带引导线显示名称与百分比。"
-      :code="fullPageSnippet">
-      <PieChart
-        :data="salesData"
-        :width="440"
-        :height="320"
-        :show-labels="true"
-        label-position="outside"
-        hoverable
-        shadow />
-    </DemoBlock>
-
-    <DemoBlock
-      title="点击选中 + 图例"
-      description="selectable 支持点击选中；配合图例实现完整交互。"
-      :code="fullPageSnippet">
-      <div class="space-y-4">
-        <PieChart
-          :data="colorfulData"
-          :width="380"
-          :height="280"
-          hoverable
-          selectable
-          shadow
-          show-legend
-          legend-position="right"
-          v-model:selectedIndex="selectedIndex"
-          @slice-click="handleSliceClick" />
-        <p class="text-sm text-gray-500">
-          选中: {{ selectedIndex !== null ? colorfulData[selectedIndex]?.label : '无' }}
-          <span v-if="clickedSlice" class="ml-4">{{ clickedSlice }}</span>
-        </p>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="完整效果"
-      description="悬停偏移 + 阴影 + 外部标签 + 图例 + 提示框的完整示例。"
-      :code="fullPageSnippet">
-      <PieChart
-        :data="salesData"
-        :width="480"
-        :height="340"
-        hoverable
-        shadow
-        :show-labels="true"
-        label-position="outside"
-        show-legend
-        legend-position="right"
-        show-tooltip />
     </DemoBlock>
   </div>
 </template>

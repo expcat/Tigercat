@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { VirtualTable } from '@expcat/tigercat-react/VirtualTable'
 import { type TableColumn } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
-import fullPageSnippet from './VirtualTableDemo.tsx?raw'
+import fullPageSnippet from './VirtualTableDemo.fixture.tsx?raw'
 
 const basicColumns: TableColumn[] = [
   { key: 'id', title: 'ID', width: 80 },
@@ -40,31 +40,6 @@ const fixedColumns: TableColumn[] = [
   }
 ]
 
-const basicSnippet = `const columns = [
-  { key: 'id', title: 'ID', width: 80 },
-  { key: 'name', title: '姓名', width: 150 },
-  { key: 'email', title: '邮箱' },
-  { key: 'status', title: '状态', width: 100 }
-]
-const data = Array.from({ length: 1000 }, (_, i) => ({
-  id: i + 1, name: \`用户 \${i + 1}\`, email: \`user\${i + 1}@example.com\`
-}))
-
-<VirtualTable dataSource={data} columns={columns} virtualHeight={400} virtualItemHeight={48} />`
-
-const styledSnippet = `<VirtualTable dataSource={data} columns={columns} virtualHeight={300} striped bordered />`
-
-const fixedSnippet = `<VirtualTable dataSource={data}
-  columns={fixedColumns}
-  virtualHeight={280}
-  virtualItemHeight={48}
-  striped
-  rowSelection={{ selectedRowKeys: [2, 4] }}
-/>`
-
-const stateSnippet = `<VirtualTable dataSource={[]} columns={columns} virtualHeight={200} loading />
-<VirtualTable dataSource={[]} columns={columns} virtualHeight={200} emptyText="暂无数据" />`
-
 const VirtualTableDemo: React.FC = () => {
   const basicData = useMemo(
     () =>
@@ -83,56 +58,73 @@ const VirtualTableDemo: React.FC = () => {
       <p className="text-gray-500 mb-8">虚拟滚动表格，可高效渲染大量数据行。</p>
 
       <DemoBlock
-        title="基础用法"
-        description="1000 行数据，virtualItemHeight=48"
+        title="组合展示"
+        description="合并展示基础用法、斑马纹 & 边框、固定列样式自定义、加载 & 空状态，减少重复示例块。"
         code={fullPageSnippet}>
-        <VirtualTable
-          dataSource={basicData}
-          columns={basicColumns}
-          virtualHeight={400}
-          virtualItemHeight={48}
-        />
-      </DemoBlock>
-
-      <DemoBlock title="斑马纹 & 边框" description="striped + bordered" code={fullPageSnippet}>
-        <VirtualTable
-          dataSource={basicData}
-          columns={basicColumns}
-          virtualHeight={300}
-          striped
-          bordered
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="固定列样式自定义"
-        description="固定列支持 fixedClassName / fixedHeaderClassName，可根据 selected 状态自定义 sticky 单元格外观。"
-        code={fullPageSnippet}>
-        <VirtualTable
-          dataSource={basicData.slice(0, 24)}
-          columns={fixedColumns}
-          virtualHeight={280}
-          virtualItemHeight={48}
-          striped
-          rowSelection={{ selectedRowKeys: [2, 4] }}
-        />
-      </DemoBlock>
-
-      <DemoBlock title="加载 & 空状态" description="loading 和 emptyText" code={fullPageSnippet}>
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <p className="text-sm text-gray-500 mb-2">Loading</p>
-            <VirtualTable dataSource={[]} columns={basicColumns} virtualHeight={200} loading />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm text-gray-500 mb-2">Empty</p>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              1000 行数据，virtualItemHeight=48
+            </p>
             <VirtualTable
-              dataSource={[]}
+              dataSource={basicData}
               columns={basicColumns}
-              virtualHeight={200}
-              emptyText="暂无数据"
+              virtualHeight={400}
+              virtualItemHeight={48}
             />
-          </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              斑马纹 & 边框
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">striped + bordered</p>
+            <VirtualTable
+              dataSource={basicData}
+              columns={basicColumns}
+              virtualHeight={300}
+              striped
+              bordered
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              固定列样式自定义
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              固定列支持 fixedClassName / fixedHeaderClassName，可根据 selected 状态自定义 sticky
+              单元格外观。
+            </p>
+            <VirtualTable
+              dataSource={basicData.slice(0, 24)}
+              columns={fixedColumns}
+              virtualHeight={280}
+              virtualItemHeight={48}
+              striped
+              rowSelection={{ selectedRowKeys: [2, 4] }}
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              加载 & 空状态
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">loading 和 emptyText</p>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <p className="text-sm text-gray-500 mb-2">Loading</p>
+                <VirtualTable dataSource={[]} columns={basicColumns} virtualHeight={200} loading />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-gray-500 mb-2">Empty</p>
+                <VirtualTable
+                  dataSource={[]}
+                  columns={basicColumns}
+                  virtualHeight={200}
+                  emptyText="暂无数据"
+                />
+              </div>
+            </div>
+          </section>
         </div>
       </DemoBlock>
     </div>

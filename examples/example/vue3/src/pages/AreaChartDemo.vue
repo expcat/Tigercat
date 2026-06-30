@@ -68,56 +68,6 @@ const stackedSeries: AreaChartSeries[] = [
 ]
 
 const hoveredIndex = ref<number | null>(null)
-
-const basicSnippet = `<AreaChart
-  :data="data"
-  :width="420"
-  :height="240"
-  :fill-opacity="0.3"
-  x-axis-label="Month"
-  y-axis-label="Value"
-/>`
-
-const multiSeriesSnippet = `<AreaChart
-  :series="multiSeries"
-  :width="420"
-  :height="240"
-  hoverable
-  show-legend
-/>`
-
-const stackedSnippet = `<AreaChart
-  :series="stackedSeries"
-  :width="420"
-  :height="240"
-  stacked
-  hoverable
-  show-legend
-  legend-position="right"
-/>`
-
-const interactiveSnippet = `<AreaChart
-  :series="multiSeries"
-  :width="420"
-  :height="240"
-  hoverable
-  selectable
-  show-points
-  show-legend
-  curve="monotone"
-  v-model:hoveredIndex="hoveredIndex"
-/>`
-
-const gradientSnippet = `<AreaChart
-  :data="data"
-  :width="420"
-  :height="240"
-  gradient
-  curve="monotone"
-  show-points
-  point-hollow
-  animated
-/>`
 </script>
 
 <template>
@@ -127,67 +77,75 @@ const gradientSnippet = `<AreaChart
       <p class="text-gray-600 dark:text-gray-400">用于展示数据随时间变化的趋势，强调数量累积。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="单系列面积图。" :code="fullPageSnippet">
-      <AreaChart
-        :data="basicData"
-        :width="420"
-        :height="240"
-        :fill-opacity="0.3"
-        x-axis-label="Month"
-        y-axis-label="Value" />
-    </DemoBlock>
-
     <DemoBlock
-      title="渐变填充 + 动画"
-      description="渐变面积填充、曲线平滑、空心数据点与入场动画，对齐 ECharts 视觉效果。"
+      title="组合展示"
+      description="合并展示基础用法、渐变填充 + 动画、多系列、堆叠面积图、交互功能，减少重复示例块。"
       :code="fullPageSnippet">
-      <AreaChart
-        :data="basicData"
-        :width="420"
-        :height="240"
-        gradient
-        curve="monotone"
-        show-points
-        point-hollow
-        animated />
-    </DemoBlock>
-
-    <DemoBlock title="多系列" description="多个系列对比。" :code="fullPageSnippet">
-      <AreaChart :series="multiSeries" :width="420" :height="240" hoverable show-legend />
-    </DemoBlock>
-
-    <DemoBlock
-      title="堆叠面积图"
-      description="数据堆叠展示，适合展示部分与整体关系。"
-      :code="fullPageSnippet">
-      <AreaChart
-        :series="stackedSeries"
-        :width="420"
-        :height="240"
-        stacked
-        hoverable
-        show-legend
-        legend-position="right" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="交互功能"
-      description="悬停高亮、点击选择、曲线平滑。"
-      :code="fullPageSnippet">
-      <div class="space-y-4">
-        <AreaChart
-          :series="multiSeries"
-          :width="420"
-          :height="240"
-          hoverable
-          selectable
-          show-points
-          show-legend
-          curve="monotone"
-          v-model:hoveredIndex="hoveredIndex" />
-        <p class="text-sm text-gray-500">
-          当前悬停: {{ hoveredIndex !== null ? multiSeries[hoveredIndex]?.name : '无' }}
-        </p>
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">单系列面积图。</p>
+          <AreaChart
+            :data="basicData"
+            :width="420"
+            :height="240"
+            :fill-opacity="0.3"
+            x-axis-label="Month"
+            y-axis-label="Value" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">渐变填充 + 动画</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            渐变面积填充、曲线平滑、空心数据点与入场动画，对齐 ECharts 视觉效果。
+          </p>
+          <AreaChart
+            :data="basicData"
+            :width="420"
+            :height="240"
+            gradient
+            curve="monotone"
+            show-points
+            point-hollow
+            animated />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">多系列</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">多个系列对比。</p>
+          <AreaChart :series="multiSeries" :width="420" :height="240" hoverable show-legend />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">堆叠面积图</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            数据堆叠展示，适合展示部分与整体关系。
+          </p>
+          <AreaChart
+            :series="stackedSeries"
+            :width="420"
+            :height="240"
+            stacked
+            hoverable
+            show-legend
+            legend-position="right" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">交互功能</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">悬停高亮、点击选择、曲线平滑。</p>
+          <div class="space-y-4">
+            <AreaChart
+              :series="multiSeries"
+              :width="420"
+              :height="240"
+              hoverable
+              selectable
+              show-points
+              show-legend
+              curve="monotone"
+              v-model:hoveredIndex="hoveredIndex" />
+            <p class="text-sm text-gray-500">
+              当前悬停: {{ hoveredIndex !== null ? multiSeries[hoveredIndex]?.name : '无' }}
+            </p>
+          </div>
+        </section>
       </div>
     </DemoBlock>
   </div>

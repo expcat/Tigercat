@@ -30,53 +30,41 @@ const nestedData = [
   { label: '运维', value: 20 }
 ]
 
-const basicSnippet = `const data = [
-  { label: '技术部', value: 40 },
-  { label: '产品部', value: 25 },
-  ...
-]
-
-<TreeMapChart data={data} width={500} height={300} hoverable showLegend />`
-
-const nestedSnippet = `const data = [
-  { label: '前端', value: 50, children: [
-    { label: 'Vue', value: 30 }, { label: 'React', value: 20 }
-  ]},
-  ...
-]
-
-<TreeMapChart data={data} width={500} height={300} hoverable />`
-
-const customSnippet = `<TreeMapChart
-  data={data} width={500} height={300}
-  gap={4} showLabels
-  colors={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']}
-  selectable />`
-
 const TreeMapChartDemo: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">TreeMapChart 矩形树图</h1>
       <p className="text-gray-500 mb-8">以嵌套矩形展示层级数据的占比关系。</p>
 
-      <DemoBlock title="基础用法" description="扁平数据，自动分配颜色" code={fullPageSnippet}>
-        <TreeMapChart data={flatData} width={500} height={300} hoverable showLegend />
-      </DemoBlock>
-
-      <DemoBlock title="层级数据" description="children 嵌套结构" code={fullPageSnippet}>
-        <TreeMapChart data={nestedData} width={500} height={300} hoverable />
-      </DemoBlock>
-
-      <DemoBlock title="自定义样式" description="gap、showLabels、颜色" code={fullPageSnippet}>
-        <TreeMapChart
-          data={flatData}
-          width={500}
-          height={300}
-          gap={4}
-          showLabels
-          colors={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']}
-          selectable
-        />
+      <DemoBlock
+        title="组合展示"
+        description="合并展示基础用法、层级数据、自定义样式，减少重复示例块。"
+        code={fullPageSnippet}>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">扁平数据，自动分配颜色</p>
+            <TreeMapChart data={flatData} width={500} height={300} hoverable showLegend />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">层级数据</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">children 嵌套结构</p>
+            <TreeMapChart data={nestedData} width={500} height={300} hoverable />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义样式</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">gap、showLabels、颜色</p>
+            <TreeMapChart
+              data={flatData}
+              width={500}
+              height={300}
+              gap={4}
+              showLabels
+              colors={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']}
+              selectable
+            />
+          </section>
+        </div>
       </DemoBlock>
     </div>
   )
