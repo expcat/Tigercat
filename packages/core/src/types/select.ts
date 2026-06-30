@@ -3,6 +3,7 @@
  */
 
 import type { ComponentSize } from './base'
+import type { TigerLocale, TigerLocaleSelect } from './locale'
 
 export type SelectValue = string | number
 
@@ -153,4 +154,14 @@ export interface SelectProps {
    * @since 0.5.0
    */
   listHeight?: number
+
+  /**
+   * Locale override merged on top of ConfigProvider locale.
+   */
+  locale?: Partial<TigerLocale>
+
+  /**
+   * UI labels for custom text. Takes precedence over `locale` and global ConfigProvider text.
+   */
+  labels?: Partial<TigerLocaleSelect>
 }

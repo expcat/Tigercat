@@ -90,6 +90,9 @@ export const ptBR: TigerLocale = defineLocale({
     wipLimitText: 'Limite WIP: {limit}',
     dragHintText: 'Arraste para mover',
     boardAriaLabel: 'Quadro de tarefas'
+  },
+  select: {
+    doneText: 'Concluir'
   }
 })
 

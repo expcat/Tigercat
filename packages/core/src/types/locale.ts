@@ -217,6 +217,11 @@ export interface TigerLocaleTaskBoard {
   boardAriaLabel?: string
 }
 
+export interface TigerLocaleSelect {
+  /** Mobile dropdown completion action text */
+  doneText?: string
+}
+
 /**
  * Built-in form-validation messages.
  *
@@ -283,6 +288,7 @@ export interface TigerLocale {
   imageEditor?: TigerLocaleImageEditor
   status?: TigerLocaleStatus
   taskBoard?: TigerLocaleTaskBoard
+  select?: TigerLocaleSelect
   formValidation?: TigerLocaleFormValidation
 }
 

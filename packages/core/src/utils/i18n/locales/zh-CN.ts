@@ -153,6 +153,9 @@ export const zhCN: TigerLocale = {
     dragHintText: '拖拽以移动',
     boardAriaLabel: '任务看板'
   },
+  select: {
+    doneText: '完成'
+  },
   formValidation: {
     required: '此字段为必填项',
     typeString: '值必须是字符串',

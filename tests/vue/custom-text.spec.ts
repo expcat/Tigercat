@@ -70,6 +70,17 @@ describe('custom text (no i18n) — Vue', () => {
       })
       expect(screen.getByText('Nothing yet')).toBeInTheDocument()
     })
+
+    it('Select done action uses labels', async () => {
+      const { container } = render(Select, {
+        props: {
+          options: [{ label: 'One', value: 1 }],
+          labels: { doneText: 'Complete' }
+        }
+      })
+      await fireEvent.click(container.querySelector('button')!)
+      expect(screen.getByRole('button', { name: 'Complete' })).toBeInTheDocument()
+    })
   })
 
   describe('global custom text via ConfigProvider', () => {
@@ -118,6 +129,25 @@ describe('custom text (no i18n) — Vue', () => {
       )
       expect(screen.getByLabelText('LocalPrev')).toBeInTheDocument()
       expect(screen.queryByLabelText('GlobalPrev')).toBeNull()
+    })
+
+    it('Select labels prop wins over global config text', async () => {
+      const { container } = render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { locale: { select: { doneText: 'GlobalDone' } } }, () =>
+                h(Select, {
+                  options: [{ label: 'One', value: 1 }],
+                  labels: { doneText: 'LocalDone' }
+                })
+              )
+          }
+        })
+      )
+      await fireEvent.click(container.querySelector('button')!)
+      expect(screen.getByRole('button', { name: 'LocalDone' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'GlobalDone' })).toBeNull()
     })
   })
 

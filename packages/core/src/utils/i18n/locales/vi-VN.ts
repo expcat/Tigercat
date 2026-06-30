@@ -75,5 +75,8 @@ export const viVN: TigerLocale = defineLocale({
     wipLimitText: 'Giới hạn WIP: {limit}',
     dragHintText: 'Kéo để di chuyển',
     boardAriaLabel: 'Bảng nhiệm vụ'
+  },
+  select: {
+    doneText: 'Hoàn thành'
   }
 })

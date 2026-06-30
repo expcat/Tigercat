@@ -90,6 +90,9 @@ export const arSA: TigerLocale = defineLocale({
     wipLimitText: 'حد العمل الجاري: {limit}',
     dragHintText: 'اسحب للنقل',
     boardAriaLabel: 'لوحة المهام'
+  },
+  select: {
+    doneText: 'إنهاء'
   }
 })
 

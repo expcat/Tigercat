@@ -75,5 +75,8 @@ export const zhTW: TigerLocale = defineLocale({
     wipLimitText: 'WIP 限制: {limit}',
     dragHintText: '拖曳以移動',
     boardAriaLabel: '任務看板'
+  },
+  select: {
+    doneText: '完成'
   }
 })

@@ -75,5 +75,8 @@ export const koKR: TigerLocale = defineLocale({
     wipLimitText: 'WIP 제한: {limit}',
     dragHintText: '드래그하여 이동',
     boardAriaLabel: '작업 보드'
+  },
+  select: {
+    doneText: '완료'
   }
 })

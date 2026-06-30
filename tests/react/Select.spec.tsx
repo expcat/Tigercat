@@ -680,6 +680,33 @@ describe('Select', () => {
       expect(queryByRole('listbox')).not.toBeInTheDocument()
     })
 
+    it('should localize the in-panel done action from zh-CN locale id', async () => {
+      const user = userEvent.setup()
+      const { container, getByRole } = render(
+        <Select options={testOptions} locale={{ locale: 'zh-CN' }} />
+      )
+
+      await user.click(container.querySelector('button')!)
+
+      expect(getByRole('button', { name: '完成' })).toBeInTheDocument()
+    })
+
+    it('should let labels override the in-panel done action text', async () => {
+      const user = userEvent.setup()
+      const { container, getByRole, queryByRole } = render(
+        <Select
+          options={testOptions}
+          locale={{ common: { okText: 'Apply' } }}
+          labels={{ doneText: 'Complete' }}
+        />
+      )
+
+      await user.click(container.querySelector('button')!)
+
+      expect(getByRole('button', { name: 'Complete' })).toBeInTheDocument()
+      expect(queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument()
+    })
+
     it('should keep multiple select open after selection until the done action is clicked', async () => {
       const user = userEvent.setup()
       const { container, getByText, getByRole, queryByRole } = render(

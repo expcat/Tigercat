@@ -189,7 +189,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Select
 
-`packages/core/src/types/select.ts` · `SelectProps` · 3/17 props
+`packages/core/src/types/select.ts` · `SelectProps` · 3/19 props
 
 | Prop           | Type            | Default | Notes                                       |
 | -------------- | --------------- | ------- | ------------------------------------------- |

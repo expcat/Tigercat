@@ -33,7 +33,9 @@ import {
   type SelectSearchDebouncer,
   resolveLocaleText,
   mergeTigerLocale,
-  type TigerLocale
+  getSelectLabels,
+  type TigerLocale,
+  type TigerLocaleSelect
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -115,6 +117,7 @@ export interface VueSelectProps {
   createOptionText?: string
   listHeight?: number
   locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleSelect>
 }
 
 export const Select = defineComponent({
@@ -237,6 +240,13 @@ export const Select = defineComponent({
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
+    },
+    /**
+     * UI labels for custom text. Takes precedence over locale and ConfigProvider text.
+     */
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleSelect>>,
+      default: undefined
     }
   },
   emits: ['update:modelValue', 'update:searchValue', 'change', 'search-change', 'create'],
@@ -340,13 +350,8 @@ export const Select = defineComponent({
       )
     })
 
-    const doneText = computed(() =>
-      resolveLocaleText(
-        'Done',
-        mergedLocale.value?.common?.okText,
-        mergedLocale.value?.common?.closeText
-      )
-    )
+    const labels = computed(() => getSelectLabels(mergedLocale.value, props.labels))
+    const doneText = computed(() => resolveLocaleText(labels.value.doneText))
 
     function isSelected(option: SelectOption): boolean {
       if (props.multiple && Array.isArray(props.modelValue)) {

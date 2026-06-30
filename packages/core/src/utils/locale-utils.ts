@@ -26,6 +26,7 @@ import type {
   TigerLocaleImageEditor,
   TigerLocaleStatus,
   TigerLocaleTaskBoard,
+  TigerLocaleSelect,
   TigerLocaleFormValidation,
   TigerLocaleDirection
 } from '../types/locale'
@@ -54,6 +55,7 @@ const TIGER_LOCALE_KEYS = [
   'imageEditor',
   'status',
   'taskBoard',
+  'select',
   'formValidation'
 ]
 
@@ -135,6 +137,7 @@ export function mergeTigerLocale(
     imageEditor: { ...base?.imageEditor, ...override?.imageEditor },
     status: { ...base?.status, ...override?.status },
     taskBoard: { ...base?.taskBoard, ...override?.taskBoard },
+    select: { ...base?.select, ...override?.select },
     formValidation: { ...base?.formValidation, ...override?.formValidation }
   }
 }
@@ -600,6 +603,29 @@ export function getTaskBoardLabels(
       overrides?.dragHintText ?? locale?.taskBoard?.dragHintText ?? defaultLabels.dragHintText,
     boardAriaLabel:
       overrides?.boardAriaLabel ?? locale?.taskBoard?.boardAriaLabel ?? defaultLabels.boardAriaLabel
+  }
+}
+
+export const DEFAULT_SELECT_LABELS: Required<TigerLocaleSelect> = {
+  doneText: 'Done'
+}
+
+export const ZH_CN_SELECT_LABELS: Required<TigerLocaleSelect> = {
+  doneText: '完成'
+}
+
+export function getSelectLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleSelect>
+): Required<TigerLocaleSelect> {
+  const isZh = !!locale?.locale?.startsWith('zh') || locale?.formWizard?.finishText === '完成'
+  const defaultLabels = isZh ? ZH_CN_SELECT_LABELS : DEFAULT_SELECT_LABELS
+  return {
+    doneText:
+      overrides?.doneText ??
+      locale?.select?.doneText ??
+      locale?.common?.okText ??
+      defaultLabels.doneText
   }
 }
 

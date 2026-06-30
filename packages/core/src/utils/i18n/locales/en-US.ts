@@ -153,6 +153,9 @@ export const enUS: TigerLocale = {
     dragHintText: 'Drag to move',
     boardAriaLabel: 'Task Board'
   },
+  select: {
+    doneText: 'Done'
+  },
   formValidation: {
     required: 'This field is required',
     typeString: 'Value must be a string',

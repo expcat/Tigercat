@@ -12,6 +12,7 @@ import {
   findNextEnabledIndex as pickerFindNextEnabledIndex,
   resolveLocaleText,
   mergeTigerLocale,
+  getSelectLabels,
   type SelectOption,
   type SelectSearchDebouncer,
   type SelectValue,
@@ -37,6 +38,7 @@ const SELECT_KEYS = new Set([
   'creatable',
   'createOptionText',
   'listHeight',
+  'labels',
   'onSearchChange',
   'onCreate',
   'className',
@@ -64,6 +66,7 @@ export function useSelectState(props: SelectProps): SelectContext {
     createOptionText = 'Create',
     virtual = false,
     listHeight = 256,
+    labels: labelsOverride,
     onSearchChange,
     onCreate,
     className,
@@ -78,6 +81,10 @@ export function useSelectState(props: SelectProps): SelectContext {
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getSelectLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
   )
 
   const divProps: Record<string, unknown> = {}
@@ -508,11 +515,7 @@ export function useSelectState(props: SelectProps): SelectContext {
     divProps,
     searchPlaceholder: resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder),
     clearAriaLabel: resolveLocaleText('Clear selection', mergedLocale?.common?.clearText),
-    doneText: resolveLocaleText(
-      'Done',
-      mergedLocale?.common?.okText,
-      mergedLocale?.common?.closeText
-    ),
+    doneText: resolveLocaleText(labels.doneText),
     filteredOptions,
     flatSelectableOptions,
     creatableOption,

@@ -5,10 +5,12 @@ import {
   getTableLabels,
   getFormWizardLabels,
   getTaskBoardLabels,
+  getSelectLabels,
   DEFAULT_PAGINATION_LABELS,
   DEFAULT_TABLE_LABELS,
   DEFAULT_FORM_WIZARD_LABELS,
-  DEFAULT_TASK_BOARD_LABELS
+  DEFAULT_TASK_BOARD_LABELS,
+  DEFAULT_SELECT_LABELS
 } from '@expcat/tigercat-core'
 
 describe('custom-text overrides on label resolvers', () => {
@@ -78,6 +80,25 @@ describe('custom-text overrides on label resolvers', () => {
       expect(labels.emptyColumnText).toBe('Nothing here')
       expect(labels.addCardText).toBe('locale-add')
       expect(labels.boardAriaLabel).toBe(DEFAULT_TASK_BOARD_LABELS.boardAriaLabel)
+    })
+  })
+
+  describe('getSelectLabels', () => {
+    it('falls back to English defaults with no locale or overrides', () => {
+      expect(getSelectLabels()).toEqual(DEFAULT_SELECT_LABELS)
+    })
+
+    it('uses Chinese defaults for zh locales', () => {
+      const labels = getSelectLabels({ locale: 'zh-CN' })
+      expect(labels.doneText).toBe('完成')
+    })
+
+    it('ranks overrides above locale and common fallback', () => {
+      const labels = getSelectLabels(
+        { select: { doneText: 'LocaleDone' }, common: { okText: 'CommonOK' } },
+        { doneText: 'OverrideDone' }
+      )
+      expect(labels.doneText).toBe('OverrideDone')
     })
   })
 })

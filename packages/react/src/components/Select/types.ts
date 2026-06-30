@@ -5,8 +5,7 @@ import type {
   SelectValue,
   SelectValues,
   ComponentSize,
-  SelectProps as CoreSelectProps,
-  TigerLocale
+  SelectProps as CoreSelectProps
 } from '@expcat/tigercat-core'
 
 type SelectDivProps = Omit<
@@ -23,8 +22,6 @@ export interface SelectBaseProps
   onCreate?: (option: SelectOption) => void
 
   className?: string
-
-  locale?: Partial<TigerLocale>
 }
 
 export interface SelectSingleProps extends SelectBaseProps {

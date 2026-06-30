@@ -75,5 +75,8 @@ export const jaJP: TigerLocale = defineLocale({
     wipLimitText: 'WIP制限: {limit}',
     dragHintText: 'ドラッグして移動',
     boardAriaLabel: 'タスクボード'
+  },
+  select: {
+    doneText: '完了'
   }
 })

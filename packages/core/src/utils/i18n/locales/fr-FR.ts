@@ -90,6 +90,9 @@ export const frFR: TigerLocale = defineLocale({
     wipLimitText: 'Limite WIP : {limit}',
     dragHintText: 'Glisser pour déplacer',
     boardAriaLabel: 'Tableau des tâches'
+  },
+  select: {
+    doneText: 'Terminer'
   }
 })
 

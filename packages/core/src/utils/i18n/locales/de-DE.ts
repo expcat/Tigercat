@@ -90,6 +90,9 @@ export const deDE: TigerLocale = defineLocale({
     wipLimitText: 'WIP-Limit: {limit}',
     dragHintText: 'Zum Verschieben ziehen',
     boardAriaLabel: 'Aufgabenboard'
+  },
+  select: {
+    doneText: 'Fertigstellen'
   }
 })
 

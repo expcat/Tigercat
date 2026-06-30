@@ -33,6 +33,7 @@ describe('i18n locale presets', () => {
     'pagination',
     'table',
     'formWizard',
+    'select',
     'taskBoard'
   ]
 
@@ -84,6 +85,12 @@ describe('i18n locale presets', () => {
   it('all locales have table searchButtonText', () => {
     for (const [, locale] of Object.entries(locales)) {
       expect(locale.table.searchButtonText).toBeDefined()
+    }
+  })
+
+  it('all locales have select.doneText', () => {
+    for (const [, locale] of Object.entries(locales)) {
+      expect(locale.select?.doneText).toBeDefined()
     }
   })
 

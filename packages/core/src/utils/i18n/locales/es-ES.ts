@@ -90,6 +90,9 @@ export const esES: TigerLocale = defineLocale({
     wipLimitText: 'Límite WIP: {limit}',
     dragHintText: 'Arrastra para mover',
     boardAriaLabel: 'Tablero de tareas'
+  },
+  select: {
+    doneText: 'Finalizar'
   }
 })
 

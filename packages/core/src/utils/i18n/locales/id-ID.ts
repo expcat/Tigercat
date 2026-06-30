@@ -75,5 +75,8 @@ export const idID: TigerLocale = defineLocale({
     wipLimitText: 'Batas WIP: {limit}',
     dragHintText: 'Seret untuk memindahkan',
     boardAriaLabel: 'Papan Tugas'
+  },
+  select: {
+    doneText: 'Selesai'
   }
 })

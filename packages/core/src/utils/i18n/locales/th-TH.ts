@@ -75,5 +75,8 @@ export const thTH: TigerLocale = defineLocale({
     wipLimitText: 'จำกัด WIP: {limit}',
     dragHintText: 'ลากเพื่อย้าย',
     boardAriaLabel: 'บอร์ดงาน'
+  },
+  select: {
+    doneText: 'เสร็จสิ้น'
   }
 })
