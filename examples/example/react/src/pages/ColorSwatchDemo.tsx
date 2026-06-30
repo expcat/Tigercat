@@ -3,6 +3,7 @@ import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
 import { ColorSwatch } from '@expcat/tigercat-react/ColorSwatch'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ColorSwatchDemo.tsx?raw'
 
 const basicSnippet = `<ColorSwatch value={color} onChange={setColor} />
 <Text>选中颜色: {color}</Text>`
@@ -56,7 +57,7 @@ const ColorSwatchDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">ColorSwatch 色板选择器</h1>
       <p className="text-gray-500 mb-8">用于从预设色板或自定义色组中快速选择颜色。</p>
 
-      <DemoBlock title="基本用法" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" code={fullPageSnippet}>
         <Space size={16} align="center">
           <ColorSwatch value={color} onChange={setColor} />
           <Text>选中颜色: {color}</Text>
@@ -66,7 +67,7 @@ const ColorSwatchDemo: React.FC = () => {
       <DemoBlock
         title="自定义色组"
         description="groups 支持分组标签，colors 支持禁用与自定义无障碍标签。"
-        code={groupSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" size={16}>
           <ColorSwatch
             value={brandColor}

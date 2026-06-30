@@ -8,7 +8,6 @@ interface DemoBlockProps {
   title: string
   description?: string
   code: string
-  script?: string
   children: React.ReactNode
   className?: string
 }
@@ -58,14 +57,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({ code }) => {
   )
 }
 
-const DemoBlock: React.FC<DemoBlockProps> = ({
-  title,
-  description,
-  code,
-  script,
-  children,
-  className
-}) => {
+const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, children, className }) => {
   const [activeKey, setActiveKey] = useState('preview')
   const sectionClasses = className ? `mb-12 ${className}` : 'mb-12'
 
@@ -77,22 +69,18 @@ const DemoBlock: React.FC<DemoBlockProps> = ({
       </div>
 
       <div className="rounded-lg">
-        <Tabs activeKey={activeKey} onActiveKeyChange={(key) => setActiveKey(String(key))} type="card">
+        <Tabs
+          activeKey={activeKey}
+          onActiveKeyChange={(key) => setActiveKey(String(key))}
+          type="card">
           <TabPane tabKey="preview" label="示例" />
           <TabPane tabKey="code" label="代码" />
-          {script ? <TabPane tabKey="script" label="脚本" /> : null}
         </Tabs>
         {activeKey === 'preview' && <div className={previewPanelClasses}>{children}</div>}
         {activeKey === 'code' && (
           <div className={codePanelClasses}>
             <CopyButton code={code} />
             <Code code={code} />
-          </div>
-        )}
-        {activeKey === 'script' && script && (
-          <div className={codePanelClasses}>
-            <CopyButton code={script} />
-            <Code code={script} />
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Tour } from '@expcat/tigercat-react/Tour'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TourDemo.tsx?raw'
 
 const steps = [
   { target: '#tour-r-btn-1', title: '步骤一', description: '点击此按钮开始引导' },
@@ -40,11 +41,7 @@ const TourDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Tour 漫游式引导</h1>
       <p className="text-gray-500 mb-8">分步引导用户了解页面功能。</p>
 
-      <DemoBlock
-        title="基础用法"
-        description="点击按钮开始引导"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基础用法" description="点击按钮开始引导" code={fullPageSnippet}>
         <div className="flex gap-4 items-center">
           <button
             id="tour-r-btn-1"
@@ -65,7 +62,7 @@ const TourDemo: React.FC = () => {
       <DemoBlock
         title="自定义按钮文字"
         description="nextText / prevText / finishText"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <button
           id="tour-r-custom"
           className="px-4 py-2 bg-green-500 text-white rounded"

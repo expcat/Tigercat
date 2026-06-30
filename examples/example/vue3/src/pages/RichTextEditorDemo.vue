@@ -3,15 +3,11 @@
     <h1 class="text-3xl font-bold mb-2">RichTextEditor 富文本编辑器</h1>
     <p class="text-gray-500 mb-8">所见即所得的富文本编辑器，带工具栏。</p>
 
-    <DemoBlock
-      title="基础用法"
-      description="v-model 绑定 HTML 内容"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="v-model 绑定 HTML 内容" :code="fullPageSnippet">
       <RichTextEditor v-model:value="content" :height="250" placeholder="在这里编辑..." />
     </DemoBlock>
 
-    <DemoBlock title="只读 & 禁用" :code="readOnlySnippet">
+    <DemoBlock title="只读 & 禁用" :code="fullPageSnippet">
       <div class="flex gap-4">
         <div class="flex-1">
           <p class="text-sm text-gray-500 mb-2">只读</p>
@@ -30,6 +26,7 @@
 import { ref } from 'vue'
 import { RichTextEditor } from '@expcat/tigercat-vue/RichTextEditor'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './RichTextEditorDemo.vue?raw'
 
 const content = ref('<p>Hello <strong>Tigercat</strong>!</p>')
 const sampleHtml = '<p>这是一段<em>只读</em>的富文本内容。</p>'

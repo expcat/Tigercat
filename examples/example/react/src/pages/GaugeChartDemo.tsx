@@ -1,5 +1,6 @@
 import { GaugeChart } from '@expcat/tigercat-react/GaugeChart'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './GaugeChartDemo.tsx?raw'
 
 const segments = [
   { range: [0, 40] as [number, number], color: '#ef4444' },
@@ -30,14 +31,14 @@ const GaugeChartDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">GaugeChart 仪表盘</h1>
       <p className="text-gray-500 mb-8">环形仪表盘，展示单一指标的进度或状态。</p>
 
-      <DemoBlock title="基础用法" description="value、min、max" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="value、min、max" code={fullPageSnippet}>
         <div className="flex gap-8 items-end">
           <GaugeChart value={72} label="完成率" />
           <GaugeChart value={35} max={50} label="得分" />
         </div>
       </DemoBlock>
 
-      <DemoBlock title="颜色分段" description="segments 按区间着色" code={segmentsSnippet}>
+      <DemoBlock title="颜色分段" description="segments 按区间着色" code={fullPageSnippet}>
         <GaugeChart
           value={82}
           width={320}
@@ -48,7 +49,10 @@ const GaugeChartDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="自定义弧形" description="arcWidth、startAngle、endAngle" code={arcSnippet}>
+      <DemoBlock
+        title="自定义弧形"
+        description="arcWidth、startAngle、endAngle"
+        code={fullPageSnippet}>
         <GaugeChart
           value={60}
           width={280}

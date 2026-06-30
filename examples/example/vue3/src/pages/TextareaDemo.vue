@@ -4,6 +4,7 @@ import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { ref } from 'vue'
 import { Textarea } from '@expcat/tigercat-vue/Textarea'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './TextareaDemo.vue?raw'
 
 const text = ref('')
 const autoResizeText = ref('')
@@ -94,11 +95,7 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock
-      title="基础用法"
-      description="基础的文本域组件。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="基础的文本域组件。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Textarea v-model="text" placeholder="请输入内容" :rows="4" />
         <p class="text-sm text-gray-600">输入的内容：{{ text }}</p>
@@ -106,7 +103,7 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 尺寸 -->
-    <DemoBlock title="尺寸" description="支持 sm / md / lg 三种尺寸。" :code="sizeSnippet">
+    <DemoBlock title="尺寸" description="支持 sm / md / lg 三种尺寸。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="Small">
           <Textarea size="sm" placeholder="Small textarea" />
@@ -121,7 +118,10 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 不同行数 -->
-    <DemoBlock title="不同行数" description="通过 rows 属性设置文本域的行数。" :code="rowsSnippet">
+    <DemoBlock
+      title="不同行数"
+      description="通过 rows 属性设置文本域的行数。"
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="2行">
           <Textarea placeholder="2行文本域" :rows="2" />
@@ -139,7 +139,7 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="自动高度"
       description="通过 autoResize 启用自动高度，可配合 minRows / maxRows 限制范围。"
-      :code="autoResizeSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="基础自动高度">
           <Textarea v-model="autoResizeText" autoResize placeholder="输入内容后将自动调整高度" />
@@ -154,7 +154,7 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="字符计数"
       description="通过 showCount 显示计数，可配合 maxLength 限制最大字符数。"
-      :code="countSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="仅计数">
           <Textarea showCount placeholder="显示字符数" />
@@ -169,7 +169,7 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="禁用、只读和必填"
       description="文本域可以设置为禁用、只读或必填状态。"
-      :code="disabledSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="禁用">
           <Textarea model-value="禁用的文本域" disabled :rows="3" />
@@ -187,7 +187,7 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="组合功能"
       description="autoResize + showCount + maxLength 组合使用。"
-      :code="combinedSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Textarea
           v-model="combined"

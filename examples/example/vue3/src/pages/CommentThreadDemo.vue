@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { CommentThread } from '@expcat/tigercat-vue/CommentThread'
 import type { CommentNode } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './CommentThreadDemo.vue?raw'
 
 const comments = ref<CommentNode[]>([
   {
@@ -211,8 +212,7 @@ const minimalSnippet = `<CommentThread
     <DemoBlock
       title="嵌套回复"
       description="支持多层嵌套、展开/收起、加载更多和实时回复。点击回复按钮试试。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <CommentThread
         :nodes="comments"
         :default-expanded-keys="[1]"
@@ -225,14 +225,14 @@ const minimalSnippet = `<CommentThread
     <DemoBlock
       title="扁平数据"
       description="传入 items（带 parentId）即可自动构建嵌套层级。"
-      :code="flatSnippet">
+      :code="fullPageSnippet">
       <CommentThread :items="flatItems" :default-expanded-keys="[100]" />
     </DemoBlock>
 
     <DemoBlock
       title="精简模式"
       description="隐藏点赞、更多按钮和分割线，适合轻量展示。"
-      :code="minimalSnippet">
+      :code="fullPageSnippet">
       <CommentThread
         :nodes="minimalNodes"
         :show-like="false"
@@ -240,7 +240,7 @@ const minimalSnippet = `<CommentThread
         :show-divider="false" />
     </DemoBlock>
 
-    <DemoBlock title="空态" description="无数据时展示空状态文案。" :code="emptySnippet">
+    <DemoBlock title="空态" description="无数据时展示空状态文案。" :code="fullPageSnippet">
       <CommentThread :items="[]" empty-text="暂无评论" />
     </DemoBlock>
   </div>

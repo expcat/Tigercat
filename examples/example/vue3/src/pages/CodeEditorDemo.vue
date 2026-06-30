@@ -6,16 +6,15 @@
     <DemoBlock
       title="基础用法"
       description="language 设置语言，v-model 绑定代码"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <CodeEditor v-model:value="jsCode" language="javascript" :min-lines="5" />
     </DemoBlock>
 
-    <DemoBlock title="主题 & 只读" description="theme='dark'，readOnly" :code="themeSnippet">
+    <DemoBlock title="主题 & 只读" description="theme='dark'，readOnly" :code="fullPageSnippet">
       <CodeEditor :value="htmlCode" language="html" theme="dark" read-only :min-lines="5" />
     </DemoBlock>
 
-    <DemoBlock title="配置项" description="tabSize、wordWrap、placeholder" :code="configSnippet">
+    <DemoBlock title="配置项" description="tabSize、wordWrap、placeholder" :code="fullPageSnippet">
       <CodeEditor
         language="css"
         :tab-size="4"
@@ -31,6 +30,7 @@
 import { ref } from 'vue'
 import { CodeEditor } from '@expcat/tigercat-vue/CodeEditor'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './CodeEditorDemo.vue?raw'
 
 const jsCode = ref(`function greet(name) {
   console.log('Hello, ' + name)

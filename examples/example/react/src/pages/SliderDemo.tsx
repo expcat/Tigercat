@@ -3,6 +3,7 @@ import { Slider } from '@expcat/tigercat-react/Slider'
 import { Space } from '@expcat/tigercat-react/Space'
 import { Text } from '@expcat/tigercat-react/Text'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './SliderDemo.tsx?raw'
 
 const SliderDemo: React.FC = () => {
   const [basicValue, setBasicValue] = useState(50)
@@ -147,11 +148,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock
-        title="基础用法"
-        description="基础的滑块用法，显示当前值。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基础用法" description="基础的滑块用法，显示当前值。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="flex items-center gap-4 w-full">
             <Slider
@@ -167,7 +164,10 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       </DemoBlock>
 
       {/* 不同范围 */}
-      <DemoBlock title="不同范围" description="通过 min 和 max 属性设置范围。" code={rangeSnippet}>
+      <DemoBlock
+        title="不同范围"
+        description="通过 min 和 max 属性设置范围。"
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="w-full">
             <Text className="text-sm text-gray-600 mb-2">0-100 (默认)</Text>
@@ -199,7 +199,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       </DemoBlock>
 
       {/* 步进 */}
-      <DemoBlock title="步进" description="通过 step 设置步进值。" code={stepSnippet}>
+      <DemoBlock title="步进" description="通过 step 设置步进值。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="flex items-center gap-4 w-full">
             <Slider
@@ -219,7 +219,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       <DemoBlock
         title="范围选择"
         description="通过 range 启用范围选择，此时值为 [min, max]。"
-        code={rangeValueSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="flex items-center gap-4 w-full">
             <Slider
@@ -238,7 +238,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       </DemoBlock>
 
       {/* 带标记 */}
-      <DemoBlock title="带标记" description="通过 marks 显示刻度标记。" code={marksSnippet}>
+      <DemoBlock title="带标记" description="通过 marks 显示刻度标记。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="flex items-center gap-4 w-full">
             <Slider
@@ -258,7 +258,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       <DemoBlock
         title="工具提示"
         description="通过 tooltip 控制是否显示提示（默认开启）。"
-        code={tooltipSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="w-full">
             <Text className="text-sm text-gray-600 mb-2">tooltip on（默认）</Text>
@@ -291,7 +291,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       </DemoBlock>
 
       {/* 禁用状态 */}
-      <DemoBlock title="禁用状态" description="通过 disabled 属性禁用滑块。" code={disabledSnippet}>
+      <DemoBlock title="禁用状态" description="通过 disabled 属性禁用滑块。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="flex items-center gap-4 w-full">
             <Slider value={disabledValue} min={0} max={100} disabled className="flex-1" />
@@ -304,7 +304,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       <DemoBlock
         title="不同尺寸"
         description="Slider 支持 sm / md / lg 三种尺寸。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="w-full">
             <Text className="text-sm text-gray-600 mb-2">sm</Text>
@@ -355,7 +355,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       <DemoBlock
         title="默认值"
         description="通过 defaultValue 设置初始值，无需绱定受控状态（非受控模式）。"
-        code={defaultValueSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="flex items-center gap-4 w-full">
             <Slider defaultValue={60} min={0} max={100} className="flex-1" />

@@ -2,6 +2,7 @@ import { NumberKeyboard } from '@expcat/tigercat-react/NumberKeyboard'
 import { useState } from 'react'
 import { Input } from '@expcat/tigercat-react/Input'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './NumberKeyboardDemo.tsx?raw'
 
 const amountSnippet = `const [amount, setAmount] = useState('')
 
@@ -37,7 +38,7 @@ export default function NumberKeyboardDemo() {
       <DemoBlock
         title="金额输入"
         description="amount 模式支持小数点和默认两位小数"
-        code={amountSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-sm space-y-3">
           <Input value={amount} readonly prefix="¥" placeholder="输入金额" />
           <NumberKeyboard
@@ -52,14 +53,17 @@ export default function NumberKeyboardDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="手机号输入" description="phone 模式默认限制 11 位数字" code={phoneSnippet}>
+      <DemoBlock
+        title="手机号输入"
+        description="phone 模式默认限制 11 位数字"
+        code={fullPageSnippet}>
         <div className="max-w-sm space-y-3">
           <Input value={phone} readonly placeholder="手机号" />
           <NumberKeyboard mode="phone" value={phone} onChange={setPhone} confirmText="完成" />
         </div>
       </DemoBlock>
 
-      <DemoBlock title="身份证输入" description="id-card 模式允许末位输入 X" code={idCardSnippet}>
+      <DemoBlock title="身份证输入" description="id-card 模式允许末位输入 X" code={fullPageSnippet}>
         <div className="max-w-sm space-y-3">
           <Input value={idCard} readonly placeholder="身份证号" />
           <NumberKeyboard mode="id-card" value={idCard} onChange={setIdCard} confirmText="完成" />

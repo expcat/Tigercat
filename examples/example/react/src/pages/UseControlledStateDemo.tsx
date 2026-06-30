@@ -4,6 +4,7 @@ import { Space } from '@expcat/tigercat-react/Space'
 import { Card } from '@expcat/tigercat-react/Card'
 import { useControlledState } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './UseControlledStateDemo.tsx?raw'
 
 interface CounterProps {
   value?: number
@@ -58,7 +59,7 @@ const UseControlledStateDemo: React.FC = () => {
       <DemoBlock
         title="非受控模式"
         description="只传入 defaultValue，组件内部维护状态。"
-        code={snippet}>
+        code={fullPageSnippet}>
         <Card>
           <Counter defaultValue={5} />
         </Card>
@@ -67,8 +68,7 @@ const UseControlledStateDemo: React.FC = () => {
       <DemoBlock
         title="受控模式"
         description="传入 value 与 onChange，由父组件控制状态。"
-        code={snippet}
-        script={controlledScriptSnippet}>
+        code={fullPageSnippet}>
         <Card>
           <Counter value={external} onChange={setExternal} />
           <div className="mt-3 text-sm text-gray-500">

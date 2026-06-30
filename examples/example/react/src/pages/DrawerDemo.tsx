@@ -4,6 +4,7 @@ import { Button } from '@expcat/tigercat-react/Button'
 import { Space } from '@expcat/tigercat-react/Space'
 import { type DrawerPlacement, type DrawerSize } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './DrawerDemo.tsx?raw'
 
 const basicSnippet = `<Button onClick={openBasic}>打开抽屉</Button>
 <Drawer
@@ -322,11 +323,7 @@ const DrawerDemo: React.FC = () => {
       </div>
 
       {/* 基本使用 */}
-      <DemoBlock
-        title="基本使用"
-        description="最基本的抽屉使用示例。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本使用" description="最基本的抽屉使用示例。" code={fullPageSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openBasic}>打开抽屉</Button>
           <Drawer
@@ -344,7 +341,7 @@ const DrawerDemo: React.FC = () => {
       <DemoBlock
         title="不同位置"
         description="通过 placement 属性设置抽屉从不同方向弹出。"
-        code={placementSnippet}>
+        code={fullPageSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Space>
             <Button
@@ -383,7 +380,7 @@ const DrawerDemo: React.FC = () => {
       <DemoBlock
         title="不同尺寸与内边距"
         description="通过 size 属性设置抽屉的大小，或者使用 bodyPadding 自定义主体区域内边距。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Space>
             <Button
@@ -440,7 +437,7 @@ const DrawerDemo: React.FC = () => {
       <DemoBlock
         title="自定义头部和底部"
         description="使用 header 和 footer 属性自定义头部和底部内容。"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openCustom}>打开自定义抽屉</Button>
           <Drawer
@@ -486,7 +483,7 @@ const DrawerDemo: React.FC = () => {
       <DemoBlock
         title="无蒙层"
         description="设置 mask=false 可以不显示遮罩层。"
-        code={noMaskSnippet}>
+        code={fullPageSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openNoMask}>打开无蒙层抽屉</Button>
           <Drawer
@@ -506,7 +503,7 @@ const DrawerDemo: React.FC = () => {
       <DemoBlock
         title="点击蒙层不关闭"
         description="设置 maskClosable=false 可以禁止点击蒙层关闭抽屉。"
-        code={notClosableSnippet}>
+        code={fullPageSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openNotClosable}>打开抽屉</Button>
           <Drawer
@@ -525,7 +522,7 @@ const DrawerDemo: React.FC = () => {
       <DemoBlock
         title="隐藏关闭按钮"
         description="设置 closable=false 可以隐藏关闭按钮。"
-        code={noCloseButtonSnippet}>
+        code={fullPageSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openNoCloseButton}>打开抽屉</Button>
           <Drawer
@@ -544,7 +541,7 @@ const DrawerDemo: React.FC = () => {
       <DemoBlock
         title="自定义文案 (labels)"
         description="单语言项目无需引入 locale，直接用扁平 labels 覆盖关闭按钮的 aria-label。"
-        code={labelsSnippet}>
+        code={fullPageSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openLabels}>打开抽屉</Button>
           <Drawer
@@ -562,7 +559,7 @@ const DrawerDemo: React.FC = () => {
       <DemoBlock
         title="关闭时销毁"
         description="设置 destroyOnClose 可以在关闭时销毁内容，适用于表单重置等场景。"
-        code={destroySnippet}>
+        code={fullPageSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openDestroy}>打开抽屉</Button>
           <Drawer

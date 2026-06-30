@@ -4,6 +4,7 @@ import { Input } from '@expcat/tigercat-vue/Input'
 import { Select } from '@expcat/tigercat-vue/Select'
 import { Button } from '@expcat/tigercat-vue/Button'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './InputGroupDemo.vue?raw'
 
 const basicSnippet = `<InputGroup>
   <Input placeholder="搜索内容" style="flex: 1" />
@@ -37,14 +38,14 @@ const sizeSnippet = `<Space direction="vertical" :size="12" class="w-full">
     <h1 class="text-3xl font-bold mb-2">InputGroup 输入框组</h1>
     <p class="text-gray-500 mb-8">将多个输入元素组合在一起，支持前后缀和紧凑模式。</p>
 
-    <DemoBlock title="基本用法" description="输入框 + 按钮组合" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="输入框 + 按钮组合" :code="fullPageSnippet">
       <InputGroup>
         <Input placeholder="搜索内容" style="flex: 1" />
         <Button variant="primary">搜索</Button>
       </InputGroup>
     </DemoBlock>
 
-    <DemoBlock title="混合组件" description="Select + Input + Select 组合" :code="addonSnippet">
+    <DemoBlock title="混合组件" description="Select + Input + Select 组合" :code="fullPageSnippet">
       <InputGroup>
         <Select
           :options="[
@@ -64,7 +65,7 @@ const sizeSnippet = `<Space direction="vertical" :size="12" class="w-full">
       </InputGroup>
     </DemoBlock>
 
-    <DemoBlock title="尺寸" description="sm / md / lg 三种尺寸" :code="sizeSnippet">
+    <DemoBlock title="尺寸" description="sm / md / lg 三种尺寸" :code="fullPageSnippet">
       <div class="space-y-3">
         <InputGroup size="sm">
           <Input placeholder="小尺寸" style="flex: 1" />

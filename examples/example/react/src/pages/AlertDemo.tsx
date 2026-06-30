@@ -3,6 +3,7 @@ import { List } from '@expcat/tigercat-react/List'
 import { useState } from 'react'
 import { Alert } from '@expcat/tigercat-react/Alert'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './AlertDemo.tsx?raw'
 
 const basicSnippet = `<Alert title="这是一条提示信息" />
 <Alert type="success" title="这是一条成功提示" />
@@ -57,7 +58,7 @@ export default function AlertDemo() {
       <DemoBlock
         title="基本用法"
         description="最简单的用法，适用于简短的警告提示。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Alert title="这是一条提示信息" />
           <Alert type="success" title="这是一条成功提示" />
@@ -69,7 +70,7 @@ export default function AlertDemo() {
       <DemoBlock
         title="提示类型"
         description="Alert 组件支持 4 种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。"
-        code={typeSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Alert type="info" title="信息提示" description="这是一条信息提示的详细内容" />
           <Alert type="success" title="成功提示" description="操作成功完成" />
@@ -81,7 +82,7 @@ export default function AlertDemo() {
       <DemoBlock
         title="尺寸大小"
         description="Alert 组件支持 3 种不同的尺寸：小、中、大。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Alert size="sm" type="info" title="小尺寸提示" description="这是小尺寸的提示内容" />
           <Alert
@@ -97,7 +98,7 @@ export default function AlertDemo() {
       <DemoBlock
         title="带图标"
         description="默认情况下会显示图标，可以通过 showIcon 属性控制。"
-        code={iconSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Alert type="success" title="带图标的成功提示" showIcon={true} />
           <Alert type="warning" title="不带图标的警告提示" showIcon={false} />
@@ -107,8 +108,7 @@ export default function AlertDemo() {
       <DemoBlock
         title="可关闭"
         description="通过设置 closable 属性可以让 Alert 显示关闭按钮。"
-        code={closableSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           {showAlert1 && (
             <Alert
@@ -150,7 +150,7 @@ export default function AlertDemo() {
       <DemoBlock
         title="带描述信息"
         description="使用 description 属性可以添加详细的描述内容。"
-        code={descriptionSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Alert
             type="success"
@@ -173,7 +173,7 @@ export default function AlertDemo() {
       <DemoBlock
         title="自定义内容"
         description="可以使用 titleSlot 和 descriptionSlot 自定义标题和描述内容。"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Alert
             type="info"
@@ -205,7 +205,7 @@ export default function AlertDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="完整功能示例" description="综合展示所有功能。" code={fullSnippet}>
+      <DemoBlock title="完整功能示例" description="综合展示所有功能。" code={fullPageSnippet}>
         <div className={demoCardClassName}>
           {showAlert3 && (
             <Alert
@@ -233,7 +233,7 @@ export default function AlertDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="实际应用场景" description="模拟真实的使用场景。" code={scenarioSnippet}>
+      <DemoBlock title="实际应用场景" description="模拟真实的使用场景。" code={fullPageSnippet}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h3 className="text-lg font-semibold mb-3">表单提交成功</h3>

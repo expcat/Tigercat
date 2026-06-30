@@ -3,14 +3,14 @@
     <h1 class="text-3xl font-bold mb-2">FunnelChart 漏斗图</h1>
     <p class="text-gray-500 mb-8">展示数据从大到小递减的流程或转化率。</p>
 
-    <DemoBlock title="基础用法" description="垂直漏斗，hoverable 启用悬停" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="垂直漏斗，hoverable 启用悬停" :code="fullPageSnippet">
       <FunnelChart :data="funnelData" :width="400" :height="280" hoverable show-legend />
     </DemoBlock>
 
     <DemoBlock
       title="水平方向 & 收尖"
       description="direction='horizontal'，pinch 收尖末端"
-      :code="horizontalSnippet">
+      :code="fullPageSnippet">
       <FunnelChart
         :data="funnelData"
         :width="500"
@@ -23,7 +23,7 @@
     <DemoBlock
       title="自定义颜色 & 间距"
       description="colors 调色板，gap 段间距"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <FunnelChart
         :data="funnelData"
         :width="400"
@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import { FunnelChart } from '@expcat/tigercat-vue/FunnelChart'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './FunnelChartDemo.vue?raw'
 
 const funnelData = [
   { label: '访问', value: 5000 },

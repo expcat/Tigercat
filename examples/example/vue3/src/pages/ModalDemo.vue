@@ -5,6 +5,7 @@ import { Input } from '@expcat/tigercat-vue/Input'
 import { ref } from 'vue'
 import { Modal } from '@expcat/tigercat-vue/Modal'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ModalDemo.vue?raw'
 
 const basicSnippet = `<Button>打开对话框</Button>
 <Modal v-model:open="visible1" title="基本对话框">...</Modal>`
@@ -161,8 +162,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="基本用法"
       description="最简单的用法，点击按钮打开对话框。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible1 = true">打开对话框</Button>
         <Modal v-model:open="visible1" title="基本对话框" @ok="handleOk" @cancel="handleCancel">
@@ -181,7 +181,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="不同尺寸"
       description="Modal 提供了多种尺寸选项：sm、md（默认）、lg、xl、full。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Space>
           <Button @click="visibleSm = true">小尺寸</Button>
@@ -212,7 +212,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="居中显示"
       description="设置 centered 属性可以使 Modal 垂直居中显示。"
-      :code="centeredSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleCentered = true">打开居中对话框</Button>
         <Modal v-model:open="visibleCentered" title="居中对话框" centered>
@@ -225,7 +225,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="自定义页脚"
       description="通过 footer 插槽可以自定义 Modal 的页脚内容。"
-      :code="customFooterSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleCustomFooter = true">自定义页脚对话框</Button>
         <Modal v-model:open="visibleCustomFooter" title="自定义页脚对话框">
@@ -244,7 +244,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="默认页脚"
       description="设置 show-default-footer 属性可以使用内置的确定/取消页脚，通过 @ok/@cancel 监听操作。"
-      :code="defaultFooterSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleDefaultFooter = true">默认页脚对话框</Button>
         <Modal
@@ -269,7 +269,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="自定义文案 (labels)"
       description="单语言项目无需引入 locale，直接用扁平 labels 覆盖默认页脚按钮与关闭按钮文案。"
-      :code="labelsSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleLabels = true">自定义文案对话框</Button>
         <Modal
@@ -285,7 +285,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="嵌套对话框"
       description="对话框可以嵌套使用，通过 z-index 控制层级。"
-      :code="nestedSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleNested = true">打开嵌套对话框</Button>
         <Modal v-model:open="visibleNested" title="第一层对话框">
@@ -302,7 +302,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="禁用遮罩关闭"
       description="设置 mask-closable 为 false 可以禁止点击遮罩层关闭对话框。"
-      :code="maskClosableSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible2 = true">禁用遮罩关闭</Button>
         <Modal v-model:open="visible2" title="禁用遮罩关闭" :mask-closable="false">
@@ -315,7 +315,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="无遮罩"
       description="设置 mask 为 false 可以不显示遮罩层。"
-      :code="noMaskSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleNoMask = true">无遮罩对话框</Button>
         <Modal v-model:open="visibleNoMask" title="无遮罩对话框" :mask="false">
@@ -327,7 +327,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="关闭时销毁"
       description="设置 destroy-on-close 可以在关闭对话框时销毁其内容。"
-      :code="destroySnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleDestroyOnClose = true">关闭时销毁</Button>
         <Modal v-model:open="visibleDestroyOnClose" title="关闭时销毁" destroy-on-close>
@@ -340,7 +340,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="无关闭按钮"
       description="设置 closable 为 false 可以隐藏关闭按钮。"
-      :code="noCloseSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible3 = true">无关闭按钮</Button>
         <Modal v-model:open="visible3" title="无关闭按钮" :closable="false">
@@ -355,7 +355,7 @@ const handleFormSubmit = async () => {
     <DemoBlock
       title="实际应用场景"
       description="用更贴近业务的例子展示交互、滚动与表单。"
-      :code="scenarioSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-6">
         <div>
           <h3 class="text-lg font-semibold mb-3">确认对话框</h3>

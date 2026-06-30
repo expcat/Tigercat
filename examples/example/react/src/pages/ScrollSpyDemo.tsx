@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { ScrollSpy } from '@expcat/tigercat-react/ScrollSpy'
 import { type ScrollSpyItem } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ScrollSpyDemo.tsx?raw'
 
 const getMainContainer = () => {
   const scrollContainer = document.querySelector('main > div.overflow-y-auto')
@@ -75,7 +76,7 @@ export default function ScrollSpyDemo() {
           <DemoBlock
             title="基本用法"
             description="根据页面滚动位置同步当前导航项。"
-            code={basicSnippet}>
+            code={fullPageSnippet}>
             <div className="space-y-6">
               <section
                 id="scrollspy-overview"
@@ -106,7 +107,8 @@ export default function ScrollSpyDemo() {
                 className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">事件</h3>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  onActiveKeyChange 会返回 activeKey、item 和 source，业务侧可以记录用户点击或滚动来源。
+                  onActiveKeyChange 会返回 activeKey、item 和
+                  source，业务侧可以记录用户点击或滚动来源。
                 </p>
               </section>
             </div>
@@ -115,7 +117,7 @@ export default function ScrollSpyDemo() {
           <DemoBlock
             title="水平导航"
             description="适合页内顶部导航或紧凑筛选区域。"
-            code={horizontalSnippet}>
+            code={fullPageSnippet}>
             <div className="space-y-4">
               <ScrollSpy
                 direction="horizontal"
@@ -131,7 +133,7 @@ export default function ScrollSpyDemo() {
           <DemoBlock
             title="自定义滚动容器"
             description="指定内部容器作为滚动监听目标。"
-            code={containerSnippet}>
+            code={fullPageSnippet}>
             <div className="grid gap-4 md:grid-cols-[1fr_180px]">
               <div
                 ref={containerRef}

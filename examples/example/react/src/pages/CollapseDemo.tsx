@@ -2,6 +2,7 @@ import { CollapsePanel } from '@expcat/tigercat-react/CollapsePanel'
 import { useState } from 'react'
 import { Collapse } from '@expcat/tigercat-react/Collapse'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './CollapseDemo.tsx?raw'
 
 const basicSnippet = `<Collapse activeKey={activeKey} onChange={setActiveKey}>
   <CollapsePanel panelKey="1" header="面板 1">内容 1</CollapsePanel>
@@ -102,11 +103,7 @@ export default function CollapseDemo() {
         </p>
       </div>
 
-      <DemoBlock
-        title="基本用法"
-        description="可以同时展开多个面板。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="可以同时展开多个面板。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             activeKey={activeKey1}
@@ -124,7 +121,7 @@ export default function CollapseDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="手风琴模式" description="每次只能展开一个面板。" code={accordionSnippet}>
+      <DemoBlock title="手风琴模式" description="每次只能展开一个面板。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             accordion
@@ -143,7 +140,7 @@ export default function CollapseDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="无边框" description="简洁的无边框样式。" code={borderlessSnippet}>
+      <DemoBlock title="无边框" description="简洁的无边框样式。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             bordered={false}
@@ -159,7 +156,7 @@ export default function CollapseDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="透明背景" description="背景透明的 Ghost 模式。" code={ghostSnippet}>
+      <DemoBlock title="透明背景" description="背景透明的 Ghost 模式。" code={fullPageSnippet}>
         <div className="p-6 bg-linear-to-r from-blue-50 to-purple-50 rounded-lg">
           <Collapse
             ghost
@@ -175,7 +172,7 @@ export default function CollapseDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="图标位置" description="可以将展开图标放在右侧。" code={iconPositionSnippet}>
+      <DemoBlock title="图标位置" description="可以将展开图标放在右侧。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             expandIconPosition="end"
@@ -191,7 +188,7 @@ export default function CollapseDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="禁用面板" description="可以禁用某个面板。" code={disabledSnippet}>
+      <DemoBlock title="禁用面板" description="可以禁用某个面板。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             activeKey={activeKey6}
@@ -209,7 +206,7 @@ export default function CollapseDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="嵌套面板" description="折叠面板可以嵌套使用。" code={nestedSnippet}>
+      <DemoBlock title="嵌套面板" description="折叠面板可以嵌套使用。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             activeKey={activeKey7}
@@ -234,7 +231,7 @@ export default function CollapseDemo() {
       <DemoBlock
         title="自定义标题与额外内容"
         description="通过 props 自定义面板标题和右侧额外内容。"
-        code={customHeaderSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             activeKey={activeKey8}
@@ -257,7 +254,7 @@ export default function CollapseDemo() {
       <DemoBlock
         title="隐藏箭头"
         description="通过 showArrow 属性隐藏展开/收起箭头图标。"
-        code={hideArrowSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             activeKey={activeKey9}

@@ -4,6 +4,7 @@ import { Button } from '@expcat/tigercat-react/Button'
 import { useState } from 'react'
 import { Dropdown } from '@expcat/tigercat-react/Dropdown'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './DropdownDemo.tsx?raw'
 
 const basicSnippet = `<Dropdown>
   <Button>悬浮触发</Button>
@@ -215,7 +216,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="基本用法"
         description="悬停在触发元素上时显示下拉菜单。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <Dropdown>
           <Button>悬浮触发</Button>
           <DropdownMenu>
@@ -230,7 +231,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="触发方式"
         description="支持点击和悬浮两种触发方式。触发器上会自动暴露稳定的 data-state='open' | 'closed' 属性，支持 Tailwind selector 联动定制样式（如点击触发按钮所示）。"
-        code={triggerSnippet}>
+        code={fullPageSnippet}>
         <div className="flex gap-4">
           <Dropdown trigger="hover">
             <Button>悬浮触发</Button>
@@ -255,7 +256,7 @@ export default function DropdownDemo() {
       </DemoBlock>
 
       {/* 弹出位置 */}
-      <DemoBlock title="弹出位置" description="支持 12 种弹出位置。" code={placementSnippet}>
+      <DemoBlock title="弹出位置" description="支持 12 种弹出位置。" code={fullPageSnippet}>
         <div className="flex flex-col gap-4">
           <div className="flex gap-4">
             <Dropdown placement="bottom-start">
@@ -315,7 +316,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="禁用状态"
         description="禁用整个下拉菜单或单个菜单项。"
-        code={disabledSnippet}>
+        code={fullPageSnippet}>
         <div className="flex gap-4">
           <Dropdown disabled>
             <Button disabled>禁用的下拉菜单</Button>
@@ -340,7 +341,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="分割线"
         description="使用 divided 属性在菜单项之间添加分割线。"
-        code={dividedSnippet}>
+        code={fullPageSnippet}>
         <Dropdown>
           <Button>操作菜单</Button>
           <DropdownMenu>
@@ -356,7 +357,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="点击事件"
         description="监听菜单项的点击事件（查看控制台）。"
-        code={clickSnippet}>
+        code={fullPageSnippet}>
         <Dropdown>
           <Button>操作</Button>
           <DropdownMenu>
@@ -373,8 +374,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="受控模式"
         description="通过 open 和 onOpenChange 控制下拉菜单的显示隐藏。"
-        code={controlledSnippet}
-        script={controlledScriptSnippet}>
+        code={fullPageSnippet}>
         <div className="flex gap-4 items-center">
           <Dropdown open={visible1} onOpenChange={setVisible1}>
             <Button>受控下拉菜单</Button>
@@ -394,7 +394,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="多种按钮样式"
         description="下拉菜单可以搭配不同样式的按钮使用。"
-        code={variantSnippet}>
+        code={fullPageSnippet}>
         <div className="flex gap-4">
           <Dropdown>
             <Button variant="primary">主要按钮</Button>
@@ -429,7 +429,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="无箭头指示器"
         description="通过 showArrow={false} 隐藏下拉箭头。"
-        code={noArrowSnippet}>
+        code={fullPageSnippet}>
         <Dropdown showArrow={false}>
           <Button>无箭头指示器</Button>
           <DropdownMenu>
@@ -444,7 +444,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="点击不关闭"
         description="设置 closeOnClick={false}，点击菜单项不会自动关闭。"
-        code={closeOnClickSnippet}>
+        code={fullPageSnippet}>
         <Dropdown closeOnClick={false} trigger="click">
           <Button>点击不关闭</Button>
           <DropdownMenu>
@@ -459,7 +459,7 @@ export default function DropdownDemo() {
       <DemoBlock
         title="默认展开"
         description="通过 defaultOpen 设置初始展开状态。"
-        code={defaultVisibleSnippet}>
+        code={fullPageSnippet}>
         <Dropdown defaultOpen trigger="click">
           <Button>默认展开</Button>
           <DropdownMenu>

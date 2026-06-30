@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { Pagination } from '@expcat/tigercat-react/Pagination'
 import { type TigerLocalePagination } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './PaginationDemo.tsx?raw'
 
 const PaginationDemo: React.FC = () => {
   const [current1, setCurrent1] = useState(1)
@@ -174,11 +175,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock
-        title="基本用法"
-        description="最简单的分页组件。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="最简单的分页组件。" code={fullPageSnippet}>
         <Pagination current={current1} onChange={setCurrent1} total={100} pageSize={10} />
       </DemoBlock>
 
@@ -186,7 +183,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       <DemoBlock
         title="快速跳页"
         description="显示快速跳页输入框，方便快速跳转到指定页。"
-        code={quickSnippet}>
+        code={fullPageSnippet}>
         <Pagination
           current={current2}
           onChange={setCurrent2}
@@ -197,10 +194,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       </DemoBlock>
 
       {/* 改变每页条数 */}
-      <DemoBlock
-        title="改变每页条数"
-        description="可以改变每页显示的条数。"
-        code={sizeChangeSnippet}>
+      <DemoBlock title="改变每页条数" description="可以改变每页显示的条数。" code={fullPageSnippet}>
         <Pagination
           current={current3}
           onChange={setCurrent3}
@@ -216,12 +210,12 @@ const customLabels: Partial<TigerLocalePagination> = {
       <DemoBlock
         title="简单模式"
         description="只显示上一页、下一页和当前页/总页数。"
-        code={simpleSnippet}>
+        code={fullPageSnippet}>
         <Pagination current={current4} onChange={setCurrent4} total={500} simple />
       </DemoBlock>
 
       {/* 不同尺寸 */}
-      <DemoBlock title="不同尺寸" description="提供三种尺寸：小、中、大。" code={sizeSnippet}>
+      <DemoBlock title="不同尺寸" description="提供三种尺寸：小、中、大。" code={fullPageSnippet}>
         <div className="space-y-4">
           <div>
             <p className="text-sm text-gray-500 mb-2">小尺寸</p>
@@ -242,7 +236,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       <DemoBlock
         title="自定义对齐方式"
         description="可以设置分页组件的对齐方式。"
-        code={alignSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <div>
             <p className="text-sm text-gray-500 mb-2">左对齐</p>
@@ -263,7 +257,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       <DemoBlock
         title="自定义总数文本"
         description="可以自定义显示总条数的文本。"
-        code={totalTextSnippet}>
+        code={fullPageSnippet}>
         <Pagination
           current={current7}
           onChange={setCurrent7}
@@ -273,7 +267,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       </DemoBlock>
 
       {/* 禁用状态 */}
-      <DemoBlock title="禁用状态" description="禁用分页组件的所有交互。" code={disabledSnippet}>
+      <DemoBlock title="禁用状态" description="禁用分页组件的所有交互。" code={fullPageSnippet}>
         <Pagination current={current8} onChange={setCurrent8} total={100} disabled />
       </DemoBlock>
 
@@ -281,7 +275,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       <DemoBlock
         title="单页隐藏"
         description="当只有一页时自动隐藏分页组件。"
-        code={hideOnSinglePageSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-2">
           <p className="text-sm text-gray-500">下方分页组件因为只有 1 页而被隐藏：</p>
           <Pagination
@@ -301,7 +295,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       <DemoBlock
         title="紧凑页码 (showLessItems)"
         description="显示更少的页码按钮，适合空间有限的场景。"
-        code={showLessItemsSnippet}>
+        code={fullPageSnippet}>
         <Pagination current={current11} onChange={setCurrent11} total={500} showLessItems />
       </DemoBlock>
 
@@ -309,7 +303,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       <DemoBlock
         title="国际化 (i18n)"
         description="通过 locale 和 labels 属性自定义国际化文本。点击按钮切换语言查看效果。"
-        code={i18nSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500">
@@ -336,7 +330,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       <DemoBlock
         title="自定义文案 (labels)"
         description="单语言项目无需引入 locale，直接用扁平 labels 覆盖文案（优先级高于 locale 与全局 ConfigProvider）。"
-        code={labelsSnippet}>
+        code={fullPageSnippet}>
         <Pagination
           current={currentLabels}
           onChange={setCurrentLabels}
@@ -354,7 +348,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       <DemoBlock
         title="完整示例"
         description="包含所有功能的完整示例（查看控制台）。"
-        code={fullSnippet}>
+        code={fullPageSnippet}>
         <Pagination
           current={current3}
           onChange={setCurrent3}

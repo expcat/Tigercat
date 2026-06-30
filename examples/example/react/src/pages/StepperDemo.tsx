@@ -3,6 +3,7 @@ import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
 import { Stepper } from '@expcat/tigercat-react/Stepper'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './StepperDemo.tsx?raw'
 
 const basicScriptSnippet = `import { useState } from 'react'
 
@@ -29,8 +30,7 @@ const StepperDemo: React.FC = () => {
       <DemoBlock
         title="基本用法"
         description="value + onChange 受控，min/max 范围"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
           <Stepper value={val} onChange={setVal} />
           <Stepper value={val} onChange={setVal} min={0} max={10} step={2} />
@@ -38,7 +38,7 @@ const StepperDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸" code={sizeSnippet}>
+      <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸" code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
           <Stepper value={1} size="sm" />
           <Stepper value={1} size="md" />
@@ -47,7 +47,7 @@ const StepperDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="小数精度" description="precision 控制小数位数" code={precisionSnippet}>
+      <DemoBlock title="小数精度" description="precision 控制小数位数" code={fullPageSnippet}>
         <Stepper value={1.5} step={0.1} precision={2} min={0} max={5} />
       </DemoBlock>
     </div>

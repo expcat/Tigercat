@@ -54,7 +54,7 @@
     "size:check": "size-limit --json",
     "quality:quick": "pnpm lint && pnpm types:check && pnpm api:validate && pnpm test:core",
     "quality:size": "pnpm size",
-    "quality:examples": "pnpm example:build",
+    "quality:examples": "pnpm example:sources:check && pnpm example:build",
     "quality:ssr": "pnpm example:ssr:check",
     "quality:release": "pnpm release:check && pnpm quality:quick && pnpm test:coverage && pnpm api:baseline:check && pnpm exports:check && pnpm docs:api:check && pnpm quality:size && pnpm publish:check && pnpm test:validate && pnpm quality:examples && pnpm quality:ssr",
     "release:check": "node ./scripts/check-release-readiness.mjs",
@@ -81,6 +81,7 @@
     "example:ssr:next": "pnpm --filter @expcat/tigercat-example-nextjs build",
     "example:ssr:build": "pnpm example:ssr:nuxt && pnpm example:ssr:next",
     "example:ssr:check": "node ./scripts/check-ssr-examples.mjs",
+    "example:sources:check": "node ./scripts/validate-example-sources.mjs",
     "example:all": "node ./scripts/run-examples.mjs",
     "dev:check": "node ./scripts/check-env.mjs",
     "setup": "node ./scripts/setup.mjs"

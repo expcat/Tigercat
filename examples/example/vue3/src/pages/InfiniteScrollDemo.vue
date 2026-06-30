@@ -3,11 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">InfiniteScroll 无限滚动</h1>
     <p class="text-gray-500 mb-8">滚动到底部自动加载更多内容。</p>
 
-    <DemoBlock
-      title="基础用法"
-      description="滚动到底部触发 load-more"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="滚动到底部触发 load-more" :code="fullPageSnippet">
       <InfiniteScroll
         :has-more="hasMore"
         :loading="loading"
@@ -17,7 +13,7 @@
       </InfiniteScroll>
     </DemoBlock>
 
-    <DemoBlock title="自定义文案" description="loadingText / endText" :code="customSnippet">
+    <DemoBlock title="自定义文案" description="loadingText / endText" :code="fullPageSnippet">
       <InfiniteScroll
         :has-more="false"
         loading-text="拼命加载中..."
@@ -33,6 +29,7 @@
 import { ref } from 'vue'
 import { InfiniteScroll } from '@expcat/tigercat-vue/InfiniteScroll'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './InfiniteScrollDemo.vue?raw'
 
 const items = ref(Array.from({ length: 20 }, (_, i) => i + 1))
 const loading = ref(false)

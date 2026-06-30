@@ -3,6 +3,7 @@ import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
 import { CronEditor } from '@expcat/tigercat-react/CronEditor'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './CronEditorDemo.tsx?raw'
 
 const basicSnippet = `<CronEditor value={cron} onChange={setCron} />
 <Text>表达式: {cron}</Text>`
@@ -33,7 +34,7 @@ const CronEditorDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">CronEditor Cron 编辑器</h1>
       <p className="text-gray-500 mb-8">用于编辑和校验 5 段 Cron 表达式。</p>
 
-      <DemoBlock title="基本用法" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
           <CronEditor value={cron} onChange={setCron} />
           <Text>表达式: {cron}</Text>
@@ -43,7 +44,7 @@ const CronEditorDemo: React.FC = () => {
       <DemoBlock
         title="预设、校验与状态"
         description="支持预设选择、字段可视化编辑和错误提示。"
-        code={featureSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" size={16}>
           <CronEditor
             value={advancedCron}

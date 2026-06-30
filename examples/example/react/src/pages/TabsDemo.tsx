@@ -2,6 +2,7 @@ import { TabPane } from '@expcat/tigercat-react/TabPane'
 import { useRef, useState } from 'react'
 import { Tabs } from '@expcat/tigercat-react/Tabs'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TabsDemo.tsx?raw'
 
 const basicSnippet = `<Tabs activeKey={activeKey1} onActiveKeyChange={...}>
   <TabPane tabKey="1" label="标签页 1">...</TabPane>
@@ -85,11 +86,7 @@ export default function TabsDemo() {
         <p className="text-gray-600 dark:text-gray-400">用于内容的分类与切换。</p>
       </div>
 
-      <DemoBlock
-        title="基本用法"
-        description="基础的、简洁的标签页。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="基础的、简洁的标签页。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs activeKey={activeKey1} onActiveKeyChange={(key) => setActiveKey1(String(key))}>
             <TabPane tabKey="1" label="标签页 1">
@@ -108,9 +105,12 @@ export default function TabsDemo() {
       <DemoBlock
         title="卡片式标签页"
         description="卡片式的标签页，适合在容器内使用。"
-        code={cardSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Tabs activeKey={activeKey2} onActiveKeyChange={(key) => setActiveKey2(String(key))} type="card">
+          <Tabs
+            activeKey={activeKey2}
+            onActiveKeyChange={(key) => setActiveKey2(String(key))}
+            type="card">
             <TabPane tabKey="1" label="选项卡 1">
               <div className="p-4">选项卡 1 的内容</div>
             </TabPane>
@@ -124,7 +124,7 @@ export default function TabsDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="可编辑卡片" description="可以新增和关闭标签页。" code={editableSnippet}>
+      <DemoBlock title="可编辑卡片" description="可以新增和关闭标签页。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs
             activeKey={activeEditableKey}
@@ -144,7 +144,7 @@ export default function TabsDemo() {
       <DemoBlock
         title="不同位置"
         description="可以设置标签页的位置：上、下、左、右。"
-        code={positionSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="mb-4">
             <label className="mr-4">位置：</label>
@@ -175,9 +175,12 @@ export default function TabsDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="居中标签" description="标签居中显示。" code={centeredSnippet}>
+      <DemoBlock title="居中标签" description="标签居中显示。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Tabs activeKey={activeKey4} onActiveKeyChange={(key) => setActiveKey4(String(key))} centered>
+          <Tabs
+            activeKey={activeKey4}
+            onActiveKeyChange={(key) => setActiveKey4(String(key))}
+            centered>
             <TabPane tabKey="1" label="标签页 1">
               <div className="p-4">标签页 1 的内容</div>
             </TabPane>
@@ -194,7 +197,7 @@ export default function TabsDemo() {
       <DemoBlock
         title="不同尺寸"
         description="提供三种尺寸：小、中（默认）、大。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg space-y-6">
           <div>
             <h3 className="text-lg font-semibold mb-2">小尺寸</h3>
@@ -252,7 +255,7 @@ export default function TabsDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="禁用标签" description="可以禁用某个标签页。" code={disabledSnippet}>
+      <DemoBlock title="禁用标签" description="可以禁用某个标签页。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs activeKey={activeKey6} onActiveKeyChange={(key) => setActiveKey6(String(key))}>
             <TabPane tabKey="1" label="标签页 1">
@@ -268,7 +271,7 @@ export default function TabsDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="带图标的标签" description="标签可以配置图标。" code={iconSnippet}>
+      <DemoBlock title="带图标的标签" description="标签可以配置图标。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs activeKey={activeKey7} onActiveKeyChange={(key) => setActiveKey7(String(key))}>
             <TabPane tabKey="1" label="首页" icon={<span>🏠</span>}>
@@ -287,7 +290,7 @@ export default function TabsDemo() {
       <DemoBlock
         title="销毁非激活面板"
         description="切换时销毁已隐藏的标签面板，而非仅隐藏。"
-        code={destroySnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs
             activeKey={activeKey8}

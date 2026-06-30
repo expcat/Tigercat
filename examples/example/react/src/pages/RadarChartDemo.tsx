@@ -2,6 +2,7 @@ import React from 'react'
 import { RadarChart } from '@expcat/tigercat-react/RadarChart'
 import { type RadarChartDatum, type RadarChartSeries } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './RadarChartDemo.tsx?raw'
 
 const basicData: RadarChartDatum[] = [
   { label: '速度', value: 80 },
@@ -104,11 +105,11 @@ const RadarChartDemo: React.FC = () => {
         <p className="text-gray-600 dark:text-gray-400">用于展示多维指标对比。</p>
       </div>
 
-      <DemoBlock title="基础用法" description="默认雷达图样式。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="默认雷达图样式。" code={fullPageSnippet}>
         <RadarChart data={basicData} width={360} height={260} />
       </DemoBlock>
 
-      <DemoBlock title="固定最大值" description="统一尺度并增加网格层数。" code={customSnippet}>
+      <DemoBlock title="固定最大值" description="统一尺度并增加网格层数。" code={fullPageSnippet}>
         <RadarChart
           data={customData}
           width={360}
@@ -124,7 +125,7 @@ const RadarChartDemo: React.FC = () => {
       <DemoBlock
         title="圆形网格 + 分割区域"
         description="ECharts 风格的圆形网格与交替背景。"
-        code={circleSnippet}>
+        code={fullPageSnippet}>
         <RadarChart
           data={customData}
           width={360}
@@ -144,7 +145,7 @@ const RadarChartDemo: React.FC = () => {
       <DemoBlock
         title="多系列对比"
         description="多组数据叠加展示，支持交互与分割区域。"
-        code={multiSnippet}>
+        code={fullPageSnippet}>
         <RadarChart
           series={multiSeries}
           width={360}

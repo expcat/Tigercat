@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { Resizable } from '@expcat/tigercat-react/Resizable'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ResizableDemo.tsx?raw'
 
 const basicSnippet = `<Resizable defaultWidth={300} defaultHeight={150} minWidth={100} minHeight={60} onResize={onResize}>
   <div>{width} × {height}</div>
@@ -25,11 +26,7 @@ const ResizableDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Resizable 可调整大小容器</h1>
       <p className="text-gray-500 mb-8">拖拽手柄改变元素尺寸，支持锁定宽高比和约束范围。</p>
 
-      <DemoBlock
-        title="基础用法"
-        description="拖拽右下角手柄"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基础用法" description="拖拽右下角手柄" code={fullPageSnippet}>
         <Resizable
           defaultWidth={300}
           defaultHeight={150}
@@ -42,7 +39,7 @@ const ResizableDemo: React.FC = () => {
         </Resizable>
       </DemoBlock>
 
-      <DemoBlock title="锁定宽高比 & 单轴" code={constrainedSnippet}>
+      <DemoBlock title="锁定宽高比 & 单轴" code={fullPageSnippet}>
         <div className="flex gap-8">
           <Resizable defaultWidth={200} defaultHeight={200} lockAspectRatio>
             <div className="w-full h-full bg-green-50 border border-green-200 rounded flex items-center justify-center text-sm">
@@ -57,7 +54,7 @@ const ResizableDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="禁用" code={disabledSnippet}>
+      <DemoBlock title="禁用" code={fullPageSnippet}>
         <Resizable defaultWidth={200} defaultHeight={100} disabled>
           <div className="w-full h-full bg-gray-100 border rounded flex items-center justify-center text-sm text-gray-400">
             禁用状态

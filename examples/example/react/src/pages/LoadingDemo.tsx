@@ -3,6 +3,7 @@ import { Card } from '@expcat/tigercat-react/Card'
 import { useState } from 'react'
 import { Loading } from '@expcat/tigercat-react/Loading'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './LoadingDemo.tsx?raw'
 
 const basicSnippet = `<Loading />
 <Loading text="加载中..." />`
@@ -77,7 +78,7 @@ export default function LoadingDemo() {
         </p>
       </div>
 
-      <DemoBlock title="基本用法" description="最简单的用法，显示加载动画。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="最简单的用法，显示加载动画。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="flex gap-8 items-center justify-center">
             <Loading />
@@ -89,7 +90,7 @@ export default function LoadingDemo() {
       <DemoBlock
         title="加载动画变体"
         description="Loading 组件支持 5 种不同的动画样式。"
-        code={variantSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-5 gap-8">
             <div className="flex flex-col items-center gap-2">
@@ -119,7 +120,7 @@ export default function LoadingDemo() {
       <DemoBlock
         title="尺寸大小"
         description="Loading 组件支持 4 种不同的尺寸：sm、md（默认）、lg、xl。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="flex gap-8 items-center justify-center">
             <div className="flex flex-col items-center gap-2">
@@ -145,7 +146,7 @@ export default function LoadingDemo() {
       <DemoBlock
         title="颜色变体"
         description="Loading 组件支持 7 种颜色变体，也可以自定义颜色。"
-        code={colorSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-4 gap-6">
             <div className="flex flex-col items-center gap-2">
@@ -187,15 +188,14 @@ export default function LoadingDemo() {
       <DemoBlock
         title="全屏加载"
         description="使用 fullscreen 属性可以创建全屏加载遮罩层。"
-        code={fullscreenSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Button onClick={showPageLoading}>显示全屏加载</Button>
           {pageLoading && <Loading fullscreen text="页面加载中..." />}
         </div>
       </DemoBlock>
 
-      <DemoBlock title="区域加载" description="在某个区域内显示加载状态。" code={cardSnippet}>
+      <DemoBlock title="区域加载" description="在某个区域内显示加载状态。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Card header="数据统计">
             <div className="relative min-h-[200px]">
@@ -219,7 +219,7 @@ export default function LoadingDemo() {
       <DemoBlock
         title="按钮加载"
         description="与按钮组合使用，展示操作进行中的状态。"
-        code={buttonSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="flex gap-4">
             <Button loading={buttonLoading} onClick={handleSubmit}>
@@ -235,7 +235,7 @@ export default function LoadingDemo() {
       <DemoBlock
         title="延迟显示"
         description="使用 delay 属性可以延迟显示加载器，避免闪烁（延迟 300ms）。"
-        code={delaySnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="flex gap-8 items-center justify-center">
             <div className="flex flex-col items-center gap-2">

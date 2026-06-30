@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Tree } from '@expcat/tigercat-react/Tree'
 import type { TreeNode } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TreeDemo.tsx?raw'
 
 export default function TreeDemo() {
   // Basic tree data
@@ -195,19 +196,18 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
         键盘：方向键移动焦点，Enter 选择，Space 勾选，Escape 收拢。
       </p>
 
-      <DemoBlock title="基本用法" description="基础树形结构展示。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="基础树形结构展示。" code={fullPageSnippet}>
         <Tree treeData={basicTreeData} ariaLabel="Tree 基本用法" />
       </DemoBlock>
 
-      <DemoBlock title="默认展开所有节点" description="初始展开全部节点。" code={expandAllSnippet}>
+      <DemoBlock title="默认展开所有节点" description="初始展开全部节点。" code={fullPageSnippet}>
         <Tree treeData={basicTreeData} defaultExpandAll />
       </DemoBlock>
 
       <DemoBlock
         title="可选择的树"
         description="支持选择节点并回显选中结果。"
-        code={selectableSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <p className="text-sm text-gray-600 mb-4">已选择: {selectedKeys.join(', ')}</p>
         <Tree
           treeData={basicTreeData}
@@ -217,7 +217,7 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
         />
       </DemoBlock>
 
-      <DemoBlock title="多选树（级联）" description="勾选节点时父子联动。" code={checkableSnippet}>
+      <DemoBlock title="多选树（级联）" description="勾选节点时父子联动。" code={fullPageSnippet}>
         <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeys.join(', ')}</p>
         <Tree
           treeData={basicTreeData}
@@ -231,7 +231,7 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
       <DemoBlock
         title="多选树（父子独立）"
         description="父子节点勾选状态相互独立。"
-        code={checkStrictlySnippet}>
+        code={fullPageSnippet}>
         <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeysStrictly.join(', ')}</p>
         <Tree
           treeData={basicTreeData}
@@ -243,16 +243,16 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
         />
       </DemoBlock>
 
-      <DemoBlock title="禁用节点" description="为特定节点设置禁用状态。" code={disabledSnippet}>
+      <DemoBlock title="禁用节点" description="为特定节点设置禁用状态。" code={fullPageSnippet}>
         <Tree treeData={disabledTreeData} checkable defaultExpandAll />
       </DemoBlock>
 
-      <DemoBlock title="懒加载" description="展开节点时动态加载子节点。" code={lazySnippet}>
+      <DemoBlock title="懒加载" description="展开节点时动态加载子节点。" code={fullPageSnippet}>
         <p className="text-sm text-gray-600 mb-4">点击节点展开，动态加载子节点</p>
         <Tree treeData={lazyTreeData} loadData={loadChildren} />
       </DemoBlock>
 
-      <DemoBlock title="节点过滤" description="根据关键字过滤节点。" code={filterSnippet}>
+      <DemoBlock title="节点过滤" description="根据关键字过滤节点。" code={fullPageSnippet}>
         <Input
           value={filterValue}
           onChange={(e) => setFilterValue(e.target.value)}
@@ -262,14 +262,14 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
         <Tree treeData={filterTreeData} filterValue={filterValue} ariaLabel="Tree 节点过滤" />
       </DemoBlock>
 
-      <DemoBlock title="连接线" description="显示节点连接线。" code={showLineSnippet}>
+      <DemoBlock title="连接线" description="显示节点连接线。" code={fullPageSnippet}>
         <Tree treeData={basicTreeData} showLine defaultExpandAll />
       </DemoBlock>
 
       <DemoBlock
         title="多选（selectionMode）"
         description="通过 selectionMode='multiple' 支持多选。"
-        code={multiSelectSnippet}>
+        code={fullPageSnippet}>
         <p className="text-sm text-gray-600 mb-4">已选择: {multiSelectedKeys.join(', ')}</p>
         <Tree
           treeData={basicTreeData}
@@ -283,7 +283,7 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
       <DemoBlock
         title="受控展开"
         description="通过 expandedKeys 外部控制展开状态。"
-        code={controlledExpandSnippet}>
+        code={fullPageSnippet}>
         <p className="text-sm text-gray-600 mb-4">展开节点: {controlledExpandedKeys.join(', ')}</p>
         <Tree
           treeData={basicTreeData}
@@ -292,11 +292,11 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
         />
       </DemoBlock>
 
-      <DemoBlock title="空数据" description="自定义空数据提示文案。" code={emptySnippet}>
+      <DemoBlock title="空数据" description="自定义空数据提示文案。" code={fullPageSnippet}>
         <Tree treeData={[]} emptyText="暂无数据" />
       </DemoBlock>
 
-      <DemoBlock title="Block 节点" description="节点占据整行宽度。" code={blockSnippet}>
+      <DemoBlock title="Block 节点" description="节点占据整行宽度。" code={fullPageSnippet}>
         <p className="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
         <Tree treeData={basicTreeData} blockNode defaultExpandAll />
       </DemoBlock>

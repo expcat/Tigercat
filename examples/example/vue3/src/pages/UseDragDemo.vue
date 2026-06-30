@@ -5,6 +5,7 @@ import { ref, computed } from 'vue'
 import { useDrag } from '@expcat/tigercat-vue'
 import type { DragItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './UseDragDemo.vue?raw'
 
 interface TodoItem extends DragItem {
   title: string
@@ -88,8 +89,7 @@ const items = ref<TodoItem[]>([
     <DemoBlock
       title="基础列表排序"
       description="拖动条目即可重新排序，松开时通过 reorder() 计算新顺序。"
-      :code="reorderSnippet"
-      :script="reorderScriptSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-3" v-bind="drag.getDropZoneAttrs()">
         <Card
           v-for="item in items"

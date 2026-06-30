@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { type SpotlightItem } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SpotlightDemo.vue?raw'
 
 const commands: SpotlightItem[] = [
   {
@@ -65,7 +66,10 @@ const controlledSnippet = `<Spotlight
     <h1 class="text-3xl font-bold mb-2">Spotlight 命令面板</h1>
     <p class="text-gray-500 mb-8">支持分组结果、模糊搜索与键盘导航的命令面板。</p>
 
-    <DemoBlock title="基本用法" description="通过 open 控制命令面板显示状态" :code="basicSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="通过 open 控制命令面板显示状态"
+      :code="fullPageSnippet">
       <div class="flex flex-wrap items-center gap-3">
         <Button @click="open = true">打开命令面板</Button>
         <span v-if="selected" class="text-sm text-gray-500">已选择：{{ selected }}</span>
@@ -79,10 +83,7 @@ const controlledSnippet = `<Spotlight
         @select="(item) => (selected = item.label)" />
     </DemoBlock>
 
-    <DemoBlock
-      title="受控搜索"
-      description="query 与 open 都可以完全受控"
-      :code="controlledSnippet">
+    <DemoBlock title="受控搜索" description="query 与 open 都可以完全受控" :code="fullPageSnippet">
       <div class="flex flex-wrap items-center gap-3">
         <Button variant="outline" @click="controlledOpen = true">打开受控面板</Button>
         <span class="text-sm text-gray-500">当前查询：{{ query || '空' }}</span>

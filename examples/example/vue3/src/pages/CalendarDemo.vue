@@ -6,8 +6,7 @@
     <DemoBlock
       title="基础用法"
       description="默认月视图，v-model 绑定选中日期"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <Calendar v-model="selectedDate" />
       <p class="mt-2 text-sm text-gray-500">
         选中日期: {{ selectedDate?.toLocaleDateString() ?? '无' }}
@@ -17,11 +16,11 @@
     <DemoBlock
       title="年视图 & 全屏"
       description="mode='year' 显示月份选择，fullscreen 全屏模式"
-      :code="yearSnippet">
+      :code="fullPageSnippet">
       <Calendar mode="year" fullscreen />
     </DemoBlock>
 
-    <DemoBlock title="禁用日期" description="disabledDate 函数禁用周末" :code="disabledSnippet">
+    <DemoBlock title="禁用日期" description="disabledDate 函数禁用周末" :code="fullPageSnippet">
       <Calendar v-model="selectedDate2" :disabled-date="isWeekend" />
     </DemoBlock>
   </div>
@@ -31,6 +30,7 @@
 import { ref } from 'vue'
 import { Calendar } from '@expcat/tigercat-vue/Calendar'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './CalendarDemo.vue?raw'
 
 const selectedDate = ref<Date | undefined>(new Date())
 const selectedDate2 = ref<Date | undefined>(new Date())

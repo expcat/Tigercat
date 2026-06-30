@@ -5,6 +5,7 @@ import { ref, computed, inject, type Ref } from 'vue'
 import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
 import type { DemoLang } from '@demo-shared/app-config'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './DatePickerDemo.vue?raw'
 
 const date = ref<Date | null>(null)
 const dateWithDefault = ref(new Date('2024-01-15'))
@@ -177,11 +178,7 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock
-      title="基础用法"
-      description="基础的日期选择器组件。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="基础的日期选择器组件。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <DatePicker
           v-model="date"
@@ -195,7 +192,7 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 范围选择 -->
-    <DemoBlock title="范围选择" description="选择开始日期与结束日期。" :code="rangeSnippet">
+    <DemoBlock title="范围选择" description="选择开始日期与结束日期。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <DatePicker
           v-model="range"
@@ -214,7 +211,7 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="自定义文案"
       description="通过 labels 覆盖 Today/OK 与 aria-label 文案。"
-      :code="labelsSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <DatePicker
           v-model="labeledRange"
@@ -229,7 +226,7 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="不同尺寸"
       description="日期选择器有三种尺寸：小、中、大。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="小尺寸">
           <DatePicker
@@ -256,7 +253,7 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 日期格式 -->
-    <DemoBlock title="日期格式" description="支持四种日期显示格式。" :code="formatSnippet">
+    <DemoBlock title="日期格式" description="支持四种日期显示格式。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="yyyy-MM-dd">
           <DatePicker
@@ -293,7 +290,7 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="日期范围限制"
       description="使用 min-date 和 max-date 限制可选择的日期范围（2024年度）。"
-      :code="minMaxSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <DatePicker
           v-model="minMaxDate"
@@ -312,7 +309,7 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="禁用和只读"
       description="日期选择器可以设置为禁用或只读状态。"
-      :code="disabledSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="禁用">
           <DatePicker
@@ -335,7 +332,7 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="可清除"
       description="使用 clearable 属性控制是否显示清除按钮。"
-      :code="clearableSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="可清除">
           <DatePicker

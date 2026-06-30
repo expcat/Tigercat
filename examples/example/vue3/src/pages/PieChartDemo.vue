@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { PieChart } from '@expcat/tigercat-vue/PieChart'
 import { type PieChartDatum } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './PieChartDemo.vue?raw'
 
 const salesData: PieChartDatum[] = [
   { value: 335, label: '直接访问' },
@@ -99,14 +100,14 @@ const fullSnippet = `<PieChart
     <DemoBlock
       title="基础饼图"
       description="自带 2px 白色边框分隔扇区，视觉更清晰。"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <PieChart :data="salesData" :width="380" :height="280" :show-labels="true" />
     </DemoBlock>
 
     <DemoBlock
       title="悬停偏移 + 阴影"
       description="hoverable + shadow 模拟 ECharts emphasis 效果：悬停时扇区向外偏移并附带阴影。"
-      :code="hoverSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <PieChart
           :data="colorfulData"
@@ -124,7 +125,7 @@ const fullSnippet = `<PieChart
     <DemoBlock
       title="外部标签 + 引导线"
       description="labelPosition='outside' 时标签在扇区外侧，带引导线显示名称与百分比。"
-      :code="outsideSnippet">
+      :code="fullPageSnippet">
       <PieChart
         :data="salesData"
         :width="440"
@@ -138,8 +139,7 @@ const fullSnippet = `<PieChart
     <DemoBlock
       title="点击选中 + 图例"
       description="selectable 支持点击选中；配合图例实现完整交互。"
-      :code="selectableSnippet"
-      :script="selectableScriptSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <PieChart
           :data="colorfulData"
@@ -162,7 +162,7 @@ const fullSnippet = `<PieChart
     <DemoBlock
       title="完整效果"
       description="悬停偏移 + 阴影 + 外部标签 + 图例 + 提示框的完整示例。"
-      :code="fullSnippet">
+      :code="fullPageSnippet">
       <PieChart
         :data="salesData"
         :width="480"

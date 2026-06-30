@@ -4,6 +4,7 @@ import { Upload } from '@expcat/tigercat-vue/Upload'
 import { type UploadFile } from '@expcat/tigercat-vue'
 import type { UploadRequestOptions } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './UploadDemo.vue?raw'
 
 const fileList = ref<UploadFile[]>([])
 const fileList2 = ref<UploadFile[]>([])
@@ -133,11 +134,7 @@ const customRequestSnippet = `<div class="max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock
-      title="基础用法"
-      description="基础的文件上传组件。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="基础的文件上传组件。" :code="fullPageSnippet">
       <div class="max-w-md space-y-4">
         <Upload v-model:file-list="fileList" @change="handleChange">
           <template #default> 选择文件 </template>
@@ -146,7 +143,7 @@ const customRequestSnippet = `<div class="max-w-md">
     </DemoBlock>
 
     <!-- 拖拽上传 -->
-    <DemoBlock title="拖拽上传" description="将文件拖拽到区域内即可上传。" :code="dragSnippet">
+    <DemoBlock title="拖拽上传" description="将文件拖拽到区域内即可上传。" :code="fullPageSnippet">
       <div class="max-w-md">
         <Upload v-model:file-list="fileList2" drag />
       </div>
@@ -156,7 +153,7 @@ const customRequestSnippet = `<div class="max-w-md">
     <DemoBlock
       title="多文件上传"
       description="通过设置 multiple 属性允许同时选择多个文件。"
-      :code="multipleSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md">
         <Upload v-model:file-list="fileList3" multiple> 选择多个文件 </Upload>
       </div>
@@ -166,7 +163,7 @@ const customRequestSnippet = `<div class="max-w-md">
     <DemoBlock
       title="文件数量限制"
       description="通过 limit 属性限制上传文件的数量。"
-      :code="limitSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md">
         <Upload v-model:file-list="fileList4" multiple :limit="3" @exceed="handleExceed">
           最多上传 3 个文件
@@ -178,7 +175,7 @@ const customRequestSnippet = `<div class="max-w-md">
     <DemoBlock
       title="文件类型和大小限制"
       description="通过 accept 和 maxSize 限制文件类型和大小。"
-      :code="validateSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">仅允许图片</label>
@@ -201,7 +198,7 @@ const customRequestSnippet = `<div class="max-w-md">
     <DemoBlock
       title="图片卡片列表"
       description='使用 listType="picture-card" 显示图片卡片样式。'
-      :code="pictureCardSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-2xl">
         <Upload
           v-model:file-list="fileList6"
@@ -216,7 +213,7 @@ const customRequestSnippet = `<div class="max-w-md">
     <DemoBlock
       title="禁用状态"
       description="设置 disabled 属性禁用上传功能。"
-      :code="disabledSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">禁用的按钮上传</label>
@@ -233,7 +230,7 @@ const customRequestSnippet = `<div class="max-w-md">
     <DemoBlock
       title="自定义上传"
       description="通过 customRequest 实现自定义上传逻辑，可观察上传进度。"
-      :code="customRequestSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md">
         <Upload v-model:file-list="fileList7" :custom-request="simulateUpload" multiple drag />
       </div>

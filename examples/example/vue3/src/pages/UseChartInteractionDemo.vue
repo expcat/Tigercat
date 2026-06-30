@@ -3,6 +3,7 @@ import { Card } from '@expcat/tigercat-vue/Card'
 import { computed } from 'vue'
 import { useChartInteraction } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './UseChartInteractionDemo.vue?raw'
 
 interface BarDatum {
   label: string
@@ -79,7 +80,7 @@ const interaction = useChartInteraction<BarDatum>({
     <DemoBlock
       title="自定义柱状图"
       description="使用该组合式函数实现自定义图表的悬停高亮和点击选中。"
-      :code="snippet">
+      :code="fullPageSnippet">
       <Card>
         <svg viewBox="0 0 400 200" class="w-full h-48">
           <g v-for="(d, i) in data" :key="d.label">

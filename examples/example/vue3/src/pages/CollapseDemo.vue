@@ -3,6 +3,7 @@ import { CollapsePanel } from '@expcat/tigercat-vue/CollapsePanel'
 import { ref } from 'vue'
 import { Collapse } from '@expcat/tigercat-vue/Collapse'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './CollapseDemo.vue?raw'
 
 const basicSnippet = `<Collapse v-model:activeKey="activeKey">
   <CollapsePanel panelKey="1" header="面板 1">内容 1</CollapsePanel>
@@ -84,11 +85,7 @@ const activeKey9 = ref<string[]>([])
       </p>
     </div>
 
-    <DemoBlock
-      title="基本用法"
-      description="可以同时展开多个面板。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基本用法" description="可以同时展开多个面板。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse v-model:activeKey="activeKey1">
           <CollapsePanel panelKey="1" header="面板标题 1">
@@ -104,7 +101,7 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock title="手风琴模式" description="每次只能展开一个面板。" :code="accordionSnippet">
+    <DemoBlock title="手风琴模式" description="每次只能展开一个面板。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse accordion v-model:activeKey="activeKey2">
           <CollapsePanel panelKey="1" header="手风琴面板 1">
@@ -120,7 +117,7 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock title="无边框" description="简洁的无边框样式。" :code="borderlessSnippet">
+    <DemoBlock title="无边框" description="简洁的无边框样式。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse :bordered="false" v-model:activeKey="activeKey3">
           <CollapsePanel panelKey="1" header="无边框面板 1">
@@ -133,7 +130,7 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock title="透明背景" description="背景透明的 Ghost 模式。" :code="ghostSnippet">
+    <DemoBlock title="透明背景" description="背景透明的 Ghost 模式。" :code="fullPageSnippet">
       <div class="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
         <Collapse ghost v-model:activeKey="activeKey4">
           <CollapsePanel panelKey="1" header="Ghost 面板 1">
@@ -146,7 +143,7 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock title="图标位置" description="可以将展开图标放在右侧。" :code="iconPositionSnippet">
+    <DemoBlock title="图标位置" description="可以将展开图标放在右侧。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse expandIconPosition="end" v-model:activeKey="activeKey5">
           <CollapsePanel panelKey="1" header="箭头在右侧">
@@ -159,7 +156,7 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock title="禁用面板" description="可以禁用某个面板。" :code="disabledSnippet">
+    <DemoBlock title="禁用面板" description="可以禁用某个面板。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse v-model:activeKey="activeKey6">
           <CollapsePanel panelKey="1" header="正常面板">
@@ -175,7 +172,7 @@ const activeKey9 = ref<string[]>([])
       </div>
     </DemoBlock>
 
-    <DemoBlock title="嵌套面板" description="折叠面板可以嵌套使用。" :code="nestedSnippet">
+    <DemoBlock title="嵌套面板" description="折叠面板可以嵌套使用。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse v-model:activeKey="activeKey7">
           <CollapsePanel panelKey="1" header="外层面板 1">
@@ -198,7 +195,7 @@ const activeKey9 = ref<string[]>([])
     <DemoBlock
       title="自定义标题与额外内容"
       description="通过 slot 自定义面板标题和右侧额外内容。"
-      :code="customHeaderSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse v-model:activeKey="activeKey8">
           <CollapsePanel panelKey="1">
@@ -223,7 +220,7 @@ const activeKey9 = ref<string[]>([])
     <DemoBlock
       title="隐藏箭头"
       description="通过 showArrow 属性隐藏展开/收起箭头图标。"
-      :code="hideArrowSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse v-model:activeKey="activeKey9">
           <CollapsePanel panelKey="1" header="无箭头面板 1" :showArrow="false">

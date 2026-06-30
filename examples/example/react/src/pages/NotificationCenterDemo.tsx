@@ -1,6 +1,7 @@
 import { NotificationCenter } from '@expcat/tigercat-react/NotificationCenter'
 import type { NotificationItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './NotificationCenterDemo.tsx?raw'
 
 const items: NotificationItem[] = [
   {
@@ -94,19 +95,19 @@ export default function NotificationCenterDemo() {
       <DemoBlock
         title="基础用法"
         description="按类型分组、已读状态筛选、批量标记已读。使用 manageReadState 自动管理已读状态。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-lg">
           <NotificationCenter items={items} groupOrder={groupOrder} manageReadState />
         </div>
       </DemoBlock>
 
-      <DemoBlock title="加载态" description="数据加载中的展示。" code={loadingSnippet}>
+      <DemoBlock title="加载态" description="数据加载中的展示。" code={fullPageSnippet}>
         <div className="max-w-lg">
           <NotificationCenter loading loadingText="正在加载通知..." />
         </div>
       </DemoBlock>
 
-      <DemoBlock title="空态" description="无通知时显示空状态提示。" code={emptySnippet}>
+      <DemoBlock title="空态" description="无通知时显示空状态提示。" code={fullPageSnippet}>
         <div className="max-w-lg">
           <NotificationCenter items={[]} emptyText="暂无新通知" title="消息" />
         </div>

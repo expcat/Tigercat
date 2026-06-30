@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { MarkdownEditor } from '@expcat/tigercat-react/MarkdownEditor'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './MarkdownEditorDemo.tsx?raw'
 
 const initialMarkdown = `# Release notes
 
@@ -49,8 +50,7 @@ const MarkdownEditorDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="value + onChange 绑定 Markdown"
-        code={basicSnippet}
-        script={scriptSnippet}>
+        code={fullPageSnippet}>
         <MarkdownEditor
           value={content}
           onChange={setContent}
@@ -59,7 +59,7 @@ const MarkdownEditorDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="模式切换" description="edit / split / preview" code={modeSnippet}>
+      <DemoBlock title="模式切换" description="edit / split / preview" code={fullPageSnippet}>
         <div className="grid gap-4 md:grid-cols-2">
           <MarkdownEditor value={readOnlyMarkdown} mode="preview" height={220} readOnly />
           <MarkdownEditor defaultValue={readOnlyMarkdown} defaultMode="edit" height={220} />
@@ -69,7 +69,7 @@ const MarkdownEditorDemo: React.FC = () => {
       <DemoBlock
         title="扩展渲染器"
         description="renderer 接管预览 HTML，组件仍会清理危险内容"
-        code={rendererSnippet}>
+        code={fullPageSnippet}>
         <MarkdownEditor value={content} renderer={renderer} mode="preview" height={180} />
       </DemoBlock>
     </div>

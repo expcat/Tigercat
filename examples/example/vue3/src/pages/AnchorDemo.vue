@@ -3,6 +3,7 @@ import { AnchorLink } from '@expcat/tigercat-vue/AnchorLink'
 import { ref } from 'vue'
 import { Anchor } from '@expcat/tigercat-vue/Anchor'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './AnchorDemo.vue?raw'
 
 // Get the main scroll container from the layout
 const getMainContainer = () => {
@@ -92,7 +93,7 @@ const handleDemoChange = (activeLink: string) => {
       <!-- 左侧内容区 -->
       <div class="lg:col-span-3 space-y-8">
         <div id="demo-basic" class="scroll-mt-20">
-          <DemoBlock title="基本用法" description="最简单的锚点导航。" :code="basicSnippet">
+          <DemoBlock title="基本用法" description="最简单的锚点导航。" :code="fullPageSnippet">
             <div class="p-6 bg-gray-50 rounded-lg">
               <p class="text-gray-600 dark:text-gray-400">
                 点击右侧的锚点链接可以滚动到对应的内容区域。当前选中的锚点会高亮显示。
@@ -102,7 +103,7 @@ const handleDemoChange = (activeLink: string) => {
         </div>
 
         <div id="demo-horizontal" class="scroll-mt-20">
-          <DemoBlock title="水平方向" description="锚点可以水平排列。" :code="horizontalSnippet">
+          <DemoBlock title="水平方向" description="锚点可以水平排列。" :code="fullPageSnippet">
             <div class="p-6 bg-gray-50 rounded-lg">
               <Anchor
                 direction="horizontal"
@@ -119,7 +120,7 @@ const handleDemoChange = (activeLink: string) => {
         </div>
 
         <div id="demo-container" class="scroll-mt-20">
-          <DemoBlock title="自定义容器" description="可以指定滚动容器。" :code="targetSnippet">
+          <DemoBlock title="自定义容器" description="可以指定滚动容器。" :code="fullPageSnippet">
             <div class="p-6 bg-gray-50 rounded-lg">
               <div class="flex gap-4">
                 <div
@@ -157,7 +158,7 @@ const handleDemoChange = (activeLink: string) => {
         </div>
 
         <div id="demo-nested" class="scroll-mt-20">
-          <DemoBlock title="嵌套锚点" description="支持多级嵌套的锚点。" :code="nestedSnippet">
+          <DemoBlock title="嵌套锚点" description="支持多级嵌套的锚点。" :code="fullPageSnippet">
             <div class="p-6 bg-gray-50 rounded-lg">
               <div class="flex gap-8">
                 <div class="flex-1">
@@ -192,7 +193,7 @@ const handleDemoChange = (activeLink: string) => {
           <DemoBlock
             title="墨水指示器"
             description="固定模式下通过 showInkInFixed 显示墨水指示器；非固定模式默认可见。"
-            :code="inkSnippet">
+            :code="fullPageSnippet">
             <div class="p-6 bg-gray-50 rounded-lg">
               <div class="flex gap-8">
                 <div class="flex-1">
@@ -218,8 +219,7 @@ const handleDemoChange = (activeLink: string) => {
           <DemoBlock
             title="事件处理"
             description="监听 @click 和 @change 事件，可配合 targetOffset 使用。"
-            :code="eventsSnippet"
-            :script="eventsScriptSnippet">
+            :code="fullPageSnippet">
             <div class="p-6 bg-gray-50 rounded-lg">
               <div class="flex gap-8 items-start">
                 <div class="flex-1">

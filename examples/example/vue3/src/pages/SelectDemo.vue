@@ -3,6 +3,7 @@ import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Select } from '@expcat/tigercat-vue/Select'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SelectDemo.vue?raw'
 
 const basicValue = ref<string | number>('')
 const defaultValue = ref<string | number>('china')
@@ -165,11 +166,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock
-      title="基础用法"
-      description="适用广泛的基础选择器。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="适用广泛的基础选择器。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="basicValue" :options="options" placeholder="请选择" />
         <p class="text-sm text-gray-600">选中的值：{{ basicValue || '未选择' }}</p>
@@ -177,7 +174,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 有默认值 -->
-    <DemoBlock title="有默认值" description="可以设置默认选中的值。" :code="defaultSnippet">
+    <DemoBlock title="有默认值" description="可以设置默认选中的值。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="defaultValue" :options="countries" />
         <p class="text-sm text-gray-600">选中的国家：{{ defaultValue }}</p>
@@ -185,7 +182,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 禁用状态 -->
-    <DemoBlock title="禁用状态" description="禁用整个选择器组件。" :code="disabledSnippet">
+    <DemoBlock title="禁用状态" description="禁用整个选择器组件。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="disabledValue" :options="countries" disabled />
       </Space>
@@ -195,7 +192,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="不同尺寸"
       description="Select 支持 sm / md / lg 三种尺寸。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="w-full">
           <p class="text-sm text-gray-600 mb-2">sm</p>
@@ -213,7 +210,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 禁用选项 -->
-    <DemoBlock title="禁用选项" description="可以禁用单个选项。" :code="disabledOptionSnippet">
+    <DemoBlock title="禁用选项" description="可以禁用单个选项。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="disabledOptionValue" :options="optionsWithDisabled" placeholder="请选择" />
         <p class="text-sm text-gray-600">选中的值：{{ disabledOptionValue || '未选择' }}</p>
@@ -224,7 +221,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="可清空"
       description="默认支持清空，也可以关闭清空功能。"
-      :code="clearableSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="w-full">
           <p class="text-sm text-gray-600 mb-2">clearable: true</p>
@@ -241,7 +238,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="可搜索"
       description="启用 searchable 后可在下拉中输入关键字过滤选项。"
-      :code="searchableSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select
           v-model="searchableValue"
@@ -254,7 +251,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 多选 -->
-    <DemoBlock title="多选" description="启用 multiple 后可选择多个选项。" :code="multipleSnippet">
+    <DemoBlock title="多选" description="启用 multiple 后可选择多个选项。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="multipleValue" :options="options" multiple placeholder="请选择多个" />
         <p class="text-sm text-gray-600">
@@ -267,7 +264,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="多选 + 可搜索"
       description="同时启用 multiple 和 searchable，支持搜索并多选。"
-      :code="multipleSearchableSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select
           v-model="multiSearchValue"
@@ -285,7 +282,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="分组选项"
       description="支持传入分组数据（group label + options）。"
-      :code="groupedSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="groupedValue" :options="groupedOptions" />
         <p class="text-sm text-gray-600">选中的值：{{ groupedValue }}</p>
@@ -296,7 +293,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     <DemoBlock
       title="空状态"
       description="当 options 为空时，会显示空提示文案。"
-      :code="emptySnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="emptyValue" :options="[]" empty-text="暂无数据" placeholder="无可用选项" />
       </Space>

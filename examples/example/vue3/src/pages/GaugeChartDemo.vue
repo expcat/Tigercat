@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">GaugeChart 仪表盘</h1>
     <p class="text-gray-500 mb-8">环形仪表盘，展示单一指标的进度或状态。</p>
 
-    <DemoBlock title="基础用法" description="value、min、max" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="value、min、max" :code="fullPageSnippet">
       <div class="flex gap-8 items-end">
         <GaugeChart :value="72" label="完成率" />
         <GaugeChart :value="35" :max="50" label="得分" />
@@ -13,7 +13,7 @@
     <DemoBlock
       title="颜色分段"
       description="segments 按区间着色，自定义格式化"
-      :code="segmentsSnippet">
+      :code="fullPageSnippet">
       <GaugeChart
         :value="82"
         :width="320"
@@ -23,7 +23,10 @@
         :value-formatter="(v) => v + '%'" />
     </DemoBlock>
 
-    <DemoBlock title="自定义弧形" description="arcWidth、startAngle、endAngle" :code="arcSnippet">
+    <DemoBlock
+      title="自定义弧形"
+      description="arcWidth、startAngle、endAngle"
+      :code="fullPageSnippet">
       <GaugeChart
         :value="60"
         :width="280"
@@ -40,6 +43,7 @@
 <script setup lang="ts">
 import { GaugeChart } from '@expcat/tigercat-vue/GaugeChart'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './GaugeChartDemo.vue?raw'
 
 const segments = [
   { range: [0, 40] as [number, number], color: '#ef4444' },

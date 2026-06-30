@@ -3,6 +3,7 @@ import { Button } from '@expcat/tigercat-vue/Button'
 import { ref, onMounted } from 'vue'
 import { BackTop } from '@expcat/tigercat-vue/BackTop'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './BackTopDemo.vue?raw'
 
 const basicSnippet = `<BackTop />
 <!-- 滚动页面超过 400px 后显示 -->`
@@ -58,8 +59,7 @@ const handleClick = () => {
     <DemoBlock
       title="基本用法"
       description="滚动页面，右下角会出现回到顶部按钮。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <p class="text-gray-600 mb-4">向下滚动页面超过 400px 后，右下角会出现回到顶部按钮。</p>
         <p class="text-sm text-gray-500">提示：本页面已添加 BackTop 组件，请向下滚动查看效果。</p>
@@ -69,7 +69,7 @@ const handleClick = () => {
     <DemoBlock
       title="自定义显示高度"
       description="可以设置滚动多少距离后显示按钮。"
-      :code="customHeightSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <p class="text-gray-600 dark:text-gray-400">
           通过 <code class="bg-gray-200 px-1 rounded">visibilityHeight</code> 属性设置滚动高度阈值。
@@ -77,10 +77,7 @@ const handleClick = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock
-      title="自定义内容"
-      description="可以自定义按钮的显示内容。"
-      :code="customContentSnippet">
+    <DemoBlock title="自定义内容" description="可以自定义按钮的显示内容。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <p class="text-gray-600 mb-4">通过默认插槽自定义按钮内容。</p>
         <div class="flex items-center gap-4">
@@ -96,7 +93,7 @@ const handleClick = () => {
     <DemoBlock
       title="自定义动画时长"
       description="通过 duration 属性控制滚动到顶部的动画时长。"
-      :code="customDurationSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <p class="text-gray-600 dark:text-gray-400">
           通过 <code class="bg-gray-200 px-1 rounded">duration</code> 属性设置动画时长（毫秒），默认
@@ -108,7 +105,7 @@ const handleClick = () => {
     <DemoBlock
       title="自定义滚动容器"
       description="指定 target 监听自定义容器的滚动。"
-      :code="customTargetSnippet">
+      :code="fullPageSnippet">
       <div
         ref="innerContainer"
         class="h-64 overflow-auto rounded-lg border border-gray-200 relative">
@@ -126,7 +123,7 @@ const handleClick = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="点击回调" description="点击按钮时触发回调函数。" :code="clickSnippet">
+    <DemoBlock title="点击回调" description="点击按钮时触发回调函数。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <p class="text-gray-600 mb-4">
           通过 <code class="bg-gray-200 px-1 rounded">@click</code> 监听点击事件。

@@ -4,6 +4,7 @@ import { DataTableWithToolbar } from '@expcat/tigercat-vue/DataTableWithToolbar'
 import { type TableColumn, type TableToolbarFilterValue } from '@expcat/tigercat-vue'
 import type { TableToolbarAction, TableCardLayoutItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './DataTableWithToolbarDemo.vue?raw'
 
 interface UserRow extends Record<string, unknown> {
   id: number
@@ -389,11 +390,7 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
       <p class="text-gray-600 dark:text-gray-400">搜索、筛选、批量操作与分页联动的组合组件。</p>
     </div>
 
-    <DemoBlock
-      title="基础用法"
-      description="搜索/筛选/批量操作 + 分页联动"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="搜索/筛选/批量操作 + 分页联动" :code="fullPageSnippet">
       <DataTableWithToolbar
         :columns="columns"
         :dataSource="pagedData"
@@ -419,7 +416,7 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
     <DemoBlock
       title="自定义过滤器"
       description="filters-extra 插槽可把年龄段等复合控件放入工具栏，并通过 setFilter 发出对象型过滤值。"
-      :code="ageRangeSnippet">
+      :code="fullPageSnippet">
       <DataTableWithToolbar
         :columns="columns"
         :dataSource="pagedData"
@@ -457,8 +454,7 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
     <DemoBlock
       title="列设置"
       description="开启 showColumnSettings 后，工具栏右侧出现列设置入口，可勾选控制列显隐；hideable: false 的列不可隐藏。支持 v-model:hidden-column-keys 双向绑定。"
-      :code="columnSettingsSnippet"
-      :script="columnSettingsScriptSnippet">
+      :code="fullPageSnippet">
       <DataTableWithToolbar
         :columns="settingsColumns"
         :dataSource="pagedData"
@@ -477,8 +473,7 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
     <DemoBlock
       title="钉列 / 锁定列"
       description="column.fixed 让列在横向滚动时钉在边缘（姓名列钉在左侧）；开启 column-lockable 后表头出现锁定按钮，锁定列会进入左侧固定区，未锁定列向右排列；columnSettings.lockedColumnKeys 让该列在列设置面板中不可隐藏。横向滚动表格可观察钉列效果。"
-      :code="columnLockSnippet"
-      :script="columnLockScriptSnippet">
+      :code="fullPageSnippet">
       <DataTableWithToolbar
         :columns="lockColumns"
         :dataSource="pagedData"
@@ -499,7 +494,7 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
     <DemoBlock
       title="卡片模式字段定制"
       description="窄屏（小于 cardBreakpoint，此处为 lg/1024px）自动切换为卡片：姓名作为标题、ID 隐藏、状态/角色按 cardPriority 排序。缩窄窗口可预览。"
-      :code="cardSnippet">
+      :code="fullPageSnippet">
       <DataTableWithToolbar
         :columns="cardColumns"
         :dataSource="pagedData"
@@ -529,7 +524,7 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
     <DemoBlock
       title="自定义卡片网格布局"
       description="使用 cardGrid 列属性或 cardLayout 集中配置，实现双列/三列混排的卡片网格布局。cardLayout 配置优先于 cardGrid；最窄屏默认单列，sm 及以上按 colSpan 混排。缩窄窗口到 lg/1024px 以下可预览效果。"
-      :code="gridCardSnippet">
+      :code="fullPageSnippet">
       <DataTableWithToolbar
         :columns="gridCardColumns"
         :dataSource="pagedData"
@@ -549,7 +544,7 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
     <DemoBlock
       title="工具栏布局定制"
       description="通过 itemClass/itemStyle 定制单个 filter 容器宽度（替换默认尺寸类），searchClassName 定制搜索框尺寸，toolbar.className/style 定制容器样式。"
-      :code="itemClassSnippet">
+      :code="fullPageSnippet">
       <DataTableWithToolbar
         :columns="columns"
         :dataSource="pagedData"
@@ -586,7 +581,7 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
     <DemoBlock
       title="完全自定义工具栏"
       description="#toolbar 插槽完全替换内置工具栏区域（含 role='toolbar' 容器），通过 context 获取搜索/筛选/选择等状态和操作。使用时请自行添加 role='toolbar' 以保持可访问性。"
-      :code="customToolbarSnippet">
+      :code="fullPageSnippet">
       <DataTableWithToolbar
         :columns="columns"
         :dataSource="pagedData"
@@ -634,7 +629,7 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
     <DemoBlock
       title="卡片自定义渲染"
       description="通过 #card 插槽完全自定义卡片内容（优先于 renderCard prop），或使用 cardClassName 添加卡片容器样式。缩窄窗口到 lg/1024px 以下可预览。"
-      :code="cardSlotSnippet">
+      :code="fullPageSnippet">
       <DataTableWithToolbar
         :columns="cardColumns"
         :dataSource="pagedData"

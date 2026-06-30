@@ -3,6 +3,7 @@ import { BreadcrumbItem } from '@expcat/tigercat-vue/BreadcrumbItem'
 import { h } from 'vue'
 import { Breadcrumb } from '@expcat/tigercat-vue/Breadcrumb'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './BreadcrumbDemo.vue?raw'
 
 const basicSnippet = `<Breadcrumb>
   <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -99,7 +100,7 @@ const handleClick = (event: MouseEvent) => {
       </p>
     </div>
 
-    <DemoBlock title="基本用法" description="最简单的面包屑导航。" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="最简单的面包屑导航。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -109,7 +110,7 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="箭头分隔符" description="使用箭头作为分隔符。" :code="arrowSnippet">
+    <DemoBlock title="箭头分隔符" description="使用箭头作为分隔符。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb separator="arrow">
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -119,7 +120,7 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="尖括号分隔符" description="使用尖括号作为分隔符。" :code="chevronSnippet">
+    <DemoBlock title="尖括号分隔符" description="使用尖括号作为分隔符。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb separator="chevron">
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -133,7 +134,7 @@ const handleClick = (event: MouseEvent) => {
     <DemoBlock
       title="自定义分隔符"
       description="可以使用任意字符串作为分隔符。"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb separator=">">
           <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -143,7 +144,7 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="带图标" description="可以在面包屑项中添加图标。" :code="iconSnippet">
+    <DemoBlock title="带图标" description="可以在面包屑项中添加图标。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
           <BreadcrumbItem href="/" :icon="homeIcon">首页</BreadcrumbItem>
@@ -153,7 +154,7 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="外部链接" description="支持在新窗口打开链接。" :code="externalSnippet">
+    <DemoBlock title="外部链接" description="支持在新窗口打开链接。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -166,7 +167,7 @@ const handleClick = (event: MouseEvent) => {
     <DemoBlock
       title="点击事件"
       description="面包屑项可以监听点击事件（查看控制台）。"
-      :code="clickSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
           <BreadcrumbItem href="/" @click="handleClick">首页</BreadcrumbItem>
@@ -176,7 +177,7 @@ const handleClick = (event: MouseEvent) => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="多级层次" description="支持任意层级的面包屑导航。" :code="multiSnippet">
+    <DemoBlock title="多级层次" description="支持任意层级的面包屑导航。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb separator="chevron">
           <BreadcrumbItem href="/">首页</BreadcrumbItem>
@@ -192,7 +193,7 @@ const handleClick = (event: MouseEvent) => {
     <DemoBlock
       title="单独设置分隔符"
       description="每个面包屑项可以单独设置分隔符。"
-      :code="itemSeparatorSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
           <BreadcrumbItem href="/" separator="arrow">首页</BreadcrumbItem>
@@ -205,7 +206,7 @@ const handleClick = (event: MouseEvent) => {
     <DemoBlock
       title="扩展区域"
       description="通过 extra 插槽在面包屑末尾添加操作按钮等扩展内容。"
-      :code="extraSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Breadcrumb>
           <template #extra>

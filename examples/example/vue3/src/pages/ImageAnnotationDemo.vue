@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { ImageAnnotation } from '@expcat/tigercat-vue/ImageAnnotation'
 import type { ImageAnnotation as ImageAnnotationItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ImageAnnotationDemo.vue?raw'
 
 const PHOTO = 'https://picsum.photos/seed/annotation/900/600'
 
@@ -55,7 +56,7 @@ const shapeSnippet = `<ImageAnnotation
     <DemoBlock
       title="受控标注"
       description="通过 v-model 管理标注数据，切换工具后在图片上拖拽绘制。"
-      :code="controlledSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <ImageAnnotation
           v-model="annotations"
@@ -72,7 +73,7 @@ const shapeSnippet = `<ImageAnnotation
     <DemoBlock
       title="多形状工具"
       description="内置 select、rectangle、ellipse、polygon、freehand 工具；多边形可用双击或 Enter 完成。"
-      :code="shapeSnippet">
+      :code="fullPageSnippet">
       <ImageAnnotation
         :src="PHOTO"
         :tools="['select', 'rectangle', 'ellipse', 'polygon', 'freehand']"

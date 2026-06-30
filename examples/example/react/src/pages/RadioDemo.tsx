@@ -3,6 +3,7 @@ import { Radio } from '@expcat/tigercat-react/Radio'
 import { RadioGroup } from '@expcat/tigercat-react/RadioGroup'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './RadioDemo.tsx?raw'
 
 const basicSnippet = `<Space direction="vertical">
   <RadioGroup value={basicValue} onChange={setBasicValue} className="flex flex-wrap items-center gap-4">
@@ -107,8 +108,7 @@ const RadioDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="单选框组合使用时，需要通过 RadioGroup 组件进行包裹。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <RadioGroup
             value={basicValue}
@@ -126,7 +126,7 @@ const RadioDemo: React.FC = () => {
       <DemoBlock
         title="单独使用"
         description="Radio 可以脱离 RadioGroup 单独使用，支持受控和非受控两种模式。"
-        code={standaloneSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <Radio value="agree" checked={agreed} onChange={() => setAgreed(true)}>
             同意用户协议
@@ -141,7 +141,7 @@ const RadioDemo: React.FC = () => {
       <DemoBlock
         title="非受控"
         description="不传 value，仅使用 defaultValue，并通过 onChange 监听变化。"
-        code={uncontrolledSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <RadioGroup
             defaultValue="male"
@@ -156,7 +156,7 @@ const RadioDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 禁用状态 */}
-      <DemoBlock title="禁用状态" description="单选框不可用的状态。" code={disabledSnippet}>
+      <DemoBlock title="禁用状态" description="单选框不可用的状态。" code={fullPageSnippet}>
         <Space direction="vertical">
           <div>
             <div className="text-sm text-gray-700 mb-2">部分禁用</div>
@@ -191,7 +191,7 @@ const RadioDemo: React.FC = () => {
       <DemoBlock
         title="尺寸"
         description="通过 RadioGroup 的 size 控制整组尺寸。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           {(['sm', 'md', 'lg'] as const).map((size) => (
             <div key={size}>
@@ -214,7 +214,7 @@ const RadioDemo: React.FC = () => {
       <DemoBlock
         title="数字值"
         description="Radio 的 value 支持 number 类型。"
-        code={numericSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <RadioGroup
             value={numericValue}
@@ -234,7 +234,7 @@ const RadioDemo: React.FC = () => {
       <DemoBlock
         title="自定义样式"
         description="通过 className 和 name 自定义 Radio 和 RadioGroup 的外观与分组。"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <RadioGroup
           value={customValue}
           onChange={setCustomValue}

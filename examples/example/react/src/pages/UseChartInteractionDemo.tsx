@@ -2,6 +2,7 @@ import React from 'react'
 import { Card } from '@expcat/tigercat-react/Card'
 import { useChartInteraction } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './UseChartInteractionDemo.tsx?raw'
 
 interface BarDatum {
   label: string
@@ -70,7 +71,7 @@ const UseChartInteractionDemo: React.FC = () => {
       <DemoBlock
         title="自定义柱状图"
         description="使用该 Hook 实现自定义图表的悬停高亮和点击选中。"
-        code={snippet}>
+        code={fullPageSnippet}>
         <Card>
           <svg viewBox="0 0 400 200" className="w-full h-48">
             {data.map((d, i) => (

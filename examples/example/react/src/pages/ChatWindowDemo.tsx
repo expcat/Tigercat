@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { ChatWindow } from '@expcat/tigercat-react/ChatWindow'
 import type { ChatMessage } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ChatWindowDemo.tsx?raw'
 
 const baseMessages: ChatMessage[] = [
   {
@@ -119,8 +120,7 @@ export default function ChatWindowDemo() {
       <DemoBlock
         title="基础用法"
         description="默认 textarea 输入，支持 Shift+Enter 换行。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <ChatWindow
           className="h-[480px]"
           messages={messages}
@@ -133,7 +133,10 @@ export default function ChatWindowDemo() {
         />
       </DemoBlock>
 
-      <DemoBlock title="单行输入" description="使用 input 模式，回车即可发送。" code={inputSnippet}>
+      <DemoBlock
+        title="单行输入"
+        description="使用 input 模式，回车即可发送。"
+        code={fullPageSnippet}>
         <ChatWindow
           className="h-[380px]"
           inputType="input"

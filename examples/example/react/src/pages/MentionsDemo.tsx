@@ -2,6 +2,7 @@ import { Space } from '@expcat/tigercat-react/Space'
 import { useState } from 'react'
 import { Mentions } from '@expcat/tigercat-react/Mentions'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './MentionsDemo.tsx?raw'
 
 const users = [
   { label: '张三', value: 'zhangsan' },
@@ -30,15 +31,11 @@ const MentionsDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Mentions 提及</h1>
       <p className="text-gray-500 mb-8">输入框中 @提及 用户，支持自定义触发字符。</p>
 
-      <DemoBlock
-        title="基本用法"
-        description="输入 @ 触发用户列表"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="输入 @ 触发用户列表" code={fullPageSnippet}>
         <Mentions value={val} onChange={setVal} options={users} placeholder="输入 @ 提及用户" />
       </DemoBlock>
 
-      <DemoBlock title="自定义触发符" description="prefix 自定义触发字符" code={customSnippet}>
+      <DemoBlock title="自定义触发符" description="prefix 自定义触发字符" code={fullPageSnippet}>
         <Mentions
           value={val2}
           onChange={setVal2}
@@ -48,7 +45,7 @@ const MentionsDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="尺寸与禁用" code={stateSnippet}>
+      <DemoBlock title="尺寸与禁用" code={fullPageSnippet}>
         <Space direction="vertical" size={12} className="w-full">
           <Mentions options={users} size="sm" placeholder="小尺寸" />
           <Mentions options={users} size="lg" placeholder="大尺寸" />

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { LineChart } from '@expcat/tigercat-vue/LineChart'
 import { type LineChartDatum, type LineChartSeries } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './LineChartDemo.vue?raw'
 
 const basicData: LineChartDatum[] = [
   { x: 'Jan', y: 30 },
@@ -108,7 +109,7 @@ const interactiveSnippet = `<LineChart
       <p class="text-gray-600 dark:text-gray-400">用于展示数据随时间或类别变化趋势。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="单系列折线图，显示数据点。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="单系列折线图，显示数据点。" :code="fullPageSnippet">
       <LineChart
         :data="basicData"
         :width="420"
@@ -118,7 +119,7 @@ const interactiveSnippet = `<LineChart
         y-axis-label="Value" />
     </DemoBlock>
 
-    <DemoBlock title="多系列" description="多条折线对比，支持虚线样式。" :code="multiSeriesSnippet">
+    <DemoBlock title="多系列" description="多条折线对比，支持虚线样式。" :code="fullPageSnippet">
       <LineChart
         :series="multiSeries"
         :width="420"
@@ -131,7 +132,7 @@ const interactiveSnippet = `<LineChart
     <DemoBlock
       title="曲线插值 + 面积填充"
       description="使用 monotone 平滑曲线并显示渐变面积。"
-      :code="curveSnippet">
+      :code="fullPageSnippet">
       <LineChart
         :data="basicData"
         :width="420"
@@ -144,7 +145,7 @@ const interactiveSnippet = `<LineChart
     <DemoBlock
       title="面积渐变 + 空心圆点"
       description="ECharts 风格：渐变填充区域、空心数据点、平滑曲线。"
-      :code="areaGradientSnippet">
+      :code="fullPageSnippet">
       <LineChart
         :series="multiSeries"
         :width="420"
@@ -160,7 +161,7 @@ const interactiveSnippet = `<LineChart
     <DemoBlock
       title="入场动画"
       description="线条从左到右绘制的入场动画效果。"
-      :code="animatedSnippet">
+      :code="fullPageSnippet">
       <LineChart
         :data="basicData"
         :width="420"
@@ -175,7 +176,7 @@ const interactiveSnippet = `<LineChart
     <DemoBlock
       title="交互功能"
       description="悬停高亮、点击选择、图例联动。"
-      :code="interactiveSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <LineChart
           :series="multiSeries"

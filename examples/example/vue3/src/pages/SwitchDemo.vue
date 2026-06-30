@@ -3,6 +3,7 @@ import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Switch } from '@expcat/tigercat-vue/Switch'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SwitchDemo.vue?raw'
 
 const basicEnabled = ref(true)
 
@@ -49,8 +50,7 @@ const sizeSnippet = `<Space align="center">
     <DemoBlock
       title="基础用法"
       description="绑定 v-model 到一个 Boolean 类型的变量。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical">
         <div class="flex items-center gap-3">
           <Switch v-model="basicEnabled" />
@@ -63,7 +63,7 @@ const sizeSnippet = `<Space align="center">
     <DemoBlock
       title="禁用状态"
       description="通过设置 disabled 属性来禁用开关。"
-      :code="disabledSnippet">
+      :code="fullPageSnippet">
       <Space>
         <Switch v-model="disabledOn" disabled />
         <Switch v-model="disabledOff" disabled />
@@ -71,7 +71,7 @@ const sizeSnippet = `<Space align="center">
     </DemoBlock>
 
     <!-- 不同尺寸 -->
-    <DemoBlock title="不同尺寸" description="开关有三种尺寸。" :code="sizeSnippet">
+    <DemoBlock title="不同尺寸" description="开关有三种尺寸。" :code="fullPageSnippet">
       <Space align="center">
         <Switch v-model="sizeSm" size="sm" />
         <Switch v-model="sizeMd" size="md" />

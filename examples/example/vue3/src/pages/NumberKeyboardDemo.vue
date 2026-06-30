@@ -3,6 +3,7 @@ import { NumberKeyboard } from '@expcat/tigercat-vue/NumberKeyboard'
 import { ref } from 'vue'
 import { Input } from '@expcat/tigercat-vue/Input'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './NumberKeyboardDemo.vue?raw'
 
 const amount = ref('')
 const phone = ref('')
@@ -37,7 +38,7 @@ const idCardSnippet = `const idCard = ref('')
     <DemoBlock
       title="金额输入"
       description="amount 模式支持小数点和默认两位小数"
-      :code="amountSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-sm space-y-3">
         <Input v-model="amount" readonly prefix="¥" placeholder="输入金额" />
         <NumberKeyboard
@@ -50,14 +51,17 @@ const idCardSnippet = `const idCard = ref('')
       </div>
     </DemoBlock>
 
-    <DemoBlock title="手机号输入" description="phone 模式默认限制 11 位数字" :code="phoneSnippet">
+    <DemoBlock
+      title="手机号输入"
+      description="phone 模式默认限制 11 位数字"
+      :code="fullPageSnippet">
       <div class="max-w-sm space-y-3">
         <Input v-model="phone" readonly placeholder="手机号" />
         <NumberKeyboard v-model="phone" mode="phone" confirm-text="完成" />
       </div>
     </DemoBlock>
 
-    <DemoBlock title="身份证输入" description="id-card 模式允许末位输入 X" :code="idCardSnippet">
+    <DemoBlock title="身份证输入" description="id-card 模式允许末位输入 X" :code="fullPageSnippet">
       <div class="max-w-sm space-y-3">
         <Input v-model="idCard" readonly placeholder="身份证号" />
         <NumberKeyboard v-model="idCard" mode="id-card" confirm-text="完成" />

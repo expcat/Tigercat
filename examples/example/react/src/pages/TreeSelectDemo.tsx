@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { TreeSelectValue } from '@expcat/tigercat-core'
 import { TreeSelect } from '@expcat/tigercat-react/TreeSelect'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TreeSelectDemo.tsx?raw'
 
 const treeData = [
   {
@@ -50,11 +51,11 @@ const TreeSelectDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">TreeSelect 树选择</h1>
       <p className="text-gray-500 mb-8">树形结构选择器，适用于组织架构等层级数据。</p>
 
-      <DemoBlock title="基本用法" code={basicSnippet} script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" code={fullPageSnippet}>
         <TreeSelect value={val} onChange={setVal} treeData={treeData} placeholder="请选择成员" />
       </DemoBlock>
 
-      <DemoBlock title="可搜索" description="searchable 开启搜索" code={searchSnippet}>
+      <DemoBlock title="可搜索" description="searchable 开启搜索" code={fullPageSnippet}>
         <TreeSelect
           value={val2}
           onChange={setVal2}
@@ -64,7 +65,7 @@ const TreeSelectDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="尺寸与禁用" code={sizeSnippet}>
+      <DemoBlock title="尺寸与禁用" code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
           <TreeSelect treeData={treeData} size="sm" placeholder="小" />
           <TreeSelect treeData={treeData} size="lg" placeholder="大" />

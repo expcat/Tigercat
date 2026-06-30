@@ -18,6 +18,7 @@ import {
 } from '@expcat/tigercat-react'
 import { countries } from '@demo-shared/constants'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './FormDemo.tsx?raw'
 
 const basicSnippet = `<Form model={basicForm} onSubmit={handleBasicSubmit} className="max-w-md">
   <FormItem label="用户名" required>
@@ -300,8 +301,7 @@ const FormDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="完整的表单示例，包含多种表单控件。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <Form model={basicForm} onSubmit={handleBasicSubmit} className="max-w-md">
           <FormItem label="用户名" required>
             <Input
@@ -371,7 +371,7 @@ const FormDemo: React.FC = () => {
       <DemoBlock
         title="表单验证"
         description="通过 rules + name 实现校验，支持提交校验与手动校验。"
-        code={validateSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full">
           <Form
             ref={validateFormRef}
@@ -463,7 +463,7 @@ const FormDemo: React.FC = () => {
       <DemoBlock
         title="布局模式"
         description="通过 labelPosition 切换标签位置：right（默认）、left、top。"
-        code={layoutSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-md">
           <Space className="mb-4">
             <Button
@@ -508,7 +508,7 @@ const FormDemo: React.FC = () => {
       <DemoBlock
         title="表单尺寸"
         description="通过 size 设置表单整体尺寸：sm、md（默认）、lg。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-md">
           <Space className="mb-4">
             <Button
@@ -543,7 +543,7 @@ const FormDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 禁用表单 */}
-      <DemoBlock title="禁用表单" description="设置 disabled 禁用整个表单。" code={disabledSnippet}>
+      <DemoBlock title="禁用表单" description="设置 disabled 禁用整个表单。" code={fullPageSnippet}>
         <Form model={disabledModel} disabled className="max-w-md">
           <FormItem label="姓名" name="name">
             <Input value={disabledModel.name} />
@@ -558,7 +558,7 @@ const FormDemo: React.FC = () => {
       <DemoBlock
         title="自定义校验器"
         description="通过 validator 函数实现自定义校验，支持同步和异步。输入 admin 触发异步校验。"
-        code={customValidatorSnippet}>
+        code={fullPageSnippet}>
         <Form
           ref={customValidatorFormRef}
           model={customModel}
@@ -594,7 +594,7 @@ const FormDemo: React.FC = () => {
       <DemoBlock
         title="错误消息模式"
         description="showMessage 控制错误提示位置。默认在 FormItem 下方显示；设为 false 则让 Input 内部显示错误（抖动 + 红色边框）。"
-        code={showMessageSnippet}>
+        code={fullPageSnippet}>
         <Form
           ref={showMessageFormRef}
           model={showMessageModel}
@@ -626,7 +626,7 @@ const FormDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 表单数据预览 */}
-      <DemoBlock title="表单数据预览" description="实时查看表单数据。" code={previewSnippet}>
+      <DemoBlock title="表单数据预览" description="实时查看表单数据。" code={fullPageSnippet}>
         <pre className="text-sm text-gray-700 bg-white p-4 rounded border">
           {JSON.stringify({ basicForm, validateForm }, null, 2)}
         </pre>

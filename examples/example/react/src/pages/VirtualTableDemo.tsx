@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { VirtualTable } from '@expcat/tigercat-react/VirtualTable'
 import { type TableColumn } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './VirtualTableDemo.tsx?raw'
 
 const basicColumns: TableColumn[] = [
   { key: 'id', title: 'ID', width: 80 },
@@ -84,7 +85,7 @@ const VirtualTableDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="1000 行数据，virtualItemHeight=48"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <VirtualTable
           dataSource={basicData}
           columns={basicColumns}
@@ -93,7 +94,7 @@ const VirtualTableDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="斑马纹 & 边框" description="striped + bordered" code={styledSnippet}>
+      <DemoBlock title="斑马纹 & 边框" description="striped + bordered" code={fullPageSnippet}>
         <VirtualTable
           dataSource={basicData}
           columns={basicColumns}
@@ -106,7 +107,7 @@ const VirtualTableDemo: React.FC = () => {
       <DemoBlock
         title="固定列样式自定义"
         description="固定列支持 fixedClassName / fixedHeaderClassName，可根据 selected 状态自定义 sticky 单元格外观。"
-        code={fixedSnippet}>
+        code={fullPageSnippet}>
         <VirtualTable
           dataSource={basicData.slice(0, 24)}
           columns={fixedColumns}
@@ -117,7 +118,7 @@ const VirtualTableDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="加载 & 空状态" description="loading 和 emptyText" code={stateSnippet}>
+      <DemoBlock title="加载 & 空状态" description="loading 和 emptyText" code={fullPageSnippet}>
         <div className="flex gap-4">
           <div className="flex-1">
             <p className="text-sm text-gray-500 mb-2">Loading</p>

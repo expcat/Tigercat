@@ -2,6 +2,7 @@ import { Button } from '@expcat/tigercat-react/Button'
 import { useRef } from 'react'
 import { notification } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './NotificationDemo.tsx?raw'
 
 const basicSnippet = `<Button onClick={showInfo}>信息</Button>
 <Button onClick={showSuccess}>成功</Button>
@@ -311,7 +312,7 @@ export default function NotificationDemo() {
         </p>
       </div>
 
-      <DemoBlock title="基本类型" description="展示四种基础通知类型。" code={basicSnippet}>
+      <DemoBlock title="基本类型" description="展示四种基础通知类型。" code={fullPageSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showInfo}
@@ -336,7 +337,7 @@ export default function NotificationDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="不同位置" description="支持在四个角落显示通知。" code={positionSnippet}>
+      <DemoBlock title="不同位置" description="支持在四个角落显示通知。" code={fullPageSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showTopLeft}
@@ -364,7 +365,7 @@ export default function NotificationDemo() {
       <DemoBlock
         title="自定义持续时间"
         description="通过 duration 设置自动关闭时间。"
-        code={durationSnippet}>
+        code={fullPageSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showShortNotification}
@@ -384,7 +385,7 @@ export default function NotificationDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="可关闭性" description="控制通知是否显示关闭按钮。" code={closableSnippet}>
+      <DemoBlock title="可关闭性" description="控制通知是否显示关闭按钮。" code={fullPageSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showClosableNotification}
@@ -402,7 +403,7 @@ export default function NotificationDemo() {
       <DemoBlock
         title="手动控制"
         description="保存关闭函数实现手动关闭或模拟流程。"
-        code={manualSnippet}>
+        code={fullPageSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showNotification}
@@ -422,7 +423,7 @@ export default function NotificationDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="点击和回调" description="支持点击与关闭回调。" code={callbackSnippet}>
+      <DemoBlock title="点击和回调" description="支持点击与关闭回调。" code={fullPageSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showClickableNotification}
@@ -437,7 +438,7 @@ export default function NotificationDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="内嵌操作" description="在通知内容下方渲染操作按钮。" code={actionsSnippet}>
+      <DemoBlock title="内嵌操作" description="在通知内容下方渲染操作按钮。" code={fullPageSnippet}>
         <Button
           onClick={showActionNotification}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
@@ -445,7 +446,7 @@ export default function NotificationDemo() {
         </Button>
       </DemoBlock>
 
-      <DemoBlock title="清空通知" description="按位置或全部清空通知。" code={clearSnippet}>
+      <DemoBlock title="清空通知" description="按位置或全部清空通知。" code={fullPageSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showMultipleNotifications}
@@ -468,7 +469,7 @@ export default function NotificationDemo() {
       <DemoBlock
         title="快速使用（仅标题）"
         description="仅传入标题的快捷写法。"
-        code={quickSnippet}>
+        code={fullPageSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={quickInfo}
@@ -496,7 +497,7 @@ export default function NotificationDemo() {
       <DemoBlock
         title="自定义外观"
         description="通过 icon 和 className 自定义通知外观。"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showCustomIcon}

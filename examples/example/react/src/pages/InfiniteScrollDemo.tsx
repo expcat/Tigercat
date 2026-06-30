@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { InfiniteScroll } from '@expcat/tigercat-react/InfiniteScroll'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './InfiniteScrollDemo.tsx?raw'
 
 const basicSnippet = `<InfiniteScroll hasMore={hasMore} loading={loading} onLoadMore={loadMore}
   className="h-[300px] border border-gray-200 rounded-lg">
@@ -39,11 +40,7 @@ const InfiniteScrollDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">InfiniteScroll 无限滚动</h1>
       <p className="text-gray-500 mb-8">滚动到底部自动加载更多内容。</p>
 
-      <DemoBlock
-        title="基础用法"
-        description="滚动到底部触发 onLoadMore"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基础用法" description="滚动到底部触发 onLoadMore" code={fullPageSnippet}>
         <InfiniteScroll
           hasMore={hasMore}
           loading={loading}
@@ -57,7 +54,7 @@ const InfiniteScrollDemo: React.FC = () => {
         </InfiniteScroll>
       </DemoBlock>
 
-      <DemoBlock title="自定义文案" description="loadingText / endText" code={customSnippet}>
+      <DemoBlock title="自定义文案" description="loadingText / endText" code={fullPageSnippet}>
         <InfiniteScroll
           hasMore={false}
           loadingText="拼命加载中..."

@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">FloatButton 悬浮按钮</h1>
     <p class="text-gray-500 mb-8">悬浮在页面角落的操作按钮，支持分组展开。</p>
 
-    <DemoBlock title="基础用法" description="shape、size、type 和 tooltip" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="shape、size、type 和 tooltip" :code="fullPageSnippet">
       <div class="relative h-64 border rounded-lg overflow-hidden">
         <FloatButton
           tooltip="默认"
@@ -24,7 +24,7 @@
     <DemoBlock
       title="按钮组"
       description="FloatButtonGroup 分组展开，支持 click / hover 触发"
-      :code="groupSnippet">
+      :code="fullPageSnippet">
       <div class="relative h-64 border rounded-lg overflow-hidden">
         <FloatButtonGroup trigger="hover" style="position: absolute; right: 24px; bottom: 24px">
           <template #trigger>
@@ -36,7 +36,7 @@
       </div>
     </DemoBlock>
 
-    <DemoBlock title="禁用" :code="disabledSnippet">
+    <DemoBlock title="禁用" :code="fullPageSnippet">
       <div class="relative h-40 border rounded-lg overflow-hidden">
         <FloatButton
           disabled
@@ -48,7 +48,7 @@
     <DemoBlock
       title="独立悬浮"
       description="单个 FloatButton 可直接固定到视口角落。"
-      :code="floatingSnippet">
+      :code="fullPageSnippet">
       <FloatButton
         floating
         placement="bottom-right"
@@ -63,6 +63,7 @@
 import { FloatButton } from '@expcat/tigercat-vue/FloatButton'
 import { FloatButtonGroup } from '@expcat/tigercat-vue/FloatButtonGroup'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './FloatButtonDemo.vue?raw'
 
 const onClick = () => {
   console.log('FloatButton clicked')

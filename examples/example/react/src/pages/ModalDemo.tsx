@@ -4,6 +4,7 @@ import { Input } from '@expcat/tigercat-react/Input'
 import { useState } from 'react'
 import { Modal } from '@expcat/tigercat-react/Modal'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ModalDemo.tsx?raw'
 
 const basicSnippet = `<Button>打开对话框</Button>
 <Modal open={visible1} title="基本对话框">...</Modal>`
@@ -151,8 +152,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="基本用法"
         description="最简单的用法，点击按钮打开对话框。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisible1(true)}>打开对话框</Button>
           <Modal
@@ -177,7 +177,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="不同尺寸"
         description="Modal 提供了多种尺寸选项：sm、md（默认）、lg、xl、full。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Space>
             <Button onClick={() => setVisibleSm(true)}>小尺寸</Button>
@@ -228,7 +228,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="居中显示"
         description="设置 centered 属性可以使 Modal 垂直居中显示。"
-        code={centeredSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleCentered(true)}>打开居中对话框</Button>
           <Modal
@@ -245,7 +245,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="自定义页脚"
         description="通过 footer 属性可以自定义 Modal 的页脚内容。"
-        code={customFooterSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleCustomFooter(true)}>自定义页脚对话框</Button>
           <Modal
@@ -268,7 +268,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="默认页脚"
         description="设置 showDefaultFooter 属性可以使用内置的确定/取消页脚，通过 onOk/onCancel 监听操作。"
-        code={defaultFooterSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleDefaultFooter(true)}>默认页脚对话框</Button>
           <Modal
@@ -288,7 +288,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="自定义文案 (labels)"
         description="单语言项目无需引入 locale，直接用扁平 labels 覆盖默认页脚按钮与关闭按钮文案。"
-        code={labelsSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleLabels(true)}>自定义文案对话框</Button>
           <Modal
@@ -306,7 +306,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="嵌套对话框"
         description="对话框可以嵌套使用，通过 z-index 控制层级。"
-        code={nestedSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleNested(true)}>打开嵌套对话框</Button>
           <Modal open={visibleNested} title="第一层对话框" onCancel={() => setVisibleNested(false)}>
@@ -329,7 +329,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="禁用遮罩关闭"
         description="设置 maskClosable 为 false 可以禁止点击遮罩层关闭对话框。"
-        code={maskClosableSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisible2(true)}>禁用遮罩关闭</Button>
           <Modal
@@ -346,7 +346,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="无遮罩"
         description="设置 mask 为 false 可以不显示遮罩层。"
-        code={noMaskSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleNoMask(true)}>无遮罩对话框</Button>
           <Modal
@@ -362,7 +362,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="关闭时销毁"
         description="设置 destroyOnClose 可以在关闭对话框时销毁其内容。"
-        code={destroySnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleDestroyOnClose(true)}>关闭时销毁</Button>
           <Modal
@@ -379,7 +379,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="无关闭按钮"
         description="设置 closable 为 false 可以隐藏关闭按钮。"
-        code={noCloseSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisible3(true)}>无关闭按钮</Button>
           <Modal
@@ -396,7 +396,7 @@ export default function ModalDemo() {
       <DemoBlock
         title="实际应用场景"
         description="用更贴近业务的例子展示交互、滚动与表单。"
-        code={scenarioSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold mb-3">确认对话框</h3>

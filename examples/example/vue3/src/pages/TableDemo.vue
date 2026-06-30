@@ -9,6 +9,7 @@ import { computed, ref, h } from 'vue'
 import { Table } from '@expcat/tigercat-vue/Table'
 import { type TableColumn } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './TableDemo.vue?raw'
 
 // Basic data
 interface UserData extends Record<string, unknown> {
@@ -519,16 +520,12 @@ const pagedData = computed(() => {
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock
-      title="基础用法"
-      description="基础的表格展示用法。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="基础的表格展示用法。" :code="fullPageSnippet">
       <Table :columns="basicColumns" :dataSource="basicData" :pagination="false" />
     </DemoBlock>
 
     <!-- 带边框和条纹 -->
-    <DemoBlock title="带边框和条纹" description="显示边框和条纹行。" :code="borderedSnippet">
+    <DemoBlock title="带边框和条纹" description="显示边框和条纹行。" :code="fullPageSnippet">
       <Table :columns="basicColumns" :dataSource="basicData" bordered striped :pagination="false" />
     </DemoBlock>
 
@@ -536,12 +533,12 @@ const pagedData = computed(() => {
     <DemoBlock
       title="排序功能"
       description="点击列头进行排序，支持升序、降序和取消排序。"
-      :code="sortingSnippet">
+      :code="fullPageSnippet">
       <Table :columns="sortableColumns" :dataSource="basicData" :pagination="false" />
     </DemoBlock>
 
     <!-- 筛选 -->
-    <DemoBlock title="筛选功能" description="支持文本筛选和下拉选择筛选。" :code="filterSnippet">
+    <DemoBlock title="筛选功能" description="支持文本筛选和下拉选择筛选。" :code="fullPageSnippet">
       <Table :columns="filterableColumns" :dataSource="basicData" :pagination="false" />
     </DemoBlock>
 
@@ -549,14 +546,14 @@ const pagedData = computed(() => {
     <DemoBlock
       title="自定义列渲染"
       description="通过 render 函数自定义单元格内容。"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <Table :columns="customColumns" :dataSource="basicData" :pagination="false" />
     </DemoBlock>
 
     <DemoBlock
       title="响应式卡片模式"
       description="显式设置 responsive-mode='card' 后，窄于 card-breakpoint 时切换为卡片。列定义可配置布局属性，支持使用 card-field-gap 自定义字段间距（如 gap-2，默认 gap-3）。"
-      :code="cardModeSnippet">
+      :code="fullPageSnippet">
       <Table
         :columns="cardColumns"
         :dataSource="basicData"
@@ -570,7 +567,7 @@ const pagedData = computed(() => {
     <DemoBlock
       title="分页功能"
       description="大数据集的分页展示（受控模式）。"
-      :code="paginationSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-3">
         <Table :columns="basicColumns" :dataSource="pagedData" :pagination="false" />
         <Pagination
@@ -586,7 +583,7 @@ const pagedData = computed(() => {
     </DemoBlock>
 
     <!-- 行选择 -->
-    <DemoBlock title="行选择" description="选择单行或多行数据。" :code="selectionSnippet">
+    <DemoBlock title="行选择" description="选择单行或多行数据。" :code="fullPageSnippet">
       <div class="mb-4">
         <p class="text-sm text-gray-600">已选择: {{ selectedRowKeys.join(', ') || '无' }}</p>
       </div>
@@ -602,7 +599,7 @@ const pagedData = computed(() => {
     </DemoBlock>
 
     <!-- 固定表头 -->
-    <DemoBlock title="固定表头" description="表头固定，内容可滚动。" :code="stickySnippet">
+    <DemoBlock title="固定表头" description="表头固定，内容可滚动。" :code="fullPageSnippet">
       <Table
         :columns="basicColumns"
         :dataSource="largeData"
@@ -615,14 +612,14 @@ const pagedData = computed(() => {
     <DemoBlock
       title="锁定列（固定列）"
       description="左右滚动时固定列保持可见（需为固定列设置 width）；开启 striped 时斑马纹行的固定单元格保持不透明。"
-      :code="fixedSnippet">
+      :code="fullPageSnippet">
       <Table :columns="fixedColumns" :dataSource="basicData" striped :pagination="false" />
     </DemoBlock>
 
     <DemoBlock
       title="固定列样式自定义"
       description="通过 fixedClassName / fixedHeaderClassName 按列覆盖 sticky 单元格外观；下面示例会在勾选行后高亮固定列。"
-      :code="fixedStyleSnippet">
+      :code="fullPageSnippet">
       <Table
         :columns="styledFixedColumns"
         :dataSource="basicData"
@@ -637,7 +634,7 @@ const pagedData = computed(() => {
     <DemoBlock
       title="固定列内的下拉菜单"
       description='行内 Dropdown 菜单默认渲染到 body（Teleport），展开后不会被后续行的固定列遮挡，也不会被表格滚动容器裁剪。如需回到旧的原位渲染，可设置 :portal="false"。'
-      :code="fixedDropdownSnippet">
+      :code="fullPageSnippet">
       <Table :columns="fixedDropdownColumns" :dataSource="basicData" :pagination="false" />
     </DemoBlock>
 
@@ -645,7 +642,7 @@ const pagedData = computed(() => {
     <DemoBlock
       title="表头锁按钮"
       description="点击表头的小锁按钮锁定/解锁该列（默认锁定到左侧）。"
-      :code="lockableSnippet">
+      :code="fullPageSnippet">
       <Table
         :columns="lockableColumns"
         :dataSource="basicData"
@@ -654,12 +651,12 @@ const pagedData = computed(() => {
     </DemoBlock>
 
     <!-- 加载状态 -->
-    <DemoBlock title="加载状态" description="显示加载中的状态。" :code="loadingSnippet">
+    <DemoBlock title="加载状态" description="显示加载中的状态。" :code="fullPageSnippet">
       <Table :columns="basicColumns" :dataSource="basicData" loading :pagination="false" />
     </DemoBlock>
 
     <!-- 空状态 -->
-    <DemoBlock title="空状态" description="没有数据时的显示。" :code="emptySnippet">
+    <DemoBlock title="空状态" description="没有数据时的显示。" :code="fullPageSnippet">
       <Table :columns="basicColumns" :dataSource="[]" emptyText="暂无数据" :pagination="false" />
     </DemoBlock>
 
@@ -667,7 +664,7 @@ const pagedData = computed(() => {
     <DemoBlock
       title="尺寸变体"
       description="通过 size 属性设置表格的紧凑程度：sm / md / lg。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-6">
         <div>
           <p class="text-sm text-gray-500 mb-2">size="sm"</p>
@@ -688,7 +685,7 @@ const pagedData = computed(() => {
     <DemoBlock
       title="固定布局"
       description='tableLayout="fixed" 使列宽按设定平均分配，不随内容自适应。'
-      :code="layoutSnippet">
+      :code="fullPageSnippet">
       <Table
         :columns="basicColumns"
         :dataSource="basicData"
@@ -700,7 +697,7 @@ const pagedData = computed(() => {
     <DemoBlock
       title="可展开行"
       description="通过 expandable 配置展开行内容，支持受控展开和行级禁用。仅 status=active 的行可展开。"
-      :code="expandableSnippet">
+      :code="fullPageSnippet">
       <Table
         :columns="basicColumns"
         :dataSource="basicData"

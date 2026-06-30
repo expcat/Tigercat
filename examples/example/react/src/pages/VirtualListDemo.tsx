@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { VirtualList } from '@expcat/tigercat-react/VirtualList'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './VirtualListDemo.tsx?raw'
 
 const basicSnippet = `<VirtualList itemCount={10000} itemHeight={40} height={300}
   renderItem={({ index }) => <div className="px-4 flex items-center h-full">第 {index + 1} 行</div>}
@@ -40,7 +41,7 @@ const VirtualListDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">VirtualList 虚拟列表</h1>
       <p className="text-gray-500 mb-8">虚拟滚动渲染大量列表项，只渲染可视区域内的元素。</p>
 
-      <DemoBlock title="基础用法" description="10000 条数据，itemHeight=40" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="10000 条数据，itemHeight=40" code={fullPageSnippet}>
         <div style={{ border: '1px solid #e5e7eb', borderRadius: 8 }}>
           <VirtualList itemCount={10000} itemHeight={40} height={300} renderItem={renderItem} />
         </div>
@@ -49,7 +50,7 @@ const VirtualListDemo: React.FC = () => {
       <DemoBlock
         title="自定义高度 & overscan"
         description="itemHeight=60，overscan=10"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <VirtualList
           itemCount={5000}
           itemHeight={60}

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { HeatmapChart } from '@expcat/tigercat-react/HeatmapChart'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './HeatmapChartDemo.tsx?raw'
 
 const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
 const hours = ['上午', '下午', '晚上']
@@ -36,7 +37,7 @@ const HeatmapChartDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">HeatmapChart 热力图</h1>
       <p className="text-gray-500 mb-8">矩阵热力图，用颜色深浅展示数据密度。</p>
 
-      <DemoBlock title="基础用法" description="xLabels / yLabels 定义坐标轴" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="xLabels / yLabels 定义坐标轴" code={fullPageSnippet}>
         <HeatmapChart
           data={heatData}
           xLabels={days}
@@ -50,7 +51,7 @@ const HeatmapChartDemo: React.FC = () => {
       <DemoBlock
         title="显示数值 & 自定义颜色"
         description="showValues、minColor、maxColor"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <HeatmapChart
           data={heatData}
           xLabels={days}

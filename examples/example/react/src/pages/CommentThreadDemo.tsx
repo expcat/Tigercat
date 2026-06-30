@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { CommentThread } from '@expcat/tigercat-react/CommentThread'
 import type { CommentNode } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './CommentThreadDemo.tsx?raw'
 
 const initialNodes: CommentNode[] = [
   {
@@ -216,8 +217,7 @@ export default function CommentThreadDemo() {
       <DemoBlock
         title="嵌套回复"
         description="支持多层嵌套、展开/收起、加载更多和实时回复。点击回复按钮试试。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <CommentThread
           nodes={nodes}
           defaultExpandedKeys={[1]}
@@ -231,18 +231,18 @@ export default function CommentThreadDemo() {
       <DemoBlock
         title="扁平数据"
         description="传入 items（带 parentId）即可自动构建嵌套层级。"
-        code={flatSnippet}>
+        code={fullPageSnippet}>
         <CommentThread items={flatItems} defaultExpandedKeys={[100]} />
       </DemoBlock>
 
       <DemoBlock
         title="精简模式"
         description="隐藏点赞、更多按钮和分割线，适合轻量展示。"
-        code={minimalSnippet}>
+        code={fullPageSnippet}>
         <CommentThread nodes={minimalNodes} showLike={false} showMore={false} showDivider={false} />
       </DemoBlock>
 
-      <DemoBlock title="空态" description="无数据时展示空状态文案。" code={emptySnippet}>
+      <DemoBlock title="空态" description="无数据时展示空状态文案。" code={fullPageSnippet}>
         <CommentThread items={[]} emptyText="暂无评论" />
       </DemoBlock>
     </div>

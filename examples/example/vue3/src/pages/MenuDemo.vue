@@ -6,6 +6,7 @@ import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
 import { Menu } from '@expcat/tigercat-vue/Menu'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './MenuDemo.vue?raw'
 
 const selectedKeys1 = ref(['1'])
 const selectedKeys2 = ref(['home'])
@@ -142,11 +143,7 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock
-      title="基本用法"
-      description="垂直菜单，默认模式。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基本用法" description="垂直菜单，默认模式。" :code="fullPageSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu v-model:selectedKeys="selectedKeys1">
@@ -163,7 +160,7 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     <DemoBlock
       title="横向菜单"
       description="水平导航菜单，支持多级嵌套级联展开。"
-      :code="horizontalSnippet">
+      :code="fullPageSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white">
           <Menu mode="horizontal" v-model:selectedKeys="selectedKeys2">
@@ -183,7 +180,7 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 子菜单 -->
-    <DemoBlock title="子菜单" description="多级菜单结构。" :code="subMenuSnippet">
+    <DemoBlock title="子菜单" description="多级菜单结构。" :code="fullPageSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu v-model:selectedKeys="selectedKeys3" v-model:openKeys="openKeys3">
@@ -203,7 +200,10 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 内联模式 -->
-    <DemoBlock title="内联模式" description="垂直菜单，子菜单内嵌在菜单中。" :code="inlineSnippet">
+    <DemoBlock
+      title="内联模式"
+      description="垂直菜单，子菜单内嵌在菜单中。"
+      :code="fullPageSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu mode="inline" v-model:selectedKeys="selectedKeys4" v-model:openKeys="openKeys4">
@@ -221,7 +221,7 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 收起菜单 -->
-    <DemoBlock title="收起菜单" description="可以收起的垂直菜单。" :code="collapseSnippet">
+    <DemoBlock title="收起菜单" description="可以收起的垂直菜单。" :code="fullPageSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="mb-4">
           <Button
@@ -244,7 +244,7 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 暗色主题 -->
-    <DemoBlock title="暗色主题" description="使用暗色主题的菜单。" :code="darkSnippet">
+    <DemoBlock title="暗色主题" description="使用暗色主题的菜单。" :code="fullPageSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="inline-block">
           <Menu theme="dark" v-model:selectedKeys="selectedKeys6">
@@ -260,7 +260,7 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </DemoBlock>
 
     <!-- 带图标的菜单 -->
-    <DemoBlock title="带图标的菜单" description="菜单项可以添加图标。" :code="iconSnippet">
+    <DemoBlock title="带图标的菜单" description="菜单项可以添加图标。" :code="fullPageSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu v-model:selectedKeys="selectedKeys7">
@@ -279,7 +279,7 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     <DemoBlock
       title="菜单项分组"
       description="使用 MenuItemGroup 对菜单项进行分组。"
-      :code="groupSnippet">
+      :code="fullPageSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu>
@@ -300,7 +300,7 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     <DemoBlock
       title="单一展开模式"
       description="设置 multiple=false，同时只能展开一个子菜单。"
-      :code="singleOpenSnippet">
+      :code="fullPageSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu :multiple="false" v-model:selectedKeys="selectedKeys8" v-model:openKeys="openKeys8">

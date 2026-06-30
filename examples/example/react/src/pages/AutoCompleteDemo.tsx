@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AutoComplete } from '@expcat/tigercat-react/AutoComplete'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './AutoCompleteDemo.tsx?raw'
 
 const allOptions = ['React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Preact', 'Next.js', 'Nuxt'].map(
   (o) => ({ label: o, value: o })
@@ -33,11 +34,7 @@ const AutoCompleteDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">AutoComplete 自动补全</h1>
       <p className="text-gray-500 mb-8">输入框自动完成，根据输入内容过滤候选项。</p>
 
-      <DemoBlock
-        title="基本用法"
-        description="输入时自动过滤匹配选项"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="输入时自动过滤匹配选项" code={fullPageSnippet}>
         <AutoComplete
           value={val}
           onChange={(v) => setVal(String(v))}
@@ -49,7 +46,7 @@ const AutoCompleteDemo: React.FC = () => {
       <DemoBlock
         title="自定义选项"
         description="options 支持 {label, value} 对象"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <AutoComplete
           value={val2}
           onChange={(v) => setVal2(String(v))}

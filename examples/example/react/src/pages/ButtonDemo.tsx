@@ -4,94 +4,6 @@ import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
 import fullPageSnippet from './ButtonDemo.tsx?raw'
 
-const typeSnippet = `<Space wrap>
-  <Button variant="primary">主要按钮</Button>
-  <Button variant="secondary">次要按钮</Button>
-  <Button variant="outline">轮廓按钮</Button>
-  <Button variant="ghost">幽灵按钮</Button>
-  <Button variant="link">链接按钮</Button>
-</Space>`
-
-const sizeSnippet = `<Space align="center">
-  <Button size="sm">小按钮</Button>
-  <Button size="md">中按钮</Button>
-  <Button size="lg">大按钮</Button>
-</Space>`
-
-const stateSnippet = `<Space direction="vertical" className="w-full">
-  <div>
-    <h3 className="text-sm font-semibold mb-2 text-gray-700">正常状态</h3>
-    <Space>
-      <Button variant="primary">主要按钮</Button>
-      <Button variant="secondary">次要按钮</Button>
-      <Button variant="outline">轮廓按钮</Button>
-    </Space>
-  </div>
-  <div>
-    <h3 className="text-sm font-semibold mb-2 text-gray-700">禁用状态</h3>
-    <Space>
-      <Button variant="primary" disabled>主要按钮</Button>
-      <Button variant="secondary" disabled>次要按钮</Button>
-      <Button variant="outline" disabled>轮廓按钮</Button>
-    </Space>
-  </div>
-  <div>
-    <h3 className="text-sm font-semibold mb-2 text-gray-700">加载状态</h3>
-    <Space>
-      <Button variant="primary" loading>主要按钮</Button>
-      <Button variant="secondary" loading>次要按钮</Button>
-      <Button variant="outline" loading>轮廓按钮</Button>
-    </Space>
-  </div>
-</Space>`
-
-const customLoadingSnippet = `<Space>
-  <Button
-    variant="primary"
-    loading
-    loadingIcon={
-      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-    }>
-    自定义加载图标
-  </Button>
-</Space>`
-
-const eventSnippet = `<Space align="center">
-  <Button variant="primary" onClick={() => setCount(c => c + 1)}>
-    已点击 {count} 次
-  </Button>
-  <Button variant="secondary" onClick={() => setCount(0)}>
-    重置
-  </Button>
-</Space>`
-
-const eventScriptSnippet = `import { useState } from 'react'
-
-const [count, setCount] = useState(0)`
-
-const htmlTypeSnippet = `<form onSubmit={(e) => { e.preventDefault(); alert('已提交') }}>
-  <Space>
-    <Button htmlType="submit" variant="primary">提交</Button>
-    <Button htmlType="reset" variant="outline">重置</Button>
-    <Button htmlType="button" variant="ghost">普通按钮</Button>
-  </Space>
-</form>`
-
-const blockSnippet = `<Space direction="vertical" className="w-full">
-  <Button variant="primary" block>主要按钮</Button>
-  <Button variant="secondary" block>次要按钮</Button>
-  <Button variant="outline" block>轮廓按钮</Button>
-</Space>`
-
-const fullWidthSnippet = `<Space direction="vertical" className="w-full">
-  <Button variant="primary" className="w-1/2">50% 宽度</Button>
-  <Button variant="secondary" className="w-3/4">75% 宽度</Button>
-  <Button variant="outline" className="w-full">100% 宽度</Button>
-</Space>`
-
 const ButtonDemo: React.FC = () => {
   const [clickCount, setClickCount] = useState(0)
 
@@ -102,175 +14,121 @@ const ButtonDemo: React.FC = () => {
         <p className="text-gray-600 dark:text-gray-400">按钮用于触发一个操作。</p>
       </div>
 
-      {/* 按钮类型 */}
       <DemoBlock
-        title="按钮类型"
-        description="按钮有五种类型：主要按钮、次要按钮、轮廓按钮、幽灵按钮和链接按钮。"
+        title="外观、尺寸与状态"
+        description="合并展示按钮类型、尺寸、禁用/加载状态和自定义加载图标。"
         code={fullPageSnippet}>
-        <Space wrap>
-          <Button variant="primary">主要按钮</Button>
-          <Button variant="secondary">次要按钮</Button>
-          <Button variant="outline">轮廓按钮</Button>
-          <Button variant="ghost">幽灵按钮</Button>
-          <Button variant="link">链接按钮</Button>
-        </Space>
-      </DemoBlock>
-
-      {/* 按钮大小 */}
-      <DemoBlock title="按钮大小" description="按钮有三种尺寸：小、中、大。" code={fullPageSnippet}>
-        <Space align="center">
-          <Button size="sm">小按钮</Button>
-          <Button size="md">中按钮</Button>
-          <Button size="lg">大按钮</Button>
-        </Space>
-      </DemoBlock>
-
-      {/* 按钮状态 */}
-      <DemoBlock
-        title="按钮状态"
-        description="按钮可以处于正常、禁用或加载状态。"
-        code={fullPageSnippet}>
-        <Space direction="vertical" className="w-full">
+        <Space direction="vertical" className="w-full" size="lg">
           <div>
-            <h3 className="text-sm font-semibold mb-2 text-gray-700">正常状态</h3>
-            <Space>
+            <h3 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-200">类型</h3>
+            <Space wrap>
               <Button variant="primary">主要按钮</Button>
               <Button variant="secondary">次要按钮</Button>
               <Button variant="outline">轮廓按钮</Button>
+              <Button variant="ghost">幽灵按钮</Button>
+              <Button variant="link">链接按钮</Button>
             </Space>
           </div>
           <div>
-            <h3 className="text-sm font-semibold mb-2 text-gray-700">禁用状态</h3>
-            <Space>
-              <Button variant="primary" disabled>
-                主要按钮
-              </Button>
+            <h3 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-200">尺寸</h3>
+            <Space align="center">
+              <Button size="sm">小按钮</Button>
+              <Button size="md">中按钮</Button>
+              <Button size="lg">大按钮</Button>
+            </Space>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-200">状态</h3>
+            <Space wrap>
+              <Button variant="primary">主要按钮</Button>
               <Button variant="secondary" disabled>
-                次要按钮
-              </Button>
-              <Button variant="outline" disabled>
-                轮廓按钮
-              </Button>
-            </Space>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold mb-2 text-gray-700">加载状态</h3>
-            <Space>
-              <Button variant="primary" loading>
-                主要按钮
-              </Button>
-              <Button variant="secondary" loading>
-                次要按钮
+                禁用按钮
               </Button>
               <Button variant="outline" loading>
-                轮廓按钮
+                加载中
+              </Button>
+              <Button
+                variant="primary"
+                loading
+                loadingIcon={
+                  <svg
+                    className="animate-spin h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                }>
+                自定义加载图标
               </Button>
             </Space>
           </div>
         </Space>
       </DemoBlock>
 
-      {/* 自定义加载图标 */}
       <DemoBlock
-        title="自定义加载图标"
-        description="通过 loadingIcon 属性自定义加载状态的图标。"
+        title="行为与原生类型"
+        description="合并展示点击事件和 HTML 原生 button 类型。"
         code={fullPageSnippet}>
-        <Space>
-          <Button
-            variant="primary"
-            loading
-            loadingIcon={
-              <svg
-                className="animate-spin h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            }>
-            自定义加载图标
-          </Button>
-        </Space>
-      </DemoBlock>
-
-      {/* 事件处理 */}
-      <DemoBlock
-        title="事件处理"
-        description="通过 onClick 监听按钮点击事件。"
-        code={fullPageSnippet}>
-        <Space align="center">
-          <Button variant="primary" onClick={() => setClickCount((c) => c + 1)}>
-            已点击 {clickCount} 次
-          </Button>
-          <Button variant="secondary" onClick={() => setClickCount(0)}>
-            重置
-          </Button>
-        </Space>
-      </DemoBlock>
-
-      {/* 原生类型 */}
-      <DemoBlock
-        title="原生类型"
-        description="通过 htmlType 属性设置 HTML 原生 button 类型（submit / reset / button）。"
-        code={fullPageSnippet}>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <Space>
-            <Button htmlType="submit" variant="primary">
-              提交
+        <Space direction="vertical" className="w-full" size="lg">
+          <Space align="center">
+            <Button variant="primary" onClick={() => setClickCount((c) => c + 1)}>
+              已点击 {clickCount} 次
             </Button>
-            <Button htmlType="reset" variant="outline">
+            <Button variant="secondary" onClick={() => setClickCount(0)}>
               重置
             </Button>
-            <Button htmlType="button" variant="ghost">
-              普通按钮
-            </Button>
           </Space>
-        </form>
-      </DemoBlock>
-
-      {/* 块级按钮 */}
-      <DemoBlock
-        title="块级按钮"
-        description="block 属性将使按钮适合其父宽度。"
-        code={fullPageSnippet}>
-        <Space direction="vertical" className="w-full">
-          <Button variant="primary" block>
-            主要按钮
-          </Button>
-          <Button variant="secondary" block>
-            次要按钮
-          </Button>
-          <Button variant="outline" block>
-            轮廓按钮
-          </Button>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <Space>
+              <Button htmlType="submit" variant="primary">
+                提交
+              </Button>
+              <Button htmlType="reset" variant="outline">
+                重置
+              </Button>
+              <Button htmlType="button" variant="ghost">
+                普通按钮
+              </Button>
+            </Space>
+          </form>
         </Space>
       </DemoBlock>
 
-      {/* 自定义宽度按钮 */}
       <DemoBlock
-        title="自定义宽度按钮"
-        description="使用 className 设置按钮为任意宽度，与 block 属性不同，可以灵活控制宽度比例。"
+        title="宽度"
+        description="合并展示 block 填满容器和 className 自定义宽度两种方式。"
         code={fullPageSnippet}>
-        <Space direction="vertical" className="w-full">
-          <Button variant="primary" className="w-1/2">
-            50% 宽度
-          </Button>
-          <Button variant="secondary" className="w-3/4">
-            75% 宽度
-          </Button>
-          <Button variant="outline" className="w-full">
-            100% 宽度
-          </Button>
+        <Space direction="vertical" className="w-full" size="lg">
+          <Space direction="vertical" className="w-full">
+            <Button variant="primary" block>
+              block 主要按钮
+            </Button>
+            <Button variant="secondary" block>
+              block 次要按钮
+            </Button>
+          </Space>
+          <Space direction="vertical" className="w-full">
+            <Button variant="primary" className="w-1/2">
+              50% 宽度
+            </Button>
+            <Button variant="secondary" className="w-3/4">
+              75% 宽度
+            </Button>
+            <Button variant="outline" className="w-full">
+              100% 宽度
+            </Button>
+          </Space>
         </Space>
       </DemoBlock>
     </div>

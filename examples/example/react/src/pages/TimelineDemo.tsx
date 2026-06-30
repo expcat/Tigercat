@@ -1,6 +1,7 @@
 import { Tag } from '@expcat/tigercat-react/Tag'
 import { Timeline } from '@expcat/tigercat-react/Timeline'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TimelineDemo.tsx?raw'
 
 type ProjectStatus = 'completed' | 'in-progress' | 'pending'
 
@@ -262,14 +263,14 @@ export default function TimelineDemo() {
       <DemoBlock
         title="基本用法"
         description="通过 items 提供数据源即可渲染时间线。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <Timeline items={basicEvents} />
       </DemoBlock>
 
       <DemoBlock
         title="展示模式"
         description="支持 left/right/alternate 三种展示模式。"
-        code={modeSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-6">
           <div className="p-6 bg-gray-50 rounded-lg">
             <div className="text-lg font-semibold mb-4">左侧时间线（默认）</div>
@@ -289,21 +290,21 @@ export default function TimelineDemo() {
       <DemoBlock
         title="自定义颜色"
         description="通过 item.color 设置时间点颜色。"
-        code={colorSnippet}>
+        code={fullPageSnippet}>
         <Timeline items={coloredEvents} />
       </DemoBlock>
 
       <DemoBlock
         title="自定义节点（dot）"
         description="通过 item.dot 为单个节点提供自定义内容。"
-        code={dotSnippet}>
+        code={fullPageSnippet}>
         <Timeline items={customDotEvents} />
       </DemoBlock>
 
       <DemoBlock
         title="自定义节点（renderDot）"
         description="通过 renderDot 统一控制节点渲染（适合按状态/数据决定样式）。"
-        code={renderDotSnippet}>
+        code={fullPageSnippet}>
         <Timeline
           items={renderDotEvents}
           renderDot={(item) => {
@@ -321,7 +322,7 @@ export default function TimelineDemo() {
       <DemoBlock
         title="自定义内容（renderItem）"
         description="通过 renderItem 自定义每个时间线项的内容区域。"
-        code={renderItemSnippet}>
+        code={fullPageSnippet}>
         <Timeline
           items={projectTimeline}
           renderItem={(item) => {
@@ -347,7 +348,7 @@ export default function TimelineDemo() {
       <DemoBlock
         title="等待中状态"
         description="通过 pending/pendingDot/pendingContent 展示“处理中”状态。"
-        code={pendingSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-6">
           <div className="p-6 bg-gray-50 rounded-lg">
             <div className="text-lg font-semibold mb-4">默认等待内容</div>
@@ -390,14 +391,17 @@ export default function TimelineDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="反转顺序" description="通过 reverse 反转时间线顺序。" code={reverseSnippet}>
+      <DemoBlock
+        title="反转顺序"
+        description="通过 reverse 反转时间线顺序。"
+        code={fullPageSnippet}>
         <Timeline items={basicEvents} reverse />
       </DemoBlock>
 
       <DemoBlock
         title="完整示例"
         description="组合 mode + renderItem + color 展示一个“项目时间线”。"
-        code={exampleSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-2xl">
           <Timeline
             items={projectTimeline}

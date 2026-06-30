@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ImageAnnotation } from '@expcat/tigercat-react/ImageAnnotation'
 import type { ImageAnnotation as ImageAnnotationItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ImageAnnotationDemo.tsx?raw'
 
 const PHOTO = 'https://picsum.photos/seed/annotation/900/600'
 
@@ -55,7 +56,7 @@ export default function ImageAnnotationDemo() {
       <DemoBlock
         title="受控标注"
         description="通过 value / onChange 管理标注数据，切换工具后在图片上拖拽绘制。"
-        code={controlledSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <ImageAnnotation
             src={PHOTO}
@@ -74,7 +75,7 @@ export default function ImageAnnotationDemo() {
       <DemoBlock
         title="多形状工具"
         description="内置 select、rectangle、ellipse、polygon、freehand 工具；多边形可用双击或 Enter 完成。"
-        code={shapeSnippet}>
+        code={fullPageSnippet}>
         <ImageAnnotation
           src={PHOTO}
           tools={['select', 'rectangle', 'ellipse', 'polygon', 'freehand']}

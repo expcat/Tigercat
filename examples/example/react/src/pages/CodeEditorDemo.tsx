@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CodeEditor } from '@expcat/tigercat-react/CodeEditor'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './CodeEditorDemo.tsx?raw'
 
 const defaultJs = `function greet(name) {
   console.log('Hello, ' + name)
@@ -31,19 +32,15 @@ const CodeEditorDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">CodeEditor 代码编辑器</h1>
       <p className="text-gray-500 mb-8">轻量级代码编辑器，支持语法高亮、行号和主题切换。</p>
 
-      <DemoBlock
-        title="基础用法"
-        description="language 设置语言"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基础用法" description="language 设置语言" code={fullPageSnippet}>
         <CodeEditor value={code} onChange={setCode} language="javascript" minLines={5} />
       </DemoBlock>
 
-      <DemoBlock title="主题 & 只读" description="theme='dark'，readOnly" code={themeSnippet}>
+      <DemoBlock title="主题 & 只读" description="theme='dark'，readOnly" code={fullPageSnippet}>
         <CodeEditor value={htmlCode} language="html" theme="dark" readOnly minLines={5} />
       </DemoBlock>
 
-      <DemoBlock title="配置项" description="tabSize、wordWrap、placeholder" code={configSnippet}>
+      <DemoBlock title="配置项" description="tabSize、wordWrap、placeholder" code={fullPageSnippet}>
         <CodeEditor
           language="css"
           tabSize={4}

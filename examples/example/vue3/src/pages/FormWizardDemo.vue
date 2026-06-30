@@ -7,6 +7,7 @@ import { reactive, ref } from 'vue'
 import { FormWizard } from '@expcat/tigercat-vue/FormWizard'
 import type { WizardStep } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './FormWizardDemo.vue?raw'
 
 const steps: WizardStep[] = [
   { title: '基本信息', description: '填写姓名与邮箱', fields: ['name', 'email'] },
@@ -92,11 +93,7 @@ const labelsSnippet = `<!-- 单语言项目：无需 locale，直接用扁平 la
       <p class="text-gray-600 dark:text-gray-400">多步表单流，支持校验阻断与完成态。</p>
     </div>
 
-    <DemoBlock
-      title="基础用法"
-      description="多步校验阻断 + 完成态"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="多步校验阻断 + 完成态" :code="fullPageSnippet">
       <FormWizard
         v-model:current="current"
         :steps="steps"
@@ -151,7 +148,7 @@ const labelsSnippet = `<!-- 单语言项目：无需 locale，直接用扁平 la
     <DemoBlock
       title="自定义文案 (labels)"
       description="单语言项目无需引入 locale，直接用扁平 labels 覆盖上一步/下一步/完成按钮文案。"
-      :code="labelsSnippet">
+      :code="fullPageSnippet">
       <FormWizard
         v-model:current="currentLabels"
         :steps="steps"

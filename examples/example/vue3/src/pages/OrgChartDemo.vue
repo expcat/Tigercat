@@ -8,7 +8,7 @@
     <DemoBlock
       title="基础用法"
       description="树形组织数据，节点自动居中到子树范围。"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <OrgChart
           :data="orgData"
@@ -29,7 +29,7 @@
     <DemoBlock
       title="横向布局"
       description="direction='horizontal' 将层级从左向右展开。"
-      :code="horizontalSnippet">
+      :code="fullPageSnippet">
       <OrgChart :data="orgData" direction="horizontal" :width="760" :height="460" hoverable />
     </DemoBlock>
   </div>
@@ -40,6 +40,7 @@ import { ref } from 'vue'
 import { OrgChart } from '@expcat/tigercat-vue/OrgChart'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './OrgChartDemo.vue?raw'
 
 const selectedId = ref<string | number | null>(null)
 

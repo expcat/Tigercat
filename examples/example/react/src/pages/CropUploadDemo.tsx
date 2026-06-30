@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CropUpload } from '@expcat/tigercat-react/CropUpload'
 import type { CropResult } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './CropUploadDemo.tsx?raw'
 
 const basicSnippet = `<CropUpload onCropComplete={(r) => setResult(r)} onError={handleError} />
 {result && <img src={result.dataUrl} />}`
@@ -57,8 +58,7 @@ export default function CropUploadDemo() {
       <DemoBlock
         title="基本用法"
         description="点击按钮选择图片，弹窗中裁剪后获取结果"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <CropUpload onCropComplete={handleCropComplete} onError={handleError} />
           {result1 && (
@@ -77,7 +77,7 @@ export default function CropUploadDemo() {
       <DemoBlock
         title="固定宽高比"
         description="通过 cropperProps 传递 aspectRatio 实现正方形裁剪"
-        code={aspectRatioSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <CropUpload cropperProps={{ aspectRatio: 1 }} onCropComplete={handleSquareCrop} />
           {result2 && (
@@ -96,7 +96,7 @@ export default function CropUploadDemo() {
       <DemoBlock
         title="自定义触发按钮"
         description="通过 children 自定义触发按钮"
-        code={customTriggerSnippet}>
+        code={fullPageSnippet}>
         <CropUpload onCropComplete={handleCropComplete}>
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded cursor-pointer hover:bg-green-600 transition-colors">
             📷 上传头像
@@ -107,7 +107,7 @@ export default function CropUploadDemo() {
       <DemoBlock
         title="限制文件大小"
         description="maxSize 限制文件大小（字节），超出触发 onError"
-        code={maxSizeSnippet}>
+        code={fullPageSnippet}>
         <CropUpload
           maxSize={2 * 1024 * 1024}
           onCropComplete={handleCropComplete}
@@ -115,7 +115,7 @@ export default function CropUploadDemo() {
         />
       </DemoBlock>
 
-      <DemoBlock title="禁用状态" description="disabled 禁用触发按钮" code={disabledSnippet}>
+      <DemoBlock title="禁用状态" description="disabled 禁用触发按钮" code={fullPageSnippet}>
         <CropUpload disabled />
       </DemoBlock>
     </div>

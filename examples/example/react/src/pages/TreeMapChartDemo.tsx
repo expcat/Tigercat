@@ -1,5 +1,6 @@
 import { TreeMapChart } from '@expcat/tigercat-react/TreeMapChart'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TreeMapChartDemo.tsx?raw'
 
 const flatData = [
   { label: '技术部', value: 40 },
@@ -58,15 +59,15 @@ const TreeMapChartDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">TreeMapChart 矩形树图</h1>
       <p className="text-gray-500 mb-8">以嵌套矩形展示层级数据的占比关系。</p>
 
-      <DemoBlock title="基础用法" description="扁平数据，自动分配颜色" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="扁平数据，自动分配颜色" code={fullPageSnippet}>
         <TreeMapChart data={flatData} width={500} height={300} hoverable showLegend />
       </DemoBlock>
 
-      <DemoBlock title="层级数据" description="children 嵌套结构" code={nestedSnippet}>
+      <DemoBlock title="层级数据" description="children 嵌套结构" code={fullPageSnippet}>
         <TreeMapChart data={nestedData} width={500} height={300} hoverable />
       </DemoBlock>
 
-      <DemoBlock title="自定义样式" description="gap、showLabels、颜色" code={customSnippet}>
+      <DemoBlock title="自定义样式" description="gap、showLabels、颜色" code={fullPageSnippet}>
         <TreeMapChart
           data={flatData}
           width={500}

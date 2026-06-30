@@ -6,7 +6,7 @@
     <DemoBlock
       title="基础用法"
       description="1000 行数据，virtualItemHeight=48"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <VirtualTable
         :data-source="basicData"
         :columns="basicColumns"
@@ -14,7 +14,7 @@
         :virtual-item-height="48" />
     </DemoBlock>
 
-    <DemoBlock title="斑马纹 & 边框" description="striped + bordered" :code="styledSnippet">
+    <DemoBlock title="斑马纹 & 边框" description="striped + bordered" :code="fullPageSnippet">
       <VirtualTable
         :data-source="basicData"
         :columns="basicColumns"
@@ -26,7 +26,7 @@
     <DemoBlock
       title="固定列样式自定义"
       description="固定列支持 fixedClassName / fixedHeaderClassName，可根据 selected 状态自定义 sticky 单元格外观。"
-      :code="fixedSnippet">
+      :code="fullPageSnippet">
       <VirtualTable
         :data-source="basicData.slice(0, 24)"
         :columns="fixedColumns"
@@ -36,7 +36,7 @@
         :row-selection="{ selectedRowKeys: [2, 4] }" />
     </DemoBlock>
 
-    <DemoBlock title="加载 & 空状态" description="loading 和 emptyText" :code="stateSnippet">
+    <DemoBlock title="加载 & 空状态" description="loading 和 emptyText" :code="fullPageSnippet">
       <div class="flex gap-4">
         <div class="flex-1">
           <p class="text-sm text-gray-500 mb-2">Loading</p>
@@ -59,6 +59,7 @@
 import { VirtualTable } from '@expcat/tigercat-vue/VirtualTable'
 import { type TableColumn } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './VirtualTableDemo.vue?raw'
 
 const basicColumns: TableColumn[] = [
   { key: 'id', title: 'ID', width: 80 },

@@ -4,6 +4,7 @@ import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
 import { Slider } from '@expcat/tigercat-vue/Slider'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SliderDemo.vue?raw'
 
 const basicValue = ref(50)
 
@@ -144,11 +145,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock
-      title="基础用法"
-      description="基础的滑块用法，显示当前值。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="基础的滑块用法，显示当前值。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider v-model:value="basicValue" :min="0" :max="100" class="flex-1" />
@@ -158,7 +155,10 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </DemoBlock>
 
     <!-- 不同范围 -->
-    <DemoBlock title="不同范围" description="通过 min 和 max 属性设置范围。" :code="rangeSnippet">
+    <DemoBlock
+      title="不同范围"
+      description="通过 min 和 max 属性设置范围。"
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">0-100 (默认)</Text>
@@ -178,7 +178,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </DemoBlock>
 
     <!-- 步进 -->
-    <DemoBlock title="步进" description="通过 step 设置步进值。" :code="stepSnippet">
+    <DemoBlock title="步进" description="通过 step 设置步进值。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider v-model:value="stepValue" :min="0" :max="100" :step="10" class="flex-1" />
@@ -191,7 +191,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     <DemoBlock
       title="范围选择"
       description="通过 range 启用范围选择，此时值为 [min, max]。"
-      :code="rangeValueSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider v-model:value="rangeValue" range :min="0" :max="100" class="flex-1" />
@@ -201,7 +201,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </DemoBlock>
 
     <!-- 带标记 -->
-    <DemoBlock title="带标记" description="通过 marks 显示刻度标记。" :code="marksSnippet">
+    <DemoBlock title="带标记" description="通过 marks 显示刻度标记。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider v-model:value="marksValue" :min="0" :max="100" :marks="marks" class="flex-1" />
@@ -214,7 +214,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     <DemoBlock
       title="工具提示"
       description="通过 tooltip 控制是否显示提示（默认开启）。"
-      :code="tooltipSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">tooltip on（默认）</Text>
@@ -239,7 +239,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </DemoBlock>
 
     <!-- 禁用状态 -->
-    <DemoBlock title="禁用状态" description="通过 disabled 属性禁用滑块。" :code="disabledSnippet">
+    <DemoBlock title="禁用状态" description="通过 disabled 属性禁用滑块。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider v-model:value="disabledValue" :min="0" :max="100" disabled class="flex-1" />
@@ -252,7 +252,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     <DemoBlock
       title="不同尺寸"
       description="Slider 支持 sm / md / lg 三种尺寸。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">sm</Text>
@@ -282,7 +282,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     <DemoBlock
       title="默认值"
       description="通过 default-value 设置初始值，无需绑定 v-model（非受控模式）。"
-      :code="defaultValueSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider :default-value="60" :min="0" :max="100" class="flex-1" />

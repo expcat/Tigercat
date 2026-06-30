@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import type { SignatureChangePayload, SignatureExportType } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SignatureDemo.vue?raw'
 
 interface SignatureExpose {
   clear: () => void
@@ -62,7 +63,7 @@ const disabledSnippet = `<Signature disabled />
     <DemoBlock
       title="基本用法"
       description="通过 change 事件获取当前签名导出值"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-3">
         <Signature
           :width="420"
@@ -82,7 +83,7 @@ const disabledSnippet = `<Signature disabled />
     <DemoBlock
       title="导出"
       description="通过 ref 导出 PNG data URL 或 SVG 字符串"
-      :code="exportSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <Signature ref="signatureRef" :width="420" :height="180" background-color="#ffffff" />
         <div class="flex flex-wrap gap-3">
@@ -106,7 +107,7 @@ const disabledSnippet = `<Signature disabled />
     <DemoBlock
       title="禁用和只读"
       description="disabled / readonly 状态下不可绘制"
-      :code="disabledSnippet">
+      :code="fullPageSnippet">
       <div class="grid gap-4 md:grid-cols-2">
         <Signature :width="320" :height="140" disabled clear-text="清空" />
         <Signature :width="320" :height="140" readonly clear-text="清空" />

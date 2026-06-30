@@ -9,7 +9,6 @@ const props = defineProps<{
   title: string
   description?: string
   code: string
-  script?: string
 }>()
 
 const activeKey = ref('preview')
@@ -17,8 +16,7 @@ const copied = ref(false)
 let resetTimer: ReturnType<typeof setTimeout> | null = null
 
 const handleCopy = async () => {
-  const text = activeKey.value === 'script' ? (props.script ?? '') : props.code
-  const ok = await copyTextToClipboard(text)
+  const ok = await copyTextToClipboard(props.code)
   if (!ok) return
   copied.value = true
   if (resetTimer) clearTimeout(resetTimer)
@@ -53,7 +51,6 @@ const copyButtonClasses =
       <Tabs v-model:activeKey="activeKey" type="card">
         <TabPane tabKey="preview" label="示例" />
         <TabPane tabKey="code" label="代码" />
-        <TabPane v-if="props.script" tabKey="script" label="脚本" />
       </Tabs>
       <div v-if="activeKey === 'preview'" :class="previewPanelClasses">
         <slot />
@@ -68,17 +65,6 @@ const copyButtonClasses =
           <span>{{ copied ? '已复制' : '复制' }}</span>
         </button>
         <Code :code="props.code" />
-      </div>
-      <div v-else-if="activeKey === 'script' && props.script" :class="codePanelClasses">
-        <button
-          type="button"
-          :class="copyButtonClasses"
-          :aria-label="copied ? '已复制' : '复制代码'"
-          @click="handleCopy">
-          <span aria-hidden="true">{{ copied ? '✓' : '⧉' }}</span>
-          <span>{{ copied ? '已复制' : '复制' }}</span>
-        </button>
-        <Code :code="props.script" />
       </div>
     </div>
   </section>

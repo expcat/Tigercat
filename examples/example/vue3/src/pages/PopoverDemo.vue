@@ -5,6 +5,7 @@ import { List } from '@expcat/tigercat-vue/List'
 import { ref } from 'vue'
 import { Popover } from '@expcat/tigercat-vue/Popover'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './PopoverDemo.vue?raw'
 
 const basicSnippet = `<Popover content="这是一个气泡卡片的内容">
   <Button>触发气泡卡片</Button>
@@ -73,7 +74,7 @@ const customContentItems = [
     <DemoBlock
       title="基本用法"
       description="最简单的用法，点击按钮显示气泡卡片。"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Popover content="这是一个气泡卡片的内容">
           <Button>触发气泡卡片</Button>
@@ -81,7 +82,7 @@ const customContentItems = [
       </div>
     </DemoBlock>
 
-    <DemoBlock title="带标题" description="可以通过 title 属性设置标题。" :code="titleSnippet">
+    <DemoBlock title="带标题" description="可以通过 title 属性设置标题。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Popover title="气泡卡片标题" content="这是一个带标题的气泡卡片内容">
           <Button>带标题的气泡卡片</Button>
@@ -89,7 +90,7 @@ const customContentItems = [
       </div>
     </DemoBlock>
 
-    <DemoBlock title="自定义内容" description="可以通过插槽自定义内容。" :code="customSnippet">
+    <DemoBlock title="自定义内容" description="可以通过插槽自定义内容。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Popover>
           <template #title>
@@ -121,7 +122,7 @@ const customContentItems = [
     <DemoBlock
       title="不同位置"
       description="通过 placement 属性设置弹出位置。"
-      :code="placementSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-2 gap-4">
           <Popover title="提示" content="上方弹出" placement="top">
@@ -146,7 +147,7 @@ const customContentItems = [
     <DemoBlock
       title="触发方式"
       description="支持 click、hover、focus、manual 四种触发方式。"
-      :code="triggerSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Popover title="点击触发" content="点击按钮触发" trigger="click">
@@ -175,8 +176,7 @@ const customContentItems = [
     <DemoBlock
       title="受控模式"
       description="通过 v-model:open 控制气泡卡片的显示状态。"
-      :code="controlledSnippet"
-      :script="controlledScriptSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Popover v-model:open="visible1" title="受控气泡卡片" content="通过外部状态控制显示">
@@ -193,7 +193,7 @@ const customContentItems = [
     <DemoBlock
       title="自定义宽度"
       description="通过 width 属性自定义气泡卡片的宽度。"
-      :code="widthSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Popover title="自定义宽度" content="这是一个宽度为 300px 的气泡卡片" width="300">
@@ -207,7 +207,7 @@ const customContentItems = [
       </div>
     </DemoBlock>
 
-    <DemoBlock title="禁用状态" description="禁用状态下无法触发气泡卡片。" :code="disabledSnippet">
+    <DemoBlock title="禁用状态" description="禁用状态下无法触发气泡卡片。" :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Popover title="禁用状态" content="这个气泡卡片已被禁用" disabled>
           <Button disabled>禁用的气泡卡片</Button>
@@ -218,7 +218,7 @@ const customContentItems = [
     <DemoBlock
       title="偏移距离"
       description="通过 offset 属性设置气泡卡片与触发元素的距离。"
-      :code="offsetSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space :size="16">
           <Popover title="默认偏移" content="默认 8px 偏移">
@@ -235,7 +235,7 @@ const customContentItems = [
     <DemoBlock
       title="自动翻转 (Floating UI)"
       description="当弹出位置空间不足时，Popover 会自动翻转到对侧显示。"
-      :code="flipSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-100 rounded overflow-auto h-32">
         <div class="pt-16">
           <Popover placement="top" title="自动翻转" content="空间不足时自动翻转到下方">

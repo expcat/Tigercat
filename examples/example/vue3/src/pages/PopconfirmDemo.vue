@@ -4,6 +4,7 @@ import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Popconfirm } from '@expcat/tigercat-vue/Popconfirm'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './PopconfirmDemo.vue?raw'
 
 const basicSnippet = `<Popconfirm title="确定要删除这条记录吗？">
   <Button variant="secondary">删除</Button>
@@ -62,7 +63,7 @@ const handleCancel = () => {
     <DemoBlock
       title="基本用法"
       description="最简单的用法，点击按钮打开确认框。"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Popconfirm title="确定要删除这条记录吗？" @confirm="handleConfirm" @cancel="handleCancel">
           <Button variant="secondary">删除</Button>
@@ -73,7 +74,7 @@ const handleCancel = () => {
     <DemoBlock
       title="不同位置"
       description="通过 placement 属性设置弹出位置。"
-      :code="placementSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-2 gap-4">
           <Popconfirm title="确定要删除吗？" placement="top">
@@ -98,7 +99,7 @@ const handleCancel = () => {
     <DemoBlock
       title="不同图标类型"
       description="支持 warning、info、error、success、question 五种图标类型。"
-      :code="iconSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Popconfirm title="这是警告信息" icon="warning">
@@ -127,7 +128,7 @@ const handleCancel = () => {
     <DemoBlock
       title="自定义按钮文字"
       description="通过 okText 和 cancelText 属性自定义按钮文字。"
-      :code="textSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Popconfirm
           title="确定要提交这个表单吗？"
@@ -142,7 +143,7 @@ const handleCancel = () => {
     <DemoBlock
       title="危险操作"
       description='通过 okType="danger" 将确认按钮设置为危险样式。'
-      :code="dangerSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Popconfirm
           title="确定要删除这个用户吗？"
@@ -159,7 +160,7 @@ const handleCancel = () => {
     <DemoBlock
       title="带描述信息"
       description="通过 description 属性添加详细描述。"
-      :code="descriptionSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Popconfirm
           title="确定要发布这篇文章吗？"
@@ -173,8 +174,7 @@ const handleCancel = () => {
     <DemoBlock
       title="受控模式"
       description="通过 v-model:open 控制 Popconfirm 的显示状态。"
-      :code="controlledSnippet"
-      :script="controlledScriptSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Popconfirm
@@ -203,7 +203,7 @@ const handleCancel = () => {
     <DemoBlock
       title="隐藏图标"
       description="通过 showIcon 属性控制图标显示。"
-      :code="noIconSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Popconfirm
           title="确定要继续吗？"
@@ -217,7 +217,7 @@ const handleCancel = () => {
     <DemoBlock
       title="禁用状态"
       description="通过 disabled 属性禁用 Popconfirm，点击触发元素不会打开确认框。"
-      :code="disabledSnippet">
+      :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Popconfirm title="此操作已禁用" :disabled="true">

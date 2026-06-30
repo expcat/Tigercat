@@ -978,3 +978,23 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `git diff --check`
 
 **状态更新要求**：已写回 R23 状态、日期、Basic/Layout 覆盖范围、代码展示来源策略、可复制复现方式和关键验证命令；阶段 17 已同步为 `已完成（2026-06-30）`，当前可执行任务为 `待追加`。R23 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R24 Example source guard and first merged demo pass
+
+**状态**：已完成（2026-06-30）。
+
+**目标**：在 R23 基础上将 raw-source code 展示策略扩展到所有 React/Vue Example 页面，移除 DemoBlock 的脚本 Tab，并开始合并互不冲突的展示效果。
+
+**允许修改**：`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/vue3/src/components/DemoBlock.vue`、React/Vue example pages、example/source 校验脚本、`package.json` scripts、`examples/README.md`、`scripts/README.md`、路线图归档。
+
+**不得修改**：组件 public API、组件运行时行为、发布产物策略、R21 分组 runner 语义、SSR 示例行为。
+
+**执行摘要**：React/Vue `DemoBlock` 已删除 `script` prop 与脚本 Tab，复制按钮只复制当前 code source。所有带 `DemoBlock` 的 React/Vue 页面均导入同页 `?raw` source，并将 `code` 指向该 raw source；新增 `scripts/validate-example-sources.mjs` 与 `example:sources:check`，校验页面不得传入 `script` 且 `code` 必须来自 `?raw` import，`quality:examples` 已先跑 source check 再跑 example build。Button 与 Input 的 React/Vue 页面已先行合并可共存展示：Button 从 8 个 DemoBlock 合并为 3 个，Input 从 11 个 DemoBlock 合并为 3 个；弹层、图表、高级交互和组合组件的剩余展示合并继续留给 R25-R27。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 example:sources:check`
+- `npx -y pnpm@11.9.0 --filter @expcat/tigercat-example-react build`
+- `npx -y pnpm@11.9.0 --filter @expcat/tigercat-example-vue3 build`
+
+**状态更新要求**：已写回 R24 状态、日期、全量 raw-source 护栏、Button/Input 展示合并范围和关键验证命令；阶段 18 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R25。R24 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。

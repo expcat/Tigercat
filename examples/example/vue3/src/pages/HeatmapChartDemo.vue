@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">HeatmapChart 热力图</h1>
     <p class="text-gray-500 mb-8">矩阵热力图，用颜色深浅展示数据密度。</p>
 
-    <DemoBlock title="基础用法" description="xLabels / yLabels 定义坐标轴" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="xLabels / yLabels 定义坐标轴" :code="fullPageSnippet">
       <HeatmapChart
         :data="heatData"
         :x-labels="days"
@@ -16,7 +16,7 @@
     <DemoBlock
       title="显示数值 & 自定义颜色"
       description="showValues、minColor、maxColor"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <HeatmapChart
         :data="heatData"
         :x-labels="days"
@@ -34,6 +34,7 @@
 <script setup lang="ts">
 import { HeatmapChart } from '@expcat/tigercat-vue/HeatmapChart'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './HeatmapChartDemo.vue?raw'
 
 const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
 const hours = ['上午', '下午', '晚上']

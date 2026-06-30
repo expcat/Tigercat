@@ -2,6 +2,7 @@ import { Space } from '@expcat/tigercat-react/Space'
 import { useState } from 'react'
 import { Cascader } from '@expcat/tigercat-react/Cascader'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './CascaderDemo.tsx?raw'
 
 const options = [
   {
@@ -57,15 +58,11 @@ const CascaderDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Cascader 级联选择</h1>
       <p className="text-gray-500 mb-8">多级联动选择器，适用于省市区等层级数据。</p>
 
-      <DemoBlock
-        title="基本用法"
-        description="逐级选择"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="逐级选择" code={fullPageSnippet}>
         <Cascader value={val} onChange={setVal} options={options} placeholder="请选择地区" />
       </DemoBlock>
 
-      <DemoBlock title="可搜索" description="searchable 开启搜索过滤" code={searchSnippet}>
+      <DemoBlock title="可搜索" description="searchable 开启搜索过滤" code={fullPageSnippet}>
         <Cascader
           value={val2}
           onChange={setVal2}
@@ -75,7 +72,7 @@ const CascaderDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸" code={sizeSnippet}>
+      <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸" code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
           <Cascader options={options} placeholder="小" size="sm" />
           <Cascader options={options} placeholder="中" size="md" />

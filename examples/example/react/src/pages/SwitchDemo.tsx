@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Switch } from '@expcat/tigercat-react/Switch'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './SwitchDemo.tsx?raw'
 
 const basicSnippet = `<Space direction="vertical">
   <div className="flex items-center gap-3">
@@ -48,8 +49,7 @@ const SwitchDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="绑定到一个 Boolean 类型的变量。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <div className="flex items-center gap-3">
             <Switch checked={basicEnabled} onChange={setBasicEnabled} />
@@ -62,7 +62,7 @@ const SwitchDemo: React.FC = () => {
       <DemoBlock
         title="禁用状态"
         description="通过设置 disabled 属性来禁用开关。"
-        code={disabledSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Switch checked={disabledOn} disabled />
           <Switch checked={disabledOff} disabled />
@@ -70,7 +70,7 @@ const SwitchDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 不同尺寸 */}
-      <DemoBlock title="不同尺寸" description="开关有三种尺寸。" code={sizeSnippet}>
+      <DemoBlock title="不同尺寸" description="开关有三种尺寸。" code={fullPageSnippet}>
         <Space align="center">
           <Switch checked={sizeSm} size="sm" onChange={setSizeSm} />
           <Switch checked={sizeMd} size="md" onChange={setSizeMd} />

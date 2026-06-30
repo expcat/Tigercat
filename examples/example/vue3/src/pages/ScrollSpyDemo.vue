@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { ScrollSpy } from '@expcat/tigercat-vue/ScrollSpy'
 import { type ScrollSpyItem } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ScrollSpyDemo.vue?raw'
 
 const getMainContainer = () => {
   const scrollContainer = document.querySelector('main > div.overflow-y-auto')
@@ -79,7 +80,7 @@ const handleContainerChange = (
         <DemoBlock
           title="基本用法"
           description="根据页面滚动位置同步当前导航项。"
-          :code="basicSnippet">
+          :code="fullPageSnippet">
           <div class="space-y-6">
             <section
               id="scrollspy-overview"
@@ -119,7 +120,7 @@ const handleContainerChange = (
         <DemoBlock
           title="水平导航"
           description="适合页内顶部导航或紧凑筛选区域。"
-          :code="horizontalSnippet">
+          :code="fullPageSnippet">
           <div class="space-y-4">
             <ScrollSpy
               v-model:active-key="activeKey"
@@ -133,7 +134,7 @@ const handleContainerChange = (
         <DemoBlock
           title="自定义滚动容器"
           description="指定内部容器作为滚动监听目标。"
-          :code="containerSnippet">
+          :code="fullPageSnippet">
           <div class="grid gap-4 md:grid-cols-[1fr_180px]">
             <div
               ref="containerRef"

@@ -3,6 +3,7 @@ import { DataTableWithToolbar } from '@expcat/tigercat-react/DataTableWithToolba
 import { type TableColumn, type TableToolbarFilterValue } from '@expcat/tigercat-react'
 import type { TableCardLayoutItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './DataTableWithToolbarDemo.tsx?raw'
 
 interface UserRow extends Record<string, unknown> {
   id: number
@@ -370,8 +371,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="搜索/筛选/批量操作 + 分页联动"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={columns}
           dataSource={pagedData}
@@ -420,7 +420,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       <DemoBlock
         title="自定义过滤器"
         description="filtersExtra 可把年龄段等复合控件放入工具栏，并通过 setFilter 发出对象型过滤值。"
-        code={ageRangeSnippet}>
+        code={fullPageSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={columns}
           dataSource={pagedData}
@@ -482,7 +482,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       <DemoBlock
         title="列设置"
         description="开启 showColumnSettings 后，工具栏右侧出现列设置入口，可勾选控制列显隐;hideable: false 的列不可隐藏。支持受控（hiddenColumnKeys）与非受控（defaultHiddenColumnKeys）两种模式。"
-        code={columnSettingsSnippet}>
+        code={fullPageSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={settingsColumns}
           dataSource={pagedData}
@@ -502,7 +502,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       <DemoBlock
         title="钉列 / 锁定列"
         description="column.fixed 让列在横向滚动时钉在边缘（姓名列钉在左侧）；开启 columnLockable 后表头出现锁定按钮，锁定列会进入左侧固定区，未锁定列向右排列；columnSettings.lockedColumnKeys 让该列在列设置面板中不可隐藏。横向滚动表格可观察钉列效果。"
-        code={columnLockSnippet}>
+        code={fullPageSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={lockColumns}
           dataSource={pagedData}
@@ -524,7 +524,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       <DemoBlock
         title="卡片模式字段定制"
         description="窄屏（小于 cardBreakpoint，此处为 lg/1024px）自动切换为卡片：name 作为标题、id 隐藏、status/role 按 cardPriority 排序。缩窄窗口可预览。"
-        code={cardSnippet}>
+        code={fullPageSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={cardColumns}
           dataSource={pagedData}
@@ -555,7 +555,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       <DemoBlock
         title="自定义卡片网格布局"
         description="使用 cardGrid 列属性或 cardLayout 集中配置，实现双列/三列混排的卡片网格布局。cardLayout 配置优先于 cardGrid；最窄屏默认单列，sm 及以上按 colSpan 混排。缩窄窗口到 lg/1024px 以下可预览效果。"
-        code={gridCardSnippet}>
+        code={fullPageSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={gridCardColumns}
           dataSource={pagedData}
@@ -576,7 +576,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       <DemoBlock
         title="工具栏布局定制"
         description="通过 itemClass/itemStyle 定制单个 filter 容器宽度（替换默认尺寸类），searchClassName 定制搜索框尺寸，toolbar.className/style 定制容器样式。"
-        code={itemClassSnippet}>
+        code={fullPageSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={columns}
           dataSource={pagedData}
@@ -614,7 +614,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       <DemoBlock
         title="完全自定义工具栏"
         description="toolbar.render 完全替换内置工具栏区域（含 role='toolbar' 容器），通过 context 获取搜索/筛选/选择等状态和操作。使用时请自行添加 role='toolbar' 以保持可访问性。"
-        code={customToolbarSnippet}>
+        code={fullPageSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={columns}
           dataSource={pagedData}
@@ -663,7 +663,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       <DemoBlock
         title="卡片自定义渲染"
         description="通过 renderCard 完全自定义卡片内容，或使用 cardClassName 添加卡片容器样式。缩窄窗口到 lg/1024px 以下可预览。"
-        code={cardRenderSnippet}>
+        code={fullPageSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={cardColumns}
           dataSource={pagedData}

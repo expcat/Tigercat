@@ -6,6 +6,7 @@ import type {
   TaskBoardColumnMoveEvent
 } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TaskBoardDemo.tsx?raw'
 
 const initialColumns: TaskBoardColumn[] = [
   {
@@ -150,8 +151,7 @@ const TaskBoardDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="受控模式 + 卡片拖拽 + 列拖拽 + 新增卡片"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <TaskBoard
           columns={columns}
           onColumnsChange={setColumns}
@@ -164,7 +164,7 @@ const TaskBoardDemo: React.FC = () => {
       <DemoBlock
         title="自定义卡片"
         description="通过 renderCard 自定义卡片渲染"
-        code={slotSnippet}
+        code={fullPageSnippet}
         className="mt-8">
         <TaskBoard
           columns={slotColumns}
@@ -186,7 +186,7 @@ const TaskBoardDemo: React.FC = () => {
       <DemoBlock
         title="自定义文案 (labels)"
         description="单语言项目无需引入 locale，直接用扁平 labels 覆盖空列占位与新增卡片按钮文案。"
-        code={labelsSnippet}
+        code={fullPageSnippet}
         className="mt-8">
         <TaskBoard
           columns={labelsColumns}

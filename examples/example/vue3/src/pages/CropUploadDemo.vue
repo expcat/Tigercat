@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { CropUpload } from '@expcat/tigercat-vue/CropUpload'
 import type { CropResult } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './CropUploadDemo.vue?raw'
 
 const result1 = ref<CropResult | null>(null)
 const result2 = ref<CropResult | null>(null)
@@ -60,8 +61,7 @@ const maxSizeSnippet = `<!-- 限制文件大小 2MB -->
     <DemoBlock
       title="基本用法"
       description="点击按钮选择图片，弹窗中裁剪后获取结果"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <CropUpload @crop-complete="handleCropComplete" @error="handleError" />
         <div v-if="result1" class="mt-4">
@@ -77,7 +77,7 @@ const maxSizeSnippet = `<!-- 限制文件大小 2MB -->
     <DemoBlock
       title="固定宽高比"
       description="通过 cropperProps 传递 aspectRatio 实现正方形裁剪"
-      :code="aspectRatioSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <CropUpload :cropper-props="{ aspectRatio: 1 }" @crop-complete="handleSquareCrop" />
         <div v-if="result2" class="mt-4">
@@ -93,7 +93,7 @@ const maxSizeSnippet = `<!-- 限制文件大小 2MB -->
     <DemoBlock
       title="自定义触发按钮"
       description="通过默认插槽自定义触发按钮"
-      :code="customTriggerSnippet">
+      :code="fullPageSnippet">
       <CropUpload @crop-complete="handleCropComplete">
         <span
           class="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded cursor-pointer hover:bg-green-600 transition-colors">
@@ -105,14 +105,14 @@ const maxSizeSnippet = `<!-- 限制文件大小 2MB -->
     <DemoBlock
       title="限制文件大小"
       description="maxSize 限制文件大小（字节），超出触发 error 事件"
-      :code="maxSizeSnippet">
+      :code="fullPageSnippet">
       <CropUpload
         :max-size="2 * 1024 * 1024"
         @crop-complete="handleCropComplete"
         @error="handleError" />
     </DemoBlock>
 
-    <DemoBlock title="禁用状态" description="disabled 禁用触发按钮" :code="disabledSnippet">
+    <DemoBlock title="禁用状态" description="disabled 禁用触发按钮" :code="fullPageSnippet">
       <CropUpload disabled />
     </DemoBlock>
   </div>

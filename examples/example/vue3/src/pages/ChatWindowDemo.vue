@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { ChatWindow } from '@expcat/tigercat-vue/ChatWindow'
 import type { ChatMessage } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ChatWindowDemo.vue?raw'
 
 const baseMessages: ChatMessage[] = [
   {
@@ -122,8 +123,7 @@ const inputSnippet = `<ChatWindow
     <DemoBlock
       title="基础用法"
       description="默认 textarea 输入，支持 Shift+Enter 换行。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <ChatWindow
         v-model="input"
         class="h-[480px]"
@@ -134,7 +134,10 @@ const inputSnippet = `<ChatWindow
         @send="handleSend" />
     </DemoBlock>
 
-    <DemoBlock title="单行输入" description="使用 input 模式，回车即可发送。" :code="inputSnippet">
+    <DemoBlock
+      title="单行输入"
+      description="使用 input 模式，回车即可发送。"
+      :code="fullPageSnippet">
       <ChatWindow
         v-model="quickInput"
         class="h-[380px]"

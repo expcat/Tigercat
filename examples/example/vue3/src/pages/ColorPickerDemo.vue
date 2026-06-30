@@ -4,6 +4,7 @@ import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
 import { ColorPicker } from '@expcat/tigercat-vue/ColorPicker'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ColorPickerDemo.vue?raw'
 
 const color = ref('#2563eb')
 const color2 = ref('#2563eb')
@@ -29,7 +30,7 @@ const featureSnippet = `<Space direction="vertical" :size="12">
     <h1 class="text-3xl font-bold mb-2">ColorPicker 颜色选择器</h1>
     <p class="text-gray-500 mb-8">用于选择颜色，支持透明度、预设颜色和多种格式。</p>
 
-    <DemoBlock title="基本用法" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock title="基本用法" :code="fullPageSnippet">
       <Space :size="16" align="center">
         <ColorPicker v-model="color" />
         <Text>选中颜色: {{ color }}</Text>
@@ -39,7 +40,7 @@ const featureSnippet = `<Space direction="vertical" :size="12">
     <DemoBlock
       title="透明度、预设与尺寸"
       description="showAlpha 透明度，presets 预设色板"
-      :code="featureSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="12">
         <ColorPicker v-model="color2" show-alpha format="rgb" />
         <ColorPicker

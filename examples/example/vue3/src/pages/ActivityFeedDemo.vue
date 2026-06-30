@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { ActivityFeed } from '@expcat/tigercat-vue/ActivityFeed'
 import type { ActivityGroup } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ActivityFeedDemo.vue?raw'
 
 const activityGroups = ref<ActivityGroup[]>([
   {
@@ -64,15 +65,15 @@ const emptySnippet = `<ActivityFeed :items="[]" empty-text="暂无活动" />`
       <p class="text-gray-600 dark:text-gray-400">组合组件，适配审计日志与动态信息流。</p>
     </div>
 
-    <DemoBlock title="分组展示" description="按日期分组展示动态。" :code="basicSnippet">
+    <DemoBlock title="分组展示" description="按日期分组展示动态。" :code="fullPageSnippet">
       <ActivityFeed :groups="activityGroups" />
     </DemoBlock>
 
-    <DemoBlock title="加载态" description="数据加载中时的展示。" :code="loadingSnippet">
+    <DemoBlock title="加载态" description="数据加载中时的展示。" :code="fullPageSnippet">
       <ActivityFeed loading loading-text="正在加载动态..." />
     </DemoBlock>
 
-    <DemoBlock title="空态" description="无数据时的展示。" :code="emptySnippet">
+    <DemoBlock title="空态" description="无数据时的展示。" :code="fullPageSnippet">
       <ActivityFeed :items="[]" empty-text="暂无活动" />
     </DemoBlock>
   </div>

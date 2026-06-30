@@ -6,15 +6,14 @@
     <DemoBlock
       title="基础用法"
       description="columns 定义列和卡片，支持拖拽"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <Kanban v-model:columns="columns" allow-add-card :style="{ height: '400px' }" />
     </DemoBlock>
 
     <DemoBlock
       title="禁用拖拽 & WIP 限制"
       description="draggable=false 禁用，enforceWipLimit 限制列容量"
-      :code="wipSnippet">
+      :code="fullPageSnippet">
       <Kanban
         :default-columns="wipColumns"
         :draggable="false"
@@ -29,6 +28,7 @@
 import { ref } from 'vue'
 import { Kanban } from '@expcat/tigercat-vue/Kanban'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './KanbanDemo.vue?raw'
 
 const columns = ref([
   {

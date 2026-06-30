@@ -4,6 +4,7 @@ import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Tooltip } from '@expcat/tigercat-vue/Tooltip'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './TooltipDemo.vue?raw'
 
 const visible1 = ref(false)
 
@@ -138,7 +139,7 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock title="基本用法" description="最简单的用法，悬停显示提示。" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="最简单的用法，悬停显示提示。" :code="fullPageSnippet">
       <Tooltip content="这是一个气泡提示">
         <Button>悬停显示提示</Button>
       </Tooltip>
@@ -148,7 +149,7 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     <DemoBlock
       title="不同位置"
       description="通过 placement 属性设置气泡提示的显示位置。"
-      :code="placementSnippet">
+      :code="fullPageSnippet">
       <div class="grid grid-cols-4 gap-4">
         <div class="flex justify-center">
           <Tooltip content="顶部提示" placement="top">
@@ -204,7 +205,7 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     <DemoBlock
       title="触发方式"
       description="支持 hover（默认）、click、focus 三种触发方式。"
-      :code="triggerSnippet">
+      :code="fullPageSnippet">
       <Space :size="16">
         <Tooltip content="悬停触发（默认）" trigger="hover">
           <Button>Hover</Button>
@@ -221,7 +222,10 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     </DemoBlock>
 
     <!-- 自定义内容 -->
-    <DemoBlock title="自定义内容" description="可以通过插槽自定义提示内容。" :code="contentSnippet">
+    <DemoBlock
+      title="自定义内容"
+      description="可以通过插槽自定义提示内容。"
+      :code="fullPageSnippet">
       <Tooltip>
         <template #content>
           <div>
@@ -237,8 +241,7 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     <DemoBlock
       title="受控模式"
       description="可以通过 open 属性控制气泡提示的显示和隐藏。"
-      :code="controlledSnippet"
-      :script="controlledScriptSnippet">
+      :code="fullPageSnippet">
       <Space :size="16">
         <Tooltip v-model:open="visible1" content="受控的气泡提示">
           <Button>受控提示</Button>
@@ -254,7 +257,7 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     <DemoBlock
       title="禁用状态"
       description="通过 disabled 属性禁用气泡提示。"
-      :code="disabledSnippet">
+      :code="fullPageSnippet">
       <Space :size="16">
         <Tooltip content="正常提示">
           <Button>正常</Button>
@@ -270,7 +273,7 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     <DemoBlock
       title="偏移距离"
       description="通过 offset 属性设置提示与触发元素的距离（单位 px）。"
-      :code="offsetSnippet">
+      :code="fullPageSnippet">
       <Space :size="16">
         <Tooltip content="默认偏移 (8px)">
           <Button>默认</Button>
@@ -290,7 +293,7 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     <DemoBlock
       title="自动翻转 (Floating UI)"
       description="当弹出位置空间不足时，Tooltip 会自动翻转到对侧显示。这是通过 Floating UI 的 flip 中间件实现的。"
-      :code="flipSnippet">
+      :code="fullPageSnippet">
       <div class="p-4 bg-gray-100 rounded overflow-auto h-32">
         <div class="pt-16">
           <Tooltip content="空间不足时自动翻转" placement="top">

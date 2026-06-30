@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { RichTextEditor } from '@expcat/tigercat-react/RichTextEditor'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './RichTextEditorDemo.tsx?raw'
 
 const sampleHtml = '<p>这是一段<em>只读</em>的富文本内容。</p>'
 
@@ -19,11 +20,7 @@ const RichTextEditorDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">RichTextEditor 富文本编辑器</h1>
       <p className="text-gray-500 mb-8">所见即所得的富文本编辑器，带工具栏。</p>
 
-      <DemoBlock
-        title="基础用法"
-        description="value + onChange 绑定 HTML"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基础用法" description="value + onChange 绑定 HTML" code={fullPageSnippet}>
         <RichTextEditor
           value={content}
           onChange={setContent}
@@ -32,7 +29,7 @@ const RichTextEditorDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="只读 & 禁用" code={readOnlySnippet}>
+      <DemoBlock title="只读 & 禁用" code={fullPageSnippet}>
         <div className="flex gap-4">
           <div className="flex-1">
             <p className="text-sm text-gray-500 mb-2">只读</p>

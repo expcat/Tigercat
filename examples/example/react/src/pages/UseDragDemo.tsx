@@ -4,6 +4,7 @@ import { Tag } from '@expcat/tigercat-react/Tag'
 import { useDrag } from '@expcat/tigercat-react'
 import type { DragItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './UseDragDemo.tsx?raw'
 
 interface TodoItem extends DragItem {
   title: string
@@ -75,8 +76,7 @@ const UseDragDemo: React.FC = () => {
       <DemoBlock
         title="基础列表排序"
         description="拖动条目即可重新排序，松开时通过 reorder() 计算新顺序。"
-        code={reorderSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-3" {...drag.getDropZoneProps()}>
           {items.map((item) => (
             <Card

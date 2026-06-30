@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { DatePicker } from '@expcat/tigercat-react/DatePicker'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './DatePickerDemo.tsx?raw'
 import { useLang } from '../context/lang'
 
 const PICKER_WIDTH = 'w-full max-w-[260px]'
@@ -124,11 +125,7 @@ const DatePickerDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock
-        title="基础用法"
-        description="基础的日期选择器组件。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基础用法" description="基础的日期选择器组件。" code={fullPageSnippet}>
         <div className="max-w-md space-y-4">
           <DatePicker
             className={PICKER_WIDTH}
@@ -144,7 +141,7 @@ const DatePickerDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 范围选择 */}
-      <DemoBlock title="范围选择" description="选择开始日期与结束日期。" code={rangeSnippet}>
+      <DemoBlock title="范围选择" description="选择开始日期与结束日期。" code={fullPageSnippet}>
         <div className="max-w-md space-y-4">
           <DatePicker
             range
@@ -166,7 +163,7 @@ const DatePickerDemo: React.FC = () => {
       <DemoBlock
         title="自定义文案"
         description="通过 labels 覆盖 Today/OK 与 aria-label 文案。"
-        code={labelsSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-md space-y-4">
           <DatePicker
             range
@@ -186,7 +183,7 @@ const DatePickerDemo: React.FC = () => {
       <DemoBlock
         title="不同尺寸"
         description="日期选择器有三种尺寸：小、中、大。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-md space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">小尺寸</label>
@@ -219,7 +216,7 @@ const DatePickerDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 日期格式 */}
-      <DemoBlock title="日期格式" description="支持四种日期显示格式。" code={formatSnippet}>
+      <DemoBlock title="日期格式" description="支持四种日期显示格式。" code={fullPageSnippet}>
         <div className="max-w-md space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">yyyy-MM-dd</label>
@@ -268,7 +265,7 @@ const DatePickerDemo: React.FC = () => {
       <DemoBlock
         title="日期范围限制"
         description="使用 minDate 和 maxDate 限制可选择的日期范围（2024年度）。"
-        code={minMaxSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-md space-y-4">
           <DatePicker
             className={PICKER_WIDTH}
@@ -289,7 +286,7 @@ const DatePickerDemo: React.FC = () => {
       <DemoBlock
         title="禁用和只读"
         description="日期选择器可以设置为禁用或只读状态。"
-        code={disabledSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-md space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">禁用</label>
@@ -316,7 +313,7 @@ const DatePickerDemo: React.FC = () => {
       <DemoBlock
         title="可清除"
         description="使用 clearable 属性控制是否显示清除按钮。"
-        code={clearableSnippet}>
+        code={fullPageSnippet}>
         <div className="max-w-md space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">可清除</label>

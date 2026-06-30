@@ -4,6 +4,7 @@ import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Radio } from '@expcat/tigercat-vue/Radio'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './RadioDemo.vue?raw'
 
 const basicValue = ref<string | number>('male')
 const agreed = ref(false)
@@ -123,8 +124,7 @@ const customSnippet = `<RadioGroup v-model="customValue"
     <DemoBlock
       title="基础用法"
       description="单选框组合使用时，需要通过 RadioGroup 组件进行包裹。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical">
         <RadioGroup v-model="basicValue" class="flex flex-wrap items-center gap-4">
           <Radio value="male">男</Radio>
@@ -139,7 +139,7 @@ const customSnippet = `<RadioGroup v-model="customValue"
     <DemoBlock
       title="单独使用"
       description="Radio 可以脱离 RadioGroup 单独使用，支持 v-model 和 defaultValue。"
-      :code="standaloneSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical">
         <Radio value="agree" v-model="agreed">同意用户协议</Radio>
         <Radio value="standalone" :default-value="true">默认选中的独立选项</Radio>
@@ -150,7 +150,7 @@ const customSnippet = `<RadioGroup v-model="customValue"
     <DemoBlock
       title="非受控"
       description="不使用 v-model，通过 defaultValue 初始化，并监听 change。"
-      :code="uncontrolledSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical">
         <RadioGroup
           default-value="male"
@@ -165,7 +165,7 @@ const customSnippet = `<RadioGroup v-model="customValue"
     </DemoBlock>
 
     <!-- 禁用状态 -->
-    <DemoBlock title="禁用状态" description="单选框不可用的状态。" :code="disabledSnippet">
+    <DemoBlock title="禁用状态" description="单选框不可用的状态。" :code="fullPageSnippet">
       <Space direction="vertical">
         <div>
           <div class="text-sm text-gray-700 mb-2">部分禁用</div>
@@ -194,7 +194,7 @@ const customSnippet = `<RadioGroup v-model="customValue"
     <DemoBlock
       title="尺寸"
       description="通过 RadioGroup 的 size 控制整组尺寸。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical">
         <div>
           <div class="text-sm text-gray-700 mb-2">小号（sm）</div>
@@ -229,7 +229,7 @@ const customSnippet = `<RadioGroup v-model="customValue"
     <DemoBlock
       title="数字值"
       description="Radio 的 value 支持 number 类型。"
-      :code="numericSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical">
         <RadioGroup v-model="numericValue" class="flex flex-wrap items-center gap-4">
           <Radio :value="1">选项 1</Radio>
@@ -246,7 +246,7 @@ const customSnippet = `<RadioGroup v-model="customValue"
     <DemoBlock
       title="自定义样式"
       description="通过 className 和 name 自定义 Radio 和 RadioGroup 的外观与分组。"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <RadioGroup
         v-model="customValue"
         class="flex flex-wrap items-center gap-6"

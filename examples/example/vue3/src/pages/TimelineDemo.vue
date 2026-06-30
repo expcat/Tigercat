@@ -3,6 +3,7 @@ import { Tag } from '@expcat/tigercat-vue/Tag'
 import { h } from 'vue'
 import { Timeline } from '@expcat/tigercat-vue/Timeline'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './TimelineDemo.vue?raw'
 
 // Basic timeline data
 const basicEvents = [
@@ -235,14 +236,14 @@ const exampleSnippet = `<div class="max-w-2xl">
     <DemoBlock
       title="基本用法"
       description="通过 items 提供数据源即可渲染时间线。"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <Timeline :items="basicEvents" />
     </DemoBlock>
 
     <DemoBlock
       title="展示模式"
       description="支持 left/right/alternate 三种展示模式。"
-      :code="modeSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <div class="text-lg font-semibold mb-4">左侧时间线（默认）</div>
@@ -262,21 +263,21 @@ const exampleSnippet = `<div class="max-w-2xl">
     <DemoBlock
       title="自定义颜色"
       description="通过 item.color 设置时间点颜色。"
-      :code="colorSnippet">
+      :code="fullPageSnippet">
       <Timeline :items="coloredEvents" />
     </DemoBlock>
 
     <DemoBlock
       title="自定义节点（dot）"
       description="通过 item.dot 为单个节点提供自定义内容。"
-      :code="dotSnippet">
+      :code="fullPageSnippet">
       <Timeline :items="customDotEvents" />
     </DemoBlock>
 
     <DemoBlock
       title="自定义节点（dot 插槽）"
       description="通过 #dot 插槽统一控制节点渲染。"
-      :code="renderDotSnippet">
+      :code="fullPageSnippet">
       <Timeline :items="renderDotEvents">
         <template #dot="{ item }">
           <div v-if="item.key === 1" class="w-4 h-4 bg-green-500 rounded-full" />
@@ -289,7 +290,7 @@ const exampleSnippet = `<div class="max-w-2xl">
     <DemoBlock
       title="自定义内容（item 插槽）"
       description="通过 #item 插槽自定义每个时间线项的内容区域。"
-      :code="renderItemSnippet">
+      :code="fullPageSnippet">
       <Timeline :items="projectTimeline">
         <template #item="{ item }">
           <div class="mb-2">
@@ -309,7 +310,7 @@ const exampleSnippet = `<div class="max-w-2xl">
     <DemoBlock
       title="等待中状态"
       description="通过 pending/pendingDot/#pending 展示“处理中”状态。"
-      :code="pendingSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <div class="text-lg font-semibold mb-4">默认等待内容</div>
@@ -354,14 +355,14 @@ const exampleSnippet = `<div class="max-w-2xl">
       </div>
     </DemoBlock>
 
-    <DemoBlock title="反转顺序" description="通过 reverse 反转时间线顺序。" :code="reverseSnippet">
+    <DemoBlock title="反转顺序" description="通过 reverse 反转时间线顺序。" :code="fullPageSnippet">
       <Timeline :items="basicEvents" :reverse="true" />
     </DemoBlock>
 
     <DemoBlock
       title="完整示例"
       description="组合 mode + item 插槽 + color 展示一个“项目时间线”。"
-      :code="exampleSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-2xl">
         <Timeline :items="projectTimeline" mode="alternate">
           <template #item="{ item }">

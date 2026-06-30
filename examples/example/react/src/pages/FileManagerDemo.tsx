@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { FileManager } from '@expcat/tigercat-react/FileManager'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './FileManagerDemo.tsx?raw'
 
 const files = [
   { key: '1', name: 'README.md', type: 'file' as const, size: 2048, modified: '2024-01-15' },
@@ -51,23 +52,19 @@ const FileManagerDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">FileManager 文件管理器</h1>
       <p className="text-gray-500 mb-8">文件浏览管理组件，支持列表/网格视图和搜索。</p>
 
-      <DemoBlock title="列表视图" description="默认列表模式，支持搜索" code={listSnippet}>
+      <DemoBlock title="列表视图" description="默认列表模式，支持搜索" code={fullPageSnippet}>
         <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
           <FileManager files={files} viewMode="list" searchable />
         </div>
       </DemoBlock>
 
-      <DemoBlock title="网格视图" description="viewMode='grid'" code={gridSnippet}>
+      <DemoBlock title="网格视图" description="viewMode='grid'" code={fullPageSnippet}>
         <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
           <FileManager files={files} viewMode="grid" />
         </div>
       </DemoBlock>
 
-      <DemoBlock
-        title="多选 & 面包屑导航"
-        description="multiple 多选"
-        code={multiSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="多选 & 面包屑导航" description="multiple 多选" code={fullPageSnippet}>
         <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
           <FileManager
             files={nestedFiles}

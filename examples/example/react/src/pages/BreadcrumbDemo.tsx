@@ -2,6 +2,7 @@ import React from 'react'
 import { Breadcrumb } from '@expcat/tigercat-react/Breadcrumb'
 import { BreadcrumbItem } from '@expcat/tigercat-react/BreadcrumbItem'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './BreadcrumbDemo.tsx?raw'
 
 const basicSnippet = `<Breadcrumb>
   <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -81,7 +82,7 @@ const BreadcrumbDemo: React.FC = () => {
         </p>
       </div>
 
-      <DemoBlock title="基本用法" description="最简单的面包屑导航。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="最简单的面包屑导航。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -91,7 +92,7 @@ const BreadcrumbDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="箭头分隔符" description="使用箭头作为分隔符。" code={arrowSnippet}>
+      <DemoBlock title="箭头分隔符" description="使用箭头作为分隔符。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb separator="arrow">
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -101,7 +102,7 @@ const BreadcrumbDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="尖括号分隔符" description="使用尖括号作为分隔符。" code={chevronSnippet}>
+      <DemoBlock title="尖括号分隔符" description="使用尖括号作为分隔符。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb separator="chevron">
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -115,7 +116,7 @@ const BreadcrumbDemo: React.FC = () => {
       <DemoBlock
         title="自定义分隔符"
         description="可以使用任意字符串作为分隔符。"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb separator=">">
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -125,7 +126,7 @@ const BreadcrumbDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="带图标" description="可以在面包屑项中添加图标。" code={iconSnippet}>
+      <DemoBlock title="带图标" description="可以在面包屑项中添加图标。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem
@@ -155,7 +156,7 @@ const BreadcrumbDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="外部链接" description="支持在新窗口打开链接。" code={externalSnippet}>
+      <DemoBlock title="外部链接" description="支持在新窗口打开链接。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -170,7 +171,7 @@ const BreadcrumbDemo: React.FC = () => {
       <DemoBlock
         title="点击事件"
         description="面包屑项可以监听点击事件（查看控制台）。"
-        code={clickSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem href="/" onClick={handleClick}>
@@ -184,7 +185,7 @@ const BreadcrumbDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="多级层次" description="支持任意层级的面包屑导航。" code={multiSnippet}>
+      <DemoBlock title="多级层次" description="支持任意层级的面包屑导航。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb separator="chevron">
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -202,7 +203,7 @@ const BreadcrumbDemo: React.FC = () => {
       <DemoBlock
         title="单独设置分隔符"
         description="每个面包屑项可以单独设置分隔符。"
-        code={itemSeparatorSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem href="/" separator="arrow">
@@ -219,7 +220,7 @@ const BreadcrumbDemo: React.FC = () => {
       <DemoBlock
         title="扩展区域"
         description="通过 extra 属性在面包屑末尾添加操作按钮等扩展内容。"
-        code={extraSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb
             extra={<button className="text-sm text-blue-600 hover:underline">Edit</button>}>

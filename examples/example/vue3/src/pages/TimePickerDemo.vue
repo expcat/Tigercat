@@ -3,6 +3,7 @@ import { inject, ref, type Ref } from 'vue'
 import { TimePicker } from '@expcat/tigercat-vue/TimePicker'
 import type { DemoLang } from '@demo-shared/app-config'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './TimePickerDemo.vue?raw'
 
 const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
 const locale = demoLang
@@ -122,7 +123,7 @@ const clearableSnippet = `<div class="max-w-md space-y-6">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="基础的时间选择器组件。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="基础的时间选择器组件。" :code="fullPageSnippet">
       <div class="max-w-md space-y-4">
         <TimePicker
           v-model="time"
@@ -137,7 +138,7 @@ const clearableSnippet = `<div class="max-w-md space-y-6">
     <DemoBlock
       title="时间段选择"
       description="启用 range 后可选择开始/结束时间。"
-      :code="rangeSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md space-y-4">
         <TimePicker
           v-model="timeRange"
@@ -155,7 +156,7 @@ const clearableSnippet = `<div class="max-w-md space-y-6">
     <DemoBlock
       title="不同尺寸"
       description="时间选择器有三种尺寸：小、中、大。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">小尺寸</label>
@@ -185,7 +186,7 @@ const clearableSnippet = `<div class="max-w-md space-y-6">
     </DemoBlock>
 
     <!-- 时间格式 -->
-    <DemoBlock title="时间格式" description="支持 12 小时制和 24 小时制。" :code="formatSnippet">
+    <DemoBlock title="时间格式" description="支持 12 小时制和 24 小时制。" :code="fullPageSnippet">
       <div class="max-w-md space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">24 小时制</label>
@@ -204,7 +205,7 @@ const clearableSnippet = `<div class="max-w-md space-y-6">
     <DemoBlock
       title="显示秒"
       description="使用 showSeconds 属性控制是否显示秒。"
-      :code="secondsSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md space-y-4">
         <TimePicker
           v-model="timeWithSeconds"
@@ -220,7 +221,7 @@ const clearableSnippet = `<div class="max-w-md space-y-6">
     <DemoBlock
       title="时间步长"
       description="使用 hourStep、minuteStep、secondStep 控制时间选择步长。"
-      :code="stepSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md space-y-4">
         <TimePicker
           v-model="timeWithSteps"
@@ -237,7 +238,7 @@ const clearableSnippet = `<div class="max-w-md space-y-6">
     <DemoBlock
       title="时间范围限制"
       description="使用 minTime 和 maxTime 限制可选择的时间范围（9:00-18:00）。"
-      :code="limitSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md space-y-4">
         <TimePicker
           v-model="timeWithRange"
@@ -254,7 +255,7 @@ const clearableSnippet = `<div class="max-w-md space-y-6">
     <DemoBlock
       title="禁用和只读"
       description="时间选择器可以设置为禁用或只读状态。"
-      :code="disabledSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">禁用</label>
@@ -271,7 +272,7 @@ const clearableSnippet = `<div class="max-w-md space-y-6">
     <DemoBlock
       title="可清除"
       description="使用 clearable 属性控制是否显示清除按钮。"
-      :code="clearableSnippet">
+      :code="fullPageSnippet">
       <div class="max-w-md space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">可清除</label>

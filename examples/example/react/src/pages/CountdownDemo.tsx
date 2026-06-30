@@ -3,6 +3,7 @@ import { Space } from '@expcat/tigercat-react/Space'
 import { useMemo, useState } from 'react'
 import { Card } from '@expcat/tigercat-react/Card'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './CountdownDemo.tsx?raw'
 
 const basicSnippet = `<Space size={32}>
   <Countdown title="活动结束" value={Date.now() + 2 * 60 * 60 * 1000} />
@@ -32,7 +33,7 @@ const CountdownDemo: React.FC = () => {
         展示目标时间的剩余时长，支持格式化、结束事件和稳定初始值。
       </p>
 
-      <DemoBlock title="基本用法" description="使用目标时间展示剩余时长" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="使用目标时间展示剩余时长" code={fullPageSnippet}>
         <Space size={32}>
           <Countdown title="活动结束" value={now + 2 * 60 * 60 * 1000} now={now} />
           <Countdown title="发售倒计时" value={now + 15 * 60 * 1000} now={now} format="mm:ss" />
@@ -42,7 +43,7 @@ const CountdownDemo: React.FC = () => {
       <DemoBlock
         title="格式与前后缀"
         description="format 可组合天、时、分、秒和毫秒"
-        code={formatSnippet}>
+        code={fullPageSnippet}>
         <Space size={32}>
           <Countdown
             title="跨天任务"
@@ -60,7 +61,7 @@ const CountdownDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      <DemoBlock title="结束事件" description="倒计时归零时触发 onFinish" code={eventSnippet}>
+      <DemoBlock title="结束事件" description="倒计时归零时触发 onFinish" code={fullPageSnippet}>
         <Card style={{ width: 260 }}>
           <Countdown
             title="付款保留时间"

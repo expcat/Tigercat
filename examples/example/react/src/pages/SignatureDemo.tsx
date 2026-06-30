@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { type SignatureRef, type SignatureChangePayload } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './SignatureDemo.tsx?raw'
 
 const basicSnippet = `<Signature
   width={420}
@@ -55,7 +56,7 @@ export default function SignatureDemo() {
       <DemoBlock
         title="基本用法"
         description="通过 onChange 获取当前签名导出值"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-3">
           <Signature
             width={420}
@@ -76,7 +77,7 @@ export default function SignatureDemo() {
       <DemoBlock
         title="导出"
         description="通过 ref 导出 PNG data URL 或 SVG 字符串"
-        code={exportSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <Signature ref={signatureRef} width={420} height={180} backgroundColor="#ffffff" />
           <div className="flex flex-wrap gap-3">
@@ -106,7 +107,7 @@ export default function SignatureDemo() {
       <DemoBlock
         title="禁用和只读"
         description="disabled / readonly 状态下不可绘制"
-        code={disabledSnippet}>
+        code={fullPageSnippet}>
         <div className="grid gap-4 md:grid-cols-2">
           <Signature width={320} height={140} disabled clearText="清空" />
           <Signature width={320} height={140} readonly clearText="清空" />

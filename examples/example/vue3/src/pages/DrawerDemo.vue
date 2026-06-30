@@ -5,6 +5,7 @@ import { defineComponent, h, ref } from 'vue'
 import { Drawer } from '@expcat/tigercat-vue/Drawer'
 import type { DrawerPlacement, DrawerSize } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './DrawerDemo.vue?raw'
 
 // Basic drawer
 const basicVisible = ref(false)
@@ -311,11 +312,7 @@ const DestroyOnCloseContent = defineComponent({
     </div>
 
     <!-- 基本使用 -->
-    <DemoBlock
-      title="基本使用"
-      description="最基本的抽屉使用示例。"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基本使用" description="最基本的抽屉使用示例。" :code="fullPageSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openBasic">打开抽屉</Button>
         <Drawer v-model:open="basicVisible" title="基本抽屉">
@@ -334,7 +331,7 @@ const DestroyOnCloseContent = defineComponent({
     <DemoBlock
       title="不同位置"
       description="通过 placement 属性设置抽屉从不同方向弹出。"
-      :code="placementSnippet">
+      :code="fullPageSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Space>
           <Button
@@ -373,7 +370,7 @@ const DestroyOnCloseContent = defineComponent({
     <DemoBlock
       title="不同尺寸与内边距"
       description="通过 size 属性设置抽屉的大小，或者使用 body-padding 自定义主体区域内边距。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Space>
           <Button
@@ -433,7 +430,7 @@ const DestroyOnCloseContent = defineComponent({
     <DemoBlock
       title="自定义头部和底部"
       description="使用插槽自定义头部和底部内容。"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openCustom">打开自定义抽屉</Button>
         <Drawer v-model:open="customVisible">
@@ -475,7 +472,7 @@ const DestroyOnCloseContent = defineComponent({
     <DemoBlock
       title="无蒙层"
       description="设置 mask=false 可以不显示遮罩层。"
-      :code="noMaskSnippet">
+      :code="fullPageSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openNoMask">打开无蒙层抽屉</Button>
         <Drawer v-model:open="noMaskVisible" :mask="false" title="无蒙层抽屉">
@@ -495,7 +492,7 @@ const DestroyOnCloseContent = defineComponent({
     <DemoBlock
       title="点击蒙层不关闭"
       description="设置 mask-closable=false 可以禁止点击蒙层关闭抽屉。"
-      :code="notClosableSnippet">
+      :code="fullPageSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openNotClosable">打开抽屉</Button>
         <Drawer v-model:open="notClosableVisible" :mask-closable="false" title="点击蒙层不关闭">
@@ -514,7 +511,7 @@ const DestroyOnCloseContent = defineComponent({
     <DemoBlock
       title="隐藏关闭按钮"
       description="设置 closable=false 可以隐藏关闭按钮。"
-      :code="noCloseButtonSnippet">
+      :code="fullPageSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openNoCloseButton">打开抽屉</Button>
         <Drawer v-model:open="noCloseButtonVisible" :closable="false" title="隐藏关闭按钮">
@@ -533,7 +530,7 @@ const DestroyOnCloseContent = defineComponent({
     <DemoBlock
       title="自定义文案 (labels)"
       description="单语言项目无需引入 locale，直接用扁平 labels 覆盖关闭按钮的 aria-label。"
-      :code="labelsSnippet">
+      :code="fullPageSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openLabels">打开抽屉</Button>
         <Drawer
@@ -554,7 +551,7 @@ const DestroyOnCloseContent = defineComponent({
     <DemoBlock
       title="关闭时销毁"
       description="设置 destroy-on-close 可以在关闭时销毁内容，适用于表单重置等场景。"
-      :code="destroySnippet">
+      :code="fullPageSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openDestroy">打开抽屉</Button>
         <Drawer v-model:open="destroyVisible" :destroy-on-close="true" title="关闭时销毁内容">

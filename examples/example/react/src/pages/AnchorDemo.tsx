@@ -2,6 +2,7 @@ import { AnchorLink } from '@expcat/tigercat-react/AnchorLink'
 import { useRef, useState } from 'react'
 import { Anchor } from '@expcat/tigercat-react/Anchor'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './AnchorDemo.tsx?raw'
 
 // Get the main scroll container from the layout
 const getMainContainer = () => {
@@ -91,7 +92,7 @@ export default function AnchorDemo() {
         {/* 左侧内容区 */}
         <div className="lg:col-span-3 space-y-8">
           <div id="demo-basic" className="scroll-mt-20">
-            <DemoBlock title="基本用法" description="最简单的锚点导航。" code={basicSnippet}>
+            <DemoBlock title="基本用法" description="最简单的锚点导航。" code={fullPageSnippet}>
               <div className="p-6 bg-gray-50 rounded-lg">
                 <p className="text-gray-600 dark:text-gray-400">
                   点击右侧的锚点链接可以滚动到对应的内容区域。当前选中的锚点会高亮显示。
@@ -101,7 +102,7 @@ export default function AnchorDemo() {
           </div>
 
           <div id="demo-horizontal" className="scroll-mt-20">
-            <DemoBlock title="水平方向" description="锚点可以水平排列。" code={horizontalSnippet}>
+            <DemoBlock title="水平方向" description="锚点可以水平排列。" code={fullPageSnippet}>
               <div className="p-6 bg-gray-50 rounded-lg">
                 <Anchor
                   direction="horizontal"
@@ -118,7 +119,7 @@ export default function AnchorDemo() {
           </div>
 
           <div id="demo-container" className="scroll-mt-20">
-            <DemoBlock title="自定义容器" description="可以指定滚动容器。" code={targetSnippet}>
+            <DemoBlock title="自定义容器" description="可以指定滚动容器。" code={fullPageSnippet}>
               <div className="p-6 bg-gray-50 rounded-lg">
                 <div className="flex gap-4">
                   <div
@@ -156,7 +157,7 @@ export default function AnchorDemo() {
           </div>
 
           <div id="demo-nested" className="scroll-mt-20">
-            <DemoBlock title="嵌套锚点" description="支持多级嵌套的锚点。" code={nestedSnippet}>
+            <DemoBlock title="嵌套锚点" description="支持多级嵌套的锚点。" code={fullPageSnippet}>
               <div className="p-6 bg-gray-50 rounded-lg">
                 <div className="flex gap-8">
                   <div className="flex-1">
@@ -191,7 +192,7 @@ export default function AnchorDemo() {
             <DemoBlock
               title="墨水指示器"
               description="固定模式下通过 showInkInFixed 显示墨水指示器；非固定模式默认可见。"
-              code={inkSnippet}>
+              code={fullPageSnippet}>
               <div className="p-6 bg-gray-50 rounded-lg">
                 <div className="flex gap-8">
                   <div className="flex-1">
@@ -221,8 +222,7 @@ export default function AnchorDemo() {
             <DemoBlock
               title="事件处理"
               description="监听 onClick 和 onChange 事件，可配合 targetOffset 使用。"
-              code={eventsSnippet}
-              script={eventsScriptSnippet}>
+              code={fullPageSnippet}>
               <div className="p-6 bg-gray-50 rounded-lg">
                 <div className="flex gap-8 items-start">
                   <div className="flex-1">

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { ScatterChart } from '@expcat/tigercat-react/ScatterChart'
 import { type ScatterChartDatum } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './ScatterChartDemo.tsx?raw'
 
 const basicData: ScatterChartDatum[] = [
   { x: 10, y: 20 },
@@ -103,14 +104,14 @@ const ScatterChartDemo: React.FC = () => {
         </p>
       </div>
 
-      <DemoBlock title="基础用法" description="默认扁平纯色填充，简洁朴素。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="默认扁平纯色填充，简洁朴素。" code={fullPageSnippet}>
         <ScatterChart data={basicData} width={420} height={260} xAxisLabel="X" yAxisLabel="Y" />
       </DemoBlock>
 
       <DemoBlock
         title="自定义样式"
         description="通过 datum.size / datum.color 控制每个点的样式。"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <ScatterChart
           data={customData}
           width={420}
@@ -124,15 +125,14 @@ const ScatterChartDemo: React.FC = () => {
       <DemoBlock
         title="入场动画"
         description="启用 animated 后数据点依次弹入。"
-        code={animatedSnippet}>
+        code={fullPageSnippet}>
         <ScatterChart data={interactiveData} width={420} height={260} animated hoverable />
       </DemoBlock>
 
       <DemoBlock
         title="悬停 + 选中"
         description="悬停时数据点放大高亮，支持点击选中。"
-        code={hoverableSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <ScatterChart
             data={interactiveData}
@@ -156,7 +156,7 @@ const ScatterChartDemo: React.FC = () => {
       <DemoBlock
         title="菱形散点"
         description="通过 pointStyle 切换形状，diamond / square / triangle 均可用。"
-        code={diamondSnippet}>
+        code={fullPageSnippet}>
         <ScatterChart
           data={interactiveData}
           width={420}
@@ -170,7 +170,7 @@ const ScatterChartDemo: React.FC = () => {
       <DemoBlock
         title="渐变风格"
         description="启用 gradient 与 pointBorderWidth 呈现立体效果。"
-        code={flatSnippet}>
+        code={fullPageSnippet}>
         <ScatterChart
           data={basicData}
           width={420}

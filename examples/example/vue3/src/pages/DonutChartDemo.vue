@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { DonutChart } from '@expcat/tigercat-vue/DonutChart'
 import { type PieChartDatum } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './DonutChartDemo.vue?raw'
 
 const basicData: PieChartDatum[] = [
   { value: 40, label: '直接访问' },
@@ -100,7 +101,7 @@ const customSnippet = `<DonutChart
     <DemoBlock
       title="基础用法"
       description="开箱即用的环形图，默认带阴影和间隙，中心可显示汇总数据。"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <DonutChart
         :data="basicData"
         :width="360"
@@ -113,7 +114,7 @@ const customSnippet = `<DonutChart
     <DemoBlock
       title="悬停高亮"
       description="启用 hoverable，悬停时扇区外移并放大，配合中心显示实时数据。"
-      :code="hoverableSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <DonutChart
           :data="interactiveData"
@@ -132,7 +133,7 @@ const customSnippet = `<DonutChart
     <DemoBlock
       title="点击选中"
       description="启用 selectable，点击可选中扇区并保持高亮。"
-      :code="selectableSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <DonutChart
           :data="interactiveData"
@@ -151,7 +152,7 @@ const customSnippet = `<DonutChart
     <DemoBlock
       title="显示图例"
       description="右侧图例 + 中心汇总数据，鼠标与图例联动高亮。"
-      :code="legendSnippet">
+      :code="fullPageSnippet">
       <DonutChart
         :data="interactiveData"
         :width="360"
@@ -166,7 +167,7 @@ const customSnippet = `<DonutChart
     <DemoBlock
       title="显示提示框"
       description="悬停时显示数据提示框，自动计算百分比。"
-      :code="tooltipSnippet">
+      :code="fullPageSnippet">
       <DonutChart
         :data="interactiveData"
         :width="360"
@@ -180,7 +181,7 @@ const customSnippet = `<DonutChart
     <DemoBlock
       title="自定义样式"
       description="自定义配色、更大的间隙和悬停偏移、不同的内径比。"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <DonutChart
         :data="interactiveData"
         :width="360"

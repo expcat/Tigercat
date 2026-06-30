@@ -4,6 +4,7 @@ import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
 import { ColorSwatch } from '@expcat/tigercat-vue/ColorSwatch'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ColorSwatchDemo.vue?raw'
 
 const color = ref('#3b82f6')
 const brandColor = ref('#2563eb')
@@ -50,7 +51,7 @@ const groupSnippet = `<ColorSwatch v-model="brandColor" :groups="brandGroups" :c
     <h1 class="text-3xl font-bold mb-2">ColorSwatch 色板选择器</h1>
     <p class="text-gray-500 mb-8">用于从预设色板或自定义色组中快速选择颜色。</p>
 
-    <DemoBlock title="基本用法" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock title="基本用法" :code="fullPageSnippet">
       <Space :size="16" align="center">
         <ColorSwatch v-model="color" />
         <Text>选中颜色: {{ color }}</Text>
@@ -60,7 +61,7 @@ const groupSnippet = `<ColorSwatch v-model="brandColor" :groups="brandGroups" :c
     <DemoBlock
       title="自定义色组"
       description="groups 支持分组标签，colors 支持禁用与自定义无障碍标签。"
-      :code="groupSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="16">
         <ColorSwatch v-model="brandColor" :groups="brandGroups" :columns="4" />
         <ColorSwatch

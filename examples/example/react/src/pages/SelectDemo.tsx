@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Select } from '@expcat/tigercat-react/Select'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './SelectDemo.tsx?raw'
 
 const basicSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <Select value={basicValue} onChange={(v) => setBasicValue(v ?? '')} options={options} placeholder="请选择" />
@@ -158,11 +159,7 @@ const SelectDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock
-        title="基础用法"
-        description="适用广泛的基础选择器。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基础用法" description="适用广泛的基础选择器。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select
             value={basicValue}
@@ -175,7 +172,7 @@ const SelectDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 有默认值 */}
-      <DemoBlock title="有默认值" description="可以设置默认选中的值。" code={defaultSnippet}>
+      <DemoBlock title="有默认值" description="可以设置默认选中的值。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select
             value={defaultValue}
@@ -187,7 +184,7 @@ const SelectDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 禁用状态 */}
-      <DemoBlock title="禁用状态" description="禁用整个选择器组件。" code={disabledSnippet}>
+      <DemoBlock title="禁用状态" description="禁用整个选择器组件。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select value={disabledValue} options={countries} disabled />
         </Space>
@@ -197,7 +194,7 @@ const SelectDemo: React.FC = () => {
       <DemoBlock
         title="不同尺寸"
         description="Select 支持 sm / md / lg 三种尺寸。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="w-full">
             <p className="text-sm text-gray-600 mb-2">sm</p>
@@ -230,7 +227,7 @@ const SelectDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 禁用选项 */}
-      <DemoBlock title="禁用选项" description="可以禁用单个选项。" code={disabledOptionSnippet}>
+      <DemoBlock title="禁用选项" description="可以禁用单个选项。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select
             value={disabledOptionValue}
@@ -246,7 +243,7 @@ const SelectDemo: React.FC = () => {
       <DemoBlock
         title="可清空"
         description="默认支持清空，也可以关闭清空功能。"
-        code={clearableSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="w-full">
             <p className="text-sm text-gray-600 mb-2">clearable: true</p>
@@ -272,7 +269,7 @@ const SelectDemo: React.FC = () => {
       <DemoBlock
         title="可搜索"
         description="启用 searchable 后可在下拉中输入关键字过滤选项。"
-        code={searchableSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select
             value={searchableValue}
@@ -287,7 +284,7 @@ const SelectDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 多选 */}
-      <DemoBlock title="多选" description="启用 multiple 后可选择多个选项。" code={multipleSnippet}>
+      <DemoBlock title="多选" description="启用 multiple 后可选择多个选项。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select
             value={multipleValue}
@@ -306,7 +303,7 @@ const SelectDemo: React.FC = () => {
       <DemoBlock
         title="多选 + 可搜索"
         description="同时启用 multiple 和 searchable，支持搜索并多选。"
-        code={multipleSearchableSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select
             value={multiSearchValue}
@@ -326,7 +323,7 @@ const SelectDemo: React.FC = () => {
       <DemoBlock
         title="分组选项"
         description="支持传入分组数据（group label + options）。"
-        code={groupedSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select
             value={groupedValue}
@@ -341,7 +338,7 @@ const SelectDemo: React.FC = () => {
       <DemoBlock
         title="空状态"
         description="当 options 为空时，会显示空提示文案。"
-        code={emptySnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select
             value={emptyValue}

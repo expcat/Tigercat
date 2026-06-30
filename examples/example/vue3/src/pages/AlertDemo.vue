@@ -4,6 +4,7 @@ import { List } from '@expcat/tigercat-vue/List'
 import { ref } from 'vue'
 import { Alert } from '@expcat/tigercat-vue/Alert'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './AlertDemo.vue?raw'
 
 const basicSnippet = `<Alert title="这是一条提示信息" />
 <Alert type="success" title="这是一条成功提示" />
@@ -70,7 +71,7 @@ const resetClosableAlerts = () => {
     <DemoBlock
       title="基本用法"
       description="最简单的用法，适用于简短的警告提示。"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <div
         class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert title="这是一条提示信息" />
@@ -83,7 +84,7 @@ const resetClosableAlerts = () => {
     <DemoBlock
       title="提示类型"
       description="Alert 组件支持 4 种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。"
-      :code="typeSnippet">
+      :code="fullPageSnippet">
       <div
         class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert type="info" title="信息提示" description="这是一条信息提示的详细内容" />
@@ -96,7 +97,7 @@ const resetClosableAlerts = () => {
     <DemoBlock
       title="尺寸大小"
       description="Alert 组件支持 3 种不同的尺寸：小、中、大。"
-      :code="sizeSnippet">
+      :code="fullPageSnippet">
       <div
         class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert size="sm" type="info" title="小尺寸提示" description="这是小尺寸的提示内容" />
@@ -108,7 +109,7 @@ const resetClosableAlerts = () => {
     <DemoBlock
       title="带图标"
       description="默认情况下会显示图标，可以通过 showIcon 属性控制。"
-      :code="iconSnippet">
+      :code="fullPageSnippet">
       <div
         class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert type="success" title="带图标的成功提示" :show-icon="true" />
@@ -119,8 +120,7 @@ const resetClosableAlerts = () => {
     <DemoBlock
       title="可关闭"
       description="通过设置 closable 属性可以让 Alert 显示关闭按钮。"
-      :code="closableSnippet"
-      :script="closableScriptSnippet">
+      :code="fullPageSnippet">
       <div
         class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert
@@ -152,7 +152,7 @@ const resetClosableAlerts = () => {
     <DemoBlock
       title="带描述信息"
       description="使用 description 属性可以添加详细的描述内容。"
-      :code="descriptionSnippet">
+      :code="fullPageSnippet">
       <div
         class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert
@@ -173,7 +173,7 @@ const resetClosableAlerts = () => {
     <DemoBlock
       title="自定义内容"
       description="可以使用插槽自定义标题和描述内容。"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <div
         class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert type="info">
@@ -204,7 +204,7 @@ const resetClosableAlerts = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="完整功能示例" description="综合展示所有功能。" :code="fullSnippet">
+    <DemoBlock title="完整功能示例" description="综合展示所有功能。" :code="fullPageSnippet">
       <div
         class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert
@@ -225,7 +225,7 @@ const resetClosableAlerts = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="实际应用场景" description="模拟真实的使用场景。" :code="scenarioSnippet">
+    <DemoBlock title="实际应用场景" description="模拟真实的使用场景。" :code="fullPageSnippet">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h3 class="text-lg font-semibold mb-3">表单提交成功</h3>

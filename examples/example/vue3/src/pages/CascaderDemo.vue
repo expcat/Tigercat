@@ -3,6 +3,7 @@ import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Cascader } from '@expcat/tigercat-vue/Cascader'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './CascaderDemo.vue?raw'
 
 const val = ref<(string | number)[]>([])
 const val2 = ref<(string | number)[]>([])
@@ -64,16 +65,15 @@ const sizeSnippet = `<Space direction="vertical" :size="12">
     <DemoBlock
       title="基本用法"
       description="逐级选择，v-model 绑定选中路径"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+      :code="fullPageSnippet">
       <Cascader v-model="val" :options="options" placeholder="请选择地区" />
     </DemoBlock>
 
-    <DemoBlock title="可搜索" description="searchable 开启搜索过滤" :code="searchSnippet">
+    <DemoBlock title="可搜索" description="searchable 开启搜索过滤" :code="fullPageSnippet">
       <Cascader v-model="val2" :options="options" placeholder="搜索地区" searchable />
     </DemoBlock>
 
-    <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸" :code="sizeSnippet">
+    <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸" :code="fullPageSnippet">
       <Space direction="vertical" :size="12">
         <Cascader :options="options" placeholder="小" size="sm" />
         <Cascader :options="options" placeholder="中" size="md" />

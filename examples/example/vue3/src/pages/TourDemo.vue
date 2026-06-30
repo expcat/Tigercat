@@ -3,11 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">Tour 漫游式引导</h1>
     <p class="text-gray-500 mb-8">分步引导用户了解页面功能。</p>
 
-    <DemoBlock
-      title="基础用法"
-      description="点击按钮开始引导"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="点击按钮开始引导" :code="fullPageSnippet">
       <div class="flex gap-4 items-center">
         <button
           id="tour-btn-1"
@@ -24,7 +20,7 @@
     <DemoBlock
       title="自定义按钮文字 & 指示器"
       description="nextText / prevText / finishText"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <button
         id="tour-custom"
         class="px-4 py-2 bg-green-500 text-white rounded"
@@ -46,6 +42,7 @@
 import { ref } from 'vue'
 import { Tour } from '@expcat/tigercat-vue/Tour'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './TourDemo.vue?raw'
 
 const open = ref(false)
 const open2 = ref(false)

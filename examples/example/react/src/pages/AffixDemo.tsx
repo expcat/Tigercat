@@ -1,5 +1,6 @@
 import { Affix } from '@expcat/tigercat-react/Affix'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './AffixDemo.tsx?raw'
 
 const topSnippet = `<Affix offsetTop={0} onChange={(affixed) => console.log(affixed)}>
   <div className="px-4 py-2 bg-blue-500 text-white rounded">固定在顶部</div>
@@ -18,7 +19,7 @@ const AffixDemo: React.FC = () => {
       <DemoBlock
         title="固定在顶部"
         description="offsetTop 设置触发固定的滚动距离"
-        code={topSnippet}>
+        code={fullPageSnippet}>
         <div
           style={{
             height: 100,
@@ -39,7 +40,7 @@ const AffixDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="底部固定" description="offsetBottom 从底部触发" code={bottomSnippet}>
+      <DemoBlock title="底部固定" description="offsetBottom 从底部触发" code={fullPageSnippet}>
         <Affix offsetBottom={20}>
           <div className="px-4 py-2 bg-green-500 text-white rounded inline-block">
             距底部 20px 固定

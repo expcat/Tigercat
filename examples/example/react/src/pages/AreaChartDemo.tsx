@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { AreaChart } from '@expcat/tigercat-react/AreaChart'
 import { type LineChartDatum, type AreaChartSeries } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './AreaChartDemo.tsx?raw'
 
 const basicData: LineChartDatum[] = [
   { x: 'Jan', y: 30 },
@@ -130,7 +131,7 @@ const AreaChartDemo: React.FC = () => {
         </p>
       </div>
 
-      <DemoBlock title="基础用法" description="单系列面积图。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="单系列面积图。" code={fullPageSnippet}>
         <AreaChart
           data={basicData}
           width={420}
@@ -144,7 +145,7 @@ const AreaChartDemo: React.FC = () => {
       <DemoBlock
         title="渐变填充 + 动画"
         description="渐变面积填充、曲线平滑、空心数据点与入场动画，对齐 ECharts 视觉效果。"
-        code={gradientSnippet}>
+        code={fullPageSnippet}>
         <AreaChart
           data={basicData}
           width={420}
@@ -157,14 +158,14 @@ const AreaChartDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="多系列" description="多个系列对比。" code={multiSeriesSnippet}>
+      <DemoBlock title="多系列" description="多个系列对比。" code={fullPageSnippet}>
         <AreaChart series={multiSeries} width={420} height={240} hoverable showLegend />
       </DemoBlock>
 
       <DemoBlock
         title="堆叠面积图"
         description="数据堆叠展示，适合展示部分与整体关系。"
-        code={stackedSnippet}>
+        code={fullPageSnippet}>
         <AreaChart
           series={stackedSeries}
           width={420}
@@ -179,8 +180,7 @@ const AreaChartDemo: React.FC = () => {
       <DemoBlock
         title="交互功能"
         description="悬停高亮、点击选择、曲线平滑。"
-        code={interactiveSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <AreaChart
             series={multiSeries}

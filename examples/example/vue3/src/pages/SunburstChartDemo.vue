@@ -3,14 +3,14 @@
     <h1 class="text-3xl font-bold mb-2">SunburstChart 旭日图</h1>
     <p class="text-gray-500 mb-8">以多层同心弧展示层级数据结构。</p>
 
-    <DemoBlock title="基础用法" description="层级数据自动展开为多层弧" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="层级数据自动展开为多层弧" :code="fullPageSnippet">
       <SunburstChart :data="sunburstData" :width="360" :height="360" hoverable show-legend />
     </DemoBlock>
 
     <DemoBlock
       title="内径 & 标签"
       description="innerRadiusRatio 创建甜甜圈效果"
-      :code="donutSnippet">
+      :code="fullPageSnippet">
       <SunburstChart
         :data="sunburstData"
         :width="360"
@@ -21,7 +21,7 @@
         selectable />
     </DemoBlock>
 
-    <DemoBlock title="自定义颜色" :code="colorSnippet">
+    <DemoBlock title="自定义颜色" :code="fullPageSnippet">
       <SunburstChart
         :data="sunburstData"
         :width="360"
@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import { SunburstChart } from '@expcat/tigercat-vue/SunburstChart'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './SunburstChartDemo.vue?raw'
 
 const sunburstData = [
   {

@@ -3,6 +3,7 @@ import { Checkbox } from '@expcat/tigercat-react/Checkbox'
 import { CheckboxGroup } from '@expcat/tigercat-react/CheckboxGroup'
 import { Space } from '@expcat/tigercat-react/Space'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './CheckboxDemo.tsx?raw'
 
 const basicSnippet = `<Space direction="vertical">
   <Checkbox checked={checked} onChange={setChecked}>复选框</Checkbox>
@@ -120,8 +121,7 @@ const CheckboxDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="单独使用可以表示两种状态之间的切换。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <Checkbox checked={checked} onChange={setChecked}>
             复选框
@@ -134,7 +134,7 @@ const CheckboxDemo: React.FC = () => {
       <DemoBlock
         title="非受控模式"
         description="使用 defaultChecked 设置默认选中，组件内部管理状态。"
-        code={uncontrolledSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Checkbox defaultChecked>默认选中</Checkbox>
           <Checkbox>默认未选中</Checkbox>
@@ -142,7 +142,7 @@ const CheckboxDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 禁用状态 */}
-      <DemoBlock title="禁用状态" description="多选框不可用状态。" code={disabledSnippet}>
+      <DemoBlock title="禁用状态" description="多选框不可用状态。" code={fullPageSnippet}>
         <Space>
           <Checkbox disabled>未选中禁用</Checkbox>
           <Checkbox checked disabled>
@@ -155,8 +155,7 @@ const CheckboxDemo: React.FC = () => {
       <DemoBlock
         title="不确定状态"
         description="通过 indeterminate 实现“全选/半选”效果。"
-        code={indeterminateSnippet}
-        script={indeterminateScriptSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <Checkbox
             checked={allChecked}
@@ -180,7 +179,7 @@ const CheckboxDemo: React.FC = () => {
       <DemoBlock
         title="多选框组"
         description="适用于多个勾选框绑定到同一个数组的情景。"
-        code={groupSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <CheckboxGroup value={fruits} onChange={handleFruitsChange}>
             <Checkbox value="apple">苹果</Checkbox>
@@ -199,7 +198,7 @@ const CheckboxDemo: React.FC = () => {
       <DemoBlock
         title="尺寸"
         description="支持 sm / md / lg 三种尺寸，可在 CheckboxGroup 中统一设置。"
-        code={sizeSnippet}>
+        code={fullPageSnippet}>
         <Space>
           <Checkbox size="sm">Small</Checkbox>
           <Checkbox size="md">Medium</Checkbox>
@@ -211,7 +210,7 @@ const CheckboxDemo: React.FC = () => {
       <DemoBlock
         title="分组禁用"
         description="设置 CheckboxGroup 的 disabled 可禁用所有子复选框。"
-        code={groupDisabledSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <CheckboxGroup disabled value={['apple']}>
             <Checkbox value="apple">苹果</Checkbox>
@@ -225,7 +224,7 @@ const CheckboxDemo: React.FC = () => {
       <DemoBlock
         title="分组尺寸继承"
         description="CheckboxGroup 设置 size 后子复选框继承，个别子项可通过自身 size 覆盖。"
-        code={groupSizeSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical">
           <CheckboxGroup size="lg" value={groupSizeValues} onChange={setGroupSizeValues}>
             <Checkbox value="apple">苹果</Checkbox>

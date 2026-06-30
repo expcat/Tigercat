@@ -3,6 +3,7 @@ import { List } from '@expcat/tigercat-react/List'
 import { useRef, useState } from 'react'
 import { Message } from '@expcat/tigercat-react/Message'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './MessageDemo.tsx?raw'
 
 export default function MessageDemo() {
   const manualLoadingCloseFnsRef = useRef<Array<() => void>>([])
@@ -298,7 +299,7 @@ const [manualLoadingCount, setManualLoadingCount] = useState(0)`
       <DemoBlock
         title="基本用法"
         description="最简单的用法，调用 Message 方法即可显示消息提示。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
             <Button className={primaryButtonClassName} onClick={showInfo}>
@@ -324,7 +325,7 @@ const [manualLoadingCount, setManualLoadingCount] = useState(0)`
       <DemoBlock
         title="自定义持续时间"
         description="通过 duration 属性自定义消息显示时间，设置为 0 时不会自动关闭。"
-        code={durationSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
             <Button className={primaryButtonClassName} onClick={showShortMessage}>
@@ -344,8 +345,7 @@ const [manualLoadingCount, setManualLoadingCount] = useState(0)`
       <DemoBlock
         title="手动关闭"
         description="设置 closable 为 true 显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条 loading，并提供逐条/一键关闭。"
-        code={manualSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2 mb-4">
             <Button className={primaryButtonClassName} onClick={showClosableMessage}>
@@ -376,7 +376,7 @@ const [manualLoadingCount, setManualLoadingCount] = useState(0)`
       </DemoBlock>
 
       {/* 完整流程示例 */}
-      <DemoBlock title="完整流程示例" description="模拟表单提交的完整流程。" code={flowSnippet}>
+      <DemoBlock title="完整流程示例" description="模拟表单提交的完整流程。" code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Button
             className="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
@@ -390,7 +390,7 @@ const [manualLoadingCount, setManualLoadingCount] = useState(0)`
       <DemoBlock
         title="队列管理"
         description="支持多条消息同时显示，可以一次清空所有消息。"
-        code={queueSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
             <Button className={primaryButtonClassName} onClick={showMultipleMessages}>
@@ -407,7 +407,7 @@ const [manualLoadingCount, setManualLoadingCount] = useState(0)`
       <DemoBlock
         title="回调函数"
         description="可以通过 onClose 回调函数在消息关闭时执行特定操作（查看控制台）。"
-        code={callbackSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Button className={successButtonClassName} onClick={showMessageWithCallback}>
             显示消息（带回调）
@@ -419,7 +419,7 @@ const [manualLoadingCount, setManualLoadingCount] = useState(0)`
       <DemoBlock
         title="自定义样式"
         description="可以通过 className 属性添加自定义样式类。"
-        code={customSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Button className={purpleButtonClassName} onClick={showCustomClass}>
             自定义样式
@@ -431,7 +431,7 @@ const [manualLoadingCount, setManualLoadingCount] = useState(0)`
       <DemoBlock
         title="自定义图标"
         description="通过 icon 属性传入 SVG path d 属性值，替换默认类型图标。"
-        code={customIconSnippet}>
+        code={fullPageSnippet}>
         <div className={demoCardClassName}>
           <Button className={primaryButtonClassName} onClick={showCustomIcon}>
             自定义图标
@@ -440,7 +440,7 @@ const [manualLoadingCount, setManualLoadingCount] = useState(0)`
       </DemoBlock>
 
       {/* 实际应用场景 */}
-      <DemoBlock title="实际应用场景" description="常见的使用场景示例。" code={sceneSnippet}>
+      <DemoBlock title="实际应用场景" description="常见的使用场景示例。" code={fullPageSnippet}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className={demoCardClassName}>
             <h3 className="text-lg font-semibold mb-3">文件上传</h3>

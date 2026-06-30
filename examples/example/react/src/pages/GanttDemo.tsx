@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Gantt } from '@expcat/tigercat-react/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './GanttDemo.tsx?raw'
 
 const releaseTasks: GanttTask[] = [
   {
@@ -66,7 +67,7 @@ export default function GanttDemo() {
       <DemoBlock
         title="基础用法"
         description="任务条、进度条与依赖线自动按时间范围布局。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <Gantt
             data={releaseTasks}
@@ -90,7 +91,7 @@ export default function GanttDemo() {
       <DemoBlock
         title="月份刻度"
         description="scale='month' 适合跨月项目排期。"
-        code={monthSnippet}>
+        code={fullPageSnippet}>
         <Gantt
           data={releaseTasks}
           width={820}

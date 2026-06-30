@@ -4,6 +4,7 @@ import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
 import { CronEditor } from '@expcat/tigercat-vue/CronEditor'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './CronEditorDemo.vue?raw'
 
 const cron = ref('0 9 * * 1-5')
 const advancedCron = ref('*/15 9-18 * * 1-5')
@@ -41,7 +42,7 @@ function handleAdvancedChange(
     <h1 class="text-3xl font-bold mb-2">CronEditor Cron 编辑器</h1>
     <p class="text-gray-500 mb-8">用于编辑和校验 5 段 Cron 表达式。</p>
 
-    <DemoBlock title="基本用法" :code="basicSnippet" :script="basicScriptSnippet">
+    <DemoBlock title="基本用法" :code="fullPageSnippet">
       <Space direction="vertical" :size="12">
         <CronEditor v-model="cron" />
         <Text>表达式: {{ cron }}</Text>
@@ -51,7 +52,7 @@ function handleAdvancedChange(
     <DemoBlock
       title="预设、校验与状态"
       description="支持预设选择、字段可视化编辑和错误提示。"
-      :code="featureSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" :size="16">
         <CronEditor v-model="advancedCron" @change="handleAdvancedChange" />
         <Text>校验结果: {{ validationText }}</Text>

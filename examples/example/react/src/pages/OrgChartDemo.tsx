@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { OrgChart } from '@expcat/tigercat-react/OrgChart'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './OrgChartDemo.tsx?raw'
 
 const orgData: OrgChartNode = {
   id: 'ceo',
@@ -65,7 +66,7 @@ export default function OrgChartDemo() {
       <DemoBlock
         title="基础用法"
         description="树形组织数据，节点自动居中到子树范围。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <OrgChart
             data={orgData}
@@ -87,7 +88,7 @@ export default function OrgChartDemo() {
       <DemoBlock
         title="横向布局"
         description="direction='horizontal' 将层级从左向右展开。"
-        code={horizontalSnippet}>
+        code={fullPageSnippet}>
         <OrgChart data={orgData} direction="horizontal" width={760} height={460} hoverable />
       </DemoBlock>
     </div>

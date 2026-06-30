@@ -3,6 +3,7 @@ import { Steps } from '@expcat/tigercat-react/Steps'
 import { StepsItem } from '@expcat/tigercat-react/StepsItem'
 import { Button } from '@expcat/tigercat-react/Button'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './StepsDemo.tsx?raw'
 
 const basicSnippet = `<Steps current={current1}>
   <StepsItem title="已完成" description="这是步骤的描述信息" />
@@ -154,11 +155,7 @@ const StepsDemo: React.FC = () => {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock
-        title="基本用法"
-        description="简单的步骤条，展示流程进度。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="简单的步骤条，展示流程进度。" code={fullPageSnippet}>
         <Steps current={current1}>
           <StepsItem title="已完成" description="这是步骤的描述信息" />
           <StepsItem title="进行中" description="这是步骤的描述信息" />
@@ -181,7 +178,7 @@ const StepsDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 迷你版 */}
-      <DemoBlock title="迷你版" description="简洁的步骤条，不显示描述信息。" code={miniSnippet}>
+      <DemoBlock title="迷你版" description="简洁的步骤条，不显示描述信息。" code={fullPageSnippet}>
         <Steps current={current2} simple>
           <StepsItem title="已完成" />
           <StepsItem title="进行中" />
@@ -204,7 +201,7 @@ const StepsDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 小尺寸 */}
-      <DemoBlock title="小尺寸" description="使用小尺寸的步骤条。" code={smallSnippet}>
+      <DemoBlock title="小尺寸" description="使用小尺寸的步骤条。" code={fullPageSnippet}>
         <Steps current={current3} size="small">
           <StepsItem title="步骤 1" description="这是步骤的描述信息" />
           <StepsItem title="步骤 2" description="这是步骤的描述信息" />
@@ -227,7 +224,7 @@ const StepsDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 错误状态 */}
-      <DemoBlock title="错误状态" description="步骤执行出错时的状态展示。" code={errorSnippet}>
+      <DemoBlock title="错误状态" description="步骤执行出错时的状态展示。" code={fullPageSnippet}>
         <Steps current={current4} status="error">
           <StepsItem title="已完成" description="这是步骤的描述信息" />
           <StepsItem title="出错了" description="发生了一些错误" />
@@ -236,7 +233,7 @@ const StepsDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 纵向步骤条 */}
-      <DemoBlock title="纵向步骤条" description="垂直方向的步骤条。" code={verticalSnippet}>
+      <DemoBlock title="纵向步骤条" description="垂直方向的步骤条。" code={fullPageSnippet}>
         <Steps current={current5} direction="vertical">
           <StepsItem title="步骤 1" description="这是步骤 1 的详细描述信息，可以比较长" />
           <StepsItem title="步骤 2" description="这是步骤 2 的详细描述信息" />
@@ -259,10 +256,7 @@ const StepsDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 可点击步骤 */}
-      <DemoBlock
-        title="可点击步骤"
-        description="点击步骤标题可以切换步骤。"
-        code={clickableSnippet}>
+      <DemoBlock title="可点击步骤" description="点击步骤标题可以切换步骤。" code={fullPageSnippet}>
         <Steps current={current6} clickable onChange={setCurrent6}>
           <StepsItem title="步骤 1" description="点击标题切换步骤" />
           <StepsItem title="步骤 2" description="点击标题切换步骤" />
@@ -272,7 +266,7 @@ const StepsDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 自定义图标 */}
-      <DemoBlock title="自定义图标" description="可以为每个步骤自定义图标。" code={iconSnippet}>
+      <DemoBlock title="自定义图标" description="可以为每个步骤自定义图标。" code={fullPageSnippet}>
         <Steps current={1}>
           <StepsItem
             title="登录"
@@ -320,7 +314,7 @@ const StepsDemo: React.FC = () => {
       <DemoBlock
         title="禁用步骤"
         description="可点击模式下，可禁用某个步骤使其无法点击切换。"
-        code={disabledSnippet}>
+        code={fullPageSnippet}>
         <Steps current={current7} clickable onChange={setCurrent7}>
           <StepsItem title="步骤 1" description="可点击的步骤" />
           <StepsItem title="步骤 2" description="该步骤已禁用" disabled />
@@ -333,7 +327,7 @@ const StepsDemo: React.FC = () => {
       <DemoBlock
         title="自定义步骤状态"
         description="通过 StepsItem 的 status 属性覆盖自动推导的步骤状态。"
-        code={customStatusSnippet}>
+        code={fullPageSnippet}>
         <Steps current={2}>
           <StepsItem title="已完成" description="自动推导为 finish" />
           <StepsItem title="自定义错误" description="status 覆盖自动状态" status="error" />

@@ -3,7 +3,10 @@
     <h1 class="text-3xl font-bold mb-2">Affix 固钉</h1>
     <p class="text-gray-500 mb-8">将元素固定在可视区域的指定位置。</p>
 
-    <DemoBlock title="固定在顶部" description="offsetTop 设置触发固定的滚动距离" :code="topSnippet">
+    <DemoBlock
+      title="固定在顶部"
+      description="offsetTop 设置触发固定的滚动距离"
+      :code="fullPageSnippet">
       <div
         style="
           height: 100px;
@@ -22,7 +25,7 @@
       </div>
     </DemoBlock>
 
-    <DemoBlock title="底部固定" description="offsetBottom 从底部触发" :code="bottomSnippet">
+    <DemoBlock title="底部固定" description="offsetBottom 从底部触发" :code="fullPageSnippet">
       <Affix :offset-bottom="20">
         <div class="px-4 py-2 bg-green-500 text-white rounded inline-block">距底部 20px 固定</div>
       </Affix>
@@ -33,6 +36,7 @@
 <script setup lang="ts">
 import { Affix } from '@expcat/tigercat-vue/Affix'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './AffixDemo.vue?raw'
 
 const onAffixChange = (affixed: boolean) => {
   console.log('Affix state:', affixed)

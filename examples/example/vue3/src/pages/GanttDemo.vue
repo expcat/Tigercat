@@ -6,7 +6,7 @@
     <DemoBlock
       title="基础用法"
       description="任务条、进度条与依赖线自动按时间范围布局。"
-      :code="basicSnippet">
+      :code="fullPageSnippet">
       <div class="space-y-4">
         <Gantt
           :data="releaseTasks"
@@ -26,7 +26,10 @@
       </div>
     </DemoBlock>
 
-    <DemoBlock title="月份刻度" description="scale='month' 适合跨月项目排期。" :code="monthSnippet">
+    <DemoBlock
+      title="月份刻度"
+      description="scale='month' 适合跨月项目排期。"
+      :code="fullPageSnippet">
       <Gantt
         :data="releaseTasks"
         :width="820"
@@ -45,6 +48,7 @@ import { ref } from 'vue'
 import { Gantt } from '@expcat/tigercat-vue/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './GanttDemo.vue?raw'
 
 const selectedId = ref<string | number | null>(null)
 

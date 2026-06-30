@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Transfer } from '@expcat/tigercat-react/Transfer'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TransferDemo.tsx?raw'
 
 const dataSource = Array.from({ length: 10 }, (_, i) => ({
   key: String(i + 1),
@@ -31,15 +32,11 @@ const TransferDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Transfer 穿梭框</h1>
       <p className="text-gray-500 mb-8">双栏穿梭选择，将数据在两栏之间移动。</p>
 
-      <DemoBlock
-        title="基本用法"
-        description="双向穿梭选择"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基本用法" description="双向穿梭选择" code={fullPageSnippet}>
         <Transfer targetKeys={targetKeys1} onChange={setTargetKeys1} dataSource={dataSource} />
       </DemoBlock>
 
-      <DemoBlock title="搜索与标题" description="searchable 开启搜索" code={searchSnippet}>
+      <DemoBlock title="搜索与标题" description="searchable 开启搜索" code={fullPageSnippet}>
         <Transfer
           targetKeys={targetKeys2}
           onChange={setTargetKeys2}

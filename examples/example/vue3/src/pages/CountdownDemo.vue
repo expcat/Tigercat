@@ -4,6 +4,7 @@ import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Card } from '@expcat/tigercat-vue/Card'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './CountdownDemo.vue?raw'
 
 const now = Date.now()
 const status = ref('等待付款')
@@ -31,7 +32,7 @@ const eventSnippet = `<Countdown
     <h1 class="text-3xl font-bold mb-2">Countdown 倒计时</h1>
     <p class="text-gray-500 mb-8">展示目标时间的剩余时长，支持格式化、结束事件和稳定初始值。</p>
 
-    <DemoBlock title="基本用法" description="使用目标时间展示剩余时长" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="使用目标时间展示剩余时长" :code="fullPageSnippet">
       <Space :size="32">
         <Countdown title="活动结束" :value="now + 2 * 60 * 60 * 1000" :now="now" />
         <Countdown title="发售倒计时" :value="now + 15 * 60 * 1000" :now="now" format="mm:ss" />
@@ -41,7 +42,7 @@ const eventSnippet = `<Countdown
     <DemoBlock
       title="格式与前后缀"
       description="format 可组合天、时、分、秒和毫秒"
-      :code="formatSnippet">
+      :code="fullPageSnippet">
       <Space :size="32">
         <Countdown
           title="跨天任务"
@@ -57,7 +58,7 @@ const eventSnippet = `<Countdown
       </Space>
     </DemoBlock>
 
-    <DemoBlock title="结束事件" description="倒计时归零时触发 finish" :code="eventSnippet">
+    <DemoBlock title="结束事件" description="倒计时归零时触发 finish" :code="fullPageSnippet">
       <Card style="width: 260px">
         <Countdown
           title="付款保留时间"

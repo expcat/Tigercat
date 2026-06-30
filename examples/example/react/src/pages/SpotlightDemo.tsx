@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { type SpotlightItem } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './SpotlightDemo.tsx?raw'
 
 const commands: SpotlightItem[] = [
   {
@@ -67,7 +68,10 @@ const SpotlightDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Spotlight 命令面板</h1>
       <p className="text-gray-500 mb-8">支持分组结果、模糊搜索与键盘导航的命令面板。</p>
 
-      <DemoBlock title="基本用法" description="通过 open 控制命令面板显示状态" code={basicSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="通过 open 控制命令面板显示状态"
+        code={fullPageSnippet}>
         <div className="flex flex-wrap items-center gap-3">
           <Button onClick={() => setOpen(true)}>打开命令面板</Button>
           {selected && <span className="text-sm text-gray-500">已选择：{selected}</span>}
@@ -83,10 +87,7 @@ const SpotlightDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock
-        title="受控搜索"
-        description="query 与 open 都可以完全受控"
-        code={controlledSnippet}>
+      <DemoBlock title="受控搜索" description="query 与 open 都可以完全受控" code={fullPageSnippet}>
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="outline" onClick={() => setControlledOpen(true)}>
             打开受控面板

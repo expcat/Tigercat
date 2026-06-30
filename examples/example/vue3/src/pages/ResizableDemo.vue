@@ -3,11 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">Resizable 可调整大小容器</h1>
     <p class="text-gray-500 mb-8">拖拽手柄改变元素尺寸，支持锁定宽高比和约束范围。</p>
 
-    <DemoBlock
-      title="基础用法"
-      description="拖拽右下角手柄"
-      :code="basicSnippet"
-      :script="basicScriptSnippet">
+    <DemoBlock title="基础用法" description="拖拽右下角手柄" :code="fullPageSnippet">
       <Resizable
         :default-width="300"
         :default-height="150"
@@ -24,7 +20,7 @@
     <DemoBlock
       title="锁定宽高比 & 单轴"
       description="lockAspectRatio / axis='x'"
-      :code="constrainedSnippet">
+      :code="fullPageSnippet">
       <div class="flex gap-8">
         <Resizable :default-width="200" :default-height="200" lock-aspect-ratio>
           <div
@@ -41,7 +37,7 @@
       </div>
     </DemoBlock>
 
-    <DemoBlock title="禁用" :code="disabledSnippet">
+    <DemoBlock title="禁用" :code="fullPageSnippet">
       <Resizable :default-width="200" :default-height="100" disabled>
         <div
           class="w-full h-full bg-gray-100 border rounded flex items-center justify-center text-sm text-gray-400">
@@ -56,6 +52,7 @@
 import { reactive } from 'vue'
 import { Resizable } from '@expcat/tigercat-vue/Resizable'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ResizableDemo.vue?raw'
 
 const size = reactive({ width: 300, height: 150 })
 

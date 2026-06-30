@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { BarChart } from '@expcat/tigercat-react/BarChart'
 import { type BarChartDatum } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './BarChartDemo.tsx?raw'
 
 const basicData: BarChartDatum[] = [
   { x: 'Mon', y: 120 },
@@ -148,7 +149,7 @@ const BarChartDemo: React.FC = () => {
         </p>
       </div>
 
-      <DemoBlock title="基础用法" description="自动生成坐标轴与网格。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="自动生成坐标轴与网格。" code={fullPageSnippet}>
         <BarChart
           data={basicData}
           width={420}
@@ -161,7 +162,7 @@ const BarChartDemo: React.FC = () => {
       <DemoBlock
         title="渐变填充 + 动画"
         description="启用 gradient 渐变与 animated 平滑过渡，配合数值标签。"
-        code={gradientSnippet}>
+        code={fullPageSnippet}>
         <BarChart
           data={interactiveData}
           width={420}
@@ -174,7 +175,10 @@ const BarChartDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="自定义样式" description="自定义颜色、圆角与刻度格式。" code={customSnippet}>
+      <DemoBlock
+        title="自定义样式"
+        description="自定义颜色、圆角与刻度格式。"
+        code={fullPageSnippet}>
         <BarChart
           data={coloredData}
           width={420}
@@ -189,7 +193,7 @@ const BarChartDemo: React.FC = () => {
       <DemoBlock
         title="数值标签"
         description="showValueLabels 在柱子上方或内部显示数值。"
-        code={valueLabelSnippet}>
+        code={fullPageSnippet}>
         <BarChart
           data={basicData}
           width={420}
@@ -204,7 +208,7 @@ const BarChartDemo: React.FC = () => {
       <DemoBlock
         title="柱宽/柱高约束"
         description="barMaxWidth 限制最大柱宽，barMinHeight 保证微小值可见。"
-        code={constraintSnippet}>
+        code={fullPageSnippet}>
         <BarChart
           data={smallValuesData}
           width={420}
@@ -219,8 +223,7 @@ const BarChartDemo: React.FC = () => {
       <DemoBlock
         title="悬停高亮"
         description="启用 hoverable 后，鼠标悬停时高亮柱子，其余淡出。"
-        code={hoverableSnippet}
-        script={basicScriptSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <BarChart
             data={interactiveData}
@@ -240,7 +243,7 @@ const BarChartDemo: React.FC = () => {
       <DemoBlock
         title="点击选中"
         description="启用 selectable 后，点击可选中柱子，支持事件回调。"
-        code={selectableSnippet}>
+        code={fullPageSnippet}>
         <div className="space-y-4">
           <BarChart
             data={interactiveData}
@@ -263,7 +266,7 @@ const BarChartDemo: React.FC = () => {
       <DemoBlock
         title="显示图例"
         description="通过 showLegend 显示图例，可设置位置。"
-        code={legendSnippet}>
+        code={fullPageSnippet}>
         <BarChart
           data={coloredData}
           width={420}
@@ -277,7 +280,7 @@ const BarChartDemo: React.FC = () => {
       <DemoBlock
         title="显示提示框"
         description="通过 showTooltip 在悬停时显示数据提示。"
-        code={tooltipSnippet}>
+        code={fullPageSnippet}>
         <BarChart data={interactiveData} width={420} height={240} hoverable showTooltip gradient />
       </DemoBlock>
     </div>

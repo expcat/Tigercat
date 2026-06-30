@@ -4,6 +4,7 @@ import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
 import { Progress } from '@expcat/tigercat-vue/Progress'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './ProgressDemo.vue?raw'
 
 const uploadProgress = ref(0)
 
@@ -126,7 +127,10 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock title="基本用法" description="线形进度条，默认展示百分比文本。" :code="basicSnippet">
+    <DemoBlock
+      title="基本用法"
+      description="线形进度条，默认展示百分比文本。"
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Progress :percentage="0" />
         <Progress :percentage="50" />
@@ -135,7 +139,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     </DemoBlock>
 
     <!-- 进度条变体 -->
-    <DemoBlock title="进度条变体" description="支持六种颜色变体。" :code="variantSnippet">
+    <DemoBlock title="进度条变体" description="支持六种颜色变体。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Progress variant="default" :percentage="20" />
         <Progress variant="primary" :percentage="40" />
@@ -150,7 +154,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     <DemoBlock
       title="进度条状态"
       description="通过状态显示不同的进度状态，状态会覆盖变体颜色。"
-      :code="statusSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Progress :percentage="100" status="success" />
         <Progress :percentage="50" status="exception" />
@@ -159,7 +163,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     </DemoBlock>
 
     <!-- 进度条尺寸 -->
-    <DemoBlock title="进度条尺寸" description="支持三种尺寸。" :code="sizeSnippet">
+    <DemoBlock title="进度条尺寸" description="支持三种尺寸。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Progress size="sm" :percentage="50" />
         <Progress size="md" :percentage="50" />
@@ -171,7 +175,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     <DemoBlock
       title="圆形进度条"
       description='通过设置 type="circle" 展示圆形进度条。'
-      :code="circleSnippet">
+      :code="fullPageSnippet">
       <Space align="center">
         <Progress type="circle" :percentage="0" :show-text="true" />
         <Progress type="circle" :percentage="25" :show-text="true" />
@@ -184,7 +188,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     <DemoBlock
       title="圆形进度条尺寸"
       description="圆形进度条支持三种尺寸。"
-      :code="circleSizeSnippet">
+      :code="fullPageSnippet">
       <Space align="center">
         <Progress type="circle" size="sm" :percentage="75" :show-text="true" />
         <Progress type="circle" size="md" :percentage="75" :show-text="true" />
@@ -193,7 +197,10 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     </DemoBlock>
 
     <!-- 自定义文本 -->
-    <DemoBlock title="自定义文本" description="可以自定义进度条显示的文本。" :code="textSnippet">
+    <DemoBlock
+      title="自定义文本"
+      description="可以自定义进度条显示的文本。"
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Progress :percentage="50" text="进行中" />
         <Progress :percentage="100" text="已完成" />
@@ -202,7 +209,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     </DemoBlock>
 
     <!-- 不显示文字 -->
-    <DemoBlock title="不显示文字" description="可以隐藏进度条的文本显示。" :code="noTextSnippet">
+    <DemoBlock title="不显示文字" description="可以隐藏进度条的文本显示。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Progress :percentage="50" :show-text="false" />
         <Progress :percentage="100" :show-text="false" />
@@ -213,7 +220,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     <DemoBlock
       title="条纹进度条"
       description="线形进度条支持条纹样式和动画效果。"
-      :code="stripedSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Progress :percentage="70" :striped="true" />
         <Progress :percentage="70" :striped="true" :striped-animation="true" />
@@ -224,7 +231,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     <DemoBlock
       title="自定义尺寸"
       description="支持自定义宽度、高度以及圆形进度条的线条宽度。"
-      :code="customSizeSnippet">
+      :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Progress :percentage="60" width="300px" />
         <Progress :percentage="60" :height="20" />
@@ -233,11 +240,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     </DemoBlock>
 
     <!-- 文件上传示例 -->
-    <DemoBlock
-      title="文件上传示例"
-      description="模拟文件上传进度。"
-      :code="uploadSnippet"
-      :script="uploadScriptSnippet">
+    <DemoBlock title="文件上传示例" description="模拟文件上传进度。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full">
         <Progress :percentage="uploadProgress" />
         <Button variant="primary" @click="startUpload">开始上传</Button>
@@ -248,7 +251,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     <DemoBlock
       title="仪表盘展示"
       description="使用圆形进度条展示系统资源使用情况。"
-      :code="dashboardSnippet">
+      :code="fullPageSnippet">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
         <div class="text-center">
           <h4 class="mb-4 text-sm font-medium">CPU 使用率</h4>

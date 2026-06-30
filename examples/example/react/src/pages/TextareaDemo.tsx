@@ -3,6 +3,7 @@ import { Textarea } from '@expcat/tigercat-react/Textarea'
 import { Space } from '@expcat/tigercat-react/Space'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './TextareaDemo.tsx?raw'
 
 const basicSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <Textarea value={text} onInput={(e) => setText(e.currentTarget.value)} placeholder="请输入内容" rows={4} />
@@ -94,11 +95,7 @@ const TextareaDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock
-        title="基础用法"
-        description="基础的文本域组件。"
-        code={basicSnippet}
-        script={basicScriptSnippet}>
+      <DemoBlock title="基础用法" description="基础的文本域组件。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Textarea
             value={text}
@@ -111,7 +108,7 @@ const TextareaDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 尺寸 */}
-      <DemoBlock title="尺寸" description="支持 sm / md / lg 三种尺寸。" code={sizeSnippet}>
+      <DemoBlock title="尺寸" description="支持 sm / md / lg 三种尺寸。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <FormItem label="Small">
             <Textarea size="sm" placeholder="Small textarea" />
@@ -126,7 +123,10 @@ const TextareaDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 不同行数 */}
-      <DemoBlock title="不同行数" description="通过 rows 属性设置文本域的行数。" code={rowsSnippet}>
+      <DemoBlock
+        title="不同行数"
+        description="通过 rows 属性设置文本域的行数。"
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <FormItem label="2行">
             <Textarea placeholder="2行文本域" rows={2} />
@@ -144,7 +144,7 @@ const TextareaDemo: React.FC = () => {
       <DemoBlock
         title="自动高度"
         description="通过 autoResize 启用自动高度，可配合 minRows / maxRows 限制范围。"
-        code={autoResizeSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <FormItem label="基础自动高度">
             <Textarea
@@ -164,7 +164,7 @@ const TextareaDemo: React.FC = () => {
       <DemoBlock
         title="字符计数"
         description="通过 showCount 显示计数，可配合 maxLength 限制最大字符数。"
-        code={countSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <FormItem label="仅计数">
             <Textarea showCount placeholder="显示字符数" />
@@ -185,7 +185,7 @@ const TextareaDemo: React.FC = () => {
       <DemoBlock
         title="禁用、只读和必填"
         description="文本域可以设置为禁用、只读或必填状态。"
-        code={disabledSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <FormItem label="禁用">
             <Textarea value="禁用的文本域" disabled rows={3} />
@@ -203,7 +203,7 @@ const TextareaDemo: React.FC = () => {
       <DemoBlock
         title="组合功能"
         description="autoResize + showCount + maxLength 组合使用。"
-        code={combinedSnippet}>
+        code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Textarea
             value={combined}

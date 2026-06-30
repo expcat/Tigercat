@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">VirtualList 虚拟列表</h1>
     <p class="text-gray-500 mb-8">虚拟滚动渲染大量列表项，只渲染可视区域内的元素。</p>
 
-    <DemoBlock title="基础用法" description="10000 条数据，itemHeight=40" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="10000 条数据，itemHeight=40" :code="fullPageSnippet">
       <VirtualList
         :item-count="10000"
         :item-height="40"
@@ -20,7 +20,7 @@
     <DemoBlock
       title="自定义高度 & overscan"
       description="itemHeight=60，overscan=10"
-      :code="customSnippet">
+      :code="fullPageSnippet">
       <VirtualList :item-count="5000" :item-height="60" :height="360" :overscan="10">
         <template #default="{ index }">
           <div class="px-4 py-2 border-b">
@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import { VirtualList } from '@expcat/tigercat-vue/VirtualList'
 import DemoBlock from '../components/DemoBlock.vue'
+import fullPageSnippet from './VirtualListDemo.vue?raw'
 
 const basicSnippet = `<VirtualList :item-count="10000" :item-height="40" :height="300">
   <template #default="{ index }">

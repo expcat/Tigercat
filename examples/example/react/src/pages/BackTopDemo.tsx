@@ -2,6 +2,7 @@ import { Button } from '@expcat/tigercat-react/Button'
 import { useState, useEffect, useRef } from 'react'
 import { BackTop } from '@expcat/tigercat-react/BackTop'
 import DemoBlock from '../components/DemoBlock'
+import fullPageSnippet from './BackTopDemo.tsx?raw'
 
 const basicSnippet = `<BackTop />
 {/* 滚动页面超过 400px 后显示 */}`
@@ -59,7 +60,7 @@ export default function BackTopDemo() {
       <DemoBlock
         title="基本用法"
         description="滚动页面，右下角会出现回到顶部按钮。"
-        code={basicSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <p className="text-gray-600 mb-4">
             向下滚动页面超过 400px 后，右下角会出现回到顶部按钮。
@@ -73,7 +74,7 @@ export default function BackTopDemo() {
       <DemoBlock
         title="自定义显示高度"
         description="可以设置滚动多少距离后显示按钮。"
-        code={customHeightSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <p className="text-gray-600 dark:text-gray-400">
             通过 <code className="bg-gray-200 px-1 rounded">visibilityHeight</code>{' '}
@@ -82,10 +83,7 @@ export default function BackTopDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock
-        title="自定义内容"
-        description="可以自定义按钮的显示内容。"
-        code={customContentSnippet}>
+      <DemoBlock title="自定义内容" description="可以自定义按钮的显示内容。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <p className="text-gray-600 mb-4">通过 children 自定义按钮内容。</p>
           <div className="flex items-center gap-4">
@@ -100,7 +98,7 @@ export default function BackTopDemo() {
       <DemoBlock
         title="自定义动画时长"
         description="通过 duration 属性控制滚动到顶部的动画时长。"
-        code={customDurationSnippet}>
+        code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <p className="text-gray-600 dark:text-gray-400">
             通过 <code className="bg-gray-200 px-1 rounded">duration</code>{' '}
@@ -112,8 +110,7 @@ export default function BackTopDemo() {
       <DemoBlock
         title="自定义滚动容器"
         description="指定 target 监听自定义容器的滚动。"
-        code={customTargetSnippet}
-        script={customTargetScriptSnippet}>
+        code={fullPageSnippet}>
         <div
           ref={innerContainerRef}
           className="h-64 overflow-auto rounded-lg border border-gray-200 relative">
@@ -137,7 +134,7 @@ export default function BackTopDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="点击回调" description="点击按钮时触发回调函数。" code={clickSnippet}>
+      <DemoBlock title="点击回调" description="点击按钮时触发回调函数。" code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <p className="text-gray-600 mb-4">
             通过 <code className="bg-gray-200 px-1 rounded">onClick</code> 监听点击事件。
