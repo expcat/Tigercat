@@ -84,13 +84,13 @@ key-terms: slot/children, emit/callback, attrs/props, v-model/controlled, open, 
 
 ## Architecture Terms
 
-| Term                    | Meaning                                                                |
-| ----------------------- | ---------------------------------------------------------------------- |
-| Core                    | `@expcat/tigercat-core`，存放类型、工具、主题和框架无关逻辑。          |
-| Vue Layer               | `@expcat/tigercat-vue`，负责 Vue 渲染、slots、emits、attrs。           |
-| React Layer             | `@expcat/tigercat-react`，负责 React 渲染、refs、callbacks、children。 |
-| Shared Utils            | 可跨框架复用的工具函数，放在 `packages/core/src/utils/`。              |
-| Compound Component      | 父子组合组件，如 `Tabs` / `TabPane`、`Steps` / `StepsItem`。           |
-| Compatibility Re-export | 旧子组件文件只 re-export，保持深路径导入兼容。                         |
-| SSR Guard               | 浏览器 API 访问前使用 `isBrowser()` 或等价守卫。                       |
-| Locale                  | 组件文案国际化配置，统一来自 locale 系统。                             |
+| Term               | Meaning                                                                |
+| ------------------ | ---------------------------------------------------------------------- |
+| Core               | `@expcat/tigercat-core`，存放类型、工具、主题和框架无关逻辑。          |
+| Vue Layer          | `@expcat/tigercat-vue`，负责 Vue 渲染、slots、emits、attrs。           |
+| React Layer        | `@expcat/tigercat-react`，负责 React 渲染、refs、callbacks、children。 |
+| Shared Utils       | 可跨框架复用的工具函数，放在 `packages/core/src/utils/`。              |
+| Compound Component | 父子组合组件，如 `Tabs` / `TabPane`、`Steps` / `StepsItem`。           |
+| Package Subpath    | PascalCase 组件子路径，如 `@expcat/tigercat-react/Button`。            |
+| SSR Guard          | 浏览器 API 访问前使用 `isBrowser()` 或等价守卫。                       |
+| Locale             | 组件文案国际化配置，统一来自 locale 系统。                             |

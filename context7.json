@@ -6,14 +6,16 @@
     "glossary": "skills/tigercat/references/shared/glossary.md",
     "patterns": "skills/tigercat/references/shared/patterns/common.md",
     "shared_props": "skills/tigercat/references/shared/props",
-    "vue_examples": "skills/tigercat/references/vue",
-    "react_examples": "skills/tigercat/references/react"
+    "vue_examples": "skills/tigercat/references/vue/index.md",
+    "react_examples": "skills/tigercat/references/react/index.md",
+    "component_index": "skills/tigercat/references/component-index.md",
+    "examples": "skills/tigercat/references/examples"
   },
   "component_index": {
     "basic": {
       "props": "skills/tigercat/references/shared/props/basic.md",
-      "vue": "skills/tigercat/references/vue/basic.md",
-      "react": "skills/tigercat/references/react/basic.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
       "components": [
         "Alert",
         "Avatar",
@@ -31,12 +33,13 @@
         "QRCode",
         "Tag",
         "Text"
-      ]
+      ],
+      "examples": "skills/tigercat/references/examples/basic.md"
     },
     "form": {
       "props": "skills/tigercat/references/shared/props/form.md",
-      "vue": "skills/tigercat/references/vue/form.md",
-      "react": "skills/tigercat/references/react/form.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
       "components": [
         "AutoComplete",
         "Cascader",
@@ -61,12 +64,13 @@
         "Transfer",
         "TreeSelect",
         "Upload"
-      ]
+      ],
+      "examples": "skills/tigercat/references/examples/form.md"
     },
     "feedback": {
       "props": "skills/tigercat/references/shared/props/feedback.md",
-      "vue": "skills/tigercat/references/vue/feedback.md",
-      "react": "skills/tigercat/references/react/feedback.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
       "components": [
         "Drawer",
         "Loading",
@@ -80,12 +84,13 @@
         "Tooltip",
         "Tour",
         "Watermark"
-      ]
+      ],
+      "examples": "skills/tigercat/references/examples/feedback.md"
     },
     "layout": {
       "props": "skills/tigercat/references/shared/props/layout.md",
-      "vue": "skills/tigercat/references/vue/layout.md",
-      "react": "skills/tigercat/references/react/layout.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
       "components": [
         "Card",
         "Carousel",
@@ -99,12 +104,13 @@
         "Space",
         "Splitter",
         "Statistic"
-      ]
+      ],
+      "examples": "skills/tigercat/references/examples/layout.md"
     },
     "navigation": {
       "props": "skills/tigercat/references/shared/props/navigation.md",
-      "vue": "skills/tigercat/references/vue/navigation.md",
-      "react": "skills/tigercat/references/react/navigation.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
       "components": [
         "Affix",
         "Anchor",
@@ -118,18 +124,20 @@
         "Steps",
         "Tabs",
         "Tree"
-      ]
+      ],
+      "examples": "skills/tigercat/references/examples/navigation.md"
     },
     "data": {
       "props": "skills/tigercat/references/shared/props/data.md",
-      "vue": "skills/tigercat/references/vue/data.md",
-      "react": "skills/tigercat/references/react/data.md",
-      "components": ["Calendar", "Collapse", "Table", "Timeline"]
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
+      "components": ["Calendar", "Collapse", "Table", "Timeline"],
+      "examples": "skills/tigercat/references/examples/data.md"
     },
     "charts": {
       "props": "skills/tigercat/references/shared/props/charts.md",
-      "vue": "skills/tigercat/references/vue/charts.md",
-      "react": "skills/tigercat/references/react/charts.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
       "components": [
         "AreaChart",
         "BarChart",
@@ -146,12 +154,13 @@
         "ScatterChart",
         "SunburstChart",
         "TreeMapChart"
-      ]
+      ],
+      "examples": "skills/tigercat/references/examples/charts.md"
     },
     "advanced": {
       "props": "skills/tigercat/references/shared/props/advanced.md",
-      "vue": "skills/tigercat/references/vue/advanced.md",
-      "react": "skills/tigercat/references/react/advanced.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
       "components": [
         "CodeEditor",
         "FileManager",
@@ -164,12 +173,13 @@
         "TaskBoard",
         "VirtualList",
         "VirtualTable"
-      ]
+      ],
+      "examples": "skills/tigercat/references/examples/advanced.md"
     },
     "composite": {
       "props": "skills/tigercat/references/shared/props/composite.md",
-      "vue": "skills/tigercat/references/vue/composite.md",
-      "react": "skills/tigercat/references/react/composite.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
       "components": [
         "ActivityFeed",
         "ChatWindow",
@@ -178,7 +188,8 @@
         "DataTableWithToolbar",
         "FormWizard",
         "NotificationCenter"
-      ]
+      ],
+      "examples": "skills/tigercat/references/examples/composite.md"
     }
   }
 }

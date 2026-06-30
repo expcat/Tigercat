@@ -1099,8 +1099,10 @@ for (const componentName of actualComponentRows.keys()) {
 // ----- Skill docs quality budget -----
 
 const SKILL_DOC_BUDGETS = {
-  entryBytes: 3000,
-  totalMarkdownLines: 6000,
+  entryBytes: 2600,
+  roadmapLines: 24,
+  totalMarkdownLines: 3600,
+  apiSummaryBytes: 14000,
   propsCategoryLines: 350,
   handReferenceLines: 120
 }
@@ -1108,6 +1110,17 @@ const SKILL_DOC_BUDGETS = {
 const skillMarkdownFiles = collectFiles(join(ROOT, 'skills', 'tigercat'), ['.md'])
 let totalSkillMarkdownLines = 0
 const componentHeadingOwners = new Map()
+
+function isGeneratedSkillReference(relativeFile) {
+  return (
+    relativeFile.includes(join('references', 'examples')) ||
+    relativeFile.includes(join('references', 'shared', 'props')) ||
+    relativeFile.endsWith(join('references', 'component-index.md')) ||
+    relativeFile.endsWith(join('references', 'shared', 'api-summary.md')) ||
+    relativeFile.endsWith(join('react', 'index.md')) ||
+    relativeFile.endsWith(join('vue', 'index.md'))
+  )
+}
 
 for (const file of skillMarkdownFiles) {
   const content = readFileSync(file, 'utf-8')
@@ -1127,6 +1140,29 @@ for (const file of skillMarkdownFiles) {
     }
   }
 
+  if (relativeFile === join('skills', 'tigercat', 'ROADMAP.md')) {
+    if (lines.length > SKILL_DOC_BUDGETS.roadmapLines) {
+      addIssue(
+        relativeFile,
+        0,
+        'docs-budget',
+        `Skill maintainer roadmap has ${lines.length} lines, expected <= ${SKILL_DOC_BUDGETS.roadmapLines}`
+      )
+    }
+  }
+
+  if (relativeFile === join('skills', 'tigercat', 'references', 'shared', 'api-summary.md')) {
+    const bytes = Buffer.byteLength(content, 'utf8')
+    if (bytes > SKILL_DOC_BUDGETS.apiSummaryBytes) {
+      addIssue(
+        relativeFile,
+        0,
+        'docs-budget',
+        `API summary is ${bytes} bytes, expected <= ${SKILL_DOC_BUDGETS.apiSummaryBytes}`
+      )
+    }
+  }
+
   if (relativeFile.includes(join('skills', 'tigercat', 'references', 'shared', 'props'))) {
     if (lines.length > SKILL_DOC_BUDGETS.propsCategoryLines) {
       addIssue(
@@ -1138,11 +1174,7 @@ for (const file of skillMarkdownFiles) {
     }
   } else if (
     relativeFile.startsWith(join('skills', 'tigercat', 'references')) &&
-    !relativeFile.includes(join('references', 'examples')) &&
-    !relativeFile.includes(join('references', 'shared')) &&
-    !relativeFile.endsWith('component-index.md') &&
-    !relativeFile.endsWith(join('react', 'index.md')) &&
-    !relativeFile.endsWith(join('vue', 'index.md'))
+    !isGeneratedSkillReference(relativeFile)
   ) {
     if (lines.length > SKILL_DOC_BUDGETS.handReferenceLines) {
       addIssue(
@@ -1155,6 +1187,18 @@ for (const file of skillMarkdownFiles) {
   }
 
   lines.forEach((line, index) => {
+    const ordinarySkillRoute =
+      relativeFile === join('skills', 'tigercat', 'SKILL.md') ||
+      relativeFile.startsWith(join('skills', 'tigercat', 'references'))
+    if (ordinarySkillRoute && /\bROADMAP\.md\b/.test(line)) {
+      addIssue(
+        relativeFile,
+        index + 1,
+        'docs-route',
+        'Ordinary skill routes must not link to maintainer Roadmap content'
+      )
+    }
+
     const tableCellCount = (line.match(/(?<!\\)\|/g) || []).length
     if (line.trim().startsWith('|') && tableCellCount > 10) {
       addIssue(
@@ -1180,6 +1224,39 @@ if (totalSkillMarkdownLines > SKILL_DOC_BUDGETS.totalMarkdownLines) {
     'docs-budget',
     `Skill markdown has ${totalSkillMarkdownLines} lines, expected <= ${SKILL_DOC_BUDGETS.totalMarkdownLines}`
   )
+}
+
+const context7Path = join(ROOT, 'context7.json')
+if (existsSync(context7Path)) {
+  const context7 = JSON.parse(readFileSync(context7Path, 'utf-8'))
+  const referencePaths = []
+  const collectReferencePaths = (value) => {
+    if (typeof value === 'string') {
+      if (value.startsWith('skills/tigercat/')) referencePaths.push(value)
+      return
+    }
+    if (Array.isArray(value)) {
+      value.forEach(collectReferencePaths)
+      return
+    }
+    if (value && typeof value === 'object') {
+      Object.values(value).forEach(collectReferencePaths)
+    }
+  }
+
+  collectReferencePaths(context7.reference_paths)
+  collectReferencePaths(context7.component_index)
+
+  for (const referencePath of referencePaths) {
+    if (!existsSync(join(ROOT, referencePath))) {
+      addIssue(
+        'context7.json',
+        0,
+        'docs-route',
+        `context7 references missing path "${referencePath}"`
+      )
+    }
+  }
 }
 
 for (const [componentName, owners] of componentHeadingOwners) {

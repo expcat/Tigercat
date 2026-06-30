@@ -2,25 +2,25 @@
 
 <!-- LLM-INDEX
 type: active-roadmap
-scope: v2.0.0 follow-up planning for grouped validation, Skill reference compression, and example consolidation
+scope: v2.0.0 follow-up planning after grouped validation and Skill reference compression
 verified-date: 2026-06-30
-source: current repository state after R19 Advanced/media and R20 Composite/business component cleanup
+source: current repository state after R22 Skill reference compression and routing
 -->
 
-本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节、R01-R20 已完成批次细节与发布收口记录不再保留在路线图中；详细执行摘要、实际验证命令和状态回写记录统一归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，public API 删除/合并证据归档到 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
+本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节、R01-R22 已完成批次细节与发布收口记录不再保留在路线图中；详细执行摘要、实际验证命令和状态回写记录统一归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，public API 删除/合并证据归档到 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
 
 ## 当前状态
 
-截至 2026-06-30，T01-T14 与 v2.0.0 R01-R21 已完成；R20 的 v2.0 发布收口按维护决定 deferred，本批次不发布版本。当前路线图进入新的 v2.0 后续维护批次，只规划 R22-R23，后续仍会追加功能计划。
+截至 2026-06-30，T01-T14 与 v2.0.0 R01-R22 已完成；R20 的 v2.0 发布收口按维护决定 deferred，本批次不发布版本。当前路线图进入 R23 example demo consolidation，后续仍会追加功能计划。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0-15 已完成 R01-R21；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
-- 当前阶段：阶段 16（R22 Skill reference compression and routing），压缩 Skill 读取路径并保留按需定位能力。
-- 当前可执行任务：R22 Skill reference compression and routing。
-- 后续阶段：R23 example demo consolidation。v2.0.0 仍会追加新的维护与功能计划，路线图不在 R23 处收口。
+- 已完成阶段：阶段 0-16 已完成 R01-R22；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
+- 当前阶段：阶段 17（R23 example demo consolidation），整合示例演示并让展示代码可复制复现。
+- 当前可执行任务：R23 example demo consolidation and reproducible code snippets。
+- 后续阶段：v2.0.0 仍会追加新的维护与功能计划，路线图不在 R23 处收口。
 
 ## 执行原则
 
@@ -51,7 +51,7 @@ source: current repository state after R19 Advanced/media and R20 Composite/busi
 | ---- | -------------------- | ------- | ----------------------------------------------------------------------- |
 | 0-14 | 已完成（2026-06-30） | R01-R20 | 已完成组件级 API 清理，细节归档到 `V2_COMPLETED.md` / `V2_API_AUDIT.md` |
 | 15   | 已完成（2026-06-30） | R21     | 已审计并收紧分组验证入口，确保后续维护不会误跑全量或漏跑目标组          |
-| 16   | 未开始               | R22     | 压缩 Skill 读取路径，删除对 LLM 使用组件库无帮助的维护者内容            |
+| 16   | 已完成（2026-06-30） | R22     | 已压缩 Skill 读取路径，删除普通路由中的维护者 backlog                   |
 | 17   | 未开始               | R23     | 整合示例演示并让展示代码成为可复制复现的完整代码                        |
 
 阶段状态规则：
@@ -63,7 +63,7 @@ source: current repository state after R19 Advanced/media and R20 Composite/busi
 
 ## 已完成归档
 
-R01-R20 已完成，主路线图不再展开逐项一行摘要；需要追溯执行细节、实际验证命令或完成状态，请读取 [V2_COMPLETED.md](V2_COMPLETED.md)；需要追溯 public API 删除/合并证据，请读取 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
+R01-R22 已完成，主路线图不再展开逐项一行摘要；需要追溯执行细节、实际验证命令或完成状态，请读取 [V2_COMPLETED.md](V2_COMPLETED.md)；需要追溯 public API 删除/合并证据，请读取 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
 
 ## v2.0 后续任务队列
 
@@ -71,68 +71,17 @@ R01-R20 已完成，主路线图不再展开逐项一行摘要；需要追溯执
 
 **状态**：已完成（2026-06-30）。
 
-**目标**：检查当前测试脚本是否能按组件组、框架和过滤器精准执行，避免后续更新验证时运行过多无关任务或漏跑相关任务；必要时收紧脚本、文档和 package scripts。
-
-**允许修改**：`scripts/lib/component-test-groups.mjs`、`scripts/run-component-group-tests.mjs`、`scripts/validate-tests.mjs`、`package.json` scripts、`scripts/README.md`、`tests/TEST_QUALITY_GUIDELINES.md`、必要的分组覆盖测试。
-
-**不得修改**：组件运行时行为、public API、Skill references 内容重写、examples 大规模示例改造、发布 workflow。
-
-**依赖/阻塞**：基于 R10 已建立的 `test:group` / `test:validate -- --group` 能力；若发现组归属来自 `scripts/lib/public-components.mjs` 的事实源不完整，应先修事实源再调整 runner。
-
-**当前事实**：root scripts 已有 `test:group`、`test:group:{basic|form|feedback|layout|navigation|data|charts|advanced|composite|core}` 和 `test:validate`；runner 支持 `--group`、`--framework`、`--filter`、`--list`，`validate-tests.mjs` 支持 `TEST_GROUP` / `--group` / `--framework` / `--filter`。
-
-**完成摘要**：已审计全部 10 个 group 的 `--list` 输出并确认均非空；`form/react/primitives` 与 `form/vue/composite` 能精准缩窄框架与 filter alias，同时保留同组 shared core specs。新增 `tests/core/component-test-groups.spec.ts` 固定 group 列表、路径排序/去重、framework narrowing、filter alias、空结果失败和 root package scripts 入口；`scripts/README.md` 与 `tests/TEST_QUALITY_GUIDELINES.md` 已补充后续 Rxx 验证模板。
-
-**计划检查项**：
-
-- 为每个 group 运行 `pnpm test:group -- --group <group> --list`，记录文件数量与明显错归/漏归。
-- 检查 `TEST_GROUP=<group> pnpm test:validate` 与 `pnpm test:validate -- --group <group>` 是否只扫描目标组文件。
-- 明确后续 Rxx 的验证模板：组件源码改动用 `test:group:{group}`；跨组 helper 改动用受影响多个 group；发布收口才升级 `quality:release`。
-- 如发现缺少轻量自检，新增脚本或测试固定 group 列表、filter alias、framework narrowing 和空组失败行为。
-
-**完成验证**：
-
-- `corepack pnpm test:group -- --group form --list`
-- `corepack pnpm test:group:form -- --framework react --filter primitives --list`
-- `TEST_GROUP=form corepack pnpm test:validate`
-- `corepack pnpm vitest run tests/core/component-test-groups.spec.ts`
-- `corepack pnpm prettier --check scripts/README.md tests/TEST_QUALITY_GUIDELINES.md docs/ROADMAP.md docs/V2_COMPLETED.md tests/core/component-test-groups.spec.ts`
-- `git diff --check`
-
-**状态更新要求**：已写回状态、日期、分组审计结论、脚本调整范围、后续验证模板和关键验证命令；阶段 15 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R22。
+**完成摘要**：已审计全部 10 个测试 group，确认 `--list`、`--framework`、`--filter` 和 `TEST_GROUP` 缩窄语义可用；新增 `tests/core/component-test-groups.spec.ts` 固定 group 列表、路径排序/去重、framework narrowing、filter alias、未知参数和空结果失败行为；`scripts/README.md` 与 `tests/TEST_QUALITY_GUIDELINES.md` 已记录后续 Rxx 验证模板。详细执行记录见 [V2_COMPLETED.md](V2_COMPLETED.md#r21-grouped-validation-audit-and-script-tightening)。
 
 ### R22 Skill reference compression and routing
 
-**状态**：未开始。
+**状态**：已完成（2026-06-30）。
 
-**目标**：压缩 Tigercat Skill 文档读取路径，减少默认读取 token；让 LLM 先读取短入口，再通过链接进入准确的组件、props、examples、recipe 或专题文档。删除或迁出对“使用组件库搭建应用”无帮助的维护者内容，例如 Skill 内部 Roadmap、历史计划、低价值重复表格和过时说明。
+**完成摘要**：已将 Skill 普通入口压缩为按任务路由；`skills/tigercat/ROADMAP.md` 从详细维护者 backlog 缩为维护者说明，`building-apps.md` 不再把普通建应用路径链回 Skill Roadmap；`shared/patterns/common.md` 压缩为跨框架决策速查；`api-summary.md` 由生成器移除与 component-index 重复的 Components/Exports 列；`context7.json` 修正为实际存在的 framework index 与 examples 路径。`api:validate` 已增加 Skill 入口大小、维护者 Roadmap 行数、手写 reference 行数、api-summary 体积、普通 reference 禁止 Roadmap 链接和 context7 路径存在性护栏。详细执行记录见 [V2_COMPLETED.md](V2_COMPLETED.md#r22-skill-reference-compression-and-routing)。
 
-**允许修改**：`skills/tigercat/SKILL.md`、`skills/tigercat/ROADMAP.md` 的保留/迁移策略、`skills/tigercat/references/**` 手写参考、`scripts/generate-api-docs.mjs` 的生成文案、`scripts/validate-api.mjs` 的 Skill token/行数护栏、必要 docs。
+**完成验证**：`npx -y pnpm@11.9.0 docs:api`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 docs:api:check`、changed-file Prettier、冲突标记扫描和 `git diff --check`。
 
-**不得修改**：组件运行时行为、public API、测试语义、examples 页面行为；不得手改由 `pnpm docs:api` 生成后会覆盖的 references 内容，除非同步修改生成器。
-
-**依赖/阻塞**：建议在 R21 完成后执行；生成 references 仍必须通过 `pnpm docs:api` 与 `docs:api:check` 保持无漂移。
-
-**当前事实**：`skills/tigercat/SKILL.md` 已是短入口；`skills/tigercat/ROADMAP.md` 是维护者 backlog，普通使用路径不应读取；generated references 包括 component-index、shared props、examples、api-summary、react/vue entry，手写 references 包括 recipes、theme、i18n、SSR、CLI、release 等。
-
-**计划检查项**：
-
-- 定义 Skill 读取预算：入口短、索引短、单组件路径短；记录压缩前后的 `wc -l` / 字节数。
-- 将维护者 backlog 从普通 Skill 路由中移除或迁到 docs 归档，只保留“维护者才读”的短链接。
-- 合并重复的 setup/theme/i18n/SSR/performance/release 说明，保留面向大模型使用组件库的操作性内容。
-- 让 component-index 只负责路由，props/examples 只负责必要 API 与可用例；长说明改成按需 recipe 链接。
-- 增加或收紧 `api:validate` 护栏，防止 generated references 再次膨胀或出现 Roadmap/维护者计划进入常规读取路径。
-
-**完成验证**：
-
-- `corepack pnpm docs:api`
-- `corepack pnpm docs:api:check`
-- `corepack pnpm api:validate`
-- `wc -l skills/tigercat/SKILL.md skills/tigercat/references/**/*.md`
-- `corepack pnpm prettier --check skills/tigercat/SKILL.md skills/tigercat/ROADMAP.md docs/ROADMAP.md docs/V2_COMPLETED.md`
-- `git diff --check`
-
-**状态更新要求**：完成后写回状态、日期、压缩前后读取规模、删除/迁出的 Skill 内容、保留的按需链接结构和关键验证命令；同步更新阶段 16 状态，并将当前可执行任务推进到 R23。
+**状态更新要求**：已写回状态、日期、压缩规模、删除/迁出的 Skill 内容、保留的按需链接结构和关键验证命令；阶段 16 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R23。R22 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
 
 ### R23 Example demo consolidation and reproducible code snippets
 

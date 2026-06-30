@@ -904,3 +904,44 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `git diff --check`
 
 **状态更新要求**：已写回 R21 状态、日期、分组审计结论、脚本调整范围、后续验证模板和关键验证命令；阶段 15 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R22。R21 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R22 Skill reference compression and routing
+
+**状态**：已完成（2026-06-30）。
+
+**目标**：压缩 Tigercat Skill 文档读取路径，减少默认读取 token；让 LLM 先读取短入口，再通过链接进入准确的组件、props、examples、recipe 或专题文档。删除或迁出对“使用组件库搭建应用”无帮助的维护者内容。
+
+**允许修改**：`skills/tigercat/SKILL.md`、`skills/tigercat/ROADMAP.md` 的保留/迁移策略、`skills/tigercat/references/**` 手写参考、`scripts/generate-api-docs.mjs` 的生成文案、`scripts/validate-api.mjs` 的 Skill token/行数护栏、必要 docs。
+
+**不得修改**：组件运行时行为、public API、测试语义、examples 页面行为；不得手改由 `pnpm docs:api` 生成后会覆盖的 references 内容，除非同步修改生成器。
+
+**执行摘要**：`skills/tigercat/SKILL.md` 已压缩为按任务路由的短入口，只保留建应用、查组件、props/examples、跨框架差异和专题文档路径；维护者发布与 token 参考保留为 maintainer-only。`skills/tigercat/ROADMAP.md` 从详细 backlog 压缩为维护者说明，普通 Skill reference 不再链接它；`references/recipes/building-apps.md` 末尾改为 Scope，不再把建应用路径导向内部 Roadmap。`references/shared/patterns/common.md` 已从长篇示例改为跨框架状态、slot/children、组合组件、浮层和 SSR 的速查页；`references/shared/glossary.md` 删除过时的 compatibility re-export 术语。`scripts/generate-api-docs.mjs` 已让 `shared/api-summary.md` 只保留 Type File / Props Interfaces，删除与 component-index 重复的 Components / Exports 列；`context7.json` 已改为指向实际存在的 `vue/index.md`、`react/index.md` 和 `examples/{category}.md`。
+
+**压缩规模**：
+
+- `skills/tigercat/SKILL.md`：34 行 / 2955 bytes → 18 行 / 1413 bytes。
+- `skills/tigercat/ROADMAP.md`：47 行 / 5628 bytes → 11 行 / 929 bytes。
+- `references/shared/patterns/common.md`：207 行 / 10291 bytes → 53 行 / 4450 bytes。
+- `references/shared/api-summary.md`：18360 bytes → 11995 bytes。
+- `skills/tigercat/**/*.md` 汇总：2611 行 / 238648 bytes → 2404 行 / 219316 bytes（PowerShell line count）；`api:validate` 的空行计数当前为 3345 行，预算收紧为 3600 行。
+
+**护栏调整**：`scripts/validate-api.mjs` 已新增或收紧以下 checks：
+
+- `SKILL.md` ≤2600 bytes。
+- `skills/tigercat/ROADMAP.md` ≤24 行。
+- Skill 全部 markdown ≤3600 行。
+- `shared/api-summary.md` ≤14000 bytes。
+- 手写 references（含 shared hand references）≤120 行。
+- 普通 Skill 入口和 references 不得链接 `ROADMAP.md`。
+- `context7.json` 中所有 `skills/tigercat/*` 路径必须存在。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 docs:api:check`
+- `npx -y pnpm@11.9.0 prettier --check context7.json scripts/generate-api-docs.mjs scripts/validate-api.mjs skills/tigercat/SKILL.md skills/tigercat/ROADMAP.md skills/tigercat/references/recipes/building-apps.md skills/tigercat/references/shared/glossary.md skills/tigercat/references/shared/patterns/common.md skills/tigercat/references/shared/api-summary.md docs/ROADMAP.md docs/V2_COMPLETED.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/V2_COMPLETED.md skills/tigercat scripts context7.json`
+- `git diff --check`
+
+**状态更新要求**：已写回 R22 状态、日期、压缩前后读取规模、删除/迁出的 Skill 内容、保留的按需链接结构和关键验证命令；阶段 16 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R23。R22 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
