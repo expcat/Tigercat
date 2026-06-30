@@ -2,6 +2,16 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.0.0-preview.1
+
+v2.0.0 preview 1 对齐 v2.0.0 破坏性升级当前发布面，用于预览验证已完成的版本号、运行时 version 导出、ESM-only package surface、显式 component exports、tree-shaking 护栏、API 删除与文档 / 示例迁移收口。
+
+### Infrastructure
+
+- root 与 `@expcat/tigercat-core`、`@expcat/tigercat-react`、`@expcat/tigercat-vue`、`@expcat/tigercat-cli` 统一为 `2.0.0-preview.1`。
+- 同步 core / React / Vue 运行时 `version` 导出、CLI `CLI_VERSION`、CLI 模板中的 Tigercat 依赖范围，以及示例首页展示版本。
+- 迁移和破坏性变更内容沿用当前 v2.0.0 预览阶段条目；正式 v2.0.0 发布前继续在 `docs/MIGRATION.md` 与本文件集中更新。
+
 ## v2.0.0
 
 本版本开启 v2.0.0 破坏性升级阶段，首批变更先稳定版本号、运行时 version 导出、CLI 模板版本和 release readiness 文档入口，并完成 ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、首批 compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移、size / publish artifact gate 收口、Basic / Layout 轻量组件 API 清理、Feedback / overlay open、portal、focus 与 close lifecycle 收敛，Form primitives 和 composite selectors 的受控模型、搜索、空态和尺寸类型收敛，Navigation 组件受控回调与子组件 subpath 产物收敛，Data/table stack 数据、选择与虚拟滚动入口统一，Charts/visualization 类型拆分与 tooltip 命名收敛，以及 Advanced/media viewer 与 editor runtime guard 收敛。

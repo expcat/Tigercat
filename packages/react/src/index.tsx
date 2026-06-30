@@ -381,4 +381,4 @@ export type { PrintLayoutProps, PrintPageBreakProps } from './components/PrintLa
 export { ImageViewer } from './components/ImageViewer'
 export type { ImageViewerProps } from './components/ImageViewer'
 
-export const version = '2.0.0'
+export const version = '2.0.0-preview.1'

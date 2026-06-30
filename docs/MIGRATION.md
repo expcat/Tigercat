@@ -2,6 +2,10 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+## v2.0.0-preview.1
+
+v2.0.0 preview 1 使用当前 v2.0.0 破坏性升级迁移路径。预览版本号已同步到四个发布包、运行时 `version` 导出、CLI 版本常量、CLI 模板 Tigercat 依赖范围和示例首页；迁移操作请按下方 v2.0.0 条目执行。
+
 ## v2.0.0
 
 v2.0.0 破坏性升级已进入执行阶段；当前批次已同步版本号、运行时 version、CLI 模板版本与 release readiness 文档入口，将 core / React / Vue 发布面切换为 ESM-only，将 React / Vue component 子路径收敛为 PascalCase 显式 exports，收紧 React / Vue tree-shaking 副作用声明，删除首批 deprecated / compat API 与 legacy token / icon path 兼容层，并将示例与 references 迁移为组件子路径和 lazy import 优先。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。
