@@ -72,16 +72,6 @@ const items: NotificationItem[] = [
 
 const groupOrder = ['系统', '评论', '任务']
 
-const basicSnippet = `<NotificationCenter
-  items={items}
-  groupOrder={['系统', '评论', '任务']}
-  manageReadState
-/>`
-
-const loadingSnippet = `<NotificationCenter loading loadingText="正在加载通知..." />`
-
-const emptySnippet = `<NotificationCenter items={[]} emptyText="暂无新通知" title="消息" />`
-
 export default function NotificationCenterDemo() {
   return (
     <div className="max-w-6xl mx-auto p-8">
@@ -93,23 +83,33 @@ export default function NotificationCenterDemo() {
       </div>
 
       <DemoBlock
-        title="基础用法"
-        description="按类型分组、已读状态筛选、批量标记已读。使用 manageReadState 自动管理已读状态。"
+        title="组合展示"
+        description="合并展示分组已读管理、加载态与空态。"
         code={fullPageSnippet}>
-        <div className="max-w-lg">
-          <NotificationCenter items={items} groupOrder={groupOrder} manageReadState />
-        </div>
-      </DemoBlock>
-
-      <DemoBlock title="加载态" description="数据加载中的展示。" code={fullPageSnippet}>
-        <div className="max-w-lg">
-          <NotificationCenter loading loadingText="正在加载通知..." />
-        </div>
-      </DemoBlock>
-
-      <DemoBlock title="空态" description="无通知时显示空状态提示。" code={fullPageSnippet}>
-        <div className="max-w-lg">
-          <NotificationCenter items={[]} emptyText="暂无新通知" title="消息" />
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              按类型分组、已读状态筛选、批量标记已读。使用 manageReadState 自动管理已读状态。
+            </p>
+            <div className="max-w-lg">
+              <NotificationCenter items={items} groupOrder={groupOrder} manageReadState />
+            </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">加载态</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">数据加载中的展示。</p>
+            <div className="max-w-lg">
+              <NotificationCenter loading loadingText="正在加载通知..." />
+            </div>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">空态</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">无通知时显示空状态提示。</p>
+            <div className="max-w-lg">
+              <NotificationCenter items={[]} emptyText="暂无新通知" title="消息" />
+            </div>
+          </section>
         </div>
       </DemoBlock>
     </div>

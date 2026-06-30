@@ -43,28 +43,6 @@ const selectedLabel = computed(() => {
   const i = interaction.resolvedSelectedIndex.value
   return i == null ? '无' : data[i]?.label
 })
-
-const snippet = `import { useChartInteraction } from '@expcat/tigercat-vue'
-
-const emits = defineEmits<{
-  (e: 'hover', index: number | null, datum: BarDatum | null): void
-  (e: 'click', index: number, datum: BarDatum): void
-}>()
-
-const interaction = useChartInteraction<BarDatum>({
-  hoverable: true,
-  selectable: true,
-  activeOpacity: 1,
-  inactiveOpacity: 0.35,
-  emit: emits,
-  getData: (i) => data[i]
-})
-
-// 模板：在 SVG 元素上绑定事件
-<rect v-for="(d, i) in data"
-      :opacity="interaction.getElementOpacity(i)"
-      @mouseenter="interaction.handleMouseEnter(i, $event)"
-      @click="interaction.handleClick(i)" />`
 </script>
 
 <template>

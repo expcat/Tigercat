@@ -65,53 +65,10 @@ const initialSlotColumns: TaskBoardColumn[] = [
   }
 ]
 
-const basicSnippet = `const [columns, setColumns] = useState(initialColumns)
-
-<TaskBoard
-  columns={columns}
-  onCardMove={(e) => {
-    // The component updates internally; persist if needed
-    console.log('card moved', e)
-  }}
-  onColumnMove={(e) => console.log('column moved', e)}
-  onCardAdd={(columnId) => {
-    setColumns(prev => prev.map(col =>
-      col.id === columnId
-        ? { ...col, cards: [...col.cards, { id: Date.now(), title: 'New Task' }] }
-        : col
-    ))
-  }}
-/>`
-
-const slotSnippet = `<TaskBoard
-  columns={slotColumns}
-  renderCard={(card) => (
-    <div className="flex flex-col gap-1">
-      <span className="font-semibold text-sm">{card.title}</span>
-      <span className="text-xs opacity-60">{card.description}</span>
-      <div className="flex gap-1 mt-1">
-        <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700">
-          {card.tag}
-        </span>
-      </div>
-    </div>
-  )}
-/>`
-
 const initialLabelsColumns: TaskBoardColumn[] = [
   { id: 'empty', title: '空列', cards: [] },
   { id: 'busy', title: '有卡片', cards: [{ id: 'l1', title: '示例卡片' }] }
 ]
-
-const labelsSnippet = `// 单语言项目：无需 locale，直接用扁平 labels 覆盖空列与新增卡片文案
-<TaskBoard
-  columns={labelsColumns}
-  onColumnsChange={setLabelsColumns}
-  allowAddCard
-  labels={{ emptyColumnText: '空空如也', addCardText: '新增卡片' }}
-/>`
-
-const basicScriptSnippet = `const [columns, setColumns] = useState<TaskBoardColumn[]>(initialColumns)`
 
 const TaskBoardDemo: React.FC = () => {
   const [columns, setColumns] = useState<TaskBoardColumn[]>(initialColumns)
@@ -149,51 +106,59 @@ const TaskBoardDemo: React.FC = () => {
       </div>
 
       <DemoBlock
-        title="基础用法"
-        description="受控模式 + 卡片拖拽 + 列拖拽 + 新增卡片"
+        title="组合展示"
+        description="合并展示受控拖拽、自定义卡片和 labels 文案覆盖。"
         code={fullPageSnippet}>
-        <TaskBoard
-          columns={columns}
-          onColumnsChange={setColumns}
-          onCardMove={handleCardMove}
-          onColumnMove={handleColumnMove}
-          onCardAdd={handleCardAdd}
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="自定义卡片"
-        description="通过 renderCard 自定义卡片渲染"
-        code={fullPageSnippet}
-        className="mt-8">
-        <TaskBoard
-          columns={slotColumns}
-          onColumnsChange={setSlotColumns}
-          renderCard={(card) => (
-            <div className="flex flex-col gap-1">
-              <span className="font-semibold text-sm">{card.title}</span>
-              <span className="text-xs opacity-60">{String(card.description ?? '')}</span>
-              <div className="flex gap-1 mt-1">
-                <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700">
-                  {String(card.tag ?? '')}
-                </span>
-              </div>
-            </div>
-          )}
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="自定义文案 (labels)"
-        description="单语言项目无需引入 locale，直接用扁平 labels 覆盖空列占位与新增卡片按钮文案。"
-        code={fullPageSnippet}
-        className="mt-8">
-        <TaskBoard
-          columns={labelsColumns}
-          onColumnsChange={setLabelsColumns}
-          allowAddCard
-          labels={{ emptyColumnText: '空空如也', addCardText: '新增卡片' }}
-        />
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              受控模式 + 卡片拖拽 + 列拖拽 + 新增卡片。
+            </p>
+            <TaskBoard
+              columns={columns}
+              onColumnsChange={setColumns}
+              onCardMove={handleCardMove}
+              onColumnMove={handleColumnMove}
+              onCardAdd={handleCardAdd}
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义卡片</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              通过 renderCard 自定义卡片渲染。
+            </p>
+            <TaskBoard
+              columns={slotColumns}
+              onColumnsChange={setSlotColumns}
+              renderCard={(card) => (
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold text-sm">{card.title}</span>
+                  <span className="text-xs opacity-60">{String(card.description ?? '')}</span>
+                  <div className="flex gap-1 mt-1">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700">
+                      {String(card.tag ?? '')}
+                    </span>
+                  </div>
+                </div>
+              )}
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              自定义文案 (labels)
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              单语言项目无需引入 locale，直接用扁平 labels 覆盖空列占位与新增卡片按钮文案。
+            </p>
+            <TaskBoard
+              columns={labelsColumns}
+              onColumnsChange={setLabelsColumns}
+              allowAddCard
+              labels={{ emptyColumnText: '空空如也', addCardText: '新增卡片' }}
+            />
+          </section>
+        </div>
       </DemoBlock>
     </div>
   )

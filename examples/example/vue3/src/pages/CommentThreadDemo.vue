@@ -173,31 +173,6 @@ const handleLike = (node: CommentNode, liked: boolean) => {
 const handleLoadMore = (node: CommentNode) => {
   console.log('load more', node)
 }
-
-const basicSnippet = `<CommentThread
-  :nodes="comments"
-  :default-expanded-keys="[1]"
-  :max-replies="2"
-  @reply="handleReply"
-  @load-more="handleLoadMore"
-  @like="handleLike"
-/>`
-
-const basicScriptSnippet = `import { ref } from 'vue'
-import type { CommentNode } from '@expcat/tigercat-core'
-
-const comments = ref<CommentNode[]>([...])`
-
-const flatSnippet = `<CommentThread :items="flatItems" :default-expanded-keys="[100]" />`
-
-const emptySnippet = `<CommentThread :items="[]" empty-text="暂无评论" />`
-
-const minimalSnippet = `<CommentThread
-  :nodes="minimalNodes"
-  :show-like="false"
-  :show-more="false"
-  :show-divider="false"
-/>`
 </script>
 
 <template>
@@ -210,38 +185,47 @@ const minimalSnippet = `<CommentThread
     </div>
 
     <DemoBlock
-      title="嵌套回复"
-      description="支持多层嵌套、展开/收起、加载更多和实时回复。点击回复按钮试试。"
+      title="组合展示"
+      description="合并展示嵌套回复、扁平数据、精简模式与空态。"
       :code="fullPageSnippet">
-      <CommentThread
-        :nodes="comments"
-        :default-expanded-keys="[1]"
-        :max-replies="2"
-        @reply="handleReply"
-        @load-more="handleLoadMore"
-        @like="handleLike" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="扁平数据"
-      description="传入 items（带 parentId）即可自动构建嵌套层级。"
-      :code="fullPageSnippet">
-      <CommentThread :items="flatItems" :default-expanded-keys="[100]" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="精简模式"
-      description="隐藏点赞、更多按钮和分割线，适合轻量展示。"
-      :code="fullPageSnippet">
-      <CommentThread
-        :nodes="minimalNodes"
-        :show-like="false"
-        :show-more="false"
-        :show-divider="false" />
-    </DemoBlock>
-
-    <DemoBlock title="空态" description="无数据时展示空状态文案。" :code="fullPageSnippet">
-      <CommentThread :items="[]" empty-text="暂无评论" />
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">嵌套回复</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            支持多层嵌套、展开/收起、加载更多和实时回复。点击回复按钮试试。
+          </p>
+          <CommentThread
+            :nodes="comments"
+            :default-expanded-keys="[1]"
+            :max-replies="2"
+            @reply="handleReply"
+            @load-more="handleLoadMore"
+            @like="handleLike" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">扁平数据</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            传入 items（带 parentId）即可自动构建嵌套层级。
+          </p>
+          <CommentThread :items="flatItems" :default-expanded-keys="[100]" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">精简模式</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            隐藏点赞、更多按钮和分割线，适合轻量展示。
+          </p>
+          <CommentThread
+            :nodes="minimalNodes"
+            :show-like="false"
+            :show-more="false"
+            :show-divider="false" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">空态</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">无数据时展示空状态文案。</p>
+          <CommentThread :items="[]" empty-text="暂无评论" />
+        </section>
+      </div>
     </DemoBlock>
   </div>
 </template>

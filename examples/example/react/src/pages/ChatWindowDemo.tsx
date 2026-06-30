@@ -40,29 +40,6 @@ const baseMessages: ChatMessage[] = [
   }
 ]
 
-const basicSnippet = `<ChatWindow
-  messages={messages}
-  value={value}
-  onChange={setValue}
-  onSend={handleSend}
-  showTime
-  allowShiftEnter
-  statusText="对方正在输入..."
-/>`
-
-const inputSnippet = `<ChatWindow
-  inputType="input"
-  placeholder="输入并回车发送"
-  messages={messages}
-  value={value}
-  onChange={setValue}
-  onSend={handleSend}
-  sendOnEnter
-/>`
-
-const basicScriptSnippet = `const [messages, setMessages] = useState<ChatMessage[]>(baseMessages)
-const [value, setValue] = useState('')`
-
 export default function ChatWindowDemo() {
   const [messages, setMessages] = useState<ChatMessage[]>(baseMessages)
   const [value, setValue] = useState('')
@@ -118,35 +95,43 @@ export default function ChatWindowDemo() {
       </div>
 
       <DemoBlock
-        title="基础用法"
-        description="默认 textarea 输入，支持 Shift+Enter 换行。"
+        title="组合展示"
+        description="合并展示 textarea 与单行 input 两种聊天输入模式。"
         code={fullPageSnippet}>
-        <ChatWindow
-          className="h-[480px]"
-          messages={messages}
-          value={value}
-          onChange={setValue}
-          onSend={handleSend}
-          showTime
-          allowShiftEnter
-          statusText="对方正在输入..."
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="单行输入"
-        description="使用 input 模式，回车即可发送。"
-        code={fullPageSnippet}>
-        <ChatWindow
-          className="h-[380px]"
-          inputType="input"
-          placeholder="输入并回车发送"
-          messages={quickMessages}
-          value={quickValue}
-          onChange={setQuickValue}
-          onSend={handleQuickSend}
-          sendOnEnter
-        />
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              默认 textarea 输入，支持 Shift+Enter 换行。
+            </p>
+            <ChatWindow
+              className="h-[480px]"
+              messages={messages}
+              value={value}
+              onChange={setValue}
+              onSend={handleSend}
+              showTime
+              allowShiftEnter
+              statusText="对方正在输入..."
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">单行输入</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              使用 input 模式，回车即可发送。
+            </p>
+            <ChatWindow
+              className="h-[380px]"
+              inputType="input"
+              placeholder="输入并回车发送"
+              messages={quickMessages}
+              value={quickValue}
+              onChange={setQuickValue}
+              onSend={handleQuickSend}
+              sendOnEnter
+            />
+          </section>
+        </div>
       </DemoBlock>
     </div>
   )

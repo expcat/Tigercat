@@ -17,36 +17,6 @@ const initialItems: TodoItem[] = [
   { id: '4', index: 3, title: '上线灰度发布' }
 ]
 
-const reorderSnippet = `import { useDrag } from '@expcat/tigercat-react'
-import type { DragItem } from '@expcat/tigercat-core'
-
-interface TodoItem extends DragItem {
-  title: string
-}
-
-const [items, setItems] = useState<TodoItem[]>(initial)
-
-const drag = useDrag({
-  onDrop: () => {
-    const result = drag.reorder(items)
-    if (result) {
-      setItems(result.items.map((item, index) => ({ ...item, index })))
-    }
-  }
-})
-
-return (
-  <div {...drag.getDropZoneProps()}>
-    {items.map((item) => (
-      <div key={item.id} {...drag.getDragItemProps(item)}>
-        {item.title}
-      </div>
-    ))}
-  </div>
-)`
-
-const basicScriptSnippet = `const [items, setItems] = useState<TodoItem[]>(initialItems)`
-
 const UseDragDemo: React.FC = () => {
   const [items, setItems] = useState<TodoItem[]>(initialItems)
 

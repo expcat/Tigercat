@@ -87,30 +87,6 @@ const handleQuickSend = (value: string) => {
     }
   ]
 }
-
-const basicSnippet = `<ChatWindow
-  v-model="input"
-  :messages="messages"
-  show-time
-  allow-shift-enter
-  status-text="对方正在输入..."
-  @send="handleSend"
-/>`
-
-const basicScriptSnippet = `import { ref } from 'vue'
-import type { ChatMessage } from '@expcat/tigercat-core'
-
-const messages = ref<ChatMessage[]>([...])
-const input = ref('')`
-
-const inputSnippet = `<ChatWindow
-  v-model="quickInput"
-  input-type="input"
-  placeholder="输入并回车发送"
-  :messages="quickMessages"
-  send-on-enter
-  @send="handleQuickSend"
-/>`
 </script>
 
 <template>
@@ -121,31 +97,37 @@ const inputSnippet = `<ChatWindow
     </div>
 
     <DemoBlock
-      title="基础用法"
-      description="默认 textarea 输入，支持 Shift+Enter 换行。"
+      title="组合展示"
+      description="合并展示 textarea 与单行 input 两种聊天输入模式。"
       :code="fullPageSnippet">
-      <ChatWindow
-        v-model="input"
-        class="h-[480px]"
-        :messages="messages"
-        show-time
-        allow-shift-enter
-        status-text="对方正在输入..."
-        @send="handleSend" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="单行输入"
-      description="使用 input 模式，回车即可发送。"
-      :code="fullPageSnippet">
-      <ChatWindow
-        v-model="quickInput"
-        class="h-[380px]"
-        input-type="input"
-        placeholder="输入并回车发送"
-        :messages="quickMessages"
-        send-on-enter
-        @send="handleQuickSend" />
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            默认 textarea 输入，支持 Shift+Enter 换行。
+          </p>
+          <ChatWindow
+            v-model="input"
+            class="h-[480px]"
+            :messages="messages"
+            show-time
+            allow-shift-enter
+            status-text="对方正在输入..."
+            @send="handleSend" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">单行输入</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">使用 input 模式，回车即可发送。</p>
+          <ChatWindow
+            v-model="quickInput"
+            class="h-[380px]"
+            input-type="input"
+            placeholder="输入并回车发送"
+            :messages="quickMessages"
+            send-on-enter
+            @send="handleQuickSend" />
+        </section>
+      </div>
     </DemoBlock>
   </div>
 </template>

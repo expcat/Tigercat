@@ -49,12 +49,6 @@ const activityGroups: ActivityGroup[] = [
   }
 ]
 
-const basicSnippet = `<ActivityFeed groups={activityGroups} />`
-
-const loadingSnippet = `<ActivityFeed loading loadingText="正在加载动态..." />`
-
-const emptySnippet = `<ActivityFeed items={[]} emptyText="暂无活动" />`
-
 export default function ActivityFeedDemo() {
   return (
     <div className="max-w-6xl mx-auto p-8">
@@ -63,16 +57,27 @@ export default function ActivityFeedDemo() {
         <p className="text-gray-600 dark:text-gray-400">组合组件，适配审计日志与动态信息流。</p>
       </div>
 
-      <DemoBlock title="分组展示" description="按日期分组展示动态。" code={fullPageSnippet}>
-        <ActivityFeed groups={activityGroups} />
-      </DemoBlock>
-
-      <DemoBlock title="加载态" description="数据加载中时的展示。" code={fullPageSnippet}>
-        <ActivityFeed loading loadingText="正在加载动态..." />
-      </DemoBlock>
-
-      <DemoBlock title="空态" description="无数据时的展示。" code={fullPageSnippet}>
-        <ActivityFeed items={[]} emptyText="暂无活动" />
+      <DemoBlock
+        title="组合展示"
+        description="合并展示按日期分组、加载态与空态，减少重复示例块。"
+        code={fullPageSnippet}>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">分组展示</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">按日期分组展示动态。</p>
+            <ActivityFeed groups={activityGroups} />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">加载态</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">数据加载中时的展示。</p>
+            <ActivityFeed loading loadingText="正在加载动态..." />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">空态</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">无数据时的展示。</p>
+            <ActivityFeed items={[]} emptyText="暂无活动" />
+          </section>
+        </div>
       </DemoBlock>
     </div>
   )

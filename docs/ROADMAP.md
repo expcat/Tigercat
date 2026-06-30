@@ -2,25 +2,25 @@
 
 <!-- LLM-INDEX
 type: active-roadmap
-scope: v2.0.0 follow-up planning after R26 charts and advanced demo merge
+scope: v2.0.0 follow-up planning after R27 composite and hooks demo cleanup
 verified-date: 2026-07-01
-source: current repository state after R26 Charts/Advanced example demo consolidation
+source: current repository state after R27 Composite/Hooks example demo cleanup
 -->
 
-本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节、R01-R26 已完成批次细节与发布收口记录不再保留在路线图中；详细执行摘要、实际验证命令和状态回写记录统一归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，public API 删除/合并证据归档到 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
+本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节、R01-R27 已完成批次细节与发布收口记录不再保留在路线图中；详细执行摘要、实际验证命令和状态回写记录统一归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，public API 删除/合并证据归档到 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
 
 ## 当前状态
 
-截至 2026-07-01，T01-T14 与 v2.0.0 R01-R26 已完成；R20 不作为 v2.0 发布收口批次，后续发布收口按维护决定单独追加。R26 已完成 Charts/Advanced 示例展示合并，保留每个页面内的场景小标题并为高复杂度 Advanced 页面增加 fixture source；后续继续推进 Composite/Hooks 展示合并与剩余 cleanup。
+截至 2026-07-01，T01-T14 与 v2.0.0 R01-R27 已完成；R20 不作为 v2.0 发布收口批次，后续发布收口按维护决定单独追加。R27 已完成 Composite/Hooks 示例展示合并与剩余 snippet cleanup；后续维护或功能计划待追加。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0-20 已完成 R01-R26；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
-- 当前阶段：阶段 21。
-- 当前可执行任务：R27。
-- 后续阶段：v2.0.0 仍会追加新的维护与功能计划，路线图不在 R23 处收口。
+- 已完成阶段：阶段 0-21 已完成 R01-R27；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
+- 当前阶段：待追加。
+- 当前可执行任务：待追加。
+- 后续阶段：v2.0.0 仍会追加新的维护与功能计划，路线图不在 R27 处收口。
 
 ## 执行原则
 
@@ -56,7 +56,7 @@ source: current repository state after R26 Charts/Advanced example demo consolid
 | 18   | 已完成（2026-06-30） | R24     | 已为全量 Example 建立 raw-source 护栏并合并 Button/Input 高重复展示     |
 | 19   | 已完成（2026-07-01） | R25     | 已合并 Navigation/Feedback 展示，弹层与通知类保留互不干扰的独立流程     |
 | 20   | 已完成（2026-07-01） | R26     | 已合并 Charts/Advanced 展示，并为复杂 Advanced 页面补充 fixture source  |
-| 21   | 未开始               | R27     | Composite/Hooks 展示合并与剩余 cleanup                                  |
+| 21   | 已完成（2026-07-01） | R27     | 已完成 Composite/Hooks 展示合并与剩余 snippet cleanup                   |
 
 阶段状态规则：
 
@@ -67,7 +67,7 @@ source: current repository state after R26 Charts/Advanced example demo consolid
 
 ## 已完成归档
 
-R01-R26 已完成，主路线图不再展开逐项一行摘要；需要追溯执行细节、实际验证命令或完成状态，请读取 [V2_COMPLETED.md](V2_COMPLETED.md)；需要追溯 public API 删除/合并证据，请读取 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
+R01-R27 已完成，主路线图不再展开逐项一行摘要；需要追溯执行细节、实际验证命令或完成状态，请读取 [V2_COMPLETED.md](V2_COMPLETED.md)；需要追溯 public API 删除/合并证据，请读取 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
 
 ## v2.0 后续任务队列
 
@@ -123,11 +123,11 @@ R01-R26 已完成，主路线图不再展开逐项一行摘要；需要追溯执
 
 ### R27 Composite and hooks demo cleanup
 
-**状态**：未开始。
+**状态**：已完成（2026-07-01）。
 
-**目标**：合并 Composite 与 Hooks 页面；清理剩余只服务旧代码展示的 snippet 常量，并复核所有 Example 页面展示块数量与 raw/fixture source 策略。
+**完成摘要**：已覆盖 React/Vue Composite 示例与 Hooks 示例页面，清理剩余只服务旧代码展示的 snippet 常量，并把 Composite 多场景展示合并为单个 raw-source `DemoBlock` 内的分节展示；`UseControlledState` React 页面合并受控/非受控展示，Vue 等价说明保持说明页。详细执行记录见 [V2_COMPLETED.md](V2_COMPLETED.md#r27-composite-and-hooks-demo-cleanup)。
 
-**完成验证**：`npx -y pnpm@11.9.0 test:group:composite`、focused hooks/core tests、`npx -y pnpm@11.9.0 example:sources:check`、`npx -y pnpm@11.9.0 example:build`、changed-file Prettier、`git diff --check`。
+**完成验证**：`npx -y pnpm@11.9.0 test:group:composite`、`npx -y pnpm@11.9.0 vitest run tests/react/useDrag.spec.tsx tests/vue/useDrag.spec.ts tests/core/chart-interaction.spec.ts tests/core/chart-interaction-utils.spec.ts`、`npx -y pnpm@11.9.0 example:sources:check`、`npx -y pnpm@11.9.0 example:build` 已通过；完整门禁记录见 [V2_COMPLETED.md](V2_COMPLETED.md#r27-composite-and-hooks-demo-cleanup)。
 
 ## Public API 与文档规则
 

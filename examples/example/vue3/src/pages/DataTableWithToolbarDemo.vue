@@ -15,40 +15,6 @@ interface UserRow extends Record<string, unknown> {
   age: number
 }
 
-const basicSnippet = `<DataTableWithToolbar
-  :columns="columns"
-  :dataSource="pagedData"
-  :rowSelection="{ selectedRowKeys, type: 'checkbox' }"
-  :toolbar="{
-    searchValue: keyword,
-    searchPlaceholder: '搜索姓名/邮箱',
-    filters: [
-      { key: 'status', label: '状态', options: statusOptions },
-      { key: 'role', label: '角色', options: roleOptions }
-    ],
-    bulkActions: [
-      { key: 'export', label: '导出' },
-      { key: 'delete', label: '删除', variant: 'outline' }
-    ],
-    selectedKeys: selectedRowKeys
-  }"
-  :pagination="{
-    current, pageSize,
-    total: filteredData.length,
-    showSizeChanger: true,
-    showTotal: true
-  }"
-  @search-change="(val) => (keyword = val)"
-  @filters-change="(val) => (filters = val)"
-  @page-change="handlePageChange"
-  @selection-change="handleSelectionChange"
-/>`
-
-const basicScriptSnippet = `import { ref } from 'vue'
-
-const keyword = ref('')
-const filters = ref<Record<string, unknown>>({ status: null, role: null })`
-
 const columns: TableColumn<Record<string, unknown>>[] = [
   { key: 'name', title: '姓名', width: '22%' },
   { key: 'email', title: '邮箱', width: '32%' },
@@ -67,22 +33,6 @@ const cardColumns: TableColumn<Record<string, unknown>>[] = [
   { key: 'age', title: '年龄', width: '10%', cardPriority: 3 },
   { key: 'email', title: '邮箱', width: '15%' }
 ]
-
-const cardSnippet = `// 卡片模式字段定制（窄于 cardBreakpoint 时启用）
-const cardColumns = [
-  { key: 'id', title: 'ID', hideInCard: true },     // 卡片中隐藏
-  { key: 'name', title: '姓名', cardTitle: true },   // 卡片标题
-  { key: 'status', title: '状态', cardPriority: 1 }, // 首个内容字段
-  { key: 'role', title: '角色', cardPriority: 2 },
-  { key: 'email', title: '邮箱' }
-]
-
-<DataTableWithToolbar
-  :columns="cardColumns"
-  :dataSource="pagedData"
-  responsive-mode="card"
-  card-breakpoint="lg"
-/>`
 
 const gridCardColumns: TableColumn<Record<string, unknown>>[] = [
   { key: 'id', title: 'ID', width: '10%', hideInCard: true },
@@ -117,93 +67,6 @@ const gridCardLayout: TableCardLayoutItem[] = [
   { key: 'role', colSpan: 3, labelPosition: 'top' },
   { key: 'status', colSpan: 3, labelPosition: 'top' }
 ]
-
-const gridCardSnippet = `// 自定义卡片网格布局 — 使用 cardGrid 列属性或 cardLayout 集中配置
-const gridCardColumns = [
-  { key: 'id', title: 'ID', hideInCard: true },
-  { key: 'name', title: '姓名', cardTitle: true },
-  { key: 'email', title: '邮箱', cardGrid: { colSpan: 6, labelPosition: 'top' } },
-  { key: 'role', title: '角色', cardGrid: { colSpan: 6, labelPosition: 'top' } },
-  { key: 'status', title: '状态', cardGrid: { colSpan: 4, labelPosition: 'top' } }
-]
-
-// 或使用 cardLayout 集中定义（覆盖 cardGrid）
-const gridCardLayout: TableCardLayoutItem[] = [
-  { key: 'email', colSpan: 6, labelPosition: 'top' },
-  { key: 'role', colSpan: 3, labelPosition: 'top' },
-  { key: 'status', colSpan: 3, labelPosition: 'top' }
-]
-
-<DataTableWithToolbar
-  :columns="gridCardColumns"
-  :dataSource="pagedData"
-  responsive-mode="card"
-  card-breakpoint="lg"
-  :card-layout="gridCardLayout"
-/>`
-
-const columnSettingsSnippet = `<!-- 工具栏列设置：内置 Popover + Checkbox 面板，驱动 Table 的 hiddenColumnKeys -->
-<DataTableWithToolbar
-  :columns="settingsColumns"
-  :dataSource="pagedData"
-  :toolbar="{ showColumnSettings: true }"
-  v-model:hidden-column-keys="hiddenColumnKeys"
-/>
-
-<!-- settingsColumns 中 hideable: false 的列不可隐藏 -->
-<!-- 锁定特定列：:toolbar="{ showColumnSettings: true, columnSettings: { lockedColumnKeys: ['name'] } }" -->`
-
-const columnLockSnippet = `<!-- 钉列 / 锁定列：
-  1) column.fixed: 'left' | 'right' —— 横向滚动时把列钉在边缘（sticky）
-  2) column-lockable —— 表头出现锁定按钮，锁定后该列进入左侧固定区
-  3) columnSettings.lockedColumnKeys —— 列设置面板中该列不可隐藏 -->
-<DataTableWithToolbar
-  :columns="lockColumns"
-  :dataSource="pagedData"
-  column-lockable
-  :toolbar="{
-    showColumnSettings: true,
-    columnSettings: { lockedColumnKeys: ['name'] }
-  }"
-/>`
-
-const columnLockScriptSnippet = `const lockColumns = [
-  { key: 'name', title: '姓名', width: 200, fixed: 'left', hideable: false },
-  { key: 'email', title: '邮箱', width: 400 },
-  { key: 'age', title: '年龄', width: 200 },
-  { key: 'role', title: '角色', width: 240 },
-  { key: 'status', title: '状态', width: 240 }
-]`
-
-const columnSettingsScriptSnippet = `import { ref } from 'vue'
-
-const hiddenColumnKeys = ref<string[]>(['role'])
-
-const settingsColumns = [
-  { key: 'name', title: '姓名', hideable: false }, // 不可隐藏
-  { key: 'email', title: '邮箱' },
-  { key: 'role', title: '角色' },
-  { key: 'status', title: '状态' }
-]`
-
-const ageRangeSnippet = `<DataTableWithToolbar
-  :columns="columns"
-  :dataSource="pagedData"
-  :toolbar="toolbar"
-  @filters-change="handleFiltersChange">
-  <template #filters-extra="{ filters, setFilter }">
-    <div class="flex items-center gap-2">
-      <span>年龄段</span>
-      <input
-        :value="getAgeRange(filters.ageRange).min ?? ''"
-        @input="(event) => setAgeRangeFilter(setFilter, filters.ageRange, 'min', event)" />
-      <span>-</span>
-      <input
-        :value="getAgeRange(filters.ageRange).max ?? ''"
-        @input="(event) => setAgeRangeFilter(setFilter, filters.ageRange, 'max', event)" />
-    </div>
-  </template>
-</DataTableWithToolbar>`
 
 const settingsColumns: TableColumn<Record<string, unknown>>[] = [
   { key: 'name', title: '姓名', width: '22%', hideable: false },
@@ -334,53 +197,6 @@ const handleBulkAction = (actionKey: string) => {
   if (selectedRowKeys.value.length === 0) return
   alert(`执行批量操作: ${actionKey}，选中 ${selectedRowKeys.value.length} 项`)
 }
-
-const itemClassSnippet = `<!-- 自定义 filter 容器宽度 -->
-<DataTableWithToolbar
-  :columns="columns"
-  :dataSource="pagedData"
-  :toolbar="{
-    filters: [
-      {
-        key: 'status', label: '状态',
-        options: statusOptions,
-        itemClass: 'w-full sm:w-auto sm:min-w-[200px] sm:max-w-[280px]',
-        itemStyle: { borderRadius: '8px' }
-      },
-      { key: 'role', label: '角色', options: roleOptions }
-    ],
-    searchClassName: 'w-full sm:w-auto sm:min-w-[300px]',
-    className: 'bg-gray-50 dark:bg-gray-800/50',
-    style: { padding: '12px 16px' }
-  }" />`
-
-const customToolbarSnippet = `<!-- 完全自定义工具栏（替换内置 toolbar 区域） -->
-<DataTableWithToolbar
-  :columns="columns"
-  :dataSource="pagedData"
-  :toolbar="{ filters: [...] }">
-  <template #toolbar="{ searchValue, setSearch, submitSearch, filters, setFilter }">
-    <div role="toolbar" class="flex items-center gap-4 p-4">
-      <input :value="searchValue" @input="setSearch($event.target.value)" />
-      <button @click="submitSearch">搜索</button>
-    </div>
-  </template>
-</DataTableWithToolbar>`
-
-const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
-<DataTableWithToolbar
-  :columns="cardColumns"
-  :dataSource="pagedData"
-  responsive-mode="card"
-  card-breakpoint="lg"
-  card-class-name="shadow-lg rounded-xl">
-  <template #card="{ record, columns }">
-    <div class="p-4">
-      <h3 class="font-bold">{{ record.name }}</h3>
-      <p class="text-sm text-gray-500">{{ record.email }}</p>
-    </div>
-  </template>
-</DataTableWithToolbar>`
 </script>
 
 <template>
@@ -390,280 +206,295 @@ const cardSlotSnippet = `<!-- 卡片自定义渲染 -->
       <p class="text-gray-600 dark:text-gray-400">搜索、筛选、批量操作与分页联动的组合组件。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="搜索/筛选/批量操作 + 分页联动" :code="fullPageSnippet">
-      <DataTableWithToolbar
-        :columns="columns"
-        :dataSource="pagedData"
-        table-layout="fixed"
-        :rowSelection="{ selectedRowKeys, type: 'checkbox' }"
-        :toolbar="toolbar"
-        :pagination="{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filteredData.length,
-          showSizeChanger: true,
-          showTotal: true
-        }"
-        @search-change="(value) => (keyword = value)"
-        @search="(value) => (keyword = value)"
-        @filters-change="handleFiltersChange"
-        @page-change="handlePageChange"
-        @page-size-change="handlePageChange"
-        @selection-change="handleSelectionChange"
-        @bulk-action="(action) => handleBulkAction(action.key as string)" />
-    </DemoBlock>
-
     <DemoBlock
-      title="自定义过滤器"
-      description="filters-extra 插槽可把年龄段等复合控件放入工具栏，并通过 setFilter 发出对象型过滤值。"
+      title="组合展示"
+      description="合并展示基础工具栏、复合过滤、列设置、锁定列、卡片模式与自定义工具栏。"
       :code="fullPageSnippet">
-      <DataTableWithToolbar
-        :columns="columns"
-        :dataSource="pagedData"
-        table-layout="fixed"
-        :toolbar="toolbar"
-        :pagination="{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filteredData.length,
-          showTotal: true
-        }"
-        @search-change="(value) => (keyword = value)"
-        @search="(value) => (keyword = value)"
-        @filters-change="handleFiltersChange"
-        @page-change="handlePageChange">
-        <template #filters-extra="{ filters, setFilter }">
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <span class="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">年龄段</span>
-            <input
-              class="w-16 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900"
-              :value="getAgeRange(filters.ageRange).min ?? ''"
-              placeholder="最小"
-              @input="(event) => setAgeRangeFilter(setFilter, filters.ageRange, 'min', event)" />
-            <span class="text-gray-400">-</span>
-            <input
-              class="w-16 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900"
-              :value="getAgeRange(filters.ageRange).max ?? ''"
-              placeholder="最大"
-              @input="(event) => setAgeRangeFilter(setFilter, filters.ageRange, 'max', event)" />
-          </div>
-        </template>
-      </DataTableWithToolbar>
-    </DemoBlock>
-
-    <DemoBlock
-      title="列设置"
-      description="开启 showColumnSettings 后，工具栏右侧出现列设置入口，可勾选控制列显隐；hideable: false 的列不可隐藏。支持 v-model:hidden-column-keys 双向绑定。"
-      :code="fullPageSnippet">
-      <DataTableWithToolbar
-        :columns="settingsColumns"
-        :dataSource="pagedData"
-        table-layout="fixed"
-        :toolbar="{ showColumnSettings: true }"
-        v-model:hidden-column-keys="hiddenColumnKeys"
-        :pagination="{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filteredData.length,
-          showTotal: true
-        }"
-        @page-change="handlePageChange" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="钉列 / 锁定列"
-      description="column.fixed 让列在横向滚动时钉在边缘（姓名列钉在左侧）；开启 column-lockable 后表头出现锁定按钮，锁定列会进入左侧固定区，未锁定列向右排列；columnSettings.lockedColumnKeys 让该列在列设置面板中不可隐藏。横向滚动表格可观察钉列效果。"
-      :code="fullPageSnippet">
-      <DataTableWithToolbar
-        :columns="lockColumns"
-        :dataSource="pagedData"
-        column-lockable
-        :toolbar="{
-          showColumnSettings: true,
-          columnSettings: { lockedColumnKeys: ['name'] }
-        }"
-        :pagination="{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filteredData.length,
-          showTotal: true
-        }"
-        @page-change="handlePageChange" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="卡片模式字段定制"
-      description="窄屏（小于 cardBreakpoint，此处为 lg/1024px）自动切换为卡片：姓名作为标题、ID 隐藏、状态/角色按 cardPriority 排序。缩窄窗口可预览。"
-      :code="fullPageSnippet">
-      <DataTableWithToolbar
-        :columns="cardColumns"
-        :dataSource="pagedData"
-        responsive-mode="card"
-        card-breakpoint="lg"
-        :toolbar="{
-          searchValue: keyword,
-          searchPlaceholder: '搜索姓名/邮箱',
-          filters: [
-            { key: 'status', label: '状态', options: statusOptions },
-            { key: 'role', label: '角色', options: roleOptions }
-          ]
-        }"
-        :pagination="{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filteredData.length,
-          showTotal: true
-        }"
-        @search-change="(value) => (keyword = value)"
-        @search="(value) => (keyword = value)"
-        @filters-change="handleFiltersChange"
-        @page-change="handlePageChange"
-        @page-size-change="handlePageChange" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="自定义卡片网格布局"
-      description="使用 cardGrid 列属性或 cardLayout 集中配置，实现双列/三列混排的卡片网格布局。cardLayout 配置优先于 cardGrid；最窄屏默认单列，sm 及以上按 colSpan 混排。缩窄窗口到 lg/1024px 以下可预览效果。"
-      :code="fullPageSnippet">
-      <DataTableWithToolbar
-        :columns="gridCardColumns"
-        :dataSource="pagedData"
-        responsive-mode="card"
-        card-breakpoint="lg"
-        :card-layout="gridCardLayout"
-        :pagination="{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filteredData.length,
-          showTotal: true
-        }"
-        @page-change="handlePageChange"
-        @page-size-change="handlePageChange" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="工具栏布局定制"
-      description="通过 itemClass/itemStyle 定制单个 filter 容器宽度（替换默认尺寸类），searchClassName 定制搜索框尺寸，toolbar.className/style 定制容器样式。"
-      :code="fullPageSnippet">
-      <DataTableWithToolbar
-        :columns="columns"
-        :dataSource="pagedData"
-        table-layout="fixed"
-        :toolbar="{
-          searchValue: keyword,
-          searchPlaceholder: '搜索姓名/邮箱',
-          filters: [
-            {
-              key: 'status',
-              label: '状态',
-              options: statusOptions,
-              itemClass: 'w-full sm:w-auto sm:min-w-[200px] sm:max-w-[280px]',
-              itemStyle: { borderRadius: '8px' }
-            },
-            { key: 'role', label: '角色', options: roleOptions }
-          ],
-          searchClassName: 'w-full sm:w-auto sm:min-w-[300px]',
-          className: 'bg-gray-50 dark:bg-gray-800/50',
-          style: { padding: '12px 16px' }
-        }"
-        :pagination="{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filteredData.length,
-          showTotal: true
-        }"
-        @search-change="(value) => (keyword = value)"
-        @search="(value) => (keyword = value)"
-        @filters-change="handleFiltersChange"
-        @page-change="handlePageChange" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="完全自定义工具栏"
-      description="#toolbar 插槽完全替换内置工具栏区域（含 role='toolbar' 容器），通过 context 获取搜索/筛选/选择等状态和操作。使用时请自行添加 role='toolbar' 以保持可访问性。"
-      :code="fullPageSnippet">
-      <DataTableWithToolbar
-        :columns="columns"
-        :dataSource="pagedData"
-        table-layout="fixed"
-        :toolbar="{
-          searchValue: keyword,
-          searchPlaceholder: '搜索姓名/邮箱',
-          filters: [
-            { key: 'status', label: '状态', options: statusOptions },
-            { key: 'role', label: '角色', options: roleOptions }
-          ]
-        }"
-        :pagination="{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filteredData.length,
-          showTotal: true
-        }"
-        @search-change="(value) => (keyword = value)"
-        @filters-change="handleFiltersChange"
-        @page-change="handlePageChange">
-        <template #toolbar="{ searchValue, setSearch, submitSearch, filters, setFilter }">
-          <div
-            role="toolbar"
-            aria-label="自定义工具栏"
-            class="flex flex-wrap items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <div class="flex items-center gap-2">
-              <input
-                class="rounded border border-blue-300 px-3 py-1.5 text-sm dark:border-blue-600 dark:bg-gray-900"
-                :value="searchValue"
-                placeholder="自定义搜索"
-                @input="(e) => setSearch((e.target as HTMLInputElement).value)" />
-              <button
-                class="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
-                @click="submitSearch">
-                搜索
-              </button>
-            </div>
-            <span class="text-sm text-gray-500">状态: {{ filters.status ?? '全部' }}</span>
-          </div>
-        </template>
-      </DataTableWithToolbar>
-    </DemoBlock>
-
-    <DemoBlock
-      title="卡片自定义渲染"
-      description="通过 #card 插槽完全自定义卡片内容（优先于 renderCard prop），或使用 cardClassName 添加卡片容器样式。缩窄窗口到 lg/1024px 以下可预览。"
-      :code="fullPageSnippet">
-      <DataTableWithToolbar
-        :columns="cardColumns"
-        :dataSource="pagedData"
-        responsive-mode="card"
-        card-breakpoint="lg"
-        card-class-name="shadow-lg rounded-xl"
-        :pagination="{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filteredData.length,
-          showTotal: true
-        }"
-        @page-change="handlePageChange">
-        <template #card="{ record }">
-          <div class="p-4">
-            <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">
-              {{ (record as UserRow).name }}
-            </h3>
-            <p class="text-sm text-gray-500 mt-1">{{ (record as UserRow).email }}</p>
-            <div class="flex items-center gap-3 mt-2">
-              <span
-                class="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
-                :class="
-                  (record as UserRow).status === 'active'
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                ">
-                {{ (record as UserRow).status === 'active' ? '启用' : '禁用' }}
-              </span>
-              <span class="text-xs text-gray-400">{{ (record as UserRow).role }}</span>
-            </div>
-          </div>
-        </template>
-      </DataTableWithToolbar>
+      <div class="space-y-8">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">搜索/筛选/批量操作 + 分页联动。</p>
+          <DataTableWithToolbar
+            :columns="columns"
+            :dataSource="pagedData"
+            table-layout="fixed"
+            :rowSelection="{ selectedRowKeys, type: 'checkbox' }"
+            :toolbar="toolbar"
+            :pagination="{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showSizeChanger: true,
+              showTotal: true
+            }"
+            @search-change="(value) => (keyword = value)"
+            @search="(value) => (keyword = value)"
+            @filters-change="handleFiltersChange"
+            @page-change="handlePageChange"
+            @page-size-change="handlePageChange"
+            @selection-change="handleSelectionChange"
+            @bulk-action="(action) => handleBulkAction(action.key as string)" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义过滤器</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            filters-extra 插槽可把年龄段等复合控件放入工具栏，并通过 setFilter 发出对象型过滤值。
+          </p>
+          <DataTableWithToolbar
+            :columns="columns"
+            :dataSource="pagedData"
+            table-layout="fixed"
+            :toolbar="toolbar"
+            :pagination="{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showTotal: true
+            }"
+            @search-change="(value) => (keyword = value)"
+            @search="(value) => (keyword = value)"
+            @filters-change="handleFiltersChange"
+            @page-change="handlePageChange">
+            <template #filters-extra="{ filters, setFilter }">
+              <div class="flex items-center gap-2 w-full sm:w-auto">
+                <span class="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                  年龄段
+                </span>
+                <input
+                  class="w-16 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900"
+                  :value="getAgeRange(filters.ageRange).min ?? ''"
+                  placeholder="最小"
+                  @input="
+                    (event) => setAgeRangeFilter(setFilter, filters.ageRange, 'min', event)
+                  " />
+                <span class="text-gray-400">-</span>
+                <input
+                  class="w-16 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900"
+                  :value="getAgeRange(filters.ageRange).max ?? ''"
+                  placeholder="最大"
+                  @input="
+                    (event) => setAgeRangeFilter(setFilter, filters.ageRange, 'max', event)
+                  " />
+              </div>
+            </template>
+          </DataTableWithToolbar>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">列设置</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            开启 showColumnSettings 后，工具栏右侧出现列设置入口；hideable: false 的列不可隐藏。
+          </p>
+          <DataTableWithToolbar
+            :columns="settingsColumns"
+            :dataSource="pagedData"
+            table-layout="fixed"
+            :toolbar="{ showColumnSettings: true }"
+            v-model:hidden-column-keys="hiddenColumnKeys"
+            :pagination="{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showTotal: true
+            }"
+            @page-change="handlePageChange" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">钉列 / 锁定列</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            column.fixed 让列在横向滚动时钉在边缘；开启 column-lockable 后表头出现锁定按钮。
+          </p>
+          <DataTableWithToolbar
+            :columns="lockColumns"
+            :dataSource="pagedData"
+            column-lockable
+            :toolbar="{
+              showColumnSettings: true,
+              columnSettings: { lockedColumnKeys: ['name'] }
+            }"
+            :pagination="{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showTotal: true
+            }"
+            @page-change="handlePageChange" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">卡片模式字段定制</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            窄屏自动切换为卡片：姓名作为标题、ID 隐藏、状态/角色按 cardPriority 排序。
+          </p>
+          <DataTableWithToolbar
+            :columns="cardColumns"
+            :dataSource="pagedData"
+            responsive-mode="card"
+            card-breakpoint="lg"
+            :toolbar="{
+              searchValue: keyword,
+              searchPlaceholder: '搜索姓名/邮箱',
+              filters: [
+                { key: 'status', label: '状态', options: statusOptions },
+                { key: 'role', label: '角色', options: roleOptions }
+              ]
+            }"
+            :pagination="{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showTotal: true
+            }"
+            @search-change="(value) => (keyword = value)"
+            @search="(value) => (keyword = value)"
+            @filters-change="handleFiltersChange"
+            @page-change="handlePageChange"
+            @page-size-change="handlePageChange" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义卡片网格布局</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            使用 cardGrid 列属性或 cardLayout 集中配置，实现双列/三列混排的卡片网格布局。
+          </p>
+          <DataTableWithToolbar
+            :columns="gridCardColumns"
+            :dataSource="pagedData"
+            responsive-mode="card"
+            card-breakpoint="lg"
+            :card-layout="gridCardLayout"
+            :pagination="{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showTotal: true
+            }"
+            @page-change="handlePageChange"
+            @page-size-change="handlePageChange" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">工具栏布局定制</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            通过 itemClass/itemStyle 定制单个 filter 容器宽度，searchClassName 定制搜索框尺寸。
+          </p>
+          <DataTableWithToolbar
+            :columns="columns"
+            :dataSource="pagedData"
+            table-layout="fixed"
+            :toolbar="{
+              searchValue: keyword,
+              searchPlaceholder: '搜索姓名/邮箱',
+              filters: [
+                {
+                  key: 'status',
+                  label: '状态',
+                  options: statusOptions,
+                  itemClass: 'w-full sm:w-auto sm:min-w-[200px] sm:max-w-[280px]',
+                  itemStyle: { borderRadius: '8px' }
+                },
+                { key: 'role', label: '角色', options: roleOptions }
+              ],
+              searchClassName: 'w-full sm:w-auto sm:min-w-[300px]',
+              className: 'bg-gray-50 dark:bg-gray-800/50',
+              style: { padding: '12px 16px' }
+            }"
+            :pagination="{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showTotal: true
+            }"
+            @search-change="(value) => (keyword = value)"
+            @search="(value) => (keyword = value)"
+            @filters-change="handleFiltersChange"
+            @page-change="handlePageChange" />
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">完全自定义工具栏</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            #toolbar 插槽完全替换内置工具栏区域，通过 context 获取搜索/筛选/选择等状态和操作。
+          </p>
+          <DataTableWithToolbar
+            :columns="columns"
+            :dataSource="pagedData"
+            table-layout="fixed"
+            :toolbar="{
+              searchValue: keyword,
+              searchPlaceholder: '搜索姓名/邮箱',
+              filters: [
+                { key: 'status', label: '状态', options: statusOptions },
+                { key: 'role', label: '角色', options: roleOptions }
+              ]
+            }"
+            :pagination="{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showTotal: true
+            }"
+            @search-change="(value) => (keyword = value)"
+            @filters-change="handleFiltersChange"
+            @page-change="handlePageChange">
+            <template #toolbar="{ searchValue, setSearch, submitSearch, filters }">
+              <div
+                role="toolbar"
+                aria-label="自定义工具栏"
+                class="flex flex-wrap items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div class="flex items-center gap-2">
+                  <input
+                    class="rounded border border-blue-300 px-3 py-1.5 text-sm dark:border-blue-600 dark:bg-gray-900"
+                    :value="searchValue"
+                    placeholder="自定义搜索"
+                    @input="(e) => setSearch((e.target as HTMLInputElement).value)" />
+                  <button
+                    class="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+                    @click="submitSearch">
+                    搜索
+                  </button>
+                </div>
+                <span class="text-sm text-gray-500">状态: {{ filters.status ?? '全部' }}</span>
+              </div>
+            </template>
+          </DataTableWithToolbar>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">卡片自定义渲染</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            通过 #card 插槽完全自定义卡片内容，或使用 cardClassName 添加卡片容器样式。
+          </p>
+          <DataTableWithToolbar
+            :columns="cardColumns"
+            :dataSource="pagedData"
+            responsive-mode="card"
+            card-breakpoint="lg"
+            card-class-name="shadow-lg rounded-xl"
+            :pagination="{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: filteredData.length,
+              showTotal: true
+            }"
+            @page-change="handlePageChange">
+            <template #card="{ record }">
+              <div class="p-4">
+                <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">
+                  {{ (record as UserRow).name }}
+                </h3>
+                <p class="text-sm text-gray-500 mt-1">{{ (record as UserRow).email }}</p>
+                <div class="flex items-center gap-3 mt-2">
+                  <span
+                    class="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
+                    :class="
+                      (record as UserRow).status === 'active'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    ">
+                    {{ (record as UserRow).status === 'active' ? '启用' : '禁用' }}
+                  </span>
+                  <span class="text-xs text-gray-400">{{ (record as UserRow).role }}</span>
+                </div>
+              </div>
+            </template>
+          </DataTableWithToolbar>
+        </section>
+      </div>
     </DemoBlock>
   </div>
 </template>

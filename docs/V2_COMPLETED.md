@@ -1058,3 +1058,36 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **剩余阻塞**：无。R27 继续处理 Composite/Hooks 展示合并与剩余 cleanup。
 
 **状态更新要求**：已写回 R26 状态、日期、Charts/Advanced 覆盖范围、DemoBlock 压缩规模、fixture source 策略和关键验证命令；阶段 20 已同步为 `已完成（2026-07-01）`，当前可执行任务推进到 R27。R26 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R27 Composite and hooks demo cleanup
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：合并 Composite 与 Hooks 页面；清理剩余只服务旧代码展示的 snippet 常量，并复核所有 Example 页面展示块数量与 raw/fixture source 策略。
+
+**允许修改**：React/Vue Composite 与 Hooks example pages、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件 public API、组件运行时行为、package exports、测试分组基础设施、generated Skill references、API baseline、发布产物策略。
+
+**执行摘要**：已覆盖 React/Vue Composite 示例页面：ActivityFeed、ChatWindow、CommentThread、DataTableWithToolbar、FormWizard、NotificationCenter、TaskBoard；Kanban 已在 R26 期间保持组合展示形态，本轮复核后未重复改写。所有目标页面清理剩余 `*Snippet` / `*ScriptSnippet` 常量，并把多个相邻 `DemoBlock` 合并为单个 `组合展示` 块，块内用 section 小标题保留基础、加载、空态、过滤、列设置、锁定列、卡片模式、自定义渲染、labels 等场景边界。Hooks 页面已清理 React/Vue `UseDrag`、React/Vue `UseChartInteraction`、React `UseControlledState` 的旧 snippet 常量；React `UseControlledState` 合并受控/非受控展示，Vue `UseControlledState` 保持 Vue 等价说明页。
+
+**合并规模**：
+
+- Composite React/Vue 目标页每页均保留单个 raw-source `DemoBlock`，避免同页多个 Code 标签重复展示相同源码。
+- DataTableWithToolbar React/Vue 从每端 9 个 `DemoBlock` 压缩为 1 个，保留所有原有表格变体。
+- Hooks 页面未引入 fixture；继续使用同页 `?raw` source 或说明页内容，未重新引入 `script` prop。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 prettier --write <changed example/docs files>`
+- `npx -y pnpm@11.9.0 example:sources:check`
+- `npx -y pnpm@11.9.0 test:group:composite`
+- `npx -y pnpm@11.9.0 vitest run tests/react/useDrag.spec.tsx tests/vue/useDrag.spec.ts tests/core/chart-interaction.spec.ts tests/core/chart-interaction-utils.spec.ts`
+- `npx -y pnpm@11.9.0 example:build`
+- `npx -y pnpm@11.9.0 prettier --check docs/ROADMAP.md docs/V2_COMPLETED.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/V2_COMPLETED.md docs/V2_API_AUDIT.md`
+- `git diff --check`
+
+**剩余阻塞**：无。后续维护或功能计划待追加。
+
+**状态更新要求**：已写回 R27 状态、日期、Composite/Hooks 覆盖范围、DemoBlock 压缩策略、snippet cleanup 和关键验证命令；阶段 21 已同步为 `已完成（2026-07-01）`，当前可执行任务标为 `待追加`。R27 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。

@@ -20,29 +20,6 @@ const data: BarDatum[] = [
 
 const max = Math.max(...data.map((d) => d.value))
 
-const snippet = `import { useChartInteraction } from '@expcat/tigercat-react'
-
-const interaction = useChartInteraction<BarDatum>({
-  hoverable: true,
-  selectable: true,
-  activeOpacity: 1,
-  inactiveOpacity: 0.35,
-  getData: (i) => data[i]
-})
-
-return (
-  <svg>
-    {data.map((d, i) => (
-      <rect key={d.label}
-            opacity={interaction.getElementOpacity(i)}
-            onMouseEnter={(e) => interaction.handleMouseEnter(i, e)}
-            onMouseLeave={interaction.handleMouseLeave}
-            onClick={() => interaction.handleClick(i)}
-            onKeyDown={(e) => interaction.handleKeyDown(e, i)} />
-    ))}
-  </svg>
-)`
-
 const UseChartInteractionDemo: React.FC = () => {
   const interaction = useChartInteraction<BarDatum>({
     hoverable: true,

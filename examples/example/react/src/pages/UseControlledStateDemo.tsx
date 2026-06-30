@@ -26,24 +26,6 @@ const Counter: React.FC<CounterProps> = ({ value, defaultValue = 0, onChange }) 
   )
 }
 
-const snippet = `import { useControlledState } from '@expcat/tigercat-react'
-
-interface CounterProps {
-  value?: number
-  defaultValue?: number
-  onChange?: (next: number) => void
-}
-
-const Counter: React.FC<CounterProps> = ({ value, defaultValue = 0, onChange }) => {
-  const [count, setCount] = useControlledState<number>(value, defaultValue, onChange)
-
-  return (
-    <button onClick={() => setCount(count + 1)}>{count}</button>
-  )
-}`
-
-const controlledScriptSnippet = `const [external, setExternal] = useState(10)`
-
 const UseControlledStateDemo: React.FC = () => {
   const [external, setExternal] = useState(10)
 
@@ -57,24 +39,32 @@ const UseControlledStateDemo: React.FC = () => {
       </div>
 
       <DemoBlock
-        title="非受控模式"
-        description="只传入 defaultValue，组件内部维护状态。"
+        title="组合展示"
+        description="合并展示非受控 defaultValue 与受控 value/onChange 两种状态模式。"
         code={fullPageSnippet}>
-        <Card>
-          <Counter defaultValue={5} />
-        </Card>
-      </DemoBlock>
-
-      <DemoBlock
-        title="受控模式"
-        description="传入 value 与 onChange，由父组件控制状态。"
-        code={fullPageSnippet}>
-        <Card>
-          <Counter value={external} onChange={setExternal} />
-          <div className="mt-3 text-sm text-gray-500">
-            外部状态：<strong>{external}</strong>
-          </div>
-        </Card>
+        <div className="space-y-6">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">非受控模式</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              只传入 defaultValue，组件内部维护状态。
+            </p>
+            <Card>
+              <Counter defaultValue={5} />
+            </Card>
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">受控模式</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              传入 value 与 onChange，由父组件控制状态。
+            </p>
+            <Card>
+              <Counter value={external} onChange={setExternal} />
+              <div className="mt-3 text-sm text-gray-500">
+                外部状态：<strong>{external}</strong>
+              </div>
+            </Card>
+          </section>
+        </div>
       </DemoBlock>
     </div>
   )

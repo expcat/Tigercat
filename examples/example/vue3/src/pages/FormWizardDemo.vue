@@ -19,10 +19,6 @@ const current = ref(0)
 const finished = ref(false)
 const currentLabels = ref(0)
 
-const basicScriptSnippet = `import { reactive, ref } from 'vue'
-
-const current = ref(0)
-const model = reactive({ name: '', email: '', phone: '' })`
 type FormExpose = {
   validate: () => Promise<boolean>
   validateFields: (fieldNames: string[]) => Promise<boolean>
@@ -46,44 +42,6 @@ const handleFinish = () => {
 const handleChange = () => {
   finished.value = false
 }
-
-const basicSnippet = `<FormWizard
-  v-model:current="current"
-  :steps="steps"
-  :before-next="handleBeforeNext"
-  @change="handleChange"
-  @finish="handleFinish">
-  <template #step="{ index }">
-    <Form ref="formRef" :model="model" class="w-full max-w-md">
-      <template v-if="index === 0">
-        <FormItem name="name" label="姓名" required :show-message="false">
-          <Input v-model="model.name" placeholder="请输入姓名" />
-        </FormItem>
-        <FormItem name="email" label="邮箱" required :show-message="false">
-          <Input v-model="model.email" placeholder="请输入邮箱" />
-        </FormItem>
-      </template>
-      <template v-else-if="index === 1">
-        <FormItem name="phone" label="手机号" required :show-message="false">
-          <Input v-model="model.phone" placeholder="请输入手机号" />
-        </FormItem>
-      </template>
-      <template v-else>
-        <div>确认信息无误后点击完成。</div>
-      </template>
-    </Form>
-  </template>
-</FormWizard>`
-
-const labelsSnippet = `<!-- 单语言项目：无需 locale，直接用扁平 labels 覆盖按钮文案 -->
-<FormWizard
-  v-model:current="currentLabels"
-  :steps="steps"
-  :labels="{ prevText: '返回', nextText: '继续', finishText: '提交完成' }">
-  <template #step="{ index }">
-    <div class="text-sm text-gray-600">第 {{ index + 1 }} 步内容</div>
-  </template>
-</FormWizard>`
 </script>
 
 <template>
@@ -93,70 +51,81 @@ const labelsSnippet = `<!-- 单语言项目：无需 locale，直接用扁平 la
       <p class="text-gray-600 dark:text-gray-400">多步表单流，支持校验阻断与完成态。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="多步校验阻断 + 完成态" :code="fullPageSnippet">
-      <FormWizard
-        v-model:current="current"
-        :steps="steps"
-        :before-next="handleBeforeNext"
-        @change="handleChange"
-        @finish="handleFinish">
-        <template #step="{ index }">
-          <Form ref="formRef" :model="model" class="w-full max-w-md">
-            <template v-if="index === 0">
-              <FormItem
-                name="name"
-                label="姓名"
-                required
-                :rules="{ required: true, message: '请输入姓名' }"
-                :show-message="false">
-                <Input v-model="model.name" placeholder="请输入姓名" />
-              </FormItem>
-              <FormItem
-                name="email"
-                label="邮箱"
-                required
-                :rules="{ required: true, message: '请输入邮箱' }"
-                :show-message="false">
-                <Input v-model="model.email" placeholder="请输入邮箱" />
-              </FormItem>
-            </template>
-            <template v-else-if="index === 1">
-              <FormItem
-                name="phone"
-                label="手机号"
-                required
-                :rules="{ required: true, message: '请输入手机号' }"
-                :show-message="false">
-                <Input v-model="model.phone" placeholder="请输入手机号" />
-              </FormItem>
-            </template>
-            <template v-else>
-              <div class="space-y-3">
-                <div class="text-sm text-(--tiger-text-secondary,#6b7280)">
-                  确认信息无误后点击完成。
-                </div>
-                <Alert
-                  :type="finished ? 'success' : 'info'"
-                  :description="finished ? '已完成提交' : '等待完成提交'" />
-              </div>
-            </template>
-          </Form>
-        </template>
-      </FormWizard>
-    </DemoBlock>
-
     <DemoBlock
-      title="自定义文案 (labels)"
-      description="单语言项目无需引入 locale，直接用扁平 labels 覆盖上一步/下一步/完成按钮文案。"
+      title="组合展示"
+      description="合并展示多步校验阻断、完成态和 labels 文案覆盖。"
       :code="fullPageSnippet">
-      <FormWizard
-        v-model:current="currentLabels"
-        :steps="steps"
-        :labels="{ prevText: '返回', nextText: '继续', finishText: '提交完成' }">
-        <template #step="{ index }">
-          <div class="text-sm text-gray-600">第 {{ index + 1 }} 步内容</div>
-        </template>
-      </FormWizard>
+      <div class="space-y-6">
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">多步校验阻断 + 完成态。</p>
+          <FormWizard
+            v-model:current="current"
+            :steps="steps"
+            :before-next="handleBeforeNext"
+            @change="handleChange"
+            @finish="handleFinish">
+            <template #step="{ index }">
+              <Form ref="formRef" :model="model" class="w-full max-w-md">
+                <template v-if="index === 0">
+                  <FormItem
+                    name="name"
+                    label="姓名"
+                    required
+                    :rules="{ required: true, message: '请输入姓名' }"
+                    :show-message="false">
+                    <Input v-model="model.name" placeholder="请输入姓名" />
+                  </FormItem>
+                  <FormItem
+                    name="email"
+                    label="邮箱"
+                    required
+                    :rules="{ required: true, message: '请输入邮箱' }"
+                    :show-message="false">
+                    <Input v-model="model.email" placeholder="请输入邮箱" />
+                  </FormItem>
+                </template>
+                <template v-else-if="index === 1">
+                  <FormItem
+                    name="phone"
+                    label="手机号"
+                    required
+                    :rules="{ required: true, message: '请输入手机号' }"
+                    :show-message="false">
+                    <Input v-model="model.phone" placeholder="请输入手机号" />
+                  </FormItem>
+                </template>
+                <template v-else>
+                  <div class="space-y-3">
+                    <div class="text-sm text-(--tiger-text-secondary,#6b7280)">
+                      确认信息无误后点击完成。
+                    </div>
+                    <Alert
+                      :type="finished ? 'success' : 'info'"
+                      :description="finished ? '已完成提交' : '等待完成提交'" />
+                  </div>
+                </template>
+              </Form>
+            </template>
+          </FormWizard>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            自定义文案 (labels)
+          </h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            单语言项目无需引入 locale，直接用扁平 labels 覆盖上一步/下一步/完成按钮文案。
+          </p>
+          <FormWizard
+            v-model:current="currentLabels"
+            :steps="steps"
+            :labels="{ prevText: '返回', nextText: '继续', finishText: '提交完成' }">
+            <template #step="{ index }">
+              <div class="text-sm text-gray-600">第 {{ index + 1 }} 步内容</div>
+            </template>
+          </FormWizard>
+        </section>
+      </div>
     </DemoBlock>
   </div>
 </template>

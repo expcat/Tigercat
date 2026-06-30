@@ -31,49 +31,6 @@ const draggedTitle = computed(() => {
   const id = drag.draggedItem.value?.id
   return id ? (items.value.find((it) => it.id === id)?.title ?? '无') : '无'
 })
-
-const reorderSnippet = `import { useDrag } from '@expcat/tigercat-vue'
-import type { DragItem } from '@expcat/tigercat-core'
-
-interface TodoItem extends DragItem {
-  title: string
-}
-
-const items = ref<TodoItem[]>([
-  { id: '1', index: 0, title: '编写需求文档' },
-  { id: '2', index: 1, title: '完成接口联调' }
-])
-
-const drag = useDrag({
-  onDrop: () => {
-    const result = drag.reorder(items.value)
-    if (result) {
-      items.value = result.items.map((item, index) => ({ ...item, index }))
-    }
-  }
-})
-
-// 模板
-<div v-bind="drag.getDropZoneAttrs()">
-  <div v-for="item in items"
-       :key="item.id"
-       v-bind="drag.getDragItemAttrs(item)">
-    {{ item.title }}
-  </div>
-</div>`
-
-const reorderScriptSnippet = `import { ref } from 'vue'
-import { useDrag } from '@expcat/tigercat-vue'
-import type { DragItem } from '@expcat/tigercat-core'
-
-interface TodoItem extends DragItem {
-  title: string
-}
-
-const items = ref<TodoItem[]>([
-  { id: '1', index: 0, title: '编写需求文档' },
-  { id: '2', index: 1, title: '完成接口联调' }
-])`
 </script>
 
 <template>
