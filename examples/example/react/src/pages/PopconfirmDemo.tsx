@@ -72,102 +72,97 @@ export default function PopconfirmDemo() {
       </DemoBlock>
 
       <DemoBlock
-        title="不同位置"
-        description="通过 placement 属性设置弹出位置。"
+        title="不同位置等组合展示"
+        description="合并展示不同位置、不同图标类型、自定义按钮文字等互不冲突的使用方式。"
         code={fullPageSnippet}>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="grid grid-cols-2 gap-4">
-            <Popconfirm title="确定要删除吗？" placement="top">
-              <Button>上方</Button>
-            </Popconfirm>
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">不同位置</h3>
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-2 gap-4">
+                <Popconfirm title="确定要删除吗？" placement="top">
+                  <Button>上方</Button>
+                </Popconfirm>
 
-            <Popconfirm title="确定要删除吗？" placement="bottom">
-              <Button>下方</Button>
-            </Popconfirm>
+                <Popconfirm title="确定要删除吗？" placement="bottom">
+                  <Button>下方</Button>
+                </Popconfirm>
 
-            <Popconfirm title="确定要删除吗？" placement="left">
-              <Button>左侧</Button>
-            </Popconfirm>
+                <Popconfirm title="确定要删除吗？" placement="left">
+                  <Button>左侧</Button>
+                </Popconfirm>
 
-            <Popconfirm title="确定要删除吗？" placement="right">
-              <Button>右侧</Button>
-            </Popconfirm>
+                <Popconfirm title="确定要删除吗？" placement="right">
+                  <Button>右侧</Button>
+                </Popconfirm>
+              </div>
+            </div>
           </div>
-        </div>
-      </DemoBlock>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">不同图标类型</h3>
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <Space>
+                <Popconfirm title="这是警告信息" icon="warning">
+                  <Button>警告</Button>
+                </Popconfirm>
 
-      <DemoBlock
-        title="不同图标类型"
-        description="支持 warning、info、error、success、question 五种图标类型。"
-        code={fullPageSnippet}>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space>
-            <Popconfirm title="这是警告信息" icon="warning">
-              <Button>警告</Button>
-            </Popconfirm>
+                <Popconfirm title="这是提示信息" icon="info">
+                  <Button>信息</Button>
+                </Popconfirm>
 
-            <Popconfirm title="这是提示信息" icon="info">
-              <Button>信息</Button>
-            </Popconfirm>
+                <Popconfirm title="这是错误信息" icon="error">
+                  <Button variant="secondary">错误</Button>
+                </Popconfirm>
 
-            <Popconfirm title="这是错误信息" icon="error">
-              <Button variant="secondary">错误</Button>
-            </Popconfirm>
+                <Popconfirm title="操作成功" icon="success">
+                  <Button>成功</Button>
+                </Popconfirm>
 
-            <Popconfirm title="操作成功" icon="success">
-              <Button>成功</Button>
-            </Popconfirm>
-
-            <Popconfirm title="确定继续吗？" icon="question">
-              <Button>疑问</Button>
-            </Popconfirm>
-          </Space>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="自定义按钮文字"
-        description="通过 okText 和 cancelText 属性自定义按钮文字。"
-        code={fullPageSnippet}>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Popconfirm
-            title="确定要提交这个表单吗？"
-            okText="提交"
-            cancelText="取消"
-            onConfirm={() => console.log('Form submitted')}>
-            <Button>提交表单</Button>
-          </Popconfirm>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="危险操作"
-        description={'通过 okType="danger" 将确认按钮设置为危险样式。'}
-        code={fullPageSnippet}>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Popconfirm
-            title="确定要删除这个用户吗？"
-            description="此操作不可撤销，用户的所有数据将被永久删除。"
-            icon="error"
-            okType="danger"
-            okText="删除"
-            onConfirm={() => console.log('User deleted')}>
-            <Button variant="secondary">删除用户</Button>
-          </Popconfirm>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="带描述信息"
-        description="通过 description 属性添加详细描述。"
-        code={fullPageSnippet}>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Popconfirm
-            title="确定要发布这篇文章吗？"
-            description="发布后，文章将对所有用户可见。"
-            onConfirm={() => console.log('Article published')}>
-            <Button>发布文章</Button>
-          </Popconfirm>
+                <Popconfirm title="确定继续吗？" icon="question">
+                  <Button>疑问</Button>
+                </Popconfirm>
+              </Space>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              自定义按钮文字
+            </h3>
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <Popconfirm
+                title="确定要提交这个表单吗？"
+                okText="提交"
+                cancelText="取消"
+                onConfirm={() => console.log('Form submitted')}>
+                <Button>提交表单</Button>
+              </Popconfirm>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">危险操作</h3>
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <Popconfirm
+                title="确定要删除这个用户吗？"
+                description="此操作不可撤销，用户的所有数据将被永久删除。"
+                icon="error"
+                okType="danger"
+                okText="删除"
+                onConfirm={() => console.log('User deleted')}>
+                <Button variant="secondary">删除用户</Button>
+              </Popconfirm>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">带描述信息</h3>
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <Popconfirm
+                title="确定要发布这篇文章吗？"
+                description="发布后，文章将对所有用户可见。"
+                onConfirm={() => console.log('Article published')}>
+                <Button>发布文章</Button>
+              </Popconfirm>
+            </div>
+          </div>
         </div>
       </DemoBlock>
 
@@ -198,35 +193,37 @@ export default function PopconfirmDemo() {
       </DemoBlock>
 
       <DemoBlock
-        title="隐藏图标"
-        description="通过 showIcon 属性控制图标显示。"
+        title="隐藏图标与禁用状态"
+        description="合并展示隐藏图标、禁用状态，减少重复示例块。"
         code={fullPageSnippet}>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Popconfirm
-            title="确定要继续吗？"
-            showIcon={false}
-            onConfirm={() => console.log('Confirmed')}>
-            <Button>无图标</Button>
-          </Popconfirm>
-        </div>
-      </DemoBlock>
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">隐藏图标</h3>
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <Popconfirm
+                title="确定要继续吗？"
+                showIcon={false}
+                onConfirm={() => console.log('Confirmed')}>
+                <Button>无图标</Button>
+              </Popconfirm>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">禁用状态</h3>
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <Space>
+                <Popconfirm title="此操作已禁用" disabled>
+                  <Button variant="secondary" disabled>
+                    禁用按钮
+                  </Button>
+                </Popconfirm>
 
-      <DemoBlock
-        title="禁用状态"
-        description="通过 disabled 属性禁用 Popconfirm，点击触发元素不会打开确认框。"
-        code={fullPageSnippet}>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space>
-            <Popconfirm title="此操作已禁用" disabled>
-              <Button variant="secondary" disabled>
-                禁用按钮
-              </Button>
-            </Popconfirm>
-
-            <Popconfirm title="Popconfirm 已禁用" disabled>
-              <Button>按钮未禁用</Button>
-            </Popconfirm>
-          </Space>
+                <Popconfirm title="Popconfirm 已禁用" disabled>
+                  <Button>按钮未禁用</Button>
+                </Popconfirm>
+              </Space>
+            </div>
+          </div>
         </div>
       </DemoBlock>
     </div>

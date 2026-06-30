@@ -136,102 +136,98 @@ export default function TooltipDemo() {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock title="基本用法" description="最简单的用法，悬停显示提示。" code={fullPageSnippet}>
-        <Tooltip content="这是一个气泡提示">
-          <Button>悬停显示提示</Button>
-        </Tooltip>
-      </DemoBlock>
-
-      {/* 不同位置 */}
       <DemoBlock
-        title="不同位置"
-        description="通过 placement 属性设置气泡提示的显示位置。"
+        title="基本用法等组合展示"
+        description="合并展示基本用法、不同位置、触发方式等互不冲突的使用方式。"
         code={fullPageSnippet}>
-        <div className="grid grid-cols-4 gap-4">
-          <div className="flex justify-center">
-            <Tooltip content="顶部提示" placement="top">
-              <Button>Top</Button>
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+            <Tooltip content="这是一个气泡提示">
+              <Button>悬停显示提示</Button>
             </Tooltip>
           </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">不同位置</h3>
+            <div className="grid grid-cols-4 gap-4">
+              <div className="flex justify-center">
+                <Tooltip content="顶部提示" placement="top">
+                  <Button>Top</Button>
+                </Tooltip>
+              </div>
 
-          <div className="flex justify-center">
-            <Tooltip content="顶部开始" placement="top-start">
-              <Button>Top Start</Button>
-            </Tooltip>
+              <div className="flex justify-center">
+                <Tooltip content="顶部开始" placement="top-start">
+                  <Button>Top Start</Button>
+                </Tooltip>
+              </div>
+
+              <div className="flex justify-center">
+                <Tooltip content="顶部结束" placement="top-end">
+                  <Button>Top End</Button>
+                </Tooltip>
+              </div>
+
+              <div className="flex justify-center">
+                <Tooltip content="底部提示" placement="bottom">
+                  <Button>Bottom</Button>
+                </Tooltip>
+              </div>
+
+              <div className="flex justify-center">
+                <Tooltip content="底部开始" placement="bottom-start">
+                  <Button>Bottom Start</Button>
+                </Tooltip>
+              </div>
+
+              <div className="flex justify-center">
+                <Tooltip content="底部结束" placement="bottom-end">
+                  <Button>Bottom End</Button>
+                </Tooltip>
+              </div>
+
+              <div className="flex justify-center">
+                <Tooltip content="左侧提示" placement="left">
+                  <Button>Left</Button>
+                </Tooltip>
+              </div>
+
+              <div className="flex justify-center">
+                <Tooltip content="右侧提示" placement="right">
+                  <Button>Right</Button>
+                </Tooltip>
+              </div>
+            </div>
           </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">触发方式</h3>
+            <Space size={16}>
+              <Tooltip content="悬停触发（默认）" trigger="hover">
+                <Button>Hover</Button>
+              </Tooltip>
 
-          <div className="flex justify-center">
-            <Tooltip content="顶部结束" placement="top-end">
-              <Button>Top End</Button>
-            </Tooltip>
+              <Tooltip content="点击触发" trigger="click">
+                <Button>Click</Button>
+              </Tooltip>
+
+              <Tooltip content="聚焦触发" trigger="focus">
+                <Button>Focus</Button>
+              </Tooltip>
+            </Space>
           </div>
-
-          <div className="flex justify-center">
-            <Tooltip content="底部提示" placement="bottom">
-              <Button>Bottom</Button>
-            </Tooltip>
-          </div>
-
-          <div className="flex justify-center">
-            <Tooltip content="底部开始" placement="bottom-start">
-              <Button>Bottom Start</Button>
-            </Tooltip>
-          </div>
-
-          <div className="flex justify-center">
-            <Tooltip content="底部结束" placement="bottom-end">
-              <Button>Bottom End</Button>
-            </Tooltip>
-          </div>
-
-          <div className="flex justify-center">
-            <Tooltip content="左侧提示" placement="left">
-              <Button>Left</Button>
-            </Tooltip>
-          </div>
-
-          <div className="flex justify-center">
-            <Tooltip content="右侧提示" placement="right">
-              <Button>Right</Button>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义内容</h3>
+            <Tooltip
+              content={
+                <div>
+                  <strong>自定义内容</strong>
+                  <p>这里可以包含任何内容</p>
+                </div>
+              }>
+              <Button>自定义提示</Button>
             </Tooltip>
           </div>
         </div>
-      </DemoBlock>
-
-      {/* 触发方式 */}
-      <DemoBlock
-        title="触发方式"
-        description="支持 hover（默认）、click、focus 三种触发方式。"
-        code={fullPageSnippet}>
-        <Space size={16}>
-          <Tooltip content="悬停触发（默认）" trigger="hover">
-            <Button>Hover</Button>
-          </Tooltip>
-
-          <Tooltip content="点击触发" trigger="click">
-            <Button>Click</Button>
-          </Tooltip>
-
-          <Tooltip content="聚焦触发" trigger="focus">
-            <Button>Focus</Button>
-          </Tooltip>
-        </Space>
-      </DemoBlock>
-
-      {/* 自定义内容 */}
-      <DemoBlock
-        title="自定义内容"
-        description="可以通过 props 自定义提示内容。"
-        code={fullPageSnippet}>
-        <Tooltip
-          content={
-            <div>
-              <strong>自定义内容</strong>
-              <p>这里可以包含任何内容</p>
-            </div>
-          }>
-          <Button>自定义提示</Button>
-        </Tooltip>
       </DemoBlock>
 
       {/* 受控模式 */}
@@ -250,50 +246,49 @@ export default function TooltipDemo() {
 
       {/* 禁用状态 */}
       <DemoBlock
-        title="禁用状态"
-        description="通过 disabled 属性禁用气泡提示。"
+        title="禁用状态等组合展示"
+        description="合并展示禁用状态、偏移距离、自动翻转 (Floating UI)，减少重复示例块。"
         code={fullPageSnippet}>
-        <Space size={16}>
-          <Tooltip content="正常提示">
-            <Button>正常</Button>
-          </Tooltip>
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">禁用状态</h3>
+            <Space size={16}>
+              <Tooltip content="正常提示">
+                <Button>正常</Button>
+              </Tooltip>
 
-          <Tooltip content="禁用提示" disabled>
-            <Button>禁用</Button>
-          </Tooltip>
-        </Space>
-      </DemoBlock>
+              <Tooltip content="禁用提示" disabled>
+                <Button>禁用</Button>
+              </Tooltip>
+            </Space>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">偏移距离</h3>
+            <Space size={16}>
+              <Tooltip content="默认偏移 (8px)">
+                <Button>默认</Button>
+              </Tooltip>
 
-      {/* 偏移距离 */}
-      <DemoBlock
-        title="偏移距离"
-        description="通过 offset 属性设置提示与触发元素的距离（单位 px）。"
-        code={fullPageSnippet}>
-        <Space size={16}>
-          <Tooltip content="默认偏移 (8px)">
-            <Button>默认</Button>
-          </Tooltip>
+              <Tooltip content="偏移 16px" offset={16}>
+                <Button>offset=16</Button>
+              </Tooltip>
 
-          <Tooltip content="偏移 16px" offset={16}>
-            <Button>offset=16</Button>
-          </Tooltip>
-
-          <Tooltip content="偏移 24px" offset={24}>
-            <Button>offset=24</Button>
-          </Tooltip>
-        </Space>
-      </DemoBlock>
-
-      {/* 自动翻转 */}
-      <DemoBlock
-        title="自动翻转 (Floating UI)"
-        description="当弹出位置空间不足时，Tooltip 会自动翻转到对侧显示。这是通过 Floating UI 的 flip 中间件实现的。"
-        code={fullPageSnippet}>
-        <div className="p-4 bg-gray-100 rounded overflow-auto h-32">
-          <div className="pt-16">
-            <Tooltip content="空间不足时自动翻转" placement="top">
-              <Button>试试滚动容器</Button>
-            </Tooltip>
+              <Tooltip content="偏移 24px" offset={24}>
+                <Button>offset=24</Button>
+              </Tooltip>
+            </Space>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              自动翻转 (Floating UI)
+            </h3>
+            <div className="p-4 bg-gray-100 rounded overflow-auto h-32">
+              <div className="pt-16">
+                <Tooltip content="空间不足时自动翻转" placement="top">
+                  <Button>试试滚动容器</Button>
+                </Tooltip>
+              </div>
+            </div>
           </div>
         </div>
       </DemoBlock>

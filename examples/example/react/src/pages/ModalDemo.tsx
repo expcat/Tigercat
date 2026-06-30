@@ -175,131 +175,126 @@ export default function ModalDemo() {
       </DemoBlock>
 
       <DemoBlock
-        title="不同尺寸"
-        description="Modal 提供了多种尺寸选项：sm、md（默认）、lg、xl、full。"
+        title="不同尺寸等组合展示"
+        description="合并展示不同尺寸、居中显示、自定义页脚等互不冲突的使用方式。"
         code={fullPageSnippet}>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Space>
-            <Button onClick={() => setVisibleSm(true)}>小尺寸</Button>
-            <Button onClick={() => setVisibleMd(true)}>中等尺寸</Button>
-            <Button onClick={() => setVisibleLg(true)}>大尺寸</Button>
-            <Button onClick={() => setVisibleXl(true)}>超大尺寸</Button>
-            <Button onClick={() => setVisibleFull(true)}>全屏</Button>
-          </Space>
-
-          <Modal
-            open={visibleSm}
-            title="小尺寸对话框"
-            size="sm"
-            onCancel={() => setVisibleSm(false)}>
-            <p>这是一个小尺寸的对话框。</p>
-          </Modal>
-          <Modal
-            open={visibleMd}
-            title="中等尺寸对话框"
-            size="md"
-            onCancel={() => setVisibleMd(false)}>
-            <p>这是一个中等尺寸的对话框（默认）。</p>
-          </Modal>
-          <Modal
-            open={visibleLg}
-            title="大尺寸对话框"
-            size="lg"
-            onCancel={() => setVisibleLg(false)}>
-            <p>这是一个大尺寸的对话框，可以容纳更多内容。</p>
-          </Modal>
-          <Modal
-            open={visibleXl}
-            title="超大尺寸对话框"
-            size="xl"
-            onCancel={() => setVisibleXl(false)}>
-            <p>这是一个超大尺寸的对话框，适合复杂的内容展示。</p>
-          </Modal>
-          <Modal
-            open={visibleFull}
-            title="全屏对话框"
-            size="full"
-            onCancel={() => setVisibleFull(false)}>
-            <p>这是一个全屏对话框，占据整个屏幕宽度。</p>
-          </Modal>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="居中显示"
-        description="设置 centered 属性可以使 Modal 垂直居中显示。"
-        code={fullPageSnippet}>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisibleCentered(true)}>打开居中对话框</Button>
-          <Modal
-            open={visibleCentered}
-            title="居中对话框"
-            centered
-            onCancel={() => setVisibleCentered(false)}>
-            <p>这是一个垂直居中显示的对话框。</p>
-            <p>默认情况下，Modal 会显示在距离顶部 10% 的位置。</p>
-          </Modal>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="自定义页脚"
-        description="通过 footer 属性可以自定义 Modal 的页脚内容。"
-        code={fullPageSnippet}>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisibleCustomFooter(true)}>自定义页脚对话框</Button>
-          <Modal
-            open={visibleCustomFooter}
-            title="自定义页脚对话框"
-            footer={
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">不同尺寸</h3>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
               <Space>
-                <Button variant="secondary" onClick={() => setVisibleCustomFooter(false)}>
-                  取消
-                </Button>
-                <Button onClick={() => setVisibleCustomFooter(false)}>提交</Button>
+                <Button onClick={() => setVisibleSm(true)}>小尺寸</Button>
+                <Button onClick={() => setVisibleMd(true)}>中等尺寸</Button>
+                <Button onClick={() => setVisibleLg(true)}>大尺寸</Button>
+                <Button onClick={() => setVisibleXl(true)}>超大尺寸</Button>
+                <Button onClick={() => setVisibleFull(true)}>全屏</Button>
               </Space>
-            }
-            onCancel={() => setVisibleCustomFooter(false)}>
-            <p>这是对话框的内容。</p>
-          </Modal>
-        </div>
-      </DemoBlock>
 
-      <DemoBlock
-        title="默认页脚"
-        description="设置 showDefaultFooter 属性可以使用内置的确定/取消页脚，通过 onOk/onCancel 监听操作。"
-        code={fullPageSnippet}>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisibleDefaultFooter(true)}>默认页脚对话框</Button>
-          <Modal
-            open={visibleDefaultFooter}
-            title="默认页脚对话框"
-            showDefaultFooter
-            onOk={() => {
-              console.log('OK clicked')
-              setVisibleDefaultFooter(false)
-            }}
-            onCancel={() => setVisibleDefaultFooter(false)}>
-            <p>这个对话框使用内置的默认页脚按钮。</p>
-          </Modal>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="自定义文案 (labels)"
-        description="单语言项目无需引入 locale，直接用扁平 labels 覆盖默认页脚按钮与关闭按钮文案。"
-        code={fullPageSnippet}>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisibleLabels(true)}>自定义文案对话框</Button>
-          <Modal
-            open={visibleLabels}
-            title="自定义文案"
-            showDefaultFooter
-            labels={{ okText: '提交', cancelText: '关闭', closeAriaLabel: '关闭对话框' }}
-            onOk={() => setVisibleLabels(false)}
-            onCancel={() => setVisibleLabels(false)}>
-            <p>页脚按钮与右上角关闭按钮的文案均由 labels 提供。</p>
-          </Modal>
+              <Modal
+                open={visibleSm}
+                title="小尺寸对话框"
+                size="sm"
+                onCancel={() => setVisibleSm(false)}>
+                <p>这是一个小尺寸的对话框。</p>
+              </Modal>
+              <Modal
+                open={visibleMd}
+                title="中等尺寸对话框"
+                size="md"
+                onCancel={() => setVisibleMd(false)}>
+                <p>这是一个中等尺寸的对话框（默认）。</p>
+              </Modal>
+              <Modal
+                open={visibleLg}
+                title="大尺寸对话框"
+                size="lg"
+                onCancel={() => setVisibleLg(false)}>
+                <p>这是一个大尺寸的对话框，可以容纳更多内容。</p>
+              </Modal>
+              <Modal
+                open={visibleXl}
+                title="超大尺寸对话框"
+                size="xl"
+                onCancel={() => setVisibleXl(false)}>
+                <p>这是一个超大尺寸的对话框，适合复杂的内容展示。</p>
+              </Modal>
+              <Modal
+                open={visibleFull}
+                title="全屏对话框"
+                size="full"
+                onCancel={() => setVisibleFull(false)}>
+                <p>这是一个全屏对话框，占据整个屏幕宽度。</p>
+              </Modal>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">居中显示</h3>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <Button onClick={() => setVisibleCentered(true)}>打开居中对话框</Button>
+              <Modal
+                open={visibleCentered}
+                title="居中对话框"
+                centered
+                onCancel={() => setVisibleCentered(false)}>
+                <p>这是一个垂直居中显示的对话框。</p>
+                <p>默认情况下，Modal 会显示在距离顶部 10% 的位置。</p>
+              </Modal>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义页脚</h3>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <Button onClick={() => setVisibleCustomFooter(true)}>自定义页脚对话框</Button>
+              <Modal
+                open={visibleCustomFooter}
+                title="自定义页脚对话框"
+                footer={
+                  <Space>
+                    <Button variant="secondary" onClick={() => setVisibleCustomFooter(false)}>
+                      取消
+                    </Button>
+                    <Button onClick={() => setVisibleCustomFooter(false)}>提交</Button>
+                  </Space>
+                }
+                onCancel={() => setVisibleCustomFooter(false)}>
+                <p>这是对话框的内容。</p>
+              </Modal>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">默认页脚</h3>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <Button onClick={() => setVisibleDefaultFooter(true)}>默认页脚对话框</Button>
+              <Modal
+                open={visibleDefaultFooter}
+                title="默认页脚对话框"
+                showDefaultFooter
+                onOk={() => {
+                  console.log('OK clicked')
+                  setVisibleDefaultFooter(false)
+                }}
+                onCancel={() => setVisibleDefaultFooter(false)}>
+                <p>这个对话框使用内置的默认页脚按钮。</p>
+              </Modal>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              自定义文案 (labels)
+            </h3>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <Button onClick={() => setVisibleLabels(true)}>自定义文案对话框</Button>
+              <Modal
+                open={visibleLabels}
+                title="自定义文案"
+                showDefaultFooter
+                labels={{ okText: '提交', cancelText: '关闭', closeAriaLabel: '关闭对话框' }}
+                onOk={() => setVisibleLabels(false)}
+                onCancel={() => setVisibleLabels(false)}>
+                <p>页脚按钮与右上角关闭按钮的文案均由 labels 提供。</p>
+              </Modal>
+            </div>
+          </div>
         </div>
       </DemoBlock>
 
@@ -327,69 +322,65 @@ export default function ModalDemo() {
       </DemoBlock>
 
       <DemoBlock
-        title="禁用遮罩关闭"
-        description="设置 maskClosable 为 false 可以禁止点击遮罩层关闭对话框。"
+        title="禁用遮罩关闭等组合展示"
+        description="合并展示禁用遮罩关闭、无遮罩、关闭时销毁等互不冲突的使用方式。"
         code={fullPageSnippet}>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisible2(true)}>禁用遮罩关闭</Button>
-          <Modal
-            open={visible2}
-            title="禁用遮罩关闭"
-            maskClosable={false}
-            onCancel={() => setVisible2(false)}>
-            <p>点击遮罩层不会关闭此对话框。</p>
-            <p className="mt-2">只能通过关闭按钮或页脚按钮关闭。</p>
-          </Modal>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="无遮罩"
-        description="设置 mask 为 false 可以不显示遮罩层。"
-        code={fullPageSnippet}>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisibleNoMask(true)}>无遮罩对话框</Button>
-          <Modal
-            open={visibleNoMask}
-            title="无遮罩对话框"
-            mask={false}
-            onCancel={() => setVisibleNoMask(false)}>
-            <p>这个对话框没有遮罩层。</p>
-          </Modal>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="关闭时销毁"
-        description="设置 destroyOnClose 可以在关闭对话框时销毁其内容。"
-        code={fullPageSnippet}>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisibleDestroyOnClose(true)}>关闭时销毁</Button>
-          <Modal
-            open={visibleDestroyOnClose}
-            title="关闭时销毁"
-            destroyOnClose
-            onCancel={() => setVisibleDestroyOnClose(false)}>
-            <p>关闭对话框时，此内容将被销毁。</p>
-            <p className="mt-2">组件状态：{new Date().toLocaleTimeString()}</p>
-          </Modal>
-        </div>
-      </DemoBlock>
-
-      <DemoBlock
-        title="无关闭按钮"
-        description="设置 closable 为 false 可以隐藏关闭按钮。"
-        code={fullPageSnippet}>
-        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisible3(true)}>无关闭按钮</Button>
-          <Modal
-            open={visible3}
-            title="无关闭按钮"
-            closable={false}
-            footer={<Button onClick={() => setVisible3(false)}>确定</Button>}
-            onCancel={() => setVisible3(false)}>
-            <p>这个对话框没有关闭按钮。</p>
-          </Modal>
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">禁用遮罩关闭</h3>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <Button onClick={() => setVisible2(true)}>禁用遮罩关闭</Button>
+              <Modal
+                open={visible2}
+                title="禁用遮罩关闭"
+                maskClosable={false}
+                onCancel={() => setVisible2(false)}>
+                <p>点击遮罩层不会关闭此对话框。</p>
+                <p className="mt-2">只能通过关闭按钮或页脚按钮关闭。</p>
+              </Modal>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">无遮罩</h3>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <Button onClick={() => setVisibleNoMask(true)}>无遮罩对话框</Button>
+              <Modal
+                open={visibleNoMask}
+                title="无遮罩对话框"
+                mask={false}
+                onCancel={() => setVisibleNoMask(false)}>
+                <p>这个对话框没有遮罩层。</p>
+              </Modal>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">关闭时销毁</h3>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <Button onClick={() => setVisibleDestroyOnClose(true)}>关闭时销毁</Button>
+              <Modal
+                open={visibleDestroyOnClose}
+                title="关闭时销毁"
+                destroyOnClose
+                onCancel={() => setVisibleDestroyOnClose(false)}>
+                <p>关闭对话框时，此内容将被销毁。</p>
+                <p className="mt-2">组件状态：{new Date().toLocaleTimeString()}</p>
+              </Modal>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">无关闭按钮</h3>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <Button onClick={() => setVisible3(true)}>无关闭按钮</Button>
+              <Modal
+                open={visible3}
+                title="无关闭按钮"
+                closable={false}
+                footer={<Button onClick={() => setVisible3(false)}>确定</Button>}
+                onCancel={() => setVisible3(false)}>
+                <p>这个对话框没有关闭按钮。</p>
+              </Modal>
+            </div>
+          </div>
         </div>
       </DemoBlock>
 

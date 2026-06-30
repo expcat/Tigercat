@@ -74,59 +74,61 @@ export default function ScrollSpyDemo() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-8">
         <div className="space-y-8">
           <DemoBlock
-            title="基本用法"
-            description="根据页面滚动位置同步当前导航项。"
+            title="基本用法与水平导航"
+            description="合并展示基本用法、水平导航，减少重复示例块。"
             code={fullPageSnippet}>
             <div className="space-y-6">
-              <section
-                id="scrollspy-overview"
-                className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">概览</h3>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  ScrollSpy 使用 href 与页面 section 关联，滚动到对应区域时自动切换 activeKey。
-                </p>
-              </section>
-              <section
-                id="scrollspy-workflow"
-                className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">工作流</h3>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  点击导航项会阻止默认跳转，改用平滑滚动定位，避免页面状态突然跳变。
-                </p>
-              </section>
-              <section
-                id="scrollspy-api"
-                className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">API</h3>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  items 支持 children，可渲染一层或多层目录结构，disabled 项不会参与滚动监听。
-                </p>
-              </section>
-              <section
-                id="scrollspy-events"
-                className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">事件</h3>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  onActiveKeyChange 会返回 activeKey、item 和
-                  source，业务侧可以记录用户点击或滚动来源。
-                </p>
-              </section>
-            </div>
-          </DemoBlock>
-
-          <DemoBlock
-            title="水平导航"
-            description="适合页内顶部导航或紧凑筛选区域。"
-            code={fullPageSnippet}>
-            <div className="space-y-4">
-              <ScrollSpy
-                direction="horizontal"
-                items={pageItems}
-                activeKey={activeKey}
-                getContainer={getMainContainer}
-                onActiveKeyChange={(key) => setActiveKey(key)}
-              />
-              <p className="text-sm text-gray-500">当前 activeKey：{String(activeKey)}</p>
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+                <div className="space-y-6">
+                  <section
+                    id="scrollspy-overview"
+                    className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">概览</h3>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      ScrollSpy 使用 href 与页面 section 关联，滚动到对应区域时自动切换 activeKey。
+                    </p>
+                  </section>
+                  <section
+                    id="scrollspy-workflow"
+                    className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">工作流</h3>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      点击导航项会阻止默认跳转，改用平滑滚动定位，避免页面状态突然跳变。
+                    </p>
+                  </section>
+                  <section
+                    id="scrollspy-api"
+                    className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">API</h3>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      items 支持 children，可渲染一层或多层目录结构，disabled 项不会参与滚动监听。
+                    </p>
+                  </section>
+                  <section
+                    id="scrollspy-events"
+                    className="scroll-mt-24 rounded border border-gray-200 p-5 dark:border-gray-700">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">事件</h3>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      onActiveKeyChange 会返回 activeKey、item 和
+                      source，业务侧可以记录用户点击或滚动来源。
+                    </p>
+                  </section>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">水平导航</h3>
+                <div className="space-y-4">
+                  <ScrollSpy
+                    direction="horizontal"
+                    items={pageItems}
+                    activeKey={activeKey}
+                    getContainer={getMainContainer}
+                    onActiveKeyChange={(key) => setActiveKey(key)}
+                  />
+                  <p className="text-sm text-gray-500">当前 activeKey：{String(activeKey)}</p>
+                </div>
+              </div>
             </div>
           </DemoBlock>
 

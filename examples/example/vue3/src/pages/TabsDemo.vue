@@ -91,38 +91,43 @@ const handleEdit = ({
       <p class="text-gray-600 dark:text-gray-400">用于内容的分类与切换。</p>
     </div>
 
-    <DemoBlock title="基本用法" description="基础的、简洁的标签页。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Tabs v-model:activeKey="activeKey1">
-          <TabPane tabKey="1" label="标签页 1">
-            <div class="p-4">标签页 1 的内容</div>
-          </TabPane>
-          <TabPane tabKey="2" label="标签页 2">
-            <div class="p-4">标签页 2 的内容</div>
-          </TabPane>
-          <TabPane tabKey="3" label="标签页 3">
-            <div class="p-4">标签页 3 的内容</div>
-          </TabPane>
-        </Tabs>
-      </div>
-    </DemoBlock>
-
     <DemoBlock
-      title="卡片式标签页"
-      description="卡片式的标签页，适合在容器内使用。"
+      title="基本用法与卡片式标签页"
+      description="合并展示基本用法、卡片式标签页，减少重复示例块。"
       :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Tabs v-model:activeKey="activeKey2" type="card">
-          <TabPane tabKey="1" label="选项卡 1">
-            <div class="p-4">选项卡 1 的内容</div>
-          </TabPane>
-          <TabPane tabKey="2" label="选项卡 2">
-            <div class="p-4">选项卡 2 的内容</div>
-          </TabPane>
-          <TabPane tabKey="3" label="选项卡 3">
-            <div class="p-4">选项卡 3 的内容</div>
-          </TabPane>
-        </Tabs>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Tabs v-model:activeKey="activeKey1">
+              <TabPane tabKey="1" label="标签页 1">
+                <div class="p-4">标签页 1 的内容</div>
+              </TabPane>
+              <TabPane tabKey="2" label="标签页 2">
+                <div class="p-4">标签页 2 的内容</div>
+              </TabPane>
+              <TabPane tabKey="3" label="标签页 3">
+                <div class="p-4">标签页 3 的内容</div>
+              </TabPane>
+            </Tabs>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">卡片式标签页</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Tabs v-model:activeKey="activeKey2" type="card">
+              <TabPane tabKey="1" label="选项卡 1">
+                <div class="p-4">选项卡 1 的内容</div>
+              </TabPane>
+              <TabPane tabKey="2" label="选项卡 2">
+                <div class="p-4">选项卡 2 的内容</div>
+              </TabPane>
+              <TabPane tabKey="3" label="选项卡 3">
+                <div class="p-4">选项卡 3 的内容</div>
+              </TabPane>
+            </Tabs>
+          </div>
+        </div>
       </div>
     </DemoBlock>
 
@@ -141,149 +146,148 @@ const handleEdit = ({
     </DemoBlock>
 
     <DemoBlock
-      title="不同位置"
-      description="可以设置标签页的位置：上、下、左、右。"
+      title="不同位置等组合展示"
+      description="合并展示不同位置、居中标签、不同尺寸等互不冲突的使用方式。"
       :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="mb-4">
-          <label class="mr-4">位置：</label>
-          <select v-model="position" class="border border-gray-300 rounded px-3 py-2">
-            <option value="top">上</option>
-            <option value="bottom">下</option>
-            <option value="left">左</option>
-            <option value="right">右</option>
-          </select>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">不同位置</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <div class="mb-4">
+              <label class="mr-4">位置：</label>
+              <select v-model="position" class="border border-gray-300 rounded px-3 py-2">
+                <option value="top">上</option>
+                <option value="bottom">下</option>
+                <option value="left">左</option>
+                <option value="right">右</option>
+              </select>
+            </div>
+            <Tabs v-model:activeKey="activeKey3" :tabPosition="position">
+              <TabPane tabKey="1" label="标签页 1">
+                <div class="p-4">标签页 1 的内容</div>
+              </TabPane>
+              <TabPane tabKey="2" label="标签页 2">
+                <div class="p-4">标签页 2 的内容</div>
+              </TabPane>
+              <TabPane tabKey="3" label="标签页 3">
+                <div class="p-4">标签页 3 的内容</div>
+              </TabPane>
+            </Tabs>
+          </div>
         </div>
-        <Tabs v-model:activeKey="activeKey3" :tabPosition="position">
-          <TabPane tabKey="1" label="标签页 1">
-            <div class="p-4">标签页 1 的内容</div>
-          </TabPane>
-          <TabPane tabKey="2" label="标签页 2">
-            <div class="p-4">标签页 2 的内容</div>
-          </TabPane>
-          <TabPane tabKey="3" label="标签页 3">
-            <div class="p-4">标签页 3 的内容</div>
-          </TabPane>
-        </Tabs>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="居中标签" description="标签居中显示。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Tabs v-model:activeKey="activeKey4" centered>
-          <TabPane tabKey="1" label="标签页 1">
-            <div class="p-4">标签页 1 的内容</div>
-          </TabPane>
-          <TabPane tabKey="2" label="标签页 2">
-            <div class="p-4">标签页 2 的内容</div>
-          </TabPane>
-          <TabPane tabKey="3" label="标签页 3">
-            <div class="p-4">标签页 3 的内容</div>
-          </TabPane>
-        </Tabs>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="不同尺寸"
-      description="提供三种尺寸：小、中（默认）、大。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg space-y-6">
-        <div>
-          <h3 class="text-lg font-semibold mb-2">小尺寸</h3>
-          <Tabs v-model:activeKey="activeKey5" size="small">
-            <TabPane tabKey="1" label="小尺寸 1">
-              <div class="p-4">内容</div>
-            </TabPane>
-            <TabPane tabKey="2" label="小尺寸 2">
-              <div class="p-4">内容</div>
-            </TabPane>
-            <TabPane tabKey="3" label="小尺寸 3">
-              <div class="p-4">内容</div>
-            </TabPane>
-          </Tabs>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">居中标签</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Tabs v-model:activeKey="activeKey4" centered>
+              <TabPane tabKey="1" label="标签页 1">
+                <div class="p-4">标签页 1 的内容</div>
+              </TabPane>
+              <TabPane tabKey="2" label="标签页 2">
+                <div class="p-4">标签页 2 的内容</div>
+              </TabPane>
+              <TabPane tabKey="3" label="标签页 3">
+                <div class="p-4">标签页 3 的内容</div>
+              </TabPane>
+            </Tabs>
+          </div>
         </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">不同尺寸</h3>
+          <div class="p-6 bg-gray-50 rounded-lg space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold mb-2">小尺寸</h3>
+              <Tabs v-model:activeKey="activeKey5" size="small">
+                <TabPane tabKey="1" label="小尺寸 1">
+                  <div class="p-4">内容</div>
+                </TabPane>
+                <TabPane tabKey="2" label="小尺寸 2">
+                  <div class="p-4">内容</div>
+                </TabPane>
+                <TabPane tabKey="3" label="小尺寸 3">
+                  <div class="p-4">内容</div>
+                </TabPane>
+              </Tabs>
+            </div>
 
-        <div>
-          <h3 class="text-lg font-semibold mb-2">中等尺寸（默认）</h3>
-          <Tabs v-model:activeKey="activeKey5" size="medium">
-            <TabPane tabKey="1" label="中等尺寸 1">
-              <div class="p-4">内容</div>
-            </TabPane>
-            <TabPane tabKey="2" label="中等尺寸 2">
-              <div class="p-4">内容</div>
-            </TabPane>
-            <TabPane tabKey="3" label="中等尺寸 3">
-              <div class="p-4">内容</div>
-            </TabPane>
-          </Tabs>
+            <div>
+              <h3 class="text-lg font-semibold mb-2">中等尺寸（默认）</h3>
+              <Tabs v-model:activeKey="activeKey5" size="medium">
+                <TabPane tabKey="1" label="中等尺寸 1">
+                  <div class="p-4">内容</div>
+                </TabPane>
+                <TabPane tabKey="2" label="中等尺寸 2">
+                  <div class="p-4">内容</div>
+                </TabPane>
+                <TabPane tabKey="3" label="中等尺寸 3">
+                  <div class="p-4">内容</div>
+                </TabPane>
+              </Tabs>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold mb-2">大尺寸</h3>
+              <Tabs v-model:activeKey="activeKey5" size="large">
+                <TabPane tabKey="1" label="大尺寸 1">
+                  <div class="p-4">内容</div>
+                </TabPane>
+                <TabPane tabKey="2" label="大尺寸 2">
+                  <div class="p-4">内容</div>
+                </TabPane>
+                <TabPane tabKey="3" label="大尺寸 3">
+                  <div class="p-4">内容</div>
+                </TabPane>
+              </Tabs>
+            </div>
+          </div>
         </div>
-
-        <div>
-          <h3 class="text-lg font-semibold mb-2">大尺寸</h3>
-          <Tabs v-model:activeKey="activeKey5" size="large">
-            <TabPane tabKey="1" label="大尺寸 1">
-              <div class="p-4">内容</div>
-            </TabPane>
-            <TabPane tabKey="2" label="大尺寸 2">
-              <div class="p-4">内容</div>
-            </TabPane>
-            <TabPane tabKey="3" label="大尺寸 3">
-              <div class="p-4">内容</div>
-            </TabPane>
-          </Tabs>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">禁用标签</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Tabs v-model:activeKey="activeKey6">
+              <TabPane tabKey="1" label="标签页 1">
+                <div class="p-4">标签页 1 的内容</div>
+              </TabPane>
+              <TabPane tabKey="2" label="禁用标签" disabled>
+                <div class="p-4">标签页 2 的内容（不可访问）</div>
+              </TabPane>
+              <TabPane tabKey="3" label="标签页 3">
+                <div class="p-4">标签页 3 的内容</div>
+              </TabPane>
+            </Tabs>
+          </div>
         </div>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="禁用标签" description="可以禁用某个标签页。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Tabs v-model:activeKey="activeKey6">
-          <TabPane tabKey="1" label="标签页 1">
-            <div class="p-4">标签页 1 的内容</div>
-          </TabPane>
-          <TabPane tabKey="2" label="禁用标签" disabled>
-            <div class="p-4">标签页 2 的内容（不可访问）</div>
-          </TabPane>
-          <TabPane tabKey="3" label="标签页 3">
-            <div class="p-4">标签页 3 的内容</div>
-          </TabPane>
-        </Tabs>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="带图标的标签" description="标签可以配置图标。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Tabs v-model:activeKey="activeKey7">
-          <TabPane tabKey="1" label="首页" icon="🏠">
-            <div class="p-4">首页内容</div>
-          </TabPane>
-          <TabPane tabKey="2" label="用户" icon="👤">
-            <div class="p-4">用户内容</div>
-          </TabPane>
-          <TabPane tabKey="3" label="设置" icon="⚙️">
-            <div class="p-4">设置内容</div>
-          </TabPane>
-        </Tabs>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="销毁非激活面板"
-      description="切换时销毁已隐藏的标签面板，而非仅隐藏。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Tabs v-model:activeKey="activeKey8" destroyInactiveTabPane>
-          <TabPane tabKey="1" label="标签页 1">
-            <div class="p-4">标签页 1 — 切换后此内容被销毁</div>
-          </TabPane>
-          <TabPane tabKey="2" label="标签页 2">
-            <div class="p-4">标签页 2 — 切换后此内容被销毁</div>
-          </TabPane>
-          <TabPane tabKey="3" label="标签页 3">
-            <div class="p-4">标签页 3 — 切换后此内容被销毁</div>
-          </TabPane>
-        </Tabs>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">带图标的标签</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Tabs v-model:activeKey="activeKey7">
+              <TabPane tabKey="1" label="首页" icon="🏠">
+                <div class="p-4">首页内容</div>
+              </TabPane>
+              <TabPane tabKey="2" label="用户" icon="👤">
+                <div class="p-4">用户内容</div>
+              </TabPane>
+              <TabPane tabKey="3" label="设置" icon="⚙️">
+                <div class="p-4">设置内容</div>
+              </TabPane>
+            </Tabs>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">销毁非激活面板</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Tabs v-model:activeKey="activeKey8" destroyInactiveTabPane>
+              <TabPane tabKey="1" label="标签页 1">
+                <div class="p-4">标签页 1 — 切换后此内容被销毁</div>
+              </TabPane>
+              <TabPane tabKey="2" label="标签页 2">
+                <div class="p-4">标签页 2 — 切换后此内容被销毁</div>
+              </TabPane>
+              <TabPane tabKey="3" label="标签页 3">
+                <div class="p-4">标签页 3 — 切换后此内容被销毁</div>
+              </TabPane>
+            </Tabs>
+          </div>
+        </div>
       </div>
     </DemoBlock>
   </div>

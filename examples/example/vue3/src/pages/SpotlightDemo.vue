@@ -67,34 +67,39 @@ const controlledSnippet = `<Spotlight
     <p class="text-gray-500 mb-8">支持分组结果、模糊搜索与键盘导航的命令面板。</p>
 
     <DemoBlock
-      title="基本用法"
-      description="通过 open 控制命令面板显示状态"
+      title="基本用法与受控搜索"
+      description="合并展示基本用法、受控搜索，减少重复示例块。"
       :code="fullPageSnippet">
-      <div class="flex flex-wrap items-center gap-3">
-        <Button @click="open = true">打开命令面板</Button>
-        <span v-if="selected" class="text-sm text-gray-500">已选择：{{ selected }}</span>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+          <div class="flex flex-wrap items-center gap-3">
+            <Button @click="open = true">打开命令面板</Button>
+            <span v-if="selected" class="text-sm text-gray-500">已选择：{{ selected }}</span>
+          </div>
+          <Spotlight
+            v-model:open="open"
+            :items="commands"
+            title="命令面板"
+            placeholder="搜索页面或操作"
+            empty-text="没有匹配命令"
+            @select="(item) => (selected = item.label)" />
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">受控搜索</h3>
+          <div class="flex flex-wrap items-center gap-3">
+            <Button variant="outline" @click="controlledOpen = true">打开受控面板</Button>
+            <span class="text-sm text-gray-500">当前查询：{{ query || '空' }}</span>
+          </div>
+          <Spotlight
+            v-model:open="controlledOpen"
+            v-model:query="query"
+            :items="commands"
+            title="受控命令面板"
+            placeholder="输入 help、crm 或设置"
+            :close-on-select="false" />
+        </div>
       </div>
-      <Spotlight
-        v-model:open="open"
-        :items="commands"
-        title="命令面板"
-        placeholder="搜索页面或操作"
-        empty-text="没有匹配命令"
-        @select="(item) => (selected = item.label)" />
-    </DemoBlock>
-
-    <DemoBlock title="受控搜索" description="query 与 open 都可以完全受控" :code="fullPageSnippet">
-      <div class="flex flex-wrap items-center gap-3">
-        <Button variant="outline" @click="controlledOpen = true">打开受控面板</Button>
-        <span class="text-sm text-gray-500">当前查询：{{ query || '空' }}</span>
-      </div>
-      <Spotlight
-        v-model:open="controlledOpen"
-        v-model:query="query"
-        :items="commands"
-        title="受控命令面板"
-        placeholder="输入 help、crm 或设置"
-        :close-on-select="false" />
     </DemoBlock>
   </div>
 </template>

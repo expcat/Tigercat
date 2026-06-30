@@ -2,24 +2,24 @@
 
 <!-- LLM-INDEX
 type: active-roadmap
-scope: v2.0.0 follow-up planning after R24 example source guard and first merge pass
-verified-date: 2026-06-30
-source: current repository state after R24 global example raw-source guard and Button/Input merge
+scope: v2.0.0 follow-up planning after R25 navigation and feedback demo merge
+verified-date: 2026-07-01
+source: current repository state after R25 Navigation/Feedback example demo consolidation
 -->
 
-本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节、R01-R24 已完成批次细节与发布收口记录不再保留在路线图中；详细执行摘要、实际验证命令和状态回写记录统一归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，public API 删除/合并证据归档到 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
+本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节、R01-R25 已完成批次细节与发布收口记录不再保留在路线图中；详细执行摘要、实际验证命令和状态回写记录统一归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，public API 删除/合并证据归档到 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
 
 ## 当前状态
 
-截至 2026-06-30，T01-T14 与 v2.0.0 R01-R24 已完成；R20 不作为 v2.0 发布收口批次，后续发布收口按维护决定单独追加。R24 已完成全量 Example 代码展示来源护栏、去除 DemoBlock script Tab，并合并 Button/Input 的高重复展示块；后续继续推进其余组件族展示合并。
+截至 2026-07-01，T01-T14 与 v2.0.0 R01-R25 已完成；R20 不作为 v2.0 发布收口批次，后续发布收口按维护决定单独追加。R25 已完成 Navigation/Feedback 示例展示合并，保留弹层、通知、异步确认和焦点流程的独立 DemoBlock；后续继续推进 Charts/Advanced 展示合并。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
-- 已完成阶段：阶段 0-18 已完成 R01-R24；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
-- 当前阶段：阶段 19。
-- 当前可执行任务：R25。
+- 已完成阶段：阶段 0-19 已完成 R01-R25；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
+- 当前阶段：阶段 20。
+- 当前可执行任务：R26。
 - 后续阶段：v2.0.0 仍会追加新的维护与功能计划，路线图不在 R23 处收口。
 
 ## 执行原则
@@ -54,7 +54,7 @@ source: current repository state after R24 global example raw-source guard and B
 | 16   | 已完成（2026-06-30） | R22     | 已压缩 Skill 读取路径，删除普通路由中的维护者 backlog                   |
 | 17   | 已完成（2026-06-30） | R23     | 已让 Basic/Layout 示例展示代码跟随同页源码，避免手写 code/script 漂移   |
 | 18   | 已完成（2026-06-30） | R24     | 已为全量 Example 建立 raw-source 护栏并合并 Button/Input 高重复展示     |
-| 19   | 未开始               | R25     | Navigation/Feedback 展示合并，弹层与通知类保留互不干扰的独立流程        |
+| 19   | 已完成（2026-07-01） | R25     | 已合并 Navigation/Feedback 展示，弹层与通知类保留互不干扰的独立流程     |
 | 20   | 未开始               | R26     | Charts/Advanced 展示合并，复杂编辑器与虚拟化页面优先使用 fixture source |
 | 21   | 未开始               | R27     | Composite/Hooks 展示合并与剩余 cleanup                                  |
 
@@ -67,7 +67,7 @@ source: current repository state after R24 global example raw-source guard and B
 
 ## 已完成归档
 
-R01-R24 已完成，主路线图不再展开逐项一行摘要；需要追溯执行细节、实际验证命令或完成状态，请读取 [V2_COMPLETED.md](V2_COMPLETED.md)；需要追溯 public API 删除/合并证据，请读取 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
+R01-R25 已完成，主路线图不再展开逐项一行摘要；需要追溯执行细节、实际验证命令或完成状态，请读取 [V2_COMPLETED.md](V2_COMPLETED.md)；需要追溯 public API 删除/合并证据，请读取 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
 
 ## v2.0 后续任务队列
 
@@ -107,11 +107,11 @@ R01-R24 已完成，主路线图不再展开逐项一行摘要；需要追溯执
 
 ### R25 Navigation and feedback demo merging
 
-**状态**：未开始。
+**状态**：已完成（2026-07-01）。
 
-**目标**：合并 Navigation 与 Feedback 页面中互不冲突的尺寸、状态、文案、触发方式展示；弹层、通知、异步确认和焦点流程保留独立 DemoBlock，避免状态互相污染。
+**完成摘要**：已合并 React/Vue Navigation 与 Feedback 示例页面中可共存的尺寸、状态、文案、触发方式和静态配置展示；`Message`、`Notification` 等通知流程保持独立，`Drawer`、`Modal`、`Popconfirm`、`Popover`、`Tooltip` 等弹层/受控/异步场景只合并互不污染的展示块。详细执行记录见 [V2_COMPLETED.md](V2_COMPLETED.md#r25-navigation-and-feedback-demo-merging)。
 
-**完成验证**：`npx -y pnpm@11.9.0 test:group:navigation`、`npx -y pnpm@11.9.0 test:group:feedback`、`npx -y pnpm@11.9.0 example:sources:check`、`npx -y pnpm@11.9.0 example:build`、changed-file Prettier、`git diff --check`。
+**完成验证**：`npx -y pnpm@11.9.0 test:group:navigation`、`npx -y pnpm@11.9.0 test:group:feedback`、`npx -y pnpm@11.9.0 example:sources:check`、`npx -y pnpm@11.9.0 example:build` 已通过；完整门禁记录见 [V2_COMPLETED.md](V2_COMPLETED.md#r25-navigation-and-feedback-demo-merging)。
 
 ### R26 Charts and advanced demo merging
 

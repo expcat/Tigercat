@@ -69,41 +69,46 @@ const SpotlightDemo: React.FC = () => {
       <p className="text-gray-500 mb-8">支持分组结果、模糊搜索与键盘导航的命令面板。</p>
 
       <DemoBlock
-        title="基本用法"
-        description="通过 open 控制命令面板显示状态"
+        title="基本用法与受控搜索"
+        description="合并展示基本用法、受控搜索，减少重复示例块。"
         code={fullPageSnippet}>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button onClick={() => setOpen(true)}>打开命令面板</Button>
-          {selected && <span className="text-sm text-gray-500">已选择：{selected}</span>}
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button onClick={() => setOpen(true)}>打开命令面板</Button>
+              {selected && <span className="text-sm text-gray-500">已选择：{selected}</span>}
+            </div>
+            <Spotlight
+              open={open}
+              items={commands}
+              title="命令面板"
+              placeholder="搜索页面或操作"
+              emptyText="没有匹配命令"
+              onOpenChange={setOpen}
+              onSelect={(item) => setSelected(item.label)}
+            />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">受控搜索</h3>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="outline" onClick={() => setControlledOpen(true)}>
+                打开受控面板
+              </Button>
+              <span className="text-sm text-gray-500">当前查询：{query || '空'}</span>
+            </div>
+            <Spotlight
+              open={controlledOpen}
+              query={query}
+              items={commands}
+              title="受控命令面板"
+              placeholder="输入 help、crm 或设置"
+              onOpenChange={setControlledOpen}
+              onQueryChange={setQuery}
+              closeOnSelect={false}
+            />
+          </div>
         </div>
-        <Spotlight
-          open={open}
-          items={commands}
-          title="命令面板"
-          placeholder="搜索页面或操作"
-          emptyText="没有匹配命令"
-          onOpenChange={setOpen}
-          onSelect={(item) => setSelected(item.label)}
-        />
-      </DemoBlock>
-
-      <DemoBlock title="受控搜索" description="query 与 open 都可以完全受控" code={fullPageSnippet}>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" onClick={() => setControlledOpen(true)}>
-            打开受控面板
-          </Button>
-          <span className="text-sm text-gray-500">当前查询：{query || '空'}</span>
-        </div>
-        <Spotlight
-          open={controlledOpen}
-          query={query}
-          items={commands}
-          title="受控命令面板"
-          placeholder="输入 help、crm 或设置"
-          onOpenChange={setControlledOpen}
-          onQueryChange={setQuery}
-          closeOnSelect={false}
-        />
       </DemoBlock>
     </div>
   )

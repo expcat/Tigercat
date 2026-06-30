@@ -100,122 +100,128 @@ const handleClick = (event: MouseEvent) => {
       </p>
     </div>
 
-    <DemoBlock title="基本用法" description="最简单的面包屑导航。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb>
-          <BreadcrumbItem href="/">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products">产品</BreadcrumbItem>
-          <BreadcrumbItem current>详情</BreadcrumbItem>
-        </Breadcrumb>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="箭头分隔符" description="使用箭头作为分隔符。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb separator="arrow">
-          <BreadcrumbItem href="/">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products">产品</BreadcrumbItem>
-          <BreadcrumbItem current>详情</BreadcrumbItem>
-        </Breadcrumb>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="尖括号分隔符" description="使用尖括号作为分隔符。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb separator="chevron">
-          <BreadcrumbItem href="/">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products">产品</BreadcrumbItem>
-          <BreadcrumbItem href="/category">分类</BreadcrumbItem>
-          <BreadcrumbItem current>详情</BreadcrumbItem>
-        </Breadcrumb>
+    <DemoBlock
+      title="基本用法等组合展示"
+      description="合并展示基本用法、箭头分隔符、尖括号分隔符等互不冲突的使用方式。"
+      :code="fullPageSnippet">
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb>
+              <BreadcrumbItem href="/">首页</BreadcrumbItem>
+              <BreadcrumbItem href="/products">产品</BreadcrumbItem>
+              <BreadcrumbItem current>详情</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">箭头分隔符</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb separator="arrow">
+              <BreadcrumbItem href="/">首页</BreadcrumbItem>
+              <BreadcrumbItem href="/products">产品</BreadcrumbItem>
+              <BreadcrumbItem current>详情</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">尖括号分隔符</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb separator="chevron">
+              <BreadcrumbItem href="/">首页</BreadcrumbItem>
+              <BreadcrumbItem href="/products">产品</BreadcrumbItem>
+              <BreadcrumbItem href="/category">分类</BreadcrumbItem>
+              <BreadcrumbItem current>详情</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义分隔符</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb separator=">">
+              <BreadcrumbItem href="/">Home</BreadcrumbItem>
+              <BreadcrumbItem href="/docs">Documentation</BreadcrumbItem>
+              <BreadcrumbItem current>Breadcrumb</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
       </div>
     </DemoBlock>
 
     <DemoBlock
-      title="自定义分隔符"
-      description="可以使用任意字符串作为分隔符。"
+      title="带图标等组合展示"
+      description="合并展示带图标、外部链接、点击事件等互不冲突的使用方式。"
       :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb separator=">">
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-          <BreadcrumbItem href="/docs">Documentation</BreadcrumbItem>
-          <BreadcrumbItem current>Breadcrumb</BreadcrumbItem>
-        </Breadcrumb>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="带图标" description="可以在面包屑项中添加图标。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb>
-          <BreadcrumbItem href="/" :icon="homeIcon">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products" :icon="bagIcon">产品</BreadcrumbItem>
-          <BreadcrumbItem current>详情</BreadcrumbItem>
-        </Breadcrumb>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="外部链接" description="支持在新窗口打开链接。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb>
-          <BreadcrumbItem href="/">首页</BreadcrumbItem>
-          <BreadcrumbItem href="https://github.com" target="_blank"> GitHub </BreadcrumbItem>
-          <BreadcrumbItem current>当前页面</BreadcrumbItem>
-        </Breadcrumb>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="点击事件"
-      description="面包屑项可以监听点击事件（查看控制台）。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb>
-          <BreadcrumbItem href="/" @click="handleClick">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products" @click="handleClick">产品</BreadcrumbItem>
-          <BreadcrumbItem current>详情</BreadcrumbItem>
-        </Breadcrumb>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="多级层次" description="支持任意层级的面包屑导航。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb separator="chevron">
-          <BreadcrumbItem href="/">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/category">分类</BreadcrumbItem>
-          <BreadcrumbItem href="/category/electronics">电子产品</BreadcrumbItem>
-          <BreadcrumbItem href="/category/electronics/phones">手机</BreadcrumbItem>
-          <BreadcrumbItem href="/category/electronics/phones/smartphones">智能手机</BreadcrumbItem>
-          <BreadcrumbItem current>iPhone 15 Pro</BreadcrumbItem>
-        </Breadcrumb>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="单独设置分隔符"
-      description="每个面包屑项可以单独设置分隔符。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb>
-          <BreadcrumbItem href="/" separator="arrow">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products" separator="chevron">产品</BreadcrumbItem>
-          <BreadcrumbItem current>详情</BreadcrumbItem>
-        </Breadcrumb>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="扩展区域"
-      description="通过 extra 插槽在面包屑末尾添加操作按钮等扩展内容。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Breadcrumb>
-          <template #extra>
-            <button class="text-sm text-blue-600 hover:underline">编辑</button>
-          </template>
-          <BreadcrumbItem href="/">首页</BreadcrumbItem>
-          <BreadcrumbItem href="/products">产品</BreadcrumbItem>
-          <BreadcrumbItem current>详情</BreadcrumbItem>
-        </Breadcrumb>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">带图标</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb>
+              <BreadcrumbItem href="/" :icon="homeIcon">首页</BreadcrumbItem>
+              <BreadcrumbItem href="/products" :icon="bagIcon">产品</BreadcrumbItem>
+              <BreadcrumbItem current>详情</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">外部链接</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb>
+              <BreadcrumbItem href="/">首页</BreadcrumbItem>
+              <BreadcrumbItem href="https://github.com" target="_blank"> GitHub </BreadcrumbItem>
+              <BreadcrumbItem current>当前页面</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">点击事件</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb>
+              <BreadcrumbItem href="/" @click="handleClick">首页</BreadcrumbItem>
+              <BreadcrumbItem href="/products" @click="handleClick">产品</BreadcrumbItem>
+              <BreadcrumbItem current>详情</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">多级层次</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb separator="chevron">
+              <BreadcrumbItem href="/">首页</BreadcrumbItem>
+              <BreadcrumbItem href="/category">分类</BreadcrumbItem>
+              <BreadcrumbItem href="/category/electronics">电子产品</BreadcrumbItem>
+              <BreadcrumbItem href="/category/electronics/phones">手机</BreadcrumbItem>
+              <BreadcrumbItem href="/category/electronics/phones/smartphones"
+                >智能手机</BreadcrumbItem
+              >
+              <BreadcrumbItem current>iPhone 15 Pro</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">单独设置分隔符</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb>
+              <BreadcrumbItem href="/" separator="arrow">首页</BreadcrumbItem>
+              <BreadcrumbItem href="/products" separator="chevron">产品</BreadcrumbItem>
+              <BreadcrumbItem current>详情</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">扩展区域</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Breadcrumb>
+              <template #extra>
+                <button class="text-sm text-blue-600 hover:underline">编辑</button>
+              </template>
+              <BreadcrumbItem href="/">首页</BreadcrumbItem>
+              <BreadcrumbItem href="/products">产品</BreadcrumbItem>
+              <BreadcrumbItem current>详情</BreadcrumbItem>
+            </Breadcrumb>
+          </div>
+        </div>
       </div>
     </DemoBlock>
   </div>

@@ -196,55 +196,63 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
         键盘：方向键移动焦点，Enter 选择，Space 勾选，Escape 收拢。
       </p>
 
-      <DemoBlock title="基本用法" description="基础树形结构展示。" code={fullPageSnippet}>
-        <Tree treeData={basicTreeData} ariaLabel="Tree 基本用法" />
-      </DemoBlock>
-
-      <DemoBlock title="默认展开所有节点" description="初始展开全部节点。" code={fullPageSnippet}>
-        <Tree treeData={basicTreeData} defaultExpandAll />
-      </DemoBlock>
-
       <DemoBlock
-        title="可选择的树"
-        description="支持选择节点并回显选中结果。"
+        title="基本用法等组合展示"
+        description="合并展示基本用法、默认展开所有节点、可选择的树等互不冲突的使用方式。"
         code={fullPageSnippet}>
-        <p className="text-sm text-gray-600 mb-4">已选择: {selectedKeys.join(', ')}</p>
-        <Tree
-          treeData={basicTreeData}
-          selectable
-          selectedKeys={selectedKeys}
-          onSelect={handleSelect}
-        />
-      </DemoBlock>
-
-      <DemoBlock title="多选树（级联）" description="勾选节点时父子联动。" code={fullPageSnippet}>
-        <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeys.join(', ')}</p>
-        <Tree
-          treeData={basicTreeData}
-          checkable
-          defaultExpandAll
-          checkedKeys={checkedKeys}
-          onCheckedKeysChange={setCheckedKeys}
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="多选树（父子独立）"
-        description="父子节点勾选状态相互独立。"
-        code={fullPageSnippet}>
-        <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeysStrictly.join(', ')}</p>
-        <Tree
-          treeData={basicTreeData}
-          checkable
-          checkStrictly
-          defaultExpandAll
-          checkedKeys={checkedKeysStrictly}
-          onCheckedKeysChange={setCheckedKeysStrictly}
-        />
-      </DemoBlock>
-
-      <DemoBlock title="禁用节点" description="为特定节点设置禁用状态。" code={fullPageSnippet}>
-        <Tree treeData={disabledTreeData} checkable defaultExpandAll />
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+            <Tree treeData={basicTreeData} ariaLabel="Tree 基本用法" />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              默认展开所有节点
+            </h3>
+            <Tree treeData={basicTreeData} defaultExpandAll />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">可选择的树</h3>
+            <p className="text-sm text-gray-600 mb-4">已选择: {selectedKeys.join(', ')}</p>
+            <Tree
+              treeData={basicTreeData}
+              selectable
+              selectedKeys={selectedKeys}
+              onSelect={handleSelect}
+            />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              多选树（级联）
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeys.join(', ')}</p>
+            <Tree
+              treeData={basicTreeData}
+              checkable
+              defaultExpandAll
+              checkedKeys={checkedKeys}
+              onCheckedKeysChange={setCheckedKeys}
+            />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              多选树（父子独立）
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeysStrictly.join(', ')}</p>
+            <Tree
+              treeData={basicTreeData}
+              checkable
+              checkStrictly
+              defaultExpandAll
+              checkedKeys={checkedKeysStrictly}
+              onCheckedKeysChange={setCheckedKeysStrictly}
+            />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">禁用节点</h3>
+            <Tree treeData={disabledTreeData} checkable defaultExpandAll />
+          </div>
+        </div>
       </DemoBlock>
 
       <DemoBlock title="懒加载" description="展开节点时动态加载子节点。" code={fullPageSnippet}>
@@ -262,43 +270,49 @@ const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
         <Tree treeData={filterTreeData} filterValue={filterValue} ariaLabel="Tree 节点过滤" />
       </DemoBlock>
 
-      <DemoBlock title="连接线" description="显示节点连接线。" code={fullPageSnippet}>
-        <Tree treeData={basicTreeData} showLine defaultExpandAll />
-      </DemoBlock>
-
       <DemoBlock
-        title="多选（selectionMode）"
-        description="通过 selectionMode='multiple' 支持多选。"
+        title="连接线等组合展示"
+        description="合并展示连接线、多选（selectionMode）、受控展开等互不冲突的使用方式。"
         code={fullPageSnippet}>
-        <p className="text-sm text-gray-600 mb-4">已选择: {multiSelectedKeys.join(', ')}</p>
-        <Tree
-          treeData={basicTreeData}
-          selectionMode="multiple"
-          defaultExpandAll
-          selectedKeys={multiSelectedKeys}
-          onSelectedKeysChange={setMultiSelectedKeys}
-        />
-      </DemoBlock>
-
-      <DemoBlock
-        title="受控展开"
-        description="通过 expandedKeys 外部控制展开状态。"
-        code={fullPageSnippet}>
-        <p className="text-sm text-gray-600 mb-4">展开节点: {controlledExpandedKeys.join(', ')}</p>
-        <Tree
-          treeData={basicTreeData}
-          expandedKeys={controlledExpandedKeys}
-          onExpandedKeysChange={setControlledExpandedKeys}
-        />
-      </DemoBlock>
-
-      <DemoBlock title="空数据" description="自定义空数据提示文案。" code={fullPageSnippet}>
-        <Tree treeData={[]} emptyText="暂无数据" />
-      </DemoBlock>
-
-      <DemoBlock title="Block 节点" description="节点占据整行宽度。" code={fullPageSnippet}>
-        <p className="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
-        <Tree treeData={basicTreeData} blockNode defaultExpandAll />
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">连接线</h3>
+            <Tree treeData={basicTreeData} showLine defaultExpandAll />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              多选（selectionMode）
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">已选择: {multiSelectedKeys.join(', ')}</p>
+            <Tree
+              treeData={basicTreeData}
+              selectionMode="multiple"
+              defaultExpandAll
+              selectedKeys={multiSelectedKeys}
+              onSelectedKeysChange={setMultiSelectedKeys}
+            />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">受控展开</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              展开节点: {controlledExpandedKeys.join(', ')}
+            </p>
+            <Tree
+              treeData={basicTreeData}
+              expandedKeys={controlledExpandedKeys}
+              onExpandedKeysChange={setControlledExpandedKeys}
+            />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">空数据</h3>
+            <Tree treeData={[]} emptyText="暂无数据" />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Block 节点</h3>
+            <p className="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
+            <Tree treeData={basicTreeData} blockNode defaultExpandAll />
+          </div>
+        </div>
       </DemoBlock>
     </div>
   )

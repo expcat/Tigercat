@@ -41,43 +41,50 @@ const TourDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Tour 漫游式引导</h1>
       <p className="text-gray-500 mb-8">分步引导用户了解页面功能。</p>
 
-      <DemoBlock title="基础用法" description="点击按钮开始引导" code={fullPageSnippet}>
-        <div className="flex gap-4 items-center">
-          <button
-            id="tour-r-btn-1"
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-            onClick={() => setOpen(true)}>
-            开始引导
-          </button>
-          <span id="tour-r-btn-2" className="px-3 py-1 bg-gray-100 rounded text-sm">
-            目标2
-          </span>
-          <span id="tour-r-btn-3" className="px-3 py-1 bg-gray-100 rounded text-sm">
-            目标3
-          </span>
-        </div>
-        <Tour open={open} steps={steps} onClose={() => setOpen(false)} />
-      </DemoBlock>
-
       <DemoBlock
-        title="自定义按钮文字"
-        description="nextText / prevText / finishText"
+        title="基础用法与自定义按钮文字"
+        description="合并展示基础用法、自定义按钮文字，减少重复示例块。"
         code={fullPageSnippet}>
-        <button
-          id="tour-r-custom"
-          className="px-4 py-2 bg-green-500 text-white rounded"
-          onClick={() => setOpen2(true)}>
-          自定义引导
-        </button>
-        <Tour
-          open={open2}
-          steps={customSteps}
-          nextText="下一步"
-          prevText="上一步"
-          finishText="完成"
-          showIndicators
-          onClose={() => setOpen2(false)}
-        />
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
+            <div className="flex gap-4 items-center">
+              <button
+                id="tour-r-btn-1"
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+                onClick={() => setOpen(true)}>
+                开始引导
+              </button>
+              <span id="tour-r-btn-2" className="px-3 py-1 bg-gray-100 rounded text-sm">
+                目标2
+              </span>
+              <span id="tour-r-btn-3" className="px-3 py-1 bg-gray-100 rounded text-sm">
+                目标3
+              </span>
+            </div>
+            <Tour open={open} steps={steps} onClose={() => setOpen(false)} />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              自定义按钮文字
+            </h3>
+            <button
+              id="tour-r-custom"
+              className="px-4 py-2 bg-green-500 text-white rounded"
+              onClick={() => setOpen2(true)}>
+              自定义引导
+            </button>
+            <Tour
+              open={open2}
+              steps={customSteps}
+              nextText="下一步"
+              prevText="上一步"
+              finishText="完成"
+              showIndicators
+              onClose={() => setOpen2(false)}
+            />
+          </div>
+        </div>
       </DemoBlock>
     </div>
   )

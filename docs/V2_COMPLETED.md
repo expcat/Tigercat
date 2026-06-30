@@ -2,12 +2,12 @@
 
 <!-- LLM-INDEX
 type: completed-roadmap-archive
-scope: v2.0.0 completed R01-R23 roadmap execution details
-verified-date: 2026-06-30
+scope: v2.0.0 completed R01-R25 roadmap execution details
+verified-date: 2026-07-01
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
-本文归档 v2.0.0 Roadmap 已完成 R01-R23 批次的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
+本文归档 v2.0.0 Roadmap 已完成 R01-R25 批次的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
 
 ## 已完成任务详情
 
@@ -998,3 +998,33 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `npx -y pnpm@11.9.0 --filter @expcat/tigercat-example-vue3 build`
 
 **状态更新要求**：已写回 R24 状态、日期、全量 raw-source 护栏、Button/Input 展示合并范围和关键验证命令；阶段 18 已同步为 `已完成（2026-06-30）`，当前可执行任务推进到 R25。R24 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R25 Navigation and feedback demo merging
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：合并 Navigation 与 Feedback 页面中互不冲突的尺寸、状态、文案、触发方式展示；弹层、通知、异步确认和焦点流程保留独立 DemoBlock，避免状态互相污染。
+
+**允许修改**：React/Vue example pages、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件 public API、组件运行时行为、package exports、测试分组基础设施、generated Skill references、API baseline、发布产物策略。
+
+**执行摘要**：已覆盖 React 与 Vue 共 42 个页面：Navigation 的 Affix、Anchor、BackTop、Breadcrumb、Dropdown、FloatButton、Menu、Pagination、ScrollSpy、Spotlight、Steps、Tabs、Tree，以及 Feedback 的 Drawer、Loading、Modal、Popconfirm、Popover、Progress、Tooltip、Tour。可共存的尺寸、状态、文案、布局密度、静态配置与普通触发方式合并到更少的 `DemoBlock` 中，并在块内用二级标题保留每个小场景的可读边界。Message 与 Notification 的命令式通知流程保持原有独立 DemoBlock；Drawer、Modal、Popconfirm、Popover、Tooltip 中的受控、异步确认、关闭/销毁、实际应用或焦点敏感流程只合并互不污染的展示块。
+
+**合并规模**：
+
+- React 目标页面 `DemoBlock` 总数从 186 个压缩到 81 个。
+- Vue 目标页面 `DemoBlock` 总数从 186 个压缩到 81 个。
+- 所有被修改页面继续使用同页 `?raw` 的 `fullPageSnippet` 作为 Code 展示来源；未重新引入手写 `script`、局部 snippet 或旧代码 Tab。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 example:sources:check`
+- `npx -y pnpm@11.9.0 example:build`
+- `npx -y pnpm@11.9.0 test:group:navigation`
+- `npx -y pnpm@11.9.0 test:group:feedback`
+- `npx -y pnpm@11.9.0 prettier --write <changed example files>`（仅格式化本轮变更页面）
+
+**剩余阻塞**：无。R26 继续处理 Charts/Advanced 示例合并。
+
+**状态更新要求**：已写回 R25 状态、日期、Navigation/Feedback 覆盖范围、DemoBlock 压缩策略和关键验证命令；阶段 19 已同步为 `已完成（2026-07-01）`，当前可执行任务推进到 R26。R25 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。

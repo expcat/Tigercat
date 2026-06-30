@@ -84,108 +84,107 @@ const handleSubmit = () => {
       </p>
     </div>
 
-    <DemoBlock title="基本用法" description="最简单的用法，显示加载动画。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="flex gap-8 items-center justify-center">
-          <Loading />
-          <Loading text="加载中..." />
-        </div>
-      </div>
-    </DemoBlock>
-
     <DemoBlock
-      title="加载动画变体"
-      description="Loading 组件支持 5 种不同的动画样式。"
+      title="基本用法等组合展示"
+      description="合并展示基本用法、加载动画变体、尺寸大小等互不冲突的使用方式。"
       :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="grid grid-cols-5 gap-8">
-          <div class="flex flex-col items-center gap-2">
-            <Loading variant="spinner" />
-            <span class="text-sm text-gray-600">Spinner</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading variant="ring" />
-            <span class="text-sm text-gray-600">Ring</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading variant="dots" />
-            <span class="text-sm text-gray-600">Dots</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading variant="bars" />
-            <span class="text-sm text-gray-600">Bars</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading variant="pulse" />
-            <span class="text-sm text-gray-600">Pulse</span>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <div class="flex gap-8 items-center justify-center">
+              <Loading />
+              <Loading text="加载中..." />
+            </div>
           </div>
         </div>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="尺寸大小"
-      description="Loading 组件支持 4 种不同的尺寸：sm、md（默认）、lg、xl。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="flex gap-8 items-center justify-center">
-          <div class="flex flex-col items-center gap-2">
-            <Loading size="sm" />
-            <span class="text-sm text-gray-600">Small</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading size="md" />
-            <span class="text-sm text-gray-600">Medium</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading size="lg" />
-            <span class="text-sm text-gray-600">Large</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading size="xl" />
-            <span class="text-sm text-gray-600">Extra Large</span>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">加载动画变体</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <div class="grid grid-cols-5 gap-8">
+              <div class="flex flex-col items-center gap-2">
+                <Loading variant="spinner" />
+                <span class="text-sm text-gray-600">Spinner</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading variant="ring" />
+                <span class="text-sm text-gray-600">Ring</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading variant="dots" />
+                <span class="text-sm text-gray-600">Dots</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading variant="bars" />
+                <span class="text-sm text-gray-600">Bars</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading variant="pulse" />
+                <span class="text-sm text-gray-600">Pulse</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="颜色变体"
-      description="Loading 组件支持 7 种颜色变体，也可以自定义颜色。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="grid grid-cols-4 gap-6">
-          <div class="flex flex-col items-center gap-2">
-            <Loading color="primary" />
-            <span class="text-sm text-gray-600">Primary</span>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">尺寸大小</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <div class="flex gap-8 items-center justify-center">
+              <div class="flex flex-col items-center gap-2">
+                <Loading size="sm" />
+                <span class="text-sm text-gray-600">Small</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading size="md" />
+                <span class="text-sm text-gray-600">Medium</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading size="lg" />
+                <span class="text-sm text-gray-600">Large</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading size="xl" />
+                <span class="text-sm text-gray-600">Extra Large</span>
+              </div>
+            </div>
           </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading color="secondary" />
-            <span class="text-sm text-gray-600">Secondary</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading color="success" />
-            <span class="text-sm text-gray-600">Success</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading color="warning" />
-            <span class="text-sm text-gray-600">Warning</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading color="danger" />
-            <span class="text-sm text-gray-600">Danger</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading color="info" />
-            <span class="text-sm text-gray-600">Info</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading color="default" />
-            <span class="text-sm text-gray-600">Default</span>
-          </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading custom-color="#ff6b6b" />
-            <span class="text-sm text-gray-600">Custom</span>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">颜色变体</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <div class="grid grid-cols-4 gap-6">
+              <div class="flex flex-col items-center gap-2">
+                <Loading color="primary" />
+                <span class="text-sm text-gray-600">Primary</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading color="secondary" />
+                <span class="text-sm text-gray-600">Secondary</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading color="success" />
+                <span class="text-sm text-gray-600">Success</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading color="warning" />
+                <span class="text-sm text-gray-600">Warning</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading color="danger" />
+                <span class="text-sm text-gray-600">Danger</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading color="info" />
+                <span class="text-sm text-gray-600">Info</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading color="default" />
+                <span class="text-sm text-gray-600">Default</span>
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading custom-color="#ff6b6b" />
+                <span class="text-sm text-gray-600">Custom</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -201,49 +200,53 @@ const handleSubmit = () => {
       </div>
     </DemoBlock>
 
-    <DemoBlock title="区域加载" description="在某个区域内显示加载状态。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Card title="数据统计">
-          <div class="relative min-h-[200px]">
-            <div
-              v-if="cardLoading"
-              class="absolute inset-0 flex items-center justify-center bg-white/80">
-              <Loading text="刷新中..." />
-            </div>
-            <div v-else>
-              <p class="mb-2">总用户数: 1,234</p>
-              <p class="mb-2">活跃用户: 567</p>
-              <p class="mb-4">新增用户: 89</p>
-              <Button @click="refreshCard">刷新数据</Button>
-            </div>
-          </div>
-        </Card>
-      </div>
-    </DemoBlock>
-
     <DemoBlock
-      title="按钮加载"
-      description="与按钮组合使用，展示操作进行中的状态。"
+      title="区域加载等组合展示"
+      description="合并展示区域加载、按钮加载、延迟显示，减少重复示例块。"
       :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="flex gap-4">
-          <Button :loading="buttonLoading" @click="handleSubmit"> 提交 </Button>
-          <Button variant="secondary" :loading="buttonLoading" @click="handleSubmit"> 保存 </Button>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">区域加载</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Card title="数据统计">
+              <div class="relative min-h-[200px]">
+                <div
+                  v-if="cardLoading"
+                  class="absolute inset-0 flex items-center justify-center bg-white/80">
+                  <Loading text="刷新中..." />
+                </div>
+                <div v-else>
+                  <p class="mb-2">总用户数: 1,234</p>
+                  <p class="mb-2">活跃用户: 567</p>
+                  <p class="mb-4">新增用户: 89</p>
+                  <Button @click="refreshCard">刷新数据</Button>
+                </div>
+              </div>
+            </Card>
+          </div>
         </div>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="延迟显示"
-      description="使用 delay 属性可以延迟显示加载器，避免闪烁（延迟 300ms）。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="flex gap-8 items-center justify-center">
-          <div class="flex flex-col items-center gap-2">
-            <Loading :delay="0" text="无延迟" />
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">按钮加载</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <div class="flex gap-4">
+              <Button :loading="buttonLoading" @click="handleSubmit"> 提交 </Button>
+              <Button variant="secondary" :loading="buttonLoading" @click="handleSubmit">
+                保存
+              </Button>
+            </div>
           </div>
-          <div class="flex flex-col items-center gap-2">
-            <Loading :delay="300" text="延迟 300ms" />
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">延迟显示</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <div class="flex gap-8 items-center justify-center">
+              <div class="flex flex-col items-center gap-2">
+                <Loading :delay="0" text="无延迟" />
+              </div>
+              <div class="flex flex-col items-center gap-2">
+                <Loading :delay="300" text="延迟 300ms" />
+              </div>
+            </div>
           </div>
         </div>
       </div>

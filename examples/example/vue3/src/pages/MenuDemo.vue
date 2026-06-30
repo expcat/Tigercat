@@ -143,180 +143,180 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     </div>
 
     <!-- 基本用法 -->
-    <DemoBlock title="基本用法" description="垂直菜单，默认模式。" :code="fullPageSnippet">
-      <div class="bg-gray-50 p-6 rounded-lg">
-        <div class="bg-white inline-block">
-          <Menu v-model:selectedKeys="selectedKeys1">
-            <MenuItem itemKey="1">菜单项 1</MenuItem>
-            <MenuItem itemKey="2">菜单项 2</MenuItem>
-            <MenuItem itemKey="3">菜单项 3</MenuItem>
-            <MenuItem itemKey="4" disabled>禁用菜单项</MenuItem>
-          </Menu>
-        </div>
-      </div>
-    </DemoBlock>
-
-    <!-- 横向菜单 -->
     <DemoBlock
-      title="横向菜单"
-      description="水平导航菜单，支持多级嵌套级联展开。"
+      title="基本用法等组合展示"
+      description="合并展示基本用法、横向菜单、子菜单等互不冲突的使用方式。"
       :code="fullPageSnippet">
-      <div class="bg-gray-50 p-6 rounded-lg">
-        <div class="bg-white">
-          <Menu mode="horizontal" v-model:selectedKeys="selectedKeys2">
-            <MenuItem itemKey="home">首页</MenuItem>
-            <SubMenu itemKey="products" title="产品">
-              <MenuItem itemKey="product-a">产品 A</MenuItem>
-              <SubMenu itemKey="product-b" title="产品 B">
-                <MenuItem itemKey="product-b1">产品 B-1</MenuItem>
-                <MenuItem itemKey="product-b2">产品 B-2</MenuItem>
-              </SubMenu>
-            </SubMenu>
-            <MenuItem itemKey="about">关于</MenuItem>
-            <MenuItem itemKey="contact">联系我们</MenuItem>
-          </Menu>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="bg-white inline-block">
+              <Menu v-model:selectedKeys="selectedKeys1">
+                <MenuItem itemKey="1">菜单项 1</MenuItem>
+                <MenuItem itemKey="2">菜单项 2</MenuItem>
+                <MenuItem itemKey="3">菜单项 3</MenuItem>
+                <MenuItem itemKey="4" disabled>禁用菜单项</MenuItem>
+              </Menu>
+            </div>
+          </div>
         </div>
-      </div>
-    </DemoBlock>
-
-    <!-- 子菜单 -->
-    <DemoBlock title="子菜单" description="多级菜单结构。" :code="fullPageSnippet">
-      <div class="bg-gray-50 p-6 rounded-lg">
-        <div class="bg-white inline-block">
-          <Menu v-model:selectedKeys="selectedKeys3" v-model:openKeys="openKeys3">
-            <SubMenu itemKey="sub1" title="导航 1">
-              <MenuItem itemKey="1">选项 1</MenuItem>
-              <MenuItem itemKey="2">选项 2</MenuItem>
-              <MenuItem itemKey="3">选项 3</MenuItem>
-            </SubMenu>
-            <SubMenu itemKey="sub2" title="导航 2">
-              <MenuItem itemKey="4">选项 4</MenuItem>
-              <MenuItem itemKey="5">选项 5</MenuItem>
-            </SubMenu>
-            <MenuItem itemKey="6">导航 3</MenuItem>
-          </Menu>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">横向菜单</h3>
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="bg-white">
+              <Menu mode="horizontal" v-model:selectedKeys="selectedKeys2">
+                <MenuItem itemKey="home">首页</MenuItem>
+                <SubMenu itemKey="products" title="产品">
+                  <MenuItem itemKey="product-a">产品 A</MenuItem>
+                  <SubMenu itemKey="product-b" title="产品 B">
+                    <MenuItem itemKey="product-b1">产品 B-1</MenuItem>
+                    <MenuItem itemKey="product-b2">产品 B-2</MenuItem>
+                  </SubMenu>
+                </SubMenu>
+                <MenuItem itemKey="about">关于</MenuItem>
+                <MenuItem itemKey="contact">联系我们</MenuItem>
+              </Menu>
+            </div>
+          </div>
         </div>
-      </div>
-    </DemoBlock>
-
-    <!-- 内联模式 -->
-    <DemoBlock
-      title="内联模式"
-      description="垂直菜单，子菜单内嵌在菜单中。"
-      :code="fullPageSnippet">
-      <div class="bg-gray-50 p-6 rounded-lg">
-        <div class="bg-white inline-block">
-          <Menu mode="inline" v-model:selectedKeys="selectedKeys4" v-model:openKeys="openKeys4">
-            <SubMenu itemKey="sub1" title="导航 1">
-              <MenuItem itemKey="1">选项 1</MenuItem>
-              <MenuItem itemKey="2">选项 2</MenuItem>
-            </SubMenu>
-            <SubMenu itemKey="sub2" title="导航 2">
-              <MenuItem itemKey="3">选项 3</MenuItem>
-              <MenuItem itemKey="4">选项 4</MenuItem>
-            </SubMenu>
-          </Menu>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">子菜单</h3>
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="bg-white inline-block">
+              <Menu v-model:selectedKeys="selectedKeys3" v-model:openKeys="openKeys3">
+                <SubMenu itemKey="sub1" title="导航 1">
+                  <MenuItem itemKey="1">选项 1</MenuItem>
+                  <MenuItem itemKey="2">选项 2</MenuItem>
+                  <MenuItem itemKey="3">选项 3</MenuItem>
+                </SubMenu>
+                <SubMenu itemKey="sub2" title="导航 2">
+                  <MenuItem itemKey="4">选项 4</MenuItem>
+                  <MenuItem itemKey="5">选项 5</MenuItem>
+                </SubMenu>
+                <MenuItem itemKey="6">导航 3</MenuItem>
+              </Menu>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">内联模式</h3>
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="bg-white inline-block">
+              <Menu mode="inline" v-model:selectedKeys="selectedKeys4" v-model:openKeys="openKeys4">
+                <SubMenu itemKey="sub1" title="导航 1">
+                  <MenuItem itemKey="1">选项 1</MenuItem>
+                  <MenuItem itemKey="2">选项 2</MenuItem>
+                </SubMenu>
+                <SubMenu itemKey="sub2" title="导航 2">
+                  <MenuItem itemKey="3">选项 3</MenuItem>
+                  <MenuItem itemKey="4">选项 4</MenuItem>
+                </SubMenu>
+              </Menu>
+            </div>
+          </div>
         </div>
       </div>
     </DemoBlock>
 
     <!-- 收起菜单 -->
-    <DemoBlock title="收起菜单" description="可以收起的垂直菜单。" :code="fullPageSnippet">
-      <div class="bg-gray-50 p-6 rounded-lg">
-        <div class="mb-4">
-          <Button
-            @click="collapsed = !collapsed"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            {{ collapsed ? '展开' : '收起' }}
-          </Button>
-        </div>
-        <div class="bg-white inline-block">
-          <Menu mode="vertical" :collapsed="collapsed" v-model:selectedKeys="selectedKeys5">
-            <MenuItem itemKey="1">菜单项 1</MenuItem>
-            <MenuItem itemKey="2">菜单项 2</MenuItem>
-            <SubMenu itemKey="sub1" title="子菜单">
-              <MenuItem itemKey="3">选项 3</MenuItem>
-              <MenuItem itemKey="4">选项 4</MenuItem>
-            </SubMenu>
-          </Menu>
-        </div>
-      </div>
-    </DemoBlock>
-
-    <!-- 暗色主题 -->
-    <DemoBlock title="暗色主题" description="使用暗色主题的菜单。" :code="fullPageSnippet">
-      <div class="bg-gray-50 p-6 rounded-lg">
-        <div class="inline-block">
-          <Menu theme="dark" v-model:selectedKeys="selectedKeys6">
-            <MenuItem itemKey="1">菜单项 1</MenuItem>
-            <MenuItem itemKey="2">菜单项 2</MenuItem>
-            <SubMenu itemKey="sub1" title="子菜单">
-              <MenuItem itemKey="3">选项 3</MenuItem>
-              <MenuItem itemKey="4">选项 4</MenuItem>
-            </SubMenu>
-          </Menu>
-        </div>
-      </div>
-    </DemoBlock>
-
-    <!-- 带图标的菜单 -->
-    <DemoBlock title="带图标的菜单" description="菜单项可以添加图标。" :code="fullPageSnippet">
-      <div class="bg-gray-50 p-6 rounded-lg">
-        <div class="bg-white inline-block">
-          <Menu v-model:selectedKeys="selectedKeys7">
-            <MenuItem itemKey="1" :icon="homeIcon">首页</MenuItem>
-            <MenuItem itemKey="2" :icon="userIcon">用户</MenuItem>
-            <SubMenu itemKey="sub1" title="设置" :icon="settingsIcon">
-              <MenuItem itemKey="3">常规设置</MenuItem>
-              <MenuItem itemKey="4">高级设置</MenuItem>
-            </SubMenu>
-          </Menu>
-        </div>
-      </div>
-    </DemoBlock>
-
-    <!-- 菜单项分组 -->
     <DemoBlock
-      title="菜单项分组"
-      description="使用 MenuItemGroup 对菜单项进行分组。"
+      title="收起菜单等组合展示"
+      description="合并展示收起菜单、暗色主题、带图标的菜单等互不冲突的使用方式。"
       :code="fullPageSnippet">
-      <div class="bg-gray-50 p-6 rounded-lg">
-        <div class="bg-white inline-block">
-          <Menu>
-            <MenuItemGroup title="分组 1">
-              <MenuItem itemKey="1">选项 1</MenuItem>
-              <MenuItem itemKey="2">选项 2</MenuItem>
-            </MenuItemGroup>
-            <MenuItemGroup title="分组 2">
-              <MenuItem itemKey="3">选项 3</MenuItem>
-              <MenuItem itemKey="4">选项 4</MenuItem>
-            </MenuItemGroup>
-          </Menu>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">收起菜单</h3>
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="mb-4">
+              <Button
+                @click="collapsed = !collapsed"
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                {{ collapsed ? '展开' : '收起' }}
+              </Button>
+            </div>
+            <div class="bg-white inline-block">
+              <Menu mode="vertical" :collapsed="collapsed" v-model:selectedKeys="selectedKeys5">
+                <MenuItem itemKey="1">菜单项 1</MenuItem>
+                <MenuItem itemKey="2">菜单项 2</MenuItem>
+                <SubMenu itemKey="sub1" title="子菜单">
+                  <MenuItem itemKey="3">选项 3</MenuItem>
+                  <MenuItem itemKey="4">选项 4</MenuItem>
+                </SubMenu>
+              </Menu>
+            </div>
+          </div>
         </div>
-      </div>
-    </DemoBlock>
-
-    <!-- 单一展开模式 -->
-    <DemoBlock
-      title="单一展开模式"
-      description="设置 multiple=false，同时只能展开一个子菜单。"
-      :code="fullPageSnippet">
-      <div class="bg-gray-50 p-6 rounded-lg">
-        <div class="bg-white inline-block">
-          <Menu :multiple="false" v-model:selectedKeys="selectedKeys8" v-model:openKeys="openKeys8">
-            <SubMenu itemKey="sub1" title="导航 1">
-              <MenuItem itemKey="1">选项 1</MenuItem>
-              <MenuItem itemKey="2">选项 2</MenuItem>
-            </SubMenu>
-            <SubMenu itemKey="sub2" title="导航 2">
-              <MenuItem itemKey="3">选项 3</MenuItem>
-              <MenuItem itemKey="4">选项 4</MenuItem>
-            </SubMenu>
-            <SubMenu itemKey="sub3" title="导航 3">
-              <MenuItem itemKey="5">选项 5</MenuItem>
-              <MenuItem itemKey="6">选项 6</MenuItem>
-            </SubMenu>
-          </Menu>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">暗色主题</h3>
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="inline-block">
+              <Menu theme="dark" v-model:selectedKeys="selectedKeys6">
+                <MenuItem itemKey="1">菜单项 1</MenuItem>
+                <MenuItem itemKey="2">菜单项 2</MenuItem>
+                <SubMenu itemKey="sub1" title="子菜单">
+                  <MenuItem itemKey="3">选项 3</MenuItem>
+                  <MenuItem itemKey="4">选项 4</MenuItem>
+                </SubMenu>
+              </Menu>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">带图标的菜单</h3>
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="bg-white inline-block">
+              <Menu v-model:selectedKeys="selectedKeys7">
+                <MenuItem itemKey="1" :icon="homeIcon">首页</MenuItem>
+                <MenuItem itemKey="2" :icon="userIcon">用户</MenuItem>
+                <SubMenu itemKey="sub1" title="设置" :icon="settingsIcon">
+                  <MenuItem itemKey="3">常规设置</MenuItem>
+                  <MenuItem itemKey="4">高级设置</MenuItem>
+                </SubMenu>
+              </Menu>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">菜单项分组</h3>
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="bg-white inline-block">
+              <Menu>
+                <MenuItemGroup title="分组 1">
+                  <MenuItem itemKey="1">选项 1</MenuItem>
+                  <MenuItem itemKey="2">选项 2</MenuItem>
+                </MenuItemGroup>
+                <MenuItemGroup title="分组 2">
+                  <MenuItem itemKey="3">选项 3</MenuItem>
+                  <MenuItem itemKey="4">选项 4</MenuItem>
+                </MenuItemGroup>
+              </Menu>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">单一展开模式</h3>
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="bg-white inline-block">
+              <Menu
+                :multiple="false"
+                v-model:selectedKeys="selectedKeys8"
+                v-model:openKeys="openKeys8">
+                <SubMenu itemKey="sub1" title="导航 1">
+                  <MenuItem itemKey="1">选项 1</MenuItem>
+                  <MenuItem itemKey="2">选项 2</MenuItem>
+                </SubMenu>
+                <SubMenu itemKey="sub2" title="导航 2">
+                  <MenuItem itemKey="3">选项 3</MenuItem>
+                  <MenuItem itemKey="4">选项 4</MenuItem>
+                </SubMenu>
+                <SubMenu itemKey="sub3" title="导航 3">
+                  <MenuItem itemKey="5">选项 5</MenuItem>
+                  <MenuItem itemKey="6">选项 6</MenuItem>
+                </SubMenu>
+              </Menu>
+            </div>
+          </div>
         </div>
       </div>
     </DemoBlock>

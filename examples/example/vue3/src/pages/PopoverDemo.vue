@@ -72,104 +72,103 @@ const customContentItems = [
     </div>
 
     <DemoBlock
-      title="基本用法"
-      description="最简单的用法，点击按钮显示气泡卡片。"
+      title="基本用法等组合展示"
+      description="合并展示基本用法、带标题、自定义内容等互不冲突的使用方式。"
       :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Popover content="这是一个气泡卡片的内容">
-          <Button>触发气泡卡片</Button>
-        </Popover>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="带标题" description="可以通过 title 属性设置标题。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Popover title="气泡卡片标题" content="这是一个带标题的气泡卡片内容">
-          <Button>带标题的气泡卡片</Button>
-        </Popover>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock title="自定义内容" description="可以通过插槽自定义内容。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Popover>
-          <template #title>
-            <span style="color: #2563eb">自定义标题</span>
-          </template>
-          <template #content>
-            <div>
-              <p class="mb-2">这是自定义的内容</p>
-              <List
-                class="text-sm"
-                bordered="none"
-                :split="false"
-                size="sm"
-                :dataSource="customContentItems">
-                <template #renderItem="{ item }">
-                  <div class="flex items-start gap-2">
-                    <span aria-hidden="true">•</span>
-                    <span>{{ item.title }}</span>
-                  </div>
-                </template>
-              </List>
-            </div>
-          </template>
-          <Button>自定义内容</Button>
-        </Popover>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="不同位置"
-      description="通过 placement 属性设置弹出位置。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="grid grid-cols-2 gap-4">
-          <Popover title="提示" content="上方弹出" placement="top">
-            <Button>上方</Button>
-          </Popover>
-
-          <Popover title="提示" content="下方弹出" placement="bottom">
-            <Button>下方</Button>
-          </Popover>
-
-          <Popover title="提示" content="左侧弹出" placement="left">
-            <Button>左侧</Button>
-          </Popover>
-
-          <Popover title="提示" content="右侧弹出" placement="right">
-            <Button>右侧</Button>
-          </Popover>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Popover content="这是一个气泡卡片的内容">
+              <Button>触发气泡卡片</Button>
+            </Popover>
+          </div>
         </div>
-      </div>
-    </DemoBlock>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">带标题</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Popover title="气泡卡片标题" content="这是一个带标题的气泡卡片内容">
+              <Button>带标题的气泡卡片</Button>
+            </Popover>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义内容</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Popover>
+              <template #title>
+                <span style="color: #2563eb">自定义标题</span>
+              </template>
+              <template #content>
+                <div>
+                  <p class="mb-2">这是自定义的内容</p>
+                  <List
+                    class="text-sm"
+                    bordered="none"
+                    :split="false"
+                    size="sm"
+                    :dataSource="customContentItems">
+                    <template #renderItem="{ item }">
+                      <div class="flex items-start gap-2">
+                        <span aria-hidden="true">•</span>
+                        <span>{{ item.title }}</span>
+                      </div>
+                    </template>
+                  </List>
+                </div>
+              </template>
+              <Button>自定义内容</Button>
+            </Popover>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">不同位置</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <div class="grid grid-cols-2 gap-4">
+              <Popover title="提示" content="上方弹出" placement="top">
+                <Button>上方</Button>
+              </Popover>
 
-    <DemoBlock
-      title="触发方式"
-      description="支持 click、hover、focus、manual 四种触发方式。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space>
-          <Popover title="点击触发" content="点击按钮触发" trigger="click">
-            <Button>点击触发</Button>
-          </Popover>
+              <Popover title="提示" content="下方弹出" placement="bottom">
+                <Button>下方</Button>
+              </Popover>
 
-          <Popover title="悬停触发" content="悬停触发气泡卡片" trigger="hover">
-            <Button>悬停触发</Button>
-          </Popover>
+              <Popover title="提示" content="左侧弹出" placement="left">
+                <Button>左侧</Button>
+              </Popover>
 
-          <Popover title="聚焦触发" content="聚焦触发气泡卡片" trigger="focus">
-            <Button>聚焦触发</Button>
-          </Popover>
+              <Popover title="提示" content="右侧弹出" placement="right">
+                <Button>右侧</Button>
+              </Popover>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">触发方式</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Space>
+              <Popover title="点击触发" content="点击按钮触发" trigger="click">
+                <Button>点击触发</Button>
+              </Popover>
 
-          <Popover
-            v-model:open="manualVisible"
-            title="手动触发"
-            content="手动控制显示隐藏"
-            trigger="manual">
-            <Button @click="manualVisible = !manualVisible">手动触发</Button>
-          </Popover>
-        </Space>
+              <Popover title="悬停触发" content="悬停触发气泡卡片" trigger="hover">
+                <Button>悬停触发</Button>
+              </Popover>
+
+              <Popover title="聚焦触发" content="聚焦触发气泡卡片" trigger="focus">
+                <Button>聚焦触发</Button>
+              </Popover>
+
+              <Popover
+                v-model:open="manualVisible"
+                title="手动触发"
+                content="手动控制显示隐藏"
+                trigger="manual">
+                <Button @click="manualVisible = !manualVisible">手动触发</Button>
+              </Popover>
+            </Space>
+          </div>
+        </div>
       </div>
     </DemoBlock>
 
@@ -191,56 +190,57 @@ const customContentItems = [
     </DemoBlock>
 
     <DemoBlock
-      title="自定义宽度"
-      description="通过 width 属性自定义气泡卡片的宽度。"
+      title="自定义宽度等组合展示"
+      description="合并展示自定义宽度、禁用状态、偏移距离等互不冲突的使用方式。"
       :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space>
-          <Popover title="自定义宽度" content="这是一个宽度为 300px 的气泡卡片" width="300">
-            <Button>宽度 300px</Button>
-          </Popover>
+      <div class="space-y-6">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义宽度</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Space>
+              <Popover title="自定义宽度" content="这是一个宽度为 300px 的气泡卡片" width="300">
+                <Button>宽度 300px</Button>
+              </Popover>
 
-          <Popover title="自定义宽度" content="这是一个宽度为 400px 的气泡卡片" width="400">
-            <Button>宽度 400px</Button>
-          </Popover>
-        </Space>
-      </div>
-    </DemoBlock>
+              <Popover title="自定义宽度" content="这是一个宽度为 400px 的气泡卡片" width="400">
+                <Button>宽度 400px</Button>
+              </Popover>
+            </Space>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">禁用状态</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Popover title="禁用状态" content="这个气泡卡片已被禁用" disabled>
+              <Button disabled>禁用的气泡卡片</Button>
+            </Popover>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">偏移距离</h3>
+          <div class="p-6 bg-gray-50 rounded-lg">
+            <Space :size="16">
+              <Popover title="默认偏移" content="默认 8px 偏移">
+                <Button>默认</Button>
+              </Popover>
 
-    <DemoBlock title="禁用状态" description="禁用状态下无法触发气泡卡片。" :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Popover title="禁用状态" content="这个气泡卡片已被禁用" disabled>
-          <Button disabled>禁用的气泡卡片</Button>
-        </Popover>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="偏移距离"
-      description="通过 offset 属性设置气泡卡片与触发元素的距离。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space :size="16">
-          <Popover title="默认偏移" content="默认 8px 偏移">
-            <Button>默认</Button>
-          </Popover>
-
-          <Popover title="自定义偏移" content="16px 偏移距离" :offset="16">
-            <Button>offset=16</Button>
-          </Popover>
-        </Space>
-      </div>
-    </DemoBlock>
-
-    <DemoBlock
-      title="自动翻转 (Floating UI)"
-      description="当弹出位置空间不足时，Popover 会自动翻转到对侧显示。"
-      :code="fullPageSnippet">
-      <div class="p-6 bg-gray-100 rounded overflow-auto h-32">
-        <div class="pt-16">
-          <Popover placement="top" title="自动翻转" content="空间不足时自动翻转到下方">
-            <Button>试试滚动容器</Button>
-          </Popover>
+              <Popover title="自定义偏移" content="16px 偏移距离" :offset="16">
+                <Button>offset=16</Button>
+              </Popover>
+            </Space>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            自动翻转 (Floating UI)
+          </h3>
+          <div class="p-6 bg-gray-100 rounded overflow-auto h-32">
+            <div class="pt-16">
+              <Popover placement="top" title="自动翻转" content="空间不足时自动翻转到下方">
+                <Button>试试滚动容器</Button>
+              </Popover>
+            </div>
+          </div>
         </div>
       </div>
     </DemoBlock>
