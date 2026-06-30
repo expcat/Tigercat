@@ -59,6 +59,7 @@ TEST_GROUP=form pnpm test:validate
 - 跨组 helper 改动：运行所有受影响 group 的 `pnpm test:group:<group>`，再补充相关 focused `vitest run`。
 - 文档或示例改动：同步运行 `pnpm docs:api:check`、`pnpm example:sources:check`、相关 examples 检查和 changed-file Prettier check。
 - 发布面或门禁策略变更：升级到 `pnpm quality:release`。
+- 发布验证必须在本地手动完成并记录结果；发布 Action 只执行安装、构建和发布，不要向 `.github/workflows/publish*.yml` 添加 `quality:release`、测试、coverage、SSR 或 publish smoke 等发布前验证门禁。
 
 ## 内部 helper（仅限仓库脚本）
 

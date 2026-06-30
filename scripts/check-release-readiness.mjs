@@ -261,16 +261,16 @@ function checkPublishWorkflows() {
   const tagPublishWorkflow = readText('.github/workflows/publish-on-tag.yml')
 
   check(
-    manualPublishWorkflow.includes('run: pnpm quality:release'),
-    '.github/workflows/publish.yml must run pnpm quality:release before publishing'
+    !manualPublishWorkflow.includes('pnpm quality:release'),
+    '.github/workflows/publish.yml must not run pnpm quality:release; run the release gate locally before publishing'
   )
   check(
     !/(^|\n)\s+(push|pull_request|schedule|workflow_run):/.test(manualPublishWorkflow),
     '.github/workflows/publish.yml must stay workflow_dispatch-only'
   )
   check(
-    tagPublishWorkflow.includes('run: pnpm quality:release'),
-    '.github/workflows/publish-on-tag.yml must run pnpm quality:release before publishing'
+    !tagPublishWorkflow.includes('pnpm quality:release'),
+    '.github/workflows/publish-on-tag.yml must not run pnpm quality:release; run the release gate locally before pushing a release tag'
   )
   check(
     !/(^|\n)\s+(pull_request|schedule):/.test(tagPublishWorkflow),

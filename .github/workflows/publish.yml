@@ -36,9 +36,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run release gate
-        run: pnpm quality:release
-
       - name: Build packages
         run: pnpm build
 

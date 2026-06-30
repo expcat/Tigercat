@@ -24,6 +24,8 @@ pnpm build
 
 `pnpm quality:release` includes quick API/type checks, size-limit, local publish artifact smoke, test checklist validation, Vue/React example builds, and the Nuxt/Next SSR build matrix. The publish smoke checks installed package ESM entrypoints and keeps Button component subpaths below their release budgets without pulling imperative APIs, charts, editors, or full locale bundles. It also verifies that `defineText` and DatePicker component subpaths do not pull unused DatePicker locale presets, while explicit DatePicker locale imports still include the requested preset.
 
+Run release validation manually on the local machine before publishing or pushing a release tag. Publish workflows are intentionally kept lightweight and must not add `quality:release`, coverage, SSR, publish smoke, or similar pre-publish validation gates, so GitHub Actions minutes are spent only on the publish operation.
+
 For component-batch work, start with the matching group gate before escalating to the full release gate:
 
 ```bash
@@ -105,7 +107,7 @@ pnpm release:next
 pnpm release:canary
 ```
 
-Before publishing, run the validation set appropriate to the release scope. For package releases, prefer `pnpm quality:release` so size-limit, local publish smoke, generated-reference drift, API baseline drift, examples, and SSR checks stay aligned.
+Before publishing, run the validation set appropriate to the release scope locally. For package releases, prefer `pnpm quality:release` so size-limit, local publish smoke, generated-reference drift, API baseline drift, examples, and SSR checks stay aligned. Do not move this gate into publish workflows.
 
 After publishing, run the published package smoke test when validating npm artifacts.
 
