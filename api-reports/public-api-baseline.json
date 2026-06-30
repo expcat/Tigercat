@@ -2247,6 +2247,8 @@
       "SegmentedProps",
       "selectBaseClasses",
       "SelectChangeHandler",
+      "selectDoneActionClasses",
+      "selectDoneButtonClasses",
       "selectDropdownBaseClasses",
       "selectEmptyStateClasses",
       "selectGroupLabelClasses",
@@ -3789,7 +3791,14 @@
     },
     "ImagePreviewProps": {
       "extends": ["ImageViewerBaseProps"],
-      "props": ["maxScale", "minScale", "scaleStep", "zIndex"]
+      "props": [
+        "maxScale",
+        "minScale",
+        "scaleStep",
+        "touchSwipeable",
+        "touchSwipeThreshold",
+        "zIndex"
+      ]
     },
     "ImageProps": {
       "extends": [],

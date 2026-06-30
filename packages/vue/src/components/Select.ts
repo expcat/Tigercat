@@ -8,6 +8,8 @@ import {
   selectGroupLabelClasses,
   selectSearchInputClasses,
   selectEmptyStateClasses,
+  selectDoneActionClasses,
+  selectDoneButtonClasses,
   isOptionGroup,
   createSelectSearchDebouncer,
   getCreateSelectOptionLabel,
@@ -337,6 +339,14 @@ export const Select = defineComponent({
         (!Array.isArray(props.modelValue) || props.modelValue.length > 0)
       )
     })
+
+    const doneText = computed(() =>
+      resolveLocaleText(
+        'Done',
+        mergedLocale.value?.common?.okText,
+        mergedLocale.value?.common?.closeText
+      )
+    )
 
     function isSelected(option: SelectOption): boolean {
       if (props.multiple && Array.isArray(props.modelValue)) {
@@ -912,7 +922,23 @@ export const Select = defineComponent({
                         props.emptyText,
                         mergedLocale.value?.common?.emptyText
                       )
-                    )
+                    ),
+              h('div', { class: selectDoneActionClasses }, [
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: selectDoneButtonClasses,
+                    onClick: closeDropdown,
+                    onKeydown: (event: KeyboardEvent) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.stopPropagation()
+                      }
+                    }
+                  },
+                  doneText.value
+                )
+              ])
             ]
           )
       ])

@@ -2,7 +2,9 @@ import React from 'react'
 import {
   classNames,
   selectDropdownBaseClasses,
-  selectSearchInputClasses
+  selectSearchInputClasses,
+  selectDoneActionClasses,
+  selectDoneButtonClasses
 } from '@expcat/tigercat-core'
 import { useSelectState } from './Select/state'
 import { renderOptions } from './Select/render-option'
@@ -80,6 +82,19 @@ export const Select: React.FC<SelectProps> = (props) => {
             />
           )}
           {renderOptions(ctx)}
+          <div className={selectDoneActionClasses}>
+            <button
+              type="button"
+              className={selectDoneButtonClasses}
+              onClick={ctx.closeDropdown}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.stopPropagation()
+                }
+              }}>
+              {ctx.doneText}
+            </button>
+          </div>
         </div>
       )}
     </div>

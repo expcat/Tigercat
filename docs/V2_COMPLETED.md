@@ -2,12 +2,12 @@
 
 <!-- LLM-INDEX
 type: completed-roadmap-archive
-scope: v2.0.0 completed R01-R18 plus R20 composite/business cleanup roadmap execution details
+scope: v2.0.0 completed R01-R20 component cleanup roadmap execution details
 verified-date: 2026-06-30
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
-本文归档 v2.0.0 Roadmap 已完成 R01-R18 与提前完成的 R20 组件清理详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
+本文归档 v2.0.0 Roadmap 已完成 R01-R20 组件级清理详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
 
 ## 已完成任务详情
 

@@ -662,6 +662,44 @@ describe('Select', () => {
       })
     })
 
+    it('should close an open single select from the in-panel done action', async () => {
+      const user = userEvent.setup()
+      const onChange = vi.fn()
+      const { container, getByRole, queryByRole } = render(
+        <Select
+          options={testOptions}
+          locale={{ common: { okText: 'Apply' } }}
+          onChange={onChange}
+        />
+      )
+
+      await user.click(container.querySelector('button')!)
+      await user.click(getByRole('button', { name: 'Apply' }))
+
+      expect(onChange).not.toHaveBeenCalled()
+      expect(queryByRole('listbox')).not.toBeInTheDocument()
+    })
+
+    it('should keep multiple select open after selection until the done action is clicked', async () => {
+      const user = userEvent.setup()
+      const { container, getByText, getByRole, queryByRole } = render(
+        <Select
+          options={testOptions}
+          multiple
+          value={[]}
+          locale={{ common: { okText: 'Apply' } }}
+        />
+      )
+
+      await user.click(container.querySelector('button')!)
+      await user.click(getByText('Option 1'))
+      expect(getByRole('listbox')).toBeInTheDocument()
+
+      await user.click(getByRole('button', { name: 'Apply' }))
+
+      expect(queryByRole('listbox')).not.toBeInTheDocument()
+    })
+
     it('should focus search input when dropdown opens with searchable', async () => {
       const user = userEvent.setup()
       const { container } = render(<Select options={testOptions} searchable />)

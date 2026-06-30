@@ -70,6 +70,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   scaleStep = 0.5,
   minScale = 0.25,
   maxScale = 5,
+  touchSwipeable = true,
+  touchSwipeThreshold = 48,
   locale,
   onOpenChange,
 
@@ -93,6 +95,13 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   const dragStartRef = useRef({ x: 0, y: 0, ox: 0, oy: 0 })
   const panRef = useRef(createPanState())
   const pinchRef = useRef(createPinchState())
+  const touchSwipeRef = useRef({
+    isTracking: false,
+    startX: 0,
+    startY: 0,
+    currentX: 0,
+    currentY: 0
+  })
 
   const resetTransform = useCallback(() => {
     setScale(1)
@@ -101,6 +110,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     setOffsetY(0)
     panRef.current = createPanState()
     pinchRef.current = createPinchState()
+    touchSwipeRef.current.isTracking = false
   }, [])
 
   useEffect(() => {
@@ -224,15 +234,30 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     (e: React.TouchEvent) => {
       if (e.touches.length === 2) {
         e.preventDefault()
+        touchSwipeRef.current.isTracking = false
         pinchRef.current = startPinch(e.touches[0], e.touches[1], scale)
         return
       }
 
       if (e.touches.length === 1) {
-        panRef.current = startPan(e.touches[0].clientX, e.touches[0].clientY, offsetX, offsetY)
+        const touch = e.touches[0]
+        if (touchSwipeable && images.length > 1 && scale === 1) {
+          touchSwipeRef.current = {
+            isTracking: true,
+            startX: touch.clientX,
+            startY: touch.clientY,
+            currentX: touch.clientX,
+            currentY: touch.clientY
+          }
+          panRef.current = createPanState()
+          return
+        }
+
+        touchSwipeRef.current.isTracking = false
+        panRef.current = startPan(touch.clientX, touch.clientY, offsetX, offsetY)
       }
     },
-    [offsetX, offsetY, scale]
+    [images.length, offsetX, offsetY, scale, touchSwipeable]
   )
 
   const handleTouchMove = useCallback(
@@ -249,15 +274,49 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         const next = movePan(panRef.current, e.touches[0].clientX, e.touches[0].clientY)
         setOffsetX(next.translateX)
         setOffsetY(next.translateY)
+        return
+      }
+
+      if (e.touches.length === 1 && touchSwipeRef.current.isTracking) {
+        const touch = e.touches[0]
+        touchSwipeRef.current.currentX = touch.clientX
+        touchSwipeRef.current.currentY = touch.clientY
+
+        const deltaX = touch.clientX - touchSwipeRef.current.startX
+        const deltaY = touch.clientY - touchSwipeRef.current.startY
+        if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
+          e.preventDefault()
+        }
       }
     },
     [maxScale, minScale, onScaleChange]
   )
 
-  const handleTouchEnd = useCallback(() => {
-    panRef.current = createPanState()
-    pinchRef.current = createPinchState()
-  }, [])
+  const handleTouchEnd = useCallback(
+    (e?: React.TouchEvent) => {
+      if (touchSwipeRef.current.isTracking) {
+        const endedTouch = e?.changedTouches?.[0]
+        const currentX = endedTouch?.clientX ?? touchSwipeRef.current.currentX
+        const currentY = endedTouch?.clientY ?? touchSwipeRef.current.currentY
+        const deltaX = currentX - touchSwipeRef.current.startX
+        const deltaY = currentY - touchSwipeRef.current.startY
+        const threshold = Math.max(0, touchSwipeThreshold)
+
+        if (Math.abs(deltaX) >= threshold && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+          if (deltaX < 0) {
+            handleNext()
+          } else {
+            handlePrev()
+          }
+        }
+      }
+
+      touchSwipeRef.current.isTracking = false
+      panRef.current = createPanState()
+      pinchRef.current = createPinchState()
+    },
+    [handleNext, handlePrev, touchSwipeThreshold]
+  )
 
   const handleMaskClick = useCallback(
     (e: React.MouseEvent) => {

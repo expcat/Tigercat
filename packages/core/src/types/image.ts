@@ -192,6 +192,18 @@ export interface ImagePreviewProps extends ImageViewerBaseProps {
    * @default 5
    */
   maxScale?: number
+
+  /**
+   * Whether one-finger horizontal swipes navigate images while the preview is not zoomed in.
+   * @default true
+   */
+  touchSwipeable?: boolean
+
+  /**
+   * Minimum horizontal movement in pixels before a one-finger swipe changes images.
+   * @default 48
+   */
+  touchSwipeThreshold?: number
 }
 
 /**

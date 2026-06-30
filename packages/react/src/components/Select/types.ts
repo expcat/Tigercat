@@ -80,6 +80,7 @@ export interface SelectContext {
   divProps: Record<string, unknown>
   searchPlaceholder: string
   clearAriaLabel: string
+  doneText: string
 
   // derived data
   filteredOptions: SelectOptions
@@ -96,6 +97,7 @@ export interface SelectContext {
   isSelected: (option: SelectOption) => boolean
   selectOption: (option: SelectOption) => void
   clearSelection: (event: React.MouseEvent) => void
+  closeDropdown: () => void
   toggleDropdown: () => void
   handleSearchInput: (event: React.ChangeEvent<HTMLInputElement>) => void
   handleTriggerKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => void

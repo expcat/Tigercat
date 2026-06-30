@@ -210,6 +210,58 @@ describe('ImagePreview', () => {
     expect(img).toHaveAttribute('src', '/img1.jpg')
   })
 
+  it('updates current image from one-finger horizontal touch swipes at base scale', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: {
+        open: true,
+        images,
+        currentIndex: 1
+      }
+    })
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
+    await fireEvent.touchMove(img, { touches: [{ clientX: 80, clientY: 66 }] })
+    await fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
+
+    expect(emitted()['update:currentIndex'][0]).toEqual([2])
+    expect(img).toHaveAttribute('src', '/img3.jpg')
+
+    await fireEvent.touchStart(img, { touches: [{ clientX: 80, clientY: 60 }] })
+    await fireEvent.touchMove(img, { touches: [{ clientX: 180, clientY: 66 }] })
+    await fireEvent.touchEnd(img, { changedTouches: [{ clientX: 180, clientY: 66 }] })
+
+    expect(emitted()['update:currentIndex'][1]).toEqual([1])
+    expect(img).toHaveAttribute('src', '/img2.jpg')
+  })
+
+  it('honors touch swipe switch and threshold configuration', async () => {
+    const { emitted, rerender } = render(ImagePreview, {
+      props: {
+        open: true,
+        images,
+        touchSwipeable: false
+      }
+    })
+
+    let img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
+    await fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
+    expect(emitted()['update:currentIndex']).toBeUndefined()
+
+    await rerender({
+      open: true,
+      images,
+      touchSwipeable: true,
+      touchSwipeThreshold: 120
+    })
+    img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
+    await fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
+
+    expect(emitted()['update:currentIndex']).toBeUndefined()
+  })
+
   it('updates zoom and rotation from toolbar actions and reset', async () => {
     const { emitted } = render(ImagePreview, {
       props: {

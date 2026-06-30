@@ -109,6 +109,18 @@ export const selectEmptyStateClasses =
   'px-3 py-8 text-center text-[var(--tiger-select-empty-text,var(--tiger-text-muted,#6b7280))] text-sm'
 
 /**
+ * Mobile select done action wrapper classes
+ */
+export const selectDoneActionClasses =
+  'sticky bottom-0 z-10 md:hidden border-t border-[var(--tiger-select-dropdown-border,var(--tiger-border,#e5e7eb))] bg-[var(--tiger-select-dropdown-bg,var(--tiger-surface,#ffffff))] p-2'
+
+/**
+ * Mobile select done button classes
+ */
+export const selectDoneButtonClasses =
+  'w-full rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-primary,#2563eb)] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-select-ring,var(--tiger-primary,#2563eb))]/40'
+
+/**
  * Select size classes map (constant for performance)
  */
 const SELECT_SIZE_CLASSES: Record<ComponentSize, string> = {

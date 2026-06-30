@@ -508,6 +508,11 @@ export function useSelectState(props: SelectProps): SelectContext {
     divProps,
     searchPlaceholder: resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder),
     clearAriaLabel: resolveLocaleText('Clear selection', mergedLocale?.common?.clearText),
+    doneText: resolveLocaleText(
+      'Done',
+      mergedLocale?.common?.okText,
+      mergedLocale?.common?.closeText
+    ),
     filteredOptions,
     flatSelectableOptions,
     creatableOption,
@@ -520,6 +525,7 @@ export function useSelectState(props: SelectProps): SelectContext {
     isSelected,
     selectOption,
     clearSelection,
+    closeDropdown,
     toggleDropdown,
     handleSearchInput,
     handleTriggerKeyDown,

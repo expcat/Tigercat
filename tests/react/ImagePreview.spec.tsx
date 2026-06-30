@@ -143,6 +143,64 @@ describe('ImagePreview', () => {
     expect(img).toHaveAttribute('src', '/img1.jpg')
   })
 
+  it('updates current image from one-finger horizontal touch swipes at base scale', () => {
+    const onCurrentIndexChange = vi.fn()
+    render(
+      <ImagePreview
+        open
+        images={images}
+        currentIndex={1}
+        onCurrentIndexChange={onCurrentIndexChange}
+      />
+    )
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
+    fireEvent.touchMove(img, { touches: [{ clientX: 80, clientY: 66 }] })
+    fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
+
+    expect(onCurrentIndexChange).toHaveBeenCalledWith(2)
+    expect(img).toHaveAttribute('src', '/img3.jpg')
+
+    fireEvent.touchStart(img, { touches: [{ clientX: 80, clientY: 60 }] })
+    fireEvent.touchMove(img, { touches: [{ clientX: 180, clientY: 66 }] })
+    fireEvent.touchEnd(img, { changedTouches: [{ clientX: 180, clientY: 66 }] })
+
+    expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
+    expect(img).toHaveAttribute('src', '/img2.jpg')
+  })
+
+  it('honors touch swipe switch and threshold configuration', () => {
+    const onCurrentIndexChange = vi.fn()
+    const { rerender } = render(
+      <ImagePreview
+        open
+        images={images}
+        touchSwipeable={false}
+        onCurrentIndexChange={onCurrentIndexChange}
+      />
+    )
+
+    let img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
+    fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
+    expect(onCurrentIndexChange).not.toHaveBeenCalled()
+
+    rerender(
+      <ImagePreview
+        open
+        images={images}
+        touchSwipeThreshold={120}
+        onCurrentIndexChange={onCurrentIndexChange}
+      />
+    )
+    img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    fireEvent.touchStart(img, { touches: [{ clientX: 180, clientY: 60 }] })
+    fireEvent.touchEnd(img, { changedTouches: [{ clientX: 80, clientY: 66 }] })
+
+    expect(onCurrentIndexChange).not.toHaveBeenCalled()
+  })
+
   it('updates zoom and rotation from toolbar actions and reset', () => {
     const onScaleChange = vi.fn()
     render(<ImagePreview open images={images} onScaleChange={onScaleChange} />)

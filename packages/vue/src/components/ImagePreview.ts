@@ -79,6 +79,8 @@ export const ImagePreview = defineComponent({
     scaleStep: { type: Number, default: 0.5 },
     minScale: { type: Number, default: 0.25 },
     maxScale: { type: Number, default: 5 },
+    touchSwipeable: { type: Boolean, default: true },
+    touchSwipeThreshold: { type: Number, default: 48 },
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
@@ -98,6 +100,13 @@ export const ImagePreview = defineComponent({
     const dragStart = ref({ x: 0, y: 0, ox: 0, oy: 0 })
     let panState = createPanState()
     let pinchState = createPinchState()
+    let touchSwipeState = {
+      isTracking: false,
+      startX: 0,
+      startY: 0,
+      currentX: 0,
+      currentY: 0
+    }
 
     const resetTransform = () => {
       scale.value = 1
@@ -106,6 +115,7 @@ export const ImagePreview = defineComponent({
       offsetY.value = 0
       panState = createPanState()
       pinchState = createPinchState()
+      touchSwipeState.isTracking = false
     }
 
     watch(
@@ -208,17 +218,27 @@ export const ImagePreview = defineComponent({
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 2) {
         e.preventDefault()
+        touchSwipeState.isTracking = false
         pinchState = startPinch(e.touches[0], e.touches[1], scale.value)
         return
       }
 
       if (e.touches.length === 1) {
-        panState = startPan(
-          e.touches[0].clientX,
-          e.touches[0].clientY,
-          offsetX.value,
-          offsetY.value
-        )
+        const touch = e.touches[0]
+        if (props.touchSwipeable && props.images.length > 1 && scale.value === 1) {
+          touchSwipeState = {
+            isTracking: true,
+            startX: touch.clientX,
+            startY: touch.clientY,
+            currentX: touch.clientX,
+            currentY: touch.clientY
+          }
+          panState = createPanState()
+          return
+        }
+
+        touchSwipeState.isTracking = false
+        panState = startPan(touch.clientX, touch.clientY, offsetX.value, offsetY.value)
       }
     }
 
@@ -240,10 +260,41 @@ export const ImagePreview = defineComponent({
         const next = movePan(panState, e.touches[0].clientX, e.touches[0].clientY)
         offsetX.value = next.translateX
         offsetY.value = next.translateY
+        return
+      }
+
+      if (e.touches.length === 1 && touchSwipeState.isTracking) {
+        const touch = e.touches[0]
+        touchSwipeState.currentX = touch.clientX
+        touchSwipeState.currentY = touch.clientY
+
+        const deltaX = touch.clientX - touchSwipeState.startX
+        const deltaY = touch.clientY - touchSwipeState.startY
+        if (Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
+          e.preventDefault()
+        }
       }
     }
 
-    const handleTouchEnd = () => {
+    const handleTouchEnd = (e?: TouchEvent) => {
+      if (touchSwipeState.isTracking) {
+        const endedTouch = e?.changedTouches?.[0]
+        const currentX = endedTouch?.clientX ?? touchSwipeState.currentX
+        const currentY = endedTouch?.clientY ?? touchSwipeState.currentY
+        const deltaX = currentX - touchSwipeState.startX
+        const deltaY = currentY - touchSwipeState.startY
+        const threshold = Math.max(0, props.touchSwipeThreshold)
+
+        if (Math.abs(deltaX) >= threshold && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+          if (deltaX < 0) {
+            handleNext()
+          } else {
+            handlePrev()
+          }
+        }
+      }
+
+      touchSwipeState.isTracking = false
       panState = createPanState()
       pinchState = createPinchState()
     }

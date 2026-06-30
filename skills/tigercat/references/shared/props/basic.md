@@ -190,7 +190,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## ImagePreview
 
-`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/4 props
+`packages/core/src/types/image.ts` · `ImagePreviewProps` · 3/6 props
 
 | Prop         | Type     | Default | Notes                                  |
 | ------------ | -------- | ------- | -------------------------------------- |
