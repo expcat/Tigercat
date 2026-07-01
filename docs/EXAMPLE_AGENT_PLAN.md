@@ -69,8 +69,8 @@ source: docs/ROADMAP.md R28
 | E08 | Alert / Loading / Progress / Tooltip / Popover / Popconfirm                                                                    | React/Vue: `#/alert`, `#/loading`, `#/progress`, `#/tooltip`, `#/popover`, `#/popconfirm`                                                                                         | 已完成（2026-07-01） |
 | E09 | Modal / Drawer / Message / Notification / Tour                                                                                 | React/Vue: `#/modal`, `#/drawer`, `#/message`, `#/notification`, `#/tour`                                                                                                         | 未开始               |
 | E10 | Form / FormItem / Input / Textarea / InputGroup / InputNumber / Stepper                                                        | React/Vue: `#/form`, `#/input`, `#/textarea`, `#/input-group`, `#/input-number`, `#/stepper`                                                                                      | 未开始               |
-| E11 | Checkbox / Radio / Switch / Slider / Segmented / Rate / ColorSwatch / ColorPicker                                              | React/Vue: `#/checkbox`, `#/radio`, `#/switch`, `#/slider`, `#/segmented`, `#/rate`, `#/color-swatch`, `#/color-picker`                                                           | 未开始               |
-| E12 | Select / AutoComplete / Cascader / TreeSelect / Mentions / Transfer                                                            | React/Vue: `#/select`, `#/auto-complete`, `#/cascader`, `#/tree-select`, `#/mentions`, `#/transfer`                                                                               | 未开始               |
+| E11 | Checkbox / Radio / Switch / Slider / Segmented / Rate / ColorSwatch / ColorPicker                                              | React/Vue: `#/checkbox`, `#/radio`, `#/switch`, `#/slider`, `#/segmented`, `#/rate`, `#/color-swatch`, `#/color-picker`                                                           | 已完成（2026-07-01） |
+| E12 | Select / AutoComplete / Cascader / TreeSelect / Mentions / Transfer                                                            | React/Vue: `#/select`, `#/auto-complete`, `#/cascader`, `#/tree-select`, `#/mentions`, `#/transfer`                                                                               | 已完成（2026-07-01） |
 | E13 | DatePicker / TimePicker / Calendar / Countdown / CronEditor / NumberKeyboard                                                   | React/Vue: `#/datepicker`, `#/timepicker`, `#/calendar`, `#/countdown`, `#/cron-editor`, `#/number-keyboard`                                                                      | 未开始               |
 | E14 | Upload / Signature                                                                                                             | React/Vue: `#/upload`, `#/signature`                                                                                                                                              | 未开始               |
 | E15 | Table / Collapse / Timeline                                                                                                    | React/Vue: `#/table`, `#/collapse`, `#/timeline`                                                                                                                                  | 未开始               |
@@ -697,6 +697,169 @@ source: docs/ROADMAP.md R28
 - P3：弹层受控示例补可见当前 `open` 状态面板。
 
 **后续执行建议**：优先只改 Example/文档；Alert `closeAriaLabel`、Progress `aria-label` 都可在示例层用现有 props 直接覆写（无需 public API 变更），Popconfirm 可见反馈与 Loading 文案同为纯 Example 改动。若选择组件级 locale（Alert 当前无 `locale` prop，Progress 的英文 aria 文案在组件内生成），再另开组件源码/i18n 任务并补 React/Vue focused a11y tests。修复阶段应复查 React/Vue `#/alert`、`#/progress`、`#/popconfirm`、`#/loading`、`#/tooltip`、`#/popover`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E11 Checkbox / Radio / Switch / Slider / Segmented / Rate / ColorSwatch / ColorPicker
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/checkbox`、`#/radio`、`#/switch`、`#/slider`、`#/segmented`、`#/rate`、`#/color-swatch`、`#/color-picker`。
+- React：`http://localhost:5174/#/checkbox`、`#/radio`、`#/switch`、`#/slider`、`#/segmented`、`#/rate`、`#/color-swatch`、`#/color-picker`。
+- 视口：桌面 `1280x720` / 交互复查 `1280x900`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器工具：Vue dev server 实际端口 `5173`，React dev server 实际端口 `5174`。本轮先连接 in-app Browser；批量 route、移动视口与交互复查使用仓库现有 Playwright/Chromium 对同一 dev server 执行。
+- 浏览器操作路径：逐页直达 hash route；检查 `h1`、页面级横向溢出、控制台错误；点击 Checkbox 基础项与全选、Radio 基础项与 number value、Switch 基础开关、Segmented “周”、ColorSwatch 色块；键盘操作 Slider 与 Rate；打开 ColorPicker 面板并分别验证 Enter/Space/click 触发、面板字段和预设色块属性。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/form.md`、`skills/tigercat/references/shared/props/form.md`、`skills/tigercat/references/examples/basic.md`、`skills/tigercat/references/shared/props/basic.md`。
+- React Example：`examples/example/react/src/pages/CheckboxDemo.tsx`、`RadioDemo.tsx`、`SwitchDemo.tsx`、`SliderDemo.tsx`、`SegmentedDemo.tsx`、`RateDemo.tsx`、`ColorSwatchDemo.tsx`、`ColorPickerDemo.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/CheckboxDemo.vue`、`RadioDemo.vue`、`SwitchDemo.vue`、`SliderDemo.vue`、`SegmentedDemo.vue`、`RateDemo.vue`、`ColorSwatchDemo.vue`、`ColorPickerDemo.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/react/src/components/Switch.tsx`、`Slider.tsx`、`Rate.tsx`、`ColorSwatch.tsx`、`ColorPicker.tsx`；`packages/vue/src/components/Switch.ts`、`Slider.ts`、`Rate.ts`、`ColorSwatch.ts`、`ColorPicker.ts`；`packages/core/src/types/slider.ts`、`rate.ts`、`color-swatch.ts`、`color-picker.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 Checkbox 页面能验证单选、非受控、禁用、半选全选、分组 value 和 group size 继承，便于落地批量选择或权限勾选场景。
+- 作为使用者，我希望 Radio 页面能验证受控/非受控、单独使用、禁用、尺寸、number value 和自定义样式，避免表单枚举值类型出错。
+- 作为使用者，我希望 Switch 页面能展示开关状态、禁用和尺寸，并给屏幕阅读器可理解的开关名称。
+- 作为使用者，我希望 Slider 页面能通过鼠标/键盘调整单值、范围、步进、marks、tooltip、禁用和尺寸，并能从 a11y 名称分辨每个滑块控制的业务字段。
+- 作为使用者，我希望 Segmented 页面能快速切换周期/视图，并确认禁用选项和 block 宽度效果。
+- 作为使用者，我希望 Rate 页面能验证整星、半星、键盘调整、自定义字符、星数和禁用态，并在中文站得到中文评分语义。
+- 作为使用者，我希望 ColorSwatch 页面能选择默认色、品牌色组、状态色和禁用色，并获得业务化色板/色值名称。
+- 作为使用者，我希望 ColorPicker 页面能通过鼠标和键盘打开面板，选择透明度、预设颜色与格式，并复制真实可运行的颜色输入示例。
+
+**Example 体验问题**：
+
+- 问题：E11 未发现 P0 route-level 阻断问题；React/Vue 16 个 route 均可打开，桌面与移动视口无页面级横向溢出，无控制台错误，Checkbox/Radio/Slider/Segmented/Rate/ColorSwatch 的核心交互可完成。
+  浏览器证据：桌面 `1280x720` 与移动 `390x844` 下 `#/checkbox`、`#/radio`、`#/switch`、`#/slider`、`#/segmented`、`#/rate`、`#/color-swatch`、`#/color-picker` 均返回目标 `h1`，`pageOverflow=false`，`logs=[]`。Checkbox 点击后出现 `选中状态：true`，全选后出现 `已选择：apple, banana, orange`；Radio 点击“女”后出现 `当前选中：female`，点击 number 选项后出现 `当前值：2（类型：number）`；Slider 键盘 `ArrowRight` 后基础值变为 `51`；Segmented 点击“周”后显示 `当前选中: weekly`；Rate 半星项键盘 `ArrowRight` 后显示 `当前值: 3`；ColorSwatch 点击第二个色块后显示 `选中颜色: #f97316`。
+  影响：E11 页面可作为表单开关、数值、评分与颜色选择类组件的体验审查入口继续使用。
+- 问题：Switch 示例的 `role="switch"` 控件没有可访问名称；旁边虽然显示“开启/关闭”，但没有通过 `aria-label`、`aria-labelledby` 或可见文本绑定到按钮。
+  浏览器证据：React/Vue `#/switch` 页面主体内 6 个 switch 的 `text=""`、`ariaLabel=null`；点击基础开关后页面文本从“开启”变为“关闭”，说明交互可用但名称仍缺失。源码层 React/Vue Switch 都透传 attrs，因此示例层可以传 `aria-label` 或 `aria-labelledby`。
+  影响：视觉用户能操作，屏幕阅读器用户只能听到未命名开关；直接复制示例会带出 a11y 缺口。
+- 问题：Slider 示例中多数 `role="slider"` 没有 `aria-label`，范围滑块默认英文 `Minimum value` / `Maximum value`，中文站无法分辨每个滑块控制的业务含义。
+  浏览器证据：React/Vue `#/slider` 页面主体内 14 个 slider 中，单值滑块 `ariaLabel=null`，范围滑块两个 thumb 分别为 `Minimum value` / `Maximum value`；键盘 `ArrowRight` 可把基础值从 `50` 调到 `51`。
+  影响：键盘交互可用，但同页多滑块场景下无障碍名称不足，复制示例后难以对应“基础值/步进/温度/尺寸”等业务字段。
+- 问题：Rate 示例在中文站输出英文无障碍文案，且页面没有展示 hover / allowClear / 自定义 valueText 的业务反馈。
+  浏览器证据：React/Vue `#/rate` 的 8 个 `role="slider"` 均为 `aria-label="Rating"`，`aria-valuetext` 为 `3 stars`、`2.5 stars`、`4 stars` 等；半星项可通过键盘改到 `当前值: 3`。
+  影响：核心评分交互可用，但中文产品复制后会得到英文 SR 文案，用户也看不到清空同值或 hover 预览如何接业务文案。
+- 问题：ColorSwatch 示例默认色板与分组色板的 radiogroup 名称均为英文 `Color swatches`，多处色值 label 也直接是英文或 hex；中文示例没有展示 `ariaLabel` 的业务化写法。
+  浏览器证据：React/Vue `#/color-swatch` 页面主体内 4 个 radiogroup 的 `ariaLabel` 均为 `Color swatches`；自定义组包含 `Ink`、`Blue`、`Cyan`、`Green`、`Success`、`Warning`、`Danger`，默认色板则大量暴露 `#ef4444`、`#f97316` 等 hex label。
+  影响：选择功能可用，但中文站复制示例后色板组语义和颜色名称不够业务化。
+- 问题：ColorPicker 示例声明“支持透明度、预设颜色和多种格式”，并在示例中传 `showAlpha` 与 `format="rgb"`，但实际面板只渲染 `Hue` / `Hex` 和 hex 输入；没有透明度输入，也没有 RGB/HSL 格式展示。
+  浏览器证据：React/Vue `#/color-picker` 第二个示例点击打开后，面板 labels 只有 `Hue`、`Hex`，inputs 只有 `type="range" aria-label="Hue"` 和 `type="text" aria-label="Color value" value="#2563eb"`；源码中 React 将 `showAlpha` / `format` 解构为 `_showAlpha` / `_format` 未使用，Vue 也只渲染 Hue 与 Hex。
+  影响：这是 Example 文案/props 与组件真实能力不一致，用户会误以为透明度和 RGB 格式已经可用。
+- 问题：ColorPicker 触发器是 `role="button"` 的 `div`，有 `tabIndex=0` 但没有键盘打开逻辑；预设色块也不是 button 且没有 tabIndex。
+  浏览器证据：React/Vue `#/color-picker` 页面主体内 6 个触发器均为 `tag=DIV`、`tabIndex=0`、`text=""`；聚焦第二个触发器后按 Enter / Space，`Color value` input 数量仍为 0，鼠标 click 后变为 1。打开第二个示例时没有预设色块属性可读，说明当前点击的是 `showAlpha` 示例；源码显示 presets 色块同样是带 `aria-label="Select ..."` 的 `div`，未设置 role/tabIndex/keydown。
+  影响：鼠标可用，键盘用户无法打开 ColorPicker 或访问预设色块；这更接近组件源码/a11y 缺口，而不是单纯文案问题。
+
+**组件能力建议**：
+
+- 类型：a11y / 文档示例。
+  建议：Switch 示例给每个开关传业务化中文 `aria-label` 或 `aria-labelledby`，例如“启用消息通知”“小号开关示例”；组件已有 attrs 透传，优先只改 Example。
+  证据：页面 switch 均无文本和 `aria-label`，但 React/Vue 组件可透传 attrs。
+- 类型：a11y / 文档示例。
+  建议：Slider 示例为单值滑块传中文 `aria-label`，范围滑块传业务化 label；若希望默认中文 `Minimum value` / `Maximum value`，另开组件 i18n 任务。
+  证据：多数滑块无名称，范围 thumb 默认英文。
+- 类型：a11y / i18n / 组件能力。
+  建议：Rate 增加可覆写 `aria-label` / `aria-valuetext` 或 locale 能力；短期可在 Example 中补“当前评分/清空评分/hover 预览”可见反馈，源码任务再处理 SR 文案。
+  证据：所有评分 slider 均输出 `Rating` 与 `N stars`。
+- 类型：a11y / i18n / 文档示例。
+  建议：ColorSwatch 示例传中文 `ariaLabel`，并把默认/品牌/状态色 label 改成业务化中文名称；必要时保留 hex 作为辅助文本。
+  证据：所有 radiogroup 均为 `Color swatches`，色值 label 多为英文或 hex。
+- 类型：API 缺口 / 文档示例。
+  建议：ColorPicker 要么先把 Example 文案改为当前真实能力（Hue + Hex + presets + size + disabled），要么另开组件任务真正实现 `showAlpha` 和 `format`；不要继续展示未生效 props。
+  证据：`showAlpha` / `format="rgb"` 示例面板仍只有 Hue 与 Hex。
+- 类型：a11y / 组件能力。
+  建议：ColorPicker 触发器改成原生 `button` 或补 Enter/Space 键盘处理；presets 色块改成 button 或至少补 role/tabIndex/keydown，并提供可覆写中文 trigger/preset aria 文案。
+  证据：触发器聚焦后 Enter/Space 均不打开，click 才打开；源码 presets 色块为不可聚焦 div。
+
+**建议优先级**：
+
+- P1：ColorPicker `showAlpha` / `format` 示例与真实能力不一致，需修正 Example 文案或实现组件能力。
+- P1：ColorPicker 触发器和预设色块键盘不可用，需组件源码/a11y 修复。
+- P1：Switch 示例补业务化中文 `aria-label` / `aria-labelledby`。
+- P1：Slider 示例补业务化中文 `aria-label`，并处理范围 thumb 默认英文。
+- P1：Rate `Rating` / `N stars` 中文站 a11y 文案修正或 locale 能力补齐。
+- P2：ColorSwatch 示例补中文 `ariaLabel` 与业务化颜色 label。
+- P3：Rate 示例补 hover / allowClear / 当前评分业务反馈；Slider 示例可补一个更真实的“预算/温度/区间筛选”组合场景。
+
+**后续执行建议**：Switch、Slider、ColorSwatch 的大部分问题优先只改 Example/文档；Rate 需要组件支持可覆写 a11y 文案或 locale 才能彻底修正；ColorPicker 至少需要组件源码任务处理键盘可用性，并决定 `showAlpha` / `format` 是实现还是从示例中移除。修复阶段应复查 React/Vue `#/switch`、`#/slider`、`#/rate`、`#/color-swatch`、`#/color-picker`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若改组件源码，再补对应 React/Vue focused a11y tests 与 `npx -y pnpm@11.9.0 api:validate`。
+
+### E12 Select / AutoComplete / Cascader / TreeSelect / Mentions / Transfer
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/select`、`#/auto-complete`、`#/cascader`、`#/tree-select`、`#/mentions`、`#/transfer`。
+- React：`http://localhost:5174/#/select`、`#/auto-complete`、`#/cascader`、`#/tree-select`、`#/mentions`、`#/transfer`。
+- 视口：桌面 `1280x720`（交互复查用 `1280x900` 以容纳下拉/穿梭框）；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器工具：本轮 dev server 实际端口被占用后 Vue 落在 `5176`、React 落在 `5175`（默认约定仍为 Vue `5173`/React `5174`）；交互式 preview 在当前环境无法绑定端口、Chrome 扩展未连接，改用仓库现有 Playwright/Chromium 对同一 dev server 做 DOM 查询与用户操作复查，证据等价于模拟浏览器体验。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、`section > h2` 分节数、`示例`/`代码`页签、桌面与移动页面级横向溢出、控制台报错；Select 打开基础下拉读 `role="option"` 并选择、读“选中的值”，验证 clearable 清除、searchable 过滤 + `onSearchChange`“最近一次搜索”、multiple 结果、禁用选项 `aria-disabled`、空态“暂无数据”，并读取 trigger `aria-haspopup`/`aria-expanded`、清除按钮 `aria-label`、内置搜索框 placeholder；AutoComplete 输入 `V` 读候选并选中回填；Cascader 逐级点击 浙江 / 杭州 / 西湖区 读 trigger 路径与 searchable placeholder；TreeSelect 点击 chevron 展开 研发部 → 前端组/后端组、读 trigger role 与下拉角色；Mentions 输入 `@` 读用户候选并选择回填、验证自定义 `#` 前缀；Transfer 读 Source/Target 计数与面板标题、勾选移动、读移动按钮 `aria-label` 与面板搜索 placeholder。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/form.md`、`skills/tigercat/references/shared/props/form.md`。
+- React Example：`examples/example/react/src/pages/SelectDemo.tsx`、`AutoCompleteDemo.tsx`、`CascaderDemo.tsx`、`TreeSelectDemo.tsx`、`MentionsDemo.tsx`、`TransferDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/SelectDemo.vue`、`AutoCompleteDemo.vue`、`CascaderDemo.vue`、`TreeSelectDemo.vue`、`MentionsDemo.vue`、`TransferDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/select.ts`、`transfer.ts`；`packages/core/src/utils/locale-utils.ts`（`DEFAULT_*` vs `ZH_CN_*`、`getSelectLabels`）；`packages/react/src/components/Select.tsx`、`Select/state.ts`、`Cascader.tsx`、`TreeSelect.tsx`、`Transfer.tsx`；对应 `packages/vue/src/components/Transfer.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 Select 页面能覆盖基础/默认值/禁用/尺寸/禁用选项/可清空/可搜索/多选/多选+搜索/分组/空态，并在选择、清除、搜索后看到可见结果，方便直接落地到表单选择器。
+- 作为使用者，我希望 AutoComplete 页面能验证输入过滤、候选选择回填，并看出禁用、尺寸、异步或自由文本等常见变体如何写。
+- 作为使用者，我希望 Cascader 页面能逐级选择省市区并看到最终路径，同时验证搜索、尺寸与禁用。
+- 作为使用者，我希望 TreeSelect 页面能展开组织架构树、选择成员并看到结果，验证搜索、尺寸与禁用。
+- 作为使用者，我希望 Mentions 页面能用 `@` 唤起用户列表、插入提及文本，并验证自定义触发符与尺寸/禁用。
+- 作为使用者，我希望 Transfer 页面能双向穿梭、看到两栏计数与自定义标题，并验证搜索，且 React/Vue 表现一致。
+
+**Example 体验问题**：
+
+- 问题：E12 未发现 route-level P0 阻断问题；React/Vue 12 个 route 均可打开，桌面与移动视口无页面级横向溢出、无控制台报错，Select/AutoComplete/Cascader/TreeSelect/Mentions/Transfer 主要交互均可完成，且 React/Vue 结构与行为高度一致（唯一显著差异见下条 Transfer 自定义标题）。
+  浏览器证据：桌面 `1280x720` 下 React/Vue 分别返回目标 `h1`；分节数一致（Select 11、AutoComplete 2、Cascader 3、TreeSelect 3、Mentions 3、Transfer 2）；移动 `390x844` 复查 12 个 route 的 `pageOverflow=false`、`errors=[]`。Select 基础下拉出现 4 个 `role="option"`，选择“选项 3”后显示“选中的值：option3”，searchable 输入“美”过滤为“美国”、“日”触发“最近一次搜索：日”，禁用选项 `aria-disabled=true`，多选显示“选中：option1, option3”，清除后 trigger 回到 placeholder，空态显示“暂无数据”；AutoComplete 输入“V”得到 [Vue, Svelte] 并回填“Vue”；Cascader 逐级点击后 trigger 显示“浙江 / 杭州 / 西湖区”；TreeSelect 点击 chevron 后 研发部 展开为 前端组/后端组；Mentions 输入“你好 @”出现 4 个用户候选，选择后值为“你好 @zhangsan ”；Transfer 显示 Source (8)/Target (2) 两栏与 2 个移动按钮。
+  影响：E12 可作为 Form 选择/输入类组件的审查入口继续使用。
+- 问题：Vue Transfer “搜索与标题”示例传入的是不存在的 `:titles="['可选', '已选']"` 数组属性（组件公开属性是 `sourceTitle` / `targetTitle`，`TransferProps` 没有 `titles`），因此 Vue 面板标题仍是英文默认 `Source (8)` / `Target (2)`，与 React 同一示例显示中文“可选 (8)/已选 (2)”不一致，该 section 声称的“自定义标题”实际未生效。
+  浏览器证据：React `#/transfer` 第 2 个 section 面板文本为“可选 (8) … 已选 (2)”、搜索框 `aria-label="Search 可选"`；Vue 同一 section 面板文本为“Source (8) … Target (2)”、搜索框 `aria-label="Search Source"`；`examples/example/vue3/src/pages/TransferDemo.vue` 第 45-49 行传 `:titles="['可选', '已选']"`，而 `packages/core/src/types/transfer.ts` 只有 `sourceTitle` / `targetTitle`、`packages/vue/src/components/Transfer.ts` props 也只声明 `sourceTitle` / `targetTitle`。
+  影响：Vue 用户复制该示例得不到自定义标题，且 React/Vue 明显不一致，属于 Example 端 P1 修复。
+- 问题：中文示例站在多个 Form 组件上显示英文内置默认文案（可见文本与 a11y 文案都有），根因是示例 app 根节点没有包裹中文 `ConfigProvider`/locale，导致内置字符串回退到默认英文 locale。
+  浏览器证据：Select 未显式传 placeholder 的示例 trigger 显示英文默认“Select an option”（`Select/state.ts` 默认参数硬编码），下拉内搜索框 placeholder 为“Search...”、清除按钮 `aria-label="Clear selection"`；Cascader/TreeSelect 搜索框 placeholder 均为“Search...”，其清除 `aria-label="Clear selection"` 在 `packages/react/src/components/Cascader.tsx:268`、`TreeSelect.tsx:241` 为硬编码英文；Transfer 基础示例面板标题为英文“Source/Target”、移动按钮 `aria-label` 为“Move selected to target”/“Move selected to source”（`packages/react/src/components/Transfer.tsx:272/286` 硬编码）、面板搜索 `aria-label="Search {title}"`。`packages/core/src/utils/locale-utils.ts` 同时存在英文默认与 `ZH_CN_*` 中文 locale，示例站两侧 app 根节点均未设置 `ConfigProvider`。
+  影响：与 E07（Tabs/Tree 英文 aria）、E08（Alert/Progress 英文 aria）同类，且此处“Select an option”“Search...”“Source/Target”均为可见文本，中文站观感与可复制性受影响。
+- 问题：AutoComplete、Cascader、TreeSelect、Mentions 的示例覆盖偏薄（分别 2、3、3、3 个 section），且这几页除 trigger 外普遍没有把“已选值/当前状态”回显到页面上，用户不易看出受控值结构；相比之下 Select 页面每个示例都有“选中的值/选中：…”回显。
+  浏览器证据：AutoComplete 仅“基本用法/自定义选项”两节，无禁用/尺寸/异步/自由文本；Cascader、TreeSelect 仅“基本用法/可搜索/尺寸与禁用”，无多选/勾选/change 回显；Mentions 仅“基本用法/自定义触发符/尺寸与禁用”；Cascader/TreeSelect/Mentions 基础节均无结果段落，选择后只能从 trigger/输入框读取。
+  影响：不阻断使用；属于文档/Example 覆盖与可复制性缺口，而非 API 缺口。
+- 问题：TreeSelect 下拉以 `role="listbox"` + `role="option"`（扁平化节点）呈现树，而非 `role="tree"` / `treeitem`；AutoComplete 触发器 `role="combobox"` 但缺少 `aria-autocomplete`。
+  浏览器证据：TreeSelect 打开后 body 角色统计为 `listbox:1`、`option:2`（折叠态仅顶层 研发部/产品部），展开 chevron 后才追加子节点 option；AutoComplete `[role="combobox"]` 的 `aria-autocomplete` 为 `null`、`aria-expanded` 随输入变化。
+  影响：功能可用（组合框-列表框是可接受的折衷），属于 a11y 语义精度的低优先 polish。
+
+**组件能力建议**：
+
+- 类型：组合使用 / 文档示例。
+  建议：把 Vue Transfer “搜索与标题”示例的 `:titles="['可选', '已选']"` 改为 `source-title="可选" target-title="已选"`（与 React 对齐），并复查 raw-source 代码页签，避免继续展示无效属性。
+  证据：`titles` 不在 `TransferProps` 中；Vue 面板仍显示英文 `Source/Target`，React 正确显示中文。
+- 类型：i18n / a11y / 组件能力。
+  建议：优先在示例站两端 app 根节点包裹中文 `ConfigProvider`/locale，使 Select 的搜索 placeholder（`common.searchPlaceholder`）、清除 `aria-label`（`common.clearText`）等 locale 驱动文案本地化；Select 默认 placeholder “Select an option” 目前非 locale 驱动，可在示例各 section 显式传中文 placeholder，或另开组件任务改为 locale 兜底。
+  证据：`Select/state.ts` 中 `searchPlaceholder`/`clearAriaLabel` 走 `resolveLocaleText(..., mergedLocale?.common?.*)`，示例未设置中文 locale；默认 placeholder 为硬编码英文参数。
+- 类型：a11y / i18n / 组件能力。
+  建议：Cascader/TreeSelect 的清除 `aria-label`、Transfer 的移动按钮与面板搜索 `aria-label`、面板默认标题均为组件层硬编码英文，需另开组件源码/i18n 任务改为可 locale 覆写（并补 React/Vue focused a11y tests）；短期示例可对 Transfer 显式传中文标题、对 Cascader/TreeSelect 说明该限制。
+  证据：`Cascader.tsx:268`、`TreeSelect.tsx:241`、`Transfer.tsx:272/286` 及面板 `aria-label="Search {title}"` 均为字面英文。
+- 类型：文档示例 / 组合使用。
+  建议：为 AutoComplete/Cascader/TreeSelect/Mentions 各补 1-2 个更贴业务的 section（如 AutoComplete 异步/自由文本、Cascader change-on-select、TreeSelect 勾选多选、Mentions 过滤/加载），并像 Select 一样在页面回显已选值，提升可复制性。
+  证据：这四页覆盖偏薄且多数基础节无结果回显。
+- 类型：a11y。
+  建议：AutoComplete 触发器补 `aria-autocomplete="list"`；TreeSelect 可评估是否升级为 `role="tree"`/`treeitem` 语义（低优先）。
+  证据：AutoComplete `aria-autocomplete=null`；TreeSelect 使用 listbox/option 呈现树。
+
+**建议优先级**：
+
+- P1：Vue Transfer “搜索与标题”改用 `source-title`/`target-title`，修复自定义标题失效与 React/Vue 不一致。
+- P1：示例站两端补中文 `ConfigProvider`/locale（或分散传中文 placeholder），修正 Select 的可见“Select an option”“Search...”与清除 aria。
+- P2：Cascader/TreeSelect 清除 aria、Transfer 移动/搜索 aria 与默认标题的英文文案（组件层 locale 能力）。
+- P2：AutoComplete/Cascader/TreeSelect/Mentions 补业务化 section 并在页面回显已选值。
+- P3：AutoComplete 补 `aria-autocomplete`；TreeSelect 树语义 polish。
+
+**后续执行建议**：优先只改 Example/文档；Vue Transfer 标题属性、Transfer 显式中文标题、四页覆盖与结果回显都不需要 public API 变更。示例站补中文 `ConfigProvider` 可一次性修正 Select 等 locale 驱动文案；Cascader/TreeSelect/Transfer 的硬编码英文 a11y 文案需另开组件源码/i18n 任务并补 React/Vue focused a11y tests 与 `npx -y pnpm@11.9.0 api:validate`。修复阶段应复查 React/Vue `#/transfer`、`#/select`、`#/cascader`、`#/tree-select`、`#/auto-complete`、`#/mentions`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时再运行 `npx -y pnpm@11.9.0 example:build`。
 
 ## 审查重点
 
