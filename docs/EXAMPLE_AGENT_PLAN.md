@@ -76,7 +76,7 @@ source: docs/ROADMAP.md R28
 | E15 | Table / Collapse / Timeline                                                                                                    | React/Vue: `#/table`, `#/collapse`, `#/timeline`                                                                                                                                  | 已完成（2026-07-01） |
 | E16 | VirtualTable / VirtualList / InfiniteScroll                                                                                    | React/Vue: `#/virtual-table`, `#/virtual-list`, `#/infinite-scroll`                                                                                                               | 已完成（2026-07-01） |
 | E17 | AreaChart / BarChart / LineChart / ScatterChart / chart subcomponents                                                          | React/Vue: `#/area-chart`, `#/bar-chart`, `#/line-chart`, `#/scatter-chart`; also inspect chart pages for ChartAxis/Canvas/Grid/Legend/Series/Tooltip behavior                    | 已完成（2026-07-01） |
-| E18 | PieChart / DonutChart / RadarChart / GaugeChart / FunnelChart / HeatmapChart / SunburstChart / TreeMapChart / Gantt / OrgChart | React/Vue: `#/pie-chart`, `#/donut-chart`, `#/radar-chart`, `#/gauge-chart`, `#/funnel-chart`, `#/heatmap-chart`, `#/sunburst-chart`, `#/treemap-chart`, `#/gantt`, `#/org-chart` | 未开始               |
+| E18 | PieChart / DonutChart / RadarChart / GaugeChart / FunnelChart / HeatmapChart / SunburstChart / TreeMapChart / Gantt / OrgChart | React/Vue: `#/pie-chart`, `#/donut-chart`, `#/radar-chart`, `#/gauge-chart`, `#/funnel-chart`, `#/heatmap-chart`, `#/sunburst-chart`, `#/treemap-chart`, `#/gantt`, `#/org-chart` | 已完成（2026-07-01） |
 | E19 | CodeEditor / MarkdownEditor / RichTextEditor / FileManager / ImageAnnotation / PrintLayout                                     | React/Vue: `#/code-editor`, `#/markdown-editor`, `#/rich-text-editor`, `#/file-manager`, `#/image-annotation`, `#/print-layout`                                                   | 未开始               |
 | E20 | ActivityFeed / ChatWindow / CommentThread / DataTableWithToolbar / FormWizard / NotificationCenter / TaskBoard / Kanban        | React/Vue: `#/activity-feed`, `#/chat-window`, `#/comment-thread`, `#/data-table-with-toolbar`, `#/form-wizard`, `#/notification-center`, `#/task-board`, `#/kanban`              | 未开始               |
 | E21 | Hooks demos: useDrag / useControlledState / useChartInteraction / useFormController                                            | React/Vue: `#/use-drag`, `#/use-controlled-state`, `#/use-chart-interaction`; `useFormController` 当前没有独立浏览器 demo route，如仍缺失则记录为“缺少可体验 Example”             | 未开始               |
@@ -1391,6 +1391,81 @@ source: docs/ROADMAP.md R28
 - P3：统一 Area/Line 数据点悬停联动语义或补面积区域悬停说明。
 
 **后续执行建议**：轴标签裁剪与 `responsive` 暴露偏组件默认行为/API，不宜只改文案；i18n 默认文案、`title`/`desc` 示例、数据点 `label`、Area/Line 一致性可在 Example 或组件层择一修复。修复阶段应用浏览器复查 React/Vue `#/bar-chart`、`#/line-chart`、`#/area-chart`、`#/scatter-chart` 的桌面与移动视口（重点复查 y 轴标签完整性、移动端是否仍需横向滚动、Scatter tooltip/图例中文文案、图表可访问名、Area 点悬停回显），并运行 `npx -y pnpm@11.9.0 example:sources:check`；如调整页面结构再运行 `npx -y pnpm@11.9.0 example:build`；若改动图表源码或 public API，补充对应 React/Vue 图表 focused tests 作为修复验证。
+
+### E18 PieChart / DonutChart / RadarChart / GaugeChart / FunnelChart / HeatmapChart / SunburstChart / TreeMapChart / Gantt / OrgChart
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/pie-chart`、`#/donut-chart`、`#/radar-chart`、`#/gauge-chart`、`#/funnel-chart`、`#/heatmap-chart`、`#/sunburst-chart`、`#/treemap-chart`、`#/gantt`、`#/org-chart`。
+- React：`http://localhost:5174/#/pie-chart`、`#/donut-chart`、`#/radar-chart`、`#/gauge-chart`、`#/funnel-chart`、`#/heatmap-chart`、`#/sunburst-chart`、`#/treemap-chart`、`#/gantt`、`#/org-chart`。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器工具：in-app browser 连接本地 Vue/React dev server 后完成 hash route 访问、桌面/移动视口切换、SVG DOM 度量、代码页签与交互复查。
+- 浏览器操作路径：逐页直达 hash route；核对 `h1`、DemoBlock 分节数、页面级横向溢出、SVG 渲染与 aria 文案；点击 PieChart 可选扇区、Gantt 任务条、OrgChart 节点读取状态回显；DonutChart 使用键盘 `Enter`/`Space` 验证可选扇区切换；切换 React/Vue PieChart 的 `代码`页签确认 raw source 与复制按钮。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/charts.md`、`skills/tigercat/references/shared/props/charts.md`。
+- React Example：`examples/example/react/src/pages/PieChartDemo.tsx`、`DonutChartDemo.tsx`、`RadarChartDemo.tsx`、`GaugeChartDemo.tsx`、`FunnelChartDemo.tsx`、`HeatmapChartDemo.tsx`、`SunburstChartDemo.tsx`、`TreeMapChartDemo.tsx`、`GanttDemo.tsx`、`OrgChartDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/PieChartDemo.vue`、`DonutChartDemo.vue`、`RadarChartDemo.vue`、`GaugeChartDemo.vue`、`FunnelChartDemo.vue`、`HeatmapChartDemo.vue`、`SunburstChartDemo.vue`、`TreeMapChartDemo.vue`、`GanttDemo.vue`、`OrgChartDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/chart-radial.ts`、`chart-visualization.ts`、`gantt.ts`、`org-chart.ts`、`packages/core/src/utils/heatmap-chart-utils.ts`、`packages/react/src/components/HeatmapChart.tsx`、`Gantt.tsx`、`OrgChart.tsx`、对应 Vue `HeatmapChart.ts` / `Gantt.ts` / `OrgChart.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 PieChart/DonutChart 页面能展示基础占比、中心汇总、悬停高亮、点击选中、图例、tooltip、外部标签和完整效果，方便复制到渠道占比、商品分类或访问来源图。
+- 作为使用者，我希望 RadarChart/GaugeChart 页面能展示多维指标、固定最大值、分割区域、颜色分段、自定义弧形和格式化文案，方便复制到能力评估或健康度仪表盘。
+- 作为使用者，我希望 FunnelChart/HeatmapChart 能展示转化流程、横向漏斗、热力矩阵坐标、数值显示和颜色映射，并能确认示例数据真的反映不同热度。
+- 作为使用者，我希望 SunburstChart/TreeMapChart 能覆盖层级数据、标签/图例、自定义颜色与 hoverable，让我判断层级数据如何映射到可视块或多层弧。
+- 作为使用者，我希望 Gantt/OrgChart 能展示真实任务排期和组织树，点击后有可见选择回显，并提供足够的 aria label 用于辅助技术。
+- 作为使用者，我希望 E18 所有图表的 `代码`页签来自同页 `?raw` source，复制出的 import、数据结构、事件回调和受控选中写法可信。
+
+**Example 体验问题**：
+
+- 问题：E18 未发现 route-level P0 阻断问题；React/Vue 20 个 route 在桌面与移动视口均加载到正确 `h1`，没有页面级横向溢出，且每页都渲染出目标图表 SVG。
+  浏览器证据：40 次 route 检查 `matched=true`、`overflowCount=0`、`zeroChartSvgCount=0`。React/Vue 桌面分节一致：Pie 5 个子场景、Donut 6、Radar 4、Gauge 3、Funnel 3、Heatmap 2、Sunburst 3、TreeMap 3、Gantt 2、OrgChart 2。React/Vue PieChart `代码`页签均可切到 `activeTab=代码`，raw source 含 `?raw`，复制按钮 `aria-label="复制代码"` 且可见文本为 `复制`。
+  影响：E18 可作为 Charts 径向/层级/排期类组件的审查入口继续使用。
+- 问题：HeatmapChart 示例实际显示值全为 `0`。示例源码传入 `x: xi, y: yi` 数字索引，但 `computeHeatmapCells` 用 `${xLabels[c]}|${yLabels[r]}` 查找数据；因此 React/Vue 虽生成随机值，渲染时都匹配不到并回退为 0。
+  浏览器证据：React/Vue `#/heatmap-chart` 的 `showValues` section 中 SVG 文本在坐标标签后连续显示 `0`；源码 `HeatmapChartDemo` 使用 `x: xi, y: yi`，而 `packages/core/src/utils/heatmap-chart-utils.ts` 查找 key 为 label 字符串组合。测试里的默认数据使用 `'A'/'One'` 标签值，因此没有覆盖数字索引路径。
+  影响：这是 E18 最高优先级问题；热力图示例无法表达热度差异，且类型注释写着 “X-axis index or label”，组件行为与类型说明存在偏差。
+- 问题：E18 多数图表示例固定 SVG 宽度大于移动视口内容宽度，页面级无横向溢出但 DemoBlock preview 需要横向滚动才能看全。
+  浏览器证据：移动 `390x844` 下 React 图表宽度包括 Pie `380/440/480`、Funnel/Heatmap/TreeMap `400/500`、Gantt `820`、OrgChart `760`；页面 `docW=clientW=390`，由 preview 的 `overflow-x-auto` 承接。Vue 页面结构一致。
+  影响：移动用户能访问页面但难以一屏理解完整图表；Gantt/OrgChart 尤其需要横向滚动才能看完时间轴或组织树。
+- 问题：Gantt/OrgChart 的选择回显显示内部 id（`build`、`frontend`），不是用户可见标签（`功能开发`、`Kai` / `Frontend`）。
+  浏览器证据：点击 React Gantt `功能开发, 01-13 to 02-05, 45%` 后回显 `当前选择：build`；点击 React OrgChart `Kai, Frontend` 后回显 `当前选择：frontend`。源码直接展示 `selectedId ?? '未选择'`。
+  影响：组件交互可用，但 Example 对业务用户不够友好；复制后用户还要自己把 id 映射回可读标签。
+- 问题：部分径向/层级图的整图 SVG 没有可访问名，主要语义分散在扇区/节点 aria label 或图例上；Gantt/OrgChart 明确传了 `title`/`desc`，但 Pie/Donut/Radar/Gauge/Funnel/Heatmap/Sunburst/TreeMap 示例没有展示整图 `title`/`desc` 写法。
+  浏览器证据：Gantt SVG `role="img"` 且 `aria-label="Gantt chart"`，OrgChart SVG `role="img"` 且 `aria-label="Organization chart"`；Pie/Donut/Radar/Funnel/Sunburst 的扇区/节点 aria label 可见，Gauge 有 `完成率: 72` 等 aria label，但示例未演示整图标题/描述。
+  影响：普通视觉使用不受阻；但复制到业务页面时，屏幕阅读器难以获得“这张图整体表达什么”的上下文。
+
+**组件能力建议**：
+
+- 类型：文档示例 / 默认行为 / API 缺口。
+  建议：短期把 React/Vue Heatmap 示例数据改为 `x: days[xi]`、`y: hours[yi]`，让页面立即显示真实热度；如果保留类型注释中的 “index or label” 承诺，则组件工具层应同时支持数字索引查找，并补 React/Vue/核心测试覆盖数字索引。
+  证据：浏览器渲染值全为 0；组件工具按 label key 查找；现有测试只覆盖 label 数据。
+- 类型：移动端 / 文档示例 / API 缺口。
+  建议：为 E18 至少补一个响应式图表示例，或让高层图表暴露/透传响应式能力；Gantt/OrgChart 可保留横向滚动，但应在示例中明确长时间轴/大组织树的移动端查看方式。
+  证据：移动端固定 SVG 宽度最高到 `820`，依赖 preview 横向滚动。
+- 类型：组合使用 / 文档示例。
+  建议：Gantt/OrgChart 选择回显从内部 id 改为业务可读文案，例如 `功能开发（build）`、`Kai / Frontend`，并在源码里示范如何由 id 查找节点/任务。
+  证据：点击后当前只回显 `build` / `frontend`。
+- 类型：a11y / 文档示例。
+  建议：在径向、可视化与层级图里至少各补一个 `title`/`desc` 示例；若组件已有整图 title/desc 能力，Example 应展示如何写；若没有，应补组件能力或文档说明。
+  证据：Gantt/OrgChart 已传 title/desc；其它 E18 页面未示范整图语义。
+- 类型：文档示例 / 组合使用。
+  建议：Donut/Pie 当前交互覆盖较完整，可在后续示例修复时把“点击选中”的状态回显统一成“标签 + 值 + 百分比”，减少用户二次加工。
+  证据：Pie 点击后回显 `选中: 产品 A 点击了 产品 A，值 40`；Donut 键盘 `Enter` 可回显 `选中: 直接访问`，但没有值或百分比。
+
+**建议优先级**：
+
+- P1：修复 Heatmap 示例全 0；若按类型注释支持数字索引，则同步补组件工具与测试。
+- P2：补 E18 图表移动端/响应式示例，至少说明长图表在 preview 内横向滚动的使用方式。
+- P2：Gantt/OrgChart 选择回显改为业务可读文案。
+- P2：径向/层级/可视化图补 `title`/`desc` a11y 示例。
+- P3：Pie/Donut 选中回显统一展示标签、值与百分比。
+
+**后续执行建议**：Heatmap 可先只改 React/Vue Example 数据为 label 字符串并复查 `#/heatmap-chart`；若要兑现类型注释中的数字索引能力，则需要组件工具/测试变更。移动端响应式、Gantt/OrgChart 可读回显、图表 `title`/`desc` 示例和 Pie/Donut 回显都可从 Example/文档开始，不必先改 public API。修复阶段应复查 React/Vue `#/heatmap-chart`、`#/pie-chart`、`#/donut-chart`、`#/gantt`、`#/org-chart` 与任一移动端长图 route，并运行 `npx -y pnpm@11.9.0 example:sources:check`；如调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`；若改组件源码或 API，补充对应 focused tests。
 
 ## 审查重点
 
