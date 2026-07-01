@@ -1,13 +1,28 @@
-# Tigercat Example Agent Plan
+# Tigercat Example User Story Requirements
 
 <!-- LLM-INDEX
-type: example-agent-plan
-scope: R28 example user-story component review queue
+type: example-user-story-requirements
+scope: R28 example user-story component review results and follow-up requirement queue
 verified-date: 2026-07-01
-source: docs/ROADMAP.md R28
+source: docs/ROADMAP.md R28 plus docs/EXAMPLE_AGENT_REQUIREMENTS.md
 -->
 
-本文是 R28 的后续 Agent 执行队列。目标不是本轮预填全部用户故事，而是固定分组、事实源、输出格式和体验要求，让后续 Agent 可以按组件族用模拟浏览器从真实使用者角度审查 React/Vue Example 的体验问题与优化建议。
+本文合并原 `docs/EXAMPLE_AGENT_PLAN.md` 与 `docs/EXAMPLE_AGENT_REQUIREMENTS.md`，作为后续 Example 体验修复、组件能力补齐和文档示例优化的唯一需求入口。E01-E21 的用户故事、浏览器证据、问题影响、组件能力建议和优先级保留在各分组记录中；后续任务应从本文拆分，不再回写旧文件。
+
+## 当前执行入口
+
+- 审查状态：E01-E21 均已完成（2026-07-01），旧 requirements 文件中 E06-E21 的“未开始”状态已过时。
+- 需求状态：各分组的 `建议优先级` 是当前修复队列事实源；P0/P1 优先拆成独立 Rxx，P2/P3 可按同源组件批量处理。
+- 事实源：每个需求必须回看对应分组的 `用户故事`、`Example 体验问题`、`组件能力建议` 和 `后续执行建议`，不要只读优先级标题。
+- 修复回写：完成某项修复后，在对应 E 组下追加复查结果、验证命令和状态变化；若任务被提升到 roadmap Rxx，同时同步更新 `docs/ROADMAP.md`。
+- 旧文件处理：原 `EXAMPLE_AGENT_PLAN.md` 的完整分组记录已迁移到本文；原 `EXAMPLE_AGENT_REQUIREMENTS.md` 中 R01-R25 的索引已由 E01-E05 的优先级记录覆盖。
+
+## 状态约定
+
+- 已审查：已完成 React/Vue Example 浏览器体验审查，产生待办或确认无阻断项。
+- 待修复：已确认需要 Example、文档或组件源码变更。
+- 已完成：对应修复已完成，并通过本文要求的浏览器复查和命令验证。
+- 阻塞：缺少环境、证据或产品/API 决策，暂不能继续。
 
 ## 执行方式
 
@@ -17,6 +32,14 @@ source: docs/ROADMAP.md R28
 - 不得用 `test:group:*`、hook spec 或单元测试命令替代体验审查；测试只允许在后续进入源码/Example 修复时作为补充验证。
 - 只记录已从浏览器体验、当前 Example、props 文档、源码中核实的事实；不确定的点写成待确认，不写成结论。
 - 如果发现需要修改组件源码、Example 实现、生成引用或 public API，先在本文件记录建议和优先级，后续另开 Rxx 或扩展允许修改范围后再实施。
+
+## 修复拆分规则
+
+- P0：立即拆出单独 Rxx，优先恢复示例可体验性或阻断路径。
+- P1：按同一组件族或同一根因拆小批次；必须覆盖 React/Vue 一致性、中文站 i18n/a11y、示例真实能力不一致等高影响问题。
+- P2：可按文档示例、组合使用、移动端、状态回显、远程资源本地化等同源主题批量处理。
+- P3：只在相邻组件已经修改时顺手处理，或集中为 polish 批次；不得挤占 P0/P1。
+- 每个修复批次完成后必须记录：实际修改范围、用户故事是否满足、浏览器复查 route、命令验证、剩余风险。
 
 ## 输出模板
 
@@ -1713,9 +1736,9 @@ source: docs/ROADMAP.md R28
 ## 验证要求
 
 - 只更新本计划文档或路线图时，运行：
-  - `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md`
-  - `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md`
-  - `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md`
+  - `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`
+  - `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`
+  - `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`
 - 如果后续 Agent 修改 Example 展示或 code source，额外运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时运行 `npx -y pnpm@11.9.0 example:build`。
 - R28 审查本身不要求、也不接受用测试命令替代浏览器体验证据。
 - 如果后续 Agent 修改组件源码或 public API，测试命令只作为修复验证补充；体验结论仍必须通过浏览器复查对应 Example route。
