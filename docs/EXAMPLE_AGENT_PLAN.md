@@ -60,7 +60,7 @@ source: docs/ROADMAP.md R28
 | 组  | 范围                                                                                                                           | 浏览器体验入口                                                                                                                                                                    | 状态                 |
 | --- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
 | E01 | Button / Link / Text / Code / Icon / Tag / Badge                                                                               | React/Vue: `#/button`, `#/link`, `#/text`, `#/code`, `#/icon`, `#/tag`, `#/badge`                                                                                                 | 已完成（2026-07-01） |
-| E02 | Avatar / AvatarGroup / Empty / Result / Statistic / QRCode / Watermark                                                         | React/Vue: `#/avatar`, `#/empty`, `#/result`, `#/statistic`, `#/qrcode`, `#/watermark`                                                                                            | 未开始               |
+| E02 | Avatar / AvatarGroup / Empty / Result / Statistic / QRCode / Watermark                                                         | React/Vue: `#/avatar`, `#/empty`, `#/result`, `#/statistic`, `#/qrcode`, `#/watermark`                                                                                            | 已完成（2026-07-01） |
 | E03 | Image / ImageGroup / ImagePreview / ImageViewer / CropUpload / ImageCropper                                                    | React/Vue: `#/image`, `#/image-viewer`, `#/crop-upload`, `#/image-cropper`                                                                                                        | 未开始               |
 | E04 | Layout / Header / Sidebar / Content / Footer / Container / Row / Col / Space / Divider                                         | React/Vue: `#/layout`, `#/grid`, `#/space`, `#/divider`                                                                                                                           | 未开始               |
 | E05 | Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel                                                        | React/Vue: `#/card`, `#/list`, `#/descriptions`, `#/skeleton`, `#/splitter`, `#/resizable`, `#/carousel`                                                                          | 未开始               |
@@ -143,6 +143,81 @@ source: docs/ROADMAP.md R28
 - P3：在 Badge 真实场景中补充零值隐藏/显示的业务说明。
 
 **后续执行建议**：只改 Example/文档即可，不需要组件源码/API 变更。修复阶段应复查 React/Vue `#/code`、`#/tag`、`#/badge`，并补充 `npx -y pnpm@11.9.0 example:sources:check`；如调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E02 Avatar / AvatarGroup / Empty / Result / Statistic / QRCode / Watermark
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/avatar`、`#/empty`、`#/result`、`#/statistic`、`#/qrcode`、`#/watermark`。
+- React：`http://localhost:5174/#/avatar`、`#/empty`、`#/result`、`#/statistic`、`#/qrcode`、`#/watermark`。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、section 数量、`示例`/`代码`页签、页面级横向溢出；在 Avatar 页面切换首个 DemoBlock 到 `代码`页签确认 raw-source 可见与复制按钮存在；点击 QRCode 过期态刷新文案、Empty `立即创建`、Result `返回首页`/`查看订单`；检查 Watermark 背景水印图层、Statistic 千分位/前后缀、Avatar 回退与在线状态场景。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/basic.md`、`skills/tigercat/references/shared/props/basic.md`。
+- React Example：`examples/example/react/src/pages/AvatarDemo.tsx`、`EmptyDemo.tsx`、`ResultDemo.tsx`、`StatisticDemo.tsx`、`QRCodeDemo.tsx`、`WatermarkDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/AvatarDemo.vue`、`EmptyDemo.vue`、`ResultDemo.vue`、`StatisticDemo.vue`、`QRCodeDemo.vue`、`WatermarkDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/react/src/components/AvatarGroup.tsx`、`packages/core/src/utils/avatar-utils.ts`、`packages/react/src/components/QRCode.tsx`、`packages/vue/src/components/QRCode.ts`、`packages/core/src/types/qrcode.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 Avatar 页面能直接看出图片、失败回退、文字缩写、图标、尺寸、形状、主题色和业务列表/评论/在线状态的组合方式。
+- 作为使用者，我希望 AvatarGroup 页面或示例能展示真实多人头像超额计数，而不是让我手写一个容易被头像缩写逻辑改变的 `+N` 头像。
+- 作为使用者，我希望 Empty 页面能覆盖无数据、无结果、错误、无图片模式和带操作按钮的空状态，便于落地列表、搜索和创建流程。
+- 作为使用者，我希望 Result 页面能展示基础状态、HTTP 状态和可执行操作区，并能看出按钮在真实页面里应如何导航或反馈。
+- 作为使用者，我希望 Statistic 页面能确认精度、千分位、前后缀、大小和卡片组合，方便复用到指标卡或运营看板。
+- 作为使用者，我希望 QRCode 页面能展示尺寸、颜色、纠错等级、过期/加载状态和刷新回调，并与当前中文示例站语言一致。
+- 作为使用者，我希望 Watermark 页面能确认文字、多行、自定义角度/间距/层级的实际覆盖效果，并理解图片水印能力是否也可用。
+
+**Example 体验问题**：
+
+- 问题：E02 未发现 P0 阻断问题；React/Vue 6 个 route 均可打开，桌面与移动视口无页面级横向溢出，Avatar/Empty/Result/Statistic/QRCode/Watermark 的主要展示均渲染。
+  浏览器证据：桌面 `1280x720` 下 React/Vue 分别返回目标 `h1`；Avatar 为 8 个 section，Empty 为 2 个，Result/Statistic/QRCode/Watermark 均为 3 个；移动 `390x844` 下 12 个 route 的 `hasHorizontalOverflow=false`；Avatar 首个 DemoBlock 的 `代码`页签可切换并出现 `复制代码`按钮和同页 raw source。
+  影响：当前 E02 基础展示可作为用户审查入口继续使用。
+- 问题：Avatar 的“团队成员（头像组）”示例没有使用 `AvatarGroup` / `max`，而是手写重叠布局和 `Avatar text="+5"`；浏览器实际只显示 `+`，不是源码里看起来的 `+5`。
+  浏览器证据：React `#/avatar` 的“实际应用示例”可见文本包含“团队成员（头像组）CD+”，不包含 `+5`；源码中同处写的是 `Avatar text="+5"`，而 `getInitials` 对单个 ASCII word 只取首字符。
+  影响：这是常见团队成员场景，用户复制后会得到错误的超额计数表现，也看不到已有 `AvatarGroup max` 能力。
+- 问题：QRCode 状态示例在中文示例站中显示英文状态文案，且过期态 `Refresh` 不是可访问 `button`，示例也没有绑定刷新回调。
+  浏览器证据：React/Vue `#/qrcode` 状态 section 文本包含 `QR code expired`、`Refresh`、`Loading...`；按 role 查找 `Refresh` button 数量为 0；源码里 QRCode 组件支持 `locale` / `onRefresh`（React）和 `locale` / `refresh` emit（Vue）。
+  影响：用户能看到状态外观，但无法从中文示例复制出本地化和刷新流程的最佳实践。
+- 问题：Empty 的 `立即创建` 与 Result 的 `返回首页` / `查看订单` 都是静态按钮，点击后没有反馈、导航或状态变化。
+  浏览器证据：React `#/empty` 中 `立即创建` 可点击但页面无变化；React `#/result` 中 `返回首页`、`查看订单` 点击后 URL 仍为 `http://localhost:5174/#/result`。
+  影响：不影响组件展示，但常见业务入口缺少“按钮应该接什么逻辑”的可复制线索。
+- 问题：Watermark 页面标题说明支持“文字和图片”，但 Example 只展示文字、多行文字和配置项，没有图片水印示例。
+  浏览器证据：React/Vue `#/watermark` 均只有“文字水印”“多行水印”“自定义配置”3 个 section；浏览器可见每个 section 的水印背景图层存在，但没有 `image` prop 场景。
+  影响：用户无法直接判断图片水印的尺寸、透明度和回退写法。
+
+**组件能力建议**：
+
+- 类型：文档示例 / 组合使用。
+  建议：把 Avatar “团队成员（头像组）”改为使用 `AvatarGroup max`，并在 React/Vue 示例中展示 `AvatarGroup` 的溢出计数和 `aria-label`，不要用 `Avatar text="+5"` 手写超额头像。
+  证据：`AvatarGroup` 已有 `max` 与 overflow label 实现；当前 Example 可见结果把 `+5` 缩成 `+`。
+- 类型：i18n / 文档示例 / a11y。
+  建议：为 QRCode 状态示例补中文 `locale` 覆盖和刷新回调；若进入源码修复阶段，再评估过期态刷新控件是否应渲染为 button 或具备 button role/键盘语义。
+  证据：React/Vue QRCode 源码已支持 locale；当前中文站仍显示英文状态文案，`Refresh` 不是 button。
+- 类型：文档示例 / 组合使用。
+  建议：Empty 和 Result 的操作按钮可在 Example 中加最小状态反馈，例如“已点击创建”或“准备跳转到订单页”，让用户看到 extra 区域如何接业务逻辑。
+  证据：按钮可点击但无反馈，Result 点击后 hash route 不变。
+- 类型：文档示例。
+  建议：Watermark 增加一个图片水印 section，或把标题文案收窄到当前已展示的文字水印能力。
+  证据：页面说明写“文字和图片”，实际 section 只覆盖文字水印。
+- 类型：文档示例。
+  建议：Statistic 后续可补“趋势颜色/同比环比”或“指标卡组”小场景，强化运营看板可复制性。
+  证据：当前示例已覆盖数值格式，但月增长只用 `↑` 文本，没有展示正负趋势区分。
+
+**建议优先级**：
+
+- P1：Avatar 团队成员示例改用 `AvatarGroup max`，修复 `+5` 实际只显示 `+` 的误导。
+- P1：QRCode 状态示例补 locale/onRefresh，并评估过期态刷新控件的 button 语义。
+- P2：Empty/Result 操作按钮补最小可见反馈或导航意图。
+- P2：Watermark 补图片水印示例或收窄页面说明。
+- P3：Statistic 补趋势颜色/同比环比的业务指标示例。
+
+**后续执行建议**：优先只改 Example/文档；AvatarGroup 示例、QRCode locale/refresh、Empty/Result 反馈和 Watermark 图片水印都不需要 public API 变更。修复阶段应复查 React/Vue `#/avatar`、`#/qrcode`、`#/empty`、`#/result`、`#/watermark`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。若 QRCode 刷新控件改语义，补充 React/Vue QRCode focused tests。
 
 ## 审查重点
 

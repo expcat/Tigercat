@@ -1121,3 +1121,34 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
 
 **状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E01 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 标为 `进行中`，当前可执行分组推进到 E02；R28 E01 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R28 E02 Basic example user-story review
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：按 `docs/EXAMPLE_AGENT_PLAN.md` 执行 E02，从真实使用者角度审查 Avatar / AvatarGroup / Empty / Result / Statistic / QRCode / Watermark 的 React/Vue Example 体验、可复制性、交互证据和后续优化建议。
+
+**允许修改**：`docs/EXAMPLE_AGENT_PLAN.md`、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件源码、Example 实现、generated Skill references、public API、API baseline、发布配置。
+
+**执行摘要**：已启动 Vue Example `http://localhost:5173/` 与 React Example `http://localhost:5174/`，读取 Basic generated refs、React/Vue E02 页面源码、DemoBlock raw-source 实现，以及 AvatarGroup / QRCode 相关源码事实源。已用浏览器访问 React/Vue 的 `#/avatar`、`#/empty`、`#/result`、`#/statistic`、`#/qrcode`、`#/watermark`。桌面 `1280x720` 下确认目标 `h1`、section 数量、`示例`/`代码`页签、Avatar 回退/在线状态、Statistic 千分位和 Watermark 背景图层；移动 `390x844` 下确认 12 个 E02 route 无页面级横向溢出。已点击 Avatar 代码页签、Empty 创建按钮、Result 操作按钮，并检查 QRCode 过期/加载状态文案。
+
+**审查结论**：
+
+- 未发现 E02 P0 阻断问题；React/Vue 6 个 route 均可打开，页面结构和主要展示能力基本对齐。
+- Avatar 团队成员示例没有使用 `AvatarGroup max`，而是手写 `Avatar text="+5"`；浏览器实际只显示 `+`，建议作为 P1 Example 修复。
+- QRCode 状态示例在中文站仍显示 `QR code expired`、`Refresh`、`Loading...`，且 `Refresh` 不是 button；组件源码已有 locale/refresh 能力，建议优先补 Example 的 locale/onRefresh，并评估刷新控件语义。
+- Empty / Result 操作按钮可点击但无反馈或导航，建议补最小业务反馈以提升可复制性。
+- Watermark 页面说明支持图片水印，但当前只展示文字水印，建议补图片水印示例或收窄说明。
+
+**实际验证**：
+
+- Browser desktop review：React/Vue `#/avatar`、`#/empty`、`#/result`、`#/statistic`、`#/qrcode`、`#/watermark` at `1280x720`。
+- Browser mobile review：React/Vue `#/avatar`、`#/empty`、`#/result`、`#/statistic`、`#/qrcode`、`#/watermark` at `390x844`。
+- Browser interactions：Avatar code tab, Empty create button, Result action buttons, QRCode status text/refresh affordance, Watermark background-image layer inspection.
+- `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+
+**状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E02 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前可执行分组推进到 E03；R28 E02 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
