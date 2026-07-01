@@ -64,7 +64,7 @@ source: docs/ROADMAP.md R28
 | E03 | Image / ImageGroup / ImagePreview / ImageViewer / CropUpload / ImageCropper                                                    | React/Vue: `#/image`, `#/image-viewer`, `#/crop-upload`, `#/image-cropper`                                                                                                        | 已完成（2026-07-01） |
 | E04 | Layout / Header / Sidebar / Content / Footer / Container / Row / Col / Space / Divider                                         | React/Vue: `#/layout`, `#/grid`, `#/space`, `#/divider`                                                                                                                           | 已完成（2026-07-01） |
 | E05 | Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel                                                        | React/Vue: `#/card`, `#/list`, `#/descriptions`, `#/skeleton`, `#/splitter`, `#/resizable`, `#/carousel`                                                                          | 已完成（2026-07-01） |
-| E06 | Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton                                                                | React/Vue: `#/affix`, `#/anchor`, `#/backtop`, `#/breadcrumb`, `#/scroll-spy`, `#/float-button`                                                                                   | 未开始               |
+| E06 | Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton                                                                | React/Vue: `#/affix`, `#/anchor`, `#/backtop`, `#/breadcrumb`, `#/scroll-spy`, `#/float-button`                                                                                   | 已完成（2026-07-01） |
 | E07 | Menu / Dropdown / Steps / Tabs / Tree / Pagination / Spotlight                                                                 | React/Vue: `#/menu`, `#/dropdown`, `#/steps`, `#/tabs`, `#/tree`, `#/pagination`, `#/spotlight`                                                                                   | 未开始               |
 | E08 | Alert / Loading / Progress / Tooltip / Popover / Popconfirm                                                                    | React/Vue: `#/alert`, `#/loading`, `#/progress`, `#/tooltip`, `#/popover`, `#/popconfirm`                                                                                         | 未开始               |
 | E09 | Modal / Drawer / Message / Notification / Tour                                                                                 | React/Vue: `#/modal`, `#/drawer`, `#/message`, `#/notification`, `#/tour`                                                                                                         | 未开始               |
@@ -450,6 +450,90 @@ source: docs/ROADMAP.md R28
 - P3：Card 封面图后续评估本地 fixture。
 
 **后续执行建议**：Splitter 需要优先进入 Example/组件一致性修复：先只改 Vue Splitter 示例 slot 与错误 props、修正 React/Vue `sizes` 示例值/文案；若选择支持百分比或折叠能力，则另开组件源码/API 任务并补 React/Vue focused tests。Descriptions/List/Card/Skeleton/Carousel 可先作为 Example/文档改进；修复阶段复查 React/Vue `#/splitter`、`#/descriptions`、`#/list`、`#/skeleton`、`#/carousel`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E06 Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/affix`、`#/anchor`、`#/backtop`、`#/breadcrumb`、`#/scroll-spy`、`#/float-button`。
+- React：`http://localhost:5174/#/affix`、`#/anchor`、`#/backtop`、`#/breadcrumb`、`#/scroll-spy`、`#/float-button`。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点当前默认主题；页面正文为中文，部分组件默认 aria/工具栏文案受全局语言切换影响显示英文。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、section 标题、React/Vue 页面级横向溢出；滚动 Affix 内部容器；点击 Anchor 自定义容器 `Section 4` 和事件示例链接；滚动 BackTop 页面主容器和内部容器；检查 Breadcrumb 外链、当前项和折叠示例覆盖；点击 ScrollSpy 水平导航和自定义容器导航；悬停 FloatButtonGroup 触发器并检查禁用态、独立悬浮位置；在 FloatButton 页面切换 `代码` tab，确认 raw-source 代码和 `复制代码`按钮可见。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/navigation.md`、`skills/tigercat/references/shared/props/navigation.md`。
+- React Example：`examples/example/react/src/pages/AffixDemo.tsx`、`AnchorDemo.tsx`、`BackTopDemo.tsx`、`BreadcrumbDemo.tsx`、`ScrollSpyDemo.tsx`、`FloatButtonDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/AffixDemo.vue`、`AnchorDemo.vue`、`BackTopDemo.vue`、`BreadcrumbDemo.vue`、`ScrollSpyDemo.vue`、`FloatButtonDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/affix.ts`、`anchor.ts`、`back-top.ts`、`breadcrumb.ts`、`float-button.ts`、`scroll-spy.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 Affix 页面能清楚验证窗口滚动和容器滚动下元素何时吸顶/吸底，方便复制到工具栏、筛选栏或操作按钮区。
+- 作为使用者，我希望 Anchor 页面能点击每一个锚点并跳到真实内容，事件示例能显示点击与激活结果，嵌套锚点也能对应到真实章节。
+- 作为使用者，我希望 BackTop 页面能同时验证页面主滚动容器和局部滚动容器，并能看出按钮的可访问名称、位置和点击回调。
+- 作为使用者，我希望 Breadcrumb 页面覆盖链接、当前项、外链安全、图标、扩展区域、多级折叠和 `maxItems`，方便落地到后台详情页。
+- 作为使用者，我希望 ScrollSpy 页面能展示页面目录、水平目录、自定义容器、事件来源和 disabled/children 数据结构，方便复制到文档页或设置页。
+- 作为使用者，我希望 FloatButton 页面能验证基础按钮、分组展开、禁用、固定到视口、可访问名称和点击反馈，方便复制到客服、帮助和快捷操作入口。
+
+**Example 体验问题**：
+
+- 问题：E06 未发现 route-level P0 阻断问题；React/Vue 12 个 route 均可打开，桌面和移动视口无页面级横向溢出，BackTop、Anchor 自定义容器、ScrollSpy 自定义容器和 FloatButtonGroup 的主要交互可触发。
+  浏览器证据：React/Vue `#/affix`、`#/anchor`、`#/backtop`、`#/breadcrumb`、`#/scroll-spy`、`#/float-button` 均返回目标 `h1`；移动 `390x844` 下 12 个 route 的 `pageOverflow=false`、`mainOverflow=false`；Anchor 点击 `Section 4` 后内部容器从 `0` 滚到 `370/385`；BackTop 主容器滚到 `650/666` 后出现页面级和容器级 `Back to top` 按钮，内部容器滚到 `220`；FloatButtonGroup hover 后出现 `操作 A` / `操作 B`；FloatButton 独立悬浮按钮固定在视口右下角，`aria-label="客服入口"`。
+  影响：E06 可作为 Navigation 浮动/滚动/路径类组件的审查入口继续使用。
+- 问题：Affix 示例把“向下滚动触发固定”放在内部滚动容器内，但没有给 Affix 指定该容器作为 `target`；滚动内部容器后没有出现固定态元素，用户无法从页面直接体验固钉触发。
+  浏览器证据：React/Vue `#/affix` 内部容器 `scrollTop` 从 `0` 改到 `180`，但页面内 `position: fixed` 的 Affix 文本为空；源码中顶部示例只传 `offsetTop`，未传 `target`。
+  影响：用户会误以为内部容器滚动应触发 Affix，但复制示例后看不到预期效果，属于常见滚动容器场景的误导。
+- 问题：Anchor 页面多个链接指向不存在的 DOM id，包括嵌套锚点章节和右侧目录的 `#demo-ink`。
+  浏览器证据：React/Vue `#/anchor` 中存在 `#chapter1`、`#section1-1`、`#section1-2`、`#chapter2`、`#section2-1`、`#demo-ink` 链接，但页面没有同名元素；点击事件示例后可见事件文本为 `激活: #demo-basic`，无法完整验证嵌套章节跳转；React dev server 还记录 `Cannot update a component (AnchorDemo) while rendering a different component (Anchor)`。
+  影响：嵌套锚点和墨水指示器看起来可点击，但用户复制到文档目录时容易遗漏真实目标节点；React 示例还存在渲染期更新噪声。
+- 问题：Breadcrumb 公开支持 `maxItems` 折叠，但 Example 没有展示折叠/展开；多级层次只是完整展示所有项。
+  浏览器证据：`packages/core/src/types/breadcrumb.ts` 和 generated props 均列出 `maxItems`；React/Vue `#/breadcrumb` 有多级层次 section，但页面没有 `...` 折叠项，浏览器检查 `hasMaxItemsExample=false`。
+  影响：后台详情页常见的长路径折叠能力不可从 Example 发现，用户需要回到 props 文档自行推断。
+- 问题：BackTop 的可见按钮默认可访问名称为英文 `Back to top`，与中文示例正文不一致；页面和容器同时显示时两个按钮同名。
+  浏览器证据：React/Vue `#/backtop` 主容器滚动后有两个可见按钮 `aria-label="Back to top"`，分别位于容器左下和页面右下。
+  影响：视觉使用不阻断，但中文示例站的 a11y 文案不一致；多个 BackTop 并存时屏幕阅读器用户难以区分页面返回顶部和容器返回顶部。
+- 问题：ScrollSpy 自定义容器能滚动并产生事件，但示例没有展示 disabled 项或更明确的点击来源反馈；点击更深的 `监控` 导航后最终事件可能停在中间 section 的 scroll 来源。
+  浏览器证据：React/Vue `#/scroll-spy` 点击自定义容器导航后容器滚动到 `292/306`，最近事件显示 `发布 / scroll`；props 支持 `disabled`，页面没有 disabled item 示例。
+  影响：核心能力可用，但用户难以判断 click 与 scroll 来源如何稳定接业务分析或侧边目录状态。
+- 问题：FloatButton 基础按钮和点击回调主要写入控制台，页面没有可见反馈；分组只展示 hover 触发，没有 click/controlled open 场景。
+  浏览器证据：React/Vue `#/float-button` hover `菜单` 后出现 `操作 A` / `操作 B`，禁用按钮为 `不可用`，固定按钮为 `客服入口`；点击基础按钮页面无可见状态变化。公开 props 支持 `trigger="click"` / `open`。
+  影响：展示外观和展开没问题，但用户复制到帮助/客服场景时缺少可见业务接线和移动端更友好的点击展开示例。
+
+**组件能力建议**：
+
+- 类型：文档示例 / 默认行为。
+  建议：Affix 示例补一个真实可滚动目标：如果当前 API 只支持 selector `target`，给内部容器稳定 id 并传 `target`；或者把示例改成页面主滚动触发，避免把无效内部滚动写成体验路径。
+  证据：内部滚动容器滚动后没有固定态；顶部示例未绑定 `target`。
+- 类型：文档示例 / 组合使用。
+  建议：Anchor 嵌套章节补真实 `id` 内容块，并把右侧目录 `#demo-ink` 改为真实 `id` 或移除；事件示例可同时显示最近点击 href 与最近激活 href，便于理解差异。
+  证据：多个 href 没有对应 DOM 目标，事件文本只显示最终激活项。
+- 类型：文档示例。
+  建议：Breadcrumb 增加 `maxItems` 折叠示例，覆盖长路径折叠、展开和当前项语义；现有外链 `rel="noopener noreferrer"` 可保留为安全示例。
+  证据：公开 props 已支持 `maxItems`，但 Example 没有折叠项。
+- 类型：a11y / i18n / 文档示例。
+  建议：BackTop 在页面级和容器级示例中展示自定义 aria-label 或 locale 文案，例如“返回页面顶部”“返回容器顶部”；若组件层已有 locale 能力，Example 应显式示范。
+  证据：两个可见 BackTop 按钮都叫 `Back to top`。
+- 类型：文档示例 / 组合使用。
+  建议：ScrollSpy 补 disabled 项和可见 click/scroll 来源日志，或让点击自定义容器导航后的目标与最近事件更稳定对应。
+  证据：当前自定义容器可滚动，但最终事件显示中间项 `发布 / scroll`。
+- 类型：文档示例 / 移动端。
+  建议：FloatButton 补 click 触发或受控 `open` 的分组示例，并给基础按钮加最小可见反馈，例如“已打开客服入口”或“已触发快捷操作”。
+  证据：hover 分组可用，但 click/controlled open 和业务反馈未展示。
+
+**建议优先级**：
+
+- P1：修正 Affix 内部滚动容器示例，使“滚动触发固定”真实可体验。
+- P1：修复 Anchor 中指向不存在 DOM id 的链接，尤其嵌套锚点和 `#demo-ink`，并消除 React Anchor 渲染期更新警告。
+- P2：Breadcrumb 增加 `maxItems` 折叠/展开示例。
+- P2：BackTop 页面级/容器级按钮展示中文且互相区分的可访问名称。
+- P2：ScrollSpy 补 click/scroll 来源反馈和 disabled item 示例。
+- P3：FloatButton 补 click/controlled 分组与可见业务反馈。
+
+**后续执行建议**：优先只改 Example/文档，不需要 public API 变更。修复阶段应复查 React/Vue `#/affix`、`#/anchor`、`#/breadcrumb`、`#/backtop`、`#/scroll-spy`、`#/float-button`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。若 BackTop 需要组件级 locale/aria API 才能区分按钮，再另开组件源码任务并补 focused tests。
 
 ## 审查重点
 
