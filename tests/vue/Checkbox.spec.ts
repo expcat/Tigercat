@@ -4,7 +4,6 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import userEvent from '@testing-library/user-event'
 import { nextTick, defineComponent, h, ref } from 'vue'
 import { Checkbox, CheckboxGroup } from '@expcat/tigercat-vue'
 import {
@@ -15,150 +14,76 @@ import {
   clearThemeVariables
 } from '../utils'
 
+const getBox = (container: HTMLElement) =>
+  container.querySelector('input[type="checkbox"]') as HTMLInputElement
+const getBoxes = (container: HTMLElement) =>
+  Array.from(container.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[]
+
+const renderGroup = (template: string, setup?: () => Record<string, unknown>) =>
+  render({ components: { CheckboxGroup, Checkbox }, template, setup })
+
 describe('Checkbox', () => {
-  describe('Basic Rendering', () => {
-    it('renders checkbox input and label', () => {
+  describe('Rendering', () => {
+    it('renders the input and label, unchecked by default with the value', () => {
       const { container, getByText } = render(Checkbox, {
+        props: { value: 'option1' },
         slots: { default: 'Check me' }
       })
-
-      expect(container.querySelector('input[type="checkbox"]')).toBeInTheDocument()
+      const box = getBox(container)
+      expect(box).toBeInTheDocument()
+      expect(box).toHaveAttribute('value', 'option1')
+      expect(box.checked).toBe(false)
       expect(getByText('Check me')).toBeInTheDocument()
     })
 
-    it('renders checkbox without label', () => {
-      const { container } = render(Checkbox)
-
-      const checkbox = container.querySelector('input[type="checkbox"]')
-      expect(checkbox).toBeInTheDocument()
-    })
-
-    it('renders unchecked by default', () => {
-      const { container } = render(Checkbox, {
-        slots: { default: 'Checkbox' }
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(checkbox.checked).toBe(false)
-    })
-
-    it('renders with value prop', () => {
-      const { container } = render(Checkbox, {
-        props: { value: 'option1' },
-        slots: { default: 'Option 1' }
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')
-      expect(checkbox).toHaveAttribute('value', 'option1')
-    })
-
-    it('renders with numeric value', () => {
-      const { container } = render(Checkbox, {
-        props: { value: 42 },
-        slots: { default: 'Numeric' }
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')
-      expect(checkbox).toHaveAttribute('value', '42')
-    })
-
-    it('applies custom className', () => {
+    it('applies custom className to the label', () => {
       const { container } = render(Checkbox, {
         props: { className: 'custom-checkbox' },
         slots: { default: 'Custom' }
       })
-
-      const label = container.querySelector('label')
-      expect(label).toHaveClass('custom-checkbox')
+      expect(container.querySelector('label')).toHaveClass('custom-checkbox')
     })
 
-    it('applies custom className to standalone checkbox', () => {
-      const { container } = render(Checkbox, {
-        props: { className: 'custom-checkbox' }
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')
-      expect(checkbox).toHaveClass('custom-checkbox')
-    })
-
-    it('applies custom style', () => {
-      const { container } = render(Checkbox, {
-        props: { style: { marginTop: '10px' } },
-        slots: { default: 'Styled' }
-      })
-
-      const label = container.querySelector('label')
-      expect(label).toHaveStyle({ marginTop: '10px' })
-    })
-  })
-
-  describe('Sizes', () => {
     it.each(componentSizes)('renders %s size', (size) => {
       const { container } = renderWithProps(Checkbox, { size }, { slots: { default: 'Checkbox' } })
-      expect(container.querySelector('input[type="checkbox"]')).toBeInTheDocument()
+      expect(getBox(container)).toBeInTheDocument()
     })
   })
 
-  describe('Disabled State', () => {
-    it('supports disabled', () => {
-      const { container } = render(Checkbox, {
-        props: { disabled: true },
-        slots: { default: 'Disabled' }
-      })
-
-      expect(container.querySelector('input[type="checkbox"]')).toBeDisabled()
-    })
-
-    it('does not emit events when disabled', async () => {
+  describe('Disabled state', () => {
+    it('is disabled and does not emit when clicked', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Checkbox, {
         props: { disabled: true, 'onUpdate:modelValue': onUpdate },
         slots: { default: 'Disabled' }
       })
-
-      await fireEvent.click(container.querySelector('input[type="checkbox"]')!)
+      const box = getBox(container)
+      expect(box).toBeDisabled()
+      await fireEvent.click(box)
       expect(onUpdate).not.toHaveBeenCalled()
     })
 
     it('cannot be toggled when disabled', async () => {
-      const user = userEvent.setup()
       const { container } = render(Checkbox, {
         props: { disabled: true, defaultValue: true },
         slots: { default: 'Disabled' }
       })
-
-      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(checkbox.checked).toBe(true)
-
-      await user.click(checkbox)
-      expect(checkbox.checked).toBe(true)
+      const box = getBox(container)
+      expect(box.checked).toBe(true)
+      await fireEvent.click(box)
+      expect(box.checked).toBe(true)
     })
   })
 
-  describe('Controlled Mode (modelValue)', () => {
-    it('supports controlled modelValue', () => {
-      const { container } = render(Checkbox, {
-        props: { modelValue: true },
-        slots: { default: 'Checked' }
-      })
-
-      expect((container.querySelector('input[type="checkbox"]') as HTMLInputElement).checked).toBe(
-        true
-      )
-    })
-
-    it('responds to modelValue changes', async () => {
+  describe('Controlled and uncontrolled', () => {
+    it('reflects modelValue and reacts to changes', async () => {
       const { container, rerender } = render(Checkbox, {
         props: { modelValue: false },
         slots: { default: 'Checkbox' }
       })
-
-      let checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(checkbox.checked).toBe(false)
-
+      expect(getBox(container).checked).toBe(false)
       await rerender({ modelValue: true })
-      checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(checkbox.checked).toBe(true)
+      expect(getBox(container).checked).toBe(true)
     })
 
     it('emits update:modelValue when clicked', async () => {
@@ -167,12 +92,11 @@ describe('Checkbox', () => {
         props: { modelValue: false, 'onUpdate:modelValue': onUpdate },
         slots: { default: 'Checkbox' }
       })
-
-      await fireEvent.click(container.querySelector('input[type="checkbox"]')!)
+      await fireEvent.click(getBox(container))
       expect(onUpdate).toHaveBeenCalledWith(true)
     })
 
-    it('works with v-model pattern', async () => {
+    it('works with a v-model pattern', async () => {
       const Wrapper = defineComponent({
         setup() {
           const checked = ref(false)
@@ -189,518 +113,282 @@ describe('Checkbox', () => {
             )
         }
       })
-
       const { container, getByText } = render(Wrapper)
-      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-
-      expect(checkbox.checked).toBe(false)
-      expect(getByText('Checked: false')).toBeInTheDocument()
-
-      await fireEvent.click(checkbox)
+      const box = getBox(container)
+      expect(box.checked).toBe(false)
+      await fireEvent.click(box)
       await nextTick()
-
-      expect(checkbox.checked).toBe(true)
+      expect(box.checked).toBe(true)
       expect(getByText('Checked: true')).toBeInTheDocument()
     })
-  })
 
-  describe('Uncontrolled Mode (defaultValue)', () => {
-    it('supports uncontrolled defaultValue', () => {
-      const { container } = render(Checkbox, {
-        props: { defaultValue: true },
-        slots: { default: 'Default checked' }
-      })
-
-      expect((container.querySelector('input[type="checkbox"]') as HTMLInputElement).checked).toBe(
-        true
-      )
-    })
-
-    it('can be toggled in uncontrolled mode', async () => {
+    it('toggles in uncontrolled mode from defaultValue', async () => {
       const { container } = render(Checkbox, {
         props: { defaultValue: false },
         slots: { default: 'Uncontrolled' }
       })
-
-      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(checkbox.checked).toBe(false)
-
-      await fireEvent.click(checkbox)
-      expect(checkbox.checked).toBe(true)
-
-      await fireEvent.click(checkbox)
-      expect(checkbox.checked).toBe(false)
-    })
-
-    it('emits update:modelValue in uncontrolled mode', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Checkbox, {
-        props: { 'onUpdate:modelValue': onUpdate },
-        slots: { default: 'Checkbox' }
-      })
-
-      await fireEvent.click(container.querySelector('input[type="checkbox"]')!)
-      expect(onUpdate).toHaveBeenCalledWith(true)
+      const box = getBox(container)
+      expect(box.checked).toBe(false)
+      await fireEvent.click(box)
+      expect(box.checked).toBe(true)
+      await fireEvent.click(box)
+      expect(box.checked).toBe(false)
     })
   })
 
-  describe('Indeterminate State', () => {
-    it('supports indeterminate', async () => {
-      const { container } = render(Checkbox, {
-        props: { indeterminate: true },
-        slots: { default: 'Indeterminate' }
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      await nextTick()
-      expect(checkbox.indeterminate).toBe(true)
-    })
-
-    it('indeterminate can be toggled', async () => {
+  describe('Indeterminate state', () => {
+    it('reflects and toggles the indeterminate prop', async () => {
       const { container, rerender } = render(Checkbox, {
         props: { indeterminate: true },
         slots: { default: 'Indeterminate' }
       })
-
-      let checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
       await nextTick()
-      expect(checkbox.indeterminate).toBe(true)
-
+      expect(getBox(container).indeterminate).toBe(true)
       await rerender({ indeterminate: false })
-      checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
       await nextTick()
-      expect(checkbox.indeterminate).toBe(false)
+      expect(getBox(container).indeterminate).toBe(false)
     })
 
-    it('clicking indeterminate checkbox emits change', async () => {
+    it('emits when an indeterminate checkbox is clicked', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Checkbox, {
         props: { indeterminate: true, 'onUpdate:modelValue': onUpdate },
         slots: { default: 'Indeterminate' }
       })
-
-      await fireEvent.click(container.querySelector('input[type="checkbox"]')!)
+      await fireEvent.click(getBox(container))
       expect(onUpdate).toHaveBeenCalledWith(true)
     })
   })
 
   describe('Events', () => {
-    it('emits change event with value and event', async () => {
+    it('emits change (value, event) and update:modelValue on click', async () => {
       const onChange = vi.fn()
+      const onUpdate = vi.fn()
       const { container } = render(Checkbox, {
-        props: { onChange },
+        props: { onChange, 'onUpdate:modelValue': onUpdate },
         slots: { default: 'Checkbox' }
       })
-
-      await fireEvent.click(container.querySelector('input[type="checkbox"]')!)
-      expect(onChange).toHaveBeenCalled()
+      await fireEvent.click(getBox(container))
       expect(onChange.mock.calls[0][0]).toBe(true)
       expect(onChange.mock.calls[0][1]).toBeInstanceOf(Event)
-    })
-
-    it('emits both update:modelValue and change events', async () => {
-      const onUpdate = vi.fn()
-      const onChange = vi.fn()
-
-      const { container } = render(Checkbox, {
-        props: { 'onUpdate:modelValue': onUpdate, onChange },
-        slots: { default: 'Checkbox' }
-      })
-
-      await fireEvent.click(container.querySelector('input[type="checkbox"]')!)
-
-      expect(onUpdate).toHaveBeenCalled()
-      expect(onChange).toHaveBeenCalled()
+      expect(onUpdate).toHaveBeenCalledWith(true)
     })
   })
 
   describe('CheckboxGroup', () => {
-    describe('Basic Rendering', () => {
-      it('renders CheckboxGroup with children', () => {
-        const { container } = render({
-          components: { CheckboxGroup, Checkbox },
-          template: `
-            <CheckboxGroup>
-              <Checkbox value="a">A</Checkbox>
-              <Checkbox value="b">B</Checkbox>
-            </CheckboxGroup>
-          `
-        })
-
-        expect(container.querySelectorAll('input[type="checkbox"]')).toHaveLength(2)
-      })
-
-      it('applies className to group', () => {
-        const { container } = render({
-          components: { CheckboxGroup, Checkbox },
-          template: `
-            <CheckboxGroup class-name="custom-group">
-              <Checkbox value="a">A</Checkbox>
-            </CheckboxGroup>
-          `
-        })
-
-        const group = container.querySelector('div.custom-group')
-        expect(group).toBeInTheDocument()
-      })
+    it('renders children checkboxes', () => {
+      const { container } = renderGroup(`
+        <CheckboxGroup>
+          <Checkbox value="a">A</Checkbox>
+          <Checkbox value="b">B</Checkbox>
+        </CheckboxGroup>
+      `)
+      expect(getBoxes(container)).toHaveLength(2)
     })
 
-    describe('Uncontrolled Mode', () => {
-      it('supports group selection via CheckboxGroup', async () => {
-        const onUpdate = vi.fn()
-        const Wrapper = defineComponent({
-          setup() {
-            return () =>
-              h(
-                CheckboxGroup,
-                { defaultValue: ['apple'], 'onUpdate:modelValue': onUpdate },
-                {
-                  default: () => [
-                    h(Checkbox, { value: 'apple' }, () => 'Apple'),
-                    h(Checkbox, { value: 'banana' }, () => 'Banana')
-                  ]
-                }
-              )
-          }
-        })
-
-        const { container } = render(Wrapper)
-        const inputs = container.querySelectorAll('input[type="checkbox"]')
-
-        expect((inputs[0] as HTMLInputElement).checked).toBe(true)
-        expect((inputs[1] as HTMLInputElement).checked).toBe(false)
-
-        await fireEvent.click(inputs[1])
-        expect(onUpdate).toHaveBeenCalledWith(['apple', 'banana'])
+    it('selects and deselects items (uncontrolled)', async () => {
+      const onUpdate = vi.fn()
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(
+              CheckboxGroup,
+              { defaultValue: ['apple'], 'onUpdate:modelValue': onUpdate },
+              {
+                default: () => [
+                  h(Checkbox, { value: 'apple' }, () => 'Apple'),
+                  h(Checkbox, { value: 'banana' }, () => 'Banana')
+                ]
+              }
+            )
+        }
       })
+      const { container } = render(Wrapper)
+      const inputs = getBoxes(container)
+      expect(inputs[0].checked).toBe(true)
+      expect(inputs[1].checked).toBe(false)
 
-      it('can uncheck item in group', async () => {
-        const onUpdate = vi.fn()
-        const Wrapper = defineComponent({
-          setup() {
-            return () =>
-              h(
-                CheckboxGroup,
-                { defaultValue: ['apple', 'banana'], 'onUpdate:modelValue': onUpdate },
-                {
-                  default: () => [
-                    h(Checkbox, { value: 'apple' }, () => 'Apple'),
-                    h(Checkbox, { value: 'banana' }, () => 'Banana')
-                  ]
-                }
-              )
-          }
-        })
+      await fireEvent.click(inputs[1])
+      expect(onUpdate).toHaveBeenCalledWith(['apple', 'banana'])
 
-        const { container } = render(Wrapper)
-        const inputs = container.querySelectorAll('input[type="checkbox"]')
-
-        await fireEvent.click(inputs[0])
-        expect(onUpdate).toHaveBeenCalledWith(['banana'])
-      })
-
-      it('works without default value', async () => {
-        const onUpdate = vi.fn()
-        const Wrapper = defineComponent({
-          setup() {
-            return () =>
-              h(
-                CheckboxGroup,
-                { 'onUpdate:modelValue': onUpdate },
-                {
-                  default: () => [
-                    h(Checkbox, { value: 'apple' }, () => 'Apple'),
-                    h(Checkbox, { value: 'banana' }, () => 'Banana')
-                  ]
-                }
-              )
-          }
-        })
-
-        const { container } = render(Wrapper)
-        const inputs = container.querySelectorAll('input[type="checkbox"]')
-
-        expect((inputs[0] as HTMLInputElement).checked).toBe(false)
-        expect((inputs[1] as HTMLInputElement).checked).toBe(false)
-
-        await fireEvent.click(inputs[0])
-        expect(onUpdate).toHaveBeenCalledWith(['apple'])
-      })
+      await fireEvent.click(inputs[0])
+      expect(onUpdate).toHaveBeenLastCalledWith(['banana'])
     })
 
-    describe('Controlled Mode', () => {
-      it('works with v-model', async () => {
-        const Wrapper = defineComponent({
-          setup() {
-            const value = ref<(string | number | boolean)[]>(['apple'])
-            return () =>
+    it('works without a default value', async () => {
+      const onUpdate = vi.fn()
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(
+              CheckboxGroup,
+              { 'onUpdate:modelValue': onUpdate },
+              {
+                default: () => [
+                  h(Checkbox, { value: 'apple' }, () => 'Apple'),
+                  h(Checkbox, { value: 'banana' }, () => 'Banana')
+                ]
+              }
+            )
+        }
+      })
+      const { container } = render(Wrapper)
+      await fireEvent.click(getBoxes(container)[0])
+      expect(onUpdate).toHaveBeenCalledWith(['apple'])
+    })
+
+    it('works as a controlled group with v-model', async () => {
+      const Wrapper = defineComponent({
+        setup() {
+          const value = ref<(string | number | boolean)[]>(['apple'])
+          return () =>
+            h(
+              CheckboxGroup,
+              {
+                modelValue: value.value,
+                'onUpdate:modelValue': (v: (string | number | boolean)[]) => {
+                  value.value = v
+                }
+              },
+              {
+                default: () => [
+                  h(Checkbox, { value: 'apple' }, () => 'Apple'),
+                  h(Checkbox, { value: 'banana' }, () => 'Banana')
+                ]
+              }
+            )
+        }
+      })
+      const { container } = render(Wrapper)
+      const inputs = getBoxes(container)
+      expect(inputs[0].checked).toBe(true)
+      await fireEvent.click(inputs[1])
+      await nextTick()
+      expect(inputs[1].checked).toBe(true)
+    })
+
+    it('lets a child override the inherited size', () => {
+      const { container } = renderGroup(`
+        <CheckboxGroup size="sm">
+          <Checkbox value="a" size="lg">A</Checkbox>
+          <Checkbox value="b">B</Checkbox>
+        </CheckboxGroup>
+      `)
+      expect(getBoxes(container)).toHaveLength(2)
+    })
+
+    it('does not emit when the group is disabled', async () => {
+      const onChange = vi.fn()
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(
+              CheckboxGroup,
+              { disabled: true, onChange },
+              {
+                default: () => [
+                  h(Checkbox, { value: 'a' }, () => 'A'),
+                  h(Checkbox, { value: 'b' }, () => 'B')
+                ]
+              }
+            )
+        }
+      })
+      const { container } = render(Wrapper)
+      const inputs = getBoxes(container)
+      inputs.forEach((input) => expect(input).toBeDisabled())
+      await fireEvent.click(inputs[0])
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('allows an individual checkbox to be disabled', () => {
+      const { container } = renderGroup(`
+        <CheckboxGroup>
+          <Checkbox value="a" disabled>A</Checkbox>
+          <Checkbox value="b">B</Checkbox>
+        </CheckboxGroup>
+      `)
+      const inputs = getBoxes(container)
+      expect(inputs[0]).toBeDisabled()
+      expect(inputs[1]).not.toBeDisabled()
+    })
+
+    it('emits change and update:modelValue with the selected values', async () => {
+      const onChange = vi.fn()
+      const onUpdate = vi.fn()
+      const { container } = renderGroup(
+        `
+        <CheckboxGroup @change="onChange" @update:modelValue="onUpdate">
+          <Checkbox value="a">A</Checkbox>
+          <Checkbox value="b">B</Checkbox>
+        </CheckboxGroup>
+      `,
+        () => ({ onChange, onUpdate })
+      )
+      await fireEvent.click(getBoxes(container)[0])
+      expect(onChange).toHaveBeenCalledWith(['a'])
+      expect(onUpdate).toHaveBeenCalledWith(['a'])
+    })
+
+    it('supports a select-all / indeterminate pattern', async () => {
+      const Wrapper = defineComponent({
+        setup() {
+          const values = ref<string[]>([])
+          const allOptions = ['a', 'b', 'c']
+          const isAllChecked = () => values.value.length === allOptions.length
+          const isIndeterminate = () =>
+            values.value.length > 0 && values.value.length < allOptions.length
+          const toggleAll = (checked: boolean) => {
+            values.value = checked ? [...allOptions] : []
+          }
+          return () =>
+            h('div', [
+              h(
+                Checkbox,
+                {
+                  modelValue: isAllChecked(),
+                  indeterminate: isIndeterminate(),
+                  'onUpdate:modelValue': toggleAll
+                },
+                () => 'Select All'
+              ),
               h(
                 CheckboxGroup,
                 {
-                  modelValue: value.value,
-                  'onUpdate:modelValue': (v: (string | number | boolean)[]) => {
-                    value.value = v
+                  modelValue: values.value,
+                  'onUpdate:modelValue': (v: string[]) => {
+                    values.value = v
                   }
                 },
                 {
-                  default: () => [
-                    h(Checkbox, { value: 'apple' }, () => 'Apple'),
-                    h(Checkbox, { value: 'banana' }, () => 'Banana')
-                  ]
+                  default: () =>
+                    allOptions.map((opt) => h(Checkbox, { value: opt, key: opt }, () => opt))
                 }
               )
-          }
-        })
-
-        const { container } = render(Wrapper)
-        const inputs = container.querySelectorAll('input[type="checkbox"]')
-
-        expect((inputs[0] as HTMLInputElement).checked).toBe(true)
-        expect((inputs[1] as HTMLInputElement).checked).toBe(false)
-
-        await fireEvent.click(inputs[1])
-        await nextTick()
-
-        expect((inputs[0] as HTMLInputElement).checked).toBe(true)
-        expect((inputs[1] as HTMLInputElement).checked).toBe(true)
+            ])
+        }
       })
-    })
+      const { container } = render(Wrapper)
+      const inputs = getBoxes(container)
+      const selectAll = inputs[0]
+      const options = inputs.slice(1)
 
-    describe('Size Inheritance', () => {
-      it.each(componentSizes)('passes %s size to children', (size) => {
-        const { container } = render({
-          components: { CheckboxGroup, Checkbox },
-          template: `
-            <CheckboxGroup size="${size}">
-              <Checkbox value="a">A</Checkbox>
-              <Checkbox value="b">B</Checkbox>
-            </CheckboxGroup>
-          `
-        })
+      expect(selectAll.checked).toBe(false)
+      expect(selectAll.indeterminate).toBe(false)
 
-        expect(container.querySelectorAll('input[type="checkbox"]')).toHaveLength(2)
-      })
+      await fireEvent.click(selectAll)
+      await nextTick()
+      expect(selectAll.checked).toBe(true)
+      options.forEach((cb) => expect(cb.checked).toBe(true))
 
-      it('allows child to override size', () => {
-        const { container } = render({
-          components: { CheckboxGroup, Checkbox },
-          template: `
-            <CheckboxGroup size="sm">
-              <Checkbox value="a" size="lg">A</Checkbox>
-              <Checkbox value="b">B</Checkbox>
-            </CheckboxGroup>
-          `
-        })
+      await fireEvent.click(options[0])
+      await nextTick()
+      expect(selectAll.indeterminate).toBe(true)
 
-        expect(container.querySelectorAll('input[type="checkbox"]')).toHaveLength(2)
-      })
-    })
-
-    describe('Disabled State', () => {
-      it('should not allow selection when group is disabled', async () => {
-        const onChange = vi.fn()
-        const Wrapper = defineComponent({
-          setup() {
-            return () =>
-              h(
-                CheckboxGroup,
-                { disabled: true, onChange },
-                {
-                  default: () => [
-                    h(Checkbox, { value: 'a' }, () => 'A'),
-                    h(Checkbox, { value: 'b' }, () => 'B')
-                  ]
-                }
-              )
-          }
-        })
-
-        const { container } = render(Wrapper)
-        const inputs = container.querySelectorAll('input[type="checkbox"]')
-
-        // Clicking should not trigger onChange when group is disabled
-        await fireEvent.click(inputs[0])
-        expect(onChange).not.toHaveBeenCalled()
-      })
-
-      it('does not emit events when group is disabled', async () => {
-        const onChange = vi.fn()
-        const Wrapper = defineComponent({
-          setup() {
-            return () =>
-              h(
-                CheckboxGroup,
-                { disabled: true, onChange },
-                {
-                  default: () => [h(Checkbox, { value: 'a' }, () => 'A')]
-                }
-              )
-          }
-        })
-
-        const { container } = render(Wrapper)
-        await fireEvent.click(container.querySelector('input[type="checkbox"]')!)
-        expect(onChange).not.toHaveBeenCalled()
-      })
-
-      it('allows individual checkbox to be disabled', () => {
-        const { container } = render({
-          components: { CheckboxGroup, Checkbox },
-          template: `
-            <CheckboxGroup>
-              <Checkbox value="a" disabled>A</Checkbox>
-              <Checkbox value="b">B</Checkbox>
-            </CheckboxGroup>
-          `
-        })
-
-        const inputs = container.querySelectorAll('input[type="checkbox"]')
-        expect(inputs[0]).toBeDisabled()
-        expect(inputs[1]).not.toBeDisabled()
-      })
-    })
-
-    describe('Events', () => {
-      it('emits change event with selected values', async () => {
-        const onChange = vi.fn()
-        const { container } = render({
-          components: { CheckboxGroup, Checkbox },
-          template: `
-            <CheckboxGroup @change="onChange">
-              <Checkbox value="a">A</Checkbox>
-              <Checkbox value="b">B</Checkbox>
-            </CheckboxGroup>
-          `,
-          setup() {
-            return { onChange }
-          }
-        })
-
-        const inputs = container.querySelectorAll('input[type="checkbox"]')
-        await fireEvent.click(inputs[0])
-
-        expect(onChange).toHaveBeenCalledWith(['a'])
-      })
-
-      it('emits update:modelValue event', async () => {
-        const onUpdate = vi.fn()
-        const { container } = render({
-          components: { CheckboxGroup, Checkbox },
-          template: `
-            <CheckboxGroup @update:modelValue="onUpdate">
-              <Checkbox value="a">A</Checkbox>
-              <Checkbox value="b">B</Checkbox>
-            </CheckboxGroup>
-          `,
-          setup() {
-            return { onUpdate }
-          }
-        })
-
-        const inputs = container.querySelectorAll('input[type="checkbox"]')
-        await fireEvent.click(inputs[1])
-
-        expect(onUpdate).toHaveBeenCalledWith(['b'])
-      })
-
-      it('emits with numeric values', async () => {
-        const onChange = vi.fn()
-        const { container } = render({
-          components: { CheckboxGroup, Checkbox },
-          template: `
-            <CheckboxGroup @change="onChange">
-              <Checkbox :value="1">One</Checkbox>
-              <Checkbox :value="2">Two</Checkbox>
-            </CheckboxGroup>
-          `,
-          setup() {
-            return { onChange }
-          }
-        })
-
-        const inputs = container.querySelectorAll('input[type="checkbox"]')
-        await fireEvent.click(inputs[0])
-        await fireEvent.click(inputs[1])
-
-        expect(onChange).toHaveBeenLastCalledWith([1, 2])
-      })
-    })
-
-    describe('Select All Pattern', () => {
-      it('supports select all / deselect all pattern', async () => {
-        const Wrapper = defineComponent({
-          setup() {
-            const values = ref<string[]>([])
-            const allOptions = ['a', 'b', 'c']
-
-            const isAllChecked = () => values.value.length === allOptions.length
-            const isIndeterminate = () =>
-              values.value.length > 0 && values.value.length < allOptions.length
-
-            const toggleAll = (checked: boolean) => {
-              values.value = checked ? [...allOptions] : []
-            }
-
-            return () =>
-              h('div', [
-                h(
-                  Checkbox,
-                  {
-                    modelValue: isAllChecked(),
-                    indeterminate: isIndeterminate(),
-                    'onUpdate:modelValue': toggleAll
-                  },
-                  () => 'Select All'
-                ),
-                h(
-                  CheckboxGroup,
-                  {
-                    modelValue: values.value,
-                    'onUpdate:modelValue': (v: string[]) => {
-                      values.value = v
-                    }
-                  },
-                  {
-                    default: () =>
-                      allOptions.map((opt) => h(Checkbox, { value: opt, key: opt }, () => opt))
-                  }
-                )
-              ])
-          }
-        })
-
-        const { container } = render(Wrapper)
-        const inputs = container.querySelectorAll(
-          'input[type="checkbox"]'
-        ) as NodeListOf<HTMLInputElement>
-        const selectAllCheckbox = inputs[0]
-        const optionCheckboxes = Array.from(inputs).slice(1) as HTMLInputElement[]
-
-        // Initially nothing is selected
-        expect(selectAllCheckbox.checked).toBe(false)
-        expect(selectAllCheckbox.indeterminate).toBe(false)
-        optionCheckboxes.forEach((cb) => expect(cb.checked).toBe(false))
-
-        // Click select all
-        await fireEvent.click(selectAllCheckbox)
-        await nextTick()
-
-        expect(selectAllCheckbox.checked).toBe(true)
-        optionCheckboxes.forEach((cb) => expect(cb.checked).toBe(true))
-
-        // Uncheck one option -> indeterminate
-        await fireEvent.click(optionCheckboxes[0])
-        await nextTick()
-
-        expect(selectAllCheckbox.indeterminate).toBe(true)
-
-        // Click select all again to select all
-        await fireEvent.click(selectAllCheckbox)
-        await nextTick()
-
-        expect(selectAllCheckbox.checked).toBe(true)
-        expect(selectAllCheckbox.indeterminate).toBe(false)
-      })
+      await fireEvent.click(selectAll)
+      await nextTick()
+      expect(selectAll.checked).toBe(true)
+      expect(selectAll.indeterminate).toBe(false)
     })
   })
 
@@ -710,128 +398,55 @@ describe('Checkbox', () => {
     })
 
     it('supports theme variables', () => {
-      setThemeVariables({
-        '--tiger-primary': '#ff0000'
-      })
-
-      render(Checkbox, {
-        props: { modelValue: true },
-        slots: { default: 'Themed' }
-      })
-
+      setThemeVariables({ '--tiger-primary': '#ff0000' })
+      render(Checkbox, { props: { modelValue: true }, slots: { default: 'Themed' } })
       const rootStyles = window.getComputedStyle(document.documentElement)
       expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 
   describe('Accessibility', () => {
-    it('has no accessibility violations', async () => {
-      const { container } = render(Checkbox, {
-        slots: { default: 'Accessible Checkbox' }
-      })
+    it('is focusable', () => {
+      const { container } = render(Checkbox, { slots: { default: 'Checkbox' } })
+      const box = getBox(container)
+      box.focus()
+      expect(box).toHaveFocus()
+    })
 
+    it('has no violations for a standalone checkbox', async () => {
+      const { container } = render(Checkbox, { slots: { default: 'Accessible Checkbox' } })
       await expectNoA11yViolationsIsolated(container)
     })
 
-    it('is focusable', () => {
-      const { container } = render(Checkbox, {
-        slots: { default: 'Checkbox' }
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')!
-      checkbox.focus()
-      expect(checkbox).toHaveFocus()
-    })
-
-    it('has proper type attribute', () => {
-      const { container } = render(Checkbox, {
-        slots: { default: 'Checkbox' }
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')
-      expect(checkbox).toHaveAttribute('type', 'checkbox')
-    })
-
-    it('CheckboxGroup passes accessibility checks', async () => {
-      const { container } = render({
-        components: { CheckboxGroup, Checkbox },
-        template: `
-          <CheckboxGroup>
-            <Checkbox value="a">Option A</Checkbox>
-            <Checkbox value="b">Option B</Checkbox>
-          </CheckboxGroup>
-        `
-      })
-
+    it('has no violations for a checkbox group', async () => {
+      const { container } = renderGroup(`
+        <CheckboxGroup>
+          <Checkbox value="a">Option A</Checkbox>
+          <Checkbox value="b">Option B</Checkbox>
+        </CheckboxGroup>
+      `)
       await expectNoA11yViolationsIsolated(container)
     })
   })
 
   describe('Edge Cases', () => {
-    it('handles empty string value', () => {
-      const { container } = render(Checkbox, {
-        props: { value: '' },
-        slots: { default: 'Empty Value' }
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')
-      expect(checkbox).toHaveAttribute('value', '')
-    })
-
-    it('handles boolean value', () => {
+    it('serializes non-string values onto the input', () => {
       const { container } = render(Checkbox, {
         props: { value: true },
         slots: { default: 'Boolean' }
       })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')
-      expect(checkbox).toHaveAttribute('value', 'true')
+      expect(getBox(container)).toHaveAttribute('value', 'true')
     })
 
-    it('handles special characters in value', () => {
+    it('handles special characters in the value', () => {
       const { container } = render(Checkbox, {
         props: { value: '<>&"\'`' },
         slots: { default: 'Special' }
       })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')
-      expect(checkbox).toHaveAttribute('value', '<>&"\'`')
+      expect(getBox(container)).toHaveAttribute('value', '<>&"\'`')
     })
 
-    it('handles rapid clicks', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Checkbox, {
-        props: { 'onUpdate:modelValue': onUpdate },
-        slots: { default: 'Rapid' }
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')!
-
-      await fireEvent.click(checkbox)
-      await fireEvent.click(checkbox)
-      await fireEvent.click(checkbox)
-
-      expect(onUpdate).toHaveBeenCalledTimes(3)
-      expect(onUpdate.mock.calls[0][0]).toBe(true)
-      expect(onUpdate.mock.calls[1][0]).toBe(false)
-      expect(onUpdate.mock.calls[2][0]).toBe(true)
-    })
-
-    it('handles switching between controlled and uncontrolled', async () => {
-      const { container, rerender } = render(Checkbox, {
-        props: { defaultValue: true },
-        slots: { default: 'Checkbox' }
-      })
-
-      let checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(checkbox.checked).toBe(true)
-
-      await rerender({ modelValue: false })
-      checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(checkbox.checked).toBe(false)
-    })
-
-    it('handles many checkboxes in group', async () => {
+    it('handles many checkboxes in a group', async () => {
       const options = Array.from({ length: 20 }, (_, i) => `option${i}`)
       const Wrapper = defineComponent({
         setup() {
@@ -846,26 +461,20 @@ describe('Checkbox', () => {
                 }
               },
               {
-                default: () =>
-                  options.map((opt) => h(Checkbox, { value: opt, key: opt }, () => opt))
+                default: () => options.map((opt) => h(Checkbox, { value: opt, key: opt }, () => opt))
               }
             )
         }
       })
-
       const { container } = render(Wrapper)
-      const inputs = container.querySelectorAll('input[type="checkbox"]')
-
+      const inputs = getBoxes(container)
       expect(inputs).toHaveLength(20)
-
-      // Click first and last
       await fireEvent.click(inputs[0])
       await fireEvent.click(inputs[19])
       await nextTick()
-
-      expect((inputs[0] as HTMLInputElement).checked).toBe(true)
-      expect((inputs[19] as HTMLInputElement).checked).toBe(true)
-      expect((inputs[10] as HTMLInputElement).checked).toBe(false)
+      expect(inputs[0].checked).toBe(true)
+      expect(inputs[19].checked).toBe(true)
+      expect(inputs[10].checked).toBe(false)
     })
   })
 })

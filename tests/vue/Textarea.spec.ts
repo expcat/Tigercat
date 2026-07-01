@@ -16,487 +16,202 @@ import {
 } from '../utils'
 
 describe('Textarea', () => {
-  describe('Rendering', () => {
-    it('should render with default props', () => {
-      render(Textarea)
+  const getTextarea = () => screen.getByRole('textbox') as HTMLTextAreaElement
 
-      const textarea = screen.getByRole('textbox')
-      expect(textarea).toBeInTheDocument()
-      expect(textarea).toHaveClass('block')
-      expect(textarea).toHaveClass('border')
+  describe('Rendering', () => {
+    it('renders a textbox by default', () => {
+      render(Textarea)
+      expect(screen.getByRole('textbox')).toBeInTheDocument()
     })
 
-    it('should render with placeholder', () => {
-      const { getByPlaceholderText } = renderWithProps(Textarea, {
-        placeholder: 'Enter text'
-      })
-
+    it('renders the placeholder', () => {
+      const { getByPlaceholderText } = renderWithProps(Textarea, { placeholder: 'Enter text' })
       expect(getByPlaceholderText('Enter text')).toBeInTheDocument()
     })
 
-    it('should render with initial value', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: 'Initial value'
+    it('forwards attrs (data/title/aria)', () => {
+      render(Textarea, {
+        attrs: { 'data-testid': 'test-textarea', title: 'Title', 'aria-describedby': 'help' }
       })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe('Initial value')
-    })
-
-    it('should forward attrs (data/aria/title)', () => {
-      const { getByRole } = render(Textarea, {
-        attrs: {
-          'data-testid': 'test-textarea',
-          title: 'Textarea title',
-          'aria-describedby': 'textarea-help'
-        }
-      })
-
-      const textarea = getByRole('textbox')
+      const textarea = getTextarea()
       expect(textarea).toHaveAttribute('data-testid', 'test-textarea')
-      expect(textarea).toHaveAttribute('title', 'Textarea title')
-      expect(textarea).toHaveAttribute('aria-describedby', 'textarea-help')
+      expect(textarea).toHaveAttribute('title', 'Title')
+      expect(textarea).toHaveAttribute('aria-describedby', 'help')
     })
 
-    it('should render wrapper div', () => {
-      const { container } = render(Textarea)
-      const wrapper = container.firstChild as HTMLElement
-      expect(wrapper.tagName).toBe('DIV')
-      expect(wrapper).toHaveClass('w-full')
-    })
-
-    it('should apply className prop to textarea', () => {
-      const { getByRole } = render(Textarea, {
-        props: { className: 'custom-textarea-class' }
-      })
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveClass('custom-textarea-class')
-    })
-
-    it('should merge class from attrs with className prop', () => {
-      const { getByRole } = render(Textarea, {
-        props: { className: 'from-prop' },
-        attrs: { class: 'from-attr' }
-      })
-      const textarea = getByRole('textbox')
+    it('merges the className prop with class from attrs', () => {
+      render(Textarea, { props: { className: 'from-prop' }, attrs: { class: 'from-attr' } })
+      const textarea = getTextarea()
       expect(textarea).toHaveClass('from-prop')
       expect(textarea).toHaveClass('from-attr')
     })
   })
 
   describe('Props', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
+    it.each(componentSizes)('renders %s size', (size) => {
       const { getByRole } = renderWithProps(Textarea, { size })
       expect(getByRole('textbox')).toBeInTheDocument()
     })
 
-    it('should apply common native attributes', () => {
+    it('applies common native attributes', () => {
       const { getByRole } = renderWithProps(Textarea, {
         rows: 5,
         maxLength: 10,
         minLength: 2,
         name: 'description',
-        id: 'textarea-id',
-        autoComplete: 'off',
+        id: 'ta',
         autoFocus: true
       })
-
       const textarea = getByRole('textbox')
       expect(textarea).toHaveAttribute('rows', '5')
       expect(textarea).toHaveAttribute('maxlength', '10')
       expect(textarea).toHaveAttribute('minlength', '2')
       expect(textarea).toHaveAttribute('name', 'description')
-      expect(textarea).toHaveAttribute('id', 'textarea-id')
-      expect(textarea).toHaveAttribute('autocomplete', 'off')
+      expect(textarea).toHaveAttribute('id', 'ta')
       expect(textarea).toHaveAttribute('autofocus')
     })
 
-    it('should use default rows of 3', () => {
-      const { getByRole } = render(Textarea)
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveAttribute('rows', '3')
-    })
-
-    it('should apply style prop', () => {
-      const { getByRole } = render(Textarea, {
-        props: { style: { minHeight: '100px' } }
-      })
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveStyle({ minHeight: '100px' })
-    })
-  })
-
-  describe('Rows Control', () => {
-    it('should set custom rows value', () => {
-      const { getByRole } = renderWithProps(Textarea, { rows: 10 })
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveAttribute('rows', '10')
-    })
-
-    it('should handle rows value of 1', () => {
-      const { getByRole } = renderWithProps(Textarea, { rows: 1 })
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveAttribute('rows', '1')
-    })
-
-    it('should handle large rows value', () => {
-      const { getByRole } = renderWithProps(Textarea, { rows: 50 })
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveAttribute('rows', '50')
+    it('defaults rows to 3 and honors a custom rows value', async () => {
+      const { getByRole, rerender } = render(Textarea)
+      expect(getByRole('textbox')).toHaveAttribute('rows', '3')
+      await rerender({ rows: 10 })
+      expect(getByRole('textbox')).toHaveAttribute('rows', '10')
     })
   })
 
   describe('States', () => {
-    it('should be disabled when disabled prop is true', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        disabled: true
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toBeDisabled()
-      expect(textarea.className).toContain('disabled:')
+    it('is disabled when disabled', () => {
+      const { getByRole } = renderWithProps(Textarea, { disabled: true })
+      expect(getByRole('textbox')).toBeDisabled()
     })
 
-    it('should be readonly when readonly prop is true', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        readonly: true
-      })
-
+    it('combines readonly and required states', () => {
+      const { getByRole } = renderWithProps(Textarea, { readonly: true, required: true })
       const textarea = getByRole('textbox')
       expect(textarea).toHaveAttribute('readonly')
+      expect(textarea).toBeRequired()
+    })
+  })
+
+  describe('Value binding (v-model)', () => {
+    it('reflects modelValue and syncs on change', async () => {
+      const { getByRole, rerender } = renderWithProps(Textarea, { modelValue: 'first' })
+      expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe('first')
+      await rerender({ modelValue: 'second' })
+      expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe('second')
+      await rerender({ modelValue: '' })
+      expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe('')
     })
 
-    it('should show required state', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        required: true
-      })
-
-      expect(getByRole('textbox')).toBeRequired()
+    it('treats undefined modelValue as an empty string', () => {
+      const { getByRole } = renderWithProps(Textarea, { modelValue: undefined })
+      expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe('')
     })
 
-    it('should combine disabled and readonly states', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        disabled: true,
-        readonly: true
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toBeDisabled()
-      expect(textarea).toHaveAttribute('readonly')
+    it('preserves multiline text', () => {
+      const multiline = 'Line 1\nLine 2\nLine 3'
+      const { getByRole } = renderWithProps(Textarea, { modelValue: multiline })
+      expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe(multiline)
     })
   })
 
   describe('Events', () => {
-    it('should emit update:modelValue on input', async () => {
+    it('emits update:modelValue and input on input', async () => {
       const onUpdate = vi.fn()
-      const { getByRole } = render(Textarea, {
-        props: {
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const textarea = getByRole('textbox')
-      await fireEvent.update(textarea, 'test')
-
-      expect(onUpdate).toHaveBeenCalledWith('test')
-    })
-
-    it('should emit input event', async () => {
       const onInput = vi.fn()
       const { getByRole } = render(Textarea, {
-        props: {
-          onInput
-        }
+        props: { 'onUpdate:modelValue': onUpdate, onInput }
       })
-
-      const textarea = getByRole('textbox')
-      await fireEvent.update(textarea, 'test')
-
+      await fireEvent.update(getByRole('textbox'), 'test')
+      expect(onUpdate).toHaveBeenCalledWith('test')
       expect(onInput).toHaveBeenCalled()
     })
 
-    it('should emit change event', async () => {
-      const onChange = vi.fn()
-      const { getByRole } = render(Textarea, {
-        props: {
-          onChange
-        }
-      })
-
-      const textarea = getByRole('textbox')
-      await fireEvent.update(textarea, 'test')
-      textarea.dispatchEvent(new Event('change', { bubbles: true }))
-
-      expect(onChange).toHaveBeenCalled()
-    })
-
-    it('should emit focus event', async () => {
+    it('emits focus and blur', async () => {
       const onFocus = vi.fn()
-      const { getByRole } = render(Textarea, {
-        props: {
-          onFocus
-        }
-      })
-
+      const onBlur = vi.fn()
+      const { getByRole } = render(Textarea, { props: { onFocus, onBlur } })
       const textarea = getByRole('textbox')
       await fireEvent.focus(textarea)
-
       expect(onFocus).toHaveBeenCalled()
-    })
-
-    it('should emit blur event', async () => {
-      const onBlur = vi.fn()
-      const { getByRole } = render(Textarea, {
-        props: {
-          onBlur
-        }
-      })
-
-      const textarea = getByRole('textbox')
       await fireEvent.blur(textarea)
-
       expect(onBlur).toHaveBeenCalled()
     })
 
-    it('should not emit events when disabled', async () => {
-      const onUpdate = vi.fn()
-      const onInput = vi.fn()
-      const { getByRole } = render(Textarea, {
-        props: {
-          disabled: true,
-          'onUpdate:modelValue': onUpdate,
-          onInput
-        }
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toBeDisabled()
-    })
-
-    it('should handle Tab key navigation', async () => {
+    it('is reachable and blurrable via Tab', async () => {
       const user = userEvent.setup()
       const onFocus = vi.fn()
       const onBlur = vi.fn()
-
-      const { getByRole } = render(Textarea, {
-        props: { onFocus, onBlur }
-      })
-
+      const { getByRole } = render(Textarea, { props: { onFocus, onBlur } })
       const textarea = getByRole('textbox')
-
       await user.tab()
       expect(textarea).toHaveFocus()
       expect(onFocus).toHaveBeenCalled()
-
       await user.tab()
       expect(textarea).not.toHaveFocus()
       expect(onBlur).toHaveBeenCalled()
     })
   })
 
-  describe('v-model binding', () => {
-    it('should update value when modelValue changes', async () => {
-      const { getByRole, rerender } = renderWithProps(Textarea, {
-        modelValue: 'initial'
-      })
-
-      let textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe('initial')
-
-      await rerender({ modelValue: 'updated' })
-      textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe('updated')
-    })
-
-    it('should handle empty string modelValue', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: ''
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe('')
-    })
-
-    it('should handle undefined modelValue', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: undefined
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe('')
-    })
-
-    it('should handle multiline text', () => {
-      const multilineText = 'Line 1\nLine 2\nLine 3'
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: multilineText
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe(multilineText)
-    })
-
-    it('should sync localValue with modelValue changes', async () => {
-      const { getByRole, rerender } = renderWithProps(Textarea, {
-        modelValue: 'first'
-      })
-
-      let textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe('first')
-
-      await rerender({ modelValue: 'second' })
-      textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe('second')
-
-      await rerender({ modelValue: '' })
-      textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe('')
-    })
-  })
-
   describe('AutoResize', () => {
-    it('should have resize-y class when autoResize is false', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        autoResize: false
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveClass('resize-y')
+    it.each([
+      [false, 'resize-y'],
+      [true, 'resize-none']
+    ])('applies the resize class for autoResize=%s', (autoResize, className) => {
+      const { getByRole } = renderWithProps(Textarea, { autoResize })
+      expect(getByRole('textbox')).toHaveClass(className)
     })
 
-    it('should have resize-none class when autoResize is true', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        autoResize: true
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveClass('resize-none')
-    })
-
-    it('should accept minRows prop', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        autoResize: true,
-        minRows: 2
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toBeInTheDocument()
-    })
-
-    it('should accept maxRows prop', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        autoResize: true,
-        maxRows: 10
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toBeInTheDocument()
-    })
-
-    it('should accept both minRows and maxRows props', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        autoResize: true,
-        minRows: 3,
-        maxRows: 10
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toBeInTheDocument()
-    })
-
-    it('should trigger height adjustment on input when autoResize is true', async () => {
+    it('accepts minRows and maxRows and adjusts on input', async () => {
       const onInput = vi.fn()
       const { getByRole } = render(Textarea, {
-        props: {
-          autoResize: true,
-          onInput
-        }
+        props: { autoResize: true, minRows: 2, maxRows: 10, onInput }
       })
-
       const textarea = getByRole('textbox')
+      expect(textarea).toBeInTheDocument()
       await fireEvent.update(textarea, 'New content')
-
       expect(onInput).toHaveBeenCalled()
     })
   })
 
-  describe('Character Count (showCount)', () => {
-    it('shows count when showCount is enabled', () => {
-      renderWithProps(Textarea, {
-        modelValue: 'abc',
-        showCount: true,
-        maxLength: 10
-      })
-
+  describe('Character count (showCount)', () => {
+    it('shows the count with maxLength', () => {
+      renderWithProps(Textarea, { modelValue: 'abc', showCount: true, maxLength: 10 })
       expect(screen.getByText('3/10')).toBeInTheDocument()
     })
 
-    it('shows count without maxLength', () => {
-      renderWithProps(Textarea, {
-        modelValue: 'hello',
-        showCount: true
-      })
-
+    it('shows the count without maxLength', () => {
+      renderWithProps(Textarea, { modelValue: 'hello', showCount: true })
       expect(screen.getByText('5')).toBeInTheDocument()
     })
 
-    it('shows zero count for empty value', () => {
-      renderWithProps(Textarea, {
-        modelValue: '',
-        showCount: true
-      })
-
+    it('shows zero for an empty value', () => {
+      renderWithProps(Textarea, { modelValue: '', showCount: true })
       expect(screen.getByText('0')).toBeInTheDocument()
     })
 
-    it('shows count with maxLength for empty value', () => {
-      renderWithProps(Textarea, {
-        modelValue: '',
-        showCount: true,
-        maxLength: 100
-      })
-
-      expect(screen.getByText('0/100')).toBeInTheDocument()
-    })
-
-    it('updates count on input', async () => {
-      const onUpdate = vi.fn()
+    it('updates the count when modelValue changes', async () => {
       const { rerender } = render(Textarea, {
-        props: {
-          modelValue: 'ab',
-          showCount: true,
-          maxLength: 10,
-          'onUpdate:modelValue': onUpdate
-        }
+        props: { modelValue: 'ab', showCount: true, maxLength: 10 }
       })
-
       expect(screen.getByText('2/10')).toBeInTheDocument()
-
       await rerender({ modelValue: 'abcd', showCount: true, maxLength: 10 })
-
       expect(screen.getByText('4/10')).toBeInTheDocument()
     })
 
-    it('does not show count when showCount is false', () => {
+    it('does not show the count when showCount is false', () => {
       const { container } = renderWithProps(Textarea, {
         modelValue: 'abc',
         showCount: false,
         maxLength: 10
       })
-
       expect(container).not.toHaveTextContent('3/10')
     })
 
-    it('count container has correct classes', () => {
-      const { container } = renderWithProps(Textarea, {
-        modelValue: 'test',
-        showCount: true
-      })
-
-      const countDiv = container.querySelector('.text-right')
-      expect(countDiv).toBeInTheDocument()
-      expect(countDiv).toHaveClass('text-sm')
-      expect(countDiv).toHaveClass('text-gray-500')
+    it('counts unicode characters correctly', () => {
+      const unicodeText = '你好世界🌍'
+      renderWithProps(Textarea, { modelValue: unicodeText, showCount: true })
+      expect(screen.getByText(String(unicodeText.length))).toBeInTheDocument()
     })
   })
 
@@ -505,18 +220,10 @@ describe('Textarea', () => {
       clearThemeVariables(['--tiger-primary'])
     })
 
-    it('should support custom theme colors', () => {
-      setThemeVariables({
-        '--tiger-primary': '#ff0000'
-      })
-
-      const { getByRole } = renderWithProps(Textarea, {
-        placeholder: 'Themed textarea'
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toBeInTheDocument()
-
+    it('supports custom theme colors', () => {
+      setThemeVariables({ '--tiger-primary': '#ff0000' })
+      const { getByRole } = renderWithProps(Textarea, { placeholder: 'Themed textarea' })
+      expect(getByRole('textbox')).toBeInTheDocument()
       const rootStyles = window.getComputedStyle(document.documentElement)
       expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
@@ -524,125 +231,51 @@ describe('Textarea', () => {
 
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
-      const { container } = render(Textarea, {
-        attrs: {
-          'aria-label': 'Description textarea'
-        }
-      })
-
+      const { container } = render(Textarea, { attrs: { 'aria-label': 'Description textarea' } })
       await expectNoA11yViolationsIsolated(container)
     })
 
-    it('should be keyboard accessible', async () => {
-      const onFocus = vi.fn()
-      const { getByRole } = render(Textarea, {
-        props: { onFocus }
-      })
+    it('reflects aria-invalid for the error state', () => {
+      const { getByRole } = render(Textarea, { attrs: { 'aria-invalid': 'true' } })
+      expect(getByRole('textbox')).toHaveAttribute('aria-invalid', 'true')
+    })
 
+    it('is keyboard focusable', () => {
+      const onFocus = vi.fn()
+      const { getByRole } = render(Textarea, { props: { onFocus } })
       const textarea = getByRole('textbox')
       textarea.focus()
-
       expect(textarea).toHaveFocus()
       expect(onFocus).toHaveBeenCalled()
-    })
-
-    it('should have proper role', () => {
-      const { getByRole } = render(Textarea)
-
-      expect(getByRole('textbox')).toBeInTheDocument()
-    })
-
-    it('should support aria-label', () => {
-      const { getByLabelText } = render(Textarea, {
-        attrs: {
-          'aria-label': 'Comments textarea'
-        }
-      })
-
-      expect(getByLabelText('Comments textarea')).toBeInTheDocument()
-    })
-
-    it('should support aria-invalid for error state', () => {
-      const { getByRole } = render(Textarea, {
-        attrs: { 'aria-invalid': 'true' }
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveAttribute('aria-invalid', 'true')
     })
   })
 
   describe('Edge Cases', () => {
-    it('should handle whitespace-only value', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: edgeCaseData.whitespace
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe(edgeCaseData.whitespace)
+    it.each([
+      ['special characters', edgeCaseData.specialCharacters],
+      ['unicode', edgeCaseData.unicode],
+      ['HTML-like content', '<script>alert("xss")</script>']
+    ])('preserves %s in the value', (_label, text) => {
+      const { getByRole } = renderWithProps(Textarea, { modelValue: text })
+      expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe(text)
     })
 
-    it('should handle special characters', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: edgeCaseData.specialCharacters
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe(edgeCaseData.specialCharacters)
-    })
-
-    it('should handle unicode characters', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: edgeCaseData.unicode
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe(edgeCaseData.unicode)
-    })
-
-    it('should handle very long text', () => {
-      const longText = 'a'.repeat(5000)
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: longText
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe(longText)
-    })
-
-    it('should handle text with many newlines', () => {
-      const textWithNewlines = 'Line1\nLine2\nLine3\nLine4\nLine5'
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: textWithNewlines
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe(textWithNewlines)
-    })
-
-    it('should handle rapid value changes', async () => {
+    it('handles rapid value changes', async () => {
       const onUpdate = vi.fn()
-      const { getByRole } = render(Textarea, {
-        props: { 'onUpdate:modelValue': onUpdate }
-      })
-
+      const { getByRole } = render(Textarea, { props: { 'onUpdate:modelValue': onUpdate } })
       const textarea = getByRole('textbox')
-
       await fireEvent.update(textarea, 'a')
       await fireEvent.update(textarea, 'ab')
       await fireEvent.update(textarea, 'abc')
-
       expect(onUpdate).toHaveBeenCalledTimes(3)
     })
 
-    it('should render without crashing with all props', () => {
+    it('renders without crashing with all props set', () => {
       const { getByRole } = render(Textarea, {
         props: {
           modelValue: 'test content',
           size: 'lg',
           placeholder: 'Enter description',
-          disabled: false,
-          readonly: false,
           required: true,
           rows: 5,
           autoResize: false,
@@ -652,36 +285,11 @@ describe('Textarea', () => {
           minLength: 10,
           name: 'description',
           id: 'textarea-id',
-          autoComplete: 'off',
-          autoFocus: false,
           showCount: true,
-          className: 'custom-class',
-          style: { width: '100%' }
+          className: 'custom-class'
         }
       })
-
       expect(getByRole('textbox')).toBeInTheDocument()
-    })
-
-    it('should handle HTML-like content safely', () => {
-      const htmlContent = '<script>alert("xss")</script>'
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: htmlContent
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe(htmlContent)
-    })
-
-    it('should correctly count unicode characters', () => {
-      const unicodeText = '你好世界🌍'
-      renderWithProps(Textarea, {
-        modelValue: unicodeText,
-        showCount: true
-      })
-
-      // Unicode characters should be counted correctly
-      expect(screen.getByText(String(unicodeText.length))).toBeInTheDocument()
     })
   })
 })

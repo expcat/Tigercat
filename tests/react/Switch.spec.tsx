@@ -15,138 +15,138 @@ import {
 } from '../utils/react'
 
 describe('Switch', () => {
+  const getSwitch = (container: HTMLElement) =>
+    container.querySelector('[role="switch"]') as HTMLElement
+
   describe('Rendering', () => {
-    it('should render with default props', () => {
+    it('renders a switch, unchecked by default', () => {
       const { container } = render(<Switch />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
+      const el = getSwitch(container)
+      expect(el).toBeInTheDocument()
+      expect(el).toHaveAttribute('aria-checked', 'false')
     })
 
-    it('should render in unchecked state by default', () => {
-      const { container } = render(<Switch />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
+    it('reflects the checked prop via aria-checked', () => {
+      const { container, rerender } = render(<Switch checked={false} />)
+      expect(getSwitch(container)).toHaveAttribute('aria-checked', 'false')
+      rerender(<Switch checked />)
+      expect(getSwitch(container)).toHaveAttribute('aria-checked', 'true')
     })
 
-    it('should render in checked state when checked prop is true', () => {
-      const { container } = render(<Switch checked />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'true')
-    })
-
-    it('should apply custom className', () => {
+    it('applies custom className', () => {
       const { container } = render(<Switch className="custom-class" />)
-
       expect(container.querySelector('.custom-class')).toBeInTheDocument()
     })
 
-    it('should compose custom className with state classes', () => {
-      const { container } = render(<Switch className="custom-class" checked disabled />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveClass('custom-class')
-      expect(switchButton).toHaveClass('cursor-not-allowed')
-      expect(switchButton?.className).toContain('bg-[var(--tiger-primary,#2563eb)]')
-    })
-  })
-
-  describe('Props', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
+    it.each(componentSizes)('renders %s size', (size) => {
       const { container } = render(<Switch size={size} />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
-    })
-
-    it('should apply disabled state', () => {
-      const { container } = render(<Switch disabled />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveClass('cursor-not-allowed')
-      expect(switchButton).toHaveAttribute('aria-disabled', 'true')
+      expect(getSwitch(container)).toBeInTheDocument()
     })
   })
 
   describe('Events', () => {
-    it('should call onChange when clicked', async () => {
+    it.each([
+      [false, true],
+      [true, false]
+    ])('toggles onChange from %s to %s on click', async (checked, expected) => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+      const { container } = render(<Switch checked={checked} onChange={handleChange} />)
+      await user.click(getSwitch(container))
+      expect(handleChange).toHaveBeenCalledWith(expected)
+    })
+
+    it.each(['[Space]', '[Enter]'])('toggles onChange when %s is pressed', async (key) => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
       const { container } = render(<Switch checked={false} onChange={handleChange} />)
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      await user.click(switchButton)
-
+      getSwitch(container).focus()
+      await user.keyboard(key)
       expect(handleChange).toHaveBeenCalledWith(true)
     })
 
-    it('should not call onChange when disabled', async () => {
+    it('does not call onChange when disabled', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
       const { container } = render(<Switch disabled onChange={handleChange} />)
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      await user.click(switchButton)
-
+      await user.click(getSwitch(container))
       expect(handleChange).not.toHaveBeenCalled()
     })
 
-    it('should toggle from true to false', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container } = render(<Switch checked={true} onChange={handleChange} />)
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      await user.click(switchButton)
-
-      expect(handleChange).toHaveBeenCalledWith(false)
-    })
-
-    it('should call onChange when Space is pressed', async () => {
+    it('does not toggle on unrelated keys', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
       const { container } = render(<Switch checked={false} onChange={handleChange} />)
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      switchButton.focus()
-      await user.keyboard('[Space]')
-
-      expect(handleChange).toHaveBeenCalledWith(true)
+      getSwitch(container).focus()
+      await user.keyboard('a')
+      await user.keyboard('[Escape]')
+      expect(handleChange).not.toHaveBeenCalled()
     })
-  })
 
-  describe('Controlled Component', () => {
-    it('should work as controlled component', async () => {
+    it('works as a controlled component', async () => {
       const user = userEvent.setup()
       const TestComponent = () => {
         const [checked, setChecked] = React.useState(false)
-
         return <Switch checked={checked} onChange={(value) => setChecked(value)} />
       }
-
       const { container } = render(<TestComponent />)
-      const switchButton = container.querySelector('[role="switch"]')!
+      const el = getSwitch(container)
+      expect(el).toHaveAttribute('aria-checked', 'false')
+      await user.click(el)
+      expect(el).toHaveAttribute('aria-checked', 'true')
+    })
+  })
 
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
+  describe('Handler composition', () => {
+    it('fires both onClick and onChange', async () => {
+      const user = userEvent.setup()
+      const handleClick = vi.fn()
+      const handleChange = vi.fn()
+      const { container } = render(
+        <Switch checked={false} onClick={handleClick} onChange={handleChange} />
+      )
+      await user.click(getSwitch(container))
+      expect(handleClick).toHaveBeenCalled()
+      expect(handleChange).toHaveBeenCalledWith(true)
+    })
 
-      await user.click(switchButton)
+    it('skips onChange when onClick prevents default', async () => {
+      const user = userEvent.setup()
+      const handleClick = vi.fn((e) => e.preventDefault())
+      const handleChange = vi.fn()
+      const { container } = render(
+        <Switch checked={false} onClick={handleClick} onChange={handleChange} />
+      )
+      await user.click(getSwitch(container))
+      expect(handleClick).toHaveBeenCalled()
+      expect(handleChange).not.toHaveBeenCalled()
+    })
 
-      expect(switchButton).toHaveAttribute('aria-checked', 'true')
+    it('skips onChange when onKeyDown prevents default', async () => {
+      const user = userEvent.setup()
+      const handleKeyDown = vi.fn((e) => e.preventDefault())
+      const handleChange = vi.fn()
+      const { container } = render(
+        <Switch checked={false} onKeyDown={handleKeyDown} onChange={handleChange} />
+      )
+      getSwitch(container).focus()
+      await user.keyboard('[Space]')
+      expect(handleKeyDown).toHaveBeenCalled()
+      expect(handleChange).not.toHaveBeenCalled()
     })
   })
 
   describe('States', () => {
-    it('should show checked state correctly', () => {
-      const { container, rerender } = render(<Switch checked={false} />)
+    it('marks the disabled state and removes it from the tab order', () => {
+      const { container } = render(<Switch disabled />)
+      const el = getSwitch(container)
+      expect(el).toHaveAttribute('aria-disabled', 'true')
+      expect(el).toHaveAttribute('tabindex', '-1')
+    })
 
-      let switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
-
-      rerender(<Switch checked={true} />)
-      switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'true')
+    it('is in the tab order when enabled', () => {
+      const { container } = render(<Switch />)
+      expect(getSwitch(container)).not.toHaveAttribute('tabindex', '-1')
     })
   })
 
@@ -155,195 +155,26 @@ describe('Switch', () => {
       clearThemeVariables(['--tiger-primary'])
     })
 
-    it('should support custom theme colors', () => {
-      setThemeVariables({
-        '--tiger-primary': '#ff0000'
-      })
-
+    it('supports custom theme colors', () => {
+      setThemeVariables({ '--tiger-primary': '#ff0000' })
       const { container } = render(<Switch checked />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
-
+      expect(getSwitch(container)).toBeInTheDocument()
       const rootStyles = window.getComputedStyle(document.documentElement)
       expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
+    it('has no accessibility violations', async () => {
       const { container } = render(<Switch aria-label="Toggle switch" />)
-
       await expectNoA11yViolationsIsolated(container)
     })
 
-    it('should have proper role and aria attributes', () => {
-      const { container } = render(<Switch checked={false} />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('role', 'switch')
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
-    })
-
-    it('should be keyboard accessible with Enter', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container } = render(<Switch checked={false} onChange={handleChange} />)
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      switchButton.focus()
-      await user.keyboard('[Enter]')
-
-      expect(handleChange).toHaveBeenCalledWith(true)
-    })
-
-    it('should have tabindex 0 when enabled', () => {
-      const { container } = render(<Switch disabled={false} />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).not.toHaveAttribute('tabindex', '-1')
-    })
-
-    it('should have tabindex -1 when disabled', () => {
-      const { container } = render(<Switch disabled />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('tabindex', '-1')
-    })
-  })
-
-  describe('Edge Cases', () => {
-    it('should handle rapid clicks correctly', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container } = render(<Switch checked={false} onChange={handleChange} />)
-
-      const switchButton = container.querySelector('[role="switch"]')!
-
-      await user.click(switchButton)
-      await user.click(switchButton)
-      await user.click(switchButton)
-
-      // In controlled mode, each click emits the toggled value
-      // Since checked stays false, all clicks emit true
-      expect(handleChange).toHaveBeenCalledTimes(3)
-      expect(handleChange).toHaveBeenNthCalledWith(1, true)
-      expect(handleChange).toHaveBeenNthCalledWith(2, true)
-      expect(handleChange).toHaveBeenNthCalledWith(3, true)
-    })
-
-    it('should not trigger on other key presses', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container } = render(<Switch checked={false} onChange={handleChange} />)
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      switchButton.focus()
-
-      await user.keyboard('a')
-      await user.keyboard('[Escape]')
-      await user.keyboard('[Tab]')
-
-      expect(handleChange).not.toHaveBeenCalled()
-    })
-
-    it('should preserve custom className with other props', () => {
-      const { container } = render(<Switch className="custom-class" checked disabled={false} />)
-
-      const switchButton = container.querySelector('.custom-class')
-      expect(switchButton).toBeInTheDocument()
-    })
-
-    it('should handle aria-label prop', () => {
-      const { container } = render(<Switch aria-label="Custom label" />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-label', 'Custom label')
-    })
-
-    it('should handle aria-labelledby prop', () => {
-      const { container } = render(<Switch aria-labelledby="label-id" />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-labelledby', 'label-id')
-    })
-  })
-
-  describe('Event Handling', () => {
-    it('should call both onClick and onChange', async () => {
-      const user = userEvent.setup()
-      const handleClick = vi.fn()
-      const handleChange = vi.fn()
-      const { container } = render(
-        <Switch checked={false} onClick={handleClick} onChange={handleChange} />
-      )
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      await user.click(switchButton)
-
-      expect(handleClick).toHaveBeenCalled()
-      expect(handleChange).toHaveBeenCalledWith(true)
-    })
-
-    it('should not call onChange when onClick prevents default', async () => {
-      const user = userEvent.setup()
-      const handleClick = vi.fn((e) => e.preventDefault())
-      const handleChange = vi.fn()
-      const { container } = render(
-        <Switch checked={false} onClick={handleClick} onChange={handleChange} />
-      )
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      await user.click(switchButton)
-
-      expect(handleClick).toHaveBeenCalled()
-      expect(handleChange).not.toHaveBeenCalled()
-    })
-
-    it('should call both onKeyDown and onChange', async () => {
-      const user = userEvent.setup()
-      const handleKeyDown = vi.fn()
-      const handleChange = vi.fn()
-      const { container } = render(
-        <Switch checked={false} onKeyDown={handleKeyDown} onChange={handleChange} />
-      )
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      switchButton.focus()
-      await user.keyboard('[Space]')
-
-      expect(handleKeyDown).toHaveBeenCalled()
-      expect(handleChange).toHaveBeenCalledWith(true)
-    })
-
-    it('should not call onChange when onKeyDown prevents default', async () => {
-      const user = userEvent.setup()
-      const handleKeyDown = vi.fn((e) => e.preventDefault())
-      const handleChange = vi.fn()
-      const { container } = render(
-        <Switch checked={false} onKeyDown={handleKeyDown} onChange={handleChange} />
-      )
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      switchButton.focus()
-      await user.keyboard('[Space]')
-
-      expect(handleKeyDown).toHaveBeenCalled()
-      expect(handleChange).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('State Management', () => {
-    it('should maintain checked state across re-renders', () => {
-      const { container, rerender } = render(<Switch checked={true} />)
-
-      let switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'true')
-
-      rerender(<Switch checked={true} disabled />)
-
-      switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'true')
+    it('forwards aria-label and aria-labelledby', () => {
+      const { container } = render(<Switch aria-label="Custom label" aria-labelledby="label-id" />)
+      const el = getSwitch(container)
+      expect(el).toHaveAttribute('aria-label', 'Custom label')
+      expect(el).toHaveAttribute('aria-labelledby', 'label-id')
     })
   })
 })

@@ -21,11 +21,36 @@ This document defines the quality standards and best practices for writing tests
 
 High-quality tests are essential for maintaining a reliable component library. This document provides guidelines to ensure our tests are:
 
-- **Comprehensive**: Cover all functionality, edge cases, and error scenarios
+- **Lean**: Prefer a small set of behavior-focused tests over an exhaustive per-category matrix
 - **Maintainable**: Easy to read, understand, and modify
 - **Reliable**: Consistent results without flakiness
 - **Fast**: Run quickly to support rapid development
 - **Valuable**: Catch real bugs and prevent regressions
+
+## Lean-First Principles
+
+We deliberately keep the suite small. Follow these rules before adding a test:
+
+1. **Test behavior, not implementation.** Never assert on Tailwind class strings
+   (`toContain('my-4')`, `toHaveClass('border-solid')`). Assert on user-visible
+   behavior, roles, ARIA, attributes, and emitted events/values instead. A class
+   is only worth asserting when it is the _sole_ observable of a behavior (e.g.
+   the axis a divider draws on), and then assert it exactly once.
+2. **One assertion of intent per test.** If two tests exercise the same code path,
+   keep one. Don't split `Controlled` / `Uncontrolled` / `State Updates` (or
+   `Keyboard Navigation` / `Keyboard Interaction`, or mouse / touch drag) into
+   separate describe blocks — fold them together.
+3. **Collapse variant matrices.** Use a single `it.each` for prop→output checks,
+   and prefer representative values (min / mid / max) over exhaustive enumeration.
+4. **One accessibility test per component per framework** (`expectNoA11yViolations`).
+5. **No snapshot tests.** They are brittle and low-signal; assert the specific
+   thing you care about instead.
+6. **Don't test shared logic twice.** Pure utility logic belongs in `tests/core`;
+   framework specs (React/Vue) should focus on the framework binding (rendering
+   contract, events/emits, slots/children, controlled/uncontrolled, a11y wiring).
+
+The categories below are a _menu_, not a required checklist. Cover what is
+meaningful for the component and stop.
 
 ## Test Quality Metrics
 
@@ -36,8 +61,9 @@ High-quality tests are essential for maintaining a reliable component library. T
 - **Function Coverage**: Minimum 80% for each component
 - **Test Count** (`pnpm test:validate` enforced):
   - **Hard minimum**: 3 tests per file (below this → validation failure)
-  - **Recommended minimum**: 15 tests per file (30 for DatePicker/Upload/TimePicker)
+  - **Recommended minimum**: 8 tests per file (15 for DatePicker/Upload/TimePicker)
   - Below recommended triggers a warning, not a failure
+  - There is no upper cap, but lean is the goal: cover each real code path once
 
 ### Automated Validation (`pnpm test:validate`)
 
@@ -53,7 +79,6 @@ The validation script checks two severity levels:
 - Test count below recommended minimum
 - No `describe` blocks for grouping
 - Low descriptive naming ratio (less than 50% of test names contain action verbs)
-- No `describe('Edge Cases')` or `describe('Boundary')` section
 - No `expectNoA11yViolations` accessibility checks
 
 ### Grouped Validation

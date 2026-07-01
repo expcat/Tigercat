@@ -11,121 +11,60 @@ import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Breadcrumb', () => {
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      render(
+    it('renders items inside a labelled nav and ordered list', () => {
+      const { container } = render(
         <Breadcrumb>
           <BreadcrumbItem href="/">Home</BreadcrumbItem>
           <BreadcrumbItem href="/products">Products</BreadcrumbItem>
           <BreadcrumbItem current>Details</BreadcrumbItem>
         </Breadcrumb>
       )
-
+      expect(container.querySelector('nav')).toHaveAttribute('aria-label', 'Breadcrumb')
+      expect(container.querySelectorAll('ol > li')).toHaveLength(3)
       expect(screen.getByText('Home')).toBeInTheDocument()
-      expect(screen.getByText('Products')).toBeInTheDocument()
       expect(screen.getByText('Details')).toBeInTheDocument()
     })
 
-    it('should render with proper ARIA attributes', () => {
-      const { container } = render(
-        <Breadcrumb>
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const nav = container.querySelector('nav')
-      expect(nav).toHaveAttribute('aria-label', 'Breadcrumb')
-    })
-
-    it('should render breadcrumb items in ordered list', () => {
-      const { container } = render(
-        <Breadcrumb>
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-          <BreadcrumbItem current>Current</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const ol = container.querySelector('ol')
-      expect(ol).toBeInTheDocument()
-      expect(ol?.querySelectorAll('li')).toHaveLength(2)
-    })
-
-    it('should render extra content', () => {
+    it('renders extra content', () => {
       const { container } = render(
         <Breadcrumb extra={<button>Action</button>}>
           <BreadcrumbItem href="/">Home</BreadcrumbItem>
           <BreadcrumbItem current>Current</BreadcrumbItem>
         </Breadcrumb>
       )
-
       expect(screen.getByText('Action')).toBeInTheDocument()
-      const extraDiv = container.querySelector('.ml-auto')
-      expect(extraDiv).toBeInTheDocument()
+      expect(container.querySelector('.ml-auto')).toBeInTheDocument()
     })
   })
 
   describe('Separator', () => {
-    it('should render with default separator', () => {
+    it.each([
+      [undefined, '/'],
+      ['arrow', '→'],
+      ['chevron', '›'],
+      ['>', '>']
+    ])('renders the %s separator as "%s"', (separator, expected) => {
+      const { container } = render(
+        <Breadcrumb separator={separator as never}>
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
+          <BreadcrumbItem current>Current</BreadcrumbItem>
+        </Breadcrumb>
+      )
+      expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent(expected)
+    })
+
+    it('does not render a separator after the last item', () => {
       const { container } = render(
         <Breadcrumb>
           <BreadcrumbItem href="/">Home</BreadcrumbItem>
           <BreadcrumbItem current>Current</BreadcrumbItem>
         </Breadcrumb>
       )
-
-      const separator = container.querySelector('[aria-hidden="true"]')
-      expect(separator).toHaveTextContent('/')
-    })
-
-    it('should render with arrow separator', () => {
-      const { container } = render(
-        <Breadcrumb separator="arrow">
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-          <BreadcrumbItem current>Current</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const separator = container.querySelector('[aria-hidden="true"]')
-      expect(separator).toHaveTextContent('→')
-    })
-
-    it('should render with chevron separator', () => {
-      const { container } = render(
-        <Breadcrumb separator="chevron">
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-          <BreadcrumbItem current>Current</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const separator = container.querySelector('[aria-hidden="true"]')
-      expect(separator).toHaveTextContent('›')
-    })
-
-    it('should render with custom separator', () => {
-      const { container } = render(
-        <Breadcrumb separator=">">
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-          <BreadcrumbItem current>Current</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const separator = container.querySelector('[aria-hidden="true"]')
-      expect(separator).toHaveTextContent('>')
-    })
-
-    it('should not render separator for current/last item', () => {
-      const { container } = render(
-        <Breadcrumb>
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-          <BreadcrumbItem current>Current</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
       const items = container.querySelectorAll('li')
-      const lastItem = items[items.length - 1]
-      expect(lastItem?.querySelector('[aria-hidden="true"]')).toBeNull()
+      expect(items[items.length - 1]?.querySelector('[aria-hidden="true"]')).toBeNull()
     })
 
-    it('should allow item-level separator override', () => {
+    it('allows an item-level separator override', () => {
       const { container } = render(
         <Breadcrumb separator="/">
           <BreadcrumbItem href="/" separator="arrow">
@@ -134,51 +73,12 @@ describe('Breadcrumb', () => {
           <BreadcrumbItem current>Current</BreadcrumbItem>
         </Breadcrumb>
       )
-
-      const separator = container.querySelector('[aria-hidden="true"]')
-      expect(separator).toHaveTextContent('→')
+      expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('→')
     })
   })
 
   describe('BreadcrumbItem', () => {
-    it('should render as link when href is provided and not current', () => {
-      const { container } = render(
-        <Breadcrumb>
-          <BreadcrumbItem href="/home">Home</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const link = container.querySelector('a')
-      expect(link).toHaveAttribute('href', '/home')
-    })
-
-    it('should render as span when current is true', () => {
-      const { container } = render(
-        <Breadcrumb>
-          <BreadcrumbItem href="/current" current>
-            Current
-          </BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const span = container.querySelector('span')
-      expect(span).toBeInTheDocument()
-      expect(span).toHaveTextContent('Current')
-      expect(container.querySelector('a')).toBeNull()
-    })
-
-    it('should have aria-current="page" for current item', () => {
-      const { container } = render(
-        <Breadcrumb>
-          <BreadcrumbItem current>Current</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const span = container.querySelector('[aria-current="page"]')
-      expect(span).toBeInTheDocument()
-    })
-
-    it('should support target attribute', () => {
+    it('renders a link with target/rel when href is set and not current', () => {
       const { container } = render(
         <Breadcrumb>
           <BreadcrumbItem href="https://example.com" target="_blank">
@@ -186,13 +86,25 @@ describe('Breadcrumb', () => {
           </BreadcrumbItem>
         </Breadcrumb>
       )
-
       const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', 'https://example.com')
       expect(link).toHaveAttribute('target', '_blank')
       expect(link).toHaveAttribute('rel', 'noopener noreferrer')
     })
 
-    it('should render icon when provided', () => {
+    it('renders the current item as a span with aria-current="page"', () => {
+      const { container } = render(
+        <Breadcrumb>
+          <BreadcrumbItem href="/current" current>
+            Current
+          </BreadcrumbItem>
+        </Breadcrumb>
+      )
+      expect(container.querySelector('a')).toBeNull()
+      expect(container.querySelector('[aria-current="page"]')).toHaveTextContent('Current')
+    })
+
+    it('renders an icon alongside the label', () => {
       render(
         <Breadcrumb>
           <BreadcrumbItem href="/" icon="🏠">
@@ -200,17 +112,15 @@ describe('Breadcrumb', () => {
           </BreadcrumbItem>
         </Breadcrumb>
       )
-
       expect(screen.getByText('🏠')).toBeInTheDocument()
       expect(screen.getByText('Home')).toBeInTheDocument()
     })
   })
 
   describe('Events', () => {
-    it('should call onClick when item is clicked', async () => {
+    it('calls onClick when a link item is clicked', async () => {
       const handleClick = vi.fn()
       const user = userEvent.setup()
-
       render(
         <Breadcrumb>
           <BreadcrumbItem href="/home" onClick={handleClick}>
@@ -218,17 +128,13 @@ describe('Breadcrumb', () => {
           </BreadcrumbItem>
         </Breadcrumb>
       )
-
-      const link = screen.getByText('Home')
-      await user.click(link)
-
+      await user.click(screen.getByText('Home'))
       expect(handleClick).toHaveBeenCalledTimes(1)
     })
 
-    it('should not call onClick when current item is clicked', async () => {
+    it('does not call onClick on the current item', async () => {
       const handleClick = vi.fn()
       const user = userEvent.setup()
-
       render(
         <Breadcrumb>
           <BreadcrumbItem current onClick={handleClick}>
@@ -236,92 +142,33 @@ describe('Breadcrumb', () => {
           </BreadcrumbItem>
         </Breadcrumb>
       )
-
-      const item = screen.getByText('Current')
-      await user.click(item)
-
+      await user.click(screen.getByText('Current'))
       expect(handleClick).not.toHaveBeenCalled()
     })
   })
 
-  describe('Accessibility', () => {
-    it('should have proper semantic structure', () => {
-      const { container } = render(
-        <Breadcrumb>
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-          <BreadcrumbItem current>Current</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      expect(container.querySelector('nav')).toBeInTheDocument()
-      expect(container.querySelector('ol')).toBeInTheDocument()
-      expect(container.querySelectorAll('li')).toHaveLength(2)
-    })
-
-    it('should hide separators from screen readers', () => {
-      const { container } = render(
-        <Breadcrumb>
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-          <BreadcrumbItem current>Current</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const separator = container.querySelector('[aria-hidden="true"]')
-      expect(separator).toBeInTheDocument()
-    })
-  })
-
-  describe('Custom Classes and Styles', () => {
-    it('should apply custom className to container', () => {
+  describe('Custom classes and styles', () => {
+    it('applies custom className to the container and items', () => {
       const { container } = render(
         <Breadcrumb className="custom-breadcrumb">
-          <BreadcrumbItem>Home</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const nav = container.querySelector('nav')
-      expect(nav).toHaveClass('custom-breadcrumb')
-    })
-
-    it('should apply custom className to item', () => {
-      const { container } = render(
-        <Breadcrumb>
           <BreadcrumbItem className="custom-item">Home</BreadcrumbItem>
         </Breadcrumb>
       )
-
-      const item = container.querySelector('li')
-      expect(item).toHaveClass('custom-item')
+      expect(container.querySelector('nav')).toHaveClass('custom-breadcrumb')
+      expect(container.querySelector('li')).toHaveClass('custom-item')
     })
 
-    it('should apply custom style to container', () => {
+    it('applies custom style to the container and items', () => {
       const { container } = render(
         <Breadcrumb style={{ fontSize: '20px' }}>
-          <BreadcrumbItem>Home</BreadcrumbItem>
-        </Breadcrumb>
-      )
-
-      const nav = container.querySelector('nav')
-      expect(nav).toHaveStyle({ fontSize: '20px' })
-    })
-
-    it('should apply custom style to item', () => {
-      const { container } = render(
-        <Breadcrumb>
           <BreadcrumbItem style={{ color: 'red' }}>Home</BreadcrumbItem>
         </Breadcrumb>
       )
+      expect(container.querySelector('nav')).toHaveStyle({ fontSize: '20px' })
+      expect(container.querySelector('li')).toHaveStyle({ color: 'red' })
+    })
+  })
 
-      const item = container.querySelector('li')
-      expect(item).toHaveStyle({ color: 'red' })
-    })
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<Breadcrumb />)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
   describe('maxItems collapse', () => {
     const renderItems = (maxItems?: number) =>
       render(
@@ -333,49 +180,53 @@ describe('Breadcrumb', () => {
           <BreadcrumbItem current>Current</BreadcrumbItem>
         </Breadcrumb>
       )
+    const ellipsis = (container: HTMLElement) =>
+      container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
 
-    it('should collapse middle items into an ellipsis when maxItems is set', () => {
+    it('collapses middle items into an ellipsis when maxItems is set', () => {
       const { container } = renderItems(3)
-
-      expect(
-        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
-      ).toBeInTheDocument()
+      expect(ellipsis(container)).toBeInTheDocument()
       expect(container.querySelectorAll('li')).toHaveLength(4)
       expect(screen.getByText('Home')).toBeInTheDocument()
       expect(screen.getByText('C')).toBeInTheDocument()
-      expect(screen.getByText('Current')).toBeInTheDocument()
       expect(screen.queryByText('A')).not.toBeInTheDocument()
-      expect(screen.queryByText('B')).not.toBeInTheDocument()
     })
 
-    it('should expand all items when ellipsis is clicked', async () => {
+    it('expands all items when the ellipsis is clicked', async () => {
       const user = userEvent.setup()
       const { container } = renderItems(3)
-
-      await user.click(
-        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')!
-      )
-
+      await user.click(ellipsis(container)!)
       expect(screen.getByText('A')).toBeInTheDocument()
       expect(screen.getByText('B')).toBeInTheDocument()
-      expect(
-        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
-      ).toBeNull()
+      expect(ellipsis(container)).toBeNull()
     })
 
-    it('should not collapse when maxItems is >= item count', () => {
+    it('does not collapse when maxItems is >= the item count', () => {
       const { container } = renderItems(10)
-
-      expect(
-        container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
-      ).toBeNull()
+      expect(ellipsis(container)).toBeNull()
       expect(container.querySelectorAll('li')).toHaveLength(5)
     })
 
-    it('should not leak maxItems to the DOM', () => {
+    it('does not leak maxItems to the DOM', () => {
       const { container } = renderItems(3)
-      const nav = container.querySelector('nav')
-      expect(nav?.hasAttribute('maxitems')).toBe(false)
+      expect(container.querySelector('nav')?.hasAttribute('maxitems')).toBe(false)
+    })
+  })
+
+  describe('Accessibility', () => {
+    it('hides separators from screen readers', () => {
+      const { container } = render(
+        <Breadcrumb>
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
+          <BreadcrumbItem current>Current</BreadcrumbItem>
+        </Breadcrumb>
+      )
+      expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
+    })
+
+    it('has no accessibility violations', async () => {
+      const { container } = render(<Breadcrumb />)
+      await expectNoA11yViolationsIsolated(container)
     })
   })
 })

@@ -197,13 +197,6 @@ function checkTestNaming(filePath, content, counters) {
   return true
 }
 
-function checkEdgeCases(content, counters) {
-  if (/describe\s*\([^\n]*(Edge Cases|Boundary)/m.test(content)) return true
-  console.log(c('yellow', '  ⚠ No Edge Cases or Boundary tests'))
-  counters.warnings++
-  return false
-}
-
 function checkAccessibility(filePath, content, counters) {
   if (/^use[A-Z].*\.spec\.(ts|tsx)$/.test(path.basename(filePath))) return true
 
@@ -228,15 +221,17 @@ function hardMinTests() {
   return 3
 }
 
-// Soft minimum: below this count triggers a warning
+// Soft minimum: below this count triggers a warning.
+// Lean-first policy: we favor a small set of behavior-focused tests over an
+// exhaustive per-category matrix, so these floors are deliberately low.
 function softMinTestsForFile(filename) {
   if (
     filename.includes('Upload') ||
     filename.includes('DatePicker') ||
     filename.includes('TimePicker')
   )
-    return 30
-  return 15
+    return 15
+  return 8
 }
 
 function isComponentSpec(filePath) {
@@ -343,7 +338,6 @@ async function main() {
     }
     if (!checkTestStructure(filePath, content, counters)) softIssues++
     if (!checkTestNaming(filePath, content, counters)) softIssues++
-    if (!checkEdgeCases(content, counters)) softIssues++
     if (componentSpec && !checkAccessibility(filePath, content, counters)) softIssues++
 
     if (errors === 0) {
