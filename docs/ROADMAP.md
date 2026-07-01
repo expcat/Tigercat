@@ -13,15 +13,15 @@ source: current repository state after R27 Composite/Hooks example demo cleanup
 
 截至 2026-07-01，T01-T14 与 v2.0.0 R01-R27 已完成；R20 不作为 v2.0 发布收口批次，后续发布收口按维护决定单独追加。
 
-当前可执行计划为 R28：后续 Agent 必须用模拟浏览器打开 React/Vue Example，以体验者身份按组件族操作示例页面，审查示例体验、组件能力缺口、文档/示例缺口和可优化建议。R28 只规划分组与后续 Agent 输出模板；具体用户故事和优化建议由后续 Agent 按 [EXAMPLE_AGENT_PLAN.md](EXAMPLE_AGENT_PLAN.md) 分组执行后写入。
+当前可执行计划为 R28：后续 Agent 必须用模拟浏览器打开 React/Vue Example，以体验者身份按组件族操作示例页面，审查示例体验、组件能力缺口、文档/示例缺口和可优化建议。E01 已完成，下一可执行分组为 E02；具体用户故事和优化建议由后续 Agent 按 [EXAMPLE_AGENT_PLAN.md](EXAMPLE_AGENT_PLAN.md) 分组执行后写入。
 
 当前文件是后续 Agent 的执行入口。执行任一 Rxx 任务前必须先读取对应任务的允许修改、不得修改、依赖和完成验证；任务完成后必须回写状态、日期和关键验证命令。
 
 ## 阶段进度
 
 - 已完成阶段：阶段 0-21 已完成 R01-R27；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
-- 当前阶段：阶段 22，R28 Example user-story component review。
-- 当前可执行任务：R28，按 [EXAMPLE_AGENT_PLAN.md](EXAMPLE_AGENT_PLAN.md) 的 E01-E21 分组执行用户视角 Example 审查。
+- 当前阶段：阶段 22，R28 Example user-story component review 进行中。
+- 当前可执行任务：R28 / E02，按 [EXAMPLE_AGENT_PLAN.md](EXAMPLE_AGENT_PLAN.md) 继续执行 Avatar / AvatarGroup / Empty / Result / Statistic / QRCode / Watermark 用户视角 Example 审查。
 - 后续阶段：v2.0.0 仍会追加新的维护与功能计划，路线图不在 R28 处收口。
 
 ## 执行原则
@@ -50,11 +50,11 @@ source: current repository state after R27 Composite/Hooks example demo cleanup
 
 ## 阶段与依赖
 
-| 阶段  | 阶段状态             | 任务    | 执行规则                                                                |
-| ----- | -------------------- | ------- | ----------------------------------------------------------------------- |
-| 0-14  | 已完成（2026-06-30） | R01-R20 | 已完成组件级 API 清理，细节归档到 `V2_COMPLETED.md` / `V2_API_AUDIT.md` |
-| 15-21 | 已完成（2026-07-01） | R21-R27 | 已完成分组验证、Skill 路由压缩、Example raw-source 护栏与展示合并维护   |
-| 22    | 未开始               | R28     | 按 [EXAMPLE_AGENT_PLAN.md](EXAMPLE_AGENT_PLAN.md) 分组执行用户视角审查  |
+| 阶段  | 阶段状态             | 任务    | 执行规则                                                                                    |
+| ----- | -------------------- | ------- | ------------------------------------------------------------------------------------------- |
+| 0-14  | 已完成（2026-06-30） | R01-R20 | 已完成组件级 API 清理，细节归档到 `V2_COMPLETED.md` / `V2_API_AUDIT.md`                     |
+| 15-21 | 已完成（2026-07-01） | R21-R27 | 已完成分组验证、Skill 路由压缩、Example raw-source 护栏与展示合并维护                       |
+| 22    | 进行中               | R28     | E01 已完成；继续按 [EXAMPLE_AGENT_PLAN.md](EXAMPLE_AGENT_PLAN.md) 执行 E02-E21 用户视角审查 |
 
 阶段状态规则：
 
@@ -71,11 +71,13 @@ R01-R27 已完成，主路线图不再展开逐项摘要；需要追溯执行细
 
 ### R28 Example user-story component review
 
-**状态**：未开始。
+**状态**：进行中。
 
 **目标**：从用户使用 React/Vue Example 的角度，用模拟浏览器逐页体验每组组件的真实展示和交互，记录使用不便、缺少能力、文档/示例缺口和可优化建议，并输出可由后续维护任务接手的用户故事与优先级。
 
 **分组计划**：[EXAMPLE_AGENT_PLAN.md](EXAMPLE_AGENT_PLAN.md) 的 E01-E21 是 R28 的唯一执行队列。后续 Agent 必须按分组启动或复用 React/Vue Example dev server，并通过浏览器访问对应 hash route、点击/输入/滚动/切换视口来形成体验证据；不得用 `test:group:*` 或单元测试命令替代用户体验审查。
+
+**分组进度**：E01 Button / Link / Text / Code / Icon / Tag / Badge 已完成（2026-07-01）；下一可执行分组为 E02。
 
 **允许修改**：后续执行 R28 分组时，可更新 `docs/EXAMPLE_AGENT_PLAN.md` 中对应分组的用户故事、体验问题、组件能力建议、优先级和后续执行建议；如该分组明确进入修复阶段，必须另开后续 Rxx 或在本任务中扩展允许修改范围后再改源码、Example 或 generated docs source。
 

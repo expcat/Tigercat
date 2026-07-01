@@ -1091,3 +1091,33 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **剩余阻塞**：无。后续维护或功能计划待追加。
 
 **状态更新要求**：已写回 R27 状态、日期、Composite/Hooks 覆盖范围、DemoBlock 压缩策略、snippet cleanup 和关键验证命令；阶段 21 已同步为 `已完成（2026-07-01）`，当前可执行任务标为 `待追加`。R27 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R28 E01 Basic example user-story review
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：按 `docs/EXAMPLE_AGENT_PLAN.md` 执行 E01，从真实使用者角度审查 Button / Link / Text / Code / Icon / Tag / Badge 的 React/Vue Example 体验、可复制性、交互证据和后续优化建议。
+
+**允许修改**：`docs/EXAMPLE_AGENT_PLAN.md`、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件源码、Example 实现、generated Skill references、public API、API baseline、发布配置。
+
+**执行摘要**：已启动 Vue Example `http://localhost:5173/` 与 React Example `http://localhost:5174/`，读取 Basic generated refs、React/Vue E01 页面源码与 DemoBlock raw-source 实现，并用浏览器访问 React/Vue 的 `#/button`、`#/link`、`#/text`、`#/code`、`#/icon`、`#/tag`、`#/badge`。桌面 `1280x720` 下确认目标 `h1`、section 数量、`示例`/`代码`页签和关键交互；移动 `390x844` 下确认 14 个 E01 route 无页面级横向溢出。Button 计数/重置、Link 点击计数、Code 复制回调、Tag 关闭/阻止关闭、Badge 通知递增/清零均已通过浏览器验证。
+
+**审查结论**：
+
+- 未发现 E01 P0/P1 阻断问题；React/Vue 页面结构和交互能力基本对齐。
+- Code 页面完整 raw-source 策略可复制性强，但局部示例查找噪声较多，建议后续为复制回调补更短 fixture/source 示例。
+- Tag 常规可关闭示例默认多个关闭按钮同名，建议后续在常规场景中展示业务化 `closeAriaLabel`。
+- Badge 实际应用示例可补充零值隐藏/显示的业务取舍说明。
+
+**实际验证**：
+
+- Browser desktop review：React/Vue `#/button`、`#/link`、`#/text`、`#/code`、`#/icon`、`#/tag`、`#/badge` at `1280x720`。
+- Browser mobile review：React/Vue `#/button`、`#/link`、`#/text`、`#/code`、`#/icon`、`#/tag`、`#/badge` at `390x844`。
+- Browser interactions：Button click/reset, Link click counter, Code copy callback, Tag close/prevent-close, Badge increment/clear.
+- `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+
+**状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E01 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 标为 `进行中`，当前可执行分组推进到 E02；R28 E01 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
