@@ -61,7 +61,7 @@ source: docs/ROADMAP.md R28
 | --- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
 | E01 | Button / Link / Text / Code / Icon / Tag / Badge                                                                               | React/Vue: `#/button`, `#/link`, `#/text`, `#/code`, `#/icon`, `#/tag`, `#/badge`                                                                                                 | 已完成（2026-07-01） |
 | E02 | Avatar / AvatarGroup / Empty / Result / Statistic / QRCode / Watermark                                                         | React/Vue: `#/avatar`, `#/empty`, `#/result`, `#/statistic`, `#/qrcode`, `#/watermark`                                                                                            | 已完成（2026-07-01） |
-| E03 | Image / ImageGroup / ImagePreview / ImageViewer / CropUpload / ImageCropper                                                    | React/Vue: `#/image`, `#/image-viewer`, `#/crop-upload`, `#/image-cropper`                                                                                                        | 未开始               |
+| E03 | Image / ImageGroup / ImagePreview / ImageViewer / CropUpload / ImageCropper                                                    | React/Vue: `#/image`, `#/image-viewer`, `#/crop-upload`, `#/image-cropper`                                                                                                        | 已完成（2026-07-01） |
 | E04 | Layout / Header / Sidebar / Content / Footer / Container / Row / Col / Space / Divider                                         | React/Vue: `#/layout`, `#/grid`, `#/space`, `#/divider`                                                                                                                           | 未开始               |
 | E05 | Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel                                                        | React/Vue: `#/card`, `#/list`, `#/descriptions`, `#/skeleton`, `#/splitter`, `#/resizable`, `#/carousel`                                                                          | 未开始               |
 | E06 | Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton                                                                | React/Vue: `#/affix`, `#/anchor`, `#/backtop`, `#/breadcrumb`, `#/scroll-spy`, `#/float-button`                                                                                   | 未开始               |
@@ -218,6 +218,76 @@ source: docs/ROADMAP.md R28
 - P3：Statistic 补趋势颜色/同比环比的业务指标示例。
 
 **后续执行建议**：优先只改 Example/文档；AvatarGroup 示例、QRCode locale/refresh、Empty/Result 反馈和 Watermark 图片水印都不需要 public API 变更。修复阶段应复查 React/Vue `#/avatar`、`#/qrcode`、`#/empty`、`#/result`、`#/watermark`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。若 QRCode 刷新控件改语义，补充 React/Vue QRCode focused tests。
+
+### E03 Image / ImageGroup / ImagePreview / ImageViewer / CropUpload / ImageCropper
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/image`、`#/image-viewer`、`#/crop-upload`、`#/image-cropper`。
+- React：`http://localhost:5174/#/image`、`#/image-viewer`、`#/crop-upload`、`#/image-cropper`。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、section 数量、页面级横向溢出、图片/文件输入/对话框角色；点击 Image 单图预览、ImageGroup 组图预览、独立 ImagePreview、ImageViewer 全功能按钮，并操作下一张、放大、右旋；检查 CropUpload 触发器、隐藏 file input、禁用态；等待 ImageCropper 8 秒后点击“裁剪”复查是否产生裁剪结果。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/basic.md`、`skills/tigercat/references/examples/advanced.md`、`skills/tigercat/references/shared/props/basic.md`、`skills/tigercat/references/shared/props/advanced.md`。
+- React Example：`examples/example/react/src/pages/ImageDemo.tsx`、`ImageViewerDemo.tsx`、`CropUploadDemo.tsx`、`ImageCropperDemo.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/ImageDemo.vue`、`ImageViewerDemo.vue`、`CropUploadDemo.vue`、`ImageCropperDemo.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/image.ts`、`packages/core/src/types/image-viewer.ts`、`packages/react/src/components/Image.tsx`、`ImageViewer.tsx`、`CropUpload.tsx`、`ImageCropper.tsx`、`packages/vue/src/components/Image.ts`、`ImageViewer.ts`、`CropUpload.ts`、`ImageCropper.ts`、`packages/core/src/utils/locale-utils.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 Image 页面能直接比较尺寸、fit、加载失败、懒加载、点击预览、悬停预览、组图预览和受控预览，方便复制到商品图、头像墙或内容图库。
+- 作为使用者，我希望 ImageGroup 和 ImagePreview 能展示多图计数、上一张/下一张、缩放、旋转和关闭方式，避免只知道单图预览。
+- 作为使用者，我希望 ImageViewer 专页能从按钮打开指定图片，并验证计数、导航、缩放、旋转后的状态变化，方便做相册/附件查看器。
+- 作为使用者，我希望 CropUpload 页面不用准备本地文件也能理解“选择图片 -> 裁剪弹窗 -> 确认 -> 输出结果”的完整链路，并能看出文件大小错误如何反馈。
+- 作为使用者，我希望 ImageCropper 页面打开后能立即拖动裁剪框、键盘微调、输出 PNG/JPEG/WebP 结果，并知道外链图片失败时如何处理。
+
+**Example 体验问题**：
+
+- 问题：ImageCropper 示例在 React/Vue 中都卡在“正在加载待裁剪图片”，等待 8 秒后仍无 `<img>`、无 `role="application"` 裁剪器、无辅助线，点击“裁剪”也没有裁剪结果。
+  浏览器证据：React/Vue `#/image-cropper` 均有 4 个 `role="img"` 加载占位，aria-label 均为“正在加载待裁剪图片”；`imgCount=0`、`guideCount=0`、`resultImages=0`；React 点击“裁剪”后 dev server 记录 `Unhandled rejection: Error: Image not loaded`。源码里的 `PHOTO` 是 `https://picsum.photos/seed/cropper/800/600`，组件内部用 `crossOrigin='anonymous'` 预加载，示例没有错误态或本地备用图。
+  影响：这是 E03 唯一阻断项；用户无法体验 ImageCropper 的拖拽、键盘调整、固定比例、JPEG 输出或裁剪结果。
+- 问题：CropUpload 页面展示 5 个触发器和 disabled 状态，但完整链路依赖本地文件选择；页面没有内置样例文件、模拟上传按钮或错误 fixture，浏览器审查无法验证弹窗裁剪、确认输出和 maxSize 错误反馈。
+  浏览器证据：React/Vue `#/crop-upload` 均有 5 个隐藏 `input[type=file]`，`accept="image/*"`；5 个触发器 aria-label 均为“选择图片进行裁剪并上传”，最后一个 `aria-disabled="true"` 且 `tabIndex=-1`；初始状态 `modalOpen=false`、`hasResult=false`。
+  影响：真实用户可以选择本地文件，但 Example 的可复制性和自动化复查不足，尤其无法从页面直接看到裁剪弹窗和错误状态。
+- 问题：CropUpload 的多个触发器使用相同 `aria-label`，包括自定义“📷 上传头像”和禁用示例。
+  浏览器证据：React/Vue 5 个 trigger 的 aria-label 都是“选择图片进行裁剪并上传”，可见文本分别是“选择图片”“📷 上传头像”“选择图片”等。
+  影响：不阻断使用；但示例没有展示如何给头像上传、封面裁剪、大小限制等业务场景提供更具体的可访问名称。
+- 问题：Image 页面常规预览、组图预览和独立 ImagePreview 功能可用，但示例仍主要依赖 `picsum.photos` 外链，缺少本地图片 fixture 对“离线/内网/CI”体验的兜底说明。
+  浏览器证据：React/Vue `#/image` 均有 8 个 section、20 张图片、10 个预览 role button；桌面和移动无横向溢出。单图/独立预览打开后显示“图片预览”、工具栏含“关闭预览/缩小/重置/放大/向左旋转/向右旋转”；ImageGroup 第 3 张打开为 `3 / 6`，点下一张变为 `4 / 6`。
+  影响：当前 Image 预览链路可用；风险集中在示例资产稳定性，而不是组件 API。
+- 问题：ImageViewer 专页交互可用，但基础和全部功能都只通过按钮打开，没有展示缩放/旋转后如何受控记录当前索引或同步外部状态。
+  浏览器证据：React/Vue `#/image-viewer` 均为 2 个 section；点击“打开查看器（第2张）”后显示 `2 / 4`，点下一张、放大、右旋后变为 `3 / 4`，图片 transform 为 `translate(0px, 0px) scale(1.25) rotate(90deg)`。
+  影响：不影响当前体验；属于更完整业务示例的缺口。
+
+**组件能力建议**：
+
+- 类型：文档示例 / 默认行为。
+  建议：把 ImageCropper 示例图片改为仓库内本地 fixture 或 data URL，并在示例中补加载失败提示；如果保留远程图，也应说明 CORS/跨域图片对 Canvas 输出的要求。
+  证据：当前 `picsum.photos` 远程图在 React/Vue 示例里都导致 cropper 长时间停在 loading，占位没有错误态。
+- 类型：文档示例 / 组合使用。
+  建议：给 CropUpload 增加一个“使用示例图片体验裁剪”的 Example 辅助入口，或拆一个纯 ImageCropper + 本地 fixture 的完整头像裁剪场景，确保不依赖系统文件选择也能看到弹窗、确认和输出结果。
+  证据：现有页面只有隐藏 file input 和触发器；未选择本地文件前无 modal、无结果、无错误状态。
+- 类型：a11y / 文档示例。
+  建议：在 CropUpload 自定义触发按钮示例中展示业务化 aria-label 或等价可访问名称，例如“上传头像并裁剪”“上传封面并裁剪”，同时保留 disabled 示例的不可聚焦状态。
+  证据：5 个触发器当前同名；disabled 触发器已正确暴露 `aria-disabled="true"` 和 `tabIndex=-1`。
+- 类型：文档示例 / 组合使用。
+  建议：ImageViewer “全部功能”后续可补受控 `currentIndex` / `onCurrentIndexChange` 展示，或者在按钮旁显示当前图片索引变化。
+  证据：浏览器确认内部计数和 transform 会变化，但 Example 没有展示如何把这些变化同步给业务状态。
+
+**建议优先级**：
+
+- P0：ImageCropper 示例改用稳定本地 fixture 或补错误态，恢复裁剪器可体验性。
+- P1：CropUpload 增加不依赖本地文件选择的完整裁剪体验入口，或至少增加 fixture 驱动的裁剪结果演示。
+- P2：CropUpload 自定义触发按钮补业务化可访问名称示例。
+- P2：ImageCropper 文档/示例说明跨域图片与 Canvas 输出限制。
+- P3：ImageViewer 补受控索引同步或外部状态展示。
+
+**后续执行建议**：优先只改 Example/文档；ImageCropper fixture、CropUpload 示例入口和 a11y 文案都不需要 public API 变更。修复阶段应复查 React/Vue `#/image-cropper`、`#/crop-upload`、`#/image`、`#/image-viewer`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若新增本地示例资源或调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。如组件层补 ImageCropper 加载失败态，再补充 React/Vue ImageCropper focused tests。
 
 ## 审查重点
 
