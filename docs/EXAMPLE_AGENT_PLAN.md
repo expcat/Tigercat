@@ -66,7 +66,7 @@ source: docs/ROADMAP.md R28
 | E05 | Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel                                                        | React/Vue: `#/card`, `#/list`, `#/descriptions`, `#/skeleton`, `#/splitter`, `#/resizable`, `#/carousel`                                                                          | 已完成（2026-07-01） |
 | E06 | Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton                                                                | React/Vue: `#/affix`, `#/anchor`, `#/backtop`, `#/breadcrumb`, `#/scroll-spy`, `#/float-button`                                                                                   | 已完成（2026-07-01） |
 | E07 | Menu / Dropdown / Steps / Tabs / Tree / Pagination / Spotlight                                                                 | React/Vue: `#/menu`, `#/dropdown`, `#/steps`, `#/tabs`, `#/tree`, `#/pagination`, `#/spotlight`                                                                                   | 已完成（2026-07-01） |
-| E08 | Alert / Loading / Progress / Tooltip / Popover / Popconfirm                                                                    | React/Vue: `#/alert`, `#/loading`, `#/progress`, `#/tooltip`, `#/popover`, `#/popconfirm`                                                                                         | 未开始               |
+| E08 | Alert / Loading / Progress / Tooltip / Popover / Popconfirm                                                                    | React/Vue: `#/alert`, `#/loading`, `#/progress`, `#/tooltip`, `#/popover`, `#/popconfirm`                                                                                         | 已完成（2026-07-01） |
 | E09 | Modal / Drawer / Message / Notification / Tour                                                                                 | React/Vue: `#/modal`, `#/drawer`, `#/message`, `#/notification`, `#/tour`                                                                                                         | 未开始               |
 | E10 | Form / FormItem / Input / Textarea / InputGroup / InputNumber / Stepper                                                        | React/Vue: `#/form`, `#/input`, `#/textarea`, `#/input-group`, `#/input-number`, `#/stepper`                                                                                      | 未开始               |
 | E11 | Checkbox / Radio / Switch / Slider / Segmented / Rate / ColorSwatch / ColorPicker                                              | React/Vue: `#/checkbox`, `#/radio`, `#/switch`, `#/slider`, `#/segmented`, `#/rate`, `#/color-swatch`, `#/color-picker`                                                           | 未开始               |
@@ -619,6 +619,84 @@ source: docs/ROADMAP.md R28
 - P3：Spotlight 补快捷键、disabled command 和受控 query 的更小可复制示例。
 
 **后续执行建议**：优先只改 Example/文档；Dropdown 可见反馈、Pagination 状态隔离、Menu 状态面板、Tree 过滤反馈、Spotlight 说明都不需要 public API 变更。Tabs/Tree 的英文 aria-label 若无法在示例层覆写，需要另开组件源码/i18n 任务并补 focused a11y tests。修复阶段应复查 React/Vue `#/dropdown`、`#/tabs`、`#/tree`、`#/pagination`、`#/menu`、`#/spotlight`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E08 Alert / Loading / Progress / Tooltip / Popover / Popconfirm
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/alert`、`#/loading`、`#/progress`、`#/tooltip`、`#/popover`、`#/popconfirm`。
+- React：`http://localhost:5174/#/alert`、`#/loading`、`#/progress`、`#/tooltip`、`#/popover`、`#/popconfirm`。
+- 视口：桌面 `1280x720`（交互脚本用 `1280x900` 以容纳弹层）；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器工具：本轮交互式 preview MCP 在当前环境无法绑定端口、Chrome 扩展未连接，改用脚本化 headless Chromium（仓库内置 Playwright/Chromium）对同一 dev server 做 DOM 查询与用户操作复查，证据等价于模拟浏览器体验。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、`h3` 子分节、`示例`/`代码`页签、桌面与移动页面级横向溢出、控制台报错；Tooltip 悬停基础触发、点击触发、聚焦触发、悬停禁用触发并检查 `role="tooltip"` 出现/消失；Popover 点击触发读 `role="dialog"` 内容与 `aria-describedby`；Popconfirm 点击“删除”读 `取消`/`确定` 按钮、点击“确定”捕获 console 与页面可见反馈、检查危险按钮红色；Alert 统计 `role="alert"`、点击关闭与重置、读取全部关闭按钮 `aria-label`；Loading 点击“显示全屏加载”与“刷新数据”并读英文说明文案；Progress 读 `aria-valuenow/min/max/label`、点击“开始上传”前后读上传条百分比、检查圆形进度文本；移动端打开 Popconfirm/Tooltip 检查弹层是否落在视口内。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/feedback.md`、`skills/tigercat/references/shared/props/feedback.md`、`skills/tigercat/references/shared/props/basic.md`（Alert 归入 Basic）。
+- React Example：`examples/example/react/src/pages/AlertDemo.tsx`、`LoadingDemo.tsx`、`ProgressDemo.tsx`、`TooltipDemo.tsx`、`PopoverDemo.tsx`、`PopconfirmDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/AlertDemo.vue`、`LoadingDemo.vue`、`ProgressDemo.vue`、`TooltipDemo.vue`、`PopoverDemo.vue`、`PopconfirmDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/alert.ts`、`loading.ts`、`progress.ts`、`tooltip.ts`、`popover.ts`、`popconfirm.ts`、`packages/react/src/components/Alert.tsx`、`Progress.tsx`、`Popconfirm.tsx`、`Tooltip.tsx`、`Popover.tsx`、对应 Vue 组件文件。
+
+**用户故事**：
+
+- 作为使用者，我希望 Alert 页面能比较类型、尺寸、图标、可关闭、描述、自定义内容和实际业务场景，复制到页面提示区，并在关闭后能重置。
+- 作为使用者，我希望 Loading 页面能比较动画变体、尺寸、颜色、全屏、区域、按钮和延迟加载，落地页面级与区块级 loading。
+- 作为使用者，我希望 Progress 页面能比较线形/圆形、变体、状态、尺寸、文本、条纹和自定义尺寸，并在上传与仪表盘场景确认进度语义与无障碍属性。
+- 作为使用者，我希望 Tooltip 页面能验证 hover/click/focus 触发、位置、偏移、禁用、自动翻转和自定义内容。
+- 作为使用者，我希望 Popover 页面能验证标题、自定义内容、位置、触发方式、受控、宽度、禁用、偏移和自动翻转。
+- 作为使用者，我希望 Popconfirm 页面能验证位置、图标、按钮文案、危险操作、描述、受控、隐藏图标和禁用，并能看出确认/取消后应如何接业务逻辑。
+
+**Example 体验问题**：
+
+- 问题：E08 未发现 P0/P1 route-level 阻断问题；React/Vue 12 个 route 均可打开，桌面与移动视口无页面级横向溢出，无控制台报错，Tooltip/Popover/Popconfirm/Alert/Loading/Progress 主要交互均可完成，且 React/Vue 结构与行为高度一致。
+  浏览器证据：桌面 `1280x720` 下 React/Vue 分别返回目标 `h1`，`h3` 子分节数一致（Alert 各含实际应用 4 项、Loading 7、Progress 12、Tooltip 7、Popover 9、Popconfirm 7）；移动 `390x844` 下 12 个 route 的 `pageOverflow=false`；`errors=[]`；Progress 暴露 37 个 `role="progressbar"`（`aria-valuenow/min/max` 正确），Popconfirm 渲染 17 个 `role="dialog"`（关闭态 `aria-hidden`），Alert 渲染 25 个 `role="alert"`；Tooltip 悬停基础触发出现 `role="tooltip"` 文本“这是一个气泡提示”，移出后归 0，点击/聚焦触发同样可见，悬停“禁用”触发保持 0；移动端打开 Popconfirm（`left=8`、`right=288`、`withinViewport=true`）与 Tooltip（`withinViewport=true`）弹层均落在视口内。
+  影响：E08 可作为 Feedback 提示/加载/进度/弹层类组件的审查入口继续使用。
+- 问题：Popconfirm 的确认/取消回调只写入控制台，页面没有任何可见业务反馈；基本用法、危险操作、发布文章、表单提交、受控模式都是同一模式。
+  浏览器证据：React/Vue `#/popconfirm` 点击“删除”后弹层出现 `取消` / `确定` 两个中文按钮，点击“确定”后控制台记录 `[log] Confirmed!`，但 `pageVisibleFeedbackAfterConfirm=false`（页面无“已删除/删除成功/已确认”等文本）；源码 handler 为 `console.log('Confirmed!')` / `console.log('Cancelled!')`。
+  影响：弹层交互本身可用，但用户复制后缺少“确认后如何接真实业务动作”的可见线索，与 E05/E06/E07 记录的“仅 console 反馈”问题同类。
+- 问题：Alert 可关闭按钮的默认无障碍名称为英文 `Close alert`，与中文示例站不一致；只有专门传 `closeAriaLabel` 的一个示例是中文。
+  浏览器证据：React/Vue `#/alert` 5 个可关闭 Alert 的关闭按钮 `aria-label` 中，4 个为 `Close alert`，1 个为 `关闭提示`；源码 `packages/core/src/types/alert.ts`、`packages/react/src/components/Alert.tsx`、`packages/vue/src/components/Alert.ts` 的 `closeAriaLabel` 默认值硬编码为 `'Close alert'`，Alert 无 `locale` 能力。
+  影响：常规可关闭示例复制后会在中文界面上带英文可访问名称，与 E07 Tabs/Tree 英文 aria-label 同类。
+- 问题：Progress 组件渲染的默认 `aria-label` 为英文 `Progress: N%`，中文示例站上屏幕阅读器读到英文标签。
+  浏览器证据：React/Vue `#/progress` 前若干进度条 `aria-valuenow/min/max` 正确，但 `aria-label` 依次为 `Progress: 0%`、`Progress: 50%`、`Progress: 100%`…；源码 `packages/react/src/components/Progress.tsx`、`packages/vue/src/components/Progress.ts` 在未传 `ariaLabel`/`aria-labelledby` 时回退为 `` `Progress: ${percentage}%` ``。示例未覆写该标签。
+  影响：进度语义可用，但无障碍标签在中文站为英文；示例既没有传中文 `aria-label`，组件也没有 locale 兜底。
+- 问题：Loading 页面的变体/尺寸/颜色说明文案为英文，与中文示例站不一致。
+  浏览器证据：React/Vue `#/loading` 页面文本包含 `Spinner`、`Ring`、`Dots`、`Bars`、`Pulse`、`Small`、`Medium`、`Large`、`Extra Large`、`Primary`、`Secondary` 等英文说明；这些是示例手写 `<span>` 标签，而非组件输出。
+  影响：不阻断使用；属于中文示例站的文案 i18n polish 缺口。
+- 问题：Tooltip/Popover/Popconfirm 的受控示例可切换 open，但页面没有可见的当前 open 状态面板，用户需回到代码理解受控结构。
+  浏览器证据：React/Vue `#/tooltip`、`#/popover`、`#/popconfirm` 受控示例点击后弹层出现/消失（如 Popover 点击后 `role="dialog"` 内容“这是一个气泡卡片的内容”、`aria-describedby=tiger-popover-1-content`、`aria-modal=false`），但页面未显示 `open` 值或最近状态。
+  影响：不阻断使用；属于受控弹层可复制业务状态的小缺口。
+
+**组件能力建议**：
+
+- 类型：a11y / i18n / 文档示例。
+  建议：Alert 常规“可关闭”与“实际应用场景”示例给关闭按钮传业务化中文 `closeAriaLabel`（如“关闭提交成功提示”“关闭系统维护通知”）；若希望默认中文，则另开组件源码任务为 Alert 增加 locale 能力。
+  证据：4/5 关闭按钮为 `Close alert`，组件默认值硬编码英文且无 locale。
+- 类型：a11y / i18n / 文档示例。
+  建议：Progress 示例在中文站传中文 `aria-label`（React `ariaLabel` / Vue `aria-label`），或在组件层用 locale 生成“进度”文案；圆形进度可视文本已正常（浏览器统计到 32 个 `%` 文本节点），无需改视觉。
+  证据：`aria-valuenow` 正确，但 `aria-label` 回退为英文 `Progress: N%`。
+- 类型：文档示例 / 组合使用。
+  建议：Popconfirm 的 `onConfirm` / `onCancel` 示例补最小可见反馈（如“已删除记录 #202312310001”“已发布文章”），保留 console 作为辅助；受控示例可同步显示 `open` 状态。
+  证据：确认后仅 `console.log('Confirmed!')`，页面无可见反馈。
+- 类型：i18n / 文档示例。
+  建议：Loading 变体/尺寸/颜色说明文案改中文或中英并列，与中文示例站一致。
+  证据：页面存在 `Spinner`/`Small`/`Primary` 等英文手写说明。
+- 类型：文档示例。
+  建议：Tooltip/Popover/Popconfirm 受控示例补一个可见当前 `open` 状态面板，便于理解受控结构（低优先）。
+  证据：受控切换可用，但页面未显示 open 值。
+
+**建议优先级**：
+
+- P1：Alert 可关闭示例的英文默认 `Close alert` 中文站 a11y 修正（示例传 `closeAriaLabel` 或组件补 locale）。
+- P1：Progress 英文默认 `aria-label`（`Progress: N%`）中文站 a11y 修正（示例传 `aria-label` 或组件补 locale）。
+- P2：Popconfirm 确认/取消示例补可见业务反馈，避免仅 console.log。
+- P3：Loading 变体/尺寸/颜色英文说明文案中文化。
+- P3：弹层受控示例补可见当前 `open` 状态面板。
+
+**后续执行建议**：优先只改 Example/文档；Alert `closeAriaLabel`、Progress `aria-label` 都可在示例层用现有 props 直接覆写（无需 public API 变更），Popconfirm 可见反馈与 Loading 文案同为纯 Example 改动。若选择组件级 locale（Alert 当前无 `locale` prop，Progress 的英文 aria 文案在组件内生成），再另开组件源码/i18n 任务并补 React/Vue focused a11y tests。修复阶段应复查 React/Vue `#/alert`、`#/progress`、`#/popconfirm`、`#/loading`、`#/tooltip`、`#/popover`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时再运行 `npx -y pnpm@11.9.0 example:build`。
 
 ## 审查重点
 
