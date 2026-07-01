@@ -10,24 +10,11 @@ import {
   rgbToHex,
   rgbToHsv,
   hsvToRgb,
-  isValidHex,
   formatColorString,
+  parseColorInput,
   classNames,
   coerceClassValue
 } from '@expcat/tigercat-core'
-
-/** Parse a hex or rgb()/rgba() string back to a hex value, or null if unrecognized. */
-function parseColorInput(raw: string): string | null {
-  const val = raw.trim()
-  if (isValidHex(val)) {
-    return val.startsWith('#') ? val : `#${val}`
-  }
-  const rgbMatch = val.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
-  if (rgbMatch) {
-    return rgbToHex(Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3]))
-  }
-  return null
-}
 
 export type VueColorPickerProps = InstanceType<typeof ColorPicker>['$props']
 

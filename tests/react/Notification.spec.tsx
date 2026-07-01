@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
-import { act, fireEvent, waitFor } from '@testing-library/react'
-import { notification } from '@expcat/tigercat-react'
+import { act, fireEvent, render, waitFor } from '@testing-library/react'
+import { ConfigProvider, notification } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Notification (React)', () => {
@@ -86,6 +86,28 @@ describe('Notification (React)', () => {
     })
 
     expect(document.querySelector('button[aria-label="关闭通知"]')).toBeTruthy()
+  })
+
+  it('uses ConfigProvider locale for command-root close aria label', async () => {
+    const { unmount } = render(
+      <ConfigProvider locale={{ locale: 'zh-CN', common: { closeText: '关闭' } }}>
+        <span />
+      </ConfigProvider>
+    )
+    await act(async () => {
+      await flushMicrotasks()
+    })
+
+    await act(async () => {
+      notification.info({
+        title: 'Provider localized notification',
+        duration: 0
+      })
+      await flushMicrotasks()
+    })
+
+    expect(document.querySelector('button[aria-label="关闭通知"]')).toBeTruthy()
+    unmount()
   })
 
   it('returns a close function', async () => {

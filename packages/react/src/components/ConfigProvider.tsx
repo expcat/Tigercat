@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   mergeTigerLocale,
   isLazyTigerLocale,
@@ -11,6 +11,7 @@ import {
   type TigerLocaleDirection,
   type ColorScheme
 } from '@expcat/tigercat-core'
+import { createGlobalTigerLocaleHandle, type GlobalTigerLocaleHandle } from '../utils/global-locale'
 
 export interface TigerConfig {
   locale?: Partial<TigerLocale>
@@ -38,6 +39,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   children
 }) => {
   const parent = useContext(TigerConfigContext)
+  const globalLocaleHandleRef = useRef<GlobalTigerLocaleHandle | null>(null)
 
   const isLazy = isLazyTigerLocale(locale)
   const immediateLocale = isLazy ? undefined : getImmediateTigerLocale(locale)
@@ -108,6 +110,18 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   useEffect(() => {
     if (value.colorScheme) ThemeManager.setColorScheme(value.colorScheme)
   }, [value.colorScheme])
+
+  useEffect(() => {
+    globalLocaleHandleRef.current = createGlobalTigerLocaleHandle(value.locale)
+    return () => {
+      globalLocaleHandleRef.current?.dispose()
+      globalLocaleHandleRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    globalLocaleHandleRef.current?.update(value.locale)
+  }, [value.locale])
 
   useEffect(() => {
     if (!value.direction || typeof document === 'undefined') return

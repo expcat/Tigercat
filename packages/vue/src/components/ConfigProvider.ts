@@ -24,6 +24,7 @@ import {
   type TigerLocaleDirection,
   type ColorScheme
 } from '@expcat/tigercat-core'
+import { createGlobalTigerLocaleHandle, type GlobalTigerLocaleHandle } from '../utils/global-locale'
 
 export interface TigerConfig {
   locale?: Partial<TigerLocale>
@@ -68,6 +69,7 @@ export const ConfigProvider = defineComponent({
   props: configProviderProps,
   setup(props, { slots }) {
     const parent = useTigerConfig()
+    let globalLocaleHandle: GlobalTigerLocaleHandle | null = null
 
     const resolvedLocale = ref<Partial<TigerLocale> | undefined>(
       isLazyTigerLocale(props.locale) ? undefined : getImmediateTigerLocale(props.locale)
@@ -135,6 +137,18 @@ export const ConfigProvider = defineComponent({
       { immediate: true }
     )
 
+    watch(
+      () => merged.value.locale,
+      (locale) => {
+        if (!globalLocaleHandle) {
+          globalLocaleHandle = createGlobalTigerLocaleHandle(locale)
+        } else {
+          globalLocaleHandle.update(locale)
+        }
+      },
+      { immediate: true }
+    )
+
     let previousDir: string | null = null
     let previousDataDir: string | null = null
     watch(
@@ -154,6 +168,9 @@ export const ConfigProvider = defineComponent({
     )
 
     onBeforeUnmount(() => {
+      globalLocaleHandle?.dispose()
+      globalLocaleHandle = null
+
       if (!isBrowser()) return
       const root = document.documentElement
       if (previousDir === null) root.removeAttribute('dir')

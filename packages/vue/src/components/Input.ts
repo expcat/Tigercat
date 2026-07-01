@@ -17,6 +17,7 @@ import {
   type InputStatus
 } from '@expcat/tigercat-core'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 let inputIdCounter = 0
 
@@ -171,10 +172,26 @@ export const Input = defineComponent({
     injectShakeStyle()
     const instance = getCurrentInstance()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
+    const formItemControl = inject<VueFormItemControlContext | null>(
+      FORM_ITEM_CONTROL_INJECTION_KEY,
+      null
+    )
     const effectiveSize = computed(() => {
       const hasOwnSize = Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'size')
       return hasOwnSize ? props.size : (inputGroup?.size ?? props.size)
     })
+    const hasOwnStatus = computed(() =>
+      Object.prototype.hasOwnProperty.call(instance?.vnode.props ?? {}, 'status')
+    )
+    const effectiveStatus = computed(() =>
+      hasOwnStatus.value ? props.status : (formItemControl?.status.value ?? props.status)
+    )
+    const effectiveErrorMessage = computed(
+      () => props.errorMessage ?? formItemControl?.errorMessage.value
+    )
+    const effectiveShakeTrigger = computed(
+      () => props._shakeTrigger ?? formItemControl?.shakeTrigger.value
+    )
     const inputRef = ref<HTMLInputElement | null>(null)
     const wrapperRef = ref<HTMLDivElement | null>(null)
     const localValue = ref<string | number>(props.modelValue ?? '')
@@ -194,7 +211,7 @@ export const Input = defineComponent({
     )
 
     // Trigger shake animation via direct DOM manipulation for reliable re-trigger
-    watch([() => props.status, () => props._shakeTrigger] as const, ([newStatus]) => {
+    watch([effectiveStatus, effectiveShakeTrigger] as const, ([newStatus]) => {
       if (newStatus === 'error' && wrapperRef.value) {
         const el = wrapperRef.value
         el.classList.remove(SHAKE_CLASS)
@@ -211,12 +228,14 @@ export const Input = defineComponent({
     const hasSuffix = computed(
       () => !!slots.suffix || !!props.suffix || props.clearable || props.showPassword
     )
-    const activeError = computed(() => props.status === 'error' && !!props.errorMessage)
+    const activeError = computed(
+      () => effectiveStatus.value === 'error' && !!effectiveErrorMessage.value
+    )
 
     const inputClasses = computed(() =>
       getInputClasses({
         size: effectiveSize.value,
-        status: props.status,
+        status: effectiveStatus.value,
         hasPrefix: hasPrefix.value,
         hasSuffix: hasSuffix.value
       })
@@ -266,7 +285,7 @@ export const Input = defineComponent({
           h(
             'div',
             { id: errorMsgId, class: getInputErrorClasses(effectiveSize.value) },
-            props.errorMessage
+            effectiveErrorMessage.value
           )
         )
       } else {
@@ -334,7 +353,7 @@ export const Input = defineComponent({
           id: props.id,
           autocomplete: props.autoComplete,
           autofocus: props.autoFocus,
-          ...(props.status === 'error' ? { 'aria-invalid': true } : {}),
+          ...(effectiveStatus.value === 'error' ? { 'aria-invalid': true } : {}),
           ...(activeError.value ? { 'aria-describedby': errorMsgId } : {}),
           onInput: handleInput,
           onChange: handleChange,

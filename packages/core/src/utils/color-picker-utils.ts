@@ -182,3 +182,17 @@ export function formatColorString(
 export function isValidHex(value: string): boolean {
   return /^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value)
 }
+
+export function parseColorInput(raw: string): string | null {
+  const value = raw.trim()
+  if (isValidHex(value)) {
+    return value.startsWith('#') ? value : `#${value}`
+  }
+
+  const rgbMatch = value.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
+  if (!rgbMatch) {
+    return null
+  }
+
+  return rgbToHex(Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3]))
+}

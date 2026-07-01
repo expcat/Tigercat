@@ -11,6 +11,7 @@ import {
   type MessagePosition
 } from '@expcat/tigercat-core'
 import { MessageContainer } from './MessageContainer'
+import { getGlobalTigerLocale } from '../utils/global-locale'
 
 export { MessageContainer } from './MessageContainer'
 export type { MessageContainerProps } from './MessageContainer'
@@ -37,6 +38,16 @@ export type MessageProps = MessageOptions
 function getMessageInstanceId(): string | number {
   getNextInstanceId ??= createInstanceCounter()
   return getNextInstanceId()
+}
+
+function getDefaultMessageCloseAriaLabel(): string | undefined {
+  const locale = getGlobalTigerLocale()
+  const closeText = locale?.common?.closeText
+  if (!closeText) return undefined
+  const localeCode = locale.locale?.toLowerCase() ?? ''
+  if (localeCode.startsWith('zh')) return `${closeText}消息`
+  if (localeCode.startsWith('en')) return `${closeText} message`
+  return closeText
 }
 
 const MessageHost: React.FC = () => {
@@ -112,7 +123,7 @@ function addMessage(config: MessageConfig): () => void {
     onClose: config.onClose,
     icon: config.icon,
     className: config.className,
-    closeAriaLabel: config.closeAriaLabel,
+    closeAriaLabel: config.closeAriaLabel ?? getDefaultMessageCloseAriaLabel(),
     position: config.position ?? 'top'
   }
 

@@ -3,8 +3,9 @@
  */
 
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
-import { nextTick } from 'vue'
+import { createApp, h, nextTick } from 'vue'
 import { Message } from '@expcat/tigercat-vue'
+import { ConfigProvider } from '../../packages/vue/src/components/ConfigProvider'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const messageTypes = ['success', 'warning', 'error', 'info', 'loading'] as const
@@ -85,6 +86,30 @@ describe('Message (Vue)', () => {
 
       const messageElement = await waitForMessageByType('warning')
       expect(messageElement?.textContent).toContain('Warning message')
+    })
+
+    it('uses ConfigProvider locale for command-root close aria label', async () => {
+      const root = document.createElement('div')
+      document.body.appendChild(root)
+      const app = createApp({
+        render: () =>
+          h(ConfigProvider, { locale: { locale: 'zh-CN', common: { closeText: '关闭' } } }, () =>
+            h('span')
+          )
+      })
+      app.mount(root)
+      await flushDomUpdates()
+
+      Message.info({
+        content: 'Provider localized message',
+        closable: true,
+        duration: 0
+      })
+      await flushDomUpdates()
+
+      expect(document.querySelector('button[aria-label="关闭消息"]')).toBeTruthy()
+      app.unmount()
+      root.remove()
     })
 
     it('renders messages into the requested position container', async () => {
@@ -452,8 +477,11 @@ describe('Message (Vue)', () => {
       const container = document.getElementById('tiger-message-container')
       expect(container).toBeTruthy()
 
+      await vi.waitFor(() => {
+        expect(container!.children).toHaveLength(2)
+      })
+
       const directChildren = Array.from(container!.children)
-      expect(directChildren).toHaveLength(2)
       directChildren.forEach((child) => {
         expect(child.hasAttribute('data-tiger-message')).toBe(true)
       })

@@ -1251,7 +1251,7 @@ describe('Form', () => {
       errorSpy.mockRestore()
     })
 
-    it('still forwards errorMessage to a direct Input child when showMessage=false', () => {
+    it('passes hidden FormItem error to a direct Input child through context', () => {
       render(
         <Form model={{}}>
           <FormItem label="Username" error="Username taken" showMessage={false}>
@@ -1260,7 +1260,22 @@ describe('Form', () => {
         </Form>
       )
 
-      // Input renders the error inline when it receives the forwarded errorMessage.
+      expect(screen.getByText('Username taken')).toBeInTheDocument()
+    })
+
+    it('passes hidden FormItem error to wrapped Input through context', () => {
+      const WrappedInput = (props: React.ComponentProps<typeof Input>) => (
+        <Input aria-label={props['aria-label']} />
+      )
+
+      render(
+        <Form model={{}}>
+          <FormItem label="Username" error="Username taken" showMessage={false}>
+            <WrappedInput aria-label="username" />
+          </FormItem>
+        </Form>
+      )
+
       expect(screen.getByText('Username taken')).toBeInTheDocument()
     })
 

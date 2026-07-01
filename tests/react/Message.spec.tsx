@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { act, waitFor } from '@testing-library/react'
-import { Message } from '@expcat/tigercat-react'
+import { act, render, waitFor } from '@testing-library/react'
+import { ConfigProvider, Message } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const messageTypes = ['success', 'warning', 'error', 'info', 'loading'] as const
@@ -80,6 +80,30 @@ describe('Message (React)', () => {
       await waitFor(() => {
         expect(document.querySelector('button[aria-label="关闭消息"]')).toBeTruthy()
       })
+    })
+
+    it('uses ConfigProvider locale for command-root close aria label', async () => {
+      const { unmount } = render(
+        <ConfigProvider locale={{ locale: 'zh-CN', common: { closeText: '关闭' } }}>
+          <span />
+        </ConfigProvider>
+      )
+      await act(async () => {
+        await Promise.resolve()
+      })
+
+      await runMessageAction(() =>
+        Message.info({
+          content: 'Provider localized message',
+          closable: true,
+          duration: 0
+        })
+      )
+
+      await waitFor(() => {
+        expect(document.querySelector('button[aria-label="关闭消息"]')).toBeTruthy()
+      })
+      unmount()
     })
 
     it('renders messages into the requested position container', async () => {

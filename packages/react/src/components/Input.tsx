@@ -15,6 +15,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { useInputGroupContext } from './InputGroup'
+import { useFormItemControlContext } from './FormItemContext'
 
 export interface InputProps
   extends
@@ -84,9 +85,9 @@ export interface InputProps
 export const Input: React.FC<InputProps> = ({
   size,
   type = 'text',
-  status = 'default',
-  errorMessage,
-  _shakeTrigger,
+  status: statusProp,
+  errorMessage: errorMessageProp,
+  _shakeTrigger: shakeTriggerProp,
   prefix,
   suffix,
   value,
@@ -115,7 +116,11 @@ export const Input: React.FC<InputProps> = ({
 }) => {
   injectShakeStyle()
   const inputGroup = useInputGroupContext()
+  const formItemControl = useFormItemControlContext()
   const effectiveSize = size ?? inputGroup?.size ?? 'md'
+  const status = statusProp ?? formItemControl?.status ?? 'default'
+  const errorMessage = errorMessageProp ?? formItemControl?.errorMessage
+  const shakeTrigger = shakeTriggerProp ?? formItemControl?.shakeTrigger
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -132,7 +137,7 @@ export const Input: React.FC<InputProps> = ({
       void el.offsetWidth // force reflow to restart animation
       el.classList.add(SHAKE_CLASS)
     }
-  }, [status, _shakeTrigger])
+  }, [status, shakeTrigger])
 
   const handleAnimationEnd = useCallback(() => {
     wrapperRef.current?.classList.remove(SHAKE_CLASS)

@@ -1,6 +1,7 @@
 import {
   defineComponent,
   inject,
+  provide,
   computed,
   ref,
   watch,
@@ -18,6 +19,7 @@ import {
   type FormFieldCondition,
   type ComponentSize,
   type FormErrorDisplayMode,
+  type InputStatus,
   getFormItemClasses,
   getFormItemLabelClasses,
   getFormItemContentClasses,
@@ -26,6 +28,7 @@ import {
   getFormItemAsteriskClasses
 } from '@expcat/tigercat-core'
 import { FormContextKey, type FormContext } from './Form'
+import { FORM_ITEM_CONTROL_INJECTION_KEY } from './FormItemContext'
 
 function mergeAriaDescribedBy(
   existing: string | undefined,
@@ -283,6 +286,14 @@ export const FormItem = defineComponent({
       return !!errorMessage.value
     })
 
+    provide(FORM_ITEM_CONTROL_INJECTION_KEY, {
+      status: computed(() => (hasError.value ? ('error' as InputStatus) : undefined)),
+      errorMessage: computed(() =>
+        hasError.value && !props.showMessage ? errorMessage.value : undefined
+      ),
+      shakeTrigger: computed(() => (hasError.value ? shakeTrigger.value : undefined))
+    })
+
     const describedById = computed(() => {
       return props.showMessage && hasError.value ? errorId : undefined
     })
@@ -363,11 +374,6 @@ export const FormItem = defineComponent({
               !isNativeElement && hasError.value
                 ? 'error'
                 : (existingProps.status as string | undefined),
-            errorMessage:
-              !isNativeElement && hasError.value && !props.showMessage
-                ? errorMessage.value
-                : (existingProps.errorMessage as string | undefined),
-            _shakeTrigger: !isNativeElement && hasError.value ? shakeTrigger.value : undefined,
             'aria-invalid': hasError.value ? 'true' : existingProps['aria-invalid'],
             'aria-required': isRequired.value ? 'true' : existingProps['aria-required'],
             disabled:

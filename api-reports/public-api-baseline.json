@@ -1998,6 +1998,7 @@
       "PanGestureOptions",
       "PanResult",
       "PanState",
+      "parseColorInput",
       "parseCountdownTimestamp",
       "parseCronFieldControl",
       "parseDate",

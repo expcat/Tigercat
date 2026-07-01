@@ -4,8 +4,9 @@
 
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
 import { fireEvent, waitFor } from '@testing-library/vue'
-import { nextTick } from 'vue'
+import { createApp, h, nextTick } from 'vue'
 import { notification } from '@expcat/tigercat-vue'
+import { ConfigProvider } from '../../packages/vue/src/components/ConfigProvider'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 async function flushMicrotasks() {
@@ -86,6 +87,29 @@ describe('Notification (Vue)', () => {
     close()
     await flush()
     expect(document.querySelector('[data-tiger-notification]')).toBeFalsy()
+  })
+
+  it('uses ConfigProvider locale for command-root close aria label', async () => {
+    const root = document.createElement('div')
+    document.body.appendChild(root)
+    const app = createApp({
+      render: () =>
+        h(ConfigProvider, { locale: { locale: 'zh-CN', common: { closeText: '关闭' } } }, () =>
+          h('span')
+        )
+    })
+    app.mount(root)
+    await flush()
+
+    notification.info({
+      title: 'Provider localized notification',
+      duration: 0
+    })
+    await flush()
+
+    expect(document.querySelector('button[aria-label="关闭通知"]')).toBeTruthy()
+    app.unmount()
+    root.remove()
   })
 
   it('respects position by creating a container per position', async () => {

@@ -5,7 +5,14 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, reactive, ref, h, nextTick } from 'vue'
-import { Form, FormItem, ConfigProvider, type FormRule, type FormRules } from '@expcat/tigercat-vue'
+import {
+  Form,
+  FormItem,
+  Input,
+  ConfigProvider,
+  type FormRule,
+  type FormRules
+} from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Form', () => {
@@ -1796,6 +1803,37 @@ describe('Form', () => {
       // Wait a bit for potential error message
       await new Promise((resolve) => setTimeout(resolve, 100))
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+
+    it('passes hidden FormItem error to wrapped Input through context', () => {
+      const WrappedInput = defineComponent({
+        setup(_, { attrs }) {
+          return () => h(Input, { 'aria-label': attrs['aria-label'] as string })
+        }
+      })
+
+      const Demo = defineComponent({
+        setup() {
+          return () =>
+            h(
+              Form,
+              { model: {} },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Username', error: 'Username taken', showMessage: false },
+                    {
+                      default: () => h(WrappedInput, { 'aria-label': 'username' })
+                    }
+                  )
+              }
+            )
+        }
+      })
+
+      render(Demo)
+      expect(screen.getByText('Username taken')).toBeInTheDocument()
     })
 
     it('supports different form sizes', () => {

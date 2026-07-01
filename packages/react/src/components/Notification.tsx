@@ -11,6 +11,7 @@ import {
   type NotificationPosition
 } from '@expcat/tigercat-core'
 import { NotificationContainer } from './NotificationContainer'
+import { getGlobalTigerLocale } from '../utils/global-locale'
 
 export { NotificationContainer } from './NotificationContainer'
 export type { NotificationContainerProps } from './NotificationContainer'
@@ -51,6 +52,16 @@ function getNotificationStackUpdateScheduler(): ReturnType<
 function getNotificationInstanceId(): string | number {
   getNextInstanceId ??= createInstanceCounter()
   return getNextInstanceId()
+}
+
+function getDefaultNotificationCloseAriaLabel(): string | undefined {
+  const locale = getGlobalTigerLocale()
+  const closeText = locale?.common?.closeText
+  if (!closeText) return undefined
+  const localeCode = locale.locale?.toLowerCase() ?? ''
+  if (localeCode.startsWith('zh')) return `${closeText}通知`
+  if (localeCode.startsWith('en')) return `${closeText} notification`
+  return closeText
 }
 
 function scheduleNotificationStackUpdate(position: NotificationPosition): void {
@@ -152,7 +163,7 @@ function addNotification(config: NotificationConfig): () => void {
     actions: config.actions,
     icon: config.icon,
     className: config.className,
-    closeAriaLabel: config.closeAriaLabel,
+    closeAriaLabel: config.closeAriaLabel ?? getDefaultNotificationCloseAriaLabel(),
     position
   }
 

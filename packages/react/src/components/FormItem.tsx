@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect, useState, useCallback, useId, useRef } from 'react'
 import {
   classNames,
+  type InputStatus,
   type ComponentSize,
   type FormRule,
   type FormItemProps as CoreFormItemProps,
@@ -12,7 +13,7 @@ import {
   getFormItemAsteriskClasses
 } from '@expcat/tigercat-core'
 import { useFormContext } from './Form'
-import { Input } from './Input'
+import { FormItemControlProvider } from './FormItemContext'
 
 export interface FormItemProps extends CoreFormItemProps {
   /**
@@ -230,14 +231,6 @@ export const FormItem: React.FC<FormItemProps> = ({
 
     if (!isNativeElement) {
       nextProps.status = hasError ? 'error' : onlyChild.props.status
-      // `errorMessage` / `_shakeTrigger` are Input-only internals. Forwarding them to
-      // any other child (Textarea, Select, Space wrappers, …) leaks unknown props onto
-      // the DOM and triggers React console errors, so gate them to the Input component.
-      if (onlyChild.type === Input) {
-        nextProps.errorMessage =
-          hasError && !showMessage ? errorMessage : onlyChild.props.errorMessage
-        nextProps._shakeTrigger = hasError ? shakeTrigger : undefined
-      }
     }
 
     return React.cloneElement(onlyChild, nextProps)
@@ -247,9 +240,6 @@ export const FormItem: React.FC<FormItemProps> = ({
     onlyChild,
     effectiveFieldId,
     hasError,
-    errorMessage,
-    showMessage,
-    shakeTrigger,
     isRequired,
     conditionState.disabled,
     formContext?.disabled,
@@ -258,6 +248,15 @@ export const FormItem: React.FC<FormItemProps> = ({
     handleBlur,
     handleChange
   ])
+
+  const controlValue = useMemo(
+    () => ({
+      status: (hasError ? 'error' : undefined) as InputStatus | undefined,
+      errorMessage: hasError && !showMessage ? errorMessage : undefined,
+      shakeTrigger: hasError ? shakeTrigger : undefined
+    }),
+    [hasError, showMessage, errorMessage, shakeTrigger]
+  )
 
   const formItemClasses = useMemo(
     () =>
@@ -330,7 +329,7 @@ export const FormItem: React.FC<FormItemProps> = ({
           aria-invalid={hasError ? true : undefined}
           onBlur={isClonableChild ? undefined : handleBlur}
           onChange={isClonableChild ? undefined : handleChange}>
-          {enhancedChild}
+          <FormItemControlProvider value={controlValue}>{enhancedChild}</FormItemControlProvider>
         </div>
         {showMessage && (
           <div
