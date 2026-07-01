@@ -9,100 +9,12 @@ source: docs/ROADMAP.md R28 plus docs/EXAMPLE_AGENT_REQUIREMENTS.md
 
 本文合并原 `docs/EXAMPLE_AGENT_PLAN.md` 与 `docs/EXAMPLE_AGENT_REQUIREMENTS.md`，作为后续 Example 体验修复、组件能力补齐和文档示例优化的唯一需求入口。E01-E21 的用户故事、浏览器证据、问题影响、组件能力建议和优先级保留在各分组记录中；后续任务应从本文拆分，不再回写旧文件。
 
-## 当前执行入口
+## 后续优化使用方式
 
-- 审查状态：E01-E21 均已完成（2026-07-01），旧 requirements 文件中 E06-E21 的“未开始”状态已过时。
-- 需求状态：各分组的 `建议优先级` 是当前修复队列事实源；P0/P1 优先拆成独立 Rxx，P2/P3 可按同源组件批量处理。
-- 事实源：每个需求必须回看对应分组的 `用户故事`、`Example 体验问题`、`组件能力建议` 和 `后续执行建议`，不要只读优先级标题。
-- 修复回写：完成某项修复后，在对应 E 组下追加复查结果、验证命令和状态变化；若任务被提升到 roadmap Rxx，同时同步更新 `docs/ROADMAP.md`。
-- 旧文件处理：原 `EXAMPLE_AGENT_PLAN.md` 的完整分组记录已迁移到本文；原 `EXAMPLE_AGENT_REQUIREMENTS.md` 中 R01-R25 的索引已由 E01-E05 的优先级记录覆盖。
-
-## 状态约定
-
-- 已审查：已完成 React/Vue Example 浏览器体验审查，产生待办或确认无阻断项。
-- 待修复：已确认需要 Example、文档或组件源码变更。
-- 已完成：对应修复已完成，并通过本文要求的浏览器复查和命令验证。
-- 阻塞：缺少环境、证据或产品/API 决策，暂不能继续。
-
-## 执行方式
-
-- 每次只领取一个 E 组，先读取本文件对应分组，再读取 `skills/tigercat/references/component-index.md`、对应 `skills/tigercat/references/examples/{category}.md`、对应 `skills/tigercat/references/shared/props/{category}.md` 和 React/Vue Example 页面。
-- 必须启动或复用示例站点，用模拟浏览器体验组件：Vue 默认 `http://localhost:5173/#/{route}`，React 默认 `http://localhost:5174/#/{route}`；如端口被占用，以实际 dev server 输出为准并记录。
-- 审查时以用户能否理解、点击、输入、滚动、复制、组合和落地 Example 为主，不把任务扩大成源码重构。
-- 不得用 `test:group:*`、hook spec 或单元测试命令替代体验审查；测试只允许在后续进入源码/Example 修复时作为补充验证。
-- 只记录已从浏览器体验、当前 Example、props 文档、源码中核实的事实；不确定的点写成待确认，不写成结论。
-- 如果发现需要修改组件源码、Example 实现、生成引用或 public API，先在本文件记录建议和优先级，后续另开 Rxx 或扩展允许修改范围后再实施。
-
-## 修复拆分规则
-
-- P0：立即拆出单独 Rxx，优先恢复示例可体验性或阻断路径。
-- P1：按同一组件族或同一根因拆小批次；必须覆盖 React/Vue 一致性、中文站 i18n/a11y、示例真实能力不一致等高影响问题。
-- P2：可按文档示例、组合使用、移动端、状态回显、远程资源本地化等同源主题批量处理。
-- P3：只在相邻组件已经修改时顺手处理，或集中为 polish 批次；不得挤占 P0/P1。
-- 每个修复批次完成后必须记录：实际修改范围、用户故事是否满足、浏览器复查 route、命令验证、剩余风险。
-
-## 输出模板
-
-每个分组执行后，在对应 E 组下追加以下内容：
-
-```md
-**状态**：未开始 / 进行中 / 已完成（YYYY-MM-DD） / 阻塞。
-
-**体验入口**：列出实际访问的 React/Vue URL、视口尺寸、主题/语言设置和浏览器操作路径。
-
-**审查入口**：列出实际读取的 Example 页面、generated refs 和源码文件。
-
-**用户故事**：
-
-- 作为使用者，我希望...
-
-**Example 体验问题**：
-
-- 问题：
-- 浏览器证据：
-- 影响：
-
-**组件能力建议**：
-
-- 类型：API 缺口 / 默认行为 / a11y / i18n / 移动端 / 组合使用 / 性能 / 样式扩展 / 文档示例。
-- 建议：
-- 证据：
-
-**建议优先级**：
-
-- P0：阻断常规使用或示例不可运行。
-- P1：常见业务场景缺失或 React/Vue 明显不一致。
-- P2：易用性、组合性、文档清晰度改善。
-- P3：示例丰富度、命名、说明文字或低风险 polish。
-
-**后续执行建议**：只改 Example/文档，或需要组件源码/API 变更；列出建议的体验复查路径，修复阶段再补充测试命令。
-```
-
-## 分组队列
-
-| 组  | 范围                                                                                                                           | 浏览器体验入口                                                                                                                                                                    | 状态                 |
-| --- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| E01 | Button / Link / Text / Code / Icon / Tag / Badge                                                                               | React/Vue: `#/button`, `#/link`, `#/text`, `#/code`, `#/icon`, `#/tag`, `#/badge`                                                                                                 | 已完成（2026-07-01） |
-| E02 | Avatar / AvatarGroup / Empty / Result / Statistic / QRCode / Watermark                                                         | React/Vue: `#/avatar`, `#/empty`, `#/result`, `#/statistic`, `#/qrcode`, `#/watermark`                                                                                            | 已完成（2026-07-01） |
-| E03 | Image / ImageGroup / ImagePreview / ImageViewer / CropUpload / ImageCropper                                                    | React/Vue: `#/image`, `#/image-viewer`, `#/crop-upload`, `#/image-cropper`                                                                                                        | 已完成（2026-07-01） |
-| E04 | Layout / Header / Sidebar / Content / Footer / Container / Row / Col / Space / Divider                                         | React/Vue: `#/layout`, `#/grid`, `#/space`, `#/divider`                                                                                                                           | 已完成（2026-07-01） |
-| E05 | Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel                                                        | React/Vue: `#/card`, `#/list`, `#/descriptions`, `#/skeleton`, `#/splitter`, `#/resizable`, `#/carousel`                                                                          | 已完成（2026-07-01） |
-| E06 | Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton                                                                | React/Vue: `#/affix`, `#/anchor`, `#/backtop`, `#/breadcrumb`, `#/scroll-spy`, `#/float-button`                                                                                   | 已完成（2026-07-01） |
-| E07 | Menu / Dropdown / Steps / Tabs / Tree / Pagination / Spotlight                                                                 | React/Vue: `#/menu`, `#/dropdown`, `#/steps`, `#/tabs`, `#/tree`, `#/pagination`, `#/spotlight`                                                                                   | 已完成（2026-07-01） |
-| E08 | Alert / Loading / Progress / Tooltip / Popover / Popconfirm                                                                    | React/Vue: `#/alert`, `#/loading`, `#/progress`, `#/tooltip`, `#/popover`, `#/popconfirm`                                                                                         | 已完成（2026-07-01） |
-| E09 | Modal / Drawer / Message / Notification / Tour                                                                                 | React/Vue: `#/modal`, `#/drawer`, `#/message`, `#/notification`, `#/tour`                                                                                                         | 已完成（2026-07-01） |
-| E10 | Form / FormItem / Input / Textarea / InputGroup / InputNumber / Stepper                                                        | React/Vue: `#/form`, `#/input`, `#/textarea`, `#/input-group`, `#/input-number`, `#/stepper`                                                                                      | 已完成（2026-07-01） |
-| E11 | Checkbox / Radio / Switch / Slider / Segmented / Rate / ColorSwatch / ColorPicker                                              | React/Vue: `#/checkbox`, `#/radio`, `#/switch`, `#/slider`, `#/segmented`, `#/rate`, `#/color-swatch`, `#/color-picker`                                                           | 已完成（2026-07-01） |
-| E12 | Select / AutoComplete / Cascader / TreeSelect / Mentions / Transfer                                                            | React/Vue: `#/select`, `#/auto-complete`, `#/cascader`, `#/tree-select`, `#/mentions`, `#/transfer`                                                                               | 已完成（2026-07-01） |
-| E13 | DatePicker / TimePicker / Calendar / Countdown / CronEditor / NumberKeyboard                                                   | React/Vue: `#/datepicker`, `#/timepicker`, `#/calendar`, `#/countdown`, `#/cron-editor`, `#/number-keyboard`                                                                      | 已完成（2026-07-01） |
-| E14 | Upload / Signature                                                                                                             | React/Vue: `#/upload`, `#/signature`                                                                                                                                              | 已完成（2026-07-01） |
-| E15 | Table / Collapse / Timeline                                                                                                    | React/Vue: `#/table`, `#/collapse`, `#/timeline`                                                                                                                                  | 已完成（2026-07-01） |
-| E16 | VirtualTable / VirtualList / InfiniteScroll                                                                                    | React/Vue: `#/virtual-table`, `#/virtual-list`, `#/infinite-scroll`                                                                                                               | 已完成（2026-07-01） |
-| E17 | AreaChart / BarChart / LineChart / ScatterChart / chart subcomponents                                                          | React/Vue: `#/area-chart`, `#/bar-chart`, `#/line-chart`, `#/scatter-chart`; also inspect chart pages for ChartAxis/Canvas/Grid/Legend/Series/Tooltip behavior                    | 已完成（2026-07-01） |
-| E18 | PieChart / DonutChart / RadarChart / GaugeChart / FunnelChart / HeatmapChart / SunburstChart / TreeMapChart / Gantt / OrgChart | React/Vue: `#/pie-chart`, `#/donut-chart`, `#/radar-chart`, `#/gauge-chart`, `#/funnel-chart`, `#/heatmap-chart`, `#/sunburst-chart`, `#/treemap-chart`, `#/gantt`, `#/org-chart` | 已完成（2026-07-01） |
-| E19 | CodeEditor / MarkdownEditor / RichTextEditor / FileManager / ImageAnnotation / PrintLayout                                     | React/Vue: `#/code-editor`, `#/markdown-editor`, `#/rich-text-editor`, `#/file-manager`, `#/image-annotation`, `#/print-layout`                                                   | 已完成（2026-07-01） |
-| E20 | ActivityFeed / ChatWindow / CommentThread / DataTableWithToolbar / FormWizard / NotificationCenter / TaskBoard / Kanban        | React/Vue: `#/activity-feed`, `#/chat-window`, `#/comment-thread`, `#/data-table-with-toolbar`, `#/form-wizard`, `#/notification-center`, `#/task-board`, `#/kanban`              | 已完成（2026-07-01） |
-| E21 | Hooks demos: useDrag / useControlledState / useChartInteraction / useFormController                                            | React/Vue: `#/use-drag`, `#/use-controlled-state`, `#/use-chart-interaction`; `useFormController` 当前没有独立浏览器 demo route，如仍缺失则记录为“缺少可体验 Example”             | 已完成（2026-07-01） |
+- 直接读取对应 E 组的 `用户故事`、`Example 体验问题`、`组件能力建议`、`建议优先级` 和 `后续执行建议`。
+- P0/P1 优先拆成独立或小批量修复；P2/P3 只按同源组件、同一根因或相邻页面改动合并。
+- 修复后在对应 E 组追加复查结果、验证命令和剩余风险；提升为 roadmap Rxx 时同步更新 `docs/ROADMAP.md`。
+- 涉及 generated refs 时修改事实源或生成器后重生成，不手改 `skills/tigercat/references/*`。
 
 ## 分组执行记录
 
@@ -1723,22 +1635,9 @@ source: docs/ROADMAP.md R28 plus docs/EXAMPLE_AGENT_REQUIREMENTS.md
 
 **后续执行建议**：E21 当前只记录体验审查，不直接改 Example 或源码。后续可优先只改 Example/文档：新增 `UseFormControllerDemo`、扩展 Vue `UseControlledStateDemo`、修复 hooks 示例 warning、为 useDrag/useChartInteraction 增加 DemoBlock，并更新 `examples/example/shared/app-config.ts` 与 React/Vue router。修复后复查 React/Vue `#/use-drag`、`#/use-controlled-state`、`#/use-chart-interaction`、新增 `#/use-form-controller`，运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及新增 route 或页面结构时运行 `npx -y pnpm@11.9.0 example:build`。
 
-## 审查重点
+## 修复验证要求
 
-- 用户故事是否能从 Example 页面直接看出业务意图，而不是只看到 props 展示。
-- 必须模拟用户操作：点击按钮、打开弹层、输入文本、选择选项、滚动长内容、拖拽可拖动控件、切换主题/语言，并至少检查一个桌面视口和一个移动视口。
-- React/Vue Example 是否覆盖同等场景；若框架差异来自惯例，需要记录差异理由。
-- Code 标签是否仍来自同页 `?raw` source 或可验证 fixture；不得建议恢复手写 snippet。
-- 示例是否足够可复制：导入路径、状态管理、数据结构、事件回调、样式扩展、i18n 和 a11y 线索是否完整。
-- 复杂组件是否把可共存场景放在同一 Example 里，把互相干扰的弹层、异步、提交、命令式流程保持独立。
-- 缺失建议要区分文档/Example 缺口和组件能力缺口，避免把说明不足误判为 API 不足。
-
-## 验证要求
-
-- 只更新本计划文档或路线图时，运行：
-  - `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`
-  - `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`
-  - `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`
-- 如果后续 Agent 修改 Example 展示或 code source，额外运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时运行 `npx -y pnpm@11.9.0 example:build`。
-- R28 审查本身不要求、也不接受用测试命令替代浏览器体验证据。
-- 如果后续 Agent 修改组件源码或 public API，测试命令只作为修复验证补充；体验结论仍必须通过浏览器复查对应 Example route。
+- 修复前先区分 Example/文档缺口和组件能力缺口，避免把说明不足误判为 API 不足。
+- Example 展示或代码来源变更后运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时同时运行 `npx -y pnpm@11.9.0 example:build`。
+- 涉及组件源码或 public API 时，补充对应 focused tests、types/API 校验，并通过浏览器复查对应 React/Vue Example route。
+- 只整理本文时运行 `npx -y pnpm@11.9.0 exec prettier --check docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`、`git diff --check -- docs/EXAMPLE_USER_STORY_REQUIREMENTS.md` 和冲突标记扫描。
