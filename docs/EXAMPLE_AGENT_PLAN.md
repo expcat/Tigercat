@@ -74,7 +74,7 @@ source: docs/ROADMAP.md R28
 | E13 | DatePicker / TimePicker / Calendar / Countdown / CronEditor / NumberKeyboard                                                   | React/Vue: `#/datepicker`, `#/timepicker`, `#/calendar`, `#/countdown`, `#/cron-editor`, `#/number-keyboard`                                                                      | 已完成（2026-07-01） |
 | E14 | Upload / Signature                                                                                                             | React/Vue: `#/upload`, `#/signature`                                                                                                                                              | 已完成（2026-07-01） |
 | E15 | Table / Collapse / Timeline                                                                                                    | React/Vue: `#/table`, `#/collapse`, `#/timeline`                                                                                                                                  | 已完成（2026-07-01） |
-| E16 | VirtualTable / VirtualList / InfiniteScroll                                                                                    | React/Vue: `#/virtual-table`, `#/virtual-list`, `#/infinite-scroll`                                                                                                               | 未开始               |
+| E16 | VirtualTable / VirtualList / InfiniteScroll                                                                                    | React/Vue: `#/virtual-table`, `#/virtual-list`, `#/infinite-scroll`                                                                                                               | 已完成（2026-07-01） |
 | E17 | AreaChart / BarChart / LineChart / ScatterChart / chart subcomponents                                                          | React/Vue: `#/area-chart`, `#/bar-chart`, `#/line-chart`, `#/scatter-chart`; also inspect chart pages for ChartAxis/Canvas/Grid/Legend/Series/Tooltip behavior                    | 未开始               |
 | E18 | PieChart / DonutChart / RadarChart / GaugeChart / FunnelChart / HeatmapChart / SunburstChart / TreeMapChart / Gantt / OrgChart | React/Vue: `#/pie-chart`, `#/donut-chart`, `#/radar-chart`, `#/gauge-chart`, `#/funnel-chart`, `#/heatmap-chart`, `#/sunburst-chart`, `#/treemap-chart`, `#/gantt`, `#/org-chart` | 未开始               |
 | E19 | CodeEditor / MarkdownEditor / RichTextEditor / FileManager / ImageAnnotation / PrintLayout                                     | React/Vue: `#/code-editor`, `#/markdown-editor`, `#/rich-text-editor`, `#/file-manager`, `#/image-annotation`, `#/print-layout`                                                   | 未开始               |
@@ -1236,6 +1236,83 @@ source: docs/ROADMAP.md R28
 - P3：Timeline 状态 Tag 用中文标签映射。
 
 **后续执行建议**：优先只改 Example/文档，不需要组件源码/public API 变更。Table 列标题/placeholder 中文化、三页 dead-code 常量清理、操作列反馈与 Timeline 状态标签本地化都可在 React/Vue Example 内完成。修复阶段应复查 React/Vue `#/table`、`#/collapse`、`#/timeline` 的桌面与移动视口，并运行 `npx -y pnpm@11.9.0 example:sources:check`；如调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E16 VirtualTable / VirtualList / InfiniteScroll
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/virtual-table`、`#/virtual-list`、`#/infinite-scroll`。
+- React：`http://localhost:5174/#/virtual-table`、`#/virtual-list`、`#/infinite-scroll`。
+- 视口：桌面 `1280x800`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器工具：in-app browser 连接本地 Vue/React dev server 后完成路由访问、桌面/移动视口切换、代码展示检查与滚动交互复查。
+- 浏览器操作路径：逐页直达 hash route；检查 `h1`、section 数量、`示例`/`代码`展示、页面级横向溢出与控制台错误；VirtualTable 在基础表格内滚动到后续行并检查固定列 section 的 `aria-selected` 行；VirtualList 在 10000/5000 条虚拟列表中滚动到后续索引；InfiniteScroll 多次滚到底部触发加载，直到 50 项并显示结束状态。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/advanced.md`、`skills/tigercat/references/shared/props/advanced.md`。
+- React Example：`examples/example/react/src/pages/VirtualTableDemo.tsx`、`VirtualTableDemo.fixture.tsx`、`VirtualListDemo.tsx`、`InfiniteScrollDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/VirtualTableDemo.vue`、`VirtualTableDemo.fixture.vue`、`VirtualListDemo.vue`、`InfiniteScrollDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/virtual-table.ts`、`virtual-list.ts`、`infinite-scroll.ts`、`packages/core/src/utils/virtual-table-utils.ts`、`virtual-list-utils.ts`、`infinite-scroll-utils.ts`、`packages/react/src/components/VirtualTable.tsx`、`VirtualList.tsx`、`InfiniteScroll.tsx`、对应 Vue `VirtualTable.ts` / `VirtualList.ts` / `InfiniteScroll.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 VirtualTable 页面能展示千行数据、固定表头、斑马纹、边框、固定列样式、加载态、空态和大数据滚动表现，并能明确看出 `rowKey`、选择状态和固定列样式如何配合。
+- 作为使用者，我希望 VirtualTable 示例能展示行点击或选择后的可见状态回显，方便复制到用户列表、订单列表或审计日志等业务表格。
+- 作为使用者，我希望 VirtualList 页面能验证 10000 条固定高度列表和 overscan 配置在滚动时只渲染可视窗口，并能理解固定、变量、动态高度三种能力何时使用。
+- 作为使用者，我希望 InfiniteScroll 页面能通过滚动看到加载中、追加数据、无更多数据和自定义文案的完整链路，且中文站默认文案一致。
+- 作为使用者，我希望三个高级滚动组件的 `代码`展示来自当前页面或 compact fixture raw source，复制出的 import、数据结构和事件处理可信。
+
+**Example 体验问题**：
+
+- 问题：E16 未发现 route-level P0 阻断问题；React/Vue 6 个 route 均可打开，桌面与移动视口无页面级横向溢出、无目标页面控制台错误，VirtualTable/VirtualList/InfiniteScroll 的核心滚动与加载交互可完成。
+  浏览器证据：桌面 `1280x800` 下 React/Vue 均返回目标 `h1`；分节数一致（VirtualTable 5、VirtualList 3、InfiniteScroll 3）；移动 `390x844` 下 6 个 route 的 `pageOverflow=false`。VirtualTable 基础表格滚动后 React/Vue 均从 `用户 1` 更新到 `用户 54` 附近；VirtualList 基础列表滚动后 React/Vue 均从 `第 1 行` 更新到 `第 83 行` 附近；InfiniteScroll 从 20 项逐步加载到 50 项后停止。`代码`展示均来自 raw source：VirtualTable 用 fixture raw source，VirtualList/InfiniteScroll 用同页 `?raw`，未发现旧 `Snippet` 常量回流。
+  影响：E16 可作为 Advanced 虚拟化/无限滚动组件的体验审查入口继续使用。
+- 问题：VirtualTable 固定列样式示例传 `rowSelection={{ selectedRowKeys: [2, 4] }}` / `:row-selection="{ selectedRowKeys: [2, 4] }"`，但没有传 `rowKey`；组件默认用行索引作 key，所以浏览器实际选中的是 ID 3 和 ID 5，而不是用户从源码字面容易理解的 ID 2 和 ID 4。
+  浏览器证据：React/Vue `#/virtual-table` 固定列 section 中 `aria-selected="true"` 的可见行文本为 `3用户 3...` 和 `5用户 5...`；`getVirtualRowKey` 在未传 `rowKey` 时返回 index。
+  影响：这是 E16 最高优先级示例问题；用户复制后容易误解 `selectedRowKeys` 与业务主键的关系，固定列 selected 样式演示也缺少可复制的主键写法。
+- 问题：VirtualTable 固定列 section 展示了 selected 状态，但没有 `onSelectionChange` / `onRowClick` 回显，也没有外部状态面板；源码层组件支持 `onRowClick`、`onSelectionChange`、`renderCell`、`virtualizeColumns` 等能力，Example 只展示了静态 selected 样式。
+  浏览器证据：固定列 section 文本只说明 `fixedClassName / fixedHeaderClassName`，页面没有“已选择/点击行/当前选择”等状态；React/Vue 示例源码只传静态 `selectedRowKeys`，未传 `rowKey`、`onSelectionChange` 或 `onRowClick`。
+  影响：用户能看到样式扩展能力，但难以复制到真实可交互大表格。
+- 问题：InfiniteScroll 基础示例在中文站加载到末尾后显示英文默认 `No more data`；同页自定义文案 section 已展示 `— 到底了 —`，但基础链路没有显式传中文 `endText` 或 locale。
+  浏览器证据：React/Vue `#/infinite-scroll` 基础 section 反复滚动后均显示 50 个 `项目` 并追加 `No more data`；自定义文案 section 显示 `— 到底了 —`。
+  影响：无限滚动是高频业务组件，基础示例复制后会把英文结束文案带入中文页面；属于 Example/i18n 一致性问题。
+- 问题：VirtualList 类型与实现支持 `getItemHeight` 的变量高度、`estimatedItemHeight` 的动态测量和自定义 `sizeStrategy`，但 Example 只展示固定 `itemHeight` 与 overscan；第二个“自定义高度”其实仍是固定高度 60，不是变量或动态高度示例。
+  浏览器证据：`VirtualListProps` 包含 `estimatedItemHeight`、`getItemHeight`、`sizeStrategy`；React/Vue `#/virtual-list` 只有“基础用法”和“自定义高度 & overscan”两节，源码两节均传固定 `itemHeight`。
+  影响：固定高度场景可用，但高级列表最难理解的变量/动态高度能力没有可复制示例。
+- 问题：VirtualTable 加载 & 空状态 section 在移动视口内部使用并排 `flex`，由 DemoBlock preview 的横向滚动承接；页面级无溢出，但移动用户需要横向滚动才能完整看 Loading/Empty 两列。
+  浏览器证据：移动 `390x844` 下 VirtualTable route `pageOverflow=false`，但 DemoBlock preview 容器 `scrollWidth=704`、`clientWidth=293`，内部 VirtualTable 容器宽约 245；加载和空状态两列在该 preview 容器内横向排列。
+  影响：不阻断体验；属于移动端可读性 polish，可改成 `grid gap-4 md:grid-cols-2` 或让两列在小屏堆叠。
+
+**组件能力建议**：
+
+- 类型：文档示例 / 组合使用。
+  建议：VirtualTable 固定列示例传 `rowKey="id"` / `row-key="id"`，并保持 `selectedRowKeys: [2, 4]`，让选中行与业务 ID 对齐；同时补一个最小 `onSelectionChange`/`selectedKeys` 回显或用 `defaultSelectedRowKeys` 避免静态受控状态误导。
+  证据：当前浏览器选中 ID 3/5；源码未传 `rowKey`。
+- 类型：文档示例 / 组合使用。
+  建议：VirtualTable 增加一条可交互业务小场景，展示 `onRowClick`、`onSelectionChange` 或 `renderCell` 的外部状态回显；列虚拟化 `virtualizeColumns` 可作为后续高级示例补充。
+  证据：组件 props 支持相关能力，但当前页面只展示静态数据和样式配置。
+- 类型：i18n / 文档示例。
+  建议：InfiniteScroll 基础示例显式传中文 `loadingText` / `endText`，或通过示例站 locale 让默认结束文案本地化；保留自定义文案 section 作为覆盖能力展示。
+  证据：基础链路结束后显示英文 `No more data`。
+- 类型：文档示例 / 性能。
+  建议：VirtualList 增加变量高度或动态高度 section，至少展示 `getItemHeight` 或 `estimatedItemHeight` 的最小可复制写法，并回显当前滚动索引或 `onScroll` 值。
+  证据：core strategy 已支持 fixed/variable/dynamic，当前 Example 只有 fixed itemHeight。
+- 类型：移动端 / 文档示例。
+  建议：VirtualTable 加载 & 空状态在小屏下改为单列堆叠，或在文案中说明 preview 区域可横向滚动；优先调整 Example layout。
+  证据：移动视口页面无整体溢出，但 preview 内部需要横向滚动才能看完两列。
+
+**建议优先级**：
+
+- P1：VirtualTable 固定列示例补 `rowKey="id"` 并修正 selected rows 与业务 ID 的对应关系。
+- P2：VirtualTable 补选择/行点击状态回显，或把静态 selected 样式示例改成更明确的“样式展示”。
+- P2：InfiniteScroll 基础示例补中文 `loadingText` / `endText` 或 locale 默认文案。
+- P2：VirtualList 补变量高度/动态高度示例和滚动状态回显。
+- P3：VirtualTable 加载 & 空状态移动端布局改为小屏单列。
+
+**后续执行建议**：优先只改 Example/文档，不需要 public API 变更。VirtualTable 的 `rowKey`、选择状态回显、InfiniteScroll 中文文案、VirtualList 变量/动态高度示例和移动端布局都可在 React/Vue Example 内完成。修复阶段应复查 React/Vue `#/virtual-table`、`#/virtual-list`、`#/infinite-scroll` 的桌面与移动视口，并运行 `npx -y pnpm@11.9.0 example:sources:check`；如调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
 
 ## 审查重点
 

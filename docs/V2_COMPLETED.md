@@ -1280,3 +1280,37 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **剩余阻塞**：无；E16-E21 仍未开始。
 
 **状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E15 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前可执行分组推进到 E16；R28 E15 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R28 E16 Advanced virtualization example user-story review
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：按 `docs/EXAMPLE_AGENT_PLAN.md` 执行 E16，从真实使用者角度审查 VirtualTable / VirtualList / InfiniteScroll 的 React/Vue Example 体验、可复制性、滚动交互证据和后续优化建议。
+
+**允许修改**：`docs/EXAMPLE_AGENT_PLAN.md`、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件源码、Example 实现、generated Skill references、public API、API baseline、发布配置。
+
+**执行摘要**：已启动 Vue Example `http://localhost:5173/` 与 React Example `http://localhost:5174/`，读取 Advanced generated refs、React/Vue E16 页面源码、router 配置，以及 VirtualTable / VirtualList / InfiniteScroll 的 core types、utils 与 React/Vue 组件源码事实源。已用浏览器访问 React/Vue 的 `#/virtual-table`、`#/virtual-list`、`#/infinite-scroll`；桌面 `1280x800` 与移动 `390x844` 下确认目标 `h1`、section 数量、代码展示来源、页面级横向溢出和控制台错误。VirtualTable 基础表格滚动、VirtualList 固定高度列表滚动、InfiniteScroll 加载到 50 项结束状态、以及 VirtualTable fixed-column selected 行状态均已通过浏览器复查。
+
+**审查结论**：
+
+- E16 未发现 route-level P0 阻断问题；React/Vue 6 个 route 均可打开，核心滚动/加载交互可完成，且 `代码`展示来自 fixture raw source 或同页 `?raw`。
+- VirtualTable 固定列示例传 `selectedRowKeys: [2, 4]` 但未传 `rowKey`，实际选中 ID 3 和 ID 5，建议 P1 修正为业务主键写法。
+- VirtualTable 固定列 selected 状态是静态样式展示，没有 `onSelectionChange` / `onRowClick` 或外部状态回显，建议后续补可交互选择/行点击场景。
+- InfiniteScroll 基础示例在中文站加载到末尾后显示英文 `No more data`，建议补中文 `loadingText` / `endText` 或接入 locale 默认文案。
+- VirtualList 支持变量/动态高度策略，但 Example 只展示固定 `itemHeight` 与 overscan，建议补变量高度或动态高度示例。
+- VirtualTable 加载 & 空状态在移动端由 preview 内部横向滚动承接，可读性可后续优化为小屏单列。
+
+**实际验证**：
+
+- Browser desktop review：React/Vue `#/virtual-table`、`#/virtual-list`、`#/infinite-scroll` at `1280x800`。
+- Browser mobile review：React/Vue `#/virtual-table`、`#/virtual-list`、`#/infinite-scroll` at `390x844`。
+- Browser interactions：VirtualTable virtual row scroll to `用户 54` range, VirtualList scroll to `第 83 行` range, InfiniteScroll load from 20 to 50 items and end state, code display raw source check, fixed-column selected row inspection.
+- `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+
+**剩余阻塞**：无；E17-E21 仍未开始。
+
+**状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E16 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前可执行分组推进到 E17；R28 E16 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
