@@ -63,7 +63,7 @@ source: docs/ROADMAP.md R28
 | E02 | Avatar / AvatarGroup / Empty / Result / Statistic / QRCode / Watermark                                                         | React/Vue: `#/avatar`, `#/empty`, `#/result`, `#/statistic`, `#/qrcode`, `#/watermark`                                                                                            | 已完成（2026-07-01） |
 | E03 | Image / ImageGroup / ImagePreview / ImageViewer / CropUpload / ImageCropper                                                    | React/Vue: `#/image`, `#/image-viewer`, `#/crop-upload`, `#/image-cropper`                                                                                                        | 已完成（2026-07-01） |
 | E04 | Layout / Header / Sidebar / Content / Footer / Container / Row / Col / Space / Divider                                         | React/Vue: `#/layout`, `#/grid`, `#/space`, `#/divider`                                                                                                                           | 已完成（2026-07-01） |
-| E05 | Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel                                                        | React/Vue: `#/card`, `#/list`, `#/descriptions`, `#/skeleton`, `#/splitter`, `#/resizable`, `#/carousel`                                                                          | 未开始               |
+| E05 | Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel                                                        | React/Vue: `#/card`, `#/list`, `#/descriptions`, `#/skeleton`, `#/splitter`, `#/resizable`, `#/carousel`                                                                          | 已完成（2026-07-01） |
 | E06 | Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton                                                                | React/Vue: `#/affix`, `#/anchor`, `#/backtop`, `#/breadcrumb`, `#/scroll-spy`, `#/float-button`                                                                                   | 未开始               |
 | E07 | Menu / Dropdown / Steps / Tabs / Tree / Pagination / Spotlight                                                                 | React/Vue: `#/menu`, `#/dropdown`, `#/steps`, `#/tabs`, `#/tree`, `#/pagination`, `#/spotlight`                                                                                   | 未开始               |
 | E08 | Alert / Loading / Progress / Tooltip / Popover / Popconfirm                                                                    | React/Vue: `#/alert`, `#/loading`, `#/progress`, `#/tooltip`, `#/popover`, `#/popconfirm`                                                                                         | 未开始               |
@@ -361,6 +361,95 @@ source: docs/ROADMAP.md R28
 - P3：Layout Shell 示例补菜单选中与内容区联动场景。
 
 **后续执行建议**：Grid 响应式问题需要组件源码/构建输出层修复，不应只改文案；修复阶段应复查 React/Vue `#/grid` 的响应式 span、offset、order，并补充 `Row`/`Col` focused tests 或对应 grouped layout 验证。Shell a11y、Divider gradient 和 nowrap 提示可优先只改 Example/文档；修复后复查 React/Vue `#/layout`、`#/divider`、`#/grid`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E05 Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/card`、`#/list`、`#/descriptions`、`#/skeleton`、`#/splitter`、`#/resizable`、`#/carousel`。
+- React：`http://localhost:5174/#/card`、`#/list`、`#/descriptions`、`#/skeleton`、`#/splitter`、`#/resizable`、`#/carousel`。
+- 视口：桌面默认 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、section 数量、`示例`/`代码`页签、图片加载、ARIA 角色和页面级横向溢出；在 Card 页面打开首个 `代码`页签确认 raw-source；点击 List 分页、加载按钮和可点击列表项；等待 Skeleton 加载态切换；用键盘操作 Splitter separator 与 Resizable handle；点击 Carousel dot position 和编程式 `Next`。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/layout.md`、`skills/tigercat/references/shared/props/layout.md`、`skills/tigercat/references/examples/basic.md`、`skills/tigercat/references/shared/props/basic.md`。
+- React Example：`examples/example/react/src/pages/CardDemo.tsx`、`ListDemo.tsx`、`DescriptionsDemo.tsx`、`SkeletonDemo.tsx`、`SplitterDemo.tsx`、`ResizableDemo.tsx`、`CarouselDemo.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/CardDemo.vue`、`ListDemo.vue`、`DescriptionsDemo.vue`、`SkeletonDemo.vue`、`SplitterDemo.vue`、`ResizableDemo.vue`、`CarouselDemo.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/card.ts`、`list.ts`、`descriptions.ts`、`skeleton.ts`、`splitter.ts`、`resizable.ts`、`carousel.ts`、`packages/react/src/components/Splitter.tsx`、`Resizable.tsx`、`Carousel.tsx`、`packages/vue/src/components/Splitter.ts`、`Resizable.ts`、`Carousel.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 Card 页面能比较变体、尺寸、内边距、封面、header/footer/actions 和完整商品卡片，复制后能直接做内容卡或商品卡。
+- 作为使用者，我希望 List 页面能覆盖基础数据、头像、extra 操作、自定义渲染、分页、加载、空态、点击和竖直布局，并在交互后看到业务状态变化。
+- 作为使用者，我希望 Descriptions 页面在桌面和移动端都能读清详情字段，并看到响应式 `column` 的推荐写法，而不是在窄列里截断字段。
+- 作为使用者，我希望 Skeleton 页面能真实展示加载前后切换，且加载完成后的业务内容语言与中文站一致。
+- 作为使用者，我希望 Splitter 页面能直接拖拽或键盘调整水平/垂直/嵌套面板，并且 React/Vue 示例表现一致。
+- 作为使用者，我希望 Resizable 页面能用鼠标或键盘调整容器尺寸，看到当前宽高同步变化，并理解锁定比例、单轴和禁用状态。
+- 作为使用者，我希望 Carousel 页面能验证 dots、arrows、autoplay、fade、dot position、非循环边界和 ref 控制，同时控制名称符合当前语言环境。
+
+**Example 体验问题**：
+
+- 问题：E05 未发现整组 route-level P0 阻断问题；React/Vue 除 Vue Splitter 内容缺失外，其余 route 均可打开，桌面和移动视口无页面级横向溢出，Card/List/Skeleton/Resizable/Carousel 主要交互可体验。
+  浏览器证据：React/Vue `#/card` 均为 7 个 section、6 张封面图加载完成；`#/list` 均为 14 个 section，点击第 2 页后显示 `当前：第 2 页，10 / 页` 且出现 `列表项 11`，点击“模拟加载”后按钮变为 `加载中...` 并有 `aria-busy=true`，2 秒后恢复；`#/skeleton` 初始有 58 个 skeleton/pulse 节点，等待 3.8 秒后出现“文章标题”和 `Item 1`；`#/resizable` 右下 handle 键盘 ArrowRight/ArrowDown 后从 `300 × 150` 变为 `310 × 160`；`#/carousel` 点击 `right` 后按钮变为 primary，点击编程式 `Next` 后 transform 从 `0` 变为 `-831px` / `-197px` 等位移。移动 `390x844` 下 14 个 E05 route 的 `pageOverflow=false`。
+  影响：E05 大多数页面可继续作为 Layout/Advanced 交互类组件的用户审查入口。
+- 问题：Splitter 示例把 `sizes={[30, 70]}` / `:sizes="[30, 70]"` 文案写成 `30% / 70%`，但组件公开类型和实现按像素解释 `sizes`，React 实际渲染为 `width: 30px` 与 `width: 70px`，左侧内容还出现内部溢出。
+  浏览器证据：React `#/splitter` 首个水平示例有 5 个 `role="separator"`；键盘按 ArrowRight 前首两个 pane 为 `30px / 70px`，按后变为 `40px / 60px`。`packages/core/src/types/splitter.ts` 写明 `sizes?: number[]` 是 “Initial sizes of each pane in pixels”；React/Vue 示例源码和 snippet 均把文本写作“左侧面板 (30%) / 右侧面板 (70%)”。
+  影响：用户会误以为 `sizes` 是百分比，并复制出几乎不可用的窄面板；这是高频布局场景，应作为 P1 修复。
+- 问题：Vue `#/splitter` 页面使用 `#panel-0` / `#panel-1` 命名 slot，但 Vue Splitter 实现只读取默认 slot，导致 4 个示例容器有高度和边框却没有 pane、separator 或示例文本。
+  浏览器证据：Vue `#/splitter` 显示 `h1` 和 4 个 section（水平分割、垂直分割、嵌套分割、可折叠），但 `paneCount=0`、`separatorCount=0`，`hasLeftPanel=false`、`hasRightPanel=false`；4 个 `data-direction` 容器宽 `879px`、高 `200/300px`，`text=""`。源码 `packages/vue/src/components/Splitter.ts` 使用 `slots.default?.()`，而 `examples/example/vue3/src/pages/SplitterDemo.vue` 只传命名 slot。
+  影响：Vue 用户无法体验 Splitter 的核心拖拽/键盘调整能力，且 React/Vue 示例明显不一致。
+- 问题：Vue Splitter 示例展示“可折叠”并传入 `:collapsible` / `:min-sizes`，但当前 Vue Splitter props 没有 `collapsible` 或 `minSizes`，React 同组只展示“最小尺寸”。
+  浏览器证据：`packages/vue/src/components/Splitter.ts` props 只有 `direction`、`sizes`、`min`、`max`、`gutterSize`、`disabled`、`className`、`style`；`packages/core/src/types/splitter.ts` 的公开 `SplitterProps` 也没有 `collapsible` / `minSizes`。Vue Example 第 4 个 DemoBlock 标题为“可折叠”，React 第 4 个为“最小尺寸”。
+  影响：即使修复 slot 后，Vue 页面仍会宣传不存在的组件能力，属于 React/Vue 不一致和 API 误导。
+- 问题：Descriptions 在多列示例中没有使用响应式 `column` 或移动端降级，多个详情容器在桌面小列宽与移动视口下出现内部内容溢出/截断。
+  浏览器证据：React/Vue `#/descriptions` 桌面 `1280x720` 下“不同尺寸”中 Descriptions 容器 `clientWidth=229px`、`scrollWidth=381/449/548px`；移动 `390x844` 下多处 Descriptions 容器 `clientWidth=165px`、`scrollWidth=545/552/548px`，容器 class 含 `overflow-hidden`，页面级 `pageOverflow=false`。
+  影响：页面整体不横向滚动，但用户在窄视口无法完整阅读邮箱、地址、系统版本等字段；示例没有展示类型中已有的响应式 `column` 写法。
+- 问题：List 的“可点击列表”和 Card/List 操作按钮多数只触发控制台或没有可见反馈，用户难以复制出业务状态流。
+  浏览器证据：点击 React `#/list` 可点击列表第一项后页面没有“点击了/已选择/选中”等可见状态，也没有 selected/active 类应用到列表项，控制台仅记录 `点击了列表项: Object 索引: 0`；Card 的“收藏/购买”、List 的“查看/购买/添加”按钮源码没有绑定反馈。
+  影响：组件交互能力存在，但 Example 对业务接线的可复制性不足，尤其列表选择、任务查看、商品购买等常见场景。
+- 问题：Skeleton 加载完成后的真实场景内容混入英文文案，且定时加载只能等待，缺少可重新触发的控制。
+  浏览器证据：React/Vue `#/skeleton` 等待 3.8 秒后显示“文章标题”和 `Item 1`，但页面同时出现 `This is the content loaded after the skeleton.`；重新体验加载态需要刷新页面，没有“重新加载”按钮。
+  影响：中文示例站语言不一致；用户也不便反复观察 Skeleton 与真实内容的切换边界。
+- 问题：Carousel 在中文示例站的内部控制和无障碍名称仍是英文，且页面没有展示受控 `currentIndex` / `onCurrentIndexChange` 的外部状态同步。
+  浏览器证据：React/Vue `#/carousel` 均有 45 个按钮，其中 dots/arrows aria-label 为 `Go to slide N`、`Previous slide`、`Next slide`，root/slide aria-label 源码也写死 `Image carousel` / `Slide N of M`；点击编程式 `Next` 能改变 transform，但页面没有显示当前 slide index 或 change 回调结果。
+  影响：视觉交互可用，但 a11y/i18n 与可复制业务状态示例不足。
+
+**组件能力建议**：
+
+- 类型：文档示例 / 默认行为。
+  建议：修复 Splitter 示例的尺寸语义；若继续按像素 API，示例应使用合理像素值（如 `240/520`）并把文案改为 px；若期望百分比分割，则需要先扩展组件 API 后再更新示例。
+  证据：公开类型和实现均按像素处理 `sizes`，当前示例却写成百分比并渲染为 `30px/70px`。
+- 类型：文档示例 / React-Vue 一致性。
+  建议：Vue Splitter 示例改用默认 slot 子节点，移除不存在的 `collapsible` / `min-sizes` 展示，或在后续源码任务中真正实现对应 pane config 后再展示。
+  证据：Vue `#/splitter` 当前没有 pane/separator，可折叠 props 不在公开 `SplitterProps` / Vue props 中。
+- 类型：移动端 / 文档示例。
+  建议：Descriptions 示例把高列数场景改为响应式 `column={{ xs: 1, md: 2, lg: 3 }}` / Vue 等价对象，或在窄容器旁显式加入内部横向滚动与提示。
+  证据：类型已支持 responsive object；当前示例固定 `column={2/3/4}` 在移动端和小列宽下截断内容。
+- 类型：组合使用 / 文档示例。
+  建议：List 可点击、Card 操作和 List extra 操作补最小可见反馈，例如当前选中项、已收藏/已加入购物车、已查看任务，避免只写 `console.log`。
+  证据：点击列表项只产生日志，页面无选择状态；多个操作按钮无 handler。
+- 类型：i18n / 文档示例。
+  建议：Skeleton 加载完成内容统一中文，并给加载态示例增加“重新加载”按钮或受控 loading 示例；Carousel 后续补中文 aria-label / locale 能力或示例层覆写，并展示受控当前页状态。
+  证据：Skeleton 真实场景出现英文内容；Carousel 源码 aria-label 写死英文且 Example 没有 current index 状态展示。
+- 类型：文档示例 / 资产稳定性。
+  建议：Card 封面图后续可考虑仓库内 fixture 或本地可控图片，降低外链图片对离线/内网/CI 体验的影响。
+  证据：当前 6 张 Unsplash 外链在本次浏览器体验中加载成功，但与 E03 图片类问题类似，示例资产稳定性仍依赖外网。
+
+**建议优先级**：
+
+- P1：修复 Vue Splitter 示例为空的问题，并移除/实现不存在的 `collapsible` / `min-sizes` 能力展示。
+- P1：修正 Splitter `sizes` 的示例单位和文案，避免 `30px/70px` 被写成 `30%/70%`。
+- P2：Descriptions 示例补响应式 `column` 或移动端可读性方案。
+- P2：List/Card 操作补可见业务反馈，尤其可点击列表的选中/点击结果。
+- P2：Carousel 控制 aria-label/i18n 与受控 current index 示例。
+- P3：Skeleton 加载完成文案中文化并增加重新触发加载态入口。
+- P3：Card 封面图后续评估本地 fixture。
+
+**后续执行建议**：Splitter 需要优先进入 Example/组件一致性修复：先只改 Vue Splitter 示例 slot 与错误 props、修正 React/Vue `sizes` 示例值/文案；若选择支持百分比或折叠能力，则另开组件源码/API 任务并补 React/Vue focused tests。Descriptions/List/Card/Skeleton/Carousel 可先作为 Example/文档改进；修复阶段复查 React/Vue `#/splitter`、`#/descriptions`、`#/list`、`#/skeleton`、`#/carousel`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
 
 ## 审查重点
 

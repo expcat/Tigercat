@@ -1152,3 +1152,34 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
 
 **状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E02 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前可执行分组推进到 E03；R28 E02 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R28 E05 Layout example user-story review
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：按 `docs/EXAMPLE_AGENT_PLAN.md` 执行 E05，从真实使用者角度审查 Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel 的 React/Vue Example 体验、可复制性、交互证据和后续优化建议。
+
+**允许修改**：`docs/EXAMPLE_AGENT_PLAN.md`、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件源码、Example 实现、generated Skill references、public API、API baseline、发布配置。
+
+**执行摘要**：已启动 Vue Example `http://localhost:5173/` 与 React Example `http://localhost:5174/`，读取 Layout/Basic generated refs、React/Vue E05 页面源码、router 配置，以及 Splitter / Resizable / Carousel / Descriptions 相关类型和组件源码事实源。已用浏览器访问 React/Vue 的 `#/card`、`#/list`、`#/descriptions`、`#/skeleton`、`#/splitter`、`#/resizable`、`#/carousel`。桌面默认 `1280x720` 下确认目标 `h1`、section 数量、`示例`/`代码`页签、Card 图片加载、List 分页/加载、Skeleton 定时切换、Splitter/Resizable 键盘调整和 Carousel dot/ref 控制；移动 `390x844` 下确认 14 个 E05 route 无页面级横向溢出，并记录 Descriptions、List pagination、Carousel 等内部局部溢出/可读性问题。
+
+**审查结论**：
+
+- E05 未发现整组 route-level P0 阻断问题；但 Vue `#/splitter` 示例内容为空，且 React/Vue Splitter 示例把像素 `sizes` 误写成百分比，是本组最高优先级问题。
+- React Splitter 首个示例实际渲染 `30px / 70px`，键盘调整后变为 `40px / 60px`；公开类型说明 `sizes` 是像素，示例文案却写 `30% / 70%`。
+- Vue Splitter 示例使用命名 slot，但组件实现读取默认 slot，导致 `paneCount=0`、`separatorCount=0`；同时示例展示不存在的 `collapsible` / `min-sizes` props。
+- Descriptions 固定多列示例在桌面小列宽与移动视口下内部截断内容，建议补响应式 `column` 示例。
+- List/Card 操作缺少可见业务反馈；Skeleton 加载完成文案混入英文；Carousel aria-label 写死英文且缺少受控 current index 状态展示。
+
+**实际验证**：
+
+- Browser desktop review：React/Vue `#/card`、`#/list`、`#/descriptions`、`#/skeleton`、`#/splitter`、`#/resizable`、`#/carousel` at default `1280x720`。
+- Browser mobile review：React/Vue `#/card`、`#/list`、`#/descriptions`、`#/skeleton`、`#/splitter`、`#/resizable`、`#/carousel` at `390x844`。
+- Browser interactions：Card code tab raw source, List page 2/loading/clickable item, Skeleton timed transition, Splitter separator keyboard resize, Resizable bottom-right keyboard resize, Carousel dot position and ref `Next`.
+- `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+
+**状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E05 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前可执行分组推进到 E06；R28 E05 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
