@@ -67,8 +67,8 @@ source: docs/ROADMAP.md R28
 | E06 | Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton                                                                | React/Vue: `#/affix`, `#/anchor`, `#/backtop`, `#/breadcrumb`, `#/scroll-spy`, `#/float-button`                                                                                   | 已完成（2026-07-01） |
 | E07 | Menu / Dropdown / Steps / Tabs / Tree / Pagination / Spotlight                                                                 | React/Vue: `#/menu`, `#/dropdown`, `#/steps`, `#/tabs`, `#/tree`, `#/pagination`, `#/spotlight`                                                                                   | 已完成（2026-07-01） |
 | E08 | Alert / Loading / Progress / Tooltip / Popover / Popconfirm                                                                    | React/Vue: `#/alert`, `#/loading`, `#/progress`, `#/tooltip`, `#/popover`, `#/popconfirm`                                                                                         | 已完成（2026-07-01） |
-| E09 | Modal / Drawer / Message / Notification / Tour                                                                                 | React/Vue: `#/modal`, `#/drawer`, `#/message`, `#/notification`, `#/tour`                                                                                                         | 未开始               |
-| E10 | Form / FormItem / Input / Textarea / InputGroup / InputNumber / Stepper                                                        | React/Vue: `#/form`, `#/input`, `#/textarea`, `#/input-group`, `#/input-number`, `#/stepper`                                                                                      | 未开始               |
+| E09 | Modal / Drawer / Message / Notification / Tour                                                                                 | React/Vue: `#/modal`, `#/drawer`, `#/message`, `#/notification`, `#/tour`                                                                                                         | 已完成（2026-07-01） |
+| E10 | Form / FormItem / Input / Textarea / InputGroup / InputNumber / Stepper                                                        | React/Vue: `#/form`, `#/input`, `#/textarea`, `#/input-group`, `#/input-number`, `#/stepper`                                                                                      | 已完成（2026-07-01） |
 | E11 | Checkbox / Radio / Switch / Slider / Segmented / Rate / ColorSwatch / ColorPicker                                              | React/Vue: `#/checkbox`, `#/radio`, `#/switch`, `#/slider`, `#/segmented`, `#/rate`, `#/color-swatch`, `#/color-picker`                                                           | 已完成（2026-07-01） |
 | E12 | Select / AutoComplete / Cascader / TreeSelect / Mentions / Transfer                                                            | React/Vue: `#/select`, `#/auto-complete`, `#/cascader`, `#/tree-select`, `#/mentions`, `#/transfer`                                                                               | 已完成（2026-07-01） |
 | E13 | DatePicker / TimePicker / Calendar / Countdown / CronEditor / NumberKeyboard                                                   | React/Vue: `#/datepicker`, `#/timepicker`, `#/calendar`, `#/countdown`, `#/cron-editor`, `#/number-keyboard`                                                                      | 未开始               |
@@ -697,6 +697,162 @@ source: docs/ROADMAP.md R28
 - P3：弹层受控示例补可见当前 `open` 状态面板。
 
 **后续执行建议**：优先只改 Example/文档；Alert `closeAriaLabel`、Progress `aria-label` 都可在示例层用现有 props 直接覆写（无需 public API 变更），Popconfirm 可见反馈与 Loading 文案同为纯 Example 改动。若选择组件级 locale（Alert 当前无 `locale` prop，Progress 的英文 aria 文案在组件内生成），再另开组件源码/i18n 任务并补 React/Vue focused a11y tests。修复阶段应复查 React/Vue `#/alert`、`#/progress`、`#/popconfirm`、`#/loading`、`#/tooltip`、`#/popover`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E09 Modal / Drawer / Message / Notification / Tour
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/modal`、`#/drawer`、`#/message`、`#/notification`、`#/tour`。
+- React：`http://localhost:5174/#/modal`、`#/drawer`、`#/message`、`#/notification`、`#/tour`。
+- 视口：桌面 `1280x800`（弹层交互脚本用 `1280x900` 以容纳对话框/抽屉）；移动 `390x844`。
+- 主题/语言：示例站点默认主题；语言由 `getStoredLang()` 决定，未写入 localStorage 时回退 `navigator.language`，`zh` 开头判为 `zh-CN`（真实中文用户默认中文文案）。
+- 浏览器工具：本轮交互式 preview MCP 在当前环境无法绑定端口、Chrome 扩展未连接，改用脚本化 headless Chromium（仓库内置 playwright-core@1.61.1 + ms-playwright chromium_headless_shell-1228）对同一 dev server 做 DOM 查询与用户操作复查。**重要方法学**：headless Chromium 的 `navigator.language` 默认 `en-US`，会让示例站默认切到 en-US 并渲染英文文案/aria；本轮显式给浏览器上下文设 `locale: 'zh-CN'` 以复现真实中文用户体验，后续 Agent 复查 E09/E1x 弹层与 i18n 时必须同样设 `zh-CN`，否则会把默认英文误判成 bug。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、`section`/`h2` 分节数、桌面与移动页面级横向溢出、控制台报错；Modal 打开基础对话框读 `role="dialog"`/`aria-modal`/关闭按钮 aria-label，`Esc` 关闭，打开“删除确认”点“确认删除”读页面可见反馈，打开“编辑资料”空提交读校验错误，打开“自定义文案对话框”读 labels 覆盖后的关闭 aria-label；Drawer 打开基础抽屉读 dialog/关闭 aria-label，打开 labels 抽屉读覆盖后的 aria-label；Message 点击信息/成功/错误读 `role=status/alert`、`aria-live`、可关闭消息的关闭按钮 aria-label；Notification 点击信息/错误读 `role`/文案/关闭 aria-label，点“显示带操作通知”读内嵌操作按钮；Tour 点“开始引导”读步骤标题、`1 / 3` 计数与导航按钮文案，点“下一步”读第二步；移动端打开右下角/左上角 Notification 与 Message 测量弹层右边界是否落在视口内。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/feedback.md`、`skills/tigercat/references/shared/props/feedback.md`。
+- React Example：`examples/example/react/src/pages/ModalDemo.tsx`、`DrawerDemo.tsx`、`MessageDemo.tsx`、`NotificationDemo.tsx`、`TourDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/ModalDemo.vue`、`DrawerDemo.vue`、`MessageDemo.vue`、`NotificationDemo.vue`、`TourDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/modal.ts`、`drawer.ts`、`message.ts`、`tour.ts`、`packages/react/src/components/Modal.tsx`、`Drawer.tsx`、`MessageContainer.tsx`、`NotificationContainer.tsx`、`Message.tsx`、`Tour.tsx`、对应 Vue 组件文件、`packages/core/src/utils/locale-utils.ts`（`getTourLabels` / `mergeTigerLocale`）、`packages/core/src/utils/i18n/locales/zh-CN.ts`、`examples/example/shared/tiger-locale.ts`、`examples/example/shared/prefs.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 Modal 页面能比较尺寸、居中、自定义/默认页脚、labels 文案、嵌套、遮罩控制、关闭销毁，并在删除确认、协议阅读、表单编辑等业务场景看到可见反馈与校验。
+- 作为使用者，我希望 Drawer 页面能验证位置、尺寸、内边距、自定义头尾、无蒙层、禁用蒙层关闭、隐藏关闭按钮、labels 文案和关闭销毁，方便落地设置面板或详情侧栏。
+- 作为使用者，我希望 Message 页面能验证类型、持续时间、手动关闭、队列、回调、自定义样式/图标和上传/保存/删除/网络错误等业务流程。
+- 作为使用者，我希望 Notification 页面能验证类型、四角位置、持续时间、可关闭性、手动控制、点击/回调、内嵌操作、清空和快捷写法。
+- 作为使用者，我希望 Tour 页面能点开始引导逐步走查、看到步骤计数和导航按钮，并确认自定义按钮文字与指示器，且在中文站得到中文导航文案。
+
+**Example 体验问题**：
+
+- 问题：E09 未发现 P0/P1 route-level 阻断问题；React/Vue 10 个 route 均可打开，桌面与移动视口无页面级横向溢出，无控制台报错，Modal/Drawer/Message/Notification/Tour 主要交互均可完成，且 React/Vue 结构与行为高度一致。
+  浏览器证据：桌面 `1280x800` 下 React/Vue 分别返回目标 `h1`，`section` 数一致（Modal 5、Drawer 8、Message 9、Notification 10、Tour 1）；移动 `390x844` 下 10 个 route 的 `pageOverflow=false`；`errors=[]`。Modal 基础对话框为 `role="dialog"`、`aria-modal="true"`；“删除确认”点“确认删除”后页面出现 `已确认：删除操作已提交（示例）`，“编辑资料”空提交出现 `请填写姓名`。Message 点击信息/成功/错误渲染 3 条 `role=status/status/alert`、`aria-live=polite/polite/assertive`。Notification 内嵌操作示例渲染 `查看` / `撤销` 两个业务操作按钮。Tour 点“开始引导”出现 `步骤一…1 / 3`，`zh-CN` 下导航按钮为 `下一步` / `上一步`、关闭 aria-label `关闭导览`，点“下一步”进入 `步骤二…2 / 3`。移动端右下角/左上角 Notification 右边界 `366`/`382`（视口 `390`，`within=true`），Message 右边界 `284`，均落在视口内。
+  影响：E09 可作为 Feedback 弹层/全局提示/引导类组件的审查入口继续使用。
+- 问题：Modal 与 Drawer 基础示例的右上角关闭按钮在中文站仍暴露英文 aria-label（Modal `Close`、Drawer `Close drawer`），只有专门的“自定义文案 (labels)”示例是中文。
+  浏览器证据：`locale=zh-CN` 下 React/Vue `#/modal` 基础对话框关闭按钮 `aria-label="Close"`，labels 示例为 `关闭对话框`；`#/drawer` 基础抽屉 `aria-label="Close drawer"`，labels 示例为 `关闭抽屉`。根因：示例站 `getDemoTigerLocale('zh-CN')` 只提供 `locale:'zh-CN'` + `formWizard` + `upload`，未提供 `modal` / `drawer` / `common` 键；`ConfigProvider` 不会把 `'zh-CN'` 字符串展开成完整 bundle（`getImmediateTigerLocale` 原样返回传入对象），Modal/Drawer 的 `resolveLocaleText` 因此回退到组件内英文默认 `'Close'` / `'Close drawer'`。
+  影响：常规弹层复制后会在中文界面带英文可访问名称，与 E07 Tabs/Tree、E08 Alert/Progress 记录的英文默认 aria-label 同类。
+- 问题：Message 与 Notification 的关闭按钮 aria-label 为硬编码英文，且无法通过示例站 locale 修复。
+  浏览器证据：`locale=zh-CN` 下可关闭 Message 的关闭按钮 `aria-label="Close message"`，Notification 关闭按钮 `aria-label="Close notification"`；源码 `packages/react/src/components/MessageContainer.tsx` 常量 `MESSAGE_CLOSE_ARIA_LABEL = 'Close message'`、`NotificationContainer.tsx` 直接写 `aria-label="Close notification"`。Message/Notification 通过 `Message.tsx` 的 `createRoot` 挂到 `document.body` 独立根（`MessageHost`），脱离应用 `ConfigProvider` 树，无法继承 locale context；imperative 配置（`MessageProps`）也没有 `closeAriaLabel` / `locale` 选项。
+  影响：即使把示例站 locale 补全，也修不了 Message/Notification 的英文关闭 aria-label；这是组件级 i18n/a11y 缺口，需要 API 或全局配置层解决。
+- 问题：Notification 的“点击和回调”“内嵌操作”示例用原生 `alert()`（`alert('查看详情功能')` / `alert('打开通知详情')`）作为点击反馈。
+  浏览器证据：`NotificationDemo.tsx` / `.vue` 的 `showClickableNotification`、`showActionNotification` 内联 `alert(...)`；点击时会弹出阻塞式浏览器对话框。
+  影响：不阻断使用；但作为可复制业务模式，阻塞式 `alert` 不够理想，建议改为页面内可见反馈或 Message/Notification 二次提示。
+- 问题：Message 与 Notification 示例用自定义 `className`（如 `bg-blue-600` / `bg-indigo-500`）手写彩色按钮，而非使用库内 `Button` 的 `variant`。
+  浏览器证据：`MessageDemo.tsx` / `NotificationDemo.tsx` 的触发按钮均在 `Button` 上叠加 Tailwind 颜色类；`Modal`/`Drawer`/`Tour` 示例则使用 `variant`。
+  影响：不阻断使用；属于示例可复制性与跨页一致性的 polish 缺口，用户容易照抄成脱离主题 token 的硬编码颜色。
+
+**组件能力建议**：
+
+- 类型：i18n / a11y / 文档示例。
+  建议：优先在示例站 `getDemoTigerLocale('zh-CN')` 补 `modal: { closeAriaLabel: '关闭' }`、`drawer: { closeAriaLabel: '关闭' }`、`common: { closeText: '关闭' }`（或直接引入 core 已有的完整 zh-CN bundle），一处修复即可覆盖全站 Modal/Drawer 关闭 aria-label；单个示例也可显式传 `labels={{ closeAriaLabel }}`。
+  证据：core `zh-CN.ts` 已有 `modal.closeAriaLabel`/`drawer.closeAriaLabel = '关闭'`，但示例站 locale 未引入，导致基础示例回退英文。
+- 类型：a11y / i18n / 组件源码。
+  建议：为 Message/Notification 提供关闭 aria-label 的本地化入口——在 imperative 配置增加 `closeAriaLabel`（或全局 `Message.config({ locale })` / 让 `MessageHost` 读取全局 locale），否则中文站的全局提示关闭按钮无法本地化。
+  证据：关闭 aria-label 硬编码英文，容器脱离 `ConfigProvider`，`MessageProps` 无相关字段。
+- 类型：文档示例 / 组合使用。
+  建议：Notification 点击/内嵌操作示例改用页面内可见反馈或二次 Message/Notification，替换阻塞式 `alert`；保留 `console.log` 作为辅助。
+  证据：`showClickableNotification` / `showActionNotification` 使用 `alert()`。
+- 类型：文档示例 / 样式扩展。
+  建议：Message/Notification 触发按钮改用 `Button` 的 `variant`（primary/secondary/danger 等），或在说明中标注彩色类仅为演示分组，避免用户照抄硬编码颜色。
+  证据：示例按钮用 Tailwind 颜色类覆盖 Button，与 Modal/Drawer/Tour 的 variant 用法不一致。
+
+**建议优先级**：
+
+- P1：示例站 zh-CN locale 补 `modal`/`drawer`/`common` 关闭文案（或引入完整 bundle），修正基础 Modal/Drawer 中文站英文关闭 aria-label。
+- P1：Message/Notification 关闭 aria-label 组件级本地化入口（imperative `closeAriaLabel` 或全局 locale），该项无法在示例层修复。
+- P2：Notification 点击/内嵌操作示例用可见反馈替换 `alert`。
+- P3：Message/Notification 触发按钮改用 Button `variant` 或补说明。
+
+**后续执行建议**：分两类修复：示例/文档层可处理 Modal/Drawer 中文关闭文案（改 `getDemoTigerLocale` 或传 `labels`）、Notification `alert` 替换、Message/Notification 按钮 variant；组件源码/API 层需处理 Message/Notification 关闭 aria-label 本地化（`MessageProps` 增字段或 host 读全局 locale）。修复阶段务必在浏览器上下文 `locale: 'zh-CN'` 下复查 React/Vue `#/modal`、`#/drawer`、`#/message`、`#/notification`、`#/tour`，Example 改动运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时再运行 `npx -y pnpm@11.9.0 example:build`；组件/API 修复补 React/Vue Message/Notification focused a11y tests。
+
+### E10 Form / FormItem / Input / Textarea / InputGroup / InputNumber / Stepper
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5175/#/form`、`#/input`、`#/textarea`、`#/input-group`、`#/input-number`、`#/stepper`。
+- React：`http://localhost:5176/#/form`、`#/input`、`#/textarea`、`#/input-group`、`#/input-number`、`#/stepper`。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案；Stepper/InputNumber 控制按钮 aria 文案仍为英文。
+- 浏览器工具：本轮使用内置浏览器 Playwright 接入真实 Vite dev server；默认端口被占用，Vue 实际跑在 `5175`，React 实际跑在 `5176`。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、section 标题、`示例`/`代码`页签、桌面与移动页面级横向溢出；React Form 点击提交校验、填入有效用户名/邮箱/年龄/网站并再次提交；Vue Form 点击提交校验与手动校验；Input 输入基础文本、触发错误抖动、检查 InputNumber 格式化与控制按钮；Textarea 输入多行文本、字符计数与组合示例；Stepper 点击增加按钮并读取当前值；在 React `#/input` 切换第一个 `代码` tab，确认 raw-source 代码和复制按钮可见。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/form.md`、`skills/tigercat/references/shared/props/form.md`。
+- React Example：`examples/example/react/src/pages/FormDemo.tsx`、`InputDemo.tsx`、`TextareaDemo.tsx`、`InputGroupDemo.tsx`、`StepperDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/FormDemo.vue`、`InputDemo.vue`、`TextareaDemo.vue`、`InputGroupDemo.vue`、`StepperDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/form.ts`、`input.ts`、`textarea.ts`、`input-group.ts`、`input-number.ts`、`stepper.ts`、`button.ts`、`packages/react/src/components/Button.tsx`、`packages/vue/src/components/Button.ts`、对应 Form/Input/Textarea/InputGroup/InputNumber/Stepper 组件文件。
+
+**用户故事**：
+
+- 作为使用者，我希望 Form 页面能展示基础收集、提交校验、手动校验、清除校验、布局、尺寸、禁用、自定义校验器和错误展示模式，方便复制到注册、资料编辑或设置页。
+- 作为使用者，我希望 FormItem 示例清楚展示 `name`、`label`、`required`、错误消息位置和 `labelPosition` 的关系，避免只看到输入框堆叠。
+- 作为使用者，我希望 Input 页面能比较受控/非受控、文本/密码/邮箱/电话/搜索、尺寸、禁用、只读、前后缀、required、长度限制、状态提示和错误抖动。
+- 作为使用者，我希望 InputNumber 能从独立入口或明确 section 体验范围、精度、尺寸、状态、禁用、只读、左右控制按钮、隐藏控制按钮和格式化解析。
+- 作为使用者，我希望 Textarea 页面能验证不同行数、自动高度、字符计数、禁用/只读/必填和组合能力，方便复制到备注、评论或描述输入。
+- 作为使用者，我希望 InputGroup 页面能展示搜索、域名前后缀、尺寸、紧凑模式和响应式组合，方便落地到工具栏过滤或 URL 输入。
+- 作为使用者，我希望 Stepper 页面能点击增减按钮、确认范围/步长/小数精度/禁用状态，并能在中文站获得中文可访问名称。
+
+**Example 体验问题**：
+
+- 问题：`#/input-number` 在 React/Vue 均不是有效体验入口；E10 队列表声明了该 route，但 InputNumber 实际只合并在 `#/input` 的“数字输入框 InputNumber”section 中。
+  浏览器证据：Vue `http://localhost:5175/#/input-number` 返回空页面，无 `h1`、无 section、无 input；React `http://localhost:5176/#/input-number` 返回 `Unexpected Application Error!` / `404 Not Found`；React/Vue `#/input` 均有“数字输入框 InputNumber”section，含 36 个 input，其中格式化值显示 `$ 1,000`。
+  影响：这是 E10 唯一 route-level 阻断项；用户按计划入口打开 `#/input-number` 会误以为 InputNumber 示例缺失或应用异常。
+- 问题：Vue Form 的“提交”和“提交并校验”示例写作 `<Button type="submit">`，但 Tigercat Button 使用 `htmlType` 透传 HTML button type；浏览器中这些按钮实际仍是 `type="button"`，点击不会触发表单 submit。
+  浏览器证据：Vue `#/form` 中“提交”“提交并校验”按钮 DOM `type="button"`；点击“提交并校验”后最近一次校验结果仍停留在表单数据预览，不出现 `valid=false`；点击同一表单的“手动校验”后出现 `{ "valid": false }`，并显示 `请输入用户名`、`请输入邮箱`、`请输入年龄`。React `#/form` 使用 `htmlType="submit"`，点击“提交并校验”可得到 `valid=false`，填入 `alice` / `alice@example.com` / `32` / `https://example.com` 后再次提交得到 `valid=true`。
+  影响：React/Vue 体验明显不一致；Vue 用户复制基础提交示例后不会得到预期 submit 行为。
+- 问题：Stepper 与 InputNumber 的增减按钮在中文示例站中暴露英文 aria-label `Increase` / `Decrease`。
+  浏览器证据：React/Vue `#/stepper` 均有 7 个 `aria-label="Increase"` 的增加按钮；点击第一个增加按钮后当前值从 `当前值: 3` 变为 `当前值: 4`，说明交互可用但可访问名称为英文。React/Vue `#/input` 的 InputNumber 控制按钮同样输出多组 `Increase` / `Decrease`。
+  影响：视觉交互不阻断，但中文业务页面复制后会得到中英混杂的无障碍文案，和 E07/E08 记录的英文 aria-label 问题同类。
+- 问题：React `#/input` 触发控制台错误，提示 `errorMessage` 和内部 `_shakeTrigger` 被透传到 DOM 元素。
+  浏览器证据：React dev server 在访问 `#/input` 时记录 `React does not recognize the errorMessage prop on a DOM element` 和 `React does not recognize the _shakeTrigger prop on a DOM element`；页面上的错误抖动示例仍可用，点击“触发错误”后显示 `验证失败，请重试！`。
+  影响：用户视觉体验不阻断，但示例页会产生 React console error，后续修复应继续追查 FormItem/Input 的 clone 或 prop 透传链路，避免把内部校验状态泄漏到原生 DOM。
+- 问题：InputGroup 页面文案说明“支持前后缀和紧凑模式”，但示例只覆盖搜索组合、Select + Input + Select 和尺寸，没有展示 `compact` prop，也没有展示移动端窄屏下组合控件如何降级。
+  浏览器证据：React/Vue `#/input-group` 均只有“基本用法”“混合组件”“尺寸”3 个 section；generated props 列出 `compact?: boolean`；移动 `390x844` 下页面级 `hasHorizontalOverflow=false`，但混合组件仍是同一行组合，用户无法从 Example 判断紧凑/非紧凑差异。
+  影响：核心组合可用，但公开 props 和页面说明不完全对齐，常见工具栏/域名输入场景缺少紧凑模式参考。
+- 问题：Textarea 与 Input 的基础能力可用，但长文本、自动高度、字符计数和长度限制更偏 props 展示，缺少真实业务场景和提交联动；Input 长度限制示例只显示当前长度，没有展示超限/校验反馈的推荐写法。
+  浏览器证据：React `#/textarea` 输入多行文本后正文回显成功，限制最大长度示例显示 `12/100`，组合示例显示 `4/500`；React `#/input` 输入基础文本后回显 `输入的内容：hello tiger`，点击“触发错误”显示 `验证失败，请重试！`。
+  影响：不阻断使用；用户能复制组件写法，但对“备注超过上限如何提示”“评论输入如何提交/清空”等业务落地仍需自行组合。
+- 问题：Form 基础用法提交会弹出 `alert` / 写 console，数据预览只包含 `basicForm` 与 `validateForm`；自定义校验器没有独立显示最近一次校验结果。
+  浏览器证据：React Form 校验 section 已有 `最近一次校验结果`，但自定义校验器点击“校验”只在字段下显示错误；基础用法 submit 使用 `alert(valid ? ...)`。Vue 基础用法受 `type`/`htmlType` 问题影响，点击提交不会触发 submit。
+  影响：提交/自定义校验能力存在，但用户复制到业务页面时缺少统一的“提交结果/异步校验结果”可见状态模式。
+
+**组件能力建议**：
+
+- 类型：文档示例。
+  建议：要么为 React/Vue 增加真实 `#/input-number` route 并从侧边导航暴露，要么把 E10 队列表和页面说明改为“InputNumber 位于 `#/input`”，避免计划入口与实际路由不一致。
+  证据：`#/input-number` 在 Vue 为空、React 为 404；`#/input` 已承载完整 InputNumber section。
+- 类型：文档示例 / React-Vue 一致性。
+  建议：把 Vue Form 示例中的提交按钮改为 `htmlType="submit"` / `html-type="submit"`，重置和普通按钮改为 `htmlType="button"` / `html-type="button"`；同时更新 snippet，避免用户复制错误写法。
+  证据：Vue Button 组件 props 为 `htmlType`，当前示例使用的 `type="submit"` 未生效；React 示例已使用 `htmlType` 且 submit 正常。
+- 类型：a11y / i18n。
+  建议：Stepper 和 InputNumber 提供中文 aria-label 覆写或 locale 能力；若组件已有可覆写入口，Example 应显式传入“增加”“减少”等中文文案。
+  证据：中文示例站中增减按钮 aria-label 仍为 `Increase` / `Decrease`。
+- 类型：默认行为 / 组件源码。
+  建议：修复 React FormItem/Input 内部校验 props 的透传链路，确保 `errorMessage` 和 `_shakeTrigger` 只用于组件内部状态，不落到原生 DOM。
+  证据：React `#/input` 访问和错误抖动示例会触发 React console error。
+- 类型：文档示例 / 组合使用。
+  建议：InputGroup 补 `compact` section，并增加一个响应式搜索/筛选条场景，展示窄屏下如何换行或保持可用宽度。
+  证据：props 有 `compact`，页面说明提到紧凑模式，但 Example 未展示。
+- 类型：文档示例 / 组合使用。
+  建议：Textarea 增加评论/备注提交小场景，Input 增加“长度限制 + 状态反馈”的最小可复制示例；Form 自定义校验器补最近一次校验结果面板。
+  证据：输入、计数、错误抖动都可用，但业务提交和超限反馈仍需用户自行拼装。
+
+**建议优先级**：
+
+- P1：修复或移除 `#/input-number` 入口不一致，避免 E10 声明 route 打开后空白/404。
+- P1：修正 Vue Form 示例 `Button type="submit"` 为 `htmlType` / `html-type`，恢复提交校验与 React 一致。
+- P1：修复 React Input/FormItem 内部校验 props 透传导致的 console error。
+- P2：Stepper/InputNumber 中文站增减按钮 aria-label 覆写或 locale 能力补齐。
+- P2：InputGroup 增加 `compact` 和响应式组合示例。
+- P3：Form 自定义校验器、Input 长度限制、Textarea 评论/备注场景补可见业务反馈。
+
+**后续执行建议**：优先拆成两类修复：Example/文档层可处理 `#/input-number`、Vue Form `htmlType`、InputGroup `compact`、Form/Input/Textarea 业务反馈；组件源码层需要处理 React `errorMessage` / `_shakeTrigger` 透传，以及 Stepper/InputNumber 英文 aria-label 若没有示例层覆写入口。修复阶段应复查 React/Vue `#/form`、`#/input`、`#/input-number`、`#/input-group`、`#/textarea`、`#/stepper`，Example 改动运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时再运行 `npx -y pnpm@11.9.0 example:build`；源码修复补 React focused tests 或 a11y tests。
 
 ### E11 Checkbox / Radio / Switch / Slider / Segmented / Rate / ColorSwatch / ColorPicker
 
