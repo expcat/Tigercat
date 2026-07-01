@@ -2,12 +2,12 @@
 
 <!-- LLM-INDEX
 type: completed-roadmap-archive
-scope: v2.0.0 completed R01-R26 roadmap execution details
+scope: v2.0.0 completed R01-R28 roadmap execution details
 verified-date: 2026-07-01
 source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 -->
 
-本文归档 v2.0.0 Roadmap 已完成 R01-R26 批次的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
+本文归档 v2.0.0 Roadmap 已完成 R01-R28 批次的详细执行记录、实际验证命令和状态回写要求。当前可执行任务仍以 [ROADMAP.md](ROADMAP.md) 为准；本文件只在需要追溯已完成任务细节时读取。
 
 ## 已完成任务详情
 
@@ -1314,3 +1314,37 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **剩余阻塞**：无；E17-E21 仍未开始。
 
 **状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E16 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前可执行分组推进到 E17；R28 E16 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R28 E21 Hooks example user-story review
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：按 `docs/EXAMPLE_AGENT_PLAN.md` 执行 E21，从真实使用者角度审查 useDrag / useControlledState / useChartInteraction / useFormController hooks demos 的 React/Vue Example 体验、可复制性、交互证据和后续优化建议。
+
+**允许修改**：`docs/EXAMPLE_AGENT_PLAN.md`、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件源码、Example 实现、generated Skill references、public API、API baseline、发布配置。
+
+**执行摘要**：已启动 React Example `http://localhost:5175/` 与 Vue Example `http://localhost:5176/`（默认端口已被占用），读取 hooks route 配置、React/Vue E21 页面源码、DemoBlock raw-source 实现、generated refs，以及 React/Vue hook/composable 源码事实源。已用浏览器访问 React/Vue 的 `#/use-drag`、`#/use-controlled-state`、`#/use-chart-interaction`，并额外访问 `#/use-form-controller` 验证缺失 route。桌面 `1280x720` 与移动 `390x844` 下确认目标 `h1`、section 数量、`示例`/`代码`页签、页面级横向溢出和控制台错误。useDrag 拖拽排序、React useControlledState 计数器、useChartInteraction 鼠标/键盘选中、代码页签 raw-source 展示均已通过浏览器复查。
+
+**审查结论**：
+
+- 已存在 hooks route 未发现 P0 阻断问题；React/Vue `#/use-drag` 与 `#/use-chart-interaction` 可打开、可切换代码页签、移动端无页面级横向溢出，核心交互可完成。
+- `useFormController` 已从 React/Vue 包导出，但 Example 没有独立 route；React `#/use-form-controller` 返回 React Router 默认 404，Vue 同 route 无正文，是本组最高优先级缺口。
+- useDrag 示例复制后会带走不受支持的 `Tag color="blue"`；Vue useChartInteraction 示例未声明 composable 会发出的 `update:hoveredIndex` / `update:selectedIndex` 事件，交互时会产生 dev server console warning。
+- Vue `#/use-controlled-state` 正确说明该 hook 仅 React 提供、Vue 使用 `v-model`，但页面没有 DemoBlock、代码页签或可点击等价 Counter。
+- useDrag 只展示单列表 `reorder`，未展示 `moveBetween`、`containerId`、禁用/手柄配置或键盘/a11y 边界。
+- useChartInteraction 只展示基础悬停/选中，未展示 tooltip position、legend handlers、controlled hovered/selected index 或回调事件流。
+
+**实际验证**：
+
+- Browser desktop review：React/Vue `#/use-drag`、`#/use-controlled-state`、`#/use-chart-interaction`、`#/use-form-controller` at `1280x720`。
+- Browser mobile review：React/Vue `#/use-drag`、`#/use-controlled-state`、`#/use-chart-interaction` at `390x844`。
+- Browser interactions：useDrag drag reorder, React useControlledState uncontrolled/controlled counter click, useChartInteraction hover/click/keyboard Enter, code tab raw-source display.
+- `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+
+**剩余阻塞**：无；R28 E01-E21 已完成。后续修复任务应从 `docs/EXAMPLE_AGENT_PLAN.md` 各分组建议中拆分追加。
+
+**状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E21 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 标为 `已完成（2026-07-01）`，当前可执行任务更新为暂无；R28 E21 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。

@@ -79,7 +79,7 @@ source: docs/ROADMAP.md R28
 | E18 | PieChart / DonutChart / RadarChart / GaugeChart / FunnelChart / HeatmapChart / SunburstChart / TreeMapChart / Gantt / OrgChart | React/Vue: `#/pie-chart`, `#/donut-chart`, `#/radar-chart`, `#/gauge-chart`, `#/funnel-chart`, `#/heatmap-chart`, `#/sunburst-chart`, `#/treemap-chart`, `#/gantt`, `#/org-chart` | 已完成（2026-07-01） |
 | E19 | CodeEditor / MarkdownEditor / RichTextEditor / FileManager / ImageAnnotation / PrintLayout                                     | React/Vue: `#/code-editor`, `#/markdown-editor`, `#/rich-text-editor`, `#/file-manager`, `#/image-annotation`, `#/print-layout`                                                   | 已完成（2026-07-01） |
 | E20 | ActivityFeed / ChatWindow / CommentThread / DataTableWithToolbar / FormWizard / NotificationCenter / TaskBoard / Kanban        | React/Vue: `#/activity-feed`, `#/chat-window`, `#/comment-thread`, `#/data-table-with-toolbar`, `#/form-wizard`, `#/notification-center`, `#/task-board`, `#/kanban`              | 已完成（2026-07-01） |
-| E21 | Hooks demos: useDrag / useControlledState / useChartInteraction / useFormController                                            | React/Vue: `#/use-drag`, `#/use-controlled-state`, `#/use-chart-interaction`; `useFormController` 当前没有独立浏览器 demo route，如仍缺失则记录为“缺少可体验 Example”             | 未开始               |
+| E21 | Hooks demos: useDrag / useControlledState / useChartInteraction / useFormController                                            | React/Vue: `#/use-drag`, `#/use-controlled-state`, `#/use-chart-interaction`; `useFormController` 当前没有独立浏览器 demo route，如仍缺失则记录为“缺少可体验 Example”             | 已完成（2026-07-01） |
 
 ## 分组执行记录
 
@@ -1622,6 +1622,83 @@ source: docs/ROADMAP.md R28
 - P3：统一 Kanban React/Vue 说明文案。
 
 **后续执行建议**：TaskBoard 新增卡片修复、DataTableWithToolbar 状态隔离、头像本地化、Kanban 文案统一均可优先只改 Example/文档，不需要 public API 变更；CommentThread 回复按钮可访问名称若改默认文案，属组件文案层，可评估是否随 Example 覆盖或进入组件 i18n。修复后复查 React/Vue `#/task-board`、`#/data-table-with-toolbar`、`#/activity-feed`、`#/chat-window`、`#/comment-thread`、`#/kanban`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构或新增本地资源，再运行 `npx -y pnpm@11.9.0 example:build`。TaskBoard 拖拽为自定义指针 DnD，Playwright 自动化不稳定，本轮未强行模拟，仅核对结构与新增卡片；如后续需要，可用真实指针序列复查拖拽。
+
+### E21 Hooks demos: useDrag / useControlledState / useChartInteraction / useFormController
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5176/#/use-drag`、`#/use-controlled-state`、`#/use-chart-interaction`；`#/use-form-controller` 无可体验页面。
+- React：`http://localhost:5175/#/use-drag`、`#/use-controlled-state`、`#/use-chart-interaction`；`#/use-form-controller` 返回 React Router 默认 404。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器操作路径：因默认端口已被占用，本轮新启动 React Example `http://localhost:5175/` 与 Vue Example `http://localhost:5176/`；逐页直达 hash route；检查每页 `h1`、section 数量、`示例`/`代码`页签、页面级横向溢出与控制台错误；拖拽 useDrag 列表第一项到第三项；点击 React useControlledState 两个计数器；悬停、点击并键盘 Enter 操作 useChartInteraction SVG 柱体；单独访问 `#/use-form-controller` 验证缺失路由。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/composite.md`、`skills/tigercat/references/shared/props/composite.md`。当前 generated component refs 只覆盖公开组件，不列 hooks/composables。
+- Route/source：`examples/example/shared/app-config.ts`、`examples/example/react/src/router.tsx`、`examples/example/vue3/src/router.ts`。
+- React Example：`examples/example/react/src/pages/UseDragDemo.tsx`、`UseControlledStateDemo.tsx`、`UseChartInteractionDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/UseDragDemo.vue`、`UseControlledStateDemo.vue`、`UseChartInteractionDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`。
+- Hook/composable source：`packages/react/src/hooks/useDrag.ts`、`useControlledState.ts`、`useChartInteraction.ts`、`useFormController.ts`、`packages/vue/src/composables/useDrag.ts`、`useChartInteraction.ts`、`useFormController.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 useDrag 示例能直接拖动列表并看到顺序更新，同时知道如何扩展到拖拽手柄、禁用拖拽和跨容器移动。
+- 作为使用者，我希望 useControlledState 示例能明确 React 的受控/非受控封装价值，并在 Vue 站点看到对应 `v-model` 写法和可复制源码。
+- 作为使用者，我希望 useChartInteraction 示例能通过鼠标和键盘验证悬停、高亮、选中和可访问名称，便于把 hook/composable 用在自定义图表。
+- 作为使用者，我希望 useFormController 有独立 Example，能体验字段值、校验错误、重置、undo/redo 和无 UI 表单控制器的落地方式。
+- 作为使用者，我希望 hooks/composables 的 Example 与组件页面一样提供可复制 raw source、明确导入路径、框架差异说明和后续能力边界。
+
+**Example 体验问题**：
+
+- 问题：E21 未发现已存在 hooks route 的 P0 阻断问题；React/Vue `#/use-drag` 与 `#/use-chart-interaction` 均可打开、切换 `代码`页签并显示 root hook/composable import，桌面与移动视口无页面级横向溢出；React `#/use-controlled-state` 可交互。
+  浏览器证据：React/Vue `#/use-drag` 桌面返回 `h1=useDrag 拖拽`、各 1 个 DemoBlock section、4 个 `draggable=true` 条目；移动 `390x844` 下无水平溢出；拖动第一项到第三项后顺序从「编写需求文档 / 完成接口联调 / 进行单元测试 / 上线灰度发布」变为「完成接口联调 / 进行单元测试 / 编写需求文档 / 上线灰度发布」。React `#/use-controlled-state` 两组 `+/-` 可点击，非受控计数从 5 到 6，受控计数和外部状态从 10 到 11。React/Vue `#/use-chart-interaction` 均有 5 个 `svg rect[role=button]`，点击 D 后再聚焦 E 按 Enter，当前悬停/选中均显示 E，E 透明度为 `1`，其他柱体为 `0.35`。
+  影响：当前已有 hooks 页面可作为最小可运行审查入口。
+- 问题：`useFormController` 已在 React/Vue 包入口导出，但 React/Vue Example 都没有独立可体验 route。
+  浏览器证据：`examples/example/shared/app-config.ts` 的 Hooks 分组只列 `use-drag`、`use-controlled-state`、`use-chart-interaction`；React/Vue router 也只注册这 3 个 hooks route。访问 React `http://localhost:5175/#/use-form-controller` 返回 React Router 默认 `Unexpected Application Error! 404 Not Found`；访问 Vue `http://localhost:5176/#/use-form-controller` 无 `h1`、无正文、无 section。
+  影响：用户无法从 Example 体验 `useFormController` 的字段值、校验、错误映射、重置和 undo/redo，且 R28 队列里明确列出的 hook 缺少可复制入口。
+- 问题：E21 已有示例存在可复制源码级 warning：useDrag 使用不受支持的 `Tag color="blue"`，Vue useChartInteraction 未声明 composable 会发出的 `update:hoveredIndex` / `update:selectedIndex` 事件。
+  浏览器证据：本轮 dev server 控制台在访问 React/Vue `#/use-drag` 时输出 `[Tigercat] Tag does not support color. Use variant instead.`；`examples/example/react/src/pages/UseDragDemo.tsx` 与 `examples/example/vue3/src/pages/UseDragDemo.vue` 都传了 `Tag color="blue"`。访问 Vue `#/use-chart-interaction` 并悬停/点击柱体时输出 `Component emitted event "update:hoveredIndex"` 和 `Component emitted event "update:selectedIndex"` 未声明 warning；`UseChartInteractionDemo.vue` 的 `defineEmits` 只声明 `hover` / `click`，而 `packages/vue/src/composables/useChartInteraction.ts` 会 emit `update:hoveredIndex` / `update:selectedIndex`。
+  影响：页面仍可运行，但用户复制示例会带走无效 Tag prop 或 Vue 事件声明 warning，降低 hooks demo 作为可复制模板的可信度。
+- 问题：Vue `#/use-controlled-state` 是说明页而非 DemoBlock，缺少 `示例`/`代码`页签和可点击等价示例。
+  浏览器证据：Vue 页面显示「该 Hook 仅在 React 版本中提供，Vue 版本请直接使用 v-model」和 `v-model:value` 代码片段；页面 `buttonCount=0`，无 DemoBlock `示例/代码`页签。React 同 route 有 DemoBlock、代码页签和两组计数器。
+  影响：框架差异说明是正确的，但 Vue 用户不能像其他页面一样复制完整同页源码，也不能通过交互验证等价的受控/非受控模式。
+- 问题：useDrag 示例只覆盖单列表排序，未展示 hook/composable 已暴露的 `moveBetween`、`containerId`、`config.disabled` / handle 约束和键盘/a11y 替代路径。
+  浏览器证据：React/Vue `UseDragDemo` 只有「基础列表排序」一个 DemoBlock，源码仅调用 `reorder(items)`；hook/composable 返回 `moveBetween`、`isSameContainer`、`isCrossContainer`，并支持 `config` 和 `containerId`，但 Example 没有跨容器、禁用态或拖拽手柄场景。当前 DOM 只提供 HTML DnD `draggable` 与 `aria-grabbed`，没有键盘排序入口。
+  影响：用户能学会最小排序，但很难判断任务看板、双列表移动、受限拖拽或无鼠标场景如何落地。
+- 问题：useChartInteraction 示例能验证悬停/选中/键盘，但没有展示 tooltip position、legend handlers、controlled hovered/selected index 或回调事件流。
+  浏览器证据：React/Vue `UseChartInteractionDemo` 只有「自定义柱状图」一个 DemoBlock，显示「当前悬停 / 当前选中」；源码使用 `hoverable`、`selectable`、`getElementOpacity`、`handleMouseEnter`、`handleClick`、`handleKeyDown`。hook/composable 还返回 `tooltipPosition`、`handleMouseMove`、`handleLegendClick`、`handleLegendHover`、`wrapperClasses`、`createLegendItems`，但页面没有 tooltip 或 legend，也没有受控状态开关。
+  影响：示例足以说明基础交互，却不足以指导自定义图表的 tooltip、图例联动和外部受控状态。
+
+**组件能力建议**：
+
+- 类型：文档示例 / 组合使用。
+  建议：为 `useFormController` 新增 React/Vue 独立 Example route，覆盖字段输入、同步 `values`、必填/格式校验、`errorsByField`、`clearValidate`、`reset`，并补一个 `undoable` 的 undo/redo 场景。
+  证据：React/Vue 源码均导出 `useFormController`，但 Hooks nav/router 未注册 route，浏览器无法体验。
+- 类型：文档示例 / 框架差异。
+  建议：保留 Vue `useControlledState` 的「React-only / Vue v-model」说明，同时改成 DemoBlock 形式并补一个可点击 Counter 等价写法，让 Vue 页面也有 `代码`页签和可复制完整源码。
+  证据：React 页面可点击计数并展示 raw source；Vue 页面只有静态说明和 code block。
+- 类型：文档示例 / 可复制性。
+  建议：将 React/Vue useDrag 中的 `Tag color="blue"` 改为当前支持的 Tag API（如 `variant` 或符合组件文档的写法）；在 Vue useChartInteraction 示例的 `defineEmits` 中补齐 `update:hoveredIndex` / `update:selectedIndex`，或按示例需要改用 `eventNames` 只发已声明事件。
+  证据：开发服务器在访问对应 hooks route 时输出 Tag 不支持 `color` 与 Vue 未声明 `update:*` 事件 warning。
+- 类型：文档示例 / 组合使用 / a11y。
+  建议：为 useDrag 增加第二个 DemoBlock，展示跨容器 `moveBetween` 或禁用/拖拽手柄配置；如果暂不支持键盘排序，应在示例或后续组件能力任务中明确 a11y 边界。
+  证据：当前单列排序可运行，但 hook/composable 已公开跨容器与配置能力，Example 未展示。
+- 类型：文档示例 / 组合使用。
+  建议：为 useChartInteraction 增加 tooltip/legend/controlled-state 示例，至少展示 `tooltipPosition` + `handleMouseMove`、`createLegendItems` / legend handlers，以及外部 selected index 控制。
+  证据：当前柱状图可点击与键盘选中，但未覆盖 hook/composable 返回值中较关键的图例和 tooltip 能力。
+
+**建议优先级**：
+
+- P1：新增 `useFormController` React/Vue 独立 Example route，消除 R28 队列中已列 hook 的可体验入口缺失。
+- P2：修复 E21 hooks 示例中的可复制源码 warning（useDrag `Tag color`、Vue useChartInteraction 未声明 `update:*` 事件）。
+- P2：Vue `useControlledState` 页面改为 DemoBlock + 可点击 `v-model` 等价 Counter，并保留 React-only 差异说明。
+- P2：useDrag 增加跨容器/禁用/手柄或 a11y 边界示例。
+- P2：useChartInteraction 增加 tooltip / legend / controlled selected index 示例。
+
+**后续执行建议**：E21 当前只记录体验审查，不直接改 Example 或源码。后续可优先只改 Example/文档：新增 `UseFormControllerDemo`、扩展 Vue `UseControlledStateDemo`、修复 hooks 示例 warning、为 useDrag/useChartInteraction 增加 DemoBlock，并更新 `examples/example/shared/app-config.ts` 与 React/Vue router。修复后复查 React/Vue `#/use-drag`、`#/use-controlled-state`、`#/use-chart-interaction`、新增 `#/use-form-controller`，运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及新增 route 或页面结构时运行 `npx -y pnpm@11.9.0 example:build`。
 
 ## 审查重点
 
