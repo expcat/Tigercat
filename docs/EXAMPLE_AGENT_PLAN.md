@@ -71,7 +71,7 @@ source: docs/ROADMAP.md R28
 | E10 | Form / FormItem / Input / Textarea / InputGroup / InputNumber / Stepper                                                        | React/Vue: `#/form`, `#/input`, `#/textarea`, `#/input-group`, `#/input-number`, `#/stepper`                                                                                      | 已完成（2026-07-01） |
 | E11 | Checkbox / Radio / Switch / Slider / Segmented / Rate / ColorSwatch / ColorPicker                                              | React/Vue: `#/checkbox`, `#/radio`, `#/switch`, `#/slider`, `#/segmented`, `#/rate`, `#/color-swatch`, `#/color-picker`                                                           | 已完成（2026-07-01） |
 | E12 | Select / AutoComplete / Cascader / TreeSelect / Mentions / Transfer                                                            | React/Vue: `#/select`, `#/auto-complete`, `#/cascader`, `#/tree-select`, `#/mentions`, `#/transfer`                                                                               | 已完成（2026-07-01） |
-| E13 | DatePicker / TimePicker / Calendar / Countdown / CronEditor / NumberKeyboard                                                   | React/Vue: `#/datepicker`, `#/timepicker`, `#/calendar`, `#/countdown`, `#/cron-editor`, `#/number-keyboard`                                                                      | 未开始               |
+| E13 | DatePicker / TimePicker / Calendar / Countdown / CronEditor / NumberKeyboard                                                   | React/Vue: `#/datepicker`, `#/timepicker`, `#/calendar`, `#/countdown`, `#/cron-editor`, `#/number-keyboard`                                                                      | 已完成（2026-07-01） |
 | E14 | Upload / Signature                                                                                                             | React/Vue: `#/upload`, `#/signature`                                                                                                                                              | 未开始               |
 | E15 | Table / Collapse / Timeline                                                                                                    | React/Vue: `#/table`, `#/collapse`, `#/timeline`                                                                                                                                  | 未开始               |
 | E16 | VirtualTable / VirtualList / InfiniteScroll                                                                                    | React/Vue: `#/virtual-table`, `#/virtual-list`, `#/infinite-scroll`                                                                                                               | 未开始               |
@@ -1016,6 +1016,81 @@ source: docs/ROADMAP.md R28
 - P3：AutoComplete 补 `aria-autocomplete`；TreeSelect 树语义 polish。
 
 **后续执行建议**：优先只改 Example/文档；Vue Transfer 标题属性、Transfer 显式中文标题、四页覆盖与结果回显都不需要 public API 变更。示例站补中文 `ConfigProvider` 可一次性修正 Select 等 locale 驱动文案；Cascader/TreeSelect/Transfer 的硬编码英文 a11y 文案需另开组件源码/i18n 任务并补 React/Vue focused a11y tests 与 `npx -y pnpm@11.9.0 api:validate`。修复阶段应复查 React/Vue `#/transfer`、`#/select`、`#/cascader`、`#/tree-select`、`#/auto-complete`、`#/mentions`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E13 DatePicker / TimePicker / Calendar / Countdown / CronEditor / NumberKeyboard
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/datepicker`、`#/timepicker`、`#/calendar`、`#/countdown`、`#/cron-editor`、`#/number-keyboard`。
+- React：`http://localhost:5174/#/datepicker`、`#/timepicker`、`#/calendar`、`#/countdown`、`#/cron-editor`、`#/number-keyboard`。
+- 视口：桌面默认 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器工具：本轮 dev server 使用默认端口，Vue 为 `http://127.0.0.1:5173/`，React 为 `http://127.0.0.1:5174/`；用模拟浏览器访问并操作上述 hash route。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、`section > h2` 分节数、桌面与移动页面级横向溢出、控制台错误；DatePicker 打开基础日历并选择 `2026-07-15`，检查默认文案与清除按钮 aria；TimePicker 打开时间面板并点击小时/分钟选项，读取选中值；Calendar 检查月视图、年视图和禁用周末按钮；Countdown 等待结束事件变更状态；CronEditor 输入 `60 * * * *` 验证校验文案；NumberKeyboard 输入金额、手机号、身份证模式并读取确认值、删除键和 `X` 键 aria。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/form.md`、`skills/tigercat/references/examples/data.md`、`skills/tigercat/references/shared/props/form.md`、`skills/tigercat/references/shared/props/data.md`。
+- React Example：`examples/example/react/src/pages/DatePickerDemo.tsx`、`TimePickerDemo.tsx`、`CalendarDemo.tsx`、`CountdownDemo.tsx`、`CronEditorDemo.tsx`、`NumberKeyboardDemo.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/DatePickerDemo.vue`、`TimePickerDemo.vue`、`CalendarDemo.vue`、`CountdownDemo.vue`、`CronEditorDemo.vue`、`NumberKeyboardDemo.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/datepicker.ts`、`timepicker.ts`、`calendar.ts`、`countdown.ts`、`cron-editor.ts`、`number-keyboard.ts`；`packages/core/src/utils/datepicker-i18n.ts`、`number-keyboard-utils.ts`、`cron-editor-utils.ts`；`packages/react/src/components/DatePicker.tsx`、`CronEditor.tsx`、`NumberKeyboard.tsx`；对应 Vue 组件源码。
+
+**用户故事**：
+
+- 作为使用者，我希望 DatePicker 页面能覆盖单日期、范围、自定义文案、尺寸、格式、日期限制、禁用/只读和清除，并在选择后看到可见回显。
+- 作为使用者，我希望 TimePicker 页面能覆盖单时间、时间段、尺寸、12/24 小时、秒、步长、时间范围、禁用/只读和清除，并能确认时间面板选项的本地化文案。
+- 作为使用者，我希望 Calendar 页面能展示月视图、年视图、全屏和禁用日期，并在选中日期后看到当前值，方便落地排期或可预约日期场景。
+- 作为使用者，我希望 Countdown 页面能展示常规倒计时、格式/前后缀和结束事件，能复用到活动、发售、支付保留等场景。
+- 作为使用者，我希望 CronEditor 页面能直接编辑表达式、使用预设、查看字段拆分和校验错误，并能复制到定时任务配置表单。
+- 作为使用者，我希望 NumberKeyboard 页面能覆盖金额、手机号和身份证输入，能确认长度/精度限制、删除、确认和特殊 `X` 键行为。
+
+**Example 体验问题**：
+
+- 问题：E13 未发现 route-level P0 阻断问题；React/Vue 12 个 route 均可打开，桌面与移动视口无页面级横向溢出、无控制台错误，DatePicker/TimePicker/Calendar/Countdown/CronEditor/NumberKeyboard 的主要交互均能完成。
+  浏览器证据：桌面下 React/Vue 均返回目标 `h1`；分节数一致（DatePicker 8、TimePicker 9、Calendar 3、Countdown 3、CronEditor 2、NumberKeyboard 3）；移动 `390x844` 下 12 个 route 的 `pageOverflow=false`。React DatePicker 选择 `2026-07-15` 后输入值为 `2026-07-15` 且回显“选中的日期：2026/7/15”；Vue TimePicker 打开后出现 84 个时间选项并可更新“选中的时间”；React Calendar 周末禁用按钮含 `2026-07-04`、`2026-07-05` 等 disabled；Vue Countdown 等待 10 秒后“付款保留时间”显示 `00:00:00` 且状态变为“订单已释放”；React CronEditor 输入 `60 * * * *` 后出现 `Minute must be between 0 and 59`；React NumberKeyboard 金额输入 `12.34` 后显示“已确认：¥12.34”，手机号限制到 `12345678901`。
+  影响：E13 可作为日期/时间/定时任务/移动数字输入类组件的审查入口继续使用。
+- 问题：DatePicker 在中文示例站里仍大量显示英文默认 placeholder 与 aria 文案；示例已经传 `locale={locale}` / `:locale="locale"`，但未传 placeholder/labels 的场景仍回退为 `Select date`、`Select date range`、`Toggle calendar`、`Clear date`。
+  浏览器证据：React/Vue `#/datepicker` 中“日期格式”“禁用和只读”“可清除”等 section 的输入 `placeholder` / `aria-label` 为 `Select date`，清除按钮为 `Clear date`，日历按钮为 `Toggle calendar`；源码中 React `DatePicker.tsx` 用 `ctx.placeholder || 'Select date'`，Vue `DatePicker.ts` 默认 `props.placeholder ?? (props.range ? 'Select date range' : 'Select date')`，英文标签来自 `datepicker-locales/en-US.ts`。
+  影响：中文站可见文本和 a11y 文案不一致，用户复制示例时会把英文默认文案带入业务表单。
+- 问题：CronEditor 的可见字段标签、预设选项、错误消息和 aria 全是英文，中文示例站只把外层标题与“校验结果”翻译成中文。
+  浏览器证据：React `#/cron-editor` 两个 section 均显示 `Preset`、`Every minute`、`Minute`、`Any`、`Specific`、`Range`、`Custom`；输入 `60 * * * *` 后错误为 `Minute must be between 0 and 59`，控件 aria 为 `Cron expression`、`Cron preset`、`Minute mode`、`Hour value` 等。源码中 React/Vue `CronEditor` 直接写 `aria-label="Cron expression"` / `Cron preset`，字段元数据与校验消息来自英文 `cron-editor-utils.ts`。
+  影响：定时任务编辑是高理解成本组件，英文字段会明显降低中文用户理解和复制落地质量。
+- 问题：NumberKeyboard 只有金额示例显式传了中文 `deleteText="退格"` / `delete-text="退格"`；手机号和身份证示例默认删除键显示英文 `Delete`，金额小数点 aria 为 `Decimal`，身份证 `X` 键 aria 为 `ID card X`。
+  浏览器证据：React `#/number-keyboard` 金额 section 按钮为“退格/完成”，手机号和身份证 section 按钮为 `Delete/完成`；浏览器点击金额 `1`、`2`、`.`、`3`、`4`、`完成` 后显示 `已确认：¥12.34`，手机号输入 12 次数字后值被限制为 `12345678901`，身份证 section 的 `X` 按钮可访问名为 `ID card X`。源码中 React/Vue `NumberKeyboard` 默认 `deleteText = 'Delete'`，`number-keyboard-utils.ts` 默认 `deleteText || 'Delete'`、小数 aria 为 `Decimal`、身份证 X aria 为 `ID card X`。
+  影响：常见移动端输入示例可用，但中文站复制 phone/id-card 示例会得到英文操作键和英文 aria。
+- 问题：Calendar / Countdown 示例可运行但业务覆盖偏薄；Calendar 没有事件/排班/预约日渲染或面板切换回显，Countdown 没有暂停/重置、服务器时间同步或结束后按钮状态等真实业务场景。
+  浏览器证据：React/Vue `#/calendar` 均只有“基础用法”“年视图 & 全屏”“禁用日期”3 节，浏览器能看到选中日期与周末禁用；React/Vue `#/countdown` 均只有“基本用法”“格式与前后缀”“结束事件”3 节，结束事件能显示“订单已释放”。
+  影响：不阻断使用；但日期展示和倒计时常用于高频业务流程，当前 Example 对组合落地线索不足。
+
+**组件能力建议**：
+
+- 类型：i18n / a11y / 默认行为。
+  建议：为 DatePicker 默认 placeholder 与 labels 接入 locale，或在 Example 所有未显式 placeholder 的 DatePicker 场景补中文 placeholder/labels；源码修复需覆盖 React/Vue DatePicker。
+  证据：示例传入 `locale` 后月份/星期可以本地化，但 placeholder、toggle、clear 仍回退英文。
+- 类型：i18n / a11y / 组件能力。
+  建议：为 CronEditor 增加 locale/labels 能力，覆盖字段标签、预设选项、校验消息和 aria；短期 Example 可在标题或文档中说明当前字段为英文 DSL 术语，但错误消息和 aria 更适合组件层本地化。
+  证据：`CronEditorProps` 当前只有 `size` / `disabled` / `readonly` 等少量 props，没有 labels/locale；浏览器中输入非法 minute 后错误为英文。
+- 类型：i18n / 文档示例 / a11y。
+  建议：NumberKeyboard 的手机号和身份证示例显式传中文 `deleteText`，并评估组件层是否应从 `ConfigProvider` locale 读取 `numberKeyboard.deleteText`、decimal aria 和 id-card X aria。
+  证据：amount 示例因显式传 `deleteText` 显示中文，phone/id-card 默认 `Delete`；core locale 已有 `numberKeyboard.deleteText` 中文字段，但组件未使用。
+- 类型：文档示例 / 组合使用。
+  建议：Calendar 后续补一个“带日程/预约状态”的 cell 渲染或选中回显场景，Countdown 补一个支付/活动结束后按钮状态切换或可重置场景。
+  证据：当前两页都只覆盖基础能力与一条事件/禁用示例，缺少用户最常复制的业务组合。
+- 类型：文档示例。
+  建议：TimePicker 可补一条跨班次/营业时间业务示例，把 `minTime` / `maxTime` / `hourStep` / `minuteStep` 与结果回显放在同一场景中。
+  证据：当前 TimePicker 覆盖较完整，但步长、范围限制和结果回显分散在不同 section。
+
+**建议优先级**：
+
+- P1：DatePicker 中文站默认 placeholder / toggle / clear 文案本地化，避免 `locale` 已传仍显示英文。
+- P1：CronEditor 增加或规划 locale/labels 能力，至少覆盖字段、预设、错误消息和 aria。
+- P2：NumberKeyboard phone/id-card 示例补中文 `deleteText`，并评估组件层读取 locale 的实现。
+- P2：Calendar 补业务化日程/预约状态示例；Countdown 补结束后业务状态或可重置示例。
+- P3：TimePicker 补跨班次/营业时间组合示例。
+
+**后续执行建议**：DatePicker 和 NumberKeyboard 可先做 Example/文档层修复（显式中文 placeholder/labels/deleteText），再另开组件 i18n 任务把默认行为接入 locale；CronEditor 需要组件源码/API 级 labels/locale 扩展，不建议只靠 Example 文案掩盖。修复阶段应复查 React/Vue `#/datepicker`、`#/cron-editor`、`#/number-keyboard`、`#/calendar`、`#/countdown`、`#/timepicker`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及组件源码/i18n 时补充 React/Vue focused tests、`npx -y pnpm@11.9.0 api:validate` 和对应 `test:group:form` / `test:group:data`。
 
 ## 审查重点
 

@@ -1183,3 +1183,34 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
 
 **状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E05 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前可执行分组推进到 E06；R28 E05 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R28 E13 Form/Data example user-story review
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：按 `docs/EXAMPLE_AGENT_PLAN.md` 执行 E13，从真实使用者角度审查 DatePicker / TimePicker / Calendar / Countdown / CronEditor / NumberKeyboard 的 React/Vue Example 体验、可复制性、交互证据和后续优化建议。
+
+**允许修改**：`docs/EXAMPLE_AGENT_PLAN.md`、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件源码、Example 实现、generated Skill references、public API、API baseline、发布配置。
+
+**执行摘要**：已启动 Vue Example `http://localhost:5173/` 与 React Example `http://localhost:5174/`，读取 Form/Data generated refs、React/Vue E13 页面源码、router 配置，以及 DatePicker / CronEditor / NumberKeyboard 相关类型、utils 与组件源码事实源。已用浏览器访问 React/Vue 的 `#/datepicker`、`#/timepicker`、`#/calendar`、`#/countdown`、`#/cron-editor`、`#/number-keyboard`。桌面默认 `1280x720` 下确认目标 `h1`、section 数量、关键输入/选择/倒计时交互；移动 `390x844` 下确认 12 个 E13 route 无页面级横向溢出。DatePicker 选中 `2026-07-15`、TimePicker 打开时间面板、Calendar 读取禁用周末、Countdown 等待 finish、CronEditor 输入非法 minute、NumberKeyboard 金额/手机号/身份证输入均已通过浏览器复查。
+
+**审查结论**：
+
+- E13 未发现 route-level P0 阻断问题；React/Vue 页面均可打开且主要交互可完成。
+- DatePicker 在中文站传入 `locale` 后仍有 `Select date`、`Select date range`、`Toggle calendar`、`Clear date` 等英文默认 placeholder / aria，建议 P1 修复 locale 默认行为或先在 Example 显式传中文文案。
+- CronEditor 的字段标签、预设、校验消息和 aria 均为英文，且当前 props 缺少 labels/locale 能力；建议另开组件源码/API 级 i18n 任务。
+- NumberKeyboard amount 示例显式传 `deleteText="退格"`，但 phone/id-card 仍显示英文 `Delete`，`Decimal` / `ID card X` aria 也未本地化；建议先补 Example，后续评估组件层 locale。
+- Calendar / Countdown 可运行但业务示例偏薄，建议后续补日程/预约状态、倒计时结束后业务状态或可重置场景。
+
+**实际验证**：
+
+- Browser desktop review：React/Vue `#/datepicker`、`#/timepicker`、`#/calendar`、`#/countdown`、`#/cron-editor`、`#/number-keyboard` at default `1280x720`。
+- Browser mobile review：React/Vue `#/datepicker`、`#/timepicker`、`#/calendar`、`#/countdown`、`#/cron-editor`、`#/number-keyboard` at `390x844`。
+- Browser interactions：DatePicker date select, TimePicker panel option click, Calendar disabled weekend inspection, Countdown finish status, CronEditor invalid minute validation, NumberKeyboard amount/phone/id-card input.
+- `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+
+**状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E13 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前可执行分组推进到 E14；R28 E13 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
