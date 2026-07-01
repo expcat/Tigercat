@@ -65,7 +65,7 @@ source: docs/ROADMAP.md R28
 | E04 | Layout / Header / Sidebar / Content / Footer / Container / Row / Col / Space / Divider                                         | React/Vue: `#/layout`, `#/grid`, `#/space`, `#/divider`                                                                                                                           | 已完成（2026-07-01） |
 | E05 | Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel                                                        | React/Vue: `#/card`, `#/list`, `#/descriptions`, `#/skeleton`, `#/splitter`, `#/resizable`, `#/carousel`                                                                          | 已完成（2026-07-01） |
 | E06 | Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton                                                                | React/Vue: `#/affix`, `#/anchor`, `#/backtop`, `#/breadcrumb`, `#/scroll-spy`, `#/float-button`                                                                                   | 已完成（2026-07-01） |
-| E07 | Menu / Dropdown / Steps / Tabs / Tree / Pagination / Spotlight                                                                 | React/Vue: `#/menu`, `#/dropdown`, `#/steps`, `#/tabs`, `#/tree`, `#/pagination`, `#/spotlight`                                                                                   | 未开始               |
+| E07 | Menu / Dropdown / Steps / Tabs / Tree / Pagination / Spotlight                                                                 | React/Vue: `#/menu`, `#/dropdown`, `#/steps`, `#/tabs`, `#/tree`, `#/pagination`, `#/spotlight`                                                                                   | 已完成（2026-07-01） |
 | E08 | Alert / Loading / Progress / Tooltip / Popover / Popconfirm                                                                    | React/Vue: `#/alert`, `#/loading`, `#/progress`, `#/tooltip`, `#/popover`, `#/popconfirm`                                                                                         | 未开始               |
 | E09 | Modal / Drawer / Message / Notification / Tour                                                                                 | React/Vue: `#/modal`, `#/drawer`, `#/message`, `#/notification`, `#/tour`                                                                                                         | 未开始               |
 | E10 | Form / FormItem / Input / Textarea / InputGroup / InputNumber / Stepper                                                        | React/Vue: `#/form`, `#/input`, `#/textarea`, `#/input-group`, `#/input-number`, `#/stepper`                                                                                      | 未开始               |
@@ -534,6 +534,91 @@ source: docs/ROADMAP.md R28
 - P3：FloatButton 补 click/controlled 分组与可见业务反馈。
 
 **后续执行建议**：优先只改 Example/文档，不需要 public API 变更。修复阶段应复查 React/Vue `#/affix`、`#/anchor`、`#/breadcrumb`、`#/backtop`、`#/scroll-spy`、`#/float-button`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。若 BackTop 需要组件级 locale/aria API 才能区分按钮，再另开组件源码任务并补 focused tests。
+
+### E07 Menu / Dropdown / Steps / Tabs / Tree / Pagination / Spotlight
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/menu`、`#/dropdown`、`#/steps`、`#/tabs`、`#/tree`、`#/pagination`、`#/spotlight`。
+- React：`http://localhost:5174/#/menu`、`#/dropdown`、`#/steps`、`#/tabs`、`#/tree`、`#/pagination`、`#/spotlight`。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、section 数量、`示例`/`代码`页签、页面级横向溢出；点击 Menu 折叠/展开、Dropdown 触发器与受控按钮、Steps 上/下一步和可点击步骤、Tabs 新增标签、Tree 节点过滤与禁用节点、Pagination 下一页/快速跳页/i18n 切换、Spotlight 打开命令面板/搜索/选择命令。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/navigation.md`、`skills/tigercat/references/shared/props/navigation.md`。
+- React Example：`examples/example/react/src/pages/MenuDemo.tsx`、`DropdownDemo.tsx`、`StepsDemo.tsx`、`TabsDemo.tsx`、`TreeDemo.tsx`、`PaginationDemo.tsx`、`SpotlightDemo.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/MenuDemo.vue`、`DropdownDemo.vue`、`StepsDemo.vue`、`TabsDemo.vue`、`TreeDemo.vue`、`PaginationDemo.vue`、`SpotlightDemo.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/menu.ts`、`dropdown.ts`、`steps.ts`、`tabs.ts`、`tree.ts`、`pagination.ts`、`spotlight.ts`、`packages/react/src/components/Menu.tsx`、`Dropdown.tsx`、`Steps.tsx`、`Tabs.tsx`、`Tree.tsx`、`Pagination.tsx`、`Spotlight.tsx`、对应 Vue 组件文件。
+
+**用户故事**：
+
+- 作为使用者，我希望 Menu 页面能比较竖向、横向、inline、折叠、暗色、图标、分组和单展开状态，并能确认选中/展开状态如何受控。
+- 作为使用者，我希望 Dropdown 页面能直接体验 hover/click、placement、disabled、portal、受控 open、点击不关闭和菜单项点击反馈，方便复制到操作菜单。
+- 作为使用者，我希望 Steps 页面能展示流程推进、错误状态、纵向步骤、可点击步骤、禁用步骤和自定义图标，并能看到当前步骤同步到业务状态。
+- 作为使用者，我希望 Tabs 页面能覆盖基础、卡片、可编辑、不同位置、居中、尺寸、禁用、图标和销毁 inactive pane，且新增/关闭标签的 a11y 文案适合中文站。
+- 作为使用者，我希望 Tree 页面能展示选择、勾选、父子独立、禁用、懒加载、过滤、连接线、多选、受控展开、空数据和 block node，且复选框/节点标签可直接复制到中文业务里。
+- 作为使用者，我希望 Pagination 页面能清楚体验页码切换、快速跳页、pageSize、simple、size、alignment、totalText、disabled、hideOnSinglePage、showLessItems、i18n 和 labels，且同页多个分页示例不会互相污染状态。
+- 作为使用者，我希望 Spotlight 页面能打开命令面板、搜索命令、跳过 disabled 命令、选择后显示结果，并看到受控 query 如何反馈到页面。
+
+**Example 体验问题**：
+
+- 问题：E07 未发现 P0 阻断问题；React/Vue 14 个 route 均可打开，桌面与移动视口无页面级横向溢出。
+  浏览器证据：桌面 `1280x720` 下 React/Vue 分别返回目标 `h1`；Menu 2 个 section、Dropdown 4 个、Steps 2 个、Tabs 3 个、Tree 4 个、Pagination 3 个、Spotlight 1 个；移动 `390x844` 下复查 14 个 route 的 `hasHorizontalOverflow=false`。
+  影响：当前 E07 页面可作为 Navigation 组件体验审查入口继续使用。
+- 问题：Dropdown 的“点击事件”示例只提示“查看控制台”，页面无可见业务反馈；同页还出现大量 portal 菜单文本，普通用户难以确认刚刚点击了哪个菜单项。
+  浏览器证据：React `#/dropdown` 页面文本包含“监听菜单项的点击事件（查看控制台）”，浏览器检查 `bodyHasVisibleFeedback=false`；页面正文/portal 文本中同时出现多组“编辑/复制/删除/菜单项”，但没有“已选择/已点击/上次操作”等状态。
+  影响：用户能看到 Dropdown 外观和 open 控制，但复制点击事件示例时缺少可见反馈模式。
+- 问题：Tabs 可编辑卡片可新增标签，但中文示例站中的新增/关闭按钮可访问名称仍是英文前缀。
+  浏览器证据：React `#/tabs` 点击 `aria-label="Add tab"` 后出现“新标签 4”；新增后按钮 aria-label 包含 `Close 标签 1`、`Close 标签 2`、`Close 标签 3`、`Close 新标签 4` 和 `Add tab`。
+  影响：功能可用，但中文站 a11y 文案不一致，用户复制后会得到中英混杂的可访问名称。
+- 问题：Tree 复选框可访问名称使用英文 `Select ...` 前缀，且节点过滤示例只有输入框和过滤结果，没有可见“匹配数量/空结果”状态。
+  浏览器证据：React `#/tree` checkbox aria-label 包含 `Select 父节点 1`、`Select 子节点 1-1`、`Select 子节点 1-2 (禁用)`；过滤输入 placeholder 为“搜索节点...”，页面已有“暂无数据”空态示例但过滤区未显示匹配数量。
+  影响：树控件功能完整，但中文示例的复选框 a11y 文案和搜索反馈不够业务化。
+- 问题：Pagination 页面在同一页展示多个快速跳页与 pageSize 控件，它们共享通用 aria-label；部分示例复用同一组 `current` / `pageSize` 状态。
+  浏览器证据：React `#/pagination` 初始可见 4 个 `aria-label="跳至"` number input 和 3 个 `aria-label="条/页"` select；源码中“改变每页条数”和“完整示例”复用 `current3` / `pageSize`，不同尺寸示例复用 `current5`，不同对齐示例复用 `current6`。
+  影响：单个分页功能可用，但同页复查和用户复制时容易混淆“这个控件控制哪个示例”，共享状态也会让独立示例互相联动。
+- 问题：Menu 和 Steps 的基础交互可用，但缺少更明确的业务状态面板来解释选中项、展开项或流程提交意图。
+  浏览器证据：React `#/menu` 点击“收起”后按钮变为“展开”，折叠态仍保留完整文本标签；React `#/steps` 有 `当前步骤: 1/3` 反馈和 disabled 步骤，但 Menu 页面主要依赖视觉选中态，未在页面上显示 selectedKeys/openKeys。
+  影响：不阻断使用；对于受控导航/流程组件，用户仍需从代码中理解状态结构。
+- 问题：Spotlight 基本用法可搜索和选择，但受控搜索与 disabled command 的体验线索偏弱。
+  浏览器证据：React `#/spotlight` 点击“打开命令面板”后出现 `role="dialog"`、`aria-label="搜索页面或操作"` 的 search input 和 4 个 option；输入“客户”后只剩“客户列表”，选择后页面显示“已选择：客户列表”。命令列表含 disabled 的“账单设置”，但 Example 未直接展示尝试选择 disabled 命令后的可见说明。
+  影响：核心命令面板可用；受控 query、disabled 命令和快捷键说明还可以更可复制。
+
+**组件能力建议**：
+
+- 类型：文档示例 / 组合使用。
+  建议：Dropdown 点击事件示例改为显示“上次操作：编辑/复制/删除”，同时保留 console 作为辅助；受控模式示例可同步显示 `open` 状态。
+  证据：当前页面只有“查看控制台”提示，没有可见业务反馈。
+- 类型：a11y / i18n。
+  建议：Tabs 可编辑卡片补中文 aria-label 能力或示例层覆写，例如“新增标签页”“关闭标签 1”；若组件暂不支持 locale，后续另开组件源码任务。
+  证据：中文示例站实际暴露 `Add tab` / `Close 标签 1`。
+- 类型：a11y / i18n / 文档示例。
+  建议：Tree checkbox aria-label 支持 locale 或示例层传入中文选择文案；节点过滤示例增加匹配数量和空结果反馈。
+  证据：复选框 aria-label 使用 `Select ...`，过滤区只有输入和结果树。
+- 类型：文档示例 / 组合使用。
+  建议：Pagination 拆分或标注多个快速跳页/pageSize 控件，避免同名控件和共享状态造成混淆；“完整示例”给出可见 change/pageSizeChange 日志而不是仅查看控制台。
+  证据：同页有 4 个 `跳至` input、3 个 `条/页` select，且多个示例复用状态。
+- 类型：文档示例。
+  建议：Menu 增加一个状态面板显示 `selectedKeys` / `openKeys`；Steps 在可点击/禁用步骤示例中补“提交当前步骤”或“下一步业务动作”的最小状态说明。
+  证据：Menu 交互主要靠视觉选中态，Steps 已有当前步骤但缺少流程结果示例。
+- 类型：文档示例 / a11y。
+  建议：Spotlight 增加 disabled command 的明确展示和尝试选择后的说明，补充快捷键触发/关闭说明与受控 query 的更短可复制示例。
+  证据：基本搜索与选择可用，但 disabled 命令只作为不可选项出现。
+
+**建议优先级**：
+
+- P1：Tabs 可编辑卡片的 `Add tab` / `Close ...` 中文站 a11y 文案修正或 locale 能力补齐。
+- P1：Tree checkbox `Select ...` 中文站 a11y 文案修正或 locale 能力补齐。
+- P2：Dropdown 点击事件示例补可见“上次操作”反馈。
+- P2：Pagination 拆分同名快速跳页/pageSize 控件或补局部状态说明，避免共享状态污染。
+- P2：Menu 补 `selectedKeys` / `openKeys` 状态面板；Tree 过滤补匹配数量/空态反馈。
+- P3：Spotlight 补快捷键、disabled command 和受控 query 的更小可复制示例。
+
+**后续执行建议**：优先只改 Example/文档；Dropdown 可见反馈、Pagination 状态隔离、Menu 状态面板、Tree 过滤反馈、Spotlight 说明都不需要 public API 变更。Tabs/Tree 的英文 aria-label 若无法在示例层覆写，需要另开组件源码/i18n 任务并补 focused a11y tests。修复阶段应复查 React/Vue `#/dropdown`、`#/tabs`、`#/tree`、`#/pagination`、`#/menu`、`#/spotlight`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时再运行 `npx -y pnpm@11.9.0 example:build`。
 
 ## 审查重点
 
