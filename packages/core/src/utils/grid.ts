@@ -59,16 +59,22 @@ type ColOrder = number | Partial<Record<Breakpoint, number>>
 
 // Tailwind needs classes to be statically present in source to generate CSS.
 // We keep a small fixed set of classes and provide concrete values via CSS vars.
+//
+// Each responsive variant falls back through the chain of lower breakpoints down
+// to the base var, so a value set at (say) `lg` still applies at `xl`/`2xl` when
+// those larger breakpoints are not explicitly provided. Without this cascade the
+// always-present `xl`/`2xl` classes would resolve to the base value at large
+// viewports and wipe out the intended `md`/`lg` layout.
 const colSpanClasses =
-  'w-[var(--tiger-col-span)] sm:w-[var(--tiger-col-span-sm,var(--tiger-col-span))] md:w-[var(--tiger-col-span-md,var(--tiger-col-span))] lg:w-[var(--tiger-col-span-lg,var(--tiger-col-span))] xl:w-[var(--tiger-col-span-xl,var(--tiger-col-span))] 2xl:w-[var(--tiger-col-span-2xl,var(--tiger-col-span))]'
+  'w-[var(--tiger-col-span)] sm:w-[var(--tiger-col-span-sm,var(--tiger-col-span))] md:w-[var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span)))] lg:w-[var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span))))] xl:w-[var(--tiger-col-span-xl,var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span)))))] 2xl:w-[var(--tiger-col-span-2xl,var(--tiger-col-span-xl,var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span))))))]'
 
 const colOffsetClasses =
-  'ml-[var(--tiger-col-offset)] sm:ml-[var(--tiger-col-offset-sm,var(--tiger-col-offset))] md:ml-[var(--tiger-col-offset-md,var(--tiger-col-offset))] lg:ml-[var(--tiger-col-offset-lg,var(--tiger-col-offset))] xl:ml-[var(--tiger-col-offset-xl,var(--tiger-col-offset))] 2xl:ml-[var(--tiger-col-offset-2xl,var(--tiger-col-offset))]'
+  'ml-[var(--tiger-col-offset)] sm:ml-[var(--tiger-col-offset-sm,var(--tiger-col-offset))] md:ml-[var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset)))] lg:ml-[var(--tiger-col-offset-lg,var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset))))] xl:ml-[var(--tiger-col-offset-xl,var(--tiger-col-offset-lg,var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset)))))] 2xl:ml-[var(--tiger-col-offset-2xl,var(--tiger-col-offset-xl,var(--tiger-col-offset-lg,var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset))))))]'
 
 const colFlexClasses = 'flex-[var(--tiger-col-flex)]'
 
 const colOrderClasses =
-  'order-[var(--tiger-col-order)] sm:order-[var(--tiger-col-order-sm,var(--tiger-col-order))] md:order-[var(--tiger-col-order-md,var(--tiger-col-order))] lg:order-[var(--tiger-col-order-lg,var(--tiger-col-order))] xl:order-[var(--tiger-col-order-xl,var(--tiger-col-order))] 2xl:order-[var(--tiger-col-order-2xl,var(--tiger-col-order))]'
+  'order-[var(--tiger-col-order)] sm:order-[var(--tiger-col-order-sm,var(--tiger-col-order))] md:order-[var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order)))] lg:order-[var(--tiger-col-order-lg,var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order))))] xl:order-[var(--tiger-col-order-xl,var(--tiger-col-order-lg,var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order)))))] 2xl:order-[var(--tiger-col-order-2xl,var(--tiger-col-order-xl,var(--tiger-col-order-lg,var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order))))))]'
 
 export const rowGutterClasses =
   'mx-[calc(var(--tiger-row-gutter-x-half)*-1)] my-[calc(var(--tiger-row-gutter-y-half)*-1)]'

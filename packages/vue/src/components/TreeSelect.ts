@@ -306,7 +306,10 @@ export const TreeSelect = defineComponent({
                   {
                     class:
                       'absolute right-2 top-1/2 -translate-y-1/2 text-[var(--tiger-treeselect-clear,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-treeselect-clear-hover,var(--tiger-text,#111827))]',
-                    'aria-label': 'Clear selection',
+                    'aria-label': resolveLocaleText(
+                      'Clear selection',
+                      mergedLocale.value?.common?.clearText
+                    ),
                     onClick: handleClear
                   },
                   [ClearIcon]
@@ -341,7 +344,10 @@ export const TreeSelect = defineComponent({
                         mergedLocale.value?.common?.searchPlaceholder
                       ),
                       value: searchQuery.value,
-                      'aria-label': 'Search tree',
+                      'aria-label': resolveLocaleText(
+                        'Search tree',
+                        mergedLocale.value?.common?.searchPlaceholder
+                      ),
                       onInput: (e: Event) => updateSearchValue((e.target as HTMLInputElement).value)
                     })
                   : null,

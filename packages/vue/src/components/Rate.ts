@@ -9,8 +9,13 @@ import {
   starPathD,
   starViewBox,
   classNames,
-  coerceClassValue
+  coerceClassValue,
+  mergeTigerLocale,
+  getRateLabels,
+  type TigerLocale,
+  type TigerLocaleRate
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export type VueRateProps = InstanceType<typeof Rate>['$props']
 
@@ -23,11 +28,16 @@ export const Rate = defineComponent({
     disabled: { type: Boolean, default: false },
     size: { type: String as PropType<RateSize>, default: 'md' },
     allowClear: { type: Boolean, default: true },
-    character: { type: String, default: undefined }
+    character: { type: String, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleRate>>, default: undefined }
   },
   emits: ['update:modelValue', 'change', 'hover-change'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
     const hoverValue = ref(0)
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getRateLabels(mergedLocale.value, props.labels))
 
     const displayValue = computed(() =>
       hoverValue.value > 0 ? hoverValue.value : props.modelValue
@@ -179,14 +189,16 @@ export const Rate = defineComponent({
         )
       }
 
-      const valueText = `${props.modelValue} star${props.modelValue === 1 ? '' : 's'}`
+      const valueText = labels.value.valueText
+        .replace('{value}', String(props.modelValue))
+        .replace('{plural}', props.modelValue === 1 ? '' : 's')
 
       return h(
         'div',
         {
           class: classNames(rateBaseClasses, coerceClassValue(attrs.class)),
           role: 'slider',
-          'aria-label': 'Rating',
+          'aria-label': labels.value.ariaLabel,
           'aria-valuemin': 0,
           'aria-valuemax': props.count,
           'aria-valuenow': props.modelValue,

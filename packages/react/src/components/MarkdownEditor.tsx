@@ -16,15 +16,19 @@ import {
   markdownEditorToolbarClasses,
   markdownEditorToolbarGroupClasses,
   markdownEditorToolbarSeparatorClasses,
-  markdownModeLabels,
   parseMarkdownHeight,
   renderMarkdownToHtml,
+  mergeTigerLocale,
+  getMarkdownEditorLabels,
   type MarkdownEditorMode,
   type MarkdownEditorProps as CoreMarkdownEditorProps,
   type MarkdownInsertResult,
   type MarkdownToolbarButton,
-  type MarkdownToolbarItem
+  type MarkdownToolbarItem,
+  type TigerLocale,
+  type TigerLocaleMarkdownEditor
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 const modes: MarkdownEditorMode[] = ['edit', 'split', 'preview']
 
@@ -55,6 +59,10 @@ export interface MarkdownEditorProps extends Omit<
   readOnly?: boolean
   disabled?: boolean
   renderer?: CoreMarkdownEditorProps['renderer']
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+  /** Text/aria label overrides */
+  labels?: Partial<TigerLocaleMarkdownEditor>
   onChange?: (markdown: string) => void
   onModeChange?: (mode: MarkdownEditorMode) => void
 }
@@ -71,12 +79,15 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   readOnly = false,
   disabled = false,
   renderer,
+  locale,
+  labels: labelsOverride,
   onChange,
   onModeChange,
   className,
   style,
   ...restProps
 }) => {
+  const config = useTigerConfig()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [currentValue, commitValue] = useControlledState(value, defaultValue, onChange)
   const [currentMode, commitMode] = useControlledState(mode, defaultMode, onModeChange)
@@ -94,6 +105,19 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     const parsedHeight = parseMarkdownHeight(height)
     return { ...(parsedHeight ? { height: parsedHeight } : {}), ...style }
   }, [height, style])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getMarkdownEditorLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const modeLabels: Record<MarkdownEditorMode, string> = {
+    edit: labels.editModeLabel,
+    split: labels.splitModeLabel,
+    preview: labels.previewModeLabel
+  }
 
   const applyToolbarButton = useCallback(
     (button: MarkdownToolbarButton) => {
@@ -150,7 +174,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         !currentValue ? markdownEditorEmptyPreviewClasses : undefined
       )}
       role="region"
-      aria-label="Markdown preview"
+      aria-label={labels.previewAriaLabel}
       {...(currentValue ? { dangerouslySetInnerHTML: { __html: previewHtml } } : {})}>
       {currentValue ? null : placeholder}
     </div>
@@ -168,7 +192,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             <div
               className={markdownEditorToolbarGroupClasses}
               role="toolbar"
-              aria-label="Markdown formatting">
+              aria-label={labels.formattingToolbarAriaLabel}>
               {toolbarItems.map((item, index) => {
                 if (isMarkdownToolbarSeparator(item)) {
                   return (
@@ -206,17 +230,17 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             <div
               className={markdownEditorToolbarGroupClasses}
               role="toolbar"
-              aria-label="Markdown view mode">
+              aria-label={labels.modeToolbarAriaLabel}>
               {modes.map((item) => (
                 <button
                   key={item}
                   type="button"
                   className={getMarkdownToolbarButtonClasses(currentMode === item)}
-                  aria-label={markdownModeLabels[item]}
+                  aria-label={modeLabels[item]}
                   aria-pressed={currentMode === item}
                   disabled={disabled}
                   onClick={() => commitMode(item)}>
-                  {markdownModeLabels[item]}
+                  {modeLabels[item]}
                 </button>
               ))}
             </div>
@@ -236,7 +260,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             readOnly={readOnly || disabled}
             disabled={disabled}
             spellCheck={true}
-            aria-label="Markdown editor"
+            aria-label={labels.editorAriaLabel}
             aria-multiline={true}
           />
         )}

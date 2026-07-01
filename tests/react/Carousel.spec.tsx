@@ -5,7 +5,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import React, { createRef } from 'react'
-import { Carousel, type CarouselRef } from '@expcat/tigercat-react'
+import { Carousel, ConfigProvider, type CarouselRef } from '@expcat/tigercat-react'
+import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Carousel', () => {
@@ -81,6 +82,23 @@ describe('Carousel', () => {
 
       expect(screen.getByRole('button', { name: 'Previous slide' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Next slide' })).toBeInTheDocument()
+    })
+
+    it('localizes carousel aria labels from ConfigProvider', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <Carousel arrows>
+            <div>第一页</div>
+            <div>第二页</div>
+          </Carousel>
+        </ConfigProvider>
+      )
+
+      expect(screen.getByRole('region', { name: '图片轮播' })).toBeInTheDocument()
+      expect(screen.getByRole('tablist', { name: '轮播导航' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '上一张' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '跳转到第 1 张' })).toBeInTheDocument()
+      expect(screen.getByLabelText('第 1 张，共 2 张')).toBeInTheDocument()
     })
 
     it('should not render arrows by default', () => {

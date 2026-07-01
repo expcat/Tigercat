@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Tabs, TabPane } from '@expcat/tigercat-react'
+import { ConfigProvider, Tabs, TabPane } from '@expcat/tigercat-react'
+import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Tabs', () => {
@@ -66,6 +67,21 @@ describe('Tabs', () => {
       const tab = screen.getByRole('tab', { name: 'Tab 1' })
       expect(tab).toHaveClass('border')
       expect(tab).toHaveClass('rounded-t')
+    })
+
+    it('localizes editable tab add and close aria labels from ConfigProvider', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <Tabs type="editable-card" closable>
+            <TabPane tabKey="1" label="概览">
+              Content 1
+            </TabPane>
+          </Tabs>
+        </ConfigProvider>
+      )
+
+      expect(screen.getByRole('button', { name: '新增标签页' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '关闭概览' })).toBeInTheDocument()
     })
 
     it('handles icons, ignored non-pane children, and lazy destroyed panes', async () => {
@@ -355,7 +371,11 @@ describe('Tabs', () => {
       const onActiveKeyChange = vi.fn()
 
       render(
-        <Tabs type="editable-card" closable defaultActiveKey="1" onActiveKeyChange={onActiveKeyChange}>
+        <Tabs
+          type="editable-card"
+          closable
+          defaultActiveKey="1"
+          onActiveKeyChange={onActiveKeyChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>

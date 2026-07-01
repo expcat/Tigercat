@@ -128,6 +128,11 @@ export interface NotificationInstance {
    * Notification position
    */
   position: NotificationPosition
+
+  /**
+   * Close button aria-label when closable.
+   */
+  closeAriaLabel?: string
 }
 
 /**
@@ -192,6 +197,12 @@ export interface NotificationProps {
    * @default 'top-right'
    */
   position?: NotificationPosition
+
+  /**
+   * Close button aria-label when `closable` is true.
+   * @default 'Close notification'
+   */
+  closeAriaLabel?: string
 }
 
 /**

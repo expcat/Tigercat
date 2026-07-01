@@ -27,12 +27,17 @@ import {
   createCarouselAutoplayController,
   carouselPrevArrowPath,
   carouselNextArrowPath,
+  mergeTigerLocale,
+  getCarouselLabels,
   type CarouselTouchPoint,
   type CarouselSwipeDirection,
   type CarouselProps as CoreCarouselProps,
-  type CarouselMethods
+  type CarouselMethods,
+  type TigerLocale,
+  type TigerLocaleCarousel
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface CarouselProps extends Omit<CoreCarouselProps, 'style'> {
   /**
@@ -63,6 +68,10 @@ export interface CarouselProps extends Omit<CoreCarouselProps, 'style'> {
    * Custom styles
    */
   style?: React.CSSProperties
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+  /** Text/aria label overrides */
+  labels?: Partial<TigerLocaleCarousel>
 }
 
 export interface CarouselRef extends CarouselMethods {}
@@ -84,6 +93,8 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       pauseOnFocus = true,
       className,
       style,
+      locale,
+      labels: labelsOverride,
       onCurrentIndexChange,
       onChange,
       onBeforeChange,
@@ -91,6 +102,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     },
     ref
   ) => {
+    const config = useTigerConfig()
     // Get slides from children
     const slides = useMemo(() => {
       return React.Children.toArray(children).filter((child) => React.isValidElement(child))
@@ -110,6 +122,14 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     const containerRef = useRef<HTMLDivElement | null>(null)
     const touchStartRef = useRef<CarouselTouchPoint | null>(null)
     const touchCurrentRef = useRef<CarouselTouchPoint | null>(null)
+    const mergedLocale = useMemo(
+      () => mergeTigerLocale(config.locale, locale),
+      [config.locale, locale]
+    )
+    const labels = useMemo(
+      () => getCarouselLabels(mergedLocale, labelsOverride),
+      [mergedLocale, labelsOverride]
+    )
 
     // Stable refs for callbacks (avoid restarting autoplay timer on callback changes)
     const onChangeRef = useRef(onChange)
@@ -346,7 +366,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         className={getCarouselArrowClasses(type, disabled)}
         onClick={onClick}
         disabled={disabled}
-        aria-label={type === 'prev' ? 'Previous slide' : 'Next slide'}>
+        aria-label={type === 'prev' ? labels.previousSlideAriaLabel : labels.nextSlideAriaLabel}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -377,14 +397,14 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       if (!dots || slideCount <= 1) return null
 
       return (
-        <div className={dotsClasses} role="tablist" aria-label="Carousel navigation">
+        <div className={dotsClasses} role="tablist" aria-label={labels.navigationAriaLabel}>
           {slides.map((_, index) => (
             <button
               type="button"
               key={index}
               className={getCarouselDotClasses(index === currentIndex)}
               onClick={() => goTo(index)}
-              aria-label={`Go to slide ${index + 1}`}
+              aria-label={labels.goToSlideAriaLabel.replace('{index}', String(index + 1))}
               aria-current={index === currentIndex ? 'true' : 'false'}
             />
           ))}
@@ -401,7 +421,9 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           style={effect === 'fade' ? slideStyle : undefined}
           role="group"
           aria-roledescription="slide"
-          aria-label={`Slide ${index + 1} of ${slideCount}`}
+          aria-label={labels.slideAriaLabel
+            .replace('{index}', String(index + 1))
+            .replace('{total}', String(slideCount))}
           aria-hidden={index !== currentIndex}>
           {slide}
         </div>
@@ -427,7 +449,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         style={style}
         role="region"
         aria-roledescription="carousel"
-        aria-label="Image carousel"
+        aria-label={labels.ariaLabel}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onFocus={handleFocus}

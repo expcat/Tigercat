@@ -7,6 +7,7 @@ export interface ChartLegendProps {
   markerSize?: number
   gap?: number
   interactive?: boolean
+  ariaLabel?: string
   className?: string
   onItemClick?: (index: number, item: ChartLegendItem) => void
   onItemHover?: (index: number, item: ChartLegendItem) => void
@@ -19,6 +20,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
   markerSize = 10,
   gap = 8,
   interactive = false,
+  ariaLabel = 'Chart legend',
   className,
   onItemClick,
   onItemHover,
@@ -61,7 +63,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
       // A group of toggle buttons is not a "list"; only use list semantics for
       // the static (non-interactive) legend.
       role={interactive ? 'group' : 'list'}
-      aria-label="Chart legend"
+      aria-label={ariaLabel}
       style={{ gap: `${gap}px` }}
       data-chart-legend="true">
       {items.map((item) => {

@@ -15,6 +15,8 @@ import {
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
+  mergeTigerLocale,
+  getChartLabels,
   type ChartGridLineStyle,
   type ChartLegendItem,
   type ChartLegendPosition,
@@ -22,7 +24,9 @@ import {
   type ChartScale,
   type ChartScaleValue,
   type ScatterChartDatum,
-  type ScatterChartProps as CoreScatterChartProps
+  type ScatterChartProps as CoreScatterChartProps,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartAxis } from './ChartAxis'
 import { ChartCanvas } from './ChartCanvas'
@@ -31,12 +35,15 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueScatterChartProps extends CoreScatterChartProps {
   data: ScatterChartDatum[]
   padding?: ChartPadding
   xScale?: ChartScale
   yScale?: ChartScale
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleChart>
 }
 
 export const ScatterChart = defineComponent({
@@ -48,6 +55,7 @@ export const ScatterChart = defineComponent({
       type: [Number, Object] as PropType<ChartPadding>,
       default: 24
     },
+    responsive: { type: Boolean, default: false },
     data: {
       type: Array as PropType<ScatterChartDatum[]>,
       required: true
@@ -123,12 +131,17 @@ export const ScatterChart = defineComponent({
     colors: { type: Array as PropType<string[]> },
     title: { type: String },
     desc: { type: String },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'point-click', 'point-hover'],
   setup(props, { emit }) {
+    const config = useTigerConfig()
     const gradientPrefix = getStableChartGradientPrefix('scatter', useId())
     const mounted = ref(false)
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
 
     onMounted(() => {
       if (props.animated) mounted.value = true
@@ -259,6 +272,7 @@ export const ScatterChart = defineComponent({
           width: props.width,
           height: props.height,
           padding: props.padding,
+          responsive: props.responsive,
           title: props.title,
           desc: props.desc,
           className: classNames(props.className)
@@ -345,7 +359,10 @@ export const ScatterChart = defineComponent({
                         role: props.selectable ? 'button' : 'img',
                         'aria-label':
                           point.datum.label ??
-                          `Point ${index + 1}: (${point.datum.x}, ${point.datum.y})`,
+                          labels.value.pointAriaLabel
+                            .replace('{index}', String(index + 1))
+                            .replace('{x}', String(point.datum.x))
+                            .replace('{y}', String(point.datum.y)),
                         'data-point-index': index,
                         onMouseenter: (e: MouseEvent) => handleMouseEnter(index, e),
                         onMousemove: handleMouseMove,
@@ -398,6 +415,7 @@ export const ScatterChart = defineComponent({
           position: props.legendPosition,
           markerSize: props.legendMarkerSize,
           gap: props.legendGap,
+          ariaLabel: labels.value.legendAriaLabel,
           interactive: props.hoverable || props.selectable,
           onItemClick: handleLegendClick,
           onItemHover: handleLegendHover,

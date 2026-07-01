@@ -152,6 +152,7 @@ function addNotification(config: NotificationConfig): () => void {
     actions: config.actions,
     icon: config.icon,
     className: config.className,
+    closeAriaLabel: config.closeAriaLabel,
     position
   }
 

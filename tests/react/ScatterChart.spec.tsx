@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { ScatterChart } from '@expcat/tigercat-react'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
+import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 
 const defaultSize = { width: 240, height: 160 }
 
@@ -24,6 +25,21 @@ describe('ScatterChart', () => {
     })
 
     await expectNoA11yViolationsIsolated(container)
+  })
+
+  it('localizes generated point and legend aria labels', () => {
+    const { container } = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20 }],
+      showLegend: true,
+      locale: zhCN,
+      ...defaultSize
+    })
+
+    expect(container.querySelector('[aria-label="第 1 个点：(10, 20)"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-chart-legend="true"]')).toHaveAttribute(
+      'aria-label',
+      '图表图例'
+    )
   })
 
   it('renders empty state with no data', () => {

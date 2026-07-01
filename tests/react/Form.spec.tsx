@@ -9,6 +9,8 @@ import React, { useState } from 'react'
 import {
   Form,
   FormItem,
+  Input,
+  Space,
   ConfigProvider,
   type FormHandle,
   type FormRule,
@@ -1219,6 +1221,47 @@ describe('Form', () => {
       // Wait a bit for potential error message
       await new Promise((resolve) => setTimeout(resolve, 100))
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+
+    it('does not leak Input-only internals (errorMessage/_shakeTrigger) to non-Input children', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      const { container } = render(
+        <Form model={{}}>
+          <FormItem label="Bio" error="Something went wrong" showMessage={false}>
+            <Space>
+              <input aria-label="bio" />
+            </Space>
+          </FormItem>
+        </Form>
+      )
+
+      // The Space wrapper spreads unknown props to its <div>; the Input-only internals
+      // must not be forwarded onto it.
+      const wrapper = screen.getByLabelText('bio').parentElement as HTMLElement
+      expect(wrapper.hasAttribute('errormessage')).toBe(false)
+      expect(wrapper.hasAttribute('_shaketrigger')).toBe(false)
+      expect(container.querySelector('[errormessage]')).toBeNull()
+
+      const leaked = errorSpy.mock.calls.some((args) =>
+        args.some((arg) => String(arg).includes('does not recognize'))
+      )
+      expect(leaked).toBe(false)
+
+      errorSpy.mockRestore()
+    })
+
+    it('still forwards errorMessage to a direct Input child when showMessage=false', () => {
+      render(
+        <Form model={{}}>
+          <FormItem label="Username" error="Username taken" showMessage={false}>
+            <Input aria-label="username" />
+          </FormItem>
+        </Form>
+      )
+
+      // Input renders the error inline when it receives the forwarded errorMessage.
+      expect(screen.getByText('Username taken')).toBeInTheDocument()
     })
 
     it('supports different form sizes', () => {

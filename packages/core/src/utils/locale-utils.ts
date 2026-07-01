@@ -27,6 +27,14 @@ import type {
   TigerLocaleStatus,
   TigerLocaleTaskBoard,
   TigerLocaleSelect,
+  TigerLocaleTabs,
+  TigerLocaleRate,
+  TigerLocaleCarousel,
+  TigerLocaleTransfer,
+  TigerLocaleChart,
+  TigerLocaleMarkdownEditor,
+  TigerLocaleRichTextEditor,
+  TigerLocaleCronEditor,
   TigerLocaleFormValidation,
   TigerLocaleDirection
 } from '../types/locale'
@@ -56,6 +64,14 @@ const TIGER_LOCALE_KEYS = [
   'status',
   'taskBoard',
   'select',
+  'tabs',
+  'rate',
+  'carousel',
+  'transfer',
+  'chart',
+  'markdownEditor',
+  'richTextEditor',
+  'cronEditor',
   'formValidation'
 ]
 
@@ -138,6 +154,14 @@ export function mergeTigerLocale(
     status: { ...base?.status, ...override?.status },
     taskBoard: { ...base?.taskBoard, ...override?.taskBoard },
     select: { ...base?.select, ...override?.select },
+    tabs: { ...base?.tabs, ...override?.tabs },
+    rate: { ...base?.rate, ...override?.rate },
+    carousel: { ...base?.carousel, ...override?.carousel },
+    transfer: { ...base?.transfer, ...override?.transfer },
+    chart: { ...base?.chart, ...override?.chart },
+    markdownEditor: { ...base?.markdownEditor, ...override?.markdownEditor },
+    richTextEditor: { ...base?.richTextEditor, ...override?.richTextEditor },
+    cronEditor: { ...base?.cronEditor, ...override?.cronEditor },
     formValidation: { ...base?.formValidation, ...override?.formValidation }
   }
 }
@@ -626,6 +650,448 @@ export function getSelectLabels(
       locale?.select?.doneText ??
       locale?.common?.okText ??
       defaultLabels.doneText
+  }
+}
+
+export const DEFAULT_TABS_LABELS: Required<TigerLocaleTabs> = {
+  addTabAriaLabel: 'Add tab',
+  closeTabAriaLabel: 'Close {label}'
+}
+
+export const ZH_CN_TABS_LABELS: Required<TigerLocaleTabs> = {
+  addTabAriaLabel: '新增标签页',
+  closeTabAriaLabel: '关闭{label}'
+}
+
+export function getTabsLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleTabs>
+): Required<TigerLocaleTabs> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_TABS_LABELS
+    : DEFAULT_TABS_LABELS
+  return {
+    addTabAriaLabel:
+      overrides?.addTabAriaLabel ?? locale?.tabs?.addTabAriaLabel ?? defaultLabels.addTabAriaLabel,
+    closeTabAriaLabel:
+      overrides?.closeTabAriaLabel ??
+      locale?.tabs?.closeTabAriaLabel ??
+      defaultLabels.closeTabAriaLabel
+  }
+}
+
+export const DEFAULT_RATE_LABELS: Required<TigerLocaleRate> = {
+  ariaLabel: 'Rating',
+  valueText: '{value} star{plural}'
+}
+
+export const ZH_CN_RATE_LABELS: Required<TigerLocaleRate> = {
+  ariaLabel: '评分',
+  valueText: '{value} 星'
+}
+
+export function getRateLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleRate>
+): Required<TigerLocaleRate> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_RATE_LABELS
+    : DEFAULT_RATE_LABELS
+  return {
+    ariaLabel: overrides?.ariaLabel ?? locale?.rate?.ariaLabel ?? defaultLabels.ariaLabel,
+    valueText: overrides?.valueText ?? locale?.rate?.valueText ?? defaultLabels.valueText
+  }
+}
+
+export const DEFAULT_CAROUSEL_LABELS: Required<TigerLocaleCarousel> = {
+  ariaLabel: 'Image carousel',
+  navigationAriaLabel: 'Carousel navigation',
+  previousSlideAriaLabel: 'Previous slide',
+  nextSlideAriaLabel: 'Next slide',
+  goToSlideAriaLabel: 'Go to slide {index}',
+  slideAriaLabel: 'Slide {index} of {total}'
+}
+
+export const ZH_CN_CAROUSEL_LABELS: Required<TigerLocaleCarousel> = {
+  ariaLabel: '图片轮播',
+  navigationAriaLabel: '轮播导航',
+  previousSlideAriaLabel: '上一张',
+  nextSlideAriaLabel: '下一张',
+  goToSlideAriaLabel: '跳转到第 {index} 张',
+  slideAriaLabel: '第 {index} 张，共 {total} 张'
+}
+
+export function getCarouselLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleCarousel>
+): Required<TigerLocaleCarousel> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_CAROUSEL_LABELS
+    : DEFAULT_CAROUSEL_LABELS
+  return {
+    ariaLabel: overrides?.ariaLabel ?? locale?.carousel?.ariaLabel ?? defaultLabels.ariaLabel,
+    navigationAriaLabel:
+      overrides?.navigationAriaLabel ??
+      locale?.carousel?.navigationAriaLabel ??
+      defaultLabels.navigationAriaLabel,
+    previousSlideAriaLabel:
+      overrides?.previousSlideAriaLabel ??
+      locale?.carousel?.previousSlideAriaLabel ??
+      defaultLabels.previousSlideAriaLabel,
+    nextSlideAriaLabel:
+      overrides?.nextSlideAriaLabel ??
+      locale?.carousel?.nextSlideAriaLabel ??
+      defaultLabels.nextSlideAriaLabel,
+    goToSlideAriaLabel:
+      overrides?.goToSlideAriaLabel ??
+      locale?.carousel?.goToSlideAriaLabel ??
+      defaultLabels.goToSlideAriaLabel,
+    slideAriaLabel:
+      overrides?.slideAriaLabel ?? locale?.carousel?.slideAriaLabel ?? defaultLabels.slideAriaLabel
+  }
+}
+
+export const DEFAULT_TRANSFER_LABELS: Required<TigerLocaleTransfer> = {
+  sourceTitle: 'Source',
+  targetTitle: 'Target',
+  searchAriaLabel: 'Search {title}',
+  itemsAriaLabel: '{title} items',
+  moveToTargetAriaLabel: 'Move selected to target',
+  moveToSourceAriaLabel: 'Move selected to source'
+}
+
+export const ZH_CN_TRANSFER_LABELS: Required<TigerLocaleTransfer> = {
+  sourceTitle: '源列表',
+  targetTitle: '目标列表',
+  searchAriaLabel: '搜索{title}',
+  itemsAriaLabel: '{title}项目',
+  moveToTargetAriaLabel: '移动选中项到目标列表',
+  moveToSourceAriaLabel: '移动选中项到源列表'
+}
+
+export function getTransferLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleTransfer>
+): Required<TigerLocaleTransfer> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_TRANSFER_LABELS
+    : DEFAULT_TRANSFER_LABELS
+  return {
+    sourceTitle:
+      overrides?.sourceTitle ?? locale?.transfer?.sourceTitle ?? defaultLabels.sourceTitle,
+    targetTitle:
+      overrides?.targetTitle ?? locale?.transfer?.targetTitle ?? defaultLabels.targetTitle,
+    searchAriaLabel:
+      overrides?.searchAriaLabel ??
+      locale?.transfer?.searchAriaLabel ??
+      defaultLabels.searchAriaLabel,
+    itemsAriaLabel:
+      overrides?.itemsAriaLabel ?? locale?.transfer?.itemsAriaLabel ?? defaultLabels.itemsAriaLabel,
+    moveToTargetAriaLabel:
+      overrides?.moveToTargetAriaLabel ??
+      locale?.transfer?.moveToTargetAriaLabel ??
+      defaultLabels.moveToTargetAriaLabel,
+    moveToSourceAriaLabel:
+      overrides?.moveToSourceAriaLabel ??
+      locale?.transfer?.moveToSourceAriaLabel ??
+      defaultLabels.moveToSourceAriaLabel
+  }
+}
+
+export const DEFAULT_CHART_LABELS: Required<TigerLocaleChart> = {
+  legendAriaLabel: 'Chart legend',
+  pointAriaLabel: 'Point {index}: ({x}, {y})'
+}
+
+export const ZH_CN_CHART_LABELS: Required<TigerLocaleChart> = {
+  legendAriaLabel: '图表图例',
+  pointAriaLabel: '第 {index} 个点：({x}, {y})'
+}
+
+export function getChartLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleChart>
+): Required<TigerLocaleChart> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_CHART_LABELS
+    : DEFAULT_CHART_LABELS
+  return {
+    legendAriaLabel:
+      overrides?.legendAriaLabel ?? locale?.chart?.legendAriaLabel ?? defaultLabels.legendAriaLabel,
+    pointAriaLabel:
+      overrides?.pointAriaLabel ?? locale?.chart?.pointAriaLabel ?? defaultLabels.pointAriaLabel
+  }
+}
+
+export const DEFAULT_MARKDOWN_EDITOR_LABELS: Required<TigerLocaleMarkdownEditor> = {
+  formattingToolbarAriaLabel: 'Markdown formatting',
+  modeToolbarAriaLabel: 'Markdown view mode',
+  editorAriaLabel: 'Markdown editor',
+  previewAriaLabel: 'Markdown preview',
+  editModeLabel: 'Edit',
+  splitModeLabel: 'Split',
+  previewModeLabel: 'Preview'
+}
+
+export const ZH_CN_MARKDOWN_EDITOR_LABELS: Required<TigerLocaleMarkdownEditor> = {
+  formattingToolbarAriaLabel: 'Markdown 格式工具栏',
+  modeToolbarAriaLabel: 'Markdown 视图模式',
+  editorAriaLabel: 'Markdown 编辑器',
+  previewAriaLabel: 'Markdown 预览',
+  editModeLabel: '编辑',
+  splitModeLabel: '分栏',
+  previewModeLabel: '预览'
+}
+
+export function getMarkdownEditorLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleMarkdownEditor>
+): Required<TigerLocaleMarkdownEditor> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_MARKDOWN_EDITOR_LABELS
+    : DEFAULT_MARKDOWN_EDITOR_LABELS
+  return {
+    formattingToolbarAriaLabel:
+      overrides?.formattingToolbarAriaLabel ??
+      locale?.markdownEditor?.formattingToolbarAriaLabel ??
+      defaultLabels.formattingToolbarAriaLabel,
+    modeToolbarAriaLabel:
+      overrides?.modeToolbarAriaLabel ??
+      locale?.markdownEditor?.modeToolbarAriaLabel ??
+      defaultLabels.modeToolbarAriaLabel,
+    editorAriaLabel:
+      overrides?.editorAriaLabel ??
+      locale?.markdownEditor?.editorAriaLabel ??
+      defaultLabels.editorAriaLabel,
+    previewAriaLabel:
+      overrides?.previewAriaLabel ??
+      locale?.markdownEditor?.previewAriaLabel ??
+      defaultLabels.previewAriaLabel,
+    editModeLabel:
+      overrides?.editModeLabel ??
+      locale?.markdownEditor?.editModeLabel ??
+      defaultLabels.editModeLabel,
+    splitModeLabel:
+      overrides?.splitModeLabel ??
+      locale?.markdownEditor?.splitModeLabel ??
+      defaultLabels.splitModeLabel,
+    previewModeLabel:
+      overrides?.previewModeLabel ??
+      locale?.markdownEditor?.previewModeLabel ??
+      defaultLabels.previewModeLabel
+  }
+}
+
+export const DEFAULT_RICH_TEXT_EDITOR_LABELS: Required<TigerLocaleRichTextEditor> = {
+  formattingToolbarAriaLabel: 'Text formatting',
+  editorAriaLabel: 'Rich text editor'
+}
+
+export const ZH_CN_RICH_TEXT_EDITOR_LABELS: Required<TigerLocaleRichTextEditor> = {
+  formattingToolbarAriaLabel: '富文本格式工具栏',
+  editorAriaLabel: '富文本编辑器'
+}
+
+export function getRichTextEditorLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleRichTextEditor>
+): Required<TigerLocaleRichTextEditor> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_RICH_TEXT_EDITOR_LABELS
+    : DEFAULT_RICH_TEXT_EDITOR_LABELS
+  return {
+    formattingToolbarAriaLabel:
+      overrides?.formattingToolbarAriaLabel ??
+      locale?.richTextEditor?.formattingToolbarAriaLabel ??
+      defaultLabels.formattingToolbarAriaLabel,
+    editorAriaLabel:
+      overrides?.editorAriaLabel ??
+      locale?.richTextEditor?.editorAriaLabel ??
+      defaultLabels.editorAriaLabel
+  }
+}
+
+export const DEFAULT_CRON_EDITOR_LABELS: Required<TigerLocaleCronEditor> = {
+  ariaLabel: 'Cron editor',
+  expressionAriaLabel: 'Cron expression',
+  presetAriaLabel: 'Cron preset',
+  presetPlaceholder: 'Preset',
+  everyMinutePreset: 'Every minute',
+  hourlyPreset: 'Hourly',
+  dailyPreset: 'Daily',
+  weeklyPreset: 'Weekly',
+  monthlyPreset: 'Monthly',
+  minuteLabel: 'Minute',
+  hourLabel: 'Hour',
+  dayOfMonthLabel: 'Day',
+  monthLabel: 'Month',
+  dayOfWeekLabel: 'Weekday',
+  modeAnyLabel: 'Any',
+  modeEveryLabel: 'Every',
+  modeSpecificLabel: 'Specific',
+  modeRangeLabel: 'Range',
+  modeCustomLabel: 'Custom',
+  modeAriaLabel: '{field} mode',
+  stepAriaLabel: '{field} step',
+  valueAriaLabel: '{field} value',
+  rangeStartAriaLabel: '{field} range start',
+  rangeEndAriaLabel: '{field} range end',
+  customValueAriaLabel: '{field} custom value',
+  expressionFieldsError: 'Cron expression must contain 5 fields',
+  fieldRequiredError: '{field} is required',
+  invalidStepError: '{field} has an invalid step expression',
+  stepRangeError: '{field} step must be between 1 and {max}',
+  fieldRangeError: '{field} must be between {min} and {max}',
+  rangeOrderError: '{field} range start must be less than or equal to end',
+  invalidFieldError: '{field} must be *, a number, a range, a step, or a comma list'
+}
+
+export const ZH_CN_CRON_EDITOR_LABELS: Required<TigerLocaleCronEditor> = {
+  ariaLabel: 'Cron 表达式编辑器',
+  expressionAriaLabel: 'Cron 表达式',
+  presetAriaLabel: 'Cron 预设',
+  presetPlaceholder: '选择预设',
+  everyMinutePreset: '每分钟',
+  hourlyPreset: '每小时',
+  dailyPreset: '每天',
+  weeklyPreset: '每周',
+  monthlyPreset: '每月',
+  minuteLabel: '分钟',
+  hourLabel: '小时',
+  dayOfMonthLabel: '日期',
+  monthLabel: '月份',
+  dayOfWeekLabel: '星期',
+  modeAnyLabel: '任意',
+  modeEveryLabel: '每隔',
+  modeSpecificLabel: '指定',
+  modeRangeLabel: '范围',
+  modeCustomLabel: '自定义',
+  modeAriaLabel: '{field}模式',
+  stepAriaLabel: '{field}步长',
+  valueAriaLabel: '{field}值',
+  rangeStartAriaLabel: '{field}范围开始',
+  rangeEndAriaLabel: '{field}范围结束',
+  customValueAriaLabel: '{field}自定义值',
+  expressionFieldsError: 'Cron 表达式必须包含 5 个字段',
+  fieldRequiredError: '{field}为必填项',
+  invalidStepError: '{field}步长表达式无效',
+  stepRangeError: '{field}步长必须在 1 到 {max} 之间',
+  fieldRangeError: '{field}必须在 {min} 到 {max} 之间',
+  rangeOrderError: '{field}范围开始值必须小于或等于结束值',
+  invalidFieldError: '{field}必须是 *、数字、范围、步长或逗号列表'
+}
+
+export function getCronEditorLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleCronEditor>
+): Required<TigerLocaleCronEditor> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_CRON_EDITOR_LABELS
+    : DEFAULT_CRON_EDITOR_LABELS
+  return {
+    ariaLabel: overrides?.ariaLabel ?? locale?.cronEditor?.ariaLabel ?? defaultLabels.ariaLabel,
+    expressionAriaLabel:
+      overrides?.expressionAriaLabel ??
+      locale?.cronEditor?.expressionAriaLabel ??
+      defaultLabels.expressionAriaLabel,
+    presetAriaLabel:
+      overrides?.presetAriaLabel ??
+      locale?.cronEditor?.presetAriaLabel ??
+      defaultLabels.presetAriaLabel,
+    presetPlaceholder:
+      overrides?.presetPlaceholder ??
+      locale?.cronEditor?.presetPlaceholder ??
+      defaultLabels.presetPlaceholder,
+    everyMinutePreset:
+      overrides?.everyMinutePreset ??
+      locale?.cronEditor?.everyMinutePreset ??
+      defaultLabels.everyMinutePreset,
+    hourlyPreset:
+      overrides?.hourlyPreset ?? locale?.cronEditor?.hourlyPreset ?? defaultLabels.hourlyPreset,
+    dailyPreset:
+      overrides?.dailyPreset ?? locale?.cronEditor?.dailyPreset ?? defaultLabels.dailyPreset,
+    weeklyPreset:
+      overrides?.weeklyPreset ?? locale?.cronEditor?.weeklyPreset ?? defaultLabels.weeklyPreset,
+    monthlyPreset:
+      overrides?.monthlyPreset ?? locale?.cronEditor?.monthlyPreset ?? defaultLabels.monthlyPreset,
+    minuteLabel:
+      overrides?.minuteLabel ?? locale?.cronEditor?.minuteLabel ?? defaultLabels.minuteLabel,
+    hourLabel: overrides?.hourLabel ?? locale?.cronEditor?.hourLabel ?? defaultLabels.hourLabel,
+    dayOfMonthLabel:
+      overrides?.dayOfMonthLabel ??
+      locale?.cronEditor?.dayOfMonthLabel ??
+      defaultLabels.dayOfMonthLabel,
+    monthLabel: overrides?.monthLabel ?? locale?.cronEditor?.monthLabel ?? defaultLabels.monthLabel,
+    dayOfWeekLabel:
+      overrides?.dayOfWeekLabel ??
+      locale?.cronEditor?.dayOfWeekLabel ??
+      defaultLabels.dayOfWeekLabel,
+    modeAnyLabel:
+      overrides?.modeAnyLabel ?? locale?.cronEditor?.modeAnyLabel ?? defaultLabels.modeAnyLabel,
+    modeEveryLabel:
+      overrides?.modeEveryLabel ??
+      locale?.cronEditor?.modeEveryLabel ??
+      defaultLabels.modeEveryLabel,
+    modeSpecificLabel:
+      overrides?.modeSpecificLabel ??
+      locale?.cronEditor?.modeSpecificLabel ??
+      defaultLabels.modeSpecificLabel,
+    modeRangeLabel:
+      overrides?.modeRangeLabel ??
+      locale?.cronEditor?.modeRangeLabel ??
+      defaultLabels.modeRangeLabel,
+    modeCustomLabel:
+      overrides?.modeCustomLabel ??
+      locale?.cronEditor?.modeCustomLabel ??
+      defaultLabels.modeCustomLabel,
+    modeAriaLabel:
+      overrides?.modeAriaLabel ?? locale?.cronEditor?.modeAriaLabel ?? defaultLabels.modeAriaLabel,
+    stepAriaLabel:
+      overrides?.stepAriaLabel ?? locale?.cronEditor?.stepAriaLabel ?? defaultLabels.stepAriaLabel,
+    valueAriaLabel:
+      overrides?.valueAriaLabel ??
+      locale?.cronEditor?.valueAriaLabel ??
+      defaultLabels.valueAriaLabel,
+    rangeStartAriaLabel:
+      overrides?.rangeStartAriaLabel ??
+      locale?.cronEditor?.rangeStartAriaLabel ??
+      defaultLabels.rangeStartAriaLabel,
+    rangeEndAriaLabel:
+      overrides?.rangeEndAriaLabel ??
+      locale?.cronEditor?.rangeEndAriaLabel ??
+      defaultLabels.rangeEndAriaLabel,
+    customValueAriaLabel:
+      overrides?.customValueAriaLabel ??
+      locale?.cronEditor?.customValueAriaLabel ??
+      defaultLabels.customValueAriaLabel,
+    expressionFieldsError:
+      overrides?.expressionFieldsError ??
+      locale?.cronEditor?.expressionFieldsError ??
+      defaultLabels.expressionFieldsError,
+    fieldRequiredError:
+      overrides?.fieldRequiredError ??
+      locale?.cronEditor?.fieldRequiredError ??
+      defaultLabels.fieldRequiredError,
+    invalidStepError:
+      overrides?.invalidStepError ??
+      locale?.cronEditor?.invalidStepError ??
+      defaultLabels.invalidStepError,
+    stepRangeError:
+      overrides?.stepRangeError ??
+      locale?.cronEditor?.stepRangeError ??
+      defaultLabels.stepRangeError,
+    fieldRangeError:
+      overrides?.fieldRangeError ??
+      locale?.cronEditor?.fieldRangeError ??
+      defaultLabels.fieldRangeError,
+    rangeOrderError:
+      overrides?.rangeOrderError ??
+      locale?.cronEditor?.rangeOrderError ??
+      defaultLabels.rangeOrderError,
+    invalidFieldError:
+      overrides?.invalidFieldError ??
+      locale?.cronEditor?.invalidFieldError ??
+      defaultLabels.invalidFieldError
   }
 }
 

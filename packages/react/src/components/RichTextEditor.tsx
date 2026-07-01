@@ -15,12 +15,17 @@ import {
   parseHeight,
   builtinRichTextEngine,
   isToolbarSeparator,
+  mergeTigerLocale,
+  getRichTextEditorLabels,
   type RichTextEditorMode,
   type ToolbarButton,
   type ToolbarItem,
   type RichTextEngine,
-  type RichTextEngineInstance
+  type RichTextEngineInstance,
+  type TigerLocale,
+  type TigerLocaleRichTextEditor
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface RichTextEditorProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
@@ -44,6 +49,10 @@ export interface RichTextEditorProps extends Omit<
   disabled?: boolean
   /** Content change callback */
   onChange?: (html: string) => void
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+  /** Text/aria label overrides */
+  labels?: Partial<TigerLocaleRichTextEditor>
   /**
    * Optional pluggable editor engine (PR-17). Defaults to the
    * built-in `contenteditable` + `document.execCommand` engine. Pass a
@@ -63,10 +72,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   readOnly = false,
   disabled = false,
   onChange,
+  locale,
+  labels: labelsOverride,
   className,
   engine,
   ...restProps
 }) => {
+  const config = useTigerConfig()
   const editorRef = useRef<HTMLDivElement>(null)
   const engineRef = useRef<RichTextEngineInstance | null>(null)
   const [currentContent, setContent] = useControlledState(value, defaultValue, onChange)
@@ -74,6 +86,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set())
   const toolbarItems = toolbar ?? defaultToolbar
   const empty = isContentEmpty(currentContent)
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getRichTextEditorLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
 
   // Mount engine once (per engine identity) on the host element.
   useEffect(() => {
@@ -151,7 +171,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   return (
     <div className={containerClasses} style={containerStyle} {...restProps}>
       {/* Toolbar */}
-      <div className={richTextToolbarClasses} role="toolbar" aria-label="Text formatting">
+      <div
+        className={richTextToolbarClasses}
+        role="toolbar"
+        aria-label={labels.formattingToolbarAriaLabel}>
         {toolbarItems.map((item, idx) => {
           if (isToolbarSeparator(item)) {
             return (
@@ -187,6 +210,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           ref={editorRef}
           className={editorAreaClasses}
           role="textbox"
+          aria-label={labels.editorAriaLabel}
           aria-multiline={true}
           aria-readonly={readOnly || undefined}
           aria-disabled={disabled || undefined}

@@ -6,9 +6,10 @@ import { describe, it, expect, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { DatePicker } from '@expcat/tigercat-react'
+import { ConfigProvider, DatePicker } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated, componentSizes } from '../utils/react'
 import { ZH_CN_DATEPICKER_LOCALE } from '../../packages/core/src/utils/i18n/datepicker-locales/zh-CN'
+import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 
 describe('DatePicker', () => {
   describe('Rendering', () => {
@@ -31,6 +32,19 @@ describe('DatePicker', () => {
 
       const input = container.querySelector('input')
       expect(input).toHaveAttribute('placeholder', 'Choose a date')
+    })
+
+    it('localizes default placeholder and control labels from ConfigProvider', () => {
+      const { container } = render(
+        <ConfigProvider locale={zhCN}>
+          <DatePicker value={new Date('2024-01-15')} />
+        </ConfigProvider>
+      )
+
+      const input = container.querySelector('input')
+      expect(input).toHaveAttribute('placeholder', '请选择日期')
+      expect(container.querySelector('button[aria-label="清除日期"]')).toBeInTheDocument()
+      expect(container.querySelector('button[aria-label="打开日历"]')).toBeInTheDocument()
     })
 
     it('should display formatted date when value is provided', () => {

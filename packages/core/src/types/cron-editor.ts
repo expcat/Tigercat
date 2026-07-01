@@ -31,6 +31,16 @@ export interface CronValidationResult {
   issues: CronValidationIssue[]
 }
 
+export interface CronEditorValidationLabels {
+  expressionFieldsError?: string
+  fieldRequiredError?: string
+  invalidStepError?: string
+  stepRangeError?: string
+  fieldRangeError?: string
+  rangeOrderError?: string
+  invalidFieldError?: string
+}
+
 export interface CronPreset {
   label: string
   value: string

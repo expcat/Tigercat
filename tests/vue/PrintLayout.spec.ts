@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
+import { h } from 'vue'
 import { render, screen } from '@testing-library/vue'
 import { PrintLayout, PrintPageBreak } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -141,6 +142,25 @@ describe('PrintPageBreak', () => {
   it('renders as div element', () => {
     const { container } = render(PrintPageBreak)
     expect(container.firstElementChild!.tagName).toBe('DIV')
+  })
+
+  it('shows the on-screen dashed indicator by default inside a PrintLayout', () => {
+    const { container } = render(PrintLayout, {
+      slots: { default: () => h(PrintPageBreak) }
+    })
+    const el = container.querySelector('[aria-hidden="true"]') as HTMLElement
+    expect(el.className).toContain('border-dashed')
+    expect(el.className).toContain('print:break-before-page')
+  })
+
+  it('hides the on-screen indicator but keeps the print break when showPageBreaks is false', () => {
+    const { container } = render(PrintLayout, {
+      props: { showPageBreaks: false },
+      slots: { default: () => h(PrintPageBreak) }
+    })
+    const el = container.querySelector('[aria-hidden="true"]') as HTMLElement
+    expect(el.className).not.toContain('border-dashed')
+    expect(el.className).toContain('print:break-before-page')
   })
 
   describe('a11y', () => {

@@ -15,12 +15,16 @@ import {
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
+  mergeTigerLocale,
+  getChartLabels,
   type ChartLegendItem,
   type ChartLegendPosition,
   type ChartPadding,
   type ChartScale,
   type ScatterChartDatum,
-  type ScatterChartProps as CoreScatterChartProps
+  type ScatterChartProps as CoreScatterChartProps,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartAxis } from './ChartAxis'
 import { ChartCanvas } from './ChartCanvas'
@@ -29,6 +33,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ScatterChartProps extends CoreScatterChartProps {
   data: ScatterChartDatum[]
@@ -59,12 +64,15 @@ export interface ScatterChartProps extends CoreScatterChartProps {
   colors?: string[]
   title?: string
   desc?: string
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleChart>
 }
 
 export const ScatterChart: React.FC<ScatterChartProps> = ({
   width = 320,
   height = 200,
   padding = 24,
+  responsive = false,
   data,
   xScale,
   yScale,
@@ -115,14 +123,25 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   colors,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className
 }) => {
+  const config = useTigerConfig()
   const gradientId = useId()
   const gradientPrefix = useMemo(
     () => getStableChartGradientPrefix('scatter', gradientId),
     [gradientId]
   )
   const [mounted, setMounted] = useState(false)
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
 
   useEffect(() => {
     if (animated) setMounted(true)
@@ -247,6 +266,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       width={width}
       height={height}
       padding={padding}
+      responsive={responsive}
       title={title}
       desc={desc}
       className={classNames(className)}>
@@ -335,7 +355,11 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
             tabIndex: selectable ? 0 : undefined,
             role: selectable ? 'button' : ('img' as const),
             'aria-label':
-              point.datum.label ?? `Point ${index + 1}: (${point.datum.x}, ${point.datum.y})`,
+              point.datum.label ??
+              labels.pointAriaLabel
+                .replace('{index}', String(index + 1))
+                .replace('{x}', String(point.datum.x))
+                .replace('{y}', String(point.datum.y)),
             'data-point-index': index,
             onMouseEnter: (e: React.MouseEvent) => handleMouseEnter(index, e),
             onMouseMove: handleMouseMove,
@@ -395,6 +419,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
         position={legendPosition}
         markerSize={legendMarkerSize}
         gap={legendGap}
+        ariaLabel={labels.legendAriaLabel}
         interactive={interactive}
         onItemClick={handleLegendClick}
         onItemHover={handleLegendHover}

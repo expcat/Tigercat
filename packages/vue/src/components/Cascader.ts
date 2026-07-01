@@ -327,7 +327,10 @@ export const Cascader = defineComponent({
             {
               class: 'flex items-center',
               role: 'button',
-              'aria-label': 'Clear selection',
+              'aria-label': resolveLocaleText(
+                'Clear selection',
+                mergedLocale.value?.common?.clearText
+              ),
               onClick: handleClear
             },
             [
@@ -399,7 +402,10 @@ export const Cascader = defineComponent({
               ),
               value: searchQuery.value,
               onInput: handleSearchInput,
-              'aria-label': 'Search options'
+              'aria-label': resolveLocaleText(
+                'Search options',
+                mergedLocale.value?.common?.searchPlaceholder
+              )
             })
           )
         }

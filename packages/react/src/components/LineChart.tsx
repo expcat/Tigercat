@@ -50,10 +50,15 @@ export interface LineChartProps extends CoreLineChartProps {
   ) => void
 }
 
+// Asymmetric default padding leaves room for the left y-axis tick labels
+// (3-digit / currency values) and the bottom x-axis label so they are not clipped.
+const DEFAULT_CARTESIAN_PADDING = { top: 24, right: 24, bottom: 52, left: 52 } as const
+
 export const LineChart: React.FC<LineChartProps> = ({
   width = 320,
   height = 200,
-  padding = 24,
+  padding = DEFAULT_CARTESIAN_PADDING,
+  responsive = false,
   data,
   series,
   xScale: xScaleProp,
@@ -343,6 +348,7 @@ export const LineChart: React.FC<LineChartProps> = ({
       width={width}
       height={height}
       padding={padding}
+      responsive={responsive}
       title={title}
       desc={desc}
       className={classNames(className)}>

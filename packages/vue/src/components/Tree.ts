@@ -668,7 +668,12 @@ export const Tree = defineComponent({
               checked: isChecked,
               indeterminate: isHalfChecked,
               disabled: node.disabled,
-              'aria-label': `Select ${node.label}`,
+              'aria-label': resolveLocaleText(
+                `Select ${node.label}`,
+                mergedLocale.value?.locale?.toLowerCase().startsWith('zh')
+                  ? `选择${node.label}`
+                  : undefined
+              ),
               onClick: (e: MouseEvent) => e.stopPropagation(),
               onChange: (e: Event) => {
                 const target = e.target as HTMLInputElement

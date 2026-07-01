@@ -41,10 +41,15 @@ export interface BarChartProps extends CoreBarChartProps {
   onBarHover?: (index: number | null, datum: BarChartDatum | null) => void
 }
 
+// Asymmetric default padding leaves room for the left y-axis tick labels
+// (3-digit / currency values) and the bottom x-axis label so they are not clipped.
+const DEFAULT_CARTESIAN_PADDING = { top: 24, right: 24, bottom: 52, left: 52 } as const
+
 export const BarChart: React.FC<BarChartProps> = ({
   width = 320,
   height = 200,
-  padding = 24,
+  padding = DEFAULT_CARTESIAN_PADDING,
+  responsive = false,
   data,
   xScale,
   yScale,
@@ -243,6 +248,7 @@ export const BarChart: React.FC<BarChartProps> = ({
       width={width}
       height={height}
       padding={padding}
+      responsive={responsive}
       title={title}
       desc={desc}
       className={classNames(className)}>

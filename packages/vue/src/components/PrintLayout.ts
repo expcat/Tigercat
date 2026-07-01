@@ -1,4 +1,13 @@
-import { defineComponent, h, PropType, computed } from 'vue'
+import {
+  defineComponent,
+  h,
+  PropType,
+  computed,
+  provide,
+  inject,
+  type ComputedRef,
+  type InjectionKey
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -9,6 +18,14 @@ import {
   type PrintPageSize,
   type PrintOrientation
 } from '@expcat/tigercat-core'
+
+/**
+ * Shares `showPageBreaks` from a PrintLayout down to nested PrintPageBreak
+ * indicators. Absent (standalone usage) defaults to showing indicators.
+ */
+const PrintLayoutShowPageBreaksKey: InjectionKey<ComputedRef<boolean>> = Symbol(
+  'tigerPrintShowPageBreaks'
+)
 
 export interface VuePrintLayoutProps {
   pageSize?: PrintPageSize
@@ -59,6 +76,11 @@ export const PrintLayout = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
+    provide(
+      PrintLayoutShowPageBreaksKey,
+      computed(() => props.showPageBreaks)
+    )
+
     const classes = computed(() =>
       classNames(
         getPrintLayoutClasses(props.pageSize, props.orientation, props.className),
@@ -106,10 +128,16 @@ export const PrintLayout = defineComponent({
 export const PrintPageBreak = defineComponent({
   name: 'TigerPrintPageBreak',
   setup(_, { attrs }) {
+    const showPageBreaks = inject(PrintLayoutShowPageBreaksKey, null)
     return () =>
       h('div', {
         ...attrs,
-        class: classNames(printLayoutPageBreakClasses, 'print:break-before-page'),
+        // Always force the print page break; only show the on-screen dashed indicator
+        // when the enclosing PrintLayout has `showPageBreaks` enabled.
+        class: classNames(
+          (showPageBreaks?.value ?? true) && printLayoutPageBreakClasses,
+          'print:break-before-page'
+        ),
         'aria-hidden': 'true'
       })
   }

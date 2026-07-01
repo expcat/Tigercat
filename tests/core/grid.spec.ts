@@ -156,6 +156,30 @@ describe('grid col css variable helpers', () => {
     expect(getFlexClasses(undefined)).toBe('')
     expect(getFlexClasses('auto')).toContain('flex-[var(--tiger-col-flex)]')
   })
+
+  it('cascades responsive span/offset/order fallbacks up through lower breakpoints', () => {
+    // A value set at a lower breakpoint must still apply at larger breakpoints when
+    // those are not explicitly provided. The always-present xl/2xl classes therefore
+    // fall back through lg -> md -> sm -> base instead of jumping straight to base
+    // (which previously reverted large viewports to the base value).
+    const span = getSpanClasses({ md: 12 })
+    expect(span).toContain(
+      'xl:w-[var(--tiger-col-span-xl,var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span)))))]'
+    )
+    expect(span).toContain(
+      '2xl:w-[var(--tiger-col-span-2xl,var(--tiger-col-span-xl,var(--tiger-col-span-lg,var(--tiger-col-span-md,var(--tiger-col-span-sm,var(--tiger-col-span))))))]'
+    )
+
+    const offset = getOffsetClasses({ md: 4 })
+    expect(offset).toContain(
+      'xl:ml-[var(--tiger-col-offset-xl,var(--tiger-col-offset-lg,var(--tiger-col-offset-md,var(--tiger-col-offset-sm,var(--tiger-col-offset)))))]'
+    )
+
+    const order = getOrderClasses({ md: 1 })
+    expect(order).toContain(
+      'xl:order-[var(--tiger-col-order-xl,var(--tiger-col-order-lg,var(--tiger-col-order-md,var(--tiger-col-order-sm,var(--tiger-col-order)))))]'
+    )
+  })
 })
 
 describe('grid row alignment helpers', () => {

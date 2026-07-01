@@ -1,0 +1,37 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "example-react",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "pnpm@11.9.0",
+        "--filter",
+        "@expcat/tigercat-example-react",
+        "dev",
+        "--",
+        "--port",
+        "5180",
+        "--strictPort"
+      ],
+      "port": 5180
+    },
+    {
+      "name": "example-vue",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "pnpm@11.9.0",
+        "--filter",
+        "@expcat/tigercat-example-vue3",
+        "dev",
+        "--",
+        "--port",
+        "5181",
+        "--strictPort"
+      ],
+      "port": 5181
+    }
+  ]
+}

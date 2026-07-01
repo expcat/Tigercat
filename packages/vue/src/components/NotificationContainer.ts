@@ -148,7 +148,7 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
                 e.stopPropagation()
                 props.onClose?.(notification.id)
               },
-              'aria-label': NOTIFICATION_CLOSE_ARIA_LABEL,
+              'aria-label': notification.closeAriaLabel ?? NOTIFICATION_CLOSE_ARIA_LABEL,
               type: 'button'
             },
             createStatusIcon(notificationCloseIconPath, notificationCloseIconClasses, {

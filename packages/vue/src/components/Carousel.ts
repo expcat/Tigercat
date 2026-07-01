@@ -32,11 +32,16 @@ import {
   createCarouselAutoplayController,
   carouselPrevArrowPath,
   carouselNextArrowPath,
+  mergeTigerLocale,
+  getCarouselLabels,
   type CarouselTouchPoint,
   type CarouselDotPosition,
   type CarouselEffect,
-  type CarouselAutoplayController
+  type CarouselAutoplayController,
+  type TigerLocale,
+  type TigerLocaleCarousel
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueCarouselProps {
   autoplay?: boolean
@@ -53,6 +58,8 @@ export interface VueCarouselProps {
   pauseOnFocus?: boolean
   className?: string
   style?: Record<string, string | number>
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleCarousel>
 }
 
 export const Carousel = defineComponent({
@@ -166,10 +173,19 @@ export const Carousel = defineComponent({
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleCarousel>>,
+      default: undefined
     }
   },
   emits: ['change', 'before-change', 'update:currentIndex'],
   setup(props, { slots, emit, attrs, expose }) {
+    const config = useTigerConfig()
     const internalCurrentIndex = ref(props.defaultCurrentIndex)
     const isPaused = ref(false)
     const slideCount = ref(0)
@@ -185,6 +201,8 @@ export const Carousel = defineComponent({
         slideCount.value
       )
     )
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getCarouselLabels(mergedLocale.value, props.labels))
 
     // Container classes
     const containerClasses = computed(() => {
@@ -417,7 +435,10 @@ export const Carousel = defineComponent({
             class: getCarouselArrowClasses(type, disabled),
             onClick,
             disabled,
-            'aria-label': type === 'prev' ? 'Previous slide' : 'Next slide'
+            'aria-label':
+              type === 'prev'
+                ? labels.value.previousSlideAriaLabel
+                : labels.value.nextSlideAriaLabel
           },
           h(
             'svg',
@@ -454,7 +475,7 @@ export const Carousel = defineComponent({
             key: index,
             class: getCarouselDotClasses(index === currentIndex.value),
             onClick: () => goTo(index),
-            'aria-label': `Go to slide ${index + 1}`,
+            'aria-label': labels.value.goToSlideAriaLabel.replace('{index}', String(index + 1)),
             'aria-current': index === currentIndex.value ? 'true' : 'false'
           })
         )
@@ -464,7 +485,7 @@ export const Carousel = defineComponent({
           {
             class: dotsClasses.value,
             role: 'tablist',
-            'aria-label': 'Carousel navigation'
+            'aria-label': labels.value.navigationAriaLabel
           },
           dots
         )
@@ -481,7 +502,9 @@ export const Carousel = defineComponent({
               style: props.effect === 'fade' ? slideStyle.value : undefined,
               role: 'group',
               'aria-roledescription': 'slide',
-              'aria-label': `Slide ${index + 1} of ${slides.length}`,
+              'aria-label': labels.value.slideAriaLabel
+                .replace('{index}', String(index + 1))
+                .replace('{total}', String(slides.length)),
               'aria-hidden': index !== currentIndex.value
             },
             slide
@@ -518,7 +541,7 @@ export const Carousel = defineComponent({
           style: props.style,
           role: 'region',
           'aria-roledescription': 'carousel',
-          'aria-label': 'Image carousel',
+          'aria-label': labels.value.ariaLabel,
           onMouseenter: handleMouseEnter,
           onMouseleave: handleMouseLeave,
           onFocusin: handleFocus,

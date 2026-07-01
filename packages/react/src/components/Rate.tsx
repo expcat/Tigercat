@@ -8,8 +8,13 @@ import {
   rateHoverColor,
   starPathD,
   starViewBox,
-  classNames
+  classNames,
+  mergeTigerLocale,
+  getRateLabels,
+  type TigerLocale,
+  type TigerLocaleRate
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface RateProps extends CoreRateProps {
   /** Controlled value */
@@ -18,6 +23,10 @@ export interface RateProps extends CoreRateProps {
   onChange?: (value: number) => void
   /** Called when hover value changes */
   onHoverChange?: (value: number) => void
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+  /** Text/aria label overrides */
+  labels?: Partial<TigerLocaleRate>
 }
 
 export const Rate: React.FC<RateProps> = ({
@@ -29,10 +38,21 @@ export const Rate: React.FC<RateProps> = ({
   allowClear = true,
   character,
   className,
+  locale,
+  labels: labelsOverride,
   onChange,
   onHoverChange
 }) => {
+  const config = useTigerConfig()
   const [hoverValue, setHoverValue] = useState(0)
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getRateLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
 
   const displayValue = hoverValue > 0 ? hoverValue : value
   const isChar = !!character
@@ -170,13 +190,15 @@ export const Rate: React.FC<RateProps> = ({
     handleMouseLeave
   ])
 
-  const valueText = `${value} star${value === 1 ? '' : 's'}`
+  const valueText = labels.valueText
+    .replace('{value}', String(value))
+    .replace('{plural}', value === 1 ? '' : 's')
 
   return (
     <div
       className={classNames(rateBaseClasses, className)}
       role="slider"
-      aria-label="Rating"
+      aria-label={labels.ariaLabel}
       aria-valuemin={0}
       aria-valuemax={count}
       aria-valuenow={value}

@@ -12,6 +12,8 @@ export type DatePickerModelValue =
   | [DatePickerInputDate | null, DatePickerInputDate | null]
 
 export interface DatePickerLabels {
+  placeholder: string
+  rangePlaceholder: string
   today: string
   ok: string
   calendar: string
@@ -19,11 +21,14 @@ export interface DatePickerLabels {
   clearDate: string
   previousMonth: string
   nextMonth: string
+  year: string
+  month: string
+  day: string
 }
 
 export interface DatePickerLocalePreset {
   locale: string
-  labels: DatePickerLabels
+  labels: Partial<DatePickerLabels>
 }
 
 export interface DatePickerLocaleConfig {

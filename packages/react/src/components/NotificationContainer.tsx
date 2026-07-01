@@ -121,7 +121,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
             e.stopPropagation()
             handleClose()
           }}
-          aria-label="Close notification"
+          aria-label={notification.closeAriaLabel ?? 'Close notification'}
           type="button">
           <StatusIcon path={notificationCloseIconPath} className={notificationCloseIconClasses} />
         </button>

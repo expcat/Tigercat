@@ -4,7 +4,9 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
-import { CronEditor } from '@expcat/tigercat-vue'
+import { h } from 'vue'
+import { ConfigProvider, CronEditor } from '@expcat/tigercat-vue'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated, renderWithProps } from '../utils'
 
 describe('CronEditor', () => {
@@ -49,6 +51,24 @@ describe('CronEditor', () => {
     await fireEvent.update(screen.getByLabelText('Cron preset'), '0 0 * * *')
 
     expect(onChange).toHaveBeenCalledWith('0 0 * * *', expect.objectContaining({ valid: true }))
+  })
+
+  it('uses ConfigProvider locale for fields, presets, aria, and validation', () => {
+    render({
+      render() {
+        return h(ConfigProvider, { locale: zhCN }, () =>
+          h(CronEditor, { modelValue: '60 * * * *' })
+        )
+      }
+    })
+
+    expect(screen.getByRole('group', { name: 'Cron 表达式编辑器' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Cron 表达式')).toHaveValue('60 * * * *')
+    expect(screen.getByLabelText('分钟模式')).toHaveValue('specific')
+    expect(screen.getByLabelText('分钟值')).toHaveValue(60)
+    expect(screen.getByLabelText('Cron 预设')).toHaveTextContent('选择预设')
+    expect(screen.getByLabelText('Cron 预设')).toHaveTextContent('每天')
+    expect(screen.getByText('分钟必须在 0 到 59 之间')).toBeInTheDocument()
   })
 
   it('updates field mode and step', async () => {

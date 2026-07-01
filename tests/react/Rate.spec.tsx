@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Rate } from '@expcat/tigercat-react'
+import { ConfigProvider, Rate } from '@expcat/tigercat-react'
+import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 /** The interactive star spans are the direct children of the slider. */
@@ -65,6 +66,16 @@ describe('Rate', () => {
   it('uses singular valuetext for a value of 1', () => {
     const { container } = render(<Rate value={1} />)
     expect(container.querySelector('[role="slider"]')).toHaveAttribute('aria-valuetext', '1 star')
+  })
+
+  it('localizes slider aria text from ConfigProvider', () => {
+    render(
+      <ConfigProvider locale={zhCN}>
+        <Rate value={3} />
+      </ConfigProvider>
+    )
+
+    expect(screen.getByRole('slider', { name: '评分' })).toHaveAttribute('aria-valuetext', '3 星')
   })
 
   // --- Keyboard ---

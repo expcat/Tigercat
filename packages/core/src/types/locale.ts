@@ -222,6 +222,96 @@ export interface TigerLocaleSelect {
   doneText?: string
 }
 
+export interface TigerLocaleTabs {
+  addTabAriaLabel?: string
+  /** Template: supports {label} */
+  closeTabAriaLabel?: string
+}
+
+export interface TigerLocaleRate {
+  ariaLabel?: string
+  /** Template: supports {value} */
+  valueText?: string
+}
+
+export interface TigerLocaleCarousel {
+  ariaLabel?: string
+  navigationAriaLabel?: string
+  previousSlideAriaLabel?: string
+  nextSlideAriaLabel?: string
+  /** Template: supports {index} */
+  goToSlideAriaLabel?: string
+  /** Template: supports {index} and {total} */
+  slideAriaLabel?: string
+}
+
+export interface TigerLocaleTransfer {
+  sourceTitle?: string
+  targetTitle?: string
+  /** Template: supports {title} */
+  searchAriaLabel?: string
+  /** Template: supports {title} */
+  itemsAriaLabel?: string
+  moveToTargetAriaLabel?: string
+  moveToSourceAriaLabel?: string
+}
+
+export interface TigerLocaleChart {
+  legendAriaLabel?: string
+  /** Template: supports {index}, {x}, {y} */
+  pointAriaLabel?: string
+}
+
+export interface TigerLocaleMarkdownEditor {
+  formattingToolbarAriaLabel?: string
+  modeToolbarAriaLabel?: string
+  editorAriaLabel?: string
+  previewAriaLabel?: string
+  editModeLabel?: string
+  splitModeLabel?: string
+  previewModeLabel?: string
+}
+
+export interface TigerLocaleRichTextEditor {
+  formattingToolbarAriaLabel?: string
+  editorAriaLabel?: string
+}
+
+export interface TigerLocaleCronEditor {
+  ariaLabel?: string
+  expressionAriaLabel?: string
+  presetAriaLabel?: string
+  presetPlaceholder?: string
+  everyMinutePreset?: string
+  hourlyPreset?: string
+  dailyPreset?: string
+  weeklyPreset?: string
+  monthlyPreset?: string
+  minuteLabel?: string
+  hourLabel?: string
+  dayOfMonthLabel?: string
+  monthLabel?: string
+  dayOfWeekLabel?: string
+  modeAnyLabel?: string
+  modeEveryLabel?: string
+  modeSpecificLabel?: string
+  modeRangeLabel?: string
+  modeCustomLabel?: string
+  modeAriaLabel?: string
+  stepAriaLabel?: string
+  valueAriaLabel?: string
+  rangeStartAriaLabel?: string
+  rangeEndAriaLabel?: string
+  customValueAriaLabel?: string
+  expressionFieldsError?: string
+  fieldRequiredError?: string
+  invalidStepError?: string
+  stepRangeError?: string
+  fieldRangeError?: string
+  rangeOrderError?: string
+  invalidFieldError?: string
+}
+
 /**
  * Built-in form-validation messages.
  *
@@ -289,6 +379,14 @@ export interface TigerLocale {
   status?: TigerLocaleStatus
   taskBoard?: TigerLocaleTaskBoard
   select?: TigerLocaleSelect
+  tabs?: TigerLocaleTabs
+  rate?: TigerLocaleRate
+  carousel?: TigerLocaleCarousel
+  transfer?: TigerLocaleTransfer
+  chart?: TigerLocaleChart
+  markdownEditor?: TigerLocaleMarkdownEditor
+  richTextEditor?: TigerLocaleRichTextEditor
+  cronEditor?: TigerLocaleCronEditor
   formValidation?: TigerLocaleFormValidation
 }
 

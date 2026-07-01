@@ -65,7 +65,6 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
   } = props
 
   const isRangeMode = isRangeDatePicker(props)
-  const placeholder = props.placeholder ?? (isRangeMode ? 'Select date range' : 'Select date')
 
   const divProps = (({
     value: _value,
@@ -196,6 +195,8 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
     () => getDatePickerLabels(mergedLocale, props.labels),
     [mergedLocale, props.labels]
   )
+  const placeholder =
+    props.placeholder ?? (isRangeMode ? labels.rangePlaceholder : labels.placeholder)
 
   const mobileDate = useMemo(() => {
     if (!isRangeMode) return selectedDate ?? normalizeDate(new Date())

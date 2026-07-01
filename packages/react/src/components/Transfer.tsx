@@ -3,11 +3,13 @@ import type {
   TransferItem,
   TransferProps as CoreTransferProps,
   TransferSearchValue,
-  TigerLocale
+  TigerLocale,
+  TigerLocaleTransfer
 } from '@expcat/tigercat-core'
 import {
   resolveLocaleText,
   mergeTigerLocale,
+  getTransferLabels,
   transferBaseClasses,
   transferPanelClasses,
   transferPanelHeaderClasses,
@@ -44,6 +46,8 @@ export interface TransferProps
   onSearchChange?: (value: TransferSearchValue) => void
   /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>
+  /** Text/aria label overrides */
+  labels?: Partial<TigerLocaleTransfer>
 }
 
 const TRANSFER_KEYS = new Set<string>([
@@ -75,14 +79,15 @@ export const Transfer: React.FC<TransferProps> = (props) => {
     searchable = false,
     searchValue,
     defaultSearchValue,
-    sourceTitle = 'Source',
-    targetTitle = 'Target',
+    sourceTitle,
+    targetTitle,
     emptyText,
     filterOption,
     className,
     onChange,
     onSearchChange,
     locale,
+    labels: labelsOverride,
     ...rest
   } = props
 
@@ -94,6 +99,15 @@ export const Transfer: React.FC<TransferProps> = (props) => {
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
+  )
+  const labels = useMemo(
+    () =>
+      getTransferLabels(mergedLocale, {
+        ...labelsOverride,
+        sourceTitle,
+        targetTitle
+      }),
+    [mergedLocale, labelsOverride, sourceTitle, targetTitle]
   )
 
   const divProps: Record<string, unknown> = {}
@@ -213,14 +227,14 @@ export const Transfer: React.FC<TransferProps> = (props) => {
             className={transferSearchClasses}
             placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
             value={searchValue}
-            aria-label={`Search ${title}`}
+            aria-label={labels.searchAriaLabel.replace('{title}', title)}
             onChange={(e) => onSearchInput(e.target.value)}
           />
         )}
 
         <div
           className={transferPanelBodyClasses}
-          {...getPickerListboxAria({ label: `${title} items` })}>
+          {...getPickerListboxAria({ label: labels.itemsAriaLabel.replace('{title}', title) })}>
           {items.length > 0 ? (
             items.map((item) => {
               const isSelected = selectedKeys.has(item.key)
@@ -256,7 +270,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
   return (
     <div className={classNames(transferBaseClasses, className)} {...divProps}>
       {renderPanel(
-        sourceTitle,
+        labels.sourceTitle,
         filteredSourceItems,
         sourceSelectedKeys,
         toggleSourceItem,
@@ -269,7 +283,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
           type="button"
           className={getTransferButtonClasses(!canMoveRight)}
           disabled={!canMoveRight}
-          aria-label="Move selected to target"
+          aria-label={labels.moveToTargetAriaLabel}
           onClick={moveRight}>
           <svg
             className="w-4 h-4"
@@ -283,7 +297,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
           type="button"
           className={getTransferButtonClasses(!canMoveLeft)}
           disabled={!canMoveLeft}
-          aria-label="Move selected to source"
+          aria-label={labels.moveToSourceAriaLabel}
           onClick={moveLeft}>
           <svg
             className="w-4 h-4"
@@ -296,7 +310,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
       </div>
 
       {renderPanel(
-        targetTitle,
+        labels.targetTitle,
         filteredTargetItems,
         targetSelectedKeys,
         toggleTargetItem,

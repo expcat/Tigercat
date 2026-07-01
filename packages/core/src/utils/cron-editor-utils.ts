@@ -1,6 +1,7 @@
 import { classNames } from './class-names'
 import type {
   CronEditorSize,
+  CronEditorValidationLabels,
   CronFieldControl,
   CronFieldKey,
   CronFieldMeta,
@@ -126,31 +127,49 @@ export function buildCronFieldValue(control: CronFieldControl, meta: CronFieldMe
 }
 
 export function validateCronExpression(expression: string): CronValidationResult {
+  return validateCronExpressionWithLabels(expression)
+}
+
+export function validateCronExpressionWithLabels(
+  expression: string,
+  labels?: CronEditorValidationLabels,
+  fieldLabels?: Partial<Record<CronFieldKey, string>>
+): CronValidationResult {
   const parts = getCronExpressionParts(expression)
   const issues: CronValidationIssue[] = []
 
   if (parts.length !== cronFieldMetas.length) {
-    issues.push({ field: 'expression', message: 'Cron expression must contain 5 fields' })
+    issues.push({
+      field: 'expression',
+      message: labels?.expressionFieldsError ?? 'Cron expression must contain 5 fields'
+    })
   }
 
   cronFieldMetas.forEach((meta, index) => {
     const part = parts[index]
     if (!part) return
-    const message = validateCronField(part, meta)
+    const localizedMeta = { ...meta, label: fieldLabels?.[meta.key] ?? meta.label }
+    const message = validateCronField(part, localizedMeta, labels)
     if (message) issues.push({ field: meta.key, message })
   })
 
   return { valid: issues.length === 0, issues }
 }
 
-export function validateCronField(value: string, meta: CronFieldMeta): string | null {
+export function validateCronField(
+  value: string,
+  meta: CronFieldMeta,
+  labels?: CronEditorValidationLabels
+): string | null {
   const trimmed = value.trim()
-  if (!trimmed) return `${meta.label} is required`
+  if (!trimmed) {
+    return formatCronValidationMessage(labels?.fieldRequiredError ?? '{field} is required', meta)
+  }
 
   return (
     trimmed
       .split(',')
-      .map((part) => validateCronFieldPart(part, meta))
+      .map((part) => validateCronFieldPart(part, meta, labels))
       .find((message): message is string => message !== null) ?? null
   )
 }
@@ -172,12 +191,24 @@ function getCronFieldIndex(field: CronFieldKey): number {
   return cronFieldMetas.findIndex((meta) => meta.key === field)
 }
 
-function validateCronFieldPart(part: string, meta: CronFieldMeta): string | null {
+function validateCronFieldPart(
+  part: string,
+  meta: CronFieldMeta,
+  labels?: CronEditorValidationLabels
+): string | null {
   const [rangePart, stepPart] = part.split('/')
-  if (part.split('/').length > 2) return `${meta.label} has an invalid step expression`
+  if (part.split('/').length > 2) {
+    return formatCronValidationMessage(
+      labels?.invalidStepError ?? '{field} has an invalid step expression',
+      meta
+    )
+  }
 
   if (stepPart !== undefined && !isCronIntegerInRange(stepPart, 1, meta.max)) {
-    return `${meta.label} step must be between 1 and ${meta.max}`
+    return formatCronValidationMessage(
+      labels?.stepRangeError ?? '{field} step must be between 1 and {max}',
+      meta
+    )
   }
 
   if (rangePart === '*') return null
@@ -187,19 +218,40 @@ function validateCronFieldPart(part: string, meta: CronFieldMeta): string | null
     const start = Number(rangeMatch[1])
     const end = Number(rangeMatch[2])
     if (!isNumberInRange(start, meta.min, meta.max) || !isNumberInRange(end, meta.min, meta.max)) {
-      return `${meta.label} must be between ${meta.min} and ${meta.max}`
+      return formatCronValidationMessage(
+        labels?.fieldRangeError ?? '{field} must be between {min} and {max}',
+        meta
+      )
     }
-    if (start > end) return `${meta.label} range start must be less than or equal to end`
+    if (start > end) {
+      return formatCronValidationMessage(
+        labels?.rangeOrderError ?? '{field} range start must be less than or equal to end',
+        meta
+      )
+    }
     return null
   }
 
   if (/^\d+$/.test(rangePart)) {
     return isCronIntegerInRange(rangePart, meta.min, meta.max)
       ? null
-      : `${meta.label} must be between ${meta.min} and ${meta.max}`
+      : formatCronValidationMessage(
+          labels?.fieldRangeError ?? '{field} must be between {min} and {max}',
+          meta
+        )
   }
 
-  return `${meta.label} must be *, a number, a range, a step, or a comma list`
+  return formatCronValidationMessage(
+    labels?.invalidFieldError ?? '{field} must be *, a number, a range, a step, or a comma list',
+    meta
+  )
+}
+
+function formatCronValidationMessage(template: string, meta: CronFieldMeta): string {
+  return template
+    .replace('{field}', meta.label)
+    .replace('{min}', String(meta.min))
+    .replace('{max}', String(meta.max))
 }
 
 function isCronIntegerInRange(value: string, min: number, max: number): boolean {

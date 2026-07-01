@@ -156,6 +156,81 @@ export const zhCN: TigerLocale = {
   select: {
     doneText: '完成'
   },
+  tabs: {
+    addTabAriaLabel: '新增标签页',
+    closeTabAriaLabel: '关闭{label}'
+  },
+  rate: {
+    ariaLabel: '评分',
+    valueText: '{value} 星'
+  },
+  carousel: {
+    ariaLabel: '图片轮播',
+    navigationAriaLabel: '轮播导航',
+    previousSlideAriaLabel: '上一张',
+    nextSlideAriaLabel: '下一张',
+    goToSlideAriaLabel: '跳转到第 {index} 张',
+    slideAriaLabel: '第 {index} 张，共 {total} 张'
+  },
+  transfer: {
+    sourceTitle: '源列表',
+    targetTitle: '目标列表',
+    searchAriaLabel: '搜索{title}',
+    itemsAriaLabel: '{title}项目',
+    moveToTargetAriaLabel: '移动选中项到目标列表',
+    moveToSourceAriaLabel: '移动选中项到源列表'
+  },
+  chart: {
+    legendAriaLabel: '图表图例',
+    pointAriaLabel: '第 {index} 个点：({x}, {y})'
+  },
+  markdownEditor: {
+    formattingToolbarAriaLabel: 'Markdown 格式工具栏',
+    modeToolbarAriaLabel: 'Markdown 视图模式',
+    editorAriaLabel: 'Markdown 编辑器',
+    previewAriaLabel: 'Markdown 预览',
+    editModeLabel: '编辑',
+    splitModeLabel: '分栏',
+    previewModeLabel: '预览'
+  },
+  richTextEditor: {
+    formattingToolbarAriaLabel: '富文本格式工具栏',
+    editorAriaLabel: '富文本编辑器'
+  },
+  cronEditor: {
+    ariaLabel: 'Cron 表达式编辑器',
+    expressionAriaLabel: 'Cron 表达式',
+    presetAriaLabel: 'Cron 预设',
+    presetPlaceholder: '选择预设',
+    everyMinutePreset: '每分钟',
+    hourlyPreset: '每小时',
+    dailyPreset: '每天',
+    weeklyPreset: '每周',
+    monthlyPreset: '每月',
+    minuteLabel: '分钟',
+    hourLabel: '小时',
+    dayOfMonthLabel: '日期',
+    monthLabel: '月份',
+    dayOfWeekLabel: '星期',
+    modeAnyLabel: '任意',
+    modeEveryLabel: '每隔',
+    modeSpecificLabel: '指定',
+    modeRangeLabel: '范围',
+    modeCustomLabel: '自定义',
+    modeAriaLabel: '{field}模式',
+    stepAriaLabel: '{field}步长',
+    valueAriaLabel: '{field}值',
+    rangeStartAriaLabel: '{field}范围开始',
+    rangeEndAriaLabel: '{field}范围结束',
+    customValueAriaLabel: '{field}自定义值',
+    expressionFieldsError: 'Cron 表达式必须包含 5 个字段',
+    fieldRequiredError: '{field}为必填项',
+    invalidStepError: '{field}步长表达式无效',
+    stepRangeError: '{field}步长必须在 1 到 {max} 之间',
+    fieldRangeError: '{field}必须在 {min} 到 {max} 之间',
+    rangeOrderError: '{field}范围开始值必须小于或等于结束值',
+    invalidFieldError: '{field}必须是 *、数字、范围、步长或逗号列表'
+  },
   formValidation: {
     required: '此字段为必填项',
     typeString: '值必须是字符串',

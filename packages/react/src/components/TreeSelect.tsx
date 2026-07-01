@@ -238,7 +238,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
         {showClearButton ? (
           <span
             className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--tiger-treeselect-clear,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-treeselect-clear-hover,var(--tiger-text,#111827))]"
-            aria-label="Clear selection"
+            aria-label={resolveLocaleText('Clear selection', mergedLocale?.common?.clearText)}
             onClick={handleClear}>
             <svg
               className="w-4 h-4"
@@ -270,7 +270,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
               className={treeSelectSearchClasses}
               placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
               value={searchQuery}
-              aria-label="Search tree"
+              aria-label={resolveLocaleText('Search tree', mergedLocale?.common?.searchPlaceholder)}
               onChange={(e) => updateSearchValue(e.target.value)}
             />
           )}

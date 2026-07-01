@@ -83,7 +83,7 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
             {
               class: messageCloseButtonClasses,
               onClick: () => props.onClose?.(message.id),
-              'aria-label': MESSAGE_CLOSE_ARIA_LABEL,
+              'aria-label': message.closeAriaLabel ?? MESSAGE_CLOSE_ARIA_LABEL,
               type: 'button'
             },
             createStatusIcon(messageCloseIconPath, 'w-4 h-4')

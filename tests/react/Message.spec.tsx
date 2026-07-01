@@ -67,6 +67,21 @@ describe('Message (React)', () => {
       })
     })
 
+    it('supports custom close aria label for closable messages', async () => {
+      await runMessageAction(() =>
+        Message.info({
+          content: 'Closable localized message',
+          closable: true,
+          closeAriaLabel: '关闭消息',
+          duration: 0
+        })
+      )
+
+      await waitFor(() => {
+        expect(document.querySelector('button[aria-label="关闭消息"]')).toBeTruthy()
+      })
+    })
+
     it('renders messages into the requested position container', async () => {
       await runMessageAction(() =>
         Message.info({

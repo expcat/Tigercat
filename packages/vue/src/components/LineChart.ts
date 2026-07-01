@@ -43,6 +43,10 @@ export interface VueLineChartProps extends CoreLineChartProps {
   yScale?: ChartScale
 }
 
+// Asymmetric default padding leaves room for the left y-axis tick labels
+// (3-digit / currency values) and the bottom x-axis label so they are not clipped.
+const DEFAULT_CARTESIAN_PADDING = { top: 24, right: 24, bottom: 52, left: 52 }
+
 export const LineChart = defineComponent({
   name: 'TigerLineChart',
   props: {
@@ -56,8 +60,9 @@ export const LineChart = defineComponent({
     },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
-      default: 24
+      default: () => DEFAULT_CARTESIAN_PADDING
     },
+    responsive: { type: Boolean, default: false },
     data: {
       type: Array as PropType<LineChartDatum[]>
     },
@@ -468,6 +473,7 @@ export const LineChart = defineComponent({
           width: props.width,
           height: props.height,
           padding: props.padding,
+          responsive: props.responsive,
           title: props.title,
           desc: props.desc,
           className: classNames(props.className)

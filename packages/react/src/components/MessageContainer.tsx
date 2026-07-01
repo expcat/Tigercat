@@ -77,7 +77,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
         <button
           className={messageCloseButtonClasses}
           onClick={handleClose}
-          aria-label={MESSAGE_CLOSE_ARIA_LABEL}
+          aria-label={message.closeAriaLabel ?? MESSAGE_CLOSE_ARIA_LABEL}
           type="button">
           <StatusIcon path={messageCloseIconPath} className="w-4 h-4" />
         </button>

@@ -26,6 +26,27 @@ describe('AreaChart', () => {
     expect(paths.length).toBeGreaterThan(0)
   })
 
+  it('applies asymmetric default padding leaving room for y-axis labels (S4)', () => {
+    const { container } = renderWithProps(AreaChart, {
+      data: [
+        { x: 'A', y: 100 },
+        { x: 'B', y: 200 }
+      ],
+      ...defaultSize
+    })
+
+    // ChartCanvas wraps the plot in <g transform="translate(padding.left, padding.top)">.
+    // The default must stay generous enough that 3-digit / currency y-axis tick labels
+    // and the bottom x-axis label are not clipped.
+    const wrapper = container.querySelector('g[transform]')
+    const m = /translate\((\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?)\)/.exec(
+      wrapper?.getAttribute('transform') || ''
+    )
+    expect(m).not.toBeNull()
+    expect(Number(m![1])).toBeGreaterThanOrEqual(40)
+    expect(Number(m![2])).toBeGreaterThanOrEqual(16)
+  })
+
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(AreaChart, {
       data: basicData

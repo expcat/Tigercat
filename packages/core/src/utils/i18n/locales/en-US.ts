@@ -156,6 +156,81 @@ export const enUS: TigerLocale = {
   select: {
     doneText: 'Done'
   },
+  tabs: {
+    addTabAriaLabel: 'Add tab',
+    closeTabAriaLabel: 'Close {label}'
+  },
+  rate: {
+    ariaLabel: 'Rating',
+    valueText: '{value} star{plural}'
+  },
+  carousel: {
+    ariaLabel: 'Image carousel',
+    navigationAriaLabel: 'Carousel navigation',
+    previousSlideAriaLabel: 'Previous slide',
+    nextSlideAriaLabel: 'Next slide',
+    goToSlideAriaLabel: 'Go to slide {index}',
+    slideAriaLabel: 'Slide {index} of {total}'
+  },
+  transfer: {
+    sourceTitle: 'Source',
+    targetTitle: 'Target',
+    searchAriaLabel: 'Search {title}',
+    itemsAriaLabel: '{title} items',
+    moveToTargetAriaLabel: 'Move selected to target',
+    moveToSourceAriaLabel: 'Move selected to source'
+  },
+  chart: {
+    legendAriaLabel: 'Chart legend',
+    pointAriaLabel: 'Point {index}: ({x}, {y})'
+  },
+  markdownEditor: {
+    formattingToolbarAriaLabel: 'Markdown formatting',
+    modeToolbarAriaLabel: 'Markdown view mode',
+    editorAriaLabel: 'Markdown editor',
+    previewAriaLabel: 'Markdown preview',
+    editModeLabel: 'Edit',
+    splitModeLabel: 'Split',
+    previewModeLabel: 'Preview'
+  },
+  richTextEditor: {
+    formattingToolbarAriaLabel: 'Text formatting',
+    editorAriaLabel: 'Rich text editor'
+  },
+  cronEditor: {
+    ariaLabel: 'Cron editor',
+    expressionAriaLabel: 'Cron expression',
+    presetAriaLabel: 'Cron preset',
+    presetPlaceholder: 'Preset',
+    everyMinutePreset: 'Every minute',
+    hourlyPreset: 'Hourly',
+    dailyPreset: 'Daily',
+    weeklyPreset: 'Weekly',
+    monthlyPreset: 'Monthly',
+    minuteLabel: 'Minute',
+    hourLabel: 'Hour',
+    dayOfMonthLabel: 'Day',
+    monthLabel: 'Month',
+    dayOfWeekLabel: 'Weekday',
+    modeAnyLabel: 'Any',
+    modeEveryLabel: 'Every',
+    modeSpecificLabel: 'Specific',
+    modeRangeLabel: 'Range',
+    modeCustomLabel: 'Custom',
+    modeAriaLabel: '{field} mode',
+    stepAriaLabel: '{field} step',
+    valueAriaLabel: '{field} value',
+    rangeStartAriaLabel: '{field} range start',
+    rangeEndAriaLabel: '{field} range end',
+    customValueAriaLabel: '{field} custom value',
+    expressionFieldsError: 'Cron expression must contain 5 fields',
+    fieldRequiredError: '{field} is required',
+    invalidStepError: '{field} has an invalid step expression',
+    stepRangeError: '{field} step must be between 1 and {max}',
+    fieldRangeError: '{field} must be between {min} and {max}',
+    rangeOrderError: '{field} range start must be less than or equal to end',
+    invalidFieldError: '{field} must be *, a number, a range, a step, or a comma list'
+  },
   formValidation: {
     required: 'This field is required',
     typeString: 'Value must be a string',

@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { RichTextEditor } from '@expcat/tigercat-react'
+import { ConfigProvider, RichTextEditor } from '@expcat/tigercat-react'
+import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function renderEditor(props: Record<string, unknown> = {}) {
@@ -122,6 +123,17 @@ describe('RichTextEditor', () => {
       buttons.forEach((btn) => {
         expect(btn.getAttribute('aria-label')).toBeTruthy()
       })
+    })
+
+    it('uses ConfigProvider locale for toolbar and editor labels', () => {
+      const { container } = render(
+        <ConfigProvider locale={zhCN}>
+          <RichTextEditor value="<p>你好</p>" />
+        </ConfigProvider>
+      )
+
+      expect(container.querySelector('[aria-label="富文本格式工具栏"]')).toBeTruthy()
+      expect(container.querySelector('[aria-label="富文本编辑器"]')).toBeTruthy()
     })
 
     it('should have aria-pressed on inline format buttons', () => {

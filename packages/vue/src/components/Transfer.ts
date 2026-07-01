@@ -22,9 +22,10 @@ import {
   chevronLeftSolidIcon20PathD,
   chevronRightSolidIcon20PathD,
   resolveLocaleText,
-  mergeTigerLocale
+  mergeTigerLocale,
+  getTransferLabels
 } from '@expcat/tigercat-core'
-import type { TigerLocale } from '@expcat/tigercat-core'
+import type { TigerLocale, TigerLocaleTransfer } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
 function ArrowIcon(pathD: string) {
@@ -89,11 +90,11 @@ export const Transfer = defineComponent({
     },
     sourceTitle: {
       type: String,
-      default: 'Source'
+      default: undefined
     },
     targetTitle: {
       type: String,
-      default: 'Target'
+      default: undefined
     },
     emptyText: {
       type: String,
@@ -109,12 +110,23 @@ export const Transfer = defineComponent({
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleTransfer>>,
+      default: undefined
     }
   },
   emits: ['update:modelValue', 'update:searchValue', 'change', 'search-change'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() =>
+      getTransferLabels(mergedLocale.value, {
+        ...props.labels,
+        sourceTitle: props.sourceTitle,
+        targetTitle: props.targetTitle
+      })
+    )
     const sourceSelectedKeys = ref<Set<string | number>>(new Set())
     const targetSelectedKeys = ref<Set<string | number>>(new Set())
     const uncontrolledSearchValue = ref<TransferSearchValue>({ ...props.defaultSearchValue })
@@ -238,7 +250,7 @@ export const Transfer = defineComponent({
                 mergedLocale.value?.common?.searchPlaceholder
               ),
               value: searchValue,
-              'aria-label': `Search ${title}`,
+              'aria-label': labels.value.searchAriaLabel.replace('{title}', title),
               onInput: (e: Event) => onSearchInput((e.target as HTMLInputElement).value)
             })
           : null,
@@ -248,7 +260,9 @@ export const Transfer = defineComponent({
           'div',
           {
             class: transferPanelBodyClasses,
-            ...getPickerListboxAria({ label: `${title} items` })
+            ...getPickerListboxAria({
+              label: labels.value.itemsAriaLabel.replace('{title}', title)
+            })
           },
           items.length > 0
             ? items.map((item) => {
@@ -296,7 +310,7 @@ export const Transfer = defineComponent({
       return h('div', { class: containerClasses }, [
         // Source panel
         renderPanel(
-          props.sourceTitle,
+          labels.value.sourceTitle,
           filteredSourceItems.value,
           sourceSelectedKeys.value,
           toggleSourceItem,
@@ -312,7 +326,7 @@ export const Transfer = defineComponent({
               type: 'button',
               class: getTransferButtonClasses(!canMoveRight.value),
               disabled: !canMoveRight.value,
-              'aria-label': 'Move selected to target',
+              'aria-label': labels.value.moveToTargetAriaLabel,
               onClick: moveRight
             },
             [ArrowIcon(chevronRightSolidIcon20PathD)]
@@ -323,7 +337,7 @@ export const Transfer = defineComponent({
               type: 'button',
               class: getTransferButtonClasses(!canMoveLeft.value),
               disabled: !canMoveLeft.value,
-              'aria-label': 'Move selected to source',
+              'aria-label': labels.value.moveToSourceAriaLabel,
               onClick: moveLeft
             },
             [ArrowIcon(chevronLeftSolidIcon20PathD)]
@@ -332,7 +346,7 @@ export const Transfer = defineComponent({
 
         // Target panel
         renderPanel(
-          props.targetTitle,
+          labels.value.targetTitle,
           filteredTargetItems.value,
           targetSelectedKeys.value,
           toggleTargetItem,

@@ -24,13 +24,18 @@ import {
   resolveSwipeGesture,
   isKeyActive,
   getNextActiveKey,
+  mergeTigerLocale,
+  getTabsLabels,
   tabAddButtonClasses,
   tabCloseButtonClasses,
   tabContentBaseClasses,
+  type TigerLocale,
+  type TigerLocaleTabs,
   type TabType,
   type TabSize,
   type TabPosition
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 // Tabs context interface
 export interface TabsContextValue {
@@ -43,6 +48,7 @@ export interface TabsContextValue {
   lazy: boolean
   swipeable: boolean
   idBase: string
+  labels: Required<TigerLocaleTabs>
   handleTabClick: (key: string | number) => void
   handleTabClose: (key: string | number, event: React.SyntheticEvent) => void
 }
@@ -271,7 +277,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
           <button
             type="button"
             className={tabCloseButtonClasses}
-            aria-label={`Close ${String(label)}`}
+            aria-label={tabsContext.labels.closeTabAriaLabel.replace('{label}', String(label))}
             tabIndex={-1}
             onClick={handleClose}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox={closeIconViewBox}>
@@ -382,6 +388,10 @@ export interface TabsProps {
    * Custom styles
    */
   style?: React.CSSProperties
+  /** Locale overrides merged on top of ConfigProvider locale */
+  locale?: Partial<TigerLocale>
+  /** Text/aria label overrides */
+  labels?: Partial<TigerLocaleTabs>
 }
 
 export const Tabs: React.FC<TabsProps> = ({
@@ -397,13 +407,24 @@ export const Tabs: React.FC<TabsProps> = ({
   swipeable = true,
   className,
   style,
+  locale,
+  labels: labelsOverride,
   onActiveKeyChange,
   onTabClick,
   onEdit,
   children
 }) => {
+  const config = useTigerConfig()
   const reactId = useId()
   const idBase = useMemo(() => `tiger-tabs-${reactId.replace(/[^a-zA-Z0-9_-]/g, '')}`, [reactId])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getTabsLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
 
   // Internal state for uncontrolled mode
   const [internalActiveKey, setInternalActiveKey] = useState<string | number | undefined>(
@@ -571,6 +592,7 @@ export const Tabs: React.FC<TabsProps> = ({
       lazy,
       swipeable,
       idBase,
+      labels,
       handleTabClick,
       handleTabClose
     }),
@@ -584,6 +606,7 @@ export const Tabs: React.FC<TabsProps> = ({
       lazy,
       swipeable,
       idBase,
+      labels,
       handleTabClick,
       handleTabClose
     ]
@@ -614,7 +637,7 @@ export const Tabs: React.FC<TabsProps> = ({
             type="button"
             className={tabAddButtonClasses}
             onClick={handleTabAdd}
-            aria-label="Add tab">
+            aria-label={labels.addTabAriaLabel}>
             +
           </button>
         )}

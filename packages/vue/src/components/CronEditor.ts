@@ -3,7 +3,9 @@ import type {
   CronEditorSize,
   CronFieldControl,
   CronFieldMeta,
-  CronPreset
+  CronPreset,
+  TigerLocale,
+  TigerLocaleCronEditor
 } from '@expcat/tigercat-core'
 import {
   buildCronFieldValue,
@@ -16,15 +18,17 @@ import {
   cronEditorLabelClasses,
   cronFieldMetas,
   defaultCronExpression,
-  defaultCronPresets,
   getCronEditorControlClasses,
+  getCronEditorLabels,
   getCronFieldIssue,
   getCronFieldValue,
+  mergeTigerLocale,
   normalizeCronExpression,
   parseCronFieldControl,
   updateCronExpressionField,
-  validateCronExpression
+  validateCronExpressionWithLabels
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export type VueCronEditorProps = InstanceType<typeof CronEditor>['$props']
 
@@ -36,6 +40,10 @@ const modeOptions: Array<{ label: string; value: CronFieldControl['mode'] }> = [
   { label: 'Custom', value: 'custom' }
 ]
 
+function formatCronControlLabel(template: string, field: string): string {
+  return template.replace('{field}', field)
+}
+
 export const CronEditor = defineComponent({
   name: 'TigerCronEditor',
   props: {
@@ -44,19 +52,57 @@ export const CronEditor = defineComponent({
     disabled: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false },
     size: { type: String as PropType<CronEditorSize>, default: 'md' },
-    presets: { type: Array as PropType<CronPreset[]>, default: () => defaultCronPresets },
-    ariaLabel: { type: String, default: 'Cron editor' }
+    presets: { type: Array as PropType<CronPreset[]>, default: undefined },
+    ariaLabel: { type: String, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleCronEditor>>, default: undefined }
   },
   emits: ['update:modelValue', 'change', 'validate'],
   setup(props, { attrs, emit }) {
+    const config = useTigerConfig()
     const innerValue = ref(props.defaultValue)
     const expression = computed(() => props.modelValue ?? innerValue.value)
-    const validation = computed(() => validateCronExpression(expression.value))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getCronEditorLabels(mergedLocale.value, props.labels))
+    const fieldLabels = computed<Record<CronFieldMeta['key'], string>>(() => ({
+      minute: labels.value.minuteLabel,
+      hour: labels.value.hourLabel,
+      dayOfMonth: labels.value.dayOfMonthLabel,
+      month: labels.value.monthLabel,
+      dayOfWeek: labels.value.dayOfWeekLabel
+    }))
+    const validation = computed(() =>
+      validateCronExpressionWithLabels(expression.value, labels.value, fieldLabels.value)
+    )
     const inactive = computed(() => props.disabled || props.readonly)
+    const localizedMetas = computed<CronFieldMeta[]>(() =>
+      cronFieldMetas.map((meta) => ({ ...meta, label: fieldLabels.value[meta.key] }))
+    )
+    const resolvedPresets = computed<CronPreset[]>(
+      () =>
+        props.presets ?? [
+          { label: labels.value.everyMinutePreset, value: '* * * * *' },
+          { label: labels.value.hourlyPreset, value: '0 * * * *' },
+          { label: labels.value.dailyPreset, value: '0 0 * * *' },
+          { label: labels.value.weeklyPreset, value: '0 0 * * 1' },
+          { label: labels.value.monthlyPreset, value: '0 0 1 * *' }
+        ]
+    )
+    const modeLabels = computed<Record<CronFieldControl['mode'], string>>(() => ({
+      any: labels.value.modeAnyLabel,
+      every: labels.value.modeEveryLabel,
+      specific: labels.value.modeSpecificLabel,
+      range: labels.value.modeRangeLabel,
+      custom: labels.value.modeCustomLabel
+    }))
 
     function commit(nextValue: string) {
       const normalized = normalizeCronExpression(nextValue)
-      const nextValidation = validateCronExpression(normalized)
+      const nextValidation = validateCronExpressionWithLabels(
+        normalized,
+        labels.value,
+        fieldLabels.value
+      )
       if (props.modelValue === undefined) innerValue.value = normalized
       emit('update:modelValue', normalized)
       emit('change', normalized, nextValidation)
@@ -64,7 +110,11 @@ export const CronEditor = defineComponent({
     }
 
     function handleRawExpressionChange(nextValue: string) {
-      const nextValidation = validateCronExpression(nextValue)
+      const nextValidation = validateCronExpressionWithLabels(
+        nextValue,
+        labels.value,
+        fieldLabels.value
+      )
       if (props.modelValue === undefined) innerValue.value = nextValue
       emit('update:modelValue', nextValue)
       emit('change', nextValue, nextValidation)
@@ -102,7 +152,7 @@ export const CronEditor = defineComponent({
           class: getCronEditorControlClasses(props.size),
           value: control.step ?? 1,
           disabled: inactive.value,
-          'aria-label': `${meta.label} step`,
+          'aria-label': formatCronControlLabel(labels.value.stepAriaLabel, meta.label),
           onInput: (event: Event) =>
             handleFieldRawChange(
               meta,
@@ -122,7 +172,7 @@ export const CronEditor = defineComponent({
           class: getCronEditorControlClasses(props.size),
           value: control.value ?? meta.min,
           disabled: inactive.value,
-          'aria-label': `${meta.label} value`,
+          'aria-label': formatCronControlLabel(labels.value.valueAriaLabel, meta.label),
           onInput: (event: Event) =>
             handleFieldRawChange(
               meta,
@@ -143,7 +193,7 @@ export const CronEditor = defineComponent({
             class: getCronEditorControlClasses(props.size),
             value: control.start ?? meta.min,
             disabled: inactive.value,
-            'aria-label': `${meta.label} range start`,
+            'aria-label': formatCronControlLabel(labels.value.rangeStartAriaLabel, meta.label),
             onInput: (event: Event) =>
               handleFieldRawChange(
                 meta,
@@ -160,7 +210,7 @@ export const CronEditor = defineComponent({
             class: getCronEditorControlClasses(props.size),
             value: control.end ?? meta.max,
             disabled: inactive.value,
-            'aria-label': `${meta.label} range end`,
+            'aria-label': formatCronControlLabel(labels.value.rangeEndAriaLabel, meta.label),
             onInput: (event: Event) =>
               handleFieldRawChange(
                 meta,
@@ -178,7 +228,7 @@ export const CronEditor = defineComponent({
         class: getCronEditorControlClasses(props.size),
         value: control.raw,
         disabled: inactive.value,
-        'aria-label': `${meta.label} custom value`,
+        'aria-label': formatCronControlLabel(labels.value.customValueAriaLabel, meta.label),
         onInput: (event: Event) =>
           handleFieldRawChange(meta, (event.target as HTMLInputElement).value)
       })
@@ -190,7 +240,7 @@ export const CronEditor = defineComponent({
         {
           class: classNames(cronEditorBaseClasses, coerceClassValue(attrs.class)),
           role: 'group',
-          'aria-label': props.ariaLabel
+          'aria-label': props.ariaLabel ?? labels.value.ariaLabel
         },
         [
           h('div', { class: 'flex flex-col gap-2 sm:flex-row' }, [
@@ -203,28 +253,28 @@ export const CronEditor = defineComponent({
               value: expression.value,
               disabled: props.disabled,
               readonly: props.readonly,
-              'aria-label': 'Cron expression',
+              'aria-label': labels.value.expressionAriaLabel,
               onInput: (event: Event) =>
                 handleRawExpressionChange((event.target as HTMLInputElement).value)
             }),
-            props.presets.length > 0
+            resolvedPresets.value.length > 0
               ? h(
                   'select',
                   {
                     class: getCronEditorControlClasses(props.size),
-                    value: props.presets.some((preset) => preset.value === expression.value)
+                    value: resolvedPresets.value.some((preset) => preset.value === expression.value)
                       ? expression.value
                       : '',
                     disabled: inactive.value,
-                    'aria-label': 'Cron preset',
+                    'aria-label': labels.value.presetAriaLabel,
                     onChange: (event: Event) => {
                       const nextValue = (event.target as HTMLSelectElement).value
                       if (nextValue) commit(nextValue)
                     }
                   },
                   [
-                    h('option', { value: '' }, 'Preset'),
-                    ...props.presets.map((preset) =>
+                    h('option', { value: '' }, labels.value.presetPlaceholder),
+                    ...resolvedPresets.value.map((preset) =>
                       h('option', { key: preset.value, value: preset.value }, preset.label)
                     )
                   ]
@@ -239,7 +289,7 @@ export const CronEditor = defineComponent({
           h(
             'div',
             { class: cronEditorFieldsClasses },
-            cronFieldMetas.map((meta) => {
+            localizedMetas.value.map((meta) => {
               const raw = getCronFieldValue(expression.value, meta.key)
               const control = parseCronFieldControl(raw)
               const issue = getCronFieldIssue(validation.value, meta.key)
@@ -252,7 +302,7 @@ export const CronEditor = defineComponent({
                     class: getCronEditorControlClasses(props.size, !!issue),
                     value: control.mode,
                     disabled: inactive.value,
-                    'aria-label': `${meta.label} mode`,
+                    'aria-label': formatCronControlLabel(labels.value.modeAriaLabel, meta.label),
                     onChange: (event: Event) =>
                       handleModeChange(
                         meta,
@@ -261,7 +311,11 @@ export const CronEditor = defineComponent({
                       )
                   },
                   modeOptions.map((mode) =>
-                    h('option', { key: mode.value, value: mode.value }, mode.label)
+                    h(
+                      'option',
+                      { key: mode.value, value: mode.value },
+                      modeLabels.value[mode.value]
+                    )
                   )
                 ),
                 renderFieldControl(meta, control),

@@ -7,6 +7,7 @@ export interface VueChartLegendProps {
   markerSize?: number
   gap?: number
   interactive?: boolean
+  ariaLabel?: string
   className?: string
 }
 
@@ -32,6 +33,10 @@ export const ChartLegend = defineComponent({
     interactive: {
       type: Boolean,
       default: false
+    },
+    ariaLabel: {
+      type: String,
+      default: 'Chart legend'
     },
     className: {
       type: String
@@ -75,7 +80,7 @@ export const ChartLegend = defineComponent({
           // A group of toggle buttons is not a "list"; only use list semantics
           // for the static (non-interactive) legend.
           role: props.interactive ? 'group' : 'list',
-          'aria-label': 'Chart legend',
+          'aria-label': props.ariaLabel,
           'data-chart-legend': 'true'
         },
         props.items.map((item) =>

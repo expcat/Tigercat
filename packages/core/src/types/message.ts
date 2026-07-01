@@ -61,6 +61,11 @@ export interface MessageInstance {
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * Close button aria-label when closable.
+   */
+  closeAriaLabel?: string
 }
 
 /**
@@ -110,6 +115,12 @@ export interface MessageProps {
    * @default 'top'
    */
   position?: MessagePosition
+
+  /**
+   * Close button aria-label when `closable` is true.
+   * @default 'Close message'
+   */
+  closeAriaLabel?: string
 }
 
 /**

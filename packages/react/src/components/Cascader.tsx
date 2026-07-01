@@ -265,7 +265,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
             <span
               className="flex items-center"
               role="button"
-              aria-label="Clear selection"
+              aria-label={resolveLocaleText('Clear selection', mergedLocale?.common?.clearText)}
               onClick={handleClear}>
               <svg
                 className="w-4 h-4 text-[var(--tiger-cascader-icon,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-cascader-icon-hover,var(--tiger-text-muted,#6b7280))]"
@@ -302,7 +302,10 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
               placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
               value={searchQuery}
               onChange={(e) => updateSearchValue(e.target.value)}
-              aria-label="Search options"
+              aria-label={resolveLocaleText(
+                'Search options',
+                mergedLocale?.common?.searchPlaceholder
+              )}
             />
           )}
 

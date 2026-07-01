@@ -112,6 +112,7 @@ function addMessage(config: MessageConfig): () => void {
     onClose: config.onClose,
     icon: config.icon,
     className: config.className,
+    closeAriaLabel: config.closeAriaLabel,
     position: config.position ?? 'top'
   }
 

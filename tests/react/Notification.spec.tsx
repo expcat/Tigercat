@@ -75,6 +75,19 @@ describe('Notification (React)', () => {
     expect(el?.textContent).toContain('This is a warning description')
   })
 
+  it('supports custom close aria label for closable notifications', async () => {
+    await act(async () => {
+      notification.info({
+        title: 'Localized close',
+        closeAriaLabel: '关闭通知',
+        duration: 0
+      })
+      await flushMicrotasks()
+    })
+
+    expect(document.querySelector('button[aria-label="关闭通知"]')).toBeTruthy()
+  })
+
   it('returns a close function', async () => {
     let close: (() => void) | undefined
 

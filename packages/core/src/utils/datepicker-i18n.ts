@@ -24,7 +24,10 @@ export function getDatePickerLocaleCode(locale?: DatePickerLocaleInput): string 
 }
 
 function getDefaultDatePickerLabels(locale?: DatePickerLocaleInput): DatePickerLabels {
-  return getLocalePreset(locale)?.labels ?? EN_US_DATEPICKER_LOCALE.labels
+  return {
+    ...(EN_US_DATEPICKER_LOCALE.labels as DatePickerLabels),
+    ...(getLocalePreset(locale)?.labels ?? {})
+  }
 }
 
 export function getDatePickerLabels(

@@ -4,7 +4,9 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { MarkdownEditor } from '@expcat/tigercat-vue'
+import { h } from 'vue'
+import { ConfigProvider, MarkdownEditor } from '@expcat/tigercat-vue'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function renderEditor(props: Record<string, unknown> = {}) {
@@ -182,6 +184,20 @@ describe('MarkdownEditor', () => {
       const { container } = renderEditor()
       expect(container.querySelector('[aria-label="Markdown editor"]')).toBeTruthy()
       expect(container.querySelector('[aria-label="Markdown preview"]')).toBeTruthy()
+    })
+
+    it('uses ConfigProvider locale for editor labels', async () => {
+      const { container, getByRole } = render({
+        render() {
+          return h(ConfigProvider, { locale: zhCN }, () => h(MarkdownEditor, { value: '# 你好' }))
+        }
+      })
+
+      expect(container.querySelector('[aria-label="Markdown 编辑器"]')).toBeTruthy()
+      expect(container.querySelector('[aria-label="Markdown 预览"]')).toBeTruthy()
+      expect(container.querySelector('[aria-label="Markdown 格式工具栏"] button')).toBeTruthy()
+      await fireEvent.click(getByRole('button', { name: '预览' }))
+      expect(container.querySelector('[data-mode="preview"]')).toBeTruthy()
     })
 
     it('has no accessibility violations', async () => {

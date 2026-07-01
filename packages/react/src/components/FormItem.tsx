@@ -12,6 +12,7 @@ import {
   getFormItemAsteriskClasses
 } from '@expcat/tigercat-core'
 import { useFormContext } from './Form'
+import { Input } from './Input'
 
 export interface FormItemProps extends CoreFormItemProps {
   /**
@@ -229,9 +230,14 @@ export const FormItem: React.FC<FormItemProps> = ({
 
     if (!isNativeElement) {
       nextProps.status = hasError ? 'error' : onlyChild.props.status
-      nextProps.errorMessage =
-        hasError && !showMessage ? errorMessage : onlyChild.props.errorMessage
-      nextProps._shakeTrigger = hasError ? shakeTrigger : undefined
+      // `errorMessage` / `_shakeTrigger` are Input-only internals. Forwarding them to
+      // any other child (Textarea, Select, Space wrappers, …) leaks unknown props onto
+      // the DOM and triggers React console errors, so gate them to the Input component.
+      if (onlyChild.type === Input) {
+        nextProps.errorMessage =
+          hasError && !showMessage ? errorMessage : onlyChild.props.errorMessage
+        nextProps._shakeTrigger = hasError ? shakeTrigger : undefined
+      }
     }
 
     return React.cloneElement(onlyChild, nextProps)

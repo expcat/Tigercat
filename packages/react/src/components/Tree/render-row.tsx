@@ -6,6 +6,7 @@ import {
   treeNodeCheckboxClasses,
   treeNodeIconClasses,
   treeNodeLabelClasses,
+  resolveLocaleText,
   type TreeNode
 } from '@expcat/tigercat-core'
 import { ExpandIcon, LoadingSpinner } from './icons'
@@ -109,7 +110,12 @@ export function renderTreeRow(ctx: TreeContext, node: TreeNode, level: number): 
       {ctx.checkable && (
         <input
           type="checkbox"
-          aria-label={`Select ${node.label}`}
+          aria-label={resolveLocaleText(
+            `Select ${node.label}`,
+            ctx.mergedLocale?.locale?.toLowerCase().startsWith('zh')
+              ? `选择${node.label}`
+              : undefined
+          )}
           className={treeNodeCheckboxClasses}
           checked={isChecked}
           ref={(input) => {

@@ -28,13 +28,18 @@ import {
   resolveSwipeGesture,
   isKeyActive,
   getNextActiveKey,
+  mergeTigerLocale,
+  getTabsLabels,
   tabAddButtonClasses,
   tabCloseButtonClasses,
   tabContentBaseClasses,
+  type TigerLocale,
+  type TigerLocaleTabs,
   type TabType,
   type TabPosition,
   type TabSize
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 // Tabs context key
 export const TabsContextKey = Symbol('TabsContext')
@@ -50,6 +55,7 @@ export interface TabsContext {
   lazy: boolean
   swipeable: boolean
   idBase: string
+  labels: Required<TigerLocaleTabs>
   handleTabClick: (key: string | number) => void
   handleTabClose: (key: string | number, event: Event) => void
 }
@@ -316,7 +322,10 @@ export const TabPane = defineComponent({
                 {
                   type: 'button',
                   class: tabCloseButtonClasses,
-                  'aria-label': `Close ${String(props.label)}`,
+                  'aria-label': tabsContext.labels.closeTabAriaLabel.replace(
+                    '{label}',
+                    String(props.label)
+                  ),
                   tabindex: -1,
                   onClick: handleClose
                 },
@@ -458,12 +467,23 @@ export const Tabs = defineComponent({
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleTabs>>,
+      default: undefined
     }
   },
   emits: ['update:activeKey', 'change', 'edit', 'tab-click'],
   setup(props, { slots, emit }) {
+    const config = useTigerConfig()
     const instance = getCurrentInstance()
     const idBase = `tiger-tabs-${instance?.uid ?? '0'}`
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getTabsLabels(mergedLocale.value, props.labels))
 
     // Internal state for uncontrolled mode
     const internalActiveKey = ref<string | number | undefined>(props.defaultActiveKey)
@@ -572,6 +592,9 @@ export const Tabs = defineComponent({
         return props.swipeable
       },
       idBase,
+      get labels() {
+        return labels.value
+      },
       handleTabClick,
       handleTabClose
     })
@@ -710,7 +733,7 @@ export const Tabs = defineComponent({
                       type: 'button',
                       class: tabAddButtonClasses,
                       onClick: () => emit('edit', { targetKey: undefined, action: 'add' }),
-                      'aria-label': 'Add tab'
+                      'aria-label': labels.value.addTabAriaLabel
                     },
                     '+'
                   )

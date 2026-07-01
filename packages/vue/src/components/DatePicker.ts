@@ -331,10 +331,6 @@ export const DatePicker = defineComponent({
       return startText ? `${startText} - ` : ` - ${endText}`
     })
 
-    const placeholderText = computed(
-      () => props.placeholder ?? (props.range ? 'Select date range' : 'Select date')
-    )
-
     const showClearButton = computed(() => {
       if (!props.clearable || props.disabled || props.readonly) return false
       if (!isRangeMode.value) return selectedDate.value !== null
@@ -352,6 +348,12 @@ export const DatePicker = defineComponent({
     const nextMonthIcon = computed(() => (isRtl.value ? ChevronLeftIcon : ChevronRightIcon))
 
     const labels = computed(() => getDatePickerLabels(mergedLocale.value, props.labels))
+
+    const placeholderText = computed(
+      () =>
+        props.placeholder ??
+        (props.range ? labels.value.rangePlaceholder : labels.value.placeholder)
+    )
 
     const mobileDate = computed(() => {
       if (!isRangeMode.value) return selectedDate.value ?? normalizeDate(new Date())
@@ -801,7 +803,7 @@ export const DatePicker = defineComponent({
                     {
                       class: datePickerMobileWheelSelectClasses,
                       value: mobileDate.value.getFullYear(),
-                      'aria-label': 'Year',
+                      'aria-label': labels.value.year,
                       onChange: (event: Event) =>
                         updateMobileDate('year', Number((event.target as HTMLSelectElement).value))
                     },
@@ -812,7 +814,7 @@ export const DatePicker = defineComponent({
                     {
                       class: datePickerMobileWheelSelectClasses,
                       value: mobileDate.value.getMonth(),
-                      'aria-label': 'Month',
+                      'aria-label': labels.value.month,
                       onChange: (event: Event) =>
                         updateMobileDate('month', Number((event.target as HTMLSelectElement).value))
                     },
@@ -825,7 +827,7 @@ export const DatePicker = defineComponent({
                     {
                       class: datePickerMobileWheelSelectClasses,
                       value: mobileDate.value.getDate(),
-                      'aria-label': 'Day',
+                      'aria-label': labels.value.day,
                       onChange: (event: Event) =>
                         updateMobileDate('day', Number((event.target as HTMLSelectElement).value))
                     },

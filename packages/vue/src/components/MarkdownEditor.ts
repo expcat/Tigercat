@@ -16,14 +16,18 @@ import {
   markdownEditorToolbarClasses,
   markdownEditorToolbarGroupClasses,
   markdownEditorToolbarSeparatorClasses,
-  markdownModeLabels,
   parseMarkdownHeight,
   renderMarkdownToHtml,
+  mergeTigerLocale,
+  getMarkdownEditorLabels,
   type MarkdownEditorMode,
   type MarkdownRenderer,
   type MarkdownToolbarButton,
-  type MarkdownToolbarItem
+  type MarkdownToolbarItem,
+  type TigerLocale,
+  type TigerLocaleMarkdownEditor
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 const modes: MarkdownEditorMode[] = ['edit', 'split', 'preview']
 
@@ -39,6 +43,8 @@ export interface VueMarkdownEditorProps {
   readOnly?: boolean
   disabled?: boolean
   renderer?: MarkdownRenderer
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleMarkdownEditor>
   className?: string
   style?: Record<string, string | number>
 }
@@ -72,6 +78,8 @@ export const MarkdownEditor = defineComponent({
       type: Object as PropType<MarkdownRenderer>,
       default: undefined
     },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleMarkdownEditor>>, default: undefined },
     className: { type: String, default: undefined },
     style: {
       type: Object as PropType<Record<string, string | number>>,
@@ -80,6 +88,7 @@ export const MarkdownEditor = defineComponent({
   },
   emits: ['update:value', 'change', 'update:mode', 'mode-change'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
     const internalValue = ref(props.defaultValue || '')
     const internalMode = ref<MarkdownEditorMode>(props.defaultMode)
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
@@ -98,6 +107,13 @@ export const MarkdownEditor = defineComponent({
     const showPreview = computed(
       () => currentMode.value === 'preview' || currentMode.value === 'split'
     )
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getMarkdownEditorLabels(mergedLocale.value, props.labels))
+    const modeLabels = computed<Record<MarkdownEditorMode, string>>(() => ({
+      edit: labels.value.editModeLabel,
+      split: labels.value.splitModeLabel,
+      preview: labels.value.previewModeLabel
+    }))
 
     const containerClasses = computed(() =>
       classNames(
@@ -180,7 +196,7 @@ export const MarkdownEditor = defineComponent({
                   {
                     class: markdownEditorToolbarGroupClasses,
                     role: 'toolbar',
-                    'aria-label': 'Markdown formatting'
+                    'aria-label': labels.value.formattingToolbarAriaLabel
                   },
                   toolbarItems.value.map((item, index) => {
                     if (isMarkdownToolbarSeparator(item)) {
@@ -213,7 +229,7 @@ export const MarkdownEditor = defineComponent({
                   {
                     class: markdownEditorToolbarGroupClasses,
                     role: 'toolbar',
-                    'aria-label': 'Markdown view mode'
+                    'aria-label': labels.value.modeToolbarAriaLabel
                   },
                   modes.map((item) =>
                     h(
@@ -222,12 +238,12 @@ export const MarkdownEditor = defineComponent({
                         key: item,
                         type: 'button',
                         class: getMarkdownToolbarButtonClasses(currentMode.value === item),
-                        'aria-label': markdownModeLabels[item],
+                        'aria-label': modeLabels.value[item],
                         'aria-pressed': currentMode.value === item,
                         disabled: props.disabled,
                         onClick: () => commitMode(item)
                       },
-                      markdownModeLabels[item]
+                      modeLabels.value[item]
                     )
                   )
                 )
@@ -246,7 +262,7 @@ export const MarkdownEditor = defineComponent({
             readonly: props.readOnly || props.disabled,
             disabled: props.disabled,
             spellcheck: true,
-            'aria-label': 'Markdown editor',
+            'aria-label': labels.value.editorAriaLabel,
             'aria-multiline': true
           })
         : null
@@ -261,7 +277,7 @@ export const MarkdownEditor = defineComponent({
                 !currentValue.value ? markdownEditorEmptyPreviewClasses : undefined
               ),
               role: 'region',
-              'aria-label': 'Markdown preview',
+              'aria-label': labels.value.previewAriaLabel,
               ...(currentValue.value ? { innerHTML: previewHtml.value } : {})
             },
             currentValue.value ? undefined : props.placeholder

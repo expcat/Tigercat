@@ -15,12 +15,17 @@ import {
   parseHeight,
   builtinRichTextEngine,
   isToolbarSeparator,
+  mergeTigerLocale,
+  getRichTextEditorLabels,
   type RichTextEditorMode,
   type ToolbarButton,
   type ToolbarItem,
   type RichTextEngine,
-  type RichTextEngineInstance
+  type RichTextEngineInstance,
+  type TigerLocale,
+  type TigerLocaleRichTextEditor
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueRichTextEditorProps {
   value?: string
@@ -31,6 +36,8 @@ export interface VueRichTextEditorProps {
   height?: number | string
   readOnly?: boolean
   disabled?: boolean
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleRichTextEditor>
   className?: string
   /**
    * Optional pluggable editor engine (PR-17). Defaults to the
@@ -61,6 +68,8 @@ export const RichTextEditor = defineComponent({
     },
     readOnly: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleRichTextEditor>>, default: undefined },
     className: { type: String, default: undefined },
     engine: {
       type: Object as PropType<RichTextEngine>,
@@ -69,6 +78,7 @@ export const RichTextEditor = defineComponent({
   },
   emits: ['update:value', 'change'],
   setup(props, { emit, attrs }) {
+    const config = useTigerConfig()
     const editorRef = ref<HTMLDivElement | null>(null)
     const internalValue = ref(props.defaultValue || '')
     const activeFormats = ref<Set<string>>(new Set())
@@ -80,6 +90,8 @@ export const RichTextEditor = defineComponent({
     )
     const toolbarItems = computed(() => props.toolbar ?? defaultToolbar)
     const isEmpty = computed(() => isContentEmpty(currentContent.value))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getRichTextEditorLabels(mergedLocale.value, props.labels))
 
     // Sync editor content when controlled value changes
     watch(
@@ -165,7 +177,7 @@ export const RichTextEditor = defineComponent({
         {
           class: richTextToolbarClasses,
           role: 'toolbar',
-          'aria-label': 'Text formatting'
+          'aria-label': labels.value.formattingToolbarAriaLabel
         },
         toolbarItems.value.map((item, idx) => {
           if (isToolbarSeparator(item)) {
@@ -204,6 +216,7 @@ export const RichTextEditor = defineComponent({
         ref: editorRef,
         class: editorAreaClasses.value,
         role: 'textbox',
+        'aria-label': labels.value.editorAriaLabel,
         'aria-multiline': true,
         'aria-readonly': props.readOnly || undefined,
         'aria-disabled': props.disabled || undefined,

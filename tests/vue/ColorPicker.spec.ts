@@ -90,6 +90,73 @@ describe('ColorPicker', () => {
     const slider = container.querySelector('input[type="range"]')
     expect(slider).toBeInTheDocument()
   })
+  // --- Keyboard accessibility (S3) ---
+  it('opens the panel with Enter and Space on the trigger', async () => {
+    const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb' })
+    const trigger = container.querySelector('[role="button"]')!
+    await fireEvent.keyDown(trigger, { key: 'Enter' })
+    expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
+    await fireEvent.keyDown(trigger, { key: 'Enter' })
+    expect(container.querySelector('input[type="text"]')).not.toBeInTheDocument()
+    await fireEvent.keyDown(trigger, { key: ' ' })
+    expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
+  })
+
+  it('exposes aria-expanded / aria-haspopup on the trigger', async () => {
+    const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb' })
+    const trigger = container.querySelector('[role="button"]')!
+    expect(trigger.getAttribute('aria-haspopup')).toBe('dialog')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    await fireEvent.click(trigger)
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  it('makes preset swatches keyboard-operable', async () => {
+    const onChange = vi.fn()
+    const { container } = render(ColorPicker, {
+      props: { modelValue: '#000000', presets: ['#ff0000'], 'onUpdate:modelValue': onChange }
+    })
+    await fireEvent.click(container.querySelector('[role="button"]')!)
+    const preset = container.querySelector('[aria-label="Select #ff0000"]')!
+    expect(preset.getAttribute('role')).toBe('button')
+    expect(preset.getAttribute('tabindex')).toBe('0')
+    await fireEvent.keyDown(preset, { key: 'Enter' })
+    expect(onChange).toHaveBeenCalledWith('#ff0000')
+  })
+
+  // --- format / showAlpha (S3) ---
+  it('renders the value in the declared format', async () => {
+    const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb', format: 'rgb' })
+    await fireEvent.click(container.querySelector('[role="button"]')!)
+    const input = container.querySelector('input[aria-label="Color value"]') as HTMLInputElement
+    expect(input.value).toBe('rgb(37, 99, 235)')
+  })
+
+  it('shows an alpha slider and reflects alpha in the displayed value when showAlpha', async () => {
+    const { container } = renderWithProps(ColorPicker, {
+      modelValue: '#2563eb',
+      format: 'rgb',
+      showAlpha: true
+    })
+    await fireEvent.click(container.querySelector('[role="button"]')!)
+    const alpha = container.querySelector('input[aria-label="Alpha"]') as HTMLInputElement
+    expect(alpha).toBeInTheDocument()
+    await fireEvent.update(alpha, '50')
+    const input = container.querySelector('input[aria-label="Color value"]') as HTMLInputElement
+    expect(input.value).toBe('rgba(37, 99, 235, 0.5)')
+  })
+
+  it('parses rgb() input back to a hex value', async () => {
+    const onChange = vi.fn()
+    const { container } = render(ColorPicker, {
+      props: { modelValue: '#2563eb', format: 'rgb', 'onUpdate:modelValue': onChange }
+    })
+    await fireEvent.click(container.querySelector('[role="button"]')!)
+    const input = container.querySelector('input[aria-label="Color value"]') as HTMLInputElement
+    await fireEvent.update(input, 'rgb(255, 0, 0)')
+    expect(onChange).toHaveBeenCalledWith('#ff0000')
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(ColorPicker)

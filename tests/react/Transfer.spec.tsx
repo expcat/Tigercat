@@ -3,10 +3,11 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Transfer } from '@expcat/tigercat-react'
+import { ConfigProvider, Transfer } from '@expcat/tigercat-react'
+import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const dataSource = [
@@ -64,6 +65,19 @@ describe('Transfer', () => {
 
       const panels = getAllByRole('listbox')
       expect(panels[1].querySelectorAll('[role="option"]').length).toBe(1)
+    })
+
+    it('localizes default titles and aria labels from ConfigProvider', () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <Transfer dataSource={dataSource} searchable />
+        </ConfigProvider>
+      )
+
+      expect(screen.getByText(/源列表/)).toBeInTheDocument()
+      expect(screen.getByRole('textbox', { name: '搜索源列表' })).toBeInTheDocument()
+      expect(screen.getByRole('listbox', { name: '源列表项目' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '移动选中项到目标列表' })).toBeDisabled()
     })
   })
 

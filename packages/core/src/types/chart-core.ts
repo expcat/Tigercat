@@ -50,6 +50,12 @@ export interface BaseChartProps {
   padding?: ChartPadding
 
   /**
+   * Whether the SVG should observe its container and resize responsively.
+   * @default false
+   */
+  responsive?: boolean
+
+  /**
    * Accessible title for the SVG
    */
   title?: string

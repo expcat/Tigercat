@@ -36,7 +36,7 @@ export function renderDatePickerMobile(ctx: DatePickerContext): React.ReactNode 
         <select
           className={datePickerMobileWheelSelectClasses}
           value={ctx.mobileDate.getFullYear()}
-          aria-label="Year"
+          aria-label={ctx.labels.year}
           onChange={(event) => ctx.updateMobileDate('year', Number(event.target.value))}>
           {ctx.mobileYears.map((year) => (
             <option key={year} value={year}>
@@ -47,7 +47,7 @@ export function renderDatePickerMobile(ctx: DatePickerContext): React.ReactNode 
         <select
           className={datePickerMobileWheelSelectClasses}
           value={ctx.mobileDate.getMonth()}
-          aria-label="Month"
+          aria-label={ctx.labels.month}
           onChange={(event) => ctx.updateMobileDate('month', Number(event.target.value))}>
           {Array.from({ length: 12 }, (_, month) => (
             <option key={month} value={month}>
@@ -58,7 +58,7 @@ export function renderDatePickerMobile(ctx: DatePickerContext): React.ReactNode 
         <select
           className={datePickerMobileWheelSelectClasses}
           value={ctx.mobileDate.getDate()}
-          aria-label="Day"
+          aria-label={ctx.labels.day}
           onChange={(event) => ctx.updateMobileDate('day', Number(event.target.value))}>
           {ctx.mobileDays.map((day) => (
             <option key={day} value={day}>
