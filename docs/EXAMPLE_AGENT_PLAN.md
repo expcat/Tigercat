@@ -75,7 +75,7 @@ source: docs/ROADMAP.md R28
 | E14 | Upload / Signature                                                                                                             | React/Vue: `#/upload`, `#/signature`                                                                                                                                              | 已完成（2026-07-01） |
 | E15 | Table / Collapse / Timeline                                                                                                    | React/Vue: `#/table`, `#/collapse`, `#/timeline`                                                                                                                                  | 已完成（2026-07-01） |
 | E16 | VirtualTable / VirtualList / InfiniteScroll                                                                                    | React/Vue: `#/virtual-table`, `#/virtual-list`, `#/infinite-scroll`                                                                                                               | 已完成（2026-07-01） |
-| E17 | AreaChart / BarChart / LineChart / ScatterChart / chart subcomponents                                                          | React/Vue: `#/area-chart`, `#/bar-chart`, `#/line-chart`, `#/scatter-chart`; also inspect chart pages for ChartAxis/Canvas/Grid/Legend/Series/Tooltip behavior                    | 未开始               |
+| E17 | AreaChart / BarChart / LineChart / ScatterChart / chart subcomponents                                                          | React/Vue: `#/area-chart`, `#/bar-chart`, `#/line-chart`, `#/scatter-chart`; also inspect chart pages for ChartAxis/Canvas/Grid/Legend/Series/Tooltip behavior                    | 已完成（2026-07-01） |
 | E18 | PieChart / DonutChart / RadarChart / GaugeChart / FunnelChart / HeatmapChart / SunburstChart / TreeMapChart / Gantt / OrgChart | React/Vue: `#/pie-chart`, `#/donut-chart`, `#/radar-chart`, `#/gauge-chart`, `#/funnel-chart`, `#/heatmap-chart`, `#/sunburst-chart`, `#/treemap-chart`, `#/gantt`, `#/org-chart` | 未开始               |
 | E19 | CodeEditor / MarkdownEditor / RichTextEditor / FileManager / ImageAnnotation / PrintLayout                                     | React/Vue: `#/code-editor`, `#/markdown-editor`, `#/rich-text-editor`, `#/file-manager`, `#/image-annotation`, `#/print-layout`                                                   | 未开始               |
 | E20 | ActivityFeed / ChatWindow / CommentThread / DataTableWithToolbar / FormWizard / NotificationCenter / TaskBoard / Kanban        | React/Vue: `#/activity-feed`, `#/chat-window`, `#/comment-thread`, `#/data-table-with-toolbar`, `#/form-wizard`, `#/notification-center`, `#/task-board`, `#/kanban`              | 未开始               |
@@ -1313,6 +1313,84 @@ source: docs/ROADMAP.md R28
 - P3：VirtualTable 加载 & 空状态移动端布局改为小屏单列。
 
 **后续执行建议**：优先只改 Example/文档，不需要 public API 变更。VirtualTable 的 `rowKey`、选择状态回显、InfiniteScroll 中文文案、VirtualList 变量/动态高度示例和移动端布局都可在 React/Vue Example 内完成。修复阶段应复查 React/Vue `#/virtual-table`、`#/virtual-list`、`#/infinite-scroll` 的桌面与移动视口，并运行 `npx -y pnpm@11.9.0 example:sources:check`；如调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E17 AreaChart / BarChart / LineChart / ScatterChart / chart subcomponents
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/area-chart`、`#/bar-chart`、`#/line-chart`、`#/scatter-chart`。
+- React：`http://localhost:5174/#/area-chart`、`#/bar-chart`、`#/line-chart`、`#/scatter-chart`。
+- 视口：桌面 `1280x800`；移动 `390x844`。
+- 主题/语言：示例站点默认主题；浏览器 context 显式设 `locale: zh-CN`（示例文案均为硬编码中文，图表组件无全局 ConfigProvider）。
+- 浏览器工具：Playwright（Chromium，仓库内置 `playwright@1.61.1`）驱动本地 Vue/React dev server，完成路由访问、桌面/移动视口切换、指针悬停/点击、tooltip 捕获、代码页签检查与 SVG DOM 度量。
+- 浏览器操作路径：逐页直达 hash route；核对 `h1`、DemoBlock 分节数、页面级与 DemoBlock preview 级横向溢出、`pageerror`/console 错误；对交互分节用真实指针事件悬停/点击柱子与数据点，读取“当前悬停/选中/点击了”回显；捕获 `showTooltip` 分节的 `[role="tooltip"]` 文本；点击图例项验证系列联动；切换首个 DemoBlock 到 `代码`页签确认 raw source 与复制按钮；度量 y 轴刻度 `text` 的绝对 x 坐标核对轴标签裁剪。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/charts.md`、`skills/tigercat/references/shared/props/charts.md`。
+- React Example：`examples/example/react/src/pages/AreaChartDemo.tsx`、`BarChartDemo.tsx`、`LineChartDemo.tsx`、`ScatterChartDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/AreaChartDemo.vue`、`BarChartDemo.vue`、`LineChartDemo.vue`、`ScatterChartDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/chart-core.ts`、`chart-cartesian.ts`、`chart-visualization.ts`、`packages/react/src/components/BarChart.tsx`、`AreaChart.tsx`、`LineChart.tsx`、`ScatterChart.tsx`、`ChartCanvas.tsx`、`ChartLegend.tsx`、`ChartTooltip.tsx`、`ChartAxis.tsx`、对应 Vue `*.ts`。
+- 子组件说明：`ChartAxis/ChartCanvas/ChartGrid/ChartLegend/ChartSeries/ChartTooltip` 是公开导出但无独立 route 的图表原语，本组通过 4 个图表页的坐标轴、网格、图例、系列、tooltip 实际渲染间接审查。
+
+**用户故事**：
+
+- 作为使用者，我希望 BarChart 页面能覆盖基础坐标轴/网格、渐变+动画、自定义颜色与刻度格式、数值标签、柱宽/柱高约束、悬停高亮、点击选中回调、图例和 tooltip，方便复制到运营看板与统计柱图。
+- 作为使用者，我希望 LineChart / AreaChart 页面能展示单系列与多系列、曲线插值、面积/渐变填充、堆叠、入场动画和悬停/选中/图例联动，并能从“当前悬停”回显判断交互事件粒度（系列还是数据点）。
+- 作为使用者，我希望 ScatterChart 页面能展示二维分布、自定义点尺寸/颜色/形状、入场动画、悬停放大、点击选中和 tooltip，方便做相关性/分布图。
+- 作为使用者，我希望四个图表的坐标轴刻度、图例文案、tooltip 文案在中文示例站里保持一致、无被裁剪的标签，并且能看出如何让图表在移动端自适应宽度。
+- 作为使用者，我希望四个图表的 `代码`页签来自同页 `?raw` source，复制出的 import、数据结构、事件回调和受控 `hoveredIndex/selectedIndex` 写法可信。
+
+**Example 体验问题**：
+
+- 问题：E17 未发现 route-level P0 阻断问题；React/Vue 8 个 route 均可打开，桌面与移动视口无页面级横向溢出、无 `pageerror`/目标页面 console 错误，Bar/Line/Area/Scatter 的悬停、选中、tooltip、图例联动核心交互均可完成。
+  浏览器证据：桌面 `1280x800` 下 React/Vue 均返回目标 `h1`；分节数一致（Area 5、Bar 9、Line 6、Scatter 6）；移动 `390x844` 下 8 个 route 的 `pageOverflow=false`、`errs=[]`。BarChart 悬停第 4 根柱回显“当前悬停: Apr”，点击第 3 根柱回显“选中: Mar 点击了 Mar，值为 190”，`显示提示框`分节悬停 May 柱出现 `[role="tooltip"]` 文本“May: 250”且其余柱 `opacity=0.25`；LineChart `交互功能`悬停点回显“当前悬停: 销售额/利润”，点击图例项“销售额”高亮同系列；ScatterChart 悬停/点击回显“悬停: Point B · 选中: Point D”，`渐变风格`分节 tooltip 文本“Point 3: (50, 40)”。`代码`页签均来自同页 `?raw`（含 `import ... ?raw` 与 `DemoBlock`），复制按钮 aria-label 为“复制代码”，未见旧 `Snippet` 常量回流。
+  影响：E17 可作为 Charts 笛卡尔坐标系图表族的体验审查入口继续使用。
+- 问题：默认 `padding=24` 下 y 轴多位数/带前缀刻度标签被 SVG viewBox 左边界裁剪。刻度 `text` 以 `text-anchor="end"` 定位在内绘制区 `x=-10`，而绘制区仅整体 `translate(24, 24)`，三位数标签实际左缘落到 viewBox 之外。
+  浏览器证据：BarChart `基础用法`（React/Vue）“100/120/…/200”标签 `absLeft≈-9`（被裁约 9px）；`柱宽/柱高约束`“100…500” `absLeft=-9`；`自定义样式`（`yTickFormat` 加 `$`）“$0…$400” `absLeft=-16`，前缀与首位数字明显被切；对照桌面截图，基础柱图 y 轴呈现“00/50/00”而非“100/150/200”。LineChart/AreaChart/ScatterChart `基础用法`为两位数刻度，`absLeft≈-1`（仅 1px 边缘，基本不影响）。
+  影响：这是 E17 最明显的视觉缺陷，凡 y 值达三位数或带货币前缀的图表都会丢失轴标签首字符；BarChart 3 个分节直接可见，React/Vue 一致。
+- 问题：所有图表示例固定 `width={420} height={240/260}`，未使用 `responsive`；移动端图表溢出 DemoBlock preview 容器需横向滚动才能看全。
+  浏览器证据：移动 `390x844` 下页面级 `pageOverflow=false`，但 DemoBlock preview（`overflow-x-auto`）`scrollWidth≈444–498`、`clientWidth=308`，420px 宽图表被 preview 横向滚动承接。源码核对：高层 BarChart 只把 `width/height/padding/title/desc/className` 透传给 `ChartCanvas`，未透传 `responsive`；`responsive`（ResizeObserver 自适应）仅存在于底层 `ChartCanvas`（`chart-core.ts` `ChartCanvasProps`），未在 Bar/Line/Area/Scatter 高层 API 暴露。
+  影响：移动用户无法一屏看全图表；示例也没有演示自适应写法，且当前高层图表无法只靠 prop 变成响应式，属于示例+组件 API 双重缺口。
+- 问题：ScatterChart 无 `label` 的数据点在中文示例站显示英文默认名。`基础用法/自定义样式/入场动画/菱形散点/渐变风格`使用 `basicData/customData`（无 `label`），点的 `aria-label` 与 tooltip 回退为英文 `Point N`。
+  浏览器证据：`渐变风格`分节 tooltip 文本“Point 3: (50, 40)”；源码 `ScatterChart.tsx:235`/`:338` 均为 `datum.label ?? \`Point ${index + 1}\``。此外交互图例容器 `aria-label="Chart legend"`（`ChartLegend.tsx`）在中文站也是英文可访问名。
+  影响：中文示例复制后带入英文点名与英文图例可访问名；属于组件默认文案的 i18n 一致性问题。
+- 问题：图表 SVG 默认无可访问名/描述，示例也未演示 `title`/`desc`。`ChartCanvas` 仅在传入 `title`/`desc` 时渲染 `<title>/<desc>`，且不给 `<svg>` 加 `role="img"`；4 个图表示例均未传 `title`/`desc`。
+  浏览器证据：图表根 `<svg>` `role=null`、`aria=null`；柱/点各自 `role="img"` 但 `aria-label` 仅为分类名（BarChart `aria-label={datum.label ?? String(datum.x)}` → “Mon/Tue…”，不含数值）。
+  影响：屏幕阅读器只能读到一串无数值的分类名、拿不到整图语义；`title`/`desc` API 已存在但示例没有示范，属于 a11y + 文档示例缺口。
+- 问题：AreaChart 与 LineChart 的“数据点悬停是否联动系列高亮”行为不一致。AreaChart `交互功能`悬停可见数据点不更新“当前悬停”，仅悬停面积主体才更新；LineChart 悬停数据点即更新。
+  浏览器证据：AreaChart `交互功能`逐个悬停 8 个点回显始终“当前悬停: 无”，改悬停面积 `path` 后回显“当前悬停: 产品 A”；LineChart 同结构悬停点即回显“销售额/利润”。源码核对：AreaChart 系列级 hover 绑定在面积 `path` 的 `onMouseEnter`，数据点只触发 `onPointHover`；LineChart 数据点会联动系列 hover。
+  影响：示例文案写“悬停高亮”并显示数据点，Area 上用户悬停最显眼的点却无系列回显，与 Line 体验不一致；属于跨组件一致性问题，建议修复阶段用浏览器复查确认预期行为。
+
+**组件能力建议**：
+
+- 类型：默认行为 / 样式扩展 / 文档示例。
+  建议：调整图表默认 `padding`（或按 y 轴刻度文本宽度自动预留左内边距），或在 Bar/Line/Area 示例显式传更大的 `padding.left`，确保三位数与带 `$` 前缀的轴标签不被裁剪；修复后用浏览器复查 y 轴首字符完整可见。
+  证据：默认 `padding=24` 下 BarChart 三位数/货币标签 `absLeft` 为 -9~-16px，落在 viewBox 之外。
+- 类型：API 缺口 / 移动端 / 文档示例。
+  建议：在高层 Bar/Line/Area/Scatter 透传/暴露 `responsive`（或提供 `maxWidth`/百分比宽度），并在示例补一个自适应容器场景；短期可先把示例 `width` 调小或包一层可响应容器，说明移动端如何自适应。
+  证据：`responsive` 仅在底层 `ChartCanvas`；示例固定 420px，移动 preview `clientWidth=308` 需横向滚动。
+- 类型：i18n / 文档示例。
+  建议：ScatterChart 示例为数据点补业务化 `label`，或让默认 `Point N` 文案与图例 `aria-label="Chart legend"` 走 locale；保留一个“无 label 回退”示例以展示默认行为。
+  证据：`渐变风格` tooltip “Point 3: (50, 40)”，图例容器可访问名为英文。
+- 类型：a11y / 文档示例。
+  建议：在至少一个图表示例演示 `title`/`desc` 可访问名与描述；并评估组件在有 `title` 时是否应给 `<svg>` 加 `role="img"`，以及柱/点 `aria-label` 是否应含数值（如“周一：120”）。
+  证据：图表 `<svg>` 无 role/可访问名，柱 `aria-label` 仅分类名。
+- 类型：组合使用 / 默认行为。
+  建议：统一 Area 与 Line 的数据点悬停联动语义，或在 AreaChart `交互功能`示例明确“悬停面积区域查看系列高亮”，避免用户悬停点无反馈。
+  证据：Area 点悬停不更新系列回显，Line 更新。
+
+**建议优先级**：
+
+- P1：修复三位数/货币 y 轴刻度标签被裁剪（默认 padding 或示例 padding.left）。
+- P2：高层图表暴露/透传 `responsive` 或提供移动端自适应示例。
+- P2：ScatterChart 默认 `Point N` 与图例 `Chart legend` 的 i18n；示例补数据点 `label`。
+- P2：图表示例演示 `title`/`desc` 可访问名，评估柱/点 `aria-label` 含数值。
+- P3：统一 Area/Line 数据点悬停联动语义或补面积区域悬停说明。
+
+**后续执行建议**：轴标签裁剪与 `responsive` 暴露偏组件默认行为/API，不宜只改文案；i18n 默认文案、`title`/`desc` 示例、数据点 `label`、Area/Line 一致性可在 Example 或组件层择一修复。修复阶段应用浏览器复查 React/Vue `#/bar-chart`、`#/line-chart`、`#/area-chart`、`#/scatter-chart` 的桌面与移动视口（重点复查 y 轴标签完整性、移动端是否仍需横向滚动、Scatter tooltip/图例中文文案、图表可访问名、Area 点悬停回显），并运行 `npx -y pnpm@11.9.0 example:sources:check`；如调整页面结构再运行 `npx -y pnpm@11.9.0 example:build`；若改动图表源码或 public API，补充对应 React/Vue 图表 focused tests 作为修复验证。
 
 ## 审查重点
 
