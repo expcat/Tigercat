@@ -78,7 +78,7 @@ source: docs/ROADMAP.md R28
 | E17 | AreaChart / BarChart / LineChart / ScatterChart / chart subcomponents                                                          | React/Vue: `#/area-chart`, `#/bar-chart`, `#/line-chart`, `#/scatter-chart`; also inspect chart pages for ChartAxis/Canvas/Grid/Legend/Series/Tooltip behavior                    | 已完成（2026-07-01） |
 | E18 | PieChart / DonutChart / RadarChart / GaugeChart / FunnelChart / HeatmapChart / SunburstChart / TreeMapChart / Gantt / OrgChart | React/Vue: `#/pie-chart`, `#/donut-chart`, `#/radar-chart`, `#/gauge-chart`, `#/funnel-chart`, `#/heatmap-chart`, `#/sunburst-chart`, `#/treemap-chart`, `#/gantt`, `#/org-chart` | 已完成（2026-07-01） |
 | E19 | CodeEditor / MarkdownEditor / RichTextEditor / FileManager / ImageAnnotation / PrintLayout                                     | React/Vue: `#/code-editor`, `#/markdown-editor`, `#/rich-text-editor`, `#/file-manager`, `#/image-annotation`, `#/print-layout`                                                   | 已完成（2026-07-01） |
-| E20 | ActivityFeed / ChatWindow / CommentThread / DataTableWithToolbar / FormWizard / NotificationCenter / TaskBoard / Kanban        | React/Vue: `#/activity-feed`, `#/chat-window`, `#/comment-thread`, `#/data-table-with-toolbar`, `#/form-wizard`, `#/notification-center`, `#/task-board`, `#/kanban`              | 未开始               |
+| E20 | ActivityFeed / ChatWindow / CommentThread / DataTableWithToolbar / FormWizard / NotificationCenter / TaskBoard / Kanban        | React/Vue: `#/activity-feed`, `#/chat-window`, `#/comment-thread`, `#/data-table-with-toolbar`, `#/form-wizard`, `#/notification-center`, `#/task-board`, `#/kanban`              | 已完成（2026-07-01） |
 | E21 | Hooks demos: useDrag / useControlledState / useChartInteraction / useFormController                                            | React/Vue: `#/use-drag`, `#/use-controlled-state`, `#/use-chart-interaction`; `useFormController` 当前没有独立浏览器 demo route，如仍缺失则记录为“缺少可体验 Example”             | 未开始               |
 
 ## 分组执行记录
@@ -1544,6 +1544,84 @@ source: docs/ROADMAP.md R28
 - P3：CodeEditor 后续可补 `disabled` 与 `lineNumbers={false}` 示例。
 
 **后续执行建议**：i18n（MarkdownEditor/RichTextEditor `locale`）、PrintLayout `showPageBreaks` 修复属于组件源码/API 变更，不应只改文案；修复阶段应复查 React/Vue `#/markdown-editor`、`#/rich-text-editor`、`#/print-layout` 并补充对应 focused tests。PrintLayout 打印预览/尺寸示例、ImageAnnotation 本地 fixture/`alt`、FileManager 文案统一可优先只改 Example/文档；修复后复查 React/Vue `#/print-layout`、`#/image-annotation`、`#/file-manager`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若新增本地资源或调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
+
+### E20 ActivityFeed / ChatWindow / CommentThread / DataTableWithToolbar / FormWizard / NotificationCenter / TaskBoard / Kanban
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/activity-feed`、`#/chat-window`、`#/comment-thread`、`#/data-table-with-toolbar`、`#/form-wizard`、`#/notification-center`、`#/task-board`、`#/kanban`。
+- React：`http://localhost:5174/#/activity-feed`、`#/chat-window`、`#/comment-thread`、`#/data-table-with-toolbar`、`#/form-wizard`、`#/notification-center`、`#/task-board`、`#/kanban`。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案（app 提供 zh locale context）。
+- 浏览器操作路径：用仓库自带 Playwright/Chromium（`localhost` 解析到 `[::1]`，`domcontentloaded`）逐页直达 hash route；检查每页 `h1`、`<section>` 数量、桌面与移动页面级横向溢出、控制台报错；ActivityFeed 核对分组/加载态/空态与头像回退；ChatWindow 输入并发送消息核对回显与 600ms 自动回复、核对 textarea/单行 input 两种输入；CommentThread 点击「回复」展开编辑器提交回复、核对嵌套/扁平/精简/空态；DataTableWithToolbar 在首个搜索框输入并核对多表联动、行数与搜索框同步；FormWizard 空值点「下一步」核对校验阻断、填值后前进；NotificationCenter 切换全部/未读筛选并「全部标记已读」；TaskBoard/Kanban 核对列/卡片/WIP/空列占位/新增卡片文案并点击「添加任务」核对是否新增卡片。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/advanced.md`、`skills/tigercat/references/shared/props/advanced.md`。
+- React Example：`examples/example/react/src/pages/ActivityFeedDemo.tsx`、`ChatWindowDemo.tsx`、`CommentThreadDemo.tsx`、`DataTableWithToolbarDemo.tsx`、`FormWizardDemo.tsx`、`NotificationCenterDemo.tsx`、`TaskBoardDemo.tsx`、`KanbanDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/ActivityFeedDemo.vue`、`ChatWindowDemo.vue`、`CommentThreadDemo.vue`、`DataTableWithToolbarDemo.vue`、`FormWizardDemo.vue`、`NotificationCenterDemo.vue`、`TaskBoardDemo.vue`、`KanbanDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/react/src/components/CommentThread.tsx`、`TaskBoard.tsx`、`packages/vue/src/components/TaskBoard.ts`、`packages/core/src/utils/locale-utils.ts`（TaskBoard labels）。
+
+**用户故事**：
+
+- 作为使用者，我希望 ActivityFeed 能一次看清按日期分组、状态标签、操作按钮、加载态与空态，直接落地审计日志/动态流。
+- 作为使用者，我希望 ChatWindow 能真实输入并发送消息、看到自己的消息与对方回复、并对比 textarea 与单行 input 两种输入模式。
+- 作为使用者，我希望 CommentThread 能点击回复真正提交、看到嵌套/扁平/精简/空态，并知道点赞、展开/收起如何工作。
+- 作为使用者，我希望 DataTableWithToolbar 能分别体验基础工具栏、复合过滤、列设置、锁定列、卡片模式与自定义工具栏，而各示例互不干扰。
+- 作为使用者，我希望 FormWizard 能验证多步校验阻断、填值前进、完成态与 labels 文案覆盖。
+- 作为使用者，我希望 NotificationCenter 能分组展示、按已读状态筛选、批量标记已读，并看到加载态/空态。
+- 作为使用者，我希望 TaskBoard/Kanban 能看到列与卡片、WIP 限制、卡片计数、空列占位与新增卡片，并且新增卡片按钮在 React/Vue 行为一致。
+
+**Example 体验问题**：
+
+- 问题：E20 未发现 P0 阻断问题；React/Vue 8 个 route 均可打开，桌面与移动视口无页面级横向溢出，多数关键交互均能完成。
+  浏览器证据：桌面 `1280x720` 下 React/Vue 逐页返回目标 `h1`；`<section>` 数量 React/Vue 一致（activity-feed/notification-center/task-board 各 4、chat-window/kanban 各 3、comment-thread 5、data-table-with-toolbar 10、form-wizard 3，含 DemoBlock 外层结构）；移动 `390x844` 下 16 个 route 的页面级 `overflow=false`。ChatWindow 输入「这是一条测试消息」发送后回显并 600ms 后出现「已收到消息」；FormWizard 空值点「下一步」停留在「填写姓名与邮箱」，填姓名/邮箱后前进到「填写手机号」；NotificationCenter 切「未读」显示子集、「全部标记已读」后再切「未读」为 0；CommentThread 对无子评论提交回复后正文出现该回复（`posted=true`）。
+  影响：当前 E20 可作为 Advanced 组合类组件的审查入口继续使用。
+- 问题：TaskBoard「基础用法」的「添加任务」按钮在 Vue 端点击无效，React 端正常，属于 React/Vue 行为不一致。
+  浏览器证据：React 待办列点「添加任务」后新增「新任务 4」（`新任务 \d+` 计数 0→1，3 次运行一致）；Vue 端点击同一按钮正文始终无「新任务」（probe7 + 两次复跑共 3 次均 `added=false`）。根因：Vue `TaskBoard` 点击时 `emit('card-add', column.id)`（`packages/vue/src/components/TaskBoard.ts:516`、`:521`），而 `onCardAdd` 仅用于决定按钮是否显示（`:502`）；示例却用 `:on-card-add="handleCardAdd"`（prop）绑定，未监听 `@card-add`，故无效。React 端 `onClick` 直接调用 `onCardAdd`（`packages/react/src/components/TaskBoard.tsx:357`）故生效。
+  影响：示例描述明确宣传「受控模式 + 卡片拖拽 + 列拖拽 + 新增卡片」，但 Vue 用户复制该写法后新增卡片会静默失效。
+- 问题：DataTableWithToolbar 单个「组合展示」DemoBlock 内 9 个表格实例共享同一份 `keyword`/`filters`/`pagination`/`selectedRowKeys` 状态，互相干扰。
+  浏览器证据：在「基础用法」搜索框输入 `user5@` 后，4 个内置搜索框值全部同步为 `user5@`，且 9 个 `<table>` 的 tbody 行数全部从 6 变为 1，`user5@example.com` 在页面出现 9 次；React/Vue 表现一致。
+  影响：用户为学习某一 section 而改搜索/筛选/翻页时，其余所有 section 会同时变化，难以独立理解每个能力点；与本计划「把互相干扰的流程保持独立」的要求相悖。
+- 问题：ActivityFeed/ChatWindow/CommentThread 的头像依赖远程 `i.pravatar.cc`，在本审查环境被浏览器拦截，回退为首字母且控制台持续报错。
+  浏览器证据：3 个 route 加载后 `<img>` 数量为 0，控制台逐张报 `Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE.NotSameOrigin`；Avatar 回退显示首字母（如「管理」「系统」「D」）。
+  影响：与 E02/E03/E19 相同的远程图片稳定性风险——离线/内网/CI/CORP 环境下头像不展示，且每次加载都产生控制台噪声。
+- 问题：CommentThread「回复」提交按钮与每条评论的「回复」切换按钮同名，且对已达 `maxReplies` 的评论回复后看不到自己刚提交的回复。
+  浏览器证据：打开回复编辑器后，页面存在大量文本完全相同的「回复」按钮（切换按钮与提交按钮同名，来源 `CommentThread.tsx:29 replyButtonText`、`:33 replyText`）；对首条（已有 3 条子回复、`maxReplies=2`）提交回复时，新回复被折叠进「▸ 展开 N 条回复」而正文不可见（`posted=false`），对无子评论提交则立即可见（`posted=true`）。
+  影响：不阻断使用；但同名按钮不利于 a11y/自动化定位，maxReplies 边界也让用户误以为回复失败。
+- 问题：Kanban「禁用拖拽 & WIP 限制」section 在 React 端缺少说明段落，且首个 section 描述文案 React/Vue 不一致。
+  浏览器证据：Vue Kanban section 2 含 `<p>`「draggable=false 禁用，enforceWipLimit 限制列容量」，React section 2 无描述段落（`section2HasDesc` React=false、Vue=true）；section 1 描述 React「columns 定义列和卡片」vs Vue「columns 定义列和卡片，支持拖拽」。
+  影响：不阻断使用；属于 React/Vue 文案一致性的小缺口。
+
+**组件能力建议**：
+
+- 类型：文档示例 / 组合使用。
+  建议：修正 Vue TaskBoard「基础用法」示例，将 `:on-card-add="handleCardAdd"` 改为监听事件 `@card-add="handleCardAdd"`（与组件 `emit('card-add')` 契约一致）；如需保留 prop 回调风格，则应在 Vue 组件点击处同时调用 `props.onCardAdd`，让 prop 与 emit 行为对齐。
+  证据：Vue 端点击「添加任务」无新增卡片，React 端正常；根因为 Vue 用 emit、示例用 prop 绑定。
+- 类型：文档示例 / 组合使用。
+  建议：给 DataTableWithToolbar 各 section 提供独立的 `keyword`/`filters`/`pagination`/`selection` 状态（或拆成多个 DemoBlock），避免一个搜索框同步驱动全部表格；至少对「基础用法」与其余能力演示做状态隔离。
+  证据：单一 keyword/filters/pagination 被 9 个表格共享，输入一次 `user5@` 令全部表格同步过滤到 1 行。
+- 类型：文档示例 / 默认行为。
+  建议：把 ActivityFeed/ChatWindow/CommentThread 的头像换成仓库内本地 fixture 或 data-URI，或去除对远程 `i.pravatar.cc` 的依赖，消除 CORP 拦截导致的头像缺失与控制台报错；与 E02/E03/E19 的远程图整改保持一致。
+  证据：3 个 route 头像 `<img>` 全被 `ERR_BLOCKED_BY_RESPONSE.NotSameOrigin` 拦截、回退首字母。
+- 类型：a11y / 文档示例。
+  建议：CommentThread 可为回复提交按钮提供区别于切换按钮的可访问名称（如「发布回复」）或 `aria-label`；示例可将默认回复目标改到无子评论/未达 maxReplies 的节点，或在文案中说明「回复会追加到该评论的展开列表」，避免用户误判提交失败。
+  证据：提交按钮与切换按钮同名；对达 maxReplies 的评论回复后新回复被折叠。
+- 类型：文档示例。
+  建议：为 Kanban React 端 section 2 补齐与 Vue 一致的说明段落，并统一 section 1 描述文案，保持 React/Vue Example 文案对齐。
+  证据：React section 2 无描述、section 1 文案与 Vue 不一致。
+
+**建议优先级**：
+
+- P1：修复 Vue TaskBoard「基础用法」新增卡片无效（改用 `@card-add` 事件），消除 React/Vue 行为不一致。
+- P2：DataTableWithToolbar 各示例状态隔离，消除多表互相干扰。
+- P2：ActivityFeed/ChatWindow/CommentThread 头像改本地 fixture/data-URI，消除远程图拦截与控制台报错。
+- P3：CommentThread 回复提交按钮补差异化可访问名称，并优化 maxReplies 边界的回复可见性/说明。
+- P3：统一 Kanban React/Vue 说明文案。
+
+**后续执行建议**：TaskBoard 新增卡片修复、DataTableWithToolbar 状态隔离、头像本地化、Kanban 文案统一均可优先只改 Example/文档，不需要 public API 变更；CommentThread 回复按钮可访问名称若改默认文案，属组件文案层，可评估是否随 Example 覆盖或进入组件 i18n。修复后复查 React/Vue `#/task-board`、`#/data-table-with-toolbar`、`#/activity-feed`、`#/chat-window`、`#/comment-thread`、`#/kanban`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构或新增本地资源，再运行 `npx -y pnpm@11.9.0 example:build`。TaskBoard 拖拽为自定义指针 DnD，Playwright 自动化不稳定，本轮未强行模拟，仅核对结构与新增卡片；如后续需要，可用真实指针序列复查拖拽。
 
 ## 审查重点
 
