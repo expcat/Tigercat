@@ -62,7 +62,7 @@ source: docs/ROADMAP.md R28
 | E01 | Button / Link / Text / Code / Icon / Tag / Badge                                                                               | React/Vue: `#/button`, `#/link`, `#/text`, `#/code`, `#/icon`, `#/tag`, `#/badge`                                                                                                 | 已完成（2026-07-01） |
 | E02 | Avatar / AvatarGroup / Empty / Result / Statistic / QRCode / Watermark                                                         | React/Vue: `#/avatar`, `#/empty`, `#/result`, `#/statistic`, `#/qrcode`, `#/watermark`                                                                                            | 已完成（2026-07-01） |
 | E03 | Image / ImageGroup / ImagePreview / ImageViewer / CropUpload / ImageCropper                                                    | React/Vue: `#/image`, `#/image-viewer`, `#/crop-upload`, `#/image-cropper`                                                                                                        | 已完成（2026-07-01） |
-| E04 | Layout / Header / Sidebar / Content / Footer / Container / Row / Col / Space / Divider                                         | React/Vue: `#/layout`, `#/grid`, `#/space`, `#/divider`                                                                                                                           | 未开始               |
+| E04 | Layout / Header / Sidebar / Content / Footer / Container / Row / Col / Space / Divider                                         | React/Vue: `#/layout`, `#/grid`, `#/space`, `#/divider`                                                                                                                           | 已完成（2026-07-01） |
 | E05 | Card / List / Descriptions / Skeleton / Splitter / Resizable / Carousel                                                        | React/Vue: `#/card`, `#/list`, `#/descriptions`, `#/skeleton`, `#/splitter`, `#/resizable`, `#/carousel`                                                                          | 未开始               |
 | E06 | Affix / Anchor / BackTop / Breadcrumb / ScrollSpy / FloatButton                                                                | React/Vue: `#/affix`, `#/anchor`, `#/backtop`, `#/breadcrumb`, `#/scroll-spy`, `#/float-button`                                                                                   | 未开始               |
 | E07 | Menu / Dropdown / Steps / Tabs / Tree / Pagination / Spotlight                                                                 | React/Vue: `#/menu`, `#/dropdown`, `#/steps`, `#/tabs`, `#/tree`, `#/pagination`, `#/spotlight`                                                                                   | 未开始               |
@@ -288,6 +288,79 @@ source: docs/ROADMAP.md R28
 - P3：ImageViewer 补受控索引同步或外部状态展示。
 
 **后续执行建议**：优先只改 Example/文档；ImageCropper fixture、CropUpload 示例入口和 a11y 文案都不需要 public API 变更。修复阶段应复查 React/Vue `#/image-cropper`、`#/crop-upload`、`#/image`、`#/image-viewer`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若新增本地示例资源或调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。如组件层补 ImageCropper 加载失败态，再补充 React/Vue ImageCropper focused tests。
+
+### E04 Layout / Header / Sidebar / Content / Footer / Container / Row / Col / Space / Divider
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/layout`、`#/grid`、`#/space`、`#/divider`。
+- React：`http://localhost:5174/#/layout`、`#/grid`、`#/space`、`#/divider`。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、section 数量、`示例`/`代码`页签、页面级横向溢出；点击普通 Sidebar 折叠按钮和后台 Shell 侧栏收起按钮；在 Grid 页面切换桌面/移动视口核对响应式 span/order 与 `wrap=false` 内部横向滚动；在 Space 页面核对 `wrap` tag 换行和自定义 `24px` gap；在 Divider 页面切换首个 `代码`页签，并检查 separator role、横/竖向分割线、线型、粗细和是否展示 `gradient`。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/layout.md`、`skills/tigercat/references/shared/props/layout.md`、`skills/tigercat/references/examples/basic.md`、`skills/tigercat/references/shared/props/basic.md`。
+- React Example：`examples/example/react/src/pages/LayoutDemo.tsx`、`GridDemo.tsx`、`SpaceDemo.tsx`、`DividerDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/LayoutDemo.vue`、`GridDemo.vue`、`SpaceDemo.vue`、`DividerDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/layout.ts`、`grid.ts`、`space.ts`、`divider.ts`、`packages/core/src/utils/grid.ts`、`space.ts`、`divider.ts`、`packages/react/src/components/Layout.tsx`、`Space.tsx`、`Divider.tsx`、`packages/vue/src/components/Layout.ts`、`Space.ts`、`Divider.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 Layout 页面能展示页面骨架、Header/Footer 高度、普通 Sidebar、折叠 Sidebar、后台 Shell 侧栏和 Mini 侧栏，方便复制到管理后台应用。
+- 作为使用者，我希望 Grid 页面能实际验证 24 分栏、gutter、响应式 span/offset/order、对齐、偏移、排序、nowrap 和 flex 自适应，而不只是看到静态文案。
+- 作为使用者，我希望 Space 页面能直接比较水平/垂直间距、内置 size、自定义 px gap、align 和 wrap，在移动端也能看出换行行为。
+- 作为使用者，我希望 Divider 页面能确认水平/垂直 separator 语义、solid/dashed/dotted/gradient、spacing、color 和 thickness 的视觉差异，并复制对应 React/Vue 写法。
+- 作为使用者，我希望每个 Layout 类页面的 `代码`页签都来自当前页面 raw source，这样复制出的导入路径、状态管理和 Vue/React 绑定差异是可信的。
+
+**Example 体验问题**：
+
+- 问题：E04 未发现 P0 route-level 阻断问题；React/Vue 8 个 route 均可打开，桌面与移动视口无页面级横向溢出，Layout 折叠、Space 换行、Divider 语义和代码页签基本可体验。
+  浏览器证据：React/Vue `#/layout` 分别有 8 个 section，`#/grid` 有 9 个，`#/space` 有 5 个，`#/divider` 有 5 个；移动 `390x844` 复查 8 个 route 的 `hasHorizontalOverflow=false`。普通 Sidebar 的“折叠侧边栏”按钮可点击，React 示例中目标 Sidebar 从 `192px` 收到 `64px`，按钮文案变为“展开侧边栏”。Space 的 14 个 tag 在桌面为 3 行、移动为 7 行；Divider 暴露 14 个 `role="separator"`，横向/竖向 `aria-orientation` 与边框方向一致；首个 Divider `代码`页签可切换，出现 `复制代码`按钮和 raw source import。
+  影响：E04 大多数页面可作为 Layout 类组件的审查入口继续使用。
+- 问题：Grid 的响应式 span/order 示例在桌面 `1280x720` 下没有呈现 md/lg 分栏和排序变化，视觉仍按 `xs` 基础值整行堆叠。
+  浏览器证据：React `#/grid` 的“响应式栅格”四个 Col 都带有 CSS 变量，例如 `--tiger-col-span-md: 50%`、`--tiger-col-span-lg: 33.333333%`，但 computed width 仍为 `798px`（整行 100%）；Vue 同组在桌面也全部为整行宽度。数字 span 示例正常：`col-12` 约 `399px`、`col-8` 约 `266px`、`col-6` 约 `200px`，说明问题集中在响应式类/构建输出而不是基础栅格。响应式排序同样停留在 xs 视觉顺序：`xs:1 -> md:2` 位于最左，`xs:3 -> md:1` 没有在桌面移到第一列。
+  影响：用户会复制一个声称支持响应式的示例，但在示例站看不到 md/lg 行为；这是常见布局能力，属于 React/Vue 同时可见的 P1 体验/行为问题。
+- 问题：后台 Shell 侧栏收起按钮在 React/Vue 中没有 `aria-label`，折叠后按钮可见宽度约 `39px`，主要可见内容是符号加“展开侧栏”的压缩文本。
+  浏览器证据：坐标点击 `"<收起侧栏"` 后 React/Vue Shell Sidebar 都从 `240px` 收到 `64px`，aside 增加 `tiger-sidebar-collapsed`；收起后按钮文本为 `">展开侧栏"`，`buttonAria=null`。
+  影响：功能可用，但这个管理后台 Shell 是推荐复制场景，示例没有示范折叠按钮在窄宽度下的明确可访问名称。
+- 问题：Divider 类型和核心实现支持 `lineStyle="gradient"`，但 props 摘要与 Example 页面只展示 `solid / dashed / dotted`。
+  浏览器证据：`packages/core/src/types/divider.ts` 中 `DividerLineStyle = 'solid' | 'dashed' | 'dotted' | 'gradient'`，`getDividerClasses` 为 gradient 生成背景渐变线；React/Vue `#/divider` 页面 `hasGradientText=false`，14 个 separator 的 computed `backgroundImage` 都是 `none`。
+  影响：用户无法从 Example 发现现代主题下的柔和渐变分割线能力，属于文档/Example 覆盖缺口。
+- 问题：Grid 的 `wrap=false` 示例在移动端正确把溢出限制在内部滚动容器，但页面没有明显提示“这里需要横向滚动查看后续列”。
+  浏览器证据：移动 `390x844` 下页面级无横向溢出；`wrap=false` 内部容器 `clientWidth=165`、`scrollWidth=720`，`overflow-x-auto` 生效。
+  影响：技术实现正确；但从普通用户视角，移动端如果没有滚动提示，容易误以为后几列不可见或示例被截断。
+
+**组件能力建议**：
+
+- 类型：默认行为 / 文档示例 / 构建输出。
+  建议：优先修复 Row/Col 响应式 span/order 类在 example build 中不生效的问题，或调整 Grid 实现为不依赖未生成的响应式任意值类；修复后在 React/Vue 示例中重新验证 `span={{ xs, md, lg }}`、响应式 `offset` 和响应式 `order`。
+  证据：CSS 变量已写入 DOM，但 md/lg computed width/order 未覆盖基础 `w-[var(--tiger-col-span)]` / `order-[var(--tiger-col-order)]`。
+- 类型：a11y / 文档示例。
+  建议：后台 Shell 示例的收起/展开按钮增加业务化 `aria-label` 或 `title`，并在折叠态保持明确的可访问名称，例如“展开后台侧栏”“收起后台侧栏”。
+  证据：Shell 折叠交互可用，但按钮没有 `aria-label`，折叠后可视宽度只剩约 `39px`。
+- 类型：文档示例。
+  建议：Divider 的线条样式 section 增加 `gradient`，并同步 props 摘要或 generated docs，让用户看到类型中已有的渐变分割线能力。
+  证据：源码支持 `gradient`，当前页面与 props 摘要只展示 solid/dashed/dotted。
+- 类型：文档示例 / 移动端。
+  建议：Grid `wrap=false` 示例在内部滚动容器旁补一个轻量可视提示或场景文案，说明移动端可横向滚动查看后续列。
+  证据：内部 `overflow-x-auto` 已限制溢出，但移动端可见区域只显示部分列。
+- 类型：组合使用。
+  建议：Layout 页面后续可把后台 Shell 示例里的 Header/Content 与侧栏菜单状态连成更完整的小应用骨架，例如展示选中菜单项对应的内容标题。
+  证据：当前 Shell 已覆盖 Sidebar + Menu collapsed popup，但 Content 只显示静态“Shell 内容区域”。
+
+**建议优先级**：
+
+- P1：修复 Grid 响应式 span/order 示例或底层响应式类生成，使 React/Vue `#/grid` 在桌面能看到 md/lg 分栏与排序。
+- P2：为后台 Shell 侧栏折叠按钮补明确可访问名称。
+- P2：Divider 示例和 props 摘要补 `gradient` 线型。
+- P3：Grid `wrap=false` 移动端补横向滚动提示。
+- P3：Layout Shell 示例补菜单选中与内容区联动场景。
+
+**后续执行建议**：Grid 响应式问题需要组件源码/构建输出层修复，不应只改文案；修复阶段应复查 React/Vue `#/grid` 的响应式 span、offset、order，并补充 `Row`/`Col` focused tests 或对应 grouped layout 验证。Shell a11y、Divider gradient 和 nowrap 提示可优先只改 Example/文档；修复后复查 React/Vue `#/layout`、`#/divider`、`#/grid`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
 
 ## 审查重点
 
