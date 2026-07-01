@@ -77,7 +77,7 @@ source: docs/ROADMAP.md R28
 | E16 | VirtualTable / VirtualList / InfiniteScroll                                                                                    | React/Vue: `#/virtual-table`, `#/virtual-list`, `#/infinite-scroll`                                                                                                               | 已完成（2026-07-01） |
 | E17 | AreaChart / BarChart / LineChart / ScatterChart / chart subcomponents                                                          | React/Vue: `#/area-chart`, `#/bar-chart`, `#/line-chart`, `#/scatter-chart`; also inspect chart pages for ChartAxis/Canvas/Grid/Legend/Series/Tooltip behavior                    | 已完成（2026-07-01） |
 | E18 | PieChart / DonutChart / RadarChart / GaugeChart / FunnelChart / HeatmapChart / SunburstChart / TreeMapChart / Gantt / OrgChart | React/Vue: `#/pie-chart`, `#/donut-chart`, `#/radar-chart`, `#/gauge-chart`, `#/funnel-chart`, `#/heatmap-chart`, `#/sunburst-chart`, `#/treemap-chart`, `#/gantt`, `#/org-chart` | 已完成（2026-07-01） |
-| E19 | CodeEditor / MarkdownEditor / RichTextEditor / FileManager / ImageAnnotation / PrintLayout                                     | React/Vue: `#/code-editor`, `#/markdown-editor`, `#/rich-text-editor`, `#/file-manager`, `#/image-annotation`, `#/print-layout`                                                   | 未开始               |
+| E19 | CodeEditor / MarkdownEditor / RichTextEditor / FileManager / ImageAnnotation / PrintLayout                                     | React/Vue: `#/code-editor`, `#/markdown-editor`, `#/rich-text-editor`, `#/file-manager`, `#/image-annotation`, `#/print-layout`                                                   | 已完成（2026-07-01） |
 | E20 | ActivityFeed / ChatWindow / CommentThread / DataTableWithToolbar / FormWizard / NotificationCenter / TaskBoard / Kanban        | React/Vue: `#/activity-feed`, `#/chat-window`, `#/comment-thread`, `#/data-table-with-toolbar`, `#/form-wizard`, `#/notification-center`, `#/task-board`, `#/kanban`              | 未开始               |
 | E21 | Hooks demos: useDrag / useControlledState / useChartInteraction / useFormController                                            | React/Vue: `#/use-drag`, `#/use-controlled-state`, `#/use-chart-interaction`; `useFormController` 当前没有独立浏览器 demo route，如仍缺失则记录为“缺少可体验 Example”             | 未开始               |
 
@@ -1466,6 +1466,84 @@ source: docs/ROADMAP.md R28
 - P3：Pie/Donut 选中回显统一展示标签、值与百分比。
 
 **后续执行建议**：Heatmap 可先只改 React/Vue Example 数据为 label 字符串并复查 `#/heatmap-chart`；若要兑现类型注释中的数字索引能力，则需要组件工具/测试变更。移动端响应式、Gantt/OrgChart 可读回显、图表 `title`/`desc` 示例和 Pie/Donut 回显都可从 Example/文档开始，不必先改 public API。修复阶段应复查 React/Vue `#/heatmap-chart`、`#/pie-chart`、`#/donut-chart`、`#/gantt`、`#/org-chart` 与任一移动端长图 route，并运行 `npx -y pnpm@11.9.0 example:sources:check`；如调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`；若改组件源码或 API，补充对应 focused tests。
+
+### E19 CodeEditor / MarkdownEditor / RichTextEditor / FileManager / ImageAnnotation / PrintLayout
+
+**状态**：已完成（2026-07-01）。
+
+**体验入口**：
+
+- Vue：`http://localhost:5173/#/code-editor`、`#/markdown-editor`、`#/rich-text-editor`、`#/file-manager`、`#/image-annotation`、`#/print-layout`。
+- React：`http://localhost:5174/#/code-editor`、`#/markdown-editor`、`#/rich-text-editor`、`#/file-manager`、`#/image-annotation`、`#/print-layout`。
+- 视口：桌面 `1280x720`；移动 `390x844`。
+- 主题/语言：示例站点默认主题与默认中文文案。
+- 浏览器操作路径：逐页直达 hash route；检查每页 `h1`、`<section>` 数量、`示例`/`代码`页签、桌面与移动页面级横向溢出、控制台报错；CodeEditor 检查 textarea 数量、只读态、行号块与占位符并在首个编辑器输入；MarkdownEditor 检查 `role="toolbar"`、edit/split/preview 模式按钮、只读预览渲染的 Markdown 标题/表格与自定义渲染器输出；RichTextEditor 检查三个 `contenteditable` 与 `role="toolbar"` 按钮标签；FileManager 输入搜索、双击 `docs` 文件夹进入并核对面包屑与子文件；ImageAnnotation 等待远程图片加载后核对 `<img>`、SVG rect/ellipse、`标注数量` 与工具按钮；PrintLayout 检查页眉页脚屏幕可见性、`PrintPageBreak` 分页指示与 `showPageBreaks` 行为。
+
+**审查入口**：
+
+- Generated refs：`skills/tigercat/references/component-index.md`、`skills/tigercat/references/examples/advanced.md`、`skills/tigercat/references/shared/props/advanced.md`。
+- React Example：`examples/example/react/src/pages/CodeEditorDemo.tsx`、`MarkdownEditorDemo.tsx`、`RichTextEditorDemo.tsx`、`FileManagerDemo.tsx`、`ImageAnnotationDemo.tsx`、`PrintLayoutDemo.tsx`、`examples/example/react/src/components/DemoBlock.tsx`、`examples/example/react/src/router.tsx`。
+- Vue Example：`examples/example/vue3/src/pages/CodeEditorDemo.vue`、`MarkdownEditorDemo.vue`、`RichTextEditorDemo.vue`、`FileManagerDemo.vue`、`ImageAnnotationDemo.vue`、`PrintLayoutDemo.vue`、`examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/vue3/src/router.ts`。
+- Source checks：`packages/core/src/types/code-editor.ts`、`markdown-editor.ts`、`rich-text-editor.ts`、`file-manager.ts`、`image-annotation.ts`、`print-layout.ts`、`packages/core/src/utils/markdown-editor-utils.ts`、`print-layout-utils.ts`、`packages/react/src/components/ImageAnnotation.tsx`、`PrintLayout.tsx`、`RichTextEditor.tsx`、`CodeEditor.tsx`、`MarkdownEditor.tsx`、`packages/vue/src/components/PrintLayout.ts`。
+
+**用户故事**：
+
+- 作为使用者，我希望 CodeEditor 页面能一次看清语言高亮、行号、亮/暗主题、只读、tabSize、wordWrap 和 placeholder，并能直接输入编辑，方便嵌入配置页或代码片段展示。
+- 作为使用者，我希望 MarkdownEditor 页面能验证编辑/分屏/预览模式切换、工具栏插入、只读预览渲染和自定义渲染器，并且编辑器界面与中文示例站语言一致。
+- 作为使用者，我希望 RichTextEditor 页面能确认工具栏按钮、所见即所得编辑、只读与禁用差异，并知道工具栏文案是否可本地化。
+- 作为使用者，我希望 FileManager 页面能体验列表/网格视图、搜索、多选和面包屑导航，并能双击文件夹逐级进入。
+- 作为使用者，我希望 ImageAnnotation 页面加载后能立即在图片上看到已有矩形/椭圆标注、切换工具绘制，并知道远程图片慢加载或离线时的兜底方式。
+- 作为使用者，我希望 PrintLayout 页面能看出纸张尺寸、横向布局、页眉页脚和分页效果，并能在屏幕上验证或预览打印结果。
+
+**Example 体验问题**：
+
+- 问题：E19 未发现 P0 阻断问题；React/Vue 6 个 route 均可打开，桌面与移动视口无页面级横向溢出，关键交互均能完成。
+  浏览器证据：桌面 `1280x720` 下 React/Vue 分别返回目标 `h1`；`<section>` 数量为 code-editor/markdown-editor/file-manager/print-layout 各 4 个、rich-text-editor/image-annotation 各 3 个（单个「组合展示」DemoBlock 内含 2–3 个子 section）；移动 `390x844` 下 12 个 route 的 `mobileOverflow=false`。CodeEditor 渲染 3 个 textarea（1 个只读）、20 个行号块；MarkdownEditor 只读预览渲染出 `Release notes`/`Component brief` 标题与 1 个表格，自定义渲染器输出 `Custom renderer`；RichTextEditor 3 个 `contenteditable` 与每个 16 按钮的 `role="toolbar"`；FileManager 双击 `docs` 后出现 `guide.md`/`api.md` 与面包屑；ImageAnnotation 图片加载后 `imgCount=2`、`svgRects=2`、`svgEllipses=2`；PrintLayout `PrintPageBreak` 在屏幕上显示分页指示。
+  影响：当前 E19 可作为 Advanced 编辑器/文件/标注/打印类组件的审查入口继续使用。
+- 问题：MarkdownEditor 与 RichTextEditor 在中文示例站中界面文案全为英文，且组件本身没有 `locale` 入口。
+  浏览器证据：MarkdownEditor 模式切换按钮为 `Edit`/`Split`/`Preview`（4 个编辑器共 12 个），工具栏 tooltip 为英文；`markdownModeLabels` 与默认工具栏标签硬编码在 `packages/core/src/utils/markdown-editor-utils.ts`，`MarkdownEditorProps` 无 `locale`。RichTextEditor 3 个工具栏 `aria-label` 均为 `Text formatting`，16 个按钮 `title` 为 `Bold (Ctrl+B)`、`Italic (Ctrl+I)` 等英文；`RichTextEditorProps` 无 `locale`。
+  影响：中文用户复制这两个编辑器后无法从示例得到本地化界面，属于 React/Vue 一致存在的组件能力 + i18n 缺口。
+- 问题：PrintLayout 的 `showPageBreaks` 在两端都是无效 prop，React 端还会把它泄漏到 DOM 并触发控制台告警。
+  浏览器证据：React `#/print-layout` 控制台报 `React does not recognize the `showPageBreaks` prop on a DOM element`；源码中 `packages/react/src/components/PrintLayout.tsx` 未解构 `showPageBreaks`，随 `...rest` 展开到 `<div>`；React/Vue 两端组件体内都未使用 `showPageBreaks`（Vue 通过 `props` 声明 + `inheritAttrs:false` 消费掉，故不告警），屏幕上的分页线实际来自 `PrintPageBreak` 子组件。
+  影响：`print-layout.ts` 将 `showPageBreaks` 记为「屏幕分页指示，默认 true」，但示例传入后无任何效果，React 端还多一条告警，属于组件行为与文档不符。
+- 问题：PrintLayout 页眉页脚在屏幕上不可见，示例也没有打印/预览入口。
+  浏览器证据：`printLayoutHeaderClasses`/`printLayoutFooterClasses` 为 `hidden print:block`；「页眉页脚」section 中 `Tigercat Inc.` 元素 `display:none`、`w=0/h=0`，`Confidential` 文本不在屏幕 `innerText`；页面无「打印/print」按钮。
+  影响：用户在浏览器里看不出页眉页脚效果，必须手动打印才能验证，示例缺少可观察该能力的入口或说明。
+- 问题：ImageAnnotation 示例依赖远程图片 `https://picsum.photos/seed/annotation/900/600`，首屏需等待数秒才出现标注，且未传 `alt`。
+  浏览器证据：等待 1.5 秒时 `imgCount=0`、无 SVG rect/ellipse、stage 处于 `role="img"` 加载态；等待约 9 秒后图片加载完成、`imgCount=2`、rect/ellipse 各 2、`role="application"`；`ImageAnnotationDemo` 未传 `alt`，组件回退默认英文 `Image to annotate`。
+  影响：与 E03 远程图相同的稳定性风险——离线/内网/CI 或慢网络下会长时间停在加载动画；`alt` 缺省也让读屏得到英文默认值。
+- 问题：FileManager 列表视图说明文案 React/Vue 不一致，多选态也没有可见勾选标记。
+  浏览器证据：Vue 列表说明为「默认列表模式，支持排序和搜索」，React 为「默认列表模式，支持搜索」；「多选 & 面包屑导航」示例 `input[type=checkbox]` 数量为 0，多选通过行高亮实现。
+  影响：不阻断使用；属于 React/Vue 文案一致性与多选可读性的小缺口。
+
+**组件能力建议**：
+
+- 类型：i18n / API 缺口。
+  建议：为 MarkdownEditor 与 RichTextEditor 增加 `locale`（或复用 `TigerLocale`）覆盖模式切换、工具栏 label/tooltip 与 `aria-label`，并在示例中展示中文界面；当前 `markdownModeLabels`、默认工具栏与 `Text formatting` 都是硬编码英文。
+  证据：两个编辑器在中文站界面全英文，且类型上都没有 `locale` 入口。
+- 类型：默认行为 / API 缺口。
+  建议：修复 PrintLayout 的 `showPageBreaks`——React 端从 props 解构避免泄漏到 DOM，并在两端真正实现「屏幕分页指示」开关，或从类型/文档/示例中移除该 prop；改后复查控制台无告警。
+  证据：React 泄漏 `showPageBreaks` 到 `<div>` 触发告警，两端组件均未使用该 prop。
+- 类型：文档示例 / 组合使用。
+  建议：PrintLayout 增加「打印预览」按钮（`window.print()`）或在屏幕上并列展示页眉页脚预览，让用户不打印也能观察 `showHeader`/`showFooter` 效果；同时补一个 Letter/A3 尺寸示例以兑现「A4/Letter」说明。
+  证据：页眉页脚 `hidden print:block` 在屏幕不可见且无打印入口，示例只演示 A4。
+- 类型：文档示例 / 默认行为 / a11y。
+  建议：把 ImageAnnotation 示例图片改为仓库内本地 fixture 或 data URL 并补加载失败/慢加载提示，同时给 `src` 补业务化中文 `alt`。
+  证据：远程 picsum 图首屏需等待数秒，离线/CI 下会长时间停在加载动画；示例未传 `alt`。
+- 类型：文档示例。
+  建议：统一 FileManager 列表说明文案（React 补「排序」或 Vue 收窄为「搜索」，以实际能力为准），并在多选示例补一条说明如何识别已选行。
+  证据：React/Vue 列表说明不一致，多选无可见勾选标记。
+
+**建议优先级**：
+
+- P1：MarkdownEditor / RichTextEditor 增加 `locale` 并在示例展示中文界面。
+- P2：修复 PrintLayout `showPageBreaks`（React DOM 泄漏 + 两端无效 prop），改后复查控制台无告警。
+- P2：PrintLayout 增加打印预览入口或屏幕页眉页脚预览，并补 Letter/A3 尺寸示例。
+- P2：ImageAnnotation 改用本地 fixture、补加载失败态与中文 `alt`。
+- P3：统一 FileManager 列表说明文案并补多选可读性说明。
+- P3：CodeEditor 后续可补 `disabled` 与 `lineNumbers={false}` 示例。
+
+**后续执行建议**：i18n（MarkdownEditor/RichTextEditor `locale`）、PrintLayout `showPageBreaks` 修复属于组件源码/API 变更，不应只改文案；修复阶段应复查 React/Vue `#/markdown-editor`、`#/rich-text-editor`、`#/print-layout` 并补充对应 focused tests。PrintLayout 打印预览/尺寸示例、ImageAnnotation 本地 fixture/`alt`、FileManager 文案统一可优先只改 Example/文档；修复后复查 React/Vue `#/print-layout`、`#/image-annotation`、`#/file-manager`，并运行 `npx -y pnpm@11.9.0 example:sources:check`；若新增本地资源或调整页面结构，再运行 `npx -y pnpm@11.9.0 example:build`。
 
 ## 审查重点
 
