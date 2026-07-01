@@ -1183,3 +1183,36 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 - `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
 
 **状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E05 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前可执行分组推进到 E06；R28 E05 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R28 E14 Form upload/signature example user-story review
+
+**状态**：已完成（2026-07-01）。
+
+**目标**：按 `docs/EXAMPLE_AGENT_PLAN.md` 执行 E14，从真实使用者角度审查 Upload / Signature 的 React/Vue Example 体验、可复制性、交互证据和后续优化建议。
+
+**允许修改**：`docs/EXAMPLE_AGENT_PLAN.md`、`docs/ROADMAP.md`、`docs/V2_COMPLETED.md`。
+
+**不得修改**：组件源码、Example 实现、generated Skill references、public API、API baseline、发布配置。
+
+**执行摘要**：已启动 Vue Example `http://localhost:5173/` 与 React Example `http://localhost:5174/`，读取 Form generated refs、React/Vue E14 页面源码、router 配置，以及 Upload / Signature 的 core types、utils 与 React/Vue 组件源码事实源。已用浏览器访问 React/Vue 的 `#/upload`、`#/signature`；桌面 `1280x720` 下确认 Upload 8 个 section、Signature 3 个 section、目标 `h1`、可见按钮/画布/file input 状态与控制台错误；移动 `390x844` 下确认四个 route 无页面级横向溢出。交互复查用 Playwright/Chromium 在同一 dev server 上完成文件选择/移除、数量限制、accept / beforeUpload 拒绝、图片卡片预览/移除按钮、自定义上传、Signature 绘制/清空/PNG 导出/SVG 导出和 disabled/readonly 状态检查。
+
+**审查结论**：
+
+- E14 未发现 route-level P0 阻断问题；React/Vue `#/upload` 与 `#/signature` 均可打开，核心交互可完成，结构与行为基本对齐。
+- Upload “文件数量限制”示例一次选择 4 个文件时实际保留 3 个，但 React/Vue 都弹出“最多只能上传 0 个文件！”，建议作为 P1 Example 修复。
+- Upload 校验拒绝路径没有页面内错误反馈，customRequest 示例也没有把进度/成功/失败状态可视化，建议优先改 Example。
+- Signature 基础示例已传中文 `ariaLabel` / `clearText`，但导出、禁用和只读示例仍暴露英文 `Signature pad` / `Clear`，建议统一中文化。
+- Signature 示例覆盖偏薄，可后续补 `clearable=false`、`backgroundColor`、`quality` 和移动端固定尺寸说明。
+
+**实际验证**：
+
+- Browser desktop review：React/Vue `#/upload`、`#/signature` at `1280x720`。
+- Browser mobile review：React/Vue `#/upload`、`#/signature` at `390x844`。
+- Browser interactions：Upload setInputFiles/remove/limit/accept/beforeUpload/picture-card/customRequest; Signature canvas draw/clear/export PNG/export SVG/disabled readonly state.
+- `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+- `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_AGENT_PLAN.md docs/V2_COMPLETED.md`
+
+**剩余阻塞**：无；E13 仍未开始，E15-E21 仍未开始。
+
+**状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E14 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 保持 `进行中`，当前最早未完成分组为 E13；R28 E14 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
