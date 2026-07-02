@@ -43,7 +43,7 @@ const expectedSizeLimitEntries = [
   ['Vue TimePicker subpath', 'packages/vue/dist/components/TimePicker.mjs', '31 kB'],
   ['React TimePicker subpath', 'packages/react/dist/components/TimePicker.mjs', '25 kB'],
   ['Core tailwind/modern subpath', 'packages/core/dist/tailwind/modern.js', '3 kB'],
-  ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js', '3 kB'],
+  ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js', '4 kB'],
   ['Core icons (common) subpath', 'packages/core/dist/icons/common.js', '1 kB']
 ]
 

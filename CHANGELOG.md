@@ -2,6 +2,21 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.0.0-preview.3
+
+v2.0.0 preview 3 延续 v2.0.0 预览发布面，在 preview.2 之后合入 DatePicker locale 文案回退修复，以及 release 门禁维护更新。
+
+### Bug Fixes
+
+- **core DatePicker i18n**：`getDatePickerLabelsFromLocale(locale, overrides)` 现以 en-US 文案为基线合并，locale preset 缺失的键回退到 en-US，而非产生 `undefined`。
+
+### Infrastructure
+
+- root 与 `@expcat/tigercat-core`、`@expcat/tigercat-react`、`@expcat/tigercat-vue`、`@expcat/tigercat-cli` 统一为 `2.0.0-preview.3`。
+- 同步 core / React / Vue 运行时 `version` 导出、CLI `CLI_VERSION`、CLI 模板中的 Tigercat 依赖范围，以及示例首页展示版本。
+- 移除 `FormItemContext` 未使用的 React 默认导入以通过 lint 门禁；将 `Core locale (zh-CN)` size 预算从 3 kB 提升至 4 kB 以容纳持续扩充的 i18n 文案。
+- 迁移和破坏性变更内容沿用当前 v2.0.0 预览阶段条目；正式 v2.0.0 发布前继续在 `docs/MIGRATION.md` 与本文件集中更新。
+
 ## v2.0.0-preview.2
 
 v2.0.0 preview 2 延续 v2.0.0 预览发布面，用于验证 preview.1 之后已合入的示例、测试和文档收口提交。

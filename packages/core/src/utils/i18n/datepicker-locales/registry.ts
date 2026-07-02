@@ -52,7 +52,8 @@ export function getDatePickerLabelsFromLocale(
   overrides?: Partial<DatePickerLabels>
 ): DatePickerLabels {
   return {
-    ...(getDatePickerLocalePreset(locale)?.labels ?? EN_US_DATEPICKER_LOCALE.labels),
+    ...(EN_US_DATEPICKER_LOCALE.labels as DatePickerLabels),
+    ...(getDatePickerLocalePreset(locale)?.labels ?? {}),
     ...(overrides ?? {})
   }
 }
