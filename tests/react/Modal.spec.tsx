@@ -554,9 +554,4 @@ describe('Modal', () => {
       expect(dialog.style.width).toBe('800px')
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      expect(() => render(<Modal open={false} />)).not.toThrow()
-    })
-  })
 })

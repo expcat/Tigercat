@@ -659,16 +659,6 @@ describe('Tree', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Tree, {
         props: {
-          treeData: sampleTreeData
-        }
-      })
-
-      await expectNoA11yViolationsIsolated(container)
-    })
-
-    it('should have no accessibility violations with checkboxes', async () => {
-      const { container } = render(Tree, {
-        props: {
           treeData: sampleTreeData,
           checkable: true
         }

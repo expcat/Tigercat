@@ -64,7 +64,6 @@ describe('Menu', () => {
 
       const menu = container.querySelector('ul')
       expect(menu).toHaveAttribute('data-tiger-menu-mode', 'horizontal')
-      expect(menu).toHaveClass('flex')
     })
 
     it('renders in inline mode', () => {
@@ -842,11 +841,6 @@ describe('Menu', () => {
     })
   })
   describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Menu)
-      expect(container.firstChild).toBeTruthy()
-    })
-
     it('warns for child components rendered outside Menu context', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 

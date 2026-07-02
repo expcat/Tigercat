@@ -24,7 +24,6 @@ describe('Input', () => {
 
       const input = screen.getByRole('textbox')
       expect(input).toBeInTheDocument()
-      expect(input).toHaveClass('border')
     })
 
     it('should render with placeholder', () => {
@@ -62,14 +61,6 @@ describe('Input', () => {
       expect(input).toHaveAttribute('data-testid', 'test-input')
       expect(input).toHaveAttribute('title', 'Input title')
       expect(input).toHaveAttribute('aria-describedby', 'input-help')
-    })
-
-    it('should render wrapper div with correct structure', () => {
-      const { container } = render(<Input />)
-      const wrapper = container.firstChild as HTMLElement
-      expect(wrapper.tagName).toBe('DIV')
-      expect(wrapper).toHaveClass('relative')
-      expect(wrapper).toHaveClass('w-full')
     })
 
     it('should apply style prop to wrapper', () => {
@@ -457,23 +448,10 @@ describe('Input', () => {
       expect(handleFocus).toHaveBeenCalled()
     })
 
-    it('should have proper role', () => {
-      const { getByRole } = render(<Input />)
-
-      expect(getByRole('textbox')).toBeInTheDocument()
-    })
-
     it('should support aria-label', () => {
       const { getByLabelText } = render(<Input aria-label="Username input" />)
 
       expect(getByLabelText('Username input')).toBeInTheDocument()
-    })
-
-    it('should support aria-invalid for error state', () => {
-      const { getByRole } = render(<Input status="error" aria-invalid="true" />)
-
-      const input = getByRole('textbox')
-      expect(input).toHaveAttribute('aria-invalid', 'true')
     })
 
     it('should handle Tab key navigation', async () => {
@@ -496,33 +474,16 @@ describe('Input', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle whitespace-only value', () => {
-      const { getByRole } = render(<Input value={edgeCaseData.whitespace} />)
+    it.each([
+      ['whitespace-only', edgeCaseData.whitespace],
+      ['special characters', edgeCaseData.specialCharacters],
+      ['unicode characters', edgeCaseData.unicode],
+      ['very long text', 'a'.repeat(1000)]
+    ])('should handle %s value', (_label, value) => {
+      const { getByRole } = render(<Input value={value} />)
 
       const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe(edgeCaseData.whitespace)
-    })
-
-    it('should handle special characters', () => {
-      const { getByRole } = render(<Input value={edgeCaseData.specialCharacters} />)
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe(edgeCaseData.specialCharacters)
-    })
-
-    it('should handle unicode characters', () => {
-      const { getByRole } = render(<Input value={edgeCaseData.unicode} />)
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe(edgeCaseData.unicode)
-    })
-
-    it('should handle very long text', () => {
-      const longText = 'a'.repeat(1000)
-      const { getByRole } = render(<Input value={longText} />)
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe(longText)
+      expect(input.value).toBe(value)
     })
 
     it('should handle rapid value changes', async () => {

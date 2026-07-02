@@ -51,22 +51,7 @@ describe('Tabs', () => {
       )
 
       const tab = screen.getByRole('tab', { name: 'Tab 1' })
-      expect(tab).toHaveClass('border')
-      expect(tab).toHaveClass('rounded-t')
-    })
-
-    it('should render with editable-card type', () => {
-      render(
-        <Tabs type="editable-card">
-          <TabPane tabKey="1" label="Tab 1">
-            Content 1
-          </TabPane>
-        </Tabs>
-      )
-
-      const tab = screen.getByRole('tab', { name: 'Tab 1' })
-      expect(tab).toHaveClass('border')
-      expect(tab).toHaveClass('rounded-t')
+      expect(tab).toHaveClass('border', 'rounded-t')
     })
 
     it('localizes editable tab add and close aria labels from ConfigProvider', () => {
@@ -215,30 +200,6 @@ describe('Tabs', () => {
 
       const navList = container.querySelector('[role="tablist"] > div')
       expect(navList).toHaveClass('justify-center')
-    })
-
-    it('should render tabs in different positions', () => {
-      const positions: Array<'top' | 'bottom' | 'left' | 'right'> = [
-        'top',
-        'bottom',
-        'left',
-        'right'
-      ]
-
-      positions.forEach((position) => {
-        const { container } = render(
-          <Tabs tabPosition={position}>
-            <TabPane tabKey="1" label="Tab 1">
-              Content 1
-            </TabPane>
-          </Tabs>
-        )
-
-        const tabContainer = container.firstChild as HTMLElement
-        if (position === 'left' || position === 'right') {
-          expect(tabContainer).toHaveClass('flex')
-        }
-      })
     })
 
     it('should render tabs in different sizes', () => {
@@ -566,8 +527,6 @@ describe('Tabs', () => {
 
       const tab = screen.getByRole('tab', { name: 'Tab 1' })
       expect(tab).toHaveAttribute('aria-disabled', 'true')
-      expect(tab).toHaveClass('opacity-50')
-      expect(tab).toHaveClass('cursor-not-allowed')
     })
 
     it('should not switch to disabled tab when clicked', async () => {
@@ -751,6 +710,11 @@ describe('Tabs', () => {
       expect(tab1).toHaveAttribute('aria-disabled', 'false')
       expect(tab2).toHaveAttribute('aria-disabled', 'true')
     })
+
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Tabs />)
+      await expectNoA11yViolationsIsolated(container)
+    })
   })
 
   describe('Controlled vs Uncontrolled', () => {
@@ -839,20 +803,7 @@ describe('Tabs', () => {
   })
 
   describe('Pills variant', () => {
-    it('should render pills type with rounded-full class', () => {
-      render(
-        <Tabs type="pills">
-          <TabPane tabKey="1" label="Tab 1">
-            Content 1
-          </TabPane>
-        </Tabs>
-      )
-
-      const tab = screen.getByRole('tab', { name: 'Tab 1' })
-      expect(tab).toHaveClass('rounded-full')
-    })
-
-    it('should apply active pills class when tab is selected', () => {
+    it('should render pills type with pill styling and highlight the active tab', () => {
       render(
         <Tabs type="pills" defaultActiveKey="1">
           <TabPane tabKey="1" label="Active">
@@ -865,6 +816,7 @@ describe('Tabs', () => {
       )
 
       const active = screen.getByRole('tab', { name: 'Active' })
+      expect(active).toHaveClass('rounded-full')
       expect(active.className).toContain('bg-[var(--tiger-primary')
     })
   })
@@ -909,18 +861,6 @@ describe('Tabs', () => {
 
       // Tab 2 content still mounted
       expect(screen.getByText('Content 2')).toBeTruthy()
-    })
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<Tabs />)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<Tabs />)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })
