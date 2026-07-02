@@ -8,281 +8,186 @@ import { InputNumber } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('InputNumber (Vue)', () => {
-  it('renders with default props', () => {
-    const { container } = render(InputNumber)
-    const input = container.querySelector('input') as HTMLInputElement
-    expect(input).toBeTruthy()
-    expect(input.getAttribute('role')).toBe('spinbutton')
-    expect(input.getAttribute('inputmode')).toBe('decimal')
-  })
+  const getInput = (container: HTMLElement) => container.querySelector('input') as HTMLInputElement
 
-  it('renders with initial modelValue', () => {
-    const { container } = render(InputNumber, {
-      props: { modelValue: 42 }
-    })
-    const input = container.querySelector('input') as HTMLInputElement
-    expect(input.value).toBe('42')
-  })
-
-  it('renders placeholder', () => {
-    const { container } = render(InputNumber, {
-      props: { placeholder: 'Enter number' }
-    })
-    const input = container.querySelector('input') as HTMLInputElement
-    expect(input.getAttribute('placeholder')).toBe('Enter number')
-  })
-
-  it('renders disabled state', () => {
-    const { container } = render(InputNumber, {
-      props: { disabled: true, modelValue: 5 }
-    })
-    const input = container.querySelector('input') as HTMLInputElement
-    expect(input.disabled).toBe(true)
-  })
-
-  it('renders readonly state', () => {
-    const { container } = render(InputNumber, {
-      props: { readonly: true, modelValue: 5 }
-    })
-    const input = container.querySelector('input') as HTMLInputElement
-    expect(input.readOnly).toBe(true)
-  })
-
-  it('shows increase/decrease buttons by default', () => {
-    render(InputNumber, { props: { modelValue: 5 } })
-    expect(screen.getByLabelText('Increase')).toBeInTheDocument()
-    expect(screen.getByLabelText('Decrease')).toBeInTheDocument()
-  })
-
-  it('hides controls when controls=false', () => {
-    render(InputNumber, { props: { modelValue: 5, controls: false } })
-    expect(screen.queryByLabelText('Increase')).toBeNull()
-    expect(screen.queryByLabelText('Decrease')).toBeNull()
-  })
-
-  it('emits update:modelValue on Increase click', async () => {
-    const { emitted } = render(InputNumber, {
-      props: { modelValue: 5 }
+  describe('Rendering', () => {
+    it('renders a decimal spinbutton by default', () => {
+      const { container } = render(InputNumber)
+      const input = getInput(container)
+      expect(input.getAttribute('role')).toBe('spinbutton')
+      expect(input.getAttribute('inputmode')).toBe('decimal')
     })
 
-    await fireEvent.click(screen.getByLabelText('Increase'))
-    expect(emitted()['update:modelValue']).toBeTruthy()
-    expect(emitted()['update:modelValue'][0]).toEqual([6])
-  })
-
-  it('emits update:modelValue on Decrease click', async () => {
-    const { emitted } = render(InputNumber, {
-      props: { modelValue: 5 }
+    it('reflects the initial modelValue', () => {
+      const { container } = render(InputNumber, { props: { modelValue: 42 } })
+      expect(getInput(container).value).toBe('42')
     })
 
-    await fireEvent.click(screen.getByLabelText('Decrease'))
-    expect(emitted()['update:modelValue']).toBeTruthy()
-    expect(emitted()['update:modelValue'][0]).toEqual([4])
-  })
-
-  it('respects min boundary', async () => {
-    const { emitted } = render(InputNumber, {
-      props: { modelValue: 1, min: 0 }
+    it('renders the placeholder', () => {
+      const { container } = render(InputNumber, { props: { placeholder: 'Enter number' } })
+      expect(getInput(container).getAttribute('placeholder')).toBe('Enter number')
     })
 
-    await fireEvent.click(screen.getByLabelText('Decrease'))
-    expect(emitted()['update:modelValue'][0]).toEqual([0])
-  })
-
-  it('respects max boundary', async () => {
-    const { emitted } = render(InputNumber, {
-      props: { modelValue: 9, max: 10 }
+    it('renders disabled and readonly states', () => {
+      const { container: disabled } = render(InputNumber, { props: { disabled: true, modelValue: 5 } })
+      expect(getInput(disabled).disabled).toBe(true)
+      const { container: readonly } = render(InputNumber, { props: { readonly: true, modelValue: 5 } })
+      expect(getInput(readonly).readOnly).toBe(true)
     })
 
-    await fireEvent.click(screen.getByLabelText('Increase'))
-    expect(emitted()['update:modelValue'][0]).toEqual([10])
-  })
-
-  it('respects step value', async () => {
-    const { emitted } = render(InputNumber, {
-      props: { modelValue: 0, step: 5 }
+    it('shows the step controls by default and hides them when controls=false', async () => {
+      const { rerender } = render(InputNumber, { props: { modelValue: 5 } })
+      expect(screen.getByLabelText('Increase')).toBeInTheDocument()
+      expect(screen.getByLabelText('Decrease')).toBeInTheDocument()
+      await rerender({ modelValue: 5, controls: false })
+      expect(screen.queryByLabelText('Increase')).toBeNull()
     })
 
-    await fireEvent.click(screen.getByLabelText('Increase'))
-    expect(emitted()['update:modelValue'][0]).toEqual([5])
-  })
-
-  it('respects precision', async () => {
-    const { emitted } = render(InputNumber, {
-      props: { modelValue: 1, step: 0.1, precision: 2 }
-    })
-
-    await fireEvent.click(screen.getByLabelText('Increase'))
-    expect(emitted()['update:modelValue'][0]).toEqual([1.1])
-  })
-
-  it('repeats increment while the Increase button is held', async () => {
-    vi.useFakeTimers()
-    try {
-      const { emitted } = render(InputNumber, {
-        props: { modelValue: 0 }
+    it('formats the display value with precision and via formatter', () => {
+      const { container: withPrecision } = render(InputNumber, {
+        props: { modelValue: 3.1, precision: 2 }
       })
-      const increase = screen.getByLabelText('Increase')
-
-      await fireEvent.pointerDown(increase)
-      expect(emitted()['update:modelValue'][0]).toEqual([1])
-
-      vi.advanceTimersByTime(450)
-      expect(emitted()['update:modelValue'].map(([value]) => value)).toEqual([1, 2, 3])
-
-      await fireEvent.pointerUp(increase)
-      vi.advanceTimersByTime(200)
-      expect(emitted()['update:modelValue'].map(([value]) => value)).toEqual([1, 2, 3])
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
-  it('formats display value with precision', () => {
-    const { container } = render(InputNumber, {
-      props: { modelValue: 3.1, precision: 2 }
+      expect(getInput(withPrecision).value).toBe('3.10')
+      const formatter = (val: number | undefined) => (val !== undefined ? `$ ${val}` : '')
+      const parser = (str: string) => Number(str.replace(/\$\s?/g, ''))
+      const { container } = render(InputNumber, {
+        props: { modelValue: 1000, formatter, parser }
+      })
+      expect(getInput(container).value).toBe('$ 1000')
     })
-    const input = container.querySelector('input') as HTMLInputElement
-    expect(input.value).toBe('3.10')
   })
 
-  it('supports keyboard ArrowUp', async () => {
-    const { container, emitted } = render(InputNumber, {
-      props: { modelValue: 5 }
+  describe('Stepping', () => {
+    it.each([
+      ['Increase', 6],
+      ['Decrease', 4]
+    ])('%s emits the value changed by one', async (label, expected) => {
+      const { emitted } = render(InputNumber, { props: { modelValue: 5 } })
+      await fireEvent.click(screen.getByLabelText(label))
+      expect(emitted()['update:modelValue'][0]).toEqual([expected])
     })
-    const input = container.querySelector('input') as HTMLInputElement
 
-    await fireEvent.keyDown(input, { key: 'ArrowUp' })
-    expect(emitted()['update:modelValue'][0]).toEqual([6])
-  })
+    it('honors a custom step and precision', async () => {
+      const step = render(InputNumber, { props: { modelValue: 0, step: 5 } })
+      await fireEvent.click(screen.getByLabelText('Increase'))
+      expect(step.emitted()['update:modelValue'][0]).toEqual([5])
 
-  it('supports keyboard ArrowDown', async () => {
-    const { container, emitted } = render(InputNumber, {
-      props: { modelValue: 5 }
+      const precision = render(InputNumber, { props: { modelValue: 1, step: 0.1, precision: 2 } })
+      await fireEvent.click(screen.getAllByLabelText('Increase')[1])
+      expect(precision.emitted()['update:modelValue'][0]).toEqual([1.1])
     })
-    const input = container.querySelector('input') as HTMLInputElement
 
-    await fireEvent.keyDown(input, { key: 'ArrowDown' })
-    expect(emitted()['update:modelValue'][0]).toEqual([4])
-  })
-
-  it('disables keyboard when keyboard=false', async () => {
-    const { container, emitted } = render(InputNumber, {
-      props: { modelValue: 5, keyboard: false }
+    it.each([
+      ['Decrease', 1, { min: 0 }, 0],
+      ['Increase', 9, { max: 10 }, 10]
+    ])('%s clamps at the boundary', async (label, start, bounds, expected) => {
+      const { emitted } = render(InputNumber, { props: { modelValue: start, ...bounds } })
+      await fireEvent.click(screen.getByLabelText(label))
+      expect(emitted()['update:modelValue'][0]).toEqual([expected])
     })
-    const input = container.querySelector('input') as HTMLInputElement
 
-    await fireEvent.keyDown(input, { key: 'ArrowUp' })
-    expect(emitted()['update:modelValue']).toBeFalsy()
-  })
-
-  it('commits value on blur', async () => {
-    const { container, emitted } = render(InputNumber, {
-      props: { modelValue: 5 }
+    it.each([
+      ['Decrease', { modelValue: 0, min: 0 }],
+      ['Increase', { modelValue: 10, max: 10 }]
+    ])('disables the %s button at the boundary', (label, props) => {
+      render(InputNumber, { props })
+      expect((screen.getByLabelText(label) as HTMLButtonElement).disabled).toBe(true)
     })
-    const input = container.querySelector('input') as HTMLInputElement
 
-    // Simulate focus, type new value, then blur
-    await fireEvent.focus(input)
-    // Directly set the display value
-    await fireEvent.update(input, '42')
-    await fireEvent.blur(input)
-    expect(emitted()['update:modelValue']).toBeTruthy()
-    expect(emitted()['update:modelValue'][0]).toEqual([42])
-  })
-
-  it('clamps value on blur', async () => {
-    const { container, emitted } = render(InputNumber, {
-      props: { modelValue: 5, min: 0, max: 10 }
+    it('repeats increment while the Increase button is held', async () => {
+      vi.useFakeTimers()
+      try {
+        const { emitted } = render(InputNumber, { props: { modelValue: 0 } })
+        const increase = screen.getByLabelText('Increase')
+        await fireEvent.pointerDown(increase)
+        expect(emitted()['update:modelValue'][0]).toEqual([1])
+        vi.advanceTimersByTime(450)
+        expect(emitted()['update:modelValue'].map(([value]) => value)).toEqual([1, 2, 3])
+        await fireEvent.pointerUp(increase)
+        vi.advanceTimersByTime(200)
+        expect(emitted()['update:modelValue'].map(([value]) => value)).toEqual([1, 2, 3])
+      } finally {
+        vi.useRealTimers()
+      }
     })
-    const input = container.querySelector('input') as HTMLInputElement
-
-    await fireEvent.focus(input)
-    await fireEvent.update(input, '999')
-    await fireEvent.blur(input)
-    expect(emitted()['update:modelValue'][0]).toEqual([10])
   })
 
-  it('handles empty input as null on blur', async () => {
-    const { container, emitted } = render(InputNumber, {
-      props: { modelValue: 5 }
+  describe('Keyboard', () => {
+    it.each([
+      ['ArrowUp', 6],
+      ['ArrowDown', 4]
+    ])('%s adjusts the value', async (key, expected) => {
+      const { container, emitted } = render(InputNumber, { props: { modelValue: 5 } })
+      await fireEvent.keyDown(getInput(container), { key })
+      expect(emitted()['update:modelValue'][0]).toEqual([expected])
     })
-    const input = container.querySelector('input') as HTMLInputElement
 
-    await fireEvent.focus(input)
-    await fireEvent.update(input, '')
-    await fireEvent.blur(input)
-    expect(emitted()['update:modelValue'][0]).toEqual([null])
-  })
-
-  it('supports formatter/parser', () => {
-    const formatter = (val: number | undefined) => (val !== undefined ? `$ ${val}` : '')
-    const parser = (str: string) => Number(str.replace(/\$\s?/g, ''))
-
-    const { container } = render(InputNumber, {
-      props: { modelValue: 1000, formatter, parser }
+    it('ignores the keyboard when keyboard=false', async () => {
+      const { container, emitted } = render(InputNumber, {
+        props: { modelValue: 5, keyboard: false }
+      })
+      await fireEvent.keyDown(getInput(container), { key: 'ArrowUp' })
+      expect(emitted()['update:modelValue']).toBeFalsy()
     })
-    const input = container.querySelector('input') as HTMLInputElement
-    expect(input.value).toBe('$ 1000')
   })
 
-  it('renders controlsPosition=both', () => {
-    render(InputNumber, { props: { modelValue: 5, controlsPosition: 'both' } })
-    expect(screen.getByLabelText('Increase')).toBeInTheDocument()
-    expect(screen.getByLabelText('Decrease')).toBeInTheDocument()
-  })
-
-  it('disables Increase button at max', () => {
-    render(InputNumber, { props: { modelValue: 10, max: 10 } })
-    const btn = screen.getByLabelText('Increase')
-    expect((btn as HTMLButtonElement).disabled).toBe(true)
-  })
-
-  it('disables Decrease button at min', () => {
-    render(InputNumber, { props: { modelValue: 0, min: 0 } })
-    const btn = screen.getByLabelText('Decrease')
-    expect((btn as HTMLButtonElement).disabled).toBe(true)
-  })
-
-  it('sets aria-valuemin and aria-valuemax', () => {
-    const { container } = render(InputNumber, {
-      props: { modelValue: 5, min: 0, max: 100 }
+  describe('Committing on blur', () => {
+    it('commits the typed value on blur', async () => {
+      const { container, emitted } = render(InputNumber, { props: { modelValue: 5 } })
+      const input = getInput(container)
+      await fireEvent.focus(input)
+      await fireEvent.update(input, '42')
+      await fireEvent.blur(input)
+      expect(emitted()['update:modelValue'][0]).toEqual([42])
     })
-    const input = container.querySelector('input') as HTMLInputElement
-    expect(input.getAttribute('aria-valuemin')).toBe('0')
-    expect(input.getAttribute('aria-valuemax')).toBe('100')
-    expect(input.getAttribute('aria-valuenow')).toBe('5')
-  })
 
-  it('does not set aria-valuemin/max for infinite bounds', () => {
-    const { container } = render(InputNumber, {
-      props: { modelValue: 5 }
+    it('clamps out-of-range input on blur', async () => {
+      const { container, emitted } = render(InputNumber, {
+        props: { modelValue: 5, min: 0, max: 10 }
+      })
+      const input = getInput(container)
+      await fireEvent.focus(input)
+      await fireEvent.update(input, '999')
+      await fireEvent.blur(input)
+      expect(emitted()['update:modelValue'][0]).toEqual([10])
     })
-    const input = container.querySelector('input') as HTMLInputElement
-    expect(input.hasAttribute('aria-valuemin')).toBe(false)
-    expect(input.hasAttribute('aria-valuemax')).toBe(false)
+
+    it('treats empty input as null on blur', async () => {
+      const { container, emitted } = render(InputNumber, { props: { modelValue: 5 } })
+      const input = getInput(container)
+      await fireEvent.focus(input)
+      await fireEvent.update(input, '')
+      await fireEvent.blur(input)
+      expect(emitted()['update:modelValue'][0]).toEqual([null])
+    })
   })
 
-  it('emits focus and blur events', async () => {
-    const { container, emitted } = render(InputNumber)
-    const input = container.querySelector('input') as HTMLInputElement
-
-    await fireEvent.focus(input)
-    expect(emitted()['focus']).toBeTruthy()
-
-    await fireEvent.blur(input)
-    expect(emitted()['blur']).toBeTruthy()
-  })
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
+    it('exposes aria value bounds only when finite', () => {
+      const { container: bounded } = render(InputNumber, {
+        props: { modelValue: 5, min: 0, max: 100 }
+      })
+      const boundedInput = getInput(bounded)
+      expect(boundedInput.getAttribute('aria-valuemin')).toBe('0')
+      expect(boundedInput.getAttribute('aria-valuemax')).toBe('100')
+      expect(boundedInput.getAttribute('aria-valuenow')).toBe('5')
+
+      const { container: infinite } = render(InputNumber, { props: { modelValue: 5 } })
+      expect(getInput(infinite).hasAttribute('aria-valuemin')).toBe(false)
+    })
+
+    it('emits focus and blur events', async () => {
+      const { container, emitted } = render(InputNumber)
+      const input = getInput(container)
+      await fireEvent.focus(input)
+      expect(emitted()['focus']).toBeTruthy()
+      await fireEvent.blur(input)
+      expect(emitted()['blur']).toBeTruthy()
+    })
+
+    it('has no accessibility violations', async () => {
       const { container } = render(InputNumber)
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(InputNumber)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })
