@@ -98,23 +98,23 @@ export default function LoadingDemo() {
               <div className="grid grid-cols-5 gap-8">
                 <div className="flex flex-col items-center gap-2">
                   <Loading variant="spinner" />
-                  <span className="text-sm text-gray-600">Spinner</span>
+                  <span className="text-sm text-gray-600">旋转</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading variant="ring" />
-                  <span className="text-sm text-gray-600">Ring</span>
+                  <span className="text-sm text-gray-600">环形</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading variant="dots" />
-                  <span className="text-sm text-gray-600">Dots</span>
+                  <span className="text-sm text-gray-600">圆点</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading variant="bars" />
-                  <span className="text-sm text-gray-600">Bars</span>
+                  <span className="text-sm text-gray-600">条形</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading variant="pulse" />
-                  <span className="text-sm text-gray-600">Pulse</span>
+                  <span className="text-sm text-gray-600">脉冲</span>
                 </div>
               </div>
             </div>
@@ -125,19 +125,19 @@ export default function LoadingDemo() {
               <div className="flex gap-8 items-center justify-center">
                 <div className="flex flex-col items-center gap-2">
                   <Loading size="sm" />
-                  <span className="text-sm text-gray-600">Small</span>
+                  <span className="text-sm text-gray-600">小</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading size="md" />
-                  <span className="text-sm text-gray-600">Medium</span>
+                  <span className="text-sm text-gray-600">中</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading size="lg" />
-                  <span className="text-sm text-gray-600">Large</span>
+                  <span className="text-sm text-gray-600">大</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading size="xl" />
-                  <span className="text-sm text-gray-600">Extra Large</span>
+                  <span className="text-sm text-gray-600">超大</span>
                 </div>
               </div>
             </div>
@@ -148,35 +148,35 @@ export default function LoadingDemo() {
               <div className="grid grid-cols-4 gap-6">
                 <div className="flex flex-col items-center gap-2">
                   <Loading color="primary" />
-                  <span className="text-sm text-gray-600">Primary</span>
+                  <span className="text-sm text-gray-600">主要色</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading color="secondary" />
-                  <span className="text-sm text-gray-600">Secondary</span>
+                  <span className="text-sm text-gray-600">次要色</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading color="success" />
-                  <span className="text-sm text-gray-600">Success</span>
+                  <span className="text-sm text-gray-600">成功色</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading color="warning" />
-                  <span className="text-sm text-gray-600">Warning</span>
+                  <span className="text-sm text-gray-600">警告色</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading color="danger" />
-                  <span className="text-sm text-gray-600">Danger</span>
+                  <span className="text-sm text-gray-600">危险色</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading color="info" />
-                  <span className="text-sm text-gray-600">Info</span>
+                  <span className="text-sm text-gray-600">信息色</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading color="default" />
-                  <span className="text-sm text-gray-600">Default</span>
+                  <span className="text-sm text-gray-600">默认色</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <Loading customColor="#ff6b6b" />
-                  <span className="text-sm text-gray-600">Custom</span>
+                  <span className="text-sm text-gray-600">自定义色</span>
                 </div>
               </div>
             </div>

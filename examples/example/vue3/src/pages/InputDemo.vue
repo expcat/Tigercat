@@ -299,22 +299,60 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
         <div class="grid gap-4 md:grid-cols-2">
           <FormItem label="基础 / 范围 / 精度">
             <Space direction="vertical" class="w-full">
-              <InputNumber v-model="numValue" />
-              <InputNumber v-model="numValue" :min="0" :max="100" :step="5" />
-              <InputNumber v-model="numValue" :precision="2" :step="0.1" />
+              <InputNumber
+                v-model="numValue"
+                increment-aria-label="增加数值"
+                decrement-aria-label="减少数值" />
+              <InputNumber
+                v-model="numValue"
+                :min="0"
+                :max="100"
+                :step="5"
+                increment-aria-label="增加数值"
+                decrement-aria-label="减少数值" />
+              <InputNumber
+                v-model="numValue"
+                :precision="2"
+                :step="0.1"
+                increment-aria-label="增加数值"
+                decrement-aria-label="减少数值" />
             </Space>
           </FormItem>
           <FormItem label="尺寸与状态">
             <Space direction="vertical" class="w-full">
               <Space>
-                <InputNumber v-model="numValue" size="sm" />
-                <InputNumber v-model="numValue" size="md" />
-                <InputNumber v-model="numValue" size="lg" />
+                <InputNumber
+                  v-model="numValue"
+                  size="sm"
+                  increment-aria-label="增加数值"
+                  decrement-aria-label="减少数值" />
+                <InputNumber
+                  v-model="numValue"
+                  size="md"
+                  increment-aria-label="增加数值"
+                  decrement-aria-label="减少数值" />
+                <InputNumber
+                  v-model="numValue"
+                  size="lg"
+                  increment-aria-label="增加数值"
+                  decrement-aria-label="减少数值" />
               </Space>
               <Space>
-                <InputNumber :model-value="5" disabled />
-                <InputNumber :model-value="5" readonly />
-                <InputNumber v-model="numValue" status="error" />
+                <InputNumber
+                  :model-value="5"
+                  disabled
+                  increment-aria-label="增加数值"
+                  decrement-aria-label="减少数值" />
+                <InputNumber
+                  :model-value="5"
+                  readonly
+                  increment-aria-label="增加数值"
+                  decrement-aria-label="减少数值" />
+                <InputNumber
+                  v-model="numValue"
+                  status="error"
+                  increment-aria-label="增加数值"
+                  decrement-aria-label="减少数值" />
               </Space>
             </Space>
           </FormItem>
@@ -322,8 +360,15 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
         <div class="grid gap-4 md:grid-cols-2">
           <FormItem label="步进按钮">
             <Space direction="vertical" class="w-full">
-              <InputNumber v-model="numValue" />
-              <InputNumber v-model="numValue" controls-position="both" />
+              <InputNumber
+                v-model="numValue"
+                increment-aria-label="增加数值"
+                decrement-aria-label="减少数值" />
+              <InputNumber
+                v-model="numValue"
+                controls-position="both"
+                increment-aria-label="增加数值"
+                decrement-aria-label="减少数值" />
               <InputNumber v-model="numValue" :controls="false" />
             </Space>
           </FormItem>
@@ -331,7 +376,9 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
             <InputNumber
               v-model="numFormatted"
               :formatter="(v) => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-              :parser="(v) => Number(v.replace(/\$\s?|(,*)/g, ''))" />
+              :parser="(v) => Number(v.replace(/\$\s?|(,*)/g, ''))"
+              increment-aria-label="增加数值"
+              decrement-aria-label="减少数值" />
           </FormItem>
         </div>
       </Space>

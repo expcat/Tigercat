@@ -167,7 +167,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Avatar shape="square" text="Item" />
         <div class="flex-1">
           <h4 class="font-semibold mb-1">Item {{ i }}</h4>
-          <p class="text-sm text-gray-600">This is the content loaded after the skeleton.</p>
+          <p class="text-sm text-gray-600">骨架屏结束后显示的内容。</p>
         </div>
       </div>
     </Card>
@@ -380,10 +380,10 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <template v-else>
           <Card v-for="i in 4" :key="i">
             <div class="flex items-start gap-4">
-              <Avatar shape="square" text="Item" />
+              <Avatar shape="square" text="项" />
               <div class="flex-1">
-                <h4 class="font-semibold mb-1">Item {{ i }}</h4>
-                <p class="text-sm text-gray-600">This is the content loaded after the skeleton.</p>
+                <h4 class="font-semibold mb-1">内容项 {{ i }}</h4>
+                <p class="text-sm text-gray-600">这是骨架屏加载完成后显示的内容。</p>
               </div>
             </div>
           </Card>

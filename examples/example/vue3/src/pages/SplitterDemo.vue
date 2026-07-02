@@ -4,8 +4,8 @@ import DemoBlock from '../components/DemoBlock.vue'
 import fullPageSnippet from './SplitterDemo.vue?raw'
 
 const horizontalSnippet = `<Splitter direction="horizontal" :sizes="[30, 70]" style="height: 200px; border: 1px solid #e5e7eb; border-radius: 8px;">
-  <div class="p-4">左侧面板 (30%)</div>
-  <div class="p-4">右侧面板 (70%)</div>
+  <div class="p-4">左侧面板 (30px)</div>
+  <div class="p-4">右侧面板 (70px)</div>
 </Splitter>`
 
 const verticalSnippet = `<Splitter direction="vertical" :sizes="[40, 60]" style="height: 300px; border: 1px solid #e5e7eb; border-radius: 8px;">
@@ -37,8 +37,8 @@ const minSnippet = `<Splitter direction="horizontal" :sizes="[30, 70]" :min="100
         direction="horizontal"
         :sizes="[30, 70]"
         style="height: 200px; border: 1px solid #e5e7eb; border-radius: 8px">
-        <div class="p-4">左侧面板 (30%)</div>
-        <div class="p-4">右侧面板 (70%)</div>
+        <div class="p-4">左侧面板 (30px)</div>
+        <div class="p-4">右侧面板 (70px)</div>
       </Splitter>
     </DemoBlock>
 

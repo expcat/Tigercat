@@ -147,6 +147,11 @@ const inputNumberControlsSnippet = `<Space direction="vertical" className="w-ful
   </FormItem>
 </Space>`
 
+const inputNumberA11y = {
+  incrementAriaLabel: '增加数值',
+  decrementAriaLabel: '减少数值'
+}
+
 const inputNumberScriptSnippet = `import { useState } from 'react'
 
 const [numValue, setNumValue] = useState<number | null>(0)
@@ -326,22 +331,55 @@ const InputDemo: React.FC = () => {
           <div className="grid gap-4 md:grid-cols-2">
             <FormItem label="基础 / 范围 / 精度">
               <Space direction="vertical" className="w-full">
-                <InputNumber value={numValue} onChange={setNumValue} />
-                <InputNumber value={numValue} onChange={setNumValue} min={0} max={100} step={5} />
-                <InputNumber value={numValue} onChange={setNumValue} precision={2} step={0.1} />
+                <InputNumber value={numValue} onChange={setNumValue} {...inputNumberA11y} />
+                <InputNumber
+                  value={numValue}
+                  onChange={setNumValue}
+                  min={0}
+                  max={100}
+                  step={5}
+                  {...inputNumberA11y}
+                />
+                <InputNumber
+                  value={numValue}
+                  onChange={setNumValue}
+                  precision={2}
+                  step={0.1}
+                  {...inputNumberA11y}
+                />
               </Space>
             </FormItem>
             <FormItem label="尺寸与状态">
               <Space direction="vertical" className="w-full">
                 <Space>
-                  <InputNumber value={numValue} onChange={setNumValue} size="sm" />
-                  <InputNumber value={numValue} onChange={setNumValue} size="md" />
-                  <InputNumber value={numValue} onChange={setNumValue} size="lg" />
+                  <InputNumber
+                    value={numValue}
+                    onChange={setNumValue}
+                    size="sm"
+                    {...inputNumberA11y}
+                  />
+                  <InputNumber
+                    value={numValue}
+                    onChange={setNumValue}
+                    size="md"
+                    {...inputNumberA11y}
+                  />
+                  <InputNumber
+                    value={numValue}
+                    onChange={setNumValue}
+                    size="lg"
+                    {...inputNumberA11y}
+                  />
                 </Space>
                 <Space>
-                  <InputNumber value={5} disabled />
-                  <InputNumber value={5} readonly />
-                  <InputNumber value={numValue} onChange={setNumValue} status="error" />
+                  <InputNumber value={5} disabled {...inputNumberA11y} />
+                  <InputNumber value={5} readonly {...inputNumberA11y} />
+                  <InputNumber
+                    value={numValue}
+                    onChange={setNumValue}
+                    status="error"
+                    {...inputNumberA11y}
+                  />
                 </Space>
               </Space>
             </FormItem>
@@ -349,8 +387,13 @@ const InputDemo: React.FC = () => {
           <div className="grid gap-4 md:grid-cols-2">
             <FormItem label="步进按钮">
               <Space direction="vertical" className="w-full">
-                <InputNumber value={numValue} onChange={setNumValue} />
-                <InputNumber value={numValue} onChange={setNumValue} controlsPosition="both" />
+                <InputNumber value={numValue} onChange={setNumValue} {...inputNumberA11y} />
+                <InputNumber
+                  value={numValue}
+                  onChange={setNumValue}
+                  controlsPosition="both"
+                  {...inputNumberA11y}
+                />
                 <InputNumber value={numValue} onChange={setNumValue} controls={false} />
               </Space>
             </FormItem>
@@ -360,6 +403,7 @@ const InputDemo: React.FC = () => {
                 onChange={setNumFormatted}
                 formatter={(v) => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={(v) => Number(v.replace(/\$\s?|(,*)/g, ''))}
+                {...inputNumberA11y}
               />
             </FormItem>
           </div>

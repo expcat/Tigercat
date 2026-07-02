@@ -3,8 +3,8 @@ import DemoBlock from '../components/DemoBlock'
 import fullPageSnippet from './SplitterDemo.tsx?raw'
 
 const horizontalSnippet = `<Splitter direction="horizontal" sizes={[30, 70]} style={{ height: 200, border: '1px solid #e5e7eb', borderRadius: 8 }}>
-  <div className="p-4">左侧面板 (30%)</div>
-  <div className="p-4">右侧面板 (70%)</div>
+  <div className="p-4">左侧面板 (30px)</div>
+  <div className="p-4">右侧面板 (70px)</div>
 </Splitter>`
 
 const verticalSnippet = `<Splitter direction="vertical" sizes={[40, 60]} style={{ height: 300 }}>
@@ -36,8 +36,8 @@ const SplitterDemo: React.FC = () => {
           direction="horizontal"
           sizes={[30, 70]}
           style={{ height: 200, border: '1px solid #e5e7eb', borderRadius: 8 }}>
-          <div className="p-4">左侧面板 (30%)</div>
-          <div className="p-4">右侧面板 (70%)</div>
+          <div className="p-4">左侧面板 (30px)</div>
+          <div className="p-4">右侧面板 (70px)</div>
         </Splitter>
       </DemoBlock>
 

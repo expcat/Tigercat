@@ -19,6 +19,11 @@ const sizeSnippet = `<Stepper value={1} size="sm" />
 
 const precisionSnippet = `<Stepper value={1.5} step={0.1} precision={2} min={0} max={5} />`
 
+const stepperA11y = {
+  incrementAriaLabel: '增加数值',
+  decrementAriaLabel: '减少数值'
+}
+
 const StepperDemo: React.FC = () => {
   const [val, setVal] = useState(3)
 
@@ -32,23 +37,23 @@ const StepperDemo: React.FC = () => {
         description="value + onChange 受控，min/max 范围"
         code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
-          <Stepper value={val} onChange={setVal} />
-          <Stepper value={val} onChange={setVal} min={0} max={10} step={2} />
+          <Stepper value={val} onChange={setVal} {...stepperA11y} />
+          <Stepper value={val} onChange={setVal} min={0} max={10} step={2} {...stepperA11y} />
           <Text>当前值: {val}</Text>
         </Space>
       </DemoBlock>
 
       <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸" code={fullPageSnippet}>
         <Space direction="vertical" size={12}>
-          <Stepper value={1} size="sm" />
-          <Stepper value={1} size="md" />
-          <Stepper value={1} size="lg" />
-          <Stepper value={1} disabled />
+          <Stepper value={1} size="sm" {...stepperA11y} />
+          <Stepper value={1} size="md" {...stepperA11y} />
+          <Stepper value={1} size="lg" {...stepperA11y} />
+          <Stepper value={1} disabled {...stepperA11y} />
         </Space>
       </DemoBlock>
 
       <DemoBlock title="小数精度" description="precision 控制小数位数" code={fullPageSnippet}>
-        <Stepper value={1.5} step={0.1} precision={2} min={0} max={5} />
+        <Stepper value={1.5} step={0.1} precision={2} min={0} max={5} {...stepperA11y} />
       </DemoBlock>
     </div>
   )

@@ -68,6 +68,8 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   formatter,
   parser,
   autoFocus = false,
+  incrementAriaLabel = 'Increase',
+  decrementAriaLabel = 'Decrease',
   onChange,
   onFocus,
   onBlur,
@@ -232,7 +234,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
         <button
           type="button"
           tabIndex={-1}
-          aria-label="Decrease"
+          aria-label={decrementAriaLabel}
           className={getInputNumberSideButtonClasses('left', disabled || atMin)}
           disabled={disabled || atMin}
           onPointerDown={startStepRepeat('down')}
@@ -279,7 +281,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
         <button
           type="button"
           tabIndex={-1}
-          aria-label="Increase"
+          aria-label={incrementAriaLabel}
           className={getInputNumberSideButtonClasses('right', disabled || atMax)}
           disabled={disabled || atMax}
           onPointerDown={startStepRepeat('up')}
@@ -305,7 +307,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
           <button
             type="button"
             tabIndex={-1}
-            aria-label="Increase"
+            aria-label={incrementAriaLabel}
             className={getInputNumberStepButtonClasses('up', disabled || atMax)}
             disabled={disabled || atMax}
             onPointerDown={startStepRepeat('up')}
@@ -324,7 +326,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
           <button
             type="button"
             tabIndex={-1}
-            aria-label="Decrease"
+            aria-label={decrementAriaLabel}
             className={getInputNumberStepButtonClasses('down', disabled || atMin)}
             disabled={disabled || atMin}
             onPointerDown={startStepRepeat('down')}

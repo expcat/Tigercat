@@ -29,6 +29,10 @@ const colonSnippet = `<Descriptions title="服务器配置" :colon="false" borde
 
 const itemClassSnippet = `<Descriptions bordered :column="2" :items="highlightItems" />`
 
+const twoColumnResponsive = { xs: 1, sm: 1, md: 2 }
+const threeColumnResponsive = { xs: 1, sm: 1, md: 2, lg: 3 }
+const fourColumnResponsive = { xs: 1, sm: 2, lg: 4 }
+
 // Basic user information
 const userInfo = [
   { label: '姓名', content: '张三' },
@@ -114,15 +118,15 @@ const highlightItems = [
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">小尺寸</h3>
-          <Descriptions size="sm" bordered :items="userInfo" :column="2" />
+          <Descriptions size="sm" bordered :items="userInfo" :column="twoColumnResponsive" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">中等尺寸（默认）</h3>
-          <Descriptions size="md" bordered :items="userInfo" :column="2" />
+          <Descriptions size="md" bordered :items="userInfo" :column="twoColumnResponsive" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">大尺寸</h3>
-          <Descriptions size="lg" bordered :items="userInfo" :column="2" />
+          <Descriptions size="lg" bordered :items="userInfo" :column="twoColumnResponsive" />
         </div>
       </div>
     </DemoBlock>
@@ -134,11 +138,15 @@ const highlightItems = [
       <div class="space-y-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">垂直布局（无边框）</h3>
-          <Descriptions layout="vertical" :items="serverConfig" :column="2" />
+          <Descriptions layout="vertical" :items="serverConfig" :column="twoColumnResponsive" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">垂直布局（带边框）</h3>
-          <Descriptions layout="vertical" bordered :items="serverConfig" :column="2" />
+          <Descriptions
+            layout="vertical"
+            bordered
+            :items="serverConfig"
+            :column="twoColumnResponsive" />
         </div>
       </div>
     </DemoBlock>
@@ -150,11 +158,11 @@ const highlightItems = [
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">2 列布局</h3>
-          <Descriptions bordered :column="2" :items="userInfo" />
+          <Descriptions bordered :column="twoColumnResponsive" :items="userInfo" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">4 列布局</h3>
-          <Descriptions bordered :column="4" :items="userInfo" />
+          <Descriptions bordered :column="fourColumnResponsive" :items="userInfo" />
         </div>
       </div>
     </DemoBlock>
@@ -164,7 +172,11 @@ const highlightItems = [
       description="描述项可以通过 span 属性实现跨列显示。"
       :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="产品详情" bordered :column="3" :items="productDetails" />
+        <Descriptions
+          title="产品详情"
+          bordered
+          :column="threeColumnResponsive"
+          :items="productDetails" />
       </div>
     </DemoBlock>
 
@@ -173,7 +185,7 @@ const highlightItems = [
       description="可以通过 extra 插槽添加操作按钮。"
       :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="订单详情" bordered :column="3" :items="orderInfo">
+        <Descriptions title="订单详情" bordered :column="threeColumnResponsive" :items="orderInfo">
           <template #extra>
             <Button size="sm">编辑</Button>
           </template>
@@ -189,7 +201,7 @@ const highlightItems = [
         <Descriptions
           title="用户信息（自定义样式）"
           bordered
-          :column="2"
+          :column="twoColumnResponsive"
           :items="userInfo"
           :labelStyle="{ fontWeight: '600', color: '#1f2937' }"
           :contentStyle="{ color: '#6b7280' }" />
@@ -210,7 +222,7 @@ const highlightItems = [
       description="通过 labelClassName / contentClassName 为单个描述项设置独立样式。"
       :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions bordered :column="2" :items="highlightItems" />
+        <Descriptions bordered :column="twoColumnResponsive" :items="highlightItems" />
       </div>
     </DemoBlock>
   </div>

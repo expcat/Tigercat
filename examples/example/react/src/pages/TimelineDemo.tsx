@@ -14,6 +14,17 @@ interface ProjectTimelineItem extends Record<string, unknown> {
   color: string
 }
 
+const getStatusText = (status: ProjectStatus) => {
+  switch (status) {
+    case 'completed':
+      return '已完成'
+    case 'in-progress':
+      return '进行中'
+    default:
+      return '待处理'
+  }
+}
+
 const basicSnippet = `<Timeline items={basicEvents} />`
 
 const modeSnippet = `<div className="space-y-6">
@@ -60,7 +71,7 @@ const renderItemSnippet = `<Timeline
         <div className="font-medium text-gray-900 mb-1">
           {t.title}
           <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
-            {t.status}
+            {getStatusText(t.status)}
           </Tag>
         </div>
         <div className="text-gray-600 dark:text-gray-400">{t.description}</div>
@@ -126,7 +137,7 @@ const exampleSnippet = `<div className="max-w-2xl">
           <div className="font-medium text-gray-900 mb-1">
             {t.title}
             <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
-              {t.status}
+              {getStatusText(t.status)}
             </Tag>
           </div>
           <div className="text-gray-600 dark:text-gray-400">{t.description}</div>
@@ -335,7 +346,7 @@ export default function TimelineDemo() {
                 <div className="font-medium text-gray-900 mb-1">
                   {t.title}
                   <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
-                    {t.status}
+                    {getStatusText(t.status)}
                   </Tag>
                 </div>
                 <div className="text-gray-600 dark:text-gray-400">{t.description}</div>
@@ -416,7 +427,7 @@ export default function TimelineDemo() {
                   <div className="font-medium text-gray-900 mb-1">
                     {t.title}
                     <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
-                      {t.status}
+                      {getStatusText(t.status)}
                     </Tag>
                   </div>
                   <div className="text-gray-600 dark:text-gray-400">{t.description}</div>

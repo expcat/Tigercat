@@ -117,6 +117,17 @@ const getStatusVariant = (status: string) => {
   }
 }
 
+const getStatusText = (status: string) => {
+  switch (status) {
+    case 'completed':
+      return '已完成'
+    case 'in-progress':
+      return '进行中'
+    default:
+      return '待处理'
+  }
+}
+
 const basicSnippet = `<Timeline :items="basicEvents" />`
 
 const modeSnippet = `<div class="space-y-6">
@@ -154,7 +165,7 @@ const renderItemSnippet = `<Timeline :items="projectTimeline">
     <div class="font-medium text-gray-900 mb-1">
       {{ item.title }}
       <Tag :variant="getStatusVariant(item.status)" size="sm" class="ml-2">
-        {{ item.status }}
+        {{ getStatusText(item.status) }}
       </Tag>
     </div>
     <div class="text-gray-600 dark:text-gray-400">{{ item.description }}</div>
@@ -215,7 +226,7 @@ const exampleSnippet = `<div class="max-w-2xl">
       <div class="font-medium text-gray-900 mb-1">
         {{ item.title }}
         <Tag :variant="getStatusVariant(item.status)" size="sm" class="ml-2">
-          {{ item.status }}
+          {{ getStatusText(item.status) }}
         </Tag>
       </div>
       <div class="text-gray-600 dark:text-gray-400">{{ item.description }}</div>
@@ -299,7 +310,7 @@ const exampleSnippet = `<div class="max-w-2xl">
           <div class="font-medium text-gray-900 mb-1">
             {{ item.title }}
             <Tag :variant="getStatusVariant(item.status)" size="sm" class="ml-2">
-              {{ item.status }}
+              {{ getStatusText(item.status) }}
             </Tag>
           </div>
           <div class="text-gray-600 dark:text-gray-400">{{ item.description }}</div>
@@ -372,7 +383,7 @@ const exampleSnippet = `<div class="max-w-2xl">
             <div class="font-medium text-gray-900 mb-1">
               {{ item.title }}
               <Tag :variant="getStatusVariant(item.status)" size="sm" class="ml-2">
-                {{ item.status }}
+                {{ getStatusText(item.status) }}
               </Tag>
             </div>
             <div class="text-gray-600 dark:text-gray-400">{{ item.description }}</div>

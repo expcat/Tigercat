@@ -1,8 +1,11 @@
 import { Avatar } from '@expcat/tigercat-react/Avatar'
+import { AvatarGroup } from '@expcat/tigercat-react/AvatarGroup'
 import { Space } from '@expcat/tigercat-react/Space'
 import { Badge } from '@expcat/tigercat-react/Badge'
 import DemoBlock from '../components/DemoBlock'
 import fullPageSnippet from './AvatarDemo.tsx?raw'
+
+const teamGroupA11y = { 'aria-label': '项目团队成员' }
 
 const imageSnippet = `<Space>
   <Avatar src="https://i.pravatar.cc/150?img=1" alt="User 1" />
@@ -102,13 +105,17 @@ const usageSnippet = `<div>
   <div className="mb-6">
     <h3 className="text-lg font-semibold mb-3">团队成员（头像组）</h3>
     <div className="p-6 bg-gray-50 rounded-lg">
-      <div className="flex -space-x-2">
-        <Avatar src="https://i.pravatar.cc/150?img=21" alt="Member 1" size="md" className="ring-2 ring-white" />
-        <Avatar src="https://i.pravatar.cc/150?img=22" alt="Member 2" size="md" className="ring-2 ring-white" />
-        <Avatar text="Charlie" bgColor="bg-[var(--tiger-secondary,#4b5563)]" textColor="text-white" size="md" className="ring-2 ring-white" />
-        <Avatar text="David" bgColor="bg-[var(--tiger-primary,#2563eb)]" textColor="text-white" size="md" className="ring-2 ring-white" />
-        <Avatar text="+5" bgColor="bg-[var(--tiger-secondary,#4b5563)]" textColor="text-white" size="md" className="ring-2 ring-white" />
-      </div>
+      <AvatarGroup max={4} size="md" {...teamGroupA11y}>
+        <Avatar src="https://i.pravatar.cc/150?img=21" alt="成员：王一" />
+        <Avatar src="https://i.pravatar.cc/150?img=22" alt="成员：李敏" />
+        <Avatar text="Charlie" bgColor="bg-[var(--tiger-secondary,#4b5563)]" textColor="text-white" aria-label="成员：Charlie" />
+        <Avatar text="David" bgColor="bg-[var(--tiger-primary,#2563eb)]" textColor="text-white" aria-label="成员：David" />
+        <Avatar text="赵六" aria-label="成员：赵六" />
+        <Avatar text="钱七" aria-label="成员：钱七" />
+        <Avatar text="孙八" aria-label="成员：孙八" />
+        <Avatar text="周九" aria-label="成员：周九" />
+        <Avatar text="吴十" aria-label="成员：吴十" />
+      </AvatarGroup>
     </div>
   </div>
 
@@ -322,41 +329,27 @@ export default function AvatarDemo() {
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3">团队成员（头像组）</h3>
             <div className="p-6 bg-gray-50 rounded-lg">
-              <div className="flex -space-x-2">
-                <Avatar
-                  src="https://i.pravatar.cc/150?img=21"
-                  alt="Member 1"
-                  size="md"
-                  className="ring-2 ring-white"
-                />
-                <Avatar
-                  src="https://i.pravatar.cc/150?img=22"
-                  alt="Member 2"
-                  size="md"
-                  className="ring-2 ring-white"
-                />
+              <AvatarGroup max={4} size="md" {...teamGroupA11y}>
+                <Avatar src="https://i.pravatar.cc/150?img=21" alt="成员：王一" />
+                <Avatar src="https://i.pravatar.cc/150?img=22" alt="成员：李敏" />
                 <Avatar
                   text="Charlie"
                   bgColor="bg-[var(--tiger-secondary,#4b5563)]"
                   textColor="text-white"
-                  size="md"
-                  className="ring-2 ring-white"
+                  aria-label="成员：Charlie"
                 />
                 <Avatar
                   text="David"
                   bgColor="bg-[var(--tiger-primary,#2563eb)]"
                   textColor="text-white"
-                  size="md"
-                  className="ring-2 ring-white"
+                  aria-label="成员：David"
                 />
-                <Avatar
-                  text="+5"
-                  bgColor="bg-[var(--tiger-secondary,#4b5563)]"
-                  textColor="text-white"
-                  size="md"
-                  className="ring-2 ring-white"
-                />
-              </div>
+                <Avatar text="赵六" aria-label="成员：赵六" />
+                <Avatar text="钱七" aria-label="成员：钱七" />
+                <Avatar text="孙八" aria-label="成员：孙八" />
+                <Avatar text="周九" aria-label="成员：周九" />
+                <Avatar text="吴十" aria-label="成员：吴十" />
+              </AvatarGroup>
             </div>
           </div>
 

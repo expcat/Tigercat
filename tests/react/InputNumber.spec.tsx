@@ -43,12 +43,20 @@ describe('InputNumber (React)', () => {
       expect(screen.queryByLabelText('Increase')).toBeNull()
     })
 
+    it('allows overriding step control aria labels', () => {
+      render(<InputNumber value={5} incrementAriaLabel="增加数值" decrementAriaLabel="减少数值" />)
+      expect(screen.getByLabelText('增加数值')).toBeInTheDocument()
+      expect(screen.getByLabelText('减少数值')).toBeInTheDocument()
+    })
+
     it('formats the display value with precision and via formatter', () => {
       const { container: withPrecision } = render(<InputNumber value={3.1} precision={2} />)
       expect(getInput(withPrecision).value).toBe('3.10')
       const formatter = (val: number | undefined) => (val !== undefined ? `$ ${val}` : '')
       const parser = (str: string) => Number(str.replace(/\$\s?/g, ''))
-      const { container } = render(<InputNumber value={1000} formatter={formatter} parser={parser} />)
+      const { container } = render(
+        <InputNumber value={1000} formatter={formatter} parser={parser} />
+      )
       expect(getInput(container).value).toBe('$ 1000')
     })
   })
@@ -79,13 +87,16 @@ describe('InputNumber (React)', () => {
     it.each([
       ['Decrease', 1, { min: 0 }, 0],
       ['Increase', 9, { max: 10 }, 10]
-    ])('%s clamps and disables the button at the boundary', async (label, start, bounds, expected) => {
-      const onChange = vi.fn()
-      render(<InputNumber defaultValue={start} {...bounds} onChange={onChange} />)
-      await userEvent.click(screen.getByLabelText(label))
-      expect(onChange).toHaveBeenCalledWith(expected)
-      expect(screen.getByLabelText(label)).toBeDisabled()
-    })
+    ])(
+      '%s clamps and disables the button at the boundary',
+      async (label, start, bounds, expected) => {
+        const onChange = vi.fn()
+        render(<InputNumber defaultValue={start} {...bounds} onChange={onChange} />)
+        await userEvent.click(screen.getByLabelText(label))
+        expect(onChange).toHaveBeenCalledWith(expected)
+        expect(screen.getByLabelText(label)).toBeDisabled()
+      }
+    )
 
     it('repeats increment while the Increase button is held', () => {
       vi.useFakeTimers()
@@ -119,7 +130,9 @@ describe('InputNumber (React)', () => {
 
     it('ignores the keyboard when keyboard=false', () => {
       const onChange = vi.fn()
-      const { container } = render(<InputNumber defaultValue={5} keyboard={false} onChange={onChange} />)
+      const { container } = render(
+        <InputNumber defaultValue={5} keyboard={false} onChange={onChange} />
+      )
       fireEvent.keyDown(getInput(container), { key: 'ArrowUp' })
       expect(onChange).not.toHaveBeenCalled()
     })
@@ -138,7 +151,9 @@ describe('InputNumber (React)', () => {
 
     it('clamps out-of-range input on blur', async () => {
       const onChange = vi.fn()
-      const { container } = render(<InputNumber defaultValue={5} min={0} max={10} onChange={onChange} />)
+      const { container } = render(
+        <InputNumber defaultValue={5} min={0} max={10} onChange={onChange} />
+      )
       const input = getInput(container)
       await userEvent.clear(input)
       await userEvent.type(input, '999')

@@ -81,6 +81,8 @@ source: docs/ROADMAP.md R28 review
   - Skeleton 加载完成示例文案改中文；Table 列 `title`/筛选 placeholder 改中文；Timeline 状态 Tag 中文映射。（E05-6/E15-1/E15-4）
     验收：zh-CN 复查上述 route 均无英文/缺失的默认文案与可访问名。
 
+**执行记录（2026-07-02）**：EX12-EX16 已完成。React/Vue Avatar 团队成员改用 `AvatarGroup max` 并补 `aria-label`；Splitter `sizes` 单位文案改为 `30px/70px`；Watermark 补图片水印 section；Descriptions 多列示例改用响应式 `column`；中文站统一补 QRCode/Alert/Switch/Slider/Progress/Signature/InputNumber/Stepper/NumberKeyboard/InfiniteScroll 等可访问名或中文文案，并将 Loading、Skeleton、Table、Timeline 等示例可见文案中文化。为支持示例层覆写，InputNumber/Stepper 新增 `incrementAriaLabel` / `decrementAriaLabel` public props，并已同步 API baseline 与 skill references。已运行 `npx -y pnpm@11.9.0 vitest run tests/react/InputNumber.spec.tsx tests/react/Stepper.spec.tsx tests/vue/InputNumber.spec.ts tests/vue/Stepper.spec.ts`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 api:baseline`、`npx -y pnpm@11.9.0 docs:api`、`npx -y pnpm@11.9.0 example:sources:check`、`npx -y pnpm@11.9.0 example:build`，并用浏览器以 zh-CN 复查 React/Vue `#/avatar`、`#/splitter`、`#/watermark`、`#/descriptions`、`#/qrcode`、`#/input`、`#/stepper`、`#/slider`、`#/signature`、`#/infinite-scroll`、`#/loading`、`#/skeleton`、`#/table`、`#/timeline`。剩余风险：Vue dev server 仍会输出既有 async route warning，本批未改 router 结构；InfiniteScroll 基础示例的末尾文案需滚动加载到 50 项后出现，静态复查覆盖了自定义结束文案。
+
 ## 三、本轮不处理（记录，避免遗漏）
 
 以下 R28 findings 属可复制性增强/新增演示/覆盖补全/远程资源替换/示例源码 warning，非错误或歧义，本轮不做；如后续需要再从此处提任务。完整证据见 git history 与 `docs/V2_COMPLETED.md`。

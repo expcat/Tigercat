@@ -104,23 +104,23 @@ const handleSubmit = () => {
             <div class="grid grid-cols-5 gap-8">
               <div class="flex flex-col items-center gap-2">
                 <Loading variant="spinner" />
-                <span class="text-sm text-gray-600">Spinner</span>
+                <span class="text-sm text-gray-600">旋转</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading variant="ring" />
-                <span class="text-sm text-gray-600">Ring</span>
+                <span class="text-sm text-gray-600">环形</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading variant="dots" />
-                <span class="text-sm text-gray-600">Dots</span>
+                <span class="text-sm text-gray-600">圆点</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading variant="bars" />
-                <span class="text-sm text-gray-600">Bars</span>
+                <span class="text-sm text-gray-600">条形</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading variant="pulse" />
-                <span class="text-sm text-gray-600">Pulse</span>
+                <span class="text-sm text-gray-600">脉冲</span>
               </div>
             </div>
           </div>
@@ -131,19 +131,19 @@ const handleSubmit = () => {
             <div class="flex gap-8 items-center justify-center">
               <div class="flex flex-col items-center gap-2">
                 <Loading size="sm" />
-                <span class="text-sm text-gray-600">Small</span>
+                <span class="text-sm text-gray-600">小</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading size="md" />
-                <span class="text-sm text-gray-600">Medium</span>
+                <span class="text-sm text-gray-600">中</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading size="lg" />
-                <span class="text-sm text-gray-600">Large</span>
+                <span class="text-sm text-gray-600">大</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading size="xl" />
-                <span class="text-sm text-gray-600">Extra Large</span>
+                <span class="text-sm text-gray-600">超大</span>
               </div>
             </div>
           </div>
@@ -154,35 +154,35 @@ const handleSubmit = () => {
             <div class="grid grid-cols-4 gap-6">
               <div class="flex flex-col items-center gap-2">
                 <Loading color="primary" />
-                <span class="text-sm text-gray-600">Primary</span>
+                <span class="text-sm text-gray-600">主要色</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading color="secondary" />
-                <span class="text-sm text-gray-600">Secondary</span>
+                <span class="text-sm text-gray-600">次要色</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading color="success" />
-                <span class="text-sm text-gray-600">Success</span>
+                <span class="text-sm text-gray-600">成功色</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading color="warning" />
-                <span class="text-sm text-gray-600">Warning</span>
+                <span class="text-sm text-gray-600">警告色</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading color="danger" />
-                <span class="text-sm text-gray-600">Danger</span>
+                <span class="text-sm text-gray-600">危险色</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading color="info" />
-                <span class="text-sm text-gray-600">Info</span>
+                <span class="text-sm text-gray-600">信息色</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading color="default" />
-                <span class="text-sm text-gray-600">Default</span>
+                <span class="text-sm text-gray-600">默认色</span>
               </div>
               <div class="flex flex-col items-center gap-2">
                 <Loading custom-color="#ff6b6b" />
-                <span class="text-sm text-gray-600">Custom</span>
+                <span class="text-sm text-gray-600">自定义色</span>
               </div>
             </div>
           </div>

@@ -59,6 +59,8 @@ export interface VueInputNumberProps {
   formatter?: (value: number | undefined) => string
   parser?: (displayValue: string) => number
   autoFocus?: boolean
+  incrementAriaLabel?: string
+  decrementAriaLabel?: string
   className?: string
 }
 
@@ -129,6 +131,14 @@ export const InputNumber = defineComponent({
     autoFocus: {
       type: Boolean,
       default: false
+    },
+    incrementAriaLabel: {
+      type: String,
+      default: 'Increase'
+    },
+    decrementAriaLabel: {
+      type: String,
+      default: 'Decrease'
     },
     className: {
       type: String,
@@ -333,7 +343,7 @@ export const InputNumber = defineComponent({
             {
               type: 'button',
               tabindex: -1,
-              'aria-label': 'Decrease',
+              'aria-label': props.decrementAriaLabel,
               class: getInputNumberSideButtonClasses('left', props.disabled || atMin.value),
               disabled: props.disabled || atMin.value,
               onPointerdown: startStepRepeat('down'),
@@ -392,7 +402,7 @@ export const InputNumber = defineComponent({
             {
               type: 'button',
               tabindex: -1,
-              'aria-label': 'Increase',
+              'aria-label': props.incrementAriaLabel,
               class: getInputNumberSideButtonClasses('right', props.disabled || atMax.value),
               disabled: props.disabled || atMax.value,
               onPointerdown: startStepRepeat('up'),
@@ -428,7 +438,7 @@ export const InputNumber = defineComponent({
               {
                 type: 'button',
                 tabindex: -1,
-                'aria-label': 'Increase',
+                'aria-label': props.incrementAriaLabel,
                 class: getInputNumberStepButtonClasses('up', props.disabled || atMax.value),
                 disabled: props.disabled || atMax.value,
                 onPointerdown: startStepRepeat('up'),
@@ -455,7 +465,7 @@ export const InputNumber = defineComponent({
               {
                 type: 'button',
                 tabindex: -1,
-                'aria-label': 'Decrease',
+                'aria-label': props.decrementAriaLabel,
                 class: getInputNumberStepButtonClasses('down', props.disabled || atMin.value),
                 disabled: props.disabled || atMin.value,
                 onPointerdown: startStepRepeat('down'),

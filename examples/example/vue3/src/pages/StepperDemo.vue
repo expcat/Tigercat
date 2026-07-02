@@ -36,8 +36,14 @@ const precisionSnippet = `<Stepper :model-value="1.5" :step="0.1" :precision="2"
       description="v-model 双向绑定，min/max 范围，step 步长"
       :code="fullPageSnippet">
       <Space direction="vertical" :size="12">
-        <Stepper v-model="val" />
-        <Stepper v-model="val" :min="0" :max="10" :step="2" />
+        <Stepper v-model="val" increment-aria-label="增加数值" decrement-aria-label="减少数值" />
+        <Stepper
+          v-model="val"
+          :min="0"
+          :max="10"
+          :step="2"
+          increment-aria-label="增加数值"
+          decrement-aria-label="减少数值" />
         <Text>当前值: {{ val }}</Text>
       </Space>
     </DemoBlock>
@@ -47,15 +53,38 @@ const precisionSnippet = `<Stepper :model-value="1.5" :step="0.1" :precision="2"
       description="sm/md/lg 三种尺寸，disabled 禁用"
       :code="fullPageSnippet">
       <Space direction="vertical" :size="12">
-        <Stepper :model-value="1" size="sm" />
-        <Stepper :model-value="1" size="md" />
-        <Stepper :model-value="1" size="lg" />
-        <Stepper :model-value="1" disabled />
+        <Stepper
+          :model-value="1"
+          size="sm"
+          increment-aria-label="增加数值"
+          decrement-aria-label="减少数值" />
+        <Stepper
+          :model-value="1"
+          size="md"
+          increment-aria-label="增加数值"
+          decrement-aria-label="减少数值" />
+        <Stepper
+          :model-value="1"
+          size="lg"
+          increment-aria-label="增加数值"
+          decrement-aria-label="减少数值" />
+        <Stepper
+          :model-value="1"
+          disabled
+          increment-aria-label="增加数值"
+          decrement-aria-label="减少数值" />
       </Space>
     </DemoBlock>
 
     <DemoBlock title="小数精度" description="precision 控制小数位数" :code="fullPageSnippet">
-      <Stepper :model-value="1.5" :step="0.1" :precision="2" :min="0" :max="5" />
+      <Stepper
+        :model-value="1.5"
+        :step="0.1"
+        :precision="2"
+        :min="0"
+        :max="5"
+        increment-aria-label="增加数值"
+        decrement-aria-label="减少数值" />
     </DemoBlock>
   </div>
 </template>

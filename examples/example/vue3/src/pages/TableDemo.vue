@@ -21,15 +21,17 @@ interface UserData extends Record<string, unknown> {
   address: string
 }
 
+const getStatusText = (status: UserData['status']) => (status === 'active' ? '启用' : '停用')
+
 const basicSnippet = `<Table :columns="basicColumns" :dataSource="basicData" :pagination="false" />`
 
 const basicScriptSnippet = `import { ref } from 'vue'
 import type { TableColumn } from '@expcat/tigercat-vue'
 
 const basicColumns: TableColumn[] = [
-  { key: 'name', title: 'Name', width: 150 },
-  { key: 'age', title: 'Age', width: 100 },
-  { key: 'email', title: 'Email', width: 200 }
+  { key: 'name', title: '姓名', width: 150 },
+  { key: 'age', title: '年龄', width: 100 },
+  { key: 'email', title: '邮箱', width: 200 }
 ]
 
 const basicData = ref([
@@ -51,10 +53,10 @@ const customSnippet = `<Table :columns="customColumns" :dataSource="basicData" :
 
 const cardModeSnippet = `const cardColumns: TableColumn[] = [
   { key: 'id', title: 'ID', hideInCard: true },
-  { key: 'name', title: 'Name', cardTitle: true },
-  { key: 'status', title: 'Status', cardPriority: 1 },
-  { key: 'age', title: 'Age', cardPriority: 2 },
-  { key: 'email', title: 'Email' }
+  { key: 'name', title: '姓名', cardTitle: true },
+  { key: 'status', title: '状态', cardPriority: 1 },
+  { key: 'age', title: '年龄', cardPriority: 2 },
+  { key: 'email', title: '邮箱' }
 ]
 
 <Table
@@ -195,84 +197,84 @@ const basicData = ref<UserData[]>([
 
 // Basic columns
 const basicColumns: TableColumn[] = [
-  { key: 'name', title: 'Name', width: 150 },
-  { key: 'age', title: 'Age', width: 100 },
-  { key: 'email', title: 'Email', width: 200 }
+  { key: 'name', title: '姓名', width: 150 },
+  { key: 'age', title: '年龄', width: 100 },
+  { key: 'email', title: '邮箱', width: 200 }
 ]
 
 const cardColumns: TableColumn[] = [
   { key: 'id', title: 'ID', hideInCard: true },
-  { key: 'name', title: 'Name', cardTitle: true },
+  { key: 'name', title: '姓名', cardTitle: true },
   {
     key: 'status',
-    title: 'Status',
+    title: '状态',
     cardPriority: 1,
     render: (record: Record<string, unknown>) => {
       const typedRecord = record as UserData
       const color =
         typedRecord.status === 'active' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'
-      return h('span', { class: `px-2 py-1 rounded ${color}` }, typedRecord.status)
+      return h('span', { class: `px-2 py-1 rounded ${color}` }, getStatusText(typedRecord.status))
     }
   },
-  { key: 'age', title: 'Age', cardPriority: 2 },
-  { key: 'email', title: 'Email' }
+  { key: 'age', title: '年龄', cardPriority: 2 },
+  { key: 'email', title: '邮箱' }
 ]
 
 // Sortable columns
 const sortableColumns: TableColumn[] = [
-  { key: 'name', title: 'Name', sortable: true, width: 150 },
-  { key: 'age', title: 'Age', sortable: true, width: 100 },
-  { key: 'email', title: 'Email', width: 200 }
+  { key: 'name', title: '姓名', sortable: true, width: 150 },
+  { key: 'age', title: '年龄', sortable: true, width: 100 },
+  { key: 'email', title: '邮箱', width: 200 }
 ]
 
 // Filterable columns
 const filterableColumns: TableColumn[] = [
   {
     key: 'name',
-    title: 'Name',
+    title: '姓名',
     sortable: true,
-    filter: { type: 'text', placeholder: 'Search name...' },
+    filter: { type: 'text', placeholder: '搜索姓名...' },
     width: 150
   },
   {
     key: 'age',
-    title: 'Age',
+    title: '年龄',
     sortable: true,
     width: 100
   },
   {
     key: 'status',
-    title: 'Status',
+    title: '状态',
     filter: {
       type: 'select',
       options: [
-        { value: 'active', label: 'Active' },
-        { value: 'inactive', label: 'Inactive' }
+        { value: 'active', label: '启用' },
+        { value: 'inactive', label: '停用' }
       ]
     },
     width: 120
   },
-  { key: 'email', title: 'Email', width: 200 }
+  { key: 'email', title: '邮箱', width: 200 }
 ]
 
 // Custom render columns
 const customColumns: TableColumn[] = [
-  { key: 'name', title: 'Name', width: 150 },
-  { key: 'age', title: 'Age', width: 100 },
+  { key: 'name', title: '姓名', width: 150 },
+  { key: 'age', title: '年龄', width: 100 },
   {
     key: 'status',
-    title: 'Status',
+    title: '状态',
     width: 120,
     render: (record: Record<string, unknown>) => {
       const typedRecord = record as UserData
       const color =
         typedRecord.status === 'active' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'
-      return h('span', { class: `px-2 py-1 rounded ${color}` }, typedRecord.status)
+      return h('span', { class: `px-2 py-1 rounded ${color}` }, getStatusText(typedRecord.status))
     }
   },
   {
     key: 'actions',
-    title: 'Actions',
+    title: '操作',
     align: 'center',
     width: 150,
     render: (record: Record<string, unknown>) => {
@@ -284,7 +286,7 @@ const customColumns: TableColumn[] = [
             size: 'sm',
             onClick: () => handleEdit(typedRecord)
           },
-          () => 'Edit'
+          () => '编辑'
         ),
         h(
           Button,
@@ -293,7 +295,7 @@ const customColumns: TableColumn[] = [
             variant: 'secondary',
             onClick: () => handleDelete(typedRecord)
           },
-          () => 'Delete'
+          () => '删除'
         )
       ])
     }
@@ -302,24 +304,24 @@ const customColumns: TableColumn[] = [
 
 // Fixed columns (sticky left/right)
 const fixedColumns: TableColumn[] = [
-  { key: 'name', title: 'Name', width: 160, fixed: 'left' },
-  { key: 'age', title: 'Age', width: 120 },
-  { key: 'email', title: 'Email', width: 240 },
-  { key: 'address', title: 'Address', width: 160 },
+  { key: 'name', title: '姓名', width: 160, fixed: 'left' },
+  { key: 'age', title: '年龄', width: 120 },
+  { key: 'email', title: '邮箱', width: 240 },
+  { key: 'address', title: '地址', width: 160 },
   {
     key: 'status',
-    title: 'Status',
+    title: '状态',
     width: 140,
     render: (record: Record<string, unknown>) => {
       const typedRecord = record as UserData
       const color =
         typedRecord.status === 'active' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'
-      return h('span', { class: `px-2 py-1 rounded ${color}` }, typedRecord.status)
+      return h('span', { class: `px-2 py-1 rounded ${color}` }, getStatusText(typedRecord.status))
     }
   },
   {
     key: 'actions',
-    title: 'Actions',
+    title: '操作',
     align: 'center',
     width: 180,
     fixed: 'right',
@@ -332,7 +334,7 @@ const fixedColumns: TableColumn[] = [
             size: 'sm',
             onClick: () => handleEdit(typedRecord)
           },
-          () => 'Edit'
+          () => '编辑'
         ),
         h(
           Button,
@@ -341,7 +343,7 @@ const fixedColumns: TableColumn[] = [
             variant: 'secondary',
             onClick: () => handleDelete(typedRecord)
           },
-          () => 'Delete'
+          () => '删除'
         )
       ])
     }
@@ -352,11 +354,11 @@ const fixedColumns: TableColumn[] = [
 const fixedDropdownSnippet = `<!-- Dropdown 菜单默认渲染到 body（Teleport），
      不会被后续行的固定列 sticky 单元格遮挡 -->
 const fixedDropdownColumns: TableColumn[] = [
-  { key: 'name', title: 'Name', width: 160, fixed: 'left' },
+  { key: 'name', title: '姓名', width: 160, fixed: 'left' },
   /* ...更多列... */
   {
     key: 'actions',
-    title: 'Actions',
+    title: '操作',
     width: 120,
     fixed: 'right',
     render: (record) =>
@@ -371,14 +373,14 @@ const fixedDropdownColumns: TableColumn[] = [
 ]`
 
 const fixedDropdownColumns: TableColumn[] = [
-  { key: 'name', title: 'Name', width: 160, fixed: 'left' },
-  { key: 'age', title: 'Age', width: 120 },
-  { key: 'email', title: 'Email', width: 240 },
-  { key: 'address', title: 'Address', width: 200 },
-  { key: 'status', title: 'Status', width: 140 },
+  { key: 'name', title: '姓名', width: 160, fixed: 'left' },
+  { key: 'age', title: '年龄', width: 120 },
+  { key: 'email', title: '邮箱', width: 240 },
+  { key: 'address', title: '地址', width: 200 },
+  { key: 'status', title: '状态', width: 140 },
   {
     key: 'actions',
-    title: 'Actions',
+    title: '操作',
     align: 'center',
     width: 120,
     fixed: 'right',
@@ -398,7 +400,7 @@ const fixedDropdownColumns: TableColumn[] = [
 const styledFixedColumns: TableColumn[] = [
   {
     key: 'name',
-    title: 'Name',
+    title: '姓名',
     width: 180,
     fixed: 'left',
     fixedHeaderClassName:
@@ -408,12 +410,12 @@ const styledFixedColumns: TableColumn[] = [
         ? 'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)] ring-2 ring-inset ring-sky-200/70'
         : 'shadow-[inset_-1px_0_0_var(--tiger-border,#e5e7eb)]'
   },
-  { key: 'age', title: 'Age', width: 120 },
-  { key: 'email', title: 'Email', width: 240 },
-  { key: 'address', title: 'Address', width: 180 },
+  { key: 'age', title: '年龄', width: 120 },
+  { key: 'email', title: '邮箱', width: 240 },
+  { key: 'address', title: '地址', width: 180 },
   {
     key: 'actions',
-    title: 'Actions',
+    title: '操作',
     align: 'center',
     width: 180,
     fixed: 'right',
@@ -432,7 +434,7 @@ const styledFixedColumns: TableColumn[] = [
             size: 'sm',
             onClick: () => handleEdit(typedRecord)
           },
-          () => 'Edit'
+          () => '编辑'
         ),
         h(
           Button,
@@ -441,7 +443,7 @@ const styledFixedColumns: TableColumn[] = [
             variant: 'secondary',
             onClick: () => handleDelete(typedRecord)
           },
-          () => 'Delete'
+          () => '删除'
         )
       ])
     }
@@ -450,12 +452,12 @@ const styledFixedColumns: TableColumn[] = [
 
 // Lockable columns (toggle fixed via header lock button)
 const lockableColumns: TableColumn[] = [
-  { key: 'name', title: 'Name', width: 160 },
-  { key: 'age', title: 'Age', width: 120 },
-  { key: 'email', title: 'Email', width: 260 },
-  { key: 'address', title: 'Address', width: 200 },
-  { key: 'status', title: 'Status', width: 160 },
-  { key: 'actions', title: 'Actions', width: 200, align: 'center' }
+  { key: 'name', title: '姓名', width: 160 },
+  { key: 'age', title: '年龄', width: 120 },
+  { key: 'email', title: '邮箱', width: 260 },
+  { key: 'address', title: '地址', width: 200 },
+  { key: 'status', title: '状态', width: 160 },
+  { key: 'actions', title: '操作', width: 200, align: 'center' }
 ]
 
 // Row selection
@@ -471,11 +473,11 @@ const pagination = ref({
 })
 
 function handleEdit(record: UserData) {
-  alert(`Editing: ${record.name}`)
+  alert(`编辑：${record.name}`)
 }
 
 function handleDelete(record: UserData) {
-  if (confirm(`Delete ${record.name}?`)) {
+  if (confirm(`确认删除 ${record.name}？`)) {
     const index = basicData.value.findIndex((item) => item.id === record.id)
     if (index > -1) {
       basicData.value.splice(index, 1)

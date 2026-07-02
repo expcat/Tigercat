@@ -156,7 +156,7 @@ const realSnippet = `<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Avatar shape="square" text="Item" />
             <div className="flex-1">
               <h4 className="font-semibold mb-1">Item {i}</h4>
-              <p className="text-sm text-gray-600">This is the content loaded after the skeleton.</p>
+              <p className="text-sm text-gray-600">骨架屏结束后显示的内容。</p>
             </div>
           </div>
         </Card>
@@ -403,9 +403,7 @@ export default function SkeletonDemo() {
                     <Avatar shape="square" text="Item" />
                     <div className="flex-1">
                       <h4 className="font-semibold mb-1">Item {i}</h4>
-                      <p className="text-sm text-gray-600">
-                        This is the content loaded after the skeleton.
-                      </p>
+                      <p className="text-sm text-gray-600">骨架屏结束后显示的内容。</p>
                     </div>
                   </div>
                 </Card>

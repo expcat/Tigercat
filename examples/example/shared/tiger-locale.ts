@@ -5,6 +5,30 @@ export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {
   if (lang === 'zh-CN') {
     return {
       locale: 'zh-CN',
+      common: {
+        okText: '确定',
+        cancelText: '取消',
+        closeText: '关闭',
+        loadingText: '加载中...',
+        emptyText: '暂无数据',
+        noMoreText: '没有更多了',
+        searchPlaceholder: '搜索...',
+        clearText: '清除'
+      },
+      modal: {
+        closeAriaLabel: '关闭对话框',
+        okText: '确定',
+        cancelText: '取消'
+      },
+      drawer: {
+        closeAriaLabel: '关闭抽屉'
+      },
+      qrcode: {
+        ariaLabel: '二维码',
+        expiredText: '二维码已过期',
+        refreshText: '刷新',
+        loadingText: '加载中...'
+      },
       formWizard: {
         prevText: '上一步',
         nextText: '下一步',
@@ -30,6 +54,30 @@ export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {
 
   return {
     locale: 'en-US',
+    common: {
+      okText: 'OK',
+      cancelText: 'Cancel',
+      closeText: 'Close',
+      loadingText: 'Loading...',
+      emptyText: 'No data',
+      noMoreText: 'No more items',
+      searchPlaceholder: 'Search...',
+      clearText: 'Clear'
+    },
+    modal: {
+      closeAriaLabel: 'Close dialog',
+      okText: 'OK',
+      cancelText: 'Cancel'
+    },
+    drawer: {
+      closeAriaLabel: 'Close drawer'
+    },
+    qrcode: {
+      ariaLabel: 'QR Code',
+      expiredText: 'QR code expired',
+      refreshText: 'Refresh',
+      loadingText: 'Loading...'
+    },
     formWizard: {
       prevText: 'Previous',
       nextText: 'Next',

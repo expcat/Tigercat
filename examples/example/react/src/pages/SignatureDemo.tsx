@@ -11,6 +11,8 @@ const basicSnippet = `<Signature
   penColor="#0f766e"
   lineWidth={3}
   exportType="image/svg+xml"
+  ariaLabel="合同签名"
+  clearText="清空"
   onChange={(payload) => setSignatureValue(payload.value)} />`
 
 const exportSnippet = `const signatureRef = useRef<SignatureRef>(null)
@@ -25,8 +27,8 @@ const exportSvg = () => {
   if (svg) setSvgText(svg)
 }`
 
-const disabledSnippet = `<Signature disabled />
-<Signature readonly />`
+const disabledSnippet = `<Signature disabled ariaLabel="禁用签名" clearText="清空" />
+<Signature readonly ariaLabel="只读签名" clearText="清空" />`
 
 export default function SignatureDemo() {
   const signatureRef = useRef<SignatureRef>(null)
@@ -79,7 +81,14 @@ export default function SignatureDemo() {
         description="通过 ref 导出 PNG data URL 或 SVG 字符串"
         code={fullPageSnippet}>
         <div className="space-y-4">
-          <Signature ref={signatureRef} width={420} height={180} backgroundColor="#ffffff" />
+          <Signature
+            ref={signatureRef}
+            width={420}
+            height={180}
+            backgroundColor="#ffffff"
+            ariaLabel="导出签名"
+            clearText="清空"
+          />
           <div className="flex flex-wrap gap-3">
             <Button onClick={exportPng}>导出 PNG</Button>
             <Button variant="secondary" onClick={exportSvg}>
@@ -109,8 +118,8 @@ export default function SignatureDemo() {
         description="disabled / readonly 状态下不可绘制"
         code={fullPageSnippet}>
         <div className="grid gap-4 md:grid-cols-2">
-          <Signature width={320} height={140} disabled clearText="清空" />
-          <Signature width={320} height={140} readonly clearText="清空" />
+          <Signature width={320} height={140} disabled ariaLabel="禁用签名" clearText="清空" />
+          <Signature width={320} height={140} readonly ariaLabel="只读签名" clearText="清空" />
         </div>
       </DemoBlock>
     </div>

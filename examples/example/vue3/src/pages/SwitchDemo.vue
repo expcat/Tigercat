@@ -53,7 +53,7 @@ const sizeSnippet = `<Space align="center">
       :code="fullPageSnippet">
       <Space direction="vertical">
         <div class="flex items-center gap-3">
-          <Switch v-model="basicEnabled" />
+          <Switch v-model="basicEnabled" aria-label="开启消息通知" />
           <span class="text-sm text-gray-600">{{ basicEnabled ? '开启' : '关闭' }}</span>
         </div>
       </Space>
@@ -65,17 +65,17 @@ const sizeSnippet = `<Space align="center">
       description="通过设置 disabled 属性来禁用开关。"
       :code="fullPageSnippet">
       <Space>
-        <Switch v-model="disabledOn" disabled />
-        <Switch v-model="disabledOff" disabled />
+        <Switch v-model="disabledOn" disabled aria-label="已开启的禁用开关" />
+        <Switch v-model="disabledOff" disabled aria-label="已关闭的禁用开关" />
       </Space>
     </DemoBlock>
 
     <!-- 不同尺寸 -->
     <DemoBlock title="不同尺寸" description="开关有三种尺寸。" :code="fullPageSnippet">
       <Space align="center">
-        <Switch v-model="sizeSm" size="sm" />
-        <Switch v-model="sizeMd" size="md" />
-        <Switch v-model="sizeLg" size="lg" />
+        <Switch v-model="sizeSm" size="sm" aria-label="小尺寸开关" />
+        <Switch v-model="sizeMd" size="md" aria-label="中尺寸开关" />
+        <Switch v-model="sizeLg" size="lg" aria-label="大尺寸开关" />
       </Space>
     </DemoBlock>
   </div>

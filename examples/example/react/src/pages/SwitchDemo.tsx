@@ -52,7 +52,7 @@ const SwitchDemo: React.FC = () => {
         code={fullPageSnippet}>
         <Space direction="vertical">
           <div className="flex items-center gap-3">
-            <Switch checked={basicEnabled} onChange={setBasicEnabled} />
+            <Switch checked={basicEnabled} onChange={setBasicEnabled} aria-label="开启消息通知" />
             <span className="text-sm text-gray-600">{basicEnabled ? '开启' : '关闭'}</span>
           </div>
         </Space>
@@ -64,17 +64,17 @@ const SwitchDemo: React.FC = () => {
         description="通过设置 disabled 属性来禁用开关。"
         code={fullPageSnippet}>
         <Space>
-          <Switch checked={disabledOn} disabled />
-          <Switch checked={disabledOff} disabled />
+          <Switch checked={disabledOn} disabled aria-label="已开启的禁用开关" />
+          <Switch checked={disabledOff} disabled aria-label="已关闭的禁用开关" />
         </Space>
       </DemoBlock>
 
       {/* 不同尺寸 */}
       <DemoBlock title="不同尺寸" description="开关有三种尺寸。" code={fullPageSnippet}>
         <Space align="center">
-          <Switch checked={sizeSm} size="sm" onChange={setSizeSm} />
-          <Switch checked={sizeMd} size="md" onChange={setSizeMd} />
-          <Switch checked={sizeLg} size="lg" onChange={setSizeLg} />
+          <Switch checked={sizeSm} size="sm" onChange={setSizeSm} aria-label="小尺寸开关" />
+          <Switch checked={sizeMd} size="md" onChange={setSizeMd} aria-label="中尺寸开关" />
+          <Switch checked={sizeLg} size="lg" onChange={setSizeLg} aria-label="大尺寸开关" />
         </Space>
       </DemoBlock>
     </div>

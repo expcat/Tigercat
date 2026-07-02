@@ -14,6 +14,8 @@
           <InfiniteScroll
             :has-more="hasMore"
             :loading="loading"
+            loading-text="正在加载更多..."
+            end-text="没有更多数据了"
             @load-more="loadMore"
             class-name="h-[300px] border border-gray-200 rounded-lg">
             <div v-for="item in items" :key="item" class="px-4 py-3 border-b">项目 {{ item }}</div>

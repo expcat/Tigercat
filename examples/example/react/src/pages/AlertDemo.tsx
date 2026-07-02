@@ -116,6 +116,7 @@ export default function AlertDemo() {
               title="可关闭的提示"
               description="点击右侧关闭按钮可以关闭此提示"
               closable
+              closeAriaLabel="关闭提示"
               onClose={() => setShowAlert1(false)}
             />
           )}

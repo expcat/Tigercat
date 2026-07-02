@@ -3898,10 +3898,12 @@
         "autoFocus",
         "controls",
         "controlsPosition",
+        "decrementAriaLabel",
         "defaultValue",
         "disabled",
         "formatter",
         "id",
+        "incrementAriaLabel",
         "keyboard",
         "max",
         "min",
@@ -4606,7 +4608,17 @@
     },
     "StepperProps": {
       "extends": [],
-      "props": ["className", "disabled", "max", "min", "precision", "size", "step"]
+      "props": [
+        "className",
+        "decrementAriaLabel",
+        "disabled",
+        "incrementAriaLabel",
+        "max",
+        "min",
+        "precision",
+        "size",
+        "step"
+      ]
     },
     "StepsProps": {
       "extends": [],
