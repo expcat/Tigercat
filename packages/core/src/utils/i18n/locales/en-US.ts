@@ -164,6 +164,10 @@ export const enUS: TigerLocale = {
     ariaLabel: 'Rating',
     valueText: '{value} star{plural}'
   },
+  avatarGroup: {
+    ariaLabel: 'Avatar group',
+    overflowAriaLabel: '{count} more'
+  },
   carousel: {
     ariaLabel: 'Image carousel',
     navigationAriaLabel: 'Carousel navigation',

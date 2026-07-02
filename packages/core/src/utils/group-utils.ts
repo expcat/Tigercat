@@ -1,4 +1,5 @@
 import { type ClassValue, classNames } from './class-names'
+import { DEFAULT_AVATAR_GROUP_LABELS } from './locale-utils'
 import {
   avatarGroupBaseClasses,
   avatarGroupItemClasses,
@@ -57,8 +58,11 @@ export function getAvatarGroupOverflowClasses(
   return classNames(avatarGroupOverflowClasses, avatarSizeClasses[size], ...classes)
 }
 
-export function getAvatarGroupOverflowLabel(overflowCount: number): string {
-  return `${overflowCount} more`
+export function getAvatarGroupOverflowLabel(
+  overflowCount: number,
+  template = DEFAULT_AVATAR_GROUP_LABELS.overflowAriaLabel
+): string {
+  return template.replace('{count}', String(overflowCount))
 }
 
 export function getAvatarGroupOverflowText(overflowCount: number): string {

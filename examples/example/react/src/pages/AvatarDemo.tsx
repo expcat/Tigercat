@@ -5,8 +5,6 @@ import { Badge } from '@expcat/tigercat-react/Badge'
 import DemoBlock from '../components/DemoBlock'
 import fullPageSnippet from './AvatarDemo.tsx?raw'
 
-const teamGroupA11y = { 'aria-label': '项目团队成员' }
-
 const imageSnippet = `<Space>
   <Avatar src="https://i.pravatar.cc/150?img=1" alt="User 1" />
   <Avatar src="https://i.pravatar.cc/150?img=2" alt="User 2" />
@@ -105,7 +103,7 @@ const usageSnippet = `<div>
   <div className="mb-6">
     <h3 className="text-lg font-semibold mb-3">团队成员（头像组）</h3>
     <div className="p-6 bg-gray-50 rounded-lg">
-      <AvatarGroup max={4} size="md" {...teamGroupA11y}>
+      <AvatarGroup max={4} size="md" aria-label="项目团队成员">
         <Avatar src="https://i.pravatar.cc/150?img=21" alt="成员：王一" />
         <Avatar src="https://i.pravatar.cc/150?img=22" alt="成员：李敏" />
         <Avatar text="Charlie" bgColor="bg-[var(--tiger-secondary,#4b5563)]" textColor="text-white" aria-label="成员：Charlie" />
@@ -329,7 +327,7 @@ export default function AvatarDemo() {
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3">团队成员（头像组）</h3>
             <div className="p-6 bg-gray-50 rounded-lg">
-              <AvatarGroup max={4} size="md" {...teamGroupA11y}>
+              <AvatarGroup max={4} size="md" aria-label="项目团队成员">
                 <Avatar src="https://i.pravatar.cc/150?img=21" alt="成员：王一" />
                 <Avatar src="https://i.pravatar.cc/150?img=22" alt="成员：李敏" />
                 <Avatar
