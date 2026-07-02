@@ -9,10 +9,10 @@ const hours = ['上午', '下午', '晚上']
 const HeatmapChartDemo: React.FC = () => {
   const heatData = useMemo(
     () =>
-      days.flatMap((_, xi) =>
-        hours.map((_, yi) => ({
-          x: xi,
-          y: yi,
+      days.flatMap((day) =>
+        hours.map((hour) => ({
+          x: day,
+          y: hour,
           value: Math.round(Math.random() * 100)
         }))
       ),

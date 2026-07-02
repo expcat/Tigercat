@@ -134,8 +134,8 @@ const basicSnippet = `<Form :model="basicForm" @submit="handleBasicSubmit" class
   </FormItem>
   <FormItem>
     <Space>
-      <Button type="submit" variant="primary">提交</Button>
-      <Button type="button" variant="secondary" @click="resetBasic">重置</Button>
+      <Button html-type="submit" variant="primary">提交</Button>
+      <Button html-type="button" variant="secondary" @click="resetBasic">重置</Button>
     </Space>
   </FormItem>
 </Form>`
@@ -161,10 +161,10 @@ const validateSnippet = `<Space direction="vertical" class="w-full">
     </FormItem>
     <FormItem>
       <Space>
-        <Button type="submit" variant="primary">提交并校验</Button>
-        <Button type="button" variant="secondary" @click="validateManually">手动校验</Button>
-        <Button type="button" variant="secondary" @click="clearValidateManually">清除校验</Button>
-        <Button type="button" variant="secondary" @click="resetValidateForm">重置</Button>
+        <Button html-type="submit" variant="primary">提交并校验</Button>
+        <Button html-type="button" variant="secondary" @click="validateManually">手动校验</Button>
+        <Button html-type="button" variant="secondary" @click="clearValidateManually">清除校验</Button>
+        <Button html-type="button" variant="secondary" @click="resetValidateForm">重置</Button>
       </Space>
     </FormItem>
   </Form>
@@ -312,8 +312,8 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
 
         <FormItem>
           <Space>
-            <Button type="submit" variant="primary">提交</Button>
-            <Button type="button" variant="secondary" @click="resetBasic">重置</Button>
+            <Button html-type="submit" variant="primary">提交</Button>
+            <Button html-type="button" variant="secondary" @click="resetBasic">重置</Button>
           </Space>
         </FormItem>
       </Form>
@@ -349,12 +349,16 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
 
           <FormItem>
             <Space>
-              <Button type="submit" variant="primary">提交并校验</Button>
-              <Button type="button" variant="secondary" @click="validateManually">手动校验</Button>
-              <Button type="button" variant="secondary" @click="clearValidateManually"
+              <Button html-type="submit" variant="primary">提交并校验</Button>
+              <Button html-type="button" variant="secondary" @click="validateManually"
+                >手动校验</Button
+              >
+              <Button html-type="button" variant="secondary" @click="clearValidateManually"
                 >清除校验</Button
               >
-              <Button type="button" variant="secondary" @click="resetValidateForm">重置</Button>
+              <Button html-type="button" variant="secondary" @click="resetValidateForm"
+                >重置</Button
+              >
             </Space>
           </FormItem>
         </Form>
@@ -468,7 +472,7 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
           <Input v-model="customValidatorModel.age" type="number" placeholder="18-120" />
         </FormItem>
         <FormItem>
-          <Button type="button" variant="primary" @click="customValidatorFormRef?.validate()"
+          <Button html-type="button" variant="primary" @click="customValidatorFormRef?.validate()"
             >校验</Button
           >
         </FormItem>
@@ -492,7 +496,7 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
           <Input v-model="showMessageModel.email" placeholder="错误在输入框内显示" />
         </FormItem>
         <FormItem>
-          <Button type="button" variant="primary" @click="showMessageFormRef?.validate()"
+          <Button html-type="button" variant="primary" @click="showMessageFormRef?.validate()"
             >校验对比</Button
           >
         </FormItem>

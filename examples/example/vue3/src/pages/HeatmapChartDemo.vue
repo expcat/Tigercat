@@ -48,10 +48,10 @@ import fullPageSnippet from './HeatmapChartDemo.vue?raw'
 const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
 const hours = ['上午', '下午', '晚上']
 
-const heatData = days.flatMap((_, xi) =>
-  hours.map((_, yi) => ({
-    x: xi,
-    y: yi,
+const heatData = days.flatMap((day) =>
+  hours.map((hour) => ({
+    x: day,
+    y: hour,
     value: Math.round(Math.random() * 100)
   }))
 )

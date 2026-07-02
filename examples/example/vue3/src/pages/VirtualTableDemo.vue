@@ -36,6 +36,7 @@
           <VirtualTable
             :data-source="basicData.slice(0, 24)"
             :columns="fixedColumns"
+            row-key="id"
             :virtual-height="280"
             :virtual-item-height="48"
             striped

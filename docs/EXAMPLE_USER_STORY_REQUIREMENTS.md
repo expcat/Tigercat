@@ -60,6 +60,8 @@ source: docs/ROADMAP.md R28 review
 - **EX10** `P1` `Example` — VirtualTable 固定列示例补 `rowKey="id"` 并修正 selected rows 与业务 ID 的对应关系。验收：选择与 ID 一致（`#/virtual-table`）。（E16-1）
 - **EX11** `P1` `Example` — Vue Transfer「搜索与标题」改用 `source-title`/`target-title`，修复自定义标题失效与 React/Vue 不一致。验收：Vue 自定义标题生效（`#/transfer`）。（E12-1）
 
+**执行记录（2026-07-02）**：EX1-EX11 已完成。改动限制在 Example 层：ImageCropper 改为内联本地 data URL 并补裁剪失败提示；Vue Splitter 改默认 slot 并移除 `collapsible`/`min-sizes` 宣传；Affix 传入内部滚动容器 `target`；Anchor 补齐所有目标 id 并避免 React 渲染期状态更新 warning；React/Vue 均补 `#/input-number` route；Vue Form 改用 `html-type`；Upload 数量限制告警文案改为固定上限；Heatmap 数据改用 label 字符串；Vue TaskBoard 改用 `@card-add` 并验证新增卡片生效；VirtualTable 固定列示例补 `rowKey="id"` / `row-key="id"`；Vue Transfer 改用 `source-title`/`target-title`。已运行 `npx -y pnpm@11.9.0 example:sources:check`、`npx -y pnpm@11.9.0 example:build`，并用浏览器复查 React `#/image-cropper`、`#/anchor`、`#/input-number`、`#/heatmap-chart`、`#/virtual-table` 与 Vue `#/splitter`、`#/form`、`#/task-board`、`#/transfer`。剩余风险：EX12+ 仍按本清单后续批次处理；本批未修改 public API 或 generated refs。
+
 ### 歧义（示例误导）
 
 - **EX12** `P1` `Example` — Avatar「团队成员」改用 `AvatarGroup max`，替换手写 `Avatar text="+5"`（实际只渲染 `+`）。验收：溢出计数正确、含 `aria-label`（`#/avatar`）。（E02-1）

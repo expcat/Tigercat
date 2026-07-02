@@ -24,6 +24,7 @@ const AffixDemo: React.FC = () => {
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">固定在顶部</h3>
             <div
+              id="affix-scroll-container"
               style={{
                 height: 100,
                 overflow: 'auto',
@@ -33,7 +34,10 @@ const AffixDemo: React.FC = () => {
               }}>
               <div style={{ height: 300 }}>
                 <p className="mb-4">向下滚动触发固定</p>
-                <Affix offsetTop={0} onChange={(affixed) => console.log('Affix:', affixed)}>
+                <Affix
+                  offsetTop={0}
+                  target="#affix-scroll-container"
+                  onChange={(affixed) => console.log('Affix:', affixed)}>
                   <div className="px-4 py-2 bg-blue-500 text-white rounded inline-block">
                     我会固定在顶部
                   </div>

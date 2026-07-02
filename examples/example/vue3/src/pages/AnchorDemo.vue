@@ -107,7 +107,11 @@ const handleDemoChange = (activeLink: string) => {
                 </div>
               </div>
               <div class="space-y-3">
-                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">水平方向</h3>
+                <h3
+                  id="demo-horizontal"
+                  class="text-sm font-semibold text-gray-700 dark:text-gray-200 scroll-mt-20">
+                  水平方向
+                </h3>
                 <div class="p-6 bg-gray-50 rounded-lg">
                   <Anchor
                     direction="horizontal"
@@ -178,11 +182,11 @@ const handleDemoChange = (activeLink: string) => {
                         嵌套锚点可以用于展示文档的层级结构，如章节和小节。
                       </p>
                       <div class="space-y-2 text-sm text-gray-500">
-                        <p>• 第一章 - Chapter 1</p>
-                        <p class="pl-4">• 1.1 小节 - Section 1.1</p>
-                        <p class="pl-4">• 1.2 小节 - Section 1.2</p>
-                        <p>• 第二章 - Chapter 2</p>
-                        <p class="pl-4">• 2.1 小节 - Section 2.1</p>
+                        <p id="chapter1" class="scroll-mt-20">• 第一章 - Chapter 1</p>
+                        <p id="section1-1" class="pl-4 scroll-mt-20">• 1.1 小节 - Section 1.1</p>
+                        <p id="section1-2" class="pl-4 scroll-mt-20">• 1.2 小节 - Section 1.2</p>
+                        <p id="chapter2" class="scroll-mt-20">• 第二章 - Chapter 2</p>
+                        <p id="section2-1" class="pl-4 scroll-mt-20">• 2.1 小节 - Section 2.1</p>
                       </div>
                     </div>
                     <div class="w-48">
@@ -200,7 +204,11 @@ const handleDemoChange = (activeLink: string) => {
                 </div>
               </div>
               <div class="space-y-3">
-                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">墨水指示器</h3>
+                <h3
+                  id="demo-ink"
+                  class="text-sm font-semibold text-gray-700 dark:text-gray-200 scroll-mt-20">
+                  墨水指示器
+                </h3>
                 <div class="p-6 bg-gray-50 rounded-lg">
                   <div class="flex gap-8">
                     <div class="flex-1">

@@ -38,6 +38,7 @@ const router = createRouter({
         { path: 'watermark', component: lazyPage(() => import('./pages/WatermarkDemo.vue')) },
         // Form
         { path: 'input', component: lazyPage(() => import('./pages/InputDemo.vue')) },
+        { path: 'input-number', component: lazyPage(() => import('./pages/InputDemo.vue')) },
         { path: 'input-group', component: lazyPage(() => import('./pages/InputGroupDemo.vue')) },
         { path: 'textarea', component: lazyPage(() => import('./pages/TextareaDemo.vue')) },
         { path: 'checkbox', component: lazyPage(() => import('./pages/CheckboxDemo.vue')) },

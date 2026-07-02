@@ -11,6 +11,7 @@
         <div class="space-y-3">
           <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">固定在顶部</h3>
           <div
+            id="affix-scroll-container"
             style="
               height: 100px;
               overflow: auto;
@@ -20,7 +21,7 @@
             ">
             <div style="height: 300px">
               <p class="mb-4">向下滚动触发固定 ↓</p>
-              <Affix :offset-top="0" @change="onAffixChange">
+              <Affix :offset-top="0" target="#affix-scroll-container" @change="onAffixChange">
                 <div class="px-4 py-2 bg-blue-500 text-white rounded inline-block">
                   我会固定在顶部
                 </div>
