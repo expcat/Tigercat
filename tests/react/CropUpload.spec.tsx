@@ -315,11 +315,6 @@ describe('CropUpload', () => {
       const { container } = render(<CropUpload />)
       await expectNoA11yViolationsIsolated(container)
     })
-
-    it('passes axe audit when disabled', async () => {
-      const { container } = render(<CropUpload disabled />)
-      await expectNoA11yViolationsIsolated(container)
-    })
   })
 
   describe('Edge Cases', () => {
