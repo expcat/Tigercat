@@ -221,6 +221,11 @@ describe('Kanban', () => {
         expect(header.getAttribute('draggable')).toBe('true')
       })
     })
+
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Kanban />)
+      await expectNoA11yViolationsIsolated(container)
+    })
   })
 
   describe('Custom renderers', () => {
@@ -236,12 +241,6 @@ describe('Kanban', () => {
         renderColumnHeader: (col: { title: string }) => <span>{col.title} ★</span>
       })
       expect(getByText('To Do ★')).toBeTruthy()
-    })
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<Kanban />)
-      await expectNoA11yViolationsIsolated(container)
     })
   })
 })

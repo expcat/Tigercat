@@ -147,43 +147,20 @@ describe('Transfer', () => {
   })
 
   describe('Accessibility', () => {
-    it('should have group role on panels', () => {
-      const { container } = render(Transfer, {
+    it('should have correct ARIA structure', () => {
+      const { container, getByLabelText } = render(Transfer, {
         props: { dataSource }
       })
 
-      const groups = container.querySelectorAll('[role="group"]')
-      expect(groups.length).toBe(2)
-    })
-
-    it('should have listbox role on item lists', () => {
-      const { container } = render(Transfer, {
-        props: { dataSource }
-      })
-
-      const listboxes = container.querySelectorAll('[role="listbox"]')
-      expect(listboxes.length).toBe(2)
-    })
-
-    it('should have aria-label on operation buttons', () => {
-      const { getByLabelText } = render(Transfer, {
-        props: { dataSource }
-      })
-
+      expect(container.querySelectorAll('[role="group"]').length).toBe(2)
+      expect(container.querySelectorAll('[role="listbox"]').length).toBe(2)
       expect(getByLabelText('Move selected to target')).toBeInTheDocument()
       expect(getByLabelText('Move selected to source')).toBeInTheDocument()
     })
-  })
-  describe('Accessibility', () => {
+
     it('should have no accessibility violations', async () => {
       const { container } = render(Transfer)
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Transfer)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })

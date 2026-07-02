@@ -268,6 +268,11 @@ describe('AutoComplete', () => {
       const opts = container.querySelectorAll('[role="option"]')
       expect(opts.length).toBe(4)
     })
+
+    it('should have no accessibility violations', async () => {
+      const { container } = render(AutoComplete)
+      await expectNoA11yViolationsIsolated(container)
+    })
   })
 
   describe('Filter', () => {
@@ -298,18 +303,6 @@ describe('AutoComplete', () => {
 
       const opts = container.querySelectorAll('[role="option"]')
       expect(opts.length).toBe(4)
-    })
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(AutoComplete)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(AutoComplete)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })

@@ -125,6 +125,11 @@ describe('RichTextEditor', () => {
       })
     })
 
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<RichTextEditor />)
+      await expectNoA11yViolationsIsolated(container)
+    })
+
     it('uses ConfigProvider locale for toolbar and editor labels', () => {
       const { container } = render(
         <ConfigProvider locale={zhCN}>
@@ -203,12 +208,6 @@ describe('RichTextEditor', () => {
       editor.innerHTML = '<p>Hello <strong>world</strong></p>'
       fireEvent.input(editor)
       expect(onChange).toHaveBeenCalledWith('Hello world')
-    })
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<RichTextEditor />)
-      await expectNoA11yViolationsIsolated(container)
     })
   })
 })

@@ -321,6 +321,11 @@ describe('TaskBoard (React)', () => {
       render(<TaskBoard columns={columns} data-testid="my-board" />)
       expect(screen.getByTestId('my-board')).toBeInTheDocument()
     })
+
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<TaskBoard columns={columns} />)
+      await expectNoA11yViolationsIsolated(container)
+    })
   })
 
   describe('className and style', () => {
@@ -481,12 +486,6 @@ describe('TaskBoard (React)', () => {
       rerender(<TaskBoard columns={columns} />)
 
       expect(screen.getByText('Done')).toBeInTheDocument()
-    })
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(<TaskBoard />)
-      await expectNoA11yViolationsIsolated(container)
     })
   })
 })

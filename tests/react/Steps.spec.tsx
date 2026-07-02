@@ -272,17 +272,10 @@ describe('Steps', () => {
       expect(screen.getByText('Verify')).toBeInTheDocument()
       expect(screen.getByText('Complete')).toBeInTheDocument()
     })
-  })
-  describe('Accessibility', () => {
+
     it('should have no accessibility violations', async () => {
       const { container } = render(<Steps />)
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<Steps />)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })

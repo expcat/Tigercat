@@ -343,17 +343,10 @@ describe('Anchor', () => {
       const link = screen.getByRole('link', { name: 'Go to Section' })
       expect(link).toBeInTheDocument()
     })
-  })
-  describe('Accessibility', () => {
+
     it('should have no accessibility violations', async () => {
       const { container } = render(Anchor)
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Anchor)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 

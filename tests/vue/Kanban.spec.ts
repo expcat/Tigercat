@@ -230,8 +230,7 @@ describe('Kanban', () => {
         expect(header.getAttribute('draggable')).toBe('true')
       })
     })
-  })
-  describe('Accessibility', () => {
+
     it('should have no accessibility violations', async () => {
       const { container } = render(Kanban)
       await expectNoA11yViolationsIsolated(container)

@@ -291,6 +291,11 @@ describe('TaskBoard (Vue)', () => {
       const region = screen.getByRole('region')
       expect(region.getAttribute('aria-label')).toBe('My Board')
     })
+
+    it('should have no accessibility violations', async () => {
+      const { container } = render(TaskBoard, { props: { columns } })
+      await expectNoA11yViolationsIsolated(container)
+    })
   })
 
   describe('WIP Limit tooltip', () => {
@@ -426,12 +431,6 @@ describe('TaskBoard (Vue)', () => {
       await rerender({ columns })
 
       expect(screen.getByText('Done')).toBeInTheDocument()
-    })
-  })
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(TaskBoard)
-      await expectNoA11yViolationsIsolated(container)
     })
   })
 })

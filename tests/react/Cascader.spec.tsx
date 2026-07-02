@@ -316,17 +316,10 @@ describe('Cascader', () => {
       fireEvent.keyDown(trigger, { key: 'Escape' })
       expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
     })
-  })
-  describe('Accessibility', () => {
+
     it('should have no accessibility violations', async () => {
       const { container } = render(<Cascader />)
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<Cascader />)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })

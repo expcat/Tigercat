@@ -328,17 +328,10 @@ describe('TreeSelect', () => {
       await fireEvent.keyDown(trigger, { key: 'Enter' })
       expect(getByRole('listbox')).toBeInTheDocument()
     })
-  })
-  describe('Accessibility', () => {
+
     it('should have no accessibility violations', async () => {
       const { container } = render(TreeSelect)
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(TreeSelect)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })

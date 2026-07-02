@@ -519,17 +519,10 @@ describe('Collapse', () => {
       expect(panelHeader).toHaveAttribute('tabindex', '-1')
       expect(panelHeader).toHaveAttribute('aria-disabled', 'true')
     })
-  })
-  describe('Accessibility', () => {
+
     it('should have no accessibility violations', async () => {
       const { container } = render(Collapse)
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Collapse)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })

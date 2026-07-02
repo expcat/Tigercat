@@ -159,17 +159,10 @@ describe('Transfer', () => {
       expect(getByLabelText('Move selected to target')).toBeInTheDocument()
       expect(getByLabelText('Move selected to source')).toBeInTheDocument()
     })
-  })
-  describe('Accessibility', () => {
+
     it('should have no accessibility violations', async () => {
       const { container } = render(<Transfer />)
       await expectNoA11yViolationsIsolated(container)
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<Transfer />)
-      expect(container.firstChild).toBeTruthy()
     })
   })
 })
