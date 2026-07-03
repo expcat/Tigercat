@@ -16,6 +16,10 @@ export interface StepperProps {
   size?: ComponentSize
   /** Precision (decimal places) */
   precision?: number
+  /** Accessible label for the increment button */
+  incrementAriaLabel?: string
+  /** Accessible label for the decrement button */
+  decrementAriaLabel?: string
   /** Custom class name */
   className?: string
 }

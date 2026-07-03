@@ -1,14 +1,19 @@
-import { defineComponent, h, provide, reactive, watch, PropType } from 'vue'
+import { computed, defineComponent, h, provide, reactive, watch, PropType } from 'vue'
 import {
   coerceClassValue,
   getAvatarGroupClasses,
   getAvatarGroupItemClasses,
+  getAvatarGroupLabels,
   getAvatarGroupOverflowClasses,
   getAvatarGroupOverflowLabel,
   getAvatarGroupOverflowText,
   getVisibleGroupItems,
-  type AvatarSize
+  mergeTigerLocale,
+  type AvatarSize,
+  type TigerLocale,
+  type TigerLocaleAvatarGroup
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export const AVATAR_GROUP_INJECTION_KEY = Symbol('TigerAvatarGroup')
 
@@ -21,6 +26,8 @@ export interface VueAvatarGroupProps {
   max?: number
   size?: AvatarSize
   className?: string
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleAvatarGroup>
 }
 
 export const AvatarGroup = defineComponent({
@@ -38,9 +45,23 @@ export const AvatarGroup = defineComponent({
     className: {
       type: String,
       default: undefined
+    },
+    /** Locale overrides merged on top of ConfigProvider locale */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    /** Text/aria label overrides */
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleAvatarGroup>>,
+      default: undefined
     }
   },
   setup(props, { slots, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getAvatarGroupLabels(mergedLocale.value, props.labels))
+
     // Provide a reactive context so child Avatars follow dynamic `size` changes
     const groupContext = reactive<AvatarGroupContext>({
       size: props.size,
@@ -68,10 +89,10 @@ export const AvatarGroup = defineComponent({
       return h(
         'div',
         {
-          ...attrs,
-          class: getAvatarGroupClasses(props.className, coerceClassValue(attrsClass)),
           role: 'group',
-          'aria-label': 'Avatar group'
+          'aria-label': labels.value.ariaLabel,
+          ...attrs,
+          class: getAvatarGroupClasses(props.className, coerceClassValue(attrsClass))
         },
         [
           ...visibleItems,
@@ -80,7 +101,10 @@ export const AvatarGroup = defineComponent({
                 'span',
                 {
                   class: getAvatarGroupOverflowClasses(props.size ?? 'md'),
-                  'aria-label': getAvatarGroupOverflowLabel(overflowCount)
+                  'aria-label': getAvatarGroupOverflowLabel(
+                    overflowCount,
+                    labels.value.overflowAriaLabel
+                  )
                 },
                 getAvatarGroupOverflowText(overflowCount)
               )

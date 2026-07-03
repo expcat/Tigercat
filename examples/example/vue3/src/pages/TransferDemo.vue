@@ -25,7 +25,8 @@ const searchSnippet = `<Transfer
   v-model="targetKeys"
   :data-source="dataSource"
   searchable
-  :titles="['可选', '已选']"
+  source-title="可选"
+  target-title="已选"
 />`
 </script>
 
@@ -40,13 +41,14 @@ const searchSnippet = `<Transfer
 
     <DemoBlock
       title="搜索与标题"
-      description="searchable 开启搜索，titles 自定义标题"
+      description="searchable 开启搜索，source-title / target-title 自定义标题"
       :code="fullPageSnippet">
       <Transfer
         v-model="targetKeys2"
         :data-source="dataSource"
         searchable
-        :titles="['可选', '已选']" />
+        source-title="可选"
+        target-title="已选" />
     </DemoBlock>
   </div>
 </template>

@@ -29,6 +29,7 @@ import type {
   TigerLocaleSelect,
   TigerLocaleTabs,
   TigerLocaleRate,
+  TigerLocaleAvatarGroup,
   TigerLocaleCarousel,
   TigerLocaleTransfer,
   TigerLocaleChart,
@@ -156,6 +157,7 @@ export function mergeTigerLocale(
     select: { ...base?.select, ...override?.select },
     tabs: { ...base?.tabs, ...override?.tabs },
     rate: { ...base?.rate, ...override?.rate },
+    avatarGroup: { ...base?.avatarGroup, ...override?.avatarGroup },
     carousel: { ...base?.carousel, ...override?.carousel },
     transfer: { ...base?.transfer, ...override?.transfer },
     chart: { ...base?.chart, ...override?.chart },
@@ -700,6 +702,32 @@ export function getRateLabels(
   return {
     ariaLabel: overrides?.ariaLabel ?? locale?.rate?.ariaLabel ?? defaultLabels.ariaLabel,
     valueText: overrides?.valueText ?? locale?.rate?.valueText ?? defaultLabels.valueText
+  }
+}
+
+export const DEFAULT_AVATAR_GROUP_LABELS: Required<TigerLocaleAvatarGroup> = {
+  ariaLabel: 'Avatar group',
+  overflowAriaLabel: '{count} more'
+}
+
+export const ZH_CN_AVATAR_GROUP_LABELS: Required<TigerLocaleAvatarGroup> = {
+  ariaLabel: '头像组',
+  overflowAriaLabel: '还有 {count} 位'
+}
+
+export function getAvatarGroupLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleAvatarGroup>
+): Required<TigerLocaleAvatarGroup> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_AVATAR_GROUP_LABELS
+    : DEFAULT_AVATAR_GROUP_LABELS
+  return {
+    ariaLabel: overrides?.ariaLabel ?? locale?.avatarGroup?.ariaLabel ?? defaultLabels.ariaLabel,
+    overflowAriaLabel:
+      overrides?.overflowAriaLabel ??
+      locale?.avatarGroup?.overflowAriaLabel ??
+      defaultLabels.overflowAriaLabel
   }
 }
 

@@ -78,7 +78,7 @@ export default function AnchorDemo() {
     setLastEvent(`点击: ${href}`)
   }
   const handleDemoChange = (activeLink: string) => {
-    setLastEvent(`激活: ${activeLink}`)
+    window.setTimeout(() => setLastEvent(`激活: ${activeLink}`), 0)
   }
 
   return (
@@ -108,7 +108,9 @@ export default function AnchorDemo() {
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <h3
+                    id="demo-horizontal"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-200 scroll-mt-20">
                     水平方向
                   </h3>
                   <div className="p-6 bg-gray-50 rounded-lg">
@@ -185,11 +187,21 @@ export default function AnchorDemo() {
                           嵌套锚点可以用于展示文档的层级结构，如章节和小节。
                         </p>
                         <div className="space-y-2 text-sm text-gray-500">
-                          <p>• 第一章 - Chapter 1</p>
-                          <p className="pl-4">• 1.1 小节 - Section 1.1</p>
-                          <p className="pl-4">• 1.2 小节 - Section 1.2</p>
-                          <p>• 第二章 - Chapter 2</p>
-                          <p className="pl-4">• 2.1 小节 - Section 2.1</p>
+                          <p id="chapter1" className="scroll-mt-20">
+                            • 第一章 - Chapter 1
+                          </p>
+                          <p id="section1-1" className="pl-4 scroll-mt-20">
+                            • 1.1 小节 - Section 1.1
+                          </p>
+                          <p id="section1-2" className="pl-4 scroll-mt-20">
+                            • 1.2 小节 - Section 1.2
+                          </p>
+                          <p id="chapter2" className="scroll-mt-20">
+                            • 第二章 - Chapter 2
+                          </p>
+                          <p id="section2-1" className="pl-4 scroll-mt-20">
+                            • 2.1 小节 - Section 2.1
+                          </p>
                         </div>
                       </div>
                       <div className="w-48">
@@ -207,7 +219,9 @@ export default function AnchorDemo() {
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <h3
+                    id="demo-ink"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-200 scroll-mt-20">
                     墨水指示器
                   </h3>
                   <div className="p-6 bg-gray-50 rounded-lg">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Avatar } from '@expcat/tigercat-vue/Avatar'
+import { AvatarGroup } from '@expcat/tigercat-vue/AvatarGroup'
 import { Space } from '@expcat/tigercat-vue/Space'
 import { Badge } from '@expcat/tigercat-vue/Badge'
 import DemoBlock from '../components/DemoBlock.vue'
@@ -115,13 +116,17 @@ const usageSnippet = `<div>
   <div class="mb-6">
     <h3 class="text-lg font-semibold mb-3">团队成员（头像组）</h3>
     <div class="p-6 bg-gray-50 rounded-lg">
-      <div class="flex -space-x-2">
-        <Avatar src="https://i.pravatar.cc/150?img=21" alt="Member 1" size="md" class="ring-2 ring-white" />
-        <Avatar src="https://i.pravatar.cc/150?img=22" alt="Member 2" size="md" class="ring-2 ring-white" />
-        <Avatar text="Charlie" bg-color="bg-[var(--tiger-secondary,#4b5563)]" text-color="text-white" size="md" class="ring-2 ring-white" />
-        <Avatar text="David" bg-color="bg-[var(--tiger-primary,#2563eb)]" text-color="text-white" size="md" class="ring-2 ring-white" />
-        <Avatar text="+5" bg-color="bg-[var(--tiger-secondary,#4b5563)]" text-color="text-white" size="md" class="ring-2 ring-white" />
-      </div>
+      <AvatarGroup :max="4" size="md" aria-label="项目团队成员">
+        <Avatar src="https://i.pravatar.cc/150?img=21" alt="成员：王一" />
+        <Avatar src="https://i.pravatar.cc/150?img=22" alt="成员：李敏" />
+        <Avatar text="Charlie" bg-color="bg-[var(--tiger-secondary,#4b5563)]" text-color="text-white" aria-label="成员：Charlie" />
+        <Avatar text="David" bg-color="bg-[var(--tiger-primary,#2563eb)]" text-color="text-white" aria-label="成员：David" />
+        <Avatar text="赵六" aria-label="成员：赵六" />
+        <Avatar text="钱七" aria-label="成员：钱七" />
+        <Avatar text="孙八" aria-label="成员：孙八" />
+        <Avatar text="周九" aria-label="成员：周九" />
+        <Avatar text="吴十" aria-label="成员：吴十" />
+      </AvatarGroup>
     </div>
   </div>
 
@@ -332,36 +337,25 @@ const usageSnippet = `<div>
         <div class="mb-6">
           <h3 class="text-lg font-semibold mb-3">团队成员（头像组）</h3>
           <div class="p-6 bg-gray-50 rounded-lg">
-            <div class="flex -space-x-2">
-              <Avatar
-                src="https://i.pravatar.cc/150?img=21"
-                alt="Member 1"
-                size="md"
-                class="ring-2 ring-white" />
-              <Avatar
-                src="https://i.pravatar.cc/150?img=22"
-                alt="Member 2"
-                size="md"
-                class="ring-2 ring-white" />
+            <AvatarGroup :max="4" size="md" aria-label="项目团队成员">
+              <Avatar src="https://i.pravatar.cc/150?img=21" alt="成员：王一" />
+              <Avatar src="https://i.pravatar.cc/150?img=22" alt="成员：李敏" />
               <Avatar
                 text="Charlie"
                 bg-color="bg-[var(--tiger-secondary,#4b5563)]"
                 text-color="text-white"
-                size="md"
-                class="ring-2 ring-white" />
+                aria-label="成员：Charlie" />
               <Avatar
                 text="David"
                 bg-color="bg-[var(--tiger-primary,#2563eb)]"
                 text-color="text-white"
-                size="md"
-                class="ring-2 ring-white" />
-              <Avatar
-                text="+5"
-                bg-color="bg-[var(--tiger-secondary,#4b5563)]"
-                text-color="text-white"
-                size="md"
-                class="ring-2 ring-white" />
-            </div>
+                aria-label="成员：David" />
+              <Avatar text="赵六" aria-label="成员：赵六" />
+              <Avatar text="钱七" aria-label="成员：钱七" />
+              <Avatar text="孙八" aria-label="成员：孙八" />
+              <Avatar text="周九" aria-label="成员：周九" />
+              <Avatar text="吴十" aria-label="成员：吴十" />
+            </AvatarGroup>
           </div>
         </div>
 

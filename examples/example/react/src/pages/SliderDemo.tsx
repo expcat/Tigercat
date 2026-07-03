@@ -156,6 +156,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
               onChange={(val) => setBasicValue(toNumber(val))}
               min={0}
               max={100}
+              aria-label="基础数值"
               className="flex-1"
             />
             <Text>{basicValue}</Text>
@@ -177,6 +178,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
                 onChange={(val) => setRangeMinMaxDefaultValue(toNumber(val))}
                 min={0}
                 max={100}
+                aria-label="默认范围数值"
                 className="flex-1"
               />
               <Text>{rangeMinMaxDefaultValue}</Text>
@@ -190,6 +192,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
                 onChange={(val) => setRangeMinMaxWideValue(toNumber(val))}
                 min={0}
                 max={200}
+                aria-label="宽范围数值"
                 className="flex-1"
               />
               <Text>{rangeMinMaxWideValue}</Text>
@@ -208,6 +211,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
               min={0}
               max={100}
               step={10}
+              aria-label="步进数值"
               className="flex-1"
             />
             <Text>{stepValue}</Text>
@@ -228,6 +232,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
               range
               min={0}
               max={100}
+              aria-label="预算范围"
               className="flex-1"
             />
             <Text>
@@ -247,6 +252,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
               min={0}
               max={100}
               marks={marks}
+              aria-label="温度刻度"
               className="flex-1"
             />
             <Text>{marksValue}</Text>
@@ -268,6 +274,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
                 onChange={(val) => setTooltipOnValue(toNumber(val))}
                 min={0}
                 max={100}
+                aria-label="显示提示的数值"
                 className="flex-1"
               />
               <Text>{tooltipOnValue}</Text>
@@ -282,6 +289,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
                 min={0}
                 max={100}
                 tooltip={false}
+                aria-label="隐藏提示的数值"
                 className="flex-1"
               />
               <Text>{tooltipOffValue}</Text>
@@ -294,7 +302,14 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
       <DemoBlock title="禁用状态" description="通过 disabled 属性禁用滑块。" code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="flex items-center gap-4 w-full">
-            <Slider value={disabledValue} min={0} max={100} disabled className="flex-1" />
+            <Slider
+              value={disabledValue}
+              min={0}
+              max={100}
+              disabled
+              aria-label="禁用数值"
+              className="flex-1"
+            />
             <Text>{disabledValue}</Text>
           </div>
         </Space>
@@ -315,6 +330,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
                 size="sm"
                 min={0}
                 max={100}
+                aria-label="小尺寸数值"
                 className="flex-1"
               />
               <Text>{sizeSm}</Text>
@@ -329,6 +345,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
                 size="md"
                 min={0}
                 max={100}
+                aria-label="中尺寸数值"
                 className="flex-1"
               />
               <Text>{sizeMd}</Text>
@@ -343,6 +360,7 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
                 size="lg"
                 min={0}
                 max={100}
+                aria-label="大尺寸数值"
                 className="flex-1"
               />
               <Text>{sizeLg}</Text>
@@ -358,7 +376,13 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
         code={fullPageSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <div className="flex items-center gap-4 w-full">
-            <Slider defaultValue={60} min={0} max={100} className="flex-1" />
+            <Slider
+              defaultValue={60}
+              min={0}
+              max={100}
+              aria-label="默认值数值"
+              className="flex-1"
+            />
           </div>
         </Space>
       </DemoBlock>

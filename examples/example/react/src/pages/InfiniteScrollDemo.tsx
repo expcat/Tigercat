@@ -37,6 +37,8 @@ const InfiniteScrollDemo: React.FC = () => {
             <InfiniteScroll
               hasMore={hasMore}
               loading={loading}
+              loadingText="正在加载更多..."
+              endText="没有更多数据了"
               onLoadMore={loadMore}
               className="h-[300px] border border-gray-200 rounded-lg">
               {items.map((i) => (

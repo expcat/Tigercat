@@ -20,6 +20,16 @@ describe('Stepper', () => {
     expect(buttons.length).toBe(2)
   })
 
+  it('allows overriding step control aria labels', () => {
+    renderWithProps(Stepper, {
+      modelValue: 5,
+      incrementAriaLabel: '增加数值',
+      decrementAriaLabel: '减少数值'
+    })
+    expect(screen.getByLabelText('增加数值')).toBeInTheDocument()
+    expect(screen.getByLabelText('减少数值')).toBeInTheDocument()
+  })
+
   it('applies className prop', () => {
     const { container } = renderWithProps(Stepper, { className: 'my-stepper' })
     expect(container.querySelector('.my-stepper')).toBeInTheDocument()

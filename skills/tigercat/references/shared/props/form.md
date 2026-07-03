@@ -139,7 +139,7 @@ description: Compact generated Tigercat Form props reference
 
 ## InputNumber
 
-`packages/core/src/types/input-number.ts` · `InputNumberProps` · 3/19 props
+`packages/core/src/types/input-number.ts` · `InputNumberProps` · 3/21 props
 
 | Prop      | Type             | Default     | Notes                           |
 | --------- | ---------------- | ----------- | ------------------------------- |
@@ -219,7 +219,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Stepper
 
-`packages/core/src/types/stepper.ts` · `StepperProps` · 3/7 props
+`packages/core/src/types/stepper.ts` · `StepperProps` · 3/9 props
 
 | Prop    | Type     | Default | Notes          |
 | ------- | -------- | ------- | -------------- |

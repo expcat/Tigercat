@@ -1348,3 +1348,30 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **剩余阻塞**：无；R28 E01-E21 已完成。后续修复任务应从 `docs/EXAMPLE_AGENT_PLAN.md` 各分组建议中拆分追加。
 
 **状态更新要求**：已将 `docs/EXAMPLE_AGENT_PLAN.md` E21 标为 `已完成（2026-07-01）` 并追加审查记录；`docs/ROADMAP.md` 阶段 22 / R28 标为 `已完成（2026-07-01）`，当前可执行任务更新为暂无；R28 E21 未修改 public API 或 shared contract，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R29 EX12-EX16 Example ambiguity and zh-CN a11y repair
+
+**状态**：已完成（2026-07-02）。
+
+**目标**：按 `docs/EXAMPLE_USER_STORY_REQUIREMENTS.md` 执行 EX12-EX16，修复示例歧义、真实能力不一致、中文站英文/缺失可访问名，以及窄视口 Descriptions 可读性。
+
+**允许修改**：React/Vue Example 页面、shared demo locale、必要组件 props/types、focused tests、API baseline、Skill references 与 roadmap/需求归档。
+
+**不得修改**：与 EX12-EX16 无关的组件行为、发布工作流门禁、旧迁移历史或 generated refs 的手写内容。
+
+**执行摘要**：React/Vue Avatar 团队成员已从手写 `Avatar text="+5"` 改为 `AvatarGroup max={4}` / `:max="4"` 并补团队 `aria-label`；Splitter 水平示例 `sizes` 文案已从百分比修正为像素；Watermark 已补图片水印示例；Descriptions 多列示例已改用响应式 `column` 配置。中文站示例层补齐 QRCode locale/refresh、Alert close aria、Switch/Slider/Progress/Signature aria、NumberKeyboard deleteText、InfiniteScroll loading/end 文案、Loading 变体/尺寸/颜色中文、Skeleton 加载完成文案、Table 列/筛选/状态/操作中文，以及 Timeline 状态 Tag 中文映射。InputNumber/Stepper 因缺少示例层覆写入口，新增 `incrementAriaLabel` / `decrementAriaLabel` public props，React/Vue 组件、core types、focused tests、API baseline 与 Skill references 已同步。
+
+**实际验证**：
+
+- `npx -y pnpm@11.9.0 vitest run tests/react/InputNumber.spec.tsx tests/react/Stepper.spec.tsx tests/vue/InputNumber.spec.ts tests/vue/Stepper.spec.ts`
+- `npx -y pnpm@11.9.0 types:check`
+- `npx -y pnpm@11.9.0 api:validate`
+- `npx -y pnpm@11.9.0 api:baseline`
+- `npx -y pnpm@11.9.0 docs:api`
+- `npx -y pnpm@11.9.0 example:sources:check`
+- `npx -y pnpm@11.9.0 example:build`
+- Browser zh-CN review：React/Vue `#/avatar`、`#/splitter`、`#/watermark`、`#/descriptions`、`#/qrcode`、`#/input`、`#/stepper`、`#/slider`、`#/signature`、`#/infinite-scroll`、`#/loading`、`#/skeleton`、`#/table`、`#/timeline`。
+
+**剩余风险**：Vue dev server 仍会输出既有 `defineAsyncComponent` route warning；InfiniteScroll 基础示例需滚动加载到 50 项后才显示基础 `endText`，静态浏览器复查覆盖了自定义结束文案。
+
+**状态更新要求**：已在 `docs/EXAMPLE_USER_STORY_REQUIREMENTS.md` 追加 EX12-EX16 执行记录，并将 `docs/ROADMAP.md` 阶段 23 / R29 最近执行记录推进到 EX12-EX16；本批新增 public props 属覆写能力补齐，无删除/合并事项，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。

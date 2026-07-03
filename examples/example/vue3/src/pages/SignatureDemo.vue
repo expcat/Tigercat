@@ -37,6 +37,8 @@ const basicSnippet = `<Signature
   pen-color="#0f766e"
   :line-width="3"
   export-type="image/svg+xml"
+  aria-label="合同签名"
+  clear-text="清空"
   @change="handleChange" />`
 
 const exportSnippet = `const signatureRef = ref()
@@ -51,8 +53,8 @@ const exportSvg = () => {
   if (svg) svgText.value = svg
 }`
 
-const disabledSnippet = `<Signature disabled />
-<Signature readonly />`
+const disabledSnippet = `<Signature disabled aria-label="禁用签名" clear-text="清空" />
+<Signature readonly aria-label="只读签名" clear-text="清空" />`
 </script>
 
 <template>
@@ -85,7 +87,13 @@ const disabledSnippet = `<Signature disabled />
       description="通过 ref 导出 PNG data URL 或 SVG 字符串"
       :code="fullPageSnippet">
       <div class="space-y-4">
-        <Signature ref="signatureRef" :width="420" :height="180" background-color="#ffffff" />
+        <Signature
+          ref="signatureRef"
+          :width="420"
+          :height="180"
+          background-color="#ffffff"
+          aria-label="导出签名"
+          clear-text="清空" />
         <div class="flex flex-wrap gap-3">
           <Button @click="exportPng">导出 PNG</Button>
           <Button variant="secondary" @click="exportSvg">导出 SVG</Button>
@@ -109,8 +117,8 @@ const disabledSnippet = `<Signature disabled />
       description="disabled / readonly 状态下不可绘制"
       :code="fullPageSnippet">
       <div class="grid gap-4 md:grid-cols-2">
-        <Signature :width="320" :height="140" disabled clear-text="清空" />
-        <Signature :width="320" :height="140" readonly clear-text="清空" />
+        <Signature :width="320" :height="140" disabled aria-label="禁用签名" clear-text="清空" />
+        <Signature :width="320" :height="140" readonly aria-label="只读签名" clear-text="清空" />
       </div>
     </DemoBlock>
   </div>

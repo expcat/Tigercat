@@ -3,8 +3,8 @@ import DemoBlock from '../components/DemoBlock'
 import fullPageSnippet from './SplitterDemo.tsx?raw'
 
 const horizontalSnippet = `<Splitter direction="horizontal" sizes={[30, 70]} style={{ height: 200, border: '1px solid #e5e7eb', borderRadius: 8 }}>
-  <div className="p-4">左侧面板 (30%)</div>
-  <div className="p-4">右侧面板 (70%)</div>
+  <div className="p-4">左侧面板 (30px)</div>
+  <div className="p-4">右侧面板 (70px)</div>
 </Splitter>`
 
 const verticalSnippet = `<Splitter direction="vertical" sizes={[40, 60]} style={{ height: 300 }}>
@@ -29,15 +29,15 @@ const SplitterDemo: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">Splitter 分割面板</h1>
-      <p className="text-gray-500 mb-8">可拖拽分割面板，支持水平/垂直、嵌套和折叠。</p>
+      <p className="text-gray-500 mb-8">可拖拽分割面板，支持水平/垂直、嵌套和最小尺寸。</p>
 
       <DemoBlock title="水平分割" description="拖拽分割条调整面板大小" code={fullPageSnippet}>
         <Splitter
           direction="horizontal"
           sizes={[30, 70]}
           style={{ height: 200, border: '1px solid #e5e7eb', borderRadius: 8 }}>
-          <div className="p-4">左侧面板 (30%)</div>
-          <div className="p-4">右侧面板 (70%)</div>
+          <div className="p-4">左侧面板 (30px)</div>
+          <div className="p-4">右侧面板 (70px)</div>
         </Splitter>
       </DemoBlock>
 

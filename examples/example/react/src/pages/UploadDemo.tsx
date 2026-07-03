@@ -121,7 +121,7 @@ const UploadDemo: React.FC = () => {
   }
 
   const handleExceed = (_files: File[], list: UploadFile[]) => {
-    alert(`最多只能上传 ${list.length} 个文件！`)
+    alert(`最多只能上传 3 个文件，当前已有 ${list.length} 个。`)
   }
 
   const beforeUpload = (file: File) => {

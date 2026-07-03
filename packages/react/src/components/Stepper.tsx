@@ -28,6 +28,8 @@ export const Stepper: React.FC<StepperProps> = ({
   size = 'md',
   precision,
   className,
+  incrementAriaLabel = 'Increase',
+  decrementAriaLabel = 'Decrease',
   onChange
 }) => {
   const repeatControllerRef = useRef(createRafRepeatActionController())
@@ -95,7 +97,7 @@ export const Stepper: React.FC<StepperProps> = ({
         type="button"
         className={getStepperButtonClasses(size, disabled || atMin, 'left')}
         disabled={disabled || atMin}
-        aria-label="Decrease"
+        aria-label={decrementAriaLabel}
         onPointerDown={startStepRepeat('down')}
         onPointerUp={stopStepRepeat}
         onPointerLeave={stopStepRepeat}
@@ -118,7 +120,7 @@ export const Stepper: React.FC<StepperProps> = ({
         type="button"
         className={getStepperButtonClasses(size, disabled || atMax, 'right')}
         disabled={disabled || atMax}
-        aria-label="Increase"
+        aria-label={incrementAriaLabel}
         onPointerDown={startStepRepeat('up')}
         onPointerUp={stopStepRepeat}
         onPointerLeave={stopStepRepeat}

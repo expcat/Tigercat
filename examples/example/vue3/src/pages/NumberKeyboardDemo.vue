@@ -57,14 +57,14 @@ const idCardSnippet = `const idCard = ref('')
       :code="fullPageSnippet">
       <div class="max-w-sm space-y-3">
         <Input v-model="phone" readonly placeholder="手机号" />
-        <NumberKeyboard v-model="phone" mode="phone" confirm-text="完成" />
+        <NumberKeyboard v-model="phone" mode="phone" confirm-text="完成" delete-text="退格" />
       </div>
     </DemoBlock>
 
     <DemoBlock title="身份证输入" description="id-card 模式允许末位输入 X" :code="fullPageSnippet">
       <div class="max-w-sm space-y-3">
         <Input v-model="idCard" readonly placeholder="身份证号" />
-        <NumberKeyboard v-model="idCard" mode="id-card" confirm-text="完成" />
+        <NumberKeyboard v-model="idCard" mode="id-card" confirm-text="完成" delete-text="退格" />
       </div>
     </DemoBlock>
   </div>

@@ -98,6 +98,7 @@ const VirtualTableDemo: React.FC = () => {
             <VirtualTable
               dataSource={basicData.slice(0, 24)}
               columns={fixedColumns}
+              rowKey="id"
               virtualHeight={280}
               virtualItemHeight={48}
               striped

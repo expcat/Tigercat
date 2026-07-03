@@ -98,7 +98,7 @@
   {
     "name": "Core locale (zh-CN) subpath",
     "path": "packages/core/dist/locales/zh-CN.js",
-    "limit": "3 kB",
+    "limit": "4 kB",
     "gzip": true
   },
   {

@@ -60,6 +60,8 @@ source: docs/ROADMAP.md R28 review
 - **EX10** `P1` `Example` — VirtualTable 固定列示例补 `rowKey="id"` 并修正 selected rows 与业务 ID 的对应关系。验收：选择与 ID 一致（`#/virtual-table`）。（E16-1）
 - **EX11** `P1` `Example` — Vue Transfer「搜索与标题」改用 `source-title`/`target-title`，修复自定义标题失效与 React/Vue 不一致。验收：Vue 自定义标题生效（`#/transfer`）。（E12-1）
 
+**执行记录（2026-07-02）**：EX1-EX11 已完成。改动限制在 Example 层：ImageCropper 改为内联本地 data URL 并补裁剪失败提示；Vue Splitter 改默认 slot 并移除 `collapsible`/`min-sizes` 宣传；Affix 传入内部滚动容器 `target`；Anchor 补齐所有目标 id 并避免 React 渲染期状态更新 warning；React/Vue 均补 `#/input-number` route；Vue Form 改用 `html-type`；Upload 数量限制告警文案改为固定上限；Heatmap 数据改用 label 字符串；Vue TaskBoard 改用 `@card-add` 并验证新增卡片生效；VirtualTable 固定列示例补 `rowKey="id"` / `row-key="id"`；Vue Transfer 改用 `source-title`/`target-title`。已运行 `npx -y pnpm@11.9.0 example:sources:check`、`npx -y pnpm@11.9.0 example:build`，并用浏览器复查 React `#/image-cropper`、`#/anchor`、`#/input-number`、`#/heatmap-chart`、`#/virtual-table` 与 Vue `#/splitter`、`#/form`、`#/task-board`、`#/transfer`。剩余风险：EX12+ 仍按本清单后续批次处理；本批未修改 public API 或 generated refs。
+
 ### 歧义（示例误导）
 
 - **EX12** `P1` `Example` — Avatar「团队成员」改用 `AvatarGroup max`，替换手写 `Avatar text="+5"`（实际只渲染 `+`）。验收：溢出计数正确、含 `aria-label`（`#/avatar`）。（E02-1）
@@ -78,6 +80,10 @@ source: docs/ROADMAP.md R28 review
   - Switch/Slider 补业务化中文 `aria-label`（Slider 范围 thumb 默认英文）；Loading 变体/尺寸/颜色说明文案改中文。（E11-3/E11-4/E08-4）
   - Skeleton 加载完成示例文案改中文；Table 列 `title`/筛选 placeholder 改中文；Timeline 状态 Tag 中文映射。（E05-6/E15-1/E15-4）
     验收：zh-CN 复查上述 route 均无英文/缺失的默认文案与可访问名。
+
+**审核记录（2026-07-02）**：对 EX1-EX16 两批改动复审，发现 Vue `AvatarGroup` 根节点在 `...attrs` 之后硬编码 `aria-label`，用户传入的 `aria-label`（EX12 的「项目团队成员」）被覆盖、与 React 端不一致；同时组件默认组名与溢出徽标读屏文案为硬编码英文。已按 S5 同款 locale 模式完整修复：core 新增 `TigerLocaleAvatarGroup`（`ariaLabel`/`overflowAriaLabel` 支持 `{count}` 模板）、`getAvatarGroupLabels`、`mergeTigerLocale` 合并键与 en-US/zh-CN 内置预设段；`getAvatarGroupOverflowLabel` 改为模板驱动；React/Vue `AvatarGroup` 新增 `locale`/`labels` props 并接入 ConfigProvider，attrs 的 `aria-label` 可覆盖默认值；React `AvatarGroupProps` 补 `React.HTMLAttributes` 继承，Avatar 示例移除 `{...teamGroupA11y}` 类型绕行改为直写 `aria-label`。验证：`npx -y pnpm@11.9.0 vitest run tests/react/Avatar.spec.tsx tests/vue/Avatar.spec.ts tests/core/i18n-locales.spec.ts tests/react/ConfigProvider.spec.tsx tests/vue/ConfigProvider.spec.ts`（93 passed）、`types:check`、`api:validate`、`api:baseline`、`docs:api`、`example:sources:check`、`example:build`，Playwright zh-CN 复查 React/Vue `#/avatar`（组名「项目团队成员」、溢出徽标 aria-label「还有 5 位」）。剩余风险：`pnpm build` 的 core DTS 在 main 上已有与本次无关的 `datepicker-locales/registry.ts` TS2322 报错（TypeScript 6.0.3），另行处理。
+
+**执行记录（2026-07-02）**：EX12-EX16 已完成。React/Vue Avatar 团队成员改用 `AvatarGroup max` 并补 `aria-label`；Splitter `sizes` 单位文案改为 `30px/70px`；Watermark 补图片水印 section；Descriptions 多列示例改用响应式 `column`；中文站统一补 QRCode/Alert/Switch/Slider/Progress/Signature/InputNumber/Stepper/NumberKeyboard/InfiniteScroll 等可访问名或中文文案，并将 Loading、Skeleton、Table、Timeline 等示例可见文案中文化。为支持示例层覆写，InputNumber/Stepper 新增 `incrementAriaLabel` / `decrementAriaLabel` public props，并已同步 API baseline 与 skill references。已运行 `npx -y pnpm@11.9.0 vitest run tests/react/InputNumber.spec.tsx tests/react/Stepper.spec.tsx tests/vue/InputNumber.spec.ts tests/vue/Stepper.spec.ts`、`npx -y pnpm@11.9.0 types:check`、`npx -y pnpm@11.9.0 api:validate`、`npx -y pnpm@11.9.0 api:baseline`、`npx -y pnpm@11.9.0 docs:api`、`npx -y pnpm@11.9.0 example:sources:check`、`npx -y pnpm@11.9.0 example:build`，并用浏览器以 zh-CN 复查 React/Vue `#/avatar`、`#/splitter`、`#/watermark`、`#/descriptions`、`#/qrcode`、`#/input`、`#/stepper`、`#/slider`、`#/signature`、`#/infinite-scroll`、`#/loading`、`#/skeleton`、`#/table`、`#/timeline`。剩余风险：Vue dev server 仍会输出既有 async route warning，本批未改 router 结构；InfiniteScroll 基础示例的末尾文案需滚动加载到 50 项后出现，静态复查覆盖了自定义结束文案。
 
 ## 三、本轮不处理（记录，避免遗漏）
 

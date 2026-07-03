@@ -129,6 +129,7 @@ const resetClosableAlerts = () => {
           title="可关闭的提示"
           description="点击右侧关闭按钮可以关闭此提示"
           closable
+          close-aria-label="关闭提示"
           @close="showAlert1 = false" />
         <Alert
           v-if="showAlert2"

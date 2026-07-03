@@ -113,9 +113,11 @@ const labelsColumns = ref<TaskBoardColumn[]>([
           </p>
           <TaskBoard
             v-model:columns="columns"
+            allow-add-card
+            :labels="{ addCardText: '新增卡片' }"
             @card-move="handleCardMove"
             @column-move="handleColumnMove"
-            :on-card-add="handleCardAdd" />
+            @card-add="handleCardAdd" />
         </section>
         <section class="space-y-3">
           <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义卡片</h3>

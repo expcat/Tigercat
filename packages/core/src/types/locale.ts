@@ -234,6 +234,12 @@ export interface TigerLocaleRate {
   valueText?: string
 }
 
+export interface TigerLocaleAvatarGroup {
+  ariaLabel?: string
+  /** Template: supports {count} */
+  overflowAriaLabel?: string
+}
+
 export interface TigerLocaleCarousel {
   ariaLabel?: string
   navigationAriaLabel?: string
@@ -381,6 +387,7 @@ export interface TigerLocale {
   select?: TigerLocaleSelect
   tabs?: TigerLocaleTabs
   rate?: TigerLocaleRate
+  avatarGroup?: TigerLocaleAvatarGroup
   carousel?: TigerLocaleCarousel
   transfer?: TigerLocaleTransfer
   chart?: TigerLocaleChart

@@ -167,6 +167,7 @@ const router = createHashRouter([
       { path: 'watermark', element: <WatermarkDemo /> },
       // Form
       { path: 'input', element: <InputDemo /> },
+      { path: 'input-number', element: <InputDemo /> },
       { path: 'input-group', element: <InputGroupDemo /> },
       { path: 'textarea', element: <TextareaDemo /> },
       { path: 'checkbox', element: <CheckboxDemo /> },

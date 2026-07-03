@@ -164,6 +164,10 @@ export const zhCN: TigerLocale = {
     ariaLabel: '评分',
     valueText: '{value} 星'
   },
+  avatarGroup: {
+    ariaLabel: '头像组',
+    overflowAriaLabel: '还有 {count} 位'
+  },
   carousel: {
     ariaLabel: '图片轮播',
     navigationAriaLabel: '轮播导航',

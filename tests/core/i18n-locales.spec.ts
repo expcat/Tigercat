@@ -154,6 +154,13 @@ describe('i18n locale presets', () => {
     expect(zhCN.timePicker?.selectTime).toBe('请选择时间')
   })
 
+  it('enUS and zhCN expose built-in AvatarGroup labels', () => {
+    expect(enUS.avatarGroup?.ariaLabel).toBe('Avatar group')
+    expect(enUS.avatarGroup?.overflowAriaLabel).toBe('{count} more')
+    expect(zhCN.avatarGroup?.ariaLabel).toBe('头像组')
+    expect(zhCN.avatarGroup?.overflowAriaLabel).toBe('还有 {count} 位')
+  })
+
   it('defineText returns only the custom text overlay', () => {
     const source = {
       modal: { okText: 'Confirm', cancelText: 'Dismiss' },

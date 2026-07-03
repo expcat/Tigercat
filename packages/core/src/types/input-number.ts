@@ -114,4 +114,16 @@ export interface InputNumberProps {
    * @default false
    */
   autoFocus?: boolean
+
+  /**
+   * Accessible label for the increment button
+   * @default 'Increase'
+   */
+  incrementAriaLabel?: string
+
+  /**
+   * Accessible label for the decrement button
+   * @default 'Decrease'
+   */
+  decrementAriaLabel?: string
 }

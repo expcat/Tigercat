@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Avatar, AvatarGroup } from '@expcat/tigercat-react'
+import { Avatar, AvatarGroup, ConfigProvider } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Avatar', () => {
@@ -155,6 +155,56 @@ describe('AvatarGroup', () => {
       </AvatarGroup>
     )
     expect(container.querySelector('[role="group"]')).toBeInTheDocument()
+  })
+
+  it('allows overriding the default group aria-label', () => {
+    const { container } = render(
+      <AvatarGroup aria-label="项目团队成员">
+        <Avatar text="A" />
+      </AvatarGroup>
+    )
+    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '项目团队成员')
+  })
+
+  it('localizes group and overflow labels via the locale prop', () => {
+    const { container } = render(
+      <AvatarGroup max={2} locale={{ locale: 'zh-CN' }}>
+        <Avatar text="A" />
+        <Avatar text="B" />
+        <Avatar text="C" />
+        <Avatar text="D" />
+      </AvatarGroup>
+    )
+    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '头像组')
+    const overflow = screen.getByLabelText('还有 2 位')
+    expect(overflow.textContent).toBe('+2')
+  })
+
+  it('localizes labels via ConfigProvider locale', () => {
+    const { container } = render(
+      <ConfigProvider locale={{ locale: 'zh-CN' }}>
+        <AvatarGroup max={1}>
+          <Avatar text="A" />
+          <Avatar text="B" />
+        </AvatarGroup>
+      </ConfigProvider>
+    )
+    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '头像组')
+    expect(screen.getByLabelText('还有 1 位')).toBeInTheDocument()
+  })
+
+  it('applies labels overrides over locale defaults', () => {
+    const { container } = render(
+      <AvatarGroup
+        max={1}
+        locale={{ locale: 'zh-CN' }}
+        labels={{ ariaLabel: '成员组', overflowAriaLabel: '另有 {count} 人' }}>
+        <Avatar text="A" />
+        <Avatar text="B" />
+      </AvatarGroup>
+    )
+    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '成员组')
+    expect(screen.getByLabelText('另有 1 人')).toBeInTheDocument()
   })
   it('prioritizes image over text when both provided', () => {
     const { container } = render(<Avatar src="/avatar.jpg" text="John Doe" alt="John Doe" />)

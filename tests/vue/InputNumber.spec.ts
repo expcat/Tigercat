@@ -29,9 +29,13 @@ describe('InputNumber (Vue)', () => {
     })
 
     it('renders disabled and readonly states', () => {
-      const { container: disabled } = render(InputNumber, { props: { disabled: true, modelValue: 5 } })
+      const { container: disabled } = render(InputNumber, {
+        props: { disabled: true, modelValue: 5 }
+      })
       expect(getInput(disabled).disabled).toBe(true)
-      const { container: readonly } = render(InputNumber, { props: { readonly: true, modelValue: 5 } })
+      const { container: readonly } = render(InputNumber, {
+        props: { readonly: true, modelValue: 5 }
+      })
       expect(getInput(readonly).readOnly).toBe(true)
     })
 
@@ -41,6 +45,18 @@ describe('InputNumber (Vue)', () => {
       expect(screen.getByLabelText('Decrease')).toBeInTheDocument()
       await rerender({ modelValue: 5, controls: false })
       expect(screen.queryByLabelText('Increase')).toBeNull()
+    })
+
+    it('allows overriding step control aria labels', () => {
+      render(InputNumber, {
+        props: {
+          modelValue: 5,
+          incrementAriaLabel: '增加数值',
+          decrementAriaLabel: '减少数值'
+        }
+      })
+      expect(screen.getByLabelText('增加数值')).toBeInTheDocument()
+      expect(screen.getByLabelText('减少数值')).toBeInTheDocument()
     })
 
     it('formats the display value with precision and via formatter', () => {

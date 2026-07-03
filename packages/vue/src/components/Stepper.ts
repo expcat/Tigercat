@@ -24,7 +24,9 @@ export const Stepper = defineComponent({
     step: { type: Number, default: 1 },
     disabled: { type: Boolean, default: false },
     size: { type: String as PropType<ComponentSize>, default: 'md' },
-    precision: { type: Number, default: undefined }
+    precision: { type: Number, default: undefined },
+    incrementAriaLabel: { type: String, default: 'Increase' },
+    decrementAriaLabel: { type: String, default: 'Decrease' }
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
@@ -122,7 +124,7 @@ export const Stepper = defineComponent({
               type: 'button',
               class: getStepperButtonClasses(props.size, props.disabled || atMin, 'left'),
               disabled: props.disabled || atMin,
-              'aria-label': 'Decrease',
+              'aria-label': props.decrementAriaLabel,
               onPointerdown: startStepRepeat('down'),
               onPointerup: stopStepRepeat,
               onPointerleave: stopStepRepeat,
@@ -148,7 +150,7 @@ export const Stepper = defineComponent({
               type: 'button',
               class: getStepperButtonClasses(props.size, props.disabled || atMax, 'right'),
               disabled: props.disabled || atMax,
-              'aria-label': 'Increase',
+              'aria-label': props.incrementAriaLabel,
               onPointerdown: startStepRepeat('up'),
               onPointerup: stopStepRepeat,
               onPointerleave: stopStepRepeat,

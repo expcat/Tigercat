@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { h } from 'vue'
+import { defineComponent, h } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Avatar, AvatarGroup } from '@expcat/tigercat-vue'
+import { Avatar, AvatarGroup, ConfigProvider } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Avatar', () => {
@@ -194,6 +194,53 @@ describe('AvatarGroup', () => {
       slots: { default: '<span>A</span>' }
     })
     expect(container.querySelector('[role="group"]')).toBeInTheDocument()
+  })
+
+  it('allows overriding the default group aria-label via attrs', () => {
+    const { container } = render(AvatarGroup, {
+      attrs: { 'aria-label': '项目团队成员' },
+      slots: { default: '<span>A</span>' }
+    })
+    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '项目团队成员')
+  })
+
+  it('localizes group and overflow labels via the locale prop', () => {
+    const { container } = render(AvatarGroup, {
+      props: { max: 2, locale: { locale: 'zh-CN' } },
+      slots: {
+        default: ['<span>A</span>', '<span>B</span>', '<span>C</span>', '<span>D</span>'].join('')
+      }
+    })
+    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '头像组')
+    const overflow = container.querySelector('[aria-label="还有 2 位"]')
+    expect(overflow).toBeInTheDocument()
+    expect(overflow?.textContent).toBe('+2')
+  })
+
+  it('localizes labels via ConfigProvider locale', () => {
+    const Wrapper = defineComponent({
+      render() {
+        return h(ConfigProvider, { locale: { locale: 'zh-CN' } }, () =>
+          h(AvatarGroup, { max: 1 }, () => [h(Avatar, { text: 'A' }), h(Avatar, { text: 'B' })])
+        )
+      }
+    })
+    const { container } = render(Wrapper)
+    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '头像组')
+    expect(container.querySelector('[aria-label="还有 1 位"]')).toBeInTheDocument()
+  })
+
+  it('applies labels overrides over locale defaults', () => {
+    const { container } = render(AvatarGroup, {
+      props: {
+        max: 1,
+        locale: { locale: 'zh-CN' },
+        labels: { ariaLabel: '成员组', overflowAriaLabel: '另有 {count} 人' }
+      },
+      slots: { default: '<span>A</span><span>B</span>' }
+    })
+    expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '成员组')
+    expect(container.querySelector('[aria-label="另有 1 人"]')).toBeInTheDocument()
   })
   it('prioritizes image over text when both provided', () => {
     const { container } = render(Avatar, {

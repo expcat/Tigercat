@@ -59,14 +59,26 @@ export default function NumberKeyboardDemo() {
         code={fullPageSnippet}>
         <div className="max-w-sm space-y-3">
           <Input value={phone} readonly placeholder="手机号" />
-          <NumberKeyboard mode="phone" value={phone} onChange={setPhone} confirmText="完成" />
+          <NumberKeyboard
+            mode="phone"
+            value={phone}
+            onChange={setPhone}
+            confirmText="完成"
+            deleteText="退格"
+          />
         </div>
       </DemoBlock>
 
       <DemoBlock title="身份证输入" description="id-card 模式允许末位输入 X" code={fullPageSnippet}>
         <div className="max-w-sm space-y-3">
           <Input value={idCard} readonly placeholder="身份证号" />
-          <NumberKeyboard mode="id-card" value={idCard} onChange={setIdCard} confirmText="完成" />
+          <NumberKeyboard
+            mode="id-card"
+            value={idCard}
+            onChange={setIdCard}
+            confirmText="完成"
+            deleteText="退格"
+          />
         </div>
       </DemoBlock>
     </div>

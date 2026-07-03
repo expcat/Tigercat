@@ -148,7 +148,12 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     <DemoBlock title="基础用法" description="基础的滑块用法，显示当前值。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
-          <Slider v-model:value="basicValue" :min="0" :max="100" class="flex-1" />
+          <Slider
+            v-model:value="basicValue"
+            :min="0"
+            :max="100"
+            aria-label="基础数值"
+            class="flex-1" />
           <Text>{{ basicValue }}</Text>
         </div>
       </Space>
@@ -163,14 +168,24 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">0-100 (默认)</Text>
           <div class="flex items-center gap-4 w-full">
-            <Slider v-model:value="rangeMinMaxDefaultValue" :min="0" :max="100" class="flex-1" />
+            <Slider
+              v-model:value="rangeMinMaxDefaultValue"
+              :min="0"
+              :max="100"
+              aria-label="默认范围数值"
+              class="flex-1" />
             <Text>{{ rangeMinMaxDefaultValue }}</Text>
           </div>
         </div>
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">0-200</Text>
           <div class="flex items-center gap-4 w-full">
-            <Slider v-model:value="rangeMinMaxWideValue" :min="0" :max="200" class="flex-1" />
+            <Slider
+              v-model:value="rangeMinMaxWideValue"
+              :min="0"
+              :max="200"
+              aria-label="宽范围数值"
+              class="flex-1" />
             <Text>{{ rangeMinMaxWideValue }}</Text>
           </div>
         </div>
@@ -181,7 +196,13 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     <DemoBlock title="步进" description="通过 step 设置步进值。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
-          <Slider v-model:value="stepValue" :min="0" :max="100" :step="10" class="flex-1" />
+          <Slider
+            v-model:value="stepValue"
+            :min="0"
+            :max="100"
+            :step="10"
+            aria-label="步进数值"
+            class="flex-1" />
           <Text>{{ stepValue }}</Text>
         </div>
       </Space>
@@ -194,7 +215,13 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
       :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
-          <Slider v-model:value="rangeValue" range :min="0" :max="100" class="flex-1" />
+          <Slider
+            v-model:value="rangeValue"
+            range
+            :min="0"
+            :max="100"
+            aria-label="预算范围"
+            class="flex-1" />
           <Text>{{ rangeValue[0] }} - {{ rangeValue[1] }}</Text>
         </div>
       </Space>
@@ -204,7 +231,13 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     <DemoBlock title="带标记" description="通过 marks 显示刻度标记。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
-          <Slider v-model:value="marksValue" :min="0" :max="100" :marks="marks" class="flex-1" />
+          <Slider
+            v-model:value="marksValue"
+            :min="0"
+            :max="100"
+            :marks="marks"
+            aria-label="温度刻度"
+            class="flex-1" />
           <Text>{{ marksValue }}</Text>
         </div>
       </Space>
@@ -219,7 +252,12 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">tooltip on（默认）</Text>
           <div class="flex items-center gap-4 w-full">
-            <Slider v-model:value="tooltipOnValue" :min="0" :max="100" class="flex-1" />
+            <Slider
+              v-model:value="tooltipOnValue"
+              :min="0"
+              :max="100"
+              aria-label="显示提示的数值"
+              class="flex-1" />
             <Text>{{ tooltipOnValue }}</Text>
           </div>
         </div>
@@ -231,6 +269,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
               :min="0"
               :max="100"
               :tooltip="false"
+              aria-label="隐藏提示的数值"
               class="flex-1" />
             <Text>{{ tooltipOffValue }}</Text>
           </div>
@@ -242,7 +281,13 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     <DemoBlock title="禁用状态" description="通过 disabled 属性禁用滑块。" :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
-          <Slider v-model:value="disabledValue" :min="0" :max="100" disabled class="flex-1" />
+          <Slider
+            v-model:value="disabledValue"
+            :min="0"
+            :max="100"
+            disabled
+            aria-label="禁用数值"
+            class="flex-1" />
           <Text>{{ disabledValue }}</Text>
         </div>
       </Space>
@@ -257,21 +302,39 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">sm</Text>
           <div class="flex items-center gap-4 w-full">
-            <Slider v-model:value="sizeSm" size="sm" :min="0" :max="100" class="flex-1" />
+            <Slider
+              v-model:value="sizeSm"
+              size="sm"
+              :min="0"
+              :max="100"
+              aria-label="小尺寸数值"
+              class="flex-1" />
             <Text>{{ sizeSm }}</Text>
           </div>
         </div>
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">md</Text>
           <div class="flex items-center gap-4 w-full">
-            <Slider v-model:value="sizeMd" size="md" :min="0" :max="100" class="flex-1" />
+            <Slider
+              v-model:value="sizeMd"
+              size="md"
+              :min="0"
+              :max="100"
+              aria-label="中尺寸数值"
+              class="flex-1" />
             <Text>{{ sizeMd }}</Text>
           </div>
         </div>
         <div class="w-full">
           <Text class="text-sm text-gray-600 mb-2">lg</Text>
           <div class="flex items-center gap-4 w-full">
-            <Slider v-model:value="sizeLg" size="lg" :min="0" :max="100" class="flex-1" />
+            <Slider
+              v-model:value="sizeLg"
+              size="lg"
+              :min="0"
+              :max="100"
+              aria-label="大尺寸数值"
+              class="flex-1" />
             <Text>{{ sizeLg }}</Text>
           </div>
         </div>
@@ -285,7 +348,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
       :code="fullPageSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
-          <Slider :default-value="60" :min="0" :max="100" class="flex-1" />
+          <Slider :default-value="60" :min="0" :max="100" aria-label="默认值数值" class="flex-1" />
         </div>
       </Space>
     </DemoBlock>
