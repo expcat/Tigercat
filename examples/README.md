@@ -4,6 +4,8 @@
 示例源码优先使用 PascalCase 组件子路径导入，保留根入口 named exports 覆盖 hooks/composables、
 命令式 API 和共享类型等非组件使用面。
 
+> 🚀 **在线示例（GitHub Pages）**：<https://expcat.github.io/Tigercat/>
+
 ## 结构
 
 ```text

@@ -5,9 +5,11 @@
 [![@expcat/tigercat-core](https://img.shields.io/npm/v/@expcat/tigercat-core?style=flat-square&logo=npm&label=@expcat/tigercat-core)](https://www.npmjs.com/package/@expcat/tigercat-core)
 [![@expcat/tigercat-cli](https://img.shields.io/npm/v/@expcat/tigercat-cli?style=flat-square&logo=npm&label=@expcat/tigercat-cli)](https://www.npmjs.com/package/@expcat/tigercat-cli)
 
-基于 Tailwind CSS 的 UI 组件库，支持 Vue 3 与 React。**133+ 组件**，开箱即用。
+基于 Tailwind CSS 的 UI 组件库，支持 Vue 3 与 React。**148+ 组件**，开箱即用。
 
-**v1.0.0** — 首个正式稳定版本，遵循 SemVer 语义化版本。
+**v2.0.0 预览阶段** — 遵循 SemVer 语义化版本，正式 v2.0.0 发布前持续在预览通道迭代（当前版本以顶部 npm 徽章为准）。
+
+> **🚀 在线示例**：<https://expcat.github.io/Tigercat/> — Vue 3 与 React 组件示例、主题切换与暗色模式实时预览。
 
 > **📘 AI Agent 文档**
 > 详细的组件 API、使用示例和配置指南请参考 [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md)
@@ -60,6 +62,7 @@ export function App() {
 
 | 文档                                                   | 说明                                             |
 | ------------------------------------------------------ | ------------------------------------------------ |
+| [在线示例](https://expcat.github.io/Tigercat/)         | 🚀 GitHub Pages 组件演示（Vue 3 / React）        |
 | [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md) | 📘 **AI Agent 入口** - 组件列表、API、主题、i18n |
 | [docs/ROADMAP.md](./docs/ROADMAP.md)                   | 开发路线图与当前规划                             |
 | [tests/README.md](./tests/README.md)                   | 测试结构、运行方式与质量标准入口                 |
