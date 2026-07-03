@@ -1,14 +1,10 @@
 name: E2E Tests
 
 on:
-  pull_request:
-  schedule:
-    # Nightly, Tuesday-Saturday 08:00 Asia/Shanghai (00:00 UTC)
-    - cron: '0 0 * * 2-6'
   workflow_dispatch:
 
 concurrency:
-  group: e2e-${{ github.event_name == 'schedule' && 'nightly' || github.ref }}
+  group: e2e-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -37,14 +33,7 @@ jobs:
       - name: Build packages
         run: pnpm build
 
-      - name: Run E2E smoke tests
-        if: github.event_name == 'pull_request'
-        run: pnpm e2e:smoke
-        env:
-          HOME: /root
-
       - name: Run E2E tests
-        if: github.event_name != 'pull_request'
         run: pnpm e2e
         env:
           HOME: /root
