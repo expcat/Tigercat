@@ -33,7 +33,9 @@ jobs:
       - name: Build packages
         run: pnpm build
 
-      - name: Run E2E tests
+      # Visual regression (*-visual) specs are skipped in CI via
+      # playwright.config.ts — macOS baselines don't match Linux rendering.
+      - name: Run functional E2E tests
         run: pnpm e2e
         env:
           HOME: /root
