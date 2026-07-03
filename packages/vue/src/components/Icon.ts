@@ -14,11 +14,13 @@ import {
   SVG_DEFAULT_VIEWBOX_24,
   SVG_DEFAULT_XMLNS,
   type IconSize,
-  type IconName
+  type IconName,
+  type IconDefinition
 } from '@expcat/tigercat-core'
 
 export interface VueIconProps {
   name?: IconName
+  icon?: IconDefinition
   size?: IconSize
   color?: string
 }
@@ -33,6 +35,14 @@ export const Icon = defineComponent({
      */
     name: {
       type: String as PropType<IconName>,
+      default: undefined
+    },
+    /**
+     * Custom icon definition (viewBox + path data), e.g. an application logo.
+     * Takes precedence over `name`; custom SVG children take precedence over both.
+     */
+    icon: {
+      type: Object as PropType<IconDefinition>,
       default: undefined
     },
     /**
@@ -65,9 +75,12 @@ export const Icon = defineComponent({
       const isDecorative =
         attrs['aria-label'] == null && attrs['aria-labelledby'] == null && attrs.role == null
 
-      // Built-in icon: render the registered glyph when a `name` is provided and
-      // no custom children override it.
-      const definition = !hasSlotContent && props.name ? getIconDefinition(props.name) : undefined
+      // Named or custom definition: render the glyph when an `icon` definition
+      // or `name` is provided and no custom children override it
+      // (children > icon > name).
+      const definition = !hasSlotContent
+        ? (props.icon ?? (props.name ? getIconDefinition(props.name) : undefined))
+        : undefined
       const builtInSvg = definition
         ? h(
             'svg',

@@ -2,6 +2,22 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.0.0-preview.4
+
+v2.0.0 preview 4 延续 v2.0.0 预览发布面，合入 Icon 组件 `icon` 属性与可 tree-shake 的扩展图标集。
+
+### Features
+
+- **Icon `icon` 属性**：Vue / React `Icon` 组件新增 `icon` 属性，接受 `IconDefinition`（viewBox + path 数据 + stroke/fill 模式），可将自定义图标（如品牌 logo）定义为常量复用，无需全局注册。优先级：自定义 SVG children > `icon` > `name`。
+- **core 扩展图标集**：新增约 60 个 Heroicons outline 风格扩展图标（排序、视图、操作、通信媒体、状态反馈、商务、数据技术、场景等），以独立 `IconDefinition` 常量从 `@expcat/tigercat-core` 导出（如 `rocketIcon`、`sortAscendingIcon`），配合 `icon` 属性使用。常量带 `/*#__PURE__*/` 标注且包声明 `sideEffects: false`，未使用的图标可被 bundler tree-shake，不进入组件包体积；`iconRegistry` / `IconName` 保持原集合不变。`extendedIcons`（`Record<ExtendedIconName, IconDefinition>`）提供全量集合用于图标画廊等场景。
+
+### Infrastructure
+
+- root 与 `@expcat/tigercat-core`、`@expcat/tigercat-react`、`@expcat/tigercat-vue`、`@expcat/tigercat-cli` 统一为 `2.0.0-preview.4`。
+- 同步 core / React / Vue 运行时 `version` 导出、CLI `CLI_VERSION`、CLI 模板中的 Tigercat 依赖范围，以及示例首页展示版本。
+- `Core (full)` size 预算 118 kB → 125 kB（core 全量入口包含全部扩展图标定义；组件子路径与按需引入体积不受影响，仍由原有预算约束）。
+- 迁移和破坏性变更内容沿用当前 v2.0.0 预览阶段条目；正式 v2.0.0 发布前继续在 `docs/MIGRATION.md` 与本文件集中更新。
+
 ## v2.0.0-preview.3
 
 v2.0.0 preview 3 延续 v2.0.0 预览发布面，在 preview.2 之后合入 DatePicker locale 文案回退修复，以及 release 门禁维护更新。

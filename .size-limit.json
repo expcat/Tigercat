@@ -2,7 +2,7 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "118 kB",
+    "limit": "125 kB",
     "gzip": true
   },
   {

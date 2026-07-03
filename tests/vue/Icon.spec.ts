@@ -5,6 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/vue'
 import { Icon } from '@expcat/tigercat-vue'
+import type { IconDefinition } from '@expcat/tigercat-core'
 import { h } from 'vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -154,6 +155,21 @@ describe('Icon (Vue)', () => {
     )
     const path = container.querySelector('svg path')
     expect(path).toHaveAttribute('d', 'M5 12h14')
+  })
+
+  const logo: IconDefinition = { viewBox: '0 0 32 32', paths: ['M16 2 2 30h28Z'], mode: 'fill' }
+
+  it('renders a custom definition via the icon prop, preferring it over name', () => {
+    const { container } = renderWithProps(Icon, { icon: logo, name: 'check' })
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveAttribute('viewBox', '0 0 32 32')
+    expect(svg).toHaveAttribute('fill', 'currentColor')
+    expect(svg?.querySelector('path')).toHaveAttribute('d', 'M16 2 2 30h28Z')
+  })
+
+  it('prefers custom children over the icon prop', () => {
+    const { container } = renderWithProps(Icon, { icon: logo }, { slots: { default: SimpleSVG } })
+    expect(container.querySelector('svg path')).toHaveAttribute('d', 'M5 12h14')
   })
 
   describe('Accessibility', () => {

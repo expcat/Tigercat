@@ -144,8 +144,42 @@ const COMPONENT_PROPS_EXTRA = {
 - \`chevron-up\` / \`chevron-down\` / \`chevron-left\` / \`chevron-right\`
 - \`arrow-up\` / \`arrow-down\` / \`arrow-left\` / \`arrow-right\`
 - \`search\` / \`plus\` / \`minus\` / \`edit\` / \`trash\`
-- \`user\` / \`settings\` / \`eye\` / \`eye-off\` / \`calendar\` / \`clock\`
+- \`user\` / \`users\` / \`settings\` / \`eye\` / \`eye-off\` / \`calendar\` / \`clock\`
 - \`menu\` / \`more-horizontal\` / \`more-vertical\` / \`external-link\`
+- \`home\` / \`bell\` / \`mail\` / \`phone\` / \`download\` / \`upload\` / \`filter\` / \`refresh\` / \`logout\` / \`lock\`
+- \`star\` / \`heart\` / \`copy\` / \`link\` / \`document\` / \`folder\` / \`image\` / \`map-pin\` / \`check-circle\` / \`x-circle\` / \`dashboard\`
+
+完整列表以 \`iconNames\` 运行时导出为准。注册表刻意保持精简——每个内部用到 Icon 的组件都会打包整个注册表，新增全局图标会增加所有相关子路径的体积。
+
+### Extended icons（按需导入）
+
+扩展图标集（排序、媒体、商务、数据等约 60 个 Heroicons outline 图标）不注册全局名称，因此不进入组件包体积。按需导入 \`IconDefinition\` 常量，通过 \`icon\` 属性使用；常量带 \`/*#__PURE__*/\` 标注且包声明 \`sideEffects: false\`，bundler 可逐个 tree-shake 未使用的图标：
+
+\`\`\`ts
+import { rocketIcon, sortAscendingIcon } from '@expcat/tigercat-core'
+\`\`\`
+
+\`\`\`tsx
+<Icon icon={rocketIcon} />
+\`\`\`
+
+命名规则：kebab-case 图标名 → camelCase + \`Icon\` 后缀（\`sort-ascending\` → \`sortAscendingIcon\`）。全量集合可通过 \`extendedIcons\`（\`Record<ExtendedIconName, IconDefinition>\`）导入用于图标画廊等场景（导入该对象会打包全部扩展图标）。
+
+### Custom logo via \`icon\` prop
+
+自定义图标（如品牌 logo）可定义为 \`IconDefinition\` 常量，定义一次、处处复用，无需全局注册：
+
+\`\`\`ts
+import type { IconDefinition } from '@expcat/tigercat-core'
+
+const myLogo: IconDefinition = { viewBox: '0 0 32 32', paths: ['…'], mode: 'fill' }
+\`\`\`
+
+\`\`\`tsx
+<Icon icon={myLogo} />
+\`\`\`
+
+优先级：自定义 SVG children > \`icon\` > \`name\`。\`IconDefinition\` 仅支持 path 数据 + 单色 stroke/fill；多色、含 circle/rect/渐变的复杂 logo 请使用 children 方式内嵌完整 SVG。
 
 **图标注册表导出的辅助函数与类型:**
 - \`iconRegistry\`: 图标定义全局注册表对象。
@@ -153,7 +187,7 @@ const COMPONENT_PROPS_EXTRA = {
 - \`getIconDefinition(name: string)\`: 根据名称获取图标定义的方法。
 - \`IconDefinition\`: 图标定义接口类型。
 - \`IconName\`: 包含所有内置图标名称的联合类型。
-- \`IconRenderMode\`: 图标渲染模式联合类型 (\`'svg' | 'font'\`)。
+- \`IconRenderMode\`: 图标渲染模式联合类型 (\`'stroke' | 'fill'\`)。
 
 导入路径示例：
 \`\`\`ts

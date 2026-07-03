@@ -21,6 +21,7 @@ export interface IconProps extends CoreIconProps, React.HTMLAttributes<HTMLSpanE
 
 export const Icon: React.FC<IconProps> = ({
   name,
+  icon,
   size = 'md',
   color = 'currentColor',
   className,
@@ -33,10 +34,10 @@ export const Icon: React.FC<IconProps> = ({
   const isDecorative =
     props['aria-label'] == null && props['aria-labelledby'] == null && props.role == null
 
-  // Built-in icon: render the registered glyph when a `name` is provided and no
-  // custom children override it.
+  // Named or custom definition: render the glyph when an `icon` definition or
+  // `name` is provided and no custom children override it (children > icon > name).
   const hasChildren = React.Children.count(children) > 0
-  const definition = !hasChildren && name ? getIconDefinition(name) : undefined
+  const definition = !hasChildren ? (icon ?? (name ? getIconDefinition(name) : undefined)) : undefined
 
   const builtInSvg = definition ? (
     <svg

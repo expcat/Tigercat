@@ -6,6 +6,7 @@ import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
 import { Icon } from '@expcat/tigercat-react'
+import type { IconDefinition } from '@expcat/tigercat-core'
 import { renderWithProps, renderWithChildren } from '../utils/render-helpers-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -33,6 +34,21 @@ describe('Icon (React)', () => {
 
   it('prefers custom children over the name prop', () => {
     const { container } = render(<Icon name="check">{SimpleSVG}</Icon>)
+    expect(container.querySelector('svg path')).toHaveAttribute('d', 'M5 12h14')
+  })
+
+  const logo: IconDefinition = { viewBox: '0 0 32 32', paths: ['M16 2 2 30h28Z'], mode: 'fill' }
+
+  it('renders a custom definition via the icon prop, preferring it over name', () => {
+    const { container } = render(<Icon icon={logo} name="check" />)
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveAttribute('viewBox', '0 0 32 32')
+    expect(svg).toHaveAttribute('fill', 'currentColor')
+    expect(svg?.querySelector('path')).toHaveAttribute('d', 'M16 2 2 30h28Z')
+  })
+
+  it('prefers custom children over the icon prop', () => {
+    const { container } = render(<Icon icon={logo}>{SimpleSVG}</Icon>)
     expect(container.querySelector('svg path')).toHaveAttribute('d', 'M5 12h14')
   })
 

@@ -1,7 +1,15 @@
 import React from 'react'
 import { Icon } from '@expcat/tigercat-react/Icon'
+import { iconNames, extendedIcons, type IconDefinition } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 import fullPageSnippet from './IconDemo.tsx?raw'
+
+// 自定义 Logo：定义一次 IconDefinition，处处通过 icon 属性复用
+const demoLogo: IconDefinition = {
+  viewBox: '0 0 24 24',
+  paths: ['M12 2 2 19.5h20L12 2Zm0 5.25 5.5 9.75h-11L12 7.25Z'],
+  mode: 'fill'
+}
 
 const basicSnippet = `<div className="flex items-center gap-6 flex-wrap">
   {/* 自定义 SVG 图标 */}
@@ -92,6 +100,51 @@ const IconDemo: React.FC = () => {
           <Icon name="plus" />
           <Icon name="edit" />
           <Icon name="trash" />
+        </div>
+      </DemoBlock>
+
+      {/* 全部内置图标 */}
+      <DemoBlock
+        title="全部内置图标"
+        description={`共 ${iconNames.length} 个内置图标，通过 name 属性直接使用。`}
+        code={fullPageSnippet}>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+          {iconNames.map((n) => (
+            <div key={n} className="flex flex-col items-center gap-1">
+              <Icon name={n} size="lg" />
+              <span className="text-xs text-gray-500 dark:text-gray-400 text-center break-all">
+                {n}
+              </span>
+            </div>
+          ))}
+        </div>
+      </DemoBlock>
+
+      {/* 扩展图标 */}
+      <DemoBlock
+        title="扩展图标（按需导入）"
+        description={`共 ${Object.keys(extendedIcons).length} 个扩展图标，从 @expcat/tigercat-core 按需导入 IconDefinition 常量（如 rocketIcon），通过 icon 属性使用；未使用的图标可被 bundler tree-shake，不增加组件包体积。`}
+        code={fullPageSnippet}>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+          {Object.entries(extendedIcons).map(([n, def]) => (
+            <div key={n} className="flex flex-col items-center gap-1">
+              <Icon icon={def} size="lg" />
+              <span className="text-xs text-gray-500 dark:text-gray-400 text-center break-all">
+                {n}
+              </span>
+            </div>
+          ))}
+        </div>
+      </DemoBlock>
+
+      {/* 自定义 Logo */}
+      <DemoBlock
+        title="自定义 Logo（icon 属性）"
+        description="将自定义 SVG 定义为 IconDefinition 常量，通过 icon 属性复用，无需每次内联 SVG。优先级：children > icon > name。"
+        code={fullPageSnippet}>
+        <div className="flex items-center gap-6">
+          <Icon icon={demoLogo} size="lg" />
+          <Icon icon={demoLogo} size="xl" color="#f59e0b" />
         </div>
       </DemoBlock>
 

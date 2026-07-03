@@ -25,7 +25,6 @@
         "--filter",
         "@expcat/tigercat-example-vue3",
         "dev",
-        "--",
         "--port",
         "5181",
         "--strictPort"
