@@ -10,7 +10,6 @@
         "--filter",
         "@expcat/tigercat-example-react",
         "dev",
-        "--",
         "--port",
         "5180",
         "--strictPort"
