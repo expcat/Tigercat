@@ -26,7 +26,7 @@ export const Select: React.FC<SelectProps> = (props) => {
       <button
         ref={ctx.triggerRef}
         type="button"
-        className={classNames(ctx.triggerClasses, 'pr-16')}
+        className={classNames(ctx.triggerClasses, ctx.showClearButton ? 'pr-14' : 'pr-9')}
         disabled={ctx.disabled}
         onClick={ctx.toggleDropdown}
         onKeyDown={ctx.handleTriggerKeyDown}

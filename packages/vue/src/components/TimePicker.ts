@@ -677,7 +677,11 @@ export const TimePicker = defineComponent({
     })
 
     return () => {
-      const inputClasses = getTimePickerInputClasses(props.size, props.disabled || props.readonly)
+      const inputClasses = getTimePickerInputClasses(
+        props.size,
+        props.disabled || props.readonly,
+        showClearButton.value
+      )
       const iconButtonClasses = getTimePickerIconButtonClasses(props.size)
 
       return h('div', { ...attrs, class: rootClasses.value, style: rootStyle.value }, [

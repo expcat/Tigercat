@@ -686,7 +686,7 @@ export const Select = defineComponent({
           {
             ref: triggerRef,
             type: 'button',
-            class: classNames(triggerClasses, 'pr-16'),
+            class: classNames(triggerClasses, showClearButton.value ? 'pr-14' : 'pr-9'),
             disabled: props.disabled,
             onClick: toggleDropdown,
             onKeydown: handleTriggerKeyDown,

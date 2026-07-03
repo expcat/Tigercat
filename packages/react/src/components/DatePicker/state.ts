@@ -534,8 +534,8 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
   }, [isOpen, focusDateButtonByIso, getFirstEnabledIsoInView])
 
   const inputClasses = useMemo(
-    () => getDatePickerInputClasses(size, disabled || readonly),
-    [size, disabled, readonly]
+    () => getDatePickerInputClasses(size, disabled || readonly, showClearButton),
+    [size, disabled, readonly, showClearButton]
   )
   const iconButtonClasses = useMemo(() => getDatePickerIconButtonClasses(size), [size])
 

@@ -702,7 +702,11 @@ export const DatePicker = defineComponent({
     })
 
     return () => {
-      const inputClasses = getDatePickerInputClasses(props.size, props.disabled || props.readonly)
+      const inputClasses = getDatePickerInputClasses(
+        props.size,
+        props.disabled || props.readonly,
+        showClearButton.value
+      )
       const iconButtonClasses = getDatePickerIconButtonClasses(props.size)
 
       return h(

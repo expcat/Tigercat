@@ -223,12 +223,18 @@ export const timePickerInputWrapperClasses = 'relative flex items-center'
 /**
  * Get input field classes based on size and state
  */
-export function getTimePickerInputClasses(size: 'sm' | 'md' | 'lg', disabled: boolean): string {
+export function getTimePickerInputClasses(
+  size: 'sm' | 'md' | 'lg',
+  disabled: boolean,
+  showClear = false
+): string {
   const baseClasses = [
     'w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-300',
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-transparent',
     'transition-colors duration-200',
-    'pr-16' // Space for clear + clock buttons
+    // Reserve space for the clock button (right-1 + w-6/8/10 per size),
+    // plus the clear button (right-10, 24px wide) only when it is visible
+    showClear ? 'pr-16' : { sm: 'pr-8', md: 'pr-10', lg: 'pr-12' }[size]
   ]
 
   const sizeClasses = {

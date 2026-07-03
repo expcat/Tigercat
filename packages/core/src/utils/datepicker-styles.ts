@@ -18,7 +18,11 @@ export const datePickerInputWrapperClasses = 'relative w-full'
 /**
  * Get input classes based on size
  */
-export function getDatePickerInputClasses(size: ComponentSize = 'md', disabled = false): string {
+export function getDatePickerInputClasses(
+  size: ComponentSize = 'md',
+  disabled = false,
+  showClear = false
+): string {
   const baseClasses = [
     'w-full',
     'rounded-[var(--tiger-radius-md,0.5rem)]',
@@ -31,8 +35,7 @@ export function getDatePickerInputClasses(size: ComponentSize = 'md', disabled =
     'focus:ring-2',
     'focus:ring-[var(--tiger-primary,#2563eb)]',
     'focus:border-transparent',
-    'transition-colors',
-    'pr-16' // Space for clear + calendar buttons
+    'transition-colors'
   ]
 
   const sizeClasses = {
@@ -41,11 +44,17 @@ export function getDatePickerInputClasses(size: ComponentSize = 'md', disabled =
     lg: 'px-4 py-3 text-lg'
   }
 
+  // Reserve space for the calendar button (right-0 + px per size + w-5 icon),
+  // plus the clear button (right-10, 24px wide) only when it is visible
+  const rightPaddingClasses = showClear
+    ? 'pr-16'
+    : { sm: 'pr-10', md: 'pr-12', lg: 'pr-14' }[size]
+
   const disabledClasses = disabled
     ? ['bg-gray-100', 'cursor-not-allowed', 'text-gray-500']
     : ['cursor-pointer']
 
-  return classNames(...baseClasses, sizeClasses[size], ...disabledClasses)
+  return classNames(...baseClasses, sizeClasses[size], rightPaddingClasses, ...disabledClasses)
 }
 
 /**

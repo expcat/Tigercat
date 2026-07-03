@@ -440,7 +440,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
     return () => window.clearTimeout(focusTimer)
   }, [isOpen, activePart])
 
-  const inputClasses = getTimePickerInputClasses(size, disabled || readonly)
+  const inputClasses = getTimePickerInputClasses(size, disabled || readonly, showClearButton)
   const iconButtonClasses = getTimePickerIconButtonClasses(size)
 
   return {
