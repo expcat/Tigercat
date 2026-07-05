@@ -60,6 +60,14 @@ export interface ListPaginationConfig {
    */
   total?: number
   /**
+   * Remote (server-side) pagination mode. When true, `dataSource` is treated
+   * as the current page and the list skips internal slicing; page count and
+   * range text are derived from `total`, and `current`/`pageSize` act as
+   * controlled props.
+   * @default false
+   */
+  remote?: boolean
+  /**
    * Page size options
    */
   pageSizeOptions?: number[]

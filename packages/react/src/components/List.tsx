@@ -211,15 +211,24 @@ export const List = <T extends ListItem = ListItem>({
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const [currentPage, setCurrentPage] = useState(
-    pagination && typeof pagination === 'object' ? pagination.current || 1 : 1
-  )
+  const paginationCfg = pagination !== false && typeof pagination === 'object' ? pagination : null
+  const isRemotePagination = paginationCfg?.remote === true
+
+  const [internalCurrentPage, setInternalCurrentPage] = useState(paginationCfg?.current || 1)
 
   const dragIndexRef = React.useRef<number | null>(null)
 
-  const [currentPageSize, setCurrentPageSize] = useState(
-    pagination && typeof pagination === 'object' ? pagination.pageSize || 10 : 10
+  const [internalCurrentPageSize, setInternalCurrentPageSize] = useState(
+    paginationCfg?.pageSize || 10
   )
+
+  // Remote mode treats current/pageSize as controlled props.
+  const currentPage = isRemotePagination
+    ? (paginationCfg?.current ?? internalCurrentPage)
+    : internalCurrentPage
+  const currentPageSize = isRemotePagination
+    ? (paginationCfg?.pageSize ?? internalCurrentPageSize)
+    : internalCurrentPageSize
 
   // Paginated data
   const paginatedData = useMemo(() => {
@@ -227,8 +236,17 @@ export const List = <T extends ListItem = ListItem>({
       return dataSource
     }
 
+    // Remote mode: dataSource already holds only the current page — no slicing.
+    if (isRemotePagination) {
+      return dataSource
+    }
+
     return paginateData(dataSource, currentPage, currentPageSize)
-  }, [dataSource, currentPage, currentPageSize, pagination])
+  }, [dataSource, currentPage, currentPageSize, pagination, isRemotePagination])
+
+  const paginationTotal = isRemotePagination
+    ? (paginationCfg?.total ?? dataSource.length)
+    : dataSource.length
 
   // Pagination info
   const paginationInfo = useMemo(() => {
@@ -236,9 +254,8 @@ export const List = <T extends ListItem = ListItem>({
       return null
     }
 
-    const total = dataSource.length
-    return calculatePagination(total, currentPage, currentPageSize)
-  }, [dataSource.length, currentPage, currentPageSize, pagination])
+    return calculatePagination(paginationTotal, currentPage, currentPageSize)
+  }, [paginationTotal, currentPage, currentPageSize, pagination])
 
   // List classes
   const listClasses = useMemo(() => {
@@ -256,13 +273,13 @@ export const List = <T extends ListItem = ListItem>({
   }, [grid])
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
+    setInternalCurrentPage(page)
     onPageChange?.({ current: page, pageSize: currentPageSize })
   }
 
   const handlePageSizeChange = (pageSize: number) => {
-    setCurrentPageSize(pageSize)
-    setCurrentPage(1)
+    setInternalCurrentPageSize(pageSize)
+    setInternalCurrentPage(1)
     onPageChange?.({ current: 1, pageSize })
   }
 
@@ -471,7 +488,7 @@ export const List = <T extends ListItem = ListItem>({
     }
 
     const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo
-    const total = dataSource.length
+    const total = paginationTotal
     const paginationConfig = pagination as ListPaginationConfig
     const paginationLabels = getPaginationLabels(mergedLocale)
     const localeCode = mergedLocale?.locale

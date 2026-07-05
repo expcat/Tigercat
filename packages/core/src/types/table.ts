@@ -326,6 +326,15 @@ export interface PaginationConfig {
   total?: number
 
   /**
+   * Remote (server-side) pagination mode. When true, `dataSource` is treated
+   * as the current page and the table skips internal slicing; page count and
+   * range text are derived from `total`. Built-in sorting/filtering only
+   * affects the current page — perform them server-side instead.
+   * @default false
+   */
+  remote?: boolean
+
+  /**
    * Available page size options
    * @default [10, 20, 50, 100]
    */

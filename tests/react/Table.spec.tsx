@@ -872,6 +872,48 @@ describe('Table', () => {
       expect(queryByText('John Doe')).not.toBeInTheDocument()
       expect(getByText('Jane Smith')).toBeInTheDocument()
     })
+
+    it('should render dataSource as-is and derive page count from total in remote mode', () => {
+      // Server-side pagination: dataSource holds only the current page (page 2 of 48 items)
+      const pageTwoRows = Array.from({ length: 10 }, (_, i) => ({
+        id: i + 11,
+        name: `Person ${i + 11}`,
+        age: 20 + i,
+        email: `person${i + 11}@example.com`
+      }))
+
+      const { container, getByText } = render(
+        <Table
+          columns={columns}
+          dataSource={pageTwoRows}
+          pagination={{ remote: true, current: 2, pageSize: 10, total: 48 }}
+        />
+      )
+
+      expect(container.querySelectorAll('tbody tr')).toHaveLength(10)
+      expect(getByText('Person 11')).toBeInTheDocument()
+      expect(getByText('Person 20')).toBeInTheDocument()
+      expect(getByText('Page 2 of 5')).toBeInTheDocument()
+      expect(getByText('Total 48 items')).toBeInTheDocument()
+    })
+
+    it('should keep client-side slicing when remote is not set (regression)', () => {
+      const rows = Array.from({ length: 15 }, (_, i) => ({
+        id: i + 1,
+        name: `Person ${i + 1}`,
+        age: 20 + i,
+        email: `person${i + 1}@example.com`
+      }))
+
+      const { container, getByText, queryByText } = render(
+        <Table columns={columns} dataSource={rows} pagination={{ current: 2, pageSize: 10 }} />
+      )
+
+      expect(container.querySelectorAll('tbody tr')).toHaveLength(5)
+      expect(getByText('Person 11')).toBeInTheDocument()
+      expect(queryByText('Person 1')).not.toBeInTheDocument()
+      expect(getByText('Page 2 of 2')).toBeInTheDocument()
+    })
   })
 
   describe('Row Selection', () => {

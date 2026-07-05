@@ -235,14 +235,27 @@ export const List = defineComponent({
       return typeof handler === 'function' || Array.isArray(handler)
     })
 
-    const currentPage = ref(
-      props.pagination && typeof props.pagination === 'object' ? props.pagination.current || 1 : 1
+    const paginationCfg = computed(() =>
+      props.pagination !== false && typeof props.pagination === 'object' ? props.pagination : null
     )
 
-    const currentPageSize = ref(
-      props.pagination && typeof props.pagination === 'object'
-        ? props.pagination.pageSize || 10
-        : 10
+    const isRemotePagination = computed(() => paginationCfg.value?.remote === true)
+
+    const internalCurrentPage = ref(paginationCfg.value?.current || 1)
+
+    const internalCurrentPageSize = ref(paginationCfg.value?.pageSize || 10)
+
+    // Remote mode treats current/pageSize as controlled props.
+    const currentPage = computed(() =>
+      isRemotePagination.value
+        ? (paginationCfg.value?.current ?? internalCurrentPage.value)
+        : internalCurrentPage.value
+    )
+
+    const currentPageSize = computed(() =>
+      isRemotePagination.value
+        ? (paginationCfg.value?.pageSize ?? internalCurrentPageSize.value)
+        : internalCurrentPageSize.value
     )
 
     // Drag state
@@ -279,8 +292,19 @@ export const List = defineComponent({
         return props.dataSource
       }
 
+      // Remote mode: dataSource already holds only the current page — no slicing.
+      if (isRemotePagination.value) {
+        return props.dataSource
+      }
+
       return paginateData(props.dataSource, currentPage.value, currentPageSize.value)
     })
+
+    const paginationTotal = computed(() =>
+      isRemotePagination.value
+        ? (paginationCfg.value?.total ?? props.dataSource.length)
+        : props.dataSource.length
+    )
 
     // Pagination info
     const paginationInfo = computed(() => {
@@ -288,8 +312,7 @@ export const List = defineComponent({
         return null
       }
 
-      const total = props.dataSource.length
-      return calculatePagination(total, currentPage.value, currentPageSize.value)
+      return calculatePagination(paginationTotal.value, currentPage.value, currentPageSize.value)
     })
 
     // List classes
@@ -320,13 +343,13 @@ export const List = defineComponent({
     })
 
     function handlePageChange(page: number) {
-      currentPage.value = page
+      internalCurrentPage.value = page
       emit('page-change', { current: page, pageSize: currentPageSize.value })
     }
 
     function handlePageSizeChange(pageSize: number) {
-      currentPageSize.value = pageSize
-      currentPage.value = 1
+      internalCurrentPageSize.value = pageSize
+      internalCurrentPage.value = 1
       emit('page-change', { current: 1, pageSize })
     }
 
@@ -517,7 +540,7 @@ export const List = defineComponent({
       }
 
       const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo.value
-      const total = props.dataSource.length
+      const total = paginationTotal.value
       const paginationConfig = props.pagination as ListPaginationConfig
       const paginationLabels = getPaginationLabels(mergedLocale.value)
       const localeCode = mergedLocale.value?.locale

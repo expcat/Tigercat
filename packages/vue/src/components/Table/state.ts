@@ -227,6 +227,10 @@ export function useTableState(
     if (props.pagination === false) {
       return processedData.value
     }
+    // Remote mode: dataSource already holds only the current page — no slicing.
+    if (paginationConfig.value?.remote) {
+      return processedData.value
+    }
     return paginateData(processedData.value, currentPage.value, currentPageSize.value)
   })
 

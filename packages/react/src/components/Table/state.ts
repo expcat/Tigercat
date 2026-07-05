@@ -296,8 +296,12 @@ export function useTableState(input: UseTableStateInput): TableContext {
     if (pagination === false) {
       return processedData
     }
+    // Remote mode: dataSource already holds only the current page — no slicing.
+    if (paginationConfig?.remote) {
+      return processedData
+    }
     return paginateData(processedData, currentPage, currentPageSize)
-  }, [processedData, currentPage, currentPageSize, pagination])
+  }, [processedData, currentPage, currentPageSize, pagination, paginationConfig?.remote])
 
   const pageRowKeys = useMemo(
     () => createTableRowKeyCache<Record<string, unknown>>(rowKey).getMany(paginatedData),

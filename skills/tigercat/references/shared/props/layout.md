@@ -101,6 +101,8 @@ Note: `padding`（`boolean | string`）可用于覆写基于内置 `size` 计算
 
 `packages/core/src/types/list.ts` · `ListProps` · 3/16 props
 
+Note: 服务端分页用 `pagination.remote: true`：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。
+
 | Prop        | Type              | Default     | Notes             |
 | ----------- | ----------------- | ----------- | ----------------- |
 | `size?`     | `ComponentSize`   | `'md'`      | List size         |

@@ -66,6 +66,41 @@ describe('List', () => {
     expect(onPageChange).toHaveBeenCalledWith({ current: 2, pageSize: 10 })
   })
 
+  it('renders dataSource as-is and derives page count from total in remote mode', () => {
+    // Server-side pagination: dataSource holds only the current page (page 2 of 48 items)
+    const pageTwoItems = Array.from({ length: 10 }, (_, i) => ({
+      key: i + 11,
+      title: `Item ${i + 11}`
+    }))
+
+    render(
+      <List
+        dataSource={pageTwoItems}
+        pagination={{ remote: true, current: 2, pageSize: 10, total: 48 }}
+      />
+    )
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(10)
+    expect(screen.getByText('Item 11')).toBeInTheDocument()
+    expect(screen.getByText('Item 20')).toBeInTheDocument()
+    expect(screen.getByText('Page 2 of 5')).toBeInTheDocument()
+    expect(screen.getByText('Total 48 items')).toBeInTheDocument()
+  })
+
+  it('keeps client-side slicing when remote is not set (regression)', () => {
+    const items = Array.from({ length: 15 }, (_, i) => ({
+      key: i + 1,
+      title: `Item ${i + 1}`
+    }))
+
+    render(<List dataSource={items} pagination={{ current: 2, pageSize: 10 }} />)
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(5)
+    expect(screen.getByText('Item 11')).toBeInTheDocument()
+    expect(screen.queryByText('Item 1')).not.toBeInTheDocument()
+    expect(screen.getByText('Page 2 of 2')).toBeInTheDocument()
+  })
+
   it('enables keyboard activation only when clickable', async () => {
     const onItemClick = vi.fn()
 
