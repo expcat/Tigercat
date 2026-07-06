@@ -34,14 +34,8 @@ import {
   getSpinnerSVG,
   normalizeSvgAttrs,
   getLoadingOverlaySpinnerClasses,
-  // Simple pagination style utilities
-  getSimplePaginationContainerClasses,
-  getSimplePaginationTotalClasses,
-  getSimplePaginationControlsClasses,
-  getSimplePaginationSelectClasses,
-  getSimplePaginationButtonClasses,
-  getSimplePaginationPageIndicatorClasses,
-  getSimplePaginationButtonsWrapperClasses,
+  getBuiltInPaginationContainerClasses,
+  resolvePaginationDisplayMode,
   getPaginationLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
@@ -53,6 +47,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { VirtualList } from './VirtualList'
+import { Pagination } from './Pagination'
 import { useTigerConfig } from './ConfigProvider'
 
 const spinnerSvg = getSpinnerSVG('spinner')
@@ -539,82 +534,56 @@ export const List = defineComponent({
         return null
       }
 
-      const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo.value
+      const { totalPages } = paginationInfo.value
       const total = paginationTotal.value
       const paginationConfig = props.pagination as ListPaginationConfig
       const paginationLabels = getPaginationLabels(mergedLocale.value)
       const localeCode = mergedLocale.value?.locale
 
-      return h('div', { class: getSimplePaginationContainerClasses() }, [
-        // Total info
-        paginationConfig.showTotal !== false &&
-          h(
-            'div',
-            { class: getSimplePaginationTotalClasses() },
-            paginationConfig.totalText
-              ? paginationConfig.totalText(total, [startIndex, endIndex])
-              : formatPaginationTotal(
-                  paginationLabels.totalText,
-                  total,
-                  [startIndex, endIndex],
-                  localeCode
-                )
-          ),
+      // More than 3 pages: full page-number buttons plus quick jumper;
+      // otherwise the simple prev/next indicator (config values override).
+      const { simple, showQuickJumper } = resolvePaginationDisplayMode(
+        totalPages,
+        paginationConfig
+      )
 
-        // Pagination controls
-        h('div', { class: getSimplePaginationControlsClasses() }, [
-          // Page size selector
-          paginationConfig.showSizeChanger !== false &&
-            h(
-              'select',
-              {
-                class: getSimplePaginationSelectClasses(),
-                value: currentPageSize.value,
-                onChange: (e: Event) =>
-                  handlePageSizeChange(Number((e.target as HTMLSelectElement).value))
-              },
-              (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) =>
-                h('option', { value: size }, `${size} ${paginationLabels.itemsPerPageText}`)
-              )
-            ),
+      const totalText =
+        paginationConfig.totalText ??
+        ((value: number, range: [number, number]) =>
+          formatPaginationTotal(paginationLabels.totalText, value, range, localeCode))
 
-          // Page buttons
-          h('div', { class: getSimplePaginationButtonsWrapperClasses() }, [
-            // Previous button
-            h(
-              'button',
-              {
-                class: getSimplePaginationButtonClasses(!hasPrev),
-                disabled: !hasPrev,
-                onClick: () => handlePageChange(currentPage.value - 1)
-              },
-              paginationLabels.prevPageAriaLabel
-            ),
+      const pageIndicatorText = (current: number, pages: number) =>
+        formatPaginationPageIndicator(
+          paginationLabels.pageIndicatorText,
+          current,
+          pages,
+          localeCode
+        )
 
-            // Current page indicator
-            h(
-              'span',
-              { class: getSimplePaginationPageIndicatorClasses() },
-              formatPaginationPageIndicator(
-                paginationLabels.pageIndicatorText,
-                currentPage.value,
-                totalPages,
-                localeCode
-              )
-            ),
-
-            // Next button
-            h(
-              'button',
-              {
-                class: getSimplePaginationButtonClasses(!hasNext),
-                disabled: !hasNext,
-                onClick: () => handlePageChange(currentPage.value + 1)
-              },
-              paginationLabels.nextPageAriaLabel
-            )
-          ])
-        ])
+      return h('div', { class: getBuiltInPaginationContainerClasses() }, [
+        h(Pagination, {
+          size: 'small',
+          align: 'right',
+          current: currentPage.value,
+          pageSize: currentPageSize.value,
+          total,
+          simple,
+          showQuickJumper,
+          showSizeChanger: paginationConfig.showSizeChanger !== false,
+          showTotal: paginationConfig.showTotal !== false,
+          totalText,
+          pageIndicatorText,
+          pageSizeOptions: paginationConfig.pageSizeOptions || [10, 20, 50, 100],
+          locale: mergedLocale.value,
+          onChange: (page: number, pageSize: number) => {
+            // Page-size changes are routed through onPageSizeChange below; the
+            // companion change event they trigger carries the new size and is skipped.
+            if (pageSize === currentPageSize.value) {
+              handlePageChange(page)
+            }
+          },
+          onPageSizeChange: (_page: number, pageSize: number) => handlePageSizeChange(pageSize)
+        })
       ])
     }
 

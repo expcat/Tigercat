@@ -58,6 +58,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   showTotal = true,
   totalText,
   simple = false,
+  pageIndicatorText,
   size = 'medium',
   align = 'center',
   disabled = false,
@@ -288,9 +289,15 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   if (simple) {
     // Simple mode: current / total
+    const indicatorText = pageIndicatorText
+      ? pageIndicatorText(validatedCurrentPage, totalPages)
+      : `${validatedCurrentPage} / ${totalPages}`
     elements.push(
-      <span key="current" className={classNames('mx-2', getSizeTextClasses(size))}>
-        {validatedCurrentPage} / {totalPages}
+      <span
+        key="current"
+        className={classNames('mx-2', getSizeTextClasses(size))}
+        aria-label={indicatorText}>
+        {indicatorText}
       </span>
     )
   } else {

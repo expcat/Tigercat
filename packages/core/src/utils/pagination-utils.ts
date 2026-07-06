@@ -202,6 +202,40 @@ export function defaultTotalText(total: number, _range: [number, number]): strin
 }
 
 /**
+ * Page-count threshold above which built-in pagination (Table/List) switches
+ * from the simple prev/next indicator to full page-number buttons plus a
+ * quick jumper.
+ */
+export const PAGINATION_FULL_MODE_PAGE_THRESHOLD = 3
+
+/**
+ * Resolved display mode for built-in pagination.
+ */
+export interface PaginationDisplayMode {
+  simple: boolean
+  showQuickJumper: boolean
+}
+
+/**
+ * Resolve the display mode for built-in pagination (Table/List).
+ *
+ * By default, more than {@link PAGINATION_FULL_MODE_PAGE_THRESHOLD} pages
+ * enables page-number buttons and the quick jumper; otherwise the simple
+ * prev/next indicator is used. Explicit `simple` / `showQuickJumper`
+ * config values override the automatic behavior.
+ */
+export function resolvePaginationDisplayMode(
+  totalPages: number,
+  config?: { simple?: boolean; showQuickJumper?: boolean }
+): PaginationDisplayMode {
+  const useFullMode = totalPages > PAGINATION_FULL_MODE_PAGE_THRESHOLD
+  return {
+    simple: config?.simple ?? !useFullMode,
+    showQuickJumper: config?.showQuickJumper ?? useFullMode
+  }
+}
+
+/**
  * Get container classes for pagination
  */
 export function getPaginationContainerClasses(
@@ -404,4 +438,12 @@ export function getSimplePaginationPageIndicatorClasses(): string {
  */
 export function getSimplePaginationButtonsWrapperClasses(): string {
   return 'flex gap-1'
+}
+
+/**
+ * Get container classes for built-in pagination rendered by Table/List.
+ * Wraps a Pagination component below the data area.
+ */
+export function getBuiltInPaginationContainerClasses(): string {
+  return classNames('px-4 py-3', 'border-t border-[var(--tiger-border,#e5e7eb)]')
 }

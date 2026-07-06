@@ -111,7 +111,7 @@ describe('List', () => {
       }
     })
 
-    await fireEvent.click(screen.getByText('Next page'))
+    await fireEvent.click(screen.getByRole('button', { name: 'Next page' }))
     expect(onPageChange).toHaveBeenCalledWith({ current: 2, pageSize: 10 })
   })
 
@@ -132,7 +132,10 @@ describe('List', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(10)
     expect(screen.getByText('Item 11')).toBeInTheDocument()
     expect(screen.getByText('Item 20')).toBeInTheDocument()
-    expect(screen.getByText('Page 2 of 5')).toBeInTheDocument()
+    // More than 3 pages: page-number buttons plus quick jumper
+    expect(screen.getByRole('button', { name: 'Page 2' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('button', { name: 'Page 5' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Go to')).toBeInTheDocument()
     expect(screen.getByText('Total 48 items')).toBeInTheDocument()
   })
 

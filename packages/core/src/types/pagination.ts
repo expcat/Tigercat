@@ -119,6 +119,14 @@ export interface PaginationProps {
   simple?: boolean
 
   /**
+   * Custom text renderer for the simple-mode page indicator.
+   * Defaults to `{current} / {totalPages}` when not provided.
+   * @param current - Current page number
+   * @param totalPages - Total number of pages
+   */
+  pageIndicatorText?: (current: number, totalPages: number) => string
+
+  /**
    * Size of pagination
    * @default 'medium'
    */

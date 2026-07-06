@@ -1,20 +1,16 @@
 import React from 'react'
 import {
-  formatIntlNumber,
-  formatPaginationTotal,
   formatPaginationPageIndicator,
+  formatPaginationTotal,
+  getBuiltInPaginationContainerClasses,
   getPaginationLabels,
-  getSimplePaginationContainerClasses,
-  getSimplePaginationTotalClasses,
-  getSimplePaginationControlsClasses,
-  getSimplePaginationSelectClasses,
-  getSimplePaginationButtonClasses,
-  getSimplePaginationPageIndicatorClasses,
-  getSimplePaginationButtonsWrapperClasses,
+  resolvePaginationDisplayMode,
   type TigerLocale,
+  type TigerLocalePagination,
   type PaginationConfig,
   type PaginationPageSizeOptionItem
 } from '@expcat/tigercat-core'
+import { Pagination } from '../Pagination'
 import type { TableContext } from './types'
 
 export interface RenderPaginationViewProps {
@@ -32,7 +28,7 @@ export function renderPagination(
     return null
   }
 
-  const { totalPages, startIndex, endIndex, hasNext, hasPrev } = ctx.paginationInfo
+  const { totalPages } = ctx.paginationInfo
   const paginationConfig = pagination as PaginationConfig
   const total =
     paginationConfig.total !== undefined && paginationConfig.total > 0
@@ -42,82 +38,66 @@ export function renderPagination(
   const labels = getPaginationLabels(locale)
   const localeCode = locale?.locale
 
-  const finalTotalText = paginationConfig.totalText
-    ? paginationConfig.totalText(total, [startIndex, endIndex])
-    : formatPaginationTotal(labels.totalText, total, [startIndex, endIndex], localeCode)
+  // More than 3 pages: full page-number buttons plus quick jumper;
+  // otherwise the simple prev/next indicator (config values override).
+  const { simple, showQuickJumper } = resolvePaginationDisplayMode(totalPages, paginationConfig)
 
-  const finalPrevText = paginationConfig.prevText || labels.prevPageAriaLabel
-  const finalNextText = paginationConfig.nextText || labels.nextPageAriaLabel
+  const totalText =
+    paginationConfig.totalText ??
+    ((value: number, range: [number, number]) =>
+      formatPaginationTotal(labels.totalText, value, range, localeCode))
 
-  const finalPageIndicatorText = paginationConfig.pageIndicatorText
-    ? paginationConfig.pageIndicatorText(ctx.currentPage, totalPages)
-    : formatPaginationPageIndicator(
-        labels.pageIndicatorText,
-        ctx.currentPage,
-        totalPages,
-        localeCode
-      )
+  const pageIndicatorText =
+    paginationConfig.pageIndicatorText ??
+    ((current: number, pages: number) =>
+      formatPaginationPageIndicator(labels.pageIndicatorText, current, pages, localeCode))
 
-  const finalPrevAriaLabel = view.disableI18n ? finalPrevText : labels.prevPageAriaLabel
-  const finalNextAriaLabel = view.disableI18n ? finalNextText : labels.nextPageAriaLabel
-  const normalizedPageSizeOptions = (paginationConfig.pageSizeOptions || [
+  // When i18n is disabled the Pagination component must not pick up the
+  // ConfigProvider locale, so lock every label to the resolved defaults.
+  const overrides: Partial<TigerLocalePagination> = view.disableI18n ? { ...labels } : {}
+  if (paginationConfig.prevText) overrides.prevPageAriaLabel = paginationConfig.prevText
+  if (paginationConfig.nextText) overrides.nextPageAriaLabel = paginationConfig.nextText
+  const labelsOverride = Object.keys(overrides).length > 0 ? overrides : undefined
+
+  const pageSizeOptions = (paginationConfig.pageSizeOptions ?? [
     10, 20, 50, 100
   ]) as PaginationPageSizeOptionItem[]
+  const pageSizeText = paginationConfig.pageSizeText
+  const normalizedPageSizeOptions = pageSizeText
+    ? pageSizeOptions.map((option) => {
+        if (typeof option === 'number') {
+          return { value: option, label: pageSizeText(option) }
+        }
+        return { value: option.value, label: option.label ?? pageSizeText(option.value) }
+      })
+    : pageSizeOptions
 
   return (
-    <div className={getSimplePaginationContainerClasses()}>
-      {paginationConfig.showTotal !== false && (
-        <div className={getSimplePaginationTotalClasses()}>{finalTotalText}</div>
-      )}
-
-      <div className={getSimplePaginationControlsClasses()}>
-        {paginationConfig.showSizeChanger !== false && (
-          <select
-            className={getSimplePaginationSelectClasses()}
-            value={ctx.currentPageSize}
-            aria-label={labels.itemsPerPageText}
-            onChange={(e) => ctx.handlePageSizeChange(Number(e.target.value))}>
-            {normalizedPageSizeOptions.map((option) => {
-              const value = typeof option === 'number' ? option : option.value
-              const label =
-                typeof option === 'number'
-                  ? `${formatIntlNumber(value, localeCode)} ${labels.itemsPerPageText}`
-                  : (option.label ??
-                    `${formatIntlNumber(value, localeCode)} ${labels.itemsPerPageText}`)
-
-              return (
-                <option key={value} value={value}>
-                  {paginationConfig.pageSizeText ? paginationConfig.pageSizeText(value) : label}
-                </option>
-              )
-            })}
-          </select>
-        )}
-
-        <div className={getSimplePaginationButtonsWrapperClasses()}>
-          <button
-            className={getSimplePaginationButtonClasses(!hasPrev)}
-            disabled={!hasPrev}
-            aria-label={finalPrevAriaLabel}
-            onClick={() => ctx.handlePageChange(ctx.currentPage - 1)}>
-            {finalPrevText}
-          </button>
-
-          <span
-            className={getSimplePaginationPageIndicatorClasses()}
-            aria-label={finalPageIndicatorText}>
-            {finalPageIndicatorText}
-          </span>
-
-          <button
-            className={getSimplePaginationButtonClasses(!hasNext)}
-            disabled={!hasNext}
-            aria-label={finalNextAriaLabel}
-            onClick={() => ctx.handlePageChange(ctx.currentPage + 1)}>
-            {finalNextText}
-          </button>
-        </div>
-      </div>
+    <div className={getBuiltInPaginationContainerClasses()}>
+      <Pagination
+        size="small"
+        align="right"
+        current={ctx.currentPage}
+        pageSize={ctx.currentPageSize}
+        total={total}
+        simple={simple}
+        showQuickJumper={showQuickJumper}
+        showSizeChanger={paginationConfig.showSizeChanger !== false}
+        showTotal={paginationConfig.showTotal !== false}
+        totalText={totalText}
+        pageIndicatorText={pageIndicatorText}
+        pageSizeOptions={normalizedPageSizeOptions}
+        locale={locale}
+        labels={labelsOverride}
+        onChange={(page, pageSize) => {
+          // Page-size changes are routed through onPageSizeChange below; the
+          // companion onChange they trigger carries the new size and is skipped.
+          if (pageSize === ctx.currentPageSize) {
+            ctx.handlePageChange(page)
+          }
+        }}
+        onPageSizeChange={(_page, pageSize) => ctx.handlePageSizeChange(pageSize)}
+      />
     </div>
   )
 }

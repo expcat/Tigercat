@@ -163,7 +163,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## Pagination
 
-`packages/core/src/types/pagination.ts` · `PaginationProps` · 3/21 props
+`packages/core/src/types/pagination.ts` · `PaginationProps` · 3/22 props
 
 | Prop              | Type     | Default | Notes                                        |
 | ----------------- | -------- | ------- | -------------------------------------------- |

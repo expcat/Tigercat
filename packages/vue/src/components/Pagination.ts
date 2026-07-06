@@ -62,6 +62,7 @@ export interface VuePaginationProps {
   showTotal?: boolean
   totalText?: (total: number, range: [number, number]) => string
   simple?: boolean
+  pageIndicatorText?: (current: number, totalPages: number) => string
   size?: PaginationSize
   align?: PaginationAlign
   disabled?: boolean
@@ -170,6 +171,14 @@ export const Pagination = defineComponent({
     simple: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Custom text renderer for the simple-mode page indicator.
+     * Defaults to `{current} / {totalPages}` when not provided.
+     */
+    pageIndicatorText: {
+      type: Function as PropType<(current: number, totalPages: number) => string>,
+      default: undefined
     },
     /**
      * Size of pagination
@@ -480,8 +489,15 @@ export const Pagination = defineComponent({
 
       if (props.simple) {
         // Simple mode: current / total
+        const indicatorText = props.pageIndicatorText
+          ? props.pageIndicatorText(page, pages)
+          : `${page} / ${pages}`
         elements.push(
-          h('span', { class: classNames('mx-2', getSizeTextClasses(size)) }, `${page} / ${pages}`)
+          h(
+            'span',
+            { class: classNames('mx-2', getSizeTextClasses(size)), 'aria-label': indicatorText },
+            indicatorText
+          )
         )
       } else {
         // Full mode: page number buttons

@@ -691,7 +691,7 @@ describe('Table', () => {
         email: `person${i + 11}@example.com`
       }))
 
-      const { container, getByText } = renderWithProps(Table, {
+      const { container, getByText, getByRole, getByLabelText } = renderWithProps(Table, {
         columns,
         dataSource: pageTwoRows,
         pagination: { remote: true, current: 2, pageSize: 10, total: 48 }
@@ -700,8 +700,37 @@ describe('Table', () => {
       expect(container.querySelectorAll('tbody tr')).toHaveLength(10)
       expect(getByText('Person 11')).toBeInTheDocument()
       expect(getByText('Person 20')).toBeInTheDocument()
-      expect(getByText('Page 2 of 5')).toBeInTheDocument()
+      // More than 3 pages: page-number buttons plus quick jumper
+      expect(getByRole('button', { name: 'Page 2' })).toHaveAttribute('aria-current', 'page')
+      expect(getByRole('button', { name: 'Page 5' })).toBeInTheDocument()
+      expect(getByLabelText('Go to')).toBeInTheDocument()
       expect(getByText('Total 48 items')).toBeInTheDocument()
+    })
+
+    it('should jump to a page via the quick jumper when more than 3 pages', async () => {
+      const onPageChange = vi.fn()
+      const rows = Array.from({ length: 48 }, (_, i) => ({
+        id: i + 1,
+        name: `Person ${i + 1}`,
+        age: 20 + (i % 30),
+        email: `person${i + 1}@example.com`
+      }))
+
+      const { getByLabelText } = render(Table, {
+        props: {
+          columns,
+          dataSource: rows
+        },
+        attrs: {
+          onPageChange
+        }
+      })
+
+      const jumperInput = getByLabelText('Go to')
+      await fireEvent.update(jumperInput, '4')
+      await fireEvent.keyDown(jumperInput, { key: 'Enter' })
+
+      expect(onPageChange).toHaveBeenCalledWith({ current: 4, pageSize: 10 })
     })
 
     it('should keep client-side slicing when remote is not set (regression)', () => {

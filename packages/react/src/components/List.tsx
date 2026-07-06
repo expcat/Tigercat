@@ -22,13 +22,8 @@ import {
   listGridContainerClasses,
   getSpinnerSVG,
   getLoadingOverlaySpinnerClasses,
-  getSimplePaginationContainerClasses,
-  getSimplePaginationTotalClasses,
-  getSimplePaginationControlsClasses,
-  getSimplePaginationSelectClasses,
-  getSimplePaginationButtonClasses,
-  getSimplePaginationPageIndicatorClasses,
-  getSimplePaginationButtonsWrapperClasses,
+  getBuiltInPaginationContainerClasses,
+  resolvePaginationDisplayMode,
   getPaginationLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
@@ -40,6 +35,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { VirtualList } from './VirtualList'
+import { Pagination } from './Pagination'
 import { useTigerConfig } from './ConfigProvider'
 
 const spinnerSvg = getSpinnerSVG('spinner')
@@ -487,70 +483,49 @@ export const List = <T extends ListItem = ListItem>({
       return null
     }
 
-    const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo
+    const { totalPages } = paginationInfo
     const total = paginationTotal
     const paginationConfig = pagination as ListPaginationConfig
     const paginationLabels = getPaginationLabels(mergedLocale)
     const localeCode = mergedLocale?.locale
 
+    // More than 3 pages: full page-number buttons plus quick jumper;
+    // otherwise the simple prev/next indicator (config values override).
+    const { simple, showQuickJumper } = resolvePaginationDisplayMode(totalPages, paginationConfig)
+
+    const totalText =
+      paginationConfig.totalText ??
+      ((value: number, range: [number, number]) =>
+        formatPaginationTotal(paginationLabels.totalText, value, range, localeCode))
+
+    const pageIndicatorText = (current: number, pages: number) =>
+      formatPaginationPageIndicator(paginationLabels.pageIndicatorText, current, pages, localeCode)
+
     return (
-      <div className={getSimplePaginationContainerClasses()}>
-        {/* Total info */}
-        {paginationConfig.showTotal !== false && (
-          <div className={getSimplePaginationTotalClasses()}>
-            {paginationConfig.totalText
-              ? paginationConfig.totalText(total, [startIndex, endIndex])
-              : formatPaginationTotal(
-                  paginationLabels.totalText,
-                  total,
-                  [startIndex, endIndex],
-                  localeCode
-                )}
-          </div>
-        )}
-
-        {/* Pagination controls */}
-        <div className={getSimplePaginationControlsClasses()}>
-          {/* Page size selector */}
-          {paginationConfig.showSizeChanger !== false && (
-            <select
-              className={getSimplePaginationSelectClasses()}
-              value={currentPageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
-              {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) => (
-                <option key={size} value={size}>
-                  {size} {paginationLabels.itemsPerPageText}
-                </option>
-              ))}
-            </select>
-          )}
-
-          {/* Page buttons */}
-          <div className={getSimplePaginationButtonsWrapperClasses()}>
-            <button
-              className={getSimplePaginationButtonClasses(!hasPrev)}
-              disabled={!hasPrev}
-              onClick={() => handlePageChange(currentPage - 1)}>
-              {paginationLabels.prevPageAriaLabel}
-            </button>
-
-            <span className={getSimplePaginationPageIndicatorClasses()}>
-              {formatPaginationPageIndicator(
-                paginationLabels.pageIndicatorText,
-                currentPage,
-                totalPages,
-                localeCode
-              )}
-            </span>
-
-            <button
-              className={getSimplePaginationButtonClasses(!hasNext)}
-              disabled={!hasNext}
-              onClick={() => handlePageChange(currentPage + 1)}>
-              {paginationLabels.nextPageAriaLabel}
-            </button>
-          </div>
-        </div>
+      <div className={getBuiltInPaginationContainerClasses()}>
+        <Pagination
+          size="small"
+          align="right"
+          current={currentPage}
+          pageSize={currentPageSize}
+          total={total}
+          simple={simple}
+          showQuickJumper={showQuickJumper}
+          showSizeChanger={paginationConfig.showSizeChanger !== false}
+          showTotal={paginationConfig.showTotal !== false}
+          totalText={totalText}
+          pageIndicatorText={pageIndicatorText}
+          pageSizeOptions={paginationConfig.pageSizeOptions || [10, 20, 50, 100]}
+          locale={mergedLocale}
+          onChange={(page, pageSize) => {
+            // Page-size changes are routed through onPageSizeChange below; the
+            // companion onChange they trigger carries the new size and is skipped.
+            if (pageSize === currentPageSize) {
+              handlePageChange(page)
+            }
+          }}
+          onPageSizeChange={(_page, pageSize) => handlePageSizeChange(pageSize)}
+        />
       </div>
     )
   }

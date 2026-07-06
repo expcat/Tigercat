@@ -347,6 +347,19 @@ export interface PaginationConfig {
   showSizeChanger?: boolean
 
   /**
+   * Force simple mode (prev/next with a page indicator, no page-number
+   * buttons). By default simple mode is used when there are 3 pages or
+   * fewer, and full page-number buttons appear above that.
+   */
+  simple?: boolean
+
+  /**
+   * Whether to show the quick jumper (input to jump to a page).
+   * By default it appears automatically when there are more than 3 pages.
+   */
+  showQuickJumper?: boolean
+
+  /**
    * Whether to show total count
    * @default true
    */
