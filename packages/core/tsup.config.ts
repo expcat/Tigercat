@@ -38,6 +38,7 @@ export default defineConfig({
     tailwind: 'src/tailwind-entry.ts',
     'tailwind/modern': 'src/tailwind-entry-modern.ts',
     'utils/table-export': 'src/utils/table-export.ts',
+    'utils/data-export': 'src/utils/data-export.ts',
     ...localeEntries,
     ...datePickerLocaleEntries,
     ...iconEntries

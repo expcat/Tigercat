@@ -130,6 +130,19 @@ export interface TigerLocaleTable {
   collapseRowAriaLabel?: string
 }
 
+export interface TigerLocaleDataExport {
+  /** Trigger button text when multiple formats are offered */
+  triggerText?: string
+  /** Aria label for the export trigger button */
+  triggerAriaLabel?: string
+  /** Button/menu-item text for xlsx export */
+  xlsxText?: string
+  /** Button/menu-item text for markdown export */
+  markdownText?: string
+  /** Trigger text while an export is running */
+  exportingText?: string
+}
+
 export interface TigerLocaleFormWizard {
   prevText?: string
   nextText?: string
@@ -376,6 +389,7 @@ export interface TigerLocale {
   table?: TigerLocaleTable
   datePicker?: Partial<DatePickerLocalePreset>
   timePicker?: TigerLocaleTimePicker
+  dataExport?: TigerLocaleDataExport
   formWizard?: TigerLocaleFormWizard
   tour?: TigerLocaleTour
   calendar?: TigerLocaleCalendar

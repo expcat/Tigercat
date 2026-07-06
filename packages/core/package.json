@@ -169,6 +169,10 @@
     "./utils/table-export": {
       "types": "./dist/utils/table-export.d.ts",
       "import": "./dist/utils/table-export.js"
+    },
+    "./utils/data-export": {
+      "types": "./dist/utils/data-export.d.ts",
+      "import": "./dist/utils/data-export.js"
     }
   },
   "files": [

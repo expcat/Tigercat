@@ -80,6 +80,13 @@ export const zhCN: TigerLocale = {
     expandRowAriaLabel: '展开行',
     collapseRowAriaLabel: '收起行'
   },
+  dataExport: {
+    triggerText: '导出',
+    triggerAriaLabel: '导出数据',
+    xlsxText: '导出 Excel',
+    markdownText: '导出 Markdown',
+    exportingText: '导出中...'
+  },
   datePicker: ZH_CN_DATEPICKER_LOCALE,
   timePicker: ZH_CN_TIME_PICKER_LABELS,
   formWizard: {

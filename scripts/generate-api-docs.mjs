@@ -60,6 +60,11 @@ const EXAMPLE_NOTES = {
 }
 
 const COMPONENT_USAGE_NOTES = {
+  DataExport: {
+    uses: ['Dropdown', 'DropdownMenu', 'DropdownItem'],
+    notes:
+      '将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）或 GFM Markdown 表格；序列化逻辑在点击导出时才通过 `import(\'@expcat/tigercat-core/utils/data-export\')` 按需加载。`formats` 单个值渲染普通按钮，多个值渲染下拉菜单；列复用 `TableColumn`（取 `title` 与 `dataKey || key`），可直接透传 Table/DataTableWithToolbar 的列定义，`cellFormatter` 用于单元格取值转换。'
+  },
   Dropdown: {
     uses: ['DropdownMenu', 'DropdownItem'],
     notes:
@@ -338,6 +343,7 @@ const COMPONENT_SNIPPETS = {
     ActivityFeed: '<ActivityFeed :items="items" />',
     CommentThread: '<CommentThread :nodes="nodes" />',
     NotificationCenter: '<NotificationCenter :items="items" />',
+    DataExport: '<DataExport :columns="columns" :data-source="rows" file-name="users" />',
     TableToolbar:
       '<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" />',
     DataTableWithToolbar:
@@ -376,6 +382,7 @@ const COMPONENT_SNIPPETS = {
     ActivityFeed: '<ActivityFeed items={items} />',
     CommentThread: '<CommentThread nodes={nodes} />',
     NotificationCenter: '<NotificationCenter items={items} />',
+    DataExport: '<DataExport columns={columns} dataSource={rows} fileName="users" />',
     TableToolbar: '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} />',
     DataTableWithToolbar:
       '<DataTableWithToolbar columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} toolbar={toolbar} />',

@@ -7,7 +7,7 @@ description: Compact generated Tigercat Data props reference
 
 # Data Props
 
-数据展示、表格、时间线、日历和折叠面板组件。 共 6 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+数据展示、表格、时间线、日历和折叠面板组件。 共 7 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Calendar
 
@@ -50,6 +50,20 @@ Events/callback props: `onChange?`, `onPanelChange?`.
 | `value?`  | `CountdownValue` | `-`     | -     |
 | `now?`    | `CountdownValue` | `-`     | -     |
 | `format?` | `string`         | `-`     | -     |
+
+## DataExport
+
+`packages/core/src/types/data-export.ts` · `DataExportProps` · 3/5 props
+
+Uses: `Dropdown`, `DropdownMenu`, `DropdownItem`.
+
+Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）或 GFM Markdown 表格；序列化逻辑在点击导出时才通过 `import('@expcat/tigercat-core/utils/data-export')` 按需加载。`formats` 单个值渲染普通按钮，多个值渲染下拉菜单；列复用 `TableColumn`（取 `title` 与 `dataKey || key`），可直接透传 Table/DataTableWithToolbar 的列定义，`cellFormatter` 用于单元格取值转换。
+
+| Prop         | Type                 | Default                | Notes                                                                                      |
+| ------------ | -------------------- | ---------------------- | ------------------------------------------------------------------------------------------ |
+| `columns`    | `TableColumn<T>[]`   | `-`                    | Columns describing header titles and record keys. Reuses TableColumn so Table/DataTable... |
+| `dataSource` | `T[]`                | `-`                    | Records to export                                                                          |
+| `formats?`   | `DataExportFormat[]` | `['xlsx', 'markdown']` | Formats offered to the user. A single format renders a plain button, multiple formats r... |
 
 ## Table
 

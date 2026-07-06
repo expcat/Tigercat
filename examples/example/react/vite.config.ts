@@ -74,6 +74,10 @@ export default defineConfig(({ command }) => ({
         replacement: path.resolve(workspaceRoot, 'packages/react/src/index.tsx')
       },
       {
+        find: '@expcat/tigercat-core/utils/data-export',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/data-export.ts')
+      },
+      {
         find: '@expcat/tigercat-core',
         replacement: path.resolve(workspaceRoot, 'packages/core/src/index.ts')
       }

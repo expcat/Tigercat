@@ -81,6 +81,10 @@ const router = createRouter({
         // Data Display
         { path: 'table', component: lazyPage(() => import('./pages/TableDemo.vue')) },
         {
+          path: 'data-export',
+          component: lazyPage(() => import('./pages/DataExportDemo.vue'))
+        },
+        {
           path: 'virtual-table',
           component: lazyPage(() => import('./pages/VirtualTableDemo.vue'))
         },

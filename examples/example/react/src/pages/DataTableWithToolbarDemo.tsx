@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { DataTableWithToolbar } from '@expcat/tigercat-react/DataTableWithToolbar'
+import { DataExport } from '@expcat/tigercat-react/DataExport'
 import { type TableColumn, type TableToolbarFilterValue } from '@expcat/tigercat-react'
 import type { TableCardLayoutItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
@@ -107,6 +108,8 @@ const seedData: UserRow[] = Array.from({ length: 26 }).map((_, index) => {
   }
 })
 
+const exportRows = seedData.slice(0, 8)
+
 const getAgeRange = (value: TableToolbarFilterValue) =>
   value && typeof value === 'object' ? (value as { min?: string; max?: string }) : {}
 
@@ -119,6 +122,8 @@ const DataTableWithToolbarDemo: React.FC = () => {
   })
   const [pagination, setPagination] = useState({ current: 1, pageSize: 6 })
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([])
+  const [exportSelectedKeys, setExportSelectedKeys] = useState<(string | number)[]>([])
+  const [exportHiddenKeys, setExportHiddenKeys] = useState<string[]>([])
 
   useEffect(() => {
     setPagination((prev) => ({ ...prev, current: 1 }))
@@ -521,6 +526,42 @@ const DataTableWithToolbarDemo: React.FC = () => {
                 showTotal: true
               }}
               onPageChange={handlePageChange}
+            />
+          </section>
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              集成导出（DataExport）
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              把 DataExport 放进 toolbar.filtersExtra，实现“所见即所导”：导出列跟随列设置的隐藏状态；有选中行时仅导出选中行，否则导出全部数据。
+            </p>
+            <DataTableWithToolbar<UserRow>
+              columns={columns}
+              dataSource={exportRows}
+              tableLayout="fixed"
+              rowSelection={{
+                selectedRowKeys: exportSelectedKeys,
+                type: 'checkbox'
+              }}
+              hiddenColumnKeys={exportHiddenKeys}
+              onHiddenColumnKeysChange={setExportHiddenKeys}
+              onSelectionChange={setExportSelectedKeys}
+              toolbar={{
+                showColumnSettings: true,
+                selectedKeys: exportSelectedKeys,
+                filtersExtra: () => (
+                  <DataExport<UserRow>
+                    columns={columns.filter((column) => !exportHiddenKeys.includes(column.key))}
+                    dataSource={
+                      exportSelectedKeys.length > 0
+                        ? exportRows.filter((row) => exportSelectedKeys.includes(row.id))
+                        : exportRows
+                    }
+                    fileName="用户列表"
+                  />
+                )
+              }}
+              pagination={false}
             />
           </section>
         </div>

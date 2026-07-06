@@ -88,7 +88,7 @@ export const CATEGORIES = {
     'tabs',
     'tree'
   ],
-  Data: ['calendar', 'collapse', 'countdown', 'table', 'timeline'],
+  Data: ['calendar', 'collapse', 'countdown', 'data-export', 'table', 'timeline'],
   Charts: [
     'chart',
     'chart-core',

@@ -63,6 +63,7 @@ const PrintLayoutDemo = lazy(() => import('./pages/PrintLayoutDemo'))
 
 // Data Display
 const TableDemo = lazy(() => import('./pages/TableDemo'))
+const DataExportDemo = lazy(() => import('./pages/DataExportDemo'))
 const VirtualTableDemo = lazy(() => import('./pages/VirtualTableDemo'))
 const TimelineDemo = lazy(() => import('./pages/TimelineDemo'))
 const ProgressDemo = lazy(() => import('./pages/ProgressDemo'))
@@ -203,6 +204,7 @@ const router = createHashRouter([
       { path: 'print-layout', element: <PrintLayoutDemo /> },
       // Data Display
       { path: 'table', element: <TableDemo /> },
+      { path: 'data-export', element: <DataExportDemo /> },
       { path: 'virtual-table', element: <VirtualTableDemo /> },
       { path: 'timeline', element: <TimelineDemo /> },
       { path: 'progress', element: <ProgressDemo /> },

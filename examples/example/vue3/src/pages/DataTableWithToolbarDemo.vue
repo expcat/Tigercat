@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { DataTableWithToolbar } from '@expcat/tigercat-vue/DataTableWithToolbar'
+import { DataExport } from '@expcat/tigercat-vue/DataExport'
 import { type TableColumn, type TableToolbarFilterValue } from '@expcat/tigercat-vue'
 import type { TableToolbarAction, TableCardLayoutItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
@@ -118,6 +119,17 @@ const filters = ref<Record<string, TableToolbarFilterValue>>({
 })
 const pagination = ref({ current: 1, pageSize: 6 })
 const selectedRowKeys = ref<(string | number)[]>([])
+const exportSelectedKeys = ref<(string | number)[]>([])
+const exportHiddenKeys = ref<string[]>([])
+const exportRows = seedData.slice(0, 8)
+const exportColumns = computed(() =>
+  columns.filter((column) => !exportHiddenKeys.value.includes(column.key))
+)
+const exportDataSource = computed(() =>
+  exportSelectedKeys.value.length > 0
+    ? exportRows.filter((row) => exportSelectedKeys.value.includes(row.id as number))
+    : exportRows
+)
 
 watch(
   [keyword, () => filters.value.status, () => filters.value.role, () => filters.value.ageRange],
@@ -491,6 +503,31 @@ const handleBulkAction = (actionKey: string) => {
                   <span class="text-xs text-gray-400">{{ (record as UserRow).role }}</span>
                 </div>
               </div>
+            </template>
+          </DataTableWithToolbar>
+        </section>
+        <section class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            集成导出（DataExport）
+          </h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            把 DataExport 放进 #filters-extra 插槽，实现“所见即所导”：导出列跟随列设置的隐藏状态；有选中行时仅导出选中行，否则导出全部数据。
+          </p>
+          <DataTableWithToolbar
+            :columns="columns"
+            :dataSource="exportRows"
+            table-layout="fixed"
+            :rowSelection="{ selectedRowKeys: exportSelectedKeys, type: 'checkbox' }"
+            v-model:hidden-column-keys="exportHiddenKeys"
+            :toolbar="{ showColumnSettings: true, selectedKeys: exportSelectedKeys }"
+            :pagination="false"
+            @selection-change="(keys: (string | number)[]) => (exportSelectedKeys = keys)">
+            <template #filters-extra>
+              <DataExport
+                :columns="exportColumns"
+                :data-source="exportDataSource"
+                file-name="用户列表"
+              />
             </template>
           </DataTableWithToolbar>
         </section>

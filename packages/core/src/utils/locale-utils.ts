@@ -18,6 +18,7 @@ import type {
   TigerLocaleLazyModule,
   TigerLocalePagination,
   TigerLocaleTable,
+  TigerLocaleDataExport,
   TigerLocaleFormWizard,
   TigerLocaleTour,
   TigerLocaleCalendar,
@@ -584,6 +585,48 @@ export function formatTableSelectRowAriaLabel(
 
 export function formatTableSortByText(template: string, column: string): string {
   return template.replace('{column}', column)
+}
+
+// ============================================================================
+// DataExport Labels
+// ============================================================================
+
+export const DEFAULT_DATA_EXPORT_LABELS: Required<TigerLocaleDataExport> = {
+  triggerText: 'Export',
+  triggerAriaLabel: 'Export data',
+  xlsxText: 'Export Excel',
+  markdownText: 'Export Markdown',
+  exportingText: 'Exporting...'
+}
+
+export const ZH_CN_DATA_EXPORT_LABELS: Required<TigerLocaleDataExport> = {
+  triggerText: '导出',
+  triggerAriaLabel: '导出数据',
+  xlsxText: '导出 Excel',
+  markdownText: '导出 Markdown',
+  exportingText: '导出中...'
+}
+
+export function getDataExportLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleDataExport>
+): Required<TigerLocaleDataExport> {
+  const isZh = !!locale?.locale?.startsWith('zh') || locale?.common?.emptyText === '暂无数据'
+  const defaultLabels = isZh ? ZH_CN_DATA_EXPORT_LABELS : DEFAULT_DATA_EXPORT_LABELS
+
+  return {
+    triggerText:
+      overrides?.triggerText ?? locale?.dataExport?.triggerText ?? defaultLabels.triggerText,
+    triggerAriaLabel:
+      overrides?.triggerAriaLabel ??
+      locale?.dataExport?.triggerAriaLabel ??
+      defaultLabels.triggerAriaLabel,
+    xlsxText: overrides?.xlsxText ?? locale?.dataExport?.xlsxText ?? defaultLabels.xlsxText,
+    markdownText:
+      overrides?.markdownText ?? locale?.dataExport?.markdownText ?? defaultLabels.markdownText,
+    exportingText:
+      overrides?.exportingText ?? locale?.dataExport?.exportingText ?? defaultLabels.exportingText
+  }
 }
 
 // ============================================================================

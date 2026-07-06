@@ -197,6 +197,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     items: [
       { key: 'table', path: '/table', label: { 'zh-CN': 'Table 表格', 'en-US': 'Table' } },
       {
+        key: 'data-export',
+        path: '/data-export',
+        label: { 'zh-CN': 'DataExport 导出', 'en-US': 'DataExport' }
+      },
+      {
         key: 'virtual-table',
         path: '/virtual-table',
         label: { 'zh-CN': 'VirtualTable 虚拟表格', 'en-US': 'VirtualTable' }

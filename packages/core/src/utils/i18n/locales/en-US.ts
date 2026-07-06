@@ -80,6 +80,13 @@ export const enUS: TigerLocale = {
     expandRowAriaLabel: 'Expand row',
     collapseRowAriaLabel: 'Collapse row'
   },
+  dataExport: {
+    triggerText: 'Export',
+    triggerAriaLabel: 'Export data',
+    xlsxText: 'Export Excel',
+    markdownText: 'Export Markdown',
+    exportingText: 'Exporting...'
+  },
   datePicker: EN_US_DATEPICKER_LOCALE,
   timePicker: DEFAULT_TIME_PICKER_LABELS,
   formWizard: {

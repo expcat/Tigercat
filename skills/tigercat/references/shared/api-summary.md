@@ -112,13 +112,14 @@ description: Compact generated route map for Tigercat core type files
 
 ## Data
 
-| Type File    | Props Interfaces                  |
-| ------------ | --------------------------------- |
-| calendar.ts  | CalendarProps                     |
-| collapse.ts  | CollapseProps, CollapsePanelProps |
-| countdown.ts | CountdownProps                    |
-| table.ts     | TableProps                        |
-| timeline.ts  | TimelineProps                     |
+| Type File      | Props Interfaces                  |
+| -------------- | --------------------------------- |
+| calendar.ts    | CalendarProps                     |
+| collapse.ts    | CollapseProps, CollapsePanelProps |
+| countdown.ts   | CountdownProps                    |
+| data-export.ts | DataExportProps                   |
+| table.ts       | TableProps                        |
+| timeline.ts    | TimelineProps                     |
 
 ## Charts
 

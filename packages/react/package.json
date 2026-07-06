@@ -244,6 +244,11 @@
       "import": "./dist/components/CropUpload.mjs",
       "default": "./dist/components/CropUpload.mjs"
     },
+    "./DataExport": {
+      "types": "./dist/components/DataExport.d.mts",
+      "import": "./dist/components/DataExport.mjs",
+      "default": "./dist/components/DataExport.mjs"
+    },
     "./DataTableWithToolbar": {
       "types": "./dist/components/DataTableWithToolbar.d.mts",
       "import": "./dist/components/DataTableWithToolbar.mjs",

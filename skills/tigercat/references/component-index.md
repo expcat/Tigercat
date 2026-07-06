@@ -87,6 +87,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Collapse              | Data       | `data`       | collapse.ts                                         | ./Collapse              |
 | CollapsePanel         | Data       | `data`       | collapse.ts                                         | ./CollapsePanel         |
 | Countdown             | Data       | `data`       | countdown.ts                                        | ./Countdown             |
+| DataExport            | Data       | `data`       | data-export.ts                                      | ./DataExport            |
 | Table                 | Data       | `data`       | table.ts                                            | ./Table                 |
 | Timeline              | Data       | `data`       | timeline.ts                                         | ./Timeline              |
 | Drawer                | Feedback   | `feedback`   | drawer.ts                                           | ./Drawer                |

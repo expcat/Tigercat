@@ -102,6 +102,9 @@ export type { UploadProps } from './components/Upload'
 export { Table } from './components/Table'
 export type { TableProps } from './components/Table'
 
+export { DataExport } from './components/DataExport'
+export type { DataExportProps } from './components/DataExport'
+
 export { Tag } from './components/Tag'
 export type { TagProps } from './components/Tag'
 
