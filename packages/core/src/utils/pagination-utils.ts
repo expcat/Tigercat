@@ -254,21 +254,36 @@ export function getPaginationContainerClasses(
 /**
  * Get base button classes for pagination buttons
  */
-export function getPaginationButtonBaseClasses(size: PaginationSize = 'medium'): string {
+export function getPaginationButtonBaseClasses(
+  size: PaginationSize = 'medium',
+  active = false
+): string {
   const sizeClasses = {
     small: 'min-w-7 h-7 text-sm px-2',
     medium: 'min-w-8 h-8 text-base px-2.5',
     large: 'min-w-10 h-10 text-lg px-3'
   }
 
+  // Active/inactive color utilities are mutually exclusive so a button never
+  // emits two conflicting `bg-*`/`text-*`/`border-*` classes at once. Merging
+  // both would leave the winner up to Tailwind's CSS source order, which is how
+  // the active page number ended up rendering as white text on a white surface.
+  const colorClasses = active
+    ? getPaginationButtonActiveClasses()
+    : classNames(
+        'border-[var(--tiger-border,#d1d5db)]',
+        'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#374151)]',
+        'hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)]',
+        'disabled:hover:border-[var(--tiger-border,#d1d5db)] disabled:hover:text-[var(--tiger-text,#374151)]'
+      )
+
   return classNames(
     'inline-flex items-center justify-center',
-    'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#d1d5db)]',
-    'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#374151)]',
+    'rounded-[var(--tiger-radius-md,0.5rem)] border',
     'transition-colors duration-200',
-    'hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)]',
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/40',
-    'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-[var(--tiger-border,#d1d5db)] disabled:hover:text-[var(--tiger-text,#374151)]',
+    'disabled:cursor-not-allowed disabled:opacity-50',
+    colorClasses,
     sizeClasses[size]
   )
 }

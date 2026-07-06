@@ -9,7 +9,6 @@ import {
   formatPaginationTotal,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
-  getPaginationButtonActiveClasses,
   getPaginationEllipsisClasses,
   getQuickJumperInputClasses,
   getPageSizeSelectorClasses,
@@ -318,10 +317,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <button
             key={`page-${pageNum}`}
             type="button"
-            className={classNames(
-              getPaginationButtonBaseClasses(size),
-              isActive && getPaginationButtonActiveClasses()
-            )}
+            className={getPaginationButtonBaseClasses(size, isActive)}
             disabled={disabled}
             onClick={() => handlePageChange(pageNum as number)}
             aria-label={formatPageAriaLabel(labels.pageAriaLabel, pageNum as number, localeCode)}

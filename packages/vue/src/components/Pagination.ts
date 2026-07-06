@@ -20,7 +20,6 @@ import {
   formatPaginationTotal,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
-  getPaginationButtonActiveClasses,
   getPaginationEllipsisClasses,
   getQuickJumperInputClasses,
   getPageSizeSelectorClasses,
@@ -513,10 +512,7 @@ export const Pagination = defineComponent({
                 'button',
                 {
                   type: 'button',
-                  class: classNames(
-                    getPaginationButtonBaseClasses(size),
-                    isActive && getPaginationButtonActiveClasses()
-                  ),
+                  class: getPaginationButtonBaseClasses(size, isActive),
                   disabled: props.disabled,
                   onClick: () => handlePageChange(pageNum as number),
                   'aria-label': formatPageAriaLabel(
