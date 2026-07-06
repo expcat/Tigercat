@@ -2,6 +2,22 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.0.0-preview.6
+
+v2.0.0 preview 6 延续 v2.0.0 预览发布面，新增 DataExport 数据导出组件，并增强 Table / List 分页交互。
+
+### Features
+
+- **DataExport 数据导出组件**：Vue / React 新增 `DataExport` 组件（Data 分类，子路径 `@expcat/tigercat-react/DataExport` / `@expcat/tigercat-vue/DataExport`），支持将表格数据导出为 XLSX 或 Markdown。`columns` 复用 `TableColumn`，Table / DataTableWithToolbar 的列配置可直接透传；`formats` 单一格式渲染普通按钮、多格式渲染下拉菜单（默认 `['xlsx', 'markdown']`），另支持 `fileName`、`sheetName`、`cellFormatter`、`disabled`。序列化实现位于 core 新增子路径 `@expcat/tigercat-core/utils/data-export`，组件按需 lazy import，不使用导出功能时不进入 bundle。导出按钮文案随 locale（zh-CN / en-US）同步新增。
+- **Table / List 分页增强**：`PaginationConfig` 与 `ListPaginationConfig` 新增 `simple?: boolean`（强制简洁模式：上一页/下一页 + 页码指示，默认 ≤3 页自动简洁、>3 页显示页码按钮）与 `showQuickJumper?: boolean`（快速跳页输入框，默认 >3 页自动出现）；`pageIndicatorText?: (current, totalPages) => string` 可自定义简洁模式页码指示文案（缺省 `{current} / {totalPages}`）。同时改进分页可访问性。
+
+### Infrastructure
+
+- root 与 `@expcat/tigercat-core`、`@expcat/tigercat-react`、`@expcat/tigercat-vue`、`@expcat/tigercat-cli` 统一为 `2.0.0-preview.6`。
+- 同步 core / React / Vue 运行时 `version` 导出、CLI `CLI_VERSION`、CLI 模板中的 Tigercat 依赖范围，以及示例首页展示版本。
+- 公开组件数 148 → 149（新增 DataExport），README 与示例首页统计同步更新。
+- 迁移和破坏性变更内容沿用当前 v2.0.0 预览阶段条目；正式 v2.0.0 发布前继续在 `docs/MIGRATION.md` 与本文件集中更新。
+
 ## v2.0.0-preview.5
 
 v2.0.0 preview 5 延续 v2.0.0 预览发布面，新增 Table / List 远程（服务端）分页模式。

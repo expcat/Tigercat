@@ -5,7 +5,7 @@
 [![@expcat/tigercat-core](https://img.shields.io/npm/v/@expcat/tigercat-core?style=flat-square&logo=npm&label=@expcat/tigercat-core)](https://www.npmjs.com/package/@expcat/tigercat-core)
 [![@expcat/tigercat-cli](https://img.shields.io/npm/v/@expcat/tigercat-cli?style=flat-square&logo=npm&label=@expcat/tigercat-cli)](https://www.npmjs.com/package/@expcat/tigercat-cli)
 
-基于 Tailwind CSS 的 UI 组件库，支持 Vue 3 与 React。**148+ 组件**，开箱即用。
+基于 Tailwind CSS 的 UI 组件库，支持 Vue 3 与 React。**149+ 组件**，开箱即用。
 
 **v2.0.0 预览阶段** — 遵循 SemVer 语义化版本，正式 v2.0.0 发布前持续在预览通道迭代（当前版本以顶部 npm 徽章为准）。
 
