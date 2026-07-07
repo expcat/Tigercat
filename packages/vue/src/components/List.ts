@@ -575,13 +575,7 @@ export const List = defineComponent({
           pageIndicatorText,
           pageSizeOptions: paginationConfig.pageSizeOptions || [10, 20, 50, 100],
           locale: mergedLocale.value,
-          onChange: (page: number, pageSize: number) => {
-            // Page-size changes are routed through onPageSizeChange below; the
-            // companion change event they trigger carries the new size and is skipped.
-            if (pageSize === currentPageSize.value) {
-              handlePageChange(page)
-            }
-          },
+          onChange: (page: number) => handlePageChange(page),
           onPageSizeChange: (_page: number, pageSize: number) => handlePageSizeChange(pageSize)
         })
       ])

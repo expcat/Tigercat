@@ -135,8 +135,9 @@ describe('Pagination', () => {
     expect(screen.getByText('页')).toBeInTheDocument()
   })
 
-  it('emits page-size-change and adjusts page when needed', async () => {
+  it('reports a size change only through page-size-change, never a duplicate change', async () => {
     const onPageSizeChange = vi.fn()
+    const onChange = vi.fn()
     render(Pagination, {
       props: {
         total: 100,
@@ -145,13 +146,16 @@ describe('Pagination', () => {
         showSizeChanger: true,
         pageSizeOptions: [10, 20, 50]
       },
-      attrs: { onPageSizeChange }
+      attrs: { onPageSizeChange, onChange }
     })
 
     // Use default English label from i18n system
     await fireEvent.update(screen.getByLabelText('/ page'), '50')
 
+    // current page 10 is clamped to 2 (100/50), carried by page-size-change
     expect(onPageSizeChange).toHaveBeenCalledWith(2, 50)
+    // the clamp must not also surface as a page-navigation event
+    expect(onChange).not.toHaveBeenCalled()
   })
 
   it('applies size classes', () => {

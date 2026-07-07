@@ -517,13 +517,7 @@ export const List = <T extends ListItem = ListItem>({
           pageIndicatorText={pageIndicatorText}
           pageSizeOptions={paginationConfig.pageSizeOptions || [10, 20, 50, 100]}
           locale={mergedLocale}
-          onChange={(page, pageSize) => {
-            // Page-size changes are routed through onPageSizeChange below; the
-            // companion onChange they trigger carries the new size and is skipped.
-            if (pageSize === currentPageSize) {
-              handlePageChange(page)
-            }
-          }}
+          onChange={(page) => handlePageChange(page)}
           onPageSizeChange={(_page, pageSize) => handlePageSizeChange(pageSize)}
         />
       </div>

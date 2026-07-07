@@ -36,7 +36,13 @@ export interface PaginationProps
   extends Omit<CorePaginationProps, 'style'>, Omit<React.HTMLAttributes<HTMLElement>, 'onChange'> {
   style?: React.CSSProperties
 
+  /** Fired on page navigation (page button, prev/next, quick jumper). */
   onChange?: (current: number, pageSize: number) => void
+  /**
+   * Fired when the page size changes. `current` is the resulting page after the
+   * new size is applied (clamped when the previous page fell out of range).
+   * A size change does not additionally fire `onChange`.
+   */
   onPageSizeChange?: (current: number, pageSize: number) => void
 
   /**
@@ -187,13 +193,11 @@ export const Pagination: React.FC<PaginationProps> = ({
         setInternalCurrent(newPage)
       }
 
-      // Call callbacks
+      // Size changes are reported only through onPageSizeChange, which carries
+      // the resulting page (clamped when the previous page fell out of range).
+      // We deliberately do NOT also fire onChange here: onChange means page
+      // navigation, so a single size change never triggers two callbacks.
       onPageSizeChange?.(newPage, newPageSize)
-
-      // Also call onChange if page changed
-      if (newPage !== validatedCurrentPage) {
-        onChange?.(newPage, newPageSize)
-      }
     },
     [
       disabled,
@@ -201,8 +205,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       validatedCurrentPage,
       controlledPageSize,
       controlledCurrent,
-      onPageSizeChange,
-      onChange
+      onPageSizeChange
     ]
   )
 

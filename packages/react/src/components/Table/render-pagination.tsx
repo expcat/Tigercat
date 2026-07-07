@@ -89,13 +89,7 @@ export function renderPagination(
         pageSizeOptions={normalizedPageSizeOptions}
         locale={locale}
         labels={labelsOverride}
-        onChange={(page, pageSize) => {
-          // Page-size changes are routed through onPageSizeChange below; the
-          // companion onChange they trigger carries the new size and is skipped.
-          if (pageSize === ctx.currentPageSize) {
-            ctx.handlePageChange(page)
-          }
-        }}
+        onChange={(page) => ctx.handlePageChange(page)}
         onPageSizeChange={(_page, pageSize) => ctx.handlePageSizeChange(pageSize)}
       />
     </div>

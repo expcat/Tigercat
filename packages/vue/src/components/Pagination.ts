@@ -252,6 +252,9 @@ export const Pagination = defineComponent({
       default: undefined
     }
   },
+  // `change` fires on page navigation only; `page-size-change` fires on size
+  // changes and carries the resulting (clamped) page. A size change never also
+  // fires `change`, so consumers get exactly one event per interaction.
   emits: ['update:current', 'update:pageSize', 'change', 'page-size-change'],
   setup(props, { emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
@@ -390,10 +393,12 @@ export const Pagination = defineComponent({
       emit('update:pageSize', newPageSize)
       emit('page-size-change', newPage, newPageSize)
 
-      // Also emit change if page changed
+      // Keep v-model:current in sync when the page was clamped, but do NOT emit
+      // `change`: a size change is reported only through `page-size-change`
+      // (which carries the resulting page), so consumers never get two events
+      // for one size change. `change` means page navigation only.
       if (newPage !== validatedCurrentPage.value) {
         emit('update:current', newPage)
-        emit('change', newPage, newPageSize)
       }
     }
 

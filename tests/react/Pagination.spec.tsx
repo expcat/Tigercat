@@ -113,8 +113,9 @@ describe('Pagination', () => {
     expect(screen.getByText('页')).toBeInTheDocument()
   })
 
-  it('calls onPageSizeChange and adjusts page when needed', async () => {
+  it('reports a size change only through onPageSizeChange, never a duplicate onChange', async () => {
     const onPageSizeChange = vi.fn()
+    const onChange = vi.fn()
     render(
       <Pagination
         total={100}
@@ -123,6 +124,7 @@ describe('Pagination', () => {
         showSizeChanger
         pageSizeOptions={[10, 20, 50]}
         onPageSizeChange={onPageSizeChange}
+        onChange={onChange}
       />
     )
 
@@ -130,7 +132,10 @@ describe('Pagination', () => {
       target: { value: '50' }
     })
 
+    // current page 10 is clamped to 2 (100/50), carried by onPageSizeChange
     expect(onPageSizeChange).toHaveBeenCalledWith(2, 50)
+    // the clamp must not also surface as a page-navigation event
+    expect(onChange).not.toHaveBeenCalled()
   })
 
   it('applies size classes', () => {
