@@ -15,15 +15,15 @@ export const TEMPLATE_VERSIONS = {
   tigercat: '^2.0.0-rc.1',
 
   // Frameworks
-  vue: '^3.5.38',
+  vue: '^3.5.39',
   react: '^19.2.7',
   reactDom: '^19.2.7',
 
   // Build toolchain
   typescript: '^6.0.3',
-  vite: '^8.1.0',
-  tailwindcss: '^4.3.1',
-  tailwindcssVite: '^4.3.1',
+  vite: '^8.1.3',
+  tailwindcss: '^4.3.2',
+  tailwindcssVite: '^4.3.2',
 
   // Vite plugins
   vitejsPluginVue: '^6.0.7',
@@ -35,7 +35,7 @@ export const TEMPLATE_VERSIONS = {
 
   // Vue-specific
   vueTsconfig: '^0.9.1',
-  vueTsc: '^3.3.5'
+  vueTsc: '^3.3.7'
 } as const
 
 export const COMPONENT_CATEGORIES = {
