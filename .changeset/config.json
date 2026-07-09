@@ -7,7 +7,8 @@
       "@expcat/tigercat-core",
       "@expcat/tigercat-vue",
       "@expcat/tigercat-react",
-      "@expcat/tigercat-cli"
+      "@expcat/tigercat-cli",
+      "@expcat/tigercat-mcp"
     ]
   ],
   "linked": [],

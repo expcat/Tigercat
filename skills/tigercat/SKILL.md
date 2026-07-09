@@ -16,6 +16,7 @@ Tailwind CSS 驱动的 React + Vue 3 组件库。先按任务定位 reference，
 - Binding differences: [shared/patterns/common.md](references/shared/patterns/common.md); terms: [shared/glossary.md](references/shared/glossary.md).
 - Type lookup only: [shared/api-summary.md](references/shared/api-summary.md).
 - Table/virtual/toolbar: start from data, advanced, and composite props/examples.
+- MCP routing: LLM clients can use `tigercat-mcp` to route tasks to the minimum needed skill references.
 
 ## Use Rules
 

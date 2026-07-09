@@ -1,0 +1,52 @@
+{
+  "name": "@expcat/tigercat-mcp",
+  "version": "2.0.0-rc.1",
+  "type": "module",
+  "description": "Local MCP server for routing LLMs to Tigercat skill references",
+  "license": "MIT",
+  "author": "Yizhe Wang",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/expcat/Tigercat",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/expcat/Tigercat#readme",
+  "bugs": {
+    "url": "https://github.com/expcat/Tigercat/issues"
+  },
+  "keywords": [
+    "tigercat",
+    "mcp",
+    "llm",
+    "skill",
+    "docs"
+  ],
+  "bin": {
+    "tigercat-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "dev": "tsup --config tsup.config.ts --watch",
+    "clean": "node ../../scripts/rimraf.mjs dist"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  }
+}

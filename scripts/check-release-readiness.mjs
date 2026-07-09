@@ -16,7 +16,8 @@ const packageFiles = {
   core: 'packages/core/package.json',
   vue: 'packages/vue/package.json',
   react: 'packages/react/package.json',
-  cli: 'packages/cli/package.json'
+  cli: 'packages/cli/package.json',
+  mcp: 'packages/mcp/package.json'
 }
 
 const sourceVersionFiles = {

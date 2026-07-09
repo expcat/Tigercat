@@ -4,6 +4,7 @@
 [![@expcat/tigercat-react](https://img.shields.io/npm/v/@expcat/tigercat-react?style=flat-square&logo=react&label=@expcat/tigercat-react)](https://www.npmjs.com/package/@expcat/tigercat-react)
 [![@expcat/tigercat-core](https://img.shields.io/npm/v/@expcat/tigercat-core?style=flat-square&logo=npm&label=@expcat/tigercat-core)](https://www.npmjs.com/package/@expcat/tigercat-core)
 [![@expcat/tigercat-cli](https://img.shields.io/npm/v/@expcat/tigercat-cli?style=flat-square&logo=npm&label=@expcat/tigercat-cli)](https://www.npmjs.com/package/@expcat/tigercat-cli)
+[![@expcat/tigercat-mcp](https://img.shields.io/npm/v/@expcat/tigercat-mcp?style=flat-square&logo=npm&label=@expcat/tigercat-mcp)](https://www.npmjs.com/package/@expcat/tigercat-mcp)
 
 基于 Tailwind CSS 的 UI 组件库，支持 Vue 3 与 React。**149+ 组件**，开箱即用。
 
@@ -13,6 +14,7 @@
 
 > **📘 AI Agent 文档**
 > 详细的组件 API、使用示例和配置指南请参考 [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md)
+> LLM 客户端可优先通过 `tigercat-mcp` 路由 skill references，按任务读取最小必要上下文。
 
 ## 快速开始
 
@@ -79,12 +81,13 @@ export function App() {
 
 ## 包
 
-| Package                  | Description    |
-| ------------------------ | -------------- |
-| `@expcat/tigercat-core`  | 通用工具与类型 |
-| `@expcat/tigercat-vue`   | Vue 3 组件     |
-| `@expcat/tigercat-react` | React 组件     |
-| `@expcat/tigercat-cli`   | CLI 脚手架工具 |
+| Package                  | Description                  |
+| ------------------------ | ---------------------------- |
+| `@expcat/tigercat-core`  | 通用工具与类型               |
+| `@expcat/tigercat-vue`   | Vue 3 组件                   |
+| `@expcat/tigercat-react` | React 组件                   |
+| `@expcat/tigercat-cli`   | CLI 脚手架工具               |
+| `@expcat/tigercat-mcp`   | LLM skill reference 路由服务 |
 
 ## 兼容性
 
@@ -105,18 +108,20 @@ pnpm example:react  # http://localhost:5174
 
 ## 常用命令
 
-| Command            | Description          |
-| ------------------ | -------------------- |
-| `pnpm build`       | 构建所有包           |
-| `pnpm dev`         | 监听模式             |
-| `pnpm test`        | 运行测试             |
-| `pnpm test:a11y`   | 运行 axe 无障碍回归  |
-| `pnpm size`        | 检查 bundle 大小     |
-| `pnpm bench`       | 运行性能基准         |
-| `pnpm docs:api`    | 生成 skills API 摘要 |
-| `pnpm example:all` | 同时运行两个示例     |
-| `pnpm lint`        | 代码检查             |
-| `pnpm clean`       | 清理构建产物         |
+| Command            | Description            |
+| ------------------ | ---------------------- |
+| `pnpm build`       | 构建所有包             |
+| `pnpm dev`         | 监听模式               |
+| `pnpm test`        | 运行测试               |
+| `pnpm test:a11y`   | 运行 axe 无障碍回归    |
+| `pnpm size`        | 检查 bundle 大小       |
+| `pnpm bench`       | 运行性能基准           |
+| `pnpm docs:api`    | 生成 skills API 摘要   |
+| `pnpm mcp:build`   | 构建本地 MCP 服务      |
+| `pnpm mcp:serve`   | 以 stdio 启动 MCP 服务 |
+| `pnpm example:all` | 同时运行两个示例       |
+| `pnpm lint`        | 代码检查               |
+| `pnpm clean`       | 清理构建产物           |
 
 ## 参与贡献
 
