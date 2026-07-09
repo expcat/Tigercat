@@ -19,6 +19,7 @@ import ts from 'typescript'
 import {
   CATEGORIES,
   CATEGORY_SLUGS,
+  buildTigercatContext7,
   buildPublicComponentEntries,
   formatComponentIndexType,
   getComponentPackageSubpath,
@@ -33,6 +34,7 @@ const PROPS_DIR = join(SHARED_DIR, 'props')
 const EXAMPLES_DIR = join(SKILL_REFERENCES_DIR, 'examples')
 const LLM_API_SUMMARY = join(SHARED_DIR, 'api-summary.md')
 const COMPONENT_INDEX = join(SKILL_REFERENCES_DIR, 'component-index.md')
+const CONTEXT7_JSON = join(ROOT_DIR, 'context7.json')
 
 const CATEGORY_DESCRIPTIONS = {
   Basic: '基础展示与低级交互组件。',
@@ -63,7 +65,7 @@ const COMPONENT_USAGE_NOTES = {
   DataExport: {
     uses: ['Dropdown', 'DropdownMenu', 'DropdownItem'],
     notes:
-      '将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）或 GFM Markdown 表格；序列化逻辑在点击导出时才通过 `import(\'@expcat/tigercat-core/utils/data-export\')` 按需加载。`formats` 单个值渲染普通按钮，多个值渲染下拉菜单；列复用 `TableColumn`（取 `title` 与 `dataKey || key`），可直接透传 Table/DataTableWithToolbar 的列定义，`cellFormatter` 用于单元格取值转换。'
+      "将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）或 GFM Markdown 表格；序列化逻辑在点击导出时才通过 `import('@expcat/tigercat-core/utils/data-export')` 按需加载。`formats` 单个值渲染普通按钮，多个值渲染下拉菜单；列复用 `TableColumn`（取 `title` 与 `dataKey || key`），可直接透传 Table/DataTableWithToolbar 的列定义，`cellFormatter` 用于单元格取值转换。"
   },
   Dropdown: {
     uses: ['DropdownMenu', 'DropdownItem'],
@@ -925,6 +927,10 @@ async function main() {
     COMPONENT_INDEX,
     await formatMarkdown(generateComponentIndex(componentRows)),
     'utf8'
+  )
+  await writeFile(
+    CONTEXT7_JSON,
+    `${JSON.stringify(buildTigercatContext7(componentRows), null, 2)}\n`
   )
 
   for (const category of Object.keys(CATEGORIES)) {

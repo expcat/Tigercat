@@ -1057,6 +1057,11 @@ const expectedComponentRows = new Map(
     }
   ])
 )
+const expectedComponentEntries = buildPublicComponentEntries(
+  ROOT,
+  coreFileInfoByName,
+  publicExports
+)
 const actualComponentRows = collectComponentIndexRows()
 
 for (const [componentName, expected] of expectedComponentRows) {
@@ -1246,6 +1251,9 @@ if (existsSync(context7Path)) {
 
   collectReferencePaths(context7.reference_paths)
   collectReferencePaths(context7.component_index)
+  collectReferencePaths(context7.components)
+  collectReferencePaths(context7.topics)
+  collectReferencePaths(context7.command_apis)
 
   for (const referencePath of referencePaths) {
     if (!existsSync(join(ROOT, referencePath))) {
@@ -1256,6 +1264,92 @@ if (existsSync(context7Path)) {
         `context7 references missing path "${referencePath}"`
       )
     }
+  }
+
+  const metadata = context7.components ?? {}
+  const metadataNames = new Set(Object.keys(metadata))
+  const expectedNames = new Set(expectedComponentEntries.map((entry) => entry.component))
+
+  if (context7.component_count !== expectedNames.size) {
+    addIssue(
+      'context7.json',
+      0,
+      'docs-route',
+      `context7 component_count 应为 ${expectedNames.size}，实际为 ${context7.component_count}`
+    )
+  }
+
+  for (const entry of expectedComponentEntries) {
+    const component = metadata[entry.component]
+    const slug = CATEGORY_SLUGS[entry.category] || entry.category.toLowerCase()
+
+    if (!component) {
+      addIssue('context7.json', 0, 'docs-route', `context7 缺少公开组件 "${entry.component}"`)
+      continue
+    }
+
+    const expectedReferences = {
+      componentIndex: 'skills/tigercat/references/component-index.md',
+      props: `skills/tigercat/references/shared/props/${slug}.md`,
+      examples: `skills/tigercat/references/examples/${slug}.md`,
+      react: 'skills/tigercat/references/react/index.md',
+      vue: 'skills/tigercat/references/vue/index.md'
+    }
+
+    const mismatches = []
+    if (component.category !== entry.category) mismatches.push(`category=${component.category}`)
+    if (component.slug !== slug) mismatches.push(`slug=${component.slug}`)
+    if (component.testGroup !== slug) mismatches.push(`testGroup=${component.testGroup}`)
+    if (component.packageSubpath !== getComponentPackageSubpath(entry.component)) {
+      mismatches.push(`packageSubpath=${component.packageSubpath}`)
+    }
+    if (!component.packageTarget) mismatches.push('packageTarget missing')
+    if (component.typeSource !== entry.typeSource)
+      mismatches.push(`typeSource=${component.typeSource}`)
+    if (
+      !Array.isArray(component.frameworks) ||
+      !component.frameworks.includes('react') ||
+      !component.frameworks.includes('vue')
+    ) {
+      mismatches.push(`frameworks=${JSON.stringify(component.frameworks)}`)
+    }
+    for (const [key, expectedPath] of Object.entries(expectedReferences)) {
+      if (component.references?.[key] !== expectedPath) {
+        mismatches.push(`references.${key}=${component.references?.[key]}`)
+      }
+    }
+
+    if (mismatches.length > 0) {
+      addIssue(
+        'context7.json',
+        0,
+        'docs-route',
+        `context7 组件 "${entry.component}" 元数据不一致：${mismatches.join(', ')}`
+      )
+    }
+  }
+
+  for (const name of metadataNames) {
+    if (expectedNames.has(name)) continue
+    addIssue('context7.json', 0, 'docs-route', `context7 误列非公开组件 "${name}"`)
+  }
+
+  const gridAlias = context7.aliases?.Grid
+  if (!Array.isArray(gridAlias) || gridAlias.join(',') !== 'Row,Col') {
+    addIssue('context7.json', 0, 'docs-route', 'context7 aliases.Grid 必须路由到 Row, Col')
+  }
+
+  if (metadata.Notification || metadata.Grid) {
+    addIssue('context7.json', 0, 'docs-route', 'context7 不应把 Notification 或 Grid 列为公开组件')
+  }
+
+  if (!context7.command_apis?.notification || !context7.topics?.commandApis) {
+    addIssue(
+      'context7.json',
+      0,
+      'docs-route',
+      'context7 必须将 notification 建模为 command API/topic route'
+    )
   }
 }
 

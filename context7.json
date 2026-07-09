@@ -1,17 +1,235 @@
 {
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
+  "generated_by": "pnpm docs:api",
+  "component_count": 149,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
+    "component_index": "skills/tigercat/references/component-index.md",
+    "api_summary": "skills/tigercat/references/shared/api-summary.md",
     "glossary": "skills/tigercat/references/shared/glossary.md",
     "patterns": "skills/tigercat/references/shared/patterns/common.md",
     "shared_props": "skills/tigercat/references/shared/props",
-    "vue_examples": "skills/tigercat/references/vue/index.md",
-    "react_examples": "skills/tigercat/references/react/index.md",
-    "component_index": "skills/tigercat/references/component-index.md",
-    "examples": "skills/tigercat/references/examples"
+    "examples": "skills/tigercat/references/examples",
+    "react": "skills/tigercat/references/react/index.md",
+    "vue": "skills/tigercat/references/vue/index.md"
+  },
+  "aliases": {
+    "Grid": [
+      "Row",
+      "Col"
+    ]
+  },
+  "command_apis": {
+    "notification": {
+      "name": "notification",
+      "title": "Imperative notification API",
+      "topic": "commandApis",
+      "references": [
+        "skills/tigercat/SKILL.md",
+        "skills/tigercat/references/shared/props/feedback.md",
+        "skills/tigercat/references/examples/feedback.md",
+        "skills/tigercat/references/shared/patterns/common.md"
+      ]
+    },
+    "Message": {
+      "name": "Message",
+      "title": "Imperative message API",
+      "topic": "commandApis",
+      "references": [
+        "skills/tigercat/SKILL.md",
+        "skills/tigercat/references/shared/props/feedback.md",
+        "skills/tigercat/references/examples/feedback.md",
+        "skills/tigercat/references/shared/patterns/common.md"
+      ]
+    }
+  },
+  "topics": {
+    "setup": {
+      "title": "Setup and installation",
+      "references": [
+        "skills/tigercat/references/getting-started.md"
+      ],
+      "keywords": [
+        "setup",
+        "install",
+        "gettingstarted",
+        "start",
+        "quickstart",
+        "安装",
+        "开始"
+      ]
+    },
+    "cli": {
+      "title": "CLI and scaffolding",
+      "references": [
+        "skills/tigercat/references/cli.md"
+      ],
+      "keywords": [
+        "cli",
+        "command",
+        "scaffold",
+        "generate",
+        "命令",
+        "脚手架"
+      ]
+    },
+    "theme": {
+      "title": "Theme and dark mode",
+      "references": [
+        "skills/tigercat/references/theme.md"
+      ],
+      "keywords": [
+        "theme",
+        "dark",
+        "mode",
+        "color",
+        "主题",
+        "暗色",
+        "颜色"
+      ]
+    },
+    "i18n": {
+      "title": "Locale and i18n",
+      "references": [
+        "skills/tigercat/references/i18n.md"
+      ],
+      "keywords": [
+        "i18n",
+        "locale",
+        "language",
+        "translation",
+        "国际化",
+        "语言",
+        "文案"
+      ]
+    },
+    "ssr": {
+      "title": "SSR integration",
+      "references": [
+        "skills/tigercat/references/ssr.md"
+      ],
+      "keywords": [
+        "ssr",
+        "serverrender",
+        "nuxt",
+        "next",
+        "hydration",
+        "服务端"
+      ]
+    },
+    "accessibility": {
+      "title": "Accessibility and keyboard support",
+      "references": [
+        "skills/tigercat/references/accessibility.md"
+      ],
+      "keywords": [
+        "a11y",
+        "accessibility",
+        "aria",
+        "keyboard",
+        "无障碍",
+        "键盘"
+      ]
+    },
+    "performance": {
+      "title": "Performance and bundle size",
+      "references": [
+        "skills/tigercat/references/performance.md"
+      ],
+      "keywords": [
+        "performance",
+        "perf",
+        "bundle",
+        "size",
+        "lazy",
+        "性能",
+        "体积"
+      ]
+    },
+    "release": {
+      "title": "Maintainer release workflow",
+      "references": [
+        "skills/tigercat/references/release.md"
+      ],
+      "keywords": [
+        "release",
+        "publish",
+        "rc",
+        "version",
+        "发布",
+        "版本"
+      ]
+    },
+    "tokens": {
+      "title": "Design tokens",
+      "references": [
+        "skills/tigercat/references/tokens.md"
+      ],
+      "keywords": [
+        "token",
+        "tokens",
+        "design",
+        "figma",
+        "变量"
+      ]
+    },
+    "app": {
+      "title": "Application shell and routing",
+      "references": [
+        "skills/tigercat/references/recipes/building-apps.md"
+      ],
+      "keywords": [
+        "app",
+        "shell",
+        "routing",
+        "route",
+        "layout",
+        "应用",
+        "路由",
+        "布局"
+      ]
+    },
+    "commandApis": {
+      "title": "Root command APIs",
+      "references": [
+        "skills/tigercat/SKILL.md",
+        "skills/tigercat/references/shared/props/feedback.md",
+        "skills/tigercat/references/examples/feedback.md",
+        "skills/tigercat/references/shared/patterns/common.md"
+      ],
+      "keywords": [
+        "notification",
+        "message",
+        "toast",
+        "imperative",
+        "commandapi",
+        "通知",
+        "消息"
+      ]
+    }
   },
   "component_index": {
+    "advanced": {
+      "props": "skills/tigercat/references/shared/props/advanced.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
+      "components": [
+        "CodeEditor",
+        "FileManager",
+        "ImageAnnotation",
+        "ImageViewer",
+        "InfiniteScroll",
+        "Kanban",
+        "MarkdownEditor",
+        "PrintLayout",
+        "PrintPageBreak",
+        "RichTextEditor",
+        "VirtualList",
+        "VirtualTable"
+      ],
+      "examples": "skills/tigercat/references/examples/advanced.md"
+    },
     "basic": {
       "props": "skills/tigercat/references/shared/props/basic.md",
       "vue": "skills/tigercat/references/vue/index.md",
@@ -24,17 +242,103 @@
         "Button",
         "ButtonGroup",
         "Code",
+        "ConfigProvider",
+        "CropUpload",
         "Divider",
         "Empty",
         "Icon",
         "Image",
         "ImageCropper",
+        "ImageGroup",
+        "ImagePreview",
         "Link",
         "QRCode",
+        "Rate",
+        "Result",
+        "Segmented",
+        "Statistic",
         "Tag",
-        "Text"
+        "Text",
+        "Watermark"
       ],
       "examples": "skills/tigercat/references/examples/basic.md"
+    },
+    "charts": {
+      "props": "skills/tigercat/references/shared/props/charts.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
+      "components": [
+        "AreaChart",
+        "BarChart",
+        "ChartAxis",
+        "ChartCanvas",
+        "ChartGrid",
+        "ChartLegend",
+        "ChartSeries",
+        "ChartTooltip",
+        "DonutChart",
+        "FunnelChart",
+        "Gantt",
+        "GaugeChart",
+        "HeatmapChart",
+        "LineChart",
+        "OrgChart",
+        "PieChart",
+        "RadarChart",
+        "ScatterChart",
+        "SunburstChart",
+        "TreeMapChart"
+      ],
+      "examples": "skills/tigercat/references/examples/charts.md"
+    },
+    "composite": {
+      "props": "skills/tigercat/references/shared/props/composite.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
+      "components": [
+        "ActivityFeed",
+        "ChatWindow",
+        "CommentThread",
+        "DataTableWithToolbar",
+        "FormWizard",
+        "NotificationCenter",
+        "TaskBoard"
+      ],
+      "examples": "skills/tigercat/references/examples/composite.md"
+    },
+    "data": {
+      "props": "skills/tigercat/references/shared/props/data.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
+      "components": [
+        "Calendar",
+        "Collapse",
+        "CollapsePanel",
+        "Countdown",
+        "DataExport",
+        "Table",
+        "Timeline"
+      ],
+      "examples": "skills/tigercat/references/examples/data.md"
+    },
+    "feedback": {
+      "props": "skills/tigercat/references/shared/props/feedback.md",
+      "vue": "skills/tigercat/references/vue/index.md",
+      "react": "skills/tigercat/references/react/index.md",
+      "components": [
+        "Drawer",
+        "Loading",
+        "Message",
+        "MessageContainer",
+        "Modal",
+        "NotificationContainer",
+        "Popconfirm",
+        "Popover",
+        "Progress",
+        "Tooltip",
+        "Tour"
+      ],
+      "examples": "skills/tigercat/references/examples/feedback.md"
     },
     "form": {
       "props": "skills/tigercat/references/shared/props/form.md",
@@ -46,16 +350,21 @@
         "Checkbox",
         "CheckboxGroup",
         "ColorPicker",
+        "ColorSwatch",
+        "CronEditor",
         "DatePicker",
         "Form",
+        "FormItem",
         "Input",
         "InputGroup",
+        "InputGroupAddon",
         "InputNumber",
         "Mentions",
+        "NumberKeyboard",
         "Radio",
         "RadioGroup",
-        "Rate",
         "Select",
+        "Signature",
         "Slider",
         "Stepper",
         "Switch",
@@ -67,26 +376,6 @@
       ],
       "examples": "skills/tigercat/references/examples/form.md"
     },
-    "feedback": {
-      "props": "skills/tigercat/references/shared/props/feedback.md",
-      "vue": "skills/tigercat/references/vue/index.md",
-      "react": "skills/tigercat/references/react/index.md",
-      "components": [
-        "Drawer",
-        "Loading",
-        "Message",
-        "Modal",
-        "Notification",
-        "Popconfirm",
-        "Popover",
-        "Progress",
-        "Result",
-        "Tooltip",
-        "Tour",
-        "Watermark"
-      ],
-      "examples": "skills/tigercat/references/examples/feedback.md"
-    },
     "layout": {
       "props": "skills/tigercat/references/shared/props/layout.md",
       "vue": "skills/tigercat/references/vue/index.md",
@@ -94,16 +383,20 @@
       "components": [
         "Card",
         "Carousel",
+        "Col",
         "Container",
+        "Content",
         "Descriptions",
-        "Grid",
+        "Footer",
+        "Header",
         "Layout",
         "List",
         "Resizable",
+        "Row",
+        "Sidebar",
         "Skeleton",
         "Space",
-        "Splitter",
-        "Statistic"
+        "Splitter"
       ],
       "examples": "skills/tigercat/references/examples/layout.md"
     },
@@ -114,82 +407,4061 @@
       "components": [
         "Affix",
         "Anchor",
+        "AnchorLink",
         "BackTop",
         "Breadcrumb",
+        "BreadcrumbItem",
         "Dropdown",
+        "DropdownItem",
+        "DropdownMenu",
         "FloatButton",
+        "FloatButtonGroup",
         "Menu",
+        "MenuItem",
+        "MenuItemGroup",
         "Pagination",
-        "Segmented",
+        "ScrollSpy",
+        "Spotlight",
         "Steps",
+        "StepsItem",
+        "SubMenu",
+        "TabPane",
         "Tabs",
         "Tree"
       ],
       "examples": "skills/tigercat/references/examples/navigation.md"
-    },
-    "data": {
-      "props": "skills/tigercat/references/shared/props/data.md",
-      "vue": "skills/tigercat/references/vue/index.md",
-      "react": "skills/tigercat/references/react/index.md",
-      "components": ["Calendar", "Collapse", "Table", "Timeline"],
-      "examples": "skills/tigercat/references/examples/data.md"
-    },
-    "charts": {
-      "props": "skills/tigercat/references/shared/props/charts.md",
-      "vue": "skills/tigercat/references/vue/index.md",
-      "react": "skills/tigercat/references/react/index.md",
-      "components": [
-        "AreaChart",
-        "BarChart",
-        "ChartCanvas",
-        "ChartLegend",
-        "ChartTooltip",
-        "DonutChart",
-        "FunnelChart",
-        "GaugeChart",
-        "HeatmapChart",
-        "LineChart",
-        "PieChart",
-        "RadarChart",
-        "ScatterChart",
-        "SunburstChart",
-        "TreeMapChart"
+    }
+  },
+  "components": {
+    "CodeEditor": {
+      "name": "CodeEditor",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./CodeEditor",
+      "packageTarget": "CodeEditor",
+      "typeSource": "packages/core/src/types/code-editor.ts",
+      "sourceFiles": [
+        "packages/core/src/types/code-editor.ts"
       ],
-      "examples": "skills/tigercat/references/examples/charts.md"
-    },
-    "advanced": {
-      "props": "skills/tigercat/references/shared/props/advanced.md",
-      "vue": "skills/tigercat/references/vue/index.md",
-      "react": "skills/tigercat/references/react/index.md",
-      "components": [
-        "CodeEditor",
-        "FileManager",
-        "ImageViewer",
-        "InfiniteScroll",
-        "Kanban",
-        "MarkdownEditor",
-        "PrintLayout",
-        "RichTextEditor",
-        "TaskBoard",
-        "VirtualList",
-        "VirtualTable"
+      "propsInterfaces": [
+        "CodeEditorProps"
       ],
-      "examples": "skills/tigercat/references/examples/advanced.md"
-    },
-    "composite": {
-      "props": "skills/tigercat/references/shared/props/composite.md",
-      "vue": "skills/tigercat/references/vue/index.md",
-      "react": "skills/tigercat/references/react/index.md",
-      "components": [
-        "ActivityFeed",
-        "ChatWindow",
-        "CommentThread",
-        "CropUpload",
-        "DataTableWithToolbar",
-        "FormWizard",
-        "NotificationCenter"
+      "frameworks": [
+        "react",
+        "vue"
       ],
-      "examples": "skills/tigercat/references/examples/composite.md"
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "FileManager": {
+      "name": "FileManager",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./FileManager",
+      "packageTarget": "FileManager",
+      "typeSource": "packages/core/src/types/file-manager.ts",
+      "sourceFiles": [
+        "packages/core/src/types/file-manager.ts"
+      ],
+      "propsInterfaces": [
+        "FileManagerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ImageAnnotation": {
+      "name": "ImageAnnotation",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./ImageAnnotation",
+      "packageTarget": "ImageAnnotation",
+      "typeSource": "packages/core/src/types/image-annotation.ts",
+      "sourceFiles": [
+        "packages/core/src/types/image-annotation.ts"
+      ],
+      "propsInterfaces": [
+        "ImageAnnotationProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ImageViewer": {
+      "name": "ImageViewer",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./ImageViewer",
+      "packageTarget": "ImageViewer",
+      "typeSource": "packages/core/src/types/image-viewer.ts",
+      "sourceFiles": [
+        "packages/core/src/types/image-viewer.ts"
+      ],
+      "propsInterfaces": [
+        "ImageViewerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "InfiniteScroll": {
+      "name": "InfiniteScroll",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./InfiniteScroll",
+      "packageTarget": "InfiniteScroll",
+      "typeSource": "packages/core/src/types/infinite-scroll.ts",
+      "sourceFiles": [
+        "packages/core/src/types/infinite-scroll.ts"
+      ],
+      "propsInterfaces": [
+        "InfiniteScrollProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Kanban": {
+      "name": "Kanban",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./Kanban",
+      "packageTarget": "Kanban",
+      "typeSource": "packages/core/src/types/kanban.ts",
+      "sourceFiles": [
+        "packages/core/src/types/kanban.ts"
+      ],
+      "propsInterfaces": [
+        "KanbanProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "MarkdownEditor": {
+      "name": "MarkdownEditor",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./MarkdownEditor",
+      "packageTarget": "MarkdownEditor",
+      "typeSource": "packages/core/src/types/markdown-editor.ts",
+      "sourceFiles": [
+        "packages/core/src/types/markdown-editor.ts"
+      ],
+      "propsInterfaces": [
+        "MarkdownEditorProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "PrintLayout": {
+      "name": "PrintLayout",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./PrintLayout",
+      "packageTarget": "PrintLayout",
+      "typeSource": "packages/core/src/types/print-layout.ts",
+      "sourceFiles": [
+        "packages/core/src/types/print-layout.ts"
+      ],
+      "propsInterfaces": [
+        "PrintLayoutProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "PrintPageBreak": {
+      "name": "PrintPageBreak",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./PrintPageBreak",
+      "packageTarget": "PrintLayout",
+      "typeSource": "packages/react/src/components/PrintLayout.tsx and packages/vue/src/components/PrintLayout.ts",
+      "sourceFiles": [
+        "packages/react/src/components/PrintLayout.tsx",
+        "packages/vue/src/components/PrintLayout.ts"
+      ],
+      "propsInterfaces": [
+        "PrintPageBreakProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "RichTextEditor": {
+      "name": "RichTextEditor",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./RichTextEditor",
+      "packageTarget": "RichTextEditor",
+      "typeSource": "packages/core/src/types/rich-text-editor.ts",
+      "sourceFiles": [
+        "packages/core/src/types/rich-text-editor.ts"
+      ],
+      "propsInterfaces": [
+        "RichTextEditorProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "VirtualList": {
+      "name": "VirtualList",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./VirtualList",
+      "packageTarget": "VirtualList",
+      "typeSource": "packages/core/src/types/virtual-list.ts",
+      "sourceFiles": [
+        "packages/core/src/types/virtual-list.ts"
+      ],
+      "propsInterfaces": [
+        "VirtualListProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "VirtualTable": {
+      "name": "VirtualTable",
+      "aliases": [],
+      "category": "Advanced",
+      "slug": "advanced",
+      "testGroup": "advanced",
+      "packageSubpath": "./VirtualTable",
+      "packageTarget": "VirtualTable",
+      "typeSource": "packages/core/src/types/virtual-table.ts",
+      "sourceFiles": [
+        "packages/core/src/types/virtual-table.ts"
+      ],
+      "propsInterfaces": [
+        "VirtualTableProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/advanced.md",
+        "examples": "skills/tigercat/references/examples/advanced.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Alert": {
+      "name": "Alert",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Alert",
+      "packageTarget": "Alert",
+      "typeSource": "packages/core/src/types/alert.ts",
+      "sourceFiles": [
+        "packages/core/src/types/alert.ts"
+      ],
+      "propsInterfaces": [
+        "AlertProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Avatar": {
+      "name": "Avatar",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Avatar",
+      "packageTarget": "Avatar",
+      "typeSource": "packages/core/src/types/avatar.ts",
+      "sourceFiles": [
+        "packages/core/src/types/avatar.ts"
+      ],
+      "propsInterfaces": [
+        "AvatarProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "AvatarGroup": {
+      "name": "AvatarGroup",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./AvatarGroup",
+      "packageTarget": "AvatarGroup",
+      "typeSource": "packages/core/src/types/avatar.ts",
+      "sourceFiles": [
+        "packages/core/src/types/avatar.ts"
+      ],
+      "propsInterfaces": [
+        "AvatarGroupProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Badge": {
+      "name": "Badge",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Badge",
+      "packageTarget": "Badge",
+      "typeSource": "packages/core/src/types/badge.ts",
+      "sourceFiles": [
+        "packages/core/src/types/badge.ts"
+      ],
+      "propsInterfaces": [
+        "BadgeProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Button": {
+      "name": "Button",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Button",
+      "packageTarget": "Button",
+      "typeSource": "packages/core/src/types/button.ts",
+      "sourceFiles": [
+        "packages/core/src/types/button.ts"
+      ],
+      "propsInterfaces": [
+        "ButtonProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ButtonGroup": {
+      "name": "ButtonGroup",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./ButtonGroup",
+      "packageTarget": "ButtonGroup",
+      "typeSource": "packages/core/src/types/button.ts",
+      "sourceFiles": [
+        "packages/core/src/types/button.ts"
+      ],
+      "propsInterfaces": [
+        "ButtonGroupProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Code": {
+      "name": "Code",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Code",
+      "packageTarget": "Code",
+      "typeSource": "packages/core/src/types/code.ts",
+      "sourceFiles": [
+        "packages/core/src/types/code.ts"
+      ],
+      "propsInterfaces": [
+        "CodeProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ConfigProvider": {
+      "name": "ConfigProvider",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./ConfigProvider",
+      "packageTarget": "ConfigProvider",
+      "typeSource": "packages/react/src/components/ConfigProvider.tsx and packages/vue/src/components/ConfigProvider.ts",
+      "sourceFiles": [],
+      "propsInterfaces": [],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "CropUpload": {
+      "name": "CropUpload",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./CropUpload",
+      "packageTarget": "CropUpload",
+      "typeSource": "packages/core/src/types/image.ts",
+      "sourceFiles": [
+        "packages/core/src/types/image.ts"
+      ],
+      "propsInterfaces": [
+        "CropUploadProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Divider": {
+      "name": "Divider",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Divider",
+      "packageTarget": "Divider",
+      "typeSource": "packages/core/src/types/divider.ts",
+      "sourceFiles": [
+        "packages/core/src/types/divider.ts"
+      ],
+      "propsInterfaces": [
+        "DividerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Empty": {
+      "name": "Empty",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Empty",
+      "packageTarget": "Empty",
+      "typeSource": "packages/core/src/types/empty.ts",
+      "sourceFiles": [
+        "packages/core/src/types/empty.ts"
+      ],
+      "propsInterfaces": [
+        "EmptyProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Icon": {
+      "name": "Icon",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Icon",
+      "packageTarget": "Icon",
+      "typeSource": "packages/core/src/types/icon.ts",
+      "sourceFiles": [
+        "packages/core/src/types/icon.ts"
+      ],
+      "propsInterfaces": [
+        "IconProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Image": {
+      "name": "Image",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Image",
+      "packageTarget": "Image",
+      "typeSource": "packages/core/src/types/image.ts",
+      "sourceFiles": [
+        "packages/core/src/types/image.ts"
+      ],
+      "propsInterfaces": [
+        "ImageProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ImageCropper": {
+      "name": "ImageCropper",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./ImageCropper",
+      "packageTarget": "ImageCropper",
+      "typeSource": "packages/core/src/types/image.ts",
+      "sourceFiles": [
+        "packages/core/src/types/image.ts"
+      ],
+      "propsInterfaces": [
+        "ImageCropperProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ImageGroup": {
+      "name": "ImageGroup",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./ImageGroup",
+      "packageTarget": "ImageGroup",
+      "typeSource": "packages/core/src/types/image.ts",
+      "sourceFiles": [
+        "packages/core/src/types/image.ts"
+      ],
+      "propsInterfaces": [
+        "ImageGroupProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ImagePreview": {
+      "name": "ImagePreview",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./ImagePreview",
+      "packageTarget": "ImagePreview",
+      "typeSource": "packages/core/src/types/image.ts",
+      "sourceFiles": [
+        "packages/core/src/types/image.ts"
+      ],
+      "propsInterfaces": [
+        "ImagePreviewProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Link": {
+      "name": "Link",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Link",
+      "packageTarget": "Link",
+      "typeSource": "packages/core/src/types/link.ts",
+      "sourceFiles": [
+        "packages/core/src/types/link.ts"
+      ],
+      "propsInterfaces": [
+        "LinkProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "QRCode": {
+      "name": "QRCode",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./QRCode",
+      "packageTarget": "QRCode",
+      "typeSource": "packages/core/src/types/qrcode.ts",
+      "sourceFiles": [
+        "packages/core/src/types/qrcode.ts"
+      ],
+      "propsInterfaces": [
+        "QRCodeProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Rate": {
+      "name": "Rate",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Rate",
+      "packageTarget": "Rate",
+      "typeSource": "packages/core/src/types/rate.ts",
+      "sourceFiles": [
+        "packages/core/src/types/rate.ts"
+      ],
+      "propsInterfaces": [
+        "RateProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Result": {
+      "name": "Result",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Result",
+      "packageTarget": "Result",
+      "typeSource": "packages/core/src/types/result.ts",
+      "sourceFiles": [
+        "packages/core/src/types/result.ts"
+      ],
+      "propsInterfaces": [
+        "ResultProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Segmented": {
+      "name": "Segmented",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Segmented",
+      "packageTarget": "Segmented",
+      "typeSource": "packages/core/src/types/segmented.ts",
+      "sourceFiles": [
+        "packages/core/src/types/segmented.ts"
+      ],
+      "propsInterfaces": [
+        "SegmentedProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Statistic": {
+      "name": "Statistic",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Statistic",
+      "packageTarget": "Statistic",
+      "typeSource": "packages/core/src/types/statistic.ts",
+      "sourceFiles": [
+        "packages/core/src/types/statistic.ts"
+      ],
+      "propsInterfaces": [
+        "StatisticProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Tag": {
+      "name": "Tag",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Tag",
+      "packageTarget": "Tag",
+      "typeSource": "packages/core/src/types/tag.ts",
+      "sourceFiles": [
+        "packages/core/src/types/tag.ts"
+      ],
+      "propsInterfaces": [
+        "TagProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Text": {
+      "name": "Text",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Text",
+      "packageTarget": "Text",
+      "typeSource": "packages/core/src/types/text.ts",
+      "sourceFiles": [
+        "packages/core/src/types/text.ts"
+      ],
+      "propsInterfaces": [
+        "TextProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Watermark": {
+      "name": "Watermark",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Watermark",
+      "packageTarget": "Watermark",
+      "typeSource": "packages/core/src/types/watermark.ts",
+      "sourceFiles": [
+        "packages/core/src/types/watermark.ts"
+      ],
+      "propsInterfaces": [
+        "WatermarkProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "AreaChart": {
+      "name": "AreaChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./AreaChart",
+      "packageTarget": "AreaChart",
+      "typeSource": "packages/core/src/types/chart-cartesian.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-cartesian.ts"
+      ],
+      "propsInterfaces": [
+        "AreaChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "BarChart": {
+      "name": "BarChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./BarChart",
+      "packageTarget": "BarChart",
+      "typeSource": "packages/core/src/types/chart-cartesian.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-cartesian.ts"
+      ],
+      "propsInterfaces": [
+        "BarChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ChartAxis": {
+      "name": "ChartAxis",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./ChartAxis",
+      "packageTarget": "ChartAxis",
+      "typeSource": "packages/core/src/types/chart-core.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-core.ts"
+      ],
+      "propsInterfaces": [
+        "ChartAxisProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ChartCanvas": {
+      "name": "ChartCanvas",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./ChartCanvas",
+      "packageTarget": "ChartCanvas",
+      "typeSource": "packages/core/src/types/chart-core.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-core.ts"
+      ],
+      "propsInterfaces": [
+        "ChartCanvasProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ChartGrid": {
+      "name": "ChartGrid",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./ChartGrid",
+      "packageTarget": "ChartGrid",
+      "typeSource": "packages/core/src/types/chart-core.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-core.ts"
+      ],
+      "propsInterfaces": [
+        "ChartGridProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ChartLegend": {
+      "name": "ChartLegend",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./ChartLegend",
+      "packageTarget": "ChartLegend",
+      "typeSource": "packages/core/src/types/chart-core.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-core.ts"
+      ],
+      "propsInterfaces": [
+        "ChartLegendProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ChartSeries": {
+      "name": "ChartSeries",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./ChartSeries",
+      "packageTarget": "ChartSeries",
+      "typeSource": "packages/core/src/types/chart-core.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-core.ts"
+      ],
+      "propsInterfaces": [
+        "ChartSeriesProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ChartTooltip": {
+      "name": "ChartTooltip",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./ChartTooltip",
+      "packageTarget": "ChartTooltip",
+      "typeSource": "packages/core/src/types/chart-core.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-core.ts"
+      ],
+      "propsInterfaces": [
+        "ChartTooltipProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "DonutChart": {
+      "name": "DonutChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./DonutChart",
+      "packageTarget": "DonutChart",
+      "typeSource": "packages/core/src/types/chart-radial.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-radial.ts"
+      ],
+      "propsInterfaces": [
+        "DonutChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "FunnelChart": {
+      "name": "FunnelChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./FunnelChart",
+      "packageTarget": "FunnelChart",
+      "typeSource": "packages/core/src/types/chart-visualization.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-visualization.ts"
+      ],
+      "propsInterfaces": [
+        "FunnelChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Gantt": {
+      "name": "Gantt",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./Gantt",
+      "packageTarget": "Gantt",
+      "typeSource": "packages/core/src/types/gantt.ts",
+      "sourceFiles": [
+        "packages/core/src/types/gantt.ts"
+      ],
+      "propsInterfaces": [
+        "GanttProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "GaugeChart": {
+      "name": "GaugeChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./GaugeChart",
+      "packageTarget": "GaugeChart",
+      "typeSource": "packages/core/src/types/chart-radial.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-radial.ts"
+      ],
+      "propsInterfaces": [
+        "GaugeChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "HeatmapChart": {
+      "name": "HeatmapChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./HeatmapChart",
+      "packageTarget": "HeatmapChart",
+      "typeSource": "packages/core/src/types/chart-visualization.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-visualization.ts"
+      ],
+      "propsInterfaces": [
+        "HeatmapChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "LineChart": {
+      "name": "LineChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./LineChart",
+      "packageTarget": "LineChart",
+      "typeSource": "packages/core/src/types/chart-cartesian.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-cartesian.ts"
+      ],
+      "propsInterfaces": [
+        "LineChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "OrgChart": {
+      "name": "OrgChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./OrgChart",
+      "packageTarget": "OrgChart",
+      "typeSource": "packages/core/src/types/org-chart.ts",
+      "sourceFiles": [
+        "packages/core/src/types/org-chart.ts"
+      ],
+      "propsInterfaces": [
+        "OrgChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "PieChart": {
+      "name": "PieChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./PieChart",
+      "packageTarget": "PieChart",
+      "typeSource": "packages/core/src/types/chart-radial.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-radial.ts"
+      ],
+      "propsInterfaces": [
+        "PieChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "RadarChart": {
+      "name": "RadarChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./RadarChart",
+      "packageTarget": "RadarChart",
+      "typeSource": "packages/core/src/types/chart-radial.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-radial.ts"
+      ],
+      "propsInterfaces": [
+        "RadarChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ScatterChart": {
+      "name": "ScatterChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./ScatterChart",
+      "packageTarget": "ScatterChart",
+      "typeSource": "packages/core/src/types/chart-cartesian.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-cartesian.ts"
+      ],
+      "propsInterfaces": [
+        "ScatterChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "SunburstChart": {
+      "name": "SunburstChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./SunburstChart",
+      "packageTarget": "SunburstChart",
+      "typeSource": "packages/core/src/types/chart-visualization.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-visualization.ts"
+      ],
+      "propsInterfaces": [
+        "SunburstChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "TreeMapChart": {
+      "name": "TreeMapChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "charts",
+      "testGroup": "charts",
+      "packageSubpath": "./TreeMapChart",
+      "packageTarget": "TreeMapChart",
+      "typeSource": "packages/core/src/types/chart-visualization.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chart-visualization.ts"
+      ],
+      "propsInterfaces": [
+        "TreeMapChartProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ActivityFeed": {
+      "name": "ActivityFeed",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./ActivityFeed",
+      "packageTarget": "ActivityFeed",
+      "typeSource": "packages/core/src/types/activity-feed.ts",
+      "sourceFiles": [
+        "packages/core/src/types/activity-feed.ts"
+      ],
+      "propsInterfaces": [
+        "ActivityFeedProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ChatWindow": {
+      "name": "ChatWindow",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./ChatWindow",
+      "packageTarget": "ChatWindow",
+      "typeSource": "packages/core/src/types/chat.ts",
+      "sourceFiles": [
+        "packages/core/src/types/chat.ts"
+      ],
+      "propsInterfaces": [
+        "ChatWindowProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "CommentThread": {
+      "name": "CommentThread",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./CommentThread",
+      "packageTarget": "CommentThread",
+      "typeSource": "packages/core/src/types/comment-thread.ts",
+      "sourceFiles": [
+        "packages/core/src/types/comment-thread.ts"
+      ],
+      "propsInterfaces": [
+        "CommentThreadProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "DataTableWithToolbar": {
+      "name": "DataTableWithToolbar",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./DataTableWithToolbar",
+      "packageTarget": "DataTableWithToolbar",
+      "typeSource": "packages/core/src/types/table-toolbar.ts",
+      "sourceFiles": [
+        "packages/core/src/types/table-toolbar.ts"
+      ],
+      "propsInterfaces": [
+        "DataTableWithToolbarProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "FormWizard": {
+      "name": "FormWizard",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./FormWizard",
+      "packageTarget": "FormWizard",
+      "typeSource": "packages/core/src/types/form-wizard.ts",
+      "sourceFiles": [
+        "packages/core/src/types/form-wizard.ts"
+      ],
+      "propsInterfaces": [
+        "FormWizardProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NotificationCenter": {
+      "name": "NotificationCenter",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./NotificationCenter",
+      "packageTarget": "NotificationCenter",
+      "typeSource": "packages/core/src/types/notification-center.ts",
+      "sourceFiles": [
+        "packages/core/src/types/notification-center.ts"
+      ],
+      "propsInterfaces": [
+        "NotificationCenterProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "TaskBoard": {
+      "name": "TaskBoard",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "composite",
+      "testGroup": "composite",
+      "packageSubpath": "./TaskBoard",
+      "packageTarget": "TaskBoard",
+      "typeSource": "packages/core/src/types/task-board.ts",
+      "sourceFiles": [
+        "packages/core/src/types/task-board.ts"
+      ],
+      "propsInterfaces": [
+        "TaskBoardProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Calendar": {
+      "name": "Calendar",
+      "aliases": [],
+      "category": "Data",
+      "slug": "data",
+      "testGroup": "data",
+      "packageSubpath": "./Calendar",
+      "packageTarget": "Calendar",
+      "typeSource": "packages/core/src/types/calendar.ts",
+      "sourceFiles": [
+        "packages/core/src/types/calendar.ts"
+      ],
+      "propsInterfaces": [
+        "CalendarProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/data.md",
+        "examples": "skills/tigercat/references/examples/data.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Collapse": {
+      "name": "Collapse",
+      "aliases": [],
+      "category": "Data",
+      "slug": "data",
+      "testGroup": "data",
+      "packageSubpath": "./Collapse",
+      "packageTarget": "Collapse",
+      "typeSource": "packages/core/src/types/collapse.ts",
+      "sourceFiles": [
+        "packages/core/src/types/collapse.ts"
+      ],
+      "propsInterfaces": [
+        "CollapseProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/data.md",
+        "examples": "skills/tigercat/references/examples/data.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "CollapsePanel": {
+      "name": "CollapsePanel",
+      "aliases": [],
+      "category": "Data",
+      "slug": "data",
+      "testGroup": "data",
+      "packageSubpath": "./CollapsePanel",
+      "packageTarget": "CollapsePanel",
+      "typeSource": "packages/core/src/types/collapse.ts",
+      "sourceFiles": [
+        "packages/core/src/types/collapse.ts"
+      ],
+      "propsInterfaces": [
+        "CollapsePanelProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/data.md",
+        "examples": "skills/tigercat/references/examples/data.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Countdown": {
+      "name": "Countdown",
+      "aliases": [],
+      "category": "Data",
+      "slug": "data",
+      "testGroup": "data",
+      "packageSubpath": "./Countdown",
+      "packageTarget": "Countdown",
+      "typeSource": "packages/core/src/types/countdown.ts",
+      "sourceFiles": [
+        "packages/core/src/types/countdown.ts"
+      ],
+      "propsInterfaces": [
+        "CountdownProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/data.md",
+        "examples": "skills/tigercat/references/examples/data.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "DataExport": {
+      "name": "DataExport",
+      "aliases": [],
+      "category": "Data",
+      "slug": "data",
+      "testGroup": "data",
+      "packageSubpath": "./DataExport",
+      "packageTarget": "DataExport",
+      "typeSource": "packages/core/src/types/data-export.ts",
+      "sourceFiles": [
+        "packages/core/src/types/data-export.ts"
+      ],
+      "propsInterfaces": [
+        "DataExportProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/data.md",
+        "examples": "skills/tigercat/references/examples/data.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Table": {
+      "name": "Table",
+      "aliases": [],
+      "category": "Data",
+      "slug": "data",
+      "testGroup": "data",
+      "packageSubpath": "./Table",
+      "packageTarget": "Table",
+      "typeSource": "packages/core/src/types/table.ts",
+      "sourceFiles": [
+        "packages/core/src/types/table.ts"
+      ],
+      "propsInterfaces": [
+        "TableProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/data.md",
+        "examples": "skills/tigercat/references/examples/data.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Timeline": {
+      "name": "Timeline",
+      "aliases": [],
+      "category": "Data",
+      "slug": "data",
+      "testGroup": "data",
+      "packageSubpath": "./Timeline",
+      "packageTarget": "Timeline",
+      "typeSource": "packages/core/src/types/timeline.ts",
+      "sourceFiles": [
+        "packages/core/src/types/timeline.ts"
+      ],
+      "propsInterfaces": [
+        "TimelineProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/data.md",
+        "examples": "skills/tigercat/references/examples/data.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Drawer": {
+      "name": "Drawer",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Drawer",
+      "packageTarget": "Drawer",
+      "typeSource": "packages/core/src/types/drawer.ts",
+      "sourceFiles": [
+        "packages/core/src/types/drawer.ts"
+      ],
+      "propsInterfaces": [
+        "DrawerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Loading": {
+      "name": "Loading",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Loading",
+      "packageTarget": "Loading",
+      "typeSource": "packages/core/src/types/loading.ts",
+      "sourceFiles": [
+        "packages/core/src/types/loading.ts"
+      ],
+      "propsInterfaces": [
+        "LoadingProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Message": {
+      "name": "Message",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Message",
+      "packageTarget": "Message",
+      "typeSource": "packages/core/src/types/message.ts",
+      "sourceFiles": [
+        "packages/core/src/types/message.ts"
+      ],
+      "propsInterfaces": [
+        "MessageProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "MessageContainer": {
+      "name": "MessageContainer",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./MessageContainer",
+      "packageTarget": "MessageContainer",
+      "typeSource": "packages/react/src/components/MessageContainer.tsx and packages/vue/src/components/MessageContainer.ts",
+      "sourceFiles": [
+        "packages/react/src/components/MessageContainer.tsx",
+        "packages/vue/src/components/MessageContainer.ts"
+      ],
+      "propsInterfaces": [
+        "MessageContainerProps",
+        "VueMessageContainerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Modal": {
+      "name": "Modal",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Modal",
+      "packageTarget": "Modal",
+      "typeSource": "packages/core/src/types/modal.ts",
+      "sourceFiles": [
+        "packages/core/src/types/modal.ts"
+      ],
+      "propsInterfaces": [
+        "ModalProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NotificationContainer": {
+      "name": "NotificationContainer",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./NotificationContainer",
+      "packageTarget": "NotificationContainer",
+      "typeSource": "packages/react/src/components/NotificationContainer.tsx and packages/vue/src/components/NotificationContainer.ts",
+      "sourceFiles": [
+        "packages/react/src/components/NotificationContainer.tsx",
+        "packages/vue/src/components/NotificationContainer.ts"
+      ],
+      "propsInterfaces": [
+        "NotificationContainerProps",
+        "VueNotificationContainerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Popconfirm": {
+      "name": "Popconfirm",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Popconfirm",
+      "packageTarget": "Popconfirm",
+      "typeSource": "packages/core/src/types/popconfirm.ts",
+      "sourceFiles": [
+        "packages/core/src/types/popconfirm.ts"
+      ],
+      "propsInterfaces": [
+        "PopconfirmProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Popover": {
+      "name": "Popover",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Popover",
+      "packageTarget": "Popover",
+      "typeSource": "packages/core/src/types/popover.ts",
+      "sourceFiles": [
+        "packages/core/src/types/popover.ts"
+      ],
+      "propsInterfaces": [
+        "PopoverProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Progress": {
+      "name": "Progress",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Progress",
+      "packageTarget": "Progress",
+      "typeSource": "packages/core/src/types/progress.ts",
+      "sourceFiles": [
+        "packages/core/src/types/progress.ts"
+      ],
+      "propsInterfaces": [
+        "ProgressProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Tooltip": {
+      "name": "Tooltip",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Tooltip",
+      "packageTarget": "Tooltip",
+      "typeSource": "packages/core/src/types/tooltip.ts",
+      "sourceFiles": [
+        "packages/core/src/types/tooltip.ts"
+      ],
+      "propsInterfaces": [
+        "TooltipProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Tour": {
+      "name": "Tour",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./Tour",
+      "packageTarget": "Tour",
+      "typeSource": "packages/core/src/types/tour.ts",
+      "sourceFiles": [
+        "packages/core/src/types/tour.ts"
+      ],
+      "propsInterfaces": [
+        "TourProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "AutoComplete": {
+      "name": "AutoComplete",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./AutoComplete",
+      "packageTarget": "AutoComplete",
+      "typeSource": "packages/core/src/types/auto-complete.ts",
+      "sourceFiles": [
+        "packages/core/src/types/auto-complete.ts"
+      ],
+      "propsInterfaces": [
+        "AutoCompleteProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Cascader": {
+      "name": "Cascader",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Cascader",
+      "packageTarget": "Cascader",
+      "typeSource": "packages/core/src/types/cascader.ts",
+      "sourceFiles": [
+        "packages/core/src/types/cascader.ts"
+      ],
+      "propsInterfaces": [
+        "CascaderProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Checkbox": {
+      "name": "Checkbox",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Checkbox",
+      "packageTarget": "Checkbox",
+      "typeSource": "packages/core/src/types/checkbox.ts",
+      "sourceFiles": [
+        "packages/core/src/types/checkbox.ts"
+      ],
+      "propsInterfaces": [
+        "CheckboxProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "CheckboxGroup": {
+      "name": "CheckboxGroup",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./CheckboxGroup",
+      "packageTarget": "CheckboxGroup",
+      "typeSource": "packages/core/src/types/checkbox.ts",
+      "sourceFiles": [
+        "packages/core/src/types/checkbox.ts"
+      ],
+      "propsInterfaces": [
+        "CheckboxGroupProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ColorPicker": {
+      "name": "ColorPicker",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./ColorPicker",
+      "packageTarget": "ColorPicker",
+      "typeSource": "packages/core/src/types/color-picker.ts",
+      "sourceFiles": [
+        "packages/core/src/types/color-picker.ts"
+      ],
+      "propsInterfaces": [
+        "ColorPickerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ColorSwatch": {
+      "name": "ColorSwatch",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./ColorSwatch",
+      "packageTarget": "ColorSwatch",
+      "typeSource": "packages/core/src/types/color-swatch.ts",
+      "sourceFiles": [
+        "packages/core/src/types/color-swatch.ts"
+      ],
+      "propsInterfaces": [
+        "ColorSwatchProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "CronEditor": {
+      "name": "CronEditor",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./CronEditor",
+      "packageTarget": "CronEditor",
+      "typeSource": "packages/core/src/types/cron-editor.ts",
+      "sourceFiles": [
+        "packages/core/src/types/cron-editor.ts"
+      ],
+      "propsInterfaces": [
+        "CronEditorProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "DatePicker": {
+      "name": "DatePicker",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./DatePicker",
+      "packageTarget": "DatePicker",
+      "typeSource": "packages/core/src/types/datepicker.ts",
+      "sourceFiles": [
+        "packages/core/src/types/datepicker.ts"
+      ],
+      "propsInterfaces": [
+        "DatePickerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Form": {
+      "name": "Form",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Form",
+      "packageTarget": "Form",
+      "typeSource": "packages/core/src/types/form.ts",
+      "sourceFiles": [
+        "packages/core/src/types/form.ts"
+      ],
+      "propsInterfaces": [
+        "FormProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "FormItem": {
+      "name": "FormItem",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./FormItem",
+      "packageTarget": "FormItem",
+      "typeSource": "packages/core/src/types/form.ts",
+      "sourceFiles": [
+        "packages/core/src/types/form.ts"
+      ],
+      "propsInterfaces": [
+        "FormItemProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Input": {
+      "name": "Input",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Input",
+      "packageTarget": "Input",
+      "typeSource": "packages/core/src/types/input.ts",
+      "sourceFiles": [
+        "packages/core/src/types/input.ts"
+      ],
+      "propsInterfaces": [
+        "InputProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "InputGroup": {
+      "name": "InputGroup",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./InputGroup",
+      "packageTarget": "InputGroup",
+      "typeSource": "packages/core/src/types/input-group.ts",
+      "sourceFiles": [
+        "packages/core/src/types/input-group.ts"
+      ],
+      "propsInterfaces": [
+        "InputGroupProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "InputGroupAddon": {
+      "name": "InputGroupAddon",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./InputGroupAddon",
+      "packageTarget": "InputGroup",
+      "typeSource": "packages/core/src/types/input-group.ts",
+      "sourceFiles": [
+        "packages/core/src/types/input-group.ts"
+      ],
+      "propsInterfaces": [
+        "InputGroupAddonProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "InputNumber": {
+      "name": "InputNumber",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./InputNumber",
+      "packageTarget": "InputNumber",
+      "typeSource": "packages/core/src/types/input-number.ts",
+      "sourceFiles": [
+        "packages/core/src/types/input-number.ts"
+      ],
+      "propsInterfaces": [
+        "InputNumberProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Mentions": {
+      "name": "Mentions",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Mentions",
+      "packageTarget": "Mentions",
+      "typeSource": "packages/core/src/types/mentions.ts",
+      "sourceFiles": [
+        "packages/core/src/types/mentions.ts"
+      ],
+      "propsInterfaces": [
+        "MentionsProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NumberKeyboard": {
+      "name": "NumberKeyboard",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./NumberKeyboard",
+      "packageTarget": "NumberKeyboard",
+      "typeSource": "packages/core/src/types/number-keyboard.ts",
+      "sourceFiles": [
+        "packages/core/src/types/number-keyboard.ts"
+      ],
+      "propsInterfaces": [
+        "NumberKeyboardProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Radio": {
+      "name": "Radio",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Radio",
+      "packageTarget": "Radio",
+      "typeSource": "packages/core/src/types/radio.ts",
+      "sourceFiles": [
+        "packages/core/src/types/radio.ts"
+      ],
+      "propsInterfaces": [
+        "RadioProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "RadioGroup": {
+      "name": "RadioGroup",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./RadioGroup",
+      "packageTarget": "RadioGroup",
+      "typeSource": "packages/core/src/types/radio.ts",
+      "sourceFiles": [
+        "packages/core/src/types/radio.ts"
+      ],
+      "propsInterfaces": [
+        "RadioGroupProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Select": {
+      "name": "Select",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Select",
+      "packageTarget": "Select",
+      "typeSource": "packages/core/src/types/select.ts",
+      "sourceFiles": [
+        "packages/core/src/types/select.ts"
+      ],
+      "propsInterfaces": [
+        "SelectProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Signature": {
+      "name": "Signature",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Signature",
+      "packageTarget": "Signature",
+      "typeSource": "packages/core/src/types/signature.ts",
+      "sourceFiles": [
+        "packages/core/src/types/signature.ts"
+      ],
+      "propsInterfaces": [
+        "SignatureProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Slider": {
+      "name": "Slider",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Slider",
+      "packageTarget": "Slider",
+      "typeSource": "packages/core/src/types/slider.ts",
+      "sourceFiles": [
+        "packages/core/src/types/slider.ts"
+      ],
+      "propsInterfaces": [
+        "SliderProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Stepper": {
+      "name": "Stepper",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Stepper",
+      "packageTarget": "Stepper",
+      "typeSource": "packages/core/src/types/stepper.ts",
+      "sourceFiles": [
+        "packages/core/src/types/stepper.ts"
+      ],
+      "propsInterfaces": [
+        "StepperProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Switch": {
+      "name": "Switch",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Switch",
+      "packageTarget": "Switch",
+      "typeSource": "packages/core/src/types/switch.ts",
+      "sourceFiles": [
+        "packages/core/src/types/switch.ts"
+      ],
+      "propsInterfaces": [
+        "SwitchProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Textarea": {
+      "name": "Textarea",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Textarea",
+      "packageTarget": "Textarea",
+      "typeSource": "packages/core/src/types/textarea.ts",
+      "sourceFiles": [
+        "packages/core/src/types/textarea.ts"
+      ],
+      "propsInterfaces": [
+        "TextareaProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "TimePicker": {
+      "name": "TimePicker",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./TimePicker",
+      "packageTarget": "TimePicker",
+      "typeSource": "packages/core/src/types/timepicker.ts",
+      "sourceFiles": [
+        "packages/core/src/types/timepicker.ts"
+      ],
+      "propsInterfaces": [
+        "TimePickerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Transfer": {
+      "name": "Transfer",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Transfer",
+      "packageTarget": "Transfer",
+      "typeSource": "packages/core/src/types/transfer.ts",
+      "sourceFiles": [
+        "packages/core/src/types/transfer.ts"
+      ],
+      "propsInterfaces": [
+        "TransferProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "TreeSelect": {
+      "name": "TreeSelect",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./TreeSelect",
+      "packageTarget": "TreeSelect",
+      "typeSource": "packages/core/src/types/tree-select.ts",
+      "sourceFiles": [
+        "packages/core/src/types/tree-select.ts"
+      ],
+      "propsInterfaces": [
+        "TreeSelectProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Upload": {
+      "name": "Upload",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./Upload",
+      "packageTarget": "Upload",
+      "typeSource": "packages/core/src/types/upload.ts",
+      "sourceFiles": [
+        "packages/core/src/types/upload.ts"
+      ],
+      "propsInterfaces": [
+        "UploadProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Card": {
+      "name": "Card",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Card",
+      "packageTarget": "Card",
+      "typeSource": "packages/core/src/types/card.ts",
+      "sourceFiles": [
+        "packages/core/src/types/card.ts"
+      ],
+      "propsInterfaces": [
+        "CardProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Carousel": {
+      "name": "Carousel",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Carousel",
+      "packageTarget": "Carousel",
+      "typeSource": "packages/core/src/types/carousel.ts",
+      "sourceFiles": [
+        "packages/core/src/types/carousel.ts"
+      ],
+      "propsInterfaces": [
+        "CarouselProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Col": {
+      "name": "Col",
+      "aliases": [
+        "Grid"
+      ],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Col",
+      "packageTarget": "Col",
+      "typeSource": "packages/core/src/types/grid.ts",
+      "sourceFiles": [
+        "packages/core/src/types/grid.ts"
+      ],
+      "propsInterfaces": [
+        "ColProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Container": {
+      "name": "Container",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Container",
+      "packageTarget": "Container",
+      "typeSource": "packages/core/src/types/container.ts",
+      "sourceFiles": [
+        "packages/core/src/types/container.ts"
+      ],
+      "propsInterfaces": [
+        "ContainerProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Content": {
+      "name": "Content",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Content",
+      "packageTarget": "Content",
+      "typeSource": "packages/core/src/types/layout.ts",
+      "sourceFiles": [
+        "packages/core/src/types/layout.ts"
+      ],
+      "propsInterfaces": [
+        "ContentProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Descriptions": {
+      "name": "Descriptions",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Descriptions",
+      "packageTarget": "Descriptions",
+      "typeSource": "packages/core/src/types/descriptions.ts",
+      "sourceFiles": [
+        "packages/core/src/types/descriptions.ts"
+      ],
+      "propsInterfaces": [
+        "DescriptionsProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Footer": {
+      "name": "Footer",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Footer",
+      "packageTarget": "Footer",
+      "typeSource": "packages/core/src/types/layout.ts",
+      "sourceFiles": [
+        "packages/core/src/types/layout.ts"
+      ],
+      "propsInterfaces": [
+        "FooterProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Header": {
+      "name": "Header",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Header",
+      "packageTarget": "Header",
+      "typeSource": "packages/core/src/types/layout.ts",
+      "sourceFiles": [
+        "packages/core/src/types/layout.ts"
+      ],
+      "propsInterfaces": [
+        "HeaderProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Layout": {
+      "name": "Layout",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Layout",
+      "packageTarget": "Layout",
+      "typeSource": "packages/core/src/types/layout.ts",
+      "sourceFiles": [
+        "packages/core/src/types/layout.ts"
+      ],
+      "propsInterfaces": [
+        "LayoutProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "List": {
+      "name": "List",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./List",
+      "packageTarget": "List",
+      "typeSource": "packages/core/src/types/list.ts",
+      "sourceFiles": [
+        "packages/core/src/types/list.ts"
+      ],
+      "propsInterfaces": [
+        "ListProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Resizable": {
+      "name": "Resizable",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Resizable",
+      "packageTarget": "Resizable",
+      "typeSource": "packages/core/src/types/resizable.ts",
+      "sourceFiles": [
+        "packages/core/src/types/resizable.ts"
+      ],
+      "propsInterfaces": [
+        "ResizableProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Row": {
+      "name": "Row",
+      "aliases": [
+        "Grid"
+      ],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Row",
+      "packageTarget": "Row",
+      "typeSource": "packages/core/src/types/grid.ts",
+      "sourceFiles": [
+        "packages/core/src/types/grid.ts"
+      ],
+      "propsInterfaces": [
+        "RowProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Sidebar": {
+      "name": "Sidebar",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Sidebar",
+      "packageTarget": "Sidebar",
+      "typeSource": "packages/core/src/types/layout.ts",
+      "sourceFiles": [
+        "packages/core/src/types/layout.ts"
+      ],
+      "propsInterfaces": [
+        "SidebarProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Skeleton": {
+      "name": "Skeleton",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Skeleton",
+      "packageTarget": "Skeleton",
+      "typeSource": "packages/core/src/types/skeleton.ts",
+      "sourceFiles": [
+        "packages/core/src/types/skeleton.ts"
+      ],
+      "propsInterfaces": [
+        "SkeletonProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Space": {
+      "name": "Space",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Space",
+      "packageTarget": "Space",
+      "typeSource": "packages/core/src/types/space.ts",
+      "sourceFiles": [
+        "packages/core/src/types/space.ts"
+      ],
+      "propsInterfaces": [
+        "SpaceProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Splitter": {
+      "name": "Splitter",
+      "aliases": [],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Splitter",
+      "packageTarget": "Splitter",
+      "typeSource": "packages/core/src/types/splitter.ts",
+      "sourceFiles": [
+        "packages/core/src/types/splitter.ts"
+      ],
+      "propsInterfaces": [
+        "SplitterProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Affix": {
+      "name": "Affix",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Affix",
+      "packageTarget": "Affix",
+      "typeSource": "packages/core/src/types/affix.ts",
+      "sourceFiles": [
+        "packages/core/src/types/affix.ts"
+      ],
+      "propsInterfaces": [
+        "AffixProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Anchor": {
+      "name": "Anchor",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Anchor",
+      "packageTarget": "Anchor",
+      "typeSource": "packages/core/src/types/anchor.ts",
+      "sourceFiles": [
+        "packages/core/src/types/anchor.ts"
+      ],
+      "propsInterfaces": [
+        "AnchorProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "AnchorLink": {
+      "name": "AnchorLink",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./AnchorLink",
+      "packageTarget": "Anchor",
+      "typeSource": "packages/core/src/types/anchor.ts",
+      "sourceFiles": [
+        "packages/core/src/types/anchor.ts"
+      ],
+      "propsInterfaces": [
+        "AnchorLinkProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "BackTop": {
+      "name": "BackTop",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./BackTop",
+      "packageTarget": "BackTop",
+      "typeSource": "packages/core/src/types/back-top.ts",
+      "sourceFiles": [
+        "packages/core/src/types/back-top.ts"
+      ],
+      "propsInterfaces": [
+        "BackTopProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Breadcrumb": {
+      "name": "Breadcrumb",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Breadcrumb",
+      "packageTarget": "Breadcrumb",
+      "typeSource": "packages/core/src/types/breadcrumb.ts",
+      "sourceFiles": [
+        "packages/core/src/types/breadcrumb.ts"
+      ],
+      "propsInterfaces": [
+        "BreadcrumbProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "BreadcrumbItem": {
+      "name": "BreadcrumbItem",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./BreadcrumbItem",
+      "packageTarget": "Breadcrumb",
+      "typeSource": "packages/core/src/types/breadcrumb.ts",
+      "sourceFiles": [
+        "packages/core/src/types/breadcrumb.ts"
+      ],
+      "propsInterfaces": [
+        "BreadcrumbItemProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Dropdown": {
+      "name": "Dropdown",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Dropdown",
+      "packageTarget": "Dropdown",
+      "typeSource": "packages/core/src/types/dropdown.ts",
+      "sourceFiles": [
+        "packages/core/src/types/dropdown.ts"
+      ],
+      "propsInterfaces": [
+        "DropdownProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "DropdownItem": {
+      "name": "DropdownItem",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./DropdownItem",
+      "packageTarget": "Dropdown",
+      "typeSource": "packages/core/src/types/dropdown.ts",
+      "sourceFiles": [
+        "packages/core/src/types/dropdown.ts"
+      ],
+      "propsInterfaces": [
+        "DropdownItemProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "DropdownMenu": {
+      "name": "DropdownMenu",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./DropdownMenu",
+      "packageTarget": "Dropdown",
+      "typeSource": "packages/core/src/types/dropdown.ts",
+      "sourceFiles": [
+        "packages/core/src/types/dropdown.ts"
+      ],
+      "propsInterfaces": [
+        "DropdownMenuProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "FloatButton": {
+      "name": "FloatButton",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./FloatButton",
+      "packageTarget": "FloatButton",
+      "typeSource": "packages/core/src/types/float-button.ts",
+      "sourceFiles": [
+        "packages/core/src/types/float-button.ts"
+      ],
+      "propsInterfaces": [
+        "FloatButtonProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "FloatButtonGroup": {
+      "name": "FloatButtonGroup",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./FloatButtonGroup",
+      "packageTarget": "FloatButton",
+      "typeSource": "packages/core/src/types/float-button.ts",
+      "sourceFiles": [
+        "packages/core/src/types/float-button.ts"
+      ],
+      "propsInterfaces": [
+        "FloatButtonGroupProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Menu": {
+      "name": "Menu",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Menu",
+      "packageTarget": "Menu",
+      "typeSource": "packages/core/src/types/menu.ts",
+      "sourceFiles": [
+        "packages/core/src/types/menu.ts"
+      ],
+      "propsInterfaces": [
+        "MenuProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "MenuItem": {
+      "name": "MenuItem",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./MenuItem",
+      "packageTarget": "Menu",
+      "typeSource": "packages/core/src/types/menu.ts",
+      "sourceFiles": [
+        "packages/core/src/types/menu.ts"
+      ],
+      "propsInterfaces": [
+        "MenuItemProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "MenuItemGroup": {
+      "name": "MenuItemGroup",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./MenuItemGroup",
+      "packageTarget": "Menu",
+      "typeSource": "packages/core/src/types/menu.ts",
+      "sourceFiles": [
+        "packages/core/src/types/menu.ts"
+      ],
+      "propsInterfaces": [
+        "MenuItemGroupProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Pagination": {
+      "name": "Pagination",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Pagination",
+      "packageTarget": "Pagination",
+      "typeSource": "packages/core/src/types/pagination.ts",
+      "sourceFiles": [
+        "packages/core/src/types/pagination.ts"
+      ],
+      "propsInterfaces": [
+        "PaginationProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ScrollSpy": {
+      "name": "ScrollSpy",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./ScrollSpy",
+      "packageTarget": "ScrollSpy",
+      "typeSource": "packages/core/src/types/scroll-spy.ts",
+      "sourceFiles": [
+        "packages/core/src/types/scroll-spy.ts"
+      ],
+      "propsInterfaces": [
+        "ScrollSpyProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Spotlight": {
+      "name": "Spotlight",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Spotlight",
+      "packageTarget": "Spotlight",
+      "typeSource": "packages/core/src/types/spotlight.ts",
+      "sourceFiles": [
+        "packages/core/src/types/spotlight.ts"
+      ],
+      "propsInterfaces": [
+        "SpotlightProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Steps": {
+      "name": "Steps",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Steps",
+      "packageTarget": "Steps",
+      "typeSource": "packages/core/src/types/steps.ts",
+      "sourceFiles": [
+        "packages/core/src/types/steps.ts"
+      ],
+      "propsInterfaces": [
+        "StepsProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "StepsItem": {
+      "name": "StepsItem",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./StepsItem",
+      "packageTarget": "Steps",
+      "typeSource": "packages/react/src/components/Steps.tsx and packages/vue/src/components/Steps.ts",
+      "sourceFiles": [
+        "packages/react/src/components/Steps.tsx",
+        "packages/vue/src/components/Steps.ts"
+      ],
+      "propsInterfaces": [
+        "StepsItemProps",
+        "VueStepsItemProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "SubMenu": {
+      "name": "SubMenu",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./SubMenu",
+      "packageTarget": "Menu",
+      "typeSource": "packages/core/src/types/menu.ts",
+      "sourceFiles": [
+        "packages/core/src/types/menu.ts"
+      ],
+      "propsInterfaces": [
+        "SubMenuProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "TabPane": {
+      "name": "TabPane",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./TabPane",
+      "packageTarget": "Tabs",
+      "typeSource": "packages/core/src/types/tabs.ts",
+      "sourceFiles": [
+        "packages/core/src/types/tabs.ts"
+      ],
+      "propsInterfaces": [
+        "TabPaneProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Tabs": {
+      "name": "Tabs",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Tabs",
+      "packageTarget": "Tabs",
+      "typeSource": "packages/core/src/types/tabs.ts",
+      "sourceFiles": [
+        "packages/core/src/types/tabs.ts"
+      ],
+      "propsInterfaces": [
+        "TabsProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Tree": {
+      "name": "Tree",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./Tree",
+      "packageTarget": "Tree",
+      "typeSource": "packages/core/src/types/tree.ts",
+      "sourceFiles": [
+        "packages/core/src/types/tree.ts"
+      ],
+      "propsInterfaces": [
+        "TreeProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
     }
   }
 }

@@ -1,25 +1,60 @@
 import { describe, expect, it } from 'vitest'
 import { existsSync } from 'node:fs'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import { resolve } from 'node:path'
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
-import { loadSkillIndex, lookupTigercatComponent, routeTigercatTask } from '@expcat/tigercat-mcp'
+import {
+  diagnoseTigercatMcp,
+  getTigercatComponent,
+  loadSkillIndex,
+  routeTigercatTask,
+  searchTigercat
+} from '@expcat/tigercat-mcp'
 
+const execFileAsync = promisify(execFile)
 const root = process.cwd()
 
-describe('Tigercat MCP skill routing', () => {
-  it('routes Button React usage to basic props, examples, React notes, and patterns', async () => {
+describe('Tigercat MCP generated inventory', () => {
+  it('loads every public component from generated context7 metadata', async () => {
     const index = await loadSkillIndex(root)
-    const result = await lookupTigercatComponent(index, {
-      component: 'button',
+
+    expect(index.context7.generated_by).toBe('pnpm docs:api')
+    expect(index.context7.component_count).toBe(149)
+    expect(index.components.size).toBe(149)
+    expect(index.components.has('ConfigProvider')).toBe(true)
+    expect(index.components.has('DataTableWithToolbar')).toBe(true)
+    expect(index.components.has('Notification')).toBe(false)
+    expect(index.components.has('Grid')).toBe(false)
+    expect(index.aliasTargetsByNormalizedName.get('grid')).toEqual(['Row', 'Col'])
+  })
+
+  it('diagnoses readable references and generated route consistency', async () => {
+    const result = await diagnoseTigercatMcp(root)
+
+    expect(result.ok).toBe(true)
+    expect(result.componentCount).toBe(149)
+    expect(result.aliasCount).toBeGreaterThanOrEqual(1)
+    expect(result.topicCount).toBeGreaterThanOrEqual(10)
+    expect(result.issues).toEqual([])
+  })
+})
+
+describe('Tigercat MCP routing API', () => {
+  it('returns an exact component bundle with imports, refs, examples, and React notes', async () => {
+    const index = await loadSkillIndex(root)
+    const result = await getTigercatComponent(index, {
+      component: 'Button',
       framework: 'react',
       maxBytes: 800
     })
 
     expect(result.found).toBe(true)
-    expect(result.matches[0].component).toBe('Button')
-    expect(result.matches[0].category).toBe('Basic')
+    expect(result.matches[0].component.name).toBe('Button')
+    expect(result.matches[0].component.category).toBe('Basic')
+    expect(result.matches[0].component.packageSubpath).toBe('./Button')
     expect(result.matches[0].sources.map((source) => source.path)).toEqual(
       expect.arrayContaining([
         'skills/tigercat/references/component-index.md',
@@ -31,61 +66,53 @@ describe('Tigercat MCP skill routing', () => {
     )
   })
 
-  it('routes Table and VirtualTable as separate data and advanced component matches', async () => {
+  it('routes Grid alias to Row and Col component bundles', async () => {
     const index = await loadSkillIndex(root)
-    const result = await lookupTigercatComponent(index, {
-      component: 'Table/VirtualTable',
-      maxBytes: 800
-    })
-
-    expect(result.found).toBe(true)
-    expect(result.matches.map((match) => [match.component, match.category])).toEqual(
-      expect.arrayContaining([
-        ['VirtualTable', 'Advanced'],
-        ['Table', 'Data']
-      ])
-    )
-    expect(result.matches.flatMap((match) => match.sources.map((source) => source.path))).toEqual(
-      expect.arrayContaining([
-        'skills/tigercat/references/shared/props/data.md',
-        'skills/tigercat/references/shared/props/advanced.md'
-      ])
-    )
-  })
-
-  it('routes SSR, theme, i18n, and a11y tasks to hand-written references', async () => {
-    const index = await loadSkillIndex(root)
-    const result = await routeTigercatTask(index, {
-      task: 'Need SSR theme i18n and a11y guidance for an app shell',
+    const result = await getTigercatComponent(index, {
+      component: 'Grid',
       maxBytes: 600
     })
 
-    expect(result.intent).toBe('topic')
+    expect(result.found).toBe(true)
+    expect(result.matches.map((match) => match.component.name)).toEqual(['Row', 'Col'])
+    expect(result.matches.every((match) => match.component.category === 'Layout')).toBe(true)
+  })
+
+  it('searches components, categories, aliases, and command API topics', async () => {
+    const index = await loadSkillIndex(root)
+    const component = await searchTigercat(index, { query: 'button' })
+    const alias = await searchTigercat(index, { query: 'grid' })
+    const command = await searchTigercat(index, { query: 'notification toast' })
+
+    expect(component.results[0].name).toBe('Button')
+    expect(alias.results.some((result) => result.kind === 'alias')).toBe(true)
+    expect(command.results.some((result) => result.kind === 'command')).toBe(true)
+  })
+
+  it('routes component and topic tasks to minimal reference sources', async () => {
+    const index = await loadSkillIndex(root)
+    const result = await routeTigercatTask(index, {
+      task: 'Need SSR theme i18n and a11y guidance for Button in an app shell',
+      framework: 'vue',
+      maxBytes: 600
+    })
+
+    expect(result.intent).toBe('mixed')
+    expect(result.matches.map((match) => match.component.name)).toContain('Button')
+    expect(result.topics.map((topic) => topic.slug)).toEqual(
+      expect.arrayContaining(['ssr', 'theme', 'i18n', 'accessibility', 'app'])
+    )
     expect(result.sources.map((source) => source.path)).toEqual(
       expect.arrayContaining([
-        'skills/tigercat/SKILL.md',
+        'skills/tigercat/references/shared/props/basic.md',
+        'skills/tigercat/references/vue/index.md',
         'skills/tigercat/references/ssr.md',
-        'skills/tigercat/references/theme.md',
-        'skills/tigercat/references/i18n.md',
-        'skills/tigercat/references/accessibility.md',
-        'skills/tigercat/references/recipes/building-apps.md'
+        'skills/tigercat/references/theme.md'
       ])
     )
   })
 
-  it('returns candidates for unknown component lookups without guessing', async () => {
-    const index = await loadSkillIndex(root)
-    const result = await lookupTigercatComponent(index, {
-      component: 'But',
-      framework: 'vue'
-    })
-
-    expect(result.found).toBe(false)
-    expect(result.matches).toEqual([])
-    expect(result.candidates).toContain('Button')
-  })
-
-  it('keeps unknown non-component tasks as unknown and falls back to the skill index', async () => {
+  it('keeps unknown tasks as unknown and returns search candidates', async () => {
     const index = await loadSkillIndex(root)
     const result = await routeTigercatTask(index, {
       task: 'zzzz yyyy qqqq',
@@ -93,12 +120,14 @@ describe('Tigercat MCP skill routing', () => {
     })
 
     expect(result.intent).toBe('unknown')
+    expect(result.matches).toEqual([])
+    expect(result.topics).toEqual([])
     expect(result.sources.map((source) => source.path)).toEqual(['skills/tigercat/SKILL.md'])
   })
 
   it('truncates reference snippets and marks their source', async () => {
     const index = await loadSkillIndex(root)
-    const result = await lookupTigercatComponent(index, {
+    const result = await getTigercatComponent(index, {
       component: 'Button',
       framework: 'react',
       maxBytes: 300
@@ -111,11 +140,16 @@ describe('Tigercat MCP skill routing', () => {
 })
 
 describe('Tigercat MCP stdio server', () => {
-  it('exposes tools, resources, prompts, and guarded reads from the built binary', async () => {
+  it('exposes redesigned tools, resources, prompts, doctor, and guarded reads from the built binary', async () => {
     const serverPath = resolve(root, 'packages/mcp/dist/index.js')
     if (!existsSync(serverPath)) {
       return
     }
+
+    const doctor = await execFileAsync(process.execPath, [serverPath, '--root', root, '--doctor'], {
+      timeout: 10_000
+    })
+    expect(doctor.stdout).toContain('Tigercat MCP doctor: ok')
 
     const transport = new StdioClientTransport({
       command: process.execPath,
@@ -132,29 +166,41 @@ describe('Tigercat MCP stdio server', () => {
       const tools = await client.listTools()
       expect(tools.tools.map((tool) => tool.name)).toEqual(
         expect.arrayContaining([
-          'tigercat_route_task',
-          'tigercat_lookup_component',
-          'tigercat_read_reference'
+          'tigercat_search',
+          'tigercat_component',
+          'tigercat_route',
+          'tigercat_reference'
+        ])
+      )
+      expect(tools.tools.map((tool) => tool.name)).not.toContain('tigercat_lookup_component')
+
+      const resources = await client.listResources()
+      expect(resources.resources.map((resource) => resource.uri)).toContain('tigercat://inventory')
+
+      const templates = await client.listResourceTemplates()
+      expect(templates.resourceTemplates.map((template) => template.uriTemplate)).toEqual(
+        expect.arrayContaining([
+          'tigercat://component/{name}',
+          'tigercat://category/{slug}',
+          'tigercat://topic/{topic}',
+          'tigercat://reference/{path}'
         ])
       )
 
-      const resources = await client.listResources()
-      expect(resources.resources.map((resource) => resource.uri)).toEqual(
-        expect.arrayContaining(['tigercat://skill/index', 'tigercat://context7'])
-      )
-
       const prompts = await client.listPrompts()
-      expect(prompts.prompts.map((prompt) => prompt.name)).toContain('tigercat-component-usage')
+      expect(prompts.prompts.map((prompt) => prompt.name)).toContain('tigercat-usage')
 
       const lookup = await client.callTool({
-        name: 'tigercat_lookup_component',
-        arguments: { component: 'Button', framework: 'react', maxBytes: 500 }
+        name: 'tigercat_component',
+        arguments: { component: 'Grid', framework: 'react', maxBytes: 500 }
       })
       expect(lookup.isError).not.toBe(true)
-      expect(JSON.parse(String(lookup.content[0].text)).matches[0].component).toBe('Button')
+      expect(
+        JSON.parse(String(lookup.content[0].text)).matches.map((match) => match.component.name)
+      ).toEqual(['Row', 'Col'])
 
       const blocked = await client.callTool({
-        name: 'tigercat_read_reference',
+        name: 'tigercat_reference',
         arguments: { path: '../package.json' }
       })
       expect(blocked.isError).toBe(true)

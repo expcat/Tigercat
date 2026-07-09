@@ -9,8 +9,15 @@ import {
   ReadResourceRequestSchema
 } from '@modelcontextprotocol/sdk/types.js'
 
-import { loadSkillIndex, readContext7Source, readReferenceSource } from './skill-index'
-import { lookupTigercatComponent, routeTigercatTask } from './router'
+import { loadSkillIndex, readReferenceSource } from './skill-index'
+import {
+  createTopicRoute,
+  getCategoryComponents,
+  getInventory,
+  getTigercatComponent,
+  routeTigercatTask,
+  searchTigercat
+} from './router'
 import type { SkillIndex, TigercatFramework, TigercatMcpOptions } from './types'
 
 const JSON_MIME = 'application/json'
@@ -40,30 +47,34 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
       {
-        name: 'tigercat_route_task',
-        description:
-          'Route a Tigercat task to the smallest useful skill references and context snippets.',
+        name: 'tigercat_search',
+        description: 'Search Tigercat components, aliases, categories, topics, and command APIs.',
         inputSchema: {
           type: 'object',
           properties: {
-            task: { type: 'string', description: 'Natural-language Tigercat task.' },
+            query: {
+              type: 'string',
+              description: 'Component, alias, category, topic, or use case.'
+            },
             framework: { type: 'string', enum: ['react', 'vue'] },
-            maxBytes: { type: 'number', minimum: 200, maximum: 50000 }
+            limit: { type: 'number', minimum: 1, maximum: 30 }
           },
-          required: ['task'],
+          required: ['query'],
           additionalProperties: false
         }
       },
       {
-        name: 'tigercat_lookup_component',
+        name: 'tigercat_component',
         description:
-          'Look up Tigercat component props/examples/framework references from context7.json.',
+          'Return exact Tigercat component metadata, import paths, docs, examples, and framework notes.',
         inputSchema: {
           type: 'object',
           properties: {
-            component: { type: 'string', description: 'Component name such as Button or Table.' },
+            component: {
+              type: 'string',
+              description: 'Component name or alias, such as Button or Grid.'
+            },
             framework: { type: 'string', enum: ['react', 'vue'] },
-            task: { type: 'string', description: 'Optional task context.' },
             maxBytes: { type: 'number', minimum: 200, maximum: 50000 }
           },
           required: ['component'],
@@ -71,7 +82,23 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
         }
       },
       {
-        name: 'tigercat_read_reference',
+        name: 'tigercat_route',
+        description:
+          'Route a natural-language Tigercat task to the smallest useful component/topic references.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            task: { type: 'string', description: 'Natural-language Tigercat task.' },
+            framework: { type: 'string', enum: ['react', 'vue'] },
+            maxBytes: { type: 'number', minimum: 200, maximum: 50000 },
+            limit: { type: 'number', minimum: 1, maximum: 30 }
+          },
+          required: ['task'],
+          additionalProperties: false
+        }
+      },
+      {
+        name: 'tigercat_reference',
         description: 'Read an allow-listed Tigercat skill reference with optional byte truncation.',
         inputSchema: {
           type: 'object',
@@ -94,28 +121,38 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
     const args = (request.params.arguments ?? {}) as Record<string, unknown>
 
     try {
-      if (request.params.name === 'tigercat_route_task') {
+      if (request.params.name === 'tigercat_search') {
+        return jsonContent(
+          await searchTigercat(index, {
+            query: stringArg(args.query),
+            framework: frameworkArg(args.framework),
+            limit: numberArg(args.limit)
+          })
+        )
+      }
+
+      if (request.params.name === 'tigercat_component') {
+        return jsonContent(
+          await getTigercatComponent(index, {
+            component: stringArg(args.component),
+            framework: frameworkArg(args.framework),
+            maxBytes: numberArg(args.maxBytes)
+          })
+        )
+      }
+
+      if (request.params.name === 'tigercat_route') {
         return jsonContent(
           await routeTigercatTask(index, {
             task: stringArg(args.task),
             framework: frameworkArg(args.framework),
-            maxBytes: numberArg(args.maxBytes)
+            maxBytes: numberArg(args.maxBytes),
+            limit: numberArg(args.limit)
           })
         )
       }
 
-      if (request.params.name === 'tigercat_lookup_component') {
-        return jsonContent(
-          await lookupTigercatComponent(index, {
-            component: stringArg(args.component),
-            framework: frameworkArg(args.framework),
-            task: optionalStringArg(args.task),
-            maxBytes: numberArg(args.maxBytes)
-          })
-        )
-      }
-
-      if (request.params.name === 'tigercat_read_reference') {
+      if (request.params.name === 'tigercat_reference') {
         return jsonContent(
           await readReferenceSource(
             index,
@@ -135,15 +172,9 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
   server.setRequestHandler(ListResourcesRequestSchema, async () => ({
     resources: [
       {
-        uri: 'tigercat://skill/index',
-        name: 'Tigercat skill index',
-        description: 'Top-level Tigercat skill route index.',
-        mimeType: MARKDOWN_MIME
-      },
-      {
-        uri: 'tigercat://context7',
-        name: 'Tigercat Context7 route map',
-        description: 'Component-to-reference route map consumed by the MCP server.',
+        uri: 'tigercat://inventory',
+        name: 'Tigercat inventory',
+        description: 'Generated component, alias, category, and topic inventory.',
         mimeType: JSON_MIME
       }
     ]
@@ -153,8 +184,20 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
     resourceTemplates: [
       {
         uriTemplate: 'tigercat://component/{name}',
-        name: 'Tigercat component route',
-        description: 'Component-specific props/examples/framework route bundle.',
+        name: 'Tigercat component bundle',
+        description: 'Component metadata plus props/examples/framework reference bundle.',
+        mimeType: JSON_MIME
+      },
+      {
+        uriTemplate: 'tigercat://category/{slug}',
+        name: 'Tigercat category inventory',
+        description: 'Components in a generated component category.',
+        mimeType: JSON_MIME
+      },
+      {
+        uriTemplate: 'tigercat://topic/{topic}',
+        name: 'Tigercat topic bundle',
+        description: 'Hand-written topic route plus reference snippets.',
         mimeType: JSON_MIME
       },
       {
@@ -170,24 +213,26 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
     const index = await getIndex()
     const uri = request.params.uri
 
-    if (uri === 'tigercat://skill/index') {
-      const source = await readReferenceSource(
-        index,
-        'skills/tigercat/SKILL.md',
-        'Top-level skill route index.'
-      )
-      return resourceText(uri, source.text ?? '', MARKDOWN_MIME)
-    }
-
-    if (uri === 'tigercat://context7') {
-      const source = await readContext7Source(index)
-      return resourceText(uri, source.text ?? '', JSON_MIME)
+    if (uri === 'tigercat://inventory') {
+      return resourceText(uri, JSON.stringify(getInventory(index), null, 2), JSON_MIME)
     }
 
     if (uri.startsWith('tigercat://component/')) {
       const component = decodeURIComponent(uri.slice('tigercat://component/'.length))
-      const lookup = await lookupTigercatComponent(index, { component })
+      const lookup = await getTigercatComponent(index, { component })
       return resourceText(uri, JSON.stringify(lookup, null, 2), JSON_MIME)
+    }
+
+    if (uri.startsWith('tigercat://category/')) {
+      const category = decodeURIComponent(uri.slice('tigercat://category/'.length))
+      const components = getCategoryComponents(index, category)
+      return resourceText(uri, JSON.stringify({ category, components }, null, 2), JSON_MIME)
+    }
+
+    if (uri.startsWith('tigercat://topic/')) {
+      const topic = decodeURIComponent(uri.slice('tigercat://topic/'.length))
+      const route = await createTopicRoute(index, topic)
+      return resourceText(uri, JSON.stringify(route, null, 2), JSON_MIME)
     }
 
     if (uri.startsWith('tigercat://reference/')) {
@@ -202,22 +247,17 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
   server.setRequestHandler(ListPromptsRequestSchema, async () => ({
     prompts: [
       {
-        name: 'tigercat-component-usage',
-        description: 'Guide an LLM to route, read, and answer a Tigercat component usage task.',
+        name: 'tigercat-usage',
+        description: 'Guide an LLM to route, read, and answer a Tigercat usage task.',
         arguments: [
           {
-            name: 'component',
-            description: 'Tigercat component name.',
+            name: 'task',
+            description: 'Usage, migration, implementation, or debugging task.',
             required: true
           },
           {
             name: 'framework',
             description: 'Target framework: react or vue.',
-            required: false
-          },
-          {
-            name: 'task',
-            description: 'Usage, migration, or implementation task.',
             required: false
           }
         ]
@@ -226,27 +266,27 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
   }))
 
   server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-    if (request.params.name !== 'tigercat-component-usage') {
+    if (request.params.name !== 'tigercat-usage') {
       throw new Error(`Unknown Tigercat MCP prompt: ${request.params.name}`)
     }
 
     const args = request.params.arguments ?? {}
-    const component = stringArg(args.component)
+    const task = stringArg(args.task)
     const framework = optionalStringArg(args.framework) ?? 'react or vue'
-    const task = optionalStringArg(args.task) ?? 'explain correct usage with minimal context'
 
     return {
-      description: `Route Tigercat ${component} usage references before answering.`,
+      description: 'Route Tigercat usage references before answering.',
       messages: [
         {
           role: 'user',
           content: {
             type: 'text',
             text: [
-              `Use tigercat_lookup_component for ${component} with framework "${framework}".`,
+              `Use tigercat_route with framework "${framework}" before answering.`,
+              'Use tigercat_component for exact component imports and props when route results mention components.',
               'Read only the returned sources needed for the task.',
               `Task: ${task}`,
-              'Answer with exact import paths, key props/events, and any React/Vue binding differences.'
+              'Answer with exact import paths, key props/events, and React/Vue binding differences.'
             ].join('\n')
           }
         }
