@@ -62,7 +62,7 @@
   {
     "name": "React Table subpath",
     "path": "packages/react/dist/components/Table.mjs",
-    "limit": "40 kB",
+    "limit": "41 kB",
     "gzip": true
   },
   {

@@ -2,6 +2,10 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+## v2.0.0-rc.2
+
+v2.0.0 rc.2 使用当前 v2.0.0 破坏性升级迁移路径。本次候选版本新增 `@expcat/tigercat-mcp` 本地 MCP 服务、组件元数据与诊断增强，并更新依赖目录；无新增破坏性变更。迁移操作请按下方 v2.0.0 条目执行。
+
 ## v2.0.0-preview.6
 
 v2.0.0 preview 6 使用当前 v2.0.0 破坏性升级迁移路径。本次预览无新增破坏性变更，DataExport 组件与 Table / List 分页 `simple` / `showQuickJumper` / `pageIndicatorText` 均为纯增量 API；迁移操作请按下方 v2.0.0 条目执行。

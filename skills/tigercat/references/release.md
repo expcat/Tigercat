@@ -5,7 +5,7 @@ description: Tigercat release commands, validation set, and published package sm
 
 # Release
 
-Tigercat uses Changesets for version planning and package publishing. All package versions are fixed together so `@expcat/tigercat-core`, `@expcat/tigercat-vue`, `@expcat/tigercat-react`, and `@expcat/tigercat-cli` stay aligned.
+Tigercat uses Changesets for version planning and package publishing. All package versions are fixed together so `@expcat/tigercat-core`, `@expcat/tigercat-vue`, `@expcat/tigercat-react`, `@expcat/tigercat-cli`, and `@expcat/tigercat-mcp` stay aligned.
 
 ## Release Readiness
 
@@ -47,7 +47,7 @@ Available groups are `basic`, `form`, `feedback`, `layout`, `navigation`, `data`
 
 Breaking changes must be centralized in [docs/MIGRATION.md](../../../docs/MIGRATION.md) and [CHANGELOG.md](../../../CHANGELOG.md). Each entry should include affected package or component, removed API, replacement API, and a minimal diff when possible.
 
-Current v2.0.0-preview.6 carries the v2.0.0 preview release surface: fixed package versions, runtime version exports, ESM-only core / React / Vue packages, explicit component exports, tree-shaking guards, API removals, and migrated docs/examples. Continue to update [docs/MIGRATION.md](../../../docs/MIGRATION.md) and [CHANGELOG.md](../../../CHANGELOG.md) before the final v2.0.0 release. The previous completed breaking-change set remains v1.5.0:
+Current v2.0.0-rc.2 carries the v2.0.0 release-candidate surface: fixed package versions including the MCP package, runtime version exports, ESM-only core / React / Vue packages, explicit component exports, tree-shaking guards, API removals, migrated docs/examples, and local MCP reference routing. Continue to update [docs/MIGRATION.md](../../../docs/MIGRATION.md) and [CHANGELOG.md](../../../CHANGELOG.md) before the final v2.0.0 release. The previous completed breaking-change set remains v1.5.0:
 
 | Area                       | Removed or changed                 | Replacement or action                                                 |
 | -------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
