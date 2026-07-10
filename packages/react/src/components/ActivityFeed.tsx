@@ -11,6 +11,13 @@ import {
   activityItemTitleGroupClasses,
   activityItemDescriptionClasses,
   activityItemActionsClasses,
+  type ActivityFeedProps as CoreActivityFeedProps,
+  type ActivityGroup,
+  type ActivityItem,
+  type ActivityAction,
+  type ActivityTimelineItem
+} from '@expcat/tigercat-core'
+import {
   activityFeedActionClasses,
   activityFeedItemSurfaceClasses,
   activityFeedAvatarClasses,
@@ -24,13 +31,8 @@ import {
   activityFeedGroupTitleClasses,
   activityFeedDotBaseClasses,
   activityFeedDotPulseBaseClasses,
-  getActivityFeedDotClasses,
-  type ActivityFeedProps as CoreActivityFeedProps,
-  type ActivityGroup,
-  type ActivityItem,
-  type ActivityAction,
-  type ActivityTimelineItem
-} from '@expcat/tigercat-core'
+  getActivityFeedDotClasses
+} from '../../../core/src/internal/activity-feed-styles'
 import { Timeline } from './Timeline'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
@@ -117,11 +119,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     )
 
     return (
-      <div
-        className={classNames(
-          activityItemClasses,
-          activityFeedItemSurfaceClasses
-        )}>
+      <div className={classNames(activityItemClasses, activityFeedItemSurfaceClasses)}>
         <div className={activityItemLayoutClasses}>
           {showAvatar && item.user ? (
             <Avatar
@@ -135,11 +133,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             <div className={activityItemHeaderClasses}>
               <div className={activityItemTitleGroupClasses}>
                 {titleText ? (
-                  <Text
-                    tag="div"
-                    size="sm"
-                    weight="semibold"
-                    className={activityFeedTitleClasses}>
+                  <Text tag="div" size="sm" weight="semibold" className={activityFeedTitleClasses}>
                     {titleText}
                   </Text>
                 ) : null}
@@ -153,11 +147,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                 ) : null}
               </div>
               {timeText ? (
-                <Text
-                  tag="div"
-                  size="xs"
-                  color="muted"
-                  className={activityFeedTimeClasses}>
+                <Text tag="div" size="xs" color="muted" className={activityFeedTimeClasses}>
                   {timeText}
                 </Text>
               ) : null}
@@ -276,9 +266,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                 return (
                   <div className="relative flex items-center justify-center w-4 h-4">
                     {dotClasses.pulse ? (
-                      <span
-                        className={`${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`}
-                      />
+                      <span className={`${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`} />
                     ) : null}
                     <span className={`${activityFeedDotBaseClasses} ${dotClasses.dot}`} />
                   </div>

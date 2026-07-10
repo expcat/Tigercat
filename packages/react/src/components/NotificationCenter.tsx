@@ -3,6 +3,12 @@ import {
   classNames,
   buildNotificationGroups,
   formatActivityTime,
+  type NotificationCenterProps as CoreNotificationCenterProps,
+  type NotificationGroup,
+  type NotificationItem,
+  type NotificationReadFilter
+} from '@expcat/tigercat-core'
+import {
   notificationCenterItemClasses,
   notificationCenterUnreadItemClasses,
   notificationCenterReadItemClasses,
@@ -26,12 +32,8 @@ import {
   notificationCenterFilterGroupClasses,
   notificationCenterFilterButtonClasses,
   notificationCenterFilterActiveClasses,
-  notificationCenterFilterIdleClasses,
-  type NotificationCenterProps as CoreNotificationCenterProps,
-  type NotificationGroup,
-  type NotificationItem,
-  type NotificationReadFilter
-} from '@expcat/tigercat-core'
+  notificationCenterFilterIdleClasses
+} from '../../../core/src/internal/notification-center-styles'
 import { Card } from './Card'
 import { Tabs, TabPane } from './Tabs'
 import { List } from './List'
@@ -248,21 +250,13 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 size="sm"
                 weight={isRead ? 'normal' : 'semibold'}
                 className={
-                  isRead
-                    ? notificationCenterReadTitleClasses
-                    : notificationCenterUnreadTitleClasses
+                  isRead ? notificationCenterReadTitleClasses : notificationCenterUnreadTitleClasses
                 }>
                 {item.title}
               </Text>
-              {!isRead && (
-                <span className={notificationCenterUnreadDotClasses} />
-              )}
+              {!isRead && <span className={notificationCenterUnreadDotClasses} />}
             </div>
-            {timeText ? (
-              <span className={notificationCenterTimeClasses}>
-                {timeText}
-              </span>
-            ) : null}
+            {timeText ? <span className={notificationCenterTimeClasses}>{timeText}</span> : null}
           </div>
           {item.description ? (
             <div
@@ -315,11 +309,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               />
             </svg>
           </div>
-          <Text
-            tag="div"
-            size="sm"
-            color="muted"
-            className={notificationCenterEmptyTextClasses}>
+          <Text tag="div" size="sm" color="muted" className={notificationCenterEmptyTextClasses}>
             {emptyText}
           </Text>
         </div>
@@ -345,7 +335,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     </div>
   ) : resolvedGroups.length > 0 ? (
     <div className="-mx-4 -mb-4">
-      <Tabs type="line" size="small" activeKey={currentGroupKey} onActiveKeyChange={handleGroupChange}>
+      <Tabs
+        type="line"
+        size="small"
+        activeKey={currentGroupKey}
+        onActiveKeyChange={handleGroupChange}>
         {groupTabData.map((tab) => (
           <TabPane key={String(tab.key)} tabKey={tab.key} label={tab.label}>
             <div className="max-h-[380px] overflow-y-auto">{renderList(tab.filteredItems)}</div>
@@ -379,9 +373,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   {title}
                 </Text>
                 {totalUnread > 0 ? (
-                  <span className={notificationCenterUnreadBadgeClasses}>
-                    {totalUnread}
-                  </span>
+                  <span className={notificationCenterUnreadBadgeClasses}>{totalUnread}</span>
                 ) : null}
               </div>
               <Button

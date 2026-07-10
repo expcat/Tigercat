@@ -65,8 +65,7 @@ const [basicForm, setBasicForm] = useState({
 })
 
 const handleBasicSubmit = ({ valid, values }) => {
-  console.log('表单提交:', { valid, values })
-  alert(valid ? '表单提交成功！' : '表单验证失败')
+  setBasicSubmitFeedback(valid ? '提交成功：' + values.username : '提交失败，请检查输入。')
 }
 
 const handleGenderChange = (value) => {
@@ -189,10 +188,12 @@ const FormDemo: React.FC = () => {
     bio: '',
     agreement: false
   })
+  const [basicSubmitFeedback, setBasicSubmitFeedback] = useState('尚未提交表单')
 
   const handleBasicSubmit = ({ valid, values }: FormSubmitEvent) => {
-    console.log('表单提交:', { valid, values })
-    alert(valid ? '表单提交成功！请查看控制台。' : '表单验证失败，请检查输入。')
+    setBasicSubmitFeedback(
+      valid ? `提交成功：${String(values.username || '未填写用户名')}` : '提交失败，请检查输入。'
+    )
   }
 
   const handleGenderChange = (value: string | number) => {
@@ -215,6 +216,7 @@ const FormDemo: React.FC = () => {
       bio: '',
       agreement: false
     })
+    setBasicSubmitFeedback('表单已重置')
   }
 
   const validateFormRef = useRef<FormHandle | null>(null)
@@ -365,6 +367,9 @@ const FormDemo: React.FC = () => {
             </Space>
           </FormItem>
         </Form>
+        <p className="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+          提交反馈：{basicSubmitFeedback}
+        </p>
       </DemoBlock>
 
       {/* 表单验证 */}

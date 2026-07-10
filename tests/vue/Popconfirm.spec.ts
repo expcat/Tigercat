@@ -258,5 +258,4 @@ describe.sequential('Popconfirm', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {})
 })

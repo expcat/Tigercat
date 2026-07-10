@@ -295,5 +295,4 @@ describe('Carousel', () => {
       expect(carouselEl).toHaveAttribute('aria-label')
     })
   })
-  describe('Edge Cases', () => {})
 })

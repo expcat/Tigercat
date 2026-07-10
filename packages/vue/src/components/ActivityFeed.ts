@@ -13,6 +13,13 @@ import {
   activityItemTitleGroupClasses,
   activityItemDescriptionClasses,
   activityItemActionsClasses,
+  type ActivityFeedProps as CoreActivityFeedProps,
+  type ActivityGroup,
+  type ActivityItem,
+  type ActivityAction,
+  type ActivityTimelineItem
+} from '@expcat/tigercat-core'
+import {
   activityFeedActionClasses,
   activityFeedItemSurfaceClasses,
   activityFeedAvatarClasses,
@@ -26,13 +33,8 @@ import {
   activityFeedGroupTitleClasses,
   activityFeedDotBaseClasses,
   activityFeedDotPulseBaseClasses,
-  getActivityFeedDotClasses,
-  type ActivityFeedProps as CoreActivityFeedProps,
-  type ActivityGroup,
-  type ActivityItem,
-  type ActivityAction,
-  type ActivityTimelineItem
-} from '@expcat/tigercat-core'
+  getActivityFeedDotClasses
+} from '../../../core/src/internal/activity-feed-styles'
 import { Timeline } from './Timeline'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
@@ -164,10 +166,7 @@ export const ActivityFeed = defineComponent({
       return h(
         'div',
         {
-          class: classNames(
-            activityItemClasses,
-            activityFeedItemSurfaceClasses
-          )
+          class: classNames(activityItemClasses, activityFeedItemSurfaceClasses)
         },
         [
           h('div', { class: activityItemLayoutClasses }, [

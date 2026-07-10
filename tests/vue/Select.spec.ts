@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { Select } from '@expcat/tigercat-vue'
 import {
@@ -475,12 +475,6 @@ describe('Select', () => {
     })
   })
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
-    })
-  })
-
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Select, {
@@ -606,8 +600,6 @@ describe('Select', () => {
       expect(getByText('Option 100')).toBeInTheDocument()
     })
   })
-
-  describe('Additional Keyboard Navigation', () => {})
 
   describe('Dropdown Behavior', () => {
     it('should close dropdown when clicking outside', async () => {

@@ -672,5 +672,4 @@ describe('Tree', () => {
       expect(items.length).toBeLessThan(50)
     })
   })
-  describe('Edge Cases', () => {})
 })

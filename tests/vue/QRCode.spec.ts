@@ -188,5 +188,4 @@ describe('QRCode', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {})
 })

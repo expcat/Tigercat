@@ -279,5 +279,4 @@ describe('Tooltip', () => {
     // Should remain visible in manual mode
     expect(getByText('Tooltip content')).toBeVisible()
   })
-  describe('Edge Cases', () => {})
 })

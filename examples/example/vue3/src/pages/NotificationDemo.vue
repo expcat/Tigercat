@@ -51,6 +51,7 @@ const customSnippet = `<Button @click="showCustomIcon">自定义图标</Button>
 <Button @click="showCustomClass">自定义样式</Button>`
 
 const closeNotificationRef = ref<(() => void) | null>(null)
+const lastAction = ref('尚未触发通知回调')
 
 // 基本类型
 const showInfo = () => {
@@ -196,8 +197,7 @@ const showClickableNotification = () => {
     title: '可点击通知',
     description: '点击这条通知查看详情',
     onClick: () => {
-      console.log('通知被点击了')
-      alert('查看详情功能')
+      lastAction.value = '已点击通知并查看详情'
     }
   })
 }
@@ -208,7 +208,7 @@ const showNotificationWithCallback = () => {
     title: '操作成功',
     description: '您的操作已经成功完成！',
     onClose: () => {
-      console.log('通知已关闭')
+      lastAction.value = '带回调通知已关闭'
     }
   })
 }
@@ -223,15 +223,14 @@ const showActionNotification = () => {
         label: '查看',
         type: 'primary',
         onClick: () => {
-          console.log('查看通知详情')
-          alert('打开通知详情')
+          lastAction.value = '已打开通知详情'
         }
       },
       {
         label: '撤销',
         closeOnClick: true,
         onClick: () => {
-          console.log('撤销通知相关操作')
+          lastAction.value = '已撤销通知相关操作'
         }
       }
     ]
@@ -310,6 +309,9 @@ const showCustomClass = () => {
       <h1 class="text-2xl font-bold mb-2">Notification 通知</h1>
       <p class="text-gray-600 dark:text-gray-400">
         全局显示通知提示信息，支持多种展示位置、关闭与定时消失。
+      </p>
+      <p class="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+        回调反馈：{{ lastAction }}
       </p>
     </div>
 

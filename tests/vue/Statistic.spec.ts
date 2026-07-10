@@ -139,5 +139,4 @@ describe('Statistic', () => {
     expect(screen.getByText('-42')).toBeInTheDocument()
   })
 
-  describe('Edge Cases', () => {})
 })

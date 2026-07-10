@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { PieChart } from '@expcat/tigercat-vue/PieChart'
 import { type PieChartDatum } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
@@ -24,6 +24,13 @@ const colorfulData: PieChartDatum[] = [
 const hoveredIndex = ref<number | null>(null)
 const selectedIndex = ref<number | null>(null)
 const clickedSlice = ref<string>('')
+const colorfulTotal = colorfulData.reduce((sum, datum) => sum + datum.value, 0)
+const selectedSummary = computed(() => {
+  if (selectedIndex.value === null) return '无'
+  const datum = colorfulData[selectedIndex.value]
+  if (!datum) return '无'
+  return `${datum.label} · ${datum.value} · ${((datum.value / colorfulTotal) * 100).toFixed(1)}%`
+})
 
 const handleSliceClick = (datum: PieChartDatum, _index: number) => {
   clickedSlice.value = `点击了 ${datum.label}，值 ${datum.value}`
@@ -101,7 +108,7 @@ const handleSliceClick = (datum: PieChartDatum, _index: number) => {
               v-model:selectedIndex="selectedIndex"
               @slice-click="handleSliceClick" />
             <p class="text-sm text-gray-500">
-              选中: {{ selectedIndex !== null ? colorfulData[selectedIndex]?.label : '无' }}
+              选中: {{ selectedSummary }}
               <span v-if="clickedSlice" class="ml-4">{{ clickedSlice }}</span>
             </p>
           </div>

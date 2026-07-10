@@ -13,6 +13,9 @@
           <p class="text-sm text-gray-500 dark:text-gray-400">
             任务条、进度条与依赖线自动按时间范围布局。
           </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            移动端可在预览区域横向滚动，查看完整时间轴。
+          </p>
           <div class="space-y-4">
             <Gantt
               :data="releaseTasks"
@@ -27,7 +30,9 @@
               desc="Feature delivery timeline"
               @update:selected-id="selectedId = $event" />
             <div class="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-              当前选择：{{ selectedId ?? '未选择' }}
+              当前选择：{{
+                selectedTask ? `${selectedTask.label}（${String(selectedTask.id)}）` : '未选择'
+              }}
             </div>
           </div>
         </section>
@@ -50,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Gantt } from '@expcat/tigercat-vue/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
@@ -95,6 +100,8 @@ const releaseTasks: GanttTask[] = [
     color: '#8b5cf6'
   }
 ]
+
+const selectedTask = computed(() => releaseTasks.find((task) => task.id === selectedId.value))
 
 const monthFormatter = (date: Date) => `${date.getMonth() + 1}月`
 </script>

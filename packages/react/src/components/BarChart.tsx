@@ -377,7 +377,7 @@ export const BarChart: React.FC<BarChartProps> = ({
 
   if (!showLegend) {
     return (
-      <div className="inline-block relative">
+      <div className={classNames('relative', responsive ? 'block w-full min-w-0' : 'inline-block')}>
         {chart}
         {tooltip}
       </div>
@@ -385,7 +385,7 @@ export const BarChart: React.FC<BarChartProps> = ({
   }
 
   return (
-    <div className={wrapperClasses}>
+    <div className={classNames(wrapperClasses, responsive && 'w-full min-w-0')}>
       {chart}
       <ChartLegend
         items={legendItems}

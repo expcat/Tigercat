@@ -15,6 +15,9 @@
           <p class="text-sm text-gray-500 dark:text-gray-400">
             树形组织数据，节点自动居中到子树范围。
           </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            移动端可在预览区域横向滚动，查看完整组织结构。
+          </p>
           <div class="space-y-4">
             <OrgChart
               :data="orgData"
@@ -27,7 +30,7 @@
               desc="Company reporting structure"
               @update:selected-id="(id: string | number | null) => (selectedId = id)" />
             <div class="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-              当前选择：{{ selectedId ?? '未选择' }}
+              当前选择：{{ selectedNodeLabel }}
             </div>
           </div>
         </section>
@@ -44,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { OrgChart } from '@expcat/tigercat-vue/OrgChart'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
@@ -83,4 +86,20 @@ const orgData: OrgChartNode = {
     }
   ]
 }
+
+function findOrgNode(node: OrgChartNode, id: string | number): OrgChartNode | undefined {
+  if (node.id === id) return node
+  for (const child of node.children ?? []) {
+    const match = findOrgNode(child, id)
+    if (match) return match
+  }
+  return undefined
+}
+
+const selectedNodeLabel = computed(() => {
+  if (selectedId.value === null) return '未选择'
+  const node = findOrgNode(orgData, selectedId.value)
+  if (!node) return '未选择'
+  return `${node.label}${node.title ? ` / ${node.title}` : ''}（${String(node.id)}）`
+})
 </script>

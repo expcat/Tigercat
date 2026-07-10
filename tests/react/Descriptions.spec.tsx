@@ -136,5 +136,4 @@ describe('Descriptions (React)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {})
 })

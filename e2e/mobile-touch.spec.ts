@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-const REACT_URL = 'http://localhost:5174'
+const REACT_URL = 'http://127.0.0.1:5174'
 
 function demoUrl(path: string): string {
   return `${REACT_URL}/#/${path}`

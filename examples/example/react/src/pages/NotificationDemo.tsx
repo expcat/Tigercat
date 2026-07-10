@@ -1,5 +1,5 @@
 import { Button } from '@expcat/tigercat-react/Button'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { notification } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 import fullPageSnippet from './NotificationDemo.tsx?raw'
@@ -51,6 +51,7 @@ const customSnippet = `<Button onClick={showCustomIcon}>自定义图标</Button>
 
 export default function NotificationDemo() {
   const closeNotificationRef = useRef<(() => void) | null>(null)
+  const [lastAction, setLastAction] = useState('尚未触发通知回调')
 
   // 基本类型
   const showInfo = () => {
@@ -196,8 +197,7 @@ export default function NotificationDemo() {
       title: '可点击通知',
       description: '点击这条通知查看详情',
       onClick: () => {
-        console.log('通知被点击了')
-        alert('查看详情功能')
+        setLastAction('已点击通知并查看详情')
       }
     })
   }
@@ -208,7 +208,7 @@ export default function NotificationDemo() {
       title: '操作成功',
       description: '您的操作已经成功完成！',
       onClose: () => {
-        console.log('通知已关闭')
+        setLastAction('带回调通知已关闭')
       }
     })
   }
@@ -223,15 +223,14 @@ export default function NotificationDemo() {
           label: '查看',
           type: 'primary',
           onClick: () => {
-            console.log('查看通知详情')
-            alert('打开通知详情')
+            setLastAction('已打开通知详情')
           }
         },
         {
           label: '撤销',
           closeOnClick: true,
           onClick: () => {
-            console.log('撤销通知相关操作')
+            setLastAction('已撤销通知相关操作')
           }
         }
       ]
@@ -309,6 +308,9 @@ export default function NotificationDemo() {
         <h1 className="text-2xl font-bold mb-2">Notification 通知</h1>
         <p className="text-gray-600 dark:text-gray-400">
           全局显示通知提示信息，支持多种展示位置、关闭与定时消失。
+        </p>
+        <p className="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+          回调反馈：{lastAction}
         </p>
       </div>
 

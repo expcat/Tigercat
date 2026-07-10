@@ -5,12 +5,13 @@
 ## Canonical Sources
 
 - 当前执行计划：`../../docs/ROADMAP.md`
-- 已完成记录：`../../docs/V2_COMPLETED.md`
+- 版本与完成记录：`../../CHANGELOG.md`
+- breaking change：`../../docs/MIGRATION.md`
 - 生成器：`../../scripts/generate-api-docs.mjs`
 - Skill 护栏：`../../scripts/validate-api.mjs`
 
 ## Rules
 
 - `references/component-index.md`、`references/examples/*`、`references/shared/props/*`、`references/shared/api-summary.md`、`references/vue/index.md`、`references/react/index.md` 都由 `pnpm docs:api` 生成。
-- 手写参考只保留用户搭应用、查组件、查绑定差异需要的内容；维护者 backlog 写入仓库 docs，不进入 Skill 常规读取路径。
+- 手写参考只保留用户搭应用、查组件、查绑定差异需要的内容；维护者只把当前可执行任务写入 `docs/ROADMAP.md`，完成历史进入 changelog 或 Git 历史。
 - `pnpm api:validate` 负责检查入口大小、手写 reference 行数、generated summary 体积、普通 references 的 Roadmap 链接和 context7 路径有效性。

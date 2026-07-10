@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Empty } from '@expcat/tigercat-react/Empty'
 import { Button } from '@expcat/tigercat-react/Button'
 import { Space } from '@expcat/tigercat-react/Space'
@@ -15,6 +16,8 @@ const customSnippet = `<Empty description="这里什么都没有" extra={<Button
 <Empty showImage={false} description="无图片模式，仅显示文字描述" />`
 
 const EmptyDemo: React.FC = () => {
+  const [lastAction, setLastAction] = useState('尚未执行操作')
+
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">Empty 空状态</h1>
@@ -45,8 +48,15 @@ const EmptyDemo: React.FC = () => {
           <div className="border rounded-lg p-6">
             <Empty
               description="这里什么都没有"
-              extra={<Button variant="primary">立即创建</Button>}
+              extra={
+                <Button variant="primary" onClick={() => setLastAction('已创建一条新内容')}>
+                  立即创建
+                </Button>
+              }
             />
+            <p className="mt-3 text-center text-sm text-gray-600 dark:text-gray-300" role="status">
+              操作反馈：{lastAction}
+            </p>
           </div>
           <div className="border rounded-lg p-6">
             <Empty showImage={false} description="无图片模式，仅显示文字描述" />

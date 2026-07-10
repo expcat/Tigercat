@@ -154,5 +154,4 @@ describe('List', () => {
     const { container } = render(<List dataSource={sampleData} />)
     await expectNoA11yViolationsIsolated(container)
   })
-  describe('Edge Cases', () => {})
 })

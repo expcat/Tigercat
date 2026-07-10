@@ -41,13 +41,14 @@ const basicScriptSnippet = `const [visible1, setVisible1] = useState(false)`
 
 export default function PopconfirmDemo() {
   const [visible1, setVisible1] = useState(false)
+  const [lastAction, setLastAction] = useState('尚未确认或取消操作')
 
   const handleConfirm = () => {
-    console.log('Confirmed!')
+    setLastAction('已确认删除记录')
   }
 
   const handleCancel = () => {
-    console.log('Cancelled!')
+    setLastAction('已取消操作')
   }
 
   return (
@@ -68,6 +69,9 @@ export default function PopconfirmDemo() {
             onCancel={handleCancel}>
             <Button variant="secondary">删除</Button>
           </Popconfirm>
+          <p className="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+            操作反馈：{lastAction}
+          </p>
         </div>
       </DemoBlock>
 
@@ -133,7 +137,7 @@ export default function PopconfirmDemo() {
                 title="确定要提交这个表单吗？"
                 okText="提交"
                 cancelText="取消"
-                onConfirm={() => console.log('Form submitted')}>
+                onConfirm={() => setLastAction('表单已提交')}>
                 <Button>提交表单</Button>
               </Popconfirm>
             </div>
@@ -147,7 +151,7 @@ export default function PopconfirmDemo() {
                 icon="error"
                 okType="danger"
                 okText="删除"
-                onConfirm={() => console.log('User deleted')}>
+                onConfirm={() => setLastAction('用户已删除')}>
                 <Button variant="secondary">删除用户</Button>
               </Popconfirm>
             </div>
@@ -158,7 +162,7 @@ export default function PopconfirmDemo() {
               <Popconfirm
                 title="确定要发布这篇文章吗？"
                 description="发布后，文章将对所有用户可见。"
-                onConfirm={() => console.log('Article published')}>
+                onConfirm={() => setLastAction('文章已发布')}>
                 <Button>发布文章</Button>
               </Popconfirm>
             </div>
@@ -203,7 +207,7 @@ export default function PopconfirmDemo() {
               <Popconfirm
                 title="确定要继续吗？"
                 showIcon={false}
-                onConfirm={() => console.log('Confirmed')}>
+                onConfirm={() => setLastAction('已确认继续')}>
                 <Button>无图标</Button>
               </Popconfirm>
             </div>

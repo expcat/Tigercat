@@ -39,13 +39,26 @@ export * from './dev-warn'
 export * from './chat-window-utils'
 
 // ActivityFeed utilities
-export * from './activity-feed-utils'
+export {
+  activityItemClasses,
+  activityItemLayoutClasses,
+  activityItemBodyClasses,
+  activityItemHeaderClasses,
+  activityItemTitleGroupClasses,
+  activityItemDescriptionClasses,
+  activityItemActionsClasses,
+  formatActivityTime,
+  sortActivityGroups,
+  buildActivityGroups,
+  toActivityTimelineItems
+} from './activity-feed-utils'
+export type { ActivityTimelineItem } from './activity-feed-utils'
 
 // NotificationCenter utilities
-export * from './notification-center-utils'
+export { sortNotificationGroups, buildNotificationGroups } from './notification-center-utils'
 
 // CommentThread utilities
-export * from './comment-thread-utils'
+export { buildCommentTree, clipCommentTreeDepth } from './comment-thread-utils'
 
 // Composite time helpers
 export * from './composite-time-utils'

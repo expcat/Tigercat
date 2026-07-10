@@ -408,5 +408,4 @@ describe('Drawer', () => {
       expect(dialog.style.width).toBe('500px')
     })
   })
-  describe('Edge Cases', () => {})
 })

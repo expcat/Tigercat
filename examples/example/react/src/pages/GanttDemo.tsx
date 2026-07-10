@@ -44,6 +44,7 @@ const releaseTasks: GanttTask[] = [
 
 export default function GanttDemo() {
   const [selectedId, setSelectedId] = useState<string | number | null>(null)
+  const selectedTask = releaseTasks.find((task) => task.id === selectedId)
 
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-8">
@@ -60,6 +61,9 @@ export default function GanttDemo() {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               任务条、进度条与依赖线自动按时间范围布局。
             </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              移动端可在预览区域横向滚动，查看完整时间轴。
+            </p>
             <div className="space-y-4">
               <Gantt
                 data={releaseTasks}
@@ -75,7 +79,8 @@ export default function GanttDemo() {
                 desc="Feature delivery timeline"
               />
               <div className="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-                当前选择：{selectedId ?? '未选择'}
+                当前选择：
+                {selectedTask ? `${selectedTask.label}（${String(selectedTask.id)}）` : '未选择'}
               </div>
             </div>
           </section>

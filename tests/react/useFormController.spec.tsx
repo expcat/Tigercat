@@ -196,5 +196,4 @@ describe('useFormController (React)', () => {
     })
   })
 
-  describe('Edge Cases', () => {})
 })

@@ -297,6 +297,7 @@ const TableDemo: React.FC = () => {
 
   // Row selection state
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([])
+  const [lastAction, setLastAction] = useState('尚未执行表格操作')
 
   // Expandable rows state
   const [expandedKeys, setExpandedKeys] = useState<(string | number)[]>([])
@@ -508,13 +509,14 @@ const TableDemo: React.FC = () => {
   ]
 
   const handleEdit = (record: UserData) => {
-    alert(`编辑：${record.name}`)
+    setLastAction(`正在编辑：${record.name}`)
   }
 
   const handleDelete = (record: UserData) => {
     if (window.confirm(`确认删除 ${record.name}？`)) {
       setBasicData((prev) => prev.filter((item) => item.id !== record.id))
       setSelectedRowKeys((prev) => prev.filter((key) => key !== record.id))
+      setLastAction(`已删除：${record.name}`)
     }
   }
 
@@ -528,6 +530,9 @@ const TableDemo: React.FC = () => {
         <h1 className="text-3xl font-bold mb-2">Table 表格</h1>
         <p className="text-gray-600 dark:text-gray-400">
           用于展示行列数据的表格组件，支持排序、筛选、分页等功能。
+        </p>
+        <p className="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+          操作反馈：{lastAction}
         </p>
       </div>
 

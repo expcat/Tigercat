@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
-const VUE_URL = 'http://localhost:5173'
-const REACT_URL = 'http://localhost:5174'
+const VUE_URL = 'http://127.0.0.1:5173'
+const REACT_URL = 'http://127.0.0.1:5174'
 
 function demoUrl(baseUrl: string, path: string): string {
   return `${baseUrl}/#/${path}`

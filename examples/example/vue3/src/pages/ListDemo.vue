@@ -138,6 +138,7 @@ const productData = ref([
 
 const loading = ref(false)
 const pageInfo = ref({ current: 1, pageSize: 10 })
+const lastClicked = ref('尚未选择列表项')
 
 const pagedListData = computed(() => {
   const start = (pageInfo.value.current - 1) * pageInfo.value.pageSize
@@ -145,7 +146,7 @@ const pagedListData = computed(() => {
 })
 
 function handleItemClick(item: ListItem, index: number) {
-  console.log('点击了列表项:', item, '索引:', index)
+  lastClicked.value = `${String(item.title ?? item.key ?? '未命名项')}（第 ${index + 1} 项）`
 }
 
 function simulateLoading() {
@@ -157,7 +158,6 @@ function simulateLoading() {
 
 function handlePageChange(current: number, pageSize: number) {
   pageInfo.value = { current, pageSize }
-  console.log('分页变化:', { current, pageSize })
 }
 </script>
 
@@ -355,8 +355,11 @@ function handlePageChange(current: number, pageSize: number) {
       title="可点击列表"
       description="列表项可以添加点击事件和悬停效果。"
       :code="fullPageSnippet">
-      <div class="p-6 bg-gray-50 rounded-lg">
+      <div class="p-6 bg-gray-50 rounded-lg space-y-3">
         <List :dataSource="basicData" hoverable @item-click="handleItemClick" />
+        <p class="text-sm text-gray-600 dark:text-gray-300" role="status">
+          当前选择：{{ lastClicked }}
+        </p>
       </div>
     </DemoBlock>
 

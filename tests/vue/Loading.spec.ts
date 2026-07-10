@@ -120,5 +120,4 @@ describe('Loading (Vue)', () => {
     }
   })
 
-  describe('Edge Cases', () => {})
 })

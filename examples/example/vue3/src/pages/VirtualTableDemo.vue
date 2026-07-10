@@ -40,13 +40,17 @@
             :virtual-height="280"
             :virtual-item-height="48"
             striped
-            :row-selection="{ selectedRowKeys: [2, 4] }" />
+            :row-selection="{ selectedRowKeys }"
+            @selection-change="selectedRowKeys = $event" />
+          <p class="text-sm text-gray-600 dark:text-gray-300" role="status">
+            已选择业务 ID：{{ selectedRowKeys.join(', ') || '无' }}
+          </p>
         </section>
         <section class="space-y-3">
           <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">加载 & 空状态</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">loading 和 emptyText</p>
-          <div class="flex gap-4">
-            <div class="flex-1">
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
               <p class="text-sm text-gray-500 mb-2">Loading</p>
               <VirtualTable
                 :data-source="[]"
@@ -54,7 +58,7 @@
                 :virtual-height="200"
                 loading />
             </div>
-            <div class="flex-1">
+            <div>
               <p class="text-sm text-gray-500 mb-2">Empty</p>
               <VirtualTable
                 :data-source="[]"
@@ -70,10 +74,13 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { VirtualTable } from '@expcat/tigercat-vue/VirtualTable'
 import { type TableColumn } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 import fullPageSnippet from './VirtualTableDemo.fixture.vue?raw'
+
+const selectedRowKeys = ref<(string | number)[]>([2, 4])
 
 const basicColumns: TableColumn[] = [
   { key: 'id', title: 'ID', width: 80 },

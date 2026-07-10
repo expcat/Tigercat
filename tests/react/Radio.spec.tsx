@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -262,12 +262,6 @@ describe('Radio', () => {
     })
   })
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
-    })
-  })
-
   describe('Accessibility', () => {
     it('should be focusable', () => {
       const { container } = render(<Radio value="option1">Radio</Radio>)
@@ -291,6 +285,4 @@ describe('Radio', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-
-  describe('Edge Cases', () => {})
 })

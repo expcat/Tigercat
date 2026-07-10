@@ -379,6 +379,9 @@ const GridDemo: React.FC = () => {
         code={fullPageSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
+            <p className="mb-3 text-sm text-gray-600 dark:text-gray-300">
+              窄屏下可在下方区域横向滚动，查看不换行的后续栅格。
+            </p>
             <div className="overflow-x-auto overflow-y-hidden px-2">
               <Row gutter={16} wrap={false} className="min-w-[720px]">
                 <Col span={6}>

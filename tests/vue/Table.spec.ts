@@ -941,7 +941,6 @@ describe('Table', () => {
     })
   })
 
-  describe('Sticky Header', () => {})
 
   describe('Custom Rendering', () => {
     it('should render custom cell content', () => {
@@ -1380,6 +1379,4 @@ describe('Table', () => {
     })
   })
 
-  describe('v0.6.0 - Virtual Scroll', () => {})
-  describe('Edge Cases', () => {})
 })

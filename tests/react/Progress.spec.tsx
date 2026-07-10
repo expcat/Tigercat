@@ -154,5 +154,4 @@ describe('Progress', () => {
     expect(progressbar.className).not.toContain('progress-stripes')
   })
 
-  describe('Edge Cases', () => {})
 })

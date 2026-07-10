@@ -64,13 +64,18 @@ const currencyFormat = (value: number | string) => `$${value}`
       <div class="space-y-6">
         <section class="space-y-3">
           <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">自动生成坐标轴与网格。</p>
-          <BarChart
-            :data="basicData"
-            :width="420"
-            :height="240"
-            x-axis-label="Weekday"
-            y-axis-label="Sales" />
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            自动生成坐标轴与网格；responsive 会让图表跟随容器宽度，适配移动端。
+          </p>
+          <div class="h-[240px] w-full max-w-[420px]">
+            <BarChart
+              :data="basicData"
+              :width="420"
+              :height="240"
+              responsive
+              x-axis-label="Weekday"
+              y-axis-label="Sales" />
+          </div>
         </section>
         <section class="space-y-3">
           <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">渐变填充 + 动画</h3>

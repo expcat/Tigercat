@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Card } from '@expcat/tigercat-react/Card'
 import { Space } from '@expcat/tigercat-react/Space'
 import { Button } from '@expcat/tigercat-react/Button'
@@ -26,6 +27,9 @@ const structureSnippet = `<Card header={...} footer={...} actions={...}>...</Car
 const fullSnippet = `<Card variant="shadow" hoverable cover="..." header={...} footer={...} actions={...}>...</Card>`
 
 export default function CardDemo() {
+  const [lastAction, setLastAction] = useState('尚未执行卡片操作')
+  const recordAction = (action: string, target: string) => setLastAction(`${action}：${target}`)
+
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
@@ -162,10 +166,16 @@ export default function CardDemo() {
               header={<h3 className="text-lg font-semibold">操作卡片</h3>}
               actions={
                 <>
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => recordAction('取消', '操作卡片')}>
                     取消
                   </Button>
-                  <Button variant="primary" size="sm">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => recordAction('确认', '操作卡片')}>
                     确认
                   </Button>
                 </>
@@ -195,10 +205,16 @@ export default function CardDemo() {
               }
               actions={
                 <>
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => recordAction('收藏', '基础套餐')}>
                     收藏
                   </Button>
-                  <Button variant="primary" size="sm">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => recordAction('购买', '基础套餐')}>
                     购买
                   </Button>
                 </>
@@ -222,10 +238,16 @@ export default function CardDemo() {
               }
               actions={
                 <>
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => recordAction('收藏', '创新方案')}>
                     收藏
                   </Button>
-                  <Button variant="primary" size="sm">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => recordAction('购买', '创新方案')}>
                     购买
                   </Button>
                 </>
@@ -249,10 +271,16 @@ export default function CardDemo() {
               }
               actions={
                 <>
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => recordAction('收藏', '专业服务')}>
                     收藏
                   </Button>
-                  <Button variant="primary" size="sm">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => recordAction('购买', '专业服务')}>
                     购买
                   </Button>
                 </>
@@ -260,6 +288,9 @@ export default function CardDemo() {
               <p className="text-gray-600 mb-4">专业团队为您提供一对一的咨询和技术支持。</p>
             </Card>
           </div>
+          <p className="text-sm text-gray-600 dark:text-gray-300" role="status">
+            操作反馈：{lastAction}
+          </p>
         </div>
       </DemoBlock>
     </div>

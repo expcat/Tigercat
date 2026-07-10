@@ -197,5 +197,4 @@ describe('Alert', () => {
     expect(screen.getByText('Banner Alert')).toBeInTheDocument()
   })
 
-  describe('Edge Cases', () => {})
 })

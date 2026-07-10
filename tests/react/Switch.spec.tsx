@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -129,12 +129,6 @@ describe('Switch', () => {
       const el = getSwitch(container)
       expect(el).toHaveAttribute('aria-disabled', 'true')
       expect(el).toHaveAttribute('tabindex', '-1')
-    })
-  })
-
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
     })
   })
 

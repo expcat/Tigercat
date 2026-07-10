@@ -405,24 +405,37 @@ export const ScatterChart = defineComponent({
           : null
 
       if (!props.showLegend) {
-        return h('div', { class: 'inline-block relative' }, [chart, tooltip])
+        return h(
+          'div',
+          {
+            class: classNames(
+              'relative',
+              props.responsive ? 'block w-full min-w-0' : 'inline-block'
+            )
+          },
+          [chart, tooltip]
+        )
       }
 
-      return h('div', { class: wrapperClasses.value }, [
-        chart,
-        h(ChartLegend, {
-          items: legendItems.value,
-          position: props.legendPosition,
-          markerSize: props.legendMarkerSize,
-          gap: props.legendGap,
-          ariaLabel: labels.value.legendAriaLabel,
-          interactive: props.hoverable || props.selectable,
-          onItemClick: handleLegendClick,
-          onItemHover: handleLegendHover,
-          onItemLeave: handleLegendLeave
-        }),
-        tooltip
-      ])
+      return h(
+        'div',
+        { class: classNames(wrapperClasses.value, props.responsive && 'w-full min-w-0') },
+        [
+          chart,
+          h(ChartLegend, {
+            items: legendItems.value,
+            position: props.legendPosition,
+            markerSize: props.legendMarkerSize,
+            gap: props.legendGap,
+            ariaLabel: labels.value.legendAriaLabel,
+            interactive: props.hoverable || props.selectable,
+            onItemClick: handleLegendClick,
+            onItemHover: handleLegendHover,
+            onItemLeave: handleLegendLeave
+          }),
+          tooltip
+        ]
+      )
     }
   }
 })

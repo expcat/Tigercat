@@ -462,6 +462,7 @@ const lockableColumns: TableColumn[] = [
 
 // Row selection
 const selectedRowKeys = ref<number[]>([])
+const lastAction = ref('尚未执行表格操作')
 
 // Expandable rows
 const expandedKeys = ref<(string | number)[]>([])
@@ -473,7 +474,7 @@ const pagination = ref({
 })
 
 function handleEdit(record: UserData) {
-  alert(`编辑：${record.name}`)
+  lastAction.value = `正在编辑：${record.name}`
 }
 
 function handleDelete(record: UserData) {
@@ -482,6 +483,7 @@ function handleDelete(record: UserData) {
     if (index > -1) {
       basicData.value.splice(index, 1)
       selectedRowKeys.value = selectedRowKeys.value.filter((key) => key !== record.id)
+      lastAction.value = `已删除：${record.name}`
     }
   }
 }
@@ -518,6 +520,9 @@ const pagedData = computed(() => {
       <h1 class="text-3xl font-bold mb-2">Table 表格</h1>
       <p class="text-gray-600 dark:text-gray-400">
         用于展示行列数据的表格组件，支持排序、筛选、分页等功能。
+      </p>
+      <p class="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+        操作反馈：{{ lastAction }}
       </p>
     </div>
 

@@ -126,6 +126,7 @@ const verticalSnippet = `<List dataSource={userData} itemLayout="vertical" />`
 export default function ListDemo() {
   const [loading, setLoading] = useState(false)
   const [pageInfo, setPageInfo] = useState({ current: 1, pageSize: 10 })
+  const [lastClicked, setLastClicked] = useState('尚未选择列表项')
 
   const pagedListData = largeData.slice(
     (pageInfo.current - 1) * pageInfo.pageSize,
@@ -133,7 +134,7 @@ export default function ListDemo() {
   )
 
   const handleItemClick = (item: DemoItem, index: number) => {
-    console.log('点击了列表项:', item, '索引:', index)
+    setLastClicked(`${String(item.title ?? item.key ?? '未命名项')}（第 ${index + 1} 项）`)
   }
 
   const simulateLoading = () => {
@@ -357,8 +358,11 @@ export default function ListDemo() {
         title="可点击列表"
         description="列表项可以添加点击事件和悬停效果。"
         code={fullPageSnippet}>
-        <div className="p-6 bg-gray-50 rounded-lg">
+        <div className="p-6 bg-gray-50 rounded-lg space-y-3">
           <List dataSource={basicData} hoverable onItemClick={handleItemClick} />
+          <p className="text-sm text-gray-600 dark:text-gray-300" role="status">
+            当前选择：{lastClicked}
+          </p>
         </div>
       </DemoBlock>
 

@@ -93,5 +93,4 @@ describe('Empty (Vue)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {})
 })

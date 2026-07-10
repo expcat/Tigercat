@@ -8,13 +8,15 @@ import DemoBlock from '../components/DemoBlock.vue'
 import fullPageSnippet from './DropdownDemo.vue?raw'
 
 const visible1 = ref(false)
+const lastCommand = ref('尚未选择操作')
 
 const controlledScriptSnippet = `import { ref } from 'vue'
 
 const visible1 = ref(false)`
 
 const handleCommand = (command: string) => {
-  console.log('点击了：', command)
+  const labels: Record<string, string> = { edit: '编辑', copy: '复制', delete: '删除' }
+  lastCommand.value = labels[command] ?? command
 }
 
 const basicSnippet = `<Dropdown>
@@ -141,7 +143,7 @@ const clickSnippet = `<Dropdown>
 </Dropdown>`
 
 const controlledSnippet = `<div class="flex gap-4 items-center">
-  <Dropdown v-model:visible="visible1">
+  <Dropdown v-model:open="visible1">
     <Button>受控下拉菜单</Button>
     <DropdownMenu>
       <DropdownItem>菜单项 1</DropdownItem>
@@ -199,7 +201,7 @@ const closeOnClickSnippet = `<Dropdown :close-on-click="false" trigger="click">
   </DropdownMenu>
 </Dropdown>`
 
-const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click">
+const defaultVisibleSnippet = `<Dropdown :default-open="true" trigger="click">
   <Button>默认展开</Button>
   <DropdownMenu>
     <DropdownItem>菜单项 1</DropdownItem>
@@ -352,25 +354,30 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     <!-- 点击事件 -->
     <DemoBlock
       title="点击事件"
-      description="监听菜单项的点击事件（查看控制台）。"
+      description="监听菜单项的点击事件，并在页面中回显最近操作。"
       :code="fullPageSnippet">
-      <Dropdown>
-        <Button>操作</Button>
-        <DropdownMenu>
-          <DropdownItem @click="handleCommand('edit')">编辑</DropdownItem>
-          <DropdownItem @click="handleCommand('copy')">复制</DropdownItem>
-          <DropdownItem @click="handleCommand('delete')" divided>删除</DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+      <div class="space-y-3">
+        <Dropdown>
+          <Button>操作</Button>
+          <DropdownMenu>
+            <DropdownItem @click="handleCommand('edit')">编辑</DropdownItem>
+            <DropdownItem @click="handleCommand('copy')">复制</DropdownItem>
+            <DropdownItem @click="handleCommand('delete')" divided>删除</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+        <p class="text-sm text-gray-600 dark:text-gray-300" role="status">
+          最近操作：{{ lastCommand }}
+        </p>
+      </div>
     </DemoBlock>
 
     <!-- 受控模式 -->
     <DemoBlock
       title="受控模式"
-      description="通过 v-model:visible 控制下拉菜单的显示隐藏。"
+      description="通过 v-model:open 控制下拉菜单的显示隐藏。"
       :code="fullPageSnippet">
       <div class="flex gap-4 items-center">
-        <Dropdown v-model:visible="visible1">
+        <Dropdown v-model:open="visible1">
           <Button>受控下拉菜单</Button>
           <DropdownMenu>
             <DropdownItem>菜单项 1</DropdownItem>
@@ -443,7 +450,7 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
         </div>
         <div class="space-y-3">
           <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">默认展开</h3>
-          <Dropdown :default-visible="true" trigger="click">
+          <Dropdown :default-open="true" trigger="click">
             <Button>默认展开</Button>
             <DropdownMenu>
               <DropdownItem>菜单项 1</DropdownItem>

@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test'
 
 const targets = [
-  { label: 'Vue', baseUrl: 'http://localhost:5173' },
-  { label: 'React', baseUrl: 'http://localhost:5174' }
+  { label: 'Vue', baseUrl: 'http://127.0.0.1:5173' },
+  { label: 'React', baseUrl: 'http://127.0.0.1:5174' }
 ] as const
 
 function demoUrl(baseUrl: string, path: string): string {
@@ -57,10 +57,10 @@ for (const { label, baseUrl } of targets) {
       await preparePage(page, demoUrl(baseUrl, 'table'))
 
       const sortingTable = page.locator('table').nth(2)
-      await sortingTable.getByRole('columnheader', { name: /Name/ }).click()
+      await sortingTable.getByRole('columnheader', { name: /姓名/ }).click()
       await expect(sortingTable.locator('tbody tr').first()).toContainText('Alice Brown')
 
-      await page.getByPlaceholder('Search name...').fill('Jane')
+      await page.getByPlaceholder('搜索姓名...').fill('Jane')
       const filterTable = page.locator('table').nth(3)
       await expect(filterTable.locator('tbody tr')).toHaveCount(1)
       await expect(filterTable.locator('tbody tr').first()).toContainText('Jane Smith')

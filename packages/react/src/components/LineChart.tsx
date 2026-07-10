@@ -590,7 +590,7 @@ export const LineChart: React.FC<LineChartProps> = ({
 
   if (!showLegend) {
     return (
-      <div className="inline-block relative">
+      <div className={classNames('relative', responsive ? 'block w-full min-w-0' : 'inline-block')}>
         {chart}
         {tooltip}
       </div>
@@ -598,7 +598,7 @@ export const LineChart: React.FC<LineChartProps> = ({
   }
 
   return (
-    <div className={wrapperClasses}>
+    <div className={classNames(wrapperClasses, responsive && 'w-full min-w-0')}>
       {chart}
       <ChartLegend
         items={legendItems}

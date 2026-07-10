@@ -80,7 +80,7 @@ pnpm example:build
 npx playwright test
 ```
 
-测试约定见 [tests/README.md](tests/README.md)。组件测试应覆盖渲染、props、事件、状态、主题、无障碍和主要快照。
+测试约定见 [tests/README.md](tests/README.md)。组件测试应覆盖渲染、props、事件、状态、主题、无障碍和主要交互回归；浏览器测试使用功能断言，不新增图片对比基线。
 
 ## PR 要求
 

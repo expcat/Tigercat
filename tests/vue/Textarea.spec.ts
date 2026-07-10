@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Textarea } from '@expcat/tigercat-vue'
@@ -163,12 +163,6 @@ describe('Textarea', () => {
     })
   })
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
-    })
-  })
-
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
       const { container } = render(Textarea, { attrs: { 'aria-label': 'Description textarea' } })
@@ -189,6 +183,4 @@ describe('Textarea', () => {
       expect(onFocus).toHaveBeenCalled()
     })
   })
-
-  describe('Edge Cases', () => {})
 })

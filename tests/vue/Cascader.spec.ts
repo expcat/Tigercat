@@ -48,7 +48,6 @@ const optionsWithDisabled = [
 ]
 
 describe('Cascader', () => {
-  describe('Rendering', () => {})
 
   describe('Props', () => {
     it.each(componentSizes)('should render %s size correctly', (size) => {

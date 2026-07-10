@@ -6,6 +6,11 @@ import {
   buildCommentTree,
   clipCommentTreeDepth,
   formatCommentTime,
+  type CommentAction,
+  type CommentNode,
+  type CommentThreadProps as CoreCommentThreadProps
+} from '@expcat/tigercat-core'
+import {
   commentThreadActionButtonClasses,
   commentThreadPrimaryButtonClasses,
   commentThreadLikeButtonClasses,
@@ -25,11 +30,8 @@ import {
   commentThreadSubmitButtonClasses,
   commentThreadRepliesClasses,
   commentThreadEmptyClasses,
-  commentThreadEmptyIconClasses,
-  type CommentAction,
-  type CommentNode,
-  type CommentThreadProps as CoreCommentThreadProps
-} from '@expcat/tigercat-core'
+  commentThreadEmptyIconClasses
+} from '../../../core/src/internal/comment-thread-styles'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
 import { Button } from './Button'
@@ -380,10 +382,7 @@ export const CommentThread = defineComponent({
           class: classNames(
             'tiger-comment-thread-item',
             depth === 1 && 'py-5',
-            depth === 1 &&
-              !isLast &&
-              props.showDivider &&
-              commentThreadDividerClasses
+            depth === 1 && !isLast && props.showDivider && commentThreadDividerClasses
           ),
           key: node.id
         },

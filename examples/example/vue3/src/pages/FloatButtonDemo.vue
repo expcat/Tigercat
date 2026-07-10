@@ -14,7 +14,7 @@
             <FloatButton
               tooltip="默认"
               style="position: absolute; right: 24px; bottom: 24px"
-              @click="onClick" />
+              @click="lastAction = '点击了默认悬浮按钮'" />
             <FloatButton
               shape="square"
               type="default"
@@ -33,8 +33,8 @@
               <template #trigger>
                 <FloatButton tooltip="菜单" />
               </template>
-              <FloatButton tooltip="操作 A" type="default" />
-              <FloatButton tooltip="操作 B" type="default" />
+              <FloatButton tooltip="操作 A" type="default" @click="lastAction = '选择了操作 A'" />
+              <FloatButton tooltip="操作 B" type="default" @click="lastAction = '选择了操作 B'" />
             </FloatButtonGroup>
           </div>
         </div>
@@ -47,6 +47,9 @@
               style="position: absolute; right: 24px; bottom: 24px" />
           </div>
         </div>
+        <p class="text-sm text-gray-600 dark:text-gray-300" role="status">
+          操作反馈：{{ lastAction }}
+        </p>
       </div>
     </DemoBlock>
 
@@ -59,20 +62,20 @@
         placement="bottom-right"
         :offset="24"
         tooltip="客服"
-        aria-label="客服入口" />
+        aria-label="客服入口"
+        @click="lastAction = '已打开客服入口'" />
     </DemoBlock>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { FloatButton } from '@expcat/tigercat-vue/FloatButton'
 import { FloatButtonGroup } from '@expcat/tigercat-vue/FloatButtonGroup'
 import DemoBlock from '../components/DemoBlock.vue'
 import fullPageSnippet from './FloatButtonDemo.vue?raw'
 
-const onClick = () => {
-  console.log('FloatButton clicked')
-}
+const lastAction = ref('尚未点击悬浮按钮')
 
 const basicSnippet = `<FloatButton tooltip="默认" @click="onClick" />
 <FloatButton shape="square" type="default" tooltip="方形" />

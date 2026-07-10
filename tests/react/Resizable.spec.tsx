@@ -94,7 +94,6 @@ describe('Resizable', () => {
     })
   })
 
-  describe('No dimensions', () => {})
 
   describe('Min/Max constraints', () => {
     it('should apply minWidth and minHeight', () => {
@@ -110,9 +109,7 @@ describe('Resizable', () => {
     })
   })
 
-  describe('Aspect ratio', () => {})
 
-  describe('Custom style', () => {})
 
   describe('Resize callbacks', () => {
     it('should call onResize during drag', () => {

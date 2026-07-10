@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Slider } from '@expcat/tigercat-vue'
 import {
@@ -223,12 +223,6 @@ describe('Slider', () => {
       expect(container.textContent).toContain('0°C')
       expect(container.textContent).toContain('50°C')
       expect(container.textContent).toContain('100°C')
-    })
-  })
-
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
     })
   })
 

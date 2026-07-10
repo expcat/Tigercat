@@ -13,20 +13,21 @@ const fileList4 = ref<UploadFile[]>([])
 const fileList5 = ref<UploadFile[]>([])
 const fileList6 = ref<UploadFile[]>([])
 const fileList7 = ref<UploadFile[]>([])
+const uploadFeedback = ref('尚未执行上传操作')
 
 const handleChange = (file: UploadFile, list: UploadFile[]) => {
-  console.log('File changed:', file, list)
+  uploadFeedback.value = `${file.name} 已加入上传列表，当前 ${list.length} 个文件。`
 }
 
 const handlePreview = (file: UploadFile) => {
-  console.log('Preview file:', file)
+  uploadFeedback.value = `正在预览 ${file.name}`
   if (file.url) {
     window.open(file.url, '_blank')
   }
 }
 
 const handleExceed = (_files: File[], list: UploadFile[]) => {
-  alert(`最多只能上传 3 个文件，当前已有 ${list.length} 个。`)
+  uploadFeedback.value = `已拒绝超出数量限制的文件；当前已有 ${list.length} 个，最多 3 个。`
 }
 
 const beforeUpload = (file: File) => {
@@ -35,13 +36,14 @@ const beforeUpload = (file: File) => {
   const isLt2M = file.size / 1024 / 1024 < 2
 
   if (!isJPG && !isPNG) {
-    alert('只能上传 JPG/PNG 格式的图片！')
+    uploadFeedback.value = `已拒绝 ${file.name}：只能上传 JPG/PNG 格式的图片。`
     return false
   }
   if (!isLt2M) {
-    alert('图片大小不能超过 2MB！')
+    uploadFeedback.value = `已拒绝 ${file.name}：图片大小不能超过 2MB。`
     return false
   }
+  uploadFeedback.value = `${file.name} 校验通过，等待上传。`
   return true
 }
 
@@ -50,9 +52,11 @@ const simulateUpload = (options: UploadRequestOptions) => {
   const timer = setInterval(() => {
     progress += 20
     options.onProgress?.(progress)
+    uploadFeedback.value = `正在上传 ${options.file.name}：${progress}%`
     if (progress >= 100) {
       clearInterval(timer)
-      options.onSuccess?.({ url: URL.createObjectURL(options.file) })
+      options.onSuccess?.({ name: options.file.name })
+      uploadFeedback.value = `${options.file.name} 上传完成`
     }
   }, 500)
 }
@@ -131,6 +135,9 @@ const customRequestSnippet = `<div class="max-w-md">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Upload 文件上传</h1>
       <p class="text-gray-600 dark:text-gray-400">通过点击或者拖拽上传文件。</p>
+      <p class="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+        上传反馈：{{ uploadFeedback }}
+      </p>
     </div>
 
     <!-- 基础用法 -->

@@ -4,6 +4,11 @@ import {
   buildCommentTree,
   clipCommentTreeDepth,
   formatCommentTime,
+  type CommentAction,
+  type CommentNode,
+  type CommentThreadProps as CoreCommentThreadProps
+} from '@expcat/tigercat-core'
+import {
   commentThreadActionButtonClasses,
   commentThreadPrimaryButtonClasses,
   commentThreadLikeButtonClasses,
@@ -23,11 +28,8 @@ import {
   commentThreadSubmitButtonClasses,
   commentThreadRepliesClasses,
   commentThreadEmptyClasses,
-  commentThreadEmptyIconClasses,
-  type CommentAction,
-  type CommentNode,
-  type CommentThreadProps as CoreCommentThreadProps
-} from '@expcat/tigercat-core'
+  commentThreadEmptyIconClasses
+} from '../../../core/src/internal/comment-thread-styles'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
 import { Button } from './Button'
@@ -202,7 +204,10 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           key="more"
           size="sm"
           variant="ghost"
-          className={classNames(commentThreadActionButtonClasses, commentThreadNeutralButtonClasses)}
+          className={classNames(
+            commentThreadActionButtonClasses,
+            commentThreadNeutralButtonClasses
+          )}
           onClick={() => onMore?.(node)}>
           <svg
             className="w-3.5 h-3.5"
@@ -250,10 +255,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         className={classNames(
           'tiger-comment-thread-item',
           depth === 1 && 'py-5',
-          depth === 1 &&
-            !isLast &&
-            showDivider &&
-            commentThreadDividerClasses
+          depth === 1 && !isLast && showDivider && commentThreadDividerClasses
         )}>
         <div className="flex gap-3">
           {showAvatar && node.user ? (
@@ -267,20 +269,12 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {node.user?.name ? (
-                <Text
-                  tag="span"
-                  size="sm"
-                  weight="bold"
-                  className={commentThreadAuthorClasses}>
+                <Text tag="span" size="sm" weight="bold" className={commentThreadAuthorClasses}>
                   {node.user.name}
                 </Text>
               ) : null}
               {node.user?.title ? (
-                <Text
-                  tag="span"
-                  size="xs"
-                  color="muted"
-                  className={commentThreadUserTitleClasses}>
+                <Text tag="span" size="xs" color="muted" className={commentThreadUserTitleClasses}>
                   {node.user.title}
                 </Text>
               ) : null}
@@ -302,19 +296,13 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 </Tag>
               ))}
               {node.time ? (
-                <Text
-                  tag="span"
-                  size="xs"
-                  color="muted"
-                  className={commentThreadTimeClasses}>
+                <Text tag="span" size="xs" color="muted" className={commentThreadTimeClasses}>
                   {formatCommentTime(node.time)}
                 </Text>
               ) : null}
             </div>
 
-            <div className={commentThreadContentClasses}>
-              {node.content}
-            </div>
+            <div className={commentThreadContentClasses}>{node.content}</div>
 
             {actions.length > 0 ? (
               <div className="flex flex-wrap items-center gap-1.5">{actions}</div>
@@ -355,10 +343,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               <Button
                 size="sm"
                 variant="ghost"
-                className={classNames(
-                  'mt-2 font-semibold',
-                  commentThreadPrimaryButtonClasses
-                )}
+                className={classNames('mt-2 font-semibold', commentThreadPrimaryButtonClasses)}
                 aria-expanded={isExpanded}
                 aria-controls={repliesId}
                 onClick={() => toggleExpanded(node.id)}>
@@ -367,9 +352,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             ) : null}
 
             {showReplies ? (
-              <div
-                id={repliesId}
-                className={commentThreadRepliesClasses}>
+              <div id={repliesId} className={commentThreadRepliesClasses}>
                 {visibleChildren.map((child, index) =>
                   renderNode(child, depth + 1, index === visibleChildren.length - 1)
                 )}

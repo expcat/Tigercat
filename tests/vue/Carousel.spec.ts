@@ -314,5 +314,4 @@ describe('Carousel', () => {
       expect(onChange).toHaveBeenCalledWith(1, 0)
     })
   })
-  describe('Edge Cases', () => {})
 })

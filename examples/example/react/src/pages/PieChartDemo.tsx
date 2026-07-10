@@ -24,6 +24,8 @@ const PieChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [clickedSlice, setClickedSlice] = useState('')
+  const selectedDatum = selectedIndex === null ? undefined : colorfulData[selectedIndex]
+  const colorfulTotal = colorfulData.reduce((sum, datum) => sum + datum.value, 0)
 
   const handleSliceClick = (_index: number, datum: PieChartDatum) => {
     setClickedSlice(`点击了 ${datum.label}，值 ${datum.value}`)
@@ -111,7 +113,10 @@ const PieChartDemo: React.FC = () => {
                 onSliceClick={handleSliceClick}
               />
               <p className="text-sm text-gray-500">
-                选中: {selectedIndex !== null ? colorfulData[selectedIndex]?.label : '无'}
+                选中:{' '}
+                {selectedDatum
+                  ? `${selectedDatum.label} · ${selectedDatum.value} · ${((selectedDatum.value / colorfulTotal) * 100).toFixed(1)}%`
+                  : '无'}
                 {clickedSlice && <span className="ml-4">{clickedSlice}</span>}
               </p>
             </div>

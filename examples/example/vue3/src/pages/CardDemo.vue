@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Card } from '@expcat/tigercat-vue/Card'
 import { Space } from '@expcat/tigercat-vue/Space'
 import { Button } from '@expcat/tigercat-vue/Button'
 import DemoBlock from '../components/DemoBlock.vue'
 import fullPageSnippet from './CardDemo.vue?raw'
+
+const lastAction = ref('尚未执行卡片操作')
+const recordAction = (action: string, target: string) => {
+  lastAction.value = `${action}：${target}`
+}
 
 const basicSnippet = `<Card>...</Card>`
 
@@ -173,8 +179,12 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
             </template>
             <p class="text-gray-600 dark:text-gray-400">这个卡片包含操作按钮。</p>
             <template #actions>
-              <Button variant="ghost" size="sm">取消</Button>
-              <Button variant="primary" size="sm">确认</Button>
+              <Button variant="ghost" size="sm" @click="recordAction('取消', '操作卡片')">
+                取消
+              </Button>
+              <Button variant="primary" size="sm" @click="recordAction('确认', '操作卡片')">
+                确认
+              </Button>
             </template>
           </Card>
         </div>
@@ -200,8 +210,12 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
               </div>
             </template>
             <template #actions>
-              <Button variant="ghost" size="sm">收藏</Button>
-              <Button variant="primary" size="sm">购买</Button>
+              <Button variant="ghost" size="sm" @click="recordAction('收藏', '基础套餐')">
+                收藏
+              </Button>
+              <Button variant="primary" size="sm" @click="recordAction('购买', '基础套餐')">
+                购买
+              </Button>
             </template>
           </Card>
 
@@ -221,8 +235,12 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
               </div>
             </template>
             <template #actions>
-              <Button variant="ghost" size="sm">收藏</Button>
-              <Button variant="primary" size="sm">购买</Button>
+              <Button variant="ghost" size="sm" @click="recordAction('收藏', '创新方案')">
+                收藏
+              </Button>
+              <Button variant="primary" size="sm" @click="recordAction('购买', '创新方案')">
+                购买
+              </Button>
             </template>
           </Card>
 
@@ -242,11 +260,18 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
               </div>
             </template>
             <template #actions>
-              <Button variant="ghost" size="sm">收藏</Button>
-              <Button variant="primary" size="sm">购买</Button>
+              <Button variant="ghost" size="sm" @click="recordAction('收藏', '专业服务')">
+                收藏
+              </Button>
+              <Button variant="primary" size="sm" @click="recordAction('购买', '专业服务')">
+                购买
+              </Button>
             </template>
           </Card>
         </div>
+        <p class="text-sm text-gray-600 dark:text-gray-300" role="status">
+          操作反馈：{{ lastAction }}
+        </p>
       </div>
     </DemoBlock>
   </div>

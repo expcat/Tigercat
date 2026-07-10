@@ -71,10 +71,11 @@ const UploadDemo: React.FC = () => {
   const [fileList5, setFileList5] = useState<UploadFile[]>([])
   const [fileList6, setFileList6] = useState<UploadFile[]>([])
   const [fileList7, setFileList7] = useState<UploadFile[]>([])
+  const [uploadFeedback, setUploadFeedback] = useState('尚未执行上传操作')
 
   const handleChange = (file: UploadFile, list: UploadFile[]) => {
-    console.log('File changed:', file, list)
     setFileList(list)
+    setUploadFeedback(`${file.name} 已加入上传列表，当前 ${list.length} 个文件。`)
   }
 
   const handleChange2 = (_file: UploadFile, list: UploadFile[]) => {
@@ -106,22 +107,24 @@ const UploadDemo: React.FC = () => {
     const timer = setInterval(() => {
       progress += 20
       options.onProgress?.(progress)
+      setUploadFeedback(`正在上传 ${options.file.name}：${progress}%`)
       if (progress >= 100) {
         clearInterval(timer)
-        options.onSuccess?.({ url: URL.createObjectURL(options.file) })
+        options.onSuccess?.({ name: options.file.name })
+        setUploadFeedback(`${options.file.name} 上传完成`)
       }
     }, 500)
   }
 
   const handlePreview = (file: UploadFile) => {
-    console.log('Preview file:', file)
+    setUploadFeedback(`正在预览 ${file.name}`)
     if (file.url) {
       window.open(file.url, '_blank')
     }
   }
 
   const handleExceed = (_files: File[], list: UploadFile[]) => {
-    alert(`最多只能上传 3 个文件，当前已有 ${list.length} 个。`)
+    setUploadFeedback(`已拒绝超出数量限制的文件；当前已有 ${list.length} 个，最多 3 个。`)
   }
 
   const beforeUpload = (file: File) => {
@@ -130,13 +133,14 @@ const UploadDemo: React.FC = () => {
     const isLt2M = file.size / 1024 / 1024 < 2
 
     if (!isJPG && !isPNG) {
-      alert('只能上传 JPG/PNG 格式的图片！')
+      setUploadFeedback(`已拒绝 ${file.name}：只能上传 JPG/PNG 格式的图片。`)
       return false
     }
     if (!isLt2M) {
-      alert('图片大小不能超过 2MB！')
+      setUploadFeedback(`已拒绝 ${file.name}：图片大小不能超过 2MB。`)
       return false
     }
+    setUploadFeedback(`${file.name} 校验通过，等待上传。`)
     return true
   }
 
@@ -145,6 +149,9 @@ const UploadDemo: React.FC = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Upload 文件上传</h1>
         <p className="text-gray-600 dark:text-gray-400">通过点击或者拖拽上传文件。</p>
+        <p className="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+          上传反馈：{uploadFeedback}
+        </p>
       </div>
 
       {/* 基础用法 */}

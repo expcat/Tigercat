@@ -67,6 +67,8 @@ export function App() {
 | [在线示例](https://expcat.github.io/Tigercat/)         | 🚀 GitHub Pages 组件演示（Vue 3 / React）        |
 | [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md) | 📘 **AI Agent 入口** - 组件列表、API、主题、i18n |
 | [docs/ROADMAP.md](./docs/ROADMAP.md)                   | 开发路线图与当前规划                             |
+| [docs/MIGRATION.md](./docs/MIGRATION.md)               | v2 breaking change 与迁移路径                    |
+| [CHANGELOG.md](./CHANGELOG.md)                         | 版本变更与发布历史                               |
 | [tests/README.md](./tests/README.md)                   | 测试结构、运行方式与质量标准入口                 |
 | [examples/README.md](./examples/README.md)             | Vue / React 示例应用运行说明                     |
 
@@ -77,7 +79,7 @@ export function App() {
 - `Table` 与 `VirtualTable` 的固定列默认会跟随表格 token、条纹行和 hover 状态；需要覆盖 sticky 单元格外观时，优先在列定义上使用 `fixedClassName` / `fixedHeaderClassName`，而不是写全局 `[style*="position: sticky"]` 选择器。
 - 图表基于纯 SVG，无第三方图表运行时依赖；超过 1000 点建议启用降采样，超过 5000 点建议服务端聚合。
 - 主题基于 CSS 变量，推荐使用 `setThemeColors` 批量更新变量，减少重复重绘。
-- 浏览器支持范围为现代浏览器最新两个主要版本；当前 E2E 配置只运行 Chromium，如需恢复 Firefox/WebKit，可在 [playwright.config.ts](./playwright.config.ts) 中重新添加 project 并生成对应快照。
+- 浏览器支持范围为现代浏览器最新两个主要版本；功能 E2E 覆盖 Chromium、Firefox、WebKit 与移动 Chromium，不维护跨系统易漂移的图片对比基线。
 
 ## 包
 

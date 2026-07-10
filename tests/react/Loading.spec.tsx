@@ -106,5 +106,4 @@ describe('Loading (React)', () => {
     }
   })
 
-  describe('Edge Cases', () => {})
 })

@@ -24,6 +24,12 @@ const total = computed(() => interactiveData.reduce((s, d) => s + d.value, 0))
 
 const hoveredIndex = ref<number | null>(null)
 const selectedIndex = ref<number | null>(null)
+const selectedSummary = computed(() => {
+  if (selectedIndex.value === null) return '无'
+  const datum = interactiveData[selectedIndex.value]
+  if (!datum) return '无'
+  return `${datum.label} · ${datum.value} · ${((datum.value / total.value) * 100).toFixed(1)}%`
+})
 </script>
 
 <template>
@@ -88,9 +94,7 @@ const selectedIndex = ref<number | null>(null)
               selectable
               :show-labels="true"
               v-model:selectedIndex="selectedIndex" />
-            <p class="text-sm text-gray-500">
-              选中: {{ selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无' }}
-            </p>
+            <p class="text-sm text-gray-500">选中: {{ selectedSummary }}</p>
           </div>
         </section>
         <section class="space-y-3">

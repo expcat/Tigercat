@@ -1,9 +1,10 @@
+import { useState } from 'react'
 import { FloatButton } from '@expcat/tigercat-react/FloatButton'
 import { FloatButtonGroup } from '@expcat/tigercat-react/FloatButtonGroup'
 import DemoBlock from '../components/DemoBlock'
 import fullPageSnippet from './FloatButtonDemo.tsx?raw'
 
-const basicSnippet = `<FloatButton tooltip="默认" onClick={() => console.log('clicked')} />
+const basicSnippet = `<FloatButton tooltip="默认" onClick={handleClick} />
 <FloatButton shape="square" type="default" tooltip="方形" />
 <FloatButton size="lg" tooltip="大号" />`
 
@@ -23,6 +24,8 @@ const floatingSnippet = `<FloatButton
 />`
 
 const FloatButtonDemo: React.FC = () => {
+  const [lastAction, setLastAction] = useState('尚未点击悬浮按钮')
+
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">FloatButton 悬浮按钮</h1>
@@ -39,7 +42,7 @@ const FloatButtonDemo: React.FC = () => {
               <FloatButton
                 tooltip="默认"
                 style={{ position: 'absolute', right: 24, bottom: 24 }}
-                onClick={() => console.log('clicked')}
+                onClick={() => setLastAction('点击了默认悬浮按钮')}
               />
               <FloatButton
                 shape="square"
@@ -61,8 +64,16 @@ const FloatButtonDemo: React.FC = () => {
                 trigger="hover"
                 triggerNode={<FloatButton tooltip="菜单" />}
                 style={{ position: 'absolute', right: 24, bottom: 24 }}>
-                <FloatButton tooltip="操作 A" type="default" />
-                <FloatButton tooltip="操作 B" type="default" />
+                <FloatButton
+                  tooltip="操作 A"
+                  type="default"
+                  onClick={() => setLastAction('选择了操作 A')}
+                />
+                <FloatButton
+                  tooltip="操作 B"
+                  type="default"
+                  onClick={() => setLastAction('选择了操作 B')}
+                />
               </FloatButtonGroup>
             </div>
           </div>
@@ -76,6 +87,9 @@ const FloatButtonDemo: React.FC = () => {
               />
             </div>
           </div>
+          <p className="text-sm text-gray-600 dark:text-gray-300" role="status">
+            操作反馈：{lastAction}
+          </p>
         </div>
       </DemoBlock>
 
@@ -89,6 +103,7 @@ const FloatButtonDemo: React.FC = () => {
           offset={24}
           tooltip="客服"
           ariaLabel="客服入口"
+          onClick={() => setLastAction('已打开客服入口')}
         />
       </DemoBlock>
     </div>

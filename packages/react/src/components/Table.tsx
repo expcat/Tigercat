@@ -127,13 +127,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const [measuredColumnWidths, setMeasuredColumnWidths] = useState<Record<string, number>>({})
   const [measuredRowHeights, setMeasuredRowHeights] = useState<number[]>([])
   const internalRowSelection = rowSelection as
-    | RowSelectionConfig<Record<string, unknown>>
-    | undefined
+    RowSelectionConfig<Record<string, unknown>> | undefined
   const internalExpandable = expandable as ExpandableConfig<Record<string, unknown>> | undefined
   const internalRowClassName = rowClassName as
-    | string
-    | ((record: Record<string, unknown>, index: number) => string)
-    | undefined
+    string | ((record: Record<string, unknown>, index: number) => string) | undefined
   const paginationLocaleInput: TigerLocaleInput | false | undefined =
     pagination !== false && typeof pagination === 'object' ? pagination.locale : undefined
   const tableLocaleInput: TigerLocaleInput | undefined = locale
@@ -244,8 +241,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     measuredColumnWidths,
     onChange,
     onRowClick: onRowClick as
-      | ((record: Record<string, unknown>, index: number) => void)
-      | undefined,
+      ((record: Record<string, unknown>, index: number) => void) | undefined,
     onSelectionChange,
     onSortChange,
     onFilterChange,
@@ -290,6 +286,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   )
 
   const effectiveVirtual = virtualRecommendation.enabled
+  const shouldObserveGeometry =
+    effectiveVirtual ||
+    columnLockable ||
+    ctx.displayColumns.some((column) => column.fixed === 'left' || column.fixed === 'right')
 
   // Row windowing: track the scroll position and compute the visible slice.
   const [virtualScrollTop, setVirtualScrollTop] = useState(0)
@@ -321,6 +321,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   }, [effectiveVirtual, maxHeight, virtualHeight])
 
   useEffect(() => {
+    if (!shouldObserveGeometry) {
+      return undefined
+    }
+
     const wrapper = wrapperRef.current
     if (!wrapper) {
       return undefined
@@ -339,7 +343,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
     controller.observe(wrapper, tableRef.current)
     return () => controller.disconnect()
-  }, [ctx.displayColumns.length, ctx.paginatedData.length])
+  }, [shouldObserveGeometry, ctx.displayColumns.length, ctx.paginatedData.length])
 
   return (
     <div

@@ -226,7 +226,7 @@ describe('Anchor', () => {
       )
 
       // Ink container should be present
-      const inkContainer = container.querySelector('.bg-gray-200')
+      const inkContainer = container.querySelector('[class*="--tiger-border"]')
       expect(inkContainer).toBeInTheDocument()
     })
 
@@ -238,7 +238,7 @@ describe('Anchor', () => {
       )
 
       // Ink container should not be present
-      const inkContainer = container.querySelector('.bg-gray-200')
+      const inkContainer = container.querySelector('[class*="--tiger-border"]')
       expect(inkContainer).not.toBeInTheDocument()
     })
 
@@ -250,7 +250,7 @@ describe('Anchor', () => {
       )
 
       // Ink container should be present
-      const inkContainer = container.querySelector('.bg-gray-200')
+      const inkContainer = container.querySelector('[class*="--tiger-border"]')
       expect(inkContainer).toBeInTheDocument()
     })
   })

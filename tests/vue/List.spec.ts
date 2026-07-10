@@ -207,5 +207,4 @@ describe('List', () => {
 
     await expectNoA11yViolationsIsolated(container)
   })
-  describe('Edge Cases', () => {})
 })

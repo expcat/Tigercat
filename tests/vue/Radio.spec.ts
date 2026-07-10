@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { ref, nextTick, defineComponent, h } from 'vue'
@@ -291,12 +291,6 @@ describe('Radio', () => {
       await user.keyboard('{ArrowDown}')
       expect(inputs[2]).toHaveFocus()
       expect(inputs[2].checked).toBe(true)
-    })
-  })
-
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
     })
   })
 

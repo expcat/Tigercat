@@ -366,6 +366,9 @@ const mixedSnippet = `<Row :gutter="16">
       :code="fullPageSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
+          <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">
+            窄屏下可在下方区域横向滚动，查看不换行的后续栅格。
+          </p>
           <div class="overflow-x-auto overflow-y-hidden px-2">
             <Row :gutter="16" :wrap="false" class="min-w-[720px]">
               <Col :span="6">

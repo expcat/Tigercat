@@ -491,7 +491,6 @@ describe('Popover', () => {
     })
   })
 
-  describe('Theme Support', () => {})
 
   describe('Accessibility', () => {
     it('should pass a11y checks', async () => {
@@ -610,5 +609,4 @@ describe('Popover', () => {
       expect(container.querySelector('[data-testid="popover-root"]')).toBeTruthy()
     })
   })
-  describe('Edge Cases', () => {})
 })

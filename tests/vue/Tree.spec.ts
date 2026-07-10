@@ -725,7 +725,6 @@ describe('Tree', () => {
     })
   })
 
-  describe('Snapshots', () => {})
 
   // v0.6.0 — searchable
   describe('Searchable (v0.6.0)', () => {
@@ -773,5 +772,4 @@ describe('Tree', () => {
       expect(items.length).toBeLessThan(50)
     })
   })
-  describe('Edge Cases', () => {})
 })

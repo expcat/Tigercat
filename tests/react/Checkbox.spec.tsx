@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -209,12 +209,6 @@ describe('Checkbox', () => {
     })
   })
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
-    })
-  })
-
   describe('Accessibility', () => {
     it('is focusable', () => {
       const { container } = render(<Checkbox>Checkbox</Checkbox>)
@@ -238,6 +232,4 @@ describe('Checkbox', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-
-  describe('Edge Cases', () => {})
 })

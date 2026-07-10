@@ -17,7 +17,11 @@ const hookEntries = [
 export default defineConfig({
   entry: ['src/index.tsx', ...componentEntries, ...hookEntries],
   format: ['esm'],
-  dts: true,
+  dts: {
+    compilerOptions: {
+      rootDir: '..'
+    }
+  },
   clean: true,
   splitting: true,
   external: ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime']

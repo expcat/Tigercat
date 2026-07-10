@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { VirtualTable } from '@expcat/tigercat-react/VirtualTable'
 import { type TableColumn } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
@@ -41,6 +41,7 @@ const fixedColumns: TableColumn[] = [
 ]
 
 const VirtualTableDemo: React.FC = () => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([2, 4])
   const basicData = useMemo(
     () =>
       Array.from({ length: 1000 }, (_, i) => ({
@@ -102,20 +103,24 @@ const VirtualTableDemo: React.FC = () => {
               virtualHeight={280}
               virtualItemHeight={48}
               striped
-              rowSelection={{ selectedRowKeys: [2, 4] }}
+              rowSelection={{ selectedRowKeys }}
+              onSelectionChange={setSelectedRowKeys}
             />
+            <p className="text-sm text-gray-600 dark:text-gray-300" role="status">
+              已选择业务 ID：{selectedRowKeys.join(', ') || '无'}
+            </p>
           </section>
           <section className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
               加载 & 空状态
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">loading 和 emptyText</p>
-            <div className="flex gap-4">
-              <div className="flex-1">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
                 <p className="text-sm text-gray-500 mb-2">Loading</p>
                 <VirtualTable dataSource={[]} columns={basicColumns} virtualHeight={200} loading />
               </div>
-              <div className="flex-1">
+              <div>
                 <p className="text-sm text-gray-500 mb-2">Empty</p>
                 <VirtualTable
                   dataSource={[]}

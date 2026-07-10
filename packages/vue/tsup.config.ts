@@ -18,7 +18,11 @@ const external = ['vue']
 export default defineConfig({
   entry: ['src/index.ts', ...componentEntries, ...composableEntries],
   format: ['esm'],
-  dts: true,
+  dts: {
+    compilerOptions: {
+      rootDir: '..'
+    }
+  },
   clean: true,
   splitting: true,
   external

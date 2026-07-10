@@ -18,6 +18,16 @@ describe('BarChart', () => {
     expect(container.querySelectorAll('rect')).toHaveLength(2)
   })
 
+  it('lets a responsive chart wrapper fill the available width', () => {
+    const { container } = renderWithProps(BarChart, {
+      data: [{ x: 'A', y: 10 }],
+      responsive: true,
+      ...defaultSize
+    })
+
+    expect(container.querySelector('svg')?.parentElement).toHaveClass('w-full', 'min-w-0')
+  })
+
   it('applies asymmetric default padding leaving room for y-axis labels (S4)', () => {
     const { container } = renderWithProps(BarChart, {
       data: [
@@ -91,7 +101,6 @@ describe('BarChart', () => {
 
     expect(container.querySelector('rect')).toHaveAttribute('fill', '#ff0000')
   })
-  describe('gradient', () => {})
 
   describe('value labels', () => {
     it('does not render labels when showValueLabels is false', () => {
@@ -104,8 +113,6 @@ describe('BarChart', () => {
       expect(container.querySelectorAll('[data-value-label]')).toHaveLength(0)
     })
   })
-
-  describe('bar constraints', () => {})
 
   describe('animated', () => {
     it('has no transition style when animated is false', () => {

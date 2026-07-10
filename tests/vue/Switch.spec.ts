@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Switch } from '@expcat/tigercat-vue'
 import {
@@ -101,12 +101,6 @@ describe('Switch', () => {
       const el = getSwitch(container)
       expect(el).toHaveAttribute('aria-disabled', 'true')
       expect(el).toHaveAttribute('tabindex', '-1')
-    })
-  })
-
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
     })
   })
 

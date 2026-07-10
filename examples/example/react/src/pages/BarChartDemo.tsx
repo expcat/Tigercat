@@ -63,14 +63,19 @@ const BarChartDemo: React.FC = () => {
         <div className="space-y-6">
           <section className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">自动生成坐标轴与网格。</p>
-            <BarChart
-              data={basicData}
-              width={420}
-              height={240}
-              xAxisLabel="Weekday"
-              yAxisLabel="Sales"
-            />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              自动生成坐标轴与网格；responsive 会让图表跟随容器宽度，适配移动端。
+            </p>
+            <div className="h-[240px] w-full max-w-[420px]">
+              <BarChart
+                data={basicData}
+                width={420}
+                height={240}
+                responsive
+                xAxisLabel="Weekday"
+                yAxisLabel="Sales"
+              />
+            </div>
           </section>
           <section className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">

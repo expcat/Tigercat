@@ -7,6 +7,7 @@ import { act, render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { Table, type TableColumn } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
+import { MockResizeObserver } from '../utils/mock-observers'
 
 const columns: TableColumn[] = [
   { key: 'name', title: 'Name' },
@@ -65,6 +66,23 @@ describe('Table', () => {
       )
 
       expect(container.querySelector('.custom-table')).toBeInTheDocument()
+    })
+
+    it('observes geometry only for fixed, lockable, or virtual tables', () => {
+      MockResizeObserver.reset()
+      vi.stubGlobal('ResizeObserver', MockResizeObserver)
+
+      const { rerender } = render(
+        <Table columns={columns} dataSource={dataSource} pagination={false} />
+      )
+      expect(MockResizeObserver.instances).toHaveLength(0)
+
+      rerender(
+        <Table columns={columns} dataSource={dataSource} columnLockable pagination={false} />
+      )
+      expect(MockResizeObserver.instances).toHaveLength(1)
+
+      vi.unstubAllGlobals()
     })
 
     it('renders mobile card markup when responsiveMode is card', () => {
@@ -913,8 +931,6 @@ describe('Table', () => {
     })
   })
 
-  describe('Sticky Header', () => {})
-
   describe('Custom Rendering', () => {
     it('should render custom cell content', () => {
       const customColumns: TableColumn[] = [
@@ -1297,7 +1313,4 @@ describe('Table', () => {
       expect(onRowOrderChange).toHaveBeenCalledWith([dataSource[1], dataSource[2], dataSource[0]])
     })
   })
-
-  describe('v0.6.0 - Virtual Scroll', () => {})
-  describe('Edge Cases', () => {})
 })

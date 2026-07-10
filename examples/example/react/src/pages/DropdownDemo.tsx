@@ -200,9 +200,11 @@ const controlledScriptSnippet = `const [visible1, setVisible1] = useState(false)
 
 export default function DropdownDemo() {
   const [visible1, setVisible1] = useState(false)
+  const [lastCommand, setLastCommand] = useState('尚未选择操作')
 
   const handleCommand = (command: string) => {
-    console.log('点击了：', command)
+    const labels: Record<string, string> = { edit: '编辑', copy: '复制', delete: '删除' }
+    setLastCommand(labels[command] ?? command)
   }
 
   return (
@@ -348,18 +350,23 @@ export default function DropdownDemo() {
       {/* 点击事件 */}
       <DemoBlock
         title="点击事件"
-        description="监听菜单项的点击事件（查看控制台）。"
+        description="监听菜单项的点击事件，并在页面中回显最近操作。"
         code={fullPageSnippet}>
-        <Dropdown>
-          <Button>操作</Button>
-          <DropdownMenu>
-            <DropdownItem onClick={() => handleCommand('edit')}>编辑</DropdownItem>
-            <DropdownItem onClick={() => handleCommand('copy')}>复制</DropdownItem>
-            <DropdownItem onClick={() => handleCommand('delete')} divided>
-              删除
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
+        <div className="space-y-3">
+          <Dropdown>
+            <Button>操作</Button>
+            <DropdownMenu>
+              <DropdownItem onClick={() => handleCommand('edit')}>编辑</DropdownItem>
+              <DropdownItem onClick={() => handleCommand('copy')}>复制</DropdownItem>
+              <DropdownItem onClick={() => handleCommand('delete')} divided>
+                删除
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <p className="text-sm text-gray-600 dark:text-gray-300" role="status">
+            最近操作：{lastCommand}
+          </p>
+        </div>
       </DemoBlock>
 
       {/* 受控模式 */}

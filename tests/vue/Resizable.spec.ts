@@ -43,7 +43,6 @@ describe('Resizable', () => {
     })
   })
 
-  describe('Disabled', () => {})
 
   describe('Custom className', () => {
     it('should apply custom className', () => {
@@ -73,7 +72,6 @@ describe('Resizable', () => {
     })
   })
 
-  describe('No dimensions', () => {})
 
   describe('Mouse interaction', () => {
     it('should have mousedown handler on handles', () => {
@@ -106,9 +104,7 @@ describe('Resizable', () => {
     })
   })
 
-  describe('Aspect ratio', () => {})
 
-  describe('Custom style', () => {})
   // --- Keyboard resize (C32-2) ---
   describe('Keyboard resize', () => {
     it('exposes handles as focusable separators with ARIA', () => {

@@ -28,9 +28,7 @@ describe('Skeleton', () => {
     })
   })
 
-  describe('Variants', () => {})
 
-  describe('Animations', () => {})
 
   describe('Dimensions', () => {
     it('should apply both custom width and height', () => {
@@ -72,7 +70,6 @@ describe('Skeleton', () => {
     })
   })
 
-  describe('Shapes', () => {})
 
   describe('Custom Classes', () => {
     it('should apply custom className and preserve base classes', () => {
@@ -108,5 +105,4 @@ describe('Skeleton', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {})
 })

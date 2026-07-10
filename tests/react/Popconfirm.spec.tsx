@@ -207,5 +207,4 @@ describe('Popconfirm', () => {
     await user.click(getByText('Delete'))
     await waitFor(() => expect(getByText('Custom description')).toBeVisible())
   })
-  describe('Edge Cases', () => {})
 })

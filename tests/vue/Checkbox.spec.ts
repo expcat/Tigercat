@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { nextTick, defineComponent, h, ref } from 'vue'
 import { Checkbox, CheckboxGroup } from '@expcat/tigercat-vue'
@@ -324,12 +324,6 @@ describe('Checkbox', () => {
     })
   })
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
-    })
-  })
-
   describe('Accessibility', () => {
     it('is focusable', () => {
       const { container } = render(Checkbox, { slots: { default: 'Checkbox' } })
@@ -353,6 +347,4 @@ describe('Checkbox', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-
-  describe('Edge Cases', () => {})
 })

@@ -2,91 +2,48 @@
 
 <!-- LLM-INDEX
 type: active-roadmap
-scope: v2.0.0 RC stabilization and whole-project optimization batches
+scope: v2.0.0 release preparation and evidence-driven follow-up
 verified-date: 2026-07-10
-source: docs/EXAMPLE_USER_STORY_REQUIREMENTS.md
+source: current repository state
 -->
 
-本文只记录下一阶段要实施的任务。v1.5.0 以前的扫描取证、T01-T14 执行细节、R01-R28 已完成批次细节与发布收口记录不再保留在路线图中；详细执行摘要、实际验证命令和状态回写记录统一归档到 [V2_COMPLETED.md](V2_COMPLETED.md)，public API 删除/合并证据归档到 [V2_API_AUDIT.md](V2_API_AUDIT.md)。
+本文只保留当前状态、发布边界和下一项可执行工作，不再保存已完成批次的逐次执行日志。
+
+- 版本变更与发布历史以 [CHANGELOG.md](../CHANGELOG.md) 为准。
+- breaking change 与唯一迁移路径以 [MIGRATION.md](MIGRATION.md) 为准。
+- 组件 API、示例与维护规则以 [Tigercat Skill](../skills/tigercat/SKILL.md) 为准。
+- 已完成任务的命令输出、浏览器审查和中间计划由 Git 历史追溯，不再复制到 `docs/`。
 
 ## 当前状态
 
-截至 2026-07-10，T01-T14 与 v2.0.0 R01-R29 已完成；R20 不作为 v2.0 发布收口批次，最终发布收口纳入 R30 B7。
+- 当前版本：`2.0.0-rc.2`。
+- v2.0.0 R01-R30 已完成；已登记的 P0/P1 组件、Example、i18n、a11y、构建与发布门禁问题均已解决。
+- R30 后保留的新增演示和纯 polish 建议不构成 RC 发布要求，已从路线图移除；如以后有新的用户证据，再作为独立任务登记。
+- 发布前清理已完成：Actions 不再运行测试、coverage、benchmark 或依赖审计；Playwright 只保留功能 E2E，图片对比 spec 与 PNG 基线已删除。
+- 当前无实现任务。下一步仅在收到明确发布指令后执行稳定版版本同步、tag、publish 与 Pages 部署。
 
-R28 的 React/Vue Example 用户故事审查与 R29 P0/P1 拆分、首批修复均已完成。E01-E21 的体验入口、用户故事、问题证据、影响、组件能力建议和优先级已合并到 [EXAMPLE_USER_STORY_REQUIREMENTS.md](EXAMPLE_USER_STORY_REQUIREMENTS.md)，继续作为 R30 Example 体验修复的唯一需求入口。
+## 发布与验证边界
 
-## 阶段进度
+- `.github/workflows/` 只保留打 tag、发布 npm 包和部署 Pages 所需流程；测试全部在本地执行。
+- 不重新引入 CI/E2E/benchmark/security 测试 workflow，不在发布 workflow 中增加 `quality:release`、coverage、SSR、E2E 或 publish smoke。
+- E2E 只验证跨浏览器功能行为；不使用 `toHaveScreenshot`，不维护 `*-snapshots` 图片目录。
+- 发布前本地执行 `pnpm quality:release` 与 `pnpm e2e`。按改动范围可先运行 focused/group checks，最终只运行一次完整门禁。
+- public API、shared contract、props、events、methods、type aliases 或 helper exports 发生变化时，同步更新 `CHANGELOG.md`、`docs/MIGRATION.md`、API baseline、generated Skill references、examples 与对应测试。
+- 生成产物只能通过事实源或生成器重建，不得手改 `skills/tigercat/references/*` 或 `api-reports/*` 掩盖漂移。
 
-- 已完成阶段：阶段 0-23 已完成 R01-R29；细节见 [V2_COMPLETED.md](V2_COMPLETED.md)。
-- 当前阶段：阶段 24，执行 R30 B0-B7 全项目优化；先恢复 RC 发布与测试基线，再按组件族处理视觉、性能和 Example P2/P3。
-- 当前可执行任务：按下方 B0-B7 顺序落地，每批同时覆盖适用的 core、React、Vue、focused tests 与 Example，最后只做一次完整发布收口。
-- 后续阶段：R30 完成并通过 release gate 后，再根据事实证据追加新任务；不预设下一轮抽象或 breaking API。
+## 发布准备检查
 
-## 执行原则
+| 检查项                        | 当前结果                      |
+| ----------------------------- | ----------------------------- |
+| 静态类型、lint、API 一致性    | 通过                          |
+| 单元/组件测试                 | 383 files / 6,840 tests 通过  |
+| API baseline、exports、Skill  | 通过，生成物零漂移            |
+| packages 与 React/Vue Example | 通过                          |
+| coverage、size、publish、SSR  | 通过                          |
+| 功能 E2E                      | 152 tests 跨四个 project 通过 |
 
-- 每个任务独立执行并单独更新状态；不要把未声明的源码修复或新功能混入相邻任务。
-- 执行任一后续 Rxx 前，必须先读取 [EXAMPLE_USER_STORY_REQUIREMENTS.md](EXAMPLE_USER_STORY_REQUIREMENTS.md) 中对应 E 组的 Routes、背景和任务项（每项含优先级、类型、动作与验收）。
-- P0/P1 必须优先拆成独立或小批量 Rxx；P2/P3 只按同源组件、同一体验根因或相邻页面改动合并。
-- v2.0.0 是破坏性版本，不新增 `@deprecated` 过渡层，不保留向后兼容分支。
-- 生成产物只能通过修改事实源或生成器后重生成；不得手改 `skills/tigercat/references/*`、`api-reports/*` 或发布快照来掩盖漂移。
-- Example 更新必须优先使用组件子路径 import，避免重新引入 root value imports 或 heavy dependency leakage。
-- 发布验证必须在本地手动完成，发布 Action 只负责发布动作；不要再向 `.github/workflows/publish*.yml` 添加 `quality:release`、测试、coverage、SSR 或 publish smoke 等发布前验证门禁。
-- 涉及 public API、shared contract、props、events、methods、type aliases 或 helper exports 删除/合并的任务，必须在 [V2_API_AUDIT.md](V2_API_AUDIT.md) 追加或更新对应批次记录。
+## 后续任务登记规则
 
-## 阶段与依赖
-
-| 阶段  | 阶段状态             | 任务    | 执行规则                                                                       |
-| ----- | -------------------- | ------- | ------------------------------------------------------------------------------ |
-| 0-14  | 已完成（2026-06-30） | R01-R20 | 已完成组件级 API 清理，细节归档到 `V2_COMPLETED.md` / `V2_API_AUDIT.md`        |
-| 15-21 | 已完成（2026-07-01） | R21-R27 | 已完成分组验证、Skill 路由压缩、Example raw-source 护栏与展示合并维护          |
-| 22    | 已完成（2026-07-01） | R28     | 已完成 E01-E21 用户故事审查，需求已合并到 `EXAMPLE_USER_STORY_REQUIREMENTS.md` |
-| 23    | 已完成（2026-07-10） | R29     | 已完成 P0/P1 拆分与首批必要修复；其余系统性优化并入 R30                        |
-| 24    | 进行中（2026-07-10） | R30     | 按 B0-B7 执行 RC 稳定性、测试瘦身、视觉/组件性能、Example 与发布收口           |
-
-## 后续任务规划
-
-### R29 Example P0/P1 修复拆分与首批执行
-
-**状态**：已完成（2026-07-10）。
-
-**目标**：从 [EXAMPLE_USER_STORY_REQUIREMENTS.md](EXAMPLE_USER_STORY_REQUIREMENTS.md) 提取 P0/P1 项，按组件族和根因拆成可独立验证的小批次，并优先修复会阻断示例体验或造成 React/Vue 明显不一致的问题。
-
-**优先范围**：ImageCropper/CropUpload 可体验性，QRCode locale/refresh，Grid responsive，Splitter 示例空白与单位错误，Affix/Anchor 体验失效，Tabs/Tree/Alert/Progress/Modal/Drawer/Message/Notification 中文站 a11y/i18n，Form/Input/InputNumber/ColorPicker/Transfer/DatePicker/CronEditor/Upload/VirtualTable/Chart/Heatmap/MarkdownEditor/RichTextEditor/TaskBoard/useFormController 等 P1。
-
-**允许修改**：对应 Example 页面、演示 fixture、本地示例资源、组件源码、locale/i18n、a11y 文案、生成器事实源和必要测试。
-
-**不得修改**：与所选批次无关的组件行为、发布工作流门禁、旧迁移历史或 generated refs 的手写内容。
-
-**完成验证**：每个批次至少复查对应 React/Vue hash route、记录浏览器操作路径，运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构时运行 `npx -y pnpm@11.9.0 example:build`；涉及源码/API 时补充 focused tests、`pnpm types:check`、`pnpm api:validate` 或对应 group validation。
-
-**最近执行记录（2026-07-02）**：EX12-EX16 已完成，覆盖 AvatarGroup overflow、Splitter 单位文案、Watermark 图片水印、Descriptions 响应式列，以及 QRCode/Alert/Switch/Slider/Progress/Signature/InputNumber/Stepper/NumberKeyboard/InfiniteScroll/Loading/Skeleton/Table/Timeline 中文站文案与可访问名。为示例层中文覆写新增 InputNumber/Stepper `incrementAriaLabel` / `decrementAriaLabel` public props，API baseline 与 skill references 已重生成。验证已通过 focused tests、`types:check`、`api:validate`、`api:baseline`、`docs:api`、`example:sources:check`、`example:build`，并浏览器复查相关 React/Vue hash route。
-
-**收口说明（2026-07-10）**：R29 以“完成 P0/P1 拆分与首批阻断修复”为完成边界；尚需系统审查的稳定性、视觉、性能和 P2/P3 工作统一映射到 R30，避免继续追加零散 EX 编号。
-
-### R30 v2.0.0 RC 全项目分批优化与 Example P2/P3 补齐
-
-**状态**：进行中（2026-07-10）。
-
-**目标**：在不新增 breaking API、不恢复 `ROADMAP_CHECK.md`、不过度抽象的前提下，按“稳定性 → 视觉基础 → 组件族 → 发布收口”优化全项目，并接受小范围覆盖率下降以减少重复测试和运行时间。
-
-| 批次 | 本轮工作映射                                                                                                         |
-| ---- | -------------------------------------------------------------------------------------------------------------------- |
-| B0   | 已完成（2026-07-10）：RC 发布元数据、路由懒加载、测试基线入口与现有 warning/非有限几何噪声                           |
-| B1   | 测试门禁去重、special/a11y/coverage 入口、分组完整性和重复用例瘦身                                                   |
-| B2   | class 暗色、Vue 开关模型、移动端设置面板与 Button 不换行                                                             |
-| B3   | Basic、Layout、Navigation、Feedback 的 token、状态、响应式、focus/keyboard 与 reduced-motion                         |
-| B4   | Form、Date/Time、Upload 的 token、对象 URL 生命周期和裁剪尺寸安全                                                    |
-| B5   | Data、VirtualList/VirtualTable、Charts 的缓存/二分定位、既有 render 契约和证据驱动性能优化                           |
-| B6   | Advanced、Media、Composite 的 SSR/资源清理、局部 palette/motion 收敛，以及 P2/P3 状态回显、移动端说明和低风险 polish |
-| B7   | CLI、Example、Tailwind v4 安装文档、生成物/API 校验、完整 release gate 与三浏览器 E2E 收口                           |
-
-**完成验证**：开发批次只跑 focused/group checks；每个 UI 批次复查 React/Vue 的桌面/移动、亮/暗模式；B7 最终运行一次完整 `quality:release` 与三浏览器 E2E，并将执行事实归档到 [V2_COMPLETED.md](V2_COMPLETED.md)。
-
-## 路线图维护验证
-
-- 文档整理后运行 `npx -y pnpm@11.9.0 exec prettier --check docs/ROADMAP.md docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`。
-- 确认路线图仍包含 `type: active-roadmap`，避免 `release:check` 失效。
-- 文档类改动至少运行 `git diff --check -- docs/ROADMAP.md docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`。
-- 合并或重写路线图后运行 `rg -n "^(<<<<<<<|=======|>>>>>>>)" docs/ROADMAP.md docs/EXAMPLE_USER_STORY_REQUIREMENTS.md`，确认没有冲突标记。
-- Example 展示或代码来源变更后运行 `npx -y pnpm@11.9.0 example:sources:check`；涉及页面结构调整时同时运行 `npx -y pnpm@11.9.0 example:build`。
-- 如 `corepack pnpm docs:api:check` 命中 ambient pnpm engine mismatch，可改用 `npx -y pnpm@11.9.0 docs:api:check` 复跑同一门禁。
+- 只登记有复现路径、影响范围和验收条件的新事实，不恢复已完成批次或旧审查清单。
+- P0/P1 拆成独立或小批任务；P2/P3 仅在同一根因和同一验证范围内合并。
+- 每项任务必须写明允许修改范围、本地验证命令和完成后的文档/生成物回写范围。

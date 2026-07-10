@@ -65,7 +65,6 @@ describe('Splitter', () => {
     })
   })
 
-  describe('Disabled state', () => {})
 
   describe('Keyboard interaction', () => {
     it('should resize on ArrowRight key in horizontal mode', () => {

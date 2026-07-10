@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -379,12 +379,6 @@ describe('Select', () => {
     })
   })
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
-    })
-  })
-
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<Select options={testOptions} placeholder="Select option" />)
@@ -481,8 +475,6 @@ describe('Select', () => {
       expect(getByText('Option 100')).toBeInTheDocument()
     })
   })
-
-  describe('Additional Keyboard Navigation', () => {})
 
   describe('Dropdown Behavior', () => {
     it('should close dropdown when clicking outside', async () => {

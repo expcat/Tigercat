@@ -80,4 +80,4 @@ Then run `pnpm docs:api:check`, the relevant examples check, and changed-file Pr
 
 ## Benchmarks
 
-Run `pnpm bench` (Vitest benchmark mode) to execute the suites under `benchmarks/` (8 `.bench.ts` files; the `benchmark` section of `vitest.config.ts` controls discovery). Results are advisory and not a CI gate: the P3 review kept hard baseline thresholds deferred because shared runners make micro-benchmark timings noisy and prone to false red builds. `.github/workflows/bench.yml` runs them weekly and on manual dispatch (`pnpm bench --run --outputJson=bench-results.json`) and uploads the JSON artifact for manual comparison against previous artifacts.
+Run `pnpm bench` (Vitest benchmark mode) locally to execute the suites under `benchmarks/` (8 `.bench.ts` files; the `benchmark` section of `vitest.config.ts` controls discovery). Results are advisory rather than a release gate because shared or cross-platform timings are noisy. When comparing changes, keep the machine and runtime stable and save JSON explicitly with `pnpm bench --run --outputJson=bench-results.json`; benchmarks are not run in GitHub Actions.

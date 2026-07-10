@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -184,12 +184,6 @@ describe('Textarea', () => {
     })
   })
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
-    })
-  })
-
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
       const { container } = render(<Textarea aria-label="Description" />)
@@ -210,8 +204,6 @@ describe('Textarea', () => {
       expect(onFocus).toHaveBeenCalled()
     })
   })
-
-  describe('Edge Cases', () => {})
 
   describe('Ref Forwarding', () => {
     it('forwards a ref to the textarea and supports imperative focus', () => {

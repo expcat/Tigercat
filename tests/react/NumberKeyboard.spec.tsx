@@ -81,5 +81,4 @@ describe('NumberKeyboard', () => {
     })
   })
 
-  describe('Edge Cases', () => {})
 })

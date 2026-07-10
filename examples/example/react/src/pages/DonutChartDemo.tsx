@@ -23,6 +23,7 @@ const DonutChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const total = useMemo(() => interactiveData.reduce((s, d) => s + d.value, 0), [])
+  const selectedDatum = selectedIndex === null ? undefined : interactiveData[selectedIndex]
 
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8">
@@ -92,7 +93,10 @@ const DonutChartDemo: React.FC = () => {
                 onSelectedIndexChange={setSelectedIndex}
               />
               <p className="text-sm text-gray-500">
-                选中: {selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无'}
+                选中:{' '}
+                {selectedDatum
+                  ? `${selectedDatum.label} · ${selectedDatum.value} · ${((selectedDatum.value / total) * 100).toFixed(1)}%`
+                  : '无'}
               </p>
             </div>
           </section>

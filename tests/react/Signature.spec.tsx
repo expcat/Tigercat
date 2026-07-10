@@ -196,5 +196,4 @@ describe('Signature', () => {
     })
   })
 
-  describe('Edge Cases', () => {})
 })

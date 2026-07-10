@@ -43,13 +43,14 @@ const disabledSnippet = `<Popconfirm title="此操作已禁用" :disabled="true"
 </Popconfirm>`
 
 const visible1 = ref(false)
+const lastAction = ref('尚未确认或取消操作')
 
 const handleConfirm = () => {
-  console.log('Confirmed!')
+  lastAction.value = '已确认删除记录'
 }
 
 const handleCancel = () => {
-  console.log('Cancelled!')
+  lastAction.value = '已取消操作'
 }
 </script>
 
@@ -68,6 +69,9 @@ const handleCancel = () => {
         <Popconfirm title="确定要删除这条记录吗？" @confirm="handleConfirm" @cancel="handleCancel">
           <Button variant="secondary">删除</Button>
         </Popconfirm>
+        <p class="mt-3 text-sm text-gray-600 dark:text-gray-300" role="status">
+          操作反馈：{{ lastAction }}
+        </p>
       </div>
     </DemoBlock>
 
@@ -131,7 +135,7 @@ const handleCancel = () => {
               title="确定要提交这个表单吗？"
               ok-text="提交"
               cancel-text="取消"
-              @confirm="() => console.log('Form submitted')">
+              @confirm="lastAction = '表单已提交'">
               <Button>提交表单</Button>
             </Popconfirm>
           </div>
@@ -145,7 +149,7 @@ const handleCancel = () => {
               icon="error"
               ok-type="danger"
               ok-text="删除"
-              @confirm="() => console.log('User deleted')">
+              @confirm="lastAction = '用户已删除'">
               <Button variant="secondary">删除用户</Button>
             </Popconfirm>
           </div>
@@ -156,7 +160,7 @@ const handleCancel = () => {
             <Popconfirm
               title="确定要发布这篇文章吗？"
               description="发布后，文章将对所有用户可见。"
-              @confirm="() => console.log('Article published')">
+              @confirm="lastAction = '文章已发布'">
               <Button>发布文章</Button>
             </Popconfirm>
           </div>
@@ -204,7 +208,7 @@ const handleCancel = () => {
             <Popconfirm
               title="确定要继续吗？"
               :show-icon="false"
-              @confirm="() => console.log('Confirmed')">
+              @confirm="lastAction = '已确认继续'">
               <Button>无图标</Button>
             </Popconfirm>
           </div>
