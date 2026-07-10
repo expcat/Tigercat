@@ -28,6 +28,8 @@
 | `pnpm docs:api`              | `scripts/generate-api-docs.mjs`         | 生成 skills API 摘要                                                                            |
 | `pnpm api:baseline:check`    | 根 package scripts                      | 公共 API 基线漂移闸：生成基线并校验 `api-reports` 无差异                                        |
 | `pnpm docs:api:check`        | 根 package scripts                      | references 漂移闸：生成 LLM API 文档并校验 `skills/tigercat/references` 无差异                  |
+| `pnpm mcp:build`             | `packages/mcp`                          | 构建 `@expcat/tigercat-mcp` 本地 stdio MCP 服务                                                                |
+| `pnpm mcp:serve`             | `packages/mcp/dist/index.js`            | 从当前仓库根目录启动 MCP 服务，供 LLM 客户端路由 skill references                                              |
 
 ## 示例应用
 
@@ -63,6 +65,23 @@ TEST_GROUP=form pnpm test:validate
 - 文档或示例改动：同步运行 `pnpm docs:api:check`、`pnpm example:sources:check`、相关 examples 检查和 changed-file Prettier check。
 - 发布面或门禁策略变更：升级到 `pnpm quality:release`。
 - 发布验证必须在本地手动完成并记录结果；发布 Action 只执行安装、构建和发布，不要向 `.github/workflows/publish*.yml` 添加 `quality:release`、测试、coverage、SSR 或 publish smoke 等发布前验证门禁。
+
+## MCP 服务
+
+`@expcat/tigercat-mcp` 是只读的本地 stdio MCP 服务。它读取 `context7.json` 和
+`skills/tigercat/**`，提供组件/任务到最小 skill references 的路由，不运行 `docs:api`
+也不修改生成文档。
+
+```bash
+pnpm mcp:build
+pnpm mcp:serve
+```
+
+LLM 客户端也可以直接配置构建后的 bin：
+
+```bash
+tigercat-mcp --root /path/to/Tigercat
+```
 
 ## 内部 helper（仅限仓库脚本）
 

@@ -16,7 +16,8 @@ const packageFiles = {
   core: 'packages/core/package.json',
   vue: 'packages/vue/package.json',
   react: 'packages/react/package.json',
-  cli: 'packages/cli/package.json'
+  cli: 'packages/cli/package.json',
+  mcp: 'packages/mcp/package.json'
 }
 
 const sourceVersionFiles = {
@@ -37,7 +38,7 @@ const expectedSizeLimitEntries = [
   ['Vue DatePicker subpath', 'packages/vue/dist/components/DatePicker.mjs', '31 kB'],
   ['React DatePicker subpath', 'packages/react/dist/components/DatePicker.mjs', '25 kB'],
   ['Vue Table subpath', 'packages/vue/dist/components/Table.mjs', '48 kB'],
-  ['React Table subpath', 'packages/react/dist/components/Table.mjs', '40 kB'],
+  ['React Table subpath', 'packages/react/dist/components/Table.mjs', '41 kB'],
   ['Vue Tree subpath', 'packages/vue/dist/components/Tree.mjs', '32 kB'],
   ['React Tree subpath', 'packages/react/dist/components/Tree.mjs', '25 kB'],
   ['Vue TimePicker subpath', 'packages/vue/dist/components/TimePicker.mjs', '31 kB'],

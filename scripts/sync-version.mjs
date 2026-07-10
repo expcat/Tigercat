@@ -16,7 +16,7 @@ assertSemver(version)
 
 updateJsonVersion(rootPackagePath, version)
 
-for (const packageName of ['core', 'vue', 'react', 'cli']) {
+for (const packageName of ['core', 'vue', 'react', 'cli', 'mcp']) {
   updateJsonVersion(path.join(rootDir, 'packages', packageName, 'package.json'), version)
 }
 

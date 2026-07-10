@@ -248,6 +248,73 @@ const DOC_SECTION_ALIASES = new Map([
   ['PrintPageBreak', 'PrintLayout']
 ])
 
+export const COMPONENT_ROUTE_ALIASES = {
+  Grid: ['Row', 'Col']
+}
+
+export const TIGERCAT_TOPIC_ROUTES = {
+  setup: {
+    title: 'Setup and installation',
+    references: ['skills/tigercat/references/getting-started.md'],
+    keywords: ['setup', 'install', 'gettingstarted', 'start', 'quickstart', '安装', '开始']
+  },
+  cli: {
+    title: 'CLI and scaffolding',
+    references: ['skills/tigercat/references/cli.md'],
+    keywords: ['cli', 'command', 'scaffold', 'generate', '命令', '脚手架']
+  },
+  theme: {
+    title: 'Theme and dark mode',
+    references: ['skills/tigercat/references/theme.md'],
+    keywords: ['theme', 'dark', 'mode', 'color', '主题', '暗色', '颜色']
+  },
+  i18n: {
+    title: 'Locale and i18n',
+    references: ['skills/tigercat/references/i18n.md'],
+    keywords: ['i18n', 'locale', 'language', 'translation', '国际化', '语言', '文案']
+  },
+  ssr: {
+    title: 'SSR integration',
+    references: ['skills/tigercat/references/ssr.md'],
+    keywords: ['ssr', 'serverrender', 'nuxt', 'next', 'hydration', '服务端']
+  },
+  accessibility: {
+    title: 'Accessibility and keyboard support',
+    references: ['skills/tigercat/references/accessibility.md'],
+    keywords: ['a11y', 'accessibility', 'aria', 'keyboard', '无障碍', '键盘']
+  },
+  performance: {
+    title: 'Performance and bundle size',
+    references: ['skills/tigercat/references/performance.md'],
+    keywords: ['performance', 'perf', 'bundle', 'size', 'lazy', '性能', '体积']
+  },
+  release: {
+    title: 'Maintainer release workflow',
+    references: ['skills/tigercat/references/release.md'],
+    keywords: ['release', 'publish', 'rc', 'version', '发布', '版本']
+  },
+  tokens: {
+    title: 'Design tokens',
+    references: ['skills/tigercat/references/tokens.md'],
+    keywords: ['token', 'tokens', 'design', 'figma', '变量']
+  },
+  app: {
+    title: 'Application shell and routing',
+    references: ['skills/tigercat/references/recipes/building-apps.md'],
+    keywords: ['app', 'shell', 'routing', 'route', 'layout', '应用', '路由', '布局']
+  },
+  commandApis: {
+    title: 'Root command APIs',
+    references: [
+      'skills/tigercat/SKILL.md',
+      'skills/tigercat/references/shared/props/feedback.md',
+      'skills/tigercat/references/examples/feedback.md',
+      'skills/tigercat/references/shared/patterns/common.md'
+    ],
+    keywords: ['notification', 'message', 'toast', 'imperative', 'commandapi', '通知', '消息']
+  }
+}
+
 const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['AnchorLink', 'Anchor'],
   ['BreadcrumbItem', 'Breadcrumb'],
@@ -454,6 +521,88 @@ export function buildPublicComponentEntries(root, fileInfoByName, publicExports)
   return [...entriesByComponent.values()].sort(
     (a, b) => a.category.localeCompare(b.category) || a.component.localeCompare(b.component)
   )
+}
+
+export function buildTigercatContext7(componentRows) {
+  const components = {}
+  const componentIndex = {}
+
+  for (const row of componentRows) {
+    const slug = CATEGORY_SLUGS[row.category] || row.category.toLowerCase()
+    const references = {
+      componentIndex: 'skills/tigercat/references/component-index.md',
+      props: `skills/tigercat/references/shared/props/${slug}.md`,
+      examples: `skills/tigercat/references/examples/${slug}.md`,
+      react: 'skills/tigercat/references/react/index.md',
+      vue: 'skills/tigercat/references/vue/index.md'
+    }
+
+    components[row.component] = {
+      name: row.component,
+      aliases: Object.entries(COMPONENT_ROUTE_ALIASES)
+        .filter(([, targets]) => targets.includes(row.component))
+        .map(([alias]) => alias),
+      category: row.category,
+      slug,
+      testGroup: slug,
+      packageSubpath: getComponentPackageSubpath(row.component),
+      packageTarget: getComponentPackageTarget(row.component),
+      typeSource: row.typeSource,
+      sourceFiles: row.sourceFiles || [],
+      propsInterfaces: row.propsInterfaces || [],
+      frameworks: ['react', 'vue'],
+      references
+    }
+
+    componentIndex[slug] ??= {
+      props: references.props,
+      vue: references.vue,
+      react: references.react,
+      components: [],
+      examples: references.examples
+    }
+    componentIndex[slug].components.push(row.component)
+  }
+
+  for (const entry of Object.values(componentIndex)) {
+    entry.components.sort((a, b) => a.localeCompare(b))
+  }
+
+  return {
+    url: 'https://context7.com/expcat/tigercat',
+    public_key: 'pk_FJkrJukw2qS9fFqa8Lt4m',
+    generated_by: 'pnpm docs:api',
+    component_count: Object.keys(components).length,
+    reference_paths: {
+      skill_index: 'skills/tigercat/SKILL.md',
+      component_index: 'skills/tigercat/references/component-index.md',
+      api_summary: 'skills/tigercat/references/shared/api-summary.md',
+      glossary: 'skills/tigercat/references/shared/glossary.md',
+      patterns: 'skills/tigercat/references/shared/patterns/common.md',
+      shared_props: 'skills/tigercat/references/shared/props',
+      examples: 'skills/tigercat/references/examples',
+      react: 'skills/tigercat/references/react/index.md',
+      vue: 'skills/tigercat/references/vue/index.md'
+    },
+    aliases: COMPONENT_ROUTE_ALIASES,
+    command_apis: {
+      notification: {
+        name: 'notification',
+        title: 'Imperative notification API',
+        topic: 'commandApis',
+        references: TIGERCAT_TOPIC_ROUTES.commandApis.references
+      },
+      Message: {
+        name: 'Message',
+        title: 'Imperative message API',
+        topic: 'commandApis',
+        references: TIGERCAT_TOPIC_ROUTES.commandApis.references
+      }
+    },
+    topics: TIGERCAT_TOPIC_ROUTES,
+    component_index: componentIndex,
+    components
+  }
 }
 
 export function formatComponentIndexType(typeSource) {

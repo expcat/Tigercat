@@ -201,7 +201,7 @@ async function smokeExamples(tarballs) {
     console.log(`Building ${example.name}...`)
     example.prepare(example.dir, tarballs)
     await installWithRetry(
-      ['install', '--no-audit', '--fund=false', '--prefer-offline'],
+      ['install', '--no-audit', '--fund=false'],
       example.dir
     )
     runOrThrow('npm', example.buildArgs, { cwd: example.dir })
@@ -518,8 +518,7 @@ async function runPublishedPackageSmoke({
         `@vue/server-renderer@${readWorkspaceCatalogValue(rootDir, '@vue/server-renderer')}`,
         `react@${readWorkspaceCatalogValue(rootDir, 'react')}`,
         `react-dom@${readWorkspaceCatalogValue(rootDir, 'react-dom')}`,
-        `tailwindcss@${readWorkspaceCatalogValue(rootDir, 'tailwindcss')}`,
-        '--prefer-offline'
+        `tailwindcss@${readWorkspaceCatalogValue(rootDir, 'tailwindcss')}`
       ],
       tempDir,
       5000

@@ -2,6 +2,24 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.0.0-rc.2
+
+v2.0.0 rc.2 验证 rc.1 之后的 MCP package 与 LLM reference routing 更新，并同步当前依赖目录。
+
+### Features
+
+- **Tigercat MCP package**：新增 `@expcat/tigercat-mcp` 本地 MCP 服务，用于将 LLM 查询路由到 Tigercat skill references，并提供组件元数据、组件分类、参考文档路径和诊断信息。
+- **组件元数据与诊断增强**：扩展 public component facts / Context7 生成内容，MCP 查询可返回更完整的组件匹配、建议 reference 和缺失配置诊断。
+
+### Infrastructure
+
+- root 与 `@expcat/tigercat-core`、`@expcat/tigercat-react`、`@expcat/tigercat-vue`、`@expcat/tigercat-cli`、`@expcat/tigercat-mcp` 统一为 `2.0.0-rc.2`。
+- 同步 core / React / Vue 运行时 `version` 导出、CLI `CLI_VERSION`、CLI 模板中的 Tigercat 依赖范围，以及示例首页展示版本。
+- 更新 workspace catalog / lockfile 中的依赖版本，并将 MCP 包纳入 release readiness 的 fixed-version 检查。
+- `React Table subpath` size 预算 40 kB → 41 kB，以覆盖 rc.1 后依赖 / 构建面更新后的稳定 gzip 体积（实测 40.52 kB）。
+- `publish:check` 的 clean npm install 不再使用 `--prefer-offline`，避免本机旧 npm metadata 将当前 registry 已存在的 catalog 版本误判为 ETARGET。
+- 本次 rc 无新增破坏性变更；迁移路径沿用当前 v2.0.0 条目。
+
 ## v2.0.0-rc.1
 
 v2.0.0 rc.1 冻结当前 v2.0.0 发布面，收敛 Pagination 样式与页容量变更事件语义，并记录候选版本相对 preview.6 的 core helper 清理。

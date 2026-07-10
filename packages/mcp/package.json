@@ -1,14 +1,14 @@
 {
-  "name": "@expcat/tigercat-cli",
+  "name": "@expcat/tigercat-mcp",
   "version": "2.0.0-rc.2",
   "type": "module",
-  "description": "CLI tooling for Tigercat UI library — project scaffolding, component generation, and more",
+  "description": "Local MCP server for routing LLMs to Tigercat skill references",
   "license": "MIT",
   "author": "Yizhe Wang",
   "repository": {
     "type": "git",
     "url": "https://github.com/expcat/Tigercat",
-    "directory": "packages/cli"
+    "directory": "packages/mcp"
   },
   "homepage": "https://github.com/expcat/Tigercat#readme",
   "bugs": {
@@ -16,13 +16,13 @@
   },
   "keywords": [
     "tigercat",
-    "ui",
-    "cli",
-    "scaffolding",
-    "code-generator"
+    "mcp",
+    "llm",
+    "skill",
+    "docs"
   ],
   "bin": {
-    "tigercat": "./dist/index.js"
+    "tigercat-mcp": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.13.0"
   },
   "scripts": {
     "build": "tsup --config tsup.config.ts",
@@ -42,12 +42,10 @@
     "clean": "node ../../scripts/rimraf.mjs dist"
   },
   "dependencies": {
-    "commander": "^15.0.0",
-    "picocolors": "^1.1.1",
-    "prompts": "^2.4.2"
+    "@modelcontextprotocol/sdk": "^1.29.0"
   },
   "devDependencies": {
-    "@types/prompts": "^2.4.9",
+    "@types/node": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:"
   }

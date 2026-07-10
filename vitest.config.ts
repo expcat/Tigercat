@@ -37,7 +37,8 @@ export default defineConfig({
       '@expcat/tigercat-core': resolve(__dirname, './packages/core/src'),
       '@expcat/tigercat-vue': resolve(__dirname, './packages/vue/src'),
       '@expcat/tigercat-react': resolve(__dirname, './packages/react/src'),
-      '@expcat/tigercat-cli': resolve(__dirname, './packages/cli/src')
+      '@expcat/tigercat-cli': resolve(__dirname, './packages/cli/src'),
+      '@expcat/tigercat-mcp': resolve(__dirname, './packages/mcp/src')
     }
   }
 })

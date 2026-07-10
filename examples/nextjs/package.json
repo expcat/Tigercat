@@ -12,7 +12,7 @@
   "dependencies": {
     "@expcat/tigercat-core": "workspace:*",
     "@expcat/tigercat-react": "workspace:*",
-    "next": "^16.2.9",
+    "next": "^16.2.10",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
