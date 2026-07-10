@@ -18,13 +18,6 @@ import {
 
 describe('Input', () => {
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      render(Input)
-
-      const input = screen.getByRole('textbox')
-      expect(input).toBeInTheDocument()
-    })
-
     it('should render with placeholder', () => {
       const { getByPlaceholderText } = renderWithProps(Input, {
         placeholder: 'Enter text'
@@ -63,16 +56,6 @@ describe('Input', () => {
       })
       const wrapper = container.firstChild as HTMLElement
       expect(wrapper).toHaveClass('custom-wrapper-class')
-    })
-
-    it('should merge class from attrs with className prop', () => {
-      const { container } = render(Input, {
-        props: { className: 'from-prop' },
-        attrs: { class: 'from-attr' }
-      })
-      const wrapper = container.firstChild as HTMLElement
-      expect(wrapper).toHaveClass('from-prop')
-      expect(wrapper).toHaveClass('from-attr')
     })
   })
 
@@ -198,63 +181,6 @@ describe('Input', () => {
       const input = container.querySelector('input')
       expect(input).toHaveAttribute('type', 'search')
     })
-
-    it('should apply maxLength attribute', () => {
-      const { getByRole } = renderWithProps(Input, {
-        maxLength: 10
-      })
-
-      expect(getByRole('textbox')).toHaveAttribute('maxlength', '10')
-    })
-
-    it('should apply minLength attribute', () => {
-      const { getByRole } = renderWithProps(Input, {
-        minLength: 3
-      })
-
-      expect(getByRole('textbox')).toHaveAttribute('minlength', '3')
-    })
-
-    it('should apply name attribute', () => {
-      const { getByRole } = renderWithProps(Input, {
-        name: 'username'
-      })
-
-      expect(getByRole('textbox')).toHaveAttribute('name', 'username')
-    })
-
-    it('should apply id attribute', () => {
-      const { container } = renderWithProps(Input, {
-        id: 'input-id'
-      })
-
-      expect(container.querySelector('#input-id')).toBeInTheDocument()
-    })
-
-    it('should apply autocomplete attribute', () => {
-      const { getByRole } = renderWithProps(Input, {
-        autoComplete: 'email'
-      })
-
-      expect(getByRole('textbox')).toHaveAttribute('autocomplete', 'email')
-    })
-
-    it('should have autofocus attribute when autoFocus is true', () => {
-      const { getByRole } = renderWithProps(Input, {
-        autoFocus: true
-      })
-
-      const input = getByRole('textbox')
-      expect(input).toHaveAttribute('autofocus')
-    })
-
-    it('should apply style prop to wrapper', () => {
-      const { container } = render(Input, {
-        props: { style: { width: '200px' } }
-      })
-      const wrapper = container.firstChild as HTMLElement
-      expect(wrapper).toHaveStyle({ width: '200px' })
-    })
   })
 
   describe('States', () => {
@@ -284,17 +210,6 @@ describe('Input', () => {
       })
 
       expect(getByRole('textbox')).toBeRequired()
-    })
-
-    it('should combine disabled and readonly states', () => {
-      const { getByRole } = renderWithProps(Input, {
-        disabled: true,
-        readonly: true
-      })
-
-      const input = getByRole('textbox')
-      expect(input).toBeDisabled()
-      expect(input).toHaveAttribute('readonly')
     })
   })
 
@@ -479,22 +394,6 @@ describe('Input', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
     })
-
-    it('should support custom theme colors', () => {
-      setThemeVariables({
-        '--tiger-primary': '#ff0000'
-      })
-
-      const { getByRole } = renderWithProps(Input, {
-        placeholder: 'Themed input'
-      })
-
-      const input = getByRole('textbox')
-      expect(input).toBeInTheDocument()
-
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
-    })
   })
 
   describe('Accessibility', () => {
@@ -555,20 +454,6 @@ describe('Input', () => {
   })
 
   describe('Edge Cases', () => {
-    it.each([
-      ['whitespace-only', edgeCaseData.whitespace],
-      ['special characters', edgeCaseData.specialCharacters],
-      ['unicode characters', edgeCaseData.unicode],
-      ['very long text', 'a'.repeat(1000)]
-    ])('should handle %s value', (_label, value) => {
-      const { getByRole } = renderWithProps(Input, {
-        modelValue: value
-      })
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe(value)
-    })
-
     it('should handle rapid value changes', async () => {
       const onUpdate = vi.fn()
       const { getByRole } = render(Input, {

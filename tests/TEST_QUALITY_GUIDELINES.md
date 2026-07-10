@@ -56,14 +56,9 @@ meaningful for the component and stop.
 
 ### Quantitative Metrics
 
-- **Line Coverage**: Minimum 80% for each component
-- **Branch Coverage**: Minimum 75% for each component
-- **Function Coverage**: Minimum 80% for each component
-- **Test Count** (`pnpm test:validate` enforced):
-  - **Hard minimum**: 3 tests per file (below this → validation failure)
-  - **Recommended minimum**: 8 tests per file (15 for DatePicker/Upload/TimePicker)
-  - Below recommended triggers a warning, not a failure
-  - There is no upper cap, but lean is the goal: cover each real code path once
+- Repository-wide coverage thresholds are enforced centrally by `vitest.config.ts`.
+- Every spec file must collect at least one test.
+- There is no per-file test-count target. Add tests only for distinct behavior or regression risk.
 
 ### Automated Validation (`pnpm test:validate`)
 
@@ -71,13 +66,12 @@ The validation script checks two severity levels:
 
 **Hard checks** (cause validation failure):
 
-- Test count below hard minimum (3)
+- No collected tests
+- Focused `.only` tests
 - Usage of `: any` type annotation in non-comment code
 
 **Soft checks** (warnings only, informational):
 
-- Test count below recommended minimum
-- No `describe` blocks for grouping
 - Low descriptive naming ratio (less than 50% of test names contain action verbs)
 - No `expectNoA11yViolations` accessibility checks
 
@@ -90,16 +84,14 @@ Use grouped validation for component-family work before broad release gates:
 - Documentation or example changes: add the relevant docs/examples check and changed-file Prettier check.
 - Release-surface or gate-policy changes: upgrade to `pnpm quality:release`.
 
-`pnpm test:group` accepts `--group` / `TEST_GROUP`, `--framework` / `TEST_FRAMEWORK`, `--filter` / `TEST_FILTER`, and `--list`. `pnpm test:validate` accepts the same group, framework, and filter controls for scoped quality scans. `--framework react|vue` narrows React/Vue component specs but still includes shared core specs for that group. Current `form` aliases are `--filter primitives` and `--filter composite`.
+`pnpm test:group` accepts `--group` / `TEST_GROUP`, `--framework` / `TEST_FRAMEWORK`, `--filter` / `TEST_FILTER`, and `--list`. `pnpm test:validate` accepts the same group, framework, and filter controls for scoped quality scans. `--framework react|vue` narrows React/Vue component specs but still includes shared core specs for that group. Current `form` aliases are `--filter primitives` and `--filter composite`. A core regression test also guarantees that every React/Vue spec belongs to at least one group.
 
 ### Qualitative Metrics
 
-- All prop combinations tested
-- All event handlers tested
-- Accessibility validated
-- Edge cases covered
-- Negative scenarios tested
-- Boundary conditions verified
+- Public rendering and state contracts are covered with representative values.
+- Framework bindings cover events/emits, slots/children, controlled or reactive state, and cleanup.
+- Keyboard and ARIA behavior are covered where the component is interactive.
+- Shared pure logic is covered once in `tests/core`, not repeated in both framework suites.
 
 ## Test Categories
 
@@ -237,18 +229,6 @@ describe('Edge Cases', () => {
 
   it('should handle special characters', () => {
     // Test with special chars
-  })
-})
-```
-
-### 8. Snapshot Tests
-
-Test for visual regressions.
-
-```typescript
-describe('Snapshots', () => {
-  it('should match snapshot for default state', () => {
-    expect(container.firstChild).toMatchSnapshot()
   })
 })
 ```
@@ -421,9 +401,9 @@ it('test 2', () => {
 
 ## Edge Case Testing
 
-### Required Edge Cases
+### Representative Edge Cases
 
-Every component must test these edge cases:
+Choose only edge cases that exercise a distinct component behavior:
 
 1. **Empty/Null Values**
 
@@ -578,11 +558,11 @@ Some code may be excluded from coverage requirements:
 ### Running Coverage
 
 ```bash
-# Generate coverage report
+# Fast release-gate coverage with text output only
 pnpm test:coverage
 
-# View coverage in browser
-pnpm test:coverage --ui
+# Generate the opt-in JSON and HTML reports
+pnpm test:coverage:report
 ```
 
 ## Test Naming Conventions
@@ -707,16 +687,13 @@ Use this checklist when reviewing test PRs:
 ### Structure
 
 - [ ] Tests are organized into logical describe blocks
-- [ ] All required test categories are present
 - [ ] Test names clearly describe what they test
 
 ### Coverage
 
-- [ ] All props are tested
-- [ ] All events are tested
-- [ ] All states are tested
-- [ ] Edge cases are covered
-- [ ] Boundary conditions are tested
+- [ ] Each test covers a distinct behavior or regression
+- [ ] Framework binding, interaction, and accessibility risks are represented
+- [ ] Shared pure logic is not duplicated across framework suites
 - [ ] Coverage meets minimum thresholds
 
 ### Quality

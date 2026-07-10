@@ -460,6 +460,65 @@ describe('Upload', () => {
       expect(renderedClasses).toContain('hover:bg-black/50')
       expect(renderedClasses).not.toContain('bg-opacity-')
     })
+
+    it('reuses and revokes local picture-card object URLs', async () => {
+      const createObjectURL = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:preview')
+      const revokeObjectURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined)
+      const file = new File(['image'], 'preview.png', { type: 'image/png' })
+      const uploadFile = {
+        uid: 'local-file',
+        name: file.name,
+        status: 'success' as const,
+        file
+      }
+
+      try {
+        const view = render(Upload, {
+          props: { fileList: [uploadFile], listType: 'picture-card' }
+        })
+        await view.rerender({ fileList: [{ ...uploadFile, progress: 50 }], listType: 'picture-card' })
+
+        expect(createObjectURL).toHaveBeenCalledTimes(1)
+
+        await view.rerender({ fileList: [], listType: 'picture-card' })
+        expect(revokeObjectURL).toHaveBeenCalledWith('blob:preview')
+
+        await view.rerender({ fileList: [uploadFile], listType: 'picture-card' })
+        view.unmount()
+        expect(createObjectURL).toHaveBeenCalledTimes(2)
+        expect(revokeObjectURL).toHaveBeenCalledTimes(2)
+      } finally {
+        createObjectURL.mockRestore()
+        revokeObjectURL.mockRestore()
+      }
+    })
+
+    it('does not create or revoke object URLs for external previews', () => {
+      const createObjectURL = vi.spyOn(URL, 'createObjectURL')
+      const revokeObjectURL = vi.spyOn(URL, 'revokeObjectURL')
+
+      try {
+        const view = renderWithProps(Upload, {
+          fileList: [
+            {
+              uid: 'external-file',
+              name: 'preview.png',
+              status: 'success',
+              url: 'https://example.com/preview.png',
+              file: new File(['image'], 'preview.png', { type: 'image/png' })
+            }
+          ],
+          listType: 'picture-card'
+        })
+        view.unmount()
+
+        expect(createObjectURL).not.toHaveBeenCalled()
+        expect(revokeObjectURL).not.toHaveBeenCalled()
+      } finally {
+        createObjectURL.mockRestore()
+        revokeObjectURL.mockRestore()
+      }
+    })
   })
 
   describe('States', () => {

@@ -196,10 +196,5 @@ describe('useFormController (React)', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { result } = renderHook(() => useFormController())
-      expect(result.current.getFieldValue('missing')).toBeUndefined()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

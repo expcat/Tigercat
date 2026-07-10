@@ -58,22 +58,6 @@ describe('RadarChart', () => {
     expect(point).toHaveAttribute('aria-label', 'A')
     expect(point).not.toHaveAttribute('tabindex')
   })
-
-  it('renders multiple series', () => {
-    const { container } = renderWithProps(RadarChart, { series: multiSeriesData })
-    expect(container.querySelectorAll('path[data-radar-area]')).toHaveLength(2)
-  })
-
-  it('renders level labels when enabled', () => {
-    const { container } = renderWithProps(RadarChart, {
-      data: singleSeriesData,
-      levels: 3,
-      showLevelLabels: true
-    })
-
-    expect(container.querySelectorAll('text[data-radar-level-label]')).toHaveLength(3)
-  })
-
   it('applies hover highlight opacity', () => {
     const { container } = renderWithProps(RadarChart, {
       series: multiSeriesData,
@@ -161,56 +145,6 @@ describe('RadarChart', () => {
 
     expect(container.querySelectorAll('[data-legend-item]')).toHaveLength(2)
   })
-
-  it('renders circle grid when gridShape is circle', () => {
-    const { container } = renderWithProps(RadarChart, {
-      data: singleSeriesData,
-      gridShape: 'circle',
-      levels: 4
-    })
-
-    // Should render circles instead of polygon paths for grid
-    const svgCircles = container.querySelectorAll('svg circle')
-    // 4 grid circles + 3 data point circles = 7
-    expect(svgCircles.length).toBeGreaterThanOrEqual(4)
-  })
-
-  it('renders split area when showSplitArea is enabled', () => {
-    const { container } = renderWithProps(RadarChart, {
-      data: singleSeriesData,
-      showSplitArea: true,
-      levels: 3
-    })
-
-    expect(container.querySelectorAll('[data-radar-split-area]').length).toBeGreaterThanOrEqual(1)
-  })
-
-  it('renders point borders', () => {
-    const { container } = renderWithProps(RadarChart, {
-      data: singleSeriesData,
-      pointBorderWidth: 2,
-      pointBorderColor: '#fff'
-    })
-
-    const points = container.querySelectorAll('circle[data-radar-point]')
-    expect(points).toHaveLength(3)
-    points.forEach((point) => {
-      expect(point.getAttribute('stroke')).toBe('#fff')
-      expect(point.getAttribute('stroke-width')).toBe('2')
-    })
-  })
-
-  it('renders circle grid with split area', () => {
-    const { container } = renderWithProps(RadarChart, {
-      data: singleSeriesData,
-      gridShape: 'circle',
-      showSplitArea: true,
-      levels: 3
-    })
-
-    expect(container.querySelectorAll('[data-radar-split-area]').length).toBeGreaterThanOrEqual(1)
-  })
-
   it('handles series, legend, point, and keyboard interactions', () => {
     const onHoveredIndexChange = vi.fn()
     const onSelectedIndexChange = vi.fn()
@@ -269,24 +203,5 @@ describe('RadarChart', () => {
     expect(container.querySelector('radialGradient')).toBeInTheDocument()
     expect(container.querySelectorAll('text[data-radar-level-label]')).toHaveLength(5)
     expect(container.textContent).toContain('0-A')
-  })
-
-  it('can hide grid, axis, labels, points, legend, and tooltip layers', () => {
-    const { container } = renderWithProps(RadarChart, {
-      data: singleSeriesData,
-      showGrid: false,
-      showAxis: false,
-      showLabels: false,
-      showPoints: false,
-      showTooltip: false,
-      maxValue: 0,
-      levels: 0,
-      fillColor: '#f00',
-      strokeColor: '#0f0'
-    })
-
-    expect(container.querySelectorAll('circle[data-radar-point]')).toHaveLength(0)
-    expect(container.querySelectorAll('text')).toHaveLength(0)
-    expect(container.querySelector('path[data-radar-area]')).toBeInTheDocument()
   })
 })

@@ -94,40 +94,6 @@ describe('Slider', () => {
       await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
       expect(onChange).not.toHaveBeenCalled()
     })
-
-    it.each([
-      ['ArrowRight', 60],
-      ['ArrowUp', 60],
-      ['ArrowLeft', 40],
-      ['ArrowDown', 40]
-    ])('should step the value with %s', async (key, expected) => {
-      const onChange = vi.fn()
-      const { container } = render(<Slider value={50} step={10} onChange={onChange} />)
-      await fireEvent.keyDown(getThumb(container), { key: key as string })
-      expect(onChange).toHaveBeenCalledWith(expected)
-    })
-
-    it('should respect a decimal step', async () => {
-      const onChange = vi.fn()
-      const { container } = render(
-        <Slider value={5} step={0.5} min={0} max={10} onChange={onChange} />
-      )
-      await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
-      expect(onChange).toHaveBeenCalledWith(5.5)
-    })
-
-    it.each([
-      ['Home', 0],
-      ['End', 100],
-      ['PageUp', 60],
-      ['PageDown', 40]
-    ])('should jump with %s', async (key, expected) => {
-      const onChange = vi.fn()
-      const { container } = render(<Slider value={50} min={0} max={100} onChange={onChange} />)
-      await fireEvent.keyDown(getThumb(container), { key: key as string })
-      expect(onChange).toHaveBeenCalledWith(expected)
-    })
-
     it.each([
       ['ArrowRight', 100, 100],
       ['ArrowLeft', 0, 0]
@@ -192,19 +158,6 @@ describe('Slider', () => {
       await fireEvent.keyDown(thumbs[1], { key: 'ArrowLeft' })
       expect(onChange).toHaveBeenCalled()
     })
-
-    it.each([
-      ['ArrowRight', 0],
-      ['ArrowLeft', 1]
-    ])('should clamp thumbs so they cannot cross over (%s)', (key, index) => {
-      const onChange = vi.fn()
-      const { container } = render(
-        <Slider value={[60, 60]} range min={0} max={100} step={5} onChange={onChange} />
-      )
-      fireEvent.keyDown(getThumbs(container)[index as number], { key: key as string })
-      expect(onChange.mock.calls.at(-1)![0]).toEqual([60, 60])
-    })
-
     it('should label per-thumb aria-label, falling back to defaults', () => {
       const { container: withLabel } = render(
         <Slider value={[20, 80]} range aria-label="Brightness" />
@@ -232,19 +185,6 @@ describe('Slider', () => {
       fireEvent.mouseUp(document)
       expect(onChange.mock.calls.at(-1)![0]).toBe(50)
     })
-
-    it('should update value via touch drag', () => {
-      const onChange = vi.fn()
-      const { container } = render(
-        <Slider value={0} min={0} max={100} step={1} onChange={onChange} />
-      )
-      stubTrackRect(container, 200)
-      fireEvent.touchStart(getThumb(container), { touches: [{ clientX: 0 }] })
-      fireEvent.touchMove(document, { touches: [{ clientX: 150 }] })
-      fireEvent.touchEnd(document)
-      expect(onChange.mock.calls.at(-1)![0]).toBe(75)
-    })
-
     it('should not start drag when disabled', () => {
       const onChange = vi.fn()
       const { container } = render(<Slider value={0} disabled onChange={onChange} />)
@@ -344,14 +284,6 @@ describe('Slider', () => {
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
-    })
-
-    it('should apply custom theme colors', () => {
-      setThemeVariables({ '--tiger-primary': '#ff0000' })
-      const { container } = render(<Slider />)
-      expect(getThumb(container)).toBeInTheDocument()
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 

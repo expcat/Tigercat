@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
+import { h } from 'vue'
 import { VirtualTable } from '@expcat/tigercat-vue'
+import type { TableColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const columns = [
@@ -230,6 +232,23 @@ describe('VirtualTable (Vue)', () => {
     const ths = getAllByRole('columnheader')
     expect(ths[0].style.width).toBe('100px')
     expect(ths[1].style.width).toBe('200px')
+  })
+
+  it('uses column render and renderHeader with dataKey values', () => {
+    const rows = [{ id: 1, name: 'Alice' }]
+    const columns: TableColumn[] = [
+      {
+        key: 'displayName',
+        dataKey: 'name',
+        title: 'Fallback',
+        renderHeader: () => h('strong', 'Custom header'),
+        render: (row) => h('span', `Column: ${String(row.name)}`)
+      }
+    ]
+    const { getByText } = render(VirtualTable, { props: { dataSource: rows, columns } })
+
+    expect(getByText('Custom header')).toBeInTheDocument()
+    expect(getByText('Column: Alice')).toBeInTheDocument()
   })
 
   describe('Sticky Columns', () => {

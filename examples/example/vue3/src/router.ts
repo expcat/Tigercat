@@ -1,10 +1,7 @@
-import type { Component } from 'vue'
-import { defineAsyncComponent } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import AppLayout from './layouts/AppLayout.vue'
 
-const lazyPage = (loader: () => Promise<{ default: Component }>) => defineAsyncComponent(loader)
-const Home = lazyPage(() => import('./pages/Home.vue'))
+const Home = () => import('./pages/Home.vue')
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -15,189 +12,189 @@ const router = createRouter({
       children: [
         { path: '', component: Home },
         // Basic
-        { path: 'button', component: lazyPage(() => import('./pages/ButtonDemo.vue')) },
-        { path: 'icon', component: lazyPage(() => import('./pages/IconDemo.vue')) },
-        { path: 'link', component: lazyPage(() => import('./pages/LinkDemo.vue')) },
-        { path: 'text', component: lazyPage(() => import('./pages/TextDemo.vue')) },
-        { path: 'code', component: lazyPage(() => import('./pages/CodeDemo.vue')) },
-        { path: 'image', component: lazyPage(() => import('./pages/ImageDemo.vue')) },
+        { path: 'button', component: () => import('./pages/ButtonDemo.vue') },
+        { path: 'icon', component: () => import('./pages/IconDemo.vue') },
+        { path: 'link', component: () => import('./pages/LinkDemo.vue') },
+        { path: 'text', component: () => import('./pages/TextDemo.vue') },
+        { path: 'code', component: () => import('./pages/CodeDemo.vue') },
+        { path: 'image', component: () => import('./pages/ImageDemo.vue') },
         {
           path: 'image-cropper',
-          component: lazyPage(() => import('./pages/ImageCropperDemo.vue'))
+          component: () => import('./pages/ImageCropperDemo.vue')
         },
-        { path: 'image-viewer', component: lazyPage(() => import('./pages/ImageViewerDemo.vue')) },
-        { path: 'avatar', component: lazyPage(() => import('./pages/AvatarDemo.vue')) },
-        { path: 'badge', component: lazyPage(() => import('./pages/BadgeDemo.vue')) },
-        { path: 'tag', component: lazyPage(() => import('./pages/TagDemo.vue')) },
-        { path: 'empty', component: lazyPage(() => import('./pages/EmptyDemo.vue')) },
-        { path: 'result', component: lazyPage(() => import('./pages/ResultDemo.vue')) },
-        { path: 'qrcode', component: lazyPage(() => import('./pages/QRCodeDemo.vue')) },
-        { path: 'statistic', component: lazyPage(() => import('./pages/StatisticDemo.vue')) },
-        { path: 'rate', component: lazyPage(() => import('./pages/RateDemo.vue')) },
-        { path: 'segmented', component: lazyPage(() => import('./pages/SegmentedDemo.vue')) },
-        { path: 'watermark', component: lazyPage(() => import('./pages/WatermarkDemo.vue')) },
+        { path: 'image-viewer', component: () => import('./pages/ImageViewerDemo.vue') },
+        { path: 'avatar', component: () => import('./pages/AvatarDemo.vue') },
+        { path: 'badge', component: () => import('./pages/BadgeDemo.vue') },
+        { path: 'tag', component: () => import('./pages/TagDemo.vue') },
+        { path: 'empty', component: () => import('./pages/EmptyDemo.vue') },
+        { path: 'result', component: () => import('./pages/ResultDemo.vue') },
+        { path: 'qrcode', component: () => import('./pages/QRCodeDemo.vue') },
+        { path: 'statistic', component: () => import('./pages/StatisticDemo.vue') },
+        { path: 'rate', component: () => import('./pages/RateDemo.vue') },
+        { path: 'segmented', component: () => import('./pages/SegmentedDemo.vue') },
+        { path: 'watermark', component: () => import('./pages/WatermarkDemo.vue') },
         // Form
-        { path: 'input', component: lazyPage(() => import('./pages/InputDemo.vue')) },
-        { path: 'input-number', component: lazyPage(() => import('./pages/InputDemo.vue')) },
-        { path: 'input-group', component: lazyPage(() => import('./pages/InputGroupDemo.vue')) },
-        { path: 'textarea', component: lazyPage(() => import('./pages/TextareaDemo.vue')) },
-        { path: 'checkbox', component: lazyPage(() => import('./pages/CheckboxDemo.vue')) },
-        { path: 'radio', component: lazyPage(() => import('./pages/RadioDemo.vue')) },
-        { path: 'switch', component: lazyPage(() => import('./pages/SwitchDemo.vue')) },
-        { path: 'slider', component: lazyPage(() => import('./pages/SliderDemo.vue')) },
-        { path: 'stepper', component: lazyPage(() => import('./pages/StepperDemo.vue')) },
-        { path: 'select', component: lazyPage(() => import('./pages/SelectDemo.vue')) },
+        { path: 'input', component: () => import('./pages/InputDemo.vue') },
+        { path: 'input-number', component: () => import('./pages/InputDemo.vue') },
+        { path: 'input-group', component: () => import('./pages/InputGroupDemo.vue') },
+        { path: 'textarea', component: () => import('./pages/TextareaDemo.vue') },
+        { path: 'checkbox', component: () => import('./pages/CheckboxDemo.vue') },
+        { path: 'radio', component: () => import('./pages/RadioDemo.vue') },
+        { path: 'switch', component: () => import('./pages/SwitchDemo.vue') },
+        { path: 'slider', component: () => import('./pages/SliderDemo.vue') },
+        { path: 'stepper', component: () => import('./pages/StepperDemo.vue') },
+        { path: 'select', component: () => import('./pages/SelectDemo.vue') },
         {
           path: 'auto-complete',
-          component: lazyPage(() => import('./pages/AutoCompleteDemo.vue'))
+          component: () => import('./pages/AutoCompleteDemo.vue')
         },
-        { path: 'cascader', component: lazyPage(() => import('./pages/CascaderDemo.vue')) },
-        { path: 'tree-select', component: lazyPage(() => import('./pages/TreeSelectDemo.vue')) },
-        { path: 'color-picker', component: lazyPage(() => import('./pages/ColorPickerDemo.vue')) },
-        { path: 'color-swatch', component: lazyPage(() => import('./pages/ColorSwatchDemo.vue')) },
-        { path: 'cron-editor', component: lazyPage(() => import('./pages/CronEditorDemo.vue')) },
-        { path: 'signature', component: lazyPage(() => import('./pages/SignatureDemo.vue')) },
+        { path: 'cascader', component: () => import('./pages/CascaderDemo.vue') },
+        { path: 'tree-select', component: () => import('./pages/TreeSelectDemo.vue') },
+        { path: 'color-picker', component: () => import('./pages/ColorPickerDemo.vue') },
+        { path: 'color-swatch', component: () => import('./pages/ColorSwatchDemo.vue') },
+        { path: 'cron-editor', component: () => import('./pages/CronEditorDemo.vue') },
+        { path: 'signature', component: () => import('./pages/SignatureDemo.vue') },
         {
           path: 'number-keyboard',
-          component: lazyPage(() => import('./pages/NumberKeyboardDemo.vue'))
+          component: () => import('./pages/NumberKeyboardDemo.vue')
         },
-        { path: 'mentions', component: lazyPage(() => import('./pages/MentionsDemo.vue')) },
-        { path: 'transfer', component: lazyPage(() => import('./pages/TransferDemo.vue')) },
-        { path: 'datepicker', component: lazyPage(() => import('./pages/DatePickerDemo.vue')) },
-        { path: 'timepicker', component: lazyPage(() => import('./pages/TimePickerDemo.vue')) },
-        { path: 'upload', component: lazyPage(() => import('./pages/UploadDemo.vue')) },
-        { path: 'form', component: lazyPage(() => import('./pages/FormDemo.vue')) },
+        { path: 'mentions', component: () => import('./pages/MentionsDemo.vue') },
+        { path: 'transfer', component: () => import('./pages/TransferDemo.vue') },
+        { path: 'datepicker', component: () => import('./pages/DatePickerDemo.vue') },
+        { path: 'timepicker', component: () => import('./pages/TimePickerDemo.vue') },
+        { path: 'upload', component: () => import('./pages/UploadDemo.vue') },
+        { path: 'form', component: () => import('./pages/FormDemo.vue') },
         // Layout
-        { path: 'layout', component: lazyPage(() => import('./pages/LayoutDemo.vue')) },
-        { path: 'grid', component: lazyPage(() => import('./pages/GridDemo.vue')) },
-        { path: 'space', component: lazyPage(() => import('./pages/SpaceDemo.vue')) },
-        { path: 'divider', component: lazyPage(() => import('./pages/DividerDemo.vue')) },
-        { path: 'card', component: lazyPage(() => import('./pages/CardDemo.vue')) },
-        { path: 'descriptions', component: lazyPage(() => import('./pages/DescriptionsDemo.vue')) },
-        { path: 'list', component: lazyPage(() => import('./pages/ListDemo.vue')) },
-        { path: 'skeleton', component: lazyPage(() => import('./pages/SkeletonDemo.vue')) },
-        { path: 'splitter', component: lazyPage(() => import('./pages/SplitterDemo.vue')) },
-        { path: 'print-layout', component: lazyPage(() => import('./pages/PrintLayoutDemo.vue')) },
+        { path: 'layout', component: () => import('./pages/LayoutDemo.vue') },
+        { path: 'grid', component: () => import('./pages/GridDemo.vue') },
+        { path: 'space', component: () => import('./pages/SpaceDemo.vue') },
+        { path: 'divider', component: () => import('./pages/DividerDemo.vue') },
+        { path: 'card', component: () => import('./pages/CardDemo.vue') },
+        { path: 'descriptions', component: () => import('./pages/DescriptionsDemo.vue') },
+        { path: 'list', component: () => import('./pages/ListDemo.vue') },
+        { path: 'skeleton', component: () => import('./pages/SkeletonDemo.vue') },
+        { path: 'splitter', component: () => import('./pages/SplitterDemo.vue') },
+        { path: 'print-layout', component: () => import('./pages/PrintLayoutDemo.vue') },
         // Data Display
-        { path: 'table', component: lazyPage(() => import('./pages/TableDemo.vue')) },
+        { path: 'table', component: () => import('./pages/TableDemo.vue') },
         {
           path: 'data-export',
-          component: lazyPage(() => import('./pages/DataExportDemo.vue'))
+          component: () => import('./pages/DataExportDemo.vue')
         },
         {
           path: 'virtual-table',
-          component: lazyPage(() => import('./pages/VirtualTableDemo.vue'))
+          component: () => import('./pages/VirtualTableDemo.vue')
         },
-        { path: 'timeline', component: lazyPage(() => import('./pages/TimelineDemo.vue')) },
-        { path: 'progress', component: lazyPage(() => import('./pages/ProgressDemo.vue')) },
-        { path: 'tree', component: lazyPage(() => import('./pages/TreeDemo.vue')) },
-        { path: 'collapse', component: lazyPage(() => import('./pages/CollapseDemo.vue')) },
-        { path: 'carousel', component: lazyPage(() => import('./pages/CarouselDemo.vue')) },
-        { path: 'calendar', component: lazyPage(() => import('./pages/CalendarDemo.vue')) },
-        { path: 'countdown', component: lazyPage(() => import('./pages/CountdownDemo.vue')) },
+        { path: 'timeline', component: () => import('./pages/TimelineDemo.vue') },
+        { path: 'progress', component: () => import('./pages/ProgressDemo.vue') },
+        { path: 'tree', component: () => import('./pages/TreeDemo.vue') },
+        { path: 'collapse', component: () => import('./pages/CollapseDemo.vue') },
+        { path: 'carousel', component: () => import('./pages/CarouselDemo.vue') },
+        { path: 'calendar', component: () => import('./pages/CalendarDemo.vue') },
+        { path: 'countdown', component: () => import('./pages/CountdownDemo.vue') },
         // Navigation
-        { path: 'menu', component: lazyPage(() => import('./pages/MenuDemo.vue')) },
-        { path: 'breadcrumb', component: lazyPage(() => import('./pages/BreadcrumbDemo.vue')) },
-        { path: 'dropdown', component: lazyPage(() => import('./pages/DropdownDemo.vue')) },
-        { path: 'tabs', component: lazyPage(() => import('./pages/TabsDemo.vue')) },
-        { path: 'steps', component: lazyPage(() => import('./pages/StepsDemo.vue')) },
-        { path: 'pagination', component: lazyPage(() => import('./pages/PaginationDemo.vue')) },
-        { path: 'anchor', component: lazyPage(() => import('./pages/AnchorDemo.vue')) },
-        { path: 'backtop', component: lazyPage(() => import('./pages/BackTopDemo.vue')) },
-        { path: 'affix', component: lazyPage(() => import('./pages/AffixDemo.vue')) },
-        { path: 'tour', component: lazyPage(() => import('./pages/TourDemo.vue')) },
-        { path: 'float-button', component: lazyPage(() => import('./pages/FloatButtonDemo.vue')) },
-        { path: 'spotlight', component: lazyPage(() => import('./pages/SpotlightDemo.vue')) },
-        { path: 'scroll-spy', component: lazyPage(() => import('./pages/ScrollSpyDemo.vue')) },
+        { path: 'menu', component: () => import('./pages/MenuDemo.vue') },
+        { path: 'breadcrumb', component: () => import('./pages/BreadcrumbDemo.vue') },
+        { path: 'dropdown', component: () => import('./pages/DropdownDemo.vue') },
+        { path: 'tabs', component: () => import('./pages/TabsDemo.vue') },
+        { path: 'steps', component: () => import('./pages/StepsDemo.vue') },
+        { path: 'pagination', component: () => import('./pages/PaginationDemo.vue') },
+        { path: 'anchor', component: () => import('./pages/AnchorDemo.vue') },
+        { path: 'backtop', component: () => import('./pages/BackTopDemo.vue') },
+        { path: 'affix', component: () => import('./pages/AffixDemo.vue') },
+        { path: 'tour', component: () => import('./pages/TourDemo.vue') },
+        { path: 'float-button', component: () => import('./pages/FloatButtonDemo.vue') },
+        { path: 'spotlight', component: () => import('./pages/SpotlightDemo.vue') },
+        { path: 'scroll-spy', component: () => import('./pages/ScrollSpyDemo.vue') },
         // Feedback
-        { path: 'alert', component: lazyPage(() => import('./pages/AlertDemo.vue')) },
-        { path: 'message', component: lazyPage(() => import('./pages/MessageDemo.vue')) },
-        { path: 'modal', component: lazyPage(() => import('./pages/ModalDemo.vue')) },
-        { path: 'popconfirm', component: lazyPage(() => import('./pages/PopconfirmDemo.vue')) },
-        { path: 'popover', component: lazyPage(() => import('./pages/PopoverDemo.vue')) },
-        { path: 'tooltip', component: lazyPage(() => import('./pages/TooltipDemo.vue')) },
-        { path: 'notification', component: lazyPage(() => import('./pages/NotificationDemo.vue')) },
-        { path: 'drawer', component: lazyPage(() => import('./pages/DrawerDemo.vue')) },
-        { path: 'loading', component: lazyPage(() => import('./pages/LoadingDemo.vue')) },
+        { path: 'alert', component: () => import('./pages/AlertDemo.vue') },
+        { path: 'message', component: () => import('./pages/MessageDemo.vue') },
+        { path: 'modal', component: () => import('./pages/ModalDemo.vue') },
+        { path: 'popconfirm', component: () => import('./pages/PopconfirmDemo.vue') },
+        { path: 'popover', component: () => import('./pages/PopoverDemo.vue') },
+        { path: 'tooltip', component: () => import('./pages/TooltipDemo.vue') },
+        { path: 'notification', component: () => import('./pages/NotificationDemo.vue') },
+        { path: 'drawer', component: () => import('./pages/DrawerDemo.vue') },
+        { path: 'loading', component: () => import('./pages/LoadingDemo.vue') },
         // Charts
-        { path: 'bar-chart', component: lazyPage(() => import('./pages/BarChartDemo.vue')) },
-        { path: 'line-chart', component: lazyPage(() => import('./pages/LineChartDemo.vue')) },
-        { path: 'area-chart', component: lazyPage(() => import('./pages/AreaChartDemo.vue')) },
-        { path: 'pie-chart', component: lazyPage(() => import('./pages/PieChartDemo.vue')) },
-        { path: 'donut-chart', component: lazyPage(() => import('./pages/DonutChartDemo.vue')) },
+        { path: 'bar-chart', component: () => import('./pages/BarChartDemo.vue') },
+        { path: 'line-chart', component: () => import('./pages/LineChartDemo.vue') },
+        { path: 'area-chart', component: () => import('./pages/AreaChartDemo.vue') },
+        { path: 'pie-chart', component: () => import('./pages/PieChartDemo.vue') },
+        { path: 'donut-chart', component: () => import('./pages/DonutChartDemo.vue') },
         {
           path: 'scatter-chart',
-          component: lazyPage(() => import('./pages/ScatterChartDemo.vue'))
+          component: () => import('./pages/ScatterChartDemo.vue')
         },
-        { path: 'radar-chart', component: lazyPage(() => import('./pages/RadarChartDemo.vue')) },
-        { path: 'funnel-chart', component: lazyPage(() => import('./pages/FunnelChartDemo.vue')) },
-        { path: 'gauge-chart', component: lazyPage(() => import('./pages/GaugeChartDemo.vue')) },
+        { path: 'radar-chart', component: () => import('./pages/RadarChartDemo.vue') },
+        { path: 'funnel-chart', component: () => import('./pages/FunnelChartDemo.vue') },
+        { path: 'gauge-chart', component: () => import('./pages/GaugeChartDemo.vue') },
         {
           path: 'heatmap-chart',
-          component: lazyPage(() => import('./pages/HeatmapChartDemo.vue'))
+          component: () => import('./pages/HeatmapChartDemo.vue')
         },
         {
           path: 'treemap-chart',
-          component: lazyPage(() => import('./pages/TreeMapChartDemo.vue'))
+          component: () => import('./pages/TreeMapChartDemo.vue')
         },
         {
           path: 'sunburst-chart',
-          component: lazyPage(() => import('./pages/SunburstChartDemo.vue'))
+          component: () => import('./pages/SunburstChartDemo.vue')
         },
-        { path: 'org-chart', component: lazyPage(() => import('./pages/OrgChartDemo.vue')) },
-        { path: 'gantt', component: lazyPage(() => import('./pages/GanttDemo.vue')) },
+        { path: 'org-chart', component: () => import('./pages/OrgChartDemo.vue') },
+        { path: 'gantt', component: () => import('./pages/GanttDemo.vue') },
         // Advanced
-        { path: 'resizable', component: lazyPage(() => import('./pages/ResizableDemo.vue')) },
-        { path: 'virtual-list', component: lazyPage(() => import('./pages/VirtualListDemo.vue')) },
+        { path: 'resizable', component: () => import('./pages/ResizableDemo.vue') },
+        { path: 'virtual-list', component: () => import('./pages/VirtualListDemo.vue') },
         {
           path: 'infinite-scroll',
-          component: lazyPage(() => import('./pages/InfiniteScrollDemo.vue'))
+          component: () => import('./pages/InfiniteScrollDemo.vue')
         },
-        { path: 'code-editor', component: lazyPage(() => import('./pages/CodeEditorDemo.vue')) },
+        { path: 'code-editor', component: () => import('./pages/CodeEditorDemo.vue') },
         {
           path: 'rich-text-editor',
-          component: lazyPage(() => import('./pages/RichTextEditorDemo.vue'))
+          component: () => import('./pages/RichTextEditorDemo.vue')
         },
         {
           path: 'markdown-editor',
-          component: lazyPage(() => import('./pages/MarkdownEditorDemo.vue'))
+          component: () => import('./pages/MarkdownEditorDemo.vue')
         },
-        { path: 'kanban', component: lazyPage(() => import('./pages/KanbanDemo.vue')) },
-        { path: 'file-manager', component: lazyPage(() => import('./pages/FileManagerDemo.vue')) },
+        { path: 'kanban', component: () => import('./pages/KanbanDemo.vue') },
+        { path: 'file-manager', component: () => import('./pages/FileManagerDemo.vue') },
         {
           path: 'image-annotation',
-          component: lazyPage(() => import('./pages/ImageAnnotationDemo.vue'))
+          component: () => import('./pages/ImageAnnotationDemo.vue')
         },
         // Composite
         {
           path: 'data-table-with-toolbar',
-          component: lazyPage(() => import('./pages/DataTableWithToolbarDemo.vue'))
+          component: () => import('./pages/DataTableWithToolbarDemo.vue')
         },
-        { path: 'form-wizard', component: lazyPage(() => import('./pages/FormWizardDemo.vue')) },
-        { path: 'chat-window', component: lazyPage(() => import('./pages/ChatWindowDemo.vue')) },
+        { path: 'form-wizard', component: () => import('./pages/FormWizardDemo.vue') },
+        { path: 'chat-window', component: () => import('./pages/ChatWindowDemo.vue') },
         {
           path: 'comment-thread',
-          component: lazyPage(() => import('./pages/CommentThreadDemo.vue'))
+          component: () => import('./pages/CommentThreadDemo.vue')
         },
         {
           path: 'activity-feed',
-          component: lazyPage(() => import('./pages/ActivityFeedDemo.vue'))
+          component: () => import('./pages/ActivityFeedDemo.vue')
         },
         {
           path: 'notification-center',
-          component: lazyPage(() => import('./pages/NotificationCenterDemo.vue'))
+          component: () => import('./pages/NotificationCenterDemo.vue')
         },
-        { path: 'crop-upload', component: lazyPage(() => import('./pages/CropUploadDemo.vue')) },
-        { path: 'task-board', component: lazyPage(() => import('./pages/TaskBoardDemo.vue')) },
+        { path: 'crop-upload', component: () => import('./pages/CropUploadDemo.vue') },
+        { path: 'task-board', component: () => import('./pages/TaskBoardDemo.vue') },
         // Hooks
-        { path: 'use-drag', component: lazyPage(() => import('./pages/UseDragDemo.vue')) },
+        { path: 'use-drag', component: () => import('./pages/UseDragDemo.vue') },
         {
           path: 'use-controlled-state',
-          component: lazyPage(() => import('./pages/UseControlledStateDemo.vue'))
+          component: () => import('./pages/UseControlledStateDemo.vue')
         },
         {
           path: 'use-chart-interaction',
-          component: lazyPage(() => import('./pages/UseChartInteractionDemo.vue'))
+          component: () => import('./pages/UseChartInteractionDemo.vue')
         }
       ]
     }

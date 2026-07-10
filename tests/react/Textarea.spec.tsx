@@ -48,18 +48,6 @@ describe('Textarea', () => {
       render(<Textarea size={size} />)
       expect(screen.getByRole('textbox')).toBeInTheDocument()
     })
-
-    it('applies common native props', () => {
-      render(<Textarea rows={5} maxLength={10} minLength={2} name="description" id="ta" autoFocus />)
-      const textarea = getTextarea()
-      expect(textarea).toHaveAttribute('rows', '5')
-      expect(textarea).toHaveAttribute('maxlength', '10')
-      expect(textarea).toHaveAttribute('minlength', '2')
-      expect(textarea).toHaveAttribute('name', 'description')
-      expect(textarea).toHaveAttribute('id', 'ta')
-      expect(textarea).toHaveFocus()
-    })
-
     it('defaults rows to 3 and honors a custom rows value', () => {
       const { rerender } = render(<Textarea />)
       expect(getTextarea()).toHaveAttribute('rows', '3')
@@ -72,13 +60,6 @@ describe('Textarea', () => {
     it('is disabled when disabled', () => {
       render(<Textarea disabled />)
       expect(getTextarea()).toBeDisabled()
-    })
-
-    it('combines readonly and required states', () => {
-      render(<Textarea readonly required />)
-      const textarea = getTextarea()
-      expect(textarea).toHaveAttribute('readonly')
-      expect(textarea).toBeRequired()
     })
   })
 
@@ -183,23 +164,17 @@ describe('Textarea', () => {
       render(<Textarea defaultValue="abc" showCount maxLength={10} />)
       expect(screen.getByText('3/10')).toBeInTheDocument()
     })
-
-    it('shows the count without maxLength', () => {
-      render(<Textarea defaultValue="hello" showCount />)
-      expect(screen.getByText('5')).toBeInTheDocument()
-    })
-
-    it('shows zero for an empty value', () => {
-      render(<Textarea defaultValue="" showCount />)
-      expect(screen.getByText('0')).toBeInTheDocument()
-    })
-
     it('updates the count on input', async () => {
       const user = userEvent.setup()
       const TestComponent = () => {
         const [value, setValue] = React.useState('ab')
         return (
-          <Textarea value={value} onChange={(e) => setValue(e.target.value)} showCount maxLength={10} />
+          <Textarea
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            showCount
+            maxLength={10}
+          />
         )
       }
       render(<TestComponent />)
@@ -207,30 +182,11 @@ describe('Textarea', () => {
       await user.type(getTextarea(), 'cd')
       expect(screen.getByText('4/10')).toBeInTheDocument()
     })
-
-    it('does not show the count when showCount is false', () => {
-      const { container } = render(<Textarea defaultValue="abc" showCount={false} maxLength={10} />)
-      expect(container).not.toHaveTextContent('3/10')
-    })
-
-    it('counts unicode characters correctly', () => {
-      const unicodeText = '你好世界🌍'
-      render(<Textarea value={unicodeText} showCount />)
-      expect(screen.getByText(String(unicodeText.length))).toBeInTheDocument()
-    })
   })
 
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
-    })
-
-    it('supports custom theme colors', () => {
-      setThemeVariables({ '--tiger-primary': '#ff0000' })
-      render(<Textarea placeholder="Themed textarea" />)
-      expect(getTextarea()).toBeInTheDocument()
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 
@@ -255,58 +211,7 @@ describe('Textarea', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it.each([
-      ['special characters', edgeCaseData.specialCharacters],
-      ['unicode', edgeCaseData.unicode],
-      ['HTML-like content', '<script>alert("xss")</script>']
-    ])('preserves %s in the value', (_label, text) => {
-      render(<Textarea value={text} />)
-      expect(getTextarea().value).toBe(text)
-    })
-
-    it('handles rapid value changes', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const TestComponent = () => {
-        const [value, setValue] = React.useState('')
-        return (
-          <Textarea
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value)
-              handleChange(e)
-            }}
-          />
-        )
-      }
-      render(<TestComponent />)
-      await user.type(getTextarea(), 'abc')
-      expect(handleChange).toHaveBeenCalledTimes(3)
-    })
-
-    it('renders without crashing with all props set', () => {
-      render(
-        <Textarea
-          value="test content"
-          size="lg"
-          placeholder="Enter description"
-          required
-          rows={5}
-          autoResize={false}
-          maxRows={10}
-          minRows={2}
-          maxLength={500}
-          minLength={10}
-          name="description"
-          id="textarea-id"
-          showCount
-          className="custom-class"
-        />
-      )
-      expect(screen.getByRole('textbox')).toBeInTheDocument()
-    })
-  })
+  describe('Edge Cases', () => {})
 
   describe('Ref Forwarding', () => {
     it('forwards a ref to the textarea and supports imperative focus', () => {

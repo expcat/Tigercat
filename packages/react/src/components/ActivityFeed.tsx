@@ -11,6 +11,20 @@ import {
   activityItemTitleGroupClasses,
   activityItemDescriptionClasses,
   activityItemActionsClasses,
+  activityFeedActionClasses,
+  activityFeedItemSurfaceClasses,
+  activityFeedAvatarClasses,
+  activityFeedTitleClasses,
+  activityFeedTimeClasses,
+  activityFeedDescriptionClasses,
+  activityFeedStateCardClasses,
+  activityFeedLoadingClasses,
+  activityFeedEmptyIconClasses,
+  activityFeedGroupMarkerClasses,
+  activityFeedGroupTitleClasses,
+  activityFeedDotBaseClasses,
+  activityFeedDotPulseBaseClasses,
+  getActivityFeedDotClasses,
   type ActivityFeedProps as CoreActivityFeedProps,
   type ActivityGroup,
   type ActivityItem,
@@ -45,7 +59,7 @@ const renderAction = (item: ActivityItem, action: ActivityAction, index: number)
       href={action.href}
       target={action.target}
       disabled={action.disabled}
-      className="inline-flex items-center px-2.5 py-1 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-950/20 text-xs font-semibold transition-all duration-200"
+      className={activityFeedActionClasses}
       onClick={() => action.onClick?.(item, action)}>
       {action.label}
     </Link>
@@ -106,7 +120,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <div
         className={classNames(
           activityItemClasses,
-          'p-4 rounded-2xl border border-gray-100/70 dark:border-gray-800/40 bg-white/40 dark:bg-gray-900/15 backdrop-blur-sm shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-gray-100/30 dark:hover:shadow-none hover:bg-white dark:hover:bg-gray-900/30 hover:-translate-y-0.5 w-full'
+          activityFeedItemSurfaceClasses
         )}>
         <div className={activityItemLayoutClasses}>
           {showAvatar && item.user ? (
@@ -114,7 +128,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
               size="sm"
               src={item.user.avatar}
               text={item.user.name}
-              className="shrink-0 ring-2 ring-white dark:ring-gray-900 shadow-sm transition-transform hover:scale-105 duration-200"
+              className={activityFeedAvatarClasses}
             />
           ) : null}
           <div className={activityItemBodyClasses}>
@@ -125,7 +139,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                     tag="div"
                     size="sm"
                     weight="semibold"
-                    className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer truncate">
+                    className={activityFeedTitleClasses}>
                     {titleText}
                   </Text>
                 ) : null}
@@ -143,7 +157,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                   tag="div"
                   size="xs"
                   color="muted"
-                  className="shrink-0 whitespace-nowrap font-medium text-gray-400 dark:text-gray-500">
+                  className={activityFeedTimeClasses}>
                   {timeText}
                 </Text>
               ) : null}
@@ -155,7 +169,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                 color="muted"
                 className={classNames(
                   activityItemDescriptionClasses,
-                  'text-gray-600 dark:text-gray-300 leading-relaxed pl-0.5 mt-1'
+                  activityFeedDescriptionClasses
                 )}>
                 {descriptionText}
               </Text>
@@ -181,9 +195,9 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
         <Card
           variant="bordered"
           size="sm"
-          className="tiger-activity-feed-loading bg-white/40 dark:bg-gray-900/20 border-gray-100 dark:border-gray-800/80 backdrop-blur-sm rounded-2xl shadow-sm overflow-hidden">
+          className={classNames('tiger-activity-feed-loading', activityFeedStateCardClasses)}>
           <div className="flex items-center justify-center py-8">
-            <Loading text={loadingText} className="text-blue-500 dark:text-blue-400 font-medium" />
+            <Loading text={loadingText} className={activityFeedLoadingClasses} />
           </div>
         </Card>
       </div>
@@ -201,10 +215,10 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
         <Card
           variant="bordered"
           size="sm"
-          className="tiger-activity-feed-empty bg-white/40 dark:bg-gray-900/20 border-gray-100 dark:border-gray-800/80 backdrop-blur-sm rounded-2xl shadow-sm overflow-hidden">
+          className={classNames('tiger-activity-feed-empty', activityFeedStateCardClasses)}>
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <svg
-              className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3 animate-pulse"
+              className={activityFeedEmptyIconClasses}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -241,12 +255,12 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             {showGroupTitle && groupTitle
               ? (headerNode ?? (
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="w-1.5 h-3.5 bg-blue-500 rounded-full dark:bg-blue-400 shadow-sm shadow-blue-500/20" />
+                    <span className={activityFeedGroupMarkerClasses} />
                     <Text
                       tag="span"
                       size="sm"
                       weight="bold"
-                      className="text-gray-900 dark:text-gray-100 uppercase tracking-wider">
+                      className={activityFeedGroupTitleClasses}>
                       {groupTitle}
                     </Text>
                   </div>
@@ -254,42 +268,19 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
               : null}
             <Timeline
               items={timelineItems}
-              style={
-                {
-                  '--tiger-border': 'rgba(156, 163, 175, 0.18)'
-                } as React.CSSProperties
-              }
               renderDot={(timelineItem) => {
                 const activity = (timelineItem as ActivityTimelineItem).activity
                 const statusVariant = (activity?.status?.variant ?? 'default') as string
-
-                const baseDotClass =
-                  'w-3 h-3 rounded-full border-2 border-white dark:border-gray-950 shadow-sm'
-                let colorClass = 'bg-gray-300 dark:bg-gray-700'
-                let pulseClass = ''
-
-                if (statusVariant === 'success') {
-                  colorClass = 'bg-emerald-500'
-                  pulseClass = 'bg-emerald-500/30'
-                } else if (statusVariant === 'warning') {
-                  colorClass = 'bg-amber-500'
-                  pulseClass = 'bg-amber-500/30'
-                } else if (statusVariant === 'error' || statusVariant === 'danger') {
-                  colorClass = 'bg-rose-500'
-                  pulseClass = 'bg-rose-500/30'
-                } else if (statusVariant === 'primary' || statusVariant === 'info') {
-                  colorClass = 'bg-blue-500'
-                  pulseClass = 'bg-blue-500/30'
-                }
+                const dotClasses = getActivityFeedDotClasses(statusVariant)
 
                 return (
                   <div className="relative flex items-center justify-center w-4 h-4">
-                    {pulseClass ? (
+                    {dotClasses.pulse ? (
                       <span
-                        className={`absolute inline-flex h-full w-full rounded-full animate-ping opacity-75 ${pulseClass}`}
+                        className={`${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`}
                       />
                     ) : null}
-                    <span className={`${baseDotClass} ${colorClass} relative z-10`} />
+                    <span className={`${activityFeedDotBaseClasses} ${dotClasses.dot}`} />
                   </div>
                 )
               }}

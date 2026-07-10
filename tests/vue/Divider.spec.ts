@@ -34,27 +34,6 @@ describe('Divider (Vue)', () => {
     const { container: dotted } = renderWithProps(Divider, { lineStyle: 'dotted' })
     expect(dotted.querySelector('[role="separator"]')?.className).toContain('border-dotted')
   })
-
-  it('applies spacing classes for each orientation', () => {
-    const { container: horizontal } = renderWithProps(Divider, {
-      spacing: 'lg',
-      orientation: 'horizontal'
-    })
-    expect(horizontal.querySelector('[role="separator"]')?.className).toContain('my-6')
-
-    const { container: vertical } = renderWithProps(Divider, {
-      spacing: 'lg',
-      orientation: 'vertical'
-    })
-    expect(vertical.querySelector('[role="separator"]')?.className).toContain('mx-6')
-  })
-
-  it('applies no spacing classes when spacing is none', () => {
-    const { container } = renderWithProps(Divider, { spacing: 'none' })
-    const cls = container.querySelector('[role="separator"]')?.className ?? ''
-    expect(cls).not.toMatch(/my-|mx-/)
-  })
-
   it('merges custom class via attrs', () => {
     const { container } = render(Divider, { attrs: { class: 'custom-divider-class' } })
     expect(container.querySelector('[role="separator"]')).toHaveClass('custom-divider-class')

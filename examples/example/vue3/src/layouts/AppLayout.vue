@@ -46,17 +46,27 @@ const isSiderCollapsed = ref<boolean>(getStoredSiderCollapsed())
 provide('demo-lang', lang)
 
 const isMobile = ref(false)
+const isCompactHeader = ref(false)
 let mqlCleanup: (() => void) | null = null
 
 function setupMobileDetection() {
   const mql = window.matchMedia('(max-width: 767px)')
+  const compactMql = window.matchMedia('(max-width: 639px)')
   const handler = (e: MediaQueryListEvent | MediaQueryList) => {
     isMobile.value = e.matches
     if (e.matches) isSiderCollapsed.value = true
   }
+  const compactHandler = (e: MediaQueryListEvent | MediaQueryList) => {
+    isCompactHeader.value = e.matches
+  }
   handler(mql)
+  compactHandler(compactMql)
   mql.addEventListener('change', handler as (e: MediaQueryListEvent) => void)
-  mqlCleanup = () => mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void)
+  compactMql.addEventListener('change', compactHandler as (e: MediaQueryListEvent) => void)
+  mqlCleanup = () => {
+    mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void)
+    compactMql.removeEventListener('change', compactHandler as (e: MediaQueryListEvent) => void)
+  }
 }
 
 const isHome = computed(() => route.path === '/')
@@ -197,6 +207,7 @@ watch(
         :lang="lang"
         :is-sider-collapsed="isSiderCollapsed"
         :is-mobile="isMobile"
+        :is-compact-header="isCompactHeader"
         right-hint="Vue 3"
         @update:lang="handleLangChange"
         @toggle-sider="toggleSider" />

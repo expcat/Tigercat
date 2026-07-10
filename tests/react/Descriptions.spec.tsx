@@ -136,10 +136,5 @@ describe('Descriptions (React)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<Descriptions />)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

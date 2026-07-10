@@ -130,25 +130,42 @@ export function dynamicSizeStrategy(
   itemCount: number
 ): VirtualListSizeStrategy {
   const measuredHeights = new Map<number, number>()
+  const offsets = new Float64Array(itemCount + 1)
+  for (let i = 0; i < itemCount; i++) {
+    offsets[i + 1] = offsets[i] + estimatedHeight
+  }
+  let dirtyFrom = itemCount
 
   function getHeight(index: number): number {
     return measuredHeights.get(index) ?? estimatedHeight
   }
 
-  function getOffset(index: number): number {
-    let offset = 0
-    for (let i = 0; i < index; i++) {
-      offset += getHeight(i)
+  function rebuildOffsets(): void {
+    if (dirtyFrom >= itemCount) return
+    for (let i = dirtyFrom; i < itemCount; i++) {
+      offsets[i + 1] = offsets[i] + getHeight(i)
     }
-    return offset
+    dirtyFrom = itemCount
   }
 
-  function getTotalHeight(): number {
-    let total = 0
-    for (let i = 0; i < itemCount; i++) {
-      total += getHeight(i)
+  function getOffset(index: number): number {
+    rebuildOffsets()
+    const safeIndex = Math.min(itemCount, Math.max(0, index))
+    return offsets[safeIndex] ?? 0
+  }
+
+  function binarySearchStart(scrollTop: number): number {
+    let lo = 0
+    let hi = itemCount - 1
+    while (lo <= hi) {
+      const mid = (lo + hi) >>> 1
+      if (offsets[mid + 1] <= scrollTop) {
+        lo = mid + 1
+      } else {
+        hi = mid - 1
+      }
     }
-    return total
+    return Math.min(lo, itemCount - 1)
   }
 
   return {
@@ -157,31 +174,19 @@ export function dynamicSizeStrategy(
         return { startIndex: 0, endIndex: -1, offsetTop: 0, totalHeight: 0 }
       }
 
-      // Linear scan from start — acceptable because overscan keeps the window small
-      let accum = 0
-      let rawStart = 0
-      for (let i = 0; i < itemCount; i++) {
-        const h = getHeight(i)
-        if (accum + h > scrollTop) {
-          rawStart = i
-          break
-        }
-        accum += h
-        if (i === itemCount - 1) rawStart = itemCount - 1
-      }
+      rebuildOffsets()
+      const rawStart = binarySearchStart(scrollTop)
 
       const startIndex = Math.max(0, rawStart - overscan)
       const viewEnd = scrollTop + containerHeight
       let endIndex = rawStart
-      let endAccum = accum
-      while (endIndex < itemCount - 1 && endAccum < viewEnd) {
-        endAccum += getHeight(endIndex)
+      while (endIndex < itemCount - 1 && offsets[endIndex] < viewEnd) {
         endIndex++
       }
       endIndex = Math.min(itemCount - 1, endIndex + overscan)
 
-      const offsetTop = getOffset(startIndex)
-      const totalHeight = getTotalHeight()
+      const offsetTop = offsets[startIndex] ?? 0
+      const totalHeight = offsets[itemCount] ?? 0
 
       return { startIndex, endIndex, offsetTop, totalHeight }
     },
@@ -192,7 +197,17 @@ export function dynamicSizeStrategy(
       return getOffset(index)
     },
     updateItemHeight(index, measuredHeight) {
+      if (
+        index < 0 ||
+        index >= itemCount ||
+        !Number.isFinite(measuredHeight) ||
+        measuredHeight <= 0 ||
+        getHeight(index) === measuredHeight
+      ) {
+        return
+      }
       measuredHeights.set(index, measuredHeight)
+      dirtyFrom = Math.min(dirtyFrom, index)
     }
   }
 }

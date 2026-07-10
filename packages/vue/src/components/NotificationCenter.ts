@@ -5,6 +5,30 @@ import {
   mergeStyleValues,
   buildNotificationGroups,
   formatActivityTime,
+  notificationCenterItemClasses,
+  notificationCenterUnreadItemClasses,
+  notificationCenterReadItemClasses,
+  notificationCenterReadTitleClasses,
+  notificationCenterUnreadTitleClasses,
+  notificationCenterUnreadDotClasses,
+  notificationCenterTimeClasses,
+  notificationCenterReadDescriptionClasses,
+  notificationCenterUnreadDescriptionClasses,
+  notificationCenterItemActionClasses,
+  notificationCenterEmptyIconWrapperClasses,
+  notificationCenterEmptyIconClasses,
+  notificationCenterEmptyTextClasses,
+  notificationCenterLoadingClasses,
+  notificationCenterCardClasses,
+  notificationCenterTitleClasses,
+  notificationCenterUnreadBadgeClasses,
+  notificationCenterMarkAllBaseClasses,
+  notificationCenterMarkAllEnabledClasses,
+  notificationCenterMarkAllDisabledClasses,
+  notificationCenterFilterGroupClasses,
+  notificationCenterFilterButtonClasses,
+  notificationCenterFilterActiveClasses,
+  notificationCenterFilterIdleClasses,
   type NotificationCenterProps as CoreNotificationCenterProps,
   type NotificationGroup,
   type NotificationItem,
@@ -304,8 +328,7 @@ export const NotificationCenter = defineComponent({
       return h(
         'div',
         {
-          class:
-            'inline-flex items-center gap-0.5 p-0.5 rounded-lg bg-gray-100/80 dark:bg-gray-800/60 self-start'
+          class: notificationCenterFilterGroupClasses
         },
         options.map((option) =>
           h(
@@ -313,10 +336,10 @@ export const NotificationCenter = defineComponent({
             {
               key: option.key,
               class: classNames(
-                'px-3.5 py-1 text-xs font-semibold rounded-md transition-all duration-200',
+                notificationCenterFilterButtonClasses,
                 currentReadFilter.value === option.key
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm scale-102'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? notificationCenterFilterActiveClasses
+                  : notificationCenterFilterIdleClasses
               ),
               onClick: () => handleReadFilterChange(option.key)
             },
@@ -334,10 +357,8 @@ export const NotificationCenter = defineComponent({
         'div',
         {
           class: classNames(
-            'group relative flex items-start gap-3.5 w-full p-3.5 rounded-xl transition-all duration-300 hover:bg-gray-50/60 dark:hover:bg-gray-800/30',
-            !isRead
-              ? 'bg-blue-50/20 dark:bg-blue-950/5 hover:bg-blue-50/40 dark:hover:bg-blue-950/10 border-l-[3px] border-l-blue-500/80 -ml-[3px] pl-[calc(0.875rem-3px)]'
-              : 'border-l-[3px] border-l-transparent -ml-[3px] pl-[calc(0.875rem-3px)]'
+            notificationCenterItemClasses,
+            isRead ? notificationCenterReadItemClasses : notificationCenterUnreadItemClasses
           )
         },
         [
@@ -351,15 +372,14 @@ export const NotificationCenter = defineComponent({
                     size: 'sm',
                     weight: isRead ? 'normal' : 'semibold',
                     class: isRead
-                      ? 'text-gray-600 dark:text-gray-400'
-                      : 'text-gray-900 dark:text-gray-100'
+                      ? notificationCenterReadTitleClasses
+                      : notificationCenterUnreadTitleClasses
                   },
                   { default: () => item.title }
                 ),
                 !isRead
                   ? h('span', {
-                      class:
-                        'w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 shrink-0 shadow-sm shadow-blue-500/40 animate-pulse'
+                      class: notificationCenterUnreadDotClasses
                     })
                   : null
               ]),
@@ -367,8 +387,7 @@ export const NotificationCenter = defineComponent({
                 ? h(
                     'span',
                     {
-                      class:
-                        'text-[11px] text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap flex-shrink-0 self-center'
+                      class: notificationCenterTimeClasses
                     },
                     timeText
                   )
@@ -381,8 +400,8 @@ export const NotificationCenter = defineComponent({
                     class: classNames(
                       'mt-1 text-xs leading-relaxed line-clamp-2',
                       isRead
-                        ? 'text-gray-500 dark:text-gray-400'
-                        : 'text-gray-600 dark:text-gray-300'
+                        ? notificationCenterReadDescriptionClasses
+                        : notificationCenterUnreadDescriptionClasses
                     )
                   },
                   item.description
@@ -394,8 +413,7 @@ export const NotificationCenter = defineComponent({
             {
               size: 'sm',
               variant: 'ghost',
-              class:
-                'opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all duration-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border-0 flex-shrink-0 self-center',
+              class: notificationCenterItemActionClasses,
               onClick: (event: MouseEvent) => {
                 event.stopPropagation()
                 handleItemReadChange(item, !isRead)
@@ -416,13 +434,13 @@ export const NotificationCenter = defineComponent({
             h(
               'div',
               {
-                class: 'p-3.5 bg-gray-50 dark:bg-gray-900 rounded-full mb-3 shadow-inner'
+                class: notificationCenterEmptyIconWrapperClasses
               },
               [
                 h(
                   'svg',
                   {
-                    class: 'w-8 h-8 text-gray-400 dark:text-gray-600 animate-pulse',
+                    class: notificationCenterEmptyIconClasses,
                     fill: 'none',
                     viewBox: '0 0 24 24',
                     stroke: 'currentColor',
@@ -444,7 +462,7 @@ export const NotificationCenter = defineComponent({
                 tag: 'div',
                 size: 'sm',
                 color: 'muted',
-                class: 'font-semibold text-gray-400 dark:text-gray-500'
+                class: notificationCenterEmptyTextClasses
               },
               { default: () => props.emptyText }
             )
@@ -511,7 +529,7 @@ export const NotificationCenter = defineComponent({
                 tag: 'div',
                 size: 'base',
                 weight: 'bold',
-                class: 'text-gray-900 dark:text-gray-100'
+                class: notificationCenterTitleClasses
               },
               { default: () => props.title }
             ),
@@ -519,8 +537,7 @@ export const NotificationCenter = defineComponent({
               ? h(
                   'span',
                   {
-                    class:
-                      'inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] font-bold rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-sm shadow-blue-500/20 animate-pulse'
+                    class: notificationCenterUnreadBadgeClasses
                   },
                   String(totalUnread.value)
                 )
@@ -533,10 +550,10 @@ export const NotificationCenter = defineComponent({
               variant: 'ghost',
               disabled: !hasUnread.value,
               class: classNames(
-                'text-xs font-semibold transition-colors duration-200',
+                notificationCenterMarkAllBaseClasses,
                 hasUnread.value
-                  ? 'text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300'
-                  : 'text-gray-400 dark:text-gray-600'
+                  ? notificationCenterMarkAllEnabledClasses
+                  : notificationCenterMarkAllDisabledClasses
               ),
               onClick: handleMarkAllRead
             },
@@ -550,7 +567,7 @@ export const NotificationCenter = defineComponent({
         ? h('div', { class: 'flex items-center justify-center py-16' }, [
             h(Loading, {
               text: props.loadingText,
-              class: 'text-blue-500 dark:text-blue-400 font-medium'
+              class: notificationCenterLoadingClasses
             })
           ])
         : resolvedGroups.value.length > 0
@@ -578,8 +595,7 @@ export const NotificationCenter = defineComponent({
             Card,
             {
               variant: 'bordered',
-              className:
-                'w-full rounded-2xl border border-gray-100/80 dark:border-gray-800/80 bg-white/95 dark:bg-gray-950/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 overflow-hidden'
+              className: notificationCenterCardClasses
             },
             {
               header: () => header,

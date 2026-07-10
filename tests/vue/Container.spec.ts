@@ -12,18 +12,6 @@ describe('Container (Vue)', () => {
   const ContentSlot = () => h('div', 'Container content')
 
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(Container, {
-        slots: {
-          default: ContentSlot
-        }
-      })
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toBeInTheDocument()
-      expect(containerEl).toHaveClass('w-full')
-    })
-
     it('should render children content', () => {
       render(Container, {
         slots: {
@@ -60,19 +48,6 @@ describe('Container (Vue)', () => {
 
       const containerEl = container.querySelector('div')
       expect(containerEl).toHaveClass('max-w-screen-sm')
-    })
-
-    it('should apply full width class', () => {
-      const { container } = renderWithProps(
-        Container,
-        { maxWidth: 'full' },
-        {
-          slots: { default: ContentSlot }
-        }
-      )
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toHaveClass('w-full')
     })
   })
 

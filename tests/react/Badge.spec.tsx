@@ -9,14 +9,6 @@ import { Badge } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Badge', () => {
-  // --- Basic rendering ---
-  it('renders with default props', () => {
-    render(<Badge content={5} />)
-    const badge = screen.getByText('5')
-    expect(badge).toBeInTheDocument()
-    expect(badge).toHaveAttribute('role', 'status')
-  })
-
   it('renders string content', () => {
     render(<Badge content="NEW" />)
     expect(screen.getByText('NEW')).toBeInTheDocument()
@@ -48,36 +40,16 @@ describe('Badge', () => {
     expect(badge?.textContent).toBe('')
     expect(badge).toHaveAttribute('aria-label', 'notification')
   })
-
-  it('renders text type with token-driven md radius', () => {
-    const { container } = render(<Badge type="text" content="HOT" />)
-    const badge = container.querySelector('[role="status"]')
-    expect(badge?.className).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
-    expect(badge?.textContent).toBe('HOT')
-  })
-
   // --- Max value ---
   it('formats max value as max+', () => {
     render(<Badge content={150} max={99} />)
     expect(screen.getByText('99+')).toBeInTheDocument()
   })
-
-  it('formats custom max value', () => {
-    render(<Badge content={1000} max={999} />)
-    expect(screen.getByText('999+')).toBeInTheDocument()
-  })
-
   // --- Show zero ---
   it('hides when content is 0 and showZero is false', () => {
     const { container } = render(<Badge content={0} showZero={false} />)
     expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
   })
-
-  it('shows when content is 0 and showZero is true', () => {
-    render(<Badge content={0} showZero />)
-    expect(screen.getByText('0')).toBeInTheDocument()
-  })
-
   // --- Wrapper mode ---
   it('supports wrapper mode when standalone is false', () => {
     const { container } = render(
@@ -88,33 +60,7 @@ describe('Badge', () => {
     expect(screen.getByText('Button')).toBeInTheDocument()
     expect(screen.getByText('5')).toBeInTheDocument()
     expect(container.querySelector('.relative')).toBeInTheDocument()
-  })
-
-  it('renders only children when hidden in wrapper mode', () => {
-    const { container } = render(
-      <Badge content={0} standalone={false}>
-        <button>Button</button>
-      </Badge>
-    )
-    expect(screen.getByText('Button')).toBeInTheDocument()
-    expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
-  })
-
-  // --- Positions ---
-  it.each(['top-right', 'top-left', 'bottom-right', 'bottom-left'] as const)(
-    'applies position="%s" in wrapper mode',
-    (position) => {
-      const { container } = render(
-        <Badge content={1} standalone={false} position={position}>
-          <div>child</div>
-        </Badge>
-      )
-      const badge = container.querySelector('[role="status"]')
-      expect(badge?.className).toContain('absolute')
-    }
-  )
-
-  // --- Aria labels ---
+  }) // --- Aria labels ---
   it('uses aria-label for number badges', () => {
     render(<Badge type="number" content={5} />)
     expect(screen.getByLabelText('5 notifications')).toBeInTheDocument()

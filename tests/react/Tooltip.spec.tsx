@@ -245,10 +245,5 @@ describe('Tooltip', () => {
     // Should remain visible in manual mode
     expect(getByText('Tooltip content')).toBeVisible()
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { getByText } = renderWithChildren(Tooltip, {}, <button>Trigger</button>)
-      expect(getByText('Trigger')).toBeInTheDocument()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

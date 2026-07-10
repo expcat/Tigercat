@@ -2,6 +2,12 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+## v2.0.0-rc.1
+
+v2.0.0 rc.1 使用下方 v2.0.0 破坏性升级迁移路径。Pagination 页容量变更现在只通过 React `onPageSizeChange` / Vue `page-size-change` 通知，并携带调整后的页码，不再同时触发页面导航 `onChange` / `change`。
+
+core 已移除仅供旧 Table/List 简易分页拼装的 `getSimplePaginationContainerClasses`、`getSimplePaginationTotalClasses`、`getSimplePaginationControlsClasses`、`getSimplePaginationSelectClasses`、`getSimplePaginationButtonClasses`、`getSimplePaginationPageIndicatorClasses` 与 `getSimplePaginationButtonsWrapperClasses`。业务代码请直接渲染 React/Vue `Pagination`；确需自定义分页样式时，改用 `getPaginationContainerClasses`、`getPaginationButtonBaseClasses`、`getPaginationEllipsisClasses`、`getTotalTextClasses` 或 `getBuiltInPaginationContainerClasses`。
+
 ## v2.0.0-preview.6
 
 v2.0.0 preview 6 使用当前 v2.0.0 破坏性升级迁移路径。本次预览无新增破坏性变更，DataExport 组件与 Table / List 分页 `simple` / `showQuickJumper` / `pageIndicatorText` 均为纯增量 API；迁移操作请按下方 v2.0.0 条目执行。

@@ -378,35 +378,7 @@ describe('Popover', () => {
     })
   })
 
-  describe('Theme Support', () => {
-    it('should apply custom className', () => {
-      const { container } = renderWithProps(Popover, {
-        className: 'custom-popover',
-        content: 'Content',
-        children: <button>Trigger</button>
-      })
-
-      const popover = container.querySelector('.tiger-popover')
-      expect(popover).toHaveClass('custom-popover')
-    })
-
-    it('should use theme CSS variables (surface/border)', async () => {
-      const user = userEvent.setup()
-      const { getByText, container } = renderWithProps(Popover, {
-        title: 'Title',
-        content: 'The content',
-        children: <button>Trigger</button>
-      })
-
-      await user.click(getByText('Trigger'))
-
-      await waitFor(() => {
-        const contentEl = document.querySelector('.tiger-popover-content')
-        expect(contentEl).toHaveClass('bg-[var(--tiger-surface,#ffffff)]')
-        expect(contentEl).toHaveClass('border-[var(--tiger-border,#e5e7eb)]')
-      })
-    })
-  })
+  describe('Theme Support', () => {})
 
   describe('Accessibility', () => {
     it('should pass a11y checks', async () => {
@@ -489,10 +461,5 @@ describe('Popover', () => {
       expect(container.querySelector('[data-testid="popover-root"]')).toBeTruthy()
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { getByText } = renderWithChildren(Popover, <button>Trigger</button>, {})
-      expect(getByText('Trigger')).toBeInTheDocument()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

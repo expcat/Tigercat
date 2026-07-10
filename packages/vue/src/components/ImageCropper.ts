@@ -46,6 +46,8 @@ export interface VueImageCropperProps {
   style?: Record<string, string | number>
 }
 
+const isPositiveFinite = (value: number) => Number.isFinite(value) && value > 0
+
 export const ImageCropper = defineComponent({
   name: 'TigerImageCropper',
   inheritAttrs: false,
@@ -91,23 +93,31 @@ export const ImageCropper = defineComponent({
     const dragStartRect = ref<CropRect>({ x: 0, y: 0, width: 0, height: 0 })
 
     const loadImage = () => {
+      imageRef.value = null
       const img = new window.Image()
       img.crossOrigin = 'anonymous'
       img.onload = () => {
-        imageRef.value = img
+        const naturalWidth = img.naturalWidth
+        const naturalHeight = img.naturalHeight
+        if (!isPositiveFinite(naturalWidth) || !isPositiveFinite(naturalHeight)) return
 
         // Calculate display dimensions to fit container
         if (containerRef.value) {
-          const containerW = containerRef.value.clientWidth
-          const containerH = containerRef.value.clientHeight || 400
-          const ratio = Math.min(containerW / img.naturalWidth, containerH / img.naturalHeight, 1)
-          displayWidth.value = img.naturalWidth * ratio
-          displayHeight.value = img.naturalHeight * ratio
+          const measuredWidth = containerRef.value.clientWidth
+          const measuredHeight = containerRef.value.clientHeight
+          const containerW = isPositiveFinite(measuredWidth) ? measuredWidth : naturalWidth
+          const containerH = isPositiveFinite(measuredHeight) ? measuredHeight : 400
+          const ratio = Math.min(containerW / naturalWidth, containerH / naturalHeight, 1)
+          displayWidth.value = naturalWidth * ratio
+          displayHeight.value = naturalHeight * ratio
         } else {
-          displayWidth.value = img.naturalWidth
-          displayHeight.value = img.naturalHeight
+          displayWidth.value = naturalWidth
+          displayHeight.value = naturalHeight
         }
 
+        if (!isPositiveFinite(displayWidth.value) || !isPositiveFinite(displayHeight.value)) return
+
+        imageRef.value = img
         cropRect.value = getInitialCropRect(
           displayWidth.value,
           displayHeight.value,

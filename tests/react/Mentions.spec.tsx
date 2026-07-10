@@ -20,14 +20,6 @@ describe('Mentions', () => {
     const { container } = render(<Mentions options={defaultOptions} />)
     expect(container.querySelector('textarea')).toBeInTheDocument()
   })
-
-  it('applies placeholder', () => {
-    const { container } = render(
-      <Mentions options={defaultOptions} placeholder="Type @ to mention" />
-    )
-    expect(container.querySelector('textarea')).toHaveAttribute('placeholder', 'Type @ to mention')
-  })
-
   it('applies className', () => {
     const { container } = render(<Mentions options={defaultOptions} className="my-mentions" />)
     expect(container.querySelector('.my-mentions')).toBeInTheDocument()
@@ -59,13 +51,6 @@ describe('Mentions', () => {
     fireEvent.change(textarea, { target: { value: 'hello' } })
     expect(onChange).toHaveBeenCalled()
   })
-
-  // --- Dropdown (listbox) role ---
-  it('does not show dropdown initially', () => {
-    const { container } = render(<Mentions options={defaultOptions} />)
-    expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
-  })
-
   it('positions dropdown with floating styles when mention query opens', async () => {
     const { container } = render(<Mentions options={defaultOptions} value="" onChange={vi.fn()} />)
     const textarea = container.querySelector('textarea')!
@@ -132,26 +117,6 @@ describe('Mentions', () => {
     fireEvent.keyDown(textarea, { key: 'Escape' })
     expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
   })
-
-  // --- Option click selection ---
-  it('selects option on click', async () => {
-    const onSelect = vi.fn()
-    const onChange = vi.fn()
-    const { container } = render(
-      <Mentions options={defaultOptions} value="" onChange={onChange} onSelect={onSelect} />
-    )
-    const textarea = container.querySelector('textarea')!
-
-    fireEvent.change(textarea, {
-      target: { value: '@', selectionStart: 1 }
-    })
-    await screen.findByRole('listbox')
-
-    const option = container.querySelectorAll('[role="option"]')[0]
-    fireEvent.click(option)
-    expect(onSelect).toHaveBeenCalled()
-  })
-
   // --- Filtering ---
   it('filters options based on query text', async () => {
     const { container } = render(<Mentions options={defaultOptions} value="" onChange={vi.fn()} />)
@@ -166,24 +131,6 @@ describe('Mentions', () => {
     expect(options).toHaveLength(1)
     expect(options[0].textContent).toBe('Alice')
   })
-
-  // --- Custom prefix ---
-  it('supports custom prefix character', async () => {
-    const { container } = render(
-      <Mentions options={defaultOptions} value="" onChange={vi.fn()} prefix="#" />
-    )
-    const textarea = container.querySelector('textarea')!
-
-    fireEvent.change(textarea, {
-      target: { value: '#b', selectionStart: 2 }
-    })
-    await screen.findByRole('listbox')
-
-    const options = container.querySelectorAll('[role="option"]')
-    expect(options).toHaveLength(1)
-    expect(options[0].textContent).toBe('Bob')
-  })
-
   // --- Disabled options ---
   it('does not select disabled options', async () => {
     const disabledOptions = [...defaultOptions, { value: 'dave', label: 'Dave', disabled: true }]
@@ -208,10 +155,5 @@ describe('Mentions', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<Mentions />)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

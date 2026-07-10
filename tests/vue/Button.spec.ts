@@ -19,6 +19,7 @@ describe('Button', () => {
     const button = container.querySelector('button')
     expect(button).toBeInTheDocument()
     expect(button).toHaveClass('inline-flex')
+    expect(button).toHaveClass('whitespace-nowrap')
     expect(button).toHaveClass('from-prop')
     expect(button).toHaveClass('from-attr')
   })

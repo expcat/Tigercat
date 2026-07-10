@@ -168,10 +168,5 @@ describe('QRCode', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<QRCode value="https://example.com" />)
-      expect(container.querySelector('svg')).toBeInTheDocument()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

@@ -46,18 +46,28 @@ export const AppLayout: React.FC = () => {
   const [lang, setLang] = useState<DemoLang>(() => getStoredLang())
   const [isSiderCollapsed, setIsSiderCollapsed] = useState<boolean>(() => getStoredSiderCollapsed())
   const [isMobile, setIsMobile] = useState(false)
+  const [isCompactHeader, setIsCompactHeader] = useState(false)
 
   const isHome = location.pathname === '/'
 
   useEffect(() => {
     const mql = window.matchMedia('(max-width: 767px)')
+    const compactMql = window.matchMedia('(max-width: 639px)')
     const handler = (e: MediaQueryListEvent | MediaQueryList) => {
       setIsMobile(e.matches)
       if (e.matches) setIsSiderCollapsed(true)
     }
+    const compactHandler = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsCompactHeader(e.matches)
+    }
     handler(mql)
+    compactHandler(compactMql)
     mql.addEventListener('change', handler as (e: MediaQueryListEvent) => void)
-    return () => mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void)
+    compactMql.addEventListener('change', compactHandler as (e: MediaQueryListEvent) => void)
+    return () => {
+      mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void)
+      compactMql.removeEventListener('change', compactHandler as (e: MediaQueryListEvent) => void)
+    }
   }, [])
 
   useEffect(() => {
@@ -143,6 +153,7 @@ export const AppLayout: React.FC = () => {
             rightHint="React"
             isSiderCollapsed={isSiderCollapsed}
             isMobile={isMobile}
+            isCompactHeader={isCompactHeader}
             onToggleSider={() => setIsSiderCollapsed((prev) => !prev)}
           />
 

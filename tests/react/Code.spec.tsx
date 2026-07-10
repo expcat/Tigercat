@@ -222,11 +222,5 @@ describe('Code (React)', () => {
       const { container } = render(<Code code={longCode} />)
       expect(container.querySelector('code')!.textContent).toBe(longCode)
     })
-
-    it('renders code with unicode characters', () => {
-      const code = 'const emoji = "🎉"; // 注释'
-      render(<Code code={code} />)
-      expect(screen.getByText(code)).toBeInTheDocument()
-    })
   })
 })

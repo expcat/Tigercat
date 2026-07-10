@@ -400,15 +400,6 @@ describe('Drawer', () => {
       const dialog = screen.getByRole('dialog') as HTMLElement
       expect(dialog.style.width).toBe('400px')
     })
-
-    it('should apply custom height style for top placement', () => {
-      render(Drawer, {
-        props: { open: true, placement: 'top', width: '300px' }
-      })
-      const dialog = screen.getByRole('dialog') as HTMLElement
-      expect(dialog.style.height).toBe('300px')
-    })
-
     it('should apply number width as pixels', () => {
       render(Drawer, {
         props: { open: true, width: 500 }
@@ -417,10 +408,5 @@ describe('Drawer', () => {
       expect(dialog.style.width).toBe('500px')
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Drawer)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

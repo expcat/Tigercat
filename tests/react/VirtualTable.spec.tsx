@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { VirtualTable } from '@expcat/tigercat-react'
+import type { TableColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const columns = [
@@ -241,6 +242,35 @@ describe('VirtualTable (React)', () => {
     )
     expect(getByText('[1]')).toBeTruthy()
     expect(getByText('[Row 1]')).toBeTruthy()
+  })
+
+  it('uses column render and renderHeader while keeping renderCell precedence', () => {
+    const rows = [{ id: 1, name: 'Alice' }]
+    const columns: TableColumn<(typeof rows)[number]>[] = [
+      {
+        key: 'displayName',
+        dataKey: 'name',
+        title: 'Fallback',
+        renderHeader: () => <strong>Custom header</strong>,
+        render: (row) => <span>Column: {row.name}</span>
+      }
+    ]
+    const { getByText, queryByText, rerender } = render(
+      <VirtualTable dataSource={rows} columns={columns} />
+    )
+
+    expect(getByText('Custom header')).toBeInTheDocument()
+    expect(getByText('Column: Alice')).toBeInTheDocument()
+
+    rerender(
+      <VirtualTable
+        dataSource={rows}
+        columns={columns}
+        renderCell={(value) => <span>Override: {String(value)}</span>}
+      />
+    )
+    expect(getByText('Override: Alice')).toBeInTheDocument()
+    expect(queryByText('Column: Alice')).not.toBeInTheDocument()
   })
 
   it('applies column width', () => {

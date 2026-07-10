@@ -27,10 +27,10 @@ export function getDatePickerInputClasses(
     'w-full',
     'rounded-[var(--tiger-radius-md,0.5rem)]',
     'border',
-    'border-gray-300',
-    'bg-white',
-    'text-gray-900',
-    'placeholder-gray-400',
+    'border-[var(--tiger-border,#d1d5db)]',
+    'bg-[var(--tiger-surface,#ffffff)]',
+    'text-[var(--tiger-text,#111827)]',
+    'placeholder:text-[var(--tiger-text-muted,#9ca3af)]',
     'focus:outline-none',
     'focus:ring-2',
     'focus:ring-[var(--tiger-primary,#2563eb)]',
@@ -51,7 +51,11 @@ export function getDatePickerInputClasses(
     : { sm: 'pr-10', md: 'pr-12', lg: 'pr-14' }[size]
 
   const disabledClasses = disabled
-    ? ['bg-gray-100', 'cursor-not-allowed', 'text-gray-500']
+    ? [
+        'bg-[var(--tiger-surface-muted,#f3f4f6)]',
+        'cursor-not-allowed',
+        'text-[var(--tiger-text-muted,#6b7280)]'
+      ]
     : ['cursor-pointer']
 
   return classNames(...baseClasses, sizeClasses[size], rightPaddingClasses, ...disabledClasses)
@@ -69,8 +73,8 @@ export function getDatePickerIconButtonClasses(size: ComponentSize = 'md'): stri
     'flex',
     'items-center',
     'justify-center',
-    'text-gray-400',
-    'hover:text-gray-600',
+    'text-[var(--tiger-text-muted,#9ca3af)]',
+    'hover:text-[var(--tiger-text,#111827)]',
     'transition-colors'
   ]
 
@@ -90,9 +94,9 @@ export const datePickerCalendarClasses = classNames(
   'absolute',
   'z-50',
   'mt-1',
-  'bg-white',
+  'bg-[var(--tiger-surface,#ffffff)]',
   'border',
-  'border-gray-300',
+  'border-[var(--tiger-border,#d1d5db)]',
   'rounded-[var(--tiger-radius-md,0.5rem)]',
   'shadow-lg',
   'p-4',
@@ -108,8 +112,8 @@ export const datePickerMobileWheelClasses = classNames(
   'z-50',
   'rounded-t-[var(--tiger-radius-lg,0.75rem)]',
   'border',
-  'border-gray-200',
-  'bg-white',
+  'border-[var(--tiger-border,#e5e7eb)]',
+  'bg-[var(--tiger-surface,#ffffff)]',
   'p-4',
   'shadow-2xl',
   'pb-[calc(1rem+env(safe-area-inset-bottom))]'
@@ -121,13 +125,13 @@ export const datePickerMobileWheelSelectClasses = classNames(
   'w-full',
   'rounded-[var(--tiger-radius-md,0.5rem)]',
   'border',
-  'border-gray-300',
-  'bg-white',
+  'border-[var(--tiger-border,#d1d5db)]',
+  'bg-[var(--tiger-surface,#ffffff)]',
   'px-3',
   'py-3',
   'text-center',
   'text-base',
-  'text-gray-900',
+  'text-[var(--tiger-text,#111827)]',
   'focus:outline-none',
   'focus:ring-2',
   'focus:ring-[var(--tiger-primary,#2563eb)]'
@@ -149,10 +153,10 @@ export const datePickerCalendarHeaderClasses = classNames(
 export const datePickerNavButtonClasses = classNames(
   'p-2',
   'rounded-[var(--tiger-radius-md,0.5rem)]',
-  'hover:bg-gray-100',
+  'hover:bg-[var(--tiger-surface-muted,#f3f4f6)]',
   'transition-colors',
-  'text-gray-600',
-  'hover:text-gray-900',
+  'text-[var(--tiger-text-muted,#4b5563)]',
+  'hover:text-[var(--tiger-text,#111827)]',
   'focus:outline-none',
   'focus:ring-2',
   'focus:ring-[var(--tiger-primary,#2563eb)]'
@@ -161,7 +165,11 @@ export const datePickerNavButtonClasses = classNames(
 /**
  * Calendar month/year display classes
  */
-export const datePickerMonthYearClasses = classNames('text-base', 'font-semibold', 'text-gray-900')
+export const datePickerMonthYearClasses = classNames(
+  'text-base',
+  'font-semibold',
+  'text-[var(--tiger-text,#111827)]'
+)
 
 /**
  * Calendar grid classes
@@ -175,7 +183,7 @@ export const datePickerDayNameClasses = classNames(
   'text-center',
   'text-xs',
   'font-medium',
-  'text-gray-500',
+  'text-[var(--tiger-text-muted,#6b7280)]',
   'py-2'
 )
 
@@ -197,7 +205,10 @@ export function getDatePickerDayCellClasses(
     'w-10 h-10 flex items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] text-sm transition-colors'
 
   if (isDisabled) {
-    return classNames(base, 'cursor-not-allowed text-gray-300')
+    return classNames(
+      base,
+      'cursor-not-allowed text-[var(--tiger-text-muted,#9ca3af)] opacity-50'
+    )
   }
 
   if (isSelected || isRangeStart || isRangeEnd) {
@@ -209,11 +220,19 @@ export function getDatePickerDayCellClasses(
     )
   }
 
-  const color = isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+  const color = isCurrentMonth
+    ? 'text-[var(--tiger-text,#111827)]'
+    : 'text-[var(--tiger-text-muted,#9ca3af)]'
   const range = isInRange ? 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]' : ''
   const today = isToday ? 'border border-[var(--tiger-primary,#2563eb)] font-semibold' : ''
 
-  return classNames(base, 'cursor-pointer hover:bg-gray-100', color, range, today)
+  return classNames(
+    base,
+    'cursor-pointer hover:bg-[var(--tiger-surface-muted,#f3f4f6)]',
+    color,
+    range,
+    today
+  )
 }
 
 /**
@@ -224,8 +243,8 @@ export const datePickerClearButtonClasses = classNames(
   'right-10',
   'top-1/2',
   '-translate-y-1/2',
-  'text-gray-400',
-  'hover:text-gray-600',
+  'text-[var(--tiger-text-muted,#9ca3af)]',
+  'hover:text-[var(--tiger-text,#111827)]',
   'transition-colors',
   'p-1'
 )
@@ -237,7 +256,7 @@ export const datePickerFooterClasses = classNames(
   'mt-3',
   'pt-3',
   'border-t',
-  'border-gray-200',
+  'border-[var(--tiger-border,#e5e7eb)]',
   'flex',
   'items-center',
   'justify-between',
@@ -254,15 +273,16 @@ export const datePickerFooterButtonClasses = classNames(
   'font-medium',
   'rounded',
   'border',
-  'border-gray-300',
-  'hover:border-gray-400',
-  'bg-white',
-  'hover:bg-gray-50',
-  'text-gray-700',
+  'border-[var(--tiger-border,#d1d5db)]',
+  'hover:border-[var(--tiger-text-muted,#9ca3af)]',
+  'bg-[var(--tiger-surface,#ffffff)]',
+  'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
+  'text-[var(--tiger-text,#374151)]',
   'focus:outline-none',
   'focus:ring-2',
   'focus:ring-[var(--tiger-primary,#2563eb)]',
   'focus:ring-offset-1',
+  'focus:ring-offset-[var(--tiger-surface,#ffffff)]',
   'transition-colors',
   'duration-150'
 )

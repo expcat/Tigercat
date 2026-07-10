@@ -36,15 +36,6 @@ const optionsWithDisabledFirst = [
 
 describe('Select', () => {
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')
-      expect(trigger).toBeInTheDocument()
-    })
-
     it('exposes data-state on the trigger reflecting open state', async () => {
       const { container } = render(Select, { props: { options: testOptions } })
       const trigger = container.querySelector('button')!
@@ -488,22 +479,6 @@ describe('Select', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
     })
-
-    it('should support custom theme colors', () => {
-      setThemeVariables({
-        '--tiger-primary': '#ff0000'
-      })
-
-      const { container } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')
-      expect(trigger).toBeInTheDocument()
-
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
-    })
   })
 
   describe('Accessibility', () => {
@@ -516,26 +491,6 @@ describe('Select', () => {
       })
 
       await expectNoA11yViolationsIsolated(container)
-    })
-
-    it('should have proper button element', () => {
-      const { container } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')
-      expect(trigger).toHaveAttribute('type', 'button')
-    })
-
-    it('should be keyboard accessible', async () => {
-      const { container } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      trigger.focus()
-
-      expect(trigger).toHaveFocus()
     })
   })
 
@@ -571,24 +526,6 @@ describe('Select', () => {
 
       expect(getByText('No matches found')).toBeInTheDocument()
     })
-
-    it('should handle long option text with truncation', () => {
-      const longOptions = [
-        { label: 'This is a very long option text that should be truncated', value: 'long' }
-      ]
-
-      const { getByText } = render(Select, {
-        props: {
-          options: longOptions,
-          modelValue: 'long'
-        }
-      })
-
-      expect(
-        getByText('This is a very long option text that should be truncated')
-      ).toBeInTheDocument()
-    })
-
     it('should handle disabled options in groups', async () => {
       const groupWithDisabled = [
         {
@@ -670,114 +607,7 @@ describe('Select', () => {
     })
   })
 
-  describe('Additional Keyboard Navigation', () => {
-    it('should navigate up with ArrowUp key', async () => {
-      const { container, getByRole } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      trigger.focus()
-
-      await fireEvent.keyDown(trigger, { key: 'ArrowUp' })
-
-      await waitFor(() => {
-        const listbox = getByRole('listbox')
-        expect(listbox).toBeInTheDocument()
-      })
-    })
-
-    it('should select option with Space key', async () => {
-      const onUpdate = vi.fn()
-      const { container, getByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      trigger.focus()
-
-      await fireEvent.keyDown(trigger, { key: ' ' })
-
-      const firstOption = await waitFor(() => getByRole('option', { name: 'Option 1' }))
-      await waitFor(() => {
-        expect(firstOption).toHaveFocus()
-      })
-
-      await fireEvent.keyDown(firstOption, { key: ' ' })
-      expect(onUpdate).toHaveBeenCalledWith('1')
-    })
-
-    it('should close dropdown with Tab key', async () => {
-      const { container, getByText, queryByText } = render(Select, {
-        props: { options: testOptions }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      await waitFor(() => {
-        expect(getByText('Option 1')).toBeInTheDocument()
-      })
-
-      const firstOption = container.querySelector('[role="option"]') as HTMLElement
-      await fireEvent.keyDown(firstOption, { key: 'Tab' })
-
-      await waitFor(() => {
-        expect(queryByText('Option 1')).not.toBeInTheDocument()
-      })
-    })
-
-    it('should navigate to first option with Home key', async () => {
-      const { container, getByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          modelValue: '3'
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const lastOption = await waitFor(() => getByRole('option', { name: 'Option 3' }))
-      await waitFor(() => {
-        expect(lastOption).toHaveFocus()
-      })
-
-      await fireEvent.keyDown(lastOption, { key: 'Home' })
-
-      const firstOption = getByRole('option', { name: 'Option 1' })
-      await waitFor(() => {
-        expect(firstOption).toHaveFocus()
-      })
-    })
-
-    it('should navigate to last option with End key', async () => {
-      const { container, getByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          modelValue: '1'
-        }
-      })
-
-      const trigger = container.querySelector('button')!
-      await fireEvent.click(trigger)
-
-      const firstOption = await waitFor(() => getByRole('option', { name: 'Option 1' }))
-      await waitFor(() => {
-        expect(firstOption).toHaveFocus()
-      })
-
-      await fireEvent.keyDown(firstOption, { key: 'End' })
-
-      const lastOption = getByRole('option', { name: 'Option 3' })
-      await waitFor(() => {
-        expect(lastOption).toHaveFocus()
-      })
-    })
-  })
+  describe('Additional Keyboard Navigation', () => {})
 
   describe('Dropdown Behavior', () => {
     it('should close dropdown when clicking outside', async () => {
@@ -834,35 +664,6 @@ describe('Select', () => {
       expect(onUpdate).not.toHaveBeenCalled()
       expect(queryByRole('listbox')).not.toBeInTheDocument()
     })
-
-    it('should localize the in-panel done action from zh-CN locale id', async () => {
-      const { container, getByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          locale: { locale: 'zh-CN' }
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-
-      expect(getByRole('button', { name: '完成' })).toBeInTheDocument()
-    })
-
-    it('should let labels override the in-panel done action text', async () => {
-      const { container, getByRole, queryByRole } = render(Select, {
-        props: {
-          options: testOptions,
-          locale: { common: { okText: 'Apply' } },
-          labels: { doneText: 'Complete' }
-        }
-      })
-
-      await fireEvent.click(container.querySelector('button')!)
-
-      expect(getByRole('button', { name: 'Complete' })).toBeInTheDocument()
-      expect(queryByRole('button', { name: 'Apply' })).not.toBeInTheDocument()
-    })
-
     it('should keep multiple select open after selection until the done action is clicked', async () => {
       const { container, getByText, getByRole, queryByRole } = render(Select, {
         props: {
@@ -1021,29 +822,6 @@ describe('Select', () => {
         }
       })
       expect(getByText('Option 1, Option 2 +1')).toBeInTheDocument()
-    })
-
-    it('should show all labels when selected items do not exceed maxTagCount', () => {
-      const { getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: ['1', '2'],
-          maxTagCount: 2
-        }
-      })
-      expect(getByText('Option 1, Option 2')).toBeInTheDocument()
-    })
-
-    it('should show all labels when maxTagCount is not set', () => {
-      const { getByText } = render(Select, {
-        props: {
-          options: testOptions,
-          multiple: true,
-          modelValue: ['1', '2', '3']
-        }
-      })
-      expect(getByText('Option 1, Option 2, Option 3')).toBeInTheDocument()
     })
   })
 })

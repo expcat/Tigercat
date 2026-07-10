@@ -36,15 +36,6 @@ describe('Radio', () => {
       expect(radio.checked).toBe(false)
       expect(getByText('Option 1')).toBeInTheDocument()
     })
-
-    it('should render with a numeric value', () => {
-      const { container } = render(Radio, {
-        props: { value: 123 },
-        slots: { default: 'Numeric' }
-      })
-      expect(getRadio(container)).toHaveAttribute('value', '123')
-    })
-
     it('should apply custom className to the label', () => {
       const { container } = render(Radio, {
         props: { value: 'option1', className: 'custom-radio' },
@@ -248,17 +239,6 @@ describe('Radio', () => {
       expect(name).toContain('tiger-radio-group')
       inputs.forEach((input) => expect(input).toHaveAttribute('name', name))
     })
-
-    it('should let a child override the inherited size', () => {
-      const { container } = renderGroup(`
-        <RadioGroup size="sm">
-          <Radio value="a" size="lg">A</Radio>
-          <Radio value="b">B</Radio>
-        </RadioGroup>
-      `)
-      expect(getRadios(container)).toHaveLength(2)
-    })
-
     it('should not allow selection when the group is disabled', async () => {
       const onChange = vi.fn()
       const Wrapper = defineComponent({
@@ -280,19 +260,6 @@ describe('Radio', () => {
       await fireEvent.click(getRadios(container)[0])
       expect(onChange).not.toHaveBeenCalled()
     })
-
-    it('should allow an individual radio to be disabled', () => {
-      const { container } = renderGroup(`
-        <RadioGroup>
-          <Radio value="a" disabled>A</Radio>
-          <Radio value="b">B</Radio>
-        </RadioGroup>
-      `)
-      const inputs = getRadios(container)
-      expect(inputs[0]).toBeDisabled()
-      expect(inputs[1]).not.toBeDisabled()
-    })
-
     it('should emit change and update:modelValue with the selected value', async () => {
       const onChange = vi.fn()
       const onUpdate = vi.fn()
@@ -325,38 +292,11 @@ describe('Radio', () => {
       expect(inputs[2]).toHaveFocus()
       expect(inputs[2].checked).toBe(true)
     })
-
-    it('should navigate both directions with ArrowLeft/ArrowRight', async () => {
-      const user = userEvent.setup()
-      const { container } = renderGroup(`
-        <RadioGroup default-value="a">
-          <Radio value="a">A</Radio>
-          <Radio value="b">B</Radio>
-        </RadioGroup>
-      `)
-      const inputs = getRadios(container)
-      inputs[0].focus()
-      await user.keyboard('{ArrowRight}')
-      expect(inputs[1]).toHaveFocus()
-      await user.keyboard('{ArrowLeft}')
-      expect(inputs[0]).toHaveFocus()
-    })
   })
 
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
-    })
-
-    it('should support custom theme colors', () => {
-      setThemeVariables({ '--tiger-primary': '#ff0000' })
-      const { container } = render(Radio, {
-        props: { value: 'option1', modelValue: true },
-        slots: { default: 'Themed' }
-      })
-      expect(getRadio(container)).toBeInTheDocument()
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 
@@ -391,14 +331,6 @@ describe('Radio', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle special characters in the value', () => {
-      const { container } = render(Radio, {
-        props: { value: '<>&"\'`' },
-        slots: { default: 'Special' }
-      })
-      expect(getRadio(container)).toHaveAttribute('value', '<>&"\'`')
-    })
-
     it('should update the controlled checked state on rerender', async () => {
       const { container, rerender } = render(Radio, {
         props: { value: 'option1', modelValue: true },

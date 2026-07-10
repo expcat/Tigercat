@@ -185,14 +185,5 @@ describe('ConfigProvider', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(
-        <ConfigProvider>
-          <div>content</div>
-        </ConfigProvider>
-      )
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

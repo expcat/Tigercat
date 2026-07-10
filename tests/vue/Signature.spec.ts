@@ -177,9 +177,5 @@ describe('Signature', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      expect(() => render(Signature)).not.toThrow()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

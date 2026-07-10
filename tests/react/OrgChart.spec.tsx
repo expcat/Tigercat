@@ -81,14 +81,6 @@ describe('OrgChart', () => {
 
     expect(container.querySelector('[data-series-type="org-chart"]')).toBeInTheDocument()
   })
-
-  it('applies custom colors and className', () => {
-    const { container } = render(<OrgChart data={data} colors={['#ff0000']} className="org" />)
-
-    expect(container.querySelector('svg.org')).toBeInTheDocument()
-    expect(container.querySelector('rect[fill="#ff0000"]')).toBeInTheDocument()
-  })
-
   it('hides subtitles when disabled', () => {
     const { queryByText } = render(<OrgChart data={data} showSubtitles={false} />)
 
@@ -101,34 +93,6 @@ describe('OrgChart', () => {
   })
 
   describe('Edge Cases and Boundary', () => {
-    it.each(['vertical', 'horizontal'] as const)('renders %s direction boundary', (direction) => {
-      const { container } = render(<OrgChart data={data} direction={direction} />)
-
-      expect(container.querySelector('[data-series-type="org-chart"]')).toBeInTheDocument()
-    })
-
-    it('renders multiple root nodes', () => {
-      const roots: OrgChartNode[] = [data, { id: 'finance', label: 'Noor', title: 'Finance' }]
-      const { container, getByText } = render(<OrgChart data={roots} />)
-
-      expect(container.querySelectorAll('[data-org-chart-nodes="true"] > g')).toHaveLength(4)
-      expect(getByText('Noor')).toBeInTheDocument()
-    })
-
-    it('renders node avatars when enabled', () => {
-      const avatarData: OrgChartNode = { ...data, avatar: '/ada.png' }
-      const { container } = render(<OrgChart data={avatarData} />)
-
-      expect(container.querySelector('image[href="/ada.png"]')).toBeInTheDocument()
-    })
-
-    it('hides node avatars when showAvatars is false', () => {
-      const avatarData: OrgChartNode = { ...data, avatar: '/ada.png' }
-      const { container } = render(<OrgChart data={avatarData} showAvatars={false} />)
-
-      expect(container.querySelector('image')).not.toBeInTheDocument()
-    })
-
     it('prevents disabled nodes from becoming selectable', () => {
       const onSelectedIdChange = vi.fn()
       const onNodeClick = vi.fn()

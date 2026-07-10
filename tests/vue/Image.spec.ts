@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { Image } from '@expcat/tigercat-vue'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -16,18 +16,24 @@ describe('Image', () => {
   })
 
   it('shows an enlarged overlay on hover when previewTrigger is hover', async () => {
-    const { container } = render(Image, {
-      props: { src: '/hover.jpg', alt: 'Hover', previewTrigger: 'hover' }
-    })
-    const root = container.firstElementChild as HTMLElement
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      const { container } = render(Image, {
+        props: { src: '/hover.jpg', alt: 'Hover', previewTrigger: 'hover' }
+      })
+      const root = container.firstElementChild as HTMLElement
 
-    await fireEvent.mouseEnter(root)
+      await fireEvent.mouseEnter(root)
 
-    await waitFor(() => {
-      const previews = document.querySelectorAll('img[src="/hover.jpg"]')
-      // one inline <img> plus the floating overlay copy
-      expect(previews.length).toBeGreaterThanOrEqual(2)
-    })
+      await waitFor(() => {
+        const previews = document.querySelectorAll('img[src="/hover.jpg"]')
+        // one inline <img> plus the floating overlay copy
+        expect(previews.length).toBeGreaterThanOrEqual(2)
+      })
+      expect(warnSpy.mock.calls.flat().join(' ')).not.toContain('Component emitted event')
+    } finally {
+      warnSpy.mockRestore()
+    }
   })
 
   it('renders image with src and alt', () => {

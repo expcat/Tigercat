@@ -111,6 +111,30 @@ describe('dynamicSizeStrategy', () => {
     expect(range.totalHeight).toBe(140)
   })
 
+  it('rebuilds cached offsets from the earliest changed item', () => {
+    const strategy = dynamicSizeStrategy(30, 100_000)
+    strategy.updateItemHeight!(10, 50)
+    strategy.updateItemHeight!(50_000, 20)
+
+    expect(strategy.getItemOffset(11)).toBe(350)
+    expect(strategy.getItemOffset(50_001)).toBe(1_500_040)
+
+    const range = strategy.getRange(2_999_400, 300, 100_000, 2)
+    expect(range.startIndex).toBeGreaterThan(99_900)
+    expect(range.totalHeight).toBe(3_000_010)
+  })
+
+  it('ignores invalid measurements and unchanged heights', () => {
+    const strategy = dynamicSizeStrategy(30, 3)
+    strategy.updateItemHeight!(-1, 50)
+    strategy.updateItemHeight!(3, 50)
+    strategy.updateItemHeight!(1, Number.NaN)
+    strategy.updateItemHeight!(1, 0)
+    strategy.updateItemHeight!(1, 30)
+
+    expect(strategy.getRange(0, 100, 3, 0).totalHeight).toBe(90)
+  })
+
   it('returns empty range for zero items', () => {
     const strategy = dynamicSizeStrategy(30, 0)
     const range = strategy.getRange(0, 100, 0, 2)

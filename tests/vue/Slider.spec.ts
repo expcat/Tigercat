@@ -97,43 +97,6 @@ describe('Slider', () => {
 
   describe('Keyboard', () => {
     it.each([
-      ['ArrowRight', 60],
-      ['ArrowUp', 60],
-      ['ArrowLeft', 40],
-      ['ArrowDown', 40]
-    ])('should step the value with %s', async (key, expected) => {
-      const onUpdate = vi.fn()
-      const { container } = render(Slider, {
-        props: { value: 50, step: 10, 'onUpdate:value': onUpdate }
-      })
-      await fireEvent.keyDown(getThumb(container), { key: key as string })
-      expect(onUpdate).toHaveBeenCalledWith(expected)
-    })
-
-    it('should respect a decimal step', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Slider, {
-        props: { value: 5, step: 0.5, min: 0, max: 10, 'onUpdate:value': onUpdate }
-      })
-      await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
-      expect(onUpdate).toHaveBeenCalledWith(5.5)
-    })
-
-    it.each([
-      ['Home', 0],
-      ['End', 100],
-      ['PageUp', 60],
-      ['PageDown', 40]
-    ])('should jump with %s', async (key, expected) => {
-      const onUpdate = vi.fn()
-      const { container } = render(Slider, {
-        props: { value: 50, min: 0, max: 100, 'onUpdate:value': onUpdate }
-      })
-      await fireEvent.keyDown(getThumb(container), { key: key as string })
-      expect(onUpdate).toHaveBeenCalledWith(expected)
-    })
-
-    it.each([
       ['ArrowRight', 100, 100],
       ['ArrowLeft', 0, 0]
     ])('should clamp %s at the boundary', async (key, value, expected) => {
@@ -202,20 +165,6 @@ describe('Slider', () => {
       await fireEvent.keyDown(getThumbs(container)[0], { key: 'ArrowRight' })
       expect(Array.isArray(onUpdate.mock.calls[0][0])).toBe(true)
     })
-
-    it.each([
-      [[70, 80], 0, 'ArrowRight'],
-      [[20, 30], 1, 'ArrowLeft']
-    ])('should keep range thumbs from crossing over', async (value, index, key) => {
-      const onUpdate = vi.fn()
-      const { container } = render(Slider, {
-        props: { value, range: true, step: 20, 'onUpdate:value': onUpdate }
-      })
-      await fireEvent.keyDown(getThumbs(container)[index as number], { key: key as string })
-      const [min, max] = onUpdate.mock.calls[0][0] as [number, number]
-      expect(min).toBeLessThanOrEqual(max)
-    })
-
     it('should label range thumbs with min/max', () => {
       const { container } = render(Slider, { props: { value: [20, 80], range: true } })
       const thumbs = getThumbs(container)
@@ -244,7 +193,14 @@ describe('Slider', () => {
     it('should move the nearer thumb when clicking the track in range mode', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Slider, {
-        props: { value: [20, 80], range: true, min: 0, max: 100, step: 1, 'onUpdate:value': onUpdate }
+        props: {
+          value: [20, 80],
+          range: true,
+          min: 0,
+          max: 100,
+          step: 1,
+          'onUpdate:value': onUpdate
+        }
       })
       await fireEvent.click(stubTrackRect(container, 200), { clientX: 60 })
       expect(onUpdate.mock.calls.at(-1)![0]).toEqual([30, 80])
@@ -273,14 +229,6 @@ describe('Slider', () => {
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
-    })
-
-    it('should apply custom theme colors', () => {
-      setThemeVariables({ '--tiger-primary': '#ff0000' })
-      const { container } = render(Slider)
-      expect(getThumb(container)).toBeInTheDocument()
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 

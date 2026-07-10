@@ -15,14 +15,6 @@ describe('Grid (React)', () => {
     const row = screen.getByTestId('row')
     expect(row).toHaveClass('flex', 'w-full', 'flex-wrap', 'items-start', 'justify-start')
   })
-
-  it('applies align/justify classes', () => {
-    render(<Row data-testid="row" align="middle" justify="center" />)
-
-    const row = screen.getByTestId('row')
-    expect(row).toHaveClass('items-center', 'justify-center')
-  })
-
   it('applies gutter styles to Row and Col', () => {
     render(
       <Row data-testid="row" gutter={16}>
@@ -40,18 +32,6 @@ describe('Grid (React)', () => {
     expect(col.style.paddingLeft).toBe('')
     expect(col.style.paddingRight).toBe('')
   })
-
-  it('applies span/offset classes', () => {
-    render(<Col data-testid="col" span={12} offset={4} />)
-
-    const col = screen.getByTestId('col')
-    expect(col.className).toContain('w-[var(--tiger-col-span)]')
-    expect(col.className).toContain('ml-[var(--tiger-col-offset)]')
-
-    expect(col.style.getPropertyValue('--tiger-col-span')).toBe('50%')
-    expect(col.style.getPropertyValue('--tiger-col-offset')).toBe('16.666667%')
-  })
-
   it('supports flex layout with span=0', () => {
     render(<Col data-testid="col" span={0} flex="0_0_160px" />)
 

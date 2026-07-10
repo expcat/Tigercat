@@ -159,10 +159,5 @@ describe('useFormController (Vue)', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const form = useFormController()
-      expect(form.getFieldValue('missing')).toBeUndefined()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

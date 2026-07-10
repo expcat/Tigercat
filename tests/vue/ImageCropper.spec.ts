@@ -98,6 +98,27 @@ describe('ImageCropper', () => {
     expect(el).toHaveAttribute('aria-label', 'Loading image for cropping')
   })
 
+  it('does not calculate crop geometry from invalid intrinsic dimensions', () => {
+    vi.stubGlobal(
+      'Image',
+      class InvalidImage {
+        naturalWidth = 0
+        naturalHeight = Number.POSITIVE_INFINITY
+        crossOrigin = ''
+        onload: (() => void) | null = null
+
+        set src(_value: string) {
+          this.onload?.()
+        }
+      }
+    )
+
+    const { container } = render(ImageCropper, { props: { src: '/invalid.jpg' } })
+
+    expect(container.querySelector('[role="application"]')).not.toBeInTheDocument()
+    expect(container.innerHTML).not.toMatch(/NaN|Infinity/)
+  })
+
   it('renders with guides prop', async () => {
     const { container } = await renderLoadedCropper({
       props: {
@@ -242,7 +263,7 @@ describe('ImageCropper', () => {
 
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
-      const { container } = render(ImageCropper)
+      const { container } = render(ImageCropper, { props: { src: '/test.jpg' } })
       expect(container.firstChild).toBeTruthy()
     })
   })

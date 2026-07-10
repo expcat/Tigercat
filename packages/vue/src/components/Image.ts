@@ -105,7 +105,11 @@ export const Image = defineComponent({
       floatingRef: hoverFloatingRef,
       floatingStyles: hoverFloatingStyles,
       triggerHandlers: hoverTriggerHandlers
-    } = useFloatingPopup({ props: floatingPopupProps, emit })
+    } = useFloatingPopup({
+      props: floatingPopupProps,
+      // Hover visibility is internal; popup model events are not Image events.
+      emit: () => {}
+    })
 
     const setContainerRef = (el: unknown) => {
       containerRef.value = el as HTMLElement | null

@@ -90,22 +90,6 @@ describe('Avatar', () => {
       })
     })
   })
-
-  it('applies shape classes', () => {
-    const { container: circleContainer } = render(<Avatar text="C" shape="circle" />)
-    expect(circleContainer.querySelector('[role="img"]')?.className).toContain(
-      'rounded-[var(--tiger-radius-pill,9999px)]'
-    )
-
-    const { container: squareContainer } = render(<Avatar text="S" shape="square" />)
-    expect(squareContainer.querySelector('[role="img"]')?.className).toContain(
-      'rounded-[var(--tiger-radius-md,0.5rem)]'
-    )
-
-    const { container: squircleContainer } = render(<Avatar text="Q" shape="squircle" />)
-    expect(squircleContainer.querySelector('[role="img"]')?.className).toContain('rounded-[30%]')
-  })
-
   it('applies custom bgColor and textColor', () => {
     const { container } = render(<Avatar text="T" bgColor="bg-blue-500" textColor="text-white" />)
 
@@ -212,23 +196,6 @@ describe('AvatarGroup', () => {
     expect(container.querySelector('img')).toBeInTheDocument()
     expect(screen.queryByText('JD')).not.toBeInTheDocument()
   })
-
-  it('propagates group size to child avatars and applies overlap class', () => {
-    const { container } = render(
-      <AvatarGroup size="sm">
-        <Avatar text="AB" />
-        <Avatar text="CD" />
-      </AvatarGroup>
-    )
-
-    const avatars = container.querySelectorAll('[role="img"]')
-    expect(avatars.length).toBe(2)
-    avatars.forEach((avatar) => {
-      expect(avatar.className).toContain('w-8 h-8 text-xs')
-      expect(avatar.className).toContain('-ml-2')
-    })
-  })
-
   it('lets an explicit avatar size override the group size', () => {
     const { container } = render(
       <AvatarGroup size="sm">

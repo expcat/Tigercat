@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import * as animation from '../../packages/core/src/utils/animation'
 
-const loadAnimation = async () => {
+const loadFreshAnimation = async () => {
   vi.resetModules()
-  return import('@expcat/tigercat-core')
+  return import('../../packages/core/src/utils/animation')
 }
 
 describe('animation utilities', () => {
@@ -11,9 +12,7 @@ describe('animation utilities', () => {
     vi.unstubAllGlobals()
   })
 
-  it('exports duration, easing, transition, and animation class constants', async () => {
-    const animation = await loadAnimation()
-
+  it('exports duration, easing, transition, and animation class constants', () => {
     expect(animation.ANIMATION_DURATION_MS).toBe(300)
     expect(animation.ANIMATION_DURATION_FAST_MS).toBe(200)
     expect(animation.ANIMATION_DURATION_SLOW_MS).toBe(500)
@@ -28,7 +27,7 @@ describe('animation utilities', () => {
   })
 
   it('injects shake styles once and reuses an existing style element', async () => {
-    const { injectShakeStyle } = await loadAnimation()
+    const { injectShakeStyle } = await loadFreshAnimation()
 
     injectShakeStyle()
     injectShakeStyle()
@@ -42,7 +41,7 @@ describe('animation utilities', () => {
   it('does not inject shake styles outside a browser environment', async () => {
     const originalWindow = globalThis.window
     vi.stubGlobal('window', undefined)
-    const { injectShakeStyle } = await loadAnimation()
+    const { injectShakeStyle } = await loadFreshAnimation()
 
     injectShakeStyle()
 
@@ -50,8 +49,8 @@ describe('animation utilities', () => {
     expect(document.getElementById('tiger-ui-animation-styles')).toBeNull()
   })
 
-  it('calculates path length and draw styles', async () => {
-    const { getPathLength, getPathDrawStyles } = await loadAnimation()
+  it('calculates path length and draw styles', () => {
+    const { getPathLength, getPathDrawStyles } = animation
     const path = { getTotalLength: () => 128 } as SVGPathElement
 
     expect(getPathLength(path)).toBe(128)
@@ -70,7 +69,7 @@ describe('animation utilities', () => {
   })
 
   it('injects SVG animation styles once', async () => {
-    const { injectSvgAnimationStyles } = await loadAnimation()
+    const { injectSvgAnimationStyles } = await loadFreshAnimation()
 
     injectSvgAnimationStyles()
     injectSvgAnimationStyles()
@@ -84,7 +83,7 @@ describe('animation utilities', () => {
   it('does not inject SVG animation styles outside a browser environment', async () => {
     const originalWindow = globalThis.window
     vi.stubGlobal('window', undefined)
-    const { injectSvgAnimationStyles } = await loadAnimation()
+    const { injectSvgAnimationStyles } = await loadFreshAnimation()
 
     injectSvgAnimationStyles()
 
@@ -92,13 +91,13 @@ describe('animation utilities', () => {
     expect(document.getElementById('tiger-ui-svg-animation-styles')).toBeNull()
   })
 
-  it('creates animation style objects with defaults and custom values', async () => {
+  it('creates animation style objects with defaults and custom values', () => {
     const {
       SVG_ANIMATION_VARS,
       getPathDrawAnimationStyle,
       getBarGrowAnimationStyle,
       getPieDrawAnimationStyle
-    } = await loadAnimation()
+    } = animation
 
     expect(getPathDrawAnimationStyle(240)).toEqual({
       [SVG_ANIMATION_VARS.pathLength]: '240',
@@ -123,14 +122,14 @@ describe('animation utilities', () => {
     })
   })
 
-  it('resolves token-backed component motion styles and transitions', async () => {
+  it('resolves token-backed component motion styles and transitions', () => {
     const {
       COMPONENT_MOTION_VARS,
       getComponentMotionStyle,
       getComponentMotionTransition,
       resolveMotionDuration,
       resolveMotionEasing
-    } = await loadAnimation()
+    } = animation
 
     expect(resolveMotionDuration('slow')).toBe('var(--tiger-motion-duration-slow,450ms)')
     expect(resolveMotionDuration(125)).toBe('125ms')
@@ -150,14 +149,14 @@ describe('animation utilities', () => {
     )
   })
 
-  it('collapses component motion, stagger, and sequence timing when disabled', async () => {
+  it('collapses component motion, stagger, and sequence timing when disabled', () => {
     const {
       COMPONENT_MOTION_VARS,
       getComponentMotionStyle,
       getStaggerDelay,
       getStaggeredMotionStyle,
       createMotionSequence
-    } = await loadAnimation()
+    } = animation
 
     expect(getComponentMotionStyle({ disabled: true })[COMPONENT_MOTION_VARS.duration]).toBe('0ms')
     expect(getStaggerDelay(3, { disabled: true })).toBe('0ms')
@@ -171,13 +170,13 @@ describe('animation utilities', () => {
     ])
   })
 
-  it('creates staggered and sequenced animation timing styles', async () => {
+  it('creates staggered and sequenced animation timing styles', () => {
     const {
       COMPONENT_MOTION_VARS,
       getStaggerDelay,
       getStaggeredMotionStyle,
       createMotionSequence
-    } = await loadAnimation()
+    } = animation
 
     expect(getStaggerDelay(3, { stepMs: 25, initialDelayMs: 10 })).toBe('85ms')
     expect(getStaggeredMotionStyle(2, { stepMs: 30 }).animationDelay).toBe('60ms')
@@ -205,7 +204,7 @@ describe('animation utilities', () => {
       startTigercatViewTransition,
       supportsViewTransitions,
       getViewTransitionNameStyle
-    } = await loadAnimation()
+    } = await loadFreshAnimation()
 
     const transition = {
       ready: Promise.resolve(),
@@ -235,7 +234,7 @@ describe('animation utilities', () => {
   })
 
   it('falls back to direct updates when View Transitions are unavailable', async () => {
-    const { startTigercatViewTransition } = await loadAnimation()
+    const { startTigercatViewTransition } = animation
     Object.defineProperty(document, 'startViewTransition', {
       value: undefined,
       configurable: true

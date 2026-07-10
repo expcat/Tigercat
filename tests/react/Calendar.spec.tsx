@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { Calendar } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
@@ -120,7 +120,7 @@ describe('Calendar', () => {
     it('moves focus with arrow keys', () => {
       render(<Calendar value={testDate} />)
       const start = screen.getByRole('gridcell', { name: '2024-06-15' })
-      start.focus()
+      act(() => start.focus())
       fireEvent.keyDown(start, { key: 'ArrowRight' })
       expect(screen.getByRole('gridcell', { name: '2024-06-16' })).toHaveFocus()
       fireEvent.keyDown(document.activeElement!, { key: 'ArrowDown' })
@@ -131,7 +131,7 @@ describe('Calendar', () => {
       const onChange = vi.fn()
       render(<Calendar value={testDate} onChange={onChange} />)
       const cell = screen.getByRole('gridcell', { name: '2024-06-20' })
-      cell.focus()
+      act(() => cell.focus())
       fireEvent.keyDown(cell, { key: 'Enter' })
       expect(onChange).toHaveBeenCalled()
       expect((onChange.mock.calls[0][0] as Date).getDate()).toBe(20)
@@ -140,7 +140,7 @@ describe('Calendar', () => {
     it('Home/End focus the first/last day of the month', () => {
       render(<Calendar value={testDate} />)
       const cell = screen.getByRole('gridcell', { name: '2024-06-15' })
-      cell.focus()
+      act(() => cell.focus())
       fireEvent.keyDown(cell, { key: 'Home' })
       expect(screen.getByRole('gridcell', { name: '2024-06-01' })).toHaveFocus()
       fireEvent.keyDown(document.activeElement!, { key: 'End' })
@@ -150,7 +150,7 @@ describe('Calendar', () => {
     it('arrows across the month boundary and navigates the view', () => {
       render(<Calendar value={new Date(2024, 5, 30)} />)
       const cell = screen.getByRole('gridcell', { name: '2024-06-30' })
-      cell.focus()
+      act(() => cell.focus())
       // +7 days → July 7, which is outside the visible June grid.
       fireEvent.keyDown(cell, { key: 'ArrowDown' })
       expect(screen.getByText('July 2024')).toBeInTheDocument()
@@ -162,7 +162,7 @@ describe('Calendar', () => {
       render(<Calendar mode="year" value={testDate} onPanelChange={onPanelChange} />)
       const jun = screen.getByRole('gridcell', { name: 'Jun' })
       expect(jun).toHaveAttribute('tabindex', '0')
-      jun.focus()
+      act(() => jun.focus())
       fireEvent.keyDown(jun, { key: 'ArrowRight' })
       expect(screen.getByRole('gridcell', { name: 'Jul' })).toHaveFocus()
       fireEvent.keyDown(document.activeElement!, { key: 'Enter' })

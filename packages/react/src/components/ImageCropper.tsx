@@ -48,6 +48,8 @@ export interface ImageCropperRef {
   getCropResult: () => Promise<CropResult>
 }
 
+const isPositiveFinite = (value: number) => Number.isFinite(value) && value > 0
+
 export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
   (
     {
@@ -95,18 +97,25 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
     // Load image
     useEffect(() => {
       setImageLoaded(false)
+      imageRef.current = null
       const img = new window.Image()
       img.crossOrigin = 'anonymous'
       img.onload = () => {
-        imageRef.current = img
+        const naturalWidth = img.naturalWidth
+        const naturalHeight = img.naturalHeight
+        if (!isPositiveFinite(naturalWidth) || !isPositiveFinite(naturalHeight)) return
 
         const container = containerRef.current
-        const containerW = container ? container.clientWidth : img.naturalWidth
-        const containerH = container ? container.clientHeight || 400 : img.naturalHeight
-        const ratio = Math.min(containerW / img.naturalWidth, containerH / img.naturalHeight, 1)
-        const dw = img.naturalWidth * ratio
-        const dh = img.naturalHeight * ratio
+        const measuredWidth = container?.clientWidth ?? 0
+        const measuredHeight = container?.clientHeight ?? 0
+        const containerW = isPositiveFinite(measuredWidth) ? measuredWidth : naturalWidth
+        const containerH = isPositiveFinite(measuredHeight) ? measuredHeight : 400
+        const ratio = Math.min(containerW / naturalWidth, containerH / naturalHeight, 1)
+        const dw = naturalWidth * ratio
+        const dh = naturalHeight * ratio
+        if (!isPositiveFinite(ratio) || !isPositiveFinite(dw) || !isPositiveFinite(dh)) return
 
+        imageRef.current = img
         setDisplayWidth(dw)
         setDisplayHeight(dh)
         displayDimsRef.current = { w: dw, h: dh }

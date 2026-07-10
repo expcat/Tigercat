@@ -4,6 +4,26 @@ import {
   buildCommentTree,
   clipCommentTreeDepth,
   formatCommentTime,
+  commentThreadActionButtonClasses,
+  commentThreadPrimaryButtonClasses,
+  commentThreadLikeButtonClasses,
+  commentThreadLikedButtonClasses,
+  commentThreadReplyButtonClasses,
+  commentThreadNeutralButtonClasses,
+  commentThreadLikeIconClasses,
+  commentThreadDividerClasses,
+  commentThreadAvatarClasses,
+  commentThreadAuthorClasses,
+  commentThreadUserTitleClasses,
+  commentThreadTimeClasses,
+  commentThreadContentClasses,
+  commentThreadReplyEditorClasses,
+  commentThreadReplyTextareaClasses,
+  commentThreadCancelButtonClasses,
+  commentThreadSubmitButtonClasses,
+  commentThreadRepliesClasses,
+  commentThreadEmptyClasses,
+  commentThreadEmptyIconClasses,
   type CommentAction,
   type CommentNode,
   type CommentThreadProps as CoreCommentThreadProps
@@ -99,11 +119,6 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     }
   }
 
-  const BTN_BASE =
-    'px-2 py-0.5 h-auto min-h-0 text-xs rounded-md transition-all duration-200 ease-out'
-  const ACTION_BTN = `${BTN_BASE} text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1.5`
-  const PRIMARY_BTN = `${BTN_BASE} text-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary-hover,#1d4ed8)] dark:text-blue-400 dark:hover:text-blue-300 font-semibold hover:bg-[var(--tiger-primary,#2563eb)]/10 dark:hover:bg-blue-400/10`
-
   const renderNode = (node: CommentNode, depth: number, isLast: boolean) => {
     const children = node.children ?? []
     const hasChildren = children.length > 0
@@ -130,15 +145,14 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           size="sm"
           variant="ghost"
           className={classNames(
-            ACTION_BTN,
-            'hover:text-blue-600 hover:bg-blue-50/50 dark:hover:text-blue-400 dark:hover:bg-blue-950/20',
-            node.liked &&
-              'text-blue-600 dark:text-blue-400 bg-blue-50/30 dark:bg-blue-950/10 font-semibold border-blue-200/40 dark:border-blue-800/30'
+            commentThreadActionButtonClasses,
+            commentThreadLikeButtonClasses,
+            node.liked && commentThreadLikedButtonClasses
           )}
           onClick={() => onLike?.(node, !node.liked)}>
           <svg
             className={classNames(
-              'w-3.5 h-3.5 transition-transform duration-200 active:scale-125',
+              commentThreadLikeIconClasses,
               node.liked ? 'fill-current' : 'stroke-current fill-none'
             )}
             viewBox="0 0 24 24"
@@ -160,10 +174,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           key="reply"
           size="sm"
           variant="ghost"
-          className={classNames(
-            ACTION_BTN,
-            'hover:text-emerald-600 hover:bg-emerald-50/50 dark:hover:text-emerald-400 dark:hover:bg-emerald-950/20'
-          )}
+          className={classNames(commentThreadActionButtonClasses, commentThreadReplyButtonClasses)}
           onClick={() => {
             setReplyingTo((prev) => (prev === node.id ? null : node.id))
             setReplyValue('')
@@ -191,10 +202,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           key="more"
           size="sm"
           variant="ghost"
-          className={classNames(
-            ACTION_BTN,
-            'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
-          )}
+          className={classNames(commentThreadActionButtonClasses, commentThreadNeutralButtonClasses)}
           onClick={() => onMore?.(node)}>
           <svg
             className="w-3.5 h-3.5"
@@ -221,7 +229,10 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             key={actionKey}
             size="sm"
             variant={action.variant ?? 'ghost'}
-            className={classNames(ACTION_BTN, 'hover:bg-gray-100 dark:hover:bg-gray-800')}
+            className={classNames(
+              commentThreadActionButtonClasses,
+              commentThreadNeutralButtonClasses
+            )}
             disabled={action.disabled}
             onClick={() => {
               action.onClick?.(node, action)
@@ -242,7 +253,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           depth === 1 &&
             !isLast &&
             showDivider &&
-            'border-b border-gray-100 dark:border-gray-800/80'
+            commentThreadDividerClasses
         )}>
         <div className="flex gap-3">
           {showAvatar && node.user ? (
@@ -250,7 +261,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               size={depth === 1 ? 'md' : 'sm'}
               src={node.user.avatar}
               text={node.user.name}
-              className="shrink-0 mt-0.5 ring-1 ring-black/5 dark:ring-white/10 shadow-sm transition-transform hover:scale-105 duration-200"
+              className={commentThreadAvatarClasses}
             />
           ) : null}
           <div className="flex-1 min-w-0">
@@ -260,7 +271,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   tag="span"
                   size="sm"
                   weight="bold"
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                  className={commentThreadAuthorClasses}>
                   {node.user.name}
                 </Text>
               ) : null}
@@ -269,7 +280,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   tag="span"
                   size="xs"
                   color="muted"
-                  className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-400 font-medium">
+                  className={commentThreadUserTitleClasses}>
                   {node.user.title}
                 </Text>
               ) : null}
@@ -295,13 +306,13 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   tag="span"
                   size="xs"
                   color="muted"
-                  className="ml-auto text-gray-400 dark:text-gray-500 font-normal">
+                  className={commentThreadTimeClasses}>
                   {formatCommentTime(node.time)}
                 </Text>
               ) : null}
             </div>
 
-            <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed break-words mt-2 mb-3 pr-2">
+            <div className={commentThreadContentClasses}>
               {node.content}
             </div>
 
@@ -310,19 +321,19 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             ) : null}
 
             {replyingTo === node.id ? (
-              <div className="mt-3 space-y-3 bg-gray-50/50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800/80 p-4 rounded-xl shadow-sm backdrop-blur-sm transition-all duration-300">
+              <div className={commentThreadReplyEditorClasses}>
                 <Textarea
                   rows={3}
                   value={replyValue}
                   placeholder={replyPlaceholder}
-                  className="bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-400 rounded-lg shadow-inner transition-all duration-200"
+                  className={commentThreadReplyTextareaClasses}
                   onChange={(event) => setReplyValue(event.target.value)}
                 />
                 <div className="flex items-center gap-2 justify-end">
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg transition-colors"
+                    className={commentThreadCancelButtonClasses}
                     onClick={() => {
                       setReplyingTo(null)
                       setReplyValue('')
@@ -332,7 +343,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   <Button
                     size="sm"
                     variant="primary"
-                    className="px-3 py-1.5 text-xs font-semibold shadow-sm hover:shadow transition-all duration-200 rounded-lg"
+                    className={commentThreadSubmitButtonClasses}
                     onClick={() => handleReplySubmit(node)}>
                     {replyButtonText}
                   </Button>
@@ -345,8 +356,8 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 size="sm"
                 variant="ghost"
                 className={classNames(
-                  'mt-2 font-semibold hover:bg-[var(--tiger-primary,#2563eb)]/10 dark:hover:bg-blue-400/10 transition-colors',
-                  PRIMARY_BTN
+                  'mt-2 font-semibold',
+                  commentThreadPrimaryButtonClasses
                 )}
                 aria-expanded={isExpanded}
                 aria-controls={repliesId}
@@ -358,7 +369,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             {showReplies ? (
               <div
                 id={repliesId}
-                className="mt-4 ml-1 pl-4 border-l-2 border-gray-100 dark:border-gray-800 hover:border-blue-500/40 dark:hover:border-blue-400/40 space-y-4 transition-colors duration-300">
+                className={commentThreadRepliesClasses}>
                 {visibleChildren.map((child, index) =>
                   renderNode(child, depth + 1, index === visibleChildren.length - 1)
                 )}
@@ -366,7 +377,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   <Button
                     size="sm"
                     variant="ghost"
-                    className={PRIMARY_BTN}
+                    className={commentThreadPrimaryButtonClasses}
                     onClick={() => handleLoadMore(node)}>
                     {loadMoreText}
                   </Button>
@@ -387,9 +398,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       aria-label={divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : '评论线程')}
       {...divProps}>
       {resolvedNodes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center border border-dashed border-gray-200 dark:border-gray-800/80 rounded-xl py-12 px-4 bg-gray-50/20 dark:bg-gray-900/5 transition-colors">
+        <div className={commentThreadEmptyClasses}>
           <svg
-            className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3"
+            className={commentThreadEmptyIconClasses}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

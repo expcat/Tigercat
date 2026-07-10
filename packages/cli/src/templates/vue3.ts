@@ -151,11 +151,11 @@ function toggleModern(v: boolean) {
       <div class="flex items-center gap-4 text-sm text-[var(--tiger-text-muted,#6b7280)]">
         <label class="flex items-center gap-2">
           <span>Modern</span>
-          <Switch :checked="modern" size="sm" @update:checked="toggleModern" />
+          <Switch :model-value="modern" size="sm" @update:model-value="toggleModern" />
         </label>
         <label class="flex items-center gap-2">
           <span>Dark</span>
-          <Switch :checked="dark" size="sm" @update:checked="toggleDark" />
+          <Switch :model-value="dark" size="sm" @update:model-value="toggleDark" />
         </label>
       </div>
     </div>
@@ -192,18 +192,22 @@ declare module '*.vue' {
 function commonStyleCss(): string {
   return `@import "tailwindcss";
 @plugin "@expcat/tigercat-core/tailwind/modern";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /*
  * The tigercat tailwind plugin injects every --tiger-* design token for
  * both light (:root) and dark (.dark) modes, plus the opt-in modern
  * overrides activated by data-tiger-style="modern". The demo App toggles
- * dark mode via .dark on <html> and prefers-color-scheme via the rule
- * below. Swap the @plugin line for a tailwind.config.ts calling
- * createTigercatPlugin({ preset }) to use a custom preset.
+ * dark mode via .dark on <html>; the rules below keep native controls in
+ * sync with that explicit choice.
  */
 
 html {
-  color-scheme: light dark;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 `
 }

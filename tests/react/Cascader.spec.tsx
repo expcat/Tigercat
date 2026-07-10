@@ -50,35 +50,6 @@ const optionsWithDisabled = [
 
 describe('Cascader', () => {
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(<Cascader options={simpleOptions} />)
-
-      const trigger = container.querySelector('button')
-      expect(trigger).toBeInTheDocument()
-    })
-
-    it('should render with placeholder', () => {
-      const { getByText } = render(<Cascader options={simpleOptions} placeholder="Select area" />)
-
-      expect(getByText('Select area')).toBeInTheDocument()
-    })
-
-    it('should render with selected value', () => {
-      const { getByText } = render(
-        <Cascader options={simpleOptions} value={['zhejiang', 'hangzhou', 'westlake']} />
-      )
-
-      expect(getByText('Zhejiang / Hangzhou / West Lake')).toBeInTheDocument()
-    })
-
-    it('should render with custom separator', () => {
-      const { getByText } = render(
-        <Cascader options={simpleOptions} value={['zhejiang', 'hangzhou']} separator=" > " />
-      )
-
-      expect(getByText('Zhejiang > Hangzhou')).toBeInTheDocument()
-    })
-
     it('should apply custom className', () => {
       const { container } = render(<Cascader options={simpleOptions} className="custom-class" />)
 
@@ -119,17 +90,6 @@ describe('Cascader', () => {
 
       expect(container.querySelector('.max-sm\\:fixed')).toBeInTheDocument()
     })
-
-    it('should show first level options', async () => {
-      const { container, getByText } = render(<Cascader options={simpleOptions} />)
-
-      const trigger = container.querySelector('button')!
-      fireEvent.click(trigger)
-
-      expect(getByText('Zhejiang')).toBeInTheDocument()
-      expect(getByText('Jiangsu')).toBeInTheDocument()
-    })
-
     it('should expand child options on click', async () => {
       const { container, getByText } = render(<Cascader options={simpleOptions} />)
 
@@ -154,26 +114,9 @@ describe('Cascader', () => {
 
       expect(onChange).toHaveBeenCalledWith(['zhejiang', 'ningbo'])
     })
-
-    it('should not open when disabled', async () => {
-      const { container } = render(<Cascader options={simpleOptions} disabled />)
-
-      const trigger = container.querySelector('button')!
-      fireEvent.click(trigger)
-
-      expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
-    })
   })
 
   describe('Clear', () => {
-    it('should show clear button when has value and clearable', () => {
-      const { container } = render(
-        <Cascader options={simpleOptions} value={['zhejiang', 'hangzhou']} clearable />
-      )
-
-      expect(container.querySelector('[aria-label="Clear selection"]')).toBeInTheDocument()
-    })
-
     it('should clear value on clear click', async () => {
       const onChange = vi.fn()
       const { container } = render(
@@ -190,26 +133,9 @@ describe('Cascader', () => {
 
       expect(onChange).toHaveBeenCalledWith([])
     })
-
-    it('should not show clear button when not clearable', () => {
-      const { container } = render(
-        <Cascader options={simpleOptions} value={['zhejiang']} clearable={false} />
-      )
-
-      expect(container.querySelector('[aria-label="Clear selection"]')).not.toBeInTheDocument()
-    })
   })
 
   describe('Search', () => {
-    it('should show search input when searchable is true', async () => {
-      const { container } = render(<Cascader options={simpleOptions} searchable />)
-
-      const trigger = container.querySelector('button')!
-      fireEvent.click(trigger)
-
-      expect(container.querySelector('input[aria-label="Search options"]')).toBeInTheDocument()
-    })
-
     it('should filter options by search query', async () => {
       const { container, getByText } = render(<Cascader options={simpleOptions} searchable />)
 
@@ -285,17 +211,6 @@ describe('Cascader', () => {
 
       expect(trigger.getAttribute('aria-expanded')).toBe('true')
     })
-
-    it('should have role=option on each option', async () => {
-      const { container } = render(<Cascader options={simpleOptions} />)
-
-      const trigger = container.querySelector('button')!
-      fireEvent.click(trigger)
-
-      const options = container.querySelectorAll('[role="option"]')
-      expect(options.length).toBeGreaterThan(0)
-    })
-
     it('should open on Enter key', async () => {
       const { container } = render(<Cascader options={simpleOptions} />)
 

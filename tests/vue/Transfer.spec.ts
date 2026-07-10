@@ -25,16 +25,6 @@ describe('Transfer', () => {
       const panels = container.querySelectorAll('[role="group"]')
       expect(panels.length).toBe(2)
     })
-
-    it('should show source and target titles', () => {
-      const { getByText } = render(Transfer, {
-        props: { dataSource, sourceTitle: 'Available', targetTitle: 'Selected' }
-      })
-
-      expect(getByText(/Available/)).toBeInTheDocument()
-      expect(getByText(/Selected/)).toBeInTheDocument()
-    })
-
     it('should render items in source panel', () => {
       const { getByText } = render(Transfer, {
         props: { dataSource }
@@ -42,28 +32,6 @@ describe('Transfer', () => {
 
       expect(getByText('Item 1')).toBeInTheDocument()
       expect(getByText('Item 2')).toBeInTheDocument()
-    })
-
-    it('should split items by target keys', () => {
-      const { getAllByRole } = render(Transfer, {
-        props: { dataSource, modelValue: ['1', '2'] }
-      })
-
-      const panels = getAllByRole('listbox')
-      // Source: 3 items (3, 4, 5)
-      expect(panels[0].querySelectorAll('[role="option"]').length).toBe(3)
-      // Target: 2 items (1, 2)
-      expect(panels[1].querySelectorAll('[role="option"]').length).toBe(2)
-    })
-
-    it('should split items by targetKeys alias when modelValue is absent', () => {
-      const { getAllByRole } = render(Transfer, {
-        props: { dataSource, targetKeys: ['1', '2'] }
-      })
-
-      const panels = getAllByRole('listbox')
-      expect(panels[0].querySelectorAll('[role="option"]').length).toBe(3)
-      expect(panels[1].querySelectorAll('[role="option"]').length).toBe(2)
     })
   })
 

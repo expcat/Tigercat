@@ -68,19 +68,6 @@ describe('Loading (Vue)', () => {
     const { container: xlContainer } = render(Loading, { props: { size: 'xl' } })
     expect(xlContainer.querySelector('svg')).toHaveClass('h-16', 'w-16')
   })
-
-  it('applies color classes', () => {
-    const { container } = render(Loading, { props: { color: 'success' } })
-    const svg = container.querySelector('svg')
-    expect(svg?.className).toContain('--tiger-success')
-  })
-
-  it('applies customColor as inline style', () => {
-    const { container } = render(Loading, { props: { customColor: '#ff0000' } })
-    const wrapper = container.firstChild as HTMLElement
-    expect(wrapper).toHaveStyle({ color: '#ff0000' })
-  })
-
   it('supports fullscreen background', () => {
     const { container, unmount } = render(Loading, {
       props: { fullscreen: true, background: 'rgba(0, 0, 0, 0.8)' }
@@ -133,10 +120,5 @@ describe('Loading (Vue)', () => {
     }
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Loading)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

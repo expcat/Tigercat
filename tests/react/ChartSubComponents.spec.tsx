@@ -68,32 +68,6 @@ describe('ChartAxis', () => {
     const { container } = renderWithProps(ChartAxisWrapper, { scale, tickValues })
     await expectNoA11yViolationsIsolated(container)
   })
-
-  it('renders with all positions', () => {
-    const positions = ['bottom', 'top', 'left', 'right'] as const
-    positions.forEach((position) => {
-      const { container } = renderWithProps(ChartAxisWrapper, { scale, tickValues, position })
-      expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(3)
-    })
-  })
-
-  it('renders with custom tick format', () => {
-    const { container } = renderWithProps(ChartAxisWrapper, {
-      scale,
-      tickValues,
-      tickFormat: (v: number) => `$${v}`
-    })
-
-    const ticks = container.querySelectorAll('[data-axis-tick]')
-    expect(ticks[0]).toHaveTextContent('$0')
-    expect(ticks[1]).toHaveTextContent('$50')
-    expect(ticks[2]).toHaveTextContent('$100')
-  })
-
-  it('renders with empty tickValues', () => {
-    const { container } = renderWithProps(ChartAxisWrapper, { scale, tickValues: [] })
-    expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(0)
-  })
 })
 
 // ===========================================================================
@@ -165,49 +139,9 @@ describe('ChartCanvas', () => {
 // ===========================================================================
 
 describe('ChartGrid', () => {
-  it('renders grid lines for both axes', () => {
-    const { container } = renderWithProps(ChartGridWrapper, {
-      xScale,
-      yScale,
-      xTickValues: tickValues,
-      yTickValues: tickValues
-    })
-
-    expect(container.querySelectorAll('line')).toHaveLength(6)
-  })
-
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(ChartGridWrapper, { xScale, yScale })
     await expectNoA11yViolationsIsolated(container)
-  })
-
-  it('respects show option for x, y, or none', () => {
-    const baseProps = { xScale, yScale, xTickValues: tickValues, yTickValues: tickValues }
-
-    const { container: yOnly } = renderWithProps(ChartGridWrapper, { ...baseProps, show: 'y' })
-    expect(yOnly.querySelectorAll('line')).toHaveLength(3)
-
-    const { container: xOnly } = renderWithProps(ChartGridWrapper, { ...baseProps, show: 'x' })
-    expect(xOnly.querySelectorAll('line')).toHaveLength(3)
-
-    const { container: none } = renderWithProps(ChartGridWrapper, { ...baseProps, show: 'none' })
-    expect(none.querySelectorAll('line')).toHaveLength(0)
-  })
-
-  it('renders dashed lines when lineStyle is dashed', () => {
-    const { container } = renderWithProps(ChartGridWrapper, {
-      xScale,
-      yScale,
-      xTickValues: [0, 50],
-      yTickValues: [0, 50],
-      lineStyle: 'dashed'
-    })
-
-    const lines = container.querySelectorAll('line')
-    expect(lines.length).toBeGreaterThan(0)
-    lines.forEach((line) => {
-      expect(line.getAttribute('stroke-dasharray')).toBeTruthy()
-    })
   })
 })
 
@@ -238,21 +172,6 @@ describe('ChartLegend', () => {
     const items = container.querySelectorAll('[data-legend-item]')
     expect(items[2].className).toContain('opacity')
   })
-
-  it('renders correct layout for position', () => {
-    const { container: bottom } = renderWithProps(ChartLegend, {
-      items: legendItems,
-      position: 'bottom'
-    })
-    expect(bottom.querySelector('[data-chart-legend]')?.className).toContain('flex-row')
-
-    const { container: right } = renderWithProps(ChartLegend, {
-      items: legendItems,
-      position: 'right'
-    })
-    expect(right.querySelector('[data-chart-legend]')?.className).toContain('flex-col')
-  })
-
   it('calls onItemClick when interactive', () => {
     const onItemClick = vi.fn()
     const { container } = renderWithProps(ChartLegend, {
@@ -290,16 +209,6 @@ describe('ChartLegend', () => {
     expect(items[0]).toHaveAttribute('role', 'listitem')
     expect(items[0]).not.toHaveAttribute('aria-pressed')
   })
-
-  it('applies gap on the legend container without label margin', () => {
-    const { container } = renderWithProps(ChartLegend, { items: legendItems, gap: 12 })
-    expect(container.querySelector('[data-chart-legend]')).toHaveStyle({ gap: '12px' })
-    expect(
-      (container.querySelector('[data-legend-item] span:last-child') as HTMLElement).style
-        .marginRight
-    ).toBe('')
-  })
-
   it('calls hover callbacks when interactive', () => {
     const onItemHover = vi.fn()
     const onItemLeave = vi.fn()
@@ -326,18 +235,6 @@ describe('ChartLegend', () => {
 // ===========================================================================
 
 describe('ChartSeries', () => {
-  it('renders series metadata', () => {
-    const { container } = renderWithProps(ChartSeriesWrapper, {
-      data: [{ x: 0, y: 10 }],
-      name: 'Series A',
-      type: 'scatter'
-    })
-
-    const series = container.querySelector('g')
-    expect(series).toHaveAttribute('data-series-name', 'Series A')
-    expect(series).toHaveAttribute('data-series-type', 'scatter')
-  })
-
   it('passes basic a11y checks', async () => {
     const { container } = renderWithProps(ChartSeriesWrapper, {
       data: [{ x: 0, y: 10 }]

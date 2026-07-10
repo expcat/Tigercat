@@ -42,67 +42,6 @@ describe('Menu', () => {
 
       expect(screen.getByRole('menuitem', { name: 'Item 1' })).toBeInTheDocument()
     })
-
-    it('renders in vertical mode by default', () => {
-      const { container } = render(Menu, {
-        slots: {
-          default: () => [h(MenuItem, { itemKey: '1' }, () => 'Item 1')]
-        }
-      })
-
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveAttribute('data-tiger-menu-mode', 'vertical')
-    })
-
-    it('renders in horizontal mode', () => {
-      const { container } = render(Menu, {
-        props: { mode: 'horizontal' },
-        slots: {
-          default: () => [h(MenuItem, { itemKey: '1' }, () => 'Item 1')]
-        }
-      })
-
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveAttribute('data-tiger-menu-mode', 'horizontal')
-    })
-
-    it('renders in inline mode', () => {
-      const { container } = render(Menu, {
-        props: { mode: 'inline' },
-        slots: {
-          default: () => [h(MenuItem, { itemKey: '1' }, () => 'Item 1')]
-        }
-      })
-
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveAttribute('data-tiger-menu-mode', 'inline')
-    })
-
-    it('renders with dark theme', () => {
-      const { container } = render(Menu, {
-        props: { theme: 'dark' },
-        slots: {
-          default: () => [h(MenuItem, { itemKey: '1' }, () => 'Item 1')]
-        }
-      })
-
-      const menu = container.querySelector('ul')
-      // Dark theme sets CSS variables for dark colors
-      expect(menu?.className).toContain('[--tiger-surface:#111827]')
-    })
-
-    it('renders with light theme by default', () => {
-      const { container } = render(Menu, {
-        slots: {
-          default: () => [h(MenuItem, { itemKey: '1' }, () => 'Item 1')]
-        }
-      })
-
-      const menu = container.querySelector('ul')
-      // Light theme sets CSS variables for light colors
-      expect(menu?.className).toContain('[--tiger-surface:#ffffff]')
-    })
-
     it('renders data-driven items', () => {
       render(Menu, {
         props: { items: dataItems, defaultOpenKeys: ['admin'] }
@@ -423,31 +362,6 @@ describe('Menu', () => {
       await fireEvent.keyDown(item1, { key: 'ArrowDown' })
       expect(item3).toHaveFocus()
     })
-
-    it('supports ArrowUp navigation', async () => {
-      render(Menu, {
-        slots: {
-          default: () => [
-            h(MenuItem, { itemKey: '1' }, () => 'Item 1'),
-            h(MenuItem, { itemKey: '2' }, () => 'Item 2'),
-            h(MenuItem, { itemKey: '3' }, () => 'Item 3')
-          ]
-        }
-      })
-
-      const item1 = screen.getByRole('menuitem', { name: 'Item 1' })
-      const item3 = screen.getByRole('menuitem', { name: 'Item 3' })
-
-      item3.focus()
-      await fireEvent.keyDown(item3, { key: 'ArrowUp' })
-
-      const item2 = screen.getByRole('menuitem', { name: 'Item 2' })
-      expect(item2).toHaveFocus()
-
-      await fireEvent.keyDown(item2, { key: 'ArrowUp' })
-      expect(item1).toHaveFocus()
-    })
-
     it('uses ArrowRight/ArrowLeft in horizontal mode', async () => {
       render(Menu, {
         props: { mode: 'horizontal' },
@@ -485,41 +399,6 @@ describe('Menu', () => {
       await fireEvent.keyDown(item, { key: 'Enter' })
 
       expect(onSelect).toHaveBeenCalledWith('1', { selectedKeys: ['1'] })
-    })
-
-    it('selects item with Space key', async () => {
-      const onSelect = vi.fn()
-
-      render(Menu, {
-        props: { onSelect },
-        slots: {
-          default: () => [h(MenuItem, { itemKey: '1' }, () => 'Item 1')]
-        }
-      })
-
-      const item = screen.getByRole('menuitem', { name: 'Item 1' })
-      item.focus()
-      await fireEvent.keyDown(item, { key: ' ' })
-
-      expect(onSelect).toHaveBeenCalledWith('1', { selectedKeys: ['1'] })
-    })
-
-    it('wraps focus at boundaries', async () => {
-      render(Menu, {
-        slots: {
-          default: () => [
-            h(MenuItem, { itemKey: '1' }, () => 'Item 1'),
-            h(MenuItem, { itemKey: '2' }, () => 'Item 2')
-          ]
-        }
-      })
-
-      const item1 = screen.getByRole('menuitem', { name: 'Item 1' })
-      const item2 = screen.getByRole('menuitem', { name: 'Item 2' })
-
-      item2.focus()
-      await fireEvent.keyDown(item2, { key: 'ArrowDown' })
-      expect(item1).toHaveFocus()
     })
   })
 

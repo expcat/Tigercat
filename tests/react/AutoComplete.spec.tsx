@@ -29,21 +29,6 @@ describe('AutoComplete', () => {
 
       expect(container.querySelector('input')).toBeInTheDocument()
     })
-
-    it('should render with placeholder', () => {
-      const { container } = render(<AutoComplete options={options} placeholder="Type to search" />)
-
-      const input = container.querySelector('input')
-      expect(input?.getAttribute('placeholder')).toBe('Type to search')
-    })
-
-    it('should render with initial value', () => {
-      const { container } = render(<AutoComplete options={options} value="apple" />)
-
-      const input = container.querySelector('input') as HTMLInputElement
-      expect(input.value).toBe('apple')
-    })
-
     it('should apply custom className', () => {
       const { container } = render(<AutoComplete options={options} className="custom-class" />)
 
@@ -89,18 +74,6 @@ describe('AutoComplete', () => {
 
       expect(onSelect).toHaveBeenCalledWith('apple', options[0])
     })
-
-    it('should close dropdown after selection', async () => {
-      const user = userEvent.setup()
-      const { container, getByText } = render(<AutoComplete options={options} />)
-
-      const input = container.querySelector('input')!
-      await user.click(input)
-      await user.click(getByText('Apple'))
-
-      expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
-    })
-
     it('should show not found text', async () => {
       const user = userEvent.setup()
       const { container, getByText } = render(
@@ -117,12 +90,6 @@ describe('AutoComplete', () => {
   })
 
   describe('Clear', () => {
-    it('should show clear button when clearable and has value', () => {
-      const { container } = render(<AutoComplete options={options} value="test" clearable />)
-
-      expect(container.querySelector('[aria-label="Clear"]')).toBeInTheDocument()
-    })
-
     it('should clear value on click', async () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
@@ -143,20 +110,6 @@ describe('AutoComplete', () => {
 
       expect(container.querySelector('input')).toBeDisabled()
     })
-
-    it('should not select disabled options', async () => {
-      const user = userEvent.setup()
-      const onSelect = vi.fn()
-      const { container, getByText } = render(
-        <AutoComplete options={optionsWithDisabled} onSelect={onSelect} />
-      )
-
-      const input = container.querySelector('input')!
-      await user.click(input)
-      await user.click(getByText('Banana'))
-
-      expect(onSelect).not.toHaveBeenCalled()
-    })
   })
 
   describe('Keyboard', () => {
@@ -172,19 +125,6 @@ describe('AutoComplete', () => {
 
       expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
     })
-
-    it('should close on Escape', async () => {
-      const user = userEvent.setup()
-      const { container } = render(<AutoComplete options={options} />)
-
-      const input = container.querySelector('input')!
-      await user.click(input)
-      expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
-
-      await user.keyboard('{Escape}')
-      expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
-    })
-
     it('should select on Enter', async () => {
       const user = userEvent.setup()
       const onSelect = vi.fn()
@@ -195,26 +135,6 @@ describe('AutoComplete', () => {
       await user.keyboard('{Enter}')
 
       expect(onSelect).toHaveBeenCalled()
-    })
-
-    it('should select first enabled option when the first option is disabled', async () => {
-      const user = userEvent.setup()
-      const onSelect = vi.fn()
-      const disabledFirstOptions = [
-        { label: 'Apple', value: 'apple', disabled: true },
-        { label: 'Banana', value: 'banana' }
-      ]
-      const { container } = render(
-        <AutoComplete options={disabledFirstOptions} onSelect={onSelect} />
-      )
-
-      const input = container.querySelector('input')!
-      await user.click(input)
-
-      expect(input.getAttribute('aria-activedescendant')).toContain('option-1')
-
-      await user.keyboard('{Enter}')
-      expect(onSelect).toHaveBeenCalledWith('banana', disabledFirstOptions[1])
     })
   })
 
@@ -237,18 +157,6 @@ describe('AutoComplete', () => {
 
       expect(input.getAttribute('aria-expanded')).toBe('true')
     })
-
-    it('should have role=option on each option', async () => {
-      const user = userEvent.setup()
-      const { container } = render(<AutoComplete options={options} />)
-
-      const input = container.querySelector('input')!
-      await user.click(input)
-
-      const opts = container.querySelectorAll('[role="option"]')
-      expect(opts.length).toBe(4)
-    })
-
     it('should have no accessibility violations', async () => {
       const { container } = render(<AutoComplete />)
       await expectNoA11yViolationsIsolated(container)

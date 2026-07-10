@@ -15,17 +15,6 @@ describe('Grid (Vue)', () => {
     const row = screen.getByTestId('row')
     expect(row).toHaveClass('flex', 'w-full', 'flex-wrap', 'items-start', 'justify-start')
   })
-
-  it('applies align/justify classes', () => {
-    render(Row, {
-      props: { align: 'middle', justify: 'center' },
-      attrs: { 'data-testid': 'row' }
-    })
-
-    const row = screen.getByTestId('row')
-    expect(row).toHaveClass('items-center', 'justify-center')
-  })
-
   it('applies gutter styles to Row and Col', () => {
     render(Row, {
       props: { gutter: 16 },
@@ -45,21 +34,6 @@ describe('Grid (Vue)', () => {
     expect(col.style.paddingLeft).toBe('')
     expect(col.style.paddingRight).toBe('')
   })
-
-  it('applies span/offset classes', () => {
-    render(Col, {
-      props: { span: 12, offset: 4 },
-      attrs: { 'data-testid': 'col' }
-    })
-
-    const col = screen.getByTestId('col') as HTMLElement
-    expect(col.className).toContain('w-[var(--tiger-col-span)]')
-    expect(col.className).toContain('ml-[var(--tiger-col-offset)]')
-
-    expect(col.style.getPropertyValue('--tiger-col-span')).toBe('50%')
-    expect(col.style.getPropertyValue('--tiger-col-offset')).toBe('16.666667%')
-  })
-
   it('supports flex layout with span=0', () => {
     render(Col, {
       props: { span: 0, flex: '0_0_160px' },

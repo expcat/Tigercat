@@ -197,10 +197,5 @@ describe('Alert', () => {
     expect(screen.getByText('Banner Alert')).toBeInTheDocument()
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Alert)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

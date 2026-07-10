@@ -43,10 +43,10 @@ export const tabNavPositionClasses = {
  * Tab nav border classes (applied only for line type)
  */
 export const tabNavLineBorderClasses = {
-  top: 'border-b border-gray-200',
-  bottom: 'border-t border-gray-200',
-  left: 'border-r border-gray-200',
-  right: 'border-l border-gray-200'
+  top: 'border-b border-[var(--tiger-border,#e5e7eb)]',
+  bottom: 'border-t border-[var(--tiger-border,#e5e7eb)]',
+  left: 'border-r border-[var(--tiger-border,#e5e7eb)]',
+  right: 'border-l border-[var(--tiger-border,#e5e7eb)]'
 }
 
 /**
@@ -74,7 +74,7 @@ export const tabNavListCenteredClasses = 'justify-center'
  * @since 0.2.0 - Added focus-visible ring for keyboard navigation
  */
 export const tabItemBaseClasses =
-  'relative z-10 cursor-pointer transition-all duration-200 select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-offset-2 active:opacity-90'
+  'relative z-10 cursor-pointer transition-all duration-200 motion-reduce:transition-none select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-offset-2 active:opacity-90'
 
 /**
  * Tab item size classes
@@ -89,7 +89,7 @@ export const tabItemSizeClasses = {
  * Tab item type classes - line
  */
 export const tabItemLineClasses =
-  'border-b-2 border-transparent hover:text-[var(--tiger-primary,#2563eb)] text-gray-600'
+  'border-b-2 border-transparent hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)]'
 
 /**
  * Tab item type classes - line active
@@ -97,7 +97,7 @@ export const tabItemLineClasses =
 export const tabItemLineActiveClasses = 'text-[var(--tiger-primary,#2563eb)] font-medium'
 
 export const tabIndicatorBaseClasses =
-  'pointer-events-none absolute z-0 rounded-full bg-[var(--tiger-primary,#2563eb)] transition-transform duration-200 ease-out will-change-transform'
+  'pointer-events-none absolute z-0 rounded-full bg-[var(--tiger-primary,#2563eb)] transition-transform duration-200 ease-out will-change-transform motion-reduce:transition-none'
 
 export const tabIndicatorPositionClasses: Record<TabPosition, string> = {
   top: 'bottom-0 left-0 h-0.5',
@@ -110,25 +110,25 @@ export const tabIndicatorPositionClasses: Record<TabPosition, string> = {
  * Tab item type classes - card
  */
 export const tabItemCardClasses =
-  'border border-gray-200 rounded-t bg-white hover:text-[var(--tiger-primary,#2563eb)] text-gray-600 -mb-px'
+  'border border-[var(--tiger-border,#e5e7eb)] rounded-t bg-[var(--tiger-surface,#fff)] hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)] -mb-px'
 
 /**
  * Tab item type classes - card active
  */
 export const tabItemCardActiveClasses =
-  'bg-white border-[var(--tiger-primary,#2563eb)] border-b-white text-[var(--tiger-primary,#2563eb)] font-medium z-10'
+  'bg-[var(--tiger-surface,#fff)] border-[var(--tiger-primary,#2563eb)] border-b-[var(--tiger-surface,#fff)] text-[var(--tiger-primary,#2563eb)] font-medium z-10'
 
 /**
  * Tab item type classes - editable-card
  */
 export const tabItemEditableCardClasses =
-  'border border-gray-200 rounded-t bg-gray-50 hover:bg-white hover:text-[var(--tiger-primary,#2563eb)] text-gray-600 -mb-px'
+  'border border-[var(--tiger-border,#e5e7eb)] rounded-t bg-[var(--tiger-surface-muted,#f9fafb)] hover:bg-[var(--tiger-surface,#fff)] hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)] -mb-px'
 
 /**
  * Tab item type classes - editable-card active
  */
 export const tabItemEditableCardActiveClasses =
-  'bg-white border-[var(--tiger-primary,#2563eb)] border-b-white text-[var(--tiger-primary,#2563eb)] font-medium z-10'
+  'bg-[var(--tiger-surface,#fff)] border-[var(--tiger-primary,#2563eb)] border-b-[var(--tiger-surface,#fff)] text-[var(--tiger-primary,#2563eb)] font-medium z-10'
 
 /**
  * Tab item type classes - pills
@@ -151,7 +151,7 @@ export const tabItemDisabledClasses = 'opacity-50 cursor-not-allowed pointer-eve
  * Tab close button classes
  */
 export const tabCloseButtonClasses =
-  'ml-2 p-0.5 rounded-[var(--tiger-radius-sm,0.375rem)] hover:bg-gray-200 transition-colors duration-150'
+  'ml-2 p-0.5 rounded-[var(--tiger-radius-sm,0.375rem)] hover:bg-[var(--tiger-surface-muted,#e5e7eb)] transition-colors duration-150 motion-reduce:transition-none'
 
 /**
  * Tab content container classes
@@ -172,7 +172,7 @@ export const tabPaneHiddenClasses = 'hidden'
  * Tab add button classes (for editable-card)
  */
 export const tabAddButtonClasses =
-  'px-3 py-2 border border-gray-200 rounded-t bg-gray-50 hover:bg-white hover:text-[var(--tiger-primary,#2563eb)] text-gray-600 cursor-pointer transition-colors duration-200'
+  'px-3 py-2 border border-[var(--tiger-border,#e5e7eb)] rounded-t bg-[var(--tiger-surface-muted,#f9fafb)] hover:bg-[var(--tiger-surface,#fff)] hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)] cursor-pointer transition-colors duration-200 motion-reduce:transition-none'
 
 /**
  * Get tabs container classes

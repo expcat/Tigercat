@@ -19,7 +19,8 @@ export interface ScrollSpyObserverOptions {
   onChange: (item: ScrollSpyItem) => void
 }
 
-export const scrollSpyRootClasses = 'relative text-sm text-gray-600 dark:text-gray-300'
+export const scrollSpyRootClasses =
+  'relative text-sm text-[var(--tiger-text-muted,#6b7280)]'
 
 export const scrollSpyStickyClasses = 'sticky top-0'
 
@@ -28,10 +29,10 @@ export const scrollSpyListVerticalClasses = 'flex flex-col gap-1'
 export const scrollSpyListHorizontalClasses = 'flex flex-wrap items-center gap-2'
 
 export const scrollSpyNestedListClasses =
-  'mt-1 ml-3 flex flex-col gap-1 border-l border-gray-200 pl-3 dark:border-gray-700'
+  'mt-1 ml-3 flex flex-col gap-1 border-l border-[var(--tiger-border,#e5e7eb)] pl-3'
 
 export const scrollSpyItemBaseClasses =
-  'block rounded-md px-3 py-1.5 text-left transition-colors duration-200 hover:bg-gray-100 hover:text-[var(--tiger-primary,#2563eb)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2 dark:hover:bg-gray-800'
+  'block rounded-md px-3 py-1.5 text-left transition-colors duration-200 motion-reduce:transition-none hover:bg-[var(--tiger-surface-muted,#f3f4f6)] hover:text-[var(--tiger-primary,#2563eb)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#fff)]'
 
 export const scrollSpyItemActiveClasses =
   'bg-[var(--tiger-primary,#2563eb)]/10 font-medium text-[var(--tiger-primary,#2563eb)]'

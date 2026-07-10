@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -9,12 +9,12 @@ function readWorkspaceFile(path: string) {
 }
 
 function collectFiles(dir: string): string[] {
-  const entries = readdirSync(resolve(process.cwd(), dir))
+  const entries = readdirSync(resolve(process.cwd(), dir), { withFileTypes: true })
   return entries.flatMap((entry) => {
-    const path = `${dir}/${entry}`
-    const stats = statSync(resolve(process.cwd(), path))
-    if (stats.isDirectory()) return collectFiles(path)
-    return /\.(ts|tsx|vue)$/.test(entry) ? [path] : []
+    if (entry.isSymbolicLink() || GENERATED_EXAMPLE_DIRS.has(entry.name)) return []
+    const path = `${dir}/${entry.name}`
+    if (entry.isDirectory()) return collectFiles(path)
+    return /\.(ts|tsx|vue)$/.test(entry.name) ? [path] : []
   })
 }
 
@@ -33,6 +33,8 @@ function getImportedName(specifier: string) {
 }
 
 const ROOT_COMMAND_APIS = new Set(['Message', 'notification'])
+const GENERATED_EXAMPLE_DIRS = new Set(['node_modules', 'dist', '.next', '.nuxt', '.output'])
+const EXAMPLE_SOURCE_ROOTS = ['examples/example', 'examples/nextjs', 'examples/nuxt']
 
 describe('example lazy routes', () => {
   it('uses React.lazy for every React example page route', () => {
@@ -43,13 +45,14 @@ describe('example lazy routes', () => {
     expect(router).not.toMatch(/import\s+\w+\s+from\s+'\.\/pages\//)
   })
 
-  it('uses defineAsyncComponent for every Vue example page route', () => {
+  it('uses native Vue Router import factories for every Vue example page route', () => {
     const router = readWorkspaceFile('examples/example/vue3/src/router.ts')
 
-    expect(router).toContain("import { defineAsyncComponent } from 'vue'")
-    expect(router).toContain("const Home = lazyPage(() => import('./pages/Home.vue'))")
+    expect(router).not.toContain('defineAsyncComponent')
+    expect(router).not.toContain('lazyPage')
+    expect(router).toContain("const Home = () => import('./pages/Home.vue')")
+    expect(router).toContain("component: () => import('./pages/ButtonDemo.vue')")
     expect(router).not.toMatch(/import\s+\w+\s+from\s+'\.\/pages\//)
-    expect(router).not.toContain('component: () => import(')
   })
 
   it('keeps public component value imports on explicit framework subpaths', () => {
@@ -61,7 +64,7 @@ describe('example lazy routes', () => {
     const importRegex = /import\s+\{([^}]*)\}\s+from\s+['"]@expcat\/tigercat-(react|vue)['"]/g
     const violations: string[] = []
 
-    for (const file of collectFiles('examples')) {
+    for (const file of EXAMPLE_SOURCE_ROOTS.flatMap(collectFiles)) {
       const content = readWorkspaceFile(file)
       let match: RegExpExecArray | null
       while ((match = importRegex.exec(content)) !== null) {

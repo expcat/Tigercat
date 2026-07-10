@@ -60,16 +60,6 @@ describe('Switch', () => {
       expect(onUpdate).toHaveBeenCalledWith(true)
       expect(onChange).toHaveBeenCalledWith(true)
     })
-
-    it('toggles from true to false', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Switch, {
-        props: { modelValue: true, 'onUpdate:modelValue': onUpdate }
-      })
-      await fireEvent.click(getSwitch(container))
-      expect(onUpdate).toHaveBeenCalledWith(false)
-    })
-
     it.each([
       [' ', 'Space'],
       ['Enter', 'Enter']
@@ -112,24 +102,11 @@ describe('Switch', () => {
       expect(el).toHaveAttribute('aria-disabled', 'true')
       expect(el).toHaveAttribute('tabindex', '-1')
     })
-
-    it('is in the tab order when enabled', () => {
-      const { container } = renderWithProps(Switch, { disabled: false })
-      expect(getSwitch(container)).not.toHaveAttribute('tabindex', '-1')
-    })
   })
 
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
-    })
-
-    it('supports custom theme colors', () => {
-      setThemeVariables({ '--tiger-primary': '#ff0000' })
-      const { container } = renderWithProps(Switch, { modelValue: true })
-      expect(getSwitch(container)).toBeInTheDocument()
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 

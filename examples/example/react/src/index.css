@@ -1,29 +1,15 @@
 @import 'tailwindcss';
 @plugin "../../../../packages/core/src/tailwind-plugin.ts";
+@custom-variant dark (&:where(.dark, .dark *));
 @source "../../../../packages/react/src";
 @source "../../../../packages/core/src";
 
 :root {
-  /* Neutral tokens (used by components via CSS variables) */
-  --tiger-surface: #ffffff;
-  --tiger-surface-muted: #f9fafb;
-  --tiger-text: #111827;
-  --tiger-text-muted: #6b7280;
-  --tiger-border: #e5e7eb;
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --tiger-surface: #111827;
-    --tiger-surface-muted: #1f2937;
-    --tiger-text: #f9fafb;
-    --tiger-text-muted: #9ca3af;
-    --tiger-border: #374151;
-  }
-
-  html {
-    color-scheme: dark;
-  }
+.dark {
+  color-scheme: dark;
 }
 
 body {

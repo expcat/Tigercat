@@ -207,10 +207,5 @@ describe('Popconfirm', () => {
     await user.click(getByText('Delete'))
     await waitFor(() => expect(getByText('Custom description')).toBeVisible())
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { getByText } = renderWithChildren(Popconfirm, <button>Action</button>, {})
-      expect(getByText('Action')).toBeInTheDocument()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

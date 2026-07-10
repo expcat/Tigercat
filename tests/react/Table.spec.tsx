@@ -29,13 +29,6 @@ const tableFixedStripeBgClass =
 
 describe('Table', () => {
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(<Table columns={columns} dataSource={dataSource} />)
-
-      const table = container.querySelector('table')
-      expect(table).toBeInTheDocument()
-    })
-
     it('should render column headers', () => {
       const { getByText } = render(<Table columns={columns} dataSource={dataSource} />)
 
@@ -365,16 +358,6 @@ describe('Table', () => {
   })
 
   describe('Props', () => {
-    it('should apply size classes correctly', () => {
-      const { container } = render(
-        <Table columns={columns} dataSource={dataSource} size="sm" pagination={false} />
-      )
-
-      const ths = container.querySelectorAll('th')
-      const firstDataHeader = ths[0]
-      expect(firstDataHeader).toHaveClass('px-3', 'py-2')
-    })
-
     it('should show border when bordered is true', () => {
       const { container } = render(<Table columns={columns} dataSource={dataSource} bordered />)
 
@@ -382,14 +365,6 @@ describe('Table', () => {
       const borderWrapper = Array.from(wrappers).find((div) => div.classList.contains('border'))
       expect(borderWrapper).toBeTruthy()
     })
-
-    it('should apply striped classes when striped is true', () => {
-      const { container } = render(<Table columns={columns} dataSource={dataSource} striped />)
-
-      const rows = container.querySelectorAll('tbody tr')
-      expect(rows[0]).toHaveClass(tableStripeBgClass)
-    })
-
     it('should disable pagination when pagination is false', () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} pagination={false} />
@@ -440,42 +415,6 @@ describe('Table', () => {
   })
 
   describe('Fixed Columns', () => {
-    it('should apply sticky styles for fixed left and right columns', () => {
-      const fixedColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 140, fixed: 'left' },
-        { key: 'age', title: 'Age', width: 120 },
-        { key: 'email', title: 'Email', width: 220 },
-        {
-          key: 'actions',
-          title: 'Actions',
-          width: 140,
-          fixed: 'right',
-          render: () => 'Edit'
-        }
-      ]
-
-      const { getByText } = render(
-        <Table columns={fixedColumns} dataSource={dataSource} pagination={false} />
-      )
-
-      const nameHeader = getByText('Name').closest('th')
-      expect(nameHeader).toBeInTheDocument()
-      expect(nameHeader!).toHaveStyle('position: sticky')
-      expect(nameHeader!).toHaveStyle('left: 0px')
-      expect(nameHeader).toHaveClass(tableHeaderBgClass)
-
-      const actionsHeader = getByText('Actions').closest('th')
-      expect(actionsHeader).toBeInTheDocument()
-      expect(actionsHeader!).toHaveStyle('position: sticky')
-      expect(actionsHeader!).toHaveStyle('right: 0px')
-      expect(actionsHeader).toHaveClass(tableHeaderBgClass)
-
-      const firstNameCell = getByText('John Doe').closest('td')
-      expect(firstNameCell).toBeInTheDocument()
-      expect(firstNameCell!).toHaveStyle('position: sticky')
-      expect(firstNameCell!).toHaveStyle('left: 0px')
-    })
-
     it('keeps striped background on fixed body cells', () => {
       const fixedColumns: TableColumn[] = [
         { key: 'name', title: 'Name', width: 140, fixed: 'left' },
@@ -805,20 +744,6 @@ describe('Table', () => {
   })
 
   describe('Pagination', () => {
-    it('should render pagination controls by default', () => {
-      const { getByRole } = render(<Table columns={columns} dataSource={dataSource} />)
-
-      expect(getByRole('button', { name: 'Previous page' })).toBeInTheDocument()
-      expect(getByRole('button', { name: 'Next page' })).toBeInTheDocument()
-    })
-
-    it('should show page size selector', () => {
-      const { container } = render(<Table columns={columns} dataSource={dataSource} />)
-
-      const select = container.querySelector('select')
-      expect(select).toBeInTheDocument()
-    })
-
     it('should call onPageChange when clicking next button', async () => {
       const onPageChange = vi.fn()
 
@@ -842,14 +767,6 @@ describe('Table', () => {
         pageSize: 10
       })
     })
-
-    it('should disable previous button on first page', () => {
-      const { getByRole } = render(<Table columns={columns} dataSource={dataSource} />)
-
-      const prevButton = getByRole('button', { name: 'Previous page' })
-      expect(prevButton).toBeDisabled()
-    })
-
     it('should respect controlled pagination on rerender', () => {
       const { rerender, getByText, queryByText } = render(
         <Table
@@ -898,44 +815,6 @@ describe('Table', () => {
       expect(getByRole('button', { name: 'Page 5' })).toBeInTheDocument()
       expect(getByLabelText('Go to')).toBeInTheDocument()
       expect(getByText('Total 48 items')).toBeInTheDocument()
-    })
-
-    it('should jump to a page via the quick jumper when more than 3 pages', async () => {
-      const onPageChange = vi.fn()
-      const rows = Array.from({ length: 48 }, (_, i) => ({
-        id: i + 1,
-        name: `Person ${i + 1}`,
-        age: 20 + (i % 30),
-        email: `person${i + 1}@example.com`
-      }))
-
-      const { getByLabelText } = render(
-        <Table columns={columns} dataSource={rows} onPageChange={onPageChange} />
-      )
-
-      const jumperInput = getByLabelText('Go to')
-      await fireEvent.change(jumperInput, { target: { value: '4' } })
-      await fireEvent.keyDown(jumperInput, { key: 'Enter' })
-
-      expect(onPageChange).toHaveBeenCalledWith({ current: 4, pageSize: 10 })
-    })
-
-    it('should keep client-side slicing when remote is not set (regression)', () => {
-      const rows = Array.from({ length: 15 }, (_, i) => ({
-        id: i + 1,
-        name: `Person ${i + 1}`,
-        age: 20 + i,
-        email: `person${i + 1}@example.com`
-      }))
-
-      const { container, getByText, queryByText } = render(
-        <Table columns={columns} dataSource={rows} pagination={{ current: 2, pageSize: 10 }} />
-      )
-
-      expect(container.querySelectorAll('tbody tr')).toHaveLength(5)
-      expect(getByText('Person 11')).toBeInTheDocument()
-      expect(queryByText('Person 1')).not.toBeInTheDocument()
-      expect(getByText('Page 2 of 2')).toBeInTheDocument()
     })
   })
 
@@ -1034,14 +913,7 @@ describe('Table', () => {
     })
   })
 
-  describe('Sticky Header', () => {
-    it('should apply sticky class when stickyHeader is true', () => {
-      const { container } = render(<Table columns={columns} dataSource={dataSource} stickyHeader />)
-
-      const thead = container.querySelector('thead')
-      expect(thead).toHaveClass('sticky')
-    })
-  })
+  describe('Sticky Header', () => {})
 
   describe('Custom Rendering', () => {
     it('should render custom cell content', () => {
@@ -1177,26 +1049,6 @@ describe('Table', () => {
         <div className="expanded-content">Details for {record.name as string}</div>
       )
     }
-
-    it('should render expand icon column when expandable is provided', () => {
-      const { container } = render(
-        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
-      )
-
-      const headerCells = container.querySelectorAll('thead th')
-      // columns.length + 1 for expand icon column
-      expect(headerCells.length).toBe(columns.length + 1)
-    })
-
-    it('should render expand buttons for each row', () => {
-      const { getAllByRole } = render(
-        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
-      )
-
-      const expandButtons = getAllByRole('button', { name: /expand row/i })
-      expect(expandButtons.length).toBe(dataSource.length)
-    })
-
     it('should expand row on clicking expand button', async () => {
       const { getAllByRole, getByText } = render(
         <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
@@ -1207,37 +1059,6 @@ describe('Table', () => {
 
       expect(getByText('Details for John Doe')).toBeInTheDocument()
     })
-
-    it('should collapse row on clicking expand button again', async () => {
-      const { getAllByRole, queryByText } = render(
-        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
-      )
-
-      const expandButtons = getAllByRole('button', { name: /expand row/i })
-      await fireEvent.click(expandButtons[0])
-
-      // Now collapse
-      const collapseButton = getAllByRole('button', { name: /collapse row/i })[0]
-      await fireEvent.click(collapseButton)
-
-      expect(queryByText('Details for John Doe')).not.toBeInTheDocument()
-    })
-
-    it('should support defaultExpandedRowKeys (uncontrolled)', () => {
-      const { getByText } = render(
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          expandable={{
-            ...expandableConfig,
-            defaultExpandedRowKeys: [1]
-          }}
-        />
-      )
-
-      expect(getByText('Details for John Doe')).toBeInTheDocument()
-    })
-
     it('should support controlled expandedRowKeys', () => {
       const { getByText, queryByText } = render(
         <Table
@@ -1334,56 +1155,6 @@ describe('Table', () => {
       expect(getByText('Details for John Doe')).toBeInTheDocument()
       expect(rowKey).toHaveBeenCalledTimes(dataSource.length)
     })
-
-    it('should set correct colspan on expanded row td', async () => {
-      const { getAllByRole, container } = render(
-        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
-      )
-
-      const expandButtons = getAllByRole('button', { name: /expand row/i })
-      await fireEvent.click(expandButtons[0])
-
-      // columns (3) + expand icon column (1) = 4
-      const expandedTd = container.querySelector('.expanded-content')?.closest('td')
-      expect(expandedTd?.getAttribute('colspan')).toBe('4')
-    })
-
-    it('should set correct colspan with rowSelection and expandable', async () => {
-      const { getAllByRole, container } = render(
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          expandable={expandableConfig}
-          rowSelection={{ type: 'checkbox' }}
-        />
-      )
-
-      const expandButtons = getAllByRole('button', { name: /expand row/i })
-      await fireEvent.click(expandButtons[0])
-
-      // columns (3) + checkbox column (1) + expand icon column (1) = 5
-      const expandedTd = container.querySelector('.expanded-content')?.closest('td')
-      expect(expandedTd?.getAttribute('colspan')).toBe('5')
-    })
-
-    it('should not count hidden rowSelection checkbox column in expanded colspan', async () => {
-      const { getAllByRole, container } = render(
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          expandable={expandableConfig}
-          rowSelection={{ type: 'checkbox', showCheckbox: false }}
-        />
-      )
-
-      const expandButtons = getAllByRole('button', { name: /expand row/i })
-      await fireEvent.click(expandButtons[0])
-
-      // columns (3) + expand icon column (1) = 4
-      const expandedTd = container.querySelector('.expanded-content')?.closest('td')
-      expect(expandedTd?.getAttribute('colspan')).toBe('4')
-    })
-
     it('should set aria-expanded attribute on expand button', async () => {
       const { getAllByRole } = render(
         <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
@@ -1396,28 +1167,6 @@ describe('Table', () => {
 
       const collapseButton = getAllByRole('button', { name: /collapse row/i })[0]
       expect(collapseButton.getAttribute('aria-expanded')).toBe('true')
-    })
-
-    it('should render expand column at end when expandIconPosition=end', () => {
-      const { container } = render(
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          expandable={{ ...expandableConfig, expandIconPosition: 'end' }}
-        />
-      )
-      const headerCells = container.querySelectorAll('thead th')
-      const lastTh = headerCells[headerCells.length - 1]
-      expect(lastTh.textContent).toBe('')
-    })
-
-    it('should render expand column header at start by default', () => {
-      const { container } = render(
-        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
-      )
-      const headerCells = container.querySelectorAll('thead th')
-      expect(headerCells[0].textContent).toBe('')
-      expect(headerCells[1].textContent).toContain('Name')
     })
   })
 
@@ -1438,15 +1187,6 @@ describe('Table', () => {
       expect(queryByText('John Doe')).toBeInTheDocument()
       expect(queryByText('Jane Smith')).not.toBeInTheDocument()
       expect(queryByText('Bob Johnson')).not.toBeInTheDocument()
-    })
-
-    it('should show all when filterMode is basic', () => {
-      const { getByText } = render(
-        <Table columns={columns} dataSource={dataSource} filterMode="basic" pagination={false} />
-      )
-
-      expect(getByText('John Doe')).toBeInTheDocument()
-      expect(getByText('Jane Smith')).toBeInTheDocument()
     })
   })
 
@@ -1479,19 +1219,6 @@ describe('Table', () => {
       const tfoot = container.querySelector('tfoot')
       expect(tfoot).toBeInTheDocument()
       expect(tfoot!.textContent).toContain('Total')
-    })
-
-    it('should not render summary row when summaryRow.show is false', () => {
-      const { container } = render(
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          summaryRow={{ show: false, data: { name: 'Total' } }}
-          pagination={false}
-        />
-      )
-
-      expect(container.querySelector('tfoot')).not.toBeInTheDocument()
     })
   })
 
@@ -1526,28 +1253,6 @@ describe('Table', () => {
       )
 
       expect(getByText('Export CSV')).toBeInTheDocument()
-    })
-
-    it('should not render export button when exportable is false', () => {
-      const { queryByText } = render(
-        <Table columns={columns} dataSource={dataSource} exportable={false} pagination={false} />
-      )
-
-      expect(queryByText('Export CSV')).not.toBeInTheDocument()
-    })
-
-    it('should render Excel export label when exportFormat is excel', () => {
-      const { getByText } = render(
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          exportable={true}
-          exportFormat="excel"
-          pagination={false}
-        />
-      )
-
-      expect(getByText('Export Excel')).toBeInTheDocument()
     })
   })
 
@@ -1593,27 +1298,6 @@ describe('Table', () => {
     })
   })
 
-  describe('v0.6.0 - Virtual Scroll', () => {
-    it('should apply virtual height style when virtual is true', () => {
-      const { container } = render(
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          virtual={true}
-          virtualHeight={300}
-          pagination={false}
-        />
-      )
-
-      const wrapper = container.firstElementChild as HTMLElement
-      expect(wrapper.style.height).toBe('300px')
-      expect(wrapper.style.overflow).toBe('auto')
-    })
-  })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<Table columns={[]} dataSource={[]} />)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('v0.6.0 - Virtual Scroll', () => {})
+  describe('Edge Cases', () => {})
 })

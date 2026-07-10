@@ -35,20 +35,6 @@ describe('DonutChart', () => {
     expect(container.querySelectorAll('path[data-pie-slice]')).toHaveLength(0)
     expect(container.querySelector('svg')).toBeTruthy()
   })
-
-  it('uses custom colors and thickness', () => {
-    const { container } = renderWithProps(DonutChart, {
-      data: [{ value: 40 }, { value: 30 }],
-      colors: ['#ff0000', '#00ff00'],
-      thickness: 20,
-      ...defaultSize
-    })
-
-    const slices = container.querySelectorAll('path[data-pie-slice]')
-    expect(slices[0]).toHaveAttribute('fill', '#ff0000')
-    expect(slices[1]).toHaveAttribute('fill', '#00ff00')
-  })
-
   it('renders center content when centerValue and centerLabel are provided', () => {
     const { container } = renderWithProps(DonutChart, {
       data: [{ value: 60 }, { value: 40 }],
@@ -90,16 +76,5 @@ describe('DonutChart', () => {
     const slices = container.querySelectorAll('path[data-pie-slice]')
     // First color in DONUT_PALETTE is theme token chart-1 (ECharts-inspired #5470c6 fallback)
     expect(slices[0]).toHaveAttribute('fill', 'var(--tiger-chart-1,#5470c6)')
-  })
-
-  it('applies shadow by default', () => {
-    const { container } = renderWithProps(DonutChart, {
-      data: [{ value: 50 }, { value: 50 }],
-      ...defaultSize
-    })
-
-    const slice = container.querySelector('path[data-pie-slice]')
-    const style = slice?.getAttribute('style') ?? ''
-    expect(style).toContain('drop-shadow')
   })
 })

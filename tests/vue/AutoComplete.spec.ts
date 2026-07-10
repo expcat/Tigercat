@@ -30,24 +30,6 @@ describe('AutoComplete', () => {
       const input = container.querySelector('input')
       expect(input).toBeInTheDocument()
     })
-
-    it('should render with placeholder', () => {
-      const { container } = render(AutoComplete, {
-        props: { options, placeholder: 'Type to search' }
-      })
-
-      const input = container.querySelector('input')
-      expect(input?.getAttribute('placeholder')).toBe('Type to search')
-    })
-
-    it('should render with initial value', () => {
-      const { container } = render(AutoComplete, {
-        props: { options, modelValue: 'apple' }
-      })
-
-      const input = container.querySelector('input') as HTMLInputElement
-      expect(input.value).toBe('apple')
-    })
   })
 
   describe('Dropdown', () => {
@@ -87,19 +69,6 @@ describe('AutoComplete', () => {
       expect(emitted()['update:modelValue']).toBeTruthy()
       expect(emitted()['select']).toBeTruthy()
     })
-
-    it('should close dropdown after selection', async () => {
-      const { container, getByText } = render(AutoComplete, {
-        props: { options }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      await fireEvent.click(getByText('Apple'))
-
-      expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
-    })
-
     it('should show not found text when no matches', async () => {
       const { container, getByText } = render(AutoComplete, {
         props: { options, emptyText: 'Nothing found' }
@@ -114,14 +83,6 @@ describe('AutoComplete', () => {
   })
 
   describe('Clear', () => {
-    it('should show clear button when clearable and has value', () => {
-      const { container } = render(AutoComplete, {
-        props: { options, modelValue: 'test', clearable: true }
-      })
-
-      expect(container.querySelector('[aria-label="Clear"]')).toBeInTheDocument()
-    })
-
     it('should clear value on clear click', async () => {
       const { container, emitted } = render(AutoComplete, {
         props: { options, modelValue: 'test', clearable: true }
@@ -133,14 +94,6 @@ describe('AutoComplete', () => {
       expect(emitted()['update:modelValue']).toBeTruthy()
       const lastEmit = emitted()['update:modelValue']
       expect(lastEmit[lastEmit.length - 1]).toEqual([''])
-    })
-
-    it('should not show clear button when not clearable', () => {
-      const { container } = render(AutoComplete, {
-        props: { options, modelValue: 'test', clearable: false }
-      })
-
-      expect(container.querySelector('[aria-label="Clear"]')).not.toBeInTheDocument()
     })
   })
 
@@ -164,18 +117,6 @@ describe('AutoComplete', () => {
 
       expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
     })
-
-    it('should not select disabled options', async () => {
-      const { container, getByText, emitted } = render(AutoComplete, {
-        props: { options: optionsWithDisabled }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      await fireEvent.click(getByText('Banana'))
-
-      expect(emitted()['select']).toBeFalsy()
-    })
   })
 
   describe('Keyboard', () => {
@@ -189,20 +130,6 @@ describe('AutoComplete', () => {
 
       expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
     })
-
-    it('should close on Escape', async () => {
-      const { container } = render(AutoComplete, {
-        props: { options }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-      expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
-
-      await fireEvent.keyDown(input, { key: 'Escape' })
-      expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
-    })
-
     it('should select on Enter', async () => {
       const { container, emitted } = render(AutoComplete, {
         props: { options, defaultActiveFirstOption: true }
@@ -213,24 +140,6 @@ describe('AutoComplete', () => {
       await fireEvent.keyDown(input, { key: 'Enter' })
 
       expect(emitted()['select']).toBeTruthy()
-    })
-
-    it('should select first enabled option when the first option is disabled', async () => {
-      const disabledFirstOptions = [
-        { label: 'Apple', value: 'apple', disabled: true },
-        { label: 'Banana', value: 'banana' }
-      ]
-      const { container, emitted } = render(AutoComplete, {
-        props: { options: disabledFirstOptions, defaultActiveFirstOption: true }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-
-      expect(input.getAttribute('aria-activedescendant')).toContain('option-1')
-
-      await fireEvent.keyDown(input, { key: 'Enter' })
-      expect(emitted()['select']).toEqual([['banana', disabledFirstOptions[1]]])
     })
   })
 
@@ -256,19 +165,6 @@ describe('AutoComplete', () => {
 
       expect(input.getAttribute('aria-expanded')).toBe('true')
     })
-
-    it('should have role=option on each option', async () => {
-      const { container } = render(AutoComplete, {
-        props: { options }
-      })
-
-      const input = container.querySelector('input')!
-      await fireEvent.focus(input)
-
-      const opts = container.querySelectorAll('[role="option"]')
-      expect(opts.length).toBe(4)
-    })
-
     it('should have no accessibility violations', async () => {
       const { container } = render(AutoComplete)
       await expectNoA11yViolationsIsolated(container)

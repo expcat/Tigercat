@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, PropType } from 'vue'
+import { defineComponent, h, ref, computed, PropType, type VNodeChild } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -208,7 +208,7 @@ export const VirtualTable = defineComponent({
             ),
             style: { ...widthStyle, ...stickyStyle }
           },
-          col.title ?? ''
+          [col.renderHeader ? (col.renderHeader() as VNodeChild) : (col.title ?? '')]
         )
       })
 
@@ -253,8 +253,10 @@ export const VirtualTable = defineComponent({
           if (hasSelection.value) toggleRowSelection(key, row)
         }
 
-        const cells = visibleColumns.map((col, colIdx) =>
-          h(
+        const cells = visibleColumns.map((col, colIdx) => {
+          const dataKey = col.dataKey || col.key
+          const value = row[dataKey]
+          return h(
             'td',
             {
               key: col.key as string,
@@ -276,9 +278,9 @@ export const VirtualTable = defineComponent({
               ),
               style: getVirtualTableFixedCellStyle(col.key, fi)
             },
-            String((row as Record<string, unknown>)[col.key as string] ?? '')
+            [col.render ? (col.render(row, globalIdx) as VNodeChild) : (value as VNodeChild)]
           )
-        )
+        })
 
         const rowChildren = [
           colRange && colRange.leftPad > 0

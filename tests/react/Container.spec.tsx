@@ -13,14 +13,6 @@ describe('Container (React)', () => {
   const Content = <div>Container content</div>
 
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(<Container>{Content}</Container>)
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toBeInTheDocument()
-      expect(containerEl).toHaveClass('w-full')
-    })
-
     it('should render children content', () => {
       render(<Container>{Content}</Container>)
 
@@ -47,16 +39,6 @@ describe('Container (React)', () => {
 
       const containerEl = container.querySelector('div')
       expect(containerEl).toHaveClass('max-w-screen-sm')
-    })
-
-    it('should apply full width class', () => {
-      const { container } = renderWithProps(Container, {
-        maxWidth: 'full',
-        children: Content
-      })
-
-      const containerEl = container.querySelector('div')
-      expect(containerEl).toHaveClass('w-full')
     })
   })
 

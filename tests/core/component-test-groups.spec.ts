@@ -6,7 +6,8 @@ import {
   GROUP_FILTER_ALIASES,
   TEST_GROUPS,
   assertComponentTestGroupFiles,
-  getComponentTestGroupFiles
+  getComponentTestGroupFiles,
+  getUnassignedFrameworkTestFiles
 } from '../../scripts/lib/component-test-groups.mjs'
 
 const expectedGroups = [
@@ -44,6 +45,10 @@ describe('component-test-groups', () => {
     for (const group of TEST_GROUPS) {
       expect(getFiles({ group }), group).not.toHaveLength(0)
     }
+  })
+
+  it('should assign every React and Vue spec to at least one component group', () => {
+    expect(getUnassignedFrameworkTestFiles({ rootDir })).toEqual([])
   })
 
   it('should return sorted unique relative paths', () => {

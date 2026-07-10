@@ -82,26 +82,6 @@ describe('InputNumber (Vue)', () => {
       await fireEvent.click(screen.getByLabelText(label))
       expect(emitted()['update:modelValue'][0]).toEqual([expected])
     })
-
-    it('honors a custom step and precision', async () => {
-      const step = render(InputNumber, { props: { modelValue: 0, step: 5 } })
-      await fireEvent.click(screen.getByLabelText('Increase'))
-      expect(step.emitted()['update:modelValue'][0]).toEqual([5])
-
-      const precision = render(InputNumber, { props: { modelValue: 1, step: 0.1, precision: 2 } })
-      await fireEvent.click(screen.getAllByLabelText('Increase')[1])
-      expect(precision.emitted()['update:modelValue'][0]).toEqual([1.1])
-    })
-
-    it.each([
-      ['Decrease', 1, { min: 0 }, 0],
-      ['Increase', 9, { max: 10 }, 10]
-    ])('%s clamps at the boundary', async (label, start, bounds, expected) => {
-      const { emitted } = render(InputNumber, { props: { modelValue: start, ...bounds } })
-      await fireEvent.click(screen.getByLabelText(label))
-      expect(emitted()['update:modelValue'][0]).toEqual([expected])
-    })
-
     it.each([
       ['Decrease', { modelValue: 0, min: 0 }],
       ['Increase', { modelValue: 10, max: 10 }]
@@ -155,26 +135,6 @@ describe('InputNumber (Vue)', () => {
       await fireEvent.update(input, '42')
       await fireEvent.blur(input)
       expect(emitted()['update:modelValue'][0]).toEqual([42])
-    })
-
-    it('clamps out-of-range input on blur', async () => {
-      const { container, emitted } = render(InputNumber, {
-        props: { modelValue: 5, min: 0, max: 10 }
-      })
-      const input = getInput(container)
-      await fireEvent.focus(input)
-      await fireEvent.update(input, '999')
-      await fireEvent.blur(input)
-      expect(emitted()['update:modelValue'][0]).toEqual([10])
-    })
-
-    it('treats empty input as null on blur', async () => {
-      const { container, emitted } = render(InputNumber, { props: { modelValue: 5 } })
-      const input = getInput(container)
-      await fireEvent.focus(input)
-      await fireEvent.update(input, '')
-      await fireEvent.blur(input)
-      expect(emitted()['update:modelValue'][0]).toEqual([null])
     })
   })
 

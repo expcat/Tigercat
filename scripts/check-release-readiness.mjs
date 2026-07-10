@@ -202,11 +202,13 @@ function checkRootScripts() {
   const requiredScripts = [
     'release:check',
     'publish:check',
+    'quality:static',
     'quality:quick',
     'quality:size',
     'quality:examples',
     'quality:ssr',
     'quality:release',
+    'test:special',
     'example:ssr:build',
     'docs:api',
     'exports:check',
@@ -220,8 +222,9 @@ function checkRootScripts() {
   const releaseGate = scripts['quality:release'] ?? ''
   const requiredReleaseSteps = [
     'release:check',
-    'quality:quick',
+    'quality:static',
     'test:coverage',
+    'test:special',
     'api:baseline:check',
     'exports:check',
     'docs:api:check',

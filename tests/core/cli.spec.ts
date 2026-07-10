@@ -235,6 +235,9 @@ describe('CLI Templates - Vue 3', () => {
   it('should import tigercat-vue in App.vue', () => {
     const files = getVue3Template('test')
     expect(files['src/App.vue']).toContain("from '@expcat/tigercat-vue'")
+    expect(files['src/App.vue']).toContain(':model-value=')
+    expect(files['src/App.vue']).toContain('@update:model-value=')
+    expect(files['src/App.vue']).not.toContain('@update:checked=')
   })
 
   it('should include CSS variables for theming', () => {
@@ -247,9 +250,11 @@ describe('CLI Templates - Vue 3', () => {
 
   it('should have dark mode support in styles', () => {
     const files = getVue3Template('test')
-    // Plugin emits the .dark variable block; template enables OS-level
-    // light/dark color-scheme so native form controls follow suit.
-    expect(files['src/style.css']).toContain('color-scheme: light dark')
+    // Class-driven dark mode keeps Tailwind variants, tokens, and native controls aligned.
+    expect(files['src/style.css']).toContain('@custom-variant dark')
+    expect(files['src/style.css']).toContain('color-scheme: light')
+    expect(files['src/style.css']).toContain('html.dark')
+    expect(files['src/style.css']).toContain('color-scheme: dark')
   })
 
   it('should have proper TypeScript config', () => {
@@ -311,6 +316,8 @@ describe('CLI Templates - React', () => {
     expect(files['vite.config.ts']).toContain('tailwindcss()')
     expect(files['src/style.css']).toContain('@import "tailwindcss"')
     expect(files['src/style.css']).toContain('@expcat/tigercat-core/tailwind/modern')
+    expect(files['src/style.css']).toContain('@custom-variant dark')
+    expect(files['src/style.css']).toContain('html.dark')
   })
 
   it('should import tigercat-react in App.tsx', () => {

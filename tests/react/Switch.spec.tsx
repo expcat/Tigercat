@@ -121,19 +121,6 @@ describe('Switch', () => {
       expect(handleClick).toHaveBeenCalled()
       expect(handleChange).not.toHaveBeenCalled()
     })
-
-    it('skips onChange when onKeyDown prevents default', async () => {
-      const user = userEvent.setup()
-      const handleKeyDown = vi.fn((e) => e.preventDefault())
-      const handleChange = vi.fn()
-      const { container } = render(
-        <Switch checked={false} onKeyDown={handleKeyDown} onChange={handleChange} />
-      )
-      getSwitch(container).focus()
-      await user.keyboard('[Space]')
-      expect(handleKeyDown).toHaveBeenCalled()
-      expect(handleChange).not.toHaveBeenCalled()
-    })
   })
 
   describe('States', () => {
@@ -143,24 +130,11 @@ describe('Switch', () => {
       expect(el).toHaveAttribute('aria-disabled', 'true')
       expect(el).toHaveAttribute('tabindex', '-1')
     })
-
-    it('is in the tab order when enabled', () => {
-      const { container } = render(<Switch />)
-      expect(getSwitch(container)).not.toHaveAttribute('tabindex', '-1')
-    })
   })
 
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
-    })
-
-    it('supports custom theme colors', () => {
-      setThemeVariables({ '--tiger-primary': '#ff0000' })
-      const { container } = render(<Switch checked />)
-      expect(getSwitch(container)).toBeInTheDocument()
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 

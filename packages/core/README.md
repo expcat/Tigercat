@@ -26,14 +26,13 @@ npm install @expcat/tigercat-core
 
 ## Tailwind Plugin
 
-```js
-// tailwind.config.js
-import { tigercatPlugin } from '@expcat/tigercat-core'
-
-export default {
-  plugins: [tigercatPlugin]
-}
+```css
+@import 'tailwindcss';
+@plugin '@expcat/tigercat-core/tailwind/modern';
 ```
+
+The modern preset only changes component styling when a consumer sets
+`data-tiger-style="modern"`; the default visual style remains unchanged.
 
 ## License
 

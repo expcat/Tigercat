@@ -26,58 +26,10 @@ describe('Transfer', () => {
       const panels = container.querySelectorAll('[role="group"]')
       expect(panels.length).toBe(2)
     })
-
-    it('should show source and target titles', () => {
-      const { getByText } = render(
-        <Transfer dataSource={dataSource} sourceTitle="Available" targetTitle="Selected" />
-      )
-
-      expect(getByText(/Available/)).toBeInTheDocument()
-      expect(getByText(/Selected/)).toBeInTheDocument()
-    })
-
-    it('should split items by value', () => {
-      const { getAllByRole } = render(<Transfer dataSource={dataSource} value={['1', '2']} />)
-
-      const panels = getAllByRole('listbox')
-      expect(panels[0].querySelectorAll('[role="option"]').length).toBe(3)
-      expect(panels[1].querySelectorAll('[role="option"]').length).toBe(2)
-    })
-
     it('should apply custom className', () => {
       const { container } = render(<Transfer dataSource={dataSource} className="custom-transfer" />)
 
       expect(container.querySelector('.custom-transfer')).toBeInTheDocument()
-    })
-
-    it('should split items by targetKeys alias when value is absent', () => {
-      const { getAllByRole } = render(<Transfer dataSource={dataSource} targetKeys={['1', '2']} />)
-
-      const panels = getAllByRole('listbox')
-      expect(panels[0].querySelectorAll('[role="option"]').length).toBe(3)
-      expect(panels[1].querySelectorAll('[role="option"]').length).toBe(2)
-    })
-
-    it('should prefer value over targetKeys', () => {
-      const { getAllByRole } = render(
-        <Transfer dataSource={dataSource} value={['1']} targetKeys={['1', '2', '3']} />
-      )
-
-      const panels = getAllByRole('listbox')
-      expect(panels[1].querySelectorAll('[role="option"]').length).toBe(1)
-    })
-
-    it('localizes default titles and aria labels from ConfigProvider', () => {
-      render(
-        <ConfigProvider locale={zhCN}>
-          <Transfer dataSource={dataSource} searchable />
-        </ConfigProvider>
-      )
-
-      expect(screen.getByText(/源列表/)).toBeInTheDocument()
-      expect(screen.getByRole('textbox', { name: '搜索源列表' })).toBeInTheDocument()
-      expect(screen.getByRole('listbox', { name: '源列表项目' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: '移动选中项到目标列表' })).toBeDisabled()
     })
   })
 

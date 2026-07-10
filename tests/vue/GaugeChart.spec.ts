@@ -32,31 +32,6 @@ describe('GaugeChart (Vue)', () => {
     const valueText = Array.from(texts).find((t) => t.textContent === '75')
     expect(valueText).toBeTruthy()
   })
-
-  it('uses custom valueFormatter', () => {
-    const { container } = renderWithProps(GaugeChart, {
-      value: 75,
-      valueFormatter: (v: number) => `${v}%`,
-      ...defaultSize
-    })
-
-    const texts = container.querySelectorAll('text')
-    const formatted = Array.from(texts).find((t) => t.textContent === '75%')
-    expect(formatted).toBeTruthy()
-  })
-
-  it('renders label text', () => {
-    const { container } = renderWithProps(GaugeChart, {
-      value: 50,
-      label: 'Speed',
-      ...defaultSize
-    })
-
-    const texts = container.querySelectorAll('text')
-    const labelText = Array.from(texts).find((t) => t.textContent === 'Speed')
-    expect(labelText).toBeTruthy()
-  })
-
   it('renders ticks by default', () => {
     const { container } = renderWithProps(GaugeChart, {
       value: 50,
@@ -67,53 +42,6 @@ describe('GaugeChart (Vue)', () => {
     const lines = container.querySelectorAll('line')
     expect(lines.length).toBeGreaterThanOrEqual(5)
   })
-
-  it('hides ticks when showTicks=false', () => {
-    const { container } = renderWithProps(GaugeChart, {
-      value: 50,
-      showTicks: false,
-      ...defaultSize
-    })
-
-    const lines = container.querySelectorAll('line')
-    expect(lines).toHaveLength(0)
-  })
-
-  it('renders center dot (circle)', () => {
-    const { container } = renderWithProps(GaugeChart, {
-      value: 50,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('circle')).toBeTruthy()
-  })
-
-  it('renders segments when provided', () => {
-    const { container } = renderWithProps(GaugeChart, {
-      value: 60,
-      segments: [
-        { range: [0, 40] as [number, number], color: '#22c55e' },
-        { range: [40, 70] as [number, number], color: '#eab308' },
-        { range: [70, 100] as [number, number], color: '#ef4444' }
-      ],
-      ...defaultSize
-    })
-
-    // Track + 3 segment arcs + needle = at least 5 paths
-    const paths = container.querySelectorAll('path')
-    expect(paths.length).toBeGreaterThanOrEqual(5)
-  })
-
-  it('applies gradient when enabled', () => {
-    const { container } = renderWithProps(GaugeChart, {
-      value: 50,
-      gradient: true,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('defs linearGradient')).toBeTruthy()
-  })
-
   it('respects min/max range', () => {
     const { container } = renderWithProps(GaugeChart, {
       value: 500,

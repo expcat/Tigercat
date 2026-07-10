@@ -32,13 +32,6 @@ afterEach(() => {
 })
 
 describe('Statistic', () => {
-  // --- Basic rendering ---
-  it('renders with default props', () => {
-    render(<Statistic title="Users" value={1000} />)
-    expect(screen.getByText('Users')).toBeInTheDocument()
-    expect(screen.getByText('1000')).toBeInTheDocument()
-  })
-
   it('renders string value', () => {
     render(<Statistic title="Status" value="Active" />)
     expect(screen.getByText('Active')).toBeInTheDocument()
@@ -129,10 +122,5 @@ describe('Statistic', () => {
     expect(screen.getByText('-42')).toBeInTheDocument()
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<Statistic />)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

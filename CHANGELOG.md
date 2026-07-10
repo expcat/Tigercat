@@ -2,6 +2,24 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v2.0.0-rc.1
+
+v2.0.0 rc.1 冻结当前 v2.0.0 发布面，收敛 Pagination 样式与页容量变更事件语义，并记录候选版本相对 preview.6 的 core helper 清理。
+
+### Breaking Changes
+
+- **移除 simple pagination 样式 helpers**：core 根入口不再导出 `getSimplePaginationContainerClasses`、`getSimplePaginationTotalClasses`、`getSimplePaginationControlsClasses`、`getSimplePaginationSelectClasses`、`getSimplePaginationButtonClasses`、`getSimplePaginationPageIndicatorClasses` 与 `getSimplePaginationButtonsWrapperClasses`。Table/List 内置分页已统一复用 Pagination；自定义分页应直接使用 React/Vue `Pagination`，或改用仍公开的通用 pagination 样式 helpers。
+
+### Fixed
+
+- **Pagination 激活态样式**：页码按钮激活态统一由 core 样式 helper 生成，React / Vue 不再各自拼接重复状态类。
+- **Pagination 页容量事件**：变更 `pageSize` 时只触发 React `onPageSizeChange` / Vue `page-size-change`，并携带调整后的页码；即使当前页因总页数减少而被收敛，也不再额外触发页面导航 `onChange` / `change`。
+
+### Infrastructure
+
+- root 与 `@expcat/tigercat-core`、`@expcat/tigercat-react`、`@expcat/tigercat-vue`、`@expcat/tigercat-cli` 统一为 `2.0.0-rc.1`，并同步运行时版本、CLI 与示例首页元数据。
+- 迁移和破坏性变更已同步到 `docs/MIGRATION.md`；RC 阶段不再引入未明确记录的 breaking public API。
+
 ## v2.0.0-preview.6
 
 v2.0.0 preview 6 延续 v2.0.0 预览发布面，新增 DataExport 数据导出组件，并增强 Table / List 分页交互。

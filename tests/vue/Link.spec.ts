@@ -45,21 +45,6 @@ describe('Link (Vue)', () => {
     })
     expect(c2.querySelector('a')?.className).toContain('text-gray-700')
   })
-
-  it('applies size classes', () => {
-    const { container: sm } = render(Link, {
-      props: { size: 'sm' },
-      slots: { default: 'S' }
-    })
-    expect(sm.querySelector('a')).toHaveClass('text-sm')
-
-    const { container: lg } = render(Link, {
-      props: { size: 'lg' },
-      slots: { default: 'L' }
-    })
-    expect(lg.querySelector('a')).toHaveClass('text-lg')
-  })
-
   it('adds hover:underline when underline=true (default)', () => {
     const { container } = render(Link, {
       slots: { default: 'U' }

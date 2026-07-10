@@ -198,18 +198,22 @@ export default function App() {
 function commonStyleCss(): string {
   return `@import "tailwindcss";
 @plugin "@expcat/tigercat-core/tailwind/modern";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /*
  * The tigercat tailwind plugin injects every --tiger-* design token for
  * both light (:root) and dark (.dark) modes, plus the opt-in modern
  * overrides activated by data-tiger-style="modern". The demo App toggles
- * dark mode via .dark on <html> and prefers-color-scheme via the rule
- * below. Swap the @plugin line for a tailwind.config.ts calling
- * createTigercatPlugin({ preset }) to use a custom preset.
+ * dark mode via .dark on <html>; the rules below keep native controls in
+ * sync with that explicit choice.
  */
 
 html {
-  color-scheme: light dark;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 `
 }

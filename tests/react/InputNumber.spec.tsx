@@ -71,33 +71,6 @@ describe('InputNumber (React)', () => {
       await userEvent.click(screen.getByLabelText(label))
       expect(onChange).toHaveBeenCalledWith(expected)
     })
-
-    it('honors a custom step and precision', async () => {
-      const onStep = vi.fn()
-      render(<InputNumber defaultValue={0} step={5} onChange={onStep} />)
-      await userEvent.click(screen.getByLabelText('Increase'))
-      expect(onStep).toHaveBeenCalledWith(5)
-
-      const onPrecision = vi.fn()
-      render(<InputNumber defaultValue={1} step={0.1} precision={2} onChange={onPrecision} />)
-      await userEvent.click(screen.getAllByLabelText('Increase')[1])
-      expect(onPrecision).toHaveBeenCalledWith(1.1)
-    })
-
-    it.each([
-      ['Decrease', 1, { min: 0 }, 0],
-      ['Increase', 9, { max: 10 }, 10]
-    ])(
-      '%s clamps and disables the button at the boundary',
-      async (label, start, bounds, expected) => {
-        const onChange = vi.fn()
-        render(<InputNumber defaultValue={start} {...bounds} onChange={onChange} />)
-        await userEvent.click(screen.getByLabelText(label))
-        expect(onChange).toHaveBeenCalledWith(expected)
-        expect(screen.getByLabelText(label)).toBeDisabled()
-      }
-    )
-
     it('repeats increment while the Increase button is held', () => {
       vi.useFakeTimers()
       try {
@@ -147,27 +120,6 @@ describe('InputNumber (React)', () => {
       await userEvent.type(input, '42')
       fireEvent.blur(input)
       expect(onChange).toHaveBeenCalledWith(42)
-    })
-
-    it('clamps out-of-range input on blur', async () => {
-      const onChange = vi.fn()
-      const { container } = render(
-        <InputNumber defaultValue={5} min={0} max={10} onChange={onChange} />
-      )
-      const input = getInput(container)
-      await userEvent.clear(input)
-      await userEvent.type(input, '999')
-      fireEvent.blur(input)
-      expect(onChange).toHaveBeenCalledWith(10)
-    })
-
-    it('treats empty input as null on blur', async () => {
-      const onChange = vi.fn()
-      const { container } = render(<InputNumber defaultValue={5} onChange={onChange} />)
-      const input = getInput(container)
-      await userEvent.clear(input)
-      fireEvent.blur(input)
-      expect(onChange).toHaveBeenCalledWith(null)
     })
   })
 

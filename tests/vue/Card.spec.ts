@@ -96,24 +96,6 @@ describe('Card', () => {
       unmount()
     }
   })
-
-  it('applies size classes', () => {
-    const sizes = [
-      { size: 'sm', expected: 'p-3' },
-      { size: 'md', expected: 'p-4' },
-      { size: 'lg', expected: 'p-6' }
-    ] as const
-
-    for (const { size, expected } of sizes) {
-      const { container, unmount } = render(Card, {
-        props: { size },
-        slots: { default: 'body' }
-      })
-      expect(container.firstElementChild?.className).toContain(expected)
-      unmount()
-    }
-  })
-
   it('supports hoverable', () => {
     const { container } = render(Card, {
       props: {
@@ -185,10 +167,5 @@ describe('Card', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Card)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

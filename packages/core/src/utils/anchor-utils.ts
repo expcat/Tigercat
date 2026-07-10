@@ -20,25 +20,25 @@ export const anchorAffixClasses = 'fixed'
  * Anchor ink container classes (vertical)
  */
 export const anchorInkContainerVerticalClasses =
-  'absolute left-0 top-0 bottom-0 w-0.5 bg-gray-200 rounded-full'
+  'absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--tiger-border,#e5e7eb)] rounded-full'
 
 /**
  * Anchor ink container classes (horizontal)
  */
 export const anchorInkContainerHorizontalClasses =
-  'absolute left-0 right-0 bottom-0 h-0.5 bg-gray-200 rounded-full'
+  'absolute left-0 right-0 bottom-0 h-0.5 bg-[var(--tiger-border,#e5e7eb)] rounded-full'
 
 /**
  * Active ink indicator classes (vertical)
  */
 export const anchorInkActiveVerticalClasses =
-  'absolute w-0.5 bg-[var(--tiger-primary,#2563eb)] rounded-full transition-[top,height] duration-200 ease-in-out'
+  'absolute w-0.5 bg-[var(--tiger-primary,#2563eb)] rounded-full transition-[top,height] duration-200 ease-in-out motion-reduce:transition-none'
 
 /**
  * Active ink indicator classes (horizontal)
  */
 export const anchorInkActiveHorizontalClasses =
-  'absolute h-0.5 bg-[var(--tiger-primary,#2563eb)] rounded-full transition-[left,width] duration-200 ease-in-out'
+  'absolute h-0.5 bg-[var(--tiger-primary,#2563eb)] rounded-full transition-[left,width] duration-200 ease-in-out motion-reduce:transition-none'
 
 /**
  * Anchor link list classes (vertical)
@@ -54,7 +54,7 @@ export const anchorLinkListHorizontalClasses = 'flex items-center space-x-4 pb-2
  * Anchor link base classes
  */
 export const anchorLinkBaseClasses =
-  'block text-sm text-gray-600 hover:text-[var(--tiger-primary,#2563eb)] transition-colors duration-200 whitespace-nowrap'
+  'block text-sm text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-primary,#2563eb)] transition-colors duration-200 motion-reduce:transition-none whitespace-nowrap'
 
 /**
  * Anchor link active classes

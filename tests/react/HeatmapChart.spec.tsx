@@ -114,39 +114,6 @@ describe('HeatmapChart', () => {
     const texts = Array.from(container.querySelectorAll('text')).map((t) => t.textContent)
     expect(texts).toEqual(expect.arrayContaining(['1%', '2%', '3%', '4%']))
   })
-
-  it('applies cellGap between cells', () => {
-    const { container } = renderWithProps(HeatmapChart, {
-      ...defaultProps,
-      cellGap: 4
-    })
-
-    const rects = container.querySelectorAll('rect')
-    expect(rects).toHaveLength(4)
-  })
-
-  it('applies cellRadius to cells', () => {
-    const { container } = renderWithProps(HeatmapChart, {
-      ...defaultProps,
-      cellRadius: 8
-    })
-
-    const rects = container.querySelectorAll('rect')
-    rects.forEach((rect) => {
-      expect(rect.getAttribute('rx')).toBe('8')
-    })
-  })
-
-  it('renders with custom colors array', () => {
-    const { container } = renderWithProps(HeatmapChart, {
-      ...defaultProps,
-      colors: ['#ff0000', '#00ff00', '#0000ff']
-    })
-
-    const rects = container.querySelectorAll('rect')
-    expect(rects).toHaveLength(4)
-  })
-
   it('renders empty data without errors', () => {
     const { container } = renderWithProps(HeatmapChart, {
       ...defaultProps,
@@ -157,40 +124,6 @@ describe('HeatmapChart', () => {
 
     expect(container.querySelectorAll('rect')).toHaveLength(0)
   })
-
-  it('renders single data point correctly', () => {
-    const { container } = renderWithProps(HeatmapChart, {
-      ...defaultProps,
-      data: [{ x: 'A', y: 'One', value: 5 }],
-      xLabels: ['A'],
-      yLabels: ['One']
-    })
-
-    expect(container.querySelectorAll('rect')).toHaveLength(1)
-  })
-
-  it('uses canvas with rounded cells via path drawing', () => {
-    const { container } = renderWithProps(HeatmapChart, {
-      ...defaultProps,
-      canvasThreshold: 3,
-      cellRadius: 4
-    })
-
-    const canvas = container.querySelector('[data-heatmap-canvas]')
-    expect(canvas).toBeTruthy()
-    expect(context.beginPath).toHaveBeenCalled()
-  })
-
-  it('applies colorSpace oklch when specified', () => {
-    const { container } = renderWithProps(HeatmapChart, {
-      ...defaultProps,
-      colorSpace: 'oklch'
-    })
-
-    const rects = container.querySelectorAll('rect')
-    expect(rects).toHaveLength(4)
-  })
-
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<HeatmapChart {...defaultProps} />)

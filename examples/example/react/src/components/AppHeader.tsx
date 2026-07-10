@@ -12,6 +12,7 @@ export interface AppHeaderProps {
   onLangChange: (lang: DemoLang) => void
   isSiderCollapsed: boolean
   isMobile: boolean
+  isCompactHeader: boolean
   onToggleSider: () => void
   rightHint?: string
 }
@@ -21,6 +22,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onLangChange,
   isSiderCollapsed,
   isMobile,
+  isCompactHeader,
   onToggleSider,
   rightHint
 }) => {
@@ -37,6 +39,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         : 'Collapse sidebar'
 
   const siderIcon = isMobile ? '☰' : isSiderCollapsed ? '»' : '«'
+  const settingsLabel = lang === 'zh-CN' ? '设置' : 'Settings'
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 h-14 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
@@ -58,16 +61,37 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             {DEMO_APP_TITLE[lang]}
           </Link>
           {rightHint && (
-            <div className="text-xs text-gray-500 truncate dark:text-gray-400">{rightHint}</div>
+            <div className="hidden text-xs text-gray-500 truncate dark:text-gray-400 sm:block">
+              {rightHint}
+            </div>
           )}
         </div>
 
-        <div className="flex items-center gap-3">
-          <LanguageSwitch value={lang} onChange={onLangChange} />
-          <ThemeSwitch lang={lang} />
-          <ModernStyleSwitch lang={lang} />
-          <DarkModeSwitch lang={lang} />
-        </div>
+        {isCompactHeader ? (
+          <details className="relative shrink-0 sm:hidden">
+            <summary className="flex size-8 cursor-pointer list-none select-none items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900 [&::-webkit-details-marker]:hidden">
+              <span aria-hidden="true" className="text-base leading-none">
+                ⚙
+              </span>
+              <span className="sr-only">{settingsLabel}</span>
+            </summary>
+            <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-950">
+              <div className="flex flex-col gap-3">
+                <LanguageSwitch value={lang} onChange={onLangChange} />
+                <ThemeSwitch lang={lang} />
+                <ModernStyleSwitch lang={lang} />
+                <DarkModeSwitch lang={lang} />
+              </div>
+            </div>
+          </details>
+        ) : (
+          <div className="hidden items-center gap-3 sm:flex">
+            <LanguageSwitch value={lang} onChange={onLangChange} />
+            <ThemeSwitch lang={lang} />
+            <ModernStyleSwitch lang={lang} />
+            <DarkModeSwitch lang={lang} />
+          </div>
+        )}
       </div>
     </header>
   )

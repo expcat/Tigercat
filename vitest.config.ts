@@ -14,7 +14,7 @@ export default defineConfig({
     },
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text'],
       exclude: ['node_modules/', 'tests/', 'dist/', '**/*.d.ts', '**/*.config.*', '**/__mocks__'],
       // Conservative floors set ~5pts below the measured baseline
       // (lines 90.3 / statements 88.5 / functions 89.8 / branches 81.9) so normal

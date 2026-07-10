@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useMemo } from 'react'
+import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import {
   type UploadProps as CoreUploadProps,
   type UploadFile,
@@ -94,8 +94,33 @@ export const Upload: React.FC<UploadProps> = ({
     [mergedLocale, labelsOverrides]
   )
   const inputRef = useRef<HTMLInputElement>(null)
+  const objectUrlsRef = useRef(new Map<File, string>())
   const [isDragging, setIsDragging] = useState(false)
   const [fileList, setFileList] = useControlledState<UploadFile[]>(controlledFileList, [])
+
+  const revokeUnusedObjectUrls = useCallback((files: UploadFile[]) => {
+    const activeFiles = new Set(
+      files.flatMap((file) => (file.file && !file.url ? [file.file] : []))
+    )
+    objectUrlsRef.current.forEach((url, file) => {
+      if (!activeFiles.has(file)) {
+        URL.revokeObjectURL(url)
+        objectUrlsRef.current.delete(file)
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    revokeUnusedObjectUrls(fileList)
+  }, [fileList, revokeUnusedObjectUrls])
+
+  useEffect(
+    () => () => {
+      objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url))
+      objectUrlsRef.current.clear()
+    },
+    []
+  )
 
   const updateFileList = useCallback(
     (newFileList: UploadFile[]) => {
@@ -466,7 +491,19 @@ export const Upload: React.FC<UploadProps> = ({
   }
 
   const renderPictureCard = (file: UploadFile) => {
-    const imageUrl = file.url || (file.file ? URL.createObjectURL(file.file) : '')
+    let imageUrl = file.url ?? ''
+    if (
+      !imageUrl &&
+      file.file &&
+      typeof URL !== 'undefined' &&
+      typeof URL.createObjectURL === 'function'
+    ) {
+      imageUrl = objectUrlsRef.current.get(file.file) ?? ''
+      if (!imageUrl) {
+        imageUrl = URL.createObjectURL(file.file)
+        objectUrlsRef.current.set(file.file, imageUrl)
+      }
+    }
 
     return (
       <div key={file.uid} className={getPictureCardClasses(file.status)}>

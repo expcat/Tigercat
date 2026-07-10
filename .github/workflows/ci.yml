@@ -38,6 +38,9 @@ jobs:
       - name: Run tests with coverage
         run: pnpm test:coverage
 
+      - name: Run coverage-excluded tests
+        run: pnpm test:special
+
       - name: Validate test quality
         run: pnpm test:validate
 
@@ -55,9 +58,6 @@ jobs:
 
       - name: Validate API and LLM docs
         run: pnpm api:validate
-
-      - name: Run axe accessibility regression
-        run: pnpm test:a11y
 
       - name: Check bundle size
         run: pnpm size

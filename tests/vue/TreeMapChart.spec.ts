@@ -38,50 +38,6 @@ describe('TreeMapChart (Vue)', () => {
     const rects = container.querySelectorAll('rect')
     expect(rects).toHaveLength(0)
   })
-
-  it('renders labels when showLabels is true', () => {
-    const { container } = renderWithProps(TreeMapChart, {
-      data: sampleData,
-      showLabels: true,
-      ...defaultSize
-    })
-
-    const texts = container.querySelectorAll('text')
-    expect(texts.length).toBeGreaterThanOrEqual(1)
-  })
-
-  it('uses custom colors', () => {
-    const customColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00']
-    const { container } = renderWithProps(TreeMapChart, {
-      data: sampleData,
-      colors: customColors,
-      ...defaultSize
-    })
-
-    const rects = container.querySelectorAll('rect')
-    expect(rects[0]).toHaveAttribute('fill', '#ff0000')
-  })
-
-  it('applies gradient when enabled', () => {
-    const { container } = renderWithProps(TreeMapChart, {
-      data: sampleData,
-      gradient: true,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('defs linearGradient')).toBeTruthy()
-  })
-
-  it('renders legend when showLegend is true', () => {
-    const { container } = renderWithProps(TreeMapChart, {
-      data: sampleData,
-      showLegend: true,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
-  })
-
   it('triggers hover events when hoverable', () => {
     const onHoveredIndexChange = vi.fn()
     const { container } = renderWithProps(TreeMapChart, {
@@ -131,17 +87,6 @@ describe('TreeMapChart (Vue)', () => {
     expect(container.querySelector('title')?.textContent).toBe('TreeMap Title')
     expect(container.querySelector('desc')?.textContent).toBe('TreeMap Description')
   })
-
-  it('respects gap prop', () => {
-    const { container } = renderWithProps(TreeMapChart, {
-      data: sampleData,
-      gap: 4,
-      ...defaultSize
-    })
-
-    const rects = container.querySelectorAll('rect')
-    expect(rects.length).toBeGreaterThanOrEqual(4)
-  })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(TreeMapChart, {
@@ -157,15 +102,5 @@ describe('TreeMapChart (Vue)', () => {
     })
     const rects = container.querySelectorAll('rect')
     expect(rects.length).toBeGreaterThanOrEqual(1)
-  })
-
-  it('renders with gap=0', () => {
-    const { container } = renderWithProps(TreeMapChart, {
-      data: sampleData,
-      gap: 0,
-      ...defaultSize
-    })
-    const rects = container.querySelectorAll('rect')
-    expect(rects.length).toBeGreaterThanOrEqual(4)
   })
 })

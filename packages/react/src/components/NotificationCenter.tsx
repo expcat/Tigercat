@@ -3,6 +3,30 @@ import {
   classNames,
   buildNotificationGroups,
   formatActivityTime,
+  notificationCenterItemClasses,
+  notificationCenterUnreadItemClasses,
+  notificationCenterReadItemClasses,
+  notificationCenterReadTitleClasses,
+  notificationCenterUnreadTitleClasses,
+  notificationCenterUnreadDotClasses,
+  notificationCenterTimeClasses,
+  notificationCenterReadDescriptionClasses,
+  notificationCenterUnreadDescriptionClasses,
+  notificationCenterItemActionClasses,
+  notificationCenterEmptyIconWrapperClasses,
+  notificationCenterEmptyIconClasses,
+  notificationCenterEmptyTextClasses,
+  notificationCenterLoadingClasses,
+  notificationCenterCardClasses,
+  notificationCenterTitleClasses,
+  notificationCenterUnreadBadgeClasses,
+  notificationCenterMarkAllBaseClasses,
+  notificationCenterMarkAllEnabledClasses,
+  notificationCenterMarkAllDisabledClasses,
+  notificationCenterFilterGroupClasses,
+  notificationCenterFilterButtonClasses,
+  notificationCenterFilterActiveClasses,
+  notificationCenterFilterIdleClasses,
   type NotificationCenterProps as CoreNotificationCenterProps,
   type NotificationGroup,
   type NotificationItem,
@@ -213,10 +237,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     return (
       <div
         className={classNames(
-          'group relative flex items-start gap-3.5 w-full p-3.5 rounded-xl transition-all duration-300 hover:bg-gray-50/60 dark:hover:bg-gray-800/30',
-          !isRead
-            ? 'bg-blue-50/20 dark:bg-blue-950/5 hover:bg-blue-50/40 dark:hover:bg-blue-950/10 border-l-[3px] border-l-blue-500/80 -ml-[3px] pl-[calc(0.875rem-3px)]'
-            : 'border-l-[3px] border-l-transparent -ml-[3px] pl-[calc(0.875rem-3px)]'
+          notificationCenterItemClasses,
+          isRead ? notificationCenterReadItemClasses : notificationCenterUnreadItemClasses
         )}>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline justify-between gap-2">
@@ -226,16 +248,18 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 size="sm"
                 weight={isRead ? 'normal' : 'semibold'}
                 className={
-                  isRead ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'
+                  isRead
+                    ? notificationCenterReadTitleClasses
+                    : notificationCenterUnreadTitleClasses
                 }>
                 {item.title}
               </Text>
               {!isRead && (
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 shrink-0 shadow-sm shadow-blue-500/40 animate-pulse" />
+                <span className={notificationCenterUnreadDotClasses} />
               )}
             </div>
             {timeText ? (
-              <span className="text-[11px] text-gray-400 dark:text-gray-500 font-medium whitespace-nowrap flex-shrink-0 self-center">
+              <span className={notificationCenterTimeClasses}>
                 {timeText}
               </span>
             ) : null}
@@ -244,7 +268,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             <div
               className={classNames(
                 'mt-1 text-xs leading-relaxed line-clamp-2',
-                isRead ? 'text-gray-500 dark:text-gray-400' : 'text-gray-600 dark:text-gray-300'
+                isRead
+                  ? notificationCenterReadDescriptionClasses
+                  : notificationCenterUnreadDescriptionClasses
               )}>
               {item.description}
             </div>
@@ -253,7 +279,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         <Button
           size="sm"
           variant="ghost"
-          className="opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all duration-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border-0 flex-shrink-0 self-center"
+          className={notificationCenterItemActionClasses}
           onClick={(event) => {
             event.stopPropagation()
             if (manageReadState) {
@@ -275,9 +301,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     if (listItems.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center py-14 px-4 text-center">
-          <div className="p-3.5 bg-gray-50 dark:bg-gray-900 rounded-full mb-3 shadow-inner">
+          <div className={notificationCenterEmptyIconWrapperClasses}>
             <svg
-              className="w-8 h-8 text-gray-400 dark:text-gray-600 animate-pulse"
+              className={notificationCenterEmptyIconClasses}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -293,7 +319,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             tag="div"
             size="sm"
             color="muted"
-            className="font-semibold text-gray-400 dark:text-gray-500">
+            className={notificationCenterEmptyTextClasses}>
             {emptyText}
           </Text>
         </div>
@@ -315,7 +341,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   const content = loading ? (
     <div className="flex items-center justify-center py-16">
-      <Loading text={loadingText} className="text-blue-500 dark:text-blue-400 font-medium" />
+      <Loading text={loadingText} className={notificationCenterLoadingClasses} />
     </div>
   ) : resolvedGroups.length > 0 ? (
     <div className="-mx-4 -mb-4">
@@ -340,7 +366,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       data-tiger-notification-center>
       <Card
         variant="bordered"
-        className="w-full rounded-2xl border border-gray-100/80 dark:border-gray-800/80 bg-white/95 dark:bg-gray-950/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 overflow-hidden"
+        className={notificationCenterCardClasses}
         header={
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
@@ -349,11 +375,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   tag="div"
                   size="base"
                   weight="bold"
-                  className="text-gray-900 dark:text-gray-100">
+                  className={notificationCenterTitleClasses}>
                   {title}
                 </Text>
                 {totalUnread > 0 ? (
-                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] font-bold rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-sm shadow-blue-500/20 animate-pulse">
+                  <span className={notificationCenterUnreadBadgeClasses}>
                     {totalUnread}
                   </span>
                 ) : null}
@@ -364,23 +390,23 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 disabled={!hasUnread}
                 onClick={handleMarkAllRead}
                 className={classNames(
-                  'text-xs font-semibold transition-colors duration-200',
+                  notificationCenterMarkAllBaseClasses,
                   hasUnread
-                    ? 'text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300'
-                    : 'text-gray-400 dark:text-gray-600'
+                    ? notificationCenterMarkAllEnabledClasses
+                    : notificationCenterMarkAllDisabledClasses
                 )}>
                 {markAllReadText}
               </Button>
             </div>
-            <div className="inline-flex items-center gap-0.5 p-0.5 rounded-lg bg-gray-100/80 dark:bg-gray-800/60 self-start">
+            <div className={notificationCenterFilterGroupClasses}>
               {filterButtons.map((option) => (
                 <button
                   key={option.key}
                   className={classNames(
-                    'px-3.5 py-1 text-xs font-semibold rounded-md transition-all duration-200',
+                    notificationCenterFilterButtonClasses,
                     currentReadFilter === option.key
-                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm scale-102'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      ? notificationCenterFilterActiveClasses
+                      : notificationCenterFilterIdleClasses
                   )}
                   onClick={() => handleReadFilterChange(option.key)}>
                   {option.label}

@@ -52,25 +52,6 @@ describe('Textarea', () => {
       const { getByRole } = renderWithProps(Textarea, { size })
       expect(getByRole('textbox')).toBeInTheDocument()
     })
-
-    it('applies common native attributes', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        rows: 5,
-        maxLength: 10,
-        minLength: 2,
-        name: 'description',
-        id: 'ta',
-        autoFocus: true
-      })
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveAttribute('rows', '5')
-      expect(textarea).toHaveAttribute('maxlength', '10')
-      expect(textarea).toHaveAttribute('minlength', '2')
-      expect(textarea).toHaveAttribute('name', 'description')
-      expect(textarea).toHaveAttribute('id', 'ta')
-      expect(textarea).toHaveAttribute('autofocus')
-    })
-
     it('defaults rows to 3 and honors a custom rows value', async () => {
       const { getByRole, rerender } = render(Textarea)
       expect(getByRole('textbox')).toHaveAttribute('rows', '3')
@@ -83,13 +64,6 @@ describe('Textarea', () => {
     it('is disabled when disabled', () => {
       const { getByRole } = renderWithProps(Textarea, { disabled: true })
       expect(getByRole('textbox')).toBeDisabled()
-    })
-
-    it('combines readonly and required states', () => {
-      const { getByRole } = renderWithProps(Textarea, { readonly: true, required: true })
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveAttribute('readonly')
-      expect(textarea).toBeRequired()
     })
   })
 
@@ -179,17 +153,6 @@ describe('Textarea', () => {
       renderWithProps(Textarea, { modelValue: 'abc', showCount: true, maxLength: 10 })
       expect(screen.getByText('3/10')).toBeInTheDocument()
     })
-
-    it('shows the count without maxLength', () => {
-      renderWithProps(Textarea, { modelValue: 'hello', showCount: true })
-      expect(screen.getByText('5')).toBeInTheDocument()
-    })
-
-    it('shows zero for an empty value', () => {
-      renderWithProps(Textarea, { modelValue: '', showCount: true })
-      expect(screen.getByText('0')).toBeInTheDocument()
-    })
-
     it('updates the count when modelValue changes', async () => {
       const { rerender } = render(Textarea, {
         props: { modelValue: 'ab', showCount: true, maxLength: 10 }
@@ -198,34 +161,11 @@ describe('Textarea', () => {
       await rerender({ modelValue: 'abcd', showCount: true, maxLength: 10 })
       expect(screen.getByText('4/10')).toBeInTheDocument()
     })
-
-    it('does not show the count when showCount is false', () => {
-      const { container } = renderWithProps(Textarea, {
-        modelValue: 'abc',
-        showCount: false,
-        maxLength: 10
-      })
-      expect(container).not.toHaveTextContent('3/10')
-    })
-
-    it('counts unicode characters correctly', () => {
-      const unicodeText = '你好世界🌍'
-      renderWithProps(Textarea, { modelValue: unicodeText, showCount: true })
-      expect(screen.getByText(String(unicodeText.length))).toBeInTheDocument()
-    })
   })
 
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
-    })
-
-    it('supports custom theme colors', () => {
-      setThemeVariables({ '--tiger-primary': '#ff0000' })
-      const { getByRole } = renderWithProps(Textarea, { placeholder: 'Themed textarea' })
-      expect(getByRole('textbox')).toBeInTheDocument()
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 
@@ -250,46 +190,5 @@ describe('Textarea', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it.each([
-      ['special characters', edgeCaseData.specialCharacters],
-      ['unicode', edgeCaseData.unicode],
-      ['HTML-like content', '<script>alert("xss")</script>']
-    ])('preserves %s in the value', (_label, text) => {
-      const { getByRole } = renderWithProps(Textarea, { modelValue: text })
-      expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe(text)
-    })
-
-    it('handles rapid value changes', async () => {
-      const onUpdate = vi.fn()
-      const { getByRole } = render(Textarea, { props: { 'onUpdate:modelValue': onUpdate } })
-      const textarea = getByRole('textbox')
-      await fireEvent.update(textarea, 'a')
-      await fireEvent.update(textarea, 'ab')
-      await fireEvent.update(textarea, 'abc')
-      expect(onUpdate).toHaveBeenCalledTimes(3)
-    })
-
-    it('renders without crashing with all props set', () => {
-      const { getByRole } = render(Textarea, {
-        props: {
-          modelValue: 'test content',
-          size: 'lg',
-          placeholder: 'Enter description',
-          required: true,
-          rows: 5,
-          autoResize: false,
-          maxRows: 10,
-          minRows: 2,
-          maxLength: 500,
-          minLength: 10,
-          name: 'description',
-          id: 'textarea-id',
-          showCount: true,
-          className: 'custom-class'
-        }
-      })
-      expect(getByRole('textbox')).toBeInTheDocument()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

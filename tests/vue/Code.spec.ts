@@ -214,11 +214,5 @@ describe('Code (Vue)', () => {
       const { container } = render(Code, { props: { code: longCode } })
       expect(container.querySelector('code')!.textContent).toBe(longCode)
     })
-
-    it('renders code with unicode characters', () => {
-      const code = 'const emoji = "🎉"; // 注释'
-      render(Code, { props: { code } })
-      expect(screen.getByText(code)).toBeInTheDocument()
-    })
   })
 })

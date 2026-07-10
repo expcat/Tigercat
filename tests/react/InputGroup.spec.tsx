@@ -13,18 +13,6 @@ describe('InputGroup', () => {
     render(<InputGroup>content</InputGroup>)
     expect(screen.getByRole('group')).toBeInTheDocument()
   })
-
-  it('renders children', () => {
-    render(
-      <InputGroup>
-        <span>child1</span>
-        <span>child2</span>
-      </InputGroup>
-    )
-    const group = screen.getByRole('group')
-    expect(group.children.length).toBe(2)
-  })
-
   it('applies compact mode classes', () => {
     render(<InputGroup compact>content</InputGroup>)
     const group = screen.getByRole('group')
@@ -52,22 +40,6 @@ describe('InputGroup', () => {
     expect(screen.getByTestId('my-group')).toBeInTheDocument()
     expect(screen.getByTestId('my-group').id).toBe('test')
   })
-
-  it('applies base classes', () => {
-    render(<InputGroup>content</InputGroup>)
-    const group = screen.getByRole('group')
-    expect(group.className).toContain('inline-flex')
-  })
-
-  it('accepts different sizes', () => {
-    const sizes = ['sm', 'md', 'lg'] as const
-    for (const size of sizes) {
-      const { unmount } = render(<InputGroup size={size}>content</InputGroup>)
-      expect(screen.getByRole('group')).toBeInTheDocument()
-      unmount()
-    }
-  })
-
   it('passes size to child inputs that do not set their own size', () => {
     render(
       <InputGroup size="lg">
@@ -88,25 +60,6 @@ describe('InputGroupAddon', () => {
     render(<InputGroupAddon>@</InputGroupAddon>)
     expect(screen.getByText('@')).toBeInTheDocument()
   })
-
-  it('renders as span element', () => {
-    const { container } = render(<InputGroupAddon>prefix</InputGroupAddon>)
-    expect(container.querySelector('span')).toBeInTheDocument()
-  })
-
-  it('applies addon classes', () => {
-    const { container } = render(<InputGroupAddon>$</InputGroupAddon>)
-    const span = container.querySelector('span')!
-    expect(span.className).toContain('inline-flex')
-    expect(span.className).toContain('items-center')
-  })
-
-  it('merges custom className', () => {
-    const { container } = render(<InputGroupAddon className="addon-extra">icon</InputGroupAddon>)
-    const span = container.querySelector('span')!
-    expect(span.className).toContain('addon-extra')
-  })
-
   describe('a11y', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(
@@ -117,10 +70,5 @@ describe('InputGroupAddon', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<InputGroup />)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

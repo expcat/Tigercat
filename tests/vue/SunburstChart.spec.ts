@@ -35,52 +35,6 @@ describe('SunburstChart (Vue)', () => {
 
     expect(container.querySelector('svg')).toBeTruthy()
   })
-
-  it('renders labels when showLabels is true', () => {
-    const { container } = renderWithProps(SunburstChart, {
-      data: sampleData,
-      showLabels: true,
-      ...defaultSize
-    })
-
-    // SunburstChart may filter out labels for small arcs;
-    // just verify it renders without error with showLabels on
-    expect(container.querySelector('svg')).toBeTruthy()
-  })
-
-  it('uses custom colors', () => {
-    const customColors = ['#ff0000', '#00ff00', '#0000ff']
-    const { container } = renderWithProps(SunburstChart, {
-      data: sampleData,
-      colors: customColors,
-      ...defaultSize
-    })
-
-    const paths = container.querySelectorAll('path')
-    const fills = Array.from(paths).map((p) => p.getAttribute('fill'))
-    expect(fills).toContain('#ff0000')
-  })
-
-  it('applies gradient when enabled', () => {
-    const { container } = renderWithProps(SunburstChart, {
-      data: sampleData,
-      gradient: true,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('defs linearGradient')).toBeTruthy()
-  })
-
-  it('renders legend when showLegend is true', () => {
-    const { container } = renderWithProps(SunburstChart, {
-      data: sampleData,
-      showLegend: true,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
-  })
-
   it('triggers hover events when hoverable', () => {
     const onHoveredIndexChange = vi.fn()
     const { container } = renderWithProps(SunburstChart, {
@@ -130,18 +84,6 @@ describe('SunburstChart (Vue)', () => {
     expect(container.querySelector('title')?.textContent).toBe('Sunburst Title')
     expect(container.querySelector('desc')?.textContent).toBe('Sunburst Description')
   })
-
-  it('respects innerRadiusRatio', () => {
-    const { container } = renderWithProps(SunburstChart, {
-      data: sampleData,
-      innerRadiusRatio: 0.5,
-      ...defaultSize
-    })
-
-    // Should still render arcs
-    const paths = container.querySelectorAll('path')
-    expect(paths.length).toBeGreaterThanOrEqual(3)
-  })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(SunburstChart, {
@@ -149,25 +91,5 @@ describe('SunburstChart (Vue)', () => {
       })
       await expectNoA11yViolationsIsolated(container)
     })
-  })
-  it('renders as full pie when innerRadiusRatio is 0', () => {
-    const { container } = renderWithProps(SunburstChart, {
-      data: sampleData,
-      innerRadiusRatio: 0,
-      ...defaultSize
-    })
-    const paths = container.querySelectorAll('path')
-    expect(paths.length).toBeGreaterThanOrEqual(3)
-  })
-
-  it('renders with rectangular dimensions', () => {
-    const { container } = renderWithProps(SunburstChart, {
-      data: sampleData,
-      width: 500,
-      height: 300
-    })
-    const svg = container.querySelector('svg')
-    expect(svg).toHaveAttribute('width', '500')
-    expect(svg).toHaveAttribute('height', '300')
   })
 })

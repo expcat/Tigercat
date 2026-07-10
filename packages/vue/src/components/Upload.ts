@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, watch, h, PropType } from 'vue'
+import { defineComponent, ref, computed, watch, h, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -254,6 +254,27 @@ export const Upload = defineComponent({
         return props.fileList ?? []
       }
       return internalFileList.value
+    })
+
+    const objectUrls = new Map<File, string>()
+
+    const revokeUnusedObjectUrls = (files: UploadFile[]) => {
+      const activeFiles = new Set(
+        files.flatMap((file) => (file.file && !file.url ? [file.file] : []))
+      )
+      objectUrls.forEach((url, file) => {
+        if (!activeFiles.has(file)) {
+          URL.revokeObjectURL(url)
+          objectUrls.delete(file)
+        }
+      })
+    }
+
+    watch(fileListValue, revokeUnusedObjectUrls, { deep: true })
+
+    onBeforeUnmount(() => {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url))
+      objectUrls.clear()
     })
 
     const setFileList = (value: UploadFile[]) => {
@@ -695,7 +716,19 @@ export const Upload = defineComponent({
     }
 
     const renderPictureCard = (file: UploadFile) => {
-      const imageUrl = file.url || (file.file ? URL.createObjectURL(file.file) : '')
+      let imageUrl = file.url ?? ''
+      if (
+        !imageUrl &&
+        file.file &&
+        typeof URL !== 'undefined' &&
+        typeof URL.createObjectURL === 'function'
+      ) {
+        imageUrl = objectUrls.get(file.file) ?? ''
+        if (!imageUrl) {
+          imageUrl = URL.createObjectURL(file.file)
+          objectUrls.set(file.file, imageUrl)
+        }
+      }
 
       return h(
         'div',

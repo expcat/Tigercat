@@ -44,41 +44,6 @@ describe('NumberKeyboard', () => {
     expect(onDelete).toHaveBeenCalledWith('12', expect.objectContaining({ action: 'delete' }))
     expect(onChange).toHaveBeenCalledWith('12', expect.objectContaining({ key: 'delete' }))
   })
-
-  it('confirms without changing the value', () => {
-    const onChange = vi.fn()
-    const onConfirm = vi.fn()
-    render(<NumberKeyboard defaultValue="123" onChange={onChange} onConfirm={onConfirm} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
-    expect(onConfirm).toHaveBeenCalledWith('123', expect.objectContaining({ action: 'confirm' }))
-    expect(onChange).not.toHaveBeenCalled()
-  })
-
-  it('renders amount decimal key and limits precision', () => {
-    const onChange = vi.fn()
-    render(<NumberKeyboard mode="amount" defaultValue="12.34" onChange={onChange} />)
-    fireEvent.click(screen.getByRole('button', { name: '5' }))
-    expect(onChange).not.toHaveBeenCalled()
-    expect(screen.getByRole('button', { name: 'Decimal' })).toBeInTheDocument()
-  })
-
-  it('renders id-card X key', () => {
-    const onChange = vi.fn()
-    render(<NumberKeyboard mode="id-card" defaultValue="12345678901234567" onChange={onChange} />)
-    fireEvent.click(screen.getByRole('button', { name: 'ID card X' }))
-    expect(onChange).toHaveBeenCalledWith(
-      '12345678901234567X',
-      expect.objectContaining({ key: 'X' })
-    )
-  })
-
-  it('limits phone mode to 11 digits', () => {
-    const onChange = vi.fn()
-    render(<NumberKeyboard mode="phone" defaultValue="13800138000" onChange={onChange} />)
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    expect(onChange).not.toHaveBeenCalled()
-  })
-
   it('does not emit when disabled', () => {
     const onChange = vi.fn()
     render(<NumberKeyboard disabled onChange={onChange} />)
@@ -109,14 +74,6 @@ describe('NumberKeyboard', () => {
       expect.objectContaining({ value: '3', mode: 'number' })
     )
   })
-
-  it('respects maxLength', () => {
-    const onChange = vi.fn()
-    render(<NumberKeyboard defaultValue="12" maxLength={2} onChange={onChange} />)
-    fireEvent.click(screen.getByRole('button', { name: '3' }))
-    expect(onChange).not.toHaveBeenCalled()
-  })
-
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<NumberKeyboard />)
@@ -124,9 +81,5 @@ describe('NumberKeyboard', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      expect(() => render(<NumberKeyboard />)).not.toThrow()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

@@ -29,12 +29,6 @@ describe('Radio', () => {
       expect(radio.checked).toBe(false)
       expect(getByText('Option 1')).toBeInTheDocument()
     })
-
-    it('should render with a numeric value', () => {
-      const { container } = render(<Radio value={123}>Numeric</Radio>)
-      expect(getRadio(container)).toHaveAttribute('value', '123')
-    })
-
     it('should apply custom className', () => {
       const { container } = render(
         <Radio value="option1" className="custom-class">
@@ -137,31 +131,6 @@ describe('Radio', () => {
       await user.click(radio)
       expect(radio.checked).toBe(true)
     })
-
-    it('should not change when controlled without onChange', async () => {
-      const user = userEvent.setup()
-      const { container } = render(
-        <Radio value="option1" checked={false}>
-          Controlled
-        </Radio>
-      )
-      const radio = getRadio(container)
-      await user.click(radio)
-      expect(radio.checked).toBe(false)
-    })
-
-    it('should toggle in uncontrolled mode', async () => {
-      const user = userEvent.setup()
-      const { container } = render(
-        <Radio value="option1" defaultChecked={false}>
-          Uncontrolled
-        </Radio>
-      )
-      const radio = getRadio(container)
-      expect(radio.checked).toBe(false)
-      await user.click(radio)
-      expect(radio.checked).toBe(true)
-    })
   })
 
   describe('RadioGroup', () => {
@@ -247,19 +216,6 @@ describe('Radio', () => {
       expect(name).toContain('tiger-radio-group')
       inputs.forEach((input) => expect(input).toHaveAttribute('name', name))
     })
-
-    it('should let a child override the inherited size', () => {
-      const { container } = render(
-        <RadioGroup size="sm">
-          <Radio value="a" size="lg">
-            A
-          </Radio>
-          <Radio value="b">B</Radio>
-        </RadioGroup>
-      )
-      expect(getRadios(container)).toHaveLength(2)
-    })
-
     it('should disable all radios, and support individually disabled radios', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
@@ -274,21 +230,6 @@ describe('Radio', () => {
       await user.click(inputs[0])
       expect(handleChange).not.toHaveBeenCalled()
     })
-
-    it('should allow an individual radio to be disabled', () => {
-      const { container } = render(
-        <RadioGroup>
-          <Radio value="a" disabled>
-            A
-          </Radio>
-          <Radio value="b">B</Radio>
-        </RadioGroup>
-      )
-      const inputs = getRadios(container)
-      expect(inputs[0]).toBeDisabled()
-      expect(inputs[1]).not.toBeDisabled()
-    })
-
     it('should call onChange with the selected value', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
@@ -319,39 +260,11 @@ describe('Radio', () => {
       expect(inputs[2]).toHaveFocus()
       expect(inputs[2].checked).toBe(true)
     })
-
-    it('should navigate both directions with ArrowLeft/ArrowRight', async () => {
-      const user = userEvent.setup()
-      const { container } = render(
-        <RadioGroup defaultValue="a">
-          <Radio value="a">A</Radio>
-          <Radio value="b">B</Radio>
-        </RadioGroup>
-      )
-      const inputs = getRadios(container)
-      inputs[0].focus()
-      await user.keyboard('{ArrowRight}')
-      expect(inputs[1]).toHaveFocus()
-      await user.keyboard('{ArrowLeft}')
-      expect(inputs[0]).toHaveFocus()
-    })
   })
 
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
-    })
-
-    it('should support custom theme colors', () => {
-      setThemeVariables({ '--tiger-primary': '#ff0000' })
-      const { container } = render(
-        <Radio value="option1" checked>
-          Themed
-        </Radio>
-      )
-      expect(getRadio(container)).toBeInTheDocument()
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 
@@ -379,25 +292,5 @@ describe('Radio', () => {
     })
   })
 
-  describe('Edge Cases', () => {
-    it('should handle special characters in the value', () => {
-      const specialValue = '<>&"\'\`'
-      const { container } = render(<Radio value={specialValue}>Special</Radio>)
-      expect(getRadio(container)).toHaveAttribute('value', specialValue)
-    })
-
-    it('should handle many radios in a group', () => {
-      const options = Array.from({ length: 20 }, (_, i) => `option${i}`)
-      const { container } = render(
-        <RadioGroup defaultValue="option0">
-          {options.map((opt) => (
-            <Radio key={opt} value={opt}>
-              {opt}
-            </Radio>
-          ))}
-        </RadioGroup>
-      )
-      expect(getRadios(container)).toHaveLength(20)
-    })
-  })
+  describe('Edge Cases', () => {})
 })

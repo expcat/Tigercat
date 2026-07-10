@@ -236,7 +236,7 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                     })
                   )}
                   style={{ ...widthStyle, ...stickyStyle }}>
-                  {col.title ?? ''}
+                  {col.renderHeader ? (col.renderHeader() as React.ReactNode) : (col.title ?? '')}
                 </th>
               )
             })}
@@ -284,31 +284,37 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                 {colRange && colRange.leftPad > 0 && (
                   <td aria-hidden style={{ width: `${colRange.leftPad}px`, padding: 0 }} />
                 )}
-                {visibleColumns.map((col, colIdx) => (
-                  <td
-                    key={col.key as string}
-                    aria-colindex={colIndexOffset + colIdx + 1}
-                    className={classNames(
-                      virtualTableCellClasses,
-                      getTableFixedCellClasses({
-                        view: 'virtual-table',
-                        column: col,
-                        record: row,
-                        rowIndex: globalIdx,
-                        striped,
-                        stripedActive: striped && globalIdx % 2 === 1,
-                        selected: isSelected,
-                        hoverable: true,
-                        fixedInfo,
-                        selectedClassName: virtualTableFixedCellSelectedClasses
-                      })
-                    )}
-                    style={getVirtualTableFixedCellStyle(col.key, fixedInfo)}>
-                    {renderCell
-                      ? renderCell(row[col.key as keyof T], row, col)
-                      : String(row[col.key as keyof T] ?? '')}
-                  </td>
-                ))}
+                {visibleColumns.map((col, colIdx) => {
+                  const dataKey = col.dataKey || col.key
+                  const value = row[dataKey as keyof T]
+                  return (
+                    <td
+                      key={col.key as string}
+                      aria-colindex={colIndexOffset + colIdx + 1}
+                      className={classNames(
+                        virtualTableCellClasses,
+                        getTableFixedCellClasses({
+                          view: 'virtual-table',
+                          column: col,
+                          record: row,
+                          rowIndex: globalIdx,
+                          striped,
+                          stripedActive: striped && globalIdx % 2 === 1,
+                          selected: isSelected,
+                          hoverable: true,
+                          fixedInfo,
+                          selectedClassName: virtualTableFixedCellSelectedClasses
+                        })
+                      )}
+                      style={getVirtualTableFixedCellStyle(col.key, fixedInfo)}>
+                      {renderCell
+                        ? renderCell(value, row, col)
+                        : col.render
+                          ? (col.render(row, globalIdx) as React.ReactNode)
+                          : (value as React.ReactNode)}
+                    </td>
+                  )
+                })}
                 {colRange && colRange.rightPad > 0 && (
                   <td aria-hidden style={{ width: `${colRange.rightPad}px`, padding: 0 }} />
                 )}

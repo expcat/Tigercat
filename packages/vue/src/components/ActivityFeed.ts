@@ -13,6 +13,20 @@ import {
   activityItemTitleGroupClasses,
   activityItemDescriptionClasses,
   activityItemActionsClasses,
+  activityFeedActionClasses,
+  activityFeedItemSurfaceClasses,
+  activityFeedAvatarClasses,
+  activityFeedTitleClasses,
+  activityFeedTimeClasses,
+  activityFeedDescriptionClasses,
+  activityFeedStateCardClasses,
+  activityFeedLoadingClasses,
+  activityFeedEmptyIconClasses,
+  activityFeedGroupMarkerClasses,
+  activityFeedGroupTitleClasses,
+  activityFeedDotBaseClasses,
+  activityFeedDotPulseBaseClasses,
+  getActivityFeedDotClasses,
   type ActivityFeedProps as CoreActivityFeedProps,
   type ActivityGroup,
   type ActivityItem,
@@ -49,8 +63,7 @@ const renderAction = (item: ActivityItem, action: ActivityAction, index: number)
       href: action.href,
       target: action.target,
       disabled: action.disabled,
-      className:
-        'inline-flex items-center px-2.5 py-1 rounded-lg hover:bg-blue-50/50 dark:hover:bg-blue-950/20 text-xs font-semibold transition-all duration-200',
+      className: activityFeedActionClasses,
       onClick: () => action.onClick?.(item, action)
     },
     {
@@ -153,7 +166,7 @@ export const ActivityFeed = defineComponent({
         {
           class: classNames(
             activityItemClasses,
-            'p-4 rounded-2xl border border-gray-100/70 dark:border-gray-800/40 bg-white/40 dark:bg-gray-900/15 backdrop-blur-sm shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-gray-100/30 dark:hover:shadow-none hover:bg-white dark:hover:bg-gray-900/30 hover:-translate-y-0.5 w-full'
+            activityFeedItemSurfaceClasses
           )
         },
         [
@@ -163,8 +176,7 @@ export const ActivityFeed = defineComponent({
                   size: 'sm',
                   src: item.user.avatar,
                   text: item.user.name,
-                  className:
-                    'shrink-0 ring-2 ring-white dark:ring-gray-900 shadow-sm transition-transform hover:scale-105 duration-200'
+                  className: activityFeedAvatarClasses
                 })
               : null,
             h('div', { class: activityItemBodyClasses }, [
@@ -177,8 +189,7 @@ export const ActivityFeed = defineComponent({
                           tag: 'div',
                           size: 'sm',
                           weight: 'semibold',
-                          class:
-                            'text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer truncate'
+                          class: activityFeedTitleClasses
                         },
                         { default: () => titleText }
                       )
@@ -203,8 +214,7 @@ export const ActivityFeed = defineComponent({
                         tag: 'div',
                         size: 'xs',
                         color: 'muted',
-                        class:
-                          'shrink-0 whitespace-nowrap font-medium text-gray-400 dark:text-gray-500'
+                        class: activityFeedTimeClasses
                       },
                       { default: () => timeText }
                     )
@@ -219,7 +229,7 @@ export const ActivityFeed = defineComponent({
                       color: 'muted',
                       class: classNames(
                         activityItemDescriptionClasses,
-                        'text-gray-600 dark:text-gray-300 leading-relaxed pl-0.5 mt-1'
+                        activityFeedDescriptionClasses
                       )
                     },
                     { default: () => descriptionText }
@@ -252,7 +262,7 @@ export const ActivityFeed = defineComponent({
           ? slots.loading()
           : h(Loading, {
               text: props.loadingText,
-              class: 'text-blue-500 dark:text-blue-400 font-medium'
+              class: activityFeedLoadingClasses
             })
 
         return h(
@@ -272,8 +282,7 @@ export const ActivityFeed = defineComponent({
               {
                 variant: 'bordered',
                 size: 'sm',
-                className:
-                  'tiger-activity-feed-loading bg-white/40 dark:bg-gray-900/20 border-gray-100 dark:border-gray-800/80 backdrop-blur-sm rounded-2xl shadow-sm overflow-hidden'
+                className: classNames('tiger-activity-feed-loading', activityFeedStateCardClasses)
               },
               {
                 default: () =>
@@ -291,7 +300,7 @@ export const ActivityFeed = defineComponent({
               h(
                 'svg',
                 {
-                  class: 'w-12 h-12 text-gray-300 dark:text-gray-600 mb-3 animate-pulse',
+                  class: activityFeedEmptyIconClasses,
                   fill: 'none',
                   viewBox: '0 0 24 24',
                   stroke: 'currentColor',
@@ -328,8 +337,7 @@ export const ActivityFeed = defineComponent({
               {
                 variant: 'bordered',
                 size: 'sm',
-                className:
-                  'tiger-activity-feed-empty bg-white/40 dark:bg-gray-900/20 border-gray-100 dark:border-gray-800/80 backdrop-blur-sm rounded-2xl shadow-sm overflow-hidden'
+                className: classNames('tiger-activity-feed-empty', activityFeedStateCardClasses)
               },
               {
                 default: () => emptyNode
@@ -359,8 +367,7 @@ export const ActivityFeed = defineComponent({
               ? (headerNode ??
                 h('div', { class: 'flex items-center gap-2 mb-2' }, [
                   h('span', {
-                    class:
-                      'w-1.5 h-3.5 bg-blue-500 rounded-full dark:bg-blue-400 shadow-sm shadow-blue-500/20'
+                    class: activityFeedGroupMarkerClasses
                   }),
                   h(
                     Text,
@@ -368,7 +375,7 @@ export const ActivityFeed = defineComponent({
                       tag: 'span',
                       size: 'sm',
                       weight: 'bold',
-                      class: 'text-gray-900 dark:text-gray-100 uppercase tracking-wider'
+                      class: activityFeedGroupTitleClasses
                     },
                     { default: () => groupTitle }
                   )
@@ -378,39 +385,18 @@ export const ActivityFeed = defineComponent({
               Timeline,
               {
                 items: timelineItems,
-                style: {
-                  '--tiger-border': 'rgba(156, 163, 175, 0.18)'
-                },
                 renderDot: (timelineItem: ActivityTimelineItem) => {
                   const activity = timelineItem.activity
                   const statusVariant = (activity?.status?.variant ?? 'default') as string
-
-                  const baseDotClass =
-                    'w-3 h-3 rounded-full border-2 border-white dark:border-gray-950 shadow-sm'
-                  let colorClass = 'bg-gray-300 dark:bg-gray-700'
-                  let pulseClass = ''
-
-                  if (statusVariant === 'success') {
-                    colorClass = 'bg-emerald-500'
-                    pulseClass = 'bg-emerald-500/30'
-                  } else if (statusVariant === 'warning') {
-                    colorClass = 'bg-amber-500'
-                    pulseClass = 'bg-amber-500/30'
-                  } else if (statusVariant === 'error' || statusVariant === 'danger') {
-                    colorClass = 'bg-rose-500'
-                    pulseClass = 'bg-rose-500/30'
-                  } else if (statusVariant === 'primary' || statusVariant === 'info') {
-                    colorClass = 'bg-blue-500'
-                    pulseClass = 'bg-blue-500/30'
-                  }
+                  const dotClasses = getActivityFeedDotClasses(statusVariant)
 
                   return h('div', { class: 'relative flex items-center justify-center w-4 h-4' }, [
-                    pulseClass
+                    dotClasses.pulse
                       ? h('span', {
-                          class: `absolute inline-flex h-full w-full rounded-full animate-ping opacity-75 ${pulseClass}`
+                          class: `${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`
                         })
                       : null,
-                    h('span', { class: `${baseDotClass} ${colorClass} relative z-10` })
+                    h('span', { class: `${activityFeedDotBaseClasses} ${dotClasses.dot}` })
                   ])
                 }
               },

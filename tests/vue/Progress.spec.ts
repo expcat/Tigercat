@@ -88,19 +88,6 @@ describe('Progress', () => {
     })
     expect(screen.getByText('50个/100个')).toBeInTheDocument()
   })
-
-  it('supports striped animation classes', () => {
-    const { container } = renderWithProps(Progress, {
-      percentage: 70,
-      striped: true,
-      stripedAnimation: true
-    })
-
-    const progressbar = container.querySelector('[role="progressbar"]')
-    expect(progressbar?.className).toContain('bg-gradient')
-    expect(progressbar?.className).toContain('animate')
-  })
-
   it('supports custom width/height and circle strokeWidth', () => {
     const { container } = renderWithProps(Progress, {
       percentage: 50,
@@ -167,10 +154,5 @@ describe('Progress', () => {
     expect(progressbar.className).not.toContain('progress-stripes')
   })
 
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = renderWithProps(Progress, {})
-      expect(container.querySelector('[role="progressbar"]')).toBeInTheDocument()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

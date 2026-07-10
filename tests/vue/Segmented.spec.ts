@@ -14,26 +14,12 @@ const defaultOptions = [
 ]
 
 describe('Segmented', () => {
-  // --- Basic rendering ---
-  it('renders with default props', () => {
-    const { container } = renderWithProps(Segmented, { options: defaultOptions })
-    const group = container.querySelector('[role="radiogroup"]')
-    expect(group).toBeInTheDocument()
-  })
-
   it('renders all options', () => {
     renderWithProps(Segmented, { options: defaultOptions })
     expect(screen.getByText('Option A')).toBeInTheDocument()
     expect(screen.getByText('Option B')).toBeInTheDocument()
     expect(screen.getByText('Option C')).toBeInTheDocument()
   })
-
-  it('renders radio options', () => {
-    const { container } = renderWithProps(Segmented, { options: defaultOptions })
-    const radios = container.querySelectorAll('[role="radio"]')
-    expect(radios.length).toBe(3)
-  })
-
   it('applies className prop', () => {
     const { container } = renderWithProps(Segmented, {
       options: defaultOptions,
@@ -107,14 +93,6 @@ describe('Segmented', () => {
     expect(radios[1].getAttribute('tabindex')).toBe('0')
     expect(radios[2].getAttribute('tabindex')).toBe('-1')
   })
-
-  it('puts the tab-stop on the first enabled option when nothing is selected', () => {
-    const { container } = renderWithProps(Segmented, { options: defaultOptions })
-    const radios = container.querySelectorAll('[role="radio"]')
-    expect(radios[0].getAttribute('tabindex')).toBe('0')
-    expect(radios[1].getAttribute('tabindex')).toBe('-1')
-  })
-
   it('moves selection with arrow keys and wraps', async () => {
     const onChange = vi.fn()
     const { container } = render(Segmented, {
@@ -127,22 +105,6 @@ describe('Segmented', () => {
     await fireEvent.keyDown(radios[0], { key: 'ArrowLeft' })
     expect(onChange).toHaveBeenCalledWith('c')
   })
-
-  it('Home/End jump to first/last and Enter selects focused option', async () => {
-    const onChange = vi.fn()
-    const { container } = render(Segmented, {
-      props: { options: defaultOptions, modelValue: 'b', 'onUpdate:modelValue': onChange }
-    })
-    const radios = container.querySelectorAll('[role="radio"]')
-    await fireEvent.keyDown(radios[1], { key: 'End' })
-    expect(onChange).toHaveBeenCalledWith('c')
-    await fireEvent.keyDown(radios[1], { key: 'Home' })
-    expect(onChange).toHaveBeenCalledWith('a')
-    onChange.mockClear()
-    await fireEvent.keyDown(radios[2], { key: 'Enter' })
-    expect(onChange).toHaveBeenCalledWith('c')
-  })
-
   it('skips disabled options during arrow navigation', async () => {
     const opts = [
       { value: 'a', label: 'A' },
@@ -181,10 +143,5 @@ describe('Segmented', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Segmented)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

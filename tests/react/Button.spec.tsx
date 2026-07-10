@@ -20,6 +20,7 @@ describe('Button', () => {
     const button = screen.getByRole('button', { name: 'Click me' })
     expect(button).toBeInTheDocument()
     expect(button).toHaveClass('inline-flex')
+    expect(button).toHaveClass('whitespace-nowrap')
     expect(button).toHaveClass('custom-class')
   })
 

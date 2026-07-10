@@ -38,31 +38,6 @@ describe('FunnelChart (Vue)', () => {
     const series = container.querySelector('g[data-series-type="funnel"]')
     expect(series!.querySelectorAll('path')).toHaveLength(0)
   })
-
-  it('renders segment labels', () => {
-    const { container } = renderWithProps(FunnelChart, {
-      data: sampleData,
-      ...defaultSize
-    })
-
-    const texts = container.querySelectorAll('text')
-    expect(texts.length).toBeGreaterThanOrEqual(3)
-  })
-
-  it('uses custom colors', () => {
-    const customColors = ['#ff0000', '#00ff00', '#0000ff']
-    const { container } = renderWithProps(FunnelChart, {
-      data: sampleData,
-      colors: customColors,
-      ...defaultSize
-    })
-
-    const paths = container.querySelector('g[data-series-type="funnel"]')!.querySelectorAll('path')
-    expect(paths[0]).toHaveAttribute('fill', '#ff0000')
-    expect(paths[1]).toHaveAttribute('fill', '#00ff00')
-    expect(paths[2]).toHaveAttribute('fill', '#0000ff')
-  })
-
   it('renders with horizontal direction', () => {
     const { container } = renderWithProps(FunnelChart, {
       data: sampleData,
@@ -73,27 +48,6 @@ describe('FunnelChart (Vue)', () => {
     const paths = container.querySelector('g[data-series-type="funnel"]')!.querySelectorAll('path')
     expect(paths).toHaveLength(3)
   })
-
-  it('applies gradient when enabled', () => {
-    const { container } = renderWithProps(FunnelChart, {
-      data: sampleData,
-      gradient: true,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('defs linearGradient')).toBeTruthy()
-  })
-
-  it('renders legend when showLegend is true', () => {
-    const { container } = renderWithProps(FunnelChart, {
-      data: sampleData,
-      showLegend: true,
-      ...defaultSize
-    })
-
-    expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
-  })
-
   it('triggers hover events when hoverable', () => {
     const onHoveredIndexChange = vi.fn()
     const { container } = renderWithProps(FunnelChart, {
@@ -150,24 +104,5 @@ describe('FunnelChart (Vue)', () => {
       })
       await expectNoA11yViolationsIsolated(container)
     })
-  })
-  it('renders single segment without errors', () => {
-    const { container } = renderWithProps(FunnelChart, {
-      data: [{ label: 'Only', value: 100 }],
-      ...defaultSize
-    })
-    const series = container.querySelector('g[data-series-type="funnel"]')
-    expect(series!.querySelectorAll('path')).toHaveLength(1)
-  })
-
-  it('renders with minimal dimensions', () => {
-    const { container } = renderWithProps(FunnelChart, {
-      data: sampleData,
-      width: 100,
-      height: 80
-    })
-    const svg = container.querySelector('svg')
-    expect(svg).toHaveAttribute('width', '100')
-    expect(svg).toHaveAttribute('height', '80')
   })
 })

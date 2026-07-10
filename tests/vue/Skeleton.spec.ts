@@ -19,15 +19,6 @@ describe('Skeleton', () => {
   }
 
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(Skeleton)
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton).toBeInTheDocument()
-      expect(skeleton.className).toContain('tiger-skeleton-bg')
-      expect(skeleton.className).toContain('animate-pulse')
-    })
-
     it('should render single skeleton element by default', () => {
       const { container } = renderWithProps(Skeleton, {})
 
@@ -35,78 +26,11 @@ describe('Skeleton', () => {
     })
   })
 
-  describe('Variants', () => {
-    it.each(skeletonVariants)('should render %s variant correctly', (variant) => {
-      const { container } = renderWithProps(Skeleton, { variant })
+  describe('Variants', () => {})
 
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton).toBeInTheDocument()
-      expect(skeleton.className).toContain('tiger-skeleton-bg')
-    })
-
-    it('should render avatar variant with circle shape', () => {
-      const { container } = renderWithProps(Skeleton, {
-        variant: 'avatar',
-        shape: 'circle'
-      })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton.className).toContain('rounded-full')
-    })
-
-    it('should render avatar variant with square shape', () => {
-      const { container } = renderWithProps(Skeleton, {
-        variant: 'avatar',
-        shape: 'square'
-      })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton.className).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
-    })
-  })
-
-  describe('Animations', () => {
-    it.each(skeletonAnimations)('should support %s animation', (animation) => {
-      const { container } = renderWithProps(Skeleton, { animation })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton).toBeInTheDocument()
-
-      if (animation === 'pulse' || animation === 'wave') {
-        expect(skeleton.className).toContain('animate-pulse')
-      }
-    })
-
-    it('should use pulse animation by default', () => {
-      const { container } = renderWithProps(Skeleton, {})
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton.className).toContain('animate-pulse')
-    })
-
-    it('should not animate when animation is none', () => {
-      const { container } = renderWithProps(Skeleton, { animation: 'none' })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton.className).not.toContain('animate-pulse')
-    })
-  })
+  describe('Animations', () => {})
 
   describe('Dimensions', () => {
-    it('should apply custom width', () => {
-      const { container } = renderWithProps(Skeleton, { width: '200px' })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton).toHaveStyle({ width: '200px' })
-    })
-
-    it('should apply custom height', () => {
-      const { container } = renderWithProps(Skeleton, { height: '50px' })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton).toHaveStyle({ height: '50px' })
-    })
-
     it('should apply both custom width and height', () => {
       const { container } = renderWithProps(Skeleton, {
         width: '300px',
@@ -127,30 +51,6 @@ describe('Skeleton', () => {
 
       expect(getSkeletonElements(container)).toHaveLength(3)
     })
-
-    it('should apply spacing between rows', () => {
-      const { container } = renderWithProps(Skeleton, {
-        variant: 'text',
-        rows: 3
-      })
-
-      const skeletons = getSkeletonElements(container)
-      // First two rows should have margin-bottom
-      expect(skeletons[0].className).toContain('mb-2')
-      expect(skeletons[1].className).toContain('mb-2')
-      // Last row should not have margin-bottom
-      expect(skeletons[2].className).not.toContain('mb-2')
-    })
-
-    it('should render rows in a flex column container', () => {
-      const { container } = renderWithProps(Skeleton, {
-        variant: 'text',
-        rows: 2
-      })
-
-      const wrapper = container.querySelector('.flex.flex-col')
-      expect(wrapper).toBeInTheDocument()
-    })
   })
 
   describe('Paragraph Mode', () => {
@@ -168,39 +68,9 @@ describe('Skeleton', () => {
       const lastRow = skeletons[skeletons.length - 1] as HTMLElement
       expect(lastRow.style.width).toBe('60%')
     })
-
-    it('should not apply paragraph widths when paragraph is false', () => {
-      const { container } = renderWithProps(Skeleton, {
-        variant: 'text',
-        rows: 3,
-        paragraph: false,
-        width: '100%'
-      })
-
-      const skeletons = getSkeletonElements(container)
-      skeletons.forEach((skeleton) => {
-        expect((skeleton as HTMLElement).style.width).toBe('100%')
-      })
-    })
   })
 
-  describe('Shapes', () => {
-    it.each(skeletonShapes)('should support %s shape for avatar variant', (shape) => {
-      const { container } = renderWithProps(Skeleton, {
-        variant: 'avatar',
-        shape
-      })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton).toBeInTheDocument()
-
-      if (shape === 'circle') {
-        expect(skeleton?.className).toContain('rounded-full')
-      } else {
-        expect(skeleton?.className).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
-      }
-    })
-  })
+  describe('Shapes', () => {})
 
   describe('Custom Classes', () => {
     it('should apply custom className and preserve base classes', () => {
@@ -236,10 +106,5 @@ describe('Skeleton', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(Skeleton)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

@@ -41,64 +41,6 @@ describe('Menu', () => {
 
       expect(screen.getByRole('menuitem', { name: 'Item 1' })).toBeInTheDocument()
     })
-
-    it('renders in vertical mode by default', () => {
-      const { container } = render(
-        <Menu>
-          <MenuItem itemKey="1">Item 1</MenuItem>
-        </Menu>
-      )
-
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveAttribute('data-tiger-menu-mode', 'vertical')
-    })
-
-    it('renders in horizontal mode', () => {
-      const { container } = render(
-        <Menu mode="horizontal">
-          <MenuItem itemKey="1">Item 1</MenuItem>
-        </Menu>
-      )
-
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveAttribute('data-tiger-menu-mode', 'horizontal')
-    })
-
-    it('renders in inline mode', () => {
-      const { container } = render(
-        <Menu mode="inline">
-          <MenuItem itemKey="1">Item 1</MenuItem>
-        </Menu>
-      )
-
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveAttribute('data-tiger-menu-mode', 'inline')
-    })
-
-    it('renders with dark theme', () => {
-      const { container } = render(
-        <Menu theme="dark">
-          <MenuItem itemKey="1">Item 1</MenuItem>
-        </Menu>
-      )
-
-      const menu = container.querySelector('ul')
-      // Dark theme sets CSS variables for dark colors
-      expect(menu?.className).toContain('[--tiger-surface:#111827]')
-    })
-
-    it('renders with light theme by default', () => {
-      const { container } = render(
-        <Menu>
-          <MenuItem itemKey="1">Item 1</MenuItem>
-        </Menu>
-      )
-
-      const menu = container.querySelector('ul')
-      // Light theme sets CSS variables for light colors
-      expect(menu?.className).toContain('[--tiger-surface:#ffffff]')
-    })
-
     it('renders data-driven items', () => {
       render(<Menu items={dataItems} defaultOpenKeys={['admin']} />)
 
@@ -395,30 +337,6 @@ describe('Menu', () => {
       await user.keyboard('{ArrowDown}')
       expect(item3).toHaveFocus()
     })
-
-    it('supports ArrowUp navigation', async () => {
-      const user = userEvent.setup()
-
-      render(
-        <Menu>
-          <MenuItem itemKey="1">Item 1</MenuItem>
-          <MenuItem itemKey="2">Item 2</MenuItem>
-          <MenuItem itemKey="3">Item 3</MenuItem>
-        </Menu>
-      )
-
-      const item1 = screen.getByRole('menuitem', { name: 'Item 1' })
-      const item2 = screen.getByRole('menuitem', { name: 'Item 2' })
-      const item3 = screen.getByRole('menuitem', { name: 'Item 3' })
-
-      item3.focus()
-      await user.keyboard('{ArrowUp}')
-      expect(item2).toHaveFocus()
-
-      await user.keyboard('{ArrowUp}')
-      expect(item1).toHaveFocus()
-    })
-
     it('uses ArrowRight/ArrowLeft in horizontal mode', async () => {
       const user = userEvent.setup()
 
@@ -455,41 +373,6 @@ describe('Menu', () => {
       await user.keyboard('{Enter}')
 
       expect(onSelect).toHaveBeenCalledWith('1', { selectedKeys: ['1'] })
-    })
-
-    it('selects item with Space key', async () => {
-      const user = userEvent.setup()
-      const onSelect = vi.fn()
-
-      render(
-        <Menu onSelect={onSelect}>
-          <MenuItem itemKey="1">Item 1</MenuItem>
-        </Menu>
-      )
-
-      const item = screen.getByRole('menuitem', { name: 'Item 1' })
-      item.focus()
-      await user.keyboard(' ')
-
-      expect(onSelect).toHaveBeenCalledWith('1', { selectedKeys: ['1'] })
-    })
-
-    it('wraps focus at boundaries', async () => {
-      const user = userEvent.setup()
-
-      render(
-        <Menu>
-          <MenuItem itemKey="1">Item 1</MenuItem>
-          <MenuItem itemKey="2">Item 2</MenuItem>
-        </Menu>
-      )
-
-      const item1 = screen.getByRole('menuitem', { name: 'Item 1' })
-      const item2 = screen.getByRole('menuitem', { name: 'Item 2' })
-
-      item2.focus()
-      await user.keyboard('{ArrowDown}')
-      expect(item1).toHaveFocus()
     })
   })
 

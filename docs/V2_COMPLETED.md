@@ -1375,3 +1375,19 @@ source: extracted from docs/ROADMAP.md to keep active roadmap lightweight
 **剩余风险**：Vue dev server 仍会输出既有 `defineAsyncComponent` route warning；InfiniteScroll 基础示例需滚动加载到 50 项后才显示基础 `endText`，静态浏览器复查覆盖了自定义结束文案。
 
 **状态更新要求**：已在 `docs/EXAMPLE_USER_STORY_REQUIREMENTS.md` 追加 EX12-EX16 执行记录，并将 `docs/ROADMAP.md` 阶段 23 / R29 最近执行记录推进到 EX12-EX16；本批新增 public props 属覆写能力补齐，无删除/合并事项，因此 [V2_API_AUDIT.md](V2_API_AUDIT.md) 无需更新。
+
+### R30 B0 RC metadata and reliable baseline
+
+**状态**：已完成（2026-07-10）。
+
+**执行摘要**：本轮以 `docs/ROADMAP.md` 与 `docs/EXAMPLE_USER_STORY_REQUIREMENTS.md` 为事实源，按 B0-B7 处理全项目优化，未恢复已归档的 `ROADMAP_CHECK.md`。`CHANGELOG.md`、迁移指南与 release skill 已同步到 `v2.0.0-rc.1`；release readiness 同步识别 B1 新增的 `quality:static` / `test:special` 链路。Example import 审计只扫描 React/Vue/SSR 三个受控源码根并跳过生成目录与符号链接，Vue Router 全部页面改用原生 `() => import()`。animation 纯逻辑测试改走窄入口，仅样式注入场景重置模块。React Calendar focus 更新已纳入 `act`；Vue Image hover 不再向未声明事件透传；ImageCropper 在图片与有效显示尺寸为正且有限前不生成裁剪几何，测试 fixture 不再省略必需的 `src`。
+
+**实际验证**：
+
+- focused Vitest：9 个文件、168 个用例全部通过，输出无既有 Vue emits、React `act` 或 `NaN` SVG attribute warning。
+- `pnpm release:check`：通过，四个发布包均为 `2.0.0-rc.1`。
+- `pnpm types:check`：通过。
+- Vue Example `vue-tsc && vite build` 与 `pnpm example:sources:check`：通过。
+- 本批 16 个文件的 Prettier check 与仓库 `git diff --check`：通过。
+
+**剩余风险**：canonical 全量用例数、coverage 四项数据与全量墙钟仍需在 B1 测试入口稳定且无并发 Vitest 进程后统一记录；B0 未修改 coverage 阈值或 API baseline。

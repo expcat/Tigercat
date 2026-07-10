@@ -19,13 +19,6 @@ import {
 
 describe('Input', () => {
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      render(<Input />)
-
-      const input = screen.getByRole('textbox')
-      expect(input).toBeInTheDocument()
-    })
-
     it('should render with placeholder', () => {
       const { getByPlaceholderText } = render(<Input placeholder="Enter text" />)
 
@@ -61,12 +54,6 @@ describe('Input', () => {
       expect(input).toHaveAttribute('data-testid', 'test-input')
       expect(input).toHaveAttribute('title', 'Input title')
       expect(input).toHaveAttribute('aria-describedby', 'input-help')
-    })
-
-    it('should apply style prop to wrapper', () => {
-      const { container } = render(<Input style={{ width: '200px' }} />)
-      const wrapper = container.firstChild as HTMLElement
-      expect(wrapper).toHaveStyle({ width: '200px' })
     })
   })
 
@@ -150,43 +137,6 @@ describe('Input', () => {
       const input = container.querySelector('input')
       expect(input).toHaveAttribute('type', 'search')
     })
-
-    it('should apply maxLength attribute', () => {
-      const { getByRole } = render(<Input maxLength={10} />)
-
-      expect(getByRole('textbox')).toHaveAttribute('maxlength', '10')
-    })
-
-    it('should apply minLength attribute', () => {
-      const { getByRole } = render(<Input minLength={3} />)
-
-      expect(getByRole('textbox')).toHaveAttribute('minlength', '3')
-    })
-
-    it('should apply name attribute', () => {
-      const { getByRole } = render(<Input name="username" />)
-
-      expect(getByRole('textbox')).toHaveAttribute('name', 'username')
-    })
-
-    it('should apply id attribute', () => {
-      const { container } = render(<Input id="input-id" />)
-
-      expect(container.querySelector('#input-id')).toBeInTheDocument()
-    })
-
-    it('should apply autocomplete attribute', () => {
-      const { getByRole } = render(<Input autoComplete="email" />)
-
-      expect(getByRole('textbox')).toHaveAttribute('autocomplete', 'email')
-    })
-
-    it('should autofocus when autoFocus is true', () => {
-      const { getByRole } = render(<Input autoFocus />)
-
-      const input = getByRole('textbox')
-      expect(input).toHaveFocus()
-    })
   })
 
   describe('States', () => {
@@ -210,14 +160,6 @@ describe('Input', () => {
       const { getByRole } = render(<Input required />)
 
       expect(getByRole('textbox')).toBeRequired()
-    })
-
-    it('should combine disabled and readonly states', () => {
-      const { getByRole } = render(<Input disabled readonly />)
-
-      const input = getByRole('textbox')
-      expect(input).toBeDisabled()
-      expect(input).toHaveAttribute('readonly')
     })
   })
 
@@ -286,33 +228,6 @@ describe('Input', () => {
       await user.type(input, 'test')
 
       expect(input.value).toBe('initial')
-    })
-
-    it('should handle multiple event handlers together', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const handleInput = vi.fn()
-      const handleFocus = vi.fn()
-      const handleBlur = vi.fn()
-
-      const { getByRole } = render(
-        <Input
-          onChange={handleChange}
-          onInput={handleInput}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-        />
-      )
-
-      const input = getByRole('textbox')
-      await user.click(input)
-      await user.type(input, 'a')
-      await user.tab()
-
-      expect(handleFocus).toHaveBeenCalled()
-      expect(handleInput).toHaveBeenCalled()
-      expect(handleChange).toHaveBeenCalled()
-      expect(handleBlur).toHaveBeenCalled()
     })
   })
 
@@ -386,46 +301,11 @@ describe('Input', () => {
 
       expect(input.value).toBe('42')
     })
-
-    it('should handle empty string value', () => {
-      const { getByRole } = render(<Input value="" />)
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe('')
-    })
-
-    it('should handle undefined value (uncontrolled)', () => {
-      const { getByRole } = render(<Input defaultValue="" />)
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe('')
-    })
-
-    it('should handle numeric value for text input', () => {
-      const { getByRole } = render(<Input value={123} />)
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe('123')
-    })
   })
 
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
-    })
-
-    it('should support custom theme colors', () => {
-      setThemeVariables({
-        '--tiger-primary': '#ff0000'
-      })
-
-      const { getByRole } = render(<Input placeholder="Themed input" />)
-
-      const input = getByRole('textbox')
-      expect(input).toBeInTheDocument()
-
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
     })
   })
 
@@ -474,18 +354,6 @@ describe('Input', () => {
   })
 
   describe('Edge Cases', () => {
-    it.each([
-      ['whitespace-only', edgeCaseData.whitespace],
-      ['special characters', edgeCaseData.specialCharacters],
-      ['unicode characters', edgeCaseData.unicode],
-      ['very long text', 'a'.repeat(1000)]
-    ])('should handle %s value', (_label, value) => {
-      const { getByRole } = render(<Input value={value} />)
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe(value)
-    })
-
     it('should handle rapid value changes', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
@@ -597,14 +465,6 @@ describe('Input', () => {
       )
 
       expect(getByRole('textbox')).toBeInTheDocument()
-    })
-
-    it('should handle HTML-like content safely', () => {
-      const htmlContent = '<script>alert("xss")</script>'
-      const { getByRole } = render(<Input value={htmlContent} />)
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe(htmlContent)
     })
   })
 

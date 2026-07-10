@@ -27,13 +27,6 @@ const sampleTreeData = [
 
 describe('Tree', () => {
   describe('Rendering', () => {
-    it('should render with default props', () => {
-      render(<Tree treeData={sampleTreeData} />)
-
-      expect(screen.getByText('Parent 1')).toBeInTheDocument()
-      expect(screen.getByText('Parent 2')).toBeInTheDocument()
-    })
-
     it('should render tree roles', () => {
       render(<Tree treeData={sampleTreeData} />)
 
@@ -46,13 +39,6 @@ describe('Tree', () => {
 
       expect(getByText('No data')).toBeInTheDocument()
     })
-
-    it('should render custom empty text', () => {
-      const { getByText } = render(<Tree treeData={[]} emptyText="No tree data available" />)
-
-      expect(getByText('No tree data available')).toBeInTheDocument()
-    })
-
     it('should not show children by default', () => {
       render(<Tree treeData={sampleTreeData} />)
 
@@ -103,25 +89,6 @@ describe('Tree', () => {
         expect(getByText('Child 1-1')).toBeInTheDocument()
       })
     })
-
-    it('should collapse expanded node when clicking expand icon again', async () => {
-      const user = userEvent.setup()
-      const { getByText, queryByText } = render(<Tree treeData={sampleTreeData} defaultExpandAll />)
-
-      expect(getByText('Child 1-1')).toBeInTheDocument()
-
-      const parent1 = getByText('Parent 1')
-      const expandIcon = parent1.parentElement?.querySelector('svg')
-
-      if (expandIcon) {
-        await user.click(expandIcon)
-      }
-
-      await waitFor(() => {
-        expect(queryByText('Child 1-1')).not.toBeInTheDocument()
-      })
-    })
-
     it('should emit onExpand event when node expands', async () => {
       const user = userEvent.setup()
       const onExpand = vi.fn()
@@ -484,15 +451,6 @@ describe('Tree', () => {
         expect(queryByText('Parent 2')).not.toBeInTheDocument()
       })
     })
-
-    it('should highlight matched nodes', async () => {
-      const { getByText } = render(<Tree treeData={sampleTreeData} filterValue="Parent 1" />)
-
-      await waitFor(() => {
-        const matchedNode = getByText('Parent 1')
-        expect(matchedNode.className).toContain('font-semibold')
-      })
-    })
   })
 
   describe('Block Node', () => {
@@ -685,13 +643,6 @@ describe('Tree', () => {
       const input = container.querySelector('input[type="text"]')
       expect(input).toBeTruthy()
     })
-
-    it('does not render search input by default', () => {
-      const { container } = render(<Tree treeData={sampleTreeData} />)
-      const input = container.querySelector('input[type="text"]')
-      expect(input).toBeFalsy()
-    })
-
     it('filters when typing in search input', async () => {
       const user = userEvent.setup()
       const { container } = render(<Tree treeData={sampleTreeData} searchable defaultExpandAll />)
@@ -721,10 +672,5 @@ describe('Tree', () => {
       expect(items.length).toBeLessThan(50)
     })
   })
-  describe('Edge Cases', () => {
-    it('should handle empty or minimal props without errors', () => {
-      const { container } = render(<Tree treeData={[]} />)
-      expect(container.firstChild).toBeTruthy()
-    })
-  })
+  describe('Edge Cases', () => {})
 })

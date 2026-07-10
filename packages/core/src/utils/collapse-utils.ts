@@ -8,7 +8,8 @@ import type { ExpandIconPosition } from '../types/collapse'
 /**
  * Base collapse container classes
  */
-export const collapseBaseClasses = 'w-full bg-white border border-gray-200 rounded overflow-hidden'
+export const collapseBaseClasses =
+  'w-full bg-[var(--tiger-surface,#fff)] border border-[var(--tiger-border,#e5e7eb)] rounded overflow-hidden'
 
 /**
  * Collapse ghost mode classes (transparent without border)
@@ -23,18 +24,19 @@ export const collapseBorderlessClasses = 'border-0'
 /**
  * Collapse panel base classes
  */
-export const collapsePanelBaseClasses = 'border-b border-gray-200 last:border-b-0'
+export const collapsePanelBaseClasses =
+  'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0'
 
 /**
  * Collapse panel header base classes
  */
 export const collapsePanelHeaderBaseClasses =
-  'flex items-center px-4 py-3 cursor-pointer transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'flex items-center px-4 py-3 cursor-pointer transition-colors duration-200 motion-reduce:transition-none hover:bg-[var(--tiger-surface-muted,#f9fafb)] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
 
 /**
  * Collapse panel header active classes
  */
-export const collapsePanelHeaderActiveClasses = 'bg-gray-50'
+export const collapsePanelHeaderActiveClasses = 'bg-[var(--tiger-surface-muted,#f9fafb)]'
 
 /**
  * Collapse panel header disabled classes
@@ -46,17 +48,19 @@ export const collapsePanelHeaderDisabledClasses =
  * Collapse panel content wrapper classes
  */
 export const collapsePanelContentWrapperClasses =
-  'overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out'
+  'overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out motion-reduce:transition-none'
 
 /**
  * Collapse panel content base classes
  */
-export const collapsePanelContentBaseClasses = 'px-4 py-3 bg-white text-gray-700'
+export const collapsePanelContentBaseClasses =
+  'px-4 py-3 bg-[var(--tiger-surface,#fff)] text-[var(--tiger-text,#374151)]'
 
 /**
  * Collapse icon base classes
  */
-export const collapseIconBaseClasses = 'transition-transform duration-300 ease-in-out text-gray-500'
+export const collapseIconBaseClasses =
+  'transition-transform duration-300 ease-in-out motion-reduce:transition-none text-[var(--tiger-text-muted,#6b7280)]'
 
 /**
  * Collapse icon expanded classes
@@ -74,7 +78,7 @@ export const collapseIconPositionClasses = {
 /**
  * Collapse header text classes
  */
-export const collapseHeaderTextClasses = 'flex-1 font-medium text-gray-900'
+export const collapseHeaderTextClasses = 'flex-1 font-medium text-[var(--tiger-text,#111827)]'
 
 /**
  * Get collapse container classes

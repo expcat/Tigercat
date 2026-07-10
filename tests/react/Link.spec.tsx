@@ -33,15 +33,6 @@ describe('Link (React)', () => {
     const { container: c2 } = render(<Link variant="default">Def</Link>)
     expect(c2.querySelector('a')?.className).toContain('text-gray-700')
   })
-
-  it('applies size classes', () => {
-    const { container: sm } = render(<Link size="sm">S</Link>)
-    expect(sm.querySelector('a')).toHaveClass('text-sm')
-
-    const { container: lg } = render(<Link size="lg">L</Link>)
-    expect(lg.querySelector('a')).toHaveClass('text-lg')
-  })
-
   it('adds hover:underline when underline=true (default)', () => {
     const { container } = render(<Link>U</Link>)
     expect(container.querySelector('a')).toHaveClass('hover:underline')

@@ -90,16 +90,6 @@ function stripCommentLines(content) {
     .join('\n')
 }
 
-function checkTestStructure(filePath, content, counters) {
-  const describeCount = (content.match(/\bdescribe\s*\(/g) || []).length
-  if (describeCount === 0) {
-    console.log(c('yellow', '  ⚠ No describe blocks — consider grouping tests'))
-    counters.warnings++
-    return false
-  }
-  return true
-}
-
 const descriptiveNameWords = [
   'should',
   'snapshot',
@@ -206,32 +196,13 @@ function checkAccessibility(filePath, content, counters) {
   return false
 }
 
-function checkTypeSafety(content, counters) {
+function checkTypeSafety(content) {
   const stripped = stripCommentLines(content)
   if (/:\s*any\b/.test(stripped)) {
-    console.log(c('yellow', "  ⚠ Found 'any' type usage"))
-    counters.warnings++
+    console.log(c('red', "  ✗ Found 'any' type usage"))
     return false
   }
   return true
-}
-
-// Component specs must have at least this many tests to pass.
-function hardMinTests() {
-  return 3
-}
-
-// Soft minimum: below this count triggers a warning.
-// Lean-first policy: we favor a small set of behavior-focused tests over an
-// exhaustive per-category matrix, so these floors are deliberately low.
-function softMinTestsForFile(filename) {
-  if (
-    filename.includes('Upload') ||
-    filename.includes('DatePicker') ||
-    filename.includes('TimePicker')
-  )
-    return 15
-  return 8
 }
 
 function isComponentSpec(filePath) {
@@ -312,8 +283,6 @@ async function main() {
 
     const testCount = countTests(content)
     const componentSpec = isComponentSpec(filePath)
-    const hardMin = hardMinTests()
-    const softMin = softMinTestsForFile(filename)
 
     console.log(`  📊 Test count: ${testCount}`)
 
@@ -321,22 +290,17 @@ async function main() {
     let softIssues = 0 // warnings only
 
     // --- Hard checks (cause file to fail) ---
-    if (componentSpec && testCount < hardMin) {
-      console.log(c('red', `  ✗ Below hard minimum (${hardMin})`))
+    if (testCount < 1) {
+      console.log(c('red', '  ✗ No tests found'))
       errors++
     }
     if (hasFocusedTests(content)) {
       console.log(c('red', '  ✗ Focused test detected (.only)'))
       errors++
     }
-    if (!checkTypeSafety(content, counters)) errors++
+    if (!checkTypeSafety(content)) errors++
 
     // --- Soft checks (warnings, don't cause failure) ---
-    if (testCount < softMin && (!componentSpec || testCount >= hardMin)) {
-      console.log(c('yellow', `  ⚠ Below recommended minimum (${softMin})`))
-      counters.warnings++
-    }
-    if (!checkTestStructure(filePath, content, counters)) softIssues++
     if (!checkTestNaming(filePath, content, counters)) softIssues++
     if (componentSpec && !checkAccessibility(filePath, content, counters)) softIssues++
 

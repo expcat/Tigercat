@@ -24,6 +24,17 @@ export const TEST_GROUPS = Object.freeze([
 
 const FRAMEWORKS = new Set(['react', 'vue'])
 
+const FRAMEWORK_EXTRAS = {
+  basic: ['ButtonSpinnerLazy', 'ImagePreview.ssr'],
+  form: ['custom-text', 'useFormController'],
+  feedback: ['Notification'],
+  layout: ['Grid', 'LayoutSections'],
+  data: ['TableState'],
+  charts: ['ChartSubComponents', 'useChartInteraction'],
+  advanced: ['DragEnhancements', 'useDrag'],
+  composite: ['useControlledState']
+}
+
 const COMPONENT_GROUP_OVERRIDES = new Map(
   Object.entries({
     basic: [
@@ -306,6 +317,12 @@ export function getComponentTestGroupFiles({
         )
         if (existsSync(filePath)) allFiles.push(filePath)
       }
+
+      for (const extra of FRAMEWORK_EXTRAS[normalizedGroup] || []) {
+        const extension = currentFramework === 'react' ? 'tsx' : 'ts'
+        const filePath = path.join(rootDir, 'tests', currentFramework, `${extra}.spec.${extension}`)
+        if (existsSync(filePath)) allFiles.push(filePath)
+      }
     }
   }
 
@@ -323,4 +340,21 @@ export function assertComponentTestGroupFiles(options) {
     throw new Error(`No test files found for group "${options.group}"${filterText}.`)
   }
   return files
+}
+
+export function getUnassignedFrameworkTestFiles({ rootDir = process.cwd() } = {}) {
+  const assigned = new Set(
+    TEST_GROUPS.filter((group) => group !== 'core').flatMap((group) =>
+      getComponentTestGroupFiles({ rootDir, group })
+    )
+  )
+  const frameworkFiles = ['react', 'vue'].flatMap((framework) =>
+    collectFiles(path.join(rootDir, 'tests', framework), ['.spec.ts', '.spec.tsx']).map(
+      (filePath) => path.relative(rootDir, filePath).split(path.sep).join('/')
+    )
+  )
+
+  return frameworkFiles
+    .filter((filePath) => !assigned.has(filePath))
+    .sort((a, b) => a.localeCompare(b))
 }
