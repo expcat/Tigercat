@@ -317,7 +317,10 @@ function rewriteViteExampleConfig(filePath) {
     .replace(/resolve:\s*\{\s*alias:\s*\{[\s\S]*?\}\s*\},/m, aliasReplacement)
     .replace(/resolve:\s*\{\s*alias:\s*\[[\s\S]*?\r?\n    \]\r?\n  \},/m, aliasReplacement)
 
-  const next = withAlias.replace(/chunkSizeWarningLimit:\s*\d+/, 'chunkSizeWarningLimit: 1024')
+  const next = withAlias
+    .replace(/chunkSizeWarningLimit:\s*\d+/, 'chunkSizeWarningLimit: 1024')
+    .replaceAll("'../shared/playground/vite-runtime-plugin'", "'./.publish-shared/playground/vite-runtime-plugin'")
+    .replaceAll("path.resolve(__dirname, '../shared/playground')", "path.resolve(__dirname, './.publish-shared/playground')")
 
   if (withAlias === source) {
     throw new Error(`Could not rewrite Vite aliases in ${filePath}`)
@@ -345,6 +348,12 @@ function rewriteTsconfig(filePath) {
   if (Array.isArray(tsconfig.include)) {
     tsconfig.include = tsconfig.include.map((value) =>
       value === '../shared' || value === '../shared/**/*.ts' ? './.publish-shared/**/*.ts' : value
+    )
+  }
+
+  if (Array.isArray(tsconfig.exclude)) {
+    tsconfig.exclude = tsconfig.exclude.map((value) =>
+      value.startsWith('../shared/') ? value.replace('../shared/', './.publish-shared/') : value
     )
   }
 
