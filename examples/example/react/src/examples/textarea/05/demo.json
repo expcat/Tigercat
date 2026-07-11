@@ -1,0 +1,12 @@
+{
+  "id": "textarea-05",
+  "title": "字符计数",
+  "description": "通过 showCount 显示计数，可配合 maxLength 限制最大字符数。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

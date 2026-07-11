@@ -1,0 +1,13 @@
+{
+  "id": "upload-06",
+  "title": "图片卡片列表",
+  "description": "使用 listType=\"picture-card\" 显示图片卡片样式。",
+  "entry": "App.vue",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["popups"]
+}

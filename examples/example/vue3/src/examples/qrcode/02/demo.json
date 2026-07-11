@@ -1,0 +1,12 @@
+{
+  "id": "qrcode-02",
+  "title": "颜色与纠错等级",
+  "description": "自定义颜色，level 控制纠错等级 L/M/Q/H",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

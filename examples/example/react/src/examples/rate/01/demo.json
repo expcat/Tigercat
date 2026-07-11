@@ -1,0 +1,12 @@
+{
+  "id": "rate-01",
+  "title": "基本与半星",
+  "description": "value + onChange 受控，allowHalf 半星",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

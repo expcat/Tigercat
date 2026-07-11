@@ -1,0 +1,12 @@
+{
+  "id": "message-05",
+  "title": "队列管理",
+  "description": "支持多条消息同时显示，可以一次清空所有消息。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

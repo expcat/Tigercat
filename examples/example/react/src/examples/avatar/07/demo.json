@@ -1,0 +1,12 @@
+{
+  "id": "avatar-07",
+  "title": "自定义颜色",
+  "description": "可以通过 bgColor 和 textColor 自定义文字/图标头像颜色，推荐使用主题 CSS 变量以便跟随主题。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

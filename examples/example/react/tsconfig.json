@@ -26,6 +26,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@demo-shared/*": ["../shared/*"],
+      "@demo-runtime/context": ["./src/playground/runtime-context.ts"],
       "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
       "@expcat/tigercat-react": ["../../../packages/react/src/index.tsx"],
       "@expcat/tigercat-react/AnchorLink": ["../../../packages/react/src/components/Anchor"],
@@ -52,5 +53,6 @@
     }
   },
   "include": ["src", "../shared"],
+  "exclude": ["../shared/playground/vite-runtime-plugin.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

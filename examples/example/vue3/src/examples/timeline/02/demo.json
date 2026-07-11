@@ -1,0 +1,12 @@
+{
+  "id": "timeline-02",
+  "title": "展示模式",
+  "description": "支持 left/right/alternate 三种展示模式。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

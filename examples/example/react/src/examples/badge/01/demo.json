@@ -1,0 +1,12 @@
+{
+  "id": "badge-01",
+  "title": "基本用法",
+  "description": "独立使用徽章展示数字或文本。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

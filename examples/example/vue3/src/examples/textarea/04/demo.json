@@ -1,0 +1,12 @@
+{
+  "id": "textarea-04",
+  "title": "自动高度",
+  "description": "通过 autoResize 启用自动高度，可配合 minRows / maxRows 限制范围。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

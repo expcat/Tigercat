@@ -1,0 +1,12 @@
+{
+  "id": "select-08",
+  "title": "多选",
+  "description": "启用 multiple 后可选择多个选项。",
+  "entry": "App.tsx",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

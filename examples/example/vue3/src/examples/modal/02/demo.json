@@ -1,0 +1,12 @@
+{
+  "id": "modal-02",
+  "title": "不同尺寸等组合展示",
+  "description": "合并展示不同尺寸、居中显示、自定义页脚等互不冲突的使用方式。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

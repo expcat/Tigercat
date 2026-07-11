@@ -1,0 +1,12 @@
+{
+  "id": "tour-01",
+  "title": "基础用法与自定义按钮文字 & 指示器",
+  "description": "合并展示基础用法、自定义按钮文字 & 指示器，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

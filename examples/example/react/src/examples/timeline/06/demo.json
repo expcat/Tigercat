@@ -1,0 +1,12 @@
+{
+  "id": "timeline-06",
+  "title": "自定义内容（renderItem）",
+  "description": "通过 renderItem 自定义每个时间线项的内容区域。",
+  "entry": "App.tsx",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

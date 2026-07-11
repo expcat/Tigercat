@@ -1,0 +1,12 @@
+{
+  "id": "image-annotation-01",
+  "title": "组合展示",
+  "description": "合并展示受控标注、多形状工具，减少重复示例块。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

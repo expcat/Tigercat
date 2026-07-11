@@ -1,0 +1,12 @@
+{
+  "id": "select-06",
+  "title": "可清空",
+  "description": "默认支持清空，也可以关闭清空功能。",
+  "entry": "App.tsx",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

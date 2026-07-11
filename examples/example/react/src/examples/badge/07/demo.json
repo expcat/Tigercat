@@ -1,0 +1,12 @@
+{
+  "id": "badge-07",
+  "title": "包裹元素",
+  "description": "徽章可以附加到其他元素上，通过设置 standalone 为 false 启用包裹模式。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

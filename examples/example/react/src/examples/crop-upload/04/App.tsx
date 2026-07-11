@@ -1,0 +1,35 @@
+import { useState } from 'react'
+import { CropUpload } from '@expcat/tigercat-react/CropUpload'
+import type { CropResult } from '@expcat/tigercat-core'
+
+export default function App() {
+  const [result1, setResult1] = useState<CropResult | null>(null)
+
+  const [result2, setResult2] = useState<CropResult | null>(null)
+
+  const [errorMsg, setErrorMsg] = useState('')
+
+  const handleCropComplete = (r: CropResult) => {
+    setResult1(r)
+    console.log('CropUpload result:', r)
+  }
+
+  const handleSquareCrop = (r: CropResult) => {
+    setResult2(r)
+  }
+
+  const handleError = (err: Error) => {
+    setErrorMsg(err.message)
+    setTimeout(() => setErrorMsg(''), 3000)
+  }
+
+  return (
+    <>
+      <CropUpload
+        maxSize={2 * 1024 * 1024}
+        onCropComplete={handleCropComplete}
+        onError={handleError}
+      />
+    </>
+  )
+}

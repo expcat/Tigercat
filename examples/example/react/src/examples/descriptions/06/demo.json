@@ -1,0 +1,12 @@
+{
+  "id": "descriptions-06",
+  "title": "跨列显示",
+  "description": "描述项可以通过 span 属性实现跨列显示。",
+  "entry": "App.tsx",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

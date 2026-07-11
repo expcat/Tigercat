@@ -1,0 +1,13 @@
+{
+  "id": "upload-05",
+  "title": "文件类型和大小限制",
+  "description": "通过 accept 和 maxSize 限制文件类型和大小。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["popups"]
+}

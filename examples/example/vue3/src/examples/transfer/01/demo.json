@@ -1,0 +1,12 @@
+{
+  "id": "transfer-01",
+  "title": "基本用法",
+  "description": "双向穿梭选择",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

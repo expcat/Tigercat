@@ -1,0 +1,12 @@
+{
+  "id": "mentions-02",
+  "title": "自定义触发符",
+  "description": "prefix 自定义触发字符",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

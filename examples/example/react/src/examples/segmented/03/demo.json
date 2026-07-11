@@ -1,0 +1,12 @@
+{
+  "id": "segmented-03",
+  "title": "禁用",
+  "description": "整体禁用 或 单个选项禁用",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

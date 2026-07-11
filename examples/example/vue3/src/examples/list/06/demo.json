@@ -1,0 +1,12 @@
+{
+  "id": "list-06",
+  "title": "带额外内容",
+  "description": "通过数据项的 extra 在右侧添加操作区。",
+  "entry": "App.vue",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

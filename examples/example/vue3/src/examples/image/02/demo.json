@@ -1,0 +1,12 @@
+{
+  "id": "image-02",
+  "title": "适配模式",
+  "description": "fit 属性控制图片在容器中的适配方式",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

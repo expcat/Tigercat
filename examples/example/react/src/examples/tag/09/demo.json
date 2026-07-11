@@ -1,0 +1,12 @@
+{
+  "id": "tag-09",
+  "title": "应用场景",
+  "description": "标签在实际应用中的常见使用场景。",
+  "entry": "App.tsx",
+  "order": 9,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

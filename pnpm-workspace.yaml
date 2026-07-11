@@ -27,10 +27,12 @@ catalog:
   # ── Styling ────────────────────────────────────
   tailwindcss: ^4.3.2
   '@tailwindcss/vite': ^4.3.2
+  '@tailwindcss/browser': ^4.3.2
 
   # ── Vite plugins ───────────────────────────────
   '@vitejs/plugin-vue': ^6.0.7
   '@vitejs/plugin-react': ^6.0.3
+  esbuild-wasm: 0.28.1
 
   # ── Type definitions ───────────────────────────
   '@types/node': ^26.1.1
@@ -40,6 +42,7 @@ catalog:
   # ── Vue tooling ────────────────────────────────
   '@vue/tsconfig': ^0.9.1
   vue-tsc: ^3.3.7
+  '@vue/compiler-sfc': ^3.5.39
 
   # ── Testing ────────────────────────────────────
   axe-core: ^4.12.1

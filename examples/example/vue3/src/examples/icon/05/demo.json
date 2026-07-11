@@ -1,0 +1,12 @@
+{
+  "id": "icon-05",
+  "title": "图标尺寸",
+  "description": "支持 sm/md/lg/xl 四种尺寸。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

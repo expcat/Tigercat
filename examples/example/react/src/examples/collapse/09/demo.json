@@ -1,0 +1,12 @@
+{
+  "id": "collapse-09",
+  "title": "隐藏箭头",
+  "description": "通过 showArrow 属性隐藏展开/收起箭头图标。",
+  "entry": "App.tsx",
+  "order": 9,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

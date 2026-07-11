@@ -1,0 +1,12 @@
+{
+  "id": "space-05",
+  "title": "自动换行",
+  "description": "wrap=true 时，子项在空间不足时自动换行。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

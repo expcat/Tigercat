@@ -1,0 +1,12 @@
+{
+  "id": "carousel-06",
+  "title": "非循环模式",
+  "description": "关闭无限循环，到达边界时箭头自动禁用。",
+  "entry": "App.tsx",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

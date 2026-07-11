@@ -1,0 +1,12 @@
+{
+  "id": "space-03",
+  "title": "不同尺寸",
+  "description": "size 支持内置尺寸（sm/md/lg）与自定义数值（px）。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "loading-03",
+  "title": "区域加载等组合展示",
+  "description": "合并展示区域加载、按钮加载、延迟显示，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

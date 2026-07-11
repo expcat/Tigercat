@@ -1,0 +1,12 @@
+{
+  "id": "notification-03",
+  "title": "自定义持续时间",
+  "description": "通过 duration 设置自动关闭时间。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

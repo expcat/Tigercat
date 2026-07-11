@@ -1,0 +1,12 @@
+{
+  "id": "segmented-01",
+  "title": "基本用法",
+  "description": "v-model 双向绑定选中值",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "grid-01",
+  "title": "基础栅格",
+  "description": "使用单一分栏创建基础的栅格布局。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

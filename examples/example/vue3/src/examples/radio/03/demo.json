@@ -1,0 +1,12 @@
+{
+  "id": "radio-03",
+  "title": "非受控",
+  "description": "不使用 v-model，通过 defaultValue 初始化，并监听 change。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

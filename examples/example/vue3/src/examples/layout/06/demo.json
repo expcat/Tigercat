@@ -1,0 +1,12 @@
+{
+  "id": "layout-06",
+  "title": "后台 Shell 侧栏",
+  "description": "推荐使用 Sidebar 的 collapsed-width 配合文案 max-width、opacity、transform transition；Menu 在 inline + collapsed + popup-portal 下会自动退化成折叠侧栏常见的 popup 子菜单，无需手动切成 vertical。",
+  "entry": "App.vue",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

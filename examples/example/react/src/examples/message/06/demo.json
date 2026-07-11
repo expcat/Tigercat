@@ -1,0 +1,12 @@
+{
+  "id": "message-06",
+  "title": "回调函数",
+  "description": "可以通过 onClose 回调函数在消息关闭时执行特定操作（查看控制台）。",
+  "entry": "App.tsx",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

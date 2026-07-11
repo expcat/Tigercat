@@ -1,0 +1,13 @@
+{
+  "id": "table-07",
+  "title": "分页功能",
+  "description": "大数据集的分页展示（受控模式）。",
+  "entry": "App.vue",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

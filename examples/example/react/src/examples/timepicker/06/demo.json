@@ -1,0 +1,12 @@
+{
+  "id": "timepicker-06",
+  "title": "时间步长",
+  "description": "使用 hourStep、minuteStep、secondStep 控制时间选择步长。",
+  "entry": "App.tsx",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

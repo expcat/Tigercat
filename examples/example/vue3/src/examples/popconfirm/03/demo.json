@@ -1,0 +1,12 @@
+{
+  "id": "popconfirm-03",
+  "title": "受控模式",
+  "description": "通过 v-model:open 控制 Popconfirm 的显示状态。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

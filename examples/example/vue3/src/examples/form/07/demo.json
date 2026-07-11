@@ -1,0 +1,12 @@
+{
+  "id": "form-07",
+  "title": "错误消息模式",
+  "description": "showMessage 控制错误提示位置。默认在 FormItem 下方显示；设为 false 则让 Input 内部显示错误（抖动 + 红色边框）。",
+  "entry": "App.vue",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "table-08",
+  "title": "行选择",
+  "description": "选择单行或多行数据。",
+  "entry": "App.tsx",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

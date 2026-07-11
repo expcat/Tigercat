@@ -1,0 +1,12 @@
+{
+  "id": "link-01",
+  "title": "链接变体",
+  "description": "展示 primary / secondary / default 三种变体。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

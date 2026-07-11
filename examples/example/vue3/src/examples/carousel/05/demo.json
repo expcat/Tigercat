@@ -1,0 +1,12 @@
+{
+  "id": "carousel-05",
+  "title": "导航点位置",
+  "description": "可以调整导航点的位置。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

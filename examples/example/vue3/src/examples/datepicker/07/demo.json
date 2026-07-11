@@ -1,0 +1,12 @@
+{
+  "id": "datepicker-07",
+  "title": "禁用和只读",
+  "description": "日期选择器可以设置为禁用或只读状态。",
+  "entry": "App.vue",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

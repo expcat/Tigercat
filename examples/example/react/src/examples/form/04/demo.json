@@ -1,0 +1,12 @@
+{
+  "id": "form-04",
+  "title": "表单尺寸",
+  "description": "通过 size 设置表单整体尺寸：sm、md（默认）、lg。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

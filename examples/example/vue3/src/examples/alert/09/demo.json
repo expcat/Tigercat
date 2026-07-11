@@ -1,0 +1,12 @@
+{
+  "id": "alert-09",
+  "title": "实际应用场景",
+  "description": "模拟真实的使用场景。",
+  "entry": "App.vue",
+  "order": 9,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

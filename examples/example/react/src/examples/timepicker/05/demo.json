@@ -1,0 +1,12 @@
+{
+  "id": "timepicker-05",
+  "title": "显示秒",
+  "description": "使用 showSeconds 属性控制是否显示秒。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

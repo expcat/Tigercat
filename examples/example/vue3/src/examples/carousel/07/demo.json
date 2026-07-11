@@ -1,0 +1,12 @@
+{
+  "id": "carousel-07",
+  "title": "编程式控制",
+  "description": "通过 ref 调用 next / prev / goTo 方法。",
+  "entry": "App.vue",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

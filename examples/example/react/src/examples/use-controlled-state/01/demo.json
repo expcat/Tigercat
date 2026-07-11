@@ -1,0 +1,12 @@
+{
+  "id": "use-controlled-state-01",
+  "title": "组合展示",
+  "description": "合并展示非受控 defaultValue 与受控 value/onChange 两种状态模式。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

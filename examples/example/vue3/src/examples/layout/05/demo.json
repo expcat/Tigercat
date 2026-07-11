@@ -1,0 +1,12 @@
+{
+  "id": "layout-05",
+  "title": "Sidebar 折叠",
+  "description": "可折叠的侧边栏，通过 collapsed-width 设置折叠后的宽度（默认 64px）。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

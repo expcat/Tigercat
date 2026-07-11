@@ -1,0 +1,12 @@
+{
+  "id": "form-02",
+  "title": "表单验证",
+  "description": "通过 rules + name 实现校验，支持提交校验与手动校验。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

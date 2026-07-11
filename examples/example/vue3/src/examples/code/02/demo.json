@@ -1,0 +1,12 @@
+{
+  "id": "code-02",
+  "title": "自定义按钮文案",
+  "description": "通过 copy-label / copied-label 自定义按钮文案。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "slider-07",
+  "title": "禁用状态",
+  "description": "通过 disabled 属性禁用滑块。",
+  "entry": "App.vue",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

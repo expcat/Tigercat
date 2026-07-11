@@ -1,0 +1,12 @@
+{
+  "id": "select-11",
+  "title": "空状态",
+  "description": "当 options 为空时，会显示空提示文案。",
+  "entry": "App.tsx",
+  "order": 11,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

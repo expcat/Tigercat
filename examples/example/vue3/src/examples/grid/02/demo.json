@@ -1,0 +1,12 @@
+{
+  "id": "grid-02",
+  "title": "分栏间隔",
+  "description": "支持水平间距或 [水平, 垂直] 的间距数组。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

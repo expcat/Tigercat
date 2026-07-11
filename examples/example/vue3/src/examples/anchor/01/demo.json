@@ -1,0 +1,12 @@
+{
+  "id": "anchor-01",
+  "title": "基本用法与水平方向",
+  "description": "合并展示基本用法、水平方向，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

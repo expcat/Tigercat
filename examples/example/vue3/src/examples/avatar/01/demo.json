@@ -1,0 +1,12 @@
+{
+  "id": "avatar-01",
+  "title": "图片头像",
+  "description": "使用 src 属性显示图片头像。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

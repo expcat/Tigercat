@@ -1,0 +1,12 @@
+{
+  "id": "timeline-03",
+  "title": "自定义颜色",
+  "description": "通过 item.color 设置时间点颜色。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

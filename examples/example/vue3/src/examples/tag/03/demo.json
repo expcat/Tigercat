@@ -1,0 +1,12 @@
+{
+  "id": "tag-03",
+  "title": "标签大小",
+  "description": "标签有三种尺寸：小、中、大。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

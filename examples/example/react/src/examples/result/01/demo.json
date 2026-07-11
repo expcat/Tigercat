@@ -1,0 +1,12 @@
+{
+  "id": "result-01",
+  "title": "状态类型",
+  "description": "success / error / warning / info 四种基础状态",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

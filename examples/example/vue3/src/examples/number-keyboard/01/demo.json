@@ -1,0 +1,12 @@
+{
+  "id": "number-keyboard-01",
+  "title": "金额输入",
+  "description": "amount 模式支持小数点和默认两位小数",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

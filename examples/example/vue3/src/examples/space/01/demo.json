@@ -1,0 +1,12 @@
+{
+  "id": "space-01",
+  "title": "水平间距",
+  "description": "水平方向的间距。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

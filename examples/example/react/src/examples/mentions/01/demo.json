@@ -1,0 +1,12 @@
+{
+  "id": "mentions-01",
+  "title": "基本用法",
+  "description": "输入 @ 触发用户列表",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

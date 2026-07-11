@@ -1,0 +1,12 @@
+{
+  "id": "progress-02",
+  "title": "文件上传示例与仪表盘展示",
+  "description": "合并展示文件上传示例、仪表盘展示，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

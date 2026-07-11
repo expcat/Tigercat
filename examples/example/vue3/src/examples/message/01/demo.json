@@ -1,0 +1,12 @@
+{
+  "id": "message-01",
+  "title": "基本用法",
+  "description": "最简单的用法，调用 Message 方法即可显示消息提示。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

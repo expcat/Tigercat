@@ -1,0 +1,12 @@
+{
+  "id": "crop-upload-03",
+  "title": "自定义触发按钮",
+  "description": "通过 children 自定义触发按钮",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

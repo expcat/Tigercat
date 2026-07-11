@@ -1,0 +1,12 @@
+{
+  "id": "notification-04",
+  "title": "可关闭性",
+  "description": "控制通知是否显示关闭按钮。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

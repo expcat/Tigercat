@@ -1,0 +1,12 @@
+{
+  "id": "list-09",
+  "title": "分页列表",
+  "description": "当数据较多时，可以使用分页功能。",
+  "entry": "App.vue",
+  "order": 9,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

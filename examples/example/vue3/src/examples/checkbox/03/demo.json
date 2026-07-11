@@ -1,0 +1,12 @@
+{
+  "id": "checkbox-03",
+  "title": "禁用状态",
+  "description": "多选框不可用状态。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

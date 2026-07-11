@@ -1,0 +1,12 @@
+{
+  "id": "notification-05",
+  "title": "手动控制",
+  "description": "保存关闭函数实现手动关闭或模拟流程。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "anchor-04",
+  "title": "事件处理",
+  "description": "监听 @click 和 @change 事件，可配合 targetOffset 使用。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

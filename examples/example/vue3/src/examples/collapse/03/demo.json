@@ -1,0 +1,12 @@
+{
+  "id": "collapse-03",
+  "title": "无边框",
+  "description": "简洁的无边框样式。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

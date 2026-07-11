@@ -1,0 +1,13 @@
+{
+  "id": "data-export-01",
+  "title": "组合展示",
+  "description": "基础下拉导出、单一格式按钮、自定义文件名与单元格格式化、导出回调。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["downloads"]
+}

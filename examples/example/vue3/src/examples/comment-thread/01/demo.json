@@ -1,0 +1,12 @@
+{
+  "id": "comment-thread-01",
+  "title": "组合展示",
+  "description": "合并展示嵌套回复、扁平数据、精简模式与空态。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

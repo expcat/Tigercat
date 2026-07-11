@@ -1,0 +1,12 @@
+{
+  "id": "datepicker-03",
+  "title": "自定义文案",
+  "description": "通过 labels 覆盖 Today/OK 与 aria-label 文案。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

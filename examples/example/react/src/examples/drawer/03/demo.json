@@ -1,0 +1,12 @@
+{
+  "id": "drawer-03",
+  "title": "自定义头部和底部",
+  "description": "使用 header 和 footer 属性自定义头部和底部内容。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

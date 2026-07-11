@@ -1,0 +1,12 @@
+{
+  "id": "alert-03",
+  "title": "尺寸大小",
+  "description": "Alert 组件支持 3 种不同的尺寸：小、中、大。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

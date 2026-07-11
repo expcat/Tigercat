@@ -1,0 +1,12 @@
+{
+  "id": "slider-08",
+  "title": "不同尺寸",
+  "description": "Slider 支持 sm / md / lg 三种尺寸。",
+  "entry": "App.vue",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

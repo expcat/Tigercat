@@ -1,0 +1,12 @@
+{
+  "id": "modal-01",
+  "title": "基本用法",
+  "description": "最简单的用法，点击按钮打开对话框。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

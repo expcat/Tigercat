@@ -1,0 +1,12 @@
+{
+  "id": "form-03",
+  "title": "布局模式",
+  "description": "通过 labelPosition 切换标签位置：right（默认）、left、top。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "form-01",
+  "title": "基础用法",
+  "description": "完整的表单示例，包含多种表单控件。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

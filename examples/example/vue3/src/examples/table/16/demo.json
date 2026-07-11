@@ -1,0 +1,13 @@
+{
+  "id": "table-16",
+  "title": "尺寸变体",
+  "description": "通过 size 属性设置表格的紧凑程度：sm / md / lg。",
+  "entry": "App.vue",
+  "order": 16,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "scroll-spy-02",
+  "title": "自定义滚动容器",
+  "description": "指定内部容器作为滚动监听目标。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "fixed",
+    "height": 420,
+    "minHeight": 420,
+    "maxHeight": 420
+  }
+}

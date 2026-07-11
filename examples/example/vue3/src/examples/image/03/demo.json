@@ -1,0 +1,12 @@
+{
+  "id": "image-03",
+  "title": "加载失败回退",
+  "description": "设置 fallbackSrc 或使用 error 插槽自定义错误状态",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

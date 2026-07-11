@@ -1,0 +1,12 @@
+{
+  "id": "tree-select-02",
+  "title": "可搜索",
+  "description": "searchable 开启搜索",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

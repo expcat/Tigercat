@@ -1,0 +1,13 @@
+{
+  "id": "upload-08",
+  "title": "自定义上传",
+  "description": "通过 customRequest 实现自定义上传逻辑，可观察上传进度。",
+  "entry": "App.vue",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["popups"]
+}

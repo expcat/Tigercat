@@ -1,0 +1,12 @@
+{
+  "id": "popconfirm-04",
+  "title": "隐藏图标与禁用状态",
+  "description": "合并展示隐藏图标、禁用状态，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

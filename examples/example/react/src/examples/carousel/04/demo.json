@@ -1,0 +1,12 @@
+{
+  "id": "carousel-04",
+  "title": "渐变效果",
+  "description": "使用渐变切换效果。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

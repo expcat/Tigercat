@@ -1,0 +1,12 @@
+{
+  "id": "button-02",
+  "title": "行为与原生类型",
+  "description": "合并展示点击事件和 HTML 原生 button 类型。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

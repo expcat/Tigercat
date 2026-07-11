@@ -1,0 +1,12 @@
+{
+  "id": "chat-window-01",
+  "title": "组合展示",
+  "description": "合并展示 textarea 与单行 input 两种聊天输入模式。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

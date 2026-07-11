@@ -1,0 +1,12 @@
+{
+  "id": "collapse-01",
+  "title": "基本用法",
+  "description": "可以同时展开多个面板。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

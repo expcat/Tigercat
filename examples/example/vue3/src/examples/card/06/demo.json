@@ -1,0 +1,12 @@
+{
+  "id": "card-06",
+  "title": "卡片结构",
+  "description": "卡片支持头部、主体、底部和操作区域。",
+  "entry": "App.vue",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

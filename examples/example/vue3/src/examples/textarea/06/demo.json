@@ -1,0 +1,12 @@
+{
+  "id": "textarea-06",
+  "title": "禁用、只读和必填",
+  "description": "文本域可以设置为禁用、只读或必填状态。",
+  "entry": "App.vue",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

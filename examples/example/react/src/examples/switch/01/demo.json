@@ -1,0 +1,12 @@
+{
+  "id": "switch-01",
+  "title": "基础用法",
+  "description": "绑定到一个 Boolean 类型的变量。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "list-05",
+  "title": "带头像的列表",
+  "description": "列表项可以包含头像。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

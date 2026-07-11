@@ -1,0 +1,12 @@
+{
+  "id": "datepicker-05",
+  "title": "日期格式",
+  "description": "支持四种日期显示格式。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

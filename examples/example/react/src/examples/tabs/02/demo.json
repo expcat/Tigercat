@@ -1,0 +1,12 @@
+{
+  "id": "tabs-02",
+  "title": "可编辑卡片",
+  "description": "可以新增和关闭标签页。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "message-08",
+  "title": "自定义图标",
+  "description": "通过 icon 属性传入 SVG path d 属性值，替换默认类型图标。",
+  "entry": "App.vue",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

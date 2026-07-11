@@ -1,0 +1,12 @@
+{
+  "id": "drawer-01",
+  "title": "基本使用",
+  "description": "最基本的抽屉使用示例。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

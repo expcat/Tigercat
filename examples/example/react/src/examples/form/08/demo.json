@@ -1,0 +1,12 @@
+{
+  "id": "form-08",
+  "title": "表单数据预览",
+  "description": "实时查看表单数据。",
+  "entry": "App.tsx",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,21 @@
+<script setup lang="ts">
+import { Space } from '@expcat/tigercat-vue/Space'
+import { ref } from 'vue'
+import { Link } from '@expcat/tigercat-vue/Link'
+
+const clickCount = ref(0)
+
+const handlePreventNavigate = (event: MouseEvent) => {
+  event.preventDefault()
+}
+</script>
+
+<template>
+  <div class="min-w-0">
+    <Space>
+      <Link href="#" size="sm" @click="handlePreventNavigate">Small</Link>
+      <Link href="#" size="md" @click="handlePreventNavigate">Medium</Link>
+      <Link href="#" size="lg" @click="handlePreventNavigate">Large</Link>
+    </Space>
+  </div>
+</template>

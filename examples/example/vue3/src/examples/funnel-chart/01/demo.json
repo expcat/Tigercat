@@ -1,0 +1,12 @@
+{
+  "id": "funnel-chart-01",
+  "title": "组合展示",
+  "description": "合并展示基础用法、水平方向 & 收尖、自定义颜色 & 间距，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

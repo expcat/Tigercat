@@ -1,0 +1,12 @@
+{
+  "id": "switch-02",
+  "title": "禁用状态",
+  "description": "通过设置 disabled 属性来禁用开关。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

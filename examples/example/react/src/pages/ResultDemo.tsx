@@ -1,91 +1,14 @@
-import { useState } from 'react'
-import { Result } from '@expcat/tigercat-react/Result'
-import { Button } from '@expcat/tigercat-react/Button'
-import { Space } from '@expcat/tigercat-react/Space'
-import DemoBlock from '../components/DemoBlock'
-import fullPageSnippet from './ResultDemo.tsx?raw'
+import DemoPage from '../components/DemoPage'
+import { getDemoModules } from '../playground/registry'
 
-const statusSnippet = `<Result status="success" title="操作成功" subTitle="订单已提交，预计2小时内送达" />
-<Result status="error" title="提交失败" subTitle="请检查网络连接后重试" />
-<Result status="warning" title="警告提示" subTitle="当前操作存在风险" />
-<Result status="info" title="提示信息" subTitle="这是一条普通信息提示" />`
+const modules = getDemoModules('result')
 
-const httpSnippet = `<Result status="403" title="403" subTitle="抱歉，您没有权限访问此页面" />
-<Result status="404" title="404" subTitle="抱歉，您访问的页面不存在" />
-<Result status="500" title="500" subTitle="服务器出错了，请稍后重试" />`
-
-const customSnippet = `<Result status="success" title="购买成功"
-  extra={<Space><Button variant="primary">返回首页</Button><Button variant="secondary">查看订单</Button></Space>}
-/>`
-
-const ResultDemo: React.FC = () => {
-  const [lastAction, setLastAction] = useState('尚未执行操作')
-
+export default function ResultDemo() {
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-8">
-      <h1 className="text-3xl font-bold mb-2">Result 结果页</h1>
-      <p className="text-gray-500 mb-8">用于反馈操作结果，包括成功、失败、警告和 HTTP 状态码。</p>
-
-      <DemoBlock
-        title="状态类型"
-        description="success / error / warning / info 四种基础状态"
-        code={fullPageSnippet}>
-        <Space direction="vertical" size={24} className="w-full">
-          <div className="border rounded-lg p-6">
-            <Result status="success" title="操作成功" subTitle="订单已提交，预计2小时内送达" />
-          </div>
-          <div className="border rounded-lg p-6">
-            <Result status="error" title="提交失败" subTitle="请检查网络连接后重试" />
-          </div>
-          <div className="border rounded-lg p-6">
-            <Result status="warning" title="警告提示" subTitle="当前操作存在风险" />
-          </div>
-          <div className="border rounded-lg p-6">
-            <Result status="info" title="提示信息" subTitle="这是一条普通信息提示" />
-          </div>
-        </Space>
-      </DemoBlock>
-
-      <DemoBlock title="HTTP 状态码" description="403 / 404 / 500 页面" code={fullPageSnippet}>
-        <Space direction="vertical" size={24} className="w-full">
-          <div className="border rounded-lg p-6">
-            <Result status="403" title="403" subTitle="抱歉，您没有权限访问此页面" />
-          </div>
-          <div className="border rounded-lg p-6">
-            <Result status="404" title="404" subTitle="抱歉，您访问的页面不存在" />
-          </div>
-          <div className="border rounded-lg p-6">
-            <Result status="500" title="500" subTitle="服务器出错了，请稍后重试" />
-          </div>
-        </Space>
-      </DemoBlock>
-
-      <DemoBlock
-        title="自定义操作按钮"
-        description="通过 extra 添加操作按钮"
-        code={fullPageSnippet}>
-        <div className="border rounded-lg p-6">
-          <Result
-            status="success"
-            title="购买成功"
-            extra={
-              <Space>
-                <Button variant="primary" onClick={() => setLastAction('已选择返回首页')}>
-                  返回首页
-                </Button>
-                <Button variant="secondary" onClick={() => setLastAction('正在查看订单详情')}>
-                  查看订单
-                </Button>
-              </Space>
-            }
-          />
-          <p className="mt-3 text-center text-sm text-gray-600 dark:text-gray-300" role="status">
-            操作反馈：{lastAction}
-          </p>
-        </div>
-      </DemoBlock>
-    </div>
+    <DemoPage
+      title="Result 结果页"
+      description="用于反馈操作结果，包括成功、失败、警告和 HTTP 状态码。"
+      modules={modules}
+    />
   )
 }
-
-export default ResultDemo

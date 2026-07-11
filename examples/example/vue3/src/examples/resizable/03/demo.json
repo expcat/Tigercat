@@ -1,0 +1,11 @@
+{
+  "id": "resizable-03",
+  "title": "禁用",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

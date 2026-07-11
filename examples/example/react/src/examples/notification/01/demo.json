@@ -1,0 +1,12 @@
+{
+  "id": "notification-01",
+  "title": "基本类型",
+  "description": "展示四种基础通知类型。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

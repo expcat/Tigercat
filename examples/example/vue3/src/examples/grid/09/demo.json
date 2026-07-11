@@ -1,0 +1,12 @@
+{
+  "id": "grid-09",
+  "title": "混合布局",
+  "description": "通过基础的 1/24 分栏任意扩展组合形成较为复杂的混合布局。",
+  "entry": "App.vue",
+  "order": 9,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "alert-08",
+  "title": "完整功能示例",
+  "description": "综合展示所有功能。",
+  "entry": "App.vue",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

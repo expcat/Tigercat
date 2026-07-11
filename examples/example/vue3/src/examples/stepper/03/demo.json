@@ -1,0 +1,12 @@
+{
+  "id": "stepper-03",
+  "title": "小数精度",
+  "description": "precision 控制小数位数",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

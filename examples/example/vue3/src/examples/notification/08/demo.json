@@ -1,0 +1,12 @@
+{
+  "id": "notification-08",
+  "title": "清空通知",
+  "description": "按位置或全部清空通知。",
+  "entry": "App.vue",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

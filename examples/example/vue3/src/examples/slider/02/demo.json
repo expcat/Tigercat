@@ -1,0 +1,12 @@
+{
+  "id": "slider-02",
+  "title": "不同范围",
+  "description": "通过 min 和 max 属性设置范围。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

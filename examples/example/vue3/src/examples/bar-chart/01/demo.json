@@ -1,0 +1,12 @@
+{
+  "id": "bar-chart-01",
+  "title": "组合展示",
+  "description": "合并展示基础用法、渐变填充 + 动画、自定义样式、数值标签、柱宽/柱高约束、悬停高亮、点击选中、显示图例、显示提示框，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

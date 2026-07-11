@@ -1,0 +1,12 @@
+{
+  "id": "select-02",
+  "title": "有默认值",
+  "description": "可以设置默认选中的值。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

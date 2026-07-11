@@ -1,0 +1,13 @@
+{
+  "id": "table-09",
+  "title": "固定表头",
+  "description": "表头固定，内容可滚动。",
+  "entry": "App.vue",
+  "order": 9,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

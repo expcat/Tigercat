@@ -1,0 +1,13 @@
+{
+  "id": "upload-02",
+  "title": "拖拽上传",
+  "description": "将文件拖拽到区域内即可上传。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["popups"]
+}

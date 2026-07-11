@@ -1,0 +1,12 @@
+{
+  "id": "form-05",
+  "title": "禁用表单",
+  "description": "设置 disabled 禁用整个表单。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

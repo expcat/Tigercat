@@ -1,0 +1,12 @@
+{
+  "id": "grid-03",
+  "title": "响应式栅格",
+  "description": "span / offset 支持按断点设置（xs, sm, md, lg, xl, 2xl）。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "notification-02",
+  "title": "不同位置",
+  "description": "支持在四个角落显示通知。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

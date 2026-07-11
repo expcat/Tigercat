@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/browser": "catalog:",
     "@expcat/tigercat-vue": "workspace:*",
+    "@vue/compiler-sfc": "catalog:",
+    "esbuild-wasm": "catalog:",
     "vue": "catalog:",
     "vue-router": "^5.1.0"
   },

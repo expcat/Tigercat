@@ -1,0 +1,12 @@
+{
+  "id": "image-01",
+  "title": "基本用法",
+  "description": "使用 src 和尺寸属性展示图片",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

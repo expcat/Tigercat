@@ -1,0 +1,12 @@
+{
+  "id": "textarea-07",
+  "title": "组合功能",
+  "description": "autoResize + showCount + maxLength 组合使用。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

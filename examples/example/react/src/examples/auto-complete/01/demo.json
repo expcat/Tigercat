@@ -1,0 +1,12 @@
+{
+  "id": "auto-complete-01",
+  "title": "基本用法",
+  "description": "输入时自动过滤匹配选项",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

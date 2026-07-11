@@ -1,0 +1,12 @@
+{
+  "id": "crop-upload-02",
+  "title": "固定宽高比",
+  "description": "通过 cropperProps 传递 aspectRatio 实现正方形裁剪",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

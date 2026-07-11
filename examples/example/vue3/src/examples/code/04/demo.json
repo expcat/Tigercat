@@ -1,0 +1,12 @@
+{
+  "id": "code-04",
+  "title": "复制事件回调",
+  "description": "通过 @copy 监听复制事件，获取被复制的代码内容。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

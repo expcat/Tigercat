@@ -1,0 +1,12 @@
+{
+  "id": "timeline-07",
+  "title": "等待中状态",
+  "description": "通过 pending/pendingDot/pendingContent 展示“处理中”状态。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "progress-01",
+  "title": "基本用法等组合展示",
+  "description": "合并展示基本用法、进度条变体、进度条状态等互不冲突的使用方式。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

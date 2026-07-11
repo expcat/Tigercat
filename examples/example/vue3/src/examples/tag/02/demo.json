@@ -1,0 +1,12 @@
+{
+  "id": "tag-02",
+  "title": "标签类型",
+  "description": "标签有六种类型：默认、主要、成功、警告、危险和信息。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "input-group-01",
+  "title": "基本用法",
+  "description": "输入框 + 按钮组合",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

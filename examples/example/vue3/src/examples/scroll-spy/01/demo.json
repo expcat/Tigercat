@@ -1,0 +1,13 @@
+{
+  "id": "scroll-spy-01",
+  "title": "基本用法与水平导航",
+  "description": "合并展示基本用法、水平导航，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "fixed",
+    "height": 420,
+    "minHeight": 420,
+    "maxHeight": 420
+  }
+}

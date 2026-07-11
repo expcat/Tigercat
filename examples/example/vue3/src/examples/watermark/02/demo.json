@@ -1,0 +1,12 @@
+{
+  "id": "watermark-02",
+  "title": "多行水印",
+  "description": "content 传数组实现多行，自定义字体",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

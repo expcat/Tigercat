@@ -1,0 +1,12 @@
+{
+  "id": "image-04",
+  "title": "懒加载",
+  "description": "lazy 属性开启 IntersectionObserver 懒加载",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

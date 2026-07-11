@@ -1,0 +1,12 @@
+{
+  "id": "empty-01",
+  "title": "预设样式",
+  "description": "通过 preset 切换不同空状态场景",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "text-06",
+  "title": "文本对齐",
+  "description": "由 align 属性定义对齐方式。",
+  "entry": "App.vue",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

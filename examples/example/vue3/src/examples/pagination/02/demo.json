@@ -1,0 +1,12 @@
+{
+  "id": "pagination-02",
+  "title": "国际化 (i18n)与自定义文案 (labels)",
+  "description": "合并展示国际化 (i18n)、自定义文案 (labels)，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

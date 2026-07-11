@@ -1,0 +1,12 @@
+{
+  "id": "grid-07",
+  "title": "不换行（wrap=false）",
+  "description": "当总宽度超过 24 栅格时，不换行会导致横向溢出。",
+  "entry": "App.vue",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

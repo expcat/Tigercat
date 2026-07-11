@@ -24,12 +24,12 @@
 | `pnpm test:group`            | `scripts/run-component-group-tests.mjs` | 按组件组运行 Vitest；支持 `--group`、`--framework`、`--filter` 和 `--list`                      |
 | `pnpm test:validate`         | `scripts/validate-tests.mjs`            | 按 [测试质量指南](../tests/TEST_QUALITY_GUIDELINES.md) 检查测试文件                             |
 | `pnpm example:ssr:check`     | `scripts/check-ssr-examples.mjs`        | 构建 Nuxt/Next.js SSR 示例，并检查 `examples/nextjs/next-env.d.ts` 没有被构建过程改写           |
-| `pnpm example:sources:check` | `scripts/validate-example-sources.mjs`  | 校验 React/Vue DemoBlock 不再使用 script Tab，且 code 来自同页或 fixture 的 `?raw` source       |
+| `pnpm example:sources:check` | `scripts/validate-example-sources.mjs`  | 校验 456 个 React 与 455 个 Vue 独立模块的元数据、入口、导入白名单、数量和 DemoBlock 新契约     |
 | `pnpm docs:api`              | `scripts/generate-api-docs.mjs`         | 生成 skills API 摘要                                                                            |
 | `pnpm api:baseline:check`    | 根 package scripts                      | 公共 API 基线漂移闸：生成基线并校验 `api-reports` 无差异                                        |
 | `pnpm docs:api:check`        | 根 package scripts                      | references 漂移闸：生成 LLM API 文档并校验 `skills/tigercat/references` 无差异                  |
-| `pnpm mcp:build`             | `packages/mcp`                          | 构建 `@expcat/tigercat-mcp` 本地 stdio MCP 服务                                                                |
-| `pnpm mcp:serve`             | `packages/mcp/dist/index.js`            | 从当前仓库根目录启动 MCP 服务，供 LLM 客户端路由 skill references                                              |
+| `pnpm mcp:build`             | `packages/mcp`                          | 构建 `@expcat/tigercat-mcp` 本地 stdio MCP 服务                                                 |
+| `pnpm mcp:serve`             | `packages/mcp/dist/index.js`            | 从当前仓库根目录启动 MCP 服务，供 LLM 客户端路由 skill references                               |
 
 ## 示例应用
 

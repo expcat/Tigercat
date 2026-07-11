@@ -1,0 +1,12 @@
+{
+  "id": "use-drag-01",
+  "title": "基础列表排序",
+  "description": "拖动条目即可重新排序，松开时通过 reorder() 计算新顺序。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

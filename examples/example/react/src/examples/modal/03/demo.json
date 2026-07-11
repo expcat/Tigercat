@@ -1,0 +1,12 @@
+{
+  "id": "modal-03",
+  "title": "嵌套对话框",
+  "description": "对话框可以嵌套使用，通过 z-index 控制层级。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

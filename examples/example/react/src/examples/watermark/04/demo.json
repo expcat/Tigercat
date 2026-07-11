@@ -1,0 +1,12 @@
+{
+  "id": "watermark-04",
+  "title": "图片水印",
+  "description": "通过 image 属性使用图片作为水印",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "card-07",
+  "title": "完整示例",
+  "description": "结合所有功能的完整卡片示例。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

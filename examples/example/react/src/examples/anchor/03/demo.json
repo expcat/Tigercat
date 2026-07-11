@@ -1,0 +1,12 @@
+{
+  "id": "anchor-03",
+  "title": "嵌套锚点与墨水指示器",
+  "description": "合并展示嵌套锚点、墨水指示器，减少重复示例块。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

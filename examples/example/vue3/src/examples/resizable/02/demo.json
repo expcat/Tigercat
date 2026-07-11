@@ -1,0 +1,12 @@
+{
+  "id": "resizable-02",
+  "title": "锁定宽高比 & 单轴",
+  "description": "lockAspectRatio / axis='x'",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

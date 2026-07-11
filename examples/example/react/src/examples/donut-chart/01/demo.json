@@ -1,0 +1,12 @@
+{
+  "id": "donut-chart-01",
+  "title": "组合展示",
+  "description": "合并展示基础用法、悬停高亮、点击选中、显示图例、显示提示框、自定义样式，减少重复示例块。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

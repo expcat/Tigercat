@@ -1,0 +1,12 @@
+{
+  "id": "skeleton-03",
+  "title": "动画效果",
+  "description": "支持脉冲、波浪和无动画三种效果。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "link-04",
+  "title": "下划线",
+  "description": "underline=true（默认）悬停显示下划线；underline=false 无下划线。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

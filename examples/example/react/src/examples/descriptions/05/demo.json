@@ -1,0 +1,12 @@
+{
+  "id": "descriptions-05",
+  "title": "自定义列数",
+  "description": "通过 column 属性设置每行显示的列数。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

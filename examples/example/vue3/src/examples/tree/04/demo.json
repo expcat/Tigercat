@@ -1,0 +1,12 @@
+{
+  "id": "tree-04",
+  "title": "连接线等组合展示",
+  "description": "合并展示连接线、多选（selectionMode）、受控展开等互不冲突的使用方式。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

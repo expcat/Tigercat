@@ -1,0 +1,12 @@
+{
+  "id": "image-06",
+  "title": "关闭预览",
+  "description": "设置 :preview=\"false\" 禁用点击预览",
+  "entry": "App.vue",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

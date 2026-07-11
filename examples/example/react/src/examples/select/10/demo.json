@@ -1,0 +1,12 @@
+{
+  "id": "select-10",
+  "title": "分组选项",
+  "description": "支持传入分组数据（group label + options）。",
+  "entry": "App.tsx",
+  "order": 10,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

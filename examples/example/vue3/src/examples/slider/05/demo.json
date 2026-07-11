@@ -1,0 +1,12 @@
+{
+  "id": "slider-05",
+  "title": "带标记",
+  "description": "通过 marks 显示刻度标记。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "backtop-03",
+  "title": "点击回调",
+  "description": "点击按钮时触发回调函数。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "fixed",
+    "height": 420,
+    "minHeight": 420,
+    "maxHeight": 420
+  }
+}

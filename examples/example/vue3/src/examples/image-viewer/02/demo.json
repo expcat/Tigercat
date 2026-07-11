@@ -1,0 +1,12 @@
+{
+  "id": "image-viewer-02",
+  "title": "全部功能",
+  "description": "缩放、旋转、导航按钮和计数器",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

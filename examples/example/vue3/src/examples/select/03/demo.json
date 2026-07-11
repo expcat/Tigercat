@@ -1,0 +1,12 @@
+{
+  "id": "select-03",
+  "title": "禁用状态",
+  "description": "禁用整个选择器组件。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

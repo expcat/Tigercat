@@ -1,0 +1,12 @@
+{
+  "id": "checkbox-08",
+  "title": "分组尺寸继承",
+  "description": "CheckboxGroup 设置 size 后子复选框继承，个别子项可通过自身 size 覆盖。",
+  "entry": "App.vue",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

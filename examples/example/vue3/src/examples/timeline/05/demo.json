@@ -1,0 +1,12 @@
+{
+  "id": "timeline-05",
+  "title": "自定义节点（dot 插槽）",
+  "description": "通过 #dot 插槽统一控制节点渲染。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

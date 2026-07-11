@@ -1,0 +1,12 @@
+{
+  "id": "layout-01",
+  "title": "Container 容器",
+  "description": "用于约束内容宽度并提供响应式内边距。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

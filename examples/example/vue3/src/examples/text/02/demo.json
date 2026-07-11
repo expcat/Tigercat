@@ -1,0 +1,12 @@
+{
+  "id": "text-02",
+  "title": "语义标签",
+  "description": "通过 tag 属性渲染不同语义标签。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

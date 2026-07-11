@@ -1,0 +1,12 @@
+{
+  "id": "list-08",
+  "title": "头部和底部",
+  "description": "列表可以添加头部和底部内容。",
+  "entry": "App.tsx",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

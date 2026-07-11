@@ -1,0 +1,12 @@
+{
+  "id": "notification-center-01",
+  "title": "组合展示",
+  "description": "合并展示分组已读管理、加载态与空态。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

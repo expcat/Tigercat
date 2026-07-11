@@ -1,0 +1,12 @@
+{
+  "id": "datepicker-08",
+  "title": "可清除",
+  "description": "使用 clearable 属性控制是否显示清除按钮。",
+  "entry": "App.tsx",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

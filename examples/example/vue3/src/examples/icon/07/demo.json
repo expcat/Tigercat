@@ -1,0 +1,12 @@
+{
+  "id": "icon-07",
+  "title": "填充图标",
+  "description": "通过 SVG 属性 fill='currentColor' stroke='none' 切换为填充风格。",
+  "entry": "App.vue",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

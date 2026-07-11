@@ -1,0 +1,12 @@
+{
+  "id": "tree-03",
+  "title": "节点过滤",
+  "description": "根据关键字过滤节点。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

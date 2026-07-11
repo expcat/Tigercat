@@ -1,0 +1,12 @@
+{
+  "id": "cron-editor-02",
+  "title": "预设、校验与状态",
+  "description": "支持预设选择、字段可视化编辑和错误提示。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "space-04",
+  "title": "对齐方式",
+  "description": "align 控制交叉轴对齐（start/center/end/baseline/stretch）。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

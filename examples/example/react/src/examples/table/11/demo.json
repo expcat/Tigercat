@@ -1,0 +1,13 @@
+{
+  "id": "table-11",
+  "title": "固定列样式自定义",
+  "description": "通过 fixedClassName / fixedHeaderClassName 按列覆盖 sticky 单元格外观；下面示例会在勾选行后高亮固定列。",
+  "entry": "App.tsx",
+  "order": 11,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

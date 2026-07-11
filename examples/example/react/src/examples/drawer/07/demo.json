@@ -1,0 +1,12 @@
+{
+  "id": "drawer-07",
+  "title": "自定义文案 (labels)",
+  "description": "单语言项目无需引入 locale，直接用扁平 labels 覆盖关闭按钮的 aria-label。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

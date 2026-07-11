@@ -1,0 +1,12 @@
+{
+  "id": "checkbox-01",
+  "title": "基础用法",
+  "description": "单独使用可以表示两种状态之间的切换。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

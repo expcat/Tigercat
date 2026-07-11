@@ -102,6 +102,7 @@
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
+    "@tailwindcss/browser": "catalog:",
     "@types/node": "catalog:",
     "@types/react-dom": "catalog:",
     "@types/react-test-renderer": "^19.1.0",
@@ -109,11 +110,13 @@
     "@typescript-eslint/eslint-plugin": "^8.63.0",
     "@typescript-eslint/parser": "^8.63.0",
     "@vitejs/plugin-vue": "catalog:",
+    "@vue/compiler-sfc": "catalog:",
     "@vitest/coverage-v8": "^4.1.10",
     "@vitest/ui": "^4.1.10",
     "@vue/server-renderer": "catalog:",
     "axe-core": "catalog:",
     "esbuild": "0.28.1",
+    "esbuild-wasm": "catalog:",
     "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
@@ -126,7 +129,8 @@
     "size-limit": "^12.1.0",
     "typescript": "catalog:",
     "vitest": "^4.1.10",
-    "vue": "catalog:"
+    "vue": "catalog:",
+    "vite": "catalog:"
   },
   "packageManager": "pnpm@11.9.0",
   "engines": {

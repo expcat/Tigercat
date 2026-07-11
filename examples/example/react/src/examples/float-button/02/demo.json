@@ -1,0 +1,12 @@
+{
+  "id": "float-button-02",
+  "title": "独立悬浮",
+  "description": "单个 FloatButton 可直接固定到视口角落。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

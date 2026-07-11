@@ -1,0 +1,12 @@
+{
+  "id": "result-03",
+  "title": "自定义操作按钮",
+  "description": "通过 extra 添加操作按钮",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

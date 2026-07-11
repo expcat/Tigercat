@@ -1,54 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Transfer } from '@expcat/tigercat-vue/Transfer'
-import DemoBlock from '../components/DemoBlock.vue'
-import fullPageSnippet from './TransferDemo.vue?raw'
+import DemoPage from '../components/DemoPage.vue'
+import { getDemoModules } from '../playground/registry'
 
-const targetKeys1 = ref<(string | number)[]>(['3', '4'])
-const targetKeys2 = ref<(string | number)[]>(['3', '4'])
-const dataSource = Array.from({ length: 10 }, (_, i) => ({
-  key: String(i + 1),
-  label: `内容 ${i + 1}`,
-  description: `描述 ${i + 1}`
-}))
-
-const basicScriptSnippet = `import { ref } from 'vue'
-
-const targetKeys1 = ref(['3', '4'])`
-
-const basicSnippet = `<Transfer
-  v-model="targetKeys"
-  :data-source="dataSource"
-/>`
-
-const searchSnippet = `<Transfer
-  v-model="targetKeys"
-  :data-source="dataSource"
-  searchable
-  source-title="可选"
-  target-title="已选"
-/>`
+// TransferDemo
+const modules = getDemoModules('transfer')
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-4 sm:p-8">
-    <h1 class="text-3xl font-bold mb-2">Transfer 穿梭框</h1>
-    <p class="text-gray-500 mb-8">双栏穿梭选择，将数据在两栏之间移动。</p>
-
-    <DemoBlock title="基本用法" description="双向穿梭选择" :code="fullPageSnippet">
-      <Transfer v-model="targetKeys1" :data-source="dataSource" />
-    </DemoBlock>
-
-    <DemoBlock
-      title="搜索与标题"
-      description="searchable 开启搜索，source-title / target-title 自定义标题"
-      :code="fullPageSnippet">
-      <Transfer
-        v-model="targetKeys2"
-        :data-source="dataSource"
-        searchable
-        source-title="可选"
-        target-title="已选" />
-    </DemoBlock>
-  </div>
+  <DemoPage
+    title="Transfer 穿梭框"
+    description="双栏穿梭选择，将数据在两栏之间移动。"
+    :modules="modules" />
 </template>

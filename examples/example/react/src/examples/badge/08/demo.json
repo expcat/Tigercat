@@ -1,0 +1,12 @@
+{
+  "id": "badge-08",
+  "title": "徽章位置",
+  "description": "在包裹模式下，可以设置徽章的位置。",
+  "entry": "App.tsx",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

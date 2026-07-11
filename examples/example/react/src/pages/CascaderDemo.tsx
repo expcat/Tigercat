@@ -1,87 +1,14 @@
-import { Space } from '@expcat/tigercat-react/Space'
-import { useState } from 'react'
-import { Cascader } from '@expcat/tigercat-react/Cascader'
-import DemoBlock from '../components/DemoBlock'
-import fullPageSnippet from './CascaderDemo.tsx?raw'
+import DemoPage from '../components/DemoPage'
+import { getDemoModules } from '../playground/registry'
 
-const options = [
-  {
-    label: '浙江',
-    value: 'zj',
-    children: [
-      {
-        label: '杭州',
-        value: 'hz',
-        children: [
-          { label: '西湖区', value: 'xh' },
-          { label: '余杭区', value: 'yh' }
-        ]
-      },
-      { label: '宁波', value: 'nb', children: [{ label: '鄞州区', value: 'yz' }] }
-    ]
-  },
-  {
-    label: '江苏',
-    value: 'js',
-    children: [
-      {
-        label: '南京',
-        value: 'nj',
-        children: [
-          { label: '鼓楼区', value: 'gl' },
-          { label: '玄武区', value: 'xw' }
-        ]
-      },
-      { label: '苏州', value: 'sz', children: [{ label: '虎丘区', value: 'hq' }] }
-    ]
-  }
-]
+const modules = getDemoModules('cascader')
 
-const basicSnippet = `<Cascader value={val} onChange={setVal} options={options} placeholder="请选择地区" />`
-
-const basicScriptSnippet = `import { useState } from 'react'
-
-const [val, setVal] = useState([])`
-
-const searchSnippet = `<Cascader value={val} onChange={setVal} options={options} placeholder="搜索地区" searchable />`
-const sizeSnippet = `<Cascader options={options} placeholder="小" size="sm" />
-<Cascader options={options} placeholder="中" size="md" />
-<Cascader options={options} placeholder="大" size="lg" />
-<Cascader options={options} placeholder="禁用" disabled />`
-
-const CascaderDemo: React.FC = () => {
-  const [val, setVal] = useState<(string | number)[]>([])
-  const [val2, setVal2] = useState<(string | number)[]>([])
-
+export default function CascaderDemo() {
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-8">
-      <h1 className="text-3xl font-bold mb-2">Cascader 级联选择</h1>
-      <p className="text-gray-500 mb-8">多级联动选择器，适用于省市区等层级数据。</p>
-
-      <DemoBlock title="基本用法" description="逐级选择" code={fullPageSnippet}>
-        <Cascader value={val} onChange={setVal} options={options} placeholder="请选择地区" />
-      </DemoBlock>
-
-      <DemoBlock title="可搜索" description="searchable 开启搜索过滤" code={fullPageSnippet}>
-        <Cascader
-          value={val2}
-          onChange={setVal2}
-          options={options}
-          placeholder="搜索地区"
-          searchable
-        />
-      </DemoBlock>
-
-      <DemoBlock title="尺寸与禁用" description="sm/md/lg 三种尺寸" code={fullPageSnippet}>
-        <Space direction="vertical" size={12}>
-          <Cascader options={options} placeholder="小" size="sm" />
-          <Cascader options={options} placeholder="中" size="md" />
-          <Cascader options={options} placeholder="大" size="lg" />
-          <Cascader options={options} placeholder="禁用" disabled />
-        </Space>
-      </DemoBlock>
-    </div>
+    <DemoPage
+      title="Cascader 级联选择"
+      description="多级联动选择器，适用于省市区等层级数据。"
+      modules={modules}
+    />
   )
 }
-
-export default CascaderDemo

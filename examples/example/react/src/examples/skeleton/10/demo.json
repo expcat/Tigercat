@@ -1,0 +1,12 @@
+{
+  "id": "skeleton-10",
+  "title": "真实场景示例",
+  "description": "卡片列表加载效果（3.5秒后显示内容）。",
+  "entry": "App.tsx",
+  "order": 10,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

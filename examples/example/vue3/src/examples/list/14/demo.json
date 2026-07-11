@@ -1,0 +1,12 @@
+{
+  "id": "list-14",
+  "title": "竖直布局",
+  "description": "通过 itemLayout=\"vertical\" 将列表项内容竖直排列。",
+  "entry": "App.vue",
+  "order": 14,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "card-01",
+  "title": "基本用法",
+  "description": "最简单的卡片，包含基本内容。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "drawer-06",
+  "title": "隐藏关闭按钮",
+  "description": "设置 closable=false 可以隐藏关闭按钮。",
+  "entry": "App.vue",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

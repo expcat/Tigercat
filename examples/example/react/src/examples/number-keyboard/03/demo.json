@@ -1,0 +1,12 @@
+{
+  "id": "number-keyboard-03",
+  "title": "身份证输入",
+  "description": "id-card 模式允许末位输入 X",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

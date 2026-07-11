@@ -1,0 +1,13 @@
+{
+  "id": "backtop-02",
+  "title": "自定义滚动容器",
+  "description": "指定 target 监听自定义容器的滚动。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "fixed",
+    "height": 420,
+    "minHeight": 420,
+    "maxHeight": 420
+  }
+}

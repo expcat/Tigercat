@@ -1,0 +1,12 @@
+{
+  "id": "image-cropper-01",
+  "title": "基本用法",
+  "description": "自由裁剪，拖拽和缩放裁剪区域",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

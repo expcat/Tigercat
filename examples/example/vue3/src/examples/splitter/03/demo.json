@@ -1,0 +1,12 @@
+{
+  "id": "splitter-03",
+  "title": "嵌套分割",
+  "description": "水平套垂直，实现 IDE 布局",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "select-07",
+  "title": "可搜索",
+  "description": "启用 searchable 后可在下拉中输入关键字过滤选项。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "image-07",
+  "title": "图片组 ImageGroup",
+  "description": "用 ImageGroup 包裹多张 Image，点击任一图片进入多图预览",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

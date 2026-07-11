@@ -1,0 +1,12 @@
+{
+  "id": "message-04",
+  "title": "完整流程示例",
+  "description": "模拟表单提交的完整流程。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

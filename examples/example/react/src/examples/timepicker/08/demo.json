@@ -1,0 +1,12 @@
+{
+  "id": "timepicker-08",
+  "title": "禁用和只读",
+  "description": "时间选择器可以设置为禁用或只读状态。",
+  "entry": "App.tsx",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

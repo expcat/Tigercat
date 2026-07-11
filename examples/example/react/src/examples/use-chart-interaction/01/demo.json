@@ -1,0 +1,12 @@
+{
+  "id": "use-chart-interaction-01",
+  "title": "自定义柱状图",
+  "description": "使用该 Hook 实现自定义图表的悬停高亮和点击选中。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "image-08",
+  "title": "独立 ImagePreview",
+  "description": "直接使用 ImagePreview 组件，可编程控制预览",
+  "entry": "App.tsx",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

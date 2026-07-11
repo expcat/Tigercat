@@ -1,0 +1,12 @@
+{
+  "id": "badge-02",
+  "title": "徽章类型",
+  "description": "徽章有六种颜色类型：默认、主要、成功、警告、危险和信息。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

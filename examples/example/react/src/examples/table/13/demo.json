@@ -1,0 +1,13 @@
+{
+  "id": "table-13",
+  "title": "表头锁按钮",
+  "description": "点击表头的小锁按钮锁定/解锁该列（默认锁定到左侧）。",
+  "entry": "App.tsx",
+  "order": 13,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

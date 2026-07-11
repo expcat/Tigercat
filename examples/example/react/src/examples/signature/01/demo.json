@@ -1,0 +1,12 @@
+{
+  "id": "signature-01",
+  "title": "基本用法",
+  "description": "通过 onChange 获取当前签名导出值",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

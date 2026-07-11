@@ -1,0 +1,12 @@
+{
+  "id": "tooltip-02",
+  "title": "受控模式",
+  "description": "可以通过 open 属性控制气泡提示的显示和隐藏。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

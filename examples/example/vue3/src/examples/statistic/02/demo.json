@@ -1,0 +1,12 @@
+{
+  "id": "statistic-02",
+  "title": "前后缀与尺寸",
+  "description": "prefix/suffix 和 size 控制",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

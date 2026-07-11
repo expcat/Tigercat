@@ -1,0 +1,12 @@
+{
+  "id": "drawer-08",
+  "title": "关闭时销毁",
+  "description": "设置 destroy-on-close 可以在关闭时销毁内容，适用于表单重置等场景。",
+  "entry": "App.vue",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

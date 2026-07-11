@@ -1,0 +1,12 @@
+{
+  "id": "popconfirm-02",
+  "title": "不同位置等组合展示",
+  "description": "合并展示不同位置、不同图标类型、自定义按钮文字等互不冲突的使用方式。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

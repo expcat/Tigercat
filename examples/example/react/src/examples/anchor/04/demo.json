@@ -1,0 +1,12 @@
+{
+  "id": "anchor-04",
+  "title": "事件处理",
+  "description": "监听 onClick 和 onChange 事件，可配合 targetOffset 使用。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

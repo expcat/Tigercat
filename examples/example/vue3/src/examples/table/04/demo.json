@@ -1,0 +1,13 @@
+{
+  "id": "table-04",
+  "title": "筛选功能",
+  "description": "支持文本筛选和下拉选择筛选。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

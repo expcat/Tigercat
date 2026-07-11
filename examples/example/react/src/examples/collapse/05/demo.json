@@ -1,0 +1,12 @@
+{
+  "id": "collapse-05",
+  "title": "图标位置",
+  "description": "可以将展开图标放在右侧。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

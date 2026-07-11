@@ -1,0 +1,11 @@
+{
+  "id": "splitter-02",
+  "title": "垂直分割",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

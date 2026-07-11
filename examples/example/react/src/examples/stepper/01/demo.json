@@ -1,0 +1,12 @@
+{
+  "id": "stepper-01",
+  "title": "基本用法",
+  "description": "value + onChange 受控，min/max 范围",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "link-06",
+  "title": "点击事件",
+  "description": "通过 onClick 回调处理交互逻辑。",
+  "entry": "App.tsx",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

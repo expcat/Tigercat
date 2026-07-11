@@ -1,0 +1,12 @@
+{
+  "id": "dropdown-04",
+  "title": "多种按钮样式等组合展示",
+  "description": "合并展示多种按钮样式、无箭头指示器、点击不关闭等互不冲突的使用方式。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

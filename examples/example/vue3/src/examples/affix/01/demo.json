@@ -1,0 +1,13 @@
+{
+  "id": "affix-01",
+  "title": "固定在顶部与底部固定",
+  "description": "合并展示固定在顶部、底部固定，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "fixed",
+    "height": 420,
+    "minHeight": 420,
+    "maxHeight": 420
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "message-07",
+  "title": "自定义样式",
+  "description": "可以通过 className 属性添加自定义样式类。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

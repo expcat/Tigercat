@@ -1,0 +1,12 @@
+{
+  "id": "slider-09",
+  "title": "默认值",
+  "description": "通过 defaultValue 设置初始值，无需绱定受控状态（非受控模式）。",
+  "entry": "App.tsx",
+  "order": 9,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "table-05",
+  "title": "自定义列渲染",
+  "description": "通过 render 函数自定义单元格内容。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "datepicker-02",
+  "title": "范围选择",
+  "description": "选择开始日期与结束日期。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

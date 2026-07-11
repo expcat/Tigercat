@@ -1,0 +1,12 @@
+{
+  "id": "image-05",
+  "title": "图片预览模式",
+  "description": "支持点击图片进入全屏预览（默认），也可通过 previewTrigger='hover' 开启悬停放大预览。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

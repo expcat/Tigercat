@@ -1,0 +1,12 @@
+{
+  "id": "tabs-01",
+  "title": "基本用法与卡片式标签页",
+  "description": "合并展示基本用法、卡片式标签页，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

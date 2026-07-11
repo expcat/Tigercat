@@ -1,0 +1,12 @@
+{
+  "id": "file-manager-01",
+  "title": "组合展示",
+  "description": "合并展示列表视图、网格视图、多选 & 面包屑导航，减少重复示例块。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

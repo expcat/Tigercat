@@ -1,0 +1,11 @@
+{
+  "id": "icon-02",
+  "title": "全部内置图标",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

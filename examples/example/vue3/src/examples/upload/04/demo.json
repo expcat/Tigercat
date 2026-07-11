@@ -1,0 +1,13 @@
+{
+  "id": "upload-04",
+  "title": "文件数量限制",
+  "description": "通过 limit 属性限制上传文件的数量。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["popups"]
+}

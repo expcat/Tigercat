@@ -1,0 +1,12 @@
+{
+  "id": "splitter-01",
+  "title": "水平分割",
+  "description": "拖拽分割条调整面板大小",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

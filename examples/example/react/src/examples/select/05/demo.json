@@ -1,0 +1,12 @@
+{
+  "id": "select-05",
+  "title": "禁用选项",
+  "description": "可以禁用单个选项。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

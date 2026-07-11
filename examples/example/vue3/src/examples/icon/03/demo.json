@@ -1,0 +1,11 @@
+{
+  "id": "icon-03",
+  "title": "扩展图标（按需导入）",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

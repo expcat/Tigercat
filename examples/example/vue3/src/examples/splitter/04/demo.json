@@ -1,0 +1,12 @@
+{
+  "id": "splitter-04",
+  "title": "最小尺寸",
+  "description": "min 限制面板最小尺寸",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "slider-04",
+  "title": "范围选择",
+  "description": "通过 range 启用范围选择，此时值为 [min, max]。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

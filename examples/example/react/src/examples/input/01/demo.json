@@ -1,0 +1,12 @@
+{
+  "id": "input-01",
+  "title": "输入方式与外观",
+  "description": "合并展示基础输入、受控/非受控、常见类型、尺寸、禁用只读和前后缀。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

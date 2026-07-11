@@ -1,0 +1,12 @@
+{
+  "id": "tabs-03",
+  "title": "不同位置等组合展示",
+  "description": "合并展示不同位置、居中标签、不同尺寸等互不冲突的使用方式。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

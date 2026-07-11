@@ -1,0 +1,12 @@
+{
+  "id": "alert-06",
+  "title": "带描述信息",
+  "description": "使用 description 属性可以添加详细的描述内容。",
+  "entry": "App.tsx",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

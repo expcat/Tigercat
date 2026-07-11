@@ -1,0 +1,12 @@
+{
+  "id": "skeleton-02",
+  "title": "骨架屏变体",
+  "description": "支持文本、头像、图片、按钮和自定义等多种变体。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

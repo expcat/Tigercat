@@ -1,0 +1,12 @@
+{
+  "id": "steps-02",
+  "title": "纵向步骤条等组合展示",
+  "description": "合并展示纵向步骤条、可点击步骤、自定义图标等互不冲突的使用方式。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

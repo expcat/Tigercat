@@ -1,0 +1,13 @@
+{
+  "id": "loading-02",
+  "title": "全屏加载",
+  "description": "使用 fullscreen 属性可以创建全屏加载遮罩层。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["fullscreen"]
+}

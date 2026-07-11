@@ -1,0 +1,12 @@
+{
+  "id": "modal-04",
+  "title": "禁用遮罩关闭等组合展示",
+  "description": "合并展示禁用遮罩关闭、无遮罩、关闭时销毁等互不冲突的使用方式。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

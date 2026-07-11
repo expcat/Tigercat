@@ -1,0 +1,12 @@
+{
+  "id": "qrcode-01",
+  "title": "基本用法与尺寸",
+  "description": "通过 size 控制二维码大小",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

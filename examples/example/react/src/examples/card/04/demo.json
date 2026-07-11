@@ -1,0 +1,12 @@
+{
+  "id": "card-04",
+  "title": "可悬停卡片",
+  "description": "鼠标悬停时显示交互效果。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

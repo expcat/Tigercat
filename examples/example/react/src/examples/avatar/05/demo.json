@@ -1,0 +1,12 @@
+{
+  "id": "avatar-05",
+  "title": "头像尺寸",
+  "description": "头像有四种尺寸：小、中、大、超大。",
+  "entry": "App.tsx",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

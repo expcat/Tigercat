@@ -1,0 +1,12 @@
+{
+  "id": "empty-02",
+  "title": "自定义内容",
+  "description": "自定义描述文字和操作按钮",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

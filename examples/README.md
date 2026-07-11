@@ -18,6 +18,23 @@ examples/
 └── index.html  # GitHub Pages 入口
 ```
 
+## 可编辑示例模块
+
+React 与 Vue 组件页中的每个展示块都是独立运行模块。模块放在对应应用的
+`src/examples/<route>/<id>/` 下：
+
+```text
+01/
+├── demo.json  # id、标题、描述、顺序、入口、视口与可选沙箱权限
+├── App.tsx    # React 入口；Vue 使用 App.vue
+└── data.ts    # 可选的同目录辅助文件
+```
+
+- React 入口默认导出函数组件；Vue 入口使用标准 `<script setup>` SFC。
+- 模块可导入同目录文本文件、框架运行时、Tigercat 公开入口及 `@demo-shared`，不支持任意 npm 包或 Node 内置模块。
+- 页面首次展示及点击“运行”都在无同源权限的 iframe 中执行；编辑内容只保留在当前页面内存，刷新即恢复仓库源码。
+- `Cmd/Ctrl+Enter` 可运行，编译失败会保留最后一次成功预览；复杂示例可在 `demo.json` 中声明固定视口或沙箱权限。
+
 ## 运行
 
 ```bash
@@ -79,9 +96,9 @@ export default {
 
 1. `examples/example/shared/app-config.ts` 中的分类、描述和路径。
 2. `examples/example/vue3/src` 与 `examples/example/react/src` 中的组件 value imports 是否继续使用 PascalCase 子路径；hooks/composables、`notification`、共享类型可继续走根入口或 core。
-3. DemoBlock 展示代码是否来自同页 `?raw` 源码或可验证 fixture，避免手写片段与实际预览漂移；新增或修改后运行 `pnpm example:sources:check`。
-4. 多个互不冲突的展示效果是否已合并到同一个 DemoBlock 中，例如类型、尺寸、状态、禁用、只读和布局密度；互相干扰的弹层、异步流程和表单提交场景才保留独立块。
-5. 路由页是否继续通过 `React.lazy` / `defineAsyncComponent` 懒加载。
+3. 每个 `demo.json` 是否拥有唯一 ID、有效入口和稳定顺序，源码是否能在独立沙箱中运行；新增或修改后运行 `pnpm example:sources:check`。
+4. 模块是否只保留自身状态和交互；弹层、异步流程、焦点与滚动场景不得依赖同页面其他示例。
+5. 路由页是否继续通过 `React.lazy` / 原生 Vue Router import factory 懒加载，模块源码和浏览器编译器是否保持按需加载。
 6. 对应组件分组测试是否通过，例如 `pnpm test:group:form` 或 `pnpm test:group -- --group feedback --framework react`。
 7. `pnpm example:build` 是否通过；SSR、懒加载或按需导入变更还需要 `pnpm example:ssr:check`。
 8. 本次变更文件是否通过 changed-file Prettier check。

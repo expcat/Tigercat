@@ -1,0 +1,12 @@
+{
+  "id": "list-03",
+  "title": "边框样式",
+  "description": "列表支持多种边框样式。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

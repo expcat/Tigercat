@@ -1,0 +1,12 @@
+{
+  "id": "calendar-03",
+  "title": "禁用日期",
+  "description": "disabledDate 函数禁用周末",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

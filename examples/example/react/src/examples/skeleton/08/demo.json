@@ -1,0 +1,12 @@
+{
+  "id": "skeleton-08",
+  "title": "组合使用",
+  "description": "组合多个 Skeleton 组件创建复杂的加载状态。",
+  "entry": "App.tsx",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

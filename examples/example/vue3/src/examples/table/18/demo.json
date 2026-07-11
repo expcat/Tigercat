@@ -1,0 +1,13 @@
+{
+  "id": "table-18",
+  "title": "可展开行",
+  "description": "通过 expandable 配置展开行内容，支持受控展开和行级禁用。仅 status=active 的行可展开。",
+  "entry": "App.vue",
+  "order": 18,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

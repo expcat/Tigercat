@@ -1,0 +1,12 @@
+{
+  "id": "badge-10",
+  "title": "实际应用示例",
+  "description": "模拟真实的使用场景。",
+  "entry": "App.vue",
+  "order": 10,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

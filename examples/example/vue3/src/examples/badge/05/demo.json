@@ -1,0 +1,12 @@
+{
+  "id": "badge-05",
+  "title": "文本徽章",
+  "description": "显示文本内容的徽章。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

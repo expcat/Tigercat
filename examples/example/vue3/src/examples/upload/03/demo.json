@@ -1,0 +1,13 @@
+{
+  "id": "upload-03",
+  "title": "多文件上传",
+  "description": "通过设置 multiple 属性允许同时选择多个文件。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["popups"]
+}

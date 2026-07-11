@@ -1,0 +1,12 @@
+{
+  "id": "image-cropper-03",
+  "title": "隐藏辅助线",
+  "description": "guides=false 隐藏三分线",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

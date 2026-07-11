@@ -1,0 +1,12 @@
+{
+  "id": "radio-04",
+  "title": "禁用状态",
+  "description": "单选框不可用的状态。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

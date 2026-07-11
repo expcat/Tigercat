@@ -1,0 +1,12 @@
+{
+  "id": "countdown-01",
+  "title": "基本用法",
+  "description": "使用目标时间展示剩余时长",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "grid-04",
+  "title": "Row 对齐与分布",
+  "description": "justify 控制水平分布，align 控制垂直对齐。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

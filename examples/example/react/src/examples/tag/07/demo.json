@@ -1,0 +1,12 @@
+{
+  "id": "tag-07",
+  "title": "不同类型的可关闭标签",
+  "description": "展示不同变体的可关闭标签。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "layout-07",
+  "title": "Mini 模式侧边栏",
+  "description": "collapsedWidth 设为更小的值（如 48px）实现 mini 模式，折叠时仅显示图标。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

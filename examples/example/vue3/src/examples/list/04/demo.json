@@ -1,0 +1,12 @@
+{
+  "id": "list-04",
+  "title": "分割线（split）",
+  "description": "当 bordered=\"divided\" 时，可通过 split 控制是否显示分割线。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

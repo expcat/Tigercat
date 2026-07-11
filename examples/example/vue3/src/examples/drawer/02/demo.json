@@ -1,0 +1,12 @@
+{
+  "id": "drawer-02",
+  "title": "不同位置与不同尺寸与内边距",
+  "description": "合并展示不同位置、不同尺寸与内边距，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

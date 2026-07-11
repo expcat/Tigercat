@@ -1,0 +1,12 @@
+{
+  "id": "icon-06",
+  "title": "颜色定制",
+  "description": "默认继承文本颜色，也可以通过 color 属性指定。",
+  "entry": "App.tsx",
+  "order": 6,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

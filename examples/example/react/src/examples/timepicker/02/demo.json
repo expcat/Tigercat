@@ -1,0 +1,12 @@
+{
+  "id": "timepicker-02",
+  "title": "时间段选择",
+  "description": "启用 range 后可选择开始/结束时间。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

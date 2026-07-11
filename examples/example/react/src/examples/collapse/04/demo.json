@@ -1,0 +1,12 @@
+{
+  "id": "collapse-04",
+  "title": "透明背景",
+  "description": "背景透明的 Ghost 模式。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

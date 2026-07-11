@@ -1,63 +1,14 @@
 <script setup lang="ts">
-import { Button } from '@expcat/tigercat-vue/Button'
-import { ref } from 'vue'
-import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'
-import DemoBlock from '../components/DemoBlock.vue'
-import fullPageSnippet from './ImageViewerDemo.vue?raw'
+import DemoPage from '../components/DemoPage.vue'
+import { getDemoModules } from '../playground/registry'
 
-const open1 = ref(false)
-const open2 = ref(false)
-
-const images = [
-  'https://picsum.photos/800/600?random=1',
-  'https://picsum.photos/800/600?random=2',
-  'https://picsum.photos/800/600?random=3',
-  'https://picsum.photos/800/600?random=4'
-]
-
-const basicSnippet = `<Button @click="open1 = true">查看图片</Button>
-<ImageViewer
-  v-model:open="open1"
-  :images="images"
-/>`
-
-const basicScriptSnippet = `import { ref } from 'vue'
-
-const open1 = ref(false)
-const open2 = ref(false)`
-
-const featureSnippet = `<Button @click="open2 = true">打开查看器（第2张）</Button>
-<ImageViewer
-  v-model:open="open2"
-  :images="images"
-  :current-index="1"
-  :zoomable="true"
-  :rotatable="true"
-  :show-nav="true"
-  :show-counter="true"
-/>`
+// ImageViewerDemo
+const modules = getDemoModules('image-viewer')
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-4 sm:p-8">
-    <h1 class="text-3xl font-bold mb-2">ImageViewer 图片查看器</h1>
-    <p class="text-gray-500 mb-8">全屏图片预览，支持缩放、旋转和多图切换。</p>
-
-    <DemoBlock title="基本用法" description="点击按钮打开图片查看器" :code="fullPageSnippet">
-      <Button @click="open1 = true">查看图片</Button>
-      <ImageViewer v-model:open="open1" :images="images" />
-    </DemoBlock>
-
-    <DemoBlock title="全部功能" description="缩放、旋转、导航按钮和计数器" :code="fullPageSnippet">
-      <Button @click="open2 = true">打开查看器（第2张）</Button>
-      <ImageViewer
-        v-model:open="open2"
-        :images="images"
-        :current-index="1"
-        :zoomable="true"
-        :rotatable="true"
-        :show-nav="true"
-        :show-counter="true" />
-    </DemoBlock>
-  </div>
+  <DemoPage
+    title="ImageViewer 图片查看器"
+    description="全屏图片预览，支持缩放、旋转和多图切换。"
+    :modules="modules" />
 </template>

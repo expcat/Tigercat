@@ -1,0 +1,12 @@
+{
+  "id": "alert-02",
+  "title": "提示类型",
+  "description": "Alert 组件支持 4 种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

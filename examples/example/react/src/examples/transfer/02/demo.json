@@ -1,0 +1,12 @@
+{
+  "id": "transfer-02",
+  "title": "搜索与标题",
+  "description": "searchable 开启搜索",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

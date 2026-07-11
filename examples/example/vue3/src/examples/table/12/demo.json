@@ -1,0 +1,13 @@
+{
+  "id": "table-12",
+  "title": "固定列内的下拉菜单",
+  "description": "行内 Dropdown 菜单默认渲染到 body（Teleport），展开后不会被后续行的固定列遮挡，也不会被表格滚动容器裁剪。如需回到旧的原位渲染，可设置 :portal=\"false\"。",
+  "entry": "App.vue",
+  "order": 12,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["modals"]
+}

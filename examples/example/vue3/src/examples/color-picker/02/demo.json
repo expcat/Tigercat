@@ -1,0 +1,12 @@
+{
+  "id": "color-picker-02",
+  "title": "透明度、预设与尺寸",
+  "description": "showAlpha 透明度，presets 预设色板",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

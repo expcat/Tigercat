@@ -1,70 +1,14 @@
-import { useState } from 'react'
-import { Empty } from '@expcat/tigercat-react/Empty'
-import { Button } from '@expcat/tigercat-react/Button'
-import { Space } from '@expcat/tigercat-react/Space'
-import DemoBlock from '../components/DemoBlock'
-import fullPageSnippet from './EmptyDemo.tsx?raw'
+import DemoPage from '../components/DemoPage'
+import { getDemoModules } from '../playground/registry'
 
-const presetSnippet = `<Space direction="vertical" size={24} className="w-full">
-  <Empty />
-  <Empty preset="no-data" description="暂无数据" />
-  <Empty preset="no-results" description="未找到匹配结果" />
-  <Empty preset="error" description="加载出错了" />
-</Space>`
+const modules = getDemoModules('empty')
 
-const customSnippet = `<Empty description="这里什么都没有" extra={<Button variant="primary">立即创建</Button>} />
-<Empty showImage={false} description="无图片模式，仅显示文字描述" />`
-
-const EmptyDemo: React.FC = () => {
-  const [lastAction, setLastAction] = useState('尚未执行操作')
-
+export default function EmptyDemo() {
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-8">
-      <h1 className="text-3xl font-bold mb-2">Empty 空状态</h1>
-      <p className="text-gray-500 mb-8">空状态时的占位提示，支持多种预设样式。</p>
-
-      <DemoBlock
-        title="预设样式"
-        description="通过 preset 切换不同空状态场景"
-        code={fullPageSnippet}>
-        <Space direction="vertical" size={24} className="w-full">
-          <div className="border rounded-lg p-6">
-            <Empty />
-          </div>
-          <div className="border rounded-lg p-6">
-            <Empty preset="no-data" description="暂无数据" />
-          </div>
-          <div className="border rounded-lg p-6">
-            <Empty preset="no-results" description="未找到匹配结果" />
-          </div>
-          <div className="border rounded-lg p-6">
-            <Empty preset="error" description="加载出错了" />
-          </div>
-        </Space>
-      </DemoBlock>
-
-      <DemoBlock title="自定义内容" description="自定义描述文字和操作按钮" code={fullPageSnippet}>
-        <Space direction="vertical" size={24} className="w-full">
-          <div className="border rounded-lg p-6">
-            <Empty
-              description="这里什么都没有"
-              extra={
-                <Button variant="primary" onClick={() => setLastAction('已创建一条新内容')}>
-                  立即创建
-                </Button>
-              }
-            />
-            <p className="mt-3 text-center text-sm text-gray-600 dark:text-gray-300" role="status">
-              操作反馈：{lastAction}
-            </p>
-          </div>
-          <div className="border rounded-lg p-6">
-            <Empty showImage={false} description="无图片模式，仅显示文字描述" />
-          </div>
-        </Space>
-      </DemoBlock>
-    </div>
+    <DemoPage
+      title="Empty 空状态"
+      description="空状态时的占位提示，支持多种预设样式。"
+      modules={modules}
+    />
   )
 }
-
-export default EmptyDemo

@@ -1,0 +1,12 @@
+{
+  "id": "checkbox-04",
+  "title": "不确定状态",
+  "description": "通过 indeterminate 实现“全选/半选”效果。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "skeleton-07",
+  "title": "自定义尺寸",
+  "description": "通过 width 和 height 属性自定义骨架屏的尺寸。",
+  "entry": "App.vue",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

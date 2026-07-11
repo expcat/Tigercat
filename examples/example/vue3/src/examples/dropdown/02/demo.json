@@ -1,0 +1,12 @@
+{
+  "id": "dropdown-02",
+  "title": "点击事件",
+  "description": "监听菜单项的点击事件，并在页面中回显最近操作。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

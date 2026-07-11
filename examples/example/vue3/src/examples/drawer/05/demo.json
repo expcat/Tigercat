@@ -1,0 +1,12 @@
+{
+  "id": "drawer-05",
+  "title": "点击蒙层不关闭",
+  "description": "设置 mask-closable=false 可以禁止点击蒙层关闭抽屉。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

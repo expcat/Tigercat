@@ -1,0 +1,12 @@
+{
+  "id": "watermark-01",
+  "title": "文字水印",
+  "description": "基本水印效果",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

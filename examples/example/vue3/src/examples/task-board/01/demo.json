@@ -1,0 +1,12 @@
+{
+  "id": "task-board-01",
+  "title": "组合展示",
+  "description": "合并展示受控拖拽、自定义卡片和 labels 文案覆盖。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

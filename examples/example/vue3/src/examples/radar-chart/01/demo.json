@@ -1,0 +1,12 @@
+{
+  "id": "radar-chart-01",
+  "title": "组合展示",
+  "description": "合并展示基础用法、固定最大值、圆形网格 + 分割区域、多系列对比，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

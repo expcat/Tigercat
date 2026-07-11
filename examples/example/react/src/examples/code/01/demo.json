@@ -1,0 +1,12 @@
+{
+  "id": "code-01",
+  "title": "基础用法",
+  "description": "展示代码内容与默认复制按钮。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

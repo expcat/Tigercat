@@ -1,70 +1,14 @@
-import { Button } from '@expcat/tigercat-react/Button'
-import { useState } from 'react'
-import { ImageViewer } from '@expcat/tigercat-react/ImageViewer'
-import DemoBlock from '../components/DemoBlock'
-import fullPageSnippet from './ImageViewerDemo.tsx?raw'
+import DemoPage from '../components/DemoPage'
+import { getDemoModules } from '../playground/registry'
 
-const images = [
-  'https://picsum.photos/800/600?random=1',
-  'https://picsum.photos/800/600?random=2',
-  'https://picsum.photos/800/600?random=3',
-  'https://picsum.photos/800/600?random=4'
-]
+const modules = getDemoModules('image-viewer')
 
-const basicSnippet = `<Button onClick={() => setOpen(true)}>查看图片</Button>
-<ImageViewer open={open} onClose={() => setOpen(false)} images={images} />`
-
-const basicScriptSnippet = `import { useState } from 'react'
-
-const [open, setOpen] = useState(false)
-const images = [
-  'https://picsum.photos/800/600?random=1',
-  'https://picsum.photos/800/600?random=2',
-  'https://picsum.photos/800/600?random=3',
-  'https://picsum.photos/800/600?random=4'
-]`
-
-const featureSnippet = `<Button onClick={() => setOpen2(true)}>打开查看器（第2张）</Button>
-<ImageViewer
-  open={open2}
-  onClose={() => setOpen2(false)}
-  images={images}
-  currentIndex={1}
-  zoomable
-  rotatable
-  showNav
-  showCounter
-/>`
-
-const ImageViewerDemo: React.FC = () => {
-  const [open, setOpen] = useState(false)
-  const [open2, setOpen2] = useState(false)
-
+export default function ImageViewerDemo() {
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-8">
-      <h1 className="text-3xl font-bold mb-2">ImageViewer 图片查看器</h1>
-      <p className="text-gray-500 mb-8">全屏图片预览，支持缩放、旋转和多图切换。</p>
-
-      <DemoBlock title="基本用法" description="点击按钮打开图片查看器" code={fullPageSnippet}>
-        <Button onClick={() => setOpen(true)}>查看图片</Button>
-        <ImageViewer open={open} onClose={() => setOpen(false)} images={images} />
-      </DemoBlock>
-
-      <DemoBlock title="全部功能" description="缩放、旋转、导航按钮和计数器" code={fullPageSnippet}>
-        <Button onClick={() => setOpen2(true)}>打开查看器（第2张）</Button>
-        <ImageViewer
-          open={open2}
-          onClose={() => setOpen2(false)}
-          images={images}
-          currentIndex={1}
-          zoomable
-          rotatable
-          showNav
-          showCounter
-        />
-      </DemoBlock>
-    </div>
+    <DemoPage
+      title="ImageViewer 图片查看器"
+      description="全屏图片预览，支持缩放、旋转和多图切换。"
+      modules={modules}
+    />
   )
 }
-
-export default ImageViewerDemo

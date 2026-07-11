@@ -1,0 +1,12 @@
+{
+  "id": "badge-03",
+  "title": "徽章大小",
+  "description": "徽章有三种尺寸：小、中、大。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "select-04",
+  "title": "不同尺寸",
+  "description": "Select 支持 sm / md / lg 三种尺寸。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

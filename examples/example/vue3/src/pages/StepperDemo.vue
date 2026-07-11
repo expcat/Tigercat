@@ -1,90 +1,14 @@
 <script setup lang="ts">
-import { Space } from '@expcat/tigercat-vue/Space'
-import { Text } from '@expcat/tigercat-vue/Text'
-import { ref } from 'vue'
-import { Stepper } from '@expcat/tigercat-vue/Stepper'
-import DemoBlock from '../components/DemoBlock.vue'
-import fullPageSnippet from './StepperDemo.vue?raw'
+import DemoPage from '../components/DemoPage.vue'
+import { getDemoModules } from '../playground/registry'
 
-const val = ref(3)
-
-const basicScriptSnippet = `import { ref } from 'vue'
-
-const val = ref(3)`
-
-const basicSnippet = `<Stepper v-model="val" />
-<Stepper v-model="val" :min="0" :max="10" :step="2" />
-<Text>当前值: {{ val }}</Text>`
-
-const sizeSnippet = `<Space direction="vertical" :size="12">
-  <Stepper :model-value="1" size="sm" />
-  <Stepper :model-value="1" size="md" />
-  <Stepper :model-value="1" size="lg" />
-  <Stepper :model-value="1" disabled />
-</Space>`
-
-const precisionSnippet = `<Stepper :model-value="1.5" :step="0.1" :precision="2" :min="0" :max="5" />`
+// StepperDemo
+const modules = getDemoModules('stepper')
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-4 sm:p-8">
-    <h1 class="text-3xl font-bold mb-2">Stepper 步进器</h1>
-    <p class="text-gray-500 mb-8">数值增减控制器，支持步长、范围和精度。</p>
-
-    <DemoBlock
-      title="基本用法"
-      description="v-model 双向绑定，min/max 范围，step 步长"
-      :code="fullPageSnippet">
-      <Space direction="vertical" :size="12">
-        <Stepper v-model="val" increment-aria-label="增加数值" decrement-aria-label="减少数值" />
-        <Stepper
-          v-model="val"
-          :min="0"
-          :max="10"
-          :step="2"
-          increment-aria-label="增加数值"
-          decrement-aria-label="减少数值" />
-        <Text>当前值: {{ val }}</Text>
-      </Space>
-    </DemoBlock>
-
-    <DemoBlock
-      title="尺寸与禁用"
-      description="sm/md/lg 三种尺寸，disabled 禁用"
-      :code="fullPageSnippet">
-      <Space direction="vertical" :size="12">
-        <Stepper
-          :model-value="1"
-          size="sm"
-          increment-aria-label="增加数值"
-          decrement-aria-label="减少数值" />
-        <Stepper
-          :model-value="1"
-          size="md"
-          increment-aria-label="增加数值"
-          decrement-aria-label="减少数值" />
-        <Stepper
-          :model-value="1"
-          size="lg"
-          increment-aria-label="增加数值"
-          decrement-aria-label="减少数值" />
-        <Stepper
-          :model-value="1"
-          disabled
-          increment-aria-label="增加数值"
-          decrement-aria-label="减少数值" />
-      </Space>
-    </DemoBlock>
-
-    <DemoBlock title="小数精度" description="precision 控制小数位数" :code="fullPageSnippet">
-      <Stepper
-        :model-value="1.5"
-        :step="0.1"
-        :precision="2"
-        :min="0"
-        :max="5"
-        increment-aria-label="增加数值"
-        decrement-aria-label="减少数值" />
-    </DemoBlock>
-  </div>
+  <DemoPage
+    title="Stepper 步进器"
+    description="数值增减控制器，支持步长、范围和精度。"
+    :modules="modules" />
 </template>

@@ -1,0 +1,12 @@
+{
+  "id": "anchor-02",
+  "title": "自定义容器",
+  "description": "可以指定滚动容器。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

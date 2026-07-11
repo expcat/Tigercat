@@ -1,0 +1,12 @@
+{
+  "id": "tooltip-03",
+  "title": "禁用状态等组合展示",
+  "description": "合并展示禁用状态、偏移距离、自动翻转 (Floating UI)，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

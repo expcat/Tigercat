@@ -1,0 +1,12 @@
+{
+  "id": "checkbox-07",
+  "title": "分组禁用",
+  "description": "设置 CheckboxGroup 的 disabled 可禁用所有子复选框。",
+  "entry": "App.tsx",
+  "order": 7,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

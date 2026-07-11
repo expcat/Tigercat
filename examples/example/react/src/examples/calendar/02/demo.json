@@ -1,0 +1,13 @@
+{
+  "id": "calendar-02",
+  "title": "年视图 & 全屏",
+  "description": "mode='year' + fullscreen",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  },
+  "permissions": ["fullscreen"]
+}

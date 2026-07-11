@@ -1,0 +1,12 @@
+{
+  "id": "stepper-01",
+  "title": "基本用法",
+  "description": "v-model 双向绑定，min/max 范围，step 步长",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

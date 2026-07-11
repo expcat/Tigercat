@@ -1,0 +1,12 @@
+{
+  "id": "layout-02",
+  "title": "基础布局",
+  "description": "典型的页面布局。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

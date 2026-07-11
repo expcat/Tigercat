@@ -1,0 +1,12 @@
+{
+  "id": "tag-08",
+  "title": "不同大小的可关闭标签",
+  "description": "不同尺寸的可关闭标签组合。",
+  "entry": "App.vue",
+  "order": 8,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

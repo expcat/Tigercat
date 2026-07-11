@@ -1,0 +1,12 @@
+{
+  "id": "divider-03",
+  "title": "间距",
+  "description": "spacing 控制分割线周围留白（none / xs / sm / md / lg / xl）。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

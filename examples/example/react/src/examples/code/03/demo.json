@@ -1,0 +1,12 @@
+{
+  "id": "code-03",
+  "title": "禁用复制",
+  "description": "关闭 copyable 不显示复制按钮。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

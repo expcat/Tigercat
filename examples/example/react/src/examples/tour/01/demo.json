@@ -1,0 +1,12 @@
+{
+  "id": "tour-01",
+  "title": "基础用法与自定义按钮文字",
+  "description": "合并展示基础用法、自定义按钮文字，减少重复示例块。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

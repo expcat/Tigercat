@@ -1,0 +1,12 @@
+{
+  "id": "form-wizard-01",
+  "title": "组合展示",
+  "description": "合并展示多步校验阻断、完成态和 labels 文案覆盖。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

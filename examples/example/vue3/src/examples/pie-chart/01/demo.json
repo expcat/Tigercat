@@ -1,0 +1,12 @@
+{
+  "id": "pie-chart-01",
+  "title": "组合展示",
+  "description": "合并展示基础饼图、悬停偏移 + 阴影、外部标签 + 引导线、点击选中 + 图例、完整效果，减少重复示例块。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

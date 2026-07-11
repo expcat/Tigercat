@@ -1,0 +1,13 @@
+{
+  "id": "backtop-01",
+  "title": "基本用法等组合展示",
+  "description": "合并展示基本用法、自定义显示高度、自定义内容等互不冲突的使用方式。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "fixed",
+    "height": 420,
+    "minHeight": 420,
+    "maxHeight": 420
+  }
+}

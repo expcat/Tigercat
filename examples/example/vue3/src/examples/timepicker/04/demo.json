@@ -1,0 +1,12 @@
+{
+  "id": "timepicker-04",
+  "title": "时间格式",
+  "description": "支持 12 小时制和 24 小时制。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}
