@@ -1,7 +1,7 @@
 {
   "id": "select-02",
-  "title": "有默认值",
-  "description": "可以设置默认选中的值。",
+  "title": "搜索",
+  "description": "一个受控 Select 开启 searchable，在四个城市选项中进行搜索和单选。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

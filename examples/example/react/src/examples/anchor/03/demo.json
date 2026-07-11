@@ -1,7 +1,7 @@
 {
   "id": "anchor-03",
-  "title": "嵌套锚点与墨水指示器",
-  "description": "合并展示嵌套锚点、墨水指示器，减少重复示例块。",
+  "title": "嵌套锚点",
+  "description": "一个 Anchor 用必要的父子 AnchorLink 展示嵌套层级，并保留固定态墨水指示器配置。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

@@ -1,7 +1,7 @@
 {
   "id": "notification-03",
-  "title": "自定义持续时间",
-  "description": "通过 duration 设置自动关闭时间。",
+  "title": "手动关闭",
+  "description": "duration 设为 0，并保存返回的关闭函数，只维护一条常驻通知。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {

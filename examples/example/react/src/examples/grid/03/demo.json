@@ -1,7 +1,7 @@
 {
   "id": "grid-03",
-  "title": "响应式栅格",
-  "description": "span / offset 支持按断点设置（xs, sm, md, lg, xl, 2xl）。",
+  "title": "对齐与 Flex",
+  "description": "一个 Row 组合展示 justify、align、wrap=false 与固定/自适应 flex。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

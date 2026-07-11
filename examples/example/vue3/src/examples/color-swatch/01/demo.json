@@ -1,6 +1,7 @@
 {
   "id": "color-swatch-01",
-  "title": "基本用法",
+  "title": "分组色板",
+  "description": "一个受控 ColorSwatch 以两组最小数据展示分组、禁用色、三列布局和 lg 尺寸；也可直接传 colors。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

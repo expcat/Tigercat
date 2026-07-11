@@ -1,12 +1,8 @@
 {
   "id": "button-01",
   "title": "外观、尺寸与状态",
-  "description": "合并展示按钮类型、尺寸、禁用/加载状态和自定义加载图标。",
+  "description": "用一个 primary/lg/loading 按钮组合代表外观、尺寸与加载状态；其他 variant、size 和 disabled 取值按需替换。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

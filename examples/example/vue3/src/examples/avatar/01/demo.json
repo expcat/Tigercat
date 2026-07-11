@@ -1,12 +1,8 @@
 {
   "id": "avatar-01",
-  "title": "图片头像",
-  "description": "使用 src 属性显示图片头像。",
+  "title": "代表外观",
+  "description": "单个文字头像组合 lg、square 和自定义颜色；src 可切换为图片头像，shape 也支持 circle。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

@@ -1,7 +1,7 @@
 {
   "id": "layout-03",
-  "title": "自定义高度",
-  "description": "自定义 Header 和 Footer 的高度。",
+  "title": "折叠侧栏",
+  "description": "受控 Sidebar 在标准 Layout Shell 中切换展开与折叠。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {

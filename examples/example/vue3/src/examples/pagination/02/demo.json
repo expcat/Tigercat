@@ -1,7 +1,7 @@
 {
   "id": "pagination-02",
-  "title": "国际化 (i18n)与自定义文案 (labels)",
-  "description": "合并展示国际化 (i18n)、自定义文案 (labels)，减少重复示例块。",
+  "title": "本地化分页",
+  "description": "一个受控 Pagination 通过 labels 自定义总数、每页条数、跳页和上一页/下一页无障碍文案。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

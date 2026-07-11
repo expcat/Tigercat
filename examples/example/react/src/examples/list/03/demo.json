@@ -1,7 +1,7 @@
 {
   "id": "list-03",
-  "title": "边框样式",
-  "description": "列表支持多种边框样式。",
+  "title": "分页列表",
+  "description": "使用一份页码状态联动 List 与 Pagination。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

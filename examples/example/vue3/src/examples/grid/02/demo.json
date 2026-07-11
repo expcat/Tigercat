@@ -1,7 +1,7 @@
 {
   "id": "grid-02",
-  "title": "分栏间隔",
-  "description": "支持水平间距或 [水平, 垂直] 的间距数组。",
+  "title": "响应式栅格",
+  "description": "使用 xs、md、lg 断点改变两列的 span。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

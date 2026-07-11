@@ -1,7 +1,7 @@
 {
   "id": "popover-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、带标题、自定义内容等互不冲突的使用方式。",
+  "title": "基本用法",
+  "description": "单个气泡卡片复合展示标题、内容、宽度与位置。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

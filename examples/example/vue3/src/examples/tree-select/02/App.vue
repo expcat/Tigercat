@@ -1,39 +1,28 @@
 <script setup lang="ts">
-import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
+import type { TreeSelectValue } from '@expcat/tigercat-core'
 import { TreeSelect } from '@expcat/tigercat-vue/TreeSelect'
 
-const val = ref<string | number | undefined>(undefined)
-const val2 = ref<string | number | undefined>(undefined)
+const value = ref<TreeSelectValue>('')
 const treeData = [
   {
-    key: 'dev',
-    label: '研发部',
-    value: 'dev',
+    key: 'china',
+    label: '中国',
+    value: 'china',
     children: [
-      {
-        key: 'fe',
-        label: '前端组',
-        value: 'fe',
-        children: [
-          { key: 'zs', label: '张三', value: 'zs' },
-          { key: 'ls', label: '李四', value: 'ls' }
-        ]
-      },
-      {
-        key: 'be',
-        label: '后端组',
-        value: 'be',
-        children: [{ key: 'ww', label: '王五', value: 'ww' }]
-      }
+      { key: 'beijing', label: '北京', value: 'beijing' },
+      { key: 'shanghai', label: '上海', value: 'shanghai' }
     ]
   },
-  { key: 'pm', label: '产品部', value: 'pm', children: [{ key: 'zl', label: '赵六', value: 'zl' }] }
+  { key: 'singapore', label: '新加坡', value: 'singapore' }
 ]
 </script>
 
 <template>
-  <div class="min-w-0">
-    <TreeSelect v-model="val2" :tree-data="treeData" placeholder="搜索成员" searchable />
-  </div>
+  <TreeSelect
+    v-model="value"
+    :tree-data="treeData"
+    searchable
+    placeholder="搜索地区"
+    class="w-full max-w-sm" />
 </template>

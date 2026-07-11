@@ -1,12 +1,8 @@
 {
   "id": "watermark-02",
-  "title": "多行水印",
-  "description": "content 传数组实现多行，自定义字体",
+  "title": "图片水印",
+  "description": "通过 image、width 和 height 使用品牌图片作为水印，并用 gapX、gapY 控制平铺间距。",
   "entry": "App.vue",
   "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }
 }

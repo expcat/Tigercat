@@ -1,7 +1,7 @@
 {
   "id": "drawer-02",
-  "title": "不同位置与不同尺寸与内边距",
-  "description": "合并展示不同位置、不同尺寸与内边距，减少重复示例块。",
+  "title": "自定义头部与底部",
+  "description": "用单个筛选抽屉展示 header、footer 插槽和表单内容。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

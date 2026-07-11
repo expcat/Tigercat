@@ -1,12 +1,8 @@
 {
   "id": "code-01",
   "title": "基础用法",
-  "description": "展示代码内容与默认复制按钮。",
+  "description": "传入一段可复制代码并自定义复制按钮文案；可按需增加 disabled 或 onCopy。",
   "entry": "App.tsx",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

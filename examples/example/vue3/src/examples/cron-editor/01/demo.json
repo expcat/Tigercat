@@ -1,6 +1,7 @@
 {
   "id": "cron-editor-01",
   "title": "基本用法",
+  "description": "单个受控 CronEditor 编辑工作日九点的表达式，并通过 ariaLabel 提供可访问名称。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

@@ -1,7 +1,7 @@
 {
   "id": "checkbox-03",
-  "title": "禁用状态",
-  "description": "多选框不可用状态。",
+  "title": "CheckboxGroup",
+  "description": "一个受控 CheckboxGroup 用三个必要选项展示组级取值和 lg 尺寸。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {

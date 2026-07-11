@@ -1,0 +1,7 @@
+{
+  "id": "data-table-with-toolbar-05",
+  "title": "自定义工具栏",
+  "description": "用 #toolbar 完全替换内置区域，并保留搜索上下文；自定义根节点需补充 toolbar 角色与可访问名称。",
+  "entry": "App.vue",
+  "order": 5
+}

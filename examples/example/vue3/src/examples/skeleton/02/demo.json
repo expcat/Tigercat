@@ -1,7 +1,7 @@
 {
   "id": "skeleton-02",
-  "title": "骨架屏变体",
-  "description": "支持文本、头像、图片、按钮和自定义等多种变体。",
+  "title": "加载切换",
+  "description": "用最小状态在 Skeleton 与真实内容之间切换。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

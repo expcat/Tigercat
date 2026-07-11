@@ -1,12 +1,8 @@
 {
   "id": "avatar-02",
-  "title": "图片加载失败回退",
-  "description": "当图片加载失败时，自动回退到 text 文字头像。",
+  "title": "加载失败回退",
+  "description": "图片地址失效时使用 text 生成文字头像，alt 仍保留完整语义。",
   "entry": "App.vue",
   "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

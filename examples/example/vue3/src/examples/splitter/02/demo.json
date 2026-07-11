@@ -1,6 +1,7 @@
 {
   "id": "splitter-02",
   "title": "垂直分割",
+  "description": "一个垂直 Splitter 按 40/60 初始比例划分上下两个必要面板。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

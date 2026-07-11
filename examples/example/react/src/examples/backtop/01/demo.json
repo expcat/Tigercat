@@ -1,7 +1,7 @@
 {
   "id": "backtop-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、自定义显示高度、自定义内容等互不冲突的使用方式。",
+  "title": "页面滚动与回调",
+  "description": "一个 BackTop 使用 visibilityHeight 控制出现时机，并通过 onClick 回显点击次数；自定义内容可作为 children 传入。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

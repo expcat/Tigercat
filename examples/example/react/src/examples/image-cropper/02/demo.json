@@ -1,12 +1,8 @@
 {
   "id": "image-cropper-02",
-  "title": "固定宽高比",
-  "description": "设置 aspectRatio 为 1 实现正方形裁剪",
+  "title": "输出格式",
+  "description": "通过 outputType 和 quality 将裁剪结果配置为 JPEG；默认输出 PNG。",
   "entry": "App.tsx",
   "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 360, "maxHeight": 720 }
 }

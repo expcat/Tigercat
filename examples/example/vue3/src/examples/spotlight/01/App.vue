@@ -1,79 +1,29 @@
 <script setup lang="ts">
-import { Spotlight } from '@expcat/tigercat-vue/Spotlight'
 import { ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
-import { type SpotlightItem } from '@expcat/tigercat-vue'
+import { Spotlight } from '@expcat/tigercat-vue/Spotlight'
+import type { SpotlightItem } from '@expcat/tigercat-vue'
 
-const commands: SpotlightItem[] = [
-  {
-    key: 'dashboard',
-    label: '打开仪表盘',
-    description: '查看关键指标与待办事项',
-    group: '导航',
-    keywords: ['home', 'metrics'],
-    shortcut: ['⌘', 'D']
-  },
-  {
-    key: 'customers',
-    label: '客户列表',
-    description: '进入客户管理视图',
-    group: '导航',
-    keywords: ['crm'],
-    shortcut: ['⌘', 'U']
-  },
-  {
-    key: 'invite',
-    label: '邀请成员',
-    description: '向团队空间添加新成员',
-    group: '操作',
-    shortcut: ['⌘', 'I']
-  },
-  {
-    key: 'billing',
-    label: '账单设置',
-    description: '当前计划不允许修改',
-    group: '设置',
-    disabled: true
-  }
+const items: SpotlightItem[] = [
+  { key: 'dashboard', label: '打开仪表盘', group: '导航', keywords: ['home'] },
+  { key: 'invite', label: '邀请成员', group: '操作', keywords: ['team'] }
 ]
 
 const open = ref(false)
-const controlledOpen = ref(false)
 const query = ref('')
 const selected = ref('')
 </script>
 
 <template>
-  <div class="min-w-0">
-    <div class="space-y-6">
-      <div class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基本用法</h3>
-        <div class="flex flex-wrap items-center gap-3">
-          <Button @click="open = true">打开命令面板</Button>
-          <span v-if="selected" class="text-sm text-gray-500">已选择：{{ selected }}</span>
-        </div>
-        <Spotlight
-          v-model:open="open"
-          :items="commands"
-          title="命令面板"
-          placeholder="搜索页面或操作"
-          empty-text="没有匹配命令"
-          @select="(item) => (selected = item.label)" />
-      </div>
-      <div class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">受控搜索</h3>
-        <div class="flex flex-wrap items-center gap-3">
-          <Button variant="outline" @click="controlledOpen = true">打开受控面板</Button>
-          <span class="text-sm text-gray-500">当前查询：{{ query || '空' }}</span>
-        </div>
-        <Spotlight
-          v-model:open="controlledOpen"
-          v-model:query="query"
-          :items="commands"
-          title="受控命令面板"
-          placeholder="输入 help、crm 或设置"
-          :close-on-select="false" />
-      </div>
-    </div>
+  <div class="space-y-3">
+    <Button @click="open = true">打开命令面板</Button>
+    <p v-if="selected" class="text-sm text-gray-500">已选择：{{ selected }}</p>
+    <Spotlight
+      v-model:open="open"
+      v-model:query="query"
+      :items="items"
+      title="命令面板"
+      placeholder="搜索页面或操作"
+      @select="selected = $event.label" />
   </div>
 </template>

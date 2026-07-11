@@ -1,21 +1,14 @@
 <script setup lang="ts">
-import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { Tag } from '@expcat/tigercat-vue/Tag'
 
-const tags = ref(['标签一', '标签二', '标签三'])
-
-const handleClose = (index: number) => {
-  tags.value.splice(index, 1)
-}
+const visible = ref(true)
 </script>
 
 <template>
-  <div class="min-w-0">
-    <Space>
-      <Tag>Default Tag</Tag>
-      <Tag>标签二</Tag>
-      <Tag>Tag Three</Tag>
-    </Space>
-  </div>
+  <Tag v-if="visible" variant="primary" size="lg" closable @close="visible = false">
+    可关闭标签
+  </Tag>
+  <Button v-else variant="ghost" @click="visible = true">恢复标签</Button>
 </template>

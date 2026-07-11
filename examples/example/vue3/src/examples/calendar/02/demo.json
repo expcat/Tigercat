@@ -1,13 +1,7 @@
 {
   "id": "calendar-02",
-  "title": "年视图 & 全屏",
-  "description": "mode='year' 显示月份选择，fullscreen 全屏模式",
+  "title": "年视图与禁用日期",
+  "description": "年视图组合展示全屏模式和禁用日期。",
   "entry": "App.vue",
-  "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  },
-  "permissions": ["fullscreen"]
+  "order": 2
 }

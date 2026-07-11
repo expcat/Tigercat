@@ -1,7 +1,7 @@
 {
   "id": "alert-02",
-  "title": "提示类型",
-  "description": "Alert 组件支持 4 种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。",
+  "title": "可关闭提示",
+  "description": "展示自定义关闭标签和关闭后的恢复流程。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

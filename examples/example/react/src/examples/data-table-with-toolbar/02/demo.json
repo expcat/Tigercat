@@ -1,0 +1,7 @@
+{
+  "id": "data-table-with-toolbar-02",
+  "title": "自定义过滤",
+  "description": "用 filters.render 接入数值过滤并驱动数据；复合区间也可用 filtersExtra 和对象值实现。",
+  "entry": "App.tsx",
+  "order": 2
+}

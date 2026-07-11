@@ -1,42 +1,30 @@
-import { Space } from '@expcat/tigercat-react/Space'
 import { useState } from 'react'
 import type { TreeSelectValue } from '@expcat/tigercat-core'
 import { TreeSelect } from '@expcat/tigercat-react/TreeSelect'
 
 const treeData = [
   {
-    key: 'dev',
+    key: 'engineering',
     label: '研发部',
-    value: 'dev',
+    value: 'engineering',
     children: [
-      {
-        key: 'fe',
-        label: '前端组',
-        value: 'fe',
-        children: [
-          { key: 'zs', label: '张三', value: 'zs' },
-          { key: 'ls', label: '李四', value: 'ls' }
-        ]
-      },
-      {
-        key: 'be',
-        label: '后端组',
-        value: 'be',
-        children: [{ key: 'ww', label: '王五', value: 'ww' }]
-      }
+      { key: 'frontend', label: '前端组', value: 'frontend' },
+      { key: 'backend', label: '后端组', value: 'backend' }
     ]
   },
-  { key: 'pm', label: '产品部', value: 'pm', children: [{ key: 'zl', label: '赵六', value: 'zl' }] }
+  { key: 'product', label: '产品部', value: 'product' }
 ]
 
 export default function App() {
-  const [val, setVal] = useState<TreeSelectValue>(undefined as unknown as TreeSelectValue)
-
-  const [val2, setVal2] = useState<TreeSelectValue>(undefined as unknown as TreeSelectValue)
+  const [value, setValue] = useState<TreeSelectValue>('')
 
   return (
-    <>
-      <TreeSelect value={val} onChange={setVal} treeData={treeData} placeholder="请选择成员" />
-    </>
+    <TreeSelect
+      value={value}
+      onChange={setValue}
+      treeData={treeData}
+      placeholder="请选择团队"
+      className="w-full max-w-sm"
+    />
   )
 }

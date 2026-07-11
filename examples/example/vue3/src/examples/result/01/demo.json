@@ -1,12 +1,8 @@
 {
   "id": "result-01",
-  "title": "状态类型",
-  "description": "success / error / warning / info 四种基础状态",
+  "title": "结果与操作",
+  "description": "单个 Result 组合 success 状态、主副标题和操作；status 可替换为 error、warning、info 或 HTTP 状态码。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }
 }

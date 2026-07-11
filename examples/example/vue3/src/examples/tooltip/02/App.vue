@@ -1,22 +1,13 @@
 <script setup lang="ts">
-import { Button } from '@expcat/tigercat-vue/Button'
-import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { Tooltip } from '@expcat/tigercat-vue/Tooltip'
 
-const visible1 = ref(false)
+const open = ref(false)
 </script>
 
 <template>
-  <div class="min-w-0">
-    <Space :size="16">
-      <Tooltip v-model:open="visible1" content="受控的气泡提示">
-        <Button>受控提示</Button>
-      </Tooltip>
-
-      <Button @click="visible1 = !visible1">
-        {{ visible1 ? '隐藏' : '显示' }}
-      </Button>
-    </Space>
-  </div>
+  <Tooltip v-model:open="open" trigger="manual" content="这是受控提示" placement="right">
+    <Button @click="open = !open">{{ open ? '隐藏提示' : '显示提示' }}</Button>
+  </Tooltip>
 </template>

@@ -1,13 +1,12 @@
 {
   "id": "upload-02",
   "title": "拖拽上传",
-  "description": "将文件拖拽到区域内即可上传。",
+  "description": "一个受控 Upload 开启 drag 和 multiple，并将可选类型限制为常见文档。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {
     "mode": "auto",
     "minHeight": 120,
     "maxHeight": 720
-  },
-  "permissions": ["popups"]
+  }
 }

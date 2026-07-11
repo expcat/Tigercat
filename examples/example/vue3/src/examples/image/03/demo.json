@@ -1,12 +1,8 @@
 {
   "id": "image-03",
-  "title": "加载失败回退",
-  "description": "设置 fallbackSrc 或使用 error 插槽自定义错误状态",
+  "title": "图片预览",
+  "description": "单张图片通过 previewTrigger=hover 打开悬停预览；默认 click 可打开全屏预览。",
   "entry": "App.vue",
   "order": 3,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 720 }
 }

@@ -1,13 +1,12 @@
 {
   "id": "upload-03",
-  "title": "多文件上传",
-  "description": "通过设置 multiple 属性允许同时选择多个文件。",
+  "title": "图片卡片",
+  "description": "一个受控 Upload 以最小初始文件展示 picture-card 列表、图片类型与数量限制。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {
     "mode": "auto",
     "minHeight": 120,
     "maxHeight": 720
-  },
-  "permissions": ["popups"]
+  }
 }

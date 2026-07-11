@@ -1,6 +1,7 @@
 {
   "id": "color-picker-01",
-  "title": "基本用法",
+  "title": "代表配置",
+  "description": "单个受控 ColorPicker 组合透明度、RGB 格式、预设色和 lg 尺寸；format 还支持 hex、hsl。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

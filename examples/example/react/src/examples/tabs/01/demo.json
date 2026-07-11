@@ -1,7 +1,7 @@
 {
   "id": "tabs-01",
-  "title": "基本用法与卡片式标签页",
-  "description": "合并展示基本用法、卡片式标签页，减少重复示例块。",
+  "title": "基础标签页",
+  "description": "一个受控 Tabs 用两个必要页签组合 card 类型与 large 尺寸；默认线型可移除 type。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

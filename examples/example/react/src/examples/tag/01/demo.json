@@ -1,12 +1,8 @@
 {
   "id": "tag-01",
-  "title": "基本用法",
-  "description": "基础的标签展示。",
+  "title": "代表可关闭标签",
+  "description": "单个 primary/lg 标签通过 closable 与 onClose 更新业务状态；其他 variant 和 size 可直接替换。",
   "entry": "App.tsx",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

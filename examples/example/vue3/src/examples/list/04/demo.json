@@ -1,7 +1,7 @@
 {
   "id": "list-04",
-  "title": "分割线（split）",
-  "description": "当 bordered=\"divided\" 时，可通过 split 控制是否显示分割线。",
+  "title": "网格布局",
+  "description": "响应式 grid 配合 renderItem 渲染卡片列表；竖直模式使用 itemLayout。",
   "entry": "App.vue",
   "order": 4,
   "viewport": {

@@ -1,23 +1,18 @@
 import { useState } from 'react'
 import { AutoComplete } from '@expcat/tigercat-react/AutoComplete'
 
-const allOptions = ['React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Preact', 'Next.js', 'Nuxt'].map(
-  (o) => ({ label: o, value: o })
-)
+const options = ['React', 'Vue', 'Svelte', 'Angular'].map((value) => ({ label: value, value }))
 
 export default function App() {
-  const [val, setVal] = useState('')
-
-  const [val2, setVal2] = useState('')
+  const [value, setValue] = useState('')
 
   return (
-    <>
-      <AutoComplete
-        value={val}
-        onChange={(v) => setVal(String(v))}
-        options={allOptions}
-        placeholder="请输入搜索内容"
-      />
-    </>
+    <AutoComplete
+      value={value}
+      onChange={(next) => setValue(String(next))}
+      options={options}
+      placeholder="输入框架名称"
+      className="w-full max-w-sm"
+    />
   )
 }

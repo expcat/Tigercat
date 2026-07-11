@@ -2,17 +2,21 @@
 import { ref } from 'vue'
 import { Transfer } from '@expcat/tigercat-vue/Transfer'
 
-const targetKeys1 = ref<(string | number)[]>(['3', '4'])
-const targetKeys2 = ref<(string | number)[]>(['3', '4'])
-const dataSource = Array.from({ length: 10 }, (_, i) => ({
-  key: String(i + 1),
-  label: `内容 ${i + 1}`,
-  description: `描述 ${i + 1}`
-}))
+const targetKeys = ref<(string | number)[]>(['frontend'])
+const dataSource = [
+  { key: 'design', label: '设计' },
+  { key: 'frontend', label: '前端' },
+  { key: 'backend', label: '后端' },
+  { key: 'qa', label: '测试' }
+]
 </script>
 
 <template>
-  <div class="min-w-0">
-    <Transfer v-model="targetKeys1" :data-source="dataSource" />
-  </div>
+  <Transfer
+    v-model:target-keys="targetKeys"
+    :data-source="dataSource"
+    searchable
+    source-title="可选团队"
+    target-title="已选团队"
+    class="max-w-2xl" />
 </template>

@@ -1,93 +1,39 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
 import { OrgChart } from '@expcat/tigercat-vue/OrgChart'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 
-const selectedId = ref<string | number | null>(null)
-
-const orgData: OrgChartNode = {
+const data: OrgChartNode = {
   id: 'ceo',
   label: 'Ada Chen',
   title: 'Chief Executive Officer',
-  subtitle: 'Global',
   color: '#2563eb',
   children: [
     {
       id: 'product',
       label: 'Lin Wu',
       title: 'Product',
-      subtitle: 'Growth',
       color: '#10b981',
-      children: [
-        { id: 'design', label: 'Mira', title: 'Design Lead', color: '#f59e0b' },
-        { id: 'research', label: 'Noor', title: 'Research', color: '#06b6d4' }
-      ]
+      children: [{ id: 'design', label: 'Mira', title: 'Design Lead', color: '#f59e0b' }]
     },
     {
       id: 'engineering',
       label: 'Iris Park',
       title: 'Engineering',
-      subtitle: 'Platform',
       color: '#8b5cf6',
-      children: [
-        { id: 'frontend', label: 'Kai', title: 'Frontend', color: '#ef4444' },
-        { id: 'infra', label: 'Rin', title: 'Infrastructure', color: '#64748b' }
-      ]
+      children: [{ id: 'frontend', label: 'Kai', title: 'Frontend', color: '#ef4444' }]
     }
   ]
 }
-
-function findOrgNode(node: OrgChartNode, id: string | number): OrgChartNode | undefined {
-  if (node.id === id) return node
-  for (const child of node.children ?? []) {
-    const match = findOrgNode(child, id)
-    if (match) return match
-  }
-  return undefined
-}
-
-const selectedNodeLabel = computed(() => {
-  if (selectedId.value === null) return '未选择'
-  const node = findOrgNode(orgData, selectedId.value)
-  if (!node) return '未选择'
-  return `${node.label}${node.title ? ` / ${node.title}` : ''}（${String(node.id)}）`
-})
 </script>
 
 <template>
-  <div class="min-w-0">
-    <div class="space-y-6">
-      <section class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          树形组织数据，节点自动居中到子树范围。
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          移动端可在预览区域横向滚动，查看完整组织结构。
-        </p>
-        <div class="space-y-4">
-          <OrgChart
-            :data="orgData"
-            :width="760"
-            :height="460"
-            hoverable
-            selectable
-            :selected-id="selectedId"
-            title="Organization chart"
-            desc="Company reporting structure"
-            @update:selected-id="(id: string | number | null) => (selectedId = id)" />
-          <div class="rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-            当前选择：{{ selectedNodeLabel }}
-          </div>
-        </div>
-      </section>
-      <section class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">横向布局</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          direction='horizontal' 将层级从左向右展开。
-        </p>
-        <OrgChart :data="orgData" direction="horizontal" :width="760" :height="460" hoverable />
-      </section>
-    </div>
-  </div>
+  <OrgChart
+    :data="data"
+    direction="horizontal"
+    :width="760"
+    :height="360"
+    hoverable
+    selectable
+    title="Organization chart"
+    desc="Company reporting structure" />
 </template>

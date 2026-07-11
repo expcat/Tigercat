@@ -1,20 +1,18 @@
-import { Button } from '@expcat/tigercat-react/Button'
-import { Space } from '@expcat/tigercat-react/Space'
 import { useState } from 'react'
+import { Button } from '@expcat/tigercat-react/Button'
 import { Tooltip } from '@expcat/tigercat-react/Tooltip'
 
 export default function App() {
-  const [visible1, setVisible1] = useState(false)
+  const [open, setOpen] = useState(false)
 
   return (
-    <>
-      <Space size={16}>
-        <Tooltip open={visible1} content="受控的气泡提示" onOpenChange={setVisible1}>
-          <Button>受控提示</Button>
-        </Tooltip>
-
-        <Button onClick={() => setVisible1(!visible1)}>{visible1 ? '隐藏' : '显示'}</Button>
-      </Space>
-    </>
+    <Tooltip
+      open={open}
+      onOpenChange={setOpen}
+      trigger="manual"
+      content="这是受控提示"
+      placement="right">
+      <Button onClick={() => setOpen((value) => !value)}>{open ? '隐藏提示' : '显示提示'}</Button>
+    </Tooltip>
   )
 }

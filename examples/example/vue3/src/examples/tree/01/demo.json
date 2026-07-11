@@ -1,12 +1,7 @@
 {
   "id": "tree-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、默认展开所有节点、可选择的树等互不冲突的使用方式。",
+  "title": "基础树",
+  "description": "一个可勾选、可选择并默认展开的树。",
   "entry": "App.vue",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

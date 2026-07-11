@@ -1,7 +1,7 @@
 {
   "id": "drawer-03",
-  "title": "自定义头部和底部",
-  "description": "使用 header 和 footer 属性自定义头部和底部内容。",
+  "title": "生命周期",
+  "description": "展示进入、关闭完成回调，以及关闭动画后销毁内容。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

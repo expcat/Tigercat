@@ -1,7 +1,7 @@
 {
   "id": "number-keyboard-02",
-  "title": "手机号输入",
-  "description": "phone 模式默认限制 11 位数字",
+  "title": "证件输入",
+  "description": "id-card 模式支持身份证号码中的数字与末位 X，并与一个只读 Input 共享受控值。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

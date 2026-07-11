@@ -1,12 +1,7 @@
 {
   "id": "countdown-01",
-  "title": "基本用法",
-  "description": "使用目标时间展示剩余时长",
+  "title": "展示格式",
+  "description": "一个倒计时组合展示格式、前缀与尺寸。",
   "entry": "App.vue",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

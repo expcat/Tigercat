@@ -1,49 +1,13 @@
 <script setup lang="ts">
-import { Space } from '@expcat/tigercat-vue/Space'
-import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
 import { Slider } from '@expcat/tigercat-vue/Slider'
 
-const basicValue = ref(50)
-
-const rangeMinMaxDefaultValue = ref(50)
-const rangeMinMaxWideValue = ref(30)
-
-const stepValue = ref(30)
-
-const rangeValue = ref<[number, number]>([20, 80])
-
-const marksValue = ref(25)
-const marks = {
-  0: '0°C',
-  25: '25°C',
-  50: '50°C',
-  75: '75°C',
-  100: '100°C'
-}
-
-const tooltipOffValue = ref(50)
-const tooltipOnValue = ref(50)
-
-const disabledValue = ref(75)
-
-const sizeSm = ref(30)
-const sizeMd = ref(50)
-const sizeLg = ref(70)
+const value = ref<number | [number, number]>(40)
 </script>
 
 <template>
-  <div class="min-w-0">
-    <Space direction="vertical" class="w-full max-w-md">
-      <div class="flex items-center gap-4 w-full">
-        <Slider
-          v-model:value="basicValue"
-          :min="0"
-          :max="100"
-          aria-label="基础数值"
-          class="flex-1" />
-        <Text>{{ basicValue }}</Text>
-      </div>
-    </Space>
+  <div class="w-full max-w-lg space-y-2">
+    <Slider v-model="value" :min="0" :max="100" :step="5" />
+    <p class="text-sm text-gray-600 dark:text-gray-300">当前值：{{ String(value) }}</p>
   </div>
 </template>

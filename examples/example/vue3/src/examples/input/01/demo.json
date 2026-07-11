@@ -1,7 +1,7 @@
 {
   "id": "input-01",
-  "title": "输入方式与外观",
-  "description": "合并展示基础输入、受控/非受控、常见类型、尺寸、禁用只读和前后缀。",
+  "title": "Input",
+  "description": "一个受控搜索 Input 组合 lg 尺寸、前后缀与输入回显；其他 type、size、disabled 和 readonly 取值可直接替换。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

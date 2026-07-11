@@ -1,7 +1,7 @@
 {
   "id": "descriptions-02",
-  "title": "带边框",
-  "description": "使用 bordered 属性添加边框。",
+  "title": "垂直自定义",
+  "description": "一个实例组合展示 vertical、bordered、sm、span 与隐藏冒号。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

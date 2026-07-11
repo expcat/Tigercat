@@ -1,7 +1,7 @@
 {
   "id": "modal-04",
-  "title": "禁用遮罩关闭等组合展示",
-  "description": "合并展示禁用遮罩关闭、无遮罩、关闭时销毁等互不冲突的使用方式。",
+  "title": "异步业务表单",
+  "description": "单个受控对话框完成校验、保存中状态和异步关闭流程。",
   "entry": "App.tsx",
   "order": 4,
   "viewport": {

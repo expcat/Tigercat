@@ -1,12 +1,8 @@
 {
   "id": "text-01",
-  "title": "基础用法",
-  "description": "基础的 Text 用法。",
+  "title": "组合文本样式",
+  "description": "单个 Text 组合 tag、size、weight、color、align、italic 与 underline；其余取值可直接替换。",
   "entry": "App.tsx",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

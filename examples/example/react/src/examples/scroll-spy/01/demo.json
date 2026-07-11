@@ -1,7 +1,7 @@
 {
   "id": "scroll-spy-01",
-  "title": "基本用法与水平导航",
-  "description": "合并展示基本用法、水平导航，减少重复示例块。",
+  "title": "文档导航",
+  "description": "一个纵向 sticky ScrollSpy 关联两段页面文档内容；水平导航可将 direction 改为 horizontal。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

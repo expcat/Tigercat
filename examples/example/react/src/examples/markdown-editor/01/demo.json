@@ -1,7 +1,7 @@
 {
   "id": "markdown-editor-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、模式切换、扩展渲染器，减少重复示例块。",
+  "title": "Markdown 编辑",
+  "description": "最小受控编辑示例，使用 split 模式同时编辑和预览；edit、preview 与自定义 renderer 按需配置。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

@@ -1,12 +1,8 @@
 {
   "id": "link-02",
-  "title": "链接尺寸",
-  "description": "展示 sm / md / lg 三种尺寸。",
+  "title": "点击行为",
+  "description": "在 onClick 中阻止默认导航并更新业务状态，适合将 Link 用作可追踪操作入口。",
   "entry": "App.tsx",
   "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

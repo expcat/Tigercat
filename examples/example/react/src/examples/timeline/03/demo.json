@@ -1,12 +1,7 @@
 {
   "id": "timeline-03",
-  "title": "自定义颜色",
-  "description": "通过 item.color 设置时间点颜色。",
+  "title": "等待与反转",
+  "description": "一个时间线组合展示 pending 与 reverse。",
   "entry": "App.tsx",
-  "order": 3,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 3
 }

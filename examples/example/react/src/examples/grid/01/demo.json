@@ -1,7 +1,7 @@
 {
   "id": "grid-01",
   "title": "基础栅格",
-  "description": "使用单一分栏创建基础的栅格布局。",
+  "description": "一个 Row 组合展示三等分栅格与水平/垂直 gutter。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

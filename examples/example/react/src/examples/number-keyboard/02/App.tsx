@@ -1,28 +1,20 @@
-import { NumberKeyboard } from '@expcat/tigercat-react/NumberKeyboard'
 import { useState } from 'react'
 import { Input } from '@expcat/tigercat-react/Input'
+import { NumberKeyboard } from '@expcat/tigercat-react/NumberKeyboard'
 
 export default function App() {
-  const [amount, setAmount] = useState('')
-
-  const [phone, setPhone] = useState('')
-
-  const [idCard, setIdCard] = useState('')
-
-  const [confirmed, setConfirmed] = useState('')
+  const [value, setValue] = useState('')
 
   return (
-    <>
-      <div className="max-w-sm space-y-3">
-        <Input value={phone} readonly placeholder="手机号" />
-        <NumberKeyboard
-          mode="phone"
-          value={phone}
-          onChange={setPhone}
-          confirmText="完成"
-          deleteText="退格"
-        />
-      </div>
-    </>
+    <div className="max-w-sm space-y-3">
+      <Input value={value} readonly placeholder="身份证号" />
+      <NumberKeyboard
+        mode="id-card"
+        value={value}
+        onChange={setValue}
+        confirmText="完成"
+        deleteText="退格"
+      />
+    </div>
   )
 }

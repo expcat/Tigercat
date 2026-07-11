@@ -1,7 +1,7 @@
 {
   "id": "drawer-01",
-  "title": "基本使用",
-  "description": "最基本的抽屉使用示例。",
+  "title": "代表配置",
+  "description": "一个受控抽屉复合展示 right 位置、md 尺寸、遮罩和页脚关闭；placement 还支持 left、top、bottom，size 还支持 sm、lg、xl、full。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

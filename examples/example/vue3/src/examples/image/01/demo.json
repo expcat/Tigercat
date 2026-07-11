@@ -1,12 +1,8 @@
 {
   "id": "image-01",
-  "title": "基本用法",
-  "description": "使用 src 和尺寸属性展示图片",
+  "title": "基础与适配",
+  "description": "一个图片实例组合固定尺寸和 cover 适配；fit 还支持 contain、fill、none 与 scale-down。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 720 }
 }

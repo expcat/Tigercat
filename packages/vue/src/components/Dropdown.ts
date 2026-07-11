@@ -490,9 +490,6 @@ export const Dropdown = defineComponent({
     )
     provide(DropdownContextKey, dropdownContext)
 
-    // DropdownItem tabIndex: menuitem should be -1 (focused programmatically)
-    const _menuItemTabIndex = -1
-
     return () => {
       const defaultSlot = slots.default?.()
       const triggerSlot = slots.trigger?.({ open: currentVisible.value })

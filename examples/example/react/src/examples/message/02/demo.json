@@ -1,7 +1,7 @@
 {
   "id": "message-02",
-  "title": "自定义持续时间",
-  "description": "通过 duration 属性自定义消息显示时间，设置为 0 时不会自动关闭。",
+  "title": "手动关闭",
+  "description": "保存 Message.loading 返回的关闭函数，只维护一个可手动结束的加载消息。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

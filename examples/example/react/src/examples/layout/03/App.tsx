@@ -1,38 +1,27 @@
-import React, { useState } from 'react'
-import { Container } from '@expcat/tigercat-react/Container'
+import { useState } from 'react'
+import { Button } from '@expcat/tigercat-react/Button'
 import { Layout } from '@expcat/tigercat-react/Layout'
 import { Header } from '@expcat/tigercat-react/Header'
 import { Sidebar } from '@expcat/tigercat-react/Sidebar'
 import { Content } from '@expcat/tigercat-react/Content'
-import { Footer } from '@expcat/tigercat-react/Footer'
-import { Menu } from '@expcat/tigercat-react/Menu'
-import { MenuItem } from '@expcat/tigercat-react/MenuItem'
-import { SubMenu } from '@expcat/tigercat-react/SubMenu'
 
 export default function App() {
   const [collapsed, setCollapsed] = useState(false)
 
-  const [miniCollapsed, setMiniCollapsed] = useState(true)
-
-  const [shellCollapsed, setShellCollapsed] = useState(false)
-
-  const [shellSelectedKeys, setShellSelectedKeys] = useState<(string | number)[]>(['dashboard'])
-
-  const [shellOpenKeys, setShellOpenKeys] = useState<(string | number)[]>(['system'])
-
   return (
-    <>
-      <div className="p-6 bg-gray-50 rounded-lg">
-        <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
-          <Header height="48px" className="!bg-blue-600 !text-white !p-4">
-            Header (48px)
-          </Header>
-          <Content className="!bg-white !p-4">Content</Content>
-          <Footer height="64px" className="!bg-gray-800 !text-white !p-4">
-            Footer (64px)
-          </Footer>
-        </Layout>
-      </div>
-    </>
+    <div className="space-y-3">
+      <Button size="sm" onClick={() => setCollapsed((value) => !value)}>
+        {collapsed ? '展开侧栏' : '折叠侧栏'}
+      </Button>
+      <Layout className="min-h-64 overflow-hidden rounded border border-gray-300">
+        <Header className="!bg-blue-600 !p-4 !text-white">后台管理</Header>
+        <div className="flex flex-1">
+          <Sidebar width="192px" collapsedWidth="64px" collapsed={collapsed}>
+            导航
+          </Sidebar>
+          <Content className="!p-4">工作区</Content>
+        </div>
+      </Layout>
+    </div>
   )
 }

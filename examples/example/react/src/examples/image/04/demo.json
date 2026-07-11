@@ -1,12 +1,8 @@
 {
   "id": "image-04",
-  "title": "懒加载",
-  "description": "lazy 属性开启 IntersectionObserver 懒加载",
+  "title": "ImageGroup",
+  "description": "一个 ImageGroup 统一管理必要的组图子项，并在预览中提供连续切换。",
   "entry": "App.tsx",
   "order": 4,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 720 }
 }

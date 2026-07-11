@@ -1,12 +1,7 @@
 {
   "id": "countdown-02",
-  "title": "格式与前后缀",
-  "description": "format 可组合天、时、分、秒和毫秒",
+  "title": "结束回调",
+  "description": "倒计时结束后更新业务状态。",
   "entry": "App.tsx",
-  "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 2
 }

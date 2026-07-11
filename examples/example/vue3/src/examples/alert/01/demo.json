@@ -1,7 +1,7 @@
 {
   "id": "alert-01",
-  "title": "基本用法",
-  "description": "最简单的用法，适用于简短的警告提示。",
+  "title": "代表提示状态",
+  "description": "用一个实例复合展示 warning、lg、图标与描述；其余类型可取 info、success、error，尺寸可取 sm、md。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

@@ -1,12 +1,7 @@
 {
   "id": "image-annotation-01",
-  "title": "组合展示",
-  "description": "合并展示受控标注、多形状工具，减少重复示例块。",
+  "title": "受控多工具标注",
+  "description": "一个 ImageAnnotation 组合展示受控标注和多形状工具；defaultTool 可替换为任一启用工具。",
   "entry": "App.tsx",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

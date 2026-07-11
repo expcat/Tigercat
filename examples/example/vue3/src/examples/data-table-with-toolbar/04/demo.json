@@ -1,0 +1,7 @@
+{
+  "id": "data-table-with-toolbar-04",
+  "title": "卡片模式",
+  "description": "窄屏下用 cardTitle、hideInCard 与 cardPriority 组织字段；复杂网格可再用 cardGrid 或 cardLayout。",
+  "entry": "App.vue",
+  "order": 4
+}

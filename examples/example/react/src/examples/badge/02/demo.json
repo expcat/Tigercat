@@ -1,12 +1,8 @@
 {
   "id": "badge-02",
-  "title": "徽章类型",
-  "description": "徽章有六种颜色类型：默认、主要、成功、警告、危险和信息。",
+  "title": "点状或文本徽章",
+  "description": "示例选用 text 徽章；将 type 改为 dot 并移除 content 即可得到点状提示。",
   "entry": "App.tsx",
   "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

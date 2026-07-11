@@ -1,13 +1,7 @@
 {
   "id": "table-02",
-  "title": "带边框和条纹",
-  "description": "显示边框和条纹行。",
+  "title": "排序与筛选",
+  "description": "在同一组列上演示排序与文本、选项筛选。",
   "entry": "App.tsx",
-  "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  },
-  "permissions": ["modals"]
+  "order": 2
 }

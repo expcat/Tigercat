@@ -1,12 +1,7 @@
 {
   "id": "collapse-03",
-  "title": "无边框",
-  "description": "简洁的无边框样式。",
+  "title": "自定义头部",
+  "description": "通过属性或插槽自定义标题和额外区域。",
   "entry": "App.tsx",
-  "order": 3,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 3
 }

@@ -1,7 +1,7 @@
 {
   "id": "crop-upload-01",
-  "title": "基本用法",
-  "description": "点击按钮选择图片，弹窗中裁剪后获取结果",
+  "title": "基础约束",
+  "description": "单个实例组合展示方形裁剪、2 MB 文件限制、结果预览与错误处理。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

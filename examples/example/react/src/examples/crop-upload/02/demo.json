@@ -1,7 +1,7 @@
 {
   "id": "crop-upload-02",
-  "title": "固定宽高比",
-  "description": "通过 cropperProps 传递 aspectRatio 实现正方形裁剪",
+  "title": "自定义触发",
+  "description": "通过 children 提供一个可直接复制的自定义上传触发器。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

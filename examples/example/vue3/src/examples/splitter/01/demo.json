@@ -1,7 +1,7 @@
 {
   "id": "splitter-01",
   "title": "水平分割",
-  "description": "拖拽分割条调整面板大小",
+  "description": "水平分割的代表用法，同时展示初始比例与最小尺寸；其他比例可通过 sizes 调整。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

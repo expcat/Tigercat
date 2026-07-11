@@ -1,12 +1,8 @@
 {
   "id": "image-cropper-01",
-  "title": "基本用法",
-  "description": "自由裁剪，拖拽和缩放裁剪区域",
+  "title": "基础约束",
+  "description": "单个 ImageCropper 使用内联图片和 1:1 aspectRatio；删除该属性即可自由裁剪。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 360, "maxHeight": 720 }
 }

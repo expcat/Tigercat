@@ -1,12 +1,8 @@
 {
   "id": "image-viewer-01",
-  "title": "基本用法",
-  "description": "点击按钮打开图片查看器",
+  "title": "受控图片查看器",
+  "description": "一份 open 状态控制一个 ImageViewer，并组合缩放、旋转、导航和计数功能。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

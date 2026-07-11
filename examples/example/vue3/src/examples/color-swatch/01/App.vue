@@ -1,35 +1,28 @@
 <script setup lang="ts">
-import { Space } from '@expcat/tigercat-vue/Space'
-import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
 import { ColorSwatch } from '@expcat/tigercat-vue/ColorSwatch'
 
-const color = ref('#3b82f6')
-const brandColor = ref('#2563eb')
-const statusColor = ref('#16a34a')
-
-const brandGroups = [
+const color = ref('#2563eb')
+const groups = [
   {
-    label: 'Brand',
+    label: '品牌色',
     colors: [
-      { value: '#0f172a', label: 'Ink' },
-      { value: '#2563eb', label: 'Blue' },
-      { value: '#0891b2', label: 'Cyan' },
-      { value: '#059669', label: 'Green' }
+      { value: '#2563eb', label: '蓝色' },
+      { value: '#0891b2', label: '青色' },
+      { value: '#059669', label: '绿色' }
     ]
   },
   {
-    label: 'Neutral',
-    colors: ['#f8fafc', '#cbd5e1', '#64748b', '#1e293b']
+    label: '状态色',
+    colors: [
+      { value: '#f59e0b', label: '警告' },
+      { value: '#dc2626', label: '错误' },
+      { value: '#94a3b8', label: '禁用', disabled: true }
+    ]
   }
 ]
 </script>
 
 <template>
-  <div class="min-w-0">
-    <Space :size="16" align="center">
-      <ColorSwatch v-model="color" />
-      <Text>选中颜色: {{ color }}</Text>
-    </Space>
-  </div>
+  <ColorSwatch v-model="color" :groups="groups" :columns="3" size="lg" aria-label="选择主题色" />
 </template>

@@ -1,7 +1,7 @@
 {
   "id": "layout-01",
   "title": "Container 容器",
-  "description": "用于约束内容宽度并提供响应式内边距。",
+  "description": "最小 Container 示例，组合展示 maxWidth、居中和响应式内边距。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

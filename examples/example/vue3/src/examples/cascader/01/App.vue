@@ -1,47 +1,31 @@
 <script setup lang="ts">
-import { Space } from '@expcat/tigercat-vue/Space'
 import { ref } from 'vue'
 import { Cascader } from '@expcat/tigercat-vue/Cascader'
 
-const val = ref<(string | number)[]>([])
-const val2 = ref<(string | number)[]>([])
-
+const value = ref<(string | number)[]>([])
 const options = [
   {
     label: '浙江',
-    value: 'zj',
+    value: 'zhejiang',
     children: [
       {
         label: '杭州',
-        value: 'hz',
+        value: 'hangzhou',
         children: [
-          { label: '西湖区', value: 'xh' },
-          { label: '余杭区', value: 'yh' }
+          { label: '西湖区', value: 'xihu' },
+          { label: '余杭区', value: 'yuhang' }
         ]
-      },
-      { label: '宁波', value: 'nb', children: [{ label: '鄞州区', value: 'yz' }] }
+      }
     ]
   },
   {
     label: '江苏',
-    value: 'js',
-    children: [
-      {
-        label: '南京',
-        value: 'nj',
-        children: [
-          { label: '鼓楼区', value: 'gl' },
-          { label: '玄武区', value: 'xw' }
-        ]
-      },
-      { label: '苏州', value: 'sz', children: [{ label: '虎丘区', value: 'hq' }] }
-    ]
+    value: 'jiangsu',
+    children: [{ label: '南京', value: 'nanjing' }]
   }
 ]
 </script>
 
 <template>
-  <div class="min-w-0">
-    <Cascader v-model="val" :options="options" placeholder="请选择地区" />
-  </div>
+  <Cascader v-model="value" :options="options" placeholder="请选择地区" class="w-full max-w-sm" />
 </template>

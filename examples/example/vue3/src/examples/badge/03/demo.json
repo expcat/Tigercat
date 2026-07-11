@@ -1,12 +1,8 @@
 {
   "id": "badge-03",
-  "title": "徽章大小",
-  "description": "徽章有三种尺寸：小、中、大。",
+  "title": "包裹与定位",
+  "description": "standalone=false 时徽章包裹一个目标元素，position 可替换为四个角的位置。",
   "entry": "App.vue",
   "order": 3,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

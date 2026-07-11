@@ -1,22 +1,24 @@
 <script setup lang="ts">
-import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'
 
-const open1 = ref(false)
-const open2 = ref(false)
-
+const open = ref(false)
 const images = [
-  'https://picsum.photos/800/600?random=1',
-  'https://picsum.photos/800/600?random=2',
-  'https://picsum.photos/800/600?random=3',
-  'https://picsum.photos/800/600?random=4'
+  'https://picsum.photos/seed/tiger-viewer-1/800/600',
+  'https://picsum.photos/seed/tiger-viewer-2/800/600',
+  'https://picsum.photos/seed/tiger-viewer-3/800/600'
 ]
 </script>
 
 <template>
-  <div class="min-w-0">
-    <Button @click="open1 = true">查看图片</Button
-    ><ImageViewer v-model:open="open1" :images="images" />
-  </div>
+  <Button @click="open = true">查看图片</Button>
+  <ImageViewer
+    v-model:open="open"
+    :images="images"
+    :current-index="1"
+    :zoomable="true"
+    :rotatable="true"
+    :show-nav="true"
+    :show-counter="true" />
 </template>

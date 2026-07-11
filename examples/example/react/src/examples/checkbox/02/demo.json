@@ -1,7 +1,7 @@
 {
   "id": "checkbox-02",
-  "title": "非受控模式",
-  "description": "使用 defaultChecked 设置默认选中，组件内部管理状态。",
+  "title": "不确定状态",
+  "description": "一个受控 Checkbox 使用 indeterminate 表示部分选中，并在切换后更新状态。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

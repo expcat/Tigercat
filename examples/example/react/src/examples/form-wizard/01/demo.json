@@ -1,12 +1,7 @@
 {
   "id": "form-wizard-01",
-  "title": "组合展示",
-  "description": "合并展示多步校验阻断、完成态和 labels 文案覆盖。",
+  "title": "受控步骤表单",
+  "description": "一个 FormWizard 组合展示受控步骤、步骤内容、自定义按钮文案与完成回调；字段校验可通过 beforeNext 接入。",
   "entry": "App.tsx",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

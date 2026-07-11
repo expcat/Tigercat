@@ -1,4 +1,3 @@
-import React from 'react'
 import { Card } from '@expcat/tigercat-react/Card'
 import { useChartInteraction } from '@expcat/tigercat-react'
 

@@ -1,12 +1,7 @@
 {
   "id": "notification-center-01",
-  "title": "组合展示",
-  "description": "合并展示分组已读管理、加载态与空态。",
+  "title": "分组通知",
+  "description": "一个 NotificationCenter 展示分组、已读筛选与内部已读管理；加载态和空态可直接使用对应 props。",
   "entry": "App.tsx",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

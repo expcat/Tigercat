@@ -1,13 +1,7 @@
 {
   "id": "table-03",
-  "title": "排序功能",
-  "description": "点击列头进行排序，支持升序、降序和取消排序。",
+  "title": "自定义单元格",
+  "description": "使用 render 自定义状态单元格。",
   "entry": "App.vue",
-  "order": 3,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  },
-  "permissions": ["modals"]
+  "order": 3
 }

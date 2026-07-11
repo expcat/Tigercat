@@ -1,12 +1,8 @@
 {
   "id": "statistic-01",
-  "title": "基本用法",
-  "description": "展示数值、精度和后缀",
+  "title": "代表配置",
+  "description": "单个 Statistic 组合精度、分组、前后缀和 lg 尺寸；替换 value 即可用于不同指标。",
   "entry": "App.tsx",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

@@ -1,7 +1,7 @@
 {
   "id": "tooltip-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、不同位置、触发方式等互不冲突的使用方式。",
+  "title": "基本用法",
+  "description": "单个提示展示 hover 触发和 top 位置；trigger 还支持 focus、click，位置支持其余 FloatingPlacement 取值。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

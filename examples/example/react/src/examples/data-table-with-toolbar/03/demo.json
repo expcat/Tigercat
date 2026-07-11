@@ -1,0 +1,7 @@
+{
+  "id": "data-table-with-toolbar-03",
+  "title": "列显隐与锁定",
+  "description": "一个实例同时展示列设置显隐、不可隐藏列、固定列与表头动态锁定。",
+  "entry": "App.tsx",
+  "order": 3
+}

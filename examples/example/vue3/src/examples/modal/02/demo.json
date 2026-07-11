@@ -1,7 +1,7 @@
 {
   "id": "modal-02",
-  "title": "不同尺寸等组合展示",
-  "description": "合并展示不同尺寸、居中显示、自定义页脚等互不冲突的使用方式。",
+  "title": "嵌套对话框",
+  "description": "展示父子确认流程；这是唯一允许同时声明两个 Modal 的结构场景。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

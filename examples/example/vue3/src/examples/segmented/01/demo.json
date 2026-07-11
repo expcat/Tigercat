@@ -1,12 +1,8 @@
 {
   "id": "segmented-01",
-  "title": "基本用法",
-  "description": "v-model 双向绑定选中值",
+  "title": "受控分段选择",
+  "description": "一个 Segmented 组合受控值、lg、block 和禁用选项；整个组件也可通过 disabled 禁用。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

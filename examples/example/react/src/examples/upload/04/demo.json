@@ -1,13 +1,12 @@
 {
   "id": "upload-04",
-  "title": "文件数量限制",
-  "description": "通过 limit 属性限制上传文件的数量。",
+  "title": "自定义上传",
+  "description": "一个受控 Upload 通过 customRequest 模拟进度和成功回调，每次只产生一条上传流程。",
   "entry": "App.tsx",
   "order": 4,
   "viewport": {
     "mode": "auto",
     "minHeight": 120,
     "maxHeight": 720
-  },
-  "permissions": ["popups"]
+  }
 }

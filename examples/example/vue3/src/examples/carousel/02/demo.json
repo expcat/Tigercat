@@ -1,12 +1,7 @@
 {
   "id": "carousel-02",
-  "title": "带箭头",
-  "description": "显示前进后退箭头。",
+  "title": "编程控制",
+  "description": "通过组件引用控制上一页、下一页与指定页。",
   "entry": "App.vue",
-  "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 2
 }

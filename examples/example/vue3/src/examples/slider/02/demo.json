@@ -1,7 +1,7 @@
 {
   "id": "slider-02",
-  "title": "不同范围",
-  "description": "通过 min 和 max 属性设置范围。",
+  "title": "范围滑块",
+  "description": "一个受控 Slider 开启 range，用两个滑块选择 0 到 100 的区间。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

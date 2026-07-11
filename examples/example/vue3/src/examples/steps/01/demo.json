@@ -1,7 +1,7 @@
 {
   "id": "steps-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、迷你版、小尺寸等互不冲突的使用方式。",
+  "title": "横向步骤",
+  "description": "一个横向 Steps 用三个必要步骤组合受控 current、clickable 和 small 尺寸。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

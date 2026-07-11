@@ -1,7 +1,7 @@
 {
   "id": "breadcrumb-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、箭头分隔符、尖括号分隔符等互不冲突的使用方式。",
+  "title": "路径导航",
+  "description": "一个 Breadcrumb 用必要的三级路径组合 chevron 分隔符、当前项和 extra 内容；separator 可替换为其他样式。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

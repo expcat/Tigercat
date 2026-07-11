@@ -1,7 +1,7 @@
 {
   "id": "form-04",
-  "title": "表单尺寸",
-  "description": "通过 size 设置表单整体尺寸：sm、md（默认）、lg。",
+  "title": "错误呈现",
+  "description": "通过 FormItem 的 showMessage=false 隐藏默认提示，让必填错误由输入控件内联呈现。",
   "entry": "App.tsx",
   "order": 4,
   "viewport": {

@@ -1,0 +1,7 @@
+{
+  "id": "data-table-with-toolbar-02",
+  "title": "自定义过滤",
+  "description": "用 filters-extra 接入数值过滤并驱动数据；多个控件可通过对象值组合为区间条件。",
+  "entry": "App.vue",
+  "order": 2
+}

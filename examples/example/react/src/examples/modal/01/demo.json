@@ -1,7 +1,7 @@
 {
   "id": "modal-01",
-  "title": "基本用法",
-  "description": "最简单的用法，点击按钮打开对话框。",
+  "title": "代表配置",
+  "description": "一个受控对话框复合展示 md 尺寸、居中、遮罩和默认页脚；size 还支持 sm、lg、xl、full。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

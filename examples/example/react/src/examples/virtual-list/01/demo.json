@@ -1,7 +1,7 @@
 {
   "id": "virtual-list-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、自定义高度 & overscan，减少重复示例块。",
+  "title": "大数据列表",
+  "description": "一个实例组合展示固定行高、视口高度与 overscan；其他数值按业务数据调整。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

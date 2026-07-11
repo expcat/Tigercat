@@ -1,7 +1,7 @@
 {
   "id": "dropdown-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、触发方式、弹出位置等互不冲突的使用方式。",
+  "title": "基础菜单",
+  "description": "一个点击触发的 Dropdown 用三个必要菜单项展示禁用、分隔与操作回显；触发方式和位置可替换对应属性。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

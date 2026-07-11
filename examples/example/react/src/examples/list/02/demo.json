@@ -1,7 +1,7 @@
 {
   "id": "list-02",
-  "title": "列表尺寸",
-  "description": "列表支持三种尺寸：小、中、大。",
+  "title": "自定义列表项",
+  "description": "renderItem 自定义商品信息和操作按钮。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

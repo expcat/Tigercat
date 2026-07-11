@@ -1,7 +1,7 @@
 {
   "id": "steps-02",
-  "title": "纵向步骤条等组合展示",
-  "description": "合并展示纵向步骤条、可点击步骤、自定义图标等互不冲突的使用方式。",
+  "title": "纵向步骤",
+  "description": "一个纵向 Steps 用三个必要步骤展示受控 current，并通过上一步、下一步按钮推进流程。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

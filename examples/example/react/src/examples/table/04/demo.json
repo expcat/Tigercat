@@ -1,13 +1,7 @@
 {
   "id": "table-04",
-  "title": "筛选功能",
-  "description": "支持文本筛选和下拉选择筛选。",
+  "title": "分页与行选择",
+  "description": "一个受控表格同时演示分页与行选择。",
   "entry": "App.tsx",
-  "order": 4,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  },
-  "permissions": ["modals"]
+  "order": 4
 }

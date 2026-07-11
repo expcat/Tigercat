@@ -1,7 +1,7 @@
 {
   "id": "input-02",
-  "title": "约束与反馈",
-  "description": "合并展示 required、长度限制、状态提示和错误抖动。",
+  "title": "InputNumber",
+  "description": "一个受控 InputNumber 组合最小值、最大值、步长、精度、lg 尺寸和增减按钮无障碍文案。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

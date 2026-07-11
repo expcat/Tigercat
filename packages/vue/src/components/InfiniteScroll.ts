@@ -52,8 +52,6 @@ export const InfiniteScroll = defineComponent({
     const containerRef = ref<HTMLElement | null>(null)
     const sentinelRef = ref<HTMLElement | null>(null)
     let cleanupObserver: (() => void) | null = null
-    let _usingFallback = false
-
     const containerClasses = computed(() =>
       classNames(
         getInfiniteScrollContainerClasses(props.direction, props.className),
@@ -79,8 +77,6 @@ export const InfiniteScroll = defineComponent({
     function setupObserver() {
       cleanupObserver?.()
       cleanupObserver = null
-      _usingFallback = false
-
       if (props.disabled || !props.hasMore) return
 
       const sentinel = sentinelRef.value
@@ -98,7 +94,6 @@ export const InfiniteScroll = defineComponent({
         cleanupObserver = teardown
       } else {
         // IO unavailable — fall back to scroll events
-        _usingFallback = true
         containerRef.value?.addEventListener('scroll', checkScroll, { passive: true })
         cleanupObserver = () => {
           containerRef.value?.removeEventListener('scroll', checkScroll)

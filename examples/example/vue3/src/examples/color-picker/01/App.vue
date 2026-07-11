@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import { Space } from '@expcat/tigercat-vue/Space'
-import { Text } from '@expcat/tigercat-vue/Text'
 import { ref } from 'vue'
 import { ColorPicker } from '@expcat/tigercat-vue/ColorPicker'
 
-const color = ref('#2563eb')
-const color2 = ref('#2563eb')
+const color = ref('rgba(37, 99, 235, 0.8)')
 </script>
 
 <template>
-  <div class="min-w-0">
-    <Space :size="16" align="center">
-      <ColorPicker v-model="color" />
-      <Text>选中颜色: {{ color }}</Text>
-    </Space>
-  </div>
+  <ColorPicker
+    v-model="color"
+    show-alpha
+    format="rgb"
+    :presets="['#2563eb', '#0891b2', '#059669', '#dc2626']"
+    size="lg" />
 </template>

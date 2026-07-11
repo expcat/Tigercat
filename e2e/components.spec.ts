@@ -1,151 +1,104 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import { demoUrl, exampleApps, openDemo } from './example-helpers'
 
-const VUE_URL = 'http://127.0.0.1:5173'
-const REACT_URL = 'http://127.0.0.1:5174'
-
-function demoUrl(baseUrl: string, path: string): string {
-  return `${baseUrl}/#/${path}`
-}
-
-for (const [framework, baseUrl] of [
-  ['Vue', VUE_URL],
-  ['React', REACT_URL]
-] as const) {
-  test.describe(`${framework} — Basic Navigation`, () => {
+for (const { framework, baseUrl } of exampleApps) {
+  test.describe(`${framework} — Example components`, () => {
     test('home page loads', async ({ page }) => {
       await page.goto(baseUrl)
       await expect(page).toHaveTitle(/tigercat/i)
     })
 
-    test('can navigate to button demo', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'button'))
-      await expect(page.locator('button').first()).toBeVisible()
-    })
-
-    test('can navigate to input demo', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'input'))
-      await expect(page.locator('input').first()).toBeVisible()
-    })
-  })
-
-  test.describe(`${framework} — Form Components`, () => {
-    test('button click interaction', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'button'))
-      const button = page.locator('button').first()
+    test('button renders and responds to clicks', async ({ page }) => {
+      const { preview } = await openDemo(page, baseUrl, 'button', 'button-02')
+      const button = preview.getByRole('button', { name: '已点击 0 次', exact: true })
       await expect(button).toBeEnabled()
       await button.click()
+      await expect(preview.getByRole('button', { name: '已点击 1 次', exact: true })).toBeVisible()
     })
 
-    test('input typing', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'input'))
-      const input = page.locator('input').first()
+    test('input accepts text', async ({ page }) => {
+      const { preview } = await openDemo(page, baseUrl, 'input', 'input-01')
+      const input = preview.locator('input').first()
       await input.fill('Hello Tigercat')
       await expect(input).toHaveValue('Hello Tigercat')
     })
 
-    test('checkbox toggle', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'checkbox'))
-      const checkbox = page.locator('input[type="checkbox"]').first()
+    test('checkbox and switch toggle', async ({ page }) => {
+      let opened = await openDemo(page, baseUrl, 'checkbox', 'checkbox-01')
+      const checkbox = opened.preview.locator('input[type="checkbox"]').first()
       await checkbox.check()
       await expect(checkbox).toBeChecked()
-      await checkbox.uncheck()
-      await expect(checkbox).not.toBeChecked()
+
+      opened = await openDemo(page, baseUrl, 'switch', 'switch-01')
+      const switchControl = opened.preview.getByRole('switch').first()
+      await expect(switchControl).toBeVisible()
+      await expect(switchControl).toBeChecked()
+      await switchControl.click()
+      await expect(switchControl).not.toBeChecked()
     })
 
-    test('switch toggle', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'switch'))
-      const switchEl = page.locator('[role="switch"]').first()
-      await switchEl.click()
+    test('select and alert render', async ({ page }) => {
+      let opened = await openDemo(page, baseUrl, 'select', 'select-01')
+      await expect(opened.preview.locator('[aria-haspopup="listbox"]').first()).toBeVisible()
+
+      opened = await openDemo(page, baseUrl, 'alert', 'alert-01')
+      await expect(opened.preview.getByRole('alert').first()).toBeVisible()
     })
 
-    test('select dropdown', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'select'))
-      await expect(page.locator('[class*="select"]').first()).toBeVisible()
-    })
-  })
+    test('modal and tooltip stay interactive in the sandbox', async ({ page }) => {
+      let opened = await openDemo(page, baseUrl, 'modal', 'modal-01')
+      await opened.preview.getByRole('button', { name: '打开对话框', exact: true }).click()
+      await expect(opened.preview.getByRole('dialog')).toBeVisible()
 
-  test.describe(`${framework} — Feedback Components`, () => {
-    test('alert renders', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'alert'))
-      await expect(page.locator('[role="alert"]').first()).toBeVisible()
+      opened = await openDemo(page, baseUrl, 'tooltip', 'tooltip-01')
+      await opened.preview.locator('[data-tooltip-trigger], button').first().hover()
+      await expect(opened.preview.getByRole('tooltip')).toContainText('保存当前草稿')
     })
 
-    test('modal open and close', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'modal'))
-      const trigger = page.getByRole('button', { name: /打开对话框/ }).first()
-      await trigger.click()
-      const dialog = page.locator('[role="dialog"]')
-      await expect(dialog).toBeVisible()
+    test('table and tabs render', async ({ page }) => {
+      let opened = await openDemo(page, baseUrl, 'table', 'table-01')
+      await expect(opened.preview.locator('tbody tr').first()).toBeVisible()
+
+      opened = await openDemo(page, baseUrl, 'tabs', 'tabs-01')
+      const tabs = opened.preview.getByRole('tab')
+      await expect(tabs.nth(1)).toBeVisible()
+      await tabs.nth(1).click()
+      await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
     })
 
-    test('tooltip on hover', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'tooltip'))
-      const trigger = page.locator('[data-tooltip-trigger], button').first()
-      await trigger.hover()
-    })
-  })
+    test('navigation components render', async ({ page }) => {
+      let opened = await openDemo(page, baseUrl, 'menu', 'menu-01')
+      await expect(
+        opened.preview.locator('[role="menu"], [role="menubar"], nav').first()
+      ).toBeVisible()
 
-  test.describe(`${framework} — Data Display`, () => {
-    test('table renders with rows', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'table'))
-      await expect(page.locator('table').first()).toBeVisible()
-      const rows = page.locator('tbody tr')
-      await expect(rows.first()).toBeVisible()
+      opened = await openDemo(page, baseUrl, 'breadcrumb', 'breadcrumb-01')
+      await expect(opened.preview.locator('nav').first()).toBeVisible()
+
+      opened = await openDemo(page, baseUrl, 'pagination', 'pagination-01')
+      await expect(opened.preview.locator('nav[aria-label]').first()).toBeVisible()
     })
 
-    test('tabs switching', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'tabs'))
-      const tabs = page.locator('[role="tab"]')
-      await expect(tabs.first()).toBeVisible()
-      if ((await tabs.count()) > 1) {
-        await tabs.nth(1).click()
-      }
-    })
-  })
+    for (const route of ['bar-chart', 'line-chart', 'pie-chart'] as const) {
+      test(`${route} renders SVG`, async ({ page }) => {
+        const { preview } = await openDemo(page, baseUrl, route, `${route}-01`)
+        await expect(preview.locator('svg').first()).toBeVisible()
+      })
+    }
 
-  test.describe(`${framework} — Navigation`, () => {
-    test('menu renders', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'menu'))
-      await expect(page.locator('[role="menu"], [role="menubar"], nav').first()).toBeVisible()
-    })
+    test('layout examples render', async ({ page }) => {
+      let opened = await openDemo(page, baseUrl, 'grid', 'grid-01')
+      await expect(opened.preview.getByText('col-8').first()).toBeVisible()
 
-    test('breadcrumb renders', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'breadcrumb'))
-      await expect(page.locator('nav').first()).toBeVisible()
+      opened = await openDemo(page, baseUrl, 'divider', 'divider-01')
+      await expect(
+        opened.preview.locator('[role="separator"], hr, [class*="divider"]').first()
+      ).toBeVisible()
     })
 
-    test('pagination interaction', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'pagination'))
-      await expect(page.locator('nav[aria-label="Pagination"]').first()).toBeVisible()
-    })
-  })
-
-  test.describe(`${framework} — Charts`, () => {
-    test('bar chart renders SVG', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'bar-chart'))
-      await expect(page.locator('svg').first()).toBeVisible()
-    })
-
-    test('line chart renders SVG', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'line-chart'))
-      await expect(page.locator('svg').first()).toBeVisible()
-    })
-
-    test('pie chart renders SVG', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'pie-chart'))
-      await expect(page.locator('svg').first()).toBeVisible()
-    })
-  })
-
-  test.describe(`${framework} — Layout`, () => {
-    test('grid renders', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'grid'))
-      await expect(page.locator('[class*="grid"], [class*="row"]').first()).toBeVisible()
-    })
-
-    test('divider renders', async ({ page }) => {
-      await page.goto(demoUrl(baseUrl, 'divider'))
-      await expect(page.locator('[role="separator"], hr, [class*="divider"]').first()).toBeVisible()
+    test('route URLs remain stable', async ({ page }) => {
+      await page.goto(demoUrl(baseUrl, 'button'), { waitUntil: 'domcontentloaded' })
+      await expect(page.locator('[data-demo-id="button-01"]')).toBeVisible()
     })
   })
 }

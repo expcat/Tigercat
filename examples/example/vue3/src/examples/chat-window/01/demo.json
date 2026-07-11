@@ -1,12 +1,7 @@
 {
   "id": "chat-window-01",
-  "title": "组合展示",
-  "description": "合并展示 textarea 与单行 input 两种聊天输入模式。",
+  "title": "受控聊天窗口",
+  "description": "一个 ChatWindow 展示受控输入与发送消息；单行模式可改用 inputType=\"input\"。",
   "entry": "App.vue",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

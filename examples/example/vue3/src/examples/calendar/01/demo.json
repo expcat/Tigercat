@@ -1,12 +1,7 @@
 {
   "id": "calendar-01",
-  "title": "基础用法",
-  "description": "默认月视图，v-model 绑定选中日期",
+  "title": "代表视图",
+  "description": "受控月视图并回显当前选中日期。",
   "entry": "App.vue",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

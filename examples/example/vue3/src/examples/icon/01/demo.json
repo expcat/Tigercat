@@ -1,12 +1,8 @@
 {
   "id": "icon-01",
-  "title": "基础用法与内置图标",
-  "description": "支持传入 SVG 子元素来自定义图标，或者直接使用 name 属性指定内置图标（如 search, plus, edit, trash 等）。",
+  "title": "内置图标",
+  "description": "通过 name 使用内置图标，并组合 size、color 与 aria-label；替换 name 即可使用其他注册图标。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

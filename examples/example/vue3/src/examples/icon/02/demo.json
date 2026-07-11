@@ -1,11 +1,8 @@
 {
   "id": "icon-02",
-  "title": "全部内置图标",
+  "title": "自定义图标与无障碍",
+  "description": "用一个 IconDefinition 展示自定义填充图标，并通过 aria-label 提供可访问名称。",
   "entry": "App.vue",
   "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

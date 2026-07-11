@@ -1,12 +1,7 @@
 {
   "id": "comment-thread-01",
-  "title": "组合展示",
-  "description": "合并展示嵌套回复、扁平数据、精简模式与空态。",
+  "title": "嵌套评论",
+  "description": "一个 CommentThread 用最小父子数据展示标签、点赞数与默认展开；扁平数据可改传 items。",
   "entry": "App.tsx",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

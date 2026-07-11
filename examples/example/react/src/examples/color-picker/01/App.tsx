@@ -1,19 +1,17 @@
-import { Space } from '@expcat/tigercat-react/Space'
-import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
 import { ColorPicker } from '@expcat/tigercat-react/ColorPicker'
 
 export default function App() {
-  const [color, setColor] = useState('#2563eb')
-
-  const [color2, setColor2] = useState('#2563eb')
+  const [color, setColor] = useState('rgba(37, 99, 235, 0.8)')
 
   return (
-    <>
-      <Space size={16} align="center">
-        <ColorPicker value={color} onChange={setColor} />
-        <Text>选中颜色: {color}</Text>
-      </Space>
-    </>
+    <ColorPicker
+      value={color}
+      onChange={setColor}
+      showAlpha
+      format="rgb"
+      presets={['#2563eb', '#0891b2', '#059669', '#dc2626']}
+      size="lg"
+    />
   )
 }

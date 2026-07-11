@@ -1,128 +1,34 @@
 <script setup lang="ts">
-import { MenuItem } from '@expcat/tigercat-vue/MenuItem'
-import { SubMenu } from '@expcat/tigercat-vue/SubMenu'
-import { MenuItemGroup } from '@expcat/tigercat-vue/MenuItemGroup'
-import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { Menu } from '@expcat/tigercat-vue/Menu'
+import type { MenuItem as MenuItemData } from '@expcat/tigercat-core'
 
-const selectedKeys1 = ref(['1'])
-const selectedKeys2 = ref(['home'])
-const selectedKeys3 = ref(['1'])
-const openKeys3 = ref(['sub1'])
-const selectedKeys4 = ref(['1'])
-const openKeys4 = ref(['sub1'])
-const collapsed = ref(false)
-const selectedKeys5 = ref(['1'])
-const selectedKeys6 = ref(['1'])
-const selectedKeys7 = ref(['1'])
-const selectedKeys8 = ref(['1'])
-const openKeys8 = ref<(string | number)[]>([])
+const items: MenuItemData[] = [
+  { key: 'dashboard', label: '仪表盘' },
+  {
+    key: 'team',
+    label: '团队',
+    children: [
+      { key: 'members', label: '成员' },
+      { key: 'roles', label: '角色' }
+    ]
+  }
+]
 
-const homeIcon =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
-const settingsIcon =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>'
-const userIcon =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
+const collapsed = ref(true)
 </script>
 
 <template>
-  <div class="min-w-0">
-    <div class="space-y-6">
-      <div class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">收起菜单</h3>
-        <div class="bg-gray-50 p-6 rounded-lg">
-          <div class="mb-4">
-            <Button
-              @click="collapsed = !collapsed"
-              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-              {{ collapsed ? '展开' : '收起' }}
-            </Button>
-          </div>
-          <div class="bg-white inline-block">
-            <Menu mode="vertical" :collapsed="collapsed" v-model:selectedKeys="selectedKeys5">
-              <MenuItem itemKey="1">菜单项 1</MenuItem>
-              <MenuItem itemKey="2">菜单项 2</MenuItem>
-              <SubMenu itemKey="sub1" title="子菜单">
-                <MenuItem itemKey="3">选项 3</MenuItem>
-                <MenuItem itemKey="4">选项 4</MenuItem>
-              </SubMenu>
-            </Menu>
-          </div>
-        </div>
-      </div>
-      <div class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">暗色主题</h3>
-        <div class="bg-gray-50 p-6 rounded-lg">
-          <div class="inline-block">
-            <Menu theme="dark" v-model:selectedKeys="selectedKeys6">
-              <MenuItem itemKey="1">菜单项 1</MenuItem>
-              <MenuItem itemKey="2">菜单项 2</MenuItem>
-              <SubMenu itemKey="sub1" title="子菜单">
-                <MenuItem itemKey="3">选项 3</MenuItem>
-                <MenuItem itemKey="4">选项 4</MenuItem>
-              </SubMenu>
-            </Menu>
-          </div>
-        </div>
-      </div>
-      <div class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">带图标的菜单</h3>
-        <div class="bg-gray-50 p-6 rounded-lg">
-          <div class="bg-white inline-block">
-            <Menu v-model:selectedKeys="selectedKeys7">
-              <MenuItem itemKey="1" :icon="homeIcon">首页</MenuItem>
-              <MenuItem itemKey="2" :icon="userIcon">用户</MenuItem>
-              <SubMenu itemKey="sub1" title="设置" :icon="settingsIcon">
-                <MenuItem itemKey="3">常规设置</MenuItem>
-                <MenuItem itemKey="4">高级设置</MenuItem>
-              </SubMenu>
-            </Menu>
-          </div>
-        </div>
-      </div>
-      <div class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">菜单项分组</h3>
-        <div class="bg-gray-50 p-6 rounded-lg">
-          <div class="bg-white inline-block">
-            <Menu>
-              <MenuItemGroup title="分组 1">
-                <MenuItem itemKey="1">选项 1</MenuItem>
-                <MenuItem itemKey="2">选项 2</MenuItem>
-              </MenuItemGroup>
-              <MenuItemGroup title="分组 2">
-                <MenuItem itemKey="3">选项 3</MenuItem>
-                <MenuItem itemKey="4">选项 4</MenuItem>
-              </MenuItemGroup>
-            </Menu>
-          </div>
-        </div>
-      </div>
-      <div class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">单一展开模式</h3>
-        <div class="bg-gray-50 p-6 rounded-lg">
-          <div class="bg-white inline-block">
-            <Menu
-              :multiple="false"
-              v-model:selectedKeys="selectedKeys8"
-              v-model:openKeys="openKeys8">
-              <SubMenu itemKey="sub1" title="导航 1">
-                <MenuItem itemKey="1">选项 1</MenuItem>
-                <MenuItem itemKey="2">选项 2</MenuItem>
-              </SubMenu>
-              <SubMenu itemKey="sub2" title="导航 2">
-                <MenuItem itemKey="3">选项 3</MenuItem>
-                <MenuItem itemKey="4">选项 4</MenuItem>
-              </SubMenu>
-              <SubMenu itemKey="sub3" title="导航 3">
-                <MenuItem itemKey="5">选项 5</MenuItem>
-                <MenuItem itemKey="6">选项 6</MenuItem>
-              </SubMenu>
-            </Menu>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="space-y-3">
+    <Button size="sm" @click="collapsed = !collapsed">
+      {{ collapsed ? '展开菜单' : '收起菜单' }}
+    </Button>
+    <Menu
+      :items="items"
+      mode="inline"
+      theme="dark"
+      :collapsed="collapsed"
+      :default-selected-keys="['dashboard']" />
   </div>
 </template>

@@ -1,0 +1,8 @@
+{
+  "id": "data-table-with-toolbar-06",
+  "title": "导出集成",
+  "description": "将 DataExport 放入过滤扩展区；需要“所见即所导”时可再同步选中行与隐藏列状态。",
+  "entry": "App.vue",
+  "order": 6,
+  "permissions": ["downloads"]
+}

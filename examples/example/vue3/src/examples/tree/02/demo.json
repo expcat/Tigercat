@@ -1,12 +1,7 @@
 {
   "id": "tree-02",
   "title": "懒加载",
-  "description": "展开节点时动态加载子节点。",
+  "description": "展开节点时异步加载子节点。",
   "entry": "App.vue",
-  "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 2
 }

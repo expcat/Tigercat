@@ -1,7 +1,7 @@
 {
   "id": "radio-02",
-  "title": "单独使用",
-  "description": "Radio 可以脱离 RadioGroup 单独使用，支持受控和非受控两种模式。",
+  "title": "RadioGroup",
+  "description": "一个受控 RadioGroup 用三个必要选项展示互斥选择。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

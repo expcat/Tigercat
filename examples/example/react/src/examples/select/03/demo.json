@@ -1,7 +1,7 @@
 {
   "id": "select-03",
-  "title": "禁用状态",
-  "description": "禁用整个选择器组件。",
+  "title": "多选搜索",
+  "description": "一个受控 Select 同时开启 multiple 和 searchable，在最小技能列表中搜索并多选。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

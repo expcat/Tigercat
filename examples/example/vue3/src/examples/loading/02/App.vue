@@ -1,40 +1,21 @@
 <script setup lang="ts">
-import { Button } from '@expcat/tigercat-vue/Button'
-import { Card } from '@expcat/tigercat-vue/Card'
 import { ref } from 'vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { Loading } from '@expcat/tigercat-vue/Loading'
 
-const pageLoading = ref(false)
-const cardLoading = ref(false)
-const buttonLoading = ref(false)
-
-const showPageLoading = () => {
-  pageLoading.value = true
-  setTimeout(() => {
-    pageLoading.value = false
-  }, 2000)
-}
-
-const refreshCard = () => {
-  cardLoading.value = true
-  setTimeout(() => {
-    cardLoading.value = false
-  }, 1500)
-}
-
-const handleSubmit = () => {
-  buttonLoading.value = true
-  setTimeout(() => {
-    buttonLoading.value = false
-  }, 2000)
-}
+const loading = ref(true)
 </script>
 
 <template>
-  <div class="min-w-0">
-    <div class="p-6 bg-gray-50 rounded-lg">
-      <Button @click="showPageLoading">显示全屏加载</Button>
-      <Loading v-if="pageLoading" fullscreen text="页面加载中..." />
+  <div class="relative min-h-40 rounded-lg border border-gray-200 p-5">
+    <p>本月活跃用户：1,234</p>
+    <Button class="mt-4" size="sm" @click="loading = !loading">
+      {{ loading ? '显示内容' : '重新加载' }}
+    </Button>
+    <div
+      v-if="loading"
+      class="absolute inset-0 flex items-center justify-center rounded-lg bg-white/85 dark:bg-gray-950/85">
+      <Loading variant="ring" text="刷新中…" />
     </div>
   </div>
 </template>

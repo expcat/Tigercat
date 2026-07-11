@@ -1,7 +1,7 @@
 {
   "id": "descriptions-01",
-  "title": "基本用法",
-  "description": "最简单的描述列表展示。",
+  "title": "横向描述",
+  "description": "使用响应式列数展示最小的横向描述列表。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

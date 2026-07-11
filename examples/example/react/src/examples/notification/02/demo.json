@@ -1,7 +1,7 @@
 {
   "id": "notification-02",
-  "title": "不同位置",
-  "description": "支持在四个角落显示通知。",
+  "title": "位置与时长",
+  "description": "用左下角、2.5 秒的代表配置展示 position 与 duration；其余角落和时长按需替换。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

@@ -1,7 +1,7 @@
 {
   "id": "dropdown-02",
-  "title": "点击事件",
-  "description": "监听菜单项的点击事件，并在页面中回显最近操作。",
+  "title": "受控菜单",
+  "description": "一份 open 状态控制一个 Dropdown，菜单项可主动关闭浮层并在页面中回显当前受控状态。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

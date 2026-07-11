@@ -1,6 +1,7 @@
 {
   "id": "resizable-02",
-  "title": "锁定宽高比 & 单轴",
+  "title": "受限调整",
+  "description": "用一个实例展示固定宽高比与最小宽度；单轴和禁用模式可分别通过 axis、disabled 配置。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

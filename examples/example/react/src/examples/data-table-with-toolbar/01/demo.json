@@ -1,13 +1,7 @@
 {
   "id": "data-table-with-toolbar-01",
-  "title": "组合展示",
-  "description": "合并展示基础工具栏、复合过滤、列设置、锁定列、卡片模式与自定义工具栏。",
+  "title": "基础工具栏",
+  "description": "一个表格组合展示搜索、选择过滤与紧凑固定布局；分页和批量操作可按业务需要追加。",
   "entry": "App.tsx",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  },
-  "permissions": ["modals", "downloads"]
+  "order": 1
 }

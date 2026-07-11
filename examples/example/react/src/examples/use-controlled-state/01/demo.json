@@ -1,12 +1,7 @@
 {
   "id": "use-controlled-state-01",
-  "title": "组合展示",
-  "description": "合并展示非受控 defaultValue 与受控 value/onChange 两种状态模式。",
+  "title": "受控计数器",
+  "description": "一个 Counter 使用 value/onChange 展示 useControlledState 的受控模式；只传 defaultValue 即可切换为非受控模式。",
   "entry": "App.tsx",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

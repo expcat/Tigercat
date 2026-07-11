@@ -1,7 +1,7 @@
 {
   "id": "menu-02",
-  "title": "收起菜单等组合展示",
-  "description": "合并展示收起菜单、暗色主题、带图标的菜单等互不冲突的使用方式。",
+  "title": "折叠菜单",
+  "description": "一个暗色 inline Menu 通过 collapsed 状态在展开和收起之间切换，并保留最小嵌套数据。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {

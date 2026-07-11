@@ -1,12 +1,8 @@
 {
   "id": "empty-01",
-  "title": "预设样式",
-  "description": "通过 preset 切换不同空状态场景",
+  "title": "空状态与操作",
+  "description": "单个 Empty 组合预设、描述与操作按钮；preset 还支持 no-data 和 error。",
   "entry": "App.tsx",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }
 }

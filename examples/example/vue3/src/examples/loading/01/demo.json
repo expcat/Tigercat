@@ -1,7 +1,7 @@
 {
   "id": "loading-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、加载动画变体、尺寸大小等互不冲突的使用方式。",
+  "title": "内联加载",
+  "description": "用一个实例复合展示 dots 动画、lg 尺寸、主题色和加载文字；variant 还支持 spinner、bars、ring、pulse。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

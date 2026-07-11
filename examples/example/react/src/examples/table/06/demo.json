@@ -1,13 +1,7 @@
 {
   "id": "table-06",
-  "title": "响应式卡片模式",
-  "description": "显式设置 responsiveMode=\"card\" 后，窄于 cardBreakpoint 时切换为卡片。列定义可配置布局属性，支持使用 cardFieldGap 自定义字段间距（如 gap-2，默认 gap-3）。",
+  "title": "固定列体系",
+  "description": "组合展示左右固定列、固定表头与表头锁定。",
   "entry": "App.tsx",
-  "order": 6,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  },
-  "permissions": ["modals"]
+  "order": 6
 }

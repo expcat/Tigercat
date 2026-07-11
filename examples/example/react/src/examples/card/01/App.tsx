@@ -1,20 +1,14 @@
-import { useState } from 'react'
 import { Card } from '@expcat/tigercat-react/Card'
-import { Space } from '@expcat/tigercat-react/Space'
-import { Button } from '@expcat/tigercat-react/Button'
 
 export default function App() {
-  const [lastAction, setLastAction] = useState('尚未执行卡片操作')
-
-  const recordAction = (action: string, target: string) => setLastAction(`${action}：${target}`)
-
   return (
-    <>
-      <div className="p-6 bg-gray-50 rounded-lg">
-        <Card>
-          <p>这是一个基础的卡片组件，可以展示任何内容。</p>
-        </Card>
-      </div>
-    </>
+    <Card
+      variant="shadow"
+      size="md"
+      hoverable
+      header={<h3 className="font-semibold">项目概览</h3>}
+      footer={<span className="text-sm text-gray-500">更新于刚刚</span>}>
+      <p className="text-gray-600">一个实例组合展示阴影、尺寸、悬停、头部与底部。</p>
+    </Card>
   )
 }

@@ -1,7 +1,7 @@
 {
   "id": "card-01",
-  "title": "基本用法",
-  "description": "最简单的卡片，包含基本内容。",
+  "title": "代表卡片",
+  "description": "一个 Card 组合展示阴影、尺寸、悬停、头部与底部；封面和 actions 按需添加。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

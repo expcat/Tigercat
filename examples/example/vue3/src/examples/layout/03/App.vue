@@ -1,34 +1,25 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { Layout } from '@expcat/tigercat-vue/Layout'
 import { Header } from '@expcat/tigercat-vue/Header'
 import { Sidebar } from '@expcat/tigercat-vue/Sidebar'
 import { Content } from '@expcat/tigercat-vue/Content'
-import { Footer } from '@expcat/tigercat-vue/Footer'
-import { Menu } from '@expcat/tigercat-vue/Menu'
-import { MenuItem } from '@expcat/tigercat-vue/MenuItem'
-import { SubMenu } from '@expcat/tigercat-vue/SubMenu'
-import { ref } from 'vue'
-import { Container } from '@expcat/tigercat-vue/Container'
 
 const collapsed = ref(false)
-const miniCollapsed = ref(true)
-const shellCollapsed = ref(false)
-const shellSelectedKeys = ref<(string | number)[]>(['dashboard'])
-const shellOpenKeys = ref<(string | number)[]>(['system'])
-const dashboardIcon =
-  '<span class="inline-flex size-4 items-center justify-center text-[11px]">⌂</span>'
-const systemIcon =
-  '<span class="inline-flex size-4 items-center justify-center text-[11px]">⚙</span>'
 </script>
 
 <template>
-  <div class="min-w-0">
-    <div class="p-6 bg-gray-50 rounded-lg">
-      <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
-        <Header height="48px" class-name="!bg-blue-600 !text-white !p-4">Header (48px)</Header>
-        <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
-        <Footer height="64px" class-name="!bg-gray-800 !text-white !p-4">Footer (64px)</Footer>
-      </Layout>
-    </div>
+  <div class="space-y-3">
+    <Button size="sm" @click="collapsed = !collapsed">
+      {{ collapsed ? '展开侧栏' : '折叠侧栏' }}
+    </Button>
+    <Layout class="min-h-64 overflow-hidden rounded border border-gray-300">
+      <Header class="!bg-blue-600 !p-4 !text-white">后台管理</Header>
+      <div class="flex flex-1">
+        <Sidebar width="192px" collapsed-width="64px" :collapsed="collapsed">导航</Sidebar>
+        <Content class="!p-4">工作区</Content>
+      </div>
+    </Layout>
   </div>
 </template>

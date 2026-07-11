@@ -1,33 +1,22 @@
 <script setup lang="ts">
-import { DropdownMenu } from '@expcat/tigercat-vue/DropdownMenu'
-import { DropdownItem } from '@expcat/tigercat-vue/DropdownItem'
-import { Button } from '@expcat/tigercat-vue/Button'
 import { ref } from 'vue'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { Dropdown } from '@expcat/tigercat-vue/Dropdown'
+import { DropdownItem } from '@expcat/tigercat-vue/DropdownItem'
+import { DropdownMenu } from '@expcat/tigercat-vue/DropdownMenu'
 
-const visible1 = ref(false)
-const lastCommand = ref('尚未选择操作')
-
-const handleCommand = (command: string) => {
-  const labels: Record<string, string> = { edit: '编辑', copy: '复制', delete: '删除' }
-  lastCommand.value = labels[command] ?? command
-}
+const open = ref(false)
 </script>
 
 <template>
-  <div class="min-w-0">
-    <div class="space-y-3">
-      <Dropdown>
-        <Button>操作</Button>
-        <DropdownMenu>
-          <DropdownItem @click="handleCommand('edit')">编辑</DropdownItem>
-          <DropdownItem @click="handleCommand('copy')">复制</DropdownItem>
-          <DropdownItem @click="handleCommand('delete')" divided>删除</DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-      <p class="text-sm text-gray-600 dark:text-gray-300" role="status">
-        最近操作：{{ lastCommand }}
-      </p>
-    </div>
+  <div class="space-y-3">
+    <Dropdown v-model:open="open" trigger="click">
+      <Button>{{ open ? '关闭菜单' : '打开菜单' }}</Button>
+      <DropdownMenu>
+        <DropdownItem @click="open = false">保存并关闭</DropdownItem>
+        <DropdownItem :close-on-click="false">保持展开</DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+    <p class="text-sm text-gray-500">受控状态：{{ open ? '已打开' : '已关闭' }}</p>
   </div>
 </template>

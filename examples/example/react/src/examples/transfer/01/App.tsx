@@ -1,20 +1,25 @@
 import { useState } from 'react'
 import { Transfer } from '@expcat/tigercat-react/Transfer'
 
-const dataSource = Array.from({ length: 10 }, (_, i) => ({
-  key: String(i + 1),
-  label: `内容 ${i + 1}`,
-  description: `描述 ${i + 1}`
-}))
+const dataSource = [
+  { key: 'design', label: '设计' },
+  { key: 'frontend', label: '前端' },
+  { key: 'backend', label: '后端' },
+  { key: 'qa', label: '测试' }
+]
 
 export default function App() {
-  const [targetKeys1, setTargetKeys1] = useState<(string | number)[]>(['3', '4'])
-
-  const [targetKeys2, setTargetKeys2] = useState<(string | number)[]>(['3', '4'])
+  const [targetKeys, setTargetKeys] = useState<(string | number)[]>(['frontend'])
 
   return (
-    <>
-      <Transfer targetKeys={targetKeys1} onChange={setTargetKeys1} dataSource={dataSource} />
-    </>
+    <Transfer
+      dataSource={dataSource}
+      targetKeys={targetKeys}
+      onChange={setTargetKeys}
+      searchable
+      sourceTitle="可选团队"
+      targetTitle="已选团队"
+      className="max-w-2xl"
+    />
   )
 }

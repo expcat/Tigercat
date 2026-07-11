@@ -1,7 +1,7 @@
 {
   "id": "divider-02",
-  "title": "线条样式",
-  "description": "lineStyle 支持 solid / dashed / dotted。",
+  "title": "垂直分割",
+  "description": "使用一个垂直 Divider 分隔同行内容。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

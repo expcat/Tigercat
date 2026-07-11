@@ -1,7 +1,7 @@
 {
   "id": "message-04",
-  "title": "完整流程示例",
-  "description": "模拟表单提交的完整流程。",
+  "title": "回调与自定义",
+  "description": "在一条消息中组合自定义图标、className 样式和 onClose 回调。",
   "entry": "App.tsx",
   "order": 4,
   "viewport": {

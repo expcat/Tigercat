@@ -1,7 +1,7 @@
 {
   "id": "checkbox-01",
-  "title": "基础用法",
-  "description": "单独使用可以表示两种状态之间的切换。",
+  "title": "单个多选框",
+  "description": "一个受控 Checkbox 组合 lg 尺寸与状态切换；其他尺寸和禁用状态可直接替换对应属性。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

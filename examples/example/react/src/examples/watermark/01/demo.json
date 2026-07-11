@@ -1,12 +1,8 @@
 {
   "id": "watermark-01",
   "title": "文字水印",
-  "description": "基本水印效果",
+  "description": "一个 Watermark 组合文字、旋转角度和横纵间距；font 可进一步配置字号、字重与颜色。",
   "entry": "App.tsx",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }
 }

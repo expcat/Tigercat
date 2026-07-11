@@ -2,15 +2,17 @@
 import { ref } from 'vue'
 import { AutoComplete } from '@expcat/tigercat-vue/AutoComplete'
 
-const val = ref('')
-const val2 = ref('')
-const allOptions = ['React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Preact', 'Next.js', 'Nuxt'].map(
-  (o) => ({ label: o, value: o })
-)
+const value = ref('')
+const options = ['React', 'Vue', 'Svelte', 'Angular'].map((item) => ({
+  label: item,
+  value: item
+}))
 </script>
 
 <template>
-  <div class="min-w-0">
-    <AutoComplete v-model="val" :options="allOptions" placeholder="请输入搜索内容" />
-  </div>
+  <AutoComplete
+    v-model="value"
+    :options="options"
+    placeholder="输入框架名称"
+    class="w-full max-w-sm" />
 </template>

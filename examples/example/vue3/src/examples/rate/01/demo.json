@@ -1,12 +1,8 @@
 {
   "id": "rate-01",
-  "title": "基本与半星",
-  "description": "v-model 双向绑定，allow-half 半星",
+  "title": "受控评分",
+  "description": "单个 Rate 组合受控值、半星、lg 和自定义字符；count 与 disabled 可按业务需要替换。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

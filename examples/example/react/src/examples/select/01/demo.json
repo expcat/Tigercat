@@ -1,7 +1,7 @@
 {
   "id": "select-01",
-  "title": "基础用法",
-  "description": "适用广泛的基础选择器。",
+  "title": "单选",
+  "description": "一个受控 Select 用三个最小选项组合清空、lg 尺寸和禁用选项。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

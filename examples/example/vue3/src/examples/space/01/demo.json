@@ -1,7 +1,7 @@
 {
   "id": "space-01",
-  "title": "水平间距",
-  "description": "水平方向的间距。",
+  "title": "间距与换行",
+  "description": "一个 Space 组合展示大间距、居中和自动换行；垂直布局使用 direction=vertical。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

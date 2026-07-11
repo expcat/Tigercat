@@ -1,0 +1,7 @@
+{
+  "id": "progress-03",
+  "title": "异步上传",
+  "description": "用单个进度条呈现模拟上传流程。",
+  "entry": "App.tsx",
+  "order": 3
+}

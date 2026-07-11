@@ -1,7 +1,7 @@
 {
   "id": "message-03",
-  "title": "手动关闭",
-  "description": "设置 closable 为 true 显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条 loading，并提供逐条/一键关闭。",
+  "title": "异步流程",
+  "description": "同一流程先显示 loading，完成后关闭它并显示 success；失败时可改用 Message.error。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {

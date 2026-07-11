@@ -1,31 +1,15 @@
 <script setup lang="ts">
-import { CheckboxGroup } from '@expcat/tigercat-vue/CheckboxGroup'
-import { Space } from '@expcat/tigercat-vue/Space'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { Checkbox } from '@expcat/tigercat-vue/Checkbox'
+import { CheckboxGroup } from '@expcat/tigercat-vue/CheckboxGroup'
 
-const checked = ref(false)
-const fruitsIndeterminate = ref<string[]>(['apple'])
-const fruits = ref<string[]>(['apple'])
-const groupSizeValues = ref<string[]>(['apple'])
-
-const options = ['apple', 'banana', 'orange']
-
-const allChecked = computed(() => fruitsIndeterminate.value.length === options.length)
-const indeterminate = computed(
-  () => fruitsIndeterminate.value.length > 0 && fruitsIndeterminate.value.length < options.length
-)
-
-const handleCheckAllChange = (value: boolean) => {
-  fruitsIndeterminate.value = value ? [...options] : []
-}
+const values = ref<(string | number | boolean)[]>(['email'])
 </script>
 
 <template>
-  <div class="min-w-0">
-    <Space>
-      <Checkbox disabled>未选中禁用</Checkbox>
-      <Checkbox :model-value="true" disabled>选中禁用</Checkbox>
-    </Space>
-  </div>
+  <CheckboxGroup v-model="values" size="lg">
+    <Checkbox value="email">邮件</Checkbox>
+    <Checkbox value="sms">短信</Checkbox>
+    <Checkbox value="app">应用内</Checkbox>
+  </CheckboxGroup>
 </template>

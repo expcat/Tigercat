@@ -1,7 +1,7 @@
 {
   "id": "form-02",
-  "title": "表单验证",
-  "description": "通过 rules + name 实现校验，支持提交校验与手动校验。",
+  "title": "内置校验",
+  "description": "一个邮箱字段通过 required 和 email 内置规则在提交时校验。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

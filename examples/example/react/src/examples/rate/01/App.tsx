@@ -1,22 +1,13 @@
-import { Space } from '@expcat/tigercat-react/Space'
-import { Text } from '@expcat/tigercat-react/Text'
 import { useState } from 'react'
 import { Rate } from '@expcat/tigercat-react/Rate'
 
 export default function App() {
-  const [val, setVal] = useState(3)
-
-  const [halfVal, setHalfVal] = useState(2.5)
-
-  const [customVal, setCustomVal] = useState(4)
+  const [value, setValue] = useState(3.5)
 
   return (
-    <>
-      <Space direction="vertical" size={16}>
-        <Rate value={val} onChange={setVal} />
-        <Rate value={halfVal} onChange={setHalfVal} allowHalf />
-        <Text>当前值: {halfVal}</Text>
-      </Space>
-    </>
+    <div className="space-y-2">
+      <Rate value={value} onChange={setValue} allowHalf size="lg" character="★" />
+      <p className="text-sm text-gray-500">当前评分：{value}</p>
+    </div>
   )
 }

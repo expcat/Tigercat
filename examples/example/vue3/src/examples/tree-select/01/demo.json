@@ -1,6 +1,7 @@
 {
   "id": "tree-select-01",
   "title": "基本用法",
+  "description": "一个受控 TreeSelect 使用最小两级 treeData 展示层级选择。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

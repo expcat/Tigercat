@@ -1,7 +1,7 @@
 {
   "id": "pagination-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、快速跳页、改变每页条数等互不冲突的使用方式。",
+  "title": "受控分页",
+  "description": "一个 Pagination 同时受控 current 和 pageSize，并组合快速跳页、每页条数切换与总数显示。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

@@ -1,41 +1,13 @@
 <script setup lang="ts">
-import { Form } from '@expcat/tigercat-vue/Form'
-import { FormItem } from '@expcat/tigercat-vue/FormItem'
-import { Input } from '@expcat/tigercat-vue/Input'
-import { Alert } from '@expcat/tigercat-vue/Alert'
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { FormWizard } from '@expcat/tigercat-vue/FormWizard'
+import { Input } from '@expcat/tigercat-vue/Input'
 import type { WizardStep } from '@expcat/tigercat-core'
 
-const steps: WizardStep[] = [
-  { title: '基本信息', description: '填写姓名与邮箱', fields: ['name', 'email'] },
-  { title: '联系方式', description: '填写手机号', fields: ['phone'] },
-  { title: '完成', description: '提交并确认', fields: [] }
-]
-
+const steps: WizardStep[] = [{ title: '填写信息' }, { title: '确认提交' }]
 const current = ref(0)
+const name = ref('')
 const finished = ref(false)
-const currentLabels = ref(0)
-
-type FormExpose = {
-  validate: () => Promise<boolean>
-  validateFields: (fieldNames: string[]) => Promise<boolean>
-}
-const formRef = ref<FormExpose | null>(null)
-const model = reactive({ name: '', email: '', phone: '' })
-
-const handleBeforeNext = async (_current: number, step: WizardStep) => {
-  const fields = step.fields ?? []
-  if (fields.length === 0) {
-    return true
-  }
-  const valid = await formRef.value?.validateFields(fields)
-  return valid === true
-}
-
-const handleFinish = () => {
-  finished.value = true
-}
 
 const handleChange = () => {
   finished.value = false
@@ -43,75 +15,20 @@ const handleChange = () => {
 </script>
 
 <template>
-  <div class="min-w-0">
-    <div class="space-y-6">
-      <section class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">基础用法</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">多步校验阻断 + 完成态。</p>
-        <FormWizard
-          v-model:current="current"
-          :steps="steps"
-          :before-next="handleBeforeNext"
-          @change="handleChange"
-          @finish="handleFinish">
-          <template #step="{ index }">
-            <Form ref="formRef" :model="model" class="w-full max-w-md">
-              <template v-if="index === 0">
-                <FormItem
-                  name="name"
-                  label="姓名"
-                  required
-                  :rules="{ required: true, message: '请输入姓名' }"
-                  :show-message="false">
-                  <Input v-model="model.name" placeholder="请输入姓名" />
-                </FormItem>
-                <FormItem
-                  name="email"
-                  label="邮箱"
-                  required
-                  :rules="{ required: true, message: '请输入邮箱' }"
-                  :show-message="false">
-                  <Input v-model="model.email" placeholder="请输入邮箱" />
-                </FormItem>
-              </template>
-              <template v-else-if="index === 1">
-                <FormItem
-                  name="phone"
-                  label="手机号"
-                  required
-                  :rules="{ required: true, message: '请输入手机号' }"
-                  :show-message="false">
-                  <Input v-model="model.phone" placeholder="请输入手机号" />
-                </FormItem>
-              </template>
-              <template v-else>
-                <div class="space-y-3">
-                  <div class="text-sm text-(--tiger-text-secondary,#6b7280)">
-                    确认信息无误后点击完成。
-                  </div>
-                  <Alert
-                    :type="finished ? 'success' : 'info'"
-                    :description="finished ? '已完成提交' : '等待完成提交'" />
-                </div>
-              </template>
-            </Form>
-          </template>
-        </FormWizard>
-      </section>
-      <section class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">自定义文案 (labels)</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          单语言项目无需引入 locale，直接用扁平 labels 覆盖上一步/下一步/完成按钮文案。
+  <div class="space-y-3">
+    <FormWizard
+      v-model:current="current"
+      :steps="steps"
+      :labels="{ prevText: '返回', nextText: '继续', finishText: '提交' }"
+      @change="handleChange"
+      @finish="finished = true">
+      <template #step="{ index }">
+        <Input v-if="index === 0" v-model="name" placeholder="请输入姓名" />
+        <p v-else class="text-sm text-gray-600 dark:text-gray-300">
+          姓名：{{ name || '尚未填写' }}
         </p>
-        <FormWizard
-          v-model:current="currentLabels"
-          :steps="steps"
-          :labels="{ prevText: '返回', nextText: '继续', finishText: '提交完成' }">
-          <template #step="{ index }">
-            <div class="text-sm text-gray-600">第 {{ index + 1 }} 步内容</div>
-          </template>
-        </FormWizard>
-      </section>
-    </div>
+      </template>
+    </FormWizard>
+    <p v-if="finished" class="text-sm text-green-600">提交完成</p>
   </div>
 </template>

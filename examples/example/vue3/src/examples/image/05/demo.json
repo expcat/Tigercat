@@ -1,12 +1,8 @@
 {
   "id": "image-05",
-  "title": "图片预览模式",
-  "description": "支持点击图片进入全屏预览（默认），也可通过 preview-trigger='hover' 开启悬停放大预览。",
+  "title": "ImagePreview",
+  "description": "用一份 open 状态受控打开独立 ImagePreview，并通过 currentIndex 指定初始图片。",
   "entry": "App.vue",
   "order": 5,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

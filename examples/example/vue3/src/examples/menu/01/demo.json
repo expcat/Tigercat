@@ -1,7 +1,7 @@
 {
   "id": "menu-01",
-  "title": "基本用法等组合展示",
-  "description": "合并展示基本用法、横向菜单、子菜单等互不冲突的使用方式。",
+  "title": "完整菜单",
+  "description": "一个 inline Menu 组合嵌套项、禁用项、搜索，以及受控的选中项和展开项。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

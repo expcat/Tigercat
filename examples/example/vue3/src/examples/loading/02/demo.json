@@ -1,13 +1,12 @@
 {
   "id": "loading-02",
-  "title": "全屏加载",
-  "description": "使用 fullscreen 属性可以创建全屏加载遮罩层。",
+  "title": "区域加载",
+  "description": "在局部容器中切换一份加载遮罩和业务内容。",
   "entry": "App.vue",
   "order": 2,
   "viewport": {
     "mode": "auto",
     "minHeight": 120,
     "maxHeight": 720
-  },
-  "permissions": ["fullscreen"]
+  }
 }

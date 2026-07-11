@@ -7,9 +7,10 @@ import { Splitter } from '@expcat/tigercat-vue/Splitter'
     <Splitter
       direction="horizontal"
       :sizes="[30, 70]"
+      :min="100"
       style="height: 200px; border: 1px solid #e5e7eb; border-radius: 8px">
-      <div class="p-4">左侧面板 (30px)</div>
-      <div class="p-4">右侧面板 (70px)</div>
+      <div class="p-4">左侧面板（最小 100px）</div>
+      <div class="p-4">右侧面板</div>
     </Splitter>
   </div>
 </template>

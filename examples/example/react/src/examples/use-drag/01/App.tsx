@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Card } from '@expcat/tigercat-react/Card'
 import { Tag } from '@expcat/tigercat-react/Tag'
 import { useDrag } from '@expcat/tigercat-react'

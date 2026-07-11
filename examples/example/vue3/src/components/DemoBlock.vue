@@ -102,6 +102,7 @@ const sandbox = ref<{ channelId: string; document: string } | null>(null)
 const iframeHeight = ref(props.module.meta.viewport?.height ?? 180)
 const themeVersion = ref(0)
 let latestRun = 0
+let sandboxReady = false
 let intersectionObserver: IntersectionObserver | null = null
 let themeObserver: MutationObserver | null = null
 
@@ -120,6 +121,7 @@ const editorTheme = computed(() =>
 )
 
 function rebuildSandbox(result: DemoCompileSuccess) {
+  sandboxReady = false
   const channelId = crypto.randomUUID()
   sandbox.value = {
     channelId,
@@ -204,7 +206,10 @@ function onMessage(event: MessageEvent) {
   ) {
     return
   }
-  if (event.data.type === 'ready') status.value = isDirty.value ? 'dirty' : 'ready'
+  if (event.data.type === 'ready') {
+    sandboxReady = true
+    status.value = isDirty.value ? 'dirty' : 'ready'
+  }
   if (event.data.type === 'runtime-error') {
     diagnostics.value = [{ text: event.data.message ?? '示例运行失败' }]
     status.value = 'runtime-error'
@@ -245,7 +250,7 @@ onMounted(() => {
 })
 
 watch([compiled, demoLang, themeVersion], ([result]) => {
-  if (result) rebuildSandbox(result)
+  if (result && sandboxReady) rebuildSandbox(result)
 })
 
 onBeforeUnmount(() => {

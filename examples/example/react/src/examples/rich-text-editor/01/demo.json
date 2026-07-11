@@ -1,7 +1,7 @@
 {
   "id": "rich-text-editor-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、只读 & 禁用，减少重复示例块。",
+  "title": "富文本编辑",
+  "description": "最小受控编辑示例；只读与禁用模式分别通过 readOnly、disabled 设置。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

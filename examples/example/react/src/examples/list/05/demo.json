@@ -1,7 +1,7 @@
 {
   "id": "list-05",
-  "title": "带头像的列表",
-  "description": "列表项可以包含头像。",
+  "title": "加载与空态",
+  "description": "同一个 List 通过 loading 状态在加载占位和空态之间切换。",
   "entry": "App.tsx",
   "order": 5,
   "viewport": {

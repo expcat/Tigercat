@@ -1,12 +1,7 @@
 {
   "id": "collapse-02",
-  "title": "手风琴模式",
-  "description": "每次只能展开一个面板。",
+  "title": "嵌套面板",
+  "description": "折叠面板包含一组拥有独立状态的嵌套面板。",
   "entry": "App.vue",
-  "order": 2,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 2
 }

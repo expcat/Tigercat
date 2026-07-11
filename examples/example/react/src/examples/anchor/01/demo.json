@@ -1,7 +1,7 @@
 {
   "id": "anchor-01",
-  "title": "基本用法与水平方向",
-  "description": "合并展示基本用法、水平方向，减少重复示例块。",
+  "title": "文档锚点",
+  "description": "一个纵向 Anchor 关联两段文档内容，并关闭 affix 以便直接复制；水平导航可将 direction 改为 horizontal。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

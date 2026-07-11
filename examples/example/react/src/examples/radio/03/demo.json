@@ -1,7 +1,7 @@
 {
   "id": "radio-03",
-  "title": "非受控",
-  "description": "不传 value，仅使用 defaultValue，并通过 onChange 监听变化。",
+  "title": "非受控 RadioGroup",
+  "description": "一个 RadioGroup 只传 defaultValue 管理内部状态，并通过 onChange 回显最近选择。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

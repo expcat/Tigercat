@@ -1,13 +1,7 @@
 {
   "id": "table-08",
-  "title": "行选择",
-  "description": "选择单行或多行数据。",
+  "title": "可展开行",
+  "description": "受控展开行并展示行级详情。",
   "entry": "App.vue",
-  "order": 8,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  },
-  "permissions": ["modals"]
+  "order": 8
 }

@@ -1,12 +1,8 @@
 {
   "id": "link-01",
-  "title": "链接变体",
-  "description": "展示 primary / secondary / default 三种变体。",
+  "title": "代表外观",
+  "description": "组合 primary、lg 与外部链接属性；其他 variant、size、underline 和 disabled 取值按需替换。",
   "entry": "App.tsx",
   "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

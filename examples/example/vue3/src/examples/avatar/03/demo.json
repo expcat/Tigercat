@@ -1,12 +1,8 @@
 {
   "id": "avatar-03",
-  "title": "文字头像",
-  "description": "使用 text 属性显示文字头像，组件会自动提取首字母或缩写。",
+  "title": "AvatarGroup",
+  "description": "一个 AvatarGroup 管理必要成员并用 max 折叠溢出项，组级 size 会传递给子头像。",
   "entry": "App.vue",
   "order": 3,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
 }

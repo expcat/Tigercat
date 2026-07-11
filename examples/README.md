@@ -97,10 +97,11 @@ export default {
 1. `examples/example/shared/app-config.ts` 中的分类、描述和路径。
 2. `examples/example/vue3/src` 与 `examples/example/react/src` 中的组件 value imports 是否继续使用 PascalCase 子路径；hooks/composables、`notification`、共享类型可继续走根入口或 core。
 3. 每个 `demo.json` 是否拥有唯一 ID、有效入口和稳定顺序，源码是否能在独立沙箱中运行；新增或修改后运行 `pnpm example:sources:check`。
-4. 模块是否只保留自身状态和交互；弹层、异步流程、焦点与滚动场景不得依赖同页面其他示例。
-5. 路由页是否继续通过 `React.lazy` / 原生 Vue Router import factory 懒加载，模块源码和浏览器编译器是否保持按需加载。
-6. 对应组件分组测试是否通过，例如 `pnpm test:group:form` 或 `pnpm test:group -- --group feedback --framework react`。
-7. `pnpm example:build` 是否通过；SSR、懒加载或按需导入变更还需要 `pnpm example:ssr:check`。
-8. 本次变更文件是否通过 changed-file Prettier check。
+4. 单个模块是否保持小而可复制：只保留自身状态、数据和交互；颜色、尺寸、位置等正交静态变体使用一个代表实例复合展示，其余取值写入说明。
+5. 只有交互方式、数据流或结构真正不同才拆分模块；弹层使用单一受控实例，异步流程、焦点与滚动场景不得依赖同页面其他示例。
+6. 路由页是否继续通过 `React.lazy` / 原生 Vue Router import factory 懒加载，模块源码和浏览器编译器是否保持按需加载。
+7. 对应组件分组测试是否通过，例如 `pnpm test:group:form` 或 `pnpm test:group -- --group feedback --framework react`。
+8. `pnpm example:build` 是否通过；SSR、懒加载或按需导入变更还需要 `pnpm example:ssr:check`。
+9. 本次变更文件是否通过 changed-file Prettier check。
 
 组件 API 文档入口见 [skills/tigercat/SKILL.md](../skills/tigercat/SKILL.md)，测试入口见 [tests/README.md](../tests/README.md)。

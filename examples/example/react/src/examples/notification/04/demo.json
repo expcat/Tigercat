@@ -1,7 +1,7 @@
 {
   "id": "notification-04",
-  "title": "可关闭性",
-  "description": "控制通知是否显示关闭按钮。",
+  "title": "操作与回调",
+  "description": "一条通知同时展示 actions 操作和 onClose 回调，点击操作不会创建额外通知。",
   "entry": "App.tsx",
   "order": 4,
   "viewport": {

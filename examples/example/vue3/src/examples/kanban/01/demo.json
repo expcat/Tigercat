@@ -1,12 +1,7 @@
 {
   "id": "kanban-01",
-  "title": "组合展示",
-  "description": "合并展示基础用法、禁用拖拽 & WIP 限制，减少重复示例块。",
+  "title": "受控看板",
+  "description": "一个 Kanban 组合展示受控列、卡片计数、新增卡片和 WIP 限制；拖拽开关可按需调整。",
   "entry": "App.vue",
-  "order": 1,
-  "viewport": {
-    "mode": "auto",
-    "minHeight": 120,
-    "maxHeight": 720
-  }
+  "order": 1
 }

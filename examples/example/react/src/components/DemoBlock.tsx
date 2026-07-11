@@ -85,6 +85,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const latestRunRef = useRef(0)
+  const sandboxReadyRef = useRef(false)
   const [visible, setVisible] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
   const [originalBundle, setOriginalBundle] = useState<DemoSourceBundle | null>(null)
@@ -132,6 +133,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
 
   const rebuildSandbox = useCallback(
     (result: DemoCompileSuccess) => {
+      sandboxReadyRef.current = false
       const channelId = crypto.randomUUID()
       const dark = document.documentElement.classList.contains('dark')
       const modern = document.documentElement.dataset.tigerStyle === 'modern'
@@ -199,7 +201,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
   }, [module, originalBundle, run, visible])
 
   useEffect(() => {
-    if (compiled) rebuildSandbox(compiled)
+    if (compiled && sandboxReadyRef.current) rebuildSandbox(compiled)
     // themeVersion intentionally invalidates the sandbox without recompiling source.
   }, [compiled, rebuildSandbox, themeVersion])
 
@@ -212,7 +214,10 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
       )
         return
       if (event.data.channelId !== sandbox.channelId) return
-      if (event.data.type === 'ready') setStatus(isDirty ? 'dirty' : 'ready')
+      if (event.data.type === 'ready') {
+        sandboxReadyRef.current = true
+        setStatus(isDirty ? 'dirty' : 'ready')
+      }
       if (event.data.type === 'runtime-error') {
         setDiagnostics([{ text: event.data.message ?? '示例运行失败' }])
         setStatus('runtime-error')
