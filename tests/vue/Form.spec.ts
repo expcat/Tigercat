@@ -1443,8 +1443,11 @@ describe('Form', () => {
       render(Demo)
       await fireEvent.focusOut(screen.getByLabelText('username'))
 
-      // Wait a bit for potential error message
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      // Wait until async validation marks the field invalid, then assert
+      // the error message itself stays suppressed
+      await waitFor(() => {
+        expect(screen.getByLabelText('username')).toHaveAttribute('aria-invalid', 'true')
+      })
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
 

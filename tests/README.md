@@ -28,10 +28,7 @@ tests/
 │   ├── frame-scheduler.ts       # Shared requestAnimationFrame helpers
 │   └── index.ts
 ├── setup.ts            # Global test setup
-├── TESTING_GUIDE.md    # Vue testing guide
-├── REACT_TESTING_GUIDE.md  # React testing guide
-├── COMPONENT_TEST_CHECKLIST.md  # Vue test progress
-└── REACT_COMPONENT_TEST_CHECKLIST.md  # React test progress
+└── TEST_QUALITY_GUIDELINES.md  # Testing standards and review checklist
 ```
 
 ## Running Tests
@@ -47,7 +44,7 @@ pnpm test tests/vue
 pnpm test tests/react
 
 # Run tests in watch mode
-pnpm test
+pnpm test:watch
 
 # Run tests with UI
 pnpm test:ui
@@ -59,27 +56,19 @@ pnpm test:coverage
 pnpm test Button.spec
 ```
 
-## Framework-Specific Guides
+## Framework-Specific Quick Start
+
+Testing standards for both frameworks live in [TEST_QUALITY_GUIDELINES.md](./TEST_QUALITY_GUIDELINES.md).
 
 ### Vue Testing
 
-See [TESTING_GUIDE.md](./TESTING_GUIDE.md) for comprehensive Vue testing guidelines.
-
-**Quick Start:**
-
 - Test template: `vue/ComponentTemplate.spec.ts.template`
 - Example test: `vue/Button.spec.ts`
-- Progress tracker: `COMPONENT_TEST_CHECKLIST.md`
 
 ### React Testing
 
-See [REACT_TESTING_GUIDE.md](./REACT_TESTING_GUIDE.md) for comprehensive React testing guidelines.
-
-**Quick Start:**
-
 - Test template: `react/ComponentTemplate.spec.tsx.template`
 - Example test: `react/Button.spec.tsx`
-- Progress tracker: `REACT_COMPONENT_TEST_CHECKLIST.md`
 
 ## Test Structure
 
@@ -263,7 +252,7 @@ it('should match snapshot', () => {
 
 ### For New Contributors
 
-1. **Read the Testing Guides**: Vue uses [TESTING_GUIDE.md](./TESTING_GUIDE.md), and React uses [REACT_TESTING_GUIDE.md](./REACT_TESTING_GUIDE.md).
+1. **Read the Testing Standards**: [TEST_QUALITY_GUIDELINES.md](./TEST_QUALITY_GUIDELINES.md) covers both Vue and React.
 
 2. **Look at Examples**:
    - Vue: `vue/Button.spec.ts`
@@ -325,9 +314,11 @@ it('should match snapshot', () => {
    pnpm test YourComponent
    ```
 
-5. Update the test checklist:
-   - Vue: [COMPONENT_TEST_CHECKLIST.md](./COMPONENT_TEST_CHECKLIST.md)
-   - React: [REACT_COMPONENT_TEST_CHECKLIST.md](./REACT_COMPONENT_TEST_CHECKLIST.md)
+5. Validate against the quality guidelines:
+
+   ```bash
+   pnpm test:validate
+   ```
 
 ## Troubleshooting Tests
 

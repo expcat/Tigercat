@@ -6,6 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Drawer } from '@expcat/tigercat-vue'
+import { ANIMATION_DURATION_MS } from '@expcat/tigercat-core'
 import { h } from 'vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -329,30 +330,37 @@ describe('Drawer', () => {
     )
   })
 
-  it('should emit after-enter/after-close after 300ms', async () => {
-    const onAfterEnter = vi.fn()
-    const onAfterClose = vi.fn()
+  it('should emit after-enter/after-close after the animation duration', async () => {
+    vi.useFakeTimers()
+    try {
+      const onAfterEnter = vi.fn()
+      const onAfterClose = vi.fn()
 
-    const { rerender } = render(Drawer, {
-      props: {
-        open: true,
+      const { rerender } = render(Drawer, {
+        props: {
+          open: true,
+          title: 'Test Drawer',
+          onAfterEnter,
+          onAfterClose
+        }
+      })
+
+      expect(onAfterEnter).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(ANIMATION_DURATION_MS)
+      expect(onAfterEnter).toHaveBeenCalled()
+
+      await rerender({
+        open: false,
         title: 'Test Drawer',
         onAfterEnter,
         onAfterClose
-      }
-    })
-
-    await new Promise((resolve) => setTimeout(resolve, 350))
-    expect(onAfterEnter).toHaveBeenCalled()
-
-    await rerender({
-      open: false,
-      title: 'Test Drawer',
-      onAfterEnter,
-      onAfterClose
-    })
-    await new Promise((resolve) => setTimeout(resolve, 350))
-    expect(onAfterClose).toHaveBeenCalled()
+      })
+      expect(onAfterClose).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(ANIMATION_DURATION_MS)
+      expect(onAfterClose).toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('should pass basic accessibility checks', async () => {

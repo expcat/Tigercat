@@ -721,18 +721,9 @@ Use this checklist when reviewing test PRs:
 
 - [ ] Complex test logic has comments
 - [ ] Test utilities are documented
-- [ ] Test checklist is updated
 
 ## Resources
 
-- [Vue Testing Guide](./TESTING_GUIDE.md)
-- [React Testing Guide](./REACT_TESTING_GUIDE.md)
-- [Vue Component Checklist](./COMPONENT_TEST_CHECKLIST.md)
-- [React Component Checklist](./REACT_COMPONENT_TEST_CHECKLIST.md)
+- [Tests Overview](./README.md)
 - [Testing Library Best Practices](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)
 - [WCAG Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
-
----
-
-**Last Updated**: 2024-12-30
-**Version**: 1.0.0

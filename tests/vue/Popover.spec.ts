@@ -354,9 +354,9 @@ describe('Popover', () => {
         }
       )
 
-      // Click should NOT open
+      // Click should NOT open — opening is synchronous (no timers), so the
+      // awaited click has already settled any state updates
       await user.click(getByText('Manual trigger'))
-      await new Promise((r) => setTimeout(r, 100))
       expect(queryByText('Manual content')).toBeNull()
 
       // Controlled visible=true should open
@@ -385,10 +385,8 @@ describe('Popover', () => {
 
       await user.click(getByText('Disabled trigger'))
 
-      // Wait a bit to ensure it doesn't show
-      await new Promise((resolve) => setTimeout(resolve, 100))
-
-      // Content should still not be rendered
+      // Opening is synchronous when enabled, so absence right after the
+      // awaited click proves the disabled state blocked it
       expect(queryByText('Disabled content')).toBeNull()
     })
 
@@ -490,7 +488,6 @@ describe('Popover', () => {
       })
     })
   })
-
 
   describe('Accessibility', () => {
     it('should pass a11y checks', async () => {

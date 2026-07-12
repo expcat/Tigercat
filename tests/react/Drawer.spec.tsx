@@ -3,10 +3,11 @@
  */
 
 import { afterEach, describe, it, expect, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Drawer } from '@expcat/tigercat-react'
+import { ANIMATION_DURATION_MS } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Drawer', () => {
@@ -262,33 +263,44 @@ describe('Drawer', () => {
     )
   })
 
-  it('should fire onAfterEnter/onAfterClose after animation', async () => {
-    const onAfterEnter = vi.fn()
-    const onAfterClose = vi.fn()
+  it('should fire onAfterEnter/onAfterClose after animation', () => {
+    vi.useFakeTimers()
+    try {
+      const onAfterEnter = vi.fn()
+      const onAfterClose = vi.fn()
 
-    const { rerender } = render(
-      <Drawer
-        open={true}
-        title="Test Drawer"
-        onAfterEnter={onAfterEnter}
-        onAfterClose={onAfterClose}
-      />
-    )
+      const { rerender } = render(
+        <Drawer
+          open={true}
+          title="Test Drawer"
+          onAfterEnter={onAfterEnter}
+          onAfterClose={onAfterClose}
+        />
+      )
 
-    await new Promise((resolve) => setTimeout(resolve, 350))
-    expect(onAfterEnter).toHaveBeenCalled()
+      expect(onAfterEnter).not.toHaveBeenCalled()
+      act(() => {
+        vi.advanceTimersByTime(ANIMATION_DURATION_MS)
+      })
+      expect(onAfterEnter).toHaveBeenCalled()
 
-    rerender(
-      <Drawer
-        open={false}
-        title="Test Drawer"
-        onAfterEnter={onAfterEnter}
-        onAfterClose={onAfterClose}
-      />
-    )
+      rerender(
+        <Drawer
+          open={false}
+          title="Test Drawer"
+          onAfterEnter={onAfterEnter}
+          onAfterClose={onAfterClose}
+        />
+      )
 
-    await new Promise((resolve) => setTimeout(resolve, 350))
-    expect(onAfterClose).toHaveBeenCalled()
+      expect(onAfterClose).not.toHaveBeenCalled()
+      act(() => {
+        vi.advanceTimersByTime(ANIMATION_DURATION_MS)
+      })
+      expect(onAfterClose).toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('should pass basic accessibility checks', async () => {
