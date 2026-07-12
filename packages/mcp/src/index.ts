@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url'
+import { realpathSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
@@ -107,8 +108,16 @@ function helpText(): string {
   ].join('\n')
 }
 
-const isDirectRun =
-  process.argv[1] !== undefined && fileURLToPath(import.meta.url) === resolve(process.argv[1])
+// argv[1] 可能是 npm .bin 软链或 macOS /var -> /private/var 这类符号链接路径,
+// 必须 realpath 后再与模块自身路径比较,否则 bin 会静默退出。
+const isDirectRun = (() => {
+  if (process.argv[1] === undefined) return false
+  try {
+    return fileURLToPath(import.meta.url) === realpathSync(resolve(process.argv[1]))
+  } catch {
+    return false
+  }
+})()
 
 if (isDirectRun) {
   main().catch((error) => {
