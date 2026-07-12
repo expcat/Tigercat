@@ -38,7 +38,10 @@ export function playgroundRuntimePlugin(entries: Record<string, PlaygroundRuntim
         const referenceId = this.emitFile({
           type: 'chunk',
           id: path.resolve(entry.file),
-          name: `playground-${key}`
+          name: `playground-${key}`,
+          // Vite 对非 lib 构建传 preserveEntrySignatures: false,不按 chunk
+          // 覆盖的话 rolldown 会剥掉这些 import-map 入口的导出签名
+          preserveSignature: 'strict'
         })
         return `${JSON.stringify(key)}: import.meta.ROLLUP_FILE_URL_${referenceId}`
       })
