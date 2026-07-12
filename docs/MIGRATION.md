@@ -2,39 +2,9 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
-## v2.0.0-rc.2
-
-v2.0.0 rc.2 使用当前 v2.0.0 破坏性升级迁移路径。本次候选版本新增 `@expcat/tigercat-mcp` 本地 MCP 服务、组件元数据与诊断增强，并完成测试、Example、E2E 与发布文档收口；无新增破坏性变更。迁移操作请按下方 v2.0.0 条目执行。
-
-## v2.0.0-rc.1
-
-v2.0.0 rc.1 使用下方 v2.0.0 破坏性升级迁移路径。Pagination 页容量变更现在只通过 React `onPageSizeChange` / Vue `page-size-change` 通知，并携带调整后的页码，不再同时触发页面导航 `onChange` / `change`。
-
-core 已移除仅供旧 Table/List 简易分页拼装的 `getSimplePaginationContainerClasses`、`getSimplePaginationTotalClasses`、`getSimplePaginationControlsClasses`、`getSimplePaginationSelectClasses`、`getSimplePaginationButtonClasses`、`getSimplePaginationPageIndicatorClasses` 与 `getSimplePaginationButtonsWrapperClasses`。业务代码请直接渲染 React/Vue `Pagination`；确需自定义分页样式时，改用 `getPaginationContainerClasses`、`getPaginationButtonBaseClasses`、`getPaginationEllipsisClasses`、`getTotalTextClasses` 或 `getBuiltInPaginationContainerClasses`。
-
-## v2.0.0-preview.6
-
-v2.0.0 preview 6 使用当前 v2.0.0 破坏性升级迁移路径。本次预览无新增破坏性变更，DataExport 组件与 Table / List 分页 `simple` / `showQuickJumper` / `pageIndicatorText` 均为纯增量 API；迁移操作请按下方 v2.0.0 条目执行。
-
-## v2.0.0-preview.5
-
-v2.0.0 preview 5 使用当前 v2.0.0 破坏性升级迁移路径。本次预览无新增破坏性变更，Table / List 远程分页 `pagination.remote` 为纯增量 API（默认 `false`，缺省行为不变）；迁移操作请按下方 v2.0.0 条目执行。
-
-## v2.0.0-preview.4
-
-v2.0.0 preview 4 使用当前 v2.0.0 破坏性升级迁移路径。本次预览无新增破坏性变更，Icon `icon` 属性与扩展图标集均为纯增量 API；迁移操作请按下方 v2.0.0 条目执行。
-
-## v2.0.0-preview.3
-
-v2.0.0 preview 3 使用当前 v2.0.0 破坏性升级迁移路径。本次预览无新增破坏性变更，仅合入 DatePicker locale 文案回退修复与 release 门禁维护更新；迁移操作请按下方 v2.0.0 条目执行。
-
-## v2.0.0-preview.2
-
-v2.0.0 preview 2 使用当前 v2.0.0 破坏性升级迁移路径。预览版本号已同步到四个发布包、运行时 `version` 导出、CLI 版本常量、CLI 模板 Tigercat 依赖范围和示例首页；迁移操作请按下方 v2.0.0 条目执行。
-
 ## v2.0.0
 
-v2.0.0 破坏性升级实现与 RC 收口已完成：版本号、运行时 version、CLI 模板版本与 release readiness 文档入口已同步；core / React / Vue 发布面已切换为 ESM-only；React / Vue component 子路径已收敛为 PascalCase 显式 exports；tree-shaking 副作用声明、deprecated / compat API、legacy token / icon path 兼容层、示例与 references 均已按下列迁移路径收口。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。
+v2.0.0 正式版（与 v2.0.0-rc.2 公开 API 一致）。从 v1.x 升级请按本条目执行：core / React / Vue 发布面已切换为 ESM-only；React / Vue component 子路径已收敛为 PascalCase 显式 exports；tree-shaking 副作用声明、deprecated / compat API、legacy token / icon path 兼容层、示例与 references 均已按下列迁移路径收口。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。
 
 ### React / Vue component 子路径改为显式 PascalCase
 
@@ -252,6 +222,12 @@ import { TabPane } from '@expcat/tigercat-vue/TabPane'
 ```
 
 源码级深路径（如 `packages/react/src/components/MenuItem`）不再保留；库内部或源码级集成应从父组件文件导入。
+
+### Pagination 页容量事件与 simple 样式 helpers 收敛
+
+Pagination 页容量变更只通过 React `onPageSizeChange` / Vue `page-size-change` 通知，并携带调整后的页码；即使当前页因总页数减少而被收敛，也不再额外触发页面导航 `onChange` / `change`。若业务侧此前依赖 `onChange` / `change` 同步感知页容量变更，请改为监听页容量事件。
+
+core 已移除仅供旧 Table/List 简易分页拼装的 `getSimplePaginationContainerClasses`、`getSimplePaginationTotalClasses`、`getSimplePaginationControlsClasses`、`getSimplePaginationSelectClasses`、`getSimplePaginationButtonClasses`、`getSimplePaginationPageIndicatorClasses` 与 `getSimplePaginationButtonsWrapperClasses`。业务代码请直接渲染 React/Vue `Pagination`；确需自定义分页样式时，改用 `getPaginationContainerClasses`、`getPaginationButtonBaseClasses`、`getPaginationEllipsisClasses`、`getTotalTextClasses` 或 `getBuiltInPaginationContainerClasses`。
 
 ### Data / Table 数据、选择与虚拟滚动入口收敛
 

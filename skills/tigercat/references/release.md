@@ -47,7 +47,7 @@ Available groups are `basic`, `form`, `feedback`, `layout`, `navigation`, `data`
 
 Breaking changes must be centralized in [docs/MIGRATION.md](../../../docs/MIGRATION.md) and [CHANGELOG.md](../../../CHANGELOG.md). Each entry should include affected package or component, removed API, replacement API, and a minimal diff when possible.
 
-Current v2.0.0-rc.2 carries the v2.0.0 release-candidate surface: fixed package versions including the MCP package, runtime version exports, ESM-only core / React / Vue packages, explicit component exports, tree-shaking guards, API removals, migrated docs/examples, and local MCP reference routing. Continue to update [docs/MIGRATION.md](../../../docs/MIGRATION.md) and [CHANGELOG.md](../../../CHANGELOG.md) before the final v2.0.0 release. The previous completed breaking-change set remains v1.5.0:
+Current v2.0.0 is the stable release of the v2 surface: fixed package versions including the MCP package, runtime version exports, ESM-only core / React / Vue packages, explicit component exports, tree-shaking guards, API removals, migrated docs/examples, and local MCP reference routing. The full v2.0.0 breaking-change set and migration paths are centralized in [docs/MIGRATION.md](../../../docs/MIGRATION.md). The previous completed breaking-change set remains v1.5.0:
 
 | Area                       | Removed or changed                 | Replacement or action                                                 |
 | -------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
@@ -106,6 +106,8 @@ Use prerelease channels for preview builds.
 pnpm release:next
 pnpm release:canary
 ```
+
+Stable and RC releases are cut manually, not by `changeset version`: write the target version everywhere with `node scripts/sync-version.mjs <version>`, update `CHANGELOG.md` and `docs/MIGRATION.md` by hand, remove consumed `.changeset/*.md` entries so a future `changeset version` cannot mis-bump, run `pnpm quality:release` and `pnpm e2e` locally, then commit `chore: 发布 v<version>` and tag `v<version>`. Pushing the tag triggers the publish workflow (`changeset publish` publishes the versions already in package.json) and the Pages deploy.
 
 Before publishing, run the validation set appropriate to the release scope locally. For package releases, prefer `pnpm quality:release` so size-limit, local publish smoke, generated-reference drift, API baseline drift, examples, and SSR checks stay aligned. Do not move this gate into publish workflows.
 

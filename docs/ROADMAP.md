@@ -3,7 +3,7 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: v2.0.0 release preparation and evidence-driven follow-up
-verified-date: 2026-07-10
+verified-date: 2026-07-12
 source: current repository state
 -->
 
@@ -16,11 +16,12 @@ source: current repository state
 
 ## 当前状态
 
-- 当前版本：`2.0.0-rc.2`。
+- 当前版本：`2.0.0`（正式版）。
 - v2.0.0 R01-R30 已完成；已登记的 P0/P1 组件、Example、i18n、a11y、构建与发布门禁问题均已解决。
-- R30 后保留的新增演示和纯 polish 建议不构成 RC 发布要求，已从路线图移除；如以后有新的用户证据，再作为独立任务登记。
+- R30 后保留的新增演示和纯 polish 建议不构成发布要求，已从路线图移除；如以后有新的用户证据，再作为独立任务登记。
 - 发布前清理已完成：Actions 不再运行测试、coverage、benchmark 或依赖审计；Playwright 只保留功能 E2E，图片对比 spec 与 PNG 基线已删除。
-- 当前无实现任务。下一步仅在收到明确发布指令后执行稳定版版本同步、tag、publish 与 Pages 部署。
+- v2.0.0 正式版发布准备已完成：版本同步、CHANGELOG / MIGRATION 收口、`.changeset/` 暂存清理与本地全量门禁均已执行，发布 commit 与 `v2.0.0` tag 已就绪。push tag 后由 Actions 自动发布 npm 包并部署 Pages。
+- 当前无实现任务。后续新任务按下方登记规则以用户证据驱动。
 
 ## 发布与验证边界
 
@@ -33,14 +34,14 @@ source: current repository state
 
 ## 发布准备检查
 
-| 检查项                        | 当前结果                      |
-| ----------------------------- | ----------------------------- |
-| 静态类型、lint、API 一致性    | 通过                          |
-| 单元/组件测试                 | 383 files / 6,840 tests 通过  |
-| API baseline、exports、Skill  | 通过，生成物零漂移            |
-| packages 与 React/Vue Example | 通过                          |
-| coverage、size、publish、SSR  | 通过                          |
-| 功能 E2E                      | 152 tests 跨四个 project 通过 |
+| 检查项                        | 当前结果                                                  |
+| ----------------------------- | --------------------------------------------------------- |
+| 静态类型、lint、API 一致性    | 通过                                                      |
+| 单元/组件测试                 | 383 files / 6,840 tests 通过                              |
+| API baseline、exports、Skill  | 通过，生成物零漂移                                        |
+| packages 与 React/Vue Example | 通过                                                      |
+| coverage、size、publish、SSR  | 通过                                                      |
+| 功能 E2E                      | 136 tests 跨四个 project 通过（40 项按 project 条件跳过） |
 
 ## 后续任务登记规则
 
