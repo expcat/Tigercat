@@ -40,7 +40,8 @@ const publishablePackages = [
   { name: '@expcat/tigercat-core', dir: path.join(rootDir, 'packages', 'core') },
   { name: '@expcat/tigercat-vue', dir: path.join(rootDir, 'packages', 'vue') },
   { name: '@expcat/tigercat-react', dir: path.join(rootDir, 'packages', 'react') },
-  { name: '@expcat/tigercat-cli', dir: path.join(rootDir, 'packages', 'cli') }
+  { name: '@expcat/tigercat-cli', dir: path.join(rootDir, 'packages', 'cli') },
+  { name: '@expcat/tigercat-mcp', dir: path.join(rootDir, 'packages', 'mcp') }
 ]
 
 const exampleProjects = [
@@ -94,7 +95,8 @@ async function main() {
         `@expcat/tigercat-core${tag}`,
         `@expcat/tigercat-vue${tag}`,
         `@expcat/tigercat-react${tag}`,
-        `@expcat/tigercat-cli${tag}`
+        `@expcat/tigercat-cli${tag}`,
+        `@expcat/tigercat-mcp${tag}`
       ]
     })
     return
@@ -124,7 +126,8 @@ async function main() {
         tarballs['@expcat/tigercat-core'],
         tarballs['@expcat/tigercat-vue'],
         tarballs['@expcat/tigercat-react'],
-        tarballs['@expcat/tigercat-cli']
+        tarballs['@expcat/tigercat-cli'],
+        tarballs['@expcat/tigercat-mcp']
       ]
     })
 
@@ -602,6 +605,29 @@ async function verifyInstalledPackages(tempDir, version) {
   if (cliVersion !== version) {
     throw new Error(`CLI reported ${cliVersion}, expected ${version}`)
   }
+
+  // MCP 是 stdio 服务器包而非组件库,不参与 tree-shaking/体积断言,
+  // 只验证库导出、bin 可执行(--help 不会启动 stdio)与版本一致。
+  const mcpLib = await importFromTemp(tempDir, '@expcat/tigercat-mcp')
+  if (typeof mcpLib.createTigercatMcpServer !== 'function') {
+    throw new Error('mcp export createTigercatMcpServer is missing')
+  }
+
+  const mcpDir = path.join(tempDir, 'node_modules', '@expcat', 'tigercat-mcp')
+  const mcpEntry = path.join(mcpDir, 'dist', 'index.js')
+  const mcpResult = spawnSync(process.execPath, [mcpEntry, '--help'], {
+    cwd: tempDir,
+    encoding: 'utf8'
+  })
+
+  if (mcpResult.status !== 0 || !String(mcpResult.stdout).includes('tigercat-mcp')) {
+    throw new Error(mcpResult.stderr || 'MCP CLI smoke check failed')
+  }
+
+  const mcpVersion = readJson(path.join(mcpDir, 'package.json')).version
+  if (mcpVersion !== version) {
+    throw new Error(`MCP package reports ${mcpVersion}, expected ${version}`)
+  }
 }
 
 function toPortablePath(filePath) {
@@ -612,7 +638,13 @@ function assertInstalledPackagesHaveNoCjsArtifacts(tempDir) {
   const packageRoot = path.join(tempDir, 'node_modules', '@expcat')
   const cjsFiles = []
 
-  for (const packageName of ['tigercat-core', 'tigercat-vue', 'tigercat-react', 'tigercat-cli']) {
+  for (const packageName of [
+    'tigercat-core',
+    'tigercat-vue',
+    'tigercat-react',
+    'tigercat-cli',
+    'tigercat-mcp'
+  ]) {
     const packageDir = path.join(packageRoot, packageName)
     if (!existsSync(packageDir)) continue
 
