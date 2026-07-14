@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Popover } from '@expcat/tigercat-react'
+import { Popover, Select } from '@expcat/tigercat-react'
 import {
   renderWithProps,
   renderWithChildren,
@@ -421,9 +421,9 @@ describe('Popover', () => {
       })
     })
 
-    it('restores trigger focus after Escape and outside-click close', async () => {
+    it('restores trigger focus after Escape but preserves outside-click focus', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(Popover, {
+      const { getByText, queryByText } = renderWithProps(Popover, {
         trigger: 'click',
         contentContent: <button>Inside</button>,
         children: <button>Trigger</button>
@@ -441,10 +441,35 @@ describe('Popover', () => {
 
       await user.click(trigger)
       await user.click(getByText('Inside'))
-      await user.click(document.body)
+      const outside = document.createElement('button')
+      outside.textContent = 'Outside'
+      document.body.appendChild(outside)
+      await user.click(outside)
       await waitFor(() => {
-        expect(trigger).toHaveFocus()
+        expect(queryByText('Inside')).toBeNull()
+        expect(outside).toHaveFocus()
       })
+      outside.remove()
+    })
+
+    it('keeps a parent popover open when selecting from a nested overlay', async () => {
+      const user = userEvent.setup()
+      const { getByText } = render(
+        <Popover
+          defaultOpen
+          contentContent={
+            <div>
+              <span>Parent content</span>
+              <Select options={[{ label: 'Nested option', value: 'nested' }]} />
+            </div>
+          }>
+          <button>Parent trigger</button>
+        </Popover>
+      )
+
+      await user.click(getByText('Select an option'))
+      await user.click(getByText('Nested option'))
+      expect(getByText('Parent content')).toBeVisible()
     })
 
     it('should passthrough div attributes to container', () => {

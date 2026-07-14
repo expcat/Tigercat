@@ -319,7 +319,7 @@ describe('Dropdown', () => {
       })
 
       const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
-      expect(wrapper?.parentElement).toBe(document.body)
+      expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(document.body)
       expect(container.querySelector('[data-tiger-dropdown-menu]')).toBeNull()
     })
 

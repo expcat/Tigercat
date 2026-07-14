@@ -4,7 +4,16 @@ import { isBrowser } from './env'
 let bodyScrollLockCount = 0
 let previousBodyOverflow = ''
 
-const escapeDismissStacks = new WeakMap<Document, Array<() => void>>()
+type EscapeDismissLayer = () => HTMLElement | null
+
+interface EscapeDismissEntry {
+  dismiss: () => void
+  getLayer?: EscapeDismissLayer
+  order: number
+}
+
+const escapeDismissStacks = new WeakMap<Document, EscapeDismissEntry[]>()
+let escapeDismissOrder = 0
 
 type ComposedPathEvent = Event & {
   composedPath?: () => EventTarget[]
@@ -136,8 +145,39 @@ export function getFocusTrapNavigation(
   return { shouldHandle: false }
 }
 
+function compareEscapeDismissEntries(
+  ownerDocument: Document,
+  a: EscapeDismissEntry,
+  b: EscapeDismissEntry
+): number {
+  const aLayer = a.getLayer?.()
+  const bLayer = b.getLayer?.()
+
+  if (aLayer && bLayer && aLayer !== bLayer) {
+    if (aLayer.contains(bLayer)) return -1
+    if (bLayer.contains(aLayer)) return 1
+
+    const view = ownerDocument.defaultView
+    const aZIndex = Number.parseFloat(view?.getComputedStyle(aLayer).zIndex ?? '')
+    const bZIndex = Number.parseFloat(view?.getComputedStyle(bLayer).zIndex ?? '')
+    if (Number.isFinite(aZIndex) && Number.isFinite(bZIndex) && aZIndex !== bZIndex) {
+      return aZIndex - bZIndex
+    }
+
+    const position = aLayer.compareDocumentPosition(bLayer)
+    if (position & 4) return -1
+    if (position & 2) return 1
+  }
+
+  return a.order - b.order
+}
+
 /** Register an overlay in the document Escape stack. Only the topmost entry is dismissed. */
-export function registerEscapeDismiss(ownerDocument: Document, dismiss: () => void): () => void {
+export function registerEscapeDismiss(
+  ownerDocument: Document,
+  dismiss: () => void,
+  getLayer?: EscapeDismissLayer
+): () => void {
   let stack = escapeDismissStacks.get(ownerDocument)
   if (!stack) {
     stack = []
@@ -145,18 +185,22 @@ export function registerEscapeDismiss(ownerDocument: Document, dismiss: () => vo
     const entries = stack
     ownerDocument.addEventListener('keydown', (event) => {
       if (event.defaultPrevented || !isEscapeKey(event)) return
-      const topmost = entries[entries.length - 1]
+      const topmost = entries.reduce<EscapeDismissEntry | undefined>((current, entry) => {
+        if (!current) return entry
+        return compareEscapeDismissEntries(ownerDocument, current, entry) < 0 ? entry : current
+      }, undefined)
       if (topmost) {
         event.preventDefault()
-        topmost()
+        topmost.dismiss()
       }
     })
   }
 
-  stack.push(dismiss)
+  const entry = { dismiss, getLayer, order: ++escapeDismissOrder }
+  stack.push(entry)
 
   return () => {
-    const index = stack.lastIndexOf(dismiss)
+    const index = stack.lastIndexOf(entry)
     if (index >= 0) stack.splice(index, 1)
   }
 }

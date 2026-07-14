@@ -80,6 +80,24 @@ describe('AutoComplete', () => {
 
       expect(getByText('Nothing found')).toBeInTheDocument()
     })
+
+    it('keeps focus on the outside click target and stays closed', async () => {
+      const { container } = render(AutoComplete, {
+        props: { options }
+      })
+      const outside = document.createElement('button')
+      document.body.appendChild(outside)
+
+      const input = container.querySelector('input')!
+      await fireEvent.focus(input)
+      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
+
+      outside.focus()
+      await fireEvent.click(outside)
+      expect(document.body.querySelector('[role="listbox"]')).not.toBeInTheDocument()
+      expect(outside).toHaveFocus()
+      outside.remove()
+    })
   })
 
   describe('Clear', () => {

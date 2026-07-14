@@ -335,7 +335,8 @@ export const Drawer = defineComponent({
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({
         enabled: escapeEnabled,
-        onEscape: handleClose
+        onEscape: handleClose,
+        layerRef: rootRef
       })
     })
 

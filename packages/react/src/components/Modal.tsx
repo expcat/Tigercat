@@ -274,7 +274,7 @@ export const Modal: React.FC<ModalProps> = ({
     restoreFocus(previousActiveElementRef.current)
   }, [open])
 
-  useEscapeKey({ enabled: open, onEscape: handleClose })
+  useEscapeKey({ enabled: open, onEscape: handleClose, layerRef: rootRef })
   useBodyScrollLock({ enabled: open })
   useFocusTrap({ enabled: open, containerRef: rootRef })
 

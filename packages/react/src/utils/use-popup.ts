@@ -129,7 +129,13 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     offset,
     dismissOnOutside: effectiveTrigger === 'click',
     dismissOnEscape: effectiveTrigger !== 'manual',
-    onDismiss: closeAndRestoreFocus
+    onDismiss: (reason) => {
+      if (reason === 'escape') {
+        closeAndRestoreFocus()
+      } else {
+        setVisible(false)
+      }
+    }
   })
 
   // ─── Trigger handlers map ────────────────────────────────────────────

@@ -1,4 +1,12 @@
-import { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from 'react'
+import {
+  createElement,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo
+} from 'react'
 import { createPortal } from 'react-dom'
 import {
   getFocusTrapNavigation,
@@ -20,6 +28,12 @@ import {
   type FloatingOptions,
   type FloatingResult
 } from '@expcat/tigercat-core'
+
+const OVERLAY_LAYER_SELECTOR = '[data-tiger-overlay-layer]'
+
+function resolveOverlayLayer(element: HTMLElement | null): HTMLElement | null {
+  return element?.closest<HTMLElement>(OVERLAY_LAYER_SELECTOR) ?? null
+}
 
 export interface UseClickOutsideOptions {
   enabled: boolean
@@ -63,13 +77,14 @@ export function useClickOutside({
 export interface UseEscapeKeyOptions {
   enabled: boolean
   onEscape: () => void
+  layerRef?: React.RefObject<HTMLElement | null>
 }
 
-export function useEscapeKey({ enabled, onEscape }: UseEscapeKeyOptions): void {
+export function useEscapeKey({ enabled, onEscape, layerRef }: UseEscapeKeyOptions): void {
   useEffect(() => {
     if (!enabled) return
-    return registerEscapeDismiss(document, onEscape)
-  }, [enabled, onEscape])
+    return registerEscapeDismiss(document, onEscape, () => layerRef?.current ?? null)
+  }, [enabled, layerRef, onEscape])
 }
 
 export interface UseBodyScrollLockOptions {
@@ -94,8 +109,19 @@ export function renderOverlayPortal(
   target: HTMLElement | null,
   disabled = false
 ): React.ReactNode {
-  if (disabled || !target) return node
-  return createPortal(node, target)
+  if (node == null || typeof node === 'boolean') return node
+  const layeredNode = createElement(
+    'div',
+    { className: 'contents', 'data-tiger-overlay-layer': '' },
+    node,
+    createElement('div', {
+      key: 'overlay-host',
+      className: 'contents',
+      'data-tiger-overlay-host': ''
+    })
+  )
+  if (disabled || !target) return layeredNode
+  return createPortal(layeredNode, target)
 }
 
 export interface UseFocusTrapOptions {
@@ -233,18 +259,20 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
   const [arrowY, setArrowY] = useState<number | undefined>(undefined)
   const [isPositioned, setIsPositioned] = useState(false)
   const [referenceWidth, setReferenceWidth] = useState(0)
+  const enabledRef = useRef(enabled)
+  const updateRequestRef = useRef(0)
+  enabledRef.current = enabled
 
   // Store callback in ref to avoid effect re-runs
   const onPlacementChangeRef = useRef(onPlacementChange)
   onPlacementChangeRef.current = onPlacementChange
 
   const update = useCallback(async () => {
+    const request = ++updateRequestRef.current
     const reference = referenceRef.current
     const floating = floatingRef.current
 
-    if (!reference || !floating) return
-
-    setReferenceWidth(reference.getBoundingClientRect().width)
+    if (!enabledRef.current || !reference || !floating) return
 
     const floatingOptions: FloatingOptions = {
       placement: initialPlacement,
@@ -260,6 +288,16 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
       floatingOptions
     )
 
+    if (
+      request !== updateRequestRef.current ||
+      !enabledRef.current ||
+      referenceRef.current !== reference ||
+      floatingRef.current !== floating
+    ) {
+      return
+    }
+
+    setReferenceWidth(reference.getBoundingClientRect().width)
     setX(result.x)
     setY(result.y)
     setPlacement((prev) => {
@@ -278,6 +316,7 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
   }, [referenceRef, floatingRef, initialPlacement, offsetDistance, arrowRef])
 
   useEffect(() => {
+    updateRequestRef.current += 1
     const reference = referenceRef.current
     const floating = floatingRef.current
 
@@ -293,6 +332,7 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
     const cleanup = autoUpdateFloating(reference, floating, update)
 
     return () => {
+      updateRequestRef.current += 1
       cleanup()
     }
   }, [enabled, referenceRef, floatingRef, update, context])
@@ -323,8 +363,10 @@ export interface UseAnchoredOverlayOptions {
   dismissOnOutside?: boolean
   dismissOnEscape?: boolean
   restoreFocusOnDismiss?: boolean
-  onDismiss?: () => void
+  onDismiss?: (reason: AnchoredOverlayDismissReason) => void
 }
+
+export type AnchoredOverlayDismissReason = 'outside' | 'escape'
 
 export interface UseAnchoredOverlayReturn {
   target: HTMLElement | null
@@ -353,6 +395,14 @@ export function useAnchoredOverlay({
   onDismiss
 }: UseAnchoredOverlayOptions): UseAnchoredOverlayReturn {
   const [target, setTarget] = useState<HTMLElement | null>(null)
+  const floatingLayerRef = useMemo<React.RefObject<HTMLElement | null>>(
+    () => ({
+      get current() {
+        return resolveOverlayLayer(floatingRef.current) ?? floatingRef.current
+      }
+    }),
+    [floatingRef]
+  )
 
   useLayoutEffect(() => {
     if (!portal) {
@@ -384,20 +434,30 @@ export function useAnchoredOverlay({
     context: effectiveTarget
   })
 
-  const dismiss = useCallback(() => {
-    onDismiss?.()
-    if (restoreFocusOnDismiss) {
-      window.setTimeout(() => restoreFocus(referenceRef.current, { preventScroll: true }), 0)
-    }
-  }, [onDismiss, referenceRef, restoreFocusOnDismiss])
+  const dismiss = useCallback(
+    (reason: AnchoredOverlayDismissReason) => {
+      onDismiss?.(reason)
+      if (restoreFocusOnDismiss && reason === 'escape') {
+        window.setTimeout(() => restoreFocus(referenceRef.current, { preventScroll: true }), 0)
+      }
+    },
+    [onDismiss, referenceRef, restoreFocusOnDismiss]
+  )
+
+  const dismissOutside = useCallback(() => dismiss('outside'), [dismiss])
+  const dismissOnEscapeKey = useCallback(() => dismiss('escape'), [dismiss])
 
   useClickOutside({
     enabled: enabled && dismissOnOutside,
-    refs: [containerRef, referenceRef, floatingRef, ...outsideRefs],
-    onOutsideClick: dismiss,
+    refs: [containerRef, referenceRef, floatingLayerRef, ...outsideRefs],
+    onOutsideClick: dismissOutside,
     defer: false
   })
-  useEscapeKey({ enabled: enabled && dismissOnEscape, onEscape: dismiss })
+  useEscapeKey({
+    enabled: enabled && dismissOnEscape,
+    onEscape: dismissOnEscapeKey,
+    layerRef: floatingLayerRef
+  })
 
   useEffect(() => {
     const floating = floatingRef.current

@@ -20,6 +20,12 @@ import {
 } from '@expcat/tigercat-core'
 import { h, ref, computed, Teleport, watch, onBeforeUnmount, type Ref, type VNodeChild } from 'vue'
 
+const OVERLAY_LAYER_SELECTOR = '[data-tiger-overlay-layer]'
+
+function resolveOverlayLayer(element: HTMLElement | null): HTMLElement | null {
+  return element?.closest<HTMLElement>(OVERLAY_LAYER_SELECTOR) ?? null
+}
+
 export interface UseVueClickOutsideOptions {
   enabled: Ref<boolean>
   containerRef?: Ref<HTMLElement | null>
@@ -66,15 +72,22 @@ export function useVueClickOutside({
 export interface UseVueEscapeKeyOptions {
   enabled: Ref<boolean>
   onEscape: () => void
+  layerRef?: Ref<HTMLElement | null>
 }
 
-export function useVueEscapeKey({ enabled, onEscape }: UseVueEscapeKeyOptions): () => void {
+export function useVueEscapeKey({
+  enabled,
+  onEscape,
+  layerRef
+}: UseVueEscapeKeyOptions): () => void {
   let removeEntry: (() => void) | undefined
   const stop = watch(
     enabled,
     (isEnabled) => {
       removeEntry?.()
-      removeEntry = isEnabled ? registerEscapeDismiss(document, onEscape) : undefined
+      removeEntry = isEnabled
+        ? registerEscapeDismiss(document, onEscape, () => layerRef?.value ?? null)
+        : undefined
     },
     { immediate: true, flush: 'sync' }
   )
@@ -108,9 +121,13 @@ export function renderVueOverlayTeleport(
   target: HTMLElement | null,
   disabled = false
 ): VNodeChild {
-  if (disabled || !target) return children
-  const normalizedChildren = children == null ? [] : Array.isArray(children) ? children : [children]
-  return h(Teleport as never, { to: target }, normalizedChildren)
+  if (children == null || typeof children === 'boolean') return children
+  const layeredChildren = h('div', { class: 'contents', 'data-tiger-overlay-layer': '' }, [
+    children,
+    h('div', { class: 'contents', 'data-tiger-overlay-host': '' })
+  ])
+  if (disabled || !target) return layeredChildren
+  return h(Teleport as never, { to: target }, [layeredChildren])
 }
 
 export interface UseVueFocusTrapOptions {
@@ -251,14 +268,14 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
   const referenceWidth = ref(0)
 
   let cleanup: FloatingCleanup | null = null
+  let updateRequest = 0
 
   const update = async () => {
+    const request = ++updateRequest
     const reference = referenceRef.value
     const floating = floatingRef.value
 
-    if (!reference || !floating) return
-
-    referenceWidth.value = reference.getBoundingClientRect().width
+    if (!enabled.value || !reference || !floating) return
 
     const floatingOptions: FloatingOptions = {
       placement: initialPlacement,
@@ -274,6 +291,16 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
       floatingOptions
     )
 
+    if (
+      request !== updateRequest ||
+      !enabled.value ||
+      referenceRef.value !== reference ||
+      floatingRef.value !== floating
+    ) {
+      return
+    }
+
+    referenceWidth.value = reference.getBoundingClientRect().width
     x.value = result.x
     y.value = result.y
 
@@ -292,6 +319,7 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
   watch(
     [enabled, referenceRef, floatingRef],
     ([isEnabled, reference, floating]) => {
+      updateRequest += 1
       // Cleanup previous auto-update
       if (cleanup) {
         cleanup()
@@ -313,6 +341,7 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
   )
 
   onBeforeUnmount(() => {
+    updateRequest += 1
     if (cleanup) {
       cleanup()
       cleanup = null
@@ -345,11 +374,16 @@ export interface UseVueAnchoredOverlayOptions {
   dismissOnOutside?: Ref<boolean> | boolean
   dismissOnEscape?: Ref<boolean> | boolean
   restoreFocusOnDismiss?: boolean
-  onDismiss?: () => void
+  onDismiss?: (reason: AnchoredOverlayDismissReason) => void
 }
+
+export type AnchoredOverlayDismissReason = 'outside' | 'escape'
 
 export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
   const target = ref<HTMLElement | null>(null)
+  const floatingLayerRef = computed(
+    () => resolveOverlayLayer(options.floatingRef.value) ?? options.floatingRef.value
+  )
   const portalEnabled = () =>
     typeof options.portal === 'object' ? options.portal.value : (options.portal ?? true)
   const optionEnabled = (value: Ref<boolean> | boolean | undefined) =>
@@ -404,9 +438,9 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
     offset: options.offset ?? 4
   })
 
-  const dismiss = () => {
-    options.onDismiss?.()
-    if (options.restoreFocusOnDismiss) {
+  const dismiss = (reason: AnchoredOverlayDismissReason) => {
+    options.onDismiss?.(reason)
+    if (options.restoreFocusOnDismiss && reason === 'escape') {
       window.setTimeout(() => restoreFocus(options.referenceRef.value, { preventScroll: true }), 0)
     }
   }
@@ -432,15 +466,19 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
           refs: [
             options.containerRef,
             options.referenceRef,
-            options.floatingRef,
+            floatingLayerRef,
             ...(options.outsideRefs ?? [])
           ],
-          onOutsideClick: dismiss,
+          onOutsideClick: () => dismiss('outside'),
           defer: false
         })
       }
       if (optionEnabled(options.dismissOnEscape)) {
-        escapeCleanup = useVueEscapeKey({ enabled: options.enabled, onEscape: dismiss })
+        escapeCleanup = useVueEscapeKey({
+          enabled: options.enabled,
+          onEscape: () => dismiss('escape'),
+          layerRef: floatingLayerRef
+        })
       }
     },
     { immediate: true }

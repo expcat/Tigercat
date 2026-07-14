@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { act, render } from '@testing-library/react'
+import { act, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { AutoComplete } from '@expcat/tigercat-react'
@@ -86,6 +86,27 @@ describe('AutoComplete', () => {
       await user.type(input, 'xyz nonexistent')
 
       expect(getByText('Nothing found')).toBeInTheDocument()
+    })
+
+    it('keeps focus on the outside click target and stays closed', async () => {
+      const user = userEvent.setup()
+      const { container, getByText, queryByRole } = render(
+        <>
+          <AutoComplete options={options} />
+          <button>Outside target</button>
+        </>
+      )
+
+      const input = container.querySelector('input')!
+      const outside = getByText('Outside target')
+      await user.click(input)
+      expect(queryByRole('listbox')).toBeInTheDocument()
+
+      await user.click(outside)
+      await waitFor(() => {
+        expect(queryByRole('listbox')).not.toBeInTheDocument()
+        expect(outside).toHaveFocus()
+      })
     })
   })
 

@@ -146,4 +146,29 @@ describe('overlay-utils (core)', () => {
     expect(calls).toEqual(['inner', 'outer'])
     removeOuter()
   })
+
+  it('registerEscapeDismiss should prefer the deepest DOM layer over registration order', () => {
+    const calls: string[] = []
+    const outerLayer = document.createElement('div')
+    const innerLayer = document.createElement('div')
+    outerLayer.appendChild(innerLayer)
+    document.body.appendChild(outerLayer)
+
+    const removeInner = registerEscapeDismiss(
+      document,
+      () => calls.push('inner'),
+      () => innerLayer
+    )
+    const removeOuter = registerEscapeDismiss(
+      document,
+      () => calls.push('outer'),
+      () => outerLayer
+    )
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }))
+    expect(calls).toEqual(['inner'])
+
+    removeOuter()
+    removeInner()
+  })
 })

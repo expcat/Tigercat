@@ -25,6 +25,14 @@ export function getAnchoredOverlayTabTarget(
   const layer = reference.closest<HTMLElement>(`[${OVERLAY_LAYER_ATTRIBUTE}]`)
   if (!layer) return null
 
+  const floatingFocusables = getFocusableElements(floating)
+  const activeElement = floating.ownerDocument.activeElement
+  const activeIndex = floatingFocusables.findIndex((element) => element === activeElement)
+  if (activeIndex >= 0) {
+    const boundaryIndex = shiftKey ? 0 : floatingFocusables.length - 1
+    if (activeIndex !== boundaryIndex) return null
+  }
+
   const focusables = getFocusableElements(layer).filter((element) => !floating.contains(element))
   if (focusables.length === 0) return null
 

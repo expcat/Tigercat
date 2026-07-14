@@ -342,7 +342,11 @@ export const Modal = defineComponent({
     useVueFocusTrap({ enabled: overlayOpen, containerRef: rootRef })
 
     onMounted(() => {
-      cleanupEscape = useVueEscapeKey({ enabled: overlayOpen, onEscape: handleClose })
+      cleanupEscape = useVueEscapeKey({
+        enabled: overlayOpen,
+        onEscape: handleClose,
+        layerRef: rootRef
+      })
     })
 
     onBeforeUnmount(() => {

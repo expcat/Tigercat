@@ -107,6 +107,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(defaultSearchValue)
   const searchQuery = searchValue ?? uncontrolledSearchValue
   const [activePath, setActivePath] = useState<CascaderValue>([])
+  const wasOpenRef = useRef(false)
 
   const triggerRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -160,10 +161,15 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
 
   // Sync active path when dropdown opens
   useEffect(() => {
-    if (isOpen) {
-      setActivePath(value ? [...value] : [])
-      updateSearchValue('')
+    if (!isOpen) {
+      wasOpenRef.current = false
+      return
     }
+    if (wasOpenRef.current) return
+
+    wasOpenRef.current = true
+    setActivePath(value ? [...value] : [])
+    updateSearchValue('')
   }, [isOpen, updateSearchValue, value])
 
   const toggleOpen = useCallback(() => {

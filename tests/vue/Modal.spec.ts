@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
-import { Modal, Select } from '@expcat/tigercat-vue'
+import { Modal, Popover, Select } from '@expcat/tigercat-vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Modal', () => {
@@ -629,8 +629,35 @@ describe('Modal', () => {
       await fireEvent.click(dialog.querySelector('button[data-state="closed"]')!)
       const listbox = await screen.findByRole('listbox')
 
-      expect(listbox.parentElement).toBe(host)
+      const selectLayer = listbox.closest('[data-tiger-overlay-layer]')
+      expect(selectLayer?.parentElement).toBe(host)
+      expect(selectLayer?.querySelector(':scope > [data-tiger-overlay-host]')).toBeInTheDocument()
       expect(host?.closest('[data-tiger-overlay-layer]')).toBeInTheDocument()
+    })
+
+    it('closes a default-open nested overlay before the modal on Escape', async () => {
+      const user = userEvent.setup()
+      const { emitted } = render(Modal, {
+        props: { open: true, title: 'Parent modal' },
+        slots: {
+          default: () =>
+            h(
+              Popover,
+              { defaultOpen: true },
+              {
+                default: () => h('button', 'Nested trigger'),
+                content: () => 'Nested popover'
+              }
+            )
+        }
+      })
+
+      expect(await screen.findByText('Nested popover')).toBeVisible()
+      await user.keyboard('{Escape}')
+
+      await waitFor(() => expect(screen.queryByText('Nested popover')).toBeNull())
+      expect(screen.getByRole('dialog', { name: 'Parent modal' })).toBeVisible()
+      expect(emitted()['update:open']).toBeFalsy()
     })
   })
 })

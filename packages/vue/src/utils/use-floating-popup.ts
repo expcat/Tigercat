@@ -141,7 +141,13 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
     offset: props.offset ?? 8,
     dismissOnOutside: computed(() => effectiveTrigger.value === 'click'),
     dismissOnEscape: computed(() => effectiveTrigger.value !== 'manual'),
-    onDismiss: closeAndRestoreFocus
+    onDismiss: (reason) => {
+      if (reason === 'escape') {
+        closeAndRestoreFocus()
+      } else {
+        setVisible(false)
+      }
+    }
   })
 
   const x = overlay.x

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { fireEvent, render } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import React from 'react'
 import { Cascader } from '@expcat/tigercat-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
@@ -146,6 +146,37 @@ describe('Cascader', () => {
       fireEvent.change(searchInput, { target: { value: 'xyz nonexistent' } })
 
       expect(getByText('Nothing found')).toBeInTheDocument()
+    })
+
+    it('does not clear controlled searchValue again after the dropdown opens', async () => {
+      const onSearchChange = vi.fn()
+
+      function ControlledCascader() {
+        const [controlledSearch, setControlledSearch] = React.useState('')
+        return (
+          <Cascader
+            options={simpleOptions}
+            searchable
+            searchValue={controlledSearch}
+            onSearchChange={(nextValue) => {
+              onSearchChange(nextValue)
+              setControlledSearch(nextValue)
+            }}
+          />
+        )
+      }
+
+      const { container } = render(<ControlledCascader />)
+      fireEvent.click(container.querySelector('button')!)
+      const searchInput = document.body.querySelector<HTMLInputElement>(
+        'input[aria-label="Search options"]'
+      )!
+      fireEvent.change(searchInput, { target: { value: 'West' } })
+
+      await waitFor(() => expect(searchInput.value).toBe('West'))
+      expect(onSearchChange).toHaveBeenCalledTimes(2)
+      expect(onSearchChange).toHaveBeenNthCalledWith(1, '')
+      expect(onSearchChange).toHaveBeenLastCalledWith('West')
     })
   })
 

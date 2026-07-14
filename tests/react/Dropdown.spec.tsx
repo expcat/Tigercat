@@ -377,7 +377,7 @@ describe('Dropdown', () => {
       )
 
       const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
-      expect(wrapper?.parentElement).toBe(document.body)
+      expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(document.body)
       expect(container.querySelector('[data-tiger-dropdown-menu]')).toBeNull()
     })
 
@@ -392,7 +392,7 @@ describe('Dropdown', () => {
       )
 
       const wrapper = container.querySelector(
-        '.tiger-dropdown-container > [data-tiger-dropdown-menu]'
+        '.tiger-dropdown-container > [data-tiger-overlay-layer] > [data-tiger-dropdown-menu]'
       )
       expect(wrapper).toBeInTheDocument()
       expect(wrapper).not.toHaveAttribute('hidden')

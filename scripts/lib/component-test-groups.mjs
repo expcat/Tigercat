@@ -27,7 +27,7 @@ const FRAMEWORKS = new Set(['react', 'vue'])
 const FRAMEWORK_EXTRAS = {
   basic: ['ButtonSpinnerLazy', 'ImagePreview.ssr'],
   form: ['custom-text', 'useFormController'],
-  feedback: ['Notification'],
+  feedback: ['Notification', 'overlay-positioning'],
   layout: ['Grid', 'LayoutSections'],
   data: ['TableState'],
   charts: ['ChartSubComponents', 'useChartInteraction'],
@@ -125,6 +125,7 @@ const CORE_EXTRAS = {
     'picker-utils.spec.ts'
   ],
   feedback: [
+    'anchored-overlay.spec.ts',
     'floating.spec.ts',
     'focus-utils.spec.ts',
     'imperative-api.spec.ts',

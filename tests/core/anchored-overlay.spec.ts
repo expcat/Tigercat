@@ -66,4 +66,26 @@ describe('anchored overlay contract', () => {
     expect(getAnchoredOverlayTabTarget(reference, floating)).toBe(nextInput)
     expect(getAnchoredOverlayTabTarget(reference, floating, true)).toBe(nextInput)
   })
+
+  it('lets Tab move through internal controls before leaving the floating panel', () => {
+    const layer = document.createElement('div')
+    layer.setAttribute('data-tiger-overlay-layer', '')
+    const reference = document.createElement('button')
+    const nextInput = document.createElement('input')
+    const floating = document.createElement('div')
+    const first = document.createElement('input')
+    const last = document.createElement('input')
+    floating.append(first, last)
+    layer.append(reference, nextInput, floating)
+    document.body.appendChild(layer)
+
+    first.focus()
+    expect(getAnchoredOverlayTabTarget(reference, floating)).toBeNull()
+
+    last.focus()
+    expect(getAnchoredOverlayTabTarget(reference, floating)).toBe(nextInput)
+
+    first.focus()
+    expect(getAnchoredOverlayTabTarget(reference, floating, true)).toBe(nextInput)
+  })
 })

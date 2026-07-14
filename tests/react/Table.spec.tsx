@@ -546,7 +546,7 @@ describe('Table', () => {
       await fireEvent.click(getAllByText('Open menu')[0])
       const menuWrapper = document.querySelector('[data-tiger-dropdown-menu]:not([hidden])')
       expect(menuWrapper).not.toBeNull()
-      expect(menuWrapper!.parentElement).toBe(document.body)
+      expect(menuWrapper!.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(document.body)
     })
   })
 

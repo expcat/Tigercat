@@ -137,7 +137,6 @@ export const Drawer: React.FC<DrawerProps> = ({
     [maskClosable, handleClose]
   )
 
-  useEscapeKey({ enabled: open, onEscape: handleClose })
   useBodyScrollLock({ enabled: open })
 
   const previousVisible = useRef(false)
@@ -180,6 +179,8 @@ export const Drawer: React.FC<DrawerProps> = ({
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const touchStartRef = useRef<GesturePoint | null>(null)
   const touchCurrentRef = useRef<GesturePoint | null>(null)
+
+  useEscapeKey({ enabled: open, onEscape: handleClose, layerRef: rootRef })
 
   const resolvedCloseAriaLabel = resolveLocaleText(
     'Close drawer',
