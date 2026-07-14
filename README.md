@@ -156,7 +156,7 @@ pnpm example:react  # http://localhost:5174
 
 请先运行 `corepack pnpm setup` 完成依赖安装、构建和环境检查。提交前按改动范围运行 focused tests；涉及公共 API、生成文档或发布面的改动应运行 `pnpm quality:release`。
 
-组件 API、示例与维护规则以 [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md) 为准，当前项目状态与后续任务规则见 [docs/ROADMAP.md](./docs/ROADMAP.md)。
+开发与评审必须遵守 [CONTRIBUTING.md](./CONTRIBUTING.md) 的“根因修复与架构约束”；组件 API、示例与自动化维护规则以 [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md) 为准，当前项目状态与后续任务规则见 [docs/ROADMAP.md](./docs/ROADMAP.md)。
 
 ## License
 

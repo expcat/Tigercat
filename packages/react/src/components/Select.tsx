@@ -7,6 +7,7 @@ import {
   selectDoneButtonClasses
 } from '@expcat/tigercat-core'
 import { useSelectState } from './Select/state'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 import { renderOptions } from './Select/render-option'
 import { SelectClearIcon, SelectChevronIcon } from './Select/icons'
 import type { SelectProps } from './Select/types'
@@ -20,6 +21,56 @@ export type {
 
 export const Select: React.FC<SelectProps> = (props) => {
   const ctx = useSelectState(props)
+  const overlay = useAnchoredOverlay({
+    enabled: ctx.isOpen,
+    referenceRef: ctx.triggerRef,
+    floatingRef: ctx.dropdownRef,
+    placement: 'bottom-start',
+    offset: 4,
+    layout: 'fullscreen-sm',
+    matchReferenceWidth: true,
+    dismissOnOutside: true,
+    dismissOnEscape: true,
+    restoreFocusOnDismiss: true,
+    onDismiss: ctx.closeDropdown
+  })
+
+  const dropdown = ctx.isOpen ? (
+    <div
+      ref={ctx.dropdownRef}
+      className={classNames(selectDropdownBaseClasses, overlay.floatingClasses)}
+      style={overlay.floatingStyles}
+      data-positioned={overlay.positioned}
+      data-tiger-select-dropdown=""
+      role="listbox"
+      id={ctx.listboxId}
+      aria-multiselectable={ctx.isMultiple ? true : undefined}
+      onKeyDown={ctx.handleDropdownKeyDown}>
+      {ctx.searchable && (
+        <input
+          ref={ctx.searchInputRef}
+          type="text"
+          className={selectSearchInputClasses}
+          placeholder={ctx.searchPlaceholder}
+          value={ctx.searchQuery}
+          onChange={ctx.handleSearchInput}
+          onKeyDown={ctx.handleSearchKeyDown}
+        />
+      )}
+      {renderOptions(ctx)}
+      <div className={selectDoneActionClasses}>
+        <button
+          type="button"
+          className={selectDoneButtonClasses}
+          onClick={ctx.closeDropdown}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
+          }}>
+          {ctx.doneText}
+        </button>
+      </div>
+    </div>
+  ) : null
 
   return (
     <div {...ctx.divProps} className={ctx.containerClasses}>
@@ -62,41 +113,7 @@ export const Select: React.FC<SelectProps> = (props) => {
         </span>
       </span>
 
-      {ctx.isOpen && (
-        <div
-          ref={ctx.dropdownRef}
-          className={selectDropdownBaseClasses}
-          role="listbox"
-          id={ctx.listboxId}
-          aria-multiselectable={ctx.isMultiple ? true : undefined}
-          onKeyDown={ctx.handleDropdownKeyDown}>
-          {ctx.searchable && (
-            <input
-              ref={ctx.searchInputRef}
-              type="text"
-              className={selectSearchInputClasses}
-              placeholder={ctx.searchPlaceholder}
-              value={ctx.searchQuery}
-              onChange={ctx.handleSearchInput}
-              onKeyDown={ctx.handleSearchKeyDown}
-            />
-          )}
-          {renderOptions(ctx)}
-          <div className={selectDoneActionClasses}>
-            <button
-              type="button"
-              className={selectDoneButtonClasses}
-              onClick={ctx.closeDropdown}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.stopPropagation()
-                }
-              }}>
-              {ctx.doneText}
-            </button>
-          </div>
-        </div>
-      )}
+      {dropdown && renderOverlayPortal(dropdown, overlay.target)}
     </div>
   )
 }

@@ -29,6 +29,7 @@ import {
 } from '@expcat/tigercat-core'
 import { FormContextKey, type FormContext } from './Form'
 import { FORM_ITEM_CONTROL_INJECTION_KEY } from './FormItemContext'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 function mergeAriaDescribedBy(
   existing: string | undefined,
@@ -133,6 +134,8 @@ export const FormItem = defineComponent({
     const errorMessage = ref<string>('')
     const shakeTrigger = ref(0)
     const prevFormError = ref<string>('')
+    const contentRef = ref<HTMLElement | null>(null)
+    const errorRef = ref<HTMLElement | null>(null)
 
     const instanceId = ++formItemIdCounter
     const baseId = `tiger-form-item-${instanceId}`
@@ -285,6 +288,16 @@ export const FormItem = defineComponent({
     const hasError = computed(() => {
       return !!errorMessage.value
     })
+    const popupErrorVisible = computed(
+      () => props.showMessage && hasError.value && props.errorDisplayMode === 'popup'
+    )
+    const overlay = useVueAnchoredOverlay({
+      enabled: popupErrorVisible,
+      referenceRef: contentRef,
+      floatingRef: errorRef,
+      placement: 'bottom-start',
+      offset: 4
+    })
 
     provide(FORM_ITEM_CONTROL_INJECTION_KEY, {
       status: computed(() => (hasError.value ? ('error' as InputStatus) : undefined)),
@@ -409,6 +422,7 @@ export const FormItem = defineComponent({
       const contentElement = h(
         'div',
         {
+          ref: contentRef,
           class: classNames(contentClasses.value, props.errorDisplayMode === 'popup' && 'relative')
         },
         [
@@ -426,26 +440,36 @@ export const FormItem = defineComponent({
             fieldChildren
           ),
           props.showMessage &&
-            h(
-              'div',
-              {
-                id: hasError.value ? errorId : undefined,
-                role: hasError.value ? 'alert' : undefined,
-                class:
-                  props.errorDisplayMode === 'block'
-                    ? classNames(
-                        'mt-1 p-2 rounded bg-red-50 border border-red-200 text-red-600 text-sm',
-                        !hasError.value && 'hidden'
-                      )
-                    : props.errorDisplayMode === 'popup'
+            renderVueOverlayTeleport(
+              h(
+                'div',
+                {
+                  ref: errorRef,
+                  id: hasError.value ? errorId : undefined,
+                  role: hasError.value ? 'alert' : undefined,
+                  class:
+                    props.errorDisplayMode === 'block'
                       ? classNames(
-                          'absolute z-10 mt-1 px-2 py-1 rounded bg-red-600 text-white text-xs shadow-lg',
+                          'mt-1 p-2 rounded bg-red-50 border border-red-200 text-red-600 text-sm',
                           !hasError.value && 'hidden'
                         )
-                      : errorClasses.value,
-                'aria-hidden': hasError.value ? undefined : 'true'
-              },
-              hasError.value ? errorMessage.value : ''
+                      : props.errorDisplayMode === 'popup'
+                        ? classNames(
+                            'px-2 py-1 rounded bg-red-600 text-white text-xs shadow-lg',
+                            overlay.floatingClasses.value,
+                            !hasError.value && 'hidden'
+                          )
+                        : errorClasses.value,
+                  style:
+                    props.errorDisplayMode === 'popup' ? overlay.floatingStyles.value : undefined,
+                  'data-positioned':
+                    props.errorDisplayMode === 'popup' ? overlay.positioned.value : undefined,
+                  'aria-hidden': hasError.value ? undefined : 'true'
+                },
+                hasError.value ? errorMessage.value : ''
+              ),
+              overlay.target.value,
+              props.errorDisplayMode !== 'popup'
             )
         ]
       )

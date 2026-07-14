@@ -9,6 +9,25 @@ for (const { framework, baseUrl } of exampleApps) {
       const dialog = preview.getByRole('dialog').filter({ hasText: '编辑资料' })
       await expect(dialog).toBeVisible()
 
+      const initialDialogBox = await dialog.boundingBox()
+      await dialog.locator('[aria-haspopup="listbox"]').click()
+      const listbox = preview.getByRole('listbox')
+      await expect(listbox).toBeVisible()
+      const popupFitsViewport = await listbox.evaluate((element) => {
+        const rect = element.getBoundingClientRect()
+        return (
+          rect.left >= 0 &&
+          rect.top >= 0 &&
+          rect.right <= document.documentElement.clientWidth &&
+          rect.bottom <= document.documentElement.clientHeight
+        )
+      })
+      expect(popupFitsViewport).toBe(true)
+      const openDialogBox = await dialog.boundingBox()
+      expect(openDialogBox?.width).toBe(initialDialogBox?.width)
+      expect(openDialogBox?.height).toBe(initialDialogBox?.height)
+      await listbox.getByRole('option').first().click()
+
       await dialog.getByRole('button', { name: '保存', exact: true }).click()
       await expect(dialog.getByText('请填写姓名')).toBeVisible()
       await dialog.getByPlaceholder('请输入姓名').fill('Tigercat User')
@@ -22,6 +41,14 @@ for (const { framework, baseUrl } of exampleApps) {
       await preview.getByRole('button', { name: '打开抽屉', exact: true }).click()
       const drawer = preview.getByRole('dialog').filter({ hasText: '基本抽屉' })
       await expect(drawer).toBeVisible()
+      const initialDrawerBox = await drawer.boundingBox()
+      await drawer.locator('[aria-haspopup="listbox"]').click()
+      const listbox = preview.getByRole('listbox')
+      await expect(listbox).toBeVisible()
+      const openDrawerBox = await drawer.boundingBox()
+      expect(openDrawerBox?.width).toBe(initialDrawerBox?.width)
+      expect(openDrawerBox?.height).toBe(initialDrawerBox?.height)
+      await listbox.getByRole('option', { name: 'Alice' }).click()
       await drawer.getByRole('button', { name: '关闭', exact: true }).click()
       await expect(drawer).toBeHidden()
     })

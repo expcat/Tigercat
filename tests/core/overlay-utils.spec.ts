@@ -7,6 +7,7 @@ import {
   getFocusableElements,
   getFocusTrapNavigation,
   isEventOutside,
+  registerEscapeDismiss,
   shouldCloseOnMaskClick
 } from '@expcat/tigercat-core'
 
@@ -58,6 +59,17 @@ describe('overlay-utils (core)', () => {
     expect(isEventOutside(event, [container], { ignore: [trigger] })).toBe(false)
   })
 
+  it('isEventOutside should use the composed path across portal and shadow boundaries', () => {
+    const container = document.createElement('div')
+    const portalChild = document.createElement('button')
+    const event = new MouseEvent('click', { bubbles: true })
+    Object.defineProperty(event, 'composedPath', {
+      value: () => [portalChild, container, document.body, document, window]
+    })
+
+    expect(isEventOutside(event, [container])).toBe(false)
+  })
+
   it('shouldCloseOnMaskClick should only close for direct mask clicks when enabled', () => {
     const mask = document.createElement('div')
     const content = document.createElement('div')
@@ -67,7 +79,7 @@ describe('overlay-utils (core)', () => {
     expect(shouldCloseOnMaskClick({ target: mask, currentTarget: mask }, false)).toBe(false)
   })
 
-  it('getFocusableElements should filter disabled and tabindex=-1', () => {
+  it('getFocusableElements should filter disabled, untabbable, and hidden descendants', () => {
     const root = document.createElement('div')
 
     const link = document.createElement('a')
@@ -83,11 +95,17 @@ describe('overlay-utils (core)', () => {
 
     const input = document.createElement('input')
 
+    const hiddenParent = document.createElement('div')
+    hiddenParent.style.display = 'none'
+    const hiddenButton = document.createElement('button')
+    hiddenParent.appendChild(hiddenButton)
+
     root.appendChild(link)
     root.appendChild(button)
     root.appendChild(disabledButton)
     root.appendChild(tabNeg)
     root.appendChild(input)
+    root.appendChild(hiddenParent)
 
     const focusables = getFocusableElements(root)
 
@@ -96,6 +114,7 @@ describe('overlay-utils (core)', () => {
     expect(focusables).toContain(input)
     expect(focusables).not.toContain(disabledButton)
     expect(focusables).not.toContain(tabNeg)
+    expect(focusables).not.toContain(hiddenButton)
   })
 
   it('getFocusTrapNavigation should wrap focus on Tab at edges', () => {
@@ -112,5 +131,19 @@ describe('overlay-utils (core)', () => {
       shouldHandle: true,
       next: b
     })
+  })
+
+  it('registerEscapeDismiss should dismiss only the topmost overlay', () => {
+    const calls: string[] = []
+    const removeOuter = registerEscapeDismiss(document, () => calls.push('outer'))
+    const removeInner = registerEscapeDismiss(document, () => calls.push('inner'))
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }))
+    expect(calls).toEqual(['inner'])
+
+    removeInner()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }))
+    expect(calls).toEqual(['inner', 'outer'])
+    removeOuter()
   })
 })

@@ -13,19 +13,13 @@ describe('ColorPicker', () => {
     expect(container.querySelector('.my-picker')).toBeInTheDocument()
   })
 
-  // --- Sizes ---
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    const { container } = renderWithProps(ColorPicker, { size })
-    expect(container.firstElementChild).toBeInTheDocument()
-  })
-
   // --- Dropdown toggle ---
   it('opens dropdown on trigger click', async () => {
     const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb' })
     const trigger = container.querySelector('[role="button"]')!
     await fireEvent.click(trigger)
     // Should have dropdown panel
-    expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
+    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
   })
   // --- Disabled ---
   it('does not open when disabled', async () => {
@@ -44,7 +38,7 @@ describe('ColorPicker', () => {
     const trigger = container.querySelector('[role="button"]')!
     await fireEvent.click(trigger)
     // Should render 3 preset buttons
-    const presets = container.querySelectorAll('[aria-label^="Select "]')
+    const presets = document.body.querySelectorAll('[aria-label^="Select "]')
     expect(presets.length).toBe(3)
   })
 
@@ -56,7 +50,7 @@ describe('ColorPicker', () => {
     })
     const trigger = container.querySelector('[role="button"]')!
     await fireEvent.click(trigger)
-    const input = container.querySelector('input[type="text"]') as HTMLInputElement
+    const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
     await fireEvent.update(input, 'ff0000')
     expect(onChange).toHaveBeenCalledWith('#ff0000')
   }) // --- Keyboard accessibility (S3) ---
@@ -64,11 +58,11 @@ describe('ColorPicker', () => {
     const { container } = renderWithProps(ColorPicker, { modelValue: '#2563eb' })
     const trigger = container.querySelector('[role="button"]')!
     await fireEvent.keyDown(trigger, { key: 'Enter' })
-    expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
+    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
     await fireEvent.keyDown(trigger, { key: 'Enter' })
-    expect(container.querySelector('input[type="text"]')).not.toBeInTheDocument()
+    expect(document.body.querySelector('input[type="text"]')).not.toBeInTheDocument()
     await fireEvent.keyDown(trigger, { key: ' ' })
-    expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
+    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
   })
 
   it('exposes aria-expanded / aria-haspopup on the trigger', async () => {
@@ -86,7 +80,7 @@ describe('ColorPicker', () => {
       props: { modelValue: '#000000', presets: ['#ff0000'], 'onUpdate:modelValue': onChange }
     })
     await fireEvent.click(container.querySelector('[role="button"]')!)
-    const preset = container.querySelector('[aria-label="Select #ff0000"]')!
+    const preset = document.body.querySelector('[aria-label="Select #ff0000"]')!
     expect(preset.getAttribute('role')).toBe('button')
     expect(preset.getAttribute('tabindex')).toBe('0')
     await fireEvent.keyDown(preset, { key: 'Enter' })

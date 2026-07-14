@@ -260,6 +260,7 @@ export const Drawer = defineComponent({
     const deferredRendered = ref(props.open)
 
     const dialogRef = ref<HTMLElement | null>(null)
+    const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
     let touchStartPoint: GesturePoint | null = null
@@ -329,7 +330,7 @@ export const Drawer = defineComponent({
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(escapeEnabled)
-    useVueFocusTrap({ enabled: escapeEnabled, containerRef: dialogRef })
+    useVueFocusTrap({ enabled: escapeEnabled, containerRef: rootRef })
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({
@@ -394,6 +395,7 @@ export const Drawer = defineComponent({
 
       const ariaLabelledby =
         ariaLabelledbyFromAttrs ?? (props.title || slots.header ? titleId.value : undefined)
+      const overlayHostId = `${instanceId.value}-overlay-host`
 
       const containerClasses = classNames(
         getDrawerContainerClasses(),
@@ -503,6 +505,7 @@ export const Drawer = defineComponent({
           role: 'dialog',
           'aria-modal': 'true',
           'aria-labelledby': ariaLabelledby,
+          'aria-owns': overlayHostId,
           tabindex: -1,
           ref: dialogRef,
           onTouchstart: handleTouchStart,
@@ -518,12 +521,22 @@ export const Drawer = defineComponent({
         'div',
         {
           class: containerClasses,
+          ref: rootRef,
           style: { zIndex: props.zIndex },
           hidden: !props.open && !(props.destroyOnClose && props.deferDestroyOnClose),
           'aria-hidden': !props.open ? 'true' : undefined,
+          'data-tiger-overlay-layer': '',
           'data-tiger-drawer-root': ''
         },
-        [mask, panel]
+        [
+          mask,
+          panel,
+          h('div', {
+            id: overlayHostId,
+            class: 'contents',
+            'data-tiger-overlay-host': ''
+          })
+        ]
       )
 
       return renderVueBodyTeleport([root])

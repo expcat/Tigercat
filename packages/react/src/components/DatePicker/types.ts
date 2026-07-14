@@ -50,6 +50,7 @@ export interface DatePickerContext {
   // refs
   inputWrapperRef: React.RefObject<HTMLDivElement | null>
   inputRef: React.RefObject<HTMLInputElement | null>
+  panelRef: React.RefObject<HTMLDivElement | null>
   calendarRef: React.RefObject<HTMLDivElement | null>
   mobileCalendarRef: React.RefObject<HTMLDivElement | null>
 

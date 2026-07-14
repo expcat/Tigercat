@@ -2,8 +2,6 @@ import React, { useState, useMemo, useCallback, useEffect, useLayoutEffect, useR
 import {
   classNames,
   getSubMenuTitleClasses,
-  getSubmenuPopupZIndex,
-  getTransformOrigin,
   getMenuItemIndent,
   isKeyOpen,
   menuItemIconClasses,
@@ -23,7 +21,7 @@ import {
   type SubmenuHeightTransitionController,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
-import { renderBodyPortal, useFloating } from '../../utils/overlay'
+import { renderOverlayPortal, useAnchoredOverlay } from '../../utils/overlay'
 import { useMenuContext } from './context'
 import { ExpandIcon } from './icons'
 import { MenuItem } from './menu-item'
@@ -66,16 +64,18 @@ export const SubMenu: React.FC<SubMenuProps> = ({
   const popupPortal = Boolean(isPopup && menuContext?.popupPortal)
   const popupPlacement: FloatingPlacement =
     menuContext?.mode === 'horizontal' && level === 0 ? 'bottom-start' : 'right-start'
-  const {
-    x: popupX,
-    y: popupY,
-    placement: currentPopupPlacement
-  } = useFloating({
+  const overlay = useAnchoredOverlay({
     referenceRef: titleRef,
     floatingRef: popupRef,
-    enabled: popupPortal && isExpanded,
+    enabled: isPopup && isExpanded,
     placement: popupPlacement,
-    offset: 4
+    offset: 4,
+    portal: popupPortal,
+    dismissOnEscape: true,
+    onDismiss: () => {
+      setIsOpenByKeyboard(false)
+      setIsHovered(false)
+    }
   })
 
   const isInlineOrVertical = menuContext?.mode !== 'horizontal' && !isPopup
@@ -325,25 +325,13 @@ export const SubMenu: React.FC<SubMenuProps> = ({
       return child
     })
 
-    const popupZIndex = isPopup ? getSubmenuPopupZIndex(level) : {}
-
     if (isPopup) {
-      const popupStyle: React.CSSProperties = popupPortal
-        ? {
-            display: isExpanded ? 'block' : 'none',
-            position: 'absolute',
-            left: popupX,
-            top: popupY,
-            transformOrigin: getTransformOrigin(currentPopupPlacement),
-            ...popupZIndex
-          }
-        : { display: isExpanded ? 'block' : 'none', ...popupZIndex }
-
       const popup = (
         <ul
-          ref={popupPortal ? popupRef : undefined}
-          className={contentClasses}
-          style={popupStyle}
+          ref={popupRef}
+          className={classNames(contentClasses, overlay.floatingClasses)}
+          style={{ ...overlay.floatingStyles, display: isExpanded ? 'block' : 'none' }}
+          data-positioned={overlay.positioned}
           role="menu"
           aria-hidden={isExpanded ? undefined : 'true'}
           onMouseEnter={popupPortal ? handleMouseEnter : undefined}
@@ -353,20 +341,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         </ul>
       )
 
-      if (popupPortal) {
-        return renderBodyPortal(popup)
-      }
-
-      return (
-        <ul
-          className={contentClasses}
-          style={{ display: isExpanded ? 'block' : 'none', ...popupZIndex }}
-          role="menu"
-          aria-hidden={isExpanded ? undefined : 'true'}
-          data-tiger-submenu-popup="">
-          {enhancedChildren}
-        </ul>
-      )
+      return renderOverlayPortal(popup, overlay.target, !popupPortal)
     }
 
     if (!hasRenderedInline) return null

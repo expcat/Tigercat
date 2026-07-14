@@ -46,9 +46,7 @@ export function getDatePickerInputClasses(
 
   // Reserve space for the calendar button (right-0 + px per size + w-5 icon),
   // plus the clear button (right-10, 24px wide) only when it is visible
-  const rightPaddingClasses = showClear
-    ? 'pr-16'
-    : { sm: 'pr-10', md: 'pr-12', lg: 'pr-14' }[size]
+  const rightPaddingClasses = showClear ? 'pr-16' : { sm: 'pr-10', md: 'pr-12', lg: 'pr-14' }[size]
 
   const disabledClasses = disabled
     ? [
@@ -91,9 +89,6 @@ export function getDatePickerIconButtonClasses(size: ComponentSize = 'md'): stri
  * Base classes for calendar dropdown
  */
 export const datePickerCalendarClasses = classNames(
-  'absolute',
-  'z-50',
-  'mt-1',
   'bg-[var(--tiger-surface,#ffffff)]',
   'border',
   'border-[var(--tiger-border,#d1d5db)]',
@@ -106,10 +101,6 @@ export const datePickerCalendarClasses = classNames(
 
 export const datePickerMobileWheelClasses = classNames(
   'sm:hidden',
-  'fixed',
-  'inset-x-0',
-  'bottom-0',
-  'z-50',
   'rounded-t-[var(--tiger-radius-lg,0.75rem)]',
   'border',
   'border-[var(--tiger-border,#e5e7eb)]',
@@ -205,10 +196,7 @@ export function getDatePickerDayCellClasses(
     'w-10 h-10 flex items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] text-sm transition-colors'
 
   if (isDisabled) {
-    return classNames(
-      base,
-      'cursor-not-allowed text-[var(--tiger-text-muted,#9ca3af)] opacity-50'
-    )
+    return classNames(base, 'cursor-not-allowed text-[var(--tiger-text-muted,#9ca3af)] opacity-50')
   }
 
   if (isSelected || isRangeStart || isRangeEnd) {

@@ -1,4 +1,4 @@
-import { defineComponent, computed, ref, h, PropType, watch, onBeforeUnmount } from 'vue'
+import { defineComponent, computed, ref, h, PropType, watch } from 'vue'
 import {
   classNames,
   cascaderBaseClasses,
@@ -32,6 +32,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 let cascaderInstanceId = 0
 
@@ -145,6 +146,19 @@ export const Cascader = defineComponent({
     const triggerRef = ref<HTMLElement | null>(null)
     const dropdownRef = ref<HTMLElement | null>(null)
     const searchInputRef = ref<HTMLElement | null>(null)
+    const overlay = useVueAnchoredOverlay({
+      enabled: isOpen,
+      referenceRef: triggerRef,
+      floatingRef: dropdownRef,
+      placement: 'bottom-start',
+      offset: 4,
+      layout: 'fullscreen-sm',
+      matchReferenceWidth: true,
+      dismissOnOutside: true,
+      dismissOnEscape: true,
+      restoreFocusOnDismiss: true,
+      onDismiss: closeDropdown
+    })
 
     // Display label based on current value
     const displayLabel = computed(() => {
@@ -268,31 +282,6 @@ export const Cascader = defineComponent({
         closeDropdown()
       }
     }
-
-    // Click outside to close
-    function handleDocumentClick(e: MouseEvent) {
-      const target = e.target as Node
-      if (
-        triggerRef.value &&
-        !triggerRef.value.contains(target) &&
-        dropdownRef.value &&
-        !dropdownRef.value.contains(target)
-      ) {
-        closeDropdown()
-      }
-    }
-
-    watch(isOpen, (open) => {
-      if (open) {
-        document.addEventListener('click', handleDocumentClick, true)
-      } else {
-        document.removeEventListener('click', handleDocumentClick, true)
-      }
-    })
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('click', handleDocumentClick, true)
-    })
 
     return () => {
       const hasValue = props.modelValue && props.modelValue.length > 0
@@ -490,7 +479,13 @@ export const Cascader = defineComponent({
           'div',
           {
             ref: dropdownRef,
-            class: classNames(cascaderDropdownClasses, isSearchMode.value && 'flex-col')
+            class: classNames(
+              cascaderDropdownClasses,
+              isSearchMode.value && 'flex-col',
+              overlay.floatingClasses.value
+            ),
+            style: overlay.floatingStyles.value,
+            'data-positioned': overlay.positioned.value
           },
           children
         )
@@ -502,7 +497,7 @@ export const Cascader = defineComponent({
           class: cascaderBaseClasses,
           'data-testid': 'cascader'
         },
-        [trigger, dropdownContent]
+        [trigger, renderVueOverlayTeleport(dropdownContent, overlay.target.value)]
       )
     }
   }

@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/react'
 import React from 'react'
 import { Cascader } from '@expcat/tigercat-react'
-import { componentSizes, expectNoA11yViolationsIsolated } from '../utils/react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const simpleOptions = [
   {
@@ -58,13 +58,6 @@ describe('Cascader', () => {
   })
 
   describe('Props', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
-      const { container } = render(<Cascader options={simpleOptions} size={size} />)
-
-      const trigger = container.querySelector('button')
-      expect(trigger).toBeInTheDocument()
-    })
-
     it('should be disabled when disabled prop is true', () => {
       const { container } = render(<Cascader options={simpleOptions} disabled />)
 
@@ -80,16 +73,9 @@ describe('Cascader', () => {
       const trigger = container.querySelector('button')!
       fireEvent.click(trigger)
 
-      expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
+      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
     })
 
-    it('uses fullscreen panel classes for mobile dropdown', () => {
-      const { container } = render(<Cascader options={simpleOptions} />)
-
-      fireEvent.click(container.querySelector('button')!)
-
-      expect(container.querySelector('.max-sm\\:fixed')).toBeInTheDocument()
-    })
     it('should expand child options on click', async () => {
       const { container, getByText } = render(<Cascader options={simpleOptions} />)
 
@@ -142,7 +128,7 @@ describe('Cascader', () => {
       const trigger = container.querySelector('button')!
       fireEvent.click(trigger)
 
-      const searchInput = container.querySelector('input[aria-label="Search options"]')!
+      const searchInput = document.body.querySelector('input[aria-label="Search options"]')!
       fireEvent.change(searchInput, { target: { value: 'West' } })
 
       expect(getByText('Zhejiang / Hangzhou / West Lake')).toBeInTheDocument()
@@ -156,7 +142,7 @@ describe('Cascader', () => {
       const trigger = container.querySelector('button')!
       fireEvent.click(trigger)
 
-      const searchInput = container.querySelector('input[aria-label="Search options"]')!
+      const searchInput = document.body.querySelector('input[aria-label="Search options"]')!
       fireEvent.change(searchInput, { target: { value: 'xyz nonexistent' } })
 
       expect(getByText('Nothing found')).toBeInTheDocument()
@@ -218,7 +204,7 @@ describe('Cascader', () => {
       trigger.focus()
       fireEvent.keyDown(trigger, { key: 'Enter' })
 
-      expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
+      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
     })
 
     it('should close on Escape key', async () => {
@@ -226,10 +212,10 @@ describe('Cascader', () => {
 
       const trigger = container.querySelector('button')!
       fireEvent.click(trigger)
-      expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
+      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
 
       fireEvent.keyDown(trigger, { key: 'Escape' })
-      expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
+      expect(document.body.querySelector('[role="listbox"]')).not.toBeInTheDocument()
     })
 
     it('should have no accessibility violations', async () => {

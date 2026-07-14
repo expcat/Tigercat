@@ -163,7 +163,7 @@ describe('custom text (no i18n) — React', () => {
         </ConfigProvider>
       )
       fireEvent.click(container.querySelector('button')!)
-      fireEvent.change(container.querySelector('input[aria-label="Search options"]')!, {
+      fireEvent.change(document.body.querySelector('input[aria-label="Search options"]')!, {
         target: { value: 'zzz' }
       })
       expect(getByText('暂无数据')).toBeInTheDocument()
@@ -176,7 +176,7 @@ describe('custom text (no i18n) — React', () => {
         </ConfigProvider>
       )
       fireEvent.click(container.querySelector('button')!)
-      fireEvent.change(container.querySelector('input[aria-label="Search options"]')!, {
+      fireEvent.change(document.body.querySelector('input[aria-label="Search options"]')!, {
         target: { value: 'zzz' }
       })
       expect(getByText('查无此项')).toBeInTheDocument()
@@ -200,7 +200,7 @@ describe('custom text (no i18n) — React', () => {
         </ConfigProvider>
       )
       fireEvent.click(container.querySelector('button')!)
-      fireEvent.change(container.querySelector('input')!, { target: { value: 'zzz' } })
+      fireEvent.change(document.body.querySelector('input')!, { target: { value: 'zzz' } })
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 

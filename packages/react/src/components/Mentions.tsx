@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import React, { useState, useMemo, useCallback, useRef } from 'react'
 import { classNames } from '@expcat/tigercat-core'
 import type { MentionsSize, MentionOption } from '@expcat/tigercat-core'
 import {
@@ -6,9 +6,9 @@ import {
   mentionsDropdownClasses,
   getMentionsOptionClasses,
   extractMentionQuery,
-  positionMentionsDropdown,
   getCyclicIndex
 } from '@expcat/tigercat-core'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 export interface MentionsProps {
   value?: string
@@ -42,12 +42,23 @@ export const Mentions: React.FC<MentionsProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-
   const filteredOptions = useMemo(() => {
     if (!query) return options
     const q = query.toLowerCase()
     return options.filter((o) => !o.disabled && o.label.toLowerCase().includes(q))
   }, [options, query])
+  const overlay = useAnchoredOverlay({
+    enabled: isOpen && filteredOptions.length > 0,
+    referenceRef: textareaRef,
+    floatingRef: dropdownRef,
+    containerRef,
+    placement: 'bottom-start',
+    offset: 4,
+    dismissOnOutside: true,
+    dismissOnEscape: true,
+    restoreFocusOnDismiss: true,
+    onDismiss: () => setIsOpen(false)
+  })
 
   const handleInput = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -102,25 +113,6 @@ export const Mentions: React.FC<MentionsProps> = ({
     [isOpen, filteredOptions, activeIndex, selectOption]
   )
 
-  // Click outside
-  useEffect(() => {
-    if (!isOpen) return
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [isOpen])
-
-  useEffect(() => {
-    if (!isOpen || filteredOptions.length === 0) return
-    if (!textareaRef.current || !dropdownRef.current) return
-
-    void positionMentionsDropdown(textareaRef.current, dropdownRef.current)
-  }, [isOpen, filteredOptions.length, size, rows, value])
-
   const wrapperClass = classNames('relative', className)
 
   return (
@@ -135,19 +127,27 @@ export const Mentions: React.FC<MentionsProps> = ({
         onChange={handleInput}
         onKeyDown={handleKeydown}
       />
-      {isOpen && filteredOptions.length > 0 && (
-        <div ref={dropdownRef} className={mentionsDropdownClasses} role="listbox">
-          {filteredOptions.map((opt, i) => (
-            <div
-              key={opt.value}
-              className={getMentionsOptionClasses(i === activeIndex, !!opt.disabled)}
-              role="option"
-              aria-selected={i === activeIndex}
-              onClick={() => selectOption(opt)}>
-              {opt.label}
-            </div>
-          ))}
-        </div>
+      {renderOverlayPortal(
+        isOpen && filteredOptions.length > 0 ? (
+          <div
+            ref={dropdownRef}
+            className={classNames(mentionsDropdownClasses, overlay.floatingClasses)}
+            style={overlay.floatingStyles}
+            data-positioned={overlay.positioned}
+            role="listbox">
+            {filteredOptions.map((opt, i) => (
+              <div
+                key={opt.value}
+                className={getMentionsOptionClasses(i === activeIndex, !!opt.disabled)}
+                role="option"
+                aria-selected={i === activeIndex}
+                onClick={() => selectOption(opt)}>
+                {opt.label}
+              </div>
+            ))}
+          </div>
+        ) : null,
+        overlay.target
       )}
     </div>
   )

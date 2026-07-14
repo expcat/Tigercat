@@ -30,4 +30,5 @@ Tailwind CSS 驱动的 React + Vue 3 组件库。先按任务定位 reference，
 - Component imports prefer PascalCase subpaths such as `@expcat/tigercat-react/Button` or `@expcat/tigercat-vue/Button`.
 - Generated references and `context7.json` are owned by `pnpm docs:api`; change generator/source facts before editing generated docs.
 - Component route facts come from `scripts/lib/public-components.mjs`; keep package subpaths, test groups, Skill docs, and MCP inventory in sync.
+- Maintainer automation must follow `CONTRIBUTING.md` "根因修复与架构约束": fix cross-component causes in core/shared adapters, migrate every equivalent consumer symmetrically, and delete replaced paths instead of adding component or Modal-specific patches.
 - Maintainer-only package work may need [release.md](references/release.md) or [tokens.md](references/tokens.md).

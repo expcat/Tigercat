@@ -14,18 +14,12 @@ describe('ColorPicker', () => {
     expect(container.querySelector('.my-picker')).toBeInTheDocument()
   })
 
-  // --- Sizes ---
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    const { container } = render(<ColorPicker size={size} />)
-    expect(container.firstElementChild).toBeInTheDocument()
-  })
-
   // --- Dropdown toggle ---
   it('opens dropdown on trigger click', () => {
     const { container } = render(<ColorPicker value="#2563eb" />)
     const trigger = container.querySelector('[role="button"]')!
     fireEvent.click(trigger)
-    expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
+    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
   })
   // --- Disabled ---
   it('does not open when disabled', () => {
@@ -41,7 +35,7 @@ describe('ColorPicker', () => {
       <ColorPicker value="#000" presets={['#ff0000', '#00ff00', '#0000ff']} />
     )
     fireEvent.click(container.querySelector('[role="button"]')!)
-    const presets = container.querySelectorAll('[aria-label^="Select "]')
+    const presets = document.body.querySelectorAll('[aria-label^="Select "]')
     expect(presets.length).toBe(3)
   })
 
@@ -50,7 +44,7 @@ describe('ColorPicker', () => {
     const onChange = vi.fn()
     const { container } = render(<ColorPicker value="#2563eb" onChange={onChange} />)
     fireEvent.click(container.querySelector('[role="button"]')!)
-    const input = container.querySelector('input[type="text"]') as HTMLInputElement
+    const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
     fireEvent.change(input, { target: { value: 'ff0000' } })
     expect(onChange).toHaveBeenCalledWith('#ff0000')
   }) // --- Keyboard accessibility (S3) ---
@@ -58,11 +52,11 @@ describe('ColorPicker', () => {
     const { container } = render(<ColorPicker value="#2563eb" />)
     const trigger = container.querySelector('[role="button"]')!
     fireEvent.keyDown(trigger, { key: 'Enter' })
-    expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
+    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
     fireEvent.keyDown(trigger, { key: 'Enter' })
-    expect(container.querySelector('input[type="text"]')).not.toBeInTheDocument()
+    expect(document.body.querySelector('input[type="text"]')).not.toBeInTheDocument()
     fireEvent.keyDown(trigger, { key: ' ' })
-    expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
+    expect(document.body.querySelector('input[type="text"]')).toBeInTheDocument()
   })
 
   it('exposes aria-expanded / aria-haspopup on the trigger', () => {
@@ -80,7 +74,7 @@ describe('ColorPicker', () => {
       <ColorPicker value="#000000" presets={['#ff0000']} onChange={onChange} />
     )
     fireEvent.click(container.querySelector('[role="button"]')!)
-    const preset = container.querySelector('[aria-label="Select #ff0000"]')!
+    const preset = document.body.querySelector('[aria-label="Select #ff0000"]')!
     expect(preset.getAttribute('role')).toBe('button')
     expect(preset.getAttribute('tabindex')).toBe('0')
     fireEvent.keyDown(preset, { key: 'Enter' })

@@ -127,9 +127,9 @@ describe('Select a11y regression', () => {
     reactFireEvent.click(trigger)
 
     await waitFor(() => {
-      const listbox = container.querySelector('[role="listbox"]')
+      const listbox = document.body.querySelector('[role="listbox"]')
       expect(listbox).toBeTruthy()
-      const options = container.querySelectorAll('[role="option"]')
+      const options = document.body.querySelectorAll('[role="option"]')
       expect(options).toHaveLength(3)
     })
   })
@@ -142,9 +142,9 @@ describe('Select a11y regression', () => {
     const trigger = container.querySelector('[aria-haspopup="listbox"]') as HTMLElement
     await vueFireEvent.click(trigger)
 
-    const listbox = container.querySelector('[role="listbox"]')
+    const listbox = document.body.querySelector('[role="listbox"]')
     expect(listbox).toBeTruthy()
-    const options = container.querySelectorAll('[role="option"]')
+    const options = document.body.querySelectorAll('[role="option"]')
     expect(options).toHaveLength(3)
   })
 })

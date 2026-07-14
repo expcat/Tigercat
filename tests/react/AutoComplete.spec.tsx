@@ -44,7 +44,7 @@ describe('AutoComplete', () => {
       const input = container.querySelector('input')!
       await user.click(input)
 
-      expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
+      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
     })
 
     it('should show filtered options when typing', async () => {
@@ -123,7 +123,7 @@ describe('AutoComplete', () => {
       })
       await user.keyboard('{ArrowDown}')
 
-      expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
+      expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
     })
     it('should select on Enter', async () => {
       const user = userEvent.setup()
@@ -191,7 +191,7 @@ describe('AutoComplete', () => {
       await user.clear(input)
       await user.type(input, 'xyz')
 
-      const opts = container.querySelectorAll('[role="option"]')
+      const opts = document.body.querySelectorAll('[role="option"]')
       expect(opts.length).toBe(4)
     })
   })

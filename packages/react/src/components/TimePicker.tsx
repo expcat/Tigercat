@@ -15,11 +15,23 @@ import { renderTimePickerMobile } from './TimePicker/render-mobile'
 import { renderTimePickerDesktop } from './TimePicker/render-desktop'
 import { Icon } from './TimePicker/icons'
 import type { TimePickerProps } from './TimePicker/types'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 export type { TimePickerProps } from './TimePicker/types'
 
 export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
   const ctx = useTimePickerState(allProps)
+  const overlay = useAnchoredOverlay({
+    enabled: ctx.isOpen,
+    referenceRef: ctx.inputWrapperRef,
+    floatingRef: ctx.panelRef,
+    placement: 'bottom-start',
+    offset: 4,
+    layout: 'bottom-sheet-sm',
+    dismissOnOutside: true,
+    dismissOnEscape: true,
+    onDismiss: ctx.closePanel
+  })
 
   return (
     <div className={ctx.containerClasses} {...ctx.divProps}>
@@ -64,52 +76,57 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
       </div>
 
       {/* Time picker panel */}
-      {ctx.isOpen && (
-        <div
-          ref={ctx.panelRef}
-          className={timePickerPanelClasses}
-          role="dialog"
-          aria-label={ctx.labels.dialog}
-          onKeyDown={ctx.handlePanelKeyDown}>
-          {ctx.isRangeMode && (
-            <div className={timePickerRangeHeaderClasses}>
-              <button
-                type="button"
-                className={getTimePickerRangeTabButtonClasses(ctx.activePart === 'start')}
-                onClick={() => ctx.setActivePart('start')}
-                aria-label={ctx.labels.start}
-                aria-selected={ctx.activePart === 'start'}>
-                {ctx.labels.start}
+      {renderOverlayPortal(
+        ctx.isOpen ? (
+          <div
+            ref={ctx.panelRef}
+            className={`${timePickerPanelClasses} ${overlay.floatingClasses}`}
+            style={overlay.floatingStyles}
+            data-positioned={overlay.positioned}
+            role="dialog"
+            aria-label={ctx.labels.dialog}
+            onKeyDown={ctx.handlePanelKeyDown}>
+            {ctx.isRangeMode && (
+              <div className={timePickerRangeHeaderClasses}>
+                <button
+                  type="button"
+                  className={getTimePickerRangeTabButtonClasses(ctx.activePart === 'start')}
+                  onClick={() => ctx.setActivePart('start')}
+                  aria-label={ctx.labels.start}
+                  aria-selected={ctx.activePart === 'start'}>
+                  {ctx.labels.start}
+                </button>
+                <button
+                  type="button"
+                  className={getTimePickerRangeTabButtonClasses(ctx.activePart === 'end')}
+                  onClick={() => ctx.setActivePart('end')}
+                  aria-label={ctx.labels.end}
+                  aria-selected={ctx.activePart === 'end'}>
+                  {ctx.labels.end}
+                </button>
+              </div>
+            )}
+
+            {renderTimePickerMobile(ctx)}
+
+            {/* Columns container */}
+            {renderTimePickerDesktop(ctx)}
+
+            {/* Footer */}
+            <div className={timePickerFooterClasses}>
+              <button type="button" className={timePickerFooterButtonClasses} onClick={ctx.setNow}>
+                {ctx.labels.now}
               </button>
               <button
                 type="button"
-                className={getTimePickerRangeTabButtonClasses(ctx.activePart === 'end')}
-                onClick={() => ctx.setActivePart('end')}
-                aria-label={ctx.labels.end}
-                aria-selected={ctx.activePart === 'end'}>
-                {ctx.labels.end}
+                className={timePickerFooterButtonClasses}
+                onClick={ctx.closePanel}>
+                {ctx.labels.ok}
               </button>
             </div>
-          )}
-
-          {renderTimePickerMobile(ctx)}
-
-          {/* Columns container */}
-          {renderTimePickerDesktop(ctx)}
-
-          {/* Footer */}
-          <div className={timePickerFooterClasses}>
-            <button type="button" className={timePickerFooterButtonClasses} onClick={ctx.setNow}>
-              {ctx.labels.now}
-            </button>
-            <button
-              type="button"
-              className={timePickerFooterButtonClasses}
-              onClick={ctx.closePanel}>
-              {ctx.labels.ok}
-            </button>
           </div>
-        </div>
+        ) : null,
+        overlay.target
       )}
     </div>
   )

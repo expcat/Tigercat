@@ -11,7 +11,7 @@ import {
   type ImageProps as CoreImageProps
 } from '@expcat/tigercat-core'
 import { usePopup } from '../utils/use-popup'
-import { renderBodyPortal } from '../utils/overlay'
+import { renderOverlayPortal } from '../utils/overlay'
 import { ImageGroupContext } from './ImageGroup'
 import { ImagePreview } from './ImagePreview'
 
@@ -82,6 +82,9 @@ export const Image: React.FC<ImageProps> = ({
     triggerRef: hoverTriggerRef,
     floatingRef: hoverFloatingRef,
     floatingStyles: hoverFloatingStyles,
+    floatingClasses: hoverFloatingClasses,
+    positioned: hoverPositioned,
+    overlayTarget: hoverOverlayTarget,
     triggerHandlers: hoverTriggerHandlers
   } = usePopup({
     trigger: 'hover',
@@ -243,14 +246,19 @@ export const Image: React.FC<ImageProps> = ({
       {hoverPreviewEnabled &&
         hoverVisible &&
         src &&
-        renderBodyPortal(
+        renderOverlayPortal(
           <div
             ref={hoverFloatingRef}
             style={hoverFloatingStyles}
-            aria-hidden
-            className="rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-1 shadow-lg">
+            className={classNames(
+              hoverFloatingClasses,
+              'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-1 shadow-lg'
+            )}
+            data-positioned={hoverPositioned}
+            aria-hidden>
             <img src={src} alt="" className="block max-w-[16rem] max-h-[16rem] object-contain" />
-          </div>
+          </div>,
+          hoverOverlayTarget
         )}
     </>
   )

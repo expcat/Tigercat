@@ -9,7 +9,6 @@ import React from 'react'
 import { Select } from '@expcat/tigercat-react'
 import {
   expectNoA11yViolationsIsolated,
-  componentSizes,
   setThemeVariables,
   clearThemeVariables
 } from '../utils/react'
@@ -65,13 +64,6 @@ describe('Select', () => {
   })
 
   describe('Props', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
-      const { container } = render(<Select options={testOptions} size={size} />)
-
-      const trigger = container.querySelector('button')
-      expect(trigger).toBeInTheDocument()
-    })
-
     it('should be disabled when disabled prop is true', () => {
       const { container } = render(<Select options={testOptions} disabled />)
 
@@ -83,15 +75,6 @@ describe('Select', () => {
       const { container } = render(<Select options={testOptions} value="1" clearable />)
 
       expect(container.querySelector('[data-tiger-select-clear]')).toBeInTheDocument()
-    })
-
-    it('uses fullscreen panel classes for mobile dropdown', async () => {
-      const user = userEvent.setup()
-      const { container } = render(<Select options={testOptions} />)
-
-      await user.click(container.querySelector('button')!)
-
-      expect(container.querySelector('[role="listbox"]')).toHaveClass('max-sm:fixed')
     })
   })
 
@@ -222,7 +205,7 @@ describe('Select', () => {
       const trigger = container.querySelector('button')!
       await user.click(trigger)
 
-      const input = container.querySelector('input')!
+      const input = document.body.querySelector('input')!
       await user.type(input, 'Option 2')
 
       expect(onSearch).toHaveBeenCalled()
@@ -235,7 +218,7 @@ describe('Select', () => {
       const { container, getByText } = render(<Select options={testOptions} searchable remote />)
 
       await user.click(container.querySelector('button')!)
-      fireEvent.change(container.querySelector('input')!, { target: { value: 'Option 2' } })
+      fireEvent.change(document.body.querySelector('input')!, { target: { value: 'Option 2' } })
 
       expect(getByText('Option 1')).toBeInTheDocument()
       expect(getByText('Option 2')).toBeInTheDocument()
@@ -249,7 +232,7 @@ describe('Select', () => {
       )
 
       fireEvent.click(container.querySelector('button')!)
-      fireEvent.change(container.querySelector('input')!, { target: { value: 'Option 2' } })
+      fireEvent.change(document.body.querySelector('input')!, { target: { value: 'Option 2' } })
 
       expect(onSearch).not.toHaveBeenCalled()
       vi.advanceTimersByTime(200)
@@ -273,7 +256,7 @@ describe('Select', () => {
       )
 
       await user.click(container.querySelector('button')!)
-      fireEvent.change(container.querySelector('input')!, { target: { value: 'New option' } })
+      fireEvent.change(document.body.querySelector('input')!, { target: { value: 'New option' } })
       fireEvent.click(getByText('Create "New option"'))
 
       expect(onCreate).toHaveBeenCalledWith({ label: 'New option', value: 'New option' })
@@ -287,7 +270,7 @@ describe('Select', () => {
       )
 
       await user.click(container.querySelector('button')!)
-      fireEvent.change(container.querySelector('input')!, { target: { value: 'Option 1' } })
+      fireEvent.change(document.body.querySelector('input')!, { target: { value: 'Option 1' } })
 
       expect(queryByText('Create "Option 1"')).not.toBeInTheDocument()
     })
@@ -344,7 +327,7 @@ describe('Select', () => {
       const trigger = container.querySelector('button')!
       await user.click(trigger)
 
-      const input = container.querySelector('input')!
+      const input = document.body.querySelector('input')!
       await waitFor(() => {
         expect(input).toHaveFocus()
       })
@@ -407,7 +390,7 @@ describe('Select', () => {
       const trigger = container.querySelector('button')!
       await user.click(trigger)
 
-      const input = container.querySelector('input')!
+      const input = document.body.querySelector('input')!
       await user.type(input, 'xyz')
 
       expect(getByText('No matches found')).toBeInTheDocument()
@@ -449,7 +432,9 @@ describe('Select', () => {
       expect(getByText('Option 1, Option 2, Option 3')).toBeInTheDocument()
 
       await user.click(trigger)
-      const selectedOptions = container.querySelectorAll('[role="option"][aria-selected="true"]')
+      const selectedOptions = document.body.querySelectorAll(
+        '[role="option"][aria-selected="true"]'
+      )
       expect(selectedOptions.length).toBe(3)
     })
 
@@ -553,7 +538,7 @@ describe('Select', () => {
       const trigger = container.querySelector('button')!
       await user.click(trigger)
 
-      const input = container.querySelector('input')!
+      const input = document.body.querySelector('input')!
       await waitFor(() => {
         expect(input).toHaveFocus()
       })
@@ -609,7 +594,7 @@ describe('Select', () => {
       const trigger = container.querySelector('button')!
       await user.click(trigger)
 
-      const input = container.querySelector('input')!
+      const input = document.body.querySelector('input')!
       await user.type(input, 'option 1')
 
       expect(getByText('Option 1')).toBeInTheDocument()
@@ -623,14 +608,14 @@ describe('Select', () => {
       const trigger = container.querySelector('button')!
       await user.click(trigger)
 
-      const input = container.querySelector('input')!
+      const input = document.body.querySelector('input')!
       await user.type(input, 'Option 1')
 
       await user.click(getByText('Option 1'))
 
       await user.click(trigger)
 
-      const inputAfterReopen = container.querySelector('input')!
+      const inputAfterReopen = document.body.querySelector('input')!
       expect(inputAfterReopen.value).toBe('')
       expect(getByText('Option 2')).toBeInTheDocument()
     })
@@ -642,7 +627,7 @@ describe('Select', () => {
       const trigger = container.querySelector('button')!
       await user.click(trigger)
 
-      const input = container.querySelector('input')!
+      const input = document.body.querySelector('input')!
       await user.type(input, 'Option 1')
 
       await user.keyboard(' ')

@@ -38,6 +38,7 @@ import {
   type TigerLocaleSelect
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 let selectInstanceId = 0
 
@@ -265,6 +266,19 @@ export const Select = defineComponent({
     const dropdownRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const searchInputRef = ref<HTMLInputElement | null>(null)
+    const overlay = useVueAnchoredOverlay({
+      enabled: isOpen,
+      referenceRef: triggerRef,
+      floatingRef: dropdownRef,
+      placement: 'bottom-start',
+      offset: 4,
+      layout: 'fullscreen-sm',
+      matchReferenceWidth: true,
+      dismissOnOutside: true,
+      dismissOnEscape: true,
+      restoreFocusOnDismiss: true,
+      onDismiss: closeDropdown
+    })
     // Virtual scrolling (flat options only)
     const virtualScrollTop = ref(0)
     const virtualScrollRef = ref<HTMLElement | null>(null)
@@ -443,17 +457,6 @@ export const Select = defineComponent({
       emit('change', newValue)
     }
 
-    function handleClickOutside(event: Event) {
-      if (
-        dropdownRef.value &&
-        triggerRef.value &&
-        !dropdownRef.value.contains(event.target as Node) &&
-        !triggerRef.value.contains(event.target as Node)
-      ) {
-        closeDropdown()
-      }
-    }
-
     function handleSearchInput(event: Event) {
       const target = event.target as HTMLInputElement
       updateSearchValue(target.value)
@@ -617,8 +620,6 @@ export const Select = defineComponent({
       isOpen,
       (open) => {
         if (open) {
-          document.addEventListener('click', handleClickOutside)
-
           const selectedIndex = (() => {
             if (props.multiple && Array.isArray(props.modelValue)) {
               const values = props.modelValue
@@ -645,8 +646,6 @@ export const Select = defineComponent({
           if (!props.searchable) {
             focusOptionAt(nextActive)
           }
-        } else {
-          document.removeEventListener('click', handleClickOutside)
         }
       },
       { immediate: true }
@@ -672,7 +671,6 @@ export const Select = defineComponent({
     )
 
     onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside)
       searchDebouncer.cancel()
     })
 
@@ -743,208 +741,216 @@ export const Select = defineComponent({
         ),
         // Dropdown
         isOpen.value &&
-          h(
-            'div',
-            {
-              ref: dropdownRef,
-              class: selectDropdownBaseClasses,
-              role: 'listbox',
-              id: listboxId,
-              'aria-multiselectable': props.multiple ? true : undefined,
-              onKeydown: handleDropdownKeyDown
-            },
-            [
-              // Search input
-              props.searchable &&
-                h('input', {
-                  ref: searchInputRef,
-                  type: 'text',
-                  class: selectSearchInputClasses,
-                  placeholder: resolveLocaleText(
-                    'Search...',
-                    mergedLocale.value?.common?.searchPlaceholder
-                  ),
-                  value: searchQuery.value,
-                  onInput: handleSearchInput,
-                  onKeydown: handleSearchKeyDown
-                }),
-              // Options list
-              filteredOptions.value.length > 0
-                ? (() => {
-                    let optionIndex = -1
+          renderVueOverlayTeleport(
+            h(
+              'div',
+              {
+                ref: dropdownRef,
+                class: classNames(selectDropdownBaseClasses, overlay.floatingClasses.value),
+                style: overlay.floatingStyles.value,
+                'data-positioned': overlay.positioned.value,
+                role: 'listbox',
+                id: listboxId,
+                'aria-multiselectable': props.multiple ? true : undefined,
+                onKeydown: handleDropdownKeyDown
+              },
+              [
+                // Search input
+                props.searchable &&
+                  h('input', {
+                    ref: searchInputRef,
+                    type: 'text',
+                    class: selectSearchInputClasses,
+                    placeholder: resolveLocaleText(
+                      'Search...',
+                      mergedLocale.value?.common?.searchPlaceholder
+                    ),
+                    value: searchQuery.value,
+                    onInput: handleSearchInput,
+                    onKeydown: handleSearchKeyDown
+                  }),
+                // Options list
+                filteredOptions.value.length > 0
+                  ? (() => {
+                      let optionIndex = -1
 
-                    const renderOptionItem = (
-                      option: SelectOption,
-                      idx: number,
-                      displayLabel = option.label
-                    ) => {
-                      const selected = isSelected(option)
-                      const active = idx === activeIndex.value
-                      const optionAria = getPickerOptionAria({
-                        selected,
-                        disabled: !!option.disabled
-                      })
+                      const renderOptionItem = (
+                        option: SelectOption,
+                        idx: number,
+                        displayLabel = option.label
+                      ) => {
+                        const selected = isSelected(option)
+                        const active = idx === activeIndex.value
+                        const optionAria = getPickerOptionAria({
+                          selected,
+                          disabled: !!option.disabled
+                        })
 
-                      return h(
-                        'div',
-                        {
-                          key: option.value,
-                          id: getOptionId(idx),
-                          'data-option-index': idx,
-                          ...optionAria,
-                          tabindex: active ? 0 : -1,
-                          class: getSelectOptionClasses(selected, !!option.disabled, props.size),
-                          onMouseenter: () => {
-                            if (!option.disabled) {
-                              activeIndex.value = idx
+                        return h(
+                          'div',
+                          {
+                            key: option.value,
+                            id: getOptionId(idx),
+                            'data-option-index': idx,
+                            ...optionAria,
+                            tabindex: active ? 0 : -1,
+                            class: getSelectOptionClasses(selected, !!option.disabled, props.size),
+                            onMouseenter: () => {
+                              if (!option.disabled) {
+                                activeIndex.value = idx
+                              }
+                            },
+                            onClick: () => selectOption(option)
+                          },
+                          [
+                            h('span', { class: 'flex items-center justify-between w-full' }, [
+                              h('span', displayLabel),
+                              selected && h('span', CheckIcon)
+                            ])
+                          ]
+                        )
+                      }
+
+                      const hasGroups = filteredOptions.value.some(isOptionGroup)
+
+                      // Virtual mode: only for flat option lists (no groups).
+                      if (props.virtual && !hasGroups) {
+                        const flat = filteredOptions.value.filter(
+                          (o): o is SelectOption => !isOptionGroup(o)
+                        )
+                        const all = creatableOption.value ? [...flat, creatableOption.value] : flat
+                        const itemH = getSelectVirtualItemHeight(props.size)
+                        const { startIndex, endIndex, totalHeight } = fixedSizeStrategy(
+                          itemH
+                        ).getRange(virtualScrollTop.value, props.listHeight, all.length, 5)
+                        const visible = []
+                        for (let i = startIndex; i <= endIndex; i++) {
+                          const isCreate = creatableOption.value && i === all.length - 1
+                          visible.push(
+                            renderOptionItem(
+                              all[i],
+                              i,
+                              isCreate
+                                ? getCreateSelectOptionLabel(all[i], props.createOptionText)
+                                : all[i].label
+                            )
+                          )
+                        }
+                        return h(
+                          'div',
+                          {
+                            ref: virtualScrollRef,
+                            'data-tiger-select-virtual': '',
+                            style: { maxHeight: `${props.listHeight}px`, overflowY: 'auto' },
+                            onScroll: (e: Event) => {
+                              virtualScrollTop.value = (e.target as HTMLElement).scrollTop
                             }
                           },
-                          onClick: () => selectOption(option)
-                        },
-                        [
-                          h('span', { class: 'flex items-center justify-between w-full' }, [
-                            h('span', displayLabel),
-                            selected && h('span', CheckIcon)
+                          [
+                            h(
+                              'div',
+                              { style: { height: `${totalHeight}px`, position: 'relative' } },
+                              [
+                                h(
+                                  'div',
+                                  { style: { transform: `translateY(${startIndex * itemH}px)` } },
+                                  visible
+                                )
+                              ]
+                            )
+                          ]
+                        )
+                      }
+
+                      const optionNodes = filteredOptions.value.map((item) => {
+                        if (isOptionGroup(item)) {
+                          return h('div', { key: item.label }, [
+                            h('div', { class: selectGroupLabelClasses }, item.label),
+                            item.options.map((option) => {
+                              optionIndex += 1
+                              return renderOptionItem(option, optionIndex)
+                            })
                           ])
-                        ]
-                      )
-                    }
+                        }
 
-                    const hasGroups = filteredOptions.value.some(isOptionGroup)
+                        optionIndex += 1
+                        return renderOptionItem(item, optionIndex)
+                      })
 
-                    // Virtual mode: only for flat option lists (no groups).
-                    if (props.virtual && !hasGroups) {
-                      const flat = filteredOptions.value.filter(
-                        (o): o is SelectOption => !isOptionGroup(o)
-                      )
-                      const all = creatableOption.value ? [...flat, creatableOption.value] : flat
-                      const itemH = getSelectVirtualItemHeight(props.size)
-                      const { startIndex, endIndex, totalHeight } = fixedSizeStrategy(
-                        itemH
-                      ).getRange(virtualScrollTop.value, props.listHeight, all.length, 5)
-                      const visible = []
-                      for (let i = startIndex; i <= endIndex; i++) {
-                        const isCreate = creatableOption.value && i === all.length - 1
-                        visible.push(
+                      if (creatableOption.value) {
+                        optionIndex += 1
+                        optionNodes.push(
                           renderOptionItem(
-                            all[i],
-                            i,
-                            isCreate
-                              ? getCreateSelectOptionLabel(all[i], props.createOptionText)
-                              : all[i].label
+                            creatableOption.value,
+                            optionIndex,
+                            getCreateSelectOptionLabel(
+                              creatableOption.value,
+                              props.createOptionText
+                            )
                           )
                         )
                       }
-                      return h(
-                        'div',
-                        {
-                          ref: virtualScrollRef,
-                          'data-tiger-select-virtual': '',
-                          style: { maxHeight: `${props.listHeight}px`, overflowY: 'auto' },
-                          onScroll: (e: Event) => {
-                            virtualScrollTop.value = (e.target as HTMLElement).scrollTop
-                          }
-                        },
-                        [
-                          h(
-                            'div',
-                            { style: { height: `${totalHeight}px`, position: 'relative' } },
-                            [
-                              h(
-                                'div',
-                                { style: { transform: `translateY(${startIndex * itemH}px)` } },
-                                visible
-                              )
-                            ]
-                          )
-                        ]
-                      )
-                    }
 
-                    const optionNodes = filteredOptions.value.map((item) => {
-                      if (isOptionGroup(item)) {
-                        return h('div', { key: item.label }, [
-                          h('div', { class: selectGroupLabelClasses }, item.label),
-                          item.options.map((option) => {
-                            optionIndex += 1
-                            return renderOptionItem(option, optionIndex)
-                          })
-                        ])
-                      }
-
-                      optionIndex += 1
-                      return renderOptionItem(item, optionIndex)
-                    })
-
-                    if (creatableOption.value) {
-                      optionIndex += 1
-                      optionNodes.push(
-                        renderOptionItem(
-                          creatableOption.value,
-                          optionIndex,
-                          getCreateSelectOptionLabel(creatableOption.value, props.createOptionText)
-                        )
-                      )
-                    }
-
-                    return optionNodes
-                  })()
-                : creatableOption.value
-                  ? (() => {
-                      const optionLabel = getCreateSelectOptionLabel(
-                        creatableOption.value,
-                        props.createOptionText
-                      )
-                      return h(
-                        'div',
-                        {
-                          key: creatableOption.value.value,
-                          id: getOptionId(0),
-                          'data-option-index': 0,
-                          role: 'option',
-                          'aria-selected': false,
-                          tabindex: activeIndex.value === 0 ? 0 : -1,
-                          class: getSelectOptionClasses(false, false, props.size),
-                          onMouseenter: () => {
-                            activeIndex.value = 0
-                          },
-                          onClick: () => selectOption(creatableOption.value!)
-                        },
-                        [
-                          h(
-                            'span',
-                            { class: 'flex items-center justify-between w-full' },
-                            optionLabel
-                          )
-                        ]
-                      )
+                      return optionNodes
                     })()
-                  : h(
-                      'div',
-                      { class: selectEmptyStateClasses },
-                      resolveLocaleText(
-                        'No options found',
-                        props.emptyText,
-                        mergedLocale.value?.common?.emptyText
-                      )
-                    ),
-              h('div', { class: selectDoneActionClasses }, [
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: selectDoneButtonClasses,
-                    onClick: closeDropdown,
-                    onKeydown: (event: KeyboardEvent) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.stopPropagation()
+                  : creatableOption.value
+                    ? (() => {
+                        const optionLabel = getCreateSelectOptionLabel(
+                          creatableOption.value,
+                          props.createOptionText
+                        )
+                        return h(
+                          'div',
+                          {
+                            key: creatableOption.value.value,
+                            id: getOptionId(0),
+                            'data-option-index': 0,
+                            role: 'option',
+                            'aria-selected': false,
+                            tabindex: activeIndex.value === 0 ? 0 : -1,
+                            class: getSelectOptionClasses(false, false, props.size),
+                            onMouseenter: () => {
+                              activeIndex.value = 0
+                            },
+                            onClick: () => selectOption(creatableOption.value!)
+                          },
+                          [
+                            h(
+                              'span',
+                              { class: 'flex items-center justify-between w-full' },
+                              optionLabel
+                            )
+                          ]
+                        )
+                      })()
+                    : h(
+                        'div',
+                        { class: selectEmptyStateClasses },
+                        resolveLocaleText(
+                          'No options found',
+                          props.emptyText,
+                          mergedLocale.value?.common?.emptyText
+                        )
+                      ),
+                h('div', { class: selectDoneActionClasses }, [
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: selectDoneButtonClasses,
+                      onClick: closeDropdown,
+                      onKeydown: (event: KeyboardEvent) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.stopPropagation()
+                        }
                       }
-                    }
-                  },
-                  doneText.value
-                )
-              ])
-            ]
+                    },
+                    doneText.value
+                  )
+                ])
+              ]
+            ),
+            overlay.target.value
           )
       ])
     }

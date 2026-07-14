@@ -1,14 +1,21 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import {
   getFocusTrapNavigation,
   getFocusableElements,
-  isEscapeKey,
   isEventOutside,
   lockBodyScroll,
   isBrowser,
   computeFloatingPosition,
   autoUpdateFloating,
+  resolveAnchoredOverlayTarget,
+  getAnchoredOverlayTabTarget,
+  getAnchoredOverlayLayoutClasses,
+  FLOATING_OVERLAY_Z_INDEX,
+  getTransformOrigin,
+  restoreFocus,
+  registerEscapeDismiss,
+  type AnchoredOverlayLayout,
   type FloatingPlacement,
   type FloatingOptions,
   type FloatingResult
@@ -61,15 +68,7 @@ export interface UseEscapeKeyOptions {
 export function useEscapeKey({ enabled, onEscape }: UseEscapeKeyOptions): void {
   useEffect(() => {
     if (!enabled) return
-
-    const handler = (event: KeyboardEvent) => {
-      if (event.defaultPrevented) return
-      if (!isEscapeKey(event)) return
-      onEscape()
-    }
-
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
+    return registerEscapeDismiss(document, onEscape)
   }, [enabled, onEscape])
 }
 
@@ -90,6 +89,15 @@ export function renderBodyPortal(node: React.ReactNode): React.ReactPortal | nul
   return createPortal(node, document.body)
 }
 
+export function renderOverlayPortal(
+  node: React.ReactNode,
+  target: HTMLElement | null,
+  disabled = false
+): React.ReactNode {
+  if (disabled || !target) return node
+  return createPortal(node, target)
+}
+
 export interface UseFocusTrapOptions {
   enabled: boolean
   containerRef: React.RefObject<HTMLElement | null>
@@ -99,10 +107,12 @@ export function useFocusTrap({ enabled, containerRef }: UseFocusTrapOptions): vo
   useEffect(() => {
     const container = containerRef.current
     if (!enabled || !container) return
+    const ownerDocument = container.ownerDocument
 
     const handler = (event: KeyboardEvent) => {
+      if (!(event.target instanceof Node) || !container.contains(event.target)) return
       const focusables = getFocusableElements(container)
-      const activeElement = container.ownerDocument?.activeElement ?? document.activeElement
+      const activeElement = ownerDocument.activeElement
       const nav = getFocusTrapNavigation(event, focusables, activeElement)
       if (!nav.shouldHandle || !nav.next) return
 
@@ -110,8 +120,8 @@ export function useFocusTrap({ enabled, containerRef }: UseFocusTrapOptions): vo
       nav.next.focus()
     }
 
-    container.addEventListener('keydown', handler)
-    return () => container.removeEventListener('keydown', handler)
+    ownerDocument.addEventListener('keydown', handler, true)
+    return () => ownerDocument.removeEventListener('keydown', handler, true)
   }, [enabled, containerRef])
 }
 
@@ -150,6 +160,8 @@ export interface UseFloatingOptions {
    * Callback when placement changes (due to collision)
    */
   onPlacementChange?: (placement: FloatingPlacement) => void
+  /** Recreate positioning when the portal target changes. */
+  context?: unknown
 }
 
 export interface UseFloatingReturn {
@@ -177,6 +189,8 @@ export interface UseFloatingReturn {
    * Manually trigger position update
    */
   update: () => Promise<void>
+  isPositioned: boolean
+  referenceWidth: number
 }
 
 /**
@@ -208,7 +222,8 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
     placement: initialPlacement = 'bottom',
     offset: offsetDistance = 8,
     arrowRef,
-    onPlacementChange
+    onPlacementChange,
+    context
   } = options
 
   const [x, setX] = useState(0)
@@ -216,6 +231,8 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
   const [placement, setPlacement] = useState<FloatingPlacement>(initialPlacement)
   const [arrowX, setArrowX] = useState<number | undefined>(undefined)
   const [arrowY, setArrowY] = useState<number | undefined>(undefined)
+  const [isPositioned, setIsPositioned] = useState(false)
+  const [referenceWidth, setReferenceWidth] = useState(0)
 
   // Store callback in ref to avoid effect re-runs
   const onPlacementChangeRef = useRef(onPlacementChange)
@@ -226,6 +243,8 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
     const floating = floatingRef.current
 
     if (!reference || !floating) return
+
+    setReferenceWidth(reference.getBoundingClientRect().width)
 
     const floatingOptions: FloatingOptions = {
       placement: initialPlacement,
@@ -255,13 +274,17 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
       setArrowX(result.arrow.x)
       setArrowY(result.arrow.y)
     }
+    setIsPositioned(true)
   }, [referenceRef, floatingRef, initialPlacement, offsetDistance, arrowRef])
 
   useEffect(() => {
     const reference = referenceRef.current
     const floating = floatingRef.current
 
-    if (!enabled || !reference || !floating) return
+    if (!enabled || !reference || !floating) {
+      setIsPositioned(false)
+      return
+    }
 
     // Initial position calculation
     update()
@@ -272,7 +295,7 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
     return () => {
       cleanup()
     }
-  }, [enabled, referenceRef, floatingRef, update])
+  }, [enabled, referenceRef, floatingRef, update, context])
 
   return {
     x,
@@ -280,6 +303,142 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
     placement,
     arrowX,
     arrowY,
-    update
+    update,
+    isPositioned,
+    referenceWidth
+  }
+}
+
+export interface UseAnchoredOverlayOptions {
+  enabled: boolean
+  referenceRef: React.RefObject<HTMLElement | null>
+  floatingRef: React.RefObject<HTMLElement | null>
+  containerRef?: React.RefObject<HTMLElement | null>
+  outsideRefs?: Array<React.RefObject<HTMLElement | null> | undefined>
+  placement?: FloatingPlacement
+  offset?: number
+  layout?: AnchoredOverlayLayout
+  matchReferenceWidth?: boolean
+  portal?: boolean
+  dismissOnOutside?: boolean
+  dismissOnEscape?: boolean
+  restoreFocusOnDismiss?: boolean
+  onDismiss?: () => void
+}
+
+export interface UseAnchoredOverlayReturn {
+  target: HTMLElement | null
+  floatingStyles: React.CSSProperties
+  floatingClasses: string
+  positioned: boolean
+  placement: FloatingPlacement
+  x: number
+  y: number
+}
+
+export function useAnchoredOverlay({
+  enabled,
+  referenceRef,
+  floatingRef,
+  containerRef,
+  outsideRefs = [],
+  placement = 'bottom-start',
+  offset = 4,
+  layout = 'anchored',
+  matchReferenceWidth = false,
+  portal = true,
+  dismissOnOutside = false,
+  dismissOnEscape = false,
+  restoreFocusOnDismiss = false,
+  onDismiss
+}: UseAnchoredOverlayOptions): UseAnchoredOverlayReturn {
+  const [target, setTarget] = useState<HTMLElement | null>(null)
+
+  useLayoutEffect(() => {
+    if (!portal) {
+      setTarget(null)
+      return
+    }
+    setTarget(resolveAnchoredOverlayTarget(referenceRef.current))
+  }, [portal, referenceRef])
+
+  // Opening from an already-mounted trigger can resolve the layer during render.
+  // This keeps the floating subtree in the same Portal from its first open frame,
+  // so autofocus and keyboard state are not lost to a follow-up Portal remount.
+  const resolvedTarget =
+    portal && referenceRef.current ? resolveAnchoredOverlayTarget(referenceRef.current) : null
+  const effectiveTarget = resolvedTarget ?? target
+
+  const {
+    x,
+    y,
+    placement: actualPlacement,
+    isPositioned,
+    referenceWidth
+  } = useFloating({
+    referenceRef,
+    floatingRef,
+    enabled,
+    placement,
+    offset,
+    context: effectiveTarget
+  })
+
+  const dismiss = useCallback(() => {
+    onDismiss?.()
+    if (restoreFocusOnDismiss) {
+      window.setTimeout(() => restoreFocus(referenceRef.current, { preventScroll: true }), 0)
+    }
+  }, [onDismiss, referenceRef, restoreFocusOnDismiss])
+
+  useClickOutside({
+    enabled: enabled && dismissOnOutside,
+    refs: [containerRef, referenceRef, floatingRef, ...outsideRefs],
+    onOutsideClick: dismiss,
+    defer: false
+  })
+  useEscapeKey({ enabled: enabled && dismissOnEscape, onEscape: dismiss })
+
+  useEffect(() => {
+    const floating = floatingRef.current
+    if (!enabled || !floating) return
+
+    const handleTab = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return
+      const target = getAnchoredOverlayTabTarget(
+        referenceRef.current,
+        floatingRef.current,
+        event.shiftKey
+      )
+      if (!target) return
+
+      event.preventDefault()
+      window.setTimeout(() => restoreFocus(target, { preventScroll: true }), 0)
+    }
+
+    floating.addEventListener('keydown', handleTab, true)
+    return () => floating.removeEventListener('keydown', handleTab, true)
+  }, [enabled, floatingRef, referenceRef])
+
+  const floatingStyles = useMemo<React.CSSProperties>(
+    () =>
+      ({
+        '--tiger-overlay-x': `${x}px`,
+        '--tiger-overlay-y': `${y}px`,
+        '--tiger-overlay-reference-width': `${referenceWidth}px`,
+        zIndex: FLOATING_OVERLAY_Z_INDEX,
+        transformOrigin: getTransformOrigin(actualPlacement)
+      }) as React.CSSProperties,
+    [actualPlacement, referenceWidth, x, y]
+  )
+
+  return {
+    target: portal ? effectiveTarget : null,
+    floatingStyles,
+    floatingClasses: getAnchoredOverlayLayoutClasses(layout, matchReferenceWidth),
+    positioned: isPositioned,
+    placement: actualPlacement,
+    x,
+    y
   }
 }

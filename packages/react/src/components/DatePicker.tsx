@@ -10,6 +10,7 @@ import { renderDatePickerMobile } from './DatePicker/render-mobile'
 import { renderDatePickerCalendar } from './DatePicker/render-calendar'
 import { Icon } from './DatePicker/icons'
 import type { DatePickerProps } from './DatePicker/types'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 export type {
   DatePickerBaseProps,
@@ -20,6 +21,17 @@ export type {
 
 export const DatePicker: React.FC<DatePickerProps> = (props) => {
   const ctx = useDatePickerState(props)
+  const overlay = useAnchoredOverlay({
+    enabled: ctx.isOpen,
+    referenceRef: ctx.inputWrapperRef,
+    floatingRef: ctx.panelRef,
+    placement: 'bottom-start',
+    offset: 4,
+    layout: 'bottom-sheet-sm',
+    dismissOnOutside: true,
+    dismissOnEscape: true,
+    onDismiss: ctx.closeCalendar
+  })
 
   return (
     <div className={ctx.containerClasses} {...ctx.divProps}>
@@ -64,8 +76,19 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
       </div>
 
       {/* Calendar dropdown */}
-      {ctx.isOpen && renderDatePickerMobile(ctx)}
-      {ctx.isOpen && renderDatePickerCalendar(ctx)}
+      {renderOverlayPortal(
+        ctx.isOpen ? (
+          <div
+            ref={ctx.panelRef}
+            className={overlay.floatingClasses}
+            style={overlay.floatingStyles}
+            data-positioned={overlay.positioned}>
+            {renderDatePickerMobile(ctx)}
+            {renderDatePickerCalendar(ctx)}
+          </div>
+        ) : null,
+        overlay.target
+      )}
     </div>
   )
 }

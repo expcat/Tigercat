@@ -7,6 +7,7 @@ import {
   computePosition,
   flip,
   shift,
+  size,
   offset,
   arrow,
   autoUpdate,
@@ -71,6 +72,11 @@ export interface FloatingOptions {
    */
   shiftPadding?: number
   /**
+   * Whether to expose the collision-safe available size as CSS variables.
+   * @default true
+   */
+  size?: boolean
+  /**
    * Arrow element for positioning the arrow indicator.
    */
   arrowElement?: HTMLElement | null
@@ -105,6 +111,8 @@ export interface FloatingMiddlewareOptions {
    * @default 8
    */
   shiftPadding?: number
+  /** Whether to expose the collision-safe available size. @default true */
+  size?: boolean
   /**
    * Arrow element for positioning the arrow indicator.
    */
@@ -124,6 +132,7 @@ function createFloatingMiddleware({
   flip: enableFlip,
   shift: enableShift,
   shiftPadding,
+  size: enableSize,
   arrowElement,
   arrowPadding
 }: Required<FloatingMiddlewareOptions>): Middleware[] {
@@ -134,7 +143,25 @@ function createFloatingMiddleware({
   }
 
   if (enableShift) {
-    middleware.push(shift({ padding: shiftPadding }))
+    middleware.push(shift({ padding: shiftPadding, crossAxis: true }))
+  }
+
+  if (enableSize) {
+    middleware.push(
+      size({
+        padding: shiftPadding,
+        apply({ availableWidth, availableHeight, elements }) {
+          elements.floating.style.setProperty(
+            '--tiger-overlay-available-width',
+            `${Math.max(0, availableWidth)}px`
+          )
+          elements.floating.style.setProperty(
+            '--tiger-overlay-available-height',
+            `${Math.max(0, availableHeight)}px`
+          )
+        }
+      })
+    )
   }
 
   if (arrowElement) {
@@ -149,11 +176,17 @@ function getFloatingMiddlewareCacheKey({
   flip: enableFlip,
   shift: enableShift,
   shiftPadding,
+  size: enableSize,
   arrowPadding
 }: Required<FloatingMiddlewareOptions>): string {
-  return [offsetDistance, enableFlip ? 1 : 0, enableShift ? 1 : 0, shiftPadding, arrowPadding].join(
-    '|'
-  )
+  return [
+    offsetDistance,
+    enableFlip ? 1 : 0,
+    enableShift ? 1 : 0,
+    enableSize ? 1 : 0,
+    shiftPadding,
+    arrowPadding
+  ].join('|')
 }
 
 /**
@@ -167,6 +200,7 @@ export function getFloatingMiddleware(options: FloatingMiddlewareOptions = {}): 
     flip: options.flip ?? true,
     shift: options.shift ?? true,
     shiftPadding: options.shiftPadding ?? 8,
+    size: options.size ?? true,
     arrowElement: options.arrowElement ?? null,
     arrowPadding: options.arrowPadding ?? 8
   }
@@ -256,6 +290,7 @@ export async function computeFloatingPosition(
     flip: enableFlip = true,
     shift: enableShift = true,
     shiftPadding = 8,
+    size: enableSize = true,
     arrowElement = null,
     arrowPadding = 8
   } = options
@@ -265,6 +300,7 @@ export async function computeFloatingPosition(
     flip: enableFlip,
     shift: enableShift,
     shiftPadding,
+    size: enableSize,
     arrowElement,
     arrowPadding
   })

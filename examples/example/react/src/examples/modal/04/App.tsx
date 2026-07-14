@@ -2,11 +2,15 @@ import { useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { Input } from '@expcat/tigercat-react/Input'
 import { Modal } from '@expcat/tigercat-react/Modal'
+import { Select } from '@expcat/tigercat-react/Select'
+import { DatePicker } from '@expcat/tigercat-react/DatePicker'
 
 export default function App() {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [project, setProject] = useState<string | number>('website')
+  const [dueDate, setDueDate] = useState<Date | null>(null)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -49,6 +53,24 @@ export default function App() {
               value={name}
               onChange={(event) => setName(event.target.value)}
             />
+          </label>
+          <label className="block space-y-1 text-sm">
+            <span>项目（浮层自动使用 Modal layer）</span>
+            <Select
+              value={project}
+              options={[
+                { label: '网站改版', value: 'website' },
+                { label: '移动端发布', value: 'mobile' },
+                { label: '设计系统', value: 'design-system' }
+              ]}
+              onChange={(value) => {
+                if (value !== undefined && !Array.isArray(value)) setProject(value)
+              }}
+            />
+          </label>
+          <label className="block space-y-1 text-sm">
+            <span>截止日期</span>
+            <DatePicker value={dueDate} onChange={setDueDate} />
           </label>
           <label className="space-y-1 text-sm">
             <span>邮箱</span>

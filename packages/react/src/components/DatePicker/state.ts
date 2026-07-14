@@ -125,6 +125,7 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
 
   const calendarRef = useRef<HTMLDivElement>(null)
   const mobileCalendarRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const inputWrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const pendingFocusIsoRef = useRef<string | null>(null)
@@ -480,24 +481,10 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
     return date.getMonth() === viewingMonth
   }
 
-  // Consolidated open/close effect: click-outside listener + focus management
+  // Consolidated open/close effect: focus management is component-specific;
+  // dismissal is owned by the shared anchored-overlay adapter.
   useEffect(() => {
     if (isOpen) {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          calendarRef.current &&
-          mobileCalendarRef.current &&
-          inputWrapperRef.current &&
-          !calendarRef.current.contains(event.target as Node) &&
-          !mobileCalendarRef.current.contains(event.target as Node) &&
-          !inputWrapperRef.current.contains(event.target as Node)
-        ) {
-          closeCalendar()
-        }
-      }
-
-      document.addEventListener('click', handleClickOutside)
-
       const preferred = pendingFocusIsoRef.current ?? getPreferredFocusIso()
       pendingFocusIsoRef.current = null
 
@@ -507,7 +494,7 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
         if (fallback) focusDateButtonByIso(fallback)
       }, 0)
 
-      return () => document.removeEventListener('click', handleClickOutside)
+      return
     }
 
     setTimeout(() => restoreFocus(), 0)
@@ -542,6 +529,7 @@ export function useDatePickerState(props: DatePickerProps): DatePickerContext {
   return {
     inputWrapperRef,
     inputRef,
+    panelRef,
     calendarRef,
     mobileCalendarRef,
     isOpen,

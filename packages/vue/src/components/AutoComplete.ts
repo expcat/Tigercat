@@ -1,13 +1,4 @@
-import {
-  defineComponent,
-  h,
-  ref,
-  computed,
-  watch,
-  onBeforeUnmount,
-  nextTick,
-  type PropType
-} from 'vue'
+import { defineComponent, h, ref, computed, watch, nextTick, type PropType } from 'vue'
 import type { AutoCompleteOption, ComponentSize, TigerLocale } from '@expcat/tigercat-core'
 import {
   resolveLocaleText,
@@ -30,6 +21,7 @@ import {
   closeSolidIcon20PathD
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 let autoCompleteInstanceId = 0
 
@@ -125,6 +117,20 @@ export const AutoComplete = defineComponent({
     const activeIndex = ref(-1)
     const containerRef = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
+    const dropdownRef = ref<HTMLElement | null>(null)
+    const overlay = useVueAnchoredOverlay({
+      enabled: isOpen,
+      referenceRef: inputRef,
+      floatingRef: dropdownRef,
+      containerRef,
+      placement: 'bottom-start',
+      offset: 4,
+      matchReferenceWidth: true,
+      dismissOnOutside: true,
+      dismissOnEscape: true,
+      restoreFocusOnDismiss: true,
+      onDismiss: closeDropdown
+    })
 
     const filteredOptions = computed(() =>
       filterAutoCompleteOptions(props.options, inputValue.value, props.filterOption)
@@ -255,25 +261,6 @@ export const AutoComplete = defineComponent({
       }
     }
 
-    // Click outside
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.value && !containerRef.value.contains(e.target as Node)) {
-        closeDropdown()
-      }
-    }
-
-    watch(isOpen, (val) => {
-      if (val) {
-        document.addEventListener('click', handleClickOutside)
-      } else {
-        document.removeEventListener('click', handleClickOutside)
-      }
-    })
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside)
-    })
-
     return () => {
       const containerClasses = classNames(autoCompleteBaseClasses, coerceClassValue(attrs.class))
 
@@ -322,50 +309,54 @@ export const AutoComplete = defineComponent({
             : null,
 
           // Dropdown
-          isOpen.value && options.length > 0
-            ? h(
-                'div',
-                {
-                  ...getPickerListboxAria({ id: listboxId }),
-                  class: autoCompleteDropdownClasses
-                },
-                options.map((option, index) =>
-                  h(
-                    'div',
-                    {
-                      id: getPickerOptionId(listboxId, index),
-                      ...getPickerOptionAria({
-                        selected: String(option.value) === String(props.modelValue),
-                        disabled: !!option.disabled
-                      }),
-                      class: getAutoCompleteOptionClasses(
-                        String(option.value) === String(props.modelValue),
-                        !!option.disabled,
-                        props.size
-                      ),
-                      onMousedown: (e: Event) => e.preventDefault(),
-                      onClick: () => handleSelect(option),
-                      onMouseenter: () => {
-                        activeIndex.value = index
-                      }
-                    },
-                    option.label
-                  )
-                )
-              )
-            : isOpen.value && inputValue.value && options.length === 0
-              ? h(
+          isOpen.value && (options.length > 0 || inputValue.value)
+            ? renderVueOverlayTeleport(
+                h(
                   'div',
                   {
-                    class: classNames(autoCompleteDropdownClasses, autoCompleteEmptyStateClasses)
+                    ref: dropdownRef,
+                    ...(options.length > 0 ? getPickerListboxAria({ id: listboxId }) : {}),
+                    class: classNames(
+                      autoCompleteDropdownClasses,
+                      options.length === 0 && autoCompleteEmptyStateClasses,
+                      overlay.floatingClasses.value
+                    ),
+                    style: overlay.floatingStyles.value,
+                    'data-positioned': overlay.positioned.value
                   },
-                  resolveLocaleText(
-                    'No matches found',
-                    props.emptyText,
-                    mergedLocale.value?.common?.emptyText
-                  )
-                )
-              : null
+                  options.length > 0
+                    ? options.map((option, index) =>
+                        h(
+                          'div',
+                          {
+                            id: getPickerOptionId(listboxId, index),
+                            ...getPickerOptionAria({
+                              selected: String(option.value) === String(props.modelValue),
+                              disabled: !!option.disabled
+                            }),
+                            class: getAutoCompleteOptionClasses(
+                              String(option.value) === String(props.modelValue),
+                              !!option.disabled,
+                              props.size
+                            ),
+                            onMousedown: (e: Event) => e.preventDefault(),
+                            onClick: () => handleSelect(option),
+                            onMouseenter: () => {
+                              activeIndex.value = index
+                            }
+                          },
+                          option.label
+                        )
+                      )
+                    : resolveLocaleText(
+                        'No matches found',
+                        props.emptyText,
+                        mergedLocale.value?.common?.emptyText
+                      )
+                ),
+                overlay.target.value
+              )
+            : null
         ]
       )
     }

@@ -52,6 +52,16 @@ pnpm example:react
 - 对外导出需要同步检查 `packages/*/src/index.*`。
 - 组件文档和示例需要同步检查 `skills/tigercat/references/` 与 `examples/example/`。
 
+## 根因修复与架构约束
+
+- 修复缺陷前必须在 issue 或 PR 中说明根因、应承担修复责任的层，以及仓库中全部同类消费者；不得只描述出现问题的单个组件。
+- 跨组件、跨框架的问题必须在 `packages/core` 或共享框架适配层解决，并在同一改动中审计、迁移全部同类消费者。React 与 Vue 的契约和行为必须对称。
+- 禁止用组件专属 CSS 覆盖、Modal/Drawer 特判、复制全局事件监听、业务侧文档规避或新旧双轨实现代替根因修复。
+- 迁移完成后必须删除被替代的定位、挂载、dismiss 和兼容路径；不得以“暂时保留”方式让两套架构并行。
+- 共享算法在 core 一次性测试；React/Vue 只验证生命周期绑定。跨层问题还必须通过两端真实浏览器组合场景验收，包括嵌套层、滚动、视口碰撞、响应式形态和焦点边界。
+
+锚点浮层是这一原则的强制示例：组件只能使用共享 anchored-overlay adapter，不得直接调用 Portal/Teleport、Floating UI、低层 dismiss API，或自行绑定全局关闭事件。Modal 与 Drawer 只提供 layer boundary，不允许消费者判断自己是否位于 Modal/Drawer。
+
 ## 组件改动清单
 
 新增组件或显著功能变更通常需要完成：
@@ -90,6 +100,8 @@ npx playwright test
 - 验证命令已在 PR 模板中勾选或说明未运行原因。
 - 改动没有回退他人的未合并工作。
 - 新增或修改 API 时，Vue/React、Core、测试、示例和文档保持一致。
+- 根因已经消除，不存在平行旧实现或组件专属补丁。
+- React / Vue 绑定保持对称，并已审计全部同类消费者。
 - Roadmap 中对应任务状态已经同步更新；已经交付且影响用户、贡献者或发布流程的变更记录到 `CHANGELOG.md` 或发布记录。
 
 ## Issue 使用

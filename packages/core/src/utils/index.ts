@@ -31,6 +31,7 @@ export * from './motion'
 
 // Floating UI positioning utilities
 export * from './floating'
+export * from './anchored-overlay'
 
 // Development-only warnings
 export * from './dev-warn'

@@ -1,4 +1,4 @@
-import { defineComponent, computed, ref, nextTick, h, PropType, watch, onBeforeUnmount } from 'vue'
+import { defineComponent, computed, ref, nextTick, h, PropType, watch } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -50,6 +50,7 @@ import {
 
 import { createFilledIcon } from '../utils/icon-helpers'
 import { useTigerConfig } from './ConfigProvider'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 // Icons
 const CalendarIcon = createFilledIcon(calendarSolidIcon20PathD, 'w-5 h-5')
@@ -281,6 +282,18 @@ export const DatePicker = defineComponent({
     const mobileCalendarRef = ref<HTMLElement | null>(null)
     const inputWrapperRef = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
+    const panelRef = ref<HTMLElement | null>(null)
+    const overlay = useVueAnchoredOverlay({
+      enabled: isOpen,
+      referenceRef: inputWrapperRef,
+      floatingRef: panelRef,
+      placement: 'bottom-start',
+      offset: 4,
+      layout: 'bottom-sheet-sm',
+      dismissOnOutside: true,
+      dismissOnEscape: true,
+      onDismiss: closeCalendar
+    })
 
     const activeDateIso = ref<string | null>(null)
     const activeRangePart = ref<'start' | 'end'>('start')
@@ -651,25 +664,12 @@ export const DatePicker = defineComponent({
       return date.getMonth() === viewingMonth.value
     }
 
-    function handleClickOutside(event: Event) {
-      if (
-        inputWrapperRef.value &&
-        !calendarRef.value?.contains(event.target as Node) &&
-        !mobileCalendarRef.value?.contains(event.target as Node) &&
-        !inputWrapperRef.value.contains(event.target as Node)
-      ) {
-        closeCalendar()
-      }
-    }
-
     function handleInputClick() {
       toggleCalendar()
     }
 
     watch(isOpen, (newValue) => {
       if (newValue) {
-        document.addEventListener('click', handleClickOutside)
-
         const preferred = pendingFocusIso.value ?? getPreferredFocusIso()
         pendingFocusIso.value = null
 
@@ -679,15 +679,10 @@ export const DatePicker = defineComponent({
           if (fallback) focusDateButtonByIso(fallback)
         })
       } else {
-        document.removeEventListener('click', handleClickOutside)
         nextTick().then(() => {
           restoreFocus()
         })
       }
-    })
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside)
     })
 
     const rootClass = computed(() =>
@@ -768,246 +763,269 @@ export const DatePicker = defineComponent({
           ),
           // Calendar dropdown
           isOpen.value &&
-            h(
-              'div',
-              {
-                ref: mobileCalendarRef,
-                class: datePickerMobileWheelClasses,
-                role: 'group',
-                'aria-label': labels.value.calendar
-              },
-              [
-                isRangeMode.value
-                  ? h('div', { class: 'mb-3 flex items-center gap-2' }, [
-                      h(
-                        'button',
-                        {
-                          type: 'button',
-                          class: datePickerFooterButtonClasses,
-                          'aria-selected': activeRangePart.value === 'start',
-                          onClick: () => (activeRangePart.value = 'start')
-                        },
-                        'Start'
-                      ),
-                      h(
-                        'button',
-                        {
-                          type: 'button',
-                          class: datePickerFooterButtonClasses,
-                          'aria-selected': activeRangePart.value === 'end',
-                          onClick: () => (activeRangePart.value = 'end')
-                        },
-                        'End'
-                      )
-                    ])
-                  : null,
-                h('div', { class: datePickerMobileWheelGridClasses }, [
-                  h(
-                    'select',
-                    {
-                      class: datePickerMobileWheelSelectClasses,
-                      value: mobileDate.value.getFullYear(),
-                      'aria-label': labels.value.year,
-                      onChange: (event: Event) =>
-                        updateMobileDate('year', Number((event.target as HTMLSelectElement).value))
-                    },
-                    mobileYears.value.map((year) => h('option', { value: year }, year))
-                  ),
-                  h(
-                    'select',
-                    {
-                      class: datePickerMobileWheelSelectClasses,
-                      value: mobileDate.value.getMonth(),
-                      'aria-label': labels.value.month,
-                      onChange: (event: Event) =>
-                        updateMobileDate('month', Number((event.target as HTMLSelectElement).value))
-                    },
-                    Array.from({ length: 12 }, (_, month) =>
-                      h('option', { value: month }, month + 1)
-                    )
-                  ),
-                  h(
-                    'select',
-                    {
-                      class: datePickerMobileWheelSelectClasses,
-                      value: mobileDate.value.getDate(),
-                      'aria-label': labels.value.day,
-                      onChange: (event: Event) =>
-                        updateMobileDate('day', Number((event.target as HTMLSelectElement).value))
-                    },
-                    mobileDays.value.map((day) => h('option', { value: day }, day))
-                  )
-                ]),
-                h('div', { class: 'mt-4 flex justify-end gap-2' }, [
-                  h(
-                    'button',
-                    {
-                      type: 'button',
-                      class: datePickerFooterButtonClasses,
-                      'aria-label': `Mobile ${labels.value.ok}`,
-                      onClick: closeCalendar
-                    },
-                    labels.value.ok
-                  )
-                ])
-              ]
-            ),
-          isOpen.value &&
-            h(
-              'div',
-              {
-                ref: calendarRef,
-                class: datePickerCalendarClasses,
-                role: 'dialog',
-                'aria-modal': 'true',
-                'aria-label': labels.value.calendar,
-                onKeydown: handleCalendarKeyDown
-              },
-              [
-                // Calendar header
-                h('div', { class: datePickerCalendarHeaderClasses }, [
-                  h(
-                    'button',
-                    {
-                      type: 'button',
-                      class: datePickerNavButtonClasses,
-                      onClick: previousMonth,
-                      'aria-label': labels.value.previousMonth
-                    },
-                    previousMonthIcon.value
-                  ),
+            renderVueOverlayTeleport(
+              h(
+                'div',
+                {
+                  ref: panelRef,
+                  class: overlay.floatingClasses.value,
+                  style: overlay.floatingStyles.value,
+                  'data-positioned': overlay.positioned.value
+                },
+                [
                   h(
                     'div',
-                    { class: datePickerMonthYearClasses },
-                    formatMonthYear(viewingYear.value, viewingMonth.value, localeCode.value)
-                  ),
-                  h(
-                    'button',
                     {
-                      type: 'button',
-                      class: datePickerNavButtonClasses,
-                      onClick: nextMonth,
-                      'aria-label': labels.value.nextMonth
-                    },
-                    nextMonthIcon.value
-                  )
-                ]),
-                // Day names header
-                h('div', { class: datePickerCalendarGridClasses, role: 'row' }, [
-                  ...dayNames.value.map((day) =>
-                    h(
-                      'div',
-                      {
-                        class: datePickerDayNameClasses,
-                        key: day,
-                        role: 'columnheader'
-                      },
-                      day
-                    )
-                  )
-                ]),
-                // Calendar grid
-                (() => {
-                  return h(
-                    'div',
-                    {
-                      class: datePickerCalendarGridClasses,
-                      role: 'grid',
-                      'aria-rowcount': 6,
-                      'aria-colcount': 7
+                      ref: mobileCalendarRef,
+                      class: datePickerMobileWheelClasses,
+                      role: 'group',
+                      'aria-label': labels.value.calendar
                     },
                     [
-                      ...calendarDays.value.map((date, index) => {
-                        if (!date) return null
-
-                        const cell = getDatePickerCalendarCellState({
-                          date,
-                          selectedDate: selectedDate.value,
-                          selectedRange: selectedRange.value,
-                          isRangeMode: isRangeMode.value,
-                          isCurrentMonth,
-                          isDateDisabled
-                        })
-
-                        return h(
-                          'button',
-                          {
-                            key: index,
-                            type: 'button',
-                            class: getDatePickerDayCellClasses(
-                              cell.isCurrentMonthDay,
-                              cell.isSelected,
-                              cell.isTodayDay,
-                              cell.isDisabled,
-                              cell.isInRange,
-                              cell.isRangeStart,
-                              cell.isRangeEnd
+                      isRangeMode.value
+                        ? h('div', { class: 'mb-3 flex items-center gap-2' }, [
+                            h(
+                              'button',
+                              {
+                                type: 'button',
+                                class: datePickerFooterButtonClasses,
+                                'aria-selected': activeRangePart.value === 'start',
+                                onClick: () => (activeRangePart.value = 'start')
+                              },
+                              'Start'
                             ),
-                            disabled: cell.isDisabled,
-                            onClick: () => selectDate(date),
-                            role: 'gridcell',
-                            'data-date': cell.iso,
-                            onFocus: () => {
-                              activeDateIso.value = cell.iso
-                            },
-                            tabindex: activeDateIso.value === cell.iso && !cell.isDisabled ? 0 : -1,
-                            'aria-label': cell.iso,
-                            'aria-selected': cell.isSelected,
-                            'aria-current': cell.isTodayDay ? 'date' : undefined
+                            h(
+                              'button',
+                              {
+                                type: 'button',
+                                class: datePickerFooterButtonClasses,
+                                'aria-selected': activeRangePart.value === 'end',
+                                onClick: () => (activeRangePart.value = 'end')
+                              },
+                              'End'
+                            )
+                          ])
+                        : null,
+                      h('div', { class: datePickerMobileWheelGridClasses }, [
+                        h(
+                          'select',
+                          {
+                            class: datePickerMobileWheelSelectClasses,
+                            value: mobileDate.value.getFullYear(),
+                            'aria-label': labels.value.year,
+                            onChange: (event: Event) =>
+                              updateMobileDate(
+                                'year',
+                                Number((event.target as HTMLSelectElement).value)
+                              )
                           },
-                          date.getDate()
+                          mobileYears.value.map((year) => h('option', { value: year }, year))
+                        ),
+                        h(
+                          'select',
+                          {
+                            class: datePickerMobileWheelSelectClasses,
+                            value: mobileDate.value.getMonth(),
+                            'aria-label': labels.value.month,
+                            onChange: (event: Event) =>
+                              updateMobileDate(
+                                'month',
+                                Number((event.target as HTMLSelectElement).value)
+                              )
+                          },
+                          Array.from({ length: 12 }, (_, month) =>
+                            h('option', { value: month }, month + 1)
+                          )
+                        ),
+                        h(
+                          'select',
+                          {
+                            class: datePickerMobileWheelSelectClasses,
+                            value: mobileDate.value.getDate(),
+                            'aria-label': labels.value.day,
+                            onChange: (event: Event) =>
+                              updateMobileDate(
+                                'day',
+                                Number((event.target as HTMLSelectElement).value)
+                              )
+                          },
+                          mobileDays.value.map((day) => h('option', { value: day }, day))
                         )
-                      })
-                    ]
-                  )
-                })(),
-
-                // Shortcuts panel
-                props.shortcuts?.length
-                  ? h(
-                      'div',
-                      {
-                        class:
-                          'flex flex-wrap gap-1 px-3 py-2 border-t border-[var(--tiger-border,#e5e7eb)]'
-                      },
-                      props.shortcuts.map((sc) =>
+                      ]),
+                      h('div', { class: 'mt-4 flex justify-end gap-2' }, [
                         h(
                           'button',
                           {
                             type: 'button',
                             class: datePickerFooterButtonClasses,
-                            onClick: () => handleShortcut(sc)
+                            'aria-label': `Mobile ${labels.value.ok}`,
+                            onClick: closeCalendar
                           },
-                          sc.label
+                          labels.value.ok
                         )
-                      )
-                    )
-                  : null,
+                      ])
+                    ]
+                  ),
+                  h(
+                    'div',
+                    {
+                      ref: calendarRef,
+                      class: datePickerCalendarClasses,
+                      role: 'dialog',
+                      'aria-modal': 'true',
+                      'aria-label': labels.value.calendar,
+                      onKeydown: handleCalendarKeyDown
+                    },
+                    [
+                      // Calendar header
+                      h('div', { class: datePickerCalendarHeaderClasses }, [
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            class: datePickerNavButtonClasses,
+                            onClick: previousMonth,
+                            'aria-label': labels.value.previousMonth
+                          },
+                          previousMonthIcon.value
+                        ),
+                        h(
+                          'div',
+                          { class: datePickerMonthYearClasses },
+                          formatMonthYear(viewingYear.value, viewingMonth.value, localeCode.value)
+                        ),
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            class: datePickerNavButtonClasses,
+                            onClick: nextMonth,
+                            'aria-label': labels.value.nextMonth
+                          },
+                          nextMonthIcon.value
+                        )
+                      ]),
+                      // Day names header
+                      h('div', { class: datePickerCalendarGridClasses, role: 'row' }, [
+                        ...dayNames.value.map((day) =>
+                          h(
+                            'div',
+                            {
+                              class: datePickerDayNameClasses,
+                              key: day,
+                              role: 'columnheader'
+                            },
+                            day
+                          )
+                        )
+                      ]),
+                      // Calendar grid
+                      (() => {
+                        return h(
+                          'div',
+                          {
+                            class: datePickerCalendarGridClasses,
+                            role: 'grid',
+                            'aria-rowcount': 6,
+                            'aria-colcount': 7
+                          },
+                          [
+                            ...calendarDays.value.map((date, index) => {
+                              if (!date) return null
 
-                // Footer (range mode only)
-                isRangeMode.value
-                  ? h('div', { class: datePickerFooterClasses }, [
-                      h(
-                        'button',
-                        {
-                          type: 'button',
-                          class: datePickerFooterButtonClasses,
-                          onClick: setToday
-                        },
-                        labels.value.today
-                      ),
-                      h(
-                        'button',
-                        {
-                          type: 'button',
-                          class: datePickerFooterButtonClasses,
-                          onClick: closeCalendar
-                        },
-                        labels.value.ok
-                      )
-                    ])
-                  : null
-              ]
+                              const cell = getDatePickerCalendarCellState({
+                                date,
+                                selectedDate: selectedDate.value,
+                                selectedRange: selectedRange.value,
+                                isRangeMode: isRangeMode.value,
+                                isCurrentMonth,
+                                isDateDisabled
+                              })
+
+                              return h(
+                                'button',
+                                {
+                                  key: index,
+                                  type: 'button',
+                                  class: getDatePickerDayCellClasses(
+                                    cell.isCurrentMonthDay,
+                                    cell.isSelected,
+                                    cell.isTodayDay,
+                                    cell.isDisabled,
+                                    cell.isInRange,
+                                    cell.isRangeStart,
+                                    cell.isRangeEnd
+                                  ),
+                                  disabled: cell.isDisabled,
+                                  onClick: () => selectDate(date),
+                                  role: 'gridcell',
+                                  'data-date': cell.iso,
+                                  onFocus: () => {
+                                    activeDateIso.value = cell.iso
+                                  },
+                                  tabindex:
+                                    activeDateIso.value === cell.iso && !cell.isDisabled ? 0 : -1,
+                                  'aria-label': cell.iso,
+                                  'aria-selected': cell.isSelected,
+                                  'aria-current': cell.isTodayDay ? 'date' : undefined
+                                },
+                                date.getDate()
+                              )
+                            })
+                          ]
+                        )
+                      })(),
+
+                      // Shortcuts panel
+                      props.shortcuts?.length
+                        ? h(
+                            'div',
+                            {
+                              class:
+                                'flex flex-wrap gap-1 px-3 py-2 border-t border-[var(--tiger-border,#e5e7eb)]'
+                            },
+                            props.shortcuts.map((sc) =>
+                              h(
+                                'button',
+                                {
+                                  type: 'button',
+                                  class: datePickerFooterButtonClasses,
+                                  onClick: () => handleShortcut(sc)
+                                },
+                                sc.label
+                              )
+                            )
+                          )
+                        : null,
+
+                      // Footer (range mode only)
+                      isRangeMode.value
+                        ? h('div', { class: datePickerFooterClasses }, [
+                            h(
+                              'button',
+                              {
+                                type: 'button',
+                                class: datePickerFooterButtonClasses,
+                                onClick: setToday
+                              },
+                              labels.value.today
+                            ),
+                            h(
+                              'button',
+                              {
+                                type: 'button',
+                                class: datePickerFooterButtonClasses,
+                                onClick: closeCalendar
+                              },
+                              labels.value.ok
+                            )
+                          ])
+                        : null
+                    ]
+                  )
+                ]
+              ),
+              overlay.target.value
             )
         ]
       )

@@ -23,9 +23,7 @@ import {
   getDropdownChevronClasses,
   getDropdownMenuClasses,
   getDropdownItemClasses,
-  getTransformOrigin,
   injectDropdownStyles,
-  FLOATING_OVERLAY_Z_INDEX,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
   handleMenuNavigation,
@@ -41,12 +39,7 @@ import type {
   DropdownMenuProps as CoreDropdownMenuProps,
   DropdownItemProps as CoreDropdownItemProps
 } from '@expcat/tigercat-core'
-import {
-  useVueFloating,
-  useVueClickOutside,
-  useVueEscapeKey,
-  renderVueBodyTeleport
-} from '../utils/overlay'
+import { useVueAnchoredOverlay, renderVueOverlayTeleport } from '../utils/overlay'
 
 // --- DropdownMenu (child component) ---
 
@@ -399,59 +392,23 @@ export const Dropdown = defineComponent({
       }
     }
 
-    // Floating UI positioning
-    const {
-      x,
-      y,
-      placement: currentPlacement
-    } = useVueFloating({
+    const clickOutsideEnabled = computed(() => props.trigger === 'click')
+    const portalEnabled = computed(() => props.portal)
+    const overlay = useVueAnchoredOverlay({
       referenceRef: triggerRef,
       floatingRef,
       enabled: currentVisible,
       placement: props.placement,
-      offset: props.offset
+      offset: props.offset,
+      portal: portalEnabled,
+      containerRef,
+      dismissOnOutside: clickOutsideEnabled,
+      dismissOnEscape: true,
+      onDismiss: () => setVisible(false)
     })
-
-    const clickOutsideEnabled = computed(() => currentVisible.value && props.trigger === 'click')
-
-    let cleanupClickOutside: (() => void) | null = null
-    watch(
-      clickOutsideEnabled,
-      (enabled) => {
-        cleanupClickOutside?.()
-        cleanupClickOutside = null
-        if (enabled) {
-          cleanupClickOutside = useVueClickOutside({
-            enabled: currentVisible,
-            refs: [containerRef, floatingRef],
-            onOutsideClick: () => setVisible(false),
-            defer: true
-          })
-        }
-      },
-      { immediate: true }
-    )
-
-    let cleanupEscapeKey: (() => void) | null = null
-    watch(
-      currentVisible,
-      (visible) => {
-        cleanupEscapeKey?.()
-        cleanupEscapeKey = null
-        if (visible) {
-          cleanupEscapeKey = useVueEscapeKey({
-            enabled: currentVisible,
-            onEscape: () => setVisible(false)
-          })
-        }
-      },
-      { immediate: true }
-    )
 
     onBeforeUnmount(() => {
       if (hoverTimer) clearTimeout(hoverTimer)
-      cleanupClickOutside?.()
-      cleanupEscapeKey?.()
     })
 
     const containerClasses = computed(() =>
@@ -467,15 +424,9 @@ export const Dropdown = defineComponent({
 
     const triggerClasses = computed(() => getDropdownTriggerClasses(props.disabled))
 
-    const menuWrapperClasses = classNames('absolute', DROPDOWN_ENTER_CLASS)
-
-    const menuWrapperStyles = computed(() => ({
-      position: 'absolute' as const,
-      left: `${x.value}px`,
-      top: `${y.value}px`,
-      zIndex: FLOATING_OVERLAY_Z_INDEX,
-      transformOrigin: getTransformOrigin(currentPlacement.value)
-    }))
+    const menuWrapperClasses = computed(() =>
+      classNames(overlay.floatingClasses.value, DROPDOWN_ENTER_CLASS)
+    )
 
     // Provide a reactive context so items see dynamic `closeOnClick` changes
     const dropdownContext = reactive<DropdownContext>({
@@ -561,8 +512,9 @@ export const Dropdown = defineComponent({
             'div',
             {
               ref: floatingRef,
-              class: menuWrapperClasses,
-              style: menuWrapperStyles.value,
+              class: menuWrapperClasses.value,
+              style: overlay.floatingStyles.value,
+              'data-positioned': overlay.positioned.value,
               'data-tiger-dropdown-menu': '',
               onMouseenter: handleMouseEnter,
               onMouseleave: handleMouseLeave,
@@ -573,7 +525,9 @@ export const Dropdown = defineComponent({
           )
         : null
 
-      const menu = menuWrapper ? renderVueBodyTeleport(menuWrapper, !props.portal) : null
+      const menu = menuWrapper
+        ? renderVueOverlayTeleport(menuWrapper, overlay.target.value, !props.portal)
+        : null
 
       const {
         class: _class,

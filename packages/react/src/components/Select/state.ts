@@ -468,29 +468,6 @@ export function useSelectState(props: SelectProps): SelectContext {
     focusOptionAt
   ])
 
-  useEffect(() => {
-    if (!isOpen) {
-      return
-    }
-
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node
-      if (
-        dropdownRef.current &&
-        triggerRef.current &&
-        !dropdownRef.current.contains(target) &&
-        !triggerRef.current.contains(target)
-      ) {
-        closeDropdown()
-      }
-    }
-
-    document.addEventListener('click', handleClickOutside)
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [isOpen])
-
   return {
     listboxId,
     getOptionId,

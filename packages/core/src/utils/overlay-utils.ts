@@ -1,8 +1,10 @@
-import { isTabKey, type KeyLikeEvent } from './a11y-utils'
+import { isEscapeKey, isTabKey, type KeyLikeEvent } from './a11y-utils'
 import { isBrowser } from './env'
 
 let bodyScrollLockCount = 0
 let previousBodyOverflow = ''
+
+const escapeDismissStacks = new WeakMap<Document, Array<() => void>>()
 
 type ComposedPathEvent = Event & {
   composedPath?: () => EventTarget[]
@@ -78,7 +80,18 @@ export function getFocusableElements(root: ParentNode): HTMLElement[] {
   const elements = Array.from(root.querySelectorAll<HTMLElement>(selectors.join(',')))
 
   return elements.filter((el) => {
-    if (el.getAttribute('aria-hidden') === 'true') return false
+    let current: HTMLElement | null = el
+    while (current) {
+      if (current.hidden || current.getAttribute('aria-hidden') === 'true') return false
+      if (current.style.display === 'none' || current.style.visibility === 'hidden') return false
+
+      const view: Window | null = current.ownerDocument.defaultView
+      const style: CSSStyleDeclaration | undefined = view?.getComputedStyle(current)
+      if (style?.display === 'none' || style?.visibility === 'hidden') return false
+
+      if (current === root) break
+      current = current.parentElement
+    }
     if (el.getAttribute('disabled') !== null) return false
     if (el.tabIndex < 0) return false
     return true
@@ -121,6 +134,31 @@ export function getFocusTrapNavigation(
   }
 
   return { shouldHandle: false }
+}
+
+/** Register an overlay in the document Escape stack. Only the topmost entry is dismissed. */
+export function registerEscapeDismiss(ownerDocument: Document, dismiss: () => void): () => void {
+  let stack = escapeDismissStacks.get(ownerDocument)
+  if (!stack) {
+    stack = []
+    escapeDismissStacks.set(ownerDocument, stack)
+    const entries = stack
+    ownerDocument.addEventListener('keydown', (event) => {
+      if (event.defaultPrevented || !isEscapeKey(event)) return
+      const topmost = entries[entries.length - 1]
+      if (topmost) {
+        event.preventDefault()
+        topmost()
+      }
+    })
+  }
+
+  stack.push(dismiss)
+
+  return () => {
+    const index = stack.lastIndexOf(dismiss)
+    if (index >= 0) stack.splice(index, 1)
+  }
 }
 
 export function lockBodyScroll(targetDocument?: Document): () => void {

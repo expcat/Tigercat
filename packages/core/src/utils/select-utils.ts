@@ -70,7 +70,7 @@ const SELECT_TRIGGER_DISABLED_CLASSES_STRING = [
  * Select dropdown base classes
  */
 export const selectDropdownBaseClasses =
-  'absolute z-50 w-full mt-1 bg-[var(--tiger-select-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-select-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg max-h-60 overflow-auto max-sm:fixed max-sm:inset-0 max-sm:mt-0 max-sm:w-auto max-sm:max-h-none max-sm:rounded-none max-sm:border-0 max-sm:shadow-none max-sm:pt-[env(safe-area-inset-top)] max-sm:pb-[env(safe-area-inset-bottom)]'
+  'bg-[var(--tiger-select-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-select-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg max-h-60 overflow-auto max-sm:w-auto max-sm:max-h-none max-sm:rounded-none max-sm:border-0 max-sm:shadow-none max-sm:pt-[env(safe-area-inset-top)] max-sm:pb-[env(safe-area-inset-bottom)]'
 
 /**
  * Select option base classes

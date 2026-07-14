@@ -162,6 +162,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   const reactId = useId()
   const drawerId = useMemo(() => `tiger-drawer-${reactId}`, [reactId])
   const titleId = `${drawerId}-title`
+  const overlayHostId = `${drawerId}-overlay-host`
 
   const {
     ['aria-labelledby']: _ariaLabelledby,
@@ -174,6 +175,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     (rest as React.AriaAttributes)['aria-labelledby'] ?? (title || header ? titleId : undefined)
 
   const dialogRef = useRef<HTMLDivElement | null>(null)
+  const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const touchStartRef = useRef<GesturePoint | null>(null)
@@ -200,7 +202,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     restoreFocus(previousActiveElementRef.current)
   }, [open])
 
-  useFocusTrap({ enabled: open, containerRef: dialogRef })
+  useFocusTrap({ enabled: open, containerRef: rootRef })
 
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null
@@ -282,10 +284,12 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const drawerContent = (
     <div
+      ref={rootRef}
       className={containerClasses}
       style={{ zIndex }}
       hidden={!open && !isClosingBeforeDestroy}
       aria-hidden={!open ? 'true' : undefined}
+      data-tiger-overlay-layer=""
       data-tiger-drawer-root="">
       {mask && (
         <div
@@ -312,6 +316,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={ariaLabelledby}
+        aria-owns={overlayHostId}
         tabIndex={-1}
         ref={dialogRef}
         onTouchStart={handleTouchStart}
@@ -342,6 +347,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         {children && <div className={bodyClasses}>{children}</div>}
         {footer && <div className={footerClasses}>{footer}</div>}
       </div>
+      <div id={overlayHostId} className="contents" data-tiger-overlay-host="" />
     </div>
   )
 

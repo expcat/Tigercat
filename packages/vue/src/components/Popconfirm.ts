@@ -1,6 +1,6 @@
 import { defineComponent, computed, h, cloneVNode, isVNode, PropType } from 'vue'
 import { useFloatingPopup } from '../utils/use-floating-popup'
-import { renderVueBodyTeleport } from '../utils/overlay'
+import { renderVueOverlayTeleport } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
@@ -99,6 +99,9 @@ export const Popconfirm = defineComponent({
       floatingRef,
       closeAndRestoreFocus,
       floatingStyles,
+      floatingClasses,
+      positioned,
+      overlayTarget,
       actualPlacement
     } = useFloatingPopup({ props, emit, multiTrigger: false })
 
@@ -130,10 +133,6 @@ export const Popconfirm = defineComponent({
     })
 
     const triggerClasses = computed(() => getPopconfirmTriggerClasses(props.disabled))
-
-    const contentWrapperClasses = computed(() =>
-      classNames('absolute z-50', currentVisible.value ? 'block' : 'hidden')
-    )
 
     const arrowClasses = computed(() => getPopconfirmArrowClasses(actualPlacement.value))
 
@@ -248,8 +247,9 @@ export const Popconfirm = defineComponent({
         'div',
         {
           ref: floatingRef,
-          class: contentWrapperClasses.value,
+          class: floatingClasses.value,
           style: floatingStyles.value,
+          'data-positioned': positioned.value,
           hidden: !currentVisible.value,
           'aria-hidden': !currentVisible.value
         },
@@ -314,7 +314,7 @@ export const Popconfirm = defineComponent({
           class: containerClasses.value,
           style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
         },
-        [trigger, renderVueBodyTeleport(content)]
+        [trigger, renderVueOverlayTeleport(content, overlayTarget.value)]
       )
     }
   }

@@ -9,7 +9,7 @@ import { classNames } from './class-names'
 export const treeSelectBaseClasses = 'relative inline-block w-full'
 
 export const treeSelectDropdownClasses =
-  'absolute z-50 w-full mt-1 bg-[var(--tiger-treeselect-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-treeselect-dropdown-border,var(--tiger-border,#d1d5db))] rounded-[var(--tiger-radius-md,0.5rem)] shadow-lg max-h-60 overflow-auto'
+  'bg-[var(--tiger-treeselect-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-treeselect-dropdown-border,var(--tiger-border,#d1d5db))] rounded-[var(--tiger-radius-md,0.5rem)] shadow-lg max-h-60 overflow-auto'
 
 export const treeSelectSearchClasses =
   'w-full px-3 py-1.5 border-b border-[var(--tiger-treeselect-border,var(--tiger-border,#d1d5db))] text-sm bg-[var(--tiger-treeselect-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-treeselect-text,var(--tiger-text,#111827))] outline-none placeholder:text-[var(--tiger-treeselect-placeholder,var(--tiger-text-muted,#9ca3af))]'

@@ -45,25 +45,29 @@
     "name": "Vue DatePicker subpath",
     "path": "packages/vue/dist/components/DatePicker.mjs",
     "limit": "31 kB",
-    "gzip": true
+    "gzip": true,
+    "ignore": ["@expcat/tigercat-core", "@floating-ui/dom"]
   },
   {
     "name": "React DatePicker subpath",
     "path": "packages/react/dist/components/DatePicker.mjs",
     "limit": "25 kB",
-    "gzip": true
+    "gzip": true,
+    "ignore": ["@expcat/tigercat-core", "@floating-ui/dom"]
   },
   {
     "name": "Vue Table subpath",
     "path": "packages/vue/dist/components/Table.mjs",
     "limit": "48 kB",
-    "gzip": true
+    "gzip": true,
+    "ignore": ["@expcat/tigercat-core", "@floating-ui/dom"]
   },
   {
     "name": "React Table subpath",
     "path": "packages/react/dist/components/Table.mjs",
     "limit": "41 kB",
-    "gzip": true
+    "gzip": true,
+    "ignore": ["@expcat/tigercat-core", "@floating-ui/dom"]
   },
   {
     "name": "Vue Tree subpath",
@@ -81,13 +85,15 @@
     "name": "Vue TimePicker subpath",
     "path": "packages/vue/dist/components/TimePicker.mjs",
     "limit": "31 kB",
-    "gzip": true
+    "gzip": true,
+    "ignore": ["@expcat/tigercat-core", "@floating-ui/dom"]
   },
   {
     "name": "React TimePicker subpath",
     "path": "packages/react/dist/components/TimePicker.mjs",
     "limit": "25 kB",
-    "gzip": true
+    "gzip": true,
+    "ignore": ["@expcat/tigercat-core", "@floating-ui/dom"]
   },
   {
     "name": "Core tailwind/modern subpath",

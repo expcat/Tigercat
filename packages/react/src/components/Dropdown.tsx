@@ -15,9 +15,7 @@ import {
   getDropdownChevronClasses,
   getDropdownMenuClasses,
   getDropdownItemClasses,
-  getTransformOrigin,
   injectDropdownStyles,
-  FLOATING_OVERLAY_Z_INDEX,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
   handleMenuNavigation,
@@ -29,7 +27,7 @@ import {
   type DropdownItemProps as CoreDropdownItemProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
-import { renderBodyPortal, useClickOutside, useEscapeKey, useFloating } from '../utils/overlay'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 // Dropdown context interface
 export interface DropdownContextValue {
@@ -266,25 +264,17 @@ export const Dropdown: React.FC<DropdownProps> = ({
     }
   }, [])
 
-  // Handle outside click to close dropdown
-  useClickOutside({
-    enabled: trigger === 'click' && visible,
-    refs: [containerRef, floatingRef],
-    onOutsideClick: () => setVisible(false)
-  })
-
-  useEscapeKey({
-    enabled: visible,
-    onEscape: () => setVisible(false)
-  })
-
-  // Floating UI positioning
-  const { x, y, placement } = useFloating({
+  const overlay = useAnchoredOverlay({
     referenceRef: triggerRef,
     floatingRef,
     enabled: visible,
     placement: initialPlacement,
-    offset
+    offset,
+    portal,
+    containerRef,
+    dismissOnOutside: trigger === 'click',
+    dismissOnEscape: true,
+    onDismiss: () => setVisible(false)
   })
 
   // Cleanup timer on unmount
@@ -303,18 +293,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   const triggerClasses = useMemo(() => getDropdownTriggerClasses(disabled), [disabled])
 
-  const menuWrapperClasses = classNames('absolute', DROPDOWN_ENTER_CLASS)
-
-  const menuWrapperStyles = useMemo<React.CSSProperties>(
-    () => ({
-      position: 'absolute',
-      left: x,
-      top: y,
-      zIndex: FLOATING_OVERLAY_Z_INDEX,
-      transformOrigin: getTransformOrigin(placement)
-    }),
-    [x, y, placement]
-  )
+  const menuWrapperClasses = classNames(overlay.floatingClasses, DROPDOWN_ENTER_CLASS)
+  const menuWrapperStyles = overlay.floatingStyles
 
   const contextValue = useMemo<DropdownContextValue>(
     () => ({ closeOnClick, handleItemClick }),
@@ -362,6 +342,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
       ref={floatingRef}
       className={menuWrapperClasses}
       style={menuWrapperStyles}
+      data-positioned={overlay.positioned}
       hidden={!visible}
       data-tiger-dropdown-menu=""
       onMouseEnter={handleMouseEnter}
@@ -391,7 +372,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           {triggerElement}
           {chevronNode}
         </div>
-        {portal ? renderBodyPortal(menuWrapperNode) : menuWrapperNode}
+        {renderOverlayPortal(menuWrapperNode, overlay.target, !portal)}
       </div>
     </DropdownContext.Provider>
   )

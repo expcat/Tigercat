@@ -285,15 +285,14 @@ export const timePickerClearButtonClasses = [
  * Dropdown panel classes
  */
 export const timePickerPanelClasses = [
-  'absolute z-10 mt-1 bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-lg',
-  'w-max max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-50 max-sm:mt-0 max-sm:w-auto max-sm:rounded-t-[var(--tiger-radius-lg,0.75rem)] max-sm:rounded-b-none max-sm:p-4 max-sm:shadow-2xl max-sm:pb-[calc(1rem+env(safe-area-inset-bottom))]'
+  'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-lg',
+  'w-max max-sm:w-auto max-sm:rounded-t-[var(--tiger-radius-lg,0.75rem)] max-sm:rounded-b-none max-sm:p-4 max-sm:shadow-2xl max-sm:pb-[calc(1rem+env(safe-area-inset-bottom))]'
 ].join(' ')
 
 /**
  * Dropdown panel content classes
  */
-export const timePickerPanelContentClasses =
-  'flex divide-x divide-[var(--tiger-border,#e5e7eb)]'
+export const timePickerPanelContentClasses = 'flex divide-x divide-[var(--tiger-border,#e5e7eb)]'
 
 export const timePickerDesktopPanelContentClasses =
   'max-sm:hidden flex divide-x divide-[var(--tiger-border,#e5e7eb)]'

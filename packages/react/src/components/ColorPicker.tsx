@@ -14,6 +14,7 @@ import {
   parseColorInput,
   classNames
 } from '@expcat/tigercat-core'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 export interface ColorPickerProps extends CoreColorPickerProps {
   /** Controlled color value (hex) */
@@ -35,6 +36,20 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const [isOpen, setIsOpen] = useState(false)
   const [alpha, setAlpha] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const overlay = useAnchoredOverlay({
+    enabled: isOpen,
+    referenceRef: triggerRef,
+    floatingRef: panelRef,
+    containerRef,
+    placement: 'bottom-start',
+    offset: 4,
+    dismissOnOutside: true,
+    dismissOnEscape: true,
+    restoreFocusOnDismiss: true,
+    onDismiss: () => setIsOpen(false)
+  })
 
   const rgb = useMemo(() => hexToRgb(value), [value])
   const hsv = useMemo(() => rgbToHsv(rgb.r, rgb.g, rgb.b), [rgb])
@@ -99,22 +114,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     }
   }
 
-  // Click outside
-  useEffect(() => {
-    if (!isOpen) return
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [isOpen])
-
   return (
     <div ref={containerRef} className={classNames(colorPickerBaseClasses, className)}>
       {/* Trigger swatch */}
       <div
+        ref={triggerRef}
         className={getColorPickerTriggerClasses(size, disabled)}
         style={{ backgroundColor: swatchColor }}
         role="button"
@@ -128,84 +132,93 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       />
 
       {/* Panel */}
-      {isOpen && (
-        <div className={colorPickerPanelClasses}>
-          {/* Hue slider */}
-          <div className="mb-2">
-            <label className="block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1">Hue</label>
-            <input
-              type="range"
-              min={0}
-              max={360}
-              value={hsv.h}
-              className="w-full h-2 rounded-full cursor-pointer accent-[var(--tiger-primary,#2563eb)]"
-              aria-label="Hue"
-              onChange={handleHueChange}
-            />
-          </div>
-
-          {/* Alpha slider */}
-          {showAlpha && (
+      {renderOverlayPortal(
+        isOpen ? (
+          <div
+            ref={panelRef}
+            className={classNames(colorPickerPanelClasses, overlay.floatingClasses)}
+            style={overlay.floatingStyles}
+            data-positioned={overlay.positioned}>
+            {/* Hue slider */}
             <div className="mb-2">
               <label className="block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1">
-                Alpha
+                Hue
               </label>
               <input
                 type="range"
                 min={0}
-                max={100}
-                value={Math.round(alpha * 100)}
+                max={360}
+                value={hsv.h}
                 className="w-full h-2 rounded-full cursor-pointer accent-[var(--tiger-primary,#2563eb)]"
-                aria-label="Alpha"
-                onChange={handleAlphaChange}
+                aria-label="Hue"
+                onChange={handleHueChange}
               />
             </div>
-          )}
 
-          {/* Color value input (rendered in the selected format) */}
-          <div className="mb-2">
-            <label className="block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1 uppercase">
-              {format}
-            </label>
-            <input
-              type="text"
-              className={colorPickerInputClasses}
-              value={inputValue}
-              aria-label="Color value"
-              onChange={handleInputChange}
-            />
-          </div>
-
-          {/* Preview */}
-          <div className="flex items-center gap-2 mb-2">
-            <div
-              className="w-8 h-8 rounded border border-[var(--tiger-border,#d1d5db)]"
-              style={{ backgroundColor: swatchColor }}
-              aria-label="Color preview"
-            />
-            <span className="text-xs font-mono text-[var(--tiger-text,#111827)]">
-              {displayValue}
-            </span>
-          </div>
-
-          {/* Presets */}
-          {presets && presets.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {presets.map((color) => (
-                <div
-                  key={color}
-                  className={colorPickerPresetClasses}
-                  style={{ backgroundColor: color }}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Select ${color}`}
-                  onClick={() => handlePresetClick(color)}
-                  onKeyDown={(e) => handlePresetKeyDown(e, color)}
+            {/* Alpha slider */}
+            {showAlpha && (
+              <div className="mb-2">
+                <label className="block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1">
+                  Alpha
+                </label>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={Math.round(alpha * 100)}
+                  className="w-full h-2 rounded-full cursor-pointer accent-[var(--tiger-primary,#2563eb)]"
+                  aria-label="Alpha"
+                  onChange={handleAlphaChange}
                 />
-              ))}
+              </div>
+            )}
+
+            {/* Color value input (rendered in the selected format) */}
+            <div className="mb-2">
+              <label className="block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1 uppercase">
+                {format}
+              </label>
+              <input
+                type="text"
+                className={colorPickerInputClasses}
+                value={inputValue}
+                aria-label="Color value"
+                onChange={handleInputChange}
+              />
             </div>
-          )}
-        </div>
+
+            {/* Preview */}
+            <div className="flex items-center gap-2 mb-2">
+              <div
+                className="w-8 h-8 rounded border border-[var(--tiger-border,#d1d5db)]"
+                style={{ backgroundColor: swatchColor }}
+                aria-label="Color preview"
+              />
+              <span className="text-xs font-mono text-[var(--tiger-text,#111827)]">
+                {displayValue}
+              </span>
+            </div>
+
+            {/* Presets */}
+            {presets && presets.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {presets.map((color) => (
+                  <div
+                    key={color}
+                    className={colorPickerPresetClasses}
+                    style={{ backgroundColor: color }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Select ${color}`}
+                    onClick={() => handlePresetClick(color)}
+                    onKeyDown={(e) => handlePresetKeyDown(e, color)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : null,
+        overlay.target
       )}
     </div>
   )

@@ -23,8 +23,6 @@ import {
   getMenuItemIndent,
   getSubMenuTitleClasses,
   getSubMenuExpandIconClasses,
-  getSubmenuPopupZIndex,
-  getTransformOrigin,
   filterMenuItems,
   isKeySelected,
   isKeyOpen,
@@ -58,7 +56,7 @@ import {
   toggleKey,
   initRovingTabIndex
 } from '@expcat/tigercat-core'
-import { renderVueBodyTeleport, useVueFloating } from '../utils/overlay'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 // Menu context key
 export const MenuContextKey = Symbol('MenuContext')
@@ -867,16 +865,18 @@ export const SubMenu = defineComponent({
       menuContext?.mode.value === 'horizontal' && props.level === 0 ? 'bottom-start' : 'right-start'
     )
 
-    const {
-      x: popupX,
-      y: popupY,
-      placement: currentPopupPlacement
-    } = useVueFloating({
+    const overlay = useVueAnchoredOverlay({
       referenceRef: titleEl,
       floatingRef: popupEl,
-      enabled: computed(() => popupPortal.value && isExpanded.value),
+      enabled: computed(() => isPopup.value && isExpanded.value),
       placement: popupPlacement.value,
-      offset: 4
+      offset: 4,
+      portal: popupPortal,
+      dismissOnEscape: true,
+      onDismiss: () => {
+        isOpenByKeyboard.value = false
+        isHovered.value = false
+      }
     })
 
     const disposeHeightTransition = () => {
@@ -957,9 +957,6 @@ export const SubMenu = defineComponent({
 
       return submenuContentVerticalClasses
     })
-
-    // Dynamic z-index for popup layers
-    const popupZIndex = computed(() => (isPopup.value ? getSubmenuPopupZIndex(props.level) : {}))
 
     // Handle title click
     const handleTitleClick = () => {
@@ -1199,26 +1196,16 @@ export const SubMenu = defineComponent({
 
       // Render submenu content
       const popupContentNode = () => {
-        const popupStyle = popupPortal.value
-          ? {
-              display: isExpanded.value ? 'block' : 'none',
-              position: 'absolute' as const,
-              left: `${popupX.value}px`,
-              top: `${popupY.value}px`,
-              transformOrigin: getTransformOrigin(currentPopupPlacement.value),
-              ...popupZIndex.value
-            }
-          : {
-              display: isExpanded.value ? 'block' : 'none',
-              ...popupZIndex.value
-            }
-
         const node = h(
           'ul',
           {
-            ref: popupPortal.value ? popupEl : undefined,
-            class: contentClasses.value,
-            style: popupStyle,
+            ref: popupEl,
+            class: classNames(contentClasses.value, overlay.floatingClasses.value),
+            style: {
+              ...overlay.floatingStyles.value,
+              display: isExpanded.value ? 'block' : 'none'
+            },
+            'data-positioned': overlay.positioned.value,
             role: 'menu',
             'aria-hidden': isExpanded.value ? undefined : 'true',
             onMouseenter: popupPortal.value ? handleMouseEnter : undefined,
@@ -1228,7 +1215,7 @@ export const SubMenu = defineComponent({
           withChildLevel(slots.default?.() as VNode[] | undefined)
         )
 
-        return popupPortal.value ? renderVueBodyTeleport(node) : node
+        return renderVueOverlayTeleport(node, overlay.target.value, !popupPortal.value)
       }
 
       const contentNode = isPopup.value

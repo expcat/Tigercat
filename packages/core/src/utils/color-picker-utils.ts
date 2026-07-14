@@ -25,7 +25,7 @@ export function getColorPickerTriggerClasses(size: ComponentSize, disabled: bool
 }
 
 export const colorPickerPanelClasses = classNames(
-  'absolute z-50 mt-1 p-3 rounded-[var(--tiger-radius-md,0.5rem)] shadow-lg',
+  'p-3 rounded-[var(--tiger-radius-md,0.5rem)] shadow-lg',
   'bg-[var(--tiger-colorpicker-panel-bg,var(--tiger-surface,#ffffff))]',
   'border border-[var(--tiger-colorpicker-panel-border,var(--tiger-border,#d1d5db))]'
 )

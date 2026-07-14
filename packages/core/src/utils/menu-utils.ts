@@ -104,19 +104,19 @@ export const submenuExpandIconExpandedClasses = 'transform rotate-180'
  * Submenu content classes - horizontal mode (top-level, drops below)
  */
 export const submenuContentHorizontalClasses =
-  'absolute left-0 top-full mt-0 min-w-[160px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50'
+  'min-w-[160px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg'
 
 /**
  * Submenu content classes - horizontal mode nested (level >= 1, cascades right)
  */
 export const submenuContentHorizontalNestedClasses =
-  'absolute left-full top-0 ml-0 min-w-[160px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50'
+  'min-w-[160px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg'
 
 /**
  * Submenu content classes - collapsed vertical mode (popup)
  */
 export const submenuContentPopupClasses =
-  'absolute left-full top-0 ml-1 min-w-[180px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50'
+  'min-w-[180px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg'
 
 /**
  * Submenu content classes - vertical mode
@@ -166,14 +166,6 @@ export const menuCollapsedClasses = 'min-w-[64px]'
  * Menu collapsed item classes
  */
 export const menuCollapsedItemClasses = 'justify-center px-2'
-
-/**
- * Get z-index style for nested submenu popups.
- * Each deeper level gets a higher z-index to stack correctly.
- */
-export function getSubmenuPopupZIndex(level: number): Record<string, number> {
-  return { zIndex: 50 + level * 10 }
-}
 
 /**
  * Pick the appropriate class string based on menu theme

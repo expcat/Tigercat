@@ -240,6 +240,7 @@ export const Modal: React.FC<ModalProps> = ({
   const reactId = useId()
   const modalId = useMemo(() => `tiger-modal-${reactId}`, [reactId])
   const titleId = `${modalId}-title`
+  const overlayHostId = `${modalId}-overlay-host`
 
   const {
     ['aria-labelledby']: _ariaLabelledby,
@@ -253,6 +254,7 @@ export const Modal: React.FC<ModalProps> = ({
     (title || titleContent ? titleId : undefined)
 
   const dialogRef = useRef<HTMLDivElement | null>(null)
+  const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const touchStartRef = useRef<GesturePoint | null>(null)
@@ -274,7 +276,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   useEscapeKey({ enabled: open, onEscape: handleClose })
   useBodyScrollLock({ enabled: open })
-  useFocusTrap({ enabled: open, containerRef: dialogRef })
+  useFocusTrap({ enabled: open, containerRef: rootRef })
 
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null
@@ -355,10 +357,12 @@ export const Modal: React.FC<ModalProps> = ({
 
   const modalContent = (
     <div
+      ref={rootRef}
       className={classNames(modalWrapperClasses, !open && 'pointer-events-none')}
       style={{ zIndex }}
       hidden={!open}
       aria-hidden={!open ? 'true' : undefined}
+      data-tiger-overlay-layer=""
       data-tiger-modal-root="">
       {/* Mask */}
       {mask && (
@@ -386,6 +390,7 @@ export const Modal: React.FC<ModalProps> = ({
           role="dialog"
           aria-modal="true"
           aria-labelledby={ariaLabelledby}
+          aria-owns={overlayHostId}
           tabIndex={-1}
           ref={dialogRef}
           onTouchStart={handleTouchStart}
@@ -437,6 +442,7 @@ export const Modal: React.FC<ModalProps> = ({
           ) : null}
         </div>
       </div>
+      <div id={overlayHostId} className="contents" data-tiger-overlay-host="" />
     </div>
   )
 

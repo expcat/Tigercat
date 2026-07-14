@@ -4,6 +4,12 @@ import tsParser from '@typescript-eslint/parser'
 import reactHooks from 'eslint-plugin-react-hooks'
 import prettier from 'eslint-config-prettier'
 
+const anchoredOverlayConsumerFiles = [
+  'packages/react/src/components/{AutoComplete,Cascader,ColorPicker,DatePicker,Dropdown,FormItem,Image,Mentions,Popover,Popconfirm,Select,TimePicker,Tooltip,TreeSelect}.tsx',
+  'packages/react/src/components/{DatePicker,TimePicker,Menu}/**/*.{ts,tsx}',
+  'packages/vue/src/components/{AutoComplete,Cascader,ColorPicker,DatePicker,Dropdown,FormItem,Image,Mentions,Menu,Popover,Popconfirm,Select,TimePicker,Tooltip,TreeSelect}.ts'
+]
+
 export default [
   js.configs.recommended,
   {
@@ -45,6 +51,65 @@ export default [
     rules: {
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn'
+    }
+  },
+  {
+    files: anchoredOverlayConsumerFiles,
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'react-dom',
+              message: '锚点浮层只能通过共享 overlay adapter 挂载。'
+            },
+            {
+              name: '@expcat/tigercat-core',
+              importNames: [
+                'applyFloatingStyles',
+                'autoUpdateFloating',
+                'computeFloatingPosition',
+                'isEventOutside'
+              ],
+              message: '锚点浮层组件不得直接编排低层定位或 dismiss API。'
+            },
+            {
+              name: 'vue',
+              importNames: ['Teleport'],
+              message: '锚点浮层只能通过共享 overlay adapter 挂载。'
+            }
+          ],
+          patterns: [
+            {
+              group: ['@floating-ui/*'],
+              message: 'Floating UI 只能由共享 overlay adapter 调用。'
+            },
+            {
+              group: ['**/utils/overlay'],
+              importNames: [
+                'renderBodyPortal',
+                'renderVueBodyTeleport',
+                'useClickOutside',
+                'useEscapeKey',
+                'useFloating',
+                'useVueClickOutside',
+                'useVueEscapeKey',
+                'useVueFloating'
+              ],
+              message: '锚点浮层组件只能调用共享 anchored-overlay adapter。'
+            }
+          ]
+        }
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "CallExpression[callee.object.name='document'][callee.property.name='addEventListener']",
+          message: '锚点浮层关闭事件只能由共享 overlay adapter 绑定。'
+        }
+      ]
     }
   },
   {

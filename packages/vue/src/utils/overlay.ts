@@ -1,21 +1,29 @@
 import {
   getFocusTrapNavigation,
   getFocusableElements,
-  isEscapeKey,
   isEventOutside,
   lockBodyScroll,
   computeFloatingPosition,
   autoUpdateFloating,
+  resolveAnchoredOverlayTarget,
+  getAnchoredOverlayTabTarget,
+  getAnchoredOverlayLayoutClasses,
+  FLOATING_OVERLAY_Z_INDEX,
+  getTransformOrigin,
+  restoreFocus,
+  registerEscapeDismiss,
+  type AnchoredOverlayLayout,
   type FloatingPlacement,
   type FloatingOptions,
   type FloatingResult,
   type FloatingCleanup
 } from '@expcat/tigercat-core'
-import { h, ref, Teleport, watch, onBeforeUnmount, type Ref, type VNodeChild } from 'vue'
+import { h, ref, computed, Teleport, watch, onBeforeUnmount, type Ref, type VNodeChild } from 'vue'
 
 export interface UseVueClickOutsideOptions {
   enabled: Ref<boolean>
   containerRef?: Ref<HTMLElement | null>
+  outsideRefs?: Array<Ref<HTMLElement | null> | undefined>
   refs?: Array<Ref<HTMLElement | null> | undefined>
   onOutsideClick: () => void
   defer?: boolean
@@ -61,15 +69,20 @@ export interface UseVueEscapeKeyOptions {
 }
 
 export function useVueEscapeKey({ enabled, onEscape }: UseVueEscapeKeyOptions): () => void {
-  const handler = (event: KeyboardEvent) => {
-    if (!enabled.value) return
-    if (event.defaultPrevented) return
-    if (!isEscapeKey(event)) return
-    onEscape()
-  }
+  let removeEntry: (() => void) | undefined
+  const stop = watch(
+    enabled,
+    (isEnabled) => {
+      removeEntry?.()
+      removeEntry = isEnabled ? registerEscapeDismiss(document, onEscape) : undefined
+    },
+    { immediate: true, flush: 'sync' }
+  )
 
-  document.addEventListener('keydown', handler)
-  return () => document.removeEventListener('keydown', handler)
+  return () => {
+    stop()
+    removeEntry?.()
+  }
 }
 
 export function useVueBodyScrollLock(enabled: Ref<boolean>): void {
@@ -90,6 +103,16 @@ export function renderVueBodyTeleport(children: VNodeChild, disabled = false): V
   return h(Teleport as never, { to: 'body', disabled }, normalizedChildren)
 }
 
+export function renderVueOverlayTeleport(
+  children: VNodeChild,
+  target: HTMLElement | null,
+  disabled = false
+): VNodeChild {
+  if (disabled || !target) return children
+  const normalizedChildren = children == null ? [] : Array.isArray(children) ? children : [children]
+  return h(Teleport as never, { to: target }, normalizedChildren)
+}
+
 export interface UseVueFocusTrapOptions {
   enabled: Ref<boolean>
   containerRef: Ref<HTMLElement | null>
@@ -100,10 +123,12 @@ export function useVueFocusTrap({ enabled, containerRef }: UseVueFocusTrapOption
     [enabled, containerRef],
     ([isEnabled, container], _previous, onCleanup) => {
       if (!isEnabled || !container) return
+      const ownerDocument = container.ownerDocument
 
       const handler = (event: KeyboardEvent) => {
+        if (!(event.target instanceof Node) || !container.contains(event.target)) return
         const focusables = getFocusableElements(container)
-        const activeElement = container.ownerDocument?.activeElement ?? document.activeElement
+        const activeElement = ownerDocument.activeElement
         const navigation = getFocusTrapNavigation(event, focusables, activeElement)
 
         if (!navigation.shouldHandle || !navigation.next) return
@@ -112,8 +137,8 @@ export function useVueFocusTrap({ enabled, containerRef }: UseVueFocusTrapOption
         navigation.next.focus()
       }
 
-      container.addEventListener('keydown', handler)
-      onCleanup(() => container.removeEventListener('keydown', handler))
+      ownerDocument.addEventListener('keydown', handler, true)
+      onCleanup(() => ownerDocument.removeEventListener('keydown', handler, true))
     },
     { immediate: true, flush: 'post' }
   )
@@ -181,6 +206,8 @@ export interface UseVueFloatingReturn {
    * Manually trigger position update
    */
   update: () => Promise<void>
+  isPositioned: Ref<boolean>
+  referenceWidth: Ref<number>
 }
 
 /**
@@ -220,6 +247,8 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
   const placement = ref<FloatingPlacement>(initialPlacement)
   const arrowX = ref<number | undefined>(undefined)
   const arrowY = ref<number | undefined>(undefined)
+  const isPositioned = ref(false)
+  const referenceWidth = ref(0)
 
   let cleanup: FloatingCleanup | null = null
 
@@ -228,6 +257,8 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
     const floating = floatingRef.value
 
     if (!reference || !floating) return
+
+    referenceWidth.value = reference.getBoundingClientRect().width
 
     const floatingOptions: FloatingOptions = {
       placement: initialPlacement,
@@ -255,6 +286,7 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
       arrowX.value = result.arrow.x
       arrowY.value = result.arrow.y
     }
+    isPositioned.value = true
   }
 
   watch(
@@ -266,7 +298,10 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
         cleanup = null
       }
 
-      if (!isEnabled || !reference || !floating) return
+      if (!isEnabled || !reference || !floating) {
+        isPositioned.value = false
+        return
+      }
 
       // Initial position calculation
       update()
@@ -290,6 +325,153 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
     placement,
     arrowX,
     arrowY,
-    update
+    update,
+    isPositioned,
+    referenceWidth
+  }
+}
+
+export interface UseVueAnchoredOverlayOptions {
+  enabled: Ref<boolean>
+  referenceRef: Ref<HTMLElement | null>
+  floatingRef: Ref<HTMLElement | null>
+  containerRef?: Ref<HTMLElement | null>
+  outsideRefs?: Array<Ref<HTMLElement | null> | undefined>
+  placement?: FloatingPlacement
+  offset?: number
+  layout?: AnchoredOverlayLayout
+  matchReferenceWidth?: boolean
+  portal?: Ref<boolean> | boolean
+  dismissOnOutside?: Ref<boolean> | boolean
+  dismissOnEscape?: Ref<boolean> | boolean
+  restoreFocusOnDismiss?: boolean
+  onDismiss?: () => void
+}
+
+export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
+  const target = ref<HTMLElement | null>(null)
+  const portalEnabled = () =>
+    typeof options.portal === 'object' ? options.portal.value : (options.portal ?? true)
+  const optionEnabled = (value: Ref<boolean> | boolean | undefined) =>
+    typeof value === 'object' ? value.value : Boolean(value)
+
+  const targetSources = [
+    options.enabled,
+    options.referenceRef,
+    ...(typeof options.portal === 'object' ? [options.portal] : [])
+  ]
+  watch(
+    targetSources,
+    () => {
+      if (!portalEnabled()) {
+        target.value = null
+        return
+      }
+      target.value = resolveAnchoredOverlayTarget(options.referenceRef.value)
+    },
+    { immediate: true, flush: 'post' }
+  )
+
+  watch(
+    [options.enabled, options.floatingRef],
+    ([enabled, floating], _previous, onCleanup) => {
+      if (!enabled || !floating) return
+
+      const handleTab = (event: KeyboardEvent) => {
+        if (event.key !== 'Tab') return
+        const target = getAnchoredOverlayTabTarget(
+          options.referenceRef.value,
+          options.floatingRef.value,
+          event.shiftKey
+        )
+        if (!target) return
+
+        event.preventDefault()
+        window.setTimeout(() => restoreFocus(target, { preventScroll: true }), 0)
+      }
+
+      floating.addEventListener('keydown', handleTab, true)
+      onCleanup(() => floating.removeEventListener('keydown', handleTab, true))
+    },
+    { immediate: true, flush: 'post' }
+  )
+
+  const floating = useVueFloating({
+    referenceRef: options.referenceRef,
+    floatingRef: options.floatingRef,
+    enabled: options.enabled,
+    placement: options.placement ?? 'bottom-start',
+    offset: options.offset ?? 4
+  })
+
+  const dismiss = () => {
+    options.onDismiss?.()
+    if (options.restoreFocusOnDismiss) {
+      window.setTimeout(() => restoreFocus(options.referenceRef.value, { preventScroll: true }), 0)
+    }
+  }
+
+  let outsideCleanup: (() => void) | undefined
+  let escapeCleanup: (() => void) | undefined
+  const dismissSources = [
+    options.enabled,
+    ...(typeof options.dismissOnOutside === 'object' ? [options.dismissOnOutside] : []),
+    ...(typeof options.dismissOnEscape === 'object' ? [options.dismissOnEscape] : [])
+  ]
+  watch(
+    dismissSources,
+    ([enabled]) => {
+      outsideCleanup?.()
+      escapeCleanup?.()
+      outsideCleanup = undefined
+      escapeCleanup = undefined
+      if (!enabled) return
+      if (optionEnabled(options.dismissOnOutside)) {
+        outsideCleanup = useVueClickOutside({
+          enabled: options.enabled,
+          refs: [
+            options.containerRef,
+            options.referenceRef,
+            options.floatingRef,
+            ...(options.outsideRefs ?? [])
+          ],
+          onOutsideClick: dismiss,
+          defer: false
+        })
+      }
+      if (optionEnabled(options.dismissOnEscape)) {
+        escapeCleanup = useVueEscapeKey({ enabled: options.enabled, onEscape: dismiss })
+      }
+    },
+    { immediate: true }
+  )
+
+  onBeforeUnmount(() => {
+    outsideCleanup?.()
+    escapeCleanup?.()
+  })
+
+  const floatingStyles = computed(() => ({
+    '--tiger-overlay-x': `${floating.x.value}px`,
+    '--tiger-overlay-y': `${floating.y.value}px`,
+    '--tiger-overlay-reference-width': `${floating.referenceWidth.value}px`,
+    zIndex: FLOATING_OVERLAY_Z_INDEX,
+    transformOrigin: getTransformOrigin(floating.placement.value)
+  }))
+  const floatingClasses = computed(() =>
+    getAnchoredOverlayLayoutClasses(
+      options.layout ?? 'anchored',
+      options.matchReferenceWidth ?? false
+    )
+  )
+
+  return {
+    target,
+    floatingStyles,
+    floatingClasses,
+    positioned: floating.isPositioned,
+    placement: floating.placement,
+    x: floating.x,
+    y: floating.y
   }
 }

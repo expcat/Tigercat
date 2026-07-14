@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, watch, onBeforeUnmount, type PropType } from 'vue'
+import { defineComponent, h, ref, computed, type PropType } from 'vue'
 import type { TreeNode } from '@expcat/tigercat-core'
 import type { ComponentSize, TreeSelectValue } from '@expcat/tigercat-core'
 import {
@@ -27,6 +27,7 @@ import {
 } from '@expcat/tigercat-core'
 import type { TigerLocale } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 let treeSelectInstanceId = 0
 
@@ -136,6 +137,21 @@ export const TreeSelect = defineComponent({
     const uncontrolledSearchValue = ref(props.defaultSearchValue)
     const searchQuery = computed(() => props.searchValue ?? uncontrolledSearchValue.value)
     const containerRef = ref<HTMLElement | null>(null)
+    const triggerRef = ref<HTMLElement | null>(null)
+    const dropdownRef = ref<HTMLElement | null>(null)
+    const overlay = useVueAnchoredOverlay({
+      enabled: isOpen,
+      referenceRef: triggerRef,
+      floatingRef: dropdownRef,
+      containerRef,
+      placement: 'bottom-start',
+      offset: 4,
+      matchReferenceWidth: true,
+      dismissOnOutside: true,
+      dismissOnEscape: true,
+      restoreFocusOnDismiss: true,
+      onDismiss: closeDropdown
+    })
 
     const expandedKeys = ref<Set<string | number>>(
       props.defaultExpandAll ? new Set(getAllTreeSelectKeys(props.treeData)) : new Set()
@@ -251,25 +267,6 @@ export const TreeSelect = defineComponent({
       }
     }
 
-    // Click outside
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.value && !containerRef.value.contains(e.target as Node)) {
-        closeDropdown()
-      }
-    }
-
-    watch(isOpen, (val) => {
-      if (val) {
-        document.addEventListener('click', handleClickOutside)
-      } else {
-        document.removeEventListener('click', handleClickOutside)
-      }
-    })
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside)
-    })
-
     return () => {
       const containerClasses = classNames(treeSelectBaseClasses, coerceClassValue(attrs.class))
 
@@ -278,6 +275,7 @@ export const TreeSelect = defineComponent({
         h(
           'button',
           {
+            ref: triggerRef,
             type: 'button',
             class: getTreeSelectTriggerClasses(props.size, props.disabled, isOpen.value),
             ...getPickerComboboxAria({ expanded: isOpen.value, listboxId }),
@@ -327,100 +325,107 @@ export const TreeSelect = defineComponent({
 
         // Dropdown
         isOpen.value
-          ? h(
-              'div',
-              {
-                ...getPickerListboxAria({ id: listboxId }),
-                class: treeSelectDropdownClasses
-              },
-              [
-                // Search
-                props.searchable
-                  ? h('input', {
-                      type: 'text',
-                      class: treeSelectSearchClasses,
-                      placeholder: resolveLocaleText(
-                        'Search...',
-                        mergedLocale.value?.common?.searchPlaceholder
-                      ),
-                      value: searchQuery.value,
-                      'aria-label': resolveLocaleText(
-                        'Search tree',
-                        mergedLocale.value?.common?.searchPlaceholder
-                      ),
-                      onInput: (e: Event) => updateSearchValue((e.target as HTMLInputElement).value)
-                    })
-                  : null,
+          ? renderVueOverlayTeleport(
+              h(
+                'div',
+                {
+                  ref: dropdownRef,
+                  ...getPickerListboxAria({ id: listboxId }),
+                  class: classNames(treeSelectDropdownClasses, overlay.floatingClasses.value),
+                  style: overlay.floatingStyles.value,
+                  'data-positioned': overlay.positioned.value
+                },
+                [
+                  // Search
+                  props.searchable
+                    ? h('input', {
+                        type: 'text',
+                        class: treeSelectSearchClasses,
+                        placeholder: resolveLocaleText(
+                          'Search...',
+                          mergedLocale.value?.common?.searchPlaceholder
+                        ),
+                        value: searchQuery.value,
+                        'aria-label': resolveLocaleText(
+                          'Search tree',
+                          mergedLocale.value?.common?.searchPlaceholder
+                        ),
+                        onInput: (e: Event) =>
+                          updateSearchValue((e.target as HTMLInputElement).value)
+                      })
+                    : null,
 
-                // Tree nodes
-                visibleNodes.value.length > 0
-                  ? visibleNodes.value.map((flatNode) => {
-                      const { node, level, hasChildren, isExpanded } = flatNode
-                      const selected = isSelected(node.key)
-                      const indent = level * 20
+                  // Tree nodes
+                  visibleNodes.value.length > 0
+                    ? visibleNodes.value.map((flatNode) => {
+                        const { node, level, hasChildren, isExpanded } = flatNode
+                        const selected = isSelected(node.key)
+                        const indent = level * 20
 
-                      return h(
+                        return h(
+                          'div',
+                          {
+                            key: node.key,
+                            ...getPickerOptionAria({ selected, disabled: !!node.disabled }),
+                            class: getTreeSelectNodeClasses(selected, !!node.disabled, props.size),
+                            style: { paddingLeft: `${indent + 8}px` },
+                            onClick: (e: MouseEvent) => {
+                              e.stopPropagation()
+                              handleNodeSelect(node)
+                            }
+                          },
+                          [
+                            // Expand toggle
+                            hasChildren
+                              ? h(
+                                  'span',
+                                  {
+                                    class: classNames(
+                                      'inline-flex items-center justify-center w-4 h-4 mr-1 transition-transform',
+                                      isExpanded ? 'rotate-90' : ''
+                                    ),
+                                    onClick: (e: MouseEvent) => {
+                                      e.stopPropagation()
+                                      toggleExpand(node.key)
+                                    }
+                                  },
+                                  [
+                                    h(
+                                      'svg',
+                                      {
+                                        class: 'w-3 h-3',
+                                        viewBox: icon20ViewBox,
+                                        fill: 'currentColor'
+                                      },
+                                      [
+                                        h('path', {
+                                          d: chevronRightSolidIcon20PathD,
+                                          'fill-rule': 'evenodd',
+                                          'clip-rule': 'evenodd'
+                                        })
+                                      ]
+                                    )
+                                  ]
+                                )
+                              : h('span', { class: 'w-4 mr-1' }),
+
+                            // Label
+                            h('span', { class: 'flex-1 truncate' }, node.label)
+                          ]
+                        )
+                      })
+                    : h(
                         'div',
-                        {
-                          key: node.key,
-                          ...getPickerOptionAria({ selected, disabled: !!node.disabled }),
-                          class: getTreeSelectNodeClasses(selected, !!node.disabled, props.size),
-                          style: { paddingLeft: `${indent + 8}px` },
-                          onClick: (e: MouseEvent) => {
-                            e.stopPropagation()
-                            handleNodeSelect(node)
-                          }
-                        },
-                        [
-                          // Expand toggle
-                          hasChildren
-                            ? h(
-                                'span',
-                                {
-                                  class: classNames(
-                                    'inline-flex items-center justify-center w-4 h-4 mr-1 transition-transform',
-                                    isExpanded ? 'rotate-90' : ''
-                                  ),
-                                  onClick: (e: MouseEvent) => {
-                                    e.stopPropagation()
-                                    toggleExpand(node.key)
-                                  }
-                                },
-                                [
-                                  h(
-                                    'svg',
-                                    {
-                                      class: 'w-3 h-3',
-                                      viewBox: icon20ViewBox,
-                                      fill: 'currentColor'
-                                    },
-                                    [
-                                      h('path', {
-                                        d: chevronRightSolidIcon20PathD,
-                                        'fill-rule': 'evenodd',
-                                        'clip-rule': 'evenodd'
-                                      })
-                                    ]
-                                  )
-                                ]
-                              )
-                            : h('span', { class: 'w-4 mr-1' }),
-
-                          // Label
-                          h('span', { class: 'flex-1 truncate' }, node.label)
-                        ]
+                        { class: treeSelectEmptyClasses },
+                        resolveLocaleText(
+                          'No data',
+                          props.emptyText,
+                          mergedLocale.value?.common?.emptyText
+                        )
                       )
-                    })
-                  : h(
-                      'div',
-                      { class: treeSelectEmptyClasses },
-                      resolveLocaleText(
-                        'No data',
-                        props.emptyText,
-                        mergedLocale.value?.common?.emptyText
-                      )
-                    )
-              ]
+                ]
+              ),
+              overlay.target.value
             )
           : null
       ])

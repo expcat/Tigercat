@@ -7,10 +7,8 @@
  * trigger → event-handler mapping, floating styles.
  */
 import React, { useCallback, useMemo, useRef, useState } from 'react'
-import { useFloating, useClickOutside, useEscapeKey } from './overlay'
+import { useAnchoredOverlay } from './overlay'
 import {
-  getTransformOrigin,
-  FLOATING_OVERLAY_Z_INDEX,
   buildTriggerHandlerMap,
   restoreFocus,
   type FloatingPlacement,
@@ -49,6 +47,9 @@ export interface UsePopupReturn {
   y: number
   actualPlacement: FloatingPlacement
   floatingStyles: React.CSSProperties
+  floatingClasses: string
+  positioned: boolean
+  overlayTarget: HTMLElement | null
   triggerHandlers: React.DOMAttributes<HTMLDivElement>
   closeAndRestoreFocus: () => void
 }
@@ -76,19 +77,6 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
   const floatingRef = useRef<HTMLDivElement>(null)
-
-  // ─── Floating positioning ────────────────────────────────────────────
-  const {
-    x,
-    y,
-    placement: actualPlacement
-  } = useFloating({
-    referenceRef: triggerRef,
-    floatingRef,
-    enabled: currentVisible,
-    placement,
-    offset
-  })
 
   // ─── setVisible ──────────────────────────────────────────────────────
   const setVisible = useCallback(
@@ -132,30 +120,17 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
 
   const effectiveTrigger: FloatingTrigger = multiTrigger ? trigger : 'click'
 
-  // ─── Overlay dismiss ─────────────────────────────────────────────────
-  useClickOutside({
-    enabled: currentVisible && effectiveTrigger === 'click',
-    refs: [containerRef, floatingRef],
-    onOutsideClick: closeAndRestoreFocus,
-    defer: true
+  const overlay = useAnchoredOverlay({
+    enabled: currentVisible,
+    referenceRef: triggerRef,
+    floatingRef,
+    containerRef,
+    placement,
+    offset,
+    dismissOnOutside: effectiveTrigger === 'click',
+    dismissOnEscape: effectiveTrigger !== 'manual',
+    onDismiss: closeAndRestoreFocus
   })
-
-  useEscapeKey({
-    enabled: currentVisible && effectiveTrigger !== 'manual',
-    onEscape: closeAndRestoreFocus
-  })
-
-  // ─── Floating styles ─────────────────────────────────────────────────
-  const floatingStyles = useMemo<React.CSSProperties>(
-    () => ({
-      position: 'absolute',
-      left: x,
-      top: y,
-      transformOrigin: getTransformOrigin(actualPlacement),
-      zIndex: FLOATING_OVERLAY_Z_INDEX
-    }),
-    [x, y, actualPlacement]
-  )
 
   // ─── Trigger handlers map ────────────────────────────────────────────
   const triggerHandlers = useMemo<React.DOMAttributes<HTMLDivElement>>(() => {
@@ -175,10 +150,13 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     containerRef,
     triggerRef,
     floatingRef,
-    x,
-    y,
-    actualPlacement,
-    floatingStyles,
+    x: overlay.x,
+    y: overlay.y,
+    actualPlacement: overlay.placement,
+    floatingStyles: overlay.floatingStyles,
+    floatingClasses: overlay.floatingClasses,
+    positioned: overlay.positioned,
+    overlayTarget: overlay.target,
     triggerHandlers,
     closeAndRestoreFocus
   }

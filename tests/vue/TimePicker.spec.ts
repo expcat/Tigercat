@@ -74,7 +74,7 @@ describe('TimePicker', () => {
   it('opens panel when input clicked', async () => {
     const { container } = render(TimePicker)
     await fireEvent.click(container.querySelector('input') as HTMLInputElement)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
   })
 
   it('renders mobile wheel selects and emits time changes from them', async () => {
@@ -83,7 +83,7 @@ describe('TimePicker', () => {
     })
 
     await fireEvent.click(container.querySelector('input') as HTMLInputElement)
-    const hourSelect = container.querySelector('select[aria-label="Hour"]') as HTMLSelectElement
+    const hourSelect = document.body.querySelector('select[aria-label="Hour"]') as HTMLSelectElement
 
     expect(hourSelect).toBeInTheDocument()
     await fireEvent.update(hourSelect, '11')
@@ -95,12 +95,14 @@ describe('TimePicker', () => {
     const input = container.querySelector('input') as HTMLInputElement
 
     await fireEvent.click(input)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
 
-    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+    const dialog = document.body.querySelector('[role="dialog"]') as HTMLElement
     await fireEvent.keyDown(dialog, { key: 'Escape' })
 
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(document.body.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    )
     expect(document.activeElement).toBe(input)
   })
 
@@ -111,9 +113,9 @@ describe('TimePicker', () => {
     const input = container.querySelector('input') as HTMLInputElement
 
     await fireEvent.click(input)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
 
-    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+    const dialog = document.body.querySelector('[role="dialog"]') as HTMLElement
     await fireEvent.keyDown(dialog, { key: 'ArrowDown' })
     await fireEvent.keyDown(dialog, { key: 'Enter' })
 
@@ -129,9 +131,9 @@ describe('TimePicker', () => {
     const input = container.querySelector('input') as HTMLInputElement
 
     await fireEvent.click(input)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
 
-    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+    const dialog = document.body.querySelector('[role="dialog"]') as HTMLElement
     const hourButtons = Array.from(
       dialog.querySelectorAll('button[data-tiger-timepicker-unit="hour"]')
     ).filter((el) => !(el as HTMLButtonElement).disabled) as HTMLButtonElement[]
@@ -187,8 +189,8 @@ describe('TimePicker', () => {
     })
 
     await fireEvent.click(container.querySelector('input') as HTMLInputElement)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
-    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const dialog = document.body.querySelector('[role="dialog"]') as HTMLElement
     const secondButton = dialog.querySelector<HTMLButtonElement>(
       'button[data-tiger-timepicker-unit="second"][aria-label="5 seconds"]'
     )!
@@ -207,8 +209,8 @@ describe('TimePicker', () => {
     })
 
     await fireEvent.click(container.querySelector('input') as HTMLInputElement)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
-    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const dialog = document.body.querySelector('[role="dialog"]') as HTMLElement
 
     expect(
       dialog.querySelector<HTMLButtonElement>(
@@ -229,8 +231,8 @@ describe('TimePicker', () => {
     })
 
     await fireEvent.click(container.querySelector('input') as HTMLInputElement)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
-    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const dialog = document.body.querySelector('[role="dialog"]') as HTMLElement
     const pmButton = dialog.querySelector<HTMLButtonElement>(
       'button[data-tiger-timepicker-unit="period"][aria-label="PM"]'
     )!
@@ -250,8 +252,8 @@ describe('TimePicker', () => {
     })
 
     await fireEvent.click(container.querySelector('input') as HTMLInputElement)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
-    const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const dialog = document.body.querySelector('[role="dialog"]') as HTMLElement
 
     await fireEvent.click(dialog.querySelector<HTMLButtonElement>('button[aria-label="Start"]')!)
     await fireEvent.click(
@@ -276,34 +278,38 @@ describe('TimePicker', () => {
     const { container, rerender } = renderWithProps(TimePicker, { disabled: true })
 
     await fireEvent.click(container.querySelector('button[aria-label="Toggle time picker"]')!)
-    expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    expect(document.body.querySelector('[role="dialog"]')).not.toBeInTheDocument()
 
     await rerender({ disabled: false, readonly: true })
     await fireEvent.click(container.querySelector('button[aria-label="Toggle time picker"]')!)
-    expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    expect(document.body.querySelector('[role="dialog"]')).not.toBeInTheDocument()
   })
 
   it('closes on outside click and supports Now/OK footer actions', async () => {
     const { container, emitted } = renderWithProps(TimePicker, { modelValue: null })
 
     await fireEvent.click(container.querySelector('input') as HTMLInputElement)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
-    const nowButton = Array.from(container.querySelectorAll('button')).find(
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
+    const nowButton = Array.from(document.body.querySelectorAll('button')).find(
       (button) => button.textContent === 'Now'
     ) as HTMLButtonElement
     await fireEvent.click(nowButton)
     expect(emitted()).toHaveProperty('update:modelValue')
 
-    const okButton = Array.from(container.querySelectorAll('button')).find(
+    const okButton = Array.from(document.body.querySelectorAll('button')).find(
       (button) => button.textContent === 'OK'
     ) as HTMLButtonElement
     await fireEvent.click(okButton)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(document.body.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    )
 
     await fireEvent.click(container.querySelector('input') as HTMLInputElement)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
+    await waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument())
     await fireEvent.click(document.body)
-    await waitFor(() => expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(document.body.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    )
   })
 
   it('passes native input attributes and custom class to the wrapper', () => {

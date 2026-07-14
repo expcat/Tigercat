@@ -227,11 +227,7 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
 
     const active = document.activeElement as HTMLElement | null
     const unit = active?.getAttribute('data-tiger-timepicker-unit') as
-      | 'hour'
-      | 'minute'
-      | 'second'
-      | 'period'
-      | null
+      'hour' | 'minute' | 'second' | 'period' | null
 
     if (!unit) return
 
@@ -396,26 +392,6 @@ export function useTimePickerState(allProps: TimePickerProps): TimePickerContext
   const handleInputClick = () => {
     togglePanel()
   }
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        panelRef.current &&
-        inputWrapperRef.current &&
-        !panelRef.current.contains(event.target as Node) &&
-        !inputWrapperRef.current.contains(event.target as Node)
-      ) {
-        closePanel()
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('click', handleClickOutside)
-      return () => {
-        document.removeEventListener('click', handleClickOutside)
-      }
-    }
-  }, [isOpen])
 
   useEffect(() => {
     if (!isOpen) return

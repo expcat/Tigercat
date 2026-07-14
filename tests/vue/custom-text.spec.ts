@@ -243,7 +243,10 @@ describe('custom text (no i18n) — Vue', () => {
         })
       )
       await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.update(container.querySelector('input[aria-label="Search options"]')!, 'zzz')
+      await fireEvent.update(
+        document.body.querySelector('input[aria-label="Search options"]')!,
+        'zzz'
+      )
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 
@@ -263,7 +266,10 @@ describe('custom text (no i18n) — Vue', () => {
         })
       )
       await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.update(container.querySelector('input[aria-label="Search options"]')!, 'zzz')
+      await fireEvent.update(
+        document.body.querySelector('input[aria-label="Search options"]')!,
+        'zzz'
+      )
       expect(getByText('查无此项')).toBeInTheDocument()
       expect(queryByText('暂无数据')).toBeNull()
     })
@@ -295,7 +301,7 @@ describe('custom text (no i18n) — Vue', () => {
         })
       )
       await fireEvent.click(container.querySelector('button')!)
-      await fireEvent.update(container.querySelector('input')!, 'zzz')
+      await fireEvent.update(document.body.querySelector('input')!, 'zzz')
       expect(getByText('暂无数据')).toBeInTheDocument()
     })
 

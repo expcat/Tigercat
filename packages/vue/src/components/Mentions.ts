@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, watch, nextTick, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, h, ref, computed, PropType } from 'vue'
 import { classNames, coerceClassValue } from '@expcat/tigercat-core'
 import type { MentionsSize, MentionOption } from '@expcat/tigercat-core'
 import {
@@ -6,9 +6,9 @@ import {
   mentionsDropdownClasses,
   getMentionsOptionClasses,
   extractMentionQuery,
-  positionMentionsDropdown,
   getCyclicIndex
 } from '@expcat/tigercat-core'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 export interface VueMentionsProps {
   modelValue?: string
@@ -45,6 +45,19 @@ export const Mentions = defineComponent({
       if (!query.value) return props.options || []
       const q = query.value.toLowerCase()
       return (props.options || []).filter((o) => !o.disabled && o.label.toLowerCase().includes(q))
+    })
+    const overlayEnabled = computed(() => isOpen.value && filteredOptions.value.length > 0)
+    const overlay = useVueAnchoredOverlay({
+      enabled: overlayEnabled,
+      referenceRef: textareaRef,
+      floatingRef: dropdownRef,
+      containerRef,
+      placement: 'bottom-start',
+      offset: 4,
+      dismissOnOutside: true,
+      dismissOnEscape: true,
+      restoreFocusOnDismiss: true,
+      onDismiss: () => (isOpen.value = false)
     })
 
     function handleInput(e: Event) {
@@ -94,33 +107,6 @@ export const Mentions = defineComponent({
       }
     }
 
-    // Click outside
-    function onClickOutside(e: MouseEvent) {
-      if (containerRef.value && !containerRef.value.contains(e.target as Node)) {
-        isOpen.value = false
-      }
-    }
-
-    watch(isOpen, (val) => {
-      if (val) document.addEventListener('mousedown', onClickOutside)
-      else document.removeEventListener('mousedown', onClickOutside)
-    })
-
-    watch(
-      [isOpen, filteredOptions],
-      async () => {
-        if (!isOpen.value || filteredOptions.value.length === 0) return
-        await nextTick()
-        if (!textareaRef.value || !dropdownRef.value) return
-        await positionMentionsDropdown(textareaRef.value, dropdownRef.value)
-      },
-      { flush: 'post' }
-    )
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('mousedown', onClickOutside)
-    })
-
     return () => {
       const wrapperClass = classNames('relative', coerceClassValue(attrs.class))
 
@@ -136,22 +122,31 @@ export const Mentions = defineComponent({
           onKeydown: handleKeydown
         }),
         isOpen.value && filteredOptions.value.length > 0
-          ? h(
-              'div',
-              { ref: dropdownRef, class: mentionsDropdownClasses, role: 'listbox' },
-              filteredOptions.value.map((opt, i) =>
-                h(
-                  'div',
-                  {
-                    key: opt.value,
-                    class: getMentionsOptionClasses(i === activeIndex.value, !!opt.disabled),
-                    role: 'option',
-                    'aria-selected': i === activeIndex.value,
-                    onClick: () => selectOption(opt)
-                  },
-                  opt.label
+          ? renderVueOverlayTeleport(
+              h(
+                'div',
+                {
+                  ref: dropdownRef,
+                  class: classNames(mentionsDropdownClasses, overlay.floatingClasses.value),
+                  style: overlay.floatingStyles.value,
+                  'data-positioned': overlay.positioned.value,
+                  role: 'listbox'
+                },
+                filteredOptions.value.map((opt, i) =>
+                  h(
+                    'div',
+                    {
+                      key: opt.value,
+                      class: getMentionsOptionClasses(i === activeIndex.value, !!opt.disabled),
+                      role: 'option',
+                      'aria-selected': i === activeIndex.value,
+                      onClick: () => selectOption(opt)
+                    },
+                    opt.label
+                  )
                 )
-              )
+              ),
+              overlay.target.value
             )
           : null
       ])

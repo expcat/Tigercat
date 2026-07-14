@@ -288,7 +288,7 @@ describe('TreeSelect', () => {
       const button = container.querySelector('button')!
       await user.click(button)
 
-      const option = container.querySelector('[role="option"][aria-selected="true"]')
+      const option = document.body.querySelector('[role="option"][aria-selected="true"]')
       expect(option).toBeInTheDocument()
       expect(option!.textContent).toContain('Grain')
     })

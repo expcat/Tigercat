@@ -24,7 +24,7 @@ import {
   type ImagePreviewTrigger
 } from '@expcat/tigercat-core'
 import { useFloatingPopup } from '../utils/use-floating-popup'
-import { renderVueBodyTeleport } from '../utils/overlay'
+import { renderVueOverlayTeleport } from '../utils/overlay'
 import type { ImageGroupContext } from './ImageGroup'
 import { ImagePreview } from './ImagePreview'
 
@@ -104,6 +104,9 @@ export const Image = defineComponent({
       triggerRef: hoverTriggerRef,
       floatingRef: hoverFloatingRef,
       floatingStyles: hoverFloatingStyles,
+      floatingClasses: hoverFloatingClasses,
+      positioned: hoverPositioned,
+      overlayTarget: hoverOverlayTarget,
       triggerHandlers: hoverTriggerHandlers
     } = useFloatingPopup({
       props: floatingPopupProps,
@@ -287,15 +290,18 @@ export const Image = defineComponent({
       // Hover preview overlay (enlarged floating image)
       const hoverPreviewEl =
         hoverPreviewEnabled.value && hoverVisible.value && props.src
-          ? renderVueBodyTeleport(
+          ? renderVueOverlayTeleport(
               h(
                 'div',
                 {
                   ref: hoverFloatingRef,
                   style: hoverFloatingStyles.value,
+                  'data-positioned': hoverPositioned.value,
                   'aria-hidden': true,
-                  class:
+                  class: classNames(
+                    hoverFloatingClasses.value,
                     'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-1 shadow-lg'
+                  )
                 },
                 [
                   h('img', {
@@ -304,7 +310,8 @@ export const Image = defineComponent({
                     class: 'block max-w-[16rem] max-h-[16rem] object-contain'
                   })
                 ]
-              )
+              ),
+              hoverOverlayTarget.value
             )
           : null
 

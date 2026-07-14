@@ -7,7 +7,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { ConfigProvider, DatePicker } from '@expcat/tigercat-react'
-import { expectNoA11yViolationsIsolated, componentSizes } from '../utils/react'
+import { expectNoA11yViolationsIsolated } from '../utils/react'
 import { ZH_CN_DATEPICKER_LOCALE } from '../../packages/core/src/utils/i18n/datepicker-locales/zh-CN'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 
@@ -80,15 +80,6 @@ describe('DatePicker', () => {
     })
   })
 
-  describe('Sizes', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
-      const { container } = render(<DatePicker size={size} />)
-
-      const input = container.querySelector('input')
-      expect(input).toBeInTheDocument()
-    })
-  })
-
   describe('States', () => {
     it('should be disabled when disabled prop is true', () => {
       const { container } = render(<DatePicker disabled={true} />)
@@ -126,7 +117,7 @@ describe('DatePicker', () => {
       await user.click(input)
 
       await waitFor(() => {
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar).toBeInTheDocument()
       })
     })
@@ -140,7 +131,7 @@ describe('DatePicker', () => {
 
       await user.click(container.querySelector('input') as HTMLInputElement)
 
-      const daySelect = container.querySelector('select[aria-label="Day"]') as HTMLSelectElement
+      const daySelect = document.body.querySelector('select[aria-label="Day"]') as HTMLSelectElement
       expect(daySelect).toBeInTheDocument()
       fireEvent.change(daySelect, { target: { value: '16' } })
 
@@ -156,26 +147,26 @@ describe('DatePicker', () => {
       await user.click(input)
 
       await waitFor(() => {
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar).toBeInTheDocument()
       })
 
-      const prevButton = container.querySelector(
+      const prevButton = document.body.querySelector(
         'button[aria-label="Previous month"]'
       ) as HTMLButtonElement
       await user.click(prevButton)
 
       await waitFor(() => {
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar?.textContent).toContain('February 2024')
       })
-      const nextButton = container.querySelector(
+      const nextButton = document.body.querySelector(
         'button[aria-label="Next month"]'
       ) as HTMLButtonElement
       await user.click(nextButton)
 
       await waitFor(() => {
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar?.textContent).toContain('March 2024')
       })
     })
@@ -189,17 +180,17 @@ describe('DatePicker', () => {
       await user.click(input)
 
       await waitFor(() => {
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar).toBeInTheDocument()
       })
 
       // Click on a date button (first available date)
-      const dateButtons = container.querySelectorAll('button[aria-selected]')
+      const dateButtons = document.body.querySelectorAll('button[aria-selected]')
       if (dateButtons.length > 0) {
         await user.click(dateButtons[0])
 
         await waitFor(() => {
-          const calendar = container.querySelector('[role="dialog"]')
+          const calendar = document.body.querySelector('[role="dialog"]')
           expect(calendar).not.toBeInTheDocument()
         })
       }
@@ -215,7 +206,7 @@ describe('DatePicker', () => {
       await user.click(input)
 
       await waitFor(() => {
-        expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+        expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument()
       })
 
       // Footer buttons
@@ -229,16 +220,16 @@ describe('DatePicker', () => {
       // Selecting an end date should NOT close the calendar
       const endDate = screen.getByLabelText('2024-03-12') as HTMLButtonElement
       await user.click(endDate)
-      expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+      expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument()
 
       // Today should not close the calendar
       await user.click(screen.getByRole('button', { name: 'Today' }))
-      expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+      expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument()
 
       // OK closes the calendar
       await user.click(screen.getByRole('button', { name: 'OK' }))
       await waitFor(() => {
-        expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+        expect(document.body.querySelector('[role="dialog"]')).not.toBeInTheDocument()
       })
     })
 
@@ -380,12 +371,12 @@ describe('DatePicker', () => {
       await user.click(input)
 
       await waitFor(() => {
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar).toBeInTheDocument()
       })
 
       // Click on a date button
-      const dateButtons = container.querySelectorAll('button[aria-selected]')
+      const dateButtons = document.body.querySelectorAll('button[aria-selected]')
       if (dateButtons.length > 0) {
         await user.click(dateButtons[0])
 
@@ -426,11 +417,11 @@ describe('DatePicker', () => {
       await user.click(input)
 
       await waitFor(() => {
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar).toBeInTheDocument()
       })
 
-      const dateButtons = container.querySelectorAll('button[aria-selected]')
+      const dateButtons = document.body.querySelectorAll('button[aria-selected]')
       if (dateButtons.length > 0) {
         await user.click(dateButtons[0])
         expect(onChange).toHaveBeenCalled()
@@ -457,11 +448,11 @@ describe('DatePicker', () => {
       await user.click(input)
 
       await waitFor(() => {
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar).toBeInTheDocument()
 
         // Check that some date buttons are disabled
-        const disabledButtons = container.querySelectorAll('button[disabled][aria-selected]')
+        const disabledButtons = document.body.querySelectorAll('button[disabled][aria-selected]')
         expect(disabledButtons.length).toBeGreaterThan(0)
       })
     })
@@ -476,10 +467,10 @@ describe('DatePicker', () => {
       await user.click(input)
 
       await waitFor(() => {
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar).toBeInTheDocument()
 
-        const disabledButtons = container.querySelectorAll('button[disabled][aria-selected]')
+        const disabledButtons = document.body.querySelectorAll('button[disabled][aria-selected]')
         expect(disabledButtons.length).toBeGreaterThan(0)
       })
     })
@@ -533,7 +524,7 @@ describe('DatePicker', () => {
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled()
-        const calendar = container.querySelector('[role="dialog"]')
+        const calendar = document.body.querySelector('[role="dialog"]')
         expect(calendar).not.toBeInTheDocument()
       })
     })

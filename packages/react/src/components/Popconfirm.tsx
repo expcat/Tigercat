@@ -23,7 +23,7 @@ import {
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 import { usePopup } from '../utils/use-popup'
-import { renderBodyPortal } from '../utils/overlay'
+import { renderOverlayPortal } from '../utils/overlay'
 
 const createPopconfirmId = createFloatingIdFactory('popconfirm')
 
@@ -97,6 +97,9 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     containerRef,
     triggerRef,
     floatingRef,
+    floatingClasses,
+    positioned,
+    overlayTarget,
     closeAndRestoreFocus,
     actualPlacement,
     floatingStyles: baseFloatingStyles
@@ -123,24 +126,12 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     setVisible(!currentVisible)
   }
 
-  // Compute styles (strip zIndex since Popconfirm uses its own z-50 class)
-  const contentWrapperStyles = useMemo<React.CSSProperties>(
-    () => ({
-      position: 'absolute',
-      left: baseFloatingStyles.left,
-      top: baseFloatingStyles.top,
-      transformOrigin: baseFloatingStyles.transformOrigin
-    }),
-    [baseFloatingStyles]
-  )
-
   // Classes
   const containerClasses = useMemo(
     () => classNames(getPopconfirmContainerClasses(), className),
     [className]
   )
   const triggerClasses = useMemo(() => getPopconfirmTriggerClasses(disabled), [disabled])
-  const contentWrapperClasses = 'absolute z-50'
   const arrowClasses = useMemo(() => getPopconfirmArrowClasses(actualPlacement), [actualPlacement])
   const contentClasses = getPopconfirmContentClasses()
   const titleClasses = getPopconfirmTitleClasses()
@@ -208,11 +199,12 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     <div ref={containerRef} className={containerClasses} style={mergedStyle} {...divProps}>
       <div ref={triggerRef}>{triggerNode}</div>
 
-      {renderBodyPortal(
+      {renderOverlayPortal(
         <div
           ref={floatingRef}
-          className={contentWrapperClasses}
-          style={contentWrapperStyles}
+          className={floatingClasses}
+          style={baseFloatingStyles}
+          data-positioned={positioned}
           hidden={!currentVisible}
           aria-hidden={!currentVisible}>
           <div className="relative">
@@ -251,7 +243,8 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        overlayTarget
       )}
     </div>
   )

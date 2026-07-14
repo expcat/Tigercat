@@ -1,14 +1,4 @@
-import {
-  defineComponent,
-  computed,
-  ref,
-  h,
-  nextTick,
-  PropType,
-  watch,
-  onMounted,
-  onBeforeUnmount
-} from 'vue'
+import { defineComponent, computed, ref, h, nextTick, PropType, watch } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -58,6 +48,7 @@ import {
 
 import { createFilledIcon } from '../utils/icon-helpers'
 import { useTigerConfig } from './ConfigProvider'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 // Icons
 const ClockIcon = createFilledIcon(clockSolidIcon20PathD, 'w-5 h-5')
@@ -272,6 +263,17 @@ export const TimePicker = defineComponent({
     const panelRef = ref<HTMLElement | null>(null)
     const inputWrapperRef = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
+    const overlay = useVueAnchoredOverlay({
+      enabled: isOpen,
+      referenceRef: inputWrapperRef,
+      floatingRef: panelRef,
+      placement: 'bottom-start',
+      offset: 4,
+      layout: 'bottom-sheet-sm',
+      dismissOnOutside: true,
+      dismissOnEscape: true,
+      onDismiss: closePanel
+    })
 
     const isRangeMode = computed(() => props.range === true)
     const activePart = ref<'start' | 'end'>('start')
@@ -418,11 +420,7 @@ export const TimePicker = defineComponent({
 
       const active = document.activeElement as HTMLElement | null
       const unit = active?.getAttribute('data-tiger-timepicker-unit') as
-        | 'hour'
-        | 'minute'
-        | 'second'
-        | 'period'
-        | null
+        'hour' | 'minute' | 'second' | 'period' | null
 
       if (!unit) return
 
@@ -624,25 +622,12 @@ export const TimePicker = defineComponent({
       )
     }
 
-    function handleClickOutside(event: Event) {
-      if (
-        panelRef.value &&
-        inputWrapperRef.value &&
-        !panelRef.value.contains(event.target as Node) &&
-        !inputWrapperRef.value.contains(event.target as Node)
-      ) {
-        closePanel()
-      }
-    }
-
     function handleInputClick() {
       togglePanel()
     }
 
     watch(isOpen, async (newValue) => {
       if (newValue) {
-        document.addEventListener('click', handleClickOutside)
-
         await nextTick()
         const panel = panelRef.value
         if (!panel) return
@@ -661,19 +646,7 @@ export const TimePicker = defineComponent({
         ) as HTMLButtonElement | null
 
         firstHour?.focus()
-      } else {
-        document.removeEventListener('click', handleClickOutside)
       }
-    })
-
-    onMounted(() => {
-      if (isOpen.value) {
-        document.addEventListener('click', handleClickOutside)
-      }
-    })
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside)
     })
 
     return () => {
@@ -736,267 +709,272 @@ export const TimePicker = defineComponent({
         ),
         // Time picker panel
         isOpen.value &&
-          h(
-            'div',
-            {
-              ref: panelRef,
-              class: timePickerPanelClasses,
-              role: 'dialog',
-              'aria-label': labels.value.dialog,
-              onKeydown: handlePanelKeydown
-            },
-            [
-              // Range header
-              isRangeMode.value &&
-                h('div', { class: timePickerRangeHeaderClasses }, [
-                  h(
-                    'button',
-                    {
-                      type: 'button',
-                      class: getTimePickerRangeTabButtonClasses(activePart.value === 'start'),
-                      onClick: () => (activePart.value = 'start'),
-                      'aria-label': labels.value.start,
-                      'aria-selected': activePart.value === 'start'
-                    },
-                    labels.value.start
-                  ),
-                  h(
-                    'button',
-                    {
-                      type: 'button',
-                      class: getTimePickerRangeTabButtonClasses(activePart.value === 'end'),
-                      onClick: () => (activePart.value = 'end'),
-                      'aria-label': labels.value.end,
-                      'aria-selected': activePart.value === 'end'
-                    },
-                    labels.value.end
-                  )
-                ]),
-
-              // Columns container
-              h('div', { class: timePickerMobileWheelClasses }, [
-                h(
-                  'select',
-                  {
-                    class: timePickerMobileWheelSelectClasses,
-                    value:
-                      props.format === '12'
-                        ? to12HourFormat(selectedHours.value).hours
-                        : selectedHours.value,
-                    'aria-label': labels.value.hour,
-                    onChange: (event: Event) =>
-                      selectHour(Number((event.target as HTMLSelectElement).value))
-                  },
-                  hoursList.value.map((hour) =>
-                    h('option', { value: hour, disabled: isHourDisabled(hour) }, padTwo(hour))
-                  )
-                ),
-                h(
-                  'select',
-                  {
-                    class: timePickerMobileWheelSelectClasses,
-                    value: selectedMinutes.value,
-                    'aria-label': labels.value.minute,
-                    onChange: (event: Event) =>
-                      selectMinute(Number((event.target as HTMLSelectElement).value))
-                  },
-                  minutesList.value.map((minute) =>
+          renderVueOverlayTeleport(
+            h(
+              'div',
+              {
+                ref: panelRef,
+                class: classNames(timePickerPanelClasses, overlay.floatingClasses.value),
+                style: overlay.floatingStyles.value,
+                'data-positioned': overlay.positioned.value,
+                role: 'dialog',
+                'aria-label': labels.value.dialog,
+                onKeydown: handlePanelKeydown
+              },
+              [
+                // Range header
+                isRangeMode.value &&
+                  h('div', { class: timePickerRangeHeaderClasses }, [
                     h(
-                      'option',
-                      { value: minute, disabled: isMinuteDisabled(minute) },
-                      padTwo(minute)
+                      'button',
+                      {
+                        type: 'button',
+                        class: getTimePickerRangeTabButtonClasses(activePart.value === 'start'),
+                        onClick: () => (activePart.value = 'start'),
+                        'aria-label': labels.value.start,
+                        'aria-selected': activePart.value === 'start'
+                      },
+                      labels.value.start
+                    ),
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: getTimePickerRangeTabButtonClasses(activePart.value === 'end'),
+                        onClick: () => (activePart.value = 'end'),
+                        'aria-label': labels.value.end,
+                        'aria-selected': activePart.value === 'end'
+                      },
+                      labels.value.end
                     )
-                  )
-                ),
-                props.showSeconds &&
+                  ]),
+
+                // Columns container
+                h('div', { class: timePickerMobileWheelClasses }, [
                   h(
                     'select',
                     {
                       class: timePickerMobileWheelSelectClasses,
-                      value: selectedSeconds.value,
-                      'aria-label': labels.value.second,
+                      value:
+                        props.format === '12'
+                          ? to12HourFormat(selectedHours.value).hours
+                          : selectedHours.value,
+                      'aria-label': labels.value.hour,
                       onChange: (event: Event) =>
-                        selectSecond(Number((event.target as HTMLSelectElement).value))
+                        selectHour(Number((event.target as HTMLSelectElement).value))
                     },
-                    secondsList.value.map((second) =>
+                    hoursList.value.map((hour) =>
+                      h('option', { value: hour, disabled: isHourDisabled(hour) }, padTwo(hour))
+                    )
+                  ),
+                  h(
+                    'select',
+                    {
+                      class: timePickerMobileWheelSelectClasses,
+                      value: selectedMinutes.value,
+                      'aria-label': labels.value.minute,
+                      onChange: (event: Event) =>
+                        selectMinute(Number((event.target as HTMLSelectElement).value))
+                    },
+                    minutesList.value.map((minute) =>
                       h(
                         'option',
-                        { value: second, disabled: isSecondDisabled(second) },
-                        padTwo(second)
+                        { value: minute, disabled: isMinuteDisabled(minute) },
+                        padTwo(minute)
                       )
                     )
                   ),
-                props.format === '12' &&
-                  h(
-                    'select',
-                    {
-                      class: timePickerMobileWheelSelectClasses,
-                      value: selectedPeriod.value,
-                      'aria-label': 'Period',
-                      onChange: (event: Event) =>
-                        selectPeriod((event.target as HTMLSelectElement).value as 'AM' | 'PM')
-                    },
-                    [
-                      h('option', { value: 'AM' }, periodLabels.value.am),
-                      h('option', { value: 'PM' }, periodLabels.value.pm)
-                    ]
-                  )
-              ]),
-
-              h('div', { class: timePickerDesktopPanelContentClasses }, [
-                // Hours column
-                h('div', { class: timePickerColumnClasses }, [
-                  h('div', { class: timePickerColumnHeaderClasses }, labels.value.hour),
-                  h(
-                    'div',
-                    { class: timePickerColumnListClasses },
-                    hoursList.value.map((hour) => {
-                      const hours24 =
-                        props.format === '12' ? to24HourFormat(hour, selectedPeriod.value) : hour
-                      const isSelected = selectedHours.value === hours24
-                      const isDisabled = isHourDisabled(hour)
-
-                      return h(
-                        'button',
-                        {
-                          key: hour,
-                          type: 'button',
-                          class: getTimePickerItemClasses(isSelected, isDisabled),
-                          disabled: isDisabled,
-                          onClick: () => selectHour(hour),
-                          'data-tiger-timepicker-unit': 'hour',
-                          'aria-label': getTimePickerOptionAriaLabel(
-                            hour,
-                            'hour',
-                            mergedLocale.value,
-                            props.labels
-                          ),
-                          'aria-selected': isSelected
-                        },
-                        padTwo(hour)
+                  props.showSeconds &&
+                    h(
+                      'select',
+                      {
+                        class: timePickerMobileWheelSelectClasses,
+                        value: selectedSeconds.value,
+                        'aria-label': labels.value.second,
+                        onChange: (event: Event) =>
+                          selectSecond(Number((event.target as HTMLSelectElement).value))
+                      },
+                      secondsList.value.map((second) =>
+                        h(
+                          'option',
+                          { value: second, disabled: isSecondDisabled(second) },
+                          padTwo(second)
+                        )
                       )
-                    })
-                  )
+                    ),
+                  props.format === '12' &&
+                    h(
+                      'select',
+                      {
+                        class: timePickerMobileWheelSelectClasses,
+                        value: selectedPeriod.value,
+                        'aria-label': 'Period',
+                        onChange: (event: Event) =>
+                          selectPeriod((event.target as HTMLSelectElement).value as 'AM' | 'PM')
+                      },
+                      [
+                        h('option', { value: 'AM' }, periodLabels.value.am),
+                        h('option', { value: 'PM' }, periodLabels.value.pm)
+                      ]
+                    )
                 ]),
-                // Minutes column
-                h('div', { class: timePickerColumnClasses }, [
-                  h('div', { class: timePickerColumnHeaderClasses }, labels.value.minute),
-                  h(
-                    'div',
-                    { class: timePickerColumnListClasses },
-                    minutesList.value.map((minute) => {
-                      const isSelected = selectedMinutes.value === minute
-                      const isDisabled = isMinuteDisabled(minute)
 
-                      return h(
-                        'button',
-                        {
-                          key: minute,
-                          type: 'button',
-                          class: getTimePickerItemClasses(isSelected, isDisabled),
-                          disabled: isDisabled,
-                          onClick: () => selectMinute(minute),
-                          'data-tiger-timepicker-unit': 'minute',
-                          'aria-label': getTimePickerOptionAriaLabel(
-                            minute,
-                            'minute',
-                            mergedLocale.value,
-                            props.labels
-                          ),
-                          'aria-selected': isSelected
-                        },
-                        padTwo(minute)
-                      )
-                    })
-                  )
-                ]),
-                // Seconds column (if enabled)
-                props.showSeconds &&
+                h('div', { class: timePickerDesktopPanelContentClasses }, [
+                  // Hours column
                   h('div', { class: timePickerColumnClasses }, [
-                    h('div', { class: timePickerColumnHeaderClasses }, labels.value.second),
+                    h('div', { class: timePickerColumnHeaderClasses }, labels.value.hour),
                     h(
                       'div',
                       { class: timePickerColumnListClasses },
-                      secondsList.value.map((second) => {
-                        const isSelected = selectedSeconds.value === second
-                        const isDisabled = isSecondDisabled(second)
+                      hoursList.value.map((hour) => {
+                        const hours24 =
+                          props.format === '12' ? to24HourFormat(hour, selectedPeriod.value) : hour
+                        const isSelected = selectedHours.value === hours24
+                        const isDisabled = isHourDisabled(hour)
 
                         return h(
                           'button',
                           {
-                            key: second,
+                            key: hour,
                             type: 'button',
                             class: getTimePickerItemClasses(isSelected, isDisabled),
                             disabled: isDisabled,
-                            onClick: () => selectSecond(second),
-                            'data-tiger-timepicker-unit': 'second',
+                            onClick: () => selectHour(hour),
+                            'data-tiger-timepicker-unit': 'hour',
                             'aria-label': getTimePickerOptionAriaLabel(
-                              second,
-                              'second',
+                              hour,
+                              'hour',
                               mergedLocale.value,
                               props.labels
                             ),
                             'aria-selected': isSelected
                           },
-                          padTwo(second)
+                          padTwo(hour)
                         )
                       })
                     )
                   ]),
-                // AM/PM column (if 12-hour format)
-                props.format === '12' &&
+                  // Minutes column
                   h('div', { class: timePickerColumnClasses }, [
-                    h('div', { class: timePickerColumnHeaderClasses }, ' '),
-                    h('div', { class: 'flex flex-col' }, [
+                    h('div', { class: timePickerColumnHeaderClasses }, labels.value.minute),
+                    h(
+                      'div',
+                      { class: timePickerColumnListClasses },
+                      minutesList.value.map((minute) => {
+                        const isSelected = selectedMinutes.value === minute
+                        const isDisabled = isMinuteDisabled(minute)
+
+                        return h(
+                          'button',
+                          {
+                            key: minute,
+                            type: 'button',
+                            class: getTimePickerItemClasses(isSelected, isDisabled),
+                            disabled: isDisabled,
+                            onClick: () => selectMinute(minute),
+                            'data-tiger-timepicker-unit': 'minute',
+                            'aria-label': getTimePickerOptionAriaLabel(
+                              minute,
+                              'minute',
+                              mergedLocale.value,
+                              props.labels
+                            ),
+                            'aria-selected': isSelected
+                          },
+                          padTwo(minute)
+                        )
+                      })
+                    )
+                  ]),
+                  // Seconds column (if enabled)
+                  props.showSeconds &&
+                    h('div', { class: timePickerColumnClasses }, [
+                      h('div', { class: timePickerColumnHeaderClasses }, labels.value.second),
                       h(
-                        'button',
-                        {
-                          type: 'button',
-                          class: getTimePickerPeriodButtonClasses(selectedPeriod.value === 'AM'),
-                          onClick: () => selectPeriod('AM'),
-                          'data-tiger-timepicker-unit': 'period',
-                          'aria-label': periodLabels.value.am,
-                          'aria-selected': selectedPeriod.value === 'AM'
-                        },
-                        periodLabels.value.am
-                      ),
-                      h(
-                        'button',
-                        {
-                          type: 'button',
-                          class: getTimePickerPeriodButtonClasses(selectedPeriod.value === 'PM'),
-                          onClick: () => selectPeriod('PM'),
-                          'data-tiger-timepicker-unit': 'period',
-                          'aria-label': periodLabels.value.pm,
-                          'aria-selected': selectedPeriod.value === 'PM'
-                        },
-                        periodLabels.value.pm
+                        'div',
+                        { class: timePickerColumnListClasses },
+                        secondsList.value.map((second) => {
+                          const isSelected = selectedSeconds.value === second
+                          const isDisabled = isSecondDisabled(second)
+
+                          return h(
+                            'button',
+                            {
+                              key: second,
+                              type: 'button',
+                              class: getTimePickerItemClasses(isSelected, isDisabled),
+                              disabled: isDisabled,
+                              onClick: () => selectSecond(second),
+                              'data-tiger-timepicker-unit': 'second',
+                              'aria-label': getTimePickerOptionAriaLabel(
+                                second,
+                                'second',
+                                mergedLocale.value,
+                                props.labels
+                              ),
+                              'aria-selected': isSelected
+                            },
+                            padTwo(second)
+                          )
+                        })
                       )
+                    ]),
+                  // AM/PM column (if 12-hour format)
+                  props.format === '12' &&
+                    h('div', { class: timePickerColumnClasses }, [
+                      h('div', { class: timePickerColumnHeaderClasses }, ' '),
+                      h('div', { class: 'flex flex-col' }, [
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            class: getTimePickerPeriodButtonClasses(selectedPeriod.value === 'AM'),
+                            onClick: () => selectPeriod('AM'),
+                            'data-tiger-timepicker-unit': 'period',
+                            'aria-label': periodLabels.value.am,
+                            'aria-selected': selectedPeriod.value === 'AM'
+                          },
+                          periodLabels.value.am
+                        ),
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            class: getTimePickerPeriodButtonClasses(selectedPeriod.value === 'PM'),
+                            onClick: () => selectPeriod('PM'),
+                            'data-tiger-timepicker-unit': 'period',
+                            'aria-label': periodLabels.value.pm,
+                            'aria-selected': selectedPeriod.value === 'PM'
+                          },
+                          periodLabels.value.pm
+                        )
+                      ])
                     ])
-                  ])
-              ]),
-              // Footer
-              h('div', { class: timePickerFooterClasses }, [
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: timePickerFooterButtonClasses,
-                    onClick: setNow
-                  },
-                  labels.value.now
-                ),
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: timePickerFooterButtonClasses,
-                    onClick: closePanel
-                  },
-                  labels.value.ok
-                )
-              ])
-            ]
+                ]),
+                // Footer
+                h('div', { class: timePickerFooterClasses }, [
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: timePickerFooterButtonClasses,
+                      onClick: setNow
+                    },
+                    labels.value.now
+                  ),
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: timePickerFooterButtonClasses,
+                      onClick: closePanel
+                    },
+                    labels.value.ok
+                  )
+                ])
+              ]
+            ),
+            overlay.target.value
           )
       ])
     }

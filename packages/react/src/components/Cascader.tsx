@@ -29,6 +29,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 type CascaderDivProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'>
 
@@ -109,6 +110,19 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
 
   const triggerRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const overlay = useAnchoredOverlay({
+    enabled: isOpen,
+    referenceRef: triggerRef,
+    floatingRef: dropdownRef,
+    placement: 'bottom-start',
+    offset: 4,
+    layout: 'fullscreen-sm',
+    matchReferenceWidth: true,
+    dismissOnOutside: true,
+    dismissOnEscape: true,
+    restoreFocusOnDismiss: true,
+    onDismiss: () => setIsOpen(false)
+  })
 
   const displayLabel = useMemo(
     () => getCascaderDisplayLabel(options, value, separator),
@@ -134,40 +148,23 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
     [size, disabled, isOpen, className]
   )
 
+  const updateSearchValue = useCallback(
+    (nextValue: string) => {
+      if (searchValue === undefined) {
+        setUncontrolledSearchValue(nextValue)
+      }
+      onSearchChange?.(nextValue)
+    },
+    [onSearchChange, searchValue]
+  )
+
   // Sync active path when dropdown opens
   useEffect(() => {
     if (isOpen) {
       setActivePath(value ? [...value] : [])
       updateSearchValue('')
     }
-  }, [isOpen, value])
-
-  function updateSearchValue(value: string) {
-    if (searchValue === undefined) {
-      setUncontrolledSearchValue(value)
-    }
-    onSearchChange?.(value)
-  }
-
-  // Click outside to close
-  useEffect(() => {
-    if (!isOpen) return
-
-    function handleClick(e: MouseEvent) {
-      const target = e.target as Node
-      if (
-        triggerRef.current &&
-        !triggerRef.current.contains(target) &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(target)
-      ) {
-        setIsOpen(false)
-      }
-    }
-
-    document.addEventListener('click', handleClick, true)
-    return () => document.removeEventListener('click', handleClick, true)
-  }, [isOpen])
+  }, [isOpen, updateSearchValue, value])
 
   const toggleOpen = useCallback(() => {
     if (disabled) return
@@ -290,100 +287,118 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
       </button>
 
       {/* Dropdown */}
-      {isOpen && (
-        <div
-          ref={dropdownRef}
-          className={classNames(cascaderDropdownClasses, isSearchMode && 'flex-col')}>
-          {/* Search input */}
-          {searchable && (
-            <input
-              type="text"
-              className={cascaderSearchInputClasses}
-              placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
-              value={searchQuery}
-              onChange={(e) => updateSearchValue(e.target.value)}
-              aria-label={resolveLocaleText(
-                'Search options',
-                mergedLocale?.common?.searchPlaceholder
-              )}
-            />
-          )}
+      {renderOverlayPortal(
+        isOpen ? (
+          <div
+            ref={dropdownRef}
+            className={classNames(
+              cascaderDropdownClasses,
+              isSearchMode && 'flex-col',
+              overlay.floatingClasses
+            )}
+            style={overlay.floatingStyles}
+            data-positioned={overlay.positioned}>
+            {/* Search input */}
+            {searchable && (
+              <input
+                type="text"
+                className={cascaderSearchInputClasses}
+                placeholder={resolveLocaleText(
+                  'Search...',
+                  mergedLocale?.common?.searchPlaceholder
+                )}
+                value={searchQuery}
+                onChange={(e) => updateSearchValue(e.target.value)}
+                aria-label={resolveLocaleText(
+                  'Search options',
+                  mergedLocale?.common?.searchPlaceholder
+                )}
+              />
+            )}
 
-          {isSearchMode ? (
-            // Search results
-            searchResults.length === 0 ? (
-              <div className={cascaderEmptyStateClasses}>
-                {resolveLocaleText('No results found', emptyText, mergedLocale?.common?.emptyText)}
-              </div>
+            {isSearchMode ? (
+              // Search results
+              searchResults.length === 0 ? (
+                <div className={cascaderEmptyStateClasses}>
+                  {resolveLocaleText(
+                    'No results found',
+                    emptyText,
+                    mergedLocale?.common?.emptyText
+                  )}
+                </div>
+              ) : (
+                <div
+                  className="max-h-64 overflow-auto"
+                  {...getPickerListboxAria({ id: listboxId })}>
+                  {searchResults.map((item) => (
+                    <div
+                      key={item.valuePath.join(',')}
+                      className={classNames(
+                        cascaderSearchResultClasses,
+                        item.disabled && 'opacity-50 cursor-not-allowed'
+                      )}
+                      {...getPickerOptionAria({
+                        selected: value?.join(',') === item.valuePath.join(','),
+                        disabled: item.disabled
+                      })}
+                      onClick={() => handleSearchResultClick(item.valuePath, item.disabled)}>
+                      {typeof searchable === 'object' && searchable.render
+                        ? searchable.render(searchQuery, item.path)
+                        : item.label}
+                    </div>
+                  ))}
+                </div>
+              )
             ) : (
-              <div className="max-h-64 overflow-auto" {...getPickerListboxAria({ id: listboxId })}>
-                {searchResults.map((item) => (
+              // Cascading columns
+              <div className="flex">
+                {columns.map((col, colIndex) => (
                   <div
-                    key={item.valuePath.join(',')}
-                    className={classNames(
-                      cascaderSearchResultClasses,
-                      item.disabled && 'opacity-50 cursor-not-allowed'
-                    )}
-                    {...getPickerOptionAria({
-                      selected: value?.join(',') === item.valuePath.join(','),
-                      disabled: item.disabled
+                    key={colIndex}
+                    className={cascaderColumnClasses}
+                    {...getPickerListboxAria({
+                      id: colIndex === 0 ? listboxId : undefined,
+                      label: `Level ${colIndex + 1}`
                     })}
-                    onClick={() => handleSearchResultClick(item.valuePath, item.disabled)}>
-                    {typeof searchable === 'object' && searchable.render
-                      ? searchable.render(searchQuery, item.path)
-                      : item.label}
+                    aria-label={`Level ${colIndex + 1}`}>
+                    {col.options.map((option) => {
+                      const isSelected = col.selectedValue === option.value
+                      const hasChildren = isCascaderOptionExpandable(option)
+
+                      return (
+                        <div
+                          key={option.value}
+                          className={getCascaderOptionClasses(isSelected, !!option.disabled, size)}
+                          {...getPickerOptionAria({
+                            selected: isSelected,
+                            disabled: !!option.disabled
+                          })}
+                          onClick={() => handleOptionClick(option, colIndex)}
+                          onMouseEnter={() => handleOptionHover(option, colIndex)}>
+                          <span className="flex-1 truncate">{option.label}</span>
+                          {hasChildren && (
+                            <svg
+                              className="w-4 h-4 text-[var(--tiger-text-muted,#9ca3af)]"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 20 20"
+                              fill="currentColor">
+                              <path
+                                fillRule="evenodd"
+                                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 ))}
               </div>
-            )
-          ) : (
-            // Cascading columns
-            <div className="flex">
-              {columns.map((col, colIndex) => (
-                <div
-                  key={colIndex}
-                  className={cascaderColumnClasses}
-                  {...getPickerListboxAria({
-                    id: colIndex === 0 ? listboxId : undefined,
-                    label: `Level ${colIndex + 1}`
-                  })}
-                  aria-label={`Level ${colIndex + 1}`}>
-                  {col.options.map((option) => {
-                    const isSelected = col.selectedValue === option.value
-                    const hasChildren = isCascaderOptionExpandable(option)
-
-                    return (
-                      <div
-                        key={option.value}
-                        className={getCascaderOptionClasses(isSelected, !!option.disabled, size)}
-                        {...getPickerOptionAria({
-                          selected: isSelected,
-                          disabled: !!option.disabled
-                        })}
-                        onClick={() => handleOptionClick(option, colIndex)}
-                        onMouseEnter={() => handleOptionHover(option, colIndex)}>
-                        <span className="flex-1 truncate">{option.label}</span>
-                        {hasChildren && (
-                          <svg
-                            className="w-4 h-4 text-[var(--tiger-text-muted,#9ca3af)]"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path
-                              fillRule="evenodd"
-                              d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ) : null,
+        overlay.target
       )}
     </div>
   )

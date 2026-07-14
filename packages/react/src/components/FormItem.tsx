@@ -14,6 +14,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useFormContext } from './Form'
 import { FormItemControlProvider } from './FormItemContext'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 export interface FormItemProps extends CoreFormItemProps {
   /**
@@ -82,6 +83,8 @@ export const FormItem: React.FC<FormItemProps> = ({
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [shakeTrigger, setShakeTrigger] = useState(0)
   const prevFormErrorRef = useRef<string>('')
+  const contentRef = useRef<HTMLDivElement>(null)
+  const errorRef = useRef<HTMLDivElement>(null)
 
   const reactId = useId()
   const baseId = `tiger-form-item-${reactId}`
@@ -189,6 +192,14 @@ export const FormItem: React.FC<FormItemProps> = ({
   }, [name, formContext, rules])
 
   const hasError = !!errorMessage
+  const popupErrorVisible = showMessage && hasError && errorDisplayMode === 'popup'
+  const overlay = useAnchoredOverlay({
+    enabled: popupErrorVisible,
+    referenceRef: contentRef,
+    floatingRef: errorRef,
+    placement: 'bottom-start',
+    offset: 4
+  })
 
   const describedById = useMemo(
     () => (showMessage && hasError ? errorId : undefined),
@@ -320,7 +331,7 @@ export const FormItem: React.FC<FormItemProps> = ({
           {label}
         </label>
       )}
-      <div className={contentClasses}>
+      <div ref={contentRef} className={contentClasses}>
         <div
           className={FIELD_CLASSES}
           role="group"
@@ -331,27 +342,34 @@ export const FormItem: React.FC<FormItemProps> = ({
           onChange={isClonableChild ? undefined : handleChange}>
           <FormItemControlProvider value={controlValue}>{enhancedChild}</FormItemControlProvider>
         </div>
-        {showMessage && (
-          <div
-            id={hasError ? errorId : undefined}
-            role={hasError ? 'alert' : undefined}
-            className={
-              errorDisplayMode === 'block'
-                ? classNames(
-                    'mt-1 p-2 rounded bg-red-50 border border-red-200 text-red-600 text-sm',
-                    !hasError && 'hidden'
-                  )
-                : errorDisplayMode === 'popup'
+        {showMessage &&
+          renderOverlayPortal(
+            <div
+              ref={errorRef}
+              id={hasError ? errorId : undefined}
+              role={hasError ? 'alert' : undefined}
+              className={
+                errorDisplayMode === 'block'
                   ? classNames(
-                      'absolute z-10 mt-1 px-2 py-1 rounded bg-red-600 text-white text-xs shadow-lg',
+                      'mt-1 p-2 rounded bg-red-50 border border-red-200 text-red-600 text-sm',
                       !hasError && 'hidden'
                     )
-                  : errorClasses
-            }
-            aria-hidden={hasError ? undefined : true}>
-            {hasError ? errorMessage : ''}
-          </div>
-        )}
+                  : errorDisplayMode === 'popup'
+                    ? classNames(
+                        'px-2 py-1 rounded bg-red-600 text-white text-xs shadow-lg',
+                        overlay.floatingClasses,
+                        !hasError && 'hidden'
+                      )
+                    : errorClasses
+              }
+              style={errorDisplayMode === 'popup' ? overlay.floatingStyles : undefined}
+              data-positioned={errorDisplayMode === 'popup' ? overlay.positioned : undefined}
+              aria-hidden={hasError ? undefined : true}>
+              {hasError ? errorMessage : ''}
+            </div>,
+            overlay.target,
+            errorDisplayMode !== 'popup'
+          )}
       </div>
     </div>
   )

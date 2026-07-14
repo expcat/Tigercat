@@ -23,6 +23,7 @@ import {
   closeSolidIcon20PathD
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 export interface AutoCompleteProps
   extends
@@ -108,6 +109,20 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
   const [activeIndex, setActiveIndex] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const overlay = useAnchoredOverlay({
+    enabled: isOpen,
+    referenceRef: inputRef,
+    floatingRef: dropdownRef,
+    containerRef,
+    placement: 'bottom-start',
+    offset: 4,
+    matchReferenceWidth: true,
+    dismissOnOutside: true,
+    dismissOnEscape: true,
+    restoreFocusOnDismiss: true,
+    onDismiss: closeDropdown
+  })
 
   // Sync external value
   useEffect(() => {
@@ -225,19 +240,42 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
     }
   }
 
-  // Click outside
-  useEffect(() => {
-    if (!isOpen) return
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        closeDropdown()
-      }
-    }
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [isOpen])
-
   const containerClasses = classNames(autoCompleteBaseClasses, className)
+  const dropdown =
+    isOpen && (filteredOptions.length > 0 || inputValue) ? (
+      <div
+        ref={dropdownRef}
+        {...(filteredOptions.length > 0 ? getPickerListboxAria({ id: listboxId }) : {})}
+        className={classNames(
+          autoCompleteDropdownClasses,
+          filteredOptions.length === 0 && autoCompleteEmptyStateClasses,
+          overlay.floatingClasses
+        )}
+        style={overlay.floatingStyles}
+        data-positioned={overlay.positioned}>
+        {filteredOptions.length > 0
+          ? filteredOptions.map((option, index) => (
+              <div
+                key={String(option.value)}
+                id={getPickerOptionId(listboxId, index)}
+                {...getPickerOptionAria({
+                  selected: String(option.value) === String(value),
+                  disabled: !!option.disabled
+                })}
+                className={getAutoCompleteOptionClasses(
+                  String(option.value) === String(value),
+                  !!option.disabled,
+                  size
+                )}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => handleSelect(option)}
+                onMouseEnter={() => setActiveIndex(index)}>
+                {option.label}
+              </div>
+            ))
+          : resolvedNotFoundText}
+      </div>
+    ) : null
 
   return (
     <div ref={containerRef} className={containerClasses} {...divProps}>
@@ -272,35 +310,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
         </button>
       )}
 
-      {isOpen && filteredOptions.length > 0 && (
-        <div {...getPickerListboxAria({ id: listboxId })} className={autoCompleteDropdownClasses}>
-          {filteredOptions.map((option, index) => (
-            <div
-              key={String(option.value)}
-              id={getPickerOptionId(listboxId, index)}
-              {...getPickerOptionAria({
-                selected: String(option.value) === String(value),
-                disabled: !!option.disabled
-              })}
-              className={getAutoCompleteOptionClasses(
-                String(option.value) === String(value),
-                !!option.disabled,
-                size
-              )}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => handleSelect(option)}
-              onMouseEnter={() => setActiveIndex(index)}>
-              {option.label}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {isOpen && inputValue && filteredOptions.length === 0 && (
-        <div className={classNames(autoCompleteDropdownClasses, autoCompleteEmptyStateClasses)}>
-          {resolvedNotFoundText}
-        </div>
-      )}
+      {renderOverlayPortal(dropdown, overlay.target)}
     </div>
   )
 }

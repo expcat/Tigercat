@@ -6,11 +6,9 @@
  * Floating UI positioning, click-outside dismiss, escape-key dismiss,
  * trigger → event-handler mapping, floating styles.
  */
-import { computed, ref, watch, onBeforeUnmount, type Ref } from 'vue'
-import { useVueFloating, useVueClickOutside, useVueEscapeKey } from './overlay'
+import { computed, ref, watch, type Ref } from 'vue'
+import { useVueAnchoredOverlay } from './overlay'
 import {
-  getTransformOrigin,
-  FLOATING_OVERLAY_Z_INDEX,
   buildTriggerHandlerMap,
   restoreFocus,
   type FloatingPlacement,
@@ -67,6 +65,9 @@ export interface UseFloatingPopupReturn {
   actualPlacement: Ref<FloatingPlacement>
   /** Computed floating wrapper styles (position + transform-origin + zIndex) */
   floatingStyles: Ref<Record<string, unknown>>
+  floatingClasses: Ref<string>
+  positioned: Ref<boolean>
+  overlayTarget: Ref<HTMLElement | null>
   /**
    * Build trigger event handlers for the current trigger type.
    * Returns a plain object ready to spread onto the trigger element.
@@ -127,66 +128,24 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
     restoreTriggerFocus()
   }
 
-  // ─── Floating positioning ────────────────────────────────────────────
-  const {
-    x,
-    y,
-    placement: actualPlacement
-  } = useVueFloating({
-    referenceRef: triggerRef,
-    floatingRef,
-    enabled: currentVisible,
-    placement: (props.placement ?? 'top') as FloatingPlacement,
-    offset: props.offset ?? 8
-  })
-
-  // ─── Overlay dismiss ─────────────────────────────────────────────────
-  let outsideClickCleanup: (() => void) | undefined
-  let escapeKeyCleanup: (() => void) | undefined
-
   const effectiveTrigger = computed<FloatingTrigger>(() =>
     multiTrigger ? (props.trigger ?? 'click') : 'click'
   )
 
-  watch(
-    [currentVisible, effectiveTrigger],
-    ([visible, trigger]) => {
-      outsideClickCleanup?.()
-      escapeKeyCleanup?.()
-      outsideClickCleanup = undefined
-      escapeKeyCleanup = undefined
-
-      if (visible && trigger === 'click') {
-        outsideClickCleanup = useVueClickOutside({
-          enabled: currentVisible,
-          refs: [containerRef, floatingRef],
-          onOutsideClick: closeAndRestoreFocus,
-          defer: true
-        })
-      }
-      if (visible && trigger !== 'manual') {
-        escapeKeyCleanup = useVueEscapeKey({
-          enabled: currentVisible,
-          onEscape: closeAndRestoreFocus
-        })
-      }
-    },
-    { immediate: true }
-  )
-
-  onBeforeUnmount(() => {
-    outsideClickCleanup?.()
-    escapeKeyCleanup?.()
+  const overlay = useVueAnchoredOverlay({
+    enabled: currentVisible,
+    referenceRef: triggerRef,
+    floatingRef,
+    containerRef,
+    placement: (props.placement ?? 'top') as FloatingPlacement,
+    offset: props.offset ?? 8,
+    dismissOnOutside: computed(() => effectiveTrigger.value === 'click'),
+    dismissOnEscape: computed(() => effectiveTrigger.value !== 'manual'),
+    onDismiss: closeAndRestoreFocus
   })
 
-  // ─── Floating styles ─────────────────────────────────────────────────
-  const floatingStyles = computed(() => ({
-    position: 'absolute' as const,
-    left: `${x.value}px`,
-    top: `${y.value}px`,
-    transformOrigin: getTransformOrigin(actualPlacement.value),
-    zIndex: FLOATING_OVERLAY_Z_INDEX
-  }))
+  const x = overlay.x
+  const y = overlay.y
 
   // ─── Trigger handlers ────────────────────────────────────────────────
   const handleToggle = () => {
@@ -219,8 +178,11 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
     floatingRef,
     x,
     y,
-    actualPlacement,
-    floatingStyles,
+    actualPlacement: overlay.placement,
+    floatingStyles: overlay.floatingStyles,
+    floatingClasses: overlay.floatingClasses,
+    positioned: overlay.positioned,
+    overlayTarget: overlay.target,
     triggerHandlers,
     closeAndRestoreFocus
   }

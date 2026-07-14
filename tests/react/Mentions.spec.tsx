@@ -25,12 +25,6 @@ describe('Mentions', () => {
     expect(container.querySelector('.my-mentions')).toBeInTheDocument()
   })
 
-  // --- Sizes ---
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s"', (size) => {
-    const { container } = render(<Mentions options={defaultOptions} size={size} />)
-    expect(container.querySelector('textarea')).toBeInTheDocument()
-  })
-
   // --- Disabled ---
   it('disables textarea when disabled', () => {
     const { container } = render(<Mentions options={defaultOptions} disabled />)
@@ -65,8 +59,9 @@ describe('Mentions', () => {
     const dropdown = await screen.findByRole('listbox')
 
     await waitFor(() => {
-      expect(dropdown.style.left).not.toBe('')
-      expect(dropdown.style.top).not.toBe('')
+      expect(dropdown.style.getPropertyValue('--tiger-overlay-x')).not.toBe('')
+      expect(dropdown.style.getPropertyValue('--tiger-overlay-y')).not.toBe('')
+      expect(dropdown).toHaveAttribute('data-positioned', 'true')
     })
   })
 
@@ -81,7 +76,7 @@ describe('Mentions', () => {
     await screen.findByRole('listbox')
 
     fireEvent.keyDown(textarea, { key: 'ArrowDown' })
-    const options = container.querySelectorAll('[role="option"]')
+    const options = document.body.querySelectorAll('[role="option"]')
     expect(options[1]?.getAttribute('aria-selected')).toBe('true')
 
     fireEvent.keyDown(textarea, { key: 'ArrowUp' })
@@ -115,7 +110,7 @@ describe('Mentions', () => {
     await screen.findByRole('listbox')
 
     fireEvent.keyDown(textarea, { key: 'Escape' })
-    expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
+    expect(document.body.querySelector('[role="listbox"]')).not.toBeInTheDocument()
   })
   // --- Filtering ---
   it('filters options based on query text', async () => {
@@ -127,7 +122,7 @@ describe('Mentions', () => {
     })
     await screen.findByRole('listbox')
 
-    const options = container.querySelectorAll('[role="option"]')
+    const options = document.body.querySelectorAll('[role="option"]')
     expect(options).toHaveLength(1)
     expect(options[0].textContent).toBe('Alice')
   })

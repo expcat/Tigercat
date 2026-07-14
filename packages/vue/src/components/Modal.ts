@@ -247,6 +247,7 @@ export const Modal = defineComponent({
     const hasBeenOpened = ref(props.open)
 
     const dialogRef = ref<HTMLElement | null>(null)
+    const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
     let touchStartPoint: GesturePoint | null = null
@@ -338,7 +339,7 @@ export const Modal = defineComponent({
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(overlayOpen)
-    useVueFocusTrap({ enabled: overlayOpen, containerRef: dialogRef })
+    useVueFocusTrap({ enabled: overlayOpen, containerRef: rootRef })
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({ enabled: overlayOpen, onEscape: handleClose })
@@ -414,6 +415,7 @@ export const Modal = defineComponent({
 
       const ariaLabelledby =
         ariaLabelledbyFromAttrs ?? (props.title || slots.title ? titleId.value : undefined)
+      const overlayHostId = `${instanceId.value}-overlay-host`
 
       const mergedClass = classNames(contentClasses.value, coerceClassValue(attrs.class))
 
@@ -518,9 +520,11 @@ export const Modal = defineComponent({
         'div',
         {
           class: modalWrapperClasses,
+          ref: rootRef,
           style: { zIndex: props.zIndex },
           hidden: !props.open,
           'aria-hidden': !props.open ? 'true' : undefined,
+          'data-tiger-overlay-layer': '',
           'data-tiger-modal-root': ''
         },
         [
@@ -546,6 +550,7 @@ export const Modal = defineComponent({
                   role: 'dialog',
                   'aria-modal': 'true',
                   'aria-labelledby': ariaLabelledby,
+                  'aria-owns': overlayHostId,
                   tabindex: -1,
                   ref: dialogRef,
                   onTouchstart: handleTouchStart,
@@ -557,7 +562,12 @@ export const Modal = defineComponent({
                 [header, body, footer]
               )
             ]
-          )
+          ),
+          h('div', {
+            id: overlayHostId,
+            class: 'contents',
+            'data-tiger-overlay-host': ''
+          })
         ]
       )
 

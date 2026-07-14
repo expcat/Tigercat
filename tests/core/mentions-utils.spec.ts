@@ -3,11 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import {
-  extractMentionQuery,
-  positionMentionsDropdown,
-  getMentionsOptionClasses
-} from '@expcat/tigercat-core'
+import { extractMentionQuery, getMentionsOptionClasses } from '@expcat/tigercat-core'
 
 describe('mentions-utils', () => {
   it('extracts mention query before the cursor', () => {
@@ -20,26 +16,5 @@ describe('mentions-utils', () => {
       'bg-[var(--tiger-mentions-option-active'
     )
     expect(getMentionsOptionClasses(false, true)).toContain('cursor-not-allowed')
-  })
-
-  it('positions dropdown with floating styles', async () => {
-    const reference = document.createElement('textarea')
-    const dropdown = document.createElement('div')
-
-    Object.defineProperty(reference, 'offsetWidth', {
-      configurable: true,
-      value: 240
-    })
-
-    document.body.append(reference, dropdown)
-
-    await positionMentionsDropdown(reference, dropdown, { matchReferenceWidth: true })
-
-    expect(dropdown.style.minWidth).toBe('240px')
-    expect(dropdown.style.left).not.toBe('')
-    expect(dropdown.style.top).not.toBe('')
-
-    reference.remove()
-    dropdown.remove()
   })
 })

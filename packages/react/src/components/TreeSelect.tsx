@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect, useId } from 'react'
+import React, { useState, useMemo, useRef, useId } from 'react'
 import type { TreeNode } from '@expcat/tigercat-core'
 import type {
   TreeSelectProps as CoreTreeSelectProps,
@@ -29,6 +29,7 @@ import {
   closeSolidIcon20PathD
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 export interface TreeSelectProps
   extends CoreTreeSelectProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
@@ -103,6 +104,21 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     defaultExpandAll ? new Set(getAllTreeSelectKeys(treeData)) : new Set()
   )
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const overlay = useAnchoredOverlay({
+    enabled: isOpen,
+    referenceRef: triggerRef,
+    floatingRef: dropdownRef,
+    containerRef,
+    placement: 'bottom-start',
+    offset: 4,
+    matchReferenceWidth: true,
+    dismissOnOutside: true,
+    dismissOnEscape: true,
+    restoreFocusOnDismiss: true,
+    onDismiss: closeDropdown
+  })
 
   const displayLabel = useMemo(() => getTreeSelectDisplayLabel(treeData, value), [treeData, value])
 
@@ -203,22 +219,11 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     }
   }
 
-  // Click outside
-  useEffect(() => {
-    if (!isOpen) return
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        closeDropdown()
-      }
-    }
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [isOpen])
-
   return (
     <div ref={containerRef} className={classNames(treeSelectBaseClasses, className)} {...divProps}>
       {/* Trigger */}
       <button
+        ref={triggerRef}
         type="button"
         className={getTreeSelectTriggerClasses(size, disabled, isOpen)}
         {...getPickerComboboxAria({ expanded: isOpen, listboxId })}
@@ -262,63 +267,77 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       </button>
 
       {/* Dropdown */}
-      {isOpen && (
-        <div {...getPickerListboxAria({ id: listboxId })} className={treeSelectDropdownClasses}>
-          {searchable && (
-            <input
-              type="text"
-              className={treeSelectSearchClasses}
-              placeholder={resolveLocaleText('Search...', mergedLocale?.common?.searchPlaceholder)}
-              value={searchQuery}
-              aria-label={resolveLocaleText('Search tree', mergedLocale?.common?.searchPlaceholder)}
-              onChange={(e) => updateSearchValue(e.target.value)}
-            />
-          )}
+      {renderOverlayPortal(
+        isOpen ? (
+          <div
+            ref={dropdownRef}
+            {...getPickerListboxAria({ id: listboxId })}
+            className={classNames(treeSelectDropdownClasses, overlay.floatingClasses)}
+            style={overlay.floatingStyles}
+            data-positioned={overlay.positioned}>
+            {searchable && (
+              <input
+                type="text"
+                className={treeSelectSearchClasses}
+                placeholder={resolveLocaleText(
+                  'Search...',
+                  mergedLocale?.common?.searchPlaceholder
+                )}
+                value={searchQuery}
+                aria-label={resolveLocaleText(
+                  'Search tree',
+                  mergedLocale?.common?.searchPlaceholder
+                )}
+                onChange={(e) => updateSearchValue(e.target.value)}
+              />
+            )}
 
-          {visibleNodes.length > 0 ? (
-            visibleNodes.map((flatNode) => {
-              const { node, level, hasChildren, isExpanded } = flatNode
-              const selected = isSelected(node.key)
-              const indent = level * 20
+            {visibleNodes.length > 0 ? (
+              visibleNodes.map((flatNode) => {
+                const { node, level, hasChildren, isExpanded } = flatNode
+                const selected = isSelected(node.key)
+                const indent = level * 20
 
-              return (
-                <div
-                  key={String(node.key)}
-                  {...getPickerOptionAria({ selected, disabled: !!node.disabled })}
-                  className={getTreeSelectNodeClasses(selected, !!node.disabled, size)}
-                  style={{ paddingLeft: `${indent + 8}px` }}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleNodeSelect(node)
-                  }}>
-                  {hasChildren ? (
-                    <span
-                      className={classNames(
-                        'inline-flex items-center justify-center w-4 h-4 mr-1 transition-transform',
-                        isExpanded ? 'rotate-90' : ''
-                      )}
-                      onClick={(e) => toggleExpand(node.key, e)}>
-                      <svg className="w-3 h-3" viewBox={icon20ViewBox} fill="currentColor">
-                        <path
-                          d={chevronRightSolidIcon20PathD}
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </span>
-                  ) : (
-                    <span className="w-4 mr-1" />
-                  )}
-                  <span className="flex-1 truncate">{node.label}</span>
-                </div>
-              )
-            })
-          ) : (
-            <div className={treeSelectEmptyClasses}>
-              {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
-            </div>
-          )}
-        </div>
+                return (
+                  <div
+                    key={String(node.key)}
+                    {...getPickerOptionAria({ selected, disabled: !!node.disabled })}
+                    className={getTreeSelectNodeClasses(selected, !!node.disabled, size)}
+                    style={{ paddingLeft: `${indent + 8}px` }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleNodeSelect(node)
+                    }}>
+                    {hasChildren ? (
+                      <span
+                        className={classNames(
+                          'inline-flex items-center justify-center w-4 h-4 mr-1 transition-transform',
+                          isExpanded ? 'rotate-90' : ''
+                        )}
+                        onClick={(e) => toggleExpand(node.key, e)}>
+                        <svg className="w-3 h-3" viewBox={icon20ViewBox} fill="currentColor">
+                          <path
+                            d={chevronRightSolidIcon20PathD}
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </span>
+                    ) : (
+                      <span className="w-4 mr-1" />
+                    )}
+                    <span className="flex-1 truncate">{node.label}</span>
+                  </div>
+                )
+              })
+            ) : (
+              <div className={treeSelectEmptyClasses}>
+                {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
+              </div>
+            )}
+          </div>
+        ) : null,
+        overlay.target
       )}
     </div>
   )

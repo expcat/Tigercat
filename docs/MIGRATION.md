@@ -6,6 +6,14 @@
 
 v2.0.0 正式版（与 v2.0.0-rc.2 公开 API 一致）。从 v1.x 升级请按本条目执行：core / React / Vue 发布面已切换为 ESM-only；React / Vue component 子路径已收敛为 PascalCase 显式 exports；tree-shaking 副作用声明、deprecated / compat API、legacy token / icon path 兼容层、示例与 references 均已按下列迁移路径收口。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。
 
+### 锚点浮层 DOM 挂载层级
+
+Select、DatePicker、Dropdown、Tooltip 等锚点浮层现在默认挂载到最近的 Modal/Drawer layer host；不在 overlay layer 中时挂载到 `document.body`。因此浮层不会参与 Modal/Drawer 内容区布局，也不会被内容区的 `overflow` 裁剪。嵌套 Modal/Drawer、自定义 `zIndex`、滚动和视口边缘碰撞由组件库自动处理，不需要业务侧追加 `overflow: visible`、提高局部 `z-index` 或判断 Modal 上下文。
+
+如果测试或业务 CSS 曾依赖“浮层是触发器 DOM 子节点”，请改为使用组件公开的 ARIA/`data-tiger-*` 标识或从 `document.body` 查询；不要用父子选择器控制浮层。Dropdown `portal={false}` / `:portal="false"` 与 Menu `popupPortal={false}` / `:popup-portal="false"` 仍保留原有就地挂载语义，但定位与 dismiss 仍由同一基础设施执行。表单组件不新增 `portal` 属性。
+
+旧组件私有定位工具 `positionMentionsDropdown`、`PositionMentionsDropdownOptions` 与 `getSubmenuPopupZIndex` 已删除。应用不应直接调用这些工具；请使用 Mentions/Menu 组件，由统一浮层层负责定位与层级。
+
 ### React / Vue component 子路径改为显式 PascalCase
 
 React / Vue 根入口 named exports 保持可用：

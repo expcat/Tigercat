@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from 'react'
 import { usePopup } from '../utils/use-popup'
-import { renderBodyPortal } from '../utils/overlay'
+import { renderOverlayPortal } from '../utils/overlay'
 import {
   classNames,
   createFloatingIdFactory,
@@ -56,8 +56,17 @@ export const Popover: React.FC<PopoverProps> = ({
   const contentId = `${popoverId}-content`
 
   // Shared popup logic
-  const { currentVisible, containerRef, triggerRef, floatingRef, floatingStyles, triggerHandlers } =
-    usePopup({ open, defaultOpen, disabled, trigger, placement, offset, onOpenChange })
+  const {
+    currentVisible,
+    containerRef,
+    triggerRef,
+    floatingRef,
+    floatingStyles,
+    floatingClasses,
+    positioned,
+    overlayTarget,
+    triggerHandlers
+  } = usePopup({ open, defaultOpen, disabled, trigger, placement, offset, onOpenChange })
 
   // Memoized classes
   const containerClasses = useMemo(
@@ -88,8 +97,13 @@ export const Popover: React.FC<PopoverProps> = ({
       </div>
 
       {currentVisible &&
-        renderBodyPortal(
-          <div ref={floatingRef} style={floatingStyles} aria-hidden={false}>
+        renderOverlayPortal(
+          <div
+            ref={floatingRef}
+            className={floatingClasses}
+            style={floatingStyles}
+            data-positioned={positioned}
+            aria-hidden={false}>
             <div
               id={popoverId}
               role="dialog"
@@ -108,7 +122,8 @@ export const Popover: React.FC<PopoverProps> = ({
                 </div>
               )}
             </div>
-          </div>
+          </div>,
+          overlayTarget
         )}
     </div>
   )

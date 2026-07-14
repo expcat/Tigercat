@@ -12,7 +12,12 @@ describe('floating utilities', () => {
       const second = getFloatingMiddleware({ offset: 8, flip: true, shift: true })
 
       expect(first).toBe(second)
-      expect(first.map((middleware) => middleware.name)).toEqual(['offset', 'flip', 'shift'])
+      expect(first.map((middleware) => middleware.name)).toEqual([
+        'offset',
+        'flip',
+        'shift',
+        'size'
+      ])
     })
 
     it('keeps distinct middleware chains for different scalar options', () => {
@@ -22,7 +27,11 @@ describe('floating utilities', () => {
 
       expect(customOffsetMiddleware).not.toBe(defaultMiddleware)
       expect(noFlipMiddleware).not.toBe(defaultMiddleware)
-      expect(noFlipMiddleware.map((middleware) => middleware.name)).toEqual(['offset', 'shift'])
+      expect(noFlipMiddleware.map((middleware) => middleware.name)).toEqual([
+        'offset',
+        'shift',
+        'size'
+      ])
     })
 
     it('caches arrow middleware per arrow element', () => {
@@ -41,6 +50,7 @@ describe('floating utilities', () => {
         'offset',
         'flip',
         'shift',
+        'size',
         'arrow'
       ])
     })

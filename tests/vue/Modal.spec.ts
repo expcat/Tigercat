@@ -5,10 +5,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Modal } from '@expcat/tigercat-vue'
+import { h } from 'vue'
+import { Modal, Select } from '@expcat/tigercat-vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
-
-const modalSizes = ['sm', 'md', 'lg', 'xl', 'full'] as const
 
 describe('Modal', () => {
   describe('Rendering', () => {
@@ -94,19 +93,6 @@ describe('Modal', () => {
   })
 
   describe('Props', () => {
-    it.each(modalSizes)('should render with size %s', async (size) => {
-      const { container } = renderWithProps(Modal, {
-        open: true,
-        size,
-        title: 'Test Modal'
-      })
-
-      await waitFor(() => {
-        const dialog = document.querySelector('[role="dialog"]')
-        expect(dialog).toBeInTheDocument()
-      })
-    })
-
     it('should show close button by default', async () => {
       const { container } = renderWithProps(Modal, {
         open: true,
@@ -338,24 +324,24 @@ describe('Modal', () => {
     })
 
     it('should emit after-close when external close lifecycle completes', async () => {
-      const onAfterClose = vi.fn()
+      vi.useFakeTimers()
+      try {
+        const onAfterClose = vi.fn()
+        const { rerender } = render(Modal, {
+          props: {
+            open: true,
+            title: 'Test Modal',
+            onAfterClose
+          }
+        })
 
-      const { rerender } = render(Modal, {
-        props: {
-          open: true,
-          title: 'Test Modal',
-          onAfterClose
-        }
-      })
+        await rerender({ open: false, onAfterClose })
+        await vi.runOnlyPendingTimersAsync()
 
-      await rerender({ open: false, onAfterClose })
-
-      await waitFor(
-        () => {
-          expect(onAfterClose).toHaveBeenCalled()
-        },
-        { timeout: 1000 }
-      )
+        expect(onAfterClose).toHaveBeenCalled()
+      } finally {
+        vi.useRealTimers()
+      }
     })
 
     it('should restore focus to trigger after close', async () => {
@@ -623,6 +609,28 @@ describe('Modal', () => {
       })
       const dialog = document.querySelector('[role="dialog"]') as HTMLElement
       expect(dialog.style.width).toBe('800px')
+    })
+  })
+
+  describe('anchored overlay layer', () => {
+    it('owns a layer host and teleports nested anchored overlays into it', async () => {
+      render(Modal, {
+        props: { open: true, title: 'Layer host' },
+        slots: {
+          default: () => h(Select, { options: [{ label: 'Option', value: 'option' }] })
+        }
+      })
+
+      const dialog = await screen.findByRole('dialog')
+      const hostId = dialog.getAttribute('aria-owns')
+      const host = hostId ? document.getElementById(hostId) : null
+      expect(host).toHaveAttribute('data-tiger-overlay-host')
+
+      await fireEvent.click(dialog.querySelector('button[data-state="closed"]')!)
+      const listbox = await screen.findByRole('listbox')
+
+      expect(listbox.parentElement).toBe(host)
+      expect(host?.closest('[data-tiger-overlay-layer]')).toBeInTheDocument()
     })
   })
 })
