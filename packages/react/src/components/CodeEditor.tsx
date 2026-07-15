@@ -10,6 +10,7 @@ import {
   handleTabKey,
   getActiveLineIndex,
   getCodeEditorActiveLineClasses,
+  getCodeEditorCaretClasses,
   codeEditorTextareaClasses,
   codeEditorHighlightClasses,
   type CodeEditorProps as CoreCodeEditorProps,
@@ -184,7 +185,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           )}
           <textarea
             ref={textareaRef}
-            className={classNames(codeEditorTextareaClasses, wrapClass)}
+            className={classNames(
+              codeEditorTextareaClasses,
+              getCodeEditorCaretClasses(theme),
+              wrapClass
+            )}
             value={code}
             onChange={handleInput}
             onKeyDown={handleKeyDown}

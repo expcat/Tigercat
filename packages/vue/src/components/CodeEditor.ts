@@ -11,6 +11,7 @@ import {
   handleTabKey,
   getActiveLineIndex,
   getCodeEditorActiveLineClasses,
+  getCodeEditorCaretClasses,
   codeEditorTextareaClasses,
   codeEditorHighlightClasses,
   type CodeLanguage,
@@ -108,7 +109,7 @@ export const CodeEditor = defineComponent({
     )
 
     const containerStyle = computed(() => {
-      const lineHeight = 1.625 // leading-relaxed ≈ 1.625rem
+      const lineHeight = 1.625 // matches leading-[1.625rem] on each editor line
       const s: Record<string, string> = {}
       if (props.minLines > 0) {
         s.minHeight = `${props.minLines * lineHeight + 1.5}rem`
@@ -212,7 +213,7 @@ export const CodeEditor = defineComponent({
 
       const textareaNode = h('textarea', {
         ref: textareaRef,
-        class: classNames(codeEditorTextareaClasses, wrapClass),
+        class: classNames(codeEditorTextareaClasses, getCodeEditorCaretClasses(props.theme), wrapClass),
         value: code.value,
         onInput,
         onKeydown: onKeyDown,

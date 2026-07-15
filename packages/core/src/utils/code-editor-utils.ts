@@ -11,7 +11,7 @@ import type { CodeLanguage, CodeEditorTheme } from '../types/code-editor'
 // ─── Style Constants ────────────────────────────────────────────────
 
 export const codeEditorBaseClasses =
-  'relative font-mono text-sm leading-relaxed border rounded overflow-hidden'
+  'relative font-mono text-sm leading-[1.625rem] border rounded overflow-hidden'
 
 export const codeEditorLightClasses = 'bg-white border-gray-200 text-gray-900'
 
@@ -20,10 +20,10 @@ export const codeEditorDarkClasses = 'bg-gray-900 border-gray-700 text-gray-100'
 export const codeEditorDisabledClasses = 'opacity-60 cursor-not-allowed'
 
 export const codeEditorTextareaClasses =
-  'absolute inset-0 w-full h-full resize-none outline-none bg-transparent text-transparent caret-current p-3 font-mono text-sm leading-relaxed whitespace-pre overflow-auto'
+  'absolute inset-0 w-full h-full resize-none outline-none bg-transparent text-transparent p-3 font-mono text-sm leading-[1.625rem] whitespace-pre overflow-auto'
 
 export const codeEditorHighlightClasses =
-  'p-3 font-mono text-sm leading-relaxed whitespace-pre overflow-auto pointer-events-none'
+  'p-3 font-mono text-sm leading-[1.625rem] whitespace-pre overflow-auto pointer-events-none'
 
 export const codeEditorLineNumberClasses =
   'select-none text-right pr-3 pl-2 border-r min-w-[3rem] flex-shrink-0'
@@ -43,6 +43,16 @@ export const codeEditorActiveLineDarkClasses = 'bg-gray-800/60'
  */
 export function getCodeEditorActiveLineClasses(theme: CodeEditorTheme): string {
   return theme === 'dark' ? codeEditorActiveLineDarkClasses : codeEditorActiveLineLightClasses
+}
+
+/**
+ * Caret (text-cursor) color for the editable textarea, matched to the
+ * theme's text color. This must be set explicitly: the textarea uses
+ * `text-transparent` to reveal the highlight layer beneath it, which turns
+ * `currentColor` transparent — so a `caret-current` caret is invisible.
+ */
+export function getCodeEditorCaretClasses(theme: CodeEditorTheme): string {
+  return theme === 'dark' ? 'caret-gray-100' : 'caret-gray-900'
 }
 
 /**
