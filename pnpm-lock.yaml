@@ -42,15 +42,18 @@ catalogs:
     axe-core:
       specifier: ^4.12.1
       version: 4.12.1
-    esbuild-wasm:
-      specifier: 0.28.1
-      version: 0.28.1
+    es-module-lexer:
+      specifier: 2.3.0
+      version: 2.3.0
     react:
       specifier: ^19.2.7
       version: 19.2.7
     react-dom:
       specifier: ^19.2.7
       version: 19.2.7
+    sucrase:
+      specifier: 3.35.1
+      version: 3.35.1
     tailwindcss:
       specifier: ^4.3.2
       version: 4.3.2
@@ -165,11 +168,11 @@ importers:
       axe-core:
         specifier: 'catalog:'
         version: 4.12.1
+      es-module-lexer:
+        specifier: 'catalog:'
+        version: 2.3.0
       esbuild:
         specifier: 0.28.1
-        version: 0.28.1
-      esbuild-wasm:
-        specifier: 'catalog:'
         version: 0.28.1
       eslint:
         specifier: ^10.6.0
@@ -201,6 +204,9 @@ importers:
       size-limit:
         specifier: ^12.1.0
         version: 12.1.0(jiti@2.7.0)
+      sucrase:
+        specifier: 'catalog:'
+        version: 3.35.1
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -222,9 +228,9 @@ importers:
       '@tailwindcss/browser':
         specifier: 'catalog:'
         version: 4.3.2
-      esbuild-wasm:
+      es-module-lexer:
         specifier: 'catalog:'
-        version: 0.28.1
+        version: 2.3.0
       react:
         specifier: 'catalog:'
         version: 19.2.7
@@ -234,6 +240,9 @@ importers:
       react-router-dom:
         specifier: ^7.18.1
         version: 7.18.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      sucrase:
+        specifier: 'catalog:'
+        version: 3.35.1
     devDependencies:
       '@tailwindcss/vite':
         specifier: 'catalog:'
@@ -271,9 +280,12 @@ importers:
       '@vue/compiler-sfc':
         specifier: 'catalog:'
         version: 3.5.39
-      esbuild-wasm:
+      es-module-lexer:
         specifier: 'catalog:'
-        version: 0.28.1
+        version: 2.3.0
+      sucrase:
+        specifier: 'catalog:'
+        version: 3.35.1
       vue:
         specifier: 'catalog:'
         version: 3.5.39(typescript@6.0.3)
@@ -3614,11 +3626,6 @@ packages:
   es-object-atoms@1.1.2:
     resolution: {integrity: sha512-HWcBoN6NileqtSydK2FqHbS/LoDd2pqrnQHLyJzBj4kOp/ky2MWMN694xOfkK8/SnUsW2DH7EfyVlydKCsm1Zw==}
     engines: {node: '>= 0.4'}
-
-  esbuild-wasm@0.28.1:
-    resolution: {integrity: sha512-p/GD4E8oYRjg3kjdKrnMb0s4PzXgJF42e0MF4H0+ACyK/kIlFRp3e0fzOleIG+wBBm6MM3XQrbpe7soEA+vJIA==}
-    engines: {node: '>=18'}
-    hasBin: true
 
   esbuild@0.28.1:
     resolution: {integrity: sha512-HrJrvZv5ayxBzPfwphOoNzkzOIIlifzk0KJrGK2c8R4+LKpMtpYLQeUdjnwjWv/LZlkH2laZk+4w78pi99D4Vw==}
@@ -9218,8 +9225,6 @@ snapshots:
   es-object-atoms@1.1.2:
     dependencies:
       es-errors: 1.3.0
-
-  esbuild-wasm@0.28.1: {}
 
   esbuild@0.28.1:
     optionalDependencies:

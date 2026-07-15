@@ -12,10 +12,11 @@
   "dependencies": {
     "@tailwindcss/browser": "catalog:",
     "@expcat/tigercat-react": "workspace:*",
-    "esbuild-wasm": "catalog:",
+    "es-module-lexer": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-router-dom": "^7.18.1"
+    "react-router-dom": "^7.18.1",
+    "sucrase": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",

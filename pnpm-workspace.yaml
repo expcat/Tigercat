@@ -32,7 +32,10 @@ catalog:
   # ── Vite plugins ───────────────────────────────
   '@vitejs/plugin-vue': ^6.0.7
   '@vitejs/plugin-react': ^6.0.3
-  esbuild-wasm: 0.28.1
+
+  # ── Playground compiler (examples) ─────────────
+  sucrase: 3.35.1
+  es-module-lexer: 2.3.0
 
   # ── Type definitions ───────────────────────────
   '@types/node': ^26.1.1

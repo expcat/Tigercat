@@ -1,4 +1,5 @@
-import type { Loader, Message } from 'esbuild-wasm'
+import { transform, type Transform } from 'sucrase'
+import { init, parse } from 'es-module-lexer'
 import type { DemoDiagnostic } from './types'
 
 const ALLOWED_IMPORTS = [
@@ -13,16 +14,6 @@ const ALLOWED_IMPORTS = [
   '@demo-runtime/'
 ]
 
-export function normalizeDemoPath(value: string): string {
-  const segments: string[] = []
-  for (const segment of value.replace(/\\/g, '/').split('/')) {
-    if (!segment || segment === '.') continue
-    if (segment === '..') segments.pop()
-    else segments.push(segment)
-  }
-  return `/${segments.join('/')}`
-}
-
 export function isBareImport(value: string): boolean {
   return !value.startsWith('.') && !value.startsWith('/')
 }
@@ -31,39 +22,53 @@ export function isAllowedImport(value: string): boolean {
   return ALLOWED_IMPORTS.some((prefix) => value === prefix || value.startsWith(prefix))
 }
 
-export function resolveDemoFile(
-  files: Record<string, string>,
-  importer: string,
-  requested: string
-): string | null {
-  const base = importer.slice(0, importer.lastIndexOf('/') + 1)
-  const candidate = normalizeDemoPath(requested.startsWith('/') ? requested : `${base}${requested}`)
-  const extensions = ['', '.ts', '.tsx', '.js', '.jsx', '.vue', '.json', '.css']
-  for (const extension of extensions) {
-    const path = `${candidate}${extension}`
-    if (path in files) return path
-  }
-  for (const extension of extensions.slice(1)) {
-    const path = `${candidate}/index${extension}`
-    if (path in files) return path
-  }
-  return null
+// Transpile a single example file to browser-ready ESM. TypeScript types are
+// erased and (for React) JSX is lowered against the automatic runtime, matching
+// the importmap's `react/jsx-runtime` entry. No bundling: examples are single
+// files whose bare imports are served by the sandbox importmap.
+export function transformModule(
+  source: string,
+  options: { filename: string; jsx: boolean }
+): string {
+  const transforms: Transform[] = ['typescript']
+  if (options.jsx) transforms.push('jsx')
+  return transform(source, {
+    transforms,
+    jsxRuntime: 'automatic',
+    production: true,
+    filePath: options.filename
+  }).code
 }
 
-export function loaderForFile(path: string): Loader {
-  if (path.endsWith('.tsx')) return 'tsx'
-  if (path.endsWith('.ts')) return 'ts'
-  if (path.endsWith('.jsx')) return 'jsx'
-  if (path.endsWith('.json')) return 'json'
-  if (path.endsWith('.css')) return 'css'
-  return 'js'
+// Collect the bare module specifiers referenced by transpiled example code and
+// enforce the import allow-list. Relative specifiers are rejected because every
+// example is a single file (see the playground compiler proposal, §5).
+export async function scanImports(code: string): Promise<string[]> {
+  await init
+  const [records] = parse(code)
+  const imports = new Set<string>()
+  for (const record of records) {
+    const specifier = record.n
+    if (!specifier) continue
+    if (!isBareImport(specifier)) {
+      throw new Error(`找不到示例文件：${specifier}`)
+    }
+    if (!isAllowedImport(specifier)) {
+      throw new Error(`不允许导入外部模块：${specifier}`)
+    }
+    imports.add(specifier)
+  }
+  return [...imports].sort()
 }
 
-export function toDiagnostics(messages: Message[]): DemoDiagnostic[] {
-  return messages.map((message) => ({
-    text: message.text,
-    file: message.location?.file,
-    line: message.location?.line,
-    column: message.location ? message.location.column + 1 : undefined
-  }))
+export function toDiagnostic(error: unknown): DemoDiagnostic {
+  if (error instanceof Error) {
+    // sucrase embeds the offending position as "(line:column)" in its message.
+    const match = /\((\d+):(\d+)\)/.exec(error.message)
+    if (match) {
+      return { text: error.message, line: Number(match[1]), column: Number(match[2]) + 1 }
+    }
+    return { text: error.message }
+  }
+  return { text: String(error) }
 }

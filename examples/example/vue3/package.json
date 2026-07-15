@@ -13,7 +13,8 @@
     "@tailwindcss/browser": "catalog:",
     "@expcat/tigercat-vue": "workspace:*",
     "@vue/compiler-sfc": "catalog:",
-    "esbuild-wasm": "catalog:",
+    "es-module-lexer": "catalog:",
+    "sucrase": "catalog:",
     "vue": "catalog:",
     "vue-router": "^5.1.0"
   },
