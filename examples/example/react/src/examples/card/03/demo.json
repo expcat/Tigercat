@@ -1,0 +1,8 @@
+{
+  "id": "card-03",
+  "title": "尺寸与内边距",
+  "description": "size 控制内边距密度；padding 可用自定义类覆盖，或设为 false 交由内容自行控制。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

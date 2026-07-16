@@ -1,0 +1,8 @@
+{
+  "id": "segmented-03",
+  "title": "块级与整体禁用",
+  "description": "block 撑满容器宽度；disabled 禁用整个控件。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

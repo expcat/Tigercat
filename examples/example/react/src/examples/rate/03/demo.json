@@ -1,0 +1,8 @@
+{
+  "id": "rate-03",
+  "title": "自定义字符、清除与只读",
+  "description": "character 渲染文本或 emoji；allowClear 支持点击清零；disabled 变为只读展示。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

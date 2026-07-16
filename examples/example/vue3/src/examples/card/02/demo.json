@@ -1,0 +1,8 @@
+{
+  "id": "card-02",
+  "title": "五种变体",
+  "description": "variant 覆盖 default、bordered、shadow、elevated、transparent 五种外观。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

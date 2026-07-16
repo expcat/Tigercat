@@ -1,0 +1,8 @@
+{
+  "id": "empty-03",
+  "title": "无插图与自定义操作",
+  "description": "showImage=false 隐藏插图；description 覆盖文案，extra 承载操作按钮。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

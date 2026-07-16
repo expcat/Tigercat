@@ -1,0 +1,8 @@
+{
+  "id": "input-group-03",
+  "title": "尺寸与紧凑模式",
+  "description": "size 统一控制子项高度；compact=false 时子项之间保留间距。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

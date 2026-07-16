@@ -1,0 +1,8 @@
+{
+  "id": "card-04",
+  "title": "封面、横向布局与操作",
+  "description": "cover/coverAlt 渲染封面图，actions 固定底部操作区，direction=\"horizontal\" 时封面移至左侧。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

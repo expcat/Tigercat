@@ -1,0 +1,8 @@
+{
+  "id": "switch-03",
+  "title": "禁用状态",
+  "description": "disabled 锁定开关，开启与关闭两种状态均不可交互。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 100, "maxHeight": 720 }
+}

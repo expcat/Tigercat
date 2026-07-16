@@ -1,0 +1,8 @@
+{
+  "id": "input-group-02",
+  "title": "前后缀 Addon",
+  "description": "InputGroupAddon 作为前后缀包裹输入框，type=\"icon\" 适配图标附加。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

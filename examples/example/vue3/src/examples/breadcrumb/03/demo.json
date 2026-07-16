@@ -1,0 +1,8 @@
+{
+  "id": "breadcrumb-03",
+  "title": "折叠超长路径",
+  "description": "maxItems 限制可见层级，中间项折叠为 …，点击可展开完整路径。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+}

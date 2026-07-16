@@ -1,0 +1,8 @@
+{
+  "id": "color-swatch-03",
+  "title": "列数与禁用",
+  "description": "columns 控制每行色块数量；disabled 禁用整组选择。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}
