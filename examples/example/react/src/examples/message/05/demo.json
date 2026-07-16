@@ -1,0 +1,7 @@
+{
+  "id": "message-05",
+  "title": "受控消息容器",
+  "description": "直接传入 messages，并通过 position 与 onClose 管理 MessageContainer 中的消息。",
+  "order": 5,
+  "entry": "App.tsx"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "config-provider-01",
+  "title": "全局配置",
+  "description": "动态切换 ConfigProvider 的 locale、theme、colorScheme 与 direction 配置。",
+  "order": 1,
+  "entry": "App.vue"
+}

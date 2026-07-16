@@ -1,0 +1,7 @@
+{
+  "id": "menu-03",
+  "title": "组合式菜单",
+  "description": "使用 MenuItem、MenuItemGroup 与 SubMenu 子组件构建分组和多级菜单。",
+  "order": 3,
+  "entry": "App.tsx"
+}

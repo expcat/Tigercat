@@ -6,6 +6,7 @@ const Home = lazy(() => import('./pages/Home'))
 
 // Basic
 const ButtonDemo = lazy(() => import('./pages/ButtonDemo'))
+const ConfigProviderDemo = lazy(() => import('./pages/ConfigProviderDemo'))
 const IconDemo = lazy(() => import('./pages/IconDemo'))
 const LinkDemo = lazy(() => import('./pages/LinkDemo'))
 const TextDemo = lazy(() => import('./pages/TextDemo'))
@@ -149,6 +150,7 @@ const router = createHashRouter([
       { index: true, element: <Home /> },
       // Basic
       { path: 'button', element: <ButtonDemo /> },
+      { path: 'config-provider', element: <ConfigProviderDemo /> },
       { path: 'icon', element: <IconDemo /> },
       { path: 'link', element: <LinkDemo /> },
       { path: 'text', element: <TextDemo /> },

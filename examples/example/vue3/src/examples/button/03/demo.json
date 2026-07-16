@@ -1,0 +1,7 @@
+{
+  "id": "button-03",
+  "title": "按钮组与尺寸继承",
+  "description": "展示 ButtonGroup 的水平、垂直布局，以及子按钮继承按钮组尺寸的能力。",
+  "order": 3,
+  "entry": "App.vue"
+}

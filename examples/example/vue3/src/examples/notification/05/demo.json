@@ -1,0 +1,7 @@
+{
+  "id": "notification-05",
+  "title": "受控通知容器",
+  "description": "直接管理 notifications 数组，展示 NotificationContainer 的位置、操作按钮、点击和关闭回调。",
+  "order": 5,
+  "entry": "App.vue"
+}

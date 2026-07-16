@@ -1,0 +1,7 @@
+{
+  "id": "tour-02",
+  "title": "异步与条件步骤",
+  "description": "通过 loadSteps、受控 current、skipWhen、placement 与 mask 构建动态引导流程。",
+  "order": 2,
+  "entry": "App.vue"
+}

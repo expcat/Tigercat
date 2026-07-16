@@ -13,6 +13,10 @@ const router = createRouter({
         { path: '', component: Home },
         // Basic
         { path: 'button', component: () => import('./pages/ButtonDemo.vue') },
+        {
+          path: 'config-provider',
+          component: () => import('./pages/ConfigProviderDemo.vue')
+        },
         { path: 'icon', component: () => import('./pages/IconDemo.vue') },
         { path: 'link', component: () => import('./pages/LinkDemo.vue') },
         { path: 'text', component: () => import('./pages/TextDemo.vue') },

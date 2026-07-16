@@ -28,6 +28,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     label: { 'zh-CN': '基础组件', 'en-US': 'Basics' },
     items: [
       { key: 'button', path: '/button', label: { 'zh-CN': 'Button 按钮', 'en-US': 'Button' } },
+      {
+        key: 'config-provider',
+        path: '/config-provider',
+        label: { 'zh-CN': 'ConfigProvider 全局配置', 'en-US': 'ConfigProvider' }
+      },
       { key: 'icon', path: '/icon', label: { 'zh-CN': 'Icon 图标', 'en-US': 'Icon' } },
       { key: 'link', path: '/link', label: { 'zh-CN': 'Link 链接', 'en-US': 'Link' } },
       { key: 'text', path: '/text', label: { 'zh-CN': 'Text 文本', 'en-US': 'Text' } },

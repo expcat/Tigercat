@@ -1,0 +1,7 @@
+{
+  "id": "transfer-02",
+  "title": "受控搜索与禁用项",
+  "description": "展示受控 searchValue、自定义 filterOption、禁用数据和带方向及 movedKeys 的移动回调。",
+  "order": 2,
+  "entry": "App.tsx"
+}
