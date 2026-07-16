@@ -1,0 +1,12 @@
+{
+  "id": "virtual-table-02",
+  "title": "受控选择、列虚拟化与状态",
+  "description": "使用 selectedRowKeys 控制行选择，为宽表启用列虚拟化，并切换加载态与空态。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

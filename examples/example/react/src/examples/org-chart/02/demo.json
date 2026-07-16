@@ -1,0 +1,12 @@
+{
+  "id": "org-chart-02",
+  "title": "纵向头像与受控选择",
+  "description": "以纵向布局展示节点头像，并通过 selectedId 与 onSelectedIdChange 控制当前选择。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

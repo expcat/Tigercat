@@ -1,0 +1,12 @@
+{
+  "id": "spotlight-02",
+  "title": "自定义过滤与命令状态",
+  "description": "通过 filterItem 搜索自定义别名，并展示命令快捷键和不可选择的 disabled 项。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}
