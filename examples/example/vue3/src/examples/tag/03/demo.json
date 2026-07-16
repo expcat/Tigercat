@@ -1,0 +1,8 @@
+{
+  "id": "tag-03",
+  "title": "六种变体",
+  "description": "variant 覆盖 default、primary、success、warning、danger、info 六种语义色。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 100, "maxHeight": 720 }
+}

@@ -1,0 +1,8 @@
+{
+  "id": "tooltip-04",
+  "title": "弹出位置",
+  "description": "placement 控制提示相对触发元素的方位：top/bottom/left/right。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

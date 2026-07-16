@@ -1,0 +1,8 @@
+{
+  "id": "text-02",
+  "title": "尺寸与字重",
+  "description": "size 覆盖 xs 到 6xl 的字号阶梯；weight 覆盖 thin 到 black 的字重。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 140, "maxHeight": 720 }
+}

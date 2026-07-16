@@ -1,0 +1,8 @@
+{
+  "id": "pagination-04",
+  "title": "简洁模式与禁用",
+  "description": "simple 仅保留上一页/下一页与页码指示；disabled 锁定整个分页。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

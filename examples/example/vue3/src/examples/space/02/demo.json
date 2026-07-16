@@ -1,0 +1,8 @@
+{
+  "id": "space-02",
+  "title": "方向与尺寸",
+  "description": "direction 切换横向/纵向；size 支持 sm/md/lg 预设或自定义像素数值。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

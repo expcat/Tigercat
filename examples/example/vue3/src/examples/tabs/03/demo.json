@@ -1,0 +1,8 @@
+{
+  "id": "tabs-03",
+  "title": "标签类型",
+  "description": "type 提供 line、pills、card 三种外观（editable-card 见上一示例）。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }
+}

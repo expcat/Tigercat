@@ -1,0 +1,8 @@
+{
+  "id": "color-picker-02",
+  "title": "格式与尺寸",
+  "description": "format 切换 hex/rgb/hsl 显示；size 提供 sm/md/lg 三档触发器。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

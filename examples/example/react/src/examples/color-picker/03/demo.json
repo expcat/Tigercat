@@ -1,0 +1,8 @@
+{
+  "id": "color-picker-03",
+  "title": "预设与禁用",
+  "description": "presets 提供快速选色；disabled 锁定为只读展示。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 140, "maxHeight": 720 }
+}

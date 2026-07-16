@@ -1,0 +1,8 @@
+{
+  "id": "text-03",
+  "title": "颜色与修饰",
+  "description": "color 提供语义色板；truncate、italic、underline、lineThrough 控制修饰样式。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

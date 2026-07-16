@@ -1,0 +1,8 @@
+{
+  "id": "result-03",
+  "title": "自定义图标与操作",
+  "description": "icon 插槽覆盖默认状态图标；extra 承载多个操作按钮，默认插槽放置补充说明。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }
+}

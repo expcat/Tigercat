@@ -1,0 +1,8 @@
+{
+  "id": "signature-03",
+  "title": "只读与禁用",
+  "description": "readonly 展示但不可绘制；disabled 停用画板，clearable=false 隐藏清除按钮。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 200, "maxHeight": 720 }
+}

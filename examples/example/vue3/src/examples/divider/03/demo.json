@@ -1,0 +1,8 @@
+{
+  "id": "divider-03",
+  "title": "线型与间距",
+  "description": "lineStyle 提供 solid/dashed/dotted/gradient；spacing 控制分割线上下留白。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }
+}

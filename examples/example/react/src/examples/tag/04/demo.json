@@ -1,0 +1,8 @@
+{
+  "id": "tag-04",
+  "title": "尺寸与可关闭列表",
+  "description": "size 提供 sm/md/lg 三档；closable + onClose 组合成可移除的标签列表。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 140, "maxHeight": 720 }
+}

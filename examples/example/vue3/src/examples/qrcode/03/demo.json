@@ -1,0 +1,8 @@
+{
+  "id": "qrcode-03",
+  "title": "配色与状态",
+  "description": "color/bgColor 自定义前景与背景；status 展示 active、expired、loading 三种覆盖态。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 200, "maxHeight": 720 }
+}

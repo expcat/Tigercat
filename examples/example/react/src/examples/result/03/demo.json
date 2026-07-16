@@ -1,0 +1,8 @@
+{
+  "id": "result-03",
+  "title": "自定义图标与操作",
+  "description": "icon 覆盖默认状态图标；extra 承载多个操作按钮，children 放置补充说明。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }
+}

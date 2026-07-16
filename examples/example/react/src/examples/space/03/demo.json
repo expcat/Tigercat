@@ -1,0 +1,8 @@
+{
+  "id": "space-03",
+  "title": "对齐与自动换行",
+  "description": "align 控制交叉轴对齐（start/center/end）；wrap 让子项在容器不足时自动折行。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 200, "maxHeight": 720 }
+}

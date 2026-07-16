@@ -1,0 +1,8 @@
+{
+  "id": "qrcode-02",
+  "title": "尺寸与纠错级别",
+  "description": "size 控制像素尺寸；level 提供 L/M/Q/H 四档纠错能力。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }
+}

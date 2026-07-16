@@ -1,0 +1,8 @@
+{
+  "id": "stepper-03",
+  "title": "步长、范围与禁用",
+  "description": "step 控制增减步长，min/max 限制取值范围；disabled 锁定控件。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+}

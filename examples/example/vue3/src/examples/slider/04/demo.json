@@ -1,0 +1,8 @@
+{
+  "id": "slider-04",
+  "title": "尺寸与禁用",
+  "description": "size 提供 sm/md/lg 三档；disabled 锁定控件，tooltip=false 隐藏数值气泡。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }
+}

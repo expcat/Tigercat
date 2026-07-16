@@ -1,0 +1,8 @@
+{
+  "id": "affix-02",
+  "title": "固定到底部",
+  "description": "offsetBottom 让元素在滚动到容器底部一定距离时固定；与 offsetTop 互斥。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": { "mode": "fixed", "height": 200 }
+}

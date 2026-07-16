@@ -1,0 +1,8 @@
+{
+  "id": "alert-04",
+  "title": "横幅与自动关闭倒计时",
+  "description": "banner 展示为全宽横幅；duration + showCountdown 显示倒计时进度条并自动关闭。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 720 }
+}

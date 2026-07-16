@@ -1,0 +1,8 @@
+{
+  "id": "signature-02",
+  "title": "画笔颜色与背景",
+  "description": "penColor 设置笔迹颜色，lineWidth 控制粗细，backgroundColor 设置画板背景。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 200, "maxHeight": 720 }
+}

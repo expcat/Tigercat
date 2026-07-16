@@ -1,0 +1,8 @@
+{
+  "id": "slider-03",
+  "title": "刻度标记",
+  "description": "marks 可传对象自定义刻度文案，或传 true 按 step 自动生成刻度。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 200, "maxHeight": 720 }
+}

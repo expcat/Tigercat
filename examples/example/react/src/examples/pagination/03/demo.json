@@ -1,0 +1,8 @@
+{
+  "id": "pagination-03",
+  "title": "尺寸与对齐",
+  "description": "size 提供 small/medium/large 三档；align 控制左/中/右对齐。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 200, "maxHeight": 720 }
+}

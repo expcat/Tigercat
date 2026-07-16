@@ -1,0 +1,8 @@
+{
+  "id": "statistic-03",
+  "title": "数字动画与前后缀",
+  "description": "animated 在挂载时从 0 递增到目标值；prefix/suffix 附加货币或单位符号。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 140, "maxHeight": 720 }
+}
