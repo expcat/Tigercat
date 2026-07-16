@@ -1,0 +1,12 @@
+{
+  "id": "rich-text-editor-02",
+  "title": "工具栏与编辑状态",
+  "description": "受控编辑器使用精简的自定义 toolbar，并列展示 readOnly 与 disabled 的视觉和交互差异。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 960
+  }
+}

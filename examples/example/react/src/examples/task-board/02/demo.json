@@ -1,0 +1,12 @@
+{
+  "id": "task-board-02",
+  "title": "列拖拽与自定义卡片",
+  "description": "受控 TaskBoard 支持拖拽调整列顺序、按标题或描述过滤卡片，并通过 renderCard 展示优先级与负责人。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

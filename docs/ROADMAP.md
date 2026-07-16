@@ -19,10 +19,10 @@ source: current repository state
 - 当前版本：`2.0.4`（正式版）。
 - v2.0.0 R01-R30 已完成；已登记的 P0/P1 组件、Example、i18n、a11y、构建与发布门禁问题均已解决。
 - R30 后的旧演示 polish 建议已移除；2026-07-16 根据最新 Example 覆盖审查和用户确认，新增 R31-R35 作为独立的非发布阻塞任务。
-- 149 个公开组件均已有有效展示入口；R31-R32 已补齐 7 个高优先级组件后，剩余 11 个组件建议扩展功能展示，其中高优先级 3 个、中优先级 8 个。
+- 149 个公开组件均已有有效展示入口；R31-R33 已补齐 10 个高优先级组件后，剩余 8 个中优先级组件建议扩展功能展示。
 - 发布前清理已完成：Actions 不再运行测试、coverage、benchmark 或依赖审计；Playwright 只保留功能 E2E，图片对比 spec 与 PNG 基线已删除。
 - v2.0.0 正式版发布准备与发布流程已完成；当前代码与三个公开包均已同步到 v2.0.4，`v2.0.0` / `v2.0.4` tag 均已推送到 `origin`。
-- 当前可执行任务：R33；完成后依次执行 R34-R35，并回写本节和对应批次状态。
+- 当前可执行任务：R34；完成后执行 R35，并回写本节和对应批次状态。
 
 ## Example 展示完善计划
 
@@ -40,7 +40,7 @@ source: current repository state
 | --- | ------ | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | R31 | 已完成 | FileManager、FormWizard、ChatWindow、CommentThread | 网格与受控文件操作；异步校验/跳步；虚拟消息与输入模式；点赞、回复、展开及加载事件                        |
 | R32 | 已完成 | ImageAnnotation、InfiniteScroll、MarkdownEditor    | 受控工具/选区与只读；反向或横向加载；edit/preview 模式、自定义 renderer/toolbar                          |
-| R33 | 待执行 | NotificationCenter、RichTextEditor、TaskBoard      | 受控分组/已读筛选与状态页；只读/禁用及自定义工具栏；列拖拽、过滤与自定义卡片                             |
+| R33 | 已完成 | NotificationCenter、RichTextEditor、TaskBoard      | 受控分组/已读筛选与状态页；只读/禁用及自定义工具栏；列拖拽、过滤与自定义卡片                             |
 | R34 | 待执行 | ActivityFeed、CodeEditor、Gantt、ImageViewer       | 平铺分组与加载/空态；只读/禁用状态；时间刻度和受控选择回调；受控图片索引、缩放边界与关闭行为             |
 | R35 | 待执行 | InputNumber、OrgChart、Spotlight、VirtualTable     | formatter/parser 与控件布局；纵向/头像及受控选择；自定义过滤、快捷键和禁用项；受控选择、列虚拟化及状态页 |
 

@@ -1,0 +1,12 @@
+{
+  "id": "notification-center-02",
+  "title": "受控筛选与状态页",
+  "description": "受控分组和已读筛选保持外部状态同步，并可切换加载、空状态；标记已读操作由外部数据源接管。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}
