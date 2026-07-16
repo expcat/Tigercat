@@ -14,14 +14,14 @@
 
 > **📘 AI Agent 文档**
 > 组件 API、使用示例和配置指南请参考 [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md)。
-> LLM 客户端可通过 `@expcat/tigercat-mcp` 按任务路由并读取最小必要上下文。
+> LLM 客户端可通过 `@expcat/tigercat-mcp` 按任务路由并读取最小必要上下文（默认从 GitHub Pages 远程读取，无需克隆仓库）。
 
 ## 特性
 
 - Vue 3 与 React 组件保持一致的功能边界、命名和设计 token。
 - 支持组件子路径导入、tree shaking、暗色模式、主题定制与国际化。
 - 覆盖表单、导航、数据展示、虚拟化、图表、编辑器和复合业务组件。
-- 提供 Vite 脚手架、组件辅助命令、环境诊断以及本地 MCP 文档路由。
+- 提供 Vite 脚手架、组件辅助命令、环境诊断以及 MCP 文档路由。
 - 支持 SSR；功能 E2E 覆盖 Chromium、Firefox、WebKit 与移动 Chromium。
 
 ## 快速开始
@@ -107,6 +107,31 @@ export function App() {
 - 主题基于 CSS 变量，推荐使用 `setThemeColors` 批量更新变量，减少重复重绘。
 - 浏览器支持范围为现代浏览器最新两个主要版本；功能 E2E 覆盖 Chromium、Firefox、WebKit 与移动 Chromium，不维护跨系统易漂移的图片对比基线。
 
+## MCP 接入（AI Agent）
+
+`@expcat/tigercat-mcp` 是只读 stdio MCP 服务，默认从 GitHub Pages（<https://expcat.github.io/Tigercat/mcp/>）远程读取 skills 文档，无需克隆仓库：
+
+```bash
+claude mcp add tigercat -- npx -y @expcat/tigercat-mcp
+```
+
+或在任意 MCP 客户端的 `mcpServers` 中配置：
+
+```json
+{
+  "mcpServers": {
+    "tigercat": {
+      "command": "npx",
+      "args": ["-y", "@expcat/tigercat-mcp"]
+    }
+  }
+}
+```
+
+- 本地/离线模式：`tigercat-mcp --root /path/to/Tigercat`（读取仓库 checkout，仓库内开发与测试也走此模式）。
+- 镜像模式：`--base-url <url>` 或环境变量 `TIGERCAT_MCP_BASE_URL`（GitHub Pages 在部分网络环境不可达时切换镜像站）。
+- 诊断：`tigercat-mcp --doctor` 校验技能源可达性、清单完整性与远程版本。
+
 ## 包
 
 | Package                  | Description                                 |
@@ -115,7 +140,7 @@ export function App() {
 | `@expcat/tigercat-vue`   | Vue 3 组件与 composables                    |
 | `@expcat/tigercat-react` | React 组件与 hooks                          |
 | `@expcat/tigercat-cli`   | 项目脚手架、组件辅助、playground 与环境诊断 |
-| `@expcat/tigercat-mcp`   | 面向 LLM 的本地 Skill reference 路由服务    |
+| `@expcat/tigercat-mcp`   | 面向 LLM 的 Skill reference 路由服务（默认远程读取 GitHub Pages，`--root` 本地模式） |
 
 ## 兼容性
 
@@ -148,8 +173,8 @@ pnpm example:react  # http://localhost:5174
 | `pnpm e2e`             | 运行跨浏览器功能 E2E                 |
 | `pnpm size`            | 检查 bundle 大小                     |
 | `pnpm docs:api`        | 重新生成 Skill API 摘要              |
-| `pnpm mcp:build`       | 构建本地 MCP 服务                    |
-| `pnpm mcp:serve`       | 以 stdio 启动 MCP 服务               |
+| `pnpm mcp:build`       | 构建 MCP 服务                        |
+| `pnpm mcp:serve`       | 以 stdio 启动 MCP 服务（本地模式）   |
 | `pnpm example:all`     | 同时运行 Vue 3 与 React 在线示例应用 |
 
 ## 参与贡献

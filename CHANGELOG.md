@@ -2,6 +2,13 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## 未发布
+
+- **`@expcat/tigercat-mcp` 默认远程读取 skills**：裸 `npx tigercat-mcp` 不再要求本地仓库 checkout，默认从 GitHub Pages `https://expcat.github.io/Tigercat/mcp/` 拉取 `context7.json` 与 skill references；`--root` 保留本地模式（仓库开发/离线），新增 `--base-url` 与环境变量 `TIGERCAT_MCP_BASE_URL` 用于镜像站。无参调用语义变化：不再从当前目录向上查找仓库根（内部 `findTigercatRoot` 移除），库调用 `loadSkillIndex()` / `diagnoseTigercatMcp()` 无参时同样默认远程。
+- **GitHub Pages 新增 `/mcp/` 路由**：随 `vue/`、`react/` 一起发布 skills 静态文件（`context7.json`、`skills/tigercat/**.md`）、部署版本 `version.json` 与说明页；示例首页新增 MCP 入口卡片。
+- **`context7.json` 新增 `skill_files` 清单**：`pnpm docs:api` 生成全部 skill markdown 的仓库相对路径，作为远程模式 allow-list 契约；`pnpm api:validate` 与磁盘双向校验。
+- **修复 MCP server 版本硬编码**：`createTigercatMcpServer` 上报的 server version 由写死的 `2.0.0-rc.1` 改为运行时读取包版本；`--doctor` 输出增加 `mode: local|remote`，远程模式报告 base URL 与部署版本。
+
 ## v2.0.0
 
 v2.0.0 正式版。本版本相对 v1.5.0 完成破坏性升级：ESM-only 发布面、显式 component exports、React / Vue tree-shaking 副作用收敛、compat API 删除、legacy token / icon path 兼容层清理、按需加载文档迁移、size / publish artifact gate 收口、Basic / Layout 轻量组件 API 清理、Feedback / overlay open、portal、focus 与 close lifecycle 收敛，Form primitives 和 composite selectors 的受控模型、搜索、空态和尺寸类型收敛，Navigation 组件受控回调与子组件 subpath 产物收敛，Data/table stack 数据、选择与虚拟滚动入口统一，Charts/visualization 类型拆分与 tooltip 命名收敛，以及 Advanced/media viewer 与 editor runtime guard 收敛。完整迁移路径见 [docs/MIGRATION.md](docs/MIGRATION.md)。

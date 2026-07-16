@@ -4,11 +4,11 @@
 
 ## Canonical Sources
 
-- 当前执行计划：`../../docs/ROADMAP.md`
-- 版本与完成记录：`../../CHANGELOG.md`
-- breaking change：`../../docs/MIGRATION.md`
-- 生成器：`../../scripts/generate-api-docs.mjs`
-- Skill 护栏：`../../scripts/validate-api.mjs`
+- 当前执行计划：<https://github.com/expcat/Tigercat/blob/main/docs/ROADMAP.md>
+- 版本与完成记录：<https://github.com/expcat/Tigercat/blob/main/CHANGELOG.md>
+- breaking change：<https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md>
+- 生成器：<https://github.com/expcat/Tigercat/blob/main/scripts/generate-api-docs.mjs>
+- Skill 护栏：<https://github.com/expcat/Tigercat/blob/main/scripts/validate-api.mjs>
 
 ## Rules
 

@@ -13,7 +13,7 @@
  */
 
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
-import { basename, join } from 'node:path'
+import { basename, join, relative, sep } from 'node:path'
 import prettier from 'prettier'
 import ts from 'typescript'
 import {
@@ -25,9 +25,11 @@ import {
   getComponentPackageSubpath,
   loadPublicComponentExports
 } from './lib/public-components.mjs'
+import { collectFiles } from './utils/files.mjs'
 
 const ROOT_DIR = join(import.meta.dirname, '..')
 const TYPES_DIR = join(ROOT_DIR, 'packages', 'core', 'src', 'types')
+const SKILL_DIR = join(ROOT_DIR, 'skills', 'tigercat')
 const SKILL_REFERENCES_DIR = join(ROOT_DIR, 'skills', 'tigercat', 'references')
 const SHARED_DIR = join(SKILL_REFERENCES_DIR, 'shared')
 const PROPS_DIR = join(SHARED_DIR, 'props')
@@ -928,10 +930,6 @@ async function main() {
     await formatMarkdown(generateComponentIndex(componentRows)),
     'utf8'
   )
-  await writeFile(
-    CONTEXT7_JSON,
-    `${JSON.stringify(buildTigercatContext7(componentRows), null, 2)}\n`
-  )
 
   for (const category of Object.keys(CATEGORIES)) {
     if (category === 'Core') continue
@@ -961,9 +959,24 @@ async function main() {
     'utf8'
   )
 
+  // context7.json 最后写出：skill_files 清单必须在所有 markdown 落盘之后收集。
+  await writeFile(
+    CONTEXT7_JSON,
+    `${JSON.stringify(buildTigercatContext7(componentRows, collectSkillFiles()), null, 2)}\n`
+  )
+
   console.log(`Skill references generated under: ${SKILL_REFERENCES_DIR}`)
   console.log(`Total exported types: ${totalTypes}`)
   console.log(`Indexed components: ${componentRows.length}`)
+}
+
+// skill markdown 清单（仓库相对 POSIX 路径，码位序）。排除维护者专用的
+// ROADMAP.md：它不属于 MCP allow-list，纳入会反向扩大可读范围。
+function collectSkillFiles() {
+  return collectFiles(SKILL_DIR, ['.md'])
+    .map((file) => relative(ROOT_DIR, file).split(sep).join('/'))
+    .filter((path) => path !== 'skills/tigercat/ROADMAP.md')
+    .sort()
 }
 
 main().catch((error) => {

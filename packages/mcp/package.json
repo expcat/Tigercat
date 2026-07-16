@@ -2,7 +2,7 @@
   "name": "@expcat/tigercat-mcp",
   "version": "2.0.4",
   "type": "module",
-  "description": "Local MCP server for routing LLMs to Tigercat skill references",
+  "description": "MCP server routing LLMs to Tigercat skill references, fetched from GitHub Pages by default with a local checkout fallback",
   "license": "MIT",
   "author": "Yizhe Wang",
   "repository": {
@@ -10,7 +10,7 @@
     "url": "https://github.com/expcat/Tigercat",
     "directory": "packages/mcp"
   },
-  "homepage": "https://github.com/expcat/Tigercat#readme",
+  "homepage": "https://expcat.github.io/Tigercat/mcp/",
   "bugs": {
     "url": "https://github.com/expcat/Tigercat/issues"
   },

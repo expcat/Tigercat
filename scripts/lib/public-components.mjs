@@ -523,7 +523,7 @@ export function buildPublicComponentEntries(root, fileInfoByName, publicExports)
   )
 }
 
-export function buildTigercatContext7(componentRows) {
+export function buildTigercatContext7(componentRows, skillFiles = []) {
   const components = {}
   const componentIndex = {}
 
@@ -584,6 +584,8 @@ export function buildTigercatContext7(componentRows) {
       react: 'skills/tigercat/references/react/index.md',
       vue: 'skills/tigercat/references/vue/index.md'
     },
+    // 全部 skill markdown 清单：MCP 远程模式无法列目录，靠它构建 allow-list。
+    skill_files: skillFiles,
     aliases: COMPONENT_ROUTE_ALIASES,
     command_apis: {
       notification: {

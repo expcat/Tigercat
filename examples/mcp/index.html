@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tigercat MCP 技能源 — @expcat/tigercat-mcp</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --tc-primary: #2563eb;
+        --tc-primary-hover: #1d4ed8;
+        --tc-bg: #f8fafc;
+        --tc-surface: #ffffff;
+        --tc-text: #0f172a;
+        --tc-text-muted: #475569;
+        --tc-border: #e2e8f0;
+        --tc-shadow: rgba(15, 23, 42, 0.08);
+        --tc-code-bg: #0f172a;
+        --tc-code-text: #e2e8f0;
+      }
+
+      html[data-theme='dark'] {
+        color-scheme: dark;
+        --tc-bg: #0f172a;
+        --tc-surface: #1e293b;
+        --tc-text: #f1f5f9;
+        --tc-text-muted: #94a3b8;
+        --tc-border: #334155;
+        --tc-shadow: rgba(0, 0, 0, 0.3);
+        --tc-code-bg: #020617;
+        --tc-code-text: #e2e8f0;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--tc-bg);
+        color: var(--tc-text);
+        line-height: 1.6;
+      }
+
+      .header {
+        padding: 48px 16px 24px;
+        text-align: center;
+      }
+      .header h1 {
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+      .header p {
+        font-size: 15px;
+        color: var(--tc-text-muted);
+        max-width: 640px;
+        margin: 0 auto;
+      }
+      .version-badge {
+        display: inline-block;
+        background: var(--tc-primary);
+        color: #fff;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+
+      .toolbar {
+        max-width: 860px;
+        margin: 0 auto 24px;
+        padding: 0 16px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .theme-toggle {
+        padding: 8px 16px;
+        border: 1px solid var(--tc-border);
+        border-radius: 8px;
+        background: var(--tc-surface);
+        color: var(--tc-text);
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .theme-toggle:hover {
+        border-color: var(--tc-primary);
+      }
+
+      .section {
+        max-width: 860px;
+        margin: 0 auto 28px;
+        padding: 0 16px;
+      }
+      .card {
+        background: var(--tc-surface);
+        border-radius: 16px;
+        padding: 24px 28px;
+        box-shadow: 0 12px 30px var(--tc-shadow);
+      }
+      .card h2 {
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .card p {
+        font-size: 14px;
+        color: var(--tc-text-muted);
+        margin-bottom: 10px;
+      }
+      .card p:last-child {
+        margin-bottom: 0;
+      }
+      .card code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+        background: var(--tc-bg);
+        border: 1px solid var(--tc-border);
+        border-radius: 4px;
+        padding: 1px 5px;
+      }
+      pre.code-block {
+        background: var(--tc-code-bg);
+        color: var(--tc-code-text);
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.55;
+        overflow-x: auto;
+        margin: 10px 0 14px;
+      }
+      pre.code-block:last-child {
+        margin-bottom: 0;
+      }
+
+      .tool-list {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        gap: 10px;
+      }
+      .tool-list li {
+        border: 1px solid var(--tc-border);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 14px;
+      }
+      .tool-list .name {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-weight: 600;
+        color: var(--tc-primary);
+      }
+      .tool-list .desc {
+        color: var(--tc-text-muted);
+        font-size: 13px;
+      }
+
+      .file-links {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        gap: 8px;
+        font-size: 14px;
+      }
+      .file-links a {
+        color: var(--tc-primary);
+        text-decoration: none;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+      }
+      .file-links a:hover {
+        text-decoration: underline;
+      }
+      .file-links .desc {
+        color: var(--tc-text-muted);
+        margin-left: 6px;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 32px 16px;
+        color: var(--tc-text-muted);
+        font-size: 13px;
+        border-top: 1px solid var(--tc-border);
+      }
+      .footer a {
+        color: var(--tc-primary);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Tigercat MCP 技能源<span class="version-badge" id="versionBadge" hidden></span></h1>
+      <p>
+        本站是 <code>@expcat/tigercat-mcp</code> 默认读取的静态技能源：context7 组件清单 + skills
+        markdown 文档，随每次 release 自动部署。
+      </p>
+    </div>
+
+    <div class="toolbar">
+      <button class="theme-toggle" id="themeToggle">🌙 暗色模式</button>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <h2>快速开始</h2>
+        <p>Claude Code 一行接入（默认远程读取本站，无需克隆仓库）：</p>
+        <pre class="code-block">claude mcp add tigercat -- npx -y @expcat/tigercat-mcp</pre>
+        <p>或在任意 MCP 客户端的 <code>mcpServers</code> 配置中加入：</p>
+        <pre class="code-block">{
+  "mcpServers": {
+    "tigercat": {
+      "command": "npx",
+      "args": ["-y", "@expcat/tigercat-mcp"]
+    }
+  }
+}</pre>
+        <p>本地 / 镜像模式（离线开发或 GitHub Pages 不可达时）：</p>
+        <pre class="code-block">tigercat-mcp --root /path/to/Tigercat        # 读取本地仓库 checkout
+tigercat-mcp --base-url https://mirror.example.com/mcp/   # 指向镜像站
+TIGERCAT_MCP_BASE_URL=…                      # 环境变量等价于 --base-url
+tigercat-mcp --doctor                        # 校验技能源可达性与完整性</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <h2>MCP 能力</h2>
+        <ul class="tool-list">
+          <li>
+            <span class="name">tigercat_search</span>
+            <div class="desc">模糊搜索组件、别名、分类、主题与命令式 API。</div>
+          </li>
+          <li>
+            <span class="name">tigercat_component</span>
+            <div class="desc">精确返回组件元数据、导入路径、props、示例与框架差异说明。</div>
+          </li>
+          <li>
+            <span class="name">tigercat_route</span>
+            <div class="desc">把自然语言任务路由到最小可用的组件 / 主题引用集合。</div>
+          </li>
+          <li>
+            <span class="name">tigercat_reference</span>
+            <div class="desc">直接读取 allow-list 内的 skill reference，支持字节截断。</div>
+          </li>
+        </ul>
+        <p style="margin-top: 12px">
+          另提供 <code>tigercat://inventory</code> 等 resources 与
+          <code>tigercat-usage</code> prompt。
+        </p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <h2>技能源文件</h2>
+        <ul class="file-links">
+          <li>
+            <a href="./context7.json">context7.json</a>
+            <span class="desc">组件清单与路由映射（含 skill_files 清单）</span>
+          </li>
+          <li>
+            <a href="./skills/tigercat/SKILL.md">skills/tigercat/SKILL.md</a>
+            <span class="desc">技能入口与路由规则</span>
+          </li>
+          <li>
+            <a href="./skills/tigercat/references/component-index.md"
+              >skills/tigercat/references/component-index.md</a
+            >
+            <span class="desc">149+ 组件索引</span>
+          </li>
+          <li>
+            <a href="./version.json">version.json</a>
+            <span class="desc">部署版本与构建信息</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>
+        Tigercat · MIT License ·
+        <a href="https://github.com/expcat/Tigercat">GitHub</a> ·
+        <a href="../">返回示例首页</a>
+      </p>
+    </div>
+
+    <script>
+      // Dark mode toggle（与示例首页共享 tc-theme 存储键）
+      const toggle = document.getElementById('themeToggle')
+      const html = document.documentElement
+      const savedTheme = localStorage.getItem('tc-theme')
+      if (
+        savedTheme === 'dark' ||
+        (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)
+      ) {
+        html.dataset.theme = 'dark'
+        toggle.textContent = '☀️ 浅色模式'
+      }
+      toggle.addEventListener('click', () => {
+        const isDark = html.dataset.theme === 'dark'
+        if (isDark) {
+          html.removeAttribute('data-theme')
+        } else {
+          html.dataset.theme = 'dark'
+        }
+        toggle.textContent = isDark ? '🌙 暗色模式' : '☀️ 浅色模式'
+        localStorage.setItem('tc-theme', isDark ? 'light' : 'dark')
+      })
+
+      // 版本徽章：部署时生成的 version.json，加载失败则保持隐藏
+      fetch('./version.json')
+        .then((response) => (response.ok ? response.json() : Promise.reject()))
+        .then((data) => {
+          if (data && typeof data.version === 'string' && data.version) {
+            const badge = document.getElementById('versionBadge')
+            badge.textContent = 'v' + data.version
+            badge.hidden = false
+          }
+        })
+        .catch(() => {})
+    </script>
+  </body>
+</html>

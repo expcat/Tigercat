@@ -1,24 +1,37 @@
 import { existsSync } from 'node:fs'
-import { access, readdir, readFile, realpath } from 'node:fs/promises'
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
+import { readdir, readFile } from 'node:fs/promises'
+import { join, relative, resolve } from 'node:path'
 
+import { createFsSource, createHttpSource, DEFAULT_REMOTE_BASE_URL } from './source'
 import type {
   ComponentMetadata,
   DoctorResult,
+  LoadSkillIndexOptions,
   ReferenceSource,
   SkillIndex,
+  SkillSource,
   TigercatContext7
 } from './types'
 
 const DEFAULT_MAX_BYTES = 12_000
-const SKILL_ROOT = 'skills/tigercat'
 const REFERENCES_ROOT = 'skills/tigercat/references'
 const DEFAULT_COMPONENT_INDEX = 'skills/tigercat/references/component-index.md'
 const DEFAULT_REACT_REFERENCE = 'skills/tigercat/references/react/index.md'
 const DEFAULT_VUE_REFERENCE = 'skills/tigercat/references/vue/index.md'
 
-export async function loadSkillIndex(root?: string): Promise<SkillIndex> {
-  const resolvedRoot = root ? resolve(root) : await findTigercatRoot(process.cwd())
+export async function loadSkillIndex(
+  options?: string | LoadSkillIndexOptions
+): Promise<SkillIndex> {
+  const resolved = typeof options === 'string' ? { root: options } : (options ?? {})
+
+  if (resolved.root) {
+    return loadFsSkillIndex(resolve(resolved.root))
+  }
+
+  return loadHttpSkillIndex(resolved.baseUrl ?? DEFAULT_REMOTE_BASE_URL, resolved.timeoutMs)
+}
+
+async function loadFsSkillIndex(resolvedRoot: string): Promise<SkillIndex> {
   const contextPath = join(resolvedRoot, 'context7.json')
 
   if (!existsSync(contextPath)) {
@@ -26,6 +39,76 @@ export async function loadSkillIndex(root?: string): Promise<SkillIndex> {
   }
 
   const context7 = JSON.parse(await readFile(contextPath, 'utf8')) as TigercatContext7
+  const allowedReferencePaths = collectAllowedReferencePaths(context7)
+
+  if (existsSync(join(resolvedRoot, REFERENCES_ROOT))) {
+    for (const path of await collectMarkdownReferences(join(resolvedRoot, REFERENCES_ROOT))) {
+      allowedReferencePaths.add(normalizeRelativePath(relative(resolvedRoot, path)))
+    }
+  }
+
+  retainMarkdownPaths(allowedReferencePaths)
+
+  for (const path of allowedReferencePaths) {
+    const absolutePath = join(resolvedRoot, path)
+    if (!existsSync(absolutePath)) {
+      throw new Error(`Missing Tigercat skill reference: ${path}`)
+    }
+  }
+
+  return buildSkillIndex(context7, createFsSource(resolvedRoot), allowedReferencePaths)
+}
+
+async function loadHttpSkillIndex(baseUrl: string, timeoutMs?: number): Promise<SkillIndex> {
+  const source = createHttpSource(baseUrl, { timeoutMs })
+  const raw = await source.readText('context7.json')
+
+  let context7: TigercatContext7
+  try {
+    context7 = JSON.parse(raw) as TigercatContext7
+  } catch (error) {
+    throw new Error(
+      `Invalid context7.json from ${source.origin}context7.json: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      { cause: error }
+    )
+  }
+
+  // 远程无法列目录;context7.json(含 skill_files 清单)即 allow-list 契约,
+  // 逐文件可达性留给惰性读取与 --doctor 兜底。
+  const allowedReferencePaths = retainMarkdownPaths(collectAllowedReferencePaths(context7))
+
+  return buildSkillIndex(context7, source, allowedReferencePaths)
+}
+
+function collectAllowedReferencePaths(context7: TigercatContext7): Set<string> {
+  const allowedReferencePaths = new Set<string>()
+
+  for (const path of collectReferencePaths(context7)) {
+    allowedReferencePaths.add(normalizeRelativePath(path))
+  }
+
+  allowedReferencePaths.add('skills/tigercat/SKILL.md')
+  return allowedReferencePaths
+}
+
+// reference_paths 中含目录条目(shared/props、examples),allow-list 只保留 .md 文件,
+// 避免真读 EISDIR 与远程 doctor 对目录 URL 的虚假 404。
+function retainMarkdownPaths(paths: Set<string>): Set<string> {
+  for (const path of paths) {
+    if (!path.endsWith('.md')) {
+      paths.delete(path)
+    }
+  }
+  return paths
+}
+
+function buildSkillIndex(
+  context7: TigercatContext7,
+  source: SkillSource,
+  allowedReferencePaths: Set<string>
+): SkillIndex {
   const components = buildComponentMap(context7)
   const componentsByNormalizedName = new Map<string, ComponentMetadata>()
   const aliasTargetsByNormalizedName = new Map<string, string[]>()
@@ -45,28 +128,9 @@ export async function loadSkillIndex(root?: string): Promise<SkillIndex> {
     }
   }
 
-  const allowedReferencePaths = new Set<string>()
-  for (const path of collectReferencePaths(context7)) {
-    allowedReferencePaths.add(normalizeRelativePath(path))
-  }
-
-  if (existsSync(join(resolvedRoot, REFERENCES_ROOT))) {
-    for (const path of await collectMarkdownReferences(join(resolvedRoot, REFERENCES_ROOT))) {
-      allowedReferencePaths.add(normalizeRelativePath(relative(resolvedRoot, path)))
-    }
-  }
-
-  allowedReferencePaths.add('skills/tigercat/SKILL.md')
-
-  for (const path of allowedReferencePaths) {
-    const absolutePath = join(resolvedRoot, path)
-    if (!existsSync(absolutePath)) {
-      throw new Error(`Missing Tigercat skill reference: ${path}`)
-    }
-  }
-
   return {
-    root: resolvedRoot,
+    root: source.origin,
+    source,
     context7,
     components,
     componentsByNormalizedName,
@@ -76,8 +140,10 @@ export async function loadSkillIndex(root?: string): Promise<SkillIndex> {
   }
 }
 
-export async function diagnoseTigercatMcp(root?: string): Promise<DoctorResult> {
-  const index = await loadSkillIndex(root)
+export async function diagnoseTigercatMcp(
+  options?: string | LoadSkillIndexOptions
+): Promise<DoctorResult> {
+  const index = await loadSkillIndex(options)
   const issues: string[] = []
   let readableReferenceCount = 0
 
@@ -97,22 +163,40 @@ export async function diagnoseTigercatMcp(root?: string): Promise<DoctorResult> 
     }
   }
 
+  // 顺序探测：doctor 对延迟不敏感，避免并发打爆简单静态服务器（镜像站）。
   for (const path of index.allowedReferencePaths) {
     try {
-      await access(join(index.root, path))
+      await index.source.probe(path)
       readableReferenceCount += 1
     } catch {
       issues.push(`reference is not readable: ${path}`)
     }
   }
 
+  let remoteVersion: string | undefined
+  if (index.source.kind === 'http') {
+    // version.json 由 Pages 部署时生成,属补充信息,不可达不算问题。
+    try {
+      const parsed = JSON.parse(await index.source.readText('version.json')) as {
+        version?: unknown
+      }
+      if (typeof parsed.version === 'string' && parsed.version) {
+        remoteVersion = parsed.version
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   return {
     ok: issues.length === 0,
     root: index.root,
+    mode: index.source.kind,
     componentCount: index.components.size,
     aliasCount: index.aliasTargetsByNormalizedName.size,
     topicCount: index.topics.size,
     readableReferenceCount,
+    ...(remoteVersion ? { remoteVersion } : {}),
     issues
   }
 }
@@ -129,16 +213,7 @@ export async function readReferenceSource(
     throw new Error(`Reference path is not allowed: ${path}`)
   }
 
-  const absolutePath = join(index.root, normalizedPath)
-  const rootPath = await realpath(index.root)
-  const filePath = await realpath(absolutePath)
-  const relativePath = relative(rootPath, filePath)
-
-  if (relativePath.startsWith('..') || isAbsolute(relativePath)) {
-    throw new Error(`Reference path escapes the Tigercat repo: ${path}`)
-  }
-
-  const text = await readFile(filePath, 'utf8')
+  const text = await index.source.readText(normalizedPath)
   const limit = Number.isFinite(maxBytes) && maxBytes > 0 ? Math.floor(maxBytes) : DEFAULT_MAX_BYTES
   const truncated = Buffer.byteLength(text, 'utf8') > limit
 
@@ -151,28 +226,12 @@ export async function readReferenceSource(
 }
 
 export async function readContext7Source(index: SkillIndex): Promise<ReferenceSource> {
-  const text = await readFile(join(index.root, 'context7.json'), 'utf8')
+  const text = await index.source.readText('context7.json')
   return {
     path: 'context7.json',
     reason: 'Generated Tigercat MCP inventory and route map.',
     truncated: false,
     text
-  }
-}
-
-export async function findTigercatRoot(startDirectory: string): Promise<string> {
-  let current = resolve(startDirectory)
-
-  while (true) {
-    if (existsSync(join(current, 'context7.json')) && existsSync(join(current, SKILL_ROOT))) {
-      return current
-    }
-
-    const next = dirname(current)
-    if (next === current) {
-      throw new Error(`Could not find Tigercat repo root from ${startDirectory}`)
-    }
-    current = next
   }
 }
 

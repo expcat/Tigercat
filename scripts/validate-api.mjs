@@ -10,7 +10,7 @@
  */
 
 import { readFileSync, readdirSync, writeFileSync, existsSync, statSync } from 'fs'
-import { join, basename, relative } from 'path'
+import { join, basename, relative, sep } from 'path'
 import { fileURLToPath } from 'url'
 import {
   buildPublicComponentEntries,
@@ -1263,6 +1263,60 @@ if (existsSync(context7Path)) {
         'docs-route',
         `context7 references missing path "${referencePath}"`
       )
+    }
+  }
+
+  // ----- MCP 远程模式 manifest（skill_files）双向校验 -----
+  // 远程模式无法列目录，allow-list 完全依赖该清单；必须与磁盘精确一致。
+  const expectedSkillFiles = collectFiles(join(ROOT, 'skills', 'tigercat'), ['.md'])
+    .map((file) => relative(ROOT, file).split(sep).join('/'))
+    .filter((path) => path !== 'skills/tigercat/ROADMAP.md')
+    .sort()
+  const manifestSkillFiles = context7.skill_files
+
+  if (!Array.isArray(manifestSkillFiles)) {
+    addIssue(
+      'context7.json',
+      0,
+      'mcp-manifest',
+      'context7 缺少 skill_files 数组（MCP 远程 allow-list 契约），请重跑 pnpm docs:api'
+    )
+  } else {
+    const sortedUnique = [...new Set(manifestSkillFiles)].sort()
+    if (
+      manifestSkillFiles.length !== sortedUnique.length ||
+      manifestSkillFiles.some((path, position) => path !== sortedUnique[position])
+    ) {
+      addIssue('context7.json', 0, 'mcp-manifest', 'skill_files 必须去重并按码位排序')
+    }
+
+    for (const path of manifestSkillFiles) {
+      if (
+        typeof path !== 'string' ||
+        !path.startsWith('skills/tigercat/') ||
+        !path.endsWith('.md')
+      ) {
+        addIssue(
+          'context7.json',
+          0,
+          'mcp-manifest',
+          `skill_files 含非法条目 "${path}"（须为 skills/tigercat/**.md）`
+        )
+      }
+    }
+
+    const manifestSet = new Set(manifestSkillFiles)
+    for (const path of expectedSkillFiles) {
+      if (!manifestSet.has(path)) {
+        addIssue('context7.json', 0, 'mcp-manifest', `skill_files 缺少磁盘文件 "${path}"`)
+      }
+    }
+
+    const expectedSet = new Set(expectedSkillFiles)
+    for (const path of manifestSet) {
+      if (typeof path === 'string' && !expectedSet.has(path)) {
+        addIssue('context7.json', 0, 'mcp-manifest', `skill_files 含磁盘上不存在的条目 "${path}"`)
+      }
     }
   }
 

@@ -45,9 +45,9 @@ Available groups are `basic`, `form`, `feedback`, `layout`, `navigation`, `data`
 
 ## Breaking Changes
 
-Breaking changes must be centralized in [docs/MIGRATION.md](../../../docs/MIGRATION.md) and [CHANGELOG.md](../../../CHANGELOG.md). Each entry should include affected package or component, removed API, replacement API, and a minimal diff when possible.
+Breaking changes must be centralized in [docs/MIGRATION.md](https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md) and [CHANGELOG.md](https://github.com/expcat/Tigercat/blob/main/CHANGELOG.md). Each entry should include affected package or component, removed API, replacement API, and a minimal diff when possible.
 
-Current v2.0.0 is the stable release of the v2 surface: fixed package versions including the MCP package, runtime version exports, ESM-only core / React / Vue packages, explicit component exports, tree-shaking guards, API removals, migrated docs/examples, and local MCP reference routing. The full v2.0.0 breaking-change set and migration paths are centralized in [docs/MIGRATION.md](../../../docs/MIGRATION.md). The previous completed breaking-change set remains v1.5.0:
+Current v2.0.0 is the stable release of the v2 surface: fixed package versions including the MCP package, runtime version exports, ESM-only core / React / Vue packages, explicit component exports, tree-shaking guards, API removals, migrated docs/examples, and local MCP reference routing. The full v2.0.0 breaking-change set and migration paths are centralized in [docs/MIGRATION.md](https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md). The previous completed breaking-change set remains v1.5.0:
 
 | Area                       | Removed or changed                 | Replacement or action                                                 |
 | -------------------------- | ---------------------------------- | --------------------------------------------------------------------- |

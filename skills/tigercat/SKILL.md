@@ -14,6 +14,7 @@ Tailwind CSS 驱动的 React + Vue 3 组件库。先按任务定位 reference，
 - Use `tigercat_search` for fuzzy component/category/topic lookup; `Grid` routes to `Row` + `Col`.
 - Use `tigercat_reference` only for direct allow-listed Skill reference reads.
 - `notification` is a root command API/topic route, not a public component; `Message` remains both component docs and command API context.
+- MCP 默认从 GitHub Pages 远程读取 skills；`--root` 用本地仓库，`--base-url` 可指镜像。
 
 ## Routes
 

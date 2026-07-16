@@ -52,10 +52,14 @@ jobs:
 
       - name: Prepare public_html
         run: |
-          mkdir -p public_html
+          mkdir -p public_html/mcp
           cp examples/index.html public_html/index.html
           mv examples/example/vue3/dist public_html/vue
           mv examples/example/react/dist public_html/react
+          cp examples/mcp/index.html public_html/mcp/index.html
+          cp context7.json public_html/mcp/context7.json
+          cp -r skills public_html/mcp/skills
+          node -e "const fs=require('fs');const v=JSON.parse(fs.readFileSync('package.json','utf8')).version;fs.writeFileSync('public_html/mcp/version.json',JSON.stringify({version:v,commit:process.env.GITHUB_SHA||'',builtAt:new Date().toISOString()})+'\n')"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

@@ -10,6 +10,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js'
 
 import { loadSkillIndex, readReferenceSource } from './skill-index'
+import { PACKAGE_VERSION } from './version'
 import {
   createTopicRoute,
   getCategoryComponents,
@@ -27,7 +28,7 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
   const server = new Server(
     {
       name: '@expcat/tigercat-mcp',
-      version: '2.0.0-rc.1'
+      version: PACKAGE_VERSION
     },
     {
       capabilities: {
@@ -40,7 +41,7 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
 
   let indexPromise: Promise<SkillIndex> | undefined
   const getIndex = () => {
-    indexPromise ??= loadSkillIndex(options.root)
+    indexPromise ??= loadSkillIndex(options)
     return indexPromise
   }
 

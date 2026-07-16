@@ -68,20 +68,29 @@ TEST_GROUP=form pnpm test:validate
 
 ## MCP 服务
 
-`@expcat/tigercat-mcp` 是只读的本地 stdio MCP 服务。它读取 `context7.json` 和
-`skills/tigercat/**`，提供组件/任务到最小 skill references 的路由，不运行 `docs:api`
-也不修改生成文档。
+`@expcat/tigercat-mcp` 是只读的 stdio MCP 服务。默认从 GitHub Pages 的
+`https://expcat.github.io/Tigercat/mcp/` 远程读取 `context7.json` 和
+`skills/tigercat/**`（随 Pages 部署发布，见 `.github/workflows/deploy.yml`）；
+`--root` 切换为读取本地仓库 checkout。服务只做组件/任务到最小 skill references
+的路由，不运行 `docs:api` 也不修改生成文档。
 
 ```bash
 pnpm mcp:build
-pnpm mcp:serve
+pnpm mcp:serve          # 等价于 --root .（本地模式）
 ```
 
 LLM 客户端也可以直接配置构建后的 bin：
 
 ```bash
-tigercat-mcp --root /path/to/Tigercat
+tigercat-mcp                                             # 默认远程（GitHub Pages）
+tigercat-mcp --root /path/to/Tigercat                    # 本地仓库（离线/开发）
+tigercat-mcp --base-url https://mirror.example.com/mcp/  # 镜像站
+tigercat-mcp --doctor                                    # 校验技能源可达性与完整性
 ```
+
+`TIGERCAT_MCP_BASE_URL` 是 `--base-url` 的环境变量形式。远程 allow-list 由
+`context7.json` 的 `skill_files` 清单驱动：`pnpm docs:api` 生成、`pnpm api:validate`
+与磁盘双向校验。
 
 ## 内部 helper（仅限仓库脚本）
 
