@@ -1,0 +1,7 @@
+{
+  "id": "file-manager-02",
+  "title": "网格与受控文件操作",
+  "description": "展示网格视图下受控选择、搜索、打开、新建与删除；files、selectedKeys 和 searchText 均由页面状态维护。",
+  "entry": "App.vue",
+  "order": 2
+}

@@ -1,0 +1,7 @@
+{
+  "id": "form-wizard-02",
+  "title": "异步校验与条件跳步",
+  "description": "beforeNext 在前进前执行异步用户名校验，skipCondition 根据页面状态决定是否跳过团队步骤。",
+  "entry": "App.vue",
+  "order": 2
+}

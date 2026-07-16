@@ -1,0 +1,7 @@
+{
+  "id": "chat-window-02",
+  "title": "虚拟消息与输入模式",
+  "description": "使用固定行高虚拟化渲染 120 条消息，并在单行 input 与多行 textarea 输入模式之间切换。",
+  "entry": "App.tsx",
+  "order": 2
+}

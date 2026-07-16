@@ -1,0 +1,7 @@
+{
+  "id": "comment-thread-02",
+  "title": "受控互动与加载事件",
+  "description": "受控 expandedKeys 展示展开状态，并实际处理点赞、回复、更多操作与加载剩余回复事件。",
+  "entry": "App.vue",
+  "order": 2
+}
