@@ -1,0 +1,12 @@
+{
+  "id": "image-viewer-02",
+  "title": "索引、缩放与关闭控制",
+  "description": "受控 currentIndex 跟随导航回调更新，将缩放限制在 0.75×–2×，并记录关闭事件。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

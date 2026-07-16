@@ -1,0 +1,12 @@
+{
+  "id": "activity-feed-02",
+  "title": "数据模式与状态",
+  "description": "在平铺 items、显式 groups、加载态和空态之间切换，展示 ActivityFeed 的主要数据与反馈分支。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}
