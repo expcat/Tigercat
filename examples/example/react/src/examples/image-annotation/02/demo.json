@@ -1,0 +1,7 @@
+{
+  "id": "image-annotation-02",
+  "title": "受控工具、选区与只读",
+  "description": "外部状态同步 tool 和 selectedId，并可切换 readonly；组件内工具栏和标注点击会回写同一受控状态。",
+  "entry": "App.tsx",
+  "order": 2
+}

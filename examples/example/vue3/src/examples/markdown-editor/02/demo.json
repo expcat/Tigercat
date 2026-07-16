@@ -1,0 +1,12 @@
+{
+  "id": "markdown-editor-02",
+  "title": "受控模式与扩展渲染",
+  "description": "外部按钮控制 edit/preview，自定义 renderer 负责预览输出，自定义 toolbar 混合内置格式动作与提示块动作。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

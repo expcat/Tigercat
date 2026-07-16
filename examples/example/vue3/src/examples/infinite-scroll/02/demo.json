@@ -1,0 +1,13 @@
+{
+  "id": "infinite-scroll-02",
+  "title": "横向增量加载",
+  "description": "direction=horizontal 将容器切换为横向滚动，并在右侧边界触发分批加载与结束状态。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "fixed",
+    "height": 320,
+    "minHeight": 320,
+    "maxHeight": 320
+  }
+}
