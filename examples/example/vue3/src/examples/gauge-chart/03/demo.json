@@ -1,0 +1,8 @@
+{
+  "id": "gauge-chart-03",
+  "title": "完整表盘、渐变与提示",
+  "description": "不传角度时使用默认 135°–405° 完整表盘；gradient 让指示弧带渐变，showTooltip + tooltipFormatter 自定义悬停提示。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }
+}

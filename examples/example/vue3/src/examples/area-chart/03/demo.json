@@ -1,0 +1,8 @@
+{
+  "id": "area-chart-03",
+  "title": "坐标轴与网格",
+  "description": "非堆叠多系列配合 xAxisLabel/yAxisLabel、yTickFormat 与 gridLineStyle；关掉 showGrid/showAxis 可做迷你趋势图。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 240, "maxHeight": 720 }
+}

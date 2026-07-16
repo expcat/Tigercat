@@ -1,0 +1,8 @@
+{
+  "id": "donut-chart-02",
+  "title": "调色板、动画与渐变",
+  "description": "colors 统一配色，animated 开启入场动画，gradient 渐变填充，borderWidth/borderColor 控制扇区描边。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }
+}

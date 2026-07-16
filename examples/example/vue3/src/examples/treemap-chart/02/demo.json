@@ -1,0 +1,8 @@
+{
+  "id": "treemap-chart-02",
+  "title": "渐变、标签阈值与提示",
+  "description": "gradient 为每个节点叠加自上而下的渐变；minLabelSize 决定过小的格子隐藏标签；showLabels=false 时可改用 legendPosition 放置图例。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 380, "maxHeight": 720 }
+}

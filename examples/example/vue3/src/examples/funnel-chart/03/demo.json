@@ -1,0 +1,8 @@
+{
+  "id": "funnel-chart-03",
+  "title": "逐项配色、响应式与无障碍",
+  "description": "数据项自带 color 可逐段指定颜色；responsive 跟随容器宽度；title/desc 为 SVG 提供无障碍标题与描述。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 300, "maxHeight": 720 }
+}

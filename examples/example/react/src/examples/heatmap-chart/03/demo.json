@@ -1,0 +1,8 @@
+{
+  "id": "heatmap-chart-03",
+  "title": "大矩阵与 canvas 渲染",
+  "description": "renderMode=\"canvas\" 把格子画进 canvas 层，适合大矩阵；默认 \"auto\" 会在格子数超过 canvasThreshold 时自动切换。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 280, "maxHeight": 720 }
+}

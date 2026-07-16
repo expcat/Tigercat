@@ -1,0 +1,8 @@
+{
+  "id": "bar-chart-02",
+  "title": "数值标签与格式化",
+  "description": "valueLabelPosition 在柱顶/柱内切换，valueLabelFormatter 自定义标签文案，tooltipFormatter 自定义提示文案。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 240, "maxHeight": 720 }
+}

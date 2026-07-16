@@ -1,0 +1,8 @@
+{
+  "id": "bar-chart-03",
+  "title": "配色、柱体与坐标轴",
+  "description": "colors 循环配色或 barColor 单色；barMaxWidth/barPaddingInner 控制柱体宽度与间距；xAxisLabel/yAxisLabel 标注轴，showGrid 可关闭网格。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 240, "maxHeight": 720 }
+}

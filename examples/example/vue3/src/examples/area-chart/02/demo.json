@@ -1,0 +1,8 @@
+{
+  "id": "area-chart-02",
+  "title": "单系列与填充自定义",
+  "description": "data 单系列写法配合 areaColor/fillOpacity 定制填充；showPoints 与 includeZero 控制数据点与基线。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 240, "maxHeight": 720 }
+}

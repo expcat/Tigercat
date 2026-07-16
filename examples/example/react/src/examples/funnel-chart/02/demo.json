@@ -1,0 +1,8 @@
+{
+  "id": "funnel-chart-02",
+  "title": "纵向布局、渐变与提示",
+  "description": "direction=\"vertical\"（默认）自上而下收窄；gradient 开启分段渐变，showTooltip 与 legendPosition 控制提示与图例位置。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 300, "maxHeight": 720 }
+}

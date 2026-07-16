@@ -1,0 +1,8 @@
+{
+  "id": "scatter-chart-02",
+  "title": "点样式与尺寸",
+  "description": "pointStyle 支持 circle/square/triangle/diamond；pointSize、pointColor、pointOpacity 统一控制散点外观。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 720 }
+}

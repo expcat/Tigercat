@@ -1,0 +1,8 @@
+{
+  "id": "pie-chart-02",
+  "title": "内半径、角度与间隔",
+  "description": "innerRadius 挖出环形；startAngle/endAngle 做半圆仪表式扇形；padAngle 与 borderWidth/borderColor 控制扇区间隔。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }
+}

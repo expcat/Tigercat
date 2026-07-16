@@ -1,0 +1,8 @@
+{
+  "id": "radar-chart-02",
+  "title": "单系列、网格层级与线型",
+  "description": "data 单系列写法配合 levels 控制网格圈数、gridShape=\"polygon\" 多边形网格、gridLineStyle 换线型；也可关掉 showGrid/showAxis 只留形状。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 280, "maxHeight": 720 }
+}

@@ -1,0 +1,8 @@
+{
+  "id": "line-chart-02",
+  "title": "坐标轴与网格",
+  "description": "xAxisLabel/yAxisLabel 标注轴含义，yTicks + yTickFormat 控制刻度，gridLineStyle 换网格线型；也可用 showGrid/showYAxis 关成极简折线。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 240, "maxHeight": 720 }
+}

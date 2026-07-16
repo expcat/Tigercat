@@ -1,0 +1,8 @@
+{
+  "id": "scatter-chart-03",
+  "title": "坐标轴与图例",
+  "description": "xAxisLabel/yAxisLabel 与 xTicks/yTicks/yTickFormat 配置坐标轴；colors 循环配色配合 showLegend 展示分类图例。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 260, "maxHeight": 720 }
+}
