@@ -335,7 +335,7 @@ async function main() {
 
   if (counters.failedFiles > 0) {
     console.log(c('red', '❌ Validation failed'))
-    console.log('See tests/TEST_QUALITY_GUIDELINES.md for standards.')
+    console.log('See tests/README.md for standards.')
     process.exit(1)
   }
 

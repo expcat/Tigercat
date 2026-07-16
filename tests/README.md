@@ -1,432 +1,75 @@
-# Tigercat Component Tests
+# Tigercat 测试指南
 
-This directory contains comprehensive test suites for all Vue and React components in the Tigercat UI library.
+本目录包含 framework-agnostic core 测试、React/Vue 绑定测试和共享测试工具。本文是测试约定的唯一入口；脚本行为以 `package.json`、`vitest.config.ts` 与 `scripts/validate-tests.mjs` 为准。
 
-## Structure
+## 目录
 
-```
+```text
 tests/
-├── core/               # Core utils/theme unit tests (framework-agnostic)
-│   ├── class-names.spec.ts
-│   ├── chart-utils.spec.ts
-│   └── ...
-├── vue/                # Vue component test files
-│   ├── Button.spec.ts
-│   ├── Input.spec.ts
-│   └── ...
-├── react/              # React component test files
-│   ├── Button.spec.tsx
-│   ├── Input.spec.tsx
-│   └── ...
-├── utils/              # Shared test utilities and helpers
-│   ├── render-helpers.ts        # Vue render helpers
-│   ├── render-helpers-react.ts  # React render helpers
-│   ├── a11y-helpers.ts
-│   ├── theme-helpers.ts
-│   ├── test-fixtures.ts
-│   ├── mock-observers.ts        # Shared MockResizeObserver / MockIntersectionObserver
-│   ├── frame-scheduler.ts       # Shared requestAnimationFrame helpers
-│   └── index.ts
-├── setup.ts            # Global test setup
-└── TEST_QUALITY_GUIDELINES.md  # Testing standards and review checklist
+├── core/     # 共享算法、工具、导出与跨框架回归
+├── react/    # React 渲染、事件、受控状态与生命周期绑定
+├── vue/      # Vue 渲染、emits、响应式状态与生命周期绑定
+├── utils/    # render、a11y、主题、observer 与 frame helpers
+└── setup.ts  # Vitest 全局环境
 ```
 
-## Running Tests
+## 常用命令
 
 ```bash
-# Run all tests (Vue and React)
-pnpm test
-
-# Run Vue tests only
-pnpm test tests/vue
-
-# Run React tests only
-pnpm test tests/react
-
-# Run tests in watch mode
-pnpm test:watch
-
-# Run tests with UI
-pnpm test:ui
-
-# Run tests with coverage
-pnpm test:coverage
-
-# Run specific test file
-pnpm test Button.spec
+pnpm test                         # 全部测试
+pnpm test:core                   # core 测试
+pnpm test:react                  # React 测试
+pnpm test:vue                    # Vue 测试
+pnpm test:group:form             # 指定组件分组
+pnpm test:group -- --group data --framework react
+pnpm test:coverage               # 发布门禁使用的 coverage
+pnpm test:coverage:report        # 按需生成 JSON/HTML 报告
+pnpm test:validate               # 测试质量检查
+pnpm test:watch                  # watch mode
+pnpm test:ui                     # Vitest UI
 ```
 
-## Framework-Specific Quick Start
-
-Testing standards for both frameworks live in [TEST_QUALITY_GUIDELINES.md](./TEST_QUALITY_GUIDELINES.md).
-
-### Vue Testing
-
-- Test template: `vue/ComponentTemplate.spec.ts.template`
-- Example test: `vue/Button.spec.ts`
-
-### React Testing
-
-- Test template: `react/ComponentTemplate.spec.tsx.template`
-- Example test: `react/Button.spec.tsx`
-
-## Test Structure
-
-Both Vue and React tests follow a similar structure:
-
-```typescript
-describe('ComponentName', () => {
-  describe('Rendering', () => {
-    // Basic rendering tests
-  })
-
-  describe('Props', () => {
-    // Props validation tests
-  })
-
-  describe('Events', () => {
-    // Event/handler tests
-  })
-
-  describe('States', () => {
-    // Different state tests (disabled, loading, etc.)
-  })
-
-  describe('Theme Support', () => {
-    // Theme customization tests
-  })
-
-  describe('Accessibility', () => {
-    // a11y tests
-  })
-
-  describe('Snapshots', () => {
-    // Snapshot tests for major variants
-  })
-})
-```
-
-## Test Coverage Requirements
-
-All component tests should cover:
-
-1. **Rendering**: Basic rendering with default and custom props
-2. **Props**: All prop combinations and edge cases
-3. **Events**: All emitted events and their payloads
-4. **Slots**: Default and named slots if applicable
-5. **States**: Different states (disabled, loading, error, etc.)
-6. **Theme**: Theme customization via CSS variables
-7. **Accessibility**:
-   - ARIA attributes
-   - Keyboard navigation
-   - Screen reader support
-   - No accessibility violations
-8. **Snapshots**: Major use cases and variants
-
-### Writing Tests
-
-#### Basic Rendering Test
-
-```typescript
-it('should render with default props', () => {
-  const { getByRole } = render(Component, {
-    slots: { default: 'Content' }
-  })
-
-  expect(getByRole('button')).toBeInTheDocument()
-})
-```
-
-#### Props Testing
-
-```typescript
-it('should apply size prop correctly', () => {
-  const { container } = renderWithProps(Component, { size: 'lg' })
-  expect(container.querySelector('button')).toHaveClass('px-6')
-})
-```
-
-#### Event Testing
-
-```typescript
-it('should emit click event', async () => {
-  const handleClick = vi.fn()
-  const { getByRole } = render(Component, {
-    props: { onClick: handleClick }
-  })
-
-  await fireEvent.click(getByRole('button'))
-  expect(handleClick).toHaveBeenCalledTimes(1)
-})
-```
-
-#### Accessibility Testing
-
-```typescript
-it('should have no a11y violations', async () => {
-  const { container } = render(Component)
-  await expectNoA11yViolations(container)
-})
-```
-
-#### Theme Testing
-
-```typescript
-it('should support custom theme', () => {
-  setThemeVariables({ '--tiger-primary': '#ff0000' })
-  const { container } = render(Component)
-
-  // Verify theme is applied
-  const styles = getComputedStyles(document.documentElement)
-  expect(styles.getPropertyValue('--tiger-primary')).toBe('#ff0000')
-})
-```
-
-#### Snapshot Testing
-
-```typescript
-it('should match snapshot', () => {
-  const { container } = render(Component)
-  expect(container.firstChild).toMatchSnapshot()
-})
-```
-
-## Test Utilities
-
-### Render Helpers
-
-- `renderComponent(component, options)` - Render with default setup
-- `renderWithProps(component, props, options)` - Render with props
-- `renderWithSlots(component, slots, options)` - Render with slots
-- `createWrapper(component, wrapper)` - Create wrapped component
-
-### Accessibility Helpers
-
-- `axe(container)` - Run axe accessibility tests
-- `expectNoA11yViolations(container)` - Assert no a11y violations
-- `expectProperAriaLabels(element, attributes)` - Check ARIA attributes
-- `testKeyboardNavigation(element, keys)` - Test keyboard interactions
-
-### Theme Helpers
-
-- `setThemeVariables(variables)` - Set CSS variables
-- `clearThemeVariables(variables)` - Clear CSS variables
-- `getComputedStyles(element)` - Get computed styles
-- `expectThemeColor(element, variable, color)` - Test theme colors
-- `themeTestCases` - Common theme test cases
-
-### Mock Observers (`mock-observers.ts`)
-
-- `MockResizeObserver` - Shared ResizeObserver mock with `trigger()` and static `reset()`
-- `MockIntersectionObserver` - Shared IntersectionObserver mock with `trigger()` and static `reset()`
-
-### Frame Scheduler (`frame-scheduler.ts`)
-
-- `createFrameScheduler()` - DI-pattern scheduler (requestFrame/cancelFrame/flush) for dependency injection
-- `installFrameScheduler()` - Global stub that replaces `requestAnimationFrame`/`cancelAnimationFrame` with `vi.fn()` + `flush()`
-
-### Test Fixtures
-
-- `buttonVariants` - Common button variants
-- `componentSizes` - Common component sizes
-- `inputTypes` - Common input types
-- `createMockHandlers()` - Create mock event handlers
-- `waitForNextTick()` - Wait for next tick
-- `waitFor(condition)` - Wait for condition
-- `testLabels` - Common test labels
-- `commonClasses` - Common CSS classes
-
-## Best Practices
-
-1. **Test Behavior, Not Implementation**: Focus on what the component does, not how it does it
-2. **Use Semantic Queries**: Prefer `getByRole`, `getByLabelText` over `getByTestId`
-3. **Test User Interactions**: Simulate real user behavior with `fireEvent` from `@testing-library/vue`
-4. **Keep Tests Independent**: Each test should run independently
-5. **Use Descriptive Names**: Test names should clearly describe what they test
-6. **Don't Test Third-Party Code**: Focus on your component logic
-7. **Avoid Implementation Details**: Don't test internal state or methods
-8. **Test Edge Cases**: Include error states, empty states, boundary values
-9. **Maintain Snapshots**: Update snapshots only when changes are intentional
-
-## Testing Workflow
-
-### For New Contributors
-
-1. **Read the Testing Standards**: [TEST_QUALITY_GUIDELINES.md](./TEST_QUALITY_GUIDELINES.md) covers both Vue and React.
-
-2. **Look at Examples**:
-   - Vue: `vue/Button.spec.ts`
-   - React: `react/Button.spec.tsx`
-
-3. **Run Tests in Watch Mode**:
-
-   ```bash
-   pnpm test
-   ```
-
-4. **Use Test UI for Debugging**:
-   ```bash
-   pnpm test:ui
-   ```
-
-### Writing Tests for New Components
-
-1. Create test file in appropriate directory:
-   - Vue: `tests/vue/YourComponent.spec.ts`
-   - React: `tests/react/YourComponent.spec.tsx`
-
-2. Follow the standard test structure:
-
-   ```typescript
-   describe('YourComponent', () => {
-     describe('Rendering', () => {
-       /* ... */
-     })
-     describe('Props', () => {
-       /* ... */
-     })
-     describe('Events', () => {
-       /* ... */
-     })
-     describe('States', () => {
-       /* ... */
-     })
-     describe('Theme Support', () => {
-       /* ... */
-     })
-     describe('Accessibility', () => {
-       /* ... */
-     })
-     describe('Snapshots', () => {
-       /* ... */
-     })
-   })
-   ```
-
-3. Use helper functions from `tests/utils/`:
-   - `renderWithProps(component, props)`
-   - `expectNoA11yViolations(container)`
-   - `setThemeVariables(variables)`
-
-4. Run your tests:
-
-   ```bash
-   pnpm test YourComponent
-   ```
-
-5. Validate against the quality guidelines:
-
-   ```bash
-   pnpm test:validate
-   ```
-
-## Troubleshooting Tests
-
-### Common Issues
-
-#### 1. Tests Failing After Changes
-
-**Problem**: Tests fail after updating dependencies or making changes.
-
-**Solution**:
+运行单文件或按名称筛选：
 
 ```bash
-# Clear Vitest cache
-rm -rf node_modules/.vitest
-
-# Rebuild packages
-pnpm build
-
-# Rerun tests
-pnpm test
+pnpm vitest run tests/react/Button.spec.tsx
+pnpm vitest run -t "opens the menu"
 ```
 
-#### 2. Accessibility Tests Failing
+组件分组、filter 与 framework 参数见 [scripts/README.md](../scripts/README.md)。
 
-**Problem**: `jest-axe` reports violations you can't see.
+## 编写原则
 
-**Solution**:
+1. 测行为，不测实现细节。优先断言角色、ARIA、属性、可见内容、事件和受控值；不要断言 Tailwind class 字符串。
+2. 每条测试只覆盖一个独立意图。相同代码路径的 controlled/uncontrolled、键盘/鼠标或多个变体优先合并为代表性用例或 `it.each`。
+3. 不写 snapshot 测试；直接断言需要保护的行为。
+4. 共享纯逻辑只在 `tests/core` 测一次；React/Vue spec 只验证各自的绑定、渲染、事件、slots/children、生命周期和无障碍接线。
+5. 交互组件每个框架保留一条 `expectNoA11yViolations` 检查，并针对真实风险补充键盘与 ARIA 断言。
+6. 不使用任意 timeout 等待；使用 `waitFor`、`findBy*`、observer mock 或 frame scheduler 驱动状态。
+7. 测试必须独立，不依赖执行顺序或跨测试共享的可变状态。
 
-- Run tests with UI: `pnpm test:ui`
-- Check the detailed violation messages
-- Use browser dev tools to inspect the rendered component
-- Refer to [WCAG guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+`tests/react/ComponentTemplate.spec.tsx.template` 与 `tests/vue/ComponentTemplate.spec.ts.template` 提供最小模板。共享 helper 从 `tests/utils` 导入；新增 helper 前先检查现有 render、a11y、theme、observer 和 frame 工具。
 
-#### 3. Snapshot Mismatches
+## 自动门禁
 
-**Problem**: Snapshot tests fail after intentional changes.
+`pnpm test:validate` 的硬错误：
 
-**Solution**:
+- spec 没有收集到测试；
+- 存在 `.only`；
+- 非注释代码中使用 `: any`。
 
-```bash
-# Review the snapshot diff carefully
-pnpm test -- -u  # Update snapshots (only if changes are intentional)
-```
+以下仅为建议警告：
 
-#### 4. Flaky Tests
+- 少于一半测试名包含可识别的行为动词；
+- React/Vue 组件 spec 没有 `expectNoA11yViolations`。
 
-**Problem**: Tests pass/fail inconsistently.
+Coverage 阈值由 `vitest.config.ts` 统一维护，当前为 lines 85%、statements 83%、functions 84%、branches 76%。不要在文档或单个 spec 中另设一套阈值。
 
-**Solution**:
+## 按改动范围验证
 
-- Use `waitFor` for async operations
-- Avoid relying on timing (use proper async utilities)
-- Ensure tests are independent (no shared state)
-- Use `beforeEach`/`afterEach` for setup/cleanup
+- 单组件：运行对应单文件和 `pnpm test:group:<group>`。
+- 共享 helper：运行所有受影响 group，并补充 focused core spec。
+- public API 或发布面：运行 `pnpm quality:release`，并按需执行 `pnpm e2e`。
+- 文档或 Example：运行相关 docs/examples 检查和 changed-file Prettier；无需运行无关的完整测试集。
 
-#### 5. Component Not Rendering
-
-**Problem**: Test can't find rendered component.
-
-**Solution**:
-
-```typescript
-// Debug by logging the rendered output
-const { container } = render(Component)
-console.log(container.innerHTML)
-
-// Use screen.debug() for better formatting
-import { screen } from '@testing-library/vue'
-screen.debug()
-```
-
-### Getting Help
-
-- Check existing test files for examples
-- Read [Vue Testing Library docs](https://testing-library.com/docs/vue-testing-library/intro/)
-- Read [React Testing Library docs](https://testing-library.com/docs/react-testing-library/intro/)
-- Search [GitHub Issues](https://github.com/expcat/Tigercat/issues)
-
-## Debugging Tests
-
-```bash
-# Run a specific test file
-pnpm test Button.spec.ts
-
-# Run tests matching a pattern
-pnpm test --grep "should render"
-
-# Run with verbose output
-pnpm test --reporter=verbose
-
-# Run with UI for debugging
-pnpm test:ui
-```
-
-## Resources
-
-- [Vitest Documentation](https://vitest.dev/)
-- [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
-- [Testing Library Queries](https://testing-library.com/docs/queries/about)
-- [vitest-axe](https://github.com/chaance/vitest-axe)
-- [jest-dom Matchers](https://github.com/testing-library/jest-dom)
-
-## Contributing
-
-When adding new components:
-
-1. Create a corresponding `.spec.ts` file in `tests/vue/`
-2. Follow the test structure outlined above
-3. Ensure all test categories are covered
-4. Run tests and verify coverage
-5. Update this README if adding new utilities or patterns
+提交前确认测试保护的是用户可观察行为、没有重复覆盖共享逻辑，也没有通过扩大等待时间掩盖不稳定性。

@@ -68,7 +68,7 @@ pnpm --filter @expcat/tigercat-example-nuxt build
 pnpm --filter @expcat/tigercat-example-nextjs build
 ```
 
-SSR 示例会渲染稳定 `DatePicker` 与带 SVG gradient 的 `BarChart`，覆盖 Roadmap §9.3 中的 hydration mismatch 风险点。
+SSR 示例会渲染稳定的 `DatePicker` 与带 SVG gradient 的 `BarChart`，覆盖 locale/timezone 与 SVG id 的 hydration 风险。
 
 ## 样式接入要点
 

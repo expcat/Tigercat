@@ -22,9 +22,9 @@
 | `pnpm test:special`          | 根 package scripts                      | 运行 coverage 排除的 4 个副作用/命令式 API specs                                                |
 | `pnpm test:coverage:report`  | 根 package scripts                      | 按需生成 text、JSON 与 HTML coverage 报告                                                       |
 | `pnpm test:group`            | `scripts/run-component-group-tests.mjs` | 按组件组运行 Vitest；支持 `--group`、`--framework`、`--filter` 和 `--list`                      |
-| `pnpm test:validate`         | `scripts/validate-tests.mjs`            | 按 [测试质量指南](../tests/TEST_QUALITY_GUIDELINES.md) 检查测试文件                             |
+| `pnpm test:validate`         | `scripts/validate-tests.mjs`            | 按 [测试指南](../tests/README.md) 检查测试文件                                                  |
 | `pnpm example:ssr:check`     | `scripts/check-ssr-examples.mjs`        | 构建 Nuxt/Next.js SSR 示例，并检查 `examples/nextjs/next-env.d.ts` 没有被构建过程改写           |
-| `pnpm example:sources:check` | `scripts/validate-example-sources.mjs`  | 校验 456 个 React 与 455 个 Vue 独立模块的元数据、入口、导入白名单、数量和 DemoBlock 新契约     |
+| `pnpm example:sources:check` | `scripts/validate-example-sources.mjs`  | 校验 React/Vue 独立模块的元数据、入口、导入白名单、数量和 DemoBlock 契约                        |
 | `pnpm docs:api`              | `scripts/generate-api-docs.mjs`         | 生成 skills API 摘要                                                                            |
 | `pnpm api:baseline:check`    | 根 package scripts                      | 公共 API 基线漂移闸：生成基线并校验 `api-reports` 无差异                                        |
 | `pnpm docs:api:check`        | 根 package scripts                      | references 漂移闸：生成 LLM API 文档并校验 `skills/tigercat/references` 无差异                  |
@@ -46,7 +46,7 @@ pnpm example:all -- --smoke --smoke-ms=2000
 
 ## 组件分组测试
 
-R10 之后的组件批次优先运行对应分组测试，再按变更范围补充 API、docs、examples 或发布门禁。分组来自 `scripts/lib/public-components.mjs` 的组件 Category，runner 会同时收集 React/Vue 组件 spec、同组 core utils spec 和必要 cross-cutting spec。`--framework react|vue` 只缩窄 React/Vue 组件 spec，仍会保留同组 shared core spec。
+组件改动优先运行对应分组测试，再按变更范围补充 API、docs、examples 或发布门禁。分组来自 `scripts/lib/public-components.mjs` 的组件 Category，runner 会同时收集 React/Vue 组件 spec、同组 core utils spec 和必要 cross-cutting spec。`--framework react|vue` 只缩窄 React/Vue 组件 spec，仍会保留同组 shared core spec。
 
 ```bash
 pnpm test:group -- --group form --list
@@ -58,7 +58,7 @@ TEST_GROUP=form pnpm test:validate
 
 可用分组：`basic`、`form`、`feedback`、`layout`、`navigation`、`data`、`charts`、`advanced`、`composite`、`core`。`pnpm test:group` 支持 `--group` / `TEST_GROUP`、`--framework` / `TEST_FRAMEWORK`、`--filter` / `TEST_FILTER` 和 `--list`；`pnpm test:validate` 支持同一组参数用于只扫描目标组测试质量。当前 `form` 支持 `primitives` 与 `composite` filter alias。
 
-后续 Rxx 验证模板：
+按改动范围选择验证：
 
 - 组件源码改动：运行对应 `pnpm test:group:<group>`，必要时用 `--framework` 或 `--filter` 缩小范围。
 - 跨组 helper 改动：运行所有受影响 group 的 `pnpm test:group:<group>`，再补充相关 focused `vitest run`。

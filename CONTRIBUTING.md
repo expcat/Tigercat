@@ -5,7 +5,7 @@
 ## 开始之前
 
 - 阅读 [README.md](README.md) 了解包结构、兼容性和常用命令。
-- 阅读 [docs/ROADMAP.md](docs/ROADMAP.md) 确认当前优先级与文档职责边界，避免重复实现已经规划或完成的工作。
+- 阅读 [docs/ROADMAP.md](docs/ROADMAP.md) 确认当前任务与文档职责边界。
 - 组件 API、示例、主题、i18n 和术语以 [skills/tigercat/SKILL.md](skills/tigercat/SKILL.md) 为准。
 - 大改动先开 issue 讨论；新组件请使用 Component Proposal 模板。
 
@@ -41,7 +41,7 @@ pnpm example:react
 - 从 `main` 创建功能分支，例如 `feat/table-editing`、`fix/date-picker-locale`、`docs/contributing-guide`。
 - 保持改动聚焦，一次 PR 只解决一个问题或一个 Roadmap 任务。
 - 不提交构建产物、报告目录或无关格式化变更。
-- 如果修改公共 API，请同步更新测试、示例、文档和 Roadmap 状态。
+- 如果修改公共 API，请同步更新测试、示例和文档；仅在对应 Roadmap 任务存在时更新其状态。
 
 ## 代码组织
 
@@ -90,7 +90,7 @@ pnpm example:build
 npx playwright test
 ```
 
-测试约定见 [tests/README.md](tests/README.md)。组件测试应覆盖渲染、props、事件、状态、主题、无障碍和主要交互回归；浏览器测试使用功能断言，不新增图片对比基线。
+测试约定见 [tests/README.md](tests/README.md)。只覆盖具有独立回归价值的渲染、状态、事件和无障碍行为；浏览器测试使用功能断言，不新增图片对比基线。
 
 ## PR 要求
 
@@ -102,7 +102,7 @@ npx playwright test
 - 新增或修改 API 时，Vue/React、Core、测试、示例和文档保持一致。
 - 根因已经消除，不存在平行旧实现或组件专属补丁。
 - React / Vue 绑定保持对称，并已审计全部同类消费者。
-- Roadmap 中对应任务状态已经同步更新；已经交付且影响用户、贡献者或发布流程的变更记录到 `CHANGELOG.md` 或发布记录。
+- 已存在的 Roadmap 任务状态已经同步；影响用户、贡献者或发布流程的交付记录到 `CHANGELOG.md` 或发布记录。
 
 ## Issue 使用
 

@@ -47,16 +47,7 @@ Available groups are `basic`, `form`, `feedback`, `layout`, `navigation`, `data`
 
 Breaking changes must be centralized in [docs/MIGRATION.md](https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md) and [CHANGELOG.md](https://github.com/expcat/Tigercat/blob/main/CHANGELOG.md). Each entry should include affected package or component, removed API, replacement API, and a minimal diff when possible.
 
-Current v2.0.0 is the stable release of the v2 surface: fixed package versions including the MCP package, runtime version exports, ESM-only core / React / Vue packages, explicit component exports, tree-shaking guards, API removals, migrated docs/examples, and local MCP reference routing. The full v2.0.0 breaking-change set and migration paths are centralized in [docs/MIGRATION.md](https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md). The previous completed breaking-change set remains v1.5.0:
-
-| Area                       | Removed or changed                 | Replacement or action                                                 |
-| -------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
-| React `useControlledState` | 3-tuple return with `isControlled` | 2-tuple return; derive `isControlled` locally                         |
-| core                       | `kanbanAddCardClasses` alias       | `taskBoardAddCardClasses`                                             |
-| Dropdown                   | in-place menu DOM by default       | default body portal; use `portal: false` to restore old DOM placement |
-| ImageViewer React          | `onIndexChange`                    | `onCurrentIndexChange`                                                |
-| CommentThread Vue          | `expand-change`                    | `update:expandedKeys` / `v-model:expanded-keys`                       |
-| Spotlight Vue              | `close` event                      | `open-change(false)`                                                  |
+v2 is the current stable API series: package versions including MCP stay fixed together, core / React / Vue publish ESM-only surfaces, and React/Vue use explicit component exports. The full v2.0.0 breaking-change set and every supported replacement path are centralized in [docs/MIGRATION.md](https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md); release history belongs in [CHANGELOG.md](https://github.com/expcat/Tigercat/blob/main/CHANGELOG.md), not this operational guide.
 
 ## SSR And Hydration Matrix
 

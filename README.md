@@ -8,7 +8,7 @@
 
 基于 Tailwind CSS v4 的 Vue 3 / React UI 组件库。两套框架共享设计 token、类型与交互约定，并各自提供 **149 个公共组件入口**。
 
-当前稳定版本为 **v2.0.0**，所有官方包保持相同版本并遵循 SemVer（线上最新版本以顶部 npm 徽章为准）。
+当前稳定系列为 **v2**，所有官方包保持相同版本并遵循 SemVer；具体最新版本以顶部 npm 徽章为准。
 
 > **🚀 在线示例**：<https://expcat.github.io/Tigercat/> — Vue 3 与 React 组件示例、主题切换与暗色模式实时预览。
 
@@ -134,12 +134,12 @@ claude mcp add tigercat -- npx -y @expcat/tigercat-mcp
 
 ## 包
 
-| Package                  | Description                                 |
-| ------------------------ | ------------------------------------------- |
-| `@expcat/tigercat-core`  | 共享类型、设计 token、主题与 Tailwind 插件  |
-| `@expcat/tigercat-vue`   | Vue 3 组件与 composables                    |
-| `@expcat/tigercat-react` | React 组件与 hooks                          |
-| `@expcat/tigercat-cli`   | 项目脚手架、组件辅助、playground 与环境诊断 |
+| Package                  | Description                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| `@expcat/tigercat-core`  | 共享类型、设计 token、主题与 Tailwind 插件                                           |
+| `@expcat/tigercat-vue`   | Vue 3 组件与 composables                                                             |
+| `@expcat/tigercat-react` | React 组件与 hooks                                                                   |
+| `@expcat/tigercat-cli`   | 项目脚手架、组件辅助、playground 与环境诊断                                          |
 | `@expcat/tigercat-mcp`   | 面向 LLM 的 Skill reference 路由服务（默认远程读取 GitHub Pages，`--root` 本地模式） |
 
 ## 兼容性
