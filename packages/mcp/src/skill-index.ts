@@ -205,7 +205,8 @@ export async function readReferenceSource(
   index: SkillIndex,
   path: string,
   reason: string,
-  maxBytes = DEFAULT_MAX_BYTES
+  maxBytes = DEFAULT_MAX_BYTES,
+  section?: string
 ): Promise<ReferenceSource> {
   const normalizedPath = normalizeRelativePath(path)
 
@@ -215,6 +216,20 @@ export async function readReferenceSource(
 
   const text = await index.source.readText(normalizedPath)
   const limit = Number.isFinite(maxBytes) && maxBytes > 0 ? Math.floor(maxBytes) : DEFAULT_MAX_BYTES
+
+  if (section) {
+    const extracted = extractMarkdownSection(text, section)
+    if (extracted !== undefined) {
+      return {
+        path: normalizedPath,
+        reason,
+        truncated: Buffer.byteLength(extracted, 'utf8') > limit,
+        section,
+        text: truncateUtf8(extracted, limit)
+      }
+    }
+  }
+
   const truncated = Buffer.byteLength(text, 'utf8') > limit
 
   return {
@@ -223,6 +238,50 @@ export async function readReferenceSource(
     truncated,
     text: truncateUtf8(text, limit)
   }
+}
+
+// 分类级 props 文件按 `## <组件名>` 抽小节,替代按字节盲截——盲截会把落在
+// 12KB 之后的组件(如 basic 分类的 Tag/Link)整段切丢。找不到小节时返回
+// undefined,由调用方回退整文件读取。
+export function extractMarkdownSection(text: string, section: string): string | undefined {
+  const lines = text.split('\n')
+  const heading = section.trim().toLowerCase()
+  let start = -1
+
+  for (let index = 0; index < lines.length; index++) {
+    const match = /^##\s+(.+?)\s*$/.exec(lines[index])
+    if (match && match[1].toLowerCase() === heading) {
+      start = index
+      break
+    }
+  }
+
+  if (start === -1) return undefined
+
+  let end = lines.length
+  for (let index = start + 1; index < lines.length; index++) {
+    if (/^##\s/.test(lines[index])) {
+      end = index
+      break
+    }
+  }
+
+  return `${lines.slice(start, end).join('\n').trimEnd()}\n`
+}
+
+// 指针型 source:只给 path/reason 不内联正文,用于每会话读一次即可的背景文档。
+export function createReferencePointer(
+  index: SkillIndex,
+  path: string,
+  reason: string
+): ReferenceSource {
+  const normalizedPath = normalizeRelativePath(path)
+
+  if (!index.allowedReferencePaths.has(normalizedPath)) {
+    throw new Error(`Reference path is not allowed: ${path}`)
+  }
+
+  return { path: normalizedPath, reason, truncated: false }
 }
 
 export async function readContext7Source(index: SkillIndex): Promise<ReferenceSource> {
@@ -235,8 +294,10 @@ export async function readContext7Source(index: SkillIndex): Promise<ReferenceSo
   }
 }
 
+// 保留 CJK 统一表意文字:中文别名/任务词(如 表单、日期选择器)归一化后不再被清空,
+// 组件路由才能命中;英文行为不变。
 export function normalizeName(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, '')
+  return value.toLowerCase().replace(/[^a-z0-9一-鿿]/g, '')
 }
 
 export function normalizeRelativePath(path: string): string {

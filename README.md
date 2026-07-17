@@ -109,7 +109,7 @@ export function App() {
 
 ## MCP 接入（AI Agent）
 
-`@expcat/tigercat-mcp` 是只读 stdio MCP 服务，默认从 GitHub Pages（<https://expcat.github.io/Tigercat/mcp/>）远程读取 skills 文档，无需克隆仓库：
+`@expcat/tigercat-mcp` 是只读 stdio MCP 服务，默认从 GitHub Pages（<https://expcat.github.io/Tigercat/mcp/>）远程读取 skills 文档，无需克隆仓库。接入后 Agent 在写 Tigercat 代码前可按任务路由到精确的导入子路径、组件 props/事件与 React/Vue 绑定差异（支持中文组件别名，如 表单、日期选择、表格），单次查询只内联所需小节，无需通读组件库文档：
 
 ```bash
 claude mcp add tigercat -- npx -y @expcat/tigercat-mcp

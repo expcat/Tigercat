@@ -55,6 +55,397 @@
     "Grid": [
       "Row",
       "Col"
+    ],
+    "栅格": [
+      "Row",
+      "Col"
+    ],
+    "按钮": [
+      "Button"
+    ],
+    "按钮组": [
+      "ButtonGroup"
+    ],
+    "浮动按钮": [
+      "FloatButton"
+    ],
+    "悬浮按钮": [
+      "FloatButton"
+    ],
+    "图标": [
+      "Icon"
+    ],
+    "头像": [
+      "Avatar"
+    ],
+    "徽标": [
+      "Badge"
+    ],
+    "徽章": [
+      "Badge"
+    ],
+    "标签": [
+      "Tag"
+    ],
+    "标签页": [
+      "Tabs"
+    ],
+    "选项卡": [
+      "Tabs"
+    ],
+    "输入框": [
+      "Input"
+    ],
+    "数字输入框": [
+      "InputNumber"
+    ],
+    "文本域": [
+      "Textarea"
+    ],
+    "多行输入": [
+      "Textarea"
+    ],
+    "下拉选择": [
+      "Select"
+    ],
+    "下拉框": [
+      "Select"
+    ],
+    "下拉菜单": [
+      "Dropdown"
+    ],
+    "自动完成": [
+      "AutoComplete"
+    ],
+    "自动补全": [
+      "AutoComplete"
+    ],
+    "提及": [
+      "Mentions"
+    ],
+    "单选框": [
+      "Radio"
+    ],
+    "复选框": [
+      "Checkbox"
+    ],
+    "多选框": [
+      "Checkbox"
+    ],
+    "开关": [
+      "Switch"
+    ],
+    "滑块": [
+      "Slider"
+    ],
+    "评分": [
+      "Rate"
+    ],
+    "日期选择": [
+      "DatePicker"
+    ],
+    "时间选择": [
+      "TimePicker"
+    ],
+    "级联选择": [
+      "Cascader"
+    ],
+    "树选择": [
+      "TreeSelect"
+    ],
+    "穿梭框": [
+      "Transfer"
+    ],
+    "上传": [
+      "Upload"
+    ],
+    "裁剪上传": [
+      "CropUpload"
+    ],
+    "表单": [
+      "Form"
+    ],
+    "表单项": [
+      "FormItem"
+    ],
+    "表单向导": [
+      "FormWizard"
+    ],
+    "表格": [
+      "Table"
+    ],
+    "虚拟表格": [
+      "VirtualTable"
+    ],
+    "表格工具栏": [
+      "DataTableWithToolbar"
+    ],
+    "虚拟列表": [
+      "VirtualList"
+    ],
+    "无限滚动": [
+      "InfiniteScroll"
+    ],
+    "分页": [
+      "Pagination"
+    ],
+    "列表": [
+      "List"
+    ],
+    "树形控件": [
+      "Tree"
+    ],
+    "树形": [
+      "Tree"
+    ],
+    "轮播": [
+      "Carousel"
+    ],
+    "走马灯": [
+      "Carousel"
+    ],
+    "折叠面板": [
+      "Collapse"
+    ],
+    "描述列表": [
+      "Descriptions"
+    ],
+    "空状态": [
+      "Empty"
+    ],
+    "骨架屏": [
+      "Skeleton"
+    ],
+    "时间轴": [
+      "Timeline"
+    ],
+    "时间线": [
+      "Timeline"
+    ],
+    "日历": [
+      "Calendar"
+    ],
+    "弹窗": [
+      "Modal"
+    ],
+    "对话框": [
+      "Modal"
+    ],
+    "模态框": [
+      "Modal"
+    ],
+    "抽屉": [
+      "Drawer"
+    ],
+    "气泡确认": [
+      "Popconfirm"
+    ],
+    "气泡卡片": [
+      "Popover"
+    ],
+    "文字提示": [
+      "Tooltip"
+    ],
+    "工具提示": [
+      "Tooltip"
+    ],
+    "警告提示": [
+      "Alert"
+    ],
+    "全局提示": [
+      "Message"
+    ],
+    "消息": [
+      "Message"
+    ],
+    "加载中": [
+      "Loading"
+    ],
+    "进度条": [
+      "Progress"
+    ],
+    "结果页": [
+      "Result"
+    ],
+    "面包屑": [
+      "Breadcrumb"
+    ],
+    "菜单": [
+      "Menu"
+    ],
+    "步骤条": [
+      "Steps"
+    ],
+    "步进器": [
+      "Stepper"
+    ],
+    "分段控制器": [
+      "Segmented"
+    ],
+    "锚点": [
+      "Anchor"
+    ],
+    "回到顶部": [
+      "BackTop"
+    ],
+    "返回顶部": [
+      "BackTop"
+    ],
+    "固钉": [
+      "Affix"
+    ],
+    "滚动监听": [
+      "ScrollSpy"
+    ],
+    "布局": [
+      "Layout"
+    ],
+    "侧边栏": [
+      "Sidebar"
+    ],
+    "容器": [
+      "Container"
+    ],
+    "分割线": [
+      "Divider"
+    ],
+    "分割面板": [
+      "Splitter"
+    ],
+    "间距": [
+      "Space"
+    ],
+    "卡片": [
+      "Card"
+    ],
+    "统计数值": [
+      "Statistic"
+    ],
+    "二维码": [
+      "QRCode"
+    ],
+    "水印": [
+      "Watermark"
+    ],
+    "倒计时": [
+      "Countdown"
+    ],
+    "图片": [
+      "Image"
+    ],
+    "图片预览": [
+      "ImagePreview"
+    ],
+    "图片裁剪": [
+      "ImageCropper"
+    ],
+    "图片标注": [
+      "ImageAnnotation"
+    ],
+    "富文本": [
+      "RichTextEditor"
+    ],
+    "代码编辑器": [
+      "CodeEditor"
+    ],
+    "markdown编辑器": [
+      "MarkdownEditor"
+    ],
+    "cron编辑器": [
+      "CronEditor"
+    ],
+    "颜色选择器": [
+      "ColorPicker"
+    ],
+    "取色器": [
+      "ColorPicker"
+    ],
+    "签名": [
+      "Signature"
+    ],
+    "数字键盘": [
+      "NumberKeyboard"
+    ],
+    "折线图": [
+      "LineChart"
+    ],
+    "柱状图": [
+      "BarChart"
+    ],
+    "饼图": [
+      "PieChart"
+    ],
+    "环形图": [
+      "DonutChart"
+    ],
+    "面积图": [
+      "AreaChart"
+    ],
+    "散点图": [
+      "ScatterChart"
+    ],
+    "雷达图": [
+      "RadarChart"
+    ],
+    "仪表盘": [
+      "GaugeChart"
+    ],
+    "热力图": [
+      "HeatmapChart"
+    ],
+    "漏斗图": [
+      "FunnelChart"
+    ],
+    "旭日图": [
+      "SunburstChart"
+    ],
+    "矩形树图": [
+      "TreeMapChart"
+    ],
+    "甘特图": [
+      "Gantt"
+    ],
+    "组织架构图": [
+      "OrgChart"
+    ],
+    "看板": [
+      "Kanban"
+    ],
+    "任务看板": [
+      "TaskBoard"
+    ],
+    "聊天窗口": [
+      "ChatWindow"
+    ],
+    "评论": [
+      "CommentThread"
+    ],
+    "活动流": [
+      "ActivityFeed"
+    ],
+    "文件管理": [
+      "FileManager"
+    ],
+    "通知中心": [
+      "NotificationCenter"
+    ],
+    "新手引导": [
+      "Tour"
+    ],
+    "漫游式引导": [
+      "Tour"
+    ],
+    "聚光灯": [
+      "Spotlight"
+    ],
+    "全局配置": [
+      "ConfigProvider"
+    ],
+    "打印布局": [
+      "PrintLayout"
+    ],
+    "数据导出": [
+      "DataExport"
     ]
   },
   "command_apis": {
@@ -472,7 +863,9 @@
   "components": {
     "CodeEditor": {
       "name": "CodeEditor",
-      "aliases": [],
+      "aliases": [
+        "代码编辑器"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -499,7 +892,9 @@
     },
     "FileManager": {
       "name": "FileManager",
-      "aliases": [],
+      "aliases": [
+        "文件管理"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -526,7 +921,9 @@
     },
     "ImageAnnotation": {
       "name": "ImageAnnotation",
-      "aliases": [],
+      "aliases": [
+        "图片标注"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -580,7 +977,9 @@
     },
     "InfiniteScroll": {
       "name": "InfiniteScroll",
-      "aliases": [],
+      "aliases": [
+        "无限滚动"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -607,7 +1006,9 @@
     },
     "Kanban": {
       "name": "Kanban",
-      "aliases": [],
+      "aliases": [
+        "看板"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -634,7 +1035,9 @@
     },
     "MarkdownEditor": {
       "name": "MarkdownEditor",
-      "aliases": [],
+      "aliases": [
+        "markdown编辑器"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -661,7 +1064,9 @@
     },
     "PrintLayout": {
       "name": "PrintLayout",
-      "aliases": [],
+      "aliases": [
+        "打印布局"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -716,7 +1121,9 @@
     },
     "RichTextEditor": {
       "name": "RichTextEditor",
-      "aliases": [],
+      "aliases": [
+        "富文本"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -743,7 +1150,9 @@
     },
     "VirtualList": {
       "name": "VirtualList",
-      "aliases": [],
+      "aliases": [
+        "虚拟列表"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -770,7 +1179,9 @@
     },
     "VirtualTable": {
       "name": "VirtualTable",
-      "aliases": [],
+      "aliases": [
+        "虚拟表格"
+      ],
       "category": "Advanced",
       "slug": "advanced",
       "testGroup": "advanced",
@@ -797,7 +1208,9 @@
     },
     "Alert": {
       "name": "Alert",
-      "aliases": [],
+      "aliases": [
+        "警告提示"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -824,7 +1237,9 @@
     },
     "Avatar": {
       "name": "Avatar",
-      "aliases": [],
+      "aliases": [
+        "头像"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -878,7 +1293,10 @@
     },
     "Badge": {
       "name": "Badge",
-      "aliases": [],
+      "aliases": [
+        "徽标",
+        "徽章"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -905,7 +1323,9 @@
     },
     "Button": {
       "name": "Button",
-      "aliases": [],
+      "aliases": [
+        "按钮"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -932,7 +1352,9 @@
     },
     "ButtonGroup": {
       "name": "ButtonGroup",
-      "aliases": [],
+      "aliases": [
+        "按钮组"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -986,7 +1408,9 @@
     },
     "ConfigProvider": {
       "name": "ConfigProvider",
-      "aliases": [],
+      "aliases": [
+        "全局配置"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1009,7 +1433,9 @@
     },
     "CropUpload": {
       "name": "CropUpload",
-      "aliases": [],
+      "aliases": [
+        "裁剪上传"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1036,7 +1462,9 @@
     },
     "Divider": {
       "name": "Divider",
-      "aliases": [],
+      "aliases": [
+        "分割线"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1063,7 +1491,9 @@
     },
     "Empty": {
       "name": "Empty",
-      "aliases": [],
+      "aliases": [
+        "空状态"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1090,7 +1520,9 @@
     },
     "Icon": {
       "name": "Icon",
-      "aliases": [],
+      "aliases": [
+        "图标"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1117,7 +1549,9 @@
     },
     "Image": {
       "name": "Image",
-      "aliases": [],
+      "aliases": [
+        "图片"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1144,7 +1578,9 @@
     },
     "ImageCropper": {
       "name": "ImageCropper",
-      "aliases": [],
+      "aliases": [
+        "图片裁剪"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1198,7 +1634,9 @@
     },
     "ImagePreview": {
       "name": "ImagePreview",
-      "aliases": [],
+      "aliases": [
+        "图片预览"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1252,7 +1690,9 @@
     },
     "QRCode": {
       "name": "QRCode",
-      "aliases": [],
+      "aliases": [
+        "二维码"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1279,7 +1719,9 @@
     },
     "Rate": {
       "name": "Rate",
-      "aliases": [],
+      "aliases": [
+        "评分"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1306,7 +1748,9 @@
     },
     "Result": {
       "name": "Result",
-      "aliases": [],
+      "aliases": [
+        "结果页"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1333,7 +1777,9 @@
     },
     "Segmented": {
       "name": "Segmented",
-      "aliases": [],
+      "aliases": [
+        "分段控制器"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1360,7 +1806,9 @@
     },
     "Statistic": {
       "name": "Statistic",
-      "aliases": [],
+      "aliases": [
+        "统计数值"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1387,7 +1835,9 @@
     },
     "Tag": {
       "name": "Tag",
-      "aliases": [],
+      "aliases": [
+        "标签"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1441,7 +1891,9 @@
     },
     "Watermark": {
       "name": "Watermark",
-      "aliases": [],
+      "aliases": [
+        "水印"
+      ],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1468,7 +1920,9 @@
     },
     "AreaChart": {
       "name": "AreaChart",
-      "aliases": [],
+      "aliases": [
+        "面积图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1495,7 +1949,9 @@
     },
     "BarChart": {
       "name": "BarChart",
-      "aliases": [],
+      "aliases": [
+        "柱状图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1684,7 +2140,9 @@
     },
     "DonutChart": {
       "name": "DonutChart",
-      "aliases": [],
+      "aliases": [
+        "环形图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1711,7 +2169,9 @@
     },
     "FunnelChart": {
       "name": "FunnelChart",
-      "aliases": [],
+      "aliases": [
+        "漏斗图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1738,7 +2198,9 @@
     },
     "Gantt": {
       "name": "Gantt",
-      "aliases": [],
+      "aliases": [
+        "甘特图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1765,7 +2227,9 @@
     },
     "GaugeChart": {
       "name": "GaugeChart",
-      "aliases": [],
+      "aliases": [
+        "仪表盘"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1792,7 +2256,9 @@
     },
     "HeatmapChart": {
       "name": "HeatmapChart",
-      "aliases": [],
+      "aliases": [
+        "热力图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1819,7 +2285,9 @@
     },
     "LineChart": {
       "name": "LineChart",
-      "aliases": [],
+      "aliases": [
+        "折线图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1846,7 +2314,9 @@
     },
     "OrgChart": {
       "name": "OrgChart",
-      "aliases": [],
+      "aliases": [
+        "组织架构图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1873,7 +2343,9 @@
     },
     "PieChart": {
       "name": "PieChart",
-      "aliases": [],
+      "aliases": [
+        "饼图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1900,7 +2372,9 @@
     },
     "RadarChart": {
       "name": "RadarChart",
-      "aliases": [],
+      "aliases": [
+        "雷达图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1927,7 +2401,9 @@
     },
     "ScatterChart": {
       "name": "ScatterChart",
-      "aliases": [],
+      "aliases": [
+        "散点图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1954,7 +2430,9 @@
     },
     "SunburstChart": {
       "name": "SunburstChart",
-      "aliases": [],
+      "aliases": [
+        "旭日图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1981,7 +2459,9 @@
     },
     "TreeMapChart": {
       "name": "TreeMapChart",
-      "aliases": [],
+      "aliases": [
+        "矩形树图"
+      ],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -2008,7 +2488,9 @@
     },
     "ActivityFeed": {
       "name": "ActivityFeed",
-      "aliases": [],
+      "aliases": [
+        "活动流"
+      ],
       "category": "Composite",
       "slug": "composite",
       "testGroup": "composite",
@@ -2035,7 +2517,9 @@
     },
     "ChatWindow": {
       "name": "ChatWindow",
-      "aliases": [],
+      "aliases": [
+        "聊天窗口"
+      ],
       "category": "Composite",
       "slug": "composite",
       "testGroup": "composite",
@@ -2062,7 +2546,9 @@
     },
     "CommentThread": {
       "name": "CommentThread",
-      "aliases": [],
+      "aliases": [
+        "评论"
+      ],
       "category": "Composite",
       "slug": "composite",
       "testGroup": "composite",
@@ -2089,7 +2575,9 @@
     },
     "DataTableWithToolbar": {
       "name": "DataTableWithToolbar",
-      "aliases": [],
+      "aliases": [
+        "表格工具栏"
+      ],
       "category": "Composite",
       "slug": "composite",
       "testGroup": "composite",
@@ -2116,7 +2604,9 @@
     },
     "FormWizard": {
       "name": "FormWizard",
-      "aliases": [],
+      "aliases": [
+        "表单向导"
+      ],
       "category": "Composite",
       "slug": "composite",
       "testGroup": "composite",
@@ -2143,7 +2633,9 @@
     },
     "NotificationCenter": {
       "name": "NotificationCenter",
-      "aliases": [],
+      "aliases": [
+        "通知中心"
+      ],
       "category": "Composite",
       "slug": "composite",
       "testGroup": "composite",
@@ -2170,7 +2662,9 @@
     },
     "TaskBoard": {
       "name": "TaskBoard",
-      "aliases": [],
+      "aliases": [
+        "任务看板"
+      ],
       "category": "Composite",
       "slug": "composite",
       "testGroup": "composite",
@@ -2197,7 +2691,9 @@
     },
     "Calendar": {
       "name": "Calendar",
-      "aliases": [],
+      "aliases": [
+        "日历"
+      ],
       "category": "Data",
       "slug": "data",
       "testGroup": "data",
@@ -2224,7 +2720,9 @@
     },
     "Collapse": {
       "name": "Collapse",
-      "aliases": [],
+      "aliases": [
+        "折叠面板"
+      ],
       "category": "Data",
       "slug": "data",
       "testGroup": "data",
@@ -2278,7 +2776,9 @@
     },
     "Countdown": {
       "name": "Countdown",
-      "aliases": [],
+      "aliases": [
+        "倒计时"
+      ],
       "category": "Data",
       "slug": "data",
       "testGroup": "data",
@@ -2305,7 +2805,9 @@
     },
     "DataExport": {
       "name": "DataExport",
-      "aliases": [],
+      "aliases": [
+        "数据导出"
+      ],
       "category": "Data",
       "slug": "data",
       "testGroup": "data",
@@ -2332,7 +2834,9 @@
     },
     "Table": {
       "name": "Table",
-      "aliases": [],
+      "aliases": [
+        "表格"
+      ],
       "category": "Data",
       "slug": "data",
       "testGroup": "data",
@@ -2359,7 +2863,10 @@
     },
     "Timeline": {
       "name": "Timeline",
-      "aliases": [],
+      "aliases": [
+        "时间轴",
+        "时间线"
+      ],
       "category": "Data",
       "slug": "data",
       "testGroup": "data",
@@ -2386,7 +2893,9 @@
     },
     "Drawer": {
       "name": "Drawer",
-      "aliases": [],
+      "aliases": [
+        "抽屉"
+      ],
       "category": "Feedback",
       "slug": "feedback",
       "testGroup": "feedback",
@@ -2413,7 +2922,9 @@
     },
     "Loading": {
       "name": "Loading",
-      "aliases": [],
+      "aliases": [
+        "加载中"
+      ],
       "category": "Feedback",
       "slug": "feedback",
       "testGroup": "feedback",
@@ -2440,7 +2951,10 @@
     },
     "Message": {
       "name": "Message",
-      "aliases": [],
+      "aliases": [
+        "全局提示",
+        "消息"
+      ],
       "category": "Feedback",
       "slug": "feedback",
       "testGroup": "feedback",
@@ -2496,7 +3010,11 @@
     },
     "Modal": {
       "name": "Modal",
-      "aliases": [],
+      "aliases": [
+        "弹窗",
+        "对话框",
+        "模态框"
+      ],
       "category": "Feedback",
       "slug": "feedback",
       "testGroup": "feedback",
@@ -2552,7 +3070,9 @@
     },
     "Popconfirm": {
       "name": "Popconfirm",
-      "aliases": [],
+      "aliases": [
+        "气泡确认"
+      ],
       "category": "Feedback",
       "slug": "feedback",
       "testGroup": "feedback",
@@ -2579,7 +3099,9 @@
     },
     "Popover": {
       "name": "Popover",
-      "aliases": [],
+      "aliases": [
+        "气泡卡片"
+      ],
       "category": "Feedback",
       "slug": "feedback",
       "testGroup": "feedback",
@@ -2606,7 +3128,9 @@
     },
     "Progress": {
       "name": "Progress",
-      "aliases": [],
+      "aliases": [
+        "进度条"
+      ],
       "category": "Feedback",
       "slug": "feedback",
       "testGroup": "feedback",
@@ -2633,7 +3157,10 @@
     },
     "Tooltip": {
       "name": "Tooltip",
-      "aliases": [],
+      "aliases": [
+        "文字提示",
+        "工具提示"
+      ],
       "category": "Feedback",
       "slug": "feedback",
       "testGroup": "feedback",
@@ -2660,7 +3187,10 @@
     },
     "Tour": {
       "name": "Tour",
-      "aliases": [],
+      "aliases": [
+        "新手引导",
+        "漫游式引导"
+      ],
       "category": "Feedback",
       "slug": "feedback",
       "testGroup": "feedback",
@@ -2687,7 +3217,10 @@
     },
     "AutoComplete": {
       "name": "AutoComplete",
-      "aliases": [],
+      "aliases": [
+        "自动完成",
+        "自动补全"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -2714,7 +3247,9 @@
     },
     "Cascader": {
       "name": "Cascader",
-      "aliases": [],
+      "aliases": [
+        "级联选择"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -2741,7 +3276,10 @@
     },
     "Checkbox": {
       "name": "Checkbox",
-      "aliases": [],
+      "aliases": [
+        "复选框",
+        "多选框"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -2795,7 +3333,10 @@
     },
     "ColorPicker": {
       "name": "ColorPicker",
-      "aliases": [],
+      "aliases": [
+        "颜色选择器",
+        "取色器"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -2849,7 +3390,9 @@
     },
     "CronEditor": {
       "name": "CronEditor",
-      "aliases": [],
+      "aliases": [
+        "cron编辑器"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -2876,7 +3419,9 @@
     },
     "DatePicker": {
       "name": "DatePicker",
-      "aliases": [],
+      "aliases": [
+        "日期选择"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -2903,7 +3448,9 @@
     },
     "Form": {
       "name": "Form",
-      "aliases": [],
+      "aliases": [
+        "表单"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -2930,7 +3477,9 @@
     },
     "FormItem": {
       "name": "FormItem",
-      "aliases": [],
+      "aliases": [
+        "表单项"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -2957,7 +3506,9 @@
     },
     "Input": {
       "name": "Input",
-      "aliases": [],
+      "aliases": [
+        "输入框"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3038,7 +3589,9 @@
     },
     "InputNumber": {
       "name": "InputNumber",
-      "aliases": [],
+      "aliases": [
+        "数字输入框"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3065,7 +3618,9 @@
     },
     "Mentions": {
       "name": "Mentions",
-      "aliases": [],
+      "aliases": [
+        "提及"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3092,7 +3647,9 @@
     },
     "NumberKeyboard": {
       "name": "NumberKeyboard",
-      "aliases": [],
+      "aliases": [
+        "数字键盘"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3119,7 +3676,9 @@
     },
     "Radio": {
       "name": "Radio",
-      "aliases": [],
+      "aliases": [
+        "单选框"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3173,7 +3732,10 @@
     },
     "Select": {
       "name": "Select",
-      "aliases": [],
+      "aliases": [
+        "下拉选择",
+        "下拉框"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3200,7 +3762,9 @@
     },
     "Signature": {
       "name": "Signature",
-      "aliases": [],
+      "aliases": [
+        "签名"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3227,7 +3791,9 @@
     },
     "Slider": {
       "name": "Slider",
-      "aliases": [],
+      "aliases": [
+        "滑块"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3254,7 +3820,9 @@
     },
     "Stepper": {
       "name": "Stepper",
-      "aliases": [],
+      "aliases": [
+        "步进器"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3281,7 +3849,9 @@
     },
     "Switch": {
       "name": "Switch",
-      "aliases": [],
+      "aliases": [
+        "开关"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3308,7 +3878,10 @@
     },
     "Textarea": {
       "name": "Textarea",
-      "aliases": [],
+      "aliases": [
+        "文本域",
+        "多行输入"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3335,7 +3908,9 @@
     },
     "TimePicker": {
       "name": "TimePicker",
-      "aliases": [],
+      "aliases": [
+        "时间选择"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3362,7 +3937,9 @@
     },
     "Transfer": {
       "name": "Transfer",
-      "aliases": [],
+      "aliases": [
+        "穿梭框"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3389,7 +3966,9 @@
     },
     "TreeSelect": {
       "name": "TreeSelect",
-      "aliases": [],
+      "aliases": [
+        "树选择"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3416,7 +3995,9 @@
     },
     "Upload": {
       "name": "Upload",
-      "aliases": [],
+      "aliases": [
+        "上传"
+      ],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",
@@ -3443,7 +4024,9 @@
     },
     "Card": {
       "name": "Card",
-      "aliases": [],
+      "aliases": [
+        "卡片"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3470,7 +4053,10 @@
     },
     "Carousel": {
       "name": "Carousel",
-      "aliases": [],
+      "aliases": [
+        "轮播",
+        "走马灯"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3498,7 +4084,8 @@
     "Col": {
       "name": "Col",
       "aliases": [
-        "Grid"
+        "Grid",
+        "栅格"
       ],
       "category": "Layout",
       "slug": "layout",
@@ -3526,7 +4113,9 @@
     },
     "Container": {
       "name": "Container",
-      "aliases": [],
+      "aliases": [
+        "容器"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3580,7 +4169,9 @@
     },
     "Descriptions": {
       "name": "Descriptions",
-      "aliases": [],
+      "aliases": [
+        "描述列表"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3661,7 +4252,9 @@
     },
     "Layout": {
       "name": "Layout",
-      "aliases": [],
+      "aliases": [
+        "布局"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3688,7 +4281,9 @@
     },
     "List": {
       "name": "List",
-      "aliases": [],
+      "aliases": [
+        "列表"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3743,7 +4338,8 @@
     "Row": {
       "name": "Row",
       "aliases": [
-        "Grid"
+        "Grid",
+        "栅格"
       ],
       "category": "Layout",
       "slug": "layout",
@@ -3771,7 +4367,9 @@
     },
     "Sidebar": {
       "name": "Sidebar",
-      "aliases": [],
+      "aliases": [
+        "侧边栏"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3798,7 +4396,9 @@
     },
     "Skeleton": {
       "name": "Skeleton",
-      "aliases": [],
+      "aliases": [
+        "骨架屏"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3825,7 +4425,9 @@
     },
     "Space": {
       "name": "Space",
-      "aliases": [],
+      "aliases": [
+        "间距"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3852,7 +4454,9 @@
     },
     "Splitter": {
       "name": "Splitter",
-      "aliases": [],
+      "aliases": [
+        "分割面板"
+      ],
       "category": "Layout",
       "slug": "layout",
       "testGroup": "layout",
@@ -3879,7 +4483,9 @@
     },
     "Affix": {
       "name": "Affix",
-      "aliases": [],
+      "aliases": [
+        "固钉"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -3906,7 +4512,9 @@
     },
     "Anchor": {
       "name": "Anchor",
-      "aliases": [],
+      "aliases": [
+        "锚点"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -3960,7 +4568,10 @@
     },
     "BackTop": {
       "name": "BackTop",
-      "aliases": [],
+      "aliases": [
+        "回到顶部",
+        "返回顶部"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -3987,7 +4598,9 @@
     },
     "Breadcrumb": {
       "name": "Breadcrumb",
-      "aliases": [],
+      "aliases": [
+        "面包屑"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -4041,7 +4654,9 @@
     },
     "Dropdown": {
       "name": "Dropdown",
-      "aliases": [],
+      "aliases": [
+        "下拉菜单"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -4122,7 +4737,10 @@
     },
     "FloatButton": {
       "name": "FloatButton",
-      "aliases": [],
+      "aliases": [
+        "浮动按钮",
+        "悬浮按钮"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -4176,7 +4794,9 @@
     },
     "Menu": {
       "name": "Menu",
-      "aliases": [],
+      "aliases": [
+        "菜单"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -4257,7 +4877,9 @@
     },
     "Pagination": {
       "name": "Pagination",
-      "aliases": [],
+      "aliases": [
+        "分页"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -4284,7 +4906,9 @@
     },
     "ScrollSpy": {
       "name": "ScrollSpy",
-      "aliases": [],
+      "aliases": [
+        "滚动监听"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -4311,7 +4935,9 @@
     },
     "Spotlight": {
       "name": "Spotlight",
-      "aliases": [],
+      "aliases": [
+        "聚光灯"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -4338,7 +4964,9 @@
     },
     "Steps": {
       "name": "Steps",
-      "aliases": [],
+      "aliases": [
+        "步骤条"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -4448,7 +5076,10 @@
     },
     "Tabs": {
       "name": "Tabs",
-      "aliases": [],
+      "aliases": [
+        "标签页",
+        "选项卡"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",
@@ -4475,7 +5106,10 @@
     },
     "Tree": {
       "name": "Tree",
-      "aliases": [],
+      "aliases": [
+        "树形控件",
+        "树形"
+      ],
       "category": "Navigation",
       "slug": "navigation",
       "testGroup": "navigation",

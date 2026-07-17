@@ -11,7 +11,7 @@ import type {
   TigercatFramework,
   TopicRoute
 } from './types'
-import { normalizeName, readReferenceSource } from './skill-index'
+import { createReferencePointer, normalizeName, readReferenceSource } from './skill-index'
 
 interface RouteTaskInput {
   task: string
@@ -112,8 +112,10 @@ export async function routeTigercatTask(
           : matches.length > 0
             ? 'component'
             : 'topic',
-      matches,
-      topics,
+      // 正文只在顶层 sources 内联一次;matches/topics 里保留 path/reason 元数据,
+      // 否则同一份 reference 全文会在响应里出现两遍。
+      matches: matches.map((match) => ({ ...match, sources: match.sources.map(stripText) })),
+      topics: topics.map((topic) => ({ ...topic, sources: topic.sources.map(stripText) })),
       candidates: [],
       sources
     }
@@ -143,14 +145,11 @@ export async function createComponentRoute(
   framework?: TigercatFramework,
   maxBytes?: number
 ): Promise<ComponentRoute> {
-  const sourceSpecs = [
-    {
-      path: entry.references.componentIndex,
-      reason: 'Canonical generated component inventory and package subpath map.'
-    },
+  const inlineSpecs = dedupeByPath([
     {
       path: entry.references.props,
-      reason: `${entry.name} props, events, methods, and type source.`
+      reason: `${entry.name} props, events, methods, and type source.`,
+      section: entry.name
     },
     { path: entry.references.examples, reason: `${entry.name} compact Vue/React example routes.` },
     ...(framework
@@ -163,20 +162,42 @@ export async function createComponentRoute(
       : [
           { path: entry.references.react, reason: 'React binding and import notes.' },
           { path: entry.references.vue, reason: 'Vue binding and import notes.' }
-        ]),
-    { path: SHARED_PATTERNS, reason: 'Cross-framework binding differences and common patterns.' },
-    { path: SHARED_GLOSSARY, reason: 'Shared Tigercat terminology.' }
-  ]
+        ])
+  ])
 
   const sources = await Promise.all(
-    dedupeByPath(sourceSpecs).map((spec) =>
-      readReferenceSource(index, spec.path, spec.reason, maxBytes)
+    inlineSpecs.map((spec) =>
+      readReferenceSource(
+        index,
+        spec.path,
+        spec.reason,
+        maxBytes,
+        'section' in spec ? spec.section : undefined
+      )
     )
   )
 
+  // 会话级背景文档只给指针不内联:同一会话多次组件查询不必重复携带
+  // 全量清单/术语表/通用模式(此前每次固定 ~22KB)。
+  const pointers = [
+    {
+      path: entry.references.componentIndex,
+      reason: 'Full component inventory; read at most once per session via tigercat_reference.'
+    },
+    {
+      path: SHARED_PATTERNS,
+      reason:
+        'Cross-framework binding differences; read at most once per session via tigercat_reference.'
+    },
+    {
+      path: SHARED_GLOSSARY,
+      reason: 'Shared Tigercat terminology; read at most once per session via tigercat_reference.'
+    }
+  ].map((spec) => createReferencePointer(index, spec.path, spec.reason))
+
   return {
     component: entry,
-    sources
+    sources: dedupeByPath([...sources, ...pointers])
   }
 }
 
@@ -189,19 +210,25 @@ export async function createTopicRoute(
   if (!topic) throw new Error(`Unknown Tigercat topic: ${slug}`)
 
   const sources = await Promise.all(
-    dedupeByPath([
-      { path: SKILL_INDEX, reason: 'Top-level skill route index.' },
-      ...topic.references.map((path) => ({
+    dedupeByPath(
+      topic.references.map((path) => ({
         path,
         reason: `${topic.title} reference.`
       }))
-    ]).map((spec) => readReferenceSource(index, spec.path, spec.reason, maxBytes))
+    ).map((spec) => readReferenceSource(index, spec.path, spec.reason, maxBytes))
   )
 
   return {
     slug,
     title: topic.title,
-    sources
+    sources: dedupeByPath([
+      ...sources,
+      createReferencePointer(
+        index,
+        SKILL_INDEX,
+        'Top-level skill route index; read via tigercat_reference only if the topic references are insufficient.'
+      )
+    ])
   }
 }
 
@@ -401,13 +428,16 @@ function uniqueComponents(components: ComponentMetadata[]): ComponentMetadata[] 
   return result
 }
 
-function dedupeByPath<T extends { path: string }>(items: T[]): T[] {
+// 去重键含 section:同分类两个组件的 props 指向同一文件的不同小节,只按 path
+// 去重会把后一个组件的小节丢掉。
+function dedupeByPath<T extends { path: string; section?: string }>(items: T[]): T[] {
   const seen = new Set<string>()
   const result: T[] = []
 
   for (const item of items) {
-    if (seen.has(item.path)) continue
-    seen.add(item.path)
+    const key = `${item.path}#${item.section ?? ''}`
+    if (seen.has(key)) continue
+    seen.add(key)
     result.push(item)
   }
 
@@ -416,6 +446,11 @@ function dedupeByPath<T extends { path: string }>(items: T[]): T[] {
 
 function mergeSources(sources: ReferenceSource[]): ReferenceSource[] {
   return dedupeByPath(sources)
+}
+
+function stripText(source: ReferenceSource): ReferenceSource {
+  const { text: _text, ...rest } = source
+  return rest
 }
 
 function keywordMatches(task: string, normalizedTask: string, keyword: string): boolean {

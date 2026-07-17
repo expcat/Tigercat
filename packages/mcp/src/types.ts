@@ -25,6 +25,9 @@ export interface ReferenceSource {
   path: string
   reason: string
   truncated: boolean
+  /** 抽取的 `## <section>` 小节名;整文件读取时缺省。 */
+  section?: string
+  /** 内联正文;指针型 source(建议每会话经 tigercat_reference 另读一次)不带 text。 */
   text?: string
 }
 
