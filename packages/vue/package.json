@@ -420,6 +420,11 @@
       "import": "./dist/components/InputNumber.mjs",
       "default": "./dist/components/InputNumber.mjs"
     },
+    "./InputOTP": {
+      "types": "./dist/components/InputOTP.d.mts",
+      "import": "./dist/components/InputOTP.mjs",
+      "default": "./dist/components/InputOTP.mjs"
+    },
     "./Kanban": {
       "types": "./dist/components/Kanban.d.mts",
       "import": "./dist/components/Kanban.mjs",
@@ -454,6 +459,11 @@
       "types": "./dist/components/MarkdownEditor.d.mts",
       "import": "./dist/components/MarkdownEditor.mjs",
       "default": "./dist/components/MarkdownEditor.mjs"
+    },
+    "./MaskInput": {
+      "types": "./dist/components/MaskInput.d.mts",
+      "import": "./dist/components/MaskInput.mjs",
+      "default": "./dist/components/MaskInput.mjs"
     },
     "./Mentions": {
       "types": "./dist/components/Mentions.d.mts",
@@ -699,6 +709,11 @@
       "types": "./dist/components/Tag.d.mts",
       "import": "./dist/components/Tag.mjs",
       "default": "./dist/components/Tag.mjs"
+    },
+    "./TagsInput": {
+      "types": "./dist/components/TagsInput.d.mts",
+      "import": "./dist/components/TagsInput.mjs",
+      "default": "./dist/components/TagsInput.mjs"
     },
     "./TaskBoard": {
       "types": "./dist/components/TaskBoard.d.mts",

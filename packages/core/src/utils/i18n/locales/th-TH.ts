@@ -78,5 +78,13 @@ export const thTH: TigerLocale = defineLocale({
   },
   select: {
     doneText: 'เสร็จสิ้น'
+  },
+  inputOtp: {
+    groupLabel: 'รหัสผ่านแบบใช้ครั้งเดียว',
+    slotLabel: 'อักขระที่ {index} จาก {total}'
+  },
+  tagsInput: {
+    removeTagLabel: 'ลบ {tag}',
+    clearAllLabel: 'ล้างแท็กทั้งหมด'
   }
 })

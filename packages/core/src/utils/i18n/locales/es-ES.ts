@@ -93,6 +93,14 @@ export const esES: TigerLocale = defineLocale({
   },
   select: {
     doneText: 'Finalizar'
+  },
+  inputOtp: {
+    groupLabel: 'Contraseña de un solo uso',
+    slotLabel: 'Carácter {index} de {total}'
+  },
+  tagsInput: {
+    removeTagLabel: 'Eliminar {tag}',
+    clearAllLabel: 'Borrar todas las etiquetas'
   }
 })
 

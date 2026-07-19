@@ -21,6 +21,6 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 | Switch    | `<Switch v-model="value" />`                                                                | `<Switch value={value} onChange={setValue} />`                                                                   |
 | Textarea  | `<Textarea v-model="value" />`                                                              | `<Textarea value={value} onChange={setValue} />`                                                                 |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AutoComplete, Cascader, CheckboxGroup, ColorPicker, ColorSwatch, CronEditor, DatePicker, FormItem, InputGroup, InputGroupAddon, InputNumber, Mentions, NumberKeyboard, RadioGroup, Signature, Slider, Stepper, TimePicker, Transfer, TreeSelect, Upload.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AutoComplete, Cascader, CheckboxGroup, ColorPicker, ColorSwatch, CronEditor, DatePicker, FormItem, InputGroup, InputGroupAddon, InputNumber, InputOTP, MaskInput, Mentions, NumberKeyboard, RadioGroup, Signature, Slider, Stepper, TagsInput, TimePicker, Transfer, TreeSelect, Upload.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

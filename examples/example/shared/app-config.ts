@@ -142,6 +142,21 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'NumberKeyboard 数字键盘', 'en-US': 'NumberKeyboard' }
       },
       {
+        key: 'input-otp',
+        path: '/input-otp',
+        label: { 'zh-CN': 'InputOTP 验证码输入', 'en-US': 'InputOTP' }
+      },
+      {
+        key: 'tags-input',
+        path: '/tags-input',
+        label: { 'zh-CN': 'TagsInput 标签输入', 'en-US': 'TagsInput' }
+      },
+      {
+        key: 'mask-input',
+        path: '/mask-input',
+        label: { 'zh-CN': 'MaskInput 掩码输入', 'en-US': 'MaskInput' }
+      },
+      {
         key: 'mentions',
         path: '/mentions',
         label: { 'zh-CN': 'Mentions 提及', 'en-US': 'Mentions' }

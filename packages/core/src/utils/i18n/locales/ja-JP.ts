@@ -78,5 +78,13 @@ export const jaJP: TigerLocale = defineLocale({
   },
   select: {
     doneText: '完了'
+  },
+  inputOtp: {
+    groupLabel: 'ワンタイムパスワード',
+    slotLabel: '{total} 文字中 {index} 文字目'
+  },
+  tagsInput: {
+    removeTagLabel: '{tag} を削除',
+    clearAllLabel: 'すべてのタグをクリア'
   }
 })

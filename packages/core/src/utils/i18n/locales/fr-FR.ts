@@ -93,6 +93,14 @@ export const frFR: TigerLocale = defineLocale({
   },
   select: {
     doneText: 'Terminer'
+  },
+  inputOtp: {
+    groupLabel: 'Mot de passe à usage unique',
+    slotLabel: 'Caractère {index} sur {total}'
+  },
+  tagsInput: {
+    removeTagLabel: 'Supprimer {tag}',
+    clearAllLabel: 'Effacer toutes les étiquettes'
   }
 })
 

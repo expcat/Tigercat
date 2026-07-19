@@ -7,7 +7,7 @@ description: Compact generated Tigercat Form props reference
 
 # Form Props
 
-表单输入、选择、校验和上传相关组件。 共 28 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+表单输入、选择、校验和上传相关组件。 共 31 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## AutoComplete
 
@@ -147,6 +147,26 @@ description: Compact generated Tigercat Form props reference
 | `status?` | `InputStatus`    | `'default'` | Validation status               |
 | `value?`  | `number \| null` | `-`         | Current value (controlled mode) |
 
+## InputOTP
+
+`packages/core/src/types/input-otp.ts` · `InputOTPProps` · 3/18 props
+
+| Prop            | Type            | Default     | Notes                    |
+| --------------- | --------------- | ----------- | ------------------------ |
+| `size?`         | `ComponentSize` | `'md'`      | Input size               |
+| `status?`       | `InputStatus`   | `'default'` | Validation status        |
+| `errorMessage?` | `string`        | `-`         | Error message to display |
+
+## MaskInput
+
+`packages/core/src/types/mask-input.ts` · `MaskInputProps` · 3/15 props
+
+| Prop            | Type            | Default     | Notes                    |
+| --------------- | --------------- | ----------- | ------------------------ |
+| `size?`         | `ComponentSize` | `'md'`      | Input size               |
+| `status?`       | `InputStatus`   | `'default'` | Validation status        |
+| `errorMessage?` | `string`        | `-`         | Error message to display |
+
 ## Mentions
 
 `packages/core/src/types/mentions.ts` · `MentionsProps` · 3/7 props
@@ -236,6 +256,16 @@ description: Compact generated Tigercat Form props reference
 | `checked?`  | `boolean`       | `false` | Whether the switch is checked  |
 | `disabled?` | `boolean`       | `false` | Whether the switch is disabled |
 | `size?`     | `ComponentSize` | `'md'`  | Switch size                    |
+
+## TagsInput
+
+`packages/core/src/types/tags-input.ts` · `TagsInputProps` · 3/17 props
+
+| Prop            | Type            | Default     | Notes                    |
+| --------------- | --------------- | ----------- | ------------------------ |
+| `size?`         | `ComponentSize` | `'md'`      | Input size               |
+| `status?`       | `InputStatus`   | `'default'` | Validation status        |
+| `errorMessage?` | `string`        | `-`         | Error message to display |
 
 ## Textarea
 

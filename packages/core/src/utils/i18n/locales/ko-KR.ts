@@ -78,5 +78,13 @@ export const koKR: TigerLocale = defineLocale({
   },
   select: {
     doneText: '완료'
+  },
+  inputOtp: {
+    groupLabel: '일회용 비밀번호',
+    slotLabel: '총 {total}자 중 {index}번째'
+  },
+  tagsInput: {
+    removeTagLabel: '{tag} 제거',
+    clearAllLabel: '모든 태그 지우기'
   }
 })

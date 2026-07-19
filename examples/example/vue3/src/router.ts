@@ -62,6 +62,9 @@ const router = createRouter({
           path: 'number-keyboard',
           component: () => import('./pages/NumberKeyboardDemo.vue')
         },
+        { path: 'input-otp', component: () => import('./pages/InputOtpDemo.vue') },
+        { path: 'tags-input', component: () => import('./pages/TagsInputDemo.vue') },
+        { path: 'mask-input', component: () => import('./pages/MaskInputDemo.vue') },
         { path: 'mentions', component: () => import('./pages/MentionsDemo.vue') },
         { path: 'transfer', component: () => import('./pages/TransferDemo.vue') },
         { path: 'datepicker', component: () => import('./pages/DatePickerDemo.vue') },

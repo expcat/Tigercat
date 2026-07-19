@@ -93,6 +93,14 @@ export const ptBR: TigerLocale = defineLocale({
   },
   select: {
     doneText: 'Concluir'
+  },
+  inputOtp: {
+    groupLabel: 'Senha de uso único',
+    slotLabel: 'Caractere {index} de {total}'
+  },
+  tagsInput: {
+    removeTagLabel: 'Remover {tag}',
+    clearAllLabel: 'Limpar todas as tags'
   }
 })
 

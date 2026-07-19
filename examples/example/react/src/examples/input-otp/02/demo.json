@@ -1,0 +1,12 @@
+{
+  "id": "input-otp-02",
+  "title": "掩码 + 字母数字 + 分组",
+  "description": "masked 隐藏字符、alphanumeric 字符集、groups 分组显示与自定义分隔符。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 480
+  }
+}

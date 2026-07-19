@@ -113,7 +113,7 @@ describe('Tigercat MCP remote skill index', () => {
     expect(remote.source.kind).toBe('http')
     expect(remote.root).toBe(baseUrl)
     expect(remote.context7.generated_by).toBe('pnpm docs:api')
-    expect(remote.components.size).toBe(149)
+    expect(remote.components.size).toBe(152)
     expect(remote.aliasTargetsByNormalizedName.get('grid')).toEqual(['Row', 'Col'])
     expect([...remote.allowedReferencePaths].sort()).toEqual(
       [...local.allowedReferencePaths].sort()
@@ -212,7 +212,7 @@ describe('Tigercat MCP remote skill index', () => {
       const index = await loadSkillIndex({ baseUrl: `${prefixedUrl}mcp` })
 
       expect(index.root).toBe(`${prefixedUrl}mcp/`)
-      expect(index.components.size).toBe(149)
+      expect(index.components.size).toBe(152)
     } finally {
       await close(prefixed.server)
     }

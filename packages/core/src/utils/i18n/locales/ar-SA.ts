@@ -93,6 +93,14 @@ export const arSA: TigerLocale = defineLocale({
   },
   select: {
     doneText: 'إنهاء'
+  },
+  inputOtp: {
+    groupLabel: 'كلمة المرور لمرة واحدة',
+    slotLabel: 'الحرف {index} من {total}'
+  },
+  tagsInput: {
+    removeTagLabel: 'إزالة {tag}',
+    clearAllLabel: 'مسح كل الوسوم'
   }
 })
 

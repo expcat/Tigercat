@@ -38,6 +38,8 @@ import type {
   TigerLocaleRichTextEditor,
   TigerLocaleCronEditor,
   TigerLocaleFormValidation,
+  TigerLocaleInputOTP,
+  TigerLocaleTagsInput,
   TigerLocaleDirection
 } from '../types/locale'
 import type { TimePickerLabels } from '../types/timepicker'
@@ -74,7 +76,9 @@ const TIGER_LOCALE_KEYS = [
   'markdownEditor',
   'richTextEditor',
   'cronEditor',
-  'formValidation'
+  'formValidation',
+  'inputOtp',
+  'tagsInput'
 ]
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -165,7 +169,9 @@ export function mergeTigerLocale(
     markdownEditor: { ...base?.markdownEditor, ...override?.markdownEditor },
     richTextEditor: { ...base?.richTextEditor, ...override?.richTextEditor },
     cronEditor: { ...base?.cronEditor, ...override?.cronEditor },
-    formValidation: { ...base?.formValidation, ...override?.formValidation }
+    formValidation: { ...base?.formValidation, ...override?.formValidation },
+    inputOtp: { ...base?.inputOtp, ...override?.inputOtp },
+    tagsInput: { ...base?.tagsInput, ...override?.tagsInput }
   }
 }
 
@@ -1502,4 +1508,60 @@ export const ZH_CN_UPLOAD_LABELS: UploadLabels = {
   uploadingAriaLabel: '上传中',
   removeFileAriaLabel: '移除 {fileName}',
   previewFileAriaLabel: '预览 {fileName}'
+}
+
+// ============================================================================
+// InputOTP Labels
+// ============================================================================
+
+export const DEFAULT_INPUT_OTP_LABELS: Required<TigerLocaleInputOTP> = {
+  groupLabel: 'One-time password',
+  slotLabel: 'Character {index} of {total}'
+}
+
+export const ZH_CN_INPUT_OTP_LABELS: Required<TigerLocaleInputOTP> = {
+  groupLabel: '一次性验证码',
+  slotLabel: '第 {index} 位，共 {total} 位'
+}
+
+export function getInputOTPLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleInputOTP>
+): Required<TigerLocaleInputOTP> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_INPUT_OTP_LABELS
+    : DEFAULT_INPUT_OTP_LABELS
+  return {
+    groupLabel: overrides?.groupLabel ?? locale?.inputOtp?.groupLabel ?? defaultLabels.groupLabel,
+    slotLabel: overrides?.slotLabel ?? locale?.inputOtp?.slotLabel ?? defaultLabels.slotLabel
+  }
+}
+
+// ============================================================================
+// TagsInput Labels
+// ============================================================================
+
+export const DEFAULT_TAGS_INPUT_LABELS: Required<TigerLocaleTagsInput> = {
+  removeTagLabel: 'Remove {tag}',
+  clearAllLabel: 'Clear all tags'
+}
+
+export const ZH_CN_TAGS_INPUT_LABELS: Required<TigerLocaleTagsInput> = {
+  removeTagLabel: '移除 {tag}',
+  clearAllLabel: '清空全部标签'
+}
+
+export function getTagsInputLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleTagsInput>
+): Required<TigerLocaleTagsInput> {
+  const defaultLabels = locale?.locale?.toLowerCase().startsWith('zh')
+    ? ZH_CN_TAGS_INPUT_LABELS
+    : DEFAULT_TAGS_INPUT_LABELS
+  return {
+    removeTagLabel:
+      overrides?.removeTagLabel ?? locale?.tagsInput?.removeTagLabel ?? defaultLabels.removeTagLabel,
+    clearAllLabel:
+      overrides?.clearAllLabel ?? locale?.tagsInput?.clearAllLabel ?? defaultLabels.clearAllLabel
+  }
 }

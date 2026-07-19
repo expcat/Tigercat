@@ -43,6 +43,9 @@ const ColorSwatchDemo = lazy(() => import('./pages/ColorSwatchDemo'))
 const CronEditorDemo = lazy(() => import('./pages/CronEditorDemo'))
 const SignatureDemo = lazy(() => import('./pages/SignatureDemo'))
 const NumberKeyboardDemo = lazy(() => import('./pages/NumberKeyboardDemo'))
+const InputOtpDemo = lazy(() => import('./pages/InputOtpDemo'))
+const TagsInputDemo = lazy(() => import('./pages/TagsInputDemo'))
+const MaskInputDemo = lazy(() => import('./pages/MaskInputDemo'))
 const MentionsDemo = lazy(() => import('./pages/MentionsDemo'))
 const TransferDemo = lazy(() => import('./pages/TransferDemo'))
 const DatePickerDemo = lazy(() => import('./pages/DatePickerDemo'))
@@ -187,6 +190,9 @@ const router = createHashRouter([
       { path: 'cron-editor', element: <CronEditorDemo /> },
       { path: 'signature', element: <SignatureDemo /> },
       { path: 'number-keyboard', element: <NumberKeyboardDemo /> },
+      { path: 'input-otp', element: <InputOtpDemo /> },
+      { path: 'tags-input', element: <TagsInputDemo /> },
+      { path: 'mask-input', element: <MaskInputDemo /> },
       { path: 'mentions', element: <MentionsDemo /> },
       { path: 'transfer', element: <TransferDemo /> },
       { path: 'datepicker', element: <DatePickerDemo /> },

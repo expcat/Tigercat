@@ -43,6 +43,12 @@ const expectedSizeLimitEntries = [
   ['React Tree subpath', 'packages/react/dist/components/Tree.mjs', '25 kB'],
   ['Vue TimePicker subpath', 'packages/vue/dist/components/TimePicker.mjs', '31 kB'],
   ['React TimePicker subpath', 'packages/react/dist/components/TimePicker.mjs', '25 kB'],
+  ['Vue InputOTP subpath', 'packages/vue/dist/components/InputOTP.mjs', '31 kB'],
+  ['React InputOTP subpath', 'packages/react/dist/components/InputOTP.mjs', '23 kB'],
+  ['Vue TagsInput subpath', 'packages/vue/dist/components/TagsInput.mjs', '32 kB'],
+  ['React TagsInput subpath', 'packages/react/dist/components/TagsInput.mjs', '24 kB'],
+  ['Vue MaskInput subpath', 'packages/vue/dist/components/MaskInput.mjs', '30 kB'],
+  ['React MaskInput subpath', 'packages/react/dist/components/MaskInput.mjs', '22 kB'],
   ['Core tailwind/modern subpath', 'packages/core/dist/tailwind/modern.js', '3 kB'],
   ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js', '4 kB'],
   ['Core icons (common) subpath', 'packages/core/dist/icons/common.js', '1 kB']

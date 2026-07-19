@@ -1,0 +1,12 @@
+{
+  "id": "tags-input-02",
+  "title": "受控 + 分隔符 + 校验钩子",
+  "description": "受控值、自定义 delimiters、beforeAdd 归一化(小写)；粘贴多值可批量拆分。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 480
+  }
+}

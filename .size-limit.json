@@ -96,6 +96,42 @@
     "ignore": ["@expcat/tigercat-core", "@floating-ui/dom"]
   },
   {
+    "name": "Vue InputOTP subpath",
+    "path": "packages/vue/dist/components/InputOTP.mjs",
+    "limit": "31 kB",
+    "gzip": true
+  },
+  {
+    "name": "React InputOTP subpath",
+    "path": "packages/react/dist/components/InputOTP.mjs",
+    "limit": "23 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue TagsInput subpath",
+    "path": "packages/vue/dist/components/TagsInput.mjs",
+    "limit": "32 kB",
+    "gzip": true
+  },
+  {
+    "name": "React TagsInput subpath",
+    "path": "packages/react/dist/components/TagsInput.mjs",
+    "limit": "24 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue MaskInput subpath",
+    "path": "packages/vue/dist/components/MaskInput.mjs",
+    "limit": "30 kB",
+    "gzip": true
+  },
+  {
+    "name": "React MaskInput subpath",
+    "path": "packages/react/dist/components/MaskInput.mjs",
+    "limit": "22 kB",
+    "gzip": true
+  },
+  {
     "name": "Core tailwind/modern subpath",
     "path": "packages/core/dist/tailwind/modern.js",
     "limit": "3 kB",

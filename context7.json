@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 149,
+  "component_count": 152,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -787,6 +787,8 @@
         "InputGroup",
         "InputGroupAddon",
         "InputNumber",
+        "InputOTP",
+        "MaskInput",
         "Mentions",
         "NumberKeyboard",
         "Radio",
@@ -796,6 +798,7 @@
         "Slider",
         "Stepper",
         "Switch",
+        "TagsInput",
         "Textarea",
         "TimePicker",
         "Transfer",
@@ -3616,6 +3619,60 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
+    "InputOTP": {
+      "name": "InputOTP",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./InputOTP",
+      "packageTarget": "InputOTP",
+      "typeSource": "packages/core/src/types/input-otp.ts",
+      "sourceFiles": [
+        "packages/core/src/types/input-otp.ts"
+      ],
+      "propsInterfaces": [
+        "InputOTPProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "MaskInput": {
+      "name": "MaskInput",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./MaskInput",
+      "packageTarget": "MaskInput",
+      "typeSource": "packages/core/src/types/mask-input.ts",
+      "sourceFiles": [
+        "packages/core/src/types/mask-input.ts"
+      ],
+      "propsInterfaces": [
+        "MaskInputProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
     "Mentions": {
       "name": "Mentions",
       "aliases": [
@@ -3863,6 +3920,33 @@
       ],
       "propsInterfaces": [
         "SwitchProps"
+      ],
+      "frameworks": [
+        "react",
+        "vue"
+      ],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/form.md",
+        "examples": "skills/tigercat/references/examples/form.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "TagsInput": {
+      "name": "TagsInput",
+      "aliases": [],
+      "category": "Form",
+      "slug": "form",
+      "testGroup": "form",
+      "packageSubpath": "./TagsInput",
+      "packageTarget": "TagsInput",
+      "typeSource": "packages/core/src/types/tags-input.ts",
+      "sourceFiles": [
+        "packages/core/src/types/tags-input.ts"
+      ],
+      "propsInterfaces": [
+        "TagsInputProps"
       ],
       "frameworks": [
         "react",

@@ -1,0 +1,12 @@
+{
+  "id": "tags-input-03",
+  "title": "尺寸、状态与清空",
+  "description": "sm/md/lg 尺寸、warning/error 状态与错误信息、clearable 一键清空。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 200,
+    "maxHeight": 480
+  }
+}

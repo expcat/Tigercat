@@ -1,0 +1,12 @@
+{
+  "id": "mask-input-01",
+  "title": "日期与电话掩码",
+  "description": "模板掩码固定字符自动插入;change 事件同时给出原始值与格式化值。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 160,
+    "maxHeight": 480
+  }
+}

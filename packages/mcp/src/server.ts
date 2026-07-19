@@ -27,7 +27,7 @@ const MARKDOWN_MIME = 'text/markdown'
 // 注入到 MCP 客户端系统提示的服务器级指令:工具优先级、成本模型与中文任务
 // 提示都放在这里,而不是只写在装了 Skill 的用户才看得到的 SKILL.md 里。
 export const TIGERCAT_SERVER_INSTRUCTIONS = [
-  'Tigercat is a Tailwind CSS React + Vue 3 UI library (149 components, imported from',
+  'Tigercat is a Tailwind CSS React + Vue 3 UI library (152 components, imported from',
   '@expcat/tigercat-react / @expcat/tigercat-vue PascalCase subpaths such as',
   '@expcat/tigercat-react/Button). Use this server BEFORE writing or reviewing any code',
   'that touches Tigercat — it returns exact import subpaths, props/events, and',

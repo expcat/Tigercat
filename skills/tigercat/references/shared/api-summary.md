@@ -47,8 +47,11 @@ description: Compact generated route map for Tigercat core type files
 | input.ts           | InputProps                            |
 | input-group.ts     | InputGroupProps, InputGroupAddonProps |
 | input-number.ts    | InputNumberProps                      |
+| input-otp.ts       | InputOTPProps                         |
+| mask-input.ts      | MaskInputProps                        |
 | mentions.ts        | MentionsProps                         |
 | number-keyboard.ts | NumberKeyboardProps                   |
+| tags-input.ts      | TagsInputProps                        |
 | radio.ts           | RadioProps, RadioGroupProps           |
 | select.ts          | SelectProps                           |
 | signature.ts       | SignatureProps                        |

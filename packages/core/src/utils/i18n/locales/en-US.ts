@@ -263,5 +263,13 @@ export const enUS: TigerLocale = {
     patternMismatch: 'Value does not match the required pattern',
     validatorFailed: 'Validation failed',
     validatorError: 'Validation error occurred'
+  },
+  inputOtp: {
+    groupLabel: 'One-time password',
+    slotLabel: 'Character {index} of {total}'
+  },
+  tagsInput: {
+    removeTagLabel: 'Remove {tag}',
+    clearAllLabel: 'Clear all tags'
   }
 }

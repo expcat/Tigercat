@@ -1,0 +1,12 @@
+{
+  "id": "mask-input-01",
+  "title": "日期与电话掩码",
+  "description": "模板掩码固定字符自动插入;onChange 同时输出原始值与格式化值。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 160,
+    "maxHeight": 480
+  }
+}

@@ -4,6 +4,9 @@
 
 ## 未发布
 
+- 新增 **InputOTP** 表单组件（批次 1）：分格输入一次性验证码/PIN，支持粘贴分发、自动聚焦推进、掩码模式（`masked`/`maskChar`）、分组显示（`groups`/`separator`）、`numeric`/`alphanumeric` 字符集与自定义 `pattern`；填满触发 `complete`；提供 Vue/React 双端实现、示例、单测与 E2E，新增 `inputOtp` locale 分区（13 套语言）。
+- 新增 **TagsInput** 表单组件（批次 1）：输入创建标签，支持回车/分隔符提交、粘贴多值批量拆分、去重、最大数量、两段式退格删除、`beforeAdd` 校验/转换钩子与 `clearable` 清空，受控与非受控；chip 复用 Tag 组件；提供双端实现、示例、单测与 E2E，新增 `tagsInput` locale 分区（13 套语言）。
+- 新增 **MaskInput** 表单组件（批次 1）：模板掩码输入（`#` 数字、`a` 字母、`*` 字母数字、`!` 转义），支持自定义 `tokens` 与 `transform`、固定字符 eager 插入、IME 组合输入与 `clearable`；同时输出原始值（`v-model`/`onChange` 第一参）与格式化值（`change` payload 的 `maskedValue`）；提供双端实现、示例、单测与 E2E。
 - **文档维护入口收敛**：Roadmap 只保留当前任务与登记规则；删除已实施的 Playground 编译器提案；测试说明合并到 `tests/README.md`，移除重复且已过时的测试质量清单，并同步修正版本、SSR 与验证文档中的旧引用。
 - **`@expcat/tigercat-mcp` 默认远程读取 skills**：裸 `npx tigercat-mcp` 不再要求本地仓库 checkout，默认从 GitHub Pages `https://expcat.github.io/Tigercat/mcp/` 拉取 `context7.json` 与 skill references；`--root` 保留本地模式（仓库开发/离线），新增 `--base-url` 与环境变量 `TIGERCAT_MCP_BASE_URL` 用于镜像站。无参调用语义变化：不再从当前目录向上查找仓库根（内部 `findTigercatRoot` 移除），库调用 `loadSkillIndex()` / `diagnoseTigercatMcp()` 无参时同样默认远程。
 - **GitHub Pages 新增 `/mcp/` 路由**：随 `vue/`、`react/` 一起发布 skills 静态文件（`context7.json`、`skills/tigercat/**.md`）、部署版本 `version.json` 与说明页；示例首页新增 MCP 入口卡片。

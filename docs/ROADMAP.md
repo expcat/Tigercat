@@ -61,9 +61,9 @@ source: current repository state + competitor benchmark (2026-07-19)
 
 ### 批次 1 表单输入(P0)
 
-- [ ] InputOTP:分格输入、粘贴分发、自动聚焦推进、掩码模式。
-- [ ] TagsInput:输入创建、退格删除、去重、最大数量,受控与非受控。
-- [ ] MaskInput:模板掩码(日期/电话/自定义 token),原始值与格式化值双输出。
+- [x] InputOTP:分格输入、粘贴分发、自动聚焦推进、掩码模式。
+- [x] TagsInput:输入创建、退格删除、去重、最大数量,受控与非受控。
+- [x] MaskInput:模板掩码(日期/电话/自定义 token),原始值与格式化值双输出。
 - 验证:`pnpm test:group:form`;粘贴、IME、键盘导航交互补 E2E。
 
 ### 批次 2 滚动与布局(P0)

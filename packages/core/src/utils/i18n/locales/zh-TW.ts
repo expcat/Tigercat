@@ -78,5 +78,13 @@ export const zhTW: TigerLocale = defineLocale({
   },
   select: {
     doneText: '完成'
+  },
+  inputOtp: {
+    groupLabel: '一次性驗證碼',
+    slotLabel: '第 {index} 位，共 {total} 位'
+  },
+  tagsInput: {
+    removeTagLabel: '移除 {tag}',
+    clearAllLabel: '清空全部標籤'
   }
 })

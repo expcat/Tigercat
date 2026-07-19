@@ -115,6 +115,8 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | InputGroup            | Form       | `form`       | input-group.ts                                      | ./InputGroup            |
 | InputGroupAddon       | Form       | `form`       | input-group.ts                                      | ./InputGroupAddon       |
 | InputNumber           | Form       | `form`       | input-number.ts                                     | ./InputNumber           |
+| InputOTP              | Form       | `form`       | input-otp.ts                                        | ./InputOTP              |
+| MaskInput             | Form       | `form`       | mask-input.ts                                       | ./MaskInput             |
 | Mentions              | Form       | `form`       | mentions.ts                                         | ./Mentions              |
 | NumberKeyboard        | Form       | `form`       | number-keyboard.ts                                  | ./NumberKeyboard        |
 | Radio                 | Form       | `form`       | radio.ts                                            | ./Radio                 |
@@ -124,6 +126,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Slider                | Form       | `form`       | slider.ts                                           | ./Slider                |
 | Stepper               | Form       | `form`       | stepper.ts                                          | ./Stepper               |
 | Switch                | Form       | `form`       | switch.ts                                           | ./Switch                |
+| TagsInput             | Form       | `form`       | tags-input.ts                                       | ./TagsInput             |
 | Textarea              | Form       | `form`       | textarea.ts                                         | ./Textarea              |
 | TimePicker            | Form       | `form`       | timepicker.ts                                       | ./TimePicker            |
 | Transfer              | Form       | `form`       | transfer.ts                                         | ./Transfer              |

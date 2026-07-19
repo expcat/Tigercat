@@ -22,8 +22,8 @@ describe('Tigercat MCP generated inventory', () => {
     const index = await loadSkillIndex(root)
 
     expect(index.context7.generated_by).toBe('pnpm docs:api')
-    expect(index.context7.component_count).toBe(149)
-    expect(index.components.size).toBe(149)
+    expect(index.context7.component_count).toBe(152)
+    expect(index.components.size).toBe(152)
     expect(index.components.has('ConfigProvider')).toBe(true)
     expect(index.components.has('DataTableWithToolbar')).toBe(true)
     expect(index.components.has('Notification')).toBe(false)
@@ -35,7 +35,7 @@ describe('Tigercat MCP generated inventory', () => {
     const result = await diagnoseTigercatMcp(root)
 
     expect(result.ok).toBe(true)
-    expect(result.componentCount).toBe(149)
+    expect(result.componentCount).toBe(152)
     expect(result.aliasCount).toBeGreaterThanOrEqual(1)
     expect(result.topicCount).toBeGreaterThanOrEqual(10)
     expect(result.issues).toEqual([])

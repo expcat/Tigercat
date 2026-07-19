@@ -1,0 +1,12 @@
+{
+  "id": "tags-input-01",
+  "title": "基础标签输入",
+  "description": "非受控模式，回车创建、退格删除、去重与最大数量限制。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 480
+  }
+}

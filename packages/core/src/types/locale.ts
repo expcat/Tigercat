@@ -373,6 +373,28 @@ export interface TigerLocaleFormValidation {
   validatorError?: string
 }
 
+/**
+ * InputOTP labels.
+ * @since 2.1.0
+ */
+export interface TigerLocaleInputOTP {
+  /** Accessible label for the slot group */
+  groupLabel?: string
+  /** Per-slot aria-label — template: supports {index} (1-based) and {total} */
+  slotLabel?: string
+}
+
+/**
+ * TagsInput labels.
+ * @since 2.1.0
+ */
+export interface TigerLocaleTagsInput {
+  /** Remove-tag button aria-label — template: supports {tag} */
+  removeTagLabel?: string
+  /** Clear-all button aria-label */
+  clearAllLabel?: string
+}
+
 export interface TigerLocale {
   /** BCP 47 locale identifier, for Intl formatting and direction inference. */
   locale?: string
@@ -409,6 +431,8 @@ export interface TigerLocale {
   richTextEditor?: TigerLocaleRichTextEditor
   cronEditor?: TigerLocaleCronEditor
   formValidation?: TigerLocaleFormValidation
+  inputOtp?: TigerLocaleInputOTP
+  tagsInput?: TigerLocaleTagsInput
 }
 
 /**

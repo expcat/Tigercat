@@ -1,0 +1,12 @@
+{
+  "id": "input-otp-03",
+  "title": "尺寸与状态",
+  "description": "sm/md/lg 尺寸、error 状态与错误信息、disabled 禁用。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 160,
+    "maxHeight": 480
+  }
+}

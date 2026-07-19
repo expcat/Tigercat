@@ -78,5 +78,13 @@ export const viVN: TigerLocale = defineLocale({
   },
   select: {
     doneText: 'Hoàn thành'
+  },
+  inputOtp: {
+    groupLabel: 'Mật khẩu dùng một lần',
+    slotLabel: 'Ký tự {index} trong {total}'
+  },
+  tagsInput: {
+    removeTagLabel: 'Xóa {tag}',
+    clearAllLabel: 'Xóa tất cả thẻ'
   }
 })

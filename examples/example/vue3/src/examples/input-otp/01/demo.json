@@ -1,0 +1,12 @@
+{
+  "id": "input-otp-01",
+  "title": "基础 6 位验证码",
+  "description": "分格输入、自动聚焦推进、粘贴分发；填满触发 complete。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 480
+  }
+}

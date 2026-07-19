@@ -78,5 +78,13 @@ export const idID: TigerLocale = defineLocale({
   },
   select: {
     doneText: 'Selesai'
+  },
+  inputOtp: {
+    groupLabel: 'Kata sandi sekali pakai',
+    slotLabel: 'Karakter {index} dari {total}'
+  },
+  tagsInput: {
+    removeTagLabel: 'Hapus {tag}',
+    clearAllLabel: 'Hapus semua tag'
   }
 })

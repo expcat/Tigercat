@@ -263,5 +263,13 @@ export const zhCN: TigerLocale = {
     patternMismatch: '格式不正确',
     validatorFailed: '校验未通过',
     validatorError: '校验时发生错误'
+  },
+  inputOtp: {
+    groupLabel: '一次性验证码',
+    slotLabel: '第 {index} 位，共 {total} 位'
+  },
+  tagsInput: {
+    removeTagLabel: '移除 {tag}',
+    clearAllLabel: '清空全部标签'
   }
 }

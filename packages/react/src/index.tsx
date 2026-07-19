@@ -84,6 +84,13 @@ export type { SignatureProps, SignatureRef } from './components/Signature'
 export { NumberKeyboard } from './components/NumberKeyboard'
 export type { NumberKeyboardProps } from './components/NumberKeyboard'
 
+export { InputOTP } from './components/InputOTP'
+export type { InputOTPProps } from './components/InputOTP'
+export { TagsInput } from './components/TagsInput'
+export type { TagsInputProps } from './components/TagsInput'
+export { MaskInput } from './components/MaskInput'
+export type { MaskInputProps } from './components/MaskInput'
+
 export { Transfer } from './components/Transfer'
 export type { TransferProps } from './components/Transfer'
 

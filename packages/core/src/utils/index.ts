@@ -85,6 +85,15 @@ export * from './signature-utils'
 // NumberKeyboard utilities
 export * from './number-keyboard-utils'
 
+// InputOTP utilities
+export * from './input-otp-utils'
+
+// TagsInput utilities
+export * from './tags-input-utils'
+
+// MaskInput utilities
+export * from './mask-input-utils'
+
 // CronEditor utilities
 export * from './cron-editor-utils'
 
