@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Tag } from '@expcat/tigercat-react'
+import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Tag', () => {
@@ -25,6 +26,8 @@ describe('Tag', () => {
   })
 
   it('warns when color is passed instead of variant', () => {
+    // devWarn dedupes per key process-wide, so drop any earlier hit first.
+    resetDevWarnCache()
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
     render(<Tag color="green">Color prop</Tag>)

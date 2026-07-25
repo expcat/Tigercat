@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Button, getButtonVariantClasses, buttonSizeClasses } from '@expcat/tigercat-react'
+import { resetDevWarnCache } from '@expcat/tigercat-core'
 import {
   expectNoA11yViolationsIsolated,
   setThemeVariables,
@@ -36,6 +37,8 @@ describe('Button', () => {
   })
 
   it('warns when color is passed instead of variant', () => {
+    // devWarn dedupes per key process-wide, so drop any earlier hit first.
+    resetDevWarnCache()
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
     render(<Button color="primary">Color prop</Button>)

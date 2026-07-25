@@ -113,7 +113,16 @@ source: current repository state + competitor benchmark (2026-07-19)
 
 基线 `pnpm test`:397 个 spec 文件 / 6952 个测试。切换到 threads pool 前墙钟 73.7s,切换后 54.2s(-26%)。分阶段累计 worker 时间显示编译只占 5.9%、断言执行只占 9.7%,其余 84% 是框架空转(import 43.0% / setup 24.5% / environment 17.0%)。以下两项已测量但本轮未做:
 
-- [ ] 消除跨文件状态污染,使 `--no-isolate` 可用。实测 `--no-isolate` 墙钟降到 11.8s(-84%),但有 5 个文件失败,均为违反测试独立性(tests/README.md 编写原则第 7 条)的既有缺陷:`packages/core/src/utils/dev-warn.ts` 的模块级 `warnedKeys` 缓存跨文件残留(`tests/react/Button.spec.tsx`)、`tests/vue/Input.spec.ts` 与 `tests/vue/MaskInput.spec.ts` 的执行顺序依赖、`tests/vue/BackTop.spec.ts` 的滚动监听泄漏、`tests/core/a11y-interactive-regression.spec.tsx` 的 modal DOM 残留。修复价值不只在提速——这些是真实的隔离缺陷。给 `devWarn` 加 reset 钩子会把测试专用 API 带进生产代码,需先定方案。
+- [ ] 消除跨文件状态污染,使 `--no-isolate` 可用。2026-07-26 复测修正了原先的判断,原条目记的「5 个文件、全部是测试独立性缺陷」两点都不准确。
+
+  复现口径:`npx vitest run --no-isolate --maxWorkers=1` 才是确定性的(13 个文件 / 79 条失败);并行跑因 worker 调度不同,每次失败集合都不一样(实测 8 个文件 / 17~39 条),不能作为基线。墙钟 12.4s vs 基线 54.2s。
+
+  已归因的根因:
+  - **`packages/core/src/utils/copy-text.ts` 的生产缺陷(本轮已改)**:`document.body.removeChild(textarea)` 写在 `try` 内、跟在会抛的 `select()` / `setSelectionRange()` / `execCommand()` 之后,一旦抛异常就把一个隐藏 textarea 永久留在文档里。这不只是测试问题——真实浏览器里每次降级复制失败都会往 DOM 里塞一个可聚焦的 textbox,污染无障碍树。79 条失败里有 66 条是它引起的:残留 textarea 让后续文件的 `getByRole('textbox')` 报 "Found multiple elements"。已补 `tests/core/copy-text.spec.ts`(此前该 util 零覆盖)。
+  - **`devWarn` 去重缓存**:原条目说「加 reset 钩子会把测试专用 API 带进生产代码」——该结论已过期,`resetDevWarnCache()` 早就存在且已在 `api-reports/public-api-baseline.json` 里,是已发布的公开导出。本轮按 `tests/core/dev-warn.spec.ts` 的既有写法,在 Button/Tag 的 React 与 Vue 四个 spec 里调用它。
+  - **`vi.mock` 与共享模块注册表冲突(新发现,原条目没有)**:`--no-isolate` 下同一 worker 共享模块注册表,先加载过的模块不会再走 mock 工厂。`tests/react/ButtonSpinnerLazy.spec.tsx`、`tests/react/overlay-positioning.spec.tsx`、`tests/vue/overlay-positioning.spec.ts` 三个文件(全仓库用 `vi.mock` 的就这三个)因此必然失败。这不是测试独立性缺陷,写法本身没问题,靠改 spec 修不掉;要么给它们单开一个 `isolate: true` 的 project(与 `FORK_ONLY_SPECS` 同一套登记方式),要么在文件内 `vi.resetModules()`。**这一条决定了 `--no-isolate` 能不能全绿,应先定方案再动其余。**
+
+  尚未归因/未修的残留(探针实测):`document.documentElement` 的 inline style 与 class 残留(`setThemeVariables` 有 16 个调用方,`clearThemeVariables` 靠调用方自觉),拖累 `tests/core/modern-theme-interaction.spec.ts`;portal / teleport 容器空 div 持续累积;`tests/react|vue/BackTop`、`tests/react/Avatar`、`tests/*/Spotlight`、`tests/vue/Image` 的失败尚未逐一定位,其中 Spotlight 的 a11y 违规很可能是残留 textarea 的连带,需在 copy-text 修复后复测。
 - [ ] 组件 spec 从根 barrel 改为按组件子路径导入。当前 257 个 React/Vue spec 都从 `@expcat/tigercat-vue` / `@expcat/tigercat-react` 根入口导入,每个文件都要重新求值全部 152 个组件。20 个等价 spec 的对照实验:import 21.30s→9.89s、transform 11.91s→4.93s、墙钟 5.08s→3.54s(-30%)。根 barrel 可达性由 `tests/core/package-exports.spec.ts` 独立覆盖,改导入不丢契约;代价是 257 个文件的机械改动。
 
 ## 长期观察项(不绑定版本)

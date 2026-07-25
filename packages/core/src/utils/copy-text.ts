@@ -14,8 +14,13 @@ export const copyTextToClipboard = async (text: string): Promise<boolean> => {
 
   if (!isBrowser()) return false
 
+  // `textarea` is removed in `finally`: `select()`, `setSelectionRange()` and
+  // `execCommand()` can all throw (or be missing) in embedded webviews and test
+  // DOMs, and an early return from the old catch left the node in the document
+  // for good — an invisible, focusable textbox in the a11y tree.
+  let textarea: HTMLTextAreaElement | null = null
   try {
-    const textarea = document.createElement('textarea')
+    textarea = document.createElement('textarea')
     textarea.value = text
     textarea.setAttribute('readonly', '')
     textarea.style.position = 'fixed'
@@ -24,10 +29,10 @@ export const copyTextToClipboard = async (text: string): Promise<boolean> => {
     document.body.appendChild(textarea)
     textarea.select()
     textarea.setSelectionRange(0, textarea.value.length)
-    const ok = document.execCommand('copy')
-    document.body.removeChild(textarea)
-    return ok
+    return document.execCommand('copy')
   } catch {
     return false
+  } finally {
+    textarea?.remove()
   }
 }
