@@ -9,8 +9,8 @@
 | `pnpm setup`                 | `scripts/setup.mjs`                     | 安装依赖、构建包并运行环境检查                                                                  |
 | `pnpm dev:check`             | `scripts/check-env.mjs`                 | 检查 Node、pnpm、依赖安装和构建产物                                                             |
 | `pnpm example:all`           | `scripts/run-examples.mjs`              | 同时运行 Vue3 与 React 示例                                                                     |
-| `pnpm quality:static`        | 根 package scripts                      | 静态门禁：lint、公开类型与 API 校验                                                             |
-| `pnpm quality:quick`         | 根 package scripts                      | 快速门禁：lint、公开类型/API 校验、core 单测                                                    |
+| `pnpm quality:static`        | 根 package scripts                      | 静态门禁：lint、公开类型与 API 校验、文档链接校验                                               |
+| `pnpm quality:quick`         | 根 package scripts                      | 快速门禁：lint、公开类型/API 校验、文档链接校验、core 单测                                      |
 | `pnpm quality:size`          | 根 package scripts                      | size-limit 包体积门禁                                                                           |
 | `pnpm quality:examples`      | 根 package scripts                      | 示例门禁：校验 DemoBlock code 来源，再构建 React 与 Vue3 example                                |
 | `pnpm quality:ssr`           | 根 package scripts                      | SSR 示例构建门禁：Nuxt 与 Next.js                                                               |
@@ -26,6 +26,7 @@
 | `pnpm example:ssr:check`     | `scripts/check-ssr-examples.mjs`        | 构建 Nuxt/Next.js SSR 示例，并检查 `examples/nextjs/next-env.d.ts` 没有被构建过程改写           |
 | `pnpm example:sources:check` | `scripts/validate-example-sources.mjs`  | 校验 React/Vue 独立模块的元数据、入口、导入白名单、数量和 DemoBlock 契约                        |
 | `pnpm docs:api`              | `scripts/generate-api-docs.mjs`         | 生成 skills API 摘要                                                                            |
+| `pnpm docs:links`            | `scripts/check-doc-links.mjs`           | 校验全部 Markdown 的相对链接目标与 `#anchor` 片段（外部 http 链接不发请求）                     |
 | `pnpm api:baseline:check`    | 根 package scripts                      | 公共 API 基线漂移闸：生成基线并校验 `api-reports` 无差异                                        |
 | `pnpm docs:api:check`        | 根 package scripts                      | references 漂移闸：生成 LLM API 文档并校验 `skills/tigercat/references` 无差异                  |
 | `pnpm mcp:build`             | `packages/mcp`                          | 构建 `@expcat/tigercat-mcp` 本地 stdio MCP 服务                                                 |
@@ -58,13 +59,7 @@ TEST_GROUP=form pnpm test:validate
 
 可用分组：`basic`、`form`、`feedback`、`layout`、`navigation`、`data`、`charts`、`advanced`、`composite`、`core`。`pnpm test:group` 支持 `--group` / `TEST_GROUP`、`--framework` / `TEST_FRAMEWORK`、`--filter` / `TEST_FILTER` 和 `--list`；`pnpm test:validate` 支持同一组参数用于只扫描目标组测试质量。当前 `form` 支持 `primitives` 与 `composite` filter alias。
 
-按改动范围选择验证：
-
-- 组件源码改动：运行对应 `pnpm test:group:<group>`，必要时用 `--framework` 或 `--filter` 缩小范围。
-- 跨组 helper 改动：运行所有受影响 group 的 `pnpm test:group:<group>`，再补充相关 focused `vitest run`。
-- 文档或示例改动：同步运行 `pnpm docs:api:check`、`pnpm example:sources:check`、相关 examples 检查和 changed-file Prettier check。
-- 发布面或门禁策略变更：升级到 `pnpm quality:release`。
-- 发布验证必须在本地手动完成并记录结果；发布 Action 只执行安装、构建和发布，不要向 `.github/workflows/publish*.yml` 添加 `quality:release`、测试、coverage、SSR 或 publish smoke 等发布前验证门禁。
+改动范围 → 验证命令的映射见 [tests/README.md](../tests/README.md)「按改动范围验证」，本文不重复维护。
 
 ## MCP 服务
 
@@ -79,18 +74,12 @@ pnpm mcp:build
 pnpm mcp:serve          # 等价于 --root .（本地模式）
 ```
 
-LLM 客户端也可以直接配置构建后的 bin：
+客户端接入方式与 `--root` / `--base-url` / `--doctor` 标志见
+[README.md](../README.md)「MCP 接入（AI Agent）」。
 
-```bash
-tigercat-mcp                                             # 默认远程（GitHub Pages）
-tigercat-mcp --root /path/to/Tigercat                    # 本地仓库（离线/开发）
-tigercat-mcp --base-url https://mirror.example.com/mcp/  # 镜像站
-tigercat-mcp --doctor                                    # 校验技能源可达性与完整性
-```
-
-`TIGERCAT_MCP_BASE_URL` 是 `--base-url` 的环境变量形式。远程 allow-list 由
-`context7.json` 的 `skill_files` 清单驱动：`pnpm docs:api` 生成、`pnpm api:validate`
-与磁盘双向校验。
+维护者需要知道的额外约束：远程 allow-list 由 `context7.json` 的 `skill_files`
+清单驱动，`pnpm docs:api` 生成、`pnpm api:validate` 与磁盘双向校验。改动 skill
+文件集合后必须重跑 `pnpm docs:api`，否则远程模式会读不到新文件。
 
 ## 内部 helper（仅限仓库脚本）
 

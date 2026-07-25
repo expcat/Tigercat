@@ -6,7 +6,7 @@
 [![@expcat/tigercat-cli](https://img.shields.io/npm/v/@expcat/tigercat-cli?style=flat-square&logo=npm&label=@expcat/tigercat-cli)](https://www.npmjs.com/package/@expcat/tigercat-cli)
 [![@expcat/tigercat-mcp](https://img.shields.io/npm/v/@expcat/tigercat-mcp?style=flat-square&logo=npm&label=@expcat/tigercat-mcp)](https://www.npmjs.com/package/@expcat/tigercat-mcp)
 
-基于 Tailwind CSS v4 的 Vue 3 / React UI 组件库。两套框架共享设计 token、类型与交互约定，并各自提供 **149 个公共组件入口**。
+基于 Tailwind CSS v4 的 Vue 3 / React UI 组件库。两套框架共享设计 token、类型与交互约定，并各自提供 **152 个公共组件入口**。
 
 当前稳定系列为 **v2**，所有官方包保持相同版本并遵循 SemVer；具体最新版本以顶部 npm 徽章为准。
 
@@ -176,6 +176,8 @@ pnpm example:react  # http://localhost:5174
 | `pnpm mcp:build`       | 构建 MCP 服务                        |
 | `pnpm mcp:serve`       | 以 stdio 启动 MCP 服务（本地模式）   |
 | `pnpm example:all`     | 同时运行 Vue 3 与 React 在线示例应用 |
+
+完整脚本与门禁清单见 [scripts/README.md](./scripts/README.md)。
 
 ## 参与贡献
 

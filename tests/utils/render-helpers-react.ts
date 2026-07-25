@@ -70,26 +70,3 @@ export function renderWithChildren<T extends Record<string, unknown>>(
     options
   )
 }
-
-/**
- * Helper to create a wrapper component for testing
- * Useful for testing components that need a parent context (e.g., providers, routers)
- *
- * @template P - Type of wrapper component props
- * @param WrapperComponent - Component to use as wrapper (e.g., ThemeProvider, Router)
- * @param wrapperProps - Props to pass to the wrapper component
- * @returns Wrapper function compatible with Testing Library's wrapper option
- *
- * @example
- * const wrapper = createReactWrapper(ThemeProvider, { theme: 'dark' })
- * render(<MyComponent />, { wrapper })
- */
-export function createReactWrapper<P extends Record<string, unknown> = Record<string, never>>(
-  WrapperComponent: React.ComponentType<P & { children?: React.ReactNode }>,
-  wrapperProps?: P
-) {
-  return ({ children }: { children: React.ReactNode }) =>
-    React.createElement(WrapperComponent, { ...wrapperProps, children } as P & {
-      children: React.ReactNode
-    })
-}

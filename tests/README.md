@@ -9,9 +9,13 @@ tests/
 ├── core/     # 共享算法、工具、导出与跨框架回归
 ├── react/    # React 渲染、事件、受控状态与生命周期绑定
 ├── vue/      # Vue 渲染、emits、响应式状态与生命周期绑定
+├── mcp/      # MCP 路由契约
 ├── utils/    # render、a11y、主题、observer 与 frame helpers
 └── setup.ts  # Vitest 全局环境
 ```
+
+`tests/utils` 只保留在用 helper。新增 helper 前先确认现有 render、a11y、theme、
+observer、frame 工具不能满足；不再被任何 spec 引用的 helper 应随改动一并删除。
 
 ## 常用命令
 
@@ -47,8 +51,40 @@ pnpm vitest run -t "opens the menu"
 5. 交互组件每个框架保留一条 `expectNoA11yViolations` 检查，并针对真实风险补充键盘与 ARIA 断言。
 6. 不使用任意 timeout 等待；使用 `waitFor`、`findBy*`、observer mock 或 frame scheduler 驱动状态。
 7. 测试必须独立，不依赖执行顺序或跨测试共享的可变状态。
+8. 默认环境是 `happy-dom`。不需要 DOM 的 spec 必须用文件头 docblock 显式声明 `@vitest-environment node`（当前 3 个 spec 如此），不要在 node 环境 spec 里依赖 `window`。
 
 `tests/react/ComponentTemplate.spec.tsx.template` 与 `tests/vue/ComponentTemplate.spec.ts.template` 提供最小模板。共享 helper 从 `tests/utils` 导入；新增 helper 前先检查现有 render、a11y、theme、observer 和 frame 工具。
+
+组件 spec 统一从框架根入口导入（`@expcat/tigercat-vue` / `@expcat/tigercat-react`，经 `vitest.config.ts` alias 指向 `packages/*/src`）。这让每个 spec 都要重新求值整个组件库——见 [docs/ROADMAP.md](../docs/ROADMAP.md) 的测试执行成本条目。
+
+## 执行模型
+
+`vitest.config.ts` 把测试拆成两个 project：
+
+| Project     | Pool      | 范围                      | 原因                                                             |
+| ----------- | --------- | ------------------------- | ---------------------------------------------------------------- |
+| `unit`      | `threads` | 除 fork-only 外的 392 个  | worker thread 复用比每文件 fork 进程快得多（全量 73.7s → 54.2s） |
+| `fork-only` | `forks`   | `FORK_ONLY_SPECS` 的 5 个 | 见下                                                             |
+
+`FORK_ONLY_SPECS` 目前包含：
+
+- `tests/core/cli.spec.ts` —— 用 `process.chdir()`，worker thread 不支持。
+- `tests/core/imperative-side-effects.spec.ts`、`tests/react/Notification.spec.tsx`、
+  `tests/vue/Message.spec.ts`、`tests/vue/Notification.spec.ts` —— 挂载进程级
+  Message/Notification 容器并依赖真实定时器，共享 worker 线程的事件循环争用会让
+  1s `waitFor` 偶发超时。用独立进程消除争用，而不是放宽超时。
+
+新 spec 若需要 `process.chdir()`、原生模块、其他线程不安全 API，或挂载进程级全局
+容器，请加入 `FORK_ONLY_SPECS` 并在此登记；不要为它关闭全局隔离，也不要靠调大
+timeout 掩盖。
+
+coverage 运行额外排除上面 4 个命令式 API spec（`COVERAGE_EXCLUDED_SPECS`），它们由
+`pnpm test:special` 单独运行。排除项写在配置里而不是 CLI `--exclude`：`projects`
+不继承 CLI 的 include/exclude 过滤器。因此 `pnpm test` 是 397 个文件、
+`pnpm test:coverage` 是 393 个。
+
+**文件级隔离保持开启**：每个 spec 文件都拿到干净的模块注册表。测试之间不得依赖
+执行顺序或跨文件共享的可变状态（模块级缓存、全局 registry、未清理的事件监听）。
 
 ## 自动门禁
 
@@ -67,9 +103,17 @@ Coverage 阈值由 `vitest.config.ts` 统一维护，当前为 lines 85%、state
 
 ## 按改动范围验证
 
-- 单组件：运行对应单文件和 `pnpm test:group:<group>`。
-- 共享 helper：运行所有受影响 group，并补充 focused core spec。
-- public API 或发布面：运行 `pnpm quality:release`，并按需执行 `pnpm e2e`。
-- 文档或 Example：运行相关 docs/examples 检查和 changed-file Prettier；无需运行无关的完整测试集。
+这是全仓库的唯一一份改动范围 → 验证命令映射，其他文档只链接到这里。
+
+| 改动范围                     | 运行                                                                                                                                         |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 单组件                       | 对应单文件 + `pnpm test:group:<group>`；必要时用 `--framework` / `--filter` 再缩小                                                           |
+| 跨组共享 helper              | 所有受影响 group 的 `pnpm test:group:<group>`，再补 focused `vitest run` core spec                                                           |
+| 文档或 Example               | `pnpm docs:links`、`pnpm docs:api:check`、`pnpm example:sources:check`、相关 examples 检查与 changed-file Prettier；无需运行无关的完整测试集 |
+| public API、发布面或门禁策略 | `pnpm quality:release`，并按需 `pnpm e2e`                                                                                                    |
+
+发布验证必须在本地手动完成并记录结果。发布 Action 只执行安装、构建和发布；不要向
+`.github/workflows/publish*.yml` 添加 `quality:release`、测试、coverage、SSR 或
+publish smoke 等发布前门禁。
 
 提交前确认测试保护的是用户可观察行为、没有重复覆盖共享逻辑，也没有通过扩大等待时间掩盖不稳定性。

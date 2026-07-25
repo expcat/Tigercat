@@ -1,24 +1,10 @@
 import { render, RenderOptions } from '@testing-library/vue'
-import { Component, h, VNode } from 'vue'
+import { Component, VNode } from 'vue'
 
 /**
  * Type for slot content that can be string, VNode, or render function
  */
 type SlotContent = string | VNode | (() => VNode)
-
-/**
- * Custom render function that wraps @testing-library/vue's render
- * with default options and common providers
- *
- * @param component - Vue component to render
- * @param options - Render options from @testing-library/vue
- * @returns Render result with utility functions
- */
-export function renderComponent(component: Component, options?: RenderOptions) {
-  return render(component, {
-    ...options
-  })
-}
 
 /**
  * Helper to render a component with props
@@ -88,24 +74,4 @@ export function renderWithSlots(
     slots,
     props: maybeOptions
   })
-}
-
-/**
- * Helper to create a wrapper component for testing
- * Useful for testing components that need a parent context
- *
- * @param component - Component to wrap
- * @param wrapperComponent - Wrapper component (e.g., Provider, Router)
- * @returns Wrapped component for testing
- *
- * @example
- * const wrapped = createWrapper(MyComponent, ThemeProvider)
- * render(wrapped)
- */
-export function createWrapper(component: Component, wrapperComponent: Component) {
-  return {
-    setup() {
-      return () => h(wrapperComponent, null, () => h(component))
-    }
-  }
 }

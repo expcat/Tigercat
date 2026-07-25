@@ -16,29 +16,29 @@ source: current repository state + competitor benchmark (2026-07-19)
 
 ## 竞品基准与缺口结论
 
-2026-07-19 核查。对比对象:Ant Design、Element Plus、Naive UI、PrimeVue、Mantine、shadcn/ui、HeroUI。基线为 v2.0.19,149 个公共组件入口(权威清单见 `skills/tigercat/references/component-index.md`,生成物)。
+2026-07-19 核查。对比对象:Ant Design、Element Plus、Naive UI、PrimeVue、Mantine、shadcn/ui、HeroUI。核查时基线为 v2.0.19 的 149 个公共组件入口;批次 1 落地后当前为 152(权威清单见 `skills/tigercat/references/component-index.md`,生成物)。
 
 ### 缺口组件
 
 均为 Tigercat 无、主流竞品有的组件;「竞品覆盖」为出现该组件的竞品数。
 
-| 组件 | 竞品覆盖 | 归类 | Test Group |
-| ---------------------------------- | ---- | ---------- | ------------ |
-| InputOTP 验证码/PIN 输入 | 6 家 | Form | `form` |
-| TagsInput 标签输入 | 4 家 | Form | `form` |
-| MaskInput 掩码输入 | 2 家 | Form | `form` |
-| ScrollArea 自定义滚动容器 | 5 家 | Layout | `layout` |
-| Masonry 瀑布流布局 | 1 家(AntD 5 新增) | Layout | `layout` |
-| AspectRatio 宽高比容器 | 3 家 | Layout | `layout` |
-| ContextMenu 右键菜单 | 4 家 | Navigation | `navigation` |
-| NavigationMenu 站点导航(含 MegaMenu) | 3 家 | Navigation | `navigation` |
-| PageHeader 页头 | 2 家 | Navigation | `navigation` |
-| LoadingBar 顶部加载条 | 1 家(Naive,nprogress 类通用需求) | Feedback | `feedback` |
-| Kbd 按键标识 | 3 家 | Basic | `basic` |
-| Highlight 文本高亮 | 2 家 | Basic | `basic` |
-| SplitButton 分裂按钮 | 2 家 | Basic | `basic` |
-| Marquee 跑马灯 | 2 家 | Basic | `basic` |
-| ImageCompare 图片对比滑块 | 1 家(PrimeVue,与 Image 家族互补) | Basic | `basic` |
+| 组件                                 | 竞品覆盖                         | 归类       | Test Group   |
+| ------------------------------------ | -------------------------------- | ---------- | ------------ |
+| InputOTP 验证码/PIN 输入             | 6 家                             | Form       | `form`       |
+| TagsInput 标签输入                   | 4 家                             | Form       | `form`       |
+| MaskInput 掩码输入                   | 2 家                             | Form       | `form`       |
+| ScrollArea 自定义滚动容器            | 5 家                             | Layout     | `layout`     |
+| Masonry 瀑布流布局                   | 1 家(AntD 5 新增)                | Layout     | `layout`     |
+| AspectRatio 宽高比容器               | 3 家                             | Layout     | `layout`     |
+| ContextMenu 右键菜单                 | 4 家                             | Navigation | `navigation` |
+| NavigationMenu 站点导航(含 MegaMenu) | 3 家                             | Navigation | `navigation` |
+| PageHeader 页头                      | 2 家                             | Navigation | `navigation` |
+| LoadingBar 顶部加载条                | 1 家(Naive,nprogress 类通用需求) | Feedback   | `feedback`   |
+| Kbd 按键标识                         | 3 家                             | Basic      | `basic`      |
+| Highlight 文本高亮                   | 2 家                             | Basic      | `basic`      |
+| SplitButton 分裂按钮                 | 2 家                             | Basic      | `basic`      |
+| Marquee 跑马灯                       | 2 家                             | Basic      | `basic`      |
+| ImageCompare 图片对比滑块            | 1 家(PrimeVue,与 Image 家族互补) | Basic      | `basic`      |
 
 ### 缺少的功能
 
@@ -96,6 +96,25 @@ source: current repository state + competitor benchmark (2026-07-19)
 - [ ] TreeSelect 虚拟化:复用 Tree 已有 virtual 能力。
 - 允许修改范围限于 cascader/tree-select 相关 core utils、双框架实现与测试;公共 API 仅新增可选 props,不做 breaking change。
 - 验证:`pnpm test:group:form`;受影响的 `benchmarks/` 套件需复跑。
+
+### v2.0.19 发布记录缺失(2026-07-26 发现,P1)
+
+`pnpm release:check` 在 v2.0.19 上是红的。其中公开 `version` 常量漂移(三个包的 `export const version` 停在 `'2.0.0'`)已随本轮修复:跑了 `pnpm sync:version`,并让 `.github/workflows/create-release-tags.yml` 把三个 `src/index` 一并 `git add`,防止再次漂移。
+
+剩余三条仍未处理,都是 v2.0.19 打了 tag 但没写发布文档:
+
+- [ ] `CHANGELOG.md` 缺 v2.0.19 条目。
+- [ ] `docs/MIGRATION.md` 缺 v2.0.19(若该版本无 breaking change,需要确认门禁是否应放行无 breaking 的补丁版本)。
+- [ ] `skills/tigercat/references/release.md` 缺 v2.0.19。
+
+未代写:发布说明必须由实际发布内容决定,不能从 git log 反推杜撰。
+
+### 测试执行成本(2026-07-26 实测,P2)
+
+基线 `pnpm test`:397 个 spec 文件 / 6952 个测试。切换到 threads pool 前墙钟 73.7s,切换后 54.2s(-26%)。分阶段累计 worker 时间显示编译只占 5.9%、断言执行只占 9.7%,其余 84% 是框架空转(import 43.0% / setup 24.5% / environment 17.0%)。以下两项已测量但本轮未做:
+
+- [ ] 消除跨文件状态污染,使 `--no-isolate` 可用。实测 `--no-isolate` 墙钟降到 11.8s(-84%),但有 5 个文件失败,均为违反测试独立性(tests/README.md 编写原则第 7 条)的既有缺陷:`packages/core/src/utils/dev-warn.ts` 的模块级 `warnedKeys` 缓存跨文件残留(`tests/react/Button.spec.tsx`)、`tests/vue/Input.spec.ts` 与 `tests/vue/MaskInput.spec.ts` 的执行顺序依赖、`tests/vue/BackTop.spec.ts` 的滚动监听泄漏、`tests/core/a11y-interactive-regression.spec.tsx` 的 modal DOM 残留。修复价值不只在提速——这些是真实的隔离缺陷。给 `devWarn` 加 reset 钩子会把测试专用 API 带进生产代码,需先定方案。
+- [ ] 组件 spec 从根 barrel 改为按组件子路径导入。当前 257 个 React/Vue spec 都从 `@expcat/tigercat-vue` / `@expcat/tigercat-react` 根入口导入,每个文件都要重新求值全部 152 个组件。20 个等价 spec 的对照实验:import 21.30s→9.89s、transform 11.91s→4.93s、墙钟 5.08s→3.54s(-30%)。根 barrel 可达性由 `tests/core/package-exports.spec.ts` 独立覆盖,改导入不丢契约;代价是 257 个文件的机械改动。
 
 ## 长期观察项(不绑定版本)
 

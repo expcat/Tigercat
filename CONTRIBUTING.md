@@ -45,12 +45,7 @@ pnpm example:react
 
 ## 代码组织
 
-- 框架无关类型放在 `packages/core/src/types/`。
-- 框架无关工具、计算、格式化和样式逻辑放在 `packages/core/src/utils/`。
-- Vue 组件放在 `packages/vue/src/components/`。
-- React 组件放在 `packages/react/src/components/`。
-- 对外导出需要同步检查 `packages/*/src/index.*`。
-- 组件文档和示例需要同步检查 `skills/tigercat/references/` 与 `examples/example/`。
+目录职责与命名约定见 [AGENTS.md](AGENTS.md)「修改位置」与「代码风格」，两处不重复维护。
 
 ## 根因修复与架构约束
 
@@ -64,33 +59,13 @@ pnpm example:react
 
 ## 组件改动清单
 
-新增组件或显著功能变更通常需要完成：
-
-- Core 共享 Props 类型和必要工具。
-- Vue 3 与 React 双端实现。
-- 包入口导出。
-- 单测覆盖正常路径、边界场景和无障碍检查。
-- Example 页面或示例片段。
-- `skills/tigercat/references/` 中对应分类文档。
-- 有用户可见文案时同步 i18n label。
+新增组件或显著功能变更的交付项清单见 [AGENTS.md](AGENTS.md)「完成交付」，本文不重复维护。
 
 ## 测试和验证
 
-按改动范围选择验证命令，不需要为文档-only 改动运行完整测试。常用命令：
+按改动范围选择验证命令，不需要为文档-only 改动运行完整测试。测试约定与「按改动范围验证」命令表见 [tests/README.md](tests/README.md)，脚本与门禁清单见 [scripts/README.md](scripts/README.md)。
 
-```bash
-pnpm lint
-pnpm build
-pnpm test
-pnpm test:vue
-pnpm test:react
-pnpm test:validate
-pnpm size
-pnpm example:build
-npx playwright test
-```
-
-测试约定见 [tests/README.md](tests/README.md)。只覆盖具有独立回归价值的渲染、状态、事件和无障碍行为；浏览器测试使用功能断言，不新增图片对比基线。
+只覆盖具有独立回归价值的渲染、状态、事件和无障碍行为；浏览器测试使用功能断言，不新增图片对比基线。
 
 ## PR 要求
 
