@@ -92,7 +92,10 @@ jobs:
           node ./scripts/sync-version.mjs "${VERSION}"
 
           if [[ -n "$(git status --porcelain)" ]]; then
-            git add package.json packages/*/package.json packages/cli/src/constants.ts examples/index.html docs/ROADMAP.md
+            git add \
+              package.json packages/*/package.json \
+              packages/core/src/index.ts packages/vue/src/index.ts packages/react/src/index.tsx \
+              packages/cli/src/constants.ts examples/index.html docs/ROADMAP.md
             git commit -m "chore(release): ${TAG}"
           fi
 

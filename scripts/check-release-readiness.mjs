@@ -86,7 +86,7 @@ function checkSourceVersions(expectedVersion) {
     if (match) {
       check(
         match[1] === expectedVersion,
-        `${path} exports version ${match[1]}, expected ${expectedVersion}`
+        `${path} exports version ${match[1]}, expected ${expectedVersion}; run pnpm sync:version`
       )
     }
   }
