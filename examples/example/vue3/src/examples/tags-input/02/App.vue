@@ -12,8 +12,7 @@ const toLower = (tag: string) => tag.toLowerCase()
       v-model="tags"
       :delimiters="[',', ';']"
       :before-add="toLower"
-      placeholder="逗号/分号或回车分隔，自动小写"
-    />
+      placeholder="逗号/分号或回车分隔，自动小写" />
     <p class="text-sm text-gray-600 dark:text-gray-300">当前：{{ tags.join(' · ') || '暂无' }}</p>
   </div>
 </template>

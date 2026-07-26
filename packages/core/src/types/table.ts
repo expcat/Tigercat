@@ -68,12 +68,10 @@ export interface TableFixedCellClassNameContext<T = Record<string, unknown>> {
 }
 
 export type TableFixedHeaderClassName<T = Record<string, unknown>> =
-  | string
-  | ((context: TableFixedHeaderClassNameContext<T>) => string | undefined | null | false)
+  string | ((context: TableFixedHeaderClassNameContext<T>) => string | undefined | null | false)
 
 export type TableFixedCellClassName<T = Record<string, unknown>> =
-  | string
-  | ((context: TableFixedCellClassNameContext<T>) => string | undefined | null | false)
+  string | ((context: TableFixedCellClassNameContext<T>) => string | undefined | null | false)
 
 /**
  * Filter type

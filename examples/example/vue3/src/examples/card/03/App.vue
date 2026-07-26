@@ -19,7 +19,9 @@ const sizes = ['sm', 'md', 'lg'] as const
         <p class="text-sm text-gray-600">padding="p-8" 覆盖尺寸内边距。</p>
       </Card>
       <Card variant="bordered" :padding="false">
-        <div class="bg-blue-500 px-4 py-6 text-sm text-white">padding=false：内容自行控制边距。</div>
+        <div class="bg-blue-500 px-4 py-6 text-sm text-white">
+          padding=false：内容自行控制边距。
+        </div>
       </Card>
     </div>
   </div>

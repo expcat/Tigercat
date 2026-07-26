@@ -80,12 +80,7 @@ describe('DataExport', () => {
   it('exports on click and emits onExport with the format', async () => {
     const onExport = vi.fn()
     render(
-      <DataExport
-        columns={columns}
-        dataSource={data}
-        formats={['markdown']}
-        onExport={onExport}
-      />
+      <DataExport columns={columns} dataSource={data} formats={['markdown']} onExport={onExport} />
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Export data' }))

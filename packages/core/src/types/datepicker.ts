@@ -7,9 +7,7 @@ import type { ComponentSize } from './base'
 export type DatePickerInputDate = Date | string
 
 export type DatePickerModelValue =
-  | DatePickerInputDate
-  | null
-  | [DatePickerInputDate | null, DatePickerInputDate | null]
+  DatePickerInputDate | null | [DatePickerInputDate | null, DatePickerInputDate | null]
 
 export interface DatePickerLabels {
   placeholder: string
@@ -36,9 +34,7 @@ export interface DatePickerLocaleConfig {
 }
 
 export type DatePickerLocaleInput =
-  | string
-  | Partial<DatePickerLocalePreset>
-  | DatePickerLocaleConfig
+  string | Partial<DatePickerLocalePreset> | DatePickerLocaleConfig
 
 /**
  * Date format types

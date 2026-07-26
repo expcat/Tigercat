@@ -11,7 +11,9 @@ const data: ScatterChartDatum[] = [
 export default function App() {
   return (
     <div>
-      <p className="mb-1 text-sm text-gray-500">坐标轴标题 + 刻度格式化 + 图例（colors 循环配色）</p>
+      <p className="mb-1 text-sm text-gray-500">
+        坐标轴标题 + 刻度格式化 + 图例（colors 循环配色）
+      </p>
       <ScatterChart
         data={data}
         width={460}

@@ -18,13 +18,7 @@ export type LoadingSize = 'sm' | 'md' | 'lg' | 'xl'
  * Loading color variants
  */
 export type LoadingColor =
-  | 'primary'
-  | 'secondary'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'info'
-  | 'default'
+  'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info' | 'default'
 
 /**
  * Base loading props interface

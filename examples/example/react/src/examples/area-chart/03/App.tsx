@@ -41,7 +41,14 @@ export default function App() {
       </div>
       <div>
         <p className="mb-1 text-sm text-gray-500">showGrid=false + showAxis=false（迷你趋势）</p>
-        <AreaChart series={series} width={420} height={120} showGrid={false} showAxis={false} gradient />
+        <AreaChart
+          series={series}
+          width={420}
+          height={120}
+          showGrid={false}
+          showAxis={false}
+          gradient
+        />
       </div>
     </div>
   )

@@ -23,7 +23,12 @@ const palette = [
     </div>
     <div>
       <p class="mb-2 text-sm text-gray-500">disabled</p>
-      <ColorSwatch :model-value="color" :colors="palette" :columns="8" disabled aria-label="禁用色板" />
+      <ColorSwatch
+        :model-value="color"
+        :colors="palette"
+        :columns="8"
+        disabled
+        aria-label="禁用色板" />
     </div>
   </div>
 </template>

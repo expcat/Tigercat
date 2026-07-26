@@ -15,7 +15,12 @@ const data: LineChartDatum[] = [
   <div class="space-y-6">
     <div>
       <p class="mb-1 text-sm text-gray-500">data 单系列 + areaColor + fillOpacity</p>
-      <AreaChart :data="data" :width="420" :height="200" area-color="#0891b2" :fill-opacity="0.35" />
+      <AreaChart
+        :data="data"
+        :width="420"
+        :height="200"
+        area-color="#0891b2"
+        :fill-opacity="0.35" />
     </div>
     <div>
       <p class="mb-1 text-sm text-gray-500">showPoints=false + includeZero=false（紧凑基线）</p>

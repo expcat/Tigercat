@@ -13,7 +13,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { format } from 'prettier'
+import { format, resolveConfig } from 'prettier'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const TOKENS_DIR = join(__dirname, '..', 'tokens')
@@ -82,14 +82,13 @@ function tokenPathToName(path) {
   return path.join('/')
 }
 
-function formatGenerated(source, parser) {
-  return format(source, {
-    parser,
-    singleQuote: true,
-    semi: false,
-    trailingComma: 'none',
-    bracketSameLine: true
-  })
+// 必须复用仓库 .prettierrc.json，不能手写子集：漏掉 printWidth 会让产物停在
+// prettier 默认的 80 列，与 `pnpm format:check` 永久互相打架。
+let prettierConfigPromise
+async function formatGenerated(source, parser) {
+  prettierConfigPromise ??= resolveConfig(TOKENS_DIR)
+  const config = await prettierConfigPromise
+  return format(source, { ...config, parser })
 }
 
 // ---------------------------------------------------------------------------

@@ -447,13 +447,9 @@ export interface TigerLocale {
 export type TigerText = Omit<Partial<TigerLocale>, 'locale' | 'direction'>
 
 export type TigerLocaleLazyModule =
-  | Partial<TigerLocale>
-  | { default?: Partial<TigerLocale> }
-  | Record<string, unknown>
+  Partial<TigerLocale> | { default?: Partial<TigerLocale> } | Record<string, unknown>
 
 export type TigerLocaleLoader = () => PromiseLike<TigerLocaleLazyModule>
 
 export type TigerLocaleInput =
-  | Partial<TigerLocale>
-  | PromiseLike<TigerLocaleLazyModule>
-  | TigerLocaleLoader
+  Partial<TigerLocale> | PromiseLike<TigerLocaleLazyModule> | TigerLocaleLoader

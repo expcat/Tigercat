@@ -1560,7 +1560,9 @@ export function getTagsInputLabels(
     : DEFAULT_TAGS_INPUT_LABELS
   return {
     removeTagLabel:
-      overrides?.removeTagLabel ?? locale?.tagsInput?.removeTagLabel ?? defaultLabels.removeTagLabel,
+      overrides?.removeTagLabel ??
+      locale?.tagsInput?.removeTagLabel ??
+      defaultLabels.removeTagLabel,
     clearAllLabel:
       overrides?.clearAllLabel ?? locale?.tagsInput?.clearAllLabel ?? defaultLabels.clearAllLabel
   }

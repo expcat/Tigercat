@@ -10,7 +10,9 @@ const data = [
 export default function App() {
   return (
     <div>
-      <p className="mb-1 text-sm text-gray-500">direction=&quot;vertical&quot;（默认）+ gradient + 提示</p>
+      <p className="mb-1 text-sm text-gray-500">
+        direction=&quot;vertical&quot;（默认）+ gradient + 提示
+      </p>
       <FunnelChart
         data={data}
         width={420}

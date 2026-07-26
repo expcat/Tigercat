@@ -136,15 +136,17 @@ export function buildStoredZip(entries: ZipEntrySource[]): Uint8Array {
 // --- XML helpers ---
 
 function escapeXml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;')
-    // control characters (except tab/newline/CR) are not representable in XML 1.0
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+  return (
+    value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
+      // control characters (except tab/newline/CR) are not representable in XML 1.0
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+  )
 }
 
 /** 0 -> A, 25 -> Z, 26 -> AA ... */
@@ -160,7 +162,10 @@ function columnLetter(index: number): string {
 
 // Excel forbids : \ / ? * [ ] in sheet names and caps them at 31 characters
 function sanitizeSheetName(name?: string): string {
-  const cleaned = (name ?? '').replace(/[:\\/?*[\]]/g, ' ').trim().slice(0, 31)
+  const cleaned = (name ?? '')
+    .replace(/[:\\/?*[\]]/g, ' ')
+    .trim()
+    .slice(0, 31)
   return cleaned || 'Sheet1'
 }
 

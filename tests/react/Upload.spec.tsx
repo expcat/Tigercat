@@ -777,5 +777,4 @@ describe('Upload', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-
 })

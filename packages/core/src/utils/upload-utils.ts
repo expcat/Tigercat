@@ -35,11 +35,7 @@ export function getUploadStatusIconClasses(
 export type BeforeUploadHandler = (file: File) => boolean | Promise<boolean>
 
 export type UploadRejectReason =
-  | 'exceed'
-  | 'type'
-  | 'size'
-  | 'before-upload'
-  | 'before-upload-error'
+  'exceed' | 'type' | 'size' | 'before-upload' | 'before-upload-error'
 
 export interface UploadRejectedFile {
   file: File

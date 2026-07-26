@@ -23,7 +23,9 @@ export default function App() {
         />
       </div>
       <div>
-        <p className="mb-1 text-sm text-gray-500">barColor 单色 + barMaxWidth + barPaddingInner + 无网格</p>
+        <p className="mb-1 text-sm text-gray-500">
+          barColor 单色 + barMaxWidth + barPaddingInner + 无网格
+        </p>
         <BarChart
           data={data}
           width={420}

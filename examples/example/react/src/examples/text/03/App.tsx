@@ -24,7 +24,9 @@ export default function App() {
         </Text>
       </div>
       <div className="max-w-xs">
-        <Text truncate>truncate：这是一段很长很长的文本，超出容器宽度时会以省略号结尾而不换行。</Text>
+        <Text truncate>
+          truncate：这是一段很长很长的文本，超出容器宽度时会以省略号结尾而不换行。
+        </Text>
       </div>
     </div>
   )

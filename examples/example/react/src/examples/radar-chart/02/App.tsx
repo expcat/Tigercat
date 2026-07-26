@@ -29,7 +29,9 @@ export default function App() {
         />
       </div>
       <div>
-        <p className="mb-1 text-sm text-gray-500">showGrid=false + showAxis=false（只留形状与标签）</p>
+        <p className="mb-1 text-sm text-gray-500">
+          showGrid=false + showAxis=false（只留形状与标签）
+        </p>
         <RadarChart
           data={data}
           width={300}

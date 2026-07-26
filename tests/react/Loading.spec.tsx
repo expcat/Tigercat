@@ -105,5 +105,4 @@ describe('Loading (React)', () => {
       unmount()
     }
   })
-
 })

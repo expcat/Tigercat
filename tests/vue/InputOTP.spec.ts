@@ -88,7 +88,9 @@ describe('InputOTP', () => {
     })
 
     it('has no a11y violations', async () => {
-      const { container } = render(InputOTP, { props: { length: 4, ariaLabel: 'Verification code' } })
+      const { container } = render(InputOTP, {
+        props: { length: 4, ariaLabel: 'Verification code' }
+      })
       await expectNoA11yViolationsIsolated(container)
     })
   })

@@ -1,13 +1,4 @@
-import {
-  computed,
-  defineComponent,
-  h,
-  inject,
-  nextTick,
-  ref,
-  watch,
-  type PropType
-} from 'vue'
+import { computed, defineComponent, h, inject, nextTick, ref, watch, type PropType } from 'vue'
 import {
   applyMaskInput,
   classNames,
@@ -128,7 +119,9 @@ export const MaskInput = defineComponent({
     const spec = computed(() => parseMask(props.mask, props.tokens))
     const isControlled = computed(() => props.modelValue !== undefined)
     const innerRaw = ref(props.defaultValue ?? '')
-    const rawValue = computed(() => (isControlled.value ? (props.modelValue ?? '') : innerRaw.value))
+    const rawValue = computed(() =>
+      isControlled.value ? (props.modelValue ?? '') : innerRaw.value
+    )
     const formatted = computed(() => formatMaskValue(rawValue.value, spec.value))
     const maskedValue = computed(() => formatted.value.maskedValue)
 
@@ -271,11 +264,7 @@ export const MaskInput = defineComponent({
         'div',
         {
           ref: wrapperRef,
-          class: classNames(
-            getInputWrapperClasses(),
-            props.className,
-            coerceClassValue(attrClass)
-          ),
+          class: classNames(getInputWrapperClasses(), props.className, coerceClassValue(attrClass)),
           style: mergeStyleValues(props.style, attrStyle as Record<string, unknown> | undefined)
         },
         children

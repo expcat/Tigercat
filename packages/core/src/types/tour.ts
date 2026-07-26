@@ -8,14 +8,7 @@ import type { TigerLocale } from './locale'
  * Placement for the tour step popover
  */
 export type TourPlacement =
-  | 'top'
-  | 'top-start'
-  | 'top-end'
-  | 'bottom'
-  | 'bottom-start'
-  | 'bottom-end'
-  | 'left'
-  | 'right'
+  'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'right'
 
 export type TourStepSkipPredicate = () => boolean
 

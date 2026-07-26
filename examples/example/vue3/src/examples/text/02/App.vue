@@ -11,7 +11,9 @@ const weights = ['normal', 'medium', 'semibold', 'bold', 'black'] as const
       <Text v-for="size in sizes" :key="size" tag="span" :size="size">{{ size }}</Text>
     </div>
     <div class="flex flex-wrap items-baseline gap-4">
-      <Text v-for="weight in weights" :key="weight" tag="span" size="lg" :weight="weight">{{ weight }}</Text>
+      <Text v-for="weight in weights" :key="weight" tag="span" size="lg" :weight="weight">{{
+        weight
+      }}</Text>
     </div>
   </div>
 </template>

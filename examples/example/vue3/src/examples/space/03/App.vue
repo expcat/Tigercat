@@ -19,7 +19,10 @@ const tags = Array.from({ length: 10 }, (_, i) => i + 1)
       <p class="mb-2 text-sm text-gray-500">wrap（窄容器内自动换行）</p>
       <div class="max-w-xs">
         <Space size="sm" wrap>
-          <span v-for="i in tags" :key="i" class="rounded bg-emerald-600 px-3 py-1 text-sm text-white">
+          <span
+            v-for="i in tags"
+            :key="i"
+            class="rounded bg-emerald-600 px-3 py-1 text-sm text-white">
             标签 {{ i }}
           </span>
         </Space>

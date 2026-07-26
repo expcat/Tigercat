@@ -17,7 +17,9 @@ export default function App() {
         <AreaChart data={data} width={420} height={200} areaColor="#0891b2" fillOpacity={0.35} />
       </div>
       <div>
-        <p className="mb-1 text-sm text-gray-500">showPoints=false + includeZero=false（紧凑基线）</p>
+        <p className="mb-1 text-sm text-gray-500">
+          showPoints=false + includeZero=false（紧凑基线）
+        </p>
         <AreaChart data={data} width={420} height={200} showPoints={false} includeZero={false} />
       </div>
     </div>

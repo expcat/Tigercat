@@ -141,7 +141,9 @@ describe('Breadcrumb', () => {
       const user = userEvent.setup()
       render(Breadcrumb, {
         slots: {
-          default: () => [h(BreadcrumbItem, { current: true, onClick: handleClick }, () => 'Current')]
+          default: () => [
+            h(BreadcrumbItem, { current: true, onClick: handleClick }, () => 'Current')
+          ]
         }
       })
       await user.click(screen.getByText('Current'))
@@ -194,7 +196,10 @@ describe('Breadcrumb', () => {
       container.querySelector('button[aria-label="Show collapsed breadcrumb items"]')
 
     it('collapses middle items into an ellipsis when maxItems is set', () => {
-      const { container } = render(Breadcrumb, { props: { maxItems: 3 }, slots: { default: items } })
+      const { container } = render(Breadcrumb, {
+        props: { maxItems: 3 },
+        slots: { default: items }
+      })
       expect(ellipsis(container)).toBeInTheDocument()
       expect(container.querySelectorAll('li')).toHaveLength(4)
       expect(screen.getByText('Home')).toBeInTheDocument()
@@ -204,7 +209,10 @@ describe('Breadcrumb', () => {
 
     it('expands all items when the ellipsis is clicked', async () => {
       const user = userEvent.setup()
-      const { container } = render(Breadcrumb, { props: { maxItems: 3 }, slots: { default: items } })
+      const { container } = render(Breadcrumb, {
+        props: { maxItems: 3 },
+        slots: { default: items }
+      })
       await user.click(ellipsis(container)!)
       expect(screen.getByText('A')).toBeInTheDocument()
       expect(screen.getByText('B')).toBeInTheDocument()
@@ -212,7 +220,10 @@ describe('Breadcrumb', () => {
     })
 
     it('does not collapse when maxItems is >= the item count', () => {
-      const { container } = render(Breadcrumb, { props: { maxItems: 10 }, slots: { default: items } })
+      const { container } = render(Breadcrumb, {
+        props: { maxItems: 10 },
+        slots: { default: items }
+      })
       expect(ellipsis(container)).toBeNull()
       expect(container.querySelectorAll('li')).toHaveLength(5)
     })

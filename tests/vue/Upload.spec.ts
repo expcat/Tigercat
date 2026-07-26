@@ -477,7 +477,10 @@ describe('Upload', () => {
         const view = render(Upload, {
           props: { fileList: [uploadFile], listType: 'picture-card' }
         })
-        await view.rerender({ fileList: [{ ...uploadFile, progress: 50 }], listType: 'picture-card' })
+        await view.rerender({
+          fileList: [{ ...uploadFile, progress: 50 }],
+          listType: 'picture-card'
+        })
 
         expect(createObjectURL).toHaveBeenCalledTimes(1)
 
@@ -810,5 +813,4 @@ describe('Upload', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-
 })

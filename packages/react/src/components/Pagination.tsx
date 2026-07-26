@@ -199,14 +199,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       // navigation, so a single size change never triggers two callbacks.
       onPageSizeChange?.(newPage, newPageSize)
     },
-    [
-      disabled,
-      total,
-      validatedCurrentPage,
-      controlledPageSize,
-      controlledCurrent,
-      onPageSizeChange
-    ]
+    [disabled, total, validatedCurrentPage, controlledPageSize, controlledCurrent, onPageSizeChange]
   )
 
   // Handle quick jumper submit

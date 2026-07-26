@@ -11,12 +11,7 @@ export type MessageType = 'success' | 'warning' | 'error' | 'info' | 'loading'
  * Message position on screen
  */
 export type MessagePosition =
-  | 'top'
-  | 'top-left'
-  | 'top-right'
-  | 'bottom'
-  | 'bottom-left'
-  | 'bottom-right'
+  'top' | 'top-left' | 'top-right' | 'bottom' | 'bottom-left' | 'bottom-right'
 
 /**
  * Message instance interface

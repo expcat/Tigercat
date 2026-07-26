@@ -138,5 +138,4 @@ describe('Statistic', () => {
     renderWithProps(Statistic, { title: 'T', value: -42 })
     expect(screen.getByText('-42')).toBeInTheDocument()
   })
-
 })

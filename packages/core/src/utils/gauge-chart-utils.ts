@@ -195,7 +195,10 @@ export function valueToGaugeAngle(
   const safeMin = safeNumber(min)
   const safeMax = safeNumber(max, safeMin)
   if (safeMax <= safeMin) return safeStart
-  const ratio = Math.max(0, Math.min(1, (safeNumber(value, safeMin) - safeMin) / (safeMax - safeMin)))
+  const ratio = Math.max(
+    0,
+    Math.min(1, (safeNumber(value, safeMin) - safeMin) / (safeMax - safeMin))
+  )
   return safeStart + ratio * (safeEnd - safeStart)
 }
 

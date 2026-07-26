@@ -176,5 +176,4 @@ describe('Signature', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-
 })

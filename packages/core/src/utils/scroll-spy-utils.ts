@@ -19,8 +19,7 @@ export interface ScrollSpyObserverOptions {
   onChange: (item: ScrollSpyItem) => void
 }
 
-export const scrollSpyRootClasses =
-  'relative text-sm text-[var(--tiger-text-muted,#6b7280)]'
+export const scrollSpyRootClasses = 'relative text-sm text-[var(--tiger-text-muted,#6b7280)]'
 
 export const scrollSpyStickyClasses = 'sticky top-0'
 

@@ -89,11 +89,7 @@ export function interpolateColor(minColor: string, maxColor: string, t: number):
   const clamped = Number.isFinite(t) ? Math.max(0, Math.min(1, t)) : 0
   const [r1, g1, b1] = hexToRgb(minColor)
   const [r2, g2, b2] = hexToRgb(maxColor)
-  return rgbToHex(
-    r1 + (r2 - r1) * clamped,
-    g1 + (g2 - g1) * clamped,
-    b1 + (b2 - b1) * clamped
-  )
+  return rgbToHex(r1 + (r2 - r1) * clamped, g1 + (g2 - g1) * clamped, b1 + (b2 - b1) * clamped)
 }
 
 /**

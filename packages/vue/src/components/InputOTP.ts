@@ -123,8 +123,8 @@ export const InputOTP = defineComponent({
       FORM_ITEM_CONTROL_INJECTION_KEY,
       null
     )
-    const effectiveStatus = computed(
-      () => (props.status !== 'default' ? props.status : (formItemControl?.status.value ?? props.status))
+    const effectiveStatus = computed(() =>
+      props.status !== 'default' ? props.status : (formItemControl?.status.value ?? props.status)
     )
     const effectiveErrorMessage = computed(
       () => props.errorMessage ?? formItemControl?.errorMessage.value

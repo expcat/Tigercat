@@ -89,17 +89,14 @@
   --tiger-primitive-radius-xl: 12px;
   --tiger-primitive-radius-full: 9999px;
   --tiger-primitive-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --tiger-primitive-shadow-sm:
-    0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-  --tiger-primitive-shadow-md:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --tiger-primitive-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --tiger-primitive-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   --tiger-primitive-shadow-lg:
     0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   --tiger-primitive-shadow-xl:
     0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   --tiger-primitive-font-family-base:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
-    Arial, sans-serif;
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --tiger-primitive-font-family-mono:
     'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   --tiger-primitive-font-size-xs: 12px;
@@ -224,8 +221,7 @@
   --tiger-component-drawer-width-xl: 680px;
   --tiger-component-card-border-radius: 12px;
   --tiger-component-card-padding: 24px;
-  --tiger-component-card-shadow:
-    0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --tiger-component-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   --tiger-component-card-border-color: #e5e5e5;
   --tiger-component-badge-font-size: 12px;
   --tiger-component-badge-font-weight: 500;

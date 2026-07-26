@@ -12,6 +12,7 @@
 - **GitHub Pages 新增 `/mcp/` 路由**：随 `vue/`、`react/` 一起发布 skills 静态文件（`context7.json`、`skills/tigercat/**.md`）、部署版本 `version.json` 与说明页；示例首页新增 MCP 入口卡片。
 - **`context7.json` 新增 `skill_files` 清单**：`pnpm docs:api` 生成全部 skill markdown 的仓库相对路径，作为远程模式 allow-list 契约；`pnpm api:validate` 与磁盘双向校验。
 - **修复 MCP server 版本硬编码**：`createTigercatMcpServer` 上报的 server version 由写死的 `2.0.0-rc.1` 改为运行时读取包版本；`--doctor` 输出增加 `mode: local|remote`，远程模式报告 base URL 与部署版本。
+- **格式化漂移收敛并纳入门禁**：`pnpm format` 收敛全仓库 108 个漂移文件，`pnpm format:check` 加入 `quality:static`（此前不在任何门禁里，是漂移积累的根因）。同时修掉两处生成器与 prettier 打架的根因：`packages/core/scripts/generate-tokens.mjs` 原先手写 prettier 配置子集、漏掉 `printWidth: 100`，产物停在默认 80 列；`context7.json` 原先由 `JSON.stringify(…, null, 2)` 直接写出，从不过 prettier。两者改为经 `resolveConfig` 复用 `.prettierrc.json`，`pnpm tokens:build` 与 `pnpm docs:api` 的产物现已与 `format:check` 一致且可重复生成。Next.js 自己重写的 `examples/nextjs/next-env.d.ts` 加入 `.prettierignore`。纯格式化改动，无公开 API 变化。
 
 ## v2.0.0
 

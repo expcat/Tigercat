@@ -429,10 +429,14 @@ const COMPONENT_PROP_PRIORITY = {
 }
 
 let prettierConfigPromise
-async function formatMarkdown(content) {
+async function formatWithPrettier(content, parser) {
   prettierConfigPromise ??= prettier.resolveConfig(SKILL_REFERENCES_DIR)
   const config = await prettierConfigPromise
-  return prettier.format(content, { ...config, parser: 'markdown' })
+  return prettier.format(content, { ...config, parser })
+}
+
+function formatMarkdown(content) {
+  return formatWithPrettier(content, 'markdown')
 }
 
 function hasExportModifier(node) {
@@ -960,9 +964,14 @@ async function main() {
   )
 
   // context7.json 最后写出：skill_files 清单必须在所有 markdown 落盘之后收集。
+  // 走 prettier 而非 JSON.stringify 缩进，否则产物与 `pnpm format:check` 互相打架。
   await writeFile(
     CONTEXT7_JSON,
-    `${JSON.stringify(buildTigercatContext7(componentRows, collectSkillFiles()), null, 2)}\n`
+    await formatWithPrettier(
+      JSON.stringify(buildTigercatContext7(componentRows, collectSkillFiles())),
+      'json'
+    ),
+    'utf8'
   )
 
   console.log(`Skill references generated under: ${SKILL_REFERENCES_DIR}`)

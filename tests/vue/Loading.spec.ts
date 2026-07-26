@@ -119,5 +119,4 @@ describe('Loading (Vue)', () => {
       unmount()
     }
   })
-
 })

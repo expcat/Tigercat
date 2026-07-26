@@ -55,7 +55,7 @@
     "size": "size-limit",
     "size:check": "size-limit --json",
     "docs:links": "node ./scripts/check-doc-links.mjs",
-    "quality:static": "pnpm lint && pnpm types:check && pnpm api:validate && pnpm docs:links",
+    "quality:static": "pnpm format:check && pnpm lint && pnpm types:check && pnpm api:validate && pnpm docs:links",
     "quality:quick": "pnpm quality:static && pnpm test:core",
     "quality:size": "pnpm size",
     "quality:examples": "pnpm example:sources:check && pnpm example:compile:check && pnpm example:build",

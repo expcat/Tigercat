@@ -56,9 +56,7 @@ export const ChartAxis = ({
       <line {...axisLine} className={chartAxisLineClasses} data-axis-line="true" />
       {axisTicks.map((tick) => {
         const textAnchor = (isHorizontal ? 'middle' : isTopOrLeft ? 'end' : 'start') as
-          | 'middle'
-          | 'end'
-          | 'start'
+          'middle' | 'end' | 'start'
 
         const tickLine = isHorizontal
           ? {

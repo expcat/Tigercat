@@ -29,14 +29,7 @@ export type TextSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl
  * Text weight types
  */
 export type TextWeight =
-  | 'thin'
-  | 'light'
-  | 'normal'
-  | 'medium'
-  | 'semibold'
-  | 'bold'
-  | 'extrabold'
-  | 'black'
+  'thin' | 'light' | 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold' | 'black'
 
 /**
  * Text alignment types
@@ -47,13 +40,7 @@ export type TextAlign = 'left' | 'center' | 'right' | 'justify'
  * Text color types
  */
 export type TextColor =
-  | 'default'
-  | 'primary'
-  | 'secondary'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'muted'
+  'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'muted'
 
 /**
  * Base text props interface

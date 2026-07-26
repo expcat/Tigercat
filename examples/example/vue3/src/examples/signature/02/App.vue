@@ -5,7 +5,12 @@ import { Signature } from '@expcat/tigercat-vue/Signature'
 <template>
   <div class="flex flex-wrap gap-4">
     <div class="space-y-1">
-      <Signature :width="280" :height="140" pen-color="#dc2626" :line-width="2" aria-label="红色细笔" />
+      <Signature
+        :width="280"
+        :height="140"
+        pen-color="#dc2626"
+        :line-width="2"
+        aria-label="红色细笔" />
       <p class="text-xs text-gray-500">penColor 红 · lineWidth 2</p>
     </div>
     <div class="space-y-1">

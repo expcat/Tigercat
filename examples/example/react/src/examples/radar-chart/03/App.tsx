@@ -12,7 +12,9 @@ const data: RadarChartDatum[] = [
 export default function App() {
   return (
     <div>
-      <p className="mb-1 text-sm text-gray-500">labelFormatter + levelLabelFormatter + 自定义提示</p>
+      <p className="mb-1 text-sm text-gray-500">
+        labelFormatter + levelLabelFormatter + 自定义提示
+      </p>
       <RadarChart
         data={data}
         width={380}

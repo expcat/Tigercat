@@ -6,3 +6,7 @@ pnpm-lock.yaml
 coverage
 playwright-report
 test-results
+
+# Next.js 自己生成并在每次 `next build`（pnpm example:ssr:next）时重写，
+# 格式化它只会在下一次构建后重新漂移。
+examples/nextjs/next-env.d.ts

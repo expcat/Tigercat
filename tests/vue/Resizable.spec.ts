@@ -43,7 +43,6 @@ describe('Resizable', () => {
     })
   })
 
-
   describe('Custom className', () => {
     it('should apply custom className', () => {
       const { container } = renderResizable({ className: 'my-resizable' })
@@ -71,7 +70,6 @@ describe('Resizable', () => {
       })
     })
   })
-
 
   describe('Mouse interaction', () => {
     it('should have mousedown handler on handles', () => {
@@ -103,7 +101,6 @@ describe('Resizable', () => {
       expect(container.querySelector('[data-resizable]')).toBeTruthy()
     })
   })
-
 
   // --- Keyboard resize (C32-2) ---
   describe('Keyboard resize', () => {

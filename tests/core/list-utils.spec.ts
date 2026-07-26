@@ -9,8 +9,6 @@ describe('list-utils', () => {
   })
 
   it('uses xs as the base class and ignores invalid values', () => {
-    expect(getGridColumnClasses(3, 2, -1, Number.NaN, 99, 4.9)).toBe(
-      'grid-cols-2 xl:grid-cols-4'
-    )
+    expect(getGridColumnClasses(3, 2, -1, Number.NaN, 99, 4.9)).toBe('grid-cols-2 xl:grid-cols-4')
   })
 })

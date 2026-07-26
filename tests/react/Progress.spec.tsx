@@ -153,5 +153,4 @@ describe('Progress', () => {
     expect(progressbar.className).toContain('bg-gradient')
     expect(progressbar.className).not.toContain('progress-stripes')
   })
-
 })

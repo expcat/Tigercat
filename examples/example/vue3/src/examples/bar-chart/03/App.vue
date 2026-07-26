@@ -23,7 +23,9 @@ const data: BarChartDatum[] = [
         y-axis-label="数量" />
     </div>
     <div>
-      <p class="mb-1 text-sm text-gray-500">barColor 单色 + barMaxWidth + barPaddingInner + 无网格</p>
+      <p class="mb-1 text-sm text-gray-500">
+        barColor 单色 + barMaxWidth + barPaddingInner + 无网格
+      </p>
       <BarChart
         :data="data"
         :width="420"

@@ -78,7 +78,17 @@ export const DataExport = <T extends Record<string, unknown>>({
         setExporting(false)
       }
     },
-    [columns, dataSource, sheetName, cellFormatter, fileName, disabled, exporting, onExport, onError]
+    [
+      columns,
+      dataSource,
+      sheetName,
+      cellFormatter,
+      fileName,
+      disabled,
+      exporting,
+      onExport,
+      onError
+    ]
   )
 
   const formatLabel = (format: DataExportFormat) =>

@@ -195,5 +195,4 @@ describe('useFormController (React)', () => {
       expect(result.current.values.x).toBe(2)
     })
   })
-
 })

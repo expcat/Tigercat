@@ -26,8 +26,6 @@ describe('Skeleton', () => {
     })
   })
 
-
-
   describe('Dimensions', () => {
     it('should apply both custom width and height', () => {
       const { container } = renderWithProps(Skeleton, {
@@ -67,7 +65,6 @@ describe('Skeleton', () => {
       expect(lastRow.style.width).toBe('60%')
     })
   })
-
 
   describe('Custom Classes', () => {
     it('should apply custom className and preserve base classes', () => {

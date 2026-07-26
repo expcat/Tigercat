@@ -94,7 +94,6 @@ describe('Resizable', () => {
     })
   })
 
-
   describe('Min/Max constraints', () => {
     it('should apply minWidth and minHeight', () => {
       const { container } = renderResizable({ minWidth: 100, minHeight: 50 })
@@ -108,8 +107,6 @@ describe('Resizable', () => {
       expect(container.querySelector('[data-resizable]')).toBeTruthy()
     })
   })
-
-
 
   describe('Resize callbacks', () => {
     it('should call onResize during drag', () => {

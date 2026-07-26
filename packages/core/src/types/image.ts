@@ -53,14 +53,7 @@ export type CropHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
  * Image preview toolbar action types
  */
 export type ImagePreviewToolbarAction =
-  | 'zoomIn'
-  | 'zoomOut'
-  | 'rotateLeft'
-  | 'rotateRight'
-  | 'reset'
-  | 'prev'
-  | 'next'
-  | 'close'
+  'zoomIn' | 'zoomOut' | 'rotateLeft' | 'rotateRight' | 'reset' | 'prev' | 'next' | 'close'
 
 /**
  * Navigation state for preview with multiple images

@@ -174,13 +174,7 @@ export interface ThemeConfig {
 
 /** Name of a built-in preset theme */
 export type ThemePresetName =
-  | 'default'
-  | 'vibrant'
-  | 'professional'
-  | 'minimal'
-  | 'natural'
-  | 'modern'
-  | 'high-contrast'
+  'default' | 'vibrant' | 'professional' | 'minimal' | 'natural' | 'modern' | 'high-contrast'
 
 /**
  * A fully defined preset theme.

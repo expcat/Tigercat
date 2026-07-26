@@ -7,7 +7,11 @@ const placements = ['top', 'bottom', 'left', 'right'] as const
 
 <template>
   <div class="flex flex-wrap gap-4 py-8 pl-12">
-    <Tooltip v-for="placement in placements" :key="placement" :content="`placement=${placement}`" :placement="placement">
+    <Tooltip
+      v-for="placement in placements"
+      :key="placement"
+      :content="`placement=${placement}`"
+      :placement="placement">
       <Button variant="outline">{{ placement }}</Button>
     </Tooltip>
   </div>

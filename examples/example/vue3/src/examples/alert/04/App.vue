@@ -8,7 +8,11 @@ const show = ref(true)
 
 <template>
   <div class="space-y-3">
-    <Alert type="warning" banner title="banner 横幅：撑满宽度、无圆角，常用于页面顶部通知。" show-icon />
+    <Alert
+      type="warning"
+      banner
+      title="banner 横幅：撑满宽度、无圆角，常用于页面顶部通知。"
+      show-icon />
     <Alert
       v-if="show"
       type="info"

@@ -44,8 +44,7 @@ export interface ReactTableToolbarProps extends Omit<
 > {
   filters?: ReactTableToolbarFilter[]
   filtersExtra?:
-    | React.ReactNode
-    | ((context: ReactTableToolbarFiltersExtraContext) => React.ReactNode)
+    React.ReactNode | ((context: ReactTableToolbarFiltersExtraContext) => React.ReactNode)
   /**
    * Full toolbar replacement. When provided, the built-in toolbar region
    * (including its container and `role="toolbar"`) is not rendered.

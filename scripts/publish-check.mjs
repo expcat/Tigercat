@@ -203,10 +203,7 @@ async function smokeExamples(tarballs) {
   for (const example of exampleProjects) {
     console.log(`Building ${example.name}...`)
     example.prepare(example.dir, tarballs)
-    await installWithRetry(
-      ['install', '--no-audit', '--fund=false'],
-      example.dir
-    )
+    await installWithRetry(['install', '--no-audit', '--fund=false'], example.dir)
     runOrThrow('npm', example.buildArgs, { cwd: example.dir })
   }
 }
@@ -322,8 +319,14 @@ function rewriteViteExampleConfig(filePath) {
 
   const next = withAlias
     .replace(/chunkSizeWarningLimit:\s*\d+/, 'chunkSizeWarningLimit: 1024')
-    .replaceAll("'../shared/playground/vite-runtime-plugin'", "'./.publish-shared/playground/vite-runtime-plugin'")
-    .replaceAll("path.resolve(__dirname, '../shared/playground')", "path.resolve(__dirname, './.publish-shared/playground')")
+    .replaceAll(
+      "'../shared/playground/vite-runtime-plugin'",
+      "'./.publish-shared/playground/vite-runtime-plugin'"
+    )
+    .replaceAll(
+      "path.resolve(__dirname, '../shared/playground')",
+      "path.resolve(__dirname, './.publish-shared/playground')"
+    )
 
   if (withAlias === source) {
     throw new Error(`Could not rewrite Vite aliases in ${filePath}`)

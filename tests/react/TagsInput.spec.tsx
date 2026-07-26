@@ -52,9 +52,7 @@ describe('TagsInput', () => {
     it('rejects duplicates by default and keeps the pending text', async () => {
       const user = userEvent.setup()
       const onAdd = vi.fn()
-      const { getAllByText, getByRole } = render(
-        <TagsInput defaultValue={['dup']} onAdd={onAdd} />
-      )
+      const { getAllByText, getByRole } = render(<TagsInput defaultValue={['dup']} onAdd={onAdd} />)
       const input = getByRole('textbox') as HTMLInputElement
       await user.click(input)
       await user.keyboard('dup{Enter}')
@@ -126,9 +124,7 @@ describe('TagsInput', () => {
 
   describe('Accessibility', () => {
     it('marks the input invalid and links the error message', () => {
-      const { getByRole, getByText } = render(
-        <TagsInput status="error" errorMessage="Required" />
-      )
+      const { getByRole, getByText } = render(<TagsInput status="error" errorMessage="Required" />)
       const input = getByRole('textbox')
       expect(input).toHaveAttribute('aria-invalid', 'true')
       expect(getByText('Required')).toBeInTheDocument()

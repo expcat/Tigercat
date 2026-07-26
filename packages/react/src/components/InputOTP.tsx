@@ -108,10 +108,7 @@ export const InputOTP: React.FC<InputOTPProps> = ({
   const [rawValue, setRawValue] = useControlledState<string>(value, defaultValue ?? '', onChange)
   const currentValue = normalizeOtpValue(rawValue, length, charOptions)
 
-  const separatorIndices = useMemo(
-    () => getOtpSeparatorIndices(length, groups),
-    [length, groups]
-  )
+  const separatorIndices = useMemo(() => getOtpSeparatorIndices(length, groups), [length, groups])
   if (groups && groups.length > 0 && separatorIndices.length === 0) {
     devWarn('InputOTP.groups', '[Tigercat] InputOTP: `groups` must sum to `length`; ignoring.')
   }
@@ -151,7 +148,13 @@ export const InputOTP: React.FC<InputOTPProps> = ({
 
   const handleSlotChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     if (!isInteractive) return
-    const result = applyOtpCharInput(currentValue, index, event.currentTarget.value, length, charOptions)
+    const result = applyOtpCharInput(
+      currentValue,
+      index,
+      event.currentTarget.value,
+      length,
+      charOptions
+    )
     // Keep the DOM in sync even when the value is rejected or the parent
     // ignores the change (React only patches on state changes)
     event.currentTarget.value = displayChar(result.value, index)

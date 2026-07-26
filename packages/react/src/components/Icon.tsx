@@ -37,7 +37,9 @@ export const Icon: React.FC<IconProps> = ({
   // Named or custom definition: render the glyph when an `icon` definition or
   // `name` is provided and no custom children override it (children > icon > name).
   const hasChildren = React.Children.count(children) > 0
-  const definition = !hasChildren ? (icon ?? (name ? getIconDefinition(name) : undefined)) : undefined
+  const definition = !hasChildren
+    ? (icon ?? (name ? getIconDefinition(name) : undefined))
+    : undefined
 
   const builtInSvg = definition ? (
     <svg

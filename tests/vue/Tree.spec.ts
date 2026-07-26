@@ -725,7 +725,6 @@ describe('Tree', () => {
     })
   })
 
-
   // v0.6.0 — searchable
   describe('Searchable (v0.6.0)', () => {
     it('renders search input when searchable is true', () => {

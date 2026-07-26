@@ -569,9 +569,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 
   const dragType = dragSnap.drag?.type ?? null
   const dragStateId = (dragSnap.drag?.type === 'card' ? dragSnap.drag.id : null) as
-    | string
-    | number
-    | null
+    string | number | null
   const kbDragStateId = (dragSnap.kbDrag?.id ?? null) as string | number | null
 
   return (

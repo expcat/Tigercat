@@ -14,7 +14,9 @@ const data = yLabels.flatMap((y, yIndex) =>
 
 <template>
   <div>
-    <p class="mb-1 text-sm text-gray-500">renderMode="canvas"：{{ data.length }} 个单元格的大矩阵</p>
+    <p class="mb-1 text-sm text-gray-500">
+      renderMode="canvas"：{{ data.length }} 个单元格的大矩阵
+    </p>
     <HeatmapChart
       :data="data"
       :x-labels="xLabels"

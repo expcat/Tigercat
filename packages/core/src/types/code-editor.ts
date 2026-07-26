@@ -6,14 +6,7 @@
  * Supported programming languages for syntax highlighting
  */
 export type CodeLanguage =
-  | 'javascript'
-  | 'typescript'
-  | 'html'
-  | 'css'
-  | 'json'
-  | 'markdown'
-  | 'python'
-  | 'plain'
+  'javascript' | 'typescript' | 'html' | 'css' | 'json' | 'markdown' | 'python' | 'plain'
 
 /**
  * Code editor theme

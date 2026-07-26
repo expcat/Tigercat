@@ -197,10 +197,7 @@ export const MaskInput: React.FC<MaskInputProps> = ({
   })
 
   return (
-    <div
-      ref={wrapperRef}
-      className={classNames(getInputWrapperClasses(), className)}
-      style={style}>
+    <div ref={wrapperRef} className={classNames(getInputWrapperClasses(), className)} style={style}>
       <input
         {...rest}
         ref={inputRef}

@@ -211,7 +211,8 @@
         <p>Claude Code 一行接入（默认远程读取本站，无需克隆仓库）：</p>
         <pre class="code-block">claude mcp add tigercat -- npx -y @expcat/tigercat-mcp</pre>
         <p>或在任意 MCP 客户端的 <code>mcpServers</code> 配置中加入：</p>
-        <pre class="code-block">{
+        <pre class="code-block">
+{
   "mcpServers": {
     "tigercat": {
       "command": "npx",
@@ -220,7 +221,8 @@
   }
 }</pre>
         <p>本地 / 镜像模式（离线开发或 GitHub Pages 不可达时）：</p>
-        <pre class="code-block">tigercat-mcp --root /path/to/Tigercat        # 读取本地仓库 checkout
+        <pre class="code-block">
+tigercat-mcp --root /path/to/Tigercat        # 读取本地仓库 checkout
 tigercat-mcp --base-url https://mirror.example.com/mcp/   # 指向镜像站
 TIGERCAT_MCP_BASE_URL=…                      # 环境变量等价于 --base-url
 tigercat-mcp --doctor                        # 校验技能源可达性与完整性</pre>

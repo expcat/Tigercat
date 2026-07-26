@@ -6,14 +6,7 @@
  * Resize handle position
  */
 export type ResizeHandlePosition =
-  | 'top'
-  | 'right'
-  | 'bottom'
-  | 'left'
-  | 'top-left'
-  | 'top-right'
-  | 'bottom-left'
-  | 'bottom-right'
+  'top' | 'right' | 'bottom' | 'left' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 /**
  * Resize constraint axis

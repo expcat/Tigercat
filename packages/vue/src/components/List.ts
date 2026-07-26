@@ -542,10 +542,7 @@ export const List = defineComponent({
 
       // More than 3 pages: full page-number buttons plus quick jumper;
       // otherwise the simple prev/next indicator (config values override).
-      const { simple, showQuickJumper } = resolvePaginationDisplayMode(
-        totalPages,
-        paginationConfig
-      )
+      const { simple, showQuickJumper } = resolvePaginationDisplayMode(totalPages, paginationConfig)
 
       const totalText =
         paginationConfig.totalText ??

@@ -158,5 +158,4 @@ describe('useFormController (Vue)', () => {
       expect(form.values.x).toBe(2)
     })
   })
-
 })

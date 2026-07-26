@@ -12,7 +12,9 @@ export default function App() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="mb-1 text-sm text-gray-500">valueLabelPosition=&quot;top&quot; + 自定义标签格式</p>
+        <p className="mb-1 text-sm text-gray-500">
+          valueLabelPosition=&quot;top&quot; + 自定义标签格式
+        </p>
         <BarChart
           data={data}
           width={420}
@@ -23,7 +25,9 @@ export default function App() {
         />
       </div>
       <div>
-        <p className="mb-1 text-sm text-gray-500">valueLabelPosition=&quot;inside&quot; + 自定义提示</p>
+        <p className="mb-1 text-sm text-gray-500">
+          valueLabelPosition=&quot;inside&quot; + 自定义提示
+        </p>
         <BarChart
           data={data}
           width={420}

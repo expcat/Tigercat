@@ -13,6 +13,10 @@ const types = ['success', 'info', 'warning', 'error'] as const
       :title="`类型：${type}`"
       description="类型决定图标与配色。"
       show-icon />
-    <Alert type="info" title="无图标" description="showIcon=false 时不显示类型图标。" :show-icon="false" />
+    <Alert
+      type="info"
+      title="无图标"
+      description="showIcon=false 时不显示类型图标。"
+      :show-icon="false" />
   </div>
 </template>

@@ -3,12 +3,7 @@ import type { TigerLocale } from './locale'
 export type NumberKeyboardMode = 'number' | 'amount' | 'phone' | 'id-card'
 
 export type NumberKeyboardKeyType =
-  | 'digit'
-  | 'decimal'
-  | 'id-card-x'
-  | 'delete'
-  | 'confirm'
-  | 'empty'
+  'digit' | 'decimal' | 'id-card-x' | 'delete' | 'confirm' | 'empty'
 
 export type NumberKeyboardAction = 'input' | 'delete' | 'confirm'
 

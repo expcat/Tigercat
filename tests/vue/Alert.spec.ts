@@ -196,5 +196,4 @@ describe('Alert', () => {
     expect(alert).toHaveClass('w-full', 'rounded-none', 'border-x-0')
     expect(screen.getByText('Banner Alert')).toBeInTheDocument()
   })
-
 })

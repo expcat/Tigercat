@@ -71,7 +71,6 @@ describe('Splitter', () => {
     })
   })
 
-
   describe('Keyboard interaction', () => {
     it('should resize on ArrowRight key in horizontal mode', async () => {
       const onResize = vi.fn()

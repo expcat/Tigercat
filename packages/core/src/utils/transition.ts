@@ -21,13 +21,7 @@ import { isBrowser } from './env'
  * Standard transition type names
  */
 export type TransitionType =
-  | 'fade'
-  | 'slide-up'
-  | 'slide-down'
-  | 'slide-left'
-  | 'slide-right'
-  | 'scale'
-  | 'collapse'
+  'fade' | 'slide-up' | 'slide-down' | 'slide-left' | 'slide-right' | 'scale' | 'collapse'
 
 /**
  * CSS class names for each phase of a transition

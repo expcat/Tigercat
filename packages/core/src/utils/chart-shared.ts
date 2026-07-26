@@ -127,8 +127,12 @@ export function resolveChartTooltipPosition(input: ChartTooltipPositionInput): {
   const anchorY = Number.isFinite(input.y) ? input.y : 0
   const rectWidth = Number.isFinite(input.rect.width) ? Math.max(0, input.rect.width) : 0
   const rectHeight = Number.isFinite(input.rect.height) ? Math.max(0, input.rect.height) : 0
-  const viewportWidth = Number.isFinite(input.viewport.width) ? Math.max(0, input.viewport.width) : 0
-  const viewportHeight = Number.isFinite(input.viewport.height) ? Math.max(0, input.viewport.height) : 0
+  const viewportWidth = Number.isFinite(input.viewport.width)
+    ? Math.max(0, input.viewport.width)
+    : 0
+  const viewportHeight = Number.isFinite(input.viewport.height)
+    ? Math.max(0, input.viewport.height)
+    : 0
 
   let nextX = anchorX + offsetX
   let nextY = anchorY + offsetY

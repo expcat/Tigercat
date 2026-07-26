@@ -68,7 +68,8 @@ packages: core, vue, react, cli, mcp
 
 ## 代码风格
 
-- 遵循 `.prettierrc.json` / `.editorconfig`：单引号、无分号、2 空格、无尾逗号、`bracketSameLine: true`。
+- 遵循 `.prettierrc.json` / `.editorconfig`：单引号、无分号、2 空格、无尾逗号、`bracketSameLine: true`。`pnpm format:check` 已进 `quality:static`，提交前跑 `pnpm format`。
+- 生成器写出的文件也必须过 prettier，且要复用 `.prettierrc.json`（`resolveConfig`）而不是手写配置子集，否则产物会与 `format:check` 永久互相打架。
 - import 顺序：外部依赖 -> `@expcat/tigercat-core` -> 相对路径。
 - TypeScript 严格模式；源码禁用 `any`；导出函数写清晰返回类型。
 - React 原生属性冲突用 `Omit<...>`；Vue `attrs.class/style` 使用既有 helper 合并。

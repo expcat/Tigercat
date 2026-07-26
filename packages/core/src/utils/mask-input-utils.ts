@@ -6,9 +6,7 @@ export const DEFAULT_MASK_TOKENS: Record<string, MaskToken> = {
   '*': { pattern: /[a-zA-Z0-9]/ }
 }
 
-export type MaskSpecEntry =
-  | { kind: 'token'; token: MaskToken }
-  | { kind: 'fixed'; char: string }
+export type MaskSpecEntry = { kind: 'token'; token: MaskToken } | { kind: 'fixed'; char: string }
 
 /**
  * Parse a mask template into a positional spec. `!` escapes the next

@@ -941,7 +941,6 @@ describe('Table', () => {
     })
   })
 
-
   describe('Custom Rendering', () => {
     it('should render custom cell content', () => {
       const customColumns = [
@@ -1378,5 +1377,4 @@ describe('Table', () => {
       expect(onRowOrderChange).toHaveBeenCalledWith([dataSource[1], dataSource[2], dataSource[0]])
     })
   })
-
 })

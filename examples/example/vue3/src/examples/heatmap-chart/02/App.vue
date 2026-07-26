@@ -17,7 +17,9 @@ const percent = (value: number) => `${value}%`
 
 <template>
   <div>
-    <p class="mb-1 text-sm text-gray-500">valueFormatter + cellGap/cellRadius + colorSpace="oklch"</p>
+    <p class="mb-1 text-sm text-gray-500">
+      valueFormatter + cellGap/cellRadius + colorSpace="oklch"
+    </p>
     <HeatmapChart
       :data="data"
       :x-labels="days"

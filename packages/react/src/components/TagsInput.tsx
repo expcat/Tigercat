@@ -244,10 +244,7 @@ export const TagsInput: React.FC<TagsInputProps> = ({
       {...rest}
       ref={containerRef}
       id={id}
-      className={classNames(
-        getTagsInputContainerClasses(size, status, { disabled }),
-        className
-      )}
+      className={classNames(getTagsInputContainerClasses(size, status, { disabled }), className)}
       style={style}
       data-state={isFull ? 'full' : undefined}
       onClick={focusInput}>

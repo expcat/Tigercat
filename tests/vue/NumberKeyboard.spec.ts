@@ -71,5 +71,4 @@ describe('NumberKeyboard', () => {
       await expectNoA11yViolationsIsolated(container)
     })
   })
-
 })

@@ -17,7 +17,9 @@ export default function App() {
         <Input aria-label="非紧凑" placeholder="compact=false（带间距）" style={{ flex: 1 }} />
         <Button variant="outline">操作</Button>
       </InputGroup>
-      <p className="text-sm text-gray-500">size 统一控制子项高度；compact=false 时子项之间保留间距。</p>
+      <p className="text-sm text-gray-500">
+        size 统一控制子项高度；compact=false 时子项之间保留间距。
+      </p>
     </div>
   )
 }

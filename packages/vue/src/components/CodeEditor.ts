@@ -213,7 +213,11 @@ export const CodeEditor = defineComponent({
 
       const textareaNode = h('textarea', {
         ref: textareaRef,
-        class: classNames(codeEditorTextareaClasses, getCodeEditorCaretClasses(props.theme), wrapClass),
+        class: classNames(
+          codeEditorTextareaClasses,
+          getCodeEditorCaretClasses(props.theme),
+          wrapClass
+        ),
         value: code.value,
         onInput,
         onKeydown: onKeyDown,

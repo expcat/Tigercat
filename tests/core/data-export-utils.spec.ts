@@ -143,9 +143,7 @@ describe('exportDataToMarkdown', () => {
   })
 
   it('escapes pipes, backslashes and newlines', () => {
-    const markdown = exportDataToMarkdown(columns, [
-      { name: 'A|B', age: 1, city: 'line1\nline2' }
-    ])
+    const markdown = exportDataToMarkdown(columns, [{ name: 'A|B', age: 1, city: 'line1\nline2' }])
     expect(markdown).toContain('A\\|B')
     expect(markdown).toContain('line1<br>line2')
 
@@ -173,7 +171,11 @@ describe('downloadDataExport', () => {
     const removeSpy = vi.spyOn(document.body, 'removeChild').mockImplementation((n) => n)
     const revokeURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
 
-    downloadDataExport(format === 'xlsx' ? exportDataToXlsx(columns, data) : '| a |', 'report', format)
+    downloadDataExport(
+      format === 'xlsx' ? exportDataToXlsx(columns, data) : '| a |',
+      'report',
+      format
+    )
 
     expect(createElementSpy).toHaveBeenCalledWith('a')
     expect(link.download).toBe(expectedName)
