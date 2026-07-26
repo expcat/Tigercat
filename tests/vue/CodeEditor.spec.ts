@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { CodeEditor } from '@expcat/tigercat-vue'
+import { CodeEditor } from '@expcat/tigercat-vue/CodeEditor'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function renderCodeEditor(props: Record<string, unknown> = {}) {

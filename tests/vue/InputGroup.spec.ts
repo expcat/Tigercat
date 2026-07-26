@@ -5,7 +5,10 @@
 import { describe, it, expect } from 'vitest'
 import { h } from 'vue'
 import { render, screen } from '@testing-library/vue'
-import { InputGroup, InputGroupAddon, Input, Textarea, InputNumber } from '@expcat/tigercat-vue'
+import { Input } from '@expcat/tigercat-vue/Input'
+import { InputGroup, InputGroupAddon } from '@expcat/tigercat-vue/InputGroup'
+import { InputNumber } from '@expcat/tigercat-vue/InputNumber'
+import { Textarea } from '@expcat/tigercat-vue/Textarea'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('InputGroup', () => {

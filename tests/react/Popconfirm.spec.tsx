@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Popconfirm } from '@expcat/tigercat-react'
+import { Popconfirm } from '@expcat/tigercat-react/Popconfirm'
 import { renderWithChildren, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import React from 'react'
 

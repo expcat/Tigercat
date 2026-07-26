@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Segmented } from '@expcat/tigercat-vue'
+import { Segmented } from '@expcat/tigercat-vue/Segmented'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const defaultOptions = [

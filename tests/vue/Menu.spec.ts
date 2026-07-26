@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { h } from 'vue'
-import { Menu, MenuItem, SubMenu, MenuItemGroup } from '@expcat/tigercat-vue'
+import { Menu, MenuItem, MenuItemGroup, SubMenu } from '@expcat/tigercat-vue/Menu'
 import type { MenuItem as CoreMenuItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'
 

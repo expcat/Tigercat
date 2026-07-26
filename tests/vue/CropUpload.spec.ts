@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { CropUpload } from '@expcat/tigercat-vue'
+import { CropUpload } from '@expcat/tigercat-vue/CropUpload'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function createFile(name: string, size: number, type = 'image/png'): File {

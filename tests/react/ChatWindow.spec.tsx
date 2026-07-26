@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { ChatWindow } from '@expcat/tigercat-react'
+import { ChatWindow } from '@expcat/tigercat-react/ChatWindow'
 import type { ChatMessage } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

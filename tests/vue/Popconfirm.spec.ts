@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Popconfirm } from '@expcat/tigercat-vue'
+import { Popconfirm } from '@expcat/tigercat-vue/Popconfirm'
 import { renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 import { h } from 'vue'
 

@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
-import { Result } from '@expcat/tigercat-vue'
+import { Result } from '@expcat/tigercat-vue/Result'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Result (Vue)', () => {

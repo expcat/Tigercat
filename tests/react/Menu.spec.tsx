@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Menu, MenuItem, SubMenu, MenuItemGroup } from '@expcat/tigercat-react'
+import { Menu, MenuItem, MenuItemGroup, SubMenu } from '@expcat/tigercat-react/Menu'
 import type { MenuItem as CoreMenuItem } from '@expcat/tigercat-core'
 import React from 'react'
 import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'

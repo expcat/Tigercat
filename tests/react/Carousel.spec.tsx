@@ -5,7 +5,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import React, { createRef } from 'react'
-import { Carousel, ConfigProvider, type CarouselRef } from '@expcat/tigercat-react'
+import { Carousel, type CarouselRef } from '@expcat/tigercat-react/Carousel'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

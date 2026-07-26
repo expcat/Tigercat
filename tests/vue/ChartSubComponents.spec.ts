@@ -7,14 +7,12 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { nextTick } from 'vue'
 import { waitFor } from '@testing-library/vue'
-import {
-  ChartAxis,
-  ChartCanvas,
-  ChartGrid,
-  ChartLegend,
-  ChartSeries,
-  ChartTooltip
-} from '@expcat/tigercat-vue'
+import { ChartAxis } from '@expcat/tigercat-vue/ChartAxis'
+import { ChartCanvas } from '@expcat/tigercat-vue/ChartCanvas'
+import { ChartGrid } from '@expcat/tigercat-vue/ChartGrid'
+import { ChartLegend } from '@expcat/tigercat-vue/ChartLegend'
+import { ChartSeries } from '@expcat/tigercat-vue/ChartSeries'
+import { ChartTooltip } from '@expcat/tigercat-vue/ChartTooltip'
 import { createLinearScale } from '@expcat/tigercat-core'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 import { MockResizeObserver } from '../utils/mock-observers'

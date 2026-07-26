@@ -2,7 +2,11 @@ import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'
-import { Layout, Header, Footer, Sidebar, Content } from '@expcat/tigercat-react'
+import { Content } from '@expcat/tigercat-react/Content'
+import { Footer } from '@expcat/tigercat-react/Footer'
+import { Header } from '@expcat/tigercat-react/Header'
+import { Layout } from '@expcat/tigercat-react/Layout'
+import { Sidebar } from '@expcat/tigercat-react/Sidebar'
 
 describe('Layout Sections', () => {
   it('renders Layout with className and forwarded attrs', () => {

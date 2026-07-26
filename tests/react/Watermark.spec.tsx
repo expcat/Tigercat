@@ -5,7 +5,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
-import { Watermark } from '@expcat/tigercat-react'
+import { Watermark } from '@expcat/tigercat-react/Watermark'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Watermark', () => {

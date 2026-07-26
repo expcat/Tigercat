@@ -4,7 +4,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
-import { Signature } from '@expcat/tigercat-vue'
+import { Signature } from '@expcat/tigercat-vue/Signature'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const createContextMock = () =>

@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { ColorPicker } from '@expcat/tigercat-vue'
+import { ColorPicker } from '@expcat/tigercat-vue/ColorPicker'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('ColorPicker', () => {

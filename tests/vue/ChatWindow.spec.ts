@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent, screen } from '@testing-library/vue'
-import { ChatWindow } from '@expcat/tigercat-vue'
+import { ChatWindow } from '@expcat/tigercat-vue/ChatWindow'
 import type { ChatMessage } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

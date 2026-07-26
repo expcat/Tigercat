@@ -5,7 +5,8 @@
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { ConfigProvider, MarkdownEditor } from '@expcat/tigercat-vue'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { MarkdownEditor } from '@expcat/tigercat-vue/MarkdownEditor'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

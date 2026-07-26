@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/vue'
-import { Divider } from '@expcat/tigercat-vue'
+import { Divider } from '@expcat/tigercat-vue/Divider'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Divider (Vue)', () => {

@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
-import { ConfigProvider, Timeline } from '@expcat/tigercat-react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { Timeline } from '@expcat/tigercat-react/Timeline'
 import type { TimelineItem } from '../../packages/core/src/types/timeline'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

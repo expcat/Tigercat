@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { Mentions } from '@expcat/tigercat-vue'
+import { Mentions } from '@expcat/tigercat-vue/Mentions'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const defaultOptions = [

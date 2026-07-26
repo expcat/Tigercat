@@ -6,7 +6,9 @@ import { describe, it, expect, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Modal, Popover, Select } from '@expcat/tigercat-react'
+import { Modal } from '@expcat/tigercat-react/Modal'
+import { Popover } from '@expcat/tigercat-react/Popover'
+import { Select } from '@expcat/tigercat-react/Select'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Modal', () => {

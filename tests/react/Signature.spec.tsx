@@ -5,7 +5,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import React, { createRef } from 'react'
-import { Signature, type SignatureRef } from '@expcat/tigercat-react'
+import { Signature, type SignatureRef } from '@expcat/tigercat-react/Signature'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const createContextMock = () =>

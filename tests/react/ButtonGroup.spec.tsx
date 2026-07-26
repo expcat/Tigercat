@@ -5,7 +5,8 @@
 import { describe, it, expect } from 'vitest'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { ButtonGroup, Button } from '@expcat/tigercat-react'
+import { Button } from '@expcat/tigercat-react/Button'
+import { ButtonGroup } from '@expcat/tigercat-react/ButtonGroup'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ButtonGroup', () => {

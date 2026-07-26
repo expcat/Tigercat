@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { FileManager } from '@expcat/tigercat-vue'
+import { FileManager } from '@expcat/tigercat-vue/FileManager'
 import type { FileItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

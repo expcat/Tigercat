@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Text } from '@expcat/tigercat-vue'
+import { Text } from '@expcat/tigercat-vue/Text'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Text (Vue)', () => {

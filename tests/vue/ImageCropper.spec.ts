@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
-import { ImageCropper } from '@expcat/tigercat-vue'
+import { ImageCropper } from '@expcat/tigercat-vue/ImageCropper'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 // Mock Image constructor for happy-dom

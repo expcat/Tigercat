@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { Transfer } from '@expcat/tigercat-vue'
+import { Transfer } from '@expcat/tigercat-vue/Transfer'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const dataSource = [

@@ -5,14 +5,11 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, reactive, ref, h, nextTick } from 'vue'
-import {
-  Form,
-  FormItem,
-  Input,
-  ConfigProvider,
-  type FormRule,
-  type FormRules
-} from '@expcat/tigercat-vue'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
+import { Input } from '@expcat/tigercat-vue/Input'
+import type { FormRule, FormRules } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Form', () => {

@@ -4,7 +4,7 @@
 
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ImageAnnotation } from '@expcat/tigercat-vue'
+import { ImageAnnotation } from '@expcat/tigercat-vue/ImageAnnotation'
 import type { ImageAnnotation as CoreImageAnnotation } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

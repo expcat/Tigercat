@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { NotificationCenter } from '@expcat/tigercat-vue'
+import { NotificationCenter } from '@expcat/tigercat-vue/NotificationCenter'
 import type { NotificationItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

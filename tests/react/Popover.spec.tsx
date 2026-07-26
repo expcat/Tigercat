@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Popover, Select } from '@expcat/tigercat-react'
+import { Popover } from '@expcat/tigercat-react/Popover'
+import { Select } from '@expcat/tigercat-react/Select'
 import {
   renderWithProps,
   renderWithChildren,

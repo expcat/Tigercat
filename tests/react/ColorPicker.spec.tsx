@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { ColorPicker } from '@expcat/tigercat-react'
+import { ColorPicker } from '@expcat/tigercat-react/ColorPicker'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ColorPicker', () => {

@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/vue'
-import { Progress } from '@expcat/tigercat-vue'
+import { Progress } from '@expcat/tigercat-vue/Progress'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Progress', () => {

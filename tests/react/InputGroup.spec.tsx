@@ -5,7 +5,10 @@
 import { describe, it, expect } from 'vitest'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { InputGroup, InputGroupAddon, Input, Textarea, InputNumber } from '@expcat/tigercat-react'
+import { Input } from '@expcat/tigercat-react/Input'
+import { InputGroup, InputGroupAddon } from '@expcat/tigercat-react/InputGroup'
+import { InputNumber } from '@expcat/tigercat-react/InputNumber'
+import { Textarea } from '@expcat/tigercat-react/Textarea'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('InputGroup', () => {

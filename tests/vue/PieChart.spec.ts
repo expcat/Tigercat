@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { PieChart } from '@expcat/tigercat-vue'
+import { PieChart } from '@expcat/tigercat-vue/PieChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const defaultSize = { width: 240, height: 160 }

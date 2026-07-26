@@ -7,18 +7,14 @@ import { render as renderReact, screen as reactScreen } from '@testing-library/r
 import { render as renderVue, screen as vueScreen } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import type { NotificationItem, CommentNode, TableColumn } from '@expcat/tigercat-core'
-import {
-  NotificationCenter as ReactNotificationCenter,
-  ActivityFeed as ReactActivityFeed,
-  CommentThread as ReactCommentThread,
-  DataTableWithToolbar as ReactDataTableWithToolbar
-} from '@expcat/tigercat-react'
-import {
-  NotificationCenter as VueNotificationCenter,
-  ActivityFeed as VueActivityFeed,
-  CommentThread as VueCommentThread,
-  DataTableWithToolbar as VueDataTableWithToolbar
-} from '@expcat/tigercat-vue'
+import { ActivityFeed as ReactActivityFeed } from '@expcat/tigercat-react/ActivityFeed'
+import { CommentThread as ReactCommentThread } from '@expcat/tigercat-react/CommentThread'
+import { DataTableWithToolbar as ReactDataTableWithToolbar } from '@expcat/tigercat-react/DataTableWithToolbar'
+import { NotificationCenter as ReactNotificationCenter } from '@expcat/tigercat-react/NotificationCenter'
+import { ActivityFeed as VueActivityFeed } from '@expcat/tigercat-vue/ActivityFeed'
+import { CommentThread as VueCommentThread } from '@expcat/tigercat-vue/CommentThread'
+import { DataTableWithToolbar as VueDataTableWithToolbar } from '@expcat/tigercat-vue/DataTableWithToolbar'
+import { NotificationCenter as VueNotificationCenter } from '@expcat/tigercat-vue/NotificationCenter'
 
 const notificationItems: NotificationItem[] = [
   { id: 1, title: '系统通知', type: '系统', read: false }

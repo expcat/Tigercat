@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { AutoComplete } from '@expcat/tigercat-vue'
+import { AutoComplete } from '@expcat/tigercat-vue/AutoComplete'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const options = [

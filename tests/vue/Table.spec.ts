@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { nextTick, h } from 'vue'
-import { Table } from '@expcat/tigercat-vue'
+import { Table } from '@expcat/tigercat-vue/Table'
 import type { TableColumn } from '@expcat/tigercat-core'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 

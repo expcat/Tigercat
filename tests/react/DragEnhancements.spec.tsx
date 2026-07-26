@@ -5,7 +5,9 @@
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { List, Tree, Modal } from '@expcat/tigercat-react'
+import { List } from '@expcat/tigercat-react/List'
+import { Modal } from '@expcat/tigercat-react/Modal'
+import { Tree } from '@expcat/tigercat-react/Tree'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const sampleListData = [

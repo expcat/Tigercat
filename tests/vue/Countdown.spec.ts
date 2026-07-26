@@ -5,7 +5,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { render, screen } from '@testing-library/vue'
-import { Countdown } from '@expcat/tigercat-vue'
+import { Countdown } from '@expcat/tigercat-vue/Countdown'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const baseTime = 1704067200000

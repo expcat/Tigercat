@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Segmented } from '@expcat/tigercat-react'
+import { Segmented } from '@expcat/tigercat-react/Segmented'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const defaultOptions = [

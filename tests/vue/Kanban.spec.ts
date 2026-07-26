@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { Kanban } from '@expcat/tigercat-vue'
+import { Kanban } from '@expcat/tigercat-vue/Kanban'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

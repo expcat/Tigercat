@@ -5,7 +5,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { Collapse, CollapsePanel } from '@expcat/tigercat-vue'
+import { Collapse } from '@expcat/tigercat-vue/Collapse'
+import { CollapsePanel } from '@expcat/tigercat-vue/CollapsePanel'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function createFrameScheduler() {

@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Tree } from '@expcat/tigercat-react'
+import { Tree } from '@expcat/tigercat-react/Tree'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 import React from 'react'
 

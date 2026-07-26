@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { BackTop } from '@expcat/tigercat-vue'
+import { BackTop } from '@expcat/tigercat-vue/BackTop'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('BackTop', () => {

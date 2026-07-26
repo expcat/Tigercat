@@ -4,7 +4,8 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
-import { TimePicker, ConfigProvider } from '@expcat/tigercat-vue'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { TimePicker } from '@expcat/tigercat-vue/TimePicker'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { defineComponent, h } from 'vue'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'

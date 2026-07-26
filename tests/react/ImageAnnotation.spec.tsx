@@ -5,7 +5,7 @@
 import React from 'react'
 import { render, fireEvent, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ImageAnnotation } from '@expcat/tigercat-react'
+import { ImageAnnotation } from '@expcat/tigercat-react/ImageAnnotation'
 import type { ImageAnnotation as CoreImageAnnotation } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

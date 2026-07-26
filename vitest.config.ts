@@ -2,12 +2,36 @@ import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
+import {
+  buildFrameworkPackageSubpathFacts,
+  loadPublicComponentExports
+} from './scripts/lib/public-components.mjs'
+
+const publicComponents = loadPublicComponentExports(__dirname)
+
+// Per-component subpath aliases so a spec can import `@expcat/tigercat-vue/Button`
+// instead of the root barrel, which re-evaluates all 152 components in every
+// file. Generated from the same facts `pnpm exports:check` syncs into each
+// package's `exports` map, so a spec can only reach a genuinely published
+// subpath. Vite matches string aliases by prefix and takes the first hit, so
+// these must be spread ahead of the root-package aliases below.
+function buildSubpathAliases(framework: 'vue' | 'react') {
+  return Object.fromEntries(
+    buildFrameworkPackageSubpathFacts(publicComponents[framework]).map(({ subpath, target }) => [
+      `@expcat/tigercat-${framework}/${subpath.replace(/^\.\//, '')}`,
+      resolve(__dirname, `./packages/${framework}/src/components/${target}`)
+    ])
+  )
+}
+
 const testAliases = {
   '@expcat/tigercat-core/locales': resolve(__dirname, './packages/core/src/utils/i18n/locales'),
   '@expcat/tigercat-core/datepicker-locales': resolve(
     __dirname,
     './packages/core/src/utils/i18n/datepicker-locales'
   ),
+  ...buildSubpathAliases('vue'),
+  ...buildSubpathAliases('react'),
   '@expcat/tigercat-core': resolve(__dirname, './packages/core/src'),
   '@expcat/tigercat-vue': resolve(__dirname, './packages/vue/src'),
   '@expcat/tigercat-react': resolve(__dirname, './packages/react/src'),

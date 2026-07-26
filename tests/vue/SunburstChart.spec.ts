@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { SunburstChart } from '@expcat/tigercat-vue'
+import { SunburstChart } from '@expcat/tigercat-vue/SunburstChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 import { render } from '@testing-library/vue'
 

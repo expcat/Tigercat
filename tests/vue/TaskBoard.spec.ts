@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { h } from 'vue'
-import { TaskBoard } from '@expcat/tigercat-vue'
+import { TaskBoard } from '@expcat/tigercat-vue/TaskBoard'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

@@ -6,7 +6,11 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
 import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'
-import { Layout, Header, Footer, Sidebar, Content } from '@expcat/tigercat-vue'
+import { Content } from '@expcat/tigercat-vue/Content'
+import { Footer } from '@expcat/tigercat-vue/Footer'
+import { Header } from '@expcat/tigercat-vue/Header'
+import { Layout } from '@expcat/tigercat-vue/Layout'
+import { Sidebar } from '@expcat/tigercat-vue/Sidebar'
 
 describe('Layout Sections', () => {
   it('Layout merges props.className with attrs.class and forwards attrs', () => {

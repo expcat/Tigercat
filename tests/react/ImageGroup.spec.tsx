@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/react'
 import React from 'react'
-import { ImageGroup, Image } from '@expcat/tigercat-react'
+import { Image } from '@expcat/tigercat-react/Image'
+import { ImageGroup } from '@expcat/tigercat-react/ImageGroup'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ImageGroup', () => {

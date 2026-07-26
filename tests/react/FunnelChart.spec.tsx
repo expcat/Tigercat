@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
-import { FunnelChart } from '@expcat/tigercat-react'
+import { FunnelChart } from '@expcat/tigercat-react/FunnelChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import { fireEvent, render } from '@testing-library/react'
 

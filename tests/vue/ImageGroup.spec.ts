@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
-import { ImageGroup, Image } from '@expcat/tigercat-vue'
+import { Image } from '@expcat/tigercat-vue/Image'
+import { ImageGroup } from '@expcat/tigercat-vue/ImageGroup'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('ImageGroup', () => {

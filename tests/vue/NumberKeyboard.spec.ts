@@ -4,7 +4,7 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
-import { NumberKeyboard } from '@expcat/tigercat-vue'
+import { NumberKeyboard } from '@expcat/tigercat-vue/NumberKeyboard'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('NumberKeyboard', () => {

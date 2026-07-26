@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
-import { ActivityFeed } from '@expcat/tigercat-react'
+import { ActivityFeed } from '@expcat/tigercat-react/ActivityFeed'
 import type { ActivityGroup } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

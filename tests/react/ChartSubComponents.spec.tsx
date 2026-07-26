@@ -7,15 +7,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import React from 'react'
 import { act, waitFor, cleanup, fireEvent } from '@testing-library/react'
-import {
-  ChartAxis,
-  ChartCanvas,
-  ChartGrid,
-  ChartLegend,
-  ChartSeries,
-  ChartTooltip
-} from '@expcat/tigercat-react'
-import type { ChartAxisProps } from '@expcat/tigercat-react'
+import { ChartAxis } from '@expcat/tigercat-react/ChartAxis'
+import { ChartCanvas } from '@expcat/tigercat-react/ChartCanvas'
+import { ChartGrid } from '@expcat/tigercat-react/ChartGrid'
+import { ChartLegend } from '@expcat/tigercat-react/ChartLegend'
+import { ChartSeries } from '@expcat/tigercat-react/ChartSeries'
+import { ChartTooltip } from '@expcat/tigercat-react/ChartTooltip'
+import type { ChartAxisProps } from '@expcat/tigercat-react/ChartAxis'
 import { createLinearScale } from '@expcat/tigercat-core'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import { MockResizeObserver } from '../utils/mock-observers'

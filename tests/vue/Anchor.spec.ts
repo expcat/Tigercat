@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
-import { Anchor, AnchorLink } from '@expcat/tigercat-vue'
+import { Anchor, AnchorLink } from '@expcat/tigercat-vue/Anchor'
 import { expectNoA11yViolationsIsolated } from '../utils'
 import { MockIntersectionObserver } from '../utils/mock-observers'
 

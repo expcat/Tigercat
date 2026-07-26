@@ -4,7 +4,7 @@
 
 import { fireEvent, render } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
-import { Gantt } from '@expcat/tigercat-vue'
+import { Gantt } from '@expcat/tigercat-vue/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

@@ -4,7 +4,9 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { List, Tree, Modal } from '@expcat/tigercat-vue'
+import { List } from '@expcat/tigercat-vue/List'
+import { Modal } from '@expcat/tigercat-vue/Modal'
+import { Tree } from '@expcat/tigercat-vue/Tree'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const sampleListData = [

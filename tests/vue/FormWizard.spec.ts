@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { FormWizard } from '@expcat/tigercat-vue'
+import { FormWizard } from '@expcat/tigercat-vue/FormWizard'
 import type { WizardStep } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

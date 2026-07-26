@@ -5,7 +5,9 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Avatar, AvatarGroup, ConfigProvider } from '@expcat/tigercat-react'
+import { Avatar } from '@expcat/tigercat-react/Avatar'
+import { AvatarGroup } from '@expcat/tigercat-react/AvatarGroup'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Avatar', () => {

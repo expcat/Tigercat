@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { TreeMapChart } from '@expcat/tigercat-vue'
+import { TreeMapChart } from '@expcat/tigercat-vue/TreeMapChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 import { render } from '@testing-library/vue'
 

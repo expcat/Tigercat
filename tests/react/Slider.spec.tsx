@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Slider } from '@expcat/tigercat-react'
+import { Slider } from '@expcat/tigercat-react/Slider'
 import {
   expectNoA11yViolationsIsolated,
   componentSizes,

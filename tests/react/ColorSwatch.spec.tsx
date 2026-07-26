@@ -5,7 +5,7 @@
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen } from '@testing-library/react'
-import { ColorSwatch } from '@expcat/tigercat-react'
+import { ColorSwatch } from '@expcat/tigercat-react/ColorSwatch'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ColorSwatch', () => {

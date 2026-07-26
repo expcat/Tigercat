@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { Tour } from '@expcat/tigercat-vue'
+import { Tour } from '@expcat/tigercat-vue/Tour'
 import type { TourStep } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

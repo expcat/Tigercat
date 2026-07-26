@@ -4,7 +4,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, waitFor } from '@testing-library/react'
-import { ConfigProvider, Message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const messageTypes = ['success', 'warning', 'error', 'info', 'loading'] as const

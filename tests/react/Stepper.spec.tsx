@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import React from 'react'
-import { Stepper } from '@expcat/tigercat-react'
+import { Stepper } from '@expcat/tigercat-react/Stepper'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Stepper', () => {

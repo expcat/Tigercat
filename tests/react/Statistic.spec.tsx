@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import React from 'react'
-import { Statistic } from '@expcat/tigercat-react'
+import { Statistic } from '@expcat/tigercat-react/Statistic'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function createFrameScheduler() {

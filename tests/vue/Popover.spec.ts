@@ -6,7 +6,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
-import { Popover, Select } from '@expcat/tigercat-vue'
+import { Popover } from '@expcat/tigercat-vue/Popover'
+import { Select } from '@expcat/tigercat-vue/Select'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Popover', () => {

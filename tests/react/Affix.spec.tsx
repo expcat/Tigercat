@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor, act } from '@testing-library/react'
 import React from 'react'
-import { Affix } from '@expcat/tigercat-react'
+import { Affix } from '@expcat/tigercat-react/Affix'
 import { MockIntersectionObserver, MockResizeObserver } from '../utils/mock-observers'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

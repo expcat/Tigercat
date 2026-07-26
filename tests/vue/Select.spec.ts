@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
-import { Select } from '@expcat/tigercat-vue'
+import { Select } from '@expcat/tigercat-vue/Select'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,

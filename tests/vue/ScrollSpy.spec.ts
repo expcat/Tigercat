@@ -4,7 +4,8 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
-import { ScrollSpy, type ScrollSpyItem } from '@expcat/tigercat-vue'
+import { ScrollSpy } from '@expcat/tigercat-vue/ScrollSpy'
+import type { ScrollSpyItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const items: ScrollSpyItem[] = [

@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { Splitter } from '@expcat/tigercat-vue'
+import { Splitter } from '@expcat/tigercat-vue/Splitter'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function renderSplitter(props: Record<string, unknown> = {}) {

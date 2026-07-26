@@ -5,7 +5,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
-import { NumberKeyboard } from '@expcat/tigercat-react'
+import { NumberKeyboard } from '@expcat/tigercat-react/NumberKeyboard'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('NumberKeyboard', () => {

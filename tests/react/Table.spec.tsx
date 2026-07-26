@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { act, render, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Table, type TableColumn } from '@expcat/tigercat-react'
+import { Table } from '@expcat/tigercat-react/Table'
+import type { TableColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 import { MockResizeObserver } from '../utils/mock-observers'
 

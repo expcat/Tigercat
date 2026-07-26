@@ -5,7 +5,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Collapse, CollapsePanel } from '@expcat/tigercat-react'
+import { Collapse } from '@expcat/tigercat-react/Collapse'
+import { CollapsePanel } from '@expcat/tigercat-react/CollapsePanel'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function createFrameScheduler() {

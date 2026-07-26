@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
-import { ConfigProvider, Timeline } from '@expcat/tigercat-vue'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { Timeline } from '@expcat/tigercat-vue/Timeline'
 import type { TimelineItem } from '../../packages/core/src/types/timeline'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

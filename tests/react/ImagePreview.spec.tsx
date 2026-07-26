@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { ImagePreview } from '@expcat/tigercat-react'
+import { ImagePreview } from '@expcat/tigercat-react/ImagePreview'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ImagePreview', () => {

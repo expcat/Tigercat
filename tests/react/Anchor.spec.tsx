@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
-import { Anchor, AnchorLink } from '@expcat/tigercat-react'
+import { Anchor, AnchorLink } from '@expcat/tigercat-react/Anchor'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Anchor', () => {

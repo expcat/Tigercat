@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { Dropdown, DropdownMenu, DropdownItem } from '@expcat/tigercat-vue'
+import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-vue/Dropdown'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Dropdown', () => {

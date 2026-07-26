@@ -3,18 +3,14 @@ import React, { createElement } from 'react'
 import { renderToString as renderReactToString } from 'react-dom/server'
 import { createSSRApp, h } from 'vue'
 import { renderToString as renderVueToString } from '@vue/server-renderer'
-import {
-  BarChart as ReactBarChart,
-  BackTop as ReactBackTop,
-  ConfigProvider as ReactConfigProvider,
-  DatePicker as ReactDatePicker
-} from '@expcat/tigercat-react'
-import {
-  BarChart as VueBarChart,
-  BackTop as VueBackTop,
-  ConfigProvider as VueConfigProvider,
-  DatePicker as VueDatePicker
-} from '@expcat/tigercat-vue'
+import { BackTop as ReactBackTop } from '@expcat/tigercat-react/BackTop'
+import { BarChart as ReactBarChart } from '@expcat/tigercat-react/BarChart'
+import { ConfigProvider as ReactConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { DatePicker as ReactDatePicker } from '@expcat/tigercat-react/DatePicker'
+import { BackTop as VueBackTop } from '@expcat/tigercat-vue/BackTop'
+import { BarChart as VueBarChart } from '@expcat/tigercat-vue/BarChart'
+import { ConfigProvider as VueConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { DatePicker as VueDatePicker } from '@expcat/tigercat-vue/DatePicker'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
 const selectedDate = new Date(2024, 0, 15)

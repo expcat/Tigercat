@@ -1,7 +1,7 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { Gantt } from '@expcat/tigercat-react'
+import { Gantt } from '@expcat/tigercat-react/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

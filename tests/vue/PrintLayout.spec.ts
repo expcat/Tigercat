@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { h } from 'vue'
 import { render, screen } from '@testing-library/vue'
-import { PrintLayout, PrintPageBreak } from '@expcat/tigercat-vue'
+import { PrintLayout, PrintPageBreak } from '@expcat/tigercat-vue/PrintLayout'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('PrintLayout', () => {

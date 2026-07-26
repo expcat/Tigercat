@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { PieChart } from '@expcat/tigercat-react'
+import { PieChart } from '@expcat/tigercat-react/PieChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import { fireEvent } from '@testing-library/react'
 

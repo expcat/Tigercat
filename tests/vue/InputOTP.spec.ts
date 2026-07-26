@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { InputOTP } from '@expcat/tigercat-vue'
+import { InputOTP } from '@expcat/tigercat-vue/InputOTP'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function getSlots(container: HTMLElement): HTMLInputElement[] {

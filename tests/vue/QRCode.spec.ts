@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { ConfigProvider, QRCode } from '@expcat/tigercat-vue'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { QRCode } from '@expcat/tigercat-vue/QRCode'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('QRCode', () => {

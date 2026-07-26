@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { TreeSelect } from '@expcat/tigercat-vue'
+import { TreeSelect } from '@expcat/tigercat-vue/TreeSelect'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const treeData = [

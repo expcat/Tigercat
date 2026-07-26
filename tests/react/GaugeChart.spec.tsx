@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import React from 'react'
-import { GaugeChart } from '@expcat/tigercat-react'
+import { GaugeChart } from '@expcat/tigercat-react/GaugeChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import { render } from '@testing-library/react'
 

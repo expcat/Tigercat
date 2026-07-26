@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h, nextTick } from 'vue'
-import { Tree } from '@expcat/tigercat-vue'
+import { Tree } from '@expcat/tigercat-vue/Tree'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const sampleTreeData = [

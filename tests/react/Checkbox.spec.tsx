@@ -6,7 +6,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Checkbox, CheckboxGroup } from '@expcat/tigercat-react'
+import { Checkbox } from '@expcat/tigercat-react/Checkbox'
+import { CheckboxGroup } from '@expcat/tigercat-react/CheckboxGroup'
 import {
   expectNoA11yViolationsIsolated,
   componentSizes,

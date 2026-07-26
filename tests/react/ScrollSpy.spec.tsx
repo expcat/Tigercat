@@ -5,7 +5,8 @@
 import React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen } from '@testing-library/react'
-import { ScrollSpy, type ScrollSpyItem } from '@expcat/tigercat-react'
+import { ScrollSpy } from '@expcat/tigercat-react/ScrollSpy'
+import type { ScrollSpyItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const items: ScrollSpyItem[] = [

@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { DataExport } from '@expcat/tigercat-vue'
+import { DataExport } from '@expcat/tigercat-vue/DataExport'
 import type { TableColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

@@ -15,22 +15,18 @@ import {
 import { fireEvent as reactFireEvent } from '@testing-library/react'
 import { describe, expect, it, afterEach } from 'vitest'
 import { h } from 'vue'
-import {
-  Drawer as ReactDrawer,
-  Select as ReactSelect,
-  Switch as ReactSwitch,
-  Table as ReactTable,
-  Tooltip as ReactTooltip,
-  Input as ReactInput
-} from '@expcat/tigercat-react'
-import {
-  Drawer as VueDrawer,
-  Select as VueSelect,
-  Switch as VueSwitch,
-  Table as VueTable,
-  Tooltip as VueTooltip,
-  Input as VueInput
-} from '@expcat/tigercat-vue'
+import { Drawer as ReactDrawer } from '@expcat/tigercat-react/Drawer'
+import { Input as ReactInput } from '@expcat/tigercat-react/Input'
+import { Select as ReactSelect } from '@expcat/tigercat-react/Select'
+import { Switch as ReactSwitch } from '@expcat/tigercat-react/Switch'
+import { Table as ReactTable } from '@expcat/tigercat-react/Table'
+import { Tooltip as ReactTooltip } from '@expcat/tigercat-react/Tooltip'
+import { Drawer as VueDrawer } from '@expcat/tigercat-vue/Drawer'
+import { Input as VueInput } from '@expcat/tigercat-vue/Input'
+import { Select as VueSelect } from '@expcat/tigercat-vue/Select'
+import { Switch as VueSwitch } from '@expcat/tigercat-vue/Switch'
+import { Table as VueTable } from '@expcat/tigercat-vue/Table'
+import { Tooltip as VueTooltip } from '@expcat/tigercat-vue/Tooltip'
 import { expectNoA11yViolations, axe } from '../utils/a11y-helpers'
 
 // ── Drawer ───────────────────────────────────────────────────────

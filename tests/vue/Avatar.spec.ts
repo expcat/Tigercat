@@ -5,7 +5,9 @@
 import { describe, it, expect } from 'vitest'
 import { defineComponent, h } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Avatar, AvatarGroup, ConfigProvider } from '@expcat/tigercat-vue'
+import { Avatar } from '@expcat/tigercat-vue/Avatar'
+import { AvatarGroup } from '@expcat/tigercat-vue/AvatarGroup'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Avatar', () => {

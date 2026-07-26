@@ -4,7 +4,7 @@
 
 import { fireEvent, render } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
-import { OrgChart } from '@expcat/tigercat-vue'
+import { OrgChart } from '@expcat/tigercat-vue/OrgChart'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

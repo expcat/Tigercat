@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { MaskInput } from '@expcat/tigercat-react'
+import { MaskInput } from '@expcat/tigercat-react/MaskInput'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('MaskInput', () => {

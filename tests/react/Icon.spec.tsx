@@ -5,7 +5,7 @@
 import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
-import { Icon } from '@expcat/tigercat-react'
+import { Icon } from '@expcat/tigercat-react/Icon'
 import type { IconDefinition } from '@expcat/tigercat-core'
 import { renderWithProps, renderWithChildren } from '../utils/render-helpers-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'

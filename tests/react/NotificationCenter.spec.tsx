@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { NotificationCenter } from '@expcat/tigercat-react'
+import { NotificationCenter } from '@expcat/tigercat-react/NotificationCenter'
 import type { NotificationItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

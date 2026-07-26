@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Splitter } from '@expcat/tigercat-react'
+import { Splitter } from '@expcat/tigercat-react/Splitter'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function renderSplitter(props: Record<string, unknown> = {}) {

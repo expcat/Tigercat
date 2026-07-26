@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { ScatterChart } from '@expcat/tigercat-vue'
+import { ScatterChart } from '@expcat/tigercat-vue/ScatterChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const defaultSize = { width: 240, height: 160 }

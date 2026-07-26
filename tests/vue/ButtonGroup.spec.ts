@@ -5,7 +5,8 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
-import { ButtonGroup, Button } from '@expcat/tigercat-vue'
+import { Button } from '@expcat/tigercat-vue/Button'
+import { ButtonGroup } from '@expcat/tigercat-vue/ButtonGroup'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('ButtonGroup', () => {

@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Select } from '@expcat/tigercat-react'
+import { Select } from '@expcat/tigercat-react/Select'
 import {
   expectNoA11yViolationsIsolated,
   setThemeVariables,

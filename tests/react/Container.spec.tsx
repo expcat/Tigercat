@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Container } from '@expcat/tigercat-react'
+import { Container } from '@expcat/tigercat-react/Container'
 import { renderWithProps, renderWithChildren } from '../utils/render-helpers-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 import React from 'react'

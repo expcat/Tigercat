@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { PrintLayout, PrintPageBreak } from '@expcat/tigercat-react'
+import { PrintLayout, PrintPageBreak } from '@expcat/tigercat-react/PrintLayout'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('PrintLayout', () => {

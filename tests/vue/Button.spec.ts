@@ -5,8 +5,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Button, getButtonVariantClasses, buttonSizeClasses } from '@expcat/tigercat-vue'
-import { resetDevWarnCache } from '@expcat/tigercat-core'
+import { Button } from '@expcat/tigercat-vue/Button'
+import {
+  buttonSizeClasses,
+  getButtonVariantClasses,
+  resetDevWarnCache
+} from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated, setThemeVariables, clearThemeVariables } from '../utils'
 
 describe('Button', () => {

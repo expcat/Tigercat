@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { CommentThread } from '@expcat/tigercat-react'
+import { CommentThread } from '@expcat/tigercat-react/CommentThread'
 import type { CommentNode } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

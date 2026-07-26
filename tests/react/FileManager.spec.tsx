@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { FileManager } from '@expcat/tigercat-react'
+import { FileManager } from '@expcat/tigercat-react/FileManager'
 import type { FileItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

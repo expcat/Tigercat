@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { RadarChart } from '@expcat/tigercat-react'
+import { RadarChart } from '@expcat/tigercat-react/RadarChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 
 const singleSeriesData = [

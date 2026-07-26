@@ -5,7 +5,7 @@
 import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
-import { Countdown } from '@expcat/tigercat-react'
+import { Countdown } from '@expcat/tigercat-react/Countdown'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const baseTime = 1704067200000

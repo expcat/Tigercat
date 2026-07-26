@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { ConfigProvider, Tabs, TabPane } from '@expcat/tigercat-react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { TabPane, Tabs } from '@expcat/tigercat-react/Tabs'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

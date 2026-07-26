@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { BackTop } from '@expcat/tigercat-react'
+import { BackTop } from '@expcat/tigercat-react/BackTop'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('BackTop', () => {

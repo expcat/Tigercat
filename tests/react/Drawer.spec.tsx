@@ -6,7 +6,7 @@ import { afterEach, describe, it, expect, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Drawer } from '@expcat/tigercat-react'
+import { Drawer } from '@expcat/tigercat-react/Drawer'
 import { ANIMATION_DURATION_MS } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h, ref, nextTick } from 'vue'
-import { Carousel } from '@expcat/tigercat-vue'
+import { Carousel } from '@expcat/tigercat-vue/Carousel'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Carousel', () => {

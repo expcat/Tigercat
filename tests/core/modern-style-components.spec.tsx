@@ -8,12 +8,12 @@ import { render as renderVue, screen as vueScreen } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { defineComponent, h } from 'vue'
 import { createTigercatPlugin, MODERN_OVERRIDE_TOKENS_LIGHT } from '@expcat/tigercat-core'
-import {
-  Button as ReactButton,
-  Card as ReactCard,
-  Input as ReactInput
-} from '@expcat/tigercat-react'
-import { Button as VueButton, Card as VueCard, Input as VueInput } from '@expcat/tigercat-vue'
+import { Button as ReactButton } from '@expcat/tigercat-react/Button'
+import { Card as ReactCard } from '@expcat/tigercat-react/Card'
+import { Input as ReactInput } from '@expcat/tigercat-react/Input'
+import { Button as VueButton } from '@expcat/tigercat-vue/Button'
+import { Card as VueCard } from '@expcat/tigercat-vue/Card'
+import { Input as VueInput } from '@expcat/tigercat-vue/Input'
 
 type CssBlock = Record<string, string>
 type AddBaseFn = (rule: Record<string, unknown>) => void

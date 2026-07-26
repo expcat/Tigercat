@@ -5,7 +5,7 @@
 import { afterEach, describe, it, expect } from 'vitest'
 import { render, waitFor } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
-import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-vue'
+import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-vue/ConfigProvider'
 import type { TigerLocale } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

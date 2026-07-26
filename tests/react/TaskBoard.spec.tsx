@@ -5,7 +5,7 @@
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { TaskBoard } from '@expcat/tigercat-react'
+import { TaskBoard } from '@expcat/tigercat-react/TaskBoard'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

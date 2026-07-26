@@ -5,7 +5,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { h } from 'vue'
-import { ConfigProvider, CronEditor } from '@expcat/tigercat-vue'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { CronEditor } from '@expcat/tigercat-vue/CronEditor'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated, renderWithProps } from '../utils'
 

@@ -4,7 +4,8 @@
 
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
 import { act, fireEvent, render, waitFor } from '@testing-library/react'
-import { ConfigProvider, notification } from '@expcat/tigercat-react'
+import { notification } from '@expcat/tigercat-react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Notification (React)', () => {

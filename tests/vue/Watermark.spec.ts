@@ -4,7 +4,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Watermark } from '@expcat/tigercat-vue'
+import { Watermark } from '@expcat/tigercat-vue/Watermark'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Watermark', () => {

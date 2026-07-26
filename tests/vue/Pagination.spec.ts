@@ -6,7 +6,7 @@ import { nextTick } from 'vue'
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Pagination } from '@expcat/tigercat-vue'
+import { Pagination } from '@expcat/tigercat-vue/Pagination'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Pagination', () => {

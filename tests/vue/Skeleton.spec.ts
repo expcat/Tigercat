@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/vue'
-import { Skeleton } from '@expcat/tigercat-vue'
+import { Skeleton } from '@expcat/tigercat-vue/Skeleton'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const skeletonVariants = ['text', 'avatar', 'image', 'button', 'custom'] as const

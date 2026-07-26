@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { FloatButton, FloatButtonGroup } from '@expcat/tigercat-vue'
+import { FloatButton, FloatButtonGroup } from '@expcat/tigercat-vue/FloatButton'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('FloatButton (Vue)', () => {

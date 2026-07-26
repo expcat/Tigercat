@@ -3,7 +3,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { HeatmapChart } from '@expcat/tigercat-react'
+import { HeatmapChart } from '@expcat/tigercat-react/HeatmapChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import { render } from '@testing-library/react'
 

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { FunnelChart } from '@expcat/tigercat-vue'
+import { FunnelChart } from '@expcat/tigercat-vue/FunnelChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 import { render } from '@testing-library/vue'
 

@@ -5,7 +5,7 @@
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, waitFor, act } from '@testing-library/react'
 import React from 'react'
-import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react'
+import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react/ConfigProvider'
 import type { TigerLocale } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

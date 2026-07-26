@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { Switch } from '@expcat/tigercat-vue'
+import { Switch } from '@expcat/tigercat-vue/Switch'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,

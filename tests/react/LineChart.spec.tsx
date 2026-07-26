@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { LineChart } from '@expcat/tigercat-react'
+import { LineChart } from '@expcat/tigercat-react/LineChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 
 const basicData = [

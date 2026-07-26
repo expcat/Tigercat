@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { VirtualList } from '@expcat/tigercat-vue'
+import { VirtualList } from '@expcat/tigercat-vue/VirtualList'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('VirtualList', () => {

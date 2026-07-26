@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { MaskInput } from '@expcat/tigercat-vue'
+import { MaskInput } from '@expcat/tigercat-vue/MaskInput'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('MaskInput', () => {

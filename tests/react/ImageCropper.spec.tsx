@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
-import { ImageCropper } from '@expcat/tigercat-react'
+import { ImageCropper } from '@expcat/tigercat-react/ImageCropper'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 // Mock Image constructor for happy-dom

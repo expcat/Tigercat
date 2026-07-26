@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Input } from '@expcat/tigercat-vue'
+import { Input } from '@expcat/tigercat-vue/Input'
 import type { InputType, InputStatus } from '@expcat/tigercat-core'
 import {
   renderWithProps,

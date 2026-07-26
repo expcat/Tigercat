@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { InfiniteScroll } from '@expcat/tigercat-react'
+import { InfiniteScroll } from '@expcat/tigercat-react/InfiniteScroll'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('InfiniteScroll (React)', () => {

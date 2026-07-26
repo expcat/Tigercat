@@ -6,7 +6,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Radio, RadioGroup } from '@expcat/tigercat-react'
+import { Radio } from '@expcat/tigercat-react/Radio'
+import { RadioGroup } from '@expcat/tigercat-react/RadioGroup'
 import {
   expectNoA11yViolationsIsolated,
   componentSizes,

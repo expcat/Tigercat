@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
-import { SunburstChart } from '@expcat/tigercat-react'
+import { SunburstChart } from '@expcat/tigercat-react/SunburstChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import { fireEvent, render } from '@testing-library/react'
 

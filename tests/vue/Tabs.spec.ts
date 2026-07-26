@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, cleanup } from '@testing-library/vue'
 import { defineComponent, h, ref } from 'vue'
-import { Tabs, TabPane } from '@expcat/tigercat-vue'
+import { TabPane, Tabs } from '@expcat/tigercat-vue/Tabs'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Tabs', () => {

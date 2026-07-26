@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { ConfigProvider, QRCode } from '@expcat/tigercat-react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { QRCode } from '@expcat/tigercat-react/QRCode'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('QRCode', () => {

@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Statistic } from '@expcat/tigercat-vue'
+import { Statistic } from '@expcat/tigercat-vue/Statistic'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 function createFrameScheduler() {

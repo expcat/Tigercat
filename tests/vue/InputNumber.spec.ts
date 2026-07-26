@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { InputNumber } from '@expcat/tigercat-vue'
+import { InputNumber } from '@expcat/tigercat-vue/InputNumber'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('InputNumber (Vue)', () => {

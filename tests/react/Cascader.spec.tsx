@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import React from 'react'
-import { Cascader } from '@expcat/tigercat-react'
+import { Cascader } from '@expcat/tigercat-react/Cascader'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const simpleOptions = [

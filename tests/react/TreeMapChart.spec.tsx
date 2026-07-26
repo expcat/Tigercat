@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
-import { TreeMapChart } from '@expcat/tigercat-react'
+import { TreeMapChart } from '@expcat/tigercat-react/TreeMapChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import { fireEvent, render } from '@testing-library/react'
 

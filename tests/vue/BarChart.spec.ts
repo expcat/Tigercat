@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { BarChart } from '@expcat/tigercat-vue'
+import { BarChart } from '@expcat/tigercat-vue/BarChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const defaultSize = { width: 240, height: 160 }

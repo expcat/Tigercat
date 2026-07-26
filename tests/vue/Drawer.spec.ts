@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Drawer } from '@expcat/tigercat-vue'
+import { Drawer } from '@expcat/tigercat-vue/Drawer'
 import { ANIMATION_DURATION_MS } from '@expcat/tigercat-core'
 import { h } from 'vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'

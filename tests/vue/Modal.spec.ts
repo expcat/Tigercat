@@ -6,7 +6,9 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
-import { Modal, Popover, Select } from '@expcat/tigercat-vue'
+import { Modal } from '@expcat/tigercat-vue/Modal'
+import { Popover } from '@expcat/tigercat-vue/Popover'
+import { Select } from '@expcat/tigercat-vue/Select'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Modal', () => {

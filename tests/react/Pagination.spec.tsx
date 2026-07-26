@@ -6,7 +6,7 @@ import React from 'react'
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Pagination } from '@expcat/tigercat-react'
+import { Pagination } from '@expcat/tigercat-react/Pagination'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Pagination', () => {

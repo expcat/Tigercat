@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { act, render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Calendar } from '@expcat/tigercat-react'
+import { Calendar } from '@expcat/tigercat-react/Calendar'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Calendar', () => {

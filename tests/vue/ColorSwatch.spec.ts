@@ -4,7 +4,7 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/vue'
-import { ColorSwatch } from '@expcat/tigercat-vue'
+import { ColorSwatch } from '@expcat/tigercat-vue/ColorSwatch'
 import { expectNoA11yViolationsIsolated, renderWithProps } from '../utils'
 
 describe('ColorSwatch', () => {

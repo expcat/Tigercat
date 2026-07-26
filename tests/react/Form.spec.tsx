@@ -6,16 +6,12 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useState } from 'react'
-import {
-  Form,
-  FormItem,
-  Input,
-  Space,
-  ConfigProvider,
-  type FormHandle,
-  type FormRule,
-  type FormRules
-} from '@expcat/tigercat-react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { Form, type FormHandle } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { Input } from '@expcat/tigercat-react/Input'
+import { Space } from '@expcat/tigercat-react/Space'
+import type { FormRule, FormRules } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Form', () => {

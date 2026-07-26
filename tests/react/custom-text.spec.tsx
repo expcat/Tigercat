@@ -8,20 +8,18 @@
 import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import {
-  Pagination,
-  Modal,
-  Drawer,
-  FormWizard,
-  TaskBoard,
-  Transfer,
-  List,
-  InfiniteScroll,
-  Select,
-  Cascader,
-  FileManager,
-  ConfigProvider
-} from '@expcat/tigercat-react'
+import { Cascader } from '@expcat/tigercat-react/Cascader'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { Drawer } from '@expcat/tigercat-react/Drawer'
+import { FileManager } from '@expcat/tigercat-react/FileManager'
+import { FormWizard } from '@expcat/tigercat-react/FormWizard'
+import { InfiniteScroll } from '@expcat/tigercat-react/InfiniteScroll'
+import { List } from '@expcat/tigercat-react/List'
+import { Modal } from '@expcat/tigercat-react/Modal'
+import { Pagination } from '@expcat/tigercat-react/Pagination'
+import { Select } from '@expcat/tigercat-react/Select'
+import { TaskBoard } from '@expcat/tigercat-react/TaskBoard'
+import { Transfer } from '@expcat/tigercat-react/Transfer'
 
 describe('custom text (no i18n) — React', () => {
   describe('per-component labels prop', () => {

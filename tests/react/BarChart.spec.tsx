@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { BarChart } from '@expcat/tigercat-react'
+import { BarChart } from '@expcat/tigercat-react/BarChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import { fireEvent } from '@testing-library/react'
 

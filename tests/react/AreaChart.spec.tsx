@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { fireEvent } from '@testing-library/react'
-import { AreaChart } from '@expcat/tigercat-react'
+import { AreaChart } from '@expcat/tigercat-react/AreaChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 
 const basicData = [

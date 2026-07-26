@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { Cascader } from '@expcat/tigercat-vue'
+import { Cascader } from '@expcat/tigercat-vue/Cascader'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const simpleOptions = [

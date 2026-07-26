@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { DatePicker } from '@expcat/tigercat-vue'
+import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 import { ZH_CN_DATEPICKER_LOCALE } from '../../packages/core/src/utils/i18n/datepicker-locales/zh-CN'
 

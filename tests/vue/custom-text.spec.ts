@@ -8,20 +8,18 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
-import {
-  Pagination,
-  Modal,
-  Drawer,
-  FormWizard,
-  TaskBoard,
-  Transfer,
-  List,
-  InfiniteScroll,
-  Select,
-  Cascader,
-  FileManager,
-  ConfigProvider
-} from '@expcat/tigercat-vue'
+import { Cascader } from '@expcat/tigercat-vue/Cascader'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { Drawer } from '@expcat/tigercat-vue/Drawer'
+import { FileManager } from '@expcat/tigercat-vue/FileManager'
+import { FormWizard } from '@expcat/tigercat-vue/FormWizard'
+import { InfiniteScroll } from '@expcat/tigercat-vue/InfiniteScroll'
+import { List } from '@expcat/tigercat-vue/List'
+import { Modal } from '@expcat/tigercat-vue/Modal'
+import { Pagination } from '@expcat/tigercat-vue/Pagination'
+import { Select } from '@expcat/tigercat-vue/Select'
+import { TaskBoard } from '@expcat/tigercat-vue/TaskBoard'
+import { Transfer } from '@expcat/tigercat-vue/Transfer'
 
 describe('custom text (no i18n) — Vue', () => {
   describe('per-component labels prop', () => {

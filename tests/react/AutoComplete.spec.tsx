@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { act, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { AutoComplete } from '@expcat/tigercat-react'
+import { AutoComplete } from '@expcat/tigercat-react/AutoComplete'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const options = [

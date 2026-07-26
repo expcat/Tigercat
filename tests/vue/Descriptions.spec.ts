@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Descriptions } from '@expcat/tigercat-vue'
+import { Descriptions } from '@expcat/tigercat-vue/Descriptions'
 import type { DescriptionsItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

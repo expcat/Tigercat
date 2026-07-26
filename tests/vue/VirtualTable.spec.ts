@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { VirtualTable } from '@expcat/tigercat-vue'
+import { VirtualTable } from '@expcat/tigercat-vue/VirtualTable'
 import type { TableColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

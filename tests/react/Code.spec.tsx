@@ -6,7 +6,7 @@ import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Code } from '@expcat/tigercat-react'
+import { Code } from '@expcat/tigercat-react/Code'
 import { renderWithProps } from '../utils/render-helpers-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

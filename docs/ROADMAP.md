@@ -111,7 +111,7 @@ source: current repository state + competitor benchmark (2026-07-19)
 
 ### 测试执行成本(2026-07-26 实测,P2)
 
-基线 `pnpm test`:397 个 spec 文件 / 6952 个测试。切换到 threads pool 前墙钟 73.7s,切换后 54.2s(-26%)。分阶段累计 worker 时间显示编译只占 5.9%、断言执行只占 9.7%,其余 84% 是框架空转(import 43.0% / setup 24.5% / environment 17.0%)。以下两项已测量但本轮未做:
+基线 `pnpm test`:397 个 spec 文件 / 6952 个测试。切换到 threads pool 前墙钟 73.7s,切换后 54.2s(-26%)。分阶段累计 worker 时间显示编译只占 5.9%、断言执行只占 9.7%,其余 84% 是框架空转(import 43.0% / setup 24.5% / environment 17.0%)。子路径导入已落地(见下),剩余一项仍未做:
 
 - [ ] 消除跨文件状态污染,使 `--no-isolate` 可用。2026-07-26 复测修正了原先的判断,原条目记的「5 个文件、全部是测试独立性缺陷」两点都不准确。
 
@@ -123,7 +123,18 @@ source: current repository state + competitor benchmark (2026-07-19)
   - **`vi.mock` 与共享模块注册表冲突(新发现,原条目没有)**:`--no-isolate` 下同一 worker 共享模块注册表,先加载过的模块不会再走 mock 工厂。`tests/react/ButtonSpinnerLazy.spec.tsx`、`tests/react/overlay-positioning.spec.tsx`、`tests/vue/overlay-positioning.spec.ts` 三个文件(全仓库用 `vi.mock` 的就这三个)因此必然失败。这不是测试独立性缺陷,写法本身没问题,靠改 spec 修不掉;要么给它们单开一个 `isolate: true` 的 project(与 `FORK_ONLY_SPECS` 同一套登记方式),要么在文件内 `vi.resetModules()`。**这一条决定了 `--no-isolate` 能不能全绿,应先定方案再动其余。**
 
   尚未归因/未修的残留(探针实测):`document.documentElement` 的 inline style 与 class 残留(`setThemeVariables` 有 16 个调用方,`clearThemeVariables` 靠调用方自觉),拖累 `tests/core/modern-theme-interaction.spec.ts`;portal / teleport 容器空 div 持续累积;`tests/react|vue/BackTop`、`tests/react/Avatar`、`tests/*/Spotlight`、`tests/vue/Image` 的失败尚未逐一定位,其中 Spotlight 的 a11y 违规很可能是残留 textarea 的连带,需在 copy-text 修复后复测。
-- [ ] 组件 spec 从根 barrel 改为按组件子路径导入。当前 257 个 React/Vue spec 都从 `@expcat/tigercat-vue` / `@expcat/tigercat-react` 根入口导入,每个文件都要重新求值全部 152 个组件。20 个等价 spec 的对照实验:import 21.30s→9.89s、transform 11.91s→4.93s、墙钟 5.08s→3.54s(-30%)。根 barrel 可达性由 `tests/core/package-exports.spec.ts` 独立覆盖,改导入不丢契约;代价是 257 个文件的机械改动。
+- [x] 组件 spec 从根 barrel 改为按组件子路径导入(2026-07-26 完成)。253 个 spec 里 259 条根入口导入语句拆成 391 条 `@expcat/tigercat-vue/Button` 形式的子路径导入,原先靠 barrel `export *` 间接拿到的 core 符号改为直接从 `@expcat/tigercat-core` 导入。`vitest.config.ts` 从 `scripts/lib/public-components.mjs` 生成子路径 alias(与 `pnpm exports:check` 同一份事实源,spec 只能指向真实已发布的子路径),必须排在根包 alias 之前——Vite 的字符串 alias 按前缀匹配且首个命中生效。
+
+  实测(398 文件 / 6957 测试,前后一致):墙钟 54.8s→48.6s(-11%,改后 3 次 48.2/48.7/48.9),累计 worker import 168.3s→118.3s(-30%)、transform 29.1s→24.2s。低于原条目 20 spec 对照实验预估的 -30%,因为全量跑里 setup / environment / tests 三段不随导入收窄而下降。
+
+  未改的例外:`Message` / `notification` 出自 `MessageRoot` / `NotificationRoot`,`useDrag` / `useFormController` / `useChartInteraction` 出自 hooks / composables 目录,都没有对应的已发布子路径,仍走根 barrel。`tests/core/cli.spec.ts` 里断言 CLI 生成代码的字符串字面量必须保持根 barrel 写法——那是脚手架产物的期望值,不是本仓库的导入。
+
+### 仓库 prettier 漂移(2026-07-26 发现,P2)
+
+`pnpm format:check` 在 main 上是红的:85 个文件有格式差异(packages 37 / examples 37 / tests 7 / scripts 1 / docs 1 / context7.json / .claude 各 1)。根因是 `format:check` 不在任何门禁里——`quality:release` 走的 `quality:static` 只有 lint、types:check、api:validate、docs:links。
+
+- [ ] 跑一次 `pnpm format` 收敛全仓库,并决定 `format:check` 是否进 `quality:static`。`context7.json` 是 `pnpm docs:api` 的生成物,需确认生成器输出与 prettier 一致,否则门禁会与 `docs:api:check` 互相打架。
+- 验证:`pnpm format:check` 全绿,且 `pnpm docs:api:check` 不产生 diff。
 
 ## 长期观察项(不绑定版本)
 

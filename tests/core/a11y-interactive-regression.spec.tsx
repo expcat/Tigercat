@@ -12,14 +12,13 @@ import {
 } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import { defineComponent, h, reactive } from 'vue'
-import {
-  Form as ReactForm,
-  FormItem as ReactFormItem,
-  Modal as ReactModal,
-  type FormHandle as ReactFormHandle,
-  type FormRules as ReactFormRules
-} from '@expcat/tigercat-react'
-import { Form as VueForm, FormItem as VueFormItem, Modal as VueModal } from '@expcat/tigercat-vue'
+import { Form as ReactForm, type FormHandle as ReactFormHandle } from '@expcat/tigercat-react/Form'
+import { FormItem as ReactFormItem } from '@expcat/tigercat-react/FormItem'
+import { Modal as ReactModal } from '@expcat/tigercat-react/Modal'
+import type { FormRules as ReactFormRules } from '@expcat/tigercat-core'
+import { Form as VueForm } from '@expcat/tigercat-vue/Form'
+import { FormItem as VueFormItem } from '@expcat/tigercat-vue/FormItem'
+import { Modal as VueModal } from '@expcat/tigercat-vue/Modal'
 import { expectNoA11yViolations } from '../utils/a11y-helpers'
 
 describe('interactive a11y regression coverage', () => {

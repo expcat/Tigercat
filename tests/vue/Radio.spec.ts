@@ -6,7 +6,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { ref, nextTick, defineComponent, h } from 'vue'
-import { Radio, RadioGroup } from '@expcat/tigercat-vue'
+import { Radio } from '@expcat/tigercat-vue/Radio'
+import { RadioGroup } from '@expcat/tigercat-vue/RadioGroup'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,

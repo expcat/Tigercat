@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { TagsInput } from '@expcat/tigercat-vue'
+import { TagsInput } from '@expcat/tigercat-vue/TagsInput'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('TagsInput', () => {

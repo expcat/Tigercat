@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { Image } from '@expcat/tigercat-vue'
+import { Image } from '@expcat/tigercat-vue/Image'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Image', () => {

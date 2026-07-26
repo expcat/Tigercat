@@ -4,7 +4,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
-import { HeatmapChart } from '@expcat/tigercat-vue'
+import { HeatmapChart } from '@expcat/tigercat-vue/HeatmapChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 import { render } from '@testing-library/vue'
 

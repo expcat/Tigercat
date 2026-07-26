@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { InputNumber } from '@expcat/tigercat-react'
+import { InputNumber } from '@expcat/tigercat-react/InputNumber'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('InputNumber (React)', () => {

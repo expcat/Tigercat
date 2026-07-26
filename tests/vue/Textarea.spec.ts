@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Textarea } from '@expcat/tigercat-vue'
+import { Textarea } from '@expcat/tigercat-vue/Textarea'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,

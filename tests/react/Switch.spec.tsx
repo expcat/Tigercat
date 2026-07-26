@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Switch } from '@expcat/tigercat-react'
+import { Switch } from '@expcat/tigercat-react/Switch'
 import {
   expectNoA11yViolationsIsolated,
   componentSizes,

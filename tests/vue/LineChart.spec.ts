@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { fireEvent } from '@testing-library/vue'
-import { LineChart } from '@expcat/tigercat-vue'
+import { LineChart } from '@expcat/tigercat-vue/LineChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 const basicData = [

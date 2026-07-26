@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { Resizable } from '@expcat/tigercat-vue'
+import { Resizable } from '@expcat/tigercat-vue/Resizable'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function renderResizable(props: Record<string, unknown> = {}) {

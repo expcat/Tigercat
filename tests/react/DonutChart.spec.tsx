@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { DonutChart } from '@expcat/tigercat-react'
+import { DonutChart } from '@expcat/tigercat-react/DonutChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 
 const defaultSize = { width: 240, height: 160 }

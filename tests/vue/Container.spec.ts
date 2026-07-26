@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Container } from '@expcat/tigercat-vue'
+import { Container } from '@expcat/tigercat-vue/Container'
 import { h } from 'vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 

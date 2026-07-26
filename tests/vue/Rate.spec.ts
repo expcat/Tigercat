@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { Rate } from '@expcat/tigercat-vue'
+import { Rate } from '@expcat/tigercat-vue/Rate'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 /** The interactive star spans are the direct children of the slider. */

@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Badge } from '@expcat/tigercat-vue'
+import { Badge } from '@expcat/tigercat-vue/Badge'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Badge', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { ScatterChart } from '@expcat/tigercat-react'
+import { ScatterChart } from '@expcat/tigercat-react/ScatterChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/render-helpers-react'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 

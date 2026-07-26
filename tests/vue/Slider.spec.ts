@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { Slider } from '@expcat/tigercat-vue'
+import { Slider } from '@expcat/tigercat-vue/Slider'
 import {
   expectNoA11yViolationsIsolated,
   componentSizes,

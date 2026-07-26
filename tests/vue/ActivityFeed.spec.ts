@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { ActivityFeed } from '@expcat/tigercat-vue'
+import { ActivityFeed } from '@expcat/tigercat-vue/ActivityFeed'
 import type { ActivityGroup } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

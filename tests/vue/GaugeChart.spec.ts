@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { GaugeChart } from '@expcat/tigercat-vue'
+import { GaugeChart } from '@expcat/tigercat-vue/GaugeChart'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 import { render } from '@testing-library/vue'
 

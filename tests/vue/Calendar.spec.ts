@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Calendar } from '@expcat/tigercat-vue'
+import { Calendar } from '@expcat/tigercat-vue/Calendar'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Calendar', () => {

@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-import { Progress } from '@expcat/tigercat-react'
+import { Progress } from '@expcat/tigercat-react/Progress'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Progress', () => {

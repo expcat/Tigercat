@@ -1,7 +1,7 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { OrgChart } from '@expcat/tigercat-react'
+import { OrgChart } from '@expcat/tigercat-react/OrgChart'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 

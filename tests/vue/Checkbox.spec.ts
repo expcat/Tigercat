@@ -5,7 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { nextTick, defineComponent, h, ref } from 'vue'
-import { Checkbox, CheckboxGroup } from '@expcat/tigercat-vue'
+import { Checkbox } from '@expcat/tigercat-vue/Checkbox'
+import { CheckboxGroup } from '@expcat/tigercat-vue/CheckboxGroup'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,

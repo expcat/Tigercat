@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Stepper } from '@expcat/tigercat-vue'
+import { Stepper } from '@expcat/tigercat-vue/Stepper'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Stepper', () => {

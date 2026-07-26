@@ -9,7 +9,7 @@
 import { describe, it, expect } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import React from 'react'
-import { ImagePreview } from '@expcat/tigercat-react'
+import { ImagePreview } from '@expcat/tigercat-react/ImagePreview'
 
 describe('ImagePreview (SSR)', () => {
   const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg']

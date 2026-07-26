@@ -6,8 +6,12 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Button, getButtonVariantClasses, buttonSizeClasses } from '@expcat/tigercat-react'
-import { resetDevWarnCache } from '@expcat/tigercat-core'
+import { Button } from '@expcat/tigercat-react/Button'
+import {
+  buttonSizeClasses,
+  getButtonVariantClasses,
+  resetDevWarnCache
+} from '@expcat/tigercat-core'
 import {
   expectNoA11yViolationsIsolated,
   setThemeVariables,

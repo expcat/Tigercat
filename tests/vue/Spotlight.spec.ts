@@ -5,7 +5,8 @@
 import { defineComponent, h, ref } from 'vue'
 import { fireEvent, render } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
-import { Spotlight, type SpotlightItem } from '@expcat/tigercat-vue'
+import { Spotlight } from '@expcat/tigercat-vue/Spotlight'
+import type { SpotlightItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const items: SpotlightItem[] = [

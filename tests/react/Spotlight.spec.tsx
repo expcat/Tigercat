@@ -6,7 +6,8 @@ import React, { useState } from 'react'
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { Spotlight, type SpotlightItem } from '@expcat/tigercat-react'
+import { Spotlight } from '@expcat/tigercat-react/Spotlight'
+import type { SpotlightItem } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const items: SpotlightItem[] = [

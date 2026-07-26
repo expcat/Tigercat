@@ -4,7 +4,7 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Code } from '@expcat/tigercat-vue'
+import { Code } from '@expcat/tigercat-vue/Code'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Code (Vue)', () => {

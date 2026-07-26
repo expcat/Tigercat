@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Tooltip } from '@expcat/tigercat-react'
+import { Tooltip } from '@expcat/tigercat-react/Tooltip'
 import { renderWithProps, renderWithChildren, expectNoA11yViolationsIsolated } from '../utils/react'
 import React from 'react'
 

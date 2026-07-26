@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/vue'
-import { Affix } from '@expcat/tigercat-vue'
+import { Affix } from '@expcat/tigercat-vue/Affix'
 import { MockIntersectionObserver, MockResizeObserver } from '../utils/mock-observers'
 import { expectNoA11yViolationsIsolated } from '../utils'
 

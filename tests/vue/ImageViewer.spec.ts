@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { ImageViewer } from '@expcat/tigercat-vue'
+import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const images = [

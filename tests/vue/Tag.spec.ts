@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Tag } from '@expcat/tigercat-vue'
+import { Tag } from '@expcat/tigercat-vue/Tag'
 import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
