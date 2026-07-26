@@ -13,6 +13,17 @@ expect.extend(toHaveNoViolations)
 afterEach(() => {
   cleanupVue()
   cleanupReact()
+
+  // Reset <html> to a clean slate. Specs set theme CSS variables via
+  // `tests/utils/theme-helpers.ts` and toggle the `dark` class directly, but
+  // `clearThemeVariables()` requires the caller to pass back the exact same
+  // variable names, so any spec that forgets one — or fails before its own
+  // afterEach runs — leaks state into every later spec sharing this document.
+  // Cleaning up centrally means specs no longer have to be trusted to do it.
+  if (typeof document !== 'undefined') {
+    document.documentElement.removeAttribute('style')
+    document.documentElement.className = ''
+  }
 })
 
 // Mock matchMedia for components that use responsive features.

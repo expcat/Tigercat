@@ -101,16 +101,30 @@ source: current repository state + competitor benchmark (2026-07-19)
 
 基线 `pnpm test`:397 个 spec 文件 / 6952 个测试。切换到 threads pool 前墙钟 73.7s,切换后 54.2s(-26%)。分阶段累计 worker 时间显示编译只占 5.9%、断言执行只占 9.7%,其余 84% 是框架空转(import 43.0% / setup 24.5% / environment 17.0%)。子路径导入已落地(见下),剩余一项仍未做:
 
-- [ ] 消除跨文件状态污染,使 `--no-isolate` 可用。2026-07-26 复测修正了原先的判断,原条目记的「5 个文件、全部是测试独立性缺陷」两点都不准确。
+- [x] `--no-isolate` 目标已放弃(2026-07-26 实测推翻前提)。原条目要求「消除跨文件状态污染,使 `--no-isolate` 可用」,并记收益为墙钟 12.4s vs 基线 54.2s(-77%)。四组对照实测(398 文件 / 6957 测试)证明该收益不存在:
 
-  复现口径:`npx vitest run --no-isolate --maxWorkers=1` 才是确定性的(13 个文件 / 79 条失败);并行跑因 worker 调度不同,每次失败集合都不一样(实测 8 个文件 / 17~39 条),不能作为基线。墙钟 12.4s vs 基线 54.2s。
+  | 配置                             | 墙钟    | 结果            |
+  | -------------------------------- | ------- | --------------- |
+  | 基线 `pnpm test`(isolate + 并行) | 43.07s  | 398 全绿        |
+  | `--no-isolate`(并行)             | 44.91s  | 有失败          |
+  | `--no-isolate --maxWorkers=1`    | 33.86s  | 1~9 条失败,不定 |
+  | `--maxWorkers=1`(保留 isolate)   | 237.09s | 398 全绿        |
 
-  已归因的根因:
-  - **`packages/core/src/utils/copy-text.ts` 的生产缺陷(本轮已改)**:`document.body.removeChild(textarea)` 写在 `try` 内、跟在会抛的 `select()` / `setSelectionRange()` / `execCommand()` 之后,一旦抛异常就把一个隐藏 textarea 永久留在文档里。这不只是测试问题——真实浏览器里每次降级复制失败都会往 DOM 里塞一个可聚焦的 textbox,污染无障碍树。79 条失败里有 66 条是它引起的:残留 textarea 让后续文件的 `getByRole('textbox')` 报 "Found multiple elements"。已补 `tests/core/copy-text.spec.ts`(此前该 util 零覆盖)。
-  - **`devWarn` 去重缓存**:原条目说「加 reset 钩子会把测试专用 API 带进生产代码」——该结论已过期,`resetDevWarnCache()` 早就存在且已在 `api-reports/public-api-baseline.json` 里,是已发布的公开导出。本轮按 `tests/core/dev-warn.spec.ts` 的既有写法,在 Button/Tag 的 React 与 Vue 四个 spec 里调用它。
-  - **`vi.mock` 与共享模块注册表冲突(新发现,原条目没有)**:`--no-isolate` 下同一 worker 共享模块注册表,先加载过的模块不会再走 mock 工厂。`tests/react/ButtonSpinnerLazy.spec.tsx`、`tests/react/overlay-positioning.spec.tsx`、`tests/vue/overlay-positioning.spec.ts` 三个文件(全仓库用 `vi.mock` 的就这三个)因此必然失败。这不是测试独立性缺陷,写法本身没问题,靠改 spec 修不掉;要么给它们单开一个 `isolate: true` 的 project(与 `FORK_ONLY_SPECS` 同一套登记方式),要么在文件内 `vi.resetModules()`。**这一条决定了 `--no-isolate` 能不能全绿,应先定方案再动其余。**
+  结论:`--no-isolate` 在正常并行下**零收益**(44.91s 比基线还慢);唯一快于基线的是叠加 `--maxWorkers=1`,但只有 -21%,代价是同时放弃文件级隔离**和**并行。原条目的 12.4s 几乎肯定是当时 79 条失败大量提前抛错退出造成的假快。收益不足以换取永久的顺序依赖脆弱性,故放弃。
 
-  尚未归因/未修的残留(探针实测):`document.documentElement` 的 inline style 与 class 残留(`setThemeVariables` 有 16 个调用方,`clearThemeVariables` 靠调用方自觉),拖累 `tests/core/modern-theme-interaction.spec.ts`;portal / teleport 容器空 div 持续累积;`tests/react|vue/BackTop`、`tests/react/Avatar`、`tests/*/Spotlight`、`tests/vue/Image` 的失败尚未逐一定位,其中 Spotlight 的 a11y 违规很可能是残留 textarea 的连带,需在 copy-text 修复后复测。
+  同时修正原条目两处错误事实:
+  - **`--maxWorkers=1` 不是确定性口径**。实测 8 次得到 8 种结果(1/2/2/4/5/6/9/9 条失败),文件集合每次不同,从未全绿也从未重复。即串行也无法复现固定失败集,原条目「才是确定性的(13 个文件 / 79 条失败)」不成立——因此「修到全绿」本就缺少可验证口径。
+  - **三个 `vi.mock` 文件不是必然失败**,而是顺序依赖:`--no-isolate` 下 mock 是否生效取决于该模块是否已被先前文件加载,而文件顺序不固定。实测 `ButtonSpinnerLazy` 3/5 次、两个 `overlay-positioning` 各 2/5 次失败。写法本身没问题,不需要改。
+
+  copy-text 修复(commit 3d9915b4)的效果已复测确认:失败从 79 条降到 1~9 条,原条目预测的 66 条残留 textarea 连带失败全部消失,Spotlight a11y 违规也不再出现。
+
+- [ ] 修跨文件状态泄漏(与 `--no-isolate` 解耦,按真实测试质量缺陷推进,P2)。这些泄漏在基线配置下不致失败,但会以负载相关的 flake 形式偶发——2026-07-26 一次高负载全量跑(墙钟 140s vs 正常 43s)就让 `tests/core/modern-theme-interaction.spec.ts` 单条 flake。
+
+  已修:`document.documentElement` 的 inline style 与 class 残留。根因是 `tests/utils/theme-helpers.ts` 的 `clearThemeVariables(names)` 要求调用方回传与 set 完全一致的变量名列表,漏一个就泄漏,且 spec 失败时其自身 afterEach 可能不执行。改为在 `tests/setup.ts` 全局 afterEach 集中 `removeAttribute('style')` + 清空 className,不再依赖 16 个调用方自觉。修复后 `modern-theme-interaction` 不再出现在泄漏检测失败集里;基线连续 3 次 398 全绿。
+
+  待归因:`tests/react|vue/BackTop`、`tests/react/Avatar`、`tests/vue/Image` 的偶发失败;portal / teleport 容器空 div 持续累积。
+
+  检测手段:`npx vitest run --no-isolate --maxWorkers=1` 仍是最灵敏的泄漏探针(放弃它作为日常配置,不等于放弃用它检测),但**因其不确定性,只能用于发现泄漏,不能作为验收口径**。验收改用:基线 `pnpm test` 连续多次全绿,加针对单个泄漏的定向断言。
 
 - [x] 组件 spec 从根 barrel 改为按组件子路径导入(2026-07-26 完成)。253 个 spec 里 259 条根入口导入语句拆成 391 条 `@expcat/tigercat-vue/Button` 形式的子路径导入,原先靠 barrel `export *` 间接拿到的 core 符号改为直接从 `@expcat/tigercat-core` 导入。`vitest.config.ts` 从 `scripts/lib/public-components.mjs` 生成子路径 alias(与 `pnpm exports:check` 同一份事实源,spec 只能指向真实已发布的子路径),必须排在根包 alias 之前——Vite 的字符串 alias 按前缀匹配且首个命中生效。
 
