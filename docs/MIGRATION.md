@@ -2,6 +2,36 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+## v2.0.19
+
+补记条目：v2.0.19 是 patch 号，但 `@expcat/tigercat-mcp` 有两处需要用户处理的行为变化。**只影响直接使用 MCP 包的项目**；`@expcat/tigercat-core` / `-vue` / `-react` / `-cli` 的公开 API 无变化，组件用户无需任何改动。
+
+### `@expcat/tigercat-mcp` 无参调用默认改为远程
+
+此前无参调用会从当前工作目录向上查找 Tigercat 仓库根，读本地 `skills/`；现在默认从 GitHub Pages（`https://expcat.github.io/Tigercat/mcp/`）拉取。内部辅助 `findTigercatRoot` 已移除，不再有「自动发现仓库根」的行为。
+
+受影响的是把 MCP 当库调用、且依赖自动发现本地 skills 的代码 —— 它现在会改走网络，在离线或 CI 沙箱中会失败：
+
+```ts
+// v2.0.19 前：在仓库内无参调用会自动找到仓库根并读本地 skills
+await loadSkillIndex()
+await diagnoseTigercatMcp()
+
+// v2.0.19 起：需要显式传入仓库根才走本地
+await loadSkillIndex(repoRoot) // 等价于 { root: repoRoot }
+await diagnoseTigercatMcp({ root: repoRoot })
+```
+
+命令行同理：仓库开发与离线场景显式传 `--root`，镜像站用 `--base-url` 或环境变量 `TIGERCAT_MCP_BASE_URL`。
+
+```bash
+npx tigercat-mcp --root /path/to/Tigercat
+```
+
+### MCP 工具响应结构改为指针 + 小节
+
+`routeTigercatTask` 现在内联并去重 sources，长引用通过 `createReferencePointer` 以会话级背景文档的指针形式返回，而不再内联全文；引用可按 markdown 小节抽取。响应体积显著下降，但**解析响应结构的消费方需要适配**：不能再假设引用正文一定内联在工具返回里，需按指针取背景文档。仅通过 MCP 客户端把结果交给 LLM 消费的用法不受影响。
+
 ## v2.0.0
 
 v2.0.0 正式版（与 v2.0.0-rc.2 公开 API 一致）。从 v1.x 升级请按本条目执行：core / React / Vue 发布面已切换为 ESM-only；React / Vue component 子路径已收敛为 PascalCase 显式 exports；tree-shaking 副作用声明、deprecated / compat API、legacy token / icon path 兼容层、示例与 references 均已按下列迁移路径收口。依赖 CommonJS `require()` 加载 Tigercat 包或 core 子路径的项目需要改用 ESM `import`。

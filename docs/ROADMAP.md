@@ -97,18 +97,6 @@ source: current repository state + competitor benchmark (2026-07-19)
 - 允许修改范围限于 cascader/tree-select 相关 core utils、双框架实现与测试;公共 API 仅新增可选 props,不做 breaking change。
 - 验证:`pnpm test:group:form`;受影响的 `benchmarks/` 套件需复跑。
 
-### v2.0.19 发布记录缺失(2026-07-26 发现,P1)
-
-`pnpm release:check` 在 v2.0.19 上是红的。其中公开 `version` 常量漂移(三个包的 `export const version` 停在 `'2.0.0'`)已随本轮修复:跑了 `pnpm sync:version`,并让 `.github/workflows/create-release-tags.yml` 把三个 `src/index` 一并 `git add`,防止再次漂移。
-
-剩余三条仍未处理,都是 v2.0.19 打了 tag 但没写发布文档:
-
-- [ ] `CHANGELOG.md` 缺 v2.0.19 条目。
-- [ ] `docs/MIGRATION.md` 缺 v2.0.19(若该版本无 breaking change,需要确认门禁是否应放行无 breaking 的补丁版本)。
-- [ ] `skills/tigercat/references/release.md` 缺 v2.0.19。
-
-未代写:发布说明必须由实际发布内容决定,不能从 git log 反推杜撰。
-
 ### 测试执行成本(2026-07-26 实测,P2)
 
 基线 `pnpm test`:397 个 spec 文件 / 6952 个测试。切换到 threads pool 前墙钟 73.7s,切换后 54.2s(-26%)。分阶段累计 worker 时间显示编译只占 5.9%、断言执行只占 9.7%,其余 84% 是框架空转(import 43.0% / setup 24.5% / environment 17.0%)。子路径导入已落地(见下),剩余一项仍未做:

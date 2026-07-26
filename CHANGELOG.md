@@ -7,12 +7,20 @@
 - 新增 **InputOTP** 表单组件（批次 1）：分格输入一次性验证码/PIN，支持粘贴分发、自动聚焦推进、掩码模式（`masked`/`maskChar`）、分组显示（`groups`/`separator`）、`numeric`/`alphanumeric` 字符集与自定义 `pattern`；填满触发 `complete`；提供 Vue/React 双端实现、示例、单测与 E2E，新增 `inputOtp` locale 分区（13 套语言）。
 - 新增 **TagsInput** 表单组件（批次 1）：输入创建标签，支持回车/分隔符提交、粘贴多值批量拆分、去重、最大数量、两段式退格删除、`beforeAdd` 校验/转换钩子与 `clearable` 清空，受控与非受控；chip 复用 Tag 组件；提供双端实现、示例、单测与 E2E，新增 `tagsInput` locale 分区（13 套语言）。
 - 新增 **MaskInput** 表单组件（批次 1）：模板掩码输入（`#` 数字、`a` 字母、`*` 字母数字、`!` 转义），支持自定义 `tokens` 与 `transform`、固定字符 eager 插入、IME 组合输入与 `clearable`；同时输出原始值（`v-model`/`onChange` 第一参）与格式化值（`change` payload 的 `maskedValue`）；提供双端实现、示例、单测与 E2E。
-- **文档维护入口收敛**：Roadmap 只保留当前任务与登记规则；删除已实施的 Playground 编译器提案；测试说明合并到 `tests/README.md`，移除重复且已过时的测试质量清单，并同步修正版本、SSR 与验证文档中的旧引用。
+- **格式化漂移收敛并纳入门禁**：`pnpm format` 收敛全仓库 108 个漂移文件，`pnpm format:check` 加入 `quality:static`（此前不在任何门禁里，是漂移积累的根因）。同时修掉两处生成器与 prettier 打架的根因：`packages/core/scripts/generate-tokens.mjs` 原先手写 prettier 配置子集、漏掉 `printWidth: 100`，产物停在默认 80 列；`context7.json` 原先由 `JSON.stringify(…, null, 2)` 直接写出，从不过 prettier。两者改为经 `resolveConfig` 复用 `.prettierrc.json`，`pnpm tokens:build` 与 `pnpm docs:api` 的产物现已与 `format:check` 一致且可重复生成。Next.js 自己重写的 `examples/nextjs/next-env.d.ts` 加入 `.prettierignore`。纯格式化改动，无公开 API 变化。
+
+## v2.0.19
+
+补记版本：v2.0.19 于 2026-07-17 打 tag 并发布，但当时未切分发布文档，条目一直留在「未发布」节。本节内容按 tag 区间（`v2.0.4..v2.0.19`）的实际提交归属整理，MCP 五条为当时原文。该版本虽为 patch 号，但 `@expcat/tigercat-mcp` 存在语义与响应契约变化，详见 [docs/MIGRATION.md](docs/MIGRATION.md#v2019)。
+
 - **`@expcat/tigercat-mcp` 默认远程读取 skills**：裸 `npx tigercat-mcp` 不再要求本地仓库 checkout，默认从 GitHub Pages `https://expcat.github.io/Tigercat/mcp/` 拉取 `context7.json` 与 skill references；`--root` 保留本地模式（仓库开发/离线），新增 `--base-url` 与环境变量 `TIGERCAT_MCP_BASE_URL` 用于镜像站。无参调用语义变化：不再从当前目录向上查找仓库根（内部 `findTigercatRoot` 移除），库调用 `loadSkillIndex()` / `diagnoseTigercatMcp()` 无参时同样默认远程。
+- **MCP 路由与引用响应瘦身**：`readReferenceSource` 支持按 markdown 小节抽取，`routeTigercatTask` 内联 sources 并去重，新增 `createReferencePointer` 以会话级背景文档形式返回指针而非全文；`createComponentRoute` 支持小节级引用。响应体积显著下降，但 MCP 工具返回结构随之变化（契约变化）。同时归一化保留 CJK 字符，组件路由扩充中文别名，中文查询匹配率提升。
 - **GitHub Pages 新增 `/mcp/` 路由**：随 `vue/`、`react/` 一起发布 skills 静态文件（`context7.json`、`skills/tigercat/**.md`）、部署版本 `version.json` 与说明页；示例首页新增 MCP 入口卡片。
 - **`context7.json` 新增 `skill_files` 清单**：`pnpm docs:api` 生成全部 skill markdown 的仓库相对路径，作为远程模式 allow-list 契约；`pnpm api:validate` 与磁盘双向校验。
 - **修复 MCP server 版本硬编码**：`createTigercatMcpServer` 上报的 server version 由写死的 `2.0.0-rc.1` 改为运行时读取包版本；`--doctor` 输出增加 `mode: local|remote`，远程模式报告 base URL 与部署版本。
-- **格式化漂移收敛并纳入门禁**：`pnpm format` 收敛全仓库 108 个漂移文件，`pnpm format:check` 加入 `quality:static`（此前不在任何门禁里，是漂移积累的根因）。同时修掉两处生成器与 prettier 打架的根因：`packages/core/scripts/generate-tokens.mjs` 原先手写 prettier 配置子集、漏掉 `printWidth: 100`，产物停在默认 80 列；`context7.json` 原先由 `JSON.stringify(…, null, 2)` 直接写出，从不过 prettier。两者改为经 `resolveConfig` 复用 `.prettierrc.json`，`pnpm tokens:build` 与 `pnpm docs:api` 的产物现已与 `format:check` 一致且可重复生成。Next.js 自己重写的 `examples/nextjs/next-env.d.ts` 加入 `.prettierignore`。纯格式化改动，无公开 API 变化。
+- **修复 CodeEditor 光标不可见与行高错位**：textarea 用 `text-transparent` 露出下层高亮，导致 `caret-current` 的光标同样透明、完全看不见；新增 `getCodeEditorCaretClasses(theme)` 按主题显式给出 `caret-gray-900` / `caret-gray-100`。同时把容器、textarea 与高亮层的 `leading-relaxed` 统一为固定 `leading-[1.625rem]`，消除两层文本行高不一致造成的错位。
+- **文档维护入口收敛**：Roadmap 只保留当前任务与登记规则；删除已实施的 Playground 编译器提案；测试说明合并到 `tests/README.md`，移除重复且已过时的测试质量清单，并同步修正版本、SSR 与验证文档中的旧引用。
+- **示例与 playground（仅仓库内，不影响发布包）**：playground 编译器由 esbuild-wasm 换为 sucrase，Vue SFC 编译拆到 `vue-sfc.ts`，新增 `scripts/validate-example-compile.mjs` 编译校验；补充 R31–R35 示例覆盖（ConfigProvider、Menu、Message/Notification 容器、Tour、Transfer、chart 交互与多种图表类型）以及 Pagination `simple`/`disabled`、InputGroup 尺寸与 compact 示例。
 
 ## v2.0.0
 
