@@ -7,6 +7,8 @@
 - 新增 **InputOTP** 表单组件（批次 1）：分格输入一次性验证码/PIN，支持粘贴分发、自动聚焦推进、掩码模式（`masked`/`maskChar`）、分组显示（`groups`/`separator`）、`numeric`/`alphanumeric` 字符集与自定义 `pattern`；填满触发 `complete`；提供 Vue/React 双端实现、示例、单测与 E2E，新增 `inputOtp` locale 分区（13 套语言）。
 - 新增 **TagsInput** 表单组件（批次 1）：输入创建标签，支持回车/分隔符提交、粘贴多值批量拆分、去重、最大数量、两段式退格删除、`beforeAdd` 校验/转换钩子与 `clearable` 清空，受控与非受控；chip 复用 Tag 组件；提供双端实现、示例、单测与 E2E，新增 `tagsInput` locale 分区（13 套语言）。
 - 新增 **MaskInput** 表单组件（批次 1）：模板掩码输入（`#` 数字、`a` 字母、`*` 字母数字、`!` 转义），支持自定义 `tokens` 与 `transform`、固定字符 eager 插入、IME 组合输入与 `clearable`；同时输出原始值（`v-model`/`onChange` 第一参）与格式化值（`change` payload 的 `maskedValue`）；提供双端实现、示例、单测与 E2E。
+- 新增 **ScrollArea** 布局组件（批次 2）：样式化滚动条容器，隐藏原生滚动条并渲染自绘轨道与滑块，支持 `direction`（`vertical`/`horizontal`/`both`）、`scrollbar` 显示策略（`auto`/`hover`/`always`/`hidden`）、`scrollbarSize` 粗细、`shadow` 滚动阴影、`minThumbSize` 与 `height`/`maxHeight`/`width`/`maxWidth` 尺寸；滑块支持拖拽、轨道支持点击跳转；`scroll` 事件回传滚动偏移与推导状态，ref 暴露 `scrollTo`/`scrollToTop`/`scrollToBottom`/`getViewport`/`getState`；提供双端实现、示例、单测与 E2E。
+- **同步 `.size-limit.json` 全量包预算**：`Core (full)` 125→131 kB、`Vue (full)` 284→293 kB、`React (full)` 320→328 kB。批次 1 的三个表单组件已让三个全量包超出旧预算（`pnpm size` 在本次改动前即为红），本次连同 ScrollArea 的增量一并按实测重设，并同步 `scripts/check-release-readiness.mjs` 的期望值。
 - **格式化漂移收敛并纳入门禁**：`pnpm format` 收敛全仓库 108 个漂移文件，`pnpm format:check` 加入 `quality:static`（此前不在任何门禁里，是漂移积累的根因）。同时修掉两处生成器与 prettier 打架的根因：`packages/core/scripts/generate-tokens.mjs` 原先手写 prettier 配置子集、漏掉 `printWidth: 100`，产物停在默认 80 列；`context7.json` 原先由 `JSON.stringify(…, null, 2)` 直接写出，从不过 prettier。两者改为经 `resolveConfig` 复用 `.prettierrc.json`，`pnpm tokens:build` 与 `pnpm docs:api` 的产物现已与 `format:check` 一致且可重复生成。Next.js 自己重写的 `examples/nextjs/next-env.d.ts` 加入 `.prettierignore`。纯格式化改动，无公开 API 变化。
 
 ## v2.0.19

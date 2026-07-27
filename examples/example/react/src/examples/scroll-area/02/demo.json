@@ -1,0 +1,12 @@
+{
+  "id": "scroll-area-02",
+  "title": "双向滚动与滚动条样式",
+  "description": "direction 为 both 时同时接管横纵滚动条;scrollbar/scrollbarSize 控制显示时机与粗细。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 240,
+    "maxHeight": 480
+  }
+}

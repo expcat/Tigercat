@@ -72,6 +72,7 @@ export const CATEGORIES = {
     'layout',
     'list',
     'resizable',
+    'scroll-area',
     'skeleton',
     'space',
     'splitter'
@@ -340,6 +341,8 @@ export const COMPONENT_ROUTE_ALIASES = {
   容器: ['Container'],
   分割线: ['Divider'],
   分割面板: ['Splitter'],
+  滚动区域: ['ScrollArea'],
+  滚动容器: ['ScrollArea'],
   间距: ['Space'],
   卡片: ['Card'],
   统计数值: ['Statistic'],

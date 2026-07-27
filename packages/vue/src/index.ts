@@ -312,6 +312,10 @@ export type { VueSplitterProps } from './components/Splitter'
 export { Resizable } from './components/Resizable'
 export type { VueResizableProps } from './components/Resizable'
 
+// ScrollArea (v2.1.0+)
+export { ScrollArea } from './components/ScrollArea'
+export type { VueScrollAreaProps } from './components/ScrollArea'
+
 // CodeEditor (v0.8.0+)
 export { CodeEditor } from './components/CodeEditor'
 export type { VueCodeEditorProps } from './components/CodeEditor'

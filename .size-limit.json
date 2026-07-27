@@ -2,19 +2,19 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "125 kB",
+    "limit": "131 kB",
     "gzip": true
   },
   {
     "name": "Vue (full)",
     "path": "packages/vue/dist/index.mjs",
-    "limit": "284 kB",
+    "limit": "293 kB",
     "gzip": true
   },
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "320 kB",
+    "limit": "328 kB",
     "gzip": true
   },
   {
@@ -129,6 +129,18 @@
     "name": "React MaskInput subpath",
     "path": "packages/react/dist/components/MaskInput.mjs",
     "limit": "22 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue ScrollArea subpath",
+    "path": "packages/vue/dist/components/ScrollArea.mjs",
+    "limit": "28 kB",
+    "gzip": true
+  },
+  {
+    "name": "React ScrollArea subpath",
+    "path": "packages/react/dist/components/ScrollArea.mjs",
+    "limit": "21 kB",
     "gzip": true
   },
   {

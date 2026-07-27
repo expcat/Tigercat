@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 152,
+  "component_count": 153,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -138,6 +138,8 @@
     "容器": ["Container"],
     "分割线": ["Divider"],
     "分割面板": ["Splitter"],
+    "滚动区域": ["ScrollArea"],
+    "滚动容器": ["ScrollArea"],
     "间距": ["Space"],
     "卡片": ["Card"],
     "统计数值": ["Statistic"],
@@ -457,6 +459,7 @@
         "List",
         "Resizable",
         "Row",
+        "ScrollArea",
         "Sidebar",
         "Skeleton",
         "Space",
@@ -2997,6 +3000,26 @@
       "typeSource": "packages/core/src/types/grid.ts",
       "sourceFiles": ["packages/core/src/types/grid.ts"],
       "propsInterfaces": ["RowProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ScrollArea": {
+      "name": "ScrollArea",
+      "aliases": ["滚动区域", "滚动容器"],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./ScrollArea",
+      "packageTarget": "ScrollArea",
+      "typeSource": "packages/core/src/types/scroll-area.ts",
+      "sourceFiles": ["packages/core/src/types/scroll-area.ts"],
+      "propsInterfaces": ["ScrollAreaProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

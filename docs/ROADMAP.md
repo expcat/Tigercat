@@ -68,7 +68,7 @@ source: current repository state + competitor benchmark (2026-07-19)
 
 ### 批次 2 滚动与布局(P0)
 
-- [ ] ScrollArea:样式化滚动条、横/纵向、滚动阴影、暴露 scrollTo;为组件内部滚动提供统一收口。
+- [x] ScrollArea:样式化滚动条、横/纵向、滚动阴影、暴露 scrollTo;为组件内部滚动提供统一收口。
 - [ ] Masonry:列数/间距响应式、动态插入重排。
 - [ ] AspectRatio:宽高比容器。
 - 验证:`pnpm test:group:layout`。

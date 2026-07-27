@@ -7,7 +7,7 @@ description: Compact generated Tigercat Layout props reference
 
 # Layout Props
 
-布局容器、栅格、列表、分割和尺寸控制组件。 共 16 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+布局容器、栅格、列表、分割和尺寸控制组件。 共 17 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Card
 
@@ -128,6 +128,16 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 | `gutter?`  | `GutterSize` | `0`       | Grid gutter, could be horizontal or [horizontal, vertical] |
 | `align?`   | `Align`      | `'top'`   | Vertical alignment of flex layout                          |
 | `justify?` | `Justify`    | `'start'` | Horizontal arrangement of flex layout                      |
+
+## ScrollArea
+
+`packages/core/src/types/scroll-area.ts` · `ScrollAreaProps` · 3/12 props
+
+| Prop             | Type                            | Default      | Notes                                |
+| ---------------- | ------------------------------- | ------------ | ------------------------------------ |
+| `direction?`     | `ScrollAreaDirection`           | `'vertical'` | Axes that may scroll                 |
+| `scrollbar?`     | `ScrollAreaScrollbarVisibility` | `'auto'`     | Custom scrollbar visibility strategy |
+| `scrollbarSize?` | `ScrollAreaScrollbarSize`       | `'md'`       | Custom scrollbar thickness           |
 
 ## Sidebar
 

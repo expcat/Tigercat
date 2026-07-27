@@ -91,6 +91,7 @@ description: Compact generated route map for Tigercat core type files
 | layout.ts       | LayoutProps, HeaderProps, SidebarProps, ContentProps, FooterProps |
 | list.ts         | ListProps                                                         |
 | resizable.ts    | ResizableProps                                                    |
+| scroll-area.ts  | ScrollAreaProps                                                   |
 | skeleton.ts     | SkeletonProps                                                     |
 | space.ts        | SpaceProps                                                        |
 | splitter.ts     | SplitterProps                                                     |

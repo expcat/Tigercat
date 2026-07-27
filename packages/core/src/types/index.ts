@@ -45,6 +45,7 @@ export * from './divider'
 export * from './layout'
 export * from './grid'
 export * from './container'
+export * from './scroll-area'
 
 // Data display components
 export * from './table'

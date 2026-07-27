@@ -81,6 +81,7 @@ const router = createRouter({
         { path: 'list', component: () => import('./pages/ListDemo.vue') },
         { path: 'skeleton', component: () => import('./pages/SkeletonDemo.vue') },
         { path: 'splitter', component: () => import('./pages/SplitterDemo.vue') },
+        { path: 'scroll-area', component: () => import('./pages/ScrollAreaDemo.vue') },
         { path: 'print-layout', component: () => import('./pages/PrintLayoutDemo.vue') },
         // Data Display
         { path: 'table', component: () => import('./pages/TableDemo.vue') },

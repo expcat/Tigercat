@@ -1,0 +1,12 @@
+{
+  "id": "scroll-area-03",
+  "title": "命令式滚动与滚动进度",
+  "description": "通过 ref 调用 scrollTo / scrollToTop / scrollToBottom;scroll 事件回传滚动进度。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 300,
+    "maxHeight": 520
+  }
+}

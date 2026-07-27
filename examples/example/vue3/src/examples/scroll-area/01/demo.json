@@ -1,0 +1,12 @@
+{
+  "id": "scroll-area-01",
+  "title": "纵向滚动与滚动阴影",
+  "description": "样式化滚动条替代原生滚动条;shadow 在有未读内容的一侧渲染渐变阴影。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 240,
+    "maxHeight": 480
+  }
+}

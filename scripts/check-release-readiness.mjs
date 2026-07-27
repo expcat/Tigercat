@@ -28,9 +28,9 @@ const sourceVersionFiles = {
 
 const expectedRepositoryUrl = 'https://github.com/expcat/Tigercat'
 const expectedSizeLimitEntries = [
-  ['Core (full)', 'packages/core/dist/index.js', '125 kB'],
-  ['Vue (full)', 'packages/vue/dist/index.mjs', '284 kB'],
-  ['React (full)', 'packages/react/dist/index.mjs', '320 kB'],
+  ['Core (full)', 'packages/core/dist/index.js', '131 kB'],
+  ['Vue (full)', 'packages/vue/dist/index.mjs', '293 kB'],
+  ['React (full)', 'packages/react/dist/index.mjs', '328 kB'],
   ['Vue Button subpath', 'packages/vue/dist/components/Button.mjs', '22 kB'],
   ['React Button subpath', 'packages/react/dist/components/Button.mjs', '20 kB'],
   ['Vue Menu subpath', 'packages/vue/dist/components/Menu.mjs', '41 kB'],
@@ -49,6 +49,8 @@ const expectedSizeLimitEntries = [
   ['React TagsInput subpath', 'packages/react/dist/components/TagsInput.mjs', '24 kB'],
   ['Vue MaskInput subpath', 'packages/vue/dist/components/MaskInput.mjs', '30 kB'],
   ['React MaskInput subpath', 'packages/react/dist/components/MaskInput.mjs', '22 kB'],
+  ['Vue ScrollArea subpath', 'packages/vue/dist/components/ScrollArea.mjs', '28 kB'],
+  ['React ScrollArea subpath', 'packages/react/dist/components/ScrollArea.mjs', '21 kB'],
   ['Core tailwind/modern subpath', 'packages/core/dist/tailwind/modern.js', '3 kB'],
   ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js', '4 kB'],
   ['Core icons (common) subpath', 'packages/core/dist/icons/common.js', '1 kB']

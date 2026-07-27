@@ -63,6 +63,7 @@ const DescriptionsDemo = lazy(() => import('./pages/DescriptionsDemo'))
 const ListDemo = lazy(() => import('./pages/ListDemo'))
 const SkeletonDemo = lazy(() => import('./pages/SkeletonDemo'))
 const SplitterDemo = lazy(() => import('./pages/SplitterDemo'))
+const ScrollAreaDemo = lazy(() => import('./pages/ScrollAreaDemo'))
 const PrintLayoutDemo = lazy(() => import('./pages/PrintLayoutDemo'))
 
 // Data Display
@@ -209,6 +210,7 @@ const router = createHashRouter([
       { path: 'list', element: <ListDemo /> },
       { path: 'skeleton', element: <SkeletonDemo /> },
       { path: 'splitter', element: <SplitterDemo /> },
+      { path: 'scroll-area', element: <ScrollAreaDemo /> },
       { path: 'print-layout', element: <PrintLayoutDemo /> },
       // Data Display
       { path: 'table', element: <TableDemo /> },

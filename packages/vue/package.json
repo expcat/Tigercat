@@ -605,6 +605,11 @@
       "import": "./dist/components/ScatterChart.mjs",
       "default": "./dist/components/ScatterChart.mjs"
     },
+    "./ScrollArea": {
+      "types": "./dist/components/ScrollArea.d.mts",
+      "import": "./dist/components/ScrollArea.mjs",
+      "default": "./dist/components/ScrollArea.mjs"
+    },
     "./ScrollSpy": {
       "types": "./dist/components/ScrollSpy.d.mts",
       "import": "./dist/components/ScrollSpy.mjs",

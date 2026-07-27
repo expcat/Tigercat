@@ -205,6 +205,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'Skeleton 骨架屏', 'en-US': 'Skeleton' }
       },
       {
+        key: 'scroll-area',
+        path: '/scroll-area',
+        label: { 'zh-CN': 'ScrollArea 滚动区域', 'en-US': 'ScrollArea' }
+      },
+      {
         key: 'print-layout',
         path: '/print-layout',
         label: { 'zh-CN': 'PrintLayout 打印', 'en-US': 'PrintLayout' }

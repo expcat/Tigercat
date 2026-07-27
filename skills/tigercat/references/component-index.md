@@ -144,6 +144,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | List                  | Layout     | `layout`     | list.ts                                             | ./List                  |
 | Resizable             | Layout     | `layout`     | resizable.ts                                        | ./Resizable             |
 | Row                   | Layout     | `layout`     | grid.ts                                             | ./Row                   |
+| ScrollArea            | Layout     | `layout`     | scroll-area.ts                                      | ./ScrollArea            |
 | Sidebar               | Layout     | `layout`     | layout.ts                                           | ./Sidebar               |
 | Skeleton              | Layout     | `layout`     | skeleton.ts                                         | ./Skeleton              |
 | Space                 | Layout     | `layout`     | space.ts                                            | ./Space                 |

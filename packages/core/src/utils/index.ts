@@ -151,6 +151,9 @@ export * from './splitter-utils'
 // Resizable utilities (v0.8.0+)
 export * from './resizable-utils'
 
+// ScrollArea utilities (v2.1.0+)
+export * from './scroll-area-utils'
+
 // CodeEditor utilities (v0.8.0+)
 export * from './code-editor-utils'
 
