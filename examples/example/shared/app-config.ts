@@ -210,6 +210,16 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'ScrollArea 滚动区域', 'en-US': 'ScrollArea' }
       },
       {
+        key: 'masonry',
+        path: '/masonry',
+        label: { 'zh-CN': 'Masonry 瀑布流', 'en-US': 'Masonry' }
+      },
+      {
+        key: 'aspect-ratio',
+        path: '/aspect-ratio',
+        label: { 'zh-CN': 'AspectRatio 宽高比容器', 'en-US': 'AspectRatio' }
+      },
+      {
         key: 'print-layout',
         path: '/print-layout',
         label: { 'zh-CN': 'PrintLayout 打印', 'en-US': 'PrintLayout' }

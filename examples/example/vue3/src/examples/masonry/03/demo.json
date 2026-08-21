@@ -1,0 +1,12 @@
+{
+  "id": "masonry-03",
+  "title": "动态插入与重排",
+  "description": "新增或移除卡片后组件自动测量并重新分配到最短列,无需手动干预。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 240,
+    "maxHeight": 480
+  }
+}

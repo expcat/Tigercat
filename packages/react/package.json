@@ -59,6 +59,11 @@
       "import": "./dist/components/AreaChart.mjs",
       "default": "./dist/components/AreaChart.mjs"
     },
+    "./AspectRatio": {
+      "types": "./dist/components/AspectRatio.d.mts",
+      "import": "./dist/components/AspectRatio.mjs",
+      "default": "./dist/components/AspectRatio.mjs"
+    },
     "./AutoComplete": {
       "types": "./dist/components/AutoComplete.d.mts",
       "import": "./dist/components/AutoComplete.mjs",
@@ -463,6 +468,11 @@
       "types": "./dist/components/MaskInput.d.mts",
       "import": "./dist/components/MaskInput.mjs",
       "default": "./dist/components/MaskInput.mjs"
+    },
+    "./Masonry": {
+      "types": "./dist/components/Masonry.d.mts",
+      "import": "./dist/components/Masonry.mjs",
+      "default": "./dist/components/Masonry.mjs"
     },
     "./Mentions": {
       "types": "./dist/components/Mentions.d.mts",

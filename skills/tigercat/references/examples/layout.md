@@ -16,6 +16,6 @@ description: Compact Tigercat Layout Vue and React usage routes
 | Card      | -    | `padding`（`boolean \| string`）可用于覆写基于内置 `size` 计算的内边距。设为 `false` 可移除内边距，传入字符串（如 `"p-8"`）可注入自定义 Tailwind 样式类。                                                                                                                                                                                                                                                                                               |
 | List      | -    | 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。 |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Card, Carousel, Col, Container, Content, Descriptions, Footer, Header, Layout, List, Resizable, Row, ScrollArea, Sidebar, Skeleton, Space, Splitter.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：AspectRatio, Card, Carousel, Col, Container, Content, Descriptions, Footer, Header, Layout, List, Masonry, Resizable, Row, ScrollArea, Sidebar, Skeleton, Space, Splitter.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

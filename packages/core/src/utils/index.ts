@@ -217,3 +217,9 @@ export * from './image-viewer-utils'
 // Composite shared helpers (FormWizard / CropUpload navigation + file pipeline)
 export * from './form-wizard-utils'
 export * from './crop-upload-utils'
+
+// AspectRatio utilities (v2.1.0+)
+export * from './aspect-ratio-utils'
+
+// Masonry utilities (v2.1.0+)
+export * from './masonry-utils'

@@ -132,6 +132,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Transfer              | Form       | `form`       | transfer.ts                                         | ./Transfer              |
 | TreeSelect            | Form       | `form`       | tree-select.ts                                      | ./TreeSelect            |
 | Upload                | Form       | `form`       | upload.ts                                           | ./Upload                |
+| AspectRatio           | Layout     | `layout`     | aspect-ratio.ts                                     | ./AspectRatio           |
 | Card                  | Layout     | `layout`     | card.ts                                             | ./Card                  |
 | Carousel              | Layout     | `layout`     | carousel.ts                                         | ./Carousel              |
 | Col                   | Layout     | `layout`     | grid.ts                                             | ./Col                   |
@@ -142,6 +143,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Header                | Layout     | `layout`     | layout.ts                                           | ./Header                |
 | Layout                | Layout     | `layout`     | layout.ts                                           | ./Layout                |
 | List                  | Layout     | `layout`     | list.ts                                             | ./List                  |
+| Masonry               | Layout     | `layout`     | masonry.ts                                          | ./Masonry               |
 | Resizable             | Layout     | `layout`     | resizable.ts                                        | ./Resizable             |
 | Row                   | Layout     | `layout`     | grid.ts                                             | ./Row                   |
 | ScrollArea            | Layout     | `layout`     | scroll-area.ts                                      | ./ScrollArea            |

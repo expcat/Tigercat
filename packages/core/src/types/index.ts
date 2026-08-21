@@ -46,6 +46,8 @@ export * from './layout'
 export * from './grid'
 export * from './container'
 export * from './scroll-area'
+export * from './aspect-ratio'
+export * from './masonry'
 
 // Data display components
 export * from './table'

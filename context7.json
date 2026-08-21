@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 153,
+  "component_count": 155,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -138,8 +138,12 @@
     "容器": ["Container"],
     "分割线": ["Divider"],
     "分割面板": ["Splitter"],
+    "宽高比": ["AspectRatio"],
+    "宽高比容器": ["AspectRatio"],
     "滚动区域": ["ScrollArea"],
     "滚动容器": ["ScrollArea"],
+    "瀑布流": ["Masonry"],
+    "瀑布流布局": ["Masonry"],
     "间距": ["Space"],
     "卡片": ["Card"],
     "统计数值": ["Statistic"],
@@ -447,6 +451,7 @@
       "vue": "skills/tigercat/references/vue/index.md",
       "react": "skills/tigercat/references/react/index.md",
       "components": [
+        "AspectRatio",
         "Card",
         "Carousel",
         "Col",
@@ -457,6 +462,7 @@
         "Header",
         "Layout",
         "List",
+        "Masonry",
         "Resizable",
         "Row",
         "ScrollArea",
@@ -2769,6 +2775,26 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
+    "AspectRatio": {
+      "name": "AspectRatio",
+      "aliases": ["宽高比", "宽高比容器"],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./AspectRatio",
+      "packageTarget": "AspectRatio",
+      "typeSource": "packages/core/src/types/aspect-ratio.ts",
+      "sourceFiles": ["packages/core/src/types/aspect-ratio.ts"],
+      "propsInterfaces": ["AspectRatioProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
     "Card": {
       "name": "Card",
       "aliases": ["卡片"],
@@ -2960,6 +2986,26 @@
       "typeSource": "packages/core/src/types/list.ts",
       "sourceFiles": ["packages/core/src/types/list.ts"],
       "propsInterfaces": ["ListProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/layout.md",
+        "examples": "skills/tigercat/references/examples/layout.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Masonry": {
+      "name": "Masonry",
+      "aliases": ["瀑布流", "瀑布流布局"],
+      "category": "Layout",
+      "slug": "layout",
+      "testGroup": "layout",
+      "packageSubpath": "./Masonry",
+      "packageTarget": "Masonry",
+      "typeSource": "packages/core/src/types/masonry.ts",
+      "sourceFiles": ["packages/core/src/types/masonry.ts"],
+      "propsInterfaces": ["MasonryProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

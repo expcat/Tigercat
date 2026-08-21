@@ -7,7 +7,17 @@ description: Compact generated Tigercat Layout props reference
 
 # Layout Props
 
-布局容器、栅格、列表、分割和尺寸控制组件。 共 17 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+布局容器、栅格、列表、分割和尺寸控制组件。 共 19 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+
+## AspectRatio
+
+`packages/core/src/types/aspect-ratio.ts` · `AspectRatioProps`
+
+| Prop                | Type               | Default  | Notes                                                                   |
+| ------------------- | ------------------ | -------- | ----------------------------------------------------------------------- |
+| `ratio?`            | `AspectRatioValue` | `'16/9'` | Width-to-height ratio                                                   |
+| `className?`        | `string`           | `-`      | Additional CSS class name for the root element                          |
+| `contentClassName?` | `string`           | `-`      | Additional CSS class name for the absolutely positioned content wrapper |
 
 ## Card
 
@@ -108,6 +118,16 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 | `size?`     | `ComponentSize`   | `'md'`      | List size         |
 | `bordered?` | `ListBorderStyle` | `'divided'` | List border style |
 | `loading?`  | `boolean`         | `false`     | Loading state     |
+
+## Masonry
+
+`packages/core/src/types/masonry.ts` · `MasonryProps` · 3/5 props
+
+| Prop         | Type                     | Default | Notes                                                                            |
+| ------------ | ------------------------ | ------- | -------------------------------------------------------------------------------- |
+| `columns?`   | `MasonryResponsiveValue` | `3`     | Column count. Pass a breakpoint map for responsive columns.                      |
+| `gap?`       | `MasonryResponsiveValue` | `16`    | Gap between columns and items in px. Pass a breakpoint map for a responsive gap. |
+| `className?` | `string`                 | `-`     | Additional CSS class name for the root element                                   |
 
 ## Resizable
 

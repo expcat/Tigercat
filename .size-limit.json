@@ -144,6 +144,30 @@
     "gzip": true
   },
   {
+    "name": "Vue Masonry subpath",
+    "path": "packages/vue/dist/components/Masonry.mjs",
+    "limit": "27 kB",
+    "gzip": true
+  },
+  {
+    "name": "React Masonry subpath",
+    "path": "packages/react/dist/components/Masonry.mjs",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue AspectRatio subpath",
+    "path": "packages/vue/dist/components/AspectRatio.mjs",
+    "limit": "19 kB",
+    "gzip": true
+  },
+  {
+    "name": "React AspectRatio subpath",
+    "path": "packages/react/dist/components/AspectRatio.mjs",
+    "limit": "19 kB",
+    "gzip": true
+  },
+  {
     "name": "Core tailwind/modern subpath",
     "path": "packages/core/dist/tailwind/modern.js",
     "limit": "3 kB",

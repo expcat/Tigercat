@@ -1,0 +1,12 @@
+{
+  "id": "aspect-ratio-01",
+  "title": "基础宽高比",
+  "description": "ratio 省略时默认 16/9；传 '4/3' 等分数字符串可切换常用比例。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 200,
+    "maxHeight": 480
+  }
+}

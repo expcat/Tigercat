@@ -89,6 +89,12 @@
       "AriaLiveLevel",
       "arSA",
       "arSADatePickerLocale",
+      "ASPECT_RATIO_DEFAULT",
+      "aspectRatioContentClasses",
+      "AspectRatioProps",
+      "aspectRatioRootClasses",
+      "AspectRatioStyle",
+      "AspectRatioValue",
       "autoCompleteBaseClasses",
       "autoCompleteDropdownClasses",
       "autoCompleteEmptyStateClasses",
@@ -359,6 +365,8 @@
       "clampDimensions",
       "clampImageAnnotationPoint",
       "clampImageAnnotationUnit",
+      "clampMasonryColumnCount",
+      "clampMasonryGap",
       "clampPaneSize",
       "clampPercentage",
       "clampScale",
@@ -472,6 +480,7 @@
       "computeGanttLayout",
       "computeGaugeTicks",
       "computeHeatmapCells",
+      "computeMasonryColumnHeights",
       "computeOrgChartLayout",
       "computePieHoverOffset",
       "computePieLabelLine",
@@ -717,6 +726,7 @@
       "descriptionsWrapperClasses",
       "designTokens",
       "devWarn",
+      "distributeMasonryItems",
       "distributeOtpPaste",
       "DividerLineStyle",
       "DividerOrientation",
@@ -1042,6 +1052,9 @@
       "getAnchorWrapperClasses",
       "getAreaGradientPrefix",
       "getArrowStyles",
+      "getAspectRatioContentClasses",
+      "getAspectRatioRootClasses",
+      "getAspectRatioStyle",
       "getAutoCompleteInputClasses",
       "getAutoCompleteOptionClasses",
       "getAutoExpandKeys",
@@ -1294,6 +1307,11 @@
       "getMarkdownToolbarButtonClasses",
       "getMarkdownToolbarButtons",
       "getMaskCaretPosition",
+      "getMasonryColumnClasses",
+      "getMasonryColumnStyle",
+      "getMasonryGapStyle",
+      "getMasonryItemClasses",
+      "getMasonryRootClasses",
       "getMentionsInputClasses",
       "getMentionsOptionClasses",
       "getMenuButtons",
@@ -1901,6 +1919,15 @@
       "MaskInputProps",
       "MaskSpecEntry",
       "MaskToken",
+      "MASONRY_DEFAULT_COLUMNS",
+      "MASONRY_DEFAULT_GAP",
+      "masonryColumnClasses",
+      "MasonryInstance",
+      "masonryItemClasses",
+      "MasonryLayoutDetail",
+      "MasonryProps",
+      "MasonryResponsiveValue",
+      "masonryRootClasses",
       "matchesHotkey",
       "matchesMenuSearch",
       "measureTableResizeSnapshot",
@@ -1976,6 +2003,7 @@
       "MODERN_OVERRIDE_TOKENS_LIGHT",
       "MODERN_REDUCED_MOTION_TOKENS",
       "modernTheme",
+      "moduloDistributeMasonryItems",
       "MONTHS",
       "moonIcon",
       "MOTION_DURATION_TOKEN_FALLBACKS",
@@ -2107,6 +2135,7 @@
       "PanResult",
       "PanState",
       "paperclipIcon",
+      "parseAspectRatio",
       "parseColorInput",
       "parseCountdownTimestamp",
       "parseCronFieldControl",
@@ -2242,6 +2271,7 @@
       "RateProps",
       "RateSize",
       "readFileAsDataUrl",
+      "readMasonryItemHeight",
       "readScrollAreaMetrics",
       "redoFormHistory",
       "registerEscapeDismiss",
@@ -2302,6 +2332,8 @@
       "resolveFormFieldConditionState",
       "resolveHeatmapRenderMode",
       "resolveLocaleText",
+      "resolveMasonryColumnCount",
+      "resolveMasonryGap",
       "resolveMotionDuration",
       "resolveMotionEasing",
       "resolveMultiSeriesTooltipContent",
@@ -3205,6 +3237,10 @@
         "yTicks",
         "yTickValues"
       ]
+    },
+    "AspectRatioProps": {
+      "extends": [],
+      "props": ["className", "contentClassName", "ratio"]
     },
     "AutoCompleteProps": {
       "extends": [],
@@ -4280,6 +4316,10 @@
         "value"
       ]
     },
+    "MasonryProps": {
+      "extends": [],
+      "props": ["className", "columnClassName", "columns", "gap", "itemClassName"]
+    },
     "MentionsProps": {
       "extends": [],
       "props": ["className", "disabled", "options", "placeholder", "prefix", "rows", "size"]
@@ -5319,6 +5359,7 @@
       "Anchor",
       "AnchorLink",
       "AreaChart",
+      "AspectRatio",
       "AutoComplete",
       "Avatar",
       "AvatarGroup",
@@ -5400,6 +5441,7 @@
       "Loading",
       "MarkdownEditor",
       "MaskInput",
+      "Masonry",
       "Mentions",
       "Menu",
       "MenuItem",
@@ -5497,6 +5539,11 @@
         "component": "AreaChart",
         "subpath": "./AreaChart",
         "target": "AreaChart"
+      },
+      {
+        "component": "AspectRatio",
+        "subpath": "./AspectRatio",
+        "target": "AspectRatio"
       },
       {
         "component": "AutoComplete",
@@ -5902,6 +5949,11 @@
         "component": "MaskInput",
         "subpath": "./MaskInput",
         "target": "MaskInput"
+      },
+      {
+        "component": "Masonry",
+        "subpath": "./Masonry",
+        "target": "Masonry"
       },
       {
         "component": "Mentions",
@@ -6248,6 +6300,8 @@
       "AnchorProps",
       "AreaChart",
       "AreaChartProps",
+      "AspectRatio",
+      "AspectRatioProps",
       "AutoComplete",
       "AutoCompleteProps",
       "Avatar",
@@ -6420,6 +6474,8 @@
       "MarkdownEditorProps",
       "MaskInput",
       "MaskInputProps",
+      "Masonry",
+      "MasonryProps",
       "Mentions",
       "MentionsProps",
       "Menu",
@@ -6591,6 +6647,7 @@
       "Anchor",
       "AnchorLink",
       "AreaChart",
+      "AspectRatio",
       "AutoComplete",
       "Avatar",
       "AvatarGroup",
@@ -6672,6 +6729,7 @@
       "Loading",
       "MarkdownEditor",
       "MaskInput",
+      "Masonry",
       "Mentions",
       "Menu",
       "MenuItem",
@@ -6769,6 +6827,11 @@
         "component": "AreaChart",
         "subpath": "./AreaChart",
         "target": "AreaChart"
+      },
+      {
+        "component": "AspectRatio",
+        "subpath": "./AspectRatio",
+        "target": "AspectRatio"
       },
       {
         "component": "AutoComplete",
@@ -7176,6 +7239,11 @@
         "target": "MaskInput"
       },
       {
+        "component": "Masonry",
+        "subpath": "./Masonry",
+        "target": "Masonry"
+      },
+      {
         "component": "Mentions",
         "subpath": "./Mentions",
         "target": "Mentions"
@@ -7514,6 +7582,7 @@
       "AnchorContext",
       "AnchorLink",
       "AreaChart",
+      "AspectRatio",
       "AutoComplete",
       "Avatar",
       "AvatarGroup",
@@ -7598,6 +7667,7 @@
       "Loading",
       "MarkdownEditor",
       "MaskInput",
+      "Masonry",
       "Mentions",
       "Menu",
       "MenuItem",
@@ -7683,6 +7753,7 @@
       "VueAnchorLinkProps",
       "VueAnchorProps",
       "VueAreaChartProps",
+      "VueAspectRatioProps",
       "VueAutoCompleteProps",
       "VueAvatarGroupProps",
       "VueAvatarProps",
@@ -7765,6 +7836,7 @@
       "VueLoadingProps",
       "VueMarkdownEditorProps",
       "VueMaskInputProps",
+      "VueMasonryProps",
       "VueMentionsProps",
       "VueMenuItemGroupProps",
       "VueMenuItemProps",

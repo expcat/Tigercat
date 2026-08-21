@@ -51,6 +51,10 @@ const expectedSizeLimitEntries = [
   ['React MaskInput subpath', 'packages/react/dist/components/MaskInput.mjs', '22 kB'],
   ['Vue ScrollArea subpath', 'packages/vue/dist/components/ScrollArea.mjs', '28 kB'],
   ['React ScrollArea subpath', 'packages/react/dist/components/ScrollArea.mjs', '21 kB'],
+  ['Vue Masonry subpath', 'packages/vue/dist/components/Masonry.mjs', '27 kB'],
+  ['React Masonry subpath', 'packages/react/dist/components/Masonry.mjs', '20 kB'],
+  ['Vue AspectRatio subpath', 'packages/vue/dist/components/AspectRatio.mjs', '19 kB'],
+  ['React AspectRatio subpath', 'packages/react/dist/components/AspectRatio.mjs', '19 kB'],
   ['Core tailwind/modern subpath', 'packages/core/dist/tailwind/modern.js', '3 kB'],
   ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js', '4 kB'],
   ['Core icons (common) subpath', 'packages/core/dist/icons/common.js', '1 kB']

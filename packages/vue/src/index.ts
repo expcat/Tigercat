@@ -316,6 +316,10 @@ export type { VueResizableProps } from './components/Resizable'
 export { ScrollArea } from './components/ScrollArea'
 export type { VueScrollAreaProps } from './components/ScrollArea'
 
+// Masonry (v2.1.0+)
+export { Masonry } from './components/Masonry'
+export type { VueMasonryProps } from './components/Masonry'
+
 // CodeEditor (v0.8.0+)
 export { CodeEditor } from './components/CodeEditor'
 export type { VueCodeEditorProps } from './components/CodeEditor'
@@ -361,5 +365,9 @@ export type { VuePrintLayoutProps } from './components/PrintLayout'
 // ImageViewer (v0.9.0+)
 export { ImageViewer } from './components/ImageViewer'
 export type { VueImageViewerProps } from './components/ImageViewer'
+
+// AspectRatio (v2.1.0+)
+export { AspectRatio } from './components/AspectRatio'
+export type { VueAspectRatioProps } from './components/AspectRatio'
 
 export const version = '2.0.19'

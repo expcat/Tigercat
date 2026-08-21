@@ -1,0 +1,12 @@
+{
+  "id": "masonry-01",
+  "title": "基础瀑布流",
+  "description": "高度不一的卡片被贪心装入当前最短的列,默认 3 列与 16px 间距。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 240,
+    "maxHeight": 480
+  }
+}

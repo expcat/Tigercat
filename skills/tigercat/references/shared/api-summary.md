@@ -83,12 +83,14 @@ description: Compact generated route map for Tigercat core type files
 
 | Type File       | Props Interfaces                                                  |
 | --------------- | ----------------------------------------------------------------- |
+| aspect-ratio.ts | AspectRatioProps                                                  |
 | card.ts         | CardProps                                                         |
 | carousel.ts     | CarouselProps                                                     |
 | container.ts    | ContainerProps                                                    |
 | descriptions.ts | DescriptionsProps                                                 |
 | grid.ts         | RowProps, ColProps                                                |
 | layout.ts       | LayoutProps, HeaderProps, SidebarProps, ContentProps, FooterProps |
+| masonry.ts      | MasonryProps                                                      |
 | list.ts         | ListProps                                                         |
 | resizable.ts    | ResizableProps                                                    |
 | scroll-area.ts  | ScrollAreaProps                                                   |

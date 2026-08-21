@@ -1,0 +1,12 @@
+{
+  "id": "aspect-ratio-03",
+  "title": "动态切换与覆盖层",
+  "description": "运行时切换比例，底部信息条等覆盖层内容始终铺满比例框。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 200,
+    "maxHeight": 480
+  }
+}

@@ -349,6 +349,10 @@ export type { ResizableProps } from './components/Resizable'
 export { ScrollArea } from './components/ScrollArea'
 export type { ScrollAreaProps } from './components/ScrollArea'
 
+// Masonry (v2.1.0+)
+export { Masonry } from './components/Masonry'
+export type { MasonryProps } from './components/Masonry'
+
 // CodeEditor (v0.8.0+)
 export { CodeEditor } from './components/CodeEditor'
 export type { CodeEditorProps } from './components/CodeEditor'
@@ -394,5 +398,9 @@ export type { PrintLayoutProps, PrintPageBreakProps } from './components/PrintLa
 // ImageViewer (v0.9.0+)
 export { ImageViewer } from './components/ImageViewer'
 export type { ImageViewerProps } from './components/ImageViewer'
+
+// AspectRatio (v2.1.0+)
+export { AspectRatio } from './components/AspectRatio'
+export type { AspectRatioProps } from './components/AspectRatio'
 
 export const version = '2.0.19'
