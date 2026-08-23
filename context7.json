@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 170,
+  "component_count": 172,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -137,6 +137,9 @@
     "全局提示": ["Message"],
     "消息": ["Message"],
     "加载中": ["Loading"],
+    "顶部加载条": ["LoadingBar"],
+    "顶部加载": ["LoadingBar"],
+    "加载条": ["LoadingBar"],
     "进度条": ["Progress"],
     "结果页": ["Result"],
     "面包屑": ["Breadcrumb"],
@@ -231,6 +234,17 @@
         "skills/tigercat/references/examples/feedback.md",
         "skills/tigercat/references/shared/patterns/common.md"
       ]
+    },
+    "LoadingBar": {
+      "name": "LoadingBar",
+      "title": "Imperative loading bar API",
+      "topic": "commandApis",
+      "references": [
+        "skills/tigercat/SKILL.md",
+        "skills/tigercat/references/shared/props/feedback.md",
+        "skills/tigercat/references/examples/feedback.md",
+        "skills/tigercat/references/shared/patterns/common.md"
+      ]
     }
   },
   "topics": {
@@ -292,7 +306,17 @@
         "skills/tigercat/references/examples/feedback.md",
         "skills/tigercat/references/shared/patterns/common.md"
       ],
-      "keywords": ["notification", "message", "toast", "imperative", "commandapi", "通知", "消息"]
+      "keywords": [
+        "notification",
+        "message",
+        "toast",
+        "imperative",
+        "commandapi",
+        "loadingbar",
+        "通知",
+        "消息",
+        "加载条"
+      ]
     }
   },
   "component_index": {
@@ -419,6 +443,8 @@
       "components": [
         "Drawer",
         "Loading",
+        "LoadingBar",
+        "LoadingBarContainer",
         "Message",
         "MessageContainer",
         "Modal",
@@ -2094,6 +2120,46 @@
       "typeSource": "packages/core/src/types/loading.ts",
       "sourceFiles": ["packages/core/src/types/loading.ts"],
       "propsInterfaces": ["LoadingProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "LoadingBar": {
+      "name": "LoadingBar",
+      "aliases": ["顶部加载条", "顶部加载", "加载条"],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./LoadingBar",
+      "packageTarget": "LoadingBar",
+      "typeSource": "packages/core/src/types/loading-bar.ts",
+      "sourceFiles": ["packages/core/src/types/loading-bar.ts"],
+      "propsInterfaces": ["LoadingBarProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "LoadingBarContainer": {
+      "name": "LoadingBarContainer",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./LoadingBarContainer",
+      "packageTarget": "LoadingBarContainer",
+      "typeSource": "packages/core/src/types/loading-bar.ts",
+      "sourceFiles": ["packages/core/src/types/loading-bar.ts"],
+      "propsInterfaces": ["LoadingBarContainerProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

@@ -97,6 +97,8 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Timeline              | Data       | `data`       | timeline.ts                                         | ./Timeline              |
 | Drawer                | Feedback   | `feedback`   | drawer.ts                                           | ./Drawer                |
 | Loading               | Feedback   | `feedback`   | loading.ts                                          | ./Loading               |
+| LoadingBar            | Feedback   | `feedback`   | loading-bar.ts                                      | ./LoadingBar            |
+| LoadingBarContainer   | Feedback   | `feedback`   | loading-bar.ts                                      | ./LoadingBarContainer   |
 | Message               | Feedback   | `feedback`   | message.ts                                          | ./Message               |
 | MessageContainer      | Feedback   | `feedback`   | MessageContainer.tsx, MessageContainer.ts           | ./MessageContainer      |
 | Modal                 | Feedback   | `feedback`   | modal.ts                                            | ./Modal                 |

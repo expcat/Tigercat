@@ -65,6 +65,7 @@ export const CATEGORIES = {
     'popconfirm',
     'popover',
     'progress',
+    'loading-bar',
     'tooltip',
     'tour'
   ],
@@ -357,6 +358,9 @@ export const COMPONENT_ROUTE_ALIASES = {
   全局提示: ['Message'],
   消息: ['Message'],
   加载中: ['Loading'],
+  顶部加载条: ['LoadingBar'],
+  顶部加载: ['LoadingBar'],
+  加载条: ['LoadingBar'],
   进度条: ['Progress'],
   结果页: ['Result'],
   面包屑: ['Breadcrumb'],
@@ -489,7 +493,17 @@ export const TIGERCAT_TOPIC_ROUTES = {
       'skills/tigercat/references/examples/feedback.md',
       'skills/tigercat/references/shared/patterns/common.md'
     ],
-    keywords: ['notification', 'message', 'toast', 'imperative', 'commandapi', '通知', '消息']
+    keywords: [
+      'notification',
+      'message',
+      'toast',
+      'imperative',
+      'commandapi',
+      'loadingbar',
+      '通知',
+      '消息',
+      '加载条'
+    ]
   }
 }
 
@@ -782,6 +796,12 @@ export function buildTigercatContext7(componentRows, skillFiles = []) {
       Message: {
         name: 'Message',
         title: 'Imperative message API',
+        topic: 'commandApis',
+        references: TIGERCAT_TOPIC_ROUTES.commandApis.references
+      },
+      LoadingBar: {
+        name: 'LoadingBar',
+        title: 'Imperative loading bar API',
         topic: 'commandApis',
         references: TIGERCAT_TOPIC_ROUTES.commandApis.references
       }

@@ -137,6 +137,7 @@ const router = createRouter({
         { path: 'notification', component: () => import('./pages/NotificationDemo.vue') },
         { path: 'drawer', component: () => import('./pages/DrawerDemo.vue') },
         { path: 'loading', component: () => import('./pages/LoadingDemo.vue') },
+        { path: 'loading-bar', component: () => import('./pages/LoadingBarDemo.vue') },
         // Charts
         { path: 'bar-chart', component: () => import('./pages/BarChartDemo.vue') },
         { path: 'line-chart', component: () => import('./pages/LineChartDemo.vue') },

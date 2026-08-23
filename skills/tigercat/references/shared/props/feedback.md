@@ -7,7 +7,7 @@ description: Compact generated Tigercat Feedback props reference
 
 # Feedback Props
 
-覆盖层、提示、加载、结果和进度反馈组件。 共 11 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+覆盖层、提示、加载、结果和进度反馈组件。 共 13 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Drawer
 
@@ -30,6 +30,26 @@ Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边�
 | `locale?`  | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
 | `variant?` | `LoadingVariant`       | `'spinner'` | Loading spinner variant - determines animation style    |
 | `size?`    | `LoadingSize`          | `'md'`      | Size of the loading indicator                           |
+
+## LoadingBar
+
+`packages/core/src/types/loading-bar.ts` · `LoadingBarProps` · 3/6 props
+
+| Prop         | Type              | Default     | Notes                                                      |
+| ------------ | ----------------- | ----------- | ---------------------------------------------------------- |
+| `color?`     | `LoadingBarColor` | `'primary'` | Fill color while loading. Error status always uses danger. |
+| `height?`    | `number`          | `2`         | Bar height in pixels.                                      |
+| `className?` | `string`          | `-`         | Additional CSS classes merged onto the bar.                |
+
+## LoadingBarContainer
+
+`packages/core/src/types/loading-bar.ts` · `LoadingBarContainerProps` · 3/7 props
+
+| Prop          | Type               | Default     | Notes                                       |
+| ------------- | ------------------ | ----------- | ------------------------------------------- |
+| `percentage?` | `number`           | `0`         | Current progress percentage (0-100).        |
+| `status?`     | `LoadingBarStatus` | `'idle'`    | Visual status. Error uses the danger color. |
+| `color?`      | `LoadingBarColor`  | `'primary'` | Fill color while loading.                   |
 
 ## Message
 

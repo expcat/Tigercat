@@ -125,7 +125,7 @@ for (const filename of typeFiles) {
 // ----- Vue component scan (check events/emits naming) -----
 
 const VUE_COMPONENTS_DIR = join(ROOT, 'packages', 'vue', 'src', 'components')
-const INTERNAL_COMPONENT_MODULES = new Set(['MessageRoot', 'NotificationRoot'])
+const INTERNAL_COMPONENT_MODULES = new Set(['MessageRoot', 'NotificationRoot', 'LoadingBarRoot'])
 const vueFiles = readdirSync(VUE_COMPONENTS_DIR).filter(
   (f) => f.endsWith('.ts') && !INTERNAL_COMPONENT_MODULES.has(f.replace('.ts', ''))
 )

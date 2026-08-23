@@ -1,0 +1,58 @@
+import type { LoadingBarApi, LoadingBarOptions } from '@expcat/tigercat-core'
+
+export type LoadingBarProps = LoadingBarOptions
+
+type LoadingBarCommand =
+  | { type: 'start'; options?: LoadingBarOptions }
+  | { type: 'finish' }
+  | { type: 'error' }
+  | { type: 'clear' }
+
+let loadingBarModulePromise: Promise<typeof import('./LoadingBar')> | null = null
+let pendingCommands: LoadingBarCommand[] = []
+let resolvedApi: LoadingBarApi | null = null
+
+function loadLoadingBarModule(): Promise<typeof import('./LoadingBar')> {
+  loadingBarModulePromise ??= import('./LoadingBar')
+  return loadingBarModulePromise
+}
+
+function applyCommand(api: LoadingBarApi, command: LoadingBarCommand): void {
+  if (command.type === 'start') {
+    api.start(command.options)
+    return
+  }
+  api[command.type]()
+}
+
+function enqueue(command: LoadingBarCommand): void {
+  if (resolvedApi) {
+    applyCommand(resolvedApi, command)
+    return
+  }
+
+  pendingCommands.push(command)
+  void loadLoadingBarModule().then(({ LoadingBar }) => {
+    resolvedApi = LoadingBar
+    const queue = pendingCommands
+    pendingCommands = []
+    for (const item of queue) {
+      applyCommand(LoadingBar, item)
+    }
+  })
+}
+
+export const LoadingBar: LoadingBarApi = {
+  start(options) {
+    enqueue({ type: 'start', options })
+  },
+  finish() {
+    enqueue({ type: 'finish' })
+  },
+  error() {
+    enqueue({ type: 'error' })
+  },
+  clear() {
+    enqueue({ type: 'clear' })
+  }
+}

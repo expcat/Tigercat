@@ -2,19 +2,19 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "131 kB",
+    "limit": "135 kB",
     "gzip": true
   },
   {
     "name": "Vue (full)",
     "path": "packages/vue/dist/index.mjs",
-    "limit": "293 kB",
+    "limit": "305 kB",
     "gzip": true
   },
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "328 kB",
+    "limit": "340 kB",
     "gzip": true
   },
   {
@@ -242,7 +242,7 @@
   {
     "name": "Vue ImageCompare subpath",
     "path": "packages/vue/dist/components/ImageCompare.mjs",
-    "limit": "23 kB",
+    "limit": "26 kB",
     "gzip": true
   },
   {
@@ -250,6 +250,20 @@
     "path": "packages/react/dist/components/ImageCompare.mjs",
     "limit": "21 kB",
     "gzip": true
+  },
+  {
+    "name": "Vue LoadingBar subpath",
+    "path": "packages/vue/dist/components/LoadingBar.mjs",
+    "limit": "19 kB",
+    "gzip": true,
+    "ignore": ["@expcat/tigercat-core", "vue"]
+  },
+  {
+    "name": "React LoadingBar subpath",
+    "path": "packages/react/dist/components/LoadingBar.mjs",
+    "limit": "19 kB",
+    "gzip": true,
+    "ignore": ["@expcat/tigercat-core", "react", "react-dom", "react-dom/client", "react/jsx-runtime"]
   },
   {
     "name": "Vue SplitButton subpath",

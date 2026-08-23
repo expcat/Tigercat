@@ -32,7 +32,7 @@ function getImportedName(specifier: string) {
     .trim()
 }
 
-const ROOT_COMMAND_APIS = new Set(['Message', 'notification'])
+const ROOT_COMMAND_APIS = new Set(['Message', 'notification', 'LoadingBar'])
 const GENERATED_EXAMPLE_DIRS = new Set(['node_modules', 'dist', '.next', '.nuxt', '.output'])
 const EXAMPLE_SOURCE_ROOTS = ['examples/example', 'examples/nextjs', 'examples/nuxt']
 

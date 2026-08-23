@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- 新增 **LoadingBar** 反馈组件（批次 4）：顶部加载条（Naive/nprogress 类），命令式离散 API `start()` / `finish()` / `error()` / `clear()`；懒加载 Root facade 与 `ensureContainer` 宿主挂载与 Message/Notification 一致，SSR 安全（无顶层 `window`，`isBrowser` 守卫）；`start` 显示并 trickle 递增，`finish` 拉满后隐藏，`error` 进入错误色后隐藏；`LoadingBarContainer` 为 `progressbar`（polite、`aria-busy`，不抢焦点）；支持 `color`/`height`/`className`/`style` 与可选挂载容器；Vue/React API 对称，不改动现有 Loading/Progress。
+- **同步 `.size-limit.json` 预算**：`Core (full)` 131→135 kB、`Vue (full)` 293→305 kB、`React (full)` 328→340 kB，并新增 LoadingBar 子路径预算。
 - 新增 **ImageCompare** 基础组件（批次 4）：before/after 图片对比滑块，支持指针拖动与键盘调整手柄位置；`orientation` 横向或纵向，`position`/`defaultPosition` 受控与非受控，`beforeSrc`/`afterSrc` 或 Vue `before`/`after` 插槽 / React `before`/`after` 节点；复用 Image 家族 `ImageFit` 与 `toCSSSize`；手柄为可聚焦 `slider`（`aria-valuenow` 0–100），图片带 alt；Vue/React API 对称、SSR 安全。
 - 新增 **Marquee** 基础组件（批次 4）：循环滚动子内容，默认水平向左，无缝复制轨道；`pauseOnHover` 默认在悬停与 focus-within 时暂停；`prefers-reduced-motion` 下停用动画并隐藏复制段，改为静态可滚动内容；支持 `direction`/`duration`/`gap`/`repeat`，Vue/React API 对称、SSR 安全。
 - 新增 **SplitButton** 基础组件（批次 4）：主操作按钮 + 相邻 chevron 触发下拉扩展；复用 Button 与 Dropdown，不另起菜单栈；共用 `variant`/`size`/`disabled`/`loading`/`danger`，菜单项走现有 `DropdownMenu`/`DropdownItem` API，主按钮 click 与菜单开关分离；chevron 触发器带可覆盖的 `triggerAriaLabel`（默认 More options）与 `aria-expanded`；Vue/React API 对称、SSR 安全。

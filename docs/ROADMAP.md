@@ -87,7 +87,7 @@ source: current repository state + competitor benchmark (2026-07-19)
 - [x] SplitButton(Basic):主操作 + 下拉扩展,复用 Button/Dropdown。
 - [x] Marquee(Basic):循环滚动、hover 暂停、遵循 prefers-reduced-motion。
 - [x] ImageCompare(Basic):对比滑块,与 Image 家族共用类型。
-- [ ] LoadingBar(Feedback):discrete API(start/finish/error),容器机制与 Message/Notification 保持一致。
+- [x] LoadingBar(Feedback):discrete API(start/finish/error),容器机制与 Message/Notification 保持一致。
 - 验证:`pnpm test:group:basic` 与 `pnpm test:group:feedback`。
 
 ### 批次 5 既有组件功能增强(P1)

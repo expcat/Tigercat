@@ -385,7 +385,12 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'Notification 通知', 'en-US': 'Notification' }
       },
       { key: 'drawer', path: '/drawer', label: { 'zh-CN': 'Drawer 抽屉', 'en-US': 'Drawer' } },
-      { key: 'loading', path: '/loading', label: { 'zh-CN': 'Loading 加载', 'en-US': 'Loading' } }
+      { key: 'loading', path: '/loading', label: { 'zh-CN': 'Loading 加载', 'en-US': 'Loading' } },
+      {
+        key: 'loading-bar',
+        path: '/loading-bar',
+        label: { 'zh-CN': 'LoadingBar 顶部加载条', 'en-US': 'LoadingBar' }
+      }
     ]
   },
   {

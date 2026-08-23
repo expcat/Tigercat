@@ -494,6 +494,16 @@
       "import": "./dist/components/Loading.mjs",
       "default": "./dist/components/Loading.mjs"
     },
+    "./LoadingBar": {
+      "types": "./dist/components/LoadingBar.d.mts",
+      "import": "./dist/components/LoadingBar.mjs",
+      "default": "./dist/components/LoadingBar.mjs"
+    },
+    "./LoadingBarContainer": {
+      "types": "./dist/components/LoadingBarContainer.d.mts",
+      "import": "./dist/components/LoadingBarContainer.mjs",
+      "default": "./dist/components/LoadingBarContainer.mjs"
+    },
     "./MarkdownEditor": {
       "types": "./dist/components/MarkdownEditor.d.mts",
       "import": "./dist/components/MarkdownEditor.mjs",

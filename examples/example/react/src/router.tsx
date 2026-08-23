@@ -113,6 +113,7 @@ const TooltipDemo = lazy(() => import('./pages/TooltipDemo'))
 const NotificationDemo = lazy(() => import('./pages/NotificationDemo'))
 const DrawerDemo = lazy(() => import('./pages/DrawerDemo'))
 const LoadingDemo = lazy(() => import('./pages/LoadingDemo'))
+const LoadingBarDemo = lazy(() => import('./pages/LoadingBarDemo'))
 
 // Charts
 const BarChartDemo = lazy(() => import('./pages/BarChartDemo'))
@@ -267,6 +268,7 @@ const router = createHashRouter([
       { path: 'notification', element: <NotificationDemo /> },
       { path: 'drawer', element: <DrawerDemo /> },
       { path: 'loading', element: <LoadingDemo /> },
+      { path: 'loading-bar', element: <LoadingBarDemo /> },
       // Charts
       { path: 'bar-chart', element: <BarChartDemo /> },
       { path: 'line-chart', element: <LineChartDemo /> },

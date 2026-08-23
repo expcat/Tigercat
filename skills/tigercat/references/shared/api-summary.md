@@ -71,18 +71,19 @@ description: Compact generated route map for Tigercat core type files
 
 ## Feedback
 
-| Type File       | Props Interfaces  |
-| --------------- | ----------------- |
-| drawer.ts       | DrawerProps       |
-| loading.ts      | LoadingProps      |
-| message.ts      | MessageProps      |
-| modal.ts        | ModalProps        |
-| notification.ts | NotificationProps |
-| popconfirm.ts   | PopconfirmProps   |
-| popover.ts      | PopoverProps      |
-| progress.ts     | ProgressProps     |
-| tooltip.ts      | TooltipProps      |
-| tour.ts         | TourProps         |
+| Type File       | Props Interfaces                          |
+| --------------- | ----------------------------------------- |
+| drawer.ts       | DrawerProps                               |
+| loading.ts      | LoadingProps                              |
+| message.ts      | MessageProps                              |
+| modal.ts        | ModalProps                                |
+| notification.ts | NotificationProps                         |
+| popconfirm.ts   | PopconfirmProps                           |
+| popover.ts      | PopoverProps                              |
+| progress.ts     | ProgressProps                             |
+| loading-bar.ts  | LoadingBarProps, LoadingBarContainerProps |
+| tooltip.ts      | TooltipProps                              |
+| tour.ts         | TourProps                                 |
 
 ## Layout
 
