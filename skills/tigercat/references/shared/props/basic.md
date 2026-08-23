@@ -7,7 +7,7 @@ description: Compact generated Tigercat Basic props reference
 
 # Basic Props
 
-基础展示与低级交互组件。 共 28 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+基础展示与低级交互组件。 共 29 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Alert
 
@@ -261,6 +261,16 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `variant?`  | `LinkVariant` | `'primary'` | Link variant style           |
 | `size?`     | `LinkSize`    | `'md'`      | Link size                    |
 | `disabled?` | `boolean`     | `false`     | Whether the link is disabled |
+
+## Marquee
+
+`packages/core/src/types/marquee.ts` · `MarqueeProps` · 3/8 props
+
+| Prop            | Type               | Default  | Notes                                                           |
+| --------------- | ------------------ | -------- | --------------------------------------------------------------- |
+| `direction?`    | `MarqueeDirection` | `'left'` | Scroll direction                                                |
+| `duration?`     | `number`           | `20000`  | Time for one full loop, in milliseconds                         |
+| `pauseOnHover?` | `boolean`          | `true`   | Pause looping while hovered or while focus is inside the region |
 
 ## QRCode
 

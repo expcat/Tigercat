@@ -48,6 +48,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         path: '/highlight',
         label: { 'zh-CN': 'Highlight 文本高亮', 'en-US': 'Highlight' }
       },
+      {
+        key: 'marquee',
+        path: '/marquee',
+        label: { 'zh-CN': 'Marquee 跑马灯', 'en-US': 'Marquee' }
+      },
       { key: 'image', path: '/image', label: { 'zh-CN': 'Image 图片', 'en-US': 'Image' } },
       {
         key: 'image-cropper',

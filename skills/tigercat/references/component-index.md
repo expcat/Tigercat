@@ -50,6 +50,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | ImagePreview          | Basic      | `basic`      | image.ts                                            | ./ImagePreview          |
 | Kbd                   | Basic      | `basic`      | kbd.ts                                              | ./Kbd                   |
 | Link                  | Basic      | `basic`      | link.ts                                             | ./Link                  |
+| Marquee               | Basic      | `basic`      | marquee.ts                                          | ./Marquee               |
 | QRCode                | Basic      | `basic`      | qrcode.ts                                           | ./QRCode                |
 | Rate                  | Basic      | `basic`      | rate.ts                                             | ./Rate                  |
 | Result                | Basic      | `basic`      | result.ts                                           | ./Result                |

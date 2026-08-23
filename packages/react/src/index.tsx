@@ -59,6 +59,8 @@ export { Kbd } from './components/Kbd'
 export type { KbdProps } from './components/Kbd'
 export { Highlight } from './components/Highlight'
 export type { HighlightProps } from './components/Highlight'
+export { Marquee } from './components/Marquee'
+export type { MarqueeProps } from './components/Marquee'
 export { Icon } from './components/Icon'
 export type { IconProps } from './components/Icon'
 

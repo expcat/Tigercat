@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 168,
+  "component_count": 169,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -66,6 +66,8 @@
     "键盘按键": ["Kbd"],
     "文本高亮": ["Highlight"],
     "关键词高亮": ["Highlight"],
+    "跑马灯": ["Marquee"],
+    "循环滚动": ["Marquee"],
     "头像": ["Avatar"],
     "徽标": ["Badge"],
     "徽章": ["Badge"],
@@ -335,6 +337,7 @@
         "ImagePreview",
         "Kbd",
         "Link",
+        "Marquee",
         "QRCode",
         "Rate",
         "Result",
@@ -1147,6 +1150,26 @@
       "typeSource": "packages/core/src/types/link.ts",
       "sourceFiles": ["packages/core/src/types/link.ts"],
       "propsInterfaces": ["LinkProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Marquee": {
+      "name": "Marquee",
+      "aliases": ["跑马灯", "循环滚动"],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Marquee",
+      "packageTarget": "Marquee",
+      "typeSource": "packages/core/src/types/marquee.ts",
+      "sourceFiles": ["packages/core/src/types/marquee.ts"],
+      "propsInterfaces": ["MarqueeProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

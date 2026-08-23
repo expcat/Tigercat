@@ -14,6 +14,7 @@ const TextDemo = lazy(() => import('./pages/TextDemo'))
 const CodeDemo = lazy(() => import('./pages/CodeDemo'))
 const KbdDemo = lazy(() => import('./pages/KbdDemo'))
 const HighlightDemo = lazy(() => import('./pages/HighlightDemo'))
+const MarqueeDemo = lazy(() => import('./pages/MarqueeDemo'))
 const ImageDemo = lazy(() => import('./pages/ImageDemo'))
 const ImageCropperDemo = lazy(() => import('./pages/ImageCropperDemo'))
 const ImageViewerDemo = lazy(() => import('./pages/ImageViewerDemo'))
@@ -170,6 +171,7 @@ const router = createHashRouter([
       { path: 'code', element: <CodeDemo /> },
       { path: 'kbd', element: <KbdDemo /> },
       { path: 'highlight', element: <HighlightDemo /> },
+      { path: 'marquee', element: <MarqueeDemo /> },
       { path: 'image', element: <ImageDemo /> },
       { path: 'image-cropper', element: <ImageCropperDemo /> },
       { path: 'image-viewer', element: <ImageViewerDemo /> },

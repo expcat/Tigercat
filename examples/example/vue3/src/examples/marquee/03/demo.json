@@ -1,0 +1,8 @@
+{
+  "id": "marquee-03",
+  "title": "纵向滚动",
+  "description": "direction 为 up 或 down 时沿纵轴循环；可用 duration 与 gap 控制节奏和间距。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 320 }
+}

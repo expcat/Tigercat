@@ -85,7 +85,7 @@ source: current repository state + competitor benchmark (2026-07-19)
 - [x] Kbd(Basic):按键标识。
 - [x] Highlight(Basic):关键词/正则高亮。
 - [x] SplitButton(Basic):主操作 + 下拉扩展,复用 Button/Dropdown。
-- [ ] Marquee(Basic):循环滚动、hover 暂停、遵循 prefers-reduced-motion。
+- [x] Marquee(Basic):循环滚动、hover 暂停、遵循 prefers-reduced-motion。
 - [ ] ImageCompare(Basic):对比滑块,与 Image 家族共用类型。
 - [ ] LoadingBar(Feedback):discrete API(start/finish/error),容器机制与 Message/Notification 保持一致。
 - 验证:`pnpm test:group:basic` 与 `pnpm test:group:feedback`。

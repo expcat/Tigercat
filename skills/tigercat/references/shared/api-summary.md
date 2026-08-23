@@ -25,6 +25,7 @@ description: Compact generated route map for Tigercat core type files
 | image.ts        | ImageProps, ImageViewerBaseProps, ImagePreviewProps, ImageGroupProps, ImageCropperProps, CropUploadProps |
 | kbd.ts          | KbdProps                                                                                                 |
 | link.ts         | LinkProps                                                                                                |
+| marquee.ts      | MarqueeProps                                                                                             |
 | qrcode.ts       | QRCodeProps                                                                                              |
 | rate.ts         | RateProps                                                                                                |
 | result.ts       | ResultProps                                                                                              |

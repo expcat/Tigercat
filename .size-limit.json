@@ -228,6 +228,18 @@
     "gzip": true
   },
   {
+    "name": "Vue Marquee subpath",
+    "path": "packages/vue/dist/components/Marquee.mjs",
+    "limit": "23 kB",
+    "gzip": true
+  },
+  {
+    "name": "React Marquee subpath",
+    "path": "packages/react/dist/components/Marquee.mjs",
+    "limit": "19 kB",
+    "gzip": true
+  },
+  {
     "name": "Vue SplitButton subpath",
     "path": "packages/vue/dist/components/SplitButton.mjs",
     "limit": "41 kB",

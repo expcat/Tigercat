@@ -495,6 +495,11 @@
       "import": "./dist/components/MarkdownEditor.mjs",
       "default": "./dist/components/MarkdownEditor.mjs"
     },
+    "./Marquee": {
+      "types": "./dist/components/Marquee.d.mts",
+      "import": "./dist/components/Marquee.mjs",
+      "default": "./dist/components/Marquee.mjs"
+    },
     "./MaskInput": {
       "types": "./dist/components/MaskInput.d.mts",
       "import": "./dist/components/MaskInput.mjs",

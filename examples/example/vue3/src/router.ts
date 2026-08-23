@@ -24,6 +24,7 @@ const router = createRouter({
         { path: 'code', component: () => import('./pages/CodeDemo.vue') },
         { path: 'kbd', component: () => import('./pages/KbdDemo.vue') },
         { path: 'highlight', component: () => import('./pages/HighlightDemo.vue') },
+        { path: 'marquee', component: () => import('./pages/MarqueeDemo.vue') },
         { path: 'image', component: () => import('./pages/ImageDemo.vue') },
         {
           path: 'image-cropper',

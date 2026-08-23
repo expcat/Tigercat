@@ -7,7 +7,7 @@
  * - Data display: table, tag, badge, card, avatar, list, descriptions, timeline, tree, skeleton, progress
  * - Navigation: menu, tabs, breadcrumb, steps, pagination, dropdown, context-menu, navigation-menu, page-header
  * - Feedback: drawer, modal, alert, message, notification, loading, popconfirm, popover, tooltip
- * - Other: link, text, icon, code, highlight, kbd, split-button, chart, locale
+ * - Other: link, text, icon, code, highlight, kbd, marquee, split-button, chart, locale
  */
 
 // Base shared interfaces (v1.0+)
@@ -103,6 +103,7 @@ export * from './icon'
 export * from './code'
 export * from './highlight'
 export * from './kbd'
+export * from './marquee'
 export * from './split-button'
 export * from './chart'
 export * from './locale'
