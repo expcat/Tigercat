@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 166,
+  "component_count": 167,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -62,6 +62,8 @@
     "按键": ["Kbd"],
     "快捷键": ["Kbd"],
     "键盘按键": ["Kbd"],
+    "文本高亮": ["Highlight"],
+    "关键词高亮": ["Highlight"],
     "头像": ["Avatar"],
     "徽标": ["Badge"],
     "徽章": ["Badge"],
@@ -323,6 +325,7 @@
         "CropUpload",
         "Divider",
         "Empty",
+        "Highlight",
         "Icon",
         "Image",
         "ImageCropper",
@@ -981,6 +984,26 @@
       "typeSource": "packages/core/src/types/empty.ts",
       "sourceFiles": ["packages/core/src/types/empty.ts"],
       "propsInterfaces": ["EmptyProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Highlight": {
+      "name": "Highlight",
+      "aliases": ["文本高亮", "关键词高亮"],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Highlight",
+      "packageTarget": "Highlight",
+      "typeSource": "packages/core/src/types/highlight.ts",
+      "sourceFiles": ["packages/core/src/types/highlight.ts"],
+      "propsInterfaces": ["HighlightProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

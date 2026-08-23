@@ -216,6 +216,18 @@
     "gzip": true
   },
   {
+    "name": "Vue Highlight subpath",
+    "path": "packages/vue/dist/components/Highlight.mjs",
+    "limit": "19 kB",
+    "gzip": true
+  },
+  {
+    "name": "React Highlight subpath",
+    "path": "packages/react/dist/components/Highlight.mjs",
+    "limit": "19 kB",
+    "gzip": true
+  },
+  {
     "name": "Core tailwind/modern subpath",
     "path": "packages/core/dist/tailwind/modern.js",
     "limit": "3 kB",

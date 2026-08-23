@@ -1,0 +1,8 @@
+{
+  "id": "highlight-02",
+  "title": "多个关键词",
+  "description": "keywords 传入字符串数组；默认忽略大小写并高亮全部匹配。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }
+}

@@ -38,6 +38,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
       { key: 'text', path: '/text', label: { 'zh-CN': 'Text 文本', 'en-US': 'Text' } },
       { key: 'code', path: '/code', label: { 'zh-CN': 'Code 代码', 'en-US': 'Code' } },
       { key: 'kbd', path: '/kbd', label: { 'zh-CN': 'Kbd 按键', 'en-US': 'Kbd' } },
+      {
+        key: 'highlight',
+        path: '/highlight',
+        label: { 'zh-CN': 'Highlight 文本高亮', 'en-US': 'Highlight' }
+      },
       { key: 'image', path: '/image', label: { 'zh-CN': 'Image 图片', 'en-US': 'Image' } },
       {
         key: 'image-cropper',

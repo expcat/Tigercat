@@ -20,6 +20,7 @@ description: Compact generated route map for Tigercat core type files
 | code.ts      | CodeProps                                                                                                |
 | divider.ts   | DividerProps                                                                                             |
 | empty.ts     | EmptyProps                                                                                               |
+| highlight.ts | HighlightProps                                                                                           |
 | icon.ts      | IconProps                                                                                                |
 | image.ts     | ImageProps, ImageViewerBaseProps, ImagePreviewProps, ImageGroupProps, ImageCropperProps, CropUploadProps |
 | kbd.ts       | KbdProps                                                                                                 |

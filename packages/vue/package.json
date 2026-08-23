@@ -385,6 +385,11 @@
       "import": "./dist/components/HeatmapChart.mjs",
       "default": "./dist/components/HeatmapChart.mjs"
     },
+    "./Highlight": {
+      "types": "./dist/components/Highlight.d.mts",
+      "import": "./dist/components/Highlight.mjs",
+      "default": "./dist/components/Highlight.mjs"
+    },
     "./Icon": {
       "types": "./dist/components/Icon.d.mts",
       "import": "./dist/components/Icon.mjs",

@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- 新增 **Highlight** 基础组件（批次 4）：关键词/正则文本高亮，将匹配片段包在语义化 `mark` 中并保留非匹配文本；支持 `keywords` 字符串、字符串数组与 `RegExp`，可选 `caseSensitive`/`global`，字符串关键词自动转义；匹配范围由 core helper 计算（无 DOM 依赖），Vue/React API 对称、SSR 安全，无交互角色。
 - 新增 **Kbd** 基础组件（批次 4）：语义化 `kbd` 按键标识（不是按钮），支持默认插槽/`children` 与 `keys` 单键或组合键，可选 `separator`、`size`（sm/md/lg）与 `variant`（default/subtle）；样式复用 Tag 尺寸与 default 色板，Vue/React API 对称、SSR 安全，无交互角色。
 - 新增 **PageHeader** 导航组件（批次 3）：页面级页头（`header` landmark，不是 Layout 顶栏），可选 `showBack`/`onBack`/`@back` 返回控件与 `backHref`；默认返回复用 Button，带链接时复用 Link，也可用 back 插槽覆盖；提供 breadcrumb/title/subTitle/actions 插槽与右侧操作区弹性布局；Vue/React API 对称、SSR 安全，无 menubar 角色。
 - 新增 **NavigationMenu** 导航组件（批次 3）：水平 `menubar` 站点导航，悬停/聚焦展开下拉或 MegaMenu 面板；复用 Dropdown 菜单样式与 anchored-overlay / floating-ui 碰撞定位，默认 portal 到 `document.body`；顶栏左右方向键、Enter/Space/ArrowDown 打开、Escape 关闭并还原焦点；支持受控 `value`/`open` 与非受控 `defaultValue`/`defaultOpen`；提供 Vue/React 双端实现、示例、单测与键盘 E2E。

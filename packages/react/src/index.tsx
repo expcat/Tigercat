@@ -55,6 +55,8 @@ export { Code } from './components/Code'
 export type { CodeProps } from './components/Code'
 export { Kbd } from './components/Kbd'
 export type { KbdProps } from './components/Kbd'
+export { Highlight } from './components/Highlight'
+export type { HighlightProps } from './components/Highlight'
 export { Icon } from './components/Icon'
 export type { IconProps } from './components/Icon'
 

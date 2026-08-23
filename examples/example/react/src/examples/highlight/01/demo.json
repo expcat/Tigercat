@@ -1,0 +1,8 @@
+{
+  "id": "highlight-01",
+  "title": "关键词高亮",
+  "description": "children 提供源文本，keywords 传入单个关键词，匹配片段渲染为 mark。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }
+}

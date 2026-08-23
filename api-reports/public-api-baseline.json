@@ -657,6 +657,8 @@
       "DEFAULT_FORM_VALIDATION_LABELS",
       "DEFAULT_FORM_WIZARD_LABELS",
       "DEFAULT_HEATMAP_CANVAS_THRESHOLD",
+      "DEFAULT_HIGHLIGHT_CASE_SENSITIVE",
+      "DEFAULT_HIGHLIGHT_GLOBAL",
       "DEFAULT_IMAGE_EDITOR_LABELS",
       "DEFAULT_IMAGE_VIEWER_LABELS",
       "DEFAULT_INPUT_OTP_LABELS",
@@ -813,6 +815,7 @@
       "errorCircleSolidIcon20PathD",
       "ES_ES_DATEPICKER_LOCALE",
       "escapeHighlightHtml",
+      "escapeHighlightKeyword",
       "escapeMarkdownHtml",
       "esES",
       "esESDatePickerLocale",
@@ -884,6 +887,7 @@
       "findCascaderOption",
       "findColumnFromPoint",
       "findFirstEnabledIndex",
+      "findHighlightRanges",
       "findHotkeyMatch",
       "findLastEnabledIndex",
       "findMarkdownHotkeyMatch",
@@ -1264,6 +1268,9 @@
       "getGroupHeaderCellClasses",
       "getGutterStyles",
       "getHeatmapCellIndexAtPoint",
+      "getHighlightMarkClasses",
+      "getHighlightRootClasses",
+      "getHighlightSegments",
       "getIconDefinition",
       "getImageAnnotationCenter",
       "getImageAnnotationPathData",
@@ -1668,6 +1675,13 @@
       "helpCircleIcon",
       "hexToRgb",
       "highContrastTheme",
+      "HighlightKeywords",
+      "highlightMarkClasses",
+      "HighlightMatchOptions",
+      "HighlightProps",
+      "HighlightRange",
+      "highlightRootClasses",
+      "HighlightSegment",
       "HsvColor",
       "hsvToRgb",
       "icon16ViewBox",
@@ -2018,6 +2032,7 @@
       "menuSearchInputClasses",
       "MenuSelectHandler",
       "MenuTheme",
+      "mergeHighlightRanges",
       "mergeStyleValues",
       "mergeTigerLocale",
       "messageBaseClasses",
@@ -2105,6 +2120,7 @@
       "normalizeCronExpression",
       "normalizeDate",
       "normalizeGanttDate",
+      "normalizeHighlightKeywords",
       "normalizeImageAnnotationBox",
       "normalizeKbdKeys",
       "normalizeMenuSearchQuery",
@@ -2414,6 +2430,9 @@
       "resolveFormConditionState",
       "resolveFormFieldConditionState",
       "resolveHeatmapRenderMode",
+      "resolveHighlightCaseSensitive",
+      "resolveHighlightGlobal",
+      "resolveHighlightText",
       "resolveKbdSeparator",
       "resolveKbdSize",
       "resolveKbdVariant",
@@ -4116,6 +4135,19 @@
         "yLabels"
       ]
     },
+    "HighlightProps": {
+      "extends": [],
+      "props": [
+        "caseSensitive",
+        "className",
+        "global",
+        "highlightClassName",
+        "highlightStyle",
+        "keywords",
+        "style",
+        "text"
+      ]
+    },
     "IconProps": {
       "extends": [],
       "props": ["className", "color", "icon", "name", "size"]
@@ -5581,6 +5613,7 @@
       "GaugeChart",
       "Header",
       "HeatmapChart",
+      "Highlight",
       "Icon",
       "Image",
       "ImageAnnotation",
@@ -6032,6 +6065,11 @@
         "component": "HeatmapChart",
         "subpath": "./HeatmapChart",
         "target": "HeatmapChart"
+      },
+      {
+        "component": "Highlight",
+        "subpath": "./Highlight",
+        "target": "Highlight"
       },
       {
         "component": "Icon",
@@ -6661,6 +6699,8 @@
       "HeaderProps",
       "HeatmapChart",
       "HeatmapChartProps",
+      "Highlight",
+      "HighlightProps",
       "Icon",
       "IconProps",
       "Image",
@@ -6960,6 +7000,7 @@
       "GaugeChart",
       "Header",
       "HeatmapChart",
+      "Highlight",
       "Icon",
       "Image",
       "ImageAnnotation",
@@ -7411,6 +7452,11 @@
         "component": "HeatmapChart",
         "subpath": "./HeatmapChart",
         "target": "HeatmapChart"
+      },
+      {
+        "component": "Highlight",
+        "subpath": "./Highlight",
+        "target": "Highlight"
       },
       {
         "component": "Icon",
@@ -7963,6 +8009,7 @@
       "GaugeChart",
       "Header",
       "HeatmapChart",
+      "Highlight",
       "Icon",
       "Image",
       "ImageAnnotation",
@@ -8144,6 +8191,7 @@
       "VueGaugeChartProps",
       "VueHeaderProps",
       "VueHeatmapChartProps",
+      "VueHighlightProps",
       "VueIconProps",
       "VueImageAnnotationProps",
       "VueImageCropperProps",

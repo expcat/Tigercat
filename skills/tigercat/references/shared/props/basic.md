@@ -7,7 +7,7 @@ description: Compact generated Tigercat Basic props reference
 
 # Basic Props
 
-基础展示与低级交互组件。 共 26 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+基础展示与低级交互组件。 共 27 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Alert
 
@@ -117,6 +117,16 @@ description: Compact generated Tigercat Basic props reference
 | `locale?`      | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale. |
 | `preset?`      | `EmptyPreset`          | `'default'` | Preset empty state style                                |
 | `description?` | `string`               | `-`         | Description text below the illustration                 |
+
+## Highlight
+
+`packages/core/src/types/highlight.ts` · `HighlightProps` · 3/8 props
+
+| Prop             | Type                | Default | Notes                                                                                      |
+| ---------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `text?`          | `string`            | `-`     | Source text to search. When omitted, Vue default slot / React children are flattened to... |
+| `keywords?`      | `HighlightKeywords` | `-`     | Keyword string(s) and/or regular expression(s) to highlight.                               |
+| `caseSensitive?` | `boolean`           | `false` | Match case for string keywords. Regular expressions keep their own `i` flag.               |
 
 ## Icon
 
