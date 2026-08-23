@@ -289,6 +289,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         path: '/dropdown',
         label: { 'zh-CN': 'Dropdown 下拉菜单', 'en-US': 'Dropdown' }
       },
+      {
+        key: 'context-menu',
+        path: '/context-menu',
+        label: { 'zh-CN': 'ContextMenu 右键菜单', 'en-US': 'ContextMenu' }
+      },
       { key: 'tabs', path: '/tabs', label: { 'zh-CN': 'Tabs 标签页', 'en-US': 'Tabs' } },
       { key: 'steps', path: '/steps', label: { 'zh-CN': 'Steps 步骤条', 'en-US': 'Steps' } },
       {

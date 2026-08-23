@@ -157,6 +157,10 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | BackTop               | Navigation | `navigation` | back-top.ts                                         | ./BackTop               |
 | Breadcrumb            | Navigation | `navigation` | breadcrumb.ts                                       | ./Breadcrumb            |
 | BreadcrumbItem        | Navigation | `navigation` | breadcrumb.ts                                       | ./BreadcrumbItem        |
+| ContextMenu           | Navigation | `navigation` | context-menu.ts                                     | ./ContextMenu           |
+| ContextMenuItem       | Navigation | `navigation` | context-menu.ts                                     | ./ContextMenuItem       |
+| ContextMenuMenu       | Navigation | `navigation` | context-menu.ts                                     | ./ContextMenuMenu       |
+| ContextMenuSub        | Navigation | `navigation` | context-menu.ts                                     | ./ContextMenuSub        |
 | Dropdown              | Navigation | `navigation` | dropdown.ts                                         | ./Dropdown              |
 | DropdownItem          | Navigation | `navigation` | dropdown.ts                                         | ./DropdownItem          |
 | DropdownMenu          | Navigation | `navigation` | dropdown.ts                                         | ./DropdownMenu          |

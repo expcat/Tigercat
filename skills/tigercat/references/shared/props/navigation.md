@@ -7,7 +7,7 @@ description: Compact generated Tigercat Navigation props reference
 
 # Navigation Props
 
-导航、菜单、分页、步骤、锚点和树形导航组件。 共 23 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+导航、菜单、分页、步骤、锚点和树形导航组件。 共 27 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Affix
 
@@ -68,6 +68,45 @@ description: Compact generated Tigercat Navigation props reference
 | `href?`    | `string`                                     | `-`     | Navigation link URL                   |
 | `target?`  | `'_blank' \| '_self' \| '_parent' \| '_top'` | `-`     | Link target attribute                 |
 | `current?` | `boolean`                                    | `false` | Whether this is the current/last item |
+
+## ContextMenu
+
+`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 3/8 props
+
+| Prop           | Type      | Default | Notes                                      |
+| -------------- | --------- | ------- | ------------------------------------------ |
+| `disabled?`    | `boolean` | `false` | Whether the context menu is disabled       |
+| `open?`        | `boolean` | `-`     | Whether the menu is open (controlled mode) |
+| `defaultOpen?` | `boolean` | `false` | Default open state (uncontrolled mode)     |
+
+## ContextMenuItem
+
+`packages/core/src/types/context-menu.ts` · `ContextMenuItemProps` · 3/4 props
+
+| Prop        | Type               | Default | Notes                                              |
+| ----------- | ------------------ | ------- | -------------------------------------------------- |
+| `key?`      | `string \| number` | `-`     | Unique key for the menu item                       |
+| `disabled?` | `boolean`          | `false` | Whether the item is disabled                       |
+| `divided?`  | `boolean`          | `false` | Whether the item is divided from the previous item |
+
+## ContextMenuMenu
+
+`packages/core/src/types/context-menu.ts` · `ContextMenuMenuProps`
+
+| Prop         | Type                      | Default | Notes                  |
+| ------------ | ------------------------- | ------- | ---------------------- |
+| `className?` | `string`                  | `-`     | Additional CSS classes |
+| `style?`     | `Record<string, unknown>` | `-`     | Custom styles          |
+
+## ContextMenuSub
+
+`packages/core/src/types/context-menu.ts` · `ContextMenuSubProps` · 3/4 props
+
+| Prop        | Type               | Default | Notes                                   |
+| ----------- | ------------------ | ------- | --------------------------------------- |
+| `itemKey?`  | `string \| number` | `-`     | Unique key for the submenu              |
+| `title?`    | `string`           | `-`     | Submenu trigger label                   |
+| `disabled?` | `boolean`          | `false` | Whether the submenu trigger is disabled |
 
 ## Dropdown
 

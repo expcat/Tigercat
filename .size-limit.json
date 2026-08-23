@@ -168,6 +168,18 @@
     "gzip": true
   },
   {
+    "name": "Vue ContextMenu subpath",
+    "path": "packages/vue/dist/components/ContextMenu.mjs",
+    "limit": "40 kB",
+    "gzip": true
+  },
+  {
+    "name": "React ContextMenu subpath",
+    "path": "packages/react/dist/components/ContextMenu.mjs",
+    "limit": "33 kB",
+    "gzip": true
+  },
+  {
     "name": "Core tailwind/modern subpath",
     "path": "packages/core/dist/tailwind/modern.js",
     "limit": "3 kB",

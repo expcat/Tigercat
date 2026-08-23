@@ -163,6 +163,18 @@ export { Dropdown } from './components/Dropdown'
 export type { VueDropdownProps } from './components/Dropdown'
 export { DropdownMenu, DropdownItem } from './components/Dropdown'
 export type { VueDropdownMenuProps, VueDropdownItemProps } from './components/Dropdown'
+export {
+  ContextMenu,
+  ContextMenuMenu,
+  ContextMenuItem,
+  ContextMenuSub
+} from './components/ContextMenu'
+export type {
+  VueContextMenuProps,
+  VueContextMenuMenuProps,
+  VueContextMenuItemProps,
+  VueContextMenuSubProps
+} from './components/ContextMenu'
 export { Spotlight } from './components/Spotlight'
 export type { VueSpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'

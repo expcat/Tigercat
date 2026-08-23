@@ -1,0 +1,12 @@
+{
+  "id": "context-menu-01",
+  "title": "基础右键菜单",
+  "description": "在区域内右键打开菜单，支持禁用项、分隔线与操作回显；Esc 或点击外部关闭。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 220,
+    "maxHeight": 720
+  }
+}

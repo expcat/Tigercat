@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- 新增 **ContextMenu** 导航组件（批次 3）：右键（`contextmenu`）触发并阻止浏览器默认菜单，用 1px 虚拟参考点把菜单定位在 `clientX/clientY`；复用 Dropdown 菜单样式与 anchored-overlay / floating-ui 碰撞定位，默认 portal 到 `document.body`；支持嵌套 `ContextMenuSub`（悬停与 ArrowRight/Enter 展开、ArrowLeft/Escape 逐层关闭）、方向键/Home/End 导航、Esc 与外部点击关闭、关闭后焦点还原；受控 `open` 与非受控 `defaultOpen` 与 Dropdown 对齐；提供 Vue/React 双端实现、示例、单测与键盘 E2E。
 - 新增 **InputOTP** 表单组件（批次 1）：分格输入一次性验证码/PIN，支持粘贴分发、自动聚焦推进、掩码模式（`masked`/`maskChar`）、分组显示（`groups`/`separator`）、`numeric`/`alphanumeric` 字符集与自定义 `pattern`；填满触发 `complete`；提供 Vue/React 双端实现、示例、单测与 E2E，新增 `inputOtp` locale 分区（13 套语言）。
 - 新增 **TagsInput** 表单组件（批次 1）：输入创建标签，支持回车/分隔符提交、粘贴多值批量拆分、去重、最大数量、两段式退格删除、`beforeAdd` 校验/转换钩子与 `clearable` 清空，受控与非受控；chip 复用 Tag 组件；提供双端实现、示例、单测与 E2E，新增 `tagsInput` locale 分区（13 套语言）。
 - 新增 **MaskInput** 表单组件（批次 1）：模板掩码输入（`#` 数字、`a` 字母、`*` 字母数字、`!` 转义），支持自定义 `tokens` 与 `transform`、固定字符 eager 插入、IME 组合输入与 `clearable`；同时输出原始值（`v-model`/`onChange` 第一参）与格式化值（`change` payload 的 `maskedValue`）；提供双端实现、示例、单测与 E2E。

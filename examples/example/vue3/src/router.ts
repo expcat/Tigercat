@@ -106,6 +106,7 @@ const router = createRouter({
         { path: 'menu', component: () => import('./pages/MenuDemo.vue') },
         { path: 'breadcrumb', component: () => import('./pages/BreadcrumbDemo.vue') },
         { path: 'dropdown', component: () => import('./pages/DropdownDemo.vue') },
+        { path: 'context-menu', component: () => import('./pages/ContextMenuDemo.vue') },
         { path: 'tabs', component: () => import('./pages/TabsDemo.vue') },
         { path: 'steps', component: () => import('./pages/StepsDemo.vue') },
         { path: 'pagination', component: () => import('./pages/PaginationDemo.vue') },

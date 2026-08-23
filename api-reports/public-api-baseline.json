@@ -499,6 +499,14 @@
       "containerPaddingClasses",
       "ContainerProps",
       "ContentProps",
+      "CONTEXT_MENU_ENTER_CLASS",
+      "CONTEXT_MENU_POINT_SIZE",
+      "CONTEXT_MENU_SUB_CHEVRON_PATH",
+      "ContextMenuItemProps",
+      "ContextMenuMenuProps",
+      "ContextMenuPoint",
+      "ContextMenuProps",
+      "ContextMenuSubProps",
       "copyTextToClipboard",
       "COUNTDOWN_DEFAULT_FORMAT",
       "COUNTDOWN_DEFAULT_INTERVAL_MS",
@@ -1140,6 +1148,16 @@
       "GetContainerClassesOptions",
       "getContainerHeight",
       "getContainerScrollTop",
+      "getContextMenuContainerClasses",
+      "getContextMenuItemClasses",
+      "getContextMenuMenuClasses",
+      "getContextMenuOpenPoint",
+      "getContextMenuPointFromElement",
+      "getContextMenuPointFromEvent",
+      "getContextMenuPointStyle",
+      "getContextMenuSubChevronClasses",
+      "getContextMenuSubTriggerClasses",
+      "getContextMenuTriggerClasses",
       "getCountdownParts",
       "getCountdownRemaining",
       "getCountdownTitleClasses",
@@ -1718,6 +1736,7 @@
       "InfiniteScrollProps",
       "infiniteScrollSentinelClasses",
       "initRovingTabIndex",
+      "injectContextMenuStyles",
       "injectDropdownStyles",
       "injectLoadingAnimationStyles",
       "injectShakeStyle",
@@ -1756,6 +1775,7 @@
       "isCascaderOptionExpandable",
       "isColorSwatchSelected",
       "isContentEmpty",
+      "isContextMenuKeyboardEvent",
       "isCrossContainerDrag",
       "isDateInRange",
       "isDragEnabled",
@@ -3651,6 +3671,31 @@
       "extends": [],
       "props": ["className", "padding"]
     },
+    "ContextMenuItemProps": {
+      "extends": [],
+      "props": ["className", "disabled", "divided", "key"]
+    },
+    "ContextMenuMenuProps": {
+      "extends": [],
+      "props": ["className", "style"]
+    },
+    "ContextMenuProps": {
+      "extends": [],
+      "props": [
+        "className",
+        "closeOnClick",
+        "defaultOpen",
+        "disabled",
+        "offset",
+        "open",
+        "portal",
+        "style"
+      ]
+    },
+    "ContextMenuSubProps": {
+      "extends": [],
+      "props": ["className", "disabled", "itemKey", "title"]
+    },
     "CountdownProps": {
       "extends": [],
       "props": [
@@ -5394,6 +5439,10 @@
       "ConfigProvider",
       "Container",
       "Content",
+      "ContextMenu",
+      "ContextMenuItem",
+      "ContextMenuMenu",
+      "ContextMenuSub",
       "Countdown",
       "CronEditor",
       "CropUpload",
@@ -5714,6 +5763,26 @@
         "component": "Content",
         "subpath": "./Content",
         "target": "Content"
+      },
+      {
+        "component": "ContextMenu",
+        "subpath": "./ContextMenu",
+        "target": "ContextMenu"
+      },
+      {
+        "component": "ContextMenuItem",
+        "subpath": "./ContextMenuItem",
+        "target": "ContextMenu"
+      },
+      {
+        "component": "ContextMenuMenu",
+        "subpath": "./ContextMenuMenu",
+        "target": "ContextMenu"
+      },
+      {
+        "component": "ContextMenuSub",
+        "subpath": "./ContextMenuSub",
+        "target": "ContextMenu"
       },
       {
         "component": "Countdown",
@@ -6373,6 +6442,15 @@
       "ContainerProps",
       "Content",
       "ContentProps",
+      "ContextMenu",
+      "ContextMenuContextValue",
+      "ContextMenuItem",
+      "ContextMenuItemProps",
+      "ContextMenuMenu",
+      "ContextMenuMenuProps",
+      "ContextMenuProps",
+      "ContextMenuSub",
+      "ContextMenuSubProps",
       "Countdown",
       "CountdownProps",
       "CronEditor",
@@ -6682,6 +6760,10 @@
       "ConfigProvider",
       "Container",
       "Content",
+      "ContextMenu",
+      "ContextMenuItem",
+      "ContextMenuMenu",
+      "ContextMenuSub",
       "Countdown",
       "CronEditor",
       "CropUpload",
@@ -7002,6 +7084,26 @@
         "component": "Content",
         "subpath": "./Content",
         "target": "Content"
+      },
+      {
+        "component": "ContextMenu",
+        "subpath": "./ContextMenu",
+        "target": "ContextMenu"
+      },
+      {
+        "component": "ContextMenuItem",
+        "subpath": "./ContextMenuItem",
+        "target": "ContextMenu"
+      },
+      {
+        "component": "ContextMenuMenu",
+        "subpath": "./ContextMenuMenu",
+        "target": "ContextMenu"
+      },
+      {
+        "component": "ContextMenuSub",
+        "subpath": "./ContextMenuSub",
+        "target": "ContextMenu"
       },
       {
         "component": "Countdown",
@@ -7617,6 +7719,10 @@
       "ConfigProvider",
       "Container",
       "Content",
+      "ContextMenu",
+      "ContextMenuItem",
+      "ContextMenuMenu",
+      "ContextMenuSub",
       "Countdown",
       "CronEditor",
       "CropUpload",
@@ -7788,6 +7894,10 @@
       "VueConfigProviderProps",
       "VueContainerProps",
       "VueContentProps",
+      "VueContextMenuItemProps",
+      "VueContextMenuMenuProps",
+      "VueContextMenuProps",
+      "VueContextMenuSubProps",
       "VueCountdownProps",
       "VueCronEditorProps",
       "VueCropUploadProps",

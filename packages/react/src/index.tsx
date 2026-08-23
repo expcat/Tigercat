@@ -194,6 +194,19 @@ export type { DropdownProps, DropdownContextValue } from './components/Dropdown'
 
 export { DropdownMenu, DropdownItem } from './components/Dropdown'
 export type { DropdownMenuProps, DropdownItemProps } from './components/Dropdown'
+export {
+  ContextMenu,
+  ContextMenuMenu,
+  ContextMenuItem,
+  ContextMenuSub
+} from './components/ContextMenu'
+export type {
+  ContextMenuProps,
+  ContextMenuMenuProps,
+  ContextMenuItemProps,
+  ContextMenuSubProps,
+  ContextMenuContextValue
+} from './components/ContextMenu'
 export { Spotlight } from './components/Spotlight'
 export type { SpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'
