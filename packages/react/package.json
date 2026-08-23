@@ -404,6 +404,11 @@
       "import": "./dist/components/ImageAnnotation.mjs",
       "default": "./dist/components/ImageAnnotation.mjs"
     },
+    "./ImageCompare": {
+      "types": "./dist/components/ImageCompare.d.mts",
+      "import": "./dist/components/ImageCompare.mjs",
+      "default": "./dist/components/ImageCompare.mjs"
+    },
     "./ImageCropper": {
       "types": "./dist/components/ImageCropper.d.mts",
       "import": "./dist/components/ImageCropper.mjs",

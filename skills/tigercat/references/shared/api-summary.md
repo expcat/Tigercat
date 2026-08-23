@@ -11,30 +11,31 @@ description: Compact generated route map for Tigercat core type files
 
 ## Basic
 
-| Type File       | Props Interfaces                                                                                         |
-| --------------- | -------------------------------------------------------------------------------------------------------- |
-| alert.ts        | AlertProps                                                                                               |
-| avatar.ts       | AvatarProps, AvatarGroupProps                                                                            |
-| badge.ts        | BadgeProps                                                                                               |
-| button.ts       | ButtonProps, ButtonGroupProps                                                                            |
-| code.ts         | CodeProps                                                                                                |
-| divider.ts      | DividerProps                                                                                             |
-| empty.ts        | EmptyProps                                                                                               |
-| highlight.ts    | HighlightProps                                                                                           |
-| icon.ts         | IconProps                                                                                                |
-| image.ts        | ImageProps, ImageViewerBaseProps, ImagePreviewProps, ImageGroupProps, ImageCropperProps, CropUploadProps |
-| kbd.ts          | KbdProps                                                                                                 |
-| link.ts         | LinkProps                                                                                                |
-| marquee.ts      | MarqueeProps                                                                                             |
-| qrcode.ts       | QRCodeProps                                                                                              |
-| rate.ts         | RateProps                                                                                                |
-| result.ts       | ResultProps                                                                                              |
-| segmented.ts    | SegmentedProps                                                                                           |
-| split-button.ts | SplitButtonProps                                                                                         |
-| statistic.ts    | StatisticProps                                                                                           |
-| tag.ts          | TagProps                                                                                                 |
-| text.ts         | TextProps                                                                                                |
-| watermark.ts    | WatermarkProps                                                                                           |
+| Type File        | Props Interfaces                                                                                         |
+| ---------------- | -------------------------------------------------------------------------------------------------------- |
+| alert.ts         | AlertProps                                                                                               |
+| avatar.ts        | AvatarProps, AvatarGroupProps                                                                            |
+| badge.ts         | BadgeProps                                                                                               |
+| button.ts        | ButtonProps, ButtonGroupProps                                                                            |
+| code.ts          | CodeProps                                                                                                |
+| divider.ts       | DividerProps                                                                                             |
+| empty.ts         | EmptyProps                                                                                               |
+| highlight.ts     | HighlightProps                                                                                           |
+| icon.ts          | IconProps                                                                                                |
+| image.ts         | ImageProps, ImageViewerBaseProps, ImagePreviewProps, ImageGroupProps, ImageCropperProps, CropUploadProps |
+| image-compare.ts | ImageCompareProps                                                                                        |
+| kbd.ts           | KbdProps                                                                                                 |
+| link.ts          | LinkProps                                                                                                |
+| marquee.ts       | MarqueeProps                                                                                             |
+| qrcode.ts        | QRCodeProps                                                                                              |
+| rate.ts          | RateProps                                                                                                |
+| result.ts        | ResultProps                                                                                              |
+| segmented.ts     | SegmentedProps                                                                                           |
+| split-button.ts  | SplitButtonProps                                                                                         |
+| statistic.ts     | StatisticProps                                                                                           |
+| tag.ts           | TagProps                                                                                                 |
+| text.ts          | TextProps                                                                                                |
+| watermark.ts     | WatermarkProps                                                                                           |
 
 ## Form
 

@@ -136,6 +136,8 @@ export type { AvatarGroupProps } from './components/AvatarGroup'
 
 export { Image } from './components/Image'
 export type { ImageProps } from './components/Image'
+export { ImageCompare } from './components/ImageCompare'
+export type { ImageCompareProps } from './components/ImageCompare'
 export { ImagePreview } from './components/ImagePreview'
 export type { ImagePreviewProps } from './components/ImagePreview'
 export { ImageGroup, ImageGroupContext } from './components/ImageGroup'

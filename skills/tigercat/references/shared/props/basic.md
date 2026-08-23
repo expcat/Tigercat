@@ -7,7 +7,7 @@ description: Compact generated Tigercat Basic props reference
 
 # Basic Props
 
-基础展示与低级交互组件。 共 29 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+基础展示与低级交互组件。 共 30 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Alert
 
@@ -213,6 +213,16 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `src?`   | `string`           | `-`     | Image source URL           |
 | `alt?`   | `string`           | `-`     | Alternative text for image |
 | `width?` | `number \| string` | `-`     | Image width (CSS value)    |
+
+## ImageCompare
+
+`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 3/15 props
+
+| Prop         | Type     | Default | Notes                                                                                      |
+| ------------ | -------- | ------- | ------------------------------------------------------------------------------------------ |
+| `beforeSrc?` | `string` | `-`     | Before (starting) image URL. Vue `before` slot / React `before` node take precedence wh... |
+| `afterSrc?`  | `string` | `-`     | After (ending) image URL. Vue `after` slot / React `after` node take precedence when pr... |
+| `beforeAlt?` | `string` | `''`    | Alternative text for the before image                                                      |
 
 ## ImageCropper
 

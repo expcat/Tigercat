@@ -45,6 +45,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Highlight             | Basic      | `basic`      | highlight.ts                                        | ./Highlight             |
 | Icon                  | Basic      | `basic`      | icon.ts                                             | ./Icon                  |
 | Image                 | Basic      | `basic`      | image.ts                                            | ./Image                 |
+| ImageCompare          | Basic      | `basic`      | image-compare.ts                                    | ./ImageCompare          |
 | ImageCropper          | Basic      | `basic`      | image.ts                                            | ./ImageCropper          |
 | ImageGroup            | Basic      | `basic`      | image.ts                                            | ./ImageGroup            |
 | ImagePreview          | Basic      | `basic`      | image.ts                                            | ./ImagePreview          |

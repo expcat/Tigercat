@@ -107,6 +107,7 @@ export * from '../split-button-utils'
 
 // Image components
 export * from '../image-utils'
+export * from '../image-compare-utils'
 
 // Other components
 export * from '../carousel-utils'

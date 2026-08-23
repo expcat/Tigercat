@@ -1,0 +1,8 @@
+{
+  "id": "image-compare-01",
+  "title": "基础对比",
+  "description": "叠放 before/after 图片，拖动或键盘调整中间的对比滑块，默认停在 50%。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 280, "maxHeight": 720 }
+}

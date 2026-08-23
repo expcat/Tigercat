@@ -55,6 +55,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
       },
       { key: 'image', path: '/image', label: { 'zh-CN': 'Image 图片', 'en-US': 'Image' } },
       {
+        key: 'image-compare',
+        path: '/image-compare',
+        label: { 'zh-CN': 'ImageCompare 图片对比', 'en-US': 'ImageCompare' }
+      },
+      {
         key: 'image-cropper',
         path: '/image-cropper',
         label: { 'zh-CN': 'ImageCropper 裁剪', 'en-US': 'ImageCropper' }

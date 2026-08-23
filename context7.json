@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 169,
+  "component_count": 170,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -170,6 +170,9 @@
     "图片预览": ["ImagePreview"],
     "图片裁剪": ["ImageCropper"],
     "图片标注": ["ImageAnnotation"],
+    "图片对比": ["ImageCompare"],
+    "对比滑块": ["ImageCompare"],
+    "图片对比滑块": ["ImageCompare"],
     "富文本": ["RichTextEditor"],
     "代码编辑器": ["CodeEditor"],
     "markdown编辑器": ["MarkdownEditor"],
@@ -332,6 +335,7 @@
         "Highlight",
         "Icon",
         "Image",
+        "ImageCompare",
         "ImageCropper",
         "ImageGroup",
         "ImagePreview",
@@ -1050,6 +1054,26 @@
       "typeSource": "packages/core/src/types/image.ts",
       "sourceFiles": ["packages/core/src/types/image.ts"],
       "propsInterfaces": ["ImageProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ImageCompare": {
+      "name": "ImageCompare",
+      "aliases": ["图片对比", "对比滑块", "图片对比滑块"],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./ImageCompare",
+      "packageTarget": "ImageCompare",
+      "typeSource": "packages/core/src/types/image-compare.ts",
+      "sourceFiles": ["packages/core/src/types/image-compare.ts"],
+      "propsInterfaces": ["ImageCompareProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

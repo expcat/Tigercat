@@ -240,6 +240,18 @@
     "gzip": true
   },
   {
+    "name": "Vue ImageCompare subpath",
+    "path": "packages/vue/dist/components/ImageCompare.mjs",
+    "limit": "23 kB",
+    "gzip": true
+  },
+  {
+    "name": "React ImageCompare subpath",
+    "path": "packages/react/dist/components/ImageCompare.mjs",
+    "limit": "21 kB",
+    "gzip": true
+  },
+  {
     "name": "Vue SplitButton subpath",
     "path": "packages/vue/dist/components/SplitButton.mjs",
     "limit": "41 kB",

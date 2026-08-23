@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- 新增 **ImageCompare** 基础组件（批次 4）：before/after 图片对比滑块，支持指针拖动与键盘调整手柄位置；`orientation` 横向或纵向，`position`/`defaultPosition` 受控与非受控，`beforeSrc`/`afterSrc` 或 Vue `before`/`after` 插槽 / React `before`/`after` 节点；复用 Image 家族 `ImageFit` 与 `toCSSSize`；手柄为可聚焦 `slider`（`aria-valuenow` 0–100），图片带 alt；Vue/React API 对称、SSR 安全。
 - 新增 **Marquee** 基础组件（批次 4）：循环滚动子内容，默认水平向左，无缝复制轨道；`pauseOnHover` 默认在悬停与 focus-within 时暂停；`prefers-reduced-motion` 下停用动画并隐藏复制段，改为静态可滚动内容；支持 `direction`/`duration`/`gap`/`repeat`，Vue/React API 对称、SSR 安全。
 - 新增 **SplitButton** 基础组件（批次 4）：主操作按钮 + 相邻 chevron 触发下拉扩展；复用 Button 与 Dropdown，不另起菜单栈；共用 `variant`/`size`/`disabled`/`loading`/`danger`，菜单项走现有 `DropdownMenu`/`DropdownItem` API，主按钮 click 与菜单开关分离；chevron 触发器带可覆盖的 `triggerAriaLabel`（默认 More options）与 `aria-expanded`；Vue/React API 对称、SSR 安全。
 - 新增 **Highlight** 基础组件（批次 4）：关键词/正则文本高亮，将匹配片段包在语义化 `mark` 中并保留非匹配文本；支持 `keywords` 字符串、字符串数组与 `RegExp`，可选 `caseSensitive`/`global`，字符串关键词自动转义；匹配范围由 core helper 计算（无 DOM 依赖），Vue/React API 对称、SSR 安全，无交互角色。

@@ -1,0 +1,8 @@
+{
+  "id": "image-compare-03",
+  "title": "插槽与受控位置",
+  "description": "before/after 节点可自定义内容；position 与 onChange 受控同步滑块位置。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 320, "maxHeight": 720 }
+}

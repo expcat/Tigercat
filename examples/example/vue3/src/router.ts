@@ -27,6 +27,10 @@ const router = createRouter({
         { path: 'marquee', component: () => import('./pages/MarqueeDemo.vue') },
         { path: 'image', component: () => import('./pages/ImageDemo.vue') },
         {
+          path: 'image-compare',
+          component: () => import('./pages/ImageCompareDemo.vue')
+        },
+        {
           path: 'image-cropper',
           component: () => import('./pages/ImageCropperDemo.vue')
         },
