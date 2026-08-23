@@ -102,6 +102,7 @@ export * from '../code-utils'
 export * from '../text-utils'
 export * from '../kbd-utils'
 export * from '../highlight-utils'
+export * from '../split-button-utils'
 
 // Image components
 export * from '../image-utils'

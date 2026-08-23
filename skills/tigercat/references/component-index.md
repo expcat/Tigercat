@@ -54,6 +54,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Rate                  | Basic      | `basic`      | rate.ts                                             | ./Rate                  |
 | Result                | Basic      | `basic`      | result.ts                                           | ./Result                |
 | Segmented             | Basic      | `basic`      | segmented.ts                                        | ./Segmented             |
+| SplitButton           | Basic      | `basic`      | split-button.ts                                     | ./SplitButton           |
 | Statistic             | Basic      | `basic`      | statistic.ts                                        | ./Statistic             |
 | Tag                   | Basic      | `basic`      | tag.ts                                              | ./Tag                   |
 | Text                  | Basic      | `basic`      | text.ts                                             | ./Text                  |

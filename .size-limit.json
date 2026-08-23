@@ -228,6 +228,18 @@
     "gzip": true
   },
   {
+    "name": "Vue SplitButton subpath",
+    "path": "packages/vue/dist/components/SplitButton.mjs",
+    "limit": "41 kB",
+    "gzip": true
+  },
+  {
+    "name": "React SplitButton subpath",
+    "path": "packages/react/dist/components/SplitButton.mjs",
+    "limit": "34 kB",
+    "gzip": true
+  },
+  {
     "name": "Core tailwind/modern subpath",
     "path": "packages/core/dist/tailwind/modern.js",
     "limit": "3 kB",

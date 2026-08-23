@@ -29,6 +29,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     items: [
       { key: 'button', path: '/button', label: { 'zh-CN': 'Button 按钮', 'en-US': 'Button' } },
       {
+        key: 'split-button',
+        path: '/split-button',
+        label: { 'zh-CN': 'SplitButton 分裂按钮', 'en-US': 'SplitButton' }
+      },
+      {
         key: 'config-provider',
         path: '/config-provider',
         label: { 'zh-CN': 'ConfigProvider 全局配置', 'en-US': 'ConfigProvider' }

@@ -719,6 +719,11 @@
       "import": "./dist/components/Space.mjs",
       "default": "./dist/components/Space.mjs"
     },
+    "./SplitButton": {
+      "types": "./dist/components/SplitButton.d.mts",
+      "import": "./dist/components/SplitButton.mjs",
+      "default": "./dist/components/SplitButton.mjs"
+    },
     "./Splitter": {
       "types": "./dist/components/Splitter.d.mts",
       "import": "./dist/components/Splitter.mjs",

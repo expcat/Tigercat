@@ -7,7 +7,7 @@ description: Compact generated Tigercat Basic props reference
 
 # Basic Props
 
-基础展示与低级交互组件。 共 27 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+基础展示与低级交互组件。 共 28 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Alert
 
@@ -301,6 +301,16 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `options?`  | `SegmentedOption[]` | `-`     | Available options                     |
 | `disabled?` | `boolean`           | `-`     | Whether the whole control is disabled |
 | `size?`     | `ComponentSize`     | `-`     | Component size                        |
+
+## SplitButton
+
+`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 3/15 props
+
+| Prop        | Type            | Default     | Notes                                                             |
+| ----------- | --------------- | ----------- | ----------------------------------------------------------------- |
+| `variant?`  | `ButtonVariant` | `'primary'` | Visual variant applied to the primary action and the menu trigger |
+| `size?`     | `ButtonSize`    | `'md'`      | Size applied to the primary action and the menu trigger           |
+| `disabled?` | `boolean`       | `false`     | Whether both the primary action and the menu trigger are disabled |
 
 ## Statistic
 

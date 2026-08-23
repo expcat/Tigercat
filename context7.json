@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 167,
+  "component_count": 168,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -56,6 +56,8 @@
     "栅格": ["Row", "Col"],
     "按钮": ["Button"],
     "按钮组": ["ButtonGroup"],
+    "分裂按钮": ["SplitButton"],
+    "分割按钮": ["SplitButton"],
     "浮动按钮": ["FloatButton"],
     "悬浮按钮": ["FloatButton"],
     "图标": ["Icon"],
@@ -337,6 +339,7 @@
         "Rate",
         "Result",
         "Segmented",
+        "SplitButton",
         "Statistic",
         "Tag",
         "Text",
@@ -1224,6 +1227,26 @@
       "typeSource": "packages/core/src/types/segmented.ts",
       "sourceFiles": ["packages/core/src/types/segmented.ts"],
       "propsInterfaces": ["SegmentedProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "SplitButton": {
+      "name": "SplitButton",
+      "aliases": ["分裂按钮", "分割按钮"],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./SplitButton",
+      "packageTarget": "SplitButton",
+      "typeSource": "packages/core/src/types/split-button.ts",
+      "sourceFiles": ["packages/core/src/types/split-button.ts"],
+      "propsInterfaces": ["SplitButtonProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

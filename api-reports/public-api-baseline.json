@@ -671,6 +671,9 @@
       "DEFAULT_RATE_LABELS",
       "DEFAULT_RICH_TEXT_EDITOR_LABELS",
       "DEFAULT_SELECT_LABELS",
+      "DEFAULT_SPLIT_BUTTON_SIZE",
+      "DEFAULT_SPLIT_BUTTON_TRIGGER_ARIA_LABEL",
+      "DEFAULT_SPLIT_BUTTON_VARIANT",
       "DEFAULT_STATUS_LABELS",
       "DEFAULT_TABLE_LABELS",
       "DEFAULT_TABS_LABELS",
@@ -1516,6 +1519,9 @@
       "getSpaceStyle",
       "getSpanClasses",
       "getSpinnerSVG",
+      "getSplitButtonPrimaryClasses",
+      "getSplitButtonRootClasses",
+      "getSplitButtonTriggerClasses",
       "getSplitterContainerClasses",
       "getSplitterGutterClasses",
       "getSplitterGutterHandleClasses",
@@ -2454,6 +2460,9 @@
       "resolveSelectFilteredOptions",
       "ResolveSelectOptionsOptions",
       "resolveSeriesData",
+      "resolveSplitButtonSize",
+      "resolveSplitButtonTriggerAriaLabel",
+      "resolveSplitButtonVariant",
       "resolveSwipeGesture",
       "resolveTableColumnWidth",
       "resolveTigerLocale",
@@ -2639,6 +2648,13 @@
       "SpaceProps",
       "SpaceSize",
       "sparklesIcon",
+      "splitButtonPrimaryBlockClasses",
+      "splitButtonPrimaryClasses",
+      "SplitButtonProps",
+      "splitButtonRootBlockClasses",
+      "splitButtonRootClasses",
+      "splitButtonTriggerClasses",
+      "splitButtonTriggerSizeClasses",
       "SplitDirection",
       "splitTagInput",
       "splitterBaseClasses",
@@ -5035,6 +5051,26 @@
       "extends": ["Pick"],
       "props": ["align", "direction", "size", "wrap"]
     },
+    "SplitButtonProps": {
+      "extends": [],
+      "props": [
+        "block",
+        "className",
+        "closeOnClick",
+        "danger",
+        "defaultOpen",
+        "disabled",
+        "htmlType",
+        "iconPosition",
+        "loading",
+        "open",
+        "portal",
+        "size",
+        "style",
+        "triggerAriaLabel",
+        "variant"
+      ]
+    },
     "SplitterProps": {
       "extends": [],
       "props": ["className", "direction", "disabled", "gutterSize", "max", "min", "sizes", "style"]
@@ -5680,6 +5716,7 @@
       "Skeleton",
       "Slider",
       "Space",
+      "SplitButton",
       "Splitter",
       "Spotlight",
       "Statistic",
@@ -6400,6 +6437,11 @@
         "component": "Space",
         "subpath": "./Space",
         "target": "Space"
+      },
+      {
+        "component": "SplitButton",
+        "subpath": "./SplitButton",
+        "target": "SplitButton"
       },
       {
         "component": "Splitter",
@@ -6847,6 +6889,8 @@
       "SliderProps",
       "Space",
       "SpaceProps",
+      "SplitButton",
+      "SplitButtonProps",
       "Splitter",
       "SplitterProps",
       "SplitterResizeEvent",
@@ -7067,6 +7111,7 @@
       "Skeleton",
       "Slider",
       "Space",
+      "SplitButton",
       "Splitter",
       "Spotlight",
       "Statistic",
@@ -7789,6 +7834,11 @@
         "target": "Space"
       },
       {
+        "component": "SplitButton",
+        "subpath": "./SplitButton",
+        "target": "SplitButton"
+      },
+      {
         "component": "Splitter",
         "subpath": "./Splitter",
         "target": "Splitter"
@@ -8078,6 +8128,7 @@
       "Skeleton",
       "Slider",
       "Space",
+      "SplitButton",
       "Splitter",
       "Spotlight",
       "Statistic",
@@ -8258,6 +8309,7 @@
       "VueSkeletonProps",
       "VueSliderProps",
       "VueSpaceProps",
+      "VueSplitButtonProps",
       "VueSplitterProps",
       "VueSpotlightProps",
       "VueStatisticProps",

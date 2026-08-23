@@ -13,6 +13,7 @@ const router = createRouter({
         { path: '', component: Home },
         // Basic
         { path: 'button', component: () => import('./pages/ButtonDemo.vue') },
+        { path: 'split-button', component: () => import('./pages/SplitButtonDemo.vue') },
         {
           path: 'config-provider',
           component: () => import('./pages/ConfigProviderDemo.vue')

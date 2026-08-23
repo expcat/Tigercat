@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- 新增 **SplitButton** 基础组件（批次 4）：主操作按钮 + 相邻 chevron 触发下拉扩展；复用 Button 与 Dropdown，不另起菜单栈；共用 `variant`/`size`/`disabled`/`loading`/`danger`，菜单项走现有 `DropdownMenu`/`DropdownItem` API，主按钮 click 与菜单开关分离；chevron 触发器带可覆盖的 `triggerAriaLabel`（默认 More options）与 `aria-expanded`；Vue/React API 对称、SSR 安全。
 - 新增 **Highlight** 基础组件（批次 4）：关键词/正则文本高亮，将匹配片段包在语义化 `mark` 中并保留非匹配文本；支持 `keywords` 字符串、字符串数组与 `RegExp`，可选 `caseSensitive`/`global`，字符串关键词自动转义；匹配范围由 core helper 计算（无 DOM 依赖），Vue/React API 对称、SSR 安全，无交互角色。
 - 新增 **Kbd** 基础组件（批次 4）：语义化 `kbd` 按键标识（不是按钮），支持默认插槽/`children` 与 `keys` 单键或组合键，可选 `separator`、`size`（sm/md/lg）与 `variant`（default/subtle）；样式复用 Tag 尺寸与 default 色板，Vue/React API 对称、SSR 安全，无交互角色。
 - 新增 **PageHeader** 导航组件（批次 3）：页面级页头（`header` landmark，不是 Layout 顶栏），可选 `showBack`/`onBack`/`@back` 返回控件与 `backHref`；默认返回复用 Button，带链接时复用 Link，也可用 back 插槽覆盖；提供 breadcrumb/title/subTitle/actions 插槽与右侧操作区弹性布局；Vue/React API 对称、SSR 安全，无 menubar 角色。
