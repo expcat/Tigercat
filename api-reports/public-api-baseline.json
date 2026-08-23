@@ -271,6 +271,7 @@
       "carouselTrackScrollClasses",
       "CarouselVisibilityDocument",
       "cartIcon",
+      "CASCADER_DEFAULT_LIST_HEIGHT",
       "cascaderBaseClasses",
       "cascaderColumnClasses",
       "cascaderDropdownClasses",
@@ -1134,6 +1135,9 @@
       "getCascaderOptionPath",
       "getCascaderOptionsAtLevel",
       "getCascaderTriggerClasses",
+      "getCascaderVirtualAlignScrollTop",
+      "getCascaderVirtualItemHeight",
+      "getCascaderVirtualRange",
       "getChartAnimationStyle",
       "getChartAxisTickCacheSize",
       "getChartAxisTicks",
@@ -3666,12 +3670,14 @@
         "disabled",
         "emptyText",
         "expandTrigger",
+        "listHeight",
         "options",
         "placeholder",
         "searchable",
         "searchValue",
         "separator",
-        "size"
+        "size",
+        "virtual"
       ]
     },
     "ChartAxisProps": {

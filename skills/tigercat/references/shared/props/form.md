@@ -21,7 +21,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Cascader
 
-`packages/core/src/types/cascader.ts` · `CascaderProps` · 3/13 props
+`packages/core/src/types/cascader.ts` · `CascaderProps` · 3/15 props
 
 | Prop           | Type               | Default           | Notes                 |
 | -------------- | ------------------ | ----------------- | --------------------- |

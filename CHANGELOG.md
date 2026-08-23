@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Cascader 虚拟化**：新增可选非破坏 props `virtual`（默认 `false`）与 `listHeight`（默认 `256`，与 Select 一致）。`virtual` 为 true 时，每一列选项面板与可搜索扁平路径列表按 Select 的 fixed-size 策略（`fixedSizeStrategy` / `getRange` + overscan）只渲染可视行；键盘导航时把 active/selected 行滚进窗口。Vue/React API 对称，默认非虚拟渲染不变。
 - 新增 **LoadingBar** 反馈组件（批次 4）：顶部加载条（Naive/nprogress 类），命令式离散 API `start()` / `finish()` / `error()` / `clear()`；懒加载 Root facade 与 `ensureContainer` 宿主挂载与 Message/Notification 一致，SSR 安全（无顶层 `window`，`isBrowser` 守卫）；`start` 显示并 trickle 递增，`finish` 拉满后隐藏，`error` 进入错误色后隐藏；`LoadingBarContainer` 为 `progressbar`（polite、`aria-busy`，不抢焦点）；支持 `color`/`height`/`className`/`style` 与可选挂载容器；Vue/React API 对称，不改动现有 Loading/Progress。
 - **同步 `.size-limit.json` 预算**：`Core (full)` 131→135 kB、`Vue (full)` 293→305 kB、`React (full)` 328→340 kB，并新增 LoadingBar 子路径预算。
 - 新增 **ImageCompare** 基础组件（批次 4）：before/after 图片对比滑块，支持指针拖动与键盘调整手柄位置；`orientation` 横向或纵向，`position`/`defaultPosition` 受控与非受控，`beforeSrc`/`afterSrc` 或 Vue `before`/`after` 插槽 / React `before`/`after` 节点；复用 Image 家族 `ImageFit` 与 `toCSSSize`；手柄为可聚焦 `slider`（`aria-valuenow` 0–100），图片带 alt；Vue/React API 对称、SSR 安全。

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, fireEvent } from '@testing-library/vue'
+import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { Cascader } from '@expcat/tigercat-vue/Cascader'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -243,6 +243,149 @@ describe('Cascader', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(Cascader)
       await expectNoA11yViolationsIsolated(container)
+    })
+  })
+
+  describe('Virtual scrolling', () => {
+    const largeOptions = Array.from({ length: 200 }, (_, i) => ({
+      label: `Option ${i}`,
+      value: i,
+      children: [{ label: `Child ${i}`, value: `c-${i}` }]
+    }))
+
+    it('renders only a subset of column options when virtual is enabled', async () => {
+      const { container, getByText, queryByText } = render(Cascader, {
+        props: { options: largeOptions, virtual: true }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+
+      const virtualList = document.body.querySelector('[data-tiger-cascader-virtual]')
+      expect(virtualList).toBeInTheDocument()
+      expect(getByText('Option 0')).toBeInTheDocument()
+      expect(queryByText('Option 199')).not.toBeInTheDocument()
+
+      const options = document.body.querySelectorAll('[role="option"]')
+      expect(options.length).toBeGreaterThan(0)
+      expect(options.length).toBeLessThan(50)
+    })
+
+    it('does not virtualize by default and still renders a small column fully', async () => {
+      const { container, getByText } = render(Cascader, {
+        props: { options: simpleOptions }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+
+      expect(document.body.querySelector('[data-tiger-cascader-virtual]')).not.toBeInTheDocument()
+      expect(getByText('Zhejiang')).toBeInTheDocument()
+      expect(getByText('Jiangsu')).toBeInTheDocument()
+      expect(document.body.querySelectorAll('[role="option"]').length).toBe(2)
+    })
+
+    it('keeps a far selected option in the virtual window', async () => {
+      const { container, getByText, queryByText } = render(Cascader, {
+        props: {
+          options: largeOptions,
+          virtual: true,
+          modelValue: [80, 'c-80']
+        }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+
+      await waitFor(() => {
+        expect(getByText('Option 80')).toBeInTheDocument()
+      })
+      expect(queryByText('Option 0')).not.toBeInTheDocument()
+    })
+
+    it('keeps the active option in the window during keyboard navigation', async () => {
+      const { container, getByText, queryByText } = render(Cascader, {
+        props: { options: largeOptions, virtual: true }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+      const virtualList = document.body.querySelector('[data-tiger-cascader-virtual]')!
+      await fireEvent.keyDown(virtualList, { key: 'End' })
+
+      await waitFor(() => {
+        expect(getByText('Option 199')).toBeInTheDocument()
+      })
+      expect(queryByText('Option 0')).not.toBeInTheDocument()
+    })
+
+    it('virtualizes the searchable flat path list', async () => {
+      const searchOptions = Array.from({ length: 80 }, (_, i) => ({
+        label: `City ${i}`,
+        value: i
+      }))
+      const { container, getByText, queryByText } = render(Cascader, {
+        props: {
+          options: searchOptions,
+          virtual: true,
+          searchable: { limit: 80 }
+        }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+      const searchInput = document.body.querySelector('input[aria-label="Search options"]')!
+      await fireEvent.update(searchInput, 'City')
+
+      await waitFor(() => {
+        expect(document.body.querySelector('[data-tiger-cascader-virtual]')).toBeInTheDocument()
+      })
+      expect(getByText('City 0')).toBeInTheDocument()
+      expect(queryByText('City 79')).not.toBeInTheDocument()
+      expect(document.body.querySelectorAll('[role="option"]').length).toBeLessThan(50)
+    })
+
+    it('still shows the first matching row after End then a tighter search query', async () => {
+      const searchOptions = Array.from({ length: 80 }, (_, i) => ({
+        label: `City ${i}`,
+        value: i
+      }))
+      const { container, getByText, queryByText } = render(Cascader, {
+        props: {
+          options: searchOptions,
+          virtual: true,
+          searchable: { limit: 80 }
+        }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+      const searchInput = document.body.querySelector('input[aria-label="Search options"]')!
+      await fireEvent.update(searchInput, 'City')
+
+      await waitFor(() => {
+        expect(document.body.querySelector('[data-tiger-cascader-virtual]')).toBeInTheDocument()
+      })
+
+      const virtualList = document.body.querySelector('[data-tiger-cascader-virtual]')!
+      await fireEvent.keyDown(virtualList, { key: 'End' })
+
+      await waitFor(() => {
+        expect(getByText('City 79')).toBeInTheDocument()
+      })
+
+      await fireEvent.update(searchInput, 'City 0')
+
+      await waitFor(() => {
+        expect(getByText('City 0')).toBeInTheDocument()
+      })
+      expect(queryByText('City 79')).not.toBeInTheDocument()
+    })
+
+    it('still selects a visible option when virtual is enabled', async () => {
+      const { container, getByText, emitted } = render(Cascader, {
+        props: { options: largeOptions, virtual: true }
+      })
+
+      await fireEvent.click(container.querySelector('button')!)
+      await fireEvent.click(getByText('Option 0'))
+      await fireEvent.click(getByText('Child 0'))
+
+      expect(emitted()['update:modelValue'][0]).toEqual([[0, 'c-0']])
     })
   })
 })

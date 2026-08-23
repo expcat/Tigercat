@@ -92,7 +92,7 @@ source: current repository state + competitor benchmark (2026-07-19)
 
 ### 批次 5 既有组件功能增强(P1)
 
-- [ ] Cascader 虚拟化:大数据量列渲染复用 Select 的 virtual 模式。
+- [x] Cascader 虚拟化:大数据量列渲染复用 Select 的 virtual 模式。
 - [ ] TreeSelect 虚拟化:复用 Tree 已有 virtual 能力。
 - 允许修改范围限于 cascader/tree-select 相关 core utils、双框架实现与测试;公共 API 仅新增可选 props,不做 breaking change。
 - 验证:`pnpm test:group:form`;受影响的 `benchmarks/` 套件需复跑。
