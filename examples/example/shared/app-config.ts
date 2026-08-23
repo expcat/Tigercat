@@ -37,6 +37,7 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
       { key: 'link', path: '/link', label: { 'zh-CN': 'Link 链接', 'en-US': 'Link' } },
       { key: 'text', path: '/text', label: { 'zh-CN': 'Text 文本', 'en-US': 'Text' } },
       { key: 'code', path: '/code', label: { 'zh-CN': 'Code 代码', 'en-US': 'Code' } },
+      { key: 'kbd', path: '/kbd', label: { 'zh-CN': 'Kbd 按键', 'en-US': 'Kbd' } },
       { key: 'image', path: '/image', label: { 'zh-CN': 'Image 图片', 'en-US': 'Image' } },
       {
         key: 'image-cropper',

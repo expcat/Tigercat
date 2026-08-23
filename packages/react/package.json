@@ -454,6 +454,11 @@
       "import": "./dist/components/Kanban.mjs",
       "default": "./dist/components/Kanban.mjs"
     },
+    "./Kbd": {
+      "types": "./dist/components/Kbd.d.mts",
+      "import": "./dist/components/Kbd.mjs",
+      "default": "./dist/components/Kbd.mjs"
+    },
     "./Layout": {
       "types": "./dist/components/Layout.d.mts",
       "import": "./dist/components/Layout.mjs",

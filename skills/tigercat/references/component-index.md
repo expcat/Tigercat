@@ -47,6 +47,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | ImageCropper          | Basic      | `basic`      | image.ts                                            | ./ImageCropper          |
 | ImageGroup            | Basic      | `basic`      | image.ts                                            | ./ImageGroup            |
 | ImagePreview          | Basic      | `basic`      | image.ts                                            | ./ImagePreview          |
+| Kbd                   | Basic      | `basic`      | kbd.ts                                              | ./Kbd                   |
 | Link                  | Basic      | `basic`      | link.ts                                             | ./Link                  |
 | QRCode                | Basic      | `basic`      | qrcode.ts                                           | ./QRCode                |
 | Rate                  | Basic      | `basic`      | rate.ts                                             | ./Rate                  |

@@ -1,0 +1,8 @@
+{
+  "id": "kbd-02",
+  "title": "组合键",
+  "description": "keys 传入字符串或数组；多键用 separator 连接，也可把最后一键放到 children。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }
+}

@@ -21,6 +21,7 @@ const router = createRouter({
         { path: 'link', component: () => import('./pages/LinkDemo.vue') },
         { path: 'text', component: () => import('./pages/TextDemo.vue') },
         { path: 'code', component: () => import('./pages/CodeDemo.vue') },
+        { path: 'kbd', component: () => import('./pages/KbdDemo.vue') },
         { path: 'image', component: () => import('./pages/ImageDemo.vue') },
         {
           path: 'image-cropper',

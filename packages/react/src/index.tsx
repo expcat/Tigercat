@@ -53,6 +53,8 @@ export { Text } from './components/Text'
 export type { TextProps } from './components/Text'
 export { Code } from './components/Code'
 export type { CodeProps } from './components/Code'
+export { Kbd } from './components/Kbd'
+export type { KbdProps } from './components/Kbd'
 export { Icon } from './components/Icon'
 export type { IconProps } from './components/Icon'
 

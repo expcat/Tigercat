@@ -7,7 +7,7 @@ description: Compact generated Tigercat Basic props reference
 
 # Basic Props
 
-基础展示与低级交互组件。 共 25 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+基础展示与低级交互组件。 共 26 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Alert
 
@@ -231,6 +231,16 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `zIndex?`    | `number` | `1050`  | Custom z-index for the preview overlay |
 | `scaleStep?` | `number` | `0.5`   | Scale step for zoom in/out             |
 | `minScale?`  | `number` | `0.25`  | Minimum scale factor                   |
+
+## Kbd
+
+`packages/core/src/types/kbd.ts` · `KbdProps` · 3/6 props
+
+| Prop         | Type      | Default | Notes                                                                                      |
+| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `keys?`      | `KbdKeys` | `-`     | One key or a combo list. A string is a single key; an array is joined with `separator`.... |
+| `separator?` | `string`  | `'+'`   | Separator between combo keys                                                               |
+| `size?`      | `KbdSize` | `'md'`  | Visual size                                                                                |
 
 ## Link
 

@@ -82,7 +82,7 @@ source: current repository state + competitor benchmark (2026-07-19)
 
 ### 批次 4 展示与反馈(P1)
 
-- [ ] Kbd(Basic):按键标识。
+- [x] Kbd(Basic):按键标识。
 - [ ] Highlight(Basic):关键词/正则高亮。
 - [ ] SplitButton(Basic):主操作 + 下拉扩展,复用 Button/Dropdown。
 - [ ] Marquee(Basic):循环滚动、hover 暂停、遵循 prefers-reduced-motion。

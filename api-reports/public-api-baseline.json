@@ -660,6 +660,9 @@
       "DEFAULT_IMAGE_EDITOR_LABELS",
       "DEFAULT_IMAGE_VIEWER_LABELS",
       "DEFAULT_INPUT_OTP_LABELS",
+      "DEFAULT_KBD_SEPARATOR",
+      "DEFAULT_KBD_SIZE",
+      "DEFAULT_KBD_VARIANT",
       "DEFAULT_MARKDOWN_EDITOR_LABELS",
       "DEFAULT_MASK_TOKENS",
       "DEFAULT_PAGINATION_LABELS",
@@ -945,6 +948,8 @@
       "formatGanttDate",
       "formatInputNumberDisplay",
       "formatIntlNumber",
+      "formatKbdCombo",
+      "formatKbdSeparatorText",
       "formatMaskValue",
       "formatMonthYear",
       "formatOtpSlotLabel",
@@ -1301,6 +1306,9 @@
       "getIntlPluralCategory",
       "getJustifyClasses",
       "getKanbanContainerClasses",
+      "getKbdParts",
+      "getKbdRootClasses",
+      "getKbdVariantClasses",
       "getLayoutContentClasses",
       "getLayoutHeaderClasses",
       "getLeafKeys",
@@ -1850,6 +1858,15 @@
       "kanbanSwimlaneCollapsedClasses",
       "kanbanSwimlaneDotClasses",
       "kanbanSwimlaneHeaderClasses",
+      "kbdBaseClasses",
+      "kbdKeyClasses",
+      "KbdKeys",
+      "KbdPart",
+      "KbdProps",
+      "kbdSeparatorClasses",
+      "KbdSize",
+      "kbdSubtleVariantClasses",
+      "KbdVariant",
       "keyIcon",
       "KeyLikeEvent",
       "KO_KR_DATEPICKER_LOCALE",
@@ -2089,6 +2106,7 @@
       "normalizeDate",
       "normalizeGanttDate",
       "normalizeImageAnnotationBox",
+      "normalizeKbdKeys",
       "normalizeMenuSearchQuery",
       "normalizeNumberKeyboardValue",
       "normalizeOrgChartData",
@@ -2396,6 +2414,9 @@
       "resolveFormConditionState",
       "resolveFormFieldConditionState",
       "resolveHeatmapRenderMode",
+      "resolveKbdSeparator",
+      "resolveKbdSize",
+      "resolveKbdVariant",
       "resolveLocaleText",
       "resolveMasonryColumnCount",
       "resolveMasonryGap",
@@ -4280,6 +4301,10 @@
       "extends": ["TaskBoardProps"],
       "props": ["swimlaneField", "swimlanes"]
     },
+    "KbdProps": {
+      "extends": [],
+      "props": ["className", "keys", "separator", "size", "style", "variant"]
+    },
     "LayoutProps": {
       "extends": [],
       "props": ["className"]
@@ -5570,6 +5595,7 @@
       "InputNumber",
       "InputOTP",
       "Kanban",
+      "Kbd",
       "Layout",
       "LineChart",
       "Link",
@@ -6076,6 +6102,11 @@
         "component": "Kanban",
         "subpath": "./Kanban",
         "target": "Kanban"
+      },
+      {
+        "component": "Kbd",
+        "subpath": "./Kbd",
+        "target": "Kbd"
       },
       {
         "component": "Layout",
@@ -6661,6 +6692,8 @@
       "InputProps",
       "Kanban",
       "KanbanProps",
+      "Kbd",
+      "KbdProps",
       "Layout",
       "LayoutProps",
       "LineChart",
@@ -6941,6 +6974,7 @@
       "InputNumber",
       "InputOTP",
       "Kanban",
+      "Kbd",
       "Layout",
       "LineChart",
       "Link",
@@ -7449,6 +7483,11 @@
         "target": "Kanban"
       },
       {
+        "component": "Kbd",
+        "subpath": "./Kbd",
+        "target": "Kbd"
+      },
+      {
         "component": "Layout",
         "subpath": "./Layout",
         "target": "Layout"
@@ -7938,6 +7977,7 @@
       "InputNumber",
       "InputOTP",
       "Kanban",
+      "Kbd",
       "Layout",
       "LineChart",
       "Link",
@@ -8118,6 +8158,7 @@
       "VueInputOTPProps",
       "VueInputProps",
       "VueKanbanProps",
+      "VueKbdProps",
       "VueLayoutProps",
       "VueLineChartProps",
       "VueLinkProps",

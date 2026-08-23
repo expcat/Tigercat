@@ -204,6 +204,18 @@
     "gzip": true
   },
   {
+    "name": "Vue Kbd subpath",
+    "path": "packages/vue/dist/components/Kbd.mjs",
+    "limit": "19 kB",
+    "gzip": true
+  },
+  {
+    "name": "React Kbd subpath",
+    "path": "packages/react/dist/components/Kbd.mjs",
+    "limit": "19 kB",
+    "gzip": true
+  },
+  {
     "name": "Core tailwind/modern subpath",
     "path": "packages/core/dist/tailwind/modern.js",
     "limit": "3 kB",

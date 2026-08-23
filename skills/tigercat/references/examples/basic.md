@@ -22,6 +22,6 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 | --------- | ------------------------ | ------------------------ |
 | Icon      | `<Icon name="search" />` | `<Icon name="search" />` |
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, Code, ConfigProvider, CropUpload, Divider, Empty, Image, ImageCropper, ImageGroup, ImagePreview, Link, QRCode, Rate, Result, Segmented, Statistic, Tag, Text, Watermark.
+标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, Code, ConfigProvider, CropUpload, Divider, Empty, Image, ImageCropper, ImageGroup, ImagePreview, Kbd, Link, QRCode, Rate, Result, Segmented, Statistic, Tag, Text, Watermark.
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

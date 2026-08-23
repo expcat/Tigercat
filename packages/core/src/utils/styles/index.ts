@@ -100,6 +100,7 @@ export * from '../link-utils'
 export * from '../icon-utils'
 export * from '../code-utils'
 export * from '../text-utils'
+export * from '../kbd-utils'
 
 // Image components
 export * from '../image-utils'

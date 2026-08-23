@@ -1,0 +1,8 @@
+{
+  "id": "kbd-03",
+  "title": "尺寸与变体",
+  "description": "size 覆盖 sm/md/lg；variant 为 default（Tag 默认色板）或更安静的 subtle。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 100, "maxHeight": 280 }
+}
