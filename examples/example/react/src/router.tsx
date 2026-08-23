@@ -86,6 +86,7 @@ const BreadcrumbDemo = lazy(() => import('./pages/BreadcrumbDemo'))
 const DropdownDemo = lazy(() => import('./pages/DropdownDemo'))
 const ContextMenuDemo = lazy(() => import('./pages/ContextMenuDemo'))
 const NavigationMenuDemo = lazy(() => import('./pages/NavigationMenuDemo'))
+const PageHeaderDemo = lazy(() => import('./pages/PageHeaderDemo'))
 const TabsDemo = lazy(() => import('./pages/TabsDemo'))
 const StepsDemo = lazy(() => import('./pages/StepsDemo'))
 const PaginationDemo = lazy(() => import('./pages/PaginationDemo'))
@@ -235,6 +236,7 @@ const router = createHashRouter([
       { path: 'dropdown', element: <DropdownDemo /> },
       { path: 'context-menu', element: <ContextMenuDemo /> },
       { path: 'navigation-menu', element: <NavigationMenuDemo /> },
+      { path: 'page-header', element: <PageHeaderDemo /> },
       { path: 'tabs', element: <TabsDemo /> },
       { path: 'steps', element: <StepsDemo /> },
       { path: 'pagination', element: <PaginationDemo /> },

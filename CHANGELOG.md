@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- 新增 **PageHeader** 导航组件（批次 3）：页面级页头（`header` landmark，不是 Layout 顶栏），可选 `showBack`/`onBack`/`@back` 返回控件与 `backHref`；默认返回复用 Button，带链接时复用 Link，也可用 back 插槽覆盖；提供 breadcrumb/title/subTitle/actions 插槽与右侧操作区弹性布局；Vue/React API 对称、SSR 安全，无 menubar 角色。
 - 新增 **NavigationMenu** 导航组件（批次 3）：水平 `menubar` 站点导航，悬停/聚焦展开下拉或 MegaMenu 面板；复用 Dropdown 菜单样式与 anchored-overlay / floating-ui 碰撞定位，默认 portal 到 `document.body`；顶栏左右方向键、Enter/Space/ArrowDown 打开、Escape 关闭并还原焦点；支持受控 `value`/`open` 与非受控 `defaultValue`/`defaultOpen`；提供 Vue/React 双端实现、示例、单测与键盘 E2E。
 - 新增 **ContextMenu** 导航组件（批次 3）：右键（`contextmenu`）触发并阻止浏览器默认菜单，用 1px 虚拟参考点把菜单定位在 `clientX/clientY`；复用 Dropdown 菜单样式与 anchored-overlay / floating-ui 碰撞定位，默认 portal 到 `document.body`；支持嵌套 `ContextMenuSub`（悬停与 ArrowRight/Enter 展开、ArrowLeft/Escape 逐层关闭）、方向键/Home/End 导航、Esc 与外部点击关闭、关闭后焦点还原；受控 `open` 与非受控 `defaultOpen` 与 Dropdown 对齐；提供 Vue/React 双端实现、示例、单测与键盘 E2E。
 - 新增 **InputOTP** 表单组件（批次 1）：分格输入一次性验证码/PIN，支持粘贴分发、自动聚焦推进、掩码模式（`masked`/`maskChar`）、分组显示（`groups`/`separator`）、`numeric`/`alphanumeric` 字符集与自定义 `pattern`；填满触发 `complete`；提供 Vue/React 双端实现、示例、单测与 E2E，新增 `inputOtp` locale 分区（13 套语言）。

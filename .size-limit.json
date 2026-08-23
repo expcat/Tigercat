@@ -192,6 +192,18 @@
     "gzip": true
   },
   {
+    "name": "Vue PageHeader subpath",
+    "path": "packages/vue/dist/components/PageHeader.mjs",
+    "limit": "25 kB",
+    "gzip": true
+  },
+  {
+    "name": "React PageHeader subpath",
+    "path": "packages/react/dist/components/PageHeader.mjs",
+    "limit": "23 kB",
+    "gzip": true
+  },
+  {
     "name": "Core tailwind/modern subpath",
     "path": "packages/core/dist/tailwind/modern.js",
     "limit": "3 kB",

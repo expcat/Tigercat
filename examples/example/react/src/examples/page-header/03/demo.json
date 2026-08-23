@@ -1,0 +1,12 @@
+{
+  "id": "page-header-03",
+  "title": "自定义返回与正文",
+  "description": "back 节点覆盖默认返回按钮（示例用 Link），children 把说明放在标题行下方。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 160,
+    "maxHeight": 480
+  }
+}

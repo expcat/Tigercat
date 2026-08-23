@@ -223,6 +223,8 @@ export type {
   NavigationMenuContextValue,
   NavigationMenuItemContextValue
 } from './components/NavigationMenu'
+export { PageHeader } from './components/PageHeader'
+export type { PageHeaderProps } from './components/PageHeader'
 export { Spotlight } from './components/Spotlight'
 export type { SpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'

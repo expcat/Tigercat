@@ -174,6 +174,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | NavigationMenuItem    | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuItem    |
 | NavigationMenuLink    | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuLink    |
 | NavigationMenuTrigger | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuTrigger |
+| PageHeader            | Navigation | `navigation` | page-header.ts                                      | ./PageHeader            |
 | Pagination            | Navigation | `navigation` | pagination.ts                                       | ./Pagination            |
 | ScrollSpy             | Navigation | `navigation` | scroll-spy.ts                                       | ./ScrollSpy             |
 | Spotlight             | Navigation | `navigation` | spotlight.ts                                        | ./Spotlight             |

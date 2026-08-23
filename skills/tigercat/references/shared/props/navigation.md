@@ -7,7 +7,7 @@ description: Compact generated Tigercat Navigation props reference
 
 # Navigation Props
 
-导航、菜单、分页、步骤、锚点和树形导航组件。 共 32 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+导航、菜单、分页、步骤、锚点和树形导航组件。 共 33 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Affix
 
@@ -249,6 +249,16 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 | `disabled?`  | `boolean` | `false` | Whether the trigger is disabled                                     |
 | `showArrow?` | `boolean` | `-`     | Whether to show a chevron. Falls back to the root `showArrow` prop. |
 | `className?` | `string`  | `-`     | Additional CSS classes                                              |
+
+## PageHeader
+
+`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 3/7 props
+
+| Prop             | Type      | Default  | Notes                                                                                      |
+| ---------------- | --------- | -------- | ------------------------------------------------------------------------------------------ |
+| `showBack?`      | `boolean` | `-`      | Whether to show the back control. When omitted, the control is shown if `onBack` / `@ba... |
+| `backHref?`      | `string`  | `-`      | Navigation URL for the default back control. Renders a Link instead of a Button when se... |
+| `backAriaLabel?` | `string`  | `'Back'` | Accessible name for the default back control                                               |
 
 ## Pagination
 

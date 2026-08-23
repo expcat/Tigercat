@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 164,
+  "component_count": 165,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -77,6 +77,8 @@
     "导航菜单": ["NavigationMenu"],
     "站点导航": ["NavigationMenu"],
     "MegaMenu": ["NavigationMenu"],
+    "页头": ["PageHeader"],
+    "页面头部": ["PageHeader"],
     "自动完成": ["AutoComplete"],
     "自动补全": ["AutoComplete"],
     "提及": ["Mentions"],
@@ -506,6 +508,7 @@
         "NavigationMenuItem",
         "NavigationMenuLink",
         "NavigationMenuTrigger",
+        "PageHeader",
         "Pagination",
         "ScrollSpy",
         "Spotlight",
@@ -3620,6 +3623,26 @@
       "typeSource": "packages/core/src/types/navigation-menu.ts",
       "sourceFiles": ["packages/core/src/types/navigation-menu.ts"],
       "propsInterfaces": ["NavigationMenuTriggerProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "PageHeader": {
+      "name": "PageHeader",
+      "aliases": ["页头", "页面头部"],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./PageHeader",
+      "packageTarget": "PageHeader",
+      "typeSource": "packages/core/src/types/page-header.ts",
+      "sourceFiles": ["packages/core/src/types/page-header.ts"],
+      "propsInterfaces": ["PageHeaderProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

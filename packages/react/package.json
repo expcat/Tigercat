@@ -574,6 +574,11 @@
       "import": "./dist/components/OrgChart.mjs",
       "default": "./dist/components/OrgChart.mjs"
     },
+    "./PageHeader": {
+      "types": "./dist/components/PageHeader.d.mts",
+      "import": "./dist/components/PageHeader.mjs",
+      "default": "./dist/components/PageHeader.mjs"
+    },
     "./Pagination": {
       "types": "./dist/components/Pagination.d.mts",
       "import": "./dist/components/Pagination.mjs",

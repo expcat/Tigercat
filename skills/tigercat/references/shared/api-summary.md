@@ -109,6 +109,7 @@ description: Compact generated route map for Tigercat core type files
 | dropdown.ts        | DropdownProps, DropdownMenuProps, DropdownItemProps                                                                           |
 | context-menu.ts    | ContextMenuProps, ContextMenuMenuProps, ContextMenuItemProps, ContextMenuSubProps                                             |
 | navigation-menu.ts | NavigationMenuProps, NavigationMenuItemProps, NavigationMenuTriggerProps, NavigationMenuContentProps, NavigationMenuLinkProps |
+| page-header.ts     | PageHeaderProps                                                                                                               |
 | float-button.ts    | FloatButtonProps, FloatButtonGroupProps                                                                                       |
 | menu.ts            | MenuProps, MenuItemProps, SubMenuProps, MenuItemGroupProps                                                                    |
 | pagination.ts      | PaginationProps                                                                                                               |

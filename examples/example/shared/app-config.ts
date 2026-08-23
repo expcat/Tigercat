@@ -299,6 +299,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         path: '/navigation-menu',
         label: { 'zh-CN': 'NavigationMenu 站点导航', 'en-US': 'NavigationMenu' }
       },
+      {
+        key: 'page-header',
+        path: '/page-header',
+        label: { 'zh-CN': 'PageHeader 页头', 'en-US': 'PageHeader' }
+      },
       { key: 'tabs', path: '/tabs', label: { 'zh-CN': 'Tabs 标签页', 'en-US': 'Tabs' } },
       { key: 'steps', path: '/steps', label: { 'zh-CN': 'Steps 步骤条', 'en-US': 'Steps' } },
       {

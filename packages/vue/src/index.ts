@@ -189,6 +189,8 @@ export type {
   VueNavigationMenuContentProps,
   VueNavigationMenuLinkProps
 } from './components/NavigationMenu'
+export { PageHeader } from './components/PageHeader'
+export type { VuePageHeaderProps } from './components/PageHeader'
 export { Spotlight } from './components/Spotlight'
 export type { VueSpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'
