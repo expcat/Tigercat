@@ -1344,6 +1344,14 @@
       "getModalContentClasses",
       "getMonthDays",
       "getMonthNames",
+      "getNavigationMenuBarItems",
+      "getNavigationMenuChevronClasses",
+      "getNavigationMenuClasses",
+      "getNavigationMenuContentClasses",
+      "getNavigationMenuItemClasses",
+      "getNavigationMenuLinkClasses",
+      "getNavigationMenuListClasses",
+      "getNavigationMenuTriggerClasses",
       "getNextActiveKey",
       "getNextColorSwatchIndex",
       "getNextImageAnnotationTool",
@@ -1629,6 +1637,7 @@
       "handleDragOver",
       "handleDragStart",
       "handleDrop",
+      "handleMenubarNavigation",
       "handleMenuNavigation",
       "handleNodeCheck",
       "handleTabKey",
@@ -1735,10 +1744,12 @@
       "InfiniteScrollObserverOptions",
       "InfiniteScrollProps",
       "infiniteScrollSentinelClasses",
+      "initNavigationMenuRovingTabIndex",
       "initRovingTabIndex",
       "injectContextMenuStyles",
       "injectDropdownStyles",
       "injectLoadingAnimationStyles",
+      "injectNavigationMenuStyles",
       "injectShakeStyle",
       "injectSvgAnimationStyles",
       "injectViewTransitionStyles",
@@ -1798,6 +1809,9 @@
       "isMarkdownToolbarSeparator",
       "isMobile",
       "isModalSheetSwipeCloseGesture",
+      "isNavigationMenuOpen",
+      "isNavigationMenuTriggerOpenKey",
+      "isNavigationMenuValueOpen",
       "isNextDisabled",
       "isOptionGroup",
       "isOtpComplete",
@@ -2050,6 +2064,18 @@
       "musicIcon",
       "naturalTheme",
       "navigateToFolder",
+      "NAVIGATION_MENU_BAR_ITEM_ATTR",
+      "NAVIGATION_MENU_CHEVRON_PATH",
+      "NAVIGATION_MENU_DEFAULT_DELAY_DURATION",
+      "NAVIGATION_MENU_DEFAULT_OFFSET",
+      "NAVIGATION_MENU_DEFAULT_SKIP_DELAY_DURATION",
+      "NAVIGATION_MENU_ENTER_CLASS",
+      "NavigationMenuContentProps",
+      "NavigationMenuItemProps",
+      "NavigationMenuLinkProps",
+      "NavigationMenuProps",
+      "NavigationMenuTriggerProps",
+      "NavigationMenuValue",
       "nextIconPath",
       "normalizeActiveKeys",
       "normalizeChartBrushRange",
@@ -2357,6 +2383,7 @@
       "resolveMotionDuration",
       "resolveMotionEasing",
       "resolveMultiSeriesTooltipContent",
+      "resolveNavigationMenuOpenValue",
       "resolvePaginationDisplayMode",
       "resolvePanGesture",
       "resolvePinchScale",
@@ -2497,6 +2524,7 @@
       "shouldReduceMotion",
       "shouldRenderScrollAreaScrollbar",
       "shouldShowBackTop",
+      "shouldSkipNavigationMenuOpenDelay",
       "SidebarProps",
       "signatureCanvasClasses",
       "SignatureCanvasRect",
@@ -4438,6 +4466,40 @@
       "extends": ["BaseInteractiveProps"],
       "props": []
     },
+    "NavigationMenuContentProps": {
+      "extends": [],
+      "props": ["className", "mega", "style"]
+    },
+    "NavigationMenuItemProps": {
+      "extends": [],
+      "props": ["className", "disabled", "style", "value"]
+    },
+    "NavigationMenuLinkProps": {
+      "extends": [],
+      "props": ["active", "className", "disabled", "href", "rel", "style", "target"]
+    },
+    "NavigationMenuProps": {
+      "extends": [],
+      "props": [
+        "className",
+        "closeOnClick",
+        "defaultOpen",
+        "defaultValue",
+        "delayDuration",
+        "disabled",
+        "offset",
+        "open",
+        "portal",
+        "showArrow",
+        "skipDelayDuration",
+        "style",
+        "value"
+      ]
+    },
+    "NavigationMenuTriggerProps": {
+      "extends": [],
+      "props": ["className", "disabled", "showArrow", "style"]
+    },
     "NotificationCenterProps": {
       "extends": [],
       "props": [
@@ -5498,6 +5560,11 @@
       "Message",
       "MessageContainer",
       "Modal",
+      "NavigationMenu",
+      "NavigationMenuContent",
+      "NavigationMenuItem",
+      "NavigationMenuLink",
+      "NavigationMenuTrigger",
       "NotificationCenter",
       "NotificationContainer",
       "NumberKeyboard",
@@ -6058,6 +6125,31 @@
         "component": "Modal",
         "subpath": "./Modal",
         "target": "Modal"
+      },
+      {
+        "component": "NavigationMenu",
+        "subpath": "./NavigationMenu",
+        "target": "NavigationMenu"
+      },
+      {
+        "component": "NavigationMenuContent",
+        "subpath": "./NavigationMenuContent",
+        "target": "NavigationMenu"
+      },
+      {
+        "component": "NavigationMenuItem",
+        "subpath": "./NavigationMenuItem",
+        "target": "NavigationMenu"
+      },
+      {
+        "component": "NavigationMenuLink",
+        "subpath": "./NavigationMenuLink",
+        "target": "NavigationMenu"
+      },
+      {
+        "component": "NavigationMenuTrigger",
+        "subpath": "./NavigationMenuTrigger",
+        "target": "NavigationMenu"
       },
       {
         "component": "NotificationCenter",
@@ -6569,6 +6661,18 @@
       "MessageProps",
       "Modal",
       "ModalProps",
+      "NavigationMenu",
+      "NavigationMenuContent",
+      "NavigationMenuContentProps",
+      "NavigationMenuContextValue",
+      "NavigationMenuItem",
+      "NavigationMenuItemContextValue",
+      "NavigationMenuItemProps",
+      "NavigationMenuLink",
+      "NavigationMenuLinkProps",
+      "NavigationMenuProps",
+      "NavigationMenuTrigger",
+      "NavigationMenuTriggerProps",
       "notification",
       "NotificationCenter",
       "NotificationCenterProps",
@@ -6819,6 +6923,11 @@
       "Message",
       "MessageContainer",
       "Modal",
+      "NavigationMenu",
+      "NavigationMenuContent",
+      "NavigationMenuItem",
+      "NavigationMenuLink",
+      "NavigationMenuTrigger",
       "NotificationCenter",
       "NotificationContainer",
       "NumberKeyboard",
@@ -7381,6 +7490,31 @@
         "target": "Modal"
       },
       {
+        "component": "NavigationMenu",
+        "subpath": "./NavigationMenu",
+        "target": "NavigationMenu"
+      },
+      {
+        "component": "NavigationMenuContent",
+        "subpath": "./NavigationMenuContent",
+        "target": "NavigationMenu"
+      },
+      {
+        "component": "NavigationMenuItem",
+        "subpath": "./NavigationMenuItem",
+        "target": "NavigationMenu"
+      },
+      {
+        "component": "NavigationMenuLink",
+        "subpath": "./NavigationMenuLink",
+        "target": "NavigationMenu"
+      },
+      {
+        "component": "NavigationMenuTrigger",
+        "subpath": "./NavigationMenuTrigger",
+        "target": "NavigationMenu"
+      },
+      {
         "component": "NotificationCenter",
         "subpath": "./NotificationCenter",
         "target": "NotificationCenter"
@@ -7781,6 +7915,11 @@
       "Message",
       "MessageContainer",
       "Modal",
+      "NavigationMenu",
+      "NavigationMenuContent",
+      "NavigationMenuItem",
+      "NavigationMenuLink",
+      "NavigationMenuTrigger",
       "notification",
       "NotificationCenter",
       "NotificationContainer",
@@ -7954,6 +8093,11 @@
       "VueMessageContainerProps",
       "VueMessageProps",
       "VueModalProps",
+      "VueNavigationMenuContentProps",
+      "VueNavigationMenuItemProps",
+      "VueNavigationMenuLinkProps",
+      "VueNavigationMenuProps",
+      "VueNavigationMenuTriggerProps",
       "VueNotificationCenterProps",
       "VueNotificationContainerProps",
       "VueNotificationProps",

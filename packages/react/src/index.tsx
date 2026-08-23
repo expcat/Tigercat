@@ -207,6 +207,22 @@ export type {
   ContextMenuSubProps,
   ContextMenuContextValue
 } from './components/ContextMenu'
+export {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink
+} from './components/NavigationMenu'
+export type {
+  NavigationMenuProps,
+  NavigationMenuItemProps,
+  NavigationMenuTriggerProps,
+  NavigationMenuContentProps,
+  NavigationMenuLinkProps,
+  NavigationMenuContextValue,
+  NavigationMenuItemContextValue
+} from './components/NavigationMenu'
 export { Spotlight } from './components/Spotlight'
 export type { SpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'

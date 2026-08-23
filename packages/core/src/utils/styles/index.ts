@@ -80,6 +80,7 @@ export * from '../steps-utils'
 export * from '../pagination-utils'
 export * from '../dropdown-utils'
 export * from '../context-menu-utils'
+export * from '../navigation-menu-utils'
 
 // Feedback components
 export * from '../drawer-utils'

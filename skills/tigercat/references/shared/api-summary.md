@@ -100,22 +100,23 @@ description: Compact generated route map for Tigercat core type files
 
 ## Navigation
 
-| Type File       | Props Interfaces                                                                  |
-| --------------- | --------------------------------------------------------------------------------- |
-| affix.ts        | AffixProps                                                                        |
-| anchor.ts       | AnchorProps, AnchorLinkProps                                                      |
-| back-top.ts     | BackTopProps                                                                      |
-| breadcrumb.ts   | BreadcrumbProps, BreadcrumbItemProps                                              |
-| dropdown.ts     | DropdownProps, DropdownMenuProps, DropdownItemProps                               |
-| context-menu.ts | ContextMenuProps, ContextMenuMenuProps, ContextMenuItemProps, ContextMenuSubProps |
-| float-button.ts | FloatButtonProps, FloatButtonGroupProps                                           |
-| menu.ts         | MenuProps, MenuItemProps, SubMenuProps, MenuItemGroupProps                        |
-| pagination.ts   | PaginationProps                                                                   |
-| scroll-spy.ts   | ScrollSpyProps                                                                    |
-| spotlight.ts    | SpotlightProps                                                                    |
-| steps.ts        | StepsProps                                                                        |
-| tabs.ts         | TabsProps, TabPaneProps                                                           |
-| tree.ts         | TreeProps                                                                         |
+| Type File          | Props Interfaces                                                                                                              |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| affix.ts           | AffixProps                                                                                                                    |
+| anchor.ts          | AnchorProps, AnchorLinkProps                                                                                                  |
+| back-top.ts        | BackTopProps                                                                                                                  |
+| breadcrumb.ts      | BreadcrumbProps, BreadcrumbItemProps                                                                                          |
+| dropdown.ts        | DropdownProps, DropdownMenuProps, DropdownItemProps                                                                           |
+| context-menu.ts    | ContextMenuProps, ContextMenuMenuProps, ContextMenuItemProps, ContextMenuSubProps                                             |
+| navigation-menu.ts | NavigationMenuProps, NavigationMenuItemProps, NavigationMenuTriggerProps, NavigationMenuContentProps, NavigationMenuLinkProps |
+| float-button.ts    | FloatButtonProps, FloatButtonGroupProps                                                                                       |
+| menu.ts            | MenuProps, MenuItemProps, SubMenuProps, MenuItemGroupProps                                                                    |
+| pagination.ts      | PaginationProps                                                                                                               |
+| scroll-spy.ts      | ScrollSpyProps                                                                                                                |
+| spotlight.ts       | SpotlightProps                                                                                                                |
+| steps.ts           | StepsProps                                                                                                                    |
+| tabs.ts            | TabsProps, TabPaneProps                                                                                                       |
+| tree.ts            | TreeProps                                                                                                                     |
 
 ## Data
 

@@ -76,7 +76,7 @@ source: current repository state + competitor benchmark (2026-07-19)
 ### 批次 3 导航与站点(P1)
 
 - [x] ContextMenu:contextmenu 触发、坐标定位、嵌套子菜单、键盘导航;复用 Dropdown/Menu 的菜单渲染与 floating-ui 定位。
-- [ ] NavigationMenu:水平导航 + 下拉/MegaMenu 面板、hover/focus 展开、menubar 语义 a11y。
+- [x] NavigationMenu:水平导航 + 下拉/MegaMenu 面板、hover/focus 展开、menubar 语义 a11y。
 - [ ] PageHeader:返回、面包屑/标题/操作区插槽。
 - 验证:`pnpm test:group:navigation`;ContextMenu/NavigationMenu 键盘交互补 E2E。
 

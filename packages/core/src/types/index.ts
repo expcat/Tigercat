@@ -5,7 +5,7 @@
  * - Form components: button, input, textarea, select, checkbox, radio, switch, slider, datepicker, timepicker, upload, form
  * - Layout components: space, divider, layout, grid, container
  * - Data display: table, tag, badge, card, avatar, list, descriptions, timeline, tree, skeleton, progress
- * - Navigation: menu, tabs, breadcrumb, steps, pagination, dropdown, context-menu
+ * - Navigation: menu, tabs, breadcrumb, steps, pagination, dropdown, context-menu, navigation-menu
  * - Feedback: drawer, modal, alert, message, notification, loading, popconfirm, popover, tooltip
  * - Other: link, text, icon, code, chart, locale
  */
@@ -73,6 +73,7 @@ export * from './steps'
 export * from './pagination'
 export * from './dropdown'
 export * from './context-menu'
+export * from './navigation-menu'
 export * from './spotlight'
 export * from './scroll-spy'
 

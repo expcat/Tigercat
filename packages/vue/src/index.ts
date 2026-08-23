@@ -175,6 +175,20 @@ export type {
   VueContextMenuItemProps,
   VueContextMenuSubProps
 } from './components/ContextMenu'
+export {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink
+} from './components/NavigationMenu'
+export type {
+  VueNavigationMenuProps,
+  VueNavigationMenuItemProps,
+  VueNavigationMenuTriggerProps,
+  VueNavigationMenuContentProps,
+  VueNavigationMenuLinkProps
+} from './components/NavigationMenu'
 export { Spotlight } from './components/Spotlight'
 export type { VueSpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'

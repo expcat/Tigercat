@@ -529,6 +529,31 @@
       "import": "./dist/components/Modal.mjs",
       "default": "./dist/components/Modal.mjs"
     },
+    "./NavigationMenu": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
+    "./NavigationMenuContent": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
+    "./NavigationMenuItem": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
+    "./NavigationMenuLink": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
+    "./NavigationMenuTrigger": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
     "./NotificationCenter": {
       "types": "./dist/components/NotificationCenter.d.mts",
       "import": "./dist/components/NotificationCenter.mjs",

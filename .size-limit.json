@@ -180,6 +180,18 @@
     "gzip": true
   },
   {
+    "name": "Vue NavigationMenu subpath",
+    "path": "packages/vue/dist/components/NavigationMenu.mjs",
+    "limit": "40 kB",
+    "gzip": true
+  },
+  {
+    "name": "React NavigationMenu subpath",
+    "path": "packages/react/dist/components/NavigationMenu.mjs",
+    "limit": "33 kB",
+    "gzip": true
+  },
+  {
     "name": "Core tailwind/modern subpath",
     "path": "packages/core/dist/tailwind/modern.js",
     "limit": "3 kB",

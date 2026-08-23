@@ -7,7 +7,7 @@ description: Compact generated Tigercat Navigation props reference
 
 # Navigation Props
 
-导航、菜单、分页、步骤、锚点和树形导航组件。 共 27 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+导航、菜单、分页、步骤、锚点和树形导航组件。 共 32 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Affix
 
@@ -199,6 +199,56 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 | ------------ | -------- | ------- | ---------------------- |
 | `title?`     | `string` | `-`     | Group title            |
 | `className?` | `string` | `-`     | Additional CSS classes |
+
+## NavigationMenu
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 3/13 props
+
+| Prop            | Type                          | Default | Notes                                                                                      |
+| --------------- | ----------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`        | `NavigationMenuValue \| null` | `-`     | Currently open top-level item key (controlled mode). `null` or `''` closes every panel.    |
+| `defaultValue?` | `NavigationMenuValue \| null` | `-`     | Default open item key (uncontrolled mode)                                                  |
+| `open?`         | `boolean`                     | `-`     | Whether any panel is open (controlled mode). When `false`, every panel is closed even i... |
+
+## NavigationMenuContent
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuContentProps`
+
+| Prop         | Type                      | Default | Notes                                                    |
+| ------------ | ------------------------- | ------- | -------------------------------------------------------- |
+| `mega?`      | `boolean`                 | `false` | Wider MegaMenu panel with extra padding for rich content |
+| `className?` | `string`                  | `-`     | Additional CSS classes                                   |
+| `style?`     | `Record<string, unknown>` | `-`     | Custom styles                                            |
+
+## NavigationMenuItem
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuItemProps` · 3/4 props
+
+| Prop         | Type                  | Default | Notes                                                                                      |
+| ------------ | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`     | `NavigationMenuValue` | `-`     | Unique key used as the open `value` when this item has a panel. Auto-generated when omi... |
+| `disabled?`  | `boolean`             | `false` | Whether the item (trigger or top-level link) is disabled                                   |
+| `className?` | `string`              | `-`     | Additional CSS classes                                                                     |
+
+## NavigationMenuLink
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuLinkProps` · 3/7 props
+
+| Prop      | Type     | Default | Notes                                                                     |
+| --------- | -------- | ------- | ------------------------------------------------------------------------- |
+| `href?`   | `string` | `-`     | Link href. Renders an `<a>` when set, otherwise a `<button>`.             |
+| `target?` | `string` | `-`     | Link target                                                               |
+| `rel?`    | `string` | `-`     | Rel attribute. `noopener noreferrer` is added automatically for `_blank`. |
+
+## NavigationMenuTrigger
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuTriggerProps` · 3/4 props
+
+| Prop         | Type      | Default | Notes                                                               |
+| ------------ | --------- | ------- | ------------------------------------------------------------------- |
+| `disabled?`  | `boolean` | `false` | Whether the trigger is disabled                                     |
+| `showArrow?` | `boolean` | `-`     | Whether to show a chevron. Falls back to the root `showArrow` prop. |
+| `className?` | `string`  | `-`     | Additional CSS classes                                              |
 
 ## Pagination
 
