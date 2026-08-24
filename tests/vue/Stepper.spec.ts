@@ -67,6 +67,18 @@ describe('Stepper', () => {
     }
   })
 
+  it('increments the displayed value without modelValue', async () => {
+    const { container } = renderWithProps(Stepper, {})
+    const buttons = container.querySelectorAll('button')
+    await fireEvent.click(buttons[1])
+    expect(container.querySelector('input')).toHaveValue('1')
+  })
+
+  it('starts at defaultValue', () => {
+    const { container } = renderWithProps(Stepper, { defaultValue: 5 })
+    expect(container.querySelector('input')).toHaveValue('5')
+  })
+
   // --- Disabled ---
   it('disables all controls when disabled', () => {
     const { container } = renderWithProps(Stepper, { disabled: true })

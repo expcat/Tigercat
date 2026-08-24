@@ -97,6 +97,22 @@ describe('Switch', () => {
     })
   })
 
+  describe('Uncontrolled', () => {
+    it('toggles aria-checked on click without checked', async () => {
+      const user = userEvent.setup()
+      const { container } = render(<Switch />)
+      const el = getSwitch(container)
+      expect(el).toHaveAttribute('aria-checked', 'false')
+      await user.click(el)
+      expect(el).toHaveAttribute('aria-checked', 'true')
+    })
+
+    it('starts checked when defaultChecked is true', () => {
+      const { container } = render(<Switch defaultChecked />)
+      expect(getSwitch(container)).toHaveAttribute('aria-checked', 'true')
+    })
+  })
+
   describe('Handler composition', () => {
     it('fires both onClick and onChange', async () => {
       const user = userEvent.setup()

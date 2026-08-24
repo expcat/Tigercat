@@ -29,7 +29,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A9 | VirtualList example stripe | done | this commit | 2026-08-25 |
 | A10 | ImageViewer toolbar/nav (same as #19) | done | this commit | 2026-08-25 |
 | #2 | Vue Slider v-model | done | this commit | 2026-08-25 |
-| #3 | Switch / Stepper / ColorSwatch uncontrolled | pending | | |
+| #3 | Switch / Stepper / ColorSwatch uncontrolled | done | this commit | 2026-08-25 |
 | #4 | Vue Transfer targetKeys | pending | | |
 | #5 | AutoComplete write option.label | pending | | |
 | #6 | React Form validate after updateValue | pending | | |
@@ -196,3 +196,17 @@ Vue Slider default v-model in `packages/vue/src/components/Slider.ts`:
 Examples still use `<Slider v-model>`. React Slider and core `SliderProps` unchanged. Public API addition recorded in CHANGELOG unpublished.
 
 Next: Phase C #3 Switch / Stepper / ColorSwatch uncontrolled.
+
+## #3 notes
+
+Switch / Stepper (Vue+React) and Vue ColorSwatch keep uncontrolled inner state:
+
+- Vue Switch: `modelValue` is `[Boolean, null]` default `null` (not Boolean `false`); `defaultValue` seeds `internalChecked`; controlled when `modelValue !== null`
+- React Switch: no `checked = false` destructure; `useControlledState(checked, defaultChecked ?? false, onChange)`
+- Vue Stepper: `modelValue` has no default; `defaultValue` (default 0) seeds `inner`; display / step / atMin / atMax use resolved value
+- React Stepper: no `value = 0` destructure; `useControlledState(value, defaultValue ?? 0, onChange)`
+- Vue ColorSwatch: optional `defaultValue` + `innerValue`; selected mark uses `modelValue ?? inner` (React ColorSwatch already had this)
+
+Bare click / plus / swatch pick updates UI when the parent does not write back. Controlled `v-model` / `checked` / `value` still require parent write-back. Examples unchanged. Public API addition recorded in CHANGELOG unpublished.
+
+Next: Phase C #4 Vue Transfer targetKeys.

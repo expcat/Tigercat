@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Switch / Stepper / ColorSwatch 非受控内部态**：两端 Switch、Stepper 与 Vue ColorSwatch 通过 `defaultValue` / `defaultChecked` 保留非受控内部状态，点击后即使父级不回写也会更新 UI；受控 `v-model` / `checked` / `value` 仍可用。公开 API 增补，无主题变量变化。
 - **Vue Slider 支持默认 v-model**：同时接受 `modelValue` 并兼发 `update:modelValue`，Pages/示例里的 `<Slider v-model>` 不再停在 min；原有 `v-model:value` / `update:value` 保持不变。公开 API 增补，无主题变量变化。
 - **ImageViewer 亮色工具条/导航白底白字**：工具条、左右导航与计数去掉已注册 `--tiger-surface`，改走未注册 `--tiger-image-toolbar-bg` 并以 `rgba(0,0,0,0.6)` 为 last-resort，与 ImagePreview 深色半透明 chrome 对齐。不注册进 `THEME_CSS_VARS`。
 - **VirtualList 示例暗色斑马**：virtual-list/01 偶数行去掉锁死的 `bg-gray-50`，改走已注册 `--tiger-surface-muted`，避免暗色页白条浅字。可选 `--tiger-virtuallist-stripe` 为一层覆写，不注册进 `THEME_CSS_VARS`。

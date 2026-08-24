@@ -1,4 +1,4 @@
-import { defineComponent, h, onBeforeUnmount, type PropType } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, ref, watch, type PropType } from 'vue'
 import type { ComponentSize } from '@expcat/tigercat-core'
 import {
   stepperBaseClasses,
@@ -18,7 +18,8 @@ export type VueStepperProps = InstanceType<typeof Stepper>['$props']
 export const Stepper = defineComponent({
   name: 'TigerStepper',
   props: {
-    modelValue: { type: Number, default: 0 },
+    modelValue: { type: Number },
+    defaultValue: { type: Number, default: 0 },
     min: { type: Number, default: -Infinity },
     max: { type: Number, default: Infinity },
     step: { type: Number, default: 1 },
@@ -30,20 +31,37 @@ export const Stepper = defineComponent({
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
+    const inner = ref(props.defaultValue ?? 0)
+    const currentValue = computed(() =>
+      props.modelValue !== undefined ? props.modelValue : inner.value
+    )
+
+    watch(
+      () => props.modelValue,
+      (value) => {
+        if (value !== undefined) {
+          inner.value = value
+        }
+      }
+    )
+
     const repeatController = createRafRepeatActionController()
-    let repeatValue = props.modelValue
+    let repeatValue = currentValue.value
     let suppressNextClick = false
 
     onBeforeUnmount(() => repeatController.stop())
 
     function setValue(v: number): number {
       const clamped = clampStepperValue(v, props.min, props.max, props.precision)
+      if (props.modelValue === undefined) {
+        inner.value = clamped
+      }
       emit('update:modelValue', clamped)
       emit('change', clamped)
       return clamped
     }
 
-    function stepBy(direction: 'up' | 'down', baseValue: number = props.modelValue): number {
+    function stepBy(direction: 'up' | 'down', baseValue: number = currentValue.value): number {
       return setValue(direction === 'up' ? baseValue + props.step : baseValue - props.step)
     }
 
@@ -69,11 +87,11 @@ export const Stepper = defineComponent({
       return (event: PointerEvent) => {
         event.preventDefault()
         if (props.disabled) return
-        if (direction === 'down' && props.modelValue <= props.min) return
-        if (direction === 'up' && props.modelValue >= props.max) return
+        if (direction === 'down' && currentValue.value <= props.min) return
+        if (direction === 'up' && currentValue.value >= props.max) return
 
         suppressNextClick = true
-        repeatValue = props.modelValue
+        repeatValue = currentValue.value
         repeatController.start(() => {
           const baseValue = repeatValue
           const nextValue = stepBy(direction, baseValue)
@@ -107,8 +125,8 @@ export const Stepper = defineComponent({
       )
 
     return () => {
-      const atMin = props.modelValue <= props.min
-      const atMax = props.modelValue >= props.max
+      const atMin = currentValue.value <= props.min
+      const atMax = currentValue.value >= props.max
 
       return h(
         'div',
@@ -138,8 +156,8 @@ export const Stepper = defineComponent({
             class: getStepperInputClasses(props.size),
             value:
               props.precision !== undefined
-                ? props.modelValue.toFixed(props.precision)
-                : String(props.modelValue),
+                ? currentValue.value.toFixed(props.precision)
+                : String(currentValue.value),
             disabled: props.disabled,
             'aria-label': 'Value',
             onChange: handleInput

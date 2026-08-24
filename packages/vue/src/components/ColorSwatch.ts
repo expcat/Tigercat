@@ -29,6 +29,7 @@ export const ColorSwatch = defineComponent({
   name: 'TigerColorSwatch',
   props: {
     modelValue: { type: String, default: undefined },
+    defaultValue: { type: String },
     disabled: { type: Boolean, default: false },
     size: { type: String as PropType<ComponentSize>, default: 'md' },
     colors: { type: Array as PropType<ColorSwatchOptionInput[]>, default: undefined },
@@ -38,13 +39,17 @@ export const ColorSwatch = defineComponent({
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { attrs, emit }) {
+    const innerValue = ref(props.defaultValue)
     const focusIndex = ref(-1)
     const optionRefs = ref<HTMLElement[]>([])
 
     const normalizedGroups = computed(() => normalizeColorSwatchGroups(props.groups, props.colors))
     const options = computed(() => flattenColorSwatchGroups(normalizedGroups.value))
+    const selectedValue = computed(() =>
+      props.modelValue !== undefined ? props.modelValue : innerValue.value
+    )
     const selectedIndex = computed(() =>
-      options.value.findIndex((option) => isColorSwatchSelected(option.value, props.modelValue))
+      options.value.findIndex((option) => isColorSwatchSelected(option.value, selectedValue.value))
     )
     const firstEnabledIndex = computed(() => options.value.findIndex((option) => !option.disabled))
     const activeIndex = computed(() =>
@@ -53,6 +58,7 @@ export const ColorSwatch = defineComponent({
 
     function handleSelect(option: ColorSwatchNormalizedOption) {
       if (props.disabled || option.disabled) return
+      if (props.modelValue === undefined) innerValue.value = option.value
       emit('update:modelValue', option.value)
       emit('change', option.value, option)
     }
@@ -107,7 +113,7 @@ export const ColorSwatch = defineComponent({
                 group.colors.map((option) => {
                   const optionIndex = flatIndex
                   flatIndex += 1
-                  const selected = isColorSwatchSelected(option.value, props.modelValue)
+                  const selected = isColorSwatchSelected(option.value, selectedValue.value)
                   const optionDisabled = props.disabled || !!option.disabled
                   const tabIndex =
                     !optionDisabled &&
