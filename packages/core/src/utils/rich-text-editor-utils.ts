@@ -47,13 +47,15 @@ export const defaultToolbar: ToolbarButton[] = [
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
+/** Container fill: optional `--tiger-rte-bg`, then registered `--tiger-surface`. */
 export const richTextContainerBase =
-  'flex flex-col border border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-bg,#ffffff)]'
+  'flex flex-col border border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-rte-bg,var(--tiger-surface,#ffffff))]'
 
 export const richTextContainerDisabled = 'opacity-50 cursor-not-allowed pointer-events-none'
 
+/** Toolbar fill: optional `--tiger-rte-toolbar-bg`, then registered `--tiger-surface-muted`. */
 export const richTextToolbarClasses =
-  'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg-secondary,#f9fafb)]'
+  'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-rte-toolbar-bg,var(--tiger-surface-muted,#f9fafb))]'
 
 export const richTextToolbarButtonBase =
   'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-bg-hover,#e5e7eb)] hover:text-[var(--tiger-text,#111827)]'

@@ -6,6 +6,7 @@ import {
   getEditorAreaClasses,
   richTextContainerBase,
   richTextContainerDisabled,
+  richTextToolbarClasses,
   richTextToolbarButtonBase,
   richTextToolbarButtonActive,
   richTextToolbarSeparatorClasses,
@@ -66,6 +67,28 @@ describe('getRichTextContainerClasses', () => {
   it('appends custom className', () => {
     const result = getRichTextContainerClasses(false, 'custom-class')
     expect(result).toContain('custom-class')
+  })
+
+  it('lands container fill on registered surface, not locked white or bg aliases', () => {
+    expect(richTextContainerBase).toContain('--tiger-surface')
+    expect(richTextContainerBase).toContain('--tiger-rte-bg,var(--tiger-surface')
+    expect(richTextContainerBase).not.toContain('bg-[var(--tiger-bg,#ffffff)]')
+    expect(richTextContainerBase).not.toContain('--tiger-bg')
+    expect(richTextContainerBase).not.toContain('--tiger-fill')
+    expect(richTextContainerBase).not.toContain('--tiger-surface-muted')
+
+    const overrideIdx = richTextContainerBase.indexOf('--tiger-rte-bg')
+    const semanticIdx = richTextContainerBase.indexOf('--tiger-surface')
+    expect(overrideIdx).toBeGreaterThan(-1)
+    expect(semanticIdx).toBeGreaterThan(overrideIdx)
+  })
+
+  it('lands toolbar fill on registered surface-muted, not locked bg-secondary', () => {
+    expect(richTextToolbarClasses).toContain('--tiger-surface-muted')
+    expect(richTextToolbarClasses).toContain('--tiger-rte-toolbar-bg,var(--tiger-surface-muted')
+    expect(richTextToolbarClasses).not.toContain('--tiger-bg-secondary')
+    expect(richTextToolbarClasses).not.toContain('--tiger-bg')
+    expect(richTextToolbarClasses).not.toContain('--tiger-fill')
   })
 })
 

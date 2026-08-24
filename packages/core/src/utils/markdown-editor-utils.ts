@@ -11,13 +11,15 @@ import type {
 
 export { parseHeight as parseMarkdownHeight }
 
+/** Container fill: optional `--tiger-md-bg`, then registered `--tiger-surface`. */
 export const markdownEditorContainerBase =
-  'flex flex-col border border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-bg,#ffffff)] text-[var(--tiger-text,#111827)]'
+  'flex flex-col border border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-md-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-text,#111827)]'
 
 export const markdownEditorContainerDisabled = 'opacity-50 cursor-not-allowed'
 
+/** Toolbar fill: optional `--tiger-md-toolbar-bg`, then registered `--tiger-surface-muted`. */
 export const markdownEditorToolbarClasses =
-  'flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 border-b border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg-secondary,#f9fafb)]'
+  'flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 border-b border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-md-toolbar-bg,var(--tiger-surface-muted,#f9fafb))]'
 
 export const markdownEditorToolbarGroupClasses = 'flex flex-wrap items-center gap-1'
 
@@ -30,7 +32,9 @@ export const markdownEditorToolbarButtonActive =
 export const markdownEditorToolbarSeparatorClasses =
   'w-px h-5 mx-1 bg-[var(--tiger-border,#d1d5db)]'
 
-export const markdownEditorBodyClasses = 'grid flex-1 min-h-0 bg-[var(--tiger-bg,#ffffff)]'
+/** Body fill: same surface chain as the container. */
+export const markdownEditorBodyClasses =
+  'grid flex-1 min-h-0 bg-[var(--tiger-md-bg,var(--tiger-surface,#ffffff))]'
 
 export const markdownEditorTextareaClasses =
   'w-full h-full min-h-0 resize-none border-0 outline-none bg-transparent p-4 font-mono text-sm leading-7 text-[var(--tiger-text,#111827)] placeholder:text-[var(--tiger-text-tertiary,#9ca3af)] disabled:cursor-not-allowed'

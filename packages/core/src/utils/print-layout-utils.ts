@@ -6,10 +6,11 @@
 import type { PrintPageSize, PrintOrientation } from '../types/print-layout'
 
 /**
- * Base classes for the PrintLayout container (screen view)
+ * Base classes for the PrintLayout container (screen view).
+ * Paper stays white; ink is forced dark so themed `--tiger-text` cannot sit on the sheet.
  */
 export const printLayoutBaseClasses =
-  'tiger-print-layout relative bg-white shadow-sm border border-[var(--tiger-border,#e5e7eb)] mx-auto'
+  'tiger-print-layout relative bg-white text-[var(--tiger-print-ink,#111827)] shadow-sm border border-[var(--tiger-border,#e5e7eb)] mx-auto'
 
 /**
  * Classes for print-only header

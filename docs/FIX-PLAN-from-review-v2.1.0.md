@@ -25,7 +25,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A5 | Layout / Container examples + Content fallback | done | this commit | 2026-08-25 |
 | A6 | Tree root `bg-white` → `--tiger-surface` | done | this commit | 2026-08-25 |
 | A7 | OrgChart node fill / title | done | this commit | 2026-08-25 |
-| A8 | FileManager / Markdown / RTE / Print / ImageAnnotation chrome | pending | | |
+| A8 | FileManager / Markdown / RTE / Print / ImageAnnotation chrome | done | this commit | 2026-08-25 |
 | A9 | VirtualList example stripe | pending | | |
 | A10 | ImageViewer toolbar/nav (same as #19) | pending | | |
 | #2 | Vue Slider v-model | pending | | |
@@ -139,4 +139,22 @@ OrgChart chrome in `packages/core/src/utils/org-chart-utils.ts`:
 
 `--tiger-org-*` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core constants. Dark default surface is `#111827` + text `#f9fafb`. Horizontal `flipLayoutNode` width/height swap left.
 
-Next: A8 FileManager / Markdown / RTE / Print / ImageAnnotation chrome.
+Next: A9 VirtualList example stripe.
+
+## A8 notes
+
+FileManager / Markdown / RTE / Print / ImageAnnotation chrome in the five core utils:
+
+- FileManager container / loading / search: `--tiger-file-manager-bg` -> `--tiger-surface` (`#ffffff` last-resort)
+- FileManager toolbar: `--tiger-file-manager-toolbar-bg` -> `--tiger-surface-muted` (`#f9fafb` last-resort)
+- Markdown container / body: `--tiger-md-bg` -> `--tiger-surface` (`#ffffff` last-resort); text stays `--tiger-text`
+- Markdown toolbar: `--tiger-md-toolbar-bg` -> `--tiger-surface-muted` (`#f9fafb` last-resort)
+- RTE container: `--tiger-rte-bg` -> `--tiger-surface` (`#ffffff` last-resort)
+- RTE toolbar: `--tiger-rte-toolbar-bg` -> `--tiger-surface-muted` (`#f9fafb` last-resort)
+- Print paper: keep `bg-white`; ink `--tiger-print-ink` -> `#111827` (not `--tiger-text`)
+- ImageAnnotation unselected tool: `--tiger-annotation-tool-bg` -> `--tiger-surface`; text `--tiger-annotation-tool-text` -> `--tiger-text`; hover `--tiger-surface-muted`
+
+`--tiger-file-manager-*` / `--tiger-md-*` / `--tiger-rte-*` / `--tiger-print-ink` / `--tiger-annotation-tool-*` stay optional first `var()` overrides only; not registered in `THEME_CSS_VARS`. Vue/React consume the core constants. Dark default surface is `#111827` + text `#f9fafb`. Print header/footer `hidden print:block`, FileManager `selectedKeys` inner state, VirtualList stripe, and ImageViewer toolbar left.
+
+Next: A9 VirtualList example stripe.
+
