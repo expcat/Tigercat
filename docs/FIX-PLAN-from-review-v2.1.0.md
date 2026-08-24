@@ -21,7 +21,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A1 | Segmented track/indicator tokens | done | this commit | 2026-08-25 |
 | A2 | Kbd / Tag default bg+text pair | done | this commit | 2026-08-25 |
 | A3 | Loading fullscreen mask | done | this commit | 2026-08-25 |
-| A4 | Skeleton surface-muted | pending | | |
+| A4 | Skeleton surface-muted | done | this commit | 2026-08-25 |
 | A5 | Layout / Container examples + Content fallback | pending | | |
 | A6 | Tree root `bg-white` → `--tiger-surface` | pending | | |
 | A7 | OrgChart node fill / title | pending | | |
@@ -85,3 +85,14 @@ Loading fullscreen mask default in `packages/core/src/utils/loading-utils.ts` `D
 `--tiger-loading-mask` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core constant. JSDoc `@default` matches. Dark veil follows `--tiger-surface` (`#111827`) at 90% mix. Example `bg-white/85` (loading/02) left for T5/A4.
 
 Next: A4 Skeleton surface-muted.
+
+## A4 notes
+
+Skeleton chrome in `packages/core/src/utils/skeleton-utils.ts`:
+
+- Bar / wave from-to: `--tiger-skeleton-bg` -> `--tiger-surface-muted` (`#f9fafb` last-resort)
+- Wave via: `--tiger-skeleton-bg-alt` -> `--tiger-border` (`#e5e7eb` last-resort)
+
+`--tiger-skeleton-*` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume `getSkeletonClasses`. Dark default muted is `#1f2937` vs page surface `#111827`. Example `bg-white/85` (loading/02) left for T5.
+
+Next: A5 Layout / Container examples + Content fallback.
