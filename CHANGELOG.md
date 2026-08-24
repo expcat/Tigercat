@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **OrgChart 暗色节点填色 / 职称**：节点 fill fallback 改为已注册 `--tiger-surface`，职称与副标题走 `--tiger-text-secondary`，姓名保持 `--tiger-text`，避免暗色页白卡浅字。可选 `--tiger-org-node-bg` / `--tiger-org-label` / `--tiger-org-title` / `--tiger-org-subtitle` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **Tree 暗色白底 chrome**：根背景 fallback 改为已注册 `--tiger-surface` 并继承 `--tiger-text`，节点 hover 走 `--tiger-surface-muted`，空态/连线走 `--tiger-text-secondary` / `--tiger-border`，避免暗色页白卡白字。可选 `--tiger-tree-bg` / `--tiger-tree-node-hover` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **Layout Content / Container 示例暗色白底**：Content 默认背景 fallback 改为已注册 `--tiger-surface-muted`，layout/01 Container 与 layout/02 Content 去掉锁死的 `bg-white` / `!bg-white`，避免暗色页白底白字。可选 `--tiger-layout-content-bg` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **Skeleton 暗色占位条**：条背景 fallback 改为已注册 `--tiger-surface-muted`，wave from/to 同一链，via 走 `--tiger-border`，避免暗色页上浅灰白杠。可选 `--tiger-skeleton-bg` / `--tiger-skeleton-bg-alt` 为一层覆写，不注册进 `THEME_CSS_VARS`。

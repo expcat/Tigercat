@@ -24,7 +24,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A4 | Skeleton surface-muted | done | this commit | 2026-08-25 |
 | A5 | Layout / Container examples + Content fallback | done | this commit | 2026-08-25 |
 | A6 | Tree root `bg-white` → `--tiger-surface` | done | this commit | 2026-08-25 |
-| A7 | OrgChart node fill / title | pending | | |
+| A7 | OrgChart node fill / title | done | this commit | 2026-08-25 |
 | A8 | FileManager / Markdown / RTE / Print / ImageAnnotation chrome | pending | | |
 | A9 | VirtualList example stripe | pending | | |
 | A10 | ImageViewer toolbar/nav (same as #19) | pending | | |
@@ -127,3 +127,16 @@ Tree chrome in `packages/core/src/utils/tree-utils.ts`:
 `--tiger-tree-*` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core constants / `getTreeNodeClasses`. Dark default surface is `#111827` + text `#f9fafb`. Checkbox `border-gray-300` left.
 
 Next: A7 OrgChart node fill / title.
+
+## A7 notes
+
+OrgChart chrome in `packages/core/src/utils/org-chart-utils.ts`:
+
+- Node fill: `--tiger-org-node-bg` -> `--tiger-surface` (`#ffffff` last-resort)
+- Label: `--tiger-org-label` -> `--tiger-text` (`#111827` last-resort)
+- Title: `--tiger-org-title` -> `--tiger-text-secondary` (`#6b7280` last-resort)
+- Subtitle: `--tiger-org-subtitle` -> `--tiger-text-secondary` (`#6b7280` last-resort)
+
+`--tiger-org-*` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core constants. Dark default surface is `#111827` + text `#f9fafb`. Horizontal `flipLayoutNode` width/height swap left.
+
+Next: A8 FileManager / Markdown / RTE / Print / ImageAnnotation chrome.

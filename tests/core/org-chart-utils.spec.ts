@@ -3,7 +3,11 @@ import {
   computeOrgChartLayout,
   getOrgChartLinkPath,
   getOrgChartNodeAriaLabel,
-  normalizeOrgChartData
+  normalizeOrgChartData,
+  orgChartNodeLabelClasses,
+  orgChartNodeRectClasses,
+  orgChartNodeSubtitleClasses,
+  orgChartNodeTitleClasses
 } from '@expcat/tigercat-core'
 import type { OrgChartNode } from '@expcat/tigercat-core'
 
@@ -115,5 +119,56 @@ describe('org-chart-utils', () => {
     expect(
       getOrgChartNodeAriaLabel({ id: 'n', label: 'Ada', title: 'CEO', subtitle: 'Platform' })
     ).toBe('Ada, CEO, Platform')
+  })
+
+  it('lands node fill on registered surface, not locked white or bg/fill aliases', () => {
+    expect(orgChartNodeRectClasses).toContain('--tiger-surface')
+    expect(orgChartNodeRectClasses).toContain('--tiger-org-node-bg')
+    expect(orgChartNodeRectClasses).toContain('--tiger-org-node-bg,var(--tiger-surface')
+    expect(orgChartNodeRectClasses).toContain('--tiger-border')
+    expect(orgChartNodeRectClasses).toContain('drop-shadow-sm')
+    expect(orgChartNodeRectClasses).not.toContain('--tiger-bg')
+    expect(orgChartNodeRectClasses).not.toContain('--tiger-fill')
+    expect(orgChartNodeRectClasses).not.toContain('fill-[var(--tiger-bg,#ffffff)]')
+    expect(orgChartNodeRectClasses).not.toContain('--tiger-surface-muted')
+
+    const overrideIdx = orgChartNodeRectClasses.indexOf('--tiger-org-node-bg')
+    const semanticIdx = orgChartNodeRectClasses.indexOf('--tiger-surface')
+    expect(overrideIdx).toBeGreaterThan(-1)
+    expect(semanticIdx).toBeGreaterThan(overrideIdx)
+  })
+
+  it('lands node label on registered text, not muted alias', () => {
+    expect(orgChartNodeLabelClasses).toContain('--tiger-text')
+    expect(orgChartNodeLabelClasses).toContain('--tiger-org-label,var(--tiger-text')
+    expect(orgChartNodeLabelClasses).not.toContain('--tiger-text-muted')
+    expect(orgChartNodeLabelClasses).not.toContain('--tiger-text-secondary')
+
+    const overrideIdx = orgChartNodeLabelClasses.indexOf('--tiger-org-label')
+    const semanticIdx = orgChartNodeLabelClasses.indexOf('--tiger-text,#111827')
+    expect(overrideIdx).toBeGreaterThan(-1)
+    expect(semanticIdx).toBeGreaterThan(overrideIdx)
+  })
+
+  it('lands node title and subtitle on registered text-secondary, not muted alias', () => {
+    expect(orgChartNodeTitleClasses).toContain('--tiger-text-secondary')
+    expect(orgChartNodeTitleClasses).toContain('--tiger-org-title,var(--tiger-text-secondary')
+    expect(orgChartNodeTitleClasses).not.toContain('--tiger-text-muted')
+    expect(orgChartNodeTitleClasses).not.toContain('--tiger-text-muted,#6b7280')
+
+    expect(orgChartNodeSubtitleClasses).toContain('--tiger-text-secondary')
+    expect(orgChartNodeSubtitleClasses).toContain('--tiger-org-subtitle,var(--tiger-text-secondary')
+    expect(orgChartNodeSubtitleClasses).not.toContain('--tiger-text-muted')
+    expect(orgChartNodeSubtitleClasses).not.toContain('--tiger-text-muted,#6b7280')
+
+    const titleOverrideIdx = orgChartNodeTitleClasses.indexOf('--tiger-org-title')
+    const titleSemanticIdx = orgChartNodeTitleClasses.indexOf('--tiger-text-secondary')
+    expect(titleOverrideIdx).toBeGreaterThan(-1)
+    expect(titleSemanticIdx).toBeGreaterThan(titleOverrideIdx)
+
+    const subtitleOverrideIdx = orgChartNodeSubtitleClasses.indexOf('--tiger-org-subtitle')
+    const subtitleSemanticIdx = orgChartNodeSubtitleClasses.indexOf('--tiger-text-secondary')
+    expect(subtitleOverrideIdx).toBeGreaterThan(-1)
+    expect(subtitleSemanticIdx).toBeGreaterThan(subtitleOverrideIdx)
   })
 })
