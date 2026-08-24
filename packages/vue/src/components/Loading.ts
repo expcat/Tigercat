@@ -9,6 +9,7 @@ import {
   getLoadingDotsWrapperClasses,
   getLoadingTextClasses,
   getSpinnerSVG,
+  DEFAULT_LOADING_BACKGROUND,
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
   loadingColorClasses,
@@ -61,7 +62,7 @@ export const Loading = defineComponent({
     },
     background: {
       type: String,
-      default: 'rgba(255, 255, 255, 0.9)'
+      default: DEFAULT_LOADING_BACKGROUND
     },
     customColor: {
       type: String,

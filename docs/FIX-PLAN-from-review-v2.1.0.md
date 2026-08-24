@@ -20,7 +20,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A0 | Register `--tiger-text-muted` → text-secondary, `--tiger-fill` → surface-muted, `--tiger-bg` → surface | done | this commit | 2026-08-25 |
 | A1 | Segmented track/indicator tokens | done | this commit | 2026-08-25 |
 | A2 | Kbd / Tag default bg+text pair | done | this commit | 2026-08-25 |
-| A3 | Loading fullscreen mask | pending | | |
+| A3 | Loading fullscreen mask | done | this commit | 2026-08-25 |
 | A4 | Skeleton surface-muted | pending | | |
 | A5 | Layout / Container examples + Content fallback | pending | | |
 | A6 | Tree root `bg-white` → `--tiger-surface` | pending | | |
@@ -76,3 +76,12 @@ Tag/Kbd default chrome in `packages/core/src/theme-runtime/colors.ts` `defaultTa
 
 Next: A3 Loading fullscreen mask.
 
+## A3 notes
+
+Loading fullscreen mask default in `packages/core/src/utils/loading-utils.ts` `DEFAULT_LOADING_BACKGROUND`:
+
+- `var(--tiger-loading-mask, color-mix(in srgb, var(--tiger-surface, #ffffff) 90%, transparent))`
+
+`--tiger-loading-mask` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core constant. JSDoc `@default` matches. Dark veil follows `--tiger-surface` (`#111827`) at 90% mix. Example `bg-white/85` (loading/02) left for T5/A4.
+
+Next: A4 Skeleton surface-muted.
