@@ -420,7 +420,7 @@ export interface TagThemeColors {
  */
 export const defaultTagThemeColors: TagThemeColors = {
   default: {
-    bg: 'bg-[var(--tiger-tag-default-bg,#f3f4f6)]',
+    bg: 'bg-[var(--tiger-tag-default-bg,var(--tiger-surface-muted,#f9fafb))]',
     text: 'text-[var(--tiger-text,#111827)]',
     border: 'border-[var(--tiger-border,#e5e7eb)]',
     closeBgHover: 'hover:bg-[var(--tiger-tag-default-close-hover,#e5e7eb)]'

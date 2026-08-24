@@ -19,7 +19,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | --- | --- | --- | --- | --- |
 | A0 | Register `--tiger-text-muted` → text-secondary, `--tiger-fill` → surface-muted, `--tiger-bg` → surface | done | this commit | 2026-08-25 |
 | A1 | Segmented track/indicator tokens | done | this commit | 2026-08-25 |
-| A2 | Kbd / Tag default bg+text pair | pending | | |
+| A2 | Kbd / Tag default bg+text pair | done | this commit | 2026-08-25 |
 | A3 | Loading fullscreen mask | pending | | |
 | A4 | Skeleton surface-muted | pending | | |
 | A5 | Layout / Container examples + Content fallback | pending | | |
@@ -52,7 +52,7 @@ Registered in `THEME_CSS_VARS` as `textMuted` / `fill` / `bg`. Shared helper `se
 
 ThemeManager and Tailwind `:root` / `.dark` both use the helper. Not required `ThemeSemanticColors` fields. Dark `--tiger-bg` follows dark `--tiger-surface` (`#111827`).
 
-Next: A2 Kbd / Tag default bg+text pair.
+Next: A3 Loading fullscreen mask.
 
 ## A1 notes
 
@@ -63,4 +63,16 @@ Segmented chrome in `packages/core/src/utils/segmented-utils.ts`:
 
 `--tiger-segmented-*` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core helpers. Dark default muted/raised are both `#1f2937` vs page surface `#111827`.
 
-Next: A2 Kbd / Tag default bg+text pair.
+Next: A3 Loading fullscreen mask.
+
+## A2 notes
+
+Tag/Kbd default chrome in `packages/core/src/theme-runtime/colors.ts` `defaultTagThemeColors.default`:
+
+- bg: `--tiger-tag-default-bg` -> `--tiger-surface-muted` (`#f9fafb` last-resort)
+- text: `--tiger-text` (`#111827` last-resort)
+
+`--tiger-tag-default-bg` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Kbd default still reuses `getTagVariantClasses('default')`. Other Tag variants and Kbd subtle unchanged. Dark default muted is `#1f2937` + text `#f9fafb`.
+
+Next: A3 Loading fullscreen mask.
+

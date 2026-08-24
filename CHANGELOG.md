@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Kbd / Tag default 暗色 chrome**：default 背景 fallback 改为已注册 `--tiger-surface-muted`，文字保持 `--tiger-text`，避免暗色页上浅底浅字。不新增 `--tiger-tag-*` theme 变量。
 - **Segmented 暗色轨道/指示器**：轨道 fallback 改为已注册 `--tiger-surface-muted`，指示器改为 `--tiger-surface-raised`，避免暗色页上浅轨+深滑块。不新增 `--tiger-segmented-*` theme 变量。
 - **主题 CSS 变量别名**：公开 `THEME_CSS_VARS` 增补 `--tiger-text-muted` / `--tiger-fill` / `--tiger-bg`，分别以 `var()` alias 到已有 `--tiger-text-secondary` / `--tiger-surface-muted` / `--tiger-surface`。ThemeManager 与 Tailwind `:root` / `.dark` 共用同一转换 helper，暗色 `--tiger-bg` 跟随 `--tiger-surface`，不新增第三套颜色字段。
 
