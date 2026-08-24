@@ -11,8 +11,13 @@
  * @since 0.7.0
  */
 
-import type { ThemeConfig, ThemePreset, ThemeSemanticColors, ColorScheme } from '../types/theme'
-import { THEME_CSS_VARS, removeCssVarsCached, setCssVarsCached } from '../theme-runtime'
+import type { ThemeConfig, ThemePreset, ColorScheme } from '../types/theme'
+import {
+  THEME_CSS_VARS,
+  removeCssVarsCached,
+  semanticColorsToCssVars,
+  setCssVarsCached
+} from '../theme-runtime'
 import { isBrowser } from '../utils/env'
 
 // ---------------------------------------------------------------------------
@@ -64,13 +69,8 @@ export const THEME_CONFIG_CSS_VARS = {
 } as const
 
 export function themeConfigToCssVars(config: ThemeConfig): Record<string, string> {
-  const vars: Record<string, string> = {}
-
-  if (config.colors) {
-    for (const [key, value] of Object.entries(config.colors)) {
-      const varName = THEME_CSS_VARS[key as keyof ThemeSemanticColors]
-      if (varName && value) vars[varName] = value
-    }
+  const vars: Record<string, string> = {
+    ...semanticColorsToCssVars(config.colors)
   }
 
   for (const section of ['typography', 'radius', 'shadows', 'spacing', 'motion'] as const) {

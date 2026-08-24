@@ -182,6 +182,9 @@ describe('themes/manager — ThemeManager', () => {
           motion: { durationBase: '240ms' }
         })
       ).toEqual({
+        '--tiger-text-muted': 'var(--tiger-text-secondary)',
+        '--tiger-fill': 'var(--tiger-surface-muted)',
+        '--tiger-bg': 'var(--tiger-surface)',
         '--tiger-font-family': 'Inter, sans-serif',
         '--tiger-radius-md': '0.75rem',
         '--tiger-shadow-md': '0 8px 16px rgb(0 0 0 / 0.2)',

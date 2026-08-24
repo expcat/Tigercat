@@ -116,6 +116,7 @@ const CORE_EXTRAS = {
     'modern-theme-interaction.spec.ts',
     'reduced-motion.spec.ts',
     'theme-contrast.spec.ts',
+    'theme-css-var-aliases.spec.ts',
     'themes-manager.spec.ts'
   ],
   form: [

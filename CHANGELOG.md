@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **主题 CSS 变量别名**：公开 `THEME_CSS_VARS` 增补 `--tiger-text-muted` / `--tiger-fill` / `--tiger-bg`，分别以 `var()` alias 到已有 `--tiger-text-secondary` / `--tiger-surface-muted` / `--tiger-surface`。ThemeManager 与 Tailwind `:root` / `.dark` 共用同一转换 helper，暗色 `--tiger-bg` 跟随 `--tiger-surface`，不新增第三套颜色字段。
+
 ## v2.1.0
 
 v2.1.0 minor：完成 Roadmap 批次 1–5。本版本无 breaking change，组件用户无需迁移。公开组件入口现为 172（相对 v2.0.19 基线 149，含批次 1–4 新增入口与子组件）。
