@@ -118,11 +118,11 @@ source: current repository state + competitor benchmark (2026-07-19)
 
   copy-text 修复(commit 3d9915b4)的效果已复测确认:失败从 79 条降到 1~9 条,原条目预测的 66 条残留 textarea 连带失败全部消失,Spotlight a11y 违规也不再出现。
 
-- [ ] 修跨文件状态泄漏(与 `--no-isolate` 解耦,按真实测试质量缺陷推进,P2)。这些泄漏在基线配置下不致失败,但会以负载相关的 flake 形式偶发——2026-07-26 一次高负载全量跑(墙钟 140s vs 正常 43s)就让 `tests/core/modern-theme-interaction.spec.ts` 单条 flake。
+- [x] 修跨文件状态泄漏(与 `--no-isolate` 解耦,按真实测试质量缺陷推进,P2)。这些泄漏在基线配置下不致失败,但会以负载相关的 flake 形式偶发——2026-07-26 一次高负载全量跑(墙钟 140s vs 正常 43s)就让 `tests/core/modern-theme-interaction.spec.ts` 单条 flake。
 
   已修:`document.documentElement` 的 inline style 与 class 残留。根因是 `tests/utils/theme-helpers.ts` 的 `clearThemeVariables(names)` 要求调用方回传与 set 完全一致的变量名列表,漏一个就泄漏,且 spec 失败时其自身 afterEach 可能不执行。改为在 `tests/setup.ts` 全局 afterEach 集中 `removeAttribute('style')` + 清空 className,不再依赖 16 个调用方自觉。修复后 `modern-theme-interaction` 不再出现在泄漏检测失败集里;基线连续 3 次 398 全绿。
 
-  待归因:`tests/react|vue/BackTop`、`tests/react/Avatar`、`tests/vue/Image` 的偶发失败;portal / teleport 容器空 div 持续累积。
+  已修:portal / teleport 容器空 div 持续累积,以及 `tests/react|vue/BackTop`、`tests/react/Avatar`、`tests/vue/Image` 的 document 级查询 flake 机制。根因是 `@testing-library/vue` 的 cleanup 只在 `wrapper.element.parentNode.parentNode === document.body` 时移除挂载容器;Vue Teleport 把组件根(Modal / Drawer / ImagePreview / Tour 等)重挂到 `document.body` 后该判断失败,留下空 `<div>`。React Testing Library 只移除自己跟踪的容器,因此这些宿主会在共享 document(`--no-isolate`,或 isolate 下环境复用)中跨文件累积。BackTop 的 `screen.getByRole('button')`、Avatar 的 `screen.getByText`、Vue Image 的 `document.querySelector('[aria-label="Close preview"]')` 都是 document 级查询,会打到残留宿主或未卸干净的 overlay。本轮在基线 isolate 下未复现这四个 spec 的偶发失败;`--no-isolate --maxWorkers=1` 下空 div 累积可稳定复现。改为在 Testing Library cleanup 之后调用 `resetTestDocument()`(清空 body children、body style/class、html style/class/`data-tiger-style`、window scroll);定向断言见 `tests/core/dom-cleanup.spec.ts`。BackTop 的 `afterEach` 改用 `scrollContainer.remove()`,避免节点已脱离时 `removeChild` 抛错。
 
   检测手段:`npx vitest run --no-isolate --maxWorkers=1` 仍是最灵敏的泄漏探针(放弃它作为日常配置,不等于放弃用它检测),但**因其不确定性,只能用于发现泄漏,不能作为验收口径**。验收改用:基线 `pnpm test` 连续多次全绿,加针对单个泄漏的定向断言。
 
