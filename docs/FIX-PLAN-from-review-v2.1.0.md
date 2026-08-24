@@ -23,7 +23,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A3 | Loading fullscreen mask | done | this commit | 2026-08-25 |
 | A4 | Skeleton surface-muted | done | this commit | 2026-08-25 |
 | A5 | Layout / Container examples + Content fallback | done | this commit | 2026-08-25 |
-| A6 | Tree root `bg-white` → `--tiger-surface` | pending | | |
+| A6 | Tree root `bg-white` → `--tiger-surface` | done | this commit | 2026-08-25 |
 | A7 | OrgChart node fill / title | pending | | |
 | A8 | FileManager / Markdown / RTE / Print / ImageAnnotation chrome | pending | | |
 | A9 | VirtualList example stripe | pending | | |
@@ -114,3 +114,16 @@ Examples:
 `layoutRootClasses` `min-h-screen` / iframe height left for P2.
 
 Next: A6 Tree root `bg-white` -> `--tiger-surface`.
+
+## A6 notes
+
+Tree chrome in `packages/core/src/utils/tree-utils.ts`:
+
+- Root fill: `--tiger-tree-bg` -> `--tiger-surface` (`#ffffff` last-resort) plus `text-[var(--tiger-text,#111827)]`
+- Node hover: `--tiger-tree-node-hover` -> `--tiger-surface-muted` (`#f9fafb` last-resort)
+- Empty: `--tiger-text-secondary` (`#6b7280` last-resort)
+- Line: `--tiger-border` (`#e5e7eb` last-resort)
+
+`--tiger-tree-*` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core constants / `getTreeNodeClasses`. Dark default surface is `#111827` + text `#f9fafb`. Checkbox `border-gray-300` left.
+
+Next: A7 OrgChart node fill / title.

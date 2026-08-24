@@ -185,7 +185,8 @@ export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAct
 /**
  * Base classes for tree container
  */
-export const treeBaseClasses = 'w-full bg-white rounded-[var(--tiger-radius-md,0.5rem)]'
+export const treeBaseClasses =
+  'w-full bg-[var(--tiger-tree-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-text,#111827)] rounded-[var(--tiger-radius-md,0.5rem)]'
 
 /**
  * Tree node wrapper classes
@@ -201,7 +202,8 @@ export const treeNodeContentClasses =
 /**
  * Tree node hover classes
  */
-export const treeNodeHoverClasses = 'hover:bg-gray-50'
+export const treeNodeHoverClasses =
+  'hover:bg-[var(--tiger-tree-node-hover,var(--tiger-surface-muted,#f9fafb))]'
 
 /**
  * Tree node selected classes
@@ -259,12 +261,12 @@ export const treeLoadingClasses = 'inline-block ml-2 animate-spin h-4 w-4'
 /**
  * Tree empty state classes
  */
-export const treeEmptyStateClasses = 'py-8 text-center text-gray-500'
+export const treeEmptyStateClasses = 'py-8 text-center text-[var(--tiger-text-secondary,#6b7280)]'
 
 /**
  * Tree line classes
  */
-export const treeLineClasses = 'border-l border-gray-300'
+export const treeLineClasses = 'border-l border-[var(--tiger-border,#e5e7eb)]'
 
 /**
  * Get tree node classes

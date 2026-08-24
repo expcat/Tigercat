@@ -60,7 +60,7 @@ describe('tree-utils classes', () => {
     expect(treeBaseClasses).toContain('w-full')
     expect(treeNodeWrapperClasses).toBe('select-none')
     expect(treeNodeContentClasses).toContain('cursor-pointer')
-    expect(treeNodeHoverClasses).toContain('hover:bg-gray-50')
+    expect(treeNodeHoverClasses).toContain('--tiger-surface-muted')
     expect(treeNodeSelectedClasses).toContain('tiger-primary')
     expect(treeNodeDisabledClasses).toContain('cursor-not-allowed')
     expect(treeNodeIndentClasses).toContain('w-6')
@@ -73,6 +73,37 @@ describe('tree-utils classes', () => {
     expect(treeLoadingClasses).toContain('animate-spin')
     expect(treeEmptyStateClasses).toContain('text-center')
     expect(treeLineClasses).toContain('border-l')
+  })
+
+  it('lands tree root chrome on registered surface/text, not locked white or bg/fill aliases', () => {
+    expect(treeBaseClasses).toContain('--tiger-surface')
+    expect(treeBaseClasses).toContain('--tiger-text')
+    expect(treeBaseClasses).toContain('--tiger-tree-bg,var(--tiger-surface')
+    expect(treeBaseClasses).toContain('w-full')
+    expect(treeBaseClasses).toContain('--tiger-radius-md')
+    expect(treeBaseClasses).not.toContain('bg-white')
+    expect(treeBaseClasses).not.toContain('--tiger-bg')
+    expect(treeBaseClasses).not.toContain('--tiger-fill')
+    expect(treeBaseClasses).not.toContain('--tiger-surface-muted')
+
+    const overrideIdx = treeBaseClasses.indexOf('--tiger-tree-bg')
+    const semanticIdx = treeBaseClasses.indexOf('--tiger-surface')
+    expect(overrideIdx).toBeGreaterThan(-1)
+    expect(semanticIdx).toBeGreaterThan(overrideIdx)
+  })
+
+  it('lands node hover on registered surface-muted, not locked gray-50', () => {
+    expect(treeNodeHoverClasses).toContain('--tiger-surface-muted')
+    expect(treeNodeHoverClasses).toContain('--tiger-tree-node-hover,var(--tiger-surface-muted')
+    expect(treeNodeHoverClasses).not.toContain('hover:bg-gray-50')
+    expect(treeNodeHoverClasses).not.toContain('bg-gray-50')
+  })
+
+  it('lands empty/line chrome on secondary text and border tokens', () => {
+    expect(treeEmptyStateClasses).toContain('--tiger-text-secondary')
+    expect(treeEmptyStateClasses).not.toContain('text-gray-500')
+    expect(treeLineClasses).toContain('--tiger-border')
+    expect(treeLineClasses).not.toContain('border-gray-300')
   })
 
   it('combines node state classes', () => {
