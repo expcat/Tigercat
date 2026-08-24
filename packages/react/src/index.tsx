@@ -14,6 +14,8 @@ export { Button } from './components/Button'
 export type { ButtonProps } from './components/Button'
 export { ButtonGroup } from './components/ButtonGroup'
 export type { ButtonGroupProps } from './components/ButtonGroup'
+export { SplitButton } from './components/SplitButton'
+export type { SplitButtonProps } from './components/SplitButton'
 export { Slider } from './components/Slider'
 export type { SliderProps } from './components/Slider'
 export { Switch } from './components/Switch'
@@ -53,6 +55,12 @@ export { Text } from './components/Text'
 export type { TextProps } from './components/Text'
 export { Code } from './components/Code'
 export type { CodeProps } from './components/Code'
+export { Kbd } from './components/Kbd'
+export type { KbdProps } from './components/Kbd'
+export { Highlight } from './components/Highlight'
+export type { HighlightProps } from './components/Highlight'
+export { Marquee } from './components/Marquee'
+export type { MarqueeProps } from './components/Marquee'
 export { Icon } from './components/Icon'
 export type { IconProps } from './components/Icon'
 
@@ -128,6 +136,8 @@ export type { AvatarGroupProps } from './components/AvatarGroup'
 
 export { Image } from './components/Image'
 export type { ImageProps } from './components/Image'
+export { ImageCompare } from './components/ImageCompare'
+export type { ImageCompareProps } from './components/ImageCompare'
 export { ImagePreview } from './components/ImagePreview'
 export type { ImagePreviewProps } from './components/ImagePreview'
 export { ImageGroup, ImageGroupContext } from './components/ImageGroup'
@@ -194,6 +204,37 @@ export type { DropdownProps, DropdownContextValue } from './components/Dropdown'
 
 export { DropdownMenu, DropdownItem } from './components/Dropdown'
 export type { DropdownMenuProps, DropdownItemProps } from './components/Dropdown'
+export {
+  ContextMenu,
+  ContextMenuMenu,
+  ContextMenuItem,
+  ContextMenuSub
+} from './components/ContextMenu'
+export type {
+  ContextMenuProps,
+  ContextMenuMenuProps,
+  ContextMenuItemProps,
+  ContextMenuSubProps,
+  ContextMenuContextValue
+} from './components/ContextMenu'
+export {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink
+} from './components/NavigationMenu'
+export type {
+  NavigationMenuProps,
+  NavigationMenuItemProps,
+  NavigationMenuTriggerProps,
+  NavigationMenuContentProps,
+  NavigationMenuLinkProps,
+  NavigationMenuContextValue,
+  NavigationMenuItemContextValue
+} from './components/NavigationMenu'
+export { PageHeader } from './components/PageHeader'
+export type { PageHeaderProps } from './components/PageHeader'
 export { Spotlight } from './components/Spotlight'
 export type { SpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'
@@ -215,6 +256,10 @@ export { NotificationContainer } from './components/NotificationContainer'
 export type { NotificationContainerProps } from './components/NotificationContainer'
 export { Loading } from './components/Loading'
 export type { LoadingProps } from './components/Loading'
+export { LoadingBar } from './components/LoadingBarRoot'
+export type { LoadingBarProps } from './components/LoadingBarRoot'
+export { LoadingBarContainer } from './components/LoadingBarContainer'
+export type { LoadingBarContainerProps } from './components/LoadingBarContainer'
 export { Popconfirm } from './components/Popconfirm'
 export type { PopconfirmProps } from './components/Popconfirm'
 export { Popover } from './components/Popover'

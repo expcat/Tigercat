@@ -19,7 +19,7 @@ describe('BackTop', () => {
   })
 
   afterEach(() => {
-    document.body.removeChild(scrollContainer)
+    scrollContainer.remove()
   })
 
   it('renders with default props', () => {

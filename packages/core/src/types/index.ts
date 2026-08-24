@@ -5,9 +5,9 @@
  * - Form components: button, input, textarea, select, checkbox, radio, switch, slider, datepicker, timepicker, upload, form
  * - Layout components: space, divider, layout, grid, container
  * - Data display: table, tag, badge, card, avatar, list, descriptions, timeline, tree, skeleton, progress
- * - Navigation: menu, tabs, breadcrumb, steps, pagination, dropdown
+ * - Navigation: menu, tabs, breadcrumb, steps, pagination, dropdown, context-menu, navigation-menu, page-header
  * - Feedback: drawer, modal, alert, message, notification, loading, popconfirm, popover, tooltip
- * - Other: link, text, icon, code, chart, locale
+ * - Other: link, text, icon, code, highlight, kbd, marquee, split-button, image-compare, chart, locale
  */
 
 // Base shared interfaces (v1.0+)
@@ -72,6 +72,9 @@ export * from './breadcrumb'
 export * from './steps'
 export * from './pagination'
 export * from './dropdown'
+export * from './context-menu'
+export * from './navigation-menu'
+export * from './page-header'
 export * from './spotlight'
 export * from './scroll-spy'
 
@@ -82,6 +85,7 @@ export * from './alert'
 export * from './message'
 export * from './notification'
 export * from './loading'
+export * from './loading-bar'
 export * from './floating-popup'
 export * from './popconfirm'
 export * from './popover'
@@ -92,12 +96,17 @@ export * from './composite'
 
 // Image components
 export * from './image'
+export * from './image-compare'
 
 // Other components
 export * from './link'
 export * from './text'
 export * from './icon'
 export * from './code'
+export * from './highlight'
+export * from './kbd'
+export * from './marquee'
+export * from './split-button'
 export * from './chart'
 export * from './locale'
 export * from './carousel'

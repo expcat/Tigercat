@@ -75,25 +75,25 @@ source: current repository state + competitor benchmark (2026-07-19)
 
 ### 批次 3 导航与站点(P1)
 
-- [ ] ContextMenu:contextmenu 触发、坐标定位、嵌套子菜单、键盘导航;复用 Dropdown/Menu 的菜单渲染与 floating-ui 定位。
-- [ ] NavigationMenu:水平导航 + 下拉/MegaMenu 面板、hover/focus 展开、menubar 语义 a11y。
-- [ ] PageHeader:返回、面包屑/标题/操作区插槽。
+- [x] ContextMenu:contextmenu 触发、坐标定位、嵌套子菜单、键盘导航;复用 Dropdown/Menu 的菜单渲染与 floating-ui 定位。
+- [x] NavigationMenu:水平导航 + 下拉/MegaMenu 面板、hover/focus 展开、menubar 语义 a11y。
+- [x] PageHeader:返回、面包屑/标题/操作区插槽。
 - 验证:`pnpm test:group:navigation`;ContextMenu/NavigationMenu 键盘交互补 E2E。
 
 ### 批次 4 展示与反馈(P1)
 
-- [ ] Kbd(Basic):按键标识。
-- [ ] Highlight(Basic):关键词/正则高亮。
-- [ ] SplitButton(Basic):主操作 + 下拉扩展,复用 Button/Dropdown。
-- [ ] Marquee(Basic):循环滚动、hover 暂停、遵循 prefers-reduced-motion。
-- [ ] ImageCompare(Basic):对比滑块,与 Image 家族共用类型。
-- [ ] LoadingBar(Feedback):discrete API(start/finish/error),容器机制与 Message/Notification 保持一致。
+- [x] Kbd(Basic):按键标识。
+- [x] Highlight(Basic):关键词/正则高亮。
+- [x] SplitButton(Basic):主操作 + 下拉扩展,复用 Button/Dropdown。
+- [x] Marquee(Basic):循环滚动、hover 暂停、遵循 prefers-reduced-motion。
+- [x] ImageCompare(Basic):对比滑块,与 Image 家族共用类型。
+- [x] LoadingBar(Feedback):discrete API(start/finish/error),容器机制与 Message/Notification 保持一致。
 - 验证:`pnpm test:group:basic` 与 `pnpm test:group:feedback`。
 
 ### 批次 5 既有组件功能增强(P1)
 
-- [ ] Cascader 虚拟化:大数据量列渲染复用 Select 的 virtual 模式。
-- [ ] TreeSelect 虚拟化:复用 Tree 已有 virtual 能力。
+- [x] Cascader 虚拟化:大数据量列渲染复用 Select 的 virtual 模式。
+- [x] TreeSelect 虚拟化:复用 Tree 已有 virtual 能力。
 - 允许修改范围限于 cascader/tree-select 相关 core utils、双框架实现与测试;公共 API 仅新增可选 props,不做 breaking change。
 - 验证:`pnpm test:group:form`;受影响的 `benchmarks/` 套件需复跑。
 
@@ -118,11 +118,11 @@ source: current repository state + competitor benchmark (2026-07-19)
 
   copy-text 修复(commit 3d9915b4)的效果已复测确认:失败从 79 条降到 1~9 条,原条目预测的 66 条残留 textarea 连带失败全部消失,Spotlight a11y 违规也不再出现。
 
-- [ ] 修跨文件状态泄漏(与 `--no-isolate` 解耦,按真实测试质量缺陷推进,P2)。这些泄漏在基线配置下不致失败,但会以负载相关的 flake 形式偶发——2026-07-26 一次高负载全量跑(墙钟 140s vs 正常 43s)就让 `tests/core/modern-theme-interaction.spec.ts` 单条 flake。
+- [x] 修跨文件状态泄漏(与 `--no-isolate` 解耦,按真实测试质量缺陷推进,P2)。这些泄漏在基线配置下不致失败,但会以负载相关的 flake 形式偶发——2026-07-26 一次高负载全量跑(墙钟 140s vs 正常 43s)就让 `tests/core/modern-theme-interaction.spec.ts` 单条 flake。
 
   已修:`document.documentElement` 的 inline style 与 class 残留。根因是 `tests/utils/theme-helpers.ts` 的 `clearThemeVariables(names)` 要求调用方回传与 set 完全一致的变量名列表,漏一个就泄漏,且 spec 失败时其自身 afterEach 可能不执行。改为在 `tests/setup.ts` 全局 afterEach 集中 `removeAttribute('style')` + 清空 className,不再依赖 16 个调用方自觉。修复后 `modern-theme-interaction` 不再出现在泄漏检测失败集里;基线连续 3 次 398 全绿。
 
-  待归因:`tests/react|vue/BackTop`、`tests/react/Avatar`、`tests/vue/Image` 的偶发失败;portal / teleport 容器空 div 持续累积。
+  已修:portal / teleport 容器空 div 持续累积,以及 `tests/react|vue/BackTop`、`tests/react/Avatar`、`tests/vue/Image` 的 document 级查询 flake 机制。根因是 `@testing-library/vue` 的 cleanup 只在 `wrapper.element.parentNode.parentNode === document.body` 时移除挂载容器;Vue Teleport 把组件根(Modal / Drawer / ImagePreview / Tour 等)重挂到 `document.body` 后该判断失败,留下空 `<div>`。React Testing Library 只移除自己跟踪的容器,因此这些宿主会在共享 document(`--no-isolate`,或 isolate 下环境复用)中跨文件累积。BackTop 的 `screen.getByRole('button')`、Avatar 的 `screen.getByText`、Vue Image 的 `document.querySelector('[aria-label="Close preview"]')` 都是 document 级查询,会打到残留宿主或未卸干净的 overlay。本轮在基线 isolate 下未复现这四个 spec 的偶发失败;`--no-isolate --maxWorkers=1` 下空 div 累积可稳定复现。改为在 Testing Library cleanup 之后调用 `resetTestDocument()`(清空 body children、body style/class、html style/class/`data-tiger-style`、window scroll);定向断言见 `tests/core/dom-cleanup.spec.ts`。BackTop 的 `afterEach` 改用 `scrollContainer.remove()`,避免节点已脱离时 `removeChild` 抛错。
 
   检测手段:`npx vitest run --no-isolate --maxWorkers=1` 仍是最灵敏的泄漏探针(放弃它作为日常配置,不等于放弃用它检测),但**因其不确定性,只能用于发现泄漏,不能作为验收口径**。验收改用:基线 `pnpm test` 连续多次全绿,加针对单个泄漏的定向断言。
 

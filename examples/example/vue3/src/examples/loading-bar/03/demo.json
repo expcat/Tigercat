@@ -1,0 +1,12 @@
+{
+  "id": "loading-bar-03",
+  "title": "颜色、高度与清除",
+  "description": "start() 可传入 color、height、className；clear() 立即拆除宿主，不等待完成动画。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

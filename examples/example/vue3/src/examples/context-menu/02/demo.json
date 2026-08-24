@@ -1,0 +1,12 @@
+{
+  "id": "context-menu-02",
+  "title": "嵌套子菜单",
+  "description": "悬停或方向键展开嵌套子菜单；Enter 选择，Escape 逐层关闭。",
+  "entry": "App.vue",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 240,
+    "maxHeight": 720
+  }
+}

@@ -4,26 +4,20 @@ import { cleanup as cleanupVue } from '@testing-library/vue'
 import { cleanup as cleanupReact } from '@testing-library/react'
 import * as matchers from '@testing-library/jest-dom/matchers'
 import { toHaveNoViolations } from 'jest-axe'
+import { resetTestDocument } from './utils/dom-cleanup'
 
 // Extend Vitest's expect method with jest-dom matchers and axe matchers
 expect.extend(matchers)
 expect.extend(toHaveNoViolations)
 
-// Cleanup after each test case (both Vue and React)
+// Cleanup after each test case (both Vue and React), then reset the shared
+// document. Testing Library cleanup does not remove every Teleport/portal host
+// (see tests/utils/dom-cleanup.ts), so leftover empty body divs, body overflow,
+// and <html> theme attrs would otherwise leak into later specs.
 afterEach(() => {
   cleanupVue()
   cleanupReact()
-
-  // Reset <html> to a clean slate. Specs set theme CSS variables via
-  // `tests/utils/theme-helpers.ts` and toggle the `dark` class directly, but
-  // `clearThemeVariables()` requires the caller to pass back the exact same
-  // variable names, so any spec that forgets one — or fails before its own
-  // afterEach runs — leaks state into every later spec sharing this document.
-  // Cleaning up centrally means specs no longer have to be trusted to do it.
-  if (typeof document !== 'undefined') {
-    document.documentElement.removeAttribute('style')
-    document.documentElement.className = ''
-  }
+  resetTestDocument()
 })
 
 // Mock matchMedia for components that use responsive features.

@@ -79,6 +79,9 @@ export * from '../breadcrumb-utils'
 export * from '../steps-utils'
 export * from '../pagination-utils'
 export * from '../dropdown-utils'
+export * from '../context-menu-utils'
+export * from '../navigation-menu-utils'
+export * from '../page-header-utils'
 
 // Feedback components
 export * from '../drawer-utils'
@@ -87,6 +90,7 @@ export * from '../alert-utils'
 export * from '../message-utils'
 export * from '../notification-utils'
 export * from '../loading-utils'
+export * from '../loading-bar-utils'
 export * from '../floating-popup-utils'
 export * from '../popconfirm-utils'
 export * from '../popover-utils'
@@ -97,9 +101,14 @@ export * from '../link-utils'
 export * from '../icon-utils'
 export * from '../code-utils'
 export * from '../text-utils'
+export * from '../kbd-utils'
+export * from '../highlight-utils'
+export * from '../marquee-utils'
+export * from '../split-button-utils'
 
 // Image components
 export * from '../image-utils'
+export * from '../image-compare-utils'
 
 // Other components
 export * from '../carousel-utils'

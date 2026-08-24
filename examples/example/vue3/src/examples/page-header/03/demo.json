@@ -1,0 +1,12 @@
+{
+  "id": "page-header-03",
+  "title": "自定义返回与正文",
+  "description": "back 插槽覆盖默认返回按钮（示例用 Link），default 插槽把说明放在标题行下方。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 160,
+    "maxHeight": 480
+  }
+}

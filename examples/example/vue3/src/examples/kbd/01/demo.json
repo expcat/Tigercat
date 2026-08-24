@@ -1,0 +1,8 @@
+{
+  "id": "kbd-01",
+  "title": "行内单键",
+  "description": "默认插槽把单个按键渲染成语义化 kbd，可嵌在说明文案里。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }
+}

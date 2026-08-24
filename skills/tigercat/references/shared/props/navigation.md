@@ -7,7 +7,7 @@ description: Compact generated Tigercat Navigation props reference
 
 # Navigation Props
 
-导航、菜单、分页、步骤、锚点和树形导航组件。 共 23 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+导航、菜单、分页、步骤、锚点和树形导航组件。 共 33 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Affix
 
@@ -68,6 +68,45 @@ description: Compact generated Tigercat Navigation props reference
 | `href?`    | `string`                                     | `-`     | Navigation link URL                   |
 | `target?`  | `'_blank' \| '_self' \| '_parent' \| '_top'` | `-`     | Link target attribute                 |
 | `current?` | `boolean`                                    | `false` | Whether this is the current/last item |
+
+## ContextMenu
+
+`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 3/8 props
+
+| Prop           | Type      | Default | Notes                                      |
+| -------------- | --------- | ------- | ------------------------------------------ |
+| `disabled?`    | `boolean` | `false` | Whether the context menu is disabled       |
+| `open?`        | `boolean` | `-`     | Whether the menu is open (controlled mode) |
+| `defaultOpen?` | `boolean` | `false` | Default open state (uncontrolled mode)     |
+
+## ContextMenuItem
+
+`packages/core/src/types/context-menu.ts` · `ContextMenuItemProps` · 3/4 props
+
+| Prop        | Type               | Default | Notes                                              |
+| ----------- | ------------------ | ------- | -------------------------------------------------- |
+| `key?`      | `string \| number` | `-`     | Unique key for the menu item                       |
+| `disabled?` | `boolean`          | `false` | Whether the item is disabled                       |
+| `divided?`  | `boolean`          | `false` | Whether the item is divided from the previous item |
+
+## ContextMenuMenu
+
+`packages/core/src/types/context-menu.ts` · `ContextMenuMenuProps`
+
+| Prop         | Type                      | Default | Notes                  |
+| ------------ | ------------------------- | ------- | ---------------------- |
+| `className?` | `string`                  | `-`     | Additional CSS classes |
+| `style?`     | `Record<string, unknown>` | `-`     | Custom styles          |
+
+## ContextMenuSub
+
+`packages/core/src/types/context-menu.ts` · `ContextMenuSubProps` · 3/4 props
+
+| Prop        | Type               | Default | Notes                                   |
+| ----------- | ------------------ | ------- | --------------------------------------- |
+| `itemKey?`  | `string \| number` | `-`     | Unique key for the submenu              |
+| `title?`    | `string`           | `-`     | Submenu trigger label                   |
+| `disabled?` | `boolean`          | `false` | Whether the submenu trigger is disabled |
 
 ## Dropdown
 
@@ -160,6 +199,66 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 | ------------ | -------- | ------- | ---------------------- |
 | `title?`     | `string` | `-`     | Group title            |
 | `className?` | `string` | `-`     | Additional CSS classes |
+
+## NavigationMenu
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 3/13 props
+
+| Prop            | Type                          | Default | Notes                                                                                      |
+| --------------- | ----------------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`        | `NavigationMenuValue \| null` | `-`     | Currently open top-level item key (controlled mode). `null` or `''` closes every panel.    |
+| `defaultValue?` | `NavigationMenuValue \| null` | `-`     | Default open item key (uncontrolled mode)                                                  |
+| `open?`         | `boolean`                     | `-`     | Whether any panel is open (controlled mode). When `false`, every panel is closed even i... |
+
+## NavigationMenuContent
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuContentProps`
+
+| Prop         | Type                      | Default | Notes                                                    |
+| ------------ | ------------------------- | ------- | -------------------------------------------------------- |
+| `mega?`      | `boolean`                 | `false` | Wider MegaMenu panel with extra padding for rich content |
+| `className?` | `string`                  | `-`     | Additional CSS classes                                   |
+| `style?`     | `Record<string, unknown>` | `-`     | Custom styles                                            |
+
+## NavigationMenuItem
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuItemProps` · 3/4 props
+
+| Prop         | Type                  | Default | Notes                                                                                      |
+| ------------ | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `value?`     | `NavigationMenuValue` | `-`     | Unique key used as the open `value` when this item has a panel. Auto-generated when omi... |
+| `disabled?`  | `boolean`             | `false` | Whether the item (trigger or top-level link) is disabled                                   |
+| `className?` | `string`              | `-`     | Additional CSS classes                                                                     |
+
+## NavigationMenuLink
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuLinkProps` · 3/7 props
+
+| Prop      | Type     | Default | Notes                                                                     |
+| --------- | -------- | ------- | ------------------------------------------------------------------------- |
+| `href?`   | `string` | `-`     | Link href. Renders an `<a>` when set, otherwise a `<button>`.             |
+| `target?` | `string` | `-`     | Link target                                                               |
+| `rel?`    | `string` | `-`     | Rel attribute. `noopener noreferrer` is added automatically for `_blank`. |
+
+## NavigationMenuTrigger
+
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuTriggerProps` · 3/4 props
+
+| Prop         | Type      | Default | Notes                                                               |
+| ------------ | --------- | ------- | ------------------------------------------------------------------- |
+| `disabled?`  | `boolean` | `false` | Whether the trigger is disabled                                     |
+| `showArrow?` | `boolean` | `-`     | Whether to show a chevron. Falls back to the root `showArrow` prop. |
+| `className?` | `string`  | `-`     | Additional CSS classes                                              |
+
+## PageHeader
+
+`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 3/7 props
+
+| Prop             | Type      | Default  | Notes                                                                                      |
+| ---------------- | --------- | -------- | ------------------------------------------------------------------------------------------ |
+| `showBack?`      | `boolean` | `-`      | Whether to show the back control. When omitted, the control is shown if `onBack` / `@ba... |
+| `backHref?`      | `string`  | `-`      | Navigation URL for the default back control. Renders a Link instead of a Button when se... |
+| `backAriaLabel?` | `string`  | `'Back'` | Accessible name for the default back control                                               |
 
 ## Pagination
 

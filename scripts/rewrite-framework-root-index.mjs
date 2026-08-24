@@ -36,6 +36,7 @@ const coreRuntimeExportNames = await collectCoreRuntimeExportNames()
 let isTypeExportBlock = false
 let wroteMessageRoot = false
 let wroteNotificationRoot = false
+let wroteLoadingBarRoot = false
 
 function toRuntimeSpecifier(specifier) {
   if (!specifier.startsWith('.')) {
@@ -239,6 +240,50 @@ const notification = {
 export { notification };`
 }
 
+function createLoadingBarRootExport() {
+  wroteLoadingBarRoot = true
+
+  return `function enqueueLoadingBar(command) {
+  if (resolvedLoadingBar) {
+    applyLoadingBarCommand(resolvedLoadingBar, command);
+    return;
+  }
+  pendingLoadingBarCommands.push(command);
+  void import('./components/LoadingBar.mjs').then(({ LoadingBar }) => {
+    resolvedLoadingBar = LoadingBar;
+    const queue = pendingLoadingBarCommands;
+    pendingLoadingBarCommands = [];
+    for (const item of queue) {
+      applyLoadingBarCommand(LoadingBar, item);
+    }
+  });
+}
+function applyLoadingBarCommand(api, command) {
+  if (command.type === 'start') {
+    api.start(command.options);
+    return;
+  }
+  api[command.type]();
+}
+let pendingLoadingBarCommands = [];
+let resolvedLoadingBar = null;
+const LoadingBar = {
+  start(options) {
+    enqueueLoadingBar({ type: 'start', options });
+  },
+  finish() {
+    enqueueLoadingBar({ type: 'finish' });
+  },
+  error() {
+    enqueueLoadingBar({ type: 'error' });
+  },
+  clear() {
+    enqueueLoadingBar({ type: 'clear' });
+  }
+};
+export { LoadingBar };`
+}
+
 for (let index = 0; index < lines.length; index += 1) {
   const trimmed = lines[index].trim()
 
@@ -304,6 +349,14 @@ for (let index = 0; index < lines.length; index += 1) {
   if (statement === "export { notification } from './components/NotificationRoot'") {
     if (!wroteNotificationRoot) {
       output.push(createNotificationRootExport())
+    }
+
+    continue
+  }
+
+  if (statement === "export { LoadingBar } from './components/LoadingBarRoot'") {
+    if (!wroteLoadingBarRoot) {
+      output.push(createLoadingBarRootExport())
     }
 
     continue

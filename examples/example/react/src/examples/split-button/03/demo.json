@@ -1,0 +1,8 @@
+{
+  "id": "split-button-03",
+  "title": "危险操作与受控菜单",
+  "description": "danger 同步到两侧按钮；open / onOpenChange 受控菜单，triggerAriaLabel 覆盖 chevron 的无障碍名称。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 280 }
+}

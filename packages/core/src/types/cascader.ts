@@ -135,6 +135,20 @@ export interface CascaderProps {
   emptyText?: string
 
   /**
+   * Whether to use virtual scrolling for large column / search lists.
+   * When enabled, only visible rows (plus overscan) are rendered.
+   * @default false
+   */
+  virtual?: boolean
+
+  /**
+   * Height of each column panel (and the searchable flat list) in pixels.
+   * Relevant when `virtual` is true.
+   * @default 256
+   */
+  listHeight?: number
+
+  /**
    * Additional CSS classes
    */
   className?: string

@@ -13,6 +13,7 @@ const router = createRouter({
         { path: '', component: Home },
         // Basic
         { path: 'button', component: () => import('./pages/ButtonDemo.vue') },
+        { path: 'split-button', component: () => import('./pages/SplitButtonDemo.vue') },
         {
           path: 'config-provider',
           component: () => import('./pages/ConfigProviderDemo.vue')
@@ -21,7 +22,14 @@ const router = createRouter({
         { path: 'link', component: () => import('./pages/LinkDemo.vue') },
         { path: 'text', component: () => import('./pages/TextDemo.vue') },
         { path: 'code', component: () => import('./pages/CodeDemo.vue') },
+        { path: 'kbd', component: () => import('./pages/KbdDemo.vue') },
+        { path: 'highlight', component: () => import('./pages/HighlightDemo.vue') },
+        { path: 'marquee', component: () => import('./pages/MarqueeDemo.vue') },
         { path: 'image', component: () => import('./pages/ImageDemo.vue') },
+        {
+          path: 'image-compare',
+          component: () => import('./pages/ImageCompareDemo.vue')
+        },
         {
           path: 'image-cropper',
           component: () => import('./pages/ImageCropperDemo.vue')
@@ -106,6 +114,9 @@ const router = createRouter({
         { path: 'menu', component: () => import('./pages/MenuDemo.vue') },
         { path: 'breadcrumb', component: () => import('./pages/BreadcrumbDemo.vue') },
         { path: 'dropdown', component: () => import('./pages/DropdownDemo.vue') },
+        { path: 'context-menu', component: () => import('./pages/ContextMenuDemo.vue') },
+        { path: 'navigation-menu', component: () => import('./pages/NavigationMenuDemo.vue') },
+        { path: 'page-header', component: () => import('./pages/PageHeaderDemo.vue') },
         { path: 'tabs', component: () => import('./pages/TabsDemo.vue') },
         { path: 'steps', component: () => import('./pages/StepsDemo.vue') },
         { path: 'pagination', component: () => import('./pages/PaginationDemo.vue') },
@@ -126,6 +137,7 @@ const router = createRouter({
         { path: 'notification', component: () => import('./pages/NotificationDemo.vue') },
         { path: 'drawer', component: () => import('./pages/DrawerDemo.vue') },
         { path: 'loading', component: () => import('./pages/LoadingDemo.vue') },
+        { path: 'loading-bar', component: () => import('./pages/LoadingBarDemo.vue') },
         // Charts
         { path: 'bar-chart', component: () => import('./pages/BarChartDemo.vue') },
         { path: 'line-chart', component: () => import('./pages/LineChartDemo.vue') },

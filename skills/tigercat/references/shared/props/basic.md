@@ -7,7 +7,7 @@ description: Compact generated Tigercat Basic props reference
 
 # Basic Props
 
-基础展示与低级交互组件。 共 25 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+基础展示与低级交互组件。 共 30 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## Alert
 
@@ -118,6 +118,16 @@ description: Compact generated Tigercat Basic props reference
 | `preset?`      | `EmptyPreset`          | `'default'` | Preset empty state style                                |
 | `description?` | `string`               | `-`         | Description text below the illustration                 |
 
+## Highlight
+
+`packages/core/src/types/highlight.ts` · `HighlightProps` · 3/8 props
+
+| Prop             | Type                | Default | Notes                                                                                      |
+| ---------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `text?`          | `string`            | `-`     | Source text to search. When omitted, Vue default slot / React children are flattened to... |
+| `keywords?`      | `HighlightKeywords` | `-`     | Keyword string(s) and/or regular expression(s) to highlight.                               |
+| `caseSensitive?` | `boolean`           | `false` | Match case for string keywords. Regular expressions keep their own `i` flag.               |
+
 ## Icon
 
 `packages/core/src/types/icon.ts` · `IconProps` · 3/5 props
@@ -204,6 +214,16 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `alt?`   | `string`           | `-`     | Alternative text for image |
 | `width?` | `number \| string` | `-`     | Image width (CSS value)    |
 
+## ImageCompare
+
+`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 3/15 props
+
+| Prop         | Type     | Default | Notes                                                                                      |
+| ------------ | -------- | ------- | ------------------------------------------------------------------------------------------ |
+| `beforeSrc?` | `string` | `-`     | Before (starting) image URL. Vue `before` slot / React `before` node take precedence wh... |
+| `afterSrc?`  | `string` | `-`     | After (ending) image URL. Vue `after` slot / React `after` node take precedence when pr... |
+| `beforeAlt?` | `string` | `''`    | Alternative text for the before image                                                      |
+
 ## ImageCropper
 
 `packages/core/src/types/image.ts` · `ImageCropperProps` · 3/9 props
@@ -232,6 +252,16 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `scaleStep?` | `number` | `0.5`   | Scale step for zoom in/out             |
 | `minScale?`  | `number` | `0.25`  | Minimum scale factor                   |
 
+## Kbd
+
+`packages/core/src/types/kbd.ts` · `KbdProps` · 3/6 props
+
+| Prop         | Type      | Default | Notes                                                                                      |
+| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `keys?`      | `KbdKeys` | `-`     | One key or a combo list. A string is a single key; an array is joined with `separator`.... |
+| `separator?` | `string`  | `'+'`   | Separator between combo keys                                                               |
+| `size?`      | `KbdSize` | `'md'`  | Visual size                                                                                |
+
 ## Link
 
 `packages/core/src/types/link.ts` · `LinkProps` · 3/7 props
@@ -241,6 +271,16 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `variant?`  | `LinkVariant` | `'primary'` | Link variant style           |
 | `size?`     | `LinkSize`    | `'md'`      | Link size                    |
 | `disabled?` | `boolean`     | `false`     | Whether the link is disabled |
+
+## Marquee
+
+`packages/core/src/types/marquee.ts` · `MarqueeProps` · 3/8 props
+
+| Prop            | Type               | Default  | Notes                                                           |
+| --------------- | ------------------ | -------- | --------------------------------------------------------------- |
+| `direction?`    | `MarqueeDirection` | `'left'` | Scroll direction                                                |
+| `duration?`     | `number`           | `20000`  | Time for one full loop, in milliseconds                         |
+| `pauseOnHover?` | `boolean`          | `true`   | Pause looping while hovered or while focus is inside the region |
 
 ## QRCode
 
@@ -281,6 +321,16 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 | `options?`  | `SegmentedOption[]` | `-`     | Available options                     |
 | `disabled?` | `boolean`           | `-`     | Whether the whole control is disabled |
 | `size?`     | `ComponentSize`     | `-`     | Component size                        |
+
+## SplitButton
+
+`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 3/15 props
+
+| Prop        | Type            | Default     | Notes                                                             |
+| ----------- | --------------- | ----------- | ----------------------------------------------------------------- |
+| `variant?`  | `ButtonVariant` | `'primary'` | Visual variant applied to the primary action and the menu trigger |
+| `size?`     | `ButtonSize`    | `'md'`      | Size applied to the primary action and the menu trigger           |
+| `disabled?` | `boolean`       | `false`     | Whether both the primary action and the menu trigger are disabled |
 
 ## Statistic
 

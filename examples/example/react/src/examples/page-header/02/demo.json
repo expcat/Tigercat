@@ -1,0 +1,12 @@
+{
+  "id": "page-header-02",
+  "title": "面包屑与标题",
+  "description": "breadcrumb 传入 Breadcrumb，与标题、操作区共用同一行弹性布局：左回退/路径/标题，右操作。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 160,
+    "maxHeight": 480
+  }
+}

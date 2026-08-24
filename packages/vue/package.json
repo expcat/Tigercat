@@ -235,6 +235,26 @@
       "import": "./dist/components/Content.mjs",
       "default": "./dist/components/Content.mjs"
     },
+    "./ContextMenu": {
+      "types": "./dist/components/ContextMenu.d.mts",
+      "import": "./dist/components/ContextMenu.mjs",
+      "default": "./dist/components/ContextMenu.mjs"
+    },
+    "./ContextMenuItem": {
+      "types": "./dist/components/ContextMenu.d.mts",
+      "import": "./dist/components/ContextMenu.mjs",
+      "default": "./dist/components/ContextMenu.mjs"
+    },
+    "./ContextMenuMenu": {
+      "types": "./dist/components/ContextMenu.d.mts",
+      "import": "./dist/components/ContextMenu.mjs",
+      "default": "./dist/components/ContextMenu.mjs"
+    },
+    "./ContextMenuSub": {
+      "types": "./dist/components/ContextMenu.d.mts",
+      "import": "./dist/components/ContextMenu.mjs",
+      "default": "./dist/components/ContextMenu.mjs"
+    },
     "./Countdown": {
       "types": "./dist/components/Countdown.d.mts",
       "import": "./dist/components/Countdown.mjs",
@@ -365,6 +385,11 @@
       "import": "./dist/components/HeatmapChart.mjs",
       "default": "./dist/components/HeatmapChart.mjs"
     },
+    "./Highlight": {
+      "types": "./dist/components/Highlight.d.mts",
+      "import": "./dist/components/Highlight.mjs",
+      "default": "./dist/components/Highlight.mjs"
+    },
     "./Icon": {
       "types": "./dist/components/Icon.d.mts",
       "import": "./dist/components/Icon.mjs",
@@ -379,6 +404,11 @@
       "types": "./dist/components/ImageAnnotation.d.mts",
       "import": "./dist/components/ImageAnnotation.mjs",
       "default": "./dist/components/ImageAnnotation.mjs"
+    },
+    "./ImageCompare": {
+      "types": "./dist/components/ImageCompare.d.mts",
+      "import": "./dist/components/ImageCompare.mjs",
+      "default": "./dist/components/ImageCompare.mjs"
     },
     "./ImageCropper": {
       "types": "./dist/components/ImageCropper.d.mts",
@@ -435,6 +465,11 @@
       "import": "./dist/components/Kanban.mjs",
       "default": "./dist/components/Kanban.mjs"
     },
+    "./Kbd": {
+      "types": "./dist/components/Kbd.d.mts",
+      "import": "./dist/components/Kbd.mjs",
+      "default": "./dist/components/Kbd.mjs"
+    },
     "./Layout": {
       "types": "./dist/components/Layout.d.mts",
       "import": "./dist/components/Layout.mjs",
@@ -460,10 +495,25 @@
       "import": "./dist/components/Loading.mjs",
       "default": "./dist/components/Loading.mjs"
     },
+    "./LoadingBar": {
+      "types": "./dist/components/LoadingBar.d.mts",
+      "import": "./dist/components/LoadingBar.mjs",
+      "default": "./dist/components/LoadingBar.mjs"
+    },
+    "./LoadingBarContainer": {
+      "types": "./dist/components/LoadingBarContainer.d.mts",
+      "import": "./dist/components/LoadingBarContainer.mjs",
+      "default": "./dist/components/LoadingBarContainer.mjs"
+    },
     "./MarkdownEditor": {
       "types": "./dist/components/MarkdownEditor.d.mts",
       "import": "./dist/components/MarkdownEditor.mjs",
       "default": "./dist/components/MarkdownEditor.mjs"
+    },
+    "./Marquee": {
+      "types": "./dist/components/Marquee.d.mts",
+      "import": "./dist/components/Marquee.mjs",
+      "default": "./dist/components/Marquee.mjs"
     },
     "./MaskInput": {
       "types": "./dist/components/MaskInput.d.mts",
@@ -510,6 +560,31 @@
       "import": "./dist/components/Modal.mjs",
       "default": "./dist/components/Modal.mjs"
     },
+    "./NavigationMenu": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
+    "./NavigationMenuContent": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
+    "./NavigationMenuItem": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
+    "./NavigationMenuLink": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
+    "./NavigationMenuTrigger": {
+      "types": "./dist/components/NavigationMenu.d.mts",
+      "import": "./dist/components/NavigationMenu.mjs",
+      "default": "./dist/components/NavigationMenu.mjs"
+    },
     "./NotificationCenter": {
       "types": "./dist/components/NotificationCenter.d.mts",
       "import": "./dist/components/NotificationCenter.mjs",
@@ -529,6 +604,11 @@
       "types": "./dist/components/OrgChart.d.mts",
       "import": "./dist/components/OrgChart.mjs",
       "default": "./dist/components/OrgChart.mjs"
+    },
+    "./PageHeader": {
+      "types": "./dist/components/PageHeader.d.mts",
+      "import": "./dist/components/PageHeader.mjs",
+      "default": "./dist/components/PageHeader.mjs"
     },
     "./Pagination": {
       "types": "./dist/components/Pagination.d.mts",
@@ -659,6 +739,11 @@
       "types": "./dist/components/Space.d.mts",
       "import": "./dist/components/Space.mjs",
       "default": "./dist/components/Space.mjs"
+    },
+    "./SplitButton": {
+      "types": "./dist/components/SplitButton.d.mts",
+      "import": "./dist/components/SplitButton.mjs",
+      "default": "./dist/components/SplitButton.mjs"
     },
     "./Splitter": {
       "types": "./dist/components/Splitter.d.mts",

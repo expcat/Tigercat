@@ -1,0 +1,192 @@
+import React, { forwardRef, useCallback, useMemo } from 'react'
+import {
+  chevronLeftSolidIcon20PathD,
+  composeComponentClasses,
+  getPageHeaderBackButtonClasses,
+  getPageHeaderRootClasses,
+  hasPageHeaderHeadingContent,
+  icon20ViewBox,
+  pageHeaderActionsClasses,
+  pageHeaderBackIconClasses,
+  pageHeaderBackWrapClasses,
+  pageHeaderContentClasses,
+  pageHeaderHeadingRowClasses,
+  pageHeaderMainClasses,
+  pageHeaderStartClasses,
+  pageHeaderSubtitleClasses,
+  pageHeaderTitleClasses,
+  pageHeaderTitleRowClasses,
+  resolvePageHeaderBackAriaLabel,
+  resolvePageHeaderBackVisibility,
+  type PageHeaderProps as CorePageHeaderProps
+} from '@expcat/tigercat-core'
+import { Button } from './Button'
+import { Link } from './Link'
+
+export interface PageHeaderProps
+  extends
+    Omit<CorePageHeaderProps, 'style' | 'title' | 'subTitle'>,
+    Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
+  /**
+   * Page title. Accepts a node so it matches the Vue `#title` slot.
+   */
+  title?: React.ReactNode
+  /**
+   * Secondary text shown beside the title
+   */
+  subTitle?: React.ReactNode
+  /**
+   * Breadcrumb row, typically a Breadcrumb component
+   */
+  breadcrumb?: React.ReactNode
+  /**
+   * Right-aligned action area
+   */
+  actions?: React.ReactNode
+  /**
+   * Custom back control. Replaces the default Button / Link when provided.
+   */
+  back?: React.ReactNode
+  /**
+   * Called when the default back control is activated
+   */
+  onBack?: (event: React.MouseEvent<HTMLElement>) => void
+  children?: React.ReactNode
+  style?: React.CSSProperties
+}
+
+function BackIcon() {
+  return (
+    <svg
+      className={pageHeaderBackIconClasses}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={icon20ViewBox}
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false">
+      <path fillRule="evenodd" d={chevronLeftSolidIcon20PathD} clipRule="evenodd" />
+    </svg>
+  )
+}
+
+export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
+  (
+    {
+      showBack,
+      backHref,
+      backAriaLabel,
+      title,
+      subTitle,
+      breadcrumb,
+      actions,
+      back,
+      onBack,
+      className,
+      style,
+      children,
+      ...rest
+    },
+    ref
+  ) => {
+    const hasBackOverride = back != null && back !== false
+    const hasBreadcrumb = breadcrumb != null && breadcrumb !== false
+    const hasTitle = title != null && title !== false && title !== ''
+    const hasSubtitle = subTitle != null && subTitle !== false && subTitle !== ''
+    const hasActions = actions != null && actions !== false
+    const hasBody = children != null && children !== false
+
+    const showBackControl = resolvePageHeaderBackVisibility({
+      showBack,
+      hasHandler: Boolean(onBack),
+      hasBackHref: Boolean(backHref),
+      hasBackOverride
+    })
+
+    const showHeading = hasPageHeaderHeadingContent({
+      showBack: showBackControl,
+      hasBreadcrumb,
+      hasTitle,
+      hasSubtitle,
+      hasActions
+    })
+
+    const resolvedBackAriaLabel = resolvePageHeaderBackAriaLabel(backAriaLabel)
+    const rootClasses = useMemo(
+      () => composeComponentClasses(getPageHeaderRootClasses(className)),
+      [className]
+    )
+    const backButtonClasses = useMemo(() => getPageHeaderBackButtonClasses(), [])
+
+    const handleBack = useCallback(
+      (event: React.MouseEvent<HTMLElement>) => {
+        onBack?.(event)
+      },
+      [onBack]
+    )
+
+    const defaultBackControl = backHref ? (
+      <Link
+        href={backHref}
+        underline={false}
+        variant="default"
+        className={backButtonClasses}
+        aria-label={resolvedBackAriaLabel}
+        onClick={handleBack}>
+        <BackIcon />
+      </Link>
+    ) : (
+      <Button
+        variant="ghost"
+        size="sm"
+        className={backButtonClasses}
+        aria-label={resolvedBackAriaLabel}
+        onClick={handleBack}>
+        <BackIcon />
+      </Button>
+    )
+
+    return (
+      <header {...rest} ref={ref} data-page-header="" className={rootClasses} style={style}>
+        {showHeading ? (
+          <div className={pageHeaderHeadingRowClasses} data-page-header-heading="">
+            <div className={pageHeaderStartClasses}>
+              {showBackControl ? (
+                <div className={pageHeaderBackWrapClasses} data-page-header-back="">
+                  {hasBackOverride ? back : defaultBackControl}
+                </div>
+              ) : null}
+              {hasBreadcrumb || hasTitle || hasSubtitle ? (
+                <div className={pageHeaderMainClasses}>
+                  {hasBreadcrumb ? breadcrumb : null}
+                  {hasTitle || hasSubtitle ? (
+                    <div className={pageHeaderTitleRowClasses}>
+                      {hasTitle ? (
+                        <div className={pageHeaderTitleClasses} data-page-header-title="">
+                          {title}
+                        </div>
+                      ) : null}
+                      {hasSubtitle ? (
+                        <div className={pageHeaderSubtitleClasses} data-page-header-subtitle="">
+                          {subTitle}
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+            {hasActions ? (
+              <div className={pageHeaderActionsClasses} data-page-header-actions="">
+                {actions}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+        {hasBody ? <div className={pageHeaderContentClasses}>{children}</div> : null}
+      </header>
+    )
+  }
+)
+PageHeader.displayName = 'PageHeader'
+
+export default PageHeader

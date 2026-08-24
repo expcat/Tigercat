@@ -1,0 +1,8 @@
+{
+  "id": "highlight-03",
+  "title": "正则与区分大小写",
+  "description": "keywords 可传 RegExp；字符串关键词可用 caseSensitive 区分大小写，global=false 只高亮首次匹配。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }
+}

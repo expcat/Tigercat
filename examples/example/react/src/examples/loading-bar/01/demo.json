@@ -1,0 +1,12 @@
+{
+  "id": "loading-bar-01",
+  "title": "开始与完成",
+  "description": "start() 显示顶部加载条并缓慢递增，finish() 拉满后隐藏。适合路由切换或请求过程。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

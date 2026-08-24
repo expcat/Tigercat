@@ -29,6 +29,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     items: [
       { key: 'button', path: '/button', label: { 'zh-CN': 'Button 按钮', 'en-US': 'Button' } },
       {
+        key: 'split-button',
+        path: '/split-button',
+        label: { 'zh-CN': 'SplitButton 分裂按钮', 'en-US': 'SplitButton' }
+      },
+      {
         key: 'config-provider',
         path: '/config-provider',
         label: { 'zh-CN': 'ConfigProvider 全局配置', 'en-US': 'ConfigProvider' }
@@ -37,7 +42,23 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
       { key: 'link', path: '/link', label: { 'zh-CN': 'Link 链接', 'en-US': 'Link' } },
       { key: 'text', path: '/text', label: { 'zh-CN': 'Text 文本', 'en-US': 'Text' } },
       { key: 'code', path: '/code', label: { 'zh-CN': 'Code 代码', 'en-US': 'Code' } },
+      { key: 'kbd', path: '/kbd', label: { 'zh-CN': 'Kbd 按键', 'en-US': 'Kbd' } },
+      {
+        key: 'highlight',
+        path: '/highlight',
+        label: { 'zh-CN': 'Highlight 文本高亮', 'en-US': 'Highlight' }
+      },
+      {
+        key: 'marquee',
+        path: '/marquee',
+        label: { 'zh-CN': 'Marquee 跑马灯', 'en-US': 'Marquee' }
+      },
       { key: 'image', path: '/image', label: { 'zh-CN': 'Image 图片', 'en-US': 'Image' } },
+      {
+        key: 'image-compare',
+        path: '/image-compare',
+        label: { 'zh-CN': 'ImageCompare 图片对比', 'en-US': 'ImageCompare' }
+      },
       {
         key: 'image-cropper',
         path: '/image-cropper',
@@ -289,6 +310,21 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         path: '/dropdown',
         label: { 'zh-CN': 'Dropdown 下拉菜单', 'en-US': 'Dropdown' }
       },
+      {
+        key: 'context-menu',
+        path: '/context-menu',
+        label: { 'zh-CN': 'ContextMenu 右键菜单', 'en-US': 'ContextMenu' }
+      },
+      {
+        key: 'navigation-menu',
+        path: '/navigation-menu',
+        label: { 'zh-CN': 'NavigationMenu 站点导航', 'en-US': 'NavigationMenu' }
+      },
+      {
+        key: 'page-header',
+        path: '/page-header',
+        label: { 'zh-CN': 'PageHeader 页头', 'en-US': 'PageHeader' }
+      },
       { key: 'tabs', path: '/tabs', label: { 'zh-CN': 'Tabs 标签页', 'en-US': 'Tabs' } },
       { key: 'steps', path: '/steps', label: { 'zh-CN': 'Steps 步骤条', 'en-US': 'Steps' } },
       {
@@ -349,7 +385,12 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'Notification 通知', 'en-US': 'Notification' }
       },
       { key: 'drawer', path: '/drawer', label: { 'zh-CN': 'Drawer 抽屉', 'en-US': 'Drawer' } },
-      { key: 'loading', path: '/loading', label: { 'zh-CN': 'Loading 加载', 'en-US': 'Loading' } }
+      { key: 'loading', path: '/loading', label: { 'zh-CN': 'Loading 加载', 'en-US': 'Loading' } },
+      {
+        key: 'loading-bar',
+        path: '/loading-bar',
+        label: { 'zh-CN': 'LoadingBar 顶部加载条', 'en-US': 'LoadingBar' }
+      }
     ]
   },
   {

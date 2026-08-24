@@ -1,4 +1,4 @@
-import { defineComponent, computed, ref, h, PropType, watch } from 'vue'
+import { defineComponent, computed, ref, h, PropType, watch, nextTick } from 'vue'
 import {
   classNames,
   cascaderBaseClasses,
@@ -14,10 +14,15 @@ import {
   flattenCascaderOptions,
   filterCascaderOptions,
   isCascaderOptionExpandable,
+  getCascaderVirtualItemHeight,
+  getCascaderVirtualRange,
+  getCascaderVirtualAlignScrollTop,
+  CASCADER_DEFAULT_LIST_HEIGHT,
   getPickerComboboxAria,
   getPickerListboxAria,
   getPickerOptionAria,
   getPickerTriggerKeyAction,
+  getPickerNavigationIndex,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -27,6 +32,7 @@ import {
   type ComponentSize,
   type CascaderExpandTrigger,
   type CascaderSearchConfig,
+  type CascaderFlattenedOption,
   resolveLocaleText,
   mergeTigerLocale,
   type TigerLocale
@@ -68,6 +74,8 @@ export interface VueCascaderProps {
   changeOnSelect?: boolean
   separator?: string
   emptyText?: string
+  virtual?: boolean
+  listHeight?: number
   locale?: Partial<TigerLocale>
 }
 
@@ -127,6 +135,21 @@ export const Cascader = defineComponent({
       default: undefined
     },
     /**
+     * Whether to use virtual scrolling for column and search lists
+     */
+    virtual: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Height of each column panel (and searchable list) in pixels
+     * @default 256
+     */
+    listHeight: {
+      type: Number,
+      default: CASCADER_DEFAULT_LIST_HEIGHT
+    },
+    /**
      * Locale overrides merged on top of ConfigProvider locale
      */
     locale: {
@@ -159,6 +182,13 @@ export const Cascader = defineComponent({
       restoreFocusOnDismiss: true,
       onDismiss: closeDropdown
     })
+    // Virtual scrolling (column panels + searchable flat list)
+    const columnScrollTops = ref<number[]>([])
+    const columnScrollEls = ref<(HTMLElement | null)[]>([])
+    const columnActiveIndices = ref<number[]>([])
+    const searchScrollTop = ref(0)
+    const searchScrollEl = ref<HTMLElement | null>(null)
+    const searchActiveIndex = ref(-1)
 
     // Display label based on current value
     const displayLabel = computed(() => {
@@ -196,12 +226,91 @@ export const Cascader = defineComponent({
       )
     )
 
+    function selectedIndexInColumn(
+      options: CascaderOption[],
+      selectedValue: string | number | undefined
+    ): number {
+      if (selectedValue === undefined) return -1
+      return options.findIndex((option) => option.value === selectedValue)
+    }
+
+    function alignVirtualScroll(
+      el: HTMLElement | null,
+      index: number,
+      setScrollTop: (top: number) => void
+    ) {
+      if (!props.virtual || !el || index < 0) return
+      const itemH = getCascaderVirtualItemHeight(props.size)
+      const next = getCascaderVirtualAlignScrollTop(el.scrollTop, index, itemH, props.listHeight)
+      if (el.scrollTop !== next) el.scrollTop = next
+      setScrollTop(next)
+    }
+
     // Sync active path with model value when dropdown opens
     watch(isOpen, (open) => {
       if (open) {
+        columnScrollTops.value = []
+        columnScrollEls.value = []
+        columnActiveIndices.value = []
+        searchScrollTop.value = 0
+        searchActiveIndex.value = -1
         activePath.value = props.modelValue ? [...props.modelValue] : []
         updateSearchValue('')
       }
+    })
+
+    watch(
+      columns,
+      (cols) => {
+        if (!props.virtual || !isOpen.value) return
+        const itemH = getCascaderVirtualItemHeight(props.size)
+        columnActiveIndices.value = cols.map((col, i) => {
+          const prev = columnActiveIndices.value[i]
+          if (prev !== undefined && prev >= 0 && prev < col.options.length) return prev
+          return selectedIndexInColumn(col.options, col.selectedValue)
+        })
+        columnScrollTops.value = cols.map((col, i) => {
+          const stored = columnScrollTops.value[i]
+          if (stored !== undefined) return stored
+          return getCascaderVirtualAlignScrollTop(
+            0,
+            columnActiveIndices.value[i] ?? -1,
+            itemH,
+            props.listHeight
+          )
+        })
+      },
+      { immediate: true }
+    )
+
+    // Keep the active option within the virtual scroll window (mirrors Select).
+    watch(
+      columnActiveIndices,
+      (indices) => {
+        if (!props.virtual) return
+        nextTick(() => {
+          indices.forEach((idx, colIndex) => {
+            alignVirtualScroll(columnScrollEls.value[colIndex] ?? null, idx, (top) => {
+              columnScrollTops.value[colIndex] = top
+            })
+          })
+        })
+      },
+      { deep: true }
+    )
+
+    watch(searchActiveIndex, (idx) => {
+      if (!props.virtual) return
+      nextTick(() => {
+        alignVirtualScroll(searchScrollEl.value, idx, (top) => {
+          searchScrollTop.value = top
+        })
+      })
+    })
+
+    watch(searchQuery, () => {
+      searchScrollTop.value = 0
+      searchActiveIndex.value = -1
     })
 
     function updateSearchValue(value: string) {
@@ -221,13 +330,25 @@ export const Cascader = defineComponent({
       isOpen.value = false
     }
 
+    function setColumnActiveIndex(colIndex: number, index: number) {
+      const next = columnActiveIndices.value.slice()
+      next[colIndex] = index
+      columnActiveIndices.value = next
+    }
+
     function handleOptionClick(option: CascaderOption, level: number) {
       if (option.disabled) return
 
+      const optionIndex = columns.value[level]?.options.findIndex(
+        (item) => item.value === option.value
+      )
       // Update active path
       const newPath = activePath.value.slice(0, level)
       newPath.push(option.value)
       activePath.value = newPath
+      if (optionIndex !== undefined && optionIndex >= 0) {
+        setColumnActiveIndex(level, optionIndex)
+      }
 
       const hasChildren = isCascaderOptionExpandable(option)
 
@@ -244,6 +365,12 @@ export const Cascader = defineComponent({
     }
 
     function handleOptionHover(option: CascaderOption, level: number) {
+      const optionIndex = columns.value[level]?.options.findIndex(
+        (item) => item.value === option.value
+      )
+      if (optionIndex !== undefined && optionIndex >= 0 && !option.disabled) {
+        setColumnActiveIndex(level, optionIndex)
+      }
       if (props.expandTrigger !== 'hover' || option.disabled) return
 
       const newPath = activePath.value.slice(0, level)
@@ -266,6 +393,68 @@ export const Cascader = defineComponent({
 
     function handleSearchInput(e: Event) {
       updateSearchValue((e.target as HTMLInputElement).value)
+    }
+
+    function handleVirtualListKeyDown<T extends { disabled?: boolean }>(
+      e: KeyboardEvent,
+      items: T[],
+      current: number,
+      setIndex: (index: number) => void
+    ) {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Home' && e.key !== 'End') {
+        return
+      }
+      e.preventDefault()
+      e.stopPropagation()
+      setIndex(getPickerNavigationIndex(items, current, e.key))
+    }
+
+    function renderVirtualWindow(
+      itemCount: number,
+      scrollTop: number,
+      onScrollTop: (top: number) => void,
+      setScrollEl: (el: HTMLElement | null) => void,
+      renderItem: (index: number) => ReturnType<typeof h> | null,
+      extraAttrs: Record<string, unknown>,
+      onKeyDown?: (e: KeyboardEvent) => void
+    ) {
+      const itemH = getCascaderVirtualItemHeight(props.size)
+      const { startIndex, endIndex, totalHeight } = getCascaderVirtualRange(
+        scrollTop,
+        props.listHeight,
+        itemCount,
+        itemH
+      )
+      const fromIndex = itemCount <= 0 ? 0 : Math.min(startIndex, endIndex, itemCount - 1)
+      const toIndex = itemCount <= 0 ? -1 : Math.min(endIndex, itemCount - 1)
+      const visible: ReturnType<typeof h>[] = []
+      if (fromIndex <= toIndex) {
+        for (let i = fromIndex; i <= toIndex; i++) {
+          const node = renderItem(i)
+          if (node) visible.push(node)
+        }
+      }
+      return h(
+        'div',
+        {
+          ref: (el: Element | null) => {
+            setScrollEl(el as HTMLElement | null)
+          },
+          'data-tiger-cascader-virtual': '',
+          tabindex: 0,
+          style: { maxHeight: `${props.listHeight}px`, overflowY: 'auto' },
+          onScroll: (e: Event) => {
+            onScrollTop((e.target as HTMLElement).scrollTop)
+          },
+          onKeydown: onKeyDown,
+          ...extraAttrs
+        },
+        [
+          h('div', { style: { height: `${totalHeight}px`, position: 'relative' } }, [
+            h('div', { style: { transform: `translateY(${fromIndex * itemH}px)` } }, visible)
+          ])
+        ]
+      )
     }
 
     // Keyboard navigation
@@ -414,63 +603,133 @@ export const Cascader = defineComponent({
               )
             )
           } else {
-            const searchList = h(
-              'div',
-              { class: 'max-h-64 overflow-auto', ...getPickerListboxAria({ id: listboxId }) },
-              searchResults.value.map((item) =>
-                h(
-                  'div',
-                  {
-                    class: classNames(
-                      cascaderSearchResultClasses,
-                      item.disabled && 'opacity-50 cursor-not-allowed'
-                    ),
-                    ...getPickerOptionAria({
-                      selected: props.modelValue?.join(',') === item.valuePath.join(','),
-                      disabled: item.disabled
-                    }),
-                    onClick: () => handleSearchResultClick(item.valuePath, item.disabled)
+            const renderSearchItem = (item: CascaderFlattenedOption, index: number) =>
+              h(
+                'div',
+                {
+                  key: item.valuePath.join(','),
+                  'data-option-index': index,
+                  class: classNames(
+                    cascaderSearchResultClasses,
+                    item.disabled && 'opacity-50 cursor-not-allowed'
+                  ),
+                  ...getPickerOptionAria({
+                    selected: props.modelValue?.join(',') === item.valuePath.join(','),
+                    disabled: item.disabled
+                  }),
+                  onMouseenter: () => {
+                    if (!item.disabled) searchActiveIndex.value = index
                   },
-                  typeof props.searchable === 'object' && props.searchable.render
-                    ? props.searchable.render(searchQuery.value, item.path)
-                    : item.label
-                )
+                  onClick: () => handleSearchResultClick(item.valuePath, item.disabled)
+                },
+                typeof props.searchable === 'object' && props.searchable.render
+                  ? props.searchable.render(searchQuery.value, item.path)
+                  : item.label
               )
-            )
+
+            const searchList = props.virtual
+              ? renderVirtualWindow(
+                  searchResults.value.length,
+                  searchScrollTop.value,
+                  (top) => {
+                    searchScrollTop.value = top
+                  },
+                  (el) => {
+                    searchScrollEl.value = el
+                  },
+                  (index) => renderSearchItem(searchResults.value[index], index),
+                  {
+                    ...getPickerListboxAria({ id: listboxId })
+                  },
+                  (e) =>
+                    handleVirtualListKeyDown(
+                      e,
+                      searchResults.value,
+                      searchActiveIndex.value,
+                      (index) => {
+                        searchActiveIndex.value = index
+                      }
+                    )
+                )
+              : h(
+                  'div',
+                  { class: 'max-h-64 overflow-auto', ...getPickerListboxAria({ id: listboxId }) },
+                  searchResults.value.map((item, index) => renderSearchItem(item, index))
+                )
             children.push(searchList)
           }
         } else {
           // Column mode (cascading panels)
-          const columnElements = columns.value.map((col, colIndex) =>
-            h(
+          const renderColumnOption = (
+            option: CascaderOption,
+            col: (typeof columns.value)[number],
+            colIndex: number,
+            optionIndex: number
+          ) => {
+            const isSelected = col.selectedValue === option.value
+            const hasChildren = isCascaderOptionExpandable(option)
+
+            return h(
+              'div',
+              {
+                key: option.value,
+                'data-option-index': optionIndex,
+                class: getCascaderOptionClasses(isSelected, !!option.disabled, props.size),
+                ...getPickerOptionAria({ selected: isSelected, disabled: !!option.disabled }),
+                onClick: () => handleOptionClick(option, colIndex),
+                onMouseenter: () => handleOptionHover(option, colIndex)
+              },
+              [
+                h('span', { class: 'flex-1 truncate' }, option.label),
+                hasChildren ? ChevronRightIcon : null
+              ]
+            )
+          }
+
+          const columnElements = columns.value.map((col, colIndex) => {
+            const listboxAttrs = getPickerListboxAria({
+              id: colIndex === 0 ? listboxId : undefined,
+              label: `Level ${colIndex + 1}`
+            })
+
+            if (props.virtual) {
+              return renderVirtualWindow(
+                col.options.length,
+                columnScrollTops.value[colIndex] ?? 0,
+                (top) => {
+                  columnScrollTops.value[colIndex] = top
+                },
+                (el) => {
+                  const next = columnScrollEls.value.slice()
+                  next[colIndex] = el
+                  columnScrollEls.value = next
+                },
+                (index) => renderColumnOption(col.options[index], col, colIndex, index),
+                {
+                  class: cascaderColumnClasses,
+                  ...listboxAttrs
+                },
+                (e) =>
+                  handleVirtualListKeyDown(
+                    e,
+                    col.options,
+                    columnActiveIndices.value[colIndex] ?? -1,
+                    (index) => setColumnActiveIndex(colIndex, index)
+                  )
+              )
+            }
+
+            return h(
               'div',
               {
                 class: cascaderColumnClasses,
-                ...getPickerListboxAria({
-                  id: colIndex === 0 ? listboxId : undefined,
-                  label: `Level ${colIndex + 1}`
-                })
+                ...listboxAttrs
               },
-              col.options.map((option) => {
-                const isSelected = col.selectedValue === option.value
-                const hasChildren = isCascaderOptionExpandable(option)
-
-                return h(
-                  'div',
-                  {
-                    class: getCascaderOptionClasses(isSelected, !!option.disabled, props.size),
-                    ...getPickerOptionAria({ selected: isSelected, disabled: !!option.disabled }),
-                    onClick: () => handleOptionClick(option, colIndex),
-                    onMouseenter: () => handleOptionHover(option, colIndex)
-                  },
-                  [
-                    h('span', { class: 'flex-1 truncate' }, option.label),
-                    hasChildren ? ChevronRightIcon : null
-                  ]
-                )
-              })
+              col.options.map((option, optionIndex) =>
+                renderColumnOption(option, col, colIndex, optionIndex)
+              )
             )
-          )
+          })
 
           children.push(h('div', { class: 'flex' }, columnElements))
         }

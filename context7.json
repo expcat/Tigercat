@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 155,
+  "component_count": 172,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -56,9 +56,18 @@
     "栅格": ["Row", "Col"],
     "按钮": ["Button"],
     "按钮组": ["ButtonGroup"],
+    "分裂按钮": ["SplitButton"],
+    "分割按钮": ["SplitButton"],
     "浮动按钮": ["FloatButton"],
     "悬浮按钮": ["FloatButton"],
     "图标": ["Icon"],
+    "按键": ["Kbd"],
+    "快捷键": ["Kbd"],
+    "键盘按键": ["Kbd"],
+    "文本高亮": ["Highlight"],
+    "关键词高亮": ["Highlight"],
+    "跑马灯": ["Marquee"],
+    "循环滚动": ["Marquee"],
     "头像": ["Avatar"],
     "徽标": ["Badge"],
     "徽章": ["Badge"],
@@ -72,6 +81,13 @@
     "下拉选择": ["Select"],
     "下拉框": ["Select"],
     "下拉菜单": ["Dropdown"],
+    "右键菜单": ["ContextMenu"],
+    "上下文菜单": ["ContextMenu"],
+    "导航菜单": ["NavigationMenu"],
+    "站点导航": ["NavigationMenu"],
+    "MegaMenu": ["NavigationMenu"],
+    "页头": ["PageHeader"],
+    "页面头部": ["PageHeader"],
     "自动完成": ["AutoComplete"],
     "自动补全": ["AutoComplete"],
     "提及": ["Mentions"],
@@ -121,6 +137,9 @@
     "全局提示": ["Message"],
     "消息": ["Message"],
     "加载中": ["Loading"],
+    "顶部加载条": ["LoadingBar"],
+    "顶部加载": ["LoadingBar"],
+    "加载条": ["LoadingBar"],
     "进度条": ["Progress"],
     "结果页": ["Result"],
     "面包屑": ["Breadcrumb"],
@@ -154,6 +173,9 @@
     "图片预览": ["ImagePreview"],
     "图片裁剪": ["ImageCropper"],
     "图片标注": ["ImageAnnotation"],
+    "图片对比": ["ImageCompare"],
+    "对比滑块": ["ImageCompare"],
+    "图片对比滑块": ["ImageCompare"],
     "富文本": ["RichTextEditor"],
     "代码编辑器": ["CodeEditor"],
     "markdown编辑器": ["MarkdownEditor"],
@@ -205,6 +227,17 @@
     "Message": {
       "name": "Message",
       "title": "Imperative message API",
+      "topic": "commandApis",
+      "references": [
+        "skills/tigercat/SKILL.md",
+        "skills/tigercat/references/shared/props/feedback.md",
+        "skills/tigercat/references/examples/feedback.md",
+        "skills/tigercat/references/shared/patterns/common.md"
+      ]
+    },
+    "LoadingBar": {
+      "name": "LoadingBar",
+      "title": "Imperative loading bar API",
       "topic": "commandApis",
       "references": [
         "skills/tigercat/SKILL.md",
@@ -273,7 +306,17 @@
         "skills/tigercat/references/examples/feedback.md",
         "skills/tigercat/references/shared/patterns/common.md"
       ],
-      "keywords": ["notification", "message", "toast", "imperative", "commandapi", "通知", "消息"]
+      "keywords": [
+        "notification",
+        "message",
+        "toast",
+        "imperative",
+        "commandapi",
+        "loadingbar",
+        "通知",
+        "消息",
+        "加载条"
+      ]
     }
   },
   "component_index": {
@@ -313,16 +356,21 @@
         "CropUpload",
         "Divider",
         "Empty",
+        "Highlight",
         "Icon",
         "Image",
+        "ImageCompare",
         "ImageCropper",
         "ImageGroup",
         "ImagePreview",
+        "Kbd",
         "Link",
+        "Marquee",
         "QRCode",
         "Rate",
         "Result",
         "Segmented",
+        "SplitButton",
         "Statistic",
         "Tag",
         "Text",
@@ -395,6 +443,8 @@
       "components": [
         "Drawer",
         "Loading",
+        "LoadingBar",
+        "LoadingBarContainer",
         "Message",
         "MessageContainer",
         "Modal",
@@ -484,6 +534,10 @@
         "BackTop",
         "Breadcrumb",
         "BreadcrumbItem",
+        "ContextMenu",
+        "ContextMenuItem",
+        "ContextMenuMenu",
+        "ContextMenuSub",
         "Dropdown",
         "DropdownItem",
         "DropdownMenu",
@@ -492,6 +546,12 @@
         "Menu",
         "MenuItem",
         "MenuItemGroup",
+        "NavigationMenu",
+        "NavigationMenuContent",
+        "NavigationMenuItem",
+        "NavigationMenuLink",
+        "NavigationMenuTrigger",
+        "PageHeader",
         "Pagination",
         "ScrollSpy",
         "Spotlight",
@@ -969,6 +1029,26 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
+    "Highlight": {
+      "name": "Highlight",
+      "aliases": ["文本高亮", "关键词高亮"],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Highlight",
+      "packageTarget": "Highlight",
+      "typeSource": "packages/core/src/types/highlight.ts",
+      "sourceFiles": ["packages/core/src/types/highlight.ts"],
+      "propsInterfaces": ["HighlightProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
     "Icon": {
       "name": "Icon",
       "aliases": ["图标"],
@@ -1000,6 +1080,26 @@
       "typeSource": "packages/core/src/types/image.ts",
       "sourceFiles": ["packages/core/src/types/image.ts"],
       "propsInterfaces": ["ImageProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ImageCompare": {
+      "name": "ImageCompare",
+      "aliases": ["图片对比", "对比滑块", "图片对比滑块"],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./ImageCompare",
+      "packageTarget": "ImageCompare",
+      "typeSource": "packages/core/src/types/image-compare.ts",
+      "sourceFiles": ["packages/core/src/types/image-compare.ts"],
+      "propsInterfaces": ["ImageCompareProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
@@ -1069,6 +1169,26 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
+    "Kbd": {
+      "name": "Kbd",
+      "aliases": ["按键", "快捷键", "键盘按键"],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Kbd",
+      "packageTarget": "Kbd",
+      "typeSource": "packages/core/src/types/kbd.ts",
+      "sourceFiles": ["packages/core/src/types/kbd.ts"],
+      "propsInterfaces": ["KbdProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
     "Link": {
       "name": "Link",
       "aliases": [],
@@ -1080,6 +1200,26 @@
       "typeSource": "packages/core/src/types/link.ts",
       "sourceFiles": ["packages/core/src/types/link.ts"],
       "propsInterfaces": ["LinkProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Marquee": {
+      "name": "Marquee",
+      "aliases": ["跑马灯", "循环滚动"],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./Marquee",
+      "packageTarget": "Marquee",
+      "typeSource": "packages/core/src/types/marquee.ts",
+      "sourceFiles": ["packages/core/src/types/marquee.ts"],
+      "propsInterfaces": ["MarqueeProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
@@ -1160,6 +1300,26 @@
       "typeSource": "packages/core/src/types/segmented.ts",
       "sourceFiles": ["packages/core/src/types/segmented.ts"],
       "propsInterfaces": ["SegmentedProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/basic.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "SplitButton": {
+      "name": "SplitButton",
+      "aliases": ["分裂按钮", "分割按钮"],
+      "category": "Basic",
+      "slug": "basic",
+      "testGroup": "basic",
+      "packageSubpath": "./SplitButton",
+      "packageTarget": "SplitButton",
+      "typeSource": "packages/core/src/types/split-button.ts",
+      "sourceFiles": ["packages/core/src/types/split-button.ts"],
+      "propsInterfaces": ["SplitButtonProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
@@ -1960,6 +2120,46 @@
       "typeSource": "packages/core/src/types/loading.ts",
       "sourceFiles": ["packages/core/src/types/loading.ts"],
       "propsInterfaces": ["LoadingProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "LoadingBar": {
+      "name": "LoadingBar",
+      "aliases": ["顶部加载条", "顶部加载", "加载条"],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./LoadingBar",
+      "packageTarget": "LoadingBar",
+      "typeSource": "packages/core/src/types/loading-bar.ts",
+      "sourceFiles": ["packages/core/src/types/loading-bar.ts"],
+      "propsInterfaces": ["LoadingBarProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/feedback.md",
+        "examples": "skills/tigercat/references/examples/feedback.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "LoadingBarContainer": {
+      "name": "LoadingBarContainer",
+      "aliases": [],
+      "category": "Feedback",
+      "slug": "feedback",
+      "testGroup": "feedback",
+      "packageSubpath": "./LoadingBarContainer",
+      "packageTarget": "LoadingBarContainer",
+      "typeSource": "packages/core/src/types/loading-bar.ts",
+      "sourceFiles": ["packages/core/src/types/loading-bar.ts"],
+      "propsInterfaces": ["LoadingBarContainerProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
@@ -3275,6 +3475,86 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
+    "ContextMenu": {
+      "name": "ContextMenu",
+      "aliases": ["右键菜单", "上下文菜单"],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./ContextMenu",
+      "packageTarget": "ContextMenu",
+      "typeSource": "packages/core/src/types/context-menu.ts",
+      "sourceFiles": ["packages/core/src/types/context-menu.ts"],
+      "propsInterfaces": ["ContextMenuProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ContextMenuItem": {
+      "name": "ContextMenuItem",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./ContextMenuItem",
+      "packageTarget": "ContextMenu",
+      "typeSource": "packages/core/src/types/context-menu.ts",
+      "sourceFiles": ["packages/core/src/types/context-menu.ts"],
+      "propsInterfaces": ["ContextMenuItemProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ContextMenuMenu": {
+      "name": "ContextMenuMenu",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./ContextMenuMenu",
+      "packageTarget": "ContextMenu",
+      "typeSource": "packages/core/src/types/context-menu.ts",
+      "sourceFiles": ["packages/core/src/types/context-menu.ts"],
+      "propsInterfaces": ["ContextMenuMenuProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "ContextMenuSub": {
+      "name": "ContextMenuSub",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./ContextMenuSub",
+      "packageTarget": "ContextMenu",
+      "typeSource": "packages/core/src/types/context-menu.ts",
+      "sourceFiles": ["packages/core/src/types/context-menu.ts"],
+      "propsInterfaces": ["ContextMenuSubProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
     "Dropdown": {
       "name": "Dropdown",
       "aliases": ["下拉菜单"],
@@ -3426,6 +3706,126 @@
       "typeSource": "packages/core/src/types/menu.ts",
       "sourceFiles": ["packages/core/src/types/menu.ts"],
       "propsInterfaces": ["MenuItemGroupProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NavigationMenu": {
+      "name": "NavigationMenu",
+      "aliases": ["导航菜单", "站点导航", "MegaMenu"],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./NavigationMenu",
+      "packageTarget": "NavigationMenu",
+      "typeSource": "packages/core/src/types/navigation-menu.ts",
+      "sourceFiles": ["packages/core/src/types/navigation-menu.ts"],
+      "propsInterfaces": ["NavigationMenuProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NavigationMenuContent": {
+      "name": "NavigationMenuContent",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./NavigationMenuContent",
+      "packageTarget": "NavigationMenu",
+      "typeSource": "packages/core/src/types/navigation-menu.ts",
+      "sourceFiles": ["packages/core/src/types/navigation-menu.ts"],
+      "propsInterfaces": ["NavigationMenuContentProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NavigationMenuItem": {
+      "name": "NavigationMenuItem",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./NavigationMenuItem",
+      "packageTarget": "NavigationMenu",
+      "typeSource": "packages/core/src/types/navigation-menu.ts",
+      "sourceFiles": ["packages/core/src/types/navigation-menu.ts"],
+      "propsInterfaces": ["NavigationMenuItemProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NavigationMenuLink": {
+      "name": "NavigationMenuLink",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./NavigationMenuLink",
+      "packageTarget": "NavigationMenu",
+      "typeSource": "packages/core/src/types/navigation-menu.ts",
+      "sourceFiles": ["packages/core/src/types/navigation-menu.ts"],
+      "propsInterfaces": ["NavigationMenuLinkProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NavigationMenuTrigger": {
+      "name": "NavigationMenuTrigger",
+      "aliases": [],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./NavigationMenuTrigger",
+      "packageTarget": "NavigationMenu",
+      "typeSource": "packages/core/src/types/navigation-menu.ts",
+      "sourceFiles": ["packages/core/src/types/navigation-menu.ts"],
+      "propsInterfaces": ["NavigationMenuTriggerProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/navigation.md",
+        "examples": "skills/tigercat/references/examples/navigation.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "PageHeader": {
+      "name": "PageHeader",
+      "aliases": ["页头", "页面头部"],
+      "category": "Navigation",
+      "slug": "navigation",
+      "testGroup": "navigation",
+      "packageSubpath": "./PageHeader",
+      "packageTarget": "PageHeader",
+      "typeSource": "packages/core/src/types/page-header.ts",
+      "sourceFiles": ["packages/core/src/types/page-header.ts"],
+      "propsInterfaces": ["PageHeaderProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

@@ -14,10 +14,15 @@ import {
   flattenCascaderOptions,
   filterCascaderOptions,
   isCascaderOptionExpandable,
+  getCascaderVirtualItemHeight,
+  getCascaderVirtualRange,
+  getCascaderVirtualAlignScrollTop,
+  CASCADER_DEFAULT_LIST_HEIGHT,
   getPickerComboboxAria,
   getPickerListboxAria,
   getPickerOptionAria,
   getPickerTriggerKeyAction,
+  getPickerNavigationIndex,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -25,7 +30,9 @@ import {
   mergeTigerLocale,
   type CascaderOption,
   type CascaderValue,
+  type CascaderFlattenedOption,
   type CascaderProps as CoreCascaderProps,
+  type ComponentSize,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
@@ -62,11 +69,114 @@ const CASCADER_KEYS = new Set([
   'changeOnSelect',
   'separator',
   'emptyText',
+  'virtual',
+  'listHeight',
   'className',
   'locale'
 ])
 
 const EMPTY_CASCADER_VALUE: CascaderValue = []
+
+function selectedIndexInColumn(
+  options: CascaderOption[],
+  selectedValue: string | number | undefined
+): number {
+  if (selectedValue === undefined) return -1
+  return options.findIndex((option) => option.value === selectedValue)
+}
+
+/**
+ * Virtualized cascader column / search list. Mirrors Select's fixed-size
+ * `fixedSizeStrategy` + `getRange` window, and keeps `activeIndex` in view.
+ */
+const VirtualCascaderList = <T extends { disabled?: boolean }>({
+  items,
+  size,
+  listHeight,
+  activeIndex,
+  onActiveIndexChange,
+  className,
+  listboxProps,
+  renderItem
+}: {
+  items: T[]
+  size: ComponentSize
+  listHeight: number
+  activeIndex: number
+  onActiveIndexChange: (index: number) => void
+  className?: string
+  listboxProps?: Record<string, unknown>
+  renderItem: (item: T, index: number) => React.ReactNode
+}): React.ReactElement => {
+  const itemHeight = getCascaderVirtualItemHeight(size)
+  const itemCount = items.length
+  const clampedActiveIndex = activeIndex >= 0 && activeIndex < itemCount ? activeIndex : -1
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [scrollTop, setScrollTop] = useState(() =>
+    getCascaderVirtualAlignScrollTop(0, clampedActiveIndex, itemHeight, listHeight)
+  )
+  const maxScrollTop = Math.max(0, itemCount * itemHeight - listHeight)
+  const effectiveScrollTop = Math.min(Math.max(0, scrollTop), maxScrollTop)
+  const { startIndex, endIndex, totalHeight } = getCascaderVirtualRange(
+    effectiveScrollTop,
+    listHeight,
+    itemCount,
+    itemHeight
+  )
+  const fromIndex = itemCount <= 0 ? 0 : Math.min(startIndex, endIndex, itemCount - 1)
+  const toIndex = itemCount <= 0 ? -1 : Math.min(endIndex, itemCount - 1)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    if (el.scrollTop !== effectiveScrollTop) el.scrollTop = effectiveScrollTop
+  }, [effectiveScrollTop])
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el || clampedActiveIndex < 0) return
+    const next = getCascaderVirtualAlignScrollTop(
+      el.scrollTop,
+      clampedActiveIndex,
+      itemHeight,
+      listHeight
+    )
+    if (next !== el.scrollTop) {
+      el.scrollTop = next
+      setScrollTop(next)
+    }
+  }, [clampedActiveIndex, itemHeight, listHeight])
+
+  const visible: React.ReactNode[] = []
+  if (fromIndex <= toIndex) {
+    for (let i = fromIndex; i <= toIndex; i++) {
+      visible.push(renderItem(items[i], i))
+    }
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      data-tiger-cascader-virtual=""
+      tabIndex={0}
+      className={className}
+      style={{ maxHeight: `${listHeight}px`, overflowY: 'auto' }}
+      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+      onKeyDown={(e) => {
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Home' && e.key !== 'End') {
+          return
+        }
+        e.preventDefault()
+        e.stopPropagation()
+        onActiveIndexChange(getPickerNavigationIndex(items, clampedActiveIndex, e.key))
+      }}
+      {...listboxProps}>
+      <div style={{ height: `${totalHeight}px`, position: 'relative' }}>
+        <div style={{ transform: `translateY(${fromIndex * itemHeight}px)` }}>{visible}</div>
+      </div>
+    </div>
+  )
+}
 
 export const Cascader: React.FC<CascaderProps> = (props) => {
   const {
@@ -85,6 +195,8 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
     changeOnSelect = false,
     separator = ' / ',
     emptyText,
+    virtual = false,
+    listHeight = CASCADER_DEFAULT_LIST_HEIGHT,
     className,
     locale
   } = props
@@ -107,6 +219,13 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(defaultSearchValue)
   const searchQuery = searchValue ?? uncontrolledSearchValue
   const [activePath, setActivePath] = useState<CascaderValue>([])
+  const [columnActiveIndices, setColumnActiveIndices] = useState<number[]>([])
+  const [searchActiveIndex, setSearchActiveIndex] = useState(-1)
+  const [indexedSearchQuery, setIndexedSearchQuery] = useState(searchQuery)
+  if (indexedSearchQuery !== searchQuery) {
+    setIndexedSearchQuery(searchQuery)
+    setSearchActiveIndex(-1)
+  }
   const wasOpenRef = useRef(false)
 
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -163,6 +282,8 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
   useEffect(() => {
     if (!isOpen) {
       wasOpenRef.current = false
+      setColumnActiveIndices([])
+      setSearchActiveIndex(-1)
       return
     }
     if (wasOpenRef.current) return
@@ -171,6 +292,18 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
     setActivePath(value ? [...value] : [])
     updateSearchValue('')
   }, [isOpen, updateSearchValue, value])
+
+  useEffect(() => {
+    if (!virtual || !isOpen) return
+    setColumnActiveIndices((prev) =>
+      columns.map((col, i) => {
+        if (prev[i] !== undefined && prev[i] >= 0 && prev[i] < col.options.length) {
+          return prev[i]
+        }
+        return selectedIndexInColumn(col.options, col.selectedValue)
+      })
+    )
+  }, [virtual, isOpen, columns])
 
   const toggleOpen = useCallback(() => {
     if (disabled) return
@@ -181,9 +314,17 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
     (option: CascaderOption, level: number) => {
       if (option.disabled) return
 
+      const optionIndex = columns[level]?.options.findIndex((item) => item.value === option.value)
       const newPath = activePath.slice(0, level)
       newPath.push(option.value)
       setActivePath(newPath)
+      if (optionIndex !== undefined && optionIndex >= 0) {
+        setColumnActiveIndices((prev) => {
+          const next = prev.slice()
+          next[level] = optionIndex
+          return next
+        })
+      }
 
       const hasChildren = isCascaderOptionExpandable(option)
 
@@ -194,18 +335,26 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
         onChange?.(newPath)
       }
     },
-    [activePath, onChange, changeOnSelect]
+    [activePath, onChange, changeOnSelect, columns]
   )
 
   const handleOptionHover = useCallback(
     (option: CascaderOption, level: number) => {
+      const optionIndex = columns[level]?.options.findIndex((item) => item.value === option.value)
+      if (optionIndex !== undefined && optionIndex >= 0 && !option.disabled) {
+        setColumnActiveIndices((prev) => {
+          const next = prev.slice()
+          next[level] = optionIndex
+          return next
+        })
+      }
       if (expandTrigger !== 'hover' || option.disabled) return
 
       const newPath = activePath.slice(0, level)
       newPath.push(option.value)
       setActivePath(newPath)
     },
-    [expandTrigger, activePath]
+    [expandTrigger, activePath, columns]
   )
 
   const handleSearchResultClick = useCallback(
@@ -332,13 +481,45 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                     mergedLocale?.common?.emptyText
                   )}
                 </div>
+              ) : virtual ? (
+                <VirtualCascaderList
+                  key={searchQuery}
+                  items={searchResults}
+                  size={size}
+                  listHeight={listHeight}
+                  activeIndex={searchActiveIndex}
+                  onActiveIndexChange={setSearchActiveIndex}
+                  listboxProps={getPickerListboxAria({ id: listboxId })}
+                  renderItem={(item: CascaderFlattenedOption, index) => (
+                    <div
+                      key={item.valuePath.join(',')}
+                      data-option-index={index}
+                      className={classNames(
+                        cascaderSearchResultClasses,
+                        item.disabled && 'opacity-50 cursor-not-allowed'
+                      )}
+                      {...getPickerOptionAria({
+                        selected: value?.join(',') === item.valuePath.join(','),
+                        disabled: item.disabled
+                      })}
+                      onMouseEnter={() => {
+                        if (!item.disabled) setSearchActiveIndex(index)
+                      }}
+                      onClick={() => handleSearchResultClick(item.valuePath, item.disabled)}>
+                      {typeof searchable === 'object' && searchable.render
+                        ? searchable.render(searchQuery, item.path)
+                        : item.label}
+                    </div>
+                  )}
+                />
               ) : (
                 <div
                   className="max-h-64 overflow-auto"
                   {...getPickerListboxAria({ id: listboxId })}>
-                  {searchResults.map((item) => (
+                  {searchResults.map((item, index) => (
                     <div
                       key={item.valuePath.join(',')}
+                      data-option-index={index}
                       className={classNames(
                         cascaderSearchResultClasses,
                         item.disabled && 'opacity-50 cursor-not-allowed'
@@ -358,48 +539,81 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
             ) : (
               // Cascading columns
               <div className="flex">
-                {columns.map((col, colIndex) => (
-                  <div
-                    key={colIndex}
-                    className={cascaderColumnClasses}
-                    {...getPickerListboxAria({
-                      id: colIndex === 0 ? listboxId : undefined,
-                      label: `Level ${colIndex + 1}`
-                    })}
-                    aria-label={`Level ${colIndex + 1}`}>
-                    {col.options.map((option) => {
-                      const isSelected = col.selectedValue === option.value
-                      const hasChildren = isCascaderOptionExpandable(option)
+                {columns.map((col, colIndex) => {
+                  const listboxProps = getPickerListboxAria({
+                    id: colIndex === 0 ? listboxId : undefined,
+                    label: `Level ${colIndex + 1}`
+                  })
+                  const renderColumnOption = (option: CascaderOption, optionIndex: number) => {
+                    const isSelected = col.selectedValue === option.value
+                    const hasChildren = isCascaderOptionExpandable(option)
 
-                      return (
-                        <div
-                          key={option.value}
-                          className={getCascaderOptionClasses(isSelected, !!option.disabled, size)}
-                          {...getPickerOptionAria({
-                            selected: isSelected,
-                            disabled: !!option.disabled
-                          })}
-                          onClick={() => handleOptionClick(option, colIndex)}
-                          onMouseEnter={() => handleOptionHover(option, colIndex)}>
-                          <span className="flex-1 truncate">{option.label}</span>
-                          {hasChildren && (
-                            <svg
-                              className="w-4 h-4 text-[var(--tiger-text-muted,#9ca3af)]"
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 20 20"
-                              fill="currentColor">
-                              <path
-                                fillRule="evenodd"
-                                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                ))}
+                    return (
+                      <div
+                        key={option.value}
+                        data-option-index={optionIndex}
+                        className={getCascaderOptionClasses(isSelected, !!option.disabled, size)}
+                        {...getPickerOptionAria({
+                          selected: isSelected,
+                          disabled: !!option.disabled
+                        })}
+                        onClick={() => handleOptionClick(option, colIndex)}
+                        onMouseEnter={() => handleOptionHover(option, colIndex)}>
+                        <span className="flex-1 truncate">{option.label}</span>
+                        {hasChildren && (
+                          <svg
+                            className="w-4 h-4 text-[var(--tiger-text-muted,#9ca3af)]"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path
+                              fillRule="evenodd"
+                              d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    )
+                  }
+
+                  if (virtual) {
+                    return (
+                      <VirtualCascaderList
+                        key={colIndex}
+                        items={col.options}
+                        size={size}
+                        listHeight={listHeight}
+                        activeIndex={columnActiveIndices[colIndex] ?? -1}
+                        onActiveIndexChange={(index) => {
+                          setColumnActiveIndices((prev) => {
+                            const next = prev.slice()
+                            next[colIndex] = index
+                            return next
+                          })
+                        }}
+                        className={cascaderColumnClasses}
+                        listboxProps={{
+                          ...listboxProps,
+                          'aria-label': `Level ${colIndex + 1}`
+                        }}
+                        renderItem={renderColumnOption}
+                      />
+                    )
+                  }
+
+                  return (
+                    <div
+                      key={colIndex}
+                      className={cascaderColumnClasses}
+                      {...listboxProps}
+                      aria-label={`Level ${colIndex + 1}`}>
+                      {col.options.map((option, optionIndex) =>
+                        renderColumnOption(option, optionIndex)
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>

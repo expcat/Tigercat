@@ -28,9 +28,9 @@ const sourceVersionFiles = {
 
 const expectedRepositoryUrl = 'https://github.com/expcat/Tigercat'
 const expectedSizeLimitEntries = [
-  ['Core (full)', 'packages/core/dist/index.js', '131 kB'],
-  ['Vue (full)', 'packages/vue/dist/index.mjs', '293 kB'],
-  ['React (full)', 'packages/react/dist/index.mjs', '328 kB'],
+  ['Core (full)', 'packages/core/dist/index.js', '135 kB'],
+  ['Vue (full)', 'packages/vue/dist/index.mjs', '305 kB'],
+  ['React (full)', 'packages/react/dist/index.mjs', '340 kB'],
   ['Vue Button subpath', 'packages/vue/dist/components/Button.mjs', '22 kB'],
   ['React Button subpath', 'packages/react/dist/components/Button.mjs', '20 kB'],
   ['Vue Menu subpath', 'packages/vue/dist/components/Menu.mjs', '41 kB'],

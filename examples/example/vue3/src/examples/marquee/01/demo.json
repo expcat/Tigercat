@@ -1,0 +1,8 @@
+{
+  "id": "marquee-01",
+  "title": "水平循环",
+  "description": "默认向左循环滚动子内容，复制一份轨道形成无缝衔接。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }
+}

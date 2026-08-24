@@ -1,27 +1,34 @@
-import React, { useState, useMemo, useRef, useId } from 'react'
+import React, { useState, useMemo, useRef, useId, useLayoutEffect, useCallback } from 'react'
 import type { TreeNode } from '@expcat/tigercat-core'
 import type {
   TreeSelectProps as CoreTreeSelectProps,
   TreeSelectValue,
-  TigerLocale
+  TigerLocale,
+  FlatTreeSelectNode
 } from '@expcat/tigercat-core'
 import {
   resolveLocaleText,
   mergeTigerLocale,
   treeSelectBaseClasses,
-  treeSelectDropdownClasses,
   treeSelectSearchClasses,
   treeSelectEmptyClasses,
   getTreeSelectTriggerClasses,
   getTreeSelectNodeClasses,
+  getTreeSelectDropdownClasses,
   getTreeSelectDisplayLabel,
   getAllTreeSelectKeys,
   flattenTreeSelectNodes,
   filterTreeSelectNodes,
+  getTreeSelectVisibleIndex,
+  alignTreeSelectVirtualScroll,
+  TREE_SELECT_DEFAULT_HEIGHT,
+  TREE_SELECT_DEFAULT_ITEM_HEIGHT,
   getPickerComboboxAria,
   getPickerListboxAria,
   getPickerOptionAria,
   getPickerTriggerKeyAction,
+  getPickerNavigationIndex,
+  findFirstEnabledIndex,
   classNames,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
@@ -29,6 +36,7 @@ import {
   closeSolidIcon20PathD
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { VirtualList } from './VirtualList'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 
 export interface TreeSelectProps
@@ -56,6 +64,9 @@ const TREESELECT_KEYS = new Set<string>([
   'defaultSearchValue',
   'emptyText',
   'defaultExpandAll',
+  'virtual',
+  'height',
+  'itemHeight',
   'onChange',
   'onSearchChange'
 ])
@@ -74,6 +85,9 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     defaultSearchValue = '',
     emptyText,
     defaultExpandAll = false,
+    virtual = false,
+    height = TREE_SELECT_DEFAULT_HEIGHT,
+    itemHeight = TREE_SELECT_DEFAULT_ITEM_HEIGHT,
     className,
     onChange,
     onSearchChange,
@@ -106,6 +120,8 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const virtualListWrapperRef = useRef<HTMLDivElement>(null)
+  const [activeIndex, setActiveIndex] = useState(-1)
   const overlay = useAnchoredOverlay({
     enabled: isOpen,
     referenceRef: triggerRef,
@@ -144,6 +160,72 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     if (!matchedKeys) return flatNodes
     return flatNodes.filter((f) => matchedKeys.has(f.node.key))
   }, [flatNodes, matchedKeys])
+
+  const isNodeDisabled = useCallback((item: FlatTreeSelectNode) => !!item.node.disabled, [])
+
+  const visibleNodesRef = useRef(visibleNodes)
+  visibleNodesRef.current = visibleNodes
+  const valueRef = useRef(value)
+  valueRef.current = value
+  const lastActiveKeyRef = useRef<string | number | undefined>()
+
+  const resolveActiveIndex = useCallback((): number => {
+    const nodes = visibleNodesRef.current
+    const selected = getTreeSelectVisibleIndex(nodes, valueRef.current)
+    if (selected >= 0 && !nodes[selected]?.node.disabled) return selected
+    return findFirstEnabledIndex(nodes, isNodeDisabled)
+  }, [isNodeDisabled])
+
+  const commitActiveIndex = useCallback((index: number) => {
+    lastActiveKeyRef.current = index >= 0 ? visibleNodesRef.current[index]?.node.key : undefined
+    setActiveIndex(index)
+  }, [])
+
+  const alignVirtualScroll = useCallback(
+    (index: number) => {
+      if (!virtual) return
+      const wrapper = virtualListWrapperRef.current
+      const el = (wrapper?.firstElementChild as HTMLElement | null) ?? wrapper
+      alignTreeSelectVirtualScroll(el, index, itemHeight, height)
+    },
+    [virtual, itemHeight, height]
+  )
+
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      commitActiveIndex(-1)
+      return
+    }
+    if (!virtual) return
+    commitActiveIndex(resolveActiveIndex())
+  }, [isOpen, searchQuery, virtual, commitActiveIndex, resolveActiveIndex])
+
+  useLayoutEffect(() => {
+    if (!isOpen || !virtual) return
+    const remapped = getTreeSelectVisibleIndex(visibleNodesRef.current, lastActiveKeyRef.current)
+    if (remapped >= 0) setActiveIndex(remapped)
+    // Flatten identity can change while open (expand/collapse, parent re-render).
+    // Re-resolve only on open/searchQuery; remap the previous key instead.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expandedKeys, treeData, isOpen, virtual])
+
+  useLayoutEffect(() => {
+    if (!isOpen || !virtual) return
+    alignVirtualScroll(activeIndex)
+  }, [activeIndex, isOpen, virtual, alignVirtualScroll, visibleNodes.length])
+
+  function handleVirtualListKeyDown(e: React.KeyboardEvent) {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Home' && e.key !== 'End') {
+      return
+    }
+    e.preventDefault()
+    e.stopPropagation()
+    setActiveIndex((current) => {
+      const next = getPickerNavigationIndex(visibleNodes, current, e.key, isNodeDisabled)
+      lastActiveKeyRef.current = visibleNodes[next]?.node.key
+      return next
+    })
+  }
 
   function openDropdown() {
     if (disabled) return
@@ -219,6 +301,40 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     }
   }
 
+  function renderFlatNode(flatNode: FlatTreeSelectNode) {
+    const { node, level, hasChildren, isExpanded } = flatNode
+    const selected = isSelected(node.key)
+    const indent = level * 20
+
+    return (
+      <div
+        key={String(node.key)}
+        {...getPickerOptionAria({ selected, disabled: !!node.disabled })}
+        className={getTreeSelectNodeClasses(selected, !!node.disabled, size)}
+        style={{ paddingLeft: `${indent + 8}px`, height: virtual ? '100%' : undefined }}
+        onClick={(e) => {
+          e.stopPropagation()
+          handleNodeSelect(node)
+        }}>
+        {hasChildren ? (
+          <span
+            className={classNames(
+              'inline-flex items-center justify-center w-4 h-4 mr-1 transition-transform',
+              isExpanded ? 'rotate-90' : ''
+            )}
+            onClick={(e) => toggleExpand(node.key, e)}>
+            <svg className="w-3 h-3" viewBox={icon20ViewBox} fill="currentColor">
+              <path d={chevronRightSolidIcon20PathD} fillRule="evenodd" clipRule="evenodd" />
+            </svg>
+          </span>
+        ) : (
+          <span className="w-4 mr-1" />
+        )}
+        <span className="flex-1 truncate">{node.label}</span>
+      </div>
+    )
+  }
+
   return (
     <div ref={containerRef} className={classNames(treeSelectBaseClasses, className)} {...divProps}>
       {/* Trigger */}
@@ -272,7 +388,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
           <div
             ref={dropdownRef}
             {...getPickerListboxAria({ id: listboxId })}
-            className={classNames(treeSelectDropdownClasses, overlay.floatingClasses)}
+            className={classNames(getTreeSelectDropdownClasses(virtual), overlay.floatingClasses)}
             style={overlay.floatingStyles}
             data-positioned={overlay.positioned}>
             {searchable && (
@@ -293,43 +409,25 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
             )}
 
             {visibleNodes.length > 0 ? (
-              visibleNodes.map((flatNode) => {
-                const { node, level, hasChildren, isExpanded } = flatNode
-                const selected = isSelected(node.key)
-                const indent = level * 20
-
-                return (
-                  <div
-                    key={String(node.key)}
-                    {...getPickerOptionAria({ selected, disabled: !!node.disabled })}
-                    className={getTreeSelectNodeClasses(selected, !!node.disabled, size)}
-                    style={{ paddingLeft: `${indent + 8}px` }}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleNodeSelect(node)
-                    }}>
-                    {hasChildren ? (
-                      <span
-                        className={classNames(
-                          'inline-flex items-center justify-center w-4 h-4 mr-1 transition-transform',
-                          isExpanded ? 'rotate-90' : ''
-                        )}
-                        onClick={(e) => toggleExpand(node.key, e)}>
-                        <svg className="w-3 h-3" viewBox={icon20ViewBox} fill="currentColor">
-                          <path
-                            d={chevronRightSolidIcon20PathD}
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </span>
-                    ) : (
-                      <span className="w-4 mr-1" />
-                    )}
-                    <span className="flex-1 truncate">{node.label}</span>
-                  </div>
-                )
-              })
+              virtual ? (
+                <div
+                  ref={virtualListWrapperRef}
+                  data-tiger-treeselect-virtual=""
+                  tabIndex={0}
+                  onKeyDown={handleVirtualListKeyDown}>
+                  <VirtualList
+                    itemCount={visibleNodes.length}
+                    itemHeight={itemHeight}
+                    height={height}
+                    renderItem={({ index }) => {
+                      const item = visibleNodes[index]
+                      return item ? renderFlatNode(item) : null
+                    }}
+                  />
+                </div>
+              ) : (
+                visibleNodes.map((flatNode) => renderFlatNode(flatNode))
+              )
             ) : (
               <div className={treeSelectEmptyClasses}>
                 {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}

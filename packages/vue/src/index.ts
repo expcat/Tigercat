@@ -24,6 +24,8 @@ export { Button } from './components/Button'
 export type { VueButtonProps } from './components/Button'
 export { ButtonGroup } from './components/ButtonGroup'
 export type { VueButtonGroupProps } from './components/ButtonGroup'
+export { SplitButton } from './components/SplitButton'
+export type { VueSplitButtonProps } from './components/SplitButton'
 export { Slider } from './components/Slider'
 export type { VueSliderProps } from './components/Slider'
 export { Switch } from './components/Switch'
@@ -93,6 +95,12 @@ export { Text } from './components/Text'
 export type { VueTextProps } from './components/Text'
 export { Code } from './components/Code'
 export type { VueCodeProps } from './components/Code'
+export { Kbd } from './components/Kbd'
+export type { VueKbdProps } from './components/Kbd'
+export { Highlight } from './components/Highlight'
+export type { VueHighlightProps } from './components/Highlight'
+export { Marquee } from './components/Marquee'
+export type { VueMarqueeProps } from './components/Marquee'
 export { Icon } from './components/Icon'
 export type { VueIconProps } from './components/Icon'
 export { DatePicker } from './components/DatePicker'
@@ -117,6 +125,8 @@ export { AvatarGroup } from './components/AvatarGroup'
 export type { VueAvatarGroupProps } from './components/AvatarGroup'
 export { Image } from './components/Image'
 export type { VueImageProps } from './components/Image'
+export { ImageCompare } from './components/ImageCompare'
+export type { VueImageCompareProps } from './components/ImageCompare'
 export { ImagePreview } from './components/ImagePreview'
 export type { VueImagePreviewProps } from './components/ImagePreview'
 export { ImageGroup } from './components/ImageGroup'
@@ -163,6 +173,34 @@ export { Dropdown } from './components/Dropdown'
 export type { VueDropdownProps } from './components/Dropdown'
 export { DropdownMenu, DropdownItem } from './components/Dropdown'
 export type { VueDropdownMenuProps, VueDropdownItemProps } from './components/Dropdown'
+export {
+  ContextMenu,
+  ContextMenuMenu,
+  ContextMenuItem,
+  ContextMenuSub
+} from './components/ContextMenu'
+export type {
+  VueContextMenuProps,
+  VueContextMenuMenuProps,
+  VueContextMenuItemProps,
+  VueContextMenuSubProps
+} from './components/ContextMenu'
+export {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink
+} from './components/NavigationMenu'
+export type {
+  VueNavigationMenuProps,
+  VueNavigationMenuItemProps,
+  VueNavigationMenuTriggerProps,
+  VueNavigationMenuContentProps,
+  VueNavigationMenuLinkProps
+} from './components/NavigationMenu'
+export { PageHeader } from './components/PageHeader'
+export type { VuePageHeaderProps } from './components/PageHeader'
 export { Spotlight } from './components/Spotlight'
 export type { VueSpotlightProps } from './components/Spotlight'
 export { ScrollSpy } from './components/ScrollSpy'
@@ -183,6 +221,10 @@ export { NotificationContainer } from './components/NotificationContainer'
 export type { VueNotificationContainerProps } from './components/NotificationContainer'
 export { Loading } from './components/Loading'
 export type { VueLoadingProps } from './components/Loading'
+export { LoadingBar } from './components/LoadingBarRoot'
+export type { VueLoadingBarProps } from './components/LoadingBarRoot'
+export { LoadingBarContainer } from './components/LoadingBarContainer'
+export type { VueLoadingBarContainerProps } from './components/LoadingBarContainer'
 export { Popconfirm } from './components/Popconfirm'
 export type { VuePopconfirmProps } from './components/Popconfirm'
 export { Popover } from './components/Popover'

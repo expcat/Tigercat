@@ -42,16 +42,21 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | CropUpload            | Basic      | `basic`      | image.ts                                            | ./CropUpload            |
 | Divider               | Basic      | `basic`      | divider.ts                                          | ./Divider               |
 | Empty                 | Basic      | `basic`      | empty.ts                                            | ./Empty                 |
+| Highlight             | Basic      | `basic`      | highlight.ts                                        | ./Highlight             |
 | Icon                  | Basic      | `basic`      | icon.ts                                             | ./Icon                  |
 | Image                 | Basic      | `basic`      | image.ts                                            | ./Image                 |
+| ImageCompare          | Basic      | `basic`      | image-compare.ts                                    | ./ImageCompare          |
 | ImageCropper          | Basic      | `basic`      | image.ts                                            | ./ImageCropper          |
 | ImageGroup            | Basic      | `basic`      | image.ts                                            | ./ImageGroup            |
 | ImagePreview          | Basic      | `basic`      | image.ts                                            | ./ImagePreview          |
+| Kbd                   | Basic      | `basic`      | kbd.ts                                              | ./Kbd                   |
 | Link                  | Basic      | `basic`      | link.ts                                             | ./Link                  |
+| Marquee               | Basic      | `basic`      | marquee.ts                                          | ./Marquee               |
 | QRCode                | Basic      | `basic`      | qrcode.ts                                           | ./QRCode                |
 | Rate                  | Basic      | `basic`      | rate.ts                                             | ./Rate                  |
 | Result                | Basic      | `basic`      | result.ts                                           | ./Result                |
 | Segmented             | Basic      | `basic`      | segmented.ts                                        | ./Segmented             |
+| SplitButton           | Basic      | `basic`      | split-button.ts                                     | ./SplitButton           |
 | Statistic             | Basic      | `basic`      | statistic.ts                                        | ./Statistic             |
 | Tag                   | Basic      | `basic`      | tag.ts                                              | ./Tag                   |
 | Text                  | Basic      | `basic`      | text.ts                                             | ./Text                  |
@@ -92,6 +97,8 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Timeline              | Data       | `data`       | timeline.ts                                         | ./Timeline              |
 | Drawer                | Feedback   | `feedback`   | drawer.ts                                           | ./Drawer                |
 | Loading               | Feedback   | `feedback`   | loading.ts                                          | ./Loading               |
+| LoadingBar            | Feedback   | `feedback`   | loading-bar.ts                                      | ./LoadingBar            |
+| LoadingBarContainer   | Feedback   | `feedback`   | loading-bar.ts                                      | ./LoadingBarContainer   |
 | Message               | Feedback   | `feedback`   | message.ts                                          | ./Message               |
 | MessageContainer      | Feedback   | `feedback`   | MessageContainer.tsx, MessageContainer.ts           | ./MessageContainer      |
 | Modal                 | Feedback   | `feedback`   | modal.ts                                            | ./Modal                 |
@@ -157,6 +164,10 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | BackTop               | Navigation | `navigation` | back-top.ts                                         | ./BackTop               |
 | Breadcrumb            | Navigation | `navigation` | breadcrumb.ts                                       | ./Breadcrumb            |
 | BreadcrumbItem        | Navigation | `navigation` | breadcrumb.ts                                       | ./BreadcrumbItem        |
+| ContextMenu           | Navigation | `navigation` | context-menu.ts                                     | ./ContextMenu           |
+| ContextMenuItem       | Navigation | `navigation` | context-menu.ts                                     | ./ContextMenuItem       |
+| ContextMenuMenu       | Navigation | `navigation` | context-menu.ts                                     | ./ContextMenuMenu       |
+| ContextMenuSub        | Navigation | `navigation` | context-menu.ts                                     | ./ContextMenuSub        |
 | Dropdown              | Navigation | `navigation` | dropdown.ts                                         | ./Dropdown              |
 | DropdownItem          | Navigation | `navigation` | dropdown.ts                                         | ./DropdownItem          |
 | DropdownMenu          | Navigation | `navigation` | dropdown.ts                                         | ./DropdownMenu          |
@@ -165,6 +176,12 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Menu                  | Navigation | `navigation` | menu.ts                                             | ./Menu                  |
 | MenuItem              | Navigation | `navigation` | menu.ts                                             | ./MenuItem              |
 | MenuItemGroup         | Navigation | `navigation` | menu.ts                                             | ./MenuItemGroup         |
+| NavigationMenu        | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenu        |
+| NavigationMenuContent | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuContent |
+| NavigationMenuItem    | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuItem    |
+| NavigationMenuLink    | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuLink    |
+| NavigationMenuTrigger | Navigation | `navigation` | navigation-menu.ts                                  | ./NavigationMenuTrigger |
+| PageHeader            | Navigation | `navigation` | page-header.ts                                      | ./PageHeader            |
 | Pagination            | Navigation | `navigation` | pagination.ts                                       | ./Pagination            |
 | ScrollSpy             | Navigation | `navigation` | scroll-spy.ts                                       | ./ScrollSpy             |
 | Spotlight             | Navigation | `navigation` | spotlight.ts                                        | ./Spotlight             |

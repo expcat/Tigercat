@@ -5,7 +5,10 @@ import type {
   CascaderFlattenedOption,
   CascaderSearchConfig
 } from '../types/cascader'
+import type { VirtualRange } from '../types/virtual-list'
 import { classNames } from './class-names'
+import { getSelectVirtualItemHeight } from './select-utils'
+import { fixedSizeStrategy } from './virtual-list-utils'
 
 // ============================================================================
 // STYLE CLASSES
@@ -306,4 +309,61 @@ export function getCascaderColumns(
   }
 
   return columns
+}
+
+// ============================================================================
+// VIRTUAL SCROLLING (mirrors Select fixed-size virtual mode)
+// ============================================================================
+
+/** Default panel height (px) when `virtual` is true — same as Select `listHeight`. */
+export const CASCADER_DEFAULT_LIST_HEIGHT = 256
+
+/** Extra rows rendered above/below the viewport — same overscan as Select. */
+const CASCADER_VIRTUAL_OVERSCAN = 5
+
+/**
+ * Virtual-scroll row height (px) for a cascader size.
+ * Cascader option rows share Select size padding, so the Select height map is reused.
+ */
+export function getCascaderVirtualItemHeight(size: ComponentSize = 'md'): number {
+  return getSelectVirtualItemHeight(size)
+}
+
+/**
+ * Visible window for a cascader column or searchable flat list.
+ * Uses the shared `fixedSizeStrategy` / `getRange` path Select virtual mode uses.
+ */
+export function getCascaderVirtualRange(
+  scrollTop: number,
+  listHeight: number,
+  itemCount: number,
+  itemHeight: number,
+  overscan: number = CASCADER_VIRTUAL_OVERSCAN
+): VirtualRange {
+  const range = fixedSizeStrategy(itemHeight).getRange(scrollTop, listHeight, itemCount, overscan)
+  // Select's getRange does not clamp startIndex to itemCount, so a stale
+  // scrollTop (e.g. End, then a tighter search) can yield startIndex > endIndex.
+  if (range.endIndex < 0 || range.startIndex <= range.endIndex) return range
+  return {
+    ...range,
+    startIndex: range.endIndex,
+    offsetTop: range.endIndex * itemHeight
+  }
+}
+
+/**
+ * Next `scrollTop` that keeps `index` inside the virtual window.
+ * Returns `scrollTop` unchanged when `index` is out of range.
+ */
+export function getCascaderVirtualAlignScrollTop(
+  scrollTop: number,
+  index: number,
+  itemHeight: number,
+  listHeight: number
+): number {
+  if (index < 0 || itemHeight <= 0 || listHeight <= 0) return scrollTop
+  const top = index * itemHeight
+  if (top < scrollTop) return top
+  if (top + itemHeight > scrollTop + listHeight) return top + itemHeight - listHeight
+  return scrollTop
 }

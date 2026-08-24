@@ -1,0 +1,12 @@
+{
+  "id": "navigation-menu-02",
+  "title": "MegaMenu 面板",
+  "description": "更宽的 MegaMenu 内容区，用插槽排多列链接，仍保持 menubar 键盘与悬停展开。",
+  "entry": "App.tsx",
+  "order": 2,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 220,
+    "maxHeight": 720
+  }
+}

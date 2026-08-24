@@ -1,0 +1,8 @@
+{
+  "id": "split-button-01",
+  "title": "主操作与下拉扩展",
+  "description": "点击主按钮触发主操作；相邻 chevron 打开 Dropdown 菜单，菜单项复用 DropdownMenu / DropdownItem。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 280 }
+}

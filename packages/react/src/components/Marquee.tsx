@@ -1,0 +1,146 @@
+import React, { forwardRef, useCallback, useState } from 'react'
+import {
+  getMarqueeContentClasses,
+  getMarqueeRootClasses,
+  getMarqueeTrackClasses,
+  getMarqueeTrackStyle,
+  injectMarqueeStyles,
+  isMarqueeFocusInside,
+  isMarqueePaused,
+  resolveMarqueeAriaLabel,
+  resolveMarqueeDirection,
+  resolveMarqueePauseOnHover,
+  resolveMarqueeRepeat,
+  type MarqueeProps as CoreMarqueeProps
+} from '@expcat/tigercat-core'
+
+export interface MarqueeProps
+  extends
+    Omit<CoreMarqueeProps, 'style'>,
+    Omit<React.ComponentPropsWithoutRef<'div'>, keyof CoreMarqueeProps> {
+  children?: React.ReactNode
+  style?: React.CSSProperties
+}
+
+export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
+  (
+    {
+      direction,
+      duration,
+      pauseOnHover,
+      gap,
+      repeat,
+      ariaLabel,
+      className,
+      style,
+      children,
+      onMouseEnter,
+      onMouseLeave,
+      onFocus,
+      onBlur,
+      ...rest
+    },
+    ref
+  ) => {
+    injectMarqueeStyles()
+
+    const [hovered, setHovered] = useState(false)
+    const [focused, setFocused] = useState(false)
+    const resolvedDirection = resolveMarqueeDirection(direction)
+    const resolvedPauseOnHover = resolveMarqueePauseOnHover(pauseOnHover)
+    const copies = resolveMarqueeRepeat(repeat)
+    const paused = isMarqueePaused({
+      pauseOnHover: resolvedPauseOnHover,
+      hovered,
+      focused
+    })
+    const { 'aria-label': ariaLabelAttr, ...domProps } = rest
+    const resolvedAriaLabel = resolveMarqueeAriaLabel(
+      typeof ariaLabelAttr === 'string' ? ariaLabelAttr : ariaLabel
+    )
+
+    const handleMouseEnter = useCallback(
+      (event: React.MouseEvent<HTMLDivElement>) => {
+        if (resolvedPauseOnHover) setHovered(true)
+        onMouseEnter?.(event)
+      },
+      [onMouseEnter, resolvedPauseOnHover]
+    )
+
+    const handleMouseLeave = useCallback(
+      (event: React.MouseEvent<HTMLDivElement>) => {
+        if (resolvedPauseOnHover) setHovered(false)
+        onMouseLeave?.(event)
+      },
+      [onMouseLeave, resolvedPauseOnHover]
+    )
+
+    const handleFocus = useCallback(
+      (event: React.FocusEvent<HTMLDivElement>) => {
+        if (resolvedPauseOnHover) setFocused(true)
+        onFocus?.(event)
+      },
+      [onFocus, resolvedPauseOnHover]
+    )
+
+    const handleBlur = useCallback(
+      (event: React.FocusEvent<HTMLDivElement>) => {
+        if (
+          resolvedPauseOnHover &&
+          !isMarqueeFocusInside(event.currentTarget, event.relatedTarget)
+        ) {
+          setFocused(false)
+        }
+        onBlur?.(event)
+      },
+      [onBlur, resolvedPauseOnHover]
+    )
+
+    return (
+      <div
+        {...domProps}
+        ref={ref}
+        role="region"
+        aria-label={resolvedAriaLabel}
+        data-marquee=""
+        data-marquee-direction={resolvedDirection}
+        data-marquee-paused={paused ? 'true' : 'false'}
+        data-marquee-pause-on-hover={resolvedPauseOnHover ? 'true' : 'false'}
+        className={getMarqueeRootClasses({
+          direction: resolvedDirection,
+          pauseOnHover: resolvedPauseOnHover,
+          repeat: copies,
+          className
+        })}
+        style={style}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onFocus={handleFocus}
+        onBlur={handleBlur}>
+        <div
+          data-marquee-track=""
+          className={getMarqueeTrackClasses(resolvedDirection)}
+          style={getMarqueeTrackStyle({ duration, gap, repeat: copies })}>
+          {Array.from({ length: copies }, (_, index) => {
+            const clone = index > 0
+            return (
+              <div
+                key={clone ? `clone-${index}` : 'content'}
+                className={getMarqueeContentClasses({
+                  direction: resolvedDirection,
+                  clone
+                })}
+                data-marquee-content=""
+                {...(clone ? { 'data-marquee-clone': '', 'aria-hidden': true } : {})}>
+                {children}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+)
+Marquee.displayName = 'Marquee'
+
+export default Marquee

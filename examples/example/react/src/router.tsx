@@ -6,12 +6,17 @@ const Home = lazy(() => import('./pages/Home'))
 
 // Basic
 const ButtonDemo = lazy(() => import('./pages/ButtonDemo'))
+const SplitButtonDemo = lazy(() => import('./pages/SplitButtonDemo'))
 const ConfigProviderDemo = lazy(() => import('./pages/ConfigProviderDemo'))
 const IconDemo = lazy(() => import('./pages/IconDemo'))
 const LinkDemo = lazy(() => import('./pages/LinkDemo'))
 const TextDemo = lazy(() => import('./pages/TextDemo'))
 const CodeDemo = lazy(() => import('./pages/CodeDemo'))
+const KbdDemo = lazy(() => import('./pages/KbdDemo'))
+const HighlightDemo = lazy(() => import('./pages/HighlightDemo'))
+const MarqueeDemo = lazy(() => import('./pages/MarqueeDemo'))
 const ImageDemo = lazy(() => import('./pages/ImageDemo'))
+const ImageCompareDemo = lazy(() => import('./pages/ImageCompareDemo'))
 const ImageCropperDemo = lazy(() => import('./pages/ImageCropperDemo'))
 const ImageViewerDemo = lazy(() => import('./pages/ImageViewerDemo'))
 const AvatarDemo = lazy(() => import('./pages/AvatarDemo'))
@@ -84,6 +89,9 @@ const CountdownDemo = lazy(() => import('./pages/CountdownDemo'))
 const MenuDemo = lazy(() => import('./pages/MenuDemo'))
 const BreadcrumbDemo = lazy(() => import('./pages/BreadcrumbDemo'))
 const DropdownDemo = lazy(() => import('./pages/DropdownDemo'))
+const ContextMenuDemo = lazy(() => import('./pages/ContextMenuDemo'))
+const NavigationMenuDemo = lazy(() => import('./pages/NavigationMenuDemo'))
+const PageHeaderDemo = lazy(() => import('./pages/PageHeaderDemo'))
 const TabsDemo = lazy(() => import('./pages/TabsDemo'))
 const StepsDemo = lazy(() => import('./pages/StepsDemo'))
 const PaginationDemo = lazy(() => import('./pages/PaginationDemo'))
@@ -105,6 +113,7 @@ const TooltipDemo = lazy(() => import('./pages/TooltipDemo'))
 const NotificationDemo = lazy(() => import('./pages/NotificationDemo'))
 const DrawerDemo = lazy(() => import('./pages/DrawerDemo'))
 const LoadingDemo = lazy(() => import('./pages/LoadingDemo'))
+const LoadingBarDemo = lazy(() => import('./pages/LoadingBarDemo'))
 
 // Charts
 const BarChartDemo = lazy(() => import('./pages/BarChartDemo'))
@@ -156,12 +165,17 @@ const router = createHashRouter([
       { index: true, element: <Home /> },
       // Basic
       { path: 'button', element: <ButtonDemo /> },
+      { path: 'split-button', element: <SplitButtonDemo /> },
       { path: 'config-provider', element: <ConfigProviderDemo /> },
       { path: 'icon', element: <IconDemo /> },
       { path: 'link', element: <LinkDemo /> },
       { path: 'text', element: <TextDemo /> },
       { path: 'code', element: <CodeDemo /> },
+      { path: 'kbd', element: <KbdDemo /> },
+      { path: 'highlight', element: <HighlightDemo /> },
+      { path: 'marquee', element: <MarqueeDemo /> },
       { path: 'image', element: <ImageDemo /> },
+      { path: 'image-compare', element: <ImageCompareDemo /> },
       { path: 'image-cropper', element: <ImageCropperDemo /> },
       { path: 'image-viewer', element: <ImageViewerDemo /> },
       { path: 'avatar', element: <AvatarDemo /> },
@@ -231,6 +245,9 @@ const router = createHashRouter([
       { path: 'menu', element: <MenuDemo /> },
       { path: 'breadcrumb', element: <BreadcrumbDemo /> },
       { path: 'dropdown', element: <DropdownDemo /> },
+      { path: 'context-menu', element: <ContextMenuDemo /> },
+      { path: 'navigation-menu', element: <NavigationMenuDemo /> },
+      { path: 'page-header', element: <PageHeaderDemo /> },
       { path: 'tabs', element: <TabsDemo /> },
       { path: 'steps', element: <StepsDemo /> },
       { path: 'pagination', element: <PaginationDemo /> },
@@ -251,6 +268,7 @@ const router = createHashRouter([
       { path: 'notification', element: <NotificationDemo /> },
       { path: 'drawer', element: <DrawerDemo /> },
       { path: 'loading', element: <LoadingDemo /> },
+      { path: 'loading-bar', element: <LoadingBarDemo /> },
       // Charts
       { path: 'bar-chart', element: <BarChartDemo /> },
       { path: 'line-chart', element: <LineChartDemo /> },
