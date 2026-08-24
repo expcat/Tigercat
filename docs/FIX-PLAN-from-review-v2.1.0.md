@@ -22,7 +22,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A2 | Kbd / Tag default bg+text pair | done | this commit | 2026-08-25 |
 | A3 | Loading fullscreen mask | done | this commit | 2026-08-25 |
 | A4 | Skeleton surface-muted | done | this commit | 2026-08-25 |
-| A5 | Layout / Container examples + Content fallback | pending | | |
+| A5 | Layout / Container examples + Content fallback | done | this commit | 2026-08-25 |
 | A6 | Tree root `bg-white` → `--tiger-surface` | pending | | |
 | A7 | OrgChart node fill / title | pending | | |
 | A8 | FileManager / Markdown / RTE / Print / ImageAnnotation chrome | pending | | |
@@ -96,3 +96,21 @@ Skeleton chrome in `packages/core/src/utils/skeleton-utils.ts`:
 `--tiger-skeleton-*` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume `getSkeletonClasses`. Dark default muted is `#1f2937` vs page surface `#111827`. Example `bg-white/85` (loading/02) left for T5.
 
 Next: A5 Layout / Container examples + Content fallback.
+
+## A5 notes
+
+Layout Content chrome in `packages/core/src/utils/layout-utils.ts` `layoutContentClasses`:
+
+- Content fill: `--tiger-layout-content-bg` -> `--tiger-surface-muted` (`#f9fafb` last-resort)
+
+`--tiger-layout-content-bg` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume `getLayoutContentClasses`. Dark default muted is `#1f2937` vs page surface `#111827`.
+
+Examples:
+
+- layout/01 Container (Vue+React): dropped `bg-white` (transparent over page surface)
+- layout/02 Content (Vue+React): dropped `!bg-white`; inherits the Content chain (`!p-4` kept)
+- layout/03 Content: still `!p-4` only; now inherits surface-muted instead of locked `#f9fafb`
+
+`layoutRootClasses` `min-h-screen` / iframe height left for P2.
+
+Next: A6 Tree root `bg-white` -> `--tiger-surface`.

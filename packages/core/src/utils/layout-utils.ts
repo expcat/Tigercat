@@ -40,8 +40,9 @@ export function getSidebarStyle(
   return { width: w, minWidth: w }
 }
 
+/** Content fill: optional `--tiger-layout-content-bg`, then registered `--tiger-surface-muted`. */
 export const layoutContentClasses =
-  'tiger-content flex-1 bg-[var(--tiger-layout-content-bg,#f9fafb)]'
+  'tiger-content flex-1 bg-[var(--tiger-layout-content-bg,var(--tiger-surface-muted,#f9fafb))]'
 
 export function getLayoutContentClasses(padding: boolean | string = true): string {
   return classNames(

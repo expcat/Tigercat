@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Layout Content / Container 示例暗色白底**：Content 默认背景 fallback 改为已注册 `--tiger-surface-muted`，layout/01 Container 与 layout/02 Content 去掉锁死的 `bg-white` / `!bg-white`，避免暗色页白底白字。可选 `--tiger-layout-content-bg` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **Skeleton 暗色占位条**：条背景 fallback 改为已注册 `--tiger-surface-muted`，wave from/to 同一链，via 走 `--tiger-border`，避免暗色页上浅灰白杠。可选 `--tiger-skeleton-bg` / `--tiger-skeleton-bg-alt` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **Loading 全屏遮罩暗色**：fullscreen 默认背景从硬编码 `rgba(255, 255, 255, 0.9)` 改为跟随 `--tiger-surface` 的 90% `color-mix`，暗色页不再盖白布。可选 `--tiger-loading-mask` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **Kbd / Tag default 暗色 chrome**：default 背景 fallback 改为已注册 `--tiger-surface-muted`，文字保持 `--tiger-text`，避免暗色页上浅底浅字。不新增 `--tiger-tag-*` theme 变量。
