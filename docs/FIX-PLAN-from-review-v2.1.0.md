@@ -27,7 +27,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A7 | OrgChart node fill / title | done | this commit | 2026-08-25 |
 | A8 | FileManager / Markdown / RTE / Print / ImageAnnotation chrome | done | this commit | 2026-08-25 |
 | A9 | VirtualList example stripe | done | this commit | 2026-08-25 |
-| A10 | ImageViewer toolbar/nav (same as #19) | pending | | |
+| A10 | ImageViewer toolbar/nav (same as #19) | done | this commit | 2026-08-25 |
 | #2 | Vue Slider v-model | pending | | |
 | #3 | Switch / Stepper / ColorSwatch uncontrolled | pending | | |
 | #4 | Vue Transfer targetKeys | pending | | |
@@ -170,3 +170,16 @@ VirtualList example stripe in `examples/example/{vue3,react}/src/examples/virtua
 `--tiger-virtuallist-stripe` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. No new public export (`virtualListContainerClasses` unchanged). Dark default muted is `#1f2937` vs page surface `#111827`.
 
 Next: A10 ImageViewer toolbar/nav.
+
+
+## A10 notes
+
+ImageViewer chrome in `packages/core/src/utils/image-viewer-utils.ts`:
+
+- Toolbar: `--tiger-image-toolbar-bg` -> `rgba(0,0,0,0.6)` last-resort (no `--tiger-surface`)
+- Nav: same fill + `text-white` + `hover:bg-white/20` (ImagePreview nav)
+- Counter: same fill + `text-white`
+
+`--tiger-image-toolbar-bg` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core constants. Aligns with ImagePreview `--tiger-image-toolbar-bg, rgba(0,0,0,0.6)`. iframe trap left for T5.
+
+Next: Phase C #2 Vue Slider v-model.
