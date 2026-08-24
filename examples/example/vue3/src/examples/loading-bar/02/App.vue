@@ -10,5 +10,5 @@ const simulateError = async () => {
 </script>
 
 <template>
-  <Button variant="danger" @click="simulateError">模拟失败</Button>
+  <Button danger @click="simulateError">模拟失败</Button>
 </template>

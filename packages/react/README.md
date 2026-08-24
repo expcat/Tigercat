@@ -35,18 +35,18 @@ function App() {
 
 ## Components
 
-152 public component entries across 9 categories. The authoritative list with
+172 public component entries across 9 categories. The authoritative list with
 import subpaths lives in
 [component-index.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/component-index.md)
 (generated); the table below is only a sampler.
 
 | Category       | Count | Examples                                                      |
 | -------------- | ----- | ------------------------------------------------------------- |
-| **Basic**      | 25    | Button, Alert, Avatar, Badge, Icon, Tag, Text, Result, QRCode |
+| **Basic**      | 30    | Button, Alert, Avatar, Badge, Icon, Tag, Text, Result, QRCode |
 | **Form**       | 31    | Input, Select, DatePicker, Form, Upload, InputOTP, TagsInput  |
-| **Layout**     | 16    | Card, Row/Col, Layout, List, Descriptions, Skeleton, Space    |
-| **Navigation** | 23    | Menu, Tabs, Breadcrumb, Pagination, Steps, Dropdown, Tree     |
-| **Feedback**   | 11    | Modal, Drawer, Message, Popover, Tooltip, Progress, Tour      |
+| **Layout**     | 19    | Card, Row/Col, Layout, List, Descriptions, Skeleton, Space    |
+| **Navigation** | 33    | Menu, Tabs, Breadcrumb, Pagination, Steps, Dropdown, Tree     |
+| **Feedback**   | 13    | Modal, Drawer, Message, Popover, Tooltip, Progress, Tour      |
 | **Data**       | 7     | Table, Calendar, Collapse, Timeline, DataExport               |
 | **Charts**     | 20    | BarChart, LineChart, PieChart, RadarChart, GaugeChart, Gantt  |
 | **Advanced**   | 12    | VirtualTable, VirtualList, RichTextEditor, CodeEditor         |

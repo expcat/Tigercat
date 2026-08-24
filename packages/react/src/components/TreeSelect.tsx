@@ -167,7 +167,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
   visibleNodesRef.current = visibleNodes
   const valueRef = useRef(value)
   valueRef.current = value
-  const lastActiveKeyRef = useRef<string | number | undefined>()
+  const lastActiveKeyRef = useRef<string | number | undefined>(undefined)
 
   const resolveActiveIndex = useCallback((): number => {
     const nodes = visibleNodesRef.current

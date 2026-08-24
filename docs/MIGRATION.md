@@ -2,6 +2,17 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+## v2.1.0
+
+v2.1.0 是相对 v2.0.19 的 minor 发布。**没有 breaking change，组件用户无需迁移步骤。** `@expcat/tigercat-core` / `-vue` / `-react` / `-cli` / `-mcp` 的既有公开 API 保持向后兼容。
+
+本版本只增加可选能力（Roadmap 批次 1–5）：
+
+- 新组件：InputOTP、TagsInput、MaskInput、ScrollArea、Masonry、AspectRatio、ContextMenu、NavigationMenu、PageHeader、Kbd、Highlight、SplitButton、Marquee、ImageCompare、LoadingBar（及对应子组件入口）。
+- 既有组件增强：Cascader / TreeSelect 新增可选 `virtual`（默认 `false`），默认非虚拟渲染不变。
+
+未使用这些新组件或未打开虚拟化的现有代码不需要改动。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v210)。
+
 ## v2.0.19
 
 补记条目：v2.0.19 是 patch 号，但 `@expcat/tigercat-mcp` 有两处需要用户处理的行为变化。**只影响直接使用 MCP 包的项目**；`@expcat/tigercat-core` / `-vue` / `-react` / `-cli` 的公开 API 无变化，组件用户无需任何改动。

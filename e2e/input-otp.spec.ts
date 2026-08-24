@@ -1,15 +1,5 @@
-import { expect, test, type Locator } from '@playwright/test'
-import { exampleApps, openDemo } from './example-helpers'
-
-async function dispatchPaste(locator: Locator, text: string) {
-  await locator.evaluate((el: HTMLElement, value: string) => {
-    const data = new DataTransfer()
-    data.setData('text', value)
-    el.dispatchEvent(
-      new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true })
-    )
-  }, text)
-}
+import { expect, test } from '@playwright/test'
+import { dispatchPaste, exampleApps, openDemo } from './example-helpers'
 
 for (const { framework, baseUrl } of exampleApps) {
   test.describe(`${framework} — InputOTP`, () => {

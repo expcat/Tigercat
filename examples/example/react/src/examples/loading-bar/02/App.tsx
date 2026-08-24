@@ -9,7 +9,7 @@ export default function App() {
   }
 
   return (
-    <Button variant="danger" onClick={() => void simulateError()}>
+    <Button danger onClick={() => void simulateError()}>
       模拟失败
     </Button>
   )

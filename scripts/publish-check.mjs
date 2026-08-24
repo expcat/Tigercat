@@ -203,7 +203,16 @@ async function smokeExamples(tarballs) {
   for (const example of exampleProjects) {
     console.log(`Building ${example.name}...`)
     example.prepare(example.dir, tarballs)
-    await installWithRetry(['install', '--no-audit', '--fund=false'], example.dir)
+    await installWithRetry(
+      [
+        'install',
+        '--no-audit',
+        '--fund=false',
+        // npm 10 arborist crashes on Nuxt 4's peer tree (`edgesOut` of null).
+        ...(example.name === 'nuxt example' ? ['--legacy-peer-deps'] : [])
+      ],
+      example.dir
+    )
     runOrThrow('npm', example.buildArgs, { cwd: example.dir })
   }
 }

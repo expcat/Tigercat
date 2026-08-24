@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  classNames,
   DEFAULT_LOADING_BAR_ARIA_LABEL,
   DEFAULT_LOADING_BAR_COLOR,
   DEFAULT_LOADING_BAR_HEIGHT,

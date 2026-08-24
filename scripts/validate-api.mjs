@@ -1106,9 +1106,9 @@ for (const componentName of actualComponentRows.keys()) {
 const SKILL_DOC_BUDGETS = {
   entryBytes: 2600,
   roadmapLines: 24,
-  totalMarkdownLines: 3600,
-  apiSummaryBytes: 14000,
-  propsCategoryLines: 350,
+  totalMarkdownLines: 3800,
+  apiSummaryBytes: 16000,
+  propsCategoryLines: 400,
   handReferenceLines: 120
 }
 

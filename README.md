@@ -6,7 +6,7 @@
 [![@expcat/tigercat-cli](https://img.shields.io/npm/v/@expcat/tigercat-cli?style=flat-square&logo=npm&label=@expcat/tigercat-cli)](https://www.npmjs.com/package/@expcat/tigercat-cli)
 [![@expcat/tigercat-mcp](https://img.shields.io/npm/v/@expcat/tigercat-mcp?style=flat-square&logo=npm&label=@expcat/tigercat-mcp)](https://www.npmjs.com/package/@expcat/tigercat-mcp)
 
-基于 Tailwind CSS v4 的 Vue 3 / React UI 组件库。两套框架共享设计 token、类型与交互约定，并各自提供 **152 个公共组件入口**。
+基于 Tailwind CSS v4 的 Vue 3 / React UI 组件库。两套框架共享设计 token、类型与交互约定，并各自提供 **172 个公共组件入口**。
 
 当前稳定系列为 **v2**，所有官方包保持相同版本并遵循 SemVer；具体最新版本以顶部 npm 徽章为准。
 

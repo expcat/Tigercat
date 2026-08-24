@@ -425,7 +425,7 @@ export const NavigationMenuContent = defineComponent({
 
     const portalEnabled = computed(() => Boolean(root?.portal.value))
     const overlayEnabled = computed(
-      () => Boolean(item) && Boolean(item?.isOpen.value) && !Boolean(item?.disabled)
+      () => Boolean(item) && Boolean(item?.isOpen.value) && !item?.disabled
     )
 
     const overlay = useVueAnchoredOverlay({

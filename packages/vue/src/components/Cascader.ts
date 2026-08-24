@@ -1,4 +1,4 @@
-import { defineComponent, computed, ref, h, PropType, watch, nextTick } from 'vue'
+import { defineComponent, computed, ref, h, PropType, watch, nextTick, type VNodeRef } from 'vue'
 import {
   classNames,
   cascaderBaseClasses,
@@ -437,17 +437,17 @@ export const Cascader = defineComponent({
       return h(
         'div',
         {
-          ref: (el: Element | null) => {
+          ...extraAttrs,
+          ref: ((el: Element | null) => {
             setScrollEl(el as HTMLElement | null)
-          },
+          }) as VNodeRef,
           'data-tiger-cascader-virtual': '',
           tabindex: 0,
           style: { maxHeight: `${props.listHeight}px`, overflowY: 'auto' },
           onScroll: (e: Event) => {
             onScrollTop((e.target as HTMLElement).scrollTop)
           },
-          onKeydown: onKeyDown,
-          ...extraAttrs
+          onKeydown: onKeyDown
         },
         [
           h('div', { style: { height: `${totalHeight}px`, position: 'relative' } }, [
