@@ -299,7 +299,7 @@ description: Compact generated Tigercat Form props reference
 
 ## TreeSelect
 
-`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 3/12 props
+`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 3/15 props
 
 | Prop           | Type            | Default | Notes            |
 | -------------- | --------------- | ------- | ---------------- |

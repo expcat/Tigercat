@@ -1,21 +1,27 @@
-import { defineComponent, h, ref, computed, type PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, nextTick, type PropType } from 'vue'
 import type { TreeNode } from '@expcat/tigercat-core'
-import type { ComponentSize, TreeSelectValue } from '@expcat/tigercat-core'
+import type { ComponentSize, TreeSelectValue, FlatTreeSelectNode } from '@expcat/tigercat-core'
 import {
   treeSelectBaseClasses,
-  treeSelectDropdownClasses,
   treeSelectSearchClasses,
   treeSelectEmptyClasses,
   getTreeSelectTriggerClasses,
   getTreeSelectNodeClasses,
+  getTreeSelectDropdownClasses,
   getTreeSelectDisplayLabel,
   getAllTreeSelectKeys,
   flattenTreeSelectNodes,
   filterTreeSelectNodes,
+  getTreeSelectVisibleIndex,
+  alignTreeSelectVirtualScroll,
+  TREE_SELECT_DEFAULT_HEIGHT,
+  TREE_SELECT_DEFAULT_ITEM_HEIGHT,
   getPickerComboboxAria,
   getPickerListboxAria,
   getPickerOptionAria,
   getPickerTriggerKeyAction,
+  getPickerNavigationIndex,
+  findFirstEnabledIndex,
   coerceClassValue,
   classNames,
   icon20ViewBox,
@@ -27,6 +33,7 @@ import {
 } from '@expcat/tigercat-core'
 import type { TigerLocale } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { VirtualList } from './VirtualList'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 let treeSelectInstanceId = 0
@@ -119,6 +126,30 @@ export const TreeSelect = defineComponent({
       default: false
     },
     /**
+     * Enable virtualized rendering of the dropdown tree.
+     * Visible flattened rows are rendered through VirtualList with fixed item height.
+     */
+    virtual: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Pixel height of the virtualized dropdown viewport.
+     * @default 400
+     */
+    height: {
+      type: Number,
+      default: TREE_SELECT_DEFAULT_HEIGHT
+    },
+    /**
+     * Pixel height of each virtualized tree row.
+     * @default 32
+     */
+    itemHeight: {
+      type: Number,
+      default: TREE_SELECT_DEFAULT_ITEM_HEIGHT
+    },
+    /**
      * Locale overrides merged on top of ConfigProvider locale
      */
     locale: {
@@ -139,6 +170,9 @@ export const TreeSelect = defineComponent({
     const containerRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const dropdownRef = ref<HTMLElement | null>(null)
+    const virtualListWrapperRef = ref<HTMLElement | null>(null)
+    const activeIndex = ref(-1)
+    const lastActiveKey = ref<string | number | undefined>()
     const overlay = useVueAnchoredOverlay({
       enabled: isOpen,
       referenceRef: triggerRef,
@@ -187,6 +221,68 @@ export const TreeSelect = defineComponent({
       if (!matchedKeys.value) return flatNodes.value
       return flatNodes.value.filter((f) => matchedKeys.value!.has(f.node.key))
     })
+
+    function isNodeDisabled(item: FlatTreeSelectNode): boolean {
+      return !!item.node.disabled
+    }
+
+    function getVirtualScrollEl(): HTMLElement | null {
+      const wrapper = virtualListWrapperRef.value
+      return (wrapper?.firstElementChild as HTMLElement | null) ?? wrapper
+    }
+
+    function resolveActiveIndex(): number {
+      const selected = getTreeSelectVisibleIndex(visibleNodes.value, props.modelValue)
+      if (selected >= 0 && !visibleNodes.value[selected]?.node.disabled) return selected
+      return findFirstEnabledIndex(visibleNodes.value, isNodeDisabled)
+    }
+
+    function commitActiveIndex(index: number) {
+      activeIndex.value = index
+      lastActiveKey.value = index >= 0 ? visibleNodes.value[index]?.node.key : undefined
+    }
+
+    function alignVirtualScroll(index: number) {
+      if (!props.virtual) return
+      alignTreeSelectVirtualScroll(getVirtualScrollEl(), index, props.itemHeight, props.height)
+    }
+
+    watch(isOpen, (open) => {
+      if (!open) {
+        commitActiveIndex(-1)
+        return
+      }
+      if (!props.virtual) return
+      commitActiveIndex(resolveActiveIndex())
+      nextTick(() => alignVirtualScroll(activeIndex.value))
+    })
+
+    watch(activeIndex, (idx) => {
+      if (!props.virtual || !isOpen.value) return
+      nextTick(() => alignVirtualScroll(idx))
+    })
+
+    watch(searchQuery, () => {
+      if (!props.virtual || !isOpen.value) return
+      commitActiveIndex(resolveActiveIndex())
+    })
+
+    watch([expandedKeys, () => props.treeData], () => {
+      if (!props.virtual || !isOpen.value) return
+      const remapped = getTreeSelectVisibleIndex(visibleNodes.value, lastActiveKey.value)
+      if (remapped >= 0) activeIndex.value = remapped
+    })
+
+    function handleVirtualListKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Home' && e.key !== 'End') {
+        return
+      }
+      e.preventDefault()
+      e.stopPropagation()
+      commitActiveIndex(
+        getPickerNavigationIndex(visibleNodes.value, activeIndex.value, e.key, isNodeDisabled)
+      )
+    }
 
     function openDropdown() {
       if (props.disabled) return
@@ -267,6 +363,61 @@ export const TreeSelect = defineComponent({
       }
     }
 
+    function renderFlatNode(flatNode: FlatTreeSelectNode) {
+      const { node, level, hasChildren, isExpanded } = flatNode
+      const selected = isSelected(node.key)
+      const indent = level * 20
+
+      return h(
+        'div',
+        {
+          key: node.key,
+          ...getPickerOptionAria({ selected, disabled: !!node.disabled }),
+          class: getTreeSelectNodeClasses(selected, !!node.disabled, props.size),
+          style: { paddingLeft: `${indent + 8}px`, height: props.virtual ? '100%' : undefined },
+          onClick: (e: MouseEvent) => {
+            e.stopPropagation()
+            handleNodeSelect(node)
+          }
+        },
+        [
+          hasChildren
+            ? h(
+                'span',
+                {
+                  class: classNames(
+                    'inline-flex items-center justify-center w-4 h-4 mr-1 transition-transform',
+                    isExpanded ? 'rotate-90' : ''
+                  ),
+                  onClick: (e: MouseEvent) => {
+                    e.stopPropagation()
+                    toggleExpand(node.key)
+                  }
+                },
+                [
+                  h(
+                    'svg',
+                    {
+                      class: 'w-3 h-3',
+                      viewBox: icon20ViewBox,
+                      fill: 'currentColor'
+                    },
+                    [
+                      h('path', {
+                        d: chevronRightSolidIcon20PathD,
+                        'fill-rule': 'evenodd',
+                        'clip-rule': 'evenodd'
+                      })
+                    ]
+                  )
+                ]
+              )
+            : h('span', { class: 'w-4 mr-1' }),
+          h('span', { class: 'flex-1 truncate' }, node.label)
+        ]
+      )
+    }
+
     return () => {
       const containerClasses = classNames(treeSelectBaseClasses, coerceClassValue(attrs.class))
 
@@ -331,7 +482,10 @@ export const TreeSelect = defineComponent({
                 {
                   ref: dropdownRef,
                   ...getPickerListboxAria({ id: listboxId }),
-                  class: classNames(treeSelectDropdownClasses, overlay.floatingClasses.value),
+                  class: classNames(
+                    getTreeSelectDropdownClasses(props.virtual),
+                    overlay.floatingClasses.value
+                  ),
                   style: overlay.floatingStyles.value,
                   'data-positioned': overlay.positioned.value
                 },
@@ -357,63 +511,33 @@ export const TreeSelect = defineComponent({
 
                   // Tree nodes
                   visibleNodes.value.length > 0
-                    ? visibleNodes.value.map((flatNode) => {
-                        const { node, level, hasChildren, isExpanded } = flatNode
-                        const selected = isSelected(node.key)
-                        const indent = level * 20
-
-                        return h(
+                    ? props.virtual
+                      ? h(
                           'div',
                           {
-                            key: node.key,
-                            ...getPickerOptionAria({ selected, disabled: !!node.disabled }),
-                            class: getTreeSelectNodeClasses(selected, !!node.disabled, props.size),
-                            style: { paddingLeft: `${indent + 8}px` },
-                            onClick: (e: MouseEvent) => {
-                              e.stopPropagation()
-                              handleNodeSelect(node)
-                            }
+                            ref: virtualListWrapperRef,
+                            'data-tiger-treeselect-virtual': '',
+                            tabindex: 0,
+                            onKeydown: handleVirtualListKeyDown
                           },
                           [
-                            // Expand toggle
-                            hasChildren
-                              ? h(
-                                  'span',
-                                  {
-                                    class: classNames(
-                                      'inline-flex items-center justify-center w-4 h-4 mr-1 transition-transform',
-                                      isExpanded ? 'rotate-90' : ''
-                                    ),
-                                    onClick: (e: MouseEvent) => {
-                                      e.stopPropagation()
-                                      toggleExpand(node.key)
-                                    }
-                                  },
-                                  [
-                                    h(
-                                      'svg',
-                                      {
-                                        class: 'w-3 h-3',
-                                        viewBox: icon20ViewBox,
-                                        fill: 'currentColor'
-                                      },
-                                      [
-                                        h('path', {
-                                          d: chevronRightSolidIcon20PathD,
-                                          'fill-rule': 'evenodd',
-                                          'clip-rule': 'evenodd'
-                                        })
-                                      ]
-                                    )
-                                  ]
-                                )
-                              : h('span', { class: 'w-4 mr-1' }),
-
-                            // Label
-                            h('span', { class: 'flex-1 truncate' }, node.label)
+                            h(
+                              VirtualList,
+                              {
+                                itemCount: visibleNodes.value.length,
+                                itemHeight: props.itemHeight,
+                                height: props.height
+                              },
+                              {
+                                default: ({ index }: { index: number }) => {
+                                  const item = visibleNodes.value[index]
+                                  return item ? renderFlatNode(item) : null
+                                }
+                              }
+                            )
                           ]
                         )
-                      })
+                      : visibleNodes.value.map((flatNode) => renderFlatNode(flatNode))
                     : h(
                         'div',
                         { class: treeSelectEmptyClasses },

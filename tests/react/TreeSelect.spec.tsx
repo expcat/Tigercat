@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor } from '@testing-library/react'
+import { render, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { TreeSelect } from '@expcat/tigercat-react/TreeSelect'
@@ -305,6 +305,179 @@ describe('TreeSelect', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<TreeSelect />)
       await expectNoA11yViolationsIsolated(container)
+    })
+  })
+
+  describe('Virtual scrolling', () => {
+    const largeTree = Array.from({ length: 200 }, (_, i) => ({
+      key: `n-${i}`,
+      label: `Node ${i}`,
+      children: [{ key: `c-${i}`, label: `Child ${i}` }]
+    }))
+
+    it('renders only a subset of flattened rows when virtual is enabled', async () => {
+      const user = userEvent.setup()
+      const { container, getByText, queryByText } = render(
+        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} />
+      )
+
+      await user.click(container.querySelector('button')!)
+
+      const virtualList = document.body.querySelector('[data-tiger-treeselect-virtual]')
+      expect(virtualList).toBeInTheDocument()
+      expect(getByText('Node 0')).toBeInTheDocument()
+      expect(queryByText('Node 199')).not.toBeInTheDocument()
+
+      const options = document.body.querySelectorAll('[role="option"]')
+      expect(options.length).toBeGreaterThan(0)
+      expect(options.length).toBeLessThan(50)
+    })
+
+    it('does not virtualize by default and still renders a small tree fully', async () => {
+      const user = userEvent.setup()
+      const { container, getByText } = render(<TreeSelect treeData={treeData} />)
+
+      await user.click(container.querySelector('button')!)
+
+      expect(document.body.querySelector('[data-tiger-treeselect-virtual]')).not.toBeInTheDocument()
+      expect(getByText('Fruits')).toBeInTheDocument()
+      expect(getByText('Vegetables')).toBeInTheDocument()
+      expect(getByText('Grain')).toBeInTheDocument()
+      expect(document.body.querySelectorAll('[role="option"]').length).toBe(3)
+    })
+
+    it('keeps a far selected option in the virtual window', async () => {
+      const user = userEvent.setup()
+      const { container } = render(
+        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} value="n-80" />
+      )
+
+      await user.click(container.querySelector('button')!)
+
+      await waitFor(() => {
+        const labels = [...document.body.querySelectorAll('[role="option"]')].map(
+          (el) => el.textContent
+        )
+        expect(labels).toContain('Node 80')
+        expect(labels).not.toContain('Node 0')
+      })
+    })
+
+    it('keeps the active option in the window during keyboard navigation', async () => {
+      const user = userEvent.setup()
+      const { container } = render(
+        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} />
+      )
+
+      await user.click(container.querySelector('button')!)
+      const virtualList = document.body.querySelector('[data-tiger-treeselect-virtual]')!
+      fireEvent.keyDown(virtualList, { key: 'End' })
+
+      await waitFor(() => {
+        const labels = [...document.body.querySelectorAll('[role="option"]')].map(
+          (el) => el.textContent
+        )
+        expect(labels).toContain('Node 199')
+        expect(labels).not.toContain('Node 0')
+      })
+    })
+
+    it('keeps the keyboard-aligned node in the window after expanding it', async () => {
+      const user = userEvent.setup()
+      const { container, getByText } = render(
+        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} />
+      )
+
+      await user.click(container.querySelector('button')!)
+      const virtualList = document.body.querySelector('[data-tiger-treeselect-virtual]')!
+      fireEvent.keyDown(virtualList, { key: 'End' })
+
+      await waitFor(() => {
+        expect(getByText('Node 199')).toBeInTheDocument()
+      })
+
+      const parentOption = getByText('Node 199').closest('[role="option"]')!
+      const expandToggle = parentOption.querySelector('span')!
+      await user.click(expandToggle)
+
+      await waitFor(() => {
+        const labels = [...document.body.querySelectorAll('[role="option"]')].map(
+          (el) => el.textContent
+        )
+        expect(labels).toContain('Node 199')
+        expect(labels).not.toContain('Node 0')
+      })
+    })
+
+    it('expands a parent node under virtual rendering', async () => {
+      const user = userEvent.setup()
+      const { container, getByText, queryByText } = render(
+        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} />
+      )
+
+      await user.click(container.querySelector('button')!)
+      expect(queryByText('Child 0')).not.toBeInTheDocument()
+
+      const parentOption = getByText('Node 0').closest('[role="option"]')!
+      const expandToggle = parentOption.querySelector('span')!
+      await user.click(expandToggle)
+
+      expect(getByText('Child 0')).toBeInTheDocument()
+      expect(queryByText('Node 199')).not.toBeInTheDocument()
+    })
+
+    it('virtualizes the searchable flattened list', async () => {
+      const user = userEvent.setup()
+      const { container, getByText, queryByText, getByLabelText } = render(
+        <TreeSelect treeData={largeTree} virtual searchable height={200} itemHeight={32} />
+      )
+
+      await user.click(container.querySelector('button')!)
+      const input = getByLabelText('Search tree')
+      await user.clear(input)
+      await user.type(input, 'Node')
+
+      await waitFor(() => {
+        expect(document.body.querySelector('[data-tiger-treeselect-virtual]')).toBeInTheDocument()
+      })
+      expect(getByText('Node 0')).toBeInTheDocument()
+      expect(queryByText('Node 199')).not.toBeInTheDocument()
+      expect(document.body.querySelectorAll('[role="option"]').length).toBeLessThan(50)
+    })
+
+    it('still selects a visible option when virtual is enabled', async () => {
+      const user = userEvent.setup()
+      const onChange = vi.fn()
+      const { container, getByText } = render(
+        <TreeSelect treeData={largeTree} virtual height={200} itemHeight={32} onChange={onChange} />
+      )
+
+      await user.click(container.querySelector('button')!)
+      await user.click(getByText('Node 0'))
+
+      expect(onChange).toHaveBeenCalledWith('n-0')
+    })
+
+    it('keeps multiple selection open under virtual rendering', async () => {
+      const user = userEvent.setup()
+      const onChange = vi.fn()
+      const { container, getByText, getByRole } = render(
+        <TreeSelect
+          treeData={largeTree}
+          virtual
+          height={200}
+          itemHeight={32}
+          multiple
+          value={[]}
+          onChange={onChange}
+        />
+      )
+
+      await user.click(container.querySelector('button')!)
+      await user.click(getByText('Node 0'))
+
+      expect(onChange).toHaveBeenCalledWith(['n-0'])
+      expect(getByRole('listbox')).toBeInTheDocument()
     })
   })
 })
