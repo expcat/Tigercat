@@ -30,7 +30,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A10 | ImageViewer toolbar/nav (same as #19) | done | this commit | 2026-08-25 |
 | #2 | Vue Slider v-model | done | this commit | 2026-08-25 |
 | #3 | Switch / Stepper / ColorSwatch uncontrolled | done | this commit | 2026-08-25 |
-| #4 | Vue Transfer targetKeys | pending | | |
+| #4 | Vue Transfer targetKeys | done | this commit | 2026-08-25 |
 | #5 | AutoComplete write option.label | pending | | |
 | #6 | React Form validate after updateValue | pending | | |
 | #7 | React Upload controlled fileList | pending | | |
@@ -210,3 +210,17 @@ Switch / Stepper (Vue+React) and Vue ColorSwatch keep uncontrolled inner state:
 Bare click / plus / swatch pick updates UI when the parent does not write back. Controlled `v-model` / `checked` / `value` still require parent write-back. Examples unchanged. Public API addition recorded in CHANGELOG unpublished.
 
 Next: Phase C #4 Vue Transfer targetKeys.
+
+## #4 notes
+
+Vue Transfer dual-emits `update:targetKeys` so Pages `v-model:target-keys` binds:
+
+- `moveRight` / `moveLeft` go through `updateTargetKeys` (Slider-style helper)
+- Same payload: `update:modelValue` + `update:targetKeys` + existing `change`
+- `resolvedTargetKeys` stays `modelValue ?? targetKeys ?? []` (`modelValue` wins)
+- No inner target state; no example rewrite (01 still `v-model:target-keys`, 02 still `v-model`)
+- React Transfer untouched
+
+Public API addition recorded in CHANGELOG unpublished.
+
+Next: Phase C #5 AutoComplete write option.label.
