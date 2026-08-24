@@ -18,7 +18,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | ID | Task | Status | Commit | Date (Asia/Shanghai) |
 | --- | --- | --- | --- | --- |
 | A0 | Register `--tiger-text-muted` → text-secondary, `--tiger-fill` → surface-muted, `--tiger-bg` → surface | done | this commit | 2026-08-25 |
-| A1 | Segmented track/indicator tokens | pending | | |
+| A1 | Segmented track/indicator tokens | done | this commit | 2026-08-25 |
 | A2 | Kbd / Tag default bg+text pair | pending | | |
 | A3 | Loading fullscreen mask | pending | | |
 | A4 | Skeleton surface-muted | pending | | |
@@ -52,4 +52,15 @@ Registered in `THEME_CSS_VARS` as `textMuted` / `fill` / `bg`. Shared helper `se
 
 ThemeManager and Tailwind `:root` / `.dark` both use the helper. Not required `ThemeSemanticColors` fields. Dark `--tiger-bg` follows dark `--tiger-surface` (`#111827`).
 
-Next: A1 Segmented track fallback `surface-muted`, indicator `surface-raised`.
+Next: A2 Kbd / Tag default bg+text pair.
+
+## A1 notes
+
+Segmented chrome in `packages/core/src/utils/segmented-utils.ts`:
+
+- Track: `--tiger-segmented-bg` -> `--tiger-surface-muted` (`#f9fafb` last-resort)
+- Indicator: `--tiger-segmented-active-bg` -> `--tiger-surface-raised` (`#ffffff` last-resort)
+
+`--tiger-segmented-*` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core helpers. Dark default muted/raised are both `#1f2937` vs page surface `#111827`.
+
+Next: A2 Kbd / Tag default bg+text pair.
