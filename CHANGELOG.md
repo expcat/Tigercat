@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **VirtualList 示例暗色斑马**：virtual-list/01 偶数行去掉锁死的 `bg-gray-50`，改走已注册 `--tiger-surface-muted`，避免暗色页白条浅字。可选 `--tiger-virtuallist-stripe` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **FileManager / Markdown / RTE / Print / ImageAnnotation 暗色 chrome**：FileManager 容器/加载/搜索、Markdown 容器/正文、RTE 容器 fallback 改为已注册 `--tiger-surface`，工具条走 `--tiger-surface-muted`；Print 纸面保持 `bg-white` 并强制深色墨；ImageAnnotation 未选工具钮 bg/text 成对走 `--tiger-surface` / `--tiger-text`，hover 走 `--tiger-surface-muted`。可选 `--tiger-file-manager-*` / `--tiger-md-*` / `--tiger-rte-*` / `--tiger-print-ink` / `--tiger-annotation-tool-*` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **OrgChart 暗色节点填色 / 职称**：节点 fill fallback 改为已注册 `--tiger-surface`，职称与副标题走 `--tiger-text-secondary`，姓名保持 `--tiger-text`，避免暗色页白卡浅字。可选 `--tiger-org-node-bg` / `--tiger-org-label` / `--tiger-org-title` / `--tiger-org-subtitle` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **Tree 暗色白底 chrome**：根背景 fallback 改为已注册 `--tiger-surface` 并继承 `--tiger-text`，节点 hover 走 `--tiger-surface-muted`，空态/连线走 `--tiger-text-secondary` / `--tiger-border`，避免暗色页白卡白字。可选 `--tiger-tree-bg` / `--tiger-tree-node-hover` 为一层覆写，不注册进 `THEME_CSS_VARS`。

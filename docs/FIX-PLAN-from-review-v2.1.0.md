@@ -26,7 +26,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A6 | Tree root `bg-white` → `--tiger-surface` | done | this commit | 2026-08-25 |
 | A7 | OrgChart node fill / title | done | this commit | 2026-08-25 |
 | A8 | FileManager / Markdown / RTE / Print / ImageAnnotation chrome | done | this commit | 2026-08-25 |
-| A9 | VirtualList example stripe | pending | | |
+| A9 | VirtualList example stripe | done | this commit | 2026-08-25 |
 | A10 | ImageViewer toolbar/nav (same as #19) | pending | | |
 | #2 | Vue Slider v-model | pending | | |
 | #3 | Switch / Stepper / ColorSwatch uncontrolled | pending | | |
@@ -158,3 +158,15 @@ FileManager / Markdown / RTE / Print / ImageAnnotation chrome in the five core u
 
 Next: A9 VirtualList example stripe.
 
+
+## A9 notes
+
+VirtualList example stripe in `examples/example/{vue3,react}/src/examples/virtual-list/01`:
+
+- Even rows (`index % 2 === 0`, displayed 第 1/3/5 行): `--tiger-virtuallist-stripe` -> `--tiger-surface-muted` (`#f9fafb` last-resort)
+- Odd rows stay transparent over container `--tiger-surface`
+- Row text still inherits `--tiger-text`
+
+`--tiger-virtuallist-stripe` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. No new public export (`virtualListContainerClasses` unchanged). Dark default muted is `#1f2937` vs page surface `#111827`.
+
+Next: A10 ImageViewer toolbar/nav.
