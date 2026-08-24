@@ -28,7 +28,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | A8 | FileManager / Markdown / RTE / Print / ImageAnnotation chrome | done | this commit | 2026-08-25 |
 | A9 | VirtualList example stripe | done | this commit | 2026-08-25 |
 | A10 | ImageViewer toolbar/nav (same as #19) | done | this commit | 2026-08-25 |
-| #2 | Vue Slider v-model | pending | | |
+| #2 | Vue Slider v-model | done | this commit | 2026-08-25 |
 | #3 | Switch / Stepper / ColorSwatch uncontrolled | pending | | |
 | #4 | Vue Transfer targetKeys | pending | | |
 | #5 | AutoComplete write option.label | pending | | |
@@ -183,3 +183,16 @@ ImageViewer chrome in `packages/core/src/utils/image-viewer-utils.ts`:
 `--tiger-image-toolbar-bg` stays an optional first `var()` override only; not registered in `THEME_CSS_VARS`. Vue/React consume the core constants. Aligns with ImagePreview `--tiger-image-toolbar-bg, rgba(0,0,0,0.6)`. iframe trap left for T5.
 
 Next: Phase C #2 Vue Slider v-model.
+
+## #2 notes
+
+Vue Slider default v-model in `packages/vue/src/components/Slider.ts`:
+
+- Accept optional `modelValue` (same type as `value`; no default, so it does not force controlled mode)
+- `updateValue` dual-emits `update:value` + `update:modelValue` + existing `change`
+- Resolve bound value: defined `value` first (`v-model:value`), else defined `modelValue` (default `v-model`), else `defaultValue`, else range `[min,max]` / scalar `min`
+- Watch both props; an undefined sibling does not wipe a defined one
+
+Examples still use `<Slider v-model>`. React Slider and core `SliderProps` unchanged. Public API addition recorded in CHANGELOG unpublished.
+
+Next: Phase C #3 Switch / Stepper / ColorSwatch uncontrolled.

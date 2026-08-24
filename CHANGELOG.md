@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Vue Slider 支持默认 v-model**：同时接受 `modelValue` 并兼发 `update:modelValue`，Pages/示例里的 `<Slider v-model>` 不再停在 min；原有 `v-model:value` / `update:value` 保持不变。公开 API 增补，无主题变量变化。
 - **ImageViewer 亮色工具条/导航白底白字**：工具条、左右导航与计数去掉已注册 `--tiger-surface`，改走未注册 `--tiger-image-toolbar-bg` 并以 `rgba(0,0,0,0.6)` 为 last-resort，与 ImagePreview 深色半透明 chrome 对齐。不注册进 `THEME_CSS_VARS`。
 - **VirtualList 示例暗色斑马**：virtual-list/01 偶数行去掉锁死的 `bg-gray-50`，改走已注册 `--tiger-surface-muted`，避免暗色页白条浅字。可选 `--tiger-virtuallist-stripe` 为一层覆写，不注册进 `THEME_CSS_VARS`。
 - **FileManager / Markdown / RTE / Print / ImageAnnotation 暗色 chrome**：FileManager 容器/加载/搜索、Markdown 容器/正文、RTE 容器 fallback 改为已注册 `--tiger-surface`，工具条走 `--tiger-surface-muted`；Print 纸面保持 `bg-white` 并强制深色墨；ImageAnnotation 未选工具钮 bg/text 成对走 `--tiger-surface` / `--tiger-text`，hover 走 `--tiger-surface-muted`。可选 `--tiger-file-manager-*` / `--tiger-md-*` / `--tiger-rte-*` / `--tiger-print-ink` / `--tiger-annotation-tool-*` 为一层覆写，不注册进 `THEME_CSS_VARS`。
