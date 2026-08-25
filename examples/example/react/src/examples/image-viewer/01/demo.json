@@ -4,5 +4,5 @@
   "description": "一份 open 状态控制一个 ImageViewer，并组合缩放、旋转、导航和计数功能。",
   "entry": "App.tsx",
   "order": 1,
-  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+  "viewport": { "mode": "auto", "minHeight": 560, "maxHeight": 720 }
 }

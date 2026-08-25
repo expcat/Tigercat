@@ -65,7 +65,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #33 | FloatButton default plus + Group placement/offset/portal | done | this commit | 2026-08-25 |
 | #35 | Table virtual scroll box overflow only around body | done | this commit | 2026-08-25 |
 | #38 | Sunburst showLabels midAngle labels | done | this commit | 2026-08-25 |
-| #20 | ImagePreview/ImageViewer iframe (Phase E T5) | pending | | |
+| #20 | ImagePreview/ImageViewer iframe (Phase E T5) | done | this commit | 2026-08-25 |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -741,4 +741,16 @@ SunburstChart Vue + React `showLabels` (default true) now paints SVG text at eac
 
 Public behavior fix (dead API now live) recorded in CHANGELOG unpublished.
 
-Next: Phase E T5 / #20 ImagePreview/ImageViewer iframe (preview `max-h-[90vh] max-w-[90vw]`; raise demo viewport or stretch iframe when preview opens). #19 already landed in A10. C table P1 otherwise complete.
+## #20 notes
+
+ImagePreview / ImageViewer iframe first cut (Phase E T5 / C table #20):
+
+- Core `imagePreviewImgClasses` is now `max-h-[90vh] max-w-[90vw] select-none …` (dropped `max-w-none`)
+- Vue/React ImagePreview already consume the core string; no component rewrite
+- `imageViewerImgClasses` already had the 90vh/90vw constraint; toolbar/nav/counter (#19 / A10) left alone
+- image/04, image/05, image-viewer/01, image-viewer/02 (Vue+React) `viewport.minHeight` 560, `mode: auto`, `maxHeight` 720, no frozen `height`
+- DemoBlock, sandbox.ts, allow-same-origin, srcdoc dark: sync, other overlay demos left for T5 leftover / P2-1 / P2-15
+
+Public visual fix recorded in CHANGELOG unpublished.
+
+Next: leftover T5 / P2-1 Pages sandbox viewport (DatePicker/Modal/Tour/Spotlight/CropUpload stretch or raise; do not blindly raise every iframe). Then Phase F 5.2.3 P2-2..20 (skip if T1 already covers). P2-15 clipboard / allow-same-origin is a later T5 slice.

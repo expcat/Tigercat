@@ -74,6 +74,20 @@ describe('ImagePreview', () => {
     expect(img).toHaveAttribute('src', '/img2.jpg')
   })
 
+  it('constrains the open preview image to 90vh / 90vw', () => {
+    render(ImagePreview, {
+      props: {
+        open: true,
+        images
+      }
+    })
+
+    const img = document.querySelector('[role="dialog"] img')
+    expect(img).toBeInTheDocument()
+    expect(img?.className).toContain('max-h-[90vh]')
+    expect(img?.className).toContain('max-w-[90vw]')
+  })
+
   it('renders navigation buttons for multiple images', () => {
     render(ImagePreview, {
       props: {

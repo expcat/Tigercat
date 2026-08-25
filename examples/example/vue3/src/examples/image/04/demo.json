@@ -4,5 +4,5 @@
   "description": "一个 ImageGroup 统一管理必要的组图子项，并在预览中提供连续切换。",
   "entry": "App.vue",
   "order": 4,
-  "viewport": { "mode": "auto", "minHeight": 180, "maxHeight": 720 }
+  "viewport": { "mode": "auto", "minHeight": 560, "maxHeight": 720 }
 }

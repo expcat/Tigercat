@@ -1,11 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import {
+  imageViewerImgClasses,
   imageViewerToolbarClasses,
   imageViewerNavBtnClasses,
   imageViewerCounterClasses
 } from '@expcat/tigercat-core'
 
 describe('image-viewer-utils chrome tokens', () => {
+  it('imageViewerImgClasses still constrains the viewer img to 90vh / 90vw', () => {
+    expect(imageViewerImgClasses).toContain('max-h-[90vh]')
+    expect(imageViewerImgClasses).toContain('max-w-[90vw]')
+  })
+
   it('lands toolbar fill on ImagePreview dark translucent chrome, not page surface', () => {
     expect(imageViewerToolbarClasses).toContain('--tiger-image-toolbar-bg')
     expect(imageViewerToolbarClasses).toContain('rgba(0,0,0,0.6)')

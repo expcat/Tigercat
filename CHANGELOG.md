@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **ImagePreview 预览图 90vh/90vw 约束，Pages 预览 iframe 加高**：Vue / React 预览 `<img>` 由 `max-w-none` 改为 `max-h-[90vh] max-w-[90vw]`，组图/独立预览不再被裁成无限宽横条。Pages `/image` ImageGroup / ImagePreview 与 `/image-viewer` 示例把 `viewport.minHeight` 提到 560（仍 `mode: auto`，不设冻结 `height`），iframe 底足以放下该 90vh 盒。ImageViewer img 类本就有该约束；工具条未改。公开视觉修复。无主题变量变化，无新公开 prop。
 - **SunburstChart `showLabels` 在弧中点绘制标签**：Vue / React 默认 `showLabels`（true）在每段弧的 `midAngle` 与环中径处绘制 SVG `<text>`，Pages `/sunburst-chart` 外环可见中国/日本/印度等子层名称，不再只有 path。React 不再把 prop 绑成 `_showLabels`。`showLabels={false}` 仍无文字。公开行为修复（死 API 现已生效）。无主题变量变化，无新公开 prop。
 - **React Table `virtual` / `autoVirtual` 滚动盒对齐 Vue**：`height` + `overflow:auto` 只包表体（colgroup/header/body/summary），导出钮与 Pagination 留在外层 wrapper、不进滚动盒。公开行为修复。无主题变量变化，无新公开 prop。
 - **FloatButton 默认 plus 图标与 Group placement/offset/portal**：无 children / 默认插槽时渲染 plus SVG。FloatButton.Group 接受 `placement` / `offset`（与独立 FloatButton / BackTop 同一套 viewport helpers，默认 `bottom-right` / 24）以及 `portal`（默认 true；`false` 时就地 `absolute` 定位，相对祖先可装下）。Pages `/float-button`「悬浮按钮组」留在 `h-56` 盒内，空圆/空方不再无图标。公开 API 增补 + 行为修复。无主题变量变化。

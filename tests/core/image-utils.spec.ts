@@ -2,6 +2,8 @@
  * @vitest-environment happy-dom
  */
 
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import {
   getImageImgClasses,
@@ -16,11 +18,18 @@ import {
   getInitialCropRect,
   cropCanvas,
   getTouchDistance,
-  toCSSSize
+  toCSSSize,
+  imagePreviewImgClasses
 } from '@expcat/tigercat-core'
 import type { CropHandle, CropRect, ImageFit } from '@expcat/tigercat-core'
 
 describe('image-utils — class generators', () => {
+  it('imagePreviewImgClasses constrains preview img to 90vh / 90vw', () => {
+    expect(imagePreviewImgClasses).toContain('max-h-[90vh]')
+    expect(imagePreviewImgClasses).toContain('max-w-[90vw]')
+    expect(imagePreviewImgClasses).not.toContain('max-w-none')
+  })
+
   it('getImageImgClasses maps every ImageFit value', () => {
     const fits: Array<[ImageFit, string]> = [
       ['contain', 'object-contain'],
@@ -349,6 +358,27 @@ describe('image-utils — getTouchDistance', () => {
     const a = { clientX: 10, clientY: 10 } as unknown as Touch
     const b = { clientX: 10, clientY: 10 } as unknown as Touch
     expect(getTouchDistance(a, b)).toBe(0)
+  })
+})
+
+describe('image preview / image-viewer demo viewports', () => {
+  it.each([
+    'examples/example/vue3/src/examples/image/04/demo.json',
+    'examples/example/vue3/src/examples/image/05/demo.json',
+    'examples/example/vue3/src/examples/image-viewer/01/demo.json',
+    'examples/example/vue3/src/examples/image-viewer/02/demo.json',
+    'examples/example/react/src/examples/image/04/demo.json',
+    'examples/example/react/src/examples/image/05/demo.json',
+    'examples/example/react/src/examples/image-viewer/01/demo.json',
+    'examples/example/react/src/examples/image-viewer/02/demo.json'
+  ])('%s minHeight fits 90vh preview and does not freeze height', (relativePath) => {
+    const demo = JSON.parse(readFileSync(resolve(process.cwd(), relativePath), 'utf-8')) as {
+      viewport: { mode: string; minHeight: number; maxHeight: number; height?: number }
+    }
+    expect(demo.viewport.mode).toBe('auto')
+    expect(demo.viewport.minHeight).toBeGreaterThanOrEqual(520)
+    expect(demo.viewport.maxHeight).toBeGreaterThanOrEqual(720)
+    expect(demo.viewport).not.toHaveProperty('height')
   })
 })
 
