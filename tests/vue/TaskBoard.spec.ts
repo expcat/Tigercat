@@ -282,6 +282,79 @@ describe('TaskBoard (Vue)', () => {
       expect(emitted()['card-move']).toBeUndefined()
       expect(emitted()['update:columns']).toBeUndefined()
     })
+
+    const filterDropColumns: TaskBoardColumn[] = [
+      {
+        id: 'todo',
+        title: 'To Do',
+        cards: [
+          { id: 'a', title: '发布设计' },
+          { id: 'b', title: '开发任务' },
+          { id: 'c', title: '发布文档' },
+          { id: 'd', title: '测试计划' }
+        ]
+      },
+      {
+        id: 'doing',
+        title: 'In Progress',
+        // description matches filterText so the source card stays in the DOM
+        cards: [{ id: 'e', title: '代码审查', description: '发布' }]
+      }
+    ]
+
+    it('maps a filterText drop index back to the source column', async () => {
+      const { container, emitted } = render(TaskBoard, {
+        props: { defaultColumns: filterDropColumns, filterText: '发布' }
+      })
+      const card = container.querySelector('[data-tiger-taskboard-card-id="e"]')!
+      const targetBody = container
+        .querySelectorAll('[data-tiger-taskboard-column]')[0]
+        .querySelector('[role="list"]')!
+      const dragData = JSON.stringify({ type: 'card', cardId: 'e', columnId: 'doing', index: 0 })
+
+      await fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      await fireEvent.dragOver(targetBody, { clientY: 150 })
+      await fireEvent.drop(targetBody, {
+        dataTransfer: { getData: () => dragData, effectAllowed: '' }
+      })
+
+      await waitFor(() => expect(emitted()['card-move']).toBeTruthy())
+      expect(emitted()['card-move'][0][0]).toMatchObject({
+        cardId: 'e',
+        fromColumnId: 'doing',
+        toColumnId: 'todo',
+        toIndex: 3
+      })
+      const next = emitted()['update:columns'][0][0] as TaskBoardColumn[]
+      expect(next[0].cards.map((c) => c.id)).toEqual(['a', 'b', 'c', 'e', 'd'])
+    })
+
+    it('appends at the source length when dropping last without filterText', async () => {
+      const { container, emitted } = render(TaskBoard, {
+        props: { defaultColumns: filterDropColumns }
+      })
+      const card = container.querySelector('[data-tiger-taskboard-card-id="e"]')!
+      const targetBody = container
+        .querySelectorAll('[data-tiger-taskboard-column]')[0]
+        .querySelector('[role="list"]')!
+      const dragData = JSON.stringify({ type: 'card', cardId: 'e', columnId: 'doing', index: 0 })
+
+      await fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      await fireEvent.dragOver(targetBody, { clientY: 150 })
+      await fireEvent.drop(targetBody, {
+        dataTransfer: { getData: () => dragData, effectAllowed: '' }
+      })
+
+      await waitFor(() => expect(emitted()['card-move']).toBeTruthy())
+      expect(emitted()['card-move'][0][0]).toMatchObject({
+        cardId: 'e',
+        fromColumnId: 'doing',
+        toColumnId: 'todo',
+        toIndex: 4
+      })
+      const next = emitted()['update:columns'][0][0] as TaskBoardColumn[]
+      expect(next[0].cards.map((c) => c.id)).toEqual(['a', 'b', 'c', 'd', 'e'])
+    })
   })
 
   describe('Draggable prop', () => {

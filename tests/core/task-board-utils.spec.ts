@@ -6,11 +6,13 @@ import {
   appendDefaultTaskBoardCard,
   getDropIndex,
   getColumnDropIndex,
+  mapVisibleCardIndexToSource,
   createCardDragData,
   createColumnDragData,
   parseDragData,
   setDragData,
   createTouchDragTracker,
+  type TaskBoardCard,
   type TaskBoardColumn
 } from '@expcat/tigercat-core'
 
@@ -388,6 +390,58 @@ describe('getColumnDropIndex', () => {
     expect(getColumnDropIndex(50, rects)).toBe(0)
     expect(getColumnDropIndex(250, rects)).toBe(1)
     expect(getColumnDropIndex(600, rects)).toBe(3)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// mapVisibleCardIndexToSource
+// ---------------------------------------------------------------------------
+
+describe('mapVisibleCardIndexToSource', () => {
+  const source: TaskBoardCard[] = [
+    { id: 'a', title: '发布设计' },
+    { id: 'b', title: '开发任务' },
+    { id: 'c', title: '发布文档' },
+    { id: 'd', title: '测试计划' }
+  ]
+  const visible: TaskBoardCard[] = [source[0], source[2]]
+
+  it('maps a filtered insertion index back to the source column', () => {
+    expect(mapVisibleCardIndexToSource(source, visible, 0)).toBe(0)
+    expect(mapVisibleCardIndexToSource(source, visible, 1)).toBe(2)
+    expect(mapVisibleCardIndexToSource(source, visible, 2)).toBe(3)
+    expect(mapVisibleCardIndexToSource(source, visible, 99)).toBe(3)
+  })
+
+  it('maps empty visible + index 0 to 0 (start of source)', () => {
+    expect(mapVisibleCardIndexToSource(source, [], 0)).toBe(0)
+  })
+
+  it('is identity when visible matches source', () => {
+    expect(mapVisibleCardIndexToSource(source, source, 0)).toBe(0)
+    expect(mapVisibleCardIndexToSource(source, source, 1)).toBe(1)
+    expect(mapVisibleCardIndexToSource(source, source, 2)).toBe(2)
+    expect(mapVisibleCardIndexToSource(source, source, 3)).toBe(3)
+    expect(mapVisibleCardIndexToSource(source, source, 4)).toBe(4)
+  })
+
+  it('feeds the mapped last-visible index to moveCard on unfiltered columns', () => {
+    const cols: TaskBoardColumn[] = [
+      { id: 'todo', title: 'To Do', cards: source },
+      { id: 'doing', title: 'In Progress', cards: [{ id: 'e', title: '代码审查' }] }
+    ]
+    const mapped = mapVisibleCardIndexToSource(source, visible, 2)
+    expect(mapped).toBe(3)
+    const result = moveCard(cols, 'e', 'doing', 'todo', mapped)
+    expect(result).not.toBeNull()
+    expect(result!.columns[0].cards.map((c) => c.id)).toEqual(['a', 'b', 'c', 'e', 'd'])
+    expect(result!.columns[0].cards.map((c) => c.id)).not.toEqual(['a', 'b', 'e', 'c', 'd'])
+  })
+
+  it('falls back without throwing when a visible id is missing from source', () => {
+    const ghost: TaskBoardCard[] = [{ id: 'ghost', title: 'missing' }]
+    expect(mapVisibleCardIndexToSource(source, ghost, 0)).toBe(0)
+    expect(mapVisibleCardIndexToSource(source, ghost, 1)).toBe(source.length)
   })
 })
 

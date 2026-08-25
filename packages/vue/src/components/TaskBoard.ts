@@ -25,9 +25,11 @@ import {
   kanbanSwimlaneCollapsedClasses,
   kanbanAddColumnClasses,
   filterColumns,
+  filterCards,
   groupBySwimlane,
   getColumnCardCount,
   moveCard,
+  mapVisibleCardIndexToSource,
   reorderColumns,
   isWipExceeded,
   appendDefaultTaskBoardCard,
@@ -198,7 +200,16 @@ export const TaskBoard = defineComponent({
       toColumnId: string | number,
       toIdx: number
     ) => {
-      const result = moveCard(currentColumns.value, cardId, fromColumnId, toColumnId, toIdx, {
+      const sourceCol = currentColumns.value.find((c) => c.id === toColumnId)
+      const mappedIdx =
+        sourceCol == null
+          ? toIdx
+          : mapVisibleCardIndexToSource(
+              sourceCol.cards,
+              filterCards(sourceCol.cards, props.filterText || ''),
+              toIdx
+            )
+      const result = moveCard(currentColumns.value, cardId, fromColumnId, toColumnId, mappedIdx, {
         enforceWipLimit: props.enforceWipLimit
       })
       if (!result) return

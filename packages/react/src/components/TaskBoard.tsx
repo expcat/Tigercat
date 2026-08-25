@@ -23,9 +23,11 @@ import {
   kanbanSwimlaneCollapsedClasses,
   kanbanAddColumnClasses,
   filterColumns,
+  filterCards,
   groupBySwimlane,
   getColumnCardCount,
   moveCard,
+  mapVisibleCardIndexToSource,
   reorderColumns,
   isWipExceeded,
   appendDefaultTaskBoardCard,
@@ -505,6 +507,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onColumnMoveRef.current = onColumnMove
   const enforceWipLimitRef = useRef(enforceWipLimit)
   enforceWipLimitRef.current = enforceWipLimit
+  const filterTextRef = useRef(filterText)
+  filterTextRef.current = filterText
 
   const applyCardMove = useCallback(
     async (
@@ -513,7 +517,16 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       toColumnId: string | number,
       toIdx: number
     ) => {
-      const result = moveCard(columnsRef.current, cardId, fromColumnId, toColumnId, toIdx, {
+      const sourceCol = columnsRef.current.find((c) => c.id === toColumnId)
+      const mappedIdx =
+        sourceCol == null
+          ? toIdx
+          : mapVisibleCardIndexToSource(
+              sourceCol.cards,
+              filterCards(sourceCol.cards, filterTextRef.current),
+              toIdx
+            )
+      const result = moveCard(columnsRef.current, cardId, fromColumnId, toColumnId, mappedIdx, {
         enforceWipLimit: enforceWipLimitRef.current
       })
       if (!result) return

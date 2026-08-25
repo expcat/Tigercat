@@ -1,4 +1,5 @@
 import type {
+  TaskBoardCard,
   TaskBoardColumn,
   TaskBoardCardMoveEvent,
   TaskBoardColumnMoveEvent
@@ -288,6 +289,48 @@ export function getDropIndex(pointerY: number, cardRects: DOMRect[]): number {
     if (pointerY < mid) return i
   }
   return cardRects.length
+}
+
+/**
+ * Map a drop/insertion index from the visible (filtered) card list back to the
+ * unfiltered source column. `visibleIndex` is an insertion point in
+ * `0..visibleCards.length` — the same range `getDropIndex` returns.
+ *
+ * - `visibleIndex <= 0` → source index of `visibleCards[0]`, or `0` if visible is empty
+ * - `0 < visibleIndex < visibleCards.length` → source index of `visibleCards[visibleIndex]`
+ *   (insert BEFORE that visible card)
+ * - `visibleIndex >= visibleCards.length` → one past the last visible card in source
+ *   (`sourceIndex(lastVisible) + 1`), or `sourceCards.length` if visible is empty
+ *
+ * When `visibleCards` is the same sequence as `sourceCards`, the result is
+ * `visibleIndex` clamped to `0..sourceCards.length`.
+ *
+ * Empty visible + index `0` maps to `0` (insert at the start of source). Unknown
+ * visible ids (should not happen) fall back to `visibleIndex` or `sourceCards.length`
+ * and do not throw.
+ */
+export function mapVisibleCardIndexToSource(
+  sourceCards: TaskBoardCard[],
+  visibleCards: TaskBoardCard[],
+  visibleIndex: number
+): number {
+  if (visibleCards.length === 0) {
+    return visibleIndex <= 0 ? 0 : sourceCards.length
+  }
+
+  if (visibleIndex <= 0) {
+    const idx = sourceCards.findIndex((card) => card.id === visibleCards[0].id)
+    return idx === -1 ? 0 : idx
+  }
+
+  if (visibleIndex >= visibleCards.length) {
+    const last = visibleCards[visibleCards.length - 1]
+    const idx = sourceCards.findIndex((card) => card.id === last.id)
+    return idx === -1 ? sourceCards.length : idx + 1
+  }
+
+  const idx = sourceCards.findIndex((card) => card.id === visibleCards[visibleIndex].id)
+  return idx === -1 ? visibleIndex : idx
 }
 
 /**

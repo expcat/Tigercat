@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **TaskBoard 过滤下落点映射回源列**：Vue / React 在 `moveCard` 前把 `filterText` 可见卡的 drop index 映射回未过滤列（core `mapVisibleCardIndexToSource`）；Pages `/task-board` 02「列拖拽与自定义卡片」过滤「发布」后再拖到可见末位，不再插进隐藏卡槽。`getDropIndex` 仍读可见卡 rect（指示条位置不变）。公开行为修复，无主题变量变化，无新公开 TaskBoard prop；core 增补该 helper。
 - **Vue ChatWindow 去掉 onUpdated 滚底**：auto-scroll 只跟 `messages.length`（加首次 `onMounted`），用户离开底部后跳过；受控 `v-model` 逐字输入不再把 Pages `/chat-window` 02 历史拽回最新气泡。React 本就只跟 `messages.length`。公开行为修复，无主题变量变化，无新公开 prop。
 - **ScatterChart `animated` 非 circle 入场保留 translate(cx,cy)**：Vue / React 把 square / triangle / diamond 的 `translate(cx,cy)` 放在包裹 `<g>` 上，入场 CSS `transform:scale()` 只作用在内部 `<path>`（路径以 (0,0) 为中心），不再覆盖 SVG 位移。Pages `/scatter-chart` 01 菱形停在数据映射位置，不再堆在绘图区左上；circle 仍用 `cx`/`cy` 入场。公开视觉/行为修复，无主题变量变化，无新公开 prop。
 - **OrgChart `direction=horizontal` 保持 nodeWidth × nodeHeight**：Vue / React 经 core `flipLayoutNode` 横向布局只交换 x/y，节点盒保持 `nodeWidth` × `nodeHeight`（默认 160×72），不再把卡片拧成 72×160 竖条。Pages `/org-chart`「组合展示」横卡可完整显示姓名与职称。公开视觉/行为修复，无主题变量变化，无新公开 prop。

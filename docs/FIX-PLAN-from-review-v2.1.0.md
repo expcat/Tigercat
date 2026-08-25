@@ -49,7 +49,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #36 | OrgChart direction=horizontal keep node size | done | this commit | 2026-08-25 |
 | #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
 | #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
-| #15–#16, #19–#27, #30–#33, #35, #38, #40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
+| #15–#16, #19–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -491,3 +492,18 @@ Vue ChatWindow auto-scroll no longer runs on every re-render:
 Pages /chat-window 02: typing after scrolling history no longer jumps to the latest bubble. Public behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #40 TaskBoard filter drop index (map filtered drop index back to source column).
+
+## #40 notes
+
+TaskBoard filter drop index maps back to the source column (Vue + React via core helper):
+
+- visibleColumns = filterColumns(...) still paints matching cards (not CSS hide)
+- getDropIndex still reads visible card DOMRects; drop indicator stays a visible index
+- applyCardMove remaps with mapVisibleCardIndexToSource(source.cards, filterCards(...), toIdx) before moveCard
+- visible last (visible.length) → sourceIndex(lastVisible) + 1, not a hidden sibling slot
+- fixture [a 发布设计, b 开发, c 发布文档, d 测试] filter「发布」 then drop e at last → todo [a,b,c,e,d]
+- Kanban Add / appendDefaultTaskBoardCard untouched
+
+Pages /task-board 02「列拖拽与自定义卡片」filter「发布」drop-to-last no longer inserts into a hidden card slot. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #15 Empty preset grid clip (same demo-container class as #16 Result).
