@@ -75,6 +75,36 @@ describe('FileManager (React)', () => {
     expect(onSelect).toHaveBeenCalledOnce()
   })
 
+  it('selects README.md without selectedKeys (uncontrolled)', () => {
+    const { getByText } = render(<FileManager files={files} />)
+    fireEvent.click(getByText('README.md'))
+    expect(getByText('README.md').closest('[role="option"]')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+  })
+
+  it('seeds selection from defaultSelectedKeys', () => {
+    const { getByText } = render(<FileManager files={files} defaultSelectedKeys={['readme']} />)
+    expect(getByText('README.md').closest('[role="option"]')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+  })
+
+  it('keeps explicit selectedKeys=[] controlled empty after click', () => {
+    const onSelectedKeysChange = vi.fn()
+    const { getByText } = render(
+      <FileManager files={files} selectedKeys={[]} onSelectedKeysChange={onSelectedKeysChange} />
+    )
+    fireEvent.click(getByText('README.md'))
+    expect(onSelectedKeysChange).toHaveBeenCalledWith(['readme'])
+    expect(getByText('README.md').closest('[role="option"]')).toHaveAttribute(
+      'aria-selected',
+      'false'
+    )
+  })
+
   it('calls onOpen on file double-click', () => {
     const onOpen = vi.fn()
     const { getByText } = render(<FileManager files={files} onOpen={onOpen} />)

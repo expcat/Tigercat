@@ -36,7 +36,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #7 | React Upload controlled fileList | done | this commit | 2026-08-25 |
 | #8 | Pagination React pageSize example | done | this commit | 2026-08-25 |
 | #9 | Table default pagination uncontrolled | done | this commit | 2026-08-25 |
-| #10 | FileManager selectedKeys inner state | pending | | |
+| #10 | FileManager selectedKeys inner state | done | this commit | 2026-08-25 |
 | #11 | Kanban allowAddCard insert | pending | | |
 | #12–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
@@ -295,3 +295,18 @@ Table (Vue + React) default pagination is uncontrolled:
 Pages `/table` bound demo still works. Public behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase C #10 FileManager selectedKeys inner state.
+
+## #10 notes
+
+FileManager (Vue + React) keeps uncontrolled selectedKeys inner state:
+
+- Vue: selectedKeys has no default (undefined when omitted); defaultSelectedKeys defaults to []; inner is a copy; resolved = selectedKeys !== undefined ? selectedKeys : inner
+- React: no selectedKeys = [] destructure; useControlledState(selectedKeys, defaultSelectedKeys ?? [], onSelectedKeysChange)
+- deriveFileManagerModel / aria-selected / handleSelect use resolved keys; click writes inner when uncontrolled and always emits
+- Bare FileManager (Pages /file-manager 01 unbound) click now sets aria-selected; explicit selectedKeys stays controlled
+- file-manager/01 stays unbound; 02 stays bound; handleDrop / update:files and Kanban #11 untouched
+
+Public API addition (defaultSelectedKeys) recorded in CHANGELOG unpublished.
+
+Next: Phase C #11 Kanban allowAddCard insert.
+

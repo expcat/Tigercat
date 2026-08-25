@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **FileManager 非受控 selectedKeys 内部态**：Vue / React 通过 `defaultSelectedKeys` 保留非受控选择，裸 FileManager（Pages 01）点击会更新 `aria-selected`；只有显式传入 `selectedKeys` 才受控。公开 API 增补，无主题变量变化。
 - **Table 默认分页非受控**：Vue / React 默认 pagination 改用 `defaultCurrent` / `defaultPageSize`，裸表（不传 pagination）点 Next 会换行；只有调用方显式传 `current`（及 `pageSize`）才受控。公开行为修复，无主题变量变化。
 - **React Upload 受控 fileList 进度回写**：受控时 `customRequest` 的 progress/success/error 经 `notify` 以新数组调用 `onChange(file, nextList)`，Pages `/upload` 自定义上传能绘成功态。Vue 已 `emit('update:file-list')`。公开行为修复，无主题变量变化。
 - **React FormItem change 校验先 updateValue**：change 触发 `validateField` 前先把子控件新值写入 `formValuesRef`，同拍读到新值，必填错误不再在第一字后残留。Vue 不变。公开行为修复，无主题变量变化。
