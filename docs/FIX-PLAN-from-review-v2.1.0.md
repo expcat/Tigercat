@@ -32,7 +32,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #3 | Switch / Stepper / ColorSwatch uncontrolled | done | this commit | 2026-08-25 |
 | #4 | Vue Transfer targetKeys | done | this commit | 2026-08-25 |
 | #5 | AutoComplete write option.label | done | this commit | 2026-08-25 |
-| #6 | React Form validate after updateValue | pending | | |
+| #6 | React Form validate after updateValue | done | this commit | 2026-08-25 |
 | #7 | React Upload controlled fileList | pending | | |
 | #8 | Pagination React pageSize example | pending | | |
 | #9 | Table default pagination uncontrolled | pending | | |
@@ -239,3 +239,17 @@ AutoComplete (Vue + React) resolves `option.label` on controlled value writeback
 Public behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase C #6 React Form validate after updateValue.
+
+
+## #6 notes
+
+React FormItem writes the new field value into Form `formValuesRef` before change-triggered validation:
+
+- `extractFormChangeValue`: change event with a target → checkbox/radio `checked`, else `target.value`; bare values (including `0` and `''`) used as-is; no argument / `undefined` skips `updateValue` so the field is not wiped
+- Cloned child `onChange` still calls the child's handler, then `updateValue` then `validateField(..., 'change')`
+- Existing context `updateValue` writes `formValuesRef` first, then optional Form `onChange`
+- Blur path unchanged; Vue Form / FormItem unchanged; examples not rewritten
+
+Pages `/form` React「内置校验」first keystroke no longer keeps the required error. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase C #7 React Upload controlled fileList.
