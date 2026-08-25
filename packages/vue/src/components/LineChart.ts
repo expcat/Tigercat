@@ -6,7 +6,6 @@ import {
   createLinePath,
   createPointScale,
   getChartElementOpacity,
-  getChartInnerRect,
   getStableChartGradientPrefix,
   getNumberExtent,
   linePointTransitionClasses,
@@ -34,6 +33,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
+import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 
 export interface VueLineChartProps extends CoreLineChartProps {
   data?: LineChartDatum[]
@@ -272,7 +272,12 @@ export const LineChart = defineComponent({
     // Unique gradient prefix for area fills
     const gradientPrefix = getStableChartGradientPrefix('line', useId())
 
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
+    const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+      () => props.width,
+      () => props.height,
+      () => props.padding,
+      () => props.responsive
+    )
 
     // Normalize series data. Single-series colors (`lineColor`/`pointColor`)
     // seed the synthesized series so they apply when only `data` is provided.
@@ -483,7 +488,8 @@ export const LineChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className)
+          className: classNames(props.className),
+          onResolvedSizeChange
         },
         {
           default: () =>

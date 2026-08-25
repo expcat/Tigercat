@@ -6,7 +6,6 @@ import {
   createLinePath,
   createPointScale,
   getChartElementOpacity,
-  getChartInnerRect,
   getStableChartGradientPrefix,
   getNumberExtent,
   linePointTransitionClasses,
@@ -32,6 +31,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 
 export interface AreaChartProps extends CoreAreaChartProps {
   data?: LineChartDatum[]
@@ -135,9 +135,11 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     [gradientId]
   )
 
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
 
   const resolvedSeries = useMemo<AreaChartSeries[]>(
@@ -407,7 +409,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}>
+      className={classNames(className)}
+      onResolvedSizeChange={onResolvedSizeChange}>
       {/* Gradient defs and animation styles */}
       {(gradient || animated || strokeGradient || pointGradient) && (
         <defs>

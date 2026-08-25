@@ -6,7 +6,6 @@ import {
   createLinePath,
   createPointScale,
   getChartElementOpacity,
-  getChartInnerRect,
   getStableChartGradientPrefix,
   getNumberExtent,
   linePointTransitionClasses,
@@ -31,6 +30,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 
 export interface LineChartProps extends CoreLineChartProps {
   data?: LineChartDatum[]
@@ -128,9 +128,11 @@ export const LineChart: React.FC<LineChartProps> = ({
     [gradientId]
   )
 
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
 
   const resolvedSeries = useMemo<LineChartSeries[]>(
@@ -358,7 +360,8 @@ export const LineChart: React.FC<LineChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}>
+      className={classNames(className)}
+      onResolvedSizeChange={onResolvedSizeChange}>
       {/* Gradient defs and animation styles */}
       {(seriesData.some((sd) => sd.showArea) || animated || strokeGradient || pointGradient) && (
         <defs>

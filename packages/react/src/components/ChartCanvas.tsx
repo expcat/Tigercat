@@ -26,10 +26,12 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
   title,
   desc,
   children,
+  onResolvedSizeChange,
   ...props
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null)
   const [observedSize, setObservedSize] = useState<ChartCanvasSize | null>(null)
+  const lastReportedSizeRef = useRef<ChartCanvasSize | null>(null)
   const resizeControllerRef = useRef(
     createChartResizeObserverController({
       onSizeChange: setObservedSize
@@ -59,6 +61,17 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
     controller.observe(target)
     return () => controller.disconnect()
   }, [responsive])
+
+  useEffect(() => {
+    if (!onResolvedSizeChange) return
+    const prev = lastReportedSizeRef.current
+    if (prev && prev.width === resolvedSize.width && prev.height === resolvedSize.height) {
+      return
+    }
+    const nextSize = { width: resolvedSize.width, height: resolvedSize.height }
+    lastReportedSizeRef.current = nextSize
+    onResolvedSizeChange(nextSize)
+  }, [resolvedSize.width, resolvedSize.height, onResolvedSizeChange])
 
   return (
     <svg

@@ -3,7 +3,6 @@ import {
   classNames,
   createLinearScale,
   getChartElementOpacity,
-  getChartInnerRect,
   getNumberExtent,
   getStableChartGradientPrefix,
   getScatterHoverShadow,
@@ -33,6 +32,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface ScatterChartProps extends CoreScatterChartProps {
@@ -178,9 +178,11 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
     callbacks: { onClick: onPointClick }
   })
 
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
   const xValues = useMemo(() => data.map((item) => item.x), [data])
   const yValues = useMemo(() => data.map((item) => item.y), [data])
@@ -270,7 +272,8 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}>
+      className={classNames(className)}
+      onResolvedSizeChange={onResolvedSizeChange}>
       {/* Radial gradient defs */}
       {gradient && (
         <defs>

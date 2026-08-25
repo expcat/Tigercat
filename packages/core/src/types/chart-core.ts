@@ -321,6 +321,13 @@ export interface ChartCanvasProps {
   responsive?: boolean
 
   /**
+   * Resolved SVG size after the parent is observed (`responsive`) or the
+   * `width`/`height` fallback. Framework wrappers also emit this as
+   * `onResolvedSizeChange` / `resolved-size-change`.
+   */
+  onResolvedSizeChange?: (size: { width: number; height: number }) => void
+
+  /**
    * Inner padding for chart drawing area
    * @default 24
    */

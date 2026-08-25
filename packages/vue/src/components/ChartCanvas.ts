@@ -18,6 +18,9 @@ export interface VueChartCanvasProps extends ChartCanvasProps {
 export const ChartCanvas = defineComponent({
   name: 'TigerChartCanvas',
   inheritAttrs: false,
+  emits: {
+    'resolved-size-change': (_size: ChartCanvasSize) => true
+  },
   props: {
     width: {
       type: Number,
@@ -45,7 +48,7 @@ export const ChartCanvas = defineComponent({
       type: String
     }
   },
-  setup(props, { slots, attrs }) {
+  setup(props, { slots, attrs, emit }) {
     const svgRef = ref<SVGSVGElement | null>(null)
     const observedSize = ref<ChartCanvasSize | null>(null)
     const resizeController = createChartResizeObserverController({
@@ -85,6 +88,14 @@ export const ChartCanvas = defineComponent({
 
     onMounted(syncResponsiveObserver)
     watch(() => props.responsive, syncResponsiveObserver)
+    watch(
+      [() => resolvedSize.value.width, () => resolvedSize.value.height],
+      ([nextWidth, nextHeight], prev) => {
+        if (prev && prev[0] === nextWidth && prev[1] === nextHeight) return
+        emit('resolved-size-change', { width: nextWidth, height: nextHeight })
+      },
+      { immediate: true }
+    )
     onBeforeUnmount(() => resizeController.disconnect())
 
     return () => {
@@ -109,7 +120,7 @@ export const ChartCanvas = defineComponent({
             {
               transform: `translate(${rect.x}, ${rect.y})`
             },
-            slots.default?.({ innerRect: rect })
+            slots.default?.({ innerRect: rect, width: size.width, height: size.height })
           )
         ].filter(Boolean)
       )

@@ -8,7 +8,6 @@ import {
   getStableChartGradientPrefix,
   getBarValueLabelY,
   getChartElementOpacity,
-  getChartInnerRect,
   getNumberExtent,
   resolveChartPalette,
   buildChartLegendItems,
@@ -29,6 +28,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
+import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 
 export interface BarChartProps extends CoreBarChartProps {
   data: BarChartDatum[]
@@ -141,9 +141,11 @@ export const BarChart: React.FC<BarChartProps> = ({
     }
   })
 
-  const innerRect = useMemo(
-    () => getChartInnerRect(width, height, padding),
-    [width, height, padding]
+  const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+    width,
+    height,
+    padding,
+    responsive
   )
   const xDomain = useMemo(() => data.map((item) => String(item.x)), [data])
   const yValues = useMemo(() => data.map((item) => item.y), [data])
@@ -252,7 +254,8 @@ export const BarChart: React.FC<BarChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
-      className={classNames(className)}>
+      className={classNames(className)}
+      onResolvedSizeChange={onResolvedSizeChange}>
       {gradient && (
         <defs>
           {bars.map((bar) => (

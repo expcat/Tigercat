@@ -7,7 +7,6 @@ import {
   createPointScale,
   getStableChartGradientPrefix,
   getChartElementOpacity,
-  getChartInnerRect,
   getNumberExtent,
   linePointTransitionClasses,
   stackSeriesData,
@@ -35,6 +34,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
+import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 
 export interface VueAreaChartProps extends CoreAreaChartProps {
   data?: LineChartDatum[]
@@ -272,7 +272,12 @@ export const AreaChart = defineComponent({
     // Unique gradient prefix for area fills
     const gradientPrefix = getStableChartGradientPrefix('area', useId())
 
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
+    const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+      () => props.width,
+      () => props.height,
+      () => props.padding,
+      () => props.responsive
+    )
 
     // Normalize series data. Single-series colors (`areaColor`/`pointColor`)
     // seed the synthesized series so they apply when only `data` is provided.
@@ -532,7 +537,8 @@ export const AreaChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className)
+          className: classNames(props.className),
+          onResolvedSizeChange
         },
         {
           default: () =>

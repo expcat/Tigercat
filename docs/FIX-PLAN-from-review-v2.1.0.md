@@ -77,7 +77,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-8 | Table sort keyboard + dataKey | done | this commit | 2026-08-25 |
 | P2-9 | Gantt drag (wire bar drag to dates) | done | this commit | 2026-08-25 |
 | P2-10 | Chart showTooltip / hoverable | done | this commit | 2026-08-25 |
-| P2-11..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-11 | Chart responsive scale | done | this commit | 2026-08-25 |
+| P2-12..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -905,3 +906,16 @@ Chart `showTooltip` default tooltip without `hoverable` (Vue + React):
 T1 A0-A10 did not cover Chart tooltip gating. No new public prop. `responsive` not changed.
 
 Next: P2-11 Chart `responsive` scale (recompute scale after observing parent; do not only stretch SVG). T1 A0-A10 did not cover ChartCanvas resize vs prop scale, so do not skip.
+
+## P2-11 notes
+
+Chart `responsive` recomputes plot scale / innerRect after observing the parent (Vue + React):
+
+- ChartCanvas keeps the single ResizeObserver + rAF + `resolveResponsiveChartSize`; reports `{ width, height }` via React `onResolvedSizeChange` / Vue `resolved-size-change` (slot also gets resolved width/height)
+- Bar / Line / Area / Scatter `useResponsiveChartSize` (internal): `plotSize` then `getChartInnerRect(plotSize, padding)` — auto band/point/linear ranges use that innerRect, not the prop 420×240
+- Custom `xScale` / `yScale` still win (range not rewritten). `responsive` default stays false
+- Pages `/bar-chart` 01: after parent ~926×688, last bar sits near the right of the plot instead of a 420×240 pocket
+
+T1 A0-A10 did not cover ChartCanvas resize vs prop scale. Optional ChartCanvas callback is public; no new required chart prop.
+
+Next: P2-12 Chat / Comment / Activity / Notification copy to locale (FormWizard/TaskBoard already do). T1 A0-A10 did not cover these default Chinese strings, so do not skip.

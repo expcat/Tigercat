@@ -7,7 +7,6 @@ import {
   ensureBarMinHeight,
   getStableChartGradientPrefix,
   getBarValueLabelY,
-  getChartInnerRect,
   getNumberExtent,
   resolveChartPalette,
   buildChartLegendItems,
@@ -33,6 +32,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
+import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 
 export interface VueBarChartProps extends CoreBarChartProps {
   data: BarChartDatum[]
@@ -264,7 +264,12 @@ export const BarChart = defineComponent({
       eventNames: { hover: 'bar-hover', click: 'bar-click' }
     })
 
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
+    const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+      () => props.width,
+      () => props.height,
+      () => props.padding,
+      () => props.responsive
+    )
 
     const xDomain = computed(() => props.data.map((item) => String(item.x)))
     const yValues = computed(() => props.data.map((item) => item.y))
@@ -417,7 +422,8 @@ export const BarChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className)
+          className: classNames(props.className),
+          onResolvedSizeChange
         },
         {
           default: () =>

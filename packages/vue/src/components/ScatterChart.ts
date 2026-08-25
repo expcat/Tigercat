@@ -3,7 +3,6 @@ import {
   classNames,
   createLinearScale,
   getChartElementOpacity,
-  getChartInnerRect,
   getNumberExtent,
   getStableChartGradientPrefix,
   getScatterHoverShadow,
@@ -35,6 +34,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
+import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueScatterChartProps extends CoreScatterChartProps {
@@ -174,7 +174,12 @@ export const ScatterChart = defineComponent({
       eventNames: { hover: 'point-hover', click: 'point-click' }
     })
 
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
+    const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
+      () => props.width,
+      () => props.height,
+      () => props.padding,
+      () => props.responsive
+    )
 
     const xValues = computed(() => props.data.map((item) => item.x))
     const yValues = computed(() => props.data.map((item) => item.y))
@@ -276,7 +281,8 @@ export const ScatterChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
-          className: classNames(props.className)
+          className: classNames(props.className),
+          onResolvedSizeChange
         },
         {
           default: () =>

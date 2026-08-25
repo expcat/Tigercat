@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Chart `responsive` 观察父级后重算 plot scale / innerRect**：Bar / Line / Area / Scatter 用 ChartCanvas 解析后的宽高（ResizeObserver + rAF）重建 band/point/linear scale 与网格/轴，而不只是拉大 SVG `width`/`height`/`viewBox`。Pages `/bar-chart` 01 不再把 420×240 的柱子留在约 926×688 SVG 的左上角。自定义 `xScale`/`yScale` 仍按传入 range 使用。ChartCanvas 通过 React `onResolvedSizeChange` / Vue `resolved-size-change` 报告解析尺寸。`responsive` 默认仍为 false；观察前仍用 `width`/`height` fallback。Vue/React。公开行为修复。无新必填 prop。
 - **Chart `showTooltip` 默认悬停出框，不再要求 `hoverable`**：`showTooltip`（默认 true）悬停数据点即打开 ChartTooltip；`hoverable`（默认仍 false）只控制高亮 / 透明度 / 公开 hover 事件。`showTooltip={false}` 仍不出现浮层。Pages `/bar-chart` 02、`/heatmap-chart` 02 悬停可见 `A: 10` / 格值框。Vue/React。公开行为修复。无新公开 prop。`responsive` / tooltip chrome 未改。
 - **Gantt 拖条改 `start`/`end`（保时长、本地日吸附、夹到 min/max）**：非 disabled 条 pointer 拖动；松手按像素换算日期（`ganttPxToMs` / `shiftGanttTaskDates` / `moveGanttTaskByPx`）。Vue `update:data` + `task-change`；React `onDataChange` + `onTaskChange`。未回写的 `data`（Pages `/gantt` 01/02 静态数组）用内部 overlay 保住新日期，条 `x` 会动。零位移仍走原 click/select。无新 `draggable` prop。行斑马/轴文案未改（A0 已把 `--tiger-fill` / `--tiger-text-muted` 别名到 surface-muted / text-secondary）。Vue/React。公开 API 增补 + 行为修复。
 - **Table 排序键盘可达，`sortData` / `filterTableData` 读 `dataKey`**：可排序表头改为真实 `<button type="button">`（`data-tiger-table-sort`，Tab/Enter/Space），`aria-sort` 仍在 `<th>`；`sortData`（可选第 5 参 `columns`）与 `filterTableData` 按 `dataKey` 否则 `key` 取值，对齐单元格/导出。Vue/React。公开行为修复。无新公开 Table prop。
