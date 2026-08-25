@@ -74,7 +74,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-5 | parseDate YYYY-MM-DD local calendar day | done | this commit | 2026-08-25 |
 | P2-6 | Cascader / TreeSelect keyboard | done | this commit | 2026-08-25 |
 | P2-7 | Tour mask close + Vue last-step onClose | done | this commit | 2026-08-25 |
-| P2-8..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-8 | Table sort keyboard + dataKey | done | this commit | 2026-08-25 |
+| P2-9..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -861,3 +862,15 @@ Tour mask close and Vue last-step `close` (Vue + React):
 - `getTourSpotlightStyle` kept in core unused by Vue/React; no new public component prop
 
 Next: P2-8 Table sort keyboard + `dataKey` (header is a button; `sortData`/`filterTableData` read `dataKey` else `key`). T1 A0-A10 did not cover Table sort keyboard, so do not skip.
+
+## P2-8 notes
+
+Table sort keyboard + `dataKey` (Vue + React):
+
+- Sortable `<th>` keeps `aria-sort` and `data-tiger-table-column-key`; title + SortIcon live in `<button type="button" data-tiger-table-sort>`
+- Shared chrome `tableSortButtonClasses`; `th` has no `onClick` (no double-toggle)
+- Lock stays a sibling button; filter input/select stay outside the sort button
+- `getTableColumnDataKey` is `dataKey || key`; `sortData` optional 5th arg `columns` (4-arg still looks up `key`); `filterTableData` uses the helper for the matching column
+- Filter/sort state keys stay `column.key`; no new public Table prop
+
+Next: P2-9 Gantt drag (wire bar drag to dates; row fill `surface-muted`). T1 A0 aliased `--tiger-fill` so the zebra token may already follow surface-muted — do not skip the drag wiring.

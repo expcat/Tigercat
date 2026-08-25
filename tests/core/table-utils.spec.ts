@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createTableRowKeyCache,
   filterHiddenColumns,
+  filterTableData,
   freezeTableColumnWidths,
   getCardColumns,
   getCardGridInfo,
@@ -9,6 +10,7 @@ import {
   getFixedColumnPosition,
   getFixedColumnStyle,
   getNextTableSelectAllKeys,
+  getTableColumnDataKey,
   getTableSelectionState,
   getTableColgroup,
   orderTableFixedColumns,
@@ -23,6 +25,7 @@ import {
   hasTableSelectionColumn,
   getExpandedRowClasses,
   getRowKey,
+  sortData,
   tableBaseClasses,
   tableSummaryRowClasses,
   tableBackgroundClasses,
@@ -661,6 +664,53 @@ describe('table-utils', () => {
       expect(getExpandedRowClasses()).toContain('[&:not(:last-child)>td]:border-b')
       expect(tableSummaryRowClasses).toContain('[&>td]:border-t-2')
       expect(tableSummaryRowClasses).not.toMatch(/(^|\s)border-t-2(\s|$)/)
+    })
+  })
+
+  describe('getTableColumnDataKey', () => {
+    it('returns dataKey when set, otherwise key', () => {
+      expect(getTableColumnDataKey({ key: 'nameCol', dataKey: 'name' })).toBe('name')
+      expect(getTableColumnDataKey({ key: 'name' })).toBe('name')
+    })
+  })
+
+  describe('sortData dataKey', () => {
+    const rows = [
+      { name: 'Alice', nameCol: 'zzz' },
+      { name: 'Bob', nameCol: 'aaa' }
+    ]
+    const columns: TableColumn<(typeof rows)[number]>[] = [
+      { key: 'nameCol', title: 'Name', dataKey: 'name' }
+    ]
+
+    it('sorts by dataKey when columns are passed', () => {
+      const sorted = sortData(rows, 'nameCol', 'asc', undefined, columns)
+      expect(sorted.map((row) => row.name)).toEqual(['Alice', 'Bob'])
+    })
+
+    it('sorts by the given key when no columns override is passed', () => {
+      const sorted = sortData(rows, 'nameCol', 'asc')
+      expect(sorted.map((row) => row.name)).toEqual(['Bob', 'Alice'])
+    })
+  })
+
+  describe('filterTableData dataKey', () => {
+    const rows = [
+      { name: 'Alice', nameCol: 'zzz', age: 31 },
+      { name: 'Bob', nameCol: 'aaa', age: 22 }
+    ]
+    const columns: TableColumn<(typeof rows)[number]>[] = [
+      { key: 'nameCol', title: 'Name', dataKey: 'name' }
+    ]
+
+    it('filters by dataKey for the column whose key matches the filters entry', () => {
+      const filtered = filterTableData(rows, columns, { nameCol: 'Ali' })
+      expect(filtered.map((row) => row.name)).toEqual(['Alice'])
+    })
+
+    it('falls back to the filters key when no column matches', () => {
+      const filtered = filterTableData(rows, columns, { name: 'Bob' })
+      expect(filtered.map((row) => row.name)).toEqual(['Bob'])
     })
   })
 })

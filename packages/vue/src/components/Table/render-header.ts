@@ -8,6 +8,7 @@ import {
   getCheckboxCellClasses,
   getExpandIconCellClasses,
   formatTableSortByText,
+  tableSortButtonClasses,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
 import { LockIcon, SortIcon } from './icons'
@@ -80,15 +81,34 @@ export function renderTableHeader(
 
     const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
 
-    const headerContent: VNodeChild[] = []
+    const titleContent: VNodeChild[] = []
 
     const slotContent = slots[`header-${column.key}`]?.()
     if (slotContent && slotContent.length > 0) {
-      headerContent.push(...slotContent)
+      titleContent.push(...slotContent)
     } else if (column.renderHeader) {
-      headerContent.push(column.renderHeader() as VNodeChild)
+      titleContent.push(column.renderHeader() as VNodeChild)
     } else {
-      headerContent.push(column.title)
+      titleContent.push(column.title)
+    }
+
+    const headerContent: VNodeChild[] = []
+
+    if (column.sortable) {
+      headerContent.push(
+        h(
+          'button',
+          {
+            type: 'button',
+            'data-tiger-table-sort': '',
+            class: tableSortButtonClasses,
+            onClick: () => ctx.handleSort(column.key)
+          },
+          [...titleContent, SortIcon(sortDirection)]
+        )
+      )
+    } else {
+      headerContent.push(...titleContent)
     }
 
     if (props.columnLockable) {
@@ -119,10 +139,6 @@ export function renderTableHeader(
       )
     }
 
-    if (column.sortable) {
-      headerContent.push(SortIcon(sortDirection))
-    }
-
     headerCells.push(
       h(
         'th',
@@ -148,8 +164,7 @@ export function renderTableHeader(
           draggable: props.columnDraggable ? 'true' : undefined,
           onDragstart: props.columnDraggable ? () => ctx.handleDragStart(column.key) : undefined,
           onDragover: props.columnDraggable ? (e: DragEvent) => e.preventDefault() : undefined,
-          onDrop: props.columnDraggable ? () => ctx.handleDrop(column.key) : undefined,
-          onClick: column.sortable ? () => ctx.handleSort(column.key) : undefined
+          onDrop: props.columnDraggable ? () => ctx.handleDrop(column.key) : undefined
         },
         [
           h('div', { class: 'flex items-center gap-2' }, headerContent),

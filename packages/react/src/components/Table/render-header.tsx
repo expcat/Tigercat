@@ -8,6 +8,7 @@ import {
   getCheckboxCellClasses,
   getExpandIconCellClasses,
   formatTableSortByText,
+  tableSortButtonClasses,
   type RowSelectionConfig,
   type ExpandableConfig,
   type TableSize,
@@ -86,6 +87,10 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
 
           const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
 
+          const titleNode = column.renderHeader
+            ? (column.renderHeader() as React.ReactNode)
+            : column.title
+
           return (
             <th
               key={column.key}
@@ -109,10 +114,20 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
               draggable={columnDraggable ? true : undefined}
               onDragStart={columnDraggable ? () => ctx.handleDragStart(column.key) : undefined}
               onDragOver={columnDraggable ? (e) => e.preventDefault() : undefined}
-              onDrop={columnDraggable ? () => ctx.handleDrop(column.key) : undefined}
-              onClick={column.sortable ? () => ctx.handleSort(column.key) : undefined}>
+              onDrop={columnDraggable ? () => ctx.handleDrop(column.key) : undefined}>
               <div className="flex items-center gap-2">
-                {column.renderHeader ? (column.renderHeader() as React.ReactNode) : column.title}
+                {column.sortable ? (
+                  <button
+                    type="button"
+                    data-tiger-table-sort=""
+                    className={tableSortButtonClasses}
+                    onClick={() => ctx.handleSort(column.key)}>
+                    {titleNode}
+                    <SortIcon direction={sortDirection} />
+                  </button>
+                ) : (
+                  titleNode
+                )}
 
                 {columnLockable && (
                   <button
@@ -136,8 +151,6 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                     <LockIcon locked={column.fixed === 'left' || column.fixed === 'right'} />
                   </button>
                 )}
-
-                {column.sortable && <SortIcon direction={sortDirection} />}
               </div>
 
               {column.filter && (

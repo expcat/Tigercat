@@ -474,6 +474,31 @@ describe('Table', () => {
   })
 
   describe('Sorting', () => {
+    it('renders a real sort button on sortable headers for keyboard access', () => {
+      const sortableColumns = [
+        { key: 'name', title: 'Name', sortable: true },
+        { key: 'age', title: 'Age' }
+      ]
+
+      const { getByText } = renderWithProps(Table, {
+        columns: sortableColumns,
+        dataSource
+      })
+
+      const nameHeaderCell = getByText('Name').closest('th')!
+      const sortButton = nameHeaderCell.querySelector<HTMLButtonElement>(
+        'button[type="button"][data-tiger-table-sort]'
+      )
+      expect(sortButton).not.toBeNull()
+      expect(sortButton).not.toBeDisabled()
+      expect(sortButton).not.toHaveAttribute('tabindex', '-1')
+      expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
+      expect(nameHeaderCell).toHaveAttribute('data-tiger-table-column-key', 'name')
+
+      const ageHeaderCell = getByText('Age').closest('th')!
+      expect(ageHeaderCell.querySelector('[data-tiger-table-sort]')).toBeNull()
+    })
+
     it('should emit sort-change event when clicking sortable column', async () => {
       const sortableColumns = [
         { key: 'name', title: 'Name', sortable: true },
@@ -494,9 +519,10 @@ describe('Table', () => {
 
       const nameHeader = getByText('Name')
       const nameHeaderCell = nameHeader.closest('th')!
+      const sortButton = nameHeaderCell.querySelector('[data-tiger-table-sort]')!
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
 
-      await fireEvent.click(nameHeaderCell)
+      await fireEvent.click(sortButton)
       await nextTick()
 
       expect(onSortChange).toHaveBeenCalledWith({
@@ -523,11 +549,12 @@ describe('Table', () => {
       })
 
       const nameHeaderCell = getByText('Name').closest('th')!
+      const sortButton = nameHeaderCell.querySelector('[data-tiger-table-sort]')!
 
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
 
       // First click - asc
-      await fireEvent.click(nameHeaderCell)
+      await fireEvent.click(sortButton)
       await nextTick()
       expect(onSortChange).toHaveBeenCalledWith({
         key: 'name',
@@ -536,7 +563,7 @@ describe('Table', () => {
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'ascending')
 
       // Second click - desc
-      await fireEvent.click(nameHeaderCell)
+      await fireEvent.click(sortButton)
       await nextTick()
       expect(onSortChange).toHaveBeenCalledWith({
         key: 'name',
@@ -545,13 +572,42 @@ describe('Table', () => {
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'descending')
 
       // Third click - null (clear sort)
-      await fireEvent.click(nameHeaderCell)
+      await fireEvent.click(sortButton)
       await nextTick()
       expect(onSortChange).toHaveBeenCalledWith({
         key: null,
         direction: null
       })
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
+    })
+
+    it('sorts and filters by dataKey when it differs from key', async () => {
+      const splitColumns: TableColumn[] = [
+        { key: 'nameCol', title: 'Name', dataKey: 'name', sortable: true },
+        { key: 'ageCol', title: 'Age', dataKey: 'age', filter: { type: 'text' } }
+      ]
+
+      const { container, getByText } = renderWithProps(Table, {
+        columns: splitColumns,
+        dataSource,
+        pagination: false
+      })
+
+      const nameHeaderCell = getByText('Name').closest('th')!
+      const sortButton = nameHeaderCell.querySelector('[data-tiger-table-sort]')!
+      await fireEvent.click(sortButton)
+      await nextTick()
+
+      const firstCell = container.querySelector('tbody tr td')
+      expect(firstCell).toHaveTextContent('Bob Johnson')
+
+      const filterInput = container.querySelector('thead input[type="text"]') as HTMLInputElement
+      await fireEvent.input(filterInput, { target: { value: '32' } })
+      await nextTick()
+
+      const rows = container.querySelectorAll('tbody tr')
+      expect(rows).toHaveLength(1)
+      expect(rows[0]).toHaveTextContent('Jane Smith')
     })
   })
 
@@ -1145,7 +1201,7 @@ describe('Table', () => {
       })
 
       const nameHeader = getByText('Name')
-      await fireEvent.click(nameHeader.closest('th')!)
+      await fireEvent.click(nameHeader.closest('th')!.querySelector('[data-tiger-table-sort]')!)
 
       expect(onChange).toHaveBeenCalledWith(
         expect.objectContaining({

@@ -217,7 +217,13 @@ export function useTableState(
 
     if (sortState.value.key && sortState.value.direction) {
       const column = columnByKey.value[sortState.value.key]
-      data = sortData(data, sortState.value.key, sortState.value.direction, column?.sortFn)
+      data = sortData(
+        data,
+        sortState.value.key,
+        sortState.value.direction,
+        column?.sortFn,
+        props.columns
+      )
     }
 
     return data

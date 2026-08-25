@@ -287,7 +287,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     }
     if (sortState.key && sortState.direction) {
       const column = columnByKey[sortState.key]
-      data = sortData(data, sortState.key, sortState.direction, column?.sortFn)
+      data = sortData(data, sortState.key, sortState.direction, column?.sortFn, columns)
     }
     return data
   }, [dataSource, columns, filterState, sortState, columnByKey, filterMode, advancedFilterRules])
