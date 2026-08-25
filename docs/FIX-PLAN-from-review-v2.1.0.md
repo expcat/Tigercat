@@ -59,7 +59,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
 | #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
 | #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
-| #19–#20, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #30 | Affix offsetBottom relative to target | done | this commit | 2026-08-25 |
+| #19–#20, #31–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -644,3 +645,20 @@ Vue Radio inherits RadioGroup `disabled` with Checkbox-style OR:
 Pages callers that wrap radios in `<RadioGroup disabled>` now disable and skip the native inputs. Public behavior / a11y fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #30 Affix `offsetBottom` (relative to `target` container bottom, or sticky; do not touch iframe/T5).
+
+
+## #30 notes
+
+Affix offsetBottom pins to the target container bottom (Vue + React via core calculateAffixState):
+
+- Affixed bottom style is `innerHeight - containerRect.bottom + offset` (not viewport `bottom: offset`)
+- Window target: containerRect.bottom === innerHeight, so bottom stays `${offset}px`
+- Custom target: e.g. innerHeight 200, container bottom 180, offset 8 → bottom 28px (not 8px)
+- offsetTop still `containerRect.top + offset`
+- offsetBottom sentinel sits after the wrapper (after placeholder when affixed); offsetTop sentinel stays before content
+- example 02 dropped mt-auto so first screen is no longer parked below the h-40 clip
+- iframe/T5, DemoBlock, #31+ left alone
+
+Pages /affix 「固定到底部」no longer nails the iframe floor. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #31 DropdownItem close-on-click (implement item-level closeOnClick or rebind the example; do not touch iframe/T5).

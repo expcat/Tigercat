@@ -14,8 +14,9 @@ export interface AffixProps {
   offsetTop?: number
 
   /**
-   * Distance from the bottom of the viewport to trigger fixed positioning (px)
-   * When set, the element affixes to the bottom.
+   * Distance from the bottom of the target container to trigger fixed positioning (px).
+   * When `target` is window (the default), this is the viewport bottom.
+   * When set, the element affixes to the container bottom.
    */
   offsetBottom?: number
 

@@ -27,29 +27,33 @@ export interface AffixState {
  *
  * @param elementRect - The original bounding rect of the element (before affixing)
  * @param containerRect - The bounding rect of the scroll container (or viewport)
- * @param offsetTop - Offset from top (undefined if using bottom)
- * @param offsetBottom - Offset from bottom (undefined if using top)
+ * @param offsetTop - Offset from the target container top (undefined if using bottom)
+ * @param offsetBottom - Offset from the target container bottom (viewport when target is window)
  * @param zIndex - z-index for the fixed element
+ * @param viewportHeight - Viewport height in px; defaults to `window.innerHeight` (or `containerRect.bottom` when not in a browser)
  */
 export function calculateAffixState(
   elementRect: { top: number; left: number; width: number; height: number },
   containerRect: { top: number; bottom: number },
   offsetTop: number | undefined,
   offsetBottom: number | undefined,
-  zIndex: number
+  zIndex: number,
+  viewportHeight?: number
 ): AffixState {
   const useBottom = offsetBottom !== undefined
   const offset = useBottom ? offsetBottom : (offsetTop ?? 0)
 
   if (useBottom) {
-    // Affix to bottom: element bottom is above container bottom - offset
+    // Affix to bottom: element bottom is below container bottom - offset
     const shouldAffix = elementRect.top + elementRect.height > containerRect.bottom - offset
     if (shouldAffix) {
+      const innerHeight =
+        viewportHeight ?? (isBrowser() ? window.innerHeight : containerRect.bottom)
       return {
         affixed: true,
         style: {
           position: 'fixed',
-          bottom: `${offset}px`,
+          bottom: `${innerHeight - containerRect.bottom + offset}px`,
           left: `${elementRect.left}px`,
           width: `${elementRect.width}px`,
           zIndex
