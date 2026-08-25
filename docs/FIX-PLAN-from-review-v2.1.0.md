@@ -70,7 +70,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-1 | Pages sandbox viewport (T5 leftover overlays) | done | this commit | 2026-08-25 |
 | P2-2 | Message / Alert token | done | this commit | 2026-08-25 |
 | P2-3 | Menu theme=light | done | this commit | 2026-08-25 |
-| P2-4..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-4 | Collapse a11y inert/aria-hidden + extra stopPropagation | done | this commit | 2026-08-25 |
+| P2-5..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -804,4 +805,17 @@ Menu default `theme="light"` in `packages/core/src/utils/menu-utils.ts`:
 
 No `--tiger-menu-*` in `THEME_CSS_VARS`. Vue/React consume `getMenuClasses`. No new public prop. Hover/selected light pair still token+last-resort.
 
-Next: P2-4 Collapse a11y (折叠 `inert`+`aria-hidden`; `extra` `stopPropagation`). T1 A0-A10 did not cover Collapse a11y (T3), so do not skip.
+Next: P2-4 Collapse a11y landed in this commit. Then P2-5 `parseDate` UTC (`YYYY-MM-DD` as local calendar day, not `new Date(string)`). T1 A0-A10 did not cover parseDate, so do not skip.
+
+## P2-4 notes
+
+Collapse panel a11y in Vue/React `CollapsePanel`:
+
+- Collapsed `[data-tiger-collapse-content]` gets HTML `inert` + `aria-hidden="true"` (omitted when expanded; no `inert="false"`)
+- Children stay mounted so the max-height transition still runs
+- Extra wrapper (`span.ml-auto`, Vue slot / React `extra`) `stopPropagation` on click so Pages `/collapse` 03 「已更新」 no longer toggles
+- Header click / Enter / Space still toggle
+
+No new public prop. Transition controller / `panelKey` equality / accordion initial keys / `parseDate` untouched.
+
+Next: P2-5 `parseDate` UTC (`YYYY-MM-DD` as local calendar day, not `new Date(string)`). T1 A0-A10 did not cover parseDate, so do not skip.

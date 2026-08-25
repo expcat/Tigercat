@@ -94,6 +94,10 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
     }
   }, [disabled, collapseContext, panelKey])
 
+  const handleExtraClick = useCallback((event: React.MouseEvent) => {
+    event.stopPropagation()
+  }, [])
+
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -163,19 +167,29 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
         {/* Header text or content */}
         <span className={collapseHeaderTextClasses}>{header}</span>
 
-        {/* Extra content */}
-        {extra && <span className="ml-auto">{extra}</span>}
+        {/* Extra sits inside role="button"; stop click from toggling the panel */}
+        {extra && (
+          <span className="ml-auto" onClick={handleExtraClick}>
+            {extra}
+          </span>
+        )}
 
         {/* Arrow icon at end */}
         {showArrow && collapseContext.expandIconPosition === 'end' && arrowIcon}
       </div>
 
-      {/* Content with animation wrapper */}
+      {/* Collapsed wrapper is inert + aria-hidden; content stays mounted for the height transition */}
       <div
         ref={contentRef}
         data-tiger-collapse-content=""
         className={collapsePanelContentWrapperClasses}
-        style={initialContentStyleRef.current}>
+        style={initialContentStyleRef.current}
+        {...(!isActive
+          ? {
+              inert: true,
+              'aria-hidden': true
+            }
+          : {})}>
         <div className={collapsePanelContentBaseClasses}>{children}</div>
       </div>
     </div>

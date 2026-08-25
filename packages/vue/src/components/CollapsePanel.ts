@@ -123,6 +123,10 @@ export const CollapsePanel = defineComponent({
       }
     }
 
+    const handleExtraClick = (event: Event) => {
+      event.stopPropagation()
+    }
+
     // Handle keyboard navigation
     const handleKeydown = (event: KeyboardEvent) => {
       if (props.disabled) {
@@ -199,9 +203,18 @@ export const CollapsePanel = defineComponent({
         )
       )
 
-      // Add extra slot if provided
+      // Extra sits inside role="button"; stop click from toggling the panel
       if (extraSlot) {
-        headerContent.push(h('span', { class: 'ml-auto' }, extraSlot))
+        headerContent.push(
+          h(
+            'span',
+            {
+              class: 'ml-auto',
+              onClick: handleExtraClick
+            },
+            extraSlot
+          )
+        )
       }
 
       // Add arrow icon at end if enabled
@@ -224,14 +237,20 @@ export const CollapsePanel = defineComponent({
         headerContent
       )
 
-      // Panel content with animation wrapper
+      // Collapsed wrapper is inert + aria-hidden; content stays mounted for the height transition
       const content = h(
         'div',
         {
           ref: contentRef,
           'data-tiger-collapse-content': '',
           class: collapsePanelContentWrapperClasses,
-          style: initialContentStyle
+          style: initialContentStyle,
+          ...(isActive.value
+            ? {}
+            : {
+                inert: true,
+                'aria-hidden': 'true'
+              })
         },
         [
           h(
