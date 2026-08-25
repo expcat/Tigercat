@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **AutoComplete 受控回写显示 option.label**：Vue / React 在 `searchValue` 未受控时，用 core `resolveAutoCompleteDisplayValue` 把匹配选项的 `label` 同步进输入框，不再把 raw `value` 盖上去；`label !== value`（如 `北京 Beijing` / `beijing`）选中后仍显示 label。`modelValue` / `value` / `onChange` 仍使用 `option.value`。公开行为修复，无主题变量变化。
 - **Vue Transfer 兼发 `update:targetKeys`**：`moveRight` / `moveLeft` 同时发出 `update:modelValue` 与 `update:targetKeys`，Pages/示例里的 `v-model:target-keys` 不再停在初始目标项；默认 `v-model` / `update:modelValue` 保持不变。公开 API 增补，无主题变量变化。
 - **Switch / Stepper / ColorSwatch 非受控内部态**：两端 Switch、Stepper 与 Vue ColorSwatch 通过 `defaultValue` / `defaultChecked` 保留非受控内部状态，点击后即使父级不回写也会更新 UI；受控 `v-model` / `checked` / `value` 仍可用。公开 API 增补，无主题变量变化。
 - **Vue Slider 支持默认 v-model**：同时接受 `modelValue` 并兼发 `update:modelValue`，Pages/示例里的 `<Slider v-model>` 不再停在 min；原有 `v-model:value` / `update:value` 保持不变。公开 API 增补，无主题变量变化。

@@ -64,7 +64,7 @@ describe('AutoComplete', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
       const onSelect = vi.fn()
-      const { container, getByText } = render(
+      const { container, getByText, rerender } = render(
         <AutoComplete options={options} onChange={onChange} onSelect={onSelect} />
       )
 
@@ -73,6 +73,11 @@ describe('AutoComplete', () => {
       await user.click(getByText('Apple'))
 
       expect(onSelect).toHaveBeenCalledWith('apple', options[0])
+      expect(onChange).toHaveBeenCalledWith('apple')
+      rerender(
+        <AutoComplete options={options} value="apple" onChange={onChange} onSelect={onSelect} />
+      )
+      expect(input).toHaveValue('Apple')
     })
     it('should show not found text', async () => {
       const user = userEvent.setup()
@@ -214,6 +219,69 @@ describe('AutoComplete', () => {
 
       const opts = document.body.querySelectorAll('[role="option"]')
       expect(opts.length).toBe(4)
+    })
+  })
+
+  describe('Controlled display writeback', () => {
+    const cityOptions = [
+      { label: '北京 Beijing', value: 'beijing' },
+      { label: '上海 Shanghai', value: 'shanghai' },
+      { label: '深圳 Shenzhen', value: 'shenzhen' }
+    ]
+
+    it('shows option.label after selecting when parent writes back option.value', async () => {
+      const user = userEvent.setup()
+
+      function Pages02AutoComplete() {
+        const [value, setValue] = React.useState<string | number>('')
+        return (
+          <AutoComplete value={value} onChange={(next) => setValue(next)} options={cityOptions} />
+        )
+      }
+
+      const { container, getByText } = render(<Pages02AutoComplete />)
+      const input = container.querySelector('input')!
+      await user.click(input)
+      await user.click(getByText('北京 Beijing'))
+
+      expect(input).toHaveValue('北京 Beijing')
+    })
+
+    it('shows option.label when value is an option value', () => {
+      const { container, rerender } = render(<AutoComplete options={cityOptions} value="beijing" />)
+
+      const input = container.querySelector('input')!
+      expect(input).toHaveValue('北京 Beijing')
+
+      rerender(<AutoComplete options={cityOptions} value="shanghai" />)
+      expect(input).toHaveValue('上海 Shanghai')
+    })
+
+    it('resolves option.label when options arrive after the controlled value', () => {
+      const { container, rerender } = render(<AutoComplete options={[]} value="beijing" />)
+
+      const input = container.querySelector('input')!
+      expect(input).toHaveValue('beijing')
+
+      rerender(<AutoComplete options={cityOptions} value="beijing" />)
+      expect(input).toHaveValue('北京 Beijing')
+    })
+
+    it('keeps unmatched free input after writeback', async () => {
+      const user = userEvent.setup()
+
+      function FreeInputAutoComplete() {
+        const [value, setValue] = React.useState<string | number>('')
+        return (
+          <AutoComplete value={value} onChange={(next) => setValue(next)} options={cityOptions} />
+        )
+      }
+
+      const { container } = render(<FreeInputAutoComplete />)
+      const input = container.querySelector('input')!
+      await user.click(input)
+      await user.type(input, 'not-a-city')
+      expect(input).toHaveValue('not-a-city')
     })
   })
 })

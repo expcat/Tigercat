@@ -9,6 +9,7 @@ import {
   getAutoCompleteInputClasses,
   getAutoCompleteOptionClasses,
   filterAutoCompleteOptions,
+  resolveAutoCompleteDisplayValue,
   getInitialPickerActiveIndex,
   getPickerComboboxAria,
   getPickerListboxAria,
@@ -111,7 +112,8 @@ export const AutoComplete = defineComponent({
 
     const isOpen = ref(false)
     const uncontrolledSearchValue = ref(
-      String(props.searchValue ?? props.modelValue ?? props.defaultSearchValue ?? '')
+      props.searchValue ??
+        resolveAutoCompleteDisplayValue(props.modelValue, props.options, props.defaultSearchValue)
     )
     const inputValue = computed(() => props.searchValue ?? uncontrolledSearchValue.value)
     const activeIndex = ref(-1)
@@ -140,15 +142,16 @@ export const AutoComplete = defineComponent({
       () => props.clearable && !props.disabled && inputValue.value !== ''
     )
 
-    // Sync external modelValue changes
-    watch(
-      () => props.modelValue,
-      (val) => {
-        if (props.searchValue === undefined) {
-          uncontrolledSearchValue.value = String(val ?? props.defaultSearchValue ?? '')
-        }
+    // Sync external modelValue / options into the input display
+    watch([() => props.modelValue, () => props.options], () => {
+      if (props.searchValue === undefined) {
+        uncontrolledSearchValue.value = resolveAutoCompleteDisplayValue(
+          props.modelValue,
+          props.options,
+          props.defaultSearchValue
+        )
       }
-    )
+    })
 
     function openDropdown() {
       if (props.disabled) return

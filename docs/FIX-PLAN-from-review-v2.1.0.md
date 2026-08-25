@@ -31,7 +31,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #2 | Vue Slider v-model | done | this commit | 2026-08-25 |
 | #3 | Switch / Stepper / ColorSwatch uncontrolled | done | this commit | 2026-08-25 |
 | #4 | Vue Transfer targetKeys | done | this commit | 2026-08-25 |
-| #5 | AutoComplete write option.label | pending | | |
+| #5 | AutoComplete write option.label | done | this commit | 2026-08-25 |
 | #6 | React Form validate after updateValue | pending | | |
 | #7 | React Upload controlled fileList | pending | | |
 | #8 | Pagination React pageSize example | pending | | |
@@ -224,3 +224,18 @@ Vue Transfer dual-emits `update:targetKeys` so Pages `v-model:target-keys` binds
 Public API addition recorded in CHANGELOG unpublished.
 
 Next: Phase C #5 AutoComplete write option.label.
+
+## #5 notes
+
+AutoComplete (Vue + React) resolves `option.label` on controlled value writeback:
+
+- Core `resolveAutoCompleteDisplayValue(value, options, fallback)`: nullish → fallback; first `String(option.value) === String(value)` → `option.label`; else `String(value)` (numeric `0` is a real value)
+- Vue seeds `uncontrolledSearchValue` and `watch([modelValue, options])` through the helper when `searchValue` is undefined
+- React seeds `useState` and `useEffect` the same way (`[defaultSearchValue, options, searchValue, value]`)
+- `handleSelect` still writes `option.label` and still emits / `onChange`s `option.value`
+- Controlled `searchValue` still owns the input
+- No example rewrite (02 still `北京 Beijing` / `beijing` + v-model / value+onChange)
+
+Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase C #6 React Form validate after updateValue.

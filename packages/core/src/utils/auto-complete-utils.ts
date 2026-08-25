@@ -114,3 +114,26 @@ export function filterAutoCompleteOptions(
 
   return options.filter((opt) => filterFn(inputValue, opt))
 }
+
+/**
+ * Resolve the input display text for a controlled AutoComplete value.
+ * First option with String(option.value) === String(value) wins (option.label).
+ * Nullish values use fallback. Unmatched values (including '') stay as String(value).
+ * Numeric 0 is not treated as empty.
+ */
+export function resolveAutoCompleteDisplayValue(
+  value: string | number | null | undefined,
+  options: AutoCompleteOption[] | null | undefined = [],
+  fallback: string | number | null | undefined = ''
+): string {
+  if (value === undefined || value === null) {
+    return String(fallback ?? '')
+  }
+
+  const match = (options ?? []).find((option) => String(option.value) === String(value))
+  if (match) {
+    return match.label
+  }
+
+  return String(value)
+}
