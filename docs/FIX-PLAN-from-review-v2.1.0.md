@@ -60,7 +60,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
 | #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
 | #30 | Affix offsetBottom relative to target | done | this commit | 2026-08-25 |
-| #19–#20, #31–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #31 | DropdownItem close-on-click | done | this commit | 2026-08-25 |
+| #19–#20, #32–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -661,4 +662,21 @@ Affix offsetBottom pins to the target container bottom (Vue + React via core cal
 
 Pages /affix 「固定到底部」no longer nails the iframe floor. Public behavior fix recorded in CHANGELOG unpublished.
 
-Next: Phase D #31 DropdownItem close-on-click (implement item-level closeOnClick or rebind the example; do not touch iframe/T5).
+Next: Phase D #32 Anchor / ScrollSpy current item (last intersecting at the offset line, lock after click until scroll ends; do not touch iframe/T5).
+
+
+## #31 notes
+
+DropdownItem item-level closeOnClick (Vue + React):
+
+- Core `DropdownItemProps` adds optional `closeOnClick?: boolean`
+- Resolve is `item.closeOnClick ?? parent.closeOnClick ?? true`
+- Vue item prop is Boolean with `default: undefined` so omitted inherits the parent
+- Parent `handleItemClick` always `setVisible(false)` (item already decided; item-true can override parent-false)
+- Vue example 02 keeps `:close-on-click="false"` on 「保持展开」
+- React example 02 aligned to `closeOnClick={false}` + 「保持展开」
+- iframe/T5, DemoBlock, #32+ left alone
+
+Pages /dropdown 「受控开关」「保持展开」 now stays open. Public API addition recorded in CHANGELOG unpublished.
+
+Next: Phase D #32 Anchor / ScrollSpy current item (last intersecting at the offset line, lock after click until scroll ends; do not touch iframe/T5).

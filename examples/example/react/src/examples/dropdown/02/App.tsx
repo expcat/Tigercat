@@ -13,7 +13,7 @@ export default function App() {
         <Button>{open ? '关闭菜单' : '打开菜单'}</Button>
         <DropdownMenu>
           <DropdownItem onClick={() => setOpen(false)}>保存并关闭</DropdownItem>
-          <DropdownItem disabled>仅展示状态</DropdownItem>
+          <DropdownItem closeOnClick={false}>保持展开</DropdownItem>
         </DropdownMenu>
       </Dropdown>
       <p className="text-sm text-gray-500">受控状态：{open ? '已打开' : '已关闭'}</p>

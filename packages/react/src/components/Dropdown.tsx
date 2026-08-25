@@ -90,6 +90,7 @@ export interface DropdownItemProps
 export const DropdownItem: React.FC<DropdownItemProps> = ({
   disabled = false,
   divided = false,
+  closeOnClick,
   className,
   onClick,
   children,
@@ -105,8 +106,9 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
 
     onClick?.(event)
 
-    if (context?.closeOnClick) {
-      context.handleItemClick()
+    const shouldClose = closeOnClick ?? context?.closeOnClick ?? true
+    if (shouldClose) {
+      context?.handleItemClick()
     }
   }
 
@@ -218,12 +220,12 @@ export const Dropdown: React.FC<DropdownProps> = ({
     [disabled, visible, controlledOpen, onOpenChange]
   )
 
-  // Handle item click (close dropdown)
+  // Handle item click (close dropdown). The item already decided whether to
+  // close; do not re-check parent closeOnClick here so an item can override
+  // parent-false with closeOnClick={true}.
   const handleItemClick = useCallback(() => {
-    if (closeOnClick) {
-      setVisible(false)
-    }
-  }, [closeOnClick, setVisible])
+    setVisible(false)
+  }, [setVisible])
 
   // Handle mouse enter (for hover trigger)
   const handleMouseEnter = useCallback(() => {

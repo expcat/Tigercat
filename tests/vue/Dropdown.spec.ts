@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
 import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-vue/Dropdown'
@@ -382,6 +382,83 @@ describe('Dropdown', () => {
       await rerender({ trigger: 'click', closeOnClick: true })
       await fireEvent.click(screen.getByText('Item 1'))
       expect(wrapper).toHaveAttribute('hidden')
+    })
+
+    it('keeps the menu open when an item sets closeOnClick false under parent default true', async () => {
+      render(Dropdown, {
+        props: { trigger: 'click' },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [
+              h(DropdownItem, { closeOnClick: false }, () => 'Stay open'),
+              h(DropdownItem, null, () => 'Close sibling')
+            ])
+          ]
+        }
+      })
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Stay open'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Close sibling'))
+      expect(wrapper).toHaveAttribute('hidden')
+    })
+
+    it('closes when an item sets closeOnClick true under parent closeOnClick false', async () => {
+      render(Dropdown, {
+        props: { trigger: 'click', closeOnClick: false },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [
+              h(DropdownItem, null, () => 'Inherit stay'),
+              h(DropdownItem, { closeOnClick: true }, () => 'Force close')
+            ])
+          ]
+        }
+      })
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Inherit stay'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Force close'))
+      expect(wrapper).toHaveAttribute('hidden')
+    })
+
+    it('does not emit or close when a disabled item sets closeOnClick false', async () => {
+      const onClick = vi.fn()
+      render(Dropdown, {
+        props: { trigger: 'click' },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [
+              h(
+                DropdownItem,
+                { disabled: true, closeOnClick: false, onClick },
+                () => 'Disabled stay'
+              )
+            ])
+          ]
+        }
+      })
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Disabled stay'))
+      expect(onClick).not.toHaveBeenCalled()
+      expect(wrapper).not.toHaveAttribute('hidden')
     })
 
     it('emits open-change event', async () => {

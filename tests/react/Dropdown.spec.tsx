@@ -439,6 +439,72 @@ describe('Dropdown', () => {
       expect(wrapper).not.toHaveAttribute('hidden')
     })
 
+    it('keeps the menu open when an item sets closeOnClick false under parent default true', async () => {
+      render(
+        <Dropdown trigger="click">
+          <button>Trigger</button>
+          <DropdownMenu>
+            <DropdownItem closeOnClick={false}>Stay open</DropdownItem>
+            <DropdownItem>Close sibling</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Stay open'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Close sibling'))
+      expect(wrapper).toHaveAttribute('hidden')
+    })
+
+    it('closes when an item sets closeOnClick true under parent closeOnClick false', async () => {
+      render(
+        <Dropdown trigger="click" closeOnClick={false}>
+          <button>Trigger</button>
+          <DropdownMenu>
+            <DropdownItem>Inherit stay</DropdownItem>
+            <DropdownItem closeOnClick={true}>Force close</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Inherit stay'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Force close'))
+      expect(wrapper).toHaveAttribute('hidden')
+    })
+
+    it('does not emit or close when a disabled item sets closeOnClick false', async () => {
+      const onClick = vi.fn()
+      render(
+        <Dropdown trigger="click">
+          <button>Trigger</button>
+          <DropdownMenu>
+            <DropdownItem disabled closeOnClick={false} onClick={onClick}>
+              Disabled stay
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
+      await fireEvent.click(screen.getByText('Trigger'))
+      expect(wrapper).not.toHaveAttribute('hidden')
+
+      await fireEvent.click(screen.getByText('Disabled stay'))
+      expect(onClick).not.toHaveBeenCalled()
+      expect(wrapper).not.toHaveAttribute('hidden')
+    })
+
     it('renders disabled item with aria-disabled', () => {
       render(
         <Dropdown defaultOpen>

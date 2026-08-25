@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **DropdownItem `closeOnClick`**：Vue / React 的 DropdownItem 现接受可选 `closeOnClick`（Vue `:close-on-click`）。设置后覆盖父级 Dropdown `closeOnClick`；省略则继承父级（默认 true）。Vue 示例 02「保持展开」现在保持展开；React 示例 02 对齐为同一 item 级 API。公开 API 增补。无主题变量变化。
 - **Affix `offsetBottom` 相对 target 容器底钉住**：Vue / React 经 core `calculateAffixState` 把已固定的 `bottom` 写成 `innerHeight - containerRect.bottom + offset`，钉在 `target` 容器底边上方 `offset` px，不再钉视口/iframe 底。Window target 时 `containerRect.bottom === innerHeight`，`bottom` 仍是 `${offset}px`。`offsetBottom` 的 sentinel 放在内容底（affixed 时在 placeholder 后）。公开行为修复。无主题变量变化，无新 prop。
 - **Vue Radio group `disabled` 继承**：Vue Radio 将 `disabled` 视为 true 或继承 RadioGroup `disabled`（OR，对齐 Checkbox）。Boolean 省略是 `false`，旧的 `!== undefined` 永不继承 group，radio 仍可聚焦而 group onChange 会 bail。React 本就正确继承，未改。公开行为/无障碍修复。无主题变量变化，无新 prop。
 - **InputNumber leftover attrs 落到 spinbutton**：Vue / React 把未声明的 HTML attrs（`aria-label`、`data-*` 等）转发到 `role="spinbutton"` 的 input 上。Vue `inheritAttrs:false` 原先只把 `class` 合到 wrapper；React 丢掉未声明 attrs。`class` / `className` 仍作用在 wrapper。公开无障碍/属性转发修复。React props 类型放宽为可接受原生 input 属性（`size`/`value`/`onChange`/`min`/`max`/`step` 等已 Omit）。无主题变量变化，无新具名 prop。
