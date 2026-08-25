@@ -99,6 +99,11 @@ export const esES: TigerLocale = defineLocale({
     sentText: 'Entregado',
     failedText: 'Error al enviar'
   },
+  code: {
+    copyLabel: 'Copiar',
+    copiedLabel: 'Copiado',
+    copyFailedLabel: 'Error al copiar'
+  },
   commentThread: {
     emptyText: 'No hay comentarios',
     replyPlaceholder: 'Escribe una respuesta...',

@@ -28,6 +28,7 @@ import type {
   TigerLocaleStatus,
   TigerLocaleTaskBoard,
   TigerLocaleChatWindow,
+  TigerLocaleCode,
   TigerLocaleCommentThread,
   TigerLocaleActivityFeed,
   TigerLocaleNotificationCenter,
@@ -72,6 +73,7 @@ const TIGER_LOCALE_KEYS = [
   'status',
   'taskBoard',
   'chatWindow',
+  'code',
   'commentThread',
   'activityFeed',
   'notificationCenter',
@@ -168,6 +170,7 @@ export function mergeTigerLocale(
     status: { ...base?.status, ...override?.status },
     taskBoard: { ...base?.taskBoard, ...override?.taskBoard },
     chatWindow: { ...base?.chatWindow, ...override?.chatWindow },
+    code: { ...base?.code, ...override?.code },
     commentThread: { ...base?.commentThread, ...override?.commentThread },
     activityFeed: { ...base?.activityFeed, ...override?.activityFeed },
     notificationCenter: { ...base?.notificationCenter, ...override?.notificationCenter },
@@ -730,6 +733,36 @@ export function getChatWindowLabels(
       overrides?.sendingText ?? locale?.chatWindow?.sendingText ?? defaultLabels.sendingText,
     sentText: overrides?.sentText ?? locale?.chatWindow?.sentText ?? defaultLabels.sentText,
     failedText: overrides?.failedText ?? locale?.chatWindow?.failedText ?? defaultLabels.failedText
+  }
+}
+
+// ============================================================================
+// Code Labels
+// ============================================================================
+
+export const DEFAULT_CODE_LABELS: Required<TigerLocaleCode> = {
+  copyLabel: 'Copy',
+  copiedLabel: 'Copied',
+  copyFailedLabel: 'Copy failed'
+}
+
+export const ZH_CN_CODE_LABELS: Required<TigerLocaleCode> = {
+  copyLabel: '复制',
+  copiedLabel: '已复制',
+  copyFailedLabel: '复制失败'
+}
+
+export function getCodeLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleCode>
+): Required<TigerLocaleCode> {
+  const isZh = locale?.locale?.startsWith('zh')
+  const defaultLabels = isZh ? ZH_CN_CODE_LABELS : DEFAULT_CODE_LABELS
+  return {
+    copyLabel: overrides?.copyLabel ?? locale?.code?.copyLabel ?? defaultLabels.copyLabel,
+    copiedLabel: overrides?.copiedLabel ?? locale?.code?.copiedLabel ?? defaultLabels.copiedLabel,
+    copyFailedLabel:
+      overrides?.copyFailedLabel ?? locale?.code?.copyFailedLabel ?? defaultLabels.copyFailedLabel
   }
 }
 

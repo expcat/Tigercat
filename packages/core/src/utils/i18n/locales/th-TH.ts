@@ -84,6 +84,11 @@ export const thTH: TigerLocale = defineLocale({
     sentText: 'ส่งแล้ว',
     failedText: 'ส่งไม่สำเร็จ'
   },
+  code: {
+    copyLabel: 'คัดลอก',
+    copiedLabel: 'คัดลอกแล้ว',
+    copyFailedLabel: 'คัดลอกไม่สำเร็จ'
+  },
   commentThread: {
     emptyText: 'ไม่มีความคิดเห็น',
     replyPlaceholder: 'เขียนการตอบกลับ...',

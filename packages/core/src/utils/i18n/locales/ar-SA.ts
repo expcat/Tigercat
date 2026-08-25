@@ -99,6 +99,11 @@ export const arSA: TigerLocale = defineLocale({
     sentText: 'تم التسليم',
     failedText: 'فشل الإرسال'
   },
+  code: {
+    copyLabel: 'نسخ',
+    copiedLabel: 'تم النسخ',
+    copyFailedLabel: 'فشل النسخ'
+  },
   commentThread: {
     emptyText: 'لا توجد تعليقات',
     replyPlaceholder: 'اكتب ردًا...',

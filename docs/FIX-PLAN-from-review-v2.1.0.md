@@ -81,7 +81,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-12 | Chat / Comment / Activity / Notification copy to locale | done | this commit | 2026-08-25 |
 | P2-13 | FormWizard skipCondition handleStepChange | done | this commit | 2026-08-25 |
 | P2-14 | Pagination Chinese-English mix (showTotal through locale) | done | this commit | 2026-08-25 |
-| P2-15..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-15 | Code clipboard failure state + locale | done | this commit | 2026-08-25 |
+| P2-16..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -961,4 +962,17 @@ Pagination showTotal default copy goes through getPaginationLabels / formatPagin
 - T1 A0-A10 did not cover Pagination copy. No new public prop.
 
 Next: P2-15 Code clipboard (sandbox allow-same-origin or failure state; copy through locale). T1 A0-A10 did not cover clipboard / allow-same-origin, so do not skip.
+
+## P2-15 notes
+
+Code clipboard failure is visible and Copy / Copied / Copy failed go through getCodeLabels (Vue + React):
+
+- copyTextToClipboard false sets failed (error token + copyFailedLabel), does not emit copy / onCopy
+- no-locale / non-zh is English Copy / Copied / Copy failed; zh-CN keeps 复制 / 已复制 / 复制失败
+- explicit copyLabel / copiedLabel / copyFailedLabel still win
+- sandbox allow-same-origin / srcdoc dark: not changed (document was OR; this row used failure state)
+- T1 A0-A10 did not cover clipboard / locale copy. No new required prop.
+
+Next: P2-16 Upload drag slot (honor default slot; drop hardcoded bg-white / border-gray-300). T1 A0-A10 did not cover the ignored drag slot, so do not skip.
+
 

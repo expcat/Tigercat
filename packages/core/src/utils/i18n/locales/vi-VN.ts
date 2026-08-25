@@ -84,6 +84,11 @@ export const viVN: TigerLocale = defineLocale({
     sentText: 'Đã gửi',
     failedText: 'Gửi thất bại'
   },
+  code: {
+    copyLabel: 'Sao chép',
+    copiedLabel: 'Đã sao chép',
+    copyFailedLabel: 'Sao chép thất bại'
+  },
   commentThread: {
     emptyText: 'Không có bình luận',
     replyPlaceholder: 'Viết phản hồi...',

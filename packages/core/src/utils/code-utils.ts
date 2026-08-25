@@ -12,14 +12,23 @@ export const codeBlockCopyButtonBaseClasses =
 export const codeBlockCopyButtonCopiedClasses =
   'border-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary,#2563eb)]'
 
+export const codeBlockCopyButtonFailedClasses =
+  'border-[var(--tiger-error,#ef4444)] text-[var(--tiger-error,#ef4444)]'
+
+export type CodeCopyButtonStatus = 'idle' | 'copied' | 'failed'
+
 export function getCodeBlockContainerClasses(...classes: ClassValue[]): string {
   return classNames(codeBlockContainerClasses, ...classes)
 }
 
-export function getCodeBlockCopyButtonClasses(isCopied: boolean, ...classes: ClassValue[]): string {
+export function getCodeBlockCopyButtonClasses(
+  status: CodeCopyButtonStatus = 'idle',
+  ...classes: ClassValue[]
+): string {
   return classNames(
     codeBlockCopyButtonBaseClasses,
-    isCopied && codeBlockCopyButtonCopiedClasses,
+    status === 'copied' && codeBlockCopyButtonCopiedClasses,
+    status === 'failed' && codeBlockCopyButtonFailedClasses,
     ...classes
   )
 }

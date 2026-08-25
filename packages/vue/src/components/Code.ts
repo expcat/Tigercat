@@ -5,9 +5,16 @@ import {
   copyTextToClipboard,
   getCodeBlockContainerClasses,
   getCodeBlockCopyButtonClasses,
+  getCodeLabels,
   mergeStyleValues,
-  type CodeProps as CoreCodeProps
+  mergeTigerLocale,
+  resolveLocaleText,
+  type CodeCopyButtonStatus,
+  type CodeProps as CoreCodeProps,
+  type TigerLocale,
+  type TigerLocaleCode
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueCodeProps extends CoreCodeProps {
   className?: string
@@ -28,11 +35,23 @@ export const Code = defineComponent({
     },
     copyLabel: {
       type: String,
-      default: '复制'
+      default: undefined
     },
     copiedLabel: {
       type: String,
-      default: '已复制'
+      default: undefined
+    },
+    copyFailedLabel: {
+      type: String,
+      default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleCode>>,
+      default: undefined
     },
     className: {
       type: String,
@@ -45,8 +64,26 @@ export const Code = defineComponent({
   },
   emits: ['copy'],
   setup(props, { emit, attrs }) {
-    const isCopied = ref(false)
+    const config = useTigerConfig()
+    const copyStatus = ref<CodeCopyButtonStatus>('idle')
     const timerRef = ref<number | null>(null)
+
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getCodeLabels(mergedLocale.value, props.labels))
+    const resolvedCopyLabel = computed(() =>
+      resolveLocaleText(labels.value.copyLabel, props.copyLabel)
+    )
+    const resolvedCopiedLabel = computed(() =>
+      resolveLocaleText(labels.value.copiedLabel, props.copiedLabel)
+    )
+    const resolvedCopyFailedLabel = computed(() =>
+      resolveLocaleText(labels.value.copyFailedLabel, props.copyFailedLabel)
+    )
+    const buttonLabel = computed(() => {
+      if (copyStatus.value === 'failed') return resolvedCopyFailedLabel.value
+      if (copyStatus.value === 'copied') return resolvedCopiedLabel.value
+      return resolvedCopyLabel.value
+    })
 
     const containerClasses = computed(() => {
       const attrsRecord = attrs as Record<string, unknown>
@@ -54,7 +91,7 @@ export const Code = defineComponent({
     })
 
     const copyButtonClasses = computed(() => {
-      return getCodeBlockCopyButtonClasses(isCopied.value)
+      return getCodeBlockCopyButtonClasses(copyStatus.value)
     })
 
     const clearTimer = () => {
@@ -67,13 +104,15 @@ export const Code = defineComponent({
     const handleCopy = async () => {
       if (!props.copyable) return
       const ok = await copyTextToClipboard(props.code)
-      if (!ok) return
-
-      isCopied.value = true
-      emit('copy', props.code)
       clearTimer()
+      if (ok) {
+        copyStatus.value = 'copied'
+        emit('copy', props.code)
+      } else {
+        copyStatus.value = 'failed'
+      }
       timerRef.value = window.setTimeout(() => {
-        isCopied.value = false
+        copyStatus.value = 'idle'
         timerRef.value = null
       }, 1500)
     }
@@ -99,9 +138,9 @@ export const Code = defineComponent({
                   type: 'button',
                   class: copyButtonClasses.value,
                   onClick: handleCopy,
-                  'aria-label': isCopied.value ? props.copiedLabel : props.copyLabel
+                  'aria-label': buttonLabel.value
                 },
-                isCopied.value ? props.copiedLabel : props.copyLabel
+                buttonLabel.value
               )
             : null
         ]

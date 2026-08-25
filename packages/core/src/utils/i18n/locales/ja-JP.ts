@@ -84,6 +84,11 @@ export const jaJP: TigerLocale = defineLocale({
     sentText: '配信済み',
     failedText: '送信に失敗しました'
   },
+  code: {
+    copyLabel: 'コピー',
+    copiedLabel: 'コピーしました',
+    copyFailedLabel: 'コピーに失敗しました'
+  },
   commentThread: {
     emptyText: 'コメントはありません',
     replyPlaceholder: '返信を書く...',

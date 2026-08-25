@@ -84,6 +84,11 @@ export const koKR: TigerLocale = defineLocale({
     sentText: '전송됨',
     failedText: '보내기 실패'
   },
+  code: {
+    copyLabel: '복사',
+    copiedLabel: '복사됨',
+    copyFailedLabel: '복사 실패'
+  },
   commentThread: {
     emptyText: '댓글이 없습니다',
     replyPlaceholder: '답글을 작성하세요...',

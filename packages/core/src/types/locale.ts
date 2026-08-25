@@ -239,6 +239,12 @@ export interface TigerLocaleChatWindow {
   failedText?: string
 }
 
+export interface TigerLocaleCode {
+  copyLabel?: string
+  copiedLabel?: string
+  copyFailedLabel?: string
+}
+
 export interface TigerLocaleCommentThread {
   emptyText?: string
   replyPlaceholder?: string
@@ -462,6 +468,7 @@ export interface TigerLocale {
   status?: TigerLocaleStatus
   taskBoard?: TigerLocaleTaskBoard
   chatWindow?: TigerLocaleChatWindow
+  code?: TigerLocaleCode
   commentThread?: TigerLocaleCommentThread
   activityFeed?: TigerLocaleActivityFeed
   notificationCenter?: TigerLocaleNotificationCenter

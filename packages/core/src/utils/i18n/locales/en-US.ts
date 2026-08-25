@@ -168,6 +168,11 @@ export const enUS: TigerLocale = {
     sentText: 'Delivered',
     failedText: 'Failed to send'
   },
+  code: {
+    copyLabel: 'Copy',
+    copiedLabel: 'Copied',
+    copyFailedLabel: 'Copy failed'
+  },
   commentThread: {
     emptyText: 'No comments',
     replyPlaceholder: 'Write a reply...',

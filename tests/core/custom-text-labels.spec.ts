@@ -7,6 +7,7 @@ import {
   getTaskBoardLabels,
   getSelectLabels,
   getChatWindowLabels,
+  getCodeLabels,
   getCommentThreadLabels,
   getActivityFeedLabels,
   getNotificationCenterLabels,
@@ -18,10 +19,12 @@ import {
   DEFAULT_TASK_BOARD_LABELS,
   DEFAULT_SELECT_LABELS,
   DEFAULT_CHAT_WINDOW_LABELS,
+  DEFAULT_CODE_LABELS,
   DEFAULT_COMMENT_THREAD_LABELS,
   DEFAULT_ACTIVITY_FEED_LABELS,
   DEFAULT_NOTIFICATION_CENTER_LABELS,
   ZH_CN_CHAT_WINDOW_LABELS,
+  ZH_CN_CODE_LABELS,
   ZH_CN_COMMENT_THREAD_LABELS,
   ZH_CN_ACTIVITY_FEED_LABELS,
   ZH_CN_NOTIFICATION_CENTER_LABELS
@@ -117,6 +120,32 @@ describe('custom-text overrides on label resolvers', () => {
       expect(labels.sendText).toBe('override-send')
       expect(labels.emptyText).toBe('locale-empty')
       expect(labels.placeholder).toBe(DEFAULT_CHAT_WINDOW_LABELS.placeholder)
+    })
+  })
+
+  describe('getCodeLabels', () => {
+    it('falls back to English Copy / Copied / Copy failed with no locale', () => {
+      expect(getCodeLabels()).toEqual(DEFAULT_CODE_LABELS)
+      expect(getCodeLabels(undefined).copyLabel).toBe('Copy')
+      expect(getCodeLabels(undefined).copiedLabel).toBe('Copied')
+      expect(getCodeLabels(undefined).copyFailedLabel).toBe('Copy failed')
+    })
+
+    it('uses Chinese defaults for zh locales and zh-CN preset', () => {
+      expect(getCodeLabels({ locale: 'zh-CN' }).copyLabel).toBe('复制')
+      expect(getCodeLabels({ locale: 'zh-CN' }).copiedLabel).toBe('已复制')
+      expect(getCodeLabels({ locale: 'zh-CN' }).copyFailedLabel).toBe('复制失败')
+      expect(getCodeLabels(zhCN)).toEqual(ZH_CN_CODE_LABELS)
+    })
+
+    it('ranks overrides above locale and default', () => {
+      const labels = getCodeLabels(
+        { code: { copyLabel: 'locale-copy', copiedLabel: 'locale-copied' } },
+        { copyLabel: 'Clone' }
+      )
+      expect(labels.copyLabel).toBe('Clone')
+      expect(labels.copiedLabel).toBe('locale-copied')
+      expect(labels.copyFailedLabel).toBe(DEFAULT_CODE_LABELS.copyFailedLabel)
     })
   })
 

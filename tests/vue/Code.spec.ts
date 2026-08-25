@@ -4,7 +4,11 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { defineComponent, h } from 'vue'
 import { Code } from '@expcat/tigercat-vue/Code'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { renderWithProps, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Code (Vue)', () => {
@@ -55,9 +59,20 @@ describe('Code (Vue)', () => {
       expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
     })
 
-    it('renders default copy label as 复制', () => {
+    it('renders default copy label as Copy', () => {
       render(Code, { props: { code: 'x = 1' } })
-      expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: '复制' })).not.toBeInTheDocument()
+    })
+
+    it('renders custom copyFailedLabel', () => {
+      render(Code, { props: { code: 'x = 1', copyFailedLabel: 'Nope' } })
+      expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+    })
+
+    it('lets labels.copyLabel override the idle text', () => {
+      render(Code, { props: { code: 'x = 1', labels: { copyLabel: 'Clone' } } })
+      expect(screen.getByRole('button', { name: 'Clone' })).toBeInTheDocument()
     })
 
     it('merges class attribute onto container', () => {
@@ -85,12 +100,12 @@ describe('Code (Vue)', () => {
       })
 
       const { emitted } = render(Code, { props: { code: "console.log('copy')" } })
-      const button = screen.getByRole('button', { name: '复制' })
+      const button = screen.getByRole('button', { name: 'Copy' })
       await fireEvent.click(button)
 
       expect(writeText).toHaveBeenCalledWith("console.log('copy')")
       expect(emitted().copy?.[0]).toEqual(["console.log('copy')"])
-      expect(await screen.findByRole('button', { name: '已复制' })).toBeInTheDocument()
+      expect(await screen.findByRole('button', { name: 'Copied' })).toBeInTheDocument()
     })
 
     it('resets copied state after timeout', async () => {
@@ -102,19 +117,20 @@ describe('Code (Vue)', () => {
       })
 
       render(Code, { props: { code: 'abc' } })
-      await fireEvent.click(screen.getByRole('button', { name: '复制' }))
+      await fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
       await vi.waitFor(() => {
-        expect(screen.getByRole('button', { name: '已复制' })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument()
       })
 
       vi.advanceTimersByTime(1500)
       await vi.waitFor(() => {
-        expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
       })
       vi.useRealTimers()
     })
 
-    it('does not emit copy when clipboard fails', async () => {
+    it('shows Copy failed and does not emit copy when clipboard fails', async () => {
+      vi.useFakeTimers()
       const writeText = vi.fn().mockRejectedValue(new Error('fail'))
       Object.defineProperty(navigator, 'clipboard', {
         value: { writeText },
@@ -122,7 +138,33 @@ describe('Code (Vue)', () => {
       })
 
       const { emitted } = render(Code, { props: { code: 'fail' } })
-      await fireEvent.click(screen.getByRole('button', { name: '复制' }))
+      await fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
+      await vi.waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Copy failed' })).toBeInTheDocument()
+      })
+      expect(emitted().copy).toBeUndefined()
+      expect(screen.getByRole('button').className).toContain('--tiger-error')
+      expect(screen.getByRole('button').className).not.toContain('--tiger-primary')
+
+      vi.advanceTimersByTime(1500)
+      await vi.waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+      })
+      vi.useRealTimers()
+    })
+
+    it('lets custom copyFailedLabel win on failure', async () => {
+      const writeText = vi.fn().mockRejectedValue(new Error('fail'))
+      Object.defineProperty(navigator, 'clipboard', {
+        value: { writeText },
+        configurable: true
+      })
+
+      const { emitted } = render(Code, {
+        props: { code: 'fail', copyFailedLabel: 'Nope' }
+      })
+      await fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
+      expect(await screen.findByRole('button', { name: 'Nope' })).toBeInTheDocument()
       expect(emitted().copy).toBeUndefined()
     })
 
@@ -147,7 +189,7 @@ describe('Code (Vue)', () => {
       })
 
       render(Code, { props: { code: 'rapid' } })
-      const button = screen.getByRole('button', { name: '复制' })
+      const button = screen.getByRole('button', { name: 'Copy' })
       await fireEvent.click(button)
       await fireEvent.click(button)
       await fireEvent.click(button)
@@ -155,9 +197,67 @@ describe('Code (Vue)', () => {
       expect(writeText).toHaveBeenCalledTimes(3)
       vi.advanceTimersByTime(1500)
       await vi.waitFor(() => {
-        expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
       })
       vi.useRealTimers()
+    })
+  })
+
+  describe('locale', () => {
+    it('uses ConfigProvider zh-CN for Copy / Copied / Copy failed', async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined)
+      Object.defineProperty(navigator, 'clipboard', {
+        value: { writeText },
+        configurable: true
+      })
+      const Wrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: zhCN }, () => h(Code, { code: 'x = 1' }))
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument()
+      await fireEvent.click(screen.getByRole('button', { name: '复制' }))
+      expect(await screen.findByRole('button', { name: '已复制' })).toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider en-US for Copy', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: enUS }, () => h(Code, { code: 'x = 1' }))
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+    })
+
+    it('lets explicit copyLabel win under zh-CN', () => {
+      const Wrapper = defineComponent({
+        setup() {
+          return () =>
+            h(ConfigProvider, { locale: zhCN }, () =>
+              h(Code, { code: 'x = 1', copyLabel: 'Clone' })
+            )
+        }
+      })
+      render(Wrapper)
+      expect(screen.getByRole('button', { name: 'Clone' })).toBeInTheDocument()
+    })
+
+    it('shows 复制失败 under ConfigProvider zh-CN when clipboard fails', async () => {
+      const writeText = vi.fn().mockRejectedValue(new Error('fail'))
+      Object.defineProperty(navigator, 'clipboard', {
+        value: { writeText },
+        configurable: true
+      })
+      const Wrapper = defineComponent({
+        setup() {
+          return () => h(ConfigProvider, { locale: zhCN }, () => h(Code, { code: 'fail' }))
+        }
+      })
+      render(Wrapper)
+      await fireEvent.click(screen.getByRole('button', { name: '复制' }))
+      expect(await screen.findByRole('button', { name: '复制失败' })).toBeInTheDocument()
     })
   })
 

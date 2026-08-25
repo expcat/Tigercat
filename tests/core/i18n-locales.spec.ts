@@ -13,8 +13,11 @@ import { deDE } from '@expcat/tigercat-core/locales/de-DE'
 import { ptBR } from '@expcat/tigercat-core/locales/pt-BR'
 import { arSA } from '@expcat/tigercat-core/locales/ar-SA'
 import {
+  DEFAULT_CODE_LABELS,
+  ZH_CN_CODE_LABELS,
   defineLocale,
   defineText,
+  getCodeLabels,
   getLocaleDirection,
   isRtlLocale,
   mergeTigerLocale
@@ -36,6 +39,7 @@ describe('i18n locale presets', () => {
     'select',
     'taskBoard',
     'chatWindow',
+    'code',
     'commentThread',
     'activityFeed',
     'notificationCenter'
@@ -124,6 +128,33 @@ describe('i18n locale presets', () => {
   it('enUS chatWindow.sendText is "Send" and zhCN is "发送"', () => {
     expect(enUS.chatWindow.sendText).toBe('Send')
     expect(zhCN.chatWindow.sendText).toBe('发送')
+  })
+
+  it('enUS code labels are English and zhCN are Simplified Chinese', () => {
+    expect(enUS.code.copyLabel).toBe('Copy')
+    expect(enUS.code.copiedLabel).toBe('Copied')
+    expect(enUS.code.copyFailedLabel).toBe('Copy failed')
+    expect(zhCN.code.copyLabel).toBe('复制')
+    expect(zhCN.code.copiedLabel).toBe('已复制')
+    expect(zhCN.code.copyFailedLabel).toBe('复制失败')
+  })
+
+  it('getCodeLabels(undefined) is English Copy / Copied / Copy failed', () => {
+    expect(getCodeLabels(undefined)).toEqual(DEFAULT_CODE_LABELS)
+    expect(getCodeLabels()).toEqual({
+      copyLabel: 'Copy',
+      copiedLabel: 'Copied',
+      copyFailedLabel: 'Copy failed'
+    })
+  })
+
+  it('getCodeLabels zh-CN is 复制 / 已复制 / 复制失败', () => {
+    expect(getCodeLabels({ locale: 'zh-CN' })).toEqual(ZH_CN_CODE_LABELS)
+    expect(getCodeLabels(zhCN)).toEqual({
+      copyLabel: '复制',
+      copiedLabel: '已复制',
+      copyFailedLabel: '复制失败'
+    })
   })
 
   it('mergeTigerLocale keeps chatWindow / commentThread / activityFeed / notificationCenter blocks', () => {

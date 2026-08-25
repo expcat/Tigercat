@@ -84,6 +84,11 @@ export const idID: TigerLocale = defineLocale({
     sentText: 'Terkirim',
     failedText: 'Gagal mengirim'
   },
+  code: {
+    copyLabel: 'Salin',
+    copiedLabel: 'Disalin',
+    copyFailedLabel: 'Gagal menyalin'
+  },
   commentThread: {
     emptyText: 'Tidak ada komentar',
     replyPlaceholder: 'Tulis balasan...',

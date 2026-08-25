@@ -168,6 +168,11 @@ export const zhCN: TigerLocale = {
     sentText: '已送达',
     failedText: '发送失败'
   },
+  code: {
+    copyLabel: '复制',
+    copiedLabel: '已复制',
+    copyFailedLabel: '复制失败'
+  },
   commentThread: {
     emptyText: '暂无评论',
     replyPlaceholder: '写下回复...',

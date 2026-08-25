@@ -99,6 +99,11 @@ export const ptBR: TigerLocale = defineLocale({
     sentText: 'Entregue',
     failedText: 'Falha ao enviar'
   },
+  code: {
+    copyLabel: 'Copiar',
+    copiedLabel: 'Copiado',
+    copyFailedLabel: 'Falha ao copiar'
+  },
   commentThread: {
     emptyText: 'Nenhum comentário',
     replyPlaceholder: 'Escreva uma resposta...',

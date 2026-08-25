@@ -84,6 +84,11 @@ export const zhTW: TigerLocale = defineLocale({
     sentText: '已送達',
     failedText: '傳送失敗'
   },
+  code: {
+    copyLabel: '複製',
+    copiedLabel: '已複製',
+    copyFailedLabel: '複製失敗'
+  },
   commentThread: {
     emptyText: '暫無評論',
     replyPlaceholder: '寫下回覆...',
