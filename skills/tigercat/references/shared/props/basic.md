@@ -70,7 +70,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Code
 
-`packages/core/src/types/code.ts` · `CodeProps` · 3/4 props
+`packages/core/src/types/code.ts` · `CodeProps` · 3/7 props
 
 | Prop         | Type      | Default | Notes |
 | ------------ | --------- | ------- | ----- |
@@ -284,7 +284,7 @@ Note: 支持 `previewTrigger="hover"` 以展示浮动放大预览层，而非默
 
 ## QRCode
 
-`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 3/7 props
+`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 3/6 props
 
 | Prop     | Type     | Default | Notes                |
 | -------- | -------- | ------- | -------------------- |

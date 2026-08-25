@@ -28,13 +28,13 @@ const sourceVersionFiles = {
 
 const expectedRepositoryUrl = 'https://github.com/expcat/Tigercat'
 const expectedSizeLimitEntries = [
-  ['Core (full)', 'packages/core/dist/index.js', '136 kB'],
-  ['Vue (full)', 'packages/vue/dist/index.mjs', '308 kB'],
-  ['React (full)', 'packages/react/dist/index.mjs', '344 kB'],
+  ['Core (full)', 'packages/core/dist/index.js', '140 kB'],
+  ['Vue (full)', 'packages/vue/dist/index.mjs', '315 kB'],
+  ['React (full)', 'packages/react/dist/index.mjs', '351 kB'],
   ['Vue Button subpath', 'packages/vue/dist/components/Button.mjs', '22 kB'],
   ['React Button subpath', 'packages/react/dist/components/Button.mjs', '20 kB'],
   ['Vue Menu subpath', 'packages/vue/dist/components/Menu.mjs', '41 kB'],
-  ['React Menu subpath', 'packages/react/dist/components/Menu.mjs', '33 kB'],
+  ['React Menu subpath', 'packages/react/dist/components/Menu.mjs', '34 kB'],
   ['Vue DatePicker subpath', 'packages/vue/dist/components/DatePicker.mjs', '31 kB'],
   ['React DatePicker subpath', 'packages/react/dist/components/DatePicker.mjs', '25 kB'],
   ['Vue Table subpath', 'packages/vue/dist/components/Table.mjs', '48 kB'],

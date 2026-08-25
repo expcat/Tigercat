@@ -21,13 +21,13 @@ description: Compact generated Tigercat Advanced props reference
 
 ## FileManager
 
-`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 3/16 props
+`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 3/17 props
 
-| Prop            | Type                   | Default | Notes                        |
-| --------------- | ---------------------- | ------- | ---------------------------- |
-| `files?`        | `FileItem[]`           | `-`     | File/folder tree data        |
-| `viewMode?`     | `FileViewMode`         | `-`     | View mode                    |
-| `selectedKeys?` | `(string \| number)[]` | `-`     | Currently selected file keys |
+| Prop            | Type                   | Default | Notes                                     |
+| --------------- | ---------------------- | ------- | ----------------------------------------- |
+| `files?`        | `FileItem[]`           | `-`     | File/folder tree data                     |
+| `viewMode?`     | `FileViewMode`         | `-`     | View mode                                 |
+| `selectedKeys?` | `(string \| number)[]` | `-`     | Currently selected file keys (controlled) |
 
 Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysChange?`, `onCurrentPathChange?`, `onSearchTextChange?`, ....
 

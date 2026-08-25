@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## ActivityFeed
 
-`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 3/12 props
+`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 3/14 props
 
 Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
 
@@ -25,7 +25,7 @@ Note: 时间线、头像、状态标签和动作链接由组件内部组合，�
 
 ## ChatWindow
 
-`packages/core/src/types/chat.ts` · `ChatWindowProps` · 3/26 props
+`packages/core/src/types/chat.ts` · `ChatWindowProps` · 3/28 props
 
 Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
 
@@ -41,7 +41,7 @@ Events/callback props: `onChange?`, `onSend?`.
 
 ## CommentThread
 
-`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 3/20 props
+`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 3/24 props
 
 Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
 
@@ -118,7 +118,7 @@ Events/callback props: `onChange?`, `onFinish?`.
 
 ## NotificationCenter
 
-`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 3/19 props
+`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 3/21 props
 
 Uses: `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`.
 

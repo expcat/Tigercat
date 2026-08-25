@@ -16,7 +16,7 @@ description: Compact generated Tigercat Navigation props reference
 | Prop            | Type     | Default | Notes                                                                                      |
 | --------------- | -------- | ------- | ------------------------------------------------------------------------------------------ |
 | `offsetTop?`    | `number` | `0`     | Distance from the top of the viewport to trigger fixed positioning (px) Mutually exclus... |
-| `offsetBottom?` | `number` | `-`     | Distance from the bottom of the viewport to trigger fixed positioning (px) When set, th... |
+| `offsetBottom?` | `number` | `-`     | Distance from the bottom of the target container to trigger fixed positioning (px). Whe... |
 | `target?`       | `string` | `-`     | The scrollable container. Defaults to `window`. CSS selector string.                       |
 
 ## Anchor
@@ -124,7 +124,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## DropdownItem
 
-`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 3/5 props
+`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 3/6 props
 
 | Prop        | Type               | Default | Notes                                          |
 | ----------- | ------------------ | ------- | ---------------------------------------------- |
@@ -153,7 +153,7 @@ Note: 菜单默认渲染到 `document.body`（React portal / Vue Teleport，zInd
 
 ## FloatButtonGroup
 
-`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 3/4 props
+`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 3/7 props
 
 | Prop       | Type                 | Default    | Notes                                  |
 | ---------- | -------------------- | ---------- | -------------------------------------- |

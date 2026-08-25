@@ -4,6 +4,11 @@
 
 ## 未发布
 
+## v2.1.1
+
+v2.1.1 patch：v2.1.0 之后的 Pages + source 审查修复（暗色 chrome、受控绑定、overlay 视口、无障碍/行为修复）。本版本无 breaking change。
+
+- **同步 `.size-limit.json` 预算（v2.1.1 实测）**：`Core (full)` 136→140 kB（实测 139.79）、`Vue (full)` 308→315 kB（实测 314.74）、`React (full)` 344→351 kB（实测 350.67）、`React Menu` 33→34 kB（实测 33.14）。
 - **Tooltip / Popover hover 关层加 delay，指针可移入浮层**：默认 hover 的 Tooltip 与 `trigger="hover"` 的 Popover（Vue/React）离开 trigger 后延迟 100ms 再关，并把 trigger + Teleport/portal 浮层当作同一 hover 组；指针穿过默认 8px 间隙进入浮层会取消关闭。Click / Esc / focus / manual 仍立即开关。公开行为修复。无新必填 prop。
 - **CommentThread 内部 liked/likes overlay**：裸 CommentThread（Pages `/comment-thread` 01，无 `@like` / `onLike`）点「点赞 3」变为「已赞 4」/ Like 3 → Liked 4，仍发出 `like` / `onLike`，不改 `nodes`。绑定示例 02 的父级回写仍可用且不重复计数。Vue/React。公开行为修复。无新必填 prop。
 - **RadarChart splitArea 不再用 `var(--tiger-bg,#fff)` 挖洞**：内外环改成 evenodd 透明环路径（`createPolygonRingPath` / `createCircleRingPath`），暗色页不再露出白/薄荷盘。默认 `RADAR_SPLIT_AREA_COLORS` 不再用 `rgba(0,0,0,0.02/0.05)`，改走 `color-mix` + `--tiger-text`（可选 `--tiger-chart-split-*` 覆写），暗色跟主题。Vue/React。公开视觉修复。无新必填 prop。自定义 `splitAreaColors` 未改。
@@ -23,7 +28,7 @@
 - **Collapse 折叠面板 `inert` + `aria-hidden`，extra 点击不再切换**：折叠态内容包装层（`data-tiger-collapse-content`）带 HTML `inert` 与 `aria-hidden="true"`，关闭面板正文离开 a11y / 焦点树；展开时两者都不写。header 内 extra（Pages `/collapse` 03「已更新」）点击 `stopPropagation`，不再切换面板。Vue/React。公开无障碍/行为修复。无新公开 prop。
 - **Menu 默认 `theme="light"` 跟随 `html.dark`**：不再把 `--tiger-surface`（及 `--tiger-text` / `--tiger-text-muted` / `--tiger-border` / `--tiger-surface-muted`）锁成浅色 hex；默认继承页面 token。Pages `/menu` 01/03 暗色跟 surface。显式 `theme="dark"` 仍强制深色 chrome。Vue/React 消费 core helpers。公开视觉/主题 chrome 修复。无新公开 prop。
 - **Message / Alert 暗色 chrome 跟 surface + status**：info/success/warning/error 的 bg fallback 改为已注册 `--tiger-surface`，字/图标走已注册 `--tiger-info` / `--tiger-success` / `--tiger-warning` / `--tiger-error`（或 `--tiger-text`），边框走 `--tiger-border`；Alert description 走 `--tiger-text-secondary`，关闭钮 hover 走 `--tiger-surface-muted`。暗色 Pages `/message` / `/alert` 不再锁浅粉彩卡片。可选 `--tiger-message-*` / `--tiger-alert-*` 仍只作一层覆写，不注册进 `THEME_CSS_VARS`。Vue/React 消费 core maps。公开视觉/主题 chrome 修复。无新公开 prop。
-- **Pages overlay 示例 iframe 加高**：DatePicker / TimePicker / Cascader、Modal / Drawer / Tour、Loading 区域+全屏、Spotlight / Dropdown、CropUpload 的 Vue / React `demo.json` 把 `viewport.minHeight` 提到 560（仍 `mode: auto`，不设冻结 `height`），弹出日历 / 级联列 / 对话框 / 抽屉 / 引导 / Spotlight / 裁剪 Modal 不再困在 120–180px iframe 里。loading/01 内联、loading-bar / message / notification、DemoBlock chrome、sandbox `allow-same-origin`、srcdoc `dark:` 未改。仅示例 / Pages 视觉修复。无公开组件 API 变化，无主题变量变化。
+- **Pages overlay 示例 iframe 加高**：DatePicker / TimePicker / Cascader、Tour、Loading 区域+全屏、Spotlight / Dropdown、CropUpload 的 Vue / React `demo.json` 把 `viewport.minHeight` 提到 560；Modal / Drawer 提到 720（仍 `mode: auto`，不设冻结 `height`），弹出日历 / 级联列 / 对话框 / 抽屉 / 引导 / Spotlight / 裁剪 Modal 不再困在 120–180px iframe 里。loading/01 内联、loading-bar / message / notification、DemoBlock chrome、sandbox `allow-same-origin`、srcdoc `dark:` 未改。仅示例 / Pages 视觉修复。无公开组件 API 变化，无主题变量变化。
 - **ImagePreview 预览图 90vh/90vw 约束，Pages 预览 iframe 加高**：Vue / React 预览 `<img>` 由 `max-w-none` 改为 `max-h-[90vh] max-w-[90vw]`，组图/独立预览不再被裁成无限宽横条。Pages `/image` ImageGroup / ImagePreview 与 `/image-viewer` 示例把 `viewport.minHeight` 提到 560（仍 `mode: auto`，不设冻结 `height`），iframe 底足以放下该 90vh 盒。ImageViewer img 类本就有该约束；工具条未改。公开视觉修复。无主题变量变化，无新公开 prop。
 - **SunburstChart `showLabels` 在弧中点绘制标签**：Vue / React 默认 `showLabels`（true）在每段弧的 `midAngle` 与环中径处绘制 SVG `<text>`，Pages `/sunburst-chart` 外环可见中国/日本/印度等子层名称，不再只有 path。React 不再把 prop 绑成 `_showLabels`。`showLabels={false}` 仍无文字。公开行为修复（死 API 现已生效）。无主题变量变化，无新公开 prop。
 - **React Table `virtual` / `autoVirtual` 滚动盒对齐 Vue**：`height` + `overflow:auto` 只包表体（colgroup/header/body/summary），导出钮与 Pagination 留在外层 wrapper、不进滚动盒。公开行为修复。无主题变量变化，无新公开 prop。
@@ -46,7 +51,7 @@
 - **Splitter `sizes` 解析与初始化 min**：Vue / React 的 `sizes` 现接受像素数字与 `'30%'` / `'200px'` 字符串（经 core `parsePaneSize` / `calculateInitialSizes`）；挂载时对每格 `clampPaneSize(min, max)`，`[30,70]` + `min={100}` 不再是 30px 细条，首次拖拽也不会塌成 `[0,100]`。示例 01–03 改为百分比字符串。Pages `/splitter` 水平/垂直/嵌套展示比例。公开 API 放宽 + 行为修复，无主题变量变化。
 - **ColorPicker rgba/hsla 解析与 showAlpha emit**：`parseColorInput` 现接受 `rgba`/`hsla`（及 `hsl`）；Vue / React 用解析后的 RGB+alpha 画触发色块，不再把 rgba 交给 `hexToRgb`。`showAlpha` 滑条会发出带 alpha 的字符串（`update:modelValue` / `onChange`）。Pages `/color-picker`「代表配置」不再是黑块。公开行为修复，无主题变量变化。
 - **ImagePreview maskClosable 暗区关闭**：Vue / React 把关闭绑到独立 mask 子节点（`imagePreviewMaskClasses` / `aria-hidden`），点击暗区发出 `update:open` false / `onOpenChange(false)`；独立 mask 不再吞掉点击。`maskClosable={false}` 仍不关。Pages `/image` ImageGroup / ImagePreview 暗区可关闭。公开行为修复，无主题变量变化，无新公开 prop。
-- **QRCode 移除未使用的 level**：Vue / React / core 去掉未使用的 `level` prop 与 `QRCodeLevel` 类型；剩余 QRCode 是装饰性哈希矩阵（不可扫描）；Pages `/qrcode` 不再宣传 L/M/Q/H 纠错级别。公开 API 删除，无主题变量变化。
+- **QRCode 移除未使用的 level**：Vue / React / core 去掉未使用的 `level` prop 与 `QRCodeLevel` 类型；剩余 QRCode 是装饰性哈希矩阵（不可扫描）；Pages `/qrcode` 不再宣传 L/M/Q/H 纠错级别。移除从未生效的死 API，调用方若传 `level` 会被忽略，无主题变量变化。
 - **Avatar getInitials 短 token 原样显示**：Vue / React 经 core `getInitials` 对无空格且长度 ≤2 的 `text` 原样（再 `toUpperCase`）显示，`text="TC"` 不再只剩 **T**。Pages `/avatar`「代表外观」方块 logo 与示例一致。公开视觉/行为修复，无主题变量变化。
 - **Rate 半星左半裁剪**：Vue / React 半星层保持 `overflow-hidden` 宽 50%，内部 glyph 使用 `w-[200%] h-full`（core `rateHalfStarInnerClasses`），裁出满宽星的左半而不是把 SVG 压进半宽盒。Pages `/rate` 只读 4.5 第 5 颗星不再变瘦。公开视觉/行为修复，无主题变量变化。
 - **ButtonGroup 子按钮组选择器**：Vue / React 经 core `buttonGroupItemClasses` / `buttonGroupItemVerticalClasses` 把组根上的 `[&:first-child]` 自选择器改为 `[&>*:first-child]` / last / middle（对齐 InputGroup compact），并用 `!` 覆盖 Button 的 `rounded-[var(--tiger-radius-md)]`，相邻按钮共享直边与 `-ml-px` / `-mt-px` 叠缝，不再各自胶囊。公开视觉/行为修复，无主题变量变化。

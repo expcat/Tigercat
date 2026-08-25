@@ -49,6 +49,8 @@ description: Compact generated Tigercat Charts props reference
 | `height?`     | `number`  | `200`   | SVG height                                                  |
 | `responsive?` | `boolean` | `false` | Resize the SVG to its parent container using ResizeObserver |
 
+Events/callback props: `onResolvedSizeChange?`.
+
 ## ChartGrid
 
 `packages/core/src/types/chart-core.ts` · `ChartGridProps` · 3/12 props

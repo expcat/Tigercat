@@ -2,19 +2,19 @@
   {
     "name": "Core (full)",
     "path": "packages/core/dist/index.js",
-    "limit": "136 kB",
+    "limit": "140 kB",
     "gzip": true
   },
   {
     "name": "Vue (full)",
     "path": "packages/vue/dist/index.mjs",
-    "limit": "308 kB",
+    "limit": "315 kB",
     "gzip": true
   },
   {
     "name": "React (full)",
     "path": "packages/react/dist/index.mjs",
-    "limit": "344 kB",
+    "limit": "351 kB",
     "gzip": true
   },
   {
@@ -38,7 +38,7 @@
   {
     "name": "React Menu subpath",
     "path": "packages/react/dist/components/Menu.mjs",
-    "limit": "33 kB",
+    "limit": "34 kB",
     "gzip": true
   },
   {

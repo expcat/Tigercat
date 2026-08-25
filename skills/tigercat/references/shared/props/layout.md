@@ -193,8 +193,8 @@ Note: 内置分页由 Pagination 组件统一渲染：页数大于 3 时自动�
 
 `packages/core/src/types/splitter.ts` · `SplitterProps` · 3/8 props
 
-| Prop         | Type             | Default        | Notes                                                                       |
-| ------------ | ---------------- | -------------- | --------------------------------------------------------------------------- |
-| `direction?` | `SplitDirection` | `'horizontal'` | Direction of the split                                                      |
-| `sizes?`     | `number[]`       | `-`            | Initial sizes of each pane in pixels. If not provided, panes split equally. |
-| `min?`       | `number`         | `0`            | Minimum size of any pane in pixels                                          |
+| Prop         | Type                   | Default        | Notes                                                                                      |
+| ------------ | ---------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `direction?` | `SplitDirection`       | `'horizontal'` | Direction of the split                                                                     |
+| `sizes?`     | `(number \| string)[]` | `-`            | Initial sizes of each pane in pixels or percentage / px strings (`'30%'`, `'200px'`). N... |
+| `min?`       | `number`               | `0`            | Minimum size of any pane in pixels                                                         |

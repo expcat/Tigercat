@@ -33,7 +33,13 @@ export async function openDemo(
     return openDemo(page, baseUrl, route, demoId, attempt + 1)
   }
   await moduleRoot.scrollIntoViewIfNeeded()
-  await expect(moduleRoot.locator('iframe')).toBeVisible({ timeout: 60_000 })
+  try {
+    await expect(moduleRoot.locator('iframe')).toBeVisible({ timeout: 60_000 })
+  } catch (error) {
+    if (attempt >= 2) throw error
+    await page.goto('about:blank')
+    return openDemo(page, baseUrl, route, demoId, attempt + 1)
+  }
   const status = moduleRoot.locator('[aria-live="polite"]')
   await expect(status).toHaveText(/^(ready|compile-error|runtime-error)$/, { timeout: 60_000 })
   const finalStatus = await status.textContent()
@@ -42,7 +48,7 @@ export async function openDemo(
     const detail = diagnostics.join(' | ')
     if (
       attempt < 2 &&
-      /Failed to fetch dynamically imported module: blob:|Importing a module script failed|doesn't provide an export named/i.test(
+      /Failed to fetch dynamically imported module: blob:|error loading dynamically imported module|Importing a module script failed|doesn't provide an export named/i.test(
         detail
       )
     ) {
@@ -51,6 +57,13 @@ export async function openDemo(
     expect(finalStatus, `${demoId}: ${detail}`).toBe('ready')
   }
   return { moduleRoot, preview: moduleRoot.frameLocator('iframe') }
+}
+
+/** Scroll the host page so a tall overlay iframe footer is in the page viewport. */
+export async function revealDemoIframe(moduleRoot: Locator): Promise<void> {
+  await moduleRoot.locator('iframe').evaluate((el: HTMLElement) => {
+    el.scrollIntoView({ block: 'end', inline: 'nearest' })
+  })
 }
 
 /** Fire a paste event with clipboardData. Firefox ignores ClipboardEvent's constructor clipboardData. */

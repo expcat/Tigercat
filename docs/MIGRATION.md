@@ -2,6 +2,11 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+## v2.1.1
+
+v2.1.1 是相对 v2.1.0 的 patch。**没有 breaking change，组件用户无需迁移步骤。**
+本版本是 v2.1.0 之后的审查修复补丁（暗色 chrome、受控绑定、overlay 视口、无障碍/行为修复）。完整条目见 [CHANGELOG.md](../CHANGELOG.md#v211)。
+
 ## v2.1.0
 
 v2.1.0 是相对 v2.0.19 的 minor 发布。**没有 breaking change，组件用户无需迁移步骤。** `@expcat/tigercat-core` / `-vue` / `-react` / `-cli` / `-mcp` 的既有公开 API 保持向后兼容。
