@@ -75,7 +75,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-6 | Cascader / TreeSelect keyboard | done | this commit | 2026-08-25 |
 | P2-7 | Tour mask close + Vue last-step onClose | done | this commit | 2026-08-25 |
 | P2-8 | Table sort keyboard + dataKey | done | this commit | 2026-08-25 |
-| P2-9..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-9 | Gantt drag (wire bar drag to dates) | done | this commit | 2026-08-25 |
+| P2-10..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -874,3 +875,17 @@ Table sort keyboard + `dataKey` (Vue + React):
 - Filter/sort state keys stay `column.key`; no new public Table prop
 
 Next: P2-9 Gantt drag (wire bar drag to dates; row fill `surface-muted`). T1 A0 aliased `--tiger-fill` so the zebra token may already follow surface-muted — do not skip the drag wiring.
+
+## P2-9 notes
+
+Gantt bar drag wires to dates (Vue + React):
+
+- Core `ganttPxToMs` / `shiftGanttTaskDates` / `moveGanttTaskByPx`: pixel delta → local calendar days, duration kept, clamp to min/max; `YYYY-MM-DD` / Date / number kinds preserved
+- Non-disabled bars: pointerdown + `setPointerCapture` / document up; preview `translate(deltaX)`; drop writes overlay + Vue `task-change`/`update:data` + React `onTaskChange`/`onDataChange`
+- Unbound static `data` (Pages `/gantt` 01/02) keeps new dates via `applyGanttTaskDateOverlay` so bar `x` moves without parent write-back
+- Tiny move / 0-day snap still select + `task-click`; real drag does not toggle selectedId
+- No new `draggable` prop; no zoom / resize handles
+
+Row fill / axis tokens: T1 A0 already aliases `--tiger-fill` → `--tiger-surface-muted` and `--tiger-text-muted` → `--tiger-text-secondary`. `ganttRowClasses` stays `fill-[var(--tiger-fill,#f9fafb)]`; last-resort hex not restyled (not a drag blocker).
+
+Next: P2-10 Chart `showTooltip` / `hoverable` (default tooltip without requiring `hoverable`). T1 A0-A10 did not cover Chart tooltip gating, so do not skip.

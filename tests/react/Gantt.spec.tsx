@@ -152,4 +152,117 @@ describe('Gantt', () => {
       expect(container.querySelector('[data-gantt-today="true"]')).toBeInTheDocument()
     })
   })
+
+  describe('bar drag', () => {
+    const dragData: GanttTask[] = [
+      { id: 'design', label: 'Design', start: '2026-01-01', end: '2026-01-05', progress: 40 }
+    ]
+
+    it('moves a bar and emits date changes after a day-scale drag', () => {
+      const onTaskChange = vi.fn()
+      const onDataChange = vi.fn()
+      const onTaskClick = vi.fn()
+      const onSelectedIdChange = vi.fn()
+      const { container, rerender } = render(
+        <Gantt
+          data={dragData}
+          selectable
+          minDate="2026-01-01"
+          maxDate="2026-01-31"
+          onTaskChange={onTaskChange}
+          onDataChange={onDataChange}
+          onTaskClick={onTaskClick}
+          onSelectedIdChange={onSelectedIdChange}
+        />
+      )
+      const bar = container.querySelector('[data-gantt-task-id="design"]') as SVGElement
+      const startX = Number(bar.querySelector('rect')?.getAttribute('x'))
+
+      fireEvent.pointerDown(bar, { pointerId: 1, clientX: 200, button: 0 })
+      fireEvent.pointerMove(document, { pointerId: 1, clientX: 240 })
+      fireEvent.pointerUp(document, { pointerId: 1, clientX: 240 })
+
+      expect(onTaskChange).toHaveBeenCalledTimes(1)
+      expect(onTaskChange.mock.calls[0][0]).toMatchObject({
+        id: 'design',
+        start: '2026-01-03',
+        end: '2026-01-07'
+      })
+      expect(onDataChange.mock.calls[0][0][0].start).toBe('2026-01-03')
+      expect(onTaskClick).not.toHaveBeenCalled()
+      expect(onSelectedIdChange).not.toHaveBeenCalled()
+
+      const movedX = Number(
+        container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x')
+      )
+      expect(movedX).not.toBe(startX)
+
+      rerender(
+        <Gantt
+          data={dragData}
+          selectable
+          minDate="2026-01-01"
+          maxDate="2026-01-31"
+          onTaskChange={onTaskChange}
+          onDataChange={onDataChange}
+        />
+      )
+      expect(
+        Number(container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x'))
+      ).toBe(movedX)
+    })
+
+    it('treats a tiny pointer gesture as a click, not a date change', () => {
+      const onTaskChange = vi.fn()
+      const onDataChange = vi.fn()
+      const onSelectedIdChange = vi.fn()
+      const { container } = render(
+        <Gantt
+          data={dragData}
+          selectable
+          minDate="2026-01-01"
+          maxDate="2026-01-31"
+          onTaskChange={onTaskChange}
+          onDataChange={onDataChange}
+          onSelectedIdChange={onSelectedIdChange}
+        />
+      )
+      const bar = container.querySelector('[data-gantt-task-id="design"]') as SVGElement
+      const startX = Number(bar.querySelector('rect')?.getAttribute('x'))
+
+      fireEvent.pointerDown(bar, { pointerId: 1, clientX: 200, button: 0 })
+      fireEvent.pointerUp(bar, { pointerId: 1, clientX: 201 })
+
+      expect(onDataChange).not.toHaveBeenCalled()
+      expect(onTaskChange).not.toHaveBeenCalled()
+      expect(onSelectedIdChange).toHaveBeenCalledWith('design')
+      expect(Number(bar.querySelector('rect')?.getAttribute('x'))).toBe(startX)
+    })
+
+    it('does not drag a disabled bar', () => {
+      const onTaskChange = vi.fn()
+      const onDataChange = vi.fn()
+      const disabledData: GanttTask[] = [{ ...dragData[0], disabled: true }]
+      const { container } = render(
+        <Gantt
+          data={disabledData}
+          selectable
+          minDate="2026-01-01"
+          maxDate="2026-01-31"
+          onTaskChange={onTaskChange}
+          onDataChange={onDataChange}
+        />
+      )
+      const bar = container.querySelector('[data-gantt-task-id="design"]') as SVGElement
+      const startX = Number(bar.querySelector('rect')?.getAttribute('x'))
+
+      fireEvent.pointerDown(bar, { pointerId: 1, clientX: 200, button: 0 })
+      fireEvent.pointerMove(document, { pointerId: 1, clientX: 240 })
+      fireEvent.pointerUp(document, { pointerId: 1, clientX: 240 })
+
+      expect(onDataChange).not.toHaveBeenCalled()
+      expect(onTaskChange).not.toHaveBeenCalled()
+      expect(Number(bar.querySelector('rect')?.getAttribute('x'))).toBe(startX)
+    })
+  })
 })

@@ -138,4 +138,75 @@ describe('Gantt', () => {
       expect(container.querySelector('[data-gantt-today="true"]')).toBeInTheDocument()
     })
   })
+
+  describe('bar drag', () => {
+    const dragData: GanttTask[] = [
+      { id: 'design', label: 'Design', start: '2026-01-01', end: '2026-01-05', progress: 40 }
+    ]
+    const dragProps = {
+      data: dragData,
+      minDate: '2026-01-01',
+      maxDate: '2026-01-31',
+      selectable: true
+    }
+
+    it('moves a bar and emits date changes after a day-scale drag', async () => {
+      const { container, emitted, rerender } = render(Gantt, { props: dragProps })
+      const bar = container.querySelector('[data-gantt-task-id="design"]') as SVGElement
+      const startX = Number(bar.querySelector('rect')?.getAttribute('x'))
+
+      await fireEvent.pointerDown(bar, { pointerId: 1, clientX: 200, button: 0 })
+      await fireEvent.pointerMove(document, { pointerId: 1, clientX: 240 })
+      await fireEvent.pointerUp(document, { pointerId: 1, clientX: 240 })
+
+      const changed = emitted()['task-change']?.[0]?.[0] as GanttTask
+      expect(changed.id).toBe('design')
+      expect(changed.start).toBe('2026-01-03')
+      expect(changed.end).toBe('2026-01-07')
+      expect(emitted()['update:data']?.[0]?.[0][0].start).toBe('2026-01-03')
+      expect(emitted()['task-click']).toBeUndefined()
+      expect(emitted()['update:selectedId']).toBeUndefined()
+
+      const movedX = Number(
+        container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x')
+      )
+      expect(movedX).not.toBe(startX)
+
+      await rerender(dragProps)
+      expect(
+        Number(container.querySelector('[data-gantt-task-id="design"] rect')?.getAttribute('x'))
+      ).toBe(movedX)
+    })
+
+    it('treats a tiny pointer gesture as a click, not a date change', async () => {
+      const { container, emitted } = render(Gantt, { props: dragProps })
+      const bar = container.querySelector('[data-gantt-task-id="design"]') as SVGElement
+      const startX = Number(bar.querySelector('rect')?.getAttribute('x'))
+
+      await fireEvent.pointerDown(bar, { pointerId: 1, clientX: 200, button: 0 })
+      await fireEvent.pointerUp(bar, { pointerId: 1, clientX: 201 })
+
+      expect(emitted()['update:data']).toBeUndefined()
+      expect(emitted()['task-change']).toBeUndefined()
+      expect(emitted()['update:selectedId']).toEqual([['design']])
+      expect(Number(bar.querySelector('rect')?.getAttribute('x'))).toBe(startX)
+    })
+
+    it('does not drag a disabled bar', async () => {
+      const disabledData: GanttTask[] = [{ ...dragData[0], disabled: true }]
+      const { container, emitted } = render(Gantt, {
+        props: { ...dragProps, data: disabledData }
+      })
+      const bar = container.querySelector('[data-gantt-task-id="design"]') as SVGElement
+      const startX = Number(bar.querySelector('rect')?.getAttribute('x'))
+
+      await fireEvent.pointerDown(bar, { pointerId: 1, clientX: 200, button: 0 })
+      await fireEvent.pointerMove(document, { pointerId: 1, clientX: 240 })
+      await fireEvent.pointerUp(document, { pointerId: 1, clientX: 240 })
+
+      expect(emitted()['update:data']).toBeUndefined()
+      expect(emitted()['task-change']).toBeUndefined()
+      expect(Number(bar.querySelector('rect')?.getAttribute('x'))).toBe(startX)
+    })
+  })
 })

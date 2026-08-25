@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Gantt 拖条改 `start`/`end`（保时长、本地日吸附、夹到 min/max）**：非 disabled 条 pointer 拖动；松手按像素换算日期（`ganttPxToMs` / `shiftGanttTaskDates` / `moveGanttTaskByPx`）。Vue `update:data` + `task-change`；React `onDataChange` + `onTaskChange`。未回写的 `data`（Pages `/gantt` 01/02 静态数组）用内部 overlay 保住新日期，条 `x` 会动。零位移仍走原 click/select。无新 `draggable` prop。行斑马/轴文案未改（A0 已把 `--tiger-fill` / `--tiger-text-muted` 别名到 surface-muted / text-secondary）。Vue/React。公开 API 增补 + 行为修复。
 - **Table 排序键盘可达，`sortData` / `filterTableData` 读 `dataKey`**：可排序表头改为真实 `<button type="button">`（`data-tiger-table-sort`，Tab/Enter/Space），`aria-sort` 仍在 `<th>`；`sortData`（可选第 5 参 `columns`）与 `filterTableData` 按 `dataKey` 否则 `key` 取值，对齐单元格/导出。Vue/React。公开行为修复。无新公开 Table prop。
 - **Tour 有 target 时点遮罩可关，Vue 最后一步也发 `close`**：dimmed mask 改为全屏可点节点（`data-tiger-tour-mask`）并用 clip-path 挖洞露出 target，不再靠 `pointer-events:none` 的 box-shadow spotlight；无 target 的 fallback 与 `step.mask === false` 不变。Vue 最后一步 Finish 在 `finish` 之外兼发 `close`（对齐 React `onClose`）。Vue/React。公开行为修复。无新公开 prop。
 - **Cascader / TreeSelect 非虚拟列表键盘选值，清空钮为 trigger 兄弟**：打开后面板 Arrow/Enter（及 Space）可移动并提交当前项；清空控件改为 combobox trigger 的兄弟 `<button>`（`data-tiger-cascader-clear` / `data-tiger-treeselect-clear`，对齐 Select）。Vue/React。公开无障碍/行为修复。无新公开 prop。

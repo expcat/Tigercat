@@ -98,8 +98,152 @@ export function getGanttTaskAriaLabel(task: GanttTask): string {
   return `${task.label}, ${start} to ${end}${progress}`
 }
 
-export function getGanttTaskClasses(interactive: boolean, selected: boolean): string {
-  return classNames(ganttBarClasses, interactive && 'cursor-pointer', selected && 'drop-shadow-md')
+export function getGanttTaskClasses(
+  interactive: boolean,
+  selected: boolean,
+  movable = false,
+  grabbing = false
+): string {
+  return classNames(
+    ganttBarClasses,
+    grabbing ? 'cursor-grabbing' : movable ? 'cursor-grab' : interactive && 'cursor-pointer',
+    selected && 'drop-shadow-md'
+  )
+}
+
+export interface ShiftGanttTaskDatesOptions {
+  minMs?: number
+  maxMs?: number
+}
+
+export type GanttTimeRange = Pick<GanttLayoutResult, 'minMs' | 'maxMs' | 'timelineWidth'>
+
+export interface GanttTaskDateOverlayEntry {
+  start: GanttDateValue
+  end: GanttDateValue
+  baseStart?: GanttDateValue
+  baseEnd?: GanttDateValue
+}
+
+export function ganttPxToMs(
+  deltaX: number,
+  minMs: number,
+  maxMs: number,
+  timelineWidth: number
+): number {
+  if (!(timelineWidth > 0) || !Number.isFinite(timelineWidth) || !Number.isFinite(deltaX)) return 0
+  const rangeMs = maxMs - minMs
+  if (!Number.isFinite(rangeMs) || rangeMs <= 0) return 0
+  return deltaX * (rangeMs / timelineWidth)
+}
+
+export function ganttDateValuesEqual(a: GanttDateValue, b: GanttDateValue): boolean {
+  if (Object.is(a, b)) return true
+  const aMs = normalizeGanttDate(a)
+  const bMs = normalizeGanttDate(b)
+  return Number.isFinite(aMs) && Number.isFinite(bMs) && aMs === bMs
+}
+
+export function clampGanttDragDeltaX(
+  deltaX: number,
+  barX: number,
+  barWidth: number,
+  taskLabelWidth: number,
+  layoutWidth: number
+): number {
+  if (!Number.isFinite(deltaX)) return 0
+  const minDelta = taskLabelWidth - barX
+  const maxDelta = layoutWidth - barX - barWidth
+  if (!Number.isFinite(minDelta) || !Number.isFinite(maxDelta) || minDelta > maxDelta) {
+    return 0
+  }
+  return Math.min(maxDelta, Math.max(minDelta, deltaX))
+}
+
+export function shiftGanttTaskDates(
+  task: GanttTask,
+  deltaMs: number,
+  options: ShiftGanttTaskDatesOptions = {}
+): GanttTask {
+  const startMs = normalizeGanttDate(task.start)
+  const endMs = normalizeGanttDate(task.end)
+  if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) return { ...task }
+
+  const dayDelta = Math.round((Number.isFinite(deltaMs) ? deltaMs : 0) / DAY_MS)
+  if (dayDelta === 0) {
+    return {
+      ...task,
+      start: cloneGanttDateValue(task.start),
+      end: cloneGanttDateValue(task.end)
+    }
+  }
+
+  let nextStart = addLocalDays(startMs, dayDelta)
+  let nextEnd = addLocalDays(endMs, dayDelta)
+  if (nextEnd.getTime() < nextStart.getTime()) {
+    const swapped = nextStart
+    nextStart = nextEnd
+    nextEnd = swapped
+  }
+
+  const durationMs = nextEnd.getTime() - nextStart.getTime()
+  const minMs = options.minMs
+  const maxMs = options.maxMs
+  const hasMin = minMs !== undefined && Number.isFinite(minMs)
+  const hasMax = maxMs !== undefined && Number.isFinite(maxMs)
+
+  if (hasMin && hasMax && durationMs > (maxMs as number) - (minMs as number)) {
+    nextStart = new Date(minMs as number)
+    nextEnd = new Date((minMs as number) + durationMs)
+  } else {
+    if (hasMin && nextStart.getTime() < (minMs as number)) {
+      nextStart = new Date(minMs as number)
+      nextEnd = new Date((minMs as number) + durationMs)
+    }
+    if (hasMax && nextEnd.getTime() > (maxMs as number)) {
+      nextEnd = new Date(maxMs as number)
+      nextStart = new Date((maxMs as number) - durationMs)
+    }
+    if (hasMin && nextStart.getTime() < (minMs as number)) {
+      nextStart = new Date(minMs as number)
+      nextEnd = new Date((minMs as number) + durationMs)
+    }
+  }
+
+  return {
+    ...task,
+    start: preserveGanttDateValue(task.start, nextStart),
+    end: preserveGanttDateValue(task.end, nextEnd)
+  }
+}
+
+export function moveGanttTaskByPx(
+  task: GanttTask,
+  deltaX: number,
+  range: GanttTimeRange
+): GanttTask {
+  const deltaMs = ganttPxToMs(deltaX, range.minMs, range.maxMs, range.timelineWidth)
+  return shiftGanttTaskDates(task, deltaMs, { minMs: range.minMs, maxMs: range.maxMs })
+}
+
+export function applyGanttTaskDateOverlay(
+  data: GanttTask[],
+  overlay?: ReadonlyMap<string | number, GanttTaskDateOverlayEntry> | null
+): GanttTask[] {
+  if (!overlay || overlay.size === 0) return data
+  return data.map((task) => {
+    const entry = overlay.get(task.id)
+    if (!entry) return task
+    if (
+      entry.baseStart !== undefined &&
+      entry.baseEnd !== undefined &&
+      (!ganttDateValuesEqual(task.start, entry.baseStart) ||
+        !ganttDateValuesEqual(task.end, entry.baseEnd))
+    ) {
+      return task
+    }
+    return { ...task, start: entry.start, end: entry.end }
+  })
 }
 
 export function getGanttDependencyPath(dependency: Omit<GanttLayoutDependency, 'path'>): string {
@@ -300,4 +444,32 @@ function addTick(date: Date, scale: GanttScale): Date {
   else if (scale === 'week') next.setDate(next.getDate() + 7)
   else next.setDate(next.getDate() + 1)
   return next
+}
+
+function isYearMonthDayString(value: unknown): value is string {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+}
+
+function toYearMonthDayString(date: Date): string {
+  const year = date.getFullYear()
+  const month = `${date.getMonth() + 1}`.padStart(2, '0')
+  const day = `${date.getDate()}`.padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function cloneGanttDateValue(value: GanttDateValue): GanttDateValue {
+  return value instanceof Date ? new Date(value.getTime()) : value
+}
+
+function addLocalDays(ms: number, days: number): Date {
+  const date = new Date(ms)
+  date.setDate(date.getDate() + days)
+  return date
+}
+
+function preserveGanttDateValue(original: GanttDateValue, next: Date): GanttDateValue {
+  if (isYearMonthDayString(original)) return toYearMonthDayString(next)
+  if (original instanceof Date) return next
+  if (typeof original === 'number') return next.getTime()
+  return toYearMonthDayString(next)
 }
