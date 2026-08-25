@@ -43,7 +43,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #14 | Avatar getInitials short token | done | this commit | 2026-08-25 |
 | #17 | QRCode drop dead `level` / decorative | done | this commit | 2026-08-25 |
 | #18 | ImagePreview maskClosable mask click | done | this commit | 2026-08-25 |
-| #15–#16, #19–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #28 | ColorPicker 初值/alpha | done | this commit | 2026-08-25 |
+| #15–#16, #19–#27, #29–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -398,3 +399,19 @@ ImagePreview maskClosable closes from the dedicated mask child (Vue + React):
 Pages `/image` ImageGroup / ImagePreview dark area can dismiss. Public behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #28 ColorPicker (`parseColorInput` accepts rgba/hsla; `showAlpha` must emit).
+
+
+## #28 notes
+
+ColorPicker parse + showAlpha emit (Vue + React) via core `parseColorParts` / `parseColorInput`:
+
+- `parseColorInput` accepts hex, `rgb()`/`rgba()`, `hsl()`/`hsla()`; return type stays `string | null`
+- alpha < 1 keeps an alpha-bearing string (`rgba`/`hsla`); hex / opaque rgb/hsl still normalize to `#rrggbb`
+- Vue/React derive RGB from `parseColorParts`, not `hexToRgb(raw)`; seed/sync local `alpha` from explicit `rgba`/`hsla`
+- `showAlpha` slider emits `formatColorString` with rgb/hsl + alpha (`update:modelValue` / `onChange`)
+- hue / presets / typed hex still emit hex; `format` still drives panel preview only
+- examples untouched (already rgba 37 99 235 0.8 + show-alpha + format rgb)
+
+Pages /color-picker representative config is the blue 0.8 swatch, not a black block. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #29 Splitter sizes (examples use real px or wire 30 percent; init also apply min).

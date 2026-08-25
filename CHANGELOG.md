@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **ColorPicker rgba/hsla 解析与 showAlpha emit**：`parseColorInput` 现接受 `rgba`/`hsla`（及 `hsl`）；Vue / React 用解析后的 RGB+alpha 画触发色块，不再把 rgba 交给 `hexToRgb`。`showAlpha` 滑条会发出带 alpha 的字符串（`update:modelValue` / `onChange`）。Pages `/color-picker`「代表配置」不再是黑块。公开行为修复，无主题变量变化。
 - **ImagePreview maskClosable 暗区关闭**：Vue / React 把关闭绑到独立 mask 子节点（`imagePreviewMaskClasses` / `aria-hidden`），点击暗区发出 `update:open` false / `onOpenChange(false)`；独立 mask 不再吞掉点击。`maskClosable={false}` 仍不关。Pages `/image` ImageGroup / ImagePreview 暗区可关闭。公开行为修复，无主题变量变化，无新公开 prop。
 - **QRCode 移除未使用的 level**：Vue / React / core 去掉未使用的 `level` prop 与 `QRCodeLevel` 类型；剩余 QRCode 是装饰性哈希矩阵（不可扫描）；Pages `/qrcode` 不再宣传 L/M/Q/H 纠错级别。公开 API 删除，无主题变量变化。
 - **Avatar getInitials 短 token 原样显示**：Vue / React 经 core `getInitials` 对无空格且长度 ≤2 的 `text` 原样（再 `toUpperCase`）显示，`text="TC"` 不再只剩 **T**。Pages `/avatar`「代表外观」方块 logo 与示例一致。公开视觉/行为修复，无主题变量变化。

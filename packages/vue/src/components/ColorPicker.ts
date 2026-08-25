@@ -6,16 +6,27 @@ import {
   colorPickerPanelClasses,
   colorPickerInputClasses,
   colorPickerPresetClasses,
-  hexToRgb,
   rgbToHex,
   rgbToHsv,
   hsvToRgb,
   formatColorString,
   parseColorInput,
+  parseColorParts,
   classNames,
   coerceClassValue
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
+
+function rgbFromValue(value: string): { r: number; g: number; b: number } {
+  const parts = parseColorParts(value)
+  return parts ? { r: parts.r, g: parts.g, b: parts.b } : { r: 0, g: 0, b: 0 }
+}
+
+function explicitAlphaFromValue(value: string): number | null {
+  if (!/^(rgba|hsla)\(/i.test(value.trim())) return null
+  const parts = parseColorParts(value)
+  return parts ? parts.a : null
+}
 
 export type VueColorPickerProps = InstanceType<typeof ColorPicker>['$props']
 
@@ -32,7 +43,7 @@ export const ColorPicker = defineComponent({
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
     const isOpen = ref(false)
-    const alpha = ref(1)
+    const alpha = ref(explicitAlphaFromValue(props.modelValue) ?? 1)
     const containerRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const panelRef = ref<HTMLElement | null>(null)
@@ -49,9 +60,17 @@ export const ColorPicker = defineComponent({
       onDismiss: closePanel
     })
 
-    const rgb = computed(() => hexToRgb(props.modelValue))
+    const rgb = computed(() => rgbFromValue(props.modelValue))
     // Derive HSV from modelValue
     const hsv = computed(() => rgbToHsv(rgb.value.r, rgb.value.g, rgb.value.b))
+
+    watch(
+      () => props.modelValue,
+      (value) => {
+        const next = explicitAlphaFromValue(value)
+        if (next !== null) alpha.value = next
+      }
+    )
 
     // Value rendered in the panel input / preview, honoring `format` (and `showAlpha`).
     const displayValue = computed(() =>
@@ -96,7 +115,12 @@ export const ColorPicker = defineComponent({
     }
 
     function handleAlphaChange(e: Event) {
-      alpha.value = Number((e.target as HTMLInputElement).value) / 100
+      const nextAlpha = Number((e.target as HTMLInputElement).value) / 100
+      alpha.value = nextAlpha
+      const format = props.format === 'hex' ? 'rgb' : props.format
+      const next = formatColorString(rgb.value.r, rgb.value.g, rgb.value.b, format, nextAlpha)
+      emit('update:modelValue', next)
+      emit('change', next)
     }
 
     function handleHueChange(e: Event) {
@@ -110,10 +134,10 @@ export const ColorPicker = defineComponent({
     function handleInputChange(e: Event) {
       const val = (e.target as HTMLInputElement).value
       inputValue.value = val
-      const hex = parseColorInput(val)
-      if (hex) {
-        emit('update:modelValue', hex)
-        emit('change', hex)
+      const parsed = parseColorInput(val)
+      if (parsed) {
+        emit('update:modelValue', parsed)
+        emit('change', parsed)
       }
     }
 
