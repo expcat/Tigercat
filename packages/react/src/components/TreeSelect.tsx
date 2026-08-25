@@ -28,6 +28,7 @@ import {
   getPickerOptionAria,
   getPickerTriggerKeyAction,
   getPickerNavigationIndex,
+  getPickerOptionId,
   findFirstEnabledIndex,
   classNames,
   icon20ViewBox,
@@ -196,23 +197,22 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       commitActiveIndex(-1)
       return
     }
-    if (!virtual) return
     commitActiveIndex(resolveActiveIndex())
-  }, [isOpen, searchQuery, virtual, commitActiveIndex, resolveActiveIndex])
+  }, [isOpen, searchQuery, commitActiveIndex, resolveActiveIndex])
 
   useLayoutEffect(() => {
-    if (!isOpen || !virtual) return
+    if (!isOpen) return
     const remapped = getTreeSelectVisibleIndex(visibleNodesRef.current, lastActiveKeyRef.current)
     if (remapped >= 0) setActiveIndex(remapped)
     // Flatten identity can change while open (expand/collapse, parent re-render).
     // Re-resolve only on open/searchQuery; remap the previous key instead.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expandedKeys, treeData, isOpen, virtual])
+  }, [expandedKeys, treeData, isOpen])
 
   useLayoutEffect(() => {
-    if (!isOpen || !virtual) return
+    if (!isOpen) return
     alignVirtualScroll(activeIndex)
-  }, [activeIndex, isOpen, virtual, alignVirtualScroll, visibleNodes.length])
+  }, [activeIndex, isOpen, alignVirtualScroll, visibleNodes.length])
 
   function handleVirtualListKeyDown(e: React.KeyboardEvent) {
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Home' && e.key !== 'End') {
@@ -249,14 +249,18 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     else openDropdown()
   }
 
-  function toggleExpand(key: string | number, e: React.MouseEvent) {
-    e.stopPropagation()
+  function toggleExpandKey(key: string | number) {
     setExpandedKeys((prev) => {
       const next = new Set(prev)
       if (next.has(key)) next.delete(key)
       else next.add(key)
       return next
     })
+  }
+
+  function toggleExpand(key: string | number, e: React.MouseEvent) {
+    e.stopPropagation()
+    toggleExpandKey(key)
   }
 
   function isSelected(key: string | number): boolean {
@@ -286,7 +290,58 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     onChange?.(multiple ? [] : (undefined as unknown as TreeSelectValue))
   }
 
+  function handleOpenListKeyDown(e: React.KeyboardEvent, fromSearchInput = false): boolean {
+    const key = e.key
+    if (fromSearchInput && key === ' ') return false
+
+    if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Home' || key === 'End') {
+      e.preventDefault()
+      e.stopPropagation()
+      setActiveIndex((current) => {
+        const next = getPickerNavigationIndex(visibleNodes, current, key, isNodeDisabled)
+        lastActiveKeyRef.current = visibleNodes[next]?.node.key
+        return next
+      })
+      return true
+    }
+
+    if (key === 'Enter' || key === ' ') {
+      e.preventDefault()
+      e.stopPropagation()
+      const item = visibleNodes[activeIndex]
+      if (item && !item.node.disabled) {
+        handleNodeSelect(item.node)
+      }
+      return true
+    }
+
+    if (key === 'ArrowRight') {
+      e.preventDefault()
+      e.stopPropagation()
+      const item = visibleNodes[activeIndex]
+      if (item?.hasChildren && !item.isExpanded) {
+        toggleExpandKey(item.node.key)
+      }
+      return true
+    }
+
+    if (key === 'ArrowLeft') {
+      e.preventDefault()
+      e.stopPropagation()
+      const item = visibleNodes[activeIndex]
+      if (item?.hasChildren && item.isExpanded) {
+        toggleExpandKey(item.node.key)
+      }
+      return true
+    }
+
+    return false
+  }
+
   function handleKeyDown(e: React.KeyboardEvent) {
+    if (disabled) return
+    if (isOpen && handleOpenListKeyDown(e)) return
+
     const action = getPickerTriggerKeyAction(e.key, isOpen)
     if (action === 'none') return
 
@@ -301,16 +356,46 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
     }
   }
 
-  function renderFlatNode(flatNode: FlatTreeSelectNode) {
+  function handleDropdownKeyDown(e: React.KeyboardEvent) {
+    if (e.target instanceof HTMLInputElement) return
+    if (!isOpen) return
+    handleOpenListKeyDown(e)
+  }
+
+  function handleSearchKeyDown(e: React.KeyboardEvent) {
+    switch (e.key) {
+      case ' ':
+        e.stopPropagation()
+        return
+      case 'ArrowDown':
+      case 'ArrowUp':
+      case 'Enter':
+        handleOpenListKeyDown(e, true)
+        return
+      case 'Escape':
+        e.preventDefault()
+        e.stopPropagation()
+        closeDropdown()
+        triggerRef.current?.focus()
+        return
+      default:
+        return
+    }
+  }
+
+  function renderFlatNode(flatNode: FlatTreeSelectNode, index: number) {
     const { node, level, hasChildren, isExpanded } = flatNode
     const selected = isSelected(node.key)
+    const isActive = index === activeIndex
     const indent = level * 20
 
     return (
       <div
         key={String(node.key)}
+        id={getPickerOptionId(listboxId, index)}
+        data-active={isActive || undefined}
         {...getPickerOptionAria({ selected, disabled: !!node.disabled })}
-        className={getTreeSelectNodeClasses(selected, !!node.disabled, size)}
+        className={getTreeSelectNodeClasses(selected || isActive, !!node.disabled, size)}
         style={{ paddingLeft: `${indent + 8}px`, height: virtual ? '100%' : undefined }}
         onClick={(e) => {
           e.stopPropagation()
@@ -341,8 +426,15 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       <button
         ref={triggerRef}
         type="button"
-        className={getTreeSelectTriggerClasses(size, disabled, isOpen)}
-        {...getPickerComboboxAria({ expanded: isOpen, listboxId })}
+        className={classNames(
+          getTreeSelectTriggerClasses(size, disabled, isOpen),
+          showClearButton ? 'pr-14' : undefined
+        )}
+        {...getPickerComboboxAria({
+          expanded: isOpen,
+          listboxId,
+          activeIndex: isOpen ? activeIndex : -1
+        })}
         disabled={disabled}
         onClick={toggleDropdown}
         onKeyDown={handleKeyDown}>
@@ -355,10 +447,13 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
           )}>
           {displayLabel || placeholder}
         </span>
-
-        {showClearButton ? (
-          <span
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--tiger-treeselect-clear,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-treeselect-clear-hover,var(--tiger-text,#111827))]"
+      </button>
+      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center gap-1">
+        {showClearButton && (
+          <button
+            type="button"
+            className="pointer-events-auto inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-treeselect-ring,var(--tiger-primary,#2563eb))] text-[var(--tiger-treeselect-clear,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-treeselect-clear-hover,var(--tiger-text,#111827))]"
+            data-tiger-treeselect-clear=""
             aria-label={resolveLocaleText('Clear selection', mergedLocale?.common?.clearText)}
             onClick={handleClear}>
             <svg
@@ -368,19 +463,23 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
               xmlns="http://www.w3.org/2000/svg">
               <path d={closeSolidIcon20PathD} fillRule="evenodd" clipRule="evenodd" />
             </svg>
-          </span>
-        ) : (
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--tiger-text-muted,#9ca3af)] pointer-events-none">
-            <svg
-              className="w-4 h-4 transition-transform"
-              viewBox={icon20ViewBox}
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg">
-              <path d={chevronDownSolidIcon20PathD} fillRule="evenodd" clipRule="evenodd" />
-            </svg>
-          </span>
+          </button>
         )}
-      </button>
+        <span
+          className={classNames(
+            'inline-flex text-[var(--tiger-text-muted,#9ca3af)]',
+            isOpen && 'rotate-180'
+          )}
+          aria-hidden="true">
+          <svg
+            className="w-4 h-4 transition-transform"
+            viewBox={icon20ViewBox}
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d={chevronDownSolidIcon20PathD} fillRule="evenodd" clipRule="evenodd" />
+          </svg>
+        </span>
+      </span>
 
       {/* Dropdown */}
       {renderOverlayPortal(
@@ -390,7 +489,8 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
             {...getPickerListboxAria({ id: listboxId })}
             className={classNames(getTreeSelectDropdownClasses(virtual), overlay.floatingClasses)}
             style={overlay.floatingStyles}
-            data-positioned={overlay.positioned}>
+            data-positioned={overlay.positioned}
+            onKeyDown={handleDropdownKeyDown}>
             {searchable && (
               <input
                 type="text"
@@ -405,6 +505,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
                   mergedLocale?.common?.searchPlaceholder
                 )}
                 onChange={(e) => updateSearchValue(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
               />
             )}
 
@@ -421,12 +522,12 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
                     height={height}
                     renderItem={({ index }) => {
                       const item = visibleNodes[index]
-                      return item ? renderFlatNode(item) : null
+                      return item ? renderFlatNode(item, index) : null
                     }}
                   />
                 </div>
               ) : (
-                visibleNodes.map((flatNode) => renderFlatNode(flatNode))
+                visibleNodes.map((flatNode, index) => renderFlatNode(flatNode, index))
               )
             ) : (
               <div className={treeSelectEmptyClasses}>

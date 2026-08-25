@@ -23,6 +23,8 @@ import {
   getPickerOptionAria,
   getPickerTriggerKeyAction,
   getPickerNavigationIndex,
+  getPickerOptionId,
+  findFirstEnabledIndex,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -160,6 +162,7 @@ export const Cascader = defineComponent({
   emits: ['update:modelValue', 'update:searchValue', 'change', 'search-change'],
   setup(props, { emit, attrs }) {
     const instanceId = ++cascaderInstanceId
+    const listboxId = `tiger-cascader-listbox-${instanceId}`
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const isOpen = ref(false)
@@ -189,6 +192,7 @@ export const Cascader = defineComponent({
     const searchScrollTop = ref(0)
     const searchScrollEl = ref<HTMLElement | null>(null)
     const searchActiveIndex = ref(-1)
+    const focusedColumnIndex = ref(0)
 
     // Display label based on current value
     const displayLabel = computed(() => {
@@ -254,21 +258,34 @@ export const Cascader = defineComponent({
         columnActiveIndices.value = []
         searchScrollTop.value = 0
         searchActiveIndex.value = -1
+        focusedColumnIndex.value = 0
         activePath.value = props.modelValue ? [...props.modelValue] : []
         updateSearchValue('')
       }
     })
 
     watch(
-      columns,
-      (cols) => {
-        if (!props.virtual || !isOpen.value) return
-        const itemH = getCascaderVirtualItemHeight(props.size)
+      [isOpen, columns],
+      () => {
+        if (!isOpen.value) return
+        const cols = columns.value
         columnActiveIndices.value = cols.map((col, i) => {
           const prev = columnActiveIndices.value[i]
-          if (prev !== undefined && prev >= 0 && prev < col.options.length) return prev
+          if (
+            prev !== undefined &&
+            prev >= 0 &&
+            prev < col.options.length &&
+            !col.options[prev]?.disabled
+          ) {
+            return prev
+          }
           return selectedIndexInColumn(col.options, col.selectedValue)
         })
+        if (focusedColumnIndex.value > cols.length - 1) {
+          focusedColumnIndex.value = Math.max(0, cols.length - 1)
+        }
+        if (!props.virtual) return
+        const itemH = getCascaderVirtualItemHeight(props.size)
         columnScrollTops.value = cols.map((col, i) => {
           const stored = columnScrollTops.value[i]
           if (stored !== undefined) return stored
@@ -330,10 +347,48 @@ export const Cascader = defineComponent({
       isOpen.value = false
     }
 
+    function isOptionDisabled(option: CascaderOption): boolean {
+      return !!option.disabled
+    }
+
+    function getColumnOptionDomId(colIndex: number, optionIndex: number): string {
+      return `${listboxId}-col${colIndex}-opt${optionIndex}`
+    }
+
+    function getCurrentColumnIndex(): number {
+      const last = columns.value.length - 1
+      if (last < 0) return 0
+      const focused = focusedColumnIndex.value
+      if (focused >= 0 && focused <= last) return focused
+      return last
+    }
+
     function setColumnActiveIndex(colIndex: number, index: number) {
       const next = columnActiveIndices.value.slice()
       next[colIndex] = index
       columnActiveIndices.value = next
+    }
+
+    function activateColumnOption(colIndex: number, index: number) {
+      setColumnActiveIndex(colIndex, index)
+      focusedColumnIndex.value = colIndex
+    }
+
+    function resolveColumnActiveIndex(colIndex: number): number {
+      const col = columns.value[colIndex]
+      if (!col) return -1
+      const current = columnActiveIndices.value[colIndex]
+      if (
+        current !== undefined &&
+        current >= 0 &&
+        current < col.options.length &&
+        !col.options[current].disabled
+      ) {
+        return current
+      }
+      const selected = selectedIndexInColumn(col.options, col.selectedValue)
+      if (selected >= 0 && !col.options[selected]?.disabled) return selected
+      return findFirstEnabledIndex(col.options, isOptionDisabled)
     }
 
     function handleOptionClick(option: CascaderOption, level: number) {
@@ -347,7 +402,7 @@ export const Cascader = defineComponent({
       newPath.push(option.value)
       activePath.value = newPath
       if (optionIndex !== undefined && optionIndex >= 0) {
-        setColumnActiveIndex(level, optionIndex)
+        activateColumnOption(level, optionIndex)
       }
 
       const hasChildren = isCascaderOptionExpandable(option)
@@ -369,7 +424,7 @@ export const Cascader = defineComponent({
         (item) => item.value === option.value
       )
       if (optionIndex !== undefined && optionIndex >= 0 && !option.disabled) {
-        setColumnActiveIndex(level, optionIndex)
+        activateColumnOption(level, optionIndex)
       }
       if (props.expandTrigger !== 'hover' || option.disabled) return
 
@@ -457,8 +512,109 @@ export const Cascader = defineComponent({
       )
     }
 
-    // Keyboard navigation
+    function commitActiveOption() {
+      if (isSearchMode.value) {
+        const item = searchResults.value[searchActiveIndex.value]
+        if (!item || item.disabled) return
+        handleSearchResultClick(item.valuePath, item.disabled)
+        return
+      }
+
+      const colIndex = getCurrentColumnIndex()
+      const col = columns.value[colIndex]
+      const idx = columnActiveIndices.value[colIndex] ?? -1
+      const option = col?.options[idx]
+      if (!option || option.disabled) return
+      handleOptionClick(option, colIndex)
+      if (isCascaderOptionExpandable(option)) {
+        nextTick(() => {
+          const nextCol = colIndex + 1
+          if (!columns.value[nextCol]) return
+          activateColumnOption(nextCol, resolveColumnActiveIndex(nextCol))
+        })
+      }
+    }
+
+    function handleOpenListKeyDown(e: KeyboardEvent, fromSearchInput = false): boolean {
+      const key = e.key
+      if (fromSearchInput && key === ' ') return false
+
+      if (isSearchMode.value) {
+        if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Home' || key === 'End') {
+          e.preventDefault()
+          e.stopPropagation()
+          searchActiveIndex.value = getPickerNavigationIndex(
+            searchResults.value,
+            searchActiveIndex.value,
+            key,
+            (item) => !!item.disabled
+          )
+          return true
+        }
+        if (key === 'Enter' || key === ' ') {
+          e.preventDefault()
+          e.stopPropagation()
+          commitActiveOption()
+          return true
+        }
+        return false
+      }
+
+      const colIndex = getCurrentColumnIndex()
+      const col = columns.value[colIndex]
+      if (!col) return false
+
+      if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Home' || key === 'End') {
+        e.preventDefault()
+        e.stopPropagation()
+        const current = columnActiveIndices.value[colIndex] ?? -1
+        const next = getPickerNavigationIndex(col.options, current, key, isOptionDisabled)
+        activateColumnOption(colIndex, next)
+        return true
+      }
+
+      if (key === 'ArrowRight') {
+        e.preventDefault()
+        e.stopPropagation()
+        const idx = columnActiveIndices.value[colIndex] ?? -1
+        const option = col.options[idx]
+        if (option && !option.disabled && isCascaderOptionExpandable(option)) {
+          handleOptionClick(option, colIndex)
+          nextTick(() => {
+            const nextCol = colIndex + 1
+            if (!columns.value[nextCol]) return
+            activateColumnOption(nextCol, resolveColumnActiveIndex(nextCol))
+          })
+        }
+        return true
+      }
+
+      if (key === 'ArrowLeft') {
+        e.preventDefault()
+        e.stopPropagation()
+        if (activePath.value.length > 0) {
+          activePath.value = activePath.value.slice(0, -1)
+          nextTick(() => {
+            focusedColumnIndex.value = Math.max(0, Math.min(colIndex - 1, columns.value.length - 1))
+          })
+        }
+        return true
+      }
+
+      if (key === 'Enter' || key === ' ') {
+        e.preventDefault()
+        e.stopPropagation()
+        commitActiveOption()
+        return true
+      }
+
+      return false
+    }
+
     function handleTriggerKeyDown(e: KeyboardEvent) {
+      if (props.disabled) return
+      if (isOpen.value && handleOpenListKeyDown(e)) return
+
       const action = getPickerTriggerKeyAction(e.key, isOpen.value)
       if (action === 'none') return
 
@@ -472,39 +628,85 @@ export const Cascader = defineComponent({
       }
     }
 
+    function handleDropdownKeyDown(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement) return
+      if (!isOpen.value) return
+      handleOpenListKeyDown(e)
+    }
+
+    function handleSearchKeyDown(e: KeyboardEvent) {
+      switch (e.key) {
+        case ' ':
+          e.stopPropagation()
+          return
+        case 'ArrowDown':
+        case 'ArrowUp':
+        case 'Enter':
+          handleOpenListKeyDown(e, true)
+          return
+        case 'Escape':
+          e.preventDefault()
+          e.stopPropagation()
+          closeDropdown()
+          nextTick(() => {
+            ;(triggerRef.value as HTMLButtonElement | null)?.focus()
+          })
+          return
+        default:
+          return
+      }
+    }
+
     return () => {
       const hasValue = props.modelValue && props.modelValue.length > 0
       const showClear = props.clearable && hasValue && !props.disabled
-      const listboxId = `tiger-cascader-listbox-${instanceId}`
+      const currentCol = getCurrentColumnIndex()
+      const currentOpt = columnActiveIndices.value[currentCol] ?? -1
+      const activeOptionId = !isOpen.value
+        ? undefined
+        : isSearchMode.value
+          ? searchActiveIndex.value >= 0
+            ? getPickerOptionId(listboxId, searchActiveIndex.value)
+            : undefined
+          : currentOpt >= 0
+            ? getColumnOptionDomId(currentCol, currentOpt)
+            : undefined
 
-      // Build chevron down icon
       const chevronIcon = h(
-        'svg',
+        'span',
         {
-          class: classNames(
-            'w-5 h-5 text-[var(--tiger-cascader-icon,var(--tiger-text-muted,#9ca3af))] transition-transform',
-            isOpen.value && 'rotate-180'
-          ),
-          xmlns: 'http://www.w3.org/2000/svg',
-          viewBox: icon20ViewBox,
-          fill: 'currentColor'
+          class: classNames('inline-flex', isOpen.value && 'rotate-180'),
+          'aria-hidden': 'true'
         },
         [
-          h('path', {
-            'fill-rule': 'evenodd',
-            d: chevronDownSolidIcon20PathD,
-            'clip-rule': 'evenodd'
-          })
+          h(
+            'svg',
+            {
+              class:
+                'w-5 h-5 text-[var(--tiger-cascader-icon,var(--tiger-text-muted,#9ca3af))] transition-transform',
+              xmlns: 'http://www.w3.org/2000/svg',
+              viewBox: icon20ViewBox,
+              fill: 'currentColor'
+            },
+            [
+              h('path', {
+                'fill-rule': 'evenodd',
+                d: chevronDownSolidIcon20PathD,
+                'clip-rule': 'evenodd'
+              })
+            ]
+          )
         ]
       )
 
-      // Build clear icon
-      const clearIcon = showClear
+      const clearButton = showClear
         ? h(
-            'span',
+            'button',
             {
-              class: 'flex items-center',
-              role: 'button',
+              type: 'button',
+              class:
+                'pointer-events-auto inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-cascader-ring,var(--tiger-primary,#2563eb))]',
+              'data-tiger-cascader-clear': '',
               'aria-label': resolveLocaleText(
                 'Clear selection',
                 mergedLocale.value?.common?.clearText
@@ -533,15 +735,18 @@ export const Cascader = defineComponent({
           )
         : null
 
-      // Trigger button
       const trigger = h(
         'button',
         {
           ref: triggerRef,
           type: 'button',
-          class: triggerClasses.value,
+          class: classNames(triggerClasses.value, showClear ? 'pr-14' : 'pr-9'),
           disabled: props.disabled,
-          ...getPickerComboboxAria({ expanded: isOpen.value, listboxId }),
+          ...getPickerComboboxAria({
+            expanded: isOpen.value,
+            listboxId,
+            activeOptionId
+          }),
           onClick: toggleOpen,
           onKeydown: handleTriggerKeyDown
         },
@@ -556,9 +761,14 @@ export const Cascader = defineComponent({
               )
             },
             hasValue ? displayLabel.value : props.placeholder
-          ),
-          h('span', { class: 'flex items-center gap-1' }, [clearIcon, chevronIcon])
+          )
         ]
+      )
+
+      const iconRow = h(
+        'span',
+        { class: 'pointer-events-none absolute inset-y-0 right-3 flex items-center gap-1' },
+        [clearButton, chevronIcon]
       )
 
       // Dropdown content
@@ -580,6 +790,7 @@ export const Cascader = defineComponent({
               ),
               value: searchQuery.value,
               onInput: handleSearchInput,
+              onKeydown: handleSearchKeyDown,
               'aria-label': resolveLocaleText(
                 'Search options',
                 mergedLocale.value?.common?.searchPlaceholder
@@ -603,14 +814,19 @@ export const Cascader = defineComponent({
               )
             )
           } else {
-            const renderSearchItem = (item: CascaderFlattenedOption, index: number) =>
-              h(
+            const renderSearchItem = (item: CascaderFlattenedOption, index: number) => {
+              const isActive = searchActiveIndex.value === index
+              return h(
                 'div',
                 {
                   key: item.valuePath.join(','),
+                  id: getPickerOptionId(listboxId, index),
                   'data-option-index': index,
+                  'data-active': isActive || undefined,
                   class: classNames(
                     cascaderSearchResultClasses,
+                    isActive &&
+                      'bg-[var(--tiger-cascader-option-bg-selected,var(--tiger-outline-bg-hover,#eff6ff))]',
                     item.disabled && 'opacity-50 cursor-not-allowed'
                   ),
                   ...getPickerOptionAria({
@@ -626,6 +842,7 @@ export const Cascader = defineComponent({
                   ? props.searchable.render(searchQuery.value, item.path)
                   : item.label
               )
+            }
 
             const searchList = props.virtual
               ? renderVirtualWindow(
@@ -667,14 +884,21 @@ export const Cascader = defineComponent({
             optionIndex: number
           ) => {
             const isSelected = col.selectedValue === option.value
+            const isActive = (columnActiveIndices.value[colIndex] ?? -1) === optionIndex
             const hasChildren = isCascaderOptionExpandable(option)
 
             return h(
               'div',
               {
                 key: option.value,
+                id: getColumnOptionDomId(colIndex, optionIndex),
                 'data-option-index': optionIndex,
-                class: getCascaderOptionClasses(isSelected, !!option.disabled, props.size),
+                'data-active': isActive || undefined,
+                class: getCascaderOptionClasses(
+                  isSelected || isActive,
+                  !!option.disabled,
+                  props.size
+                ),
                 ...getPickerOptionAria({ selected: isSelected, disabled: !!option.disabled }),
                 onClick: () => handleOptionClick(option, colIndex),
                 onMouseenter: () => handleOptionHover(option, colIndex)
@@ -744,7 +968,8 @@ export const Cascader = defineComponent({
               overlay.floatingClasses.value
             ),
             style: overlay.floatingStyles.value,
-            'data-positioned': overlay.positioned.value
+            'data-positioned': overlay.positioned.value,
+            onKeydown: handleDropdownKeyDown
           },
           children
         )
@@ -756,7 +981,7 @@ export const Cascader = defineComponent({
           class: cascaderBaseClasses,
           'data-testid': 'cascader'
         },
-        [trigger, renderVueOverlayTeleport(dropdownContent, overlay.target.value)]
+        [trigger, iconRow, renderVueOverlayTeleport(dropdownContent, overlay.target.value)]
       )
     }
   }

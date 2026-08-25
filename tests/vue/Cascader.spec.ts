@@ -128,6 +128,22 @@ describe('Cascader', () => {
 
       expect(emitted()['update:modelValue'][0]).toEqual([[]])
     })
+
+    it('renders clear as a sibling button of the combobox trigger', () => {
+      const { container } = render(Cascader, {
+        props: {
+          options: simpleOptions,
+          modelValue: ['zhejiang', 'hangzhou'],
+          clearable: true
+        }
+      })
+
+      const trigger = container.querySelector('[role="combobox"]')!
+      const clearBtn = container.querySelector('[data-tiger-cascader-clear]')
+      expect(clearBtn).toBeTruthy()
+      expect(clearBtn?.tagName).toBe('BUTTON')
+      expect(trigger.contains(clearBtn)).toBe(false)
+    })
   })
 
   describe('Search', () => {
@@ -225,6 +241,42 @@ describe('Cascader', () => {
       await fireEvent.keyDown(trigger, { key: 'Enter' })
 
       expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
+    })
+
+    it('moves and commits with ArrowDown and Enter on a non-virtual list', async () => {
+      const { container, getByText, emitted } = render(Cascader, {
+        props: { options: simpleOptions }
+      })
+
+      const trigger = container.querySelector('button')!
+      await fireEvent.click(trigger)
+      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+      await fireEvent.keyDown(trigger, { key: 'Enter' })
+
+      expect(getByText('Hangzhou')).toBeInTheDocument()
+      expect(getByText('Ningbo')).toBeInTheDocument()
+
+      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+      await fireEvent.keyDown(trigger, { key: 'Enter' })
+
+      expect(emitted()['update:modelValue'][0]).toEqual([['zhejiang', 'ningbo']])
+      expect(emitted()['change'][0]).toEqual([['zhejiang', 'ningbo']])
+    })
+
+    it('skips disabled options when moving with ArrowDown', async () => {
+      const { container } = render(Cascader, {
+        props: { options: optionsWithDisabled }
+      })
+
+      const trigger = container.querySelector('button')!
+      await fireEvent.click(trigger)
+      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+
+      const activeId = trigger.getAttribute('aria-activedescendant')
+      expect(activeId).toBeTruthy()
+      const activeEl = document.getElementById(activeId!)
+      expect(activeEl?.textContent).toContain('Active')
+      expect(activeEl?.textContent).not.toContain('Disabled')
     })
 
     it('should close on Escape key', async () => {

@@ -23,6 +23,8 @@ import {
   getPickerOptionAria,
   getPickerTriggerKeyAction,
   getPickerNavigationIndex,
+  getPickerOptionId,
+  findFirstEnabledIndex,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -221,6 +223,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
   const [activePath, setActivePath] = useState<CascaderValue>([])
   const [columnActiveIndices, setColumnActiveIndices] = useState<number[]>([])
   const [searchActiveIndex, setSearchActiveIndex] = useState(-1)
+  const [focusedColumnIndex, setFocusedColumnIndex] = useState(0)
   const [indexedSearchQuery, setIndexedSearchQuery] = useState(searchQuery)
   if (indexedSearchQuery !== searchQuery) {
     setIndexedSearchQuery(searchQuery)
@@ -284,6 +287,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
       wasOpenRef.current = false
       setColumnActiveIndices([])
       setSearchActiveIndex(-1)
+      setFocusedColumnIndex(0)
       return
     }
     if (wasOpenRef.current) return
@@ -294,16 +298,26 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
   }, [isOpen, updateSearchValue, value])
 
   useEffect(() => {
-    if (!virtual || !isOpen) return
+    if (!isOpen) return
     setColumnActiveIndices((prev) =>
       columns.map((col, i) => {
-        if (prev[i] !== undefined && prev[i] >= 0 && prev[i] < col.options.length) {
+        if (
+          prev[i] !== undefined &&
+          prev[i] >= 0 &&
+          prev[i] < col.options.length &&
+          !col.options[prev[i]]?.disabled
+        ) {
           return prev[i]
         }
         return selectedIndexInColumn(col.options, col.selectedValue)
       })
     )
-  }, [virtual, isOpen, columns])
+    setFocusedColumnIndex((prev) => {
+      const last = columns.length - 1
+      if (last < 0) return 0
+      return prev > last ? last : prev
+    })
+  }, [isOpen, columns])
 
   const toggleOpen = useCallback(() => {
     if (disabled) return
@@ -324,6 +338,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
           next[level] = optionIndex
           return next
         })
+        setFocusedColumnIndex(level)
       }
 
       const hasChildren = isCascaderOptionExpandable(option)
@@ -347,6 +362,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
           next[level] = optionIndex
           return next
         })
+        setFocusedColumnIndex(level)
       }
       if (expandTrigger !== 'hover' || option.disabled) return
 
@@ -374,8 +390,156 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
     [onChange]
   )
 
+  const isOptionDisabled = useCallback((option: CascaderOption) => !!option.disabled, [])
+
+  const getColumnOptionDomId = useCallback(
+    (colIndex: number, optionIndex: number) => `${listboxId}-col${colIndex}-opt${optionIndex}`,
+    [listboxId]
+  )
+
+  const getCurrentColumnIndex = useCallback(() => {
+    const last = columns.length - 1
+    if (last < 0) return 0
+    if (focusedColumnIndex >= 0 && focusedColumnIndex <= last) return focusedColumnIndex
+    return last
+  }, [columns.length, focusedColumnIndex])
+
+  const commitActiveOption = useCallback(() => {
+    if (isSearchMode) {
+      const item = searchResults[searchActiveIndex]
+      if (!item || item.disabled) return
+      handleSearchResultClick(item.valuePath, item.disabled)
+      return
+    }
+
+    const colIndex = getCurrentColumnIndex()
+    const col = columns[colIndex]
+    const idx = columnActiveIndices[colIndex] ?? -1
+    const option = col?.options[idx]
+    if (!option || option.disabled) return
+    handleOptionClick(option, colIndex)
+    if (isCascaderOptionExpandable(option)) {
+      const nextCol = colIndex + 1
+      const childOptions = option.children ?? []
+      const nextIdx = findFirstEnabledIndex(childOptions, isOptionDisabled)
+      setColumnActiveIndices((prev) => {
+        const next = prev.slice()
+        next[colIndex] = idx
+        next[nextCol] = nextIdx
+        return next
+      })
+      setFocusedColumnIndex(nextCol)
+    }
+  }, [
+    isSearchMode,
+    searchResults,
+    searchActiveIndex,
+    handleSearchResultClick,
+    getCurrentColumnIndex,
+    columns,
+    columnActiveIndices,
+    handleOptionClick,
+    isOptionDisabled
+  ])
+
+  const handleOpenListKeyDown = useCallback(
+    (e: React.KeyboardEvent, fromSearchInput = false): boolean => {
+      const key = e.key
+      if (fromSearchInput && key === ' ') return false
+
+      if (isSearchMode) {
+        if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Home' || key === 'End') {
+          e.preventDefault()
+          e.stopPropagation()
+          setSearchActiveIndex((current) =>
+            getPickerNavigationIndex(searchResults, current, key, (item) => !!item.disabled)
+          )
+          return true
+        }
+        if (key === 'Enter' || key === ' ') {
+          e.preventDefault()
+          e.stopPropagation()
+          commitActiveOption()
+          return true
+        }
+        return false
+      }
+
+      const colIndex = getCurrentColumnIndex()
+      const col = columns[colIndex]
+      if (!col) return false
+
+      if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Home' || key === 'End') {
+        e.preventDefault()
+        e.stopPropagation()
+        const current = columnActiveIndices[colIndex] ?? -1
+        const next = getPickerNavigationIndex(col.options, current, key, isOptionDisabled)
+        setColumnActiveIndices((prev) => {
+          const nextIndices = prev.slice()
+          nextIndices[colIndex] = next
+          return nextIndices
+        })
+        setFocusedColumnIndex(colIndex)
+        return true
+      }
+
+      if (key === 'ArrowRight') {
+        e.preventDefault()
+        e.stopPropagation()
+        const idx = columnActiveIndices[colIndex] ?? -1
+        const option = col.options[idx]
+        if (option && !option.disabled && isCascaderOptionExpandable(option)) {
+          handleOptionClick(option, colIndex)
+          const childOptions = option.children ?? []
+          const nextIdx = findFirstEnabledIndex(childOptions, isOptionDisabled)
+          setColumnActiveIndices((prev) => {
+            const next = prev.slice()
+            next[colIndex] = idx
+            next[colIndex + 1] = nextIdx
+            return next
+          })
+          setFocusedColumnIndex(colIndex + 1)
+        }
+        return true
+      }
+
+      if (key === 'ArrowLeft') {
+        e.preventDefault()
+        e.stopPropagation()
+        if (activePath.length > 0) {
+          setActivePath(activePath.slice(0, -1))
+          setFocusedColumnIndex(Math.max(0, colIndex - 1))
+        }
+        return true
+      }
+
+      if (key === 'Enter' || key === ' ') {
+        e.preventDefault()
+        e.stopPropagation()
+        commitActiveOption()
+        return true
+      }
+
+      return false
+    },
+    [
+      isSearchMode,
+      searchResults,
+      commitActiveOption,
+      getCurrentColumnIndex,
+      columns,
+      columnActiveIndices,
+      isOptionDisabled,
+      handleOptionClick,
+      activePath
+    ]
+  )
+
   const handleTriggerKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      if (disabled) return
+      if (isOpen && handleOpenListKeyDown(e)) return
+
       const action = getPickerTriggerKeyAction(e.key, isOpen)
       if (action === 'none') return
 
@@ -388,21 +552,64 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
         setIsOpen(false)
       }
     },
-    [toggleOpen, isOpen]
+    [disabled, isOpen, handleOpenListKeyDown, toggleOpen]
+  )
+
+  const handleDropdownKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement) return
+      if (!isOpen) return
+      handleOpenListKeyDown(e)
+    },
+    [isOpen, handleOpenListKeyDown]
+  )
+
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      switch (e.key) {
+        case ' ':
+          e.stopPropagation()
+          return
+        case 'ArrowDown':
+        case 'ArrowUp':
+        case 'Enter':
+          handleOpenListKeyDown(e, true)
+          return
+        case 'Escape':
+          e.preventDefault()
+          e.stopPropagation()
+          setIsOpen(false)
+          triggerRef.current?.focus()
+          return
+        default:
+          return
+      }
+    },
+    [handleOpenListKeyDown]
   )
 
   const hasValue = value && value.length > 0
   const showClearBtn = clearable && hasValue && !disabled
+  const currentCol = getCurrentColumnIndex()
+  const currentOpt = columnActiveIndices[currentCol] ?? -1
+  const activeOptionId = !isOpen
+    ? undefined
+    : isSearchMode
+      ? searchActiveIndex >= 0
+        ? getPickerOptionId(listboxId, searchActiveIndex)
+        : undefined
+      : currentOpt >= 0
+        ? getColumnOptionDomId(currentCol, currentOpt)
+        : undefined
 
   return (
     <div className={cascaderBaseClasses} data-testid="cascader" {...divProps}>
-      {/* Trigger */}
       <button
         ref={triggerRef}
         type="button"
-        className={triggerClasses}
+        className={classNames(triggerClasses, showClearBtn ? 'pr-14' : 'pr-9')}
         disabled={disabled}
-        {...getPickerComboboxAria({ expanded: isOpen, listboxId })}
+        {...getPickerComboboxAria({ expanded: isOpen, listboxId, activeOptionId })}
         onClick={toggleOpen}
         onKeyDown={handleTriggerKeyDown}>
         <span
@@ -412,34 +619,34 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
           )}>
           {hasValue ? displayLabel : placeholder}
         </span>
-        <span className="flex items-center gap-1">
-          {showClearBtn && (
-            <span
-              className="flex items-center"
-              role="button"
-              aria-label={resolveLocaleText('Clear selection', mergedLocale?.common?.clearText)}
-              onClick={handleClear}>
-              <svg
-                className="w-4 h-4 text-[var(--tiger-cascader-icon,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-cascader-icon-hover,var(--tiger-text-muted,#6b7280))]"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox={icon20ViewBox}
-                fill="currentColor">
-                <path fillRule="evenodd" d={closeSolidIcon20PathD} clipRule="evenodd" />
-              </svg>
-            </span>
-          )}
+      </button>
+      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center gap-1">
+        {showClearBtn && (
+          <button
+            type="button"
+            className="pointer-events-auto inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-cascader-ring,var(--tiger-primary,#2563eb))]"
+            data-tiger-cascader-clear=""
+            aria-label={resolveLocaleText('Clear selection', mergedLocale?.common?.clearText)}
+            onClick={handleClear}>
+            <svg
+              className="w-4 h-4 text-[var(--tiger-cascader-icon,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-cascader-icon-hover,var(--tiger-text-muted,#6b7280))]"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox={icon20ViewBox}
+              fill="currentColor">
+              <path fillRule="evenodd" d={closeSolidIcon20PathD} clipRule="evenodd" />
+            </svg>
+          </button>
+        )}
+        <span className={classNames('inline-flex', isOpen && 'rotate-180')} aria-hidden="true">
           <svg
-            className={classNames(
-              'w-5 h-5 text-[var(--tiger-cascader-icon,var(--tiger-text-muted,#9ca3af))] transition-transform',
-              isOpen && 'rotate-180'
-            )}
+            className="w-5 h-5 text-[var(--tiger-cascader-icon,var(--tiger-text-muted,#9ca3af))] transition-transform"
             xmlns="http://www.w3.org/2000/svg"
             viewBox={icon20ViewBox}
             fill="currentColor">
             <path fillRule="evenodd" d={chevronDownSolidIcon20PathD} clipRule="evenodd" />
           </svg>
         </span>
-      </button>
+      </span>
 
       {/* Dropdown */}
       {renderOverlayPortal(
@@ -452,7 +659,8 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
               overlay.floatingClasses
             )}
             style={overlay.floatingStyles}
-            data-positioned={overlay.positioned}>
+            data-positioned={overlay.positioned}
+            onKeyDown={handleDropdownKeyDown}>
             {/* Search input */}
             {searchable && (
               <input
@@ -464,6 +672,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                 )}
                 value={searchQuery}
                 onChange={(e) => updateSearchValue(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
                 aria-label={resolveLocaleText(
                   'Search options',
                   mergedLocale?.common?.searchPlaceholder
@@ -493,9 +702,13 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                   renderItem={(item: CascaderFlattenedOption, index) => (
                     <div
                       key={item.valuePath.join(',')}
+                      id={getPickerOptionId(listboxId, index)}
                       data-option-index={index}
+                      data-active={searchActiveIndex === index || undefined}
                       className={classNames(
                         cascaderSearchResultClasses,
+                        searchActiveIndex === index &&
+                          'bg-[var(--tiger-cascader-option-bg-selected,var(--tiger-outline-bg-hover,#eff6ff))]',
                         item.disabled && 'opacity-50 cursor-not-allowed'
                       )}
                       {...getPickerOptionAria({
@@ -519,15 +732,22 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                   {searchResults.map((item, index) => (
                     <div
                       key={item.valuePath.join(',')}
+                      id={getPickerOptionId(listboxId, index)}
                       data-option-index={index}
+                      data-active={searchActiveIndex === index || undefined}
                       className={classNames(
                         cascaderSearchResultClasses,
+                        searchActiveIndex === index &&
+                          'bg-[var(--tiger-cascader-option-bg-selected,var(--tiger-outline-bg-hover,#eff6ff))]',
                         item.disabled && 'opacity-50 cursor-not-allowed'
                       )}
                       {...getPickerOptionAria({
                         selected: value?.join(',') === item.valuePath.join(','),
                         disabled: item.disabled
                       })}
+                      onMouseEnter={() => {
+                        if (!item.disabled) setSearchActiveIndex(index)
+                      }}
                       onClick={() => handleSearchResultClick(item.valuePath, item.disabled)}>
                       {typeof searchable === 'object' && searchable.render
                         ? searchable.render(searchQuery, item.path)
@@ -546,13 +766,20 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                   })
                   const renderColumnOption = (option: CascaderOption, optionIndex: number) => {
                     const isSelected = col.selectedValue === option.value
+                    const isActive = (columnActiveIndices[colIndex] ?? -1) === optionIndex
                     const hasChildren = isCascaderOptionExpandable(option)
 
                     return (
                       <div
                         key={option.value}
+                        id={getColumnOptionDomId(colIndex, optionIndex)}
                         data-option-index={optionIndex}
-                        className={getCascaderOptionClasses(isSelected, !!option.disabled, size)}
+                        data-active={isActive || undefined}
+                        className={getCascaderOptionClasses(
+                          isSelected || isActive,
+                          !!option.disabled,
+                          size
+                        )}
                         {...getPickerOptionAria({
                           selected: isSelected,
                           disabled: !!option.disabled

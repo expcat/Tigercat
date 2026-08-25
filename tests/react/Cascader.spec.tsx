@@ -119,6 +119,18 @@ describe('Cascader', () => {
 
       expect(onChange).toHaveBeenCalledWith([])
     })
+
+    it('renders clear as a sibling button of the combobox trigger', () => {
+      const { container } = render(
+        <Cascader options={simpleOptions} value={['zhejiang', 'hangzhou']} clearable />
+      )
+
+      const trigger = container.querySelector('[role="combobox"]')!
+      const clearBtn = container.querySelector('[data-tiger-cascader-clear]')
+      expect(clearBtn).toBeTruthy()
+      expect(clearBtn?.tagName).toBe('BUTTON')
+      expect(trigger.contains(clearBtn)).toBe(false)
+    })
   })
 
   describe('Search', () => {
@@ -236,6 +248,40 @@ describe('Cascader', () => {
       fireEvent.keyDown(trigger, { key: 'Enter' })
 
       expect(document.body.querySelector('[role="listbox"]')).toBeInTheDocument()
+    })
+
+    it('moves and commits with ArrowDown and Enter on a non-virtual list', () => {
+      const onChange = vi.fn()
+      const { container, getByText } = render(
+        <Cascader options={simpleOptions} onChange={onChange} />
+      )
+
+      const trigger = container.querySelector('button')!
+      fireEvent.click(trigger)
+      fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+      fireEvent.keyDown(trigger, { key: 'Enter' })
+
+      expect(getByText('Hangzhou')).toBeInTheDocument()
+      expect(getByText('Ningbo')).toBeInTheDocument()
+
+      fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+      fireEvent.keyDown(trigger, { key: 'Enter' })
+
+      expect(onChange).toHaveBeenCalledWith(['zhejiang', 'ningbo'])
+    })
+
+    it('skips disabled options when moving with ArrowDown', () => {
+      const { container } = render(<Cascader options={optionsWithDisabled} />)
+
+      const trigger = container.querySelector('button')!
+      fireEvent.click(trigger)
+      fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+
+      const activeId = trigger.getAttribute('aria-activedescendant')
+      expect(activeId).toBeTruthy()
+      const activeEl = document.getElementById(activeId!)
+      expect(activeEl?.textContent).toContain('Active')
+      expect(activeEl?.textContent).not.toContain('Disabled')
     })
 
     it('should close on Escape key', async () => {

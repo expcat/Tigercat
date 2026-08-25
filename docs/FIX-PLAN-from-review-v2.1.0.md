@@ -72,7 +72,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-3 | Menu theme=light | done | this commit | 2026-08-25 |
 | P2-4 | Collapse a11y inert/aria-hidden + extra stopPropagation | done | this commit | 2026-08-25 |
 | P2-5 | parseDate YYYY-MM-DD local calendar day | done | this commit | 2026-08-25 |
-| P2-6..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-6 | Cascader / TreeSelect keyboard | done | this commit | 2026-08-25 |
+| P2-7..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -833,4 +834,17 @@ Next: P2-5 `parseDate` UTC landed in this commit. Then P2-6 Cascader / TreeSelec
 
 No new public prop. Cascader / TreeSelect keyboard and Calendar year-view month chip width left for later P2 rows.
 
-Next: P2-6 Cascader / TreeSelect keyboard (non-virtual Arrow/Enter to select; clear button as trigger sibling, align Select). T1 A0-A10 did not cover Cascader/TreeSelect keyboard, so do not skip.
+Next: P2-6 Cascader / TreeSelect keyboard landed in this commit. Then P2-7 Tour mask close (click mask closes when a target exists; Vue last step calls onClose like React). T1 A0-A10 did not cover Tour mask close, so do not skip.
+
+## P2-6 notes
+
+Cascader / TreeSelect keyboard and sibling clear (Vue + React):
+
+- When closed, trigger still uses `getPickerTriggerKeyAction` (Enter/Space open, ArrowDown open, Escape none)
+- When open, a trigger/dropdown interceptor runs first: ArrowDown/Up/Home/End via `getPickerNavigationIndex`; Enter/Space commit on the same path as a click
+- Cascader columns: Arrow stays in the current column; ArrowRight / Enter on a parent expands; ArrowLeft pops `activePath`; leaf Enter commits and closes
+- TreeSelect: arrows walk `visibleNodes`; ArrowRight/Left expand/collapse; Enter selects (single closes, multiple stays open)
+- Clear is a real `<button type="button">` sibling of the combobox (`data-tiger-cascader-clear` / `data-tiger-treeselect-clear`), icon row `pointer-events-none` like Select
+- `getPickerTriggerKeyAction` contract unchanged; no new public prop
+
+Next: P2-7 Tour mask close (click mask closes when a target exists; Vue last step calls onClose like React). T1 A0-A10 did not cover Tour mask close, so do not skip.
