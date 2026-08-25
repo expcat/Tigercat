@@ -717,6 +717,133 @@ describe('Upload', () => {
         expect(fileList).toBeInTheDocument()
       })
     })
+
+    it('writes controlled fileList back on customRequest progress/success (Pages /upload 04)', async () => {
+      const onChange = vi.fn()
+      let finishRequest: (() => void) | undefined
+
+      const TestComponent = () => {
+        const [fileList, setFileList] = React.useState<UploadFile[]>([])
+
+        return (
+          <Upload
+            fileList={fileList}
+            onChange={(file, nextFiles) => {
+              onChange(file, nextFiles)
+              setFileList(nextFiles)
+            }}
+            customRequest={({ onProgress, onSuccess }) => {
+              finishRequest = () => {
+                onProgress?.(100)
+                onSuccess?.({ name: 'test.txt' })
+              }
+            }}
+          />
+        )
+      }
+
+      const { container } = render(<TestComponent />)
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' })
+
+      Object.defineProperty(input, 'files', {
+        value: [file],
+        writable: false
+      })
+
+      await dispatchUploadEvent(() => fireEvent.change(input))
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled()
+        expect(finishRequest).toBeDefined()
+      })
+
+      const addList = onChange.mock.calls[0][1] as UploadFile[]
+      const addCallCount = onChange.mock.calls.length
+
+      await act(async () => {
+        finishRequest?.()
+        await Promise.resolve()
+      })
+
+      await waitFor(() => {
+        expect(container.querySelector('[aria-label="Success"]')).toBeInTheDocument()
+      })
+
+      expect(onChange.mock.calls.length).toBeGreaterThan(addCallCount)
+      const laterCalls = onChange.mock.calls.slice(addCallCount)
+      const successCall = laterCalls.find(([, nextList]) =>
+        (nextList as UploadFile[]).some((item) => item.status === 'success')
+      )
+      expect(successCall).toBeDefined()
+      const laterList = successCall?.[1] as UploadFile[]
+      expect(laterList).not.toBe(addList)
+      expect(laterList.some((item) => item.status === 'success')).toBe(true)
+    })
+
+    it('writes controlled fileList back to success without customRequest', async () => {
+      const TestComponent = () => {
+        const [fileList, setFileList] = React.useState<UploadFile[]>([])
+
+        return (
+          <Upload fileList={fileList} onChange={(_file, nextFiles) => setFileList(nextFiles)} />
+        )
+      }
+
+      const { container } = render(<TestComponent />)
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' })
+
+      Object.defineProperty(input, 'files', {
+        value: [file],
+        writable: false
+      })
+
+      await dispatchUploadEvent(() => fireEvent.change(input))
+
+      await waitFor(() => {
+        expect(container.querySelector('[aria-label="Success"]')).toBeInTheDocument()
+      })
+    })
+
+    it('reaches success in uncontrolled mode with customRequest without onChange', async () => {
+      let finishRequest: (() => void) | undefined
+
+      const { container } = render(
+        <Upload
+          customRequest={({ onProgress, onSuccess }) => {
+            finishRequest = () => {
+              onProgress?.(100)
+              onSuccess?.({ name: 'test.txt' })
+            }
+          }}
+        />
+      )
+
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' })
+
+      Object.defineProperty(input, 'files', {
+        value: [file],
+        writable: false
+      })
+
+      await dispatchUploadEvent(() => fireEvent.change(input))
+
+      await waitFor(() => {
+        expect(finishRequest).toBeDefined()
+        expect(container.querySelector('[role="list"]')).toBeInTheDocument()
+      })
+
+      await act(async () => {
+        finishRequest?.()
+        await Promise.resolve()
+      })
+
+      await waitFor(() => {
+        expect(container.querySelector('[aria-label="Success"]')).toBeInTheDocument()
+      })
+    })
   })
 
   describe('Accessibility', () => {

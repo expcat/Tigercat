@@ -33,7 +33,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #4 | Vue Transfer targetKeys | done | this commit | 2026-08-25 |
 | #5 | AutoComplete write option.label | done | this commit | 2026-08-25 |
 | #6 | React Form validate after updateValue | done | this commit | 2026-08-25 |
-| #7 | React Upload controlled fileList | pending | | |
+| #7 | React Upload controlled fileList | done | this commit | 2026-08-25 |
 | #8 | Pagination React pageSize example | pending | | |
 | #9 | Table default pagination uncontrolled | pending | | |
 | #10 | FileManager selectedKeys inner state | pending | | |
@@ -253,3 +253,17 @@ React FormItem writes the new field value into Form `formValuesRef` before chang
 Pages `/form` React「内置校验」first keystroke no longer keeps the required error. Public behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase C #7 React Upload controlled fileList.
+
+## #7 notes
+
+React Upload controlled `fileList` progress/success/error now `onChange(file, nextList)` with a new array:
+
+- `notifyFileList` copies `[...nextFileList]`, `updateFileList` (uncontrolled), then `onChange?.(file, nextList)`
+- Used for non-queue, queue, no-`customRequest` instant success, and chunked completion
+- `useControlledState` still has no Upload `onChange` (hook is `(fileList) => void`; Upload stays `(file, fileList) => void`)
+- Same-object mutation of the accumulator `uploadFile` kept (Vue-style); array identity is the writeback
+- Vue Upload, examples, CropUpload, Pagination untouched
+
+Pages `/upload` React custom upload (fileList + onChange + customRequest) can redraw success. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase C #8 Pagination React pageSize example.

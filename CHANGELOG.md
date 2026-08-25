@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **React Upload 受控 fileList 进度回写**：受控时 `customRequest` 的 progress/success/error 经 `notify` 以新数组调用 `onChange(file, nextList)`，Pages `/upload` 自定义上传能绘成功态。Vue 已 `emit('update:file-list')`。公开行为修复，无主题变量变化。
 - **React FormItem change 校验先 updateValue**：change 触发 `validateField` 前先把子控件新值写入 `formValuesRef`，同拍读到新值，必填错误不再在第一字后残留。Vue 不变。公开行为修复，无主题变量变化。
 - **AutoComplete 受控回写显示 option.label**：Vue / React 在 `searchValue` 未受控时，用 core `resolveAutoCompleteDisplayValue` 把匹配选项的 `label` 同步进输入框，不再把 raw `value` 盖上去；`label !== value`（如 `北京 Beijing` / `beijing`）选中后仍显示 label。`modelValue` / `value` / `onChange` 仍使用 `option.value`。公开行为修复，无主题变量变化。
 - **Vue Transfer 兼发 `update:targetKeys`**：`moveRight` / `moveLeft` 同时发出 `update:modelValue` 与 `update:targetKeys`，Pages/示例里的 `v-model:target-keys` 不再停在初始目标项；默认 `v-model` / `update:modelValue` 保持不变。公开 API 增补，无主题变量变化。

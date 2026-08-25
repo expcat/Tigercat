@@ -163,6 +163,16 @@ export const Upload: React.FC<UploadProps> = ({
     // to avoid overwriting previous files when selecting multiple at once.
     let nextFileList = [...fileList]
 
+    // Progress/success/error mutate the same uploadFile then notify with a new
+    // array so controlled parents (fileList + onChange) redraw. Do not pass
+    // Upload onChange into useControlledState: hook onChange is (fileList) =>
+    // void, Upload onChange is (file, fileList) => void.
+    const notifyFileList = (file: UploadFile) => {
+      const nextList = [...nextFileList]
+      updateFileList(nextList)
+      onChange?.(file, nextList)
+    }
+
     for (const file of prepared.acceptedFiles) {
       const uploadFile = fileToUploadFile(file)
 
@@ -175,7 +185,7 @@ export const Upload: React.FC<UploadProps> = ({
       }
 
       if (autoUpload && !queue) {
-        await uploadOne(file, uploadFile, () => updateFileList([...nextFileList]))
+        await uploadOne(file, uploadFile, () => notifyFileList(uploadFile))
       }
     }
 
@@ -189,7 +199,7 @@ export const Upload: React.FC<UploadProps> = ({
         async (item) => {
           const uploadFile = nextFileList.find((candidate) => candidate.uid === item.id)
           if (!uploadFile) return
-          await uploadOne(item.file, uploadFile, () => updateFileList([...nextFileList]))
+          await uploadOne(item.file, uploadFile, () => notifyFileList(uploadFile))
         },
         { concurrency: maxConcurrent, onChange: onQueueChange }
       )
