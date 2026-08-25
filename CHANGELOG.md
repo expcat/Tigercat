@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Pagination `showTotal` 默认文案走 `getPaginationLabels` / `formatPaginationTotal`**：未传自定义 `totalText` 时始终格式化 `labels.totalText`，不再在无 `locale.pagination.totalText` 块时回落硬编码中文 `defaultTotalText`。无 locale 回落英文 `Total N items`；zh-CN / ConfigProvider zhCN 仍为「共 N 条」；自定义 `totalText` 函数仍优先。`defaultTotalText` 改为英文 DEFAULT 模板。Vue/React。公开行为修复。无新必填 prop。
 - **FormWizard clickable clicks resolve via findNextUnskippedStep so skipCondition/disabled cannot be landed on**：`handleStepChange` 与 Next/Prev 一样走 `findNextUnskippedStep`（从被点索引沿方向走），不再只拦 `disabled` 后直接落地。Vue/React。公开行为修复。无新 prop。
 - **ChatWindow / CommentThread / ActivityFeed / NotificationCenter 默认文案走 ConfigProvider locale**：与 FormWizard / TaskBoard 相同，经 `mergeTigerLocale` + `getXxxLabels` + `resolveLocaleText` 解析；可选 `locale` / `labels` 覆盖。无 locale 时回落英文（Send / Like / No activity / Mark all as read）。zh-CN 仍为原来的中文（发送 / 点赞 / 暂无动态 / 全部标记已读）。Pages Lang=English 时 Chat 发送钮不再停在中文。既有 string props 仍优先。Vue/React。公开 API 增补 + 行为修复。无新必填 prop。
 - **Chart `responsive` 观察父级后重算 plot scale / innerRect**：Bar / Line / Area / Scatter 用 ChartCanvas 解析后的宽高（ResizeObserver + rAF）重建 band/point/linear scale 与网格/轴，而不只是拉大 SVG `width`/`height`/`viewBox`。Pages `/bar-chart` 01 不再把 420×240 的柱子留在约 926×688 SVG 的左上角。自定义 `xScale`/`yScale` 仍按传入 range 使用。ChartCanvas 通过 React `onResolvedSizeChange` / Vue `resolved-size-change` 报告解析尺寸。`responsive` 默认仍为 false；观察前仍用 `width`/`height` fallback。Vue/React。公开行为修复。无新必填 prop。

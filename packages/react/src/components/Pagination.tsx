@@ -5,7 +5,6 @@ import {
   getPageRange,
   validateCurrentPage,
   getPageNumbers,
-  defaultTotalText,
   formatPaginationTotal,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
@@ -258,10 +257,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   if (showTotal) {
     const totalTextFn =
       totalText ||
-      (labelsOverride?.totalText || mergedLocale?.pagination?.totalText
-        ? (value: number, range: [number, number]) =>
-            formatPaginationTotal(labels.totalText, value, range, localeCode)
-        : defaultTotalText)
+      ((value: number, range: [number, number]) =>
+        formatPaginationTotal(labels.totalText, value, range, localeCode))
     elements.push(
       <span key="total" className={getTotalTextClasses(size)}>
         {totalTextFn(total, pageRange)}

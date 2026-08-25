@@ -2,11 +2,14 @@
  * @vitest-environment happy-dom
  */
 
-import { nextTick } from 'vue'
+import { nextTick, h } from 'vue'
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Pagination } from '@expcat/tigercat-vue/Pagination'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Pagination', () => {
@@ -163,6 +166,57 @@ describe('Pagination', () => {
       props: { total: 100, pageSize: 10, size: 'small' }
     })
     expect(container.querySelector('button')).toHaveClass('h-7')
+  })
+
+  it('renders English Total N items by default without ConfigProvider', () => {
+    render(Pagination, { props: { total: 240, pageSize: 20 } })
+    expect(screen.getByText('Total 240 items')).toBeInTheDocument()
+    expect(screen.queryByText('共 240 条')).not.toBeInTheDocument()
+  })
+
+  it('renders Chinese total under ConfigProvider zhCN', () => {
+    render({
+      render() {
+        return h(ConfigProvider, { locale: zhCN }, () =>
+          h(Pagination, { total: 240, pageSize: 20 })
+        )
+      }
+    })
+    expect(screen.getByText('共 240 条')).toBeInTheDocument()
+  })
+
+  it('renders English total under ConfigProvider enUS', () => {
+    render({
+      render() {
+        return h(ConfigProvider, { locale: enUS }, () =>
+          h(Pagination, { total: 240, pageSize: 20 })
+        )
+      }
+    })
+    expect(screen.getByText('Total 240 items')).toBeInTheDocument()
+  })
+
+  it('lets explicit totalText win under zh-CN', () => {
+    render({
+      render() {
+        return h(ConfigProvider, { locale: zhCN }, () =>
+          h(Pagination, {
+            total: 240,
+            pageSize: 20,
+            totalText: (total: number) => `Custom ${total}`
+          })
+        )
+      }
+    })
+    expect(screen.getByText('Custom 240')).toBeInTheDocument()
+    expect(screen.queryByText('共 240 条')).not.toBeInTheDocument()
+  })
+
+  it('formats labels.totalText template', () => {
+    render(Pagination, {
+      props: { total: 240, pageSize: 20, labels: { totalText: 'All {total}' } }
+    })
+    expect(screen.getByText('All 240')).toBeInTheDocument()
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
