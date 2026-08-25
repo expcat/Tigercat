@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Upload drag 模式尊重默认插槽 / children**：`drag` 为 true 且提供默认插槽 / children 时，拖拽区内只渲染该内容（Pages `/upload` 02「点击或拖拽文档到此处」可见），不再叠 locale「Click to upload / or drag and drop」；无插槽时仍回落 SVG + locale 提示 + accept/maxSize。拖拽区 / 上传按钮 chrome 不再硬编码 `bg-white` / `border-gray-300`，改走已注册 `--tiger-surface` / `--tiger-border`。Vue/React。公开行为 + 视觉修复。无新必填 prop。未绘制 `file.progress` 进度条。
 - **Code copy / copied / failed 走 `getCodeLabels`，剪贴板失败可见**：无 locale 回落英文 Copy / Copied / Copy failed；zh-CN / ConfigProvider zhCN 仍为「复制 / 已复制 / 复制失败」。剪贴板失败显示 failed 态（error token + Copy failed），不再停在 idle 也不看起来像成功；成功仍只在写入成功时发 `copy` / `onCopy`。显式 `copyLabel` / `copiedLabel` / `copyFailedLabel` 仍优先。Vue/React。公开行为修复。无新必填 prop。
 - **Pagination `showTotal` 默认文案走 `getPaginationLabels` / `formatPaginationTotal`**：未传自定义 `totalText` 时始终格式化 `labels.totalText`，不再在无 `locale.pagination.totalText` 块时回落硬编码中文 `defaultTotalText`。无 locale 回落英文 `Total N items`；zh-CN / ConfigProvider zhCN 仍为「共 N 条」；自定义 `totalText` 函数仍优先。`defaultTotalText` 改为英文 DEFAULT 模板。Vue/React。公开行为修复。无新必填 prop。
 - **FormWizard clickable clicks resolve via findNextUnskippedStep so skipCondition/disabled cannot be landed on**：`handleStepChange` 与 Next/Prev 一样走 `findNextUnskippedStep`（从被点索引沿方向走），不再只拦 `disabled` 后直接落地。Vue/React。公开行为修复。无新 prop。

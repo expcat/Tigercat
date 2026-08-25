@@ -44,6 +44,27 @@ describe('Upload', () => {
       expect(dragArea).toHaveTextContent('or drag and drop')
     })
 
+    it('should honor default slot in drag area (Pages /upload 02)', () => {
+      const { container } = render(Upload, {
+        props: {
+          drag: true,
+          multiple: true,
+          accept: '.pdf,.doc,.docx'
+        },
+        slots: {
+          default: '点击或拖拽文档到此处'
+        }
+      })
+
+      const dragArea = container.querySelector('[role="button"]')
+      expect(dragArea).toBeInTheDocument()
+      expect(dragArea).toHaveAttribute('role', 'button')
+      expect(dragArea).toHaveTextContent('点击或拖拽文档到此处')
+      expect(dragArea).not.toHaveTextContent('Click to upload')
+      expect(dragArea).not.toHaveTextContent('or drag and drop')
+      expect(container).not.toHaveTextContent('Accepted:')
+    })
+
     it('should show accept info in drag area', () => {
       const { container } = renderWithProps(Upload, {
         drag: true,
@@ -657,6 +678,33 @@ describe('Upload', () => {
       }
 
       await fireEvent.drop(dragArea, { dataTransfer })
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled()
+      })
+    })
+
+    it('should open file dialog and accept drop when drag area has default slot', async () => {
+      const onChange = vi.fn()
+      const { container } = render(Upload, {
+        props: {
+          drag: true,
+          onChange
+        },
+        slots: {
+          default: '点击或拖拽文档到此处'
+        }
+      })
+
+      const dragArea = container.querySelector('[role="button"]') as HTMLElement
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+      const clickSpy = vi.spyOn(input, 'click')
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' })
+
+      await fireEvent.click(dragArea)
+      expect(clickSpy).toHaveBeenCalled()
+
+      await fireEvent.drop(dragArea, { dataTransfer: { files: [file] } })
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled()

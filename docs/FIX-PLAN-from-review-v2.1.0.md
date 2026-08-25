@@ -82,7 +82,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-13 | FormWizard skipCondition handleStepChange | done | this commit | 2026-08-25 |
 | P2-14 | Pagination Chinese-English mix (showTotal through locale) | done | this commit | 2026-08-25 |
 | P2-15 | Code clipboard failure state + locale | done | this commit | 2026-08-25 |
-| P2-16..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-16 | Upload drag slot (honor default slot; drop bg-white / border-gray-300) | done | this commit | 2026-08-25 |
+| P2-17..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -974,5 +975,17 @@ Code clipboard failure is visible and Copy / Copied / Copy failed go through get
 - T1 A0-A10 did not cover clipboard / locale copy. No new required prop.
 
 Next: P2-16 Upload drag slot (honor default slot; drop hardcoded bg-white / border-gray-300). T1 A0-A10 did not cover the ignored drag slot, so do not skip.
+
+## P2-16 notes
+
+Upload drag mode honors the default slot / children and drag/button chrome uses surface/border tokens (Vue + React):
+
+- drag + default slot/children renders that content as the entire drag inner; locale Click to upload is only the no-slot fallback
+- Pages /upload 02 Chinese copy is visible; Click to upload / or drag and drop are not shown when a slot is provided
+- getUploadButtonClasses / idle getDragAreaClasses / picture-card ready+success drop hardcoded bg-white / border-gray-300
+- file.progress bar not added
+- T1 A0-A10 did not cover the ignored drag slot. No new required prop.
+
+Next: P2-17 Splitter gutter (bg-gray-200 to token; gutterSize to visual width). T1 A0-A10 did not cover gutter chrome or gutterSize visual width, so do not skip.
 
 
