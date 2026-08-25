@@ -26,10 +26,10 @@ export const menuCollapsedModeClasses = {
 }
 
 /**
- * Menu theme classes - light theme
+ * Default `theme="light"` inherits page tokens (`html.dark` / `:root`).
+ * Empty so the menu root does not re-declare `--tiger-surface` (and siblings) as light hexes.
  */
-export const menuLightThemeClasses =
-  '[--tiger-surface:#ffffff] [--tiger-text:#111827] [--tiger-text-muted:#6b7280] [--tiger-border:#e5e7eb] [--tiger-surface-muted:#f9fafb]'
+export const menuLightThemeClasses = ''
 
 /**
  * Menu theme classes - dark theme
@@ -183,8 +183,11 @@ export function getMenuClasses(mode: MenuMode, theme: MenuTheme, collapsed?: boo
       ? menuCollapsedModeClasses[mode]
       : menuModeClasses[mode]
   const classes = [menuBaseClasses, modeClasses]
+  const themeClasses = themeClass(theme, menuLightThemeClasses, menuDarkThemeClasses)
 
-  classes.push(themeClass(theme, menuLightThemeClasses, menuDarkThemeClasses))
+  if (themeClasses) {
+    classes.push(themeClasses)
+  }
 
   if (collapsed && (mode === 'vertical' || mode === 'inline')) {
     classes.push(menuCollapsedClasses)

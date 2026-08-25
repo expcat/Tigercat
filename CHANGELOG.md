@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Menu 默认 `theme="light"` 跟随 `html.dark`**：不再把 `--tiger-surface`（及 `--tiger-text` / `--tiger-text-muted` / `--tiger-border` / `--tiger-surface-muted`）锁成浅色 hex；默认继承页面 token。Pages `/menu` 01/03 暗色跟 surface。显式 `theme="dark"` 仍强制深色 chrome。Vue/React 消费 core helpers。公开视觉/主题 chrome 修复。无新公开 prop。
 - **Message / Alert 暗色 chrome 跟 surface + status**：info/success/warning/error 的 bg fallback 改为已注册 `--tiger-surface`，字/图标走已注册 `--tiger-info` / `--tiger-success` / `--tiger-warning` / `--tiger-error`（或 `--tiger-text`），边框走 `--tiger-border`；Alert description 走 `--tiger-text-secondary`，关闭钮 hover 走 `--tiger-surface-muted`。暗色 Pages `/message` / `/alert` 不再锁浅粉彩卡片。可选 `--tiger-message-*` / `--tiger-alert-*` 仍只作一层覆写，不注册进 `THEME_CSS_VARS`。Vue/React 消费 core maps。公开视觉/主题 chrome 修复。无新公开 prop。
 - **Pages overlay 示例 iframe 加高**：DatePicker / TimePicker / Cascader、Modal / Drawer / Tour、Loading 区域+全屏、Spotlight / Dropdown、CropUpload 的 Vue / React `demo.json` 把 `viewport.minHeight` 提到 560（仍 `mode: auto`，不设冻结 `height`），弹出日历 / 级联列 / 对话框 / 抽屉 / 引导 / Spotlight / 裁剪 Modal 不再困在 120–180px iframe 里。loading/01 内联、loading-bar / message / notification、DemoBlock chrome、sandbox `allow-same-origin`、srcdoc `dark:` 未改。仅示例 / Pages 视觉修复。无公开组件 API 变化，无主题变量变化。
 - **ImagePreview 预览图 90vh/90vw 约束，Pages 预览 iframe 加高**：Vue / React 预览 `<img>` 由 `max-w-none` 改为 `max-h-[90vh] max-w-[90vw]`，组图/独立预览不再被裁成无限宽横条。Pages `/image` ImageGroup / ImagePreview 与 `/image-viewer` 示例把 `viewport.minHeight` 提到 560（仍 `mode: auto`，不设冻结 `height`），iframe 底足以放下该 90vh 盒。ImageViewer img 类本就有该约束；工具条未改。公开视觉修复。无主题变量变化，无新公开 prop。

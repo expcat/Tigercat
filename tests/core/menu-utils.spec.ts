@@ -10,8 +10,11 @@ import {
   getInitialSubmenuHeightTransitionStyle,
   initRovingTabIndex,
   matchesMenuSearch,
+  menuBaseClasses,
   menuCollapsedIconClasses,
+  menuDarkThemeClasses,
   menuItemIconClasses,
+  menuLightThemeClasses,
   moveFocusInMenu,
   normalizeMenuSearchQuery,
   submenuHeightTransitionClasses,
@@ -186,11 +189,52 @@ describe('menu-utils search filtering', () => {
 })
 
 describe('menu-utils classes', () => {
+  const LIGHT_TOKEN_LOCKS = [
+    '[--tiger-surface:#ffffff]',
+    '[--tiger-text:#111827]',
+    '[--tiger-text-muted:#6b7280]',
+    '[--tiger-border:#e5e7eb]',
+    '[--tiger-surface-muted:#f9fafb]'
+  ] as const
+
   it('uses the collapsed width without retaining the default vertical min width', () => {
     const classes = getMenuClasses('vertical', 'light', true)
 
     expect(classes).toContain('min-w-[64px]')
     expect(classes).not.toContain('min-w-[200px]')
+  })
+
+  it('does not lock default light theme tokens to light hexes', () => {
+    expect(menuLightThemeClasses).toBe('')
+
+    for (const lock of LIGHT_TOKEN_LOCKS) {
+      expect(menuLightThemeClasses).not.toContain(lock)
+    }
+  })
+
+  it('lets default light menu classes inherit page tokens via menuBaseClasses', () => {
+    const inline = getMenuClasses('inline', 'light')
+    const vertical = getMenuClasses('vertical', 'light')
+
+    for (const classes of [inline, vertical]) {
+      expect(classes).toContain(menuBaseClasses)
+      expect(classes).toContain('--tiger-surface')
+      expect(classes).toContain('bg-[var(--tiger-surface,#ffffff)]')
+      expect(classes).toContain('text-[var(--tiger-text,#111827)]')
+      expect(classes).toContain('border-[var(--tiger-border,#e5e7eb)]')
+
+      for (const lock of LIGHT_TOKEN_LOCKS) {
+        expect(classes).not.toContain(lock)
+      }
+    }
+  })
+
+  it('keeps explicit dark theme as a forced chrome lock', () => {
+    const classes = getMenuClasses('inline', 'dark')
+
+    expect(menuDarkThemeClasses).toContain('[--tiger-surface:#111827]')
+    expect(classes).toContain(menuDarkThemeClasses)
+    expect(classes).toContain('[--tiger-surface:#111827]')
   })
 
   it('drops the icon right margin when collapsed', () => {

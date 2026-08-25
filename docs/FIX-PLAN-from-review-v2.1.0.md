@@ -69,7 +69,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | T5 | Pages sandbox viewport | done | this commit | 2026-08-25 |
 | P2-1 | Pages sandbox viewport (T5 leftover overlays) | done | this commit | 2026-08-25 |
 | P2-2 | Message / Alert token | done | this commit | 2026-08-25 |
-| P2-3..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-3 | Menu theme=light | done | this commit | 2026-08-25 |
+| P2-4..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -790,4 +791,17 @@ Message / Alert chrome in `packages/core/src/utils/message-utils.ts` `defaultMes
 
 `--tiger-message-*` / `--tiger-alert-*` stay optional first `var()` overrides only; not registered in `THEME_CSS_VARS`. Vue/React consume the core maps. Dark default surface is `#111827` + status ink (`#4ade80` / `#fbbf24` / `#f87171` / `#60a5fa`).
 
-Next: P2-3 Menu `theme="light"` (default follow `html.dark`, do not lock `--tiger-surface` to `#ffffff`). T1 A0-A10 did not cover Menu theme lock, so do not skip.
+Next: P2-3 Menu `theme="light"` landed in this commit. Then P2-4 Collapse a11y (`inert`+`aria-hidden`; `extra` stopPropagation). T1 A0-A10 did not cover Collapse a11y, so do not skip.
+
+## P2-3 notes
+
+Menu default `theme="light"` in `packages/core/src/utils/menu-utils.ts`:
+
+- `menuLightThemeClasses` is now `''` (no `[--tiger-surface:#ffffff]` or sibling light hex locks)
+- `getMenuClasses` skips the empty light class token; root keeps `menuBaseClasses` `var(--tiger-surface,#ffffff)` last-resort
+- `html.dark` inherited `--tiger-surface` / `--tiger-text` / `--tiger-border` win on Pages `/menu` 01/03
+- Explicit `theme="dark"` still pushes `menuDarkThemeClasses` (`[--tiger-surface:#111827]` and siblings)
+
+No `--tiger-menu-*` in `THEME_CSS_VARS`. Vue/React consume `getMenuClasses`. No new public prop. Hover/selected light pair still token+last-resort.
+
+Next: P2-4 Collapse a11y (折叠 `inert`+`aria-hidden`; `extra` `stopPropagation`). T1 A0-A10 did not cover Collapse a11y (T3), so do not skip.
