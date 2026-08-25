@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Signature 拖出垫面结束笔画**：Vue / React 在 pointerdown 时对 canvas 调用 `setPointerCapture`，并在 `lostpointercapture` 与 document `pointerup`/`pointercancel` 上走同一条 `finishStroke`，拖出垫面不再把 `activeStroke` 卡住。公开行为修复，无主题变量变化，无新公开 prop。
 - **Input `errorMessage` 移到字段下方**：Vue / React 不再用 `absolute inset-y-0 right-0` 把错误文案叠在值区里；错误节点作为 chrome 边框盒的兄弟（`w-full` 外壳内，顺序为 error 再 count）渲染在字段下方，并带 `aria-live="polite"`，输入框仍用 `aria-describedby` 指向该节点。Clear / 密码显隐 / suffix 在有错误时仍可用。MaskInput 共用 `getInputErrorClasses`，错误节点同样改为块级并加 `aria-live`。公开视觉/无障碍修复，无主题变量变化，无新公开 prop。
 - **InputGroup compact 拼合 Input/Textarea**：Vue / React 经 core 类串把 compact 从 `[&>*:focus]` 改为 `[&>*:focus-within]`，并用 `!rounded-*` 压过 token 半径。Input 把边框/圆角/表面/状态边框/`focus-within` 焦点环提到现有 wrapper（原生 input 为无边框字段）；Textarea 在无 `showCount` 时以 textarea 自身为根（字数仍在边框盒外）。Pages `/input-group` 01 的 Input+Button 不再各自胶囊。InputNumber 根本就是边框盒，未改。公开视觉/行为修复，无主题变量变化，无新公开 prop。
 - **Vue Input `clearable` + `showPassword` 双钮错开**：Vue 两钮同时可见时清除钮左移一档图标槽（`right-8`/`right-10`/`right-12`），密码显隐仍在 `right-0`，字段改用双槽 `pr-16`/`pr-20`/`pr-24`，不再叠在同一像素。仅单钮时仍 `right-0` + 一档 `pr-*`。React 本就只渲染一个（clear 优先），未改。公开视觉/行为修复，无主题变量变化，无新公开 prop。

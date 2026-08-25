@@ -46,6 +46,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #22 | Input Vue dual buttons | done | this commit | 2026-08-25 |
 | #21 | InputGroup compact | done | this commit | 2026-08-25 |
 | #23 | Input errorMessage below field | done | this commit | 2026-08-25 |
+| #25 | Signature strokes setPointerCapture / document up | done | this commit | 2026-08-25 |
 | #17 | QRCode drop dead `level` / decorative | done | this commit | 2026-08-25 |
 | #18 | ImagePreview maskClosable mask click | done | this commit | 2026-08-25 |
 | #28 | ColorPicker 初值/alpha | done | this commit | 2026-08-25 |
@@ -55,7 +56,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
 | #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
 | #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
-| #19–#20, #24–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #19–#20, #24, #26–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -580,3 +581,18 @@ Input `errorMessage` sits below the chrome field (Vue + React via core class str
 Pages callers with a long `errorMessage` no longer cover the value. Public visual/a11y fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #25 Signature strokes (`setPointerCapture` / document up; do not touch iframe/T5).
+
+## #25 notes
+
+Signature (Vue + React) finishes a stroke after the pointer leaves the pad:
+
+- pointerdown (not disabled/readonly) calls `canvas.setPointerCapture(pointerId)` when the method exists (try/catch for happy-dom)
+- canvas still owns pointermove / pointerup / pointercancel; `lostpointercapture` also calls `finishStroke`
+- while a stroke is active, document listens for pointerup / pointercancel; removed in finishStroke and on unmount
+- `finishStroke` nulls activeStroke first, emits change + end once, then detaches listeners and `releasePointerCapture` if still held
+- React maps points from `canvasRef.getBoundingClientRect()` (Vue already did), so document events stay on-pad coordinates
+- default penColor, modelValue empty-string reset, Backspace/Delete, JPEG/WebP background, MaskInput raw submit, iframe/T5 left alone
+
+Pages `/signature` drag-off no longer leaves `activeStroke` stuck. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #24 MaskInput raw submit (hidden raw when `name` is set; do not touch iframe/T5).

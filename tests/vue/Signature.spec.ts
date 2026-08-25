@@ -33,6 +33,28 @@ beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/png;base64,test')
 })
 
+const ensurePointerCaptureMethods = () => {
+  const proto = HTMLElement.prototype
+  if (typeof proto.setPointerCapture !== 'function') {
+    proto.setPointerCapture = function () {}
+  }
+  if (typeof proto.releasePointerCapture !== 'function') {
+    proto.releasePointerCapture = function () {}
+  }
+}
+
+const spyPointerCapture = () => {
+  ensurePointerCaptureMethods()
+  return {
+    setPointerCapture: vi
+      .spyOn(HTMLElement.prototype, 'setPointerCapture')
+      .mockImplementation(() => {}),
+    releasePointerCapture: vi
+      .spyOn(HTMLElement.prototype, 'releasePointerCapture')
+      .mockImplementation(() => {})
+  }
+}
+
 const drawSignature = async (canvas: HTMLElement) => {
   await fireEvent.pointerDown(canvas, { clientX: 10, clientY: 20 })
   await fireEvent.pointerMove(canvas, { clientX: 30, clientY: 40 })
@@ -168,6 +190,99 @@ describe('Signature', () => {
   it('forwards attrs to the root element', () => {
     const { container } = render(Signature, { attrs: { 'data-testid': 'signature-root' } })
     expect(container.querySelector('[data-testid="signature-root"]')).toBeInTheDocument()
+  })
+
+  it('captures the pointer on pointerdown', async () => {
+    const { setPointerCapture } = spyPointerCapture()
+    render(Signature)
+    const canvas = screen.getByRole('img')
+
+    await fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+
+    expect(setPointerCapture).toHaveBeenCalledWith(1)
+  })
+
+  it('does not capture the pointer while disabled', async () => {
+    const { setPointerCapture } = spyPointerCapture()
+    render(Signature, { props: { disabled: true } })
+
+    await fireEvent.pointerDown(screen.getByRole('img'), {
+      pointerId: 1,
+      clientX: 10,
+      clientY: 20
+    })
+
+    expect(setPointerCapture).not.toHaveBeenCalled()
+  })
+
+  it('does not capture the pointer while readonly', async () => {
+    const { setPointerCapture } = spyPointerCapture()
+    render(Signature, { props: { readonly: true } })
+
+    await fireEvent.pointerDown(screen.getByRole('img'), {
+      pointerId: 1,
+      clientX: 10,
+      clientY: 20
+    })
+
+    expect(setPointerCapture).not.toHaveBeenCalled()
+  })
+
+  it('finishes the stroke on document pointerup after leaving the pad', async () => {
+    const { emitted } = render(Signature)
+    const canvas = screen.getByRole('img')
+
+    await fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+    await fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 30, clientY: 40 })
+    await fireEvent.pointerUp(document)
+
+    expect(emitted().begin).toHaveLength(1)
+    expect(emitted().change).toHaveLength(1)
+    expect(emitted().end).toHaveLength(1)
+
+    await drawSignature(canvas)
+
+    expect(emitted().begin).toHaveLength(2)
+    expect(emitted().change).toHaveLength(2)
+    expect(emitted().end).toHaveLength(2)
+  })
+
+  it('finishes the stroke on lostpointercapture', async () => {
+    const { emitted } = render(Signature)
+    const canvas = screen.getByRole('img')
+
+    await fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+    await fireEvent.lostPointerCapture(canvas)
+
+    expect(emitted().change).toHaveLength(1)
+    expect(emitted().end).toHaveLength(1)
+  })
+
+  it('finishes the stroke on pointercancel', async () => {
+    const { emitted } = render(Signature)
+    const canvas = screen.getByRole('img')
+
+    await fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+    await fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 30, clientY: 40 })
+    await fireEvent.pointerCancel(canvas)
+
+    expect(emitted().change).toHaveLength(1)
+    expect(emitted().end).toHaveLength(1)
+  })
+
+  it('finishes the stroke only once when pointerup follows capture', async () => {
+    spyPointerCapture()
+    const { emitted } = render(Signature)
+    const canvas = screen.getByRole('img')
+
+    await fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+    await fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 30, clientY: 40 })
+    await fireEvent.pointerUp(canvas)
+    await fireEvent.lostPointerCapture(canvas)
+    await fireEvent.pointerUp(document)
+
+    expect(emitted().change).toHaveLength(1)
+    expect(emitted().end).toHaveLength(1)
   })
 
   describe('Accessibility', () => {

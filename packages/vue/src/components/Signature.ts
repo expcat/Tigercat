@@ -1,4 +1,13 @@
-import { computed, defineComponent, h, onMounted, ref, watch, type PropType } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  type PropType
+} from 'vue'
 import {
   classNames,
   clampSignatureLineWidth,
@@ -65,8 +74,10 @@ export const Signature = defineComponent({
     const canvasRef = ref<HTMLCanvasElement | null>(null)
     const strokes = ref<SignatureStroke[]>([])
     const activeStroke = ref<SignatureStroke | null>(null)
+    const capturedPointerId = ref<number | null>(null)
     const isDisabled = computed(() => props.disabled || props.readonly)
     const normalizedLineWidth = computed(() => clampSignatureLineWidth(props.lineWidth))
+    let documentPointerListening = false
 
     const draw = (nextStrokes: readonly SignatureStroke[]) => {
       const canvas = canvasRef.value
@@ -98,6 +109,8 @@ export const Signature = defineComponent({
         if (value === '' && !isSignatureEmpty(strokes.value)) {
           strokes.value = []
           activeStroke.value = null
+          detachDocumentPointerListeners()
+          releaseCanvasPointer()
           draw([])
         }
       }
@@ -149,6 +162,8 @@ export const Signature = defineComponent({
     const clear = () => {
       strokes.value = []
       activeStroke.value = null
+      detachDocumentPointerListeners()
+      releaseCanvasPointer()
       draw([])
       emitChange([])
       emit('clear')
@@ -165,10 +180,63 @@ export const Signature = defineComponent({
       return getSignaturePoint(event.clientX, event.clientY, rect, props.width, props.height)
     }
 
+    const captureCanvasPointer = (pointerId: number) => {
+      capturedPointerId.value = pointerId
+      const canvas = canvasRef.value
+      if (!canvas || typeof canvas.setPointerCapture !== 'function') return
+      try {
+        canvas.setPointerCapture(pointerId)
+      } catch {
+        // happy-dom / detached node
+      }
+    }
+
+    const releaseCanvasPointer = () => {
+      const canvas = canvasRef.value
+      const pointerId = capturedPointerId.value
+      capturedPointerId.value = null
+      if (!canvas || pointerId == null || typeof canvas.releasePointerCapture !== 'function') return
+      if (typeof canvas.hasPointerCapture === 'function') {
+        try {
+          if (!canvas.hasPointerCapture(pointerId)) return
+        } catch {
+          return
+        }
+      }
+      try {
+        canvas.releasePointerCapture(pointerId)
+      } catch {
+        // already released / happy-dom
+      }
+    }
+
+    const handleDocumentPointerEnd = () => {
+      finishStroke()
+    }
+
+    const attachDocumentPointerListeners = () => {
+      if (documentPointerListening || !isBrowser()) return
+      document.addEventListener('pointerup', handleDocumentPointerEnd)
+      document.addEventListener('pointercancel', handleDocumentPointerEnd)
+      documentPointerListening = true
+    }
+
+    const detachDocumentPointerListeners = () => {
+      if (!documentPointerListening || !isBrowser()) return
+      document.removeEventListener('pointerup', handleDocumentPointerEnd)
+      document.removeEventListener('pointercancel', handleDocumentPointerEnd)
+      documentPointerListening = false
+    }
+
     const handlePointerDown = (event: PointerEvent) => {
       if (isDisabled.value) return
       event.preventDefault()
       canvasRef.value?.focus()
+
+      const pointerId = event.pointerId
+      if (typeof pointerId === 'number') {
+        captureCanvasPointer(pointerId)
+      }
 
       const stroke: SignatureStroke = {
         color: props.penColor,
@@ -178,6 +246,7 @@ export const Signature = defineComponent({
 
       activeStroke.value = stroke
       strokes.value = [...strokes.value, stroke]
+      attachDocumentPointerListeners()
       emit('begin')
     }
 
@@ -188,12 +257,19 @@ export const Signature = defineComponent({
       strokes.value = [...strokes.value]
     }
 
-    const finishStroke = () => {
+    function finishStroke() {
       if (!activeStroke.value) return
       activeStroke.value = null
       const payload = emitChange(strokes.value)
       emit('end', payload)
+      detachDocumentPointerListeners()
+      releaseCanvasPointer()
     }
+
+    onUnmounted(() => {
+      detachDocumentPointerListeners()
+      releaseCanvasPointer()
+    })
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!props.clearable || isDisabled.value) return
@@ -245,6 +321,7 @@ export const Signature = defineComponent({
               onPointermove: handlePointerMove,
               onPointerup: finishStroke,
               onPointercancel: finishStroke,
+              onLostpointercapture: finishStroke,
               onKeydown: handleKeyDown
             })
           ]),

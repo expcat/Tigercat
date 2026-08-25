@@ -34,6 +34,28 @@ beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/png;base64,test')
 })
 
+const ensurePointerCaptureMethods = () => {
+  const proto = HTMLElement.prototype
+  if (typeof proto.setPointerCapture !== 'function') {
+    proto.setPointerCapture = function () {}
+  }
+  if (typeof proto.releasePointerCapture !== 'function') {
+    proto.releasePointerCapture = function () {}
+  }
+}
+
+const spyPointerCapture = () => {
+  ensurePointerCaptureMethods()
+  return {
+    setPointerCapture: vi
+      .spyOn(HTMLElement.prototype, 'setPointerCapture')
+      .mockImplementation(() => {}),
+    releasePointerCapture: vi
+      .spyOn(HTMLElement.prototype, 'releasePointerCapture')
+      .mockImplementation(() => {})
+  }
+}
+
 const drawSignature = (canvas: HTMLElement) => {
   fireEvent.pointerDown(canvas, { clientX: 10, clientY: 20 })
   fireEvent.pointerMove(canvas, { clientX: 30, clientY: 40 })
@@ -176,6 +198,100 @@ describe('Signature', () => {
   it('hides the toolbar when clearable is false', () => {
     render(<Signature clearable={false} />)
     expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument()
+  })
+
+  it('captures the pointer on pointerdown', () => {
+    const { setPointerCapture } = spyPointerCapture()
+    render(<Signature />)
+    const canvas = screen.getByRole('img')
+
+    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+
+    expect(setPointerCapture).toHaveBeenCalledWith(1)
+  })
+
+  it('does not capture the pointer while disabled', () => {
+    const { setPointerCapture } = spyPointerCapture()
+    render(<Signature disabled />)
+
+    fireEvent.pointerDown(screen.getByRole('img'), { pointerId: 1, clientX: 10, clientY: 20 })
+
+    expect(setPointerCapture).not.toHaveBeenCalled()
+  })
+
+  it('does not capture the pointer while readonly', () => {
+    const { setPointerCapture } = spyPointerCapture()
+    render(<Signature readonly />)
+
+    fireEvent.pointerDown(screen.getByRole('img'), { pointerId: 1, clientX: 10, clientY: 20 })
+
+    expect(setPointerCapture).not.toHaveBeenCalled()
+  })
+
+  it('finishes the stroke on document pointerup after leaving the pad', () => {
+    const onBegin = vi.fn()
+    const onChange = vi.fn()
+    const onEnd = vi.fn()
+    render(<Signature onBegin={onBegin} onChange={onChange} onEnd={onEnd} />)
+    const canvas = screen.getByRole('img')
+
+    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+    fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 30, clientY: 40 })
+    fireEvent.pointerUp(document)
+
+    expect(onBegin).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onEnd).toHaveBeenCalledTimes(1)
+
+    drawSignature(canvas)
+
+    expect(onBegin).toHaveBeenCalledTimes(2)
+    expect(onChange).toHaveBeenCalledTimes(2)
+    expect(onEnd).toHaveBeenCalledTimes(2)
+  })
+
+  it('finishes the stroke on lostpointercapture', () => {
+    const onChange = vi.fn()
+    const onEnd = vi.fn()
+    render(<Signature onChange={onChange} onEnd={onEnd} />)
+    const canvas = screen.getByRole('img')
+
+    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+    fireEvent.lostPointerCapture(canvas)
+
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onEnd).toHaveBeenCalledTimes(1)
+  })
+
+  it('finishes the stroke on pointercancel', () => {
+    const onChange = vi.fn()
+    const onEnd = vi.fn()
+    render(<Signature onChange={onChange} onEnd={onEnd} />)
+    const canvas = screen.getByRole('img')
+
+    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+    fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 30, clientY: 40 })
+    fireEvent.pointerCancel(canvas)
+
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onEnd).toHaveBeenCalledTimes(1)
+  })
+
+  it('finishes the stroke only once when pointerup follows capture', () => {
+    spyPointerCapture()
+    const onChange = vi.fn()
+    const onEnd = vi.fn()
+    render(<Signature onChange={onChange} onEnd={onEnd} />)
+    const canvas = screen.getByRole('img')
+
+    fireEvent.pointerDown(canvas, { pointerId: 1, clientX: 10, clientY: 20 })
+    fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 30, clientY: 40 })
+    fireEvent.pointerUp(canvas)
+    fireEvent.lostPointerCapture(canvas)
+    fireEvent.pointerUp(document)
+
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onEnd).toHaveBeenCalledTimes(1)
   })
 
   it('exports png with configured quality', () => {

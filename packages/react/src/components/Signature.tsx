@@ -83,6 +83,9 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const strokesRef = useRef<SignatureStroke[]>([])
     const activeStrokeRef = useRef<SignatureStroke | null>(null)
+    const capturedPointerIdRef = useRef<number | null>(null)
+    const documentPointerListeningRef = useRef(false)
+    const finishStrokeRef = useRef<() => void>(() => {})
     const [strokes, setStrokes] = useState<SignatureStroke[]>([])
     const isDisabled = disabled || readonly
 
@@ -153,9 +156,59 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       [createPayload, onChange]
     )
 
+    const handleDocumentPointerEnd = useRef(() => {
+      finishStrokeRef.current()
+    }).current
+
+    const detachDocumentPointerListeners = () => {
+      if (!documentPointerListeningRef.current || typeof document === 'undefined') return
+      document.removeEventListener('pointerup', handleDocumentPointerEnd)
+      document.removeEventListener('pointercancel', handleDocumentPointerEnd)
+      documentPointerListeningRef.current = false
+    }
+
+    const attachDocumentPointerListeners = () => {
+      if (documentPointerListeningRef.current || typeof document === 'undefined') return
+      document.addEventListener('pointerup', handleDocumentPointerEnd)
+      document.addEventListener('pointercancel', handleDocumentPointerEnd)
+      documentPointerListeningRef.current = true
+    }
+
+    const captureCanvasPointer = (pointerId: number) => {
+      capturedPointerIdRef.current = pointerId
+      const canvas = canvasRef.current
+      if (!canvas || typeof canvas.setPointerCapture !== 'function') return
+      try {
+        canvas.setPointerCapture(pointerId)
+      } catch {
+        // happy-dom / detached node
+      }
+    }
+
+    const releaseCanvasPointer = () => {
+      const canvas = canvasRef.current
+      const pointerId = capturedPointerIdRef.current
+      capturedPointerIdRef.current = null
+      if (!canvas || pointerId == null || typeof canvas.releasePointerCapture !== 'function') return
+      if (typeof canvas.hasPointerCapture === 'function') {
+        try {
+          if (!canvas.hasPointerCapture(pointerId)) return
+        } catch {
+          return
+        }
+      }
+      try {
+        canvas.releasePointerCapture(pointerId)
+      } catch {
+        // already released / happy-dom
+      }
+    }
+
     const clear = useCallback(() => {
       strokesRef.current = []
       activeStrokeRef.current = null
+      detachDocumentPointerListeners()
+      releaseCanvasPointer()
       setStrokes([])
       draw([])
       emitChange([])
@@ -173,8 +226,14 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       [clear, toDataURL, toSVG]
     )
 
-    const getPointFromEvent = (event: React.PointerEvent<HTMLCanvasElement>) => {
-      const rect = event.currentTarget.getBoundingClientRect()
+    const getPointFromEvent = (event: { clientX: number; clientY: number }) => {
+      const canvas = canvasRef.current
+      const rect = canvas?.getBoundingClientRect() ?? {
+        left: 0,
+        top: 0,
+        width,
+        height
+      }
       return getSignaturePoint(event.clientX, event.clientY, rect, width, height)
     }
 
@@ -182,6 +241,11 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       if (isDisabled) return
       event.preventDefault()
       event.currentTarget.focus()
+
+      const pointerId = event.pointerId
+      if (typeof pointerId === 'number') {
+        captureCanvasPointer(pointerId)
+      }
 
       const stroke: SignatureStroke = {
         color: penColor,
@@ -193,6 +257,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       activeStrokeRef.current = stroke
       strokesRef.current = nextStrokes
       setStrokes(nextStrokes)
+      attachDocumentPointerListeners()
       onBegin?.()
     }
 
@@ -212,7 +277,17 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       activeStrokeRef.current = null
       const payload = emitChange(strokesRef.current)
       onEnd?.(payload)
+      detachDocumentPointerListeners()
+      releaseCanvasPointer()
     }
+    finishStrokeRef.current = finishStroke
+
+    useEffect(() => {
+      return () => {
+        detachDocumentPointerListeners()
+        releaseCanvasPointer()
+      }
+    }, [])
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLCanvasElement>) => {
       if (!clearable || isDisabled) return
@@ -238,6 +313,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
             onPointerMove={handlePointerMove}
             onPointerUp={finishStroke}
             onPointerCancel={finishStroke}
+            onLostPointerCapture={finishStroke}
             onKeyDown={handleKeyDown}
           />
         </div>
