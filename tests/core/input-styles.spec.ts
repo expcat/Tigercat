@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
+  getInputChromeClasses,
   getInputClasses,
   getInputClearButtonClasses,
-  getInputPasswordToggleClasses
+  getInputFieldClasses,
+  getInputPasswordToggleClasses,
+  getInputWrapperClasses
 } from '@expcat/tigercat-core'
 
 const tokens = (cls: string): string[] => cls.split(/\s+/)
@@ -28,5 +31,29 @@ describe('input-styles trailing buttons', () => {
     expect(tokens(getInputClasses({ hasSuffix: true, hasDualSuffix: true }))).not.toContain('pr-10')
     expect(tokens(getInputClasses({ size: 'sm', hasDualSuffix: true }))).toContain('pr-16')
     expect(tokens(getInputClasses({ size: 'lg', hasDualSuffix: true }))).toContain('pr-24')
+  })
+})
+
+describe('input-styles chrome vs field', () => {
+  it('puts border and radius on wrapper chrome, not the field', () => {
+    const wrapper = getInputWrapperClasses('default')
+    const field = getInputFieldClasses()
+    const chrome = getInputChromeClasses('error')
+
+    expect(wrapper).toContain('border')
+    expect(wrapper).toContain('rounded-[var(--tiger-radius-md')
+    expect(wrapper).toContain('focus-within:ring-2')
+    expect(chrome).toContain('border-red-500')
+    expect(chrome).toContain('focus-within:ring-red-500')
+    expect(field).not.toContain('rounded-[var(--tiger-radius-md')
+    expect(field).not.toContain('border-red-500')
+    expect(getInputWrapperClasses()).toBe('relative w-full')
+  })
+
+  it('keeps dual-suffix padding on the field helper', () => {
+    expect(tokens(getInputFieldClasses({ hasSuffix: true, hasDualSuffix: true }))).toContain(
+      'pr-20'
+    )
+    expect(tokens(getInputFieldClasses({ hasSuffix: true }))).toContain('pr-10')
   })
 })

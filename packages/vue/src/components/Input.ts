@@ -2,7 +2,7 @@ import { defineComponent, computed, ref, watch, h, inject, getCurrentInstance, P
 import {
   classNames,
   coerceClassValue,
-  getInputClasses,
+  getInputFieldClasses,
   getInputWrapperClasses,
   getInputAffixClasses,
   getInputErrorClasses,
@@ -210,15 +210,20 @@ export const Input = defineComponent({
       }
     )
 
-    // Trigger shake animation via direct DOM manipulation for reliable re-trigger
-    watch([effectiveStatus, effectiveShakeTrigger] as const, ([newStatus]) => {
-      if (newStatus === 'error' && wrapperRef.value) {
-        const el = wrapperRef.value
-        el.classList.remove(SHAKE_CLASS)
-        void el.offsetWidth // force reflow to restart animation
-        el.classList.add(SHAKE_CLASS)
-      }
-    })
+    // flush post: wrapper class now includes status chrome, which Vue would
+    // otherwise patch over a pre-flush classList.add(SHAKE_CLASS).
+    watch(
+      [effectiveStatus, effectiveShakeTrigger] as const,
+      ([newStatus]) => {
+        if (newStatus === 'error' && wrapperRef.value) {
+          const el = wrapperRef.value
+          el.classList.remove(SHAKE_CLASS)
+          void el.offsetWidth // force reflow to restart animation
+          el.classList.add(SHAKE_CLASS)
+        }
+      },
+      { flush: 'post' }
+    )
 
     const handleAnimationEnd = () => {
       wrapperRef.value?.classList.remove(SHAKE_CLASS)
@@ -269,7 +274,7 @@ export const Input = defineComponent({
         props.clearable && !props.disabled && !props.readonly && currentValStr.length > 0
       const showPasswordToggle = props.showPassword && props.type === 'password' && !props.disabled
       const dualSuffix = !activeError.value && showClear && showPasswordToggle
-      const inputClasses = getInputClasses({
+      const inputClasses = getInputFieldClasses({
         size: effectiveSize.value,
         status: effectiveStatus.value,
         hasPrefix: hasPrefix.value,
@@ -371,7 +376,7 @@ export const Input = defineComponent({
           {
             ref: wrapperRef,
             class: classNames(
-              getInputWrapperClasses(),
+              getInputWrapperClasses(effectiveStatus.value),
               props.className,
               coerceClassValue(attrClass)
             ),

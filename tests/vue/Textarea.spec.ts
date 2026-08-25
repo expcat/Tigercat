@@ -45,6 +45,14 @@ describe('Textarea', () => {
       expect(textarea).toHaveClass('from-prop')
       expect(textarea).toHaveClass('from-attr')
     })
+
+    it('renders the textarea as the chrome root when showCount is off', () => {
+      const { container } = render(Textarea)
+      const textarea = getTextarea()
+      expect(container.firstElementChild).toBe(textarea)
+      expect(textarea.className).toContain('border')
+      expect(textarea.className).toContain('rounded-[var(--tiger-radius-md')
+    })
   })
 
   describe('Props', () => {

@@ -120,8 +120,19 @@ describe('Input', () => {
       const { container } = render(Input, {
         props: { status: 'error' }
       })
+      const wrapper = container.firstChild as HTMLElement
       const input = container.querySelector('input')
-      expect(input).toHaveClass('border-red-500')
+      expect(wrapper).toHaveClass('border-red-500')
+      expect(input).not.toHaveClass('border-red-500')
+    })
+
+    it('puts border and radius on the wrapper, not the native input', () => {
+      const { container } = render(Input)
+      const wrapper = container.firstChild as HTMLElement
+      const input = container.querySelector('input')
+      expect(wrapper.className).toContain('border')
+      expect(wrapper.className).toContain('rounded-[var(--tiger-radius-md')
+      expect(input?.className).not.toContain('rounded-[var(--tiger-radius-md')
     })
 
     it('should render error message inside input wrapper', () => {

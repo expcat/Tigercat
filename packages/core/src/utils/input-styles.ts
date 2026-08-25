@@ -7,24 +7,42 @@ import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
 
 /**
- * Base input classes that apply to all inputs
+ * Field-only classes (padding, type, disabled text). Chrome lives on the
+ * group-child root via {@link getInputChromeClasses}.
  */
-const BASE_INPUT_CLASSES = [
+const INPUT_FIELD_BASE_CLASSES = [
   'w-full',
-  'border',
-  'rounded-[var(--tiger-radius-md,0.5rem)]',
-  'bg-[var(--tiger-surface,#ffffff)]',
+  'bg-transparent',
   'text-[var(--tiger-text,#111827)]',
   'focus:outline-none',
-  'focus:ring-2',
-  'transition-colors',
-  'disabled:bg-[var(--tiger-surface-muted,#f3f4f6)]',
   'disabled:text-[var(--tiger-text-muted,#6b7280)]',
   'disabled:cursor-not-allowed',
   'placeholder:text-[var(--tiger-text-muted,#6b7280)]'
 ] as const
 
-const STATUS_CLASSES: Record<InputStatus, string> = {
+/**
+ * Border / radius / surface for a chrome node. Native fields that ARE the
+ * chrome node (Textarea, MaskInput) keep `focus:`; Input's wrapper uses
+ * `focus-within:` because the focused node is nested.
+ */
+const INPUT_CHROME_BASE_CLASSES = [
+  'border',
+  'rounded-[var(--tiger-radius-md,0.5rem)]',
+  'bg-[var(--tiger-surface,#ffffff)]',
+  'transition-colors'
+] as const
+
+const NATIVE_CHROME_FOCUS_CLASSES = [
+  'focus:ring-2',
+  'disabled:bg-[var(--tiger-surface-muted,#f3f4f6)]'
+] as const
+
+const WRAPPER_CHROME_FOCUS_CLASSES = [
+  'focus-within:ring-2',
+  'has-[:disabled]:bg-[var(--tiger-surface-muted,#f3f4f6)]'
+] as const
+
+const NATIVE_STATUS_CLASSES: Record<InputStatus, string> = {
   default:
     'border-[var(--tiger-border,#e5e7eb)] focus:ring-[var(--tiger-primary,#2563eb)]/40 focus:border-transparent',
   error: 'border-red-500 focus:ring-red-500 focus:border-red-500 text-red-900 placeholder-red-300',
@@ -32,6 +50,21 @@ const STATUS_CLASSES: Record<InputStatus, string> = {
     'border-green-500 focus:ring-green-500 focus:border-green-500 text-green-900 placeholder-green-300',
   warning:
     'border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-yellow-900 placeholder-yellow-300'
+}
+
+const WRAPPER_STATUS_CLASSES: Record<InputStatus, string> = {
+  default:
+    'border-[var(--tiger-border,#e5e7eb)] focus-within:ring-[var(--tiger-primary,#2563eb)]/40 focus-within:border-transparent',
+  error: 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500',
+  success: 'border-green-500 focus-within:ring-green-500 focus-within:border-green-500',
+  warning: 'border-yellow-500 focus-within:ring-yellow-500 focus-within:border-yellow-500'
+}
+
+const FIELD_STATUS_CLASSES: Record<InputStatus, string> = {
+  default: '',
+  error: 'text-red-900 placeholder-red-300',
+  success: 'text-green-900 placeholder-green-300',
+  warning: 'text-yellow-900 placeholder-yellow-300'
 }
 
 const INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
@@ -94,24 +127,69 @@ export interface GetInputTrailingButtonOptions {
   offset?: boolean
 }
 
-/**
- * Get complete input class string
- */
-export function getInputClasses(options: GetInputClassesOptions = {}): string {
-  const { size = 'md', status = 'default', hasPrefix, hasSuffix, hasDualSuffix } = options
+function getInputLayoutClasses(options: GetInputClassesOptions = {}): string {
+  const { size = 'md', hasPrefix, hasSuffix, hasDualSuffix } = options
   const pad = INPUT_PADDING[size]
 
   return classNames(
-    ...BASE_INPUT_CLASSES,
     INPUT_SIZE_CLASSES[size],
-    STATUS_CLASSES[status],
     hasPrefix ? pad.prefixLeft : pad.left,
     hasDualSuffix ? pad.dualSuffixRight : hasSuffix ? pad.suffixRight : pad.right
   )
 }
 
-export function getInputWrapperClasses(): string {
-  return 'relative w-full'
+/**
+ * Chrome (border / radius / surface / status / focus ring) for a group-child
+ * root. Uses `focus-within` so a nested native field still raises the ring.
+ */
+export function getInputChromeClasses(status: InputStatus = 'default'): string {
+  return classNames(
+    ...INPUT_CHROME_BASE_CLASSES,
+    ...WRAPPER_CHROME_FOCUS_CLASSES,
+    WRAPPER_STATUS_CLASSES[status]
+  )
+}
+
+/**
+ * Native field classes without border / radius / ring. Padding, type color,
+ * placeholder, and disabled text stay here.
+ */
+export function getInputFieldClasses(options: GetInputClassesOptions = {}): string {
+  const { status = 'default' } = options
+  return classNames(
+    ...INPUT_FIELD_BASE_CLASSES,
+    FIELD_STATUS_CLASSES[status],
+    getInputLayoutClasses(options)
+  )
+}
+
+/**
+ * Complete classes when the native control IS the chrome node (Textarea,
+ * MaskInput). Input uses {@link getInputChromeClasses} on the wrapper plus
+ * {@link getInputFieldClasses} on the `<input>`.
+ */
+export function getInputClasses(options: GetInputClassesOptions = {}): string {
+  const { status = 'default' } = options
+
+  return classNames(
+    'w-full',
+    ...INPUT_CHROME_BASE_CLASSES,
+    'text-[var(--tiger-text,#111827)]',
+    'focus:outline-none',
+    ...NATIVE_CHROME_FOCUS_CLASSES,
+    'disabled:text-[var(--tiger-text-muted,#6b7280)]',
+    'disabled:cursor-not-allowed',
+    'placeholder:text-[var(--tiger-text-muted,#6b7280)]',
+    NATIVE_STATUS_CLASSES[status],
+    getInputLayoutClasses(options)
+  )
+}
+
+export function getInputWrapperClasses(status?: InputStatus): string {
+  return classNames(
+    'relative w-full',
+    status !== undefined ? getInputChromeClasses(status) : undefined
+  )
 }
 
 export function getInputAffixClasses(

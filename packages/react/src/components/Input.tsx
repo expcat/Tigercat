@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import {
   classNames,
-  getInputClasses,
+  getInputFieldClasses,
   getInputWrapperClasses,
   getInputAffixClasses,
   getInputErrorClasses,
@@ -174,7 +174,7 @@ export const Input: React.FC<InputProps> = ({
   const effectiveType =
     showPassword && type === 'password' ? (passwordVisible ? 'text' : 'password') : type
 
-  const inputClasses = getInputClasses({
+  const inputClasses = getInputFieldClasses({
     size: effectiveSize,
     status,
     hasPrefix,
@@ -222,7 +222,7 @@ export const Input: React.FC<InputProps> = ({
   const wrapperNode = (
     <div
       ref={wrapperRef}
-      className={classNames(getInputWrapperClasses(), className)}
+      className={classNames(getInputWrapperClasses(status), className)}
       style={style}
       onAnimationEnd={handleAnimationEnd}>
       {hasPrefix && <div className={getInputAffixClasses('prefix', effectiveSize)}>{prefix}</div>}
