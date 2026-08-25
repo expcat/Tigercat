@@ -42,6 +42,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #13 | Rate half-star clip | done | this commit | 2026-08-25 |
 | #14 | Avatar getInitials short token | done | this commit | 2026-08-25 |
 | #15 | Empty 预设一览 preview grid | done | this commit | 2026-08-25 |
+| #16 | Result 状态一览 preview grid | done | this commit | 2026-08-25 |
 | #17 | QRCode drop dead `level` / decorative | done | this commit | 2026-08-25 |
 | #18 | ImagePreview maskClosable mask click | done | this commit | 2026-08-25 |
 | #28 | ColorPicker 初值/alpha | done | this commit | 2026-08-25 |
@@ -51,7 +52,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
 | #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
 | #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
-| #16, #19–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #19–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -521,3 +522,16 @@ Empty 预设一览 (empty/02, Vue + React) no longer clips the 5th `error` card:
 Pages /empty 「预设一览」 shows all five presets. Shared DemoBlock overflow-hidden / default 180 left for T5; #16 Result will reuse this example-level recipe.
 
 Next: Phase D #16 Result 状态一览 (same preview-height class; raise Result 02 viewport / change 403/500 grid; do not touch iframe/T5).
+
+## #16 notes
+
+Result 状态一览 (result/02, Vue + React) no longer clips the last-row 403/500 cards:
+
+- Grid: `sm:grid-cols-2 lg:grid-cols-3` -> `sm:grid-cols-3` plus `min-h-full overflow-auto` on the example root
+- Typical Pages iframe is < 1024, so lg never applied; from 640px the gallery is 3 columns / 2 rows (`404 403 500` sit on row 2)
+- result-02 viewport: `{ mode: "auto", minHeight: 560, maxHeight: 720 }` (no `height`, so DemoBlock still auto-resizes)
+- Result component, DemoBlock, sandbox, Empty examples, and CHANGELOG left alone (example-only, same as #8 / #15)
+
+Pages /result 「状态一览」 shows all six statuses. Shared DemoBlock overflow-hidden / default 180 left for T5.
+
+Next: Phase D #22 Input Vue dual buttons (clearable + showPassword overlap; do not touch iframe/T5).
