@@ -28,6 +28,7 @@ import {
   type ExpandableConfig,
   type TableCardLayoutItem,
   type TableColumn,
+  type PaginationConfig,
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
@@ -48,6 +49,15 @@ import type { TableProps } from './Table/types'
 
 export type { TableProps } from './Table/types'
 
+const DEFAULT_TABLE_PAGINATION: PaginationConfig = {
+  defaultCurrent: 1,
+  defaultPageSize: 10,
+  total: 0,
+  pageSizeOptions: [10, 20, 50, 100],
+  showSizeChanger: true,
+  showTotal: true
+}
+
 export function Table<T extends Record<string, unknown> = Record<string, unknown>>({
   columns,
   columnLockable = false,
@@ -66,14 +76,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   locale,
   labels,
   emptyText,
-  pagination = {
-    current: 1,
-    pageSize: 10,
-    total: 0,
-    pageSizeOptions: [10, 20, 50, 100],
-    showSizeChanger: true,
-    showTotal: true
-  },
+  pagination = DEFAULT_TABLE_PAGINATION,
   rowSelection,
   expandable,
   rowKey = 'id',

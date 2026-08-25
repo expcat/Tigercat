@@ -774,9 +774,12 @@ describe('Table', () => {
         email: `person${i + 1}@example.com`
       }))
 
-      const { getByRole } = render(
+      const { getByRole, getByText, queryByText } = render(
         <Table columns={columns} dataSource={largeDataSource} onPageChange={onPageChange} />
       )
+
+      expect(getByText('Person 1')).toBeInTheDocument()
+      expect(queryByText('Person 11')).not.toBeInTheDocument()
 
       const nextButton = getByRole('button', { name: 'Next page' })
       await fireEvent.click(nextButton)
@@ -785,6 +788,32 @@ describe('Table', () => {
         current: 2,
         pageSize: 10
       })
+      expect(getByText('Person 11')).toBeInTheDocument()
+      expect(queryByText('Person 1')).not.toBeInTheDocument()
+    })
+
+    it('should show all rows when default page size is changed via the size select', async () => {
+      const largeDataSource = Array.from({ length: 15 }, (_, i) => ({
+        id: i + 1,
+        name: `Person ${i + 1}`,
+        age: 20 + i,
+        email: `person${i + 1}@example.com`
+      }))
+
+      const { getByLabelText, getByText, queryByText } = render(
+        <Table columns={columns} dataSource={largeDataSource} />
+      )
+
+      expect(getByText('Person 1')).toBeInTheDocument()
+      expect(queryByText('Person 11')).not.toBeInTheDocument()
+
+      await fireEvent.change(getByLabelText('/ page'), {
+        target: { value: '20' }
+      })
+
+      expect(getByText('Person 1')).toBeInTheDocument()
+      expect(getByText('Person 11')).toBeInTheDocument()
+      expect(getByText('Person 15')).toBeInTheDocument()
     })
     it('should respect controlled pagination on rerender', () => {
       const { rerender, getByText, queryByText } = render(

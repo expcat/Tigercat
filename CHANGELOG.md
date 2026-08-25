@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Table 默认分页非受控**：Vue / React 默认 pagination 改用 `defaultCurrent` / `defaultPageSize`，裸表（不传 pagination）点 Next 会换行；只有调用方显式传 `current`（及 `pageSize`）才受控。公开行为修复，无主题变量变化。
 - **React Upload 受控 fileList 进度回写**：受控时 `customRequest` 的 progress/success/error 经 `notify` 以新数组调用 `onChange(file, nextList)`，Pages `/upload` 自定义上传能绘成功态。Vue 已 `emit('update:file-list')`。公开行为修复，无主题变量变化。
 - **React FormItem change 校验先 updateValue**：change 触发 `validateField` 前先把子控件新值写入 `formValuesRef`，同拍读到新值，必填错误不再在第一字后残留。Vue 不变。公开行为修复，无主题变量变化。
 - **AutoComplete 受控回写显示 option.label**：Vue / React 在 `searchValue` 未受控时，用 core `resolveAutoCompleteDisplayValue` 把匹配选项的 `label` 同步进输入框，不再把 raw `value` 盖上去；`label !== value`（如 `北京 Beijing` / `beijing`）选中后仍显示 label。`modelValue` / `value` / `onChange` 仍使用 `option.value`。公开行为修复，无主题变量变化。

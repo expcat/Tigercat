@@ -35,7 +35,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #6 | React Form validate after updateValue | done | this commit | 2026-08-25 |
 | #7 | React Upload controlled fileList | done | this commit | 2026-08-25 |
 | #8 | Pagination React pageSize example | done | this commit | 2026-08-25 |
-| #9 | Table default pagination uncontrolled | pending | | |
+| #9 | Table default pagination uncontrolled | done | this commit | 2026-08-25 |
 | #10 | FileManager selectedKeys inner state | pending | | |
 | #11 | Kanban allowAddCard insert | pending | | |
 | #12–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
@@ -281,3 +281,17 @@ React pagination/01 controlled `pageSize` now writes back through `onPageSizeCha
 Pages `/pagination` React「受控分页」can change 20 → 10. Example-only; no CHANGELOG unpublished bullet.
 
 Next: Phase C #9 Table default pagination uncontrolled.
+
+## #9 notes
+
+Table (Vue + React) default pagination is uncontrolled:
+
+- Vue `tableProps.pagination` factory and React `DEFAULT_TABLE_PAGINATION` use `defaultCurrent: 1` / `defaultPageSize: 10` (no `current` / `pageSize`)
+- Controlled only when the caller explicitly passes `pagination.current` (and `pageSize` independently)
+- Vue still resolves `paginationConfig.current ?? uncontrolled`; React still `isCurrentPageControlled = current !== undefined`
+- Bare `<Table>` (omit pagination) Next now changes rows; explicit bound `current` still needs parent writeback
+- table/04 stays bound; other table examples stay `pagination={false}`; Pagination component / pagination examples (#8) untouched
+
+Pages `/table` bound demo still works. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase C #10 FileManager selectedKeys inner state.
