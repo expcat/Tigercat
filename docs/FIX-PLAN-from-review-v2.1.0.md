@@ -40,7 +40,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #11 | Kanban allowAddCard insert | done | this commit | 2026-08-25 |
 | #12 | ButtonGroup child selectors | done | this commit | 2026-08-25 |
 | #13 | Rate half-star clip | done | this commit | 2026-08-25 |
-| #14–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #14 | Avatar getInitials short token | done | this commit | 2026-08-25 |
+| #15–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -352,3 +353,16 @@ Rate half-star clip in Vue `Rate.ts` / React `Rate.tsx` via core `rateHalfStarIn
 Pages `/rate` 只读 `4.5` 5th star is a left-half clip, not a squashed SVG. Public visual/behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #14 Avatar getInitials (no-space and <=2 chars as-is; `TC` -> `TC`).
+
+## #14 notes
+
+Avatar getInitials short token in core `avatar-utils.ts`:
+
+- No-space token of length <= 2 is returned uppercased (`TC` -> `TC`, `tc` -> `TC`, `A` -> `A`, `张三` -> `张三`)
+- Longer single ASCII token still first letter (`Alice` -> `A`); longer CJK still first 2 (`张三丰` -> `张三`)
+- Two or more words still first letters of the first two (`John Doe` -> `JD`)
+- Vue/React Avatar still call the shared helper; no `name` prop; examples untouched
+
+Pages `/avatar` 代表外观 `text="TC"` shows TC, not T. Public visual/behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #15 Empty 预设一览 (preview shell min-h / overflow-auto so the 5th card is not clipped).

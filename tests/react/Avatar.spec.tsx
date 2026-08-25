@@ -19,6 +19,12 @@ describe('Avatar', () => {
     expect(avatar).toHaveAttribute('aria-label', 'John Doe')
   })
 
+  it('renders a no-space two-letter token as-is', () => {
+    render(<Avatar text="TC" />)
+
+    expect(screen.getByText('TC')).toBeInTheDocument()
+  })
+
   it('renders image with src and alt', () => {
     const { container } = render(
       <Avatar src="/test-avatar.jpg" alt="Test User" data-testid="avatar" />
