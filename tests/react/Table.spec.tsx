@@ -431,6 +431,42 @@ describe('Table', () => {
 
       expect(container.querySelector('[data-tiger-virtual="enabled"]')).toBeInTheDocument()
     })
+
+    it('keeps virtual overflow on an inner scroller around the table, not export or Pagination', () => {
+      const rows = Array.from({ length: 15 }, (_, index) => ({
+        id: index,
+        name: `User ${index}`,
+        age: index,
+        email: `user${index}@example.com`
+      }))
+
+      const { container, getByText } = render(
+        <Table columns={columns} dataSource={rows} virtual virtualHeight={320} exportable />
+      )
+
+      const wrapper = container.querySelector('[data-tiger-virtual="enabled"]') as HTMLElement
+      expect(wrapper).toBeTruthy()
+      expect(wrapper.style.overflow).not.toMatch(/^(auto|scroll)$/)
+      expect(wrapper.style.height).not.toBe('320px')
+      expect(wrapper.className.split(/\s+/)).not.toContain('overflow-y-auto')
+
+      const table = wrapper.querySelector('table')
+      expect(table).toBeTruthy()
+      const scroller = table!.parentElement as HTMLElement
+      expect(scroller).not.toBe(wrapper)
+      expect(scroller.style.height).toBe('320px')
+      expect(scroller.style.overflow).toBe('auto')
+      expect(scroller.contains(table)).toBe(true)
+
+      const exportButton = getByText('Export CSV')
+      expect(wrapper.contains(exportButton)).toBe(true)
+      expect(scroller.contains(exportButton)).toBe(false)
+
+      const pagination = wrapper.querySelector('nav[role="navigation"]')
+      expect(pagination).toBeTruthy()
+      expect(wrapper.contains(pagination)).toBe(true)
+      expect(scroller.contains(pagination)).toBe(false)
+    })
   })
 
   describe('Fixed Columns', () => {

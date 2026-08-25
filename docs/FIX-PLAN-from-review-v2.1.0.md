@@ -63,7 +63,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #31 | DropdownItem close-on-click | done | this commit | 2026-08-25 |
 | #32 | Anchor / ScrollSpy current item | done | this commit | 2026-08-25 |
 | #33 | FloatButton default plus + Group placement/offset/portal | done | this commit | 2026-08-25 |
-| #19–#20, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #35 | Table virtual scroll box overflow only around body | done | this commit | 2026-08-25 |
+| #19–#20, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -713,3 +714,18 @@ FloatButton default plus + Group placement/offset/portal (Vue + React via core h
 Pages /float-button 「悬浮按钮组」 stays in the h-56 box; empty circle/square is no longer icon-less. Public API addition + behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #35 Table virtual scroll box (React overflow only around the table body, not export/Pagination; do not touch iframe/T5).
+
+## #35 notes
+
+React Table virtual / autoVirtual scroll box now matches Vue:
+
+- Inner scroller (height + overflow:auto, onScroll) wraps only the table (colgroup/header/body/summary)
+- Outer wrapper wrapperStyle is maxHeight only; no virtual height/overflow
+- getTableWrapperClasses(bordered, maxHeight) -- no raw virtual / virtualHeight
+- Export button, card list, loading overlay, and Pagination stay siblings outside the scroller
+- Vue Table source untouched (already correct); Vue spec got a contrast case
+- iframe/T5, DemoBlock, VirtualTable, #19 leftover, #20, #38 left alone
+
+Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #38 Sunburst showLabels (draw labels at midAngle, or drop the dead public API/example; do not touch iframe/T5). #20 iframe left for Phase E T5. #19 already landed in A10.
