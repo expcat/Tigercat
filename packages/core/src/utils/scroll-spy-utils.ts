@@ -158,6 +158,7 @@ export function createScrollSpyObserver(
     const root = options.container === window ? null : (options.container as Element)
     return createAnchorObserver(hrefs, {
       offsetTop: offset,
+      bounds: options.bounds ?? 5,
       root,
       onChange: notify
     })

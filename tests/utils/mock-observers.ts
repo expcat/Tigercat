@@ -68,13 +68,24 @@ export class MockIntersectionObserver implements IntersectionObserver {
   readonly thresholds: ReadonlyArray<number>
 
   private callback: IntersectionObserverCallback
+  /** Last observed target; kept for Affix tests that omit `entry.target`. */
   private target: Element | null = null
+  private targets = new Set<Element>()
 
   observe = vi.fn((target: Element) => {
     this.target = target
+    this.targets.add(target)
   })
-  unobserve = vi.fn()
-  disconnect = vi.fn()
+  unobserve = vi.fn((target: Element) => {
+    this.targets.delete(target)
+    if (this.target === target) {
+      this.target = [...this.targets].at(-1) ?? null
+    }
+  })
+  disconnect = vi.fn(() => {
+    this.targets.clear()
+    this.target = null
+  })
   takeRecords = vi.fn(() => [] as IntersectionObserverEntry[])
 
   constructor(callback: IntersectionObserverCallback, options: IntersectionObserverInit = {}) {
@@ -87,20 +98,26 @@ export class MockIntersectionObserver implements IntersectionObserver {
     MockIntersectionObserver.instances.push(this)
   }
 
-  trigger(entry: Partial<IntersectionObserverEntry>) {
-    const target = this.target ?? document.createElement('div')
-    const record: IntersectionObserverEntry = {
-      time: 0,
-      target,
-      rootBounds: new DOMRect(0, 0, 100, 600),
-      boundingClientRect: new DOMRect(),
-      intersectionRect: new DOMRect(),
-      isIntersecting: false,
-      intersectionRatio: 0,
-      ...entry
-    }
+  trigger(entry: Partial<IntersectionObserverEntry> | Partial<IntersectionObserverEntry>[]) {
+    const items = Array.isArray(entry) ? entry : [entry]
+    const records = items.map((item) => {
+      const target =
+        (item.target as Element | undefined) ?? this.target ?? document.createElement('div')
+      const record: IntersectionObserverEntry = {
+        time: 0,
+        target,
+        rootBounds: new DOMRect(0, 0, 100, 600),
+        boundingClientRect: new DOMRect(),
+        intersectionRect: new DOMRect(),
+        isIntersecting: false,
+        intersectionRatio: 0,
+        ...item,
+        target
+      }
+      return record
+    })
 
-    this.callback([record], this)
+    this.callback(records, this)
   }
 
   static reset() {

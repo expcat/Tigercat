@@ -61,7 +61,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
 | #30 | Affix offsetBottom relative to target | done | this commit | 2026-08-25 |
 | #31 | DropdownItem close-on-click | done | this commit | 2026-08-25 |
-| #19–#20, #32–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #32 | Anchor / ScrollSpy current item | done | this commit | 2026-08-25 |
+| #19–#20, #33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -680,3 +681,18 @@ DropdownItem item-level closeOnClick (Vue + React):
 Pages /dropdown 「受控开关」「保持展开」 now stays open. Public API addition recorded in CHANGELOG unpublished.
 
 Next: Phase D #32 Anchor / ScrollSpy current item (last intersecting at the offset line, lock after click until scroll ends; do not touch iframe/T5).
+
+## #32 notes
+
+Anchor / ScrollSpy current item is last-at-offset-line (Vue + React via core helpers):
+
+- Active href is the last link in document order whose section top is at or above `rootTop + offsetTop/targetOffset + bounds` (default bounds 5)
+- Shared `findActiveAnchorAtOffsetLine` used by `findActiveAnchor` and `createAnchorObserver.computeActive`
+- IO is only the change trigger; first-in-top-40%-band (`visible` + `rootMargin: -60%`) is gone
+- Public `bounds` is passed into `createAnchorObserver` (React no longer discards `_bounds`)
+- Click locks via `createProgrammaticScrollLock` until `scrollend` / scroll idle ~150ms / safety 2s; Vue/React Anchor no longer use a 500ms timeout; ScrollSpy now locks too
+- iframe/T5, DemoBlock, #20, #33+ left alone
+
+Pages /anchor 「容器滚动」点「发布」and /scroll-spy last item keep the highlight. Public behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #33 FloatButton (default plus icon; Group placement/offset, optional portal; do not touch iframe/T5).

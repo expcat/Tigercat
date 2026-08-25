@@ -10,12 +10,16 @@ import {
   getElementOffsetTop,
   scrollToAnchor,
   findActiveAnchor,
+  findActiveAnchorAtOffsetLine,
+  createAnchorObserver,
+  createProgrammaticScrollLock,
   getAnchorWrapperClasses,
   getAnchorInkContainerClasses,
   getAnchorInkActiveClasses,
   getAnchorLinkListClasses,
   getAnchorLinkClasses
 } from '@expcat/tigercat-core'
+import { MockIntersectionObserver } from '../utils/mock-observers'
 
 describe('anchor-utils', () => {
   let container: HTMLDivElement
@@ -113,6 +117,39 @@ describe('anchor-utils', () => {
     })
   })
 
+  describe('findActiveAnchorAtOffsetLine', () => {
+    const links = ['#a', '#b', '#c']
+    const tops: Record<string, number> = {
+      '#a': 10,
+      '#b': 50,
+      '#c': 120
+    }
+    const getTop = (href: string): number | null => tops[href] ?? null
+
+    it('picks the last section at or above the offset line, not the first', () => {
+      expect(findActiveAnchorAtOffsetLine(links, getTop, 50)).toBe('#b')
+      expect(findActiveAnchorAtOffsetLine(links, getTop, 49)).toBe('#a')
+      expect(findActiveAnchorAtOffsetLine(links, getTop, 120)).toBe('#c')
+      expect(findActiveAnchorAtOffsetLine(links, getTop, 9)).toBe('#a')
+    })
+
+    it('moves the offset line with bounds at the same scrollTop', () => {
+      // offset line = scrollTop + bounds; tops 10 / 50 / 120
+      // scrollTop 48, bounds 0 → line 48 → #a stays active
+      // scrollTop 48, bounds 5 → line 53 → #b
+      expect(findActiveAnchorAtOffsetLine(links, getTop, 48)).toBe('#a')
+      expect(findActiveAnchorAtOffsetLine(links, getTop, 48 + 5)).toBe('#b')
+    })
+
+    it('returns the first link when no section is at or above the line', () => {
+      expect(findActiveAnchorAtOffsetLine(links, getTop, 0)).toBe('#a')
+    })
+
+    it('returns empty string for empty links', () => {
+      expect(findActiveAnchorAtOffsetLine([], getTop, 50)).toBe('')
+    })
+  })
+
   describe('findActiveAnchor', () => {
     it('should return empty string for empty links array', () => {
       const result = findActiveAnchor([], container, 5, 0)
@@ -159,6 +196,154 @@ describe('anchor-utils', () => {
       container.scrollTop = 600
       const result3 = findActiveAnchor(links, container, 5, 0)
       expect(links).toContain(result3)
+    })
+
+    it('picks the last section at or above the offset line with stubbed offsets', () => {
+      const links = ['#section1', '#section2', '#section3']
+      Object.defineProperty(section1, 'offsetTop', { value: 10, configurable: true })
+      Object.defineProperty(section2, 'offsetTop', { value: 50, configurable: true })
+      Object.defineProperty(section3, 'offsetTop', { value: 120, configurable: true })
+      Object.defineProperty(section1, 'offsetParent', { value: container, configurable: true })
+      Object.defineProperty(section2, 'offsetParent', { value: container, configurable: true })
+      Object.defineProperty(section3, 'offsetParent', { value: container, configurable: true })
+
+      container.scrollTop = 50
+      expect(findActiveAnchor(links, container, 0, 0)).toBe('#section2')
+
+      container.scrollTop = 49
+      expect(findActiveAnchor(links, container, 0, 0)).toBe('#section1')
+    })
+
+    it('keeps the previous section active at the same scrollTop with a smaller bounds', () => {
+      const links = ['#section1', '#section2', '#section3']
+      Object.defineProperty(section1, 'offsetTop', { value: 10, configurable: true })
+      Object.defineProperty(section2, 'offsetTop', { value: 50, configurable: true })
+      Object.defineProperty(section3, 'offsetTop', { value: 120, configurable: true })
+      Object.defineProperty(section1, 'offsetParent', { value: container, configurable: true })
+      Object.defineProperty(section2, 'offsetParent', { value: container, configurable: true })
+      Object.defineProperty(section3, 'offsetParent', { value: container, configurable: true })
+
+      container.scrollTop = 48
+      expect(findActiveAnchor(links, container, 0, 0)).toBe('#section1')
+      expect(findActiveAnchor(links, container, 5, 0)).toBe('#section2')
+    })
+  })
+
+  describe('createAnchorObserver', () => {
+    beforeEach(() => {
+      MockIntersectionObserver.reset()
+      vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it('reports the last-at-offset-line href when first and last both intersect', () => {
+      const spy1 = vi.spyOn(section1, 'getBoundingClientRect')
+      vi.spyOn(section2, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 1100, 100, 40))
+      const spy3 = vi.spyOn(section3, 'getBoundingClientRect')
+      spy1.mockReturnValue(new DOMRect(0, 1000, 100, 40))
+      spy3.mockReturnValue(new DOMRect(0, 1200, 100, 40))
+
+      const onChange = vi.fn()
+      const stop = createAnchorObserver(['#section1', '#section2', '#section3'], {
+        offsetTop: 0,
+        bounds: 5,
+        onChange
+      })
+
+      expect(onChange).toHaveBeenCalledWith('#section1')
+
+      spy1.mockReturnValue(new DOMRect(0, 0, 100, 40))
+      spy3.mockReturnValue(new DOMRect(0, 4, 100, 40))
+
+      const observer = MockIntersectionObserver.instances.at(-1)
+      expect(observer).toBeDefined()
+      observer?.trigger([
+        { target: section1, isIntersecting: true },
+        { target: section3, isIntersecting: true }
+      ])
+
+      expect(onChange).toHaveBeenLastCalledWith('#section3')
+      stop()
+    })
+  })
+
+  describe('createProgrammaticScrollLock', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+      Reflect.deleteProperty(window, 'onscrollend')
+    })
+
+    it('ignores updates while locked and accepts them after idle', () => {
+      const target = document.createElement('div')
+      const lock = createProgrammaticScrollLock(() => target)
+      const accepted: string[] = []
+      const apply = (href: string) => {
+        if (lock.isLocked()) return
+        accepted.push(href)
+      }
+
+      lock.lock()
+      apply('#first')
+      expect(accepted).toEqual([])
+      expect(lock.isLocked()).toBe(true)
+
+      vi.advanceTimersByTime(149)
+      expect(lock.isLocked()).toBe(true)
+      apply('#first')
+      expect(accepted).toEqual([])
+
+      vi.advanceTimersByTime(1)
+      expect(lock.isLocked()).toBe(false)
+      apply('#first')
+      expect(accepted).toEqual(['#first'])
+    })
+
+    it('unlocks on scrollend when the event exists', () => {
+      Object.defineProperty(window, 'onscrollend', {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: null
+      })
+      const target = document.createElement('div')
+      const lock = createProgrammaticScrollLock(() => target)
+      lock.lock()
+      expect(lock.isLocked()).toBe(true)
+      target.dispatchEvent(new Event('scrollend'))
+      expect(lock.isLocked()).toBe(false)
+    })
+
+    it('resets idle on rapid lock so the last click wins', () => {
+      const target = document.createElement('div')
+      const lock = createProgrammaticScrollLock(() => target)
+      lock.lock()
+      vi.advanceTimersByTime(100)
+      lock.lock()
+      vi.advanceTimersByTime(100)
+      expect(lock.isLocked()).toBe(true)
+      vi.advanceTimersByTime(50)
+      expect(lock.isLocked()).toBe(false)
+    })
+
+    it('unlocks after the safety timeout while scroll events keep resetting idle', () => {
+      const target = document.createElement('div')
+      const lock = createProgrammaticScrollLock(() => target)
+      lock.lock()
+      const interval = setInterval(() => {
+        target.dispatchEvent(new Event('scroll'))
+      }, 40)
+      vi.advanceTimersByTime(1999)
+      expect(lock.isLocked()).toBe(true)
+      vi.advanceTimersByTime(1)
+      expect(lock.isLocked()).toBe(false)
+      clearInterval(interval)
     })
   })
 

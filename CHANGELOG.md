@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Anchor / ScrollSpy 当前项按 offset 线取最后一项**：Vue / React 的 active href 是文档序中最后一个 section top 位于 offset 线（`rootTop + offsetTop/targetOffset + bounds`，默认 5）之上或正好压线的项，不再取顶部 40% 带里第一个相交项。点击后锁住当前项直到程序化滚动结束（`scrollend`，否则 scroll idle + 安全超时）。公开 `bounds` 接到 IntersectionObserver 路径。Pages `/anchor`「容器滚动」点「发布」与 `/scroll-spy` 末项保持高亮。公开行为修复。无主题变量变化，无新公开 prop。
 - **DropdownItem `closeOnClick`**：Vue / React 的 DropdownItem 现接受可选 `closeOnClick`（Vue `:close-on-click`）。设置后覆盖父级 Dropdown `closeOnClick`；省略则继承父级（默认 true）。Vue 示例 02「保持展开」现在保持展开；React 示例 02 对齐为同一 item 级 API。公开 API 增补。无主题变量变化。
 - **Affix `offsetBottom` 相对 target 容器底钉住**：Vue / React 经 core `calculateAffixState` 把已固定的 `bottom` 写成 `innerHeight - containerRect.bottom + offset`，钉在 `target` 容器底边上方 `offset` px，不再钉视口/iframe 底。Window target 时 `containerRect.bottom === innerHeight`，`bottom` 仍是 `${offset}px`。`offsetBottom` 的 sentinel 放在内容底（affixed 时在 placeholder 后）。公开行为修复。无主题变量变化，无新 prop。
 - **Vue Radio group `disabled` 继承**：Vue Radio 将 `disabled` 视为 true 或继承 RadioGroup `disabled`（OR，对齐 Checkbox）。Boolean 省略是 `false`，旧的 `!== undefined` 永不继承 group，radio 仍可聚焦而 group onChange 会 bail。React 本就正确继承，未改。公开行为/无障碍修复。无主题变量变化，无新 prop。

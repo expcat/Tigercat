@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  createProgrammaticScrollLock,
   createScrollSpyObserver,
   createScrollSpyPayload,
   flattenScrollSpyItems,
@@ -63,6 +64,7 @@ export const ScrollSpy: React.FC<ScrollSpyProps> = ({
 
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer
+  const scrollLockRef = useRef(createProgrammaticScrollLock(() => getContainerRef.current()))
   const onActiveKeyChangeRef = useRef(onActiveKeyChange)
   onActiveKeyChangeRef.current = onActiveKeyChange
 
@@ -93,9 +95,18 @@ export const ScrollSpy: React.FC<ScrollSpyProps> = ({
       offsetTop,
       targetOffset,
       bounds,
-      onChange: (item) => emitActive(item, 'scroll')
+      onChange: (item) => {
+        if (scrollLockRef.current.isLocked()) return
+        emitActive(item, 'scroll')
+      }
     })
   }, [bounds, emitActive, items, offsetTop, targetOffset])
+
+  useEffect(() => {
+    return () => {
+      scrollLockRef.current.dispose()
+    }
+  }, [])
 
   const handleClick = useCallback(
     (item: ScrollSpyItem, event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -104,6 +115,7 @@ export const ScrollSpy: React.FC<ScrollSpyProps> = ({
 
       onClick?.(item, event)
       emitActive(item, 'click')
+      scrollLockRef.current.lock()
       scrollToScrollSpyItem(item, getContainerRef.current(), targetOffset ?? offsetTop)
     },
     [emitActive, offsetTop, onClick, targetOffset]

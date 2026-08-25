@@ -13,6 +13,7 @@ import type { VNode } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  createProgrammaticScrollLock,
   createScrollSpyObserver,
   createScrollSpyPayload,
   flattenScrollSpyItems,
@@ -100,6 +101,7 @@ export const ScrollSpy = defineComponent({
     )
     const flatItems = computed(() => flattenScrollSpyItems(props.items))
     let stopObserver: (() => void) | null = null
+    const scrollLock = createProgrammaticScrollLock(() => props.getContainer())
 
     const emitActive = (item: ScrollSpyItem, source: ScrollSpyChangePayload['source']) => {
       const nextKeyString = getScrollSpyKeyString(item.key)
@@ -118,7 +120,10 @@ export const ScrollSpy = defineComponent({
         offsetTop: props.offsetTop,
         targetOffset: props.targetOffset,
         bounds: props.bounds,
-        onChange: (item) => emitActive(item, 'scroll')
+        onChange: (item) => {
+          if (scrollLock.isLocked()) return
+          emitActive(item, 'scroll')
+        }
       })
     }
 
@@ -128,6 +133,7 @@ export const ScrollSpy = defineComponent({
 
       emit('click', item, event)
       emitActive(item, 'click')
+      scrollLock.lock()
       scrollToScrollSpyItem(item, props.getContainer(), props.targetOffset ?? props.offsetTop)
     }
 
@@ -157,6 +163,7 @@ export const ScrollSpy = defineComponent({
 
     onBeforeUnmount(() => {
       stopObserver?.()
+      scrollLock.dispose()
     })
 
     const renderItems = (items: ScrollSpyItem[], nested = false): VNode =>
