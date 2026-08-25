@@ -242,6 +242,69 @@ describe('CommentThread (React)', () => {
     expect(screen.getByRole('button', { name: /Like\s+5/ })).toBeInTheDocument()
   })
 
+  describe('like overlay', () => {
+    const likeNodes: CommentNode[] = [{ id: 1, content: 'Root', user: { name: 'A' }, likes: 3 }]
+
+    it('updates Like 3 to Liked 4 without a parent write-back', async () => {
+      render(<CommentThread nodes={likeNodes} />)
+
+      await userEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
+      expect(screen.getByRole('button', { name: /Liked\s+4/ })).toBeInTheDocument()
+
+      await userEvent.click(screen.getByRole('button', { name: /Liked\s+4/ }))
+      expect(screen.getByRole('button', { name: /Like\s+3/ })).toBeInTheDocument()
+    })
+
+    it('calls onLike and still shows Liked 4 from the overlay', async () => {
+      const onLike = vi.fn()
+      render(<CommentThread nodes={likeNodes} onLike={onLike} />)
+
+      await userEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
+
+      expect(onLike).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }), true)
+      expect(screen.getByRole('button', { name: /Liked\s+4/ })).toBeInTheDocument()
+    })
+
+    it('does not double-count when the parent writes liked/likes back', async () => {
+      function Harness() {
+        const [comments, setComments] = React.useState<CommentNode[]>([{ ...likeNodes[0] }])
+        return (
+          <CommentThread
+            nodes={comments}
+            onLike={(node, liked) => {
+              setComments((current) =>
+                current.map((item) =>
+                  item.id === node.id
+                    ? {
+                        ...item,
+                        liked,
+                        likes: Math.max(0, (item.likes ?? 0) + (liked ? 1 : -1))
+                      }
+                    : item
+                )
+              )
+            }}
+          />
+        )
+      }
+
+      render(<Harness />)
+      await userEvent.click(screen.getByRole('button', { name: /Like\s+3/ }))
+      expect(screen.getByRole('button', { name: /Liked\s+4/ })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Liked\s+5/ })).not.toBeInTheDocument()
+    })
+
+    it('uses ConfigProvider zh-CN overlay copy 点赞 3 → 已赞 4', async () => {
+      render(
+        <ConfigProvider locale={zhCN}>
+          <CommentThread nodes={likeNodes} />
+        </ConfigProvider>
+      )
+      await userEvent.click(screen.getByRole('button', { name: /点赞\s+3/ }))
+      expect(screen.getByRole('button', { name: /已赞\s+4/ })).toBeInTheDocument()
+    })
+  })
+
   describe('locale', () => {
     it('uses ConfigProvider zh-CN for like and expand replies', () => {
       const nodes: CommentNode[] = [

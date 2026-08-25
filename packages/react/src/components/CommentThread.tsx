@@ -6,8 +6,12 @@ import {
   formatCommentTime,
   getCommentThreadLabels,
   mergeTigerLocale,
+  nextCommentLikeState,
+  resolveCommentLikeState,
   resolveLocaleText,
+  writeCommentLikeOverlay,
   type CommentAction,
+  type CommentLikeOverlay,
   type CommentNode,
   type CommentThreadProps as CoreCommentThreadProps
 } from '@expcat/tigercat-core'
@@ -90,6 +94,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   const [innerExpandedKeys, setInnerExpandedKeys] =
     useState<Array<string | number>>(defaultExpandedKeys)
   const [expandedAllKeys, setExpandedAllKeys] = useState<Set<string | number>>(new Set())
+  const [likeOverlay, setLikeOverlay] = useState<CommentLikeOverlay>(() => new Map())
   const [replyingTo, setReplyingTo] = useState<string | number | null>(null)
   const [replyValue, setReplyValue] = useState('')
 
@@ -127,6 +132,12 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     onLoadMore?.(node)
   }
 
+  const handleLike = (node: CommentNode) => {
+    const next = nextCommentLikeState(node, likeOverlay)
+    setLikeOverlay(writeCommentLikeOverlay(likeOverlay, node.id, next))
+    onLike?.(node, next.liked)
+  }
+
   const handleReplySubmit = (node: CommentNode) => {
     const trimmed = replyValue.trim()
     if (!trimmed) return
@@ -157,10 +168,11 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     const actions: React.ReactNode[] = []
 
     if (showLike) {
-      const likeLabel = node.liked
+      const { liked, likes } = resolveCommentLikeState(node, likeOverlay)
+      const likeLabel = liked
         ? resolveLocaleText(labels.likedText, likedText)
         : resolveLocaleText(labels.likeText, likeText)
-      const likeCount = node.likes ? ` ${node.likes}` : ''
+      const likeCount = likes ? ` ${likes}` : ''
       actions.push(
         <Button
           key="like"
@@ -169,13 +181,13 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           className={classNames(
             commentThreadActionButtonClasses,
             commentThreadLikeButtonClasses,
-            node.liked && commentThreadLikedButtonClasses
+            liked && commentThreadLikedButtonClasses
           )}
-          onClick={() => onLike?.(node, !node.liked)}>
+          onClick={() => handleLike(node)}>
           <svg
             className={classNames(
               commentThreadLikeIconClasses,
-              node.liked ? 'fill-current' : 'stroke-current fill-none'
+              liked ? 'fill-current' : 'stroke-current fill-none'
             )}
             viewBox="0 0 24 24"
             strokeWidth="2">

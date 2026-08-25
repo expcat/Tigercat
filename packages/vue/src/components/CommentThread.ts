@@ -8,8 +8,12 @@ import {
   formatCommentTime,
   getCommentThreadLabels,
   mergeTigerLocale,
+  nextCommentLikeState,
+  resolveCommentLikeState,
   resolveLocaleText,
+  writeCommentLikeOverlay,
   type CommentAction,
+  type CommentLikeOverlay,
   type CommentNode,
   type CommentThreadProps as CoreCommentThreadProps,
   type TigerLocale,
@@ -170,6 +174,7 @@ export const CommentThread = defineComponent({
 
     const innerExpandedKeys = ref<Array<string | number>>([...props.defaultExpandedKeys])
     const expandedAllKeys = ref(new Set<string | number>())
+    const likeOverlay = ref<CommentLikeOverlay>(new Map())
     const replyingTo = ref<string | number | null>(null)
     const replyValue = ref('')
 
@@ -213,6 +218,12 @@ export const CommentThread = defineComponent({
       emit('load-more', node)
     }
 
+    const handleLike = (node: CommentNode) => {
+      const next = nextCommentLikeState(node, likeOverlay.value)
+      likeOverlay.value = writeCommentLikeOverlay(likeOverlay.value, node.id, next)
+      emit('like', node, next.liked)
+    }
+
     const handleReplySubmit = (node: CommentNode) => {
       const trimmed = replyValue.value.trim()
       if (!trimmed) return
@@ -247,10 +258,11 @@ export const CommentThread = defineComponent({
       const actions: Array<ReturnType<typeof h>> = []
 
       if (props.showLike) {
-        const likeLabel = node.liked
+        const { liked, likes } = resolveCommentLikeState(node, likeOverlay.value)
+        const likeLabel = liked
           ? resolveLocaleText(labels.value.likedText, props.likedText)
           : resolveLocaleText(labels.value.likeText, props.likeText)
-        const likeCount = node.likes ? ` ${node.likes}` : ''
+        const likeCount = likes ? ` ${likes}` : ''
         actions.push(
           h(
             Button,
@@ -261,9 +273,9 @@ export const CommentThread = defineComponent({
               className: classNames(
                 commentThreadActionButtonClasses,
                 commentThreadLikeButtonClasses,
-                node.liked && commentThreadLikedButtonClasses
+                liked && commentThreadLikedButtonClasses
               ),
-              onClick: () => emit('like', node, !node.liked)
+              onClick: () => handleLike(node)
             },
             {
               default: () =>
@@ -273,7 +285,7 @@ export const CommentThread = defineComponent({
                     {
                       class: classNames(
                         commentThreadLikeIconClasses,
-                        node.liked ? 'fill-current' : 'stroke-current fill-none'
+                        liked ? 'fill-current' : 'stroke-current fill-none'
                       ),
                       viewBox: '0 0 24 24',
                       strokeWidth: '2'

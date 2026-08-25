@@ -85,7 +85,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-16 | Upload drag slot (honor default slot; drop bg-white / border-gray-300) | done | this commit | 2026-08-25 |
 | P2-17 | Splitter gutter (bg-gray-200 to token; gutterSize to visual width) | done | this commit | 2026-08-25 |
 | P2-18 | Radar split disk (no --tiger-bg,#ffffff hole; splitArea follows dark) | done | this commit | 2026-08-25 |
-| P2-19..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-19 | CommentThread 01 like (inner liked overlay; same root as FileManager 01) | done | this commit | 2026-08-25 |
+| P2-20 | Tooltip / Popover hover (delay; pointer can enter floating layer) | pending | | |
 
 ## A0 notes
 
@@ -1014,5 +1015,20 @@ RadarChart splitArea no longer punches a white/mint disk; bands follow dark (Vue
 - showSplitArea still false; splitAreaOpacity still 0.06; custom splitAreaColors still wins
 - T1 A0 aliased --tiger-bg but did not change RadarChart or RADAR_SPLIT_AREA_COLORS. No new required prop.
 
-Next: P2-19 CommentThread 01 like (wire @like, or internal liked state; same root as FileManager 01). T1 did not cover it; P2-12 only moved 点赞 copy to locale. Do not skip.
+Next: P2-19 CommentThread 01 like landed in this commit. Then P2-20 Tooltip / Popover hover (add delay; pointer can enter the floating layer before close). T1 A0-A10 did not cover Tooltip/Popover hover close, so do not skip.
+
+
+## P2-19 notes
+
+CommentThread like keeps an inner liked/likes overlay (Vue + React via core helpers):
+
+- resolveCommentLikeState / nextCommentLikeState / writeCommentLikeOverlay store absolute { liked, likes } per node id (not xor/delta)
+- like button label / count / liked class read the overlay; click writes overlay then emit like / onLike(node, nextLiked)
+- does not mutate nodes; no update:nodes
+- Pages /comment-thread 01 unbound (likes: 3, no @like) goes 点赞 3 → 已赞 4 / Like 3 → Liked 4
+- example 02 parent write-back still works without double-count (8 → 已赞 9)
+- examples 01/02 not rewritten (01 stays unbound, same as FileManager 01)
+- T1 A0-A10 did not cover like write-back; P2-12 only moved 点赞 copy to locale. No new required prop.
+
+Next: P2-20 Tooltip / Popover hover (add delay; pointer can enter the floating layer before close). T1 A0-A10 did not cover hover close, so do not skip.
 
