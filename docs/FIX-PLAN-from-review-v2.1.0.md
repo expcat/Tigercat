@@ -71,7 +71,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | P2-2 | Message / Alert token | done | this commit | 2026-08-25 |
 | P2-3 | Menu theme=light | done | this commit | 2026-08-25 |
 | P2-4 | Collapse a11y inert/aria-hidden + extra stopPropagation | done | this commit | 2026-08-25 |
-| P2-5..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
+| P2-5 | parseDate YYYY-MM-DD local calendar day | done | this commit | 2026-08-25 |
+| P2-6..20 | Review 5.2.3 remaining (skip if T1 already covers) | pending | | |
 
 ## A0 notes
 
@@ -818,4 +819,18 @@ Collapse panel a11y in Vue/React `CollapsePanel`:
 
 No new public prop. Transition controller / `panelKey` equality / accordion initial keys / `parseDate` untouched.
 
-Next: P2-5 `parseDate` UTC (`YYYY-MM-DD` as local calendar day, not `new Date(string)`). T1 A0-A10 did not cover parseDate, so do not skip.
+Next: P2-5 `parseDate` UTC landed in this commit. Then P2-6 Cascader / TreeSelect keyboard (non-virtual Arrow/Enter to select; clear button as trigger sibling, align Select). T1 A0-A10 did not cover Cascader/TreeSelect keyboard, so do not skip.
+
+## P2-5 notes
+
+`parseDate` in `packages/core/src/utils/date-utils.ts`:
+
+- Date-only `YYYY-MM-DD` (optional surrounding whitespace) uses local `Date(year, monthIndex, day)` midnight, not `new Date(string)` UTC midnight
+- Impossible calendar days (`2024-02-30`, `2024-13-01`, non-leap `2023-02-29`) return null; leap `2024-02-29` is valid
+- Date instances / null / invalid strings and ISO datetimes with time or offset keep the previous fallback
+- DatePicker / Calendar already call the helper for min/max/value and `moveDayFocus` `data-date` keys (no component fork)
+- datepicker/03 Vue+React min/max are date-only strings so they go through `parseDate`
+
+No new public prop. Cascader / TreeSelect keyboard and Calendar year-view month chip width left for later P2 rows.
+
+Next: P2-6 Cascader / TreeSelect keyboard (non-virtual Arrow/Enter to select; clear button as trigger sibling, align Select). T1 A0-A10 did not cover Cascader/TreeSelect keyboard, so do not skip.

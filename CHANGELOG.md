@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **`parseDate` 将 `YYYY-MM-DD` 按本地日历日解析**：date-only ISO（可带首尾空白）用本地 `Date(year, monthIndex, day)` 午夜，不再走 `new Date(string)` 的 UTC 午夜；西时区下 DatePicker min/max/value 字符串与 Calendar/DatePicker 键盘 `data-date` 不再少一天。非法日历日（`2024-02-30`、非闰年 `02-29`）返回 null。Vue/React 消费共享 helper。公开行为修复。无新公开 prop。
 - **Collapse 折叠面板 `inert` + `aria-hidden`，extra 点击不再切换**：折叠态内容包装层（`data-tiger-collapse-content`）带 HTML `inert` 与 `aria-hidden="true"`，关闭面板正文离开 a11y / 焦点树；展开时两者都不写。header 内 extra（Pages `/collapse` 03「已更新」）点击 `stopPropagation`，不再切换面板。Vue/React。公开无障碍/行为修复。无新公开 prop。
 - **Menu 默认 `theme="light"` 跟随 `html.dark`**：不再把 `--tiger-surface`（及 `--tiger-text` / `--tiger-text-muted` / `--tiger-border` / `--tiger-surface-muted`）锁成浅色 hex；默认继承页面 token。Pages `/menu` 01/03 暗色跟 surface。显式 `theme="dark"` 仍强制深色 chrome。Vue/React 消费 core helpers。公开视觉/主题 chrome 修复。无新公开 prop。
 - **Message / Alert 暗色 chrome 跟 surface + status**：info/success/warning/error 的 bg fallback 改为已注册 `--tiger-surface`，字/图标走已注册 `--tiger-info` / `--tiger-success` / `--tiger-warning` / `--tiger-error`（或 `--tiger-text`），边框走 `--tiger-border`；Alert description 走 `--tiger-text-secondary`，关闭钮 hover 走 `--tiger-surface-muted`。暗色 Pages `/message` / `/alert` 不再锁浅粉彩卡片。可选 `--tiger-message-*` / `--tiger-alert-*` 仍只作一层覆写，不注册进 `THEME_CSS_VARS`。Vue/React 消费 core maps。公开视觉/主题 chrome 修复。无新公开 prop。

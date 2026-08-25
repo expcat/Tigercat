@@ -458,6 +458,20 @@ describe('DatePicker', () => {
       })
     })
 
+    it('treats date-only minDate string as the local calendar day', async () => {
+      const user = userEvent.setup()
+      const { container } = render(<DatePicker value="2024-01-15" minDate="2024-01-10" />)
+
+      const input = container.querySelector('input') as HTMLInputElement
+      await user.click(input)
+
+      await waitFor(() => {
+        expect(document.body.querySelector('[role="dialog"]')).toBeInTheDocument()
+        expect(screen.getByLabelText('2024-01-09')).toBeDisabled()
+        expect(screen.getByLabelText('2024-01-10')).not.toBeDisabled()
+      })
+    })
+
     it('should disable dates after maxDate', async () => {
       const user = userEvent.setup()
       const { container } = render(
