@@ -3,6 +3,7 @@ import type { RateProps as CoreRateProps } from '@expcat/tigercat-core'
 import {
   rateBaseClasses,
   getRateStarClasses,
+  rateHalfStarInnerClasses,
   rateActiveColor,
   rateInactiveColor,
   rateHoverColor,
@@ -155,7 +156,13 @@ export const Rate: React.FC<RateProps> = ({
               isHovering ? rateHoverColor : rateActiveColor
             )}
             style={{ width: '50%' }}>
-            {isChar ? <span>{character}</span> : starIcon}
+            {isChar ? (
+              <span className={rateHalfStarInnerClasses}>{character}</span>
+            ) : (
+              <svg viewBox={starViewBox} fill="currentColor" className={rateHalfStarInnerClasses}>
+                <path d={starPathD} />
+              </svg>
+            )}
           </span>
         </>
       ) : (

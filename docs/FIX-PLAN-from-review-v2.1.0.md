@@ -39,7 +39,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #10 | FileManager selectedKeys inner state | done | this commit | 2026-08-25 |
 | #11 | Kanban allowAddCard insert | done | this commit | 2026-08-25 |
 | #12 | ButtonGroup child selectors | done | this commit | 2026-08-25 |
-| #13–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #13 | Rate half-star clip | done | this commit | 2026-08-25 |
+| #14–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -338,3 +339,16 @@ ButtonGroup child seams in `packages/core/src/utils/button-utils.ts`:
 Public visual/behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #13 Rate half-star (clip layer keeps full-star width; do not squash the SVG).
+
+## #13 notes
+
+Rate half-star clip in Vue `Rate.ts` / React `Rate.tsx` via core `rateHalfStarInnerClasses`:
+
+- Clip wrapper stays `absolute inset-0 overflow-hidden` + inline `width: 50%` (scissors)
+- Inner glyph (default SVG and custom character) is `w-[200%] h-full` so 200% of the 50% clip equals the parent star box
+- Inactive underlay stays a full unclipped star; full/empty stars still `w-full h-full`
+- Click/hover half hit-test and keyboard 0.5 step unchanged; examples / Avatar / ButtonGroup untouched
+
+Pages `/rate` 只读 `4.5` 5th star is a left-half clip, not a squashed SVG. Public visual/behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #14 Avatar getInitials (no-space and <=2 chars as-is; `TC` -> `TC`).

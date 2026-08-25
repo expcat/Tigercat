@@ -3,6 +3,7 @@ import type { RateSize } from '@expcat/tigercat-core'
 import {
   rateBaseClasses,
   getRateStarClasses,
+  rateHalfStarInnerClasses,
   rateActiveColor,
   rateInactiveColor,
   rateHoverColor,
@@ -146,7 +147,7 @@ export const Rate = defineComponent({
                       [h('path', { d: starPathD })]
                     )
               ]),
-              // Active half (clipped left 50%)
+              // Active half (clipped left 50%; inner glyph keeps full-star width)
               h(
                 'span',
                 {
@@ -158,13 +159,13 @@ export const Rate = defineComponent({
                 },
                 [
                   isChar
-                    ? h('span', null, props.character)
+                    ? h('span', { class: rateHalfStarInnerClasses }, props.character)
                     : h(
                         'svg',
                         {
                           viewBox: starViewBox,
                           fill: 'currentColor',
-                          class: 'w-full h-full'
+                          class: rateHalfStarInnerClasses
                         },
                         [h('path', { d: starPathD })]
                       )
