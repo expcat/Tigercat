@@ -381,12 +381,19 @@ export const ScatterChart = defineComponent({
                         })
                       }
 
-                      return h('path', {
-                        key: `point-${index}`,
-                        d: getScatterPointPath(props.pointStyle, point.r),
-                        transform: `translate(${point.cx},${point.cy})`,
-                        ...shared
-                      })
+                      // CSS entrance `transform:scale()` would override an SVG
+                      // transform on the same <path>; keep translate on a wrapper.
+                      return h(
+                        'g',
+                        {
+                          key: `point-${index}`,
+                          transform: `translate(${point.cx},${point.cy})`
+                        },
+                        h('path', {
+                          d: getScatterPointPath(props.pointStyle, point.r),
+                          ...shared
+                        })
+                      )
                     })
                 }
               )

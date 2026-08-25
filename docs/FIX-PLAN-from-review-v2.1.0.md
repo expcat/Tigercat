@@ -47,7 +47,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #29 | Splitter sizes parse + init min | done | this commit | 2026-08-25 |
 | #34 | Calendar mode=year month emit + disabledDate | done | this commit | 2026-08-25 |
 | #36 | OrgChart direction=horizontal keep node size | done | this commit | 2026-08-25 |
-| #15–#16, #19–#27, #30–#33, #35, #37–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
+| #15–#16, #19–#27, #30–#33, #35, #38–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -459,3 +460,17 @@ OrgChart direction=horizontal keeps landscape cards (Vue + React via core flipLa
 Pages /org-chart combination demo shows landscape cards. Public visual/behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #37 Scatter animated non-circle (translate(cx,cy) scale, or CSS scale only on circle).
+
+## #37 notes
+
+Scatter `animated` + non-circle keeps data positions (Vue + React wrap-in-g):
+
+- square / triangle / diamond sit in `<g transform="translate(cx,cy)">`
+- CSS entrance `transform:scale()` applies only to the inner `<path>` (geometry still centered at 0,0)
+- `.tiger-scatter-entrance` also sets `transform-box:fill-box; transform-origin:center`
+- Circles still use `cx`/`cy`; getScatterPointPath geometry unchanged
+- prefers-reduced-motion still zeroes duration/delay
+
+Pages /scatter-chart 01 diamonds stay at mapped (cx,cy), not piled at the plot origin. Public visual/behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #39 ChatWindow onUpdated (Vue drop onUpdated scroll-to-bottom; only watch messages.length).

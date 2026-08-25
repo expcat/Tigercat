@@ -380,13 +380,12 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
             )
           }
 
+          // CSS entrance `transform:scale()` would override an SVG transform on
+          // the same <path>; keep translate on a wrapper so scale stays in place.
           return (
-            <path
-              key={`point-${index}`}
-              d={getScatterPointPath(pointStyle, point.r)}
-              transform={`translate(${point.cx},${point.cy})`}
-              {...sharedProps}
-            />
+            <g key={`point-${index}`} transform={`translate(${point.cx},${point.cy})`}>
+              <path d={getScatterPointPath(pointStyle, point.r)} {...sharedProps} />
+            </g>
           )
         })}
       </ChartSeries>

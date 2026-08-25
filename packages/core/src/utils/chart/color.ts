@@ -118,7 +118,7 @@ export function getScatterHoverSize(baseSize: number): number {
  * CSS animation keyframes and class for scatter entrance animation.
  * Inject once via <style> tag.
  */
-export const SCATTER_ENTRANCE_KEYFRAMES = `@keyframes tiger-scatter-entrance{from{opacity:0;transform:scale(0)}60%{transform:scale(1.15)}to{opacity:1;transform:scale(1)}}@media (prefers-reduced-motion: reduce){.tiger-scatter-entrance{animation-duration:0ms;animation-delay:0ms}}`
+export const SCATTER_ENTRANCE_KEYFRAMES = `@keyframes tiger-scatter-entrance{from{opacity:0;transform:scale(0)}60%{transform:scale(1.15)}to{opacity:1;transform:scale(1)}}.tiger-scatter-entrance{transform-box:fill-box;transform-origin:center}@media (prefers-reduced-motion: reduce){.tiger-scatter-entrance{animation-duration:0ms;animation-delay:0ms}}`
 export const SCATTER_ENTRANCE_CLASS = 'tiger-scatter-entrance'
 
 /**
