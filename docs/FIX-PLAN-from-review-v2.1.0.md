@@ -38,7 +38,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #9 | Table default pagination uncontrolled | done | this commit | 2026-08-25 |
 | #10 | FileManager selectedKeys inner state | done | this commit | 2026-08-25 |
 | #11 | Kanban allowAddCard insert | done | this commit | 2026-08-25 |
-| #12–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #12 | ButtonGroup child selectors | done | this commit | 2026-08-25 |
+| #13–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -322,4 +323,18 @@ TaskBoard / Kanban insert a default card when allowAddCard is on and the consume
 
 Public behavior fix recorded in CHANGELOG unpublished.
 
-Next: Phase D remaining P1 from Review 5.2.2 C (#12–#40).
+Next: Phase D #13 Rate half-star.
+
+
+## #12 notes
+
+ButtonGroup child seams in `packages/core/src/utils/button-utils.ts`:
+
+- Horizontal `buttonGroupItemClasses`: `[&>*:first-child]:!rounded-r-none` / last `!rounded-l-none` / middle `!rounded-none` / `[&>*:not(:first-child)]:-ml-px` / `[&>*:focus]:z-10 relative`
+- Vertical `buttonGroupItemVerticalClasses`: first `!rounded-b-none` / last `!rounded-t-none` / `-mt-px` / same focus
+- Self-selectors `[&:first-child]` removed so classes on the group root (via `getButtonGroupClasses`) style child buttons, aligned with InputGroup compact
+- `!` overrides Button `rounded-[var(--tiger-radius-md)]`. Vue/React wrappers and examples unchanged
+
+Public visual/behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #13 Rate half-star (clip layer keeps full-star width; do not squash the SVG).

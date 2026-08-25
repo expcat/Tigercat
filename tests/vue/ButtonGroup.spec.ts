@@ -60,6 +60,25 @@ describe('ButtonGroup', () => {
       expect(el.className).toContain('flex-col')
     })
 
+    it('applies child-selector classes for adjacent button seams', () => {
+      const { container } = render(ButtonGroup, {
+        slots: { default: () => 'content' }
+      })
+      const el = container.firstElementChild!
+      expect(el.className).toContain('[&>*:first-child]')
+      expect(el.className).toContain('[&>*:not(:first-child)]:-ml-px')
+    })
+
+    it('applies vertical child-selector classes when vertical', () => {
+      const { container } = render(ButtonGroup, {
+        props: { vertical: true },
+        slots: { default: () => 'content' }
+      })
+      const el = container.firstElementChild!
+      expect(el.className).toContain('-mt-px')
+      expect(el.className).toContain('[&>*:first-child]:!rounded-b-none')
+    })
+
     it('applies base inline-flex class', () => {
       const { container } = render(ButtonGroup, {
         slots: { default: () => 'content' }
