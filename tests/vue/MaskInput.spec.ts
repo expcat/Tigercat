@@ -70,8 +70,12 @@ describe('MaskInput', () => {
       const { getByRole, getByText } = render(MaskInput, {
         props: { mask: '##', status: 'error', errorMessage: 'Bad value' }
       })
-      expect(getByRole('textbox')).toHaveAttribute('aria-invalid', 'true')
-      expect(getByText('Bad value')).toBeInTheDocument()
+      const input = getByRole('textbox')
+      const errorEl = getByText('Bad value')
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+      expect(errorEl).toBeInTheDocument()
+      expect(errorEl).toHaveAttribute('aria-live', 'polite')
+      expect(errorEl.className).not.toContain('inset-y-0')
     })
 
     it('has no a11y violations', async () => {

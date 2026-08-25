@@ -207,12 +207,12 @@ export function getInputAffixClasses(
   return classNames(base, posClass, widthClass)
 }
 
-export function getInputErrorClasses(size: ComponentSize = 'md'): string {
-  return classNames(
-    'absolute inset-y-0 right-0 flex items-center pointer-events-none',
-    INPUT_PADDING[size].right,
-    'text-red-500 text-sm'
-  )
+/**
+ * Error message classes — below the field (not an in-field overlay).
+ * `size` is unused; kept so existing callers do not break.
+ */
+export function getInputErrorClasses(_size: ComponentSize = 'md'): string {
+  return classNames('text-red-500 text-sm mt-1 text-left break-words')
 }
 
 function getInputTrailingButtonClasses(size: ComponentSize, rightClass: string): string {

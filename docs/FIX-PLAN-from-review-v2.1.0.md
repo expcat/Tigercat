@@ -45,6 +45,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #16 | Result 状态一览 preview grid | done | this commit | 2026-08-25 |
 | #22 | Input Vue dual buttons | done | this commit | 2026-08-25 |
 | #21 | InputGroup compact | done | this commit | 2026-08-25 |
+| #23 | Input errorMessage below field | done | this commit | 2026-08-25 |
 | #17 | QRCode drop dead `level` / decorative | done | this commit | 2026-08-25 |
 | #18 | ImagePreview maskClosable mask click | done | this commit | 2026-08-25 |
 | #28 | ColorPicker 初值/alpha | done | this commit | 2026-08-25 |
@@ -54,7 +55,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
 | #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
 | #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
-| #19–#20, #23–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #19–#20, #24–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -565,3 +566,17 @@ InputGroup compact joins Input/Textarea with adjacent addons/buttons (Vue + Reac
 Pages `/input-group` 01 Input+Button no longer look like separate capsules. Public visual/behavior fix recorded in CHANGELOG unpublished. New helpers `getInputChromeClasses` / `getInputFieldClasses` from the existing input-styles barrel.
 
 Next: Phase D #23 Input errorMessage (move below the field + aria-live/aria-describedby; do not touch iframe/T5).
+
+## #23 notes
+
+Input `errorMessage` sits below the chrome field (Vue + React via core class string):
+
+- `getInputErrorClasses` is `text-red-500 text-sm mt-1 text-left break-words` (no `absolute inset-y-0 right-0`)
+- Error is a sibling of the chrome wrapper inside a `w-full` shell (order: error then count); no-error/no-count root stays the chrome wrapper
+- Error node has `aria-live="polite"`; input keeps `aria-describedby` and `aria-invalid`
+- Clear / password / suffix stay when an error is shown; Vue `#22` dual-suffix offsets unchanged
+- MaskInput only shared helper + `aria-live` (still mutexes clear; no #24 raw submit)
+
+Pages callers with a long `errorMessage` no longer cover the value. Public visual/a11y fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #25 Signature strokes (`setPointerCapture` / document up; do not touch iframe/T5).

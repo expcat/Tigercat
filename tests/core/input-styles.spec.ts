@@ -3,6 +3,7 @@ import {
   getInputChromeClasses,
   getInputClasses,
   getInputClearButtonClasses,
+  getInputErrorClasses,
   getInputFieldClasses,
   getInputPasswordToggleClasses,
   getInputWrapperClasses
@@ -55,5 +56,21 @@ describe('input-styles chrome vs field', () => {
       'pr-20'
     )
     expect(tokens(getInputFieldClasses({ hasSuffix: true }))).toContain('pr-10')
+  })
+})
+
+describe('input-styles error message', () => {
+  it('places error copy below the field, not as an in-field overlay', () => {
+    const cls = getInputErrorClasses()
+    const sm = getInputErrorClasses('sm')
+
+    expect(cls).toContain('text-red-500')
+    expect(cls).toContain('mt-1')
+    expect(cls).not.toContain('inset-y-0')
+    expect(tokens(cls)).not.toContain('absolute')
+    expect(cls).not.toContain('right-0')
+    expect(sm).toContain('text-red-500')
+    expect(sm).toContain('mt-1')
+    expect(sm).not.toContain('inset-y-0')
   })
 })

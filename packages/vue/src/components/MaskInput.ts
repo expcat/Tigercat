@@ -240,7 +240,7 @@ export const MaskInput = defineComponent({
         children.push(
           h(
             'div',
-            { id: errorMsgId, class: getInputErrorClasses(props.size) },
+            { id: errorMsgId, class: getInputErrorClasses(props.size), 'aria-live': 'polite' },
             effectiveErrorMessage.value
           )
         )

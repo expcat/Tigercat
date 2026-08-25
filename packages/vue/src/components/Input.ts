@@ -273,7 +273,7 @@ export const Input = defineComponent({
       const showClear =
         props.clearable && !props.disabled && !props.readonly && currentValStr.length > 0
       const showPasswordToggle = props.showPassword && props.type === 'password' && !props.disabled
-      const dualSuffix = !activeError.value && showClear && showPasswordToggle
+      const dualSuffix = showClear && showPasswordToggle
       const inputClasses = getInputFieldClasses({
         size: effectiveSize.value,
         status: effectiveStatus.value,
@@ -284,57 +284,47 @@ export const Input = defineComponent({
 
       const suffixNodes: ReturnType<typeof h>[] = []
 
-      if (activeError.value) {
+      if (showClear) {
+        suffixNodes.push(
+          h(
+            'button',
+            {
+              type: 'button',
+              class: getInputClearButtonClasses(
+                effectiveSize.value,
+                dualSuffix ? { offset: true } : undefined
+              ),
+              onClick: handleClear,
+              'aria-label': 'Clear input',
+              tabindex: -1
+            },
+            '✕'
+          )
+        )
+      }
+      if (showPasswordToggle) {
+        suffixNodes.push(
+          h(
+            'button',
+            {
+              type: 'button',
+              class: getInputPasswordToggleClasses(effectiveSize.value),
+              onClick: togglePasswordVisibility,
+              'aria-label': passwordVisible.value ? 'Hide password' : 'Show password',
+              tabindex: -1
+            },
+            passwordVisible.value ? '🙈' : '👁'
+          )
+        )
+      }
+      if (!showClear && !showPasswordToggle && hasSuffix.value) {
         suffixNodes.push(
           h(
             'div',
-            { id: errorMsgId, class: getInputErrorClasses(effectiveSize.value) },
-            effectiveErrorMessage.value
+            { class: getInputAffixClasses('suffix', effectiveSize.value) },
+            slots.suffix ? slots.suffix() : props.suffix
           )
         )
-      } else {
-        if (showClear) {
-          suffixNodes.push(
-            h(
-              'button',
-              {
-                type: 'button',
-                class: getInputClearButtonClasses(
-                  effectiveSize.value,
-                  dualSuffix ? { offset: true } : undefined
-                ),
-                onClick: handleClear,
-                'aria-label': 'Clear input',
-                tabindex: -1
-              },
-              '✕'
-            )
-          )
-        }
-        if (showPasswordToggle) {
-          suffixNodes.push(
-            h(
-              'button',
-              {
-                type: 'button',
-                class: getInputPasswordToggleClasses(effectiveSize.value),
-                onClick: togglePasswordVisibility,
-                'aria-label': passwordVisible.value ? 'Hide password' : 'Show password',
-                tabindex: -1
-              },
-              passwordVisible.value ? '🙈' : '👁'
-            )
-          )
-        }
-        if (!showClear && !showPasswordToggle && hasSuffix.value) {
-          suffixNodes.push(
-            h(
-              'div',
-              { class: getInputAffixClasses('suffix', effectiveSize.value) },
-              slots.suffix ? slots.suffix() : props.suffix
-            )
-          )
-        }
       }
 
       const wrapperChildren = [
@@ -370,32 +360,47 @@ export const Input = defineComponent({
         ...suffixNodes
       ]
 
-      const nodes = [
-        h(
-          'div',
-          {
-            ref: wrapperRef,
-            class: classNames(
-              getInputWrapperClasses(effectiveStatus.value),
-              props.className,
-              coerceClassValue(attrClass)
-            ),
-            style: [attrStyle, props.style],
-            onAnimationend: handleAnimationEnd
-          },
-          wrapperChildren
-        )
-      ]
+      const chromeNode = h(
+        'div',
+        {
+          ref: wrapperRef,
+          class: classNames(
+            getInputWrapperClasses(effectiveStatus.value),
+            props.className,
+            coerceClassValue(attrClass)
+          ),
+          style: [attrStyle, props.style],
+          onAnimationend: handleAnimationEnd
+        },
+        wrapperChildren
+      )
 
+      // Extras sit below the chrome: error first, then count.
+      const extras: ReturnType<typeof h>[] = []
+      if (activeError.value) {
+        extras.push(
+          h(
+            'div',
+            {
+              id: errorMsgId,
+              class: getInputErrorClasses(effectiveSize.value),
+              'aria-live': 'polite'
+            },
+            effectiveErrorMessage.value
+          )
+        )
+      }
       if (props.showCount) {
         const count = currentValStr.length
         const isOver = props.maxLength !== undefined && count > props.maxLength
         const countText =
           props.maxLength !== undefined ? `${count} / ${props.maxLength}` : `${count}`
-        nodes.push(h('div', { class: getInputCountClasses(isOver) }, countText))
+        extras.push(h('div', { class: getInputCountClasses(isOver) }, countText))
       }
 
-      return nodes.length === 1 ? nodes[0] : h('div', null, nodes)
+      return extras.length === 0
+        ? chromeNode
+        : h('div', { class: 'w-full' }, [chromeNode, ...extras])
     }
   }
 })

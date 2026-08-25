@@ -182,13 +182,6 @@ export const Input: React.FC<InputProps> = ({
   })
 
   const renderSuffix = () => {
-    if (activeError) {
-      return (
-        <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)}>
-          {errorMessage}
-        </div>
-      )
-    }
     if (showClear) {
       return (
         <button
@@ -253,17 +246,38 @@ export const Input: React.FC<InputProps> = ({
     </div>
   )
 
+  // Extras sit below the chrome: error first, then count.
+  const extras: React.ReactNode[] = []
+  if (activeError) {
+    extras.push(
+      <div
+        key="error"
+        id={errorMsgId}
+        className={getInputErrorClasses(effectiveSize)}
+        aria-live="polite">
+        {errorMessage}
+      </div>
+    )
+  }
   if (showCount) {
     const count = currentValStr.length
     const isOver = maxLength !== undefined && count > maxLength
     const countText = maxLength !== undefined ? `${count} / ${maxLength}` : `${count}`
-    return (
-      <div>
-        {wrapperNode}
-        <div className={getInputCountClasses(isOver)}>{countText}</div>
+    extras.push(
+      <div key="count" className={getInputCountClasses(isOver)}>
+        {countText}
       </div>
     )
   }
 
-  return wrapperNode
+  if (extras.length === 0) {
+    return wrapperNode
+  }
+
+  return (
+    <div className="w-full">
+      {wrapperNode}
+      {extras}
+    </div>
+  )
 }

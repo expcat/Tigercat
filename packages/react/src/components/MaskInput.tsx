@@ -222,7 +222,7 @@ export const MaskInput: React.FC<MaskInputProps> = ({
         onBlur={onBlur}
       />
       {activeError ? (
-        <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)}>
+        <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)} aria-live="polite">
           {errorMessage}
         </div>
       ) : (
