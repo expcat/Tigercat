@@ -49,6 +49,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #25 | Signature strokes setPointerCapture / document up | done | this commit | 2026-08-25 |
 | #24 | MaskInput hidden raw submit | done | this commit | 2026-08-25 |
 | #26 | InputNumber attrs onto spinbutton | done | this commit | 2026-08-25 |
+| #27 | Vue Radio group disabled | done | this commit | 2026-08-25 |
 | #17 | QRCode drop dead `level` / decorative | done | this commit | 2026-08-25 |
 | #18 | ImagePreview maskClosable mask click | done | this commit | 2026-08-25 |
 | #28 | ColorPicker 初值/alpha | done | this commit | 2026-08-25 |
@@ -58,7 +59,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
 | #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
 | #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
-| #19–#20, #27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #19–#20, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -626,5 +627,20 @@ InputNumber leftover attrs land on `role="spinbutton"` (Vue + React):
 
 Pages callers can label the spinbutton with `aria-label`. Public a11y/attr-forwarding fix recorded in CHANGELOG unpublished.
 
-Next: Phase D #27 Vue Radio group disabled (`disabled` true or inherit group; do not use `!== undefined`; do not touch iframe/T5).
+Next: Phase D #30 Affix offsetBottom (relative to `target` container bottom, or sticky; do not touch iframe/T5).
 
+
+## #27 notes
+
+Vue Radio inherits RadioGroup `disabled` with Checkbox-style OR:
+
+- `actualDisabled` is `props.disabled || groupContext.value?.disabled || false`
+- Vue Boolean omitted is `false`, so the old `!== undefined` never inherited the group; radios stayed focusable while group `onChange` bailed
+- Native `input[type=radio]` is actually `disabled` (not only group onChange bail)
+- Child `disabled=true` in a live group still disables that child; standalone omitted stays enabled
+- React already inherited correctly (`disabled !== undefined` is valid there) and was not changed
+- RadioGroup / Checkbox / InputNumber / iframe/T5 left alone
+
+Pages callers that wrap radios in `<RadioGroup disabled>` now disable and skip the native inputs. Public behavior / a11y fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #30 Affix `offsetBottom` (relative to `target` container bottom, or sticky; do not touch iframe/T5).

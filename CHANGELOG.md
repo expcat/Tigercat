@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Vue Radio group `disabled` 继承**：Vue Radio 将 `disabled` 视为 true 或继承 RadioGroup `disabled`（OR，对齐 Checkbox）。Boolean 省略是 `false`，旧的 `!== undefined` 永不继承 group，radio 仍可聚焦而 group onChange 会 bail。React 本就正确继承，未改。公开行为/无障碍修复。无主题变量变化，无新 prop。
 - **InputNumber leftover attrs 落到 spinbutton**：Vue / React 把未声明的 HTML attrs（`aria-label`、`data-*` 等）转发到 `role="spinbutton"` 的 input 上。Vue `inheritAttrs:false` 原先只把 `class` 合到 wrapper；React 丢掉未声明 attrs。`class` / `className` 仍作用在 wrapper。公开无障碍/属性转发修复。React props 类型放宽为可接受原生 input 属性（`size`/`value`/`onChange`/`min`/`max`/`step` 等已 Omit）。无主题变量变化，无新具名 prop。
 - **MaskInput `name` 提交 raw**：Vue / React 在设置 `name` 时渲染隐藏 input 提交 raw 值，可见框只展示掩码且不带 `name`，原生 form 提交 `12345678` 而不是 `12/34/5678`。公开行为修复，对齐既有 `name` JSDoc；无主题变量变化，无新公开 prop。
 - **Signature 拖出垫面结束笔画**：Vue / React 在 pointerdown 时对 canvas 调用 `setPointerCapture`，并在 `lostpointercapture` 与 document `pointerup`/`pointercancel` 上走同一条 `finishStroke`，拖出垫面不再把 `activeStroke` 卡住。公开行为修复，无主题变量变化，无新公开 prop。

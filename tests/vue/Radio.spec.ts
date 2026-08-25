@@ -70,6 +70,17 @@ describe('Radio', () => {
       expect(getRadio(container)).toBeDisabled()
     })
 
+    it('should not be disabled when disabled is omitted', () => {
+      const { container } = render(Radio, {
+        props: { value: 'option1' },
+        slots: { default: 'Option 1' }
+      })
+      const radio = getRadio(container)
+      expect(radio).not.toBeDisabled()
+      radio.focus()
+      expect(radio).toHaveFocus()
+    })
+
     it('should prioritize modelValue over defaultValue', () => {
       const { container } = render(Radio, {
         props: { value: 'option1', modelValue: false, defaultValue: true },
@@ -258,8 +269,42 @@ describe('Radio', () => {
         }
       })
       const { container } = render(Wrapper)
-      await fireEvent.click(getRadios(container)[0])
+      const inputs = getRadios(container)
+      inputs.forEach((input) => {
+        expect(input).toBeDisabled()
+      })
+      await fireEvent.click(inputs[0])
       expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('should disable native inputs that omit disabled when the group is disabled', () => {
+      const { container } = renderGroup(`
+        <RadioGroup disabled>
+          <Radio value="a">A</Radio>
+          <Radio value="b">B</Radio>
+        </RadioGroup>
+      `)
+      const inputs = getRadios(container)
+      expect(inputs).toHaveLength(2)
+      inputs.forEach((input) => {
+        expect(input).toBeDisabled()
+        input.focus()
+        expect(input).not.toHaveFocus()
+      })
+    })
+
+    it('should disable only the child that sets disabled inside a non-disabled group', () => {
+      const { container } = renderGroup(`
+        <RadioGroup>
+          <Radio value="a">A</Radio>
+          <Radio value="b" disabled>B</Radio>
+          <Radio value="c">C</Radio>
+        </RadioGroup>
+      `)
+      const inputs = getRadios(container)
+      expect(inputs[0]).not.toBeDisabled()
+      expect(inputs[1]).toBeDisabled()
+      expect(inputs[2]).not.toBeDisabled()
     })
     it('should emit change and update:modelValue with the selected value', async () => {
       const onChange = vi.fn()
