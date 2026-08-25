@@ -100,6 +100,24 @@ describe('org-chart-utils', () => {
     expect(ceo?.y).toBe(90)
     expect(eng?.x).toBe(100)
     expect(eng?.y).toBe(0)
+    expect(ceo?.width).toBe(100)
+    expect(ceo?.height).toBe(40)
+    expect(eng?.width).toBe(100)
+    expect(eng?.height).toBe(40)
+    expect(layout.nodes.every((node) => node.width === 100 && node.height === 40)).toBe(true)
+  })
+
+  it('keeps default nodeWidth x nodeHeight when direction is horizontal', () => {
+    const layout = computeOrgChartLayout(orgData, { direction: 'horizontal' })
+
+    expect(layout.nodes.every((node) => node.width === 160 && node.height === 72)).toBe(true)
+    expect(layout.nodes.some((node) => node.width === 72 && node.height === 160)).toBe(false)
+  })
+
+  it('keeps default nodeWidth x nodeHeight in vertical layout', () => {
+    const layout = computeOrgChartLayout(orgData)
+
+    expect(layout.nodes.every((node) => node.width === 160 && node.height === 72)).toBe(true)
   })
 
   it('builds stable curved link paths', () => {

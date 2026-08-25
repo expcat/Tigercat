@@ -46,7 +46,8 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #28 | ColorPicker 初值/alpha | done | this commit | 2026-08-25 |
 | #29 | Splitter sizes parse + init min | done | this commit | 2026-08-25 |
 | #34 | Calendar mode=year month emit + disabledDate | done | this commit | 2026-08-25 |
-| #15–#16, #19–#27, #30–#33, #35–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #36 | OrgChart direction=horizontal keep node size | done | this commit | 2026-08-25 |
+| #15–#16, #19–#27, #30–#33, #35, #37–#40 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -444,3 +445,17 @@ Calendar year-mode month chips emit + disabledDate (Vue + React) via core isCale
 Pages /calendar second block shows Sat/Sun disabled. Public behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #36 OrgChart direction=horizontal (flipLayoutNode only swap x/y, keep nodeWidth x nodeHeight).
+
+## #36 notes
+
+OrgChart direction=horizontal keeps landscape cards (Vue + React via core flipLayoutNode):
+
+- flipLayoutNode only swaps x/y; width/height stay nodeWidth x nodeHeight
+- Default 160x72 is not swapped into 72x160 bars; custom 100x40 stays 100x40
+- Existing horizontal coords still hold (ceo x=0 y=90, eng x=100 y=0 with 100x40)
+- Vertical layout unchanged; A7 node fill/title tokens untouched
+- flipLayoutLink still coordinate-only (attachments may sit on the short side)
+
+Pages /org-chart combination demo shows landscape cards. Public visual/behavior fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #37 Scatter animated non-circle (translate(cx,cy) scale, or CSS scale only on circle).

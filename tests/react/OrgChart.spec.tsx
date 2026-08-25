@@ -80,6 +80,9 @@ describe('OrgChart', () => {
     const { container } = render(<OrgChart data={data} direction="horizontal" />)
 
     expect(container.querySelector('[data-series-type="org-chart"]')).toBeInTheDocument()
+    const nodeRect = container.querySelector('[data-org-chart-nodes="true"] > g > rect')
+    expect(nodeRect).toHaveAttribute('width', '160')
+    expect(nodeRect).toHaveAttribute('height', '72')
   })
   it('hides subtitles when disabled', () => {
     const { queryByText } = render(<OrgChart data={data} showSubtitles={false} />)

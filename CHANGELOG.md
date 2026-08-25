@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **OrgChart `direction=horizontal` 保持 nodeWidth × nodeHeight**：Vue / React 经 core `flipLayoutNode` 横向布局只交换 x/y，节点盒保持 `nodeWidth` × `nodeHeight`（默认 160×72），不再把卡片拧成 72×160 竖条。Pages `/org-chart`「组合展示」横卡可完整显示姓名与职称。公开视觉/行为修复，无主题变量变化，无新公开 prop。
 - **Calendar 年视图月份芯片 emit 该月 1 日并按 disabledDate 禁月**：Vue / React `mode="year"` 点击（及 Enter/Space）月份芯片会通过 `update:modelValue` / `change` / `onChange` 写出该月 1 日（本地 Date），并仍发出 `panel-change` / `onPanelChange`。`disabledDate` 在该月每一天都被禁时禁用该芯片（周末-only 不会禁任何月）。示例 02 改为全屏月视图以展示周末禁日。Pages `/calendar` 禁用日期块可见周六/周日不可选。公开行为修复，无主题变量变化，无新公开 prop。
 - **Splitter `sizes` 解析与初始化 min**：Vue / React 的 `sizes` 现接受像素数字与 `'30%'` / `'200px'` 字符串（经 core `parsePaneSize` / `calculateInitialSizes`）；挂载时对每格 `clampPaneSize(min, max)`，`[30,70]` + `min={100}` 不再是 30px 细条，首次拖拽也不会塌成 `[0,100]`。示例 01–03 改为百分比字符串。Pages `/splitter` 水平/垂直/嵌套展示比例。公开 API 放宽 + 行为修复，无主题变量变化。
 - **ColorPicker rgba/hsla 解析与 showAlpha emit**：`parseColorInput` 现接受 `rgba`/`hsla`（及 `hsl`）；Vue / React 用解析后的 RGB+alpha 画触发色块，不再把 rgba 交给 `hexToRgb`。`showAlpha` 滑条会发出带 alpha 的字符串（`update:modelValue` / `onChange`）。Pages `/color-picker`「代表配置」不再是黑块。公开行为修复，无主题变量变化。

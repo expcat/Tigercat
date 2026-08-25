@@ -217,9 +217,7 @@ function flipLayoutNode(node: OrgChartLayoutNode): OrgChartLayoutNode {
   return {
     ...node,
     x: node.y,
-    y: node.x,
-    width: node.height,
-    height: node.width
+    y: node.x
   }
 }
 
