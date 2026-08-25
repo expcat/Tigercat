@@ -333,6 +333,7 @@ export const InputNumber = defineComponent({
     onBeforeUnmount(() => repeatController.stop())
 
     return () => {
+      const { class: _attrClass, style: attrStyle, ...restAttrs } = attrs
       const children: ReturnType<typeof h>[] = []
 
       // Left-side minus button (both mode)
@@ -373,6 +374,7 @@ export const InputNumber = defineComponent({
       // Input element
       children.push(
         h('input', {
+          ...restAttrs,
           ref: inputRef,
           type: 'text',
           inputmode: 'decimal',
@@ -494,7 +496,8 @@ export const InputNumber = defineComponent({
       return h(
         'div',
         {
-          class: wrapperClasses.value
+          class: wrapperClasses.value,
+          style: attrStyle
         },
         children
       )

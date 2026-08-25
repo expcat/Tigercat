@@ -26,7 +26,22 @@ import {
 import { useControlledState } from '../hooks/useControlledState'
 import { useInputGroupContext } from './InputGroup'
 
-export interface InputNumberProps extends CoreInputNumberProps {
+export interface InputNumberProps
+  extends
+    CoreInputNumberProps,
+    Omit<
+      React.InputHTMLAttributes<HTMLInputElement>,
+      | 'size'
+      | 'value'
+      | 'defaultValue'
+      | 'onChange'
+      | 'onFocus'
+      | 'onBlur'
+      | 'min'
+      | 'max'
+      | 'step'
+      | 'readOnly'
+    > {
   /**
    * Change handler (called with committed value)
    */
@@ -73,7 +88,9 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   onChange,
   onFocus,
   onBlur,
-  className
+  className,
+  style,
+  ...rest
 }) => {
   const inputGroup = useInputGroupContext()
   const effectiveSize = size ?? inputGroup?.size ?? 'md'
@@ -228,7 +245,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   )
 
   return (
-    <div className={wrapperClasses}>
+    <div className={wrapperClasses} style={style}>
       {/* Left-side minus button (both mode) */}
       {controls && controlsPosition === 'both' && (
         <button
@@ -256,6 +273,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
 
       {/* Input */}
       <input
+        {...rest}
         ref={inputRef}
         type="text"
         inputMode="decimal"

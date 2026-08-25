@@ -48,6 +48,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #23 | Input errorMessage below field | done | this commit | 2026-08-25 |
 | #25 | Signature strokes setPointerCapture / document up | done | this commit | 2026-08-25 |
 | #24 | MaskInput hidden raw submit | done | this commit | 2026-08-25 |
+| #26 | InputNumber attrs onto spinbutton | done | this commit | 2026-08-25 |
 | #17 | QRCode drop dead `level` / decorative | done | this commit | 2026-08-25 |
 | #18 | ImagePreview maskClosable mask click | done | this commit | 2026-08-25 |
 | #28 | ColorPicker 初值/alpha | done | this commit | 2026-08-25 |
@@ -57,7 +58,7 @@ Branch: `fix/review-v2.1.0`. One numbered task per commit. Do not push from this
 | #37 | Scatter animated non-circle keep translate | done | this commit | 2026-08-25 |
 | #39 | ChatWindow Vue drop onUpdated scroll | done | this commit | 2026-08-25 |
 | #40 | TaskBoard 过滤下落点 | done | this commit | 2026-08-25 |
-| #19–#20, #26–#27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
+| #19–#20, #27, #30–#33, #35, #38 | Remaining P1 (Review 5.2.2 C) | pending | | |
 | T5 | Pages sandbox viewport | pending | | |
 | P2-1..20 | Review 5.2.3 (skip if T1 already covers) | pending | | |
 
@@ -612,3 +613,18 @@ MaskInput (Vue + React) submits raw when `name` is set:
 Pages callers that put MaskInput in a named form now submit raw. Public behavior fix recorded in CHANGELOG unpublished.
 
 Next: Phase D #26 InputNumber attrs (`aria-label`/`data-*` onto `role="spinbutton"`; do not touch iframe/T5).
+
+## #26 notes
+
+InputNumber leftover attrs land on `role="spinbutton"` (Vue + React):
+
+- Vue `inheritAttrs:false` peels `class`/`style`; `restAttrs` spread onto the spinbutton first, then owned role / aria-valuemin/max/now / value / handlers
+- React `...rest` after known props; `InputNumberProps` widened with `Omit<InputHTMLAttributes, size|value|defaultValue|onChange|onFocus|onBlur|min|max|step|readOnly>`
+- `class` / `className` (and `style`) stay on the wrapper chrome
+- Field `aria-label` / `data-*` do not land on the wrapper or replace Increase/Decrease button names
+- No new named `ariaLabel` prop. Stepping / clamp / precision / keyboard / controls / #27 Radio / iframe/T5 left alone
+
+Pages callers can label the spinbutton with `aria-label`. Public a11y/attr-forwarding fix recorded in CHANGELOG unpublished.
+
+Next: Phase D #27 Vue Radio group disabled (`disabled` true or inherit group; do not use `!== undefined`; do not touch iframe/T5).
+

@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **InputNumber leftover attrs 落到 spinbutton**：Vue / React 把未声明的 HTML attrs（`aria-label`、`data-*` 等）转发到 `role="spinbutton"` 的 input 上。Vue `inheritAttrs:false` 原先只把 `class` 合到 wrapper；React 丢掉未声明 attrs。`class` / `className` 仍作用在 wrapper。公开无障碍/属性转发修复。React props 类型放宽为可接受原生 input 属性（`size`/`value`/`onChange`/`min`/`max`/`step` 等已 Omit）。无主题变量变化，无新具名 prop。
 - **MaskInput `name` 提交 raw**：Vue / React 在设置 `name` 时渲染隐藏 input 提交 raw 值，可见框只展示掩码且不带 `name`，原生 form 提交 `12345678` 而不是 `12/34/5678`。公开行为修复，对齐既有 `name` JSDoc；无主题变量变化，无新公开 prop。
 - **Signature 拖出垫面结束笔画**：Vue / React 在 pointerdown 时对 canvas 调用 `setPointerCapture`，并在 `lostpointercapture` 与 document `pointerup`/`pointercancel` 上走同一条 `finishStroke`，拖出垫面不再把 `activeStroke` 卡住。公开行为修复，无主题变量变化，无新公开 prop。
 - **Input `errorMessage` 移到字段下方**：Vue / React 不再用 `absolute inset-y-0 right-0` 把错误文案叠在值区里；错误节点作为 chrome 边框盒的兄弟（`w-full` 外壳内，顺序为 error 再 count）渲染在字段下方，并带 `aria-live="polite"`，输入框仍用 `aria-describedby` 指向该节点。Clear / 密码显隐 / suffix 在有错误时仍可用。MaskInput 共用 `getInputErrorClasses`，错误节点同样改为块级并加 `aria-live`。公开视觉/无障碍修复，无主题变量变化，无新公开 prop。
